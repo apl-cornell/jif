@@ -1,0 +1,24 @@
+package jif.translate;
+
+import polyglot.ast.*;
+import polyglot.ext.jl.ast.*;
+import jif.ast.*;
+import polyglot.types.*;
+import polyglot.ext.jl.types.*;
+import jif.types.*;
+import polyglot.visit.*;
+
+public class ReturnToJavaExt_c extends ToJavaExt_c {
+    public Node toJava(JifToJavaRewriter rw) throws SemanticException {
+        Return n = (Return) node();
+        n = (Return) super.toJava(rw);
+
+        // Rewrite constructor returns to return this.
+        if (rw.inConstructor()) {
+            NodeFactory nf = rw.java_nf();
+            return n.expr(nf.This(n.position()).type(rw.currentClass()));
+        }
+
+        return n;
+    }
+}

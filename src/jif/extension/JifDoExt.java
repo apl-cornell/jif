@@ -1,0 +1,77 @@
+package jif.extension;
+
+import jif.translate.ToJavaExt;
+import jif.types.*;
+import jif.types.label.Label;
+import jif.visit.LabelChecker;
+import polyglot.ast.*;
+import polyglot.types.SemanticException;
+
+/** The Jif extension of the <code>Do</code> node. 
+ * 
+ *  @see polyglot.ast.Do
+ */
+public class JifDoExt extends JifStmtExt_c
+{
+    public JifDoExt(ToJavaExt toJava) {
+        super(toJava);
+    }
+
+    public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
+	Do ds = (Do) node();
+
+	JifTypeSystem ts = (JifTypeSystem) lc.typeSystem();
+	JifContext A = (JifContext) lc.context();
+        A = (JifContext) ds.enterScope(A);
+
+        Label L1 = ts.freshLabelVariable(node().position(), "do", 
+                    "label of PC for the do statement at " + node().position());
+
+        A = (JifContext) A.pushBlock();
+
+        A.setPc(L1);
+        A.gotoLabel(Branch.CONTINUE, null, L1);
+        A.gotoLabel(Branch.BREAK, null, L1);
+
+	Expr e = (Expr) lc.context(A).labelCheck(ds.cond());
+        PathMap Xe = X(e);
+
+        A = (JifContext) A.pushBlock();
+
+        A.setPc(Xe.NV());
+
+	Stmt s = (Stmt) lc.context(A).labelCheck(ds.body());
+        PathMap Xs = X(s);
+
+        A = (JifContext) A.pop();
+        A = (JifContext) A.pop();
+
+        lc.constrain(new LabelConstraint(new NamedLabel("do_while_body.N",
+                                                        "label of normal termination of the loop body", 
+                                                        Xs.N()), 
+                                         LabelConstraint.LEQ, 
+                                         new NamedLabel("loop_pc",
+                                                        "label of the program counter at the top of the loop",
+                                                        L1),
+                                         A.labelEnv(),
+                                         ds.position(), 
+                                         false) {
+                     public String msg() {
+                         return "The information revealed by the normal " +
+                                "termination of the body of the do-while loop " +
+                                "may be more restrictive than the " +
+                                "information that should be revealed by " +
+                                "reaching the top of the loop.";
+                     }
+                     public String technicalMsg() {
+                         return "X(loopbody).n <= _pc_ of the do-while statement";
+                     }                     
+         }
+         );
+        PathMap X = Xe.join(Xs);
+	X = X.set(ts.gotoPath(Branch.BREAK, null), ts.notTaken());
+	X = X.set(ts.gotoPath(Branch.CONTINUE, null), ts.notTaken());
+
+	return X(ds.cond(e).body(s), X);
+    }
+}

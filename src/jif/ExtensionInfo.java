@@ -1,0 +1,147 @@
+package jif;
+
+import java.io.Reader;
+import java.util.*;
+
+import jif.ast.JifNodeFactory;
+import jif.ast.JifNodeFactory_c;
+import jif.translate.JifToJavaRewriter;
+import jif.types.JifTypeSystem;
+import jif.types.JifTypeSystem_c;
+import jif.visit.JifLabelSubst;
+import jif.visit.NotNullChecker;
+import polyglot.ast.NodeFactory;
+import polyglot.frontend.*;
+import polyglot.frontend.Compiler;
+import polyglot.frontend.goals.VisitorGoal;
+import polyglot.main.Options;
+import polyglot.types.*;
+import polyglot.util.ErrorQueue;
+import polyglot.util.InternalCompilerError;
+
+/** The configuration information of the Jif extension.
+ *
+ *  Compiling passes and corresponding visitors:
+ *  <ul>
+ *	<li> ... clean super barrier, inherited from the jl extension </li>
+ *	<li> rewrite argument labels, <code>RewriteArgsVisitor</code> </li>
+ *	<li> add dummy fields, <code>AddDummyFieldsVisitor</code> </li>
+ *	<li> clean signatures, inherited from the jl extension </li>
+ *      <li> resolve field labels, <code>FieldLabelResolver </li>
+ *	<li> ... check exceptions, inherited from the jl extension </li>
+ *	<li> (barrier) check labels, <code>LabelChecker</code> </li>
+ *	<li> serialization </li>
+ *	<li> translation, <code>JifTranslator</code> </li>
+ *  </ul>
+ */
+public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo
+{
+//    protected boolean doInfer = false;
+    protected OutputExtensionInfo jlext = new OutputExtensionInfo(this);
+    protected OutputExtensionInfo jlrtext = new OutputExtensionInfo(this);
+
+    public String defaultFileExtension() {
+	return "jif";
+    }
+
+    public String compilerName() {
+        return "jifc";
+    }
+
+    protected Options createOptions() {
+        return new JifOptions(this);
+    }
+
+    public JifOptions getJifOptions() {
+        return (JifOptions)this.getOptions();
+    }
+    
+    static public Set topics = new HashSet();
+    static { topics.add("jif"); }
+
+    private TypeSystem jlTypeSystem() {
+        // Use a JL type system for looking up principals.
+        return jlrtext.typeSystem();
+    }
+
+    protected TypeSystem createTypeSystem() {
+        // For looking up Java code during rewriting.
+	return new JifTypeSystem_c(jlTypeSystem());
+    }
+
+    public void initCompiler(Compiler compiler) {
+        jlext.initCompiler(compiler);
+        jlrtext.initCompiler(compiler);
+        super.initCompiler(compiler);
+    }
+
+    protected void initTypeSystem() {
+        try {
+            LoadedClassResolver lr;
+            lr = new SourceClassResolver(compiler, this, 
+                    getJifOptions().constructJifClasspath(),
+                    compiler.loader(), false);
+            ts.initialize(lr, this);
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError(
+                "Unable to initialize type system: " + e.getMessage());
+        }
+    }
+
+    protected NodeFactory createNodeFactory() {
+	return new JifNodeFactory_c();
+    }
+
+    public polyglot.main.Version version() {
+	return new Version();
+    }
+
+    public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
+
+      polyglot.lex.Lexer lexer =
+          new jif.parse.Lexer_c(reader, source.name(), eq);
+      polyglot.parse.BaseParser grm =
+          new jif.parse.Grm(lexer, (JifTypeSystem)ts,
+					 (JifNodeFactory)nf, eq);
+
+      return new CupParser(grm, source, eq);
+    }
+
+    public static class JifJobExt implements JobExt {
+      public JifJobExt(JifTypeSystem ts) {     }
+    }
+
+    public JobExt jobExt() {
+      return new JifJobExt((JifTypeSystem) typeSystem());
+    }
+
+    public JifLabelSubst labelSubst(Job job, jif.types.Solver solver) {
+	return new JifLabelSubst(job, (JifTypeSystem) ts, nf, solver);
+    }
+
+    protected Scheduler createScheduler() {
+        return new JifScheduler(this, jlext);
+    }
+
+    public List compileGoalList(final Job job) {
+        List l = super.compileGoalList(job);
+        JifScheduler jifScheduler = (JifScheduler)scheduler();
+        
+        // remove output
+        l.remove(jifScheduler.CodeGenerated(job));
+
+        // add not null check before exception checking
+        l.add(l.indexOf(jifScheduler.ExceptionsChecked(job)),
+              jifScheduler.internGoal(new VisitorGoal(job, new NotNullChecker(job, ts, nf))));
+
+        // add label checking after exception checking.
+        LabelCheckGoal labelCheckGoal = jifScheduler.LabelsChecked(job);
+        l.add(l.indexOf(jifScheduler.ExceptionsChecked(job))+1, labelCheckGoal);
+
+        // add the jif to java rewrite at the end of the list.
+        l.add(jifScheduler.JifToJavaRewritten(job));
+
+        return l;
+    }
+}

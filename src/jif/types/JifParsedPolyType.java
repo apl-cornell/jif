@@ -1,0 +1,17 @@
+package jif.types;
+
+import java.util.List;
+
+import jif.types.label.Label;
+import polyglot.ext.param.types.PClass;
+import polyglot.types.ParsedClassType;
+
+/** Jif parsed polymorphic class type. 
+ */
+public interface JifParsedPolyType extends ParsedClassType, JifPolyType {
+    void setThisLabel(Label L);
+    void setParams(List params);
+    void setAuthority(List principals);
+    void invariant(boolean inv);
+    void setInstantiatedFrom(PClass pc);
+}

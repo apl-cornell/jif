@@ -1,0 +1,34 @@
+while true; do
+    case "$1" in
+        "") break;;
+        -v) verbose="1"; shift;;
+        -verbose) verbose="1"; shift;;
+        -classpath) shift; extra_cp=$1; shift;;
+        -cp) shift; extra_cp=$1; shift;;
+        -profile) profile="-Xrunhprof:cpu=samples"; shift;;
+        *) args="$args '$1'"; shift;;
+    esac
+done
+
+if [ -n "$extra_cp" ]
+then
+    extra_cp="${PATH_SEP}${extra_cp}"
+fi
+
+jardir="${TOP}${FILE_SEP}lib${FILE_SEP}"
+
+sig_cp="${TOP}${FILE_SEP}sig-classes${PATH_SEP}${jardir}jifsig.jar"
+rt_cp="${TOP}${FILE_SEP}rt-classes${PATH_SEP}${jardir}jifrt.jar"
+lib_cp="${TOP}${FILE_SEP}lib-classes${PATH_SEP}${jardir}jiflib.jar"
+
+jars="${jardir}jif.jar${PATH_SEP}${jardir}polyglot.jar${PATH_SEP}${jardir}java_cup.jar${PATH_SEP}${jardir}JLfex.jar"
+classpath="${TOP}${FILE_SEP}classes${PATH_SEP}.${extra_cp}${PATH_SEP}${lib_cp}${PATH_SEP}${CLASSPATH}${PATH_SEP}${jars}"
+
+command="\"$JAVA\" $profile -classpath \"$classpath\" polyglot.main.Main -sigcp \"$sig_cp\" -rtcp \"$rt_cp\" $ext $args"
+
+if [ -n "$verbose" ]
+then
+  echo "$command"
+fi
+
+eval "$command"

@@ -1,0 +1,952 @@
+include "polyglot/ext/jl/parse/java12.cup"
+
+package jif.parse; 
+
+import polyglot.lex.Lexer;
+import polyglot.lex.Identifier;
+import polyglot.lex.Token;
+
+import polyglot.ext.jl.ast.*;
+import jif.ast.*;
+import jif.types.*;
+
+import java.util.*;
+
+parser Grm extends polyglot.ext.jl.parse.Grm {:
+
+    public final JifNodeFactory nf; /* shadows BaseParser.nf */
+    public final JifTypeSystem ts; /* shadows BaseParser.ts */
+
+    public Grm(polyglot.lex.Lexer l, JifTypeSystem t,
+	       JifNodeFactory n, ErrorQueue q) {
+	super(l,t,n,q);
+	ts = t;
+	nf = n;
+    }
+
+    /**
+     * After we parse as usual, the AST may contain reftype_or_expr     
+     * nodes wrapped in expressions.  These are the _only_              
+     * reftype_or_expr expressions in the AST at this point, although   
+     * there may be reftype_or_expr types, qualifiers, etc.  Here, we   
+     * make a visitor pass over the AST to unwrap these reftype_or_expr 
+     * nodes and convert them to (possibly reftype_or_expr)             
+     * expressions.                                                     
+     *                                                                  
+     * This pass is done after parsing to avoid having to convert       
+     * expressions into types. */
+    public java_cup.runtime.Symbol parse() throws Exception {
+        java_cup.runtime.Symbol sym = super.parse();
+
+        if (sym == null || sym.value == null) {
+            return null;
+        }
+
+        Node n = (Node) sym.value;
+        sym.value = n.visit(new UnwrapVisitor());
+        return sym;
+    }
+
+    // Since there are no inner classes, a type qualifier must be a package.
+    public PackageNode exprToPackage(Expr e) throws Exception {
+        if (e instanceof Wrapper) {
+            return ((Wrapper) e).amb.toPackage();
+        }
+
+        if (e instanceof AmbExpr) {
+            AmbExpr a = (AmbExpr) e;
+            return nf.PackageNode(pos(e), ts.packageForName(a.name()));
+        }
+
+        if (e instanceof Field) {
+            Field f = (Field) e;
+            PackageNode pn = prefixToPackage(f.target());
+            return nf.PackageNode(pos(e),
+                                ts.packageForName(pn.package_(), f.name()));
+        }
+
+        die(pos(e));
+        return null;
+    }
+	
+    public PackageNode prefixToPackage(Prefix p) throws Exception {
+        if (p instanceof Expr) {
+            return exprToPackage((Expr) p);
+        }
+
+        if (p instanceof AmbPrefix) {
+            AmbPrefix a = (AmbPrefix) p;
+            PackageNode pn = prefixToPackage(a.prefix());
+            return nf.PackageNode(pos(p),
+                                ts.packageForName(pn.package_(), a.name()));
+        }
+
+        die(pos(p));
+        return null;
+    }
+
+    public ParamNode exprToParam(Expr e) throws Exception {
+        if (e instanceof Wrapper) {
+            Wrapper w = (Wrapper) e;
+            if (w.amb instanceof Name) {
+                Name a = (Name) w.amb;
+                if (a.prefix == null) {
+                    return nf.AmbParam(pos(e), a.name);
+                }
+            }
+        }
+
+        die(pos(e));
+        return null;
+    }
+
+    public TypeNode exprToUninstType(Expr e) throws Exception {
+        if (e instanceof Wrapper) {
+            return ((Wrapper) e).amb.toUnlabeledType();
+        }
+
+        if (e instanceof AmbExpr) {
+            AmbExpr a = (AmbExpr) e;
+            return nf.AmbTypeNode(pos(e), a.name());
+        }
+
+        if (e instanceof Field) {
+            Field f = (Field) e;
+            Receiver r = f.target();
+            return nf.AmbTypeNode(pos(e), prefixToPackage(r), f.name());
+        }
+
+        die(pos(e));
+        return null;
+    }
+
+    public TypeNode exprToType(Expr e) throws Exception {
+        if (e instanceof ArrayAccess) {
+            ArrayAccess a = (ArrayAccess) e;
+            Expr array = a.array();
+            Expr index = a.index();
+
+            TypeNode base = exprToUninstType(array);
+            ParamNode param = exprToParam(index);
+
+            List l = new LinkedList();
+            l.add(param);
+            return nf.InstTypeNode(pos(e), base, l);
+        }
+
+        return exprToUninstType(e);
+    }
+
+    public List toParamList(java.util.List l) throws Exception {
+        List params = new TypedList(new LinkedList(), ParamNode.class, false);
+
+        for (Iterator i = l.iterator(); i.hasNext(); ) {
+            Object n = i.next();
+
+            if (n instanceof Name) {
+                params.add(nf.AmbParam(((Name) n).pos,
+                                ((Name) n).name));
+            }
+            else if (n instanceof ParamNode) {
+                params.add(n);
+            }
+            else if (n instanceof Node) {
+                die(pos((Node) n));
+                return null;
+            }
+            else {
+                die(pos());
+                return null;
+            }
+        }
+
+        return params;
+    }
+
+    public List makeParamOrExprList(Expr a) {
+	List l = new TypedList(new LinkedList(), Object.class, false);
+
+	if (a instanceof Wrapper) {
+	    Wrapper w = (Wrapper) a;
+
+	    if (w.amb instanceof Name &&
+		((Name) w.amb).prefix == null) {
+    
+		// Could be a field, local, principal, or param of the
+		// current class. The last three can be used to
+		// instantiate a class.
+		l.add(w.amb);
+	    }
+	    else {
+		l.add(a);
+	    }
+	} else {
+	    l.add(a);
+	}
+	return l; 
+    }
+	
+
+    /**
+     * Return the source position of the Parse.
+     */
+    public static Position pos(Amb n) {
+	if (n == null) {
+	    return null;
+	}
+	return n.pos;
+    }
+    
+    public Position pos(Declarator n) {
+        if (n == null) {
+            return null;
+        }
+        return n.pos;
+    }
+    
+    public Position pos() {
+        return new Position(lexer.file());
+    }
+
+    public Amb makeAccessOrInst(Amb a, List b) throws Exception {
+	if (a instanceof Access) {
+	    return new Access(this, pos(a), a, (Expr) b.get(0));
+	} else {
+	    if (b.size() == 1) {
+		if (b.get(0) instanceof Name) {
+		    Name id = (Name) b.get(0);
+		    return new InstOrAccess(this, pos(a), a, id);
+		} else if (b.get(0) instanceof ParamNode) {
+		    return new Inst(this, pos(a), a.toClassType(), b);
+		} else {
+		    return new Access(this, pos(a), a, (Expr) b.get(0));
+		}
+	    } else {
+		return new Inst(this,pos(a), a.toClassType(), toParamList(b));
+	    }
+	}
+    }
+:};
+
+terminal Token WHERE;
+terminal Token PRINCIPAL;
+terminal Token LABEL;
+terminal Token COVARIANT;
+terminal Token INVARIANT;
+terminal Token AUTHORITY;
+terminal Token CALLER;
+terminal Token ACTSFOR;
+terminal Token DECLASSIFY;
+
+non terminal DeclassifyExpr declassify;
+non terminal DeclassifyStmt declassify_statement;
+non terminal TypeNode labeled_primitive_type;
+non terminal LabelNode label, label_opt, return_label_opt;
+non terminal List component_list;
+non terminal LabelNode label_component;
+non terminal PrincipalNode principal;
+non terminal List principal_list, readers;
+non terminal ActsFor actsfor_statement;
+non terminal ActsFor actsfor_else_statement;
+non terminal ActsFor actsfor_else_statement_no_short_if;
+non terminal SwitchLabel labelcase_statement;
+non terminal List labelcases;
+non terminal LabelCase labelcase_else, labelcase_no_else;
+
+non terminal List parameters_opt, parameters;
+non terminal ParamDecl parameter;
+non terminal Boolean invariant_opt;
+non terminal List constraints, constraints_opt;
+non terminal List authority, authority_opt;
+non terminal ConstraintNode constraint;
+non terminal Amb reftype_or_expr, objtype_or_expr;
+non terminal List param_or_expr_list;
+non terminal Expr primary_no_array;
+non terminal TypeNode primitive_array_type;
+non terminal ConstructorCall explicit_super_constructor_invocation;
+start with goal;
+
+// Jif labels
+label ::=
+                    // LabelNode
+        LBRACE:x RBRACE
+            {: RESULT = parser.nf.CanonicalLabelNode(parser.pos(x),
+                                        parser.ts.bottomLabel()); :}
+    |   LBRACE:x component_list:a RBRACE
+            {: LabelNode ln;
+               if (a.size() == 1) {
+                   ln = (LabelNode)a.get(0);
+               }
+               else {
+                   ln = parser.nf.JoinLabelNode(parser.pos(x), a);
+               }
+               RESULT = ln; :}
+    ;
+label_opt ::=
+                    // LabelNode
+            {: RESULT = null; :}
+    |   label:a
+            {: RESULT = a; :}
+    ;
+component_list ::=
+                    // List of LabelNode
+        label_component:a
+            {: List l = new TypedList(new LinkedList(), LabelNode.class, false);
+               l.add(a);
+               RESULT = l; :}
+    |   component_list:a SEMICOLON label_component:b
+            {: RESULT = a;
+               a.add(b); :}
+        ;
+label_component ::=
+                    // LabelNode
+        principal:a COLON readers:b
+            {: RESULT = parser.nf.PolicyLabelNode(parser.pos(a), a, b); :}
+    |   MULT IDENTIFIER:a
+            {: RESULT = parser.nf.AmbDynamicLabelNode(parser.pos(a),
+						      a.getIdentifier()); :}
+    |   THIS:a
+            {: RESULT = parser.nf.AmbThisLabelNode(parser.pos(a)); :}
+    |   IDENTIFIER:a
+            {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),
+						  a.getIdentifier()); :}
+    ;
+readers ::=
+                    // List of PrincipalNode
+            {: RESULT = new TypedList(new LinkedList(), PrincipalNode.class,
+				      false); :}
+    |   principal_list:a
+            {: RESULT = a; :}
+    ;
+principal_list ::=
+                    // List of PrincipalNode
+        principal:a
+            {: List l = new TypedList(new LinkedList(), PrincipalNode.class, false);
+           l.add(a);
+               RESULT = l; :}
+    |   principal_list:a COMMA principal:b
+            {: RESULT = a;
+               a.add(b); :}
+    ;
+principal ::=
+                    // PrincipalNode
+        IDENTIFIER:a
+            {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a),
+                           a.getIdentifier()); :}
+    ;
+
+// 19.4) Types, Values, and Variables
+
+drop { type ::= primitive_type | reference_type; }
+extend type ::=
+                    // TypeNode
+        labeled_primitive_type:a
+            {: RESULT = a; :}
+    |   reftype_or_expr:a
+            {: RESULT = a.toType(); :}
+    |   primitive_array_type:a
+            {: RESULT = a; :}
+    |   primitive_array_type:a label:b
+            {: RESULT = parser.nf.LabeledTypeNode(parser.pos(a), a, b); :}
+    ;
+
+extend primitive_type ::=
+                    // TypeNode
+        LABEL:a
+            {: RESULT = parser.nf.CanonicalTypeNode(parser.pos(a), parser.ts.Label()); :}
+    |   PRINCIPAL:a
+            {: RESULT = parser.nf.CanonicalTypeNode(parser.pos(a), parser.ts.Principal()); :}
+    ;
+
+labeled_primitive_type  ::=
+        primitive_type:a
+            {: RESULT = a; :}
+    |   primitive_type:a label:b
+            {: RESULT = parser.nf.LabeledTypeNode(parser.pos(a), a, b); :}
+    ;
+
+drop { reference_type ::= array_type | class_or_interface_type; }
+extend reference_type ::=
+                    // TypeNode
+        primitive_array_type:a
+            {: RESULT = a; :}
+    |   reftype_or_expr:a
+            {: RESULT = a.toType(); :}
+    ;
+override class_or_interface_type ::=
+                    // TypeNode
+        reftype_or_expr:a
+            {: RESULT = a.toType(); :}
+    ;
+drop { array_type }
+
+primitive_array_type ::=
+                    // TypeNode
+        labeled_primitive_type:a dims:b
+            {: RESULT = parser.array(a, b.intValue()); :}
+    ;
+// 19.5) Names
+// 19.6) Packages
+// 19.7) Productions used only in the LALR(1) grammar
+// 19.8) Classes
+
+// 19.8.1) Class Declarations
+drop { class_declaration ::=
+        modifiers_opt CLASS IDENTIFIER 
+	super_opt interfaces_opt class_body; }
+
+extend class_declaration ::=
+                    // ClassDecl
+        modifiers_opt:a CLASS:n IDENTIFIER:b
+                parameters_opt:p invariant_opt:i super_opt:c
+                interfaces_opt:d authority_opt:u class_body:e
+            {: RESULT = parser.nf.JifClassDecl(parser.pos(b),
+                                               a, b.getIdentifier(),
+                                               p, i.booleanValue(), c, d, u, e); :}
+    ;
+
+drop { super ::= EXTENDS class_type; }
+extend super ::=
+                    // TypeNode
+        EXTENDS objtype_or_expr:a
+            {: RESULT = a.toUnlabeledType(); :}
+    ;
+
+drop { interface_type_list ::= interface_type
+			    |  interface_type_list COMMA interface_type; }
+interface_type_list ::=
+                    // List of TypeNode
+        objtype_or_expr:a
+            {: List l = new TypedList(new LinkedList(), TypeNode.class, false);
+               l.add(a.toUnlabeledType());
+               RESULT = l; :}
+    |   interface_type_list:a COMMA objtype_or_expr:b
+            {: RESULT = a;
+               a.add(b.toUnlabeledType()); :}
+    ;
+
+authority_opt ::=
+            {: RESULT = new TypedList(new LinkedList(), PrincipalNode.class,
+	       false); :}
+    |   authority:a
+            {: RESULT = a; :}
+    ;
+authority ::=
+        AUTHORITY:n LPAREN principal_list:a RPAREN
+        {: RESULT = a; :}
+    ;
+drop { class_body_declaration ::= block | static_initializer ; }
+
+drop {
+    class_member_declaration ::= 
+	modifiers_opt:a CLASS:n IDENTIFIER:b
+	super_opt:c interfaces_opt:d class_body:e
+    |   interface_declaration:a
+    ;
+}
+
+// 19.8.2) Field Declarations
+// 19.8.3) Method Declarations
+drop { 
+    method_header ::=
+        modifiers_opt type IDENTIFIER LPAREN 
+                formal_parameter_list_opt RPAREN dims_opt throws_opt
+    |   modifiers_opt VOID IDENTIFIER LPAREN
+                formal_parameter_list_opt RPAREN throws_opt
+    ;
+}
+method_header ::=
+                    // JifMethodNode
+        modifiers_opt:a type:b IDENTIFIER:c label_opt:i
+        LPAREN formal_parameter_list_opt:d RPAREN
+        dims_opt:e return_label_opt:r throws_opt:f constraints_opt:w
+            {: RESULT = parser.nf.JifMethodDecl(parser.pos(c), a,
+                        parser.array(b, e.intValue()),
+                        c.getIdentifier(),
+                                                i, d, r, f, w, null); :}
+    |   modifiers_opt:a VOID:b IDENTIFIER:c label_opt:i
+        LPAREN formal_parameter_list_opt:d RPAREN
+        dims_opt:e return_label_opt:r throws_opt:f constraints_opt:w
+            {: RESULT = parser.nf.JifMethodDecl(parser.pos(c), a,
+                        parser.nf.CanonicalTypeNode(parser.pos(b),
+                                   parser.ts.Void()),
+                        c.getIdentifier(),
+                                                i, d, r, f, w, null); :}
+    ;
+    
+override formal_parameter ::=
+                    // Formal
+                    // All formals are final
+        type:a variable_declarator_id:b
+            {: RESULT = parser.nf.Formal(parser.pos(b), Flags.FINAL,
+                                         parser.array(a, b.dims), b.name); :}
+    |   FINAL type:a variable_declarator_id:b
+            {: RESULT = parser.nf.Formal(parser.pos(b), Flags.FINAL,
+                     parser.array(a, b.dims), b.name); :}
+    ;
+
+override throws ::=
+                    // List of TypeNode
+        THROWS LPAREN class_type_list:a RPAREN
+            {: RESULT = a; :}
+    |   THROWS interface_type_list:a
+            {: RESULT = a; :}
+    ;
+
+return_label_opt ::=
+                    // LabelNode
+            {: RESULT = null; :}
+    |   COLON label:a
+            {: RESULT = a; :}
+    ;
+
+// 19.8.4) Static Initializers
+
+drop { static_initializer }
+
+// 19.8.5) Constructor Declarations
+
+drop {constructor_declaration ::=
+        modifiers_opt simple_name LPAREN formal_parameter_list_opt RPAREN
+            throws_opt constructor_body
+    ;
+}
+
+constructor_declaration ::=
+                    // ConstructorDecl
+        modifiers_opt:a reftype_or_expr:q
+        LPAREN formal_parameter_list_opt:c RPAREN return_label_opt:r
+        throws_opt:d constraints_opt:w constructor_body:e
+            {: String b; LabelNode i;
+               // Pick apart the reftype_or_expr node.
+               // It can be either an identifier "a" or an
+               // identifier and label "a{L}".
+               if (q instanceof LabeledExpr) {
+                   b = ((LabeledExpr) q).prefix.toIdentifier();
+                   i = ((LabeledExpr) q).label;
+               }
+               else {
+                   b = q.toIdentifier();
+                   i = null;
+               }
+           RESULT = parser.nf.JifConstructorDecl(parser.pos(q),
+                             a, b, i, r, c, d, w, e); :}
+    ;
+drop { constructor_body ::= LBRACE block_statements RBRACE | LBRACE RBRACE; }
+
+extend constructor_body ::=
+                    // Block
+        LBRACE:n block_statements:a explicit_super_constructor_invocation:b RBRACE
+            {: List l = new TypedList(new LinkedList(), Stmt.class, false);
+               l.addAll(a);
+               l.add(b);
+               RESULT = parser.nf.Block(parser.pos(n), l); :}
+    |   LBRACE:n block_statements:a explicit_super_constructor_invocation:b block_statements:c RBRACE
+            {: List l = new TypedList(new LinkedList(), Stmt.class, false);
+               l.addAll(a);
+               l.add(b);
+               l.addAll(c);
+               RESULT = parser.nf.Block(parser.pos(n), l); :}
+    |   LBRACE:n block_statements:a RBRACE
+            {: a.add(0, parser.nf.SuperCall(parser.pos(n), 
+                Collections.EMPTY_LIST));
+               RESULT = parser.nf.Block(parser.pos(n), a); :}
+    |   LBRACE:n RBRACE
+            {: RESULT = parser.nf.Block(parser.pos(n),
+                parser.nf.SuperCall(parser.pos(n),
+                Collections.EMPTY_LIST)); :}
+    ;
+
+explicit_super_constructor_invocation ::=
+                    // Stmt
+        SUPER:a LPAREN argument_list_opt:b RPAREN SEMICOLON
+            {: RESULT = parser.nf.SuperCall(parser.pos(a), b); :}
+    ;
+drop {
+    explicit_constructor_invocation ::=
+        SUPER LPAREN argument_list_opt RPAREN SEMICOLON
+    |   primary DOT THIS LPAREN argument_list_opt RPAREN SEMICOLON
+    |   primary DOT SUPER LPAREN argument_list_opt RPAREN SEMICOLON
+    ;
+}
+extend explicit_constructor_invocation ::=
+        explicit_super_constructor_invocation:a
+            {: RESULT = a; :}
+    ;
+
+// 19.9) Interfaces
+
+parameters_opt ::=
+            // List of ParamDecl
+            {: RESULT = new TypedList(new LinkedList(), ParamDecl.class, false); :}
+    |
+        LBRACK parameters:p RBRACK
+            {: RESULT = p; :}
+    ;
+
+parameters ::=
+            // List of ParamDecl
+        parameter:a
+            {: List l = new TypedList(new LinkedList(), ParamDecl.class, false);
+               l.add(a);
+               RESULT = l; :}
+    |   parameters:a COMMA parameter:b
+            {: RESULT = a;
+               a.add(b); :}
+    ;
+parameter ::=
+            // ParamDecl
+    LABEL IDENTIFIER:a
+        {: RESULT = parser.nf.ParamDecl(parser.pos(a),
+                                        ParamInstance.INVARIANT_LABEL,
+                                        a.getIdentifier()); :}
+    |   COVARIANT LABEL IDENTIFIER:a
+        {: RESULT = parser.nf.ParamDecl(parser.pos(a),
+                                        ParamInstance.COVARIANT_LABEL,
+                                        a.getIdentifier()); :}
+    |   PRINCIPAL IDENTIFIER:a
+        {: RESULT = parser.nf.ParamDecl(parser.pos(a),
+                                        ParamInstance.PRINCIPAL,
+                                        a.getIdentifier()); :}
+    ;
+
+invariant_opt ::=
+	{: RESULT = new Boolean(false); :}
+    |
+    	LPAREN INVARIANT RPAREN
+	{: RESULT = new Boolean(true); :}
+    ;
+    
+constraints_opt ::=
+        // List of ConstraintNode
+            {: RESULT = new TypedList(new LinkedList(), ConstraintNode.class, false); :}
+    |   WHERE constraints:a
+            {: RESULT = a; :}
+    ;
+    
+constraints ::=
+        // List of ConstraintNode
+        constraint:a
+            {: List l = new TypedList(new LinkedList(), ConstraintNode.class, false);
+               l.add(a); RESULT = l; :}
+    |   constraints:a COMMA constraint:b
+            {: RESULT = a;
+               a.add(b); :}
+    ;
+    
+constraint ::=
+        // ConstraintNode
+        AUTHORITY:n LPAREN principal_list:a RPAREN
+        {: RESULT = parser.nf.AuthConstraintNode(parser.pos(n), a); :}
+    |   CALLER:n LPAREN principal_list:a RPAREN
+        {: RESULT = parser.nf.CallerConstraintNode(parser.pos(n), a); :}
+    |   ACTSFOR:n LPAREN principal:a COMMA principal:b RPAREN
+        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(n), a, b); :}
+    ;
+
+// 19.9.1) Interface Declarations
+override interface_declaration ::=
+        // ClassDecl
+        modifiers_opt:a INTERFACE:n IDENTIFIER:b
+                parameters_opt:p invariant_opt:i
+                extends_interfaces_opt:d authority_opt:u interface_body:e
+            {: RESULT = parser.nf.JifClassDecl(parser.pos(b),
+		    a.set(Flags.INTERFACE), b.getIdentifier(),
+		    p, i.booleanValue(), null, d, u, e); :} 
+    ;
+drop { extends_interfaces ::=
+        EXTENDS interface_type:a
+    |   extends_interfaces:a COMMA interface_type:b
+    ;
+}
+drop { interface_type }
+
+extends_interfaces ::=
+                    // List of TypeNode
+        EXTENDS objtype_or_expr:a
+            {: List l = new TypedList(new LinkedList(), TypeNode.class, false);
+               l.add(a.toUnlabeledType());
+               RESULT = l; :}
+    |   extends_interfaces:a COMMA objtype_or_expr:b
+            {: RESULT = a;
+               a.add(b.toUnlabeledType()); :}
+    ;
+
+drop { interface_member_declaration ::=
+	      class_declaration
+	    | interface_declaration
+	    ;
+}
+
+// 19.10) Arrays
+
+// 19.11) Blocks and Statements
+drop { block_statement ::= class_declaration ; }
+
+extend statement ::=
+                    // Stmt
+        labelcase_statement:a
+            {: RESULT = a; :}
+    |   actsfor_statement:a
+            {: RESULT = a; :}
+    |   actsfor_else_statement:a
+            {: RESULT = a; :}
+    |   declassify_statement:a
+            {: RESULT = a; :}
+    ;
+extend statement_no_short_if ::=
+                    // Stmt
+        actsfor_else_statement_no_short_if:a
+            {: RESULT = a; :}
+    ;
+labelcase_statement ::=
+                    // SwitchLabel
+        SWITCH LABEL:n LPAREN expression:a RPAREN LBRACE labelcases:b RBRACE
+            {: RESULT = parser.nf.SwitchLabel(parser.pos(n), a, b); :}
+    ;
+labelcases ::=
+                    // List of LabelCase
+        labelcase_no_else:a
+            {: List l = new TypedList(new LinkedList(), LabelCase.class, false);
+               l.add(a); RESULT = l; :}
+    |   labelcases:a labelcase_no_else:b
+            {: RESULT = a; a.add(b); :}
+    |   labelcases:a labelcase_else:b
+            {: RESULT = a; a.add(b); :}
+    ;
+labelcase_no_else ::=
+                    // List of LabelCase
+        CASE:n LPAREN type:a IDENTIFIER:b RPAREN statement_no_short_if:c
+            {:  if (! (a instanceof LabeledTypeNode)) parser.die(parser.pos(a));
+        RESULT = parser.nf.LabelCase(parser.pos(n),
+                         parser.nf.Formal(parser.pos(a),
+                                             Flags.FINAL,
+                                 a,
+                                 b.getIdentifier()),
+                         ((LabeledTypeNode) a).labelPart(),
+                         c); :}
+    |   CASE:n label:a statement_no_short_if:b
+            {: RESULT = parser.nf.LabelCase(parser.pos(n), a, b); :}
+    ;
+labelcase_else ::=
+        ELSE:n statement_no_short_if:a
+            {: RESULT = parser.nf.LabelCase(parser.pos(n), a); :}
+    ;
+actsfor_statement ::=
+                    // ActsFor
+        ACTSFOR:n LPAREN principal:a COMMA principal:b RPAREN statement:c
+            {: RESULT = parser.nf.ActsFor(parser.pos(n), a, b, c); :}
+    ;
+actsfor_else_statement ::=
+                    // ActsFor
+        ACTSFOR:n LPAREN principal:a COMMA principal:b RPAREN
+            statement_no_short_if:c ELSE statement:d
+            {: RESULT = parser.nf.ActsFor(parser.pos(n), a, b, c, d); :}
+    ;
+actsfor_else_statement_no_short_if ::=
+                    // ActsFor
+        ACTSFOR:n LPAREN principal:a COMMA principal:b RPAREN
+            statement_no_short_if:c ELSE statement_no_short_if:d
+            {: RESULT = parser.nf.ActsFor(parser.pos(n), a, b, c, d); :}
+    ;
+declassify_statement ::=
+                    // DeclassifyStmt
+        DECLASSIFY:n LPAREN label:a RPAREN statement:b
+            {: RESULT = parser.nf.DeclassifyStmt(parser.pos(n),
+                            parser.nf.CanonicalLabelNode(parser.pos(n), parser.ts.topLabel(parser.pos(n))),
+                            a, b); :}
+    |   DECLASSIFY:n LPAREN label:a COMMA label:b RPAREN statement:c
+            {: RESULT = parser.nf.DeclassifyStmt(parser.pos(n), a, b, c); :}
+    ;
+
+// 19.12) Expr           // Expr
+extend primary ::=
+        NEW:n LABEL label:a
+            {: RESULT = parser.nf.NewLabel(parser.pos(n), a); :}
+    |   NEW:n objtype_or_expr:a
+            {: RESULT = a.toNewArray(parser.pos(n)); :}
+    ;
+extend primary_no_new_array ::=
+        primary_no_array:a
+            {: RESULT = a; :}
+    ;
+primary_no_array ::= 
+       declassify:a
+            {: RESULT = a; :}
+    ;
+transfer primary_no_new_array to primary_no_array {
+	literal | THIS | LPAREN expression RPAREN |
+	class_instance_creation_expression | field_access |
+        method_invocation
+}
+
+drop { /* no reflection */
+primary_no_new_array ::=
+	primitive_type DOT CLASS
+    |   VOID DOT CLASS
+    |   array_type DOT CLASS
+    |   name DOT CLASS
+    |   name DOT THIS
+    ;
+}
+drop { /* no inner classes... */
+    class_instance_creation_expression ::=
+        NEW class_type LPAREN argument_list_opt RPAREN
+    |   NEW class_type LPAREN argument_list_opt RPAREN class_body
+    |   primary DOT NEW simple_name LPAREN argument_list_opt RPAREN
+    |   primary DOT NEW simple_name LPAREN argument_list_opt RPAREN class_body
+    |   name DOT NEW simple_name LPAREN argument_list_opt RPAREN
+    |   name DOT NEW simple_name LPAREN argument_list_opt RPAREN class_body
+    ;
+}
+
+class_instance_creation_expression ::=
+                    // NewObjectExpr
+        NEW objtype_or_expr:a label_opt:l LPAREN argument_list_opt:b RPAREN
+            {:  TypeNode tn = a.toUnlabeledType();
+		if (l != null) 
+		    tn = parser.nf.LabeledTypeNode(parser.pos(a), tn, l);
+		RESULT = parser.nf.New(parser.pos(a), tn, b); :}
+    ;
+
+override array_creation_expression ::=
+        NEW:n objtype_or_expr:a dims:b array_initializer:c
+            {: RESULT = parser.nf.NewArray(parser.pos(n), a.toType(),
+                                       b.intValue(), c); :}
+    |   NEW:n primitive_type:a dim_exprs:b dims_opt:c
+            {: RESULT = parser.nf.NewArray(parser.pos(n), a, b,
+                                           c.intValue()); :}
+    |   NEW:n primitive_type:a dims:b array_initializer:c
+            {: RESULT = parser.nf.NewArray(parser.pos(n), a,
+                                           b.intValue(), c); :}
+    ;
+drop { field_access ::=
+	primary DOT IDENTIFIER
+    |   name DOT SUPER DOT IDENTIFIER
+    ;
+}
+extend field_access ::=
+        primary_no_new_array:a DOT IDENTIFIER:b
+        {: RESULT = parser.nf.Field(parser.pos(b), a,
+                    b.getIdentifier()); :}
+    ;
+drop {
+    method_invocation ::=
+        name LPAREN argument_list_opt RPAREN
+    |   primary DOT IDENTIFIER LPAREN argument_list_opt RPAREN
+    |   name DOT SUPER DOT IDENTIFIER LPAREN argument_list_opt RPAREN
+    ;
+}
+extend method_invocation ::=
+                    // MethodExpr
+        reftype_or_expr:a LPAREN argument_list_opt:b RPAREN
+        {: if (! (a instanceof Name)) parser.die(parser.pos(a));
+           Name n = (Name) a;
+               RESULT = parser.nf.Call(parser.pos(a),
+                       n.prefix == null ? null
+					: n.prefix.toReceiver(),
+                       n.name, b); :}
+    |   primary_no_new_array:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
+            {: RESULT = parser.nf.Call(parser.pos(b), a,
+                                       b.getIdentifier(), c); :}
+    ;
+
+declassify ::=
+                    // DeclassifyExpr
+        DECLASSIFY LPAREN expression:a COMMA label:b RPAREN
+            {: RESULT = parser.nf.DeclassifyExpr(parser.pos(a), a,
+			parser.nf.CanonicalLabelNode(parser.pos(a),
+			parser.ts.topLabel(parser.pos(a)) ), b);
+	    :}
+    |   DECLASSIFY LPAREN expression:a COMMA label:b COMMA label:c RPAREN
+            {: RESULT = parser.nf.DeclassifyExpr(parser.pos(a), a, b, c); :}
+    ;
+
+param_or_expr_list ::=
+        // List of Object (Expr or Identifier or ParamNode)
+        expression:a
+        {: RESULT = parser.makeParamOrExprList(a); :}
+    |   label:a
+	    {: List l = new TypedList(new LinkedList(), Node.class, false);
+	       l.add(a);
+	       RESULT = l; 
+	    :}
+    |   param_or_expr_list:a COMMA simple_name:b
+	    {: a.add(b); RESULT = a; :}
+    |   param_or_expr_list:a COMMA label:b
+	    {: a.add(b); RESULT = a; :}
+    ;
+    
+/* objtype_or_expr: something that looks like the name of a class or interface
+ *  but that may turn out to be an expression.
+ */
+objtype_or_expr ::=
+        IDENTIFIER:a
+            {: RESULT = new Name(parser, parser.pos(a), null,
+                                 a.getIdentifier()); :}
+    |   objtype_or_expr:a DOT IDENTIFIER:b
+            {: RESULT = new Name(parser, parser.pos(a), a,
+                                 b.getIdentifier()); :}
+    |   objtype_or_expr:a LBRACK param_or_expr_list:b RBRACK
+	    {: RESULT = parser.makeAccessOrInst(a,b); :}
+    ;
+    
+/* reftype_or_expr: something that looks like a reference type (but not
+ * a primitive array type) but might turn out to be an expression. May
+ * include a label component.
+ */
+reftype_or_expr ::=
+        IDENTIFIER:a
+            {: RESULT = new Name(parser, parser.pos(a), null,
+                                 a.getIdentifier()); :}
+    |   reftype_or_expr:a DOT IDENTIFIER:b
+            {: RESULT = new Name(parser, parser.pos(b), a,
+                                 b.getIdentifier()); :}
+    |   reftype_or_expr:a LBRACK param_or_expr_list:b RBRACK
+            {:  RESULT = parser.makeAccessOrInst(a,b); :}
+    |   reftype_or_expr:a LBRACK RBRACK
+            {: RESULT = new Array(parser, parser.pos(a), a.toType()); :}
+    |   reftype_or_expr:a label:b
+            {: RESULT = new LabeledExpr(parser, parser.pos(b), a, b); :}
+    ;
+drop {
+    array_access ::=
+        name LBRACK expression RBRACK
+    |   primary_no_new_array LBRACK expression RBRACK
+    ;
+}
+extend array_access ::=
+                    // ArrayAccess
+        primary_no_array:a dim_exprs:b
+            {: Expr x = a;
+               for (Iterator i = b.iterator(); i.hasNext(); ) {
+                    Expr e = (Expr) i.next();
+                    x = parser.nf.ArrayAccess(parser.pos(a), x, e);
+               }
+               RESULT = (ArrayAccess) x;
+	    :}
+    ;
+drop { postfix_expression ::= name; }
+extend postfix_expression ::=
+	reftype_or_expr:a
+            {: RESULT = a.wrap(); :}
+    ;
+drop {
+    cast_expression ::=
+        LPAREN primitive_type dims_opt RPAREN unary_expression
+    |   LPAREN name dims RPAREN unary_expression_not_plus_minus
+    ;
+}
+extend cast_expression ::=
+                    // Cast
+        LPAREN labeled_primitive_type:a dims_opt:b RPAREN unary_expression:c
+            {: RESULT = parser.nf.Cast(parser.pos(a),
+                                   parser.array(a, b.intValue()), c); :}
+    ;
+
+drop { left_hand_side ::= name; }
+extend left_hand_side ::=
+                    // Expr
+        reftype_or_expr:a
+            {: RESULT = a.wrap(); :}
+    ;
