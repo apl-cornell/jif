@@ -135,9 +135,9 @@ public class LabelChecker implements Copy
 	this.solver.addConstraint(c);
     }
 
-    public void bind(DynamicLabel dl, Label l) {
-        this.solver.bind(dl, l);
-    }
+//    public void bind(DynamicLabel dl, Label l) {
+//        this.solver.bind(dl, l);
+//    }
 
     /**
      * Called by JifClassDeclExt just before this label checker is used to

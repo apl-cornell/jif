@@ -1,11 +1,13 @@
 package jif.types;
 
-import polyglot.types.SemanticException;
-import polyglot.util.*;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.Label;
+import polyglot.types.SemanticException;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** 
  * Label equation derived from a label constraint. A label equation represents
@@ -35,7 +37,7 @@ public class Equation
 	this.rhs = rhs.simplify();
 	this.constraint = constraint;
 
-	if (! lhs.isSingleton()) {
+	if (!lhs.isSingleton()) {
 	    throw new InternalCompilerError(
 		"LHS of equation must be a singleton.");
 	}

@@ -3,20 +3,15 @@ package jif.types;
 import java.util.*;
 
 import jif.types.hierarchy.LabelEnv;
-import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.*;
 import jif.types.principal.*;
-import polyglot.ast.*;
-import polyglot.ast.FieldDecl;
-import polyglot.ast.ProcedureDecl;
 import polyglot.ext.jl.types.PrimitiveType_c;
 import polyglot.ext.param.types.*;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Source;
 import polyglot.types.*;
 import polyglot.types.Package;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
+import polyglot.util.*;
 
 /** An implementation of the <code>JifTypeSystem</code> interface. 
  */
@@ -26,11 +21,10 @@ public class JifTypeSystem_c
     private final TypeSystem jlts;
 
     private final DefaultSignature ds;
-    private final Map uidStore; //pos -> uid
+    //private final Map uidStore; //pos -> uid
 
     public JifTypeSystem_c(TypeSystem jlts) {
         this.jlts = jlts;
-        this.uidStore = new HashMap();
         this.ds = new FixedSignature(this);
     }
 
@@ -54,8 +48,8 @@ public class JifTypeSystem_c
     }
 
     public Solver solver() {
-        return new SolverLUB(this);
-        //return new SolverGLB(this);
+        return new SolverGLB(this);
+        //return new SolverLUB(this);
     }
 
     public MuPClass mutablePClass(Position pos) {
@@ -131,52 +125,13 @@ public class JifTypeSystem_c
                                        Flags flags,
                                        Type type,
                                        String name) {
-        //UID uid = new UID(name);
-        UID uid = (UID)uidStore.get(pos);
-        if (uid == null) {
-            uid = new UID(name);
-            uidStore.put(pos, uid);
-        }
-        if (!isLabeled(type) && container instanceof JifClassType) {
-            JifClassType ct = (JifClassType)container;
-            type = labeledType(type.position(), type, ct.thisLabel());
-        }
         JifFieldInstance_c fi =
-            new JifFieldInstance_c(this,
-                                   pos,
-                                   container,
-                                   flags,
-                                   type,
-                                   name,
-                                   uid,
-                                   freshLabelVariable(pos, 
-                                                      name, 
-                                                      "label of field " + 
-                                                        container.toString() +
-                                                        "." + name).uid(uid));
+            new JifFieldInstance_c(this, pos, container, flags, type, name);
         return fi;
     }
 
-    public LocalInstance localInstance(
-        Position pos,
-        Flags flags,
-        Type type,
-        String name) {
-        //HACK: ensure that every pass creates the same uid.
-        UID uid = (UID)uidStore.get(pos);
-        if (uid == null) {
-            uid = new UID(name);
-            uidStore.put(pos, uid);
-        }
-
-        JifLocalInstance_c li =
-            new JifLocalInstance_c(
-                this,
-                pos,
-                flags,
-                type,
-                name,
-                uid);
+    public LocalInstance localInstance(Position pos, Flags flags, Type type, String name) {
+        JifLocalInstance_c li = new JifLocalInstance_c(this, pos, flags, type, name);
         return li;
     }
 
@@ -269,29 +224,8 @@ public class JifTypeSystem_c
         return mi;
     }
 
-    public ParamInstance paramInstance(
-        Position pos,
-        JifClassType container,
-        ParamInstance.Kind kind,
-        String name) {
-        ParamInstance pi =
-            new ParamInstance_c(
-                this,
-                pos,
-                container,
-                kind,
-                name,
-                new UID(name));
-        return pi;
-    }
-
-    public ParamInstance paramInstance(
-        Position pos,
-        JifClassType container,
-        ParamInstance.Kind kind,
-        UID uid) {
-        ParamInstance pi =
-            new ParamInstance_c(this, pos, container, kind, uid.name(), uid);
+    public ParamInstance paramInstance(Position pos, JifClassType container, ParamInstance.Kind kind, String name) {
+        ParamInstance pi = new ParamInstance_c(this, pos, container, kind, name);
         return pi;
     }
 
@@ -336,7 +270,7 @@ public class JifTypeSystem_c
      * i.e. check their parameters are appropriate. 
      * @return supertype if supertype is the least common ancestor of subtype
      *     and supertype, null otherwise.
-     *  
+     * @@@@@This code looks buggy! base is never used, and neither is iter3... 
      */
     protected Type leastCommonAncestorSubtype(Type subtype, Type supertype) {
         while (subtype != null && !equals(subtype, supertype)) {
@@ -355,7 +289,7 @@ public class JifTypeSystem_c
             Param p1 = (Param)iter1.next();
             Param p2 = (Param)iter2.next();
             if (p1 instanceof Principal && p2 instanceof Principal) {
-                if (!((Principal)p1).uid().equals(((Principal)p2).uid())) {
+                if (!((Principal)p1).equals(p2)) {
                     // different UIDs...
                     return null;
                 }
@@ -532,36 +466,36 @@ public class JifTypeSystem_c
         return new UnknownParam_c(this, pos);
     }
 
-    public ClassType nullInstantiate(Position pos, PClass pc) {
-        // We don't want to instantiate on the directly formals: they're UIDs,
-        // not Params. We need to create create the params as appropriate.
-
-        if (pc.clazz() instanceof JifPolyType) {
-            JifPolyType pt = (JifPolyType) pc.clazz();
-        
-            Map subst = new HashMap();
-
-            Iterator i = pt.params().iterator();
-            Iterator j = pt.actuals().iterator();  
-            while (i.hasNext() && j.hasNext()) {      
-                ParamInstance param = (ParamInstance) i.next();
-                Object actual = j.next();
-            
-                subst.put(param.uid(), actual);
-            }
-        
-            if (i.hasNext() || j.hasNext()) {
-                throw new InternalCompilerError("Params and actuals had " +
-                        "different lengths");
-            }
-
-            return (ClassType) subst(pt, subst);
-        }
-        
-        throw new InternalCompilerError("Cannot null instantiate \"" +
-                                        pc + "\".");
-                                        
-    }
+//    public ClassType nullInstantiate(Position pos, PClass pc) {
+//        // We don't want to instantiate on the directly formals: they're UIDs,
+//        // not Params. We need to create create the params as appropriate.
+//
+//        if (pc.clazz() instanceof JifPolyType) {
+//            JifPolyType pt = (JifPolyType) pc.clazz();
+//        
+//            Map subst = new HashMap();
+//
+//            Iterator i = pt.params().iterator();
+//            Iterator j = pt.actuals().iterator();  
+//            while (i.hasNext() && j.hasNext()) {      
+//                ParamInstance param = (ParamInstance) i.next();
+//                Object actual = j.next();
+//            
+//                subst.put(param.uid(), actual);
+//            }
+//        
+//            if (i.hasNext() || j.hasNext()) {
+//                throw new InternalCompilerError("Params and actuals had " +
+//                        "different lengths");
+//            }
+//
+//            return (ClassType) subst(pt, subst);
+//        }
+//        
+//        throw new InternalCompilerError("Cannot null instantiate \"" +
+//                                        pc + "\".");
+//                                        
+//    }
 
     public void checkInstantiation(Position pos, PClass t, List args)
         throws SemanticException {
@@ -602,54 +536,38 @@ public class JifTypeSystem_c
     // Code for label manipulation
 
     public VarLabel freshLabelVariable(Position pos, String s, String description) {
-        VarLabel t = new VarLabel_c(this, pos, new UID(s));
-        t = (VarLabel)t.description(description);
+        VarLabel t = new VarLabel_c(s, description, this, pos);
         return t;
     }
 
-    public CovariantParamLabel freshCovariantLabel(Position pos, String s) {
-        CovariantParamLabel t = new CovariantParamLabel_c(this, pos, new UID(s));
+//    public CovariantParamLabel freshCovariantLabel(Position pos, ParamInstance) {
+//        CovariantParamLabel t = new CovariantParamLabel_c(this, pos, new UID(s));
+//        return t;
+//    }
+
+    public ParamPrincipal principalParam(Position pos, ParamInstance pi) {
+        ParamPrincipal t = new ParamPrincipal_c(pi, this, pos);
         return t;
     }
 
-    public ParamPrincipal principalParam(Position pos, UID uid) {
-        ParamPrincipal t = new ParamPrincipal_c(this, pos, uid);
+    public DynamicPrincipal dynamicPrincipal(Position pos, AccessPath path) {
+        DynamicPrincipal t = new DynamicPrincipal_c(path, this, pos);
         return t;
     }
 
-    public DynamicPrincipal dynamicPrincipal(
-        Position pos,
-        UID uid,
-        String name,
-        Label L) {
-        DynamicPrincipal t = new DynamicPrincipal_c(this, pos, uid, name, L);
-        return t;
-    }
-
-    static Map externalUIDs = new HashMap();
+//    static Map externalUIDs = new HashMap();
 
     public ExternalPrincipal externalPrincipal(Position pos, String name) {
-        // All external principals with the same name should have the same
-        // uid.
-        UID uid = (UID)externalUIDs.get(name);
-
-        if (uid == null) {
-            uid = new UID(name);
-            externalUIDs.put(name, uid);
-        }
-
-        ExternalPrincipal t = new ExternalPrincipal_c(this, pos, uid, name);
-        return t;
-    }
-
-    public ArgPrincipal argPrincipal(
-        Position pos,
-        UID uid,
-        String name,
-        Label L,
-        int index,
-        boolean isSignature) {
-        ArgPrincipal t = new ArgPrincipal_c(this, pos, uid, name, L, index, isSignature);
+//        // All external principals with the same name should have the same
+//        // uid.
+//        UID uid = (UID)externalUIDs.get(name);
+//
+//        if (uid == null) {
+//            uid = new UID(name);
+//            externalUIDs.put(name, uid);
+//        }
+//
+        ExternalPrincipal t = new ExternalPrincipal_c(name, this, pos);
         return t;
     }
 
@@ -675,7 +593,7 @@ public class JifTypeSystem_c
     }
 
     public Label bottomLabel(Position pos) {
-        Label t = new JoinLabel_c(this, pos, Collections.EMPTY_LIST);
+        Label t = new JoinLabel_c(Collections.EMPTY_LIST, this, pos);
         return t;
     }
 
@@ -707,55 +625,37 @@ public class JifTypeSystem_c
         return runtime;
     }
 
-    public Label labelOfVar(Position pos, VarLabel L) {
-        Label t = new LabelOfVar_c(this, pos, L);
+    public CovariantParamLabel covariantLabel(Position pos, ParamInstance pi) {
+        CovariantParamLabel t = new CovariantParamLabel_c(pi, this, pos);
         return t;
     }
 
-    public CovariantParamLabel covariantLabel(Position pos, UID uid) {
-        CovariantParamLabel t = new CovariantParamLabel_c(this, pos, uid);
+    public ParamLabel paramLabel(Position pos, ParamInstance pi) {
+        ParamLabel t = new ParamLabel_c(pi, this, pos);
         return t;
     }
 
-    public ParamLabel paramLabel(Position pos, UID uid) {
-        ParamLabel t = new ParamLabel_c(this, pos, uid);
+    public ThisLabel thisLabel(Position pos, JifClassType ct) {
+        ThisLabel t = new ThisLabel_c(ct, this, pos);
+        return t;        
+    }
+    public CovariantThisLabel covariantThisLabel(Position pos, JifClassType ct) {
+        CovariantThisLabel t = new CovariantThisLabel_c(ct, this, pos);
+        return t;        
+    }
+
+    public PolicyLabel policyLabel(Position pos, Principal owner, Collection readers) {
+        PolicyLabel t = new PolicyLabel_c(owner, readers, this, pos);
         return t;
     }
 
-    public VarLabel varLabel(Position pos, UID uid) {
-        VarLabel t = new VarLabel_c(this, pos, uid);
+    public Label joinLabel(Position pos, Collection components) {
+        Label t = new JoinLabel_c(components, this, pos).simplify();
         return t;
     }
 
-    public PolicyLabel policyLabel(
-        Position pos,
-        Principal owner,
-        Collection readers) {
-        PolicyLabel t = new PolicyLabel_c(this, pos, owner, readers);
-        return t;
-    }
-
-    public JoinLabel joinLabel(Position pos, Collection components) {
-        JoinLabel t = new JoinLabel_c(this, pos, components);
-        return t;
-    }
-
-    public MeetLabel meetLabel(Position pos, Collection components) {
-        MeetLabel t = new MeetLabel_c(this, pos, components);
-        return t;
-    }
-
-    public DynamicLabel dynamicLabel(
-        Position pos,
-        UID uid,
-        String name,
-        Label L) {
-        DynamicLabel t = new DynamicLabel_c(this, pos, uid, name, L);
-        return t;
-    }
-
-    public DynrecLabel dynrecLabel(Position pos, UID uid) {
-        DynrecLabel t = new DynrecLabel_c(this, pos, uid);
+    public DynamicLabel dynamicLabel(Position pos, AccessPath path) {
+        DynamicLabel t = new DynamicLabel_c(path, this, pos);
         return t;
     }
 
@@ -763,17 +663,6 @@ public class JifTypeSystem_c
         ArgLabel t = new ArgLabel_c(this, li, pos);
         return t;
     }
-//    public DynamicArgLabel dynamicArgLabel(
-//        Position pos,
-//        UID uid,
-//        String name,
-//        Label L,
-//        int index,
-//        boolean isSignature) {
-//        DynamicArgLabel t =
-//            new DynamicArgLabel_c(this, pos, uid, name, L, index, isSignature);
-//        return t;
-//    }
 
     public UnknownLabel unknownLabel(Position pos) {
         UnknownLabel t = new UnknownLabel_c(this, pos);
@@ -957,48 +846,37 @@ public class JifTypeSystem_c
     }
 
     public Label join(Label L1, Label L2) {
-        if (!L1.isCanonical()) {
-            return unknownLabel(L1.position());
-        }
-
-        if (!L2.isCanonical()) {
-            return unknownLabel(L2.position());
-        }
-
+//        if (!L1.isCanonical()) {
+//            return unknownLabel(L1.position());
+//        }
+//
+//        if (!L2.isCanonical()) {
+//            return unknownLabel(L2.position());
+//        }
+//
         if (L1 instanceof TopLabel || L1.isTop()) {
             return L1;
         }
-
         if (L2 instanceof TopLabel || L2.isTop()) {
             return L2;
         }
-
         if (L1 instanceof NotTaken) {
             return L2;
         }
-
         if (L2 instanceof NotTaken) {
             return L1;
         }
-
         if (L1 instanceof RuntimeLabel && L2.isRuntimeRepresentable()) {
             return L1;
         }
-
         if (L2 instanceof RuntimeLabel && L1.isRuntimeRepresentable()) {
             return L2;
         }
-
-        List l = new ArrayList(2);
-
-        l.add(L1);
-        l.add(L2);
-
+        List l = CollectionUtil.list(L1, L2);
         Position pos = L1.position();
-        if (pos == null)
-            pos = L2.position();
+        if (pos == null) pos = L2.position();
 
-        return joinLabel(pos, l).flatten();
+        return joinLabel(pos, l).simplify();
     }
 
     public boolean leq(Label L1, Label L2, LabelEnv env) {
@@ -1007,83 +885,6 @@ public class JifTypeSystem_c
 
     public boolean leq(Label L1, Label L2) {
         return emptyLabelEnv.leq(L1, L2);
-    }
-
-    /** Indirect through the TS so extensions can support new label types. */
-    public Label meet(Label L1, Label L2, PrincipalHierarchy ph) {
-        if (!L1.isMeetable() || !L2.isMeetable()) {
-            throw new InternalCompilerError(
-                "Cannot meet " + L1 + " with " + L2 + ".");
-        }
-
-        L1 = L1.simplify();
-        L2 = L2.simplify();
-
-        if (L1 instanceof TopLabel) {
-            return L2;
-        }
-
-        if (L2 instanceof TopLabel) {
-            return L1;
-        }
-
-        if (L1 instanceof RuntimeLabel) {
-            if (L2.isRuntimeRepresentable()) {
-                return L2;
-            } else {
-                return bottomLabel(L2.position());
-            }
-        }
-
-        if (L2 instanceof RuntimeLabel) {
-            if (L1.isRuntimeRepresentable()) {
-                return L1;
-            } else {
-                return bottomLabel(L1.position());
-            }
-        }
-
-        if (!L2.isEnumerable()) {
-            throw new InternalCompilerError(
-                "Cannot compare non-enumerable " + L2);
-        }
-
-        Position pos = L1.position();
-        if (pos == null)
-            pos = L2.position();
-
-        if (L1 instanceof MeetLabel) {
-            // If L1 is a MeetLabel, then ph is null, as otherwise, L1
-            // had simplify(ph) called on it, which gets rid of the MeetLabel
-            MeetLabel mL1 = (MeetLabel)L1;
-            HashSet hs = new HashSet(mL1.components());
-            hs.add(L2);
-            return meetLabel(pos, hs).flatten();
-        }
-
-        if (L2 instanceof MeetLabel) {
-            // If L2 is a MeetLabel, then ph is null, as otherwise, L2
-            // had simplify(ph) called on it, which gets rid of the MeetLabel
-            MeetLabel mL2 = (MeetLabel)L2;
-            HashSet hs = new HashSet(mL2.components());
-            hs.add(L1);
-            return meetLabel(pos, hs).flatten();
-        }
-
-        Label result = bottomLabel(pos);
-
-        for (Iterator i = L2.components().iterator(); i.hasNext();) {
-            Label c = (Label)i.next();
-            if (c instanceof MeetLabel) {
-                result = result.join(c.meet_(L1, ph));
-            } else {
-                result = result.join(L1.meet_(c, ph));
-            }
-        }
-
-        result = result.simplify();
-
-        return result;
     }
 
     public String translateClass(Resolver c, ClassType t)

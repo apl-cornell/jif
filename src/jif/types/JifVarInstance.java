@@ -8,7 +8,6 @@ import polyglot.types.*;
  */
 public interface JifVarInstance extends VarInstance
 {
-    UID uid();
     Label label();
     void setLabel(Label L);
 }

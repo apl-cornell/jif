@@ -2,20 +2,18 @@ package jif.extension;
 
 import java.util.*;
 
-import jif.ast.*;
+import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.types.label.*;
-import jif.types.label.Label;
-import jif.types.label.NotTaken;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.Formal;
+import polyglot.ast.ProcedureDecl;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
-import polyglot.visit.NodeVisitor;
 
 /** The Jif extension of the <code>ProcedureDecl</code> node. 
  * 
@@ -62,7 +60,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	// label of each formal with the corresponding label variable in
 	// the method instance.
 	
-	Graph depGraph = new Graph();
 	List formalNames = new LinkedList();
 	for (Iterator iter = mn.formals().iterator(); iter.hasNext(); ) 
 	    formalNames.add(((Formal)iter.next()).name());
@@ -262,8 +259,8 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         if (! (X.N() instanceof NotTaken)) {
             boolean singlePath = true;
             for (Iterator iter = X.paths().iterator(); iter.hasNext(); ) {
-                AccessPath p = (AccessPath) iter.next();
-                if (p.equals(AccessPath.N) || p.equals(AccessPath.R)) continue;
+                Path p = (Path) iter.next();
+                if (p.equals(Path.N) || p.equals(Path.R)) continue;
                 singlePath = false;
                 break;
             }

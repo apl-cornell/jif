@@ -1,28 +1,22 @@
 package jif.types.label;
 
-
-import jif.types.JifTypeSystem;
-import jif.types.ParamInstance;
+import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
 import polyglot.types.*;
-import polyglot.types.Resolver;
-import polyglot.types.TypeObject;
 import polyglot.util.*;
-import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
 
 /** An implementation of the <code>CovariantLabel</code> interface. 
  */
-public class CovariantParamLabel_c extends Label_c implements CovariantParamLabel {
-    private final ParamInstance paramInstance;
-    public CovariantParamLabel_c(ParamInstance paramInstance, JifTypeSystem ts, Position pos) {
-        super(ts, pos);
-        this.paramInstance = paramInstance;
+public class CovariantThisLabel_c extends CovariantParamLabel_c implements CovariantThisLabel {
+    private final JifClassType ct;
+    public CovariantThisLabel_c(JifClassType ct, JifTypeSystem ts, Position pos) {
+        super(ts.paramInstance(pos, ct, ParamInstance.COVARIANT_LABEL, "this"), ts, pos);
+        this.ct = ct;
     }
     
-    public ParamInstance paramInstance() {
-        return paramInstance;
+    public JifClassType classType() {
+        return ct;
     }
     public boolean isRuntimeRepresentable() {
         return false;
@@ -34,27 +28,30 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
         return true;
     }
     public boolean isCanonical() {
-        return paramInstance.isCanonical();
+        return ct.isCanonical();
     }
     public boolean isEnumerable() {
         return true;
     }
     public int hashCode() {
-        return paramInstance.hashCode();
+        return ct.hashCode();
     }
     public boolean equalsImpl(TypeObject o) {
-        if (! (o instanceof CovariantParamLabel)) {
+        if (! (o instanceof CovariantThisLabel)) {
             return false;
         }           
-        CovariantParamLabel that = (CovariantParamLabel) o;
-        return (this.paramInstance == that.paramInstance());
+        CovariantThisLabel that = (CovariantThisLabel) o;
+        return (this.ct.equals(that.classType()));
     }
     
     public String componentString() {
-        if (Report.should_report(Report.debug, 1)) { 
-            return "<covariant-param-label " + this.paramInstance + ">";
+        if (Report.should_report(Report.debug, 2)) { 
+            return "<covariant-this-label " + this.ct.fullName() + ">";
         }
-        return "<covariant-param-label " + this.paramInstance.name() + ">";
+        if (Report.should_report(Report.debug, 1)) { 
+            return "<covariant-this-label>";
+        }
+        return "this";
     }
 
     public boolean leq_(Label L, LabelEnv env) {

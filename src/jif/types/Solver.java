@@ -3,11 +3,7 @@ package jif.types;
 import java.util.*;
 
 import jif.JifOptions;
-import jif.types.hierarchy.LabelEnv;
-import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.*;
-import jif.types.label.DynamicLabel;
-import jif.types.label.Label;
 import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
@@ -66,13 +62,6 @@ public abstract class Solver
     private static Collection topics = CollectionUtil.list("solver", "jif");
 
     /**
-     * This boolean is used to turn on or off the use of MeetLabels.
-     * Using MeetLabels can result in a finer-grain analysis, as it delays
-     * committing to a particular prinicpal hierarchy as long as possible.
-     */
-    private static final boolean useMeetLabels = false;
-    
-    /**
      * This boolean is used to turn on or off whether the strongly
      * connected components optimization is used. 
      *
@@ -83,14 +72,6 @@ public abstract class Solver
      */
     private static final boolean useSCC = true;
 
-    protected static Label solverMeet(JifTypeSystem ts, Label l, Label r, PrincipalHierarchy ph) {
-        if (useMeetLabels) {
-            return ts.meet(l, r, null); 
-        }
-        else {
-            return l.meet(r, ph);
-        }
-    }
 
     /**
      * Constructor
@@ -502,9 +483,9 @@ public abstract class Solver
     
             // Check to see if it is currently satisfiable.
             if (! eqn.env().leq(lhsBound, rhsBound)) {
-                if (!dynCheck(lhsBound, rhsBound, eqn.env())) { 
+                //if (!dynCheck(lhsBound, rhsBound, eqn.env())) { 
                     reportError(eqn.constraint(), eqn.variables());
-                }
+                //}
             }
         }
     }
@@ -562,56 +543,56 @@ public abstract class Solver
     /**
      * DOCO: TODO XXX###
      */
-    protected final boolean dynCheck(Label lhs, Label rhs, LabelEnv env) {
-        if (!dynBounds.isEmpty()) {
-            Label lhsBound = dynBounds.applyTo(lhs);
-            Label rhsBound = dynBounds.applyTo(rhs);
-            if (shouldReport(4)) {
-            report(4, "DYN LHS = " + lhsBound);
-            report(4, "RHS APP = " + rhsBound);
-            }
-                
-            return env.leq(lhsBound, rhsBound);
-        }
-        
-        return false;
-    }
+//    protected final boolean dynCheck(Label lhs, Label rhs, LabelEnv env) {
+//        if (!dynBounds.isEmpty()) {
+//            Label lhsBound = dynBounds.applyTo(lhs);
+//            Label rhsBound = dynBounds.applyTo(rhs);
+//            if (shouldReport(4)) {
+//            report(4, "DYN LHS = " + lhsBound);
+//            report(4, "RHS APP = " + rhsBound);
+//            }
+//                
+//            return env.leq(lhsBound, rhsBound);
+//        }
+//        
+//        return false;
+//    }
+
+//    /**
+//     * DOCO: TODO ###XXX
+//     */    
+//    protected final Label dynMeet(Label lhs, Label rhs, PrincipalHierarchy ph) {
+//        //dynBounds.applyTo(lhs) meet dynBounds.applyTo(rhs)
+//        if (!dynBounds.isEmpty()) {
+//            Label lhsBound = dynBounds.applyTo(lhs);
+//            Label rhsBound = dynBounds.applyTo(rhs);
+//            if (shouldReport(4)) {
+//                report(4, "DYN BOUND of " + lhs + " = " + lhsBound);
+//                report(4, "APP = " + rhsBound);
+//            }
+//
+//            return solverMeet(ts, lhsBound, rhsBound, ph); 
+//        }
+//        return solverMeet(ts, lhs, rhs, ph);
+//    }
 
     /**
      * DOCO: TODO ###XXX
      */    
-    protected final Label dynMeet(Label lhs, Label rhs, PrincipalHierarchy ph) {
-        //dynBounds.applyTo(lhs) meet dynBounds.applyTo(rhs)
-        if (!dynBounds.isEmpty()) {
-            Label lhsBound = dynBounds.applyTo(lhs);
-            Label rhsBound = dynBounds.applyTo(rhs);
-            if (shouldReport(4)) {
-                report(4, "DYN BOUND of " + lhs + " = " + lhsBound);
-                report(4, "APP = " + rhsBound);
-            }
-
-            return solverMeet(ts, lhsBound, rhsBound, ph); 
-        }
-        return solverMeet(ts, lhs, rhs, ph);
-    }
-
-    /**
-     * DOCO: TODO ###XXX
-     */    
-    protected final Label dynJoin(Label lhs, Label rhs, PrincipalHierarchy ph) {
-        //dynBounds.applyTo(lhs) meet dynBounds.applyTo(rhs)
-        if (!dynBounds.isEmpty()) {
-            Label lhsBound = dynBounds.applyTo(lhs);
-            Label rhsBound = dynBounds.applyTo(rhs);
-            if (shouldReport(4)) {
-                report(4, "DYN BOUND of " + lhs + " = " + lhsBound);
-                report(4, "APP = " + rhsBound);
-            }
-
-            return lhsBound.join(rhsBound, ph); 
-        }
-        return lhs.join(rhs, ph);
-    }
+//    protected final Label dynJoin(Label lhs, Label rhs, PrincipalHierarchy ph) {
+//        //dynBounds.applyTo(lhs) meet dynBounds.applyTo(rhs)
+//        if (!dynBounds.isEmpty()) {
+//            Label lhsBound = dynBounds.applyTo(lhs);
+//            Label rhsBound = dynBounds.applyTo(rhs);
+//            if (shouldReport(4)) {
+//                report(4, "DYN BOUND of " + lhs + " = " + lhsBound);
+//                report(4, "APP = " + rhsBound);
+//            }
+//
+//            return lhsBound.join(rhsBound); 
+//        }
+//        return lhs.join(rhs);
+//    }
 
     /**
      * Awakens all equations in the system that depend on the variable v,
@@ -818,9 +799,9 @@ public abstract class Solver
      * This kind of binding is caused by assignments like 
      *      final label lb = new label{L};
      */
-    public final void bind(DynamicLabel dl, Label l) {
-        dynBounds.setBound(dl, l);
-    }
+//    public final void bind(DynamicLabel dl, Label l) {
+//        dynBounds.setBound(dl, l);
+//    }
     
     // *********************************************************
     //

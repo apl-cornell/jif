@@ -144,8 +144,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         JifClassDecl_c n = (JifClassDecl_c)super.disambiguate(ar);
 	
         JifParsedPolyType ct = (JifParsedPolyType) n.type;
-        Set names = new HashSet(n.params.size());
-        //@@@@Need to disamb the params? Probably....
+        //@@@@@Need to disamb the params? Probably....
 
         List principals = new ArrayList(n.authority().size());
         for (Iterator i = n.authority().iterator(); i.hasNext(); ) {
@@ -174,11 +173,9 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
         if (!ct.thisLabel().isCanonical()) {
             if (!invariant)
-                ct.setThisLabel(ts.freshCovariantLabel(position(), "this").
-                             description("label of the reference \"this\" in class " + ct.name()));
+                ct.setThisLabel(ts.covariantThisLabel(position(), ct));
             else
-                ct.setThisLabel(ts.paramLabel(position(), new UID("this")).
-                             description("label of the reference \"this\" in class " + ct.name()) );
+                ct.setThisLabel(ts.thisLabel(position(), ct));
         }
         
         return n;

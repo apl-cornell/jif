@@ -1,12 +1,10 @@
 package jif.ast;
 
 import jif.types.*;
-import jif.types.label.Label;
+import jif.types.label.*;
 import jif.types.principal.Principal;
-import polyglot.ast.Expr;
-import polyglot.ast.Field;
-import polyglot.ast.Local;
-import polyglot.ast.Node;
+import polyglot.ast.*;
+import polyglot.types.LocalInstance;
 import polyglot.util.InternalCompilerError;
 
 /**
@@ -17,14 +15,14 @@ public class JifUtil
     // Some utility functions used to avoid casts.
     public static PathMap X(Node n) {
         Jif ext = (Jif) n.ext();
-	return ext.del().X();
+        return ext.del().X();
     }
-
+    
     public static Node X(Node n, PathMap X) {
         Jif ext = (Jif) n.ext();
         return n.ext(ext.del().X(X));
     }
-
+    
     /**
      * Return the Label that the expression expr represents. 
      */
@@ -49,43 +47,55 @@ public class JifUtil
         }
         return runtimePrincipal(ts, expr);
     }
-
+    
     /** Generates a dynamic label from expr. */
     public static Label runtimeLabel(JifTypeSystem ts, Expr expr) {
-    if (expr instanceof NewLabel) {
-        NewLabel nl = (NewLabel) expr;
-        return nl.label().label();
-    }
-    if (expr instanceof Local) {
-        Local local = (Local) expr;
-        JifVarInstance jvi = (JifVarInstance) local.localInstance();
-        return ts.dynamicLabel(jvi.position(), jvi.uid(), jvi.name(), jvi.label());
-    }
-    if (expr instanceof Field) {
-        Field field = (Field) expr;
-        JifVarInstance jvi = (JifVarInstance) field.fieldInstance();
-        return ts.dynamicLabel(jvi.position(), jvi.uid(), jvi.name(), jvi.label()); 
-    }
-    
-    return null;
+        if (expr instanceof NewLabel) {
+            NewLabel nl = (NewLabel) expr;
+            return nl.label().label();
+        }
+        if (expr instanceof Local) {
+            Local local = (Local) expr;
+            JifLocalInstance jli = (JifLocalInstance) local.localInstance();
+            return ts.dynamicLabel(jli.position(), new AccessPathRoot(jli));
+        }
+        //@@@@Need to deal with final access path expressions generally
+//        if (expr instanceof Field) {
+//            Field field = (Field) expr;
+//            JifVarInstance jvi = (JifVarInstance) field.fieldInstance();
+//            return ts.dynamicLabel(jvi.position(), jvi.uid(), jvi.name(), jvi.label()); 
+//        }
+        
+        return null;
     }
     
     /** Generates a dynamic principal from expr. */
     public static Principal runtimePrincipal(JifTypeSystem ts, Expr expr) {
-    if (expr instanceof Local) {
-        Local local = (Local) expr;
-        JifVarInstance jvi = (JifVarInstance) local.localInstance();
-        return ts.dynamicPrincipal(jvi.position(), jvi.uid(), 
-            jvi.name(), jvi.label());
+        if (expr instanceof Local) {
+            Local local = (Local) expr;
+            JifLocalInstance jli = (JifLocalInstance) local.localInstance();
+            return ts.dynamicPrincipal(jli.position(), varInstanceToAcessPath(jli));
+        }
+        //@@@@Need to deal with final access path expressions generally
+//        if (expr instanceof Field) {
+//            Field field = (Field) expr;
+//            JifVarInstance jvi = (JifVarInstance) field.fieldInstance();
+//            return ts.dynamicPrincipal(jvi.position(), jvi.uid(), 
+//                                       jvi.name(), jvi.label());   
+//        }
+        
+        return null;
     }
-    if (expr instanceof Field) {
-        Field field = (Field) expr;
-        JifVarInstance jvi = (JifVarInstance) field.fieldInstance();
-        return ts.dynamicPrincipal(jvi.position(), jvi.uid(), 
-            jvi.name(), jvi.label());   
-    }
-    
-    return null;
-    }    
 
+    /**
+     * @param vi
+     * @return
+     */
+    public static AccessPath varInstanceToAcessPath(JifVarInstance vi) {
+        if (vi instanceof LocalInstance) {
+            return new AccessPathRoot((LocalInstance)vi);
+        }
+        throw new InternalCompilerError("Current not supporting converting " + vi.getClass() + " to access paths");
+    }    
+    
 }

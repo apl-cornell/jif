@@ -57,8 +57,8 @@ public class AmbParam_c extends Node_c implements AmbParam
      */
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
 	Context c = sc.context();
-        JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
-        JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
+//        JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
+//        JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
             
         VarInstance vi = c.findVariable(name);
         //        int ind = jar.indexForArg(name);
@@ -110,7 +110,6 @@ public class AmbParam_c extends Node_c implements AmbParam
     protected Node varToParam(JifVarInstance vi, AmbiguityRemover sc)
 	throws SemanticException {
 
-    	Context c = sc.context();
 	JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
@@ -120,8 +119,7 @@ public class AmbParam_c extends Node_c implements AmbParam
 	    }
 
 	    if (ts.isPrincipal(vi.type())) {
-		Principal p = ts.dynamicPrincipal(position(), vi.uid(),
-			                          vi.name(), vi.label());
+		Principal p = ts.dynamicPrincipal(position(), JifUtil.varInstanceToAcessPath(vi));
 		return nf.CanonicalPrincipalNode(position(), p);
 	    }
 	}
@@ -140,33 +138,32 @@ public class AmbParam_c extends Node_c implements AmbParam
     /** Turns a <code>PramaInstance</code> object into a label node or a 
      *  principal node. 
      */
-    protected Node paramToParam(ParamInstance vi, AmbiguityRemover sc)
+    protected Node paramToParam(ParamInstance pi, AmbiguityRemover sc)
 	throws SemanticException {
-    	Context c = sc.context();
 	JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
-	if (vi.isCovariantLabel()) {
+	if (pi.isCovariantLabel()) {
 	    // <covariant label uid> => <covariant-label uid>
-	    Label L = ts.covariantLabel(position(), vi.uid());
+	    Label L = ts.covariantLabel(position(), pi);
 	    return nf.CanonicalLabelNode(position(), L);
 	}
 
-	if (vi.isInvariantLabel()) {
+	if (pi.isInvariantLabel()) {
 	    // <param label uid> => <label-param uid>
-	    Label L = ts.paramLabel(position(), vi.uid()).
-                       description("label parameter " + vi.name() + 
-                                   " of class " + vi.container().fullName());
+	    Label L = ts.paramLabel(position(), pi);
+            L.setDescription("label parameter " + pi.name() + 
+                                   " of class " + pi.container().fullName());
 	    return nf.CanonicalLabelNode(position(), L);
 	}
 
-	if (vi.isPrincipal()) {
+	if (pi.isPrincipal()) {
 	    // <param principal uid> => <principal-param uid>
-	    Principal p = ts.principalParam(position(), vi.uid());
+	    Principal p = ts.principalParam(position(), pi);
 	    return nf.CanonicalPrincipalNode(position(), p);
 	}
 
-	throw new SemanticException("Unrecognized parameter type for " + vi,
+	throw new SemanticException("Unrecognized parameter type for " + pi,
 		                    position());
     }
 }

@@ -1,20 +1,10 @@
 package jif.types;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import jif.types.label.*;
-import jif.types.label.DynamicLabel;
-import jif.types.label.Label;
-import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
-
-import polyglot.types.ArrayType;
-import polyglot.types.Type;
+import polyglot.types.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 
@@ -34,13 +24,8 @@ import polyglot.util.InternalCompilerError;
 public class VarMap {
     private Map bounds;
     private JifTypeSystem ts;
-    private Label defaultBound;
+    private final Label defaultBound;
 
-    public VarMap(JifTypeSystem ts) {
-	this.ts = ts;
-	this.bounds = new HashMap();
-        this.defaultBound = ts.topLabel();
-    }
     public VarMap(JifTypeSystem ts, Label defaultBound) {
 	this.ts = ts;
 	this.bounds = new HashMap();
@@ -50,12 +35,7 @@ public class VarMap {
         }
     }
 
-    protected VarMap(JifTypeSystem ts, Map bounds) {
-	this.ts = ts;
-	this.bounds = new HashMap(bounds);
-        this.defaultBound = ts.topLabel();
-    }
-    protected VarMap(JifTypeSystem ts, Map bounds, Label defaultBound) {
+    private VarMap(JifTypeSystem ts, Map bounds, Label defaultBound) {
 	this.ts = ts;
 	this.bounds = new HashMap(bounds);
         this.defaultBound = defaultBound;
@@ -88,37 +68,25 @@ public class VarMap {
         bounds.put(v, bound);
     }
     
-    public Label boundOf(DynamicLabel v) {
-	Label bound = (Label) bounds.get(v);
-        // for backward compatibility reasons, if there is no
-        // mapping for a Dynamic label, we return null, rather than
-        // the default bound.
-	return bound;
-    }
-
-    public void setBound(DynamicLabel v, Label bound) {
-	if (bound == null) {
-	    throw new InternalCompilerError("Null bound label.");
-	}
-        bounds.put(v, bound);
-    }
-    
-    public void setDefaultBound(Label defaultBound) {
-	if (defaultBound == null) {
-	    throw new InternalCompilerError("Null bound label.");
-	}
-        this.defaultBound = defaultBound;
-    }
-    
     public Label applyTo(Label c) {
-        return c.bound(this, Collections.EMPTY_SET);
+        LabelSubstitution s = new LabelSubstitution() {
+            public Label substLabel(Label L) throws SemanticException {
+                if (L instanceof VarLabel) {
+                    VarLabel v = (VarLabel)L;
+                    return VarMap.this.boundOf(v);
+                }
+                return L;
+            }            
+        };
+        try {
+            return c.subst(s);
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected SemanticException", e);
+        }
     }
     
     public Principal applyTo(Principal p) {
-        if (p instanceof DynamicPrincipal) {
-            DynamicPrincipal dp = (DynamicPrincipal) p;
-            return dp.label(applyTo(dp.label()));
-        }
         return p;
     }
 
@@ -136,7 +104,6 @@ public class VarMap {
         else if (t instanceof JifSubstType) {
             JifSubstType jst = (JifSubstType)t;
             Map newMap = new HashMap();
-            List args = new LinkedList();
             boolean diff = false;
 
             for (Iterator i = jst.entries(); i.hasNext();) {
@@ -144,10 +111,10 @@ public class VarMap {
                 Object arg = e.getValue();
                 Param p;
                 if (arg instanceof Label) {
-                    p = (Label)applyTo((Label)arg);
+                    p = applyTo((Label)arg);
                 }
                 else if (arg instanceof Principal) {
-                    p = (Principal)applyTo((Principal)arg);
+                    p = applyTo((Principal)arg);
                 }
                 else {
                     throw new InternalCompilerError(
@@ -170,10 +137,6 @@ public class VarMap {
 	return t;
     }	
     
-    public boolean isEmpty() {
-	return bounds.isEmpty();
-    }
-    
     public void print() {
         if (Solver.shouldReport(1)) {
             Solver.report(1, "======== VAR MAP ========");
@@ -193,7 +156,7 @@ public class VarMap {
         }
     }
 
-    public void dump( CodeWriter w) {
+    public void dump(CodeWriter w) {
 	w.write("======== VAR MAP ========");
 	w.newline(0);
         for (Iterator i = bounds.entrySet().iterator(); i.hasNext(); ){

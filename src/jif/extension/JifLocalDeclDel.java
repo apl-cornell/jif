@@ -22,9 +22,7 @@ public class JifLocalDeclDel extends JifJL_c {
         JifTypeSystem jts = (JifTypeSystem)tb.typeSystem();
 
         JifLocalInstance li = (JifLocalInstance)n.localInstance();
-        li.setLabel(jts.freshLabelVariable(li.position(), 
-                                           li.name(), 
-                                           "label of the local variable " + li.name()).uid(li.uid()));
+        li.setLabel(jts.freshLabelVariable(li.position(), li.name(), "label of the local variable " + li.name()));
         
         return n.localInstance(li);
     }

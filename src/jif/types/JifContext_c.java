@@ -4,10 +4,7 @@ import java.util.*;
 
 import jif.types.hierarchy.*;
 import jif.types.label.*;
-import jif.types.label.CovariantParamLabel;
-import jif.types.label.Label;
 import jif.types.principal.Principal;
-
 import polyglot.ext.jl.types.Context_c;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
@@ -234,7 +231,6 @@ public class JifContext_c extends Context_c implements JifContext
     if (t instanceof JifSubstType) {
         JifSubstType jit = (JifSubstType) t;
             Map newMap = new HashMap();
-        List args = new LinkedList();
         boolean diff = false;
         for (Iterator i = jit.entries(); i.hasNext(); ) {
                 Map.Entry e = (Map.Entry) i.next();
@@ -284,27 +280,11 @@ public class JifContext_c extends Context_c implements JifContext
       
         public Label substLabel(Label L) {
             Label result = L;
-            // The following is buggy: this labels, like arg labels, can either
-            // be signature or non-signature, i.e. they either refer to the
-            // callee's "this" object, or the caller's "this" object.
-            // I (SNC) think we need a new classes, of CovariantThisLabel and
-            // ParamThisLabel, with a method "isSignature" on them; in the 
-            // following code, only signature ThisLabels should be replaced,
-            // or possibly that should be done at the same time signature
-            // arglabels are replaced.
-            if (L instanceof CovariantParamLabel && ctxt.objLabel != null) {
-                CovariantParamLabel cl = (CovariantParamLabel)L;
-                if (this.instantiateThisLabels && cl.uid().name().equals("this")) {
+            if (this.instantiateThisLabels && ctxt.objLabel != null) {
+                if (L instanceof CovariantThisLabel || L instanceof ThisLabel) {
                     result = ctxt.objLabel;
                 }
             }
-            else if (L instanceof ParamLabel && ctxt.objLabel != null) {
-                ParamLabel pl = (ParamLabel)L;
-                if (this.instantiateThisLabels && pl.uid().name().equals("this")) {
-                    result = ctxt.objLabel;
-                }
-            }
-
 
             if (ctxt.objType instanceof JifSubstType) {
                 JifSubstType t = (JifSubstType)ctxt.objType;

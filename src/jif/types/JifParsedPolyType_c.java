@@ -1,16 +1,17 @@
 package jif.types;
 
-import polyglot.ext.jl.types.*;
-import polyglot.ext.param.types.*;
-import polyglot.frontend.Source;
-import polyglot.types.*;
-import polyglot.util.*;
 import java.util.*;
 
+import jif.types.label.*;
 import jif.types.label.Label;
 import jif.types.label.ParamLabel;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
+import polyglot.ext.jl.types.ParsedClassType_c;
+import polyglot.ext.param.types.PClass;
+import polyglot.frontend.Source;
+import polyglot.types.*;
+import polyglot.util.*;
 
 /** An implementation of the <code>JifParsedPolyType</code> interface. 
  */
@@ -103,16 +104,17 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
         for (Iterator i = params.iterator(); i.hasNext(); ) {
             ParamInstance pi = (ParamInstance) i.next();
             Position posi = pi.position();
-            UID uid = pi.uid();
 
             if (pi.isCovariantLabel()) {
-                actuals.add(ts.covariantLabel(posi, uid));
+                actuals.add(ts.covariantLabel(posi, pi));
             }
             else if (pi.isLabel()) {
-                actuals.add(ts.paramLabel(posi, uid).description("label parameter " + pi.name() + " of class " + pi.container().fullName()));
+                ParamLabel pl = ts.paramLabel(posi, pi);
+                pl.setDescription("label parameter " + pi.name() + " of class " + pi.container().fullName());                
+                actuals.add(pl);
             }
             else {
-                actuals.add(ts.principalParam(posi, uid));
+                actuals.add(ts.principalParam(posi, pi));
             }
         }
 
@@ -204,12 +206,12 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
     public JifClassType setInvariantThis(Label L) throws SemanticException {
 	JifTypeSystem jts = (JifTypeSystem) typeSystem();
 
-        if (! (thisLabel instanceof ParamLabel)) {
+        if (! (thisLabel instanceof ThisLabel)) {
             throw new SemanticException("Cannot set invariant this label.");
         }
 
         Map subst = new HashMap();
-        subst.put(((ParamLabel) thisLabel).uid(), L);
+        subst.put(((ThisLabel)thisLabel).paramInstance(), L);
 
         return (JifClassType) jts.subst(this, subst);
     }

@@ -3,6 +3,7 @@ package jif.types.label;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
+import polyglot.types.*;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
 import polyglot.util.*;
@@ -40,5 +41,11 @@ public class TopLabel_c extends Label_c implements TopLabel {
     }
     public void translate(Resolver c, CodeWriter w) {
         throw new InternalCompilerError("Cannot translate label \"" + this + "\".");
+    }
+    public Label subst(LocalInstance arg, Label l) {
+        return this;
+    }
+    public Label subst(AccessPathRoot r, AccessPath e) {
+        return this;
     }
 }

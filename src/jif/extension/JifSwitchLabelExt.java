@@ -86,7 +86,9 @@ public class JifSwitchLabelExt extends JifStmtExt_c
                          }
                          );
 
-		pc = pc.join(Xe.NV().join(Li).labelOf());
+                //@@@@@ this ast will be going soon anyway... just get it to compile
+                    // pc = pc.join(Xe.NV().join(Li).labelOf());
+                pc = pc.join(Xe.NV().join(Li));
 	    }
 
 	    A = (JifContext) A.pushBlock();

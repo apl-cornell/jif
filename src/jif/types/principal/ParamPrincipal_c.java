@@ -2,6 +2,8 @@ package jif.types.principal;
 
 import jif.types.JifTypeSystem;
 import jif.types.ParamInstance;
+import jif.types.label.AccessPath;
+import jif.types.label.AccessPathRoot;
 import polyglot.main.Report;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
@@ -45,5 +47,8 @@ public class ParamPrincipal_c extends Principal_c implements ParamPrincipal {
 
     public String translate(Resolver c) {
         throw new InternalCompilerError("Cannot translate principal \"" + this + "\".");
+    }
+    public Principal subst(AccessPathRoot r, AccessPath e) {
+        return this;
     }
 }

@@ -1,14 +1,10 @@
 package jif.extension;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.PathMap;
+import jif.types.*;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
 import polyglot.types.SemanticException;
@@ -55,11 +51,7 @@ public class JifNewArrayExt extends Jif_c
 
 	if (nae.init() != null) {
 	    init = (ArrayInit) lc.context(A).labelCheck(nae.init());
-
-            if (init instanceof ArrayInit) {
-                ((JifArrayInitExt)(init.ext())).labelCheckElements(lc, nae.type()); 
-            }
-
+            ((JifArrayInitExt)(init.ext())).labelCheckElements(lc, nae.type()); 
 	    PathMap Xinit = X(init);
 	    Xs = Xs.N(ts.notTaken()).join(Xinit);
 	}

@@ -3,6 +3,7 @@ package jif.types.label;
 import java.util.*;
 
 import jif.translate.*;
+import jif.types.*;
 import jif.types.JifTypeSystem;
 import polyglot.ast.Expr;
 import polyglot.ext.jl.types.TypeObject_c;
@@ -14,7 +15,7 @@ import polyglot.util.Position;
 /** 
  * An abstract implementation of the <code>Label</code> interface. 
  */
-public abstract class Label_c extends TypeObject_c implements Label, LabelImpl
+public abstract class Label_c extends TypeObject_c implements Label
 {
     protected String description;
     protected LabelToJavaExpr toJava;
@@ -108,8 +109,14 @@ public abstract class Label_c extends TypeObject_c implements Label, LabelImpl
         return "{" + componentString() + "}";
     }
     abstract public String componentString();
+    
     public abstract boolean equalsImpl(TypeObject t);
+
     public Label simplify() {
         return this; 
+    }
+
+    public Label subst(LabelSubstitution substitution) throws SemanticException {
+        return substitution.substLabel(this); 
     }
 }

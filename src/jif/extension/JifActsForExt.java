@@ -3,8 +3,6 @@ package jif.extension;
 import jif.ast.ActsFor;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.label.Label;
-import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Node;
@@ -36,22 +34,24 @@ public class JifActsForExt extends JifStmtExt_c
         PathMap X1 = ts.pathMap().N(A.pc());
         PathMap X2 = ts.pathMap().N(A.pc());
 
-        if (p1 instanceof DynamicPrincipal) {
-            // <pr-dynamic uid L> was <var final principal{L} uid>
-            // Simulate the effect of the variable lookup.
-            Label L = ((DynamicPrincipal) p1).label();
-            X1 = X1.NV(L.join(A.pc()));
-        }
+        //@@@@@ just get it to compile first...
+//        if (p1 instanceof DynamicPrincipal) {
+//            // <pr-dynamic uid L> was <var final principal{L} uid>
+//            // Simulate the effect of the variable lookup.
+//            Label L = ((DynamicPrincipal) p1).label();
+//            X1 = X1.NV(L.join(A.pc()));
+//        }
 
         A = (JifContext) A.pushBlock();
         A.setPc(X1.N());
 
-        if (p2 instanceof DynamicPrincipal) {
-            // <pr-dynamic uid L> was <var final principal{L} uid>
-            // Simulate the effect of the variable lookup.
-            Label L = ((DynamicPrincipal) p2).label();
-            X2 = X2.NV(L.join(A.pc()));
-        }
+        //@@@@@ just get it to compile first...
+//        if (p2 instanceof DynamicPrincipal) {
+//            // <pr-dynamic uid L> was <var final principal{L} uid>
+//            // Simulate the effect of the variable lookup.
+//            Label L = ((DynamicPrincipal) p2).label();
+//            X2 = X2.NV(L.join(A.pc()));
+//        }
 
         A = (JifContext) A.pop();
 

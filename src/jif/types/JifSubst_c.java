@@ -29,19 +29,19 @@ public class JifSubst_c extends Subst_c implements JifSubst
 
         for (Iterator i = entries(); i.hasNext(); ) {
             Map.Entry e = (Map.Entry) i.next();
-            if (e.getKey() instanceof UID && e.getValue() instanceof Param)
+            if (e.getKey() instanceof ParamInstance && e.getValue() instanceof Param)
                 continue;
             throw new InternalCompilerError("bad map: the keys must be UIDs, "+
             "and the values must be Params: " + subst);
         }
     }
 
-    public Param get(UID uid) {
-        return (Param) subst.get(uid);
+    public Param get(ParamInstance pi) {
+        return (Param) subst.get(pi);
     }
 
-    public void put(UID uid, Param param) {
-        subst.put(uid, param);
+    public void put(ParamInstance pi, Param param) {
+        subst.put(pi, param);
     }
 
     ////////////////////////////////////////////////////////////////
@@ -108,7 +108,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
         fi = super.substField(fi);
         if (fi instanceof JifFieldInstance) { 
             JifFieldInstance jfi = (JifFieldInstance)fi;
-            jfi = jfi.label(substLabel(jfi.label()));
+            jfi.setLabel(substLabel(jfi.label()));
             fi = jfi;
         } 
         return fi;
@@ -200,11 +200,11 @@ public class JifSubst_c extends Subst_c implements JifSubst
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ParamLabel) {
                 ParamLabel c = (ParamLabel) L;
-                return subLabel(c, c.uid());
+                return subLabel(c, c.paramInstance());
             }
             else if (L instanceof CovariantParamLabel) {
                 CovariantParamLabel c = (CovariantParamLabel) L;
-                return subLabel(c, c.uid());
+                return subLabel(c, c.paramInstance());
             }
             return L;
         }
@@ -212,7 +212,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
         public Principal substPrincipal(Principal p) throws SemanticException {
             if (p instanceof ParamPrincipal) {
                 ParamPrincipal pp = (ParamPrincipal) p;
-                return subPrincipal(pp, pp.uid());
+                return subPrincipal(pp, pp.paramInstance());
             }
 
             return p;
@@ -221,8 +221,8 @@ public class JifSubst_c extends Subst_c implements JifSubst
 
 
     /** Return the substitution of uid, or label if not found. */
-    protected Label subLabel(Label label, UID uid) {
-	Param sub = (Param) subst.get(uid);
+    protected Label subLabel(Label label, ParamInstance pi) {
+	Param sub = (Param) subst.get(pi);
         JifTypeSystem ts = (JifTypeSystem) typeSystem();
 
 	if (sub instanceof UnknownParam) {
@@ -236,13 +236,13 @@ public class JifSubst_c extends Subst_c implements JifSubst
 	}
 	else {
 	    throw new InternalCompilerError("Cannot substitute " + label +
-		" for " + sub + " with uid " + uid, label.position());
+		" for " + sub + " with param instance " + pi, label.position());
 	}
     }
 
     /** Return the substitution of uid, or principal if not found. */
-    protected Principal subPrincipal(Principal principal, UID uid) {
-	Param sub = (Param) subst.get(uid);
+    protected Principal subPrincipal(Principal principal, ParamInstance pi) {
+	Param sub = (Param) subst.get(pi);
         JifTypeSystem ts = (JifTypeSystem) typeSystem();
 
 	if (sub instanceof UnknownParam) {
@@ -256,7 +256,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
 	}
 	else {
 	    throw new InternalCompilerError("Cannot substitute " + principal +
-		" for " + sub + " with uid " + uid, principal.position());
+		" for " + sub + " with param instance " + pi, principal.position());
 	}
     }
 
@@ -266,10 +266,10 @@ public class JifSubst_c extends Subst_c implements JifSubst
     // Params.
     protected Object getSubstValueAsKey(Object v) {
         if (v instanceof ParamLabel) {
-            return substitutions().get(((ParamLabel)v).uid());
+            return substitutions().get(((ParamLabel)v).paramInstance());
         }
         else if (v instanceof ParamPrincipal) {
-            return substitutions().get(((ParamPrincipal)v).uid());        
+            return substitutions().get(((ParamPrincipal)v).paramInstance());        
         }
         return substitutions().get(v);
     }

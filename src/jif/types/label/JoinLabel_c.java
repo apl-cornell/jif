@@ -4,9 +4,9 @@ import java.util.*;
 
 import jif.translate.JoinLabelToJavaExpr_c;
 import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
-import polyglot.types.Resolver;
-import polyglot.types.TypeObject;
+import polyglot.types.*;
 import polyglot.util.*;
 
 /** An implementation of the <code>JoinLabel</code> interface. 
@@ -82,7 +82,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     public Set variables() {
         Set s = new HashSet();
         for (Iterator i = components.iterator(); i.hasNext(); ) {
-            LabelImpl c = (LabelImpl) i.next();
+            Label c = (Label) i.next();
             s.addAll(c.variables());
         }
         
@@ -100,7 +100,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         String s = "";
         
         for (Iterator i = components.iterator(); i.hasNext(); ) {
-            LabelImpl c = (LabelImpl) i.next();
+            Label c = (Label) i.next();
             s += c.componentString();
             
             if (i.hasNext()) {
@@ -111,8 +111,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return s;
     }
     
-    public boolean leq_(Label lbl, LabelEnv env) {
-        LabelImpl L = (LabelImpl)lbl;
+    public boolean leq_(Label L, LabelEnv env) {
         if (! L.isSingleton() || ! L.isComparable() || ! L.isEnumerable())
             throw new InternalCompilerError("Cannot compare " + L);
         
@@ -140,7 +139,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label ic = (Label) i.next();
             
-            ((LabelImpl)ic).translate(c, w);
+            ic.translate(c, w);
             
             if (! first) {
                 w.write(")");
@@ -167,7 +166,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         JifTypeSystem jts = (JifTypeSystem) ts;
         
         for (Iterator i = components.iterator(); i.hasNext(); ) {
-            LabelImpl ci = (LabelImpl)((LabelImpl) i.next()).simplify();
+            Label ci = ((Label) i.next()).simplify();
             
             if (ci.hasVariables()) {
                 needed.add(ci);
@@ -176,7 +175,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
                 boolean subsumed = false;
                 
                 for (Iterator j = needed.iterator(); j.hasNext(); ) {
-                    LabelImpl cj = (LabelImpl) j.next();
+                    Label cj = (Label) j.next();
                     
                     if (cj.hasVariables()) 
                         continue;
@@ -208,9 +207,9 @@ public class JoinLabel_c extends Label_c implements JoinLabel
             }
             
             if (L instanceof JoinLabel_c) {
-                L = flatten(((LabelImpl) L).components(), ts, L.position());
+                L = flatten(L.components(), ts, L.position());
                 
-                for (Iterator j = ((LabelImpl)L).components().iterator(); j.hasNext(); ) {
+                for (Iterator j = L.components().iterator(); j.hasNext(); ) {
                     Label Lj = (Label) j.next();
                     
                     if (Lj instanceof TopLabel) {
@@ -230,5 +229,56 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         }
         
         return ts.joinLabel(pos, c);
+    }
+
+    public Label subst(LocalInstance arg, Label l) {
+        boolean changed = false;
+        Set s = new HashSet();
+        for (Iterator i = components.iterator(); i.hasNext(); ) {
+            Label c = (Label) i.next();
+            Label newc = c.subst(arg, l);
+            if (newc != c) changed = true;
+            s.add(newc);
+        }
+        if (!changed) return this;
+        return ((JifTypeSystem)typeSystem()).joinLabel(this.position, s);
+    }
+
+    /**
+     * 
+     */
+    public Label subst(AccessPathRoot r, AccessPath e) {
+        boolean changed = false;
+        Set s = new HashSet();
+        for (Iterator i = components.iterator(); i.hasNext(); ) {
+            Label c = (Label) i.next();
+            Label newc = c.subst(r, e);
+            if (newc != c) changed = true;
+            s.add(newc);
+        }
+        if (!changed) return this;
+        return ((JifTypeSystem)typeSystem()).joinLabel(this.position, s);
+    }
+
+    public Label subst(LabelSubstitution substitution) throws SemanticException {        
+        if (components.isEmpty()) {
+            return substitution.substLabel(this);
+        }
+        
+        boolean changed = false;
+        Set s = new LinkedHashSet();
+        
+        for (Iterator i = components.iterator(); i.hasNext(); ) {
+            Label c = (Label) i.next();
+            Label newc = c.subst(substitution);
+            if (newc != c) changed = true;
+            s.add(newc);
+        }
+        
+        if (!changed) return substitution.substLabel(this);
+        
+        JifTypeSystem ts = (JifTypeSystem)this.typeSystem();
+        Label newJoinLabel = ts.joinLabel(this.position(), s);
+        return substitution.substLabel(newJoinLabel);
     }
 }

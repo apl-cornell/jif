@@ -1,12 +1,11 @@
 package jif.extension;
 
 import jif.types.JifFieldInstance;
+import jif.types.JifTypeSystem;
 import jif.visit.ConstChecker;
-import polyglot.ast.Expr;
-import polyglot.ast.FieldDecl;
-import polyglot.ast.Node;
+import polyglot.ast.*;
 import polyglot.types.SemanticException;
-import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>FieldDecl</code> node. 
@@ -18,11 +17,15 @@ public class JifFieldDeclDel extends JifJL_c
     public JifFieldDeclDel() {
     }
 
-    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
         // Set the flag JifFieldInstance.hasInitializer correctly.
-        FieldDecl fd = (FieldDecl)super.disambiguate(ar);
+        FieldDecl fd = (FieldDecl)super.buildTypes(tb);
         JifFieldInstance jfi = (JifFieldInstance)fd.fieldInstance();
-        jfi.setHasInitializer(fd.init() != null);               
+        jfi.setHasInitializer(fd.init() != null);
+        
+        JifTypeSystem ts = (JifTypeSystem)tb.typeSystem();
+        jfi.setLabel(ts.freshLabelVariable(fd.position(), fd.name(), 
+                                           "label of the field " + tb.currentClass().name() + "." + fd.name()));
         return fd;
     }
 

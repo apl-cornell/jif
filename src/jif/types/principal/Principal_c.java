@@ -2,6 +2,7 @@ package jif.types.principal;
 
 import jif.translate.*;
 import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
 import polyglot.ast.Expr;
 import polyglot.ext.jl.types.TypeObject_c;
 import polyglot.types.SemanticException;
@@ -27,4 +28,8 @@ public abstract class Principal_c extends TypeObject_c implements Principal, Pri
 
     public abstract boolean isCanonical();
     public abstract boolean isRuntimeRepresentable();
+
+    public Principal subst(LabelSubstitution substitution) throws SemanticException {
+        return substitution.substPrincipal(this);
+    }
 }

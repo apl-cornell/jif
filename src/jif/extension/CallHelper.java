@@ -4,7 +4,6 @@ import java.util.*;
 
 import jif.ast.JifUtil;
 import jif.ast.Jif_c;
-import jif.ast.PrincipalNode;
 import jif.types.*;
 import jif.types.label.Label;
 import jif.types.label.VarLabel;
@@ -13,9 +12,7 @@ import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
 import polyglot.main.Report;
 import polyglot.types.*;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.util.StringUtil;
+import polyglot.util.*;
 
 /** 
  * This is a tool to label check method calls. 
@@ -80,7 +77,7 @@ public class CallHelper
      * (<code>argLabels</code>) and the dynamic arguments 
      * (<code>dynArgs</code>).
      */
-    private ArgLabelSubstitution argSubstitution; // LabelSubstitution for argLabels and dynArgs 
+    //private ArgLabelSubstitution argSubstitution; // LabelSubstitution for argLabels and dynArgs 
 
     /**
      * The PathMap for the procedure call.
@@ -118,8 +115,6 @@ public class CallHelper
 	
         if (pi.formalTypes().size() != args.size()) 
             throw new InternalCompilerError("Wrong number of args.");   
-
-        this.argSubstitution = null;
     }
 
     public Type returnType() {
@@ -183,7 +178,7 @@ public class CallHelper
 
     /**
      * Return the elements of the List args that are dynamic labels or 
-     * principals. The reutnred list is the same size as args, and
+     * principals. The returned list is the same size as args, and
      * any dynamic arguments in the returned list are at the same index
      * as they were in <code>args</code>.
      * 
@@ -196,7 +191,7 @@ public class CallHelper
         for (Iterator j = args.iterator(); j.hasNext();) {
             Expr Ej = (Expr)j.next();            
             if (ts.isLabel(Ej.type())) {
-                Label l = JifUtil.exprToLabel(ts, Ej);
+                Label l = JifUtil.exprToLabel(ts, Ej); //@@@@@I think this will need to be a final or constant label expression...
                 if (l == null) {                
                     throw new InternalCompilerError("Unexpected label " + 
                             Ej + " (" + Ej.getClass().getName() + ")");
@@ -255,7 +250,8 @@ public class CallHelper
 	    Type tj = (Type) formalArgTypes.next();
             
             // the label of the formal argument type         
-            Label argLj = instantiate(A, ts.labelOfType(tj, Lj));
+	    //@@@@What does ts.labelOfType(tj, Lj) look like? is it an arg-label or the declared label? Should be the bound on the arg label. Maybe better to get the arglabel, and ask for it's bound.	    
+            Label argLj = instantiate(A, ts.labelOfType(tj, Lj));//@@@@@
 
 	    // To get more precise results, we use the constraint
 	    // "Lj <= argLj" instead of "Lj == argLj"

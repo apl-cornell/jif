@@ -3,11 +3,13 @@ package jif.types.label;
 import java.util.*;
 
 import jif.translate.PolicyLabelToJavaExpr_c;
+import jif.types.*;
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.principal.Principal;
 import jif.types.principal.PrincipalImpl;
+import polyglot.types.*;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
 import polyglot.util.*;
@@ -71,13 +73,12 @@ public class PolicyLabel_c extends Label_c implements PolicyLabel {
         return owner.hashCode() + readers.hashCode();
     }
     
-    public boolean leq_(Label Lbl, LabelEnv env) {
-        LabelImpl L = (LabelImpl)Lbl;
+    public boolean leq_(Label L, LabelEnv env) {
         if (! L.isSingleton() || ! L.isComparable() || ! L.isEnumerable()) {
             throw new InternalCompilerError("Cannot compare " + L);
         }
 
-        L = (LabelImpl)L.singletonComponent();
+        L = L.singletonComponent();
         
         PrincipalHierarchy ph = env.ph();
         if (L instanceof PolicyLabel) {
@@ -141,5 +142,48 @@ public class PolicyLabel_c extends Label_c implements PolicyLabel {
         
         w.write(")");
     }
+    public Label subst(LocalInstance arg, Label l) {
+        return this;
+    }
+    public Label subst(AccessPathRoot r, AccessPath e) {
+        boolean changed = false;
 
+        Principal newOwner = owner.subst(r, e);
+        if (newOwner != owner) changed = true;
+        Set newReaders = new HashSet(readers.size());
+        
+        
+        for (Iterator i = readers.iterator(); i.hasNext(); ) {
+            Principal rd = (Principal) i.next();
+            Principal newRd = rd.subst(r, e);
+            if (newRd != rd) changed = true;
+            newReaders.add(newRd);
+        }
+        
+        if (!changed) return this;
+
+        return ((JifTypeSystem)typeSystem()).policyLabel(this.position(), newOwner, newReaders);        
+    }
+    public Label subst(LabelSubstitution substitution) throws SemanticException {
+        boolean changed = false;
+
+        Principal newOwner = owner.subst(substitution);
+        if (newOwner != owner) changed = true;
+        Set newReaders = new HashSet(readers.size());
+        
+        
+        for (Iterator i = readers.iterator(); i.hasNext(); ) {
+            Principal rd = (Principal) i.next();
+            Principal newRd = rd.subst(substitution);
+            if (newRd != rd) changed = true;
+            newReaders.add(newRd);
+        }
+        
+        if (!changed) return this;
+
+        JifTypeSystem ts = (JifTypeSystem)typeSystem();
+        PolicyLabel newLabel = ts.policyLabel(this.position(), newOwner, newReaders);
+        return substitution.substLabel(newLabel);
+    }
+    
 }

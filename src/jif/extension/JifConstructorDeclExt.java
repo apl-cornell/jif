@@ -258,7 +258,9 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                 // trouble to go through the AST fixing up uids, so just equate
                 // the two UIDs using a union-find algorithm.  UID.equals will
                 // do the rest.
-                assFi.uid().equate(rhsVi.uid());
+                // assFi.uid().equate(rhsVi.uid());
+                //@@@@@ Here, I think we need to add an assertion to the appropriate hierarchy
+                // This probably needs to be done a whole bunch earlier...
             }
         }                    
 

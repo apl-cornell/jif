@@ -3,6 +3,7 @@ package jif.ast;
 import java.util.List;
 
 import jif.types.*;
+import jif.types.label.AccessPathRoot;
 import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
@@ -96,8 +97,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
 	if (vi.flags().isFinal()) {
 	    if (ts.isPrincipal(vi.type())) {
 		return nf.CanonicalPrincipalNode(position(),
-		    ts.dynamicPrincipal(position(),
-			                vi.uid(), vi.name(), vi.label()));
+		    ts.dynamicPrincipal(position(), JifUtil.varInstanceToAcessPath(vi)));
 	    }
 	}
 
@@ -114,18 +114,18 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
 	return nf.CanonicalPrincipalNode(position(), ep);
     }
 
-    protected Node paramToPrincipal(ParamInstance vi, AmbiguityRemover sc)
+    protected Node paramToPrincipal(ParamInstance pi, AmbiguityRemover sc)
 	throws SemanticException {
 	JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
-	if (vi.isPrincipal()) {
+	if (pi.isPrincipal()) {
 	    // <param principal uid> => <principal-param uid>
-	    Principal p = ts.principalParam(position(), vi.uid());
+	    Principal p = ts.principalParam(position(), pi);
 	    return nf.CanonicalPrincipalNode(position(), p);
 	}
 
-	throw new SemanticException(vi + " may not be used as a principal.",
+	throw new SemanticException(pi + " may not be used as a principal.",
 		                    position());
     }
 

@@ -19,9 +19,6 @@ public interface ParamInstance extends VarInstance
     JifClassType container();
     ParamInstance container(JifClassType container);
 
-    UID uid();
-    ParamInstance uid(UID uid);
-
     Kind kind();
     ParamInstance kind(Kind kind);
     ParamInstance name(String name);

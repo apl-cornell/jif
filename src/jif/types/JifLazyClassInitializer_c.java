@@ -1,12 +1,8 @@
 package jif.types;
 
-import polyglot.types.*;
-import polyglot.ext.jl.types.*;
-import polyglot.types.Package;
-import polyglot.util.*;
-import polyglot.frontend.Job;
-import java.io.*;
-import java.util.*;
+import polyglot.ext.jl.types.LazyClassInitializer_c;
+import polyglot.types.ParsedClassType;
+import polyglot.types.TypeSystem;
 
 /**
  * A LazyClassInitializer is responsible for initializing members of

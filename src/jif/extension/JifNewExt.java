@@ -26,7 +26,7 @@ public class JifNewExt extends Jif_c
     public Node labelCheck(LabelChecker lc) throws SemanticException {
 	New noe = (New) node();
 
-	JifTypeSystem ts = (JifTypeSystem) lc.typeSystem();
+	JifTypeSystem ts = lc.typeSystem();
         JifContext A = lc.jifContext();
 	A = (JifContext) noe.enterScope(A);
 

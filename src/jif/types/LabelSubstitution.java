@@ -19,10 +19,5 @@ public abstract class LabelSubstitution {
     }
     public Principal substPrincipal(Principal p) throws SemanticException {
         return p;
-    }
-    
-    /**
-     * Shoudl dynamic labels and principals recurse into labelOf components?
-     */
-    public boolean recurseIntoLabelOf() { return true; }
+    }    
 }

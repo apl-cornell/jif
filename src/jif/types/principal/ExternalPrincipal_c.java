@@ -2,6 +2,8 @@ package jif.types.principal;
 
 import jif.translate.ExternalPrincipalToJavaExpr_c;
 import jif.types.JifTypeSystem;
+import jif.types.label.AccessPath;
+import jif.types.label.AccessPathRoot;
 import polyglot.main.Report;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
@@ -48,5 +50,9 @@ public class ExternalPrincipal_c extends Principal_c implements ExternalPrincipa
 
     public String translate(Resolver c) {
         return "jif.principal." + name + ".P";
+    }
+
+    public Principal subst(AccessPathRoot r, AccessPath e) {
+        return this;
     }
 }

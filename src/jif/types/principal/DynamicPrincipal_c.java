@@ -3,6 +3,7 @@ package jif.types.principal;
 import jif.translate.DynamicPrincipalToJavaExpr_c;
 import jif.types.JifTypeSystem;
 import jif.types.label.AccessPath;
+import jif.types.label.AccessPathRoot;
 import polyglot.main.Report;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
@@ -48,5 +49,13 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
     
     public String translate(Resolver c) {
         return path.translate(c);
+    }
+    public Principal subst(AccessPathRoot r, AccessPath e) {
+        AccessPath newPath = path.subst(r, e);
+        if (newPath == path) {
+            return this;
+        }
+        
+        return ((JifTypeSystem)typeSystem()).dynamicPrincipal(this.position(), newPath);
     }
 }

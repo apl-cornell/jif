@@ -2,10 +2,9 @@ package jif.translate;
 
 import java.util.ListIterator;
 
-import jif.ast.Jif_c;
-import jif.ast.LabelCase;
-import jif.ast.SwitchLabel;
-import jif.types.*;
+import jif.ast.*;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import polyglot.ast.*;
 import polyglot.types.SemanticException;
@@ -26,7 +25,7 @@ public class SwitchLabelToJavaExt_c extends ToJavaExt_c {
         // Get the runtime label of the expression.
         PathMap Xe = Jif_c.X(n.expr());
         Label L = Xe.NV();
-        L = L.meet(jif_ts.runtimeLabel(), n.ph());
+        //@@@L = L.meet(jif_ts.runtimeLabel(), n.ph());
 
         Expr el1 = rw.labelToJava(L);
 
@@ -58,7 +57,7 @@ public class SwitchLabelToJavaExt_c extends ToJavaExt_c {
 	    }
 	    else {
 		Label Li = p.label().label();
-		Li = Li.meet(jif_ts.runtimeLabel(), n.ph());
+		//@@@@@Li = Li.meet(jif_ts.runtimeLabel(), n.ph());
                 Expr el2 = rw.labelToJava(Li);
 
 		if (p.decl() != null) {

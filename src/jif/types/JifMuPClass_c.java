@@ -1,10 +1,9 @@
 package jif.types;
 
-import polyglot.ext.jl.types.*;
-import polyglot.ext.param.types.*;
-import polyglot.types.*;
-import polyglot.util.*;
 import java.util.*;
+
+import polyglot.ext.param.types.MuPClass_c;
+import polyglot.util.Position;
 
 /** An implementation of the <code>JifParsedPolyType</code> interface. 
  */
@@ -25,7 +24,7 @@ public class JifMuPClass_c extends MuPClass_c
 
         for (Iterator i = pt.params().iterator(); i.hasNext(); ) {
             ParamInstance pi = (ParamInstance) i.next();
-            l.add(pi.uid());
+            l.add(pi);
         }
 
         return l;
@@ -35,9 +34,8 @@ public class JifMuPClass_c extends MuPClass_c
 	String s = "";
 
         for (Iterator i = formals().iterator(); i.hasNext(); ) {
-            //ParamInstance pi = (ParamInstance) o; ###
-	    UID puid = (UID) i.next();
-            s += puid.toString();
+	    ParamInstance pi =  (ParamInstance)i.next();
+            s += pi.name();
 
             if (i.hasNext()) {
                 s += ", ";

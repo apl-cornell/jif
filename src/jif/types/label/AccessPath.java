@@ -6,8 +6,8 @@ import polyglot.types.Resolver;
  * TODO Documentation
  * Represent a final access path 
  */
-public class AccessPath {
-    public boolean isCanonical() { return false; }
-    public String translate(Resolver c) { return null;
-    }
+public abstract class AccessPath {
+    public abstract boolean isCanonical();
+    public abstract String translate(Resolver c);
+    public abstract AccessPath subst(AccessPathRoot r, AccessPath e);
 }

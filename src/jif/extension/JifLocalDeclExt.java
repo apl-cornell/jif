@@ -102,18 +102,19 @@ public class JifLocalDeclExt extends JifStmtExt_c
 	    Xd = Xe;
 
             //deal with the special case "final label l = new label(...)"
-            if (li.flags().isFinal() && ts.isLabel(li.type())) {
-                JifVarInstance jvi = (JifVarInstance) li;
-                DynamicLabel dl = ts.dynamicLabel(decl.position(), jvi.uid(), jvi.name(), jvi.label());
-                Label rhs_label = JifUtil.exprToLabel(ts, decl.init());
-                
-                // the rhs_label may be null, e.g. "final label l = foo();",
-                // since there is no specific label associated with this particular
-                // call to the method.
-                if (rhs_label != null) {
-                    lc.bind(dl, rhs_label);
-                }   
-            }
+        // @@@@@ need to add assertion here?
+//            if (li.flags().isFinal() && ts.isLabel(li.type())) {
+//                JifVarInstance jvi = (JifVarInstance) li;
+//                DynamicLabel dl = ts.dynamicLabel(decl.position(), jvi.uid(), jvi.name(), jvi.label());
+//                Label rhs_label = JifUtil.exprToLabel(ts, decl.init());
+//                
+//                // the rhs_label may be null, e.g. "final label l = foo();",
+//                // since there is no specific label associated with this particular
+//                // call to the method.
+//                if (rhs_label != null) {
+//                    lc.bind(dl, rhs_label);
+//                }   
+//            }
 
 	    // Must check that the expression type is a subtype of the
 	    // declared type.  Most of this is done in typeCheck, but if

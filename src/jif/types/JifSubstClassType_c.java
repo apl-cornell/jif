@@ -45,7 +45,7 @@ public class JifSubstClassType_c extends SubstClassType_c
 
         for (Iterator i = pt.params().iterator(); i.hasNext(); ) {
             ParamInstance pi = (ParamInstance) i.next();
-            Param p = subst.get(pi.uid());
+            Param p = subst.get(pi);
             actuals.add(p);
         }
 
@@ -90,13 +90,13 @@ public class JifSubstClassType_c extends SubstClassType_c
 
                 JifSubst subst = (JifSubst) this.subst;
 
-                if (L.equals(subst.get(thisLabel.uid()))) {
+                if (L.equals(subst.get(thisLabel.paramInstance()))) {
                     return this;
                 }
 
                 Map newSubst = new HashMap();
                 newSubst.putAll(subst.substitutions());
-                newSubst.put(thisLabel.uid(), L);
+                newSubst.put(thisLabel, L);
 
                 // Don't pass in the cache since the subst map changed. 
                 return (JifClassType) ts.subst(pt, newSubst);
@@ -124,7 +124,7 @@ public class JifSubstClassType_c extends SubstClassType_c
         if (jpt.params() != null) {
             for (Iterator i = jpt.params().iterator(); i.hasNext(); ) {
                 ParamInstance pi = (ParamInstance) i.next();
-                s += subst.substitutions().get(pi.uid());
+                s += subst.substitutions().get(pi);
 
                 if (i.hasNext()) {
                     s += ", ";

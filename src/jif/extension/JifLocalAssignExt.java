@@ -1,15 +1,11 @@
 package jif.extension;
 
-import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.label.DynamicLabel;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
-import polyglot.types.LocalInstance;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
+import polyglot.types.*;
 
 /** The Jif extension of the <code>LocalAssign</code> node. 
  */
@@ -84,17 +80,18 @@ public class JifLocalAssignExt extends JifAssignExt
         Expr lhs = (Expr) X(lve, X);
 
         //deal with the special case "l = new label(...)" and "L1 = L2"
-        if (ts.isLabel(li.type())) {
-            JifVarInstance jvi = (JifVarInstance) li;
-            DynamicLabel dl = ts.dynamicLabel(lve.position(), jvi.uid(), jvi.name(), jvi.label());
-            Label rhs_label = JifUtil.exprToLabel(ts, rhs);
-            // the rhs_label may be null, e.g. "l = foo();",
-            // since there is no specific label associated with this particular
-            // call to the method.
-            if (rhs_label != null) {
-                lc.bind(dl, rhs_label);
-            }   
-        }
+        //@@@@@ Need to modify label env here.
+//        if (ts.isLabel(li.type())) {
+//            JifVarInstance jvi = (JifVarInstance) li;
+//            DynamicLabel dl = ts.dynamicLabel(lve.position(), jvi.uid(), jvi.name(), jvi.label());
+//            Label rhs_label = JifUtil.exprToLabel(ts, rhs);
+//            // the rhs_label may be null, e.g. "l = foo();",
+//            // since there is no specific label associated with this particular
+//            // call to the method.
+//            if (rhs_label != null) {
+//                lc.bind(dl, rhs_label);
+//            }   
+//        }
 
         return (Assign) X(assign.right(rhs).left(lhs), X);
     }

@@ -7,5 +7,4 @@ import polyglot.types.*;
  */
 public interface JifLocalInstance extends LocalInstance, JifVarInstance
 {
-    void setUid(UID uid);
 }

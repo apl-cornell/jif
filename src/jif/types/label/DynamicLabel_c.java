@@ -1,10 +1,10 @@
 package jif.types.label;
 
 import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
-import polyglot.types.Resolver;
-import polyglot.types.TypeObject;
+import polyglot.types.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 
@@ -62,5 +62,20 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
 
     public void translate(Resolver c, CodeWriter w) {
         w.write(path.translate(c));
+    }
+    public Label subst(AccessPathRoot r, AccessPath e) {
+        AccessPath newPath = path.subst(r, e);
+        if (newPath == path) {
+            return this;
+        }
+        
+        return ((JifTypeSystem)typeSystem()).dynamicLabel(this.position(), newPath);
+    }
+
+    public Label subst(LocalInstance arg, Label l) {
+        return this;
+    }
+    public Label subst(LabelSubstitution substitution) throws SemanticException {
+        return substitution.substLabel(this);
     }
 }

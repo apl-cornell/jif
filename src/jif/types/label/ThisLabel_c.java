@@ -1,26 +1,23 @@
 package jif.types.label;
 
 
-import jif.types.JifTypeSystem;
-import jif.types.ParamInstance;
+import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
 import polyglot.types.*;
-import polyglot.types.Resolver;
-import polyglot.types.TypeObject;
 import polyglot.util.*;
 
 /** An implementation of the <code>ParamLabel</code> interface. 
  */
-public class ParamLabel_c extends Label_c implements ParamLabel {
-    private final ParamInstance paramInstance;
-    public ParamLabel_c(ParamInstance paramInstance, JifTypeSystem ts, Position pos) {
-        super(ts, pos);
-        this.paramInstance = paramInstance;
+public class ThisLabel_c extends ParamLabel_c implements ThisLabel {
+    private final JifClassType ct;
+    public ThisLabel_c(JifClassType ct, JifTypeSystem ts, Position pos) {
+        super(ts.paramInstance(pos, ct, ParamInstance.INVARIANT_LABEL, "this"), ts, pos);
+        this.ct = ct;
     }
     
-    public ParamInstance paramInstance() {
-        return paramInstance;
+    public JifClassType classType() {
+        return ct;
     }
 
     public boolean isRuntimeRepresentable() { return false; }
@@ -29,21 +26,24 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
     public boolean isCanonical() { return true; }
     public boolean isEnumerable() { return true; }
     public int hashCode() {
-        return paramInstance.hashCode();
+        return ct.hashCode();
     }
     public boolean equalsImpl(TypeObject o) {
-        if (! (o instanceof ParamLabel)) {
+        if (! (o instanceof ThisLabel)) {
             return false;
         }           
-        ParamLabel that = (ParamLabel) o;
-        return (this.paramInstance == that.paramInstance());
+        ThisLabel that = (ThisLabel) o;
+        return (this.ct.equals(that.classType()));
     }
     
     public String componentString() {
-        if (Report.should_report(Report.debug, 1)) { 
-            return "<param-label " + this.paramInstance + ">";
+        if (Report.should_report(Report.debug, 2)) { 
+            return "<this-label " + this.ct.fullName() + ">";
         }
-        return "<param-label " + this.paramInstance.name() + ">";
+        if (Report.should_report(Report.debug, 1)) { 
+            return "<this-label>";
+        }
+        return "this";
     }
 
     public boolean leq_(Label L, LabelEnv env) {

@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
+import polyglot.types.*;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
 import polyglot.util.*;
@@ -45,5 +46,11 @@ public class RuntimeLabel_c extends Label_c implements RuntimeLabel {
     }    
     public void translate(Resolver c, CodeWriter w) {
         throw new InternalCompilerError("Cannot translate label \"" + this + "\".");
+    }
+    public Label subst(LocalInstance arg, Label l) {
+        return this;
+    }
+    public Label subst(AccessPathRoot r, AccessPath e) {
+        return this;
     }
 }

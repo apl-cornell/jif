@@ -3,6 +3,7 @@ package jif.types.label;
 import java.util.Set;
 
 import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
 import polyglot.types.*;
@@ -12,7 +13,7 @@ import polyglot.util.*;
  * This label is used as the label of the real argument.
  * The purpose is to avoid having to re-interpret labels at each call.
  */
-public class ArgLabel_c extends Label_c implements ArgLabel, LabelImpl {
+public class ArgLabel_c extends Label_c implements ArgLabel {
     private final LocalInstance li;
     private Label upperBound;
     
@@ -41,7 +42,7 @@ public class ArgLabel_c extends Label_c implements ArgLabel, LabelImpl {
     public boolean isComparable() { return true; }
     public boolean isCanonical() { return true; }
     public boolean isEnumerable() { return true; }
-    public Set variables() { return ((LabelImpl)upperBound).variables(); }
+    public Set variables() { return upperBound.variables(); }
     
     public boolean equalsImpl(TypeObject o) {
         if (! (o instanceof ArgLabel)) {
@@ -75,4 +76,29 @@ public class ArgLabel_c extends Label_c implements ArgLabel, LabelImpl {
     public void translate(Resolver c, CodeWriter w) {
         throw new InternalCompilerError("Cannot translate \"" + this + "\".");
     }
+ 
+    public Label subst(LocalInstance arg, Label l) {
+        if (this.li.equals(arg)) {
+            return l;
+        }
+        return this;
+    }
+    public Label subst(AccessPathRoot r, AccessPath e) {
+        return this;
+    }
+    public Label subst(LabelSubstitution substitution) throws SemanticException {
+        Label newBound = upperBound.subst(substitution);
+        
+        if (newBound != upperBound) {
+            JifTypeSystem ts = (JifTypeSystem)typeSystem();
+            ArgLabel newLabel = ts.argLabel(this.position(), li);
+            newLabel.setUpperBound(newBound);
+            return substitution.substLabel(newLabel);        
+        }
+        else {
+            return substitution.substLabel(this);
+        }
+    }
+    
+    
 }

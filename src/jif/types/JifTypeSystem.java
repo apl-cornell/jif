@@ -3,12 +3,10 @@ package jif.types;
 import java.util.Collection;
 import java.util.List;
 
-import jif.types.hierarchy.*;
+import jif.types.hierarchy.LabelEnv;
+import jif.types.hierarchy.LabelEnv_c;
 import jif.types.label.*;
 import jif.types.principal.*;
-import polyglot.ast.*;
-import polyglot.ast.FieldDecl;
-import polyglot.ast.ProcedureDecl;
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.types.*;
 import polyglot.util.Position;
@@ -55,10 +53,7 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     /** Constructs a parameter instance for a class parameter declaration */
     ParamInstance paramInstance(Position pos, JifClassType container,
-				ParamInstance.Kind kind, String name);
-    ParamInstance paramInstance(Position pos, JifClassType container,
-				ParamInstance.Kind kind, UID uid);
-    
+				ParamInstance.Kind kind, String name);    
 
     /** Constructs a principal instance for an external principal. */
     PrincipalInstance principalInstance(Position pos,
@@ -83,16 +78,14 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     // Principal constructors
 
-    ParamPrincipal principalParam(Position pos, UID uid);
-    DynamicPrincipal dynamicPrincipal(Position pos, UID uid, String name, Label L);
+    ParamPrincipal principalParam(Position pos, ParamInstance pi);
+    DynamicPrincipal dynamicPrincipal(Position pos, AccessPath path);
     ExternalPrincipal externalPrincipal(Position pos, String name);
-    ArgPrincipal argPrincipal(Position pos, UID uid, String name, Label L, int index, boolean isSignature);
     UnknownPrincipal unknownPrincipal(Position pos);
 
     // Label constructors
-
     VarLabel freshLabelVariable(Position pos, String s, String description);
-    CovariantParamLabel freshCovariantLabel(Position pos, String s);
+    //@@@@@CovariantParamLabel freshCovariantLabel(Position pos, ParamInstance pi);
 
     Label topLabel(Position pos);
     Label bottomLabel(Position pos);
@@ -104,24 +97,18 @@ public interface JifTypeSystem extends ParamTypeSystem
     Label notTaken();
     Label runtimeLabel();
 
-    Label labelOfVar(Position pos, VarLabel L);
-    CovariantParamLabel covariantLabel(Position pos, UID uid);
-    ParamLabel paramLabel(Position pos, UID uid);
-    VarLabel varLabel(Position pos, UID uid);
+    CovariantParamLabel covariantLabel(Position pos, ParamInstance pi);
+    ParamLabel paramLabel(Position pos, ParamInstance pi);
+    ThisLabel thisLabel(Position pos, JifClassType ct);
+    CovariantThisLabel covariantThisLabel(Position pos, JifClassType ct);
     PolicyLabel policyLabel(Position pos, Principal owner, Collection readers);
-    JoinLabel joinLabel(Position pos, Collection components);
-    MeetLabel meetLabel(Position pos, Collection components);
-    DynamicLabel dynamicLabel(Position pos, UID uid, String name, Label L);
-    DynrecLabel dynrecLabel(Position pos, UID uid);
+    Label joinLabel(Position pos, Collection components);
+    DynamicLabel dynamicLabel(Position pos, AccessPath path);
     ArgLabel argLabel(Position pos, LocalInstance li);
-//    DynamicArgLabel dynamicArgLabel(Position pos, UID uid, String name, Label L, int index, boolean isSignature);
     UnknownLabel unknownLabel(Position pos);
 
     /** Returns the join of L1 and L2. */
     Label join(Label L1, Label L2);
-
-    /** Returns the meet of L1 and L2 in <code>ph</code>. */
-    Label meet(Label L1, Label L2, PrincipalHierarchy ph);
 
     /** Returns true iff L1 <= L2 in <code>ph</code>. */
     boolean leq(Label L1, Label L2, LabelEnv env);

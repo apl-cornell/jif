@@ -5,6 +5,8 @@ import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
+import polyglot.main.Report;
+import polyglot.types.*;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
 import polyglot.util.*;
@@ -14,12 +16,15 @@ import polyglot.util.*;
 public class VarLabel_c extends Label_c implements VarLabel {
     private final transient int uid = ++counter;
     private static int counter = 0;
+    private String name;
     
     protected VarLabel_c() {
     }
     
-    public VarLabel_c(JifTypeSystem ts, Position pos) {
+    public VarLabel_c(String name, String description, JifTypeSystem ts, Position pos) {
         super(ts, pos);
+        this.name = name;
+        setDescription(description);
     }
     
     public boolean isEnumerable() { return true; }
@@ -31,7 +36,13 @@ public class VarLabel_c extends Label_c implements VarLabel {
     public Set variables() { return Collections.singleton(this); }
     
     public String componentString() {
-        return "<var " + uid + ">";
+        if (Report.should_report(Report.debug, 2)) { 
+            return "<var " + name + " " + uid + ">";
+        }
+        if (Report.should_report(Report.debug, 1)) { 
+            return "<var " + name + ">";
+        }
+        return name;
     }    
     public boolean equalsImpl(TypeObject o) {
         return this == o;
@@ -44,5 +55,11 @@ public class VarLabel_c extends Label_c implements VarLabel {
     
     public void translate(Resolver c, CodeWriter w) {
         throw new InternalCompilerError("Cannot translate \"" + this + "\".");
+    }
+    public Label subst(LocalInstance arg, Label l) {
+        return this;
+    }
+    public Label subst(AccessPathRoot r, AccessPath e) {
+        return this;
     }
 }

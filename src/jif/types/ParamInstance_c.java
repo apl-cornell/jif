@@ -13,16 +13,14 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
 {
     JifClassType container;
     Kind kind;
-    UID uid;
 
     public ParamInstance_c(JifTypeSystem ts, Position pos,
-	JifClassType container, Kind kind, String name, UID uid) {
+	JifClassType container, Kind kind, String name) {
 
 	super(ts, pos, ts.Public().Static().Final(),
 	      kind == PRINCIPAL ? ts.Principal() : ts.Label(), name);
 	this.kind = kind;
 	this.container = container;
-	this.uid = uid;
     }
 
     public JifClassType container() {
@@ -42,16 +40,6 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
     public ParamInstance kind(Kind kind) {
 	ParamInstance_c n = (ParamInstance_c) copy();
 	n.kind = kind;
-	return n;
-    }
-
-    public UID uid() {
-	return uid;
-    }
-
-    public ParamInstance uid(UID uid) {
-	ParamInstance_c n = (ParamInstance_c) copy();
-	n.uid = uid;
 	return n;
     }
 
@@ -79,16 +67,15 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
 
     public String toString() {
         if (Report.should_report(Report.debug, 1)) {
-            return kind + " " + uid();
+            return kind + " " + container().name() + "." + name();
         }
-        return kind + " " + uid().name();
+        return kind + " " + name();
     }
     
     private void writeObject(java.io.ObjectOutputStream out) 
 	throws IOException
     {
 	out.writeObject(container);
-	out.writeObject(uid);
 	if (kind == INVARIANT_LABEL) out.writeInt(0);
 	else if (kind == COVARIANT_LABEL) out.writeInt(1);
 	else if (kind == PRINCIPAL) out.writeInt(2);
@@ -99,7 +86,6 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
 	throws IOException, ClassNotFoundException
     {
 	this.container = (JifClassType) in.readObject();
-	this.uid = (UID) in.readObject();
 	int k = in.readInt();
 	switch (k) {
 	case 0: kind = INVARIANT_LABEL; break;

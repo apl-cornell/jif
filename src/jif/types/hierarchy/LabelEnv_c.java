@@ -11,7 +11,7 @@ import polyglot.util.InternalCompilerError;
  * The wrapper of a set of assumptions that can be used to decide
  * whether L1 &lt;= L2. 
  */
-class LabelEnv_c implements LabelEnv
+public class LabelEnv_c implements LabelEnv
 {
     private final PrincipalHierarchy ph;
     private final List assertions;
@@ -59,7 +59,7 @@ class LabelEnv_c implements LabelEnv
         // L1 is less than L2,
         if (!(this.leq(L1, L2, false))) {
             assertions.add(new LabelLeAssertion_c(L1, L2));
-            if (!this.hasVariables && (((LabelImpl)L1).hasVariables() || ((LabelImpl)L2).hasVariables())) {
+            if (!this.hasVariables && (L1.hasVariables() || L2.hasVariables())) {
                 // at least one assertion in this label env has a variable.
                 this.hasVariables = true;
             }
@@ -79,11 +79,11 @@ class LabelEnv_c implements LabelEnv
     protected boolean leq(Label Lb1, Label Lb2, boolean useAssertions
     /*boolean boundVars*/) {
         // simplify the two labels
-        LabelImpl L1 = (LabelImpl)((LabelImpl)Lb1).simplify();
-        LabelImpl L2 = (LabelImpl)((LabelImpl)Lb2).simplify();
+        Label L1 = Lb1.simplify();
+        Label L2 = Lb2.simplify();
         
-        if (L1.isSingleton()) L1 = (LabelImpl)L1.singletonComponent();
-        if (L2.isSingleton()) L2 = (LabelImpl)L2.singletonComponent();
+        if (L1.isSingleton()) L1 = L1.singletonComponent();
+        if (L2.isSingleton()) L2 = L2.singletonComponent();
         
         if (! L1.isComparable() || ! L2.isComparable()) {
             throw new InternalCompilerError("Cannot compare " + L1 +
@@ -113,7 +113,7 @@ class LabelEnv_c implements LabelEnv
         }
         
         if (L2.isSingleton()) {
-            L2 = (LabelImpl)L2.singletonComponent();
+            L2 = L2.singletonComponent();
             boolean result = L1.leq_(L2, this);
             
             if (result == true || !useAssertions) 
@@ -124,12 +124,12 @@ class LabelEnv_c implements LabelEnv
                 LabelLeAssertion c = (LabelLeAssertion) i.next();
                 // FIXME: keep check of the visited constraints to avoid
                 // infinite loops.
-                LabelImpl cLHS = (LabelImpl)c.lhs();
+                Label cLHS = c.lhs();
                 if (cLHS.hasVariables()) 
-                    cLHS = (LabelImpl)this.solver.applyBoundsTo(c.lhs());
-                LabelImpl cRHS = (LabelImpl)c.rhs();
+                    cLHS = this.solver.applyBoundsTo(c.lhs());
+                Label cRHS = c.rhs();
                 if (cRHS.hasVariables()) 
-                    cRHS = (LabelImpl)this.solver.applyBoundsTo(c.rhs());
+                    cRHS = this.solver.applyBoundsTo(c.rhs());
                 
                 if (leq(L1, cLHS, false) && leq(cRHS, L2, false)) {
                     return true;
@@ -158,12 +158,12 @@ class LabelEnv_c implements LabelEnv
             // contains {L1} <= {L2;L3}.
             for (Iterator i = assertions.iterator(); i.hasNext();) { 
                 LabelLeAssertion c = (LabelLeAssertion)i.next();
-                LabelImpl cLHS = (LabelImpl)c.lhs();
+                Label cLHS = c.lhs();
                 if (cLHS.hasVariables()) 
-                    cLHS = (LabelImpl)this.solver.applyBoundsTo(c.lhs());
-                LabelImpl cRHS = (LabelImpl)c.rhs();
+                    cLHS = this.solver.applyBoundsTo(c.lhs());
+                Label cRHS = c.rhs();
                 if (cRHS.hasVariables()) 
-                    cRHS = (LabelImpl)this.solver.applyBoundsTo(c.rhs());
+                    cRHS = this.solver.applyBoundsTo(c.rhs());
                 // FIXME: keep check of the visited constraints to avoid
                 // infinite loops.
                 //if (!(c.rhs() instanceof VarLabel) && leq(L1, c.lhs(), false)) {
@@ -232,7 +232,7 @@ class LabelEnv_c implements LabelEnv
         Set labelComponents = new LinkedHashSet();
         for (Iterator iter = assertions.iterator(); iter.hasNext(); ) {
             LabelLeAssertion c = (LabelLeAssertion) iter.next();
-            LabelImpl bound = (LabelImpl)bounds.applyTo(c.lhs());
+            Label bound = bounds.applyTo(c.lhs());
             if (bound.isEnumerable() && !bound.components().isEmpty()) {                
                 for (Iterator i = bound.components().iterator(); i.hasNext(); ) {
                     Label l = (Label)i.next();
@@ -243,7 +243,7 @@ class LabelEnv_c implements LabelEnv
                 labelComponents.add(bound);                
             }
             
-            bound = (LabelImpl)bounds.applyTo(c.rhs());
+            bound = bounds.applyTo(c.rhs());
             if (bound.isEnumerable() && !bound.components().isEmpty()) {                
                 for (Iterator i = bound.components().iterator(); i.hasNext(); ) {
                     Label l = (Label)i.next();
@@ -258,7 +258,7 @@ class LabelEnv_c implements LabelEnv
         labelComponents.removeAll(seenComponents);
         
         for (Iterator iter = labelComponents.iterator(); iter.hasNext(); ) {
-            LabelImpl l = (LabelImpl)iter.next();
+            Label l = (Label)iter.next();
             if (l.description() != null) {
                 String s = l.componentString();
                 if (s.length() == 0)

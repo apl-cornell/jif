@@ -1,9 +1,7 @@
 package jif.types;
 
-import polyglot.types.*;
-import java.util.*;
-
 import jif.types.label.Label;
+import polyglot.types.MethodInstance;
 
 /** Jif method instance. A wrapper of all the type information related to
  *  a method. 

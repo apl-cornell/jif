@@ -1,6 +1,7 @@
 package jif.ast;
 
 import jif.types.*;
+import jif.types.label.ParamLabel;
 import polyglot.ast.Node;
 import polyglot.types.*;
 import polyglot.util.CodeWriter;
@@ -73,15 +74,14 @@ public class AmbVarLabelNode_c extends AmbLabelNode_c
 
 	    if (pi.isCovariantLabel()) {
 		return nf.CanonicalLabelNode(position(),
-			                     ts.covariantLabel(position(),
-							       pi.uid()));
+			                     ts.covariantLabel(position(), pi));
 	    }
 	    if (pi.isInvariantLabel()) {
-		return nf.CanonicalLabelNode(position(),
-			                     ts.paramLabel(position(),
-							   pi.uid()).                       
-                  description("label parameter " + pi.name() + 
-                              " of class " + pi.container().fullName()));
+                ParamLabel pl = ts.paramLabel(position(), pi);
+                pl.setDescription("label parameter " + pi.name() + 
+                                  " of class " + pi.container().fullName());
+                
+		return nf.CanonicalLabelNode(position(), pl);        
 	    }
 	    if (pi.isPrincipal()) {
                 throw new SemanticException("Cannot use the principal " + 

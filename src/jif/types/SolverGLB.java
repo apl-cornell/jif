@@ -1,13 +1,9 @@
 package jif.types;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-import jif.types.label.*;
-import jif.types.label.DynamicLabel;
 import jif.types.label.Label;
-
+import jif.types.label.VarLabel;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 
@@ -98,18 +94,17 @@ public class SolverGLB extends Solver
         // has a variable...
         
         // get a count of them, to figure out if we need to do a search...
-        List modifiableComponents = new ArrayList(eqn.rhs().components().size());
+        List rhsVariables = new ArrayList(eqn.rhs().components().size());
         for (Iterator i = eqn.rhs().components().iterator(); i.hasNext(); ) {
             Label lb = (Label) i.next();
-            if (lb.hasVariables()) {
-                modifiableComponents.add(lb);
+            if (lb instanceof VarLabel) {
+                rhsVariables.add(lb);
             }
         }
 
-        if (modifiableComponents.size() == 1) {
-            // only a single component has a variable, and it is the component
-            // comp
-            solveComponent((Label)modifiableComponents.get(0), eqn);
+        if (rhsVariables.size() == 1) {
+            // only a single component is a variable
+            refineVariableEquation((VarLabel)rhsVariables.get(0), eqn);
         }
         else {
             if (!allActivesAreMultiVarRHS()) {
@@ -121,6 +116,8 @@ public class SolverGLB extends Solver
 
             // we will do a very simple search, not delaying the solution of any 
             // constraints...            
+            // #### could do a more complicated search, doing the most restricted
+            // eqns first.
 
             // we only need one of the components to satisfy the constraints.
             // we will just try each one in turn.
@@ -129,11 +126,10 @@ public class SolverGLB extends Solver
             // restore it again later...
             VarMap origBounds = bounds().copy();
             
-            for (Iterator i = modifiableComponents.iterator(); i.hasNext(); ) {
-                Label comp = (Label) i.next();
+            for (Iterator i = rhsVariables.iterator(); i.hasNext(); ) {
+                VarLabel comp = (VarLabel) i.next();
                 
-                solveComponent(comp, eqn);
-                
+                refineVariableEquation(comp, eqn);                
                 if (search(eqn)) {
                     // we were successfully able to find a solution to the 
                     // constraints!
@@ -163,8 +159,7 @@ public class SolverGLB extends Solver
             Equation eqn = (Equation) i.next();
             int modCompCount = 0;
             for (Iterator j = eqn.rhs().components().iterator(); j.hasNext(); ) {
-                Label lb = (Label) j.next();
-                if (lb.hasVariables()) {
+                if (j.next() instanceof VarLabel) {
                     modCompCount++;
                 }
             }
@@ -174,26 +169,9 @@ public class SolverGLB extends Solver
         }
         return true;
     }
-
-    private void solveComponent(Label component, Equation eqn) throws SemanticException {
-        if (component instanceof VarLabel) {
-            // v <= L
-            refineVariableEquation((VarLabel) component, eqn);
-        }
-        else if (component instanceof LabelOfVar) {
-            throw new InternalCompilerError("Unsupported: labelOfVar on RHS");
-        }
-        else if (component instanceof DynamicLabel) {
-            handleDynamicRHS((DynamicLabel)component, eqn);
-        }
-        else {
-            throw new InternalCompilerError("Unexpected type for component: " + 
-                     component.getClass().getName());
-        }                
-    }
     
     /**
-     * Lower the upper bound on the label variable v, which is a component
+     * Raise the bound on the label variable v, which is a component
      * of the RHS of the equation eqn.
      */
     protected void refineVariableEquation(VarLabel v,
@@ -204,56 +182,17 @@ public class SolverGLB extends Solver
         if (shouldReport(4)) report(4, "BOUND of " + v + " = " + vBound);
 	if (shouldReport(4)) report(4, "APP = " + lhsBound);
 
-        Label join = vBound.join(lhsBound, eqn.env().ph()); //### use ph here?
+	// ###Could do something smarter here, to try and raise v's bound
+	// just enough to satisfy the equation
+        Label join = vBound.join(lhsBound);
         
-	if (join.isTop()) {
-            join = dynJoin(vBound, lhsBound, eqn.env().ph());
-	}
-	// XXX Previous line is highly suspect.
-
-	if (shouldReport(3))
-	    report(3, "JOIN: " + v + " := " + join);
+	if (shouldReport(3)) report(3, "JOIN: " + v + " := " + join);
         
         addTrace(v, eqn, join);
 	setBound(v, join, eqn.constraint()); 
         wakeUp(v);
     }
 
-    /**
-     * Handle all processing of a constraint with a dynamic label as a 
-     * component of the RHS, including putting the equation back on the 
-     * proper queue.
-     */
-    protected void handleDynamicRHS(DynamicLabel d, Equation eqn) throws SemanticException {
-        if (!d.hasVariables()) { // nothing to refine
-            return;
-        }
-        VarLabel v = (VarLabel) d.label();
-        // may need to change prev line if assumptions change
-
-        Label boundLabelOfD = bounds().applyTo(v);
-        Label labelOfBoundLHS = bounds().applyTo(eqn.lhs()).labelOf();
-        labelOfBoundLHS = labelOfBoundLHS.subst(d.uid(), d);
-        Label boundLabelOfBoundLHS = bounds().applyTo(labelOfBoundLHS);
-
-        if (shouldReport(4)) {
-            report(4, "  bound(labelOf(d)) = " + boundLabelOfD);
-            report(4, "  bound(lhs) = " + bounds().applyTo(eqn.lhs()));
-            report(4, "  labelOf(bound(lhs)) = " + labelOfBoundLHS);
-            report(4, "  bound(labelOf(bound(lhs)) = " + boundLabelOfBoundLHS);
-        }
-
-        Label join = boundLabelOfD.join(boundLabelOfBoundLHS, eqn.env().ph());
-        Label existedBound = bounds().boundOf(v);
-        if (!eqn.env().leq(join, existedBound)) {
-            addTrace(v, eqn, join);
-            setBound(v, join, eqn.constraint()); 
-            wakeUp(v);
-            if (shouldReport(3))
-                report(3, "DYNAMIC LABEL JOIN: " + v + " := " + join);
-        }
-    }    
-    
     /**
      * Search recursively for solution to system of constraints. 
      */
@@ -304,9 +243,9 @@ public class SolverGLB extends Solver
 
         // Check to see if it is currently satisfiable.
         if (! eqn.env().leq(lhsBound, rhsLabel)) {
-            //try bounding the dynamic labels
-
-            if (dynCheck(lhsBound, rhsLabel, eqn.env())) return;
+//            //try bounding the dynamic labels
+//            if (dynCheck(lhsBound, rhsLabel, eqn.env())) return;
+            
             // This equation isn't satisfiable.
             reportError(eqn.constraint(), eqn.variables());
         }

@@ -1,12 +1,10 @@
 package jif.types;
 
-import polyglot.types.*;
-import polyglot.ext.param.types.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
 
 import jif.types.label.Label;
 import jif.types.principal.Principal;
+import polyglot.ext.param.types.Subst;
 
 public interface JifSubst extends Subst
 {
@@ -19,6 +17,6 @@ public interface JifSubst extends Subst
     public List substLabelList(List labels);
     public List substPrincipalList(List principals);
 
-    public Param get(UID uid);
-    public void put(UID uid, Param param);
+    public Param get(ParamInstance pi);
+    public void put(ParamInstance pi, Param param);
 }

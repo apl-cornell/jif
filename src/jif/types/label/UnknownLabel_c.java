@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
+import polyglot.types.*;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
 import polyglot.util.*;
@@ -42,5 +43,11 @@ public class UnknownLabel_c extends Label_c implements UnknownLabel
     }    
     public void translate(Resolver c, CodeWriter w) {
         throw new InternalCompilerError("Cannot translate unknown label.");
+    }
+    public Label subst(LocalInstance arg, Label l) {
+        return this;
+    }
+    public Label subst(AccessPathRoot r, AccessPath e) {
+        return this;
     }
 }
