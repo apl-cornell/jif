@@ -81,7 +81,7 @@ public interface JifTypeSystem extends ParamTypeSystem
     PolicyLabel policyLabel(Position pos, Principal owner, Collection readers);
     Label joinLabel(Position pos, Collection components);
     DynamicLabel dynamicLabel(Position pos, AccessPath path);
-    ArgLabel argLabel(Position pos, LocalInstance li);
+    ArgLabel argLabel(Position pos, JifLocalInstance li);
     UnknownLabel unknownLabel(Position pos);
 
     /** Returns the join of L1 and L2. */

@@ -660,7 +660,7 @@ public class JifTypeSystem_c
         return t;
     }
 
-    public ArgLabel argLabel(Position pos, LocalInstance li) {
+    public ArgLabel argLabel(Position pos, JifLocalInstance li) {
         ArgLabel t = new ArgLabel_c(this, li, pos);
         return t;
     }

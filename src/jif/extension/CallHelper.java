@@ -49,7 +49,7 @@ public class CallHelper
      * replace the elements of this list with the label checked versions of
      * the argument expressions.  
      */
-    private final List args;
+    private final List actualArgs;
     
     /**
      * The procedure being called.
@@ -70,6 +70,11 @@ public class CallHelper
      * Labels of the actual arguments.
      */
     private List actualArgLabels;
+        
+    /**
+     * Exprs of the actual arguments that are final expressions of type Label or Principal.@@@@@
+     */
+    private List actualArgExprs;
         
     /**
      * LabelSusbtitution to replace signature <code>ArgLabel</code>s and
@@ -103,18 +108,18 @@ public class CallHelper
     public CallHelper(ReferenceType calleeContainer, 
                       Label targetObjLabel,
                       JifProcedureInstance pi, 
-                      List args, 
+                      List actualArgs, 
 	              Position position)
     {
 	this.calleeContainer = calleeContainer;
 	this.targetObjLabel = targetObjLabel;
-	this.args = new ArrayList(args);
+	this.actualArgs = new ArrayList(actualArgs);
 	this.pi = pi;
 	this.position = position;
         this.callChecked = false;
 	
-        if (pi.formalArgLabels().size() != args.size()) 
-            throw new InternalCompilerError("Wrong number of args.");   
+        if (pi.formalArgLabels().size() != actualArgs.size()) 
+            throw new InternalCompilerError("Wrong number of args.");        
     }
 
     public Type returnType() {
@@ -128,7 +133,7 @@ public class CallHelper
         if (!callChecked) {
             throw new InternalCompilerError("checkCall not yet called!");
         }
-	return args;
+	return actualArgs;
     }
 
     public PathMap X() {
@@ -154,11 +159,11 @@ public class CallHelper
 
         Xjoin = ts.pathMap();
         	
-        actualArgLabels = new ArrayList(args.size());
-        argPathMaps = new ArrayList(args.size());
+        actualArgLabels = new ArrayList(actualArgs.size());
+        argPathMaps = new ArrayList(actualArgs.size());
 	
-        for (int i = 0; i < args.size(); i++ ) {
-	    Expr Ej = (Expr) args.get(i);
+        for (int i = 0; i < actualArgs.size(); i++ ) {
+	    Expr Ej = (Expr) actualArgs.get(i);
 
 	    // A[pc := X_{j-1}[N]] |- Ej : Xj
 	    A = (JifContext) A.pushBlock();
@@ -166,7 +171,7 @@ public class CallHelper
 	    Ej = (Expr) lc.context(A).labelCheck(Ej);
             A = (JifContext) A.pop();
     
-            args.set(i, Ej);
+            actualArgs.set(i, Ej);
 
 	    Xj = Jif_c.X(Ej);        
             argPathMaps.add(Xj);
@@ -182,13 +187,12 @@ public class CallHelper
      * any dynamic arguments in the returned list are at the same index
      * as they were in <code>args</code>.
      * 
-     * @param args a list of <code>Expr</code>, being the actual arguments to the procedure
      * 
      */
-    private List dynArgs(List args, JifTypeSystem ts) throws SemanticException {
-        List dynArgs = new ArrayList(args.size());
+    private void buildActualArgExprs(JifTypeSystem ts) throws SemanticException {
+        this.actualArgExprs = new ArrayList(actualArgs.size());
 
-        for (Iterator j = args.iterator(); j.hasNext();) {
+        for (Iterator j = actualArgs.iterator(); j.hasNext();) {
             Expr Ej = (Expr)j.next();            
             if (ts.isLabel(Ej.type())) {
                 Label l = JifUtil.exprToLabel(ts, Ej); //@@@@@I think this will need to be a final or constant label expression...
@@ -196,7 +200,7 @@ public class CallHelper
                     throw new InternalCompilerError("Unexpected label " + 
                             Ej + " (" + Ej.getClass().getName() + ")");
                 }
-                dynArgs.add(l);
+                actualArgExprs.add(l);
             }
             else if (ts.isPrincipal(Ej.type())) {
                 Principal p = JifUtil.exprToPrincipal(ts, Ej);
@@ -204,14 +208,12 @@ public class CallHelper
                     throw new InternalCompilerError("Unexpected principal " + 
                             Ej + " (" + Ej.getClass().getName() + ")");
                 }
-                dynArgs.add(p);
+                actualArgExprs.add(p);
             }
             else {
-                dynArgs.add(null);
+                actualArgExprs.add(null);
             }
         }
-        
-        return dynArgs;
     }
     
     /**
@@ -226,10 +228,10 @@ public class CallHelper
 
 	Iterator formalArgLabels = pi.formalArgLabels().iterator();
 
-	for (int j = 0; j < args.size(); j++) {
+	for (int j = 0; j < actualArgs.size(); j++) {
             final int count = j + 1;
              
-	    final Expr Ej = (Expr) args.get(j);
+	    final Expr Ej = (Expr) actualArgs.get(j);
         
 	    ArgLabel aj = (ArgLabel)formalArgLabels.next();            
             // the upper bound label of the formal argument         
@@ -333,13 +335,14 @@ public class CallHelper
 	JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.typeSystem();
 	
-	// A |- call-begin(ct, args, mti)
+        buildActualArgExprs(ts);
+
+        // A |- call-begin(ct, args, mti)
 	if (shouldReport(4)) report(4, ">>>>> call-begin");
 
 	// check arguments
 	labelCheckArguments(lc);
 	
-//        this.argSubstitution = new ArgLabelSubstitution(actualArgLabels, dynArgs(args, ts), true);
         A = A.objectTypeAndLabel(calleeContainer, targetObjLabel);
         lc = lc.context(A);
 
@@ -501,18 +504,28 @@ public class CallHelper
     private Label instantiate(JifContext A, Label L) {
         L = A.instantiate(L, true);
         if (L != null) {
-            try {
-                L = L.subst(argSubstitution);
+            // go through each formal arglabel, and replace it appropriately...
+            Iterator iArgLabels = this.pi.formalArgLabels().iterator();
+            Iterator iActualArgLabels = this.actualArgLabels.iterator();
+            Iterator iActualArgExprs = this.actualArgExprs.iterator();
+            while (iArgLabels.hasNext()) {
+                ArgLabel formalArgLbl = (ArgLabel)iArgLabels.next();
+                Label actualArgLbl = (Label)iActualArgLabels.next();
+                Expr actualExpr = (Expr)iActualArgExprs.next();
+                
+                L.subst(formalArgLbl.formalInstance(), actualArgLbl);
+                if (actualExpr != null) {
+                    L.subst(JifUtil.varInstanceToAcessPath(formalArgLbl.formalInstance()), 
+                            JifUtil.exprToAcessPath(actualExpr));
+                }
             }
-            catch (SemanticException e) {
-                throw new InternalCompilerError("Unexpected SemanticException " +
-                "during label substitution: " + e.getMessage(), L.position());
+            if (iArgLabels.hasNext() || iActualArgLabels.hasNext() || iActualArgExprs.hasNext()) {
+                throw new InternalCompilerError("Inconsistent arg lists");
             }
         }
         return L;
     }
     
-
     /**
      * replaces any signature ArgLabels in p with the appropriate label, and
      * replaces any signature ArgPrincipal with the appropriate prinicipal. 
@@ -520,17 +533,26 @@ public class CallHelper
     private Principal instantiate(JifContext A, Principal p) {
         p = A.instantiate(p, true);
         if (p != null) {
-            try {
-                p = p.subst(argSubstitution);
+            // go through each formal arglabel, and replace it appropriately...
+            Iterator iArgLabels = this.pi.formalArgLabels().iterator();
+            Iterator iActualArgExprs = this.actualArgExprs.iterator();
+            while (iArgLabels.hasNext()) {
+                ArgLabel formalArgLbl = (ArgLabel)iArgLabels.next();
+                Expr actualExpr = (Expr)iActualArgExprs.next();
+                
+                if (actualExpr != null) {
+                    p.subst(JifUtil.varInstanceToAcessPath(formalArgLbl.formalInstance()), 
+                            JifUtil.exprToAcessPath(actualExpr));
+                }
             }
-            catch (SemanticException e) {
-                throw new InternalCompilerError("Unexpected SemanticException " +
-                "during label substitution: " + e.getMessage(), p.position());
+            if (iArgLabels.hasNext() || iActualArgExprs.hasNext()) {
+                throw new InternalCompilerError("Inconsistent arg lists");
             }
         }
         
         return p;   
     }
+
     private Type instantiate(JifContext A, Type t) throws SemanticException {
         t = A.instantiate(t, true);
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();

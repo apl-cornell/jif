@@ -91,7 +91,17 @@ public class JifUtil
      * @param vi
      * @return
      */
-    public static AccessPath varInstanceToAcessPath(JifVarInstance vi) {
+    public static AccessPathRoot varInstanceToAcessPath(JifVarInstance vi) {
+        if (vi instanceof LocalInstance) {
+            return new AccessPathRoot((LocalInstance)vi);
+        }
+        throw new InternalCompilerError("Current not supporting converting " + vi.getClass() + " to access paths");
+    }    
+
+    /**
+     * @return
+     */
+    public static AccessPath exprToAcessPath(Expr e) {
         if (vi instanceof LocalInstance) {
             return new AccessPathRoot((LocalInstance)vi);
         }

@@ -2,8 +2,7 @@ package jif.types.label;
 
 import java.util.Set;
 
-import jif.types.JifTypeSystem;
-import jif.types.LabelSubstitution;
+import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
 import polyglot.types.*;
@@ -14,18 +13,18 @@ import polyglot.util.*;
  * The purpose is to avoid having to re-interpret labels at each call.
  */
 public class ArgLabel_c extends Label_c implements ArgLabel {
-    private final LocalInstance li;
+    private final JifLocalInstance li;
     private Label upperBound;
     
     protected ArgLabel_c() {
         li = null;
     }
-    public ArgLabel_c(JifTypeSystem ts, LocalInstance li, Position pos) {
+    public ArgLabel_c(JifTypeSystem ts, JifLocalInstance li, Position pos) {
         super(ts, pos);
         this.li = li;
     }
     
-    public LocalInstance formalInstance() {
+    public JifLocalInstance formalInstance() {
         return li;
     }
     
