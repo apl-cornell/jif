@@ -6,13 +6,13 @@ import java.util.List;
 import jif.ast.JifMethodDecl;
 import jif.translate.ToJavaExt;
 import jif.types.*;
+import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.Block;
 import polyglot.ast.Node;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
-import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
 
@@ -108,15 +108,13 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             A.addAssertionLE(miContainer.thisLabel(), mjContainer.thisLabel());
             A.addAssertionLE(mjContainer.thisLabel(), miContainer.thisLabel());
             
-            Iterator iteri = mi.formalTypes().iterator();
-            Iterator iterj = mj.formalTypes().iterator();
+            Iterator iteri = mi.formalArgLabels().iterator();
+            Iterator iterj = mj.formalArgLabels().iterator();
             while (iteri.hasNext() && iterj.hasNext() ) {
-                Type ti = (Type)iteri.next();
-                Type tj = (Type)iterj.next();
-                Label Li = ts.labelOfType(ti);
-                Label Lj = ts.labelOfType(tj);
-                A.addAssertionLE(Li, Lj);
-                A.addAssertionLE(Lj, Li);
+                ArgLabel ai = (ArgLabel)iteri.next();
+                ArgLabel aj = (ArgLabel)iterj.next();
+                A.addAssertionLE(ai, aj);
+                A.addAssertionLE(aj, ai);
             }
             
             LabelChecker newlc = lc.context(A);
@@ -160,7 +158,6 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             // start labels are contravariant:
             //    the start label on mi may be more restrictive than the start 
             //    label on mj
-            
             NamedLabel starti = new NamedLabel("sub_start_label",
                                                "Start label of method " + mi.name() + " in " + mi.container(), 
                                                mi.startLabel());

@@ -117,7 +117,7 @@ public class CallHelper
 	this.pi = pi;
 	this.position = position;
         this.callChecked = false;
-	
+
         if (pi.formalArgLabels().size() != actualArgs.size()) 
             throw new InternalCompilerError("Wrong number of args.");        
     }
@@ -429,7 +429,7 @@ public class CallHelper
 
 	Label Lr = resolveReturnLabel(A);
 	Label Lrv = resolveReturnValueLabel(A, Lr);
-	
+	        
 	X = Xjoin.N(Lr.join(A.pc()));
 	X = X.NV(Lrv.join(A.pc()));
 	X = X.join(excPathMap(A, Lr));
@@ -500,26 +500,47 @@ public class CallHelper
 	    }
 	}
     }
-    
     private Label instantiate(JifContext A, Label L) {
-        L = A.instantiate(L, true);
+        return instantiateArgLabels(A.instantiate(L, true), 
+                                    this.pi.formalArgLabels(), 
+                                    this.actualArgLabels, 
+                                    this.actualArgExprs);
+    }
+    
+    public static Label instantiateArgLabels(Label L, List formalArgLabels, List actualArgLabels) {
+        return instantiateArgLabels(L, formalArgLabels, actualArgLabels, null);
+    }
+
+    private static Label instantiateArgLabels(Label L, List formalArgLabels, List actualArgLabels, List actualArgExprs) {
+        if (formalArgLabels.size() != actualArgLabels.size() || 
+                (actualArgExprs != null && formalArgLabels.size() != actualArgExprs.size())) {
+            throw new InternalCompilerError("Inconsistent sized lists of args");
+        }
         if (L != null) {
             // go through each formal arglabel, and replace it appropriately...
-            Iterator iArgLabels = this.pi.formalArgLabels().iterator();
-            Iterator iActualArgLabels = this.actualArgLabels.iterator();
-            Iterator iActualArgExprs = this.actualArgExprs.iterator();
+            Iterator iArgLabels = formalArgLabels.iterator();
+            Iterator iActualArgLabels = actualArgLabels.iterator();
+            Iterator iActualArgExprs = null;
+            if (actualArgExprs != null) {
+                iActualArgExprs = actualArgExprs.iterator();
+            }
             while (iArgLabels.hasNext()) {
                 ArgLabel formalArgLbl = (ArgLabel)iArgLabels.next();
                 Label actualArgLbl = (Label)iActualArgLabels.next();
-                Expr actualExpr = (Expr)iActualArgExprs.next();
+                L = L.subst(formalArgLbl.formalInstance(), actualArgLbl);
+
+                if (iActualArgExprs != null) {
+                    Expr actualExpr = (Expr)iActualArgExprs.next();
                 
-                L.subst(formalArgLbl.formalInstance(), actualArgLbl);
-                if (actualExpr != null) {
-                    L.subst(JifUtil.varInstanceToAcessPath(formalArgLbl.formalInstance()), 
-                            JifUtil.exprToAcessPath(actualExpr));
+                    if (actualExpr != null) {
+                        L = L.subst(JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance()), 
+                                    JifUtil.exprToAccessPath(actualExpr));
+                    }
                 }
             }
-            if (iArgLabels.hasNext() || iActualArgLabels.hasNext() || iActualArgExprs.hasNext()) {
+            if (iArgLabels.hasNext() || 
+                    iActualArgLabels.hasNext() || 
+                    (iActualArgExprs != null && iActualArgExprs.hasNext())) {
                 throw new InternalCompilerError("Inconsistent arg lists");
             }
         }
@@ -531,18 +552,29 @@ public class CallHelper
      * replaces any signature ArgPrincipal with the appropriate prinicipal. 
      */        
     private Principal instantiate(JifContext A, Principal p) {
-        p = A.instantiate(p, true);
+        return instantiateArgLabels(A.instantiate(p, true),
+                                    this.pi.formalArgLabels(), 
+                                    this.actualArgExprs);
+    }
+    /**
+     * replaces any signature ArgLabels in p with the appropriate label, and
+     * replaces any signature ArgPrincipal with the appropriate prinicipal. 
+     */        
+    public static Principal instantiateArgLabels(Principal p, List formalArgLabels, List actualArgExprs) {
+        if (formalArgLabels.size() != actualArgExprs.size()) {
+            throw new InternalCompilerError("Inconsistent sized lists of args");
+        }
         if (p != null) {
             // go through each formal arglabel, and replace it appropriately...
-            Iterator iArgLabels = this.pi.formalArgLabels().iterator();
-            Iterator iActualArgExprs = this.actualArgExprs.iterator();
+            Iterator iArgLabels = formalArgLabels.iterator();
+            Iterator iActualArgExprs = actualArgExprs.iterator();
             while (iArgLabels.hasNext()) {
                 ArgLabel formalArgLbl = (ArgLabel)iArgLabels.next();
                 Expr actualExpr = (Expr)iActualArgExprs.next();
                 
                 if (actualExpr != null) {
-                    p.subst(JifUtil.varInstanceToAcessPath(formalArgLbl.formalInstance()), 
-                            JifUtil.exprToAcessPath(actualExpr));
+                    p = p.subst(JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance()), 
+                            JifUtil.exprToAccessPath(actualExpr));
                 }
             }
             if (iArgLabels.hasNext() || iActualArgExprs.hasNext()) {

@@ -354,7 +354,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	
 	// Add the exception path constraints.
 	for (Iterator iter = X.paths().iterator(); iter.hasNext(); ) {
-	    AccessPath path = (AccessPath) iter.next();
+	    Path path = (Path) iter.next();
 
 	    if (! (path instanceof ExceptionPath)) {
 		continue;

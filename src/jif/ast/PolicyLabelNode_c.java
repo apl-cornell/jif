@@ -1,14 +1,13 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
-import jif.types.*;
-import jif.types.principal.Principal;
-import jif.visit.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
 import java.util.*;
+
+import jif.types.JifTypeSystem;
+import jif.types.principal.Principal;
+import polyglot.ast.Node;
+import polyglot.types.SemanticException;
+import polyglot.util.*;
+import polyglot.visit.*;
 
 /** An implementation of the <code>PolicyLabel</code> interface.
  */
@@ -68,10 +67,18 @@ public class PolicyLabelNode_c extends AmbLabelNode_c implements PolicyLabelNode
 	Principal o = owner.principal();
         if (o == null) throw new InternalCompilerError("null owner " + owner.getClass().getName() + " " + owner.position());
 
+        if (!owner.isDisambiguated()) {
+            // owner is not yet ready...
+            return this;
+        }
 	List l = new LinkedList();
 
 	for (Iterator i = this.readers.iterator(); i.hasNext(); ) {
 	    PrincipalNode r = (PrincipalNode) i.next();
+            if (!r.isDisambiguated()) {
+                // reader is not yet ready...
+                return this;
+            }
 	    l.add(r.principal());
 	}
 

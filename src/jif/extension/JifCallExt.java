@@ -6,7 +6,6 @@ import jif.types.*;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
-import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
@@ -68,7 +67,6 @@ public class JifCallExt extends Jif_c
 
         CallHelper helper = new CallHelper(rt, objLabel, mi, me.arguments(), node().position());
 	helper.checkCall(lc.context(A));
-	
         A = (JifContext) A.pop();
 
 	//subst arguments of inst_type

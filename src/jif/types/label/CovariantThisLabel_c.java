@@ -10,9 +10,12 @@ import polyglot.util.*;
  */
 public class CovariantThisLabel_c extends CovariantParamLabel_c implements CovariantThisLabel {
     private final JifClassType ct;
+    private final String ctName;
     public CovariantThisLabel_c(JifClassType ct, JifTypeSystem ts, Position pos) {
         super(ts.paramInstance(pos, ct, ParamInstance.COVARIANT_LABEL, "this"), ts, pos);
         this.ct = ct;
+        this.ctName = ct.fullName();
+        this.setDescription("covariant label \"this\" of " + ct.fullName());
     }
     
     public JifClassType classType() {
@@ -34,7 +37,7 @@ public class CovariantThisLabel_c extends CovariantParamLabel_c implements Covar
         return true;
     }
     public int hashCode() {
-        return ct.hashCode();
+        return ctName.hashCode();
     }
     public boolean equalsImpl(TypeObject o) {
         if (! (o instanceof CovariantThisLabel)) {
@@ -49,9 +52,9 @@ public class CovariantThisLabel_c extends CovariantParamLabel_c implements Covar
             return "<covariant-this-label " + this.ct.fullName() + ">";
         }
         if (Report.should_report(Report.debug, 1)) { 
-            return "<covariant-this-label>";
+            return "<covariant-this-label " + this.ct.name() + ">";
         }
-        return "this";
+        return this.ct.name() + "this";
     }
 
     public boolean leq_(Label L, LabelEnv env) {

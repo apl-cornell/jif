@@ -1,13 +1,17 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
-import jif.types.*;
-import jif.visit.*;
+import java.util.LinkedList;
+import java.util.List;
+
+import jif.types.JifPolyType;
+import jif.types.JifTypeSystem;
 import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.ext.jl.ast.Node_c;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
 
 /** An implementation of the <code>AmbParamTypeOrAccess</code> interface.
  */
@@ -74,6 +78,8 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 	JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
+	if (!prefix.isDisambiguated()) return this;
+    
 	if (prefix instanceof TypeNode) {
 	    // "name" must be a parameter.
 	    TypeNode tn = (TypeNode) prefix;
@@ -86,12 +92,6 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 	    n = (ParamNode) n.visit(ar);
 
 	    List l = new LinkedList();
-            if (!n.isDisambiguated()) {
-                // the instance is not yet ready
-                // @@@@@Is this right?
-                return this;
-            }
-
             l.add(n.parameter());
 
 	    Type t = ts.instantiate(position(),

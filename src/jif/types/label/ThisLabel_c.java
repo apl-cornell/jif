@@ -11,9 +11,12 @@ import polyglot.util.*;
  */
 public class ThisLabel_c extends ParamLabel_c implements ThisLabel {
     private final JifClassType ct;
+    private final String ctName;
     public ThisLabel_c(JifClassType ct, JifTypeSystem ts, Position pos) {
         super(ts.paramInstance(pos, ct, ParamInstance.INVARIANT_LABEL, "this"), ts, pos);
         this.ct = ct;
+        this.ctName = ct.fullName();
+        this.setDescription("label \"this\" of " + ct.fullName());
     }
     
     public JifClassType classType() {
@@ -26,7 +29,7 @@ public class ThisLabel_c extends ParamLabel_c implements ThisLabel {
     public boolean isCanonical() { return true; }
     public boolean isEnumerable() { return true; }
     public int hashCode() {
-        return ct.hashCode();
+        return ctName.hashCode();
     }
     public boolean equalsImpl(TypeObject o) {
         if (! (o instanceof ThisLabel)) {
@@ -41,9 +44,9 @@ public class ThisLabel_c extends ParamLabel_c implements ThisLabel {
             return "<this-label " + this.ct.fullName() + ">";
         }
         if (Report.should_report(Report.debug, 1)) { 
-            return "<this-label>";
+            return "<this-label " + this.ct.name() + ">";
         }
-        return "this";
+        return this.ct.name() + "this";
     }
 
     public boolean leq_(Label L, LabelEnv env) {

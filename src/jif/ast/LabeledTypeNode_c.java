@@ -1,15 +1,15 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
-import jif.types.*;
+import jif.types.JifClassType;
+import jif.types.JifTypeSystem;
 import jif.types.label.Label;
-import jif.visit.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
+import polyglot.ext.jl.ast.TypeNode_c;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.*;
-
-import java.util.*;
+import polyglot.visit.*;
 
 /** An implementation of the <code>LabeledTypeNode</code> interface. 
  */
@@ -67,6 +67,10 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode
           }
 
           return this;
+    }
+
+    public boolean isDisambiguated() {
+        return typePart.isDisambiguated() && labelPart.isDisambiguated();
     }
 
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {

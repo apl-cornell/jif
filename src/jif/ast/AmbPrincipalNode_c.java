@@ -3,7 +3,6 @@ package jif.ast;
 import java.util.List;
 
 import jif.types.*;
-import jif.types.label.AccessPathRoot;
 import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
@@ -97,7 +96,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
 	if (vi.flags().isFinal()) {
 	    if (ts.isPrincipal(vi.type())) {
 		return nf.CanonicalPrincipalNode(position(),
-		    ts.dynamicPrincipal(position(), JifUtil.varInstanceToAcessPath(vi)));
+		    ts.dynamicPrincipal(position(), JifUtil.varInstanceToAccessPath(vi)));
 	    }
 	}
 

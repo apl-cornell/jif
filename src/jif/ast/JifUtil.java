@@ -74,7 +74,7 @@ public class JifUtil
         if (expr instanceof Local) {
             Local local = (Local) expr;
             JifLocalInstance jli = (JifLocalInstance) local.localInstance();
-            return ts.dynamicPrincipal(jli.position(), varInstanceToAcessPath(jli));
+            return ts.dynamicPrincipal(jli.position(), varInstanceToAccessPath(jli));
         }
         //@@@@Need to deal with final access path expressions generally
 //        if (expr instanceof Field) {
@@ -91,9 +91,11 @@ public class JifUtil
      * @param vi
      * @return
      */
-    public static AccessPathRoot varInstanceToAcessPath(JifVarInstance vi) {
+    public static AccessPathRoot varInstanceToAccessPath(JifVarInstance vi) {
         if (vi instanceof LocalInstance) {
-            return new AccessPathRoot((LocalInstance)vi);
+            if (((LocalInstance)vi).flags().isFinal()) {
+                return new AccessPathRoot((LocalInstance)vi);
+            }
         }
         throw new InternalCompilerError("Current not supporting converting " + vi.getClass() + " to access paths");
     }    
@@ -101,11 +103,35 @@ public class JifUtil
     /**
      * @return
      */
-    public static AccessPath exprToAcessPath(Expr e) {
-        if (vi instanceof LocalInstance) {
-            return new AccessPathRoot((LocalInstance)vi);
+    public static AccessPath exprToAccessPath(Expr e) {
+        if (e instanceof Local) {
+           Local l = (Local)e;
+           if (l.localInstance().flags().isFinal()) {
+               return new AccessPathRoot(l.localInstance());
+           }
         }
-        throw new InternalCompilerError("Current not supporting converting " + vi.getClass() + " to access paths");
-    }    
-    
+        else if (e instanceof Field) {
+            Field f = (Field)e;
+            if (f.fieldInstance().flags().isFinal()) {
+                Receiver target = f.target();
+                if (target instanceof Expr) {
+                    AccessPath prefix = exprToAccessPath((Expr)f.target());
+                    return new AccessPathField(prefix, f.name());
+                }
+                else {
+                    throw new InternalCompilerError("Not currently supporting access paths for " + target.getClass().getName());
+                }
+            }
+        }
+        else if (e instanceof Special) {
+            Special s = (Special)e;
+            if (Special.THIS.equals(s.kind())) {
+                throw new InternalCompilerError("Current not converting this to an access path");                
+            }
+            else {
+                throw new InternalCompilerError("Not currently supporting access paths for special of kind " + s.kind());
+            }            
+        }
+        throw new InternalCompilerError("Expression " + e + " not suitable for an access path");
+    }        
 }

@@ -70,7 +70,7 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
 
 	    JifVarInstance jvi = (JifVarInstance) vi;
 
-	    Label L = ts.dynamicLabel(position(), JifUtil.varInstanceToAcessPath(jvi));
+	    Label L = ts.dynamicLabel(position(), JifUtil.varInstanceToAccessPath(jvi));
 	    return nf.CanonicalLabelNode(position(), L);
 	}
 

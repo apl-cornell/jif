@@ -42,6 +42,9 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
 	this.formalTypes = TypedList.copyAndCheck(formalTypes, 
 					       Type.class, 
 					       true);
+	this.formalArgLabels = TypedList.copyAndCheck(formalArgLabels, 
+                                               Label.class, 
+                                               true);
     }
 
 

@@ -193,6 +193,9 @@ public class JoinLabel_c extends Label_c implements JoinLabel
                     needed.add(ci);
             }
         }
+        if (needed.size() == components.size()) {
+            
+        }
         
         return flatten(needed, (JifTypeSystem)ts, position());
     }
@@ -228,7 +231,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
             return (Label) c.toArray()[0];
         }
         
-        return ts.joinLabel(pos, c);
+        return new JoinLabel_c(c, ts, pos);
     }
 
     public Label subst(LocalInstance arg, Label l) {

@@ -27,7 +27,7 @@ public class JifFormalDel extends JifJL_c
         JifLocalInstance li = (JifLocalInstance)n.localInstance();
         ArgLabel al = jts.argLabel(n.position(), li);
         li.setLabel(al);
-        
+                
         return n.localInstance(li);
     }
 

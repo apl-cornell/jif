@@ -1,14 +1,16 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
+import java.util.*;
+
 import jif.types.*;
 import jif.types.label.Label;
-import jif.visit.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
+import polyglot.ext.jl.ast.TypeNode_c;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.*;
-import java.util.*;
+import polyglot.visit.*;
 
 /** An implementation of the <code>InstTypeNode</code> interface.
  */
@@ -60,13 +62,16 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode
 	return reconstruct(base, params);
     }
 
+    public boolean isDisambiguated() {
+        return false;
+    }
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
-	Type b = (Type) base.type();
+	Type b = base.type();
 
 	if (! b.isCanonical()) {
-	    throw new SemanticException(
-		"Cannot instantiate from a non-canonical type " + b);
+	    //  not yet ready to disambiguate
+	    return this;
 	}
 
         if (! (b instanceof JifPolyType)) {
