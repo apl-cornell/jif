@@ -140,6 +140,19 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         }        
         jmi.setReturnLabel(Lr, isDefaultReturnLabel);
         
+        // set the formal arg labels.
+        List formalArgLabels = new ArrayList(n.formals().size());
+        for (Iterator i = n.formals().iterator(); i.hasNext(); ) {
+            Formal f = (Formal)i.next();
+            if (!f.isDisambiguated()) {
+                // formals are not disambiguated yet.
+                return n;
+            }
+            JifLocalInstance jli = (JifLocalInstance)f.localInstance();
+            formalArgLabels.add(jli.label());
+        }
+        jmi.setFormalArgLabels(formalArgLabels);
+        
         // set the labels for the throwTypes.
         List throwTypes = new LinkedList();        
         for (Iterator i = n.throwTypes().iterator(); i.hasNext();) {

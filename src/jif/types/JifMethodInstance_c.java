@@ -2,6 +2,7 @@ package jif.types;
 
 import java.util.*;
 
+import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import polyglot.ext.jl.types.MethodInstance_c;
 import polyglot.main.Report;
@@ -17,13 +18,14 @@ public class JifMethodInstance_c extends MethodInstance_c
     protected Label startLabel;
     protected Label returnLabel;
     protected List constraints;
+    protected List formalArgLabels;
     protected boolean isDefaultStartLabel;
     protected boolean isDefaultReturnLabel;
 
     public JifMethodInstance_c(JifTypeSystem ts, Position pos,
 	    ReferenceType container, Flags flags, Type returnType,
 	    String name, Label startLabel, boolean isDefaultStartLabel,
-            List formalTypes,
+            List formalTypes, List formalArgLabels,
 	    Label returnLabel, boolean isDefaultReturnLabel,
             List excTypes, List constraints) {
 
@@ -34,12 +36,15 @@ public class JifMethodInstance_c extends MethodInstance_c
         this.isDefaultStartLabel = isDefaultStartLabel;
 	this.returnLabel = returnLabel;
         this.isDefaultReturnLabel = isDefaultReturnLabel;
-	this.throwTypes = TypedList.copyAndCheck(this.throwTypes, 
+	this.throwTypes = TypedList.copyAndCheck(throwTypes, 
 					       Type.class, 
 					       true);
-	this.formalTypes = TypedList.copyAndCheck(this.formalTypes, 
-					       Type.class, 
-					       true);
+	this.formalTypes = TypedList.copyAndCheck(formalTypes, 
+	                                          Type.class, 
+	                                          true);
+	this.formalArgLabels = TypedList.copyAndCheck(formalArgLabels, 
+	                                          Label.class, 
+	                                          true);
     
     }
 //    private Label replaceArgLabels(Label l) {
@@ -115,6 +120,14 @@ public class JifMethodInstance_c extends MethodInstance_c
 	    return jts.notTaken();
 
 	return jts.labelOfType(returnType);
+    }
+
+    public List formalArgLabels() {
+        return formalArgLabels;
+    }
+
+    public void setFormalArgLabels(List formalArgLabels) {
+        this.formalArgLabels = TypedList.copyAndCheck(formalArgLabels, ArgLabel.class, true);
     }
 
     public List constraints() {

@@ -15,7 +15,7 @@ import polyglot.util.Position;
  */
 public interface JifTypeSystem extends ParamTypeSystem
 {
-    static LabelEnv emptyLabelEnv = new LabelEnv_c();
+    static final LabelEnv emptyLabelEnv = new LabelEnv_c();
     
     // Type constructors
 
@@ -27,29 +27,6 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     /** Returns a labeled type, type{label}. */
     LabeledType labeledType(Position pos, Type type, Label label);
-
-    /** Constructs a Jif constructor instance */
-    JifConstructorInstance jifConstructorInstance(Position pos,
-						  ClassType container,
-						  Flags flags, 
-                                                  Label startLabel,
-                                                  boolean isDefaultStartLabel,
-						  Label returnLabel,
-                                                  boolean isDefaultReturnLabel,
-						  List formalTypes, List excTypes,
-						  List constraints);
-
-    /** Constructs a Jif method instance */
-    JifMethodInstance jifMethodInstance(Position pos,
-					ReferenceType container, Flags flags,
-					Type returnType, String name,
-					Label startLabel, 
-                                        boolean isDefaultStartLabel,
-                                        List formalTypes,
-					Label endLabel, 
-                                        boolean isDefaultEndLabel,
-                                        List excTypes,
-					List constraints);
 
     /** Constructs a parameter instance for a class parameter declaration */
     ParamInstance paramInstance(Position pos, JifClassType container,

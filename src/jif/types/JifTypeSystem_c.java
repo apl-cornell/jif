@@ -140,9 +140,9 @@ public class JifTypeSystem_c
         ClassType container,
         Flags flags,
         List formalTypes,
-        List excTypes) {
+        List excTypes) {        
         return jifConstructorInstance(pos,container,flags,unknownLabel(pos), false,unknownLabel(pos),false,
-            formalTypes,
+            formalTypes, Collections.EMPTY_LIST,
             excTypes,
             Collections.EMPTY_LIST); 
     }
@@ -156,6 +156,7 @@ public class JifTypeSystem_c
         Label returnLabel,
         boolean isDefaultReturnLabel,
         List formalTypes,
+        List formalArgLabels,
         List excTypes,
         List constraints) {
         JifConstructorInstance ci =
@@ -166,7 +167,7 @@ public class JifTypeSystem_c
                 flags,
                 startLabel, isDefaultStartLabel,
                 returnLabel, isDefaultReturnLabel,
-                formalTypes,
+                formalTypes, formalArgLabels,
                 excTypes,
                 constraints);
         return ci;
@@ -188,7 +189,7 @@ public class JifTypeSystem_c
             returnType,
             name,
             unknownLabel(pos), false,
-            formalTypes,
+            formalTypes, Collections.EMPTY_LIST,
             unknownLabel(pos), false,
             excTypes,
             Collections.EMPTY_LIST);
@@ -202,7 +203,7 @@ public class JifTypeSystem_c
         String name,
         Label startLabel,
         boolean isDefaultStartLabel,
-        List formalTypes,
+        List formalTypes, List formalArgLabels,
         Label endLabel,
         boolean isDefaultEndLabel,
         List excTypes,
@@ -217,7 +218,7 @@ public class JifTypeSystem_c
                 returnType,
                 name,
                 startLabel, isDefaultStartLabel,
-                formalTypes,
+                formalTypes, formalArgLabels,
                 endLabel, isDefaultEndLabel,
                 excTypes,
                 constraints);
@@ -937,6 +938,7 @@ public class JifTypeSystem_c
                                       Public(),
                                       topLabel(), true,
                                       bottomLabel(), true,
+                                      Collections.EMPTY_LIST,
                                       Collections.EMPTY_LIST,
                                       Collections.EMPTY_LIST,
                                       Collections.EMPTY_LIST);

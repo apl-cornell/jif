@@ -2,6 +2,7 @@ package jif.types;
 
 import java.util.*;
 
+import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import polyglot.ext.jl.types.ConstructorInstance_c;
 import polyglot.types.*;
@@ -16,13 +17,14 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
     protected Label startLabel;
     protected Label returnLabel;
     protected List constraints;
+    protected List formalArgLabels;
     protected boolean isDefaultStartLabel;
     protected boolean isDefaultReturnLabel;
 
     public JifConstructorInstance_c(JifTypeSystem ts, Position pos,
 	    ClassType container, Flags flags,
 	    Label startLabel, boolean isDefaultStartLabel, Label returnLabel, 
-            boolean isDefaultReturnLabel, List formalTypes,
+            boolean isDefaultReturnLabel, List formalTypes, List formalArgLabels,
 	    List excTypes, List constraints) {
 
 	super(ts, pos, container, flags, formalTypes, excTypes);
@@ -34,10 +36,10 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
         this.isDefaultStartLabel = isDefaultStartLabel;
 	this.returnLabel = returnLabel;
         this.isDefaultReturnLabel = isDefaultReturnLabel;
-	this.throwTypes = TypedList.copyAndCheck(this.throwTypes, 
+	this.throwTypes = TypedList.copyAndCheck(throwTypes, 
 					       Type.class, 
 					       true);
-	this.formalTypes = TypedList.copyAndCheck(this.formalTypes, 
+	this.formalTypes = TypedList.copyAndCheck(formalTypes, 
 					       Type.class, 
 					       true);
     }
@@ -71,6 +73,13 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
 
     public boolean isDefaultStartLabel() {
         return isDefaultStartLabel;
+    }
+    public List formalArgLabels() {
+        return formalArgLabels;
+    }
+
+    public void setFormalArgLabels(List formalArgLabels) {
+        this.formalArgLabels = TypedList.copyAndCheck(formalArgLabels, ArgLabel.class, true);
     }
 
     public List constraints() {

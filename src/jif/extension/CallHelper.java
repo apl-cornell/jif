@@ -5,8 +5,8 @@ import java.util.*;
 import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.types.*;
+import jif.types.label.ArgLabel;
 import jif.types.label.Label;
-import jif.types.label.VarLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
@@ -69,8 +69,8 @@ public class CallHelper
     /**
      * Labels of the actual arguments.
      */
-    private List argLabels;
-    
+    private List actualArgLabels;
+        
     /**
      * LabelSusbtitution to replace signature <code>ArgLabel</code>s and
      * <code>DynamicArgLabel</code>s with labels of actual arguments 
@@ -113,7 +113,7 @@ public class CallHelper
 	this.position = position;
         this.callChecked = false;
 	
-        if (pi.formalTypes().size() != args.size()) 
+        if (pi.formalArgLabels().size() != args.size()) 
             throw new InternalCompilerError("Wrong number of args.");   
     }
 
@@ -154,7 +154,7 @@ public class CallHelper
 
         Xjoin = ts.pathMap();
         	
-        argLabels = new ArrayList(args.size());
+        actualArgLabels = new ArrayList(args.size());
         argPathMaps = new ArrayList(args.size());
 	
         for (int i = 0; i < args.size(); i++ ) {
@@ -170,7 +170,7 @@ public class CallHelper
 
 	    Xj = Jif_c.X(Ej);        
             argPathMaps.add(Xj);
-            argLabels.add(Xj.NV().copy());
+            actualArgLabels.add(Xj.NV().copy());
             
 	    Xjoin = Xjoin.join(Xj);	    
 	}
@@ -214,82 +214,36 @@ public class CallHelper
         return dynArgs;
     }
     
-    private VarLabel createVarLabelForArg(JifTypeSystem ts, int argIndex, Position argPos) {
-        String name = "call";
-        // For easier debugging.
-        if (pi instanceof MethodInstance)
-            name = ((MethodInstance)pi).name();
-        name += "-"+(argIndex+1);
-        return ts.freshLabelVariable(argPos, name,
-                "label of the PC after evaluating the " + StringUtil.nth(argIndex+1) + 
-                " arg of method call at " + 
-                argPos.toString());
-    }
-    
     /**
      * ???@@@
      */
     private void constrainArguments(LabelChecker lc) throws SemanticException {
 	JifContext A = lc.jifContext();
-        JifTypeSystem ts = lc.typeSystem();
         
 	// Now constrain the labels of the arguments to be less
-	// than the labels of the formals, substituting in the
+	// than the bounds of the formal args, substituting in the
 	// fresh labels we just created.
 
-	Iterator formalArgTypes = pi.formalTypes().iterator();
+	Iterator formalArgLabels = pi.formalArgLabels().iterator();
 
 	for (int j = 0; j < args.size(); j++) {
             final int count = j + 1;
              
 	    final Expr Ej = (Expr) args.get(j);
+        
+	    ArgLabel aj = (ArgLabel)formalArgLabels.next();            
+            // the upper bound label of the formal argument         
+            Label argBoundj = instantiate(A, aj.upperBound());
 
-            // the var label for the jth argument
-            Label Lj = createVarLabelForArg(ts, j, Ej.position());
-
-	    Type tj = (Type) formalArgTypes.next();
-            
-            // the label of the formal argument type         
-	    //@@@@What does ts.labelOfType(tj, Lj) look like? is it an arg-label or the declared label? Should be the bound on the arg label. Maybe better to get the arglabel, and ask for it's bound.	    
-            Label argLj = instantiate(A, ts.labelOfType(tj, Lj));//@@@@@
-
-	    // To get more precise results, we use the constraint
-	    // "Lj <= argLj" instead of "Lj == argLj"
-            lc.constrain(new LabelConstraint(new NamedLabel("poly_formal_arg_"+count, 
-                                                            "the label of the " + StringUtil.nth(count) + " formal argument",
-                                                            Lj), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("formal_arg_"+count+"_bound", 
-                                                        "upper bound on label of the " + StringUtil.nth(count) + " formal argument",
-                                                        argLj),
-                                         A.labelEnv(),
-                                         Ej.position()) {
-                 public String msg() {
-                     return "The actual argument is more restrictive than " +
-                            "the formal argument.";
-                 }
-                 public String detailMsg() { 
-                     return "The label of the actual argument, " + namedLhs() + 
-                            ", is more restrictive than the label of the " +
-                            "formal argument, " + namedRhs() + ".";
-                 }
-                 public String technicalMsg() {
-                     return "[Lj <= argLj] is not satisfied for argument <" + 
-                            Ej + ">.";
-                 }                     
-            }
-            );
-
-	    // A |- Xj[nv] <= Lj
-
+	    // A |- Xj[nv] <= argLj
 	    PathMap Xj = (PathMap)argPathMaps.get(j);
             lc.constrain(new LabelConstraint(new NamedLabel("actual_arg_"+count, 
                                                             "the label of the " + StringUtil.nth(count) + " actual argument",
                                                             Xj.NV()), 
                                          LabelConstraint.LEQ, 
-                                         new NamedLabel("poly_formal_arg_"+count, 
-                                                        "the label of the " + StringUtil.nth(count) + " formal argument",
-                                                        Lj),
+                                         new NamedLabel("formal_arg_"+count, 
+                                                        "the upper bound of the formal argument " + aj.formalInstance().name(),
+                                                        argBoundj),
                                          A.labelEnv(),
                                          Ej.position()) {
                  public String msg() {
@@ -315,15 +269,12 @@ public class CallHelper
 	    // labels.
             SubtypeChecker sc = new SubtypeChecker();
 	    sc.addSubtypeConstraints(lc, Ej.position(),
-	                             instantiate(A, tj), Ej.type());
+	                             instantiate(A, aj.formalInstance().type()), Ej.type());
 	}
     }
 
     private Label resolveStartLabel(JifContext A) {
-	if (pi.startLabel()!= null) {
-	    return instantiate(A, pi.startLabel());
-	}
-        return null;
+        return instantiate(A, pi.startLabel());
     }
 
     /** 
@@ -331,14 +282,7 @@ public class CallHelper
      * label is not defined.
      */
     private Label resolveReturnLabel(JifContext A) {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
-
-	Label Lr = ts.bottomLabel();
-        if (pi.returnLabel() != null) {
-            Lr = instantiate(A, pi.returnLabel());
-        }
-
-        return Lr;
+        return instantiate(A, pi.returnLabel());
     }
 
     private Label resolveReturnValueLabel(JifContext A, Label returnLabel) {
@@ -347,14 +291,10 @@ public class CallHelper
 
 	if (pi instanceof MethodInstance) {
 	    MethodInstance mi = (MethodInstance) pi;
-	    if (ts.isLabeled(mi.returnType())) {
-		L = instantiate(A, ts.labelOfType(mi.returnType()));
-            }
-	    else 
-		L = defaultReturnValueLabel(ts);
+	    L = instantiate(A, ts.labelOfType(mi.returnType()));
 	}
 	else {
-	    L = defaultReturnValueLabel(ts);
+	    L = ts.bottomLabel(pi.position());
 	}
 
 	L = L.join(returnLabel);
@@ -362,15 +302,6 @@ public class CallHelper
         return L;	
     }
     
-    private Label defaultReturnValueLabel(JifTypeSystem ts) {
-        if (pi instanceof MethodInstance
-            && !((MethodInstance)pi).returnType().isVoid()) {
-            return Xjoin.NV();
-        } else {
-            return ts.bottomLabel(pi.position());
-        }
-    }
-
     private PathMap excPathMap(JifContext A, Label returnLabel) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
 	PathMap Xexn = ts.pathMap();
@@ -408,7 +339,7 @@ public class CallHelper
 	// check arguments
 	labelCheckArguments(lc);
 	
-        this.argSubstitution = new ArgLabelSubstitution(argLabels, dynArgs(args, ts), true);
+//        this.argSubstitution = new ArgLabelSubstitution(actualArgLabels, dynArgs(args, ts), true);
         A = A.objectTypeAndLabel(calleeContainer, targetObjLabel);
         lc = lc.context(A);
 
@@ -517,7 +448,7 @@ public class CallHelper
     private void satisfiesConstraints(JifContext A) 
 	throws SemanticException
     {
-	JifProcedureInstance jpi = (JifProcedureInstance) pi;
+	JifProcedureInstance jpi = pi;
 	
 	for (Iterator i = jpi.constraints().iterator(); i.hasNext() ; ) {
 	    Assertion jc = (Assertion) i.next();
