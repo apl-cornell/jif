@@ -1,0 +1,12 @@
+package java.lang;
+
+/**
+ * The Jif signature for java.lang.Object. 
+ *
+ * Most methods are not available. 
+ */
+public class Object {
+    private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
+    public Object() { }
+    public native final Class{this} getClass();
+}

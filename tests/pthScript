@@ -1,0 +1,164 @@
+# pth test script
+#
+# This file is a test script for pth (Polyglot Test Harness). It
+# conforms to the following grammar.
+#
+#      ScriptFile   ::= CompilerTest+
+#      CompilerTest ::= ExtClassName ["CmdLineArgs"] { FileTest [; FileTest]* }
+#      FileTest     ::= Filenames [Description] [FailureSet]
+#      Filenames    ::= Filename [Filename]*
+#      Description  ::= LitString
+#      FailureSet   ::= Failure [, Failure]*
+#      Failure      ::= ( ErrorKind )
+#                    |  ( ErrorKind, "RegExp" )
+#                    |  ( "RegExp" )
+#                    |  ( )
+#      ErrorKind    :   one of, or a unique prefix of one of the following 
+#                       strings: "Warning", "Internal Error", "I/O Error", 
+#                       "Lexical Error", "Syntax Error", "Semantic Error"
+#                       or "Post-compiler Error".
+#      Filename     :   the name of a file. Is interpreted from the 
+#                       directory where pth is run.
+#      LitString    :   a literal string, enclosed in quotes.
+#      RegExp       :   a regular expression, as in java.util.regex; 
+#                       is always enclosed in quotes.
+#      CmdLineArgs  :   additional command line args for the Polyglot 
+#                       compiler; is always enclosed in quotes.
+
+# When invoking this script, it will probably be necessary to supply
+# an appropriate class path:
+#    $ pth pthScript -cp "../classes:../lib-classes:."
+jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
+	A.jif ;
+	Account.jif ;
+	ActsFor1.jif ;
+	ActsFor2.jif ;
+	ActsFor3.jif ;
+	ActsFor4.jif ;
+	ActsFor5.jif ;
+	ArgLabelSubst.jif ;
+	ArgLabelSubst2.jif ;
+	Array.jif ;
+	Array1.jif (Semantic, "not a subtype") ;
+	Array2.jif ;
+	ArrayLeak.jif (Semantic, "not a subtype") ;
+	ArrayLeak2.jif (Semantic, "not a subtype") ;
+	BadNullExcept1.jif (Semantic, "NullPointerException.*must .* be caught") ;
+	BadNullExcept2.jif (Semantic, "NullPointerException.*must .* be caught") ;
+	BadNullExcept3.jif (Semantic, "NullPointerException.*must .* be caught") ;
+	BadNullExcept4.jif (Semantic, "ArrayIndex.*Exception.*must .* be caught") ;
+	BadNullExcept5.jif (Semantic, "NullPointerException.*must .* be caught") ;
+	BadNullExcept6.jif (Semantic, "ArrayIndex.*Exception.*must .* be caught") ;
+	BadNullExcept7.jif (Semantic, "NullPointerException.*must .* be caught") ;
+	Binary.jif ;
+	Call1.jif ;
+	cat.jif ;
+	clientEmptyList.jif ;
+	clientList.jif ;
+	clientPairList.jif ;
+	Complex.jif ;
+	CondExpr.jif ;
+	ConditionalLeak.jif (Semantic, "not a subtype") ;
+	Constraints1.jif ;
+	Constraints3.jif ;
+	Constraints5.jif ;
+	/* KNOWN BAD: tries to translate an "all-runtime" label Constraints7.jif ; */
+	ConstructorTest.jif ;
+	Declassify.jif ;
+	Default1.jif ;
+	Deref.jif ;
+	Deref2.jif ;
+	Dyn1.jif ;
+	Dyn2.jif ;
+	Dyn4.jif ;
+	Dyn5.jif ;
+	Dyn6.jif ;
+	Dyn7.jif ;
+	EmptyList.jif List.jif;
+	EmptyList2.jif ;
+	Exc.jif ;
+	Exc2.jif ;
+	FieldLeak.jif (Semantic) ;
+	FileTester.jif ;
+	For1.jif ;
+	Heapsort.jif ;
+	Hello.jif ;
+	HiRefLowField.jif (Semantic, "Label .* not less restrictive");
+	If1.jif ;
+	Implicit.jif ;
+	Implicit2.jif ;
+	IntPair.jif ;
+	InterfaceTest.jif ;
+	InvariantClass.jif (Semantic, "Covariant classes .* can only be extended with covariant classes");
+	List.jif ;
+	List2.jif ;
+	ListTest.jif ;
+	Main1.jif (Warning, "signature of.*main method.*should either be"),
+                  (Semantic, "Jif allows only one static method named \"main\"");
+	Main2.jif ;
+	MyInteger.jif ;
+	NewLabel.jif ;
+	NullExcept1.jif ;
+	NullExcept2.jif ;
+	NullExcept3.jif ;
+	NullExcept4.jif ;
+	NullExcept5.jif ;
+	NullExcept6.jif ;
+	NullExcept7.jif ;
+	NullExcept8.jif ;
+	NullExcept9.jif ;
+	PairList.jif  List.jif;
+	PairList2.jif ;
+	Params1.jif ;
+	Params1Test.jif ;
+	Params1TestTest.jif ;
+	Params2.jif ;
+	Params3.jif ;
+	Params4.jif ;
+	Params5.jif ;
+	Params6.jif ;
+	Params7.jif ;
+	Params8.jif ;
+	Params9.jif ;
+	Params10.jif ;
+	Params11.jif ;
+	Params12.jif ;
+	Params13.jif (Semantic, "not cast.*invariant.* parameter to.* covariant");
+	Params14.jif (Semantic, "not instantiate .* invariant .* parameter with .* non-invariant");
+	ParamsActsFor.jif ;
+	Password.jif ;
+	Password2.jif ;
+	Poly.jif ;
+	/* KNOWN BAD: Protected.jif ; */
+	Simple.jif ;
+	Simple2.jif ;
+	Simple3.jif ;
+	Simple4.jif ;
+	StaticThis1.jif (Semantic, "this.*cannot be used in a static context");
+	StaticThis2.jif (Semantic, "this.*cannot be used in a static context");
+	StaticThis3.jif (Semantic, "this.*cannot be used in a static context");
+	StaticThis4.jif (Semantic, "this.*cannot be used in a static context");
+	StaticThis5.jif (Semantic, "this.*cannot be used in a static context");
+	StaticThis6.jif ;
+	StringTester.jif ;
+	SubtypeChecker1.jif (Semantic, "not a subtype") ;
+	SubtypeChecker2.jif ;
+	SubtypeChecker3.jif (Semantic, "not a subtype") ;
+	SubtypeChecker4.jif (Semantic, "subclass of .*Throwable may not have.* parameters") ;
+	Super1.jif (Semantic, "No valid constructor") ;
+	Super2.jif ;
+	Super3.jif (Semantic, "first statement .* must be .* constructor call") ;
+	Super4.jif (Semantic, "first statement .* must be .* constructor call") ;
+	Super5.jif ;
+	Super6.jif (Semantic, "Final variable.*must be initialized") ;
+	SwitchLabel.jif ;
+	/* KNOWN BAD: SwitchLabel2.jif ; */ 
+	SwitchLabel3.jif ;
+	SwitchLabel4.jif (Semantic, "label of the switch expression is more restrictive");
+	This1.jif ;
+	This2.jif ;
+	ToString.jif (Semantic, "Cannot coerce") ;
+	User1.jif ;
+	Vec.jif ;
+	While.jif ; 
+}

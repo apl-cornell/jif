@@ -1,0 +1,23 @@
+import jif.runtime.Runtime;
+import jif.lang.*;
+import java.io.*;
+
+public class cat {
+
+    public static void main{}(principal{} p, String{}[]{} args) {
+        try {
+            String{} filename = args[0];
+            final label{} lb = new label{p:};
+            Runtime[p]{} runtime = Runtime[p].getRuntime(p);
+            FileInputStream[{*lb}]{*lb} fis = runtime.openFileRead(filename, lb);
+            InputStreamReader[{*lb}]{*lb} reader = new InputStreamReader[{*lb}](fis);
+            BufferedReader[{*lb}]{*lb} br = new BufferedReader[{*lb}](reader);
+            PrintStream[{p:}]{p:} out = runtime.out();
+            String{*lb} line = br.readLine();
+            while (line != null) {
+                out.println(line);
+                line = br.readLine();
+            }
+        } catch (Exception ignored) { }
+    }
+}

@@ -1,0 +1,13 @@
+package jif.lang;
+
+/**
+ * This interface combines the Jif signatures for the methods
+ * equals(), hashCode() and toString(). This provides a 
+ * convenient replacement for 
+ */
+public interface JifObject[label L] extends IDComparable[L], 
+					    Hashable[L], 
+					    ToStringable[L] 
+{
+
+}

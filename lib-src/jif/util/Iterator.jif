@@ -1,0 +1,9 @@
+package jif.util;
+
+public interface Iterator[label L] {
+    boolean{L} hasNext();
+
+    JifObject[L]{L} next{L}():{L} throws (NoSuchElementException{L});
+
+    void remove{L}():{L} throws (IllegalStateException{L});
+}

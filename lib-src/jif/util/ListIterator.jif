@@ -1,0 +1,20 @@
+package jif.util;
+
+public interface ListIterator[label L] extends Iterator[L] {
+    // Query Operations
+
+    boolean{L} hasPrevious();
+
+    JifObject[L]{L} previous{L}():{L} throws (NoSuchElementException{L});
+
+    int{L} nextIndex();
+
+    int{L} previousIndex();
+
+
+    // Modification Operations
+    
+    void set{L}(JifObject[L]{L} o):{L} throws (IllegalStateException{L});
+
+    void add{L}(JifObject[L]{L} o):{L} throws (ClassCastException{L}, IllegalArgumentException{L});
+}

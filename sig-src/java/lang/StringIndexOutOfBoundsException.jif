@@ -1,0 +1,18 @@
+package java.lang;
+
+public
+class StringIndexOutOfBoundsException extends IndexOutOfBoundsException {
+    private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
+
+    public StringIndexOutOfBoundsException() {
+	super();
+    }
+
+    public StringIndexOutOfBoundsException(String{this} s) {
+	super(s);
+    }
+
+    public StringIndexOutOfBoundsException(int{this} index) {
+	super("String index out of range: " + index);
+    }
+}

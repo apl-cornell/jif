@@ -1,0 +1,220 @@
+package jif.util;
+
+public class LinkedList[label L]
+                        extends AbstractList[L]
+		        implements List[L]
+{
+    private LinkedListEntry[L]{L} head;
+
+    public LinkedList() {
+        head = null;
+        super();
+    }
+    public int{L} size() {
+	int s = 0;
+	
+	LinkedListEntry[L] e = head;
+	while (e != null) {
+	    e = e.next;
+	    s++;
+	}
+	return s;
+    }
+
+    public boolean{L} isEmpty() {
+	//	return (this.size() == 0);
+	return true;
+    }
+
+    public boolean{L} add{L}(JifObject[L]{L} o) {
+	LinkedListEntry[L]{L} n = new LinkedListEntry[L]();
+	LinkedListEntry[L]{L} m = head; // use a local to avoid NPE
+	n.data = o;
+
+	n.next = m;
+	if (m != null) {
+	    m.prev = n;
+	}
+
+	head = n;
+
+	return true;
+    }
+
+    public boolean{L} remove{L}(JifObject[L]{L} o) {
+	LinkedListEntry[L] e = head;
+	while (e != null) {
+	    if (e.data == o || (o != null && o.equals(e.data))) {
+		// remove it...
+		LinkedListEntry[L] f = e.prev;
+		if (f != null) {
+		    f.next = e.next;
+		}
+		f = e.next;
+		if (f != null) {
+		    f.prev = e.prev;
+		}
+		
+		return true;
+	    }
+	    e = e.next;
+	}
+	return false;
+    }
+
+    public JifObject[L]{L} remove{L}(int{L} index) throws (IndexOutOfBoundsException{L}) {
+	int s = 0;
+	int size = size();
+
+	if (index < 0 || index >= size) {
+	    throw new IndexOutOfBoundsException();
+	}
+
+	LinkedListEntry[L] e = head;
+	while (e != null && s != index) {
+	    e = e.next;
+	    s++;
+	}
+
+	if (e != null) {	    
+	    LinkedListEntry[L] f = e.prev;
+	    if (f != null) {
+		f.next = e.next;
+	    }
+	    f = e.next;
+	    if (f != null) {
+		f.prev = e.prev;
+	    }
+	
+	    return e.data;
+	}
+	// unreachable
+	return null;
+    }
+
+    public int{L} hashCode() {
+	int hashCode = 1;
+	LinkedListEntry[L] e = head;
+	while (e != null) {
+	    JifObject[L] mobj = e.data;
+	    hashCode = 31*hashCode + (mobj==null ? 0 : mobj.hashCode());
+	}
+	return hashCode;
+    }
+
+    public JifObject[L]{L;index} get(int index):{L;index} throws (IndexOutOfBoundsException{L;index}) {
+	if (index < 0 || index >= size()) {
+	    throw new IndexOutOfBoundsException();
+	}
+
+	int s = 0;
+	
+	LinkedListEntry[L] e = head;
+	while (e != null) {
+	    if (s == index) {
+		return e.data;
+	    }
+	    e = e.next;
+	    s++;
+	}
+	// unreachable here
+	return null;
+    }
+
+    public JifObject[L]{L} getFirst():{L} throws (IndexOutOfBoundsException{L}) {
+	return get(0);
+    }
+
+    public JifObject[L]{L} getLast():{L} throws (IndexOutOfBoundsException{L}) {
+	return get(size()-1);
+    }
+
+
+    public JifObject[L]{L} set{L}(int{L} index, JifObject[L]{L} element):{L} throws (IndexOutOfBoundsException{L}) {
+	int s = 0;
+	
+	LinkedListEntry[L] e = head;
+	while (e != null) {
+	    if (s == index) {
+		JifObject[L] old = e.data;
+		e.data = element;
+		return old;
+	    }
+	    e = e.next;
+	    s++;
+	}
+	throw new IndexOutOfBoundsException();
+    }
+
+    public void add{L}(int{L} index, JifObject[L]{L} element):{L} throws (IndexOutOfBoundsException{L}) {
+	int s = 0;
+	
+	LinkedListEntry[L] e = head;
+	while (e != null) {
+	    if (s == index) {
+		LinkedListEntry[L] n = new LinkedListEntry[L]();
+		n.data = element;
+		n.next = e;
+		n.prev = e.prev;
+		e.prev = n;
+		
+		LinkedListEntry[L] p = n.prev; // use of local to avoid NPE
+		if (p != null) {
+		    p.next = e;
+		}
+		return;
+	    }
+	    if (s == index-1 && e.next == null) {
+		// the index == size()
+		LinkedListEntry[L] n = new LinkedListEntry[L]();
+		n.data = element;
+		n.next = null;
+		n.prev = e;
+		e.next = n;
+		break;
+	    }
+	    e = e.next;
+	    s++;
+	}
+	throw new IndexOutOfBoundsException();
+    }
+
+
+    public int{L;o} indexOf(JifObject[L] o) {
+	int s = 0;
+	
+	LinkedListEntry[L] e = head;
+	while (e != null) {
+	    if (o == e.data || (o != null && o.equals(e.data))) {
+		return s;
+	    }
+	    e = e.next;
+	    s++;
+	}
+	return -1;
+    }
+
+    public int{L;o} lastIndexOf(JifObject[L] o) {
+	int s = 0;
+	int last = -1;
+	
+	LinkedListEntry[L] e = head;
+	while (e != null) {
+	    if (o == e.data || (o != null && o.equals(e.data))) {
+		last = s;
+	    }
+	    e = e.next;
+	    s++;
+	}
+	return last;
+    }
+
+}
+
+class LinkedListEntry[label L] {
+    LinkedListEntry() {}
+    LinkedListEntry[L]{L} next;
+    LinkedListEntry[L]{L} prev;
+    JifObject[L]{L} data;
+}
+

@@ -1,0 +1,261 @@
+Programming in Jif
+------------------
+
+This file contains some information about writing programs in
+Jif. Examples of Jif can be found in sub-directories of this
+directory, and also in $JIF/lib-src, where $JIF is the root of the Jif
+installation.
+
+
+Default labels
+--------------
+
+A powerful feature of Jif is that you don't have to write down labels
+of local variables. The Jif compiler can figure out whether there is a
+way of labeling local variables to satisfy all the label
+constraints. However, most of the time you do need to write down the
+labels of fields and method signatures, including the begin label, the
+return label, the result label and arguments' labels. When these
+labels are missing, some conservative rules are used to assign
+restrictive default labels:
+
+  - Default method begin label: a fresh covariant label, which means the
+    method has no side effects.
+
+  - Default method return label: "this" label if the method is not
+    static, bottom (i.e., the label {}) otherwise. It means no extra
+    information can be gained by knowing that the method returns
+    normally. Note that if a method returns normally, we can infer
+    that the target (receiver) of the method is not null. So the
+    default return label of a non-static method should be the "this"
+    label.
+
+  - Default method result label: the join of all the arguments' labels
+    and the return label. Note that the "this" label is folded in
+    through the return label.
+
+  - Default argument label: top. It says that the method can be called
+    with no upper bounds on the labels of the actual parameters.
+
+  - Default field label: bottom, which is conservative because no confidential
+    data can be stored in the field.
+
+
+Runtime Errors
+--------------
+
+In Jif, a method is required to catch or define in its throws clauses
+all the runtime errors that may occur in the method. This requirement
+is intended to force programmers to protect the information that can
+be derived from the fact that a runtime error happens.
+
+NullPointerException and IndexOutOfBoundsException are the two most
+frequent runtime errors that need to be caught. In some cases, if you
+are sure that a reference is not null or an array index is in bound,
+you can simply catch the runtime exceptions and do nothing in the
+catch clauses. The Jif compiler has a simple not-null dataflow analysis
+that allows it to detect if local variables (and formal arguments) are 
+not null at particular program points. For example, the Jif compiler
+detects that the following code does not throw any NullPointerExceptions:
+    ...
+    void foo(Foo a) {
+        Foo x = new Foo();
+        x.bar(); // no NPE thrown here, as x is definitely not null
+        if (a != null) a.bar(); // no NPE thrown here
+    }
+    ...
+Note that the not-null analysis does not apply to fields.
+
+The "static public void main" Method
+------------------------------------
+
+Jif provides two possible signatures for the main method of a
+class. The first is compatible with the signature for Java main
+methods, and accepts a single argument of an array of String, i.e.,
+
+  public static void main(String[] args) { ... }
+
+The second signature takes two arguments, the first a principal, and
+the second an array of String:
+
+  public static void main(principal p, String[] args) { ... }
+
+The principal p is the principal for the current user. The signature
+may optionally have the authority of the current user:
+
+  public static void main(principal p, String[] args) 
+    where caller(p)  { ... }
+
+
+
+Debugging Jif Programs
+----------------------
+
+Tracking down and correcting compilation errors in Jif code can be
+difficult. The Jif compiler has a number of reporting options that
+will result in additional information being displayed. 
+
+
+Constraint explanations:
+
+The "-explain" or "-e" flag of the Jif compiler can be used to view
+more information about failed label checking. For example, consider
+the program, in which there is a potential implicit information flow
+from the high security argument h, whose label is the dynamic label
+lbl, to the low security local variable l:
+
+    class Implicit {
+	void m(boolean{*lbl} h, label{} lbl) {
+	    boolean{} l = false;
+	    if (h) {
+		l = true;
+	    }
+	}
+    }
+
+Trying to compile this program produces the following output:
+
+    $ $JIF/bin/jifc Implicit.jif
+    Implicit.jif:5: Label of right hand side not less restrictive than the label
+	for local variable l
+		l = true;
+		^
+
+    1 error.
+
+More information can be gleaned by using the "-explain" flag:
+
+    $ $JIF/bin/jifc Implicit.jif -explain
+    Implicit.jif:5: Unsatisfiable constraint:
+     rhs.nv <= label of var l
+	    {h} <= {}
+    in environment
+     [{h} <= {*lbl}, {lbl} <= {}]
+
+    Label Descriptions
+    ------------------
+     - rhs.nv = label of successful evaluation of right hand of assignment
+     - rhs.nv = {h}
+     - label of var l = {}
+     - h = label of actual argument h
+     - {} = Bottom of the label lattice, the most public label possible
+     - lbl = label of actual argument lbl
+
+    More information is revealed by the successful evaluation of the right hand
+    side of the assignment than is allowed to flow to the local variable l.
+		l = true;
+		^
+
+    1 error.
+
+The more detailed error message first shows what the symbolic
+unsatisfiable constraint is ("rhs.nv <= label of var l"), and then
+shows the same constraints with the actual labels substituted for the
+symbols ("{h} <= {}"). The label environment in which the constraint
+must be satisfied is also shown. Here, the environment indicates that
+the label of the actual argument for h is bounded above by the label
+lbl, and the label of lbl is bounded above by {}, the bottom
+label. Brief descriptions of the labels that appear in the
+unsatisfiable constraint are also shown. Here, we see that "rhs.nv" is
+the label of information that may be acquired by the successful
+evaluation of the right hand side of the assignment, and that for this
+assignment, that label is {h}, the label of the actual argument h.
+
+
+Reporting: 
+
+Sometimes the additional information provided by the "-explain" option
+is not sufficient to determine why a Jif program fails to
+compile. There are two additional useful ways to gain more information
+about the label checking process: reporting the topics "debug" and
+"solver".
+
+Specifying the command line option "-report debug=n", where n is a
+non-negative integer, will display more information about labels. The
+higher the value for n, the more information is displayed. For
+example:
+
+    $ $JIF/bin/jifc Implicit.jif -report debug=1 -explain
+    Implicit.jif:5: Unsatisfiable constraint:
+     rhs.nv <= label of var l
+	    {<arg 0 h>} <= {}
+    in environment
+     [{<arg 0 h>} <= {<dynarg 1 lbl2 {<arg 1 lbl>}>}, {<arg 1 lbl>} <= {}]
+    ...
+
+In the environment, we see that the label of the actual argument for h
+("<arg 0 h>") is bounded above by the dynamic label lbl ("<dynarg 1
+lbl2 {<arg 1 lbl>}>"). The dynamic label lbl would normal be displayed
+as "*lbl", but with the "debug" topic reporting at level 1, it is
+displayed as "<dynarg 1 lbl2 {<arg 1 lbl>}>", indicating that it is a
+dynamic label argument ("dynarg"), that it is the second argument to
+the method (indicated by the index "1"), that the label has the unique
+identifier "lbl2", and that the label of the dynamic label is the
+label {<arg 1 lbl>}, that is, the label of the actual argument lbl,
+which the environment tells us is bounded above by {}, the bottom
+label. Thus, reporting the debug topic provides more information about
+the labels and their meaning, but a less readable display.
+
+
+Specifying the command line option "-report solver=n", for a
+nonnegative n, will display more information about the constraint
+solver, which attempts to solve the system of constraints generated by
+label checking. The higher the value for n, the more information is
+displayed.
+
+When the constraint solver is unable to solve a system of constraints,
+it attempts to find the most appropriate constraint to "blame": this
+is the constraint that is displayed in the error message. However,
+sometimes this constraint is not the real culprit, and one or more
+other constraints are really preventing successful
+compilation. Enabling reporting for the solver allows the user to
+determine which constraint(s) are problematic, when the error message
+does not appear to be helpful.
+
+
+Using Java Classes
+------------------
+
+The Jif compiler provides a mechanism to allow Jif code to be compiled
+against and linked to existing Java classes. However, appropriate Jif
+signatures must be supplied for the Java classes; the Jif compiler
+does not verify that the Java code conforms to these provided
+signatures.
+
+Suppose that you have an existing Java class, called Foo, i.e. you
+have a file "Foo.java", and a file "Foo.class" that was produced by
+compiling "Foo.java". Furthermore, suppose you want to use the class
+Foo in some Jif code you are writing. You can do this by supplying a
+Jif signature for the class Foo; at compile time, your Jif code will
+be compiled against the signature you provide, but at runtime the
+original "Foo.class" will be loaded. The steps for doing this are as
+follows:
+
+1. In a file "Foo.jif" write an appropriate Jif signature for the
+   methods and fields in the class Foo.  Take a look at
+   $JIF/sig-src/java/lang/*.jif for some examples of this.
+
+   Note the use of the "native" flag to avoid the need to provide a
+   body for the methods. Note also that there is a private static int
+   field named "__JIF_SIG_OF_JAVA_CLASS$20030619"; this is a hack to
+   let the Jif compiler to know that the class provides a Jif
+   signature for an existing Java class.
+
+2. Compile "Foo.jif" to produce the file "Foo.class"
+
+3. Make sure that the "Foo.class" you created in step 2 is on the
+   signature classpath. Do this either by dropping the class file into
+   the $JIF/sig-classes directory, or by specifying the directory with
+   the "-sigcp" flag to the Jif compiler. (If you use the "-sigcp"
+   flag you will probably also need to explicitly add the
+   $JIF/sig-classes directory to the signature classpath, e.g. use
+   "-sigcp my-sig-classes:$JIF/sig-classes")
+
+4. Compile your Jif code that uses the class Foo. The Jif compiler
+   will use the signature you created in step 1 to compile your code
+   against.
+
+5. Make sure that the original "Foo.class" is on the classpath, but
+   that the "Foo.class" you created in step 2 is not. Now, when you
+   run your Jif compiled code, the original "Foo.class" will be loaded
+   by the classloader.

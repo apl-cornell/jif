@@ -1,0 +1,76 @@
+package jif.runtime;
+
+import java.io.*;
+
+public class Runtime[principal P]
+{
+    final principal{this} dynp; //run time principal
+    
+    public Runtime(principal{this} pp) {
+	dynp = pp;
+    }
+
+    public static Runtime[u] getRuntime(principal u)
+        throws (SecurityException)
+    {
+        throw new SecurityException();
+    }
+
+    public static principal user() throws (SecurityException) {
+        //HACK: just make this method compile.
+        throw new SecurityException();
+    }
+
+    public static boolean acts_for(principal p1, principal p2) 
+    throws (SecurityException) {
+	throw new SecurityException();
+    }
+
+    public FileOutputStream[{*L}]{*L} openFileWrite(String{*L} name, boolean{*L} append, label L)
+        throws (IOException, SecurityException)
+    {
+        throw new SecurityException();
+    }
+
+    public FileInputStream[{*L}]{*L} openFileRead(String{*L} name, label L)
+        throws (FileNotFoundException, SecurityException)
+    {
+        throw new SecurityException();
+    }
+
+    public PrintStream[{*L}]{*L} stdout(label L)
+        throws (SecurityException)
+    {
+        throw new SecurityException();
+    }
+
+    public InputStream[{*L}]{*L} stdin(label L)
+        throws (SecurityException)
+    {
+        throw new SecurityException();
+    }
+
+    public PrintStream[{*L}]{*L} stderr(label L) throws (SecurityException)
+    {
+        throw new SecurityException();
+    }
+
+    //the default label is {P:}
+    public PrintStream[{P:}]{P:} err() {
+        return null;
+    }
+
+    public PrintStream[{P:}]{P:} out() {
+        return null;
+    }
+
+    public InputStream[{P:}]{P:} in() {
+        return null;
+    }
+    
+
+    public InputStream[{*L}] in(label L) {
+        return null;
+    }
+}
+

@@ -1,0 +1,43 @@
+/* This is Jif signature for a Java class.
+ *
+ * This file provides a Jif signature for Jif code 
+ * to be compiled against. However, this signature is 
+ * disregarded at runtime, and instead the standard 
+ * Java class files are used.
+ *
+ * Methods are marked as native to avoid the need to
+ * provide an implementation for them.
+ */
+package java.io;
+
+public class PrintStream[label L] extends FilterOutputStream[L] {
+    private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
+
+    public PrintStream(OutputStream[L] out) {
+		this(out, false);
+    }
+    public PrintStream(OutputStream[L] out, boolean{L} autoFlush) {
+		super(out);
+    }
+
+    public native boolean{L} checkError();
+    public native void print{L}(boolean{L} b);
+    public native void print{L}(char{L} c);
+    public native void print{L}(int{L} i);
+    public native void print{L}(long{L} l);
+    public native void print{L}(float{L} f);
+    public native void print{L}(double{L} d);
+    public native void print{L}(char{L}[]{L} s);
+    public native void print{L}(String{L} s);
+    public native void print{L}(Object{L} obj);
+    public native void println{L}();
+    public native void println{L}(boolean{L} x);
+    public native void println{L}(char{L} x);
+    public native void println{L}(int{L} x);
+    public native void println{L}(long{L} x);
+    public native void println{L}(float{L} x);
+    public native void println{L}(double{L} x);
+    public native void println{L}(char{L}[]{L} x);
+    public native void println{L}(String{L} x);
+    public native void println{L}(Object{L} x);
+}

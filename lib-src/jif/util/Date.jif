@@ -1,0 +1,171 @@
+package jif.util;
+
+/**
+ * This class is a simple utility class for representing and comparing dates. 
+ * It is not intended to replace or duplicate the functionality of 
+ * java.util.Date.
+ * It provides precision only to the day.
+ * It is immutable.
+ * It provides no way to get the current time.
+ */
+public final class Date (invariant) implements JifObject[{this}] {
+    private final int{this} year;
+    private final int{this} month;
+    private final int{this} day;
+
+    public static final String{}[]{} monthNames = {
+        "NOT A VALID MONTH",
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December",
+    };
+
+    public static final String{}[]{} shortMonthNames = {
+        "NOT A VALID MONTH",
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    };
+    public static final int{}[]{} daysInMonth = {
+        -1,
+        31, 29, 31, 30, 31, 30, 
+        31, 31, 30, 31, 30, 31,
+    };
+
+    /**
+     * At the moment, assume that the string is in the format YYYY/MM/DD
+     */
+      public static Date{d} valueOf(String d) throws (IllegalArgumentException{d}) {
+	  if (d == null || d.length() != 10) {
+	      throw new IllegalArgumentException("null or invalid string");
+	  }
+	  try {
+	      int year = Integer.parseInt(d.substring(0,4));
+	      int month = Integer.parseInt(d.substring(5,7));
+	      int day = Integer.parseInt(d.substring(8,10));
+	      return new Date(year, month, day);
+	  }
+	  catch (StringIndexOutOfBoundsException impossible) {
+	      return null;
+	  }
+      }
+ 
+    public Date(int{this} pYear, int{this} pMonth, int{this} pDay) throws (IllegalArgumentException{pYear; pMonth; pDay}){
+        this.year = pYear;
+        this.month = pMonth;
+        this.day = pDay;            
+        checkDateValid(pYear, pMonth, pDay);
+    }
+    public Date(int{this} pYear, String{this} pMonth, int{this} pDay) throws (IllegalArgumentException{pYear; pMonth; pDay}) {
+        this.year = pYear;
+        this.day = pDay;
+        int theMonth = 0;
+        for (int i = 1; i <= 12; i++) {
+            try {
+                if (monthNames[i].equalsIgnoreCase(pMonth) || shortMonthNames[i].equalsIgnoreCase(pMonth)) {
+                    theMonth = i;
+                    break;
+                }
+            }
+            catch(ArrayIndexOutOfBoundsException e) {
+                // impossible
+            }
+            catch(NullPointerException e) {
+                // impossible
+            }
+        }
+        if (theMonth == 0) {
+            throw new IllegalArgumentException("Invalid month: " + pMonth);
+        }
+        this.month = theMonth;
+        checkDateValid(pYear, theMonth, pDay);
+    }
+    private static void checkDateValid(int pYear, int pMonth, int pDay)  throws (IllegalArgumentException{pYear; pMonth; pDay}) {
+        if (pMonth < 1 || pMonth > 12) {
+            throw new IllegalArgumentException("Invalid month: " + pMonth);
+        }
+        try {
+            if (pDay < 1 || pDay > daysInMonth[pMonth]) {
+                throw new IllegalArgumentException(monthNames[pMonth] + " has " + daysInMonth[pMonth] + " days.");
+            }
+        }
+        catch(ArrayIndexOutOfBoundsException e) {
+            // impossible
+        }
+        catch(NullPointerException e) {
+            // impossible
+        }
+
+        // handle leap years
+        if (pMonth == 2 && !isLeapYear(pYear) && pDay == 29) {
+            throw new IllegalArgumentException("February " + pYear + " has only 28 days.");
+        }
+    }
+
+
+    public boolean{this; when} before(Date when) {
+        Date that = when;
+        if (that == null) {
+            return false;
+        }
+        return (this.year < that.year) ||
+            (this.year == that.year && this.month < that.month) ||
+            (this.year == that.year && this.month == that.month && this.day < that.day);
+    }
+
+    public boolean{this; when} after(Date when) {
+        Date that = when;
+        if (that == null) {
+            return false;
+        }
+        return (this.year > that.year) ||
+            (this.year == that.year && this.month > that.month) ||
+            (this.year == that.year && this.month == that.month && this.day > that.day);
+    }
+
+    /**
+     * Determine if the given year is a leap years. A year is a leap year
+     * if it is divisible by 4, unless it is the first year of a century 
+     * (i.e. is divisible by 100), except for every fourth century.
+     */
+    public static boolean{pYear} isLeapYear(int pYear) {
+        try {
+            return (pYear % 4 == 0 && (pYear % 100 != 0 || pYear % 400 == 0));
+        }
+        catch (ArithmeticException  e) {
+            return false;
+        }
+    }
+
+    public String{this} toString() {
+        try {
+            return day + " " + monthNames[month] + " " + year;
+        }
+        catch(ArrayIndexOutOfBoundsException e) {
+            return "Impossible! " + month;
+        }
+        catch(NullPointerException e) {
+            return "Impossible!";
+        }
+    }
+
+    public boolean{this;o} equals(IDComparable[{this}] o) {
+        if (o == null || !(o instanceof Date)) {
+            return false;
+        }
+        try {
+            Date that = (Date)o;
+            return this.year == that.year &&
+                this.month == that.month &&
+                this.day == that.day;
+        }
+        catch (ClassCastException e) {
+            return false;
+        }
+    }
+
+    public int{this} hashCode() {
+        return (year) ^
+            (month * 37) &
+            (day * 113);
+    }
+}

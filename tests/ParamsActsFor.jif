@@ -1,0 +1,14 @@
+class ParamsActsFor[principal p, principal q] authority (Bob) {
+    int{p: q} contents;
+    int{p: q} get() { return contents; }
+
+    static void m() where authority (Bob) {
+	ParamsActsFor[Bob, Bob] p;
+
+	actsFor(Alice, Bob) {
+	    actsFor(Bob, Alice) {
+	       p = new ParamsActsFor[Alice, Bob]();
+	    }
+	}
+    }
+}

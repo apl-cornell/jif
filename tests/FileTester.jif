@@ -1,0 +1,25 @@
+import jif.runtime.Runtime;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class FileTester {
+
+    public static void main{p:}(principal{} p, String args[]):{p:} throws (Exception) where caller(p) {
+        final label lb = new label{p:};
+        Runtime[p] runtime = Runtime[p].getRuntime(p);
+        FileInputStream[{*lb}]{*lb} fis = runtime.openFileRead("Hello.jif", lb);
+        int i;
+        try {
+            i = fis.read();
+        }
+        catch (IOException x) {
+            i = -1;
+        }
+        catch (NullPointerException xx) {
+            i = -1;
+        }
+        FileOutputStream[{*lb}]{*lb} out = runtime.openFileWrite("test1.txt", false, lb);
+        out.write(i);
+    }
+}

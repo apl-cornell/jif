@@ -1,0 +1,21 @@
+public class StringTester {
+    String{Alice:} s;
+
+
+    public StringTester() {
+    }
+
+    public String{Alice:} sub{Alice:}(int{Alice:} index) {
+        try {
+            return s.substring(index);
+        }
+        catch (Exception e) {
+	    try {
+		String x = e.toString();
+	    }
+	    catch (NullPointerException ig) {
+	    }
+            return null;
+        }
+    }
+}

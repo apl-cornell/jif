@@ -1,0 +1,34 @@
+package java.lang;
+
+public
+class NumberFormatException extends IllegalArgumentException {
+    private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
+
+    /**
+     * Constructs a <code>NumberFormatException</code> with no detail message.
+     */
+    public NumberFormatException () {
+	super();
+    }
+
+    /**
+     * Constructs a <code>NumberFormatException</code> with the 
+     * specified detail message. 
+     *
+     * @param   s   the detail message.
+     */
+    public NumberFormatException (String{this} s) {
+	super (s);
+    }
+
+    /**
+     * Factory method for making a <code>NumberFormatException</code>
+     * given the specified input which caused the error.
+     *
+     * @param   s   the input causing the error
+     */
+    static NumberFormatException{s} forInputString(String s) {
+        return new NumberFormatException("For input string: \"" + s + "\"");
+    }
+}
+

@@ -1,0 +1,90 @@
+import java.io.PrintStream;
+import jif.runtime.Runtime;
+
+/**
+ * The class BattleShip is responsible for coordinating gameplay
+ * between two Players.
+ */
+class BattleShip[principal P1, principal P2] authority (P1, P2) {
+    /**
+     * The number of covered coordinates that each player is to 
+     * have on their board. Players can have any number of ships,
+     * so long as the ships cover this number of squares.
+     */
+    public static final int{} NUM_COVERED_COORDS = 10;
+
+    public void play{}(String{} player1Name, 
+                       String{} player2Name) 
+      throws (SecurityException, IllegalArgumentException)
+      where authority (P1, P2) {
+
+        // set up the runtime environment, so
+        // that we can see some output...
+        Main m = Main.m;
+        if (m == null) return;
+        
+        final principal{} pp = m.p;
+        Runtime[pp] runtime = Runtime[pp].getRuntime(pp);
+
+        if (runtime == null) return;
+
+        PrintStream[{}] output = runtime.stdout(new label {});
+        if (output == null) return;
+
+
+        output.println("Playing battleships, with each player having " 
+                       + NUM_COVERED_COORDS + " covered coordinates");
+
+        // instantiate the two players
+        Player[P1] player1 = new Player[P1]();
+        Player[P2] player2 = new Player[P2]();
+
+
+
+        // Initialize the two players.
+        output.print("  Initializing....");
+        player1.init(NUM_COVERED_COORDS);
+        player2.init(NUM_COVERED_COORDS);
+        output.println(" Done.");
+
+        // These fields record how many hits each player has scored.
+        // The game continues until one of the players has
+        // scored NUM_COVERED_COORDS hits.
+        int player1Hits = 0;
+        int player2Hits = 0;
+
+        output.println("  Playing rounds...");
+        while (player1Hits < NUM_COVERED_COORDS && player2Hits < NUM_COVERED_COORDS) {
+
+            // get player 1's querey
+            Coordinate[{}] play1Query = player1.getNextQuery();
+            output.print("\t"+player1Name+": " + play1Query + "?  " );
+
+            // get player 2 to process player 1's query
+            boolean{} res = player2.processQuery(play1Query);
+            player1Hits += res ? 1 : 0;
+            output.print((res?"Y":"N"));
+
+            
+            if (player1Hits < NUM_COVERED_COORDS) {
+                // player 1 hasn't won, so let player 2 ask a query...
+                Coordinate[{}] play2Query = player2.getNextQuery();
+                output.print("   "+player2Name+": " + play2Query + "?  ");
+
+                // get player 1 to process player 2's query
+                res = player1.processQuery(play2Query);
+                player2Hits += res ? 1 : 0;       
+                output.print((res?"Y":"N"));
+                
+                // print a running total of the scores...
+                output.println("   Score: " + player1Hits + " vs. " + player2Hits);
+            }
+        }
+
+        // Let's see who won...
+        output.println("\n");
+        output.println((player1Hits >= NUM_COVERED_COORDS ? player1Name 
+                                                          : player2Name) 
+                       + " won!");
+    }
+}

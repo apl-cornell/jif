@@ -1,0 +1,78 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Programming Jif</title>
+</head>
+
+<body>
+
+<h1><u>Programming Jif</u></h1>
+<p>Jif is based on the JFlow language described in the 1999 paper, <a href="http://www.cs.cornell.edu/andru/papers/popl99/myers-popl99.ps.gz">Practical
+Mostly-Static Information Flow Control</a>, published in the Proceedings of the
+26th ACM Symposium on Principles of Programming Languages (POPL), January 1999,
+pp. 228-241, by Andrew C. Myers. Please refer to that paper for a description
+of the syntax of Jif.</p>
+
+<h2><a name="principal"></a>Create Principals</h2>
+<p>To program in Jif, you probably need to write down some Jif labels such as <code>{Alice:Bob}</code>. So you will need principals. In this Jif implementation, an<br>
+external principal is represented by a Java class. For example, the principal Bob is represented by the class
+<code>jif.principal.Bob</code>. In the directory <code>jif-0.9/demo/jif/principal</code>, you can find some sample Java files used to define
+principals. Let's examine <code>Bob.java</code>:</p>
+<table border="0" width="100%">
+  <tr>
+    <td width="100%" bgcolor="#C0C0C0"><font face="Courier New">    package jif.principal;<br>
+      <br>
+    import java.util.*;</font>
+      <p><font face="Courier New">public class Bob extends jif.lang.Principal {<br>
+        public static final jif.lang.Principal P;<br>
+      <br>
+        private Bob(Set s) {<br>
+      &nbsp;&nbsp;&nbsp; super(s);<br>
+        }<br>
+      <br>
+        static {<br>
+      &nbsp;&nbsp;&nbsp; Set s = new HashSet();<br>
+      &nbsp;&nbsp;&nbsp; s.add(jif.principal.Chuck.P);<br>
+      &nbsp;&nbsp;&nbsp; P = new Bob(s);<br>
+      }</font></td>
+  </tr>
+</table>
+<p>The line <u><code>s.add(jif.principal.Chuck.P);</code></u> adds Chuck into Bob's superiors set, <i>i.e.,</i> Chuck can act for Bob.<br>
+<br>
+To create the principal Bob, you simply compile <code>Bob.java</code> and make
+sure that the output directory is included in your <code>CLASSPATH</code>.</p>
+<h2><br> <a name="default_labels"></a>Default Labels</h2> <p>A powerful feature
+of Jif is that you don't have to write down labels of local variables. Jif
+compiler can figure out whether there is a way of labeling local variables to
+satisfy all the label constraints. However, most of the time you do need to
+write down labels of fields and method signatures, including begin label,
+return label, result label and arguments' labels. When these labels are
+missing, some conservatives rules are used to assign restrictive default
+labels:</p> <ul> <li> Default method begin label: a fresh covariant label,
+which means the method has no side effects.</li> <li>Default method return
+label: "this" label if the method is not static, bottom otherwise. It means no
+extra information can be gained by knowing the method returns normally. Note
+that if a method returns normally, we can infer that the target of this method
+is not null. So the default return label of a non-static method should be
+"this" label.</li> <li> Default method result label: the join of all the
+arguments' labels and the return label. Note that "this" label is folded in
+through the return label.</li> <li> Default argument label: a fresh covariant
+label. It says that the method won't leak any information about this
+variable.</li> <li>Default field label: bottom, which is conservative because
+no confidential data can be stored in the field.</li> </ul> <h2><a
+name="runtime_errors"></a>Catch Runtime Errors</h2> <p>In Jif, a method is
+required to catch or define in its throws clauses all the runtime errors that
+may occur in this method. This requirement is intended to force programmers to
+protect the information that can be derived from the fact that a runtime error
+happens.</p> <p><code>NullPointerException</code> and
+<code>IndexOutOfBoundsException</code> are the two most frequent runtime
+errors. In some cases, if you are sure that a reference is not null or an array
+index is in bound, you can simply catch the runtime exceptions and do nothing
+in the catch clauses.</p>
+
+</body>
+
+</html>

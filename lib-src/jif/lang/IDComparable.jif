@@ -1,0 +1,8 @@
+package jif.lang;
+
+/**
+ * The Jif signature for the method equals()
+ */
+public interface IDComparable[label L] {
+    boolean{L; obj} equals(IDComparable[L] obj);
+}

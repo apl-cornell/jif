@@ -1,0 +1,25 @@
+/* This is Jif signature for a Java class.
+ *
+ * This file provides a Jif signature for Jif code 
+ * to be compiled against. However, this signature is 
+ * disregarded at runtime, and instead the standard 
+ * Java class files are used.
+ *
+ * Methods are marked as native to avoid the need to
+ * provide an implementation for them.
+ */
+package java.io;
+public abstract class InputStream[label L] {
+    private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
+
+    public abstract int{L} read{L}() throws (IOException{L});
+    public native int{L;b} read{L;b}(byte{L}[] b) throws (IOException{L;b});
+    public native int{L;b} read{L;b}(byte{L}[] b, int{L} off, int{L} len) throws (IOException{L;b});
+    public native long{L} skip(long{L} n) throws (IOException{L});
+    public native int{L} available() throws (IOException{L});
+    public native void close{L}() throws (IOException{L});
+    public void mark{L}(int{L} readlimit) {}
+    public native void reset{L}() throws (IOException{L});
+    public boolean{L} markSupported() {return false;}
+
+}

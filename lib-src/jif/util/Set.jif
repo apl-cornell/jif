@@ -1,0 +1,29 @@
+package jif.util;
+
+public interface Set[label L] extends Collection[L] {
+    // Query Operations
+
+    int{L} size();
+    boolean{L} isEmpty();
+    boolean{L;o} contains(JifObject[L] o);
+
+   Iterator[L]{this} iterator();
+//      JifObject[L][] toArray();
+//      JifObject[L][] toArray(JifObject[L] a[]);
+
+
+    // Modification Operations
+
+    boolean{L} add{L}(JifObject[L]{L} o):{L} throws (ClassCastException{L}, IllegalArgumentException{L});
+
+    boolean{L} remove{L}(JifObject[L]{L} o);
+
+
+    // Bulk Operations
+
+//      boolean{L} containsAll(Collection[L] c);
+    boolean{L} addAll{L}(Collection[L]{L} c) throws (ClassCastException{L}, IllegalArgumentException{L});
+    boolean{L} removeAll{L}(Collection[L]{L} c);
+    boolean{L} retainAll{L}(Collection[L]{L} c);
+    void clear{L}();
+}

@@ -1,0 +1,94 @@
+This directory contains a collection of Jif sample programs. These
+programs are designed to test the correctness of the Jif
+compiler. This means that some of the test programs are intended to
+compile successfully, and others are intended to be be rejected by the
+Jif compiler. We are working toward having automated test harnesses
+to compile these test programs and ensure that they are accepted or
+rejected as appropriate.
+
+These test programs are provided in the distribution as a means for
+users to learn from small Jif programs how various language features
+should (and should not) be used.
+
+
+Compiling and Running Test Programs
+-----------------------------------
+
+First, follow the installation directions in the file $JIF/README,
+where $JIF is the root of the Jif installation. Upon successfully
+building the Jif compiler, you will be able to compile and run Jif
+test programs in this directory.
+
+For example, to compile the Hello.jif program, go to the $JIF/tests
+directory, where $JIF is the root directory of the Jif installation
+(i.e., go to the directory this README is in), and execute the
+following command.
+
+        $ $JIF/bin/jifc Hello.jif
+
+This will compile the Jif program. To run the compiled program, execute
+the following.
+
+        $ $JIF/bin/jif -classpath . Hello
+
+which will produce the output
+        Hello, the world!
+
+Note the need to explicitly include the current directory in the
+classpath. To see what command the jifc and jif scripts are actually
+executing, try including the "-v" flag. For example: 
+
+        $ $JIf/bin/jif -v -classpath . Hello
+
+
+Principals
+----------
+
+Some of the test programs in this directory have Jif labels which
+refer explicitly to principals, such as {Alice:Bob}. In this Jif
+implementation, an external principal is represented by a Java
+class. For example, the principal "Dolores" is represented by the
+class "jif.principal.Dolores". The test programs that refer to
+external principals require the appropriate principal classes to be
+compiled and on the classpath.
+
+The directory ./jif/principal contains Java classes for all principals
+referred to in the test programs provided here. To compile these
+classes, go to the $JIF/tests directory and compile all Java files in
+the jif/principal directory:
+
+        $ cd $JIF/tests
+        $ javac -d . -classpath $JIF/rt-classes jif/principal/*.java
+
+
+
+More Info about Principals
+--------------------------
+
+Let's examine ./jif/principal/Dolores.java, the class for the
+principal Dolores.
+
+	package jif.principal;
+
+	import java.util.*;
+	import jif.lang.InternalPrincipal;
+	import jif.lang.Principal;
+
+	public class Dolores extends InternalPrincipal {
+	    public static final Principal P;
+
+	    private Dolores(Set s) {
+		super(s);
+	    }
+
+	    static {
+		Set s = new HashSet();
+		// Dolores allows Chuck to act for her.
+		s.add(jif.principal.Chuck.P);
+		P = new Dolores(s);
+	    }
+	}
+
+The only interesting line is "s.add(jif.principal.Chuck.P);", which adds Chuck
+into Dolores's superiors set, i.e. Chuck can act for Dolores.
+

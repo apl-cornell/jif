@@ -1,0 +1,8 @@
+package jif.lang;
+
+/**
+ * The Jif signature for the method hashCode()
+ */
+public interface Hashable[label L] {
+    int{L} hashCode();
+}

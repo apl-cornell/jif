@@ -1,0 +1,11 @@
+package jif.util;
+
+public
+class NoSuchElementException extends RuntimeException {
+    public NoSuchElementException() {
+//  	super();
+    }
+//      public NoSuchElementException(String{this} s) {
+//  	super(s);
+//      }
+}

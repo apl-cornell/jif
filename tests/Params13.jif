@@ -1,0 +1,28 @@
+/*
+ * Test instantiating a covariant param with an invariant label.
+ *
+ * The instantiation should be allowed, although the downcast should not be.
+ */
+class Params13a[covariant label L] {
+}
+
+class Params13b[label M] extends Params13a[M] {
+    int{M} data = 7;
+
+    void leak() throws (ClassCastException, NullPointerException) {
+	Params13a[M] a;
+	Params13a[{}] b;
+	Params13b[M] x;
+	Params13b[{}] y = new Params13b[{}]();
+
+	b = y; // OK as it is a super class 
+	a = b; // OK as it is covariant
+	x = (Params13b[M])a; // Unsafe downcast!!
+	
+	x.data = 11; // storing secret data.
+
+	int{} leaked = y.data;
+    }
+
+}
+

@@ -1,0 +1,20 @@
+class Protected {
+    Object{*lb} content;
+    final label{this} lb;
+
+    public Protected(Object{*LL} x, label{this} LL) {
+        lb = LL;      
+        content = x;  // checked assuming "lb == LL"
+    }
+
+    public Object{*L} get(label L):{L} throws (SecurityException) {
+        switch label(content) {
+            case (Object{*L} unwrapped) return unwrapped;
+            else throw new SecurityException();
+        }
+    }
+
+    public label get_label() {
+        return lb;
+    }
+}

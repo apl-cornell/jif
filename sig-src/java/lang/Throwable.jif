@@ -1,0 +1,11 @@
+package java.lang;
+
+public class Throwable implements java.io.Serializable {
+    private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
+
+    public Throwable() { }
+    public Throwable(String{this} message) {  }
+    public native String{this} getMessage();
+    public native String{this} getLocalizedMessage();
+    public native String{this} toString();
+}

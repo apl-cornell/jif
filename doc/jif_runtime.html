@@ -1,0 +1,71 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta http-equiv="Content-Language" content="en-us">
+   <meta name="GENERATOR" content="Mozilla/4.76 [en] (X11; U; Linux 2.4.2-2 i686) [Netscape]">
+   <title>Jif Runtime Interface</title>
+</head>
+<body>
+
+<h1>
+<u>Jif Runtime Interface</u></h1>
+
+<h2>Introduction</h2>
+The Jif runtime interface allows Jif code to access system resources, such
+as files and standard output. The interface itself is written in Jif, so
+the calls to this interface can be checked statically. In addition, the
+Jif runtime provides a way of translating file access permissions on Windows
+and Unix systems to Jif labels. For instance, if a Jif program opens a
+file and creates a FileInputStream object, the FileInputStream object will
+have a label parameter that allows only readers who have the read permission
+of that file acccording to the access control policy of the file, and any information
+read from the file is guarded by the label parameter, thus cannot be leaked
+to unauthorized users by Jif codes that pass the label checking.
+
+<h2>File permissions and Jif labels</h2>
+Although the labelling model in Jif can be extended in various ways, the
+current model speaks for only the read permission.
+
+<h3>Unix system</h3>
+On Unix systems, different file permissions can be specified for the owner
+of the file, the group of the file and "others", which represents everyone
+in the system. File permissions are mapped to Jif labels according to the
+following rules:
+    <ul>
+    <li>
+    If "others" has the read permission, the label is {o:Everyone}.</li>
+
+    <li>
+    If "group" has the read permission, the label is {o:g}.</li>
+    </ul>
+    
+Due to the limit expressive power of the Unix file permission model, we
+can not accurately map an arbitrary Jif label to file permissions. In such
+cases, we have to be conservative. Here is the rules for mapping Jif labels
+to file permissions:
+    <ul>
+    <li> {o:Everyone} is mapped to "-r--r--r--".</li>
+    
+    <li> {o:} is mapped to "-r--------".</li>
+
+    <li> {o:r1,r2..rn} is mapped to "-r--r-----", if there exists a group G such
+    that it exactly has o,r1,r2,..,rn as its members. Otherwise, it is mapped
+    to "-r--------".</li>
+    </ul>
+
+<h3>Windows system</h3>
+On Windows systems, each file has an access control list (ACL), and each
+ACL contains a list of access control entry (ACE), and each ACE specifies
+the file permission for a given principal. The Jif runtime will traverse
+the ACL of a file and find all the users who have the read permission on
+the file. Suppose the reader set is R, then the corresponding Jif label
+is {o:R}.
+<p>Mapping Jif labels to an ACL is straightforward. We simply create an
+ACE of the full permissions for the owner and an ACE of the read permission
+for each reader.
+
+<h2>Runtime API</h2>
+Please refer to the <a href="http://www.cs.cornell.edu/jif/releases/javadoc/">Javadoc API</a>
+</body>
+</html>

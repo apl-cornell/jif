@@ -1,0 +1,22 @@
+/**
+ * This is the Main class for the BattleShip example. 
+ *
+ * It plays a game of BattleShip for the prinicipals Alice and Bob.
+ */
+class Main authority (Alice, Bob) {
+    public static final void main{}(principal{} p, String args[]) 
+      throws (SecurityException, IllegalArgumentException)
+      where authority (Alice, Bob) {
+        Main.m = new Main(p);
+
+        // instantiate an instance of the BattleShip game for Alice and Bob, and play it.
+        new BattleShip[Alice, Bob]().play("Alice","Bob");
+    }
+
+    public final principal{} p;
+    public static Main m;
+
+    private Main(principal{} p) {
+        this.p = p;
+    }
+}
