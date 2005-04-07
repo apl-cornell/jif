@@ -443,6 +443,16 @@ public class JifTypeSystem_c
     /****** Jif specific stuff ******/
 
     public LabeledType labeledType(Position pos, Type type, Label label) {
+        if (isLabeled(type)) {
+            throw new InternalCompilerError("Trying to label a labeled type");
+        }
+        if (type.isArray()) {
+            // we have an array type
+            // we need to set the label of psuedo field "length"
+            ArrayType at = type.toArray();
+            JifFieldInstance fi = (JifFieldInstance)at.fieldNamed("length");
+            fi.setLabel(label);
+        }
         return new LabeledType_c(this, pos, type, label);
     }
 
@@ -877,8 +887,7 @@ public class JifTypeSystem_c
         Position pos = L1.position();
         if (pos == null) pos = L2.position();
 
-        return joinLabel(pos, l);
-        //return joinLabel(pos, l).simplify();
+        return joinLabel(pos, l).simplify();
     }
 
     public boolean leq(Label L1, Label L2, LabelEnv env) {
