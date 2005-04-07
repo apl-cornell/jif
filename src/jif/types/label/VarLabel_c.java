@@ -28,7 +28,7 @@ public class VarLabel_c extends Label_c implements VarLabel {
     }
     
     public boolean isEnumerable() { return true; }
-    public boolean isComparable() { return false; }    
+    public boolean isComparable() { return true; }    
     public boolean isCanonical() { return true; }     
     public boolean isDisambiguated() { return true; }     
     public boolean isRuntimeRepresentable() { return false; }
