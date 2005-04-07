@@ -22,6 +22,7 @@ public class RuntimeLabel_c extends Label_c implements RuntimeLabel {
     public boolean isCovariant() { return false; } // covariant labels are not runtime-representable
     public boolean isEnumerable() { return false; }
     public boolean isCanonical() { return true; }
+    public boolean isDisambiguated() { return true; }     
     
     public boolean isRuntimeRepresentable() { return true; }
     

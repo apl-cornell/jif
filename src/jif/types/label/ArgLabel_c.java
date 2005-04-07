@@ -40,6 +40,7 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     public boolean isCovariant() { return false; }
     public boolean isComparable() { return true; }
     public boolean isCanonical() { return true; }
+    public boolean isDisambiguated() { return upperBound != null && upperBound.isDisambiguated(); }
     public boolean isEnumerable() { return true; }
     public Set variables() { return upperBound.variables(); }
     

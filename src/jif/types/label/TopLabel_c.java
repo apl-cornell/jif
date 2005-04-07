@@ -23,6 +23,7 @@ public class TopLabel_c extends Label_c implements TopLabel {
     public boolean isComparable() { return true; }    
     public boolean isEnumerable() { return false; }    
     public boolean isCanonical() { return true; }    
+    public boolean isDisambiguated() { return true; }     
     public boolean isRuntimeRepresentable() { return false; }
     public boolean isCovariant() { return false; }
     

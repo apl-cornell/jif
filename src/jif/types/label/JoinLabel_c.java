@@ -49,6 +49,16 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return true;
     }
     
+    public boolean isDisambiguated() {
+        for (Iterator i = components.iterator(); i.hasNext(); ) {
+            Label c = (Label) i.next();
+            
+            if (! c.isDisambiguated()) {
+                return false;
+            }
+        }       
+        return true;
+    }
     /**
      * @return true iff this label is covariant.
      *
@@ -162,6 +172,10 @@ public class JoinLabel_c extends Label_c implements JoinLabel
      * less restrictive policies.
      */
     public Label simplify() {
+        if (!this.isDisambiguated()) {
+            return this;
+        }
+        
         Set needed = new LinkedHashSet();
         JifTypeSystem jts = (JifTypeSystem) ts;
         

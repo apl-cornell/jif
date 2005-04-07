@@ -26,7 +26,8 @@ public class ThisLabel_c extends ParamLabel_c implements ThisLabel {
     public boolean isRuntimeRepresentable() { return false; }
     public boolean isCovariant() { return false; }
     public boolean isComparable() { return true; }
-    public boolean isCanonical() { return true; }
+    public boolean isCanonical() { return  ct.isCanonical() && super.isCanonical(); }
+    public boolean isDisambiguated() { return isCanonical(); }
     public boolean isEnumerable() { return true; }
     public int hashCode() {
         return ctName.hashCode();

@@ -30,6 +30,7 @@ public class NotTaken_c extends Label_c implements NotTaken {
     public boolean isComparable() { return false; }
     public boolean isEnumerable() { return false; }
     public boolean isCanonical() { return true; }
+    public boolean isDisambiguated() { return true; }
     public boolean isRuntimeRepresentable() { return false; }
 
     public String toString() { return "0"; }

@@ -85,6 +85,11 @@ public interface Label extends Param
     boolean isEnumerable();
     
     /**
+     * Are the components of this label all disambiguated?
+     */
+    boolean isDisambiguated();
+
+    /**
      * Retrieve the collection of components. This method should only
      * be called if isEnumerable returns true.
      * 

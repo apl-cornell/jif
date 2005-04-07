@@ -31,8 +31,10 @@ public class CovariantThisLabel_c extends CovariantParamLabel_c implements Covar
         return true;
     }
     public boolean isCanonical() {
-        return ct.isCanonical();
+        return ct.isCanonical() && super.isCanonical();
     }
+    public boolean isDisambiguated() { return isCanonical(); }
+
     public boolean isEnumerable() {
         return true;
     }

@@ -32,6 +32,7 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
     public boolean isCanonical() {
         return path.isCanonical();
     }
+    public boolean isDisambiguated() { return isCanonical(); }
     public boolean isEnumerable() {
         return true;
     }

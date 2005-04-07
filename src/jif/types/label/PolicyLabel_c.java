@@ -49,7 +49,7 @@ public class PolicyLabel_c extends Label_c implements PolicyLabel {
         }        
         return true;
     }
-    
+    public boolean isDisambiguated() { return isCanonical(); }
     public boolean isRuntimeRepresentable() {
         if (! owner.isRuntimeRepresentable()) {
             return false;
