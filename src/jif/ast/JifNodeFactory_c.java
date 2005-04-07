@@ -345,4 +345,11 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         n = (NewLabel)n.del(delFactory().delExpr());
         return n;
     }
+    
+    public Catch Catch(Position pos, Formal formal, Block body) {
+        Catch n = new JifCatch_c(pos, formal, body);
+        n = (Catch)n.ext(extFactory().extCatch());
+        n = (Catch)n.del(delFactory().delCatch());
+        return n;
+    }
 }

@@ -20,13 +20,26 @@ public class JifFormalDel extends JifJL_c
 {
     public JifFormalDel() { }
 
+    
+    private boolean isCatchFormal = false;
+    public void setIsCatchFormal(boolean isCatchFormal) {
+        this.isCatchFormal = isCatchFormal;
+    }
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         Formal n = (Formal) super.buildTypes(tb);
         JifTypeSystem jts = (JifTypeSystem)tb.typeSystem();
 
         JifLocalInstance li = (JifLocalInstance)n.localInstance();
-        ArgLabel al = jts.argLabel(n.position(), li);
-        li.setLabel(al);
+        if (isCatchFormal) {
+            // formals occuring in a catch clause are treated more like local decls;
+            // their label is a VarLabel
+            li.setLabel(jts.freshLabelVariable(li.position(), li.name(), "label of the formal " + li.name()));
+        }
+        else {
+            // method and constructor formals have an ArgLabel 
+	        ArgLabel al = jts.argLabel(n.position(), li);
+	        li.setLabel(al);
+        }
                 
         return n.localInstance(li);
     }
@@ -44,7 +57,7 @@ public class JifFormalDel extends JifJL_c
         }
         
         // if there is no declared label of the type, use the default arg bound
-        if (!jts.isLabeled(n.declType())) {
+        if (!isCatchFormal && !jts.isLabeled(n.declType())) {
             Type lblType = n.declType();
             Position pos = lblType.position();
             Label defaultBound = jts.defaultSignature().defaultArgBound(n);
@@ -59,10 +72,12 @@ public class JifFormalDel extends JifJL_c
         }   
 
         
-        // set the bound of the arg label to the declared label of the formal type
-        ArgLabel al = (ArgLabel)li.label();
-        al.setUpperBound(jts.labelOfType(n.declType()));
-                       
+        if (!isCatchFormal) {
+	        // set the bound of the arg label to the declared label of the formal type
+	        ArgLabel al = (ArgLabel)li.label();
+	        al.setUpperBound(jts.labelOfType(n.declType()));
+        }
+        
         return n;
     }
 }
