@@ -73,9 +73,9 @@ public class JifSubstClassType_c extends SubstClassType_c
         return subst.substLabel(base.thisLabel());
     }
 
-    public boolean invariant() {
+    public boolean isInvariant() {
         JifClassType base = (JifClassType) this.base;
-        return base.invariant();
+        return base.isInvariant();
     }
 
     public JifClassType setInvariantThis(Label L) throws SemanticException {
@@ -85,7 +85,7 @@ public class JifSubstClassType_c extends SubstClassType_c
             JifClassType pt = (JifClassType) base;
 
             // Reapply the substitution, but add the this-label.
-            if (pt.invariant() && pt.thisLabel() instanceof ParamLabel) {
+            if (pt.isInvariant() && pt.thisLabel() instanceof ParamLabel) {
                 ParamLabel thisLabel = (ParamLabel) pt.thisLabel();
 
                 JifSubst subst = (JifSubst) this.subst;

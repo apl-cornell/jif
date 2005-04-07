@@ -25,7 +25,14 @@ public interface JifClassType extends ClassType {
     List constructorCallAuthority();
     
     Label thisLabel();
-    boolean invariant();
+    boolean isInvariant();
+    
+    /**
+     * TODO DOCO
+     * @param l
+     * @return
+     * @throws SemanticException
+     */
     JifClassType setInvariantThis(Label l) throws SemanticException;
     List actuals();
 }

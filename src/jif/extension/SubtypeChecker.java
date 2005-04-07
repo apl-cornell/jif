@@ -212,7 +212,7 @@ public class SubtypeChecker
 	    JifClassType sub = (JifClassType) subtype;
 	    JifClassType sup = (JifClassType) supertype;
 
-            if (sub.invariant() != sup.invariant()) {
+            if (sub.isInvariant() != sup.isInvariant()) {
                 return false;
             }
 

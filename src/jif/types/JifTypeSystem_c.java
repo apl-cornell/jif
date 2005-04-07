@@ -651,7 +651,7 @@ public class JifTypeSystem_c
     }
 
     public Label joinLabel(Position pos, Collection components) {
-        Label t = new JoinLabel_c(components, this, pos).simplify();
+        Label t = new JoinLabel_c(components, this, pos);
         return t;
     }
 
@@ -877,7 +877,8 @@ public class JifTypeSystem_c
         Position pos = L1.position();
         if (pos == null) pos = L2.position();
 
-        return joinLabel(pos, l).simplify();
+        return joinLabel(pos, l);
+        //return joinLabel(pos, l).simplify();
     }
 
     public boolean leq(Label L1, Label L2, LabelEnv env) {

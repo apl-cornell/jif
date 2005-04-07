@@ -23,7 +23,7 @@ public class ParamPrincipal_c extends Principal_c implements ParamPrincipal {
         return paramInstance;
     }
     public boolean isRuntimeRepresentable() { return false; }
-    public boolean isCanonical() { return false; }
+    public boolean isCanonical() { return true; }
 
     public String toString() {
         if (Report.should_report(Report.debug, 1)) { 

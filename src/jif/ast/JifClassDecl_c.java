@@ -87,13 +87,6 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         JifClassDecl_c n = (JifClassDecl_c) super.buildTypes(tb);
         n.buildParams((JifTypeSystem) tb.typeSystem());
-
-        //"this" label attached to ClassType. Essentially, it is a
-        //covariant label parameter.
-        JifParsedPolyType ct = (JifParsedPolyType) n.type;
-        JifTypeSystem jts = (JifTypeSystem)tb.typeSystem();
-        ct.setThisLabel(jts.unknownLabel(ct.position()));
-        
         return n;
     }
 
@@ -119,8 +112,10 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         }
         ct.setParams(newParams);
 
+        // set the this label
         if (invariant) {
-            ct.invariant(true);
+            ct.setInvariant(true);
+            ct.setThisLabel(ts.thisLabel(position(), ct));
 
             /*
              * NJN -- not necessary
@@ -137,6 +132,9 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
              * ct.superType(newSt); } }
              */
         }
+        else {
+            ct.setThisLabel(ts.covariantThisLabel(position(), ct));
+        }            
     }
 
 
@@ -160,22 +158,13 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 
                 if (st instanceof JifClassType) {
                     JifClassType jst = (JifClassType) st;
-                    if (jst.invariant()) {
+                    if (jst.isInvariant()) {
                         Type newSt = jst.setInvariantThis(ct.thisLabel());
                         if (st != newSt) 
                             ct.superType(newSt);
                     }
                 }
             }	
-        }
-
-        // set the this label
-        JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
-        if (!ct.thisLabel().isCanonical()) {
-            if (!invariant)
-                ct.setThisLabel(ts.covariantThisLabel(position(), ct));
-            else
-                ct.setThisLabel(ts.thisLabel(position(), ct));
         }
         
         return n;
@@ -263,7 +252,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             superClass = this.superClass().type();
         }
         if (superClass != null) {
-            if (this.invariant != ((JifClassType)superClass.toClass()).invariant()) {
+            if (this.invariant != ((JifClassType)superClass.toClass()).isInvariant()) {
                 throw new SemanticException("Covariant classes other than " +
                      "Object can only be " +
                     "extended with covariant classes.", 

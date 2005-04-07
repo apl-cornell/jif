@@ -4,6 +4,7 @@ import java.util.*;
 
 import jif.types.*;
 import jif.types.label.Label;
+import polyglot.ast.*;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl.ast.TypeNode_c;
@@ -14,7 +15,7 @@ import polyglot.visit.*;
 
 /** An implementation of the <code>InstTypeNode</code> interface.
  */
-public class InstTypeNode_c extends TypeNode_c implements InstTypeNode
+public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguous
 {
     protected TypeNode base;
     protected List params;

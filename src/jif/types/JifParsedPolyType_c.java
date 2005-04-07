@@ -129,11 +129,11 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	this.thisLabel = L;
     }
 
-    public boolean invariant() {
+    public boolean isInvariant() {
 	return this.invariant;
     }
 
-    public void invariant(boolean inv) {
+    public void setInvariant(boolean inv) {
 	this.invariant = inv;
     }
     
@@ -189,14 +189,14 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 		    && flags.equals(t.flags())
 		    && params.equals(t.params())
 		    && authority.equals(t.authority())
-                    && invariant == t.invariant();
+                    && invariant == t.isInvariant();
 	    }
 	    else if (package_() == t.package_()) {
 		return name.equals(t.name())
 		    && flags.equals(t.flags())
 		    && params.equals(t.params())
 		    && authority.equals(t.authority())
-                    && invariant == t.invariant();
+                    && invariant == t.isInvariant();
 	    }
 	}
 

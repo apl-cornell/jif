@@ -26,7 +26,7 @@ public class JifNew_c extends New_c implements New
 	if (t instanceof JifClassType && ! jts.isLabeled(t)) {
 	    JifClassType ct = (JifClassType) t;
 	    //HACK: adding a place holder
-	    if (ct.invariant()) {
+	    if (ct.isInvariant()) {
                 // XXX SNC: I don't believe this code is ever called.
                 //          If it were, then an exception should be thrown,
                 //          as an invariant this label can only be a ParamLabel.

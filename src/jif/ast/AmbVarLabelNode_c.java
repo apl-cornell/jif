@@ -59,10 +59,6 @@ public class AmbVarLabelNode_c extends AmbLabelNode_c
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
 	VarInstance vi = c.findVariable(name);
-        if (!vi.isCanonical()) {
-            // the instance is not yet ready
-            return this;
-        }
     
 	if (vi instanceof JifVarInstance) {
 	    JifVarInstance jvi = (JifVarInstance) vi;

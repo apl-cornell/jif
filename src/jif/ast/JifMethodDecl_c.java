@@ -106,6 +106,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             // return type isn't labeled. Add the default label.
             declrt = jts.labeledType(declrt.position(), declrt, ds.defaultReturnValueLabel(n));
             n = (JifMethodDecl)n.returnType(n.returnType().type(declrt));
+            jmi.setReturnType(declrt);
         }
 
         if (n.startLabel() != null && !n.startLabel().isDisambiguated()) {

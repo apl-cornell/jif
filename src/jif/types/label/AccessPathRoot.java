@@ -23,6 +23,10 @@ public class AccessPathRoot extends AccessPath {
         return this;
     }
     
+    public String toString() {
+        return li.name();
+    }
+    
     public boolean equals(Object o) {
         if (o instanceof AccessPathRoot) {
             return li.equals(((AccessPathRoot)o).li);

@@ -166,6 +166,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
+        
 	Node n = super.typeCheck(tc);    
         JifConstructorDecl_c jcd = (JifConstructorDecl_c)n;
         jcd.checkConstructorCall(tc);

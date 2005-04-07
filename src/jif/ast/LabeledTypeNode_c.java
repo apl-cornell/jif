@@ -3,6 +3,7 @@ package jif.ast;
 import jif.types.JifClassType;
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
+import polyglot.ast.*;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl.ast.TypeNode_c;
@@ -13,7 +14,7 @@ import polyglot.visit.*;
 
 /** An implementation of the <code>LabeledTypeNode</code> interface. 
  */
-public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode
+public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Ambiguous
 {
     protected TypeNode typePart;
     protected LabelNode labelPart;
@@ -83,7 +84,7 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode
 
 	Type t = typePart.type();
 	Label L = labelPart.label();
-
+    
 	if (t.isVoid()) {
 	    throw new SemanticException("The void type cannot be labeled.",
 		position());
@@ -92,8 +93,9 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode
 	if (t instanceof JifClassType) {
 	    JifClassType ct = (JifClassType) t;
 
-	    if (ct.invariant())
-		t = ct.setInvariantThis(L);	    
+	    if (ct.isInvariant()) {
+		t = ct.setInvariantThis(L);
+	    }
 	}
 
 	return sc.nodeFactory().CanonicalTypeNode(position(), 

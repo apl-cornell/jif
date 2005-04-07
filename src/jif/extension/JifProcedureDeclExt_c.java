@@ -84,7 +84,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
 	    A.addAssertionLE(Lj, argBj);
 	    if (ts.unlabel(tj) instanceof JifClassType) {
-		if (((JifClassType) ts.unlabel(tj)).invariant()) 
+		if (((JifClassType) ts.unlabel(tj)).isInvariant()) 
 		    A.addAssertionLE(argBj, Lj);
 	    }
 
@@ -314,6 +314,9 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	}
 	else if (returnType.isVoid()) {
 	    Lrv = ts.notTaken();
+	}
+	else {
+	    throw new InternalCompilerError("Unexpected return type: " + returnType);
 	}
 	// Lrv = A.instantiate(Lrv);
 

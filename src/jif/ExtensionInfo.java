@@ -5,7 +5,6 @@ import java.util.*;
 
 import jif.ast.JifNodeFactory;
 import jif.ast.JifNodeFactory_c;
-import jif.translate.JifToJavaRewriter;
 import jif.types.JifTypeSystem;
 import jif.types.JifTypeSystem_c;
 import jif.visit.JifLabelSubst;

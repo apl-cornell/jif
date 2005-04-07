@@ -39,7 +39,7 @@ public class JifNewExt extends Jif_c
                             ct.name() + " object, at " + noe.position());
 	if (ct instanceof JifClassType) {
 	    JifClassType jct = (JifClassType) ct;
-	    if (jct.invariant()) {
+	    if (jct.isInvariant()) {
               /*
                 JifPolyType pt = (JifPolyType) ((JifSubstType)jct).base();
                 ParamLabel thisL = (ParamLabel) pt.thisLabel();
