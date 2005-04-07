@@ -4,7 +4,11 @@ import jif.types.JifFieldInstance;
 import jif.types.JifTypeSystem;
 import jif.visit.ConstChecker;
 import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.types.Context;
 import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -29,7 +33,25 @@ public class JifFieldDeclDel extends JifJL_c
         return fd;
     }
 
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        Context c = ar.context();
+        TypeSystem ts = ar.typeSystem();
 
+        FieldDecl n = (FieldDecl)node();
+        FieldInstance fi = n.fieldInstance();
+        if (fi.isCanonical()) {
+            // Nothing to do.
+            return n;
+        }
+
+        if (n.declType().isCanonical()) {
+            fi.setType(n.declType());
+        }
+        
+        return n;
+    }
+
+    
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	FieldDecl fd = (FieldDecl) node();
 
