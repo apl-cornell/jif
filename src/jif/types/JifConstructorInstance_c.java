@@ -94,10 +94,23 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
     }
 
     public boolean isCanonical() {
-	return super.isCanonical()
-	    && startLabel.isCanonical()
-	    && returnLabel.isCanonical()
-	    && listIsCanonical(constraints);
+        if (!(super.isCanonical()
+                && startLabel.isCanonical()
+                && returnLabel.isCanonical()
+                && listIsCanonical(constraints)
+                && formalArgLabels != null
+                && formalTypes != null
+                && formalArgLabels.size() == formalTypes.size())) {
+            return false;
+        }
+    
+    JifTypeSystem jts = (JifTypeSystem)typeSystem();
+    // also need to make sure that every formal type is labeled
+    for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
+        Type t = (Type) i.next();
+        if (!jts.isLabeled(t)) return false;
+    }    
+    return true;
     }
     
     public void subst(VarMap bounds) {

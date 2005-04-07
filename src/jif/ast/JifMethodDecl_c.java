@@ -89,9 +89,6 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
 
         JifMethodInstance jmi = (JifMethodInstance)n.methodInstance();
         JifTypeSystem jts = (JifTypeSystem)ar.typeSystem();
-        if (jmi.isCanonical()) {
-            return n;
-        }
 
         // return type
         if (!n.returnType().isDisambiguated()) {
@@ -141,8 +138,9 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         }        
         jmi.setReturnLabel(Lr, isDefaultReturnLabel);
         
-        // set the formal arg labels.
+        // set the formal arg labels and formal types
         List formalArgLabels = new ArrayList(n.formals().size());
+        List formalTypes = new ArrayList(n.formals().size());
         for (Iterator i = n.formals().iterator(); i.hasNext(); ) {
             Formal f = (Formal)i.next();
             if (!f.isDisambiguated()) {
@@ -151,9 +149,12 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             }
             JifLocalInstance jli = (JifLocalInstance)f.localInstance();
             formalArgLabels.add(jli.label());
+            formalTypes.add(f.declType());
         }
         jmi.setFormalArgLabels(formalArgLabels);
+        jmi.setFormalTypes(formalTypes);
         
+
         // set the labels for the throwTypes.
         List throwTypes = new LinkedList();        
         for (Iterator i = n.throwTypes().iterator(); i.hasNext();) {
@@ -182,7 +183,6 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             constraints.add(cn.constraint());
         }
         jmi.setConstraints(constraints);
-
         return n.methodInstance(jmi);
     }
 }

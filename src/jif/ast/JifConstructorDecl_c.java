@@ -83,9 +83,6 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
 
         JifConstructorInstance jci = (JifConstructorInstance)n.constructorInstance();
         JifTypeSystem jts = (JifTypeSystem)ar.typeSystem();
-        if (jci.isCanonical()) {
-            return n;
-        }
 
         if (n.startLabel() != null && !n.startLabel().isDisambiguated()) {
             // the startlabel node hasn't been disambiguated yet
@@ -120,8 +117,9 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         }        
         jci.setReturnLabel(Lr, isDefaultReturnLabel);
 
-        // set the formal arg labels.
+        // set the formal arg labels and formal types
         List formalArgLabels = new ArrayList(n.formals().size());
+        List formalTypes = new ArrayList(n.formals().size());
         for (Iterator i = n.formals().iterator(); i.hasNext(); ) {
             Formal f = (Formal)i.next();
             if (!f.isDisambiguated()) {
@@ -130,8 +128,10 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             }
             JifLocalInstance jli = (JifLocalInstance)f.localInstance();
             formalArgLabels.add(jli.label());
+            formalTypes.add(f.declType());
         }
         jci.setFormalArgLabels(formalArgLabels);
+        jci.setFormalTypes(formalTypes);
 
         // set the labels for the throwTypes.
         List throwTypes = new LinkedList();        
