@@ -1,6 +1,7 @@
 package jif.types.label;
 
 import java.util.Collection;
+import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
@@ -34,7 +35,7 @@ public class NotTaken_c extends Label_c implements NotTaken {
     public boolean isRuntimeRepresentable() { return false; }
 
     public String toString() { return "0"; }
-    public String componentString() { return "0"; }
+    public String componentString(Set printedLabels) { return "0"; }
 
     public boolean equalsImpl(TypeObject o) {
 	return o instanceof NotTaken;

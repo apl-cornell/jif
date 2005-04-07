@@ -106,9 +106,15 @@ public abstract class Label_c extends TypeObject_c implements Label
     }
     
     public String toString() {
-        return "{" + componentString() + "}";
+        return "{" + componentString(new HashSet()) + "}";
     }
-    abstract public String componentString();
+    public String toString(Set printedLabels) {
+        return "{" + componentString(printedLabels) + "}";
+    }
+    public String componentString() {
+        return componentString(new HashSet());
+    }
+    abstract public String componentString(Set printedLabels);
     
     public abstract boolean equalsImpl(TypeObject t);
 

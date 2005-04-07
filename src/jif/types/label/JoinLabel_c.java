@@ -106,12 +106,12 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return components.hashCode();
     }
     
-    public String componentString() {
+    public String componentString(Set printedLabels) {
         String s = "";
         
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label c = (Label) i.next();
-            s += c.componentString();
+            s += c.componentString(printedLabels);
             
             if (i.hasNext()) {
                 s += "; ";

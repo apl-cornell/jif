@@ -1,5 +1,7 @@
 package jif.types.label;
 
+import java.util.Set;
+
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
@@ -49,7 +51,7 @@ public class CovariantThisLabel_c extends CovariantParamLabel_c implements Covar
         return (this.ct.equals(that.classType()));
     }
     
-    public String componentString() {
+    public String componentString(Set printedLabels) {
         if (Report.should_report(Report.debug, 2)) { 
             return "<covariant-this-label " + this.ct.fullName() + ">";
         }

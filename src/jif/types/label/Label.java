@@ -114,8 +114,6 @@ public interface Label extends Param
 
     Label simplify();
     
-    String componentString();
-    
     /**
      * Does the label contain any variables, that is, labels of type 
      * VarLabel?
@@ -142,4 +140,8 @@ public interface Label extends Param
     
     void translate(Resolver c, CodeWriter w);
     Expr toJava(JifToJavaRewriter rw) throws SemanticException;
+    
+    String componentString();    
+    String componentString(Set printedLabels);    
+    String toString(Set printedLabels);
 }

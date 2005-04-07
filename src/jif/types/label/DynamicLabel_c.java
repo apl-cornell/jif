@@ -1,5 +1,7 @@
 package jif.types.label;
 
+import java.util.Set;
+
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
@@ -47,7 +49,7 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
         return path.hashCode();
     }
     
-    public String componentString() {
+    public String componentString(Set printedLabels) {
         if (Report.should_report(Report.debug, 1)) { 
             return "<dynamic " + path + ">";
         }

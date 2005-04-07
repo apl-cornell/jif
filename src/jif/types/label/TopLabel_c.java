@@ -1,6 +1,8 @@
 package jif.types.label;
 
 
+import java.util.Set;
+
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.types.*;
@@ -27,7 +29,7 @@ public class TopLabel_c extends Label_c implements TopLabel {
     public boolean isRuntimeRepresentable() { return false; }
     public boolean isCovariant() { return false; }
     
-    public String componentString() {
+    public String componentString(Set printedLabels) {
         return "<top>";
     }    
     public String toString() {

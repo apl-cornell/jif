@@ -36,7 +36,7 @@ public class VarLabel_c extends Label_c implements VarLabel {
     
     public Set variables() { return Collections.singleton(this); }
     
-    public String componentString() {
+    public String componentString(Set printedLabels) {
         if (Report.should_report(Report.debug, 2)) { 
             return "<var " + name + " " + uid + ">";
         }

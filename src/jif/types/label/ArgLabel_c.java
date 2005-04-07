@@ -2,11 +2,15 @@ package jif.types.label;
 
 import java.util.Set;
 
-import jif.types.*;
+import jif.types.JifLocalInstance;
+import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
 import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * This label is used as the label of the real argument.
@@ -55,13 +59,24 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         return li.hashCode();
     }
     
-    public String componentString() {
+    public String componentString(Set printedLabels) {
+        if (printedLabels.contains(this)) {
+            if (Report.should_report(Report.debug, 2)) { 
+                return "<arg " + li.name() + ">";
+            }
+            else if (Report.should_report(Report.debug, 1)) {
+                return "<arg " + li.name() + ">";
+            }
+            return li.name();            
+        }
+        printedLabels.add(this);
+        
         if (Report.should_report(Report.debug, 2)) { 
-            String ub = upperBound==null?"-":upperBound.toString();
-            return "<arg " + li + " " + ub + ">";
+            String ub = upperBound==null?"-":upperBound.toString(printedLabels);
+            return "<arg " + li.name() + " " + ub + ">";
         }
         else if (Report.should_report(Report.debug, 1)) {
-            String ub = upperBound==null?"-":upperBound.toString();
+            String ub = upperBound==null?"-":upperBound.toString(printedLabels);
             return "<arg " + li.name() + " " + ub + ">";
         }
         return li.name();

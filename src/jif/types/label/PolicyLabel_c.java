@@ -117,7 +117,7 @@ public class PolicyLabel_c extends Label_c implements PolicyLabel {
         return false;
     }
 
-    public String componentString() {
+    public String componentString(Set printedLabels) {
         StringBuffer sb = new StringBuffer(owner.toString());
         sb.append(": ");        
         for (Iterator i = readers.iterator(); i.hasNext(); ) {

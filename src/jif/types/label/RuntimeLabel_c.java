@@ -1,6 +1,7 @@
 package jif.types.label;
 
 import java.util.Collection;
+import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
@@ -33,7 +34,7 @@ public class RuntimeLabel_c extends Label_c implements RuntimeLabel {
     public String toString() {
         return "<all-runtime>";
     }
-    public String componentString() {
+    public String componentString(Set printedLabels) {
         return "<all-runtime>";
     }
     public boolean equalsImpl(TypeObject o) {
