@@ -28,7 +28,6 @@ public class JifDeclassifyStmtExt extends JifStmtExt_c
     {
 	DeclassifyStmt ds = (DeclassifyStmt) node();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
         A = (JifContext) ds.enterScope(A);
 
@@ -109,6 +108,7 @@ public class JifDeclassifyStmtExt extends JifStmtExt_c
 
 	A = (JifContext) A.pushBlock();
 	A.setPc(L);
+	A.setEntryPC(L);
 
 	Stmt body = (Stmt) lc.context(A).labelCheck(ds.body());
 	PathMap Xs = X(body);
