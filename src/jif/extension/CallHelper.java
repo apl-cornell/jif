@@ -5,6 +5,7 @@ import java.util.*;
 import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.types.*;
+import jif.types.label.*;
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
@@ -72,7 +73,7 @@ public class CallHelper
     private List actualArgLabels;
         
     /**
-     * Exprs of the actual arguments that are final expressions of type Label or Principal.@@@@@
+     * Exprs of the actual arguments that are final expressions.
      */
     private List actualArgExprs;
         
@@ -182,10 +183,9 @@ public class CallHelper
     }
 
     /**
-     * Return the elements of the List args that are dynamic labels or 
-     * principals. The returned list is the same size as args, and
-     * any dynamic arguments in the returned list are at the same index
-     * as they were in <code>args</code>.
+     * Return the elements of the List args that are final expressions.
+     * The returned list is the same size as args, and any args that are
+     * not final expressions have an entry in the returned list of null.
      * 
      * 
      */
@@ -194,21 +194,8 @@ public class CallHelper
 
         for (Iterator j = actualArgs.iterator(); j.hasNext();) {
             Expr Ej = (Expr)j.next();            
-            if (ts.isLabel(Ej.type())) {
-                Label l = JifUtil.exprToLabel(ts, Ej); //@@@@@I think this will need to be a final or constant label expression...
-                if (l == null) {                
-                    throw new InternalCompilerError("Unexpected label " + 
-                            Ej + " (" + Ej.getClass().getName() + ")");
-                }
-                actualArgExprs.add(l);
-            }
-            else if (ts.isPrincipal(Ej.type())) {
-                Principal p = JifUtil.exprToPrincipal(ts, Ej);
-                if (p == null) {                
-                    throw new InternalCompilerError("Unexpected principal " + 
-                            Ej + " (" + Ej.getClass().getName() + ")");
-                }
-                actualArgExprs.add(p);
+            if (JifUtil.isFinalAccessExpr(ts, Ej)){
+                actualArgExprs.add(Ej);
             }
             else {
                 actualArgExprs.add(null);
@@ -504,14 +491,15 @@ public class CallHelper
         return instantiateArgLabels(A.instantiate(L, true), 
                                     this.pi.formalArgLabels(), 
                                     this.actualArgLabels, 
-                                    this.actualArgExprs);
+                                    this.actualArgExprs, 
+                                    A.currentClass());
     }
     
-    public static Label instantiateArgLabels(Label L, List formalArgLabels, List actualArgLabels) {
-        return instantiateArgLabels(L, formalArgLabels, actualArgLabels, null);
+    public static Label instantiateArgLabels(Label L, List formalArgLabels, List actualArgLabels, ClassType currentClass) {
+        return instantiateArgLabels(L, formalArgLabels, actualArgLabels, null, currentClass);
     }
 
-    private static Label instantiateArgLabels(Label L, List formalArgLabels, List actualArgLabels, List actualArgExprs) {
+    private static Label instantiateArgLabels(Label L, List formalArgLabels, List actualArgLabels, List actualArgExprs, ClassType callerClass) {
         if (formalArgLabels.size() != actualArgLabels.size() || 
                 (actualArgExprs != null && formalArgLabels.size() != actualArgExprs.size())) {
             throw new InternalCompilerError("Inconsistent sized lists of args");
@@ -533,8 +521,8 @@ public class CallHelper
                     Expr actualExpr = (Expr)iActualArgExprs.next();
                 
                     if (actualExpr != null) {
-                        L = L.subst(JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance()), 
-                                    JifUtil.exprToAccessPath(actualExpr));
+                        L = L.subst((AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance()), 
+                                    JifUtil.exprToAccessPath(actualExpr, callerClass));
                     }
                 }
             }
@@ -554,13 +542,14 @@ public class CallHelper
     private Principal instantiate(JifContext A, Principal p) {
         return instantiateArgLabels(A.instantiate(p, true),
                                     this.pi.formalArgLabels(), 
-                                    this.actualArgExprs);
+                                    this.actualArgExprs,
+                                    A.currentClass());
     }
     /**
      * replaces any signature ArgLabels in p with the appropriate label, and
      * replaces any signature ArgPrincipal with the appropriate prinicipal. 
      */        
-    public static Principal instantiateArgLabels(Principal p, List formalArgLabels, List actualArgExprs) {
+    public static Principal instantiateArgLabels(Principal p, List formalArgLabels, List actualArgExprs, ClassType callerClass) {
         if (formalArgLabels.size() != actualArgExprs.size()) {
             throw new InternalCompilerError("Inconsistent sized lists of args");
         }
@@ -573,8 +562,8 @@ public class CallHelper
                 Expr actualExpr = (Expr)iActualArgExprs.next();
                 
                 if (actualExpr != null) {
-                    p = p.subst(JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance()), 
-                            JifUtil.exprToAccessPath(actualExpr));
+                    p = p.subst((AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance()), 
+                            JifUtil.exprToAccessPath(actualExpr, callerClass));
                 }
             }
             if (iArgLabels.hasNext() || iActualArgExprs.hasNext()) {
