@@ -31,9 +31,7 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
     public boolean isComparable() {
         return true;
     }
-    public boolean isCanonical() {
-        return path.isCanonical();
-    }
+    public boolean isCanonical() { return true; }
     public boolean isDisambiguated() { return isCanonical(); }
     public boolean isEnumerable() {
         return true;
