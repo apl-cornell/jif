@@ -47,14 +47,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 	Label L = fi.label();
 	Type t = decl.declType();
 
-	Label declaredLabel = null;
-        if (ts.isLabeled(t)) {
-	    declaredLabel = ts.labelOfType(t);
-	} else {
-            // an unlabeled type.
-	    //use default field label
-            declaredLabel = ts.defaultSignature().defaultFieldLabel(decl);            
-	}
+	Label declaredLabel = ts.labelOfType(t);
 
         // error messages for equality constraints aren't displayed, so no
         // need top define error messages.	

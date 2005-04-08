@@ -1,8 +1,6 @@
 package jif.extension;
 
-import jif.ast.JifNodeFactory;
-import jif.ast.JifNodeFactory_c;
-import jif.ast.Jif_c;
+import jif.ast.*;
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.types.label.Label;
@@ -146,7 +144,6 @@ public class JifFieldExt extends Jif_c
         throws SemanticException
     {
         JifTypeSystem ts = lc.jifTypeSystem();
-        JifContext A = lc.jifContext();
 
         if (! (fe.target() instanceof Expr)) {
             // TODO: support static fields
