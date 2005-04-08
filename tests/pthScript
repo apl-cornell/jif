@@ -134,6 +134,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Simple2.jif ;
 	Simple3.jif ;
 	Simple4.jif ;
+	StaticField.jif;
 	StaticThis1.jif (Semantic, "this.*cannot be used in a static context");
 	StaticThis2.jif (Semantic, "this.*cannot be used in a static context");
 	StaticThis3.jif (Semantic, "this.*cannot be used in a static context");
