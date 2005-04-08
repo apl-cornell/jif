@@ -96,7 +96,7 @@ public class JifSubstClassType_c extends SubstClassType_c
 
                 Map newSubst = new HashMap();
                 newSubst.putAll(subst.substitutions());
-                newSubst.put(thisLabel, L);
+                newSubst.put(thisLabel.paramInstance(), L);
 
                 // Don't pass in the cache since the subst map changed. 
                 return (JifClassType) ts.subst(pt, newSubst);
