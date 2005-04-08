@@ -43,10 +43,10 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
         VarInstance vi = c.findVariable(name);
-        if (!vi.isCanonical()) {
-            // the instance is not yet ready
-            return this;
-        }
+//        if (!vi.isCanonical()) {
+//            // the instance is not yet ready
+//            return this;
+//        }
         
 //        if (vi == null || ind >= 0) {
 //            JifProcedureInstance pi = (JifProcedureInstance)c.currentCode();
@@ -65,8 +65,8 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
 //            }
 //        }
 
-	if (vi instanceof JifVarInstance &&
-	    vi.flags().isFinal() && ts.isLabel(vi.type())) {
+	if (vi instanceof JifVarInstance && vi.flags().isFinal()) {
+	    // we will check that it is a label later.
 
 	    JifVarInstance jvi = (JifVarInstance) vi;
 

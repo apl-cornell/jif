@@ -2,14 +2,14 @@ package jif.ast;
 
 import java.util.List;
 
+import jif.types.JifTypeSystem;
+import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
+import polyglot.ast.Node;
 import polyglot.ast.Term;
-import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.visit.CFGBuilder;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.Translator;
+import polyglot.types.SemanticException;
+import polyglot.util.*;
+import polyglot.visit.*;
 
 /** An implemenation of the <code>CanonicalPrincipal</code> interface. 
  */
@@ -20,6 +20,17 @@ public class CanonicalPrincipalNode_c extends PrincipalNode_c implements Canonic
 	this.principal = principal;
     }
     
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        if (principal instanceof DynamicPrincipal) {
+            DynamicPrincipal dp = (DynamicPrincipal)principal;
+            JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
+            if (!ts.isPrincipal(dp.path().type())) {
+                throw new SemanticException("The type of a dynamic label must be \"principal\"", this.position());
+            }
+        }
+        return super.typeCheck(tc);
+    }
+
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(principal.toString());
     }
