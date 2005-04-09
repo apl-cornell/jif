@@ -94,6 +94,22 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             return n;
         }
 
+        // set the formal arg labels and formal types
+        List formalArgLabels = new ArrayList(n.formals().size());
+        List formalTypes = new ArrayList(n.formals().size());
+        for (Iterator i = n.formals().iterator(); i.hasNext(); ) {
+            Formal f = (Formal)i.next();
+            if (!f.isDisambiguated()) {
+                // formals are not disambiguated yet.
+                return n;
+            }
+            JifLocalInstance jli = (JifLocalInstance)f.localInstance();
+            formalArgLabels.add(jli.label());
+            formalTypes.add(f.declType());
+        }
+        jci.setFormalArgLabels(formalArgLabels);
+        jci.setFormalTypes(formalTypes);
+
         Label Li; // start label
         boolean isDefaultStartLabel = false;
         DefaultSignature ds = jts.defaultSignature();
@@ -116,22 +132,6 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             Lr = n.returnLabel().label();
         }        
         jci.setReturnLabel(Lr, isDefaultReturnLabel);
-
-        // set the formal arg labels and formal types
-        List formalArgLabels = new ArrayList(n.formals().size());
-        List formalTypes = new ArrayList(n.formals().size());
-        for (Iterator i = n.formals().iterator(); i.hasNext(); ) {
-            Formal f = (Formal)i.next();
-            if (!f.isDisambiguated()) {
-                // formals are not disambiguated yet.
-                return n;
-            }
-            JifLocalInstance jli = (JifLocalInstance)f.localInstance();
-            formalArgLabels.add(jli.label());
-            formalTypes.add(f.declType());
-        }
-        jci.setFormalArgLabels(formalArgLabels);
-        jci.setFormalTypes(formalTypes);
 
         // set the labels for the throwTypes.
         List throwTypes = new LinkedList();        
