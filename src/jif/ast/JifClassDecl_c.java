@@ -142,7 +142,6 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         JifClassDecl_c n = (JifClassDecl_c)super.disambiguate(ar);
 	
         JifParsedPolyType ct = (JifParsedPolyType) n.type;
-        //@@@@@Need to disamb the params? Probably....
 
         List principals = new ArrayList(n.authority().size());
         for (Iterator i = n.authority().iterator(); i.hasNext(); ) {
