@@ -17,7 +17,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     
     public JoinLabel_c(Collection components, JifTypeSystem ts, Position pos) {
         super(ts, pos, new JoinLabelToJavaExpr_c());
-        this.components = Collections.unmodifiableSet(new LinkedHashSet(components));
+        this.components = Collections.unmodifiableSet(new LinkedHashSet(flatten(components)));
         if (isBottom()) {
             setDescription("Bottom of the label lattice, the most public label possible");        
         }
@@ -175,11 +175,12 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         if (!this.isDisambiguated()) {
             return this;
         }
-        
+
+        Collection comps = flatten(components);
         Set needed = new LinkedHashSet();
         JifTypeSystem jts = (JifTypeSystem) ts;
-        
-        for (Iterator i = components.iterator(); i.hasNext(); ) {
+
+        for (Iterator i = comps.iterator(); i.hasNext(); ) {
             Label ci = ((Label) i.next()).simplify();
             
             if (ci.hasVariables()) {
@@ -191,9 +192,10 @@ public class JoinLabel_c extends Label_c implements JoinLabel
                 for (Iterator j = needed.iterator(); j.hasNext(); ) {
                     Label cj = (Label) j.next();
                     
-                    if (cj.hasVariables()) 
+                    if (cj.hasVariables()) {
                         continue;
-                    
+                    }
+
                     if (jts.leq(ci, cj)) {
                         subsumed = true;
                         break;
@@ -207,30 +209,35 @@ public class JoinLabel_c extends Label_c implements JoinLabel
                     needed.add(ci);
             }
         }
-        if (needed.size() == components.size()) {
-            
-        }
         
-        return flatten(needed, (JifTypeSystem)ts, position());
+        if (needed.equals(components)) {
+            return this;
+        }
+        if (needed.size() == 1) {
+            return (Label)needed.iterator().next();
+        }
+
+        return new JoinLabel_c(needed, (JifTypeSystem)ts, position());
     }
-    private static Label flatten(Collection comps, JifTypeSystem ts, Position pos) {
+    
+    private static Collection flatten(Collection comps) {
         Collection c = new LinkedHashSet();
         
         for (Iterator i = comps.iterator(); i.hasNext(); ) {
             Label L = (Label) i.next();
             
             if (L instanceof TopLabel) {
-                return L;
+                return Collections.singleton(L);
             }
             
             if (L instanceof JoinLabel_c) {
-                L = flatten(L.components(), ts, L.position());
+                Collection lComps = flatten(L.components());
                 
-                for (Iterator j = L.components().iterator(); j.hasNext(); ) {
+                for (Iterator j = lComps.iterator(); j.hasNext(); ) {
                     Label Lj = (Label) j.next();
                     
                     if (Lj instanceof TopLabel) {
-                        return Lj;
+                        return Collections.singleton(Lj);
                     }
                     
                     c.add(Lj);
@@ -241,11 +248,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
             }
         }
         
-        if (c.size() == 1) {
-            return (Label) c.toArray()[0];
-        }
-        
-        return new JoinLabel_c(c, ts, pos);
+        return c;
     }
 
     public Label subst(LocalInstance arg, Label l) {
@@ -295,7 +298,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         if (!changed) return substitution.substLabel(this);
         
         JifTypeSystem ts = (JifTypeSystem)this.typeSystem();
-        Label newJoinLabel = ts.joinLabel(this.position(), s);
-        return substitution.substLabel(newJoinLabel);
+        Label newJoinLabel = ts.joinLabel(this.position(), flatten(s));
+        return substitution.substLabel(newJoinLabel).simplify();
     }
 }
