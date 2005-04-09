@@ -58,7 +58,7 @@ public class CovariantThisLabel_c extends CovariantParamLabel_c implements Covar
         if (Report.should_report(Report.debug, 1)) { 
             return "<covariant-this-label " + this.ct.name() + ">";
         }
-        return this.ct.name() + "this";
+        return this.ct.name() + ".this";
     }
 
     public boolean leq_(Label L, LabelEnv env) {

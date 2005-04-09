@@ -49,7 +49,7 @@ public class ThisLabel_c extends ParamLabel_c implements ThisLabel {
         if (Report.should_report(Report.debug, 1)) { 
             return "<this-label " + this.ct.name() + ">";
         }
-        return this.ct.name() + "this";
+        return this.ct.name() + ".this";
     }
 
     public boolean leq_(Label L, LabelEnv env) {
