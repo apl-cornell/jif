@@ -55,14 +55,19 @@ public class LabelEnv_c implements LabelEnv
     }
     
     public void addAssertionLE(Label L1, Label L2) {
-        // don't bother adding the assertion if we already know 
-        // L1 is less than L2,
-        if (!(this.leq(L1, L2, false))) {
-            assertions.add(new LabelLeAssertion_c(L1, L2));
-            if (!this.hasVariables && (L1.hasVariables() || L2.hasVariables())) {
-                // at least one assertion in this label env has a variable.
-                this.hasVariables = true;
-            }
+        // break up the components
+        for (Iterator c = L1.components().iterator(); c.hasNext(); ) {
+            Label cmp = (Label)c.next();
+
+            // don't bother adding the assertion if we already know 
+            // cmp is less than L2,
+            if (!(this.leq(cmp, L2, false))) {
+                assertions.add(new LabelLeAssertion_c(cmp, L2));
+                if (!this.hasVariables && (cmp.hasVariables() || L2.hasVariables())) {
+                    // at least one assertion in this label env has a variable.
+                    this.hasVariables = true;
+                }
+            }            
         }
     }
     
