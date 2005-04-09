@@ -2,11 +2,13 @@ package jif.types.principal;
 
 import jif.translate.DynamicPrincipalToJavaExpr_c;
 import jif.types.JifTypeSystem;
+import jif.types.label.*;
 import jif.types.label.AccessPath;
 import jif.types.label.AccessPathRoot;
 import polyglot.main.Report;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /** An implementation of the <code>DynamicPrincipal</code> interface. 
@@ -17,6 +19,9 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
     public DynamicPrincipal_c(AccessPath path, JifTypeSystem ts, Position pos) {
 	super(ts, pos, new DynamicPrincipalToJavaExpr_c());
         this.path = path;
+        if (path instanceof AccessPathConstant) {
+            throw new InternalCompilerError("Don't expect to get AccessPathConstants for dynamic labels");
+        }
     }
 
     public AccessPath path() {
@@ -54,6 +59,14 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
         AccessPath newPath = path.subst(r, e);
         if (newPath == path) {
             return this;
+        }
+
+        if (newPath instanceof AccessPathConstant) {
+            AccessPathConstant apc = (AccessPathConstant)newPath;
+            if (!apc.isPrincipalConstant()) {
+                throw new InternalCompilerError("Replaced a dynamic principal with a non-principal!");
+            }
+            return (Principal)apc.constantValue();
         }
         
         return ((JifTypeSystem)typeSystem()).dynamicPrincipal(this.position(), newPath);

@@ -2,6 +2,7 @@ package jif.ast;
 
 import jif.types.*;
 import jif.types.label.*;
+import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
@@ -145,10 +146,18 @@ public class JifUtil
                 throw new InternalCompilerError("Not currently supporting access paths for special of kind " + s.kind());
             }            
         }
+        else if (e instanceof NewLabel) {
+            NewLabel nl = (NewLabel)e;
+            return new AccessPathConstant(nl.label().label());
+        }
+        else if (e instanceof PrincipalNode) {
+            PrincipalNode pn = (PrincipalNode)e;
+            return new AccessPathConstant(pn.principal());
+        }
         throw new InternalCompilerError("Expression " + e + " not suitable for an access path");
     }        
 
-    public static boolean isFinalAccessExpr(JifTypeSystem ts, Expr e) {
+    private static boolean isFinalAccessExpr(JifTypeSystem ts, Expr e) {
         if (e instanceof Local) {
             Local l = (Local)e;
             return l.localInstance().flags().isFinal();
@@ -164,8 +173,26 @@ public class JifUtil
         }
         return false;
     }
-    boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e) {
-        return isFinalAccessExpr(ts, e) || e.isConstant();
+    public static boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e) {
+        return isFinalAccessExpr(ts, e) || e instanceof NewLabel || e instanceof PrincipalNode;
+    }
+    public static Label exprToLabel(JifTypeSystem ts, Expr e, ReferenceType currentClass) {
+        if (isFinalAccessExpr(ts, e)) {
+            return ts.dynamicLabel(e.position(), exprToAccessPath(e, currentClass));
+        }
+        if (e instanceof NewLabel) {
+            return ((NewLabel)e).label().label();
+        }
+        throw new InternalCompilerError("Expected a final access expression, or constant");
+    }
+    public static Principal exprToPrincipal(JifTypeSystem ts, Expr e, ReferenceType currentClass) {
+        if (isFinalAccessExpr(ts, e)) {
+            return ts.dynamicPrincipal(e.position(), exprToAccessPath(e, currentClass));
+        }
+        if (e instanceof PrincipalNode) {
+            return ((PrincipalNode)e).principal();
+        }
+        throw new InternalCompilerError("Expected a final access expression, or constant");
     }
 
 }

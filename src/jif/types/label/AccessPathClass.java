@@ -2,9 +2,6 @@ package jif.types.label;
 
 import polyglot.main.Report;
 import polyglot.types.*;
-import polyglot.types.ClassType;
-import polyglot.types.Resolver;
-import polyglot.util.InternalCompilerError;
 
 /**
  * TODO Documentation

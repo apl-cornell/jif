@@ -194,7 +194,7 @@ public class CallHelper
 
         for (Iterator j = actualArgs.iterator(); j.hasNext();) {
             Expr Ej = (Expr)j.next();            
-            if (JifUtil.isFinalAccessExpr(ts, Ej)){
+            if (JifUtil.isFinalAccessExprOrConst(ts, Ej)){
                 actualArgExprs.add(Ej);
             }
             else {

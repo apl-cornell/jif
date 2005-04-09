@@ -3,9 +3,13 @@ package jif.extension;
 import java.util.*;
 
 import jif.ast.JifConstructorDecl;
+import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.*;
+import jif.types.label.DynamicLabel;
 import jif.types.label.Label;
+import jif.types.principal.DynamicPrincipal;
+import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
 import polyglot.main.Report;
@@ -240,6 +244,25 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         uninitFinalVars.remove(assFi);
 
         JifTypeSystem ts = lc.jifTypeSystem();
+        // deal with label and principal fields being initialzed 
+        if (assFi.flags().isFinal() && 
+                (ts.isLabel(assFi.type()) || ts.isPrincipal(assFi.type())) && 
+                JifUtil.isFinalAccessExprOrConst(ts, ass.right())) {
+            
+            if (ts.isLabel(assFi.type())) {
+                DynamicLabel dl = ts.dynamicLabel(assFi.position(), JifUtil.varInstanceToAccessPath(assFi));                
+                Label rhs_label = JifUtil.exprToLabel(ts, ass.right(), lc.context().currentClass());
+                lc.context().addAssertionLE(dl, rhs_label);
+                lc.context().addAssertionLE(rhs_label, dl);
+            }
+            if (ts.isPrincipal(assFi.type())) {
+                DynamicPrincipal dp = ts.dynamicPrincipal(assFi.position(), JifUtil.varInstanceToAccessPath(assFi));                
+                Principal rhs_principal = JifUtil.exprToPrincipal(ts, ass.right(), lc.context().currentClass());
+                lc.context().addActsFor(dp, rhs_principal);                    
+            }
+        }                            
+
+        
         if (ts.isLabel(assFi.type())) {
             // the field is a label. If it is being initialized from a
             // final label, we want to equate the UIDs (Figure 4.45).      
@@ -254,11 +277,6 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
             
             if (rhsVi != null && ts.isLabel(rhsVi.type()) && rhsVi.flags().isFinal()) {
                 // the RHS of the assignment is a final label.
-                // We've already constructed the labels and it would be too much
-                // trouble to go through the AST fixing up uids, so just equate
-                // the two UIDs using a union-find algorithm.  UID.equals will
-                // do the rest.
-                // assFi.uid().equate(rhsVi.uid());
                 //@@@@@ Here, I think we need to add an assertion to the appropriate hierarchy
                 // This probably needs to be done a whole bunch earlier...
             }

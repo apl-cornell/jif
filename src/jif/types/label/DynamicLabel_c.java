@@ -7,6 +7,7 @@ import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
 import polyglot.types.*;
+import polyglot.util.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 
@@ -18,6 +19,9 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
     public DynamicLabel_c(AccessPath path, JifTypeSystem ts, Position pos) {
         super(ts, pos);
         this.path = path;
+        if (path instanceof AccessPathConstant) {
+            throw new InternalCompilerError("Don't expect to get AccessPathConstants for dynamic labels");
+        }
     }
     public AccessPath path() {
         return path;
@@ -70,6 +74,13 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
             return this;
         }
         
+        if (newPath instanceof AccessPathConstant) {
+            AccessPathConstant apc = (AccessPathConstant)newPath;
+            if (!apc.isLabelConstant()) {
+                throw new InternalCompilerError("Replaced a dynamic label with a non-label!");
+            }
+            return (Label)apc.constantValue();
+        }
         return ((JifTypeSystem)typeSystem()).dynamicLabel(this.position(), newPath);
     }
 
