@@ -78,21 +78,6 @@ public class JifLocalAssignExt extends JifAssignExt
          );
 
         Expr lhs = (Expr) X(lve, X);
-
-        //deal with the special case "l = new label(...)" and "L1 = L2"
-        //@@@@@ Need to modify label env here.
-//        if (ts.isLabel(li.type())) {
-//            JifVarInstance jvi = (JifVarInstance) li;
-//            DynamicLabel dl = ts.dynamicLabel(lve.position(), jvi.uid(), jvi.name(), jvi.label());
-//            Label rhs_label = JifUtil.exprToLabel(ts, rhs);
-//            // the rhs_label may be null, e.g. "l = foo();",
-//            // since there is no specific label associated with this particular
-//            // call to the method.
-//            if (rhs_label != null) {
-//                lc.bind(dl, rhs_label);
-//            }   
-//        }
-
         return (Assign) X(assign.right(rhs).left(lhs), X);
     }
 }
