@@ -866,22 +866,22 @@ public class JifTypeSystem_c
 //        }
 //
         if (L1 instanceof TopLabel || L1.isTop()) {
-            return L1;
+            return L1.simplify();
         }
         if (L2 instanceof TopLabel || L2.isTop()) {
-            return L2;
+            return L2.simplify();
         }
         if (L1 instanceof NotTaken) {
-            return L2;
+            return L2.simplify();
         }
         if (L2 instanceof NotTaken) {
-            return L1;
+            return L1.simplify();
         }
         if (L1 instanceof RuntimeLabel && L2.isRuntimeRepresentable()) {
-            return L1;
+            return L1.simplify();
         }
         if (L2 instanceof RuntimeLabel && L1.isRuntimeRepresentable()) {
-            return L2;
+            return L2.simplify();
         }
         List l = CollectionUtil.list(L1, L2);
         Position pos = L1.position();
