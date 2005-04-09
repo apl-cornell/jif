@@ -10,4 +10,6 @@ public interface JifVarInstance extends VarInstance
 {
     Label label();
     void setLabel(Label L);
+
+    void subst(VarMap bounds);
 }

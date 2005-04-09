@@ -20,6 +20,11 @@ public class JifFieldInstance_c extends FieldInstance_c
 	super(ts, pos, container, flags, type, name);
     }
 
+    public void subst(VarMap bounds) {
+        this.setLabel(bounds.applyTo(label));
+        this.setType(bounds.applyTo(type));
+    }
+
     public Label label() {
         return label;
     }

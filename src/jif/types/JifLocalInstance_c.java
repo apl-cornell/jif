@@ -1,9 +1,10 @@
 package jif.types;
 
 import jif.types.label.Label;
-import polyglot.ext.jl.types.*;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.ext.jl.types.LocalInstance_c;
+import polyglot.types.Flags;
+import polyglot.types.Type;
+import polyglot.util.Position;
 
 /** An implementation of the <code>JifLocalInstance</code> interface. 
  */
@@ -15,6 +16,11 @@ public class JifLocalInstance_c extends LocalInstance_c implements JifLocalInsta
         super(ts, pos, flags, type, name);
     }
     
+    public void subst(VarMap bounds) {
+        this.setLabel(bounds.applyTo(label));
+        this.setType(bounds.applyTo(type));
+    }
+
     public boolean isCanonical() {
         return label != null && label.isCanonical() && super.isCanonical();
     }
