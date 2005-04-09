@@ -3,6 +3,7 @@ package jif.types;
 import java.util.Iterator;
 
 import jif.ast.JifProcedureDecl;
+import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import polyglot.ast.*;
 import polyglot.types.Type;
@@ -52,9 +53,9 @@ public class VarSignature implements DefaultSignature
         JifProcedureInstance pi = (JifProcedureInstance)pd.procedureInstance();
         JifTypeSystem jts = (JifTypeSystem)pi.typeSystem();
 
-        for (Iterator i = pi.formalTypes().iterator(); i.hasNext(); ) {
-            Type t = (Type)i.next();
-            Lrv = Lrv.join(jts.labelOfType(t));
+        for (Iterator i = pi.formalArgLabels().iterator(); i.hasNext(); ) {
+            ArgLabel a = (ArgLabel)i.next();
+            Lrv = Lrv.join(a);
         }
         
 	return Lrv;	
