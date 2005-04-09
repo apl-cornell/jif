@@ -79,8 +79,6 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
     protected void overrideMethodLabelCheck(LabelChecker lc, final JifMethodInstance mi) throws SemanticException {
         JifTypeSystem ts = lc.jifTypeSystem();
 
-        //@@@@@Need to instantiate all arg labels in sup with the sub arg labels
-        
         for (Iterator iter = mi.implemented().iterator(); iter.hasNext(); ) {
             final JifMethodInstance mj = (JifMethodInstance) iter.next();
             
