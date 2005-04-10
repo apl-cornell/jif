@@ -105,7 +105,6 @@ public class JifFieldExt extends Jif_c
 	JifTypeSystem ts = lc.jifTypeSystem();
 
 	Field fe = (Field) node();
-
 	Receiver target = checkTarget(lc, fe);
 	PathMap Xe = X(target);
 	
@@ -116,13 +115,15 @@ public class JifFieldExt extends Jif_c
 	}
 
 	// Must be done after visiting target to get PC right.
-	
-	//Hack: get the field instance from the type system, because "fi" may 
-	//be a different instance and contain outdated data.
-	FieldInstance fi = ts.findField(target.type().toReference(), fe.name(), lc.context());
-	
+		
+	FieldInstance fi = fe.fieldInstance();
 	Label L = ts.labelOfField(fi, A.pc());
 
+	// hack to deal with the special length field of arrays
+	if (L == null && fe.name().equals("length") && ts.unlabel(fe.target().type()).isArray()) {
+	    // the label of the field "length" is just the label of the array expression.
+	    L = Xe.NV();
+	}
 	if (target instanceof Expr) {
 	    Label objLabel = X(target).NV();
 	    

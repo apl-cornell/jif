@@ -89,11 +89,6 @@ public class JifTypeSystem_c
         return p;
     }
 
-    public ArrayType arrayOf(Position pos, Type type) {
-        ArrayType t = super.arrayOf(pos, type);
-        return t;
-    }
-
     private static final PrimitiveType.Kind PRINCIPAL_KIND = new PrimitiveType.Kind("principal");
     private static final PrimitiveType.Kind LABEL_KIND = new PrimitiveType.Kind("label");
     protected PrimitiveType PRINCIPAL_;
@@ -445,13 +440,6 @@ public class JifTypeSystem_c
     public LabeledType labeledType(Position pos, Type type, Label label) {
         if (isLabeled(type)) {
             throw new InternalCompilerError("Trying to label a labeled type");
-        }
-        if (type.isArray()) {
-            // we have an array type
-            // we need to set the label of psuedo field "length"
-            ArrayType at = type.toArray();
-            JifFieldInstance fi = (JifFieldInstance)at.fieldNamed("length");
-            fi.setLabel(label);
         }
         return new LabeledType_c(this, pos, type, label);
     }
