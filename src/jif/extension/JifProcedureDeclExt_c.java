@@ -59,7 +59,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	// Add constraints for the formal parameters.  Equate the declared
 	// label of each formal with the corresponding label variable in
 	// the method instance.
-	
+	// @@@@@Check that this is correct!!! I think it is not needed, it is just insisting that <arg _ ub> <= ub
 	List formalNames = new LinkedList();
 	for (Iterator iter = mn.formals().iterator(); iter.hasNext(); ) 
 	    formalNames.add(((Formal)iter.next()).name());

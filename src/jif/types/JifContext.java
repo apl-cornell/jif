@@ -127,42 +127,4 @@ public interface JifContext extends Context {
     Label constructorReturnLabel();
     void setConstructorReturnLabel(Label Lr);
     
-    /**
-     * Set the current object type and label of the reference to the object.
-     * This is used in the instantiation of field and method signatures. 
-     * For example, if <code>C</code> is a class with a field <code>f</code> 
-     * and the label of the field <code>f</code> is <code>this</code>, and 
-     * <code>o</code> is an object of class <code>C</code>, and the label of 
-     * <code>o</code> is <code>L</code>, then the label of <code>o.f</code>
-     * is <code>L</code>, and the label checking code will call this method
-     * with paramters of <code>class C</code> and <code>L</code> to produce the
-     * context after evaluating <code>o</code> but before evaluating the field
-     * reference to <code>f</code> in the expression <code>o.f</code>. 
-     */
-    JifContext objectTypeAndLabel(ReferenceType t, Label objLabel);
-    
-    /**
-     * Instantiate the label L with any substitutions required by the object
-     * type. If instantiateThisLabels is true, then it will also replace 
-     * "this" labels with the label of the object, as 
-     * recorded by the last call to <code>objectTypeAndLabel</code>. 
-     */
-    Label instantiate(Label L, boolean instantiateThisLabels);
-    
-    /**
-     * Instantiate the principal p with any substitutions required by the object
-     * type. If instantiateThisLabels is true, then it will also replace
-     * "this" labels with the label of the object, as 
-     * recorded by the last call to <code>objectTypeAndLabel</code>. 
-     */
-    Principal instantiate(Principal p, boolean instantiateThisLabels);
-    
-    /**
-     * Instantiate the type t with any substitutions required by the object
-     * type. If instantiateThisLabels is true, then it will also replace
-     * "this" labels with the label of the object, as 
-     * recorded by the last call to <code>objectTypeAndLabel</code>. 
-     */
-    Type instantiate(Type t, boolean instantiateThisLabels) throws SemanticException;
-
 }

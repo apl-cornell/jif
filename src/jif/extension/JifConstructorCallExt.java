@@ -26,7 +26,6 @@ public class JifConstructorCallExt extends JifStmtExt_c
     {
 	ConstructorCall ccs = (ConstructorCall) node();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
         A = (JifContext) ccs.enterScope(A);
 
@@ -44,7 +43,7 @@ public class JifConstructorCallExt extends JifStmtExt_c
 
 	constructorChecker.checkConstructorAuthority(ct, A);
 
-	CallHelper helper = new CallHelper(ct, jct.thisLabel(), ci, 
+	CallHelper helper = new CallHelper(jct.thisLabel(), ct, ci, 
                                            ccs.arguments(), node().position());
 
 	helper.checkCall(lc.context(A));

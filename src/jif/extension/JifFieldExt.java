@@ -127,10 +127,9 @@ public class JifFieldExt extends Jif_c
 	if (target instanceof Expr) {
 	    Label objLabel = X(target).NV();
 	    
-	    JifContext A1 = A.objectTypeAndLabel(targetType(ts, A, target, fe), objLabel);
-	    L = A1.instantiate(L, true);
+	    L = JifInstantiator.instantiate(L, A, (Expr)target, targetType(ts, A, target, fe), objLabel);
 
-	    Type ft = A1.instantiate(fe.type(), true);
+	    Type ft = JifInstantiator.instantiate(fe.type(), A, (Expr)target, targetType(ts, A, target, fe), objLabel); 
 	    
 	    if (ft != fe.type())
 		fe = (Field)fe.type(ft);

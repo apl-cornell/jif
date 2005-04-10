@@ -1,5 +1,6 @@
 package jif.extension;
 
+import jif.ast.JifInstantiator;
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.types.label.Label;
@@ -31,8 +32,6 @@ public class JifFieldAssignExt extends JifAssignExt
 
         Receiver target = JifFieldExt.checkTarget(lc, fe);
         PathMap Xe = X(target);
-
-        ReferenceType rt = null; 
 
         // check rhs
         A = (JifContext) A.pushBlock();
@@ -92,13 +91,11 @@ public class JifFieldAssignExt extends JifAssignExt
 
         if (target instanceof Expr) {
             if (!(target instanceof Special)) {
-                JifContext A1 = A.objectTypeAndLabel(JifFieldExt.targetType(ts, A, target, fe), X(target).NV());
-                Lf = A1.instantiate(Lf, true);
+                Lf = JifInstantiator.instantiate(Lf, A, (Expr)target, JifFieldExt.targetType(ts, A, target, fe), X(target).NV());
             }
             else {
                 JifClassType jct = (JifClassType) A.currentClass();
-                JifContext A1 = A.objectTypeAndLabel(JifFieldExt.targetType(ts, A, target, fe), jct.thisLabel());
-                Lf = A1.instantiate(Lf, true);
+                Lf = JifInstantiator.instantiate(Lf, A, (Expr)target, JifFieldExt.targetType(ts, A, target, fe), jct.thisLabel());
             }
         }
 

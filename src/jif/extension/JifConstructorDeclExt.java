@@ -2,6 +2,7 @@ package jif.extension;
 
 import java.util.*;
 
+import jif.ast.*;
 import jif.ast.JifConstructorDecl;
 import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
@@ -125,7 +126,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
             Lr = ts.bottomLabel(ci.position());
         }
 
-        A.setConstructorReturnLabel(A.instantiate(Lr, false));
+        A.setConstructorReturnLabel(JifInstantiator.subst(Lr));
 
         // stmts is the statements in the constructor body.
         List stmts = new LinkedList();
