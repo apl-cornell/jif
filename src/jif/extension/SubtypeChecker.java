@@ -7,12 +7,8 @@ import jif.types.label.Label;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.main.Report;
-import polyglot.types.ArrayType;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.util.StringUtil;
+import polyglot.types.*;
+import polyglot.util.*;
 
 /** A checker of subtype relationships. 
  */
@@ -92,7 +88,6 @@ public class SubtypeChecker
 	if (Report.should_report(Report.types, 2))
 	    Report.report(2, "Adding param constraints: " + supertype + " >= " + subtype);
 
-	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
 
 	Iterator iter = polyTypeForClass(supertype).params().iterator();
@@ -113,20 +108,22 @@ public class SubtypeChecker
                   : pi.isCovariantLabel() ? LabelConstraint.LEQ   // subParam <= supParam
                   : null;
 		
+                final Type lOrigSubtype = origSubtype;
+                final Type lOrigSupertype = origSupertype;
                 lc.constrain(new LabelConstraint(new NamedLabel(
                                                      "sub_param_"+count,
-                                                     StringUtil.nth(count) + " param of subtype " + origSubtype,
+                                                     StringUtil.nth(count) + " param of subtype " + lOrigSubtype,
                                                      label(subParam, pos)), 
                                                  kind, 
                                                  new NamedLabel(
                                                     "sup_param_"+count,
-                                                    StringUtil.nth(count) + " param of supertype " + origSupertype,
+                                                    StringUtil.nth(count) + " param of supertype " + lOrigSupertype,
                                                     label(supParam, pos)), 
                                                  A.labelEnv(),
                                                  pos) {
                          public String msg() {
-                             return origSubtype + " is not a subtype of " + 
-                                   origSupertype + 
+                             return lOrigSubtype + " is not a subtype of " + 
+                                   lOrigSupertype + 
                                 ", since the subtype relation between label " + 
                                 "parameters is not satisfied.";
                          }
@@ -137,8 +134,8 @@ public class SubtypeChecker
                              String reln = kind() == EQUAL 
                                                       ? "equal to"
                                                       : "less restrictive than";
-                             return origSubtype + " is not a subtype of " + 
-                                   origSupertype + ". Subtyping requires " +
+                             return lOrigSubtype + " is not a subtype of " + 
+                                   lOrigSupertype + ". Subtyping requires " +
                                    "the " + StringUtil.nth(count) + 
                                    " parameter of the subtype to be " +
                                    reln + 
@@ -172,12 +169,13 @@ public class SubtypeChecker
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-	
-    
+	    
         if (ts.isLabeled(supertype) && ts.isLabeled(subtype)) {
             // the two types are labeled. make sure that 
             // the label of supertype is at least as restrictve as that
             // of subtype.
+            final Type lOrigSubtype = origSubtype;
+            final Type lOrigSupertype = origSupertype;
             lc.constrain(new LabelConstraint(new NamedLabel(
                                                  "label of type " + subtype,
                                                  ts.labelOfType(subtype)), 
@@ -188,12 +186,12 @@ public class SubtypeChecker
                                              A.labelEnv(),
                                              pos) {
                          public String msg() {
-                             return origSubtype + " is not a subtype of " + 
-                                   origSupertype + ".";
+                             return lOrigSubtype + " is not a subtype of " + 
+                                   lOrigSupertype + ".";
                          }
                          public String detailMsg() {
-                             return origSubtype + " is not a subtype of " + 
-                                   origSupertype + ". Subtyping requires " +
+                             return lOrigSubtype + " is not a subtype of " + 
+                                   lOrigSupertype + ". Subtyping requires " +
                                    "the label of the subtype to be less " +
                                    "restrictive than the label of the " +
                                    "supertype.";
