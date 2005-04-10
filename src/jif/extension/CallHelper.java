@@ -119,7 +119,7 @@ public class CallHelper
 	this.position = position;
         this.callChecked = false;
 
-        if (pi.formalArgLabels().size() != actualArgs.size()) 
+        if (pi.formalTypes().size() != actualArgs.size()) 
             throw new InternalCompilerError("Wrong number of args.");        
     }
 
@@ -208,19 +208,22 @@ public class CallHelper
      */
     private void constrainArguments(LabelChecker lc) throws SemanticException {
 	JifContext A = lc.jifContext();
+        JifTypeSystem jts = (JifTypeSystem)A.typeSystem();
         
 	// Now constrain the labels of the arguments to be less
 	// than the bounds of the formal args, substituting in the
 	// fresh labels we just created.
 
-	Iterator formalArgLabels = pi.formalArgLabels().iterator();
+	Iterator formalTypes = pi.formalTypes().iterator();
 
 	for (int j = 0; j < actualArgs.size(); j++) {
             final int count = j + 1;
              
 	    final Expr Ej = (Expr) actualArgs.get(j);
         
-	    ArgLabel aj = (ArgLabel)formalArgLabels.next();            
+	    Type tj = (Type)formalTypes.next();
+	    ArgLabel aj = (ArgLabel)jts.labelOfType(tj);
+        
             // the upper bound label of the formal argument         
             Label argBoundj = instantiate(A, aj.upperBound());
 
@@ -487,18 +490,23 @@ public class CallHelper
 	    }
 	}
     }
-    private Label instantiate(JifContext A, Label L) {
+    private static List getArgLabelsFromFormalTypes(List formalTypes, JifTypeSystem jts) {
+        List formalArgLabels = new ArrayList(formalTypes.size());
+        for (Iterator iter = formalTypes.iterator(); iter.hasNext(); ) {
+            Type t = (Type)iter.next();
+            ArgLabel al = (ArgLabel)jts.labelOfType(t);
+            formalArgLabels.add(al);            
+        }
+        return formalArgLabels;        
+    }
+    private Label instantiate(JifContext A, Label L) {        
         return instantiateArgLabels(A.instantiate(L, true), 
-                                    this.pi.formalArgLabels(), 
+                                    getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem()), 
                                     this.actualArgLabels, 
                                     this.actualArgExprs, 
                                     A.currentClass());
     }
     
-    public static Label instantiateArgLabels(Label L, List formalArgLabels, List actualArgLabels, ClassType currentClass) {
-        return instantiateArgLabels(L, formalArgLabels, actualArgLabels, null, currentClass);
-    }
-
     private static Label instantiateArgLabels(Label L, List formalArgLabels, List actualArgLabels, List actualArgExprs, ClassType callerClass) {
         if (formalArgLabels.size() != actualArgLabels.size() || 
                 (actualArgExprs != null && formalArgLabels.size() != actualArgExprs.size())) {
@@ -541,7 +549,7 @@ public class CallHelper
      */        
     private Principal instantiate(JifContext A, Principal p) {
         return instantiateArgLabels(A.instantiate(p, true),
-                                    this.pi.formalArgLabels(), 
+                                    getArgLabelsFromFormalTypes(this.pi.formalTypes(), (JifTypeSystem)this.pi.typeSystem()), 
                                     this.actualArgExprs,
                                     A.currentClass());
     }
@@ -549,7 +557,7 @@ public class CallHelper
      * replaces any signature ArgLabels in p with the appropriate label, and
      * replaces any signature ArgPrincipal with the appropriate prinicipal. 
      */        
-    public static Principal instantiateArgLabels(Principal p, List formalArgLabels, List actualArgExprs, ClassType callerClass) {
+    private static Principal instantiateArgLabels(Principal p, List formalArgLabels, List actualArgExprs, ClassType callerClass) {
         if (formalArgLabels.size() != actualArgExprs.size()) {
             throw new InternalCompilerError("Inconsistent sized lists of args");
         }

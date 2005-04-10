@@ -18,7 +18,6 @@ public class JifMethodInstance_c extends MethodInstance_c
     protected Label startLabel;
     protected Label returnLabel;
     protected List constraints;
-    protected List formalArgLabels;
     protected boolean isDefaultStartLabel;
     protected boolean isDefaultReturnLabel;
 
@@ -42,10 +41,6 @@ public class JifMethodInstance_c extends MethodInstance_c
 	this.formalTypes = TypedList.copyAndCheck(formalTypes, 
 	                                          Type.class, 
 	                                          true);
-	this.formalArgLabels = TypedList.copyAndCheck(formalArgLabels, 
-	                                          Label.class, 
-	                                          true);
-    
     }
 //    private Label replaceArgLabels(Label l) {
 //        if (l == null) return l;
@@ -122,14 +117,6 @@ public class JifMethodInstance_c extends MethodInstance_c
 	return jts.labelOfType(returnType);
     }
 
-    public List formalArgLabels() {
-        return formalArgLabels;
-    }
-
-    public void setFormalArgLabels(List formalArgLabels) {
-        this.formalArgLabels = TypedList.copyAndCheck(formalArgLabels, ArgLabel.class, true);
-    }
-
     public List constraints() {
 	return constraints;
     }
@@ -199,17 +186,15 @@ public class JifMethodInstance_c extends MethodInstance_c
                 && startLabel.isCanonical()
                 && returnLabel.isCanonical()
                 && listIsCanonical(constraints)
-                && formalArgLabels != null
-                && formalTypes != null
-                && formalArgLabels.size() == formalTypes.size())) {
+                && formalTypes != null)) {
             return false;
         }
         
         JifTypeSystem jts = (JifTypeSystem)typeSystem();
-        // also need to make sure that every formal type is labeled
+        // also need to make sure that every formal type is labeled with an arg label
         for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
             Type t = (Type) i.next();
-            if (!jts.isLabeled(t)) return false;
+            if (!jts.isLabeled(t) || !(jts.labelOfType(t) instanceof ArgLabel)) return false;
         }    
         return true;
     }

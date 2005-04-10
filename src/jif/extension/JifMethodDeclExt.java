@@ -13,6 +13,7 @@ import polyglot.ast.Block;
 import polyglot.ast.Node;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
 
@@ -106,11 +107,13 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             A.addAssertionLE(miContainer.thisLabel(), mjContainer.thisLabel());
             A.addAssertionLE(mjContainer.thisLabel(), miContainer.thisLabel());
             
-            Iterator iteri = mi.formalArgLabels().iterator();
-            Iterator iterj = mj.formalArgLabels().iterator();
+            Iterator iteri = mi.formalTypes().iterator();
+            Iterator iterj = mj.formalTypes().iterator();
             while (iteri.hasNext() && iterj.hasNext() ) {
-                ArgLabel ai = (ArgLabel)iteri.next();
-                ArgLabel aj = (ArgLabel)iterj.next();
+                Type ti = (Type)iteri.next();
+                Type tj = (Type)iterj.next();
+                ArgLabel ai = (ArgLabel)ts.labelOfType(ti);
+                ArgLabel aj = (ArgLabel)ts.labelOfType(tj);
                 A.addAssertionLE(ai, aj);
                 A.addAssertionLE(aj, ai);
             }
@@ -125,16 +128,18 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             Iterator mjargs = mj.formalTypes().iterator();
 	    int c=0;
             while (miargs.hasNext() && mjargs.hasNext()) {
-                LabeledType i = (LabeledType)miargs.next();
-                LabeledType j = (LabeledType)mjargs.next();
+                Type i = (Type)miargs.next();
+                Type j = (Type)mjargs.next();
+                ArgLabel ai = (ArgLabel)ts.labelOfType(i);
+                ArgLabel aj = (ArgLabel)ts.labelOfType(j);
 		final int argIndex = ++c;
                 newlc.constrain(new LabelConstraint(new NamedLabel("sup_arg_"+argIndex,
                                                                    "label of " + StringUtil.nth(argIndex) + " arg of overridden method",
-                                                                   j.labelPart()),
+                                                                   aj.upperBound()),
                                                     LabelConstraint.LEQ,
                                                     new NamedLabel("sub_arg_"+argIndex,
                                                                    "label of " + StringUtil.nth(argIndex) + " arg of overridding method",
-                                                                   i.labelPart()),
+                                                                   ai.upperBound()),
                                                     A.labelEnv(),
                                                     mi.position()) {
                                 public String msg() {

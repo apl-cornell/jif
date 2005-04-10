@@ -17,15 +17,6 @@ public interface JifProcedureInstance extends ProcedureInstance
     void setReturnLabel(Label returnLabel, boolean isDefault);
     void setConstraints(List constraints);
 
-    /**
-     * A list of the formal arg labels. All elements of this list are
-     * <code>ArgLabel</code>s. Moreover, it is the case that for the ith
-     * formal arg label <code>a</code>, and the ith formal type <code>T{L}</code>
-     * we have <code>a.upperBound() = L</code>.
-     */
-    List formalArgLabels();
-    void setFormalArgLabels(List formalArgLabels);
-    
     boolean isDefaultStartLabel();
     boolean isDefaultReturnLabel();
 

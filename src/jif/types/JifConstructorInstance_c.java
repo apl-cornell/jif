@@ -17,7 +17,6 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
     protected Label startLabel;
     protected Label returnLabel;
     protected List constraints;
-    protected List formalArgLabels;
     protected boolean isDefaultStartLabel;
     protected boolean isDefaultReturnLabel;
 
@@ -42,9 +41,6 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
 	this.formalTypes = TypedList.copyAndCheck(formalTypes, 
 					       Type.class, 
 					       true);
-	this.formalArgLabels = TypedList.copyAndCheck(formalArgLabels, 
-                                               Label.class, 
-                                               true);
     }
 
 
@@ -77,13 +73,6 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
     public boolean isDefaultStartLabel() {
         return isDefaultStartLabel;
     }
-    public List formalArgLabels() {
-        return formalArgLabels;
-    }
-
-    public void setFormalArgLabels(List formalArgLabels) {
-        this.formalArgLabels = TypedList.copyAndCheck(formalArgLabels, ArgLabel.class, true);
-    }
 
     public List constraints() {
 	return constraints;
@@ -98,19 +87,17 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
                 && startLabel.isCanonical()
                 && returnLabel.isCanonical()
                 && listIsCanonical(constraints)
-                && formalArgLabels != null
-                && formalTypes != null
-                && formalArgLabels.size() == formalTypes.size())) {
+                && formalTypes != null)) {
             return false;
         }
-    
-    JifTypeSystem jts = (JifTypeSystem)typeSystem();
-    // also need to make sure that every formal type is labeled
-    for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
-        Type t = (Type) i.next();
-        if (!jts.isLabeled(t)) return false;
-    }    
-    return true;
+        
+        JifTypeSystem jts = (JifTypeSystem)typeSystem();
+        // also need to make sure that every formal type is labeled with an arg label
+        for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
+            Type t = (Type) i.next();
+            if (!jts.isLabeled(t) || !(jts.labelOfType(t) instanceof ArgLabel)) return false;
+        }    
+        return true;
     }
     
     public void subst(VarMap bounds) {

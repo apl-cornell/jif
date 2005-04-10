@@ -56,27 +56,39 @@ public class JifFormalDel extends JifJL_c
             return n;
         }
         
-        // if there is no declared label of the type, use the default arg bound
-        if (!isCatchFormal && !jts.isLabeled(n.declType())) {
-            Type lblType = n.declType();
-            Position pos = lblType.position();
-            Label defaultBound = jts.defaultSignature().defaultArgBound(n);
+        JifLocalInstance li = (JifLocalInstance)n.localInstance();
+        if (!isCatchFormal) {
+            ArgLabel al = (ArgLabel)li.label();
+            if (al.upperBound() == null) {
+                // haven't set the arg label yet
+                // do so now.
+                
+                if (!jts.isLabeled(n.declType())) {
+                    // declared type isn't labeled, use the default arg bound
+                    Type lblType = n.declType();
+                    Position pos = lblType.position();
+                    Label defaultBound = jts.defaultSignature().defaultArgBound(n);
+                    lblType = jts.labeledType(pos, lblType, defaultBound);
+                    n = n.type(n.type().type(lblType));
+                }
+                
+                // now take the label of the declared type, and set it to 
+                // be the bound
+                al.setUpperBound(jts.labelOfType(n.declType()));
+                
+                // now set the label of the declared type to be the arg label
+                Type lblType = n.declType();
+                lblType = jts.labeledType(lblType.position(), jts.unlabel(lblType), al);
+                n = n.type(n.type().type(lblType));                
+            }
             
-            lblType = jts.labeledType(pos, lblType, defaultBound);
-            n = n.type(n.type().type(lblType));
+            
         }
 
-        JifLocalInstance li = (JifLocalInstance)n.localInstance();
+        
         if (n.declType().isCanonical()) {
             li.setType(n.declType());
         }   
-
-        
-        if (!isCatchFormal) {
-	        // set the bound of the arg label to the declared label of the formal type
-	        ArgLabel al = (ArgLabel)li.label();
-	        al.setUpperBound(jts.labelOfType(n.declType()));
-        }
         
         return n;
     }

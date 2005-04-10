@@ -94,8 +94,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             return n;
         }
 
-        // set the formal arg labels and formal types
-        List formalArgLabels = new ArrayList(n.formals().size());
+        // set the formal types
         List formalTypes = new ArrayList(n.formals().size());
         for (Iterator i = n.formals().iterator(); i.hasNext(); ) {
             Formal f = (Formal)i.next();
@@ -103,11 +102,8 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
                 // formals are not disambiguated yet.
                 return n;
             }
-            JifLocalInstance jli = (JifLocalInstance)f.localInstance();
-            formalArgLabels.add(jli.label());
             formalTypes.add(f.declType());
         }
-        jci.setFormalArgLabels(formalArgLabels);
         jci.setFormalTypes(formalTypes);
 
         Label Li; // start label

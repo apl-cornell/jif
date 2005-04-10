@@ -90,8 +90,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         JifMethodInstance jmi = (JifMethodInstance)n.methodInstance();
         JifTypeSystem jts = (JifTypeSystem)ar.typeSystem();        
         
-        // set the formal arg labels and formal types
-        List formalArgLabels = new ArrayList(n.formals().size());
+        // set the formal types
         List formalTypes = new ArrayList(n.formals().size());
         for (Iterator i = n.formals().iterator(); i.hasNext(); ) {
             Formal f = (Formal)i.next();
@@ -99,11 +98,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
                 // formals are not disambiguated yet.
                 return n;
             }
-            JifLocalInstance jli = (JifLocalInstance)f.localInstance();
-            formalArgLabels.add(jli.label());
             formalTypes.add(f.declType());
         }
-        jmi.setFormalArgLabels(formalArgLabels);
         jmi.setFormalTypes(formalTypes);
 
         // return type
