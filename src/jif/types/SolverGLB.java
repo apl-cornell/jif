@@ -19,14 +19,14 @@ public class SolverGLB extends Solver
     public SolverGLB(JifTypeSystem ts) {
         super(ts);
     }
-
+    
     /**
      * Constructor
      */
     protected SolverGLB(SolverGLB js) {
         super(js);
     }
-
+    
     /**
      * This method adds the correct dependencies from Equation
      * eqn to varaiables occuring in eqn, and dependencies in the other 
@@ -45,30 +45,30 @@ public class SolverGLB extends Solver
             report(4, "Equation " + eqn + " depends on variables: " +
                    eqn.lhs().variables());
         }
-
+        
         // Build dependency maps for this equation.
         for (Iterator j = eqn.rhs().variables().iterator(); j.hasNext(); ) {
             VarLabel v = (VarLabel) j.next();
-
+            
             // If this equation is examined, then the bound for v may be changed
             addDependency(eqn, v);
         }    
         for (Iterator j = eqn.lhs().variables().iterator(); j.hasNext(); ) {
             VarLabel v = (VarLabel) j.next();
-
+            
             // If the bound for v is changed (upward), then we may need to 
             // reexamine this equation.
             addDependency(v, eqn);
         }    
     }
-
+    
     /**
      * The default bound of variables in this solver is bottom
      */
     protected Label getDefaultBound() {
         return ts.bottomLabel();
     }
-
+    
     /**
      * This method changes the bounds of variables in the RHS of Equation eqn, 
      * to make the equation satisfied. ###DOCO TO DO
@@ -89,7 +89,7 @@ public class SolverGLB extends Solver
             checkEquation(eqn);
             return;
         }
-
+        
         // at this point we know that at least one component of the RHS of eqn
         // has a variable...
         
@@ -101,7 +101,7 @@ public class SolverGLB extends Solver
                 rhsVariables.add(lb);
             }
         }
-
+        
         if (rhsVariables.size() == 1) {
             // only a single component is a variable
             refineVariableEquation((VarLabel)rhsVariables.get(0), eqn);
@@ -113,12 +113,12 @@ public class SolverGLB extends Solver
                 addEquationToQueue(eqn);                
                 return;
             }
-
+            
             // we will do a very simple search, not delaying the solution of any 
             // constraints...            
             // #### could do a more complicated search, doing the most restricted
             // eqns first.
-
+            
             // we only need one of the components to satisfy the constraints.
             // we will just try each one in turn.
             
@@ -163,7 +163,7 @@ public class SolverGLB extends Solver
                     modCompCount++;
                 }
             }
-            if (modCompCount == 1) {
+            if (modCompCount <= 1) {
                 return false;
             }
         }
@@ -174,25 +174,32 @@ public class SolverGLB extends Solver
      * Raise the bound on the label variable v, which is a component
      * of the RHS of the equation eqn.
      */
-    protected void refineVariableEquation(VarLabel v,
-	                                Equation eqn) throws SemanticException {
-	Label vBound = bounds().boundOf(v);
-	Label lhsBound = bounds().applyTo(eqn.lhs());
-
-        if (shouldReport(4)) report(4, "BOUND of " + v + " = " + vBound);
-	if (shouldReport(4)) report(4, "APP = " + lhsBound);
-
-	// ###Could do something smarter here, to try and raise v's bound
-	// just enough to satisfy the equation
-        Label join = vBound.join(lhsBound);
+    protected void refineVariableEquation(VarLabel v, Equation eqn) throws SemanticException {
+        Label vBound = bounds().boundOf(v);
+        Label lhsBound = bounds().applyTo(eqn.lhs());
+        Label rhsBound = bounds().applyTo(eqn.rhs());
         
-	if (shouldReport(3)) report(3, "JOIN: " + v + " := " + join);
+        if (shouldReport(4)) report(4, "BOUND of " + v + " = " + vBound);
+        if (shouldReport(4)) report(4, "APP = " + lhsBound);
+        
+        // Try and raise v's bound just enough to satisfy the equation
+        Collection needed = new ArrayList(lhsBound.components().size());
+        for (Iterator comps = lhsBound.components().iterator(); comps.hasNext(); ) {
+            Label comp = (Label)comps.next();
+            if (!eqn.env().leq(comp, rhsBound)) {
+                needed.add(comp);
+            }
+        }
+        // everything not in needed is already satisfied
+        Label join = vBound.join(ts.joinLabel(lhsBound.position(), needed));
+        
+        if (shouldReport(3)) report(3, "JOIN: " + v + " := " + join);
         
         addTrace(v, eqn, join);
-	setBound(v, join, eqn.constraint()); 
+        setBound(v, join, eqn.constraint()); 
         wakeUp(v);
     }
-
+    
     /**
      * Search recursively for solution to system of constraints. 
      */
@@ -216,8 +223,8 @@ public class SolverGLB extends Solver
             return false;
         }
     }
-
-
+    
+    
     /**
      * Check that the equation eqn is satisfied. The RHS of eqn cannot 
      * have any variables.
@@ -229,22 +236,22 @@ public class SolverGLB extends Solver
     {
         if (eqn.rhs().hasVariables()) {
             throw new InternalCompilerError("RHS of equation " + eqn +
-                " should not contain variables.");
+            " should not contain variables.");
         }
-
+        
         // This equation must have been woken up.  We need to
         // check whether it is solvable given the current variables.
-
+        
         Label rhsLabel = eqn.rhs();
         if (shouldReport(3)) report(3, "RHS = " + rhsLabel);
-
+        
         Label lhsBound = bounds().applyTo(eqn.lhs());
         if (shouldReport(3)) report(3, "LHS APP = " + lhsBound);
-
+        
         // Check to see if it is currently satisfiable.
         if (! eqn.env().leq(lhsBound, rhsLabel)) {
-//            //try bounding the dynamic labels
-//            if (dynCheck(lhsBound, rhsLabel, eqn.env())) return;
+            //            //try bounding the dynamic labels
+            //            if (dynCheck(lhsBound, rhsLabel, eqn.env())) return;
             
             // This equation isn't satisfiable.
             reportError(eqn.constraint(), eqn.variables());
