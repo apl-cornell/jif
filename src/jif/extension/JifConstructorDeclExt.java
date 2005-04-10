@@ -252,8 +252,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
             if (ts.isLabel(assFi.type())) {
                 DynamicLabel dl = ts.dynamicLabel(assFi.position(), JifUtil.varInstanceToAccessPath(assFi));                
                 Label rhs_label = JifUtil.exprToLabel(ts, ass.right(), lc.context().currentClass());
-                lc.context().addAssertionLE(dl, rhs_label);
-                lc.context().addAssertionLE(rhs_label, dl);
+                lc.context().addDefinitionalAssertionLE(dl, rhs_label);
+                lc.context().addDefinitionalAssertionLE(rhs_label, dl);
             }
             if (ts.isPrincipal(assFi.type())) {
                 DynamicPrincipal dp = ts.dynamicPrincipal(assFi.position(), JifUtil.varInstanceToAccessPath(assFi));                

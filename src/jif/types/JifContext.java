@@ -33,6 +33,14 @@ public interface JifContext extends Context {
      */
     void addAssertionLE(Label L1, Label L2);
 
+    /**
+     * Adds the assertion to this context, and all outer contexts up to
+     * the method/constructor/initializer level
+     * @param L1
+     * @param L2
+     */
+    void addDefinitionalAssertionLE(Label L1, Label L2);
+
     /* ************************************************
      * Prinicpal Hierarchy methods
      */

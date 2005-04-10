@@ -38,6 +38,26 @@ public class JifLocalDeclExt extends JifStmtExt_c
         if (polyglot.main.Report.should_report(jif.Topics.jif, 4))
             polyglot.main.Report.report(4, "Processing declaration for " + li);
         
+        //deal with the special cases "final label l = new label(...)"
+        // and "final principal p = ..."
+        if (li.flags().isFinal() && 
+                (ts.isLabel(li.type()) || ts.isPrincipal(li.type())) && 
+                JifUtil.isFinalAccessExprOrConst(ts, decl.init())) {
+            
+            if (ts.isLabel(li.type())) {
+                DynamicLabel dl = ts.dynamicLabel(decl.position(), JifUtil.varInstanceToAccessPath(li));                
+                Label rhs_label = JifUtil.exprToLabel(ts, decl.init(), lc.context().currentClass());
+                lc.context().addDefinitionalAssertionLE(dl, rhs_label);
+                lc.context().addDefinitionalAssertionLE(rhs_label, dl);
+                System.out.println(lc.context().labelEnv());
+            }
+            if (ts.isPrincipal(li.type())) {
+                DynamicPrincipal dp = ts.dynamicPrincipal(decl.position(), JifUtil.varInstanceToAccessPath(li));                
+                Principal rhs_principal = JifUtil.exprToPrincipal(ts, decl.init(), lc.context().currentClass());
+                lc.context().addActsFor(dp, rhs_principal);                    
+            }
+        }                            
+        
         // Equate the variable label with the declared label.
         VarLabel L = (VarLabel)li.label();
         Type t = decl.declType();
@@ -107,25 +127,6 @@ public class JifLocalDeclExt extends JifStmtExt_c
             }
             );
             Xd = Xe;
-            
-            //deal with the special cases "final label l = new label(...)"
-            // and "final principal p = ..."
-            if (li.flags().isFinal() && 
-                    (ts.isLabel(li.type()) || ts.isPrincipal(li.type())) && 
-                    JifUtil.isFinalAccessExprOrConst(ts, decl.init())) {
-                
-                if (ts.isLabel(li.type())) {
-                    DynamicLabel dl = ts.dynamicLabel(decl.position(), JifUtil.varInstanceToAccessPath(li));                
-                    Label rhs_label = JifUtil.exprToLabel(ts, decl.init(), lc.context().currentClass());
-                    lc.context().addAssertionLE(dl, rhs_label);
-                    lc.context().addAssertionLE(rhs_label, dl);
-                }
-                if (ts.isPrincipal(li.type())) {
-                    DynamicPrincipal dp = ts.dynamicPrincipal(decl.position(), JifUtil.varInstanceToAccessPath(li));                
-                    Principal rhs_principal = JifUtil.exprToPrincipal(ts, decl.init(), lc.context().currentClass());
-                    lc.context().addActsFor(dp, rhs_principal);                    
-                }
-            }                            
             
             // Must check that the expression type is a subtype of the
             // declared type.  Most of this is done in typeCheck, but if

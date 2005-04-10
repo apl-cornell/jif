@@ -102,6 +102,21 @@ public class JifContext_c extends Context_c implements JifContext
         labelEnv().addAssertionLE(L1, L2);
     }
     
+    /**
+     * Adds the assertion to this context, and all outer contexts up to
+     * the method/constructor/initializer level
+     * @param L1
+     * @param L2
+     */
+    public void addDefinitionalAssertionLE(Label L1, Label L2) {
+        this.addAssertionLE(L1, L2);
+        JifContext_c jc = this;
+        do {
+            jc = (JifContext_c)jc.pop();
+            if (jc != null) jc.addAssertionLE(L1, L2);
+        } while (jc != null && !jc.isCode());
+    }
+
     public void addActsFor(Principal p1, Principal p2) {
 	env.addActsFor(p1, p2);
     }
