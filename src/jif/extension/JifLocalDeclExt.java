@@ -49,7 +49,6 @@ public class JifLocalDeclExt extends JifStmtExt_c
                 Label rhs_label = JifUtil.exprToLabel(ts, decl.init(), lc.context().currentClass());
                 lc.context().addDefinitionalAssertionLE(dl, rhs_label);
                 lc.context().addDefinitionalAssertionLE(rhs_label, dl);
-                System.out.println(lc.context().labelEnv());
             }
             if (ts.isPrincipal(li.type())) {
                 DynamicPrincipal dp = ts.dynamicPrincipal(decl.position(), JifUtil.varInstanceToAccessPath(li));                
@@ -144,7 +143,6 @@ public class JifLocalDeclExt extends JifStmtExt_c
         X = X.N(ts.notTaken()).join(Xd);
         
         decl = (LocalDecl) X(decl.init(init), X);
-        //System.out.println("### X(decl): " + Xd + " " + node().position()); 
         return decl;
     }
 }
