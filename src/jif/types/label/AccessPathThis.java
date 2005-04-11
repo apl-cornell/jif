@@ -1,5 +1,9 @@
 package jif.types.label;
 
+import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.types.ClassType;
@@ -17,7 +21,6 @@ public class AccessPathThis extends AccessPathRoot {
     }
     
     public boolean isCanonical() { return true; }
-    public String translate(Resolver c) { return null; }
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         if (r instanceof AccessPathThis) {            
             if (ct.equals(((AccessPathThis)r).ct)) {
@@ -50,7 +53,23 @@ public class AccessPathThis extends AccessPathRoot {
         return false;        
     }
 
+    public int hashCode() {
+        return ct.hashCode();
+    }
     public Type type() {
         return ct;
+    }
+
+    public PathMap labelcheck(JifContext A) {
+    	JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+    	JifClassType ct = (JifClassType)A.currentClass();
+    	
+
+    	PathMap X = ts.pathMap();
+    	X = X.N(A.pc());
+    	
+    	// X(this).NV = this_label, which is upper-bounded by the begin label. 
+    	X = X.NV(ct.thisLabel().join(A.pc()));	    	
+        return X;
     }
 }

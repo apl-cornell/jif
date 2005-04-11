@@ -13,7 +13,6 @@ public class AccessPathUninterpreted extends AccessPathRoot {
     }
     
     public boolean isCanonical() { return true; }
-    public String translate(Resolver c) { return null; }
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         return e;
     }
@@ -29,6 +28,9 @@ public class AccessPathUninterpreted extends AccessPathRoot {
         return this == o;
     }
 
+    public int hashCode() {
+        return System.identityHashCode(this);
+    }
     public Type type() {
         return null;
     }

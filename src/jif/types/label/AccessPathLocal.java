@@ -1,5 +1,9 @@
 package jif.types.label;
 
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
+import polyglot.ast.Local;
 import polyglot.types.*;
 import polyglot.types.LocalInstance;
 import polyglot.types.Resolver;
@@ -15,8 +19,6 @@ public class AccessPathLocal extends AccessPathRoot {
     }
     
     public boolean isCanonical() { return li.isCanonical(); }
-    public String translate(Resolver c) { return null;
-    }
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         if (r instanceof AccessPathLocal) {            
             if (li.equals(((AccessPathLocal)r).li)) {
@@ -37,7 +39,21 @@ public class AccessPathLocal extends AccessPathRoot {
         return false;        
     }
 
+    public int hashCode() {
+        return li.hashCode();
+    }
     public Type type() {
         return li.type();
+    }
+
+    public PathMap labelcheck(JifContext A) {
+    	JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+    	Label L = ts.labelOfLocal(li, A.pc());
+
+    	PathMap X = ts.pathMap();
+    	X = X.N(A.pc());
+    	X = X.NV(L.join(A.pc()));
+        
+        return X;
     }
 }

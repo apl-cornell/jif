@@ -1,5 +1,8 @@
 package jif.types.label;
 
+import jif.types.*;
+import jif.types.JifContext;
+import jif.types.PathMap;
 import polyglot.main.Report;
 import polyglot.types.*;
 
@@ -14,7 +17,6 @@ public class AccessPathClass extends AccessPathRoot {
     }
     
     public boolean isCanonical() { return true; }
-    public String translate(Resolver c) { return null; }
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         return this;
     }
@@ -35,5 +37,16 @@ public class AccessPathClass extends AccessPathRoot {
 
     public Type type() {
         return ct;
+    }
+
+    public int hashCode() {
+        return ct.hashCode();
+    }
+
+    public PathMap labelcheck(JifContext A) {
+    	JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+    	
+    	// there is no information gained by accessing a class statically.
+    	return ts.pathMap();
     }
 }

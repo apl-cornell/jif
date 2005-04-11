@@ -37,7 +37,6 @@ public class AccessPathConstant extends AccessPathRoot {
     }
     
     public boolean isCanonical() { return true; }
-    public String translate(Resolver c) { return null; }
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         throw new InternalCompilerError("Shouldn't be calling subst on an AccessPathConstant!");
     }
@@ -53,9 +52,9 @@ public class AccessPathConstant extends AccessPathRoot {
         }
         return false;        
     }
-    /**
-     * 
-     */
+    public int hashCode() {
+        return constantValue.hashCode();
+    }
     public Type type() {
         if (isLabel) {
             Label l = (Label)constantValue;
