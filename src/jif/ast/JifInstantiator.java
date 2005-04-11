@@ -260,7 +260,13 @@ public class JifInstantiator
             if (receiverType != null && receiverType instanceof JifClassType) {
                 this.thisLabel = ((JifClassType)receiverType).thisLabel();
                 if (!(thisLabel instanceof CovariantThisLabel || thisLabel instanceof ThisLabel)) {
-                    throw new InternalCompilerError("expected thisLabel to be a ThisLabel");
+                    // if thisLabel is not a CovariantThisLabel or ThisLabel, then
+                    // it is the result of a substitution (see JifSUbstClassType_c.thisLabel), 
+                    // i.e., the ThisLabel or CovariantThisLabel has already been
+                    // substituted, we don't need to.
+                    // We really need to re-examine the param extension, tidy it up, and figure out
+                    // what exactly the "this" parameter is.
+                    this.thisLabel = null;
                 }
             }
             this.receiverLabel = receiverLabel;
