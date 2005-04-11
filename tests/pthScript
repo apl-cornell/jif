@@ -37,6 +37,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	ActsFor4.jif ;
 	ActsFor5.jif ;
 	ActsFor6.jif ;
+	ActsFor7.jif (Semantic, "not less restrictive");
 	ArgLabelSubst.jif ;
 	ArgLabelSubst2.jif ;
 	Array.jif ;
