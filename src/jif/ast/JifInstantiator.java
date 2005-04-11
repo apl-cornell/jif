@@ -95,12 +95,24 @@ public class JifInstantiator
         }
     }
     
+    public static Label instantiate(Label L, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) {
+        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        AccessPath receiverPath;
+        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
+            receiverPath = JifUtil.exprToAccessPath(receiverExpr, A.currentClass());
+        }
+        else {
+            receiverPath = new AccessPathUninterpreted(); 
+        }
+        return instantiate(L, A, receiverPath, receiverType, receiverLbl);
+    }
+
         /**
      * Replace this this access path with an appropraite access path for the
      * receiver expression
      * TODO Documentation
      */
-    public static Label instantiate(Label L, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) {
+    public static Label instantiate(Label L, JifContext A, AccessPath receiverPath, ReferenceType receiverType, Label receiverLbl) {
         if (L == null) return L;
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
 
@@ -112,13 +124,6 @@ public class JifInstantiator
             throw new InternalCompilerError("Unexpected SemanticException " +
                                             "during label substitution: " + e.getMessage(), L.position());
         }
-        AccessPath receiverPath;
-        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, A.currentClass());
-        }
-        else {
-            receiverPath = new AccessPathUninterpreted(); // @@@@@Uninterpreted root?
-        }
         
         if (receiverType.isClass()) {
             L = L.subst(new AccessPathThis(receiverType.toClass()), receiverPath);
@@ -128,6 +133,10 @@ public class JifInstantiator
 
     public static Label instantiate(Label L, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs) {
         L = instantiate(L, A, receiverExpr, receiverType, receiverLbl);
+        return instantiate(L, formalArgs, actualArgLabels, actualArgExprs, A.currentClass());
+    }
+    public static Label instantiate(Label L, JifContext A, AccessPath receiverPath, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs) {
+        L = instantiate(L, A, receiverPath, receiverType, receiverLbl);
         return instantiate(L, formalArgs, actualArgLabels, actualArgExprs, A.currentClass());
     }
 
