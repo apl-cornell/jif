@@ -36,6 +36,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	ActsFor3.jif ;
 	ActsFor4.jif ;
 	ActsFor5.jif ;
+	ActsFor6.jif ;
 	ArgLabelSubst.jif ;
 	ArgLabelSubst2.jif ;
 	Array.jif ;
