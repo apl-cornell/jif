@@ -1,5 +1,11 @@
 package jif.types.label;
 
+import jif.ast.JifInstantiator;
+import jif.types.*;
+import jif.types.JifContext;
+import jif.types.PathMap;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
 import polyglot.types.*;
 import polyglot.types.FieldInstance;
 import polyglot.types.Resolver;
@@ -18,8 +24,6 @@ public class AccessPathField extends AccessPath {
     }
     
     public boolean isCanonical() { return path.isCanonical(); }
-    public String translate(Resolver c) { return null;
-    }
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         AccessPath newPath = path.subst(r, e);
         if (newPath == path) return this;
@@ -36,8 +40,28 @@ public class AccessPathField extends AccessPath {
         }
         return false;        
     }
+    public int hashCode() {
+        return path.hashCode() + fi.name().hashCode();
+    }
 
     public Type type() {
         return fi.type();
+    }
+
+    public PathMap labelcheck(JifContext A) {
+    	PathMap Xt = path.labelcheck(A);
+
+    	JifTypeSystem ts = (JifTypeSystem)A.typeSystem();    	
+
+        // null pointer exception may be thrown.
+    	// TODO: take into account not-null checking somehow
+        PathMap X = Xt.exc(Xt.NV(), ts.NullPointerException());
+    	
+        Label L = ts.labelOfField(fi, A.pc());
+        Label objLabel = Xt.NV();
+        L = JifInstantiator.instantiate(L, A, path, path.type().toReference(), Xt.NV());
+
+        X = X.NV(L.join(X.NV()));
+        return X;
     }
 }
