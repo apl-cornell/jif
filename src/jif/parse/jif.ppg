@@ -330,9 +330,9 @@ principal_list ::=
     ;
 principal ::=
                     // PrincipalNode
-        IDENTIFIER:a
+        expression:a
             {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a),
-                           a.getIdentifier()); :}
+                           a); :}
     ;
 
 // 19.4) Types, Values, and Variables

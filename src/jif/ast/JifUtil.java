@@ -164,8 +164,9 @@ public class JifUtil
         }
         if (e instanceof Field) {
             Field f = (Field)e;
-            return f.fieldInstance().flags().isFinal() && 
-                (f.fieldInstance().flags().isStatic() || 
+            Flags flgs = f.flags();
+            return flgs.isFinal() && 
+                (flgs.isStatic() || 
                  isFinalAccessExpr(ts, (Expr)f.target()));
         }
         if (e instanceof Special) {

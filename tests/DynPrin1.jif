@@ -1,0 +1,18 @@
+class DynPrin1
+{
+    final principal{} p;
+    DynPrin1(principal{} a) { this.p = a; }
+}
+
+class DynPrin1a {
+    DynPrin1{} f;
+    DynPrin1a{} g;
+  
+    DynPrin1a(DynPrin1a{} g, principal{} f) {
+	this.g = g; this.f =  new DynPrin1(f);
+    }
+
+    void m(principal q) {	
+	int{this.g.p:} x;
+    }
+}

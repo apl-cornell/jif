@@ -16,7 +16,7 @@ import polyglot.visit.NodeVisitor;
  * the tree! 
  */
 public class Wrapper extends Expr_c {
-    Amb amb;
+    public Amb amb;
 
     Wrapper(Amb amb) {
 	super(amb.pos);

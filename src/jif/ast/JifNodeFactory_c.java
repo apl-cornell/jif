@@ -115,8 +115,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public AmbPrincipalNode AmbPrincipalNode(Position pos, String name) {
-        AmbPrincipalNode n = new AmbPrincipalNode_c(pos, name);
+    public AmbPrincipalNode AmbPrincipalNode(Position pos, Expr expr) {
+        AmbPrincipalNode n = new AmbPrincipalNode_c(pos, expr);
         n = (AmbPrincipalNode)n.ext(jifExtFactory().extAmbPrincipalNode());
         n = (AmbPrincipalNode)n.del(delFactory().delExpr());
         return n;
