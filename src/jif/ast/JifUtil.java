@@ -125,8 +125,8 @@ public class JifUtil
         return isFinalAccessExpr(ts, e) || e instanceof NewLabel || e instanceof PrincipalNode;
     }
     public static Label exprToLabel(JifTypeSystem ts, Expr e, ReferenceType currentClass) {
-        if (e instanceof NewLabel) {
-            return ((NewLabel)e).label().label();
+        if (e instanceof LabelExpr) {
+            return ((LabelExpr)e).label().label();
         }
         if (isFinalAccessExpr(ts, e)) {
             return ts.dynamicLabel(e.position(), exprToAccessPath(e, currentClass));

@@ -14,43 +14,43 @@ import polyglot.util.CollectionUtil;
 import polyglot.frontend.Pass;
 import java.util.*;
 
-/** An implementation of the <tt>ActsFor</tt> interface. */
-public class ActsFor_c extends Stmt_c implements ActsFor
+/** An implementation of the <tt>LabelIf</tt> interface. */
+public class LabelIf_c extends Stmt_c implements LabelIf
 {
-    protected PrincipalNode actor;
-    protected PrincipalNode granter;
+    protected LabelExpr lhs;
+    protected LabelExpr rhs;
     protected Stmt consequent;
     protected Stmt alternative;
 
-    public ActsFor_c(Position pos, PrincipalNode actor, PrincipalNode granter, Stmt consequent, Stmt alternative) {
+    public LabelIf_c(Position pos, LabelExpr lhs, LabelExpr rhs, Stmt consequent, Stmt alternative) {
 	super(pos);
-	this.actor = actor;
-	this.granter = granter;
+	this.lhs = lhs;
+	this.rhs = rhs;
 	this.consequent = consequent;
 	this.alternative = alternative;
     }
 
-    /** Gets the actor principal. */
-    public PrincipalNode actor() {
-	return this.actor;
+    /** Gets the lhs principal. */
+    public LabelExpr lhs() {
+	return this.lhs;
     }
 
-    /** Sets the actor principal. */
-    public ActsFor actor(PrincipalNode actor) {
-	ActsFor_c n = (ActsFor_c) copy();
-	n.actor = actor;
+    /** Sets the lhs principal. */
+    public LabelIf lhs(LabelExpr lhs) {
+	LabelIf_c n = (LabelIf_c) copy();
+	n.lhs = lhs;
 	return n;
     }
 
-    /** Gets the granter principal. */
-    public PrincipalNode granter() {
-	return this.granter;
+    /** Gets the rhs principal. */
+    public LabelExpr rhs() {
+	return this.rhs;
     }
 
-    /** Sets the granter principal. */
-    public ActsFor granter(PrincipalNode granter) {
-	ActsFor_c n = (ActsFor_c) copy();
-	n.granter = granter;
+    /** Sets the rhs principal. */
+    public LabelIf rhs(LabelExpr rhs) {
+	LabelIf_c n = (LabelIf_c) copy();
+	n.rhs = rhs;
 	return n;
     }
 
@@ -60,8 +60,8 @@ public class ActsFor_c extends Stmt_c implements ActsFor
     }
 
     /** Sets the consequent statement. */
-    public ActsFor consequent(Stmt consequent) {
-	ActsFor_c n = (ActsFor_c) copy();
+    public LabelIf consequent(Stmt consequent) {
+	LabelIf_c n = (LabelIf_c) copy();
 	n.consequent = consequent;
 	return n;
     }
@@ -72,18 +72,18 @@ public class ActsFor_c extends Stmt_c implements ActsFor
     }
 
     /** Sets the alternative statement. */
-    public ActsFor alternative(Stmt alternative) {
-	ActsFor_c n = (ActsFor_c) copy();
+    public LabelIf alternative(Stmt alternative) {
+	LabelIf_c n = (LabelIf_c) copy();
 	n.alternative = alternative;
 	return n;
     }
 
     /** Reconstructs the node. */
-    protected ActsFor_c reconstruct(PrincipalNode actor, PrincipalNode granter, Stmt consequent, Stmt alternative) {
-	if (actor != this.actor || granter != this.granter || consequent != this.consequent || alternative != this.alternative) {
-	    ActsFor_c n = (ActsFor_c) copy();
-	    n.actor = actor;
-	    n.granter = granter;
+    protected LabelIf_c reconstruct(LabelExpr lhs, LabelExpr rhs, Stmt consequent, Stmt alternative) {
+	if (lhs != this.lhs || rhs != this.rhs || consequent != this.consequent || alternative != this.alternative) {
+	    LabelIf_c n = (LabelIf_c) copy();
+	    n.lhs = lhs;
+	    n.rhs = rhs;
 	    n.consequent = consequent;
 	    n.alternative = alternative;
 	    return n;
@@ -94,46 +94,46 @@ public class ActsFor_c extends Stmt_c implements ActsFor
 
     /** Visits the children of the node. */
     public Node visitChildren(NodeVisitor v) {
-	PrincipalNode actor = (PrincipalNode) visitChild(this.actor, v);
-	PrincipalNode granter = (PrincipalNode) visitChild(this.granter, v);
+	LabelExpr lhs = (LabelExpr) visitChild(this.lhs, v);
+	LabelExpr rhs = (LabelExpr) visitChild(this.rhs, v);
 	Stmt consequent = (Stmt) visitChild(this.consequent, v);
 	Stmt alternative = (Stmt) visitChild(this.alternative, v);
-	return reconstruct(actor, granter, consequent, alternative);
+	return reconstruct(lhs, rhs, consequent, alternative);
     }
 
     /** Type check the expression. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();
 
-	if (!actor.principal().isRuntimeRepresentable()) {
+	if (!lhs.label().label().isRuntimeRepresentable()) {
 	    throw new SemanticException(
-                    "A principal used in an actsfor must be runtime-representable; it cannot be a parameter.", 
-                    actor.position());
+                    "A label used for a run-time test must be runtime-representable.", 
+                    lhs.position());
 	}
 
-	if (!granter.principal().isRuntimeRepresentable()) {
+	if (!rhs.label().label().isRuntimeRepresentable()) {
 	    throw new SemanticException(
-               "A principal used in an actsfor must be runtime-representable; it cannot be a parameter.", 
-		granter.position());
+	        "A label used for a run-time test must be runtime-representable.", 
+		rhs.position());
 	}
 
 	return this;
     }
 
     public Term entry() {
-        return actor.entry();
+        return lhs.entry();
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(actor, granter.entry());
+        v.visitCFG(lhs, rhs.entry());
 
         if (alternative == null) {
-            v.visitCFG(granter, FlowGraph.EDGE_KEY_TRUE, consequent.entry(), 
+            v.visitCFG(rhs, FlowGraph.EDGE_KEY_TRUE, consequent.entry(), 
                                 FlowGraph.EDGE_KEY_FALSE, this);
             v.visitCFG(consequent, this);
         }
         else {
-            v.visitCFG(granter, FlowGraph.EDGE_KEY_TRUE, consequent.entry(),
+            v.visitCFG(rhs, FlowGraph.EDGE_KEY_TRUE, consequent.entry(),
                                 FlowGraph.EDGE_KEY_FALSE, alternative.entry());
             v.visitCFG(consequent, this);
             v.visitCFG(alternative, this);
@@ -143,14 +143,14 @@ public class ActsFor_c extends Stmt_c implements ActsFor
     }
     
     public String toString() {
-	return "if (" + actor + " actsfor " + granter + ") ...";
+	return "if (" + lhs + " <= " + rhs + ") ...";
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("if (");
-        print(actor, w, tr);
-        w.write(" actsfor ");
-        print(granter, w, tr);
+        print(lhs, w, tr);
+        w.write(" <= ");
+        print(rhs, w, tr);
         w.write(")");
 
         printSubStmt(consequent, w, tr);

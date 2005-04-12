@@ -7,31 +7,31 @@ import polyglot.ast.Stmt;
  * Grammer: <code>actsFor(actor, granter) statement [else statement]
  * </code>
  */
-public interface ActsFor extends CompoundStmt
+public interface LabelIf extends CompoundStmt
 {
     /** Gets the actor. */
-    PrincipalNode actor();
+    LabelExpr lhs();
 
-    /** Makes a copy node and sets the actor of the copy. */
-    ActsFor actor(PrincipalNode actor);
+    /** Makes a copy node and sets the lhs of the copy. */
+    LabelIf lhs(LabelExpr lhs);
 
-    /** Gets the granter. */
-    PrincipalNode granter();
+    /** Gets the rhs. */
+    LabelExpr rhs();
 
-    /** Makes a copy of this node and sets the granter of the copy. */
-    ActsFor granter(PrincipalNode granter);
+    /** Makes a copy of this node and sets the rhs of the copy. */
+    LabelIf rhs(LabelExpr rhs);
 
     /** Gets the consequent statement. */
     Stmt consequent();
 
     /** Makes a copy of this node and sets the consequent statement of the copy.
      * */
-    ActsFor consequent(Stmt consequent);
+    LabelIf consequent(Stmt consequent);
 
     /** Gets the alternative statement. */
     Stmt alternative();
 
     /** Makes a copy of this node and sets the alternative statement of the
      * copy. */
-    ActsFor alternative(Stmt alternative);
+    LabelIf alternative(Stmt alternative);
 }

@@ -331,6 +331,20 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
+    public LabelIf LabelIf(Position pos, Label lhs, Label rhs, Stmt consequent, Stmt alternative) {
+        LabelExpr lhsNode = LabelExpr(pos, CanonicalLabelNode(pos, lhs));
+        LabelExpr rhsNode = LabelExpr(pos, CanonicalLabelNode(pos, rhs));
+        return LabelIf(pos, lhsNode, rhsNode, consequent, alternative);
+    }
+    
+    public LabelIf LabelIf(Position pos, LabelExpr lhs, LabelExpr rhs, Stmt consequent, Stmt alternative) {
+        LabelIf n = new LabelIf_c(pos, lhs, rhs, consequent,
+                                  alternative);
+        n = (LabelIf)n.ext(jifExtFactory().extLabelIf());
+        n = (LabelIf)n.del(delFactory().delStmt());
+        return n;
+    }
+
     public DeclassifyStmt DeclassifyStmt(Position pos, LabelNode bound, LabelNode label, Stmt body) {
         DeclassifyStmt n = new DeclassifyStmt_c(pos, bound, label,
                                                 body);
@@ -346,6 +360,13 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
                                                 label);
         n = (DeclassifyExpr)n.ext(jifExtFactory().extDeclassifyExpr());
         n = (DeclassifyExpr)n.del(delFactory().delExpr());
+        return n;
+    }
+
+    public LabelExpr LabelExpr(Position pos, LabelNode node) {
+        LabelExpr n = new LabelExpr_c(pos, node);
+        n = (LabelExpr)n.ext(jifExtFactory().extLabelExpr());
+        n = (LabelExpr)n.del(delFactory().delExpr());
         return n;
     }
 

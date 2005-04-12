@@ -1,18 +1,11 @@
 package jif.extension;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import polyglot.ast.*;
-import polyglot.ast.Call;
-import polyglot.ast.CanonicalTypeNode;
-import polyglot.ast.Receiver;
-import polyglot.ast.Special;
+import jif.types.JifTypeSystem;
+import polyglot.ast.Binary;
+import polyglot.ast.Node;
+import polyglot.ast.Precedence;
 import polyglot.ast.Binary.Operator;
-import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
-import polyglot.util.InternalCompilerError;
 import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>Call</code> node. 
@@ -29,6 +22,14 @@ public class JifBinaryDel extends JifJL_c
         Binary b = (Binary)node();
         if (b.operator() == ACTSFOR) {
             throw new SemanticException("The actsfor binary operator can only be used in an if statement, for example \"if (" + b + ") { ... }\"");
+        }
+        
+        JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
+        if (b.operator() == Binary.LE && 
+                (ts.isLabel(b.left().type()) || ts.isLabel(b.right().type()))) {
+            // looks like we may have an if label. Currently, we'll just ignore type
+            // checking for this node.
+            return b.type(ts.Boolean());
         }
         return super.typeCheck(tc);
     }

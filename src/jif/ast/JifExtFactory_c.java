@@ -365,6 +365,11 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return postExtActsFor(e);
     }
     
+    public final Ext extLabelIf() {
+        Ext e = extLabelIfImpl();
+        return postExtLabelIf(e);
+    }
+    
     public final Ext extDeclassifyStmt() {
         Ext e = extDeclassifyStmtImpl();
         return postExtDeclassifyStmt(e);
@@ -378,6 +383,11 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     public final Ext extNewLabel() {
         Ext e = extNewLabelImpl();
         return postExtNewLabel(e);
+    }
+
+    public final Ext extLabelExpr() {
+        Ext e = extLabelExprImpl();
+        return postExtLabelExpr(e);
     }
     
 
@@ -485,6 +495,10 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return new JifActsForExt(new ActsForToJavaExt_c());
     }
 
+    protected Ext extLabelIfImpl() {
+        return new JifLabelIfExt(new LabelIfToJavaExt_c());
+    }
+
     protected Ext extDeclassifyStmtImpl() {
         return new JifDeclassifyStmtExt(new DeclassifyStmtToJavaExt_c());
     }
@@ -496,6 +510,10 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     protected Ext extNewLabelImpl() {
         return new JifLiteralExt(new NewLabelToJavaExt_c());
     }
+    protected Ext extLabelExprImpl() {
+        return new JifLiteralExt(new LabelExprToJavaExt_c());
+    }
+    
     //----------------------------------------------------------------
     // Jif-specific nodes Post methods
     //-----------------------------------------------------------------
@@ -601,6 +619,10 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return postExtStmt(e);
     }
 
+    protected Ext postExtLabelIf(Ext e) {
+        return postExtStmt(e);
+    }
+
     protected Ext postExtDeclassifyStmt(Ext e) {
         return postExtStmt(e);
     }
@@ -610,6 +632,10 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext postExtNewLabel(Ext e) {
+        return postExtLabelExpr(e);
+    }
+
+    protected Ext postExtLabelExpr(Ext e) {
         return postExtExpr(e);
     }
 }

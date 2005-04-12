@@ -107,6 +107,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	IntPair.jif ;
 	InterfaceTest.jif ;
 	InvariantClass.jif (Semantic, "Covariant classes .* can only be extended with covariant classes");
+	LabelIf1.jif ;
 	List.jif ;
 	List2.jif ;
 	ListTest.jif ;
