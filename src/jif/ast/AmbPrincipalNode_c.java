@@ -40,28 +40,6 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
     }
     
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-//        // if expression contains any ambiguous nodes, do nothing...
-//        final boolean[] allOk = new boolean[] { true };
-//        expr.visit(new NodeVisitor() {
-//            public Node override(Node parent, Node n) {
-//                if (! allOk[0]) { return n; }
-//                
-//                System.out.println("  " + n + " :: " + n.getClass());
-//                // Don't check if New is disambiguated; this is handled
-//                // during type-checking.
-//                if (n instanceof Ambiguous) {
-//                    allOk[0] = false;
-//                    return n;
-//                }
-//                
-//                return null;
-//            }
-//        });
-//        
-//        if (!allOk[0]) {
-//            return this;
-//        }
-
         if (!expr.isDisambiguated()) {
             return this;
         }

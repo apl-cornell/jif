@@ -270,16 +270,16 @@ start with goal;
 // Jif labels
 label ::=
                     // LabelNode
-        LBRACE:x RBRACE
-            {: RESULT = parser.nf.CanonicalLabelNode(parser.pos(x),
+        LBRACE:x RBRACE:y
+            {: RESULT = parser.nf.CanonicalLabelNode(parser.pos(x, y),
                                         parser.ts.bottomLabel()); :}
-    |   LBRACE:x component_list:a RBRACE
+    |   LBRACE:x component_list:a RBRACE:y
             {: LabelNode ln;
                if (a.size() == 1) {
                    ln = (LabelNode)a.get(0);
                }
                else {
-                   ln = parser.nf.JoinLabelNode(parser.pos(x), a);
+                   ln = parser.nf.JoinLabelNode(parser.pos(x, y), a);
                }
                RESULT = ln; :}
     ;
@@ -302,10 +302,10 @@ component_list ::=
 label_component ::=
                     // LabelNode
         principal:a COLON readers:b
-            {: RESULT = parser.nf.PolicyLabelNode(parser.pos(a), a, b); :}
-    |   MULT IDENTIFIER:a
-            {: RESULT = parser.nf.AmbDynamicLabelNode(parser.pos(a),
-						      a.getIdentifier()); :}
+            {: RESULT = parser.nf.PolicyLabelNode(parser.pos(a, b), a, b); :}
+    |   MULT:x accesspath_or_id:a
+            {: RESULT = parser.nf.AmbDynamicLabelNode(parser.pos(x, a),
+						      a.toExpr()); :}
     |   THIS:a
             {: RESULT = parser.nf.AmbThisLabelNode(parser.pos(a)); :}
     |   IDENTIFIER:a
@@ -340,7 +340,7 @@ accesspath_or_id ::=
         THIS:a {:  RESULT = new Name(parser, parser.pos(a), "this");  :}
     |   IDENTIFIER:a {: RESULT = new Name(parser, parser.pos(a), a.getIdentifier()); :}
     | accesspath_or_id:a DOT IDENTIFIER:b 
-             {: RESULT = new Name(parser, parser.pos(b), a,  b.getIdentifier()); :}
+             {: RESULT = new Name(parser, parser.pos(a,b), a,  b.getIdentifier()); :}
      ;
 
 // 19.4) Types, Values, and Variables
@@ -355,7 +355,7 @@ extend type ::=
     |   primitive_array_type:a
             {: RESULT = a; :}
     |   primitive_array_type:a label:b
-            {: RESULT = parser.nf.LabeledTypeNode(parser.pos(a), a, b); :}
+            {: RESULT = parser.nf.LabeledTypeNode(parser.pos(a,b), a, b); :}
     ;
 
 extend primitive_type ::=
@@ -370,7 +370,7 @@ labeled_primitive_type  ::=
         primitive_type:a
             {: RESULT = a; :}
     |   primitive_type:a label:b
-            {: RESULT = parser.nf.LabeledTypeNode(parser.pos(a), a, b); :}
+            {: RESULT = parser.nf.LabeledTypeNode(parser.pos(a, b), a, b); :}
     ;
 
 drop { reference_type ::= array_type | class_or_interface_type; }
@@ -408,7 +408,7 @@ extend class_declaration ::=
         modifiers_opt:a CLASS:n IDENTIFIER:b
                 parameters_opt:p invariant_opt:i super_opt:c
                 interfaces_opt:d authority_opt:u class_body:e
-            {: RESULT = parser.nf.JifClassDecl(parser.pos(b),
+            {: RESULT = parser.nf.JifClassDecl(parser.pos(n, b),
                                                a, b.getIdentifier(),
                                                p, i.booleanValue(), c, d, u, e); :}
     ;
@@ -468,14 +468,14 @@ method_header ::=
         modifiers_opt:a type:b IDENTIFIER:c label_opt:i
         LPAREN formal_parameter_list_opt:d RPAREN
         dims_opt:e return_label_opt:r throws_opt:f constraints_opt:w
-            {: RESULT = parser.nf.JifMethodDecl(parser.pos(c), a,
+            {: RESULT = parser.nf.JifMethodDecl(parser.pos(b,c), a,
                         parser.array(b, e.intValue()),
                         c.getIdentifier(),
                                                 i, d, r, f, w, null); :}
     |   modifiers_opt:a VOID:b IDENTIFIER:c label_opt:i
         LPAREN formal_parameter_list_opt:d RPAREN
         dims_opt:e return_label_opt:r throws_opt:f constraints_opt:w
-            {: RESULT = parser.nf.JifMethodDecl(parser.pos(c), a,
+            {: RESULT = parser.nf.JifMethodDecl(parser.pos(b,c), a,
                         parser.nf.CanonicalTypeNode(parser.pos(b),
                                    parser.ts.Void()),
                         c.getIdentifier(),
@@ -486,10 +486,10 @@ override formal_parameter ::=
                     // Formal
                     // All formals are final
         type:a variable_declarator_id:b
-            {: RESULT = parser.nf.Formal(parser.pos(b), Flags.FINAL,
+            {: RESULT = parser.nf.Formal(parser.pos(a,b), Flags.FINAL,
                                          parser.array(a, b.dims), b.name); :}
-    |   FINAL type:a variable_declarator_id:b
-            {: RESULT = parser.nf.Formal(parser.pos(b), Flags.FINAL,
+    |   FINAL:x type:a variable_declarator_id:b
+            {: RESULT = parser.nf.Formal(parser.pos(x, b), Flags.FINAL,
                      parser.array(a, b.dims), b.name); :}
     ;
 
@@ -523,7 +523,7 @@ drop {constructor_declaration ::=
 constructor_declaration ::=
                     // ConstructorDecl
         modifiers_opt:a reftype_or_expr:q
-        LPAREN formal_parameter_list_opt:c RPAREN return_label_opt:r
+        LPAREN formal_parameter_list_opt:c RPAREN:y return_label_opt:r
         throws_opt:d constraints_opt:w constructor_body:e
             {: String b; LabelNode i;
                // Pick apart the reftype_or_expr node.
@@ -537,38 +537,38 @@ constructor_declaration ::=
                    b = q.toIdentifier();
                    i = null;
                }
-           RESULT = parser.nf.JifConstructorDecl(parser.pos(q),
+           RESULT = parser.nf.JifConstructorDecl(parser.pos(q, y),
                              a, b, i, r, c, d, w, e); :}
     ;
 drop { constructor_body ::= LBRACE block_statements RBRACE | LBRACE RBRACE; }
 
 extend constructor_body ::=
                     // Block
-        LBRACE:n block_statements:a explicit_super_constructor_invocation:b RBRACE
+        LBRACE:x block_statements:a explicit_super_constructor_invocation:b RBRACE:y
             {: List l = new TypedList(new LinkedList(), Stmt.class, false);
                l.addAll(a);
                l.add(b);
-               RESULT = parser.nf.Block(parser.pos(n), l); :}
-    |   LBRACE:n block_statements:a explicit_super_constructor_invocation:b block_statements:c RBRACE
+               RESULT = parser.nf.Block(parser.pos(x,y), l); :}
+    |   LBRACE:x block_statements:a explicit_super_constructor_invocation:b block_statements:c RBRACE:y
             {: List l = new TypedList(new LinkedList(), Stmt.class, false);
                l.addAll(a);
                l.add(b);
                l.addAll(c);
-               RESULT = parser.nf.Block(parser.pos(n), l); :}
-    |   LBRACE:n block_statements:a RBRACE
-            {: a.add(0, parser.nf.SuperCall(parser.pos(n), 
+               RESULT = parser.nf.Block(parser.pos(x,y), l); :}
+    |   LBRACE:x block_statements:a RBRACE:y
+            {: a.add(0, parser.nf.SuperCall(parser.pos(x), 
                 Collections.EMPTY_LIST));
-               RESULT = parser.nf.Block(parser.pos(n), a); :}
-    |   LBRACE:n RBRACE
-            {: RESULT = parser.nf.Block(parser.pos(n),
-                parser.nf.SuperCall(parser.pos(n),
+               RESULT = parser.nf.Block(parser.pos(a,y), a); :}
+    |   LBRACE:x RBRACE:y
+            {: RESULT = parser.nf.Block(parser.pos(x,y),
+                parser.nf.SuperCall(parser.pos(x),
                 Collections.EMPTY_LIST)); :}
     ;
 
 explicit_super_constructor_invocation ::=
                     // Stmt
-        SUPER:a LPAREN argument_list_opt:b RPAREN SEMICOLON
-            {: RESULT = parser.nf.SuperCall(parser.pos(a), b); :}
+        SUPER:a LPAREN argument_list_opt:b RPAREN:y SEMICOLON
+            {: RESULT = parser.nf.SuperCall(parser.pos(a,y), b); :}
     ;
 drop {
     explicit_constructor_invocation ::=
@@ -604,16 +604,16 @@ parameters ::=
     ;
 parameter ::=
             // ParamDecl
-    LABEL IDENTIFIER:a
-        {: RESULT = parser.nf.ParamDecl(parser.pos(a),
+    LABEL:x IDENTIFIER:a
+        {: RESULT = parser.nf.ParamDecl(parser.pos(x, a),
                                         ParamInstance.INVARIANT_LABEL,
                                         a.getIdentifier()); :}
-    |   COVARIANT LABEL IDENTIFIER:a
-        {: RESULT = parser.nf.ParamDecl(parser.pos(a),
+    |   COVARIANT:x LABEL IDENTIFIER:a
+        {: RESULT = parser.nf.ParamDecl(parser.pos(x, a),
                                         ParamInstance.COVARIANT_LABEL,
                                         a.getIdentifier()); :}
-    |   PRINCIPAL IDENTIFIER:a
-        {: RESULT = parser.nf.ParamDecl(parser.pos(a),
+    |   PRINCIPAL:x IDENTIFIER:a
+        {: RESULT = parser.nf.ParamDecl(parser.pos(x, a),
                                         ParamInstance.PRINCIPAL,
                                         a.getIdentifier()); :}
     ;
@@ -644,12 +644,12 @@ constraints ::=
     
 constraint ::=
         // ConstraintNode
-        AUTHORITY:n LPAREN principal_list:a RPAREN
-        {: RESULT = parser.nf.AuthConstraintNode(parser.pos(n), a); :}
-    |   CALLER:n LPAREN principal_list:a RPAREN
-        {: RESULT = parser.nf.CallerConstraintNode(parser.pos(n), a); :}
-    |   ACTSFOR:n LPAREN principal:a COMMA principal:b RPAREN
-        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(n), a, b); :}
+        AUTHORITY:x LPAREN principal_list:a RPAREN:y
+        {: RESULT = parser.nf.AuthConstraintNode(parser.pos(x,y), a); :}
+    |   CALLER:x LPAREN principal_list:a RPAREN:y
+        {: RESULT = parser.nf.CallerConstraintNode(parser.pos(x,y), a); :}
+    |   ACTSFOR:x LPAREN principal:a COMMA principal:b RPAREN:y
+        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(x,y), a, b); :}
     ;
 
 // 19.9.1) Interface Declarations
@@ -658,7 +658,7 @@ override interface_declaration ::=
         modifiers_opt:a INTERFACE:n IDENTIFIER:b
                 parameters_opt:p invariant_opt:i
                 extends_interfaces_opt:d authority_opt:u interface_body:e
-            {: RESULT = parser.nf.JifClassDecl(parser.pos(b),
+            {: RESULT = parser.nf.JifClassDecl(parser.pos(n,b),
 		    a.set(Flags.INTERFACE), b.getIdentifier(),
 		    p, i.booleanValue(), null, d, u, e); :} 
     ;
@@ -743,36 +743,36 @@ labelcase_else ::=
 actsfor_statement ::=
                     // ActsFor
         ACTSFOR:n LPAREN principal:a COMMA principal:b RPAREN statement:c
-            {: RESULT = parser.nf.ActsFor(parser.pos(n), a, b, c); :}
+            {: RESULT = parser.nf.ActsFor(parser.pos(n, c), a, b, c); :}
     ;
 actsfor_else_statement ::=
                     // ActsFor
         ACTSFOR:n LPAREN principal:a COMMA principal:b RPAREN
             statement_no_short_if:c ELSE statement:d
-            {: RESULT = parser.nf.ActsFor(parser.pos(n), a, b, c, d); :}
+            {: RESULT = parser.nf.ActsFor(parser.pos(n, d), a, b, c, d); :}
     ;
 actsfor_else_statement_no_short_if ::=
                     // ActsFor
         ACTSFOR:n LPAREN principal:a COMMA principal:b RPAREN
             statement_no_short_if:c ELSE statement_no_short_if:d
-            {: RESULT = parser.nf.ActsFor(parser.pos(n), a, b, c, d); :}
+            {: RESULT = parser.nf.ActsFor(parser.pos(n, d), a, b, c, d); :}
     ;
 declassify_statement ::=
                     // DeclassifyStmt
         DECLASSIFY:n LPAREN label:a RPAREN statement:b
-            {: RESULT = parser.nf.DeclassifyStmt(parser.pos(n),
+            {: RESULT = parser.nf.DeclassifyStmt(parser.pos(n, b),
                             parser.nf.CanonicalLabelNode(parser.pos(n), parser.ts.topLabel(parser.pos(n))),
                             a, b); :}
     |   DECLASSIFY:n LPAREN label:a COMMA label:b RPAREN statement:c
-            {: RESULT = parser.nf.DeclassifyStmt(parser.pos(n), a, b, c); :}
+            {: RESULT = parser.nf.DeclassifyStmt(parser.pos(n, c), a, b, c); :}
     ;
 
 // 19.12) Expr           // Expr
 extend primary ::=
         NEW:n LABEL label:a
-            {: RESULT = parser.nf.NewLabel(parser.pos(n), a); :}
+            {: RESULT = parser.nf.NewLabel(parser.pos(n, a), a); :}
     |   NEW:n objtype_or_expr:a
-            {: RESULT = a.toNewArray(parser.pos(n)); :}
+            {: RESULT = a.toNewArray(parser.pos(n, a)); :}
     ;
 extend primary_no_new_array ::=
         primary_no_array:a
@@ -810,22 +810,22 @@ drop { /* no inner classes... */
 
 class_instance_creation_expression ::=
                     // NewObjectExpr
-        NEW objtype_or_expr:a label_opt:l LPAREN argument_list_opt:b RPAREN
+        NEW:x objtype_or_expr:a label_opt:l LPAREN argument_list_opt:b RPAREN:y
             {:  TypeNode tn = a.toUnlabeledType();
 		if (l != null) 
-		    tn = parser.nf.LabeledTypeNode(parser.pos(a), tn, l);
-		RESULT = parser.nf.New(parser.pos(a), tn, b); :}
+		    tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
+		RESULT = parser.nf.New(parser.pos(x,y), tn, b); :}
     ;
 
 override array_creation_expression ::=
         NEW:n objtype_or_expr:a dims:b array_initializer:c
-            {: RESULT = parser.nf.NewArray(parser.pos(n), a.toType(),
+            {: RESULT = parser.nf.NewArray(parser.pos(n,c), a.toType(),
                                        b.intValue(), c); :}
     |   NEW:n primitive_type:a dim_exprs:b dims_opt:c
-            {: RESULT = parser.nf.NewArray(parser.pos(n), a, b,
+            {: RESULT = parser.nf.NewArray(parser.pos(n,c), a, b,
                                            c.intValue()); :}
     |   NEW:n primitive_type:a dims:b array_initializer:c
-            {: RESULT = parser.nf.NewArray(parser.pos(n), a,
+            {: RESULT = parser.nf.NewArray(parser.pos(n,c), a,
                                            b.intValue(), c); :}
     ;
 drop { field_access ::=
@@ -835,7 +835,7 @@ drop { field_access ::=
 }
 extend field_access ::=
         primary_no_new_array:a DOT IDENTIFIER:b
-        {: RESULT = parser.nf.Field(parser.pos(b), a,
+        {: RESULT = parser.nf.Field(parser.pos(a, b), a,
                     b.getIdentifier()); :}
     ;
 drop {
@@ -847,27 +847,27 @@ drop {
 }
 extend method_invocation ::=
                     // MethodExpr
-        reftype_or_expr:a LPAREN argument_list_opt:b RPAREN
+        reftype_or_expr:a LPAREN argument_list_opt:b RPAREN:y
         {: if (! (a instanceof Name)) parser.die(parser.pos(a));
            Name n = (Name) a;
-               RESULT = parser.nf.Call(parser.pos(a),
+               RESULT = parser.nf.Call(parser.pos(a,y),
                        n.prefix == null ? null
 					: n.prefix.toReceiver(),
                        n.name, b); :}
-    |   primary_no_new_array:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
-            {: RESULT = parser.nf.Call(parser.pos(b), a,
+    |   primary_no_new_array:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:y
+            {: RESULT = parser.nf.Call(parser.pos(a,y), a,
                                        b.getIdentifier(), c); :}
     ;
 
 declassify ::=
                     // DeclassifyExpr
-        DECLASSIFY LPAREN expression:a COMMA label:b RPAREN
-            {: RESULT = parser.nf.DeclassifyExpr(parser.pos(a), a,
-			parser.nf.CanonicalLabelNode(parser.pos(a),
-			parser.ts.topLabel(parser.pos(a)) ), b);
+        DECLASSIFY:x LPAREN expression:a COMMA label:b RPAREN:y
+            {: RESULT = parser.nf.DeclassifyExpr(parser.pos(x,y), a,
+			parser.nf.CanonicalLabelNode(parser.pos(b),
+			parser.ts.topLabel(parser.pos(b)) ), b);
 	    :}
-    |   DECLASSIFY LPAREN expression:a COMMA label:b COMMA label:c RPAREN
-            {: RESULT = parser.nf.DeclassifyExpr(parser.pos(a), a, b, c); :}
+    |   DECLASSIFY:x LPAREN expression:a COMMA label:b COMMA label:c RPAREN:y
+            {: RESULT = parser.nf.DeclassifyExpr(parser.pos(x,y), a, b, c); :}
     ;
 
 param_or_expr_list ::=
@@ -893,7 +893,7 @@ objtype_or_expr ::=
             {: RESULT = new Name(parser, parser.pos(a), null,
                                  a.getIdentifier()); :}
     |   objtype_or_expr:a DOT IDENTIFIER:b
-            {: RESULT = new Name(parser, parser.pos(a), a,
+            {: RESULT = new Name(parser, parser.pos(a,b), a,
                                  b.getIdentifier()); :}
     |   objtype_or_expr:a LBRACK param_or_expr_list:b RBRACK
 	    {: RESULT = parser.makeAccessOrInst(a,b); :}
@@ -908,14 +908,14 @@ reftype_or_expr ::=
             {: RESULT = new Name(parser, parser.pos(a), null,
                                  a.getIdentifier()); :}
     |   reftype_or_expr:a DOT IDENTIFIER:b
-            {: RESULT = new Name(parser, parser.pos(b), a,
+            {: RESULT = new Name(parser, parser.pos(a,b), a,
                                  b.getIdentifier()); :}
     |   reftype_or_expr:a LBRACK param_or_expr_list:b RBRACK
             {:  RESULT = parser.makeAccessOrInst(a,b); :}
-    |   reftype_or_expr:a LBRACK RBRACK
-            {: RESULT = new Array(parser, parser.pos(a), a.toType()); :}
+    |   reftype_or_expr:a LBRACK RBRACK:y
+            {: RESULT = new Array(parser, parser.pos(a,y), a.toType()); :}
     |   reftype_or_expr:a label:b
-            {: RESULT = new LabeledExpr(parser, parser.pos(b), a, b); :}
+            {: RESULT = new LabeledExpr(parser, parser.pos(a,b), a, b); :}
     ;
 drop {
     array_access ::=
@@ -929,7 +929,7 @@ extend array_access ::=
             {: Expr x = a;
                for (Iterator i = b.iterator(); i.hasNext(); ) {
                     Expr e = (Expr) i.next();
-                    x = parser.nf.ArrayAccess(parser.pos(a), x, e);
+                    x = parser.nf.ArrayAccess(parser.pos(a,b), x, e);
                }
                RESULT = (ArrayAccess) x;
 	    :}
@@ -947,8 +947,8 @@ drop {
 }
 extend cast_expression ::=
                     // Cast
-        LPAREN labeled_primitive_type:a dims_opt:b RPAREN unary_expression:c
-            {: RESULT = parser.nf.Cast(parser.pos(a),
+        LPAREN:x labeled_primitive_type:a dims_opt:b RPAREN unary_expression:c
+            {: RESULT = parser.nf.Cast(parser.pos(x,c),
                                    parser.array(a, b.intValue()), c); :}
     ;
 

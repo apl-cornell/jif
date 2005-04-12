@@ -17,7 +17,7 @@ public interface JifNodeFactory extends NodeFactory {
     AmbParamTypeOrAccess AmbParamTypeOrAccess(Position pos, Receiver base, String name);
     JoinLabelNode JoinLabelNode(Position pos, List components);
     PolicyLabelNode PolicyLabelNode(Position pos, PrincipalNode owner, List readers);
-    AmbDynamicLabelNode AmbDynamicLabelNode(Position pos, String name);
+    AmbDynamicLabelNode AmbDynamicLabelNode(Position pos, Expr expr);
     AmbVarLabelNode AmbVarLabelNode(Position pos, String name);
     AmbThisLabelNode AmbThisLabelNode(Position pos);
     CanonicalLabelNode CanonicalLabelNode(Position pos, Label label);

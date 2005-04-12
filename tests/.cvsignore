@@ -1,2 +1,4 @@
 pthOutput*
 pthScript.results
+*.java
+*.class

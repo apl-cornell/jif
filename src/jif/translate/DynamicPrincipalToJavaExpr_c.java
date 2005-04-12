@@ -8,6 +8,6 @@ import polyglot.types.SemanticException;
 public class DynamicPrincipalToJavaExpr_c extends PrincipalToJavaExpr_c {
     public Expr toJava(Principal principal, JifToJavaRewriter rw) throws SemanticException {
         DynamicPrincipal p = (DynamicPrincipal) principal;
-        return rw.qq().parseExpr(p.path().toString());
+        return rw.qq().parseExpr(p.path().exprString());
     }
 }

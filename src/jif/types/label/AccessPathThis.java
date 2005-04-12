@@ -52,6 +52,9 @@ public class AccessPathThis extends AccessPathRoot {
         return "this";
     }
     
+    public String exprString() {
+        return "this";
+    }
     public boolean equals(Object o) {
         if (o instanceof AccessPathThis) {
             if (ct == null) return true;

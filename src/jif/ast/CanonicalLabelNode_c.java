@@ -1,5 +1,6 @@
 package jif.ast;
 
+import jif.extension.LabelTypeCheckUtil;
 import jif.types.JifTypeSystem;
 import jif.types.label.DynamicLabel;
 import jif.types.label.Label;
@@ -16,13 +17,7 @@ public class CanonicalLabelNode_c extends LabelNode_c implements CanonicalLabelN
 	super(pos, label);
     }
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        if (label() instanceof DynamicLabel) {
-            DynamicLabel dl = (DynamicLabel)label();
-            JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-            if (!ts.isLabel(dl.path().type())) {
-                throw new SemanticException("The type of a dynamic label must be \"label\"", this.position());
-            }
-        }
+        LabelTypeCheckUtil.typeCheckLabel(tc, label());        
         return super.typeCheck(tc);
     }
 }

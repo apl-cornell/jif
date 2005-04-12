@@ -84,8 +84,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public AmbDynamicLabelNode AmbDynamicLabelNode(Position pos, String name) {
-        AmbDynamicLabelNode n = new AmbDynamicLabelNode_c(pos, name);
+    public AmbDynamicLabelNode AmbDynamicLabelNode(Position pos, Expr expr) {
+        AmbDynamicLabelNode n = new AmbDynamicLabelNode_c(pos, expr);
         n = (AmbDynamicLabelNode)n.ext(jifExtFactory().extAmbDynamicLabelNode());
         n = (AmbDynamicLabelNode)n.del(delFactory().delNode());
         return n;

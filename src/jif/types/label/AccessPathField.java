@@ -37,6 +37,9 @@ public class AccessPathField extends AccessPath {
     public String toString() {
         return path + "." + fieldName;
     }
+    public String exprString() {
+        return path.exprString() + "." + fieldName;
+    }	
     public boolean equals(Object o) {
         if (o instanceof AccessPathField) {
             AccessPathField that = (AccessPathField)o; 

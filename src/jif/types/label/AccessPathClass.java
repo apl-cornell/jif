@@ -29,6 +29,10 @@ public class AccessPathClass extends AccessPathRoot {
         }
         return ct.name();
     }
+
+    public String exprString() {
+        return ct.fullName();
+    }	
     
     public boolean equals(Object o) {
         if (o instanceof AccessPathClass) {

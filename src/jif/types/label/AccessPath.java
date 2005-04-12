@@ -28,5 +28,6 @@ public abstract class AccessPath implements Serializable {
      * @param A
      */
     public void verify(JifContext A) throws SemanticException {}
+    public String exprString() { return toString(); }
     public final String translate(Resolver c) { throw new UnsupportedOperationException(); }
 }

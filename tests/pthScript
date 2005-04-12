@@ -84,6 +84,13 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	DynPrin6.jif (Semantic, "Field.*is not final");
 	DynPrin7.jif ;
 	DynPrin8.jif (Syntax);
+	DynLabel1.jif ;
+	DynLabel2.jif (Semantic, "Non-final.*access path"), (Semantic, "Non-final.*access path");
+	DynLabel3.jif (Semantic, "Field.*is not final"), (Semantic, "Field.*is not final");
+	DynLabel4.jif (Semantic, "type .*must be .*label");
+	DynLabel5.jif (Semantic, "type .*must be .*label");
+	DynLabel6.jif (Semantic, "access path .*not a reference type");
+	DynLabel7.jif (Syntax);
 	EmptyList.jif List.jif;
 	EmptyList2.jif ;
 	Exc.jif ;
