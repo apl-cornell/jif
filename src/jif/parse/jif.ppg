@@ -245,7 +245,7 @@ non terminal LabelNode label, label_opt, return_label_opt;
 non terminal List component_list;
 non terminal LabelNode label_component;
 non terminal PrincipalNode principal;
-non terminal Amb accesspath;
+non terminal Amb accesspath_or_id;
 non terminal List principal_list, readers;
 non terminal ActsFor actsfor_statement;
 non terminal ActsFor actsfor_else_statement;
@@ -331,15 +331,15 @@ principal_list ::=
     ;
 principal ::=
                     // PrincipalNode
-        accesspath:a
+        accesspath_or_id:a
             {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a),
                            a.toExpr()); :}
     ;
 
-accesspath ::= 
+accesspath_or_id ::= 
         THIS:a {:  RESULT = new Name(parser, parser.pos(a), "this");  :}
     |   IDENTIFIER:a {: RESULT = new Name(parser, parser.pos(a), a.getIdentifier()); :}
-    | accesspath:a DOT IDENTIFIER:b 
+    | accesspath_or_id:a DOT IDENTIFIER:b 
              {: RESULT = new Name(parser, parser.pos(b), a,  b.getIdentifier()); :}
      ;
 
