@@ -6,6 +6,7 @@ import polyglot.types.*;
 import polyglot.types.ClassType;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * TODO Documentation
@@ -17,7 +18,8 @@ public class AccessPathThis extends AccessPathRoot {
      * 
      * @param ct may be null.
      */
-    public AccessPathThis(ClassType ct) {
+    public AccessPathThis(ClassType ct, Position pos) {
+        super(pos);
         this.ct = ct;
     }
     

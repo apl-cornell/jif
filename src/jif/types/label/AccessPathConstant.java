@@ -4,6 +4,7 @@ import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * TODO Documentation
@@ -16,11 +17,13 @@ public class AccessPathConstant extends AccessPathRoot {
      */
     private Object constantValue;
     private boolean isLabel;
-    public AccessPathConstant(Label label) {
+    public AccessPathConstant(Label label, Position pos) {
+        super(pos);
         this.constantValue = label;
         this.isLabel = true;
     }
-    public AccessPathConstant(Principal principal) {
+    public AccessPathConstant(Principal principal, Position pos) {
+        super(pos);
         this.constantValue = principal;
         this.isLabel = false;
     }

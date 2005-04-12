@@ -1,6 +1,6 @@
 class DynPrin1 {
     final principal{} f;
-    DynPrin1{} g;
+    final DynPrin1{} g;
 
     DynPrin1(principal{} p, DynPrin1{} o) {
 	this.f = p;

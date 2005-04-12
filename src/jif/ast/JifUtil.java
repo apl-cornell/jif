@@ -6,6 +6,7 @@ import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * An implementation of the <code>Jif</code> interface. 
@@ -91,10 +92,10 @@ public class JifUtil
      * @param vi
      * @return
      */
-    public static AccessPath varInstanceToAccessPath(JifVarInstance vi) {
+    public static AccessPath varInstanceToAccessPath(JifVarInstance vi, Position pos) {
         if (vi instanceof LocalInstance) {
             if (((LocalInstance)vi).flags().isFinal()) {
-                return new AccessPathLocal((LocalInstance)vi, vi.name());
+                return new AccessPathLocal((LocalInstance)vi, vi.name(), pos);
             }
         }
         else if (vi instanceof FieldInstance) {
@@ -103,12 +104,12 @@ public class JifUtil
             if (fi.flags().isFinal() && (ts.isLabel(fi.type()) || ts.isPrincipal(fi.type()))) {
                 AccessPathRoot root;
                 if (fi.flags().isStatic()) {
-                    root = new AccessPathClass(fi.container().toClass());                    
+                    root = new AccessPathClass(fi.container().toClass(), pos);                    
                 }
                 else {
-                    root = new AccessPathThis(fi.container().toClass());
+                    root = new AccessPathThis(fi.container().toClass(), pos);
                 }
-                return new AccessPathField(root, fi, fi.name());
+                return new AccessPathField(root, fi, fi.name(), pos);
             }            
         }
         throw new InternalCompilerError("Unexpected var instance " + vi.getClass());
@@ -118,12 +119,9 @@ public class JifUtil
      * @return
      */
     public static AccessPath exprToAccessPath(Expr e, ReferenceType currentClass) {
-        return exprToAccessPathImpl(e, currentClass);
-    }
-    private static AccessPath exprToAccessPathImpl(Node e, ReferenceType currentClass) {
         if (e instanceof Local) {
            Local l = (Local)e;
-           return new AccessPathLocal(l.localInstance(), l.name());
+           return new AccessPathLocal(l.localInstance(), l.name(), e.position());
         }
         else if (e instanceof Field) {
             Field f = (Field)e;
@@ -133,22 +131,21 @@ public class JifUtil
                 if (f.isTypeChecked()) {
                     container = f.fieldInstance().container();
                 }
-                AccessPath prefix = exprToAccessPathImpl(f.target(), container);
-                return new AccessPathField(prefix, f.fieldInstance(), f.name());
+                AccessPath prefix = exprToAccessPath((Expr)f.target(), container);
+                return new AccessPathField(prefix, f.fieldInstance(), f.name(), f.position());
             }
             else if (target instanceof TypeNode && ((TypeNode)target).type().isClass()){
-                AccessPath prefix = new AccessPathClass(((TypeNode)target).type().toClass());
-                return new AccessPathField(prefix, f.fieldInstance(), f.name());
+                AccessPath prefix = new AccessPathClass(((TypeNode)target).type().toClass(), target.position());
+                return new AccessPathField(prefix, f.fieldInstance(), f.name(), f.position());
             }
             else {
-                AccessPath prefix = exprToAccessPathImpl(f.target(), null);
-                return new AccessPathField(prefix, f.fieldInstance(), f.name());
+                throw new InternalCompilerError("Not currently supporting access paths for targets of " + target.getClass());
             }
         }
         else if (e instanceof Special) {
             Special s = (Special)e;
             if (Special.THIS.equals(s.kind())) {
-                return new AccessPathThis((ClassType)currentClass);
+                return new AccessPathThis((ClassType)currentClass, s.position());
             }
             else {
                 throw new InternalCompilerError("Not currently supporting access paths for special of kind " + s.kind());
@@ -168,11 +165,11 @@ public class JifUtil
 //        }
         else if (e instanceof NewLabel) {
             NewLabel nl = (NewLabel)e;
-            return new AccessPathConstant(nl.label().label());
+            return new AccessPathConstant(nl.label().label(), nl.position());
         }
         else if (e instanceof PrincipalNode) {
             PrincipalNode pn = (PrincipalNode)e;
-            return new AccessPathConstant(pn.principal());
+            return new AccessPathConstant(pn.principal(), pn.position());
         }
         throw new InternalCompilerError("Expression " + e + " not suitable for an access path: " + e.getClass());
     }        

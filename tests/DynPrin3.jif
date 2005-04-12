@@ -1,15 +1,15 @@
-class DynPrin1 {
+class DynPrin3 {
     final principal{} f;
-    DynPrin1{} g;
+    DynPrin3{} g;
 
-    DynPrin1(principal{} p, DynPrin1{} o) {
+    DynPrin3(principal{} p, DynPrin3{} o) {
 	this.f = p;
 	this.g = o;
     }
   
     void m(principal{} q) {	
-	final DynPrin1 local = new DynPrin1(q, null);
+	final DynPrin3 local = new DynPrin3(q, null);
 
-	int{local:} x1; // not ok
+	int{local:} x1; // not ok, expression of wrong type
     }
 }

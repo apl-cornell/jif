@@ -5,6 +5,7 @@ import polyglot.types.*;
 import polyglot.types.LocalInstance;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * TODO Documentation
@@ -13,7 +14,8 @@ import polyglot.util.InternalCompilerError;
 public class AccessPathLocal extends AccessPathRoot {
     private LocalInstance li;
     private String name;
-    public AccessPathLocal(LocalInstance li, String name) {
+    public AccessPathLocal(LocalInstance li, String name, Position pos) {
+        super(pos);
         this.li = li;
         this.name = name;
         if (li != null && !name.equals(li.name())) {
@@ -70,7 +72,7 @@ public class AccessPathLocal extends AccessPathRoot {
             }
         }
         if (!li.flags().isFinal()) {
-            throw new SemanticException("Non-final local variable used in access path");
+            throw new SemanticException("Non-final local variable used in access path", position());
         }
     }
 }

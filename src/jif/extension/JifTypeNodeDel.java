@@ -28,6 +28,11 @@ public class JifTypeNodeDel extends JifJL_c
         TypeNode tn = (TypeNode) super.typeCheck(tc);
         
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
+        if (ts.isLabeled(tn.type())) {
+            Label L = ts.labelOfType(tn.type());
+            LabelTypeCheckUtil.typeCheckLabel(tc, L);
+        }
+        
         Type unlabeledType = ts.unlabel(tn.type()); 
         if (unlabeledType instanceof JifParsedPolyType) {
             JifParsedPolyType jppt = (JifParsedPolyType)unlabeledType;

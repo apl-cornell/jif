@@ -29,20 +29,17 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         return expr + "{amb}";
     }
     
-    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
+        // if the expression is just a single name, we disambiguate using
+        // the method disambiguateName, since it could be a param or an external principal
         if (expr instanceof AmbExpr) {
-            // avoiding visiting the child if it is just a single name.
-            return ar.bypassChildren(this);
+            AmbExpr ae = (AmbExpr)expr;
+            return disambiguateName(ar, ae.name());
         }
-        return ar;
+        return null;
     }
     
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-        if (expr instanceof AmbExpr) {
-            AmbExpr ae = (AmbExpr)expr;
-            return disambiguateName(sc, ae.name());
-        }
-        
 //        // if expression contains any ambiguous nodes, do nothing...
 //        final boolean[] allOk = new boolean[] { true };
 //        expr.visit(new NodeVisitor() {
@@ -109,7 +106,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         
         if (vi.flags().isFinal()) {
             return nf.CanonicalPrincipalNode(position(),
-                                             ts.dynamicPrincipal(position(), JifUtil.varInstanceToAccessPath(vi)));
+                                             ts.dynamicPrincipal(position(), JifUtil.varInstanceToAccessPath(vi, this.position())));
         }
         
         throw new SemanticException(vi + " is not a final variable " +

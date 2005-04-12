@@ -2,13 +2,15 @@ package jif.types.label;
 
 import polyglot.main.Report;
 import polyglot.types.Type;
+import polyglot.util.Position;
 
 /**
  * TODO Documentation
  * Represent a final access path rooted at "this".
  */
 public class AccessPathUninterpreted extends AccessPathRoot {
-    public AccessPathUninterpreted() {
+    public AccessPathUninterpreted(Position pos) {
+        super(pos);
     }
     
     public boolean isCanonical() { return true; }

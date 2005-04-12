@@ -1,15 +1,15 @@
-class DynPrin1 {
+class DynPrin7 {
     final principal{} f;
-    DynPrin1{} g;
+    DynPrin7{} g;
     final M m = new M();
 
-    DynPrin1(principal{} p, DynPrin1{} o) {
+    DynPrin7(principal{} p, DynPrin7{} o) {
 	this.f = p;
 	this.g = o;
     }
   
     void m(principal{} q) {	
-	final DynPrin1 local = new DynPrin1(q, null);
+	final DynPrin7 local = new DynPrin7(q, null);
 
 	int{m.p:} x1; // ok
     }

@@ -2,7 +2,10 @@ package jif.ast;
 
 import java.util.List;
 
+import jif.extension.LabelTypeCheckUtil;
+import jif.types.JifContext;
 import jif.types.JifTypeSystem;
+import jif.types.label.AccessPath;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
@@ -21,13 +24,7 @@ public class CanonicalPrincipalNode_c extends PrincipalNode_c implements Canonic
     }
     
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        if (principal instanceof DynamicPrincipal) {
-            DynamicPrincipal dp = (DynamicPrincipal)principal;
-            JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-            if (!ts.isPrincipal(dp.path().type())) {
-                throw new SemanticException("The type of a dynamic label must be \"principal\"", this.position());
-            }
-        }
+        LabelTypeCheckUtil.typeCheckPrincipal(tc, principal);        
         return super.typeCheck(tc);
     }
 

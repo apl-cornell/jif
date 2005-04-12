@@ -5,6 +5,7 @@ import jif.types.JifContext;
 import jif.types.PathMap;
 import polyglot.main.Report;
 import polyglot.types.*;
+import polyglot.util.Position;
 
 /**
  * TODO Documentation
@@ -12,7 +13,8 @@ import polyglot.types.*;
  */
 public class AccessPathClass extends AccessPathRoot {
     private ClassType ct;
-    public AccessPathClass(ClassType ct) {
+    public AccessPathClass(ClassType ct, Position pos) {
+        super(pos);
         this.ct = ct;
     }
     

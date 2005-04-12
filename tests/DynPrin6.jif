@@ -1,17 +1,17 @@
-class DynPrin1 {
+class DynPrin6 {
     final principal{} f;
-    DynPrin1{} g;
+    DynPrin6{} g;
     M m;
 
-    DynPrin1(principal{} p, DynPrin1{} o) {
+    DynPrin6(principal{} p, DynPrin6{} o) {
 	this.f = p;
 	this.g = o;
     }
   
     void m(principal{} q) {	
-	final DynPrin1 local = new DynPrin1(q, null);
+	final DynPrin6 local = new DynPrin6(q, null);
 
-	int{m.p:} x1; // not ok
+	int{m.p:} x1; // not ok, m not final
     }
 }
 

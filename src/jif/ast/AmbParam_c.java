@@ -119,7 +119,7 @@ public class AmbParam_c extends Node_c implements AmbParam
 	    }
 
 	    if (ts.isPrincipal(vi.type())) {
-		Principal p = ts.dynamicPrincipal(position(), JifUtil.varInstanceToAccessPath(vi));
+		Principal p = ts.dynamicPrincipal(position(), JifUtil.varInstanceToAccessPath(vi, this.position()));
 		return nf.CanonicalPrincipalNode(position(), p);
 	    }
 	}

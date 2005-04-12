@@ -36,7 +36,7 @@ public class JifInstantiator
                     Expr actualExpr = (Expr)iActualArgExprs.next();
                 
                     if (actualExpr != null) {
-                        L = L.subst((AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance()), 
+                        L = L.subst((AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), actualExpr.position()), 
                                     JifUtil.exprToAccessPath(actualExpr, callerClass));
                     }
                 }
@@ -67,7 +67,7 @@ public class JifInstantiator
                 Expr actualExpr = (Expr)iActualArgExprs.next();
                 
                 if (actualExpr != null) {
-                    p = p.subst((AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance()), 
+                    p = p.subst((AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), actualExpr.position()), 
                             JifUtil.exprToAccessPath(actualExpr, callerClass));
                 }
             }
@@ -102,7 +102,7 @@ public class JifInstantiator
             receiverPath = JifUtil.exprToAccessPath(receiverExpr, A.currentClass());
         }
         else {
-            receiverPath = new AccessPathUninterpreted(); 
+            receiverPath = new AccessPathUninterpreted(L.position()); 
         }
         return instantiate(L, A, receiverPath, receiverType, receiverLbl);
     }
@@ -126,7 +126,7 @@ public class JifInstantiator
         }
         
         if (receiverType.isClass()) {
-            L = L.subst(new AccessPathThis(receiverType.toClass()), receiverPath);
+            L = L.subst(new AccessPathThis(receiverType.toClass(), L.position()), receiverPath);
         }
         return L;
     }
@@ -162,11 +162,11 @@ public class JifInstantiator
             receiverPath = JifUtil.exprToAccessPath(receiverExpr, A.currentClass());
         }
         else {
-            receiverPath = new AccessPathUninterpreted(); // @@@@@Uninterpreted root?
+            receiverPath = new AccessPathUninterpreted(p.position()); // @@@@@Uninterpreted root?
         }
         
         if (receiverType.isClass()) {
-            p = p.subst(new AccessPathThis(receiverType.toClass()), receiverPath);
+            p = p.subst(new AccessPathThis(receiverType.toClass(), p.position()), receiverPath);
         }
         return p;
     }

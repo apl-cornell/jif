@@ -6,6 +6,7 @@ import polyglot.types.*;
 import polyglot.types.FieldInstance;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * TODO Documentation
@@ -16,7 +17,8 @@ public class AccessPathField extends AccessPath {
     private String fieldName;
     private AccessPath path;
 
-    public AccessPathField(AccessPath path, FieldInstance fi, String fieldName) {
+    public AccessPathField(AccessPath path, FieldInstance fi, String fieldName, Position pos) {
+        super(pos);
         this.fi = fi;
         this.path = path;
         this.fieldName = fieldName;
@@ -30,7 +32,7 @@ public class AccessPathField extends AccessPath {
         AccessPath newPath = path.subst(r, e);
         if (newPath == path) return this;
         
-        return new AccessPathField(newPath, fi, fieldName);
+        return new AccessPathField(newPath, fi, fieldName, position());
     }
     public String toString() {
         return path + "." + fieldName;
@@ -68,17 +70,21 @@ public class AccessPathField extends AccessPath {
         return X;
     }
     public void verify(JifContext A) throws SemanticException {
+        path.verify(A);
+        if (!path.type().isReference()) {
+            throw new SemanticException("Expression " + path + " used in final access path is not a reference type", position());
+        }
         FieldInstance found = path.type().toReference().fieldNamed(fieldName); 
-        if (fi == null) {            
+        if (fi == null || !fi.isCanonical()) {            
             fi = found;
         }
         else {
             if (!fi.equals(found)) {
-                throw new InternalCompilerError("Unexpected field instance for name " + fieldName);
+                throw new InternalCompilerError("Unexpected field instance for name " + fieldName + ": original was " + fi + "; found was " + found);
             }
         }
         if (!fi.flags().isFinal()) {
-            throw new SemanticException("Field in access path is not final");
+            throw new SemanticException("Field " + fi.name() + " in access path is not final", position());
         }
     }
 }

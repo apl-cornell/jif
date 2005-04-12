@@ -53,21 +53,6 @@ public abstract class PrincipalNode_c extends Expr_c implements PrincipalNode
     /** Type check the expression. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-        
-        if (principal instanceof DynamicPrincipal) {
-            // Make sure that the access path is set correctly
-            // check also that all field accesses are final, and that
-            // the type of the expression is principal
-            AccessPath path = ((DynamicPrincipal)principal).path();
-            try {
-                path.verify((JifContext)tc.context());                
-            }
-            catch (SemanticException e) {
-                throw new SemanticException(e.getMessage(), this.position());
-            }
-            //@@@@@ Check that expression is of type principal?
-            
-        }
         return type(ts.Principal());
     }
 }

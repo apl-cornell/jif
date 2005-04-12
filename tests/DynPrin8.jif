@@ -1,17 +1,17 @@
-class DynPrin1 {
+class DynPrin8 {
     final principal{} f;
-    DynPrin1{} g;
+    DynPrin8{} g;
     final M m = new M();
 
-    DynPrin1(principal{} p, DynPrin1{} o) {
+    DynPrin8(principal{} p, DynPrin8{} o) {
 	this.f = p;
 	this.g = o;
     }
   
     void m(principal{} q) {	
-	final DynPrin1 local = new DynPrin1(q, null);
+	final DynPrin8 local = new DynPrin8(q, null);
 
-	int{m.foo():} x1; // not ok
+	int{m.foo():} x1; // not ok, method calls not allowed
     }
 }
 
