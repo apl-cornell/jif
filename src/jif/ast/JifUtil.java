@@ -94,7 +94,7 @@ public class JifUtil
     public static AccessPath varInstanceToAccessPath(JifVarInstance vi) {
         if (vi instanceof LocalInstance) {
             if (((LocalInstance)vi).flags().isFinal()) {
-                return new AccessPathLocal((LocalInstance)vi);
+                return new AccessPathLocal((LocalInstance)vi, vi.name());
             }
         }
         else if (vi instanceof FieldInstance) {
@@ -108,7 +108,7 @@ public class JifUtil
                 else {
                     root = new AccessPathThis(fi.container().toClass());
                 }
-                return new AccessPathField(root, fi);
+                return new AccessPathField(root, fi, fi.name());
             }            
         }
         throw new InternalCompilerError("Unexpected var instance " + vi.getClass());
@@ -118,34 +118,54 @@ public class JifUtil
      * @return
      */
     public static AccessPath exprToAccessPath(Expr e, ReferenceType currentClass) {
+        return exprToAccessPathImpl(e, currentClass);
+    }
+    private static AccessPath exprToAccessPathImpl(Node e, ReferenceType currentClass) {
         if (e instanceof Local) {
            Local l = (Local)e;
-           if (l.localInstance().flags().isFinal()) {
-               return new AccessPathLocal(l.localInstance());
-           }
+           return new AccessPathLocal(l.localInstance(), l.name());
         }
         else if (e instanceof Field) {
             Field f = (Field)e;
-            if (f.fieldInstance().flags().isFinal()) {
-                Receiver target = f.target();
-                if (target instanceof Expr) {
-                    AccessPath prefix = exprToAccessPath((Expr)f.target(), f.fieldInstance().container());
-                    return new AccessPathField(prefix, f.fieldInstance());
+            Receiver target = f.target();
+            if (target instanceof Expr) {
+                ReferenceType container = null;
+                if (f.isTypeChecked()) {
+                    container = f.fieldInstance().container();
                 }
-                else {
-                    throw new InternalCompilerError("Not currently supporting access paths for " + target.getClass().getName());
-                }
+                AccessPath prefix = exprToAccessPathImpl(f.target(), container);
+                return new AccessPathField(prefix, f.fieldInstance(), f.name());
+            }
+            else if (target instanceof TypeNode && ((TypeNode)target).type().isClass()){
+                AccessPath prefix = new AccessPathClass(((TypeNode)target).type().toClass());
+                return new AccessPathField(prefix, f.fieldInstance(), f.name());
+            }
+            else {
+                AccessPath prefix = exprToAccessPathImpl(f.target(), null);
+                return new AccessPathField(prefix, f.fieldInstance(), f.name());
             }
         }
         else if (e instanceof Special) {
             Special s = (Special)e;
             if (Special.THIS.equals(s.kind())) {
-                return new AccessPathThis(currentClass.toClass());
+                return new AccessPathThis((ClassType)currentClass);
             }
             else {
                 throw new InternalCompilerError("Not currently supporting access paths for special of kind " + s.kind());
             }            
         }
+//        else if (e instanceof AmbReceiver) {
+//            AmbReceiver r = (AmbReceiver)e;            
+//            Prefix target = r.prefix();
+//            AccessPath prefix = exprToAccessPathImpl(target, null);
+//            return new AccessPathField(prefix, null, r.name());
+//        }
+//        else if (e instanceof AmbPrefix) {
+//            AmbPrefix r = (AmbPrefix)e;            
+//            Prefix target = r.prefix();
+//            AccessPath prefix = exprToAccessPathImpl(target, null);
+//            return new AccessPathField(prefix, null, r.name());
+//        }
         else if (e instanceof NewLabel) {
             NewLabel nl = (NewLabel)e;
             return new AccessPathConstant(nl.label().label());
@@ -154,20 +174,30 @@ public class JifUtil
             PrincipalNode pn = (PrincipalNode)e;
             return new AccessPathConstant(pn.principal());
         }
-        throw new InternalCompilerError("Expression " + e + " not suitable for an access path");
+        throw new InternalCompilerError("Expression " + e + " not suitable for an access path: " + e.getClass());
     }        
 
     private static boolean isFinalAccessExpr(JifTypeSystem ts, Expr e) {
         if (e instanceof Local) {
             Local l = (Local)e;
-            return l.localInstance().flags().isFinal();
+            if (e.isTypeChecked()) {
+                return l.localInstance().flags().isFinal();
+            }
+            else {
+                return true;
+            }
         }
         if (e instanceof Field) {
             Field f = (Field)e;
-            Flags flgs = f.flags();
-            return flgs.isFinal() && 
-                (flgs.isStatic() || 
-                 isFinalAccessExpr(ts, (Expr)f.target()));
+            if (f.isTypeChecked()) {
+                Flags flgs = f.flags();
+                return flgs.isFinal() && 
+                    (flgs.isStatic() || 
+                     isFinalAccessExpr(ts, (Expr)f.target()));
+            }
+            else {
+                return true;
+            }
         }
         if (e instanceof Special) {
             return ((Special)e).kind() == Special.THIS;          

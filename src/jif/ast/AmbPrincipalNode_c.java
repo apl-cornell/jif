@@ -2,22 +2,13 @@ package jif.ast;
 
 import java.util.List;
 
-import jif.parse.Name;
-import jif.parse.Wrapper;
 import jif.types.*;
-import jif.types.principal.*;
-import jif.types.principal.DynamicPrincipal_c;
 import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
-import polyglot.ast.Expr;
-import polyglot.ast.Node;
-import polyglot.ast.Term;
 import polyglot.types.*;
 import polyglot.util.Position;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.CFGBuilder;
-import polyglot.visit.NodeVisitor;
+import polyglot.visit.*;
 
 /** An implementation of the <code>AmbPrincipalNode</code> interface. 
  */
@@ -38,32 +29,52 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         return expr + "{amb}";
     }
     
-//    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
-//        if (expr instanceof Wrapper) {
-//            // avoiding visiting the child if it is just a single name.
-//            return ar.bypassChildren(this);
-//        }
-//        return ar;
-//    }
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
+        if (expr instanceof AmbExpr) {
+            // avoiding visiting the child if it is just a single name.
+            return ar.bypassChildren(this);
+        }
+        return ar;
+    }
     
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-        if (expr instanceof Wrapper) {
-            Wrapper w = (Wrapper)expr;
-            Name n = (Name)w.amb;
-            return disambiguateName(sc, n.name);
+        if (expr instanceof AmbExpr) {
+            AmbExpr ae = (AmbExpr)expr;
+            return disambiguateName(sc, ae.name());
         }
         
+//        // if expression contains any ambiguous nodes, do nothing...
+//        final boolean[] allOk = new boolean[] { true };
+//        expr.visit(new NodeVisitor() {
+//            public Node override(Node parent, Node n) {
+//                if (! allOk[0]) { return n; }
+//                
+//                System.out.println("  " + n + " :: " + n.getClass());
+//                // Don't check if New is disambiguated; this is handled
+//                // during type-checking.
+//                if (n instanceof Ambiguous) {
+//                    allOk[0] = false;
+//                    return n;
+//                }
+//                
+//                return null;
+//            }
+//        });
+//        
+//        if (!allOk[0]) {
+//            return this;
+//        }
+
         if (!expr.isDisambiguated()) {
             return this;
         }
-        
-        System.out.println("Disambiguating " + expr + " :: " + expr.isDisambiguated());
-        System.out.println("          " + expr.getClass());
+
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
         if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             throw new SemanticException("Only a final access path or constant can be used as a dynamic principal.");
         }
+
         return nf.CanonicalPrincipalNode(position(),
                                          ts.dynamicPrincipal(position(), JifUtil.exprToAccessPath(expr, sc.context().currentClass())));
     }
@@ -138,4 +149,10 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
     public Term entry() {
         return this;    
     }
+    public Node visitChildren(NodeVisitor v) {
+        Expr expr = (Expr) visitChild(this.expr, v);
+        if (this.expr == expr) { return this; }
+        return new AmbPrincipalNode_c(this.position, expr); 
+    }
+    
 }

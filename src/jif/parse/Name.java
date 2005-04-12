@@ -16,79 +16,88 @@ public class Name extends Amb {
     // prefix.name
     public String name;
     public Amb prefix;
-
+    
     public Name(Grm parser, Position pos, String name) throws Exception {
-	this(parser, pos, null, name);
+        this(parser, pos, null, name);
     }
-
+    
     public Name(Grm parser, Position pos, Amb prefix, String name) throws Exception {
-	super(parser, pos);
-	this.prefix = prefix;
-	this.name = name;
-
-	if (prefix instanceof LabeledExpr) parser.die(pos);
-	if (prefix instanceof Array) parser.die(pos);
+        super(parser, pos);
+        this.prefix = prefix;
+        this.name = name;
+        
+        if (prefix instanceof LabeledExpr) parser.die(pos);
+        if (prefix instanceof Array) parser.die(pos);
     }
-
+    
     public Expr toExpr() throws Exception {
-	if (prefix == null) {
-	    return parser.nf.AmbExpr(pos, name);
-	}
-
-	return parser.nf.Field(pos, prefix.toReceiver(), name);
+        if (prefix == null) {
+            if ("this".equals(name)) {
+                return parser.nf.This(pos);
+            }
+            return parser.nf.AmbExpr(pos, name);
+        }
+        
+        return parser.nf.Field(pos, prefix.toReceiver(), name);
     }
-
+    
     public Receiver toReceiver() throws Exception {
-	if (prefix == null) {
-	    return parser.nf.AmbReceiver(pos, name);
-	}
-
-	return parser.nf.AmbReceiver(pos, prefix.toPrefix(), name);
+        if (prefix == null) {
+            if ("this".equals(name)) {
+                return parser.nf.This(pos);
+            }
+            return parser.nf.AmbReceiver(pos, name);
+        }
+        
+        return parser.nf.AmbReceiver(pos, prefix.toPrefix(), name);
     }
-
+    
     public Prefix toPrefix() throws Exception {
-	if (prefix == null) {
-	    return parser.nf.AmbPrefix(pos, name);
-	}
-
-	return parser.nf.AmbPrefix(pos, prefix.toPrefix(), name);
+        if (prefix == null) {
+            if ("this".equals(name)) {
+                return parser.nf.This(pos);
+            }
+            return parser.nf.AmbPrefix(pos, name);
+        }
+        
+        return parser.nf.AmbPrefix(pos, prefix.toPrefix(), name);
     }
-
+    
     public PackageNode toPackage() throws Exception {
-	return parser.nf.PackageNode(pos,
-					parser.ts.packageForName(toName()));
+        return parser.nf.PackageNode(pos,
+                                     parser.ts.packageForName(toName()));
     }
-
+    
     public TypeNode toType() throws Exception {
-	if (prefix == null) {
-	    return parser.nf.AmbTypeNode(pos, name);
-	}
-
-	return parser.nf.AmbTypeNode(pos, prefix.toPackage(), name);
+        if (prefix == null) {
+            return parser.nf.AmbTypeNode(pos, name);
+        }
+        
+        return parser.nf.AmbTypeNode(pos, prefix.toPackage(), name);
     }
-
+    
     public TypeNode toClassType() throws Exception { return toType(); }
     public TypeNode toUnlabeledType() throws Exception { return toType(); }
-
+    
     public String toIdentifier() throws Exception {
-	if (prefix != null) {
-	    parser.die(pos);
-	}
-
-	return name;
+        if (prefix != null) {
+            parser.die(pos);
+        }
+        
+        return name;
     }
-
+    
     public String toName() throws Exception {
-	if (prefix == null) {
-	    return name;
-	}
-
-	return prefix.toName() + "." + name;
+        if (prefix == null) {
+            return name;
+        }
+        
+        return prefix.toName() + "." + name;
     }
-
+    
     public String toString() {
         try {
-         return toName();
+            return toName();
         }
         catch (Exception e) {
             return super.toString();
