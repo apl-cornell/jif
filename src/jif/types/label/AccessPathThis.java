@@ -1,13 +1,10 @@
 package jif.types.label;
 
 import jif.types.*;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.PathMap;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.types.ClassType;
-import polyglot.types.Resolver;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 
 /**
@@ -16,6 +13,10 @@ import polyglot.util.InternalCompilerError;
  */
 public class AccessPathThis extends AccessPathRoot {
     private ClassType ct;
+    /**
+     * 
+     * @param ct may be null.
+     */
     public AccessPathThis(ClassType ct) {
         this.ct = ct;
     }
@@ -23,7 +24,7 @@ public class AccessPathThis extends AccessPathRoot {
     public boolean isCanonical() { return true; }
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         if (r instanceof AccessPathThis) {            
-            if (ct.equals(((AccessPathThis)r).ct)) {
+            if (this.equals(r)) {
                 return e;
             }
             else {
@@ -37,24 +38,29 @@ public class AccessPathThis extends AccessPathRoot {
     }
     
     public String toString() {
+        String name = "<not-typechecked>";
         if (Report.should_report(Report.debug, 2)) { 
-            return "this(of " + ct.fullName() + ")";
+            if (ct != null) name = ct.fullName();
+            return "this(of " + name + ")";
         }
         if (Report.should_report(Report.debug, 1)) { 
-            return "this(of " + ct.name() + ")";
+            if (ct != null) name = ct.name();
+            return "this(of " + name + ")";
         }
         return "this";
     }
     
     public boolean equals(Object o) {
         if (o instanceof AccessPathThis) {
+            if (ct == null) return true;
             return ct.equals(((AccessPathThis)o).ct);
         }
         return false;        
     }
 
     public int hashCode() {
-        return ct.hashCode();
+        if (ct != null) return ct.hashCode();
+        return -572309;
     }
     public Type type() {
         return ct;
@@ -71,5 +77,15 @@ public class AccessPathThis extends AccessPathRoot {
     	// X(this).NV = this_label, which is upper-bounded by the begin label. 
     	X = X.NV(ct.thisLabel().join(A.pc()));	    	
         return X;
+    }
+    public void verify(JifContext A) throws SemanticException {
+        if (ct == null) {
+            ct = A.currentClass();
+        }
+        else {
+            if (!ct.equals(A.currentClass())) {
+                throw new InternalCompilerError("Unexpected class type for access path this");
+            }
+        }
     }
 }

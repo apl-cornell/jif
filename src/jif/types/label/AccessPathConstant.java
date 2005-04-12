@@ -2,7 +2,6 @@ package jif.types.label;
 
 import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
-import polyglot.types.Resolver;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 
@@ -63,7 +62,4 @@ public class AccessPathConstant extends AccessPathRoot {
         Principal p = (Principal)constantValue;
         return ((JifTypeSystem)p.typeSystem()).Principal();
     }
-    
-    
-
 }

@@ -2,13 +2,10 @@ package jif.types.label;
 
 import jif.ast.JifInstantiator;
 import jif.types.*;
-import jif.types.JifContext;
-import jif.types.PathMap;
-import polyglot.ast.Expr;
-import polyglot.ast.Field;
 import polyglot.types.*;
 import polyglot.types.FieldInstance;
-import polyglot.types.Resolver;
+import polyglot.types.Type;
+import polyglot.util.InternalCompilerError;
 
 /**
  * TODO Documentation
@@ -16,11 +13,16 @@ import polyglot.types.Resolver;
  */
 public class AccessPathField extends AccessPath {
     private FieldInstance fi;
+    private String fieldName;
     private AccessPath path;
 
-    public AccessPathField(AccessPath path, FieldInstance fi) {
+    public AccessPathField(AccessPath path, FieldInstance fi, String fieldName) {
         this.fi = fi;
         this.path = path;
+        this.fieldName = fieldName;
+        if (fi != null && !fieldName.equals(fi.name())) {
+            throw new InternalCompilerError("Inconsistent field names");
+        }
     }
     
     public boolean isCanonical() { return path.isCanonical(); }
@@ -28,23 +30,25 @@ public class AccessPathField extends AccessPath {
         AccessPath newPath = path.subst(r, e);
         if (newPath == path) return this;
         
-        return new AccessPathField(newPath, fi);
+        return new AccessPathField(newPath, fi, fieldName);
     }
     public String toString() {
-        return path + "." + fi.name();
+        return path + "." + fieldName;
     }
     public boolean equals(Object o) {
         if (o instanceof AccessPathField) {
             AccessPathField that = (AccessPathField)o; 
-            return this.fi.name().equals(that.fi.name()) && this.path.equals(that.path);
+            return this.fieldName.equals(that.fieldName) && this.path.equals(that.path);
         }
         return false;        
     }
-    public int hashCode() {
-        return path.hashCode() + fi.name().hashCode();
+    public int hashCode() {        
+        return path.hashCode() + fieldName.hashCode();
     }
+    
 
     public Type type() {
+        if (fi == null) return null;
         return fi.type();
     }
 
@@ -58,10 +62,23 @@ public class AccessPathField extends AccessPath {
         PathMap X = Xt.exc(Xt.NV(), ts.NullPointerException());
     	
         Label L = ts.labelOfField(fi, A.pc());
-        Label objLabel = Xt.NV();
         L = JifInstantiator.instantiate(L, A, path, path.type().toReference(), Xt.NV());
 
         X = X.NV(L.join(X.NV()));
         return X;
+    }
+    public void verify(JifContext A) throws SemanticException {
+        FieldInstance found = path.type().toReference().fieldNamed(fieldName); 
+        if (fi == null) {            
+            fi = found;
+        }
+        else {
+            if (!fi.equals(found)) {
+                throw new InternalCompilerError("Unexpected field instance for name " + fieldName);
+            }
+        }
+        if (!fi.flags().isFinal()) {
+            throw new SemanticException("Field in access path is not final");
+        }
     }
 }

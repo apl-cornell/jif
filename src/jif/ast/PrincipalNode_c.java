@@ -1,13 +1,13 @@
 package jif.ast;
 
-import jif.types.JifTypeSystem;
-import jif.types.Param;
+import jif.types.*;
+import jif.types.label.AccessPath;
+import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
 import polyglot.ext.jl.ast.Expr_c;
 import polyglot.types.SemanticException;
 import polyglot.util.Position;
-import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>PrincipalNode</code> interface. 
@@ -52,6 +52,22 @@ public abstract class PrincipalNode_c extends Expr_c implements PrincipalNode
     
     /** Type check the expression. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return type(((JifTypeSystem)tc.typeSystem()).Principal());
+        JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
+        
+        if (principal instanceof DynamicPrincipal) {
+            // Make sure that the access path is set correctly
+            // check also that all field accesses are final, and that
+            // the type of the expression is principal
+            AccessPath path = ((DynamicPrincipal)principal).path();
+            try {
+                path.verify((JifContext)tc.context());                
+            }
+            catch (SemanticException e) {
+                throw new SemanticException(e.getMessage(), this.position());
+            }
+            //@@@@@ Check that expression is of type principal?
+            
+        }
+        return type(ts.Principal());
     }
 }

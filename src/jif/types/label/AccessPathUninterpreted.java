@@ -1,7 +1,6 @@
 package jif.types.label;
 
 import polyglot.main.Report;
-import polyglot.types.Resolver;
 import polyglot.types.Type;
 
 /**
