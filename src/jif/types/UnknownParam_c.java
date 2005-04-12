@@ -21,11 +21,6 @@ public class UnknownParam_c extends TypeObject_c
 	return false;
     }
 
-    public String translate(Resolver c) {
-	throw new InternalCompilerError(
-	    "Cannot translate an unknown parameter.");
-    }
-
     public String toString() {
 	return "<unknown param>";
     }

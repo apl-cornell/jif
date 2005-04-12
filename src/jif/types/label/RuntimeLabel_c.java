@@ -46,9 +46,6 @@ public class RuntimeLabel_c extends Label_c implements RuntimeLabel {
         // TS already tested against TOP and Runtime.  Anything else is false.
         return false;
     }    
-    public void translate(Resolver c, CodeWriter w) {
-        throw new InternalCompilerError("Cannot translate label \"" + this + "\".");
-    }
     public Label subst(LocalInstance arg, Label l) {
         return this;
     }

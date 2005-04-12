@@ -56,9 +56,6 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
         // this method is called.
         return false;
     }
-    public void translate(Resolver c, CodeWriter w) {
-        throw new InternalCompilerError("Cannot translate " + this);
-    }
     public Label subst(LocalInstance arg, Label l) {
         return this;
     }

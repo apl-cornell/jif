@@ -8,7 +8,6 @@ import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.principal.Principal;
-import jif.types.principal.PrincipalImpl;
 import polyglot.types.*;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
@@ -130,18 +129,6 @@ public class PolicyLabel_c extends Label_c implements PolicyLabel {
         return sb.toString();
     }
     
-    public void translate(Resolver c, CodeWriter w) {
-        w.write("jif.lang.Label.policy(");
-        w.write(((PrincipalImpl)owner).translate(c) + ", ");
-        w.write("new jif.lang.PrincipalSet()");
-        
-        for (Iterator i = readers.iterator(); i.hasNext(); ) {
-            PrincipalImpl p = (PrincipalImpl) i.next();
-            w.write(".add(" + p.translate(c) + ")");
-        }
-        
-        w.write(")");
-    }
     public Label subst(LocalInstance arg, Label l) {
         return this;
     }

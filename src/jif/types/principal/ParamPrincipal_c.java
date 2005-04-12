@@ -45,9 +45,6 @@ public class ParamPrincipal_c extends Principal_c implements ParamPrincipal {
 	return paramInstance.hashCode();
     }
 
-    public String translate(Resolver c) {
-        throw new InternalCompilerError("Cannot translate principal \"" + this + "\".");
-    }
     public Principal subst(AccessPathRoot r, AccessPath e) {
         return this;
     }

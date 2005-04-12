@@ -67,9 +67,6 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
         return false;
     }
 
-    public void translate(Resolver c, CodeWriter w) {
-        w.write(path.translate(c));
-    }
     public Label subst(AccessPathRoot r, AccessPath e) {
         AccessPath newPath = path.subst(r, e);
         if (newPath == path) {

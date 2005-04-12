@@ -54,9 +54,6 @@ public class VarLabel_c extends Label_c implements VarLabel {
         throw new InternalCompilerError("Cannot compare " + this + ".");
     }
     
-    public void translate(Resolver c, CodeWriter w) {
-        throw new InternalCompilerError("Cannot translate \"" + this + "\".");
-    }
     public Label subst(LocalInstance arg, Label l) {
         return this;
     }

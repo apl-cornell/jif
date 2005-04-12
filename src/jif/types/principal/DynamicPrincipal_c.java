@@ -52,9 +52,6 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
 	return path.hashCode();
     }
     
-    public String translate(Resolver c) {
-        return path.translate(c);
-    }
     public Principal subst(AccessPathRoot r, AccessPath e) {
         AccessPath newPath = path.subst(r, e);
         if (newPath == path) {

@@ -42,9 +42,6 @@ public class TopLabel_c extends Label_c implements TopLabel {
     public boolean leq_(Label L, LabelEnv env) {
         return L.isTop();
     }
-    public void translate(Resolver c, CodeWriter w) {
-        throw new InternalCompilerError("Cannot translate label \"" + this + "\".");
-    }
     public Label subst(LocalInstance arg, Label l) {
         return this;
     }

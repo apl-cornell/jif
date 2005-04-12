@@ -46,9 +46,6 @@ public class NotTaken_c extends Label_c implements NotTaken {
     public boolean leq_(Label L, LabelEnv env) {
         throw new InternalCompilerError("Cannot compare \"" + this + "\".");
     }
-    public void translate(Resolver c, CodeWriter w) {
-        throw new InternalCompilerError("Cannot translate label \"" + this + "\".");
-    }
     public Label subst(LocalInstance arg, Label l) {
         return this;
     }

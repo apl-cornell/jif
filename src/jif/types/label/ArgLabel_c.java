@@ -87,10 +87,6 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         // So the arg label is less than L if the upper bound is less than L.
         return env.leq(upperBound(), L);
     }
-
-    public void translate(Resolver c, CodeWriter w) {
-        throw new InternalCompilerError("Cannot translate \"" + this + "\".");
-    }
  
     public Label subst(LocalInstance arg, Label l) {
         if (this.li.equals(arg)) {

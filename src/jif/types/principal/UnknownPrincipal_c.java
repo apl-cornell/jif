@@ -22,14 +22,10 @@ public class UnknownPrincipal_c extends Principal_c
     public boolean isRuntimeRepresentable() { return false; }
     public boolean isCanonical() { return false; }
 
-    public String translate(Resolver c) {
-	throw new InternalCompilerError("Cannot translate an unknown label.");
-    }
-
     public String toString() { return "<unknown principal>"; }
 
     public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
-	throw new InternalCompilerError("Cannot translate an unknown label.");
+	throw new InternalCompilerError("Cannot translate an unknown principal.");
     }
     public Principal subst(AccessPathRoot r, AccessPath e) {
         return this;

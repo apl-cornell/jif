@@ -10,7 +10,7 @@ import polyglot.util.Position;
 
 /** An abstract implementation of the <code>Principal</code> interface. 
  */
-public abstract class Principal_c extends TypeObject_c implements Principal, PrincipalImpl {
+public abstract class Principal_c extends TypeObject_c implements Principal {
     PrincipalToJavaExpr toJava;
 
     public Principal_c(JifTypeSystem ts, Position pos) {

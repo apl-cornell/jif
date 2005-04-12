@@ -138,7 +138,6 @@ public interface Label extends Param
 
     boolean isRuntimeRepresentable();
     
-    void translate(Resolver c, CodeWriter w);
     Expr toJava(JifToJavaRewriter rw) throws SemanticException;
     
     String componentString();    

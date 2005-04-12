@@ -43,9 +43,6 @@ public class UnknownLabel_c extends Label_c implements UnknownLabel
     public boolean leq_(Label L, LabelEnv env) {
         throw new InternalCompilerError("Cannot compare unknown label.");
     }    
-    public void translate(Resolver c, CodeWriter w) {
-        throw new InternalCompilerError("Cannot translate unknown label.");
-    }
     public Label subst(LocalInstance arg, Label l) {
         return this;
     }

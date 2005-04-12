@@ -54,9 +54,6 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
         // this method is called.
         return false;
     }
-    public void translate(Resolver c, CodeWriter w) {
-        throw new InternalCompilerError("Cannot translate " + this);
-    }
     public Label subst(LocalInstance arg, Label l) {
         return this;
     }

@@ -48,10 +48,6 @@ public class ExternalPrincipal_c extends Principal_c implements ExternalPrincipa
 	return name.hashCode();
     }
 
-    public String translate(Resolver c) {
-        return "jif.principal." + name + ".P";
-    }
-
     public Principal subst(AccessPathRoot r, AccessPath e) {
         return this;
     }

@@ -138,31 +138,6 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return true;
     }
     
-    public void translate(Resolver c, CodeWriter w) {
-        if (components.isEmpty()) {
-            w.write("jif.lang.Label.bottom()");
-            return;
-        }
-        
-        boolean first = true;
-        
-        for (Iterator i = components.iterator(); i.hasNext(); ) {
-            Label ic = (Label) i.next();
-            
-            ic.translate(c, w);
-            
-            if (! first) {
-                w.write(")");
-            }
-            
-            if (i.hasNext()) {
-                w.write(".join(");
-            }
-            
-            first = false;
-        }
-    }
-    
     public Collection components() {
         return Collections.unmodifiableCollection(components);
     }
