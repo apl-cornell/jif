@@ -151,18 +151,6 @@ public class JifUtil
                 throw new InternalCompilerError("Not currently supporting access paths for special of kind " + s.kind());
             }            
         }
-//        else if (e instanceof AmbReceiver) {
-//            AmbReceiver r = (AmbReceiver)e;            
-//            Prefix target = r.prefix();
-//            AccessPath prefix = exprToAccessPathImpl(target, null);
-//            return new AccessPathField(prefix, null, r.name());
-//        }
-//        else if (e instanceof AmbPrefix) {
-//            AmbPrefix r = (AmbPrefix)e;            
-//            Prefix target = r.prefix();
-//            AccessPath prefix = exprToAccessPathImpl(target, null);
-//            return new AccessPathField(prefix, null, r.name());
-//        }
         else if (e instanceof NewLabel) {
             NewLabel nl = (NewLabel)e;
             return new AccessPathConstant(nl.label().label(), nl.position());

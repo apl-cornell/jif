@@ -245,7 +245,8 @@ non terminal LabelNode label, label_opt, return_label_opt;
 non terminal List component_list;
 non terminal LabelNode label_component;
 non terminal PrincipalNode principal;
-non terminal Amb accesspath_or_id;
+non terminal Expr accesspath;
+non terminal Expr accesspath_no_id;
 non terminal List principal_list, readers;
 non terminal ActsFor actsfor_statement;
 non terminal ActsFor actsfor_else_statement;
@@ -303,9 +304,9 @@ label_component ::=
                     // LabelNode
         principal:a COLON readers:b
             {: RESULT = parser.nf.PolicyLabelNode(parser.pos(a, b), a, b); :}
-    |   MULT:x accesspath_or_id:a
+    |   MULT:x accesspath:a
             {: RESULT = parser.nf.AmbDynamicLabelNode(parser.pos(x, a),
-						      a.toExpr()); :}
+						      a); :}
     |   THIS:a
             {: RESULT = parser.nf.AmbThisLabelNode(parser.pos(a)); :}
     |   IDENTIFIER:a
@@ -331,17 +332,26 @@ principal_list ::=
     ;
 principal ::=
                     // PrincipalNode
-        accesspath_or_id:a
-            {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a),
-                           a.toExpr()); :}
+        accesspath_no_id:a
+            {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a), a); :}
+    |  IDENTIFIER:a
+            {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a), a.getIdentifier()); :}
+
     ;
 
-accesspath_or_id ::= 
-        THIS:a {:  RESULT = new Name(parser, parser.pos(a), "this");  :}
-    |   IDENTIFIER:a {: RESULT = new Name(parser, parser.pos(a), a.getIdentifier()); :}
-    | accesspath_or_id:a DOT IDENTIFIER:b 
-             {: RESULT = new Name(parser, parser.pos(a,b), a,  b.getIdentifier()); :}
+accesspath ::= 
+        THIS:a {:  RESULT = parser.nf.This(parser.pos(a));  :}
+    |   IDENTIFIER:a {: RESULT = new Name(parser, parser.pos(a), a.getIdentifier()).toExpr(); :}
+    | accesspath:a DOT IDENTIFIER:b 
+             {: RESULT = parser.nf.Field(parser.pos(a, b),
+	                     a, 
+			        b.getIdentifier()); :}
      ;
+
+accesspath_no_id ::= 
+        THIS:a {:  RESULT = parser.nf.This(parser.pos(a));  :}
+    | accesspath:a DOT IDENTIFIER:b 
+             {: RESULT = parser.nf.Field(parser.pos(a, b), a, b.getIdentifier()); :};
 
 // 19.4) Types, Values, and Variables
 

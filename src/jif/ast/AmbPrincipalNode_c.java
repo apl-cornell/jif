@@ -15,46 +15,50 @@ import polyglot.visit.*;
 public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalNode
 {
     protected Expr expr;
+    protected String name;
     
     public AmbPrincipalNode_c(Position pos, Expr expr) {
         super(pos);
         this.expr = expr;
+        this.name = null;
     }
     
+    public AmbPrincipalNode_c(Position pos, String name) {
+        super(pos);
+        this.expr = null;
+        this.name = name;
+    }
+
     public boolean isDisambiguated() {
         return false;
     }
     
     public String toString() {
-        return expr + "{amb}";
+        if (expr != null) return expr + "{amb}";
+        return name + "{amb}";
     }
     
-    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
-        // if the expression is just a single name, we disambiguate using
-        // the method disambiguateName, since it could be a param or an external principal
-        if (expr instanceof AmbExpr) {
-            AmbExpr ae = (AmbExpr)expr;
-            return disambiguateName(ar, ae.name());
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        if (name != null) {
+            return disambiguateName(ar, name);
         }
-        return null;
-    }
-    
-    public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
+        
+        // must be the case that name == null and expr != null
         if (!expr.isDisambiguated()) {
             return this;
         }
 
-        JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
-        JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
+        JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
+        JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
         if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             throw new SemanticException("Only a final access path or constant can be used as a dynamic principal.");
         }
 
         return nf.CanonicalPrincipalNode(position(),
-                                         ts.dynamicPrincipal(position(), JifUtil.exprToAccessPath(expr, sc.context().currentClass())));
+                                         ts.dynamicPrincipal(position(), JifUtil.exprToAccessPath(expr, ar.context().currentClass())));
     }
-    protected Node disambiguateName(AmbiguityRemover sc, String name) throws SemanticException {
-        Context c = sc.context();
+    protected Node disambiguateName(AmbiguityRemover ar, String name) throws SemanticException {
+        Context c = ar.context();
         VarInstance vi = c.findVariable(name);
         if (!vi.isCanonical()) {
             // the instance is not yet ready
@@ -62,15 +66,15 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         }
         
         if (vi instanceof JifVarInstance) {
-            return varToPrincipal((JifVarInstance) vi, sc);
+            return varToPrincipal((JifVarInstance) vi, ar);
         }
         
         if (vi instanceof PrincipalInstance) {
-            return principalToPrincipal((PrincipalInstance) vi, sc);
+            return principalToPrincipal((PrincipalInstance) vi, ar);
         }
         
         if (vi instanceof ParamInstance) {
-            return paramToPrincipal((ParamInstance) vi, sc);
+            return paramToPrincipal((ParamInstance) vi, ar);
         }
         
         throw new SemanticException(vi + " cannot be used as principal.",
@@ -125,6 +129,8 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         return this;    
     }
     public Node visitChildren(NodeVisitor v) {
+        if (this.expr == null) return this;
+        
         Expr expr = (Expr) visitChild(this.expr, v);
         if (this.expr == expr) { return this; }
         return new AmbPrincipalNode_c(this.position, expr); 

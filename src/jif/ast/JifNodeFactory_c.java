@@ -122,6 +122,13 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
+    public AmbPrincipalNode AmbPrincipalNode(Position pos, String name) {
+        AmbPrincipalNode n = new AmbPrincipalNode_c(pos, name);
+        n = (AmbPrincipalNode)n.ext(jifExtFactory().extAmbPrincipalNode());
+        n = (AmbPrincipalNode)n.del(delFactory().delExpr());
+        return n;
+    }
+
     public CanonicalPrincipalNode CanonicalPrincipalNode(Position pos, Principal principal) {
         CanonicalPrincipalNode n = new CanonicalPrincipalNode_c(pos,
                                                                 principal);
