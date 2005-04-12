@@ -1,6 +1,7 @@
 class DynPrin1 {
     final principal{} f;
     DynPrin1{} g;
+    final M m = new M();
 
     DynPrin1(principal{} p, DynPrin1{} o) {
 	this.f = p;
@@ -10,11 +11,11 @@ class DynPrin1 {
     void m(principal{} q) {	
 	final DynPrin1 local = new DynPrin1(q, null);
 
-	int{q:} x; // ok
-	int{this.f:} x2; // ok
-	int{this.g.f:} x3; // ok
-	int{this.g.g.f:} x4; // ok
-	int{g.g.f:} x5; // ok
-	int{local.g.g.f:} x6; // ok
+	int{m.foo():} x1; // not ok
     }
+}
+
+class M {
+    final principal p = Alice;
+    int{} foo() { return 4; }
 }
