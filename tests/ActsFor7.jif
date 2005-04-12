@@ -4,7 +4,7 @@ class ActsFor7
         int{b:} x = 0;
         int{a:} y = 0;
 
-        actsFor(a, b) {
+        if (a actsFor b) {
 	    // Should fail, since the actsfor test is tainted by the 
 	    // arglabels for a and b, which cannot flow to the var
 	    // y

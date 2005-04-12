@@ -8,6 +8,7 @@ import jif.types.ParamInstance;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
+import polyglot.ast.Binary.Operator;
 import polyglot.ext.jl.ast.NodeFactory_c;
 import polyglot.types.Flags;
 import polyglot.util.InternalCompilerError;
@@ -316,10 +317,12 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return LabelCase(pos, null, null, body);
     }
 
-    public ActsFor ActsFor(Position pos, PrincipalNode actor, PrincipalNode granter, Stmt consequent) {
-        return ActsFor(pos, actor, granter, consequent, null);
+    public ActsFor ActsFor(Position pos, Principal actor, Principal granter, Stmt consequent, Stmt alternative) {
+        PrincipalNode actorNode = CanonicalPrincipalNode(actor.position(), actor);
+        PrincipalNode granterNode = CanonicalPrincipalNode(granter.position(), granter);
+        return ActsFor(pos, actorNode, granterNode, consequent, alternative);
+        
     }
-
     public ActsFor ActsFor(Position pos, PrincipalNode actor, PrincipalNode granter, Stmt consequent, Stmt alternative) {
         ActsFor n = new ActsFor_c(pos, actor, granter, consequent,
                                   alternative);

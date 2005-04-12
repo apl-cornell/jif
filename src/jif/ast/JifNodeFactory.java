@@ -6,6 +6,7 @@ import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
+
 import java.util.*;
 
 /** The node factory of the Jif extension. 
@@ -37,7 +38,7 @@ public interface JifNodeFactory extends NodeFactory {
     LabelCase LabelCase(Position pos, Formal decl, LabelNode label, Stmt body);
     LabelCase LabelCase(Position pos, LabelNode label, Stmt body);
     LabelCase LabelCase(Position pos, Stmt body);
-    ActsFor ActsFor(Position pos, PrincipalNode actor, PrincipalNode granter, Stmt consequent);
+    ActsFor ActsFor(Position pos, Principal actor, Principal granter, Stmt consequent, Stmt alternative);
     ActsFor ActsFor(Position pos, PrincipalNode actor, PrincipalNode granter, Stmt consequent, Stmt alternative);
     DeclassifyStmt DeclassifyStmt(Position pos, LabelNode bound, LabelNode label, Stmt body);
     DeclassifyExpr DeclassifyExpr(Position pos, Expr expr, LabelNode bound, LabelNode label);

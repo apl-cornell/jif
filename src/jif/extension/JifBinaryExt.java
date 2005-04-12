@@ -4,9 +4,11 @@ import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.visit.LabelChecker;
+import polyglot.ast.*;
 import polyglot.ast.Binary;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
+import polyglot.ast.Binary.Operator;
 import polyglot.types.SemanticException;
 
 /** The Jif extension of the <code>Binary</code> node. 

@@ -134,26 +134,26 @@ public class SwitchLabel_c extends Stmt_c implements SwitchLabel {
         return succs;
     }
 
-    void eval(CodeWriter w, Translator tr) {
-	JifTypeSystem ts = (JifTypeSystem) tr.typeSystem();
-	JifContext c = (JifContext) tr.context();
-
-	// Evaluate the expression on whose label we're switching, and save the
-	// result in a fresh variable.  We do this even if we don't use the
-	// variable because we must evaluate the expression for its side
-	// effects.
-
-	// Write out the LHS of the declaration of the temporary.
-	Type t = expr.type();
-
-	w.write("final ");
-	w.write(t.translate(c));
-	w.write(" " + UniqueID.newID("t") + " = ");
-
-	// Evaluate the expression.
-	expr.del().translate(w, tr);
-	w.write(";");
-    }
+//    void eval(CodeWriter w, Translator tr) {
+//	JifTypeSystem ts = (JifTypeSystem) tr.typeSystem();
+//	JifContext c = (JifContext) tr.context();
+//
+//	// Evaluate the expression on whose label we're switching, and save the
+//	// result in a fresh variable.  We do this even if we don't use the
+//	// variable because we must evaluate the expression for its side
+//	// effects.
+//
+//	// Write out the LHS of the declaration of the temporary.
+//	Type t = expr.type();
+//
+//	w.write("final ");
+//	w.write(t.translate(c));
+//	w.write(" " + UniqueID.newID("t") + " = ");
+//
+//	// Evaluate the expression.
+//	expr.del().translate(w, tr);
+//	w.write(";");
+//    }
     
     public String toString() {
 	return "switch label (" + expr + ") ...";

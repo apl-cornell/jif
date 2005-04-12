@@ -5,8 +5,8 @@ class ParamsActsFor[principal p, principal q] authority (Bob) {
     static void m() where authority (Bob) {
 	ParamsActsFor[Bob, Bob] p;
 
-	actsFor(Alice, Bob) {
-	    actsFor(Bob, Alice) {
+	if (Alice actsFor Bob) {
+	    if (Bob actsFor Alice) {
 	       p = new ParamsActsFor[Alice, Bob]();
 	    }
 	}

@@ -17,12 +17,12 @@ public class Constraints1 {
 	int{Alice:} a = 0;
 	int{Bob:} b = 0;
 
-	actsFor(Alice, Bob) {
+	if (Alice actsFor Bob) {
 	    a = v;
 	    v = b;
 	}
 
-	actsFor(Bob, Alice) {
+	if (Bob actsFor Alice) {
 	    b = v;
 	    v = a;
 	}

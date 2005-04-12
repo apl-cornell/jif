@@ -4,7 +4,7 @@ class ActsFor2
         int{Ethel:Bob} x = 0;
         int{Ethel:Bob,Alice} y = 0;
 
-        actsFor(Alice, Bob) {
+        if (Alice actsFor Bob) {
             y = x; // add a reader that acts for an existing reader
         }
         else {

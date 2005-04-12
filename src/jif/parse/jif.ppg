@@ -9,6 +9,7 @@ import polyglot.lex.Token;
 import polyglot.ext.jl.ast.*;
 import jif.ast.*;
 import jif.types.*;
+import jif.extension.JifBinaryDel;
 
 import java.util.*;
 
@@ -236,6 +237,7 @@ terminal Token INVARIANT;
 terminal Token AUTHORITY;
 terminal Token CALLER;
 terminal Token ACTSFOR;
+terminal Token ACTSFOR_LOWER;
 terminal Token DECLASSIFY;
 
 non terminal DeclassifyExpr declassify;
@@ -245,12 +247,10 @@ non terminal LabelNode label, label_opt, return_label_opt;
 non terminal List component_list;
 non terminal LabelNode label_component;
 non terminal PrincipalNode principal;
+non terminal Token actsfor;
 non terminal Expr accesspath;
 non terminal Expr accesspath_no_id;
 non terminal List principal_list, readers;
-non terminal ActsFor actsfor_statement;
-non terminal ActsFor actsfor_else_statement;
-non terminal ActsFor actsfor_else_statement_no_short_if;
 non terminal SwitchLabel labelcase_statement;
 non terminal List labelcases;
 non terminal LabelCase labelcase_else, labelcase_no_else;
@@ -658,7 +658,7 @@ constraint ::=
         {: RESULT = parser.nf.AuthConstraintNode(parser.pos(x,y), a); :}
     |   CALLER:x LPAREN principal_list:a RPAREN:y
         {: RESULT = parser.nf.CallerConstraintNode(parser.pos(x,y), a); :}
-    |   ACTSFOR:x LPAREN principal:a COMMA principal:b RPAREN:y
+    |   actsfor:x LPAREN principal:a COMMA principal:b RPAREN:y
         {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(x,y), a, b); :}
     ;
 
@@ -705,16 +705,7 @@ extend statement ::=
                     // Stmt
         labelcase_statement:a
             {: RESULT = a; :}
-    |   actsfor_statement:a
-            {: RESULT = a; :}
-    |   actsfor_else_statement:a
-            {: RESULT = a; :}
     |   declassify_statement:a
-            {: RESULT = a; :}
-    ;
-extend statement_no_short_if ::=
-                    // Stmt
-        actsfor_else_statement_no_short_if:a
             {: RESULT = a; :}
     ;
 labelcase_statement ::=
@@ -750,23 +741,6 @@ labelcase_else ::=
         ELSE:n statement_no_short_if:a
             {: RESULT = parser.nf.LabelCase(parser.pos(n), a); :}
     ;
-actsfor_statement ::=
-                    // ActsFor
-        ACTSFOR:n LPAREN principal:a COMMA principal:b RPAREN statement:c
-            {: RESULT = parser.nf.ActsFor(parser.pos(n, c), a, b, c); :}
-    ;
-actsfor_else_statement ::=
-                    // ActsFor
-        ACTSFOR:n LPAREN principal:a COMMA principal:b RPAREN
-            statement_no_short_if:c ELSE statement:d
-            {: RESULT = parser.nf.ActsFor(parser.pos(n, d), a, b, c, d); :}
-    ;
-actsfor_else_statement_no_short_if ::=
-                    // ActsFor
-        ACTSFOR:n LPAREN principal:a COMMA principal:b RPAREN
-            statement_no_short_if:c ELSE statement_no_short_if:d
-            {: RESULT = parser.nf.ActsFor(parser.pos(n, d), a, b, c, d); :}
-    ;
 declassify_statement ::=
                     // DeclassifyStmt
         DECLASSIFY:n LPAREN label:a RPAREN statement:b
@@ -798,6 +772,14 @@ transfer primary_no_new_array to primary_no_array {
         method_invocation
 }
 
+extend relational_expression ::=
+     relational_expression:a actsfor shift_expression:b {:
+                RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.ACTSFOR, b); 
+                :}
+    ;
+    
+actsfor ::= ACTSFOR | ACTSFOR_LOWER ;
+    
 drop { /* no reflection */
 primary_no_new_array ::=
 	primitive_type DOT CLASS

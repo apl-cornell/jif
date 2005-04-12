@@ -36,21 +36,21 @@ public class Constraints5 {
        	int{Chuck:} c = 0;
 
 
-	actsFor(Alice, Bob) {
-	    actsFor(Bob, Chuck) {
+	if (Alice actsfor Bob) {
+	    if (Bob actsfor Chuck) {
 		b = w; // constraint 1
 		w = v; // constraint 2
 	    }
 	}
 
-	actsFor(Bob, Alice) {
-	    actsFor(Alice, Chuck) {
+	if (Bob actsfor Alice) {
+	    if (Alice actsfor Chuck) {
 		a = v; // constraint 3
 	    }
 	}
 
-	actsFor(Alice, Bob) {
-	    actsFor(Bob, Chuck) {
+	if (Alice actsfor Bob) {
+	    if (Bob actsfor Chuck) {
 		c = w; // constraint 4
 	    }
 	}

@@ -4,7 +4,7 @@ class ActsFor6
         int{b:} x = 0;
         int{a:} y = 0;
 
-        actsFor(a, b) {
+        if (a actsFor b) {
             y = x; // replace the owner with a principal that acts for it
         }
         else {
