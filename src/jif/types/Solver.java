@@ -377,28 +377,6 @@ public abstract class Solver
             }
         }
 
-        maxDynamicLabel = maximumDynamicLabel(); // set this up for future
-
-        /*
-         * Replace any occurrences of the all-runtime label l with a join
-         * of all dynamic components in the system. 
-         */
-        if (shouldReport(4)) {
-            report(4, "Fixing equations...");
-        }
-        
-        for (Iterator i = equations.iterator(); i.hasNext();) {
-            Equation eqn = (Equation) i.next();
-            try {
-                eqn.subst(rtLabelSubst);
-            }
-            catch (SemanticException e) {
-                throw new InternalCompilerError("Unexpected Semantic Exception " +
-                    e.getMessage());
-            }
-            if (shouldReport(4)) report(4, "fixed: " + eqn.toString());
-        }
-
         int counter = 0;
 
         if (Q.isEmpty()) 
@@ -490,110 +468,6 @@ public abstract class Solver
         }
     }
     
-    /** 
-     * Return a Set of all labels used in the system. The labels are not 
-     * broken down into their components, but are just the labels used on the
-     * LHS and RHS of the equations. 
-     */
-    protected final Set allLabels() {
-    Set ret = new LinkedHashSet();
-    for (Iterator i = equations.iterator(); i.hasNext(); ) {
-        Equation eqn = (Equation) i.next();
-        ret.add(eqn.lhs());
-        ret.add(eqn.rhs());
-    }
-    return ret;
-    }
-
-    /**
-     * Return the join of all the dynamic labels used in the system.
-     */
-    protected final Label maximumDynamicLabel() {
-        Label ret = ts.bottomLabel();
-        for (Iterator i = allLabels().iterator(); i.hasNext();) {
-            Label c = (Label) i.next();
-            if (c instanceof DynamicLabel) {
-                ret = ret.join(c);
-            }
-        }
-        return ret;
-    }
-
-
-    /**
-     * An instance of <code>RuntimeLabelSubstitution</code>, to be used by
-     * <code>fixAllRuntime(Label)</code>. 
-     */
-    protected RuntimeLabelSubstitution rtLabelSubst = new RuntimeLabelSubstitution();
-    
-    /**
-     * This class is a <code>LabelSubstitution</code> to replace all
-     * <code>RuntimeLabel</code>s with <code>maxDynamicLabel</code>
-     *
-     */
-    protected class RuntimeLabelSubstitution extends LabelSubstitution {
-        public Label substLabel(Label L) throws SemanticException {
-            if (L instanceof RuntimeLabel) {
-                return Solver.this.maxDynamicLabel;
-            }
-            return L;
-        }
-    }
-    
-    /**
-     * DOCO: TODO XXX###
-     */
-//    protected final boolean dynCheck(Label lhs, Label rhs, LabelEnv env) {
-//        if (!dynBounds.isEmpty()) {
-//            Label lhsBound = dynBounds.applyTo(lhs);
-//            Label rhsBound = dynBounds.applyTo(rhs);
-//            if (shouldReport(4)) {
-//            report(4, "DYN LHS = " + lhsBound);
-//            report(4, "RHS APP = " + rhsBound);
-//            }
-//                
-//            return env.leq(lhsBound, rhsBound);
-//        }
-//        
-//        return false;
-//    }
-
-//    /**
-//     * DOCO: TODO ###XXX
-//     */    
-//    protected final Label dynMeet(Label lhs, Label rhs, PrincipalHierarchy ph) {
-//        //dynBounds.applyTo(lhs) meet dynBounds.applyTo(rhs)
-//        if (!dynBounds.isEmpty()) {
-//            Label lhsBound = dynBounds.applyTo(lhs);
-//            Label rhsBound = dynBounds.applyTo(rhs);
-//            if (shouldReport(4)) {
-//                report(4, "DYN BOUND of " + lhs + " = " + lhsBound);
-//                report(4, "APP = " + rhsBound);
-//            }
-//
-//            return solverMeet(ts, lhsBound, rhsBound, ph); 
-//        }
-//        return solverMeet(ts, lhs, rhs, ph);
-//    }
-
-    /**
-     * DOCO: TODO ###XXX
-     */    
-//    protected final Label dynJoin(Label lhs, Label rhs, PrincipalHierarchy ph) {
-//        //dynBounds.applyTo(lhs) meet dynBounds.applyTo(rhs)
-//        if (!dynBounds.isEmpty()) {
-//            Label lhsBound = dynBounds.applyTo(lhs);
-//            Label rhsBound = dynBounds.applyTo(rhs);
-//            if (shouldReport(4)) {
-//                report(4, "DYN BOUND of " + lhs + " = " + lhsBound);
-//                report(4, "APP = " + rhsBound);
-//            }
-//
-//            return lhsBound.join(rhsBound); 
-//        }
-//        return lhs.join(rhs);
-//    }
-
     /**
      * Awakens all equations in the system that depend on the variable v,
      * ensuring that they are in the queue of active equations. 
