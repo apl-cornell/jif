@@ -1,7 +1,10 @@
 package jif.extension;
 
 import jif.ast.ActsFor;
+import jif.ast.LabelExpr;
+import jif.ast.PrincipalNode;
 import jif.translate.ToJavaExt;
+import jif.types.*;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.PathMap;
@@ -35,40 +38,23 @@ public class JifActsForExt extends JifStmtExt_c
         A = (JifContext) af.enterScope(A);
         JifTypeSystem ts = lc.jifTypeSystem();
         
-        Principal p1 = af.actor().principal();
-        Principal p2 = af.granter().principal();
         
-        PathMap X1;
-        if (p1 instanceof DynamicPrincipal) {
-            // Get the information given by the successful evaluation of the access path            
-            AccessPath path = ((DynamicPrincipal) p1).path();
-            X1 = path.labelcheck(A);
-        }
-        else {
-            X1 = ts.pathMap().N(A.pc());            
-        }
         
-        A = (JifContext) A.pushBlock();
-        A.setPc(X1.N());
-        
-        PathMap X2;        
-        if (p2 instanceof DynamicPrincipal) {
-            // Get the information given by the successful evaluation of the access path            
-            AccessPath path = ((DynamicPrincipal) p2).path();
-            X2 = path.labelcheck(A);
-        }
-        else {
-            X2 = ts.pathMap().N(A.pc());            
-        }
-        
+	PrincipalNode actor = (PrincipalNode)lc.context(A).labelCheck(af.actor());
+	PathMap Xactor = X(actor);
+
+	A = (JifContext) A.pushBlock();
+	A.setPc(Xactor.N());
+	PrincipalNode granter = (PrincipalNode) lc.context(A).labelCheck(af.granter());
+	PathMap Xgranter = X(granter);
         A = (JifContext) A.pop();
-        
+
+	PathMap X2 = Xactor.set(Path.N, ts.notTaken()).join(Xgranter);
+
+	
         A = (JifContext) A.pushBlock();
-        
-        A.setPc(X1.NV().join(X2.NV()));
-        
-        A = (JifContext) A.pushBlock();
-        A.addActsFor(p1, p2);
+        A.setPc(X2.N().join(X2.NV()));
+        A.addActsFor(actor.principal(), granter.principal());
         
         Stmt S1 = (Stmt) lc.context(A).labelCheck(af.consequent());
         PathMap X3 = X(S1);
@@ -89,8 +75,8 @@ public class JifActsForExt extends JifStmtExt_c
         
         A = (JifContext) A.pop();
         
-        PathMap X = X1.join(X2).join(X3).join(X4);
+        PathMap X = Xactor.join(X2).join(X3).join(X4);
         
-        return X(af.consequent(S1).alternative(S2), X);
+        return X(af.actor(actor).granter(granter).consequent(S1).alternative(S2), X);
     }
 }

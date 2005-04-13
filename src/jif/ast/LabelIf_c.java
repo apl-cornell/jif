@@ -101,25 +101,6 @@ public class LabelIf_c extends Stmt_c implements LabelIf
 	return reconstruct(lhs, rhs, consequent, alternative);
     }
 
-    /** Type check the expression. */
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-	JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();
-
-	if (!lhs.label().label().isRuntimeRepresentable()) {
-	    throw new SemanticException(
-                    "A label used for a run-time test must be runtime-representable.", 
-                    lhs.position());
-	}
-
-	if (!rhs.label().label().isRuntimeRepresentable()) {
-	    throw new SemanticException(
-	        "A label used for a run-time test must be runtime-representable.", 
-		rhs.position());
-	}
-
-	return this;
-    }
-
     public Term entry() {
         return lhs.entry();
     }

@@ -27,6 +27,11 @@ public class JifBinaryExt extends Jif_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
+	
+	if (ts.isLabel(be.left().type()) || ts.isLabel(be.right().type())) {
+	    throw new SemanticException("Label comparison <= can only be used in an if statement, for example \"if (" + be + ") { ... }\"", be.position());
+	}
+	
         A = (JifContext) be.enterScope(A);
 
 	Expr left = (Expr) lc.context(A).labelCheck(be.left());

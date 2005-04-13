@@ -1,8 +1,10 @@
 package jif.ast;
 
+import jif.types.*;
 import jif.types.JifParsedPolyType;
 import jif.types.JifTypeSystem;
 import jif.types.PrincipalInstance;
+import jif.types.principal.Principal;
 import polyglot.ast.Node;
 import polyglot.ast.Receiver;
 import polyglot.ext.jl.ast.Disamb_c;
@@ -26,6 +28,19 @@ public class JifDisamb_c extends Disamb_c
             PrincipalInstance pi = (PrincipalInstance)vi;
             JifNodeFactory jnf = (JifNodeFactory)nf;
             return jnf.CanonicalPrincipalNode(pos, pi.principal());
+        }
+        if (vi instanceof ParamInstance) {
+            ParamInstance pi = (ParamInstance)vi;
+            if (pi.isPrincipal()) {
+                // <param principal uid> => <principal-param uid>
+                JifNodeFactory jnf = (JifNodeFactory)nf;
+                JifTypeSystem ts = (JifTypeSystem)vi.typeSystem();
+                Principal p = ts.principalParam(pos, pi);
+                return jnf.CanonicalPrincipalNode(pos, p);
+            }
+            
+            throw new SemanticException(pi + " may not be used as a principal.",
+                                        pos);
         }
         return null;
     }

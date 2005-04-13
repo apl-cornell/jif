@@ -50,13 +50,7 @@ public class LabelExpr_c extends Expr_c implements LabelExpr
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();
-	Label l = label.label();	
-	if (!l.isRuntimeRepresentable()) {
-	    throw new SemanticException("new label expression must contain a run-time " +
-					"representable label.", position());
-	}
-	
+	JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();	
 	return type(ts.Label());
     }
 

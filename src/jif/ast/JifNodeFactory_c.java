@@ -331,12 +331,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public LabelIf LabelIf(Position pos, Label lhs, Label rhs, Stmt consequent, Stmt alternative) {
-        LabelExpr lhsNode = LabelExpr(pos, CanonicalLabelNode(pos, lhs));
-        LabelExpr rhsNode = LabelExpr(pos, CanonicalLabelNode(pos, rhs));
-        return LabelIf(pos, lhsNode, rhsNode, consequent, alternative);
-    }
-    
     public LabelIf LabelIf(Position pos, LabelExpr lhs, LabelExpr rhs, Stmt consequent, Stmt alternative) {
         LabelIf n = new LabelIf_c(pos, lhs, rhs, consequent,
                                   alternative);
@@ -361,6 +355,11 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         n = (DeclassifyExpr)n.ext(jifExtFactory().extDeclassifyExpr());
         n = (DeclassifyExpr)n.del(delFactory().delExpr());
         return n;
+    }
+
+    public LabelExpr LabelExpr(Position pos, Label l) {
+        LabelNode ln = CanonicalLabelNode(pos, l);
+        return LabelExpr(pos, ln);
     }
 
     public LabelExpr LabelExpr(Position pos, LabelNode node) {

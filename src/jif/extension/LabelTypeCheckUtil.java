@@ -40,35 +40,39 @@ public class LabelTypeCheckUtil {
         }        
     }
 
-    public static void typeCheckLabel(TypeChecker tc, Label l) throws SemanticException {
-        if (l instanceof DynamicLabel) {
-            JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-            DynamicLabel dl = (DynamicLabel)l;
-
-            // Make sure that the access path is set correctly
-            // check also that all field accesses are final, and that
-            // the type of the expression is label
-            AccessPath path = dl.path();
-            try {
-                path.verify((JifContext)tc.context());                
-            }
-            catch (SemanticException e) {
-                throw new SemanticException(e.getMessage(), dl.position());
-            }
-            
-            if (!ts.isLabel(dl.path().type())) {
-                throw new SemanticException("The type of a dynamic label must be \"label\"", dl.position());
-            }
-        }        
-        else if (l instanceof PolicyLabel) {
-            JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-            PolicyLabel pl = (PolicyLabel)l;
-            typeCheckPrincipal(tc, pl.owner());
-            for (Iterator i = pl.readers().iterator(); i.hasNext(); ) {
-                Principal r = (Principal)i.next();
-                typeCheckPrincipal(tc, r);                
+    public static void typeCheckLabel(TypeChecker tc, Label Lbl) throws SemanticException {
+        for (Iterator comps = Lbl.components().iterator(); comps.hasNext(); ) {
+            Label l = (Label)comps.next();
+            if (l instanceof DynamicLabel) {
+                JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
+                DynamicLabel dl = (DynamicLabel)l;
+                
+                // Make sure that the access path is set correctly
+                // check also that all field accesses are final, and that
+                // the type of the expression is label
+                AccessPath path = dl.path();
+                try {
+                    path.verify((JifContext)tc.context());                
+                }
+                catch (SemanticException e) {
+                    throw new SemanticException(e.getMessage(), dl.position());
+                }
+                
+                if (!ts.isLabel(dl.path().type())) {
+                    throw new SemanticException("The type of a dynamic label must be \"label\"", dl.position());
+                }
+            }        
+            else if (l instanceof PolicyLabel) {
+                JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
+                PolicyLabel pl = (PolicyLabel)l;
+                typeCheckPrincipal(tc, pl.owner());
+                for (Iterator i = pl.readers().iterator(); i.hasNext(); ) {
+                    Principal r = (Principal)i.next();
+                    typeCheckPrincipal(tc, r);                
+                }
             }
         }
+
     }
 
 

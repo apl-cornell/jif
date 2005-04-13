@@ -1,10 +1,7 @@
 package jif.extension;
 
-import jif.ast.JifNodeFactory;
-import jif.ast.JifUtil;
-import jif.ast.LabelIf;
+import jif.ast.*;
 import jif.types.JifTypeSystem;
-import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.Binary;
 import polyglot.ast.If;
@@ -47,8 +44,22 @@ public class JifIfDel extends JifJL_c {
                 // replace the "if (L <= L') { ... } else { ... }" node with
                 // a LabelIf node.
                 JifNodeFactory nf = (JifNodeFactory)tc.nodeFactory();
-                Label lhs = JifUtil.exprToLabel(ts, b.left(), tc.context().currentClass());
-                Label rhs = JifUtil.exprToLabel(ts, b.right(), tc.context().currentClass());
+                LabelExpr lhs;
+                if (b.left() instanceof LabelExpr) {
+                    lhs = (LabelExpr)b.left();
+                }
+                else {
+                    lhs = nf.LabelExpr(b.left().position(), 
+                                       JifUtil.exprToLabel(ts, b.left(), tc.context().currentClass()));
+                }
+                LabelExpr rhs;
+                if (b.right() instanceof LabelExpr) {
+                    rhs = (LabelExpr)b.right();
+                }
+                else {
+                    rhs = nf.LabelExpr(b.right().position(),
+                                       JifUtil.exprToLabel(ts, b.right(), tc.context().currentClass()));
+                }
                 LabelIf labelIf = nf.LabelIf(ifNode.position(), lhs, rhs, ifNode.consequent(), ifNode.alternative());
                 
                 // now typecheck the label-if node.

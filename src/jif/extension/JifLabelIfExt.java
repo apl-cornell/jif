@@ -42,12 +42,9 @@ public class JifLabelIfExt extends JifStmtExt_c
 	PathMap Xl = X(lhs);
 
 	A = (JifContext) A.pushBlock();
-
 	A.setPc(Xl.N());
-
 	LabelExpr rhs = (LabelExpr) lc.context(A).labelCheck(labelIf.rhs());
 	PathMap Xr = X(rhs);
-
         A = (JifContext) A.pop();
 
 	PathMap X2 = Xl.set(Path.N, ts.notTaken()).join(Xr);
@@ -59,8 +56,9 @@ public class JifLabelIfExt extends JifStmtExt_c
         A.setPc(X2.N().join(X2.NV()));
         
         A = (JifContext) A.pushBlock();
+        // add the assertion that the conditional is true to check
+        // the consequent.
         A.addAssertionLE(lhs.label().label(), rhs.label().label());
-        
         Stmt S1 = (Stmt) lc.context(A).labelCheck(labelIf.consequent());
         PathMap X3 = X(S1);
         

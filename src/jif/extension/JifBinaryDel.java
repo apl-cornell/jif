@@ -21,7 +21,7 @@ public class JifBinaryDel extends JifJL_c
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Binary b = (Binary)node();
         if (b.operator() == ACTSFOR) {
-            throw new SemanticException("The actsfor binary operator can only be used in an if statement, for example \"if (" + b + ") { ... }\"");
+            throw new SemanticException("The actsfor binary operator can only be used in an if statement, for example \"if (" + b + ") { ... }\"", b.position());
         }
         
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();

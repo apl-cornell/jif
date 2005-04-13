@@ -41,7 +41,7 @@ public interface JifNodeFactory extends NodeFactory {
     ActsFor ActsFor(Position pos, Principal actor, Principal granter, Stmt consequent, Stmt alternative);
     ActsFor ActsFor(Position pos, PrincipalNode actor, PrincipalNode granter, Stmt consequent, Stmt alternative);
     LabelIf LabelIf(Position pos, LabelExpr lhs, LabelExpr rhs, Stmt consequent, Stmt alternative);
-    LabelIf LabelIf(Position pos, Label lhs, Label rhs, Stmt consequent, Stmt alternative);
+    LabelExpr LabelExpr(Position pos, Label l);
     DeclassifyStmt DeclassifyStmt(Position pos, LabelNode bound, LabelNode label, Stmt body);
     DeclassifyExpr DeclassifyExpr(Position pos, Expr expr, LabelNode bound, LabelNode label);
     NewLabel NewLabel(Position pos, LabelNode label);
