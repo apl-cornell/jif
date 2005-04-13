@@ -77,7 +77,7 @@ public abstract class Label_c extends TypeObject_c implements Label
     /**
      * A label is a singleton if it only has a single component.
      */
-    public final boolean isSingleton() {
+    public boolean isSingleton() {
         return components().size() <= 1;
     }
     
@@ -86,7 +86,7 @@ public abstract class Label_c extends TypeObject_c implements Label
      * 
      * @throws InternalCompilerError if this label is not a singleton.
      */
-    public final Label singletonComponent() {
+    public Label singletonComponent() {
         if (! isSingleton()) {
             throw new InternalCompilerError(
             "Cannot get singleton component of a non-singleton label.");

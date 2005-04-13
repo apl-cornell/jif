@@ -24,8 +24,13 @@ public class RuntimeLabel_c extends Label_c implements RuntimeLabel {
     public boolean isEnumerable() { return false; }
     public boolean isCanonical() { return true; }
     public boolean isDisambiguated() { return true; }     
+    public boolean isSingleton() { return true; }     
     
     public boolean isRuntimeRepresentable() { return true; }
+    public Label singletonComponent() {
+        return this;
+    }
+
     
     public Collection components() {
         throw new InternalCompilerError(
