@@ -1,8 +1,13 @@
 class SwitchLabel4 {
 	public int{} m(label L, int{*L} x):{L} throws (Exception) {
-		switch label (x) {
-		    case (int{} xx) return xx; // xx carries info about L!
-		    else throw new Exception();
-		}
+//  	    switch label (x) {
+//  		case (int{} xx) return xx; // xx carries info about L!
+//  		    else throw new Exception();
+//  	    }
+	    if (L <= new label {}) {
+		return x;
+	    }
+	    else {
+	    }
 	}
 }

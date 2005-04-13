@@ -1,0 +1,8 @@
+class StaticMethod[label H] {
+    public static void main(String[] args) {
+	n();
+    }
+
+    public static void n() {}
+}
+

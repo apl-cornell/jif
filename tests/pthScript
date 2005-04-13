@@ -38,6 +38,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	ActsFor5.jif ;
 	ActsFor6.jif ;
 	ActsFor7.jif (Semantic, "not less restrictive");
+	ActsFor8.jif (Semantic, "must be runtime-representable");
+	ActsFor9.jif (Semantic, "actsfor .* can only be used");
 	ArgLabelSubst.jif ;
 	ArgLabelSubst2.jif ;
 	Array.jif ;
@@ -108,6 +110,9 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	InterfaceTest.jif ;
 	InvariantClass.jif (Semantic, "Covariant classes .* can only be extended with covariant classes");
 	LabelIf1.jif ;
+	LabelIf2.jif (Semantic, "only be used in an if statement");
+	LabelIf3.jif (Semantic, "only be used in an if statement");
+	LabelIf4.jif (Semantic, "must be representable at runtime");
 	List.jif ;
 	List2.jif ;
 	ListTest.jif ;
@@ -116,6 +121,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Main2.jif ;
 	MyInteger.jif ;
 	NewLabel.jif ;
+	NewLabel2.jif (Semantic, "must be representable at runtime");
 	NullExcept1.jif ;
 	NullExcept2.jif ;
 	NullExcept3.jif ;
@@ -143,6 +149,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Params12.jif ;
 	Params13.jif (Semantic, "not cast.*invariant.* parameter to.* covariant");
 	Params14.jif (Semantic, "not instantiate .* invariant .* parameter with .* non-invariant");
+	Params15.jif;
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;
@@ -153,6 +160,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Simple3.jif ;
 	Simple4.jif ;
 	StaticField.jif;
+	StaticMethod.jif;
 	StaticThis1.jif (Semantic, "this.*cannot be used in a static context");
 	StaticThis2.jif (Semantic, "this.*cannot be used in a static context");
 	StaticThis3.jif (Semantic, "this.*cannot be used in a static context");

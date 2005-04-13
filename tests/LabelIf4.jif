@@ -1,0 +1,7 @@
+class LabelIf1[label L]
+{
+    public void m() {
+	if (new label {Alice: Bob} <= new label {L}) { // not allowed
+	}
+    }
+}

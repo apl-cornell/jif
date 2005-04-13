@@ -1,7 +1,7 @@
 class LabelIf1
 {
-    final label M1 =  new label {Alice:};
-    final label M2 =  new label {Bob:};
+    final label{} M1 =  new label {Alice:};
+    final label{} M2 =  new label {Bob:};
     public void m(label{} L1, label{} L2) {
 	int{*L1} x = 4;
 	int{*L2} y = 4;
@@ -9,13 +9,13 @@ class LabelIf1
 	    y = x;	    
 	}
 
-	int{*M1} a = 4;
-	int{*M2} b = 4;
+//  	int{*this.M1} a = 4;
+//  	int{*this.M2; this} b = 4;
 	
-	if (this.M1 <= this.M2) { b = a; } // OK
+//  	if (this.M1 <= this.M2) { b = a; } // OK
 
-	int{Alice:} c = 4;
-	int{Bob:} d = 4;
-	if (new label {Alice:} <= new label {Bob:}) { d = c; } // OK
+//  	int{Alice:} c = 4;
+//  	int{Bob:} d = 4;
+//  	if (new label {Alice:} <= new label {Bob:}) { d = c; } // OK
     }
 }
