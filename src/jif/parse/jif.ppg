@@ -198,6 +198,13 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
 	return n.pos;
     }
     
+    protected Position posForObject(Object o) {
+      if (o instanceof Name) {
+          return pos ((Name) o);
+      }
+      return super.posForObject(o);
+    }      
+
     public Position pos(Declarator n) {
         if (n == null) {
             return null;
