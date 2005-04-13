@@ -278,6 +278,7 @@ label ::=
             {: LabelNode ln;
                if (a.size() == 1) {
                    ln = (LabelNode)a.get(0);
+                   ln = (LabelNode)ln.position(parser.pos(x, y));
                }
                else {
                    ln = parser.nf.JoinLabelNode(parser.pos(x, y), a);
