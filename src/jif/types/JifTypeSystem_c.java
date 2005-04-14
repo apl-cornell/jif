@@ -248,6 +248,14 @@ public class JifTypeSystem_c
         return super.isImplicitCastValid(strip(fromType), strip(toType));
     }
 
+    public Type staticTarget(Type t) {
+        if (t instanceof JifParsedPolyType) {
+            return nullInstantiate(t.position(), ((JifParsedPolyType)t).instantiatedFrom());
+        }
+        return super.staticTarget(t);
+            
+    }
+    
     public boolean equals(TypeObject t1, TypeObject t2) {
         if (t1 instanceof Type) {
             t1 = strip((Type)t1);
@@ -465,36 +473,33 @@ public class JifTypeSystem_c
         return new UnknownParam_c(this, pos);
     }
 
-//    public ClassType nullInstantiate(Position pos, PClass pc) {
-//        // We don't want to instantiate on the directly formals: they're UIDs,
-//        // not Params. We need to create create the params as appropriate.
-//
-//        if (pc.clazz() instanceof JifPolyType) {
-//            JifPolyType pt = (JifPolyType) pc.clazz();
-//        
-//            Map subst = new HashMap();
-//
-//            Iterator i = pt.params().iterator();
-//            Iterator j = pt.actuals().iterator();  
-//            while (i.hasNext() && j.hasNext()) {      
-//                ParamInstance param = (ParamInstance) i.next();
-//                Object actual = j.next();
-//            
-//                subst.put(param.uid(), actual);
-//            }
-//        
-//            if (i.hasNext() || j.hasNext()) {
-//                throw new InternalCompilerError("Params and actuals had " +
-//                        "different lengths");
-//            }
-//
-//            return (ClassType) subst(pt, subst);
-//        }
-//        
-//        throw new InternalCompilerError("Cannot null instantiate \"" +
-//                                        pc + "\".");
-//                                        
-//    }
+    public ClassType nullInstantiate(Position pos, PClass pc) {
+        if (pc.clazz() instanceof JifPolyType) {
+            JifPolyType pt = (JifPolyType) pc.clazz();
+        
+            Map subst = new HashMap();
+
+            Iterator i = pt.params().iterator();
+            Iterator j = pt.actuals().iterator();  
+            while (i.hasNext() && j.hasNext()) {      
+                ParamInstance param = (ParamInstance) i.next();
+                Object actual = j.next();
+            
+                subst.put(param, actual);
+            }
+        
+            if (i.hasNext() || j.hasNext()) {
+                throw new InternalCompilerError("Params and actuals had " +
+                        "different lengths");
+            }
+
+            return (ClassType) subst(pt, subst);
+        }
+        
+        throw new InternalCompilerError("Cannot null instantiate \"" +
+                                        pc + "\".");
+                                        
+    }
 
     public void checkInstantiation(Position pos, PClass t, List args)
         throws SemanticException {
