@@ -47,7 +47,7 @@ public class JifLabelIfExt extends JifStmtExt_c
 	PathMap Xr = X(rhs);
         A = (JifContext) A.pop();
 
-	PathMap X2 = Xl.set(Path.N, ts.notTaken()).join(Xr);
+	PathMap X2 = Xl.N(ts.notTaken()).join(Xr);
 
 
 
