@@ -49,6 +49,11 @@ public class JifIfDel extends JifJL_c {
                     lhs = (LabelExpr)b.left();
                 }
                 else {
+                    if (!JifUtil.isFinalAccessExprOrConst(ts, b.left())) {
+                        throw new SemanticException(
+                                "An expression used in a label test must either be a final access path or a \"new label\"",
+                                b.left().position());
+                    }
                     lhs = nf.LabelExpr(b.left().position(), 
                                        JifUtil.exprToLabel(ts, b.left(), tc.context().currentClass()));
                 }
@@ -57,6 +62,11 @@ public class JifIfDel extends JifJL_c {
                     rhs = (LabelExpr)b.right();
                 }
                 else {
+                    if (!JifUtil.isFinalAccessExprOrConst(ts, b.right())) {
+                        throw new SemanticException(
+                                "An expression used in a label test must either be a final access path or a \"new label\"",
+                                b.right().position());
+                    }
                     rhs = nf.LabelExpr(b.right().position(),
                                        JifUtil.exprToLabel(ts, b.right(), tc.context().currentClass()));
                 }
