@@ -60,8 +60,9 @@ public class LabelEnv_c implements LabelEnv
             Label cmp = (Label)c.next();
 
             // don't bother adding the assertion if we already know 
-            // cmp is less than L2,
-            if (!(this.leq(cmp, L2, false))) {
+            // cmp is less than L2. However, if it has variables, we
+            // need to add it regardless.
+            if (cmp.hasVariables() || L2.hasVariables() || !(this.leq(cmp, L2, false))) {
                 assertions.add(new LabelLeAssertion_c(cmp, L2));
                 if (!this.hasVariables && (cmp.hasVariables() || L2.hasVariables())) {
                     // at least one assertion in this label env has a variable.
