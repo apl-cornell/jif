@@ -8,8 +8,6 @@ import polyglot.ast.Formal;
 import polyglot.ext.jl.ast.Catch_c;
 import polyglot.util.Position;
 
-/** An implementation of the <code>JifClassDecl</code> interface.
- */
 public class JifCatch_c extends Catch_c
 {
     public JifCatch_c(Position pos, Formal formal, Block body) {
