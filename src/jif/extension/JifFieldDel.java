@@ -71,10 +71,6 @@ public class JifFieldDel extends JifJL_c
 	    }
 	}
 	
-	/*if (f.target() instanceof TypeNode) {
-	    throw new SemanticException("Jif does not allow static fields.");
-	}*/
-
 	return f;
     }
     
