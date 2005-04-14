@@ -9,13 +9,13 @@ class LabelIf1
 	    y = x;	    
 	}
 
-//  	int{*this.M1} a = 4;
-//  	int{*this.M2; this} b = 4;
+	int{*this.M1} a = 4;
+	int{*this.M2; this} b = 4;
 	
-//  	if (this.M1 <= this.M2) { b = a; } // OK
+	if (this.M1 <= this.M2) { b = a; } // OK
 
-//  	int{Alice:} c = 4;
-//  	int{Bob:} d = 4;
-//  	if (new label {Alice:} <= new label {Bob:}) { d = c; } // OK
+	int{Alice:} c = 4;
+	int{Bob:} d = 4;
+	if (new label {Alice:} <= new label {Bob:}) { d = c; } // OK
     }
 }

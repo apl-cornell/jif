@@ -1,8 +1,8 @@
-public class OwnedObject {
+public class LabeledObject {
     final label{} L;
-    final Object{*L} o;
+    Object{*L} o;
 
-    public OwnedObject(label{} newL, Object{*newL} newO) {
+    public LabeledObject(label{} newL, Object{*newL} newO) {
 	this.L = newL;
 	this.o = newO;
     }
