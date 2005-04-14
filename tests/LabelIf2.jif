@@ -1,4 +1,4 @@
-class LabelIf1
+class LabelIf2
 {
     final label M1 =  new label {Alice:};
     final label M2 =  new label {Bob:};

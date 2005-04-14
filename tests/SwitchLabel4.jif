@@ -4,10 +4,11 @@ class SwitchLabel4 {
 //  		case (int{} xx) return xx; // xx carries info about L!
 //  		    else throw new Exception();
 //  	    }
+	    int retVal = 0;
 	    if (L <= new label {}) {
-		return x;
+		retVal = x;
 	    }
-	    else {
-	    }
+	    else throw new Exception();
+	    return retVal;
 	}
 }

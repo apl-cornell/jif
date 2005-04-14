@@ -108,7 +108,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	FieldLeak.jif (Semantic) ;
 	FileTester.jif ;
 	For1.jif ;
-	Hierarchy.jif ;
+	Hierarchy1.jif ;
 	Heapsort.jif ;
 	Hello.jif ;
 	HiRefLowField.jif (Semantic, "Label .* not less restrictive");
@@ -158,12 +158,12 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Params12.jif ;
 	Params13.jif (Semantic, "not cast.*invariant.* parameter to.* covariant");
 	Params14.jif (Semantic, "not instantiate .* invariant .* parameter with .* non-invariant");
-	Params15.jif;
+	Params15.jif (Semantic, "must be representable at runtime");
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;
 	Poly.jif ;
-	/* KNOWN BAD: Protected.jif ; */
+	Protected.jif ; 
 	Simple.jif ;
 	Simple2.jif ;
 	Simple3.jif ;
@@ -187,10 +187,10 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Super4.jif (Semantic, "first statement .* must be .* constructor call") ;
 	Super5.jif ;
 	Super6.jif (Semantic, "Final variable.*must be initialized") ;
-	SwitchLabel.jif ;
-	/* KNOWN BAD: SwitchLabel2.jif ; */ 
-	SwitchLabel3.jif ;
-	SwitchLabel4.jif (Semantic, "label of the switch expression is more restrictive");
+	SwitchLabel.jif (Semantic, "must be representable at runtime");
+	SwitchLabel2.jif (Semantic, "must be representable at runtime");
+	SwitchLabel3.jif (Semantic, "must be representable at runtime");
+	SwitchLabel4.jif;
 	This1.jif ;
 	This2.jif ;
 	ToString.jif (Semantic, "Cannot coerce") ;

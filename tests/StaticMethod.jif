@@ -1,8 +1,10 @@
 class StaticMethod[label H] {
+    public static void n() {}
+    public static int{} f;
     public static void main(String[] args) {
 	n();
+	int x = f;
     }
 
-    public static void n() {}
 }
 

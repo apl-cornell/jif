@@ -7,11 +7,13 @@ class Protected {
         content = x;  // checked assuming "lb == LL"
     }
 
-    public Object{*L} get(label L):{L} throws (SecurityException) {
-        switch label(content) {
-            case (Object{*L} unwrapped) return unwrapped;
-            else throw new SecurityException();
-        }
+    public Object{*L;this} get(label{this} L):{L} throws (SecurityException) {
+	Object{*L;this} retVal = null;
+        if (this.lb <= L) {
+            retVal = content;
+	}
+	else throw new SecurityException();
+	return retVal;
     }
 
     public label get_label() {
