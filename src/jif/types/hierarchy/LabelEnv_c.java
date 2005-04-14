@@ -62,7 +62,7 @@ public class LabelEnv_c implements LabelEnv
             // don't bother adding the assertion if we already know 
             // cmp is less than L2. However, if it has variables, we
             // need to add it regardless.
-            if (cmp.hasVariables() || L2.hasVariables() || !(this.leq(cmp, L2, false))) {
+            if (cmp.hasVariables() || L2.hasVariables() || !(this.leq(cmp, L2, false, new HashSet()))) {
                 assertions.add(new LabelLeAssertion_c(cmp, L2));
                 if (!this.hasVariables && (cmp.hasVariables() || L2.hasVariables())) {
                     // at least one assertion in this label env has a variable.
@@ -77,12 +77,31 @@ public class LabelEnv_c implements LabelEnv
     }
     
     public boolean leq(Label L1, Label L2) {
-        return leq(L1, L2, true);
+        return leq(L1, L2, true, new HashSet());
     }
     
+    private static class LeqGoal {
+        final Label lhs;
+        final Label rhs;
+        LeqGoal(Label lhs, Label rhs) { 
+            this.lhs = lhs;
+            this.rhs = rhs;
+        }
+        public int hashCode() {
+            return lhs.hashCode() + rhs.hashCode();
+        }
+        public boolean equals(Object o) {
+            if (o instanceof LeqGoal) {
+                LeqGoal that = (LeqGoal)o;
+                return this.lhs.equals(that.lhs) && this.rhs.equals(that.rhs);
+                
+            }
+            return false;
+        }
+    }
     /** Indirect through the TS so extensions can support new label types.
      * Label.leq does not handle non-singleton or non-enumerable labels. */
-    protected boolean leq(Label Lb1, Label Lb2, boolean useAssertions
+    protected boolean leq(Label Lb1, Label Lb2, boolean useAssertions, Set currentGoals
     /*boolean boundVars*/) {
         // simplify the two labels
         Label L1 = Lb1.simplify();
@@ -118,6 +137,16 @@ public class LabelEnv_c implements LabelEnv
                                             " <= " + L2);
         }
         
+        LeqGoal newGoal = new LeqGoal(L1, L2);
+        if (currentGoals.contains(newGoal)) {
+            // already have this subgoal on the stack
+            return false;
+        }
+        else {
+            currentGoals = new HashSet(currentGoals);
+            currentGoals.add(newGoal);
+        }
+        
         if (L2.isSingleton()) {
             L2 = L2.singletonComponent();
             boolean result = L1.leq_(L2, this);
@@ -137,7 +166,7 @@ public class LabelEnv_c implements LabelEnv
                 if (cRHS.hasVariables()) 
                     cRHS = this.solver.applyBoundsTo(c.rhs());
                 
-                if (leq(L1, cLHS, false) && leq(cRHS, L2, false)) {
+                if (leq(L1, cLHS, false, currentGoals) && leq(cRHS, L2, false, currentGoals)) {
                     return true;
                 }
             }
@@ -151,7 +180,7 @@ public class LabelEnv_c implements LabelEnv
             // such that L1 <= cj
             for (Iterator j = L2.components().iterator(); j.hasNext(); ) {
                 Label cj = (Label) j.next();
-                if (leq(L1, cj, useAssertions)) {
+                if (leq(L1, cj, useAssertions, currentGoals)) {
                     return true;
                 }
             }
@@ -170,10 +199,10 @@ public class LabelEnv_c implements LabelEnv
                 Label cRHS = c.rhs();
                 if (cRHS.hasVariables()) 
                     cRHS = this.solver.applyBoundsTo(c.rhs());
-                // FIXME: keep check of the visited constraints to avoid
-                // infinite loops.
+                // TODO: keep check of the visited constraints to allow
+                // more than one constraint to be used to prove goals
                 //if (!(c.rhs() instanceof VarLabel) && leq(L1, c.lhs(), false)) {
-                if (leq(L1, cLHS, false) && leq(cRHS, L2, false)) {
+                if (leq(L1, cLHS, false, currentGoals) && leq(cRHS, L2, false, currentGoals)) {
                     return true;
                 }
             }
@@ -187,7 +216,7 @@ public class LabelEnv_c implements LabelEnv
             // we have ci <= L2
             for (Iterator i = L1.components().iterator(); i.hasNext(); ) {
                 Label ci = (Label) i.next();
-                if (!leq(ci, L2, useAssertions)) {
+                if (!leq(ci, L2, useAssertions, currentGoals)) {
                     return false;
                 }
             }	
