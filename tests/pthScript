@@ -29,6 +29,8 @@
 # an appropriate class path:
 #    $ pth pthScript -cp "../classes:../lib-classes:."
 jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
+        OwnedObject.jif;
+        LabeledObject.jif;
 	A.jif ;
 	Account.jif ;
 	ActsFor1.jif ;
@@ -40,6 +42,12 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	ActsFor7.jif (Semantic, "not less restrictive");
 	ActsFor8.jif (Semantic, "must be runtime-representable");
 	ActsFor9.jif (Semantic, "actsfor .* can only be used");
+	ActsFor10.jif ;
+	ActsFor11.jif (Semantic, "not less restrictive");
+	ActsFor12.jif (Semantic, "not less restrictive");
+	ActsFor13.jif (Semantic, "must be runtime-representable");
+	ActsFor14.jif (Semantic, "must be runtime-representable");
+	ActsFor15.jif (Semantic, "not less restrictive");
 	ArgLabelSubst.jif ;
 	ArgLabelSubst2.jif ;
 	Array.jif ;

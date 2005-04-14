@@ -1,0 +1,61 @@
+class ActsFor10[principal P]
+{
+    public void p(principal{} a, principal{} b) {
+        int{a:} x = 0;
+        int{b:} y = 0;
+	int{Alice:} z = 0;
+	int{P:} w;
+
+	// dyn dyn
+	if (a actsfor b) {
+	    x = y; // allowed
+	}
+
+	// dyn ext
+	if (a actsfor Alice) {
+	    x = z; // allowed
+	}
+
+
+	// ext dyn
+	if (Alice actsfor a) {
+	    z = x;
+	}
+
+	// ext ext
+	if (Bob actsfor Alice) {
+	    if (Alice actsfor a) {
+		int{Bob:} q = x;
+	    }
+	}
+
+
+	final OwnedObject oo = new OwnedObject(Alice, null);
+	// ext dynpath
+	if (Alice actsfor oo.p) {
+	    Object{Alice:} o = oo.o;
+	}
+
+	// dyn dynpath
+	if (a actsfor oo.p) {
+	    Object{a:} o = oo.o;
+	}
+
+	// dynpath dyn
+	if (oo.p actsfor a) {
+	    int{oo.p:} i = x;
+	}
+	// dynpath ext
+	if (oo.p actsfor Alice) {
+	    int{oo.p:} i = z;
+	}
+
+	final OwnedObject oo2 = new OwnedObject(Bob, oo);
+	// dynpath dynpath
+	if (oo.p actsfor oo2.p) {
+	    Object{oo.p:} i = oo2.o;
+	}
+
+    }
+}
+
