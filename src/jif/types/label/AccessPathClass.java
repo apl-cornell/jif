@@ -46,7 +46,7 @@ public class AccessPathClass extends AccessPathRoot {
     }
 
     public int hashCode() {
-        return ct.hashCode();
+        return -2030;
     }
 
     public PathMap labelcheck(JifContext A) {

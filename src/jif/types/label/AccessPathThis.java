@@ -64,7 +64,6 @@ public class AccessPathThis extends AccessPathRoot {
     }
 
     public int hashCode() {
-        if (ct != null) return ct.hashCode();
         return -572309;
     }
     public Type type() {
