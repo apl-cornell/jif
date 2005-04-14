@@ -54,10 +54,4 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
         // this method is called.
         return false;
     }
-    public Label subst(LocalInstance arg, Label l) {
-        return this;
-    }
-    public Label subst(AccessPathRoot r, AccessPath e) {
-        return this;
-    }
 }

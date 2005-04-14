@@ -49,16 +49,16 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     public Set variables() { return upperBound.variables(); }
     
     public boolean equalsImpl(TypeObject o) {
-        if (! (o instanceof ArgLabel)) {
+        if (! (o instanceof ArgLabel_c)) {
             return false;
         }           
-        ArgLabel that = (ArgLabel) o;
-        return (this.li == that.formalInstance());
+        ArgLabel_c that = (ArgLabel_c) o;
+        return (this.li.equals(that.li));
     }
     public int hashCode() {
         return li.hashCode();
     }
-    
+        
     public String componentString(Set printedLabels) {
         if (printedLabels.contains(this)) {
             if (Report.should_report(Report.debug, 2)) { 
@@ -88,15 +88,6 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         return env.leq(upperBound(), L);
     }
  
-    public Label subst(LocalInstance arg, Label l) {
-        if (this.li.equals(arg)) {
-            return l;
-        }
-        return this;
-    }
-    public Label subst(AccessPathRoot r, AccessPath e) {
-        return this;
-    }
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         Label newBound = upperBound.subst(substitution);
         

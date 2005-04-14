@@ -139,28 +139,6 @@ public class PolicyLabel_c extends Label_c implements PolicyLabel {
         return throwTypes; 
     }
 
-    public Label subst(LocalInstance arg, Label l) {
-        return this;
-    }
-    public Label subst(AccessPathRoot r, AccessPath e) {
-        boolean changed = false;
-
-        Principal newOwner = owner.subst(r, e);
-        if (newOwner != owner) changed = true;
-        Set newReaders = new HashSet(readers.size());
-        
-        
-        for (Iterator i = readers.iterator(); i.hasNext(); ) {
-            Principal rd = (Principal) i.next();
-            Principal newRd = rd.subst(r, e);
-            if (newRd != rd) changed = true;
-            newReaders.add(newRd);
-        }
-        
-        if (!changed) return this;
-
-        return ((JifTypeSystem)typeSystem()).policyLabel(this.position(), newOwner, newReaders);        
-    }
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         boolean changed = false;
 

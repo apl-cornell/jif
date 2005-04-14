@@ -88,9 +88,6 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
         return ((JifTypeSystem)typeSystem()).dynamicLabel(this.position(), newPath);
     }
 
-    public Label subst(LocalInstance arg, Label l) {
-        return this;
-    }
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         return substitution.substLabel(this);
     }

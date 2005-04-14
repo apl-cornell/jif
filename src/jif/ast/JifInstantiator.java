@@ -4,6 +4,7 @@ import java.util.*;
 
 import jif.types.*;
 import jif.types.label.*;
+import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.Expr;
 import polyglot.types.*;
@@ -30,14 +31,27 @@ public class JifInstantiator
             while (iArgLabels.hasNext()) {
                 ArgLabel formalArgLbl = (ArgLabel)iArgLabels.next();
                 Label actualArgLbl = (Label)iActualArgLabels.next();
-                L = L.subst(formalArgLbl.formalInstance(), actualArgLbl);
+                try {
+                    L = L.subst(new LabelInstantiator(formalArgLbl, actualArgLbl));
+                }
+                catch (SemanticException e) {
+                    throw new InternalCompilerError("Unexpected SemanticException " +
+                                                    "during label substitution: " + e.getMessage(), L.position());
+                }
 
                 if (iActualArgExprs != null) {
                     Expr actualExpr = (Expr)iActualArgExprs.next();
                 
                     if (actualExpr != null) {
-                        L = L.subst((AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), actualExpr.position()), 
-                                    JifUtil.exprToAccessPath(actualExpr, callerClass));
+                        try {
+                            AccessPathRoot root = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), actualExpr.position());
+                            AccessPath target = JifUtil.exprToAccessPath(actualExpr, callerClass); 
+                            L = L.subst(new AccessPathInstantiator(root, target));
+                        }
+                        catch (SemanticException e) {
+                            throw new InternalCompilerError("Unexpected SemanticException " +
+                                                            "during label substitution: " + e.getMessage(), L.position());
+                        }
                     }
                 }
             }
@@ -67,8 +81,15 @@ public class JifInstantiator
                 Expr actualExpr = (Expr)iActualArgExprs.next();
                 
                 if (actualExpr != null) {
-                    p = p.subst((AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), actualExpr.position()), 
-                            JifUtil.exprToAccessPath(actualExpr, callerClass));
+                    try {
+                        AccessPathRoot root = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), actualExpr.position());
+                        AccessPath target = JifUtil.exprToAccessPath(actualExpr, callerClass); 
+                        p = p.subst(new AccessPathInstantiator(root, target));
+                    }
+                    catch (SemanticException e) {
+                        throw new InternalCompilerError("Unexpected SemanticException " +
+                                                        "during label substitution: " + e.getMessage(), p.position());
+                    }
                 }
             }
             if (iArgLabels.hasNext() || iActualArgExprs.hasNext()) {
@@ -85,7 +106,7 @@ public class JifInstantiator
     public static Label subst(Label L) {
         if (L == null) return L;
 
-        LabelInstantiator labelInstantiator = new LabelInstantiator(null, null);
+        ThisLabelAndParamInstantiator labelInstantiator = new ThisLabelAndParamInstantiator(null, null);
         try {
             return L.subst(labelInstantiator);
         }
@@ -116,7 +137,7 @@ public class JifInstantiator
         if (L == null) return L;
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
 
-        LabelInstantiator labelInstantiator = new LabelInstantiator(receiverLbl, receiverType);
+        ThisLabelAndParamInstantiator labelInstantiator = new ThisLabelAndParamInstantiator(receiverLbl, receiverType);
         try {
             L = L.subst(labelInstantiator);
         }
@@ -125,8 +146,15 @@ public class JifInstantiator
                                             "during label substitution: " + e.getMessage(), L.position());
         }
         
-        if (receiverType.isClass()) {
-            L = L.subst(new AccessPathThis(receiverType.toClass(), L.position()), receiverPath);
+        if (receiverType.isClass()) {            
+            try {
+                AccessPathRoot root = new AccessPathThis(receiverType.toClass(), L.position());
+                L = L.subst(new AccessPathInstantiator(root, receiverPath));
+            }
+            catch (SemanticException e) {
+                throw new InternalCompilerError("Unexpected SemanticException " +
+                                                "during label substitution: " + e.getMessage(), L.position());
+            }
         }
         return L;
     }
@@ -149,7 +177,7 @@ public class JifInstantiator
         if (p == null) return p;
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
 
-        LabelInstantiator labelInstantiator = new LabelInstantiator(receiverLbl, receiverType);
+        ThisLabelAndParamInstantiator labelInstantiator = new ThisLabelAndParamInstantiator(receiverLbl, receiverType);
         try {
             p = p.subst(labelInstantiator);
         }
@@ -166,7 +194,14 @@ public class JifInstantiator
         }
         
         if (receiverType.isClass()) {
-            p = p.subst(new AccessPathThis(receiverType.toClass(), p.position()), receiverPath);
+            try {
+                AccessPathRoot root = new AccessPathThis(receiverType.toClass(), p.position());
+                p = p.subst(new AccessPathInstantiator(root, receiverPath));
+            }
+            catch (SemanticException e) {
+                throw new InternalCompilerError("Unexpected SemanticException " +
+                                                "during label substitution: " + e.getMessage(), p.position());
+            }
         }
         return p;
     }
@@ -261,33 +296,18 @@ public class JifInstantiator
         return t;
     }    
 
-    private static class LabelInstantiator extends LabelSubstitution {
-        private Label thisLabel;
+    private static class ThisLabelAndParamInstantiator extends LabelSubstitution {
         private Label receiverLabel;
         private Type receiverType;
-        protected LabelInstantiator(Label receiverLabel, Type receiverType) {
-            if (receiverType != null && receiverType instanceof JifClassType) {
-                this.thisLabel = ((JifClassType)receiverType).thisLabel();
-                if (!(thisLabel instanceof CovariantThisLabel || thisLabel instanceof ThisLabel)) {
-                    // if thisLabel is not a CovariantThisLabel or ThisLabel, then
-                    // it is the result of a substitution (see JifSUbstClassType_c.thisLabel), 
-                    // i.e., the ThisLabel or CovariantThisLabel has already been
-                    // substituted, we don't need to.
-                    // We really need to re-examine the param extension, tidy it up, and figure out
-                    // what exactly the "this" parameter is.
-                    this.thisLabel = null;
-                }
-            }
+        protected ThisLabelAndParamInstantiator(Label receiverLabel, Type receiverType) {
             this.receiverLabel = receiverLabel;
-            this.receiverType = receiverType;
+            this.receiverType = receiverType;            
         }
         
         public Label substLabel(Label L) {
             Label result = L;
-            if (this.receiverLabel != null && this.thisLabel != null) {
-                if (this.thisLabel.equals(L)) {
-                    result = receiverLabel;
-                }
+            if (receiverLabel != null && result instanceof ThisLabel) {
+                result = receiverLabel;
             }
 
             if (receiverType instanceof JifSubstType) {
@@ -307,4 +327,42 @@ public class JifInstantiator
         }
 
     }
+    private static class LabelInstantiator extends LabelSubstitution {
+        private Label srcLabel;
+        private Label trgLabel;
+        protected LabelInstantiator(Label srcLabel, Label trgLabel) {
+            this.srcLabel = srcLabel;
+            this.trgLabel = trgLabel;
+        }
+        
+        public Label substLabel(Label L) {
+            if (srcLabel.equals(L)) {
+                return trgLabel;
+            }
+            return L;
+        }
+    }
+
+    private static class AccessPathInstantiator extends LabelSubstitution {
+        private AccessPathRoot srcRoot;
+        private AccessPath trgPath;
+        protected AccessPathInstantiator(AccessPathRoot srcRoot, AccessPath trgPath) {
+            this.srcRoot = srcRoot;
+            this.trgPath = trgPath;
+        }
+        
+        public Label substLabel(Label L) {            
+            if (L instanceof DynamicLabel) {
+                return ((DynamicLabel)L).subst(srcRoot, trgPath);
+            }
+            return L;
+        }
+        public Principal substPrincipal(Principal p) {
+            if (p instanceof DynamicPrincipal) {
+                return ((DynamicPrincipal)p).subst(srcRoot, trgPath);
+            }
+            return p;
+        }
+    }
+    
 }

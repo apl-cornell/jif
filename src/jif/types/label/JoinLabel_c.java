@@ -235,35 +235,6 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return throwTypes; 
     }
 
-    public Label subst(LocalInstance arg, Label l) {
-        boolean changed = false;
-        Set s = new HashSet();
-        for (Iterator i = components.iterator(); i.hasNext(); ) {
-            Label c = (Label) i.next();
-            Label newc = c.subst(arg, l);
-            if (newc != c) changed = true;
-            s.add(newc);
-        }
-        if (!changed) return this;
-        return ((JifTypeSystem)typeSystem()).joinLabel(this.position, s);
-    }
-
-    /**
-     * 
-     */
-    public Label subst(AccessPathRoot r, AccessPath e) {
-        boolean changed = false;
-        Set s = new HashSet();
-        for (Iterator i = components.iterator(); i.hasNext(); ) {
-            Label c = (Label) i.next();
-            Label newc = c.subst(r, e);
-            if (newc != c) changed = true;
-            s.add(newc);
-        }
-        if (!changed) return this;
-        return ((JifTypeSystem)typeSystem()).joinLabel(this.position, s);
-    }
-
     public Label subst(LabelSubstitution substitution) throws SemanticException {        
         if (components.isEmpty()) {
             return substitution.substLabel(this);

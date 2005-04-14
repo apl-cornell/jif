@@ -7,6 +7,7 @@ import jif.types.*;
 import jif.types.JifTypeSystem;
 import polyglot.ast.Expr;
 import polyglot.ext.jl.types.TypeObject_c;
+import polyglot.types.*;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
@@ -24,6 +25,7 @@ public abstract class Label_c extends TypeObject_c implements Label
     protected Label_c() {
         super();
     }
+    
     
     public Label_c(JifTypeSystem ts, Position pos, LabelToJavaExpr toJava) {
         super(ts, pos);
@@ -126,7 +128,7 @@ public abstract class Label_c extends TypeObject_c implements Label
     public List throwTypes(TypeSystem ts) {
         return Collections.EMPTY_LIST; 
     }
-    
+
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         return substitution.substLabel(this); 
     }

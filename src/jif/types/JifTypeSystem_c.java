@@ -646,15 +646,6 @@ public class JifTypeSystem_c
         return t;
     }
 
-    public ThisLabel thisLabel(Position pos, JifClassType ct) {
-        ThisLabel t = new ThisLabel_c(ct, this, pos);
-        return t;        
-    }
-    public CovariantThisLabel covariantThisLabel(Position pos, JifClassType ct) {
-        CovariantThisLabel t = new CovariantThisLabel_c(ct, this, pos);
-        return t;        
-    }
-
     public PolicyLabel policyLabel(Position pos, Principal owner, Collection readers) {
         PolicyLabel t = new PolicyLabel_c(owner, readers, this, pos);
         return t;
@@ -673,6 +664,14 @@ public class JifTypeSystem_c
     public ArgLabel argLabel(Position pos, JifLocalInstance li) {
         ArgLabel t = new ArgLabel_c(this, li, pos);
         return t;
+    }
+    
+    public ThisLabel thisLabel(JifClassType ct) {
+        return thisLabel(ct.position(), ct);
+    }
+
+    public ThisLabel thisLabel(Position pos, JifClassType ct) {
+        return new ThisLabel_c(this, ct, pos);
     }
 
     public UnknownLabel unknownLabel(Position pos) {

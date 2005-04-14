@@ -27,7 +27,4 @@ public class UnknownPrincipal_c extends Principal_c
     public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
 	throw new InternalCompilerError("Cannot translate an unknown principal.");
     }
-    public Principal subst(AccessPathRoot r, AccessPath e) {
-        return this;
-    }
 }

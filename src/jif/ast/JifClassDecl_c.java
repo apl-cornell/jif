@@ -112,29 +112,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         }
         ct.setParams(newParams);
 
-        // set the this label
-        if (invariant) {
-            ct.setInvariant(true);
-            ct.setThisLabel(ts.thisLabel(position(), ct));
-
-            /*
-             * NJN -- not necessary
-             * 
-             * //create a new param instance ParamLabel pl = (ParamLabel)
-             * ct.thisLabel(); ct.addParam(ts.paramInstance(this.position(), ct,
-             * ParamInstance.INVARIANT_LABEL, pl.uid() ) );
-             *  
-             */
-            /*
-             * Type st = ct.superType(); if (st instanceof JifClassType) {
-             * JifClassType jst = (JifClassType) st; if (jst.invariant()) { Type
-             * newSt = jst.setInvariantThis(ct.thisLabel()); if (st != newSt)
-             * ct.superType(newSt); } }
-             */
-        }
-        else {
-            ct.setThisLabel(ts.covariantThisLabel(position(), ct));
-        }            
+        // set whether the class is invariant.
+        ct.setInvariant(this.invariant);
     }
 
 
@@ -149,23 +128,6 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             principals.add(p.principal());
         }
         ct.setAuthority(principals);
-
-        if (this.superClass() == null || this.superClass().isDisambiguated()) {
-            // Super type is disambiguated now--can add params.
-            if (invariant) {
-                Type st = ct.superType();
-
-                if (st instanceof JifClassType) {
-                    JifClassType jst = (JifClassType) st;
-                    if (jst.isInvariant()) {
-                        Type newSt = jst.setInvariantThis(ct.thisLabel());
-                        if (st != newSt) 
-                            ct.superType(newSt);
-                    }
-                }
-            }	
-        }
-        
         return n;
     }
 

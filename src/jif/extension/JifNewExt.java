@@ -47,7 +47,7 @@ public class JifNewExt extends Jif_c
                 newLabel = (Label) subst.get(thisL.uid());
                 */
 
-                newLabel = jct.thisLabel();
+                //$$$$$ newLabel = jct.thisLabel();
 	    }
 	}
 

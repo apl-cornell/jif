@@ -8,4 +8,6 @@ package jif.types.label;
 public interface DynamicLabel extends Label
 {
     AccessPath path(); 
+
+    Label subst(AccessPathRoot r, AccessPath e);
 }

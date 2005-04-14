@@ -42,10 +42,4 @@ public class TopLabel_c extends Label_c implements TopLabel {
     public boolean leq_(Label L, LabelEnv env) {
         return L.isTop();
     }
-    public Label subst(LocalInstance arg, Label l) {
-        return this;
-    }
-    public Label subst(AccessPathRoot r, AccessPath e) {
-        return this;
-    }
 }

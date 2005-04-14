@@ -43,10 +43,4 @@ public class UnknownLabel_c extends Label_c implements UnknownLabel
     public boolean leq_(Label L, LabelEnv env) {
         throw new InternalCompilerError("Cannot compare unknown label.");
     }    
-    public Label subst(LocalInstance arg, Label l) {
-        return this;
-    }
-    public Label subst(AccessPathRoot r, AccessPath e) {
-        return this;
-    }
 }

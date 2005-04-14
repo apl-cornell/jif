@@ -62,7 +62,6 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     // Label constructors
     VarLabel freshLabelVariable(Position pos, String s, String description);
-    //@@@@@CovariantParamLabel freshCovariantLabel(Position pos, ParamInstance pi);
 
     Label topLabel(Position pos);
     Label bottomLabel(Position pos);
@@ -76,12 +75,12 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     CovariantParamLabel covariantLabel(Position pos, ParamInstance pi);
     ParamLabel paramLabel(Position pos, ParamInstance pi);
-    ThisLabel thisLabel(Position pos, JifClassType ct);
-    CovariantThisLabel covariantThisLabel(Position pos, JifClassType ct);
     PolicyLabel policyLabel(Position pos, Principal owner, Collection readers);
     Label joinLabel(Position pos, Collection components);
     DynamicLabel dynamicLabel(Position pos, AccessPath path);
     ArgLabel argLabel(Position pos, JifLocalInstance li);
+    ThisLabel thisLabel(Position pos, JifClassType ct);
+    ThisLabel thisLabel(JifClassType ct);
     UnknownLabel unknownLabel(Position pos);
 
     /** Returns the join of L1 and L2. */

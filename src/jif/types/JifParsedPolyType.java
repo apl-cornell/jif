@@ -9,7 +9,6 @@ import polyglot.types.ParsedClassType;
 /** Jif parsed polymorphic class type. 
  */
 public interface JifParsedPolyType extends ParsedClassType, JifPolyType {
-    void setThisLabel(Label L);
     void setParams(List params);
     void setAuthority(List principals);
     void setInvariant(boolean inv);

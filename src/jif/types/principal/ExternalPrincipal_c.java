@@ -47,8 +47,4 @@ public class ExternalPrincipal_c extends Principal_c implements ExternalPrincipa
     public int hashCode() {
 	return name.hashCode();
     }
-
-    public Principal subst(AccessPathRoot r, AccessPath e) {
-        return this;
-    }
 }

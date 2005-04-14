@@ -17,7 +17,6 @@ import polyglot.util.*;
  */
 public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedPolyType
 {
-    Label thisLabel;
     List params;
     List authority;
     boolean invariant;
@@ -37,7 +36,6 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	this.params = new TypedList(new LinkedList(), ParamInstance.class, false);
 	this.authority = new TypedList(new LinkedList(), Principal.class, false);
         this.instantiatedFrom = null;
-        this.thisLabel = ts.unknownLabel(this.position()); 
     }
 
     public PClass instantiatedFrom() {
@@ -122,11 +120,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
     }
 
     public Label thisLabel() {
-	return this.thisLabel;
-    }
-
-    public void setThisLabel(Label L) {
-	this.thisLabel = L;
+	return ((JifTypeSystem)ts).thisLabel(this);
     }
 
     public boolean isInvariant() {
@@ -202,24 +196,4 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 
 	return false;
     }
-
-    public JifClassType setInvariantThis(Label L) throws SemanticException {
-	JifTypeSystem jts = (JifTypeSystem) typeSystem();
-
-        if (! (thisLabel instanceof ThisLabel)) {
-            throw new SemanticException("Cannot set invariant this label.");
-        }
-
-        Map subst = new HashMap();
-        subst.put(((ThisLabel)thisLabel).paramInstance(), L);
-
-        return (JifClassType) jts.subst(this, subst);
-    }
-
-    /*
-    public ClassType nullInstantiate(Position pos) {
-	JifTypeSystem jts = (JifTypeSystem) typeSystem();
-        return jts.nullInstantiate(pos, this);
-    }
-    */
 }

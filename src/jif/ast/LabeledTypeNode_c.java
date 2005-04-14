@@ -90,14 +90,6 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Am
 		position());
 	}
 
-	if (t instanceof JifClassType) {
-	    JifClassType ct = (JifClassType) t;
-
-	    if (ct.isInvariant()) {
-		t = ct.setInvariantThis(L);
-	    }
-	}
-
 	return sc.nodeFactory().CanonicalTypeNode(position(), 
 	    jts.labeledType(position(), t, L));
     }

@@ -62,9 +62,6 @@ public interface Label extends Param
     
     void  setDescription(String d);
     
-    Label subst(LocalInstance arg, Label l);
-    Label subst(AccessPathRoot r, AccessPath e);
-
     /**
      * @param labelSubst
      * @return

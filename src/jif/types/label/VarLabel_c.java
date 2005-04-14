@@ -54,10 +54,4 @@ public class VarLabel_c extends Label_c implements VarLabel {
         throw new InternalCompilerError("Cannot compare " + this + ".");
     }
     
-    public Label subst(LocalInstance arg, Label l) {
-        return this;
-    }
-    public Label subst(AccessPathRoot r, AccessPath e) {
-        return this;
-    }
 }

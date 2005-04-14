@@ -68,48 +68,12 @@ public class JifSubstClassType_c extends SubstClassType_c
     }
 
     public Label thisLabel() {
-        JifClassType base = (JifClassType) this.base;
-        JifSubst subst = (JifSubst) this.subst;
-        return subst.substLabel(base.thisLabel());
+	return ((JifTypeSystem)ts).thisLabel(this);
     }
 
     public boolean isInvariant() {
         JifClassType base = (JifClassType) this.base;
         return base.isInvariant();
-    }
-
-    public JifClassType setInvariantThis(Label L) throws SemanticException {
-        JifTypeSystem ts = (JifTypeSystem) typeSystem();
-
-        if (base instanceof JifClassType) {
-            JifClassType pt = (JifClassType) base;
-
-            // Reapply the substitution, but add the this-label.
-            if (pt.isInvariant() && pt.thisLabel() instanceof ParamLabel) {
-                ParamLabel thisLabel = (ParamLabel) pt.thisLabel();
-
-                JifSubst subst = (JifSubst) this.subst;
-
-                if (L.equals(subst.get(thisLabel.paramInstance()))) {
-                    return this;
-                }
-
-                Map newSubst = new HashMap();
-                newSubst.putAll(subst.substitutions());
-                newSubst.put(thisLabel.paramInstance(), L);
-
-                // Don't pass in the cache since the subst map changed. 
-                return (JifClassType) ts.subst(pt, newSubst);
-            }
-            else {
-                throw new InternalCompilerError("Cannot substitute for this " +
-                                                "label in non-invariant " +
-                                                "class \"" + pt + "\".");
-
-            }
-        }
-
-	return this;
     }
     
     public String toString() {

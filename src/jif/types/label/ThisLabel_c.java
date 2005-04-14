@@ -1,66 +1,72 @@
 package jif.types.label;
 
-
+import java.util.Collections;
 import java.util.Set;
 
 import jif.types.*;
+import jif.types.JifLocalInstance;
+import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
 import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
-/** An implementation of the <code>ParamLabel</code> interface. 
- */
-public class ThisLabel_c extends ParamLabel_c implements ThisLabel {
+public class ThisLabel_c extends Label_c implements ThisLabel {
     private final JifClassType ct;
-    private final String ctName;
-    public ThisLabel_c(JifClassType ct, JifTypeSystem ts, Position pos) {
-        super(ts.paramInstance(pos, ct, ParamInstance.INVARIANT_LABEL, "this"), ts, pos);
+    private final String fullName;
+    
+    public ThisLabel_c(JifTypeSystem ts, JifClassType ct, Position pos) {
+        super(ts, pos);
         this.ct = ct;
-        this.ctName = ct.fullName();
-        this.setDescription("label \"this\" of " + ct.fullName());
+        this.fullName = ct.fullName();
     }
+    
+
+    public boolean isRuntimeRepresentable() { return false; }
+    public boolean isCovariant() { return !ct.isInvariant(); }
+    public boolean isComparable() { return true; }
+    public boolean isCanonical() { return true; }
+    public boolean isDisambiguated() { return true; }
+    public boolean isEnumerable() { return true; }
+    public Set variables() { return Collections.EMPTY_SET; }
     
     public JifClassType classType() {
         return ct;
     }
-
-    public boolean isRuntimeRepresentable() { return false; }
-    public boolean isCovariant() { return false; }
-    public boolean isComparable() { return true; }
-    public boolean isCanonical() { return  ct.isCanonical() && super.isCanonical(); }
-    public boolean isDisambiguated() { return isCanonical(); }
-    public boolean isEnumerable() { return true; }
-    public int hashCode() {
-        return ctName.hashCode();
-    }
+    
     public boolean equalsImpl(TypeObject o) {
         if (! (o instanceof ThisLabel)) {
             return false;
         }           
         ThisLabel that = (ThisLabel) o;
-        return (this.ct.equals(that.classType()));
+        return this.ct.equals(that.classType());
+    }
+    public int hashCode() {
+        return fullName.hashCode();
     }
     
     public String componentString(Set printedLabels) {
         if (Report.should_report(Report.debug, 2)) { 
-            return "<this-label " + this.ct.fullName() + ">";
+            return "<this (of " + ct.fullName() + ">";
         }
-        if (Report.should_report(Report.debug, 1)) { 
-            return "<this-label " + this.ct.name() + ">";
+        else if (Report.should_report(Report.debug, 1)) {
+            return "<this (of " + ct.name() + ">";
         }
-        return this.ct.name() + ".this";
+        return "this";            
     }
 
     public boolean leq_(Label L, LabelEnv env) {
-        // only leq if equal to this parameter, which is checked before 
-        // this method is called.
+        // We know nothing about the this label, save that it is equal to itself,
+        // and whatever is in the environment.
         return false;
     }
-    public Label subst(LocalInstance arg, Label l) {
-        return this;
+ 
+    public Label subst(LabelSubstitution substitution) throws SemanticException {
+        return substitution.substLabel(this);
     }
-    public Label subst(AccessPathRoot r, AccessPath e) {
-        return this;
-    }
+    
+    
 }

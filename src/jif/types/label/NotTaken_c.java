@@ -46,10 +46,4 @@ public class NotTaken_c extends Label_c implements NotTaken {
     public boolean leq_(Label L, LabelEnv env) {
         throw new InternalCompilerError("Cannot compare \"" + this + "\".");
     }
-    public Label subst(LocalInstance arg, Label l) {
-        return this;
-    }
-    public Label subst(AccessPathRoot r, AccessPath e) {
-        return this;
-    }
 }

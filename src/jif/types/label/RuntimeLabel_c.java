@@ -51,10 +51,4 @@ public class RuntimeLabel_c extends Label_c implements RuntimeLabel {
         // TS already tested against TOP and Runtime.  Anything else is false.
         return false;
     }    
-    public Label subst(LocalInstance arg, Label l) {
-        return this;
-    }
-    public Label subst(AccessPathRoot r, AccessPath e) {
-        return this;
-    }
 }

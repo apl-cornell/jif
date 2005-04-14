@@ -13,7 +13,6 @@ import jif.types.label.*;
 /** The root interface of all kinds of Jif principals. 
  */
 public interface Principal extends Param {
-    public Principal subst(AccessPathRoot r, AccessPath e);
 
     /**
      * @param substitution

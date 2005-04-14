@@ -44,8 +44,4 @@ public class ParamPrincipal_c extends Principal_c implements ParamPrincipal {
     public int hashCode() {
 	return paramInstance.hashCode();
     }
-
-    public Principal subst(AccessPathRoot r, AccessPath e) {
-        return this;
-    }
 }
