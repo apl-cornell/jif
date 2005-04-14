@@ -19,7 +19,6 @@ public class JifCall_c extends Call_c
 
     protected Type findContainer(TypeSystem ts, MethodInstance mi) {
         Type container = mi.container();
-        System.out.println("Finding container for " + mi + " : " + container + " :: " + container.getClass());
         if (container instanceof JifParsedPolyType) {
             JifParsedPolyType jppt = (JifParsedPolyType)container;
             if (jppt.params().size() > 0) {
