@@ -51,7 +51,7 @@ public class JifIfDel extends JifJL_c {
                 else {
                     if (!JifUtil.isFinalAccessExprOrConst(ts, b.left())) {
                         throw new SemanticException(
-                                "An expression used in a label test must either be a final access path or a \"new label\"",
+                                "An expression used in a label test must be either a final access path or a \"new label\"",
                                 b.left().position());
                     }
                     lhs = nf.LabelExpr(b.left().position(), 
