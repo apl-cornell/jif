@@ -8,7 +8,6 @@ import jif.types.ParamInstance;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
-import polyglot.ast.Binary.Operator;
 import polyglot.ext.jl.ast.NodeFactory_c;
 import polyglot.types.Flags;
 import polyglot.util.InternalCompilerError;
@@ -293,28 +292,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         n = (ActsForConstraintNode)n.ext(jifExtFactory().extActsForConstraintNode());
         n = (ActsForConstraintNode)n.del(delFactory().delNode());
         return n;
-    }
-
-    public SwitchLabel SwitchLabel(Position pos, Expr expr, List cases) {
-        SwitchLabel n = new SwitchLabel_c(pos, expr, cases);
-        n = (SwitchLabel)n.ext(jifExtFactory().extSwitchLabel());
-        n = (SwitchLabel)n.del(delFactory().delStmt());
-        return n;
-    }
-
-    public LabelCase LabelCase(Position pos, Formal decl, LabelNode label, Stmt body) {
-        LabelCase n = new LabelCase_c(pos, decl, label, body);
-        n = (LabelCase)n.ext(jifExtFactory().extLabelCase());
-        n = (LabelCase)n.del(delFactory().delStmt());
-        return n;
-    }
-
-    public LabelCase LabelCase(Position pos, LabelNode label, Stmt body) {
-        return LabelCase(pos, null, label, body);
-    }
-
-    public LabelCase LabelCase(Position pos, Stmt body) {
-        return LabelCase(pos, null, null, body);
     }
 
     public ActsFor ActsFor(Position pos, Principal actor, Principal granter, Stmt consequent, Stmt alternative) {

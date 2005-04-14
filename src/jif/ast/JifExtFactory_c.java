@@ -349,17 +349,7 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         Ext e = extActsForConstraintNodeImpl();
         return postExtActsForConstraintNode(e);
     }
-    
-    public final Ext extSwitchLabel() {
-        Ext e = extSwitchLabelImpl();
-        return postExtSwitchLabel(e);
-    }
-    
-    public final Ext extLabelCase() {
-        Ext e = extLabelCaseImpl();
-        return postExtLabelCase(e);
-    }
-    
+        
     public final Ext extActsFor() {
         Ext e = extActsForImpl();
         return postExtActsFor(e);
@@ -483,14 +473,6 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return extConstraintNode();
     }
 
-    protected Ext extSwitchLabelImpl() {
-        return new JifSwitchLabelExt(new SwitchLabelToJavaExt_c());
-    }
-
-    protected Ext extLabelCaseImpl() {
-        return extCannotToJavaImpl();
-    }
-
     protected Ext extActsForImpl() {
         return new JifActsForExt(new ActsForToJavaExt_c());
     }
@@ -605,14 +587,6 @@ public class JifExtFactory_c extends AbstractExtFactory_c
 
     protected Ext postExtActsForConstraintNode(Ext e) {
         return postExtConstraintNode(e);
-    }
-
-    protected Ext postExtSwitchLabel(Ext e) {
-        return postExtStmt(e);
-    }
-
-    protected Ext postExtLabelCase(Ext e) {
-        return postExtStmt(e);
     }
 
     protected Ext postExtActsFor(Ext e) {

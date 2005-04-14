@@ -34,10 +34,6 @@ public interface JifNodeFactory extends NodeFactory {
     AuthConstraintNode AuthConstraintNode(Position pos, List principals);
     CallerConstraintNode CallerConstraintNode(Position pos, List principals);
     ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter);
-    SwitchLabel SwitchLabel(Position pos, Expr expr, List cases);
-    LabelCase LabelCase(Position pos, Formal decl, LabelNode label, Stmt body);
-    LabelCase LabelCase(Position pos, LabelNode label, Stmt body);
-    LabelCase LabelCase(Position pos, Stmt body);
     ActsFor ActsFor(Position pos, Principal actor, Principal granter, Stmt consequent, Stmt alternative);
     ActsFor ActsFor(Position pos, PrincipalNode actor, PrincipalNode granter, Stmt consequent, Stmt alternative);
     LabelIf LabelIf(Position pos, LabelExpr lhs, LabelExpr rhs, Stmt consequent, Stmt alternative);

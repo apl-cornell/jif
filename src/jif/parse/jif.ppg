@@ -258,9 +258,6 @@ non terminal Token actsfor;
 non terminal Expr accesspath;
 non terminal Expr accesspath_no_id;
 non terminal List principal_list, readers;
-non terminal SwitchLabel labelcase_statement;
-non terminal List labelcases;
-non terminal LabelCase labelcase_else, labelcase_no_else;
 
 non terminal List parameters_opt, parameters;
 non terminal ParamDecl parameter;
@@ -711,43 +708,8 @@ drop { block_statement ::= class_declaration ; }
 
 extend statement ::=
                     // Stmt
-        labelcase_statement:a
+       declassify_statement:a
             {: RESULT = a; :}
-    |   declassify_statement:a
-            {: RESULT = a; :}
-    ;
-labelcase_statement ::=
-                    // SwitchLabel
-        SWITCH LABEL:n LPAREN expression:a RPAREN LBRACE labelcases:b RBRACE
-            {: RESULT = parser.nf.SwitchLabel(parser.pos(n), a, b); :}
-    ;
-labelcases ::=
-                    // List of LabelCase
-        labelcase_no_else:a
-            {: List l = new TypedList(new LinkedList(), LabelCase.class, false);
-               l.add(a); RESULT = l; :}
-    |   labelcases:a labelcase_no_else:b
-            {: RESULT = a; a.add(b); :}
-    |   labelcases:a labelcase_else:b
-            {: RESULT = a; a.add(b); :}
-    ;
-labelcase_no_else ::=
-                    // List of LabelCase
-        CASE:n LPAREN type:a IDENTIFIER:b RPAREN statement_no_short_if:c
-            {:  if (! (a instanceof LabeledTypeNode)) parser.die(parser.pos(a));
-        RESULT = parser.nf.LabelCase(parser.pos(n),
-                         parser.nf.Formal(parser.pos(a),
-                                             Flags.FINAL,
-                                 a,
-                                 b.getIdentifier()),
-                         ((LabeledTypeNode) a).labelPart(),
-                         c); :}
-    |   CASE:n label:a statement_no_short_if:b
-            {: RESULT = parser.nf.LabelCase(parser.pos(n), a, b); :}
-    ;
-labelcase_else ::=
-        ELSE:n statement_no_short_if:a
-            {: RESULT = parser.nf.LabelCase(parser.pos(n), a); :}
     ;
 declassify_statement ::=
                     // DeclassifyStmt
