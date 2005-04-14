@@ -150,7 +150,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                 // we're before a potentially dangerous super call, so we
                 // can do check to see if we are assigning to a final label
                 // field.
-                checkFinalFieldAssignment(s, uninitFinalVars, lc);
+                checkFinalFieldAssignment(s, uninitFinalVars, A);
 
                 if (s instanceof ConstructorCall) {
                     ConstructorCall ccs = (ConstructorCall) s;
@@ -219,7 +219,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
      * the final field is a label, and it is being initialized from a final
      * label, share the uids of the fields.
      */
-    protected void checkFinalFieldAssignment(Stmt s, Set uninitFinalVars, LabelChecker lc)
+    protected void checkFinalFieldAssignment(Stmt s, Set uninitFinalVars, JifContext A)
     throws SemanticException
     {
         if (!(s instanceof Eval) || !(((Eval)s).expr() instanceof FieldAssign)) {
@@ -244,7 +244,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         // initialized here.
         uninitFinalVars.remove(assFi);
 
-        JifTypeSystem ts = lc.jifTypeSystem();
+        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         // deal with label and principal fields being initialzed 
         if (assFi.flags().isFinal() && 
                 (ts.isLabel(assFi.type()) || ts.isPrincipal(assFi.type())) && 
@@ -252,14 +252,14 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
             
             if (ts.isLabel(assFi.type())) {
                 DynamicLabel dl = ts.dynamicLabel(assFi.position(), JifUtil.varInstanceToAccessPath(assFi, assFi.position()));                
-                Label rhs_label = JifUtil.exprToLabel(ts, ass.right(), lc.context().currentClass());
-                lc.context().addDefinitionalAssertionLE(dl, rhs_label);
-                lc.context().addDefinitionalAssertionLE(rhs_label, dl);
+                Label rhs_label = JifUtil.exprToLabel(ts, ass.right(), A.currentClass());
+                A.addDefinitionalAssertionLE(dl, rhs_label);
+                A.addDefinitionalAssertionLE(rhs_label, dl);
             }
             if (ts.isPrincipal(assFi.type())) {
                 DynamicPrincipal dp = ts.dynamicPrincipal(assFi.position(), JifUtil.varInstanceToAccessPath(assFi, assFi.position()));                
-                Principal rhs_principal = JifUtil.exprToPrincipal(ts, ass.right(), lc.context().currentClass());
-                lc.context().addActsFor(dp, rhs_principal);                    
+                Principal rhs_principal = JifUtil.exprToPrincipal(ts, ass.right(), A.currentClass());
+                A.addActsFor(dp, rhs_principal);                    
             }
         }                            
 
