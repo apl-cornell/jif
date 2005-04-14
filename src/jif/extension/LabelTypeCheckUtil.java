@@ -35,7 +35,7 @@ public class LabelTypeCheckUtil {
             }
             
             if (!ts.isPrincipal(dp.path().type())) {
-                throw new SemanticException("The type of a dynamic label must be \"principal\"", principal.position());
+                throw new SemanticException("The type of a dynamic principal must be \"principal\"", principal.position());
             }
         }        
     }

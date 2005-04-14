@@ -36,7 +36,10 @@ public class JifLabelExprExt extends Jif_c
                                          A.labelEnv(),
                                          le.position()) {
             public String msg() {
-                return "A label expression must be representable at runtime. Label parameters are not represented at runtime.";
+                return "Label expression not representable at runtime.";
+            }
+            public String detailMsg() {
+                return "A label expression must be representable at runtime. Label parameters, arg labels, and labels containing principal parameters are not represented at runtime.";
             }
         });
 
