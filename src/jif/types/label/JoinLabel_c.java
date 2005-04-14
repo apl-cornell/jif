@@ -226,6 +226,15 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return c;
     }
 
+    public List throwTypes(TypeSystem ts) {
+        List throwTypes = new ArrayList();
+        for (Iterator i = components.iterator(); i.hasNext(); ) {
+            Label L = (Label) i.next();
+            throwTypes.addAll(L.throwTypes(ts));
+        }
+        return throwTypes; 
+    }
+
     public Label subst(LocalInstance arg, Label l) {
         boolean changed = false;
         Set s = new HashSet();

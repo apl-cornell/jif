@@ -129,6 +129,16 @@ public class PolicyLabel_c extends Label_c implements PolicyLabel {
         return sb.toString();
     }
     
+    public List throwTypes(TypeSystem ts) {
+        List throwTypes = new ArrayList();
+        throwTypes.addAll(owner.throwTypes(ts));
+        for (Iterator i = readers.iterator(); i.hasNext(); ) {
+            Principal r = (Principal) i.next();
+            throwTypes.addAll(r.throwTypes(ts));
+        }
+        return throwTypes; 
+    }
+
     public Label subst(LocalInstance arg, Label l) {
         return this;
     }

@@ -1,5 +1,7 @@
 package jif.types.principal;
 
+import java.util.List;
+
 import jif.translate.DynamicPrincipalToJavaExpr_c;
 import jif.types.JifTypeSystem;
 import jif.types.label.*;
@@ -8,6 +10,7 @@ import jif.types.label.AccessPathRoot;
 import polyglot.main.Report;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -52,6 +55,9 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
 	return path.hashCode();
     }
     
+    public List throwTypes(TypeSystem ts) {
+        return path.throwTypes(ts);
+    }
     public Principal subst(AccessPathRoot r, AccessPath e) {
         AccessPath newPath = path.subst(r, e);
         if (newPath == path) {

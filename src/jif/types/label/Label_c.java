@@ -9,6 +9,7 @@ import polyglot.ast.Expr;
 import polyglot.ext.jl.types.TypeObject_c;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -122,6 +123,10 @@ public abstract class Label_c extends TypeObject_c implements Label
         return this; 
     }
 
+    public List throwTypes(TypeSystem ts) {
+        return Collections.EMPTY_LIST; 
+    }
+    
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         return substitution.substLabel(this); 
     }

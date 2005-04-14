@@ -1,5 +1,6 @@
 package jif.types.label;
 
+import java.util.*;
 import java.util.Set;
 
 import jif.translate.DynamicLabelToJavaExpr_c;
@@ -65,6 +66,10 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
         // or through use of the label env, both taken care of outside
         // this method.
         return false;
+    }
+
+    public List throwTypes(TypeSystem ts) {
+        return path.throwTypes(ts);
     }
 
     public Label subst(AccessPathRoot r, AccessPath e) {

@@ -1,6 +1,7 @@
 package jif.types.label;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import jif.translate.JifToJavaRewriter;
@@ -137,6 +138,14 @@ public interface Label extends Param
     boolean leq_(Label L, LabelEnv H);
 
     boolean isRuntimeRepresentable();
+    /**
+     * If the label is runtime representable, when it is evaluated at
+     * runtime it may throw exceptions. This method returns a list of
+     * the exceptions that the runtime evaluation of the label may produce.
+     * If the label cannot be evaluated at runtime, an empty list should be returned.  
+     */
+    List throwTypes(TypeSystem ts);
+    
     
     Expr toJava(JifToJavaRewriter rw) throws SemanticException;
     

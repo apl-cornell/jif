@@ -1,5 +1,9 @@
 package jif.types.label;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import jif.ast.JifInstantiator;
 import jif.types.*;
 import polyglot.types.*;
@@ -62,15 +66,22 @@ public class AccessPathField extends AccessPath {
 
     	JifTypeSystem ts = (JifTypeSystem)A.typeSystem();    	
 
-        // null pointer exception may be thrown.
-    	// TODO: take into account not-null checking somehow
-        PathMap X = Xt.exc(Xt.NV(), ts.NullPointerException());
+    	PathMap X = Xt;
+    	if (!isTargetNeverNull()) {    	    
+    	    // null pointer exception may be thrown.
+    	    X = Xt.exc(Xt.NV(), ts.NullPointerException());
+    	}
     	
         Label L = ts.labelOfField(fi, A.pc());
         L = JifInstantiator.instantiate(L, A, path, path.type().toReference(), Xt.NV());
 
         X = X.NV(L.join(X.NV()));
         return X;
+    }
+    
+    protected boolean isTargetNeverNull() {
+    	// TODO: take into account not-null checking somehow
+        return (path instanceof AccessPathThis || path instanceof AccessPathClass);
     }
     public void verify(JifContext A) throws SemanticException {
         path.verify(A);
@@ -90,4 +101,18 @@ public class AccessPathField extends AccessPath {
             throw new SemanticException("Field " + fi.name() + " in access path is not final", position());
         }
     }
+    public List throwTypes(TypeSystem ts) {
+        List l = path.throwTypes(ts);
+        if (isTargetNeverNull()) {    	    
+            // this field access will never throw a NPE 
+            return l;
+        }
+        
+        List throwTypes = new ArrayList(l.size() + 1);        
+        throwTypes.addAll(l);
+        throwTypes.add(ts.NullPointerException());
+        
+        return throwTypes;
+    }
+    
 }

@@ -1,5 +1,7 @@
 package jif.ast;
 
+import java.util.List;
+
 import jif.types.*;
 import jif.types.label.AccessPath;
 import jif.types.principal.DynamicPrincipal;
@@ -7,6 +9,7 @@ import jif.types.principal.Principal;
 import polyglot.ast.Node;
 import polyglot.ext.jl.ast.Expr_c;
 import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.visit.TypeChecker;
 
@@ -50,6 +53,10 @@ public abstract class PrincipalNode_c extends Expr_c implements PrincipalNode
         return principal != null && principal.isCanonical() && super.isDisambiguated();
     }
     
+    public List throwTypes(TypeSystem ts) {
+        return principal().throwTypes(ts);
+    }
+
     /** Type check the expression. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();

@@ -1,11 +1,17 @@
 package jif.types.principal;
 
-import jif.translate.*;
+import java.util.Collections;
+import java.util.List;
+
+import jif.translate.CannotPrincipalToJavaExpr_c;
+import jif.translate.JifToJavaRewriter;
+import jif.translate.PrincipalToJavaExpr;
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import polyglot.ast.Expr;
 import polyglot.ext.jl.types.TypeObject_c;
 import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
 /** An abstract implementation of the <code>Principal</code> interface. 
@@ -28,6 +34,10 @@ public abstract class Principal_c extends TypeObject_c implements Principal {
 
     public abstract boolean isCanonical();
     public abstract boolean isRuntimeRepresentable();
+
+    public List throwTypes(TypeSystem ts) {
+        return Collections.EMPTY_LIST;
+    }
 
     public Principal subst(LabelSubstitution substitution) throws SemanticException {
         return substitution.substPrincipal(this);
