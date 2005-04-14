@@ -250,8 +250,15 @@ public class JifTypeSystem_c
 
     public Type staticTarget(Type t) {
         if (t instanceof JifParsedPolyType) {
-            return nullInstantiate(t.position(), ((JifParsedPolyType)t).instantiatedFrom());
-        }
+                JifParsedPolyType jppt = (JifParsedPolyType)t;
+                if (jppt.params().size() > 0) {
+                    // return the "null instantiation" of the base type,
+                    // to ensure that all TypeNodes contain either
+                    // a JifParsedPolyType with zero params, or a 
+                    // JifSubstClassType
+                    return jppt.instantiatedFrom().clazz();
+                }
+         }
         return super.staticTarget(t);
             
     }

@@ -60,7 +60,7 @@ public class JifDisamb_c extends Disamb_c
                     // to ensure that all TypeNodes contain either
                     // a JifParsedPolyType with zero params, or a 
                     // JifSubstClassType
-                    return nf.CanonicalTypeNode(pos, jppt.instantiatedFrom().clazz());
+                    return nf.CanonicalTypeNode(pos, jts.nullInstantiate(pos, jppt.instantiatedFrom()));
                 }
             }
         } 
