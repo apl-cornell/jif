@@ -108,6 +108,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	FieldLeak.jif (Semantic) ;
 	FileTester.jif ;
 	For1.jif ;
+	Hierarchy.jif ;
 	Heapsort.jif ;
 	Hello.jif ;
 	HiRefLowField.jif (Semantic, "Label .* not less restrictive");
