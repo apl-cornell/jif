@@ -80,7 +80,8 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 	//if [final] then invariant(type_part(Tf)) else invariant(type_part(Tf)) and invariant(label_part(Tf))
         {        
             Type fieldType = fi.type();
-            LabelSubstitutionVisitor lsv = new LabelSubstitutionVisitor(new InvarianceLabelChecker(decl.position()), true);
+            JifClassType jct = (JifClassType)A.currentClass();
+            LabelSubstitutionVisitor lsv = new LabelSubstitutionVisitor(new InvarianceLabelChecker(decl.position(), !jct.isInvariant()), true);
 
             // use a LabelSubstitutionVisitor to check the type of the field,
             // and make sure that it contains no convariant components.
@@ -98,7 +99,6 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
     
         // Make sure that static fields do not contain either parameters or 
         // the "this" label
-        Label thisLabel = ((JifClassType)A.currentClass()).thisLabel();
         if (decl.flags().isStatic()) {
             // use a LabelSubstitutionVisitor to check the type of the field,
             // and make sure that it contains no parameters or the "this" label.
@@ -106,7 +106,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             // including e.g. actual parameters to polymorphic types, labels
             // of array elements, etc.
             LabelSubstitutionVisitor lsv = 
-                new LabelSubstitutionVisitor(new StaticFieldLabelChecker(decl.position(), thisLabel), true);
+                new LabelSubstitutionVisitor(new StaticFieldLabelChecker(decl.position()), true);
             lsv.rewriteType(fi.type());
            
         }
@@ -201,15 +201,13 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
      * the This label, or any parameters 
      */    
     protected static class StaticFieldLabelChecker extends LabelSubstitution {
-        private Label thisLabel;
         private Position declPosition;
 
-        StaticFieldLabelChecker(Position declPosition, Label thisLbl) {
+        StaticFieldLabelChecker(Position declPosition) {
             this.declPosition = declPosition;
-            this.thisLabel = thisLbl;
         }
         public Label substLabel(Label L) throws SemanticException {
-            if (thisLabel.equals(L)) {
+            if (L instanceof ThisLabel) {
                 throw new SemanticException("The label of a static field " +
                         "cannot use the \"this\" label.", 
                         declPosition);
@@ -240,9 +238,11 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
      */    
     protected static class InvarianceLabelChecker extends LabelSubstitution {
         private Position declPosition;
+        private boolean isCovariantClass;
 
-        InvarianceLabelChecker(Position declPosition) {
+        InvarianceLabelChecker(Position declPosition, boolean isCovariantClass) {
             this.declPosition = declPosition;
+            this.isCovariantClass = isCovariantClass;
         }
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof CovariantParamLabel) {
@@ -250,6 +250,12 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                     "or a mutable location within a final field cannot " +
                     "contain covariant components.",
                             declPosition);
+            }
+            if (L instanceof ThisLabel && isCovariantClass) {
+                throw new SemanticException("The label of a non-final field, " +
+                                            "or a mutable location within a final field cannot " +
+                                            "contain the covariant label \"this\".",
+                                                    declPosition);            
             }
             return L;
         }
