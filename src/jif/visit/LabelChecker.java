@@ -45,7 +45,7 @@ public class LabelChecker implements Copy
      * class body, and upon leaving the class body, the system of constraints
      * will be solved.
      */
-    final private boolean solveClassBodies;
+    final private boolean solvePerClassBody;
     
     /**
      * The <code>Solver</code> to add constraints to. Depending on 
@@ -62,28 +62,21 @@ public class LabelChecker implements Copy
      */
     final private boolean doLabelSubst;
 
-    public LabelChecker(Job job, TypeSystem ts, NodeFactory nf, boolean solveClassBodies) {
-        this.job = job;
-        this.ts = (JifTypeSystem) ts;
-        this.context = (JifContext) ts.createContext();
-        this.nf = nf;
-
-        this.solveClassBodies = solveClassBodies;
-        this.doLabelSubst = true;
-        if (!solveClassBodies) {
-            this.solver = this.ts.solver();
-        }
+    public LabelChecker(Job job, TypeSystem ts, NodeFactory nf, boolean solvePerClassBody) {
+        this(job, ts, nf, solvePerClassBody, true);
     }
 
-    public LabelChecker(Job job, TypeSystem ts, NodeFactory nf) {
+    public LabelChecker(Job job, TypeSystem ts, NodeFactory nf, boolean solvePerClassBody, boolean doLabelSubst) {
         this.job = job;
         this.ts = (JifTypeSystem) ts;
         this.context = (JifContext) ts.createContext();
         this.nf = nf;
 
-        this.doLabelSubst = false;
-        this.solveClassBodies = false;
-        this.solver = this.ts.solver();
+        this.solvePerClassBody = solvePerClassBody;
+        this.doLabelSubst = true;
+        if (!solvePerClassBody) {
+            this.solver = this.ts.solver();
+        }
     }
 
     public Object copy() {
@@ -135,17 +128,13 @@ public class LabelChecker implements Copy
 	this.solver.addConstraint(c);
     }
 
-//    public void bind(DynamicLabel dl, Label l) {
-//        this.solver.bind(dl, l);
-//    }
-
     /**
      * Called by JifClassDeclExt just before this label checker is used to
      * check a class body. This allows us to use a different solver if
      * required.
      */
     public void enteringClassBody() {
-        if (solveClassBodies) {
+        if (solvePerClassBody) {
             // solving by class. Set a new solver for the class body
             this.solver = ts.solver();
         }
@@ -157,7 +146,7 @@ public class LabelChecker implements Copy
      * required.
      */
     public JifClassDecl leavingClassBody(JifClassDecl n) {
-        if (solveClassBodies) {
+        if (solvePerClassBody) {
             // solving by class. We need to solve the constraints
             return (JifClassDecl)solveConstraints(n);
         }
@@ -170,7 +159,7 @@ public class LabelChecker implements Copy
      * if required.
      */
     public Node finishedLabelCheckPass(Node n) {
-        if (!solveClassBodies) {
+        if (!solvePerClassBody) {
             // solving globally. We need to solve the constraints
             return solveConstraints(n);
         }
@@ -184,7 +173,7 @@ public class LabelChecker implements Copy
         
         Node newN = n;
 	jif.ExtensionInfo extInfo = (jif.ExtensionInfo) this.job.extensionInfo();
-        JifLabelSubst jls = extInfo.labelSubst(this.job, this.solver);
+        JifLabelSubst jls = new JifLabelSubst(this.job, this.ts, this.nf, this.solver);
         
         jls = (JifLabelSubst)jls.begin();
         

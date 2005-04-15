@@ -27,13 +27,9 @@ public class JifScheduler extends JLScheduler {
         return (LabelCheckGoal)internGoal(new LabelCheckGoal(job));
     }
 
-//    public Goal PostJavaRewriteBarrier() {
-//        return internGoal(new Barrier(this) {
-//            public Goal goalForJob(Job j) {
-//                return JifScheduler.this.JifToJavaRewritten(j);
-//            }
-//        });
-//    }
+    public FieldLabelInferenceGoal FieldLabelInference(Job job) {
+        return (FieldLabelInferenceGoal)internGoal(new FieldLabelInferenceGoal(job));
+    }
 
     public Goal JifToJavaRewritten(Job job) {
         JifTypeSystem ts = (JifTypeSystem) extInfo.typeSystem();
@@ -69,4 +65,5 @@ public class JifScheduler extends JLScheduler {
             return super.findContainer();
         }        
     }
+
 }

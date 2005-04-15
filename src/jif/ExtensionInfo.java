@@ -115,10 +115,6 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo
       return new JifJobExt((JifTypeSystem) typeSystem());
     }
 
-    public JifLabelSubst labelSubst(Job job, jif.types.Solver solver) {
-	return new JifLabelSubst(job, (JifTypeSystem) ts, nf, solver);
-    }
-
     protected Scheduler createScheduler() {
         return new JifScheduler(this, jlext);
     }
@@ -134,9 +130,13 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo
         l.add(l.indexOf(jifScheduler.ExceptionsChecked(job)),
               jifScheduler.internGoal(new VisitorGoal(job, new NotNullChecker(job, ts, nf))));
 
-        // add label checking after exception checking.
+        // add field label inference after exception checking.
+        FieldLabelInferenceGoal fliGoal = jifScheduler.FieldLabelInference(job);
+        l.add(l.indexOf(jifScheduler.ExceptionsChecked(job))+1, fliGoal);
+
+        // add label checking after field label inference.
         LabelCheckGoal labelCheckGoal = jifScheduler.LabelsChecked(job);
-        l.add(l.indexOf(jifScheduler.ExceptionsChecked(job))+1, labelCheckGoal);
+        l.add(l.indexOf(fliGoal)+1, labelCheckGoal);
 
         // add the jif to java rewrite at the end of the list.
         l.add(jifScheduler.JifToJavaRewritten(job));
