@@ -252,9 +252,9 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                             declPosition);
             }
             if (L instanceof ThisLabel && isCovariantClass) {
-                throw new SemanticException("The label of a non-final field, " +
+                throw new SemanticException("In a covariant class the label of a non-final field, " +
                                             "or a mutable location within a final field cannot " +
-                                            "contain the covariant label \"this\".",
+                                            "contain the label \"this\".",
                                                     declPosition);            
             }
             return L;
