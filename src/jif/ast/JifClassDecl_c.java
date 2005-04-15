@@ -92,6 +92,11 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 
     private void buildParams(JifTypeSystem ts) throws SemanticException {
         JifParsedPolyType ct = (JifParsedPolyType)this.type;
+        if (ct == null) {
+            // The only way the class type could be null is if
+            // super.buildTypes failed. Give up now.
+            return;
+        }
         MuPClass pc = ts.mutablePClass(ct.position());
 
         ct.setInstantiatedFrom(pc);
