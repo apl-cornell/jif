@@ -80,6 +80,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Default1.jif ;
 	Deref.jif ;
 	Deref2.jif ;
+	DuplicateClass.jif (Semantic, "Duplicate class");
 	Dyn1.jif ;
 	Dyn2.jif ;
 	Dyn4.jif ;
@@ -118,6 +119,10 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	IntPair.jif ;
 	InterfaceTest.jif ;
 	InvariantClass.jif (Semantic, "Covariant classes .* can only be extended with covariant classes");
+	InvariantThis1.jif ;
+	InvariantThis2.jif (Semantic, "cannot contain .*this");
+	InvariantThis3.jif (Semantic, "cannot contain .*this");
+	InvariantThis4.jif (Semantic, "cannot contain .*this");
 	LabelIf1.jif ;
 	LabelIf2.jif (Semantic, "only be used in an if statement");
 	LabelIf3.jif (Semantic, "only be used in an if statement");
