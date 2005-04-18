@@ -211,22 +211,47 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        // The invariantness of the class must agree with its super class.
-        // At the moment, this means that we can't have any invariant classes.
+        // The invariantness of the class must agree with its super class
+        // and its interfaces.
         Type superClass = null;
         if (this.superClass() != null) {
             superClass = this.superClass().type();
         }
-        if (superClass != null) {
+        if (superClass != null && !superClass.equals(tc.typeSystem().Object())) {
             if (this.invariant != ((JifClassType)superClass.toClass()).isInvariant()) {
-                throw new SemanticException("Covariant classes other than " +
-                     "Object can only be " +
-                    "extended with covariant classes.", 
-                    this.position());                
+                if (this.invariant) {
+                    throw new SemanticException("Invariant class " + this.type() + " cannot extend covariant class "
+                                                + superClass + ". An invariant class may only extend Object or another invariant class",
+                                                this.position());                    
+                }
+                else {
+                    throw new SemanticException("Covariant class " + this.type() + " cannot extend invariant class " + superClass,
+                                                this.position());                    
+                }
             }
         }
-                
-        return super.typeCheck(tc);
+        
+        JifClassDecl_c n = (JifClassDecl_c)super.typeCheck(tc);
+        
+        JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
+        for (Iterator interfaces = n.type().interfaces().iterator(); interfaces.hasNext(); ) {
+            Type interf = (Type)interfaces.next();
+            if (ts.unlabel(interf) instanceof JifClassType) {
+                if (this.invariant != ((JifClassType)interf).isInvariant()) {
+                    if (this.invariant) {
+                        throw new SemanticException("Invariant class " + this.type() + " cannot implement covariant interface "
+                                                    + interf + ". An invariant class may only implement invariant interfaces",
+                                                    this.position());                    
+                    }
+                    else {
+                        throw new SemanticException("Covariant class " + this.type() + " cannot implement invariant interface " + interf,
+                                                    this.position());                    
+                    }
+                }                
+            }
+        }
+              
+        return n;
     }
 
     public void translate(CodeWriter w, Translator tr) {
