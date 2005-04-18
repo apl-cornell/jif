@@ -118,7 +118,17 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Implicit2.jif ;
 	IntPair.jif ;
 	InterfaceTest.jif ;
-	InvariantClass.jif (Semantic, "Covariant classes .* can only be extended with covariant classes");
+	InvariantClass.jif (Semantic, "Invariant class .* cannot extend covariant class");
+	InvariantClass1.jif (Semantic, "not a subtype");
+	InvariantClass2.jif (Semantic, "Covariant class .* cannot extend invariant class");
+	InvariantClass3.jif;
+	InvariantClass4.jif (Semantic, "not a subtype");
+	InvariantClass4a.jif ;
+	InvariantClass5.jif ;
+	InvariantClass6.jif (Semantic, "not a subtype");
+	InvariantClass7.jif (Semantic, "Invariant class .* cannot implement covariant interface");
+	InvariantClass8.jif (Semantic, "Invariant class .* cannot implement covariant interface");
+	InvariantClass9.jif (Semantic, "Covariant class .* cannot extend invariant class");
 	InvariantThis1.jif ;
 	InvariantThis2.jif (Semantic, "cannot contain .*this");
 	InvariantThis3.jif (Semantic, "cannot contain .*this");
