@@ -24,10 +24,17 @@ public class SubtypeChecker
     {
         try {
             
-            // make sure that we take the top level labels off the types.
+            // make sure that we take the top level labels off the types if they are both
+            // covariant
             JifTypeSystem ts = lc.jifTypeSystem();
-            supertype = ts.unlabel(supertype);
-            subtype = ts.unlabel(subtype);
+            if (!((ts.unlabel(supertype) instanceof JifClassType && 
+                    ((JifClassType)ts.unlabel(supertype)).isInvariant()) ||
+                  (ts.unlabel(subtype) instanceof JifClassType && 
+                            ((JifClassType)ts.unlabel(subtype)).isInvariant()))) {
+              supertype = ts.unlabel(supertype);
+              subtype = ts.unlabel(subtype);                
+            }
+            
             
             if (Report.should_report(Report.types, 1))
                 Report.report(1, "Adding subtype constraints: " + supertype + " >= " + subtype);
@@ -169,46 +176,84 @@ public class SubtypeChecker
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-	    
-        if (ts.isLabeled(supertype) && ts.isLabeled(subtype)) {
+
+	Type unlblSupertype = ts.unlabel(supertype);
+	Type unlblSubtype = ts.unlabel(subtype);
+
+	if (ts.isLabeled(supertype) && ts.isLabeled(subtype)) {
             // the two types are labeled. make sure that 
             // the label of supertype is at least as restrictve as that
-            // of subtype.
+            // of subtype, or if at least one of them is invariant, that they are equal
             final Type lOrigSubtype = origSubtype;
             final Type lOrigSupertype = origSupertype;
-            lc.constrain(new LabelConstraint(new NamedLabel(
-                                                 "label of type " + subtype,
-                                                 ts.labelOfType(subtype)), 
-                                             LabelConstraint.LEQ, 
-                                             new NamedLabel(
-                                                "label of type " + supertype,
-                                                 ts.labelOfType(supertype)), 
-                                             A.labelEnv(),
-                                             pos) {
-                         public String msg() {
-                             return lOrigSubtype + " is not a subtype of " + 
-                                   lOrigSupertype + ".";
-                         }
-                         public String detailMsg() {
-                             return lOrigSubtype + " is not a subtype of " + 
-                                   lOrigSupertype + ". Subtyping requires " +
-                                   "the label of the subtype to be less " +
-                                   "restrictive than the label of the " +
-                                   "supertype.";
-                         }
-             }
-             );
+            final Type invClass;
+            final Type otherClass;
+            if (unlblSupertype instanceof JifClassType && ((JifClassType)unlblSupertype).isInvariant()) {
+                invClass = unlblSupertype;
+                otherClass = unlblSubtype;
+            }
+            else if (unlblSubtype instanceof JifClassType && ((JifClassType)unlblSubtype).isInvariant()) {
+                invClass = unlblSubtype;
+                otherClass = unlblSupertype;
+            }
+            else {
+                invClass = null;
+                otherClass = null;
+            }
+            if (invClass != null) {
+	            lc.constrain(new LabelConstraint(new NamedLabel("label of type " + subtype,
+	                                                            ts.labelOfType(subtype)), 
+	                                                        LabelConstraint.EQUAL, 
+	                                                        new NamedLabel(
+	                                                           "label of type " + supertype,
+	                                                            ts.labelOfType(supertype)), 
+	                                                        A.labelEnv(),
+	                                                        pos) {
+	                                    public String msg() {
+	                                        return lOrigSubtype + " is not a subtype of " + 
+	                                              lOrigSupertype + ".";
+	                                    }
+	                                    public String detailMsg() {
+	                                        return lOrigSubtype + " is not a subtype of " + 
+	                                              lOrigSupertype + ". The class " + invClass + " is invariant " +
+	                                              "and so the label of " + otherClass + " mus";
+	                                    }
+	                        }
+	                        );
+            }
+            else {
+                lc.constrain(new LabelConstraint(new NamedLabel(
+                                                                "label of type " + subtype,
+                                                                ts.labelOfType(subtype)), 
+                                                            LabelConstraint.LEQ, 
+                                                            new NamedLabel(
+                                                               "label of type " + supertype,
+                                                                ts.labelOfType(supertype)), 
+                                                            A.labelEnv(),
+                                                            pos) {
+                                        public String msg() {
+                                            return lOrigSubtype + " is not a subtype of " + 
+                                                  lOrigSupertype + ".";
+                                        }
+                                        public String detailMsg() {
+                                            return lOrigSubtype + " is not a subtype of " + 
+                                                  lOrigSupertype + ". Subtyping requires " +
+                                                  "the label of the subtype to be less " +
+                                                  "restrictive than the label of the " +
+                                                  "supertype.";
+                                        }
+                            }
+                            );                
+            }
         }
         
-	supertype = ts.unlabel(supertype);
-	subtype = ts.unlabel(subtype);
 
-        if (supertype instanceof JifClassType && subtype.isNull())
+        if (unlblSupertype instanceof JifClassType && unlblSubtype.isNull())
             return true;
         
-        if (subtype instanceof JifClassType && supertype instanceof JifClassType) {
-	    JifClassType sub = (JifClassType) subtype;
-	    JifClassType sup = (JifClassType) supertype;
+        if (unlblSubtype instanceof JifClassType && unlblSupertype instanceof JifClassType) {
+	    JifClassType sub = (JifClassType) unlblSubtype;
+	    JifClassType sup = (JifClassType) unlblSupertype;
 
             if (sub.isInvariant() != sup.isInvariant()) {
                 return false;
@@ -238,18 +283,17 @@ public class SubtypeChecker
 	    }
 	}
 	
-        if (subtype instanceof ArrayType && supertype instanceof ArrayType) {
+        if (unlblSubtype instanceof ArrayType && unlblSupertype instanceof ArrayType) {
             // both subtype and supertype are arrays, say of D and C respectively
             // i.e. subtype == D[], supertype = C[]
             // we insist that C[] >= D[] iff C >= D and D >= C.
-            Type subBase = ((ArrayType)subtype).base();  
-            Type supBase = ((ArrayType)supertype).base();
+            Type subBase = ((ArrayType)unlblSubtype).base();  
+            Type supBase = ((ArrayType)unlblSupertype).base();
 
             if (!recursiveAddSubtypeConstraints(lc, pos, subBase, supBase) ||
                 !recursiveAddSubtypeConstraints(lc, pos, supBase, subBase)) {
                 return false; 
             }
-  
         }
 
 	return true;
