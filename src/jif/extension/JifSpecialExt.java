@@ -3,6 +3,7 @@ package jif.extension;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
+import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.Node;
 import polyglot.ast.Special;
@@ -66,11 +67,7 @@ public class JifSpecialExt extends Jif_c
 
 	JifClassType ct = (JifClassType) A.currentClass();
 	
-        // NJN: commented out by nystrom, A.currentCode may be an initializer
-	//JifProcedureInstance jpi = (JifProcedureInstance) A.currentCode();
-
-        // NJN: commented out by zlt
-	//Label L = jpi.thisLabel();
+	se = (Special)se.type(ts.labeledType(se.position(), ct, ct.thisLabel()));
 
 	PathMap X = ts.pathMap();
 	X = X.N(A.pc());
