@@ -48,7 +48,7 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
         if (Report.should_report(Report.debug, 1)) { 
             return "<covariant-param-label " + this.paramInstance + ">";
         }
-        return "<covariant-param-label " + this.paramInstance.name() + ">";
+        return this.paramInstance.name();
     }
 
     public boolean leq_(Label L, LabelEnv env) {

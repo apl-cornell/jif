@@ -46,7 +46,7 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
         if (Report.should_report(Report.debug, 1)) { 
             return "<param-label " + this.paramInstance + ">";
         }
-        return "<param-label " + this.paramInstance.name() + ">";
+        return this.paramInstance.name();
     }
 
     public boolean leq_(Label L, LabelEnv env) {
