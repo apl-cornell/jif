@@ -24,16 +24,10 @@ public class SubtypeChecker
     {
         try {
             
-            // make sure that we take the top level labels off the types if they are both
-            // covariant
+            // make sure that we take the top level labels off the types
             JifTypeSystem ts = lc.jifTypeSystem();
-            if (!((ts.unlabel(supertype) instanceof JifClassType && 
-                    ((JifClassType)ts.unlabel(supertype)).isInvariant()) ||
-                  (ts.unlabel(subtype) instanceof JifClassType && 
-                            ((JifClassType)ts.unlabel(subtype)).isInvariant()))) {
-              supertype = ts.unlabel(supertype);
-              subtype = ts.unlabel(subtype);                
-            }
+            supertype = ts.unlabel(supertype);
+            subtype = ts.unlabel(subtype);                
             
             
             if (Report.should_report(Report.types, 1))
@@ -186,42 +180,6 @@ public class SubtypeChecker
             // of subtype, or if at least one of them is invariant, that they are equal
             final Type lOrigSubtype = origSubtype;
             final Type lOrigSupertype = origSupertype;
-            final Type invClass;
-            final Type otherClass;
-            if (unlblSupertype instanceof JifClassType && ((JifClassType)unlblSupertype).isInvariant()) {
-                invClass = unlblSupertype;
-                otherClass = unlblSubtype;
-            }
-            else if (unlblSubtype instanceof JifClassType && ((JifClassType)unlblSubtype).isInvariant()) {
-                invClass = unlblSubtype;
-                otherClass = unlblSupertype;
-            }
-            else {
-                invClass = null;
-                otherClass = null;
-            }
-            if (invClass != null) {
-	            lc.constrain(new LabelConstraint(new NamedLabel("label of type " + subtype,
-	                                                            ts.labelOfType(subtype)), 
-	                                                        LabelConstraint.EQUAL, 
-	                                                        new NamedLabel(
-	                                                           "label of type " + supertype,
-	                                                            ts.labelOfType(supertype)), 
-	                                                        A.labelEnv(),
-	                                                        pos) {
-	                                    public String msg() {
-	                                        return lOrigSubtype + " is not a subtype of " + 
-	                                              lOrigSupertype + ".";
-	                                    }
-	                                    public String detailMsg() {
-	                                        return lOrigSubtype + " is not a subtype of " + 
-	                                              lOrigSupertype + ". The class " + invClass + " is invariant " +
-	                                              "and so the label of " + otherClass + " mus";
-	                                    }
-	                        }
-	                        );
-            }
-            else {
                 lc.constrain(new LabelConstraint(new NamedLabel(
                                                                 "label of type " + subtype,
                                                                 ts.labelOfType(subtype)), 
@@ -244,7 +202,6 @@ public class SubtypeChecker
                                         }
                             }
                             );                
-            }
         }
         
 
@@ -254,10 +211,6 @@ public class SubtypeChecker
         if (unlblSubtype instanceof JifClassType && unlblSupertype instanceof JifClassType) {
 	    JifClassType sub = (JifClassType) unlblSubtype;
 	    JifClassType sup = (JifClassType) unlblSupertype;
-
-            if (sub.isInvariant() != sup.isInvariant()) {
-                return false;
-            }
 
 	    if (ts.equals(polyTypeForClass(sub), polyTypeForClass(sup))) {
 		// Insert constraints between parameters.

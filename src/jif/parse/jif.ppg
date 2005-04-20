@@ -261,7 +261,6 @@ non terminal List principal_list, readers;
 
 non terminal List parameters_opt, parameters;
 non terminal ParamDecl parameter;
-non terminal Boolean invariant_opt;
 non terminal List constraints, constraints_opt;
 non terminal List authority, authority_opt;
 non terminal ConstraintNode constraint;
@@ -421,11 +420,11 @@ drop { class_declaration ::=
 extend class_declaration ::=
                     // ClassDecl
         modifiers_opt:a CLASS:n IDENTIFIER:b
-                parameters_opt:p invariant_opt:i super_opt:c
+                parameters_opt:p super_opt:c
                 interfaces_opt:d authority_opt:u class_body:e
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n, b),
                                                a, b.getIdentifier(),
-                                               p, i.booleanValue(), c, d, u, e); :}
+                                               p, c, d, u, e); :}
     ;
 
 drop { super ::= EXTENDS class_type; }
@@ -633,12 +632,6 @@ parameter ::=
                                         a.getIdentifier()); :}
     ;
 
-invariant_opt ::=
-	{: RESULT = new Boolean(false); :}
-    |
-    	LPAREN INVARIANT RPAREN
-	{: RESULT = new Boolean(true); :}
-    ;
     
 constraints_opt ::=
         // List of ConstraintNode
@@ -671,11 +664,11 @@ constraint ::=
 override interface_declaration ::=
         // ClassDecl
         modifiers_opt:a INTERFACE:n IDENTIFIER:b
-                parameters_opt:p invariant_opt:i
+                parameters_opt:p 
                 extends_interfaces_opt:d authority_opt:u interface_body:e
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n,b),
 		    a.set(Flags.INTERFACE), b.getIdentifier(),
-		    p, i.booleanValue(), null, d, u, e); :} 
+		    p, null, d, u, e); :} 
     ;
 drop { extends_interfaces ::=
         EXTENDS interface_type:a

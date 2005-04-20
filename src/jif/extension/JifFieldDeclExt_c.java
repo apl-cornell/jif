@@ -81,7 +81,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         {        
             Type fieldType = fi.type();
             JifClassType jct = (JifClassType)A.currentClass();
-            LabelSubstitutionVisitor lsv = new LabelSubstitutionVisitor(new InvarianceLabelChecker(decl.position(), !jct.isInvariant()), true);
+            LabelSubstitutionVisitor lsv = new InvarianceLabelVisitor(decl.position());
 
             // use a LabelSubstitutionVisitor to check the type of the field,
             // and make sure that it contains no convariant components.
@@ -233,16 +233,32 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
     }
     
     /**
+     * Visitor to ensure that labels do not use
+     * covariant labels in the wrong places 
+     */    
+    protected static class InvarianceLabelVisitor extends LabelSubstitutionVisitor {
+        /* 
+         * Don't check subst types, as the subtype checker will take care of those.
+         */
+        protected boolean recurseIntoSubstType(JifSubstType type) {
+            return false;
+        }
+        public InvarianceLabelVisitor(Position pos) {
+            super(new InvarianceLabelChecker(pos), true);
+        }
+        
+    }
+    
+
+    /**
      * Checker to ensure that labels do not use
-     * covariant labels 
+     * covariant labels in the wrong places
      */    
     protected static class InvarianceLabelChecker extends LabelSubstitution {
         private Position declPosition;
-        private boolean isCovariantClass;
 
-        InvarianceLabelChecker(Position declPosition, boolean isCovariantClass) {
+        InvarianceLabelChecker(Position declPosition) {
             this.declPosition = declPosition;
-            this.isCovariantClass = isCovariantClass;
         }
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof CovariantParamLabel) {
@@ -251,8 +267,8 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                     "contain covariant components.",
                             declPosition);
             }
-            if (L instanceof ThisLabel && isCovariantClass) {
-                throw new SemanticException("In a covariant class the label of a non-final field, " +
+            if (L instanceof ThisLabel) {
+                throw new SemanticException("The label of a non-final field, " +
                                             "or a mutable location within a final field cannot " +
                                             "contain the label \"this\".",
                                                     declPosition);            

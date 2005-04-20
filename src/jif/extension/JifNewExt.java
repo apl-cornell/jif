@@ -37,19 +37,6 @@ public class JifNewExt extends Jif_c
 	Label newLabel = ts.freshLabelVariable(noe.position(), "new" + ct.name(),
                             "label of the reference to the newly created " +
                             ct.name() + " object, at " + noe.position());
-	if (ct instanceof JifClassType) {
-	    JifClassType jct = (JifClassType) ct;
-	    if (jct.isInvariant()) {
-              /*
-                JifPolyType pt = (JifPolyType) ((JifSubstType)jct).base();
-                ParamLabel thisL = (ParamLabel) pt.thisLabel();
-                JifSubst subst = (JifSubst) ((JifSubstType)jct).subst();
-                newLabel = (Label) subst.get(thisL.uid());
-                */
-
-                //$$$$$ newLabel = jct.thisLabel();
-	    }
-	}
 
 	if (ts.isLabeled(noe.type()) ) {
             // error messages for equality constraints aren't displayed, so no

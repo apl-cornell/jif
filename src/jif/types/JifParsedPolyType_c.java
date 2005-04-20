@@ -19,14 +19,12 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 {
     List params;
     List authority;
-    boolean invariant;
     PClass instantiatedFrom;
 
     protected JifParsedPolyType_c() {
 	super();
 	this.params = new TypedList(new LinkedList(), ParamInstance.class, false);
 	this.authority = new TypedList(new LinkedList(), Principal.class, false);
-	this.invariant = false;
         this.instantiatedFrom = null;
     }
 
@@ -123,14 +121,6 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	return ((JifTypeSystem)ts).thisLabel(this);
     }
 
-    public boolean isInvariant() {
-	return this.invariant;
-    }
-
-    public void setInvariant(boolean inv) {
-	this.invariant = inv;
-    }
-    
     public void addMemberClass(ClassType t) {
 	throw new InternalCompilerError("Jif does not support inner classes.");
     }
@@ -162,8 +152,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	}
 
         if (package_() != null) {
-	    return package_().toString() + "." + name + s +
-		(invariant? "(invariant)" : "");
+	    return package_().toString() + "." + name + s;
 	}
 
 	return name + s;
@@ -182,15 +171,13 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 		    && name.equals(t.name())
 		    && flags.equals(t.flags())
 		    && params.equals(t.params())
-		    && authority.equals(t.authority())
-                    && invariant == t.isInvariant();
+		    && authority.equals(t.authority());
 	    }
 	    else if (package_() == t.package_()) {
 		return name.equals(t.name())
 		    && flags.equals(t.flags())
 		    && params.equals(t.params())
-		    && authority.equals(t.authority())
-                    && invariant == t.isInvariant();
+		    && authority.equals(t.authority());
 	    }
 	}
 

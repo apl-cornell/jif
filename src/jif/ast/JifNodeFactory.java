@@ -25,7 +25,7 @@ public interface JifNodeFactory extends NodeFactory {
     AmbPrincipalNode AmbPrincipalNode(Position pos, Expr expr);
     AmbPrincipalNode AmbPrincipalNode(Position pos, String name);
     CanonicalPrincipalNode CanonicalPrincipalNode(Position pos, Principal principal);
-    JifClassDecl JifClassDecl(Position pos, Flags flags, String name, List params, boolean inv, TypeNode superClass, List interfaces, List authority, ClassBody body);
+    JifClassDecl JifClassDecl(Position pos, Flags flags, String name, List params, TypeNode superClass, List interfaces, List authority, ClassBody body);
     JifMethodDecl JifMethodDecl(Position pos, Flags flags, TypeNode returnType, String name, LabelNode startLabel, List arguments, LabelNode endLabel, List exceptions, List constraints, Block body);
     JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, String name, LabelNode startLabel, LabelNode returnLabel, List arguments, List exceptions, List constraints, Block body);
     AmbParam AmbParam(Position pos, String name);

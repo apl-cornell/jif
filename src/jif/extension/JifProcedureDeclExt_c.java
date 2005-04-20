@@ -83,10 +83,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	    // argBj = A.instantiate(argBj);
 
 	    A.addAssertionLE(Lj, argBj);
-	    if (ts.unlabel(tj) instanceof JifClassType) {
-		if (((JifClassType) ts.unlabel(tj)).isInvariant()) 
-		    A.addAssertionLE(argBj, Lj);
-	    }
 
 	    /*if (ts.isLabeled(tj)) {
 		depGraph.addNode((VarLabel) Lj);

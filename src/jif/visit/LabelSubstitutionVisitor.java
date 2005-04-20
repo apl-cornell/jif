@@ -196,17 +196,17 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
     }
 
     public Type rewriteType(Type t) throws SemanticException {
-        if (t instanceof LabeledType) {
+        if (t instanceof LabeledType && recurseIntoLabeledType((LabeledType)t)) {
             LabeledType lt = (LabeledType)t;
             Label L = lt.labelPart();
             Type bt = lt.typePart();
             return lt.labelPart(rewriteLabel(L)).typePart(rewriteType(bt));
         }
-        else if (t instanceof ArrayType) {
+        else if (t instanceof ArrayType && recurseIntoArrayType((ArrayType)t)) {
             ArrayType at = (ArrayType)t;
             return at.base(rewriteType(at.base()));
         }
-        else if (t instanceof JifSubstType) {
+        else if (t instanceof JifSubstType && recurseIntoSubstType((JifSubstType)t)) {
             JifSubstType jst = (JifSubstType)t;
             Map newMap = new HashMap();
             List args = new LinkedList();
@@ -241,6 +241,18 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
 
         }
         return t;
+    }
+
+    protected boolean recurseIntoSubstType(JifSubstType type) {
+        return true;
+    }
+
+    protected boolean recurseIntoArrayType(ArrayType type) {
+        return true;
+    }
+
+    protected boolean recurseIntoLabeledType(LabeledType type) {
+        return true;
     }
 
     protected Label rewriteLabel(Label L) throws SemanticException {

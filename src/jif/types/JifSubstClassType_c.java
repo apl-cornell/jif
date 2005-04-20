@@ -71,11 +71,6 @@ public class JifSubstClassType_c extends SubstClassType_c
 	return ((JifTypeSystem)ts).thisLabel(this);
     }
 
-    public boolean isInvariant() {
-        JifClassType base = (JifClassType) this.base;
-        return base.isInvariant();
-    }
-    
     public String toString() {
         if (Report.should_report(Report.debug, 1)) {
             return super.toString();

@@ -15,16 +15,14 @@ import polyglot.visit.*;
 public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 {
     protected List params;
-    protected boolean invariant; //"this" label is invariant
     protected List authority;
 
     public JifClassDecl_c(Position pos, Flags flags, String name,
-	    List params, boolean inv, TypeNode superClass, List interfaces,
+	    List params, TypeNode superClass, List interfaces,
 	    List authority, ClassBody body) {
 	super(pos, flags, name, superClass, interfaces, body);
 	this.params = TypedList.copyAndCheck(params, ParamDecl.class, true);
 	this.authority = TypedList.copyAndCheck(authority, PrincipalNode.class, true);
-	this.invariant = inv;
     }
 
     public List params() {
@@ -116,9 +114,6 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
                 names.add(p.name());
         }
         ct.setParams(newParams);
-
-        // set whether the class is invariant.
-        ct.setInvariant(this.invariant);
     }
 
 
@@ -167,10 +162,6 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             w.write("]");
         }
 
-        if (invariant) {
-            w.write(" (invariant)");
-        }
-
         if (! authority.isEmpty()) {
             w.write(" authority(");
             for (Iterator i = authority.iterator(); i.hasNext(); ) {
@@ -217,41 +208,9 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         if (this.superClass() != null) {
             superClass = this.superClass().type();
         }
-        if (superClass != null && !superClass.equals(tc.typeSystem().Object())) {
-            if (this.invariant != ((JifClassType)superClass.toClass()).isInvariant()) {
-                if (this.invariant) {
-                    throw new SemanticException("Invariant class " + this.type() + " cannot extend covariant class "
-                                                + superClass + ". An invariant class may only extend Object or another invariant class",
-                                                this.position());                    
-                }
-                else {
-                    throw new SemanticException("Covariant class " + this.type() + " cannot extend invariant class " + superClass,
-                                                this.position());                    
-                }
-            }
-        }
         
-        JifClassDecl_c n = (JifClassDecl_c)super.typeCheck(tc);
+        return super.typeCheck(tc);
         
-        JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-        for (Iterator interfaces = n.type().interfaces().iterator(); interfaces.hasNext(); ) {
-            Type interf = (Type)interfaces.next();
-            if (ts.unlabel(interf) instanceof JifClassType) {
-                if (this.invariant != ((JifClassType)interf).isInvariant()) {
-                    if (this.invariant) {
-                        throw new SemanticException("Invariant class " + this.type() + " cannot implement covariant interface "
-                                                    + interf + ". An invariant class may only implement invariant interfaces",
-                                                    this.position());                    
-                    }
-                    else {
-                        throw new SemanticException("Covariant class " + this.type() + " cannot implement invariant interface " + interf,
-                                                    this.position());                    
-                    }
-                }                
-            }
-        }
-              
-        return n;
     }
 
     public void translate(CodeWriter w, Translator tr) {

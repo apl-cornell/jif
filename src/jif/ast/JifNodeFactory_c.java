@@ -140,7 +140,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
 
     public ClassDecl ClassDecl(Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body) {
         ClassDecl n = new JifClassDecl_c(pos, flags, name,
-                Collections.EMPTY_LIST, false, superClass, interfaces, 
+                Collections.EMPTY_LIST, superClass, interfaces, 
                 Collections.EMPTY_LIST, body);
         n = (ClassDecl)n.ext(extFactory().extClassDecl());
         n = (ClassDecl)n.del(delFactory().delClassDecl());
@@ -152,11 +152,11 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     }
 
     public JifClassDecl JifClassDecl(Position pos, Flags flags, String name,
-                                     List params, boolean invariant,
+                                     List params, 
                                      TypeNode superClass, List interfaces,
                                      List authority, ClassBody body) {
         JifClassDecl n = new JifClassDecl_c(pos, flags, name,
-                                            params, invariant, superClass, interfaces, authority, body);
+                                            params, superClass, interfaces, authority, body);
         n = (JifClassDecl)n.ext(extFactory().extClassDecl());
         n = (JifClassDecl)n.del(delFactory().delClassDecl());
         return n;

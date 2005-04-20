@@ -31,12 +31,6 @@ public interface JifClassType extends ClassType {
     Label thisLabel();
     
     /**
-     * TODO doco
-     * @return
-     */
-    boolean isInvariant();
-    
-    /**
      * TODO Doco
      * @return
      */
