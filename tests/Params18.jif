@@ -1,0 +1,20 @@
+class C[label L, label M] extends D[{L;M}] {
+    int{L} f = 6;
+    int{M} g = 6;
+
+}
+
+class D[label N] {
+}
+
+class E {
+    public void good() {
+	C[{Alice:}, {Bob:}] foo = null;
+	D[{Alice:;Bob:}] o = foo; // upcast ok
+
+	try {
+	    C[{Alice:}, {Bob:}] that = (C[{Alice:}, {Bob:}])o; // downcast ok
+	}
+	catch (ClassCastException impossible) {}
+    }
+}
