@@ -72,8 +72,8 @@ public class JifCastExt extends Jif_c
                 
                 if (cp.isInvariantLabel() && ep.isCovariantLabel()) 
                     throw new SemanticException( 
-                                                "Can not cast an invariant label parameter to " +
-                                                "a covariant label parameter.", pos);
+                                                "Can not cast a covariant label parameter to " +
+                                                "an invariant label parameter.", pos);
                 
                 if (cp.isInvariantLabel() && ep.isInvariantLabel()) { 
                     lc.constrain(new LabelConstraint(
