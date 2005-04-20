@@ -1,6 +1,6 @@
-class Complex (invariant)
+class Complex
 {
-    public float{this} real, imag;
+    public final float{this} real, imag;
 
     public Complex{r;i}(float{this} r, float{this} i) {
 	real = r;

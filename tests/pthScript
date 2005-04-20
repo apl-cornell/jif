@@ -118,17 +118,17 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Implicit2.jif ;
 	IntPair.jif ;
 	InterfaceTest.jif ;
-	InvariantClass.jif (Semantic, "Invariant class .* cannot extend covariant class");
-	InvariantClass1.jif (Semantic, "not a subtype");
-	InvariantClass2.jif (Semantic, "Covariant class .* cannot extend invariant class");
+#	InvariantClass.jif (Semantic, "Invariant class .* cannot extend covariant class");
+#	InvariantClass1.jif (Semantic, "not a subtype");
+#	InvariantClass2.jif (Semantic, "Covariant class .* cannot extend invariant class");
 	InvariantClass3.jif;
-	InvariantClass4.jif (Semantic, "not a subtype");
-	InvariantClass4a.jif ;
-	InvariantClass5.jif ;
-	InvariantClass6.jif (Semantic, "not a subtype");
-	InvariantClass7.jif (Semantic, "Invariant class .* cannot implement covariant interface");
-	InvariantClass8.jif (Semantic, "Invariant class .* cannot implement covariant interface");
-	InvariantClass9.jif (Semantic, "Covariant class .* cannot extend invariant class");
+#	InvariantClass4.jif (Semantic, "not a subtype");
+#	InvariantClass4a.jif ;
+#	InvariantClass5.jif ;
+#	InvariantClass6.jif (Semantic, "not a subtype");
+#	InvariantClass7.jif (Semantic, "Invariant class .* cannot implement covariant interface");
+#	InvariantClass8.jif (Semantic, "Invariant class .* cannot implement covariant interface");
+#	InvariantClass9.jif (Semantic, "Covariant class .* cannot extend invariant class");
 	InvariantThis1.jif ;
 	InvariantThis2.jif (Semantic, "cannot contain .*this");
 	InvariantThis3.jif (Semantic, "cannot contain .*this");
@@ -181,13 +181,15 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Params10.jif ;
 	Params11.jif ;
 	Params12.jif ;
-	Params13.jif (Semantic, "not cast.*invariant.* parameter to.* covariant");
+	Params13.jif (Semantic, "not cast.*covariant.* parameter to.* invariant");
 	Params14.jif (Semantic, "not instantiate .* invariant .* parameter with .* non-invariant");
 	Params15.jif (Semantic, "must be representable at runtime");
 	Params16.jif (Semantic, "Cast an invariant label parameter to a different label");
-	Params17.jif (Semantic, "@@@@@"); // I think there is an instantiation missing in this test case!
-	Params18.jif ;
-	Params19.jif (Semantic, "@@@@@"); // I think there is an instantiation missing in this test case!
+	Params17.jif (Semantic, "Cast an invariant label parameter to a different label");
+	Params18.jif (Semantic, "Cast an invariant label parameter to a different label");
+	Params19.jif (Semantic, "not a subtype"); // I think there is an instantiation missing in this test case!
+	Params20.jif ;
+	Params21.jif (Semantic, "not cast.*covariant.* parameter to.* invariant");
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;
@@ -221,7 +223,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	SwitchLabel3.jif (Semantic, "not representable at runtime");
 	SwitchLabel4.jif;
 	This1.jif ;
-	This2.jif ;
+#	This2.jif ;
 	ToString.jif (Semantic, "Cannot coerce") ;
 	User1.jif ;
 	Vec.jif ;

@@ -1,0 +1,19 @@
+class C[label L] extends D[L] {
+    int{L} f = 6;
+}
+
+class D[covariant label L] {
+}
+
+class E {
+    public void leak() throws ClassCastException {
+	try {
+	    C[{}] a = new C[{}]();
+	    D[{}] b = a; // upcast ok
+	    D[{Alice:}] c = b; // upcast ok
+	    C[{Alice:}] d = (C[{Alice:}])c; // downcast bad!
+	    d.f =  34; // leak, since d aliases a.
+	}
+	catch (ClassCastException impossible) {}
+    }
+}

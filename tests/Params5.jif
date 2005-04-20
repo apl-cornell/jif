@@ -1,4 +1,4 @@
-class A[label L] (invariant) {
+class A[label L] {
     A[L]{L} a;
     A[L]{L} b;
 
