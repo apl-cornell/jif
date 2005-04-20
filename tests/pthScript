@@ -24,7 +24,7 @@
 #                       is always enclosed in quotes.
 #      CmdLineArgs  :   additional command line args for the Polyglot 
 #                       compiler; is always enclosed in quotes.
-
+#
 # When invoking this script, it will probably be necessary to supply
 # an appropriate class path:
 #    $ pth pthScript -cp "../classes:../lib-classes:."
