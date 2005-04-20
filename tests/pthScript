@@ -184,6 +184,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Params13.jif (Semantic, "not cast.*invariant.* parameter to.* covariant");
 	Params14.jif (Semantic, "not instantiate .* invariant .* parameter with .* non-invariant");
 	Params15.jif (Semantic, "must be representable at runtime");
+	Params16.jif (Semantic, "Cast an invariant label parameter to a different label");
+	Params17.jif (Semantic, "@@@@@"); // I think there is an instantiation missing in this test case!
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;

@@ -1,0 +1,19 @@
+class C[label L, label M] extends D[{L;M}] {
+    int{L} f = 6;
+    int{M} g = 6;
+
+    public void leak(D[{L;M}] o) {
+	if (o instanceof C[M, L]) { // attempt to leak things by swapping the labels
+	    try {
+		C[M,L] that = (C[M,L])o;
+		this.f = that.g; // bad!
+	    }
+	    catch (ClassCastException impossible) {}
+	    catch (NullPointerException impossible) {}
+	}
+    }
+
+}
+
+class D[label N] {
+}
