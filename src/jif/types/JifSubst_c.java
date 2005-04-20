@@ -47,6 +47,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
     ////////////////////////////////////////////////////////////////
     // Override substitution methods to handle Jif constructs
 
+
     public Type uncachedSubstType(Type t) {
         JifTypeSystem ts = (JifTypeSystem) this.ts;
 
@@ -261,23 +262,17 @@ public class JifSubst_c extends Subst_c implements JifSubst
     }
 
     ////////////////////////////////////////////////////////////////
-    // Override behaviour when looking up substitution values as keys,
-    // since keys of the substitution map are UIDs, but values are
-    // Params.
-    protected Object getSubstValueAsKey(Object v) {
-        if (v instanceof ParamLabel) {
-            return substitutions().get(((ParamLabel)v).paramInstance());
-        }
-        else if (v instanceof ParamPrincipal) {
-            return substitutions().get(((ParamPrincipal)v).paramInstance());        
-        }
-        return substitutions().get(v);
-    }
-
-
-
-    ////////////////////////////////////////////////////////////////
     // Substitution machinery
+
+    protected Object substSubstValue(Object value) {
+        if (value instanceof Label) {
+            return substLabel((Label)value);
+        }
+        else if (value instanceof Principal) {
+            return substPrincipal((Principal)value);
+        }
+        return super.substSubstValue(value);
+    }
 
     public class ConstraintXform implements Transformation {
 	public Object transform(Object o) {
