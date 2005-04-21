@@ -190,6 +190,12 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Params19.jif (Semantic, "not a subtype"); // I think there is an instantiation missing in this test case!
 	Params20.jif ;
 	Params21.jif (Semantic, "not cast.*covariant.* parameter to.* invariant");
+	Params22.jif (Semantic, "cannot be more restrictive");
+	Params22a.jif (Semantic, "cannot be less restrictive");
+	Params23.jif ;
+	Params24.jif (Semantic, "static field cannot use .* label parameter");
+	Params25.jif (Semantic, "Cannot use .* in this scope");
+	Params26.jif (Semantic, "Cannot use .* in this scope");
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;
