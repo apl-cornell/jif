@@ -46,13 +46,13 @@ public class JifLocalDeclExt extends JifStmtExt_c
             
             if (ts.isLabel(li.type())) {
                 DynamicLabel dl = ts.dynamicLabel(decl.position(), JifUtil.varInstanceToAccessPath(li, li.position()));                
-                Label rhs_label = JifUtil.exprToLabel(ts, decl.init(), lc.context().currentClass());
+                Label rhs_label = JifUtil.exprToLabel(ts, decl.init(), (JifContext)lc.context());
                 lc.context().addDefinitionalAssertionLE(dl, rhs_label);
                 lc.context().addDefinitionalAssertionLE(rhs_label, dl);
             }
             if (ts.isPrincipal(li.type())) {
                 DynamicPrincipal dp = ts.dynamicPrincipal(decl.position(), JifUtil.varInstanceToAccessPath(li, li.position()));                
-                Principal rhs_principal = JifUtil.exprToPrincipal(ts, decl.init(), lc.context().currentClass());
+                Principal rhs_principal = JifUtil.exprToPrincipal(ts, decl.init(), (JifContext)lc.context());
                 lc.context().addActsFor(dp, rhs_principal);                    
             }
         }                            

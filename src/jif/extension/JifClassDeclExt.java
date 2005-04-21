@@ -31,8 +31,11 @@ public class JifClassDeclExt extends Jif_c {
 
 	JifTypeSystem jts = (JifTypeSystem) lc.typeSystem();
 	JifContext A = lc.jifContext();
-        A = (JifContext) n.enterScope(A);
-	A.setEntryPC(jts.bottomLabel());
+        A = (JifContext)A.pushClass(n.type(), n.type());
+        A = n.addParamsToContext(A);
+        A = n.addAuthorityToContext(A);
+
+        A.setEntryPC(jts.bottomLabel());
 
 	JifParsedPolyType ct = (JifParsedPolyType) n.type();
 

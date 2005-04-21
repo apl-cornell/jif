@@ -1,5 +1,6 @@
 package jif.ast;
 
+import jif.types.*;
 import jif.types.JifTypeSystem;
 import jif.types.JifVarInstance;
 import jif.types.PathMap;
@@ -49,7 +50,7 @@ public class JifUtil
         throw new InternalCompilerError("Unexpected var instance " + vi.getClass());
     }    
 
-    public static AccessPath exprToAccessPath(Expr e, ReferenceType currentClass) {
+    public static AccessPath exprToAccessPath(Expr e, JifContext context) throws SemanticException {
         if (e instanceof Local) {
            Local l = (Local)e;
            return new AccessPathLocal(l.localInstance(), l.name(), e.position());
@@ -62,7 +63,7 @@ public class JifUtil
                 if (f.isTypeChecked()) {
                     container = f.fieldInstance().container();
                 }
-                AccessPath prefix = exprToAccessPath((Expr)f.target(), container);
+                AccessPath prefix = exprToAccessPath((Expr)f.target(), context);
                 return new AccessPathField(prefix, f.fieldInstance(), f.name(), f.position());
             }
             else if (target instanceof TypeNode && ((TypeNode)target).type().isClass()){
@@ -76,7 +77,10 @@ public class JifUtil
         else if (e instanceof Special) {
             Special s = (Special)e;
             if (Special.THIS.equals(s.kind())) {
-                return new AccessPathThis((ClassType)currentClass, s.position());
+                if (context.currentClass() == null || context.inStaticContext()) {
+                    throw new SemanticException("Cannot use \"this\" in this scope.", e.position());
+                }
+                return new AccessPathThis((ClassType)context.currentClass(), s.position());
             }
             else {
                 throw new InternalCompilerError("Not currently supporting access paths for special of kind " + s.kind());
@@ -124,21 +128,21 @@ public class JifUtil
     public static boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e) {
         return isFinalAccessExpr(ts, e) || e instanceof NewLabel || e instanceof PrincipalNode;
     }
-    public static Label exprToLabel(JifTypeSystem ts, Expr e, ReferenceType currentClass) {
+    public static Label exprToLabel(JifTypeSystem ts, Expr e, JifContext context) throws SemanticException {
         if (e instanceof LabelExpr) {
             return ((LabelExpr)e).label().label();
         }
         if (isFinalAccessExpr(ts, e)) {
-            return ts.dynamicLabel(e.position(), exprToAccessPath(e, currentClass));
+            return ts.dynamicLabel(e.position(), exprToAccessPath(e, context));
         }
         throw new InternalCompilerError("Expected a final access expression, or constant");
     }
-    public static Principal exprToPrincipal(JifTypeSystem ts, Expr e, ReferenceType currentClass) {
+    public static Principal exprToPrincipal(JifTypeSystem ts, Expr e, JifContext context) throws SemanticException {
         if (e instanceof PrincipalNode) {
             return ((PrincipalNode)e).principal();
         }
         if (isFinalAccessExpr(ts, e)) {
-            return ts.dynamicPrincipal(e.position(), exprToAccessPath(e, currentClass));
+            return ts.dynamicPrincipal(e.position(), exprToAccessPath(e, context));
         }
         throw new InternalCompilerError("Expected a final access expression, or constant");
     }

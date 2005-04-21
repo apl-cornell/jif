@@ -15,7 +15,7 @@ import polyglot.util.InternalCompilerError;
  */
 public class JifInstantiator
 {
-    public static Label instantiate(Label L, List formalArgLabels, List actualArgLabels, List actualArgExprs, ClassType callerClass) {
+    public static Label instantiate(Label L, List formalArgLabels, List actualArgLabels, List actualArgExprs, JifContext callerContext) {
         if (formalArgLabels.size() != actualArgLabels.size() || 
                 (actualArgExprs != null && formalArgLabels.size() != actualArgExprs.size())) {
             throw new InternalCompilerError("Inconsistent sized lists of args");
@@ -45,7 +45,7 @@ public class JifInstantiator
                     if (actualExpr != null) {
                         try {
                             AccessPathRoot root = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), actualExpr.position());
-                            AccessPath target = JifUtil.exprToAccessPath(actualExpr, callerClass); 
+                            AccessPath target = JifUtil.exprToAccessPath(actualExpr, callerContext); 
                             L = L.subst(new AccessPathInstantiator(root, target));
                         }
                         catch (SemanticException e) {
@@ -68,7 +68,7 @@ public class JifInstantiator
      * replaces any signature ArgLabels in p with the appropriate label, and
      * replaces any signature ArgPrincipal with the appropriate prinicipal. 
      */        
-    public static Principal instantiate(Principal p, List formalArgLabels, List actualArgExprs, ClassType callerClass) {
+    public static Principal instantiate(Principal p, List formalArgLabels, List actualArgExprs, JifContext callerContext) {
         if (formalArgLabels.size() != actualArgExprs.size()) {
             throw new InternalCompilerError("Inconsistent sized lists of args");
         }
@@ -83,7 +83,7 @@ public class JifInstantiator
                 if (actualExpr != null) {
                     try {
                         AccessPathRoot root = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), actualExpr.position());
-                        AccessPath target = JifUtil.exprToAccessPath(actualExpr, callerClass); 
+                        AccessPath target = JifUtil.exprToAccessPath(actualExpr, callerContext); 
                         p = p.subst(new AccessPathInstantiator(root, target));
                     }
                     catch (SemanticException e) {
@@ -116,11 +116,11 @@ public class JifInstantiator
         }
     }
     
-    public static Label instantiate(Label L, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) {
+    public static Label instantiate(Label L, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         AccessPath receiverPath;
         if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, A.currentClass());
+            receiverPath = JifUtil.exprToAccessPath(receiverExpr, A);
         }
         else {
             receiverPath = new AccessPathUninterpreted(L.position()); 
@@ -159,21 +159,22 @@ public class JifInstantiator
         return L;
     }
 
-    public static Label instantiate(Label L, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs) {
+    public static Label instantiate(Label L, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs) throws SemanticException {
         L = instantiate(L, A, receiverExpr, receiverType, receiverLbl);
-        return instantiate(L, formalArgs, actualArgLabels, actualArgExprs, A.currentClass());
+        return instantiate(L, formalArgs, actualArgLabels, actualArgExprs, A);
     }
     public static Label instantiate(Label L, JifContext A, AccessPath receiverPath, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs) {
         L = instantiate(L, A, receiverPath, receiverType, receiverLbl);
-        return instantiate(L, formalArgs, actualArgLabels, actualArgExprs, A.currentClass());
+        return instantiate(L, formalArgs, actualArgLabels, actualArgExprs, A);
     }
 
     /**
      * Replace this this access path with an appropraite access path for the
      * receiver expression
      * TODO Documentation
+     * @throws SemanticException
      */
-    public static Principal instantiate(Principal p, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) {
+    public static Principal instantiate(Principal p, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) throws SemanticException {
         if (p == null) return p;
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
 
@@ -187,7 +188,7 @@ public class JifInstantiator
         }
         AccessPath receiverPath;
         if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, A.currentClass());
+            receiverPath = JifUtil.exprToAccessPath(receiverExpr, A);
         }
         else {
             receiverPath = new AccessPathUninterpreted(p.position()); // @@@@@Uninterpreted root?
@@ -205,9 +206,9 @@ public class JifInstantiator
         }
         return p;
     }
-    public static Principal instantiate(Principal p, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgExprs) {
+    public static Principal instantiate(Principal p, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgExprs) throws SemanticException {
         p = instantiate(p, A, receiverExpr, receiverType, receiverLbl);
-        return instantiate(p, formalArgs, actualArgExprs, A.currentClass());
+        return instantiate(p, formalArgs, actualArgExprs, A);
     }
 
     public static Type instantiate(Type t, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs) throws SemanticException {
@@ -257,7 +258,7 @@ public class JifInstantiator
         return t;
     }
     
-    public static Type instantiate(Type t, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) {
+    public static Type instantiate(Type t, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         if (t instanceof JifSubstType) {
             JifSubstType jit = (JifSubstType) t;

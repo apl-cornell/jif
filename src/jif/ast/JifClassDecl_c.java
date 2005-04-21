@@ -67,21 +67,35 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 
     public Context enterScope(Context c) {
         JifContext A = (JifContext) c;
+        return addParamsToContext(A);    
+    }
+    public Context enterScope(Node child, Context c) {
+        if (child == this.body) {
+            JifContext A = (JifContext) c;
+            JifParsedPolyType ct = (JifParsedPolyType) this.type;
+            ClassType inst = ct;
+            A = (JifContext)A.pushClass(ct, inst);
+            return addAuthorityToContext(A);
+        }
+        return super.enterScope(child, c);
+    }
 
+    public  JifContext addParamsToContext(JifContext A) {
         JifParsedPolyType ct = (JifParsedPolyType) this.type;
-        ClassType inst = ct;
-
-        A = (JifContext) A.pushClass(ct, inst);
-
-        A.setAuthority(new HashSet(ct.authority()));
+        A = (JifContext)A.pushBlock();
         for (Iterator i = ct.params().iterator(); i.hasNext(); ) {
             ParamInstance pi = (ParamInstance) i.next();
             A.addVariable(pi);
         }
-
         return A;
     }
 
+    public JifContext addAuthorityToContext(JifContext A) {
+        JifParsedPolyType ct = (JifParsedPolyType) this.type;
+        A.setAuthority(new HashSet(ct.authority()));
+        return A;
+    }
+    
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         JifClassDecl_c n = (JifClassDecl_c) super.buildTypes(tb);
         n.buildParams((JifTypeSystem) tb.typeSystem());

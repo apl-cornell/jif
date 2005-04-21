@@ -55,7 +55,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         }
 
         return nf.CanonicalPrincipalNode(position(),
-                                         ts.dynamicPrincipal(position(), JifUtil.exprToAccessPath(expr, ar.context().currentClass())));
+                                         ts.dynamicPrincipal(position(), JifUtil.exprToAccessPath(expr, (JifContext)ar.context())));
     }
     protected Node disambiguateName(AmbiguityRemover ar, String name) throws SemanticException {
         Context c = ar.context();

@@ -1,6 +1,7 @@
 package jif.extension;
 
 import jif.ast.*;
+import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
 import polyglot.ast.Binary;
@@ -26,8 +27,8 @@ public class JifIfDel extends JifJL_c {
             JifNodeFactory nf = (JifNodeFactory)ar.nodeFactory();
             JifTypeSystem ts = (JifTypeSystem)ar.typeSystem();
             Binary b = (Binary)ifNode.cond();
-            Principal actor= JifUtil.exprToPrincipal(ts, b.left(), ar.context().currentClass());
-            Principal granter = JifUtil.exprToPrincipal(ts, b.right(), ar.context().currentClass());
+            Principal actor= JifUtil.exprToPrincipal(ts, b.left(), (JifContext)ar.context());
+            Principal granter = JifUtil.exprToPrincipal(ts, b.right(), (JifContext)ar.context());
             return nf.ActsFor(ifNode.position(), actor, granter, ifNode.consequent(), ifNode.alternative());
         }
         return super.disambiguate(ar);
@@ -55,7 +56,7 @@ public class JifIfDel extends JifJL_c {
                                 b.left().position());
                     }
                     lhs = nf.LabelExpr(b.left().position(), 
-                                       JifUtil.exprToLabel(ts, b.left(), tc.context().currentClass()));
+                                       JifUtil.exprToLabel(ts, b.left(), (JifContext)tc.context()));
                 }
                 LabelExpr rhs;
                 if (b.right() instanceof LabelExpr) {
@@ -68,7 +69,7 @@ public class JifIfDel extends JifJL_c {
                                 b.right().position());
                     }
                     rhs = nf.LabelExpr(b.right().position(),
-                                       JifUtil.exprToLabel(ts, b.right(), tc.context().currentClass()));
+                                       JifUtil.exprToLabel(ts, b.right(), (JifContext)tc.context()));
                 }
                 LabelIf labelIf = nf.LabelIf(ifNode.position(), lhs, rhs, ifNode.consequent(), ifNode.alternative());
                 

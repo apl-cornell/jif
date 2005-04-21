@@ -1,5 +1,6 @@
 package jif.ast;
 
+import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.JifVarInstance;
 import jif.types.label.Label;
@@ -50,7 +51,7 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
 //
 //	    JifVarInstance jvi = (JifVarInstance) vi;
 //
-        Label L = ts.dynamicLabel(position(), JifUtil.exprToAccessPath(expr, c.currentClass()));
+        Label L = ts.dynamicLabel(position(), JifUtil.exprToAccessPath(expr, (JifContext)c));
         return nf.CanonicalLabelNode(position(), L);
 //	}
 //

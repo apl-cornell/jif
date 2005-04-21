@@ -1,7 +1,9 @@
 package jif.ast;
 
-import polyglot.ast.*;
-import java.util.*;
+import java.util.List;
+
+import jif.types.JifContext;
+import polyglot.ast.ClassDecl;
 
 /** An immutable representation of the Jif class declaration.
  *  It extends the Java class declaration with the label/principal parameters
@@ -15,4 +17,7 @@ public interface JifClassDecl extends ClassDecl {
     JifClassDecl authority(List authority);
 
     JifClassDecl type(polyglot.types.Type type);
+    
+    JifContext addParamsToContext(JifContext A);
+    JifContext  addAuthorityToContext(JifContext A);    
 }
