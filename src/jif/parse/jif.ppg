@@ -1,7 +1,6 @@
 include "polyglot/ext/jl/parse/java12.cup"
 
-package jif.parse; 
-
+package jif.parse;
 import polyglot.lex.Lexer;
 import polyglot.lex.Identifier;
 import polyglot.lex.Token;
@@ -199,8 +198,8 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
     }
     
     protected Position posForObject(Object o) {
-      if (o instanceof Name) {
-          return pos ((Name) o);
+      if (o instanceof Amb) {
+          return pos((Amb) o);
       }
       return super.posForObject(o);
     }      
@@ -482,7 +481,7 @@ method_header ::=
         modifiers_opt:a type:b IDENTIFIER:c label_opt:i
         LPAREN formal_parameter_list_opt:d RPAREN
         dims_opt:e return_label_opt:r throws_opt:f constraints_opt:w
-            {: RESULT = parser.nf.JifMethodDecl(parser.pos(b,c), a,
+            {: RESULT = parser.nf.JifMethodDecl(parser.pos(b,c,c), a,
                         parser.array(b, e.intValue()),
                         c.getIdentifier(),
                                                 i, d, r, f, w, null); :}
