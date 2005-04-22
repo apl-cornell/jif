@@ -34,7 +34,7 @@ public final class Date[label L] implements JifObject[{L}] {
     /**
      * At the moment, assume that the string is in the format YYYY/MM/DD
      */
-      public static Date[{d}]{d} valueOf(String d) throws (IllegalArgumentException{d}) {
+      public static Date[{*lb}]{d} valueOf(String{*lb} d, label{d} lb) throws (IllegalArgumentException{d}) {
 	  if (d == null || d.length() != 10) {
 	      throw new IllegalArgumentException("null or invalid string");
 	  }
@@ -42,7 +42,7 @@ public final class Date[label L] implements JifObject[{L}] {
 	      int year = Integer.parseInt(d.substring(0,4));
 	      int month = Integer.parseInt(d.substring(5,7));
 	      int day = Integer.parseInt(d.substring(8,10));
-	      return new Date[{d}](year, month, day);
+	      return new Date[{*lb}](year, month, day);
 	  }
 	  catch (StringIndexOutOfBoundsException impossible) {
 	      return null;
