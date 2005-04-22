@@ -35,17 +35,7 @@ public class JifPrincipalNodeExt extends Jif_c {
                     pn.position());
         }
 
-        PathMap X1;
-        if (p instanceof DynamicPrincipal) {
-            // Get the information given by the successful evaluation of the
-            // access path
-            AccessPath path = ((DynamicPrincipal)p).path();
-            X1 = path.labelcheck(A);
-        }
-        else {
-            X1 = ts.pathMap().N(A.pc());
-        }
-
+        PathMap X1 = p.labelCheck(A);
         A = (JifContext)A.pop();
 
         return X(pn, X1);

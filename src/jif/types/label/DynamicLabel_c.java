@@ -5,6 +5,7 @@ import java.util.Set;
 
 import jif.translate.DynamicLabelToJavaExpr_c;
 import jif.translate.PolicyLabelToJavaExpr_c;
+import jif.types.*;
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
@@ -90,5 +91,8 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
 
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         return substitution.substLabel(this);
+    }
+    public PathMap labelCheck(JifContext A) {
+        return path.labelcheck(A);
     }
 }

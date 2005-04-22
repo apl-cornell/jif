@@ -1,28 +1,32 @@
 package jif.extension;
 
+import java.util.*;
 import java.util.Iterator;
 
-import polyglot.types.SemanticException;
-import polyglot.visit.TypeChecker;
+import jif.types.*;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import jif.types.label.*;
-import jif.types.label.AccessPath;
-import jif.types.label.DynamicLabel;
-import jif.types.label.Label;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
+import jif.visit.LabelChecker;
+import jif.visit.LabelSubstitutionVisitor;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.InternalCompilerError;
+import polyglot.visit.TypeChecker;
 
 /**
  * Contains some common utility code to type check dynamic labels and principals
  */
 public class LabelTypeCheckUtil {
-
+    
     public static void typeCheckPrincipal(TypeChecker tc, Principal principal) throws SemanticException {
         if (principal instanceof DynamicPrincipal) {
             JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
             DynamicPrincipal dp = (DynamicPrincipal)principal;
-
+            
             // Make sure that the access path is set correctly
             // check also that all field accesses are final, and that
             // the type of the expression is principal
@@ -39,7 +43,7 @@ public class LabelTypeCheckUtil {
             }
         }        
     }
-
+    
     public static void typeCheckLabel(TypeChecker tc, Label Lbl) throws SemanticException {
         for (Iterator comps = Lbl.components().iterator(); comps.hasNext(); ) {
             Label l = (Label)comps.next();
@@ -72,8 +76,95 @@ public class LabelTypeCheckUtil {
                 }
             }
         }
-
+        
     }
+    
+    public static PathMap labelCheckType(Type t, LabelChecker lc) throws SemanticException {
+        JifContext A = lc.context();
+        JifTypeSystem ts = (JifTypeSystem)lc.typeSystem();
+        PathMap X = ts.pathMap().N(A.pc());            
 
+        List Xparams = labelCheckTypeParams(t, lc);
 
+        for (Iterator iter = Xparams.iterator(); iter.hasNext(); ) {
+            PathMap Xj = (PathMap)iter.next();
+            X = X.join(Xj);
+        }
+        return X;                
+    }
+    /**
+     * 
+     * @param t
+     * @param lc
+     * @return List of <code>PathMap</code>s, one for each parameter of the subst type.
+     * @throws SemanticException
+     */
+    public static List labelCheckTypeParams(Type t, LabelChecker lc) throws SemanticException {
+        JifTypeSystem ts = (JifTypeSystem)lc.typeSystem();
+        t = ts.unlabel(t);
+        List Xparams;
+        
+        if (t instanceof JifSubstType) {            
+            JifContext A = lc.context();
+            PathMap X = ts.pathMap().N(A.pc());            
+            JifSubstType jst = (JifSubstType)t;
+            Xparams = new ArrayList(jst.subst().substitutions().size());
+            
+            for (Iterator i = jst.entries(); i.hasNext();) {
+                Map.Entry e = (Map.Entry)i.next();
+                Object arg = e.getValue();
+                if (arg instanceof Label) {
+                    Label L = (Label)arg;
+                    A = (JifContext)A.pushBlock();
+                    
+                    // make sure the label is runtime representable
+                    lc.constrain(new LabelConstraint(new NamedLabel("label_in_type", 
+                                                                    L), 
+                                                                    LabelConstraint.LEQ, 
+                                                                    new NamedLabel("RUNTIME_REPRESENTABLE", 
+                                                                                   ts.runtimeLabel()),
+                                                                                   A.labelEnv(),
+                                                                                   L.position()) {
+                        public String msg() {
+                            return "A label used in a type examined at runtime must be representable at runtime.";
+                        }
+                        public String detailMsg() {
+                            return "A label used in a type examined at runtime must be representable at runtime. Arg labels are not represented at runtime.";
+                        }
+                    });
+                    
+                    A.setPc(X.N());    
+                    PathMap Xj = L.labelCheck(A);
+                    Xparams.add(Xj);
+                    X = X.join(Xj);
+                    A = (JifContext)A.pop();
+                }
+                else if (arg instanceof Principal) {
+                    Principal p = (Principal)arg;
+                    A = (JifContext)A.pushBlock();
+                    if (!p.isRuntimeRepresentable()) {
+                        throw new SemanticException(
+                                                    "A principal used in a type examined at runtime must be representable at runtime.",
+                                                    p.position());
+                    }
+                    
+                    
+                    A.setPc(X.N());            
+                    PathMap Xj = p.labelCheck(A);
+                    Xparams.add(Xj);
+                    X = X.join(Xj);
+                    A = (JifContext)A.pop();
+                }
+                else {
+                    throw new InternalCompilerError(
+                                                    "Unexpected type for entry: "
+                                                    + arg.getClass().getName());
+                }
+            }            
+        }
+        else {
+            Xparams = Collections.EMPTY_LIST;
+        }
+        return Xparams;
+    }
 }

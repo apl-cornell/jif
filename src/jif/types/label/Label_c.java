@@ -132,4 +132,9 @@ public abstract class Label_c extends TypeObject_c implements Label
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         return substitution.substLabel(this); 
     }
+    public PathMap labelCheck(JifContext A) {
+        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        return ts.pathMap().N(A.pc()).NV(A.pc());
+    }        
+    
 }

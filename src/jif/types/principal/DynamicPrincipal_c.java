@@ -3,7 +3,9 @@ package jif.types.principal;
 import java.util.List;
 
 import jif.translate.DynamicPrincipalToJavaExpr_c;
+import jif.types.JifContext;
 import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import jif.types.label.*;
 import jif.types.label.AccessPath;
 import jif.types.label.AccessPathRoot;
@@ -74,4 +76,9 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
         
         return ((JifTypeSystem)typeSystem()).dynamicPrincipal(this.position(), newPath);
     }
+    
+    public PathMap labelCheck(JifContext A) {
+        return path.labelcheck(A);
+    }
+    
 }

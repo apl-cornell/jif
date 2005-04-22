@@ -3,11 +3,13 @@ package jif.types.label;
 import java.util.*;
 
 import jif.translate.JoinLabelToJavaExpr_c;
-import jif.types.JifTypeSystem;
-import jif.types.LabelSubstitution;
+import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** An implementation of the <code>JoinLabel</code> interface. 
  */
@@ -256,4 +258,24 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         Label newJoinLabel = ts.joinLabel(this.position(), flatten(s));
         return substitution.substLabel(newJoinLabel).simplify();
     }
+
+    public PathMap labelCheck(JifContext A) {
+        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        PathMap X = ts.pathMap().N(A.pc());
+        
+        if (components.isEmpty()) {
+            return X;
+        }
+
+        A = (JifContext)A.pushBlock();
+        
+        for (Iterator i = components.iterator(); i.hasNext(); ) {
+            A.setPc(X.N());
+            Label c = (Label) i.next();
+            PathMap Xc = c.labelCheck(A);
+            X = X.join(Xc);            
+        }
+        return X;
+    }
+    
 }

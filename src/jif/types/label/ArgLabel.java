@@ -1,6 +1,6 @@
 package jif.types.label;
 
-import jif.types.JifLocalInstance;
+import polyglot.types.VarInstance;
 
 
 /**
@@ -8,7 +8,7 @@ import jif.types.JifLocalInstance;
  * The purpose is to avoid having to re-interpret labels at each call.
  */
 public interface ArgLabel extends Label {
-    JifLocalInstance formalInstance();
+    VarInstance formalInstance();
     Label upperBound();
     void setUpperBound(Label upperBound);
 }

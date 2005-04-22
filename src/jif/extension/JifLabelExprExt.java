@@ -45,15 +45,7 @@ public class JifLabelExprExt extends Jif_c
 
         A = (JifContext) le.enterScope(A);
                 
-        PathMap X1;
-        if (l instanceof DynamicLabel) {
-            // Get the information given by the successful evaluation of the access path            
-            AccessPath path = ((DynamicLabel)l).path();
-            X1 = path.labelcheck(A);
-        }
-        else {
-            X1 = ts.pathMap().N(A.pc());            
-        }
+        PathMap X1 = l.labelCheck(A);
         
         A = (JifContext) A.pop();
                         

@@ -69,29 +69,20 @@ public class CallHelper
     private List actualArgLabels;
     
     /**
+     * Labels of the actual parameters.
+     */
+    private List actualParamLabels;
+
+    /**
      * Exprs of the actual arguments that are final expressions.
      */
     private List actualArgExprs;
     
     /**
-     * LabelSusbtitution to replace signature <code>ArgLabel</code>s and
-     * <code>DynamicArgLabel</code>s with labels of actual arguments 
-     * (<code>argLabels</code>) and the dynamic arguments 
-     * (<code>dynArgs</code>).
-     */
-    //private ArgLabelSubstitution argSubstitution; // LabelSubstitution for argLabels and dynArgs 
-    
-    /**
      * The PathMap for the procedure call.
      */        
     private PathMap X;
-    
-    /**
-     * The PathMap for the evaluation of all actual arguments, that is, 
-     * Xjoin = join_j xj, for all actual arguments xj.
-     */
-    private PathMap Xjoin; // join_j xj
-    
+        
     /**
      * The return type of the procedure, if there is one.
      */
@@ -151,11 +142,71 @@ public class CallHelper
         return X;
     }
     
+    private PathMap labelCheckAndConstrainParams(LabelChecker lc) throws SemanticException {
+        PathMap Xjoin;
+        JifTypeSystem ts = lc.typeSystem();
+        
+        // If it's a constructor or a static method call, label check 
+        // the class type, since that may reveal some information.
+        // if the method call is a constructor call, or a static method call,
+        // then we need to check the pathmap.
+        if (this.pi.flags().isStatic()) {
+            Xjoin = LabelTypeCheckUtil.labelCheckType(pi.container(), lc);
+            List Xparams = LabelTypeCheckUtil.labelCheckTypeParams(pi.container(), lc);
+            actualParamLabels = new ArrayList(Xparams.size()); 
+            for (Iterator iter = Xparams.iterator(); iter.hasNext(); ) {
+                PathMap Xj = (PathMap)iter.next();
+                actualParamLabels.add(Xj.NV().copy());
+            }
+        }
+        else if (this.pi instanceof ConstructorInstance) {
+            Xjoin = LabelTypeCheckUtil.labelCheckType(pi.container(), lc);
+            // now constraint params, pretending that they will be args to the constructor with upper bound {this}.
+            List Xparams = LabelTypeCheckUtil.labelCheckTypeParams(pi.container(), lc);
+            actualParamLabels = new ArrayList(Xparams.size()); 
+            JifContext A = lc.context();
+
+            NamedLabel paramUB = new NamedLabel("param_upper_bound", 
+                           "the upper bound on the information that may be revealed by any actual parameter",
+                           this.receiverLabel);
+                           
+            int counter = 0;
+            for (Iterator iter = Xparams.iterator(); iter.hasNext(); ) {
+                PathMap Xj = (PathMap)iter.next();
+                actualParamLabels.add(Xj.NV().copy());
+                final int count = ++counter;
+                lc.constrain(new LabelConstraint(new NamedLabel("actual_param_"+count, 
+                                                                "the label of the " + StringUtil.nth(count) + " actual parameter",
+                                                                Xj.NV()), 
+                                                                LabelConstraint.LEQ, 
+                                                                paramUB,
+                                                                A.labelEnv(),
+                                                                this.position) {
+                    public String msg() {
+                        return "The actual parameter is more restrictive than " +
+                        "permitted.";
+                    }
+                }
+                );
+            }
+        }
+        else {
+            Xjoin = ts.pathMap();
+            actualParamLabels = Collections.EMPTY_LIST; 
+        }
+        
+        return Xjoin;
+    }
     /** 
      * Label check the arguments. Also initializes the array 
      * <code>argLabels</code>, that is the labels of the actual arguments.
+     * 
+     * @param Xjoin The pathmap for the call so far, that is, up to the point 
+     *     just before the evaluation of the actual arguments.
+     * @return The PathMap for the evaluation of all actual arguments, that is, 
+     *  join_j xj, for all actual arguments xj.
      */
-    private void labelCheckArguments(LabelChecker lc) 
+    private PathMap labelCheckArguments(LabelChecker lc, PathMap Xjoin) 
     throws SemanticException
     {
         JifContext A = lc.jifContext();
@@ -164,9 +215,7 @@ public class CallHelper
         // X_0 = X_null[n := A[pc]]
         PathMap Xj = ts.pathMap();
         Xj = Xj.N(A.pc());
-        
-        Xjoin = ts.pathMap();
-        
+                
         actualArgLabels = new ArrayList(actualArgs.size());
         argPathMaps = new ArrayList(actualArgs.size());
         
@@ -187,6 +236,8 @@ public class CallHelper
             
             Xjoin = Xjoin.join(Xj);	    
         }
+        
+        return Xjoin;
     }
     
     /**
@@ -284,19 +335,20 @@ public class CallHelper
     }
     
     
-    private Label resolveStartLabel(JifContext A) {
+    private Label resolveStartLabel(JifContext A) throws SemanticException {
         return instantiate(A, pi.startLabel());
     }
     
     /** 
      * Returns the instantiated return label or the bottom label if the return
      * label is not defined.
+     * @throws SemanticException
      */
-    private Label resolveReturnLabel(JifContext A) {
+    private Label resolveReturnLabel(JifContext A) throws SemanticException {
         return instantiate(A, pi.returnLabel());
     }
     
-    private Label resolveReturnValueLabel(JifContext A, Label returnLabel) {
+    private Label resolveReturnValueLabel(JifContext A, Label returnLabel) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         Label L = null;
         
@@ -313,7 +365,7 @@ public class CallHelper
         return L;	
     }
     
-    private PathMap excPathMap(JifContext A, Label returnLabel) {
+    private PathMap excPathMap(JifContext A, Label returnLabel) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         PathMap Xexn = ts.pathMap();
         
@@ -350,7 +402,8 @@ public class CallHelper
         if (shouldReport(4)) report(4, ">>>>> call-begin");
         
         // check arguments
-        labelCheckArguments(lc);
+        PathMap Xjoin = labelCheckAndConstrainParams(lc); 
+	Xjoin = labelCheckArguments(lc, Xjoin);
         
         lc = lc.context(A);
         
@@ -517,27 +570,31 @@ public class CallHelper
         }
         return formalArgLabels;        
     }
-    private Label instantiate(JifContext A, Label L) {        
+    private Label instantiate(JifContext A, Label L) throws SemanticException {        
         return JifInstantiator.instantiate(L, A, receiverExpr, calleeContainer, receiverLabel,  
                                            getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem()), 
                                            this.actualArgLabels, 
-                                           this.actualArgExprs);
+                                           this.actualArgExprs,
+                                           this.actualParamLabels);
     }
     
     
     /**
      * replaces any signature ArgLabels in p with the appropriate label, and
      * replaces any signature ArgPrincipal with the appropriate prinicipal. 
+     * @throws SemanticException
      */        
-    private Principal instantiate(JifContext A, Principal p) {
+    private Principal instantiate(JifContext A, Principal p) throws SemanticException {
         return JifInstantiator.instantiate(p, A, receiverExpr, calleeContainer, receiverLabel, 
                                            getArgLabelsFromFormalTypes(this.pi.formalTypes(), (JifTypeSystem)this.pi.typeSystem()), 
-                                           this.actualArgExprs);
+                                           this.actualArgExprs,
+                                           this.actualParamLabels);
     }
     private Type instantiate(JifContext A, Type t) throws SemanticException {        
         return JifInstantiator.instantiate(t, A, receiverExpr, calleeContainer, receiverLabel,  
                                            getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem()), 
                                            this.actualArgLabels, 
-                                           this.actualArgExprs);
+                                           this.actualArgExprs,
+                                           this.actualParamLabels);
     }
 }

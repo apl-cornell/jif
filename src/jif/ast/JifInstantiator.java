@@ -1,6 +1,7 @@
 package jif.ast;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import jif.types.*;
 import jif.types.label.*;
@@ -15,7 +16,7 @@ import polyglot.util.InternalCompilerError;
  */
 public class JifInstantiator
 {
-    public static Label instantiate(Label L, List formalArgLabels, List actualArgLabels, List actualArgExprs, JifContext callerContext) {
+    public static Label instantiate(Label L, ReferenceType receiverType, List formalArgLabels, List actualArgLabels, List actualArgExprs, List actualParamLabels, JifContext callerContext) {
         if (formalArgLabels.size() != actualArgLabels.size() || 
                 (actualArgExprs != null && formalArgLabels.size() != actualArgExprs.size())) {
             throw new InternalCompilerError("Inconsistent sized lists of args");
@@ -60,6 +61,35 @@ public class JifInstantiator
                     (iActualArgExprs != null && iActualArgExprs.hasNext())) {
                 throw new InternalCompilerError("Inconsistent arg lists");
             }
+            
+            // also instantiate the param arg labels. They only occur in static methods
+            // of parameterized classes, but no harm in always instantiating them.
+            if (!actualParamLabels.isEmpty()) {
+                // go through the formal params, and the actual param labels.
+                JifTypeSystem ts = (JifTypeSystem)receiverType.typeSystem();
+                JifSubstType jst = (JifSubstType)receiverType;
+                JifPolyType jpt = (JifPolyType)jst.base();
+                Iterator iFormalParams = jpt.params().iterator();
+                Iterator iActualParamLabels = actualParamLabels.iterator();
+                
+                // go through each formal and actual param, and make substitutions.
+                while (iActualParamLabels.hasNext()) {
+                    Label actualParamLabel = (Label)iActualParamLabels.next();                    
+                    ParamInstance pi = (ParamInstance)iFormalParams.next();
+                    ArgLabel paramArgLabel = ts.argLabel(pi.position(), pi);
+                    paramArgLabel.setUpperBound(ts.topLabel());
+                    try {
+                        L = L.subst(new LabelInstantiator(paramArgLabel, actualParamLabel));
+                    }
+                    catch (SemanticException e) {
+                        throw new InternalCompilerError("Unexpected SemanticException " +
+                                                        "during label substitution: " + e.getMessage(), L.position());
+                    }                    
+                }
+                if (iActualParamLabels.hasNext() || iFormalParams.hasNext()) {
+                    throw new InternalCompilerError("Inconsistent param lists");
+                }
+            }
         }
         return L;
     }
@@ -68,7 +98,7 @@ public class JifInstantiator
      * replaces any signature ArgLabels in p with the appropriate label, and
      * replaces any signature ArgPrincipal with the appropriate prinicipal. 
      */        
-    public static Principal instantiate(Principal p, List formalArgLabels, List actualArgExprs, JifContext callerContext) {
+    public static Principal instantiate(Principal p, ReferenceType receiverType, List formalArgLabels, List actualArgExprs, List actualParamLabels, JifContext callerContext) {
         if (formalArgLabels.size() != actualArgExprs.size()) {
             throw new InternalCompilerError("Inconsistent sized lists of args");
         }
@@ -94,6 +124,35 @@ public class JifInstantiator
             }
             if (iArgLabels.hasNext() || iActualArgExprs.hasNext()) {
                 throw new InternalCompilerError("Inconsistent arg lists");
+            }
+            
+            // also instantiate the param arg labels. They only occur in static methods
+            // of parameterized classes, but no harm in always instantiating them.
+            if (!actualParamLabels.isEmpty()) {
+                // go through the formal params, and the actual param labels.
+                JifTypeSystem ts = (JifTypeSystem)receiverType.typeSystem();
+                JifSubstType jst = (JifSubstType)receiverType;
+                JifPolyType jpt = (JifPolyType)jst.base();
+                Iterator iFormalParams = jpt.params().iterator();
+                Iterator iActualParamLabels = actualParamLabels.iterator();
+                
+                // go through each formal and actual param, and make substitutions.
+                while (iActualParamLabels.hasNext()) {
+                    Label actualParamLabel = (Label)iActualParamLabels.next();
+                    ParamInstance pi = (ParamInstance)iFormalParams.next();
+                    ArgLabel paramArgLabel = ts.argLabel(pi.position(), pi);
+                    paramArgLabel.setUpperBound(ts.topLabel());
+                    try {
+                        p = p.subst(new LabelInstantiator(paramArgLabel, actualParamLabel));
+                    }
+                    catch (SemanticException e) {
+                        throw new InternalCompilerError("Unexpected SemanticException " +
+                                                        "during label substitution: " + e.getMessage(), p.position());
+                    }                    
+                }
+                if (iActualParamLabels.hasNext() || iFormalParams.hasNext()) {
+                    throw new InternalCompilerError("Inconsistent param lists");
+                }
             }
         }
         
@@ -159,13 +218,13 @@ public class JifInstantiator
         return L;
     }
 
-    public static Label instantiate(Label L, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs) throws SemanticException {
+    public static Label instantiate(Label L, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs, List actualParamLabels) throws SemanticException {
         L = instantiate(L, A, receiverExpr, receiverType, receiverLbl);
-        return instantiate(L, formalArgs, actualArgLabels, actualArgExprs, A);
+        return instantiate(L, receiverType, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels, A);
     }
-    public static Label instantiate(Label L, JifContext A, AccessPath receiverPath, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs) {
+    public static Label instantiate(Label L, JifContext A, AccessPath receiverPath, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs, List actualParamLabels) {
         L = instantiate(L, A, receiverPath, receiverType, receiverLbl);
-        return instantiate(L, formalArgs, actualArgLabels, actualArgExprs, A);
+        return instantiate(L, receiverType, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels, A);
     }
 
     /**
@@ -206,23 +265,23 @@ public class JifInstantiator
         }
         return p;
     }
-    public static Principal instantiate(Principal p, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgExprs) throws SemanticException {
+    public static Principal instantiate(Principal p, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgExprs, List actualParamLabels) throws SemanticException {
         p = instantiate(p, A, receiverExpr, receiverType, receiverLbl);
-        return instantiate(p, formalArgs, actualArgExprs, A);
+        return instantiate(p, receiverType, formalArgs, actualArgExprs, actualParamLabels, A);
     }
 
-    public static Type instantiate(Type t, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs) throws SemanticException {
+    public static Type instantiate(Type t, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs, List actualParamLabels) throws SemanticException {
         t = instantiate(t, A, receiverExpr, receiverType, receiverLbl);
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         if (t instanceof ArrayType) {
             ArrayType at = (ArrayType)t;
             Type baseType = at.base();
-            t = at.base(instantiate(baseType, A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgLabels, actualArgExprs));
+            t = at.base(instantiate(baseType, A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels));
         }
         
         if (ts.isLabeled(t)) {
-            Label newL = instantiate(ts.labelOfType(t), A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgLabels, actualArgExprs);
-            Type newT = instantiate(ts.unlabel(t), A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgLabels, actualArgExprs);
+            Label newL = instantiate(ts.labelOfType(t), A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels);
+            Type newT = instantiate(ts.unlabel(t), A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels);
             t = ts.labeledType(t.position(), newT, newL);
         }
 
@@ -235,10 +294,10 @@ public class JifInstantiator
                 Object arg = e.getValue();
                 Param p;
                 if (arg instanceof Label) {
-                    p = instantiate((Label)arg, A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgLabels, actualArgExprs);
+                    p = instantiate((Label)arg, A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels);
                 }
                 else if (arg instanceof Principal) {
-                    p = instantiate((Principal)arg, A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgExprs);
+                    p = instantiate((Principal)arg, A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgExprs, actualParamLabels);
                 }
                 else {
                     throw new InternalCompilerError(

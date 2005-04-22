@@ -3,6 +3,7 @@ package jif.types.label;
 
 import java.util.Set;
 
+import jif.types.*;
 import jif.types.JifTypeSystem;
 import jif.types.ParamInstance;
 import jif.types.hierarchy.LabelEnv;
@@ -26,7 +27,7 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
     public ParamInstance paramInstance() {
         return paramInstance;
     }
-    public boolean isRuntimeRepresentable() { return false; }
+    public boolean isRuntimeRepresentable() { return true; }
     public boolean isCovariant() { return true; }
     public boolean isComparable() { return true; }
     public boolean isCanonical() { return paramInstance.isCanonical(); }
@@ -51,6 +52,26 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
         return this.paramInstance.name();
     }
 
+    public PathMap labelCheck(JifContext A) {
+        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        Label l;
+        if (A.inStaticContext()) {
+            // return a special arg label
+            ArgLabel al = ts.argLabel(this.position, paramInstance); 
+            if (A.inConstructorCall()) {
+                al.setUpperBound(ts.thisLabel(this.position(), (JifClassType)A.currentClass()));
+            }
+            else {
+                al.setUpperBound(ts.topLabel());
+            }
+            l = al;
+        }
+        else {
+            l = ts.thisLabel(this.position(), (JifClassType)A.currentClass());
+        }
+        return ts.pathMap().N(l).NV(l);
+    }
+    
     public boolean leq_(Label L, LabelEnv env) {
         // only leq if equal to this parameter, which is checked before 
         // this method is called.

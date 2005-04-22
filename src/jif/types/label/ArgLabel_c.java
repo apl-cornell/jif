@@ -17,19 +17,19 @@ import polyglot.util.Position;
  * The purpose is to avoid having to re-interpret labels at each call.
  */
 public class ArgLabel_c extends Label_c implements ArgLabel {
-    private final JifLocalInstance li;
+    private final VarInstance vi;
     private Label upperBound;
     
     protected ArgLabel_c() {
-        li = null;
+        vi = null;
     }
-    public ArgLabel_c(JifTypeSystem ts, JifLocalInstance li, Position pos) {
+    public ArgLabel_c(JifTypeSystem ts, VarInstance vi, Position pos) {
         super(ts, pos);
-        this.li = li;
+        this.vi = vi;
     }
     
-    public JifLocalInstance formalInstance() {
-        return li;
+    public VarInstance formalInstance() {
+        return vi;
     }
     
     public Label upperBound() {
@@ -53,33 +53,33 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
             return false;
         }           
         ArgLabel_c that = (ArgLabel_c) o;
-        return (this.li.equals(that.li));
+        return (this.vi.equals(that.vi));
     }
     public int hashCode() {
-        return li.hashCode();
+        return vi.hashCode();
     }
         
     public String componentString(Set printedLabels) {
         if (printedLabels.contains(this)) {
             if (Report.should_report(Report.debug, 2)) { 
-                return "<arg " + li.name() + ">";
+                return "<arg " + vi.name() + ">";
             }
             else if (Report.should_report(Report.debug, 1)) {
-                return "<arg " + li.name() + ">";
+                return "<arg " + vi.name() + ">";
             }
-            return li.name();            
+            return vi.name();            
         }
         printedLabels.add(this);
         
         if (Report.should_report(Report.debug, 2)) { 
             String ub = upperBound==null?"-":upperBound.toString(printedLabels);
-            return "<arg " + li.name() + " " + ub + ">";
+            return "<arg " + vi.name() + " " + ub + ">";
         }
         else if (Report.should_report(Report.debug, 1)) {
             String ub = upperBound==null?"-":upperBound.toString(printedLabels);
-            return "<arg " + li.name() + " " + ub + ">";
+            return "<arg " + vi.name() + " " + ub + ">";
         }
-        return li.name();
+        return vi.name();
     }
 
     public boolean leq_(Label L, LabelEnv env) {
@@ -93,7 +93,7 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         
         if (newBound != upperBound) {
             JifTypeSystem ts = (JifTypeSystem)typeSystem();
-            ArgLabel newLabel = ts.argLabel(this.position(), li);
+            ArgLabel newLabel = ts.argLabel(this.position(), vi);
             newLabel.setUpperBound(newBound);
             return substitution.substLabel(newLabel);        
         }

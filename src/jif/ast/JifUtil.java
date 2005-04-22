@@ -27,7 +27,7 @@ public class JifUtil
         return n.ext(ext.del().X(X));
     }
     
-    public static AccessPath varInstanceToAccessPath(JifVarInstance vi, Position pos) {
+    public static AccessPath varInstanceToAccessPath(VarInstance vi, Position pos) {
         if (vi instanceof LocalInstance) {
             if (((LocalInstance)vi).flags().isFinal()) {
                 return new AccessPathLocal((LocalInstance)vi, vi.name(), pos);

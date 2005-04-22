@@ -22,12 +22,14 @@ public class JifContext_c extends Context_c implements JifContext
     private Label pc; //internal pc
     private Label entryPC; //external pc
 
+
     /**
      * Map from JifContext_c.Key (pairs of Branch.Kind and String) to Labels. 
      */
     private Map gotos;
 
     private boolean checkingInits;
+    private boolean inConstructorCall;
     private Label constructorReturnLabel;
     
     JifContext_c(JifTypeSystem ts, TypeSystem jlts) {
@@ -197,5 +199,18 @@ public class JifContext_c extends Context_c implements JifContext
 
     public void setConstructorReturnLabel(Label Lr) {
         this.constructorReturnLabel = Lr;
+    }
+
+    /* (non-Javadoc)
+     * @see jif.types.JifContext#pushConstructorCall()
+     */
+    public Context pushConstructorCall() {
+        JifContext_c A = (JifContext_c)pushStatic();
+        A.inConstructorCall = true;
+        return A;
+    }
+    
+    public boolean inConstructorCall() {
+        return this.inConstructorCall;
     }
 }

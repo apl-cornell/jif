@@ -27,7 +27,7 @@ public class JifConstructorCallExt extends JifStmtExt_c
 	ConstructorCall ccs = (ConstructorCall) node();
 
 	JifContext A = lc.jifContext();
-        A = (JifContext) ccs.enterScope(A);
+        A = (JifContext) ccs.del().enterScope(A);
 
 	JifConstructorInstance ci = (JifConstructorInstance)ccs.constructorInstance();
 	

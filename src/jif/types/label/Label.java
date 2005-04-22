@@ -5,14 +5,11 @@ import java.util.List;
 import java.util.Set;
 
 import jif.translate.JifToJavaRewriter;
-import jif.types.LabelSubstitution;
-import jif.types.Param;
+import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.ast.Expr;
-import polyglot.types.*;
-import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
-import polyglot.util.CodeWriter;
+import polyglot.types.TypeSystem;
 
 /** 
  * This class represents the Jif security label.
@@ -69,6 +66,12 @@ public interface Label extends Param
      */
     Label subst(LabelSubstitution labelSubst) throws SemanticException;
 
+    /**
+     * TODO DOCO 
+     * @param A
+     * @return
+     */
+    PathMap labelCheck(JifContext A);
 
     /**
      * Are the components of this label enumerable?

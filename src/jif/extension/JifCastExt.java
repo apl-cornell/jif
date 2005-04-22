@@ -41,19 +41,26 @@ public class JifCastExt extends Jif_c
             Xe = Xe.exc(Xe.NV(), ts.ClassCastException());
         }
         
-        //Check type parameters
+	// label check the type too, since the type may leak information
+	A = (JifContext) A.pushBlock();
+	A.setPc(Xe.N());	
+	PathMap Xct = LabelTypeCheckUtil.labelCheckType(c.castType().type(), lc);;
+        A = (JifContext) A.pop();
+	PathMap X = Xe.N(ts.notTaken()).join(Xct);
+
+	//Check type parameters
         if (ts.unlabel(c.type()) instanceof JifSubstType) {
-            if (! (ts.unlabel(c.expr().type()) instanceof JifSubstType)) {
-                throw new SemanticException("Cannot cast non-polymorphic "
-                                            + "types to polymorphic types", pos);
-            }
+//            if (! (ts.unlabel(c.expr().type()) instanceof JifSubstType)) {
+//                throw new SemanticException("Cannot cast non-polymorphic "
+//                                            + "types to polymorphic types", pos);
+//            }
             
             // only allow downcasts/upcasts for parameterized types. Otherwise,
             // we have no way to control the instantiation of parameters.
             JifSubstType castType = (JifSubstType) ts.unlabel(c.type());
             JifSubstType exprType = (JifSubstType) ts.unlabel(c.expr().type());
-            SubtypeChecker sc = new SubtypeChecker();
-            sc.addSubtypeConstraints(lc, c.position(), exprType, castType);
+//            SubtypeChecker sc = new SubtypeChecker();
+//            sc.addSubtypeConstraints(lc, c.position(), exprType, castType);
 
             JifPolyType ctpoly = (JifPolyType) castType.base();
             JifPolyType etpoly = (JifPolyType) exprType.base();
@@ -71,8 +78,7 @@ public class JifCastExt extends Jif_c
                 final Param ea = (Param) eai.next();
                 
                 if (cp.isInvariantLabel() && ep.isCovariantLabel()) 
-                    throw new SemanticException( 
-                                                "Can not cast a covariant label parameter to " +
+                    throw new SemanticException("Can not cast a covariant label parameter to " +
                                                 "an invariant label parameter.", pos);
                 
                 if (cp.isInvariantLabel() && ep.isInvariantLabel()) { 
@@ -149,6 +155,6 @@ public class JifCastExt extends Jif_c
                                             " number of parameters.", pos);
         }
         
-        return X(c.expr(e), Xe);
+        return X(c.expr(e), X);
     }
 }

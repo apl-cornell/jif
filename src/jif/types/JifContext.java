@@ -7,9 +7,9 @@ import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
-
 import polyglot.ast.Branch;
-import polyglot.types.*;
+import polyglot.types.Context;
+import polyglot.types.SemanticException;
 
 /** 
  * The context for Jif type checking. <code>JifContext</code>
@@ -126,5 +126,13 @@ public interface JifContext extends Context {
      */
     Label constructorReturnLabel();
     void setConstructorReturnLabel(Label Lr);
+
+    /**
+     * TODO: DOCO
+     * @return
+     */
+    Context pushConstructorCall();
+    
+    boolean inConstructorCall();
     
 }

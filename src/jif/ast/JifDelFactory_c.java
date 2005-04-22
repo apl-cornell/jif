@@ -25,6 +25,9 @@ public class JifDelFactory_c extends AbstractDelFactory_c {
   protected JL delCallImpl() {
       return new JifCallDel();
   }
+  protected JL delCastImpl() {
+      return new JifCastDel();
+  }
   protected JL delClassDeclImpl() {
       return new JifClassDeclDel();
   }

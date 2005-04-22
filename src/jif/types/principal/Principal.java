@@ -6,6 +6,7 @@ import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import jif.translate.JifToJavaRewriter;
+import jif.types.*;
 import jif.types.LabelSubstitution;
 import jif.types.Param;
 import jif.types.label.*;
@@ -20,6 +21,13 @@ public interface Principal extends Param {
      * @throws SemanticException
      */
     Principal subst(LabelSubstitution substitution) throws SemanticException;
+    /**
+     * TODO DOCO 
+     * @param A
+     * @return
+     */
+    PathMap labelCheck(JifContext A);
+
     Expr toJava(JifToJavaRewriter rw) throws SemanticException;
 
     /**
