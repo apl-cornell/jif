@@ -363,9 +363,9 @@ public final class System {
      * @exception  NullPointerException if either <code>src</code> or 
      *               <code>dst</code> is <code>null</code>.
      */
-    public static native void arraycopy(Object{dst} src, int{dst} src_position,
-                                        Object dst, int{dst} dst_position,
-                                        int{dst} length) throws (IndexOutOfBoundsException, ArrayStoreException, NullPointerException);
+//      public static native void arraycopy(Object{dst} src, int{dst} src_position,
+//                                          Object dst, int{dst} dst_position,
+//                                          int{dst} length) throws (IndexOutOfBoundsException, ArrayStoreException, NullPointerException);
 
     /**
      * Returns the same hashcode for the given object as
