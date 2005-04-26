@@ -28,7 +28,7 @@ public class Label
     public Label(List policies) {
 	components = new HashSet();
 	components.addAll(policies);
-	relabels = new HashMap();	
+	relabels = new HashMap();
     }
 
     public static Label bottom() {
@@ -75,10 +75,14 @@ public class Label
 
 	return newLabel;
     }
-    
+
     public Policy policy() {
 	//TODO: extract a policy using PH.
 	return (Policy) components.iterator().next();
+    }
+
+    public boolean equivalentTo(Label l) {
+        return this.relabelsTo(l) && l.relabelsTo(this);
     }
 
     public boolean relabelsTo(Label l) {
@@ -142,7 +146,7 @@ public class Label
 
 	return true;
     }
-    
+
     public String toString() {
 	String str = "{";
 	for (Iterator iter = components.iterator(); iter.hasNext(); ) {
