@@ -5,7 +5,7 @@ package jif.lang;
  * equals(), hashCode() and toString(). This provides a 
  * convenient replacement for 
  */
-public interface JifObject[label L] extends IDComparable[L], 
+public interface JifObject[covariant label L] extends IDComparable[L], 
 					    Hashable[L], 
 					    ToStringable[L] 
 {

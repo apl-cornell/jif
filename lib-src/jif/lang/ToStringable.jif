@@ -3,6 +3,6 @@ package jif.lang;
 /**
  * The Jif signature for the method toString()
  */
-public interface ToStringable[label L] {
+public interface ToStringable[covariant label L] {
     String{L} toString();
 }
