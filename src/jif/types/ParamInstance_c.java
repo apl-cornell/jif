@@ -5,9 +5,11 @@ import java.io.IOException;
 import polyglot.ext.jl.types.VarInstance_c;
 import polyglot.main.Report;
 import polyglot.types.Type;
+import polyglot.types.TypeObject;
+import polyglot.types.VarInstance;
 import polyglot.util.Position;
 
-/** An implementation of the <code>ParamInstance</code> interface. 
+/** An implementation of the <code>ParamInstance</code> interface.
  */
 public class ParamInstance_c extends VarInstance_c implements ParamInstance
 {
@@ -25,6 +27,17 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
 
     public JifClassType container() {
 	return container;
+    }
+
+    public boolean equalsImpl(TypeObject o) {
+        if (o instanceof ParamInstance) {
+            ParamInstance that = (ParamInstance) o;
+            return super.equalsImpl(that) &&
+                    this.kind.equals(that.kind()) &&
+                    this.container.fullName().equals(that.container().fullName());
+	}
+
+	return false;
     }
 
     public ParamInstance container(JifClassType container) {
@@ -71,8 +84,8 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
         }
         return kind + " " + name();
     }
-    
-    private void writeObject(java.io.ObjectOutputStream out) 
+
+    private void writeObject(java.io.ObjectOutputStream out)
 	throws IOException
     {
 	out.writeObject(container);
@@ -81,7 +94,7 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
 	else if (kind == PRINCIPAL) out.writeInt(2);
 	else throw new IOException("invalid kind");
     }
- 
+
     private void readObject(java.io.ObjectInputStream in)
 	throws IOException, ClassNotFoundException
     {
@@ -96,6 +109,6 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
     }
 
     public void setType(Type t) {
-    	//Do nothing	
+    	//Do nothing
     }
 }
