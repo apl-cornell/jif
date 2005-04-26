@@ -13,11 +13,11 @@ import polyglot.ast.Instanceof;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 
-/** The Jif extension of the <code>Instanceof</code> node. 
- * 
+/** The Jif extension of the <code>Instanceof</code> node.
+ *
  *  @see polyglot.ast.Instanceof
  */
-public class JifInstanceofExt extends Jif_c 
+public class JifInstanceofExt extends Jif_c
 {
     public JifInstanceofExt(ToJavaExt toJava) {
         super(toJava);
@@ -33,11 +33,11 @@ public class JifInstanceofExt extends Jif_c
 
 	// label check the type too, since the type may leak information
 	A = (JifContext) A.pushBlock();
-	A.setPc(Xe.N());	
-	PathMap Xct = LabelTypeCheckUtil.labelCheckType(ioe.compareType().type(), lc);;
+	A.setPc(Xe.N());
+	PathMap Xct = LabelTypeCheckUtil.labelCheckType(ioe.compareType().type(), lc, ioe.compareType().position());
         A = (JifContext) A.pop();
 	PathMap X = Xe.N(ts.notTaken()).join(Xct);
-	
+
 	return X(ioe.expr(e), X);
     }
 }
