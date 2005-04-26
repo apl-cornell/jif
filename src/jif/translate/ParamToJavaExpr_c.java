@@ -35,16 +35,16 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
 
     public static String paramFieldName(ParamInstance pi) {
         JifClassType jct = pi.container();
-        String fullName = jct.fullName().replace('.', '$');
-        return "jifParam$" + fullName + "$" + pi.name();
+        String fullName = jct.fullName().replace('.', '_');
+        return "jif$" + fullName + "_" + pi.name();
     }
     public static String paramFieldNameGetter(ParamInstance pi) {
         JifClassType jct = pi.container();
-        String fullName = jct.fullName().replace('.', '$');
-        return "getJifParam$" + fullName + "$" + pi.name();
+        String fullName = jct.fullName().replace('.', '_');
+        return "jif$get" + fullName + "_" + pi.name();
     }
     public static String paramArgName(ParamInstance pi) {
-        return "jifParamArg$" + pi.name();
+        return "jif$" + pi.name();
     }
 
 }

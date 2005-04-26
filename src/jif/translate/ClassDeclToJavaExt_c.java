@@ -12,9 +12,9 @@ import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
 
 public class ClassDeclToJavaExt_c extends ToJavaExt_c {
-    static final String INSTANCEOF_METHOD_NAME = "jifInstanceOf";
+    static final String INSTANCEOF_METHOD_NAME = "jif$Instanceof";
     static final String castMethodName(ClassType ct) {
-        return "jifCast$"+ct.fullName().replace('.','_');
+        return "jif$cast$"+ct.fullName().replace('.','_');
     }
     static final String interfaceClassImplName(String jifInterfaceName) {
         return jifInterfaceName + "_JIF_IMPL";
@@ -50,10 +50,10 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                         TypeNode tn = typeNodeForParam(pi, rw);
                         cb = cb.addMember(rw.qq().parseMember("private final %T %s;", tn, paramFieldName));
                     }
-
-                    // add getter methods for any params declared in interfaces
-                    cb = addInterfaceParamGetters(cb, jpt, jpt, rw);
                 }
+
+                // add getter methods for any params declared in interfaces
+                cb = addInterfaceParamGetters(cb, jpt, jpt, rw);
             }
             else {
                 ClassBody implBody = rw.java_nf().ClassBody(Position.COMPILER_GENERATED, new ArrayList(2));
@@ -97,9 +97,11 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         // go through the interfaces of cb
         for (Iterator iter = jpt.interfaces().iterator(); iter.hasNext(); ) {
             Type interf = (Type)iter.next();
-            if (rw.jif_ts().isJifClass(interf) && !rw.jif_ts().isSubtype(baseClass.superType(), interf)) {
+            if (rw.jif_ts().isJifClass(interf) &&
+                    !rw.jif_ts().isSubtype(baseClass.superType(), interf) &&
+                    interf instanceof JifSubstType) {
                 // the interface is not implemented in a super class,
-                // add fields and params.
+                // so add fields and params.
                 JifSubstType interfST = (JifSubstType)interf;
                 JifSubst subst = (JifSubst)interfST.subst();
                 JifPolyType interfPT = (JifPolyType)interfST.base();
@@ -133,11 +135,12 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         String name = jpt.name();
         StringBuffer sb = new StringBuffer();
         sb.append("static public boolean %s(%LF) {");
-        sb.append("if (o instanceof %s) {");
+        sb.append("if (o instanceof %s) { ");
         sb.append("%s c = (%s)o; ");
 
         // now test each of the params
-        sb.append("boolean ok = true;");
+        boolean moreThanOneParam = (jpt.params().size() > 1);
+        sb.append(moreThanOneParam?"boolean ok = true;":"");
         for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
             ParamInstance pi = (ParamInstance)iter.next();
             String paramFieldName = ParamToJavaExpr_c.paramFieldName(pi);
@@ -146,7 +149,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             if (pi.isCovariantLabel()) {
                 comparison = "relabelsTo";
             }
-            sb.append("ok = ok && c.");
+
+            sb.append(moreThanOneParam?"ok = ok && c.":"return c.");
             if (useGetters) {
                 sb.append(ParamToJavaExpr_c.paramFieldNameGetter(pi));
                 sb.append("()");
@@ -154,10 +158,10 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             else {
                 sb.append(paramFieldName);
             }
-            sb.append("." + comparison + "(" + paramArgName + ");\n");
+            sb.append("." + comparison + "(" + paramArgName + ");");
         }
 
-        sb.append("return ok; }");
+        sb.append(moreThanOneParam?"return ok; }":"}");
         sb.append("return false;");
 
         sb.append("}");

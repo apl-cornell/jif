@@ -7,7 +7,7 @@ public class FileTester {
 
     public static void main{p:}(principal{} p, String args[]):{p:} throws (Exception) where caller(p) {
         final label lb = new label{p:};
-        Runtime[p] runtime = Runtime[p].getRuntime(p);
+        Runtime[p] runtime = Runtime[p].getRuntime();
         FileInputStream[{*lb}]{*lb} fis = runtime.openFileRead("Hello.jif", lb);
         int i;
         try {

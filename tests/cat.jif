@@ -8,7 +8,7 @@ public class cat {
         try {
             String{} filename = args[0];
             final label{} lb = new label{p:};
-            Runtime[p]{} runtime = Runtime[p].getRuntime(p);
+            Runtime[p]{} runtime = Runtime[p].getRuntime();
             FileInputStream[{*lb}]{*lb} fis = runtime.openFileRead(filename, lb);
             InputStreamReader[{*lb}]{*lb} reader = new InputStreamReader[{*lb}](fis);
             BufferedReader[{*lb}]{*lb} br = new BufferedReader[{*lb}](reader);

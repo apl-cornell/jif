@@ -61,7 +61,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
         Block origBody = n.body();
 
         TypeNode type = rw.qq().parseType("jif.lang.Principal");
-        Expr init = rw.qq().parseExpr("jif.runtime.Runtime.user()");
+        Expr init = rw.qq().parseExpr("jif.runtime.Runtime.user(null)");
 
         Stmt declPrincipal =
             rw.java_nf().LocalDecl(origBody.position(),

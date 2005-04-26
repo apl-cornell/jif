@@ -4,73 +4,25 @@ import java.io.*;
 
 public class Runtime[principal P]
 {
-    final principal{this} dynp; //run time principal
-    
-    public Runtime(principal{this} pp) {
-	dynp = pp;
-    }
+    private Runtime(principal{this} pp) {}
 
-    public static Runtime[u] getRuntime(principal u)
-        throws (SecurityException)
-    {
-        throw new SecurityException();
-    }
+    public static native Runtime[P] getRuntime() throws SecurityException;
+    public static native principal{} user();
+    public static native boolean{p1;p2} acts_for(principal p1, principal p2) throws (SecurityException{p1;p2});
 
-    public static principal user() throws (SecurityException) {
-        //HACK: just make this method compile.
-        throw new SecurityException();
-    }
+    public native FileOutputStream[{*L}]{*L;L} openFileWrite(String{*L} name, boolean{*L} append, label L)
+	throws (IOException{*L;L}, SecurityException{*L;L});
+    public native FileInputStream[{*L}]{*L;L} openFileRead(String{*L} name, label L)
+	throws (FileNotFoundException{*L;L}, SecurityException{*L;L});
 
-    public static boolean acts_for(principal p1, principal p2) 
-    throws (SecurityException) {
-	throw new SecurityException();
-    }
-
-    public FileOutputStream[{*L}]{*L} openFileWrite(String{*L} name, boolean{*L} append, label L)
-        throws (IOException, SecurityException)
-    {
-        throw new SecurityException();
-    }
-
-    public FileInputStream[{*L}]{*L} openFileRead(String{*L} name, label L)
-        throws (FileNotFoundException, SecurityException)
-    {
-        throw new SecurityException();
-    }
-
-    public PrintStream[{*L}]{*L} stdout(label L)
-        throws (SecurityException)
-    {
-        throw new SecurityException();
-    }
-
-    public InputStream[{*L}]{*L} stdin(label L)
-        throws (SecurityException)
-    {
-        throw new SecurityException();
-    }
-
-    public PrintStream[{*L}]{*L} stderr(label L) throws (SecurityException)
-    {
-        throw new SecurityException();
-    }
+    public native PrintStream[{*L}]{*L;L} stdout(label L) throws (SecurityException{*L;L});
+    public native InputStream[{*L}]{*L;L} stdin(label L) throws (SecurityException{*L;L});
+    public native PrintStream[{*L}]{*L;L} stderr(label L) throws (SecurityException{*L;L});
 
     //the default label is {P:}
-    public PrintStream[{P:}]{P:} err() {
-        return null;
-    }
-
-    public PrintStream[{P:}]{P:} out() {
-        return null;
-    }
-
-    public InputStream[{P:}]{P:} in() {
-        return null;
-    }
-    
-
-    public InputStream[{*L}] in(label L) {
-        return null;
-    }
+    public native PrintStream[{P:}]{P:} err();
+    public native PrintStream[{P:}]{P:} out();
+    public native InputStream[{P:}]{P:} in();
+    public native InputStream[{*L}]{*L;L} in(label L);
 }
 
