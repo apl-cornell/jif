@@ -1,64 +1,73 @@
 package jif.translate;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import jif.ast.*;
-import jif.types.*;
-import jif.types.label.Label;
-import jif.types.principal.Principal;
-import polyglot.frontend.Job;
-import polyglot.frontend.Pass;
-import polyglot.frontend.ExtensionInfo;
-import polyglot.types.Package;
-import polyglot.ext.jl.qq.QQ;
 import java.util.*;
 
-/** Visitor which performs type checking on the AST. */
-public class JifToJavaRewriter extends HaltingVisitor
+import jif.ast.Jif;
+import jif.ast.JifNodeFactory;
+import jif.types.JifTypeSystem;
+import jif.types.Param;
+import jif.types.label.Label;
+import jif.types.principal.Principal;
+import polyglot.ast.*;
+import polyglot.ext.jl.qq.QQ;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Job;
+import polyglot.frontend.Source;
+import polyglot.types.ClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.util.*;
+import polyglot.visit.ContextVisitor;
+import polyglot.visit.NodeVisitor;
+
+/** Visitor which performs rewriting on the AST. */
+public class JifToJavaRewriter extends ContextVisitor
 {
-    ExtensionInfo java_ext;
-    JifTypeSystem jif_ts;
-    JifNodeFactory jif_nf;
-    Job job;
-    QQ qq;
+    private ExtensionInfo java_ext;
+    private JifTypeSystem jif_ts;
+    private JifNodeFactory jif_nf;
+    private Job job;
+    private QQ qq;
+
+    private Collection additionalClassDecls;
+    private Collection newSourceFiles;
 
     public JifToJavaRewriter(Job job,
                              JifTypeSystem jif_ts,
                              JifNodeFactory jif_nf,
                              ExtensionInfo java_ext) {
+        //super(jif_ts);
+        super(job, jif_ts, java_ext.nodeFactory());
         this.job = job;
         this.jif_ts = jif_ts;
         this.jif_nf = jif_nf;
         this.java_ext = java_ext;
         this.qq = new QQ(java_ext);
+        this.additionalClassDecls = new LinkedList();
+        this.newSourceFiles = new LinkedList();
     }
 
     public void finish(Node ast) {
-        // System.out.println("-- finished with " + job);
-
         if (ast instanceof SourceCollection) {
             SourceCollection c = (SourceCollection) ast;
+            for (Iterator iter = c.sources().iterator(); iter.hasNext(); ) {
+                SourceFile sf = (SourceFile)iter.next();
+                java_ext.scheduler().addJob(sf.source(), sf);
 
-            if (c.sources().isEmpty()) {
-              // System.out.println("-- discarding ast");
-              return;
-            }
-            else if (c.sources().size() == 1) {
-              ast = (SourceFile) new ArrayList(c.sources()).get(0);
-            }
-            else {
-                throw new InternalCompilerError("Unimplemented: cannot " +
-                                                "hand off an AST to JL with " +
-                                                "more than one source file.");
             }
         }
+        else {
+            java_ext.scheduler().addJob(job.source(), ast);
+        }
 
-        // System.out.println("-- handing off ast " + ast);
 
-        // Start a new JL job to finish the translation.
-        java_ext.scheduler().addJob(job.source(), ast);
+        // now add any additional source files, which should all be public.
+        Source baseSource = job.source();
+        for (Iterator iter = newSourceFiles.iterator(); iter.hasNext(); ) {
+            SourceFile sf = (SourceFile)iter.next();
+            java_ext.scheduler().addJob(sf.source(), sf);
+        }
+        newSourceFiles.clear();
     }
 
     public JifTypeSystem jif_ts() {
@@ -85,7 +94,7 @@ public class JifToJavaRewriter extends HaltingVisitor
         return job.compiler().errorQueue();
     }
 
-    public NodeVisitor enter(Node n) {
+    public NodeVisitor enterCall(Node n) {
         try {
             Jif ext = (Jif) n.ext();
             return ext.del().toJava().toJavaEnter(this);
@@ -104,7 +113,7 @@ public class JifToJavaRewriter extends HaltingVisitor
         }
     }
 
-    public Node leave(Node old, Node n, NodeVisitor v) {
+    public Node leaveCall(Node old, Node n, NodeVisitor v) {
         try {
             Jif ext = (Jif) n.ext();
             Node m = ext.del().toJava().toJava(this);
@@ -126,6 +135,16 @@ public class JifToJavaRewriter extends HaltingVisitor
         }
     }
 
+    public Expr paramToJava(Param param) throws SemanticException {
+        if (param instanceof Label) {
+            return labelToJava((Label)param);
+        }
+        if (param instanceof Principal) {
+            return principalToJava((Principal)param);
+        }
+        throw new SemanticException("Unexpected param " + param);
+    }
+
     public Expr labelToJava(Label label) throws SemanticException {
         return label.toJava(this);
     }
@@ -145,8 +164,45 @@ public class JifToJavaRewriter extends HaltingVisitor
         return this.currentClass;
     }
 
-    public void currentClass(ClassType t) {
+    public void enteringClass(ClassType t) {
         this.currentClass = t;
+    }
+    public void leavingClass() {
+        this.currentClass = null;
+    }
+
+    public void addAdditionalClassDecl(ClassDecl cd) {
+        this.additionalClassDecls.add(cd);
+    }
+    /**
+     * Take any additional class declarations that can fit into the source file,
+     * i.e., non-public class decls.
+     */
+    public Node leavingSourceFile(SourceFile n) {
+        List l = new ArrayList(n.decls().size() + additionalClassDecls.size());
+        l.addAll(n.decls());
+        for (Iterator iter = this.additionalClassDecls.iterator(); iter.hasNext(); ) {
+            ClassDecl cd = (ClassDecl)iter.next();
+            if (cd.flags().isPublic()) {
+                // cd is public, we will put it in it's own source file.
+                SourceFile sf = java_nf().SourceFile(Position.COMPILER_GENERATED,
+                                                     n.package_(),
+                                                     Collections.EMPTY_LIST,
+                                                     Collections.singletonList(cd));
+                Source s = new Source(cd.name() + ".jif",
+                                      n.source().path(),
+                                      n.source().lastModified());
+                sf = sf.source(s);
+                this.newSourceFiles.add(sf);
+            }
+            else {
+                // cd is not public; it's ok to put the class decl in the source file.
+                l.add(cd);
+            }
+        }
+
+        this.additionalClassDecls.clear();
+        return n.decls(l);
     }
 
     public boolean inConstructor() {

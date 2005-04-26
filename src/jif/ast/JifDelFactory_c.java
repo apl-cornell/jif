@@ -49,6 +49,9 @@ public class JifDelFactory_c extends AbstractDelFactory_c {
   protected JL delInitializerImpl() {
       return new JifInitializerDel();
   }
+  protected JL delInstanceofImpl() {
+      return new JifInstanceOfDel();
+  }
   protected JL delLocalDeclImpl() {
       return new JifLocalDeclDel();
   }
@@ -58,10 +61,10 @@ public class JifDelFactory_c extends AbstractDelFactory_c {
   protected JL delTypeNodeImpl() {
       return new JifTypeNodeDel();
   }
-  
+
   protected JL delConstructorCallImpl() {
       return new JifConstructorCallDel();
-  }    
+  }
   protected JL delMethodDeclImpl() {
       return new JifMethodDeclDel();
   }

@@ -3,6 +3,7 @@ package jif.types.label;
 
 import java.util.Set;
 
+import jif.translate.ParamToJavaExpr_c;
 import jif.types.*;
 import jif.types.JifTypeSystem;
 import jif.types.ParamInstance;
@@ -13,15 +14,15 @@ import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
 import polyglot.util.*;
 
-/** An implementation of the <code>ParamLabel</code> interface. 
+/** An implementation of the <code>ParamLabel</code> interface.
  */
 public class ParamLabel_c extends Label_c implements ParamLabel {
     private final ParamInstance paramInstance;
     public ParamLabel_c(ParamInstance paramInstance, JifTypeSystem ts, Position pos) {
-        super(ts, pos);
+        super(ts, pos, new ParamToJavaExpr_c());
         this.paramInstance = paramInstance;
     }
-    
+
     public ParamInstance paramInstance() {
         return paramInstance;
     }
@@ -38,13 +39,13 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
     public boolean equalsImpl(TypeObject o) {
         if (! (o instanceof ParamLabel)) {
             return false;
-        }           
+        }
         ParamLabel that = (ParamLabel) o;
         return (this.paramInstance == that.paramInstance());
     }
-    
+
     public String componentString(Set printedLabels) {
-        if (Report.should_report(Report.debug, 1)) { 
+        if (Report.should_report(Report.debug, 1)) {
             return "<param-label " + this.paramInstance + ">";
         }
         return this.paramInstance.name();
@@ -69,9 +70,9 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
         }
         return ts.pathMap().N(l).NV(l);
     }
-    
+
     public boolean leq_(Label L, LabelEnv env) {
-        // only leq if equal to this parameter, which is checked before 
+        // only leq if equal to this parameter, which is checked before
         // this method is called.
         return false;
     }

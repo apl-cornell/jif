@@ -13,56 +13,56 @@ import polyglot.util.*;
 public class CanonicalTypeNodeToJavaExt_c extends ToJavaExt_c {
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         CanonicalTypeNode n = (CanonicalTypeNode) node();
-        return translate(rw, n.type());
+        return translate(rw, n.type(), n.position());
     }
 
-    TypeNode translate(JifToJavaRewriter rw, Type t)
+    static TypeNode translate(JifToJavaRewriter rw, Type t, Position pos)
 	throws SemanticException
     {
-        CanonicalTypeNode n = (CanonicalTypeNode) node();
+//        CanonicalTypeNode n = (CanonicalTypeNode) node();
 
         NodeFactory nf = rw.java_nf();
         TypeSystem ts = rw.java_ts();
 
-        if (t.isNull()) return canonical(nf, ts.Null());
-        if (t.isVoid()) return canonical(nf, ts.Void());
-        if (t.isBoolean()) return canonical(nf, ts.Boolean());
-        if (t.isByte()) return canonical(nf, ts.Byte());
-        if (t.isChar()) return canonical(nf, ts.Char());
-        if (t.isShort()) return canonical(nf, ts.Short());
-        if (t.isInt()) return canonical(nf, ts.Int());
-        if (t.isLong()) return canonical(nf, ts.Long());
-        if (t.isFloat()) return canonical(nf, ts.Float());
-        if (t.isDouble()) return canonical(nf, ts.Double());
+        if (t.isNull()) return canonical(nf, ts.Null(), pos);
+        if (t.isVoid()) return canonical(nf, ts.Void(), pos);
+        if (t.isBoolean()) return canonical(nf, ts.Boolean(), pos);
+        if (t.isByte()) return canonical(nf, ts.Byte(), pos);
+        if (t.isChar()) return canonical(nf, ts.Char(), pos);
+        if (t.isShort()) return canonical(nf, ts.Short(), pos);
+        if (t.isInt()) return canonical(nf, ts.Int(), pos);
+        if (t.isLong()) return canonical(nf, ts.Long(), pos);
+        if (t.isFloat()) return canonical(nf, ts.Float(), pos);
+        if (t.isDouble()) return canonical(nf, ts.Double(), pos);
 
         if (rw.jif_ts().isLabel(t)) {
-            return nf.AmbTypeNode(n.position(),
-                                  nf.PackageNode(n.position(),
+            return nf.AmbTypeNode(pos,
+                                  nf.PackageNode(pos,
                                                  ts.packageForName("jif.lang")),
                                   "Label");
         }
 
         if (rw.jif_ts().isPrincipal(t)) {
-            return nf.AmbTypeNode(n.position(),
-                                  nf.PackageNode(n.position(),
+            return nf.AmbTypeNode(pos,
+                                  nf.PackageNode(pos,
                                                  ts.packageForName("jif.lang")),
                                   "Principal");
         }
 
         if (t.isArray()) {
-            return rw.java_nf().ArrayTypeNode(n.position(),
-                                              translate(rw, t.toArray().base()));
+            return rw.java_nf().ArrayTypeNode(pos,
+                                              translate(rw, t.toArray().base(), pos));
         }
 
         if (t.isClass()) {
             Package p = t.toClass().package_();
             String name = t.toClass().name();
             if (p == null) {
-                return nf.AmbTypeNode(n.position(), name);
+                return nf.AmbTypeNode(pos, name);
             }
             else {
-                return nf.AmbTypeNode(n.position(),
-                                      nf.PackageNode(n.position(),
+                return nf.AmbTypeNode(pos,
+                                      nf.PackageNode(pos,
                                                      ts.packageForName(p.fullName())),
                                       name);
             }
@@ -71,8 +71,7 @@ public class CanonicalTypeNodeToJavaExt_c extends ToJavaExt_c {
         throw new InternalCompilerError("Cannot translate type " + t + ".");
     }
 
-    TypeNode canonical(NodeFactory nf, Type t) {
-        CanonicalTypeNode n = (CanonicalTypeNode) node();
-        return nf.CanonicalTypeNode(n.position(), t);
+    private static TypeNode canonical(NodeFactory nf, Type t, Position pos) {
+        return nf.CanonicalTypeNode(pos, t);
     }
 }

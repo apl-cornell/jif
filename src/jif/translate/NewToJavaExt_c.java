@@ -26,7 +26,19 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
         ClassType ct = ci.container().toClass();
         String name = (ct.fullName() + ".").replace('.', '$');
 
-        return rw.qq().parseExpr("new %T().%s(%LE)",
-                                 n.objectType(), name, n.arguments());
+        List paramargs = new ArrayList();
+        if (ct instanceof JifSubstType) {
+            // add all the actual param expressions to args
+            JifSubstType t = (JifSubstType)ct;
+            JifSubst subst = (JifSubst)t.subst();
+            JifPolyType base = (JifPolyType)t.base();
+            for (Iterator iter = base.params().iterator(); iter.hasNext(); ) {
+                ParamInstance pi = (ParamInstance)iter.next();
+                paramargs.add(rw.paramToJava(subst.get(pi)));
+            }
+        }
+
+        return rw.qq().parseExpr("new %T(%LE).%s(%LE)",
+                                 n.objectType(), paramargs, name, n.arguments());
     }
 }

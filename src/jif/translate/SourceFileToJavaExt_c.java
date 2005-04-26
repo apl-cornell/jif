@@ -15,6 +15,6 @@ public class SourceFileToJavaExt_c extends ToJavaExt_c {
         Source source = n.source();
         n = (SourceFile) super.toJava(rw);
         n = n.source(source);
-        return n;
+        return rw.leavingSourceFile(n);
     }
 }

@@ -8,29 +8,39 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.visit.TypeChecker;
 
-/** The Jif extension of the <code>Cast</code> node. 
- * 
+/** The Jif extension of the <code>Cast</code> node.
+ *
  *  @see polyglot.ext.jl.ast.Cast_c
  */
 public class JifCastDel extends JifJL_c
 {
     public JifCastDel() { }
-    
+
+    private boolean isToSubstJifClass = false;
+
+    public boolean isToSubstJifClass() { return this.isToSubstJifClass; }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         // prevent casting to arrays of parameterized types
         Cast c = (Cast)this.node();
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-        Type castType = ts.unlabel(c.castType().type());
-        
+        Type castType = c.castType().type();
+
+        if (ts.isLabeled(castType)) {
+            throw new SemanticException("Cannot cast to a labeled type.", c.position());
+        }
+
         if (castType.isArray()) {
             while (castType.isArray()) {
                 castType = castType.toArray().base();
             }
-            if (castType instanceof JifSubstType) {
+            if (castType instanceof JifSubstType && ((JifSubstType)castType).entries().hasNext()) {
                 throw new SemanticException("Jif does not currently support casts to an array of a parameterized type.", c.position());
             }
         }
+
+        this.isToSubstJifClass = (castType instanceof JifSubstType && ((JifSubstType)castType).entries().hasNext());
+
         return super.typeCheck(tc);
     }
 }

@@ -5,33 +5,33 @@ import jif.translate.*;
 import polyglot.ast.Ext;
 import polyglot.ext.jl.ast.AbstractExtFactory_c;
 
-/** 
+/**
  * This class provides is Jif's Extension factory, creating the appropriate
  * Ext objects as required.
  */
-public class JifExtFactory_c extends AbstractExtFactory_c 
+public class JifExtFactory_c extends AbstractExtFactory_c
 {
 
     public JifExtFactory_c() {
         super();
     }
-        
+
     protected Ext extNodeImpl() {
         return new Jif_c(new ToJavaExt_c());
     }
-    
+
     protected Ext extExprImpl() {
         return new Jif_c(new ExprToJavaExt_c());
     }
-    
+
     /**
-     * This method returns a vanilla Jif extensions (Jif_c) with a 
+     * This method returns a vanilla Jif extensions (Jif_c) with a
      * CannotToJavaExt_c for the ToJavaExt.
      */
     protected Ext extCannotToJavaImpl() {
         return new Jif_c(new CannotToJavaExt_c());
     }
-        
+
     protected Ext extAmbExprImpl() {
         return extCannotToJavaImpl();
     }
@@ -95,7 +95,7 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extCastImpl() {
-        return new JifCastExt(new ExprToJavaExt_c());
+        return new JifCastExt(new CastToJavaExt_c());
     }
 
     protected Ext extClassBodyImpl() {
@@ -155,7 +155,7 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extInstanceofImpl() {
-            return new JifInstanceofExt(new ExprToJavaExt_c());
+            return new JifInstanceofExt(new InstanceOfToJavaExt_c());
     }
 
     protected Ext extLabeledImpl() {
@@ -165,7 +165,7 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     protected Ext extLitImpl() {
         return new JifLiteralExt(new ToJavaExt_c());
     }
-    
+
     protected Ext extLocalImpl() {
         return new JifLocalExt(new LocalToJavaExt_c());
     }
@@ -243,133 +243,133 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         Ext e = extInstTypeNodeImpl();
         return postExtInstTypeNode(e);
     }
-    
+
     public final Ext extLabeledTypeNode() {
         Ext e = extLabeledTypeNodeImpl();
         return postExtLabeledTypeNode(e);
     }
-    
+
     public final Ext extAmbNewArray() {
         Ext e = extAmbNewArrayImpl();
         return postExtAmbNewArray(e);
     }
-    
+
     public final Ext extAmbParamTypeOrAccess() {
         Ext e = extAmbParamTypeOrAccessImpl();
         return postExtAmbParamTypeOrAccess(e);
     }
-    
+
     public final Ext extJoinLabelNode() {
         Ext e = extJoinLabelNodeImpl();
         return postExtJoinLabelNode(e);
     }
-    
+
     public final Ext extPolicyLabelNode() {
         Ext e = extPolicyLabelNodeImpl();
         return postExtPolicyLabelNode(e);
     }
-    
+
     public final Ext extAmbDynamicLabelNode() {
         Ext e = extAmbDynamicLabelNodeImpl();
         return postExtAmbDynamicLabelNode(e);
     }
-    
+
     public final Ext extAmbVarLabelNode() {
         Ext e = extAmbVarLabelNodeImpl();
         return postExtAmbVarLabelNode(e);
     }
-    
+
     public final Ext extAmbThisLabelNode() {
         Ext e = extAmbThisLabelNodeImpl();
         return postExtAmbThisLabelNode(e);
     }
-    
+
     public final Ext extCanonicalLabelNode() {
         Ext e = extCanonicalLabelNodeImpl();
         return postExtCanonicalLabelNode(e);
     }
-    
+
     public final Ext extParamNode() {
         Ext e = extParamNodeImpl();
         return postExtParamNode(e);
     }
-    
+
     public final Ext extLabelNode() {
         Ext e = extLabelNodeImpl();
         return postExtLabelNode(e);
     }
-    
+
     public final Ext extPrincipalNode() {
         Ext e = extPrincipalNodeImpl();
         return postExtPrincipalNode(e);
     }
-    
+
     public final Ext extAmbPrincipalNode() {
         Ext e = extAmbPrincipalNodeImpl();
         return postExtAmbPrincipalNode(e);
     }
-    
-    
+
+
     public final Ext extCanonicalPrincipalNode() {
         Ext e = extCanonicalPrincipalNodeImpl();
         return postExtCanonicalPrincipalNode(e);
     }
-    
+
     public final Ext extAmbParam() {
         Ext e = extAmbParamImpl();
         return postExtAmbParam(e);
     }
-    
+
     public final Ext extParamDecl() {
         Ext e = extParamDeclImpl();
         return postExtParamDecl(e);
     }
-    
+
     public final Ext extConstraintNode() {
         Ext e = extConstraintNodeImpl();
         return postExtConstraintNode(e);
     }
-    
+
     public final Ext extCanonicalConstraintNode() {
         Ext e = extCanonicalConstraintNodeImpl();
         return postExtCanonicalConstraintNode(e);
     }
-    
+
     public final Ext extAuthConstraintNode() {
         Ext e = extAuthConstraintNodeImpl();
         return postExtAuthConstraintNode(e);
     }
-    
+
     public final Ext extCallerConstraintNode() {
         Ext e = extCallerConstraintNodeImpl();
         return postExtCallerConstraintNode(e);
     }
-    
+
     public final Ext extActsForConstraintNode() {
         Ext e = extActsForConstraintNodeImpl();
         return postExtActsForConstraintNode(e);
     }
-        
+
     public final Ext extActsFor() {
         Ext e = extActsForImpl();
         return postExtActsFor(e);
     }
-    
+
     public final Ext extLabelIf() {
         Ext e = extLabelIfImpl();
         return postExtLabelIf(e);
     }
-    
+
     public final Ext extDeclassifyStmt() {
         Ext e = extDeclassifyStmtImpl();
         return postExtDeclassifyStmt(e);
     }
-    
+
     public final Ext extDeclassifyExpr() {
         Ext e = extDeclassifyExprImpl();
         return postExtDeclassifyExpr(e);
     }
-    
+
     public final Ext extNewLabel() {
         Ext e = extNewLabelImpl();
         return postExtNewLabel(e);
@@ -379,7 +379,7 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         Ext e = extLabelExprImpl();
         return postExtLabelExpr(e);
     }
-    
+
 
     //----------------------------------------------------------------
     // Jif-specific nodes Impls
@@ -495,7 +495,7 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     protected Ext extLabelExprImpl() {
         return new JifLabelExprExt(new LabelExprToJavaExt_c());
     }
-    
+
     //----------------------------------------------------------------
     // Jif-specific nodes Post methods
     //-----------------------------------------------------------------
