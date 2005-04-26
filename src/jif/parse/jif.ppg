@@ -25,15 +25,15 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
     }
 
     /**
-     * After we parse as usual, the AST may contain reftype_or_expr     
-     * nodes wrapped in expressions.  These are the _only_              
-     * reftype_or_expr expressions in the AST at this point, although   
-     * there may be reftype_or_expr types, qualifiers, etc.  Here, we   
-     * make a visitor pass over the AST to unwrap these reftype_or_expr 
-     * nodes and convert them to (possibly reftype_or_expr)             
-     * expressions.                                                     
-     *                                                                  
-     * This pass is done after parsing to avoid having to convert       
+     * After we parse as usual, the AST may contain reftype_or_expr
+     * nodes wrapped in expressions.  These are the _only_
+     * reftype_or_expr expressions in the AST at this point, although
+     * there may be reftype_or_expr types, qualifiers, etc.  Here, we
+     * make a visitor pass over the AST to unwrap these reftype_or_expr
+     * nodes and convert them to (possibly reftype_or_expr)
+     * expressions.
+     *
+     * This pass is done after parsing to avoid having to convert
      * expressions into types. */
     public java_cup.runtime.Symbol parse() throws Exception {
         java_cup.runtime.Symbol sym = super.parse();
@@ -171,7 +171,7 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
 
 	    if (w.amb instanceof Name &&
 		((Name) w.amb).prefix == null) {
-    
+
 		// Could be a field, local, principal, or param of the
 		// current class. The last three can be used to
 		// instantiate a class.
@@ -183,7 +183,7 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
 	} else {
 	    l.add(a);
 	}
-	return l; 
+	return l;
     }
 	
 
@@ -196,13 +196,13 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
 	}
 	return n.pos;
     }
-    
+
     protected Position posForObject(Object o) {
       if (o instanceof Amb) {
           return pos((Amb) o);
       }
       return super.posForObject(o);
-    }      
+    }
 
     public Position pos(Declarator n) {
         if (n == null) {
@@ -210,7 +210,7 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
         }
         return n.pos;
     }
-    
+
     public Position pos() {
         return new Position(lexer.file());
     }
@@ -342,18 +342,18 @@ principal ::=
 
     ;
 
-accesspath ::= 
+accesspath ::=
         THIS:a {:  RESULT = parser.nf.This(parser.pos(a));  :}
     |   IDENTIFIER:a {: RESULT = new Name(parser, parser.pos(a), a.getIdentifier()).toExpr(); :}
-    | accesspath:a DOT IDENTIFIER:b 
+    | accesspath:a DOT IDENTIFIER:b
              {: RESULT = parser.nf.Field(parser.pos(a, b),
-	                     a, 
+	                     a,
 			        b.getIdentifier()); :}
      ;
 
-accesspath_no_id ::= 
+accesspath_no_id ::=
         THIS:a {:  RESULT = parser.nf.This(parser.pos(a));  :}
-    | accesspath:a DOT IDENTIFIER:b 
+    | accesspath:a DOT IDENTIFIER:b
              {: RESULT = parser.nf.Field(parser.pos(a, b), a, b.getIdentifier()); :};
 
 // 19.4) Types, Values, and Variables
@@ -413,7 +413,7 @@ primitive_array_type ::=
 
 // 19.8.1) Class Declarations
 drop { class_declaration ::=
-        modifiers_opt CLASS IDENTIFIER 
+        modifiers_opt CLASS IDENTIFIER
 	super_opt interfaces_opt class_body; }
 
 extend class_declaration ::=
@@ -459,7 +459,7 @@ authority ::=
 drop { class_body_declaration ::= block | static_initializer ; }
 
 drop {
-    class_member_declaration ::= 
+    class_member_declaration ::=
 	modifiers_opt:a CLASS:n IDENTIFIER:b
 	super_opt:c interfaces_opt:d class_body:e
     |   interface_declaration:a
@@ -468,9 +468,9 @@ drop {
 
 // 19.8.2) Field Declarations
 // 19.8.3) Method Declarations
-drop { 
+drop {
     method_header ::=
-        modifiers_opt type IDENTIFIER LPAREN 
+        modifiers_opt type IDENTIFIER LPAREN
                 formal_parameter_list_opt RPAREN dims_opt throws_opt
     |   modifiers_opt VOID IDENTIFIER LPAREN
                 formal_parameter_list_opt RPAREN throws_opt
@@ -494,7 +494,7 @@ method_header ::=
                         c.getIdentifier(),
                                                 i, d, r, f, w, null); :}
     ;
-    
+
 override formal_parameter ::=
                     // Formal
                     // All formals are final
@@ -569,7 +569,7 @@ extend constructor_body ::=
                l.addAll(c);
                RESULT = parser.nf.Block(parser.pos(x,y), l); :}
     |   LBRACE:x block_statements:a RBRACE:y
-            {: a.add(0, parser.nf.SuperCall(parser.pos(x), 
+            {: a.add(0, parser.nf.SuperCall(parser.pos(x),
                 Collections.EMPTY_LIST));
                RESULT = parser.nf.Block(parser.pos(a,y), a); :}
     |   LBRACE:x RBRACE:y
@@ -631,14 +631,14 @@ parameter ::=
                                         a.getIdentifier()); :}
     ;
 
-    
+
 constraints_opt ::=
         // List of ConstraintNode
             {: RESULT = new TypedList(new LinkedList(), ConstraintNode.class, false); :}
     |   WHERE constraints:a
             {: RESULT = a; :}
     ;
-    
+
 constraints ::=
         // List of ConstraintNode
         constraint:a
@@ -648,7 +648,7 @@ constraints ::=
             {: RESULT = a;
                a.add(b); :}
     ;
-    
+
 constraint ::=
         // ConstraintNode
         AUTHORITY:x LPAREN principal_list:a RPAREN:y
@@ -663,11 +663,11 @@ constraint ::=
 override interface_declaration ::=
         // ClassDecl
         modifiers_opt:a INTERFACE:n IDENTIFIER:b
-                parameters_opt:p 
+                parameters_opt:p
                 extends_interfaces_opt:d authority_opt:u interface_body:e
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n,b),
 		    a.set(Flags.INTERFACE), b.getIdentifier(),
-		    p, null, d, u, e); :} 
+		    p, null, d, u, e); :}
     ;
 drop { extends_interfaces ::=
         EXTENDS interface_type:a
@@ -724,7 +724,7 @@ extend primary_no_new_array ::=
         primary_no_array:a
             {: RESULT = a; :}
     ;
-primary_no_array ::= 
+primary_no_array ::=
        declassify:a
             {: RESULT = a; :}
     ;
@@ -736,12 +736,12 @@ transfer primary_no_new_array to primary_no_array {
 
 extend relational_expression ::=
      relational_expression:a actsfor shift_expression:b {:
-                RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.ACTSFOR, b); 
+                RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.ACTSFOR, b);
                 :}
     ;
-    
+
 actsfor ::= ACTSFOR | ACTSFOR_LOWER ;
-    
+
 drop { /* no reflection */
 primary_no_new_array ::=
 	primitive_type DOT CLASS
@@ -766,7 +766,7 @@ class_instance_creation_expression ::=
                     // NewObjectExpr
         NEW:x objtype_or_expr:a label_opt:l LPAREN argument_list_opt:b RPAREN:y
             {:  TypeNode tn = a.toUnlabeledType();
-		if (l != null) 
+		if (l != null)
 		    tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
 		RESULT = parser.nf.New(parser.pos(x,y), tn, b); :}
     ;
@@ -829,16 +829,16 @@ param_or_expr_list ::=
         expression:a
         {: RESULT = parser.makeParamOrExprList(a); :}
     |   label:a
-	    {: List l = new TypedList(new LinkedList(), Node.class, false);
+	    {: List l = new LinkedList();
 	       l.add(a);
-	       RESULT = l; 
+	       RESULT = l;
 	    :}
     |   param_or_expr_list:a COMMA simple_name:b
 	    {: a.add(b); RESULT = a; :}
     |   param_or_expr_list:a COMMA label:b
 	    {: a.add(b); RESULT = a; :}
     ;
-    
+
 /* objtype_or_expr: something that looks like the name of a class or interface
  *  but that may turn out to be an expression.
  */
@@ -852,7 +852,7 @@ objtype_or_expr ::=
     |   objtype_or_expr:a LBRACK param_or_expr_list:b RBRACK
 	    {: RESULT = parser.makeAccessOrInst(a,b); :}
     ;
-    
+
 /* reftype_or_expr: something that looks like a reference type (but not
  * a primitive array type) but might turn out to be an expression. May
  * include a label component.
