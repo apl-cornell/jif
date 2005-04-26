@@ -22,16 +22,16 @@ public class JifLabelExprExt extends Jif_c
 
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
-        LabelExpr le = (LabelExpr) node();        
+        LabelExpr le = (LabelExpr) node();
         Label l = le.label().label();
         JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.jifTypeSystem();
 
         // make sure the label is runtime representable
-        lc.constrain(new LabelConstraint(new NamedLabel("label_expr", 
-                                                        l), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("RUNTIME_REPRESENTABLE", 
+        lc.constrain(new LabelConstraint(new NamedLabel("label_expr",
+                                                        l),
+                                         LabelConstraint.LEQ,
+                                         new NamedLabel("RUNTIME_REPRESENTABLE",
                                                         ts.runtimeLabel()),
                                          A.labelEnv(),
                                          le.position()) {
@@ -39,17 +39,17 @@ public class JifLabelExprExt extends Jif_c
                 return "Label expression not representable at runtime.";
             }
             public String detailMsg() {
-                return "A label expression must be representable at runtime. Label parameters, arg labels, and labels containing principal parameters are not represented at runtime.";
+                return "A label expression must be representable at runtime. Arg labels and \"this\" labels are not represented at runtime.";
             }
         });
 
         A = (JifContext) le.enterScope(A);
-                
+
         PathMap X1 = l.labelCheck(A);
-        
+
         A = (JifContext) A.pop();
-                        
+
         return X(le, X1);
     }
-    
+
 }

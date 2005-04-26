@@ -31,7 +31,7 @@ public class JifPrincipalNodeExt extends Jif_c {
         // make sure the principal is runtime representable
         if (!p.isRuntimeRepresentable()) {
             throw new SemanticException(
-                    "A principal used in an expression must be representable at runtime. Principal parameters are not represented at runtime.",
+                    "A principal used in an expression must be representable at runtime.",
                     pn.position());
         }
 
