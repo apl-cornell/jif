@@ -1,19 +1,18 @@
 package jif.ast;
 
 import jif.types.*;
-import jif.types.JifParsedPolyType;
-import jif.types.JifTypeSystem;
-import jif.types.PrincipalInstance;
+import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
 import polyglot.ast.Receiver;
 import polyglot.ext.jl.ast.Disamb_c;
 import polyglot.types.*;
+import polyglot.util.InternalCompilerError;
 
 /**
  * Utility class which is used to disambiguate ambiguous
  * AST nodes (Expr, Type, Receiver, Qualifier, Prefix).
- * 
+ *
  * We need to override the default functionality of <code>Disamb_c</code>
  * to deal with using the correct instantiations of polymorphic classes.
  */
@@ -31,41 +30,50 @@ public class JifDisamb_c extends Disamb_c
         }
         if (vi instanceof ParamInstance) {
             ParamInstance pi = (ParamInstance)vi;
+            JifNodeFactory jnf = (JifNodeFactory)nf;
+            JifTypeSystem ts = (JifTypeSystem)vi.typeSystem();
+
             if (pi.isPrincipal()) {
                 // <param principal uid> => <principal-param uid>
-                JifNodeFactory jnf = (JifNodeFactory)nf;
-                JifTypeSystem ts = (JifTypeSystem)vi.typeSystem();
                 Principal p = ts.principalParam(pos, pi);
                 return jnf.CanonicalPrincipalNode(pos, p);
             }
-            
-            throw new SemanticException(pi + " may not be used as a principal.",
-                                        pos);
+            else if (pi.isInvariantLabel()) {
+                Label l = ts.paramLabel(pos, pi);
+                return jnf.LabelExpr(pos, l);
+            }
+            else if (pi.isCovariantLabel()) {
+                Label l = ts.covariantLabel(pos, pi);
+                return jnf.LabelExpr(pos, l);
+            }
+
+            throw new InternalCompilerError("Unexpected param " + pi,
+                                            pos);
         }
         return null;
     }
 
     /**
-     * Override superclass functionality to avoid returning an 
+     * Override superclass functionality to avoid returning an
      * uninstantiated polymorphic class.
      */
     protected Receiver makeMissingFieldTarget(FieldInstance fi) throws SemanticException {
         if (fi.flags().isStatic()) {
             JifTypeSystem jts = (JifTypeSystem)fi.typeSystem();
-            Type container = fi.container(); 
+            Type container = fi.container();
             if (container instanceof JifParsedPolyType) {
                 JifParsedPolyType jppt = (JifParsedPolyType)container;
                 if (jppt.params().size() > 0) {
                     // return the "null instantiation" of the base type,
                     // to ensure that all TypeNodes contain either
-                    // a JifParsedPolyType with zero params, or a 
+                    // a JifParsedPolyType with zero params, or a
                     // JifSubstClassType
                     return nf.CanonicalTypeNode(pos, jts.nullInstantiate(pos, jppt.instantiatedFrom()));
                 }
             }
-        } 
-        
-        return super.makeMissingFieldTarget(fi);    
+        }
+
+        return super.makeMissingFieldTarget(fi);
     }
 
 }
