@@ -1,10 +1,15 @@
 package jif.ast;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import jif.types.*;
+import jif.types.JifPolyType;
+import jif.types.JifTypeSystem;
+import jif.types.ParamInstance;
 import jif.types.label.Label;
-import polyglot.ast.*;
+import jif.types.principal.Principal;
+import polyglot.ast.Ambiguous;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl.ast.TypeNode_c;
@@ -83,17 +88,27 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
 	JifPolyType t = (JifPolyType) b;
 
 	List l = new LinkedList();
-	
+
 	Iterator i = this.params.iterator();
 	Iterator j = t.params().iterator();
 	while (i.hasNext() && j.hasNext()) {
 	    ParamNode p = (ParamNode) i.next();
 	    ParamInstance pi = (ParamInstance) j.next();
 
-	    if (pi.isInvariantLabel() && !((Label)p.parameter()).isInvariant() ) 
+	    if (pi.isLabel() && !(p.parameter() instanceof Label)) {
+		throw new SemanticException("Can not instantiate a "+
+		    			"label parameter with a non-label.",
+		    			p.position());
+	    }
+	    if (pi.isPrincipal() && !(p.parameter() instanceof Principal)) {
+		throw new SemanticException("Can not instantiate a "+
+		    			"principal parameter with a non-principal.",
+		    			p.position());
+	    }
+	    if (pi.isInvariantLabel() && !((Label)p.parameter()).isInvariant() )
 		throw new SemanticException("Can not instantiate an invariant "+
-			"label parameter with a non-invariant label.", 
-			position());
+			"label parameter with a non-invariant label.",
+			p.position());
 
 	    l.add(p.parameter());
 	}
