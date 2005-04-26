@@ -4,10 +4,10 @@ class ActsFor10[principal P]
         int{a:} x = 0;
         int{b:} y = 0;
 	int{Alice:} z = 0;
-	int{P:} w;
+	int{P:; this} w = 8;
 
 	// param dyn
-	if (P actsfor a) { // illegal
+	if (P actsfor a) { // ok
 	    w = x;
 	}
 

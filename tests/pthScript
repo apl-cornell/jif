@@ -13,16 +13,16 @@
 #                    |  ( ErrorKind, "RegExp" )
 #                    |  ( "RegExp" )
 #                    |  ( )
-#      ErrorKind    :   one of, or a unique prefix of one of the following 
-#                       strings: "Warning", "Internal Error", "I/O Error", 
+#      ErrorKind    :   one of, or a unique prefix of one of the following
+#                       strings: "Warning", "Internal Error", "I/O Error",
 #                       "Lexical Error", "Syntax Error", "Semantic Error"
 #                       or "Post-compiler Error".
-#      Filename     :   the name of a file. Is interpreted from the 
+#      Filename     :   the name of a file. Is interpreted from the
 #                       directory where pth is run.
 #      LitString    :   a literal string, enclosed in quotes.
-#      RegExp       :   a regular expression, as in java.util.regex; 
+#      RegExp       :   a regular expression, as in java.util.regex;
 #                       is always enclosed in quotes.
-#      CmdLineArgs  :   additional command line args for the Polyglot 
+#      CmdLineArgs  :   additional command line args for the Polyglot
 #                       compiler; is always enclosed in quotes.
 #
 # When invoking this script, it will probably be necessary to supply
@@ -40,13 +40,13 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	ActsFor5.jif ;
 	ActsFor6.jif ;
 	ActsFor7.jif (Semantic, "not less restrictive");
-	ActsFor8.jif (Semantic, "must be runtime-representable");
+	ActsFor8.jif ;
 	ActsFor9.jif (Semantic, "actsfor .* can only be used");
 	ActsFor10.jif ;
 	ActsFor11.jif (Semantic, "not less restrictive");
 	ActsFor12.jif (Semantic, "not less restrictive");
-	ActsFor13.jif (Semantic, "must be runtime-representable");
-	ActsFor14.jif (Semantic, "must be runtime-representable");
+	ActsFor13.jif ;
+	ActsFor14.jif ;
 	ActsFor15.jif (Semantic, "not less restrictive");
 	ArgLabelSubst.jif ;
 	ArgLabelSubst2.jif ;
@@ -136,7 +136,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	LabelIf1.jif ;
 	LabelIf2.jif (Semantic, "only be used in an if statement");
 	LabelIf3.jif (Semantic, "only be used in an if statement");
-	LabelIf4.jif (Semantic, "not representable at runtime");
+	LabelIf4.jif ;
 	LabelIf5.jif ;
 	LabelIf6.jif (Semantic, "not less restrictive");
 	LabelIf6a.jif (Semantic, "not less restrictive");
@@ -155,7 +155,9 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Main2.jif ;
 	MyInteger.jif ;
 	NewLabel.jif ;
-	NewLabel2.jif (Semantic, "not representable at runtime");
+	NewLabel2.jif ;
+	NewLabel3.jif (Semantic, "not representable at runtime");
+	NewLabel4.jif (Semantic, "not representable at runtime");
 	NullExcept1.jif ;
 	NullExcept2.jif ;
 	NullExcept3.jif ;
@@ -183,11 +185,11 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Params12.jif ;
 	Params13.jif (Semantic, "not cast.*covariant.* parameter to.* invariant");
 	Params14.jif (Semantic, "not instantiate .* invariant .* parameter with .* non-invariant");
-	Params15.jif (Semantic, "must be representable at runtime");
+	Params15.jif ; //(Semantic, "must be representable at runtime");
 	Params16.jif (Semantic, "Cast an invariant label parameter to a different label");
 	Params17.jif (Semantic, "Cast an invariant label parameter to a different label");
 	Params18.jif (Semantic, "Cast an invariant label parameter to a different label");
-	Params19.jif (Semantic, "not a subtype"); // I think there is an instantiation missing in this test case!
+	Params19.jif ; //(Semantic, "not a subtype"); // I think there is an instantiation missing in this test case!
 	Params20.jif ;
 	Params21.jif (Semantic, "not cast.*covariant.* parameter to.* invariant");
 	Params22.jif (Semantic, "cannot be more restrictive");
@@ -195,12 +197,17 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Params23.jif ;
 	Params24.jif (Semantic, "static field cannot use .* label parameter");
 	Params25.jif (Semantic, "Cannot use .* in this scope");
-	Params26.jif (Semantic, "Cannot use .* in this scope");
+	Params26.jif (Semantic, "Could not find field");
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;
 	Poly.jif ;
-	Protected.jif ; 
+	Protected.jif ;
+	RuntimeParams01.jif ;
+	RuntimeParams02.jif ;
+	RuntimeParams03.jif ;
+	RuntimeParams04.jif (Semantic, "does not .* support .* array of a parameterized type");
+	RuntimeParams05.jif (Semantic, "does not .* support .* array of a parameterized type");
 	Simple.jif ;
 	Simple2.jif ;
 	Simple3.jif ;
@@ -233,5 +240,5 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	ToString.jif (Semantic, "Cannot coerce") ;
 	User1.jif ;
 	Vec.jif ;
-	While.jif ; 
+	While.jif ;
 }

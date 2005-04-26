@@ -1,13 +1,13 @@
 class ActsFor10[principal P]
 {
     public void p(principal{} a, principal{} b) {
-        int{a:} x = 0;
+        int{this;a:} x = 0;
         int{b:} y = 0;
 	int{Alice:} z = 0;
-	int{P:} w;
+	int{P:} w = -8;
 
 	// dyn param
-	if (a actsfor P) { // illegal
+	if (a actsfor P) { // ok
 	    x = w;
 	}
 

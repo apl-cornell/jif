@@ -13,7 +13,7 @@ class E {
 	D[{Bob:}, {Alice:}] o = foo; // upcast ok
 
 	try {
-	    C[{Bob:}, {Alice:}] that = (C[{Bob:}, {Alice:}])o; // downcast bad!
+	    C[{Bob:}, {Alice:}] that = (C[{Bob:}, {Alice:}])o; // ok
 	    foo.f = that.g; // bad!
 	}
 	catch (ClassCastException impossible) {}
