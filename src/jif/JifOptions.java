@@ -7,8 +7,8 @@ import polyglot.main.Options;
 import polyglot.main.UsageError;
 import jif.types.Solver;
 
-/** 
- * This object encapsulates various polyglot options. 
+/**
+ * This object encapsulates various polyglot options.
  */
 public class JifOptions extends Options {
     /*
@@ -19,22 +19,22 @@ public class JifOptions extends Options {
       * by class basis.
       */
      boolean solveGlobally;
-     
+
      /**
       * Provide more detailed explanation of solver error messages?
       */
      public boolean explainConstraints;
- 
+
      /**
       * The classpath for the Jif signatures of java.lang objects.
       */
      String sigcp = null;
- 
+
       /**
       * The classpath for the Jif runtime library
       */
      String rtcp = null;
- 
+
 
     /**
      * Constructor
@@ -42,7 +42,7 @@ public class JifOptions extends Options {
     public JifOptions(ExtensionInfo extension) {
         super(extension);
     }
-    
+
     /**
      * Set default values for options
      */
@@ -51,7 +51,7 @@ public class JifOptions extends Options {
         solveGlobally = false;
         explainConstraints = false;
     }
-    
+
     /**
      * Parse a command
      * @return the next index to process. That is, if calling this method
@@ -90,7 +90,7 @@ public class JifOptions extends Options {
         }
         return index;
     }
-    
+
     /**
      * Print usage information
      */
@@ -103,30 +103,33 @@ public class JifOptions extends Options {
         usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");
         usageForFlag(out, "-rtcp <path>", "path for Jif runtime classes");
     }
-    
+
     public String constructJifClasspath() {
+        // use the signature classpath if it exists for compiling Jif classes
         if (sigcp != null) {
             return sigcp + File.pathSeparator + constructFullClasspath();
         }
-        return constructFullClasspath();        
+        return constructFullClasspath();
     }
-    
+
     public String constructOutputExtClasspath() {
-        if (sigcp != null) {
-            return sigcp + File.pathSeparator + 
-		rtcp + File.pathSeparator + constructFullClasspath();
+        // use the runtime classpath if it exists for compiling the output classes
+        // Note that we do not want to use the signature class path, since it contains
+        // labels and principals as primitives.
+        if (rtcp != null) {
+            return rtcp + File.pathSeparator + constructFullClasspath();
         }
-        return constructFullClasspath();        
+        return constructFullClasspath();
     }
-    
+
     public String constructPostCompilerClasspath() {
         if (rtcp != null) {
-            return rtcp + File.pathSeparator 
-                + super.constructPostCompilerClasspath() + File.pathSeparator 
+            return rtcp + File.pathSeparator
+                + super.constructPostCompilerClasspath() + File.pathSeparator
                 + constructFullClasspath();
         }
-        return super.constructPostCompilerClasspath() + File.pathSeparator 
-                + constructFullClasspath();     
+        return super.constructPostCompilerClasspath() + File.pathSeparator
+                + constructFullClasspath();
     }
-    
+
 }
