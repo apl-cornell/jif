@@ -67,7 +67,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 
     public Context enterScope(Context c) {
         JifContext A = (JifContext) c;
-        return addParamsToContext(A);    
+        return addParamsToContext(A);
     }
     public Context enterScope(Node child, Context c) {
         if (child == this.body) {
@@ -95,7 +95,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         A.setAuthority(new HashSet(ct.authority()));
         return A;
     }
-    
+
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         JifClassDecl_c n = (JifClassDecl_c) super.buildTypes(tb);
         n.buildParams((JifTypeSystem) tb.typeSystem());
@@ -133,7 +133,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         JifClassDecl_c n = (JifClassDecl_c)super.disambiguate(ar);
-	
+
         JifParsedPolyType ct = (JifParsedPolyType) n.type;
 
         List principals = new ArrayList(n.authority().size());
@@ -215,17 +215,17 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         w.write(" {");
     }
 
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        // The invariantness of the class must agree with its super class
-        // and its interfaces.
-        Type superClass = null;
-        if (this.superClass() != null) {
-            superClass = this.superClass().type();
-        }
-        
-        return super.typeCheck(tc);
-        
-    }
+//    public Node typeCheck(TypeChecker tc) throws SemanticException {
+//        // The invariantness of the class must agree with its super class
+//        // and its interfaces.
+//        Type superClass = null;
+//        if (this.superClass() != null) {
+//            superClass = this.superClass().type();
+//        }
+//
+//        return super.typeCheck(tc);
+//
+//    }
 
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("cannot translate " + this);
