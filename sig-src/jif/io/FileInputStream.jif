@@ -1,0 +1,16 @@
+/*
+ * This Jif class provides a wrapper for the corresponding Java io class.
+ * This is necessitated by the label parameters, which require a runtime representation.
+ *
+ */
+package jif.io;
+import java.io.FileDescriptor;
+import java.io.IOException;
+
+public class FileInputStream[label L] extends InputStream[L]
+{
+    private FileInputStream() {}
+
+    public native int{L} read{L}() throws (IOException{L});
+    public final native FileDescriptor{L} getFD()  throws (IOException{L});
+}

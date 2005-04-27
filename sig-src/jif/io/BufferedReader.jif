@@ -1,25 +1,18 @@
-/* This is Jif signature for a Java class.
+/*
+ * This Jif class provides a wrapper for the corresponding Java io class.
+ * This is necessitated by the label parameters, which require a runtime representation.
  *
- * This file provides a Jif signature for Jif code 
- * to be compiled against. However, this signature is 
- * disregarded at runtime, and instead the standard 
- * Java class files are used.
- *
- * Methods are marked as native to avoid the need to
- * provide an implementation for them.
  */
-package java.io;
+package jif.io;
+import java.io.*;
 
 public class BufferedReader[label L] extends Reader[L] {
-    private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
-
-    public BufferedReader(Reader[L] in, int{L} sz) {}
-    public BufferedReader(Reader[L] in) {}
+    public BufferedReader(Reader[L] in, int{L} sz) {super();}
+    public BufferedReader(Reader[L] in) {super();}
 
 
     public native int{L;cbuf} read{cbuf;L}(char{L}[] cbuf, int{L} off, int{L} len) throws (IOException{L;cbuf});
 
-    public native String{L;ignoreLF} readLine{L;ignoreLF}(boolean ignoreLF) throws (IOException{L;ignoreLF});
     public native String{L} readLine{L}() throws (IOException{L});
     public native long{L} skip{L}(long{L} n) throws (IOException{L});
     public native boolean{L} ready() throws (IOException{L});

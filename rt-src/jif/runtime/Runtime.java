@@ -1,8 +1,11 @@
 package jif.runtime;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.LinkedList;
 
+import jif.io.*;
 import jif.lang.*;
 
 /**
@@ -10,10 +13,6 @@ import jif.lang.*;
  */
 public class Runtime {
     private Principal dynp;
-
-    static PrintStream out = System.out;
-    static InputStream in = System.in;
-    static PrintStream err = System.err;
 
     static PrincipalManager pm;
 
@@ -82,7 +81,7 @@ public class Runtime {
 			+ "doesn't have sufficient access restrictions.");
 	}
 
-	FileOutputStream fos = new FileOutputStream(name, append);
+	FileOutputStream fos = new FileOutputStream(L, new java.io.FileOutputStream(name, append));
 
 	if (!existed) {
 	    fos.flush();
@@ -107,7 +106,7 @@ public class Runtime {
     {
         Label acLabel = FileSystem.labelOf(name);
         if (acLabel.relabelsTo(L)) {
-	    return new FileInputStream(name);
+	    return new FileInputStream(L, new java.io.FileInputStream(name));
 	}
 
         throw new SecurityException("The file has more restrictive access "
@@ -120,7 +119,7 @@ public class Runtime {
      */
     public PrintStream stderr(Label l) {
         if ( l.relabelsTo(defaultLabel()) )
-	    return err;
+	    return new PrintStream(l, System.err);
 
 	throw new SecurityException("The standard error output is not "
 		+ "sufficiently secure. ");
@@ -132,7 +131,7 @@ public class Runtime {
      */
     public PrintStream stdout(Label l) {
         if ( l.relabelsTo(defaultLabel()) )
-        return out;
+            return new PrintStream(defaultLabel(), System.out);
     else
         return null;
     }
@@ -143,7 +142,7 @@ public class Runtime {
      */
     public InputStream stdin(Label l) {
         if ( defaultLabel().relabelsTo(l) )
-            return in;
+	    return new InputStream(l, System.in);
         else
             return null;
     }
@@ -153,7 +152,7 @@ public class Runtime {
      * has only one reader: the principal of this <code>Runtime</code> object.
      */
     public PrintStream out() {
-        return out;
+        return new PrintStream(defaultLabel(), System.out);
     }
 
     /**
@@ -161,7 +160,7 @@ public class Runtime {
      * has only one reader: the principal of this <code>Runtime</code> object.
      */
     public InputStream in() {
-        return in;
+        return new InputStream(defaultLabel(), System.in);
     }
 
     /**
@@ -169,16 +168,10 @@ public class Runtime {
      * has only one reader: the principal of this <code>Runtime</code> object.
      */
     public PrintStream err() {
-        return err;
+        return new PrintStream(defaultLabel(), System.err);
     }
 
     public static native String currentUser();
-
-    public static boolean acts_for(Principal parameter, Principal p1, Principal p2)
-    throws SecurityException
-    {
-	return acts_for(p1, p2);
-    }
 
     public static boolean acts_for(Principal p1, Principal p2)
     throws SecurityException
