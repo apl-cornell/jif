@@ -10,7 +10,7 @@ import polyglot.types.*;
 import polyglot.util.Position;
 import polyglot.util.TypedList;
 
-/** An implementation of the <code>JifMethodInstance</code> interface. 
+/** An implementation of the <code>JifMethodInstance</code> interface.
  */
 public class JifMethodInstance_c extends MethodInstance_c
                                 implements JifMethodInstance
@@ -30,56 +30,18 @@ public class JifMethodInstance_c extends MethodInstance_c
 
 	super(ts, pos, container, flags, returnType, name, formalTypes, excTypes);
 	this.constraints = TypedList.copyAndCheck(constraints, Assertion.class, true);
-        
+
 	this.startLabel = startLabel;
         this.isDefaultStartLabel = isDefaultStartLabel;
 	this.returnLabel = returnLabel;
         this.isDefaultReturnLabel = isDefaultReturnLabel;
-	this.throwTypes = TypedList.copyAndCheck(throwTypes, 
-					       Type.class, 
+	this.throwTypes = TypedList.copyAndCheck(throwTypes,
+					       Type.class,
 					       true);
-	this.formalTypes = TypedList.copyAndCheck(formalTypes, 
-	                                          Type.class, 
+	this.formalTypes = TypedList.copyAndCheck(formalTypes,
+	                                          Type.class,
 	                                          true);
     }
-//    private Label replaceArgLabels(Label l) {
-//        if (l == null) return l;
-//        try {
-//            return l.subst(new ArgLabelSubstitution(argLabels, false));
-//        }
-//        catch (SemanticException e) {
-//            throw new InternalCompilerError("Unexpected SemanticException " +
-//            "during label substitution: " + e.getMessage(), l.position());
-//        }
-//    }
-//
-//    private Type replaceArgLabelsInType(Type t) {
-//	if (((JifTypeSystem)typeSystem()).isLabeled(t)) {
-//	    LabeledType lt = (LabeledType)t;
-//	    lt = lt.labelPart(replaceArgLabels(lt.labelPart()));
-//	    lt = lt.typePart(replaceArgLabelsInType(lt.typePart()));
-//
-//	    return lt;
-//	}
-//	else if (t instanceof ArrayType) {
-//	    ArrayType at = (ArrayType)t;
-//	    at = at.base(replaceArgLabelsInType(at.base()));
-//
-//	    return at;
-//	}
-//
-//	return t;
-//    }
-//
-//    private List replaceArgLabelsInTypeList(List l) {
-//	List m = new ArrayList(l.size());
-//	for (Iterator i = l.iterator(); i.hasNext(); ) {
-//	    Type t = (Type)i.next();
-//	    m.add(replaceArgLabelsInType(t));
-//	}
-//
-//	return m;
-//    }
 
     public Label startLabel() {
 	return startLabel;
@@ -100,7 +62,7 @@ public class JifMethodInstance_c extends MethodInstance_c
     public Label returnLabel() {
 	return returnLabel;
     }
-    
+
     public void setReturnLabel(Label returnLabel, boolean isDefault) {
         this.returnLabel = returnLabel;
 	this.isDefaultReturnLabel = isDefault;
@@ -161,7 +123,7 @@ public class JifMethodInstance_c extends MethodInstance_c
 		    s += ", ";
 		}
 	    }
-	    
+
 	    s += ")";
 	}
 
@@ -189,62 +151,37 @@ public class JifMethodInstance_c extends MethodInstance_c
                 && formalTypes != null)) {
             return false;
         }
-        
+
         JifTypeSystem jts = (JifTypeSystem)typeSystem();
         // also need to make sure that every formal type is labeled with an arg label
         for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
             Type t = (Type) i.next();
             if (!jts.isLabeled(t) || !(jts.labelOfType(t) instanceof ArgLabel)) return false;
-        }    
+        }
         return true;
     }
-    
+
     public void subst(VarMap bounds) {
 	this.startLabel = bounds.applyTo(startLabel);
 	this.returnLabel = bounds.applyTo(returnLabel);
 	this.returnType = bounds.applyTo(returnType);
-	
+
 	List formalTypes = new LinkedList();
 	for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
 	    Type t = (Type) i.next();
 	    formalTypes.add(bounds.applyTo(t));
 	}
 	this.setFormalTypes(formalTypes);
-	
+
         List throwTypes = new LinkedList();
         for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
             Type t = (Type) i.next();
             throwTypes.add(bounds.applyTo(t));
-        }    
+        }
         this.setThrowTypes(throwTypes);
     }
 
-    
-//    public ArgLabel getArgLabel(int i) {
-//        return (ArgLabel)argLabels.get(i);
-//    }
-//
-//    public List argLabels() {
-//        return argLabels;
-//    }
-//
-//    public List nonSignatureArgLabels() {
-//        if (nonSignatureArgLabels == null) {
-//            nonSignatureArgLabels = new ArrayList(argLabels.size());
-//            for (int i = 0; i < argLabels.size(); i++) {
-//                ArgLabel a = (ArgLabel)argLabels.get(i);
-//                ArgLabel b = 
-//                    ((JifTypeSystem)ts).argLabel(
-//                        a.position(),
-//                        a.uid(),
-//                        a.index(),
-//                        false,
-//                        a.name());
-//                nonSignatureArgLabels.add(i, b);
-//            }
-//        }
-//        return nonSignatureArgLabels;
-//    }
+
     public String debugString() {
 	JifTypeSystem jts = (JifTypeSystem) ts;
 	String s = "method " + flags.translate() + jts.unlabel(returnType) +
@@ -260,12 +197,12 @@ public class JifMethodInstance_c extends MethodInstance_c
 	}
 
 	s += ")";
-	
+
 	return s;
     }
 
     public String signature() {
-	StringBuffer sb = new StringBuffer(); 
+	StringBuffer sb = new StringBuffer();
         sb.append(name);
         if (!isDefaultStartLabel() || Report.should_report(Report.debug, 1)) {
             sb.append(startLabel);
@@ -279,7 +216,7 @@ public class JifMethodInstance_c extends MethodInstance_c
             }
             else {
                 if (t.isClass()) {
-                    sb.append(t.toClass().name());                    
+                    sb.append(t.toClass().name());
                 }
                 else {
                     sb.append(t.toString());
