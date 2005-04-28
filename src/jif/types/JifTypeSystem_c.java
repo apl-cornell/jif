@@ -13,7 +13,7 @@ import polyglot.types.*;
 import polyglot.types.Package;
 import polyglot.util.*;
 
-/** An implementation of the <code>JifTypeSystem</code> interface. 
+/** An implementation of the <code>JifTypeSystem</code> interface.
  */
 public class JifTypeSystem_c
     extends ParamTypeSystem_c
@@ -67,7 +67,7 @@ public class JifTypeSystem_c
         throws SemanticException {
         super.initialize(loadedResolver, extInfo);
 
-        PRINCIPAL_ = new PrimitiveType_c(this, PRINCIPAL_KIND);        
+        PRINCIPAL_ = new PrimitiveType_c(this, PRINCIPAL_KIND);
         LABEL_ = new PrimitiveType_c(this, LABEL_KIND);
 
     }
@@ -135,11 +135,11 @@ public class JifTypeSystem_c
         ClassType container,
         Flags flags,
         List formalTypes,
-        List excTypes) {        
+        List excTypes) {
         return jifConstructorInstance(pos,container,flags,unknownLabel(pos), false,unknownLabel(pos),false,
             formalTypes, Collections.EMPTY_LIST,
             excTypes,
-            Collections.EMPTY_LIST); 
+            Collections.EMPTY_LIST);
     }
 
     public JifConstructorInstance jifConstructorInstance(
@@ -254,15 +254,15 @@ public class JifTypeSystem_c
                 if (jppt.params().size() > 0) {
                     // return the "null instantiation" of the base type,
                     // to ensure that all TypeNodes contain either
-                    // a JifParsedPolyType with zero params, or a 
+                    // a JifParsedPolyType with zero params, or a
                     // JifSubstClassType
                     return jppt.instantiatedFrom().clazz();
                 }
          }
         return super.staticTarget(t);
-            
+
     }
-    
+
     public boolean equals(TypeObject t1, TypeObject t2) {
         if (t1 instanceof Type) {
             t1 = strip((Type)t1);
@@ -278,23 +278,23 @@ public class JifTypeSystem_c
     /**
      * Find out if the least common ancestor of subtype and supertype is
      * supertype, given that strip(subtype) is a sub type of strip(supertype).
-     * i.e. check their parameters are appropriate. 
+     * i.e. check their parameters are appropriate.
      * @return supertype if supertype is the least common ancestor of subtype
      *     and supertype, null otherwise.
-     * @@@@@This code looks buggy! base is never used, and neither is iter3... 
+     * @@@@@This code looks buggy! base is never used, and neither is iter3...
      */
     protected Type leastCommonAncestorSubtype(Type subtype, Type supertype) {
         while (subtype != null && !equals(subtype, supertype)) {
-            subtype = subtype.toClass().superType();                    
+            subtype = subtype.toClass().superType();
         }
-        // subtype is now the same type as supertype, when stripped of their 
+        // subtype is now the same type as supertype, when stripped of their
         // parameters. Now check their parameters.
         Iterator iter1 = ((JifClassType)subtype).actuals().iterator();
         Iterator iter2 = ((JifClassType)supertype).actuals().iterator();
         if (subtype instanceof JifSubstType) {
             Type base = ((JifSubstType)subtype).base();
         }
-        
+
         Iterator iter3 = ((JifClassType)supertype).actuals().iterator();
         while (iter1.hasNext() && iter2.hasNext()) {
             Param p1 = (Param)iter1.next();
@@ -304,7 +304,7 @@ public class JifTypeSystem_c
                     // different UIDs...
                     return null;
                 }
-                 
+
             }
             if (p1 instanceof Label && p2 instanceof Label) {
                 if (!(leq((Label)p1, (Label)p2) && leq((Label)p2, (Label)p1))) {
@@ -313,20 +313,20 @@ public class JifTypeSystem_c
                 }
             }
             else if (!p1.equals(p2)) {
-                // there are two non equal parameters, so we don't have an 
+                // there are two non equal parameters, so we don't have an
                 // appropriate least common ancestor
                 return null;
             }
         }
         if (iter1.hasNext() || iter2.hasNext()) {
             // different number of parameters!
-            return null; 
+            return null;
         }
         // all the parameters agreed! we've found the least common ancestor!
         return supertype;
     }
     /**
-     * Override the superclass implementation, to handle label and principal 
+     * Override the superclass implementation, to handle label and principal
      * parameters, and array base types correctly.
      **/
     public Type leastCommonAncestor(Type type1, Type type2)
@@ -334,29 +334,29 @@ public class JifTypeSystem_c
     {
         assert_(type1);
         assert_(type2);
-        
+
         type1 = unlabel(type1);
         type2 = unlabel(type2);
 
-        // if one of them is a numeric type, or is a null type, just hand it 
+        // if one of them is a numeric type, or is a null type, just hand it
         // off to the superclass
-        if (type1.isNumeric() || type2.isNumeric() || 
+        if (type1.isNumeric() || type2.isNumeric() ||
             type1.isNull() || type2.isNull()) {
-            return super.leastCommonAncestor(strip(type1), strip(type2));                            
+            return super.leastCommonAncestor(strip(type1), strip(type2));
         }
 
         // array types
         if (type1.isArray() && type2.isArray()) {
             Type base1 = type1.toArray().base();
             Type base2 = type2.toArray().base();
-            if (leq(labelOfType(base1), labelOfType(base2)) && 
+            if (leq(labelOfType(base1), labelOfType(base2)) &&
                 leq(labelOfType(base2), labelOfType(base1))) {
                 // Both base types are labelled with the same label.
                 // (Either or both types may be unlabelled, in which case
                 // we are using the default label).
-                 
-                return arrayOf(labeledType(base1.position(), 
-                                          leastCommonAncestor(unlabel(base1), 
+
+                return arrayOf(labeledType(base1.position(),
+                                          leastCommonAncestor(unlabel(base1),
                                                               unlabel(base2)),
                                           labelOfType(base1)));
             }
@@ -365,54 +365,54 @@ public class JifTypeSystem_c
                 return Object();
             }
         }
-            
-        
+
+
         if (type1.isReference() && type2.isReference()) {
             // Don't consider interfaces.
             if (type1.isClass() && type1.toClass().flags().isInterface()) {
                 return Object();
             }
-    
+
             if (type2.isClass() && type2.toClass().flags().isInterface()) {
                 return Object();
             }
-            
+
             // Check against Object to ensure superType() is not null.
             if (equals(type1, Object())) return type1;
             if (equals(type2, Object())) return type2;
 
             if (!(type1 instanceof JifClassType) || !(type2 instanceof JifClassType)) {
-                // this takes care of the case that one but not both are 
+                // this takes care of the case that one but not both are
                 // arraytypes. Array types should be the only possible
                 // non-JifClass reference type.
                 return Object();
             }
-    
-                            
+
+
             if (isSubtype(type1, type2)) {
-                // type1 is a subtype of type2 when stripped of all their 
+                // type1 is a subtype of type2 when stripped of all their
                 // label and principal parameters.
                 Type t = leastCommonAncestorSubtype(type1, type2);
                 if (t != null) return t;
             }
             if (isSubtype(type2, type1)) {
-                // type2 is a subtype of type2 when stripped of all their 
+                // type2 is a subtype of type2 when stripped of all their
                 // label and principal parameters.
                 Type t = leastCommonAncestorSubtype(type2, type1);
                 if (t != null) return t;
             }
-    
+
             // Walk up the hierarchy
             Type t1 = leastCommonAncestor(type1.toReference().superType(),
                                       type2);
             Type t2 = leastCommonAncestor(type2.toReference().superType(),
                           type1);
-    
+
             if (equals(t1, t2)) return t1;
-    
+
             return Object();
         }
-    
+
         throw new SemanticException(
            "No least common ancestor found for types \"" + type1 +
            "\" and \"" + type2 + "\".");
@@ -434,7 +434,7 @@ public class JifTypeSystem_c
         return new TableResolver();
     }
 
-    public ParsedClassType createClassType(LazyClassInitializer init, 
+    public ParsedClassType createClassType(LazyClassInitializer init,
                                            Source fromSource) {
         if (!init.fromClassFile()) {
             return new JifParsedPolyType_c(this, init, fromSource);
@@ -483,18 +483,18 @@ public class JifTypeSystem_c
     public ClassType nullInstantiate(Position pos, PClass pc) {
         if (pc.clazz() instanceof JifPolyType) {
             JifPolyType pt = (JifPolyType) pc.clazz();
-        
+
             Map subst = new HashMap();
 
             Iterator i = pt.params().iterator();
-            Iterator j = pt.actuals().iterator();  
-            while (i.hasNext() && j.hasNext()) {      
+            Iterator j = pt.actuals().iterator();
+            while (i.hasNext() && j.hasNext()) {
                 ParamInstance param = (ParamInstance) i.next();
                 Object actual = j.next();
-            
+
                 subst.put(param, actual);
             }
-        
+
             if (i.hasNext() || j.hasNext()) {
                 throw new InternalCompilerError("Params and actuals had " +
                         "different lengths");
@@ -502,10 +502,10 @@ public class JifTypeSystem_c
 
             return (ClassType) subst(pt, subst);
         }
-        
+
         throw new InternalCompilerError("Cannot null instantiate \"" +
                                         pc + "\".");
-                                        
+
     }
 
     public void checkInstantiation(Position pos, PClass t, List args)
@@ -665,7 +665,7 @@ public class JifTypeSystem_c
         ArgLabel t = new ArgLabel_c(this, vi, pos);
         return t;
     }
-    
+
     public ThisLabel thisLabel(JifClassType ct) {
         return thisLabel(ct.position(), ct);
     }
@@ -730,7 +730,7 @@ public class JifTypeSystem_c
 
         if (type instanceof ArrayType) {
             ArrayType at = (ArrayType)type;
-            return at.base(strip(at.base())); 
+            return at.base(strip(at.base()));
         }
         return type;
     }
@@ -754,12 +754,12 @@ public class JifTypeSystem_c
         return type instanceof LabeledType;
     }
 
-    /** 
+    /**
      * Returns true if the type is a Jif class (will return false if the type
      * is just a jif signature for a java class).
-     * 
+     *
      * Currently we determine this by assuming that Jif "source code" for Java
-     * classes have been given a private static field, named 
+     * classes have been given a private static field, named
      * "__JIF_SIG_OF_JAVA_CLASS$20030619". Ideally, in the future we would
      * have sufficient infrastructure in Polyglot to simply provide a signature
      * for a Java class, and be able to detect this.
@@ -781,39 +781,39 @@ public class JifTypeSystem_c
 
     /**
      * Check if the class has an untrusted non-jif ancestor.
-     * 
+     *
      * An untrusted non-jif ancestor is any non-jif
-     * ancestor that is not one of java.lang.Object, java.lang.Throwable,        
+     * ancestor that is not one of java.lang.Object, java.lang.Throwable,
      * java.lang.Error, java.lang.Exception, java.lang.IllegalArgumentException,
      * java.lang.IllegalStateException, java.lang.IndexOutOfBoundsException,
      * java.lang.RuntimeException or java.lang.SecurityException.
 
-     * 
+     *
      * @param t Type to check
-     * @return null if ct has no untrusted non-Jif ancestor, and the 
-     *  ClassType of an untrusted non-Jif ancestor otherwise. 
-     * 
+     * @return null if ct has no untrusted non-Jif ancestor, and the
+     *  ClassType of an untrusted non-Jif ancestor otherwise.
+     *
      */
     public ClassType hasUntrustedAncestor(Type t) {
         if (t == null || t.toReference() == null)
             return null;
-            
+
         Type st = t.toReference().superType();
         if (st == null || st.toClass() == null) {
             return null;
         }
-        
+
         ClassType ct = st.toClass();
-        
+
         if (!isJifClass(ct) && !trustedNonJifClassNames.contains(ct.fullName())) {
             return ct;
         }
-        return hasUntrustedAncestor(ct);            
+        return hasUntrustedAncestor(ct);
     }
     /**
      * Classnames of "trusted" non jif classes.
      */
-    private static List trustedNonJifClassNames = 
+    private static List trustedNonJifClassNames =
         Arrays.asList(new String[] {"java.lang.Error",
                                     "java.lang.Exception",
                                     "java.lang.IllegalArgumentException",
@@ -824,27 +824,27 @@ public class JifTypeSystem_c
                                     "java.lang.SecurityException",
                                     "java.lang.Throwable",
         });
-        
+
     /**
-     * In general, type t can be coerced to a String if t is a String, a 
+     * In general, type t can be coerced to a String if t is a String, a
      * primitive, or it has a toString() method.
      */
     public boolean canCoerceToString(Type t, Context c) {
         if (t.isPrimitive() || this.equals(t, this.String())) {
             return true;
         }
-        
+
         // check that t has a toString method
         if (t.isClass()) {
             ClassType ct = t.toClass();
             try {
                 this.findMethod(ct, "toString", Collections.EMPTY_LIST, c.currentClass());
                 // we were succesfully able to find an appropriate method
-                return true;                
+                return true;
             }
-            catch (NoMemberException e) { 
-                // no toString method. 
-                // fall through and return false 
+            catch (NoMemberException e) {
+                // no toString method.
+                // fall through and return false
             }
             catch (SemanticException e) {
                 throw new InternalCompilerError(
@@ -918,6 +918,14 @@ public class JifTypeSystem_c
         } else {
             return super.translatePrimitive(c, t);
         }
+    }
+
+    public List abstractSuperInterfaces(ReferenceType rt) {
+        return super.abstractSuperInterfaces(rt);
+    }
+
+    public boolean isAccessible(MemberInstance mi, ClassType contextClass) {
+        return super.isAccessible(mi, contextClass);
     }
 
     public PrimitiveType primitiveForName(String name)

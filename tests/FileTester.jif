@@ -1,6 +1,6 @@
 import jif.runtime.Runtime;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import jif.io.FileInputStream;
+import jif.io.FileOutputStream;
 import java.io.IOException;
 
 public class FileTester {

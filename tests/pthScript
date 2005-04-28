@@ -198,6 +198,10 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Params24.jif (Semantic, "static field cannot use .* label parameter");
 	Params25.jif (Semantic, "Cannot use .* in this scope");
 	Params26.jif (Semantic, "Could not find field");
+	Params27.jif (Semantic, "Can not instantiate .* with a non-label");
+	Params28.jif (Semantic, "Can not instantiate .* with a non-label");
+	Params29.jif (Semantic, "Can not instantiate .* with a non-principal");
+	Params30.jif (Semantic, "Can not instantiate .* with a non-principal");
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;
@@ -208,6 +212,14 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	RuntimeParams03.jif ;
 	RuntimeParams04.jif (Semantic, "does not .* support .* array of a parameterized type");
 	RuntimeParams05.jif (Semantic, "does not .* support .* array of a parameterized type");
+	RuntimeParams06.jif (Semantic, "does not .* support .* array of a parameterized type");
+	RuntimeParams07.jif (Semantic, "A Java class may not have any parameters");
+	RuntimeParams08.jif (Semantic, "Cannot override");
+	RuntimeParams09.jif ;
+	RuntimeParams10.jif (Semantic, "Cannot override");
+	RuntimeParams11.jif (Semantic, "Cannot override");
+	RuntimeParams12.jif (Semantic, "Cannot override");
+	RuntimeParams13.jif (Semantic, "Cannot override");
 	Simple.jif ;
 	Simple2.jif ;
 	Simple3.jif ;

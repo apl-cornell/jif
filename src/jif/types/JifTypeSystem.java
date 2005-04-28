@@ -11,12 +11,12 @@ import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.types.*;
 import polyglot.util.Position;
 
-/** Jif type system. 
+/** Jif type system.
  */
 public interface JifTypeSystem extends ParamTypeSystem
 {
     static final LabelEnv emptyLabelEnv = new LabelEnv_c();
-    
+
     // Type constructors
 
     /** Returns the "label" type. */
@@ -30,7 +30,7 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     /** Constructs a parameter instance for a class parameter declaration */
     ParamInstance paramInstance(Position pos, JifClassType container,
-				ParamInstance.Kind kind, String name);    
+				ParamInstance.Kind kind, String name);
 
     /** Constructs a principal instance for an external principal. */
     PrincipalInstance principalInstance(Position pos,
@@ -117,8 +117,8 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     /** Returns true if the type is labeled. */
     boolean isLabeled(Type type);
-    
-    /** 
+
+    /**
      * Returns true if the type is a Jif class (will return false if the type
      * is just a jif signature for a java class).
      */
@@ -127,22 +127,32 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     /**
      * Check if the class has an untrusted non-jif ancestor.
-     * 
+     *
      * An untrusted non-jif ancestor is any non-jif
-     * ancestor that is not one of java.lang.Object, java.lang.Throwable,        
+     * ancestor that is not one of java.lang.Object, java.lang.Throwable,
      * java.lang.Error, java.lang.Exception, java.lang.IllegalArgumentException,
      * java.lang.IllegalStateException, java.lang.IndexOutOfBoundsException,
      * java.lang.RuntimeException or java.lang.SecurityException.
-    
-     * 
+
+     *
      * @param t Type to check
-     * @return null if ct has no untrusted non-Jif ancestor, and the 
-     *  ClassType of an untrusted non-Jif ancestor otherwise. 
-     * 
+     * @return null if ct has no untrusted non-Jif ancestor, and the
+     *  ClassType of an untrusted non-Jif ancestor otherwise.
+     *
      */
     ClassType hasUntrustedAncestor(Type t);
 
-    /** Returns a new label constraint system solver. */
+    /**
+     * Exposes utility method of TypeSystem_c
+     */
+    List abstractSuperInterfaces(ReferenceType rt);
+
+    /**
+     * Exposes utility method of TypeSystem_c
+     */
+    boolean isAccessible(MemberInstance mi, ClassType contextClass);
+
+        /** Returns a new label constraint system solver. */
     Solver solver();
 
     DefaultSignature defaultSignature();
