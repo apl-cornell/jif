@@ -7,6 +7,8 @@
 package java.io;
 
 public class BufferedReader[label L] extends Reader[L] {
+    private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
+
     public BufferedReader(Reader[L] in, int{L} sz) {super();}
     public BufferedReader(Reader[L] in) {super();}
 

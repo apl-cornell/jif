@@ -7,6 +7,8 @@
 package java.io;
 
 public class InputStreamReader[label L] extends Reader[L] {
+    private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
+
     public InputStreamReader(InputStream[L] in) {super();}
     public native int{L;cbuf} read{L;cbuf}(char{L}[] cbuf, int{L} off, int{L} len) throws (IOException{L;cbuf});
     public native boolean{L} ready() throws (IOException{L});

@@ -6,8 +6,9 @@
  */
 package java.io;
 
-public class FileOutputStream[label L] extends OutputStream[L]
-{
+public class FileOutputStream[label L] extends OutputStream[L] {
+    private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
+
     private FileOutputStream() {}
     public native void write{L}(int{L} b) throws (IOException{L});
     private native void writeBytes{L}(byte{L}[]{L} b, int{L} off, int{L} len) throws (IOException{L});

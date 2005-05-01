@@ -7,6 +7,8 @@
 package java.io;
 
 public class PrintStream[label L] extends FilterOutputStream[L] {
+    private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
+
     public PrintStream(OutputStream[L] out) {
 		this(out, false);
     }
