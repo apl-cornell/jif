@@ -1,3 +1,6 @@
+import jif.runtime.Runtime;
+import java.io.PrintStream;
+
 /*
  * Test instantiating a covariant param with an invariant label.
  *
@@ -6,22 +9,40 @@
 class Params13a[covariant label L] {
 }
 
-class Params13b[label M] extends Params13a[M] {
+class Params13[label M] extends Params13a[M] {
     int{M} data = 7;
 
-    void leak() throws (ClassCastException, NullPointerException) {
-	Params13a[M] a;
-	Params13a[{}] b;
-	Params13b[M] x;
-	Params13b[{}] y = new Params13b[{}]();
+
+
+    public static void main{}(principal{} pp, String[]{} args) {
+        try {
+	    Runtime[pp] runtime = Runtime[pp].getRuntime();
+	    PrintStream[{pp:}] out = runtime.stdout(new label{pp:});
+	    new Params13[{Alice:}]().leak(out, pp);
+	}
+	catch (NullPointerException ignored) { }
+	catch (SecurityException ignored) { }
+    }
+
+    void leak{pp:}(PrintStream[{pp:}]{pp:} out, principal pp)  {
+	Params13a[{pp:;M}] a;
+	Params13a[{pp:}] b;
+	Params13[{pp:;M}] x = null;
+	Params13[{pp:}] y = new Params13[{pp:}]();
 
 	b = y; // OK as it is a super class 
 	a = b; // OK as it is covariant
-	x = (Params13b[M])a; // Unsafe downcast!!
+	try {
+	    x = (Params13[{pp:;M}])a; // Unsafe downcast!! will throw a class cast exception.
+	    if (out != null) out.println("failure! ");
+	}
+	catch (ClassCastException e) {
+	    if (out != null) out.println("success! ");
+	}
 	
-	x.data = 11; // storing secret data.
+	if (x!=null) x.data = 11; // storing secret data.
 
-	int{} leaked = y.data;
+	int{pp:} leaked = y.data;
     }
 
 }

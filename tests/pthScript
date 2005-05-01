@@ -183,10 +183,10 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Params10.jif ;
 	Params11.jif ;
 	Params12.jif ;
-	Params13.jif (Semantic, "not cast.*covariant.* parameter to.* invariant");
+	Params13.jif ;
 	Params14.jif (Semantic, "not instantiate .* invariant .* parameter with .* non-invariant");
 	Params15.jif ; 
-	Params16.jif (Semantic, "Cast an invariant label parameter to a different label");
+	Params16.jif ;
 	Params17.jif ;
 	Params18.jif ;
 	Params19.jif ; //(Semantic, "not a subtype"); // I think there is an instantiation missing in this test case!
