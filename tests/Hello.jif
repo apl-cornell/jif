@@ -1,4 +1,4 @@
-import jif.io.PrintStream;
+import java.io.PrintStream;
 import jif.runtime.Runtime;
 
 public class Hello

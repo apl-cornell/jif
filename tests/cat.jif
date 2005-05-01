@@ -1,6 +1,6 @@
 import jif.runtime.Runtime;
 import jif.lang.*;
-import jif.io.*;
+import java.io.*;
 
 public class cat {
 

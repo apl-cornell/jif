@@ -6,5 +6,10 @@
  */
 package java.io;
 
-public interface Serializable {
+public class FileInputStream[label L] extends InputStream[L]
+{
+    private FileInputStream() {}
+
+    public native int{L} read{L}() throws (IOException{L});
+    public final native FileDescriptor{L} getFD()  throws (IOException{L});
 }

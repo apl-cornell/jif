@@ -48,19 +48,11 @@ public class JifClassDeclDel extends JifJL_c {
         // any parameters.
         if (cd.type().isSubtype(ts.Throwable())) {
             JifParsedPolyType jppt = (JifParsedPolyType)cd.type();
-            if (jppt.actuals().size() > 0) {
+            if (jppt.params().size() > 0) {
                 throw new SemanticException("A subclass of " +
-                    "java.lang.Throwable may not have any parameters.",
-                    jppt.position());
-            }
-        }
-
-        // check that if this is a Java class, then it does not have
-        // any parameters.
-        if (!ts.isJifClass(cd.type())) {
-            JifParsedPolyType jppt = (JifParsedPolyType)cd.type();
-            if (jppt.actuals().size() > 0) {
-                throw new SemanticException("A Java class may not have any parameters.",
+                    "java.lang.Throwable may not have any parameters, " +
+                    "since Jif does not currently support catch blocks for " +
+                    "parameterized subclasses of Throwable.",
                     jppt.position());
             }
         }

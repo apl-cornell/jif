@@ -1,32 +1,22 @@
+/*
+ * This is a Jif signature for the Java class. It provides Jif label
+ * annotations for the Java class, allowing it to be usable by Jif
+ * code. There is no automated check that the signature provided here
+ * agrees with the actual Java code.
+ */
 package java.lang;
 
-public
-class NumberFormatException extends IllegalArgumentException {
+public class NumberFormatException extends IllegalArgumentException {
     private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
 
-    /**
-     * Constructs a <code>NumberFormatException</code> with no detail message.
-     */
     public NumberFormatException () {
 	super();
     }
 
-    /**
-     * Constructs a <code>NumberFormatException</code> with the 
-     * specified detail message. 
-     *
-     * @param   s   the detail message.
-     */
     public NumberFormatException (String{this} s) {
 	super (s);
     }
 
-    /**
-     * Factory method for making a <code>NumberFormatException</code>
-     * given the specified input which caused the error.
-     *
-     * @param   s   the input causing the error
-     */
     static NumberFormatException{s} forInputString(String s) {
         return new NumberFormatException("For input string: \"" + s + "\"");
     }

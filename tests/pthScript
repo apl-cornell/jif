@@ -185,13 +185,13 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Params12.jif ;
 	Params13.jif (Semantic, "not cast.*covariant.* parameter to.* invariant");
 	Params14.jif (Semantic, "not instantiate .* invariant .* parameter with .* non-invariant");
-	Params15.jif ; //(Semantic, "must be representable at runtime");
+	Params15.jif ; 
 	Params16.jif (Semantic, "Cast an invariant label parameter to a different label");
-	Params17.jif (Semantic, "Cast an invariant label parameter to a different label");
-	Params18.jif (Semantic, "Cast an invariant label parameter to a different label");
+	Params17.jif ;
+	Params18.jif ;
 	Params19.jif ; //(Semantic, "not a subtype"); // I think there is an instantiation missing in this test case!
 	Params20.jif ;
-	Params21.jif (Semantic, "not cast.*covariant.* parameter to.* invariant");
+	Params21.jif ;
 	Params22.jif (Semantic, "cannot be more restrictive");
 	Params22a.jif (Semantic, "cannot be less restrictive");
 	Params23.jif ;
@@ -213,13 +213,16 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	RuntimeParams04.jif (Semantic, "does not .* support .* array of a parameterized type");
 	RuntimeParams05.jif (Semantic, "does not .* support .* array of a parameterized type");
 	RuntimeParams06.jif (Semantic, "does not .* support .* array of a parameterized type");
-	RuntimeParams07.jif (Semantic, "A Java class may not have any parameters");
+	RuntimeParams07.jif ;
 	RuntimeParams08.jif (Semantic, "Cannot override");
 	RuntimeParams09.jif ;
 	RuntimeParams10.jif (Semantic, "Cannot override");
 	RuntimeParams11.jif (Semantic, "Cannot override");
 	RuntimeParams12.jif (Semantic, "Cannot override");
 	RuntimeParams13.jif (Semantic, "Cannot override");
+	RuntimeParams14.jif (Semantic, "Cannot cast to a parameterized Java class");
+	RuntimeParams15.jif (Semantic, "Cannot perform instanceof on a parameterized Java class");
+	RuntimeParams16.jif ;
 	Simple.jif ;
 	Simple2.jif ;
 	Simple3.jif ;

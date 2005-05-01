@@ -6,5 +6,7 @@
  */
 package java.io;
 
-public interface Serializable {
+public class FilterOutputStream[label L] extends OutputStream[L] {
+    public FilterOutputStream(OutputStream[L] out) { super(); }
+    public native void write{L}(int{L} b) throws (IOException{L});
 }

@@ -1,5 +1,6 @@
 package jif.extension;
 
+import jif.types.*;
 import jif.types.JifSubstType;
 import jif.types.JifTypeSystem;
 import polyglot.ast.Cast;
@@ -30,6 +31,15 @@ public class JifCastDel extends JifJL_c
             throw new SemanticException("Cannot cast to a labeled type.", c.position());
         }
 
+        if (!ts.isJifClass(castType)) {
+            if ((castType instanceof JifSubstType && ((JifSubstType)castType).entries().hasNext()) ||
+                (castType instanceof JifPolyType && !((JifPolyType)castType).params().isEmpty()))                    
+            throw new SemanticException("Cannot cast to a parameterized " + 
+                                        "Java class, since Java classes do " +
+                                        "not represent the parameters at runtime.", 
+                                        c.position());
+        }
+        
         if (castType.isArray()) {
             while (castType.isArray()) {
                 castType = castType.toArray().base();

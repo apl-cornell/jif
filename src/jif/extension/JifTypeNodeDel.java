@@ -34,7 +34,7 @@ public class JifTypeNodeDel extends JifJL_c
         Type unlabeledType = ts.unlabel(tn.type()); 
         if (unlabeledType instanceof JifParsedPolyType) {
             JifParsedPolyType jppt = (JifParsedPolyType)unlabeledType;
-            if (jppt.actuals().size() > 0) {
+            if (jppt.params().size() > 0) {
                 throw new SemanticException("The polymorphic class " + 
                         jppt.name() + " must be instantiated.",
                         tn.position());

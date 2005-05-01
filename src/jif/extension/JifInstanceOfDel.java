@@ -1,8 +1,6 @@
 package jif.extension;
 
-import jif.types.JifSubstType;
-import jif.types.JifTypeSystem;
-import polyglot.ast.Cast;
+import jif.types.*;
 import polyglot.ast.Instanceof;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
@@ -29,6 +27,15 @@ public class JifInstanceOfDel extends JifJL_c
         Type compareType = io.compareType().type();
         if (ts.isLabeled(compareType)) {
             throw new SemanticException("Cannot perform instanceof on a labeled type.", io.position());
+        }
+
+        if (!ts.isJifClass(compareType)) {
+            if ((compareType instanceof JifSubstType && ((JifSubstType)compareType).entries().hasNext()) ||
+                (compareType instanceof JifPolyType && !((JifPolyType)compareType).params().isEmpty()))                    
+            throw new SemanticException("Cannot perform instanceof on a parameterized " + 
+                                        "Java class, since Java classes do " +
+                                        "not represent the parameters at runtime.", 
+                                        io.position());
         }
 
         if (compareType.isArray()) {

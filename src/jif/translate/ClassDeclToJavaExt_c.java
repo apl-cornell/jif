@@ -167,7 +167,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         sb.append("}");
 
         List formals = produceParamFormals(jpt, rw, true);
-        return rw.qq().parseMember(sb.toString(), INSTANCEOF_METHOD_NAME, (Object)formals, name, name, name);
+        return rw.qq().parseMember(sb.toString(), INSTANCEOF_METHOD_NAME, formals, name, name, name);
     }
 
     private static TypeNode typeNodeForParam(ParamInstance pi, JifToJavaRewriter rw) throws SemanticException {
@@ -196,7 +196,6 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
             ParamInstance pi = (ParamInstance)iter.next();
             String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
-            Type paramType = pi.isPrincipal() ? rw.jif_ts().Principal() : rw.jif_ts().Label();
             TypeNode tn = typeNodeForParam(pi, rw);
             Formal f = rw.java_nf().Formal(pos, Flags.FINAL, tn, paramArgName);
             formals.add(f);
@@ -212,7 +211,6 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
     private static List produceParamArgs(JifPolyType jpt, JifToJavaRewriter rw) {
         List args = new ArrayList(jpt.params().size() + 1);
-        Position pos = Position.COMPILER_GENERATED;
         for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
             ParamInstance pi = (ParamInstance)iter.next();
             String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
@@ -232,7 +230,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
         // add super call.
         List superArgs = new ArrayList();
-        if (jpt.superType() instanceof JifSubstType) {
+        Type superType = jpt.superType();
+        if (superType instanceof JifSubstType && rw.jif_ts().isJifClass(((JifSubstType)superType).base())) {
             JifSubstType superjst = (JifSubstType)jpt.superType();
             JifPolyType superjpt = (JifPolyType)superjst.base();
 

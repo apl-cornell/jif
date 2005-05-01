@@ -1,8 +1,6 @@
 package jif.runtime;
 
-import jif.io.*;
-import java.io.IOException;
-import java.io.FileNotFoundException;
+import java.io.*;
 
 public class Runtime[principal P]
 {

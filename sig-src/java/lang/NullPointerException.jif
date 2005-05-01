@@ -1,51 +1,17 @@
 /*
- * @(#)NullPointerException.java	1.16 00/02/02
- *
- * Copyright 1994-2000 Sun Microsystems, Inc. All Rights Reserved.
- * 
- * This software is the proprietary information of Sun Microsystems, Inc.  
- * Use is subject to license terms.
- * 
+ * This is a Jif signature for the Java class. It provides Jif label
+ * annotations for the Java class, allowing it to be usable by Jif
+ * code. There is no automated check that the signature provided here
+ * agrees with the actual Java code.
  */
-
 package java.lang;
 
-/**
- * Thrown when an application attempts to use <code>null</code> in a 
- * case where an object is required. These include: 
- * <ul>
- * <li>Calling the instance method of a <code>null</code> object. 
- * <li>Accessing or modifying the field of a <code>null</code> object. 
- * <li>Taking the length of <code>null</code> as if it were an array. 
- * <li>Accessing or modifying the slots of <code>null</code> as if it 
- *     were an array. 
- * <li>Throwing <code>null</code> as if it were a <code>Throwable</code> 
- *     value. 
- * </ul>
- * <p>
- * Applications should throw instances of this class to indicate 
- * other illegal uses of the <code>null</code> object. 
- *
- * @author  unascribed
- * @version 1.16, 02/02/00
- * @since   JDK1.0
- */
-public
-class NullPointerException extends RuntimeException {
+public class NullPointerException extends RuntimeException {
     private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
-    /**
-     * Constructs a <code>NullPointerException</code> with no detail message.
-     */
     public NullPointerException() {
 	super();
     }
 
-    /**
-     * Constructs a <code>NullPointerException</code> with the specified 
-     * detail message. 
-     *
-     * @param   s   the detail message.
-     */
     public NullPointerException(String{this} s) {
 	super(s);
     }

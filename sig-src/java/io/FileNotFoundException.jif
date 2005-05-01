@@ -1,51 +1,17 @@
 /*
- * @(#)FileNotFoundException.java	1.20 00/02/02
- *
- * Copyright 1994-2000 Sun Microsystems, Inc. All Rights Reserved.
- * 
- * This software is the proprietary information of Sun Microsystems, Inc.  
- * Use is subject to license terms.
- * 
+ * This is a Jif signature for the Java class. It provides Jif label
+ * annotations for the Java class, allowing it to be usable by Jif
+ * code. There is no automated check that the signature provided here
+ * agrees with the actual Java code.
  */
-
 package java.io;
-
-
-/**
- * Signals that an attempt to open the file denoted by a specified pathname
- * has failed.
- *
- * <p> This exception will be thrown by the {@link FileInputStream}, {@link
- * FileOutputStream}, and {@link RandomAccessFile} constructors when a file
- * with the specified pathname does not exist.  It will also be thrown by these
- * constructors if the file does exist but for some reason is inaccessible, for
- * example when an attempt is made to open a read-only file for writing.
- *
- * @author  unascribed
- * @version 1.20, 02/02/00
- * @since   JDK1.0
- */
 
 public class FileNotFoundException extends IOException {
     private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
 
-    /**
-     * Constructs a <code>FileNotFoundException</code> with
-     * <code>null</code> as its error detail message.
-     */
     public FileNotFoundException() {
 	super();
     }
-
-    /**
-     * Constructs a <code>FileNotFoundException</code> with the
-     * specified detail message. The string <code>s</code> can be
-     * retrieved later by the
-     * <code>{@link java.lang.Throwable#getMessage}</code>
-     * method of class <code>java.lang.Throwable</code>.
-     *
-     * @param   s   the detail message.
-     */
     public FileNotFoundException(String{this} s) {
 	super(s);
     }

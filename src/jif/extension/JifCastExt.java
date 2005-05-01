@@ -1,19 +1,12 @@
 package jif.extension;
 
-import java.util.Iterator;
-
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.label.Label;
-import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import polyglot.ast.Cast;
-import polyglot.ast.Expr;
-import polyglot.ast.Node;
+import polyglot.ast.*;
 import polyglot.types.SemanticException;
 import polyglot.util.Position;
-import polyglot.util.StringUtil;
 
 /** The Jif extension of the <code>Cast</code> node.
  *
@@ -29,7 +22,7 @@ public class JifCastExt extends Jif_c
         Cast c = (Cast) node();
 
         JifTypeSystem ts = lc.jifTypeSystem();
-        JifContext A = (JifContext) lc.context();
+        JifContext A = lc.context();
         A = (JifContext) c.enterScope(A);
 
         Position pos = c.position();
@@ -44,7 +37,7 @@ public class JifCastExt extends Jif_c
 	// label check the type too, since the type may leak information
 	A = (JifContext) A.pushBlock();
 	A.setPc(Xe.N());
-	PathMap Xct = LabelTypeCheckUtil.labelCheckType(c.castType().type(), lc, c.castType().position());
+	PathMap Xct = LabelTypeCheckUtil.labelCheckType(c.castType().type(), lc, pos);
         A = (JifContext) A.pop();
 	PathMap X = Xe.N(ts.notTaken()).join(Xct);
 
