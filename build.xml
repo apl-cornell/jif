@@ -83,8 +83,8 @@
     <!-- Delete the ${classes} and ${dist} directory trees -->
     <delete dir="${sig-classes}"/>
     <delete dir="${rt-classes}"/>
+    <delete dir="${rt-classes}"/>
     <delete dir="${lib-classes}"/>
-    <delete dir="${dist}"/>
   </target>
 
   <target name="clobber" depends="clean">
@@ -294,8 +294,8 @@ ext="-extclass split.ExtensionInfo"
     <apply executable="${jifc}"
            parallel="false"
            failonerror="true"
-           dest="${sig-classes}"
            dir="${sig-src}"
+           dest="${sig-classes}"
 	   relative="true"
            skipemptyfilesets="true"
            vmlauncher="false">
@@ -304,10 +304,6 @@ ext="-extclass split.ExtensionInfo"
       <arg value="-sourcepath"/>
       <arg path="${sig-src}"/>
       <srcfile/>
-      <arg value="-sigcp"/>
-      <arg path="${sig-classes}"/>
-      <arg value="-rtcp"/>
-      <arg path="${rt-classes}"/>
       <fileset dir="${sig-src}" includes="**/Object.jif"/>
       <mapper type="glob" from="*.jif" to="*.class"/>
     </apply>
@@ -324,10 +320,6 @@ ext="-extclass split.ExtensionInfo"
       <arg value="-sourcepath"/>
       <arg path="${sig-src}"/>
       <srcfile/>
-      <arg value="-sigcp"/>
-      <arg path="${sig-classes}"/>
-      <arg value="-rtcp"/>
-      <arg path="${rt-classes}"/>
       <fileset dir="${sig-src}" includes="**/*.jif"/>
       <mapper type="glob" from="*.jif" to="*.class"/>
     </apply>
@@ -352,12 +344,6 @@ ext="-extclass split.ExtensionInfo"
       <arg value="-sourcepath"/>
       <arg path="${lib-src}"/>
       <srcfile/>
-      <arg value="-cp"/>
-      <arg path="${lib-classes}"/>
-      <arg value="-sigcp"/>
-      <arg path="${sig-classes}"/>
-      <arg value="-rtcp"/>
-      <arg path="${rt-classes}"/>
       <fileset dir="${lib-src}" includes="**/*.jif"/>
       <mapper type="glob" from="*.jif" to="*.class"/>
     </apply>
