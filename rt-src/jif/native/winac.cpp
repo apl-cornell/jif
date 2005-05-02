@@ -379,18 +379,11 @@ int SetSecurityInfo(LPCTSTR fname,  LPCTSTR owner, LPCTSTR* reader,
 //-----------------------------------------------------------------
 //Get the owner name of a file
 
-char* GetFileOwner(LPCTSTR fname) 
+Principal* GetFileOwner(LPCTSTR fname) 
 {
     PSECURITY_DESCRIPTOR pSD;
     PSID pSID;
     PACL pDACL;
-    char * Name = (char *) calloc(100, sizeof(char)); 
-	// address of string for account name
-    DWORD cbName = 100;       // address of size account string
-    char domainName[100];   // address of string for referenced domain
-    DWORD cbDomainName = 100;   // address of size domain string
-    SID_NAME_USE eUse;   // address of structure for SID type
-
 
     HANDLE hFile = CreateFile(fname, GENERIC_READ, FILE_SHARE_READ, NULL, 
 	    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -399,18 +392,13 @@ char* GetFileOwner(LPCTSTR fname)
 	    OWNER_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION,
 	    &pSID, NULL, &pDACL, NULL, &pSD);
 
+    CloseHandle(hFile);
+
     if (lErr != ERROR_SUCCESS) {
 	printf("error: %ld\n", GetLastError());
 	return NULL;
-    }
-
-    if (!LookupAccountSid(NULL, pSID, Name, &cbName, domainName, &cbDomainName,
-		&eUse)) {
-	printf("error: %ld\n", GetLastError());
-    }
-
-    CloseHandle(hFile);
-    return Name;
+    }		    
+    return new Principal(pSID);
 }
 
 //-----------------------------------------------------------------------
@@ -473,7 +461,7 @@ int GetReadersFromACL(PACL pACL, DWORD* num, LPBYTE* buf) {
 	    if (pACE->Header.AceType == ACCESS_ALLOWED_ACE_TYPE) {
 		if (pACE->Mask & FILE_READ_DATA) {
 		    PSID sid = PSIDFromPACE(pACE);
-		    readers[readerNum++] = new Principal(sid);		    
+		    readers[readerNum++] = new Principal(sid);
 		}
 	    }
 	}

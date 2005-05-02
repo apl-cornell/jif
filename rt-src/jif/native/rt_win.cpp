@@ -83,8 +83,9 @@ JNIEXPORT jstring JNICALL Java_jif_runtime_FileSystem_owner
 {
     LPCSTR str = env->GetStringUTFChars(fname, 0);
     
-    LPSTR owner = GetFileOwner(str);       
-    jstring ret = env->NewStringUTF(owner);  
+    Principal* owner = GetFileOwner(str);       
+    LPWSTR prName = owner->FullName();
+    jstring ret = env->NewString((const jchar*) prName, wcslen(prName));
     free(owner);   
     env->ReleaseStringUTFChars(fname, str);
 

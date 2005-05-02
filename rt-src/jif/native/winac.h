@@ -26,8 +26,6 @@ extern PSID GetSID(LPCTSTR name);
 
 extern int GetReadersFromACL(PACL pACL, DWORD* num, LPBYTE* buf);
     
-extern char* GetFileOwner(LPCTSTR fname);
-
 extern int GetFileReaders(LPCTSTR fname, DWORD* pNum, LPBYTE* buf);
 
 extern int SetSecurityInfo(const char* fname, const char* owner, 
@@ -57,5 +55,6 @@ class Principal
 	~Principal();
 };
 
+extern Principal* GetFileOwner(LPCTSTR fname);
 extern Principal* GetCurrentUser();    
 	
