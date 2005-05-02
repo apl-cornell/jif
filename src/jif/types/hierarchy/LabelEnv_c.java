@@ -186,6 +186,14 @@ public class LabelEnv_c implements LabelEnv
             }
             
             // haven't been able to prove it yet.
+            // try testing L1 against all of L2. This is needed
+            // if, say, L1 is an arg label with upper bound L join L',
+            // and L2 = L join L'.
+            if (L1.leq_(L2, this)) {
+                return true;
+            }
+            
+            // haven't been able to prove it yet.
             // Try to use the constraints to show that L1 <= L2, even
             // though L2 is not a singleton. This is useful in cases 
             // where the constraints do not have singleton RHS, e.g.

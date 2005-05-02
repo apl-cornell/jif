@@ -3,14 +3,12 @@ package jif.types.label;
 import java.util.*;
 
 import jif.translate.PolicyLabelToJavaExpr_c;
-import jif.types.*;
 import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.principal.Principal;
 import polyglot.types.*;
-import polyglot.types.Resolver;
-import polyglot.types.TypeObject;
 import polyglot.util.*;
 
 /** An implementation of the <code>PolicyLabel</code> interface. 
@@ -73,8 +71,12 @@ public class PolicyLabel_c extends Label_c implements PolicyLabel {
     }
     
     public boolean leq_(Label L, LabelEnv env) {
-        if (! L.isSingleton() || ! L.isComparable() || ! L.isEnumerable()) {
+        if (! L.isComparable() || ! L.isEnumerable()) {
             throw new InternalCompilerError("Cannot compare " + L);
+        }
+        if (! L.isSingleton()) {
+            // only try to compare Policy labels against singletons.
+            return false;
         }
 
         L = L.singletonComponent();
