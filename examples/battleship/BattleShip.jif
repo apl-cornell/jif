@@ -24,7 +24,7 @@ class BattleShip[principal P1, principal P2] authority (P1, P2) {
         if (m == null) return;
         
         final principal{} pp = m.p;
-        Runtime[pp] runtime = Runtime[pp].getRuntime(pp);
+        Runtime[pp] runtime = Runtime[pp].getRuntime();
 
         if (runtime == null) return;
 

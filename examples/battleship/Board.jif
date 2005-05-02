@@ -13,7 +13,7 @@ import jif.util.NoSuchElementException;
  * level of information the Ships contain.  
  */
 class Board[label L] {
-    private List[L]{L} ships;
+    private final List[L]{L;this} ships;
 
     public Board() {
 	this.ships = new LinkedList[L]();
