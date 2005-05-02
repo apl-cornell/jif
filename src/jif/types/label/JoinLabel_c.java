@@ -261,7 +261,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
 
     public PathMap labelCheck(JifContext A) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
-        PathMap X = ts.pathMap().N(A.pc());
+        PathMap X = ts.pathMap().N(A.pc()).NV(A.pc());
         
         if (components.isEmpty()) {
             return X;
