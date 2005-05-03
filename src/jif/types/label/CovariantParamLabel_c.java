@@ -16,7 +16,7 @@ import polyglot.util.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 
-/** An implementation of the <code>CovariantLabel</code> interface.
+/** An implementation of the <code>CovariantLabel</code> interface. 
  */
 public class CovariantParamLabel_c extends Label_c implements CovariantParamLabel {
     private final ParamInstance paramInstance;
@@ -24,7 +24,7 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
         super(ts, pos, new ParamToJavaExpr_c());
         this.paramInstance = paramInstance;
     }
-
+    
     public ParamInstance paramInstance() {
         return paramInstance;
     }
@@ -34,20 +34,20 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
     public boolean isCanonical() { return paramInstance.isCanonical(); }
     public boolean isDisambiguated() { return isCanonical(); }
     public boolean isEnumerable() { return true; }
-
+    
     public int hashCode() {
         return paramInstance.hashCode();
     }
     public boolean equalsImpl(TypeObject o) {
         if (! (o instanceof CovariantParamLabel)) {
             return false;
-        }
+        }           
         CovariantParamLabel that = (CovariantParamLabel) o;
         return (this.paramInstance == that.paramInstance());
     }
-
+    
     public String componentString(Set printedLabels) {
-        if (Report.should_report(Report.debug, 1)) {
+        if (Report.should_report(Report.debug, 1)) { 
             return "<covariant-param-label " + this.paramInstance + ">";
         }
         return this.paramInstance.name();
@@ -58,7 +58,7 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
         Label l;
         if (A.inStaticContext()) {
             // return a special arg label
-            ArgLabel al = ts.argLabel(this.position, paramInstance);
+            ArgLabel al = ts.argLabel(this.position, paramInstance); 
             if (A.inConstructorCall()) {
                 al.setUpperBound(ts.thisLabel(this.position(), (JifClassType)A.currentClass()));
             }
@@ -70,11 +70,11 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
         else {
             l = ts.thisLabel(this.position(), (JifClassType)A.currentClass());
         }
-        return ts.pathMap().N(l).NV(l);
+        return ts.pathMap().N(A.pc()).NV(l);
     }
-
+    
     public boolean leq_(Label L, LabelEnv env) {
-        // only leq if equal to this parameter, which is checked before
+        // only leq if equal to this parameter, which is checked before 
         // this method is called.
         return false;
     }
