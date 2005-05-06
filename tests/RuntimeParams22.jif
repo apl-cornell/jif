@@ -1,0 +1,13 @@
+// Test authority of calling classes for static methods of param classes.
+class C[principal P] authority (P) { 
+    static void m() where authority (P) {
+    }
+}
+
+
+class D {
+    void m() {
+	new C[Alice]();
+	C[Alice].m();
+    }
+}

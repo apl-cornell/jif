@@ -223,6 +223,13 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	RuntimeParams14.jif (Semantic, "Cannot cast to a parameterized Java class");
 	RuntimeParams15.jif (Semantic, "Cannot perform instanceof on a parameterized Java class");
 	RuntimeParams16.jif ;
+	RuntimeParams17.jif (Semantic, "@@@@");
+	RuntimeParams18.jif (Semantic, "@@@@");
+	RuntimeParams19.jif (Semantic, "@@@@");
+	RuntimeParams20.jif (Semantic, "@@@@");
+	RuntimeParams21.jif (Semantic, "@@@@");
+	RuntimeParams22.jif (Semantic, "@@@@");
+	RuntimeParams23.jif (Semantic, "@@@@");
 	Simple.jif ;
 	Simple2.jif ;
 	Simple3.jif ;
