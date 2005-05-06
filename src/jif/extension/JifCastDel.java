@@ -51,6 +51,7 @@ public class JifCastDel extends JifJL_c
 
         this.isToSubstJifClass = (castType instanceof JifSubstType && ((JifSubstType)castType).entries().hasNext());
 
+        LabelTypeCheckUtil.typeCheckType(tc, castType);
         return super.typeCheck(tc);
     }
 }

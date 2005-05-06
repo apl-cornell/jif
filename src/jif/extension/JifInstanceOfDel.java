@@ -48,6 +48,7 @@ public class JifInstanceOfDel extends JifJL_c
         }
         this.isToSubstJifClass = (compareType instanceof JifSubstType && ((JifSubstType)compareType).entries().hasNext());
 
+        LabelTypeCheckUtil.typeCheckType(tc, compareType);
         return super.typeCheck(tc);
     }
 }

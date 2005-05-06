@@ -32,6 +32,7 @@ public class JifTypeNodeDel extends JifJL_c
         }
         
         Type unlabeledType = ts.unlabel(tn.type()); 
+        
         if (unlabeledType instanceof JifParsedPolyType) {
             JifParsedPolyType jppt = (JifParsedPolyType)unlabeledType;
             if (jppt.params().size() > 0) {
@@ -55,8 +56,7 @@ public class JifTypeNodeDel extends JifJL_c
             
         }
         
-        
-        
+        LabelTypeCheckUtil.typeCheckType(tc, unlabeledType);                
         return tn;
     }
 
