@@ -30,10 +30,6 @@ public class JifCastExt extends Jif_c
         Expr e = (Expr) lc.context(A).labelCheck(c.expr());
         PathMap Xe = X(e);
 
-        if (c.type().isReference()) {
-            Xe = Xe.exc(Xe.NV(), ts.ClassCastException());
-        }
-
 	// label check the type too, since the type may leak information
 	A = (JifContext) A.pushBlock();
 	A.setPc(Xe.N());
@@ -41,6 +37,11 @@ public class JifCastExt extends Jif_c
         A = (JifContext) A.pop();
 	PathMap X = Xe.N(ts.notTaken()).join(Xct);
 
-	return X(c.expr(e), X);
+	// the cast may throw a class cast exception.
+        if (c.type().isReference()) {
+            X = X.exc(X.NV(), ts.ClassCastException());
+        }
+
+        return X(c.expr(e), X);
     }
 }
