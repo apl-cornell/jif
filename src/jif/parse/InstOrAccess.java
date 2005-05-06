@@ -20,12 +20,16 @@ import polyglot.util.Position;
 public class InstOrAccess extends Amb {
     // prefix[e] or prefix[p]
     Amb prefix;
-    Name param;
+    Object param;
 
-    InstOrAccess(Grm parser, Position pos, Amb prefix, Name param) throws Exception {
+    InstOrAccess(Grm parser, Position pos, Amb prefix, Object param) throws Exception {
 	super(parser, pos);
 	this.prefix = prefix;
 	this.param = param;
+	
+	if (!(param instanceof Name || param instanceof Expr)) {
+	    parser.die(pos);
+	}
 
 	if (prefix instanceof Labeled) parser.die(pos);
 	if (prefix instanceof Array) parser.die(pos);
@@ -33,7 +37,12 @@ public class InstOrAccess extends Amb {
 
     public TypeNode toType() throws Exception {
 	LinkedList l = new LinkedList();
-	l.add(parser.nf.AmbParam(param.pos, param.toIdentifier()));
+	if (param instanceof Name) {
+	    l.add(parser.nf.AmbParam(((Name)param).pos, ((Name)param).toIdentifier()));
+	}
+	else {
+	    l.add(parser.nf.AmbParam(((Expr)param).position(), (Expr)param));	    
+	}
 	return parser.nf.InstTypeNode(pos, prefix.toUnlabeledType(), l);
     }
 
@@ -44,38 +53,49 @@ public class InstOrAccess extends Amb {
     public Receiver toReceiver() throws Exception {
 	// The prefix must be either a type or an expression
 	// (i.e., a receiver).
-	return parser.nf.AmbParamTypeOrAccess(pos, prefix.toReceiver(),
-					    param.toIdentifier());
+        return parser.nf.AmbParamTypeOrAccess(pos, prefix.toReceiver(),
+                                              paramToExprOrString());
     }
 
+    private Expr paramToExpr() throws Exception {
+        if (param instanceof Expr) {
+            param = (Expr) ((Expr)param).visit(new UnwrapVisitor());
+            return (Expr)param;
+        }
+        return parser.nf.AmbExpr(((Name)param).pos, 
+                                 ((Name)param).toIdentifier());
+    }
     public Expr toExpr() throws Exception {
-	return parser.nf.ArrayAccess(pos, prefix.toExpr(),
-				    parser.nf.AmbExpr(param.pos,
-				    param.toIdentifier()));
+	return parser.nf.ArrayAccess(pos, prefix.toExpr(), paramToExpr());
     }
 
     public Expr toNewArray(Position p) throws Exception {
-	Access a = new Access(parser, pos, prefix,
-			    parser.nf.AmbExpr(param.pos,
-				param.toIdentifier()));
+	Access a = new Access(parser, pos, prefix, paramToExpr());
 	return a.toNewArray(p);
     }
 
+    private Object paramToExprOrString() {
+        if (param instanceof Name) {
+            return ((Name)param).name;
+        }
+        param = (Expr) ((Expr)param).visit(new UnwrapVisitor());
+        return param;
+    }
     public Expr toNewArrayPrefix(Position p) throws Exception {
 	// Only the first dimension of "new T[p][q][r]" is ambiguous;
 	// the rest must be expressions.
 
-	if (prefix instanceof Name) {
-	    // "new T.a[n]".  "name" may be either an expr or a param.
-	    List params = new LinkedList();
-		return parser.nf.AmbNewArray(p, prefix.toType(),
-					    param.toIdentifier(),
-					    Collections.EMPTY_LIST);
-	}
+        if (prefix instanceof Name) {
+            // "new T.a[n]".  "name" may be either an expr or a param.
+            List params = new LinkedList();
+            return parser.nf.AmbNewArray(p, prefix.toType(),
+                                         paramToExprOrString(),
+                                         Collections.EMPTY_LIST);
+        }
 	else if (prefix instanceof Inst) {
 	    // "new T[L,M][n]".  "name" must be an expr.
 	    List dims = new LinkedList();
-	    dims.add(parser.nf.AmbExpr(param.pos, param.toIdentifier()));
+	    dims.add(paramToExpr());
 	    return parser.nf.NewArray(p, prefix.toType(), dims);
 	}
 	else if (prefix instanceof Access ||
@@ -88,15 +108,13 @@ public class InstOrAccess extends Amb {
 	    if (e instanceof NewArray) {
 		NewArray a = (NewArray) e;
 		List dims = new LinkedList(a.dims());
-		dims.add(parser.nf.AmbExpr(param.pos,
-					param.toIdentifier()));
+		dims.add(paramToExpr());
 		return a.dims(dims);
 	    }
 	    else if (e instanceof AmbNewArray) {
 		AmbNewArray a = (AmbNewArray) e;
 		List dims = new LinkedList(a.dims());
-		dims.add(parser.nf.AmbExpr(param.pos,
-					param.toIdentifier()));
+		dims.add(paramToExpr());
 		return a.dims(dims);
 	    }
 	}

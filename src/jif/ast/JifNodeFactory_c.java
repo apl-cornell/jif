@@ -55,16 +55,16 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public AmbNewArray AmbNewArray(Position pos, TypeNode baseType, String name, List dims) {
-        AmbNewArray n = new AmbNewArray_c(pos, baseType, name, dims);
+    public AmbNewArray AmbNewArray(Position pos, TypeNode baseType, Object expr, List dims) {
+        AmbNewArray n = new AmbNewArray_c(pos, baseType, expr, dims);
         n = (AmbNewArray)n.ext(jifExtFactory().extAmbNewArray());
         n = (AmbNewArray)n.del(delFactory().delAmbExpr());
         return n;
     }
 
-    public AmbParamTypeOrAccess AmbParamTypeOrAccess(Position pos, Receiver base, String name) {
+    public AmbParamTypeOrAccess AmbParamTypeOrAccess(Position pos, Receiver base, Object expr) {
         AmbParamTypeOrAccess n = new AmbParamTypeOrAccess_c(pos, base,
-                                                            name);
+                                                            expr);
         n = (AmbParamTypeOrAccess)n.ext(jifExtFactory().extAmbParamTypeOrAccess());
         n = (AmbParamTypeOrAccess)n.del(delFactory().delAmbReceiver());
         return n;
@@ -248,6 +248,13 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
 
     public AmbParam AmbParam(Position pos, String name) {
         AmbParam n = new AmbParam_c(pos, name);
+        n = (AmbParam)n.ext(jifExtFactory().extAmbParam());
+        n = (AmbParam)n.del(delFactory().delNode());
+        return n;
+    }
+
+    public AmbParam AmbParam(Position pos, Expr expr) {
+        AmbParam n = new AmbExprParam_c(pos, expr);
         n = (AmbParam)n.ext(jifExtFactory().extAmbParam());
         n = (AmbParam)n.del(delFactory().delNode());
         return n;

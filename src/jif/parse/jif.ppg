@@ -150,6 +150,10 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
             else if (n instanceof ParamNode) {
                 params.add(n);
             }
+            else if (n instanceof Expr) {
+                params.add(nf.AmbParam(((Expr) n).position(),
+                                (Expr) n));
+            }
             else if (n instanceof Node) {
                 die(pos((Node) n));
                 return null;
@@ -216,22 +220,20 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
     }
 
     public Amb makeAccessOrInst(Amb a, List b) throws Exception {
-	if (a instanceof Access) {
-	    return new Access(this, pos(a), a, (Expr) b.get(0));
-	} else {
-	    if (b.size() == 1) {
-		if (b.get(0) instanceof Name) {
-		    Name id = (Name) b.get(0);
-		    return new InstOrAccess(this, pos(a), a, id);
-		} else if (b.get(0) instanceof ParamNode) {
-		    return new Inst(this, pos(a), a.toClassType(), b);
-		} else {
+		if (a instanceof Access) {
 		    return new Access(this, pos(a), a, (Expr) b.get(0));
+		} else {
+		    if (b.size() == 1) {
+				if (b.get(0) instanceof ParamNode) {
+				    return new Inst(this, pos(a), a.toClassType(), b);
+				}
+				else {
+				    return new InstOrAccess(this, pos(a), a, b.get(0));
+				}
+		    } else {
+				return new Inst(this,pos(a), a.toClassType(), toParamList(b));
+		    }
 		}
-	    } else {
-		return new Inst(this,pos(a), a.toClassType(), toParamList(b));
-	    }
-	}
     }
 :};
 
@@ -837,6 +839,8 @@ param_or_expr_list ::=
 	    {: a.add(b); RESULT = a; :}
     |   param_or_expr_list:a COMMA label:b
 	    {: a.add(b); RESULT = a; :}
+    |  param_or_expr_list:a COMMA accesspath_no_id:b 
+        {:  a.add(b); RESULT = a;  :}
     ;
 
 /* objtype_or_expr: something that looks like the name of a class or interface

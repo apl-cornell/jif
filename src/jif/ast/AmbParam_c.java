@@ -6,6 +6,7 @@ import jif.types.principal.Principal;
 import polyglot.ast.Node;
 import polyglot.ext.jl.ast.Node_c;
 import polyglot.types.*;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
 
@@ -14,7 +15,6 @@ import polyglot.visit.AmbiguityRemover;
 public class AmbParam_c extends Node_c implements AmbParam
 {
     protected String name;
-    protected Param param;
 
     public AmbParam_c(Position pos, String name) {
 	super(pos);
@@ -36,13 +36,7 @@ public class AmbParam_c extends Node_c implements AmbParam
     }
 
     public Param parameter() {
-	return this.param;
-    }
-
-    public AmbParam parameter(Param param) {
-	AmbParam_c n = (AmbParam_c) copy();
-	n.param = param;
-	return n;
+        throw new InternalCompilerError("No parameter yet");
     }
 
     public String toString() {
@@ -57,34 +51,7 @@ public class AmbParam_c extends Node_c implements AmbParam
      */
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
 	Context c = sc.context();
-//        JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
-//        JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
-            
         VarInstance vi = c.findVariable(name);
-        //        int ind = jar.indexForArg(name);
-//        if (vi == null || ind >= 0) {
-//            Formal formal = jar.formalForArg(ind);
-//            if (formal != null && (vi == null || vi == formal.localInstance())) {
-//                JifProcedureInstance pi = (JifProcedureInstance)c.currentCode();
-//                JifLocalInstance li = (JifLocalInstance) formal.localInstance();
-//            
-//                if (ts.isPrincipal(formal.declType())) {
-//                    Principal p = ts.argPrincipal(position(), 
-//                    li.uid(), name(), li.label(), 
-//                    ind, true);
-//                    return nf.CanonicalPrincipalNode(position(), p);
-//                }
-//                else if (ts.isLabel(formal.declType())) {
-//                    Label L = pi.getArgLabel(ind); //###
-//                    return nf.CanonicalLabelNode(position(), L);
-//                }
-//            }
-//                    
-//            // the following will fail with an appropriate exception
-//            if (vi == null) {
-//                c.findVariable(name);
-//            }
-//        }
 
         if (!vi.isCanonical()) {
             // not yet ready to disambiguate

@@ -9,8 +9,8 @@ import polyglot.visit.*;
 import java.util.*;
 
 /** An ambiguous new array expression.
- *  The ambiguity arises because in <code>new T.a[n][m]</code>, <code>n</code>
- *  may be either an expression or a label/principal parameter. 
+ *  The ambiguity arises because in <code>new T.a[e][m]</code>, <code>e</code>
+ *  may be either a dimension expression or a label/principal parameter. 
  */
 public interface AmbNewArray extends Expr, Ambiguous
 {
@@ -20,12 +20,9 @@ public interface AmbNewArray extends Expr, Ambiguous
     /** Returns a copy of this node with the base type updated. */
     AmbNewArray baseType(TypeNode baseType);
 
-    /** Gets the ambiguous name.  */
-    String name();
+    /** Gets the expr.  Will either be an Expr or a String*/
+    Object expr();
     
-    /** Returns a copy of this node with the ambiguous name updated.  */
-    AmbNewArray name(String name);
-
     /** Gets the additional dimensions.  */
     List dims();
     

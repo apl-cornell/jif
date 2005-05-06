@@ -18,14 +18,14 @@ import polyglot.visit.*;
 public class AmbNewArray_c extends Expr_c implements AmbNewArray
 {
     protected TypeNode baseType;
-    /** The ambiguous name, which may be an expression or a parameter. */
-    protected String name;
+    /** The ambiguous expr. May be a parameter or an array dimension. */
+    protected Object expr;
     protected List dims;
 
-    public AmbNewArray_c(Position pos, TypeNode baseType, String name, List dims) {
+    public AmbNewArray_c(Position pos, TypeNode baseType, Object expr, List dims) {
 	super(pos);
 	this.baseType = baseType;
-	this.name = name;
+	this.expr = expr;
 	this.dims = TypedList.copyAndCheck(dims, Expr.class, true);
     }
 
@@ -45,17 +45,17 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 	return n;
     }
 
-    /** Gets the ambiguous name. */
-    public String name() {
-	return this.name;
+    /** Gets the expr. */
+    public Object expr() {
+	return this.expr;
     }
 
     /** Returns a copy of this node with <code>name</code> updated. */
-    public AmbNewArray name(String name) {
-	AmbNewArray_c n = (AmbNewArray_c) copy();
-	n.name = name;
-	return n;
-    }
+//    public AmbNewArray expr(Expr expr) {
+//	AmbNewArray_c n = (AmbNewArray_c) copy();
+//	n.expr = expr;
+//	return n;
+//    }
 
     /** Gets the addtional dimensions. */
     public List dims() {
@@ -70,10 +70,11 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
     }
 
     /** Reconstructs the node. */
-    protected AmbNewArray_c reconstruct(TypeNode baseType, List dims) {
-	if (baseType != this.baseType || ! CollectionUtil.equals(dims, this.dims)) {
+    protected AmbNewArray_c reconstruct(TypeNode baseType, Object expr, List dims) {
+	if (baseType != this.baseType || expr != this.expr || ! CollectionUtil.equals(dims, this.dims)) {
 	    AmbNewArray_c n = (AmbNewArray_c) copy();
 	    n.baseType = baseType;
+	    n.expr = expr;
 	    n.dims = TypedList.copyAndCheck(dims, Expr.class, true);
 	    return n;
 	}
@@ -96,19 +97,25 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
     public Node visitChildren(NodeVisitor v) {
 	TypeNode baseType = (TypeNode) visitChild(this.baseType, v);
 	List dims = visitList(this.dims, v);
-	return reconstruct(baseType, dims);
+	Object expr = this.expr;
+	if (expr instanceof Expr) {
+	    expr = visitChild((Expr)expr, v);
+	}
+	return reconstruct(baseType, expr, dims);
     }
 
     public String toString() {
-	return "new " + baseType + "[" + name + "]...{amb}";
+	return "new " + baseType + "[" + expr + "]...{amb}";
     }
 
-    /** Disambiguates <code>name</code>.
+    /** Disambiguates
      */
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+	if (expr instanceof Expr && !((Expr)expr).isDisambiguated())  return this;
+
 	JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
-
+	
 	if (dims.isEmpty()) {
 	    throw new InternalCompilerError(position(),
 		"Cannot disambiguate ambiguous new array with no " +
@@ -128,13 +135,19 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 	    else if (pt.params().size() == 1) {
 		// "name" is a parameter.  Instantiate the base type with the
 		// parameter and use it as the new base type.
-                ParamNode pn = nf.AmbParam(position(), name);
+                ParamNode pn;
+                if (expr instanceof Expr) {
+                    pn = nf.AmbParam(position(), (Expr)expr);                    
+                }
+                else {
+                    pn = nf.AmbParam(position(), (String)expr);                                        
+                }
 
                 try {
                     pn = (ParamNode) pn.disambiguate(ar);
                 }
                 catch (SemanticException e) {
-		    throw new SemanticException("cannot resolve the parameter: " + name, position());
+		    throw new SemanticException("cannot resolve the parameter: " + expr, position());
                 }
 
 		List l = new LinkedList();
@@ -157,8 +170,15 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 	}
 
 	// "name" is an expression.  Prepend it to the list of dimensions.
-	Expr e = nf.AmbExpr(position(), name);
-	e = (Expr) e.visit(ar);
+	Expr e;
+	if (expr instanceof Expr) {
+	    e = (Expr) ((Expr)expr).visit(ar);
+	}
+	else {
+	    e = nf.AmbExpr(position(), (String)expr);
+	    e = (Expr) e.visit(ar);
+	}
+
 
 	List l = new LinkedList();
 	l.add(e);
@@ -171,7 +191,12 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
         w.write("new ");
         print(baseType, w, tr);
         w.write("[");
-        w.write(name);
+        if (expr instanceof Expr) {
+            print((Expr)expr, w, tr);
+        }
+        else {
+            w.write((String)expr);            
+        }
         w.write("]");
 
         for (Iterator i = dims.iterator(); i.hasNext();) {

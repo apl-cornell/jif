@@ -5,6 +5,7 @@ import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
 import polyglot.ext.jl.ast.*;
+import jif.extension.LabelTypeCheckUtil;
 import jif.types.*;
 import jif.types.label.Label;
 
@@ -22,6 +23,8 @@ public class JifNew_c extends New_c implements New
 	JifNew_c n = (JifNew_c) super.typeCheck(tc);
 
 	Type t = n.tn.type();
+        LabelTypeCheckUtil.typeCheckType(tc, t);
+        
         n = (JifNew_c) n.type(t);
 	
 	return n;

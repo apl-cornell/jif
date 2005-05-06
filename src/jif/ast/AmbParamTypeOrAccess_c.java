@@ -18,13 +18,13 @@ import polyglot.visit.NodeVisitor;
 public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAccess
 {
     protected Receiver prefix;
-    protected String name;
+    protected Object expr;
     protected Type type;
 
-    public AmbParamTypeOrAccess_c(Position pos, Receiver prefix, String name) {
+    public AmbParamTypeOrAccess_c(Position pos, Receiver prefix, Object expr) {
 	super(pos);
 	this.prefix = prefix;
-	this.name = name;
+	this.expr = expr;
     }
 
     public boolean isDisambiguated() {
@@ -41,24 +41,20 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 	return n;
     }
 
-    public String name() {
-	return this.name;
+    public Object expr() {
+	return this.expr;
     }
 
-    public AmbParamTypeOrAccess name(String name) {
-	AmbParamTypeOrAccess_c n = (AmbParamTypeOrAccess_c) copy();
-	n.name = name;
-	return n;
-    }
 
     public Type type() {
         return this.type;
     }
 
-    protected AmbParamTypeOrAccess_c reconstruct(Receiver prefix) {
-	if (prefix != this.prefix) {
+    protected AmbParamTypeOrAccess_c reconstruct(Receiver prefix, Object expr) {
+	if (prefix != this.prefix || expr != this.expr) {
 	    AmbParamTypeOrAccess_c n = (AmbParamTypeOrAccess_c) copy();
 	    n.prefix = prefix;
+	    n.expr = expr;
 	    return n;
 	}
 
@@ -67,11 +63,15 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 
     public Node visitChildren(NodeVisitor v) {
 	Receiver prefix = (Receiver) visitChild(this.prefix, v);
-	return reconstruct(prefix);
+	Object expr = this.expr;
+	if (expr instanceof Expr) {
+	    expr = visitChild((Expr)expr, v);
+	}
+	return reconstruct(prefix, expr);
     }
 
     public String toString() {
-	return prefix + "[" + name + "]{amb}";
+	return prefix + "[" + expr + "]{amb}";
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
@@ -79,16 +79,23 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
 	if (!prefix.isDisambiguated()) return this;
+	if (expr instanceof Expr && !((Expr)expr).isDisambiguated()) return this;
     
 	if (prefix instanceof TypeNode) {
-	    // "name" must be a parameter.
+	    // "expr" must be a parameter.
 	    TypeNode tn = (TypeNode) prefix;
 
 	    if (! (tn.type() instanceof JifPolyType)) {
 		throw new SemanticException(tn.type() + " is not a parameterized type.", position());
 	    }
 
-	    ParamNode n = nf.AmbParam(position(), name);
+	    ParamNode n;
+	    if (expr instanceof Expr) {
+	        n = nf.AmbParam(position(), (Expr)expr);
+	    }
+	    else {
+	        n = nf.AmbParam(position(), (String)expr);	        
+	    }
 	    n = (ParamNode) n.visit(ar);
 
 	    List l = new LinkedList();
@@ -100,9 +107,15 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
             return nf.CanonicalTypeNode(position(), t);
 	}
 	else if (prefix instanceof Expr) {
-	    // "name" must be an expression.
-	    Expr n = nf.AmbExpr(position(), name);
-	    n = (Expr) n.visit(ar);
+	    // "expr" must be an access index.
+	    Expr n;
+	    if (expr instanceof Expr) {
+	        n = (Expr)expr;
+	    }
+	    else {
+	        n = nf.AmbExpr(position(), (String)expr);;
+	        n = (Expr)n.visit(ar);
+	    }
 	    return nf.ArrayAccess(position(), (Expr) prefix, n);
 	}
 

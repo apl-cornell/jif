@@ -9,5 +9,4 @@ import java.util.*;
 /** An ambiguous parameter.
  */
 public interface AmbParam extends ParamNode, Ambiguous {
-    String name();
 }

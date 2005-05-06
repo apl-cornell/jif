@@ -2,11 +2,11 @@ package jif.ast;
 
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
-import jif.types.JifVarInstance;
 import jif.types.label.Label;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
-import polyglot.types.*;
+import polyglot.types.Context;
+import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
@@ -41,22 +41,8 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
             throw new SemanticException("Only a final access path can be used as a dynamic label.");
         }
 
-//        return nf.CanonicalPrincipalNode(position(),
-//                                         ts.dynamicPrincipal(position(), JifUtil.exprToAccessPath(expr, sc.context().currentClass())));
-//
-//        
-//        VarInstance vi = c.findVariable(name);
-//	if (vi instanceof JifVarInstance && vi.flags().isFinal()) {
-//	    // we will check that it is a label later.
-//
-//	    JifVarInstance jvi = (JifVarInstance) vi;
-//
         Label L = ts.dynamicLabel(position(), JifUtil.exprToAccessPath(expr, (JifContext)c));
         return nf.CanonicalLabelNode(position(), L);
-//	}
-//
-//	throw new SemanticException(vi + " is not a final variable " +
-//	    "of type \"label\".");
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

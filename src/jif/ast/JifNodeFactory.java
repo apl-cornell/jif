@@ -14,8 +14,8 @@ import java.util.*;
 public interface JifNodeFactory extends NodeFactory {
     InstTypeNode InstTypeNode(Position pos, TypeNode type, List params);
     LabeledTypeNode LabeledTypeNode(Position pos, TypeNode type, LabelNode label);
-    AmbNewArray AmbNewArray(Position pos, TypeNode base, String name, List dims);
-    AmbParamTypeOrAccess AmbParamTypeOrAccess(Position pos, Receiver base, String name);
+    AmbNewArray AmbNewArray(Position pos, TypeNode base, Object expr, List dims);
+    AmbParamTypeOrAccess AmbParamTypeOrAccess(Position pos, Receiver base, Object expr);
     JoinLabelNode JoinLabelNode(Position pos, List components);
     PolicyLabelNode PolicyLabelNode(Position pos, PrincipalNode owner, List readers);
     AmbDynamicLabelNode AmbDynamicLabelNode(Position pos, Expr expr);
@@ -29,6 +29,7 @@ public interface JifNodeFactory extends NodeFactory {
     JifMethodDecl JifMethodDecl(Position pos, Flags flags, TypeNode returnType, String name, LabelNode startLabel, List arguments, LabelNode endLabel, List exceptions, List constraints, Block body);
     JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, String name, LabelNode startLabel, LabelNode returnLabel, List arguments, List exceptions, List constraints, Block body);
     AmbParam AmbParam(Position pos, String name);
+    AmbParam AmbParam(Position pos, Expr expr);
     ParamDecl ParamDecl(Position pos, ParamInstance.Kind kind, String name);
     CanonicalConstraintNode CanonicalConstraintNode(Position pos, Assertion constraint);
     AuthConstraintNode AuthConstraintNode(Position pos, List principals);
