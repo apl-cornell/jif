@@ -18,35 +18,68 @@ class D {
 
     void m1(Object o) {
 	try {
-	    Object m = (C[{*this.d.lb},Alice])o;
+	    Object m = (C[{*this.d.lb},Alice])o; // throws NPE
 	}
 	catch (ClassCastException e) {
 	}
     }
     void m2(Object o) {
 	try {
-	    Object m = (C[new label {},this.d.p])o;
+	    Object m = (C[new label {},this.d.p])o; // throws NPE
 	}
 	catch (ClassCastException e) {
 	}
     }
     void m3(Object o) {
-	if (o instanceof C[{*this.d.lb},Alice]) ;
+	if (o instanceof C[{*this.d.lb},Alice]) ; // throws NPE
     }
     void m4(Object o) {
-	if (o instanceof  C[new label {},this.d.p]) ;
+	if (o instanceof  C[new label {},this.d.p]) ; // throws NPE
     }
     void m5() {
-	new C[{*this.d.lb}, Alice]();
+	new C[{*this.d.lb}, Alice](); // throws NPE
     }
     void m6() {
-	new C[new label {}, this.d.p]();
+	new C[new label {}, this.d.p](); // throws NPE
     }
     void m7() {
-	C[{*this.d.lb}, Alice].m();
+	C[{*this.d.lb}, Alice].m(); // throws NPE
     }
     void m8() {
-	C[new label {}, this.d.p].m();
+	C[new label {}, this.d.p].m(); // throws NPE
+    }
+
+    void n1(Object o) {
+	try {
+	    Object m = (C[{},Alice])o; // doesn't throw NPE
+	}
+	catch (ClassCastException e) {
+	}
+    }
+    void n2(Object o) {
+	try {
+	    Object m = (C[new label {},Alice])o; // doesn't throw NPE
+	}
+	catch (ClassCastException e) {
+	}
+    }
+    void n3(Object o) {
+	if (o instanceof C[{},Alice]) ; // doesn't throw NPE
+    }
+    void n4(Object o) {
+	if (o instanceof  C[new label {},Alice]) ; // doesn't throw NPE
+    }
+    void n5() {
+	new C[{}, Alice](); // doesn't throw NPE
+    }
+    void n6() {
+	new C[new label {}, Alice](); // doesn't throw NPE
+    }
+    void n7() {
+	C[{}, Alice].m(); // doesn't throw NPE
+    }
+    void n8() {
+	C[new label {}, Alice].m(); // doesn't throw NPE
     }
 
 }

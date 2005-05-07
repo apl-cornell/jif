@@ -230,10 +230,17 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	RuntimeParams18.jif (Semantic, "not less restrictive");
 	RuntimeParams19.jif (Semantic, "not less restrictive");
 	RuntimeParams20.jif (Semantic, "not less restrictive");
-	RuntimeParams21.jif (Semantic, "@@@@");
+	RuntimeParams21.jif (Semantic, "not less restrictive");
 	RuntimeParams22.jif (Semantic, "Calling context does not have enough authority");
 	RuntimeParams22a.jif (Semantic, "Calling context does not have enough authority");
-	RuntimeParams23.jif (Semantic, "@@@@");
+	RuntimeParams23.jif (Semantic, "NullPointerException.*must either be caught"),
+                            (Semantic, "NullPointerException.*must either be caught"),
+                            (Semantic, "NullPointerException.*must either be caught"),
+                            (Semantic, "NullPointerException.*must either be caught"),
+                            (Semantic, "NullPointerException.*must either be caught"),
+                            (Semantic, "NullPointerException.*must either be caught"),
+                            (Semantic, "NullPointerException.*must either be caught"),
+                            (Semantic, "NullPointerException.*must either be caught");
 	RuntimeParams24.jif (Semantic, "The type of a dynamic label");
 	RuntimeParams24a.jif (Semantic, "The type of a dynamic principal");
 	RuntimeParams24b.jif (Semantic, "The type of a dynamic label");

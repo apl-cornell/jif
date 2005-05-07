@@ -3,6 +3,9 @@ package jif.extension;
 import java.util.LinkedList;
 import java.util.List;
 
+import jif.types.JifClassType;
+import jif.types.JifTypeSystem;
+
 import polyglot.ast.Call;
 import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.Receiver;
@@ -62,6 +65,15 @@ public class JifCallDel extends JifJL_c
             l.add(ts.NullPointerException());
         }
 
+        // if the method instance is static, and the target type is a 
+        // parameterized class, we may need to evaluate some parameters
+        // at runtime, and need to account for them here.
+        if (mi.flags().isStatic()) {
+            if (mi.container() instanceof JifClassType) {
+                l.addAll(LabelTypeCheckUtil.throwTypes((JifClassType)mi.container(), 
+                                                       (JifTypeSystem)ts));
+            }            
+        }
         return l;
     }
 }

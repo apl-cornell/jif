@@ -1,10 +1,12 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.types.*;
 import polyglot.ast.Instanceof;
 import polyglot.ast.Node;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
+import polyglot.types.*;
 import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>Cast</code> node.
@@ -50,5 +52,14 @@ public class JifInstanceOfDel extends JifJL_c
 
         LabelTypeCheckUtil.typeCheckType(tc, compareType);
         return super.typeCheck(tc);
+    }
+    public List throwTypes(TypeSystem ts) {
+        List ex = new ArrayList(super.throwTypes(ts));
+        Instanceof io = (Instanceof)this.node();
+        if (io.compareType().type() instanceof JifClassType) {
+            ex.addAll(LabelTypeCheckUtil.throwTypes((JifClassType)io.compareType().type(), 
+                                                    (JifTypeSystem)ts));
+        }
+        return ex;
     }
 }

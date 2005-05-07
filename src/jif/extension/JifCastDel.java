@@ -1,12 +1,12 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.types.*;
-import jif.types.JifSubstType;
-import jif.types.JifTypeSystem;
 import polyglot.ast.Cast;
 import polyglot.ast.Node;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
+import polyglot.types.*;
 import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>Cast</code> node.
@@ -53,5 +53,15 @@ public class JifCastDel extends JifJL_c
 
         LabelTypeCheckUtil.typeCheckType(tc, castType);
         return super.typeCheck(tc);
+    }
+    
+    public List throwTypes(TypeSystem ts) {
+        List ex = new ArrayList(super.throwTypes(ts));
+        Cast c = (Cast)this.node();
+        if (c.castType().type() instanceof JifClassType) {
+            ex.addAll(LabelTypeCheckUtil.throwTypes((JifClassType)c.castType().type(), 
+                                                    (JifTypeSystem)ts));
+        }
+        return ex;
     }
 }

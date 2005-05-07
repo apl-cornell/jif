@@ -63,7 +63,6 @@ public class LabelTypeCheckUtil {
                 }
             }        
             else if (l instanceof PolicyLabel) {
-                JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
                 PolicyLabel pl = (PolicyLabel)l;
                 typeCheckPrincipal(tc, pl.owner());
                 for (Iterator i = pl.readers().iterator(); i.hasNext(); ) {
@@ -76,7 +75,6 @@ public class LabelTypeCheckUtil {
     }
     
     public static void typeCheckType(TypeChecker tc, Type t) throws SemanticException {
-        JifContext A = (JifContext)tc.context();
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
 
         t = ts.unlabel(t);
@@ -106,7 +104,7 @@ public class LabelTypeCheckUtil {
 
     public static PathMap labelCheckType(Type t, LabelChecker lc, Position pos) throws SemanticException {
         JifContext A = lc.context();
-        JifTypeSystem ts = (JifTypeSystem)lc.typeSystem();
+        JifTypeSystem ts = lc.typeSystem();
         PathMap X = ts.pathMap().N(A.pc());            
 
         List Xparams = labelCheckTypeParams(t, lc, pos);
@@ -125,7 +123,7 @@ public class LabelTypeCheckUtil {
      * @throws SemanticException
      */
     public static List labelCheckTypeParams(Type t, LabelChecker lc, Position pos) throws SemanticException {
-        JifTypeSystem ts = (JifTypeSystem)lc.typeSystem();
+        JifTypeSystem ts = lc.typeSystem();
         t = ts.unlabel(t);
         List Xparams;
         
@@ -191,5 +189,39 @@ public class LabelTypeCheckUtil {
             Xparams = Collections.EMPTY_LIST;
         }
         return Xparams;
+    }
+
+    /**
+     * Return the types that may be thrown by a runtime evalution
+     * of the type <code>type</code>.
+     * 
+     * @param type
+     * @param ts
+     * @return
+     */
+    public static List throwTypes(JifClassType type, JifTypeSystem ts) {
+        Type t = ts.unlabel(type);
+        if (t instanceof JifSubstType) {            
+            JifSubstType jst = (JifSubstType)t;
+            List exc = new ArrayList();
+            for (Iterator i = jst.entries(); i.hasNext();) {
+                Map.Entry e = (Map.Entry)i.next();
+                Object arg = e.getValue();
+                if (arg instanceof Label) {
+                    exc.addAll(((Label)arg).throwTypes(ts));
+                }
+                else if (arg instanceof Principal) {
+                    exc.addAll(((Principal)arg).throwTypes(ts));
+                }
+                else {
+                    throw new InternalCompilerError("Unexpected type for entry: "
+                                                    + arg.getClass().getName());
+                }
+            }            
+            return exc;
+        }
+        else {
+            return Collections.EMPTY_LIST;
+        }
     }
 }
