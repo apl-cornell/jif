@@ -1,6 +1,6 @@
 // Check npe are regarded as thrown by instanceof, cast, new, and static method call
 class C[label L, principal P] { 
-    static void m();
+    static void m() {}
 }
 
 
@@ -31,7 +31,7 @@ class D {
 	}
     }
     void m3(Object o) {
-	if (i instanceof C[{*this.d.lb},Alice]) ;
+	if (o instanceof C[{*this.d.lb},Alice]) ;
     }
     void m4(Object o) {
 	if (o instanceof  C[new label {},this.d.p]) ;

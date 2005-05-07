@@ -8,7 +8,7 @@ class C[principal P, principal Q] authority (P, Q) {
 
 
 class D {
-    void m() {
-	new C[Alice, Bob]();
+    void n() {
+	C[Alice, Bob].m();
     }
 }
