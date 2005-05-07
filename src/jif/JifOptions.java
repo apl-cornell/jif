@@ -23,7 +23,7 @@ public class JifOptions extends Options {
      /**
       * Provide more detailed explanation of solver error messages?
       */
-     public boolean explainConstraints;
+     public boolean explainErrors;
 
      /**
       * The classpath for the Jif signatures of java.lang objects.
@@ -49,7 +49,7 @@ public class JifOptions extends Options {
     public void setDefaultValues() {
         super.setDefaultValues();
         solveGlobally = false;
-        explainConstraints = false;
+        explainErrors = false;
     }
 
     /**
@@ -72,7 +72,7 @@ public class JifOptions extends Options {
         }
         else if (args[index].equals("-explain") || args[index].equals("-e")) {
             index++;
-            explainConstraints = true;
+            explainErrors = true;
         }
 
         else if (args[index].equals("-sigcp")) {

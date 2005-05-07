@@ -764,7 +764,7 @@ public abstract class Solver
     }
 
     protected boolean errorShowDetailMsg() {
-        return ((JifOptions)Options.global).explainConstraints;
+        return ((JifOptions)Options.global).explainErrors;
     }
 
     protected boolean errorShowDefns() {

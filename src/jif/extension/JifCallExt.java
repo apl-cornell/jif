@@ -30,6 +30,11 @@ public class JifCallExt extends Jif_c
 	JifTypeSystem ts = lc.jifTypeSystem();
 
 	JifMethodInstance mi = (JifMethodInstance)me.methodInstance();
+	
+	if (mi.flags().isStatic()) {
+	    new ConstructorChecker().checkStaticMethodAuthority(mi, A, me.position());
+	}
+    
 	Receiver target = (Receiver) lc.context(A).labelCheck(me.target());
 
 	A = (JifContext) A.pushBlock();

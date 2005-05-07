@@ -41,7 +41,7 @@ public class JifConstructorCallExt extends JifStmtExt_c
 		"Qualified constructor calls are not supported in Jif.");
 	}
 
-	constructorChecker.checkConstructorAuthority(ct, A);
+	constructorChecker.checkConstructorAuthority(ct, A, ccs.position());
 
 	CallHelper helper = new CallHelper(jct.thisLabel(), ct, ci, 
                                            ccs.arguments(), node().position());

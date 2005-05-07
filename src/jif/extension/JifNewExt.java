@@ -32,7 +32,7 @@ public class JifNewExt extends Jif_c
 
 	ClassType ct = (ClassType) ts.unlabel(noe.type());
 
-	constructorChecker.checkConstructorAuthority(ct, A);
+	constructorChecker.checkConstructorAuthority(ct, A, noe.position());
 
 	Label newLabel = ts.freshLabelVariable(noe.position(), "new" + ct.name(),
                             "label of the reference to the newly created " +
