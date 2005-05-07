@@ -1,11 +1,8 @@
 package jif.ast;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
-import jif.types.JifPolyType;
-import jif.types.JifTypeSystem;
+import jif.types.*;
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.Expr_c;
 import polyglot.types.SemanticException;
@@ -130,14 +127,15 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 	    if (pt.params().size() > 1) {
 		//this node shouldn't be ambiguous.
 		throw new SemanticException("Not enough parameters for " +
-		    "parameterized types " + pt + ".");
+		    "parameterized type " + pt + ".");
 	    }
 	    else if (pt.params().size() == 1) {
 		// "name" is a parameter.  Instantiate the base type with the
 		// parameter and use it as the new base type.
                 ParamNode pn;
                 if (expr instanceof Expr) {
-                    pn = nf.AmbParam(position(), (Expr)expr);                    
+                    ParamInstance pi = (ParamInstance)pt.params().get(0);
+                    pn = nf.AmbParam(position(), (Expr)expr, pi);                    
                 }
                 else {
                     pn = nf.AmbParam(position(), (String)expr);                                        
@@ -157,7 +155,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
                     return this;
                 }
 
-            l.add(pn.parameter());
+                l.add(pn.parameter());
 
 		Type base = ts.instantiate(baseType.position(),
                                            pt.instantiatedFrom(), l);

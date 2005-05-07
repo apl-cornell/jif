@@ -253,10 +253,10 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public AmbParam AmbParam(Position pos, Expr expr) {
-        AmbParam n = new AmbExprParam_c(pos, expr);
-        n = (AmbParam)n.ext(jifExtFactory().extAmbParam());
-        n = (AmbParam)n.del(delFactory().delNode());
+    public AmbExprParam AmbParam(Position pos, Expr expr, ParamInstance expectedPI) {
+        AmbExprParam n = new AmbExprParam_c(pos, expr, expectedPI);
+        n = (AmbExprParam)n.ext(jifExtFactory().extAmbParam());
+        n = (AmbExprParam)n.del(delFactory().delNode());
         return n;
     }
 

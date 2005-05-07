@@ -152,7 +152,7 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
             }
             else if (n instanceof Expr) {
                 params.add(nf.AmbParam(((Expr) n).position(),
-                                (Expr) n));
+                                (Expr) n, null));
             }
             else if (n instanceof Node) {
                 die(pos((Node) n));

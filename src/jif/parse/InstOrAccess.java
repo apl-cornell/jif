@@ -41,7 +41,7 @@ public class InstOrAccess extends Amb {
 	    l.add(parser.nf.AmbParam(((Name)param).pos, ((Name)param).toIdentifier()));
 	}
 	else {
-	    l.add(parser.nf.AmbParam(((Expr)param).position(), (Expr)param));	    
+	    l.add(parser.nf.AmbParam(((Expr)param).position(), (Expr)param, null));	    
 	}
 	return parser.nf.InstTypeNode(pos, prefix.toUnlabeledType(), l);
     }

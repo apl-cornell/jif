@@ -3,6 +3,7 @@ package jif.ast;
 import java.util.LinkedList;
 import java.util.List;
 
+import jif.types.*;
 import jif.types.JifPolyType;
 import jif.types.JifTypeSystem;
 import polyglot.ast.*;
@@ -88,10 +89,12 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 	    if (! (tn.type() instanceof JifPolyType)) {
 		throw new SemanticException(tn.type() + " is not a parameterized type.", position());
 	    }
+	    JifPolyType pt = (JifPolyType)tn.type();
 
 	    ParamNode n;
 	    if (expr instanceof Expr) {
-	        n = nf.AmbParam(position(), (Expr)expr);
+                ParamInstance pi = (ParamInstance)pt.params().get(0);
+	        n = nf.AmbParam(position(), (Expr)expr, pi);
 	    }
 	    else {
 	        n = nf.AmbParam(position(), (String)expr);	        
@@ -101,8 +104,7 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 	    List l = new LinkedList();
             l.add(n.parameter());
 
-	    Type t = ts.instantiate(position(),
-                                    ((JifPolyType) tn.type()).instantiatedFrom(), l);
+	    Type t = ts.instantiate(position(), pt.instantiatedFrom(), l);
 
             return nf.CanonicalTypeNode(position(), t);
 	}
