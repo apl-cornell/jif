@@ -1,113 +1,114 @@
 package jif.util;
 
-public class LinkedListSet[label L]
-                        extends AbstractSet[L]
-		        implements Set[L]
+/**
+ * An implementatin of Set, using a linked list to store the
+ * list elements.
+ */
+public class LinkedListSet[label L] extends AbstractSet[L]
 {
     private final LinkedList[L]{this} list;
 
     public LinkedListSet() {
         list = new LinkedList[L]();
-	super();
+        super();
     }
     public int{L} size() {
-	try {
-	    return list.size();
-	}
-	catch (NullPointerException impossible) { return 0;}
+        try {
+            return list.size();
+        }
+        catch (NullPointerException impossible) { return 0;}
     }
 
 
     public boolean{L;o} contains(JifObject[L] o) {
-	try {
-	    return list.contains(o);
-	}
-	catch (NullPointerException impossible) { return false;}
+        try {
+            return list.contains(o);
+        }
+        catch (NullPointerException impossible) { return false;}
     }
 
     public boolean{L} add{L}(JifObject[L]{L} o) {
-	try {
-	    if (!list.contains(o)) {
-		list.add(o);
-		return true;
-	    }
-	    return false;
-	}
-	catch (NullPointerException impossible) { return false;}
+        try {
+            if (!list.contains(o)) {
+                list.add(o);
+                return true;
+            }
+            return false;
+        }
+        catch (NullPointerException impossible) { return false;}
     }
 
     public boolean{L} remove{L}(JifObject[L]{L} o) {
-	try {
-	    return list.remove(o);
-	}
-	catch (NullPointerException impossible) { return false;}
+        try {
+            return list.remove(o);
+        }
+        catch (NullPointerException impossible) { return false;}
     }
     
     public Iterator[L]{this} iterator() {
-	try {
-	    return list.iterator();
-	}
-	catch (NullPointerException impossible) { return null;}	
+        try {
+            return list.iterator();
+        }
+        catch (NullPointerException impossible) { return null;}        
     }
 
     public int{L} hashCode() {
-	try {
-	    return list.hashCode();
-	}
-	catch (NullPointerException impossible) { return 0;}
+        try {
+            return list.hashCode();
+        }
+        catch (NullPointerException impossible) { return 0;}
 
     }
     public boolean{L;o} equals(IDComparable[L] o) {
-	try {
-	    if (o == null) 
-		return false;
-	    
-	    // Ideally we'd want to compare this collection to any set.
-	    // However, the problem is that the equals method is meant to
-	    // be side effect free but the iterators have side effects. There
-	    // is currently no side effect free way of iterating through
-	    // a Set. So we;ll live with it at the moment by insisting that
-	    // they must be the same class...
-	    if (!(o instanceof LinkedListSet[L]))
-		return false;
+        try {
+            if (o == null) 
+                return false;
+            
+            // Ideally we'd want to compare this collection to any set.
+            // However, the problem is that the equals method is meant to
+            // be side effect free but the iterators have side effects. There
+            // is currently no side effect free way of iterating through
+            // a Set. So welll live with it at the moment by insisting that
+            // they must be the same class...
+            if (!(o instanceof LinkedListSet[L]))
+                return false;
 
-	    if (o == this)
-		return true;
+            if (o == this)
+                return true;
 
 
-	    LinkedListSet[L] that = (LinkedListSet[L])o;
+            LinkedListSet[L] that = (LinkedListSet[L])o;
 
-	    int sz = this.size();
-	    if (sz != that.size()) 
-		return false;
+            int sz = this.size();
+            if (sz != that.size()) 
+                return false;
 
-	    int i = 0;
-	    while (i < sz) {
-		try {
-		    JifObject[L] elem = this.list.get(i);
-		    if (!that.contains(elem)) {
-			return false;
-		    }		    
-		}
-		catch (IndexOutOfBoundsException e) { /* cant happen */ }
-		catch (NullPointerException e) { /* cant happen */ }
+            int i = 0;
+            while (i < sz) {
+                try {
+                    JifObject[L] elem = this.list.get(i);
+                    if (!that.contains(elem)) {
+                        return false;
+                    }                    
+                }
+                catch (IndexOutOfBoundsException e) { /* cant happen */ }
+                catch (NullPointerException e) { /* cant happen */ }
 
-		i++;
-	    }
-	    return true;
-	}
-	catch (ClassCastException e) { /* cant happen */ }
+                i++;
+            }
+            return true;
+        }
+        catch (ClassCastException e) { /* cant happen */ }
 
-	return false;
+        return false;
     }
 
     //  String conversion
-
     public String{L} toString() {
-	try {
-	    return list.toString();
-	}
-	catch (NullPointerException impossible) { return "";}
+        try {
+            return list.toString();
+        }
+        catch (NullPointerException impossible) { return "";}
     }
 
 }

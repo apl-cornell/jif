@@ -1,30 +1,30 @@
 package jif.util;
 
-// L is the label of the elements, and also the information by knowing what is contained in this collection.
+/**
+ * A collection of JifObjects.
+ *
+ * The parameter L is the label of the elements, that is,
+ * the collection contains JifObject[L] elements. It is
+ * also the label for the amount of 
+ * information obtained by knowing what objects are 
+ * contained in this collection.
+ */
 public interface Collection[label L] extends JifObject[L] {
     int{L} size();
-
     boolean{L} isEmpty();
-
     boolean{L;o} contains(JifObject[L] o);
-
     Iterator[L]{this} iterator();
 
-//      JifObject[L][] toArray();
+    JifObject[L]{L}[]{L} toArray{L}();
 
-//      JifObject[L][] toArray(JifObject[L] a[]);
-
-    // Modification Operations
-
-    boolean{L} add{L}(JifObject[L]{L} o):{L} throws (ClassCastException{L}, IllegalArgumentException{L});
-
+    boolean{L} add{L}(JifObject[L]{L} o):{L}
+        throws (ClassCastException{L}, IllegalArgumentException{L});
     boolean{L} remove{L}(JifObject[L]{L} o);
 
-
-    // Bulk Operations
-
-//      boolean{L} containsAll(Collection[L] c);
-    boolean{L} addAll{L}(Collection[L]{L} c) throws (ClassCastException{L}, IllegalArgumentException{L});
+    boolean{L;c} containsAll{L}(Collection[L]{L} c)
+        throws (NullPointerException{c});
+    boolean{L} addAll{L}(Collection[L]{L} c)
+        throws (ClassCastException{L}, IllegalArgumentException{L});
     boolean{L} removeAll{L}(Collection[L]{L} c);
     boolean{L} retainAll{L}(Collection[L]{L} c);
     void clear{L}();

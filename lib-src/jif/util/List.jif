@@ -1,31 +1,24 @@
 package jif.util;
 
+/**
+ * A list of JifObjects.
+ *
+ * @see jif.util.Collection
+ */
 public interface List[label L] extends Collection[L] {
-    // Positional Access Operations
-
-    JifObject[L]{L;index} get(int index):{L;index} throws (IndexOutOfBoundsException{L;index});
-
-    JifObject[L]{L} set{L}(int{L} index, JifObject[L]{L} element):{L} throws (IndexOutOfBoundsException{L});
-
-    void add{L}(int{L} index, JifObject[L]{L} element):{L} throws (IndexOutOfBoundsException{L});
-
-    JifObject[L]{L} remove{L}(int{L} index) throws (IndexOutOfBoundsException{L});
-
-
-    // Search Operations
+    JifObject[L]{L;index} get(int index):{L;index}
+	throws (IndexOutOfBoundsException{L;index});
+    JifObject[L]{L} set{L}(int{L} index, JifObject[L]{L} element):{L}
+	throws (IndexOutOfBoundsException{L});
+    void add{L}(int{L} index, JifObject[L]{L} element):{L}
+	throws (IndexOutOfBoundsException{L});
+    JifObject[L]{L} remove{L}(int{L} index)
+	throws (IndexOutOfBoundsException{L});
 
     int{L;o} indexOf(JifObject[L] o);
-
     int{L;o} lastIndexOf(JifObject[L] o);
 
-
-    // List Iterators
-
     ListIterator[L]{this} listIterator();
-    
-    ListIterator[L]{this;L} listIterator(int{L} index) throws (IndexOutOfBoundsException{L});
-
-    // View
-
-    //    List subList(int fromIndex, int toIndex);
+    ListIterator[L]{this;L} listIterator(int{L} index)
+	throws (IndexOutOfBoundsException{L});
 }

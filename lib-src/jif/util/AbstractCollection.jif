@@ -1,5 +1,8 @@
 package jif.util;
 
+/**
+ * Base implementation for Collection.
+ */
 public abstract class AbstractCollection[label L] implements Collection[L] {
     /**
      * Sole constructor.  (For invocation by subclass constructors, typically
@@ -8,105 +11,136 @@ public abstract class AbstractCollection[label L] implements Collection[L] {
     protected AbstractCollection() {
     }
 
-    // Query Operations
-
     public abstract Iterator[L]{this} iterator();
-
     public abstract int{L} size();
 
-    public boolean{L} isEmpty() {
-	return size() == 0;
+    public final boolean{L} isEmpty() {
+        return size() == 0;
     }
-
-    // Modification Operations
 
     public boolean{L} remove{L}(JifObject[L]{L} o) {
-	try {
-	    Iterator[L] e = iterator();
-	    if (e != null) {
-		if (o==null) {
-		    while (e.hasNext()) {
-			if (e.next()==null) {
-			    e.remove();
-			    return true;
-			}
-		    }
-		} else {
-		    while (e.hasNext()) {
-			if (o.equals(e.next())) {
-			    e.remove();
-			    return true;
-			}
-		    }
-		}
-	    }
-	}
-	catch (IllegalStateException e) { /* cant happen */ }
-	catch (NoSuchElementException e) { /* cant happen */ }
-	return false;
+        try {
+            Iterator[L] e = iterator();
+            if (e != null) {
+                if (o == null) {
+                    while (e.hasNext()) {
+                        if (e.next() == null) {
+                            e.remove();
+                            return true;
+                        }
+                    }
+                }
+                else {
+                    while (e.hasNext()) {
+                        if (o.equals(e.next())) {
+                            e.remove();
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        catch (IllegalStateException e) { /* cant happen */ }
+        catch (NoSuchElementException e) { /* cant happen */ }
+        return false;
     }
-
-    // Bulk Operations 
-    public boolean{L} addAll{L}(Collection[L]{L} c) throws (ClassCastException{L}, IllegalArgumentException{L}) {
-	boolean{this;L} modified = false;
-	if (c != null) {
-	    Iterator[L]{this;L} e = c.iterator();
+    
+    public boolean{L;c} containsAll{L}(Collection[L]{L} c):{c} 
+        throws (NullPointerException{c}) {
+	    if (c == null) throw new NullPointerException();
+	    Iterator[L] e = c.iterator();
+	    boolean containsAll = true;
 	    while (e != null && e.hasNext()) {
 		try {
-		    if(add(e.next()))
-			modified = true;
+		    if(!contains(e.next())) {
+			containsAll = false;
+			break;
+		    }
 		}
 		catch (NoSuchElementException impossible) { }
 	    }
+	    return containsAll;
 	}
-	return modified;
+
+    public boolean{L} addAll{L}(Collection[L]{L} c) 
+        throws (ClassCastException{L}, IllegalArgumentException{L}) {
+        boolean{this;L} modified = false;
+        if (c != null) {
+            Iterator[L]{this;L} e = c.iterator();
+            while (e != null && e.hasNext()) {
+                try {
+                    if(add(e.next())) {
+                        modified = true;
+                    }
+                }
+                catch (NoSuchElementException impossible) { }
+            }
+        }
+        return modified;
     }
 
     public boolean{L} removeAll{L}(Collection[L]{L} c) {
-	boolean modified = false;
-	if (c != null) {
-	    Iterator[L] e = iterator();
-	    while (e != null && e.hasNext()) {
-		try {
-		    if(c.contains(e.next())) {
-			e.remove();
-			modified = true;
-		    }
-		}
-		catch (IllegalStateException impossible) { }
-		catch (NoSuchElementException impossible) { }
-	    }
-	}
-	return modified;
+        boolean modified = false;
+        if (c != null) {
+            Iterator[L] e = iterator();
+            while (e != null && e.hasNext()) {
+                try {
+                    if(c.contains(e.next())) {
+                        e.remove();
+                        modified = true;
+                    }
+                }
+                catch (IllegalStateException impossible) { }
+                catch (NoSuchElementException impossible) { }
+            }
+        }
+        return modified;
     }
 
     public boolean{L} retainAll{L}(Collection[L]{L} c) {
-	boolean modified = false;
-	Iterator[L] e = iterator();
-	while (e != null && e.hasNext()) {
-	    try {
-		JifObject[L] o = e.next();
-		if(c == null || !c.contains(o)) {
-		    e.remove();
-		    modified = true;
-		}
-	    }
-	    catch (IllegalStateException impossible) { }
-	    catch (NoSuchElementException impossible) { }
-	}
-	return modified;
+        boolean modified = false;
+        Iterator[L] e = iterator();
+        while (e != null && e.hasNext()) {
+            try {
+                JifObject[L] o = e.next();
+                if(c == null || !c.contains(o)) {
+                    e.remove();
+                    modified = true;
+                }
+            }
+            catch (IllegalStateException impossible) { }
+            catch (NoSuchElementException impossible) { }
+        }
+        return modified;
     }
 
     public void clear{L}() {
-	Iterator[L] e = iterator();
-	while (e != null && e.hasNext()) {
-	    try {
-		e.next();
-		e.remove();
-	    }
-	    catch (IllegalStateException impossible) { }
-	    catch (NoSuchElementException impossible) { }
+        Iterator[L] e = iterator();
+        while (e != null && e.hasNext()) {
+            try {
+                e.next();
+                e.remove();
+            }
+            catch (IllegalStateException impossible) { }
+            catch (NoSuchElementException impossible) { }
 
-	}
+        }
+    }
+
+    public JifObject[L]{L}[]{L} toArray{L}() {
+        JifObject[L]{L}[] newArray = new JifObject[L][this.size()]; 
+        Iterator[L] e = iterator();
+        int index = 0;
+        while (e != null && e.hasNext()) {
+            try {
+                JifObject[L] o = e.next();
+                newArray[index] = o;
+            }
+            catch (ArrayStoreException impossible) { }
+            catch (NoSuchElementException impossible) { }
+            catch (ArrayIndexOutOfBoundsException impossible) { }
+            index++;
+        }
+        return newArray;
     }
 }
