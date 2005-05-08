@@ -1,7 +1,6 @@
 package jif.ast;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import jif.types.*;
 import jif.types.label.*;
@@ -194,7 +193,6 @@ public class JifInstantiator
      */
     public static Label instantiate(Label L, JifContext A, AccessPath receiverPath, ReferenceType receiverType, Label receiverLbl) {
         if (L == null) return L;
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
 
         ThisLabelAndParamInstantiator labelInstantiator = new ThisLabelAndParamInstantiator(receiverLbl, receiverType);
         try {
@@ -284,9 +282,9 @@ public class JifInstantiator
             Type newT = instantiate(ts.unlabel(t), A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels);
             t = ts.labeledType(t.position(), newT, newL);
         }
-
-        if (t instanceof JifSubstType) {
-            JifSubstType jit = (JifSubstType)t;
+        Type ut = ts.unlabel(t);
+        if (ut instanceof JifSubstType) {
+            JifSubstType jit = (JifSubstType)ut;
             Map newMap = new HashMap();
             boolean diff = false;
             for (Iterator i = jit.entries(); i.hasNext();) {
@@ -310,7 +308,15 @@ public class JifInstantiator
                     diff = true;
             }
             if (diff) {
-                t = ts.subst(jit.base(), newMap);
+                ut = ts.subst(jit.base(), newMap);
+            }
+        }
+        if (ut != ts.unlabel(t)) {
+            if (ts.isLabeled(t)) {
+                t = ts.labeledType(t.position(), ut, ts.labelOfType(t));
+            }
+            else {
+                t = ut;
             }
         }
 

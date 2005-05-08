@@ -1,9 +1,6 @@
 package jif.ast;
 
 import jif.types.*;
-import jif.types.JifTypeSystem;
-import jif.types.JifVarInstance;
-import jif.types.PathMap;
 import jif.types.label.*;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
@@ -59,10 +56,10 @@ public class JifUtil
             Field f = (Field)e;
             Receiver target = f.target();
             if (target instanceof Expr) {
-                ReferenceType container = null;
-                if (f.isTypeChecked()) {
-                    container = f.fieldInstance().container();
-                }
+  //              ReferenceType container = null;
+//                if (f.isTypeChecked()) {
+//                    container = f.fieldInstance().container();
+                //}
                 AccessPath prefix = exprToAccessPath((Expr)f.target(), context);
                 return new AccessPathField(prefix, f.fieldInstance(), f.name(), f.position());
             }
@@ -80,15 +77,15 @@ public class JifUtil
                 if (context.currentClass() == null || context.inStaticContext()) {
                     throw new SemanticException("Cannot use \"this\" in this scope.", e.position());
                 }
-                return new AccessPathThis((ClassType)context.currentClass(), s.position());
+                return new AccessPathThis(context.currentClass(), s.position());
             }
             else {
                 throw new InternalCompilerError("Not currently supporting access paths for special of kind " + s.kind());
             }            
         }
-        else if (e instanceof NewLabel) {
-            NewLabel nl = (NewLabel)e;
-            return new AccessPathConstant(nl.label().label(), nl.position());
+        else if (e instanceof LabelExpr) {
+            LabelExpr le = (LabelExpr)e;
+            return new AccessPathConstant(le.label().label(), le.position());
         }
         else if (e instanceof PrincipalNode) {
             PrincipalNode pn = (PrincipalNode)e;
@@ -126,7 +123,7 @@ public class JifUtil
         return false;
     }
     public static boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e) {
-        return isFinalAccessExpr(ts, e) || e instanceof NewLabel || e instanceof PrincipalNode;
+        return isFinalAccessExpr(ts, e) || e instanceof LabelExpr || e instanceof PrincipalNode;
     }
     public static Label exprToLabel(JifTypeSystem ts, Expr e, JifContext context) throws SemanticException {
         if (e instanceof LabelExpr) {

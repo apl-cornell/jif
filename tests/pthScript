@@ -64,6 +64,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	BadNullExcept7.jif (Semantic, "NullPointerException.*must .* be caught") ;
 	Binary.jif ;
 	Call1.jif ;
+	Call2.jif ;
 	cat.jif ;
 	clientEmptyList.jif ;
 	clientList.jif ;
