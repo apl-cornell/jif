@@ -82,7 +82,8 @@ public class AmbParam_c extends Node_c implements AmbParam
 
 	if (vi.flags().isFinal()) {
 	    if (ts.isLabel(vi.type())) {
-		return nf.CanonicalLabelNode(position(), vi.label());
+	        Label l = ts.dynamicLabel(position(), JifUtil.varInstanceToAccessPath(vi, this.position()));
+	        return nf.CanonicalLabelNode(position(), l);
 	    }
 
 	    if (ts.isPrincipal(vi.type())) {
