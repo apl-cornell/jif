@@ -99,7 +99,7 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
 
       polyglot.lex.Lexer lexer =
-          new jif.parse.Lexer_c(reader, source.name(), eq);
+          new jif.parse.Lexer_c(reader, source, eq);
       polyglot.parse.BaseParser grm =
           new jif.parse.Grm(lexer, (JifTypeSystem)ts,
 					 (JifNodeFactory)nf, eq);

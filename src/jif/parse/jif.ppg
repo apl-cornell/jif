@@ -216,7 +216,7 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
     }
 
     public Position pos() {
-        return new Position(lexer.file());
+        return new Position(lexer.path(), lexer.file());
     }
 
     public Amb makeAccessOrInst(Amb a, List b) throws Exception {
