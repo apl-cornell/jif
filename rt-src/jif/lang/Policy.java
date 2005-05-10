@@ -1,6 +1,5 @@
 package jif.lang;
 
-import java.util.*;
 
 public interface Policy
 {    

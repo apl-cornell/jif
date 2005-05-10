@@ -4,12 +4,12 @@ import java.util.*;
 
 public class PrivacyPolicy implements Policy
 {
-    Principal owner;
-    Set readers;
+    private final Principal owner;
+    private final Set readers;
 
     public PrivacyPolicy(Principal owner, Collection readers) {
 	this.owner = owner;
-	this.readers = new HashSet(readers);
+	this.readers = Collections.unmodifiableSet(new HashSet(readers));
     }
 
     public PrivacyPolicy(Principal owner, PrincipalSet readers) {
@@ -35,7 +35,7 @@ public class PrivacyPolicy implements Policy
 
 	// o' >= o?
 	
-	if (! pp.owner.actsFor(owner)) {
+	if (! PrincipalUtil.actsFor(pp.owner, owner)) {
 	    return false;
 	}
 
@@ -45,14 +45,14 @@ public class PrivacyPolicy implements Policy
 
 	    boolean sat = false;
 
-	    if (rj.actsFor(owner)) {
+	    if (PrincipalUtil.actsFor(rj, owner)) {
 		sat = true;
 	    }
 	    else {
 		for (Iterator i = readers.iterator(); i.hasNext(); ) {
 		    Principal ri = (Principal) i.next();
 
-		    if (rj.actsFor(ri)) {
+		    if (PrincipalUtil.actsFor(rj, ri)) {
 			sat = true;
 			break;
 		    }

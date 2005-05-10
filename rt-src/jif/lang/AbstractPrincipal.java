@@ -1,49 +1,47 @@
 package jif.lang;
 
-import java.util.*;
-import java.lang.reflect.*;
+import java.util.HashSet;
+import java.util.Set;
 
-public abstract class AbstractPrincipal implements Principal
-{
-    protected Set superiors;
-    protected Map cache;
-
-    protected AbstractPrincipal() {
-	this.superiors = new HashSet();
-	this.cache = new HashMap();
+/**
+ * TODO Documentation 
+ */
+public abstract class AbstractPrincipal implements Principal {
+    private final String name;
+    protected final Set superiors = new HashSet();
+    
+    protected AbstractPrincipal(String name) {
+        this.name = name;
     }
 
-    protected AbstractPrincipal(Set superiors) {
-	this.superiors = new HashSet(superiors);
-	this.cache = new HashMap();
+    public String name() {
+        return name;
     }
 
-    protected abstract boolean actsForImpl(Principal principal);
-    public final boolean actsFor(Principal principal)  {
-        Boolean b = (Boolean)cache.get(principal);
-        if (b == null) {
-            b = Boolean.valueOf(actsForImpl(principal));
-            cache.put(principal, b);
+    public boolean delegatesTo(Principal p) {
+        return superiors.contains(p);
+    }
+
+    /**
+     * The default is that no closures are authorized.
+     */
+    public boolean isAuthorized(Object authorizationProof, Closure closure) {
+        return false;
+    }
+    
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o instanceof Principal) {
+            Principal p = (Principal)o;
+            return (this.name == p.name() || (this.name !=null && 
+                                                this.name.equals(p.name()))) &&
+                    this.getClass() == p.getClass();
         }
-        return b.booleanValue();
+        return false;
+    }
+    
+    public int hashCode() {
+        return name.hashCode();
     }
 
-    public final boolean equivalentTo(Principal principal)  {
-        return this.actsFor(principal) && principal.actsFor(this);
-    }
-
-    protected Set superiorsInternal() {
-        return superiors;
-    }
-    public final Set superiors() {
-	return Collections.unmodifiableSet(superiorsInternal());
-    }
-
-    public String fullName() {
-	return name();
-    }
-
-    public String toString() {
-	return name();
-    }
 }

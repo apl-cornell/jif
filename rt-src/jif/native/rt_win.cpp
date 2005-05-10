@@ -11,7 +11,6 @@
 #include <jni.h>
 #include "jif_runtime_FileSystem.h"
 #include "jif_runtime_Runtime.h"
-//#include "jif_lang_NativePM.h"
 
 #include "winac.h"
 
@@ -225,16 +224,5 @@ JNIEXPORT jobjectArray JNICALL Java_jif_policy_Passwd_groups
     }
 
     return grpArray;
-}
-
-/*
- * Class:     jif_lang_NativePM
- * Method:    actsFor
- * Signature: (Ljif/lang/NativePrincipal;Ljif/lang/NativePrincipal;)Z
- */
-JNIEXPORT jboolean JNICALL Java_jif_lang_NativePM_actsFor
-  (JNIEnv *env, jclass clazz, jobject p1, jobject p2) 
-{
-    return 0;
 }
 

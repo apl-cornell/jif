@@ -1,19 +1,14 @@
 package jif.lang;
 
-import java.util.Set;
 
 /**
  * A Principal is a runtime representation of a principal.
+ * See sig-src/jif/lang/Principal.jif.
  */
 public interface Principal {
-    boolean actsFor(Principal principal);
-    boolean equivalentTo(Principal principal);
     String name();
-    String fullName();
-
-    /**
-     * Set of the Principals that are the immediate superiors of this
-     * principal, that is, any member of this set may act for this principal.
-     */
-    Set superiors();
+    
+    boolean delegatesTo(Principal p);
+    
+    boolean isAuthorized(Object authorizationProof, Closure closure);
 }

@@ -150,15 +150,21 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 comparison = "relabelsTo";
             }
 
-            sb.append(moreThanOneParam?"ok = ok && c.":"return c.");
+            sb.append(moreThanOneParam?"ok = ok && ":"return ");
+
+            String paramExpr = paramFieldName;
             if (useGetters) {
-                sb.append(ParamToJavaExpr_c.paramFieldNameGetter(pi));
-                sb.append("()");
+                paramExpr = ParamToJavaExpr_c.paramFieldNameGetter(pi) + "()";
+            }
+            if (pi.isPrincipal()) {  
+                // e.g., PrincipalUtil.equivTo(c.expr, paramArgName)
+                sb.append("jif.lang.PrincipalUtil."+comparison+
+                                     "(c."+paramExpr+","+paramArgName+");");
             }
             else {
-                sb.append(paramFieldName);
+                // e.g., c.equivTo(paramArgName)
+                sb.append("c."+paramExpr+"."+comparison+"("+paramArgName+");");
             }
-            sb.append("." + comparison + "(" + paramArgName + ");");
         }
 
         sb.append(moreThanOneParam?"return ok; }":"}");

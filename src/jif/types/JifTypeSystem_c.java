@@ -69,7 +69,6 @@ public class JifTypeSystem_c
 
         PRINCIPAL_ = new PrimitiveType_c(this, PRINCIPAL_KIND);
         LABEL_ = new PrimitiveType_c(this, LABEL_KIND);
-
     }
 
     public UnknownType unknownType(Position pos) {
@@ -93,9 +92,22 @@ public class JifTypeSystem_c
     private static final PrimitiveType.Kind LABEL_KIND = new PrimitiveType.Kind("label");
     protected PrimitiveType PRINCIPAL_;
     protected PrimitiveType LABEL_;
+    protected Type PRINCIPAL_CLASS_ = null;
 
     public PrimitiveType Principal() {
         return PRINCIPAL_;
+    }
+
+    public Type PrincipalClass() {
+        if (PRINCIPAL_CLASS_ == null) {
+            try {
+                PRINCIPAL_CLASS_ = typeForName("jif.lang.Principal");
+            }
+            catch (SemanticException e) {
+                throw new InternalCompilerError("Cannot find Jif class jif.lang.Principal");
+            } 
+        }
+        return PRINCIPAL_CLASS_;
     }
 
     public PrimitiveType Label() {
@@ -245,7 +257,14 @@ public class JifTypeSystem_c
     }
 
     public boolean isImplicitCastValid(Type fromType, Type toType) {
-        return super.isImplicitCastValid(strip(fromType), strip(toType));
+        Type strpFromType = strip(fromType);
+        Type strpToType = strip(toType);
+        
+        if (Principal().equals(toType) && isSubtype(fromType, PrincipalClass())) {
+            return true;
+        }
+        
+        return super.isImplicitCastValid(strpFromType, strpToType);
     }
 
     public Type staticTarget(Type t) {
@@ -291,17 +310,12 @@ public class JifTypeSystem_c
         // parameters. Now check their parameters.
         Iterator iter1 = ((JifClassType)subtype).actuals().iterator();
         Iterator iter2 = ((JifClassType)supertype).actuals().iterator();
-        if (subtype instanceof JifSubstType) {
-            Type base = ((JifSubstType)subtype).base();
-        }
 
-        Iterator iter3 = ((JifClassType)supertype).actuals().iterator();
         while (iter1.hasNext() && iter2.hasNext()) {
             Param p1 = (Param)iter1.next();
             Param p2 = (Param)iter2.next();
             if (p1 instanceof Principal && p2 instanceof Principal) {
                 if (!((Principal)p1).equals(p2)) {
-                    // different UIDs...
                     return null;
                 }
 

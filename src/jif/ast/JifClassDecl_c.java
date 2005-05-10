@@ -3,6 +3,7 @@ package jif.ast;
 import java.util.*;
 
 import jif.types.*;
+import jif.types.label.AccessPathThis;
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.ClassDecl_c;
 import polyglot.ext.param.types.MuPClass;
@@ -91,8 +92,17 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
     }
 
     public JifContext addAuthorityToContext(JifContext A) {
+        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         JifParsedPolyType ct = (JifParsedPolyType) this.type;
-        A.setAuthority(new HashSet(ct.authority()));
+        Set s = new HashSet(ct.authority());
+        if (ts.isSubtype(ct, ts.PrincipalClass())) {
+            // This class implements jif.lang.Princpal, and as such
+            // implcitly has the authority of the principal represented by
+            // "this"
+            s.add(ts.dynamicPrincipal(ct.position(), 
+                                      new AccessPathThis(ct, ct.position())));
+        }
+        A.setAuthority(s);
         return A;
     }
 

@@ -34,7 +34,7 @@ public class LabelTypeCheckUtil {
                 throw new SemanticException(e.getMessage(), principal.position());
             }
             
-            if (!ts.isPrincipal(dp.path().type())) {
+            if (!ts.isImplicitCastValid(dp.path().type(), ts.Principal())) {
                 throw new SemanticException("The type of a dynamic principal must be \"principal\"", principal.position());
             }
         }        

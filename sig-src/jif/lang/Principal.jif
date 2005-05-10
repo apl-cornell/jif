@@ -1,0 +1,50 @@
+package jif.lang;
+
+/**
+ * The Jif signature for the class Principal, which is the runtime representation
+ * of principals of the decentralized label model.
+ *
+ * Objects that implement this interface can be coerced to values 
+ * of the primitive type <code>principal</code>. For example,
+ * <pre>
+   jif.lang.Principal o = ...;
+   principal p = o;
+ * </pre>
+ * <p>If the object <code>o</code> is <code>null</code>, then
+ * the principal value is the special <code>NullPrincipal</code>
+ * value, a principal for whom any other principal may act.
+ *
+ * <p>Any class that implements the <code>Principal</code> interface
+ * implicitly has the authority of the principal "this", that is,
+ * the principal represented by an object of the class.
+ */
+public interface Principal {
+    /**
+     * The name of this principal. Names should be unique within an 
+     * implementation class, that is, given two Principal objects, o and p,
+     * o and p are considered to represent the same principal if
+     * <code>o.getClass() == p.getClass()</code> and 
+     * <code>o.name().equals(p.name())</code>.
+     */
+    String{} name();
+
+    /**
+     * Does this principal delegate its authority to the 
+     * principal p?
+     */
+	boolean{p} delegatesTo(principal p);
+
+	/**
+	 * Does the <code>authPrf<code> provide
+	 * sufficient proof of this principal's authority to
+	 * execute the closure <code>closure</code>?
+	 * For example, <code>authPrf<code> may be
+	 * a password (or a password digest, or a certificate, etc.), 
+	 * and this method will return true if that password matches
+	 * the principal's password, and the closure is one that the
+	 * principal expects to be asked to authorize.
+	 */
+	boolean{authPrf; closure; lb; this} isAuthorized(Object authPrf, 
+                                                     Closure[this, lb] closure,
+                                                     label lb) where authority (this);
+}

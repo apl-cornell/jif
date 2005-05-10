@@ -2,6 +2,10 @@ package jif.lang;
 
 import java.util.*;
 
+/**
+ * 
+ * TODO Documentation
+ */
 public class Label
 {
     private static final Label BOTTOM = new Label();

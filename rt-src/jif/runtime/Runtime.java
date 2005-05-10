@@ -9,9 +9,10 @@ import jif.lang.*;
  * The runtime interface between Jif programs and the underlying system.
  */
 public class Runtime {
+    /**
+     * The principal under whose authority the JVM is running.
+     */
     private Principal dynp;
-
-    static PrincipalManager pm;
 
     private Runtime(Principal p) {
         this.dynp = p;
@@ -24,7 +25,7 @@ public class Runtime {
     public static Runtime getRuntime(Principal p) throws SecurityException {
         //check if the current user can act for p
         Principal user = user(p);
-        if (!pm.actsFor(user, p)) {
+        if (!PrincipalUtil.actsFor(user, p)) {
             throw new SecurityException("The current user does not act for "
                     + p.name() + ".");
         }
@@ -51,7 +52,7 @@ public class Runtime {
      * @param name     the file name
      * @param append   if true, then bytes will be written to the end of the file
      *                 rather than the beginning
-     * @param l        the label parameter of the resulting <code>FileOutputStream</code>
+     * @param L        the label parameter of the resulting <code>FileOutputStream</code>
      *
      * @exception  FileNotFoundException
      *      if the file exists but is a directory rather than a regular file,
@@ -88,7 +89,7 @@ public class Runtime {
      *  <code>name</code>.
      *
      *  @param name     the file name
-     *  @param l        the the label parameter of the resulting <code>FileInputStream</code>
+     *  @param L        the the label parameter of the resulting <code>FileInputStream</code>
      *
      *  @exception  SecurityException
      *      if <code>l</code> is less restrictive than the Jif label derived from
@@ -163,14 +164,11 @@ public class Runtime {
 
     public static native String currentUser();
 
-    public static boolean acts_for(Principal p1, Principal p2)
-            throws SecurityException {
-        return pm.actsFor(p1, p2);
+    public static boolean acts_for(Principal p1, Principal p2) {
+        return PrincipalUtil.actsFor(p1, p2);
+    }
+    public static boolean acts_for(Principal param, Principal p1, Principal p2) {
+        return PrincipalUtil.actsFor(p1, p2);
     }
 
-    static {
-        System.loadLibrary("jifrt");
-        String pmAlg = System.getProperty("PrincipalManager");
-        pm = PMFactory.create(pmAlg); //FIXME
-    }
 }

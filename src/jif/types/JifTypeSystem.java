@@ -24,6 +24,9 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     /** Returns the "principal" type. */
     PrimitiveType Principal();
+    
+    /** Returns the class jif.lang.Principal. */
+    Type PrincipalClass();
 
     /** Returns a labeled type, type{label}. */
     LabeledType labeledType(Position pos, Type type, Label label);

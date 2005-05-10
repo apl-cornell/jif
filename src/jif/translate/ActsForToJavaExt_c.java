@@ -1,16 +1,9 @@
 package jif.translate;
 
+import jif.ast.ActsFor;
 import polyglot.ast.*;
-import polyglot.ext.jl.ast.*;
-import jif.ast.*;
-import polyglot.types.*;
-import polyglot.ext.jl.types.*;
-import jif.types.*;
-import polyglot.visit.*;
-
-import polyglot.util.InternalCompilerError;
-
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.visit.NodeVisitor;
 
 public class ActsForToJavaExt_c extends ToJavaExt_c {
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
@@ -19,9 +12,6 @@ public class ActsForToJavaExt_c extends ToJavaExt_c {
     }
 
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
-        TypeSystem ts = rw.java_ts();
-        NodeFactory nf = rw.java_nf();
-
         ActsFor n = (ActsFor) node();
 
         // Now visit the principals.
