@@ -2,18 +2,11 @@ package jif.visit;
 
 import java.util.*;
 
-import jif.extension.JifArrayAccessDel;
-import jif.extension.JifCallDel;
-import jif.extension.JifFieldDel;
-import jif.extension.JifThrowDel;
+import jif.extension.*;
 import polyglot.ast.*;
 import polyglot.frontend.Job;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
-import polyglot.types.VarInstance;
-import polyglot.visit.DataFlow;
-import polyglot.visit.FlowGraph;
-import polyglot.visit.NodeVisitor;
+import polyglot.types.*;
+import polyglot.visit.*;
 
 /**
  * Visitor which determines at which program points local variables cannot be
@@ -96,17 +89,25 @@ public class NotNullChecker extends DataFlow
         return new DataFlowItem();
     }
 
+    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, Term n, Set edgeKeys) {
+        return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, edgeKeys);
+    }
+
     /**
      * If a local variable is initialized with a non-null expression, then
      * the variable is not null. If a local variable is assigned non-null
      * expression then the variable is not null; if a local variable is assigned
      * a possibly null expression, then the local variable is possibly null.
      */
-    public Map flow(Item in, FlowGraph graph, Term n, Set succEdgeKeys) {
-        DataFlowItem dfIn = (DataFlowItem)in;
+    public Map flow(Item trueItem, Item falseItem, Item otherItem, FlowGraph graph, Term n, Set succEdgeKeys) {
+        DataFlowItem dfIn = (DataFlowItem)safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, 
+                                     falseItem, FlowGraph.EDGE_KEY_FALSE,
+                                     otherItem, FlowGraph.EDGE_KEY_OTHER,
+                                     n, graph);
+
         if (n instanceof LocalDecl) {
             LocalDecl x = (LocalDecl)n;
-            if (((DataFlowItem)in).exprIsNotNull(x.init())) {                
+            if (dfIn.exprIsNotNull(x.init())) {                
                 Set s = new HashSet(dfIn.notNullVars);
                 s.add(x.localInstance());
                 DataFlowItem newItem = new DataFlowItem(s);
@@ -116,7 +117,7 @@ public class NotNullChecker extends DataFlow
         else if (n instanceof Assign) {
             Assign x = (Assign)n; 
             if (x.left() instanceof Local) {
-                if (((DataFlowItem)in).exprIsNotNull(x.right())) {
+                if (dfIn.exprIsNotNull(x.right())) {
                     Set s = new HashSet(dfIn.notNullVars);
                     s.add(((Local)x.left()).localInstance());
                     DataFlowItem newItem = new DataFlowItem(s);
@@ -130,17 +131,32 @@ public class NotNullChecker extends DataFlow
                 }
             }
         }
-        else if (n instanceof Expr && super.hasTrueFalseBranches(succEdgeKeys)) {
-            // we have a condition, i.e. a branch on an expression.
-            Expr e = (Expr)n;
-            if (e.type().isBoolean()) {
-                return checkNPE(constructItemsFromCondition(e, 
-                                     in, 
-                                     succEdgeKeys, 
-                                     navigator), 
-                                n);
-            }            
+        if (n instanceof Binary && 
+                (Binary.EQ.equals(((Binary)n).operator()) || 
+                    Binary.NE.equals(((Binary)n).operator()))) {
+            Binary b = (Binary)n;
+            // b is an == or != expression
+            if (b.left() instanceof NullLit || b.right() instanceof NullLit) {                
+                // b is a comparison to null                
+                // e is the expression being compared with null.
+                Expr e = (b.left() instanceof NullLit) ? b.right() : b.left();
+                
+                Map m = comparisonToNull(e, Binary.EQ.equals(b.operator()), dfIn, succEdgeKeys);
+                return checkNPE(m, n);
+            }                        
         }
+        else if (n instanceof Expr && ((Expr)n).type().isBoolean() && 
+                (n instanceof Binary || n instanceof Unary)) {
+            if (trueItem == null) trueItem = dfIn;
+            if (falseItem == null) falseItem = dfIn;
+            
+            Map ret = flowBooleanConditions(trueItem, falseItem, dfIn, graph, (Expr)n, succEdgeKeys);
+            if (ret == null) {
+                ret = itemToMap(dfIn, succEdgeKeys);
+            }
+            return checkNPE(ret, n); 
+        } 
+
         return checkNPE(itemToMap(dfIn, succEdgeKeys), n);
     }
     
@@ -168,6 +184,7 @@ public class NotNullChecker extends DataFlow
      *          out of the node.
      */
     private Map checkNPE(Map m, Term node) {
+        if (m==null) {Thread.dumpStack();}
         if (node instanceof Field || node instanceof Call) {
             Receiver r;
             if (node instanceof Field) {
@@ -210,53 +227,11 @@ public class NotNullChecker extends DataFlow
     
     
     /**
-     * This object is a subclass of ConditionNavigator that implements the
-     * combine and handleExpression methods for the Not Null analysis. 
-     * In particular, combining DataFlowItems consists of unioning their 
-     * notNullVars sets; handling expressions consists of treating comparisons
-     * to null appropriately.
-     */
-    private static final ConditionNavigator navigator = 
-        new ConditionNavigator() {
-            public Item combine(Item item1, Item item2) {
-                Set s = new HashSet(((DataFlowItem)item1).notNullVars);
-                s.addAll(((DataFlowItem)item2).notNullVars);
-                return new DataFlowItem(s);
-            }
-
-            public BoolItem handleExpression(Expr expr, Item startingItem) {
-                if (expr instanceof Binary) {
-                    Binary b = (Binary)expr;
-                    if (Binary.EQ.equals(b.operator()) || 
-                        Binary.NE.equals(b.operator())) {
-                        
-                        // b is an == or != expression
-                        if (b.left() instanceof NullLit ||
-                            b.right() instanceof NullLit) {
-                            
-                            // b is a comparison to null
-                            
-                            // e is the expression being 
-                            // compared with null.
-                            Expr e = (b.left() instanceof NullLit) ? b.right() : b.left();
-
-                            return comparisonToNull(e, 
-                                                    Binary.EQ.equals(b.operator()),
-                                                    (DataFlowItem)startingItem);
-                            
-                        }                        
-                    }
-                }
-                return new BoolItem(startingItem, startingItem);
-            }            
-    };
-
-    /**
-     * Utility method used by the ConditionNavigator to produce appropriate
+     * Utility method used to produce appropriate
      * DataFlowItems when expressions that compare local variables to null
      * are evaluated to true and false.
      */
-    private static BoolItem comparisonToNull(Expr expr, boolean equalsEquals, DataFlowItem in) {
+    private static Map comparisonToNull(Expr expr, boolean equalsEquals, DataFlowItem in, Set edgeKeys) {
         if (expr instanceof Local) {                        
             Set sEq = new HashSet(in.notNullVars);
             Set sNeq = new HashSet(in.notNullVars);
@@ -265,15 +240,13 @@ public class NotNullChecker extends DataFlow
             sNeq.add(((Local)expr).localInstance());
 
             if (equalsEquals) {
-                return new BoolItem(new DataFlowItem(sEq), 
-                                    new DataFlowItem(sNeq));
+                return itemsToMap(new DataFlowItem(sEq), new DataFlowItem(sNeq), in, edgeKeys);
             }
             else {
-                return new BoolItem(new DataFlowItem(sNeq), 
-                                    new DataFlowItem(sEq));
+                return itemsToMap(new DataFlowItem(sNeq), new DataFlowItem(sEq), in, edgeKeys);
             }                
         }
-        return new BoolItem(in, in);
+        return itemToMap(in, edgeKeys);
     }        
     
     /**
@@ -397,7 +370,7 @@ public class NotNullChecker extends DataFlow
         }
     }
     private void checkArrayAccess(ArrayAccess a, DataFlowItem inItem) {
-        if (((DataFlowItem)inItem).exprIsNotNull(a.array())) {
+        if (inItem.exprIsNotNull(a.array())) {
             // The array accessed by this array access statement can never be
             // null, e.g. it is a new expression, or it is a variable
             // that is never null.
