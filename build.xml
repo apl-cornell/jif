@@ -101,6 +101,10 @@
       </fileset>
       <fileset dir="${lib}">
         <include name="*jifrt.*"/>
+        <include name="jif.jar"/>
+        <include name="jifrt.jar"/>
+        <include name="jifsig.jar"/>
+        <!-- leave jiflib.jar, since it is needed for bootstrapping the compiler --> 
       </fileset>
       <fileset dir="${basedir}/tests">
         <include name="**/*.class"/>
@@ -348,6 +352,7 @@ ext="-extclass split.ExtensionInfo"
       <fileset dir="${lib-src}" includes="**/*.jif"/>
       <mapper type="glob" from="*.jif" to="*.class"/>
     </apply>
+    <antcall target="jiflib-jar"/>
   </target>
 
 
@@ -359,6 +364,7 @@ ext="-extclass split.ExtensionInfo"
         <classpath>
          <pathelement location="${sig-classes}"/>
          <pathelement location="${lib-classes}"/>
+         <pathelement location="${lib}/jiflib.jar"/>
          <path refid="standard.classpath"/>
         </classpath>
     </javac>
@@ -603,16 +609,20 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
        Javadoc and distribution targets
        ****************************************  -->
 
-  <target name="jar" depends="jif">
-    <jar jarfile="${lib}/jif.jar" basedir="${classes}"
-      includes="jif/**"/>
-    <jar jarfile="${lib}/jifrt.jar" basedir="${rt-classes}"
-      includes="jif/**"/>
-    <jar jarfile="${lib}/jifsig.jar" basedir="${sig-classes}"
-      includes="jif/**, java/**"/>
-    <jar jarfile="${lib}/jiflib.jar" basedir="${lib-classes}"
-      includes="jif/**"/>
-  </target>
+      <target name="jar" depends="jif">
+        <jar jarfile="${lib}/jif.jar" basedir="${classes}"
+          includes="jif/**"/>
+        <jar jarfile="${lib}/jifrt.jar" basedir="${rt-classes}"
+          includes="jif/**"/>
+        <jar jarfile="${lib}/jifsig.jar" basedir="${sig-classes}"
+          includes="jif/**, java/**"/>
+        <antcall target="jiflib-jar"/>
+      </target>
+
+     <target name="jiflib-jar">
+        <jar jarfile="${lib}/jiflib.jar" basedir="${lib-classes}"
+          includes="jif/**"/>
+     </target>
 
 
   <target name="javadoc" depends="jif-base">
