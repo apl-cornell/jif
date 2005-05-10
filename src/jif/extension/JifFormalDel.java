@@ -25,6 +25,10 @@ public class JifFormalDel extends JifJL_c
     public void setIsCatchFormal(boolean isCatchFormal) {
         this.isCatchFormal = isCatchFormal;
     }
+    public boolean isCatchFormal() {
+        return this.isCatchFormal;
+    }
+    
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         Formal n = (Formal) super.buildTypes(tb);
         JifTypeSystem jts = (JifTypeSystem)tb.typeSystem();

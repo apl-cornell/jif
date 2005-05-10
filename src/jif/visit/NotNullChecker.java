@@ -9,7 +9,8 @@ import polyglot.types.*;
 import polyglot.visit.*;
 
 /**
- * Visitor which determines at which program points local variables cannot be
+ * Visitor which determines at which program points local variables and
+ * final fields of this class cannot be
  * null, and thus field access and method calls to them cannot produce
  * NullPointerExceptions. This information is then stored in the appropriate
  * delegates. 
@@ -61,7 +62,10 @@ public class NotNullChecker extends DataFlow
             // notNullVariables, or if it is a cast of a 
 	    // non-null expression.
             return exprIsNotNullStatic(e) ||
-		(e instanceof Local && notNullVars.contains(((Local)e).localInstance())) ||
+                (e instanceof Local && notNullVars.contains(((Local)e).localInstance())) ||
+                (e instanceof Field && ((Field)e).target() instanceof Special &&
+                        ((Field)e).fieldInstance().flags().isFinal() &&
+                        notNullVars.contains(((Field)e).fieldInstance())) ||
 		(e instanceof Cast && exprIsNotNull(((Cast)e).expr()));
         }        
 
@@ -110,6 +114,19 @@ public class NotNullChecker extends DataFlow
             if (dfIn.exprIsNotNull(x.init())) {                
                 Set s = new HashSet(dfIn.notNullVars);
                 s.add(x.localInstance());
+                DataFlowItem newItem = new DataFlowItem(s);
+                return checkNPE(itemToMap(newItem, succEdgeKeys), n);
+            }
+        }
+        else if (n instanceof Formal) {
+            Formal f = (Formal)n;
+            JifFormalDel d = (JifFormalDel)n.del();
+            if (d.isCatchFormal()) {
+                // f is a formal in a catch block (e.g., 
+                // try {...} catch(Exception e) {...} )
+                // and as such is never null
+                Set s = new HashSet(dfIn.notNullVars);
+                s.add(f.localInstance());
                 DataFlowItem newItem = new DataFlowItem(s);
                 return checkNPE(itemToMap(newItem, succEdgeKeys), n);
             }
@@ -232,12 +249,21 @@ public class NotNullChecker extends DataFlow
      * are evaluated to true and false.
      */
     private static Map comparisonToNull(Expr expr, boolean equalsEquals, DataFlowItem in, Set edgeKeys) {
-        if (expr instanceof Local) {                        
+        VarInstance vi = null;
+        if (expr instanceof Local) {
+            vi = ((Local)expr).localInstance();
+        }
+        else if (expr instanceof Field && 
+                   ((Field)expr).target() instanceof Special &&
+                   ((Field)expr).fieldInstance().flags().isFinal()) {
+            vi = ((Field)expr).fieldInstance();
+        }
+        if (vi != null) {                        
             Set sEq = new HashSet(in.notNullVars);
             Set sNeq = new HashSet(in.notNullVars);
 
-            sEq.remove(((Local)expr).localInstance());
-            sNeq.add(((Local)expr).localInstance());
+            sEq.remove(vi);
+            sNeq.add(vi);
 
             if (equalsEquals) {
                 return itemsToMap(new DataFlowItem(sEq), new DataFlowItem(sNeq), in, edgeKeys);

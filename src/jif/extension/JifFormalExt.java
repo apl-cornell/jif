@@ -4,7 +4,6 @@ import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.visit.LabelChecker;
-import polyglot.ast.Formal;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 
@@ -19,7 +18,6 @@ public class JifFormalExt extends Jif_c
     }
 
     public Node labelCheck(LabelChecker lc) throws SemanticException {
-	Formal fn = (Formal) node();
         JifContext A = lc.jifContext();
 	A = (JifContext) node().enterScope(A);
         return node();

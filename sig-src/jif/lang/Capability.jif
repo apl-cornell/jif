@@ -24,7 +24,6 @@ public final class Capability[principal P, label L] authority(P) {
     public Closure[P,L]{this} getClosure() { return closure; }
 
 	public Object{closure; L} invoke{L; closure}() where authority(P) {
-		Closure[P,L] closure = this.closure;
 		if (closure == null) return null;
 		return closure.invoke();
 	}
