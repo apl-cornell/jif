@@ -923,7 +923,7 @@ public class JifTypeSystem_c
         // Fully qualify classes in jif.lang and jif.principal.
         if (t.package_() != null) {
             if (t.package_().equals(createPackage("jif.lang"))
-                || t.package_().equals(createPackage("jif.principal"))) {
+                || t.package_().equals(createPackage("jif.principals"))) {
                 return super.translateClass(null, t);
             }
         }

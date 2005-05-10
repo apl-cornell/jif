@@ -1,0 +1,7 @@
+package jif.principals;
+
+public class Chuck extends ExternalPrincipal {
+    public Chuck() {
+	super("Chuck");
+    }
+}

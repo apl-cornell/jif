@@ -1,0 +1,7 @@
+package jif.principals;
+
+public class broker extends ExternalPrincipal {
+    public broker() {
+	super("broker");
+    }
+}

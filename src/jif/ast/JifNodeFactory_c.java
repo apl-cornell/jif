@@ -8,8 +8,6 @@ import jif.types.ParamInstance;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
-import polyglot.ext.jl.ast.Call_c;
-import polyglot.ext.jl.ast.LocalDecl_c;
 import polyglot.ext.jl.ast.NodeFactory_c;
 import polyglot.types.Flags;
 import polyglot.util.InternalCompilerError;
@@ -108,9 +106,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     }
 
     public CanonicalLabelNode CanonicalLabelNode(Position pos, Label label) {
-        if (! label.isCanonical()) {
-            throw new InternalCompilerError(label + " is not canonical.");
-        }
         CanonicalLabelNode n = new CanonicalLabelNode_c(pos, label);
         n = (CanonicalLabelNode)n.ext(jifExtFactory().extCanonicalLabelNode());
         n = (CanonicalLabelNode)n.del(delFactory().delNode());

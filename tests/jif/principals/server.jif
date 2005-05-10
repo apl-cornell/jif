@@ -1,0 +1,7 @@
+package jif.principals;
+
+public class server extends ExternalPrincipal {
+    public server() {
+	super("server");
+    }
+}

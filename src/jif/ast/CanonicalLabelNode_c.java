@@ -1,11 +1,10 @@
 package jif.ast;
 
 import jif.extension.LabelTypeCheckUtil;
-import jif.types.JifTypeSystem;
-import jif.types.label.DynamicLabel;
 import jif.types.label.Label;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.TypeChecker;
 
@@ -17,6 +16,10 @@ public class CanonicalLabelNode_c extends LabelNode_c implements CanonicalLabelN
 	super(pos, label);
     }
     public Node typeCheck(TypeChecker tc) throws SemanticException {
+        if (!this.label().isCanonical()) {
+            // label should be canonical by the time we start typechecking.
+            throw new InternalCompilerError(this.label() + " is not canonical.");
+        }
         LabelTypeCheckUtil.typeCheckLabel(tc, label());        
         return super.typeCheck(tc);
     }

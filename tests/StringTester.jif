@@ -10,11 +10,7 @@ public class StringTester {
             return s.substring(index);
         }
         catch (Exception e) {
-	    try {
-		String x = e.toString();
-	    }
-	    catch (NullPointerException ig) {
-	    }
+	    String x = e.toString();
             return null;
         }
     }

@@ -1,0 +1,7 @@
+package jif.principals;
+
+public class irs extends ExternalPrincipal {
+    public irs() {
+	super("irs");
+    }
+}

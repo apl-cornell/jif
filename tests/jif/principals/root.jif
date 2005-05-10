@@ -1,0 +1,7 @@
+package jif.principals;
+
+public class root extends ExternalPrincipal {
+    private root() {
+	super("root");
+    }
+}

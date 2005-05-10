@@ -69,7 +69,7 @@ public class JifContext_c extends Context_c implements JifContext
         Named n;
         try {
             // Look for the principal only in class files.
-            String className = "jif.principal." + name;
+            String className = "jif.principals." + name;
             n = jlts.loadedResolver().find(className);
         } catch (SemanticException e) {
             return null;

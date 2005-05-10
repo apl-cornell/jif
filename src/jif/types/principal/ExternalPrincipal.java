@@ -1,9 +1,11 @@
 package jif.types.principal;
 
 
-/** The external principal existing in the running system. 
+/** The external principal is used primarily for testing purposes. 
  *  It is specified by the name of a principal, such as
  *  "Alice" and "Bob". 
+ * 
+ * @see jif.lang.ExternalPrincipal
  */
 public interface ExternalPrincipal extends Principal {
     String name();

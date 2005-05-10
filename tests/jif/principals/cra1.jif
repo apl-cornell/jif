@@ -1,0 +1,7 @@
+package jif.principals;
+
+public class cra1 extends ExternalPrincipal {
+    public cra1() {
+	super("cra1");
+    }
+}

@@ -88,7 +88,7 @@
   </target>
 
   <target name="clobber" depends="clean">
-    <delete>
+    <delete includeemptydirs="true">
       <fileset dir="${src}">
 	    <include name="**/Grm.java"/>
 		<include name="**/sym.java"/>
@@ -105,8 +105,9 @@
       <fileset dir="${basedir}/tests">
         <include name="**/*.class"/>
         <include name="**/*.java"/>
-        <include name="**/*.results"/>
-        <exclude name="jif/principal/*.java"/>
+        <include name="**/*~"/>
+        <include name="pthOutput*/**/*"/>
+        <include name="pthOutput*"/>
       </fileset>
       <fileset dir="${basedir}/examples">
         <include name="**/*.class"/>
@@ -646,7 +647,7 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
           <include name="examples/*"/>
 
           <include name="tests/*"/>
-          <include name="tests/jif/principal/**"/>
+          <include name="tests/jif/principals/**"/>
           <include name="README"/>
           <include name="LICENSE"/>
           <include name="CHANGES"/>

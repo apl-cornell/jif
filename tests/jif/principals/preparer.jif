@@ -1,0 +1,7 @@
+package jif.principals;
+
+public class preparer extends ExternalPrincipal {
+    public preparer() {
+	super("preparer");
+    }
+}

@@ -1,0 +1,7 @@
+package jif.principals;
+
+public class Citibank extends ExternalPrincipal {
+    public Citibank() {
+	super("Citibank");
+    }
+}
