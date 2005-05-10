@@ -29,12 +29,6 @@ public class AccessPathThis extends AccessPathRoot {
             if (this.equals(r)) {
                 return e;
             }
-            else {
-                throw new InternalCompilerError("Trying to replace \"this\" root of " + 
-                           ((AccessPathThis)r).ct.fullName() + 
-                           " in an access path expression rooted in " + 
-                           this.ct.fullName());
-            }
         }
         return this;
     }

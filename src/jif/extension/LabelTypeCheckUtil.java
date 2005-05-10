@@ -197,7 +197,8 @@ public class LabelTypeCheckUtil {
      * 
      * @param type
      * @param ts
-     * @return
+     * @return the types that may be thrown by a runtime evalution
+     * of the type <code>type</code>.
      */
     public static List throwTypes(JifClassType type, JifTypeSystem ts) {
         Type t = ts.unlabel(type);
@@ -224,4 +225,36 @@ public class LabelTypeCheckUtil {
             return Collections.EMPTY_LIST;
         }
     }
+    /**
+     * Returns a set of local instances that are used in the type.
+     */
+    public static Set localInstancesUsed(JifClassType type, JifTypeSystem ts) {
+        Type t = ts.unlabel(type);
+        if (t instanceof JifSubstType) {            
+            JifSubstType jst = (JifSubstType)t;
+            Set lis = new HashSet();
+            for (Iterator i = jst.entries(); i.hasNext();) {
+                Map.Entry e = (Map.Entry)i.next();
+                Object arg = e.getValue();
+                AccessPath p = null;
+                if (arg instanceof DynamicLabel) {
+                    p = ((DynamicLabel)arg).path();
+                }
+                else if (arg instanceof DynamicPrincipal) {
+                    p = ((DynamicPrincipal)arg).path();
+                }
+                while (p != null && p instanceof AccessPathField) {
+                    p = ((AccessPathField)p).path();
+                }
+                if (p instanceof AccessPathLocal) {
+                    lis.add(((AccessPathLocal)p).localInstance());
+                }
+            }            
+            return lis;
+        }
+        else {
+            return Collections.EMPTY_SET;
+        }        
+    }
+    
 }

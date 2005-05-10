@@ -7,6 +7,8 @@ import jif.translate.JifToJavaRewriter;
 import jif.types.JifSubstClassType_c;
 import jif.types.JifSubstType;
 import jif.types.JifTypeSystem;
+import jif.visit.JifInitChecker;
+import polyglot.ast.NodeFactory;
 import polyglot.ext.jl.JLScheduler;
 import polyglot.frontend.Job;
 import polyglot.frontend.goals.FieldConstantsChecked;
@@ -14,6 +16,8 @@ import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.VisitorGoal;
 import polyglot.types.FieldInstance;
 import polyglot.types.ParsedClassType;
+import polyglot.types.TypeSystem;
+import polyglot.visit.InitChecker;
 
 public class JifScheduler extends JLScheduler {
    OutputExtensionInfo jlext;
@@ -39,6 +43,12 @@ public class JifScheduler extends JLScheduler {
     public Goal FieldConstantsChecked(FieldInstance fi) {
         return internGoal(new JifFieldConstantsChecked(fi));
     }
+    public Goal InitializationsChecked(Job job) {
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        return internGoal(new VisitorGoal(job, new JifInitChecker(job, ts, nf)));
+    }
+
     public boolean runToCompletion() {
         if (super.runToCompletion()) {
             // Create a goal to compile every source file.

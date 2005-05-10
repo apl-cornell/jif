@@ -39,7 +39,9 @@ public class AccessPathLocal extends AccessPathRoot {
     public String exprString() {
         return name;
     }
-    
+    public LocalInstance localInstance() {
+        return this.li;
+    }
     public boolean equals(Object o) {
         if (o instanceof AccessPathLocal) {
             return li.equals(((AccessPathLocal)o).li);
