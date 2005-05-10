@@ -29,6 +29,7 @@ public interface JifNodeFactory extends NodeFactory {
     JifMethodDecl JifMethodDecl(Position pos, Flags flags, TypeNode returnType, String name, LabelNode startLabel, List arguments, LabelNode endLabel, List exceptions, List constraints, Block body);
     JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, String name, LabelNode startLabel, LabelNode returnLabel, List arguments, List exceptions, List constraints, Block body);
     AmbParam AmbParam(Position pos, String name);
+    AmbParam AmbParam(Position pos, String name, ParamInstance pi);
     AmbExprParam AmbParam(Position pos, Expr expr, ParamInstance expectedPI);
     ParamDecl ParamDecl(Position pos, ParamInstance.Kind kind, String name);
     CanonicalConstraintNode CanonicalConstraintNode(Position pos, Assertion constraint);

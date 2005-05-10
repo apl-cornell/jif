@@ -133,12 +133,12 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 		// "name" is a parameter.  Instantiate the base type with the
 		// parameter and use it as the new base type.
                 ParamNode pn;
+                ParamInstance pi = (ParamInstance)pt.params().get(0);
                 if (expr instanceof Expr) {
-                    ParamInstance pi = (ParamInstance)pt.params().get(0);
                     pn = nf.AmbParam(position(), (Expr)expr, pi);                    
                 }
                 else {
-                    pn = nf.AmbParam(position(), (String)expr);                                        
+                    pn = nf.AmbParam(position(), (String)expr, pi);                                        
                 }
 
                 try {

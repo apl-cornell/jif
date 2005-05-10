@@ -254,6 +254,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	RuntimeParams24c.jif (Semantic, "The type of a dynamic principal");
 	RuntimeParams24d.jif (Semantic, "Can not instantiate .* with a non-principal");
 	RuntimeParams25.jif (Syntax);
+	RuntimeParams26.jif (Semantic, "@@@@@"); // should be an initialization error
 	Simple.jif ;
 	Simple2.jif ;
 	Simple3.jif ;

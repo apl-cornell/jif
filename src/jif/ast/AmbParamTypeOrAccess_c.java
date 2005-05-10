@@ -92,13 +92,13 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 	    JifPolyType pt = (JifPolyType)tn.type();
 
 	    ParamNode n;
+            ParamInstance pi = (ParamInstance)pt.params().get(0);
 	    if (expr instanceof Expr) {
-                ParamInstance pi = (ParamInstance)pt.params().get(0);
 	        n = nf.AmbParam(position(), (Expr)expr, pi);
 	        n = (ParamNode) n.disambiguate(ar);
 	    }
 	    else {
-	        n = nf.AmbParam(position(), (String)expr);	        
+	        n = nf.AmbParam(position(), (String)expr, pi);	        
 	        n = (ParamNode) n.disambiguate(ar);
 	        if (!n.isDisambiguated()) {
 	            throw new SemanticException("\"" + expr + "\" is not " + 

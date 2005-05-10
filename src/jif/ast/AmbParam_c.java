@@ -15,10 +15,12 @@ import polyglot.visit.AmbiguityRemover;
 public class AmbParam_c extends Node_c implements AmbParam
 {
     protected String name;
+    protected ParamInstance pi;
 
-    public AmbParam_c(Position pos, String name) {
+    public AmbParam_c(Position pos, String name, ParamInstance pi) {
 	super(pos);
 	this.name = name;
+	this.pi = pi;
     }
 
     public boolean isDisambiguated() {
@@ -53,7 +55,7 @@ public class AmbParam_c extends Node_c implements AmbParam
 	Context c = sc.context();
         VarInstance vi = c.findVariable(name);
 
-        if (!vi.isCanonical()) {
+        if (!vi.isCanonical() && pi == null) {
             // not yet ready to disambiguate
             return this;
         }
@@ -79,19 +81,18 @@ public class AmbParam_c extends Node_c implements AmbParam
 
 	JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
-
 	if (vi.flags().isFinal()) {
-	    if (ts.isLabel(vi.type())) {
+	    if (ts.isLabel(vi.type()) || (pi != null && pi.isLabel())) {
 	        Label l = ts.dynamicLabel(position(), JifUtil.varInstanceToAccessPath(vi, this.position()));
 	        return nf.CanonicalLabelNode(position(), l);
 	    }
-
-	    if (ts.isPrincipal(vi.type())) {
-		Principal p = ts.dynamicPrincipal(position(), JifUtil.varInstanceToAccessPath(vi, this.position()));
-		return nf.CanonicalPrincipalNode(position(), p);
+	    
+	    if (ts.isPrincipal(vi.type()) || (pi != null && pi.isPrincipal())) {
+	        Principal p = ts.dynamicPrincipal(position(), JifUtil.varInstanceToAccessPath(vi, this.position()));
+	        return nf.CanonicalPrincipalNode(position(), p);
 	    }
 	}
-
+	
 	throw new SemanticException("Only final variables of type \"label\" " +
 	    "or \"principal\" may be used as class parameters.", position());
     }

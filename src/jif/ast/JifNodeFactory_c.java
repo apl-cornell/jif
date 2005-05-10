@@ -9,6 +9,7 @@ import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.Call_c;
+import polyglot.ext.jl.ast.LocalDecl_c;
 import polyglot.ext.jl.ast.NodeFactory_c;
 import polyglot.types.Flags;
 import polyglot.util.InternalCompilerError;
@@ -150,7 +151,14 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     public LocalClassDecl LocalClassDecl(Position pos, ClassDecl decl) {
         throw new InternalCompilerError("Jif does not support inner classes.");
     }
-
+    
+    public LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type,
+            String name, Expr init) {
+        LocalDecl n = new JifLocalDecl_c(pos, flags, type, name, init);
+        n = (LocalDecl)n.ext(extFactory().extLocalDecl());
+        n = (LocalDecl)n.del(delFactory().delLocalDecl());
+        return n;
+    }
     public JifClassDecl JifClassDecl(Position pos, Flags flags, String name,
                                      List params, 
                                      TypeNode superClass, List interfaces,
@@ -247,7 +255,10 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     }
 
     public AmbParam AmbParam(Position pos, String name) {
-        AmbParam n = new AmbParam_c(pos, name);
+        return AmbParam(pos, name, null);
+    }
+    public AmbParam AmbParam(Position pos, String name, ParamInstance pi) {
+        AmbParam n = new AmbParam_c(pos, name, pi);
         n = (AmbParam)n.ext(jifExtFactory().extAmbParam());
         n = (AmbParam)n.del(delFactory().delNode());
         return n;
