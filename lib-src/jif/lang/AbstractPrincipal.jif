@@ -1,0 +1,184 @@
+package jif.lang;
+
+
+/**
+ * TODO Documentation 
+ */
+public abstract class AbstractPrincipal implements Principal {
+    private final String{this} name;
+    protected Principal{this:}[]{this:} superiors = null;
+    
+    protected AbstractPrincipal(String{this} name) {
+        this.name = name;
+    }
+
+    public String{this} name() {
+        return name;
+    }
+
+	public boolean{this;p} delegatesTo(principal p) {
+        return superiorsContains((Principal)p);
+    }
+
+	public void addDelegatesTo{this:}(principal{this} p) where caller (this) {
+        if (superiorsContains((Principal)p)) {
+            return;
+        }
+        // need to add p to the superiors.
+        try {
+            if (superiors == null) {
+                superiors = new Principal[1];
+                superiors[0] = (Principal)p;            
+            }
+            else {
+                Principal{this:}[] old = superiors;
+                superiors = new Principal[old.length+1];
+                for (int i = 0; i < old.length; i++) {
+                    superiors[i] = old[i];
+                }
+                superiors[old.length] = (Principal)p;            
+            }
+        }
+        catch (NullPointerException impossible) {}
+        catch (ArrayStoreException impossible) {}
+        catch (ArrayIndexOutOfBoundsException impossible) {}
+    }
+    
+    protected boolean{this;p} superiorsContains(Principal p) where authority (this) {
+    	boolean result = false;
+        Principal{this:}[] sprs = superiors;
+        for (int i = 0; sprs != null && i < sprs.length; i++) {
+            try {
+                Principal pi = sprs[i];                        
+                if (p == pi || (pi != null && pi.equals(p))) {
+                    result = true;
+                    break;
+                }
+            }
+            catch (ArrayIndexOutOfBoundsException impossible) {}
+        }
+        return declassify(result, {this;p});
+    }
+
+	public boolean{authPrf; closure; lb; this} isAuthorized(Object authPrf, 
+                                                     Closure[this, lb] closure,
+                                                     label lb) where authority (this) {
+        // The default is that this principal authorizes no closures.
+        return false;
+    }
+    
+    public Principal{this;q}[]{this;q} findChainDownto{q;this}(Principal q) {
+        // don't even try! We don't have any information
+        // about who we can act for.
+        return null;
+    }
+
+    public Principal{this;p}[]{this;p} findChainUpto{p;this}(Principal p) where authority (this) {
+        int{this;p} d = 0;
+        // go through our set of superiors, and see if we can find a chain
+        // from them to p.
+        Principal{this;p}[] chain;
+        
+        Principal{this:}[]{this} sprs = declassify(superiors, {this});
+        
+        for (int i = 0; sprs != null && i < sprs.length; i++) {
+            try {
+                Principal{this} s = declassify(sprs[i], {this});
+                chain = PrincipalUtil.findDelegatesChain(p, s);
+                if (chain != null) {
+                    // success!
+                    // create a longer chain with this at the bottom 
+                    return addToChainBottom(chain, this, d);
+                }
+            }
+            catch (ArrayIndexOutOfBoundsException impossible) {}
+        }
+
+        return null;
+    }
+
+    public boolean{this;o} equals(Object o) {
+        if (o == null) return false;
+        if (o instanceof Principal) {
+            try {
+	            return equals((Principal)o);
+	        }
+	        catch (ClassCastException impossible) {}
+        }
+        return false;
+    }
+    
+	public boolean{this;p} equals(Principal p) {
+	    if (p == null) return false;
+        return (this.name == p.name() || (this.name != null && 
+                this.name.equals(p.name()))) &&
+                	this.getClass() == p.getClass();        
+    }
+    
+    public int{this} hashCode() {
+        if (name == null) return -382389;
+        return name.hashCode();
+    }
+
+    /**
+     * Create a new chain of length <code>chain.length+1</code>, such that
+     * the last element of the new chain is <code>p</code>, and 
+     * all other elements are copied over from <code>chain</code>.
+     */
+    static protected Principal{dummy; p; chain}[]{chain} 
+        addToChainBottom{dummy; p; chain}(Principal{dummy}[] chain, Principal p, int dummy) {
+        if (chain == null) {
+            Principal{dummy; p; chain}[] newChain = new Principal[1];
+            try {
+	            newChain[0] = p;
+	        }
+	        catch (ArrayStoreException impossible) {}
+            catch (ArrayIndexOutOfBoundsException impossible) {}
+
+            return newChain;
+        }
+        
+        Principal{dummy; p; chain}[] newChain = new Principal[chain.length + 1];
+        try {
+            for (int i = 0; i < chain.length; i++) {
+                newChain[i] = chain[i];
+            }
+            newChain[chain.length] = p;
+        }
+        catch (ArrayStoreException impossible) {}
+        catch (ArrayIndexOutOfBoundsException impossible) {}
+
+        return newChain;
+    }
+
+    /**
+     * Create a new chain of length <code>chain.length+1</code>, such that
+     * the first element of the new chain is <code>p</code>, and 
+     * all other elements are copied over from <code>chain</code>, offset by one.
+     */
+    static protected Principal{dummy; p; chain}[]{chain} 
+               addToChainTop{dummy; p; chain}(Principal p, Principal[] chain, int dummy) {
+        if (chain == null) {
+            Principal{dummy; p; chain}[] newChain = new Principal[1];
+            try {
+	            newChain[0] = p;
+	        }
+	        catch (ArrayStoreException impossible) {}
+            catch (ArrayIndexOutOfBoundsException impossible) {}
+
+            return newChain;
+        }
+        
+        Principal{dummy; p; chain}[] newChain = new Principal[chain.length + 1];
+        try {
+            newChain[0] = p;
+            for (int i = 0; i < chain.length; i++) {
+                newChain[i+1] = chain[i];
+            }
+        }
+        catch (ArrayStoreException impossible) {}
+        catch (ArrayIndexOutOfBoundsException impossible) {}
+
+        return newChain;
+    }
+}

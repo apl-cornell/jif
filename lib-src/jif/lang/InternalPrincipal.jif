@@ -6,7 +6,7 @@ package jif.lang;
  * principals like "Alice" and "Bob".
  */
 public class InternalPrincipal extends AbstractPrincipal {
-    public InternalPrincipal(String name) {
+    public InternalPrincipal(String{this} name) {
         super(name);
     }
 }

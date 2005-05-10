@@ -1,0 +1,99 @@
+package jif.lang;
+
+/**
+ * TODO Documentation 
+ */
+public class PrincipalUtil {
+    /**
+     * Does the principal p act for the principal q? 
+     */
+    public static native boolean{p;q} acts_for(Principal p, Principal q);
+
+    /**
+     * Are the principals p and q equivalent to each other? That is,
+     * does p act for q, and q act for p?
+     * 
+     */
+    public static boolean{p;q} equivalentTo(Principal p, Principal q) {
+        return acts_for(p, q) && acts_for(q, p);
+    }
+
+    /**
+     * Search for a delegates-chain between p and q. An delegates-chain
+     * between p and q is a Principal array <code>a</code> of 
+     * length L such that
+     *   <pre>
+     *     a[L-1] == q
+     *     a[L-1] delegates to a[L-2]
+     *     ...
+     *     a[1] delegates to a[0]
+     *     a[0] == p
+     *   </pre>.
+     *  Thus, a valid delegate chain between p and q implies that p acts for q.
+     * @param p
+     * @param q
+     * @return A delegates-chain between p and q, or null if non can be found.
+     */
+    public static Principal{p;q}[]{p;q} findDelegatesChain{p;q}(Principal p, Principal q) {
+        // try the dumb things first.
+        if (p == q) {
+            Principal{p;q}[] chain = new Principal[1];
+            try {
+	            chain[0] = p;
+	        }
+	        catch (ArrayStoreException impossible) {}
+	        catch (ArrayIndexOutOfBoundsException impossible) {}
+            return chain;
+        }
+        if (q == null || (p != null && p.equals(q) && q.equals(p))) {
+            Principal{p;q}[] chain = new Principal[2];
+            try {
+                chain[0] = p;
+                chain[1] = q;
+	        }
+	        catch (ArrayStoreException impossible) {}
+	        catch (ArrayIndexOutOfBoundsException impossible) {}
+            return chain;
+        }
+        
+        // try searching upwards from q.
+        Principal{p;q}[] chain = q.findChainUpto(p);
+        if (chain != null) return chain;
+
+        // try searching downards from p.
+        if (p != null) {
+            chain = p.findChainDownto(q);
+            if (chain != null) return chain;
+        }
+        
+        // have failed!
+        return null;
+    }
+
+    /**
+     * Verify that the chain is a valid delegates-chain between p and q. That is,
+     * q == chain[n], chain[n] delegates to chain[n-1], ..., chain[0] == p, i.e.,
+     * p acts for q.
+
+     */
+    public static boolean{chain;p;q} verifyChain(Principal{p;q}[]{p;q} chain, Principal p, Principal q) {
+        if (chain == null || chain.length == 0) return false;
+        try {
+	        if (chain[0] != p || chain[chain.length-1] != q) return false;
+        
+	        // now go through the chain and check it
+	        for (int i = 0; i < chain.length-1; i++) {
+	            // either i+1 has to be null, or i+1 has to delegate to i
+	            final Principal left = chain[i];
+	            final Principal right = chain[i+1];
+	            if (right != null && !right.delegatesTo(left)) {
+	                return false;
+	            }
+	        }
+	        return true;
+	    }
+        catch (ArrayIndexOutOfBoundsException impossible) {
+            return false;
+        }
+    }
+}

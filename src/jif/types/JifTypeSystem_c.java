@@ -253,14 +253,21 @@ public class JifTypeSystem_c
     }
 
     public boolean isCastValid(Type fromType, Type toType) {
-        return super.isCastValid(strip(fromType), strip(toType));
+        Type strpFromType = strip(fromType);
+        Type strpToType = strip(toType);
+        
+        if (Principal().equals(strpFromType) && PrincipalClass().equals(strpToType)) {
+            return true;
+        }
+        
+        return super.isCastValid(strpFromType, strpToType);
     }
 
     public boolean isImplicitCastValid(Type fromType, Type toType) {
         Type strpFromType = strip(fromType);
         Type strpToType = strip(toType);
         
-        if (Principal().equals(toType) && isSubtype(fromType, PrincipalClass())) {
+        if (Principal().equals(strpToType) && isSubtype(strpFromType, PrincipalClass())) {
             return true;
         }
         

@@ -163,12 +163,4 @@ public class Runtime {
     }
 
     public static native String currentUser();
-
-    public static boolean acts_for(Principal p1, Principal p2) {
-        return PrincipalUtil.actsFor(p1, p2);
-    }
-    public static boolean acts_for(Principal param, Principal p1, Principal p2) {
-        return PrincipalUtil.actsFor(p1, p2);
-    }
-
 }

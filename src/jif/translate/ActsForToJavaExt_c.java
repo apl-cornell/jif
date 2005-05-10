@@ -23,7 +23,7 @@ public class ActsForToJavaExt_c extends ToJavaExt_c {
 
         if (alternative != null) {
             return rw.qq().parseStmt(
-                "if (jif.runtime.Runtime.acts_for((%E), (%E))) {" +
+                "if (jif.lang.PrincipalUtil.actsFor((%E), (%E))) {" +
                 "   %S                                          " +
                 "} else {                                       " +
                 "   %S                                          " +
@@ -32,7 +32,7 @@ public class ActsForToJavaExt_c extends ToJavaExt_c {
         }
         else {
             return rw.qq().parseStmt(
-                "if (jif.runtime.Runtime.acts_for((%E), (%E))) {" +
+                "if (jif.lang.PrincipalUtil.actsFor((%E), (%E))) {" +
                 "   %S                                          " +
                 "}                                              ",
                 actor, granter, consequent);
