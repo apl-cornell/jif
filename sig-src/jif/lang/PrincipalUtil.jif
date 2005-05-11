@@ -1,7 +1,11 @@
 package jif.lang;
 
 /**
- * TODO Documentation 
+ * Utility methods for principals. In particular, there are methods to test if
+ * one principal acts for another, if two principals both act for each other, 
+ * helper methods to both find and verify delegates-chains, and a method for 
+ * dynamically acquiring a Capbility, which encapsulates the authority of a
+ * principal to execute a Closure.
  */
 public class PrincipalUtil {
     /**
@@ -96,4 +100,10 @@ public class PrincipalUtil {
             return false;
         }
     }
+    
+    /**
+     * Obtain a Capability for the given principal and closure.
+     */
+    public static native Capability[p, lb]{p; authPrf; c; lb} 
+                authorize(principal p, Object authPrf, Closure[p, lb] c, label lb);
 }

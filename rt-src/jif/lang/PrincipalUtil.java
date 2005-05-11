@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * TODO Documentation 
+ * Utility methods for principals.
+ * 
+ * See the Jif source code, in lib-src/jif/lang/PrincipalUtil.jif
  */
 public class PrincipalUtil {
-    private static Map cache = new HashMap();
+    private static Map chainCache = new HashMap();
     
     /**
      * Does the principal p act for the principal q? A synonym for the
@@ -35,18 +37,18 @@ public class PrincipalUtil {
         
         // try the cache
         PrincipalPair pp = new PrincipalPair(p, q);
-        Principal[] chain = (Principal[])cache.get(pp);
+        Principal[] chain = (Principal[])chainCache.get(pp);
         if (chain != null) {
             if (verifyChain(chain, p, q)) return true;
             // chain is no longer valid
-            cache.remove(pp);
+            chainCache.remove(pp);
         }
         
         // try searching
         chain = findDelegatesChain(p, q);
         if (chain != null && verifyChain(chain, p, q)) {
             // cache the chain to avoid searching later.
-            cache.put(pp, chain);
+            chainCache.put(pp, chain);
             return true;
         }
             
@@ -143,12 +145,29 @@ public class PrincipalUtil {
         }
     }
     
-    /**
-     * Are the principals p and q equivalent to each other? That is,
-     * does p act for q, and q act for p?
-     * 
-     */
     public static boolean equivalentTo(Principal p, Principal q) {
         return actsFor(p, q) && actsFor(q, p);
+    }
+    
+    /**
+     * Obtain a Capability for the given principal and closure.
+     */
+    public static Capability authorize(Principal p, Object authPrf, Closure c, Label lb) {
+        Principal closureP = c.jif$getjif_lang_Closure_P();
+        Label closureL = c.jif$getjif_lang_Closure_L();
+        if (closureP == p || (p != null && closureP != null &&
+                p.equals(closureP) && closureP.equals(p))) {
+            // The principals agree.
+            if (closureL != null && closureL.equivalentTo(lb)) {
+                // the labels agree
+                if (p == null || p.isAuthorized(authPrf, c, lb)) {
+                    // either p is null (and the "null" principal always 
+                    // gives authority!) or p grants authority to execute the
+                    // closure.
+                    return new Capability(closureP, closureL, c);                    
+                }
+            }
+        }
+        return null;
     }
 }

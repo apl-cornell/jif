@@ -13,7 +13,7 @@ package jif.lang;
 public final class Capability[principal P, label L] authority(P) {
     /**
      * The only way to construct a Capability is through the
-     * Runtime interface.
+     * PrincipalUtil class.
      */
     private Capability(Closure[P,L]{this} closure) { 
     	this.closure = closure;

@@ -345,7 +345,6 @@ ext="-extclass split.ExtensionInfo"
 	   vmlauncher="false">
       <arg value="-d"/>
       <arg path="${lib-classes}"/>
-      <arg value="-nooutput"/>
       <arg value="-sourcepath"/>
       <arg path="${lib-src}"/>
       <srcfile/>
