@@ -163,4 +163,9 @@ public class Runtime {
     }
 
     public static native String currentUser();
+
+    static {
+        System.loadLibrary("jifrt");
+    }
+    
 }
