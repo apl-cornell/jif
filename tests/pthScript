@@ -53,6 +53,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Array.jif ;
 	Array1.jif (Semantic, "not a subtype") ;
 	Array2.jif ;
+	Array3.jif ;
 	ArrayLeak.jif (Semantic, "not a subtype") ;
 	ArrayLeak2.jif (Semantic, "not a subtype") ;
 	BadNullExcept1.jif (Semantic, "NullPointerException.*must .* be caught") ;
