@@ -71,7 +71,9 @@ public class AmbParam_c extends Node_c implements AmbParam
 	    return paramToParam((ParamInstance) vi, sc);
 	}
 
-	throw new SemanticException(vi + " cannot be used as parameter.");
+	throw new SemanticDetailedException(vi + " cannot be used as parameter.", 
+	          "The variable " + name + " is not suitable for use as a parameter.",
+	          this.position());
     }
 
     /** Turns a <code>JifVarInstance</code> object into a label node or
@@ -91,10 +93,18 @@ public class AmbParam_c extends Node_c implements AmbParam
 	        Principal p = ts.dynamicPrincipal(position(), JifUtil.varInstanceToAccessPath(vi, this.position()));
 	        return nf.CanonicalPrincipalNode(position(), p);
 	    }
+	    throw new SemanticDetailedException(
+	          "Only final variables of type \"label\" or \"principal\" may be used as class parameters.",
+	          "Only final variables of type \"label\" or \"principal\" may be used as class parameters. " +
+	          "The variable " + vi.name() + " is not of type \"label\", nor of type \"principal\".",
+	          position());
 	}
 	
-	throw new SemanticException("Only final variables of type \"label\" " +
-	    "or \"principal\" may be used as class parameters.", position());
+	throw new SemanticDetailedException(
+          "Only final variables of type \"label\" or \"principal\" may be used as class parameters.",
+          "Only final variables of type \"label\" or \"principal\" may be used as class parameters. " +
+          "The variable " + vi.name() + " is not final.",
+          position());
     }
 
     /** Turns a <code>PrincipalInstance</code> object into a principal node. */
@@ -132,7 +142,7 @@ public class AmbParam_c extends Node_c implements AmbParam
 	    return nf.CanonicalPrincipalNode(position(), p);
 	}
 
-	throw new SemanticException("Unrecognized parameter type for " + pi,
+	throw new InternalCompilerError("Unrecognized parameter type for " + pi,
 		                    position());
     }
 }

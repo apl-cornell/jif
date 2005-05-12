@@ -104,7 +104,7 @@ public class JifTypeSystem_c
                 PRINCIPAL_CLASS_ = typeForName("jif.lang.Principal");
             }
             catch (SemanticException e) {
-                throw new InternalCompilerError("Cannot find Jif class jif.lang.Principal");
+                throw new InternalCompilerError("Cannot find Jif class jif.lang.Principal", e);
             } 
         }
         return PRINCIPAL_CLASS_;
@@ -869,8 +869,7 @@ public class JifTypeSystem_c
             }
             catch (SemanticException e) {
                 throw new InternalCompilerError(
-                        "Unexpected semantic exception: " + e.getMessage(),
-                         e.position());
+                        "Unexpected semantic exception", e);
             }
         }
         return false;

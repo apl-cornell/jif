@@ -80,15 +80,15 @@ public class AmbVarLabelNode_c extends AmbLabelNode_c
 		return nf.CanonicalLabelNode(position(), pl);        
 	    }
 	    if (pi.isPrincipal()) {
-                throw new SemanticException("Cannot use the principal " + 
-                     name + " as a label. (\"" + name + ":\" may have " +
+                throw new SemanticException("Cannot use the external principal " + 
+                     name + " as a label. (The label \"{" + name + ": }\" may have " +
                      "been intended.)", this.position());
 	    }
 	}
 
 	if (vi instanceof PrincipalInstance) {
-            throw new SemanticException("Cannot use the principal " + 
-                 name + " as a label. (\"" + name + ":\" may have " +
+            throw new SemanticException("Cannot use the external principal " + 
+                 name + " as a label. (The label \"{" + name + ": }\" may have " +
                  "been intended.)", this.position());
 	}
 

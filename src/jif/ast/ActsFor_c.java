@@ -103,18 +103,26 @@ public class ActsFor_c extends Stmt_c implements ActsFor
 
     /** Type check the expression. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();
-
 	if (!actor.principal().isRuntimeRepresentable()) {
-	    throw new SemanticException(
-                    "A principal used in an actsfor must be runtime-representable; it cannot be a parameter.", 
+	    throw new SemanticDetailedException(
+                    "A principal used in an actsfor must be runtime-representable.",                    
+                    "Both principals used in an actsfor test must be " +
+                    "represented at runtime, since the actsfor test is a dynamic " +
+                    "test. The principal " + actor.principal() + 
+                    " is not represented at runtime, and thus cannot be used " +
+                    "in an actsfor test.",
                     actor.position());
 	}
 
 	if (!granter.principal().isRuntimeRepresentable()) {
-	    throw new SemanticException(
-               "A principal used in an actsfor must be runtime-representable; it cannot be a parameter.", 
-		granter.position());
+	    throw new SemanticDetailedException(
+                    "A principal used in an actsfor must be runtime-representable.",                    
+                    "Both principals used in an actsfor test must be " +
+                    "represented at runtime, since the actsfor test is a dynamic " +
+                    "test. The principal " + granter.principal() + 
+                    " is not represented at runtime, and thus cannot be used " +
+                    "in an actsfor test.",
+                    granter.position());
 	}
 
 	return this;

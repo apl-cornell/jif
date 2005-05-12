@@ -3,8 +3,6 @@ package jif.visit;
 import jif.ast.Jif;
 import jif.ast.JifClassDecl;
 import jif.types.*;
-import jif.types.label.DynamicLabel;
-import jif.types.label.Label;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -84,7 +82,7 @@ public class LabelChecker implements Copy
             return super.clone();
         }
         catch (CloneNotSupportedException e) {
-            throw new InternalCompilerError("Java clone() weirdness.");
+            throw new InternalCompilerError("Java clone() weirdness.", e);
         }
     }
 
@@ -172,7 +170,6 @@ public class LabelChecker implements Copy
         }
         
         Node newN = n;
-	jif.ExtensionInfo extInfo = (jif.ExtensionInfo) this.job.extensionInfo();
         JifLabelSubst jls = new JifLabelSubst(this.job, this.ts, this.nf, this.solver);
         
         jls = (JifLabelSubst)jls.begin();

@@ -84,7 +84,7 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo
         }
         catch (SemanticException e) {
             throw new InternalCompilerError(
-                "Unable to initialize type system: " + e.getMessage());
+                "Unable to initialize type system: ", e);
         }
     }
 

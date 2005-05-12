@@ -107,11 +107,11 @@ public class JifSubst_c extends Subst_c implements JifSubst
     /** Perform substititions on a field. */
     public FieldInstance substField(FieldInstance fi) {
         fi = super.substField(fi);
-        if (fi instanceof JifFieldInstance) {
+        if (fi instanceof JifFieldInstance) { 
             JifFieldInstance jfi = (JifFieldInstance)fi;
             jfi.setLabel(substLabel(jfi.label()));
             fi = jfi;
-        }
+        } 
         return fi;
     }
 
@@ -161,40 +161,38 @@ public class JifSubst_c extends Subst_c implements JifSubst
         if (label == null) {
 	    return null;
 	}
-
+    
         try {
             return label.subst(substLabelSubst);
         }
         catch (SemanticException e) {
-            throw new InternalCompilerError("Unexpected semantic exception: " +
-                e.getMessage());
-        }
+            throw new InternalCompilerError("Unexpected semantic exception", e);
+        }  
     }
-
+    
     public Principal substPrincipal(Principal principal) {
         if (principal == null) {
             return null;
         }
-
+        
         try {
             return principal.subst(substLabelSubst);
         }
         catch (SemanticException e) {
-            throw new InternalCompilerError("Unexpected semantic exception: " +
-                e.getMessage());
-        }
+            throw new InternalCompilerError("Unexpected semantic exception", e);
+        }  
     }
 
     /**
      * An instance of the nested class <code>SubstLabelSubst</code>, to be
-     * used by <code>substLabel(Label)</code> and
+     * used by <code>substLabel(Label)</code> and 
      * <code>substPrincipal(Principal)</code>.
      */
     protected SubstLabelSubst substLabelSubst = new SubstLabelSubst();
-
+    
     /**
-     * This class is a <code>LabelSubstitution</code> that performs
-     * substitutions on <code>Label</code>s and <code>Principal</code>s.
+     * This class is a <code>LabelSubstitution</code> that performs 
+     * substitutions on <code>Label</code>s and <code>Principal</code>s. 
      *
      */
     protected class SubstLabelSubst extends LabelSubstitution implements Serializable {
@@ -217,7 +215,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
             }
 
             return p;
-        }
+        }        
     }
 
 

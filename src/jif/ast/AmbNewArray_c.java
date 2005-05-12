@@ -126,8 +126,12 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 
 	    if (pt.params().size() > 1) {
 		//this node shouldn't be ambiguous.
-		throw new SemanticException("Not enough parameters for " +
-		    "parameterized type " + pt + ".");
+		throw new SemanticDetailedException(
+		          "Not enough parameters for parameterized type " + pt + ".",
+		          "The type " + pt + " is a parameterized type with " +
+		          pt.params().size() + " parameters. So, to instantiate this type, " +
+		          "you must supply " + pt.params().size() + "",
+		          this.position());
 	    }
 	    else if (pt.params().size() == 1) {
 		// "name" is a parameter.  Instantiate the base type with the
@@ -141,12 +145,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
                     pn = nf.AmbParam(position(), (String)expr, pi);                                        
                 }
 
-                try {
-                    pn = (ParamNode) pn.disambiguate(ar);
-                }
-                catch (SemanticException e) {
-		    throw new SemanticException("cannot resolve the parameter: " + expr, position());
-                }
+                pn = (ParamNode) pn.disambiguate(ar);
 
 		List l = new LinkedList();
                 if (!pn.isDisambiguated()) {

@@ -178,7 +178,7 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
         }
         catch (SemanticException e) {
             throw new InternalCompilerError("Unexpected SemanticException "+
-                "thrown: " + e.getMessage(), n.position());
+                "thrown", e);
         }
     }
 
@@ -209,7 +209,6 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
         else if (t instanceof JifSubstType && recurseIntoSubstType((JifSubstType)t)) {
             JifSubstType jst = (JifSubstType)t;
             Map newMap = new HashMap();
-            List args = new LinkedList();
             boolean diff = false;
 
             for (Iterator i = jst.entries(); i.hasNext();) {

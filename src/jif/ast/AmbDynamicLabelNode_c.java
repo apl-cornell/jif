@@ -2,6 +2,7 @@ package jif.ast;
 
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
+import jif.types.SemanticDetailedException;
 import jif.types.label.Label;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
@@ -38,7 +39,15 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         }
 
         if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
-            throw new SemanticException("Only a final access path can be used as a dynamic label.");
+            throw new SemanticDetailedException(
+                "Only final access paths or label expressions can be used as a dynamic label.",
+                "Only final access paths or label expressions can be used as a dynamic label. " +
+                "A final access path is an expression starting with either \"this\" or a final " +
+                "local variable \"v\", followed by zero or more final field accesses. That is, " +
+                "a final access path is either this.f1.f2....fn, or v.f1.f2.....fn, where v is a " +
+                "final local variables, and each field f1 to fn is a final field. A label expression " +
+                "is either a label parameter, or a \"new label {...}\" expression.",
+                this.position());
         }
 
         Label L = ts.dynamicLabel(position(), JifUtil.exprToAccessPath(expr, (JifContext)c));

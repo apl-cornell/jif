@@ -1,6 +1,7 @@
 package jif.ast;
 
 import jif.types.JifClassType;
+import jif.types.JifContext;
 import polyglot.ast.Node;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
@@ -26,9 +27,9 @@ public class AmbThisLabelNode_c extends AmbLabelNode_c
      * "this". 
      */
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-	Context c = sc.context();
+	JifContext c = (JifContext)sc.context();
     
-        if (c.inStaticContext()) {
+        if (c.inStaticContext() && !c.inConstructorCall()) {
             throw new SemanticException("The label \"this\" cannot be used " +
                 "in a static context.", position());
         }

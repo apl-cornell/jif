@@ -184,7 +184,7 @@ public class JifFieldExt extends Jif_c
                 }
                 catch (SemanticException x) {
                     throw new InternalCompilerError("Cannot find the field "
-                            + name + " in " + rt);
+                            + name + " in " + rt, x);
                 }
             }
         }

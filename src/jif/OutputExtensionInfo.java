@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jif.visit.JifTranslator;
-import polyglot.ast.NodeFactory;
 import polyglot.ext.jl.JLScheduler;
-import polyglot.ext.jl.types.TypeSystem_c;
 import polyglot.frontend.*;
-import polyglot.frontend.goals.*;
+import polyglot.frontend.goals.CodeGenerated;
+import polyglot.frontend.goals.Goal;
+import polyglot.frontend.goals.Parsed;
 import polyglot.main.Options;
-import polyglot.types.*;
+import polyglot.types.LoadedClassResolver;
+import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 
 /**
@@ -50,8 +51,6 @@ public class OutputExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
 
         CodeGenerated output = new CodeGenerated(job) {
             public Pass createPass(ExtensionInfo extInfo) {
-                TypeSystem ts = extInfo.typeSystem();
-                NodeFactory nf = extInfo.nodeFactory();
                 return new OutputPass(this, new JifTranslator(job, typeSystem(),
                                                               nodeFactory(), targetFactory()));
             }            
@@ -108,7 +107,7 @@ public class OutputExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
         }
         catch (SemanticException e) {
             throw new InternalCompilerError(
-                "Unable to initialize type system: " + e.getMessage());
+                "Unable to initialize type system.", e);
         }
     }
 }
