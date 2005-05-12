@@ -21,7 +21,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
     public Node labelCheckLHS(LabelChecker lc)
         throws SemanticException
     {
-        Assign assign = (Assign)node();
+        ArrayAccessAssign assign = (ArrayAccessAssign)node();
         final ArrayAccess aie = (ArrayAccess) assign.left();
 
         JifContext A = lc.jifContext();
@@ -72,11 +72,11 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         A = (JifContext) A.pop();
         A = (JifContext) A.pop();
 
-        Type arrayType = arrayType(array, ts);
         Label La = arrayBaseLabel(array, ts);
 
         PathMap X;
 
+        
         if (assign.operator() != Assign.ASSIGN) {
             PathMap X3 = X2.N(ts.notTaken()).NV(La.join(X2.NV())).join(Xv);
 
@@ -89,7 +89,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
 
             Xv = Xv.join(X);
         }
-        else if (arrayType.isReference()) {
+        else if (assign.throwsArrayStoreException()) {
             X = X2.exc(Xa.NV().join(Xv.NV()), ase);
         }
         else {
@@ -164,18 +164,9 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         return (Assign) X(assign.right(rhs).left(lhs), X);
     }
 
-    private Type arrayType(Expr array, JifTypeSystem ts) {
-        Type arrayType = array.type();
-        if (array instanceof Local) {
-            arrayType = ((Local)array).localInstance().type();	
-        }
-
-        return ts.unlabel(arrayType); 
-    }
-
-    private Label arrayBaseLabel(Expr array, JifTypeSystem ts) {
-        Type arrayType = arrayType(array, ts);	
-        return ts.labelOfType(((ArrayType)arrayType).base());	
+    private Label arrayBaseLabel(Expr array, JifTypeSystem ts) {        
+        ArrayType arrayType = (ArrayType)ts.unlabel(array.type());
+        return ts.labelOfType(arrayType.base());	
     }
 
 }
