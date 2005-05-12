@@ -4,4 +4,12 @@ public class irs extends ExternalPrincipal {
     public irs() {
 	super("irs");
     }
+
+    private static irs{} P;
+    public static Principal getInstance{}() {
+	if (P == null) {
+	    P = new irs();
+	}
+	return P;
+    }
 }

@@ -4,4 +4,12 @@ public class preparer extends ExternalPrincipal {
     public preparer() {
 	super("preparer");
     }
+
+    private static preparer{} P;
+    public static Principal getInstance{}() {
+	if (P == null) {
+	    P = new preparer();
+	}
+	return P;
+    }
 }

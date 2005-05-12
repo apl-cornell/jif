@@ -8,6 +8,6 @@ import polyglot.types.SemanticException;
 public class ExternalPrincipalToJavaExpr_c extends PrincipalToJavaExpr_c {
     public Expr toJava(Principal principal, JifToJavaRewriter rw) throws SemanticException {
         ExternalPrincipal P = (ExternalPrincipal) principal;
-        return rw.qq().parseExpr("new jif.principals.%s()", P.name());
+        return rw.qq().parseExpr("jif.principals.%s.getInstance()", P.name());
     }
 }

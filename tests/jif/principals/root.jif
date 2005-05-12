@@ -4,4 +4,12 @@ public class root extends ExternalPrincipal {
     private root() {
 	super("root");
     }
+
+    private static root{} P;
+    public static Principal getInstance{}() {
+	if (P == null) {
+	    P = new root();
+	}
+	return P;
+    }
 }

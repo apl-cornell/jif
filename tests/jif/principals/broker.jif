@@ -4,4 +4,12 @@ public class broker extends ExternalPrincipal {
     public broker() {
 	super("broker");
     }
+
+    private static broker{} P;
+    public static Principal getInstance{}() {
+	if (P == null) {
+	    P = new broker();
+	}
+	return P;
+    }
 }

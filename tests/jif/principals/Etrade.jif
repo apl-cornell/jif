@@ -4,4 +4,12 @@ public class Etrade extends ExternalPrincipal {
     public Etrade() {
 	super("Etrade");
     }
+
+    private static Etrade{} P;
+    public static Principal getInstance{}() {
+	if (P == null) {
+	    P = new Etrade();
+	}
+	return P;
+    }
 }
