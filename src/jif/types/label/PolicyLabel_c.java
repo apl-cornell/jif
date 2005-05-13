@@ -3,8 +3,7 @@ package jif.types.label;
 import java.util.*;
 
 import jif.translate.PolicyLabelToJavaExpr_c;
-import jif.types.JifTypeSystem;
-import jif.types.LabelSubstitution;
+import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.principal.Principal;
@@ -161,6 +160,17 @@ public class PolicyLabel_c extends Label_c implements PolicyLabel {
         JifTypeSystem ts = (JifTypeSystem)typeSystem();
         PolicyLabel newLabel = ts.policyLabel(this.position(), newOwner, newReaders);
         return substitution.substLabel(newLabel);
+    }
+    public PathMap labelCheck(JifContext A) {
+        // check each principal in turn.
+        PathMap X = owner.labelCheck(A);
+        for (Iterator i = readers.iterator(); i.hasNext(); ) {
+            A.setPc(X.N());
+            Principal r = (Principal) i.next();
+            PathMap Xr = r.labelCheck(A);
+            X = X.join(Xr);            
+        }
+        return X;
     }
     
 }

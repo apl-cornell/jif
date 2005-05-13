@@ -1,13 +1,12 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.translate.ToJavaExt;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.PathMap;
+import jif.types.*;
 import jif.visit.LabelChecker;
-import polyglot.ast.Expr;
-import polyglot.ast.Node;
-import polyglot.ast.Throw;
+import polyglot.ast.*;
 import polyglot.types.SemanticException;
 
 /** Jif extension of the <code>Throw</code> node.
@@ -28,13 +27,17 @@ public class JifThrowExt extends JifStmtExt_c
 	JifContext A = lc.jifContext();
 	A = (JifContext) ths.enterScope(A);
 
-	Expr e = (Expr) lc.context(A).labelCheck(ths.expr());
+        List throwTypes = new ArrayList(ths.del().throwTypes(ts));
+
+        Expr e = (Expr) lc.context(A).labelCheck(ths.expr());
 	PathMap Xe = X(e);
 
+        checkAndRemoveThrowType(throwTypes, e.type());
 	PathMap X = Xe.exc(Xe.NV(), e.type());
 	X = X.N(ts.notTaken());
 	X = X.NV(ts.notTaken());
 
+        checkThrowTypes(throwTypes);
 	return X(ths, X);
     }
 }

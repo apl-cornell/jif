@@ -17,7 +17,7 @@ import polyglot.util.*;
 /**
  * This is a tool to label check method calls.
  * This class should be used by creating an instance of it, and then calling
- * the method {@link #checkCall(LabelChecker) checkCall(LabelChecker)}. After
+ * the method {@link #checkCall(LabelChecker, List) checkCall(LabelChecker)}. After
  * the call to that method, the remaining methods (which are getter methods)
  * may be called.
  */
@@ -142,7 +142,7 @@ public class CallHelper
         return X;
     }
 
-    private PathMap labelCheckAndConstrainParams(LabelChecker lc) throws SemanticException {
+    private PathMap labelCheckAndConstrainParams(LabelChecker lc, List throwTypes) throws SemanticException {
         PathMap Xjoin;
         JifTypeSystem ts = lc.typeSystem();
 
@@ -151,8 +151,8 @@ public class CallHelper
         // if the method call is a constructor call, or a static method call,
         // then we need to check the pathmap.
         if (this.pi.flags().isStatic()) {
-            Xjoin = LabelTypeCheckUtil.labelCheckType(pi.container(), lc, position);
-            List Xparams = LabelTypeCheckUtil.labelCheckTypeParams(pi.container(), lc, position);
+            Xjoin = LabelTypeCheckUtil.labelCheckType(pi.container(), lc, throwTypes, position);
+            List Xparams = LabelTypeCheckUtil.labelCheckTypeParams(pi.container(), lc, throwTypes, position);
             actualParamLabels = new ArrayList(Xparams.size());
             for (Iterator iter = Xparams.iterator(); iter.hasNext(); ) {
                 PathMap Xj = (PathMap)iter.next();
@@ -160,9 +160,9 @@ public class CallHelper
             }
         }
         else if (this.pi instanceof ConstructorInstance) {
-            Xjoin = LabelTypeCheckUtil.labelCheckType(pi.container(), lc, position);
+            Xjoin = LabelTypeCheckUtil.labelCheckType(pi.container(), lc, throwTypes, position);
             // now constraint params, pretending that they will be args to the constructor with upper bound {this}.
-            List Xparams = LabelTypeCheckUtil.labelCheckTypeParams(pi.container(), lc, position);
+            List Xparams = LabelTypeCheckUtil.labelCheckTypeParams(pi.container(), lc, throwTypes, position);
             actualParamLabels = new ArrayList(Xparams.size());
             JifContext A = lc.context();
 
@@ -365,16 +365,15 @@ public class CallHelper
         return L;
     }
 
-    private PathMap excPathMap(JifContext A, Label returnLabel) throws SemanticException {
+    private PathMap excPathMap(JifContext A, Label returnLabel, List throwTypes) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         PathMap Xexn = ts.pathMap();
 
         for (Iterator e = pi.throwTypes().iterator(); e.hasNext(); ) {
             Type te = (Type) e.next();
-
             Label Le = ts.labelOfType(te, returnLabel);
             Le = instantiate(A, Le);
-
+            Jif_c.checkAndRemoveThrowType(throwTypes, te);
             Xexn = Xexn.exception(te, Le.join(A.pc()));
         }
 
@@ -386,7 +385,7 @@ public class CallHelper
      *
      *
      */
-    public void checkCall(LabelChecker lc)
+    public void checkCall(LabelChecker lc, List throwTypes)
     throws SemanticException
     {
         if (callChecked) {
@@ -402,7 +401,7 @@ public class CallHelper
         if (shouldReport(4)) report(4, ">>>>> call-begin");
 
         // check arguments
-        PathMap Xjoin = labelCheckAndConstrainParams(lc);
+        PathMap Xjoin = labelCheckAndConstrainParams(lc, throwTypes);
 	Xjoin = labelCheckArguments(lc, Xjoin);
 
         lc = lc.context(A);
@@ -493,7 +492,7 @@ public class CallHelper
 
         X = Xjoin.N(Lr.join(A.pc()));
         X = X.NV(Lrv.join(A.pc()));
-        X = X.join(excPathMap(A, Lr));
+        X = X.join(excPathMap(A, Lr, throwTypes));
 
         if (pi instanceof MethodInstance) {
             returnType = instantiate(A, ((MethodInstance)pi).returnType());

@@ -1,5 +1,8 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
@@ -29,7 +32,9 @@ public class JifCallExt extends Jif_c
         A = (JifContext) me.enterScope(A);
 	JifTypeSystem ts = lc.jifTypeSystem();
 
-	JifMethodInstance mi = (JifMethodInstance)me.methodInstance();
+        List throwTypes = new ArrayList(me.del().throwTypes(ts));
+
+        JifMethodInstance mi = (JifMethodInstance)me.methodInstance();
 	
 	if (mi.flags().isStatic()) {
 	    new ConstructorChecker().checkStaticMethodAuthority(mi, A, me.position());
@@ -68,7 +73,7 @@ public class JifCallExt extends Jif_c
 	}
 
         CallHelper helper = new CallHelper(objLabel, target, mi.container(), mi, me.arguments(), node().position());
-	helper.checkCall(lc.context(A));
+	helper.checkCall(lc.context(A), throwTypes);
         A = (JifContext) A.pop();
 
 	//subst arguments of inst_type
@@ -78,10 +83,13 @@ public class JifCallExt extends Jif_c
         
         if (npExc) {
             // a null pointer exception may be thrown
+            checkAndRemoveThrowType(throwTypes, ts.NullPointerException());
+            checkThrowTypes(throwTypes);
             return X(me.target(target).arguments(helper.labelCheckedArgs()), 
-		    helper.X().exc(excPath, ts.NullPointerException()));
+                     helper.X().exc(excPath, ts.NullPointerException()));
         }
 	
+        checkThrowTypes(throwTypes);
 	return X(me.target(target).arguments(helper.labelCheckedArgs()), helper.X());
     }
 }

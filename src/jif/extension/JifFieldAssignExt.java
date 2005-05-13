@@ -1,5 +1,8 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.ast.JifInstantiator;
 import jif.translate.ToJavaExt;
 import jif.types.*;
@@ -27,6 +30,7 @@ public class JifFieldAssignExt extends JifAssignExt
         // commented out by zlt
         // A = (JifContext) fe.enterScope(A);
 
+        List throwTypes = new ArrayList(assign.del().throwTypes(ts));
         Type npe = ts.NullPointerException();
         Type are = ts.ArithmeticException();
 
@@ -36,26 +40,6 @@ public class JifFieldAssignExt extends JifAssignExt
         // check rhs
         A = (JifContext) A.pushBlock();
 
-//        @@@
-//        System.out.println("Field: " + this.node());
-//        System.out.println("  target is never null: " + ((JifFieldDel)node().del()).targetIsNeverNull());
-//        System.out.println("  target class is: " + target.getClass().getName());
-//        if (target instanceof Thrower) {
-//            System.out.println("  target throws set: " + ((Thrower)target).throwTypes(ts));
-//        }
-//        System.out.println("  node class is: " + node().getClass().getName());
-//        if (node() instanceof Thrower) {
-//            System.out.println("  node throws set: " + ((Thrower)node()).throwTypes(ts));
-//        }
-
-        if (((JifFieldDel)fe.del()).targetIsNeverNull()) {
-            // The target cannot throw NullPointerException.
-            A.setPc(Xe.N());            
-        }
-        else {
-            // The target may throw a null pointer exception.
-            A.setPc(Xe.exc(Xe.NV(), npe).N());
-        }
 
         Expr rhs = (Expr) lc.context(A).labelCheck(assign.right());
         PathMap Xr = X(rhs);
@@ -65,8 +49,10 @@ public class JifFieldAssignExt extends JifAssignExt
         PathMap Xa; 
         PathMap X;
 
-        if (assign.throwsArithmeticException()) 
+        if (assign.throwsArithmeticException()) {
+            checkAndRemoveThrowType(throwTypes, are);
             Xa = Xe.join(Xr).exc(Xr.NV(), are);
+        }
         else 
             Xa = Xe.join(Xr);	
 
@@ -81,6 +67,7 @@ public class JifFieldAssignExt extends JifAssignExt
             X = Xa;
         }
         else {
+            checkAndRemoveThrowType(throwTypes, npe);
             X = Xa.exc(Xe.NV(), npe);
         }
         
@@ -180,6 +167,7 @@ public class JifFieldAssignExt extends JifAssignExt
 
         Expr lhs = (Expr) X(fe, X);
 
+        checkThrowTypes(throwTypes);
         return (Assign) X(assign.right(rhs).left(lhs), X);
     }
     

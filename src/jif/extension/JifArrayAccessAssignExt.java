@@ -1,13 +1,14 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
-import polyglot.types.ArrayType;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 
 /** The Jif extension of the <code>ArrayAccessAssign</code> node. 
@@ -23,10 +24,11 @@ public class JifArrayAccessAssignExt extends JifAssignExt
     {
         ArrayAccessAssign assign = (ArrayAccessAssign)node();
         final ArrayAccess aie = (ArrayAccess) assign.left();
-
         JifContext A = lc.jifContext();
         A = (JifContext) aie.enterScope(A);
         JifTypeSystem ts = lc.jifTypeSystem();
+
+        List throwTypes = new ArrayList(assign.del().throwTypes(ts));
 
         if (assign.left() != aie) {
             throw new InternalCompilerError(aie +
@@ -50,10 +52,12 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         PathMap X2 = Xa.join(Xb);
         if (!((JifArrayAccessDel)assign.left().del()).arrayIsNeverNull()) {
             // a null pointer exception may be thrown
+            checkAndRemoveThrowType(throwTypes, npe);
             X2 = X2.exc(Xa.NV(), npe);             
         }
         if (((JifArrayAccessDel)assign.left().del()).outOfBoundsExcThrown()) {
             // an out of bounds exception may be thrown
+            checkAndRemoveThrowType(throwTypes, oob);
              X2 = X2.exc(Xa.NV().join(Xb.NV()), oob);
         }
 
@@ -81,6 +85,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
             PathMap X3 = X2.N(ts.notTaken()).NV(La.join(X2.NV())).join(Xv);
 
             if (assign.throwsArithmeticException()) {
+                checkAndRemoveThrowType(throwTypes, are);
                 X = X3.exc(Xv.NV(), are);
             }
             else {
@@ -90,6 +95,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
             Xv = Xv.join(X);
         }
         else if (assign.throwsArrayStoreException()) {
+            checkAndRemoveThrowType(throwTypes, ase);
             X = X2.exc(Xa.NV().join(Xv.NV()), ase);
         }
         else {
@@ -161,6 +167,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
 
         Expr lhs = (Expr) X(aie.index(index).array(array), X);
 
+        checkThrowTypes(throwTypes);
         return (Assign) X(assign.right(rhs).left(lhs), X);
     }
 

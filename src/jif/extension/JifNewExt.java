@@ -1,5 +1,8 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
@@ -30,6 +33,8 @@ public class JifNewExt extends Jif_c
         JifContext A = lc.jifContext();
 	A = (JifContext) noe.enterScope(A);
 
+	List throwTypes = new ArrayList(noe.del().throwTypes(ts));
+    
 	ClassType ct = (ClassType) ts.unlabel(noe.type());
 
 	constructorChecker.checkConstructorAuthority(ct, A, noe.position());
@@ -56,11 +61,12 @@ public class JifNewExt extends Jif_c
                                            noe.arguments(),
 		                           node().position());
 
-	helper.checkCall(lc);
+	helper.checkCall(lc, throwTypes);
 
 	PathMap retX = helper.X();
 	PathMap X = retX.NV(retX.NV().join(newLabel));
 
+	checkThrowTypes(throwTypes);
 	return X(noe.arguments(helper.labelCheckedArgs()), X);
     }
 }

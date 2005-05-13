@@ -1,11 +1,16 @@
 package jif.ast;
 
+import java.util.Iterator;
+import java.util.List;
+
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.PathMap;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.Node;
 import polyglot.ext.jl.ast.Ext_c;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 
 /** An implementation of the <code>Jif</code> interface. 
@@ -107,4 +112,39 @@ public class Jif_c extends Ext_c implements Jif
     public static Node X(Node n, PathMap X) {
         return JifUtil.X(n, X);
     }   
+
+    /**
+     * Check that the type excType is indeed in the list of types thrown, 
+     * thowTypes, and remoive excType from that list.
+     * @param throwTypes
+     * @param excType
+     */
+    public static void checkAndRemoveThrowType(List throwTypes, Type excType) {
+        if (!throwTypes.remove(excType)) {
+            throw new InternalCompilerError("The type " + excType + " is not "
+                                            + "declared to be thrown!");
+        }
+    }
+
+    /**
+     * Check that the list of types thrown, 
+     * thowTypes, does not contain any checked exceptions, i.e., all throw 
+     * types have been correctly label checked.
+     * @param throwTypes
+     */
+    public static void checkThrowTypes(List throwTypes) {
+        for (Iterator iter = throwTypes.iterator(); iter.hasNext();) {
+            Type thrw = (Type)iter.next();
+            if (thrw.typeSystem().uncheckedExceptions().contains(thrw)) {
+                iter.remove();
+            }            
+        }
+        if (!throwTypes.isEmpty()) {
+            throw new InternalCompilerError("The types " + throwTypes + " are " +
+                                            "declared to be thrown, but " +
+                                            "are not label checked!");
+        }
+    }
+
+    
 }

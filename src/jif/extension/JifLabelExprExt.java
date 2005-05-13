@@ -1,14 +1,12 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.ast.Jif_c;
 import jif.ast.LabelExpr;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.PathMap;
-import jif.types.label.AccessPath;
-import jif.types.label.DynamicLabel;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.Node;
@@ -27,6 +25,7 @@ public class JifLabelExprExt extends Jif_c
         JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.jifTypeSystem();
 
+        List throwTypes = new ArrayList(le.del().throwTypes(ts));
         // make sure the label is runtime representable
         lc.constrain(new LabelConstraint(new NamedLabel("label_expr",
                                                         l),
@@ -46,9 +45,10 @@ public class JifLabelExprExt extends Jif_c
         A = (JifContext) le.enterScope(A);
 
         PathMap X1 = l.labelCheck(A);
+        throwTypes.removeAll(l.throwTypes(ts));
 
         A = (JifContext) A.pop();
-
+        checkThrowTypes(throwTypes);
         return X(le, X1);
     }
 

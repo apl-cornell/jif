@@ -193,47 +193,68 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             return;
 
         ClassType untrusted = ts.hasUntrustedAncestor(ct);
-        if (!ts.isJifClass(ct) || untrusted != null) {
-            // the first statement of the body had better be an explicit
-            // constructor call
-            StringBuffer message = new StringBuffer("The first statement " + 
-                               "of the constructor must be a constructor " +
-                               "call");               
-            if (untrusted != null) {
-                message.append(", as the ancestor ");
-                message.append(untrusted.fullName());
-                message.append(" is not trusted");
-            }
-            message.append(".");
-            checkFirstStmtConstructorCall(message.toString(), false);
+        if (!ts.isJifClass(ct)) {
+            // If ct is not a jif class, then the first statement of the body
+            // had better be a constructor call (which is the normal Java
+            // rule).
+            checkFirstStmtConstructorCall("The first statement of a constructor " +
+                    "of a Java class must be a constructor call.", true, false);
         }
-        
-        if (ts.isJifClass(ct) && !ts.isJifClass(ct.superType())) {
-            // this is a Jif class, but it's super class is not.
-            // the first statement must be a default constructor call
-            checkFirstStmtConstructorCall("The first statement of the " +
-                           "constructor must be a default constructor call, " +
-                           "as the superclass is not a Jif class", 
-                           true);
+        else if (ts.isJifClass(ct) && untrusted != null) {
+            // If ct is a Jif class, but the super class is an
+            // untrusted Java class, then the first statement of the body
+            // must be an explicit call to the default super constructor:
+            // "super()". If it wasn't, then due to the translation of 
+            // Jif constructors, a malicious (non-Jif) superclass access
+            // final fields before they have been initialized.
+            checkFirstStmtConstructorCall("The first statement of a constructor " +
+                    "of a Jif class with an untrusted Java superclass " +
+                    "must be an explicit call to the default super constructor," +
+                    "\"super()\".", false, true);
+        }        
+        else if (ts.isJifClass(ct) && !ts.isJifClass(ct.superType())) {
+            // this is a Jif class, but it's superclass is a trusted Java class.
+            // The first statement must either be a "this(...)" constructor 
+            // call, or a "super()" call. That is, the constructor cannot
+            // call any super constructor other than the default constuctor,
+            // since in translation, the Jif class has no opportunity to
+            // marshall the arguments before the super constructor call 
+            // happens.
+            checkFirstStmtConstructorCall("The first statement of a " +
+                           "constructor of a Jif class with a Java superclass " +
+                           "must be either a \"this(...)\" constructor call, or " +
+                           "a call to the default super constructor, " +
+                           "\"super()\".", 
+                           true, true);
         }
     }
     
+    /**
+     * 
+     * @param message
+     * @param allowThisCalls if false then first statement must be super(); if true then it may be a call to this(...) or super().
+     * @throws SemanticException
+     */
     private void checkFirstStmtConstructorCall(String message, 
-                                               boolean mustBeDefaultCall) 
+                                               boolean allowThisCalls,
+                                               boolean superCallMustBeDefault) 
                                  throws SemanticException {
         if (body().statements().size() < 1) {
-            throw new SemanticException("Empty constructor body.",
-                                        position());
+            throw new SemanticException("Empty constructor body.", position());
         }
         Stmt s = (Stmt)body().statements().get(0);
         if (!(s instanceof ConstructorCall)) {
             throw new SemanticException(message, position());
         }
-        else if (mustBeDefaultCall) {
-            ConstructorCall cc = (ConstructorCall)s;
-            if (cc.arguments().size() > 0) {
-                throw new SemanticException(message, position());                
-            }
+        
+        ConstructorCall cc = (ConstructorCall)s;
+        if (!allowThisCalls && cc.kind() == ConstructorCall.THIS) {
+            throw new SemanticException(message, position());                
+        }
+        
+        if (superCallMustBeDefault && cc.kind() == ConstructorCall.SUPER &&
+                cc.arguments().size() > 0) {
+            throw new SemanticException(message, position());                
         }
         
     }

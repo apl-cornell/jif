@@ -1,5 +1,8 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.visit.LabelChecker;
@@ -27,6 +30,9 @@ public class JifConstructorCallExt extends JifStmtExt_c
 	ConstructorCall ccs = (ConstructorCall) node();
 
 	JifContext A = lc.jifContext();
+	JifTypeSystem ts = lc.typeSystem();
+    
+	List throwTypes = new ArrayList(ccs.del().throwTypes(ts)); 
         A = (JifContext) ccs.del().enterScope(A);
 
 	JifConstructorInstance ci = (JifConstructorInstance)ccs.constructorInstance();
@@ -46,8 +52,9 @@ public class JifConstructorCallExt extends JifStmtExt_c
 	CallHelper helper = new CallHelper(jct.thisLabel(), ct, ci, 
                                            ccs.arguments(), node().position());
 
-	helper.checkCall(lc.context(A));
+	helper.checkCall(lc.context(A), throwTypes);
 
+	checkThrowTypes(throwTypes);
 	return X(ccs.arguments(helper.labelCheckedArgs()), helper.X());
     }
 }

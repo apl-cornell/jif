@@ -1,5 +1,8 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.types.label.Label;
@@ -25,6 +28,8 @@ public class JifLocalAssignExt extends JifAssignExt
         JifContext A = lc.jifContext();
         A = (JifContext) lve.enterScope(A);
 
+        List throwTypes = new ArrayList(assign.del().throwTypes(ts));
+        
         final LocalInstance li = lve.localInstance();
 
         Label L = ts.labelOfLocal(li, A.pc());
@@ -40,6 +45,7 @@ public class JifLocalAssignExt extends JifAssignExt
 
             if (assign.throwsArithmeticException()) {
                 Type arithExc = ts.ArithmeticException();
+                checkAndRemoveThrowType(throwTypes, arithExc);
                 X = Xv.join(Xr).exc(Xr.NV(), arithExc);
             }
             else {
@@ -78,6 +84,7 @@ public class JifLocalAssignExt extends JifAssignExt
          );
 
         Expr lhs = (Expr) X(lve, X);
+        checkThrowTypes(throwTypes);
         return (Assign) X(assign.right(rhs).left(lhs), X);
     }
 }

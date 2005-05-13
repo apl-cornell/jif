@@ -1,14 +1,15 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
-import polyglot.types.ArrayType;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
+import polyglot.types.*;
 
 /** The Jif extension of the <code>ArrayAccess</code> node. 
  */
@@ -24,7 +25,7 @@ public class JifArrayAccessExt extends Jif_c
 	final JifTypeSystem ts = lc.jifTypeSystem();
 
 	final ArrayAccess aie = (ArrayAccess) node();
-
+        List throwTypes = new ArrayList(aie.del().throwTypes(ts));
 	Type npe = ts.NullPointerException();
 	Type oob = ts.OutOfBoundsException();
 
@@ -52,10 +53,12 @@ public class JifArrayAccessExt extends Jif_c
         PathMap X2 = Xa.join(Xb);
         if (!((JifArrayAccessDel)node().del()).arrayIsNeverNull()) {
             // a null pointer exception may be thrown
+            checkAndRemoveThrowType(throwTypes, npe);
             X2 = X2.exc(Xa.NV(), npe);             
         }
         if (((JifArrayAccessDel)node().del()).outOfBoundsExcThrown()) {
             // an out of bounds exception may be thrown
+            checkAndRemoveThrowType(throwTypes, oob);
              X2 = X2.exc(Xa.NV().join(Xb.NV()), oob);
         }
 
@@ -99,7 +102,7 @@ public class JifArrayAccessExt extends Jif_c
                      }                     
          }
          );
-
+        checkThrowTypes(throwTypes);
 	return X(aie.index(index).array(array), X);
     }
  
@@ -108,8 +111,9 @@ public class JifArrayAccessExt extends Jif_c
     {
 	JifContext A = lc.jifContext();
 	JifTypeSystem ts = lc.jifTypeSystem();
-
 	ArrayAccess aie = (ArrayAccess) node();
+
+	List throwTypes = new ArrayList(aie.del().throwTypes(ts));
 
 	Expr array = (Expr) lc.context(A).labelCheck(aie.array());
 	PathMap Xa = X(array);
@@ -130,15 +134,18 @@ public class JifArrayAccessExt extends Jif_c
         PathMap X2 = Xa.join(Xb);
         if (!((JifArrayAccessDel)node().del()).arrayIsNeverNull()) {
             // a null pointer exception may be thrown
+            checkAndRemoveThrowType(throwTypes, npe);
             X2 = X2.exc(Xa.NV(), npe);             
         }
         if (((JifArrayAccessDel)node().del()).outOfBoundsExcThrown()) {
             // an out of bounds exception may be thrown
+            checkAndRemoveThrowType(throwTypes, oob);
              X2 = X2.exc(Xa.NV().join(Xb.NV()), oob);
         }
 
 	PathMap X = X2.NV(La.join(X2.NV()));
 
+        checkThrowTypes(throwTypes);
 	return X(aie.index(index).array(array), X);
     }
 

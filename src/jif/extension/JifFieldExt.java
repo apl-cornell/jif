@@ -1,5 +1,8 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.ast.*;
 import jif.translate.ToJavaExt;
 import jif.types.*;
@@ -107,10 +110,13 @@ public class JifFieldExt extends Jif_c
 	Field fe = (Field) node();
 	Receiver target = checkTarget(lc, fe);
 	PathMap Xe = X(target);
-	
+
+        List throwTypes = new ArrayList(fe.del().throwTypes(ts));
+    
 	if (! ((JifFieldDel)node().del()).targetIsNeverNull()) {
             // null pointer exception may be thrown. 
 	    Type npe = ts.NullPointerException();
+            checkAndRemoveThrowType(throwTypes, npe);
 	    Xe = Xe.exc(Xe.NV(), npe);
 	}
 
@@ -137,6 +143,7 @@ public class JifFieldExt extends Jif_c
 
 	PathMap X = Xe.set(Path.NV, L.join(Xe.NV()));
 	
+        checkThrowTypes(throwTypes);
 	return X(fe, X);
     }
     

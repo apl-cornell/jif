@@ -1,0 +1,3 @@
+class DynPrin10 {
+    void m(principal{pp:} pp) {}
+}

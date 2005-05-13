@@ -102,12 +102,12 @@ public class LabelTypeCheckUtil {
         }
     }
 
-    public static PathMap labelCheckType(Type t, LabelChecker lc, Position pos) throws SemanticException {
+    public static PathMap labelCheckType(Type t, LabelChecker lc, List throwTypes, Position pos) throws SemanticException {
         JifContext A = lc.context();
         JifTypeSystem ts = lc.typeSystem();
         PathMap X = ts.pathMap().N(A.pc());            
 
-        List Xparams = labelCheckTypeParams(t, lc, pos);
+        List Xparams = labelCheckTypeParams(t, lc, throwTypes, pos);
 
         for (Iterator iter = Xparams.iterator(); iter.hasNext(); ) {
             PathMap Xj = (PathMap)iter.next();
@@ -122,7 +122,7 @@ public class LabelTypeCheckUtil {
      * @return List of <code>PathMap</code>s, one for each parameter of the subst type.
      * @throws SemanticException
      */
-    public static List labelCheckTypeParams(Type t, LabelChecker lc, Position pos) throws SemanticException {
+    public static List labelCheckTypeParams(Type t, LabelChecker lc, List throwTypes, Position pos) throws SemanticException {
         JifTypeSystem ts = lc.typeSystem();
         t = ts.unlabel(t);
         List Xparams;
@@ -158,6 +158,7 @@ public class LabelTypeCheckUtil {
                     
                     A.setPc(X.N());    
                     PathMap Xj = L.labelCheck(A);
+                    throwTypes.removeAll(L.throwTypes(ts));
                     Xparams.add(Xj);
                     X = X.join(Xj);
                     A = (JifContext)A.pop();
@@ -174,6 +175,7 @@ public class LabelTypeCheckUtil {
                     
                     A.setPc(X.N());            
                     PathMap Xj = p.labelCheck(A);
+                    throwTypes.removeAll(p.throwTypes(ts));
                     Xparams.add(Xj);
                     X = X.join(Xj);
                     A = (JifContext)A.pop();

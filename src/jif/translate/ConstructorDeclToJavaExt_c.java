@@ -1,16 +1,10 @@
 package jif.translate;
 
 import java.util.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import jif.ast.JifConstructorDecl;
-import jif.types.*;
 import polyglot.ast.*;
-import polyglot.types.ClassType;
-import polyglot.types.ConstructorInstance;
-import polyglot.types.SemanticException;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.visit.NodeVisitor;
 
@@ -69,31 +63,28 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
 
           // If this is a Jif class but the superclass is not a Jif class, then
           // we need to remove any calls to super constructors from body.
-          // Previous checks should have ensured that it is the first statement
-          // that is a constructor call, and that it is the default constructor
+          // Previous checks should have ensured that the first statement
+          // is either a this(...) call (permitted if the java superclass is
+          // trusted) or the default super call, super().
           if (rw.jif_ts().isJifClass(ct) && !rw.jif_ts().isJifClass(ct.superType())) {
               // check that the first statement of the body is a constructor call
               Stmt s = (Stmt)body.statements().get(0);
-              if (!(s instanceof ConstructorCall)) {
-                  throw new InternalCompilerError(body.position(),
-                               "Expected first statement of constructor of a " +
-                               "Jif class with a non-Jif superclass to be a " +
-                               "constructor call.");
-              }
-              ConstructorCall cc = (ConstructorCall)s;
-              if (cc.kind() == ConstructorCall.SUPER) {
-                  // it's a super call.
-                  // check that it's the default constructor
-                  if (cc.arguments().size() > 0) {
-                      throw new InternalCompilerError(body.position(),
-                                   "Expected super constructor call to be the" +                                   "default constructor as we have a " +
-                                   "Jif class with a non-Jif superclass.");
+              if (s instanceof ConstructorCall) {
+                  ConstructorCall cc = (ConstructorCall)s;
+                  if (cc.kind() == ConstructorCall.SUPER) {
+                      // it's a super call.
+                      // check that it's the default constructor
+                      if (cc.arguments().size() > 0) {
+                          throw new InternalCompilerError(body.position(),
+                                       "Expected super constructor call to be the" +                                       "default constructor as we have a " +
+                                       "Jif class with a non-Jif superclass.");
+                      }
+    
+                      // remove the default constructor.
+                      List stmtList = new LinkedList(body.statements());
+                      stmtList.remove(0);
+                      body = body.statements(stmtList);
                   }
-
-                  // remove the default constructor.
-                  List stmtList = new LinkedList(body.statements());
-                  stmtList.remove(0);
-                  body = body.statements(stmtList);
               }
           }
 

@@ -1,15 +1,12 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.ast.Jif_c;
 import jif.ast.PrincipalNode;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.PathMap;
-import jif.types.label.AccessPath;
-import jif.types.label.AccessPathLocal;
-import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Node;
@@ -27,6 +24,8 @@ public class JifPrincipalNodeExt extends Jif_c {
         A = (JifContext)pn.enterScope(A);
         JifTypeSystem ts = lc.jifTypeSystem();
 
+        List throwTypes = new ArrayList(pn.del().throwTypes(ts));
+        
         Principal p = pn.principal();
         // make sure the principal is runtime representable
         if (!p.isRuntimeRepresentable()) {
@@ -36,8 +35,10 @@ public class JifPrincipalNodeExt extends Jif_c {
         }
 
         PathMap X1 = p.labelCheck(A);
+        throwTypes.removeAll(p.throwTypes(ts));
         A = (JifContext)A.pop();
-
+        
+        checkThrowTypes(throwTypes);
         return X(pn, X1);
     }
 
