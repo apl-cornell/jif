@@ -1,13 +1,11 @@
 package jif.types;
 
+import java.util.*;
+
 import jif.types.label.Label;
 import jif.types.label.NotTaken;
-import jif.visit.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.types.Type;
+import polyglot.util.CodeWriter;
 
 /**
  * Implements the mapping from paths to labels.  All updates are functional, so
@@ -57,10 +55,6 @@ public class PathMap
 
     public Label RV() { return get(Path.RV); }
     public PathMap RV(Label label) { return set(Path.RV, label); }
-
-    public Label exception(Type type) {
-	return get(ts.exceptionPath(type));
-    }
 
     public PathMap exception(Type type, Label label) {
 	return set(ts.exceptionPath(type), label);
