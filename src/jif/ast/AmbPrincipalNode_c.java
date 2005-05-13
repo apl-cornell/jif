@@ -69,10 +69,6 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
     protected Node disambiguateName(AmbiguityRemover ar, String name) throws SemanticException {
         Context c = ar.context();
         VarInstance vi = c.findVariable(name);
-        if (!vi.isCanonical()) {
-            // the instance is not yet ready
-            return this;
-        }
         
         if (vi instanceof JifVarInstance) {
             return varToPrincipal((JifVarInstance) vi, ar);

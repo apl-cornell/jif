@@ -56,10 +56,6 @@ public class JifFormalDel extends JifJL_c
         JifTypeSystem jts = (JifTypeSystem)ar.typeSystem();
         
         
-        if (!n.declType().isCanonical()) {
-            return n;
-        }
-        
         JifLocalInstance li = (JifLocalInstance)n.localInstance();
         if (!isCatchFormal) {
             ArgLabel al = (ArgLabel)li.label();
@@ -85,14 +81,10 @@ public class JifFormalDel extends JifJL_c
                 lblType = jts.labeledType(lblType.position(), jts.unlabel(lblType), al);
                 n = n.type(n.type().type(lblType));                
             }
-            
-            
         }
-
-        
-        if (n.declType().isCanonical()) {
-            li.setType(n.declType());
-        }   
+        li.setFlags(n.flags());
+        li.setName(n.name());
+        li.setType(n.declType());
         
         return n;
     }

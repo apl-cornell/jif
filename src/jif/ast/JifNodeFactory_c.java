@@ -8,8 +8,10 @@ import jif.types.ParamInstance;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
+import polyglot.ext.jl.ast.CanonicalTypeNode_c;
 import polyglot.ext.jl.ast.NodeFactory_c;
 import polyglot.types.Flags;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -40,6 +42,12 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return new JifDisamb_c();
     }
 
+    public CanonicalTypeNode CanonicalTypeNode(Position pos, Type type) {
+        CanonicalTypeNode n = new JifCanonicalTypeNode_c(pos, type);
+        n = (CanonicalTypeNode)n.ext(extFactory().extCanonicalTypeNode());
+        n = (CanonicalTypeNode)n.del(delFactory().delCanonicalTypeNode());
+        return n;
+    }
     public InstTypeNode InstTypeNode(Position pos, TypeNode type, List params) {
         InstTypeNode n = new InstTypeNode_c(pos, type, params);
         n = (InstTypeNode)n.ext(jifExtFactory().extInstTypeNode());

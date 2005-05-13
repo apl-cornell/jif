@@ -23,6 +23,10 @@ public class CanonicalPrincipalNode_c extends PrincipalNode_c implements Canonic
 	this.principal = principal;
     }
     
+    public boolean isDisambiguated() {
+        return true;
+    }    
+
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         LabelTypeCheckUtil.typeCheckPrincipal(tc, principal);        
         return super.typeCheck(tc);
