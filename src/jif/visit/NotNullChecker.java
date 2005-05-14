@@ -131,6 +131,30 @@ public class NotNullChecker extends DataFlow
                 return checkNPE(itemToMap(newItem, succEdgeKeys), n);
             }
         }
+        else if (n instanceof Instanceof) {
+            Instanceof io = (Instanceof)n;
+            Expr e = io.expr();
+            VarInstance vi = null;
+            if (e instanceof Local) {
+                vi = ((Local)e).localInstance();
+            }
+            else if (e instanceof Field && 
+                       ((Field)e).target() instanceof Special &&
+                       ((Field)e).fieldInstance().flags().isFinal()) {
+                vi = ((Field)e).fieldInstance();
+            }
+            if (vi != null) {                        
+                // on the true branch of an instanceof, we know that
+                // the local (or final field of this) is not null
+                // e.g., if (o instanceof String) { /* o is not null */ }
+                Set trueBranch = new HashSet(dfIn.notNullVars);
+
+                trueBranch.add(vi);
+
+                return itemsToMap(new DataFlowItem(trueBranch), 
+                                  dfIn, dfIn, succEdgeKeys);
+            }
+        }
         else if (n instanceof Assign) {
             Assign x = (Assign)n; 
             if (x.left() instanceof Local) {
@@ -148,7 +172,7 @@ public class NotNullChecker extends DataFlow
                 }
             }
         }
-        if (n instanceof Binary && 
+        else if (n instanceof Binary && 
                 (Binary.EQ.equals(((Binary)n).operator()) || 
                     Binary.NE.equals(((Binary)n).operator()))) {
             Binary b = (Binary)n;

@@ -177,6 +177,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	NullExcept13.jif (Semantic, "NullPointerException.*must .* be caught") ;
 	NullExcept14.jif ;
 	NullExcept15.jif (Semantic, "NullPointerException.*must .* be caught") ;
+	NullExcept16.jif ;
+	NullExcept17.jif (Semantic, "NullPointerException.*must .* be caught") ;
 	PairList.jif  List.jif;
 	PairList2.jif ;
 	Params1.jif ;
