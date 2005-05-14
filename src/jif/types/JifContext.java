@@ -51,6 +51,11 @@ public interface JifContext extends Context {
      */
     void addActsFor(Principal p1, Principal p2);
     /**
+     * Adds the assertion to this context, and all outer contexts up to
+     * the method/constructor/initializer level
+     */
+    void addDefinitionalActsFor(Principal p1, Principal p2);
+    /**
      * Test an actsfor relation, using the principal hierarchy. 
      */
     boolean actsFor(Principal p1, Principal p2);

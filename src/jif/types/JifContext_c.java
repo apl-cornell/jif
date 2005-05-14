@@ -115,7 +115,21 @@ public class JifContext_c extends Context_c implements JifContext
     }
     
     public void addActsFor(Principal p1, Principal p2) {
-	env.addActsFor(p1, p2);
+        env.addActsFor(p1, p2);
+    }
+    /**
+     * Adds the assertion to this context, and all outer contexts up to
+     * the method/constructor/initializer level
+     */
+    public void addDefinitionalActsFor(Principal p1, Principal p2) {
+        this.addActsFor(p1, p2);
+        JifContext_c jc = this;
+        while (!jc.isCode()) {
+            jc = (JifContext_c)jc.pop();
+            if (jc != null) {
+                jc.addActsFor(p1, p2);
+            }            
+        }
     }
     public boolean actsFor(Principal p1, Principal p2) {
         return ph().actsFor(p1, p2);
