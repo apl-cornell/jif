@@ -2,14 +2,11 @@ package jif.types.label;
 
 import java.util.Set;
 
-import jif.types.JifLocalInstance;
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
 import polyglot.types.*;
-import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /**
@@ -46,7 +43,6 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     public boolean isCanonical() { return true; }
     public boolean isDisambiguated() { return upperBound != null && upperBound.isDisambiguated(); }
     public boolean isEnumerable() { return true; }
-    public Set variables() { return upperBound.variables(); }
     
     public boolean equalsImpl(TypeObject o) {
         if (! (o instanceof ArgLabel_c)) {
@@ -89,17 +85,24 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     }
  
     public Label subst(LabelSubstitution substitution) throws SemanticException {
-        Label newBound = upperBound.subst(substitution);
-        
-        if (newBound != upperBound) {
-            JifTypeSystem ts = (JifTypeSystem)typeSystem();
-            ArgLabel newLabel = ts.argLabel(this.position(), vi);
-            newLabel.setUpperBound(newBound);
-            return substitution.substLabel(newLabel);        
+        ArgLabel lbl = this;
+        if (!substitution.stackContains(this)) {
+            substitution.pushLabel(this);
+            Label newBound = lbl.upperBound().subst(substitution);
+            
+            if (newBound != lbl.upperBound()) {
+                JifTypeSystem ts = (JifTypeSystem)typeSystem();
+                lbl = ts.argLabel(lbl.position(), lbl.formalInstance());
+                lbl.setUpperBound(newBound);
+            }
+            substitution.popLabel(this);
         }
         else {
-            return substitution.substLabel(this);
+            // the stack already contains this label, so don't call the 
+            // substitution recursively
         }
+        return substitution.substLabel(lbl);
+
     }
     
     

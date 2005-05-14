@@ -4,13 +4,9 @@ import java.util.*;
 
 import jif.translate.*;
 import jif.types.*;
-import jif.types.JifTypeSystem;
 import polyglot.ast.Expr;
 import polyglot.ext.jl.types.TypeObject_c;
 import polyglot.types.*;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeObject;
-import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -48,8 +44,15 @@ public abstract class Label_c extends TypeObject_c implements Label
         return !variables().isEmpty();
     }
 
-    public Set variables() {
-        return Collections.EMPTY_SET;
+    public final Set variables() {
+        LabelVarGatherer lvg = new LabelVarGatherer();
+        try {
+            this.subst(lvg);
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError(e);
+        }        
+        return lvg.variables;
     }
     
     public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
@@ -136,5 +139,19 @@ public abstract class Label_c extends TypeObject_c implements Label
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         return ts.pathMap().N(A.pc()).NV(A.pc());
     }        
+
+    /**
+     * TODO Documentation 
+     */
+    private static class LabelVarGatherer extends LabelSubstitution {
+        private final Set variables = new HashSet();
+        public Label substLabel(Label L) throws SemanticException {
+            if (L instanceof VarLabel) { 
+                variables.add(L);
+            }
+            return L;
+        }
+        
+    }
     
 }

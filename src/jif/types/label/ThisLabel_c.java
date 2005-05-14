@@ -1,17 +1,12 @@
 package jif.types.label;
 
-import java.util.Collections;
 import java.util.Set;
 
 import jif.types.*;
-import jif.types.JifLocalInstance;
-import jif.types.JifTypeSystem;
-import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeObject;
 import polyglot.util.Position;
 
 public class ThisLabel_c extends Label_c implements ThisLabel {
@@ -31,7 +26,6 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
     public boolean isCanonical() { return true; }
     public boolean isDisambiguated() { return true; }
     public boolean isEnumerable() { return true; }
-    public Set variables() { return Collections.EMPTY_SET; }
     
     public JifClassType classType() {
         return ct;

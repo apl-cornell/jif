@@ -1,15 +1,13 @@
 package jif.types.label;
 
-import java.util.Collections;
 import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
-import polyglot.util.*;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** An implementation of the <code>VarLabel</code> interface. 
  */
@@ -33,8 +31,6 @@ public class VarLabel_c extends Label_c implements VarLabel {
     public boolean isDisambiguated() { return true; }     
     public boolean isRuntimeRepresentable() { return false; }
     public boolean isCovariant() { return false; }
-    
-    public Set variables() { return Collections.singleton(this); }
     
     public String componentString(Set printedLabels) {
         if (Report.should_report(Report.debug, 2)) { 

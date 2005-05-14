@@ -76,7 +76,6 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Constraints1.jif ;
 	Constraints3.jif ;
 	Constraints5.jif ;
-	/* KNOWN BAD: tries to translate an "all-runtime" label Constraints7.jif ; */
 	ConstructorTest.jif ;
 	Declassify.jif ;
 	Default1.jif ;
@@ -98,7 +97,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	DynPrin7.jif ;
 	DynPrin8.jif (Syntax);
 	DynPrin9.jif ;
-	DynPrin10.jif ;
+	DynPrin10.jif ; 
+	DynPrin11.jif (Semantic, "actual argument is more restrictive");
 	DynLabel1.jif ;
 	DynLabel2.jif (Semantic, "Non-final.*access path"), (Semantic, "Non-final.*access path");
 	DynLabel3.jif (Semantic, "Field.*is not final"), (Semantic, "Field.*is not final");

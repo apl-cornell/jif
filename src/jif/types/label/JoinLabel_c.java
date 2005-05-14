@@ -91,15 +91,6 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     public boolean isEnumerable() {
         return true;
     }
-    public Set variables() {
-        Set s = new HashSet();
-        for (Iterator i = components.iterator(); i.hasNext(); ) {
-            Label c = (Label) i.next();
-            s.addAll(c.variables());
-        }
-        
-        return s;
-    }
     
     public boolean equalsImpl(TypeObject o) {
         return this == o; // @@@@@????
@@ -238,10 +229,10 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     }
 
     public Label subst(LabelSubstitution substitution) throws SemanticException {        
-        if (components.isEmpty()) {
+        if (components.isEmpty() || substitution.stackContains(this)) {
             return substitution.substLabel(this);
         }
-        
+        substitution.pushLabel(this);
         boolean changed = false;
         Set s = new LinkedHashSet();
         
@@ -251,6 +242,8 @@ public class JoinLabel_c extends Label_c implements JoinLabel
             if (newc != c) changed = true;
             s.add(newc);
         }
+        
+        substitution.popLabel(this);
         
         if (!changed) return substitution.substLabel(this);
         
