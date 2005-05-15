@@ -1,0 +1,29 @@
+// Test implementations of jif.lang.Principal
+class TestPrincipal extends AbstractPrincipal {
+    public TestPrincipal(String{this} name) {
+	super(name);
+    }
+
+    public boolean{authPrf; closure; lb; this} isAuthorized(Object authPrf, 
+                                                     Closure[this, lb] closure,
+                                                     label lb) {
+        // allow only Test closures
+        return closure instanceof TestClosure[this];
+    }
+    
+}
+
+class TestClosure[principal P] implements Closure[P, {P:}] authority (P) {
+    public Object{this} invoke{P:}() where authority (P) {
+	final Principal p = P;
+	if (p instanceof TestPrincipal) {
+	    try {
+		final TestPrincipal tp = (TestPrincipal)p;
+		tp.addDelegatesTo(Alice);
+	    }
+	    catch (ClassCastException impossbile) {}
+	    //catch (NullPointerException impossbile) {}
+	}
+	return null;
+    }
+}

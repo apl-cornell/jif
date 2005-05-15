@@ -255,11 +255,17 @@ public class JifTypeSystem_c
     public boolean isCastValid(Type fromType, Type toType) {
         Type strpFromType = strip(fromType);
         Type strpToType = strip(toType);
-        
+                
+        // can cast from "principal" to "jif.lang.Principal"
         if (Principal().equals(strpFromType) && PrincipalClass().equals(strpToType)) {
             return true;
         }
-        
+
+        // can cast from any subtype of "jif.lang.Principal" to "principal"
+        if (Principal().equals(strpToType) && isSubtype(strpFromType, PrincipalClass())) {
+            return true;
+        }
+
         return super.isCastValid(strpFromType, strpToType);
     }
 
@@ -267,6 +273,12 @@ public class JifTypeSystem_c
         Type strpFromType = strip(fromType);
         Type strpToType = strip(toType);
         
+        // can cast from "principal" to "jif.lang.Principal"
+        if (Principal().equals(strpFromType) && PrincipalClass().equals(strpToType)) {
+            return true;
+        }
+
+        // can cast from any subtype of "jif.lang.Principal" to "principal"
         if (Principal().equals(strpToType) && isSubtype(strpFromType, PrincipalClass())) {
             return true;
         }

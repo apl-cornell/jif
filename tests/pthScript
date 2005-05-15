@@ -48,6 +48,10 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	ActsFor13.jif ;
 	ActsFor14.jif ;
 	ActsFor15.jif (Semantic, "not less restrictive");
+	ActsFor16.jif (Semantic, "Only a final access path"),
+		      (Semantic, "Only a final access path");
+	ActsFor17.jif (Semantic, "Non-final local variable"),
+		      (Semantic, "Non-final local variable");
 	ArgLabelSubst.jif ;
 	ArgLabelSubst2.jif ;
 	Array.jif ;
@@ -56,6 +60,14 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Array3.jif ;
 	ArrayLeak.jif (Semantic, "not a subtype") ;
 	ArrayLeak2.jif (Semantic, "not a subtype") ;
+	Authority01.jif ;
+	Authority02.jif ;
+	Authority03.jif ;
+	Authority04.jif (Semantic, "type of a dynamic principal must be"),
+	                (Semantic, "type of a dynamic principal must be") ;
+	Authority05.jif (Semantic, "Cannot cast the expression of type"),
+	                (Semantic, "Cannot cast the expression of type"),
+	                (Semantic, "Cannot cast the expression of type");
 	BadNullExcept1.jif (Semantic, "NullPointerException.*must .* be caught") ;
 	BadNullExcept2.jif (Semantic, "NullPointerException.*must .* be caught") ;
 	BadNullExcept3.jif (Semantic, "NullPointerException.*must .* be caught") ;

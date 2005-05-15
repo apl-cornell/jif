@@ -15,7 +15,7 @@ public class AccessPathUninterpreted extends AccessPathRoot {
     
     public boolean isCanonical() { return true; }
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
-        return e;
+        return this;
     }
     
     public String toString() {

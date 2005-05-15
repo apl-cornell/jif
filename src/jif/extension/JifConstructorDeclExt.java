@@ -247,7 +247,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         // deal with label and principal fields being initialzed 
         if (assFi.flags().isFinal() && 
-                (ts.isLabel(assFi.type()) || ts.isPrincipal(assFi.type())) && 
+                (ts.isLabel(assFi.type()) || ts.isImplicitCastValid(assFi.type(), ts.Principal())) && 
                 JifUtil.isFinalAccessExprOrConst(ts, ass.right())) {
             
             if (ts.isLabel(assFi.type())) {

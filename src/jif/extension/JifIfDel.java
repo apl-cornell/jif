@@ -4,9 +4,7 @@ import jif.ast.*;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
-import polyglot.ast.Binary;
-import polyglot.ast.If;
-import polyglot.ast.Node;
+import polyglot.ast.*;
 import polyglot.types.SemanticException;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeChecker;
@@ -23,12 +21,28 @@ public class JifIfDel extends JifJL_c {
         If ifNode = (If)node();
         if (ifNode.cond() instanceof Binary && ((Binary)ifNode.cond()).operator() == JifBinaryDel.ACTSFOR) {
             // replace the "if (.. actsfor ..) { ... } else { ... }" node with
-            // an actsfor node.
+            // an actsfor node.            
             JifNodeFactory nf = (JifNodeFactory)ar.nodeFactory();
             JifTypeSystem ts = (JifTypeSystem)ar.typeSystem();
             Binary b = (Binary)ifNode.cond();
-            Principal actor= JifUtil.exprToPrincipal(ts, b.left(), (JifContext)ar.context());
-            Principal granter = JifUtil.exprToPrincipal(ts, b.right(), (JifContext)ar.context());
+            Expr left = b.left();
+            Expr right = b.right();
+            
+            if (!JifUtil.isFinalAccessExprOrConst(ts, left)) {
+                throw new SemanticException("Only a final access path, " +
+                                            "principal parameter or a constant principal can " +
+                                            "be used as an operand to actsfor.", 
+                        left.position());
+            }
+            if (!JifUtil.isFinalAccessExprOrConst(ts, right)) {
+                throw new SemanticException("Only a final access path, " +
+                        "principal parameter or a constant principal can " +
+                        "be used as an operand to actsfor.", 
+                        right.position());
+            }
+            
+            Principal actor= JifUtil.exprToPrincipal(ts, left, (JifContext)ar.context());
+            Principal granter = JifUtil.exprToPrincipal(ts, right, (JifContext)ar.context());
             return nf.ActsFor(ifNode.position(), actor, granter, ifNode.consequent(), ifNode.alternative());
         }
         return super.disambiguate(ar);
@@ -52,7 +66,7 @@ public class JifIfDel extends JifJL_c {
                 else {
                     if (!JifUtil.isFinalAccessExprOrConst(ts, b.left())) {
                         throw new SemanticException(
-                                "An expression used in a label test must be either a final access path or a \"new label\"",
+                                "An expression used in a label test must be either a final access path, principal parameter or a constant principal",
                                 b.left().position());
                     }
                     lhs = nf.LabelExpr(b.left().position(), 

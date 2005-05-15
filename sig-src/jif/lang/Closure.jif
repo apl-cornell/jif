@@ -12,8 +12,8 @@ package jif.lang;
 public interface Closure[principal P, label L] authority(P) {
     /**
      * The code that requires the authority of the principal P.
-     * The label {L; this} is a lower bound on the side-effects
+     * The label {L} is a lower bound on the side-effects
      * of the code.
      */
-	Object{this} invoke{L; this}() where caller(P);
+	Object{this} invoke{L}() where caller(P);
 }
