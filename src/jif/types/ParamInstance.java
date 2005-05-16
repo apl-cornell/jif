@@ -1,7 +1,7 @@
 package jif.types;
 
 import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.util.Enum;
 
 /** A parameter instance. A wrapper of all the type information 
  *  related to a label/principal parameter. 

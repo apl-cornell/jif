@@ -1,6 +1,6 @@
 package jif.types;
 
-import polyglot.util.*;
+import polyglot.util.Enum;
 
 /** A control flow path. 
  */
