@@ -126,7 +126,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
             Lr = ts.bottomLabel(ci.position());
         }
 
-        A.setConstructorReturnLabel(JifInstantiator.subst(Lr));
+        A.setConstructorReturnLabel(Lr);
 
         // stmts is the statements in the constructor body.
         List stmts = new LinkedList();

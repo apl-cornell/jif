@@ -12,15 +12,52 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /**
- * TODO: DOCUMENTATION
+ * This class contains a number of static utility methods to help instantiate
+ * labels, principals and types. Instantiation includes:
+ * <ul>
+ * <li>the substitution of actual parameters for formal parameters in
+ * parametric types;
+ * <li>the substitution of receiver labels for the "this" label;
+ * <li>the substitution of actual arg labels for the formal arg labels;
+ * <li>the substitution of the receiver expression for dynamic labels and
+ * principals mentioning the "this" access path;
+ * <li>the substitution of the actual argument expressions for dynamic labels
+ * and principals mentioning formal arguments in their access path.
+ * </ul>
  */
 public class JifInstantiator
 {
-    private static Label instantiate(Label L, ReferenceType receiverType, List formalArgLabels, List actualArgLabels, List actualArgExprs, List actualParamLabels, JifContext callerContext) {
+    private JifInstantiator() {}
+    
+    /**
+     * Perform instantiation on the label L
+     *  
+     * @param L the Label to substitute
+     * @param receiverType
+     * @param formalArgLabels List of ArgLabels, the labels of the formal
+     *            arguments of the procedure being called
+     * @param actualArgLabels List of Labels, the labels of the actuals
+     *            arguments of the procedure being called
+     * @param actualArgExprs List of Exprs, the actual arguments.
+     * @param actualParamLabels List of Labels, the label of the evaluation of
+     *            the actual parameters. These are only really needed for static
+     *            methods (including constructors), where the actual parameters
+     *            need to be evaluated at runtime.
+     * @param callerContext the context of the caller of the method
+     * @return the instantiated Label
+     */
+    private static Label instantiate(Label L, 
+                                     ReferenceType receiverType, 
+                                     List formalArgLabels, 
+                                     List actualArgLabels, 
+                                     List actualArgExprs, 
+                                     List actualParamLabels, 
+                                     JifContext callerContext) {
         if (formalArgLabels.size() != actualArgLabels.size() || 
                 (actualArgExprs != null && formalArgLabels.size() != actualArgExprs.size())) {
             throw new InternalCompilerError("Inconsistent sized lists of args");
         }
+        JifTypeSystem ts = (JifTypeSystem)receiverType.typeSystem();
         if (L != null) {
             // go through each formal arglabel, and replace it appropriately...
             Iterator iArgLabels = formalArgLabels.iterator();
@@ -44,14 +81,14 @@ public class JifInstantiator
                     Expr actualExpr = (Expr)iActualArgExprs.next();
                 
                     try {
-                        Position pos = Position.COMPILER_GENERATED;
-                        if (actualExpr != null) {
-                            pos = actualExpr.position();
-                        }
+                        Position pos = actualExpr.position();
                         AccessPathRoot root = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), pos);                            
-                        AccessPath target = new AccessPathUninterpreted(pos);
-                        if (actualExpr != null) {
+                        AccessPath target;
+                        if (JifUtil.isFinalAccessExprOrConst(ts, actualExpr)) {
                             target = JifUtil.exprToAccessPath(actualExpr, callerContext);
+                        }
+                        else {
+                            target = new AccessPathUninterpreted(pos);                            
                         }
                         L = L.subst(new AccessPathInstantiator(root, target));
                     }
@@ -71,7 +108,6 @@ public class JifInstantiator
             // of parameterized classes, but no harm in always instantiating them.
             if (!actualParamLabels.isEmpty()) {
                 // go through the formal params, and the actual param labels.
-                JifTypeSystem ts = (JifTypeSystem)receiverType.typeSystem();
                 JifSubstType jst = (JifSubstType)receiverType;
                 JifPolyType jpt = (JifPolyType)jst.base();
                 Iterator iFormalParams = jpt.params().iterator();
@@ -100,13 +136,30 @@ public class JifInstantiator
     }
     
     /**
-     * replaces any signature ArgLabels in p with the appropriate label, and
-     * replaces any signature ArgPrincipal with the appropriate prinicipal. 
-     */        
-    private static Principal instantiate(Principal p, ReferenceType receiverType, List formalArgLabels, List actualArgExprs, List actualParamLabels, JifContext callerContext) {
+     * Perform instantiation on the principal p
+     *  
+     * @param p the principal to substitute
+     * @param receiverType
+     * @param formalArgLabels List of ArgLabels, the labels of the formal
+     *            arguments of the procedure being called
+     * @param actualArgExprs List of Exprs, the actual arguments.
+     * @param actualParamLabels List of Labels, the label of the evaluation of
+     *            the actual parameters. These are only really needed for static
+     *            methods (including constructors), where the actual parameters
+     *            need to be evaluated at runtime.
+     * @param callerContext the context of the caller of the method
+     * @return the instantiated Label
+     */
+    private static Principal instantiate(Principal p, 
+                                         ReferenceType receiverType, 
+                                         List formalArgLabels, 
+                                         List actualArgExprs, 
+                                         List actualParamLabels, 
+                                         JifContext callerContext) {
         if (formalArgLabels.size() != actualArgExprs.size()) {
             throw new InternalCompilerError("Inconsistent sized lists of args");
         }
+        JifTypeSystem ts = (JifTypeSystem)receiverType.typeSystem();
         if (p != null) {
             // go through each formal arglabel, and replace it appropriately...
             Iterator iArgLabels = formalArgLabels.iterator();
@@ -116,14 +169,14 @@ public class JifInstantiator
                 Expr actualExpr = (Expr)iActualArgExprs.next();
                 
                 try {
-                    Position pos = Position.COMPILER_GENERATED;
-                    if (actualExpr != null) {
-                        pos = actualExpr.position();
-                    }
+                    Position pos = actualExpr.position();
                     AccessPathRoot root = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), pos);                            
-                    AccessPath target = new AccessPathUninterpreted(pos);
-                    if (actualExpr != null) {
+                    AccessPath target;
+                    if (JifUtil.isFinalAccessExprOrConst(ts, actualExpr)) {
                         target = JifUtil.exprToAccessPath(actualExpr, callerContext);
+                    }
+                    else {
+                        target = new AccessPathUninterpreted(pos);                            
                     }
                     p = p.subst(new AccessPathInstantiator(root, target));
                 }
@@ -140,7 +193,6 @@ public class JifInstantiator
             // of parameterized classes, but no harm in always instantiating them.
             if (!actualParamLabels.isEmpty()) {
                 // go through the formal params, and the actual param labels.
-                JifTypeSystem ts = (JifTypeSystem)receiverType.typeSystem();
                 JifSubstType jst = (JifSubstType)receiverType;
                 JifPolyType jpt = (JifPolyType)jst.base();
                 Iterator iFormalParams = jpt.params().iterator();
@@ -169,22 +221,16 @@ public class JifInstantiator
         return p;   
     }
 
-    /**     
-     * TODO Documentation
+    /**
+     * Perform instantiation on the label L
+     *  
+     * @param L the Label to substitute
+     * @param A the context of the caller of the method
+     * @param receiverExpr the receiver expression, e.g., "e" in "e.m()".
+     * @param receiverType the type of the receiver
+     * @param receiverLbl the label of the receiver expression
+     * @return the instantiated Label
      */
-    public static Label subst(Label L) {
-        if (L == null) return L;
-
-        ThisLabelAndParamInstantiator labelInstantiator = new ThisLabelAndParamInstantiator(null, null);
-        try {
-            return L.subst(labelInstantiator);
-        }
-        catch (SemanticException e) {
-            throw new InternalCompilerError("Unexpected SemanticException " +
-                                            "during label substitution: " + e.getMessage(), L.position());
-        }
-    }
-    
     public static Label instantiate(Label L, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         AccessPath receiverPath;
@@ -197,10 +243,15 @@ public class JifInstantiator
         return instantiate(L, A, receiverPath, receiverType, receiverLbl);
     }
 
-        /**
-     * Replace this this access path with an appropraite access path for the
-     * receiver expression
-     * TODO Documentation
+    /**
+     * Perform instantiation on the label L
+     *  
+     * @param L the Label to substitute
+     * @param A the context of the caller of the method
+     * @param receiverPath the access path of the receiver expression, e.g., "e" in "e.m()".
+     * @param receiverType the type of the receiver
+     * @param receiverLbl the label of the receiver expression
+     * @return the instantiated Label
      */
     public static Label instantiate(Label L, JifContext A, AccessPath receiverPath, ReferenceType receiverType, Label receiverLbl) {
         if (L == null) return L;
@@ -227,18 +278,54 @@ public class JifInstantiator
         return L;
     }
 
-    public static Label instantiate(Label L, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs, List actualParamLabels) throws SemanticException {
+    /**
+     * Perform instantiation on the label L
+     *  
+     * @param L the Label to substitute
+     * @param A the context of the caller of the method
+     * @param receiverExpr the receiver expression, e.g., "e" in "e.m()".
+     * @param receiverType the type of the receiver
+     * @param receiverLbl the label of the receiver expression
+     * @param formalArgLabels List of ArgLabels, the labels of the formal
+     *            arguments of the procedure being called
+     * @param actualArgLabels List of Labels, the labels of the actuals
+     *            arguments of the procedure being called
+     * @param actualArgExprs List of Exprs, the actual arguments.
+     * @param actualParamLabels List of Labels, the label of the evaluation of
+     *            the actual parameters. These are only really needed for static
+     *            methods (including constructors), where the actual parameters
+     *            need to be evaluated at runtime.
+     * @return the instantiated Label
+     */
+    public static Label instantiate(Label L, 
+                                    JifContext A, 
+                                    Expr receiverExpr, 
+                                    ReferenceType receiverType, 
+                                    Label receiverLbl, 
+                                    List formalArgLabels, 
+                                    List actualArgLabels, 
+                                    List actualArgExprs, 
+                                    List actualParamLabels) throws SemanticException {
         L = instantiate(L, A, receiverExpr, receiverType, receiverLbl);
-        return instantiate(L, receiverType, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels, A);
+        return instantiate(L, receiverType, formalArgLabels, actualArgLabels, actualArgExprs, actualParamLabels, A);
     }
 
     /**
-     * Replace this this access path with an appropraite access path for the
-     * receiver expression
-     * TODO Documentation
+     * Perform instantiation on the principal p
+     *  
+     * @param p the principal to substitute
+     * @param A the context of the caller of the method
+     * @param receiverExpr the receiver expression, e.g., "e" in "e.m()".
+     * @param receiverType the type of the receiver
+     * @param receiverLbl the label of the receiver expression
+     * @return the instantiated principal
      * @throws SemanticException
      */
-    private static Principal instantiate(Principal p, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) throws SemanticException {
+    private static Principal instantiate(Principal p, 
+                                         JifContext A, 
+                                         Expr receiverExpr, 
+                                         ReferenceType receiverType, 
+                                         Label receiverLbl) throws SemanticException {
         if (p == null) return p;
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
 
@@ -270,23 +357,67 @@ public class JifInstantiator
         }
         return p;
     }
-    public static Principal instantiate(Principal p, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgExprs, List actualParamLabels) throws SemanticException {
+
+    /**
+     * Perform instantiation on the principal p
+     *  
+     * @param p the principal to instantiate
+     * @param A the context of the caller of the method
+     * @param receiverExpr the receiver expression, e.g., "e" in "e.m()".
+     * @param receiverType the type of the receiver
+     * @param receiverLbl the label of the receiver expression
+     * @param formalArgLabels List of ArgLabels, the labels of the formal
+     *            arguments of the procedure being called
+     * @param actualArgExprs List of Exprs, the actual arguments.
+     * @param actualParamLabels List of Labels, the label of the evaluation of
+     *            the actual parameters. These are only really needed for static
+     *            methods (including constructors), where the actual parameters
+     *            need to be evaluated at runtime.
+     * @return the instantiated principal
+     */
+    public static Principal instantiate(Principal p, 
+                                        JifContext A, 
+                                        Expr receiverExpr, 
+                                        ReferenceType receiverType, 
+                                        Label receiverLbl, 
+                                        List formalArgLabels, 
+                                        List actualArgExprs, 
+                                        List actualParamLabels) throws SemanticException {
         p = instantiate(p, A, receiverExpr, receiverType, receiverLbl);
-        return instantiate(p, receiverType, formalArgs, actualArgExprs, actualParamLabels, A);
+        return instantiate(p, receiverType, formalArgLabels, actualArgExprs, actualParamLabels, A);
     }
 
-    public static Type instantiate(Type t, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs, List actualParamLabels) throws SemanticException {
+    /**
+     * Perform instantiation on the type t
+     *  
+     * @param t the Type to substitute
+     * @param A the context of the caller of the method
+     * @param receiverExpr the receiver expression, e.g., "e" in "e.m()".
+     * @param receiverType the type of the receiver
+     * @param receiverLbl the label of the receiver expression
+     * @param formalArgLabels List of ArgLabels, the labels of the formal
+     *            arguments of the procedure being called
+     * @param actualArgLabels List of Labels, the labels of the actuals
+     *            arguments of the procedure being called
+     * @param actualArgExprs List of Exprs, the actual arguments.
+     * @param actualParamLabels List of Labels, the label of the evaluation of
+     *            the actual parameters. These are only really needed for static
+     *            methods (including constructors), where the actual parameters
+     *            need to be evaluated at runtime.
+     * @return the instantiated type
+     */
+    public static Type instantiate(Type t, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgLabels, List actualArgLabels, List actualArgExprs, List actualParamLabels) throws SemanticException {
         t = instantiate(t, A, receiverExpr, receiverType, receiverLbl);
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         if (t instanceof ArrayType) {
             ArrayType at = (ArrayType)t;
             Type baseType = at.base();
-            t = at.base(instantiate(baseType, A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels));
+            t = at.base(instantiate(baseType, A, receiverExpr, receiverType, receiverLbl, formalArgLabels, actualArgLabels, actualArgExprs, actualParamLabels));
         }
         
         if (ts.isLabeled(t)) {
-            Label newL = instantiate(ts.labelOfType(t), A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels);
-            Type newT = instantiate(ts.unlabel(t), A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels);
+            Label newL = instantiate(ts.labelOfType(t), A, receiverExpr, receiverType, receiverLbl, formalArgLabels, actualArgLabels, actualArgExprs, actualParamLabels);
+            Type newT = instantiate(ts.unlabel(t), A, receiverExpr, receiverType, receiverLbl, formalArgLabels, actualArgLabels, actualArgExprs, actualParamLabels);
             t = ts.labeledType(t.position(), newT, newL);
         }
         Type ut = ts.unlabel(t);
@@ -299,10 +430,10 @@ public class JifInstantiator
                 Object arg = e.getValue();
                 Param p;
                 if (arg instanceof Label) {
-                    p = instantiate((Label)arg, A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels);
+                    p = instantiate((Label)arg, A, receiverExpr, receiverType, receiverLbl, formalArgLabels, actualArgLabels, actualArgExprs, actualParamLabels);
                 }
                 else if (arg instanceof Principal) {
-                    p = instantiate((Principal)arg, A, receiverExpr, receiverType, receiverLbl, formalArgs, actualArgExprs, actualParamLabels);
+                    p = instantiate((Principal)arg, A, receiverExpr, receiverType, receiverLbl, formalArgLabels, actualArgExprs, actualParamLabels);
                 }
                 else {
                     throw new InternalCompilerError(
@@ -330,6 +461,16 @@ public class JifInstantiator
         return t;
     }
     
+    /**
+     * Perform instantiation on the type t
+     *  
+     * @param t the Type to substitute
+     * @param A the context of the caller of the method
+     * @param receiverExpr the receiver expression, e.g., "e" in "e.m()".
+     * @param receiverType the type of the receiver
+     * @param receiverLbl the label of the receiver expression
+     * @return the instantiated type
+     */
     public static Type instantiate(Type t, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         if (t instanceof JifSubstType) {
@@ -369,6 +510,11 @@ public class JifInstantiator
         return t;
     }    
 
+    /**
+     * Replaces the "this" label with receiverLabel, and uses
+     * receiverType to perform substitution of actual parameters for formal 
+     * parameters of a parameterized type.
+     */
     private static class ThisLabelAndParamInstantiator extends LabelSubstitution {
         private Label receiverLabel;
         private Type receiverType;
@@ -400,6 +546,10 @@ public class JifInstantiator
         }
 
     }
+    
+    /**
+     * Replaces srcLabel with trgLabel 
+     */
     private static class LabelInstantiator extends LabelSubstitution {
         private Label srcLabel;
         private Label trgLabel;
@@ -416,6 +566,9 @@ public class JifInstantiator
         }
     }
 
+    /**
+     * Replaces srcRoot with trgPath in dynamic labels and principals 
+     */
     private static class AccessPathInstantiator extends LabelSubstitution {
         private AccessPathRoot srcRoot;
         private AccessPath trgPath;

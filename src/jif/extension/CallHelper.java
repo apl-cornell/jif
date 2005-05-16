@@ -2,7 +2,9 @@ package jif.extension;
 
 import java.util.*;
 
-import jif.ast.*;
+import jif.ast.JifInstantiator;
+import jif.ast.JifUtil;
+import jif.ast.Jif_c;
 import jif.types.*;
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
@@ -12,7 +14,9 @@ import polyglot.ast.Expr;
 import polyglot.ast.Receiver;
 import polyglot.main.Report;
 import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.StringUtil;
 
 /**
  * This is a tool to label check method calls.
@@ -72,11 +76,6 @@ public class CallHelper
      * Labels of the actual parameters.
      */
     private List actualParamLabels;
-
-    /**
-     * Exprs of the actual arguments that are final expressions.
-     */
-    private List actualArgExprs;
 
     /**
      * The PathMap for the procedure call.
@@ -241,29 +240,8 @@ public class CallHelper
     }
 
     /**
-     * Return the elements of the List args that are final expressions.
-     * The returned list is the same size as args, and any args that are
-     * not final expressions have an entry in the returned list of null.
-     *
-     *
-     */
-    private void buildActualArgExprs(JifTypeSystem ts) throws SemanticException {
-        this.actualArgExprs = new ArrayList(actualArgs.size());
-
-        for (Iterator j = actualArgs.iterator(); j.hasNext();) {
-            Expr Ej = (Expr)j.next();
-            if (JifUtil.isFinalAccessExprOrConst(ts, Ej)){
-                actualArgExprs.add(Ej);
-            }
-            else {
-                // @@@@@Use uniterpreted accesspath?
-                actualArgExprs.add(null);
-            }
-        }
-    }
-
-    /**
-     * ???@@@@@
+     * Add constraints to ensure that the labels of the actual arguments
+     * are less than the upper bounds of the formal arguments.
      */
     private void constrainArguments(LabelChecker lc) throws SemanticException {
         JifContext A = lc.jifContext();
@@ -340,14 +318,17 @@ public class CallHelper
     }
 
     /**
-     * Returns the instantiated return label or the bottom label if the return
-     * label is not defined.
+     * Returns the instantiated return label.
      * @throws SemanticException
      */
     private Label resolveReturnLabel(JifContext A) throws SemanticException {
         return instantiate(A, pi.returnLabel());
     }
 
+    /**
+     * Returns the instantiated return value label joined with returnLabel.
+     * @throws SemanticException
+     */
     private Label resolveReturnValueLabel(JifContext A, Label returnLabel) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         Label L = null;
@@ -394,8 +375,6 @@ public class CallHelper
 
         JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.typeSystem();
-
-        buildActualArgExprs(ts);
 
         // A |- call-begin(ct, args, mti)
         if (shouldReport(4)) report(4, ">>>>> call-begin");
@@ -560,6 +539,7 @@ public class CallHelper
             }
         }
     }
+    
     private static List getArgLabelsFromFormalTypes(List formalTypes, JifTypeSystem jts) {
         List formalArgLabels = new ArrayList(formalTypes.size());
         for (Iterator iter = formalTypes.iterator(); iter.hasNext(); ) {
@@ -569,11 +549,12 @@ public class CallHelper
         }
         return formalArgLabels;
     }
+    
     private Label instantiate(JifContext A, Label L) throws SemanticException {
         return JifInstantiator.instantiate(L, A, receiverExpr, calleeContainer, receiverLabel,
                                            getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem()),
                                            this.actualArgLabels,
-                                           this.actualArgExprs,
+                                           this.actualArgs,
                                            this.actualParamLabels);
     }
 
@@ -586,14 +567,14 @@ public class CallHelper
     private Principal instantiate(JifContext A, Principal p) throws SemanticException {
         return JifInstantiator.instantiate(p, A, receiverExpr, calleeContainer, receiverLabel,
                                            getArgLabelsFromFormalTypes(this.pi.formalTypes(), (JifTypeSystem)this.pi.typeSystem()),
-                                           this.actualArgExprs,
+                                           this.actualArgs,
                                            this.actualParamLabels);
     }
     private Type instantiate(JifContext A, Type t) throws SemanticException {
         return JifInstantiator.instantiate(t, A, receiverExpr, calleeContainer, receiverLabel,
                                            getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem()),
                                            this.actualArgLabels,
-                                           this.actualArgExprs,
+                                           this.actualArgs,
                                            this.actualParamLabels);
     }
 }
