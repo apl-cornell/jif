@@ -7,31 +7,31 @@ import java.util.Set;
 import jif.translate.JifToJavaRewriter;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
+import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 
-/** 
+/**
  * This class represents the Jif security label.
  */
-public interface Label extends Param
-{
+public interface Label extends Param {
     /**
      * Is this label equivalent to bottom?
      * <p>
-     * For example, a JoinLabel with no components would return true for this 
+     * For example, a JoinLabel with no components would return true for this
      * method.
      */
     boolean isBottom();
-    
+
     /**
      * Is this label equivalent to top?
      * <p>
-     *  For example, a JoinLabel with two components, one of which is Top, would 
-     *  return true for this method.
+     * For example, a JoinLabel with two components, one of which is Top, would
+     * return true for this method.
      */
-    boolean isTop(); 
-    
+    boolean isTop();
+
     /**
      * Is this label invariant?
      */
@@ -42,23 +42,23 @@ public interface Label extends Param
      */
     boolean isCovariant();
 
-    /** 
-     * Returns the join of this label and L. 
+    /**
+     * Returns the join of this label and L.
      */
     Label join(Label L);
-    
+
     /**
      * Is this label comparable to other labels?
      * <p>
-     * For example, an UnknownLabel is not comparable to others, neither is a VarLabel.
-     * Most other labels are. 
+     * For example, an UnknownLabel is not comparable to others, neither is a
+     * VarLabel. Most other labels are.
      */
     boolean isComparable();
-    
+
     String description();
-    
-    void  setDescription(String d);
-    
+
+    void setDescription(String d);
+
     /**
      * @param labelSubst
      * @return
@@ -67,46 +67,62 @@ public interface Label extends Param
     Label subst(LabelSubstitution labelSubst) throws SemanticException;
 
     /**
-     * TODO DOCO 
-     * @param A
-     * @return
+     * Label check the label, which will determine how much information may be
+     * gained if the label is evaluated at runtime. For example, given the
+     * dynamic label {*lb}, where lb is a local variable, evaluation of this
+     * label at runtime will reveal as much information as the label of lb. For
+     * example, the following code is illegal, as the runtime evaluation of the
+     * label reveals too much information
+     * <pre>
+     * boolean{Alice:} secret = ...;
+     * final label{Alice:} lb = secret?new label{}:new label{Bob:};
+     * boolean{} leak = false;
+     * if ((*lb} <= new label{}) { // evaluation of lb reveals 
+     *                          // information at level {Alice:} 
+     *    leak = true;
+     * } 
+     * </pre>
+     * 
+     * @see jif.ast.Jif#labelCheck(LabelChecker)
+     * @see jif.types.principal.Principal#labelCheck(JifContext)
      */
     PathMap labelCheck(JifContext A);
 
     /**
      * Are the components of this label enumerable?
      * <p>
-     * For example, Singletons are enumerable, JoinLabels are enumerable, RuntimeLabel
-     * (the label of all runtime representable components) is not enumerable. 
+     * For example, Singletons are enumerable, JoinLabels are enumerable,
+     * RuntimeLabel (the label of all runtime representable components) is not
+     * enumerable.
      * 
-     * NOTE: The components of a label are not neccessarily stuck together
-     * with a join operation. For example, the MeetLabel uses the meet 
-     * operation between its components.
+     * NOTE: The components of a label are not neccessarily stuck together with
+     * a join operation. For example, the MeetLabel uses the meet operation
+     * between its components.
      */
     boolean isEnumerable();
-    
+
     /**
      * Are the components of this label all disambiguated?
      */
     boolean isDisambiguated();
 
     /**
-     * Retrieve the collection of components. This method should only
-     * be called if isEnumerable returns true.
+     * Retrieve the collection of components. This method should only be called
+     * if isEnumerable returns true.
      * 
      * This collection should not be modified.
      */
     Collection components();
-    
+
     /**
      * Does this label represent only a single label?
      * <p>
-     * For example, a JoinLabel with more than one component returns false, a MeetLabel
-     * with more than one component returns false, most other Labels return 
-     * true.
+     * For example, a JoinLabel with more than one component returns false, a
+     * MeetLabel with more than one component returns false, most other Labels
+     * return true.
      */
     boolean isSingleton();
-    
+
     /**
      * Retrieve the singleton component that this label represents. Should only
      * be called is isSingleton returns true.
@@ -114,42 +130,42 @@ public interface Label extends Param
     Label singletonComponent();
 
     Label simplify();
-    
+
     /**
-     * Does the label contain any variables, that is, labels of type 
-     * VarLabel?
+     * Does the label contain any variables, that is, labels of type VarLabel?
      */
     boolean hasVariables();
-    
+
     /**
-     * The set of variables that this contains, i.e., labels of type 
-     * VarLabel?
+     * The set of variables that this contains, i.e., labels of type VarLabel?
      */
     Set variables();
 
-    /** 
-     * Implementation of leq, should only be called by 
-     * JifTypeSystem 
+    /**
+     * Implementation of leq, should only be called by JifTypeSystem
      * 
-     * @param L the label to determine if this label is leq to. This label always satisfies !this.equals(L) 
-     * @param H the label environment (including principal hierarchy). 
-     * Will always be non-null.
+     * @param L the label to determine if this label is leq to. This label
+     *            always satisfies !this.equals(L)
+     * @param H the label environment (including principal hierarchy). Will
+     *            always be non-null.
      */
     boolean leq_(Label L, LabelEnv H);
 
     boolean isRuntimeRepresentable();
+
     /**
-     * If the label is runtime representable, when it is evaluated at
-     * runtime it may throw exceptions. This method returns a list of
-     * the exceptions that the runtime evaluation of the label may produce.
-     * If the label cannot be evaluated at runtime, an empty list should be returned.  
+     * If the label is runtime representable, when it is evaluated at runtime it
+     * may throw exceptions. This method returns a list of the exceptions that
+     * the runtime evaluation of the label may produce. If the label cannot be
+     * evaluated at runtime, an empty list should be returned.
      */
     List throwTypes(TypeSystem ts);
-    
-    
+
     Expr toJava(JifToJavaRewriter rw) throws SemanticException;
-    
-    String componentString();    
-    String componentString(Set printedLabels);    
+
+    String componentString();
+
+    String componentString(Set printedLabels);
+
     String toString(Set printedLabels);
 }

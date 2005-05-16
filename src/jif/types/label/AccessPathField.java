@@ -13,8 +13,9 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /**
- * TODO Documentation
- * Represent a final access path 
+ * Represent a final access path whose last element is a field access to a final
+ * field, for example "p.f", where p is a final access path. 
+ * @see jif.types.label.AccessPath
  */
 public class AccessPathField extends AccessPath {
     private FieldInstance fi;
@@ -83,7 +84,8 @@ public class AccessPathField extends AccessPath {
     }
     
     protected boolean isTargetNeverNull() {
-    	// TODO: take into account not-null checking somehow
+    	// TODO: ideally, we should
+        // take into account the not-null checking, and thus be more accurate. 
         return (path instanceof AccessPathThis || path instanceof AccessPathClass);
     }
     public void verify(JifContext A) throws SemanticException {

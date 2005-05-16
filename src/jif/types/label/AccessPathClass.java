@@ -8,8 +8,9 @@ import polyglot.types.*;
 import polyglot.util.Position;
 
 /**
- * TODO Documentation
- * Represent a final access path rooted at a class, e.g. Foo.f.
+ * Represents a final access path rooted at a class, e.g. "Foo[Alice]".
+ * 
+ * @see jif.types.label.AccessPath
  */
 public class AccessPathClass extends AccessPathRoot {
     private ClassType ct;

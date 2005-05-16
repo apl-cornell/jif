@@ -8,8 +8,8 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /**
- * TODO Documentation
- * Represent a final access path rooted at a local variable.
+ * Represents a final access path rooted at a local variable.
+ * @see jif.types.label.AccessPath
  */
 public class AccessPathLocal extends AccessPathRoot {
     private LocalInstance li;

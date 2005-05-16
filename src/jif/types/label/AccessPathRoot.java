@@ -6,8 +6,9 @@ import jif.types.PathMap;
 
 
 /**
- * TODO Documentation
- * Represent a final access path root 
+ * Represents a final access path root.
+ * 
+ * @see jif.types.label.AccessPath
  */
 public abstract class AccessPathRoot extends AccessPath {
     protected AccessPathRoot(Position pos) {

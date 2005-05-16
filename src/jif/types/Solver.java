@@ -55,8 +55,7 @@ public abstract class Solver
     private int status; // true if the current system has been solved
     private VarMap bounds;  // Current bounds on label variables
     protected VarMap dynBounds; // bounds of dynamic labels
-    private Label maxDynamicLabel; // Join of all the dynamic 
-                                   // labels used in the equations.
+
     protected JifTypeSystem ts;
     private Map traces; //Map from variables to their histories of refining
     private static Collection topics = CollectionUtil.list("solver", "jif");
@@ -156,10 +155,6 @@ public abstract class Solver
         Set removedEqns = new LinkedHashSet();
         // removing stuff of form x <= x (always true, as for all x, x <= x)
         // and removing stuff that has no variables
-        // XXX entirely expermental, I think it's legal
-        // XXX basic idea is that these equations only need to be checked
-        // XXX and not actually put in solving process since they
-        // XXX never cause the relaxation of variables
         if (shouldReport(4)) 
             report(4, "=====Equations excluded from solving loop=====");
         for (Iterator e = nodes.iterator(); e.hasNext();) {

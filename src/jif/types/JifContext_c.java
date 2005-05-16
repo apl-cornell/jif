@@ -215,9 +215,6 @@ public class JifContext_c extends Context_c implements JifContext
         this.constructorReturnLabel = Lr;
     }
 
-    /* (non-Javadoc)
-     * @see jif.types.JifContext#pushConstructorCall()
-     */
     public Context pushConstructorCall() {
         JifContext_c A = (JifContext_c)pushStatic();
         A.inConstructorCall = true;

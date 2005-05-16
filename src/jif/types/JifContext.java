@@ -133,11 +133,17 @@ public interface JifContext extends Context {
     void setConstructorReturnLabel(Label Lr);
 
     /**
-     * TODO: DOCO
-     * @return
+     * Push a Context onto the stack for a constructor call, e.g. "super(...)"
+     * or "this(...)". Jif needs to distinguish constructor call contexts
+     * from other static contexts because the this label may appear in
+     * constructor call contexts, but not other static contexts.
      */
     Context pushConstructorCall();
     
+    /**
+     * Is the Context in a constructor call, e.g. "super(...)"
+     * or "this(...)"? 
+     */
     boolean inConstructorCall();
     
 }

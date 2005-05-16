@@ -9,8 +9,8 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /**
- * TODO Documentation
- * Represent a final access path rooted at "this".
+ * Represents a final access path rooted at "this".
+ * @see jif.types.label.AccessPath
  */
 public class AccessPathThis extends AccessPathRoot {
     private ClassType ct;
