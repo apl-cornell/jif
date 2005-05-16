@@ -64,7 +64,6 @@ public class JifIfExt extends JifStmtExt_c
 
 	PathMap X = Xe.N(ts.notTaken()).join(X1).join(X2);
 	X = X.NV(ts.notTaken());
-//System.out.println("### X(if) " + X + " " + node().position());        
 	return X(is.cond(e).consequent(S1).alternative(S2), X);
     }
 }

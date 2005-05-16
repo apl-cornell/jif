@@ -48,9 +48,13 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         JifClassType ct = (JifClassType) A.currentClass();
 	
 	// We begin by getting the start label.
-        // Label Li = A.instantiate(mi.externalPC());
         Label Li = mi.externalPC();
-	A.addAssertionLE(ct.thisLabel(), Li);	
+
+	if (!mi.flags().isStatic())  {
+	    // for non-static methods, we know the this label
+	    // must be bounded above by the start label
+	    A.addAssertionLE(ct.thisLabel(), Li);	
+	}
 
         // let internal_pc = bottom, external_pc = Li
 	A.setPc(ts.bottomLabel(mi.position()));
@@ -187,9 +191,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 		return;
 	    }
 	}
-//    System.out.println("### auth: " + A.authority());
-//    System.out.println("### auth: " + A.currentCode().position());
-//    System.out.println("### ph: " + ph);
 
 	throw new SemanticException(
 	    "No principal found in authority set that acts for principal \"" +
@@ -244,11 +245,10 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
 	// fold "this" label into the return label because it is protected
 	// at the caller side.
-	if (!mi.flags().isStatic()) 
+	if (!mi.flags().isStatic())  {
 	    Lr = Lr.join(ct.thisLabel());
-	
-	//Lr = A.instantiate(Lr);
-        
+	}
+	        
         //Hack: If no other paths, the procedure must return. Therefore,
         //X.n is not taken, and X.r doesn't contain any information. 
 	//TODO: implement a more precise single-path rule.
@@ -376,8 +376,13 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
             for (Iterator j = mi.throwTypes().iterator(); j.hasNext(); ) {
 		final Type tj = (Type) j.next();
 		Label Lj = ts.labelOfType(tj, Lr);
-		// Lj = A.instantiate(Lj);
-		Lj = Lj.join(ct.thisLabel()); // FIXME: is this safe?
+		
+		// fold "this" label into the label of the declared
+		// throw type, because it is protected
+		// at the caller side.
+		if (!mi.flags().isStatic())  {
+		    Lj = Lj.join(ct.thisLabel());
+		}
 
 		if (ts.isImplicitCastValid(pathType, tj)) {
 		    subtypeChecker.addSubtypeConstraints(lc, mn.position(),

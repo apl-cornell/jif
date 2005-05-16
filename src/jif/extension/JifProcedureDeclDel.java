@@ -30,23 +30,21 @@ public class JifProcedureDeclDel extends JifJL_c
         return c;
     }
 
-    /** 
-    * Check exceptions thrown by the call. 
-    * XXX
-    */
+    /**
+     * Check exceptions thrown by the call. We override the normal method in
+     * order to prevent updating the node (and thus overriding the labeled throw
+     * types), which is done in {@link polyglot.ext.jl.ast.Term_c Term_c}.
+     */
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         TypeSystem ts = ec.typeSystem();
 
         List throwTypes = null;
-        String name;
 
         if (node() instanceof MethodDecl) {
             MethodDecl md = (MethodDecl)node();
             throwTypes = md.throwTypes();
-            name = md.name();
         } else {
             throwTypes = ((ConstructorDecl)node()).throwTypes();
-            name = "constructor";
         }
 
         SubtypeSet s = ec.throwsSet();

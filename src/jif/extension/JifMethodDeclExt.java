@@ -17,8 +17,8 @@ import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
 
-/** The Jif extension of the <code>JifMethodDecl</code> node.
- *
+/** The Jif extension of the <code>JifMethodDecl</code> node. 
+ * 
  *  @see jif.ast.JifMethodDecl
  */
 public class JifMethodDeclExt extends JifProcedureDeclExt_c
@@ -60,8 +60,11 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 	    addReturnConstraints(Li, X, mi, lc, mi.returnType());
 	}
 	else {
+	    // for an abstract or native method, just set the 
+	    // normal termination path to the entry PC of the
+	    // method.
 	    X = ts.pathMap();
-	    X = X.N(A.entryPC()); //###
+	    X = X.N(A.entryPC());
 	}
 
 	mn = (JifMethodDecl) X(mn.body(body), X);
@@ -72,9 +75,9 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
     /**
      * Check that this method instance <mi> conforms to the signatures of any
      * methods in the superclasses or interfaces that it is overriding.
-     *
+     * 
      * In particular, argument labels and start labels are contravariant,
-     * return labels, return value labels and labels on exception types are
+     * return labels, return value labels and labels on exception types are 
      * covariant.
      */
     protected void overrideMethodLabelCheck(LabelChecker lc, final JifMethodInstance mi) throws SemanticException {
@@ -82,17 +85,17 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 
         for (Iterator iter = mi.implemented().iterator(); iter.hasNext(); ) {
             final JifMethodInstance mj = (JifMethodInstance) iter.next();
-
+            
             if (! ts.isAccessible(mj, lc.context())) {
                 continue;
-            }
+            }            
             labelCheckOverride(mi, mj, lc);
         }
     }
 
     /**
      * Label check that mi is allowed to override mj.
-     *
+     * 
      * mj is a Jif method instance that mi is attempting to
      * override. Previous type checks have made sure that things like
      * abstractness, access flags, throw sets, etc. are ok.
@@ -102,7 +105,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
     protected static void labelCheckOverride(final JifMethodInstance mi, final JifMethodInstance mj, LabelChecker lc) throws SemanticException {
         // construct a JifContext here, that equates the arg labels of
         // mi and mj.
-        JifContext A = lc.context();
+        JifContext A = lc.context(); 
         A = (JifContext) A.pushBlock();
         JifTypeSystem ts = lc.typeSystem();
 
@@ -113,9 +116,13 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         // loop through the args, and equate the arg labels
         JifClassType miContainer = (JifClassType)mi.container().toClass();
         JifClassType mjContainer = (JifClassType)mj.container().toClass();
-        A.addAssertionLE(miContainer.thisLabel(), mjContainer.thisLabel());
-        A.addAssertionLE(mjContainer.thisLabel(), miContainer.thisLabel());
-
+        
+        if (!mi.flags().isStatic()) {
+            // equate the "this" label of the containers of mu and mj.            
+            A.addAssertionLE(miContainer.thisLabel(), mjContainer.thisLabel());
+            A.addAssertionLE(mjContainer.thisLabel(), miContainer.thisLabel());
+        }
+        
         Iterator iteri = mi.formalTypes().iterator();
         Iterator iterj = mj.formalTypes().iterator();
         while (iteri.hasNext() && iterj.hasNext() ) {
@@ -126,12 +133,12 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             A.addAssertionLE(ai, aj);
             A.addAssertionLE(aj, ai);
         }
-
+        
         LabelChecker newlc = lc.context(A);
-
-
+        
+        
         // argument labels are contravariant:
-        //      each argument label of mi may be more restrictive than the
+        //      each argument label of mi may be more restrictive than the 
         //      correponding argument label in mj
         Iterator miargs = mi.formalTypes().iterator();
         Iterator mjargs = mj.formalTypes().iterator();
@@ -152,29 +159,29 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
                                                 A.labelEnv(),
                                                 mi.position()) {
                             public String msg() {
-                                return "Cannot override " + mj.signature() +
-                                       " in " + mj.container() + " with " +
-                                       mi.signature() + " in " +
-                                       mi.container() + ". The label of the " +
+                                return "Cannot override " + mj.signature() + 
+                                       " in " + mj.container() + " with " + 
+                                       mi.signature() + " in " + 
+                                       mi.container() + ". The label of the " + 
                                        StringUtil.nth(argIndex) + " argument " +
                                        "of the overriding method cannot " +
                                        "be less restrictive than in " +
-                                       "the overridden method.";
+                                       "the overridden method.";                
 
                             }
                        }
             );
         }
 
-
+        
         // start labels are contravariant:
-        //    the start label on mi may be more restrictive than the start
+        //    the start label on mi may be more restrictive than the start 
         //    label on mj
         NamedLabel starti = new NamedLabel("sub_start_label",
-                                           "Start label of method " + mi.name() + " in " + mi.container(),
+                                           "Start label of method " + mi.name() + " in " + mi.container(), 
                                            mi.startLabel());
         NamedLabel startj = new NamedLabel("sup_start_label",
-                                           "Start label of method " + mj.name() + " in " + mj.container(),
+                                           "Start label of method " + mj.name() + " in " + mj.container(), 
                                            mj.startLabel());
         newlc.constrain(new LabelConstraint(startj,
                                             LabelConstraint.LEQ,
@@ -182,20 +189,20 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
                                             A.labelEnv(),
                                             mi.position()) {
                         public String msg() {
-                            return "Cannot override " + mj.signature() +
-                                   " in " + mj.container() + " with " +
-                                   mi.signature() + " in " +
-                                   mi.container() + ". The start label of the " +
+                            return "Cannot override " + mj.signature() + 
+                                   " in " + mj.container() + " with " + 
+                                   mi.signature() + " in " + 
+                                   mi.container() + ". The start label of the " + 
                                    "overriding method " +
                                    "cannot be less restrictive than in " +
-                                   "the overridden method.";
+                                   "the overridden method.";                
 
                         }
                         public String detailMsg() {
-                            return msg() +
+                            return msg() + 
                                 " The start label of a method is a lower " +
                                 "bound on the observable side effects that " +
-                                "the method may perform (such as updates to fields).";
+                                "the method may perform (such as updates to fields).";                
 
                         }
                    }
@@ -204,32 +211,32 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         // return labels are covariant
         //      the return label on mi may be less restrictive than the
         //      return label on mj
-        NamedLabel reti = new NamedLabel("sub_return_label",
-                                         "return label of method " + mi.name() + " in " + mi.container(),
+        NamedLabel reti = new NamedLabel("sub_return_label", 
+                                         "return label of method " + mi.name() + " in " + mi.container(), 
                                          mi.returnLabel());
-        NamedLabel retj = new NamedLabel("sup_return_label",
-                                         "return label of method " + mj.name() + " in " + mj.container(),
-                                         mj.returnLabel());
+        NamedLabel retj = new NamedLabel("sup_return_label", 
+                                         "return label of method " + mj.name() + " in " + mj.container(), 
+                                         mj.returnLabel());                        
         newlc.constrain(new LabelConstraint(reti,
                                             LabelConstraint.LEQ,
                                             retj,
                                             A.labelEnv(),
                                             mi.position()) {
                     public String msg() {
-                        return "Cannot override " + mj.signature() +
-                               " in " + mj.container() + " with " +
-                               mi.signature() + " in " +
-                               mi.container() + ". The return label of the " +
+                        return "Cannot override " + mj.signature() + 
+                               " in " + mj.container() + " with " + 
+                               mi.signature() + " in " + 
+                               mi.container() + ". The return label of the " + 
                                "overriding method " +
                                "cannot be more restrictive than in " +
-                               "the overridden method.";
+                               "the overridden method.";                
 
                     }
                     public String detailMsg() {
-                        return msg() +
+                        return msg() + 
                             " The return label of a method is an upper " +
                             "bound on the information that can be gained " +
-                            "by observing that the method terminates normally.";
+                            "by observing that the method terminates normally.";                
 
                     }
                    }
@@ -240,10 +247,10 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         //      the return value label on mi may be less restrictive than the
         //      return value label on mj
         NamedLabel retVali = new NamedLabel("sub_return_val_label",
-                               "label of the return value of method " + mi.name() + " in " + mi.container(),
+                               "label of the return value of method " + mi.name() + " in " + mi.container(), 
                                mi.returnValueLabel());
-        NamedLabel retValj = new NamedLabel("sup_return_val_label",
-                               "label of the return value of method " + mj.name() + " in " + mj.container(),
+        NamedLabel retValj = new NamedLabel("sup_return_val_label", 
+                               "label of the return value of method " + mj.name() + " in " + mj.container(), 
                                mj.returnValueLabel());
         newlc.constrain(new LabelConstraint(retVali,
                                             LabelConstraint.LEQ,
@@ -251,19 +258,19 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
                                             A.labelEnv(),
                                             mi.position()) {
                     public String msg() {
-                        return "Cannot override " + mj.signature() +
-                               " in " + mj.container() + " with " +
-                               mi.signature() + " in " +
-                               mi.container() + ". The return value label of the " +
+                        return "Cannot override " + mj.signature() + 
+                               " in " + mj.container() + " with " + 
+                               mi.signature() + " in " + 
+                               mi.container() + ". The return value label of the " + 
                                "overriding method " +
                                "cannot be more restrictive than in " +
-                               "the overridden method.";
+                               "the overridden method.";                
 
                     }
                     public String detailMsg() {
-                        return msg() +
+                        return msg() + 
                             " The return value label of a method is the " +
-                            "label of the value returned by the method.";
+                            "label of the value returned by the method.";                
 
                     }
                    }
@@ -277,7 +284,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 
         while (miExc.hasNext()) {
             final LabeledType exi = (LabeledType)miExc.next();
-
+                            
             // find the corresponding exception(s) in mhExc
             for (Iterator mjExcIt = mjExc.iterator(); mjExcIt.hasNext(); ) {
                 final LabeledType exj = (LabeledType)mjExcIt.next();
@@ -292,31 +299,31 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
                                                         A.labelEnv(),
                                                         mi.position()) {
                                 public String msg() {
-                                    return "Cannot override " + mj.signature() +
-                                           " in " + mj.container() + " with " +
-                                           mi.signature() + " in " +
-                                           mi.container() + ". The label of the " +
-                                           exi.typePart().toString() +
+                                    return "Cannot override " + mj.signature() + 
+                                           " in " + mj.container() + " with " + 
+                                           mi.signature() + " in " + 
+                                           mi.container() + ". The label of the " + 
+                                           exi.typePart().toString() + 
                                            "exception in overriding method " +
                                            "cannot be more restrictive " +
-                                           "than the label of the " +
+                                           "than the label of the " + 
                                            exj.typePart().toString() +
                                            "exception in " +
-                                           "the overridden method.";
+                                           "the overridden method.";                
 
                                 }
                                 public String detailMsg() {
-                                    return "Cannot override " + mj.signature() +
-                                    " in " + mj.container() + " with " +
-                                    mi.signature() + " in " +
+                                    return "Cannot override " + mj.signature() + 
+                                    " in " + mj.container() + " with " + 
+                                    mi.signature() + " in " + 
                                     mi.container() + ". If the exception " +
                                     exi.typePart().toString() + " is thrown " +
-                                    "by " + mi.signature() + " in " +
+                                    "by " + mi.signature() + " in " + 
                                     mi.container() + " then more information " +
                                     "may be revealed than is permitted by " +
                                     "the overridden method throwing " +
-                                    "the exception " +
-                                    exj.typePart().toString() + ".";
+                                    "the exception " + 
+                                    exj.typePart().toString() + ".";                
 
                                 }
                                }
@@ -324,6 +331,6 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
                 }
             }
         }
-
+        
     }
 }

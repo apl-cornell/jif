@@ -44,10 +44,10 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
     
     public String componentString(Set printedLabels) {
         if (Report.should_report(Report.debug, 2)) { 
-            return "<this (of " + ct.fullName() + ">";
+            return "<this (of " + ct.fullName() + ")>";
         }
         else if (Report.should_report(Report.debug, 1)) {
-            return "<this (of " + ct.name() + ">";
+            return "<this (of " + ct.name() + ")>";
         }
         return "this";            
     }

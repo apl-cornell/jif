@@ -40,7 +40,6 @@ public class JifWhileExt extends JifStmtExt_c
 	A = (JifContext) A.pushBlock();
 
 	A.setPc(Xe.NV());
-//System.out.println("#### " + node().position() + " " + A.pc());
 	Stmt S = (Stmt) lc.context(A).labelCheck(ws.body());
 	PathMap Xs = X(S);
 

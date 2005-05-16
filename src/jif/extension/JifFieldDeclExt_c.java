@@ -68,7 +68,6 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 	//if [final] then invariant(type_part(Tf)) else invariant(type_part(Tf)) and invariant(label_part(Tf))
         {        
             Type fieldType = fi.type();
-            JifClassType jct = (JifClassType)A.currentClass();
             LabelSubstitutionVisitor lsv = new InvarianceLabelVisitor(decl.position());
 
             // use a LabelSubstitutionVisitor to check the type of the field,

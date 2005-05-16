@@ -153,7 +153,6 @@ public class JifFieldExt extends Jif_c
         JifTypeSystem ts = lc.jifTypeSystem();
 
         if (! (fe.target() instanceof Expr)) {
-            // TODO: support static fields
             return (Receiver) X(fe.target(), ts.pathMap());
         }		
 
