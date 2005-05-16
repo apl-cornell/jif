@@ -9,13 +9,14 @@ import jif.types.principal.Principal;
 import polyglot.ast.Expr;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * TODO: DOCUMENTATION
  */
 public class JifInstantiator
 {
-    public static Label instantiate(Label L, ReferenceType receiverType, List formalArgLabels, List actualArgLabels, List actualArgExprs, List actualParamLabels, JifContext callerContext) {
+    private static Label instantiate(Label L, ReferenceType receiverType, List formalArgLabels, List actualArgLabels, List actualArgExprs, List actualParamLabels, JifContext callerContext) {
         if (formalArgLabels.size() != actualArgLabels.size() || 
                 (actualArgExprs != null && formalArgLabels.size() != actualArgExprs.size())) {
             throw new InternalCompilerError("Inconsistent sized lists of args");
@@ -42,16 +43,21 @@ public class JifInstantiator
                 if (iActualArgExprs != null) {
                     Expr actualExpr = (Expr)iActualArgExprs.next();
                 
-                    if (actualExpr != null) {
-                        try {
-                            AccessPathRoot root = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), actualExpr.position());
-                            AccessPath target = JifUtil.exprToAccessPath(actualExpr, callerContext); 
-                            L = L.subst(new AccessPathInstantiator(root, target));
+                    try {
+                        Position pos = Position.COMPILER_GENERATED;
+                        if (actualExpr != null) {
+                            pos = actualExpr.position();
                         }
-                        catch (SemanticException e) {
-                            throw new InternalCompilerError("Unexpected SemanticException " +
-                                                            "during label substitution: " + e.getMessage(), L.position());
+                        AccessPathRoot root = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), pos);                            
+                        AccessPath target = new AccessPathUninterpreted(pos);
+                        if (actualExpr != null) {
+                            target = JifUtil.exprToAccessPath(actualExpr, callerContext);
                         }
+                        L = L.subst(new AccessPathInstantiator(root, target));
+                    }
+                    catch (SemanticException e) {
+                        throw new InternalCompilerError("Unexpected SemanticException " +
+                                                        "during label substitution: " + e.getMessage(), L.position());
                     }
                 }
             }
@@ -97,7 +103,7 @@ public class JifInstantiator
      * replaces any signature ArgLabels in p with the appropriate label, and
      * replaces any signature ArgPrincipal with the appropriate prinicipal. 
      */        
-    public static Principal instantiate(Principal p, ReferenceType receiverType, List formalArgLabels, List actualArgExprs, List actualParamLabels, JifContext callerContext) {
+    private static Principal instantiate(Principal p, ReferenceType receiverType, List formalArgLabels, List actualArgExprs, List actualParamLabels, JifContext callerContext) {
         if (formalArgLabels.size() != actualArgExprs.size()) {
             throw new InternalCompilerError("Inconsistent sized lists of args");
         }
@@ -109,16 +115,21 @@ public class JifInstantiator
                 ArgLabel formalArgLbl = (ArgLabel)iArgLabels.next();
                 Expr actualExpr = (Expr)iActualArgExprs.next();
                 
-                if (actualExpr != null) {
-                    try {
-                        AccessPathRoot root = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), actualExpr.position());
-                        AccessPath target = JifUtil.exprToAccessPath(actualExpr, callerContext); 
-                        p = p.subst(new AccessPathInstantiator(root, target));
+                try {
+                    Position pos = Position.COMPILER_GENERATED;
+                    if (actualExpr != null) {
+                        pos = actualExpr.position();
                     }
-                    catch (SemanticException e) {
-                        throw new InternalCompilerError("Unexpected SemanticException " +
-                                                        "during label substitution: " + e.getMessage(), p.position());
+                    AccessPathRoot root = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), pos);                            
+                    AccessPath target = new AccessPathUninterpreted(pos);
+                    if (actualExpr != null) {
+                        target = JifUtil.exprToAccessPath(actualExpr, callerContext);
                     }
+                    p = p.subst(new AccessPathInstantiator(root, target));
+                }
+                catch (SemanticException e) {
+                    throw new InternalCompilerError("Unexpected SemanticException " +
+                                                    "during label substitution: " + e.getMessage(), p.position());
                 }
             }
             if (iArgLabels.hasNext() || iActualArgExprs.hasNext()) {
@@ -220,10 +231,6 @@ public class JifInstantiator
         L = instantiate(L, A, receiverExpr, receiverType, receiverLbl);
         return instantiate(L, receiverType, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels, A);
     }
-    public static Label instantiate(Label L, JifContext A, AccessPath receiverPath, ReferenceType receiverType, Label receiverLbl, List formalArgs, List actualArgLabels, List actualArgExprs, List actualParamLabels) {
-        L = instantiate(L, A, receiverPath, receiverType, receiverLbl);
-        return instantiate(L, receiverType, formalArgs, actualArgLabels, actualArgExprs, actualParamLabels, A);
-    }
 
     /**
      * Replace this this access path with an appropraite access path for the
@@ -231,7 +238,7 @@ public class JifInstantiator
      * TODO Documentation
      * @throws SemanticException
      */
-    public static Principal instantiate(Principal p, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) throws SemanticException {
+    private static Principal instantiate(Principal p, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) throws SemanticException {
         if (p == null) return p;
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
 
@@ -248,7 +255,7 @@ public class JifInstantiator
             receiverPath = JifUtil.exprToAccessPath(receiverExpr, A);
         }
         else {
-            receiverPath = new AccessPathUninterpreted(p.position()); // @@@@@Uninterpreted root?
+            receiverPath = new AccessPathUninterpreted(p.position());
         }
         
         if (receiverType.isClass()) {
