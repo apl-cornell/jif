@@ -79,6 +79,9 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Call1.jif ;
 	Call2.jif ;
 	cat.jif ;
+	Catch01.jif (Semantic, "Label of .* exceptions .* not less restrictive");
+	Catch02.jif (Semantic, "Label .* not less restrictive");
+	Catch03.jif (Semantic, "Label .* not less restrictive");
 	clientEmptyList.jif ;
 	clientList.jif ;
 	clientPairList.jif ;
