@@ -79,8 +79,8 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 	JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
-	if (!prefix.isDisambiguated()) return this;
-	if (expr instanceof Expr && !((Expr)expr).isDisambiguated()) return this;
+	if (!ar.isASTDisambiguated(prefix)) return this;
+	if (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr)) return this;
     
 	if (prefix instanceof TypeNode) {
 	    // "expr" must be a parameter.

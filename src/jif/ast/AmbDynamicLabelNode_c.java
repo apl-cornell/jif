@@ -34,10 +34,9 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
 	JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
-        if (!expr.isDisambiguated()) {
+        if (!sc.isASTDisambiguated(expr)) {
             return this;
         }
-
         if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             throw new SemanticDetailedException(
                 "Only final access paths or label expressions can be used as a dynamic label.",

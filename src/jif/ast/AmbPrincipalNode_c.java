@@ -44,7 +44,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         }
         
         // must be the case that name == null and expr != null
-        if (!expr.isDisambiguated()) {
+        if (!ar.isASTDisambiguated(expr)) {
             return this;
         }
 

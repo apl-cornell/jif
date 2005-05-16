@@ -108,7 +108,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
     /** Disambiguates
      */
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-	if (expr instanceof Expr && !((Expr)expr).isDisambiguated())  return this;
+	if (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr))  return this;
 
 	JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();

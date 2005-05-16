@@ -62,7 +62,7 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
      * changed to a dynamic principal later.
      */
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-        if (!expr.isDisambiguated()) {
+        if (!sc.isASTDisambiguated(expr)) {
             return this;
         }
         JifContext c = (JifContext)sc.context();
