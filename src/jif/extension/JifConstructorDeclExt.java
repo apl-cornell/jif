@@ -37,14 +37,6 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         A = (JifContext) mn.enterScope(A);
         JifConstructorInstance ci = (JifConstructorInstance) mn.constructorInstance();
     
-        /*List argLabels = new ArrayList(mn.formals().size());
-        for (int i = 0; i < mn.formals().size(); i++) {
-            Formal fi = (Formal) mn.formals().get(i);
-            JifLocalInstance li = (JifLocalInstance) fi.localInstance();
-            argLabels.add(li.label());
-        }
-        A = A.enterCall(argLabels, null); //###@@@ FIXME */
-
         lc = lc.context(A);
 
         // First, check the arguments, adjusting the context.
@@ -53,22 +45,16 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         Block body = null;
         PathMap X;
     
-        if (! mn.flags().isAbstract() && ! mn.flags().isNative()) {
-            // Now, check the body of the method in the new context.
-    
-            // Visit only the body, not the formal parameters.
-            body = checkInitsAndBody(Li, ci, mn.body(), lc);
-            X = X(body);
-    
-            if (Report.should_report(jif_verbose, 3))
-            Report.report(3, "Body path labels = " + X);
-    
-            addReturnConstraints(Li, X, ci, lc, ts.Void());
-        }
-        else {
-            X = ts.pathMap();
-            X = X.N(A.entryPC()); //###
-        }
+        // Now, check the body of the method in the new context.
+
+        // Visit only the body, not the formal parameters.
+        body = checkInitsAndBody(Li, ci, mn.body(), lc);
+        X = X(body);
+
+        if (Report.should_report(jif_verbose, 3))
+        Report.report(3, "Body path labels = " + X);
+
+        addReturnConstraints(Li, X, ci, lc, ts.Void());
     
         mn = (JifConstructorDecl) X(mn.body(body), X);
     
