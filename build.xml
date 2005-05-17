@@ -363,23 +363,6 @@ ext="-extclass split.ExtensionInfo"
 	<target name="jif-runtime-native" description="compile the jif runtime native code">
 		<!-- Compile the headers for jif.lang.NativePM -->
 		<mkdir dir="${rt-classes}/jif/native" />
-		<!--
-    <javah class="jif.lang.NativePM" destdir="${rt-classes}/jif/native" force="yes">
-        <classpath>
-         <pathelement location="${rt-classes}"/>
-         <path refid="standard.classpath"/>
-        </classpath>
-    </javah>
--->
-		<!-- Call rmic for jif.lang.RemotePM -->
-		<!--
-    <rmic classname="jif.lang.RemotePM_c" base="${rt-classes}">
-        <classpath>
-         <pathelement location="${rt-classes}"/>
-         <path refid="standard.classpath"/>
-        </classpath>
-    </rmic>
--->
 
 		<!-- Compile the headers for jif.runtime.FileSystem and jif.runtime.Runtime -->
 		<javah class="jif.runtime.FileSystem,jif.runtime.Runtime" destdir="${rt-src}/jif/native" force="yes">
@@ -667,7 +650,7 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
 		<antcall target="javadoc" />
 		<copy todir="${dist}" includeEmptyDirs="no">
 			<fileset dir="${basedir}" defaultexcludes="yes">
-				<include name="doc/api/**" />
+				<include name="doc/*api/**" />
 			</fileset>
 		</copy>
 
