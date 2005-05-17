@@ -620,8 +620,13 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
 
 
 	<target name="javadoc" depends="jif-base">
-		<javadoc sourcepath="${src}" destdir="${basedir}/doc/api" defaultexcludes="yes" classpathref="standard.classpath">
+		<javadoc sourcepath="${src}" destdir="${basedir}/doc/jifc-api" defaultexcludes="yes" classpathref="standard.classpath">
 			<packageset dir="${src}" defaultexcludes="yes">
+				<include name="**" />
+			</packageset>
+		</javadoc>
+		<javadoc sourcepath="${src}" destdir="${basedir}/doc/rt-api" defaultexcludes="yes" classpathref="standard.classpath">
+			<packageset dir="${rt-src}" defaultexcludes="yes">
 				<include name="**" />
 			</packageset>
 		</javadoc>

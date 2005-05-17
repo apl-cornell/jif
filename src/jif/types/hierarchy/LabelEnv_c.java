@@ -202,14 +202,13 @@ public class LabelEnv_c implements LabelEnv
             for (Iterator i = assertions.iterator(); i.hasNext();) { 
                 LabelLeAssertion c = (LabelLeAssertion)i.next();
                 Label cLHS = c.lhs();
-                if (cLHS.hasVariables()) 
+                if (cLHS.hasVariables()) { 
                     cLHS = this.solver.applyBoundsTo(c.lhs());
+                }
                 Label cRHS = c.rhs();
-                if (cRHS.hasVariables()) 
+                if (cRHS.hasVariables()) { 
                     cRHS = this.solver.applyBoundsTo(c.rhs());
-                // TODO: keep check of the visited constraints to allow
-                // more than one constraint to be used to prove goals
-                //if (!(c.rhs() instanceof VarLabel) && leq(L1, c.lhs(), false)) {
+                }
                 if (leq(L1, cLHS, false, currentGoals) && leq(cRHS, L2, false, currentGoals)) {
                     return true;
                 }

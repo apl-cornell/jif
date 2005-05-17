@@ -1,19 +1,14 @@
 package jif.types;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import jif.types.label.Label;
-import jif.types.label.ParamLabel;
-
+import jif.types.label.ThisLabel;
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.SubstClassType_c;
 import polyglot.main.Report;
 import polyglot.types.ClassType;
-import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -67,7 +62,7 @@ public class JifSubstClassType_c extends SubstClassType_c
         return subst.substPrincipalList(base.constructorCallAuthority());
     }
 
-    public Label thisLabel() {
+    public ThisLabel thisLabel() {
 	return ((JifTypeSystem)ts).thisLabel(this);
     }
 

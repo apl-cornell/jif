@@ -65,16 +65,9 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
                     LocalInstance li = lc.localInstance();
                     Type t = rewriteType(li.type());
 
-                    // XXX
-                    // TODO: fix this. This code currently makes a destructive
-                    // update to the local instance; this is due to an assumption
-                    // in other places of the code that there is only a single
-                    // local instance shared by all appropriate Locals. We will 
-                    // maintain that assumption here, although the long-term fix
-                    // is to fix the other code that assumes this.
+                    // Imperatively update the local instance.
                     li.setType(t);
                     return lc;
-                    //                return lc.localInstance(li.type(t));
                 }
                 return e;
             }
@@ -90,17 +83,10 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
                 JifLocalInstance li = (JifLocalInstance)fn.localInstance();
                 Type t = rewriteType(li.type());
 
-                // XXX
-                // TODO: fix this. This code currently makes a destructive
-                // update to the local instance; this is due to an assumption
-                // in other places of the code that there is only a single
-                // local instance shared by all appropriate Formals. We will 
-                // maintain that assumption here, although the long-term fix
-                // is to fix the other code that assumes this.
+                // Imperatively update the local instance.
                 li.setType(t);
                 li.setLabel(rewriteLabel(li.label()));
                 return fn;
-                //            return fn.localInstance(li.type(t));
             }
             else if (n instanceof LocalDecl) {
                 LocalDecl ld = (LocalDecl)n;
@@ -108,17 +94,10 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
                 JifLocalInstance li = (JifLocalInstance)ld.localInstance();
                 Type t = rewriteType(li.type());
 
-                // XXX
-                // TODO: fix this. This code currently makes a destructive
-                // update to the local instance; this is due to an assumption
-                // in other places of the code that there is only a single
-                // local instance shared by all appropriate Locals. We will 
-                // maintain that assumption here, although the long-term fix
-                // is to fix the other code that assumes this.
+                // Imperatively update the local instance.
                 li.setType(t);
                 li.setLabel(rewriteLabel(li.label()));
                 return ld;
-                //            return ld.localInstance(li.type(t));
             }
             else if (n instanceof FieldDecl) {
                 FieldDecl fd = (FieldDecl)n;
@@ -126,18 +105,11 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
                 JifFieldInstance fi = (JifFieldInstance)fd.fieldInstance();
                 Type t = rewriteType(fi.type());
 
-                // XXX
-                // TODO: fix this. This code currently makes a destructive
-                // update to the local instance; this is due to an assumption
-                // in other places of the code that there is only a single
-                // local instance shared by all appropriate Locals. We will 
-                // maintain that assumption here, although the long-term fix
-                // is to fix the other code that assumes this.
+                // Imperatively update the field instance.
                 fi.setType(t);
                 fi.setLabel(rewriteLabel(fi.label()));
                 
                 return fd;
-                //            return ld.localInstance(li.type(t));
             }
             else if (n instanceof ProcedureDecl) {
                 ProcedureDecl md = (ProcedureDecl)n;

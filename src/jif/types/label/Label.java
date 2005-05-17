@@ -60,8 +60,9 @@ public interface Label extends Param {
     void setDescription(String d);
 
     /**
-     * @param labelSubst
-     * @return
+     * @param labelSubst The <code>LabelSubstitution</code> to apply to this
+     *            label
+     * @return the result of applying labelSubst to this label.
      * @throws SemanticException
      */
     Label subst(LabelSubstitution labelSubst) throws SemanticException;
@@ -73,14 +74,17 @@ public interface Label extends Param {
      * label at runtime will reveal as much information as the label of lb. For
      * example, the following code is illegal, as the runtime evaluation of the
      * label reveals too much information
+     * 
      * <pre>
-     * boolean{Alice:} secret = ...;
-     * final label{Alice:} lb = secret?new label{}:new label{Bob:};
-     * boolean{} leak = false;
-     * if ((*lb} <= new label{}) { // evaluation of lb reveals 
-     *                          // information at level {Alice:} 
-     *    leak = true;
-     * } 
+     * 
+     *  boolean{Alice:} secret = ...;
+     *  final label{Alice:} lb = secret?new label{}:new label{Bob:};
+     *  boolean{} leak = false;
+     *  if ((*lb} &lt;= new label{}) { // evaluation of lb reveals 
+     *                           // information at level {Alice:} 
+     *     leak = true;
+     *  } 
+     *  
      * </pre>
      * 
      * @see jif.ast.Jif#labelCheck(LabelChecker)

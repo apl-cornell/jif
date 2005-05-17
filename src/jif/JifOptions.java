@@ -1,9 +1,11 @@
 package jif;
 
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.io.PrintStream;
 import java.io.File;
 import polyglot.main.Options;
+import polyglot.main.Report;
 import polyglot.main.UsageError;
 import jif.types.Solver;
 
@@ -79,10 +81,20 @@ public class JifOptions extends Options {
             index++;
             this.sigcp = args[index++];
         }
-
         else if (args[index].equals("-rtcp")) {
             index++;
             this.rtcp = args[index++];
+        }
+        else if (args[index].equals("-debug")) {
+            index++;
+            int level=0;
+            try {
+                level = Integer.parseInt(args[index]);
+            } 
+            catch (NumberFormatException e) {
+            }
+            Report.addTopic("debug", level);
+            index++;
         }
         else {
             int i = super.parseCommand(args, index, source);
@@ -98,6 +110,7 @@ public class JifOptions extends Options {
         super.usage(out);
         usageForFlag(out, "-e -explain", "provide more detailed " +
                                          "explanations of failed label checking.");
+        usageForFlag(out, "-debug <n>", "set debug level to n. Prints more information about labels.");
         usageForFlag(out, "-stop_constraint <n>", "halt when the nth constraint is added");
         usageForFlag(out, "-globalsolve", "infer label variables globally (default: per class)");
         usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");

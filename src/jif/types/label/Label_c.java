@@ -10,32 +10,31 @@ import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
-/** 
- * An abstract implementation of the <code>Label</code> interface. 
+/**
+ * An abstract implementation of the <code>Label</code> interface.
  */
-public abstract class Label_c extends TypeObject_c implements Label
-{
+public abstract class Label_c extends TypeObject_c implements Label {
     protected String description;
+
     protected LabelToJavaExpr toJava;
-    
+
     protected Label_c() {
         super();
     }
-    
-    
+
     public Label_c(JifTypeSystem ts, Position pos, LabelToJavaExpr toJava) {
         super(ts, pos);
         this.toJava = toJava;
     }
-    
+
     public Label_c(JifTypeSystem ts, Position pos) {
         this(ts, pos, new CannotLabelToJavaExpr_c());
     }
-    
+
     public String description() {
         return description;
     }
-    
+
     public void setDescription(String d) {
         this.description = d;
     }
@@ -51,14 +50,14 @@ public abstract class Label_c extends TypeObject_c implements Label
         }
         catch (SemanticException e) {
             throw new InternalCompilerError(e);
-        }        
+        }
         return lvg.variables;
     }
-    
+
     public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
         return toJava.toJava(this, rw);
     }
-    
+
     //    /**
     //     * By default, a label is enumerable
     //     */
@@ -72,86 +71,102 @@ public abstract class Label_c extends TypeObject_c implements Label
     public Collection components() {
         return Collections.singleton(this);
     }
+
     //
     /**
      * By default, a label is not Bottom
      */
-    public boolean isBottom() { return false; }    
-    public boolean isTop() { return false; }
-    public boolean isInvariant() { return ! isCovariant(); }
-    
+    public boolean isBottom() {
+        return false;
+    }
+
+    public boolean isTop() {
+        return false;
+    }
+
+    public boolean isInvariant() {
+        return !isCovariant();
+    }
+
     /**
      * A label is a singleton if it only has a single component.
      */
     public boolean isSingleton() {
         return components().size() <= 1;
     }
-    
+
     /**
      * Return the single component.
      * 
      * @throws InternalCompilerError if this label is not a singleton.
      */
     public Label singletonComponent() {
-        if (! isSingleton()) {
+        if (!isSingleton()) {
             throw new InternalCompilerError(
-            "Cannot get singleton component of a non-singleton label.");
+                    "Cannot get singleton component of a non-singleton label.");
         }
-        
-        if (isBottom()) 
+
+        if (isBottom())
             return this;
         else
             return (Label)components().toArray()[0];
     }
-    
+
     /**
      * Join this label to L. The result is generally a JoinLabel
      */
     public final Label join(Label L) {
-        return ((JifTypeSystem) ts).join(this, L);
+        return ((JifTypeSystem)ts).join(this, L);
     }
-    
+
     public String toString() {
         return "{" + componentString(new HashSet()) + "}";
     }
+
     public String toString(Set printedLabels) {
         return "{" + componentString(printedLabels) + "}";
     }
+
     public String componentString() {
         return componentString(new HashSet());
     }
+
     abstract public String componentString(Set printedLabels);
-    
+
     public abstract boolean equalsImpl(TypeObject t);
 
     public Label simplify() {
-        return this; 
+        return this;
     }
 
     public List throwTypes(TypeSystem ts) {
-        return Collections.EMPTY_LIST; 
+        return Collections.EMPTY_LIST;
     }
 
     public Label subst(LabelSubstitution substitution) throws SemanticException {
-        return substitution.substLabel(this); 
+        return substitution.substLabel(this);
     }
+
     public PathMap labelCheck(JifContext A) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         return ts.pathMap().N(A.pc()).NV(A.pc());
-    }        
+    }
 
     /**
-     * TODO Documentation 
+     * This class is used to implement
+     * {@link Label#variables() Label.variables()}. It constructs a set of
+     * <code>VarLabel</code>s.
      */
     private static class LabelVarGatherer extends LabelSubstitution {
         private final Set variables = new HashSet();
+
         public Label substLabel(Label L) throws SemanticException {
-            if (L instanceof VarLabel) { 
+            if (L instanceof VarLabel) {
                 variables.add(L);
             }
             return L;
         }
-        
+
     }
-    
+
 }

@@ -11,7 +11,9 @@ import jif.visit.LabelSubstitutionVisitor;
 import polyglot.ast.*;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
 
 /** The Jif extension of the <code>FieldDecl</code> node. 
  * 
@@ -35,6 +37,13 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 	Label L = fi.label();
 	Type t = decl.declType();
 
+	
+        if (!ts.isLabeled(t)) {
+            // field should always be labeled.
+            // See JifFieldDeclDel#disambiguate(AmbiguityRemover)
+            throw new InternalCompilerError("Unexpectedly unlabeled field", node().position());
+        }
+        
 	Label declaredLabel = ts.labelOfType(t);
 
         // error messages for equality constraints aren't displayed, so no
@@ -102,23 +111,26 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 	Label L = fi.label();
 	Type t = decl.declType();
 
-        if (ts.isLabeled(t)) {
-	    Label declaredLabel = ts.labelOfType(t);
+        if (!ts.isLabeled(t)) {
+            // field should always be labeled.
+            // See JifFieldDeclDel#disambiguate(AmbiguityRemover)
+            throw new InternalCompilerError("Unexpectedly unlabeled field", node().position());
+        }
 
-            // error messages for equality constraints aren't displayed, so no
-            // need top define error messages.  
-            // ###XXX Does this constraint duplicate that in labelCheckField?
-            lc.constrain(new LabelConstraint(new NamedLabel("field_label", 
-                                                            "inferred label of field " + fi.name(), 
-                                                            L), 
-                                             LabelConstraint.EQUAL, 
-                                             new NamedLabel("PC", 
-                                                            "Information revealed by program counter being at this program point", 
-                                                            A.pc()).
-                                                 join("declared label of field " + fi.name(), declaredLabel), 
-                                             A.labelEnv(),
-                                             decl.position()));
-	}
+        Label declaredLabel = ts.labelOfType(t);
+
+        // error messages for equality constraints aren't displayed, so no
+        // need top define error messages.  
+        lc.constrain(new LabelConstraint(new NamedLabel("field_label", 
+                                                        "inferred label of field " + fi.name(), 
+                                                        L), 
+                                         LabelConstraint.EQUAL, 
+                                         new NamedLabel("PC", 
+                                                        "Information revealed by program counter being at this program point", 
+                                                        A.pc()).
+                                             join("declared label of field " + fi.name(), declaredLabel), 
+                                         A.labelEnv(),
+                                         decl.position()));
 
 	PathMap Xd;
 

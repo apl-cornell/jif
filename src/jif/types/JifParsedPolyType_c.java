@@ -117,7 +117,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
         return actuals;
     }
 
-    public Label thisLabel() {
+    public ThisLabel thisLabel() {
 	return ((JifTypeSystem)ts).thisLabel(this);
     }
 

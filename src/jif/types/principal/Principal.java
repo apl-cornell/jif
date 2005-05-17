@@ -17,11 +17,12 @@ import jif.visit.LabelChecker;
 public interface Principal extends Param {
 
     /**
-     * @param substitution
-     * @return
+     * @param labelSubst The <code>LabelSubstitution</code> to apply to this
+     *            principal
+     * @return the result of applying labelSubst to this principal.
      * @throws SemanticException
      */
-    Principal subst(LabelSubstitution substitution) throws SemanticException;
+    Principal subst(LabelSubstitution labelSubst) throws SemanticException;
 
     /**
      * Label check the principal, which will determine how much information may be

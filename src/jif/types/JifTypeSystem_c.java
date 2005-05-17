@@ -21,7 +21,6 @@ public class JifTypeSystem_c
     private final TypeSystem jlts;
 
     private final DefaultSignature ds;
-    //private final Map uidStore; //pos -> uid
 
     public JifTypeSystem_c(TypeSystem jlts) {
         this.jlts = jlts;
@@ -319,7 +318,6 @@ public class JifTypeSystem_c
      * i.e. check their parameters are appropriate.
      * @return supertype if supertype is the least common ancestor of subtype
      *     and supertype, null otherwise.
-     * @@@@@This code looks buggy! base is never used, and neither is iter3...
      */
     protected Type leastCommonAncestorSubtype(Type subtype, Type supertype) {
         while (subtype != null && !equals(subtype, supertype)) {
@@ -520,6 +518,11 @@ public class JifTypeSystem_c
             Map subst = new HashMap();
 
             Iterator i = pt.params().iterator();
+            
+            // pt.actuals() constructs a list of Params based on the
+            // ParamInstances conatained in pt.params().
+            // We construct a substitution map from the ParamInstances
+            // to their corresponding Params.
             Iterator j = pt.actuals().iterator();
             while (i.hasNext() && j.hasNext()) {
                 ParamInstance param = (ParamInstance) i.next();
@@ -538,7 +541,6 @@ public class JifTypeSystem_c
 
         throw new InternalCompilerError("Cannot null instantiate \"" +
                                         pc + "\".");
-
     }
 
     public void checkInstantiation(Position pos, PClass t, List args)

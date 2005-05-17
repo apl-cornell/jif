@@ -21,7 +21,6 @@ public class FieldLabelResolver extends ContextVisitor
 {
     private final Job job;
     private final JifTypeSystem ts;
-    private final ErrorQueue eq;
     private VarMap bounds;
     private Map fieldVarBounds;
     
@@ -29,7 +28,6 @@ public class FieldLabelResolver extends ContextVisitor
 	super(job, ts, nf);
 	this.job = job;
 	this.ts = ts;
-	this.eq = job.compiler().errorQueue();
     }
 
     public NodeVisitor enterCall(Node n) throws SemanticException {
