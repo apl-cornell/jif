@@ -865,27 +865,14 @@ public class JifTypeSystem_c
      * primitive, or it has a toString() method.
      */
     public boolean canCoerceToString(Type t, Context c) {
-        if (t.isPrimitive() || this.equals(t, this.String())) {
+        if (this.equals(t, this.String()) || (t.isPrimitive() && 
+                                              !isPrincipal(t) && !isLabel(t))) {
             return true;
         }
 
-        // check that t has a toString method
-        if (t.isClass()) {
-            ClassType ct = t.toClass();
-            try {
-                this.findMethod(ct, "toString", Collections.EMPTY_LIST, c.currentClass());
-                // we were succesfully able to find an appropriate method
-                return true;
-            }
-            catch (NoMemberException e) {
-                // no toString method.
-                // fall through and return false
-            }
-            catch (SemanticException e) {
-                throw new InternalCompilerError(
-                        "Unexpected semantic exception", e);
-            }
-        }
+        // even if the type t has a toString method, it's not enough, as
+        // we do not know how much information is revealed by that string.
+        // The programmer must call toString explicitly.
         return false;
     }
 
