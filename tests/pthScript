@@ -31,6 +31,8 @@
 jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
         OwnedObject.jif;
         LabeledObject.jif;
+        TestPrincipal.jif;
+        TestClosure.jif;
 	A.jif ;
 	Account.jif ;
 	ActsFor1.jif ;
@@ -232,6 +234,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	Params31.jif (Semantic, "Cannot instantiate from a non-polymorphic type");
 	Params32.jif (Semantic, "Too many parameters");
 	Params33.jif (Semantic, "Wrong number of actual parameters");
+	Params34.jif ;
+	Params35.jif (Semantic, "Illegal principal parameter");
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;
@@ -304,7 +308,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	SwitchLabel4.jif;
 	This1.jif ;
 #	This2.jif ;
-	ToString.jif (Semantic, "Cannot coerce") ;
+	ToString.jif (Semantic, "Cannot coerce"), (Semantic, "Cannot coerce") ;
 	User1.jif ;
 	Vec.jif ;
 	While.jif ;

@@ -1,28 +1,46 @@
-// Test implementations of jif.lang.Principal
-class TestPrincipal extends AbstractPrincipal {
-    public TestPrincipal(String{this} name) {
-	super(name);
-    }
+import java.io.PrintStream;
+import jif.runtime.Runtime;
 
-    public boolean{authPrf; closure; lb; this} isAuthorized(Object authPrf, 
-                                                     Closure[this, lb] closure,
-                                                     label lb) {
-        // allow only Test closures
-        return closure instanceof TestClosure[this];
+class Authority03 {
+    public static void main{}(String[] args) {
+	final Principal me = new TestPrincipal("Steve");
+	
+	final principal nullP = null;
+        Runtime[nullP] runtime;
+	PrintStream[{}] out = null;
+	try {
+	    runtime = Runtime[nullP].getRuntime();
+	    if (runtime == null) return;
+	    out = runtime.stdout(new label {});
+	}
+	catch (SecurityException e) { }
+	if (out == null) return;
+	
+	// try invoking a closure
+	AddBobClosure[me] abc = new AddBobClosure[me](out);
+	Capability[me, {}] cap = PrincipalUtil.authorize(me, null, abc, new label {});
+	if (cap != null) {
+	    cap.invoke();
+	}
     }
-    
 }
 
-class TestClosure[principal P] implements Closure[P, {P:}] authority (P) {
-    public Object{this} invoke{P:}() where authority (P) {
+class AddBobClosure[principal P] extends TestClosure[P, {}] {
+    final PrintStream[{}]{} out;
+    AddBobClosure(PrintStream[{}]{} out) {
+	this.out = out;
+	super();
+    }
+    
+    public Object{this} invoke{}() where caller (P) {
 	final Principal p = P;
 	if (p instanceof TestPrincipal) {
 	    try {
 		final TestPrincipal tp = (TestPrincipal)p;
-		tp.addDelegatesTo(Alice);
+		if (out != null) out.println("Hi mum, from " + tp.name());
+		tp.addDelegatesTo(Bob);
 	    }
 	    catch (ClassCastException impossbile) {}
-	    //catch (NullPointerException impossbile) {}
 	}
 	return null;
     }

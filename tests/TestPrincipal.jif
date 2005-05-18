@@ -1,0 +1,14 @@
+// Test principal, reused by some authentication tests.
+public class TestPrincipal extends AbstractPrincipal {
+    public TestPrincipal(String{this} name) {
+	super(name);
+    }
+
+    public boolean{authPrf; closure; lb; this} isAuthorized(Object authPrf, 
+                                                     Closure[this, lb] closure,
+                                                     label lb) {
+        // allow only Test closures
+        return closure instanceof TestClosure[this, lb];
+    }
+    
+}
