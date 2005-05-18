@@ -67,7 +67,7 @@ public class PrivacyPolicy implements Policy
     }
 
     public int hashCode() {
-	return owner.hashCode() + readers.size();
+	return (owner==null?0:owner.hashCode()) + readers.size();
     }
 
     public boolean equals(Object o) {
@@ -77,26 +77,20 @@ public class PrivacyPolicy implements Policy
 
 	PrivacyPolicy policy = (PrivacyPolicy) o;
 
-	if (! owner.equals(policy.owner)) {
-	    return false;
+	if (owner == policy || (owner != null && owner.equals(policy.owner)
+            && policy.owner != null && policy.owner.equals(owner))) {
+	    return readers.containsAll(policy.readers) && 
+	            policy.readers.containsAll(readers);
 	}
 
-	if (readers.size() != policy.readers.size()) {
-	    return false;
-	}
-
-	if (! readers.containsAll(policy.readers)) {
-	    return false;
-	}
-
-	return true;
+	return false;
     }
     
     public String toString() {
-	String str = owner.name() + ": ";
+	String str = (owner == null?"<null>":owner.name()) + ": ";
 	for (Iterator iter = readers.iterator(); iter.hasNext(); ) {
 	    Principal reader = (Principal) iter.next();
-	    str += reader.name();
+	    str += (reader == null?"<null>":reader.name());
 	    if (iter.hasNext()) str += ",";
 	}
 	return str;
