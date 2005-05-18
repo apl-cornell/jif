@@ -52,15 +52,14 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
         if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             throw new SemanticDetailedException(
-                "Only final access paths or principal expressions can be used as a dynamic principal.",
+                "Illegal dynamic principal.",
                 "Only final access paths or principal expressions can be used as a dynamic principal. " +
                 "A final access path is an expression starting with either \"this\" or a final " +
                 "local variable \"v\", followed by zero or more final field accesses. That is, " +
                 "a final access path is either this.f1.f2....fn, or v.f1.f2.....fn, where v is a " +
                 "final local variables, and each field f1 to fn is a final field. A principal expression " +
                 "is either a principal parameter, or an external principal.",
-                this.position());
-                                        
+                this.position());                                        
         }
 
         return nf.CanonicalPrincipalNode(position(),

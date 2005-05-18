@@ -39,7 +39,7 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         }
         if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             throw new SemanticDetailedException(
-                "Only final access paths or label expressions can be used as a dynamic label.",
+                "Illegal dynamic label.",
                 "Only final access paths or label expressions can be used as a dynamic label. " +
                 "A final access path is an expression starting with either \"this\" or a final " +
                 "local variable \"v\", followed by zero or more final field accesses. That is, " +

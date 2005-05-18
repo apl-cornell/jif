@@ -69,8 +69,25 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
         if (expr instanceof PrincipalNode || (expectedPI != null && expectedPI.isPrincipal())) {
+            if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
+                throw new SemanticDetailedException(
+                    "Illegal principal parameter.",
+                    "The expression " + expr + " is not suitable as a " +
+                    "principal parameter. Principal parameters can be either " +
+                    "dynamic principals, or principal expressions, such as a " +
+                    "principal parameter, or an external principal.",
+                    this.position());                                        
+            }
             return nf.CanonicalPrincipalNode(position(), 
                                              JifUtil.exprToPrincipal(ts, expr, c));
+        }
+        if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
+            throw new SemanticDetailedException(
+                "Illegal label parameter.",
+                "The expression " + expr + " is not suitable as a " +
+                "label parameter. Label parameters can be either " +
+                "dynamic labels, or label expressions.",
+                this.position());
         }
         return nf.CanonicalLabelNode(position(), 
                                      JifUtil.exprToLabel(ts, expr, c));            
