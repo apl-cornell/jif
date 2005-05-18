@@ -178,18 +178,18 @@ The jif script automatically ensures that the directories $JIF/rt-classes
 and $JIF/lib-classes are on the classpath, and that the Jif runtime native
 code is on the library load path.
 
-See the README files in $JIF/examples and $JIF/tests for some examples of 
-compiling and running Jif code, and hints and information about writing
-Jif programs.
+See the Jif documentation ($JIF/doc/index.html) for more information
+about writing Jif programs. See the directories $JIF/examples and
+$JIF/tests for some examples of Jif programs.
 
 Credits
 -------
 
 The Jif project is supervised by Andrew Myers at the Cornell
 University Computer Science Department. Many people have contributed
-to this software.  The 1.x.x releases of the Jif compiler were
-prepared by Stephen Chong and Lantian Zheng. Steve Zdancewic and Nate
-Nystrom helped implement earlier versions.
+to this software.  This release of the Jif compiler was prepared by
+Stephen Chong. Lantian Zheng, Steve Zdancewic, Nate Nystrom and
+Stephen Chong helped implement earlier versions.
 
 Restrictions on use
 -------------------

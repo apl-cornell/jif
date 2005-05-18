@@ -1,42 +1,79 @@
 <html>
 
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
-<meta name="ProgId" content="FrontPage.Editor.Document">
 <title>Jif Documentation</title>
 </head>
 
 <body>
 
 <h1>Jif Documentation</h1>
-<p>Jif Version 0.9.2, August 2001</p>
+<p>Jif Version 2.0.0, ????? 2005</p>
+<hr>
+<p>
+Jif is based on the JFlow language described in the 1999 paper, <a
+href="http://www.cs.cornell.edu/andru/papers/popl99/myers-popl99.ps.gz">Practical
+Mostly-Static Information Flow Control</a>, published in the
+Proceedings of the 26th ACM Symposium on Principles of Programming
+Languages (POPL), January 1999, pp. 228-241, by Andrew C. Myers. The
+most complete documentation for Jif can be found in Andrew Myers'
+thesis, linked to from the <a
+href="http://www.cs.cornell.edu/jif/">Jif web site</a>. However, the
+language has developed since that time, and some features in this
+version of Jif are not documented in the thesis.
+
+<p>
+This document provides a brief description of this version of the Jif
+programming language, and information on how to write and run Jif
+programs. This document is a work in progress, and is by no means
+complete. Please contact the developers if you have questions or
+problems that this document does not address.
+
 <hr>
 <h2>Table of Contents</h2>
 <ul>
-  <li><a href="jif_programming.html">Programming Jif</a>
-    <ul>
-      <li><a href="jif_programming.html#principal">Create principals</a></li>
-      <li><a href="jif_programming.html#default_labels">Default labels</a></li>
-      <li><a href="jif_programming.html#runtime_errors">Catch runtime errors</a></li>
-    </ul>
+  <li> <a href="../README">Installing and Configuring Jif</a></li>
+  <li> <a href="../CHANGES">Change log</a></li>
+  <li> <a href="../LICENSE">License</a></li>
+
+  <li><a href="jif_programming.html">Programming in Jif</a>
+   <ul>
+   <li><a href="jif_programming.html#language-features">Language Features</a> 
+       <ul>
+	 <li><a href="jif_programming.html#dynamic-labels">Dynamic labels and principals</a></li>
+	 <li><a href="jif_programming.html#parameterized-classes">Parameterized classes</a></li> 
+	 <li><a href="jif_programming.html#method-polymorphism">Method polymorphism</a></li>
+	 <li><a href="jif_programming.html#runtime-tests">Runtime tests of labels and principals</a></li>
+	 <li><a href="jif_programming.html#static-fields">Static fields</a></li>
+	 <li><a href="jif_programming.html#runtime-exceptions">Runtime exceptions</a></li>
+	 <li><a href="jif_programming.html#user-defined-principals">User-defined principals</a></li>
+	 <li><a href="jif_programming.html#default-labels">Default labels</a></li>
+       </ul>
+   </li>
+   <li><a href="jif_programming.html#main">The <code>static public void main<code> method</a></li>
+   <li><a href="jif_programming.html#java-classes">Interacting with Java classes</a></li>
+   <li><a href="jif_programming.html#debugging">Debugging Jif Programs</a>
+       <ul>
+       <li><a href="jif_programming.html#explain">Constraint explanations</a></li>
+       <li><a href="jif_programming.html#report">Reporting</a></li>
+       </ul>
+   </li>
+  </ul>
+
   </li>
   <li><a href="jif_runtime.html">Jif Runtime Interface</a></li>
-  <li><a href="jif_usage.html">How to Run jif</a>
+  <li><a href="jif_usage.html">How to run Jif programs</a>
     <ul>
       <li><a href="jif_usage.html#usage">jif usage</a></li>
       <li><a href="jif_usage.html#find_classes">Where class definitions are
         found</a></li>
     </ul>
   </li>
-  <li>Writing Polyglot extensions
+  <li><a href="">Javadoc APIs</a>
     <ul>
-      <li><a href="ASTExtensions.html">Extending the
-        AST</a></li>
-      <li><a href="TypeSystemExtensions.html">Extending the type system</a></li>
+      <li><a href="jifc-api/index.html">Jif compiler API</a></li>
+      <li><a href="rt-api/index.html">Jif runtime API</a></li>
     </ul>
   </li>
-  <li><a href="http://www.cs.cornell.edu/jif/releases/javadoc/">Javadoc API</a></li>
 </ul>
 
 </body>

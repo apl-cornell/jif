@@ -1,77 +1,663 @@
 <html>
 
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
-<meta name="ProgId" content="FrontPage.Editor.Document">
-<title>Programming Jif</title>
+  <link rel=StyleSheet href="jifdoc.css" type="text/css">
+<title>Programming in Jif</title>
 </head>
 
 <body>
 
-<h1><u>Programming Jif</u></h1>
-<p>Jif is based on the JFlow language described in the 1999 paper, <a href="http://www.cs.cornell.edu/andru/papers/popl99/myers-popl99.ps.gz">Practical
-Mostly-Static Information Flow Control</a>, published in the Proceedings of the
-26th ACM Symposium on Principles of Programming Languages (POPL), January 1999,
-pp. 228-241, by Andrew C. Myers. Please refer to that paper for a description
-of the syntax of Jif.</p>
+<h1><u>Programming in Jif</u></h1>
 
-<h2><a name="principal"></a>Create Principals</h2>
-<p>To program in Jif, you probably need to write down some Jif labels such as <code>{Alice:Bob}</code>. So you will need principals. In this Jif implementation, an<br>
-external principal is represented by a Java class. For example, the principal Bob is represented by the class
-<code>jif.principal.Bob</code>. In the directory <code>jif-0.9/demo/jif/principal</code>, you can find some sample Java files used to define
-principals. Let's examine <code>Bob.java</code>:</p>
-<table border="0" width="100%">
-  <tr>
-    <td width="100%" bgcolor="#C0C0C0"><font face="Courier New">    package jif.principal;<br>
-      <br>
-    import java.util.*;</font>
-      <p><font face="Courier New">public class Bob extends jif.lang.Principal {<br>
-        public static final jif.lang.Principal P;<br>
-      <br>
-        private Bob(Set s) {<br>
-      &nbsp;&nbsp;&nbsp; super(s);<br>
-        }<br>
-      <br>
-        static {<br>
-      &nbsp;&nbsp;&nbsp; Set s = new HashSet();<br>
-      &nbsp;&nbsp;&nbsp; s.add(jif.principal.Chuck.P);<br>
-      &nbsp;&nbsp;&nbsp; P = new Bob(s);<br>
-      }</font></td>
-  </tr>
-</table>
-<p>The line <u><code>s.add(jif.principal.Chuck.P);</code></u> adds Chuck into Bob's superiors set, <i>i.e.,</i> Chuck can act for Bob.<br>
+
+<h2><a name="language-features"></a>Language Features</h2> 
+
+<p>This section focuses primarily on the
+language features of this version of Jif that are new or different to
+the language features described in Andrew Myers' thesis (linked to
+from the <a href="http://www.cs.cornell.edu/jif/">Jif web site</a>).
+
+<h3><a name="dynamic-labels"></a>Dynamic labels and principals</h3>
+
+Labels and principals are first-class values, and are represented at
+runtime. These "dynamic" labels and principals can be used in the
+specification of other labels, and used as the parameters of <a
+href="parameterized-classes">parameterized classes</a>. (Thus, Jif's
+type system uses dependent types.) Consider the following example.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+class C[label L] { ... }
+
+...
+
+void m() {
+    final label lb = new label {Alice: Bob};
+
+    int{*lb; Bob:} x = 4;
+
+    C[lb] foo = null;
+    C[{*lb}] bar = foo;
+}
+</pre>
+</div></td></tr></table>
+
+<p>Here we see a local variable <code>lb</code>, of type
+<code>label</code>. At runtime, this variable will contain a
+representation of the label <code>{Alice: Bob}</code>. The type of the
+variable <code>x</code> is declared to be <code>int{*lb; Bob:}</code>,
+that is, an integer whose label the policy <code>{Bob:}</code> joined
+with the <i>value</i> stored in the variable <code>lb</code>. This is
+an example of a dynamic label being used in another label.
+
+<p>The variable <code>foo</code> is of type <code>C[lb]</code>, that
+is, its type is the class <code>C</code> instantiated with the label
+that is stored in the variable <code>lb</code>. This type is
+equivalent to the type <code>C[{*lb}]</code>, since the label stored
+in the variable <code>lb</code> is equivalent to the label <code>{*lb}</code>.
+
+<p>Jif's allows more than just local variables of type
+<code>label</code> and <code>principal</code> to be used to construct
+new labels and types. in fact, any <i>final access path</i> expression
+may be used. A final access path expression is an expression of the
+form <i>r.f<sub>1</sub>.f<sub>2</sub>. ... .f<sub>n</sub></i>, where <i>r</i> is either a final local
+variable, or the expression <code>this</code>, and each
+<i>f<sub>i</sub></i> is an access to a final field. Thus, the following are all examples of legal uses of dynamic labels.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+class C[label L, principal P] {
+    final label lb;    
+    final principal q;
+    final C[lb, Alice] next;
+
+    public C() { ... }
+
+    void m(principal pp) throws NullPointerException {
+        final C[this.next.lb, pp] foo = new C[this.next.lb, pp]();
+        C[{Alice: foo.q}, P] quux = null;
+
+        int{foo.next.q: ; *this.lb} x = 8;        
+    }
+}
+</pre>
+</div></td></tr></table>
+
+<p>Final access paths appearing in labels and types may act as covert
+channels. For example, an access path may throw a null pointer
+exception, or the value stored in a particular variable may reveal
+sensitive information. The Jif type system must account for the
+information that may revealed whenever a final access path in a label
+or type is evaluated at runtime. Final access paths occurring in a
+label may be evaluated at runtime when a <code>new label</code>
+expression is evaluated; final access paths occurring in a type may be
+evaluated at runtime during the evaluation of casts to a parameterized
+type, <code>instanceof</code> checks against a parameterized type,
+construction of a new object of parameterized type, or a call to a
+static method of a parameterized type.
+
+<p>In the following example, an <code>instanceof</code> check is
+performed against a parameterized type,
+<code>C[{this.f.p:}]</code>. The evaluation of this expression
+requires the evaluation of the access path expression
+<code>this.f.p</code>, which may throw a
+<code>NullPointerException</code> if <code>this.f</code> is
+null. Thus, whether or not a <code>NullPointerException</code> is
+thrown may reveal information at level <code>{this;
+Alice:}</code>. Thus, if the assignment to the local variable
+<code>x</code> occurs, information with the label <code>{this;
+Alice:}</code> is flowing, and thus the label of the variable
+<code>x</code> must be at least <code>{this; Alice:}</code>.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+class C[label L] { ... } 
+
+class D { 
+    final D{Alice:} f; 
+    final principal{} p;
+
+    ...
+
+    void m(Object{} o) {
+        try {
+            boolean{Alice:; this} x = (o instanceof C[{this.f.p:}]);
+        }
+        catch (NullPointerException e) {
+	    // may be thrown by the evaluation of "this.f.p"
+	} 
+    }
+}
+</pre>
+</div></td></tr></table>
+
+
+<h3><a name="parameterized-classes"></a>Parameterized classes</h3> 
+
+<p>A parameterized class is generic with respect to some set of type
+parameters. Jif allows classes to be parameterized on labels and
+principals. The key difference between parameterized classes in this
+version of Jif, and as described in Andrew Myers' thesis, is that
+class parameters are represented at runtime. Thus, the following code
+is permitted.  
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+class C[label L, principal P] {
+    private final label{this} lb = L;
+
+    private void m() {
+        label foo = new label {L; Alice:};
+        principal bar = P;
+    }
+}
+</pre>
+</div></td></tr></table>
+
+
+<p>Note that the label of a parameter is the label
+<code>{this}</code>. That is, the information that may be conveyed by
+knowing the runtime value of a parameter is the same as the
+information that may be conveyed by the reference to this
+object. Thus, if the label of the final field <code>lb</code> in the
+example above was not at least as restrictive as the label
+<code>{this}</code>, the example would not compile.
+
+<h3><a name="method-polymorphism"></a>Method polymorphism</h3>
+
+<p>Methods in Jif are parametric in the labels of the arguments. This
+facilitates reuse of methods. For example, in the following method
+signature, the method <code>m</code> returns a <code>String</code> whose
+label is the same as the label of the argument <code>a</code>.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+String{a} m(int{Alice: ; Bob:} a);
+</pre></div></td></tr></table>
+ 
+
+<p>The label on the declaration of the argument <code>a</code> is
+<code>{Alice: ; Bob:}</code>. This means that the label of any actual
+argument given to <code>m</code> can be <i>at most</i> as restrictive
+as <code>{Alice: ; Bob:}</code>, that is, <code>{Alice: ; Bob:}</code> is an
+upper bound on the label of any actual argument to <code>m</code>. The
+following code that calls the method <code>m</code> compiles
+successfully.
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+int{Alice: Chuck} i = 42;
+String{Alice: Chuck} s = m(i); // OK, since m returns a String with the same label as i
+</pre></div></td></tr></table>
+ 
+
+<p>In the body of the method <code>m</code>, all that is known about
+the label of the formal argument <code>a</code> is that <code>{Alice:
+; Bob:}</code> is an upper bound for it. Thus, the first line of the method body below is illegal, while the second is legal.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+String{a} m(int{Alice: ; Bob:} a) {
+    int{Alice:} i = a; // ILLEGAL! Don't know that {a} <= {Alice:}
+    int{Alice: ; Bob: ; Chuck: } j = a; // OK
+    ...
+}
+</pre></div></td></tr></table>
+ 
+
+<p>The labels of arguments given to a method are not represented at
+runtime. That is, within a method body, there is no runtime
+representation of labels of the arguments. The following code is thus illegal.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+void foo(int{Bob:} a) {
+    label lb = new label {Alice: ; a}; // ILLEGAL! Label of a is not runtime representable.
+
+    if (new label {a} <= new label {Bob: Chuck}) { // ILLEGAL! Label of a is not runtime representable.
+    }
+    ....
+}
+</pre></div></td></tr></table>
+ 
+
+<p>If no label is specified for a formal argument, then it is assumed
+that there are no restrictions on the labels of the actual arguments
+that may be passed in. See the section on <a
+href="#default-labels">default labels</a>.
+
+<h3><a name="runtime-tests"></a>Runtime tests of labels and principals</h3>
+
+<p>Jif provides a mechanism for comparing runtime labels, and also a
+mechanism for comparing runtime principals. Both mechanisms use a
+syntax similar to that of if statements.
+
+<p>An <i>if-label</i> statement allows the runtime comparison of labels. It has the following form: 
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+if (L1 <= L2) { 
+    ... 
+} 
+else { 
+    ... 
+}
+</pre></div></td></tr></table>
+ 
+
+<p>If the label <code>L2</code> is at least as restrictive as
+the label <code>L1</code>, then the code in the <code>then</code>
+branch is executed; otherwise, the code in the <code>else</code>
+branch is executed. The <code>else</code> branch is
+optional. During the label checking of the  <code>then</code>
+branch, it is assumed that the label <code>L2</code> is indeed at least as restrictive as
+the label <code>L1</code>. Thus, the following code compiles correctly.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+void m(int{*lbl} i, label{} lbl) {
+    int{Alice:} x;
+    if (lbl <= new label {Alice:}) {
+        x = i; // OK, since {*lb} <= {Alice:}
+    }
+    else {
+        x = 0;
+    }
+}
+</pre></div></td></tr></table>
+
+
+Note that this construct replaces the <code>switch-label</code> construct that existed in previous versions of Jif.
+
+
+<p>An <i>actsfor</i> statement allows the runtime comparison of principals. It has the following form: 
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+if (P1 actsfor P2) { 
+    ... 
+} 
+else { 
+    ... 
+}
+</pre></div></td></tr></table>
+ 
+
+<p>If the principal <code>P1</code> can act for the principal
+<code>P2</code>, then the code in the <code>then</code> branch is
+executed; otherwise, the code in the <code>else</code> branch is
+executed. The <code>else</code> branch is optional. During the label
+checking of the <code>then</code> branch, it is assumed that the
+principal <code>P1</code> can act for the principal
+<code>P2</code>. Thus, the following code compiles correctly.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+void m(int{Alice: pr} i, principal{} pr) {
+    int{Alice: Bob} x;
+    if (Bob actsfor pr) {
+        x = i; // OK, since {Alice: pr} <= {Alice: Bob}
+    }
+    else {
+        x = 0;
+    }
+}
+</pre></div></td></tr></table>
+
+
+Note that this construct replaces the <code>actsfor { ... } else { ... }</code> construct that existed in previous versions of Jif.
+
+<h3><a name="static-fields"></a>Static fields</h3>
+
+<p>Static fields of classes are supported in Jif, subject to the following restrictions.
+
+<ol>
+<li>If a static field has an initializing
+expression, the expression must contain only constant values. Without
+this restriction, the initializing expression could be used to convey
+information about when the class is loaded (e.g., by calling a
+method), which may depend on sensitive information.</li>
+<li>The label of a static field cannot mention <code>this</code> (as the expression <code>this</code> is not valid in a static context).</li>
+<li>The label of a static field cannot mention any class parameters (as class parameters are specific to an instance of the class).</li>
+</ol>
+
+
+<h3><a name="runtime-exceptions"></a>Runtime exceptions</h3>
+
+<p>In Java, subclasses of <code>RuntimeException</code> (such as
+<code>NullPointerException</code>, <code>ClassCastException</code>,
+and <code>ArrayIndexOutOfBoundsException</code>) are <i>unchecked</i>;
+they may be thrown by a method without being declared in the
+<code>throws</code> clause of the method signature. Unchecked
+exceptions can serve as covert channels. To prevent this covert
+channel, Jif requires subclasses of
+<code>RuntimeException</code> to be checked.
+
+To reduce the additional programming burden of handling runtime
+exceptions, this version of Jif has a simple not-null analysis, which
+tracks whether local variables and final fields of the
+<code>this</code> object are definitely null. Thus, in the following example, the method <code>m(Object, String)</code> cannot throw a
+<code>NullPointerException</code>, and does not need to declare that it does.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+class C {
+    final String{} f = "a string";
+    C another;
+    
+    void m(Object{} o, String{} s) {
+        if (s != null) {
+            return;
+        }
+        s.length(); // OK, s known to be not-null
+        if (o instanceof String) {
+            try { 
+                ((String)o).length(); // OK, if instanceof succeeds, o is not-null
+            }
+            catch (ClassCastException e) { 
+                // still need to catch the ClassCastException
+            }
+            
+        }
+        if (f != null) { 
+            f.length(); // OK, f is final field of this.
+        }
+        if (another.f != null) { 
+            try {
+                f.length(); 
+            }
+            catch (NullPointerException e) { 
+                // still need to catch the NPE, as we cannot reason about 
+                // fields of objects other than this.  
+            }
+        }
+    }
+}
+</pre></div></td></tr></table>
+ 
+
+<h3><a name="user-defined-principals"></a>User-defined principals</h3>
+
+TODO
+
+<h3><a name="default-labels"></a>Default labels</h3>
+
+<p>A powerful feature of Jif is that you don't have to write down
+labels of local variables. Jif compiler can figure out whether there
+is a way of labeling local variables to satisfy all the label
+constraints. However, most of the time you do need to write down
+labels of fields and method signatures, including the begin label,
+return label, result label and arguments' labels. When these labels
+are missing, some conservatives rules are used to assign restrictive
+default labels:</p> 
+
+<ul> 
+<li>Default field label: the bottom label, <code>{}</code>
 <br>
-To create the principal Bob, you simply compile <code>Bob.java</code> and make
-sure that the output directory is included in your <code>CLASSPATH</code>.</p>
-<h2><br> <a name="default_labels"></a>Default Labels</h2> <p>A powerful feature
-of Jif is that you don't have to write down labels of local variables. Jif
-compiler can figure out whether there is a way of labeling local variables to
-satisfy all the label constraints. However, most of the time you do need to
-write down labels of fields and method signatures, including begin label,
-return label, result label and arguments' labels. When these labels are
-missing, some conservatives rules are used to assign restrictive default
-labels:</p> <ul> <li> Default method begin label: a fresh covariant label,
-which means the method has no side effects.</li> <li>Default method return
-label: "this" label if the method is not static, bottom otherwise. It means no
-extra information can be gained by knowing the method returns normally. Note
-that if a method returns normally, we can infer that the target of this method
-is not null. So the default return label of a non-static method should be
-"this" label.</li> <li> Default method result label: the join of all the
-arguments' labels and the return label. Note that "this" label is folded in
-through the return label.</li> <li> Default argument label: a fresh covariant
-label. It says that the method won't leak any information about this
-variable.</li> <li>Default field label: bottom, which is conservative because
-no confidential data can be stored in the field.</li> </ul> <h2><a
-name="runtime_errors"></a>Catch Runtime Errors</h2> <p>In Jif, a method is
-required to catch or define in its throws clauses all the runtime errors that
-may occur in this method. This requirement is intended to force programmers to
-protect the information that can be derived from the fact that a runtime error
-happens.</p> <p><code>NullPointerException</code> and
-<code>IndexOutOfBoundsException</code> are the two most frequent runtime
-errors. In some cases, if you are sure that a reference is not null or an array
-index is in bound, you can simply catch the runtime exceptions and do nothing
-in the catch clauses.</p>
+If a field's type declaration does not include a label, then by
+default its label is <code>{}</code>, which is conservative because no
+confidential data can be stored in the field.
+</li>
+
+<li> Default argument label: the top label, <code>&lt;top&gt;</code>
+<br>
+The label on the type of a formal argument is an upper bound for
+labels of actual arguments. See the section on <a
+href="#method-polymorphism">polymorphic methods</a>.  
+</li>
+
+
+<li> Default method begin label: the top label, <code>&lt;top&gt;</code>
+<br>
+The method begin label is an upper bound on the PC of the caller, and
+a lower bound on the side effects of method.  The default method begin
+label is <code>&lt;top&gt;</code>, the most restrictive label, meaning
+that the method has no side effects.
+</li>
+
+<li>Default method return label: The join of the declared labels of any exceptions declared to be thrown
+<br>
+The method return label (how much information may be gained by knowing
+the method terminates normally) is by default the join of the declared
+labels of any exceptions that the method declares that it
+throws. Thus, if the method does not throw any exceptions, or if the
+declared exceptions do not have any labels, the default method return
+label is the bottom label, <code>{}</code>.
+</li>
+
+<li> Default method result label: the join of all the argument labels and the return label. 
+<br>
+The method result label (the label of the value returned by the
+method) is by default the method return label joined with all of the
+argument labels (<i>not</i> the upper bounds of the argument labels;
+see the section on <a href="#method-polymorphism">polymorphic
+methods</a>).  This is the common case, as most of the time the value
+returned by a method is the result of computation on all of its
+arguments.
+</li>
+
+<li> Default declared exception label: the method return label
+<br>
+A method may declare that it throws a certain exceptions; if an
+exception is declared to be thrown, but no label is given for that
+exception type, then by default it is assumed to be the same as the
+method return label.
+</li>
+</ul>
+
+<h2><a name="main"></a>The <code>static public void main<code> method</h2>
+
+<p>Jif provides two possible signatures for the main method of a
+class. The first is compatible with the signature for Java main
+methods, and accepts a single argument of an array of String, that is,
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+public static void main(String[] args) { ... }
+</pre></div></td></tr></table>
+
+
+<p>The second signature takes two arguments, the first a principal, and
+the second an array of String:
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+public static void main(principal p, String[] args) { ... }
+</pre></div></td></tr></table>
+
+
+<p>The principal <code>p</code> is the principal representing the current user that invoked the <code>main</code>. The signature
+may optionally have the authority of the current user:
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+public static void main(principal p, String[] args) where caller(p)  { ... }
+</pre></div></td></tr></table>
+
+<h3><a name="java-classes"></a>Interacting with Java classes</h3>
+
+<p>The Jif compiler provides a mechanism to allow Jif code to be compiled
+against and linked to existing Java classes. However, appropriate Jif
+signatures must be supplied for the Java classes. <b>NOTE:</b> the Jif compiler
+does not verify that the Java code conforms to these provided
+signatures.
+
+<p>
+Suppose that you have an existing Java class, called <code>Foo</code>,
+i.e. you have a file <code>Foo.java</code>, and a file
+<code>Foo.class</code> that was produced by compiling
+<code>Foo.java</code>. Furthermore, suppose you want to use the class
+Foo in some Jif code you are writing. You can do this by supplying a
+Jif signature for the class <code>Foo</code>; at compile time, your Jif code will
+be compiled against the signature you provide, but at runtime the
+original <code>Foo.class</code> will be loaded. The steps for doing this are as
+follows:
+
+<ol>
+<li> In a file <code>Foo.jif</code> write an appropriate Jif signature for the
+   methods and fields in the class Foo.  Take a look at
+   $JIF/sig-src/java/lang/*.jif for some examples of this.
+
+   <p>Note the use of the <code>native</code> flag to avoid the need to provide a
+   body for the methods. Note also that there is a <code>private static int</code>
+   field named <code>__JIF_SIG_OF_JAVA_CLASS$20030619</code>; this is a hack to
+   let the Jif compiler to know that the class provides a Jif
+   signature for an existing Java class.
+</li>
+
+<li> Compile <code>Foo.jif</code> to produce the file <code>Foo.class</code>
+</li>
+
+<li> Make sure that the <code>Foo.class</code> you created in step 2 is on the
+   signature classpath. Do this either by dropping the class file into
+   the $JIF/sig-classes directory, or by specifying the directory with
+   the <code>-sigcp</code> flag to the Jif compiler. (If you use the <code>-sigcp</code>
+   flag you will probably also need to explicitly add the
+   $JIF/sig-classes directory to the signature classpath, e.g. use
+   <code>-sigcp my-sig-classes:$JIF/sig-classes</code>)
+</li>
+
+<li> Compile your Jif code that uses the class Foo. The Jif compiler
+   will use the signature you created in step 1 to compile your code
+   against.
+</li>
+
+<li> Make sure that the original <code>Foo.class</code> is on the classpath, but
+   that the <code>Foo.class</code> you created in step 2 is not. Now, when you
+   run your Jif compiled code, the original <code>Foo.class</code> will be loaded
+   by the classloader.
+</li>
+</ol>
+
+<h2><a name="debugging"></a>Debugging Jif Programs</h2> 
+
+<p>Tracking down and correcting compilation errors in Jif code can be
+difficult. While there is not as yet a debugger specifically for the
+Jif language, the Jif compiler has a number of reporting options that
+will result in additional information being displayed.
+
+
+<h3><a name="explain"></a>Constraint explanations</h3>
+
+<p>The <code>-explain</code> or <code>-e</code> flag of the Jif compiler can be used to view
+more information about failed label checking. For example, consider
+the program, in which there is a potential implicit information flow
+from the high security argument <code>h</code>, whose label is the dynamic label
+<code>lbl</code>, to the low security local variable <code>l</code>:
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+class Implicit {
+    void m(boolean{*lbl} h, label{} lbl) {
+        if (lbl <= new label {Alice:}) {
+            boolean{} l = false;
+            if (h) {
+                l = true;
+            }
+        }
+    }
+}
+</pre></div></td></tr></table>
+
+Trying to compile this program produces the following output:
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+$ $JIF/bin/jifc Implicit.jif
+Implicit.jif:6: Label of right hand side not less restrictive than the label
+    for local variable l
+                l = true;
+                ^
+
+1 error.
+</pre></div></td></tr></table>
+
+<p>More information can be gleaned by using the <code>-explain</code> flag:
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+$ $JIF/bin/jifc Implicit.jif -explain
+Implicit.jif:6: Unsatisfiable constraint:
+     rhs.nv <= label of var l
+        {h} <= {lbl}
+     in environment
+     [{*lbl} <= {Alice: }]
+
+     Label Descriptions
+     ------------------
+     - rhs.nv = label of successful evaluation of right hand of assignment
+     - rhs.nv = {h}
+     - label of var l = {lbl}
+
+     More information is revealed by the successful evaluation of the right
+    hand side of the assignment than is allowed to flow to the local variable
+    l.
+                l = true;
+                ^
+
+1 error.
+</pre></div></td></tr></table>
+
+<p>The more detailed error message first shows what the symbolic
+unsatisfiable constraint is (<code>rhs.nv <= label of var l</code>), and then
+shows the same constraints with the actual labels substituted for the
+symbols (<code>{h} <= {}</code>). The label environment in which the constraint
+must be satisfied is also shown. Here, the environment indicates that
+the value held in the label variable <code>lbl</code> is bounded above by the label
+<code>{Alice:}</code>. Brief descriptions of the labels that appear in the
+unsatisfiable constraint are also shown. Here, we see that <code>rhs.nv</code> is
+the label of the information that may be acquired by the successful
+evaluation of the right hand side of the assignment, and that for this
+assignment, that label is <code>{h}</code>, the label of the actual argument <code>h</code>.
+
+
+<h3><a name="report"></a>Reporting</h3>
+
+<p>Sometimes the additional information provided by the <code>-explain</code> option
+is not sufficient to determine why a Jif program fails to
+compile. There are two additional useful ways to gain more information
+about the label checking process: reporting the topics <code>debug</code> and
+<code>solver</code>.
+
+Specifying the command line option <code>-report debug=n</code>, where <code>n</code> is a
+non-negative integer, will display more information about labels. The
+higher the value for <code>n</code>, the more information is displayed. For
+example:
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+$ $JIF/bin/jifc Implicit.jif -report debug=1 -explain
+Implicit.jif:6: Unsatisfiable constraint:
+     rhs.nv <= label of var l
+        {<arg h {<dynamic lbl>}>} <= {<arg lbl {}>}
+     in environment
+     [{<dynamic lbl>} <= {<pr-external Alice>: }]
+
+     Label Descriptions
+     ------------------
+     - rhs.nv = label of successful evaluation of right hand of assignment
+     - rhs.nv = {<arg h {<dynamic lbl>}>}
+     - label of var l = {<arg lbl {}>}
+
+     More information is revealed by the successful evaluation of the right
+    hand side of the assignment than is allowed to flow to the local variable
+    l.
+                l = true;
+                ^
+
+1 error.
+</pre></div></td></tr></table>
+
+
+<p>In the environment, we see that the label of the actual argument
+for <code>h</code> is displayed as <code>&lt;arg h {&lt;dynamic
+lbl&gt;}&gt;</code>. That is, we see that the label is the argument
+label for the argument <code>h</code>, and that this arg-label is
+bounded above by the label <code>&lt;dynamic lbl&gt;</code>, that is by the dynamic label 
+<code>lbl</code>.
+
+<p>The arg-label for <code>h</code> would normally be displayed simply
+as <code>h</code>, and the dynamic label <code>lbl</code> would normal
+be displayed as <code>*lbl</code>. But with the <code>debug</code>
+topic reporting at level 1, we see more detail about the labels, which
+can be helpful to determine what reasoning the compiler is
+performing. Setting the report level higher reveals even more
+information.
+
+<p>Thus, reporting the debug topic provides more information about
+the labels and their meaning, but a less readable display.
+
+
+<p>Specifying the command line option <code>-report solver=n</code>, for a
+nonnegative n, will display more information about the constraint
+solver, which attempts to solve the system of constraints generated by
+label checking. The higher the value for n, the more information is
+displayed.
+
+<p>When the constraint solver is unable to solve a system of constraints,
+it attempts to find the most appropriate constraint to "blame": this
+is the constraint that is displayed in the error message. However,
+sometimes this constraint is not the real culprit, and one or more
+other constraints are really preventing successful
+compilation. Enabling reporting for the solver allows the user to
+determine which constraint(s) are problematic, when the error message
+does not appear to be helpful.
+
 
 </body>
 
