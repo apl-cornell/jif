@@ -1,14 +1,11 @@
 package jif.types.label;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import jif.ast.JifInstantiator;
 import jif.types.*;
 import polyglot.types.*;
-import polyglot.types.FieldInstance;
-import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -101,6 +98,9 @@ public class AccessPathField extends AccessPath {
             if (!fi.equals(found)) {
                 throw new InternalCompilerError("Unexpected field instance for name " + fieldName + ": original was " + fi + "; found was " + found);
             }
+        }
+        if (fi == null) {
+            throw new SemanticException("Field " + fieldName + " cannot be found in class " + path.type(), position());
         }
         if (!fi.flags().isFinal()) {
             throw new SemanticException("Field " + fi.name() + " in access path is not final", position());
