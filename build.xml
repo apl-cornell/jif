@@ -651,6 +651,8 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
 		<copy todir="${dist}" includeEmptyDirs="no">
 			<fileset dir="${basedir}" defaultexcludes="yes">
 				<include name="doc/*api/**" />
+				<include name="doc/*.html" />
+				<include name="doc/*.css" />
 			</fileset>
 		</copy>
 

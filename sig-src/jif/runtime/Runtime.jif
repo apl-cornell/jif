@@ -9,10 +9,6 @@ public class Runtime[principal P]
     public static native Runtime[P] getRuntime() throws SecurityException;
     public static native principal{} user();
 
-    // is called "acts_for" rather than "actsFor" to avoid conflict with the
-    // keyword "actsFor"
-    public static native boolean{p1;p2} acts_for(principal p1, principal p2);
-
     public native FileOutputStream[{*L}]{*L;L} openFileWrite(String{*L} name, boolean{*L} append, label L)
 	throws (IOException{*L;L}, SecurityException{*L;L});
     public native FileInputStream[{*L}]{*L;L} openFileRead(String{*L} name, label L)

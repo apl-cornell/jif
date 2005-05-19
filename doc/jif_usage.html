@@ -1,173 +1,85 @@
 <html>
 
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
-<meta name="ProgId" content="FrontPage.Editor.Document">
-<title>How to Run jif</title>
+<link rel=StyleSheet href="jifdoc.css" type="text/css">
+<title>Compiling and running Jif programs</title>
 </head>
 
 <body>
 
-<h1><u>How to Run jifc</u></h1>
-<p>A script named &quot;jifc&quot;, which allows you to run the Jif compiler from the
-command line,&nbsp; is created in the bin directory.</p>
-<h2><a name="usage"></a>usage: jifc [options] &lt;source-file>.jif ...</h2>
-<p>where [options] includes:</p>
-<table border="1" width="69%">
-  <tr>
-    <td width="29%">-d &lt;direccotry&gt;</td>
-    <td width="71%">output directory</td>
-  </tr>
-  <tr>
-    <td width="29%">-sourcepath &lt;path list&gt;</td>
-    <td width="71%">source path</td>
-  </tr>
-  <tr>
-    <td width="29%">-fqcn</td>
-    <td width="71%">user fully-qualified class names</td>
-  </tr>
-  <tr>
-    <td width="29%">-sx &lt;ext&gt;</td>
-    <td width="71%">set source extension</td>
-  </tr>
-  <tr>
-    <td width="29%">-ox &lt;ext&gt;</td>
-    <td width="71%">set output extension</td>
-  </tr>
-  <tr>
-    <td width="29%">-dump</td>
-    <td width="71%">dump the ast</td>
-  </tr>
-  <tr>
-    <td width="29%">-scramble [seed]</td>
-    <td width="71%">scramble the ast</td>
-  </tr>
-  <tr>
-    <td width="29%">-noserial</td>
-    <td width="71%">disable class serialization</td>
-  </tr>
-  <tr>
-    <td width="29%">-c</td>
-    <td width="71%">compile only to .java</td>
-  </tr>
-  <tr>
-    <td width="29%">-nooutput</td>
-    <td width="71%">delete the generated java files</td>
-  </tr>
-  <tr>
-    <td width="29%">-post &lt;compiler&gt;</td>
-    <td width="71%">run javac-like compiler after translation</td>
-  </tr>
-  <tr>
-    <td width="29%">-report &lt;topic&gt;=&lt;level&gt;</td>
-    <td width="71%">print verbose debugging information about topic at specified
-      verbosity</td>
-  </tr>
-  <tr>
-    <td width="29%">-v -verbose</td>
-    <td width="71%">print verbose debugging information</td>
-  </tr>
-  <tr>
-    <td width="29%">-version</td>
-    <td width="71%">print version information</td>
-  </tr>
-  <tr>
-    <td width="29%">-stop_constraint &lt;n&gt;</td>
-    <td width="71%">halt when the nth constraint is added</td>
-  </tr>
-  <tr>
-    <td width="29%">-h</td>
-    <td width="71%">print the help message</td>
-  </tr>
-</table>
-<p>Output Directory: -d<br>
-By default, output files are written in the same directory as the source files they are derived from. This option specifies a directory
-which will become the root directory of the package hierarchy for all output files. If this directory does not exist then it will be
-created when the first output file is written to disk.<br>
-<br>
-Source Path: -sourcepath<br>
-Defaults to the current directory plus any directory in which a source file is found. The path list must be a set of directories separated by
-the system-dependent path separator (":" on solaris, ";" on NT). See "Where Source Files Are Found" below.<br>
-<br>
-Fully Qualified Class Names: -fqcn<br>
-Defaults to OFF. If this options is given, each class name will be referenced by its fully qualified name. For example, "String" will
-appear throughout the output as "java.lang.String". If this options is set, then import statments will not be included in the output files
-(since they are unnecessary).<br>
-<br>
-Source Extension: -sx<br>
-Defaults to the extension of the first file given on the command line. This option should include the "." dot. For example, "-sx .jl"
-would search the source path for files such as "Foo.jl".<br>
-<br>
-Output Extension: -ox<br>
-Defaults to ".java". This option should include the "." dot. For example, "-ox .out" would create output files such as "Foo.out". If the
-desired output file name (which is derived from the output directory, if given, and the output extension) is identical to the source file
-name, then the output file name will be extended with an additional "$". In this fashion, jlc will never overwrite the source file with
-the output file. It will, however, overwrite older output files.<br>
-<br>
-Dump: -dump<br>
-Defaults to OFF. If this option is given, then the abstract syntax tree is printed out (to stdout) after each stage of the translator.<br>
-<br>
-Scramble: -scramble<br>
-Defaults to OFF. A debugging tool, see polyglot.visit.NodeScrambler for more info. Optionally takes an argument which is the long integer seed<br>
-for the random number generator used to pick which part of the tree is scrambled.<br>
-<br>
-No Serialization: -noserial<br>
-By default all translated class type information is serialized into the output files. This information will persist into the .class file
-and will continue to be available to jlc even if the source or translated Java file are lost. This allows the distribution of a set
-of .class files which still can be used with the polyglot translator. This option disables class type serialization.<br>
-<br>
-ObjectPrimitive Extension: -op<br>
-Defaults to OFF. Enables the ObjectPrimitive extension. This is a modification to the standard java type system in which primtive types
-(int, float, byte, ...) are subtypes of java.lang.Object. See the documentation in the source code in the "polyglot.ext.op" package.<br>
-<br>
-Post Process Compiler: -post<br>
-Defaults to NONE. If the post process compiler is set then the executable with the given name will be invoked after (and only if) all
-source files (and their dependencies) have been successfully translated by jlc. Note that most javac-like compiler require input
-files to have the ".java" extension.<br>
-<br>
-Verbose: -v -verbose<br>
-Print out profuse debugging information to stderr.<br>
-<br>
-Version: -version<br>
-Print out the current version of the translator and exit.<br>
-<br>
-Help: -h<br>
-Print out a summary of the usage options.<br>
-</p>
-<h2><a name="find_classes"></a> Where Class Definitions Are Found</h2>
-<ol>
-  <li>When the polyglot translator looks for a class by the name "foo.bar.Quux" it first searches for that class in any file given
-    on the command line. If the class is found one of these files, then this definition is used and the remainder of the steps are
-    skipped.</li>
-  <li>If none of these files contain the desired class, then the source path is searched  next. For example, if the source extension is
-    ".jl" and the source path is "mydir:." then the translator looks for files "mydir/foo/bar/Quux.jl" and "./foo/bar/Quux.jl". (The
-    source path may be set using the -S options, see above.)</li>
-  <li>Regardless of whether or not a source file is found, the translator searches the classpath (defined as normal through the environment
-    and command-line options to the interpreter) for the desired class.</li>
-  <li>If no source file exists, and no class is found then an error is reported (skipping the rest of the steps below).</li>
-  <li>If a source file is found, but no class, then the source file is parsed. If it contains the desired class definition (which it
-    should) then that definition is used and the remainder of the steps are skipped. (If it does not contain this definition, an error is
-    reported and the remainder of the steps are skipped.</li>
-  <li>If a class is found but no source file, then the class is examined for jlc class type information. If the class contains no class type
-    information (this is the case if the class file was compiled from raw Java source rather than jlc translated output) then this class
-    is used as the desired class definition (skipping all steps below).</li>
-  <li>(class, but no still no source) If the class does contain jlc class type information, then the version number of translator used to
-    translate the source which created the given class file is compared against the version of the current instantiation of the translator.
-    If the versions are compatible, then the jlc class type information is used as the desired definiton. If the versions are incompatible
-    (see the documentation in Compiler.java) then an error is reported. In either case, all remaining steps are skipped.</li>
-  <li>If both a suitable source file and class are found, we have a choice. If the class definition does not contain jlc class type
-    information then the source file is parsed as the definition found in this file is used as desired definiton and we stop here. If the
-    class does contain jlc class type information, then continue.</li>
-  <li>(source and class with jlc info) Next, the last modification date of the source file is compared to the last modification date of the
-    source file used to generate the class file. If the source file is more recent, the it is parsed as used as the desired definition and
-    all remaining steps are skipped.</li>
-  <li>(source and class with jlc info) Next, the jlc version of the class and of the current translator are compared (as in 7.). If the
-    verisions are incompatible, then we use the definition from the parsed source file. If the versions are compatible, then we use
-    the definition given by the jlc class type information.</li>
-</ol>
-<p>Finally, if at any point an error occurs while reading the jlc class type information (e.g., if this information exists but is corrupted), then
-an error is reported.</p>
+<h1><u>Compiling and running Jif programs</u></h1>
+
+<p>Jif programs can be compiled through the use of the script
+<code>jifc</code>, which was created in the $JIF/bin directory during
+installation (see the <a href="../README">README</a>). Information on the usage of <code>jifc</code> can be obtained by executing <code>jifc&nbsp;--help</code>:
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+$ $JIF/bin/jifc --help
+usage: jifc [options] &lt;source-file&gt;.jif ...
+where [options] includes:
+  @&lt;file&gt;                  read options from &lt;file&gt;
+  -d &lt;directory&gt;           output directory
+  -assert                  recognize the assert keyword
+  -sourcepath &lt;path&gt;       source path
+  -bootclasspath &lt;path&gt;    path for bootstrap class files
+  -ext &lt;extension&gt;         use language extension
+  -extclass &lt;ext-class&gt;    use language extension
+  -fqcn                    use fully-qualified class names
+  -sx &lt;ext&gt;                set source extension
+  -ox &lt;ext&gt;                set output extension
+  -errors &lt;num&gt;            set the maximum number of errors
+  -w &lt;num&gt;                 set the maximum width of the .java output files
+  -dump &lt;pass&gt;             dump the ast after pass &lt;pass&gt;
+  -print &lt;pass&gt;            pretty-print the ast after pass &lt;pass&gt;
+  -disable &lt;pass&gt;          disable pass &lt;pass&gt;
+  -noserial                disable class serialization
+  -nooutput                delete output files after compilation
+  -c                       compile only to .java
+  -post &lt;compiler&gt;         run javac-like compiler after translation
+  -v -verbose              print verbose debugging information
+  -report &lt;topic&gt;=&lt;level&gt;  print verbose debugging information about topic
+                           at specified verbosity
+        Allowed topics: imports, jl, serialize, types, frontend, time,
+        resolver, cfg, visit, dataflow, debug, errors, context, loader,
+        verbose, qq
+  -version                 print version info
+  -h                       print this message
+  -e -explain              provide more detailed explanations of failed
+                           label checking.
+  -debug &lt;n&gt;               set debug level to n. Prints more information
+                           about labels.
+  -stop_constraint &lt;n&gt;     halt when the nth constraint is added
+  -globalsolve             infer label variables globally (default: per
+                           class)
+  -sigcp &lt;path&gt;            path for Jif signatures (e.g. for
+                           java.lang.Object)
+  -rtcp &lt;path&gt;             path for Jif runtime classes
+</pre></div></td></tr></table>
+
+
+
+<p>The script <code>jifc</code> sets a number of the class path options by default. In particular: 
+
+<ul>
+<li>the class path for signatures (the <code>-sigcp</code> flag) is set to <code>$JIF/sig-classes:$JIF/lib/jifsig.jar</code></li>
+
+<li>the class path for the runtime classes (the <code>-rtcp</code> flag) is set to <code>$JIF/rt-classes:$JIF/lib/jifrt.jar</code></li>
+
+<li>the class path  (the <code>-classpath</code> flag) is extended to include <code>$JIF/lib-classes</code> and <code>$JIF/lib/jiflib.jar</code></li>
+</ul>
+where $JIF is the installation directory of this distribution.
+
+<h2>Running jif programs</h2>
+
+<p>Jif programs can be run through the use of the script
+<code>jif</code>, which was created in the $JIF/bin directory during
+installation (see the <a href="../README">README</a>). 
+
+<p>The script <code>jif</code> automatically extends the classpath to
+include <code>$JIF/rt-classes</code>, <code>$JIF/lib/jifrt.jar</code>,
+<code>$JIF/lib-classes</code> and
+<code>$JIF/lib/jiflib.jar</code>. You will probably need to extend the
+classpath so that your compiled Jif classes will be found.
 
 </body>
 

@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <link rel=StyleSheet href="jifdoc.css" type="text/css">
+<link rel=StyleSheet href="jifdoc.css" type="text/css">
 <title>Programming in Jif</title>
 </head>
 
@@ -362,7 +362,84 @@ class C {
 
 <h3><a name="user-defined-principals"></a>User-defined principals</h3>
 
-TODO
+<p>Jif provides an open-ended mechanism to allow applications written in
+Jif to define their own principals. The Jif interface <a
+href="rt-api/jif/lang/Principal.html"><code>jif.lang.Principal</code></a>
+is used to represent principals, and Jif programs may implement this
+interface to define their own principals.
+
+<p>Objects of type <code>jif.lang.Principal</code> can be implicitly
+cast to the type <code>principal</code>, and vice-versa.
+
+<p>The interface <code>jif.lang.Principal</code> is defined below.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+public interface Principal {
+    String{this} name();
+    boolean{this;p} delegatesTo(principal p);
+    boolean{this;p} equals(Principal p);
+    boolean{authPrf; closure; lb; this} isAuthorized(Object authPrf, 
+                                                     Closure[this, lb] closure,
+                                                     label lb) where authority (this);
+
+    Principal{this;p}[]{this;p} findChainUpto{p;this}(Principal p);
+    Principal{this;q}[]{this;q} findChainDownto{q;this}(Principal q);
+}
+</pre></div></td></tr></table>
+
+<p>The method <code>name()</code> returns the name of the
+principal. The <code>equals(Principal p)</code> method is used to
+determine if the receiver object is the same as the principal p; two
+principals <code>p</code> and <code>q</code> are regarded as being
+equal only if <code>p.equals(q) && q.equals(p)</code>.
+
+<p>The method <code>delegatesTo(principal p)</code> returns true if the
+principal represented by the receiver object has delegated its
+authority to the principal <code>p</code> (and thus <code>p</code> can
+act for the principal represented by the receiver object).
+
+<p>The methods <code>findChainUpto(Principal p)</code> and
+<code>findChainDownto(Principal p)</code> are used to search for a
+"delegates chain", a chain of principals between two principals, which
+is proof that the principal at the head of the chain is able to act
+for the principal at the tail of the chain.
+
+<p>The method <code>isAuthorized(Object authPrf, Closure[this, lb]
+closure, label lb)</code> is used to determine if the object
+<code>authCode</code> is sufficient proof for the principal
+represented by the receiver object to grant its authority to execute
+the <code>Closure</code>. The form of the authorization proof will
+depend on the principal implementation, but could be, for example, a
+password, or a certificate, or some other capability.
+
+<p>A <code>Closure[principal P, label L]</code> (see
+$JIF/sig-src/jif/lang/Closure.java) is code that needs the authorty of
+the principal P to execute, and whose side effects are bounded below
+by L. To execute a closure, a <code>Capability</code> (see
+$JIF/sig-src/jif/lang/Closure.java) is required. A capability can only
+be obtained by calling the method
+<code>jif.lang.PrincipalUtil.authorize(principal p, Object authPrf,
+Closure[p, lb] c, label lb)</code>, which returns a Capability to
+execute the closure if the method <code>isAuthorized(authPrf, c,
+lb)</code> of the principal <code>p</code> returns true, and null
+otherwise.
+
+
+<p>The class <code>jif.lang.AbstractPrincipal</code> (found in the
+$JIF/lib-src directory) is an abstract implementation of
+<code>jif.lang.Principal</code> that many principal implementations
+will find useful. The class <code>jif.lang.PrincipalUtil</code>
+contains several utility methods to help in searching for
+delegates-chains and also for obtaining capabilities to execute
+closures.
+
+<p>External principals (e.g., the principals Alice and
+Bob mentioned in Jif code; see $JIF/tests/jif/lang/Alice.jif) are
+implemented using the class <code>jif.lang.ExternalPrincipal</code>
+(found in the $JIF/lib-src directory). You can create your own
+external principals in a similar way. See the <a
+href="../tests/README">README</a> file in $JIF/tests for more
+information about creating external principals.
 
 <h3><a name="default-labels"></a>Default labels</h3>
 

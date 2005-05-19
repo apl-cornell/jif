@@ -1,9 +1,7 @@
 <!doctype html public "-//w3c//dtd html 4.0 transitional//en">
 <html>
 <head>
-   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta http-equiv="Content-Language" content="en-us">
-   <meta name="GENERATOR" content="Mozilla/4.76 [en] (X11; U; Linux 2.4.2-2 i686) [Netscape]">
+   <link rel=StyleSheet href="jifdoc.css" type="text/css">
    <title>Jif Runtime Interface</title>
 </head>
 <body>
@@ -11,17 +9,26 @@
 <h1>
 <u>Jif Runtime Interface</u></h1>
 
-<h2>Introduction</h2>
-The Jif runtime interface allows Jif code to access system resources, such
-as files and standard output. The interface itself is written in Jif, so
-the calls to this interface can be checked statically. In addition, the
-Jif runtime provides a way of translating file access permissions on Windows
-and Unix systems to Jif labels. For instance, if a Jif program opens a
-file and creates a FileInputStream object, the FileInputStream object will
-have a label parameter that allows only readers who have the read permission
-of that file acccording to the access control policy of the file, and any information
-read from the file is guarded by the label parameter, thus cannot be leaked
-to unauthorized users by Jif codes that pass the label checking.
+
+<p>To interact with the external environment, Jif provides a runtime
+interface to allow Jif code to read and write files, and access stdin,
+stdout and stderr, and also to obtain a principal representing the current user. The runtime interface is <code>jif.runtime.Runtime</code>.
+
+<p>Although
+the runtime code is itself is written in Java (see $JIF/rt-src/jif/runtime/Runtime.java), a Jif signature is
+provided to allow calls to this interface can be checked
+statically (see $JIF/sig-src/jif/runtime/Runtime.jif). 
+
+<!--
+<p>In addition, the Jif runtime provides a way of translating
+file access permissions on Windows and Unix systems to Jif labels. For
+instance, if a Jif program opens a file and creates a FileInputStream
+object, the FileInputStream object will have a label parameter that
+allows only readers who have the read permission of that file
+acccording to the access control policy of the file, and any
+information read from the file is guarded by the label parameter, thus
+cannot be leaked to unauthorized users by Jif codes that pass the
+label checking.
 
 <h2>File permissions and Jif labels</h2>
 Although the labelling model in Jif can be extended in various ways, the
@@ -66,6 +73,7 @@ ACE of the full permissions for the owner and an ACE of the read permission
 for each reader.
 
 <h2>Runtime API</h2>
-Please refer to the <a href="http://www.cs.cornell.edu/jif/releases/javadoc/">Javadoc API</a>
+-->
+Please refer to the <a href="rt-api/jif/runtime/Runtime.html">Javadoc</a> for more information.
 </body>
 </html>
