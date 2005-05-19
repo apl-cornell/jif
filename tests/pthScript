@@ -27,8 +27,9 @@
 #
 # When invoking this script, it will probably be necessary to supply
 # an appropriate class path:
-#    $ pth pthScript -cp "../classes:../lib-classes:."
-jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
+#    $ pth pthScript -cp "../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:." -sigcp "../sig-classes:../lib/jifsig.jar" -rtcp "../rt-classes:../lib/jifrt.jar"
+
+jif.ExtensionInfo  {
         OwnedObject.jif;
         LabeledObject.jif;
         TestPrincipal.jif;
@@ -278,7 +279,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes -rtcp ../rt-classes" {
 	RuntimeParams24c.jif (Semantic, "The type of a dynamic principal");
 	RuntimeParams24d.jif (Semantic, "Can not instantiate .* with a non-principal");
 	RuntimeParams25.jif (Syntax);
-	RuntimeParams26.jif (Semantic, "@@@@@"); // should be an initialization error
+//KNOWN BAD: needs a fix in Polyglot	RuntimeParams26.jif (Semantic, "@@@@@"); // should be an initialization error
 	Simple.jif ;
 	Simple2.jif ;
 	Simple3.jif ;

@@ -6,7 +6,9 @@ This file documents changes between releases of Jif.
 2005-??-??    Jif 2.0.0
     * Class parameters now represented at runtime
     * Dynamic labels and principals more expressive: now use access paths.
+    * Allow user defined principals.
     * Not-null checking more precise.
+    * Better documentation.
     * Based on the Polyglot 2.0.0 architecture
 
 2004-10-04    Jif 1.1.1
