@@ -26,10 +26,10 @@
 #                       compiler; is always enclosed in quotes.
 #
 # When invoking this script, it will probably be necessary to supply
-# an appropriate class path:
-#    $ pth pthScript -cp "../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:." -sigcp "../sig-classes:../lib/jifsig.jar" -rtcp "../rt-classes:../lib/jifrt.jar"
+# an appropriate class path, to make sure that pth can find the Jif compiler.
+#    $ pth pthScript -cp "../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:."
 
-jif.ExtensionInfo  {
+jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:../lib/jifrt.jar" {
         OwnedObject.jif;
         LabeledObject.jif;
         TestPrincipal.jif;
