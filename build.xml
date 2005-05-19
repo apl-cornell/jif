@@ -199,8 +199,7 @@ JAVA='${java.home}/bin/java'
 FILE_SEP='${file.separator}'
 PATH_SEP='${path.separator}'
 TOP='${basedir}'
-${defs.load_library_path}='${lib}${path.separator}'$$${defs.load_library_path}
-export ${defs.load_library_path}
+RT_LIB_PATH='${lib}${path.separator}'$$${defs.load_library_path}
     </echo>
 	</target>
 

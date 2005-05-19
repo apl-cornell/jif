@@ -26,7 +26,7 @@ lib_cp="${TOP}${FILE_SEP}lib-classes${PATH_SEP}${jardir}jiflib.jar"
 JIFCP="${rt_cp}${extra_cp}${PATH_SEP}${lib_cp}${PATH_SEP}${CLASSPATH}"
 
 
-command="\"$JAVA\" -cp \"$JIFCP\" $args"
+command="\"$JAVA\" -Djava.library.path=\"$RT_LIB_PATH\" -cp \"$JIFCP\" $args"
 
 if [ -n "$verbose" ]
 then

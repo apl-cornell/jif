@@ -24,7 +24,7 @@ lib_cp="${TOP}${FILE_SEP}lib-classes${PATH_SEP}${jardir}jiflib.jar"
 jars="${jardir}jif.jar${PATH_SEP}${jardir}polyglot.jar${PATH_SEP}${jardir}java_cup.jar${PATH_SEP}${jardir}JLfex.jar"
 classpath="${TOP}${FILE_SEP}classes${PATH_SEP}.${extra_cp}${PATH_SEP}${lib_cp}${PATH_SEP}${CLASSPATH}${PATH_SEP}${jars}"
 
-command="\"$JAVA\" $profile -classpath \"$classpath\" polyglot.main.Main -sigcp \"$sig_cp\" -rtcp \"$rt_cp\" $ext $args"
+command="\"$JAVA\" $profile -Djava.library.path=\"$RT_LIB_PATH\" -classpath \"$classpath\" polyglot.main.Main -sigcp \"$sig_cp\" -rtcp \"$rt_cp\" $ext $args"
 
 if [ -n "$verbose" ]
 then
