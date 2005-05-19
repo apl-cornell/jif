@@ -1,18 +1,14 @@
 package jif.extension;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
-import jif.types.JifClassType;
-import jif.types.JifTypeSystem;
-
-import polyglot.ast.Call;
-import polyglot.ast.CanonicalTypeNode;
-import polyglot.ast.Receiver;
-import polyglot.ast.Special;
-import polyglot.types.MethodInstance;
-import polyglot.types.TypeSystem;
+import jif.ast.JifInstantiator;
+import jif.types.*;
+import jif.types.label.VarLabel;
+import polyglot.ast.*;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
+import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>Call</code> node. 
  * 
@@ -76,4 +72,77 @@ public class JifCallDel extends JifJL_c
         }
         return l;
     }
+    
+    protected VarLabel receiverVarLabel;
+    protected List argVarLabels; // list of var labels for the actual args
+    protected List paramVarLabels; // list of var labels for the actual parameters of the type.
+
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        Call c = (Call)super.typeCheck(tc);
+        
+        // we need to instantiate the return type correctly during type checking,
+        // to allow, for example, the following code to correctly type checked
+        //      C[{}] x = b?null:foo(new label{});
+        //  where
+        //    C[lbl] foo(label lbl);
+        //
+        // The problem is that the type of the ternary conditional operator
+        // ends up being the type of the call, so the type of the call
+        // must be correct after the type checking pass.
+        //
+        // We use var labels, which are later bound to the correct labels 
+        // during label checking.
+        JifMethodInstance mi = (JifMethodInstance)c.methodInstance();
+        JifContext A = (JifContext)tc.context();
+        JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
+        
+        JifCallDel del = (JifCallDel)c.del();
+        del.receiverVarLabel = null;
+        Expr receiverExpr = null;
+        if (c.target() instanceof Expr) {
+            receiverExpr = (Expr)c.target();
+            del.receiverVarLabel = ts.freshLabelVariable(c.position(), 
+                                                      "receiver",
+                                                      "label of receiver of call " + c.toString());
+        }
+        del.argVarLabels = new ArrayList(c.arguments().size());
+        for (int i = 0; i < c.arguments().size(); i++) {
+            Expr arg = (Expr)c.arguments().get(i);
+            VarLabel argLbl =  ts.freshLabelVariable(arg.position(), 
+                                                     "arg"+(i+1)+"label",
+                                                     "label of arg " + (i+1) + " of call " + c.toString());
+            del.argVarLabels.add(argLbl);
+        }
+
+        Type t = mi.returnType();
+        if (t instanceof JifSubstType) {            
+            JifSubstType jst = (JifSubstType)t;
+            del.paramVarLabels = new ArrayList(jst.subst().substitutions().size());
+            
+            for (Iterator i = jst.entries(); i.hasNext();) {
+                Map.Entry e = (Map.Entry)i.next();
+                Param param = (Param)e.getValue();
+                VarLabel paramLbl =  ts.freshLabelVariable(param.position(), 
+                                                         "param_"+param+"_label",
+                                                         "label of param " + param + " of call " + c.toString());
+                del.paramVarLabels.add(paramLbl);
+            }
+        }
+        else {
+            del.paramVarLabels = Collections.EMPTY_LIST;
+        }
+        
+        Type retType =  JifInstantiator.instantiate(t, A, 
+                                                    receiverExpr, 
+                                                    mi.container(), 
+                                                    del.receiverVarLabel,
+                                                    CallHelper.getArgLabelsFromFormalTypes(mi.formalTypes(), ts),
+                                                    del.argVarLabels,
+                                                    c.arguments(),
+                                                    del.paramVarLabels);
+
+        c = (Call)c.type(retType);                
+        return c;
+    }
+    
 }

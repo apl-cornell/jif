@@ -35,11 +35,12 @@ public class JifConditionalExt extends Jif_c
         Type t1 = te.consequent().type();
         Type t2 = te.alternative().type();
         if (t1.isReference() && t2.isReference()) {
+            Type exprType = te.type();
             if (ts.isImplicitCastValid(t1, t2)) {
-                subtypeChecker.addSubtypeConstraints(lc, te.position(), t2, t1);
+                subtypeChecker.addSubtypeConstraints(lc, te.position(), exprType, t1);
             }
             if (ts.isImplicitCastValid(t2, t1)) {
-                subtypeChecker.addSubtypeConstraints(lc, te.position(), t1, t2);
+                subtypeChecker.addSubtypeConstraints(lc, te.position(), exprType, t2);
             }
         }
 

@@ -73,8 +73,18 @@ public class JifCallExt extends Jif_c
 	}
 
         CallHelper helper = new CallHelper(objLabel, target, mi.container(), mi, me.arguments(), node().position());
-	helper.checkCall(lc.context(A), throwTypes);
-        A = (JifContext) A.pop();
+        LabelChecker callLC = lc.context(A);
+	helper.checkCall(callLC, throwTypes);
+    
+	// now use the call helper to bind the var labels that were created
+        // during type checking of the call (see JifCallDel#typeCheck)
+	JifCallDel del = (JifCallDel)me.del();
+	helper.bindVarLabels(callLC, 
+	                     del.receiverVarLabel, 
+	                     del.argVarLabels, 
+	                     del.paramVarLabels);
+
+	A = (JifContext) A.pop();
 
 	//subst arguments of inst_type
 	if (helper.returnType() != me.type()) {

@@ -1,14 +1,24 @@
 // Test principal, reused by some authentication tests.
 public class TestPrincipal extends AbstractPrincipal {
+    private final String{this:} password;
     public TestPrincipal(String{this} name) {
+	this.password = null;
+	super(name);
+    }
+
+    public TestPrincipal(String{this} name, String{this:} password) {
+	this.password = password;
 	super(name);
     }
 
     public boolean{authPrf; closure; lb; this} isAuthorized(Object authPrf, 
                                                      Closure[this, lb] closure,
-                                                     label lb) {
-        // allow only Test closures
-        return closure instanceof TestClosure[this, lb];
+                                                     label lb) where authority (this) {
+	// check the password (need to declassify the result)
+	boolean passwordOK = declassify((password == null || password.equals(authPrf)), {authPrf;this});
+
+	// allow only Test closures, and check the password if one exists
+	return passwordOK && (closure instanceof TestClosure[this, lb]);
     }
     
 }

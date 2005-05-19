@@ -71,6 +71,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Authority05.jif (Semantic, "Cannot cast the expression of type"),
 	                (Semantic, "Cannot cast the expression of type"),
 	                (Semantic, "Cannot cast the expression of type");
+	Authority06.jif ;
+	Authority07.jif ;
 	BadNullExcept1.jif (Semantic, "NullPointerException.*must .* be caught") ;
 	BadNullExcept2.jif (Semantic, "NullPointerException.*must .* be caught") ;
 	BadNullExcept3.jif (Semantic, "NullPointerException.*must .* be caught") ;
@@ -90,6 +92,11 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	clientPairList.jif ;
 	Complex.jif ;
 	CondExpr.jif ;
+	CondExpr2.jif ; 
+	CondExpr3.jif (Semantic, "not a subtype") ; 
+	CondExpr4.jif (Semantic, "not a subtype") ; 
+	CondExpr5.jif ; 
+	CondExpr6.jif (Semantic, "not a subtype") ; 
 	ConditionalLeak.jif (Semantic, "not a subtype") ;
 	Constraints1.jif ;
 	Constraints3.jif ;
