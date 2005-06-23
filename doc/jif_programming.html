@@ -85,7 +85,7 @@ class C[label L, principal P] {
 channels. For example, an access path may throw a null pointer
 exception, or the value stored in a particular variable may reveal
 sensitive information. The Jif type system must account for the
-information that may revealed whenever a final access path in a label
+information that may be revealed whenever a final access path in a label
 or type is evaluated at runtime. Final access paths occurring in a
 label may be evaluated at runtime when a <code>new label</code>
 expression is evaluated; final access paths occurring in a type may be
@@ -102,7 +102,8 @@ requires the evaluation of the access path expression
 <code>NullPointerException</code> if <code>this.f</code> is
 null. Thus, whether or not a <code>NullPointerException</code> is
 thrown may reveal information at level <code>{this;
-Alice:}</code>. Thus, if the assignment to the local variable
+Alice:}</code> (which is the label of the expression <code>this.f</code>). 
+Thus, if the assignment to the local variable
 <code>x</code> occurs, information with the label <code>{this;
 Alice:}</code> is flowing, and thus the label of the variable
 <code>x</code> must be at least <code>{this; Alice:}</code>.
@@ -135,16 +136,17 @@ class D {
 parameters. Jif allows classes to be parameterized on labels and
 principals. The key difference between parameterized classes in this
 version of Jif, and as described in Andrew Myers' thesis, is that
-class parameters are represented at runtime. Thus, the following code
+class parameters are represented at runtime. Thus, the following code,
+which uses the parameters <code>L</code> and <code>P</code> at runtime, 
 is permitted.  
 
 <table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
 class C[label L, principal P] {
-    private final label{this} lb = L;
+    private final label{this} lb = L;         // runtime use of L
 
     private void m() {
-        label foo = new label {L; Alice:};
-        principal bar = P;
+        label foo = new label {L; Alice:};    // runtime use of L
+        principal bar = P;                    // runtime use of P
     }
 }
 </pre>
