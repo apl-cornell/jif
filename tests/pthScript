@@ -83,6 +83,18 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Binary.jif ;
 	Call1.jif ;
 	Call2.jif ;
+	Call3.jif (Semantic, "The caller must have the authority of the principal") ;
+	Call4.jif (Semantic, "The caller must have the authority of the principal") ;
+	Call5.jif (Semantic, "The caller must have the authority of the principal") ;
+	Call6.jif ;
+	Call7.jif ;
+	Call8.jif ;
+	Call9.jif (Semantic, "The principal .* must act for") ;
+	Call10.jif (Semantic, "The principal .* must act for") ;
+	Call11.jif (Semantic, "The principal .* must act for") ;
+	Call12.jif ;
+	Call13.jif ;
+	Call14.jif ;
 	cat.jif ;
 	Catch01.jif (Semantic, "Label of .* exceptions .* not less restrictive");
 	Catch02.jif (Semantic, "Label .* not less restrictive");
@@ -180,7 +192,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	List2.jif ;
 	ListTest.jif ;
 	Main1.jif (Warning, "signature of.*main method.*should either be"),
-                  (Semantic, "Jif allows only one static method named \"main\"");
+                  (Semantic, "Only one static method named \"main\" allowed per class");
 	Main2.jif ;
 	MyInteger.jif ;
 	NewLabel.jif ;
@@ -303,13 +315,15 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	SubtypeChecker1.jif (Semantic, "not a subtype") ;
 	SubtypeChecker2.jif ;
 	SubtypeChecker3.jif (Semantic, "not a subtype") ;
-	SubtypeChecker4.jif (Semantic, "subclass of .*Throwable may not have.* parameters") ;
+	SubtypeChecker4.jif (Semantic, "Subclasses of java.lang.Throwable can not have parameters") ;
 	Super1.jif (Semantic, "No valid constructor") ;
 	Super2.jif ;
 	Super3.jif (Semantic, "first statement .* must be .* constructor call") ;
 	Super4.jif (Semantic, "first statement .* must be .* constructor call") ;
 	Super5.jif ;
-	Super6.jif (Semantic, "Final variable.*must be initialized") ;
+	Super6.jif (Semantic, "Final field.*must be initialized") ;
+	Super7.jif (Semantic, "requires .* authority .* principal");
+	Super8.jif (Semantic, "requires .* authority .* principal");
 	SwitchLabel.jif (Semantic, "not representable at runtime");
 	SwitchLabel2.jif (Semantic, "not representable at runtime");
 	SwitchLabel3.jif (Semantic, "not representable at runtime");

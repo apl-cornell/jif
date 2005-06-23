@@ -4,8 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import jif.ast.JifClassDecl;
-import jif.types.JifParsedPolyType;
-import jif.types.JifTypeSystem;
+import jif.types.*;
 import polyglot.ast.Node;
 import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
@@ -30,14 +29,20 @@ public class JifClassDeclDel extends JifJL_c {
         // check that there are not two static methods called "main"
         MethodInstance staticMain = null;
         List mains = cd.type().methodsNamed("main");
+        
         for (Iterator iter = mains.iterator(); iter.hasNext(); ) {
             MethodInstance mi = (MethodInstance)iter.next();
             if (mi.flags().isStatic()) {
                 if (staticMain != null) {
                     // this is the second static method named main.
                     // we don't like this.
-                    throw new SemanticException("Jif allows only one static " +
-                        "method named \"main\" per class.", mi.position());
+                    throw new SemanticDetailedException("Only one static " +
+                        "method named \"main\" allowed per class.", 
+                        "Two main methods can be used to invoke a Jif " + 
+                        "program: public static main(String[]), or public " +
+                        "static main(principal, String[]). Any class may " +
+                        "have at most one static method named \"main\".", 
+                        mi.position());
                 }
 
                 staticMain = mi;
@@ -49,8 +54,9 @@ public class JifClassDeclDel extends JifJL_c {
         if (cd.type().isSubtype(ts.Throwable())) {
             JifParsedPolyType jppt = (JifParsedPolyType)cd.type();
             if (jppt.params().size() > 0) {
-                throw new SemanticException("A subclass of " +
-                    "java.lang.Throwable may not have any parameters, " +
+                throw new SemanticDetailedException("Subclasses of " +
+                    "java.lang.Throwable can not have parameters.",
+                    "Subclasses of java.lang.Throwable can not have any parameters, " +
                     "since Jif does not currently support catch blocks for " +
                     "parameterized subclasses of Throwable.",
                     jppt.position());

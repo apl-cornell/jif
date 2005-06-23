@@ -7,17 +7,11 @@ import jif.ast.JifClassDecl;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.JifClassType;
-import jif.types.JifContext;
-import jif.types.JifParsedPolyType;
-import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.ClassBody;
-import polyglot.ast.ClassMember;
-import polyglot.ast.FieldDecl;
 import polyglot.ast.Node;
-import polyglot.types.*;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 
 /** The extension of the <code>JifClassDecl</code> node. 
@@ -32,7 +26,7 @@ public class JifClassDeclExt extends Jif_c {
     public Node labelCheck(LabelChecker lc) throws SemanticException {
 	JifClassDecl n = (JifClassDecl) node();
 
-	JifTypeSystem jts = (JifTypeSystem) lc.typeSystem();
+	JifTypeSystem jts = lc.typeSystem();
 	JifContext A = lc.jifContext();
         A = (JifContext)A.pushClass(n.type(), n.type());
         A = n.addParamsToContext(A);
@@ -61,9 +55,13 @@ public class JifClassDeclExt extends Jif_c {
 		}
 
 		if (! sat) {
-		    throw new SemanticException(
-			"Unsatisfied authority constraint on class \"" +
-			ct + "\".");
+		    throw new SemanticDetailedException(
+                    "Superclass " + superType + " requires " + ct + " to " +
+                    "have the authority of principal " + pl, 
+                    "The class " + superType + " has the authority of the " +
+                    "principal " + pl + ". To extend this class, " + ct + 
+                    " must also have the authority of " + pl + ".", 
+                    n.position());
 		}
 	    }
 	}
@@ -93,7 +91,6 @@ public class JifClassDeclExt extends Jif_c {
         }
         
         JifTypeSystem ts = lc.typeSystem();
-        JifContext A = lc.context();
 
         // build up a list of superclasses and interfaces that ct 
         // extends/implements that may contain abstract methods that 

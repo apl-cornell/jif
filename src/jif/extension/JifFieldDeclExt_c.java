@@ -263,7 +263,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             if (L instanceof CovariantParamLabel) {
                 throw new SemanticException("The label of a non-final field, " +
                     "or a mutable location within a final field cannot " +
-                    "contain covariant components.",
+                    "contain the covariant component " + L,
                             declPosition);
             }
             if (L instanceof ThisLabel) {

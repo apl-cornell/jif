@@ -1,7 +1,6 @@
 package jif.extension;
 
-import jif.types.JifFieldInstance;
-import jif.types.JifTypeSystem;
+import jif.types.*;
 import jif.types.label.Label;
 import jif.visit.ConstChecker;
 import polyglot.ast.*;
@@ -70,8 +69,13 @@ public class JifFieldDeclDel extends JifJL_c
 		ConstChecker cc = new ConstChecker();
 		init.visit(cc);
 		if (!cc.isConst()) { 
-		    throw new SemanticException("Jif does not support " +
+		    throw new SemanticDetailedException("Jif does not support " +
                         "static fields without constant initializers.",
+                        "The initializer of a static field of a class is " +
+                        "executed when the class is loaded. Information may be " +
+                        "leaked if the time of class loading is observable. " +
+                        "To prevent this covert channel, Jif requires static " +
+                        "field initializers to be constant.",
 			    fd.position());
 		}
 	    }

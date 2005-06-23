@@ -519,8 +519,8 @@ public class CallHelper {
                     }
 
                     if (!sat) {
-                        throw new SemanticException("Caller does not have " +
-                                                    "sufficent authority to call " + jpi.debugString() + ".");
+                        throw new SemanticDetailedException("The caller must have the authority of the principal " + pi + " to invoke " + jpi.debugString(),
+                                                    "The " + jpi.debugString() + " requires that the caller of the method have the authority of the principal "  + pi +". The caller does not have this principal's authority.", position);
                     }
                 }
             }
@@ -534,8 +534,9 @@ public class CallHelper {
                 granter = instantiate(A, granter);
 
                 if (!A.actsFor(actor, granter)) {
-                    throw new SemanticException(jpi.debugString() +
-                    " requires invalid actsFor relation.");
+                    throw new SemanticDetailedException("The principal " + actor + " must act for " + granter + " to invoke " + jpi.debugString(),
+                                                        "The " + jpi.debugString() + " requires that the relationship " + actor + " actsfor " + granter + " holds at the call site.", position);
+
                 }
             }
         }

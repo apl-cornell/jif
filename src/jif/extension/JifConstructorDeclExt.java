@@ -2,7 +2,6 @@ package jif.extension;
 
 import java.util.*;
 
-import jif.ast.*;
 import jif.ast.JifConstructorDecl;
 import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
@@ -172,11 +171,18 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                             // this class are initialized before the super call.                            
                             for (Iterator i = uninitFinalVars.iterator(); i.hasNext();) {
                                 JifFieldInstance fi = (JifFieldInstance)i.next();
-                                throw new SemanticException(
-                                    "Final variable \""
-                                    + fi.name()
+                                throw new SemanticDetailedException(
+                                    "Final field \"" + fi.name()
                                     + "\" must be initialized before "
                                     + "calling the superclass constructor.",
+                                    "All final fields of a class must " +
+                                    "be initialized before the superclass " +
+                                    "constructor is called, to prevent " +
+                                    "ancestor classes from reading " +
+                                    "uninitialized final fields. The " +
+                                    "final field \"" + fi.name() + "\" needs to " +
+                                    "be initialized before the superclass " +
+                                    "constructor call.",
                                 ccs.position());
                             }
                         }
