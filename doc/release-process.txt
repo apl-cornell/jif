@@ -1,0 +1,6 @@
+1. Modify $JIF/CHANGES with date of release
+2. Record version number of polyglot in $JIF/README, and $JIF/CHANGES
+3. Check out clean copy of Jif
+4. Run  "ant dist"
+5. Copy polyglot.jar, JFlex.jar and java_cup.jar into the distribution's lib directory
+6. Tar it all up
