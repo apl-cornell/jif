@@ -12,6 +12,7 @@ import jif.visit.NotNullChecker;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
 import polyglot.frontend.Compiler;
+import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.VisitorGoal;
 import polyglot.main.Options;
 import polyglot.types.*;
@@ -120,28 +121,37 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo
         return new JifScheduler(this, jlext);
     }
 
-    public List compileGoalList(final Job job) {
-        List l = super.compileGoalList(job);
+    public Goal getCompileGoal(Job job) {
         JifScheduler jifScheduler = (JifScheduler)scheduler();
         
-        // remove output
-        l.remove(jifScheduler.CodeGenerated(job));
+        List l = new ArrayList();
 
         // add not null check before exception checking
-        l.add(l.indexOf(jifScheduler.ExceptionsChecked(job)),
-              jifScheduler.internGoal(new VisitorGoal(job, new NotNullChecker(job, ts, nf))));
+        l.add(jifScheduler.internGoal(new VisitorGoal(job, new NotNullChecker(job, ts, nf))));
+
+        l.add(jifScheduler.ExceptionsChecked(job));
 
         // add field label inference after exception checking.
         FieldLabelInferenceGoal fliGoal = jifScheduler.FieldLabelInference(job);
-        l.add(l.indexOf(jifScheduler.ExceptionsChecked(job))+1, fliGoal);
+        l.add(fliGoal);
 
         // add label checking after field label inference.
         LabelCheckGoal labelCheckGoal = jifScheduler.LabelsChecked(job);
-        l.add(l.indexOf(fliGoal)+1, labelCheckGoal);
+        l.add(labelCheckGoal);
+
+        l.add(jifScheduler.Serialized(job));
 
         // add the jif to java rewrite at the end of the list.
-        l.add(jifScheduler.JifToJavaRewritten(job));
+        Goal g = jifScheduler.internGoal(jifScheduler.JifToJavaRewritten(job));
+        l.add(g);
 
-        return l;
+        try {
+            jifScheduler.addPrerequisiteDependencyChain(l);
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+
+        return g;
     }
 }

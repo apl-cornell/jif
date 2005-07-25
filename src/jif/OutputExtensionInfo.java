@@ -24,7 +24,6 @@ import polyglot.util.InternalCompilerError;
  */
 public class OutputExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
     ExtensionInfo jifExtInfo;
-    Job objectJob = null;
     
     public OutputExtensionInfo(ExtensionInfo jifExtInfo) {
         this.jifExtInfo = jifExtInfo;        
@@ -34,21 +33,11 @@ public class OutputExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
         return jifExtInfo.getOptions();
     }
     
-    void setObjectJob(Job objectJob) {
-        this.objectJob = objectJob;
-    }
-    
     public Scheduler createScheduler() {
         return new OutputScheduler(this);
     }
-    
-    protected List compileGoalList(final Job job) {
-        List l = new ArrayList(super.compileGoalList(job));
-        Goal last = (Goal) l.get(l.size()-1);
-        if (last instanceof CodeGenerated) {
-            l.remove(l.size()-1);
-        }                                                                   
 
+    public Goal getCompileGoal(final Job job) {
         CodeGenerated output = new CodeGenerated(job) {
             public Pass createPass(ExtensionInfo extInfo) {
                 return new OutputPass(this, new JifTranslator(job, typeSystem(),
@@ -56,29 +45,46 @@ public class OutputExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
             }            
         };
 
-        l.add(scheduler.internGoal(output));
-        
-        if ("Object.jif".equals(job.source().name())) {
-            this.setObjectJob(job);
-        }
+        output = (CodeGenerated) scheduler.internGoal(output);
 
         try {
-            if (this.objectJob != null && job != this.objectJob)
-            scheduler().addPrerequisiteDependency(scheduler().TypesInitialized(job),
-                                                  scheduler().TypesInitialized(objectJob));
+            scheduler().addPrerequisiteDependency(output,
+                                                  scheduler().Serialized(job));
         }
         catch (CyclicDependencyException e) {
             // Cannot happen
             throw new InternalCompilerError(e);
         }
-           
-        
-        return l;
+
+        return output;
     }
-    
+        
     static class OutputScheduler extends JLScheduler {
+        Job objectJob = null;
+    
         OutputScheduler(OutputExtensionInfo extInfo) {
             super(extInfo);
+        }
+
+        void setObjectJob(Job objectJob) {
+            this.objectJob = objectJob;
+        }
+
+        public Goal TypesInitialized(Job job) {
+            if ("Object.jif".equals(job.source().name())) {
+                this.setObjectJob(job);
+            }
+
+            Goal g = super.TypesInitialized(job);
+            try {
+                if (this.objectJob != null && job != this.objectJob)
+                    addPrerequisiteDependency(g, TypesInitialized(objectJob));
+            }
+            catch (CyclicDependencyException e) {
+                // Cannot happen
+                throw new InternalCompilerError(e);
+            }
+            return g;
         }
     
         public Goal Parsed(Job job) {

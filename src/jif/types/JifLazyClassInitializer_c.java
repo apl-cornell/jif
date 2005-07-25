@@ -1,6 +1,6 @@
 package jif.types;
 
-import polyglot.ext.jl.types.LazyClassInitializer_c;
+import polyglot.ext.jl.types.SchedulerClassInitializer;
 import polyglot.types.ParsedClassType;
 import polyglot.types.TypeSystem;
 
@@ -9,7 +9,7 @@ import polyglot.types.TypeSystem;
  * a class after it has been created.  Members are initialized lazily
  * to correctly handle cyclic dependencies between classes.
  */
-public class JifLazyClassInitializer_c extends LazyClassInitializer_c
+public class JifLazyClassInitializer_c extends SchedulerClassInitializer
 {
     public JifLazyClassInitializer_c(TypeSystem ts) {
         super(ts);
@@ -17,7 +17,10 @@ public class JifLazyClassInitializer_c extends LazyClassInitializer_c
 
     /** Override to prevent the "class" field from being added to
       * every class.
-      */
+      *
+      * no longer needed --nystrom
     public void initFields(ParsedClassType ct) {
+        super.initFields(ct);
     }
+      */
 }
