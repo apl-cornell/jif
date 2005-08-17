@@ -35,7 +35,12 @@ public class LabelTypeCheckUtil {
             }
             
             if (!ts.isImplicitCastValid(dp.path().type(), ts.Principal())) {
-                throw new SemanticException("The type of a dynamic principal must be \"principal\"", principal.position());
+                throw new SemanticDetailedException("The type of a dynamic principal must be \"principal\".", 
+                                            "The type of a dynamic principal must be " +
+                                            "\"principal\". The type of the expression " + 
+                                            dp.path().exprString() + " is " + 
+                                            dp.path().type() + ".",
+                                            principal.position());
             }
         }        
     }
@@ -59,7 +64,12 @@ public class LabelTypeCheckUtil {
                 }
                 
                 if (!ts.isLabel(dl.path().type())) {
-                    throw new SemanticException("The type of a dynamic label must be \"label\"", dl.position());
+                    throw new SemanticDetailedException("The type of a dynamic label must be \"label\".",
+                                     "The type of a dynamic label must be " +
+                                     "\"label\". The type of the expression " + 
+                                     dl.path().exprString() + " is " + 
+                                     dl.path().type() + ".",
+                                                        dl.position());
                 }
             }        
             else if (l instanceof PolicyLabel) {
@@ -152,7 +162,10 @@ public class LabelTypeCheckUtil {
                             return "A label used in a type examined at runtime must be representable at runtime.";
                         }
                         public String detailMsg() {
-                            return "A label used in a type examined at runtime must be representable at runtime. Arg labels are not represented at runtime.";
+                            return "If a type is used in an instanceof, " +
+                            "cast, constructor call, or static method call, " +
+                            "all parameters of the type must be runtime " +
+                            "representable. Arg labels are not represented at runtime.";
                         }
                     });
                     
@@ -167,8 +180,14 @@ public class LabelTypeCheckUtil {
                     Principal p = (Principal)arg;
                     A = (JifContext)A.pushBlock();
                     if (!p.isRuntimeRepresentable()) {
-                        throw new SemanticException(
-                                                    "A principal used in a type examined at runtime must be representable at runtime.",
+                        throw new SemanticDetailedException("A principal used in a " +
+                            "type examined at runtime must be " +
+                            "representable at runtime.",
+                            "If a type is used in an instanceof, " +
+                            "cast, constructor call, or static method call, " +
+                            "all parameters of the type must be runtime " +
+                            "representable. The principal " + p + " is not " +
+                            "represented at runtime.",
                                                     pos);
                     }
                     
@@ -181,8 +200,7 @@ public class LabelTypeCheckUtil {
                     A = (JifContext)A.pop();
                 }
                 else {
-                    throw new InternalCompilerError(
-                                                    "Unexpected type for entry: "
+                    throw new InternalCompilerError("Unexpected type for entry: "
                                                     + arg.getClass().getName());
                 }
             }            

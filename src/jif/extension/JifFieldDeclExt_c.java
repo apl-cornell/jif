@@ -211,10 +211,10 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                         "cannot use the \"this\" label.", 
                         declPosition);
             }
-            if (L instanceof ParamLabel) {
+            if (L instanceof ParamLabel || L instanceof CovariantParamLabel) {
                 throw new SemanticException("The label of a static field " +
                         "cannot use the label parameter " + 
-                        ((ParamLabel)L).componentString(), 
+                        L.componentString(), 
                         declPosition);
             }
             return L;
@@ -260,17 +260,34 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             this.declPosition = declPosition;
         }
         public Label substLabel(Label L) throws SemanticException {
-            if (L instanceof CovariantParamLabel) {
-                throw new SemanticException("The label of a non-final field, " +
-                    "or a mutable location within a final field cannot " +
-                    "contain the covariant component " + L,
-                            declPosition);
-            }
             if (L instanceof ThisLabel) {
-                throw new SemanticException("The label of a non-final field, " +
-                                            "or a mutable location within a final field cannot " +
-                                            "contain the label \"this\".",
-                                                    declPosition);            
+                throw new SemanticDetailedException("The label of a non-final field, " +
+                        "or a mutable location within a final field can not " +
+                        "contain the label \"this\".",
+                                            "The label of a non-final field, " +
+                        "or a mutable location within a final field (such as " +
+                        "the label of elements of an array) can not " +
+                        "contain the label \"this\". Otherwise, sensitive " +
+                        "information could be written into the location " +
+                        "through a sensitive reference to the object, and " +
+                        "converted to non-sensitive information by reading " +
+                        "the value through a non-sensitive reference.",
+                                            declPosition);            
+            }
+            if (L.isCovariant()) {
+                throw new SemanticDetailedException("The label of a non-final field, " +
+                    "or a mutable location within a final field can not " +
+                    "contain the covariant component " + L,
+                                        "The label of a non-final field, " +
+                    "or a mutable location within a final field (such as " +
+                    "the label of elements of an array) can not " +
+                    "contain the covariant component " + L + ". " +
+                    "Otherwise, sensitive " +
+                    "information could be written into the location " +
+                    "through a reference to the object with a sensitive type, " +
+                    "and converted to non-sensitive information by reading " +
+                    "the value through a reference with a less sensitive type.",
+                            declPosition);
             }
             return L;
         }

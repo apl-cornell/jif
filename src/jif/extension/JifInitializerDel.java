@@ -19,7 +19,7 @@ public class JifInitializerDel extends JifJL_c
 
         if (! ib.flags().isStatic()) {
 	    throw new SemanticException(
-		"Jif does not support non-static initalizers", ib.position());
+		"Jif does not support non-static initalizer blocks.", ib.position());
 	}
 
 	return super.typeCheck(tc);

@@ -62,7 +62,8 @@ public class JifSpecialExt extends Jif_c
 
 	if (se.kind() != Special.THIS) {
 	    throw new SemanticException(
-		"Special form \"super\" not supported.");
+		"Jif does not currently support the expression \"super\". " +
+                "Use \"this\" instead.", se.position());
 	}
 
 	JifClassType ct = (JifClassType) A.currentClass();

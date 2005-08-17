@@ -192,9 +192,17 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	    }
 	}
 
-	throw new SemanticException(
-	    "No principal found in authority set that acts for principal \"" +
-	    p + "\".", A.currentCode().position());
+	String codeName = A.currentCode().toString();
+        if (A.currentCode() instanceof JifProcedureInstance) {
+            codeName = ((JifProcedureInstance)A.currentCode()).debugString();
+        }
+	throw new SemanticDetailedException(
+	    "No principal found in authority set that acts for principal " +
+	    p + ".", 
+            "The " + codeName + " states that it has the authority of the " +
+            "principal " + p + ". However, there is no principal listed " +
+            "in the authority set of the class that can act for " + p + ".",
+            A.currentCode().position());
     }
 
     /**
