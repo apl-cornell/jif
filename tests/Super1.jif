@@ -6,5 +6,5 @@ class Z {
     private Z() { }
 }
 class Y extends Z {
-    public Y() {    } // no valid constructor
+    public Y() {    } // no valid constructor: inaccessible
 }

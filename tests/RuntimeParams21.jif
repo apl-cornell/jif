@@ -8,11 +8,10 @@ class D {
     final D{Alice:} d;
     final label{} lb;
 
-//      D(D d, label lb) {
-//  	this.d = d;
-//  	this.lb = lb;
-	
-//      }
+    D(D d, label lb) {
+  	this.d = d;
+  	this.lb = lb;
+    }
 
     void m(C[{*la}]{} o, label{} la) {
 	int{} x;

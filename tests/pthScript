@@ -171,9 +171,9 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 #	InvariantClass8.jif (Semantic, "Invariant class .* cannot implement covariant interface");
 #	InvariantClass9.jif (Semantic, "Covariant class .* cannot extend invariant class");
 	InvariantThis1.jif ;
-	InvariantThis2.jif (Semantic, "cannot contain .*this");
-	InvariantThis3.jif (Semantic, "cannot contain .*this");
-	InvariantThis4.jif (Semantic, "cannot contain .*this");
+	InvariantThis2.jif (Semantic, "can not contain .*this");
+	InvariantThis3.jif (Semantic, "can not contain .*this");
+	InvariantThis4.jif (Semantic, "can not contain .*this");
 	LabelIf1.jif ;
 	LabelIf2.jif (Semantic, "only be used in an if statement");
 	LabelIf3.jif (Semantic, "only be used in an if statement");
@@ -316,7 +316,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	SubtypeChecker2.jif ;
 	SubtypeChecker3.jif (Semantic, "not a subtype") ;
 	SubtypeChecker4.jif (Semantic, "Subclasses of java.lang.Throwable can not have parameters") ;
-	Super1.jif (Semantic, "No valid constructor") ;
+	Super1.jif (Semantic, "Constructor .* is inaccessible") ;
 	Super2.jif ;
 	Super3.jif (Semantic, "first statement .* must be .* constructor call") ;
 	Super4.jif (Semantic, "first statement .* must be .* constructor call") ;
