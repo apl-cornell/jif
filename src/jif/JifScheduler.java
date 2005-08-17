@@ -4,23 +4,25 @@ import java.util.Iterator;
 
 import jif.ast.JifNodeFactory;
 import jif.translate.JifToJavaRewriter;
-import jif.types.JifSubstClassType_c;
 import jif.types.JifSubstType;
 import jif.types.JifTypeSystem;
 import jif.visit.JifInitChecker;
+import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ext.jl.JLScheduler;
-import polyglot.frontend.Job;
-import polyglot.frontend.goals.FieldConstantsChecked;
-import polyglot.frontend.goals.Goal;
-import polyglot.frontend.goals.VisitorGoal;
-import polyglot.types.FieldInstance;
-import polyglot.types.ParsedClassType;
-import polyglot.types.TypeSystem;
-import polyglot.visit.InitChecker;
+import polyglot.frontend.*;
+import polyglot.frontend.goals.*;
+import polyglot.types.*;
+import polyglot.util.InternalCompilerError;
 
 public class JifScheduler extends JLScheduler {
    OutputExtensionInfo jlext;
+   /**
+    * Hack to ensure that we track the job for java.lang.Object specially.
+    * In particular, ensure that it is submitted for re-writing before
+    * any other job.
+    */
+   private Job objectJob = null;
 
     public JifScheduler(jif.ExtensionInfo extInfo, OutputExtensionInfo jlext) {
         super(extInfo);
@@ -38,7 +40,19 @@ public class JifScheduler extends JLScheduler {
     public Goal JifToJavaRewritten(Job job) {
         JifTypeSystem ts = (JifTypeSystem) extInfo.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) extInfo.nodeFactory();
-        return internGoal(new VisitorGoal(job, new JifToJavaRewriter(job, ts, nf, jlext)));        
+        Goal g = internGoal(new VisitorGoal(job, new JifToJavaRewriter(job, ts, nf, jlext)));     
+        
+        try {
+            // make sure that if Object.jif is being compiled, it is always
+            // written to Java before any other job.
+            if (objectJob != null && job != objectJob)
+                addPrerequisiteDependency(g, JifToJavaRewritten(objectJob));
+        }
+        catch (CyclicDependencyException e) {
+            // Cannot happen
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
     public Goal FieldConstantsChecked(FieldInstance fi) {
         return internGoal(new JifFieldConstantsChecked(fi));
@@ -76,4 +90,24 @@ public class JifScheduler extends JLScheduler {
         }        
     }
 
+    /**
+     * 
+     */
+    public Job addJob(Source source, Node ast) {
+        Job j = super.addJob(source, ast);
+        if ("Object.jif".equals(source.name())) {
+            this.objectJob = j;
+        }
+        return j;
+    }
+    /**
+     * 
+     */
+    public Job addJob(Source source) {
+        Job j = super.addJob(source);
+        if ("Object.jif".equals(source.name())) {
+            this.objectJob = j;
+        }
+        return j;
+    }
 }

@@ -1,14 +1,10 @@
 package jif;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jif.visit.JifTranslator;
+import polyglot.ast.Node;
 import polyglot.ext.jl.JLScheduler;
 import polyglot.frontend.*;
-import polyglot.frontend.goals.CodeGenerated;
-import polyglot.frontend.goals.Goal;
-import polyglot.frontend.goals.Parsed;
+import polyglot.frontend.goals.*;
 import polyglot.main.Options;
 import polyglot.types.LoadedClassResolver;
 import polyglot.types.SemanticException;
@@ -59,26 +55,45 @@ public class OutputExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
         return output;
     }
         
-    static class OutputScheduler extends JLScheduler {
-        Job objectJob = null;
-    
+    static class OutputScheduler extends JLScheduler {    
+        /**
+         * Hack to ensure that we track the job for java.lang.Object specially.
+         * In particular, ensure that it is submitted for re-writing before
+         * any other job.
+         */
+        private Job objectJob = null;
+        
         OutputScheduler(OutputExtensionInfo extInfo) {
             super(extInfo);
         }
 
-        void setObjectJob(Job objectJob) {
-            this.objectJob = objectJob;
+        /**
+         * 
+         */
+        public Job addJob(Source source, Node ast) {
+            Job j = super.addJob(source, ast);
+            if ("Object.jif".equals(source.name())) {
+                this.objectJob = j;
+            }
+            return j;
+        }
+        /**
+         * 
+         */
+        public Job addJob(Source source) {
+            Job j = super.addJob(source);
+            if ("Object.jif".equals(source.name())) {
+                this.objectJob = j;
+            }
+            return j;
         }
 
         public Goal TypesInitialized(Job job) {
-            if ("Object.jif".equals(job.source().name())) {
-                this.setObjectJob(job);
-            }
-
             Goal g = super.TypesInitialized(job);
             try {
-                if (this.objectJob != null && job != this.objectJob)
+                if (objectJob != null && job != objectJob) {
                     addPrerequisiteDependency(g, TypesInitialized(objectJob));
+                }
             }
             catch (CyclicDependencyException e) {
                 // Cannot happen
