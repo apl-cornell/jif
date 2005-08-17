@@ -55,12 +55,35 @@ public class JifScheduler extends JLScheduler {
         return g;
     }
     public Goal FieldConstantsChecked(FieldInstance fi) {
-        return internGoal(new JifFieldConstantsChecked(fi));
+        Goal g = internGoal(new JifFieldConstantsChecked(fi));
+        try {
+            if (fi.container() instanceof ParsedTypeObject) {
+                ParsedTypeObject t = (ParsedTypeObject) fi.container();
+                if (t.job() != null) {
+                    addConcurrentDependency(g, ConstantsChecked(t.job()));
+                }
+                if (t instanceof ParsedClassType) {
+                    ParsedClassType ct = (ParsedClassType) t;
+                    addPrerequisiteDependency(g, SignaturesResolved(ct));
+                }
+            }
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
     public Goal InitializationsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        return internGoal(new VisitorGoal(job, new JifInitChecker(job, ts, nf)));
+        Goal g = internGoal(new VisitorGoal(job, new JifInitChecker(job, ts, nf)));
+        try {
+            addPrerequisiteDependency(g, ReachabilityChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
 
     public boolean runToCompletion() {
