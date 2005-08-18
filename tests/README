@@ -57,13 +57,13 @@ refer explicitly to principals, such as {Alice:Bob}. Principals with
 constant names, such as Alice and Bob, are referred to as "external
 principals", and are provided primarily to allow easy testing of Jif
 programs.  In this Jif implementation, external principals are
-represented by Java classes in the special package jif.principals. For
+represented by classes in the special package jif.principals. For
 example, the principal "Dolores" is represented by the class
 "jif.principals.Dolores". The test programs that refer to external
 principals require the appropriate principal classes to be compiled
 and on the classpath.
 
-The directory ./jif/principals contains Java classes for all
+The directory ./jif/principals contains Jif classes for all
 principals referred to in the test programs provided here. To compile
 these classes, go to the $JIF/tests directory and compile all Java
 files in the jif/principal directory:
