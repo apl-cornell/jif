@@ -22,7 +22,7 @@ public class JifLiteralExt extends Jif_c
     public Node labelCheck(LabelChecker lc) throws SemanticException {
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-	A = (JifContext) node().enterScope(A, null);
+	A = (JifContext) node().enterScope(A);
 	
 	PathMap X = ts.pathMap();
 	X = X.N(A.pc());

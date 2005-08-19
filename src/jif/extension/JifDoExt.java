@@ -22,7 +22,7 @@ public class JifDoExt extends JifStmtExt_c
 
 	JifTypeSystem ts = (JifTypeSystem) lc.typeSystem();
 	JifContext A = (JifContext) lc.context();
-        A = (JifContext) ds.enterScope(A, null);
+        A = (JifContext) ds.enterScope(A);
 
         Label L1 = ts.freshLabelVariable(node().position(), "do", 
                     "label of PC for the do statement at " + node().position());

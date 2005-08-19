@@ -26,7 +26,7 @@ public class JifLocalAssignExt extends JifAssignExt
 
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
-        A = (JifContext) lve.enterScope(A, null);
+        A = (JifContext) lve.enterScope(A);
 
         List throwTypes = new ArrayList(assign.del().throwTypes(ts));
         

@@ -66,7 +66,7 @@ public class JifClassDeclExt extends Jif_c {
 	    }
 	}
 
-        A = (JifContext) n.enterScope(A, null);
+        A = (JifContext) n.enterScope(A);
 	
         LabelChecker newLC = lc.context(A);
 	        

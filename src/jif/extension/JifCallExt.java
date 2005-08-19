@@ -29,7 +29,7 @@ public class JifCallExt extends Jif_c
 	Call me = (Call) node();
 
 	JifContext A = lc.jifContext();
-        A = (JifContext) me.enterScope(A, null);
+        A = (JifContext) me.enterScope(A);
 	JifTypeSystem ts = lc.jifTypeSystem();
 
         List throwTypes = new ArrayList(me.del().throwTypes(ts));

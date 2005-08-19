@@ -34,7 +34,7 @@ public class JifLabelIfExt extends JifStmtExt_c
         LabelIf labelIf = (LabelIf) node();
         
         JifContext A = lc.jifContext();
-        A = (JifContext) labelIf.enterScope(A, null);
+        A = (JifContext) labelIf.enterScope(A);
         JifTypeSystem ts = lc.jifTypeSystem();
         
 

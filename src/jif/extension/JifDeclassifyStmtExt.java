@@ -29,7 +29,7 @@ public class JifDeclassifyStmtExt extends JifStmtExt_c
 	DeclassifyStmt ds = (DeclassifyStmt) node();
 
 	JifContext A = lc.jifContext();
-        A = (JifContext) ds.enterScope(A, null);
+        A = (JifContext) ds.enterScope(A);
 
 	Label L = ds.label().label();
 

@@ -25,7 +25,7 @@ public class JifActsForExt extends JifStmtExt_c
         ActsFor af = (ActsFor) node();
         
         JifContext A = lc.jifContext();
-        A = (JifContext) af.enterScope(A, null);
+        A = (JifContext) af.enterScope(A);
         JifTypeSystem ts = lc.jifTypeSystem();
         
         

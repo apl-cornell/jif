@@ -25,7 +25,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         ArrayAccessAssign assign = (ArrayAccessAssign)node();
         final ArrayAccess aie = (ArrayAccess) assign.left();
         JifContext A = lc.jifContext();
-        A = (JifContext) aie.enterScope(A, null);
+        A = (JifContext) aie.enterScope(A);
         JifTypeSystem ts = lc.jifTypeSystem();
 
         List throwTypes = new ArrayList(assign.del().throwTypes(ts));

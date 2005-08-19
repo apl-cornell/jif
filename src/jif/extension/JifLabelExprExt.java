@@ -42,7 +42,7 @@ public class JifLabelExprExt extends Jif_c
             }
         });
 
-        A = (JifContext) le.enterScope(A, null);
+        A = (JifContext) le.enterScope(A);
 
         PathMap X1 = l.labelCheck(A);
         throwTypes.removeAll(l.throwTypes(ts));

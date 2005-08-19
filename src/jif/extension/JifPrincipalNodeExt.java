@@ -21,7 +21,7 @@ public class JifPrincipalNodeExt extends Jif_c {
         PrincipalNode pn = (PrincipalNode)node();
 
         JifContext A = lc.jifContext();
-        A = (JifContext)pn.enterScope(A, null);
+        A = (JifContext)pn.enterScope(A);
         JifTypeSystem ts = lc.jifTypeSystem();
 
         List throwTypes = new ArrayList(pn.del().throwTypes(ts));

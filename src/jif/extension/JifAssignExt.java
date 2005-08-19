@@ -24,7 +24,7 @@ public abstract class JifAssignExt extends Jif_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-        A = (JifContext) a.enterScope(A, null);
+        A = (JifContext) a.enterScope(A);
 
 	Assign checked = (Assign)labelCheckLHS(lc);
 

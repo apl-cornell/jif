@@ -33,7 +33,7 @@ public class JifConstructorCallExt extends JifStmtExt_c
 	JifTypeSystem ts = lc.typeSystem();
     
 	List throwTypes = new ArrayList(ccs.del().throwTypes(ts)); 
-        A = (JifContext) ccs.del().enterScope(A, null);
+        A = (JifContext) ccs.del().enterScope(A);
 
 	JifConstructorInstance ci = (JifConstructorInstance)ccs.constructorInstance();
 	

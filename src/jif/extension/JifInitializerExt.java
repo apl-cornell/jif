@@ -26,7 +26,7 @@ public class JifInitializerExt extends Jif_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-	A = (JifContext) ib.enterScope(A, null);
+	A = (JifContext) ib.enterScope(A);
 
 	// @@@@@What this hell is this?
     //Label Li = ts.freshCovariantLabel(ib.position(), "static");

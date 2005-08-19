@@ -38,7 +38,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
       	JifContext A = lc.jifContext();
-	A = (JifContext) mn.enterScope(A, null);
+	A = (JifContext) mn.enterScope(A);
         lc = lc.context(A);
 
 	// First, check the arguments, adjusting the context.

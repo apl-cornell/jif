@@ -72,7 +72,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         final JifFieldInstance fi = (JifFieldInstance) decl.fieldInstance();
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-	A = (JifContext) decl.enterScope(A, null);
+	A = (JifContext) decl.enterScope(A);
 	
 	//if [final] then invariant(type_part(Tf)) else invariant(type_part(Tf)) and invariant(label_part(Tf))
         {        

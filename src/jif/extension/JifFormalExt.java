@@ -19,7 +19,7 @@ public class JifFormalExt extends Jif_c
 
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         JifContext A = lc.jifContext();
-	A = (JifContext) node().enterScope(A, null);
+	A = (JifContext) node().enterScope(A);
         return node();
     }
 }

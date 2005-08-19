@@ -33,7 +33,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
 
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
-        A = (JifContext) mn.enterScope(A, null);
+        A = (JifContext) mn.enterScope(A);
         JifConstructorInstance ci = (JifConstructorInstance) mn.constructorInstance();
     
         lc = lc.context(A);
