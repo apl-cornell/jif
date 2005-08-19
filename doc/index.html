@@ -10,23 +10,30 @@
 <p>Jif Version 2.0.0</p>
 <hr>
 <p>
-Jif is based on the JFlow language described in the 1999 paper, <a
+<p><b>Jif</b> is a security-typed programming language that extends Java with
+support for static information flow control. The Jif compiler checks how
+information flows within programs, rejecting programs that use
+confidential information improperly. As a result, Jif programs are secure
+in an end-to-end sense.
+
+Jif is based on the language described in the 1999 paper, <a
 href="http://www.cs.cornell.edu/andru/papers/popl99/myers-popl99.ps.gz">Practical
-Mostly-Static Information Flow Control</a>, published in the
-Proceedings of the 26th ACM Symposium on Principles of Programming
-Languages (POPL), January 1999, pp. 228-241, by Andrew C. Myers. The
-most complete documentation for Jif can be found in Andrew Myers'
+Mostly-Static Information Flow Control</a>, published in the <i>Proceedings of the
+26th ACM Symposium on Principles of Programming Languages</i> (POPL),
+pp. 228-241, January 1999, by Andrew C. Myers.
+
+Another source of documentation for Jif can be found in Andrew Myers'
 thesis, linked to from the <a
 href="http://www.cs.cornell.edu/jif/">Jif web site</a>. However, the
 language has developed since that time, and some features in this
 version of Jif are not documented in the thesis.
 
 <p>
-This document provides a brief description of this version of the Jif
-programming language, and information on how to write and run Jif
-programs. This document is a work in progress, and is by no means
+This document describes Version 2.0.0 of the
+Jif programming language. The document is a work in progress, and is by no means
 complete. Please contact the developers if you have questions or
 problems that this document does not address.
+</p>
 
 <hr>
 <h2>Table of Contents</h2>
@@ -35,7 +42,7 @@ problems that this document does not address.
   <li> <a href="../CHANGES">Change log</a></li>
   <li> <a href="../LICENSE">License</a></li>
 
-  <li><a href="jif_programming.html">Programming in Jif</a>
+  <li><a href="jif_programming.html">Jif Reference Manual</a>
    <ul>
    <li><a href="jif_programming.html#language-features">Language Features</a> 
        <ul>

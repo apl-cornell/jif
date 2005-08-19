@@ -1,7 +1,30 @@
 /* style sheet for Jif documentation
  */
-.code {
-      font-family: Courier New,  san-serif;
-      background-color: rgb(200,200,200);
+body {
+    background-color: rgb(240,240,240)
 }
 
+p,ul {
+    font-size: 100%;
+    width: 80ex
+}
+ol {
+    font-size: 100%;
+    width: 80ex
+}
+.code {
+      width: 80ex;
+      font-family: Courier New, courier, fixed;
+      font-size: 90%;
+      background-color: rgb(230,230,230);
+      border: solid;
+      border-color: rgb(200,200,200);
+      border-width: 1;
+      margin: 5;
+      padding: 5
+}
+
+h1 { font-family: sans-serif }
+h2 { font-family: sans-serif }
+h3 { font-family: sans-serif }
+h4 { font-family: sans-serif }

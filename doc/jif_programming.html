@@ -7,7 +7,51 @@
 
 <body>
 
-<h1><u>Programming in Jif</u></h1>
+<h1>Programming in Jif</h1>
+
+<p>
+Jif is an extension to the Java programming language that supports
+static analysis of information flow. This support consists primarily
+of extensions to the type system.  Static checking of information flow
+in Jif programs is performed as part of type checking. If a Jif program
+type-checks, the compiler translates it into Java code that can be
+compiled with a standard Java compiler. The Jif compiler and run-time
+system are available from the
+<a href="http://www.cs.cornell.edu/jif">Jif web site</a>.
+</p>
+
+<p>
+Jif has a number of unique features that are important for
+building interesting programs in a security-typed language:
+
+<ul>
+<li>A <strong>declassification</strong> mechanism gives the programmer
+an explicit escape hatch for releasing information when that is necessary.
+<li><strong>Principals</strong>, the entities that have security requirements,
+are explicitly represented in the Jif language, 
+    both as type annotations and as values that can be manipulated at
+    run time. A new feature of Jif 2.0.0 is the ability to create
+    <strong>user-defined principals</strong>, so that programs can define
+    their own authentication and authorization procedures.
+<li><strong>Statically checked access control</strong> makes it possible
+    to write complex authorization code without
+    creating covert information leaks.
+<li>A <strong>principal hierarchy</strong> allows policies to be stated
+    in a general way in terms of more abstract principals.
+<li><strong>Label polymorphism</strong> allows the expression of code 
+that is generic with respect to the security class of the data it manipulates.
+<li><strong>Automatic label inference</strong>
+makes it unnecessary to write many type annotations.
+<li><strong>Run-time label checking and first-class label values</strong>
+makes it possible to discover and to define new policies at run time. Run-time
+checks are statically checked to ensure that information is not leaked by
+the success or failure of the run-time check itself.  Jif 2.0.0 significantly
+improves the expressive power of this important language feature.
+</ul>
+
+
+
+
 
 
 <h2><a name="language-features"></a>Language Features</h2> 
@@ -19,11 +63,13 @@ from the <a href="http://www.cs.cornell.edu/jif/">Jif web site</a>).
 
 <h3><a name="dynamic-labels"></a>Dynamic labels and principals</h3>
 
+<p>
 Labels and principals are first-class values, and are represented at
 runtime. These "dynamic" labels and principals can be used in the
 specification of other labels, and used as the parameters of <a
 href="parameterized-classes">parameterized classes</a>. (Thus, Jif's
 type system uses dependent types.) Consider the following example.
+</p>
 
 <table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
 class C[label L] { ... }
@@ -297,6 +343,7 @@ Note that this construct replaces the <code>actsfor { ... } else { ... }</code> 
 <h3><a name="static-fields"></a>Static fields</h3>
 
 <p>Static fields of classes are supported in Jif, subject to the following restrictions.
+</p>
 
 <ol>
 <li>If a static field has an initializing
@@ -307,7 +354,7 @@ method), which may depend on sensitive information.</li>
 <li>The label of a static field cannot mention <code>this</code> (as the expression <code>this</code> is not valid in a static context).</li>
 <li>The label of a static field cannot mention any class parameters (as class parameters are specific to an instance of the class).</li>
 </ol>
-
+</p>
 
 <h3><a name="runtime-exceptions"></a>Runtime exceptions</h3>
 
@@ -508,7 +555,7 @@ method return label.
 </li>
 </ul>
 
-<h2><a name="main"></a>The <code>static public void main<code> method</h2>
+<h2><a name="main"></a>The <code>main<code> method</h2>
 
 <p>Jif provides two possible signatures for the main method of a
 class. The first is compatible with the signature for Java main
