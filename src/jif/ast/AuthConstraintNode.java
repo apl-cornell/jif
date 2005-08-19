@@ -1,13 +1,6 @@
 package jif.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-
-import jif.types.*;
-
-import java.util.*;
+import java.util.List;
 
 /** An authority constraint node. It represents an authority
  *  constraint of a method or a class. 

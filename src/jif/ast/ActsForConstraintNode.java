@@ -1,13 +1,5 @@
 package jif.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-
-import jif.types.*;
-
-import java.util.*;
 
 /** An immutable representation of the Jif <code>ActsFor constraint</code>. 
  *  <p>Grammer: <tt>actsFor (actor, granter)</tt></p>

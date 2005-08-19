@@ -1,12 +1,7 @@
 package jif.ast;
 
-import jif.types.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-
-import java.util.*;
+import jif.types.ParamInstance;
+import polyglot.ast.Node;
 
 /** The AST node representing a label/principal parameter declaration.
  */

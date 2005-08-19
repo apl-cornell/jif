@@ -1,13 +1,12 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
-import jif.types.*;
-import jif.visit.*;
+import java.util.List;
+
 import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.ext.jl.ast.Expr_c;
+import polyglot.types.SemanticException;
 import polyglot.util.*;
 import polyglot.visit.*;
-import java.util.*;
 
 /** An implemenation of the <code>DeclassifyExpr</code> interface.
  */

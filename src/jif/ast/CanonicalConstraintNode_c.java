@@ -1,12 +1,9 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
-import jif.types.*;
-import jif.visit.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
+import jif.types.Assertion;
 import polyglot.util.*;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
 
 /** An implementation of the <code>CanonicalConstraint</code>. 
  */

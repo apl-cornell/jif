@@ -1,11 +1,8 @@
 package jif.ast;
 
 import jif.translate.ToJavaExt;
-import jif.types.JifTypeSystem;
 import jif.types.PathMap;
-import jif.types.label.Label;
 import jif.visit.LabelChecker;
-import polyglot.ast.Expr;
 import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;

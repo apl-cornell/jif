@@ -1,14 +1,13 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
 import jif.types.*;
-import jif.visit.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.ast.Node;
+import polyglot.ext.jl.ast.Node_c;
+import polyglot.types.Context;
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
 import polyglot.visit.*;
-
-import java.util.*;
 
 /** An implementation of the <code>ParamDecl</code> interface. 
  */
@@ -23,10 +22,6 @@ public class ParamDecl_c extends Node_c implements ParamDecl
 	super(pos);
 	this.kind = kind;
 	this.name = name;
-    }
-
-    public boolean isDisambiguated() {
-        return pi != null && pi.isCanonical() && super.isDisambiguated();
     }
 
     public ParamInstance.Kind kind() {

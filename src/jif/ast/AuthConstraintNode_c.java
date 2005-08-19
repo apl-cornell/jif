@@ -1,13 +1,13 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
-import jif.types.*;
-import jif.visit.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
 import java.util.*;
+
+import jif.types.AuthConstraint_c;
+import jif.types.JifTypeSystem;
+import polyglot.ast.Node;
+import polyglot.types.SemanticException;
+import polyglot.util.*;
+import polyglot.visit.*;
 
 /** An implmentation of the <code>AuthConstraintNode</code> interface.
  */

@@ -82,17 +82,10 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
         return reconstruct(base, params);
     }
     
-    public boolean isDisambiguated() {
-        return false;
-    }
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
         Type b = base.type();
         
-        if (! b.isCanonical()) {
-            //  not yet ready to disambiguate
-            return this;
-        }
         if (! (b instanceof JifPolyType) || ((JifPolyType)b).params().isEmpty()) {
             throw new SemanticException("Cannot instantiate from a non-polymorphic type " + b);
         }

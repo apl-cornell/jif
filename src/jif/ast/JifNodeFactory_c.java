@@ -8,7 +8,6 @@ import jif.types.ParamInstance;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
-import polyglot.ext.jl.ast.CanonicalTypeNode_c;
 import polyglot.ext.jl.ast.NodeFactory_c;
 import polyglot.types.Flags;
 import polyglot.types.Type;

@@ -1,7 +1,5 @@
 package jif.ast;
 
-import polyglot.ast.*;
-import jif.types.*;
 import jif.types.label.Label;
 
 /** A placeholder in the AST for a Jif label.

@@ -7,6 +7,7 @@ import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.types.*;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.*;
 
@@ -29,10 +30,6 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         this.name = name;
     }
 
-    public boolean isDisambiguated() {
-        return false;
-    }
-    
     public String toString() {
         if (expr != null) return expr + "{amb}";
         return name + "{amb}";
@@ -44,8 +41,9 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         }
         
         // must be the case that name == null and expr != null
-        if (!ar.isASTDisambiguated(expr)) {
-            return this;
+        if (expr == null) {
+            throw new InternalCompilerError("Should be that either name " +
+                    "or expr is not null");
         }
 
         JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();

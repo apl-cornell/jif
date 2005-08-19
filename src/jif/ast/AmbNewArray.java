@@ -1,12 +1,8 @@
 package jif.ast;
 
-import jif.types.*;
-import jif.extension.*;
+import java.util.List;
+
 import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import java.util.*;
 
 /** An ambiguous new array expression.
  *  The ambiguity arises because in <code>new T.a[e][m]</code>, <code>e</code>

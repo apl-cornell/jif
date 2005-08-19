@@ -28,10 +28,6 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 	this.expr = expr;
     }
 
-    public boolean isDisambiguated() {
-        return false;
-    }
-
     public Receiver prefix() {
 	return this.prefix;
     }
@@ -78,9 +74,6 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
 	JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
-
-	if (!ar.isASTDisambiguated(prefix)) return this;
-	if (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr)) return this;
     
 	if (prefix instanceof TypeNode) {
 	    // "expr" must be a parameter.
@@ -100,11 +93,6 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 	    else {
 	        n = nf.AmbParam(position(), (String)expr, pi);	        
 	        n = (ParamNode) n.disambiguate(ar);
-	        if (!n.isDisambiguated()) {
-	            throw new SemanticException("\"" + expr + "\" is not " + 
-                                            "suitable as a parameter.", position());
-                        
-                }
 	    }
 
 	    List l = new LinkedList();

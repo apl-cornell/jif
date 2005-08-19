@@ -3,8 +3,6 @@ package jif.ast;
 import java.util.*;
 
 import jif.types.*;
-import jif.types.JifMethodInstance;
-import jif.types.JifTypeSystem;
 import jif.types.label.Label;
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.MethodDecl_c;
@@ -94,20 +92,11 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         List formalTypes = new ArrayList(n.formals().size());
         for (Iterator i = n.formals().iterator(); i.hasNext(); ) {
             Formal f = (Formal)i.next();
-            if (!f.isDisambiguated()) {
-                // formals are not disambiguated yet.
-                return n;
-            }
             formalTypes.add(f.declType());
         }
         jmi.setFormalTypes(formalTypes);
 
         // return type
-        if (!n.returnType().isDisambiguated()) {
-            // return type node not disambiguated yet
-            return n;
-        }
-
         DefaultSignature ds = jts.defaultSignature();
         
         Type declrt = n.returnType().type();
@@ -116,16 +105,6 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             declrt = jts.labeledType(declrt.position(), declrt, ds.defaultReturnValueLabel(n));
             n = (JifMethodDecl)n.returnType(n.returnType().type(declrt));
             jmi.setReturnType(declrt);
-        }
-
-        if (n.startLabel() != null && !n.startLabel().isDisambiguated()) {
-            // the startlabel node hasn't been disambiguated yet
-            return n;
-        }
-
-        if (n.returnLabel() != null && !n.returnLabel().isDisambiguated()) {
-            // the return label node hasn't been disambiguated yet
-            return n;
         }
 
         Label Li; // start label
@@ -155,10 +134,6 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         List throwTypes = new LinkedList();        
         for (Iterator i = n.throwTypes().iterator(); i.hasNext();) {
             TypeNode tn = (TypeNode)i.next();
-            if (!tn.isDisambiguated()) {
-                // throw types haven't been disambiguated yet.
-                return n;
-            }
             
             Type xt = tn.type();
             if (!jts.isLabeled(xt)) {
@@ -172,10 +147,6 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         List constraints = new ArrayList(n.constraints().size());
         for (Iterator i = n.constraints().iterator(); i.hasNext(); ) {
             ConstraintNode cn = (ConstraintNode) i.next();
-            if (!cn.isDisambiguated()) {
-                // constraint nodes haven't been disambiguated yet.
-                return n;
-            }
             constraints.add(cn.constraint());
         }
         jmi.setConstraints(constraints);

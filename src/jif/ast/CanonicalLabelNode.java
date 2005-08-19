@@ -1,6 +1,5 @@
 package jif.ast;
 
-import jif.types.*;
 
 /** A canonical label node. 
  */

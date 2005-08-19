@@ -35,24 +35,6 @@ public class AmbVarLabelNode_c extends AmbLabelNode_c
 	return n;
     }
 
-    /** Disambiguates the type of this node. The following rules are used:
-     *  Suppose <code>vi</code> is the variable instance corresponding to <tt>name</tt>,
-     *  and <code>label</code> represents the Jif label contained in this node,
-     *  <ul> 
-     *  <li>if <tt>vi</tt> is a <tt>JifVarInstance</tt>, <tt>label</tt> ought to be
-     *  <tt>vi.label()</tt>. </li>
-     *  <li>if <tt>vi</tt> is a <tt>ParamInstance</tt>, 
-     *	    <ul> <li>if <tt>vi</tt> is an covariant label parameter, <tt>label</tt> ought
-     *		 to be a covariant label with the same <tt>uid</tt> as <tt>vi</tt>. </li>
-     *		 <li>if <tt>vi</tt> is an invariant label parameter, <tt>label</tt> ought
-     *		 to be a <tt>ParamLabel</tt> with the same <tt>uid</tt> as <tt>vi</tt>. </li>
-     *		 <li>if <tt>vi</tt> is a principal parameter, <tt>label</tt> ought to be
-     *		 the bottom. </li>
-     *	    </ul>
-     *  <li>if <tt>vi</tt> is a <tt>PrincipalInstance</tt>, <tt>label</tt> ought to be
-     *  the bottom. </li>
-     *  </ul>
-     */
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
 	Context c = sc.context();
 	JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();

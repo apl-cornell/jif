@@ -48,10 +48,6 @@ public abstract class PrincipalNode_c extends Expr_c implements PrincipalNode
 //    public Object constantValue() {
 //        return principal;
 //    }
-
-    public boolean isDisambiguated() {
-        return principal != null && principal.isCanonical() && super.isDisambiguated();
-    }
     
     public List throwTypes(TypeSystem ts) {
         return principal().throwTypes(ts);

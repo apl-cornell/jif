@@ -1,13 +1,7 @@
 package jif.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-
-import jif.types.*;
-
-import java.util.*;
+import polyglot.ast.CompoundStmt;
+import polyglot.ast.Stmt;
 
 /** An immutable representation of the Jif <code>declassify</code> statement. 
  *  <p>Grammer: <code>declassify(label_1, label_2) stmt</code> </p>

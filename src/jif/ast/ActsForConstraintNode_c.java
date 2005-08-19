@@ -1,12 +1,11 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
-import jif.types.*;
-import jif.visit.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
+import jif.types.ActsForConstraint;
+import jif.types.JifTypeSystem;
+import polyglot.ast.Node;
+import polyglot.types.SemanticException;
 import polyglot.util.*;
+import polyglot.visit.*;
 
 /** An implementation of the <tt>ActsForConstraintNode</tt> interface. */
 public class ActsForConstraintNode_c extends ConstraintNode_c implements ActsForConstraintNode

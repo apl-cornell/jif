@@ -1,10 +1,6 @@
 package jif.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import java.util.*;
+import polyglot.ast.Ambiguous;
 
 /** An ambiguous parameter.
  */

@@ -1,19 +1,14 @@
 package jif.ast;
 
-import java.util.Collections;
 import java.util.List;
 
 import jif.types.JifTypeSystem;
-import jif.types.label.Label;
-import polyglot.ast.*;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ext.jl.ast.Expr_c;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
-import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
+import polyglot.util.*;
 import polyglot.visit.*;
 
 /** An implementation of the <code>NewLabel</code> interface. 

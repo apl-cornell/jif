@@ -1,13 +1,11 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
-import jif.types.*;
-import jif.visit.*;
+import java.util.List;
+
 import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
+import polyglot.ext.jl.ast.Stmt_c;
 import polyglot.util.*;
-import java.util.*;
+import polyglot.visit.*;
 
 /** An implementation of the <code>DeclassifyStmt</code> interface.
  */

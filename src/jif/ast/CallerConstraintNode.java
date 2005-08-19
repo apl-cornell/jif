@@ -1,13 +1,6 @@
 package jif.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-
-import jif.types.*;
-
-import java.util.*;
+import java.util.List;
 
 /** A caller constraint node. It requests the caller of
  *  a method are granted certain authorities. 

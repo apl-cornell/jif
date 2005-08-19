@@ -1,7 +1,6 @@
 package jif.ast;
 
 import polyglot.ast.Ambiguous;
-import polyglot.ast.Expr;
 import polyglot.ast.Receiver;
 
 /** An ambiguous parameter type or array access. It has the form

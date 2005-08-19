@@ -1,18 +1,11 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
-import jif.types.*;
-import jif.types.principal.ParamPrincipal;
-import jif.visit.*;
+import java.util.List;
+
 import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.ext.jl.ast.Stmt_c;
+import polyglot.util.*;
 import polyglot.visit.*;
-import polyglot.util.CodeWriter;
-import polyglot.util.Position;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.CollectionUtil;
-import polyglot.frontend.Pass;
-import java.util.*;
 
 /** An implementation of the <tt>LabelIf</tt> interface. */
 public class LabelIf_c extends Stmt_c implements LabelIf

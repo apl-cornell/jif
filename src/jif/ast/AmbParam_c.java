@@ -23,10 +23,6 @@ public class AmbParam_c extends Node_c implements AmbParam
 	this.pi = pi;
     }
 
-    public boolean isDisambiguated() {
-        return false;
-    }
-
     public String name() {
 	return this.name;
     }
@@ -55,10 +51,6 @@ public class AmbParam_c extends Node_c implements AmbParam
 	Context c = sc.context();
         VarInstance vi = c.findVariable(name);
 
-        if (!vi.isCanonical() && pi == null) {
-            // not yet ready to disambiguate
-            return this;
-        }
 	if (vi instanceof JifVarInstance) {
 	    return varToParam((JifVarInstance) vi, sc);
 	}

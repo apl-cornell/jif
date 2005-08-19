@@ -33,10 +33,8 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
 	Context c = sc.context();
 	JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
-
-        if (!sc.isASTDisambiguated(expr)) {
-            return this;
-        }
+RUN TYPE CHECKER HERE? Or in JIF UTIL?
+    
         if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             throw new SemanticDetailedException(
                 "Illegal dynamic label.",
