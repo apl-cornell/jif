@@ -7,7 +7,6 @@ import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.types.*;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.*;
 
@@ -30,6 +29,10 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         this.name = name;
     }
 
+    public boolean isDisambiguated() {
+        return false;
+    }
+    
     public String toString() {
         if (expr != null) return expr + "{amb}";
         return name + "{amb}";
@@ -41,14 +44,17 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         }
         
         // must be the case that name == null and expr != null
-        if (expr == null) {
-            throw new InternalCompilerError("Should be that either name " +
-                    "or expr is not null");
+        if (!ar.isASTDisambiguated(expr)) {
+            return this;
         }
 
         JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
-        if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
+
+	// run the typechecker over expr.
+	expr = (Expr)expr.visit(new TypeChecker(ar.job(), ts, nf));
+
+	if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             throw new SemanticDetailedException(
                 "Illegal dynamic principal.",
                 "Only final access paths or principal expressions can be used as a dynamic principal. " +

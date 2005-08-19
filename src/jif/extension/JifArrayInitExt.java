@@ -34,7 +34,7 @@ public class JifArrayInitExt extends Jif_c
 
 
 	JifContext A = lc.jifContext();
-        A = (JifContext) init.enterScope(A);
+        A = (JifContext) init.enterScope(A, null);
 
 	A = (JifContext) A.pushBlock();
 

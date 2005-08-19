@@ -30,7 +30,7 @@ public class JifConditionalExt extends Jif_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-        A = (JifContext) te.enterScope(A);
+        A = (JifContext) te.enterScope(A, null);
         
         Type t1 = te.consequent().type();
         Type t2 = te.alternative().type();

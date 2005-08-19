@@ -84,11 +84,24 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         JifConstructorInstance jci = (JifConstructorInstance)n.constructorInstance();
         JifTypeSystem jts = (JifTypeSystem)ar.typeSystem();
 
+        if (n.startLabel() != null && !n.startLabel().isDisambiguated()) {
+            // the startlabel node hasn't been disambiguated yet
+            return n;
+        }
+
+        if (n.returnLabel() != null && !n.returnLabel().isDisambiguated()) {
+            // the return label node hasn't been disambiguated yet
+            return n;
+        }
 
         // set the formal types
         List formalTypes = new ArrayList(n.formals().size());
         for (Iterator i = n.formals().iterator(); i.hasNext(); ) {
             Formal f = (Formal)i.next();
+            if (!f.isDisambiguated()) {
+                // formals are not disambiguated yet.
+                return n;
+            }
             formalTypes.add(f.declType());
         }
         jci.setFormalTypes(formalTypes);
@@ -120,6 +133,10 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         List throwTypes = new LinkedList();        
         for (Iterator i = n.throwTypes().iterator(); i.hasNext();) {
             TypeNode tn = (TypeNode)i.next();
+            if (!tn.isDisambiguated()) {
+                // throw types haven't been disambiguated yet.
+                return n;
+            }
             
             Type xt = tn.type();
             if (!jts.isLabeled(xt)) {
@@ -133,6 +150,10 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         List constraints = new ArrayList(n.constraints().size());
         for (Iterator i = n.constraints().iterator(); i.hasNext(); ) {
             ConstraintNode cn = (ConstraintNode) i.next();
+            if (!cn.isDisambiguated()) {
+                // constraint nodes haven't been disambiguated yet.
+                return n;
+            }
             constraints.add(cn.constraint());
         }
         jci.setConstraints(constraints);

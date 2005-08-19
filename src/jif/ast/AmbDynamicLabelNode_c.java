@@ -10,6 +10,7 @@ import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.visit.*;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -33,8 +34,10 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
 	Context c = sc.context();
 	JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
-RUN TYPE CHECKER HERE? Or in JIF UTIL?
     
+	// run the typechecker over expr.
+	expr = (Expr)expr.visit(new TypeChecker(sc.job(), ts, nf));
+	
         if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             throw new SemanticDetailedException(
                 "Illegal dynamic label.",

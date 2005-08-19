@@ -25,7 +25,7 @@ public class JifEvalExt extends JifStmtExt_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-        A = (JifContext) eval.enterScope(A);
+        A = (JifContext) eval.enterScope(A, null);
 
 	Expr e = (Expr) lc.context(A).labelCheck(eval.expr());
 

@@ -25,7 +25,7 @@ public class JifCastExt extends Jif_c
 
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.context();
-        A = (JifContext) c.enterScope(A);
+        A = (JifContext) c.enterScope(A, null);
 
         List throwTypes = c.del().throwTypes(ts);
         Position pos = c.position();

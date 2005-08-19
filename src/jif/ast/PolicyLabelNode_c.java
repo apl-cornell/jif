@@ -67,10 +67,19 @@ public class PolicyLabelNode_c extends AmbLabelNode_c implements PolicyLabelNode
 	Principal o = owner.principal();
         if (o == null) throw new InternalCompilerError("null owner " + owner.getClass().getName() + " " + owner.position());
 
+//        if (!owner.isDisambiguated()) {
+//            // owner is not yet ready...
+//            System.out.println("Disambiguating a Policylabelnode " + this + " and owner is not disamb: " + owner + " :: " + owner.getClass());
+//            return this;
+//        }
 	List l = new LinkedList();
 
 	for (Iterator i = this.readers.iterator(); i.hasNext(); ) {
 	    PrincipalNode r = (PrincipalNode) i.next();
+//            if (!r.isDisambiguated()) {
+//                // reader is not yet ready...
+//                return this;
+//            }
 	    l.add(r.principal());
 	}
 

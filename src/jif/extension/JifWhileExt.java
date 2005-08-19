@@ -21,7 +21,7 @@ public class JifWhileExt extends JifStmtExt_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-	A = (JifContext) ws.enterScope(A);
+	A = (JifContext) ws.enterScope(A, null);
 
 	Label notTaken = ts.notTaken();
 

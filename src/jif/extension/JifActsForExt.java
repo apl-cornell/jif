@@ -1,19 +1,9 @@
 package jif.extension;
 
 import jif.ast.ActsFor;
-import jif.ast.LabelExpr;
 import jif.ast.PrincipalNode;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.PathMap;
-import jif.types.label.*;
-import jif.types.label.AccessPath;
-import jif.types.label.AccessPathRoot;
-import jif.types.label.Label;
-import jif.types.principal.DynamicPrincipal;
-import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Node;
 import polyglot.ast.Stmt;
@@ -35,7 +25,7 @@ public class JifActsForExt extends JifStmtExt_c
         ActsFor af = (ActsFor) node();
         
         JifContext A = lc.jifContext();
-        A = (JifContext) af.enterScope(A);
+        A = (JifContext) af.enterScope(A, null);
         JifTypeSystem ts = lc.jifTypeSystem();
         
         

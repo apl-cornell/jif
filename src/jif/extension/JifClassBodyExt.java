@@ -29,7 +29,7 @@ public class JifClassBodyExt extends Jif_c {
 	JifTypeSystem jts = lc.typeSystem();
 
 	JifContext A = lc.context();
-        A = (JifContext) n.enterScope(A);
+        A = (JifContext) n.enterScope(A, null);
         A.setEntryPC(jts.bottomLabel());
         lc = lc.context(A);
 

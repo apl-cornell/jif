@@ -101,7 +101,7 @@ public class JifUtil
     private static boolean isFinalAccessExpr(JifTypeSystem ts, Expr e) {
         if (e instanceof Local) {
             Local l = (Local)e;
-            if (e.isTypeChecked()) {
+            if (l.type() != null && l.type().isCanonical()) {
                 return l.localInstance().flags().isFinal();
             }
             else {
@@ -110,7 +110,7 @@ public class JifUtil
         }
         if (e instanceof Field) {
             Field f = (Field)e;
-            if (f.isTypeChecked()) {
+            if (f.type() != null && f.type().isCanonical()) {
                 Flags flgs = f.flags();
                 return flgs.isFinal() && 
                     (flgs.isStatic() || 

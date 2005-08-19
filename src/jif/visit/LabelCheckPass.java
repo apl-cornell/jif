@@ -44,9 +44,6 @@ public class LabelCheckPass extends AbstractPass
 
         job.ast(ast);
         
-        JifScheduler scheduler = (JifScheduler)this.lc.typeSystem().extensionInfo().scheduler();
-        scheduler.LabelsChecked(job).markRun();
-
         return (nErrsBefore == nErrsAfter);
     }
 }

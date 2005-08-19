@@ -27,7 +27,7 @@ public class JifTryExt extends JifStmtExt_c
 
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
-	A = (JifContext) trs.enterScope(A);
+	A = (JifContext) trs.enterScope(A, null);
 
 	Block t = (Block) lc.context(A).labelCheck(trs.tryBlock());
 	PathMap Xs = X(t);

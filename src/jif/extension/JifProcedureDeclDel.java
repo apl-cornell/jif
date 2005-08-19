@@ -8,6 +8,7 @@ import polyglot.types.*;
 import polyglot.util.Position;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
 
 /** The Jif delegate the <code>ProcedureDecl</code> node. 
  * 
@@ -19,8 +20,8 @@ public class JifProcedureDeclDel extends JifJL_c
 
 
     // add the formals to the context before visiting the formals
-    public Context enterScope(Context c) {
-        c = super.enterScope(c);
+    public Context enterScope(Context c, NodeVisitor v) {
+        c = super.enterScope(c, v);
         ProcedureDecl pd = (ProcedureDecl) node();
         for (Iterator i = pd.formals().iterator(); i.hasNext(); ) {
             Formal f = (Formal) i.next();

@@ -23,7 +23,7 @@ public class JifUnaryExt extends Jif_c
 	Unary ue = (Unary) node();
 
         JifContext A = lc.jifContext();
-	A = (JifContext) ue.enterScope(A);
+	A = (JifContext) ue.enterScope(A, null);
 
 	Expr e = ue.expr();
 

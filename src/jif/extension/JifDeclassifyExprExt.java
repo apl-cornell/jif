@@ -29,7 +29,7 @@ public class JifDeclassifyExprExt extends Jif_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-        A = (JifContext) d.enterScope(A);
+        A = (JifContext) d.enterScope(A, null);
 
 	Expr e = (Expr) lc.context(A).labelCheck(d.expr());
 	PathMap Xe = X(e);

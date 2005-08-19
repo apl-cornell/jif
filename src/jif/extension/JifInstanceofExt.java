@@ -26,7 +26,7 @@ public class JifInstanceofExt extends Jif_c
         JifTypeSystem ts = lc.typeSystem();
 
         List throwTypes = new ArrayList(ioe.del().throwTypes(ts));
-        A = (JifContext) ioe.enterScope(A);
+        A = (JifContext) ioe.enterScope(A, null);
 	Expr e = (Expr) lc.context(A).labelCheck(ioe.expr());
 	PathMap Xe = X(e);
 

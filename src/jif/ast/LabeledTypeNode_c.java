@@ -1,8 +1,11 @@
 package jif.ast;
 
+import jif.types.JifClassType;
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
 import polyglot.ast.*;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl.ast.TypeNode_c;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -67,7 +70,16 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Am
           return this;
     }
 
+    public boolean isDisambiguated() {
+        return typePart.isDisambiguated() && labelPart.isDisambiguated();
+    }
+
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
+        if (!this.typePart.isDisambiguated() || !this.labelPart.isDisambiguated()) {
+            // the children haven't been disambiguated yet
+            return this;
+        }
+
         JifTypeSystem jts = (JifTypeSystem) sc.typeSystem();
 
 	Type t = typePart.type();

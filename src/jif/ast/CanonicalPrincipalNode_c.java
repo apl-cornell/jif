@@ -3,6 +3,10 @@ package jif.ast;
 import java.util.List;
 
 import jif.extension.LabelTypeCheckUtil;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.label.AccessPath;
+import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
@@ -19,6 +23,10 @@ public class CanonicalPrincipalNode_c extends PrincipalNode_c implements Canonic
 	this.principal = principal;
     }
     
+    public boolean isDisambiguated() {
+        return true;
+    }    
+
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         LabelTypeCheckUtil.typeCheckPrincipal(tc, principal);        
         return super.typeCheck(tc);

@@ -5,9 +5,6 @@ import java.util.*;
 import jif.types.*;
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.Expr_c;
-import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.Scheduler;
-import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.*;
@@ -27,6 +24,10 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 	this.baseType = baseType;
 	this.expr = expr;
 	this.dims = TypedList.copyAndCheck(dims, Expr.class, true);
+    }
+
+    public boolean isDisambiguated() {
+        return false;
     }
 
     /** Gets the base type.     */
@@ -107,6 +108,8 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
     /** Disambiguates
      */
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+	if (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr))  return this;
+
 	JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 	
@@ -145,8 +148,14 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
                 pn = (ParamNode) pn.disambiguate(ar);
 
 		List l = new LinkedList();
+                if (!pn.isDisambiguated()) {
+                    // the instance is not yet ready
+                    // @@@@@is this right?
+                    return this;
+                }
+
                 l.add(pn.parameter());
-MAKE SURE PARAMETERS ARE DISAMB AND CANON
+
 		Type base = ts.instantiate(baseType.position(),
                                            pt.instantiatedFrom(), l);
 

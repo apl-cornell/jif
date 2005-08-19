@@ -60,7 +60,7 @@ public class JifScheduler extends JLScheduler {
             if (fi.container() instanceof ParsedTypeObject) {
                 ParsedTypeObject t = (ParsedTypeObject) fi.container();
                 if (t.job() != null) {
-                    addConcurrentDependency(g, ConstantsChecked(t.job()));
+                    addCorequisiteDependency(g, ConstantsChecked(t.job()));
                 }
                 if (t instanceof ParsedClassType) {
                     ParsedClassType ct = (ParsedClassType) t;

@@ -33,7 +33,7 @@ public class JifBinaryExt extends Jif_c
 	
         List throwTypes = new ArrayList(be.del().throwTypes(ts));
 
-        A = (JifContext) be.enterScope(A);
+        A = (JifContext) be.enterScope(A, null);
 
 	Expr left = (Expr) lc.context(A).labelCheck(be.left());
 	PathMap Xl = X(left);

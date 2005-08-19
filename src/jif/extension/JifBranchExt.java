@@ -24,7 +24,7 @@ public class JifBranchExt extends JifStmtExt_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-        A = (JifContext) bs.enterScope(A);
+        A = (JifContext) bs.enterScope(A, null);
 
 	Label pc = A.pc();
 	Label gotoLabel = A.gotoLabel(bs.kind(), bs.label());

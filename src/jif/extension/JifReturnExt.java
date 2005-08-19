@@ -28,7 +28,7 @@ public class JifReturnExt extends JifStmtExt_c
 
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
-	A = (JifContext) rs.enterScope(A);
+	A = (JifContext) rs.enterScope(A, null);
 
 	Expr e = null;
 

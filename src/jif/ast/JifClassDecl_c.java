@@ -70,7 +70,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         JifContext A = (JifContext) c;
         return addParamsToContext(A);
     }
-    public Context enterScope(Node child, Context c) {
+    public Context enterChildScope(Node child, Context c, NodeVisitor v) {
         if (child == this.body) {
             JifContext A = (JifContext) c;
             JifParsedPolyType ct = (JifParsedPolyType) this.type;
@@ -78,7 +78,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             A = (JifContext)A.pushClass(ct, inst);
             return addAuthorityToContext(A);
         }
-        return super.enterScope(child, c);
+        return super.enterChildScope(child, c, v);
     }
 
     public  JifContext addParamsToContext(JifContext A) {

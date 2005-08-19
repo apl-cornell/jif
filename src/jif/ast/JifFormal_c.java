@@ -15,16 +15,16 @@ public class JifFormal_c extends Formal_c {
         super(pos, flags, type, name);
     }
 
-    WHERE DO FORMAL TYPES GET LABELED?
-//    /**
-//     * 
-//     */
-//    public boolean isDisambiguated() {
-//        boolean typeNotNull = type() != null && type().type() != null;
-//        JifTypeSystem jts = (JifTypeSystem)(typeNotNull ? type().type().typeSystem() : null);
-//        return super.isDisambiguated() && 
-//                type() != null && 
-//                type().type() != null &&
-//                jts.isLabeled(type().type());
-//    }
+    
+    /**
+     * 
+     */
+    public boolean isDisambiguated() {
+        boolean typeNotNull = type() != null && type().type() != null;
+        JifTypeSystem jts = (JifTypeSystem)(typeNotNull ? type().type().typeSystem() : null);
+        return super.isDisambiguated() && 
+                type() != null && 
+                type().type() != null &&
+                jts.isLabeled(type().type());
+    }
 }

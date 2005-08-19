@@ -28,7 +28,7 @@ public class JifSourceFileExt extends Jif_c
 
         JifTypeSystem ts = lc.typeSystem();
 	JifContext A = lc.context();
-	A = (JifContext) n.enterScope(A);
+	A = (JifContext) n.enterScope(A, null);
 
         A.setAuthority(new HashSet());
         A.setPc(ts.bottomLabel());

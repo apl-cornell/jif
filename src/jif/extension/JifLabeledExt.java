@@ -25,7 +25,7 @@ public class JifLabeledExt extends JifStmtExt_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-	A = (JifContext) ls.enterScope(A);
+	A = (JifContext) ls.enterScope(A, null);
 
 	String label = ls.label();
 

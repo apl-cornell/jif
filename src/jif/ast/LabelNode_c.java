@@ -22,6 +22,10 @@ public abstract class LabelNode_c extends Node_c implements LabelNode
         this.label = label;
     }
 
+    public boolean isDisambiguated() {
+        return label != null && label.isCanonical() && super.isDisambiguated();
+    }
+
     public Label label() {
 	return label;
     }
@@ -35,7 +39,6 @@ public abstract class LabelNode_c extends Node_c implements LabelNode
     public Param parameter() {
 	return label();
     }
-    ADD DISAMBIGUATE TO RUN TYPECHECKER OVER LABEL?
 
     public String toString() {
 	if (label != null) {

@@ -22,6 +22,10 @@ public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements JifCa
         super(pos, type);
     }
 
+    public boolean isDisambiguated() {
+        return true;
+    }    
+    
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         if (!this.type().isCanonical()) {
             // type should be canonical by the time we start typechecking.

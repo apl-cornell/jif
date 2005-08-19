@@ -9,6 +9,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
+import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>AmbParam</code> interface. 
  */
@@ -22,7 +23,11 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
         this.expr = expr;
         this.expectedPI = expectedPI;
     }
-        
+    
+    public boolean isDisambiguated() {
+        return false;
+    }
+    
     public Expr expr() {
         return this.expr;
     }
@@ -58,10 +63,17 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
      * changed to a dynamic principal later.
      */
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
+        if (!sc.isASTDisambiguated(expr)) {
+            return this;
+        }
         JifContext c = (JifContext)sc.context();
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
-        if (expr instanceof PrincipalNode || (expectedPI != null && expectedPI.isPrincipal())) {
+
+        // run the typechecker over expr.
+	expr = (Expr)expr.visit(new TypeChecker(sc.job(), ts, nf));
+
+	if (expr instanceof PrincipalNode || (expectedPI != null && expectedPI.isPrincipal())) {
             if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
                 throw new SemanticDetailedException(
                     "Illegal principal parameter.",

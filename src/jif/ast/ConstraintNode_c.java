@@ -1,8 +1,12 @@
 package jif.ast;
 
-import jif.types.Assertion;
-import polyglot.ext.jl.ast.Node_c;
-import polyglot.util.Position;
+import polyglot.ext.jl.ast.*;
+import jif.types.*;
+import jif.visit.*;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.visit.*;
+import polyglot.util.*;
 
 /** An implementation of the <code>ConstraintNode</code> interface. 
  */
@@ -12,6 +16,10 @@ public class ConstraintNode_c extends Node_c implements ConstraintNode
 
     public ConstraintNode_c(Position pos) {
 	super(pos);
+    }
+
+    public boolean isDisambiguated() {
+        return constraint != null && constraint.isCanonical() && super.isDisambiguated();
     }
 
     public Assertion constraint() {

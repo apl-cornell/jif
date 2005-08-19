@@ -26,7 +26,7 @@ public class JifCaseExt extends JifStmtExt_c
 	
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-        A = (JifContext) cs.enterScope(A);
+        A = (JifContext) cs.enterScope(A, null);
 
 	PathMap X = ts.pathMap();
 	
