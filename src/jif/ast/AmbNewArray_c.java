@@ -5,6 +5,8 @@ import java.util.*;
 import jif.types.*;
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.Expr_c;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.*;
@@ -150,8 +152,8 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 		List l = new LinkedList();
                 if (!pn.isDisambiguated()) {
                     // the instance is not yet ready
-                    // @@@@@is this right?
-                    return this;
+                    Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
+                    throw new MissingDependencyException(g);
                 }
 
                 l.add(pn.parameter());

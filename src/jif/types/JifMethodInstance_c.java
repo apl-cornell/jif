@@ -156,7 +156,9 @@ public class JifMethodInstance_c extends MethodInstance_c
         // also need to make sure that every formal type is labeled with an arg label
         for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
             Type t = (Type) i.next();
-            if (!jts.isLabeled(t) || !(jts.labelOfType(t) instanceof ArgLabel)) return false;
+            if (!jts.isLabeled(t) || !(jts.labelOfType(t) instanceof ArgLabel)) {
+                return false;
+            }
         }
         return true;
     }

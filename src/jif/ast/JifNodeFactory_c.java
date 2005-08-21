@@ -8,6 +8,7 @@ import jif.types.ParamInstance;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
+import polyglot.ext.jl.ast.Formal_c;
 import polyglot.ext.jl.ast.NodeFactory_c;
 import polyglot.types.Flags;
 import polyglot.types.Type;
@@ -385,6 +386,13 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         Catch n = new JifCatch_c(pos, formal, body);
         n = (Catch)n.ext(extFactory().extCatch());
         n = (Catch)n.del(delFactory().delCatch());
+        return n;
+    }
+
+    public Formal Formal(Position pos, Flags flags, TypeNode type, String name) {
+        Formal n = new JifFormal_c(pos, flags, type, name);
+        n = (Formal)n.ext(extFactory().extFormal());
+        n = (Formal)n.del(delFactory().delFormal());
         return n;
     }
 }

@@ -52,7 +52,9 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
 	// run the typechecker over expr.
-	expr = (Expr)expr.visit(new TypeChecker(ar.job(), ts, nf));
+        TypeChecker tc = new TypeChecker(ar.job(), ts, nf);
+        tc = (TypeChecker) tc.context(ar.context());
+        expr = (Expr)expr.visit(tc);
 
 	if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             throw new SemanticDetailedException(

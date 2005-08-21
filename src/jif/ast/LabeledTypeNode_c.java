@@ -1,12 +1,11 @@
 package jif.ast;
 
-import jif.types.JifClassType;
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
 import polyglot.ast.*;
-import polyglot.ast.Node;
-import polyglot.ast.TypeNode;
 import polyglot.ext.jl.ast.TypeNode_c;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.*;
@@ -74,13 +73,14 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Am
         return typePart.isDisambiguated() && labelPart.isDisambiguated();
     }
 
-    public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (!this.typePart.isDisambiguated() || !this.labelPart.isDisambiguated()) {
             // the children haven't been disambiguated yet
-            return this;
+            Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
+            throw new MissingDependencyException(g);
         }
 
-        JifTypeSystem jts = (JifTypeSystem) sc.typeSystem();
+        JifTypeSystem jts = (JifTypeSystem) ar.typeSystem();
 
 	Type t = typePart.type();
 	Label L = labelPart.label();
@@ -90,7 +90,7 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Am
 		position());
 	}
 
-	return sc.nodeFactory().CanonicalTypeNode(position(), 
+	return ar.nodeFactory().CanonicalTypeNode(position(), 
 	    jts.labeledType(position(), t, L));
     }
 

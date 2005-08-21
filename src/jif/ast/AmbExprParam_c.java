@@ -71,9 +71,13 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
         // run the typechecker over expr.
-	expr = (Expr)expr.visit(new TypeChecker(sc.job(), ts, nf));
+        TypeChecker tc = new TypeChecker(sc.job(), ts, nf);
+        tc = (TypeChecker) tc.context(sc.context());
+	expr = (Expr)expr.visit(tc);
 
-	if (expr instanceof PrincipalNode || (expectedPI != null && expectedPI.isPrincipal())) {
+	if (expr instanceof PrincipalNode || 
+            ts.isImplicitCastValid(expr.type(), ts.Principal()) ||
+            (expectedPI != null && expectedPI.isPrincipal())) {
             if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
                 throw new SemanticDetailedException(
                     "Illegal principal parameter.",

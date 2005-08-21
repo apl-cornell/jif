@@ -6,6 +6,8 @@ import jif.types.*;
 import jif.types.label.Label;
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.ConstructorDecl_c;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -100,7 +102,8 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             Formal f = (Formal)i.next();
             if (!f.isDisambiguated()) {
                 // formals are not disambiguated yet.
-                return n;
+                Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
+                throw new MissingDependencyException(g);
             }
             formalTypes.add(f.declType());
         }
@@ -135,7 +138,8 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             TypeNode tn = (TypeNode)i.next();
             if (!tn.isDisambiguated()) {
                 // throw types haven't been disambiguated yet.
-                return n;
+                Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
+                throw new MissingDependencyException(g);
             }
             
             Type xt = tn.type();
@@ -152,7 +156,8 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             ConstraintNode cn = (ConstraintNode) i.next();
             if (!cn.isDisambiguated()) {
                 // constraint nodes haven't been disambiguated yet.
-                return n;
+                Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
+                throw new MissingDependencyException(g);
             }
             constraints.add(cn.constraint());
         }

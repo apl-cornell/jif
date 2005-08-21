@@ -5,6 +5,8 @@ import java.util.*;
 import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -60,26 +62,27 @@ public class PolicyLabelNode_c extends AmbLabelNode_c implements PolicyLabelNode
 	return reconstruct(owner, readers);
     }
 
-    public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-	JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
-	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+	JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
+	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
 	Principal o = owner.principal();
         if (o == null) throw new InternalCompilerError("null owner " + owner.getClass().getName() + " " + owner.position());
 
-//        if (!owner.isDisambiguated()) {
-//            // owner is not yet ready...
-//            System.out.println("Disambiguating a Policylabelnode " + this + " and owner is not disamb: " + owner + " :: " + owner.getClass());
-//            return this;
-//        }
+        if (!owner.isDisambiguated()) {
+            // owner is not yet ready...
+            Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
+            throw new MissingDependencyException(g);
+        }
 	List l = new LinkedList();
 
 	for (Iterator i = this.readers.iterator(); i.hasNext(); ) {
 	    PrincipalNode r = (PrincipalNode) i.next();
-//            if (!r.isDisambiguated()) {
-//                // reader is not yet ready...
-//                return this;
-//            }
+            if (!r.isDisambiguated()) {
+                // reader is not yet ready...
+                Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
+                throw new MissingDependencyException(g);
+            }
 	    l.add(r.principal());
 	}
 

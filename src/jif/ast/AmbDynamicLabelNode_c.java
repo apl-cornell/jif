@@ -36,7 +36,9 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
     
 	// run the typechecker over expr.
-	expr = (Expr)expr.visit(new TypeChecker(sc.job(), ts, nf));
+        TypeChecker tc = new TypeChecker(sc.job(), ts, nf);
+        tc = (TypeChecker) tc.context(sc.context());
+        expr = (Expr)expr.visit(tc);
 	
         if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             throw new SemanticDetailedException(
