@@ -28,7 +28,7 @@ public class JifToJavaRewriter extends ContextVisitor
     private JifNodeFactory jif_nf;
     private Job job;
     private QQ qq;
-
+    
     private Collection additionalClassDecls;
     private Collection newSourceFiles;
 
@@ -53,16 +53,15 @@ public class JifToJavaRewriter extends ContextVisitor
             for (Iterator iter = c.sources().iterator(); iter.hasNext(); ) {
                 SourceFile sf = (SourceFile)iter.next();
                 java_ext.scheduler().addJob(sf.source(), sf);
-
+                
             }
         }
         else {
             java_ext.scheduler().addJob(job.source(), ast);
         }
 
-
+        
         // now add any additional source files, which should all be public.
-        Source baseSource = job.source();
         for (Iterator iter = newSourceFiles.iterator(); iter.hasNext(); ) {
             SourceFile sf = (SourceFile)iter.next();
             java_ext.scheduler().addJob(sf.source(), sf);
@@ -84,10 +83,6 @@ public class JifToJavaRewriter extends ContextVisitor
 
     public NodeFactory java_nf() {
         return java_ext.nodeFactory();
-    }
-
-    public ExtensionInfo java_ext() {
-        return java_ext;
     }
 
     public ErrorQueue errorQueue() {
@@ -185,8 +180,8 @@ public class JifToJavaRewriter extends ContextVisitor
             ClassDecl cd = (ClassDecl)iter.next();
             if (cd.flags().isPublic()) {
                 // cd is public, we will put it in it's own source file.
-                SourceFile sf = java_nf().SourceFile(Position.COMPILER_GENERATED,
-                                                     n.package_(),
+                SourceFile sf = java_nf().SourceFile(Position.COMPILER_GENERATED, 
+                                                     n.package_(), 
                                                      Collections.EMPTY_LIST,
                                                      Collections.singletonList(cd));
                 Source s = new Source(cd.name() + ".jif",
@@ -199,8 +194,8 @@ public class JifToJavaRewriter extends ContextVisitor
                 // cd is not public; it's ok to put the class decl in the source file.
                 l.add(cd);
             }
-        }
-
+        }    
+        
         this.additionalClassDecls.clear();
         return n.decls(l);
     }
