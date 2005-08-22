@@ -5,8 +5,12 @@ body {
 }
 
 p,ul {
+    text-indent: 2ex;
     font-size: 100%;
     width: 80ex
+}
+p.cont {
+    text-indent: 0ex;
 }
 ol {
     font-size: 100%;
@@ -22,6 +26,10 @@ ol {
       border-width: 1;
       margin: 5;
       padding: 5
+}
+
+span.comment {
+    color: "red"
 }
 
 h1 { font-family: sans-serif }

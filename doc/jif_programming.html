@@ -49,23 +49,220 @@ the success or failure of the run-time check itself.  Jif 2.0.0 significantly
 improves the expressive power of this important language feature.
 </ul>
 
-
-
-
-
+<p>
+Jif is not completely a superset of Java. Certain features have
+been omitted to make information flow control tractable. Also, Jif
+does not eliminate all possible information leaks. Certain covert
+channels (particularly, various kinds of <em>timing channels</em>).
+These limitations of Jif are discussed later.
+</p>
 
 <h2><a name="language-features"></a>Language Features</h2> 
 
-<p>This section focuses primarily on the
-language features of this version of Jif that are new or different to
-the language features described in Andrew Myers' thesis (linked to
-from the <a href="http://www.cs.cornell.edu/jif/">Jif web site</a>).
+<p>
+The primary difference between Jif and Java is the addition of
+<em>labels</em> that capture restrictions on how information may
+be used. The primary goal is to prevent confidential information
+from being used improperly; in some versions of Jif, the goal is
+also to protect the integrity of trusted information.
+</p>
+
+<h3>Labels</h3>
+
+<p>
+In Jif, every value has a <em>labeled type</em> that consists of two parts:
+an ordinary Java type such as <code>int</code>,
+and a <em>label</em> that describes how
+the information can be used.
+Any type expression <i class="math">t</i>
+may be labeled with any label expression <i class="math">l</i>.
+This labeled type expression is written <code><i class="math">t</i>{<i class="math">l</i>}</code>; for example, the
+labeled type <code>int{p:}</code> represents an integer that principal <code>p</code> owns
+and, because no readers are listed, that only <code>p</code> can read.
+For example, a variable may be declared with labeled type: 
+<div class="code"><pre>
+int{p:} x = 2;
+</pre></div>
+</p>
+
+<p>
+A labeled type may occur in a Jif program almost anywhere a type
+may occur in a Java program. In fact, if the label is omitted from a type,
+the Jif compiler automatically generates a label for that type according
+to rules that are discussed later.
+</p>
+
+<p>
+In a Jif program,
+a label is denoted by a <em>label expression</em>,
+which is a set of <em>policy expressions</em>.
+The policy expressions are separated by semicolons. For example,
+the label expression
+<code>{o<sub>1</sub>: r<sub>1</sub>,r<sub>2</sub>; o<sub>2</sub>: r<sub>2</sub>,r<sub>3</sub>}</code> contains two policy expressions.
+</p>
+
+<p>
+The policy expression <code><i class="math">owner</i>:
+<i class="math">reader</i><sub>1</sub>,
+<i class="math">reader</i><sub>2</sub>, ...</code>
+denotes a policy. The meaning of this policy is that the
+principal <code><i>owner</i></code> wants to allow the labeled
+information to flow to at most the principals
+<code><i>reader<sub>i</sub></i></code>. Labels built from these
+policies are called <em>decentralized labels</em> because they
+enforce security on behalf of the owning principals, not on
+behalf of an implicitly centralized policy specifier.
+</p>
+
+<p>
+In a program, a component expression may take a few additional forms. One added
+component form is a variable name, which denotes the <em>set</em> of policies
+in the label of the variable named.  For example, 
+the label expression <code>{a}</code> contains a single component expression;
+this label means that value it labels should be as restricted as the
+contents of <code>a</code> are. The
+label expression <code>{a; o: r}</code> contains two policy components,
+indicating
+that the labeled value should be as restricted as <code>a</code> is, and also that
+the principal <code>o</code> restricts the value to be read by at most
+the principal <code>r</code>.
+Other kinds of label components will be introduced later.
+</p>
+
+<h3><a name="principal-hierarchy"></a>Principals</h3>
+
+<p>
+In the decentralized label model implemented by Jif,
+information is owned by, updated by,
+and released to <em>principals</em>: users and other
+authority entities such as groups or roles.  For example, both users and
+groups in Unix would be modeled as principals.
+</p>
+
+<p>
+Some principals may be authorized to <em>act for</em>
+other principals. If the principal <code>p</code> acts for the
+principal <code>q</code>, any action taken by <code>p</code>
+is implicitly assumed to be authorized by <code>q</code>
+The acts-for relation is reflexive and transitive,
+defining a hierarchy or partial order
+of principals. This relation is similar to the <em>speaks for</em>
+relation used in various authentication logics (e.g., [LABW91]);
+the hierarchy of principals is also similar to a <em>role hierarchy</em>
+[RBAC].
+</p>
+
+<p>
+The acts-for relation can be used to model groups and
+roles conveniently. A group principal, such as <code>students</code>,
+is modeled by authorizing all of the principals
+representing members of the group
+to act for the group principal. That is, the group principal delegates
+its authority to all of the group members.  A
+role, a restricted form of a user's authority, is modeled by
+authorizing the user's principal to act for the role principal.
+</p>
+
+<p>
+The acts-for relationship between two principals can be tested
+in a Jif program using the built-in <code>actsfor</code> operator. The
+boolean expression <code>p actsfor q</code> evaluates to <code>true</code>
+if the
+specified relationship exists. Within the body of an <code>if</code>
+statement conditioned on this test, the compiler can make use of
+the knowledge that the relationship exists when checking information
+flows.
+</p>
+
+<h3>Static and dynamic access control in Jif</h3>
+
+<h3>Implicit flows and program-counter labels</h3>
+
+<p>
+The label of an expression's value varies depending
+on the evaluation context.
+This is needed to prevent leaks through
+<em>implicit flows</em>: channels created by the control flow structure
+itself.
+To prevent information leaks through implicit flows, the compiler
+associates a <em>program-counter label</em> (<u>pc</u>)
+with every statement and expression,
+representing the information that might be learned from
+the knowledge that the statement or expression was evaluated.
+
+<p>
+For example, consider the following program, which is obviously
+equivalent to the statement <code>l = h</code>:
+<div class="code"><pre>
+boolean l = false;
+if (h) {
+    l = true;
+}
+</div>
+</p>
+
+<p class="cont">
+If <code>l</code> contains public (low) information and <code>h</code>
+contains secret (high) information, this program is not secure.
+The solution is that by conditioning on the variable <code>h</code>,
+the <code>if</code> statement makes the <u>pc</u> of the assignment
+to <code>l</code> at least as restrictive as <code>{h}</code>.
+Assume no information can be learned from the fact that the
+program is executed (that is, initially <u>pc</u>&nbsp;=&nbsp;<code>{}</code>).
+In this case, the value of <u>pc</u> during the consequent clause is
+<code>{h}</code>.
+After the <code>if</code> statement, it is again true that <u>pc</u> = <code>{}</code>,
+because no information
+about <code>h</code> can be deduced from the fact that the statement after the <code>if</code>
+statement is executed. (It is not true in general that the value of <u>pc</u>
+reverts after <code>if</code> statements,
+but is true here because this <code>if</code> statement always terminates
+without exceptions.)
+The label of a literal expression (e.g., <code>true</code>) is the same as its <u>pc</u>, or <code>{h}</code>
+in this case.
+So the assignment is permitted only if the label <code>{l}</code> is
+at least as restrictive as the label <code>{h}</code>. This would not be
+true if <code>l</code> were public and <code>h</code> secret.
+</p>
+
+<p>
+One way to think about the program-counter label is that
+there is a distinct <u>pc</u> for every basic block in the program.
+In general, the flow of control within a program depends on the values of
+certain expressions. At any given point during execution, various values
+<i class="math">v<sub>i</sub></i> have been observed in order to decide to arrive at the
+current basic block; therefore, the labels of these values affect the
+current <u>pc</u>. The Jif type system will ensure that the <u>pc</u>
+label is at least as restrictive as the labels of all the variables on
+which the program counter depends.
+</p>
+
+<p>
+A related issue is the transmission of information through
+the termination or non-termination of a program.
+Consider the execution of a <code>while</code> statement:
+According to the Jif type system,
+after the statement terminates, <u>pc</u>=<code>{}</code>, using the
+same reasoning as for the <code>if</code> statement. This
+labeling might seem strange, because we
+know the value of <code>h</code> when we arrive at the final basic block.
+However, arriving at the final block gives no
+information about the value of <code>h</code> before the code started.
+Therefore, 
+Jif does not attempt to control information transfers through
+termination channels. It also ignores timing channels, which are
+an issue for concurrent programming languages. Jif does not support
+the Java thread model for concurrent programming.
+</p>
+
+<h3><a name="access-control"></a>Access control</h3>
+
 
 <h3><a name="dynamic-labels"></a>Dynamic labels and principals</h3>
 
 <p>
 Labels and principals are first-class values, and are represented at
-runtime. These "dynamic" labels and principals can be used in the
+runtime. These &ldquo;dynamic&rdquo; labels and principals can be used in the
 specification of other labels, and used as the parameters of <a
 href="parameterized-classes">parameterized classes</a>. (Thus, Jif's
 type system uses dependent types.) Consider the following example.
@@ -385,7 +582,8 @@ class C {
         s.length(); // OK, s known to be not-null
         if (o instanceof String) {
             try { 
-                ((String)o).length(); // OK, if instanceof succeeds, o is not-null
+                ((String)o).length();
+		    <span class="comment">// OK, if instanceof succeeds, o is not-null</span>
             }
             catch (ClassCastException e) { 
                 // still need to catch the ClassCastException
