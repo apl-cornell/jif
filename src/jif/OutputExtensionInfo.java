@@ -103,8 +103,8 @@ public class OutputExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
         }
     
         public Goal Parsed(Job job) {
-            return internGoal(new Parsed(job) {
-                public Pass createPass(ExtensionInfo extInfo) {
+            return internGoal(new SourceFileGoal(job) {
+                public Pass createPass(polyglot.frontend.ExtensionInfo extInfo) {
                     return new EmptyPass(this);              
                 }
             });
