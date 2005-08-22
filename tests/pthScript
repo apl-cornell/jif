@@ -128,7 +128,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	DynPrin1.jif ;
 	DynPrin2.jif (Semantic, "Non-final.*access path");
 	DynPrin3.jif (Semantic, "type .*must be .*principal");
-	DynPrin4.jif (Semantic, "access path .*not a reference type");
+	DynPrin4.jif (Semantic, "Cannot access field .* non-reference");
 	DynPrin5.jif (Semantic, "type .*must be .*principal");
 	DynPrin6.jif (Semantic, "Field.*is not final");
 	DynPrin7.jif ;
@@ -141,7 +141,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	DynLabel3.jif (Semantic, "Field.*is not final"), (Semantic, "Field.*is not final");
 	DynLabel4.jif (Semantic, "type .*must be .*label");
 	DynLabel5.jif (Semantic, "type .*must be .*label");
-	DynLabel6.jif (Semantic, "access path .*not a reference type");
+	DynLabel6.jif (Semantic, "Cannot access field .* non-reference type");
 	DynLabel7.jif (Syntax);
 	EmptyList.jif List.jif;
 	EmptyList2.jif ;
@@ -294,7 +294,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
                             (Semantic, "NullPointerException.*must either be caught");
 	RuntimeParams24.jif (Semantic, "The type of a dynamic label");
 	RuntimeParams24a.jif (Semantic, "The type of a dynamic principal");
-	RuntimeParams24b.jif (Semantic, "The type of a dynamic label");
+	RuntimeParams24b.jif (Semantic, "Can not instantiate a label parameter with a non-label");
 	RuntimeParams24c.jif (Semantic, "The type of a dynamic principal");
 	RuntimeParams24d.jif (Semantic, "Can not instantiate .* with a non-principal");
 	RuntimeParams25.jif (Syntax);
