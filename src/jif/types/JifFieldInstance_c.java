@@ -40,4 +40,60 @@ public class JifFieldInstance_c extends FieldInstance_c
     public void setHasInitializer(boolean hasInitializer) {
         this.hasInitializer = hasInitializer;        
     }
+
+    private FieldInstance findOrigFieldInstance() {
+        if (this.container() instanceof JifSubstType) {
+            JifSubstType jst = (JifSubstType)this.container();
+            if (jst.base() instanceof ParsedClassType) {
+                return ((ParsedClassType) jst.base()).fieldNamed(this.name());
+            }
+            else {
+                throw new InternalCompilerError("Unexpected base type");
+            }
+        }
+        return this;        
+    }
+    public boolean isConstant() {
+        FieldInstance orig = findOrigFieldInstance();
+        if (this != orig) {
+            return orig.isConstant();        
+        }
+        return super.isConstant();
+    }
+    public Object constantValue() {
+        FieldInstance orig = findOrigFieldInstance();
+        if (this != orig) {
+            return orig.constantValue();        
+        }
+        return super.constantValue();
+    }
+    public boolean constantValueSet() {
+        FieldInstance orig = findOrigFieldInstance();
+        if (this != orig) {
+            return orig.constantValueSet();        
+        }
+        return super.constantValueSet();
+    }
+    public FieldInstance constantValue(Object constantValue) {
+        FieldInstance orig = findOrigFieldInstance();
+        if (this != orig) {
+            throw new InternalCompilerError("Cant modify constant value on a copy");            
+        }
+        return super.constantValue(constantValue);
+    }
+    public FieldInstance notConstant() {
+        FieldInstance orig = findOrigFieldInstance();
+        if (this != orig) {
+            throw new InternalCompilerError("Cant modify constant value on a copy");            
+        }
+        return super.notConstant();
+    }
+    public void setConstantValue(Object constantValue) {
+        FieldInstance orig = findOrigFieldInstance();
+        if (this != orig) {
+            throw new InternalCompilerError("Cant modify constant value on a copy");            
+        }
+        super.setConstantValue(constantValue);
+    }
+    
 }
