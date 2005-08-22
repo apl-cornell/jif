@@ -6,6 +6,9 @@ import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
@@ -45,7 +48,8 @@ public class JifFormalDel extends JifJL_c
 	        li.setLabel(al);
         }
                 
-        return n.localInstance(li);
+        n = n.localInstance(li);
+        return n;
     }
 
     
@@ -54,6 +58,12 @@ public class JifFormalDel extends JifJL_c
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         Formal n = (Formal)super.disambiguate(ar);
         JifTypeSystem jts = (JifTypeSystem)ar.typeSystem();
+
+        if (!n.type().isDisambiguated() || !n.declType().isCanonical()) {
+	    Scheduler sched = ar.job().extensionInfo().scheduler();
+	    Goal g = sched.Disambiguated(ar.job());
+	    throw new MissingDependencyException(g);
+	}
         
         
         JifLocalInstance li = (JifLocalInstance)n.localInstance();
