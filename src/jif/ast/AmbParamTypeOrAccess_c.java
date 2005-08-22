@@ -8,6 +8,9 @@ import jif.types.JifPolyType;
 import jif.types.JifTypeSystem;
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.Node_c;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
@@ -79,8 +82,12 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 	JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
-	if (!ar.isASTDisambiguated(prefix)) return this;
-	if (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr)) return this;
+	if (!ar.isASTDisambiguated(prefix) || 
+            (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr))) {
+            Scheduler sched = ar.job().extensionInfo().scheduler();
+            Goal g = sched.Disambiguated(ar.job());
+            throw new MissingDependencyException(g);
+	}
     
 	if (prefix instanceof TypeNode) {
 	    // "expr" must be a parameter.

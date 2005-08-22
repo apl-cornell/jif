@@ -3,9 +3,13 @@ package jif.ast;
 import java.util.List;
 
 import jif.types.*;
+import jif.types.label.AccessPath;
 import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.util.Position;
 import polyglot.visit.*;
@@ -45,7 +49,9 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         
         // must be the case that name == null and expr != null
         if (!ar.isASTDisambiguated(expr)) {
-            return this;
+            Scheduler sched = ar.job().extensionInfo().scheduler();
+            Goal g = sched.Disambiguated(ar.job());
+            throw new MissingDependencyException(g);
         }
 
         JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
@@ -56,7 +62,20 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         tc = (TypeChecker) tc.context(ar.context());
         expr = (Expr)expr.visit(tc);
 
+        if (expr.type() == null || !expr.type().isCanonical()) {
+            Scheduler sched = ar.job().extensionInfo().scheduler();
+            Goal g = sched.Disambiguated(ar.job());
+            throw new MissingDependencyException(g);
+        }
+
 	if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
+            // illegal dynamic principal. But try to convert it to an access path
+            // to allow a more precise error message.
+            AccessPath ap = JifUtil.exprToAccessPath(expr, (JifContext)ar.context()); 
+            ap.verify((JifContext)ar.context());
+
+            // previous line should throw an exception, but throw this just to
+            // be safe.
             throw new SemanticDetailedException(
                 "Illegal dynamic principal.",
                 "Only final access paths or principal expressions can be used as a dynamic principal. " +

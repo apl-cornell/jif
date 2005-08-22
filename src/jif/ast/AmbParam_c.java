@@ -5,6 +5,9 @@ import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
 import polyglot.ext.jl.ast.Node_c;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -57,7 +60,9 @@ public class AmbParam_c extends Node_c implements AmbParam
 
         if (!vi.isCanonical() && pi == null) {
             // not yet ready to disambiguate
-            return this;
+            Scheduler sched = sc.job().extensionInfo().scheduler();
+            Goal g = sched.Disambiguated(sc.job());
+            throw new MissingDependencyException(g);
         }
 	if (vi instanceof JifVarInstance) {
 	    return varToParam((JifVarInstance) vi, sc);

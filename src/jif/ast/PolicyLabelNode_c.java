@@ -6,6 +6,7 @@ import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
 import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.util.*;
@@ -66,14 +67,15 @@ public class PolicyLabelNode_c extends AmbLabelNode_c implements PolicyLabelNode
 	JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
-	Principal o = owner.principal();
-        if (o == null) throw new InternalCompilerError("null owner " + owner.getClass().getName() + " " + owner.position());
-
         if (!owner.isDisambiguated()) {
-            // owner is not yet ready...
-            Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
+            Scheduler sched = ar.job().extensionInfo().scheduler();
+            Goal g = sched.Disambiguated(ar.job());
             throw new MissingDependencyException(g);
         }
+
+        Principal o = owner.principal();
+        if (o == null) throw new InternalCompilerError("null owner " + owner.getClass().getName() + " " + owner.position());
+
 	List l = new LinkedList();
 
 	for (Iterator i = this.readers.iterator(); i.hasNext(); ) {

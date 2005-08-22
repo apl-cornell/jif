@@ -6,6 +6,7 @@ import jif.types.*;
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.Expr_c;
 import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -110,7 +111,11 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
     /** Disambiguates
      */
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-	if (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr))  return this;
+	if (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr)) {
+            Scheduler sched = ar.job().extensionInfo().scheduler();
+            Goal g = sched.Disambiguated(ar.job());
+            throw new MissingDependencyException(g);
+	}
 
 	JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();

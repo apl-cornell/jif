@@ -4,6 +4,9 @@ import jif.types.*;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ext.jl.ast.Node_c;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -64,7 +67,9 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
      */
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         if (!sc.isASTDisambiguated(expr)) {
-            return this;
+            Scheduler sched = sc.job().extensionInfo().scheduler();
+            Goal g = sched.Disambiguated(sc.job());
+            throw new MissingDependencyException(g);
         }
         JifContext c = (JifContext)sc.context();
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();

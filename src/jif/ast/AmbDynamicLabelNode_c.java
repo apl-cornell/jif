@@ -3,9 +3,13 @@ package jif.ast;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.SemanticDetailedException;
+import jif.types.label.AccessPath;
 import jif.types.label.Label;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -39,8 +43,20 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         TypeChecker tc = new TypeChecker(sc.job(), ts, nf);
         tc = (TypeChecker) tc.context(sc.context());
         expr = (Expr)expr.visit(tc);
+        if (expr.type() == null || !expr.type().isCanonical()) {
+            Scheduler sched = sc.job().extensionInfo().scheduler();
+            Goal g = sched.Disambiguated(sc.job());
+            throw new MissingDependencyException(g);
+        }
 	
         if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
+            // illegal dynamic label. But try to convert it to an access path
+            // to allow a more precise error message.
+            AccessPath ap = JifUtil.exprToAccessPath(expr, (JifContext)c); 
+            ap.verify((JifContext)c);
+
+            // previous line should throw an exception, but throw this just to
+            // be safe.
             throw new SemanticDetailedException(
                 "Illegal dynamic label.",
                 "Only final access paths or label expressions can be used as a dynamic label. " +
