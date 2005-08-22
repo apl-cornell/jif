@@ -7,6 +7,8 @@ import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.TypeNode_c;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.*;
@@ -105,6 +107,12 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
         while (i.hasNext() && j.hasNext()) {
             ParamNode p = (ParamNode) i.next();
             ParamInstance pi = (ParamInstance) j.next();
+            
+            if (!p.isDisambiguated()) {
+                // the param is not yet ready
+                Goal g = sc.job().extensionInfo().scheduler().Disambiguated(sc.job());
+                throw new MissingDependencyException(g);
+            }
             
             if (pi.isLabel() && !(p.parameter() instanceof Label)) {
                 throw new SemanticException("Can not instantiate a "+
