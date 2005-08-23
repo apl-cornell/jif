@@ -63,6 +63,12 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         expr = (Expr)expr.visit(tc);
 
         if (expr.type() == null || !expr.type().isCanonical()) {
+            // try converting the expression to an access path anyway,
+            // to flush out any semantic errors that may arise.
+            JifUtil.exprToAccessPath(expr, (JifContext)ar.context());
+            
+            // no errors thrown, wait until all dependencies are
+            // disambiguated.
             Scheduler sched = ar.job().extensionInfo().scheduler();
             Goal g = sched.Disambiguated(ar.job());
             throw new MissingDependencyException(g);

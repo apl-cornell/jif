@@ -52,6 +52,12 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         expr = (Expr)expr.visit(tc);
 	
         if (expr.type() == null || !expr.type().isCanonical()) {
+            // try converting the expression to an access path anyway,
+            // to flush out any semantic errors that may arise.
+            JifUtil.exprToAccessPath(expr, (JifContext)c);
+            
+            // no errors thrown, wait until all dependencies are
+            // disambiguated.
             Scheduler sched = sc.job().extensionInfo().scheduler();
             Goal g = sched.Disambiguated(sc.job());
             throw new MissingDependencyException(g);
