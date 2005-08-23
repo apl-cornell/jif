@@ -24,7 +24,7 @@ class Player[principal P] authority (P) {
      * This Board represents P's board. Pieces will be placed on it
      * during initialization.
      */
-    private final Board[{P:}]{} board; 
+    private final Board[{P:}]{this} board; 
     // It's fine to make the reference to the board public, as all the
     // information contained in the board is labeled {P:}
 
@@ -132,7 +132,7 @@ class Player[principal P] authority (P) {
 	// test if the opponent asked this query already, and if not,
 	// add it to our list of queries.
 	if (oppQueries.contains(query)) {
-	    throw new IllegalArgumentException("Opponent already asked the query " + query);
+	    throw new IllegalArgumentException("Opponent already asked the query " + query.toString());
 	}
 	try {
 	    oppQueries.add(query);

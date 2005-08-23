@@ -85,7 +85,7 @@ public class Ship[label L] implements JifObject[L] {
 	else 
 	    end = new Coordinate[L](pos.x, pos.y + length);
 
-	return pos + " to " + end;
+	return pos.toString() + " to " + end.toString();
     }
 
     public int{L} hashCode() {

@@ -58,7 +58,8 @@ class BattleShip[principal P1, principal P2] authority (P1, P2) {
 
             // get player 1's querey
             Coordinate[{}] play1Query = player1.getNextQuery();
-            output.print("\t"+player1Name+": " + play1Query + "?  " );
+            output.print("\t"+player1Name+": " + 
+			 (play1Query==null?"null":play1Query.toString()) + "?  " );
 
             // get player 2 to process player 1's query
             boolean{} res = player2.processQuery(play1Query);
@@ -69,7 +70,8 @@ class BattleShip[principal P1, principal P2] authority (P1, P2) {
             if (player1Hits < NUM_COVERED_COORDS) {
                 // player 1 hasn't won, so let player 2 ask a query...
                 Coordinate[{}] play2Query = player2.getNextQuery();
-                output.print("   "+player2Name+": " + play2Query + "?  ");
+                output.print("   "+player2Name+": " + 
+			     (play2Query==null?"null":play2Query.toString()) + "?  ");
 
                 // get player 1 to process player 2's query
                 res = player1.processQuery(play2Query);

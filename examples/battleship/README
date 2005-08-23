@@ -18,17 +18,17 @@ instantiating the game for the principals Alice and Bob.
 
 To compile and run the BattleShip example:
 
-1. Ensure that the principals Alice and Bob are present.
+1. Ensure that the Jif compiler is working.
+  
+   See $JIF/doc for information on compiling the Jif compiler.
+
+2. Ensure that the principals Alice and Bob are present.
 
    The code for the principals is in the $JIF/tests directory. To
    compile the code for the principals, perform the following
    commands.
         $ cd $JIF/tests
-        $ javac -d . -classpath $JIF/rt-classes jif/principal/Alice.java jif/principal/Bob.java
-
-2. Ensure that the Jif compiler is working.
-  
-   See $JIF/doc for information on compiling the Jif compiler.
+        $ $JIF/bin/jifc jif/principals/Alice.jif jif/principals/Bob.jif
 
 3. Compile the BattleShip classes
 
