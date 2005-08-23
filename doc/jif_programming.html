@@ -21,6 +21,22 @@ system are available from the
 </p>
 
 <p>
+The primary difference between Jif and Java is the addition of
+<em>labels</em> that capture restrictions on how information may
+be used. The primary goal is to prevent confidential information
+from being used improperly; in some versions of Jif, the goal is
+also to protect the integrity of trusted information.
+</p>
+
+<p>
+The core mechanism for security enforcement in Jif is
+statically tracking information flow.  This
+analysis of information flow is performed mostly statically, at
+compile time. However, Jif does also support some forms of
+run-time security enforcement.
+</p>
+
+<p>
 Jif has a number of unique features that are important for
 building interesting programs in a security-typed language:
 
@@ -59,15 +75,7 @@ These limitations of Jif are discussed later.
 
 <h2><a name="language-features"></a>Language Features</h2> 
 
-<p>
-The primary difference between Jif and Java is the addition of
-<em>labels</em> that capture restrictions on how information may
-be used. The primary goal is to prevent confidential information
-from being used improperly; in some versions of Jif, the goal is
-also to protect the integrity of trusted information.
-</p>
-
-<h3>Labels</h3>
+<h3>Labels and labeled types</h3>
 
 <p>
 In Jif, every value has a <em>labeled type</em> that consists of two parts:
@@ -86,26 +94,15 @@ int{p:} x = 2;
 </p>
 
 <p>
-A labeled type may occur in a Jif program almost anywhere a type
-may occur in a Java program. In fact, if the label is omitted from a type,
-the Jif compiler automatically generates a label for that type according
-to rules that are discussed later.
-</p>
-
-<p>
 In a Jif program,
-a label is denoted by a <em>label expression</em>,
-which is a set of <em>policy expressions</em>.
-The policy expressions are separated by semicolons. For example,
+a label is written as a set of <em>policy expressions</em>,
+separated by semicolons. For example,
 the label expression
 <code>{o<sub>1</sub>: r<sub>1</sub>,r<sub>2</sub>; o<sub>2</sub>: r<sub>2</sub>,r<sub>3</sub>}</code> contains two policy expressions.
-</p>
-
-<p>
-The policy expression <code><i class="math">owner</i>:
+A policy expression <code><i class="math">owner</i>:
 <i class="math">reader</i><sub>1</sub>,
 <i class="math">reader</i><sub>2</sub>, ...</code>
-denotes a policy. The meaning of this policy is that the
+means that the
 principal <code><i>owner</i></code> wants to allow the labeled
 information to flow to at most the principals
 <code><i>reader<sub>i</sub></i></code>. Labels built from these
@@ -113,7 +110,16 @@ policies are called <em>decentralized labels</em> because they
 enforce security on behalf of the owning principals, not on
 behalf of an implicitly centralized policy specifier.
 </p>
-
+<p>
+The compiler permits information to flow between locations
+with different labels only if that information flow does not
+lose policy restrictions.
+In particular, if information is
+able to flow from a location with label <code>L<sub>1</sub></code>
+to a location with label <code>L<sub>2</sub></code>, the
+label <code>L<sub>2</sub></code> must be more restrictive
+than <code>L<sub>1</sub></code>, or equally restrictive.
+</p>
 <p>
 In a program, a component expression may take a few additional forms. One added
 component form is a variable name, which denotes the <em>set</em> of policies
@@ -127,6 +133,30 @@ that the labeled value should be as restricted as <code>a</code> is, and also th
 the principal <code>o</code> restricts the value to be read by at most
 the principal <code>r</code>.
 Other kinds of label components will be introduced later.
+</p>
+
+
+<p>
+A labeled type may occur in a Jif program almost anywhere a type
+may occur in a Java program. In fact, if the label is omitted from a type,
+the Jif compiler automatically generates a label for that type according
+to rules that are discussed later.
+</p>
+
+<p>
+The type and label parts of a labeled type act largely independently.
+The notation <i class="math">S &le; T</i> is used here to mean
+that the type <i class="math">S</i> is a subtype of the type
+<i class="math">T</i>. The intuitive
+behavior of subtyping is that it operates independently on the type
+and label: for any two types <i class="math">S</i> and <i
+class="math">T</i> and labels <i
+class="math">L</i><sub>1</sub> and <i
+class="math">L</i><sub>2</sub>,
+<i class="math">S &le; T and L<sub>1</sub> &sqle;
+L<sub>2</sub></i> iff
+<i class="math">S{L<sub>1</sub>} &le; T{L<sub>2</sub>}</i> (as in
+[VSI96])
 </p>
 
 <h3><a name="principal-hierarchy"></a>Principals</h3>
@@ -169,12 +199,40 @@ in a Jif program using the built-in <code>actsfor</code> operator. The
 boolean expression <code>p actsfor q</code> evaluates to <code>true</code>
 if the
 specified relationship exists. Within the body of an <code>if</code>
-statement conditioned on this test, the compiler can make use of
-the knowledge that the relationship exists when checking information
-flows.
+statement conditioned on this test, the compiler makes use of
+the knowledge that the relationship exists when checking
+information flows and comparing security policies.
 </p>
 
-<h3>Static and dynamic access control in Jif</h3>
+<h3><a name="access-control"></a>Access control</h3>
+
+<p>
+A method executes with some
+<em>authority</em> that has been granted to it. The authority is essentially the
+capability to act for some set of principals, and
+controls the ability to declassify data. This simple authority mechanism
+can be used to build more complex access control mechanisms.
+</p>
+
+<p>
+At any given point within a program, the compiler understands the
+code to be running with the ability to act for some set of
+principals; the static authority of the code at that point. The actual
+authority may be greater, because the known principals may be able to act
+for other principals. The static authority can never exceed the actual
+authority unless revocation occurs while the program is running.
+</p>
+
+<p>
+The static checker maintains a notion of the <em>static principal
+hierarchy</em> at every point in the program. The static principal hierarchy
+is a set of acts-for relations that are known to exist. The static
+principal hierarchy is a subset of the acts-for relations that exist in
+the true principal hierarchy.
+The static authority of a method may be augmented by testing the
+principal hierarchy dynamically, using the
+<code>actsfor</code> test.
+</p>
 
 <h3>Implicit flows and program-counter labels</h3>
 
@@ -255,7 +313,6 @@ an issue for concurrent programming languages. Jif does not support
 the Java thread model for concurrent programming.
 </p>
 
-<h3><a name="access-control"></a>Access control</h3>
 
 
 <h3><a name="dynamic-labels"></a>Dynamic labels and principals</h3>
@@ -981,7 +1038,6 @@ other constraints are really preventing successful
 compilation. Enabling reporting for the solver allows the user to
 determine which constraint(s) are problematic, when the error message
 does not appear to be helpful.
-
 
 </body>
 
