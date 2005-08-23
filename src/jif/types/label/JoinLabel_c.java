@@ -20,6 +20,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     public JoinLabel_c(Collection components, JifTypeSystem ts, Position pos) {
         super(ts, pos, new JoinLabelToJavaExpr_c());
         this.components = Collections.unmodifiableSet(new LinkedHashSet(flatten(components)));
+        
         if (isBottom()) {
             setDescription("Bottom of the label lattice, the most public label possible");        
         }

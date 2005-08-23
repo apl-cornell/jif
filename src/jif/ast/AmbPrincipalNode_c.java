@@ -68,7 +68,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
             throw new MissingDependencyException(g);
         }
 
-	if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
+        if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             // illegal dynamic principal. But try to convert it to an access path
             // to allow a more precise error message.
             AccessPath ap = JifUtil.exprToAccessPath(expr, (JifContext)ar.context()); 

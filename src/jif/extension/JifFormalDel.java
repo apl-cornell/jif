@@ -59,7 +59,7 @@ public class JifFormalDel extends JifJL_c
         Formal n = (Formal)super.disambiguate(ar);
         JifTypeSystem jts = (JifTypeSystem)ar.typeSystem();
 
-        if (!n.type().isDisambiguated() || !n.declType().isCanonical()) {
+        if (!n.type().isDisambiguated()) {
 	    Scheduler sched = ar.job().extensionInfo().scheduler();
 	    Goal g = sched.Disambiguated(ar.job());
 	    throw new MissingDependencyException(g);

@@ -1,13 +1,15 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
-import jif.types.*;
-import jif.visit.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
 import java.util.*;
+
+import jif.types.JifTypeSystem;
+import polyglot.ast.Node;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.Goal;
+import polyglot.types.SemanticException;
+import polyglot.util.*;
+import polyglot.visit.*;
 
 /** An implementation of the <code>JoinLabel</code> interface.
  */
@@ -53,6 +55,11 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
 
 	for (Iterator i = this.components.iterator(); i.hasNext(); ) {
 	    LabelNode n = (LabelNode) i.next();
+            if (!n.isDisambiguated()) {
+                Scheduler sched = sc.job().extensionInfo().scheduler();
+                Goal g = sched.Disambiguated(sc.job());
+                throw new MissingDependencyException(g);
+            }
 	    l.add(n.label());
 	}
 

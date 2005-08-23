@@ -10,6 +10,7 @@ import polyglot.ast.Node;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
+import polyglot.types.*;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -39,16 +40,23 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
 	JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
     
-	// run the typechecker over expr.
+        if (!sc.isASTDisambiguated(expr)) {
+            Scheduler sched = sc.job().extensionInfo().scheduler();
+            Goal g = sched.Disambiguated(sc.job());
+            throw new MissingDependencyException(g);
+        }
+
+        // run the typechecker over expr.
         TypeChecker tc = new TypeChecker(sc.job(), ts, nf);
         tc = (TypeChecker) tc.context(sc.context());
         expr = (Expr)expr.visit(tc);
+	
         if (expr.type() == null || !expr.type().isCanonical()) {
             Scheduler sched = sc.job().extensionInfo().scheduler();
             Goal g = sched.Disambiguated(sc.job());
             throw new MissingDependencyException(g);
         }
-	
+
         if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             // illegal dynamic label. But try to convert it to an access path
             // to allow a more precise error message.
