@@ -6,5 +6,5 @@ class Call11
 }
 
 class C {
-    void m(principal p, principal q) where actsfor(p, q) {}
+    void m(principal p, principal q) where p actsfor q {}
 }

@@ -6,6 +6,6 @@ class Call9
 }
 
 class C {
-    void m() where actsfor(Alice, Bob) {}
+    void m() where Alice actsfor Bob {}
 }
 

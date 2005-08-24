@@ -657,8 +657,8 @@ constraint ::=
         {: RESULT = parser.nf.AuthConstraintNode(parser.pos(x,y), a); :}
     |   CALLER:x LPAREN principal_list:a RPAREN:y
         {: RESULT = parser.nf.CallerConstraintNode(parser.pos(x,y), a); :}
-    |   actsfor:x LPAREN principal:a COMMA principal:b RPAREN:y
-        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(x,y), a, b); :}
+    |   principal:a actsfor principal:b 
+        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b); :}
     ;
 
 // 19.9.1) Interface Declarations

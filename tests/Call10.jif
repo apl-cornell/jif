@@ -6,5 +6,5 @@ class Call10
 }
 
 class C[principal P, principal Q] {
-    void m() where actsfor(P, Q) {}
+    void m() where P actsfor Q {}
 }
