@@ -36,6 +36,7 @@ compile time. However, Jif does also support some forms of
 run-time security enforcement.
 </p>
 
+<h2><a name="features"></a>Language Features</h2> 
 <p>
 Jif has a number of unique features that are important for
 building interesting programs in a security-typed language:
@@ -72,8 +73,6 @@ does not eliminate all possible information leaks. Certain covert
 channels (particularly, various kinds of <em>timing channels</em>).
 These limitations of Jif are discussed later.
 </p>
-
-<h2><a name="language-features"></a>Language Features</h2> 
 
 <h3><a name="labels">Labels and labeled types</a></h3>
 
@@ -228,86 +227,9 @@ the knowledge that the relationship exists when checking
 information flows and comparing security policies.
 </p>
 
-<h3><a name="access-control"></a>Access control</h3>
-
-<p>
-A method executes with some
-<em>authority</em> that has been granted to it. The authority is essentially the
-capability to act for some set of principals, and
-controls the ability to declassify data. This simple authority mechanism
-can be used to build more complex access control mechanisms.
-It is also useful for releasing information.
-</p>
-
-<p>
-At any given point within a program, the compiler understands the
-code to be running with the ability to act for some set of
-principals; the static authority of the code at that point. The actual
-authority may be greater, because the known principals may be able to act
-for other principals. The static authority can never exceed the actual
-authority unless revocation occurs while the program is running.
-</p>
-
-<p>
-The static checker maintains a notion of the <em>static principal
-hierarchy</em> at every point in the program. The static principal hierarchy
-is a set of acts-for relations that are known to exist. The static
-principal hierarchy is a subset of the acts-for relations that exist in
-the true principal hierarchy.
-The static authority of a method may be augmented by testing the
-principal hierarchy dynamically, using the
-<code>actsfor</code> test.
-</p>
-
-<p>
-There are two ways for method code to acquire authority. First, the
-class containing the code may declare that it has the
-authority of some principal using an <code>authority</code>
-clause. A method of the class can then claim and use that 
-authority if its signature includes a <code>where authority</code>
-clause of its own. It is easy to identify the code to which
-principal <code>p</code> has directly granted its authority
-because of these clauses. For example, in the following code
-the class <code>Game</code> has the authority of the
-principal <code>referee</code>:
-</p>
-
-<div class="code"><pre>class Game authority(referee) {
-    void start() where authority(referee) {
-	...
-    }
-}
-</div>
- 
-<p>
-The second way for a method to acquire authority is for the
-method to receive authority passed from another method. If the
-receiving method signature contains a clause of the form
-<code>where caller(p)</code>, then it can be called only
-from code that is statically known to have the authority of
-principal <code>p</code>. For example, the following method
-receives authority for a principal <code>p</code> that is
-determined at run time and passed as an argument to the
-method.
-</p>
-
-<div class="code"><pre>
-    void m(principal p) where caller(p) {
-	...
-    }
-}
-</pre>
-</div>
-
-<p>
-These mechanisms can be used to implement access control
-security within a program and are similar in expressiveness
-to the Java stack inspection mechanism, while avoiding the
-run-time overhead. Of course, Jif
-offers more security assurance than stack inspection because
-it also controls information flow.
-</p>
-
+<p>As discussed <a href="#user-defined-principals">below</a>, Jif 2.0.0
+adds support for user-defined principals and user-defined
+authentication mechanisms.</p>
 
 <h3><a name="implicit-flows">Implicit flows and
 program-counter labels</a></h3>
@@ -394,10 +316,10 @@ the Java thread model for concurrent programming.
 The syntax of a Jif method
 declaration has some extensions
 when compared to Java syntax;
-there are a few optional annotations.
-These include not only the authority delegation mechanisms
-discussed above, but also annotations for
-controlling information flow.
+there are a few optional annotations,
+including annotations for
+controlling information flow and for managing
+code authority.
 </p>
 
 <p>
@@ -503,8 +425,8 @@ href="#method-polymorphism">polymorphic methods</a>.
 
 <li> Default method begin-label: the top label, <code>&lt;top&gt;</code>
 <br>
-The method begin-label is an upper bound on the PC of the caller, and
-a lower bound on the side effects of method.  The default method begin
+The method begin-label is an upper bound on the <u>pc</u> of the caller, and
+a lower bound on the side effects of the method.  The default method begin
 label is <code>&lt;top&gt;</code>, the most restrictive label, meaning
 that the method has no side effects.
 </li>
@@ -539,9 +461,92 @@ method return label.
 </li>
 </ul>
 
-<h3>Label polymorphism</h3>
+<h3><a name="access-control"></a>Access control</h3>
+
+<p>
+A method executes with some
+<em>authority</em> that has been granted to it. The authority is essentially the
+capability to act for some set of principals, and
+controls the ability to declassify data. This simple authority mechanism
+can be used to build more complex access control mechanisms.
+It is also useful for releasing information.
+</p>
+
+<p>
+At any given point within a program, the compiler understands the
+code to be running with the ability to act for some set of
+principals; the static authority of the code at that point. The actual
+authority may be greater, because the known principals may be able to act
+for other principals. The static authority can never exceed the actual
+authority unless revocation occurs while the program is running.
+</p>
+
+<p>
+The static checker maintains a notion of the <em>static principal
+hierarchy</em> at every point in the program. The static principal hierarchy
+is a set of acts-for relations that are known to exist. The static
+principal hierarchy is a subset of the acts-for relations that exist in
+the true principal hierarchy.
+The static authority of a method may be augmented by testing the
+principal hierarchy dynamically, using the
+<code>actsfor</code> test.
+</p>
+
+<p>
+There are two ways for method code to acquire authority. First, the
+class containing the code may declare that it has the
+authority of some principal using an <code>authority</code>
+clause. A method of the class can then claim and use that 
+authority if its signature includes a <code>where authority</code>
+clause of its own. It is easy to identify the code to which
+principal <code>p</code> has directly granted its authority
+because of these clauses. For example, in the following code
+the class <code>Game</code> has the authority of the
+principal <code>referee</code>:
+</p>
+
+<div class="code"><pre>class Game authority(referee) {
+    void start() where authority(referee) {
+	...
+    }
+}
+</div>
+ 
+<p>
+The second way for a method to acquire authority is for the
+method to receive authority passed from another method. If the
+receiving method signature contains a clause of the form
+<code>where caller(p)</code>, then it can be called only
+from code that is statically known to have the authority of
+principal <code>p</code>. For example, the following method
+receives authority for a principal <code>p</code> that is
+determined at run time and passed as an argument to the
+method.
+</p>
+
+<div class="code"><pre>
+    void m(principal p) where caller(p) {
+	...
+    }
+}
+</pre>
+</div>
+
+<p>
+These mechanisms can be used to implement access control
+security within a program and are similar in expressiveness
+to the Java stack inspection mechanism, while avoiding the
+run-time overhead. Of course, Jif
+offers more security assurance than stack inspection because
+it also controls information flow.
+</p>
 
 
+<h3>Polymorphism</h3>
+
+<h4>Label polymorphism</h>
+<h4>Parameterized classes</h>
+<h4>Principal polymorphism</h>
 
 <h3><a name="dynamic-labels"></a>Dynamic labels and principals</h3>
 
@@ -893,8 +898,8 @@ class C {
                 f.length(); 
             }
             catch (NullPointerException e) { 
-                // still need to catch the NPE, as we cannot reason about 
-                // fields of objects other than this.  
+		<span class="comment">// still need to catch the NPE, as we cannot reason
+                // about fields of objects other than this.</span>
             }
         }
     }
@@ -913,19 +918,20 @@ interface to define their own principals.
 <p>Objects of type <code>jif.lang.Principal</code> can be implicitly
 cast to the type <code>principal</code>, and vice-versa.
 
-<p>The interface <code>jif.lang.Principal</code> is defined below.
+<p>The interface <code>jif.lang.Principal</code> is defined
+as follows:
 
 <table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
 public interface Principal {
-    String{this} name();
-    boolean{this;p} delegatesTo(principal p);
-    boolean{this;p} equals(Principal p);
-    boolean{authPrf; closure; lb; this} isAuthorized(Object authPrf, 
-                                                     Closure[this, lb] closure,
-                                                     label lb) where authority (this);
+    String name();
+    boolean delegatesTo(principal p);
+    boolean equals(Principal p);
+    boolean isAuthorized(Object authPrf, 
+		         Closure[this, lb] closure,
+		         label lb) where authority (this);
 
-    Principal{this;p}[]{this;p} findChainUpto{p;this}(Principal p);
-    Principal{this;q}[]{this;q} findChainDownto{q;this}(Principal q);
+    Principal{this;p}[] findChainUpto{p;this}(Principal p);
+    Principal{this;q}[] findChainDownto{q;this}(Principal q);
 }
 </pre></div></td></tr></table>
 
