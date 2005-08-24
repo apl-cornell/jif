@@ -7,7 +7,7 @@
 
 <body>
 
-<h1>Programming in Jif</h1>
+<h1><a name="overview">Programming in Jif</a></h1>
 
 <p>
 Jif is an extension to the Java programming language that supports
@@ -75,7 +75,7 @@ These limitations of Jif are discussed later.
 
 <h2><a name="language-features"></a>Language Features</h2> 
 
-<h3>Labels and labeled types</h3>
+<h3><a name="labels">Labels and labeled types</a></h3>
 
 <p>
 In Jif, every value has a <em>labeled type</em> that consists of two parts:
@@ -115,10 +115,15 @@ The compiler permits information to flow between locations
 with different labels only if that information flow does not
 lose policy restrictions.
 In particular, if information is
-able to flow from a location with label <code>L<sub>1</sub></code>
-to a location with label <code>L<sub>2</sub></code>, the
-label <code>L<sub>2</sub></code> must be more restrictive
-than <code>L<sub>1</sub></code>, or equally restrictive.
+able to flow from a location with label <i class="math">L</i><sub>1</sub>
+to a location with label <i class="math">L</i><sub>2</sub>, the
+label <i class="math">L</i><sub>2</sub> must be more restrictive
+than <i class="math">L</i><sub>1</sub></i>, or equally restrictive.
+This is written formally as
+<i class="math">L</i><sub>1</sub></i> &#8849; 
+<i class="math">L</i><sub>2</sub></i>. (The ordering &#8849;
+defines a preorder on labels in which the equivalence
+classes are a distributive lattice.)
 </p>
 <p>
 When differently labeled inputs are
@@ -169,9 +174,12 @@ and label: for any two types <i class="math">S</i> and <i
 class="math">T</i> and labels <i
 class="math">L</i><sub>1</sub> and <i
 class="math">L</i><sub>2</sub>,
-<i class="math">S &le; T and L<sub>1</sub> &sqle;
-L<sub>2</sub></i> iff
-<i class="math">S{L<sub>1</sub>} &le; T{L<sub>2</sub>}</i> (as in
+<i class="math">S</i> &le;
+<i class="math">T</i> and
+<i class="math">L</i><sub>1</sub> &#8849;
+<i class="math">L</i><sub>2</sub></i> iff
+<i class="math">S</i>{<i class="math">L</i><sub>1</sub>}
+&le; <i class="math">T</i>{<i class="math">L</i><sub>2</sub>} (as in
 [VSI96])
 </p>
 
@@ -301,7 +309,8 @@ it also controls information flow.
 </p>
 
 
-<h3>Implicit flows and program-counter labels</h3>
+<h3><a name="implicit-flows">Implicit flows and
+program-counter labels</a></h3>
 
 <p>
 The label of an expression's value varies depending
