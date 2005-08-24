@@ -148,6 +148,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Exc.jif ;
 	Exc2.jif ;
 	FieldLeak.jif (Semantic) ;
+	FieldParam1.jif  ;
+	FieldParam2.jif  ;
 	FileTester.jif ;
 	For1.jif ;
 	Hierarchy1.jif ;
