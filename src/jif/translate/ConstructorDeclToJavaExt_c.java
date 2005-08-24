@@ -49,15 +49,17 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
         ConstructorInstance ci = n.constructorInstance();
         ClassType ct = ci.container().toClass();
 
-        // Add an explicit return to the body.
         Block body = n.body();
-        Return return_this = nf.Return(n.position(), nf.This(n.position()));
+        List inits = new ArrayList(3);
 
-        List inits = new ArrayList(2);
+        // add a call to the initializer.
+        inits.add(rw.qq().parseStmt("this." + 
+                  ClassDeclToJavaExt_c.INITIALIZATIONS_METHOD_NAME + "();"));
+
         if (body.statements().isEmpty() ||
             (body.statements().size() == 1 &&
              body.statements().get(0) instanceof Empty)) {
-            inits.add(return_this);
+            // no body to add...
         }
         else {
 
@@ -87,10 +89,12 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
                   }
               }
           }
-
+          
           inits.add(body);
-          inits.add(return_this);
         }
+        
+        // Add an explicit return to the body.
+        inits.add(nf.Return(n.position(), nf.This(n.position())));
 
         body = nf.Block(n.position(), inits);
 

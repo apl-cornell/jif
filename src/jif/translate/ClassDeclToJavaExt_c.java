@@ -13,6 +13,7 @@ import polyglot.visit.NodeVisitor;
 
 public class ClassDeclToJavaExt_c extends ToJavaExt_c {
     static final String INSTANCEOF_METHOD_NAME = "jif$Instanceof";
+    static final String INITIALIZATIONS_METHOD_NAME = "jif$init";
     static final String castMethodName(ClassType ct) {
         return "jif$cast$"+ct.fullName().replace('.','_');
     }
@@ -52,8 +53,13 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                     }
                 }
 
+                // add initializer method (which is called from every 
+                // translated constructer.                
+                cb = addInitializer(cb, rw);
+                
                 // add getter methods for any params declared in interfaces
                 cb = addInterfaceParamGetters(cb, jpt, jpt, rw);
+                
             }
             else {
                 ClassBody implBody = rw.java_nf().ClassBody(Position.COMPILER_GENERATED, new ArrayList(2));
@@ -86,6 +92,18 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                                       n.superClass(), n.interfaces(), cb);
     }
 
+    /**
+     * Create a method for initializations, and add it to cb.
+     * 
+     */
+    private ClassBody addInitializer(ClassBody cb, JifToJavaRewriter rw) {
+        List inits = new ArrayList(rw.getInitializations());
+        rw.getInitializations().clear();
+        return cb.addMember(rw.qq().parseMember(
+                                              "private void %s() { %LS }", 
+                                              INITIALIZATIONS_METHOD_NAME,
+                                              inits));
+    }
     /**
      * Go through the interfaces, and add any required fields and getters for the fields.
      * @param cb

@@ -31,6 +31,8 @@ public class JifToJavaRewriter extends ContextVisitor
     
     private Collection additionalClassDecls;
     private Collection newSourceFiles;
+    
+    private List initializations;
 
     public JifToJavaRewriter(Job job,
                              JifTypeSystem jif_ts,
@@ -45,6 +47,7 @@ public class JifToJavaRewriter extends ContextVisitor
         this.qq = new QQ(java_ext);
         this.additionalClassDecls = new LinkedList();
         this.newSourceFiles = new LinkedList();
+        this.initializations = new ArrayList();
     }
 
     public void finish(Node ast) {
@@ -152,8 +155,8 @@ public class JifToJavaRewriter extends ContextVisitor
         return qq;
     }
 
-    ClassType currentClass;
-    boolean inConstructor;
+    private ClassType currentClass;
+    private boolean inConstructor;
 
     public ClassType currentClass() {
         return this.currentClass;
@@ -165,10 +168,18 @@ public class JifToJavaRewriter extends ContextVisitor
     public void leavingClass() {
         this.currentClass = null;
     }
+    public void addInitializer(Stmt s) {
+        this.initializations.add(s);
+    }
+
+    public List getInitializations() {
+        return this.initializations;
+    }
 
     public void addAdditionalClassDecl(ClassDecl cd) {
         this.additionalClassDecls.add(cd);
     }
+
     /**
      * Take any additional class declarations that can fit into the source file,
      * i.e., non-public class decls.
@@ -207,4 +218,5 @@ public class JifToJavaRewriter extends ContextVisitor
     public void inConstructor(boolean flag) {
         this.inConstructor = flag;
     }
+
 }
