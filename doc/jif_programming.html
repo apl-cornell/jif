@@ -121,8 +121,25 @@ label <code>L<sub>2</sub></code> must be more restrictive
 than <code>L<sub>1</sub></code>, or equally restrictive.
 </p>
 <p>
-In a program, a component expression may take a few additional forms. One added
-component form is a variable name, which denotes the <em>set</em> of policies
+When differently labeled inputs are
+combined, the result may reveal information about
+any of the inputs. For example, when two variables
+<code>x</code> and <code>y</code> are added, the sum
+<code>x+y</code> may reveal information about both
+<code>x</code> and <code>y</code>.  Conservatively,
+the label of the result is the union of the policies
+in the labels of the inputs. This union is the
+<em>join</em> or <em>least upper bound</em>
+of the input labels. For example, if the label of
+<code>x</code> is <code>{p:q}</code> and the label of
+<code>y</code> is <code>{a:b; p:q,r}</code>, the
+label of the result is <code>{p:q; a:b; p:q,r}</code>,
+which is equivalent to <code>{p:q; a:b}</code>.
+</p>
+<p>
+In a program, a policy component of a label
+may take a few additional forms. One such
+form is a variable name, which denotes the set of policies
 in the label of the variable named.  For example, 
 the label expression <code>{a}</code> contains a single component expression;
 this label means that value it labels should be as restricted as the
@@ -134,7 +151,6 @@ the principal <code>o</code> restricts the value to be read by at most
 the principal <code>r</code>.
 Other kinds of label components will be introduced later.
 </p>
-
 
 <p>
 A labeled type may occur in a Jif program almost anywhere a type
@@ -212,6 +228,7 @@ A method executes with some
 capability to act for some set of principals, and
 controls the ability to declassify data. This simple authority mechanism
 can be used to build more complex access control mechanisms.
+It is also useful for releasing information.
 </p>
 
 <p>
@@ -234,6 +251,55 @@ principal hierarchy dynamically, using the
 <code>actsfor</code> test.
 </p>
 
+<p>
+There are two ways for method code to acquire authority. First, the
+class containing the code may declare that it has the
+authority of some principal using an <code>authority</code>
+clause. A method of the class can then claim and use that 
+authority if its signature includes a <code>where authority</code>
+clause of its own. It is easy to identify the code to which
+principal <code>p</code> has directly granted its authority
+because of these clauses. For example, in the following code
+the class <code>Game</code> has the authority of the
+principal <code>referee</code>:
+</p>
+
+<div class="code"><pre>class Game authority(referee) {
+    void start() where authority(referee) {
+	...
+    }
+}
+</div>
+ 
+<p>
+The second way for a method to acquire authority is for the
+method to receive authority passed from another method. If the
+receiving method signature contains a clause of the form
+<code>where caller(p)</code>, then it can be called only
+from code that is statically known to have the authority of
+principal <code>p</code>. For example, the following method
+receives authority for a principal <code>p</code> that is
+determined at run time and passed as an argument to the
+method.
+</p>
+
+<div class="code"><pre>
+    void m(principal p) where caller(p) {
+	...
+    }
+}
+</pre>
+</div>
+
+<p>
+These mechanisms can be used to implement access control
+security within a program and are similar in expressiveness
+to the Java stack inspection mechanism, while avoiding the
+run-time overhead. Of course, Jif
+offers more security assurance than stack inspection because
+it also controls information flow.
+</p>
+
 <h3>Implicit flows and program-counter labels</h3>
 
 <p>
@@ -254,7 +320,7 @@ equivalent to the statement <code>l = h</code>:
 <div class="code"><pre>
 boolean l = false;
 if (h) {
-    l = true;
+    
 }
 </div>
 </p>
