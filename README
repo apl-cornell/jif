@@ -33,12 +33,11 @@ environment. Jif is compiled with the Ant build tool
 g++ are in your path.
 
 Softare Versions: We recommend that you use JDK 1.4.2 or later.  Ant
-  1.6.2 is known to work with Jif 2.0.0. (Ant 1.6.3 has a bug with the
-  "javah" task.) We have had some reports that some versions of Cygwin
-  are incompatible with building Jif, however, cygwin-1.5.16-1 appears
-  to be compatible. Note that when using Cygwin, great care must be
-  taken in specifying class paths, so that they are correctly
-  interpreted by both java and ant.
+   1.6.5 is known to work with Jif 2.0.0. We have had some reports that
+   some versions of Cygwin are incompatible with building Jif, however,
+   cygwin-1.5.16-1 appears to be compatible. Note that when using Cygwin,
+   great care must be taken in specifying class paths, so that they are
+   correctly interpreted by both java and ant.
 
 Jif is implemented using the Polyglot extensible compiler toolkit,
 also developed at Cornell. Polyglot can be obtained from the web site:
