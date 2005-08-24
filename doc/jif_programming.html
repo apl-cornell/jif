@@ -300,6 +300,7 @@ offers more security assurance than stack inspection because
 it also controls information flow.
 </p>
 
+
 <h3>Implicit flows and program-counter labels</h3>
 
 <p>
@@ -379,6 +380,158 @@ an issue for concurrent programming languages. Jif does not support
 the Java thread model for concurrent programming.
 </p>
 
+<h3>Method declarations</h3>
+<p>
+The syntax of a Jif method
+declaration has some extensions
+when compared to Java syntax;
+there are a few optional annotations.
+These include not only the authority delegation mechanisms
+discussed above, but also annotations for
+controlling information flow.
+</p>
+
+<p>
+In a Jif method declaration, the return value, the arguments, and
+the exceptions each may be given their own individual label.
+There are two optional labels in a method declaration called the
+<em>begin-label</em> and the <em>end-label</em>. 
+The begin-label is used to specify any
+restriction on <u>pc</u> at the point of invocation of the method.
+The begin-label allows information about the <u>pc</u> of the caller to
+be used for statically checking the implementation, thereby
+preventing assignments within the method from creating implicit flows
+of information.
+</p>
+
+For example, a Jif version of the Java class
+<code>Vector</code> looks like the following:
+
+<div class="code"><pre>
+public class Vector[label L] extends AbstractList[L] {
+    private int{L} length;
+    private Object{L}[]{L} elements;
+
+    public Vector() ...
+    public Object elementAt(int i):{L; i}
+	            throws (IndexOutOfBoundsException) {
+	return elements[i];
+    }
+    public void setElementAt{L}(Object{} o, int{} i) ...
+    public int{L} size() { return length; }
+    public void clear{L}() ...
+    ...
+}
+</pre></div>
+
+<p>
+This code provides several examples of Jif method
+declarations. The class is generic with respect to a label 
+parameter <code>L</code>, permitting Vectors to be used to
+store information of any one desired label. (Parametric
+polymorphism over labels is discussed later).
+</p>
+
+<p>
+The method <code>setElementAt</code> in this declaration
+is prevented from leaking information
+by its declared begin-label, <code>{L}</code>.
+It can be called only if the <u>pc</u> of the
+caller is no more restrictive than <code>{L}</code>. The labels of the
+arguments <code>o</code> and <code>i</code> are written as
+<code>{}</code>, but as discussed in the
+following section, argument labels automatically
+include the begin-label,
+so both arguments are effectively labeled by <code>{L}</code>.
+</p>
+<p>
+The end-label of a method specifies the <u>pc</u> at the point of termination
+of the method, and captures the restrictions on the information that
+can be learned by observing whether the method terminates normally.
+Individual exceptions and the return value itself
+also may have their own distinct labels, allowing static
+label checking to track information flow at fine granularity. For
+example, the end-label of the <code>elementAt</code> method,
+<code>{L;i}</code>,
+means that the <u>pc</u> following normal termination of the
+method is at least as
+restrictive as both the label parameter <code>L</code> and the label
+of the argument <code>i</code>. This
+end-label is necessary because when the index-out-of-bounds exception is
+thrown, an observation has been made of both the instance variable
+<code>elements</code> and the argument <code>i</code>.
+Therefore, knowledge of the termination path of the method
+may give information about the contents of these two variables.
+</p>
+
+
+<h3><a name="default-labels"></a>Default labels</h3>
+
+<p>A powerful feature of Jif is automatic inference of the
+labels of local variables. The Jif compiler can figure out whether there
+is a way of labeling local variables to satisfy all the label
+constraints. However, most of the time you do need to write down
+labels of fields and method signatures, including the begin-label,
+return label, result label and arguments' labels. When these labels
+are missing, some conservatives rules are used to assign restrictive
+default labels:</p> 
+
+<ul> 
+<li>Default field label: the bottom label, <code>{}</code>
+<br>
+If a field's type declaration does not include a label, then by
+default its label is <code>{}</code>, which is conservative because no
+confidential data can be stored in the field.
+</li>
+
+<li> Default argument label: the top label, <code>&lt;top&gt;</code>
+<br>
+The label on the type of a formal argument is an upper bound for
+labels of actual arguments. See the section on <a
+href="#method-polymorphism">polymorphic methods</a>.  
+</li>
+
+
+<li> Default method begin-label: the top label, <code>&lt;top&gt;</code>
+<br>
+The method begin-label is an upper bound on the PC of the caller, and
+a lower bound on the side effects of method.  The default method begin
+label is <code>&lt;top&gt;</code>, the most restrictive label, meaning
+that the method has no side effects.
+</li>
+
+<li>Default method return label: The join of the declared labels of any exceptions declared to be thrown
+<br>
+The method return label (how much information may be gained by knowing
+the method terminates normally) is by default the join of the declared
+labels of any exceptions that the method declares that it
+throws. Thus, if the method does not throw any exceptions, or if the
+declared exceptions do not have any labels, the default method return
+label is the bottom label, <code>{}</code>.
+</li>
+
+<li> Default method result label: the join of all the argument labels and the return label. 
+<br>
+The method result label (the label of the value returned by the
+method) is by default the method return label joined with all of the
+argument labels (<i>not</i> the upper bounds of the argument labels;
+see the section on <a href="#method-polymorphism">polymorphic
+methods</a>).  This is the common case, as most of the time the value
+returned by a method is the result of computation on all of its
+arguments.
+</li>
+
+<li> Default declared exception label: the method return label
+<br>
+A method may declare that it throws a certain exceptions; if an
+exception is declared to be thrown, but no label is given for that
+exception type, then by default it is assumed to be the same as the
+method return label.
+</li>
+</ul>
+
+<h3>Label polymorphism</h3>
+
 
 
 <h3><a name="dynamic-labels"></a>Dynamic labels and principals</h3>
@@ -447,6 +600,16 @@ class C[label L, principal P] {
 </pre>
 </div></td></tr></table>
 
+<p>
+Unlike in Java, method arguments in Jif are always implicitly
+<code>final</code>. This change makes the use of first-class principals and labels
+more convenient.  This simple change does not
+remove any significant power from the language, since code that assigns
+to an argument variable always can be rewritten to use a local variable
+instead.
+</p>
+
+
 <p>Final access paths appearing in labels and types may act as covert
 channels. For example, an access path may throw a null pointer
 exception, or the value stored in a particular variable may reveal
@@ -488,7 +651,7 @@ class D {
             boolean{Alice:; this} x = (o instanceof C[{this.f.p:}]);
         }
         catch (NullPointerException e) {
-	    // may be thrown by the evaluation of "this.f.p"
+	    <span class="comment">// may be thrown by the evaluation of "this.f.p"</span>
 	} 
     }
 }
@@ -508,11 +671,11 @@ is permitted.
 
 <table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
 class C[label L, principal P] {
-    private final label{this} lb = L;         // runtime use of L
+    private final label{this} lb = L;         <span class="comment">// runtime use of L</span>
 
     private void m() {
-        label foo = new label {L; Alice:};    // runtime use of L
-        principal bar = P;                    // runtime use of P
+        label foo = new label {L; Alice:};    <span class="comment">// runtime use of L</span>
+        principal bar = P;                    <span class="comment">// runtime use of P</span>
     }
 }
 </pre>
@@ -548,7 +711,7 @@ following code that calls the method <code>m</code> compiles
 successfully.
 <table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
 int{Alice: Chuck} i = 42;
-String{Alice: Chuck} s = m(i); // OK, since m returns a String with the same label as i
+String{Alice: Chuck} s = m(i); <span class="comment">// OK, since m returns a String with the same label as i</span>
 </pre></div></td></tr></table>
  
 
@@ -558,8 +721,8 @@ the label of the formal argument <code>a</code> is that <code>{Alice:
 
 <table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
 String{a} m(int{Alice: ; Bob:} a) {
-    int{Alice:} i = a; // ILLEGAL! Don't know that {a} <= {Alice:}
-    int{Alice: ; Bob: ; Chuck: } j = a; // OK
+    int{Alice:} i = a; <span class="comment">// ILLEGAL!  Don't know that {a} <= {Alice:}</span>
+    int{Alice: ; Bob: ; Chuck: } j = a; <span class="comment">// OK</span>
     ...
 }
 </pre></div></td></tr></table>
@@ -571,10 +734,10 @@ representation of labels of the arguments. The following code is thus illegal.
 
 <table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
 void foo(int{Bob:} a) {
-    label lb = new label {Alice: ; a}; // ILLEGAL! Label of a is not runtime representable.
+    label lb = new label {Alice: ; a}; <span
+    class="comment">// ILLEGAL! Label of a is not runtime representable.</span>
 
-    if (new label {a} <= new label {Bob: Chuck}) { // ILLEGAL! Label of a is not runtime representable.
-    }
+    if (new label {a} &lt;= new label {Bob: Chuck}) { <span class="comment">// ILLEGAL! Label of a is not runtime representable.</span> }
     ....
 }
 </pre></div></td></tr></table>
@@ -614,7 +777,7 @@ the label <code>L1</code>. Thus, the following code compiles correctly.
 void m(int{*lbl} i, label{} lbl) {
     int{Alice:} x;
     if (lbl <= new label {Alice:}) {
-        x = i; // OK, since {*lb} <= {Alice:}
+        x = i; <span class="comment">// OK, since {*lb} &lt;= {Alice:}</span>
     }
     else {
         x = 0;
@@ -649,7 +812,7 @@ principal <code>P1</code> can act for the principal
 void m(int{Alice: pr} i, principal{} pr) {
     int{Alice: Bob} x;
     if (Bob actsfor pr) {
-        x = i; // OK, since {Alice: pr} <= {Alice: Bob}
+        x = i; <span class="comment">// OK, since {Alice: pr} &lt;= {Alice: Bob}</span>
     }
     else {
         x = 0;
@@ -702,7 +865,7 @@ class C {
         if (s != null) {
             return;
         }
-        s.length(); // OK, s known to be not-null
+        s.length(); <span class="comment">// OK, s known to be not-null</span>
         if (o instanceof String) {
             try { 
                 ((String)o).length();
@@ -811,72 +974,9 @@ external principals in a similar way. See the <a
 href="../tests/README">README</a> file in $JIF/tests for more
 information about creating external principals.
 
-<h3><a name="default-labels"></a>Default labels</h3>
+<h2><a name="java">Interacting with Java</a></h2>
 
-<p>A powerful feature of Jif is that you don't have to write down
-labels of local variables. Jif compiler can figure out whether there
-is a way of labeling local variables to satisfy all the label
-constraints. However, most of the time you do need to write down
-labels of fields and method signatures, including the begin label,
-return label, result label and arguments' labels. When these labels
-are missing, some conservatives rules are used to assign restrictive
-default labels:</p> 
-
-<ul> 
-<li>Default field label: the bottom label, <code>{}</code>
-<br>
-If a field's type declaration does not include a label, then by
-default its label is <code>{}</code>, which is conservative because no
-confidential data can be stored in the field.
-</li>
-
-<li> Default argument label: the top label, <code>&lt;top&gt;</code>
-<br>
-The label on the type of a formal argument is an upper bound for
-labels of actual arguments. See the section on <a
-href="#method-polymorphism">polymorphic methods</a>.  
-</li>
-
-
-<li> Default method begin label: the top label, <code>&lt;top&gt;</code>
-<br>
-The method begin label is an upper bound on the PC of the caller, and
-a lower bound on the side effects of method.  The default method begin
-label is <code>&lt;top&gt;</code>, the most restrictive label, meaning
-that the method has no side effects.
-</li>
-
-<li>Default method return label: The join of the declared labels of any exceptions declared to be thrown
-<br>
-The method return label (how much information may be gained by knowing
-the method terminates normally) is by default the join of the declared
-labels of any exceptions that the method declares that it
-throws. Thus, if the method does not throw any exceptions, or if the
-declared exceptions do not have any labels, the default method return
-label is the bottom label, <code>{}</code>.
-</li>
-
-<li> Default method result label: the join of all the argument labels and the return label. 
-<br>
-The method result label (the label of the value returned by the
-method) is by default the method return label joined with all of the
-argument labels (<i>not</i> the upper bounds of the argument labels;
-see the section on <a href="#method-polymorphism">polymorphic
-methods</a>).  This is the common case, as most of the time the value
-returned by a method is the result of computation on all of its
-arguments.
-</li>
-
-<li> Default declared exception label: the method return label
-<br>
-A method may declare that it throws a certain exceptions; if an
-exception is declared to be thrown, but no label is given for that
-exception type, then by default it is assumed to be the same as the
-method return label.
-</li>
-</ul>
-
-<h2><a name="main"></a>The <code>main<code> method</h2>
+<h3><a name="main"></a>The <code>main<code> method</h3>
 
 <p>Jif provides two possible signatures for the main method of a
 class. The first is compatible with the signature for Java main

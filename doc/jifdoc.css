@@ -32,11 +32,12 @@ ol {
       border-color: rgb(200,200,200);
       border-width: 1;
       margin: 5;
-      padding: 5
+      padding: 5;
+      color: rgb(20,20,30);
 }
 
 span.comment {
-    color: "red"
+    color: rgb(100,0,0)
 }
 
 h1 { font-family: sans-serif }
