@@ -10,30 +10,31 @@
 <h1><a name="overview">Programming in Jif</a></h1>
 
 <p>
-Jif is an extension to the Java programming language that supports
-static analysis of information flow. This support consists primarily
-of extensions to the type system.  Static checking of information flow
-in Jif programs is performed as part of type checking. If a Jif program
-type-checks, the compiler translates it into Java code that can be
-compiled with a standard Java compiler. The Jif compiler and run-time
-system are available from the
-<a href="http://www.cs.cornell.edu/jif">Jif web site</a>.
-</p>
-
-<p>
-The primary difference between Jif and Java is the addition of
-<em>labels</em> that capture restrictions on how information may
-be used. The primary goal is to prevent confidential information
+Jif is an extension to the Java programming language that adds
+static analysis of information flow for improved security
+assurance.  The primary goal is to prevent confidential information
 from being used improperly; in some versions of Jif, the goal is
 also to protect the integrity of trusted information.
 </p>
 
 <p>
-The core mechanism for security enforcement in Jif is
-statically tracking information flow.  This
+The largest difference between Jif and Java is the addition of
+<em>labels</em> that express security policies as
+restrictions on how information may be used.
+These labels facilitate
+statically tracking information flow. The
 analysis of information flow is performed mostly statically, at
 compile time. However, Jif does also support some forms of
 run-time security enforcement.
+</p>
+
+<p>
+Static checking of information flow
+in Jif programs is performed as part of type checking. If a Jif program
+type-checks, the compiler translates it into Java code that can be
+compiled with a standard Java compiler. The Jif compiler and run-time
+system are available from the
+<a href="http://www.cs.cornell.edu/jif">Jif web site</a>.
 </p>
 
 <h2><a name="features"></a>Language Features</h2> 
@@ -54,9 +55,12 @@ are explicitly represented in the Jif language,
     to write complex authorization code without
     creating covert information leaks.
 <li>A <strong>principal hierarchy</strong> allows policies to be stated
-    in a general way in terms of more abstract principals.
+    in a general way in terms of more abstract principals
+    such as groups or roles.
 <li><strong>Label polymorphism</strong> allows the expression of code 
 that is generic with respect to the security class of the data it manipulates.
+<strong>Principal polymorphism</strong> supports genericity
+with respect to principals as well.
 <li><strong>Automatic label inference</strong>
 makes it unnecessary to write many type annotations.
 <li><strong>Run-time label checking and first-class label values</strong>
@@ -69,9 +73,8 @@ improves the expressive power of this important language feature.
 <p>
 Jif is not completely a superset of Java. Certain features have
 been omitted to make information flow control tractable. Also, Jif
-does not eliminate all possible information leaks. Certain covert
-channels (particularly, various kinds of <em>timing channels</em>).
-These limitations of Jif are discussed later.
+does not eliminate all possible information leaks
+(particularly, various kinds of <em>timing channels</em>).
 </p>
 
 <h3><a name="labels">Labels and labeled types</a></h3>
@@ -85,15 +88,15 @@ Any type expression <i class="math">t</i>
 may be labeled with any label expression <i class="math">l</i>.
 This labeled type expression is written <code><i class="math">t</i>{<i class="math">l</i>}</code>; for example, the
 labeled type <code>int{p:}</code> represents an integer that principal <code>p</code> owns
-and, because no readers are listed, that only <code>p</code> can read.
-For example, a variable may be declared with labeled type: 
+and that only <code>p</code> can read.
+For example, a variable may be declared with this labeled type: 
 <div class="code"><pre>
 int{p:} x = 2;
 </pre></div>
 </p>
 
 <p>
-In a Jif program,
+In general,
 a label is written as a set of <em>policy expressions</em>,
 separated by semicolons. For example,
 the label expression
@@ -122,7 +125,7 @@ This is written formally as
 <i class="math">L</i><sub>1</sub></i> &#8849; 
 <i class="math">L</i><sub>2</sub></i>. (The ordering &#8849;
 defines a preorder on labels in which the equivalence
-classes are a distributive lattice.)
+classes form a join semilattice.)
 </p>
 <p>
 When differently labeled inputs are
@@ -144,10 +147,11 @@ which is equivalent to <code>{p:q; a:b}</code>.
 In a program, a policy component of a label
 may take a few additional forms. One such
 form is a variable name, which denotes the set of policies
-in the label of the variable named.  For example, 
-the label expression <code>{a}</code> contains a single component expression;
+in the label of the variable named.  For example, suppose
+that <code>a</code> is a variable and hence has a labeled type.
+The label expression <code>{a}</code> contains a single component expression;
 this label means that value it labels should be as restricted as the
-contents of <code>a</code> are. The
+contents of <code>a</code> are. The more complex
 label expression <code>{a; o: r}</code> contains two policy components,
 indicating
 that the labeled value should be as restricted as <code>a</code> is, and also that
@@ -182,7 +186,7 @@ class="math">L</i><sub>2</sub>,
 [VSI96])
 </p>
 
-<h3><a name="principal-hierarchy"></a>Principals</h3>
+<h4><a name="principal-hierarchy"></a>Principals</h4>
 
 <p>
 In the decentralized label model implemented by Jif,
@@ -196,7 +200,7 @@ groups in Unix would be modeled as principals.
 Some principals may be authorized to <em>act for</em>
 other principals. If the principal <code>p</code> acts for the
 principal <code>q</code>, any action taken by <code>p</code>
-is implicitly assumed to be authorized by <code>q</code>
+is implicitly assumed to be authorized by <code>q</code>.
 The acts-for relation is reflexive and transitive,
 defining a hierarchy or partial order
 of principals. This relation is similar to the <em>speaks for</em>
@@ -216,10 +220,11 @@ role, a restricted form of a user's authority, is modeled by
 authorizing the user's principal to act for the role principal.
 </p>
 
-<p>
+<p><a name="actsfor"></a>
 The acts-for relationship between two principals can be tested
 in a Jif program using the built-in <code>actsfor</code> operator. The
-boolean expression <code>p actsfor q</code> evaluates to <code>true</code>
+boolean expression <code>p actsfor
+q</code> evaluates to <code>true</code>
 if the
 specified relationship exists. Within the body of an <code>if</code>
 statement conditioned on this test, the compiler makes use of
@@ -231,8 +236,8 @@ information flows and comparing security policies.
 adds support for user-defined principals and user-defined
 authentication mechanisms.</p>
 
-<h3><a name="implicit-flows">Implicit flows and
-program-counter labels</a></h3>
+<h4><a name="implicit-flows">Implicit flows and
+program-counter labels</a></h4>
 
 <p>
 The label of an expression's value varies depending
@@ -248,11 +253,12 @@ the knowledge that the statement or expression was evaluated.
 
 <p>
 For example, consider the following program, which is obviously
-equivalent to the statement <code>l = h</code>:
+equivalent to the statement <code>l = h</code>, assuming
+<code>h</code> is a boolean variable:
 <div class="code"><pre>
 boolean l = false;
 if (h) {
-    
+    l = true;
 }
 </div>
 </p>
@@ -296,7 +302,8 @@ which the program counter depends.
 <p>
 A related issue is the transmission of information through
 the termination or non-termination of a program.
-Consider the execution of a <code>while</code> statement:
+Consider the execution of a <code>while</code> statement
+<code>while (h != 0) {}</code>.
 According to the Jif type system,
 after the statement terminates, <u>pc</u>=<code>{}</code>, using the
 same reasoning as for the <code>if</code> statement. This
@@ -311,7 +318,7 @@ an issue for concurrent programming languages. Jif does not support
 the Java thread model for concurrent programming.
 </p>
 
-<h3><a name="method-decls">Method declarations</a></h3>
+<h4><a name="method-decls">Method declarations</a></h4>
 <p>
 The syntax of a Jif method
 declaration has some extensions
@@ -396,7 +403,7 @@ may give information about the contents of these two variables.
 </p>
 
 
-<h3><a name="default-labels"></a>Default labels</h3>
+<h4><a name="default-labels"></a>Default labels</h4>
 
 <p>A powerful feature of Jif is automatic inference of the
 labels of local variables. The Jif compiler can figure out whether there
@@ -431,7 +438,8 @@ label is <code>&lt;top&gt;</code>, the most restrictive label, meaning
 that the method has no side effects.
 </li>
 
-<li>Default method return label: The join of the declared labels of any exceptions declared to be thrown
+<li>Default method return label: The join of the declared
+labels of any exceptions declared to be thrown.
 <br>
 The method return label (how much information may be gained by knowing
 the method terminates normally) is by default the join of the declared
@@ -454,7 +462,7 @@ arguments.
 
 <li> Default declared exception label: the method return label
 <br>
-A method may declare that it throws a certain exceptions; if an
+A method may declare that it throws certain exceptions; if an
 exception is declared to be thrown, but no label is given for that
 exception type, then by default it is assumed to be the same as the
 method return label.
@@ -489,7 +497,7 @@ principal hierarchy is a subset of the acts-for relations that exist in
 the true principal hierarchy.
 The static authority of a method may be augmented by testing the
 principal hierarchy dynamically, using the
-<code>actsfor</code> test.
+<a href="#actsfor"><code>actsfor</code> test</a>.
 </p>
 
 <h4><a name="declassification">Declassification</a></h3>
@@ -989,7 +997,15 @@ href="../tests/README">README</a> file in $JIF/tests for more
 information about creating external principals.
 
 
-<h3><a name="static-fields"></a>Static fields</h3>
+<h3><a name="java-changes">Other changes to Java</a></h3>
+
+<p>
+Jif makes several less significant changes to Java that are
+necessary in order to reason securely about information
+flow.
+</p>
+
+<h4><a name="static-fields"></a>Static fields</h4>
 
 <p>Static fields of classes are supported in Jif, subject to the following restrictions.
 </p>
@@ -1005,7 +1021,7 @@ method), which may depend on sensitive information.</li>
 </ol>
 </p>
 
-<h3><a name="runtime-exceptions"></a>Runtime exceptions</h3>
+<h4><a name="runtime-exceptions"></a>Runtime exceptions</h4>
 
 <p>In Java, subclasses of <code>RuntimeException</code> (such as
 <code>NullPointerException</code>, <code>ClassCastException</code>,
@@ -1057,7 +1073,40 @@ class C {
     }
 }
 </pre></div></td></tr></table>
- 
+
+<h4><a name="constructors">Final field initialization</a></h4> 
+
+<p>
+In Java, it is possible to observe the final fields before
+they have been initialized. This is not acceptable in Jif,
+where final fields of type <code>label</code> or
+<code>principal</code> may define the security requirements
+for other information. To ensure that final fields really
+are final, Jif constructors are required to initialize all
+final fields explicitly before the call to the superclass
+constructor. For example, a constructor might look like the
+following:
+</p>
+
+<div class="code"><pre>
+class B extends A {
+    final principal p;
+    String {p:} name;
+    B(principal q, String{q:} n) {
+	p = q;
+	super(n);
+	name = n;
+    }
+}
+</pre></div>
+
+<p>
+Because of the assignment from <code>q</code> to
+<code>p</code>, the Jif compiler knows that these
+principals are equal and uses this fact to determine that
+the assignment from <code>n</code> to <code>name</code> is
+secure.
+</p>
 
 <h2><a name="java">Interacting with Java</a></h2>
 
