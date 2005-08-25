@@ -37,6 +37,22 @@ system are available from the
 <a href="http://www.cs.cornell.edu/jif">Jif web site</a>.
 </p>
 
+<p>
+Jif is based on the JFlow language described in the <a
+href="http://www.cs.cornell.edu/andru/papers/popl99/myers-popl99.ps.gz">Practical
+Mostly-Static Information Flow Control</a>, published in the <i>Proceedings of the
+26th ACM Symposium on Principles of Programming Languages</i> (POPL),
+pp. 228-241, January 1999, by Andrew C. Myers.
+</p>
+
+<p>
+Another source of documentation for Jif can be found in Andrew Myers'
+thesis, linked to from the <a
+href="http://www.cs.cornell.edu/jif/">Jif web site</a>. However, the
+language has developed since that time, and some features in this
+version of Jif are not documented in the thesis.
+</p>
+
 <h2><a name="features"></a>Language Features</h2> 
 <p>
 Jif has a number of unique features that are important for
@@ -428,7 +444,7 @@ confidential data can be stored in the field.
 <br>
 The label on the type of a formal argument is an upper bound for
 labels of actual arguments. See the section on <a
-href="#method-polymorphism">polymorphic methods</a>.  
+href="#label-polymorphism">label polymorphism</a>.  
 </li>
 
 
@@ -632,7 +648,7 @@ it also controls information flow.
 
 
 
-<h3><a name="polymorphism">Polymorphism</a></h3>
+<h3><a name="label-polymorphism">Polymorphism</a></h3>
 
 <p>
 Libraries of reusable code make up the bulk of most
@@ -640,8 +656,6 @@ program code. Jif supports various kinds of polymorphism to make
 it possible to write reusable code that is not tied to any
 specific security policy.
 </p>
-
-<h4><a name="label-polymorphism"></a>Label polymorphism</h4>
 
 <p>
 The most common form of polymorphism is over the labels of
@@ -732,11 +746,140 @@ that there are no restrictions on the labels of the actual arguments
 that may be passed in. See the section on <a
 href="#default-labels">default labels</a>.
 
-<h4><a name="parameterized-classes"></a>Parameterized classes</h4> 
+<h3><a name="parameterized-classes"></a>Parameterized classes</h3> 
 
-<p>A parameterized class is generic with respect to some set of type
-parameters. Jif allows classes to be parameterized on labels and
-principals. A new feature in Jif 2.0.0 is that
+<p>Parameterized types have long been known to be important for building
+reusable data structures. A parameterized class is generic with respect to
+some set of type parameters. This genericity is particularly useful for building
+collection classes such as generic sets and maps.
+It is even more important to have polymorphism in the information flow domain;
+the usual way to handle the absence of statically-checked type polymorphism
+is to perform dynamic type casts, but this approach works poorly
+when applied to information flow, because dynamic tests create
+new information channels.
+</p>
+
+<h4>Label and principal parameters</h4>
+
+<p>
+Jif allows classes and interfaces to be parameterized by explictly declared
+label and principal parameters. The earlier example of a <code>Vector</code>
+class demonstrated the use of a label parameter:
+</p>
+
+<div class="code"><pre>
+public class Vector[label L] extends AbstractList[L] {
+    private int{L} length;
+    private Object{L}[]{L} elements;
+
+    public Vector() ...
+    public Object elementAt(int i):{L; i}
+	            throws (IndexOutOfBoundsException) {
+	return elements[i];
+    }
+    public void setElementAt{L}(Object{} o, int{} i) ...
+    public int{L} size() { return length; }
+    public void clear{L}() ...
+    ...
+}
+</pre></div>
+
+<p class="cont">
+ The <code>Vector</code> class is parameterized on a label <code>L</code> that represents the
+label of the contained elements. Assuming that
+<code>secret</code> and <code>public</code> are appropriately defined,
+the types <code>Vector[{secret}]</code> and <code>Vector[{public}]</code> would represent
+vectors of elements of differing sensitivity. These types are referred
+to as <em>instantiations</em> of the parameterized type <code>Vector</code>. Without the 
+ability to instantiate
+classes on particular labels, it would be necessary
+to reimplement <code>Vector</code> for every distinct element label.
+</p>
+
+<p>
+A class may also be parameterized with respect to principals, as in this
+example:
+
+<div class="code"><pre>
+class paramCell[principal p, principal q] {
+    int{p: q} contents;
+}
+</pre></div>
+
+<p>
+This class may be instantiated with any
+two principals <code>p</code> and <code>q</code>. For example,
+the instantiation <code>paramCell[Bob,Amy]</code> has
+a field <code>contents</code> with the label <code>{Bob: Amy}</code>.
+</p>
+
+<h4>Interactions with object types</h4>
+
+<p>
+When a parameterized or unparameterized type inherits from a superclass,
+or implements an interface, the supertype may be an instantiation.  The
+instantiation that is inherited from or implemented must be a legal type
+within the scope of the class that is inheriting from or implementing
+it. This is a specific instance of a more general rule in Jif:
+within a parameterized class or interface, the formal parameters
+of the class may be used as actual parameters to instantiations of
+parameterized types within its scope.
+</p>
+
+<p>
+The presence of label and principal parameters means
+instantiations of parameterized classes are simple <em>dependent types</em>,
+because types depend on values. To ensure that these dependent types have
+a well-defined meaning, only &ldquo;<code>final</code>&rdquo;
+expressions may be used as parameters;
+since they are immutable, their meaning cannot change. An alternative approach
+would be to allow all variables to
+be used as parameters; however, in that case two different types that
+mention the same variable would have different meanings if an assignment
+to the variable occurred between them.
+</p>
+
+<p>
+Subtyping is ordinarily invariant on class parameters. For example,
+even if <code>{public}</code> &#8849; <code>{secret}</code>, it is not the case
+that <code>Vector[{public}]</code> &le; <code>Vector[{secret}]</code>.
+(The label ordering is denoted here as &#8849,
+and the subtype relation is denoted by &le;.) This subtype
+relation would be unsound because <code>Vector</code> is mutable.
+</p>
+
+<p>
+When such a subtype relation is sound, the parameter may be declared
+as a <code>covariant label</code> rather than as a <code>label</code>. Covariant label parameters
+are made sound by placing additional restrictions on their use,
+as follows.
+A covariant label parameter may not be used to construct the label for
+a non-<code>final</code> instance variable.  It also may
+not be used as an actual parameter to a class whose formal parameter
+is a <code>label</code>. However,
+immutable (<code>final</code>) instance variables and method arguments and return
+values may be labeled using a covariant parameter.
+</p>
+
+<p>
+Although Jif does not support user-defined type parameters, it does support one
+type with a type parameter: the built-in Java array type, which is used as the
+type of the instance variable <code>elements</code> in the <code>Vector</code>
+exmaple.  Arrays are parameterized with respect to both the type of the
+contained elements and the label of those elements. In the example for
+<code>Vector</code>, the type of the instance variable <code>elements</code> is
+<code>Object{L}[]</code> which represents an array of <code>Object</code> where
+each element in the array is labeled with <code>L</code>. The array type
+behaves as though it were a type <code>array[T,L]</code> with two parameters:
+an element type and an element label; in this case <code>T</code> =
+<code>Object</code>.  The label parameter may be omitted, in which case it
+defaults to <code>{}</code>.  For example, the types <code>int[]</code> and
+<code>int{}[]</code> are equal.
+</p>
+
+<h4>Using parameters at run time</h4>
+<p>
+A new feature in Jif 2.0.0 is that
 all class parameters are represented and accessible
 at run time. Thus, the following code,
 which uses the parameters <code>L</code> and <code>P</code> at runtime, 
@@ -755,10 +898,10 @@ class C[label L, principal P] {
 </div>
 
 
-<p>Note that the label of a parameter is the label
+<p>When a parameter is treated as an ordinary value, its label is the label
 <code>{this}</code>. That is, the information that may be conveyed by
-knowing the runtime value of a parameter is the same as the
-information that may be conveyed by the reference to this
+knowing the run-time value of a parameter is the same as the
+information that may be conveyed by the reference to the current
 object. Thus, if the label of the final field <code>lb</code> in the
 example above was not at least as restrictive as the label
 <code>{this}</code>, the example would not compile.
@@ -766,11 +909,11 @@ example above was not at least as restrictive as the label
 <h3><a name="dynamic-labels"></a>Dynamic labels and principals</h3>
 
 <p>
-Labels and principals are first-class values, and are represented at
+Labels and principals can be used as first-class values, represented at
 runtime. These &ldquo;dynamic&rdquo; labels and principals can be used in the
 specification of other labels, and used as the parameters of <a
-href="parameterized-classes">parameterized classes</a>. (Thus, Jif's
-type system uses dependent types.) Consider the following example.
+href="#parameterized-classes">parameterized classes</a>. (Thus, Jif's
+type system has dependent types.) Consider the following example.
 </p>
 
 <div class="code"><pre>
@@ -1169,8 +1312,8 @@ final local variables of type <code>label</code> or
 
 <h4><a name="unsupported-java">Unsupported Java features</a></h4> 
 
-Jif does not currently support nested classes, or 
-initializer blocks.
+Jif does not currently support nested classes,
+initializer blocks, or threads.
 
 
 <h2><a name="java">Interacting with Java</a></h2>
