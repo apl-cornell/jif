@@ -518,7 +518,7 @@ principal hierarchy dynamically, using the
 <a href="#actsfor"><code>actsfor</code> test</a>.
 </p>
 
-<h4><a name="declassification">Declassification</a></h3>
+<h4><a name="declassification">Declassification</a></h4>
 
 <p>
 A program can use its authority to declassify information according to
@@ -620,7 +620,8 @@ method.
 
 <div class="code"><pre>
     void m(principal p) where caller(p) {
-	<span class="comment">// this method body has the authority of the dynamic principal p</span>
+	<span class="comment">// this method body has the 
+        // authority of the dynamic principal p</span>
 	...
     }
 }
@@ -759,10 +760,10 @@ when applied to information flow, because dynamic tests create
 new information channels.
 </p>
 
-<h4>Label and principal parameters</h4>
+<h4><a name="label-principal-params">Label and principal parameters</a></h4>
 
 <p>
-Jif allows classes and interfaces to be parameterized by explictly declared
+Jif allows classes and interfaces to be parameterized by explicitly declared
 label and principal parameters. The earlier example of a <code>Vector</code>
 class demonstrated the use of a label parameter:
 </p>
@@ -775,6 +776,7 @@ public class Vector[label L] extends AbstractList[L] {
     public Vector() ...
     public Object elementAt(int i):{L; i}
 	            throws (IndexOutOfBoundsException) {
+        ...
 	return elements[i];
     }
     public void setElementAt{L}(Object{} o, int{} i) ...
@@ -813,7 +815,7 @@ the instantiation <code>paramCell[Bob,Amy]</code> has
 a field <code>contents</code> with the label <code>{Bob: Amy}</code>.
 </p>
 
-<h4>Interactions with object types</h4>
+<h4><A NAME="param-interact-object-types">Interactions with object types</A></h4>
 
 <p>
 When a parameterized or unparameterized type inherits from a superclass,
@@ -856,7 +858,7 @@ as follows.
 A covariant label parameter may not be used to construct the label for
 a non-<code>final</code> instance variable.  It also may
 not be used as an actual parameter to a class whose formal parameter
-is a <code>label</code>. However,
+is a (non-<code>covariant</code>) <code>label</code>. However,
 immutable (<code>final</code>) instance variables and method arguments and return
 values may be labeled using a covariant parameter.
 </p>
@@ -865,7 +867,7 @@ values may be labeled using a covariant parameter.
 Although Jif does not support user-defined type parameters, it does support one
 type with a type parameter: the built-in Java array type, which is used as the
 type of the instance variable <code>elements</code> in the <code>Vector</code>
-exmaple.  Arrays are parameterized with respect to both the type of the
+example.  Arrays are parameterized with respect to both the type of the
 contained elements and the label of those elements. In the example for
 <code>Vector</code>, the type of the instance variable <code>elements</code> is
 <code>Object{L}[]</code> which represents an array of <code>Object</code> where
@@ -877,7 +879,7 @@ defaults to <code>{}</code>.  For example, the types <code>int[]</code> and
 <code>int{}[]</code> are equal.
 </p>
 
-<h4>Using parameters at run time</h4>
+<h4><A NAME="params-runtime">Using parameters at run time</A></h4>
 <p>
 A new feature in Jif 2.0.0 is that
 all class parameters are represented and accessible
@@ -1163,7 +1165,7 @@ depend on the principal implementation, but could be, for example, a
 password, or a certificate, or some other capability.
 
 <p>A <code>Closure[principal P, label L]</code> (see
-$JIF/sig-src/jif/lang/Closure.java) is code that needs the authorty of
+$JIF/sig-src/jif/lang/Closure.java) is code that needs the authority of
 the principal P to execute, and whose side effects are bounded below
 by L. To execute a closure, a <code>Capability</code> (see
 $JIF/sig-src/jif/lang/Capability.java) is required. A capability can only
@@ -1234,7 +1236,7 @@ tracks whether local variables and final fields of the
 example, the method <code>m(Object, String)</code> cannot throw a
 <code>NullPointerException</code>, and does not need to declare that it does.
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 class C {
     final String{} f = "a string";
     C another;
@@ -1268,7 +1270,7 @@ class C {
         }
     }
 }
-</pre></div></td></tr></table>
+</pre></div>
 
 <h4><a name="constructors">Final field initialization</a></h4> 
 
@@ -1323,28 +1325,28 @@ initializer blocks, or threads.
 <p>Jif provides two possible signatures for the main method of a
 class. The first is compatible with the signature for Java main
 methods, and accepts a single argument of an array of String, that is,
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 public static void main(String[] args) { ... }
-</pre></div></td></tr></table>
+</pre></div>
 
 
 <p>The second signature takes two arguments, the first a principal, and
 the second an array of String:
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 public static void main(principal p, String[] args) { ... }
-</pre></div></td></tr></table>
+</pre></div>
 
 
 <p>The principal <code>p</code> is the principal representing the current user that invoked the <code>main</code>. The signature
 may optionally have the authority of the current user:
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 public static void main(principal p, String[] args) where caller(p)
 {
     ...
 }
-</pre></div></td></tr></table>
+</pre></div>
 
 A class may have at most one static method named <code>main</code>.
 
@@ -1419,7 +1421,7 @@ the program, in which there is a potential implicit information flow
 from the high security argument <code>h</code>, whose label is the dynamic label
 <code>lbl</code>, to the low security local variable <code>l</code>:
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 class Implicit {
     void m(boolean{*lbl} h, label{} lbl) {
         if (lbl <= new label {Alice:}) {
@@ -1430,12 +1432,11 @@ class Implicit {
         }
     }
 }
-</pre></div></td></tr></table>
+</pre></div>
 
 Trying to compile this program produces the following output:
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div
-class="code"><pre width=80>
+<div class="code"><pre>
 $ $JIF/bin/jifc Implicit.jif
 Implicit.jif:6: Label of right hand side not less restrictive
     than the label for local variable l
@@ -1443,11 +1444,11 @@ Implicit.jif:6: Label of right hand side not less restrictive
                 ^
 
 1 error.
-</pre></div></td></tr></table>
+</pre></div>
 
 <p>More information can be gleaned by using the <code>-explain</code> flag:
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 $ $JIF/bin/jifc Implicit.jif -explain
 Implicit.jif:6: Unsatisfiable constraint:
      rhs.nv <= label of var l
@@ -1468,7 +1469,7 @@ Implicit.jif:6: Unsatisfiable constraint:
                 ^
 
 1 error.
-</pre></div></td></tr></table>
+</pre></div>
 
 <p>The more detailed error message first shows what the symbolic
 unsatisfiable constraint is (<code>rhs.nv <= label of var l</code>), and then
@@ -1495,7 +1496,7 @@ Specifying the command line option <code>-report debug=n</code>, where <code>n</
 non-negative integer, will display more information about labels. The
 higher the value for <code>n</code>, the more information is displayed. For
 example:
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 $ $JIF/bin/jifc Implicit.jif -report debug=1 -explain
 Implicit.jif:6: Unsatisfiable constraint:
      rhs.nv <= label of var l
@@ -1516,7 +1517,7 @@ Implicit.jif:6: Unsatisfiable constraint:
                 ^
 
 1 error.
-</pre></div></td></tr></table>
+</pre></div>
 
 
 <p>In the environment, we see that the label of the actual argument
@@ -1553,6 +1554,19 @@ compilation. Enabling reporting for the solver allows the user to
 determine which constraint(s) are problematic, when the error message
 does not appear to be helpful.
 
+<h2><a name="runtime-interface">Jif Runtime Interface</a></h2>
+
+
+<p>To interact with the external environment, Jif provides a runtime
+interface to allow Jif code to read and write files, and access stdin,
+stdout and stderr, and also to obtain a principal representing the current user. The runtime interface is <code>jif.runtime.Runtime</code>.
+</p>
+
+<p>Although
+the runtime code is itself is written in Java (see $JIF/rt-src/jif/runtime/Runtime.java), a Jif signature is
+provided to allow calls to this interface can be checked
+statically (see $JIF/sig-src/jif/runtime/Runtime.jif). 
+</p>
 </body>
 
 </html>
