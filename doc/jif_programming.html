@@ -624,17 +624,54 @@ it also controls information flow.
 
 <h3><a name="polymorphism">Polymorphism</a></h3>
 
-<h4><a name="method-polymorphism"></a>Method polymorphism</h4>
+<p>
+Libraries of reusable code make up the bulk of most
+program code. Jif supports various kinds of polymorphism to make
+it possible to write reusable code that is not tied to any
+specific security policy.
+</p>
 
-<p>Methods in Jif are polymorphic in the labels of the
-arguments, facilitating their reuse. For example, in the following method
+<h4><a name="label-polymorphism"></a>Label polymorphism</h4>
+
+<p>
+The most common form of polymorphism is over the labels of
+arguments to a method.
+When an argument label is omitted, the method is generic
+with respect to the label of the argument. Consider
+implementing a cosine method <code>cos</code>:
+</p.
+
+<div class="code"><pre>
+double cos(double x);
+</pre></div>
+
+<p class="cont">
+Omitting the label on the argument <code>x</code> means that
+this method can be applied to an argument <code>x</code>
+with any label.
+</p>
+
+<p>
+Without label polymorphism, there are two strategies: reimplement it
+for every argument label ever used, or implement it using run-time labels
+(discussed <a href="#dynamic-labels">later</a>).
+The former approach is clearly infeasible.
+Implicit labels have the advantage
+over run-time labels that when they
+provide adequate power, they are easier and cheaper to use.
+</p>
+
+<p>When formal variables have declared labels, the method is
+still polymorphic with respect to the label of the argument;
+however, the declared label serves as a bound on the allowed
+argument labels.
+For example, in the following method
 signature, the method <code>m</code> returns a <code>String</code> whose
 label is the same as the label of the argument <code>a</code>.
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 String{a} m(int{Alice: ; Bob:} a);
-</pre></div></td></tr></table>
- 
+</pre></div>
 
 <p>The label on the declaration of the argument <code>a</code> is
 <code>{Alice: ; Bob:}</code>. This means that the label of any actual
@@ -643,39 +680,41 @@ as <code>{Alice: ; Bob:}</code>, that is, <code>{Alice: ; Bob:}</code> is an
 upper bound on the label of any actual argument to <code>m</code>. The
 following code that calls the method <code>m</code> compiles
 successfully.
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 int{Alice: Chuck} i = 42;
 String{Alice: Chuck} s = m(i);
     <span class="comment">// OK: m returns a String with the same label as i</span>
-</pre></div></td></tr></table>
+</pre></div>
  
 
 <p>In the body of the method <code>m</code>, all that is known about
 the label of the formal argument <code>a</code> is that <code>{Alice:
 ; Bob:}</code> is an upper bound for it. Thus, the first line of the method body below is illegal, while the second is legal.
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 String{a} m(int{Alice: ; Bob:} a) {
     int{Alice:} i = a; <span class="comment">// ILLEGAL!  Don't know that {a} <= {Alice:}</span>
     int{Alice: ; Bob: ; Chuck: } j = a; <span class="comment">// OK</span>
     ...
 }
-</pre></div></td></tr></table>
+</pre></div>
  
 
 <p>The labels of arguments given to a method are not represented at
 runtime. That is, within a method body, there is no runtime
-representation of labels of the arguments. The following code is thus illegal.
+representation of labels of the arguments. The following code
+that manipulates run-time labels is thus illegal.
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 void foo(int{Bob:} a) {
-    label lb = new label {Alice: ; a}; <span
-    class="comment">// ILLEGAL! Label of a is not runtime representable.</span>
+    label lb = new label {Alice: ; a};
+	<span class="comment">// ILLEGAL! Label of a is not runtime representable.</span>
 
-    if (new label {a} &lt;= new label {Bob: Chuck}) { <span class="comment">// ILLEGAL! Label of a is not runtime representable.</span> }
-    ....
+    if (new label {a} &lt;= new label {Bob: Chuck})
+	<span class="comment">// ILLEGAL! Label of a is not runtime representable.</span>
+    { ... }
 }
-</pre></div></td></tr></table>
+</pre></div>
  
 
 <p>If no label is specified for a formal argument, then it is assumed
@@ -687,13 +726,13 @@ href="#default-labels">default labels</a>.
 
 <p>A parameterized class is generic with respect to some set of type
 parameters. Jif allows classes to be parameterized on labels and
-principals. The key difference between parameterized classes in this
-version of Jif, and as described in Andrew Myers' thesis, is that
-class parameters are represented at runtime. Thus, the following code,
+principals. A new feature in Jif 2.0.0 is that
+all class parameters are represented and accessible
+at run time. Thus, the following code,
 which uses the parameters <code>L</code> and <code>P</code> at runtime, 
 is permitted.  
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 class C[label L, principal P] {
     private final label{this} lb = L;         <span class="comment">// runtime use of L</span>
 
@@ -703,7 +742,7 @@ class C[label L, principal P] {
     }
 }
 </pre>
-</div></td></tr></table>
+</div>
 
 
 <p>Note that the label of a parameter is the label
@@ -724,7 +763,7 @@ href="parameterized-classes">parameterized classes</a>. (Thus, Jif's
 type system uses dependent types.) Consider the following example.
 </p>
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 class C[label L] { ... }
 
 ...
@@ -738,7 +777,7 @@ void m() {
     C[{*lb}] bar = foo;
 }
 </pre>
-</div></td></tr></table>
+</div>
 
 <p>Here we see a local variable <code>lb</code>, of type
 <code>label</code>. At runtime, this variable will contain a
@@ -762,7 +801,7 @@ form <i>r.f<sub>1</sub>.f<sub>2</sub>. ... .f<sub>n</sub></i>, where <i>r</i> is
 variable, or the expression <code>this</code>, and each
 <i>f<sub>i</sub></i> is an access to a final field. Thus, the following are all examples of legal uses of dynamic labels.
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 class C[label L, principal P] {
     final label lb;    
     final principal q;
@@ -778,8 +817,7 @@ class C[label L, principal P] {
     }
 }
 </pre>
-</div></td></tr></table>
-
+</div>
 <p>
 Unlike in Java, method arguments in Jif are always implicitly
 <code>final</code>. This change makes the use of first-class principals and labels
@@ -817,7 +855,7 @@ Thus, if the assignment to the local variable
 Alice:}</code> is flowing, and thus the label of the variable
 <code>x</code> must be at least <code>{this; Alice:}</code>.
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 class C[label L] { ... } 
 
 class D { 
@@ -836,7 +874,7 @@ class D {
     }
 }
 </pre>
-</div></td></tr></table>
+</div>
 
 
 <h4><a name="runtime-tests"></a>Runtime tests of labels and principals</h4>
@@ -846,14 +884,14 @@ mechanism for comparing runtime principals. Both mechanisms use a
 syntax similar to that of if statements.
 
 <p>An <i>if-label</i> statement allows the runtime comparison of labels. It has the following form: 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 if (L1 <= L2) { 
     ... 
 } 
 else { 
     ... 
 }
-</pre></div></td></tr></table>
+</pre></div>
  
 
 <p>If the label <code>L2</code> is at least as restrictive as
@@ -864,7 +902,7 @@ optional. During the label checking of the  <code>then</code>
 branch, it is assumed that the label <code>L2</code> is indeed at least as restrictive as
 the label <code>L1</code>. Thus, the following code compiles correctly.
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 void m(int{*lbl} i, label{} lbl) {
     int{Alice:} x;
     if (lbl <= new label {Alice:}) {
@@ -874,21 +912,22 @@ void m(int{*lbl} i, label{} lbl) {
         x = 0;
     }
 }
-</pre></div></td></tr></table>
+</pre></div>
 
 
+<p>
 Note that this construct replaces the <code>switch-label</code> construct that existed in previous versions of Jif.
-
+</p>
 
 <p>An <i>actsfor</i> statement allows the runtime comparison of principals. It has the following form: 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 if (P1 actsfor P2) { 
     ... 
 } 
 else { 
     ... 
 }
-</pre></div></td></tr></table>
+</pre></div>
  
 
 <p>If the principal <code>P1</code> can act for the principal
@@ -899,7 +938,7 @@ checking of the <code>then</code> branch, it is assumed that the
 principal <code>P1</code> can act for the principal
 <code>P2</code>. Thus, the following code compiles correctly.
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 void m(int{Alice: pr} i, principal{} pr) {
     int{Alice: Bob} x;
     if (Bob actsfor pr) {
@@ -909,10 +948,12 @@ void m(int{Alice: pr} i, principal{} pr) {
         x = 0;
     }
 }
-</pre></div></td></tr></table>
+</pre></div>
 
 
+<p class="cont">
 Note that this construct replaces the <code>actsfor { ... } else { ... }</code> construct that existed in previous versions of Jif.
+</p>
 
 <h4><a name="user-defined-principals"></a>User-defined principals</h4>
 
@@ -928,7 +969,7 @@ cast to the type <code>principal</code>, and vice-versa.
 <p>The interface <code>jif.lang.Principal</code> is defined
 as follows:
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<div class="code"><pre>
 public interface Principal {
     String name();
     boolean delegatesTo(principal p);
@@ -940,7 +981,7 @@ public interface Principal {
     Principal{this;p}[] findChainUpto{p;this}(Principal p);
     Principal{this;q}[] findChainDownto{q;this}(Principal q);
 }
-</pre></div></td></tr></table>
+</pre></div>
 
 <p>The method <code>name()</code> returns the name of the
 principal. The <code>equals(Principal p)</code> method is used to
