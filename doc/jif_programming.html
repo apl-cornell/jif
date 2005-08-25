@@ -311,7 +311,7 @@ an issue for concurrent programming languages. Jif does not support
 the Java thread model for concurrent programming.
 </p>
 
-<h3>Method declarations</h3>
+<h3><a name="method-decls">Method declarations</a></h3>
 <p>
 The syntax of a Jif method
 declaration has some extensions
@@ -461,7 +461,7 @@ method return label.
 </li>
 </ul>
 
-<h3><a name="access-control"></a>Access control</h3>
+<h3><a name="access-control"></a>Authority and access control</h3>
 
 <p>
 A method executes with some
@@ -491,6 +491,67 @@ The static authority of a method may be augmented by testing the
 principal hierarchy dynamically, using the
 <code>actsfor</code> test.
 </p>
+
+<h4><a name="declassification">Declassification</a></h3>
+
+<p>
+A program can use its authority to declassify information according to
+the the decentralized label model. Declassification weakens
+the policies restricting how the information can be used. It
+provides an escape hatch from strict information flow
+control, which is important for writing realistic programs.
+Importantly, the use of declassification is mediated by the
+static authority of the program.
+</p>
+
+<p>
+The expression <code>declassify(<i>e</i>,
+<i>L</i><sub>1</sub>, <i>L</i><sub>2</sub>)</code>
+relabels the result of an expression <code><i>e</i></code>
+from the initial label <code><i>L</i><sub>1</sub></code> to
+the label <code><i>L</i></code><sub>2</sub>.
+Declassification is checked statically, using the static
+authority at the point of declassification. The
+<code>declassify</code> expression
+may relax only the policies owned by principals in the static authority.
+It is also possible to omit the label
+<code><i>L</i><sub>1</sub></code> in the expression, though
+this form is deprecated.
+</p>
+
+<p>
+A program also can use its authority to declassify the program-counter
+label. This functionality is provided by the Jif statement
+<code>declassify(<i>L</i>) <i>S</i></code>,
+which executes the statement <code><i>S</i></code>
+using the program-counter label <code><i>L</i></code>.
+This form of declassification is
+also checked statically. For example, the following is an example of
+a <code>declassify</code> statement.
+<div class="code"><pre>
+int b;
+int y = 0;
+if (b) {
+    declassify ({y}) y = 1;
+}
+</pre></div>
+</p>
+
+<p>
+Assuming that the label of <code>y</code> is not more restrictive than
+the label of <code>b</code>, this program declassifies the implicit flow
+from <code>b</code> into <code>y</code>. For the duration of
+the assignment into <code>y</code>,
+the program-counter label is relaxed until it is no more restrictive than
+<code>y</code> itself.  The legitimacy of the declassification is 
+statically checked using the label of <code>y</code> and the static authority
+of the program at this point. Note that the labels of
+<code>b</code> and <code>y</code> are
+both automatically inferred in this example; these automatically inferred
+labels are not a problem for checking declassification statically.
+</p>
+
+<h4><a name="authority-decls">Authority declarations</a></h4>
 
 <p>
 There are two ways for method code to acquire authority. First, the
@@ -533,6 +594,15 @@ method.
 </div>
 
 <p>
+A final annotation for method declarations is a clause of
+the form <code>where <i>p</i> actsfor <i>q</i></code>. When
+this clause is present, the method can be called only from a
+context where the specified relationship can be statically
+determined to hold. The body of the method is checked under
+the assumption that the specified relationship does hold.
+</p>
+
+<p>
 These mechanisms can be used to implement access control
 security within a program and are similar in expressiveness
 to the Java stack inspection mechanism, while avoiding the
@@ -542,11 +612,99 @@ it also controls information flow.
 </p>
 
 
-<h3>Polymorphism</h3>
 
-<h4>Label polymorphism</h>
-<h4>Parameterized classes</h>
-<h4>Principal polymorphism</h>
+
+<h3><a name="polymorphism">Polymorphism</a></h3>
+
+<h4><a name="method-polymorphism"></a>Method polymorphism</h4>
+
+<p>Methods in Jif are polymorphic in the labels of the
+arguments, facilitating their reuse. For example, in the following method
+signature, the method <code>m</code> returns a <code>String</code> whose
+label is the same as the label of the argument <code>a</code>.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+String{a} m(int{Alice: ; Bob:} a);
+</pre></div></td></tr></table>
+ 
+
+<p>The label on the declaration of the argument <code>a</code> is
+<code>{Alice: ; Bob:}</code>. This means that the label of any actual
+argument given to <code>m</code> can be <i>at most</i> as restrictive
+as <code>{Alice: ; Bob:}</code>, that is, <code>{Alice: ; Bob:}</code> is an
+upper bound on the label of any actual argument to <code>m</code>. The
+following code that calls the method <code>m</code> compiles
+successfully.
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+int{Alice: Chuck} i = 42;
+String{Alice: Chuck} s = m(i);
+    <span class="comment">// OK: m returns a String with the same label as i</span>
+</pre></div></td></tr></table>
+ 
+
+<p>In the body of the method <code>m</code>, all that is known about
+the label of the formal argument <code>a</code> is that <code>{Alice:
+; Bob:}</code> is an upper bound for it. Thus, the first line of the method body below is illegal, while the second is legal.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+String{a} m(int{Alice: ; Bob:} a) {
+    int{Alice:} i = a; <span class="comment">// ILLEGAL!  Don't know that {a} <= {Alice:}</span>
+    int{Alice: ; Bob: ; Chuck: } j = a; <span class="comment">// OK</span>
+    ...
+}
+</pre></div></td></tr></table>
+ 
+
+<p>The labels of arguments given to a method are not represented at
+runtime. That is, within a method body, there is no runtime
+representation of labels of the arguments. The following code is thus illegal.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+void foo(int{Bob:} a) {
+    label lb = new label {Alice: ; a}; <span
+    class="comment">// ILLEGAL! Label of a is not runtime representable.</span>
+
+    if (new label {a} &lt;= new label {Bob: Chuck}) { <span class="comment">// ILLEGAL! Label of a is not runtime representable.</span> }
+    ....
+}
+</pre></div></td></tr></table>
+ 
+
+<p>If no label is specified for a formal argument, then it is assumed
+that there are no restrictions on the labels of the actual arguments
+that may be passed in. See the section on <a
+href="#default-labels">default labels</a>.
+
+<h4><a name="parameterized-classes"></a>Parameterized classes</h4> 
+
+<p>A parameterized class is generic with respect to some set of type
+parameters. Jif allows classes to be parameterized on labels and
+principals. The key difference between parameterized classes in this
+version of Jif, and as described in Andrew Myers' thesis, is that
+class parameters are represented at runtime. Thus, the following code,
+which uses the parameters <code>L</code> and <code>P</code> at runtime, 
+is permitted.  
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+class C[label L, principal P] {
+    private final label{this} lb = L;         <span class="comment">// runtime use of L</span>
+
+    private void m() {
+        label foo = new label {L; Alice:};    <span class="comment">// runtime use of L</span>
+        principal bar = P;                    <span class="comment">// runtime use of P</span>
+    }
+}
+</pre>
+</div></td></tr></table>
+
+
+<p>Note that the label of a parameter is the label
+<code>{this}</code>. That is, the information that may be conveyed by
+knowing the runtime value of a parameter is the same as the
+information that may be conveyed by the reference to this
+object. Thus, if the label of the final field <code>lb</code> in the
+example above was not at least as restrictive as the label
+<code>{this}</code>, the example would not compile.
 
 <h3><a name="dynamic-labels"></a>Dynamic labels and principals</h3>
 
@@ -673,96 +831,7 @@ class D {
 </div></td></tr></table>
 
 
-<h3><a name="parameterized-classes"></a>Parameterized classes</h3> 
-
-<p>A parameterized class is generic with respect to some set of type
-parameters. Jif allows classes to be parameterized on labels and
-principals. The key difference between parameterized classes in this
-version of Jif, and as described in Andrew Myers' thesis, is that
-class parameters are represented at runtime. Thus, the following code,
-which uses the parameters <code>L</code> and <code>P</code> at runtime, 
-is permitted.  
-
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
-class C[label L, principal P] {
-    private final label{this} lb = L;         <span class="comment">// runtime use of L</span>
-
-    private void m() {
-        label foo = new label {L; Alice:};    <span class="comment">// runtime use of L</span>
-        principal bar = P;                    <span class="comment">// runtime use of P</span>
-    }
-}
-</pre>
-</div></td></tr></table>
-
-
-<p>Note that the label of a parameter is the label
-<code>{this}</code>. That is, the information that may be conveyed by
-knowing the runtime value of a parameter is the same as the
-information that may be conveyed by the reference to this
-object. Thus, if the label of the final field <code>lb</code> in the
-example above was not at least as restrictive as the label
-<code>{this}</code>, the example would not compile.
-
-<h3><a name="method-polymorphism"></a>Method polymorphism</h3>
-
-<p>Methods in Jif are parametric in the labels of the arguments. This
-facilitates reuse of methods. For example, in the following method
-signature, the method <code>m</code> returns a <code>String</code> whose
-label is the same as the label of the argument <code>a</code>.
-
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
-String{a} m(int{Alice: ; Bob:} a);
-</pre></div></td></tr></table>
- 
-
-<p>The label on the declaration of the argument <code>a</code> is
-<code>{Alice: ; Bob:}</code>. This means that the label of any actual
-argument given to <code>m</code> can be <i>at most</i> as restrictive
-as <code>{Alice: ; Bob:}</code>, that is, <code>{Alice: ; Bob:}</code> is an
-upper bound on the label of any actual argument to <code>m</code>. The
-following code that calls the method <code>m</code> compiles
-successfully.
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
-int{Alice: Chuck} i = 42;
-String{Alice: Chuck} s = m(i); <span class="comment">// OK, since m returns a String with the same label as i</span>
-</pre></div></td></tr></table>
- 
-
-<p>In the body of the method <code>m</code>, all that is known about
-the label of the formal argument <code>a</code> is that <code>{Alice:
-; Bob:}</code> is an upper bound for it. Thus, the first line of the method body below is illegal, while the second is legal.
-
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
-String{a} m(int{Alice: ; Bob:} a) {
-    int{Alice:} i = a; <span class="comment">// ILLEGAL!  Don't know that {a} <= {Alice:}</span>
-    int{Alice: ; Bob: ; Chuck: } j = a; <span class="comment">// OK</span>
-    ...
-}
-</pre></div></td></tr></table>
- 
-
-<p>The labels of arguments given to a method are not represented at
-runtime. That is, within a method body, there is no runtime
-representation of labels of the arguments. The following code is thus illegal.
-
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
-void foo(int{Bob:} a) {
-    label lb = new label {Alice: ; a}; <span
-    class="comment">// ILLEGAL! Label of a is not runtime representable.</span>
-
-    if (new label {a} &lt;= new label {Bob: Chuck}) { <span class="comment">// ILLEGAL! Label of a is not runtime representable.</span> }
-    ....
-}
-</pre></div></td></tr></table>
- 
-
-<p>If no label is specified for a formal argument, then it is assumed
-that there are no restrictions on the labels of the actual arguments
-that may be passed in. See the section on <a
-href="#default-labels">default labels</a>.
-
-<h3><a name="runtime-tests"></a>Runtime tests of labels and principals</h3>
+<h4><a name="runtime-tests"></a>Runtime tests of labels and principals</h4>
 
 <p>Jif provides a mechanism for comparing runtime labels, and also a
 mechanism for comparing runtime principals. Both mechanisms use a
@@ -837,77 +906,7 @@ void m(int{Alice: pr} i, principal{} pr) {
 
 Note that this construct replaces the <code>actsfor { ... } else { ... }</code> construct that existed in previous versions of Jif.
 
-<h3><a name="static-fields"></a>Static fields</h3>
-
-<p>Static fields of classes are supported in Jif, subject to the following restrictions.
-</p>
-
-<ol>
-<li>If a static field has an initializing
-expression, the expression must contain only constant values. Without
-this restriction, the initializing expression could be used to convey
-information about when the class is loaded (e.g., by calling a
-method), which may depend on sensitive information.</li>
-<li>The label of a static field cannot mention <code>this</code> (as the expression <code>this</code> is not valid in a static context).</li>
-<li>The label of a static field cannot mention any class parameters (as class parameters are specific to an instance of the class).</li>
-</ol>
-</p>
-
-<h3><a name="runtime-exceptions"></a>Runtime exceptions</h3>
-
-<p>In Java, subclasses of <code>RuntimeException</code> (such as
-<code>NullPointerException</code>, <code>ClassCastException</code>,
-and <code>ArrayIndexOutOfBoundsException</code>) are <i>unchecked</i>;
-they may be thrown by a method without being declared in the
-<code>throws</code> clause of the method signature. Unchecked
-exceptions can serve as covert channels. To prevent this covert
-channel, Jif requires subclasses of
-<code>RuntimeException</code> to be checked.
-
-To reduce the additional programming burden of handling runtime
-exceptions, this version of Jif has a simple not-null analysis, which
-tracks whether local variables and final fields of the
-<code>this</code> object are definitely null. Thus, in the following example, the method <code>m(Object, String)</code> cannot throw a
-<code>NullPointerException</code>, and does not need to declare that it does.
-
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
-class C {
-    final String{} f = "a string";
-    C another;
-    
-    void m(Object{} o, String{} s) {
-        if (s != null) {
-            return;
-        }
-        s.length(); <span class="comment">// OK, s known to be not-null</span>
-        if (o instanceof String) {
-            try { 
-                ((String)o).length();
-		    <span class="comment">// OK, if instanceof succeeds, o is not-null</span>
-            }
-            catch (ClassCastException e) { 
-                // still need to catch the ClassCastException
-            }
-            
-        }
-        if (f != null) { 
-            f.length(); // OK, f is final field of this.
-        }
-        if (another.f != null) { 
-            try {
-                f.length(); 
-            }
-            catch (NullPointerException e) { 
-		<span class="comment">// still need to catch the NPE, as we cannot reason
-                // about fields of objects other than this.</span>
-            }
-        }
-    }
-}
-</pre></div></td></tr></table>
- 
-
-<h3><a name="user-defined-principals"></a>User-defined principals</h3>
+<h4><a name="user-defined-principals"></a>User-defined principals</h4>
 
 <p>Jif provides an open-ended mechanism to allow applications written in
 Jif to define their own principals. The Jif interface <a
@@ -989,9 +988,80 @@ external principals in a similar way. See the <a
 href="../tests/README">README</a> file in $JIF/tests for more
 information about creating external principals.
 
+
+<h3><a name="static-fields"></a>Static fields</h3>
+
+<p>Static fields of classes are supported in Jif, subject to the following restrictions.
+</p>
+
+<ol>
+<li>If a static field has an initializing
+expression, the expression must contain only constant values. Without
+this restriction, the initializing expression could be used to convey
+information about when the class is loaded (e.g., by calling a
+method), which may depend on sensitive information.</li>
+<li>The label of a static field cannot mention <code>this</code> (as the expression <code>this</code> is not valid in a static context).</li>
+<li>The label of a static field cannot mention any class parameters (as class parameters are specific to an instance of the class).</li>
+</ol>
+</p>
+
+<h3><a name="runtime-exceptions"></a>Runtime exceptions</h3>
+
+<p>In Java, subclasses of <code>RuntimeException</code> (such as
+<code>NullPointerException</code>, <code>ClassCastException</code>,
+and <code>ArrayIndexOutOfBoundsException</code>) are <i>unchecked</i>;
+they may be thrown by a method without being declared in the
+<code>throws</code> clause of the method signature. Unchecked
+exceptions can serve as covert channels. To prevent this covert
+channel, Jif requires subclasses of
+<code>RuntimeException</code> to be checked.
+
+To reduce the additional programming burden of handling runtime
+exceptions, this version of Jif has a simple not-null analysis, which
+tracks whether local variables and final fields of the
+<code>this</code> object are definitely null. Thus, in the following example, the method <code>m(Object, String)</code> cannot throw a
+<code>NullPointerException</code>, and does not need to declare that it does.
+
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+class C {
+    final String{} f = "a string";
+    C another;
+    
+    void m(Object{} o, String{} s) {
+        if (s != null) {
+            return;
+        }
+        s.length(); <span class="comment">// OK, s known to be not-null</span>
+        if (o instanceof String) {
+            try { 
+                ((String)o).length();
+		    <span class="comment">// OK, if instanceof succeeds, o is not-null</span>
+            }
+            catch (ClassCastException e) { 
+                // still need to catch the ClassCastException
+            }
+            
+        }
+        if (f != null) { 
+            f.length(); // OK, f is final field of this.
+        }
+        if (another.f != null) { 
+            try {
+                f.length(); 
+            }
+            catch (NullPointerException e) { 
+		<span class="comment">// still need to catch the NPE, as we cannot reason
+                // about fields of objects other than this.</span>
+            }
+        }
+    }
+}
+</pre></div></td></tr></table>
+ 
+
 <h2><a name="java">Interacting with Java</a></h2>
 
-<h3><a name="main"></a>The <code>main<code> method</h3>
+<h3><a name="main"></a>The <code>main</code> method</h3>
 
 <p>Jif provides two possible signatures for the main method of a
 class. The first is compatible with the signature for Java main
@@ -1013,7 +1083,10 @@ public static void main(principal p, String[] args) { ... }
 may optionally have the authority of the current user:
 
 <table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
-public static void main(principal p, String[] args) where caller(p)  { ... }
+public static void main(principal p, String[] args) where caller(p)
+{
+    ...
+}
 </pre></div></td></tr></table>
 
 <h3><a name="java-classes"></a>Interacting with Java classes</h3>
@@ -1102,10 +1175,11 @@ class Implicit {
 
 Trying to compile this program produces the following output:
 
-<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
+<table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div
+class="code"><pre width=80>
 $ $JIF/bin/jifc Implicit.jif
-Implicit.jif:6: Label of right hand side not less restrictive than the label
-    for local variable l
+Implicit.jif:6: Label of right hand side not less restrictive
+    than the label for local variable l
                 l = true;
                 ^
 
@@ -1150,7 +1224,7 @@ evaluation of the right hand side of the assignment, and that for this
 assignment, that label is <code>{h}</code>, the label of the actual argument <code>h</code>.
 
 
-<h3><a name="report"></a>Reporting</h3>
+<h3><a name="report"></a>Detailed reporting</h3>
 
 <p>Sometimes the additional information provided by the <code>-explain</code> option
 is not sufficient to determine why a Jif program fails to

@@ -24,7 +24,7 @@ ol {
     width: 80ex
 }
 .code {
-      width: 80ex;
+      width: 90ex;
       font-family: Courier New, courier, fixed;
       font-size: 90%;
       background-color: rgb(230,230,230);
@@ -37,7 +37,7 @@ ol {
 }
 
 span.comment {
-    color: rgb(100,0,0)
+    color: rgb(150,0,0)
 }
 
 h1 { font-family: sans-serif }
