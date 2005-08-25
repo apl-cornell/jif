@@ -1,5 +1,8 @@
 package jif.lang;
 
+/**
+ * See the doucmentation for the Jif source file, $JIF/sig-src/jif/lang/Principal.jif.
+ */
 public interface Principal {
     String name();
     

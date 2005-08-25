@@ -1,5 +1,8 @@
 package jif.lang;
 
+/**
+ * See the doucmentation for the Jif source file, $JIF/sig-src/jif/lang/Principal.jif.
+ */
 public abstract class Principal_JIF_IMPL {
     public static boolean jif$Instanceof(final Object o) {
         if (o instanceof Principal) { Principal c = (Principal) o; }
