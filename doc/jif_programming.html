@@ -227,7 +227,7 @@ boolean expression <code>p actsfor
 q</code> evaluates to <code>true</code>
 if the
 specified relationship exists. Within the body of an <code>if</code>
-statement conditioned on this test, the compiler makes use of
+statement conditioned on this test (see <a href="#runtime-tests">below</a>), the compiler makes use of
 the knowledge that the relationship exists when checking
 information flows and comparing security policies.
 </p>
@@ -303,8 +303,9 @@ which the program counter depends.
 A related issue is the transmission of information through
 the termination or non-termination of a program.
 Consider the execution of a <code>while</code> statement
-<code>while (h != 0) {}</code>.
+<code>while (h != 0) { ... }</code>.
 According to the Jif type system,
+assuming that initially <u>pc</u>=<code>{}</code>, then
 after the statement terminates, <u>pc</u>=<code>{}</code>, using the
 same reasoning as for the <code>if</code> statement. This
 labeling might seem strange, because we
@@ -353,6 +354,7 @@ public class Vector[label L] extends AbstractList[L] {
     public Vector() ...
     public Object elementAt(int i):{L; i}
 	            throws (IndexOutOfBoundsException) {
+        ...
 	return elements[i];
     }
     public void setElementAt{L}(Object{} o, int{} i) ...
@@ -367,7 +369,7 @@ This code provides several examples of Jif method
 declarations. The class is generic with respect to a label 
 parameter <code>L</code>, permitting Vectors to be used to
 store information of any one desired label. (Parametric
-polymorphism over labels is discussed later).
+polymorphism over labels is discussed <a href="#parameterized-classes">later</a>).
 </p>
 
 <p>
@@ -460,7 +462,7 @@ returned by a method is the result of computation on all of its
 arguments.
 </li>
 
-<li> Default declared exception label: the method return label
+<li> Default declared exception label: the method return label.
 <br>
 A method may declare that it throws certain exceptions; if an
 exception is declared to be thrown, but no label is given for that
@@ -576,6 +578,13 @@ principal <code>referee</code>:
 
 <div class="code"><pre>class Game authority(referee) {
     void start() where authority(referee) {
+	<span class="comment">// this entire method body has the authority of referee</span>
+	...
+    }
+
+    void halftimeShow() {
+	<span class="comment">// this method body does not have the authority of referee
+	// (no "where authority" clause)</span>
 	...
     }
 }
@@ -595,6 +604,7 @@ method.
 
 <div class="code"><pre>
     void m(principal p) where caller(p) {
+	<span class="comment">// this method body has the authority of the dynamic principal p</span>
 	...
     }
 }
@@ -799,7 +809,8 @@ new labels and types. in fact, any <i>final access path</i> expression
 may be used. A final access path expression is an expression of the
 form <i>r.f<sub>1</sub>.f<sub>2</sub>. ... .f<sub>n</sub></i>, where <i>r</i> is either a final local
 variable, or the expression <code>this</code>, and each
-<i>f<sub>i</sub></i> is an access to a final field. Thus, the following are all examples of legal uses of dynamic labels.
+<i>f<sub>i</sub></i> is an access to a final field. Thus, the following are all examples of legal uses of dynamic labels
+and principals.
 
 <div class="code"><pre>
 class C[label L, principal P] {
@@ -1012,12 +1023,12 @@ password, or a certificate, or some other capability.
 $JIF/sig-src/jif/lang/Closure.java) is code that needs the authorty of
 the principal P to execute, and whose side effects are bounded below
 by L. To execute a closure, a <code>Capability</code> (see
-$JIF/sig-src/jif/lang/Closure.java) is required. A capability can only
+$JIF/sig-src/jif/lang/Capability.java) is required. A capability can only
 be obtained by calling the method
 <code>jif.lang.PrincipalUtil.authorize(principal p, Object authPrf,
 Closure[p, lb] c, label lb)</code>, which returns a Capability to
 execute the closure if the method <code>isAuthorized(authPrf, c,
-lb)</code> of the principal <code>p</code> returns true, and null
+lb)</code> called with receiver principal <code>p</code> returns true, and null
 otherwise.
 
 
@@ -1076,7 +1087,8 @@ channel, Jif requires subclasses of
 To reduce the additional programming burden of handling runtime
 exceptions, this version of Jif has a simple not-null analysis, which
 tracks whether local variables and final fields of the
-<code>this</code> object are definitely null. Thus, in the following example, the method <code>m(Object, String)</code> cannot throw a
+<code>this</code> object are definitely not-null. Thus, in the following 
+example, the method <code>m(Object, String)</code> cannot throw a
 <code>NullPointerException</code>, and does not need to declare that it does.
 
 <table><tr><td>&nbsp;&nbsp;&nbsp;</td><td><div class="code"><pre>
@@ -1095,12 +1107,12 @@ class C {
 		    <span class="comment">// OK, if instanceof succeeds, o is not-null</span>
             }
             catch (ClassCastException e) { 
-                // still need to catch the ClassCastException
+                <span class="comment">// still need to catch the ClassCastException</span>
             }
             
         }
         if (f != null) { 
-            f.length(); // OK, f is final field of this.
+            f.length(); <span class="comment">// OK, f is final field of this.</span>
         }
         if (another.f != null) { 
             try {
@@ -1133,7 +1145,7 @@ following:
 class B extends A {
     final principal p;
     String {p:} name;
-    B(principal q, String{q:} n) {
+    B(principal{} q, String{q:} n) {
 	p = q;
 	super(n);
 	name = n;
@@ -1142,12 +1154,24 @@ class B extends A {
 </pre></div>
 
 <p>
-Because of the assignment from <code>q</code> to
-<code>p</code>, the Jif compiler knows that these
+Note that there is an assignment from <code>n</code> (with label 
+<code>{q:}</code>) to the field <code>name</code> (with label 
+<code>{p:}</code>). The assignment is permitted because
+the Jif compiler knows from the assignment <code>p=q</code> that these
 principals are equal and uses this fact to determine that
 the assignment from <code>n</code> to <code>name</code> is
-secure.
+secure. In generally, the Jif compiler can only perform this kind of 
+reasoning for final fields of type <code>label</code> or 
+<code>principal</code> that are initialized in a constructor, and 
+final local variables of type <code>label</code> or 
+<code>principal</code> with an initializing expression.
 </p>
+
+<h4><a name="unsupported-java">Unsupported Java features</a></h4> 
+
+Jif does not currently support nested classes, or 
+initializer blocks.
+
 
 <h2><a name="java">Interacting with Java</a></h2>
 
@@ -1178,6 +1202,8 @@ public static void main(principal p, String[] args) where caller(p)
     ...
 }
 </pre></div></td></tr></table>
+
+A class may have at most one static method named <code>main</code>.
 
 <h3><a name="java-classes"></a>Interacting with Java classes</h3>
 
@@ -1304,7 +1330,7 @@ Implicit.jif:6: Unsatisfiable constraint:
 <p>The more detailed error message first shows what the symbolic
 unsatisfiable constraint is (<code>rhs.nv <= label of var l</code>), and then
 shows the same constraints with the actual labels substituted for the
-symbols (<code>{h} <= {}</code>). The label environment in which the constraint
+symbols (<code>{h} <= {lbl}</code>). The label environment in which the constraint
 must be satisfied is also shown. Here, the environment indicates that
 the value held in the label variable <code>lbl</code> is bounded above by the label
 <code>{Alice:}</code>. Brief descriptions of the labels that appear in the
@@ -1330,15 +1356,15 @@ example:
 $ $JIF/bin/jifc Implicit.jif -report debug=1 -explain
 Implicit.jif:6: Unsatisfiable constraint:
      rhs.nv <= label of var l
-        {<arg h {<dynamic lbl>}>} <= {<arg lbl {}>}
+        {&lt;arg h {&lt;dynamic lbl>}>} <= {&lt;arg lbl {}>}
      in environment
-     [{<dynamic lbl>} <= {<pr-external Alice>: }]
+     [{&lt;dynamic lbl>} <= {&lt;pr-external Alice>: }]
 
      Label Descriptions
      ------------------
      - rhs.nv = label of successful evaluation of right hand of assignment
-     - rhs.nv = {<arg h {<dynamic lbl>}>}
-     - label of var l = {<arg lbl {}>}
+     - rhs.nv = {&lt;arg h {&lt;dynamic lbl>}>}
+     - label of var l = {&lt;arg lbl {}>}
 
      More information is revealed by the successful evaluation of the right
     hand side of the assignment than is allowed to flow to the local variable
