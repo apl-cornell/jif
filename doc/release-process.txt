@@ -4,3 +4,7 @@
 4. Run  "ant dist"
 5. Copy polyglot.jar, JFlex.jar and java_cup.jar into the distribution's lib directory
 6. Tar it all up
+7. Publish files $JIF/doc/jifdoc.css and $JIF/doc/web/* on the web, at 
+   http://www.cs.cornell.edu/jif/doc/jif-x.x.x/. (There is a link to the
+   reference manual from $JIF/doc/index.html.)
+
