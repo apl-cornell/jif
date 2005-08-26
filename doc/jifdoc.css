@@ -16,6 +16,10 @@ ul {
     width: 75ex;
     font-size: 100%;
 }
+.toc ul {
+    padding-left: 1.5ex; 
+    width: auto;
+}
 p.cont {
     text-indent: 0ex;
 }
