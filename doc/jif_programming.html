@@ -1275,7 +1275,7 @@ class C {
 <h4><a name="constructors">Final field initialization</a></h4> 
 
 <p>
-In Java, it is possible to observe the final fields before
+In Java, it is possible to observe final fields of an object before
 they have been initialized. This is not acceptable in Jif,
 where final fields of type <code>label</code> or
 <code>principal</code> may define the security requirements
@@ -1298,17 +1298,22 @@ class B extends A {
 }
 </pre></div>
 
+<p class="cont">The assignment to the field <code>p</code> must occur
+before the call to <code>super</code>. In fact, in Java no code may
+precede the call to <code>super</code>.
+</p>
+
 <p>
-Note that there is an assignment from <code>n</code> (with label 
+Note that this example has an assignment from <code>n</code> (with label 
 <code>{q:}</code>) to the field <code>name</code> (with label 
 <code>{p:}</code>). The assignment is permitted because
 the Jif compiler knows from the assignment <code>p=q</code> that these
-principals are equal and uses this fact to determine that
+principals are equal. It uses this fact to determine that
 the assignment from <code>n</code> to <code>name</code> is
-secure. In generally, the Jif compiler can only perform this kind of 
-reasoning for final fields of type <code>label</code> or 
+secure. In general, the Jif compiler can perform this kind of 
+reasoning only for final fields of type <code>label</code> or 
 <code>principal</code> that are initialized in a constructor, and 
-final local variables of type <code>label</code> or 
+for final local variables of type <code>label</code> or 
 <code>principal</code> with an initializing expression.
 </p>
 
