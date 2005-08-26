@@ -3,7 +3,7 @@ Jif Change Log
 
 This file documents changes between releases of Jif.
 
-2005-07-19    Jif 2.0.0
+2005-08-26    Jif 2.0.0
     * Class parameters now represented at runtime.
     * Dynamic labels and principals more expressive: now allow access paths.
     * Allow user-defined principals.
