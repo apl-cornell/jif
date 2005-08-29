@@ -32,7 +32,7 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
     public boolean isCovariant() { return true; }
     public boolean isComparable() { return true; }
     public boolean isCanonical() { return paramInstance.isCanonical(); }
-    public boolean isDisambiguated() { return isCanonical(); }
+    protected boolean isDisambiguatedImpl() { return isCanonical(); }
     public boolean isEnumerable() { return true; }
     
     public int hashCode() {

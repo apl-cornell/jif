@@ -25,7 +25,7 @@ public class UnknownLabel_c extends Label_c implements UnknownLabel
     public boolean isComparable() { return false; }
     public boolean isEnumerable() { return false; }
     public boolean isCanonical() { return false; }
-    public boolean isDisambiguated() { return false; }     
+    public boolean isDisambiguatedImpl() { return false; }     
     public boolean isCovariant() { return false; }
     public boolean isRuntimeRepresentable() { return false; }
     

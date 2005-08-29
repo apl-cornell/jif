@@ -36,7 +36,7 @@ public class JifContext_c extends Context_c implements JifContext
 	super(ts);
         this.jlts = jlts;
         this.jifts = ts;
-        this.env = new LabelEnv_c();
+        this.env = new LabelEnv_c(ts);
     }
 
     public Object copy() {

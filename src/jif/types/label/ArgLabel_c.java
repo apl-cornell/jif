@@ -41,8 +41,8 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     public boolean isCovariant() { return false; }
     public boolean isComparable() { return true; }
     public boolean isCanonical() { return true; }
-    public boolean isDisambiguated() { return upperBound != null && upperBound.isDisambiguated(); }
     public boolean isEnumerable() { return true; }
+    protected boolean isDisambiguatedImpl() { return upperBound != null; }
     
     public boolean equalsImpl(TypeObject o) {
         if (! (o instanceof ArgLabel_c)) {
@@ -79,9 +79,9 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     }
 
     public boolean leq_(Label L, LabelEnv env) {
-        // all we know about the arg label is that an upperbound is upperBound().
-        // So the arg label is less than L if the upper bound is less than L.
-        return env.leq(upperBound(), L);
+        // Should not recurse here, but allow the Label Env to do the recursion
+        // on upperBound(), to avoid infinite loops.
+        return false;
     }
  
     public Label subst(LabelSubstitution substitution) throws SemanticException {

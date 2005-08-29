@@ -52,14 +52,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return true;
     }
     
-    public boolean isDisambiguated() {
-        for (Iterator i = components.iterator(); i.hasNext(); ) {
-            Label c = (Label) i.next();
-            
-            if (! c.isDisambiguated()) {
-                return false;
-            }
-        }       
+    protected boolean isDisambiguatedImpl() {
         return true;
     }
     /**

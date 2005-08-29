@@ -40,7 +40,7 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
         return true;
     }
     public boolean isCanonical() { return true; }
-    public boolean isDisambiguated() { return isCanonical(); }
+    protected boolean isDisambiguatedImpl() { return isCanonical(); }
     public boolean isEnumerable() {
         return true;
     }

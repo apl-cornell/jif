@@ -24,7 +24,7 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
     public boolean isCovariant() { return true; }
     public boolean isComparable() { return true; }
     public boolean isCanonical() { return true; }
-    public boolean isDisambiguated() { return true; }
+    public boolean isDisambiguatedImpl() { return true; }
     public boolean isEnumerable() { return true; }
     
     public JifClassType classType() {

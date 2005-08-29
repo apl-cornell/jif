@@ -56,6 +56,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	ActsFor17.jif (Semantic, "Non-final local variable"),
 		      (Semantic, "Non-final local variable");
 	ArgLabel1.jif ;
+	ArgLabel2.jif ;
 	ArgLabelSubst.jif ;
 	ArgLabelSubst2.jif ;
 	Array.jif ;

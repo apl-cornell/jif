@@ -3,6 +3,7 @@ package jif.types;
 import java.util.*;
 
 import jif.types.hierarchy.LabelEnv;
+import jif.types.hierarchy.LabelEnv_c;
 import jif.types.label.*;
 import jif.types.principal.*;
 import polyglot.ext.jl.types.PrimitiveType_c;
@@ -19,6 +20,8 @@ public class JifTypeSystem_c
     extends ParamTypeSystem_c
     implements JifTypeSystem {
     private final TypeSystem jlts;
+
+    private final LabelEnv emptyLabelEnv = new LabelEnv_c(this);
 
     private final DefaultSignature ds;
 

@@ -4,6 +4,7 @@ import java.util.*;
 
 import jif.translate.*;
 import jif.types.*;
+import jif.types.principal.Principal;
 import polyglot.ast.Expr;
 import polyglot.ext.jl.types.TypeObject_c;
 import polyglot.types.*;
@@ -110,6 +111,33 @@ public abstract class Label_c extends TypeObject_c implements Label {
             return this;
         else
             return (Label)components().toArray()[0];
+    }
+    
+    /**
+     * Check if the label is disambiguated, without recursing into child labels.
+     */
+    protected abstract boolean isDisambiguatedImpl();
+    
+    public final boolean isDisambiguated() {
+        final boolean[] result = new boolean[1];
+        result[0] = true;
+        try {
+            this.subst(new LabelSubstitution() {
+                public Label substLabel(Label L) throws SemanticException {
+                    if (result[0] && L instanceof Label_c) {
+                        result[0] = ((Label_c)L).isDisambiguatedImpl();
+                    }
+                    return L;
+                }
+                public Principal substPrincipal(Principal p) throws SemanticException {
+                    return p;
+                }    
+      });
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected semantic exception", e);
+        }
+        return result[0];
     }
 
     /**

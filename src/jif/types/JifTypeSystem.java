@@ -15,8 +15,6 @@ import polyglot.util.Position;
  */
 public interface JifTypeSystem extends ParamTypeSystem
 {
-    static final LabelEnv emptyLabelEnv = new LabelEnv_c();
-
     // Type constructors
 
     /** Returns the "label" type. */

@@ -15,6 +15,7 @@ public class LabelEnv_c implements LabelEnv
 {
     private final PrincipalHierarchy ph;
     private final List assertions;
+    private JifTypeSystem ts;
     private Solver solver;
     
     /**
@@ -22,15 +23,19 @@ public class LabelEnv_c implements LabelEnv
      */
     private boolean hasVariables;
     
-    public LabelEnv_c() {
-        this(new PrincipalHierarchy(), new LinkedList(), false);
+    public LabelEnv_c(JifTypeSystem ts) {
+        this(ts, new PrincipalHierarchy(), new LinkedList(), false);
     }
-    private LabelEnv_c(PrincipalHierarchy ph, List assertions, boolean hasVariables) {
+    private LabelEnv_c() {
+        this(null);
+    }
+    private LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph, List assertions, boolean hasVariables) {
         this.ph = ph;
         this.assertions = assertions;
         this.hasVariables = false;
         this.solver = null;        
         this.hasVariables = hasVariables;
+        this.ts = ts;
     }
     
     public void setSolver(Solver s) {
@@ -63,7 +68,7 @@ public class LabelEnv_c implements LabelEnv
             // cmp is less than L2. However, if it has variables, we
             // need to add it regardless.
             if (cmp.hasVariables() || L2.hasVariables() || !(this.leq(cmp, L2, false, new HashSet()))) {
-                assertions.add(new LabelLeAssertion_c(cmp, L2));
+                assertions.add(new LabelLeAssertion_c(ts, cmp, L2));
                 if (!this.hasVariables && (cmp.hasVariables() || L2.hasVariables())) {
                     // at least one assertion in this label env has a variable.
                     this.hasVariables = true;
@@ -73,7 +78,7 @@ public class LabelEnv_c implements LabelEnv
     }
     
     public LabelEnv copy() {
-        return new LabelEnv_c(ph.copy(), new LinkedList(assertions), hasVariables);
+        return new LabelEnv_c(ts, ph.copy(), new LinkedList(assertions), hasVariables);
     }
     
     public boolean leq(Label L1, Label L2) {
@@ -109,7 +114,7 @@ public class LabelEnv_c implements LabelEnv
         
         if (L1.isSingleton()) L1 = L1.singletonComponent();
         if (L2.isSingleton()) L2 = L2.singletonComponent();
-        
+
         if (! L1.isComparable() || ! L2.isComparable()) {
             throw new InternalCompilerError("Cannot compare " + L1 +
                                             " with " + L2 + ".");
@@ -146,10 +151,17 @@ public class LabelEnv_c implements LabelEnv
             currentGoals = new HashSet(currentGoals);
             currentGoals.add(newGoal);
         }
-        
         if (L2.isSingleton()) {
             L2 = L2.singletonComponent();
             boolean result = L1.leq_(L2, this);
+            
+            if (result == true) { return true; }
+            
+            if (L1 instanceof ArgLabel) {
+                ArgLabel al = (ArgLabel)L1;
+                // recurse on upper bound.
+                result = leq(al.upperBound(), L2, useAssertions, currentGoals);
+            }
             
             if (result == true || !useAssertions) 
                 return result;
@@ -159,17 +171,17 @@ public class LabelEnv_c implements LabelEnv
                 LabelLeAssertion c = (LabelLeAssertion) i.next();
                 // FIXME: keep check of the visited constraints to avoid
                 // infinite loops.
-                Label cLHS = c.lhs();
+                    Label cLHS = c.lhs();
                 if (cLHS.hasVariables()) 
                     cLHS = this.solver.applyBoundsTo(c.lhs());
-                Label cRHS = c.rhs();
+                    Label cRHS = c.rhs();
                 if (cRHS.hasVariables()) 
                     cRHS = this.solver.applyBoundsTo(c.rhs());
-                
+                    
                 if (leq(L1, cLHS, false, currentGoals) && leq(cRHS, L2, false, currentGoals)) {
-                    return true;
+                        return true;
+                    }                    
                 }
-            }
             
             return false;
         }
@@ -193,6 +205,14 @@ public class LabelEnv_c implements LabelEnv
                 return true;
             }
             
+            if (L1 instanceof ArgLabel) {
+                ArgLabel al = (ArgLabel)L1;
+                // recurse on upper bound.
+                if (leq(al.upperBound(), L2, useAssertions, currentGoals)) {
+                    return true;
+                }
+            }
+
             // haven't been able to prove it yet.
             // Try to use the constraints to show that L1 <= L2, even
             // though L2 is not a singleton. This is useful in cases 

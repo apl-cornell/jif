@@ -9,7 +9,8 @@ public class LabelLeAssertion_c extends TypeObject_c implements LabelLeAssertion
     Label lhs;
     Label rhs;
     
-    public LabelLeAssertion_c(Label lhs, Label rhs) {
+    public LabelLeAssertion_c(JifTypeSystem ts, Label lhs, Label rhs) {
+        super(ts);
 	this.lhs = lhs;
 	this.rhs = rhs;
     }

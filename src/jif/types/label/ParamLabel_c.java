@@ -31,7 +31,7 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
     public boolean isCovariant() { return false; }
     public boolean isComparable() { return true; }
     public boolean isCanonical() { return paramInstance.isCanonical(); }
-    public boolean isDisambiguated() { return isCanonical(); }
+    public boolean isDisambiguatedImpl() { return isCanonical(); }
     public boolean isEnumerable() { return true; }
     public int hashCode() {
         return paramInstance.hashCode();
