@@ -144,7 +144,11 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                         // we are making a super constructor call. Is it
                         // a potentially dangerous one?
                                         
-                        if (ts.isJifClass(ci.container()) &&
+                        if (!ts.isJifClass(ci.container())) {
+                            // the class is not a Jif class, but just a signature
+                            // for a java class. Don't bother throwing any errors.
+                        }
+                        else if (ts.isJifClass(ci.container()) &&
                             !ts.isJifClass(ci.container().superType()) &&
                             ts.hasUntrustedAncestor(ci.container()) == null) {
                             // Not a potentially dangerous super call.
