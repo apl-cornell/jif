@@ -1,13 +1,13 @@
 package jif;
 
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.io.PrintStream;
 import java.io.File;
+import java.io.PrintStream;
+import java.util.*;
+
+import jif.types.Solver;
 import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.main.UsageError;
-import jif.types.Solver;
 
 /**
  * This object encapsulates various polyglot options.
@@ -32,11 +32,20 @@ public class JifOptions extends Options {
       */
      String sigcp = null;
 
+     /**
+      * Additional classpath entries for Jif signatures.
+      */
+     List addSigcp = new ArrayList();
+
       /**
       * The classpath for the Jif runtime library
       */
      String rtcp = null;
 
+     /**
+      * Additional classpath entries for Jif runtime code.
+      */
+     List addRtcp = new ArrayList();
 
     /**
      * Constructor
@@ -81,9 +90,17 @@ public class JifOptions extends Options {
             index++;
             this.sigcp = args[index++];
         }
+        else if (args[index].equals("-addsigcp")) {
+            index++;
+            this.addSigcp.add(args[index++]);
+        }
         else if (args[index].equals("-rtcp")) {
             index++;
             this.rtcp = args[index++];
+        }
+        else if (args[index].equals("-addrtcp")) {
+            index++;
+            this.addRtcp.add(args[index++]);
         }
         else if (args[index].equals("-debug")) {
             index++;
@@ -114,34 +131,44 @@ public class JifOptions extends Options {
         usageForFlag(out, "-stop_constraint <n>", "halt when the nth constraint is added");
         usageForFlag(out, "-globalsolve", "infer label variables globally (default: per class)");
         usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");
+        usageForFlag(out, "-addsigcp <path>", "additional path for Jif signatures; prepended to sigcp");
         usageForFlag(out, "-rtcp <path>", "path for Jif runtime classes");
+        usageForFlag(out, "-addrtcp <path>", "additional path for Jif runtime classes; prepended to rtcp");
     }
 
     public String constructJifClasspath() {
         // use the signature classpath if it exists for compiling Jif classes
-        if (sigcp != null) {
-            return sigcp + File.pathSeparator + constructFullClasspath();
+        String scp = "";
+        for (Iterator iter = addSigcp.iterator(); iter.hasNext(); ) {
+            scp += ((String)iter.next()) + File.pathSeparator;            
         }
-        return constructFullClasspath();
+        if (sigcp != null) {
+            scp += sigcp + File.pathSeparator;
+        }
+        return scp + constructFullClasspath();
     }
 
+    protected String constructRuntimeClassPath() {
+        String rcp = "";
+        for (Iterator iter = addRtcp.iterator(); iter.hasNext(); ) {
+            rcp += ((String)iter.next()) + File.pathSeparator;            
+        }
+        if (rtcp != null) {
+            rcp += rtcp + File.pathSeparator;
+        }
+        return rcp;        
+    }
+    
     public String constructOutputExtClasspath() {
         // use the runtime classpath if it exists for compiling the output classes
         // Note that we do not want to use the signature class path, since it contains
         // labels and principals as primitives.
-        if (rtcp != null) {
-            return rtcp + File.pathSeparator + constructFullClasspath();
-        }
-        return constructFullClasspath();
+        return constructRuntimeClassPath() + constructFullClasspath();
     }
 
     public String constructPostCompilerClasspath() {
-        if (rtcp != null) {
-            return rtcp + File.pathSeparator
-                + super.constructPostCompilerClasspath() + File.pathSeparator
-                + constructFullClasspath();
-        }
-        return super.constructPostCompilerClasspath() + File.pathSeparator
+        return constructRuntimeClassPath() + 
+            super.constructPostCompilerClasspath() + File.pathSeparator
                 + constructFullClasspath();
     }
 
