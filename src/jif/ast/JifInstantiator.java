@@ -418,11 +418,12 @@ public class JifInstantiator
         if (ts.isLabeled(t)) {
             Label newL = instantiate(ts.labelOfType(t), A, receiverExpr, receiverType, receiverLbl, formalArgLabels, actualArgLabels, actualArgExprs, actualParamLabels);
             Type newT = instantiate(ts.unlabel(t), A, receiverExpr, receiverType, receiverLbl, formalArgLabels, actualArgLabels, actualArgExprs, actualParamLabels);
-            t = ts.labeledType(t.position(), newT, newL);
+            return ts.labeledType(t.position(), newT, newL);
         }
-        Type ut = ts.unlabel(t);
-        if (ut instanceof JifSubstType) {
-            JifSubstType jit = (JifSubstType)ut;
+        
+        // t is unlabeled
+        if (t instanceof JifSubstType) {
+            JifSubstType jit = (JifSubstType)t;
             Map newMap = new HashMap();
             boolean diff = false;
             for (Iterator i = jit.entries(); i.hasNext();) {
@@ -446,18 +447,9 @@ public class JifInstantiator
                     diff = true;
             }
             if (diff) {
-                ut = ts.subst(jit.base(), newMap);
+                t = ts.subst(jit.base(), newMap);
             }
         }
-        if (ut != ts.unlabel(t)) {
-            if (ts.isLabeled(t)) {
-                t = ts.labeledType(t.position(), ut, ts.labelOfType(t));
-            }
-            else {
-                t = ut;
-            }
-        }
-
         return t;
     }
     
