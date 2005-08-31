@@ -211,7 +211,7 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
      *
      * @return a set view of the mappings contained in this map.
      */
-    public abstract Set entrySet();
+    public abstract Set[K] entrySet();
 
 
     // Comparison and hashing
