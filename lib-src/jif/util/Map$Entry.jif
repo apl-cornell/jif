@@ -1,0 +1,20 @@
+package jif.util;
+
+interface Map$Entry[label K, label V] {
+
+	JifObject[K]{K} getKey();
+
+	JifObject[V]{V} getValue();
+
+  // Do we need an argument label here?
+	JifObject[V] setValue{V}(JifObject[V]{V} value);
+
+
+  // Not sure about this one: should it be a JifObject instead?
+	boolean{K;V;o} equals(Object o);
+
+
+	int{K;V} hashCode();
+
+}
+

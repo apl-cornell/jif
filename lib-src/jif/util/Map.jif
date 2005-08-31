@@ -1,0 +1,31 @@
+package jif.util;
+/*
+ * Jif Signature for the Map interface
+ *
+ */
+public interface Map[label K, label V] extends JifObject[{K;V}] {
+    // Query Operations
+
+    int{K;V} size();
+
+    boolean{K;V} isEmpty();
+
+    boolean{K;key} containsKey(Object key);
+
+    boolean{V;value} containsValue(Object value);
+    Object{V} get(Object key);
+
+    // Modifying Operations
+    Object{V} put{K;V}(Object{K} key, Object{V} value);
+    Object{V} remove{K;V}(Object{K} key);
+
+    void putAll{K;V}(Map[K,V] t);
+    void clear{K;V}();
+
+    // Views
+    Set{K} keySet();
+    Collection[V]{V} values();
+
+    // Removed, since this uses an inner class
+    Set[{K;V}] entrySet();
+}
