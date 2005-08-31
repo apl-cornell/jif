@@ -6,26 +6,27 @@ package jif.util;
 public interface Map[label K, label V] extends JifObject[{K;V}] {
     // Query Operations
 
-    int{K;V} size();
+    int{K} size();
 
-    boolean{K;V} isEmpty();
+    boolean{K} isEmpty();
 
-    boolean{K;key} containsKey(Object key);
+    boolean{K;key} containsKey(JifObject[K] key);
 
-    boolean{V;value} containsValue(Object value);
-    Object{V} get(Object key);
+    boolean{V;value} containsValue(JifObject[V] value);
+
+    JifObject[V]{V; key} get(JifObject[K] key);
 
     // Modifying Operations
-    Object{V} put{K;V}(Object{K} key, Object{V} value);
-    Object{V} remove{K;V}(Object{K} key);
+    JifObject[V]{V} put{K;V}(Object{K} key, Object{V} value);
+    JifObject[V]{V} remove{K;V}(Object{K} key);
 
     void putAll{K;V}(Map[K,V] t);
     void clear{K;V}();
 
     // Views
-    Set{K} keySet();
-    Collection[V]{V} values();
+    Set[K] keySet();
+    Collection[V] values();
 
     // Removed, since this uses an inner class
-    Set[{K;V}] entrySet();
+    Set[{K;V}] entrySet(); // Set[K] ?
 }
