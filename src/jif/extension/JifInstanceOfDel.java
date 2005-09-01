@@ -31,11 +31,11 @@ public class JifInstanceOfDel extends JifJL_c
             throw new SemanticException("Cannot perform instanceof on a labeled type.", io.position());
         }
 
-        if (!ts.isJifClass(compareType)) {
+        if (!ts.isParamsRuntimeRep(compareType)) {
             if ((compareType instanceof JifSubstType && ((JifSubstType)compareType).entries().hasNext()) ||
                 (compareType instanceof JifPolyType && !((JifPolyType)compareType).params().isEmpty()))                    
-            throw new SemanticException("Cannot perform instanceof on a parameterized " + 
-                                        "Java class, since Java classes do " +
+            throw new SemanticException("Cannot perform instanceof on " + compareType +
+                                        ", since it does " +
                                         "not represent the parameters at runtime.", 
                                         io.position());
         }

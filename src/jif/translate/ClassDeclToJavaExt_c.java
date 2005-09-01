@@ -34,7 +34,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         JifPolyType jpt = (JifPolyType)n.type();
 
         ClassBody cb = n.body();
-        if (rw.jif_ts().isJifClass(jpt)) {
+        if (rw.jif_ts().isParamsRuntimeRep(jpt)) {
             if (!jpt.flags().isInterface()) {
                 // add constructor
                 cb = cb.addMember(produceConstructor(jpt, rw));
@@ -115,11 +115,11 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         // go through the interfaces of cb
         for (Iterator iter = jpt.interfaces().iterator(); iter.hasNext(); ) {
             Type interf = (Type)iter.next();
-            if (rw.jif_ts().isJifClass(interf) &&
+            if (rw.jif_ts().isParamsRuntimeRep(interf) &&
                     !rw.jif_ts().isSubtype(baseClass.superType(), interf) &&
                     interf instanceof JifSubstType) {
                 // the interface is not implemented in a super class,
-                // so add fields and params.
+                // so add fields and params for runtime representation of params
                 JifSubstType interfST = (JifSubstType)interf;
                 JifSubst subst = (JifSubst)interfST.subst();
                 JifPolyType interfPT = (JifPolyType)interfST.base();
@@ -255,7 +255,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         // add super call.
         List superArgs = new ArrayList();
         Type superType = jpt.superType();
-        if (superType instanceof JifSubstType && rw.jif_ts().isJifClass(((JifSubstType)superType).base())) {
+        if (superType instanceof JifSubstType && rw.jif_ts().isParamsRuntimeRep(((JifSubstType)superType).base())) {
             JifSubstType superjst = (JifSubstType)jpt.superType();
             JifPolyType superjpt = (JifPolyType)superjst.base();
 

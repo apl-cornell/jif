@@ -31,11 +31,11 @@ public class JifCastDel extends JifJL_c
             throw new SemanticException("Cannot cast to a labeled type.", c.position());
         }
 
-        if (!ts.isJifClass(castType)) {
+        if (!ts.isParamsRuntimeRep(castType)) {
             if ((castType instanceof JifSubstType && ((JifSubstType)castType).entries().hasNext()) ||
                 (castType instanceof JifPolyType && !((JifPolyType)castType).params().isEmpty()))                    
-            throw new SemanticException("Cannot cast to a parameterized " + 
-                                        "Java class, since Java classes do " +
+            throw new SemanticException("Cannot cast to " + castType +
+                                        ", since it does " +
                                         "not represent the parameters at runtime.", 
                                         c.position());
         }

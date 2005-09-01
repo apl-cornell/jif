@@ -27,7 +27,9 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
         return paramInstance;
     }
 
-    public boolean isRuntimeRepresentable() { return true; }
+    public boolean isRuntimeRepresentable() { 
+        return ((JifTypeSystem)ts).isParamsRuntimeRep(paramInstance.container()); 
+    }
     public boolean isCovariant() { return false; }
     public boolean isComparable() { return true; }
     public boolean isCanonical() { return paramInstance.isCanonical(); }

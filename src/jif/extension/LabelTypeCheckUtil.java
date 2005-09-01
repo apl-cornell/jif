@@ -150,24 +150,26 @@ public class LabelTypeCheckUtil {
                     Label L = (Label)arg;
                     A = (JifContext)A.pushBlock();
                     
-                    // make sure the label is runtime representable
-                    lc.constrain(new LabelConstraint(new NamedLabel("label_in_type", 
-                                                                    L), 
-                                                                    LabelConstraint.LEQ, 
-                                                                    new NamedLabel("RUNTIME_REPRESENTABLE", 
-                                                                                   ts.runtimeLabel()),
-                                                                                   A.labelEnv(),
-                                                                                   pos) {
-                        public String msg() {
-                            return "A label used in a type examined at runtime must be representable at runtime.";
-                        }
-                        public String detailMsg() {
-                            return "If a type is used in an instanceof, " +
-                            "cast, constructor call, or static method call, " +
-                            "all parameters of the type must be runtime " +
-                            "representable. Arg labels are not represented at runtime.";
-                        }
-                    });
+                    if (ts.isParamsRuntimeRep(t)) {
+	                    // make sure the label is runtime representable
+	                    lc.constrain(new LabelConstraint(new NamedLabel("label_in_type", 
+	                                                                    L), 
+	                                                                    LabelConstraint.LEQ, 
+	                                                                    new NamedLabel("RUNTIME_REPRESENTABLE", 
+	                                                                                   ts.runtimeLabel()),
+	                                                                                   A.labelEnv(),
+	                                                                                   pos) {
+	                        public String msg() {
+	                            return "A label used in a type examined at runtime must be representable at runtime.";
+	                        }
+	                        public String detailMsg() {
+	                            return "If a type is used in an instanceof, " +
+	                            "cast, constructor call, or static method call, " +
+	                            "all parameters of the type must be runtime " +
+	                            "representable. Arg labels are not represented at runtime.";
+	                        }
+	                    });
+                    }
                     
                     A.setPc(X.N());    
                     PathMap Xj = L.labelCheck(A);
@@ -179,7 +181,7 @@ public class LabelTypeCheckUtil {
                 else if (arg instanceof Principal) {
                     Principal p = (Principal)arg;
                     A = (JifContext)A.pushBlock();
-                    if (!p.isRuntimeRepresentable()) {
+                    if (ts.isParamsRuntimeRep(t) && !p.isRuntimeRepresentable()) {
                         throw new SemanticDetailedException("A principal used in a " +
                             "type examined at runtime must be " +
                             "representable at runtime.",

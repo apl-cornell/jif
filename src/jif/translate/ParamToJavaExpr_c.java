@@ -26,13 +26,13 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
     public Expr toJava(ParamInstance pi, JifToJavaRewriter rw) throws SemanticException {
         JifContext A = (JifContext)rw.context();
         if (A.inStaticContext()) {
-            return rw.qq().parseExpr(paramArgName(pi));
+            return rw.qq().parseExpr(paramArgName(pi));            
         }
         else {
-            return rw.qq().parseExpr("this." + paramFieldName(pi));
-        }
+            return rw.qq().parseExpr("this." + paramFieldName(pi));            
+        }        
     }
-
+    
     public static String paramFieldName(ParamInstance pi) {
         JifClassType jct = pi.container();
         String fullName = jct.fullName().replace('.', '_');

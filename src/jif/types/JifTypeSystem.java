@@ -124,6 +124,12 @@ public interface JifTypeSystem extends ParamTypeSystem
      * is just a jif signature for a java class).
      */
     boolean isJifClass(Type t);
+    
+    /**
+     * Returns true if the type is a Jif class, or if it is a non-Jif class
+     * that represents parameters at runtime.
+     */
+    boolean isParamsRuntimeRep(Type t);    
 
 
     /**

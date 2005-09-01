@@ -13,8 +13,8 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
         ConstructorInstance ci = n.constructorInstance();
         ClassType ct = ci.container().toClass();
 
-        if (! rw.jif_ts().isJifClass(ct) || (ct instanceof JifSubstType && !rw.jif_ts().isJifClass(((JifSubstType)ct).base()))) {
-            // Rewrite creation of Jif classes only.
+        if (! rw.jif_ts().isParamsRuntimeRep(ct) || (ct instanceof JifSubstType && !rw.jif_ts().isParamsRuntimeRep(((JifSubstType)ct).base()))) {
+            // only rewrite creation of classes where params are runtime represented.
             n = rw.java_nf().New(n.position(), n.qualifier(), n.objectType(),
                                 n.arguments(), n.body());
             return n;
@@ -24,7 +24,7 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
 
         List paramargs = new ArrayList();
         
-        if (ct instanceof JifSubstType && rw.jif_ts().isJifClass(((JifSubstType)ct).base())) {
+        if (ct instanceof JifSubstType && rw.jif_ts().isParamsRuntimeRep(((JifSubstType)ct).base())) {
             // add all the actual param expressions to args
             JifSubstType t = (JifSubstType)ct;
             JifSubst subst = (JifSubst)t.subst();

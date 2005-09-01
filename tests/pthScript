@@ -279,8 +279,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	RuntimeParams11.jif (Semantic, "Cannot override");
 	RuntimeParams12.jif (Semantic, "Cannot override");
 	RuntimeParams13.jif (Semantic, "Cannot override");
-	RuntimeParams14.jif (Semantic, "Cannot cast to a parameterized Java class");
-	RuntimeParams15.jif (Semantic, "Cannot perform instanceof on a parameterized Java class");
+	RuntimeParams14.jif (Semantic, "Cannot cast to .* does not represent the parameters at runtime");
+	RuntimeParams15.jif (Semantic, "Cannot perform instanceof on .* does not represent the parameters at runtime");
 	RuntimeParams16.jif ;
 	RuntimeParams17.jif (Semantic, "not less restrictive");
 	RuntimeParams18.jif (Semantic, "not less restrictive");

@@ -816,6 +816,10 @@ public class JifTypeSystem_c
 
         return true;
     }
+    
+    public boolean isParamsRuntimeRep(Type t) {
+        return isJifClass(t);
+    }
 
     /**
      * Check if the class has an untrusted non-jif ancestor.

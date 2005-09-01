@@ -28,7 +28,9 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
     public ParamInstance paramInstance() {
         return paramInstance;
     }
-    public boolean isRuntimeRepresentable() { return true; }
+    public boolean isRuntimeRepresentable() { 
+        return ((JifTypeSystem)ts).isParamsRuntimeRep(paramInstance.container()); 
+    }
     public boolean isCovariant() { return true; }
     public boolean isComparable() { return true; }
     public boolean isCanonical() { return paramInstance.isCanonical(); }

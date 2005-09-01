@@ -27,7 +27,7 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
 
         Node retVal;
         // only translate jif constructors
-        if (! rw.jif_ts().isJifClass(ct)) {
+        if (! rw.jif_ts().isParamsRuntimeRep(ct)) {
             NodeFactory nf = rw.java_nf();
             retVal = nf.ConstructorDecl(n.position(),
                                       n.flags(),

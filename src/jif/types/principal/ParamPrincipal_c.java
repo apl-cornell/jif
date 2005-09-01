@@ -20,7 +20,9 @@ public class ParamPrincipal_c extends Principal_c implements ParamPrincipal {
     public ParamInstance paramInstance() {
         return paramInstance;
     }
-    public boolean isRuntimeRepresentable() { return true; }
+    public boolean isRuntimeRepresentable() { 
+        return ((JifTypeSystem)ts).isParamsRuntimeRep(paramInstance.container()); 
+    }
     public boolean isCanonical() { return true; }
 
     public String toString() {
