@@ -4,10 +4,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import jif.ast.JifMethodDecl;
+import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
+import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Block;
 import polyglot.ast.Node;
@@ -132,6 +134,27 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             ArgLabel aj = (ArgLabel)ts.labelOfType(tj);
             A.addAssertionLE(ai, aj);
             A.addAssertionLE(aj, ai);
+            
+            if (ts.isLabel(ti)) {
+                // if the argument type is label, then the labels
+                // themselves are equal.
+                Label dynLi = ts.dynamicLabel(ai.position(),
+                                              JifUtil.varInstanceToAccessPath(ai.formalInstance(), ai.position()));
+                Label dynLj = ts.dynamicLabel(aj.position(),
+                                              JifUtil.varInstanceToAccessPath(aj.formalInstance(), aj.position()));
+                A.addAssertionLE(dynLi, dynLj);
+                A.addAssertionLE(dynLj, dynLi);
+            }
+            if (ts.isPrincipal(ti)) {
+                // if the argument type is label, then the labels
+                // themselves are equal.
+                Principal dynPi = ts.dynamicPrincipal(ai.position(),
+                                              JifUtil.varInstanceToAccessPath(ai.formalInstance(), ai.position()));
+                Principal dynPj = ts.dynamicPrincipal(aj.position(),
+                                              JifUtil.varInstanceToAccessPath(aj.formalInstance(), aj.position()));
+                A.addActsFor(dynPi, dynPj);
+                A.addActsFor(dynPj, dynPi);
+            }
         }
         
         LabelChecker newlc = lc.context(A);
