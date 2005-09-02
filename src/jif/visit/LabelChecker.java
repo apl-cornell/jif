@@ -105,6 +105,10 @@ public class LabelChecker implements Copy
 	return ts;
     }
 
+    public NodeFactory nodeFactory() {
+	return nf;
+    }
+
     public JifContext jifContext() {
 	return context;
     }

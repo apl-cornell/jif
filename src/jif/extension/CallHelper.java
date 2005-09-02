@@ -4,14 +4,17 @@ import java.util.*;
 
 import jif.ast.*;
 import jif.types.*;
-import jif.types.label.*;
+import jif.types.label.ArgLabel;
+import jif.types.label.Label;
+import jif.types.label.VarLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import polyglot.ast.Expr;
-import polyglot.ast.Receiver;
+import polyglot.ast.*;
 import polyglot.main.Report;
 import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.StringUtil;
 
 /**
  * This is a tool to label check method calls. This class should be used by
@@ -48,7 +51,8 @@ public class CallHelper {
     private final List actualArgs;
 
     /**
-     * The procedure being called.
+     * The procedure being called. Also the MethodInstance of the overridden
+     * method, when this class is used for overriding checking.
      */
     private final JifProcedureInstance pi;
 
@@ -82,11 +86,18 @@ public class CallHelper {
      */
     private Type returnType;
 
-    /**
-     * Flag to ensure that this class is used correctly.
+    /*
+     * Flags to ensure that this class is used correctly.
      */
-    private boolean callChecked;
+    private boolean callChecked = false;
+    private boolean overrideChecker = false; // false if call checker, true if override checker
 
+    /**
+     * Method instance of the overriding (subclasses') method. Used
+     * only for override checking.
+     */
+    JifMethodInstance overridingMethod = null;
+    
     public CallHelper(Label receiverLabel,
             Receiver receiver,
             ReferenceType calleeContainer,
@@ -115,7 +126,59 @@ public class CallHelper {
         this(receiverLabel, null, calleeContainer, pi, actualArgs, position);
     }
 
+    public static CallHelper OverrideHelper(
+            JifMethodInstance overridden,
+            JifMethodInstance overriding,
+            LabelChecker lc) {
+        
+        JifTypeSystem jts = (JifTypeSystem)overridden.typeSystem();
+        JifNodeFactory nf = (JifNodeFactory)lc.nodeFactory();
+        JifClassType subContainer = (JifClassType)overriding.container();
+        Label receiverLabel = subContainer.thisLabel();
+        Receiver receiver = nf.This(overriding.position());
+        ReferenceType calleeContainer = overridden.container().toReference();
+        
+        List actualArgs = new ArrayList(overriding.formalTypes().size());
+        
+        for (Iterator iter = overriding.formalTypes().iterator(); iter.hasNext(); ) {
+            Type t = (Type)iter.next();
+            if (jts.isLabeled(t)) {
+                ArgLabel al = (ArgLabel)jts.labelOfType(t);
+                LocalInstance formalInst = (LocalInstance)al.formalInstance();
+                Local l = nf.Local(formalInst.position(), formalInst.name()).
+    				localInstance(formalInst);
+                actualArgs.add(l);
+            }
+            else {
+                throw new InternalCompilerError("Formal type is not labeled!");
+            }
+        }
+
+        
+        CallHelper ch = new CallHelper(receiverLabel, 
+                                       receiver, 
+                                       calleeContainer,
+                                       overridden, 
+                                       actualArgs,
+                                       overriding.position());
+        ch.overrideChecker = true;
+        ch.overridingMethod = overriding;
+        ch.actualParamLabels = Collections.EMPTY_LIST;
+        ch.actualArgLabels = new ArrayList(overriding.formalTypes().size());
+        
+        for (Iterator iter = overriding.formalTypes().iterator(); iter.hasNext(); ) {
+            Type t = (Type)iter.next();
+            ArgLabel al = (ArgLabel)jts.labelOfType(t);
+            ch.actualArgLabels.add(al);
+        }
+
+        return ch;
+    }
+
     public Type returnType() {
+        if (overrideChecker) {
+            throw new InternalCompilerError("Not available for call checking");            
+        }
         if (!callChecked) {
             throw new InternalCompilerError("checkCall not yet called!");
         }
@@ -123,6 +186,9 @@ public class CallHelper {
     }
 
     public List labelCheckedArgs() {
+        if (overrideChecker) {
+            throw new InternalCompilerError("Not available for call checking");            
+        }
         if (!callChecked) {
             throw new InternalCompilerError("checkCall not yet called!");
         }
@@ -130,6 +196,9 @@ public class CallHelper {
     }
 
     public PathMap X() {
+        if (overrideChecker) {
+            throw new InternalCompilerError("Not available for call checking");            
+        }
         if (!callChecked) {
             throw new InternalCompilerError("checkCall not yet called!");
         }
@@ -366,6 +435,9 @@ public class CallHelper {
     public void checkCall(LabelChecker lc, List throwTypes)
     throws SemanticException
     {
+        if (overrideChecker) {
+            throw new InternalCompilerError("Not available for call checking");            
+        }
         if (callChecked) {
             throw new InternalCompilerError("checkCall already called!");
         }
@@ -558,6 +630,9 @@ public class CallHelper {
     public void bindVarLabels(LabelChecker lc, VarLabel receiverVarLabel,
             List actualArgVarLabels, List actualParamVarLabels)
             throws SemanticException {
+        if (overrideChecker) {
+            throw new InternalCompilerError("Not available for call checking");            
+        }
         if (!callChecked) {
             throw new InternalCompilerError("checkCall not yet called!");
         }
@@ -636,4 +711,232 @@ public class CallHelper {
                                            this.actualArgs,
                                            this.actualParamLabels);
     }
+    
+    /**
+     * this.pi is a Jif method instance that this.overridingMethod is attempting to
+     * override. Previous type checks have made sure that things like
+     * abstractness, access flags, throw sets, etc. are ok.
+     * We need to check that the labels conform.
+     * 
+     * @throws SemanticException
+     */
+    public void checkOverride(LabelChecker lc) throws SemanticException {
+        if (!overrideChecker) {
+            throw new InternalCompilerError("Not available for override checking");            
+        }
+
+        // construct a JifContext here, that equates the arg labels of
+        // mi and mj.
+        JifContext A = lc.context(); 
+        A = (JifContext) A.pushBlock();
+        JifTypeSystem ts = lc.typeSystem();
+                
+        final JifMethodInstance overridden = (JifMethodInstance)this.pi;
+        final JifMethodInstance overriding = this.overridingMethod;
+
+        if (overriding.formalTypes().size() != overridden.formalTypes().size()) {
+            throw new InternalCompilerError("Different number of arguments!");
+        }
+
+        
+        LabelChecker newlc = lc.context(A);
+        
+        
+        // argument labels are contravariant:
+        //      each argument label of mi may be more restrictive than the 
+        //      correponding argument label in mj
+        Iterator miargs = overriding.formalTypes().iterator();
+        Iterator mjargs = overridden.formalTypes().iterator();
+        int c=0;
+        while (miargs.hasNext() && mjargs.hasNext()) {
+            Type i = (Type)miargs.next();
+            Type j = (Type)mjargs.next();
+            ArgLabel ai = (ArgLabel)ts.labelOfType(i);
+            ArgLabel aj = (ArgLabel)ts.labelOfType(j);
+		final int argIndex = ++c;
+            newlc.constrain(new LabelConstraint(new NamedLabel("sup_arg_"+argIndex,
+                                                               "label of " + StringUtil.nth(argIndex) + " arg of overridden method",
+                                                               instantiate(A, aj.upperBound())),
+                                                LabelConstraint.LEQ,
+                                                new NamedLabel("sub_arg_"+argIndex,
+                                                               "label of " + StringUtil.nth(argIndex) + " arg of overridding method",
+                                                               ai.upperBound()),
+                                                A.labelEnv(),
+                                                overriding.position()) {
+                            public String msg() {
+                                return "Cannot override " + overridden.signature() + 
+                                       " in " + overridden.container() + " with " + 
+                                       overriding.signature() + " in " + 
+                                       overriding.container() + ". The label of the " + 
+                                       StringUtil.nth(argIndex) + " argument " +
+                                       "of the overriding method cannot " +
+                                       "be less restrictive than in " +
+                                       "the overridden method.";                
+
+                            }
+                       }
+            );
+        }
+
+        
+        // start labels are contravariant:
+        //    the start label on mi may be more restrictive than the start 
+        //    label on mj
+        NamedLabel starti = new NamedLabel("sub_start_label",
+                                           "Start label of method " + overriding.name() + " in " + overriding.container(), 
+                                           overriding.startLabel());
+        NamedLabel startj = new NamedLabel("sup_start_label",
+                                           "Start label of method " + overridden.name() + " in " + overridden.container(), 
+                                           instantiate(A, overridden.startLabel()));
+        newlc.constrain(new LabelConstraint(startj,
+                                            LabelConstraint.LEQ,
+                                            starti,
+                                            A.labelEnv(),
+                                            overriding.position()) {
+                        public String msg() {
+                            return "Cannot override " + overridden.signature() + 
+                                   " in " + overridden.container() + " with " + 
+                                   overriding.signature() + " in " + 
+                                   overriding.container() + ". The start label of the " + 
+                                   "overriding method " +
+                                   "cannot be less restrictive than in " +
+                                   "the overridden method.";                
+
+                        }
+                        public String detailMsg() {
+                            return msg() + 
+                                " The start label of a method is a lower " +
+                                "bound on the observable side effects that " +
+                                "the method may perform (such as updates to fields).";                
+
+                        }
+                   }
+        );
+
+        // return labels are covariant
+        //      the return label on mi may be less restrictive than the
+        //      return label on mj
+        NamedLabel reti = new NamedLabel("sub_return_label", 
+                                         "return label of method " + overriding.name() + " in " + overriding.container(), 
+                                         overriding.returnLabel());
+        NamedLabel retj = new NamedLabel("sup_return_label", 
+                                         "return label of method " + overridden.name() + " in " + overridden.container(), 
+                                         instantiate(A, overridden.returnLabel()));                        
+        newlc.constrain(new LabelConstraint(reti,
+                                            LabelConstraint.LEQ,
+                                            retj,
+                                            A.labelEnv(),
+                                            overriding.position()) {
+                    public String msg() {
+                        return "Cannot override " + overridden.signature() + 
+                               " in " + overridden.container() + " with " + 
+                               overriding.signature() + " in " + 
+                               overriding.container() + ". The return label of the " + 
+                               "overriding method " +
+                               "cannot be more restrictive than in " +
+                               "the overridden method.";                
+
+                    }
+                    public String detailMsg() {
+                        return msg() + 
+                            " The return label of a method is an upper " +
+                            "bound on the information that can be gained " +
+                            "by observing that the method terminates normally.";                
+
+                    }
+                   }
+        );
+
+
+        // return value labels are covariant
+        //      the return value label on mi may be less restrictive than the
+        //      return value label on mj
+        NamedLabel retVali = new NamedLabel("sub_return_val_label",
+                               "label of the return value of method " + overriding.name() + " in " + overriding.container(), 
+                               overriding.returnValueLabel());
+        NamedLabel retValj = new NamedLabel("sup_return_val_label", 
+                               "label of the return value of method " + overridden.name() + " in " + overridden.container(), 
+                               instantiate(A, overridden.returnValueLabel()));
+        newlc.constrain(new LabelConstraint(retVali,
+                                            LabelConstraint.LEQ,
+                                            retValj,
+                                            A.labelEnv(),
+                                            overriding.position()) {
+                    public String msg() {
+                        return "Cannot override " + overridden.signature() + 
+                               " in " + overridden.container() + " with " + 
+                               overriding.signature() + " in " + 
+                               overriding.container() + ". The return value label of the " + 
+                               "overriding method " +
+                               "cannot be more restrictive than in " +
+                               "the overridden method.";                
+
+                    }
+                    public String detailMsg() {
+                        return msg() + 
+                            " The return value label of a method is the " +
+                            "label of the value returned by the method.";                
+
+                    }
+                   }
+        );
+
+        // exception labels are covariant
+        //          the label of an exception E on mi may be less restrictive
+        //          than the label of any exception E' on mj, where E<=E'
+        Iterator miExc = overriding.throwTypes().iterator();
+        List mjExc = overridden.throwTypes();
+
+        while (miExc.hasNext()) {
+            final LabeledType exi = (LabeledType)miExc.next();
+                            
+            // find the corresponding exception(s) in mhExc
+            for (Iterator mjExcIt = mjExc.iterator(); mjExcIt.hasNext(); ) {
+                final LabeledType exj = (LabeledType)mjExcIt.next();
+                if (ts.isSubtype(exi.typePart(), exj.typePart())) {
+                    newlc.constrain(new LabelConstraint(new NamedLabel("exc_label_"+exi.typePart().toString(),
+                                                                       "",//"label on the exception " + exi.typePart().toString(),
+                                                                       exi.labelPart()),
+                                                        LabelConstraint.LEQ,
+                                                        new NamedLabel("exc_label_"+exj.typePart().toString(),
+                                                                       "",
+                                                                       instantiate(A, exj.labelPart())),
+                                                        A.labelEnv(),
+                                                        overriding.position()) {
+                                public String msg() {
+                                    return "Cannot override " + overridden.signature() + 
+                                           " in " + overridden.container() + " with " + 
+                                           overriding.signature() + " in " + 
+                                           overriding.container() + ". The label of the " + 
+                                           exi.typePart().toString() + 
+                                           "exception in overriding method " +
+                                           "cannot be more restrictive " +
+                                           "than the label of the " + 
+                                           exj.typePart().toString() +
+                                           "exception in " +
+                                           "the overridden method.";                
+
+                                }
+                                public String detailMsg() {
+                                    return "Cannot override " + overridden.signature() + 
+                                    " in " + overridden.container() + " with " + 
+                                    overriding.signature() + " in " + 
+                                    overriding.container() + ". If the exception " +
+                                    exi.typePart().toString() + " is thrown " +
+                                    "by " + overriding.signature() + " in " + 
+                                    overriding.container() + " then more information " +
+                                    "may be revealed than is permitted by " +
+                                    "the overridden method throwing " +
+                                    "the exception " + 
+                                    exj.typePart().toString() + ".";                
+
+                                }
+                               }
+                    );
+                }
+            }
+        }
+        
+    }
+    
 }

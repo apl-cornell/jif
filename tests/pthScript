@@ -223,6 +223,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	PairList.jif  List.jif;
 	Override01.jif;
 	Override02.jif;
+	Override03.jif;
 	PairList2.jif ;
 	Params1.jif ;
 	Params1Test.jif ;
