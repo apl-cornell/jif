@@ -40,7 +40,7 @@ public class UnknownLabel_c extends Label_c implements UnknownLabel
         return o instanceof UnknownLabel;
     }    
     public int hashCode() { return 234334; }
-    public boolean leq_(Label L, LabelEnv env) {
+    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         throw new InternalCompilerError("Cannot compare unknown label.");
     }    
 }

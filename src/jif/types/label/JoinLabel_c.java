@@ -108,7 +108,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return s;
     }
     
-    public boolean leq_(Label L, LabelEnv env) {
+    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         if (! L.isSingleton() || ! L.isComparable() || ! L.isEnumerable())
             throw new InternalCompilerError("Cannot compare " + L);
         
@@ -117,7 +117,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label ci = (Label) i.next();
             
-            if (! env.leq(ci, L)) {
+            if (! env.leq(ci, L, state)) {
                 return false;
             }
         }

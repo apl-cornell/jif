@@ -43,7 +43,7 @@ public class NotTaken_c extends Label_c implements NotTaken {
 
     public int hashCode() { return 39870; }
 
-    public boolean leq_(Label L, LabelEnv env) {
+    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         throw new InternalCompilerError("Cannot compare \"" + this + "\".");
     }
 }

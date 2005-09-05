@@ -317,6 +317,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Simple2.jif ;
 	Simple3.jif ;
 	Simple4.jif ;
+	Solver01.jif ;
+	Solver02.jif ;
 	StaticField.jif;
 	StaticMethod.jif;
 	StaticThis1.jif (Semantic, "this.*cannot be used in a static context");

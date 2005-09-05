@@ -46,7 +46,7 @@ public class VarLabel_c extends Label_c implements VarLabel {
     }    
     public int hashCode() { return -56393 + uid; }
     
-    public boolean leq_(Label L, LabelEnv env) {   
+    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {   
         throw new InternalCompilerError("Cannot compare " + this + ".");
     }
     

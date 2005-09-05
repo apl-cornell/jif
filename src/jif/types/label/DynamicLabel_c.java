@@ -62,7 +62,7 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
         return "*"+path();
     }
 
-    public boolean leq_(Label L, LabelEnv env) {
+    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         // can only be equal if the dynamic label is equal to this,
         // or through use of the label env, both taken care of outside
         // this method.

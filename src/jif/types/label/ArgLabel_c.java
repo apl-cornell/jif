@@ -78,7 +78,7 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         return vi.name();
     }
 
-    public boolean leq_(Label L, LabelEnv env) {
+    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         // Should not recurse here, but allow the Label Env to do the recursion
         // on upperBound(), to avoid infinite loops.
         return false;

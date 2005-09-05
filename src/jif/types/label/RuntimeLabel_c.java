@@ -47,7 +47,7 @@ public class RuntimeLabel_c extends Label_c implements RuntimeLabel {
     }
     
     public int hashCode() { return 532708; }
-    public boolean leq_(Label L, LabelEnv env) {
+    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         // TS already tested against TOP and Runtime.  Anything else is false.
         return false;
     }    

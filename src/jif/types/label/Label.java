@@ -153,7 +153,7 @@ public interface Label extends Param {
      * @param H the label environment (including principal hierarchy). Will
      *            always be non-null.
      */
-    boolean leq_(Label L, LabelEnv H);
+    boolean leq_(Label L, LabelEnv H, LabelEnv.SearchState state);
 
     boolean isRuntimeRepresentable();
 

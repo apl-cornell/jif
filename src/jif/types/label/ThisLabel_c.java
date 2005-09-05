@@ -52,7 +52,7 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
         return "this";            
     }
 
-    public boolean leq_(Label L, LabelEnv env) {
+    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         // We know nothing about the this label, save that it is equal to itself,
         // and whatever is in the environment.
         return false;

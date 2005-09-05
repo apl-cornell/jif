@@ -39,7 +39,7 @@ public class TopLabel_c extends Label_c implements TopLabel {
         return o instanceof TopLabel;
     }    
     public int hashCode() { return 390230; }
-    public boolean leq_(Label L, LabelEnv env) {
+    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         return L.isTop();
     }
 }

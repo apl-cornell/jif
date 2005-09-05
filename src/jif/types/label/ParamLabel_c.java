@@ -73,7 +73,7 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
         return ts.pathMap().N(A.pc()).NV(l);
     }
     
-    public boolean leq_(Label L, LabelEnv env) {
+    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         // only leq if equal to this parameter, which is checked before 
         // this method is called.
         return false;

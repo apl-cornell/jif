@@ -69,7 +69,7 @@ public class PolicyLabel_c extends Label_c implements PolicyLabel {
         return owner.hashCode() + readers.hashCode();
     }
     
-    public boolean leq_(Label L, LabelEnv env) {
+    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         if (! L.isComparable() || ! L.isEnumerable()) {
             throw new InternalCompilerError("Cannot compare " + L);
         }

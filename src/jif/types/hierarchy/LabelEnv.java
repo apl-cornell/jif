@@ -19,6 +19,9 @@ public interface LabelEnv
     // returns true if "L1 <= L2"
     boolean leq(Label L1, Label L2);
 
+    // returns true if "L1 <= L2"
+    boolean leq(Label L1, Label L2, SearchState state);
+
     PrincipalHierarchy ph();
 
     // make a copy of this environment
@@ -51,4 +54,9 @@ public interface LabelEnv
      * when determining if constraints are satisfied.
      */
     void setSolver(Solver solver);
+    
+    /**
+     * Encapsulates the solvers search state. 
+     */
+    public interface SearchState { }
 }
