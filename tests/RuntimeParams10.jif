@@ -3,9 +3,9 @@ interface I[covariant label L] {
     int{L} foo();
 }
 
-class C extends D implements I[{}] { // bad: no int{Bob:} foo() method
+class C extends D implements I[{Bob:}] { // bad: no int{Bob:} foo() method
 }
 
-class D implements I[{Bob:}] {
-    public int{Bob:} foo() { return 3; }
+class D implements I[{}] {
+    public int{} foo() { return 3; }
 }

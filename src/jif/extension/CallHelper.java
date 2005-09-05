@@ -909,7 +909,7 @@ public class CallHelper {
                                            overriding.signature() + " in " + 
                                            overriding.container() + ". The label of the " + 
                                            exi.typePart().toString() + 
-                                           "exception in overriding method " +
+                                           " exception in overriding method " +
                                            "cannot be more restrictive " +
                                            "than the label of the " + 
                                            exj.typePart().toString() +
