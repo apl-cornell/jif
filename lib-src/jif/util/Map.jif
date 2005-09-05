@@ -17,8 +17,8 @@ public interface Map[label K, label V] extends JifObject[{K;V}] {
     JifObject[V]{V; key} get(JifObject[K] key);
 
     // Modifying Operations
-    JifObject[V]{V} put{K;V}(Object{K} key, Object{V} value);
-    JifObject[V]{V} remove{K;V}(Object{K} key);
+    JifObject[V]{V} put{K;V}(JifObject[K]{K} key, JifObject[V]{V} value);
+    JifObject[V]{V} remove{K;V}(JifObject[K]{K} key);
 
     void putAll{K;V}(Map[K,V] t);
     void clear{K;V}();
