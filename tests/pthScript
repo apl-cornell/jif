@@ -138,6 +138,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	DynPrin9.jif ;
 	DynPrin10.jif ; 
 	DynPrin11.jif (Semantic, "actual argument is more restrictive");
+	DynPrin12.jif ;
 	DynLabel1.jif ;
 	DynLabel2.jif (Semantic, "Non-final.*access path"), (Semantic, "Non-final.*access path");
 	DynLabel3.jif (Semantic, "Field.*is not final"), (Semantic, "Field.*is not final");

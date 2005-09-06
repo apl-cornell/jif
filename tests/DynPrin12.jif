@@ -1,0 +1,7 @@
+class C {
+    public final principal p;
+}
+
+class D {
+    abstract public int{x.p:} invoke{x.p:}(C{x.p:} x);
+}
