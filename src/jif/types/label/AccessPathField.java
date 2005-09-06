@@ -90,7 +90,7 @@ public class AccessPathField extends AccessPath {
         if (!path.type().isReference()) {
             throw new SemanticException("Expression " + path + " used in final access path is not a reference type", position());
         }
-        FieldInstance found = path.type().toReference().fieldNamed(fieldName); 
+        FieldInstance found = A.typeSystem().findField(path.type().toReference(), fieldName); 
         if (fi == null || !fi.isCanonical()) {            
             fi = found;
         }
