@@ -62,19 +62,8 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         tc = (TypeChecker) tc.context(ar.context());
         expr = (Expr)expr.visit(tc);
 
-        if (expr.type() == null || !expr.type().isCanonical()) {
-            // try converting the expression to an access path anyway,
-            // to flush out any semantic errors that may arise.
-            JifUtil.exprToAccessPath(expr, (JifContext)ar.context());
-            
-            // no errors thrown, wait until all dependencies are
-            // disambiguated.
-            Scheduler sched = ar.job().extensionInfo().scheduler();
-            Goal g = sched.Disambiguated(ar.job());
-            throw new MissingDependencyException(g);
-        }
-
-        if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
+        if (expr.type() != null && expr.type().isCanonical() && 
+                !JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             // illegal dynamic principal. But try to convert it to an access path
             // to allow a more precise error message.
             AccessPath ap = JifUtil.exprToAccessPath(expr, (JifContext)ar.context()); 
@@ -93,6 +82,9 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
                 this.position());                                        
         }
 
+        // the expression type may not yet be fully determined, but
+        // that's ok, as type checking will ensure that it is
+        // a suitable expression.
         return nf.CanonicalPrincipalNode(position(),
                                          ts.dynamicPrincipal(position(), JifUtil.exprToAccessPath(expr, (JifContext)ar.context())));
     }

@@ -146,6 +146,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	DynLabel5.jif (Semantic, "type .*must be .*label");
 	DynLabel6.jif (Semantic, "Cannot access field .* non-reference type");
 	DynLabel7.jif (Syntax);
+	DynLabel8.jif ;
 	EmptyList.jif List.jif;
 	EmptyList2.jif ;
 	Exc.jif ;

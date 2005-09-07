@@ -51,19 +51,8 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         tc = (TypeChecker) tc.context(sc.context());
         expr = (Expr)expr.visit(tc);
 	
-        if (expr.type() == null || !expr.type().isCanonical()) {
-            // try converting the expression to an access path anyway,
-            // to flush out any semantic errors that may arise.
-            JifUtil.exprToAccessPath(expr, (JifContext)c);
-            
-            // no errors thrown, wait until all dependencies are
-            // disambiguated.
-            Scheduler sched = sc.job().extensionInfo().scheduler();
-            Goal g = sched.Disambiguated(sc.job());
-            throw new MissingDependencyException(g);
-        }
-
-        if (!JifUtil.isFinalAccessExprOrConst(ts, expr)) {
+        if (expr.type() != null && expr.type().isCanonical() && 
+                !JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             // illegal dynamic label. But try to convert it to an access path
             // to allow a more precise error message.
             AccessPath ap = JifUtil.exprToAccessPath(expr, (JifContext)c); 
@@ -82,6 +71,9 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
                 this.position());
         }
 
+        // the expression type may not yet be fully determined, but
+        // that's ok, as type checking will ensure that it is
+        // a suitable expression.
         Label L = ts.dynamicLabel(position(), JifUtil.exprToAccessPath(expr, (JifContext)c));
         return nf.CanonicalLabelNode(position(), L);
     }
