@@ -1,6 +1,6 @@
 package jif.util;
 
-interface Map$Entry[label K, label V] implements JifObject[K] {
+interface Map$Entry[label K, label V] extends JifObject[{K;V}] {
 
 	JifObject[K]{K} getKey();
 	JifObject[V]{V} getValue();
@@ -10,7 +10,7 @@ interface Map$Entry[label K, label V] implements JifObject[K] {
 
 
   // Not sure about this one: should it be a JifObject instead?
-	boolean{K;o} equals(Object o);
+	boolean{K;V;o} equals(JifObject[{K;V}] o);
 
-	int{K} hashCode();
+	int{K;V} hashCode();
 }

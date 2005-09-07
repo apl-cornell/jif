@@ -2,7 +2,7 @@ package jif.util;
 import jif.util.Map$Entry;
 
 /**
- * Signature for the AbstractMap class
+ * Jif Implementation of the Abstractmap class
  */
 
 public abstract class AbstractMap[label K, label V] implements Map[K,V] {
@@ -12,26 +12,26 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 
     // Query Operations
 
-    public int{K;V} size() {
-	return entrySet().size();
+    public int{K} size() {
+	return keySet().size();
     }
 
-    public boolean{K;V} isEmpty() {
+    public boolean{K} isEmpty() {
 	return size() == 0;
     }
 
-    public boolean{V;value} containsValue(JifObject[V]{V} value) {
-	Iterator[{K;V}] i = entrySet().iterator();
+    public boolean{V;value} containsValue(JifObject[V] value) {
+	Iterator[V] i = values().iterator();
 	if (value==null) {
 	    while (i.hasNext()) {
-		Map$Entry[K,V] e = (Map$Entry[K,V]) i.next();
-		if (e.getValue()==null)
+		JifObject[V] e = (JifObject[V]) i.next();
+		if (e == null)
 		    return true;
 	    }
 	} else {
 	    while (i.hasNext()) {
-		Map$Entry[K,V] e = (Map$Entry[K,V]) i.next();
-		if (value.equals(e.getValue()))
+		JifObject[V] e = (JifObject[V]) i.next();
+		if (value.equals(e))
 		    return true;
 	    }
 	}
@@ -39,17 +39,17 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
     }
 
     public boolean{K;key} containsKey(JifObject[K]{K} key) {
-	Iterator[{K;V}] i = entrySet().iterator();
+	Iterator[K] i = keySet().iterator();
 	if (key==null) {
 	    while (i.hasNext()) {
-		Map$Entry[K,V] e = (Map$Entry[K,V]) i.next();
-		if (e.getKey()==null)
+		JifObject[K] e = (JifObject[K]) i.next();
+		if (e == null)
 		    return true;
 	    }
 	} else {
 	    while (i.hasNext()) {
-		Map$Entry[K,V] e = (Map$Entry[K,V]) i.next();
-		if (key.equals(e.getKey()))
+		JifObject[K] e = (JifObject[K]) i.next();
+		if (key.equals(e))
 		    return true;
 	    }
 	}
@@ -57,7 +57,7 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
     }
 
     // I want the argument to be a JifObject, but I do not want to restrict its security level
-    public JifObject[V]{V} get(Object key) {
+    public JifObject[V] get(JifObject[K] key) {
 	Iterator[{K;V}] i = entrySet().iterator();
 	if (key==null) {
 	    while (i.hasNext()) {
