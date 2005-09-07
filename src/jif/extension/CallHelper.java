@@ -913,7 +913,7 @@ public class CallHelper {
                                            "cannot be more restrictive " +
                                            "than the label of the " + 
                                            exj.typePart().toString() +
-                                           "exception in " +
+                                           " exception in " +
                                            "the overridden method.";                
 
                                 }
