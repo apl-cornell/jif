@@ -823,22 +823,23 @@ public class JifTypeSystem_c
 
     /**
      * Check if the class has an untrusted non-jif ancestor.
-     *
-     * An untrusted non-jif ancestor is any non-jif
-     * ancestor that is not one of java.lang.Object, java.lang.Throwable,
-     * java.lang.Error, java.lang.Exception, java.lang.IllegalArgumentException,
-     * java.lang.IllegalStateException, java.lang.IndexOutOfBoundsException,
-     * java.lang.RuntimeException or java.lang.SecurityException.
-
-     *
+     * 
+     * An untrusted non-jif ancestor is any non-jif ancestor whose constructors
+     * may potentially access a final field (which may be on a subclass) before
+     * that field has been intitialized.
+     * 
+     * A special marker field is used in Jif signature files for Java classes to
+     * declare that all constructors of the Java file are okay.
+     * 
      * @param t Type to check
-     * @return null if ct has no untrusted non-Jif ancestor, and the
-     *  ClassType of an untrusted non-Jif ancestor otherwise.
-     *
+     * @return null if ct has no untrusted non-Jif ancestor, and the ClassType
+     *         of an untrusted non-Jif ancestor otherwise.
+     *  
      */
     public ClassType hasUntrustedAncestor(Type t) {
-        if (t == null || t.toReference() == null)
+        if (t == null || t.toReference() == null) {
             return null;
+	}
 
         Type st = t.toReference().superType();
         if (st == null || st.toClass() == null) {
@@ -846,26 +847,32 @@ public class JifTypeSystem_c
         }
 
         ClassType ct = st.toClass();
-
-        if (!isJifClass(ct) && !trustedNonJifClassNames.contains(ct.fullName())) {
+        if (!hasSafeConstructors(ct)) {
             return ct;
         }
         return hasUntrustedAncestor(ct);
     }
+
     /**
-     * Classnames of "trusted" non jif classes.
+     * Check if the class has safe constructors, that is, if the constructors of
+     * the class definitely do not access a final field (possibly on a subclass)
+     * before that field has been initalized. All Jif classes are not untrusted;
+     * Java classes can be explicitly marked as not by a specially marker field.
      */
-    private static List trustedNonJifClassNames =
-        Arrays.asList(new String[] {"java.lang.Error",
-                                    "java.lang.Exception",
-                                    "java.lang.IllegalArgumentException",
-                                    "java.lang.IllegalStateException",
-                                    "java.lang.IndexOutOfBoundsException",
-                                    "java.lang.Object",
-                                    "java.lang.RuntimeException",
-                                    "java.lang.SecurityException",
-                                    "java.lang.Throwable",
-        });
+    public boolean hasSafeConstructors(ClassType ct) {
+        if (isJifClass(ct)) {
+            return true;
+        }
+        if (ct != null) {
+            FieldInstance fi = ct
+                    .fieldNamed("__JIF_SAFE_CONSTRUCTORS$20050907");
+            if (fi != null && fi.flags().isPrivate() && fi.flags().isStatic()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * In general, type t can be coerced to a String if t is a String, a
