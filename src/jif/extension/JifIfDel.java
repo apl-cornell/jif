@@ -1,10 +1,14 @@
 package jif.extension;
 
 import jif.ast.*;
+import jif.types.*;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
-import jif.types.principal.Principal;
+import jif.types.label.AccessPath;
 import polyglot.ast.*;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeChecker;
@@ -28,26 +32,59 @@ public class JifIfDel extends JifJL_c {
             Expr left = b.left();
             Expr right = b.right();
             
-            if (!JifUtil.isFinalAccessExprOrConst(ts, left)) {
-                throw new SemanticException("Only a final access path, " +
-                                            "principal parameter or a constant principal can " +
-                                            "be used as an operand to actsfor.", 
-                        left.position());
-            }
-            if (!JifUtil.isFinalAccessExprOrConst(ts, right)) {
-                throw new SemanticException("Only a final access path, " +
-                        "principal parameter or a constant principal can " +
-                        "be used as an operand to actsfor.", 
-                        right.position());
+            PrincipalNode actor, granter;
+            if (left instanceof PrincipalNode)
+                actor = (PrincipalNode)left;
+            else {
+                // try running the type checker on left
+                left = checkPrincipalExpr(ar, left);
+                actor = nf.AmbPrincipalNode(left.position(), left);
             }
             
-            Principal actor= JifUtil.exprToPrincipal(ts, left, (JifContext)ar.context());
-            Principal granter = JifUtil.exprToPrincipal(ts, right, (JifContext)ar.context());
+            if (right instanceof PrincipalNode) {
+                granter = (PrincipalNode)right;
+            }
+            else {
+                // try running the type checker on right
+                right = checkPrincipalExpr(ar,right);
+                granter = nf.AmbPrincipalNode(right.position(), right);
+            }
+
+            actor = (PrincipalNode)actor.disambiguate(ar);
+            granter = (PrincipalNode)granter.disambiguate(ar);
             return nf.ActsFor(ifNode.position(), actor, granter, ifNode.consequent(), ifNode.alternative());
         }
         return super.disambiguate(ar);
     }
-    
+
+    private Expr checkPrincipalExpr(AmbiguityRemover ar, Expr expr) throws SemanticException {
+        JifNodeFactory nf = (JifNodeFactory)ar.nodeFactory();
+        JifTypeSystem ts = (JifTypeSystem)ar.typeSystem();
+        TypeChecker tc = new TypeChecker(ar.job(), ts, nf);
+        tc = (TypeChecker) tc.context(ar.context());
+        expr = (Expr)expr.visit(tc);
+
+        if (expr.type() != null && expr.type().isCanonical() && 
+                !JifUtil.isFinalAccessExprOrConst(ts, expr)) {
+            // illegal dynamic principal. But try to convert it to an access path
+            // to allow a more precise error message.
+            AccessPath ap = JifUtil.exprToAccessPath(expr, (JifContext)ar.context()); 
+            ap.verify((JifContext)ar.context());
+
+            // previous line should throw an exception, but throw this just to
+            // be safe.
+            throw new SemanticDetailedException(
+                "Illegal dynamic principal.",
+                "Only final access paths or principal expressions can be used as a dynamic principal. " +
+                "A final access path is an expression starting with either \"this\" or a final " +
+                "local variable \"v\", followed by zero or more final field accesses. That is, " +
+                "a final access path is either this.f1.f2....fn, or v.f1.f2.....fn, where v is a " +
+                "final local variables, and each field f1 to fn is a final field. A principal expression " +
+                "is either a principal parameter, or an external principal.",
+                expr.position());                                        
+        }
+        return expr;        
+    }
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         If ifNode = (If)node();
         if (ifNode.cond() instanceof Binary && ((Binary)ifNode.cond()).operator() == Binary.LE) {

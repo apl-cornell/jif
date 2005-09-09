@@ -94,7 +94,13 @@ public class JifUtil
         else if (e instanceof Cast) {
             return exprToAccessPath(((Cast)e).expr(), context);            
         }
-        throw new InternalCompilerError("Expression " + e + " not suitable for an access path: " + e.getClass());
+        throw new SemanticDetailedException("Expression " + e + " not suitable for an access path.",
+                                            "The expression " + e + " is not suitable for a final access " +
+                                            "path. A final access path is an expression starting with either " +
+                                            "\"this\" or a final local variable \"v\", followed by zero or more final field accesses. That is, " +
+                                            "a final access path is either this.f1.f2....fn, or v.f1.f2.....fn, where v is a " +
+                                            "final local variables, and each field f1 to fn is a final field.",
+                                            e.position());                                        
     }        
 
 

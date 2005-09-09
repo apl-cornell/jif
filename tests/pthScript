@@ -51,8 +51,9 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	ActsFor13.jif ;
 	ActsFor14.jif ;
 	ActsFor15.jif (Semantic, "not less restrictive");
-	ActsFor16.jif (Semantic, "Only a final access path"),
-		      (Semantic, "Only a final access path");
+	ActsFor16.jif (Semantic, "not suitable for an access path");
+	ActsFor16b.jif (Semantic, "not suitable for an access path");
+	ActsFor16c.jif ;
 	ActsFor17.jif (Semantic, "Non-final local variable"),
 		      (Semantic, "Non-final local variable");
 	ArgLabel1.jif ;

@@ -42,6 +42,9 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         return name + "{amb}";
     }
     
+    private int expr_disamb_fail_count = 0;
+    private static final int EXPR_DISAMB_FAIL_LIMIT = 40;
+    
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (name != null) {
             return disambiguateName(ar, name);
@@ -62,6 +65,18 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         tc = (TypeChecker) tc.context(ar.context());
         expr = (Expr)expr.visit(tc);
 
+        if (expr.type() == null || !expr.type().isCanonical()) {
+            if (++expr_disamb_fail_count < EXPR_DISAMB_FAIL_LIMIT) {
+                // keep trying until we exhaust our patience.
+                // needed for some cases where we can't distinguish if
+                // we need to push on regardless, or wait until the type
+                // really can be resolved.
+                Scheduler sched = ar.job().extensionInfo().scheduler();
+                Goal g = sched.Disambiguated(ar.job());
+                throw new MissingDependencyException(g);
+            }
+        }
+        
         if (expr.type() != null && expr.type().isCanonical() && 
                 !JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             // illegal dynamic principal. But try to convert it to an access path

@@ -1,8 +1,6 @@
 package jif.ast;
 
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.SemanticDetailedException;
+import jif.types.*;
 import jif.types.label.AccessPath;
 import jif.types.label.Label;
 import polyglot.ast.Expr;
@@ -10,15 +8,11 @@ import polyglot.ast.Node;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
-import polyglot.types.*;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.*;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
 
 /** An implementation of the <tt>AmbDynamicLabel</tt> interface. */
 public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicLabelNode
@@ -34,6 +28,9 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
 	return "*" + expr + "{amb}";
     }
 
+    private int expr_disamb_fail_count = 0;
+    private static final int EXPR_DISAMB_FAIL_LIMIT = 40;
+    
     /** Disambiguate the type of this node. */
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
 	Context c = sc.context();
@@ -51,6 +48,18 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         tc = (TypeChecker) tc.context(sc.context());
         expr = (Expr)expr.visit(tc);
 	
+        if (expr.type() == null || !expr.type().isCanonical()) {
+            if (++expr_disamb_fail_count < EXPR_DISAMB_FAIL_LIMIT) {
+                // keep trying until we exhaust our patience.
+                // needed for some cases where we can't distinguish if
+                // we need to push on regardless, or wait until the type
+                // really can be resolved.
+                Scheduler sched = sc.job().extensionInfo().scheduler();
+                Goal g = sched.Disambiguated(sc.job());
+                throw new MissingDependencyException(g);
+            }
+        }
+
         if (expr.type() != null && expr.type().isCanonical() && 
                 !JifUtil.isFinalAccessExprOrConst(ts, expr)) {
             // illegal dynamic label. But try to convert it to an access path
