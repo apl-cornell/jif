@@ -56,24 +56,7 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 	return false;
     }
 
-    // I want the argument to be a JifObject, but I do not want to restrict its security level
-    public JifObject[V] get(JifObject[K] key) {
-	Iterator[{K;V}] i = entrySet().iterator();
-	if (key==null) {
-	    while (i.hasNext()) {
-		Entry[K,V] e = (Entry) i.next();
-		if (e.getKey()==null)
-		    return e.getValue();
-	    }
-	} else {
-	    while (i.hasNext()) {
-		Entry[K,V] e = (Entry) i.next();
-		if (key.equals(e.getKey()))
-		    return e.getValue();
-	    }
-	}
-	return null;
-    }
+    public abstract JifObject[V]{V;key} get(JifObject[K] key);
 
 
     // Modification Operations
@@ -82,38 +65,15 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 	throw new UnsupportedOperationException();
     }
 
-    public JifObject[V]{V} remove{K;V](JifObject[K]{K} key) {
-	Iterator[{K;V}] i = entrySet().iterator();
-	Map$Entry[K,V] correctEntry = null;
-	if (key==null) {
-	    while (correctEntry==null && i.hasNext()) {
-		Map$Entry[K,V] e = (Map$Entry[K,V]) i.next();
-		if (e.getKey()==null)
-		    correctEntry = e;
-	    }
-	} else {
-	    while (correctEntry==null && i.hasNext()) {
-		Map$Entry[K,V] e = (Map$Entry[K,V]) i.next();
-		if (key.equals(e.getKey()))
-		    correctEntry = e;
-	    }
-	}
-
-	JifObject[V] oldValue = null;
-	if (correctEntry !=null) {
-	    oldValue = correctEntry.getValue();
-	    i.remove();
-	}
-	return oldValue;
-    }
+    public abstract JifObject[V]{V} remove{K;V}(JifObject[K]{K} key);
 
 
     // Bulk Operations
 
     public void putAll(Map[K,V] t) {
-	Iterator[{K;V}] i = t.entrySet().iterator();
+	Iterator[K] i = t.entrySet().iterator();
 	while (i.hasNext()) {
-	    Map$Entry[K,V] e = (Map$Entry[K,V]) i.next();
+	    Map$Entry[K,V]{K} e = (Map$Entry[K,V]) i.next();
 	    put(e.getKey(), e.getValue());
 	}
     }

@@ -28,5 +28,5 @@ public interface Map[label K, label V] extends JifObject[{K;V}] {
     Collection[V] values();
 
     // Removed, since this uses an inner class
-    Set[{K;V}] entrySet(); // Set[K] ?
+    Set[K] entrySet(); // Set[K] ?
 }
