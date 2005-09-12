@@ -1,0 +1,21 @@
+package jif.util;
+class AbstractMap$AbstractCollection$Iterator[label L] implements Iterator[L] {
+	private final AbstractMap$AbstractCollection parent;
+	AbstractMap$AbstractCollection$Iterator(AbstractMap$AbstractCollection parent)
+	{
+		this.parent = parent;
+	}
+	private Iterator i = parent.parent.entrySet().iterator();
+	
+	public boolean hasNext() {
+		return i.hasNext();
+	}
+	
+	public Object next() {
+		return ((Entry)i.next()).getValue();
+	}
+	
+	public void remove() {
+		i.remove();
+	}
+}

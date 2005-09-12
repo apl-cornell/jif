@@ -1,0 +1,19 @@
+package jif.util;
+class AbstractMap$AbstractCollection[label K, label V] extends AbstractCollection[V] {
+	final private AbstractMap parent;
+	AbstractMap$AbstractCollection(AbstractMap parent)
+	{
+		this.parent = parent;
+	}
+	public Iterator iterator() {
+		return new AbstractMap$AbstractCollection$Iterator[V](this);
+	}
+	
+	public int size() {
+		return parent.size();
+	}
+	
+	public boolean contains(JifObject[V] v) {
+		return AbstractMap.this.containsValue(v);
+	}
+}
