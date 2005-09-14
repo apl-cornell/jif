@@ -1,0 +1,260 @@
+public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
+	int INITIAL_SIZE=10;
+	int numberOfElements;
+	
+	int actualSize;
+	LabeledJifObject[] arrayOfKeys;
+	LabeledJifObject[] arrayOfValues;
+	
+	public ArrayMap()
+	{
+		actualSize = INITIAL_SIZE;
+		arrayOfKeys = new LabeledJifObject[actualSize];
+		arrayOfValues = new LabeledJifObject[actualSize];
+		numberOfElements = 0;
+	}
+	
+	// extend the size by INITIAL_SIZE
+	private extendSize()
+	{
+		int newSize  = actualSize + INITIAL_SIZE;
+		
+		LabeledJifObject[] newArrayOfKeys = new LabeledJifObject[newSize];
+		LabeledJifObject[] newArrayOfValues = new LabeledJifObject[newSize];
+		
+		for(int i = 0; i < numberOfElements; i++)
+		{
+			newArrayOfKeys[i] = arrayOfKeys[i];
+			newArrayOfValues[i] = arrayOfValues[i];
+		}
+		
+		arrayOfKeys = newArrayOfKeys;
+		arrayOfValues = newArrayOfValues;
+		actualSize.value = newSize;
+		
+	}
+	
+	public JifObject[V]{V;key} get(JifObject[K] key)
+	{
+		
+	}
+	
+	
+	// Modification Operations
+	
+	public JifObject[V]{V} put(JifObject[K]{K} key, JifObject[V]{V} value) {
+		throw new UnsupportedOperationException();
+	}
+	
+	public abstract JifObject[V]{V} remove{K;V}(JifObject[K]{K} key);
+	
+	
+	
+	
+	public Set[K] keySet()
+	{
+		if (keySet == null)
+		{
+			keySet = new LocalKeySet[K,V];
+		}
+		return keySet;
+	}	
+	
+	
+	public Collection[V] values{V}() {
+		if (values == null) {
+			values = new LocalValueCollection[K,V];
+		}
+		return values;
+	}
+	
+	
+}
+
+class LabeledJifObject {
+	final label{} L;
+	JifObject[*L]{*L} o;
+	
+	public LabeledObject(label{} newL, JifObject[*newL]{*newL} newO) {
+		this.L = newL;
+		this.o = newO;
+	}
+}
+
+class LocalValueCollection[label K, label V] extends AbstractCollection[V] {
+	private final ArrayMap[K,V] parent;
+	
+	LocalValueCollection(ArrayMap[K,V] parent)
+	{
+		this.parent = parent;
+	}
+	
+    public int{L} size()
+	{
+    	return parent.actualSize;
+	}
+    
+    public abstract Iterator[L]{this} iterator()
+	{
+    	return new LocalValueIterator[K,V](this.parent);
+	}
+	
+}
+																		
+
+class LocalKeySet[label K, label V] extends AbstractSet[K] {
+	
+	private final ArrayMap[K,V] parent;
+	LocalKeySet(ArrayMap[K,V] parent)
+	{
+		this.parent = parent;
+	}
+	
+	public int{K} size()
+	{
+		return parent.actualSize;
+	}	
+	
+	public boolean{K;o} contains(JifObject[K] o)
+	{
+		for(int i = 0; i < parent.actualSize; i++)
+		{
+			if(parent.arrayOfKeys[i].L <= K)
+			{
+				if(parent.arrayOfKeys[i].o.equals(o))
+				{
+					return true;
+				}
+			}
+		}
+		
+	}
+	
+	// XXX no locking required?
+	public boolean{K} remove{K}(JifObject[K]{K} o)
+	{
+		boolean found = false;
+		int i = 0;
+		while(!found && i < numberOfElements.value)
+		{
+			if(parent.arrayOfKeys[i].L <= L)
+			{
+				if(parent.arrayOfKeys[i].o.equals(o))
+				{
+					found = true;
+				}
+			}
+			i++;
+		}
+		if(found)
+		{
+			i--;
+			for(int j = i; j < parent.actualSize - 1; j++)
+			{
+				parent.arrayOfKeys[i] = parent.arrayOfKeys[i+1];
+				parent.arrayOfValues[i] = parent.arrayOfValues[i+1]
+			}
+			parent.actualSize--;
+		}
+	}
+	
+	public Iterator[K]{this} iterator()
+	{
+		return new LocalKeyIterator[K,V](this.parent);
+	}
+
+    public int{K} hashCode()
+	{
+    	// TODO will have to do this soon
+    	return 0;
+    }
+
+    public boolean{K;o} equals(IDComparable[K] o) {
+    	// TODO
+    	return false;
+    }
+    
+    public String{K} toString()
+	{
+    	return "Keys";
+	}
+}
+
+class LocalKeyIterator[label K, label V] implements Iterator[K] {
+	
+	private final ArrayMap[K,V] parent;
+	int position;
+	
+	LocalIterator(ArrayMap[K,V] parent)
+	{
+		this.parent = parent;
+		position = 0;
+	}
+	
+	boolean{K} hasNext()
+	{
+		if(position < parent.actualSize)
+		{
+			return true;
+		}
+		return false;		
+	}
+	
+	JifObject[K]{K} next{K}() throws (NoSuchElementException{K})
+	{
+		if(position >= parent.actualSize)
+		{
+			throw new NoSuchElementException();
+		}
+		
+		if(parent.arrayOfKeys[position++].L <= K)
+		{
+			return parent.arrayOfKeys[position++].o;
+		}
+		
+	}
+	
+	void remove{V}() throws (IllegalStateException{V}, UnsupportedOperationException{V})
+	{
+		throw new UnsupportedOperationException();
+	}
+}
+
+class LocalValueIterator[label K, label V] implements Iterator[V] {
+	
+	private final ArrayMap[K,V] parent;
+	int position;
+	
+	LocalValueIterator(ArrayMap[K,V] parent)
+	{
+		this.parent = parent;
+		position = 0;
+	}
+	
+	boolean{V} hasNext()
+	{
+		if(position < parent.actualSize)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	JifObject[V]{V} next{V}() throws (NoSuchElementException{V})
+	{
+		if(position >= parent.actualSize)
+		{
+			throw new NoSuchElementException();
+		}
+		
+		if(parent.arrayOfValues[position++].L <= V)
+		{
+			return parent.arrayOfValues[position++].o;
+		}
+	}
+	
+	void remove{V}() throws (IllegalStateException{V}, UnsupportedOperationException{V})
+	{
+		throw new UnsupportedOperationException();
+	}
+}
