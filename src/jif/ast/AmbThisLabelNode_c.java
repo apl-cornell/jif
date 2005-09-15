@@ -30,16 +30,15 @@ public class AmbThisLabelNode_c extends AmbLabelNode_c
      */
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
 	JifContext c = (JifContext)sc.context();
+	JifClassType ct = (JifClassType) c.currentClass();
     
-        if (c.inStaticContext() && !c.inConstructorCall()) {
+        if (ct == null || (c.inStaticContext() && !c.inConstructorCall())) {
             throw new SemanticException("The label \"this\" cannot be used " +
                 "in a static context.", position());
         }
         
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
-	JifClassType ct = (JifClassType) c.currentClass();
-    
 	if (!ct.thisLabel().isCanonical()) {
 	    Scheduler sched = sc.job().extensionInfo().scheduler();
 	    Goal g = sched.Disambiguated(sc.job());

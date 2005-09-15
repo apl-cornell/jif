@@ -330,6 +330,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	StaticThis4.jif (Semantic, "this.*cannot be used in a static context");
 	StaticThis5.jif (Semantic, "this.*cannot be used in a static context");
 	StaticThis6.jif ;
+	StaticThis7.jif (Semantic, "this.*cannot be used in a static context");
 	StringTester.jif ;
 	SubtypeChecker1.jif (Semantic, "not a subtype") ;
 	SubtypeChecker2.jif ;
