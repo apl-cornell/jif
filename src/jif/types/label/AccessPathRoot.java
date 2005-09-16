@@ -15,6 +15,10 @@ public abstract class AccessPathRoot extends AccessPath {
         super(pos);    
     }
     
+    public boolean isUninterpreted() {
+        return false;
+    }
+
     public PathMap labelcheck(JifContext A) {
         throw new UnsupportedOperationException("Cannot labelcheck an " + this.getClass());
     }

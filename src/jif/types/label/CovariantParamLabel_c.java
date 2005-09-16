@@ -23,7 +23,16 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
     public CovariantParamLabel_c(ParamInstance paramInstance, JifTypeSystem ts, Position pos) {
         super(ts, pos, new ParamToJavaExpr_c());
         this.paramInstance = paramInstance;
-    }
+        String className = null;
+        if (paramInstance != null && paramInstance.container() != null) {
+            className = paramInstance.container().fullName();
+        }
+        if (className != null && paramInstance.name() != null) {
+            setDescription("covariant label parameter " + 
+                           paramInstance.name() + " of class " + 
+                           className);
+        }
+    }	
     
     public ParamInstance paramInstance() {
         return paramInstance;

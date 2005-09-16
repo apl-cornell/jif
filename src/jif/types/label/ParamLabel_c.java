@@ -21,6 +21,15 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
     public ParamLabel_c(ParamInstance paramInstance, JifTypeSystem ts, Position pos) {
         super(ts, pos, new ParamToJavaExpr_c());
         this.paramInstance = paramInstance;
+        String className = null;
+        if (paramInstance != null && paramInstance.container() != null) {
+            className = paramInstance.container().fullName();
+        }
+        if (className != null && paramInstance.name() != null) {
+            setDescription("label parameter " + 
+                           paramInstance.name() + " of class " + 
+                           className);
+        }
     }
     
     public ParamInstance paramInstance() {

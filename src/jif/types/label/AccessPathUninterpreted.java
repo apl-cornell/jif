@@ -46,11 +46,17 @@ import polyglot.util.Position;
  * @see jif.ast.JifInstantiator
  */
 public class AccessPathUninterpreted extends AccessPathRoot {
-    public AccessPathUninterpreted(Position pos) {
+    Expr expr;
+    public AccessPathUninterpreted(Expr expr, Position pos) {
         super(pos);
+        this.expr = expr;
     }
 
     public boolean isCanonical() {
+        return true;
+    }
+    
+    public boolean isUninterpreted() {
         return true;
     }
 
@@ -60,9 +66,9 @@ public class AccessPathUninterpreted extends AccessPathRoot {
 
     public String toString() {
         if (Report.should_report(Report.debug, 1)) {
-            return "<uninterpreted path>";
+            return "<uninterpreted path: " + expr + ">";
         }
-        return "<>";
+        return "<uninterp: " + expr + ">";
     }
 
     public boolean equals(Object o) {

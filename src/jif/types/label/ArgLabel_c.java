@@ -21,10 +21,16 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         vi = null;
     }
     public ArgLabel_c(JifTypeSystem ts, VarInstance vi, Position pos) {
-        super(ts, pos);
+        super(ts, pos);        
+        setDescription();
         this.vi = vi;
     }
     
+    private void setDescription() {
+        this.setDescription("polymorphic label of the formal argument " + 
+                            vi.name() + " (bounded above by " + 
+                            upperBound + ")");
+    }
     public VarInstance formalInstance() {
         return vi;
     }
@@ -35,6 +41,7 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     
     public void setUpperBound(Label upperBound) {
         this.upperBound = upperBound;
+        setDescription();
     }
 
     public boolean isRuntimeRepresentable() { return false; }

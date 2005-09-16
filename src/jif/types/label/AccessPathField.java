@@ -30,6 +30,7 @@ public class AccessPathField extends AccessPath {
     }
     
     public boolean isCanonical() { return path.isCanonical(); }
+    public boolean isUninterpreted() { return path.isUninterpreted(); }
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         AccessPath newPath = path.subst(r, e);
         if (newPath == path) return this;

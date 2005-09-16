@@ -160,4 +160,10 @@ public class JifUtil
         throw new InternalCompilerError("Expected a final access expression, or constant");
     }
 
+    public static String accessPathDescrip(AccessPath path, String kind) {
+        if (path.isUninterpreted()) {
+            return "an uninterpreted dynamic " + kind;
+        }
+        return "dynamic " + kind + " represented by the final access path " + path;
+    }
 }

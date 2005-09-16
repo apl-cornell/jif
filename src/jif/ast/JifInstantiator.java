@@ -88,7 +88,7 @@ public class JifInstantiator
                             target = JifUtil.exprToAccessPath(actualExpr, callerContext);
                         }
                         else {
-                            target = new AccessPathUninterpreted(pos);                            
+                            target = new AccessPathUninterpreted(actualExpr, pos);                            
                         }
                         L = L.subst(new AccessPathInstantiator(root, target));
                     }
@@ -176,7 +176,7 @@ public class JifInstantiator
                         target = JifUtil.exprToAccessPath(actualExpr, callerContext);
                     }
                     else {
-                        target = new AccessPathUninterpreted(pos);                            
+                        target = new AccessPathUninterpreted(actualExpr, pos);                            
                     }
                     p = p.subst(new AccessPathInstantiator(root, target));
                 }
@@ -238,7 +238,7 @@ public class JifInstantiator
             receiverPath = JifUtil.exprToAccessPath(receiverExpr, A);
         }
         else {
-            receiverPath = new AccessPathUninterpreted(L.position()); 
+            receiverPath = new AccessPathUninterpreted(receiverExpr, L.position()); 
         }
         return instantiate(L, A, receiverPath, receiverType, receiverLbl);
     }
@@ -342,7 +342,7 @@ public class JifInstantiator
             receiverPath = JifUtil.exprToAccessPath(receiverExpr, A);
         }
         else {
-            receiverPath = new AccessPathUninterpreted(p.position());
+            receiverPath = new AccessPathUninterpreted(receiverExpr, p.position());
         }
         
         if (receiverType.isClass()) {

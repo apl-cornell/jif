@@ -17,6 +17,7 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
         super(ts, pos);
         this.ct = ct;
         this.fullName = ct.fullName();
+        setDescription("label of the special variable \"this\"");
     }
     
 

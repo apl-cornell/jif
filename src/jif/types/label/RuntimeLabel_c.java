@@ -16,7 +16,7 @@ public class RuntimeLabel_c extends Label_c implements RuntimeLabel {
     public RuntimeLabel_c(JifTypeSystem ts, Position pos) {
         super(ts, pos);
         setDescription("static representation of the " +
-                        "join of all runtime representable labels");
+                        "join of all runtime-representable labels");
     }
     
     public boolean isComparable() { return true; }

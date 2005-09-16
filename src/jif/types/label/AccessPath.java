@@ -40,6 +40,7 @@ public abstract class AccessPath implements Serializable {
     }
 
     public abstract boolean isCanonical();
+    public abstract boolean isUninterpreted();
 
     /**
      * Return the result of substituting the root r with the access path
