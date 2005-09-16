@@ -22,8 +22,8 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     }
     public ArgLabel_c(JifTypeSystem ts, VarInstance vi, Position pos) {
         super(ts, pos);        
-        setDescription();
         this.vi = vi;
+        setDescription();
     }
     
     private void setDescription() {
