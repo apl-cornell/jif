@@ -115,11 +115,6 @@ public abstract class AbstractPrincipal implements Principal {
                 	this.getClass() == p.getClass();        
     }
     
-    public int{this} hashCode() {
-        if (name == null) return -382389;
-        return name.hashCode();
-    }
-
     /**
      * Create a new chain of length <code>chain.length+1</code>, such that
      * the last element of the new chain is <code>p</code>, and 
