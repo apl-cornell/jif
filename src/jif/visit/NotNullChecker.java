@@ -3,6 +3,7 @@ package jif.visit;
 import java.util.*;
 
 import jif.ast.LabelExpr;
+import jif.ast.PrincipalNode;
 import jif.extension.*;
 import jif.types.LabelSubstitution;
 import jif.types.label.*;
@@ -410,6 +411,9 @@ public class NotNullChecker extends DataFlow
         else if (n instanceof LabelExpr) {
             checkLabelExpr((LabelExpr)n, (DataFlowItem)inItem);
         }
+        else if (n instanceof PrincipalNode) {
+            checkPrincipalNode((PrincipalNode)n, (DataFlowItem)inItem);
+        }
     }    
     
     private void checkField(Field f, DataFlowItem inItem) {
@@ -444,6 +448,15 @@ public class NotNullChecker extends DataFlow
         LabelNotNullSubst lnns = new LabelNotNullSubst(inItem);
         try {
             l.subst(lnns);
+        }
+        catch (SemanticException se) {
+            throw new InternalCompilerError("Unexpected SemanticException", se);
+        }
+    }
+    private void checkPrincipalNode(PrincipalNode pn, DataFlowItem inItem) {
+        LabelNotNullSubst lnns = new LabelNotNullSubst(inItem);
+        try {
+            pn.principal().subst(lnns);
         }
         catch (SemanticException se) {
             throw new InternalCompilerError("Unexpected SemanticException", se);
