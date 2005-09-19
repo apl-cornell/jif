@@ -224,7 +224,7 @@ public class LabelTypeCheckUtil {
      */
     public static List throwTypes(JifClassType type, JifTypeSystem ts) {
         Type t = ts.unlabel(type);
-        if (t instanceof JifSubstType) {            
+        if (t instanceof JifSubstType && ts.isParamsRuntimeRep(t)) {            
             JifSubstType jst = (JifSubstType)t;
             List exc = new ArrayList();
             for (Iterator i = jst.entries(); i.hasNext();) {
