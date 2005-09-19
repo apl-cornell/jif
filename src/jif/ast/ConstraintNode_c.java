@@ -1,12 +1,11 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
-import jif.types.*;
-import jif.visit.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import jif.types.Assertion;
+import polyglot.ext.jl.ast.Node_c;
+import polyglot.types.SemanticException;
+import polyglot.util.Position;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
 
 /** An implementation of the <code>ConstraintNode</code> interface. 
  */
@@ -32,6 +31,18 @@ public class ConstraintNode_c extends Node_c implements ConstraintNode
 	return n;
     }
 
+    /**
+     * Bypass all children when peforming an exception check. Constraints
+     * aren't examined at runtime.
+     */
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
+    throws SemanticException
+    {
+        ec = (ExceptionChecker) super.exceptionCheckEnter(ec);
+        return ec.bypassChildren(this);
+    }
+
+    
     public String toString() {
 	if (constraint != null) {
 	    return constraint.toString();
