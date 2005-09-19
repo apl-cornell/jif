@@ -14,6 +14,7 @@ import polyglot.util.Position;
 public class AccessPathLocal extends AccessPathRoot {
     private LocalInstance li;
     private String name;
+    private boolean neverNull = false;
     public AccessPathLocal(LocalInstance li, String name, Position pos) {
         super(pos);
         this.li = li;
@@ -33,6 +34,12 @@ public class AccessPathLocal extends AccessPathRoot {
         return this;
     }
     
+    public boolean isNeverNull() {
+        return neverNull;
+    }
+    public void setIsNeverNull() {
+        this.neverNull = true;
+    }
     public String toString() {
         return name;
     }

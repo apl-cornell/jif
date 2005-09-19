@@ -62,6 +62,7 @@ public class AccessPathConstant extends AccessPathRoot {
     public boolean isLabelConstant() {
         return this.isLabel;
     }
+    public boolean isNeverNull() { return false; }
 
     public boolean isPrincipalConstant() {
         return !this.isLabel;

@@ -91,10 +91,12 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
         Type b = base.type();
         
-        if (! b.isCanonical()) {
+        if (!base.isDisambiguated() || !b.isCanonical()) {
             //  not yet ready to disambiguate
-            return this;
+            Goal g = sc.job().extensionInfo().scheduler().Disambiguated(sc.job());
+            throw new MissingDependencyException(g);
         }
+
         if (! (b instanceof JifPolyType) || ((JifPolyType)b).params().isEmpty()) {
             throw new SemanticException("Cannot instantiate from a non-polymorphic type " + b);
         }

@@ -55,6 +55,7 @@ public class AccessPathUninterpreted extends AccessPathRoot {
     public boolean isCanonical() {
         return true;
     }
+    public boolean isNeverNull() { return false; }
     
     public boolean isUninterpreted() {
         return true;

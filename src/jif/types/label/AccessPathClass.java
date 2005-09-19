@@ -20,6 +20,7 @@ public class AccessPathClass extends AccessPathRoot {
     }
     
     public boolean isCanonical() { return true; }
+    public boolean isNeverNull() { return true; }
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         return this;
     }

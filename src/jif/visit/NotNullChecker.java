@@ -2,10 +2,18 @@ package jif.visit;
 
 import java.util.*;
 
+import jif.ast.LabelExpr;
 import jif.extension.*;
+import jif.types.LabelSubstitution;
+import jif.types.label.*;
+import jif.types.label.DynamicLabel;
+import jif.types.label.Label;
+import jif.types.principal.DynamicPrincipal;
+import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.frontend.Job;
 import polyglot.types.*;
+import polyglot.util.InternalCompilerError;
 import polyglot.visit.*;
 
 /**
@@ -60,13 +68,13 @@ public class NotNullChecker extends DataFlow
             // expression is not null if it is a "new" expression,
             // or if it is a VarInstance that is contained in 
             // notNullVariables, or if it is a cast of a 
-	    // non-null expression.
+        // non-null expression.
             return exprIsNotNullStatic(e) ||
                 (e instanceof Local && notNullVars.contains(((Local)e).localInstance())) ||
                 (e instanceof Field && ((Field)e).target() instanceof Special &&
                         ((Field)e).fieldInstance().flags().isFinal() &&
                         notNullVars.contains(((Field)e).fieldInstance())) ||
-		(e instanceof Cast && exprIsNotNull(((Cast)e).expr()));
+        (e instanceof Cast && exprIsNotNull(((Cast)e).expr()));
         }        
 
         public boolean equals(Object o) {
@@ -399,6 +407,9 @@ public class NotNullChecker extends DataFlow
         else if (n instanceof ArrayAccess) {
             checkArrayAccess((ArrayAccess)n, (DataFlowItem)inItem);
         }
+        else if (n instanceof LabelExpr) {
+            checkLabelExpr((LabelExpr)n, (DataFlowItem)inItem);
+        }
     }    
     
     private void checkField(Field f, DataFlowItem inItem) {
@@ -426,5 +437,54 @@ public class NotNullChecker extends DataFlow
             // that is never null.
             ((JifArrayAccessDel)a.del()).setArrayIsNeverNull();                
         }        
+    }
+    private void checkLabelExpr(LabelExpr e, DataFlowItem inItem) {
+        Label l = e.label().label();
+        
+        LabelNotNullSubst lnns = new LabelNotNullSubst(inItem);
+        try {
+            l.subst(lnns);
+        }
+        catch (SemanticException se) {
+            throw new InternalCompilerError("Unexpected SemanticException", se);
+        }
+    }
+    private class LabelNotNullSubst extends LabelSubstitution {
+        DataFlowItem inItem;
+        LabelNotNullSubst(DataFlowItem inItem) {
+            this.inItem = inItem;
+        }
+        public Label substLabel(Label L) throws SemanticException {
+            if (L instanceof DynamicLabel) {
+                DynamicLabel dl = (DynamicLabel)L;
+                checkPath(dl.path());                
+            }
+            return L;
+        }
+        public Principal substPrincipal(Principal p) throws SemanticException {
+            if (p instanceof DynamicPrincipal) {
+                DynamicPrincipal dp = (DynamicPrincipal)p;
+                checkPath(dp.path());                
+            }
+            return p;
+        }
+        private void checkPath(AccessPath p) {
+            while (p instanceof AccessPathField) {
+                AccessPathField apf = (AccessPathField)p;
+                FieldInstance fi = apf.fieldInstance();
+                p = apf.path(); 
+
+                if (fi.flags().isFinal() && p instanceof AccessPathThis &&
+                        inItem.notNullVars.contains(fi)) {
+                    apf.setIsNeverNull();
+                }
+            }
+            if (p instanceof AccessPathLocal) {
+                AccessPathLocal apl = (AccessPathLocal)p;
+                if (inItem.notNullVars.contains(apl.localInstance())) {
+                    apl.setIsNeverNull();                    
+                }                    
+            }            
+        }
     }
 }

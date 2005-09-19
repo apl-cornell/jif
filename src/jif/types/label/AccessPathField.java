@@ -18,6 +18,7 @@ public class AccessPathField extends AccessPath {
     private FieldInstance fi;
     private String fieldName;
     private AccessPath path;
+    private boolean neverNull = false;
 
     public AccessPathField(AccessPath path, FieldInstance fi, String fieldName, Position pos) {
         super(pos);
@@ -29,6 +30,13 @@ public class AccessPathField extends AccessPath {
         }
     }
     
+    public boolean isNeverNull() {
+        return neverNull;
+    }
+    public void setIsNeverNull() {
+        this.neverNull = true;
+    }
+
     public boolean isCanonical() { return path.isCanonical(); }
     public boolean isUninterpreted() { return path.isUninterpreted(); }
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
@@ -37,6 +45,7 @@ public class AccessPathField extends AccessPath {
         
         return new AccessPathField(newPath, fi, fieldName, position());
     }
+    
     public String toString() {
         return path + "." + fieldName;
     }
@@ -45,6 +54,9 @@ public class AccessPathField extends AccessPath {
     }	
     public AccessPath path() {
         return this.path;
+    }
+    public FieldInstance fieldInstance() {
+        return this.fi;
     }
     public boolean equals(Object o) {
         if (o instanceof AccessPathField) {
@@ -82,9 +94,7 @@ public class AccessPathField extends AccessPath {
     }
     
     protected boolean isTargetNeverNull() {
-    	// TODO: ideally, we should
-        // take into account the not-null checking, and thus be more accurate. 
-        return (path instanceof AccessPathThis || path instanceof AccessPathClass);
+        return path.isNeverNull();
     }
     public void verify(JifContext A) throws SemanticException {
         path.verify(A);

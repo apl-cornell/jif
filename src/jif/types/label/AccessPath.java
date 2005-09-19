@@ -59,6 +59,8 @@ public abstract class AccessPath implements Serializable {
 
     public abstract int hashCode();
 
+    public abstract boolean isNeverNull();
+
     public abstract PathMap labelcheck(JifContext A);
 
     public final Position position() {
