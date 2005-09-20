@@ -88,8 +88,11 @@ public class JifFieldAssignExt extends JifAssignExt
 
         Label L = Lf;
 
-        Type ft = JifInstantiator.instantiate(fe.type(), A, (Expr)target, JifFieldExt.targetType(ts, A, target, fe), X(target).NV());         
-        fe = (Field)fe.type(ft);
+        if (target instanceof Expr) {
+            // instantiate the type of the field
+            Type ft = JifInstantiator.instantiate(fe.type(), A, (Expr)target, JifFieldExt.targetType(ts, A, target, fe), X(target).NV());         
+            fe = (Field)fe.type(ft);
+        }
         
         if (target instanceof Special && A.checkingInits()) {
             // Relax the constraint: instead of X[nv] <= L, use
