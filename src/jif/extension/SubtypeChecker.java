@@ -29,7 +29,6 @@ public class SubtypeChecker
             supertype = ts.unlabel(supertype);
             subtype = ts.unlabel(subtype);                
             
-            
             if (Report.should_report(Report.types, 1))
                 Report.report(1, "Adding subtype constraints: " + supertype + " >= " + subtype);
 
@@ -83,7 +82,7 @@ public class SubtypeChecker
      * If not found, throw a <code>SemanticException</code>.
      * This really should not happen since we're past type checking.
      */
-    private  void addParamConstraints(LabelChecker lc, Position pos,
+    private void addParamConstraints(LabelChecker lc, Position pos,
 	JifClassType supertype, JifClassType subtype) throws SemanticException
     {
 	if (Report.should_report(Report.types, 2))
@@ -150,8 +149,15 @@ public class SubtypeChecker
 	    else if (pi.isPrincipal()) {
 		if (! A.actsFor(principal(supParam, pos), principal(subParam, pos)) ||
 		    ! A.actsFor(principal(subParam, pos), principal(supParam, pos))) {		    
-		    throw new SemanticException(
-			    "Principals must be equivalent.", pos);
+		    throw new SemanticDetailedException(
+                         origSubtype + " is not a subtype of " + 
+                         origSupertype + ", since the principals are not equivalent.", 
+                         origSubtype + " is not a subtype of " + 
+                         origSupertype + ". Subtyping requires " +
+                         "the " + StringUtil.nth(count) + 
+                         " parameter of the subtype to be equivalent to the " +
+                         StringUtil.nth(count) + " parameter of the supertype.",
+                         pos);
 		}
 	    }
 	}
