@@ -246,6 +246,7 @@ terminal Token AUTHORITY;
 terminal Token CALLER;
 terminal Token ACTSFOR;
 terminal Token ACTSFOR_LOWER;
+terminal Token EQUIV;
 terminal Token DECLASSIFY;
 
 non terminal DeclassifyExpr declassify;
@@ -739,6 +740,9 @@ transfer primary_no_new_array to primary_no_array {
 extend relational_expression ::=
      relational_expression:a actsfor shift_expression:b {:
                 RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.ACTSFOR, b);
+                :}
+  |  relational_expression:a EQUIV shift_expression:b {:
+                RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.EQUIV, b);
                 :}
     ;
 

@@ -1,33 +1,34 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
-import jif.types.*;
-import jif.types.principal.ParamPrincipal;
-import jif.visit.*;
+import java.util.List;
+
+import jif.types.SemanticDetailedException;
 import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.ext.jl.ast.Stmt_c;
+import polyglot.types.SemanticException;
+import polyglot.util.*;
 import polyglot.visit.*;
-import polyglot.util.CodeWriter;
-import polyglot.util.Position;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.CollectionUtil;
-import polyglot.frontend.Pass;
-import java.util.*;
 
 /** An implementation of the <tt>ActsFor</tt> interface. */
 public class ActsFor_c extends Stmt_c implements ActsFor
 {
+    protected Kind kind;
     protected PrincipalNode actor;
     protected PrincipalNode granter;
     protected Stmt consequent;
     protected Stmt alternative;
 
-    public ActsFor_c(Position pos, PrincipalNode actor, PrincipalNode granter, Stmt consequent, Stmt alternative) {
+    public ActsFor_c(Position pos, Kind kind, PrincipalNode actor, PrincipalNode granter, Stmt consequent, Stmt alternative) {
 	super(pos);
+	this.kind = kind;
 	this.actor = actor;
 	this.granter = granter;
 	this.consequent = consequent;
 	this.alternative = alternative;
+    }
+
+    public Kind kind() {
+        return this.kind;
     }
 
     /** Gets the actor principal. */
@@ -157,7 +158,9 @@ public class ActsFor_c extends Stmt_c implements ActsFor
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("if (");
         print(actor, w, tr);
-        w.write(" actsfor ");
+        w.write(" ");
+        w.write(kind.toString());
+        w.write(" ");
         print(granter, w, tr);
         w.write(")");
 

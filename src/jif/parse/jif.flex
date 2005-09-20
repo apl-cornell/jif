@@ -104,6 +104,7 @@ import java.util.HashMap;
         /* Jif-specific keywords */    
         keywords.put("actsFor",       new Integer(sym.ACTSFOR));
         keywords.put("actsfor",       new Integer(sym.ACTSFOR_LOWER));
+        keywords.put("equiv",         new Integer(sym.EQUIV));
         keywords.put("authority",     new Integer(sym.AUTHORITY));
         keywords.put("caller",        new Integer(sym.CALLER));
         keywords.put("covariant",     new Integer(sym.COVARIANT));

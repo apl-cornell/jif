@@ -1,5 +1,8 @@
 package jif.translate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jif.ast.ActsFor;
 import polyglot.ast.*;
 import polyglot.types.SemanticException;
@@ -21,21 +24,32 @@ public class ActsForToJavaExt_c extends ToJavaExt_c {
         Stmt consequent = n.consequent();
         Stmt alternative = n.alternative();
 
+        String comparison = "jif.lang.PrincipalUtil.actsFor((%E), (%E))";
+        List l = new ArrayList(5);
+        l.add(actor);
+        l.add(granter);
+        if (n.kind() == ActsFor.EQUIV) {
+            comparison += " && jif.lang.PrincipalUtil.actsFor((%E), (%E))";
+            l.add(granter);             
+            l.add(actor);
+        }
+        l.add(consequent);
         if (alternative != null) {
+            l.add(alternative);
             return rw.qq().parseStmt(
-                "if (jif.lang.PrincipalUtil.actsFor((%E), (%E))) {" +
+                "if (" + comparison + ") {" +
                 "   %S                                          " +
                 "} else {                                       " +
                 "   %S                                          " +
                 "}                                              ",
-                actor, granter, consequent, alternative);
+                l);
         }
         else {
             return rw.qq().parseStmt(
-                "if (jif.lang.PrincipalUtil.actsFor((%E), (%E))) {" +
+                "if (" + comparison + ") {" +
                 "   %S                                          " +
                 "}                                              ",
-                actor, granter, consequent);
+                l);
         }
     }
 }

@@ -8,7 +8,6 @@ import jif.types.ParamInstance;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
-import polyglot.ext.jl.ast.Formal_c;
 import polyglot.ext.jl.ast.NodeFactory_c;
 import polyglot.types.Flags;
 import polyglot.types.Type;
@@ -316,14 +315,14 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public ActsFor ActsFor(Position pos, Principal actor, Principal granter, Stmt consequent, Stmt alternative) {
+    public ActsFor ActsFor(Position pos, ActsFor.Kind kind, Principal actor, Principal granter, Stmt consequent, Stmt alternative) {
         PrincipalNode actorNode = CanonicalPrincipalNode(actor.position(), actor);
         PrincipalNode granterNode = CanonicalPrincipalNode(granter.position(), granter);
-        return ActsFor(pos, actorNode, granterNode, consequent, alternative);
+        return ActsFor(pos, kind, actorNode, granterNode, consequent, alternative);
         
     }
-    public ActsFor ActsFor(Position pos, PrincipalNode actor, PrincipalNode granter, Stmt consequent, Stmt alternative) {
-        ActsFor n = new ActsFor_c(pos, actor, granter, consequent,
+    public ActsFor ActsFor(Position pos, ActsFor.Kind kind, PrincipalNode actor, PrincipalNode granter, Stmt consequent, Stmt alternative) {
+        ActsFor n = new ActsFor_c(pos, kind, actor, granter, consequent,
                                   alternative);
         n = (ActsFor)n.ext(jifExtFactory().extActsFor());
         n = (ActsFor)n.del(delFactory().delStmt());

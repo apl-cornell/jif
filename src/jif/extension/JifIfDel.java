@@ -2,13 +2,8 @@ package jif.extension;
 
 import jif.ast.*;
 import jif.types.*;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
 import jif.types.label.AccessPath;
 import polyglot.ast.*;
-import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.Scheduler;
-import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeChecker;
@@ -23,11 +18,12 @@ public class JifIfDel extends JifJL_c {
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         // replace this with an actsfor node if appropriate
         If ifNode = (If)node();
-        if (ifNode.cond() instanceof Binary && ((Binary)ifNode.cond()).operator() == JifBinaryDel.ACTSFOR) {
+        if (ifNode.cond() instanceof Binary && 
+                (((Binary)ifNode.cond()).operator() == JifBinaryDel.ACTSFOR || 
+                 ((Binary)ifNode.cond()).operator() == JifBinaryDel.EQUIV)) {
             // replace the "if (.. actsfor ..) { ... } else { ... }" node with
             // an actsfor node.            
             JifNodeFactory nf = (JifNodeFactory)ar.nodeFactory();
-            JifTypeSystem ts = (JifTypeSystem)ar.typeSystem();
             Binary b = (Binary)ifNode.cond();
             Expr left = b.left();
             Expr right = b.right();
@@ -52,7 +48,8 @@ public class JifIfDel extends JifJL_c {
 
             actor = (PrincipalNode)actor.disambiguate(ar);
             granter = (PrincipalNode)granter.disambiguate(ar);
-            return nf.ActsFor(ifNode.position(), actor, granter, ifNode.consequent(), ifNode.alternative());
+            ActsFor.Kind kind = b.operator() == JifBinaryDel.ACTSFOR ? ActsFor.ACTSFOR : ActsFor.EQUIV;
+            return nf.ActsFor(ifNode.position(), kind, actor, granter, ifNode.consequent(), ifNode.alternative());
         }
         return super.disambiguate(ar);
     }

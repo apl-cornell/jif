@@ -1,7 +1,10 @@
 package jif.ast;
 
+import polyglot.ast.*;
 import polyglot.ast.CompoundStmt;
 import polyglot.ast.Stmt;
+import polyglot.ast.Binary.Operator;
+import polyglot.util.Enum;
 
 /**An immutable representation of a Jif <code>actsFor</code> statement.
  * Grammer: <code>actsFor(actor, granter) statement [else statement]
@@ -9,6 +12,16 @@ import polyglot.ast.Stmt;
  */
 public interface ActsFor extends CompoundStmt
 {
+    public static class Kind extends Enum {
+        public Kind(String name) { super(name); }
+    }
+
+    public static final Kind ACTSFOR  = new Kind("actsFor");
+    public static final Kind EQUIV    = new Kind("equiv");
+
+    /** Gets the kind. */
+    Kind kind();
+
     /** Gets the actor. */
     PrincipalNode actor();
 

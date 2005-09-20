@@ -15,6 +15,7 @@ import polyglot.visit.TypeChecker;
 public class JifBinaryDel extends JifJL_c
 {
     public static final Binary.Operator ACTSFOR  = new Operator("actsfor", Precedence.RELATIONAL);
+    public static final Binary.Operator EQUIV  = new Operator("equiv", Precedence.RELATIONAL);
 
     public JifBinaryDel() { }
 
@@ -22,6 +23,9 @@ public class JifBinaryDel extends JifJL_c
         Binary b = (Binary)node();
         if (b.operator() == ACTSFOR) {
             throw new SemanticException("The actsfor binary operator can only be used in an if statement, for example \"if (" + b + ") { ... }\"", b.position());
+        }
+        if (b.operator() == EQUIV) {
+            throw new SemanticException("The equiv binary operator can only be used in an if statement, for example \"if (" + b + ") { ... }\"", b.position());
         }
         
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
