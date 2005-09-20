@@ -5,6 +5,7 @@ import java.util.*;
 import jif.ast.LabelExpr;
 import jif.ast.PrincipalNode;
 import jif.extension.*;
+import jif.types.*;
 import jif.types.LabelSubstitution;
 import jif.types.label.*;
 import jif.types.label.DynamicLabel;
@@ -414,6 +415,15 @@ public class NotNullChecker extends DataFlow
         else if (n instanceof PrincipalNode) {
             checkPrincipalNode((PrincipalNode)n, (DataFlowItem)inItem);
         }
+        else if (n instanceof Cast) {
+            checkTypeNode(((Cast)n).castType(), (DataFlowItem)inItem);
+        }
+        else if (n instanceof Instanceof) {
+            checkTypeNode(((Instanceof)n).compareType(), (DataFlowItem)inItem);
+        }
+        else if (n instanceof New) {
+            checkTypeNode(((New)n).objectType(), (DataFlowItem)inItem);
+        }
     }    
     
     private void checkField(Field f, DataFlowItem inItem) {
@@ -462,6 +472,42 @@ public class NotNullChecker extends DataFlow
             throw new InternalCompilerError("Unexpected SemanticException", se);
         }
     }
+
+    private void checkTypeNode(TypeNode tn, DataFlowItem inItem) {
+        Type t = tn.type();
+        if (t instanceof JifSubstType && ((JifTypeSystem)ts).isParamsRuntimeRep(t)) {            
+            LabelNotNullSubst lnns = new LabelNotNullSubst(inItem);
+            JifSubstType jst = (JifSubstType)t;
+            for (Iterator i = jst.entries(); i.hasNext();) {
+                Map.Entry e = (Map.Entry)i.next();
+                Object arg = e.getValue();
+                if (arg instanceof Label) {
+                    Label L = (Label)arg;
+                    try {
+                        L.subst(lnns);
+                    }
+                    catch (SemanticException se) {
+                        throw new InternalCompilerError("Unexpected SemanticException", se);
+                    }
+                    
+                }
+                else if (arg instanceof Principal) {
+                    Principal p = (Principal)arg;
+                    try {
+                        p.subst(lnns);
+                    }
+                    catch (SemanticException se) {
+                        throw new InternalCompilerError("Unexpected SemanticException", se);
+                    }
+                }
+                else {
+                    throw new InternalCompilerError("Unexpected type for entry: "
+                                                    + arg.getClass().getName());
+                }
+            }            
+        }
+    }
+    
     private class LabelNotNullSubst extends LabelSubstitution {
         DataFlowItem inItem;
         LabelNotNullSubst(DataFlowItem inItem) {
