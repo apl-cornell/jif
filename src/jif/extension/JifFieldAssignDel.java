@@ -14,7 +14,7 @@ public class JifFieldAssignDel extends JifJL_c
     }
 
     /** 
-     * This differs from the method defined in Field_c in that it does not
+     * This differs from the method defined in FieldAssign_c in that it does not
      * throw a null pointer exception if the receiver is guaranteed to be 
      * non-null
      */
@@ -22,10 +22,8 @@ public class JifFieldAssignDel extends JifJL_c
         List l = new ArrayList();
 
         Assign a = (Assign)node();
-        if (a.operator() == Assign.ASSIGN) {
-            if (!((JifFieldDel)a.left().del()).targetIsNeverNull()) {
-                l.add(ts.NullPointerException());
-            }
+        if (!((JifFieldDel)a.left().del()).targetIsNeverNull()) {
+            l.add(ts.NullPointerException());
         }
 
         return l;
