@@ -1,0 +1,8 @@
+public class MapTest
+{
+  public static void main(String[] args)
+  {
+    Map[{Alice:},{Bob:}] map = new ArrayMap[{Alice:},{Bob:}]();
+
+  }
+}
