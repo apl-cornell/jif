@@ -33,7 +33,7 @@ public class JifUtil
         else if (vi instanceof FieldInstance) {
             FieldInstance fi = (FieldInstance)vi;
             JifTypeSystem ts = (JifTypeSystem)fi.typeSystem();
-            if (fi.flags().isFinal() && (ts.isLabel(fi.type()) || ts.isPrincipal(fi.type()))) {
+            if (fi.flags().isFinal() && (ts.isLabel(fi.type()) || ts.isImplicitCastValid(fi.type(), ts.Principal()))) {
                 AccessPathRoot root;
                 if (fi.flags().isStatic()) {
                     root = new AccessPathClass(fi.container().toClass(), pos);                    
@@ -129,13 +129,16 @@ public class JifUtil
         if (e instanceof Special) {
             return ((Special)e).kind() == Special.THIS;          
         }
+        if (e instanceof Cast) {
+            return isFinalAccessExpr(ts, ((Cast)e).expr());        
+        }
         return false;
     }
     public static boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e) {
         return isFinalAccessExpr(ts, e) || 
             e instanceof LabelExpr || 
             e instanceof PrincipalNode ||
-            (e instanceof Cast && isFinalAccessExpr(ts, ((Cast)e).expr()));
+            (e instanceof Cast && isFinalAccessExprOrConst(ts, ((Cast)e).expr()));
     }
     public static Label exprToLabel(JifTypeSystem ts, Expr e, JifContext context) throws SemanticException {
         if (e instanceof LabelExpr) {
@@ -151,8 +154,7 @@ public class JifUtil
             return ((PrincipalNode)e).principal();
         }
         if (e instanceof Cast) {
-            return ts.dynamicPrincipal(e.position(), 
-                                       exprToAccessPath(((Cast)e).expr(), context));            
+            return exprToPrincipal(ts, ((Cast)e).expr(), context);            
         }
         if (isFinalAccessExpr(ts, e)) {
             return ts.dynamicPrincipal(e.position(), exprToAccessPath(e, context));
