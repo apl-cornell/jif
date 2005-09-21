@@ -2,6 +2,7 @@ package jif.visit;
 
 import java.util.*;
 
+import jif.ast.DeclassifyExpr;
 import jif.ast.LabelExpr;
 import jif.ast.PrincipalNode;
 import jif.extension.*;
@@ -64,7 +65,8 @@ public class NotNullChecker extends DataFlow
 		(e instanceof NewArray ) ||
 		(e instanceof ArrayInit ) ||
 		(e instanceof Lit && !(e instanceof NullLit)) ||
-		(e instanceof Cast && exprIsNotNullStatic(((Cast)e).expr()));
+		(e instanceof Cast && exprIsNotNullStatic(((Cast)e).expr())) ||
+		(e instanceof DeclassifyExpr && exprIsNotNullStatic(((DeclassifyExpr)e).expr()));
         }        
         boolean exprIsNotNull(Expr e) {
             // expression is not null if it is a "new" expression,
@@ -76,7 +78,8 @@ public class NotNullChecker extends DataFlow
                 (e instanceof Field && ((Field)e).target() instanceof Special &&
                         ((Field)e).fieldInstance().flags().isFinal() &&
                         notNullVars.contains(((Field)e).fieldInstance())) ||
-        (e instanceof Cast && exprIsNotNull(((Cast)e).expr()));
+        (e instanceof Cast && exprIsNotNull(((Cast)e).expr())) ||
+        (e instanceof DeclassifyExpr && exprIsNotNull(((DeclassifyExpr)e).expr()));
         }        
 
         public boolean equals(Object o) {
