@@ -67,7 +67,7 @@ public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
 	public JifObject[V]{K} put{K}(JifObject[K]{K} key, JifObject[V]{K} value)
   {
 		boolean found = false;
-		JifObject[V] old;
+		JifObject[V] old = null;
 		
    try
    {
@@ -264,7 +264,7 @@ class LocalValueCollection[label K, label V] extends AbstractCollection[V] {
 
 class LocalKeySet[label K, label V] extends AbstractSet[K] {
 	
-	private final ArrayMap[K,V] parent;
+	private final ArrayMap[K,V]{} parent;
 	LocalKeySet(ArrayMap[K,V] parent):{parent}
 	{
 		this.parent = parent;
@@ -337,7 +337,7 @@ class LocalKeySet[label K, label V] extends AbstractSet[K] {
 
   public int{K} hashCode()
   {
-    int{K} h=0;
+    int h=0;
     try
     {
       for(int i = 0; i < parent.actualSize; i++)
@@ -370,7 +370,7 @@ class LocalKeySet[label K, label V] extends AbstractSet[K] {
       return false;
     }
 
-    Set[K] other;
+    Set[K] other = null;
     try
     {
       other = (Set[K])o;
@@ -406,7 +406,7 @@ class LocalKeySet[label K, label V] extends AbstractSet[K] {
       buf = buf + "{";
       for(int i = 0; i < parent.actualSize; i++)
       {
-        buf = buf + parent.arrayOfValues[i].toString();
+        buf = buf + parent.arrayOfKeys[i].toString();
         if(i < parent.actualSize - 1)
         {
           buf = buf + ",";
@@ -422,10 +422,10 @@ class LocalKeySet[label K, label V] extends AbstractSet[K] {
 class LocalKeyIterator[label K, label V] implements Iterator[K] {
 	
 	private final ArrayMap[K,V] parent;
-	int position;
-  boolean nextCalled;
+	int{K} position;
+  boolean{K} nextCalled;
 	
-	LocalKeyIterator(ArrayMap[K,V] parent)
+	LocalKeyIterator(ArrayMap[K,V] parent):{parent}
 	{
 		this.parent = parent;
 		position = 0;

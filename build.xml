@@ -339,6 +339,11 @@ ext="-extclass split.ExtensionInfo"
 			<arg value="lib-classes" />
 			<arg value="-sourcepath" />
 			<arg value="lib-src" />
+<!--      
+      <arg value="-e" />
+      <arg value="-report" />
+      <arg value="debug=1" />
+-->      
 			<srcfile />
 			<fileset dir="${basedir}" includes="lib-src/**/*.jif" />
 			<mapper type="regexp" from="^lib-src(.*)\.jif" to="lib-classes\1\.class" />
