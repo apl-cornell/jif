@@ -12,21 +12,25 @@ public interface Map[label K, label V] extends JifObject[{K;V}] {
 
     boolean{K;key} containsKey(JifObject[K] key);
 
-    boolean{V;value} containsValue(JifObject[V] value);
+    // the following is removed since it can be emulated using the containsKey method
+    //boolean{K;value} containsValue(JifObject[V] value);
 
-    JifObject[V]{V; key} get(JifObject[K] key);
+    JifObject[V]{K; key} get(JifObject[K] key);
 
     // Modifying Operations
-    JifObject[V]{V} put{K;V}(JifObject[K]{K} key, JifObject[V]{V} value);
-    JifObject[V]{V} remove{K;V}(JifObject[K]{K} key);
+    JifObject[V]{K} put{K}(JifObject[K]{K} key, JifObject[V]{K} value);
+    JifObject[V]{K} remove{K}(JifObject[K]{K} key);
 
-    void putAll{K;V}(Map[K,V] t);
-    void clear{K;V}();
+    // the following is removed since it can be emulated with the put method
+    //void putAll{K}(Map[K,V]{K} t);
+    void clear{K}();
 
     // Views
     Set[K] keySet();
-    Collection[V] values();
 
-    // Removed, since this uses an inner class
-    Set[K] entrySet(); // Set[K] ?
+    // the following is removed since it can be emulated with the keySet and get methods
+    //Collection[{K;V}] values();
+
+    // the following is removed since it can be emulated with the keySet and get methods
+    //Set[{K;V}] entrySet(); // Set[K] ?
 }

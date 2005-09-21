@@ -3,14 +3,8 @@ package jif.util;
 interface Map$Entry[label K, label V] extends JifObject[{K;V}] {
 
 	JifObject[K]{K} getKey();
-	JifObject[V]{V} getValue();
 
-  // Do we need an argument label here?
-	JifObject[V] setValue{V}(JifObject[V]{V} value);
+	JifObject[V]{K} getValue();
 
-
-  // Not sure about this one: should it be a JifObject instead?
-	boolean{K;V;o} equals(JifObject[{K;V}] o);
-
-	int{K;V} hashCode();
+	JifObject[V]{K} setValue{K}(JifObject[V]{K} value);
 }

@@ -13,73 +13,60 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 	// Query Operations
 	
 	public int{K} size() {
-		return keySet().size();
+    try
+    {
+      return keySet().size();
+    } catch (NullPointerException unlikely) {return 0;}
 	}
 	
 	public boolean{K} isEmpty() {
 		return size() == 0;
 	}
 	
-	public boolean{V;value} containsValue(JifObject[V] value) {
-		Iterator[V] i = values().iterator();
-		if (value==null) {
-			while (i.hasNext()) {
-				JifObject[V] e = (JifObject[V]) i.next();
-				if (e == null)
-					return true;
-			}
-		} else {
-			while (i.hasNext()) {
-				JifObject[V] e = (JifObject[V]) i.next();
-				if (value.equals(e))
-					return true;
-			}
-		}
+	public boolean{K;key} containsKey(JifObject[K] key)
+  {
+    try
+    {
+      return keySet().contains(key);
+    } catch (NullPointerException unlikely) {}
+    
 		return false;
 	}
 	
-	public boolean{K;key} containsKey(JifObject[K]{K} key) {
-		Iterator[K] i = keySet().iterator();
-		if (key==null) {
-			while (i.hasNext()) {
-				JifObject[K] e = (JifObject[K]) i.next();
-				if (e == null)
-					return true;
-			}
-		} else {
-			while (i.hasNext()) {
-				JifObject[K] e = (JifObject[K]) i.next();
-				if (key.equals(e))
-					return true;
-			}
-		}
-		return false;
-	}
-	
-	public abstract JifObject[V]{V;key} get(JifObject[K] key);
+	public abstract JifObject[V]{K;key} get(JifObject[K] key);
 	
 	
 	// Modification Operations
 	
-	public JifObject[V]{V} put(JifObject[K]{K} key, JifObject[V]{V} value) {
-		throw new UnsupportedOperationException();
-	}
+	public abstract JifObject[V]{K} put{K}(JifObject[K]{K} key, JifObject[V]{K} value);
 	
-	public abstract JifObject[V]{V} remove{K;V}(JifObject[K]{K} key);
+	public abstract JifObject[V]{K} remove{K}(JifObject[K]{K} key);
 	
 	
 	// Bulk Operations
 	
-	public void putAll(Map[K,V] t) {
-		Iterator[K] i = t.entrySet().iterator();
-		while (i.hasNext()) {
-			Map$Entry[K,V]{K} e = (Map$Entry[K,V]) i.next();
-			put(e.getKey(), e.getValue());
-		}
+  /*
+	public void putAll{K}(Map[K,V]{K} t) {
+    try
+    {
+      
+  		Iterator[K] i = t.entrySet().iterator();
+  		while (i.hasNext())
+      {
+  			Map$Entry[K,V] e = (Map$Entry[K,V]) i.next();
+  			put(e.getKey(), e.getValue());
+  		}
+    } catch (NullPointerException unlikely) {}
+      catch (NoSuchElementException unlikely) {}
+      catch (ClassCastException unlikely) {}
 	}
+  */
 	
-	public void clear{K;V}() {
-		entrySet().clear();
+	public void clear{K}() {
+    try
+    {
+      keySet().clear();
+    } catch (NullPointerException unlikely) {}
 	}
 	
 	
@@ -90,16 +77,19 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 	 * appropriate view the first time this view is requested.  The views are
 	 * stateless, so there's no reason to create more than one of each.
 	 */
-	transient volatile Set[K]       keySet = null;
-	transient volatile Collection[V] values = null;
+	//final transient volatile Set[K]{this}       keySet = null;
+	//transient volatile Collection[V] values = null;
 	
 	
+  public abstract Set[K] keySet();
+  /*
 	public Set[K] keySet() {
 		if (keySet == null) {
 			keySet = new AbstractMap$AbstractSet[K,V](this);
 		}
 		return keySet;
 	}
+  */
 	
 	/**
 	 * Returns a collection view of the values contained in this map.  The
@@ -125,12 +115,17 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 	 *
 	 * @return a collection view of the values contained in this map.
 	 */
-	public Collection[V] values() {
+
+  //public abstract Collection[V] values();
+  /*
+	public Collection[V] values()
+  {
 		if (values == null) {
 			values = new AbstractMap$AbstractCollection[K, V](this);
 		}
 		return values;
 	}
+  */
 	
 	/**
 	 * Returns a set view of the mappings contained in this map.  Each element
@@ -145,7 +140,7 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 	 *
 	 * @return a set view of the mappings contained in this map.
 	 */
-	public abstract Set[K] entrySet();
+	//public abstract Set[K] entrySet();
 	
 	
 	// Comparison and hashing
@@ -173,7 +168,10 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 	 * @param o object to be compared for equality with this map.
 	 * @return <tt>true</tt> if the specified object is equal to this map.
 	 */
-	public boolean{K;V} equals(JifObject[{K;V}] o) {
+
+
+  /*
+	public boolean{K;V;o} equals{K}(IDComparable[{K;V}] o) {
 		if (o == this)
 			return true;
 		
@@ -184,11 +182,11 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 			return false;
 		
 		try {
-			Iterator[{K;V}] i = entrySet().iterator();
+			Iterator[K] i = entrySet().iterator();
 			while (i.hasNext()) {
 				Map$Entry[K,V] e = (Map$Entry[K,V]) i.next();
-				Object key = e.getKey();
-				Object value = e.getValue();
+				JifObject[K] key = e.getKey();
+				JifObject[V] value = e.getValue();
 				if (value == null) {
 					if (!(t.get(key)==null && t.containsKey(key)))
 						return false;
@@ -201,10 +199,13 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 			return false;
 		} catch(NullPointerException unused) {
 			return false;
-		}
+		} catch (NoSuchElementException unlikely) {
+      return false;
+    }
 		
 		return true;
 	}
+  */
 	
 	/**
 	 * Returns the hash code value for this map.  The hash code of a map is
@@ -224,13 +225,20 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 	 * @see Object#equals(Object)
 	 * @see Set#equals(Object)
 	 */
-	public int{K;V} hashCode() {
-		int{K;V} h = 0;
-		Iterator[{K;V}] i = entrySet().iterator();
-		while (i.hasNext())
-			h += i.next().hashCode();
+   /*
+	public int{K} hashCode() {
+		int{K} h = 0;
+    try
+    {
+      Iterator[K] i = entrySet().iterator();
+      while (i.hasNext())
+        h += i.next().hashCode();
+    } catch (NullPointerException unlikely) {}
+      catch (NoSuchElementException unlikely) {}
+    
 		return h;
 	}
+  */
 	
 	/**
 	 * Returns a string representation of this map.  The string representation
@@ -251,27 +259,37 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 	 *
 	 * @return a String representation of this map.
 	 */
+   /*
 	public String{K;V} toString() {
-		StringBuffer buf = new StringBuffer();
-		buf.append("{");
+    
+		String buf = "";
+
+    try
+    {
+      
+    buf = buf + "{";
 		
 		Iterator[{K;V}] i = entrySet().iterator();
 		boolean hasNext = i.hasNext();
 		while (hasNext) {
-			Entry e = (Entry) (i.next());
-			Object key = e.getKey();
-			Object value = e.getValue();
-			buf.append((key == this ?  "(this Map)" : key) + "=" + 
-					(value == this ? "(this Map)": value));
+			Map$Entry[K,V] e = (Map$Entry[K,V]) (i.next());
+			JifObject[K] key = e.getKey();
+			JifObject[V] value = e.getValue();
+			buf = buf + ((key == this ?"(this Map)" : key.toString()) + "=" + 
+					(value == this ? "(this Map)": value.toString()));
 			
 			hasNext = i.hasNext();
 			if (hasNext)
-				buf.append(", ");
+				buf = buf + ", ";
 		}
 		
-		buf.append("}");
-		return buf.toString();
+		buf = buf + "}";
+    } catch (NullPointerException unlikely) {}
+      catch (NoSuchElementException unlikely) {}
+      catch (ClassCastException unlikely) {}
+		return buf;
 	}
+  */
 	
 	/**
 	 * Returns a shallow copy of this <tt>AbstractMap</tt> instance: the keys
@@ -279,10 +297,12 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 	 *
 	 * @return a shallow copy of this map.
 	 */
+   /*
 	protected JifObject[{K;V}] clone() throws CloneNotSupportedException {
 		AbstractMap result = (AbstractMap)super.clone();
 		result.keySet = null;
 		result.values = null;
 		return result;
 	}
+  */
 }

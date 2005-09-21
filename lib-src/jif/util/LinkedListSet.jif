@@ -4,7 +4,7 @@ package jif.util;
  * An implementatin of Set, using a linked list to store the
  * list elements.
  */
-public class LinkedListSet[label L] extends AbstractSet[L]
+public class LinkedListSet[label L] extends AbstractSet[L] 
 {
     private final LinkedList[L]{this} list;
 
