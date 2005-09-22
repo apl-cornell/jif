@@ -1,0 +1,10 @@
+class C[label L] {
+    public boolean{} m() {
+	C[L] o = null;
+        if (o instanceof C[L]) {
+	    o = null;
+	    C[L] that = (C[L])o; // should throw a class cast exception here
+	}
+	return true;
+    }
+}

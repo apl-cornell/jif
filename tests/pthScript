@@ -285,6 +285,9 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Poly.jif ;
 	PreciseClass01.jif ;
 	PreciseClass02.jif ;
+	PreciseClass03.jif (Semantic, "ClassCastException.*declared");
+	PreciseClass04.jif ;
+	PreciseClass05.jif (Semantic, "ClassCastException.*declared");
 	Protected.jif ;
 	Recursive.jif ;
 	RuntimeParams01.jif ;

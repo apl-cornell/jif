@@ -10,10 +10,9 @@ import polyglot.types.*;
 import polyglot.visit.*;
 
 /**
- * Visitor which determines at which program points local variables and
- * final fields of this class cannot be
- * null, and thus field access and method calls to them cannot produce
- * NullPointerExceptions. This information is then stored in the appropriate
+ * Visitor which determines at which program points more precise information
+ * is known about the runtime class of local variables and
+ * final access paths. This information is then stored in the appropriate
  * delegates. 
  */
 public class PreciseClassChecker extends DataFlow
@@ -36,7 +35,7 @@ public class PreciseClassChecker extends DataFlow
     }
 
     static class DataFlowItem extends Item {
-        // Maps VarInstances of Sets of ClassTypes
+        // Maps AccessPaths of Sets of ClassTypes
         Map classTypes;
 
         DataFlowItem() {
@@ -91,21 +90,20 @@ public class PreciseClassChecker extends DataFlow
         if (n instanceof Instanceof) {
             Instanceof io = (Instanceof)n;
             Expr e = io.expr();
-            VarInstance vi = findVarInstance(e);
-            if (vi != null) {                        
+            AccessPath ap = findAccessPathForExpr(e);
+            if (ap != null) {                        
                 // on the true branch of an instanceof, we know that
-                // the var instance is in fact an instance of the compare type.
-                Map trueBranch = addClass(dfIn.classTypes, vi, io.compareType().type());
-                Map m = itemsToMap(new DataFlowItem(trueBranch), 
+                // the path is in fact an instance of the compare type.
+                Map trueBranch = addClass(dfIn.classTypes, ap, io.compareType().type());
+                return itemsToMap(new DataFlowItem(trueBranch), 
                                   dfIn, dfIn, succEdgeKeys);
-                return m;
             }
         }
         else if (n instanceof Cast) {
             Cast cst = (Cast)n;
             Expr ex = cst.expr();
-            VarInstance vi = findVarInstance(ex);
-            if (vi != null) {                        
+            AccessPath ap = findAccessPathForExpr(ex);
+            if (ap != null) {                        
                 // on the non-ClassCastException edges, we know that
                 // the cast succeeded, and var instance is in fact an 
                 // instance of the cast type.
@@ -114,11 +112,26 @@ public class PreciseClassChecker extends DataFlow
                     Map.Entry e = (Map.Entry)i.next();
                     if (!e.getKey().equals(EDGE_KEY_CLASS_CAST_EXC)) {
                         DataFlowItem df = (DataFlowItem)e.getValue();
-                        e.setValue(new DataFlowItem(addClass(df.classTypes, vi, cst.castType().type())));
+                        e.setValue(new DataFlowItem(addClass(df.classTypes, ap, cst.castType().type())));
                     }
                 }
                 return m;
             }            
+        }
+        else if (n instanceof LocalDecl) {
+            LocalDecl x = (LocalDecl)n; 
+            // remove the precise class information...
+            Map m = killClasses(dfIn.classTypes, new AccessPathLocal(x.localInstance()));
+            return itemToMap(new DataFlowItem(m), succEdgeKeys);
+        }
+        else if (n instanceof Assign) {
+            Assign x = (Assign)n; 
+            // remove the precise class information...
+            AccessPath ap = findAccessPathForExpr(x.left());
+            if (ap != null) {                        
+                Map m = killClasses(dfIn.classTypes, ap);
+                return itemToMap(new DataFlowItem(m), succEdgeKeys);
+            }                
         }
         else if (n instanceof Expr && ((Expr)n).type().isBoolean() && 
                 (n instanceof Binary || n instanceof Unary)) {
@@ -135,20 +148,38 @@ public class PreciseClassChecker extends DataFlow
     }
     
     
-    private Map addClass(Map map, VarInstance vi, Type type) {        
+    private Map killClasses(Map map, AccessPath ap) {
+        Map m = new HashMap(map);
+        boolean changed = (m.remove(ap) != null);
+        if (ap instanceof AccessPathLocal) {
+            // go through the map and remove any access paths rooted at this local
+            for (Iterator iter = m.entrySet().iterator(); iter.hasNext(); ) {
+                Map.Entry entry = (Entry)iter.next();
+                AccessPath key = (AccessPath)entry.getKey();
+                if (ap.equals(key.findRoot())) {
+                    iter.remove();
+                    changed = true;
+                }
+            }
+            
+        }
+        return changed?m:map;
+    }
+
+    private Map addClass(Map map, AccessPath ap, Type type) {        
         if (!type.isClass()) {
             // don't bother adding this type.
             return map;
         }
         Map m = new HashMap(map);
-        Set s = (Set)m.get(vi);
+        Set s = (Set)m.get(ap);
         if (s == null) {
             s = new HashSet();
         }
         else {
             s = new HashSet(s);
         }
-        m.put(vi, s);
+        m.put(ap, s);
         s.add(type);
         return m;
     }
@@ -217,31 +248,86 @@ public class PreciseClassChecker extends DataFlow
         if (n.del() instanceof JifPreciseClassDel) {
             DataFlowItem dfi = (DataFlowItem)inItem;
             JifPreciseClassDel jpcd = (JifPreciseClassDel)n.del();
-            VarInstance vi = findVarInstance(jpcd.getPreciseClassExpr());
-            if (vi != null) {
-                jpcd.setPreciseClass((Set)dfi.classTypes.get(vi));
+            AccessPath ap = findAccessPathForExpr(jpcd.getPreciseClassExpr());
+            if (ap != null) {
+                jpcd.setPreciseClass((Set)dfi.classTypes.get(ap));
             }            
         }
     }
 
-    private VarInstance findVarInstance(Expr expr) {
-        if (expr instanceof Local) {
-            return ((Local)expr).localInstance();
+    static AccessPath findAccessPathForExpr(Expr expr) {
+        if (expr instanceof Special) {
+            return new AccessPathThis();
         }
-        if (expr instanceof Field) {
+        if (expr instanceof Local) {
+            return new AccessPathLocal(((Local)expr).localInstance());
+        }
+        if (expr instanceof Field) {            
             Field f = (Field)expr;
-            if (wantField(f)) {
-                return f.fieldInstance();
+            if (f.flags().isFinal()) {
+                AccessPath target = null;
+                if (f.target() instanceof Expr) {
+                    target = findAccessPathForExpr((Expr)f.target());
+                }
+                else if (f.target() instanceof TypeNode) {
+                    target = new AccessPathClass(((TypeNode)f.target()).type());
+                }
+                if (target == null) return null;
+                return new AccessPathFinalField(target, f.fieldInstance());
             }
         }
         return null;
     }
 
-    /**
-     * Do we want to keep track of this field? Only if it is a final field
-     * of "this"
-     */
-    private boolean wantField(Field f) {
-        return (f.target() instanceof Special && f.flags().isFinal());
-    }        
+    static abstract class AccessPath {
+        public abstract AccessPath findRoot();
+    }
+    static class AccessPathLocal extends AccessPath {
+        final LocalInstance li;
+        public AccessPathLocal(LocalInstance li) {
+            this.li = li;
+        }
+        public AccessPath findRoot() { return this; }
+        public int hashCode() { return li.hashCode(); }
+        public boolean equals(Object o) {
+            return (o instanceof AccessPathLocal &&
+                    ((AccessPathLocal)o).li.equals(this.li));
+        }
+    }
+    static class AccessPathFinalField extends AccessPath {
+        final AccessPath target;
+        final FieldInstance fi;
+        public AccessPathFinalField(AccessPath target, FieldInstance fi) {
+            this.target = target;
+            this.fi = fi;
+        }
+        public AccessPath findRoot() { return target.findRoot(); }
+        public int hashCode() { return fi.hashCode() + target.hashCode(); }
+        public boolean equals(Object o) {
+            if (o instanceof AccessPathFinalField) {
+                AccessPathFinalField that = (AccessPathFinalField)o;
+                return that.fi.equals(this.fi) && that.target.equals(this.target);
+            }
+            return false;
+        }
+    }
+    static class AccessPathThis  extends AccessPath { 
+        public AccessPath findRoot() { return this; }
+        public int hashCode() { return -45; }
+        public boolean equals(Object o) {
+            return (o instanceof AccessPathThis);
+        }
+    }
+    static class AccessPathClass extends AccessPath {
+        final Type type;
+        public AccessPathClass(Type type) {
+            this.type = type;
+        }
+        public AccessPath findRoot() { return this; }
+        public int hashCode() { return type.hashCode(); }
+        public boolean equals(Object o) {
+            return (o instanceof AccessPathClass &&
+                    ((AccessPathClass)o).type.equals(this.type));
+        }
+    }
 }
