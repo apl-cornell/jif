@@ -24,9 +24,21 @@ public class JifCallDel extends JifJL_c
      * dataflow analysis performed by jif.visit.NotNullChecker
      */
     private boolean isTargetNeverNull = false;
+
+    /**
+     * Since the CFG may visit a node more than once, we need to take the
+     * OR of all values set.
+     */
+    private boolean targetNeverNullAlreadySet = false; 
     
-    public void setTargetIsNeverNull() {
-        isTargetNeverNull = true;
+    public void setTargetIsNeverNull(boolean neverNull) {
+        if (!targetNeverNullAlreadySet) {
+            isTargetNeverNull = neverNull;
+        }
+        else {
+            isTargetNeverNull = isTargetNeverNull && neverNull;
+        }
+        targetNeverNullAlreadySet = true;
     }
 
     public boolean targetIsNeverNull() {

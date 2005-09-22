@@ -1,6 +1,6 @@
 class C {
     int x = 0;
-    C c = new C();
+    final C c = new C();
     
     void m1{}() {
 	// may throw an exception

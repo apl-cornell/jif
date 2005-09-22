@@ -197,7 +197,7 @@ public class PreciseClassChecker extends DataFlow
      * by intersecting all of their classTypes sets.
      */
     private static DataFlowItem intersect(List items) {
-        // take the intersection of all the not null variable sets of the
+        // take the intersection of all the maps of the
         // DataFlowItems, by examining the smallest one
 
         // find the smallest Map.
@@ -293,6 +293,7 @@ public class PreciseClassChecker extends DataFlow
             return (o instanceof AccessPathLocal &&
                     ((AccessPathLocal)o).li.equals(this.li));
         }
+        public String toString() { return li.name(); }
     }
     static class AccessPathFinalField extends AccessPath {
         final AccessPath target;
@@ -310,6 +311,7 @@ public class PreciseClassChecker extends DataFlow
             }
             return false;
         }
+        public String toString() { return target + "." + fi.name(); }
     }
     static class AccessPathThis  extends AccessPath { 
         public AccessPath findRoot() { return this; }
@@ -317,6 +319,7 @@ public class PreciseClassChecker extends DataFlow
         public boolean equals(Object o) {
             return (o instanceof AccessPathThis);
         }
+        public String toString() { return "this"; }
     }
     static class AccessPathClass extends AccessPath {
         final Type type;
@@ -329,5 +332,6 @@ public class PreciseClassChecker extends DataFlow
             return (o instanceof AccessPathClass &&
                     ((AccessPathClass)o).type.equals(this.type));
         }
+        public String toString() { return type.toString(); }
     }
 }
