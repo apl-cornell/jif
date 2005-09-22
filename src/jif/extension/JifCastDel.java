@@ -69,33 +69,39 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
     }
     
     
-    /**
-     * @return
-     */
     public boolean throwsClassCastException() {
         Cast c = (Cast)this.node();
         Type castType = c.castType().type();
         if (exprPreciseClasses != null) {
             for (Iterator iter = exprPreciseClasses.iterator(); iter.hasNext(); ) {
                 Type t = (Type)iter.next();
-                if (castType.equals(t)) {
+                if (typeCastGuaranteed(castType, t)) {
                     return false;
-                }
-                if (castType instanceof JifClassType &&
-                         SubtypeChecker.polyTypeForClass((JifClassType)castType).params().isEmpty()) {
-                    // cast type is not parameterized.
-
-                    // if the expr is definitely a subtype of the 
-                    // cast type, no class cast exception will be throw.
-                    if (castType.typeSystem().isSubtype(t, castType)) {
-                        return false;
-                    }
                 }
             }
         }
-        return true;
+        return !typeCastGuaranteed(castType, c.expr().type());
     }
 
+    /**
+     * Will casting from exprType to castType always succeed?
+     */
+    private static boolean typeCastGuaranteed(Type castType, Type exprType) {
+        if (castType.equals(exprType)) {
+            return true;
+        }
+        if (castType instanceof JifClassType &&
+                 SubtypeChecker.polyTypeForClass((JifClassType)castType).params().isEmpty()) {
+            // cast type is not parameterized.
+
+            // if the expr is definitely a subtype of the 
+            // cast type, no class cast exception will be throw.
+            if (castType.typeSystem().isSubtype(exprType, castType)) {
+                return true;
+            }
+        }        
+        return false;
+    }
     /**
      * 
      */
