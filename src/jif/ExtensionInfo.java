@@ -7,6 +7,7 @@ import jif.ast.JifNodeFactory;
 import jif.ast.JifNodeFactory_c;
 import jif.types.JifTypeSystem;
 import jif.types.JifTypeSystem_c;
+import jif.visit.*;
 import jif.visit.JifLabelSubst;
 import jif.visit.NotNullChecker;
 import polyglot.ast.NodeFactory;
@@ -126,10 +127,11 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo
         
         List l = new ArrayList();
 
-        // add not null check before exception checking
+        // add not null check and precise classes check before exception checking
         l.add(jifScheduler.ReachabilityChecked(job));
 
         l.add(jifScheduler.internGoal(new VisitorGoal(job, new NotNullChecker(job, ts, nf))));
+        l.add(jifScheduler.internGoal(new VisitorGoal(job, new PreciseClassChecker(job, ts, nf))));
 
         l.add(jifScheduler.ExceptionsChecked(job));
 

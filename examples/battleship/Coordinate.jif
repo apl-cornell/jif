@@ -20,25 +20,20 @@ class Coordinate[label L] implements JifObject[L] {
     }
 
     public String{L} toString() {
-	return "(" + x + ", " + y + ")";
+        return "(" + x + ", " + y + ")";
     }
 
     public int{L} hashCode() {
-	return 13 * this.x ^ 23 * this.y;
+        return 13 * this.x ^ 23 * this.y;
     }
 
     public boolean{L;o} equals(IDComparable[L] o) {
-	if (o == null || !(o instanceof Coordinate[L])) {
-	    return false;
-	}
+        if (o == null || !(o instanceof Coordinate[L])) {
+            return false;
+        }
 
-	try {
-	    Coordinate[L] that = (Coordinate[L])o;
-
-	    return this.x == that.x && this.y == that.y;
-	}
-	catch (ClassCastException impossible) { }
-	return false;
+        Coordinate[L] that = (Coordinate[L])o;
+        return this.x == that.x && this.y == that.y;
     }
 }
 

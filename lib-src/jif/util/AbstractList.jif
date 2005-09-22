@@ -109,42 +109,37 @@ public abstract class AbstractList[label L] extends AbstractCollection[L]
     }
 
     public boolean{L;o} equals(IDComparable[L] o) {
-        try {
-            if (o == null) 
-                return false;
-            
-            if (!(o instanceof List[L]))
-                return false;
-
-            if (o == this)
-                return true;
-
-
-            List[L] that = (List[L])o;
-
-            int sz = this.size();
-            if (sz != that.size()) 
-                return false;
-
-            int i = 0;
-            while (i < sz) {
-                try {
-                    JifObject[L] o1 = that.get(i);
-                    JifObject[L] o2 = this.get(i);
-                    
-                    if (!(o1==null ? o2==null : o1.equals(o2))) {
-                        return false;
-                    }
-                }
-                catch (IndexOutOfBoundsException e) { /* cant happen */ }
-
-                i++;
-            }
+        if (o == null) 
+            return false;
+        
+        if (!(o instanceof List[L]))
+            return false;
+        
+        if (o == this)
             return true;
+        
+        
+        List[L] that = (List[L])o;
+        
+        int sz = this.size();
+        if (sz != that.size()) 
+            return false;
+        
+        int i = 0;
+        while (i < sz) {
+            try {
+                JifObject[L] o1 = that.get(i);
+                JifObject[L] o2 = this.get(i);
+                
+                if (!(o1==null ? o2==null : o1.equals(o2))) {
+                    return false;
+                }
+            }
+            catch (IndexOutOfBoundsException e) { /* cant happen */ }
+            
+            i++;
         }
-        catch (ClassCastException e) { /* cant happen */ }
-
-        return false;
+        return true;
     }
 
     //  String conversion

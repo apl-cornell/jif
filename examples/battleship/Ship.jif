@@ -102,22 +102,19 @@ public class Ship[label L] implements JifObject[L] {
 	    return false;
 	}
 
-	try {
-	    Ship[L] that = (Ship[L])o;
 
-	    // use local variables to allow the NullPointerException
-	    // analysis to work.
-	    Coordinate[L] thispos = this.pos;
-	    Coordinate[L] thatpos = that.pos;
+        Ship[L] that = (Ship[L])o;
+
+            // use local variables to allow the NullPointerException
+            // analysis to work.
+        Coordinate[L] thispos = this.pos;
+        Coordinate[L] thatpos = that.pos;
 
 
-	    return this.length == that.length && 
-		this.isHorizontal == that.isHorizontal &&
-		(thispos == thatpos || 
-		   (thispos != null && thispos.equals(thatpos)));
-	}
-	catch (ClassCastException impossible) { }
-	return false;
+        return this.length == that.length && 
+            this.isHorizontal == that.isHorizontal &&
+            (thispos == thatpos || 
+             (thispos != null && thispos.equals(thatpos)));
     }
 }
 

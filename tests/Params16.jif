@@ -19,11 +19,8 @@ class Params16[label L, label M] extends D[{L;M}] {
 	Params16[L,M] o = new Params16[L,M]();
 	if (o instanceof Params16[M, L]) { // attempt to leak things by swapping the labels. will be false.
 	    if (out != null) out.println("failure! ");
-	    try {
-		Params16[M,L] that = (Params16[M,L])o; 
-		o.f = that.g; // bad!
-	    }
-	    catch (ClassCastException impossible) {}
+	    Params16[M,L] that = (Params16[M,L])o; 
+	    o.f = that.g; // bad!
 	}
 	else {
 	    if (out != null) out.println("success! ");

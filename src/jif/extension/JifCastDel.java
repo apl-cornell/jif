@@ -1,11 +1,9 @@
 package jif.extension;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import jif.types.*;
-import polyglot.ast.Cast;
-import polyglot.ast.Node;
+import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.TypeChecker;
 
@@ -13,10 +11,11 @@ import polyglot.visit.TypeChecker;
  *
  *  @see polyglot.ext.jl.ast.Cast_c
  */
-public class JifCastDel extends JifJL_c
+public class JifCastDel extends JifJL_c implements JifPreciseClassDel
 {
     public JifCastDel() { }
 
+    private Set exprPreciseClasses = null;
     private boolean isToSubstJifClass = false;
 
     public boolean isToSubstJifClass() { return this.isToSubstJifClass; }
@@ -56,12 +55,57 @@ public class JifCastDel extends JifJL_c
     }
     
     public List throwTypes(TypeSystem ts) {
-        List ex = new ArrayList(super.throwTypes(ts));
         Cast c = (Cast)this.node();
+
+        List ex = new ArrayList(super.throwTypes(ts));
+        if (!throwsClassCastException()) {
+            ex.remove(ts.ClassCastException());            
+        }
         if (c.castType().type() instanceof JifClassType) {
             ex.addAll(LabelTypeCheckUtil.throwTypes((JifClassType)c.castType().type(), 
                                                     (JifTypeSystem)ts));
         }
         return ex;
+    }
+    
+    
+    /**
+     * @return
+     */
+    public boolean throwsClassCastException() {
+        Cast c = (Cast)this.node();
+        Type castType = c.castType().type();
+        if (exprPreciseClasses != null) {
+            for (Iterator iter = exprPreciseClasses.iterator(); iter.hasNext(); ) {
+                Type t = (Type)iter.next();
+                if (castType.equals(t)) {
+                    return false;
+                }
+                if (castType instanceof JifClassType &&
+                         SubtypeChecker.polyTypeForClass((JifClassType)castType).params().isEmpty()) {
+                    // cast type is not parameterized.
+
+                    // if the expr is definitely a subtype of the 
+                    // cast type, no class cast exception will be throw.
+                    if (castType.typeSystem().isSubtype(t, castType)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 
+     */
+    public Expr getPreciseClassExpr() {
+        return ((Cast)node()).expr();
+    }
+    /**
+     * 
+     */
+    public void setPreciseClass(Set preciseClasses) {
+        this.exprPreciseClasses = preciseClasses;
     }
 }

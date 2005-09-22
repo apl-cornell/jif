@@ -18,13 +18,13 @@ public interface Collection[label L] extends JifObject[L] {
     JifObject[L]{L}[]{L} toArray{L}();
 
     boolean{L} add{L}(JifObject[L]{L} o):{L}
-        throws (ClassCastException{L}, IllegalArgumentException{L}, UnsupportedOperationException{});
+        throws (ClassCastException{L}, IllegalArgumentException{L});
     boolean{L} remove{L}(JifObject[L]{L} o);
 
     boolean{L;c} containsAll{L}(Collection[L]{L} c)
         throws (NullPointerException{c});
     boolean{L} addAll{L}(Collection[L]{L} c)
-        throws (ClassCastException{L}, IllegalArgumentException{L}, UnsupportedOperationException{L});
+        throws (ClassCastException{L}, IllegalArgumentException{L});
     boolean{L} removeAll{L}(Collection[L]{L} c);
     boolean{L} retainAll{L}(Collection[L]{L} c);
     void clear{L}();

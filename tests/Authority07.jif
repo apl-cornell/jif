@@ -50,11 +50,8 @@ class AddDelClosure[principal P] extends TestClosure[P, {P:}] {
     public Object{this} invoke{P:}() where caller (P) {
 	final Principal p = P;
 	if (p instanceof TestPrincipal) {
-	    try {
-		final TestPrincipal tp = (TestPrincipal)p;
-		tp.addDelegatesTo(del);
-	    }
-	    catch (ClassCastException impossbile) {}
+	    final TestPrincipal tp = (TestPrincipal)p;
+	    tp.addDelegatesTo(del);
 	}
 	return null;
     }

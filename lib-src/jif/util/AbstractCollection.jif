@@ -19,9 +19,9 @@ public abstract class AbstractCollection[label L] implements Collection[L] {
     }
 
     
-    public boolean{L} add{L}(JifObject[L]{L} o):{L} throws (ClassCastException{L}, IllegalArgumentException{L}, UnsupportedOperationException{})
+    public boolean{L} add{L}(JifObject[L]{L} o):{L} throws (ClassCastException{L}, IllegalArgumentException{L})
     {
-      throw new UnsupportedOperationException();
+	return false;
     }
   
     public boolean{L} remove{L}(JifObject[L]{L} o) {
@@ -69,7 +69,7 @@ public abstract class AbstractCollection[label L] implements Collection[L] {
 	}
 
     public boolean{L} addAll{L}(Collection[L]{L} c) 
-        throws (ClassCastException{L}, IllegalArgumentException{L}, UnsupportedOperationException{L}) {
+        throws (ClassCastException{L}, IllegalArgumentException{L}) {
         boolean{this;L} modified = false;
         if (c != null) {
             Iterator[L]{this;L} e = c.iterator();

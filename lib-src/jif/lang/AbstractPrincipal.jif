@@ -16,11 +16,11 @@ public abstract class AbstractPrincipal implements Principal {
         return name;
     }
 
-	public boolean{this;p} delegatesTo(principal p) {
+        public boolean{this;p} delegatesTo(principal p) {
         return superiorsContains((Principal)p);
     }
 
-	public void addDelegatesTo{this:}(principal{this} p) where caller (this) {
+        public void addDelegatesTo{this:}(principal{this} p) where caller (this) {
         if (superiorsContains((Principal)p)) {
             return;
         }
@@ -45,7 +45,7 @@ public abstract class AbstractPrincipal implements Principal {
     }
     
     protected boolean{this;p} superiorsContains(Principal p) where authority (this) {
-    	boolean result = false;
+        boolean result = false;
         Principal{this:}[] sprs = superiors;
         for (int i = 0; sprs != null && i < sprs.length; i++) {
             try {
@@ -60,7 +60,7 @@ public abstract class AbstractPrincipal implements Principal {
         return declassify(result, {this;p});
     }
 
-	public boolean{authPrf; closure; lb; this} isAuthorized(Object authPrf, 
+        public boolean{authPrf; closure; lb; this} isAuthorized(Object authPrf, 
                                                      Closure[this, lb] closure,
                                                      label lb) where authority (this) {
         // The default is that this principal authorizes no closures.
@@ -100,19 +100,16 @@ public abstract class AbstractPrincipal implements Principal {
     public boolean{this;o} equals(Object o) {
         if (o == null) return false;
         if (o instanceof Principal) {
-            try {
-	            return equals((Principal)o);
-	        }
-	        catch (ClassCastException impossible) {}
+            return equals((Principal)o);
         }
         return false;
     }
     
-	public boolean{this;p} equals(Principal p) {
-	    if (p == null) return false;
+        public boolean{this;p} equals(Principal p) {
+            if (p == null) return false;
         return (this.name == p.name() || (this.name != null && 
                 this.name.equals(p.name()))) &&
-                	this.getClass() == p.getClass();        
+                        this.getClass() == p.getClass();        
     }
     
     /**
@@ -125,9 +122,9 @@ public abstract class AbstractPrincipal implements Principal {
         if (chain == null) {
             Principal{dummy; p; chain}[] newChain = new Principal[1];
             try {
-	            newChain[0] = p;
-	        }
-	        catch (ArrayStoreException impossible) {}
+                    newChain[0] = p;
+                }
+                catch (ArrayStoreException impossible) {}
             catch (ArrayIndexOutOfBoundsException impossible) {}
 
             return newChain;

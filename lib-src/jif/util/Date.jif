@@ -152,15 +152,10 @@ public final class Date[label L] implements JifObject[{L}] {
         if (o == null || !(o instanceof Date[L])) {
             return false;
         }
-        try {
-            Date[L] that = (Date[L])o;
-            return this.year == that.year &&
-                this.month == that.month &&
-                this.day == that.day;
-        }
-        catch (ClassCastException e) {
-            return false;
-        }
+        Date[L] that = (Date[L])o;
+        return this.year == that.year &&
+            this.month == that.month &&
+            this.day == that.day;
     }
 
     public int{L} hashCode() {

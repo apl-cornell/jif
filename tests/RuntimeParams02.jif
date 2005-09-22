@@ -17,11 +17,8 @@ class C[label N, covariant label M, principal P]
     
     public boolean{N;o} equals(IDComparable[N] o) {
 	if (o != null && o instanceof C[N,M,P]) {
-	    try {
-		C[N,M,P] that = (C[N,M,P])o;
-		return this.data == that.data;
-	    }
-	    catch (ClassCastException imposs) {}
+	    C[N,M,P] that = (C[N,M,P])o;
+	    return this.data == that.data;
 	}
 	return false;
     }

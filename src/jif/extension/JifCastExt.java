@@ -41,7 +41,7 @@ public class JifCastExt extends Jif_c
 	PathMap X = Xe.N(ts.notTaken()).join(Xct);
 
 	// the cast may throw a class cast exception.
-        if (c.expr().type().isReference()) {
+        if (c.expr().type().isReference() && ((JifCastDel)c.del()).throwsClassCastException()) {
             checkAndRemoveThrowType(throwTypes, ts.ClassCastException());
             X = X.exc(X.NV(), ts.ClassCastException());
         }

@@ -283,6 +283,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Password.jif ;
 	Password2.jif ;
 	Poly.jif ;
+	PreciseClass01.jif ;
+	PreciseClass02.jif ;
 	Protected.jif ;
 	Recursive.jif ;
 	RuntimeParams01.jif ;

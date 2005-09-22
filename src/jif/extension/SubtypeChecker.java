@@ -267,7 +267,7 @@ public class SubtypeChecker
      * is returned.
      *  
      */
-    private static JifPolyType polyTypeForClass(JifClassType jct) {
+    public static JifPolyType polyTypeForClass(JifClassType jct) {
         if (jct instanceof JifPolyType) {
             return (JifPolyType)jct;
         }
