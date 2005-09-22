@@ -189,7 +189,6 @@ public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
       return true;
 
     } catch (NullPointerException unlikely) {}
-      catch (ClassCastException unlikely) {}
       catch (ArrayIndexOutOfBoundsException impossible) {}
 
     return false;
@@ -360,8 +359,7 @@ class LocalKeySet[label K, label V] extends AbstractSet[K] {
       return false;
     }
 
-    if(o == this)
-    {
+    if(o == this) {
       return true;
     }
 
@@ -370,11 +368,7 @@ class LocalKeySet[label K, label V] extends AbstractSet[K] {
       return false;
     }
 
-    Set[K] other = null;
-    try
-    {
-      other = (Set[K])o;
-    } catch (ClassCastException impossible) {}
+    Set[K] other = (Set[K])o;
 
    try
    {

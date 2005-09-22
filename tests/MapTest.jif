@@ -2,7 +2,7 @@ import jif.util.*;
 
 public class MapTest
 {
-  public static void main(String[] args)
+  public static void main{Alice:}(String[] args)
   {
     final label A = new label {Alice:};
     final label B = new label {Bob:};
@@ -27,9 +27,9 @@ public class MapTest
 
 class Key[label L] implements JifObject[L]
 {
-  private final int number;
+  private final int{this} number;
 
-  Key(int num)
+  Key(int{this} num)
   {
     number = num;
   }
