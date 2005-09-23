@@ -319,12 +319,13 @@ class LocalKeySet[label K, label V] extends AbstractSet[K] {
 	// XXX no locking required?
 	public boolean{K} remove{K}(JifObject[K]{K} o)
 	{
-		if(!parent.containsKey(o))
-		{
-			return false;
-		}
 		try
 		{
+			
+			if(!parent.containsKey(o))
+			{
+				return false;
+			}
 			parent.remove(o);
 		} catch (NullPointerException unlikely) {return false;}
 		return true;
