@@ -90,7 +90,7 @@ public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
 			}
 			else
 			{
-				if(actualSize >= numberOfElements)
+				if(actualSize < numberOfElements + 1)
 				{
 					extendSize();
 				}
