@@ -158,4 +158,8 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo
 
         return g;
     }
+    static {
+        // touch Topics to force the static initializer to be loaded.
+        String s = Topics.jif;
+    }
 }
