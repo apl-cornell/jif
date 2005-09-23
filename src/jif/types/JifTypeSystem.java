@@ -163,4 +163,12 @@ public interface JifTypeSystem extends ParamTypeSystem
     Solver solver();
 
     DefaultSignature defaultSignature();
+
+    /**
+     * Compares t1 to t2 without stripping off all the parameters and labels
+     * @param t1
+     * @param t2
+     * @return
+     */
+    boolean equalsNoStrip(TypeObject t1, TypeObject t2);
 }

@@ -258,11 +258,11 @@ public class JifTypeSystem_c
         Type strpFromType = strip(fromType);
         Type strpToType = strip(toType);
                 
-        // can cast from "principal" to "jif.lang.Principal"
-        if (Principal().equals(strpFromType) && PrincipalClass().equals(strpToType)) {
+        // can cast from "principal" to any subclass of "jif.lang.Principal"
+        if (Principal().equals(strpFromType) && isCastValid(PrincipalClass(), toType)) {
             return true;
         }
-
+        
         // can cast from any subtype of "jif.lang.Principal" to "principal"
         if (Principal().equals(strpToType) && isSubtype(strpFromType, PrincipalClass())) {
             return true;
@@ -303,6 +303,9 @@ public class JifTypeSystem_c
 
     }
 
+    public boolean equalsNoStrip(TypeObject t1, TypeObject t2) {
+        return super.equals(t1, t2);        
+    }
     public boolean equals(TypeObject t1, TypeObject t2) {
         if (t1 instanceof Type) {
             t1 = strip((Type)t1);

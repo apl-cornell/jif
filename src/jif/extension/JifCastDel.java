@@ -72,32 +72,38 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
     public boolean throwsClassCastException() {
         Cast c = (Cast)this.node();
         Type castType = c.castType().type();
+        JifTypeSystem ts = (JifTypeSystem)castType.typeSystem();
         if (exprPreciseClasses != null) {
             for (Iterator iter = exprPreciseClasses.iterator(); iter.hasNext(); ) {
                 Type t = (Type)iter.next();
-                if (typeCastGuaranteed(castType, t)) {
+                if (typeCastGuaranteed(ts, castType, t)) {
                     return false;
                 }
             }
         }
-        return !typeCastGuaranteed(castType, c.expr().type());
+        if (typeCastGuaranteed(ts, castType, c.expr().type())) {
+            return false;
+        }
+        
+        return c.castType().type() instanceof JifClassType;
     }
 
     /**
      * Will casting from exprType to castType always succeed?
      */
-    private static boolean typeCastGuaranteed(Type castType, Type exprType) {
-        if (castType.equals(exprType)) {
+    private static boolean typeCastGuaranteed(JifTypeSystem ts, Type castType, Type exprType) {
+        if (ts.equalsNoStrip(castType, exprType)) {
             return true;
         }
         if (castType instanceof JifClassType &&
-                 SubtypeChecker.polyTypeForClass((JifClassType)castType).params().isEmpty()) {
+                SubtypeChecker.polyTypeForClass((JifClassType)castType).params().isEmpty()) {            
             // cast type is not parameterized.
-
-            // if the expr is definitely a subtype of the 
-            // cast type, no class cast exception will be throw.
-            if (castType.typeSystem().isSubtype(exprType, castType)) {
-                return true;
+            if (!(exprType instanceof JifClassType) || SubtypeChecker.polyTypeForClass((JifClassType)exprType).params().isEmpty()) {
+                // if the expr is definitely a subtype of the 
+                // cast type, no class cast exception will be throw.
+                if (castType.typeSystem().isSubtype(exprType, castType)) {
+                    return true;
+                }
             }
         }        
         return false;

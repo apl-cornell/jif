@@ -150,6 +150,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	DynLabel7.jif (Syntax);
 	DynLabel8.jif ;
 	DynLabel9.jif ;
+	DynLabel10.jif ;
 	EmptyList.jif List.jif;
 	EmptyList2.jif ;
 	Exc.jif ;
@@ -295,6 +296,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	PreciseClass05.jif (Semantic, "ClassCastException.*declared");
 	PreciseClass06.jif ;
 	PreciseClass07.jif (Semantic, "ClassCastException.*declared");
+	PreciseClass08.jif (Semantic, "ClassCastException.*declared");
+	PreciseClass09.jif ;
 	Protected.jif ;
 	Recursive.jif ;
 	RuntimeParams01.jif ;
