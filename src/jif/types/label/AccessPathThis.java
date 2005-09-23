@@ -52,8 +52,11 @@ public class AccessPathThis extends AccessPathRoot {
     }
     public boolean equals(Object o) {
         if (o instanceof AccessPathThis) {
-            if (ct == null) return true;
-            return ct.equals(((AccessPathThis)o).ct);
+            AccessPathThis that = (AccessPathThis)o;
+            if (this.ct == that.ct || this.ct == null || that.ct == null) 
+                return true;
+            // return true if this.ct <= that.ct or that.ct <= this.ct  
+            return this.ct.isSubtype(that.ct) || that.ct.isSubtype(this.ct);
         }
         return false;        
     }
@@ -64,7 +67,7 @@ public class AccessPathThis extends AccessPathRoot {
     public Type type() {
         return ct;
     }
-
+    
     public PathMap labelcheck(JifContext A) {
     	JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
     	JifClassType ct = (JifClassType)A.currentClass();
@@ -82,8 +85,10 @@ public class AccessPathThis extends AccessPathRoot {
             ct = A.currentClass();
         }
         else {
-            if (!ct.equals(A.currentClass())) {
-                throw new InternalCompilerError("Unexpected class type for access path this");
+            if (!A.currentClass().isSubtype(ct)) {
+                throw new InternalCompilerError("Unexpected class type for " +
+                		"access path this: wanted a supertype of " + 
+                		A.currentClass());
             }
         }
     }

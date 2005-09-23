@@ -24,25 +24,23 @@ public class JifUtil
         return n.ext(ext.del().X(X));
     }
     
-    public static AccessPath varInstanceToAccessPath(VarInstance vi, Position pos) {
+    public static AccessPath varInstanceToAccessPath(VarInstance vi, Position pos) throws SemanticException {
+        if (!vi.flags().isFinal()) {
+            throw new SemanticException("Only final fields and final local variables may be used as access paths.", pos);
+        }
         if (vi instanceof LocalInstance) {
-            if (((LocalInstance)vi).flags().isFinal()) {
-                return new AccessPathLocal((LocalInstance)vi, vi.name(), pos);
-            }
+            return new AccessPathLocal((LocalInstance)vi, vi.name(), pos);
         }
         else if (vi instanceof FieldInstance) {
             FieldInstance fi = (FieldInstance)vi;
-            JifTypeSystem ts = (JifTypeSystem)fi.typeSystem();
-            if (fi.flags().isFinal() && (ts.isLabel(fi.type()) || ts.isImplicitCastValid(fi.type(), ts.Principal()))) {
-                AccessPathRoot root;
-                if (fi.flags().isStatic()) {
-                    root = new AccessPathClass(fi.container().toClass(), pos);                    
-                }
-                else {
-                    root = new AccessPathThis(fi.container().toClass(), pos);
-                }
-                return new AccessPathField(root, fi, fi.name(), pos);
-            }            
+            AccessPathRoot root;
+            if (fi.flags().isStatic()) {
+                root = new AccessPathClass(fi.container().toClass(), pos);                    
+            }
+            else {
+                root = new AccessPathThis(fi.container().toClass(), pos);
+            }
+            return new AccessPathField(root, fi, fi.name(), pos);
         }
         throw new InternalCompilerError("Unexpected var instance " + vi.getClass());
     }    
