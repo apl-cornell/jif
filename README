@@ -33,11 +33,27 @@ environment. Jif is compiled with the Ant build tool
 g++ are in your path.
 
 Softare Versions: We recommend that you use JDK 1.4.2 or later.  Ant
-   1.6.5 is known to work with Jif 2.0.0. We have had some reports that
-   some versions of Cygwin are incompatible with building Jif, however,
-   cygwin-1.5.16-1 appears to be compatible. Note that when using Cygwin,
-   great care must be taken in specifying class paths, so that they are
-   correctly interpreted by both java and ant.
+   1.6.5 is known to work with Jif 2.0.0. 
+
+Jif and Cygwin: Jif can be built and used on a Windows platform running 
+   Cygwin. Several issues are worth pointing out however. 
+     - The GNU C++ compiler, g++, must be installed in order to build the 
+       Jif native runtime library. 
+     - Great care must be taken in specifying class paths and environment
+       variables. Any classpath used when compiling Jif programs must be
+       understandable by both the javac compiler and ant. Thus, for 
+       example, if setting the environment variable JIF to the Jif 
+       installation directory, the variable should be set to either the 
+       string "c:\data\jif", or "c:/data/jif". It should not be set to 
+       the string "/cygdrive/c/data/jif", which cannot be interpreted by
+       javac correctly.
+       In addition, note that the path separator on a Windows platform is
+       the semicolon (';'), for example, class paths should be set 
+       accordingly , for example:
+          setenv CLASSPATH "$POLYGLOT/polyglot.jar;$POLYGLOT/lib/jflex.jar;$POLYGLOT/lib/java_cup.jar"
+     - We have had some reports that some versions of Cygwin are 
+       incompatible with building Jif, however, cygwin-1.5.16-1 appears to 
+       be compatible. 
 
 Jif is implemented using the Polyglot extensible compiler toolkit,
 also developed at Cornell. Polyglot can be obtained from the web site:
@@ -51,6 +67,7 @@ required to build Jif.
 This Jif distribution contains some C++ code, used to produce 
 platform-specific Jif runtime support. Jif requires the g++ compiler 
 to be present to compile this C++ code.
+
 
 Building Jif
 ------------
