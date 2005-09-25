@@ -62,14 +62,27 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
 	}
   */
 	
-	public void clear{K}() {
-    try
-    {
-      keySet().clear();
-    } catch (NullPointerException unlikely) {}
-	}
+    public void clear{K}() {
+        try
+        {
+            keySet().clear();
+        } catch (NullPointerException unlikely) {}
+    }
 	
-	
+    public final boolean{K;key} containsKey(String{K} key) {
+        return this.containsKey(new JifString[K](key));
+    }
+    public final JifObject[V]{K; key} get(String{K} key) {
+        return this.get(new JifString[K](key));
+    }
+    public final JifObject[V]{K} put{K}(String{K} key, JifObject[V]{K} value) {
+        return this.put(new JifString[K](key), value);
+    }
+    public final JifObject[V]{K} remove{K}(String{K} key) {
+        return this.remove(new JifString[K](key));
+    }
+
+    
 	// Views
 	
 	/**

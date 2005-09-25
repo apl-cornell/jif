@@ -44,15 +44,43 @@ public final class Date[covariant label L] implements JifObject[L] {
 
     /**
      * At the moment, assume that the string is in the format YYYY/MM/DD
+     * or DD-MM-YYYY
      */
     public static Date[lbl] valueOf{*lbl}(label lbl, String{*lbl} d) throws (IllegalArgumentException{*lbl}) {
-        if (d == null || d.length() != 10) {
-            throw new IllegalArgumentException("null or invalid string");
+        if (d == null) {
+            throw new IllegalArgumentException("null string");
         }
+        int yearStart = 0;
+        int yearEnd = 4;
+        int monthStart = 5;
+        int monthEnd = 7;
+        int dayStart = 8;
+        int dayEnd = 10;
+        int i = d.indexOf('-', 0);
+        if (i > 0) { 
+            // date is of the form dd-mm-yyyy
+            dayStart=0;
+            dayEnd = i; 
+            monthStart = i + 1; 
+            int j = d.indexOf('-', monthStart);
+            if (j > 0) { 
+                monthEnd = j; 
+                yearStart = j + 1;
+                yearEnd = d.length();
+            }
+            else {
+                throw new IllegalArgumentException("invalid string: format should be DD-MM-YYYY");
+            }
+
+        }
+        else if (d.length() < 10) {
+            throw new IllegalArgumentException("invalid string: format should be DD-MM-YYYY");
+        }
+        
         try {
-            int year = Integer.parseInt(d.substring(0,4));
-            int month = Integer.parseInt(d.substring(5,7));
-            int day = Integer.parseInt(d.substring(8,10));
+            int year = Integer.parseInt(d.substring(yearStart,yearEnd));
+            int month = Integer.parseInt(d.substring(monthStart,monthEnd));
+            int day = Integer.parseInt(d.substring(dayStart,dayEnd));
             return new Date[lbl](year, month, day);
         }
         catch (StringIndexOutOfBoundsException impossible) {
@@ -298,7 +326,7 @@ public final class Date[covariant label L] implements JifObject[L] {
         return day + " " + getMonthName() + " " + year;
     }
     public String{L} toShortString() {
-        return day + "/" + month + "/" + year;
+        return day + "-" + month + "-" + year;
     }
     
     
