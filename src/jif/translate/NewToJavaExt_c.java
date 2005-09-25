@@ -6,12 +6,21 @@ import jif.types.*;
 import polyglot.ast.Expr;
 import polyglot.ast.New;
 import polyglot.types.*;
+import polyglot.visit.NodeVisitor;
 
 public class NewToJavaExt_c extends ExprToJavaExt_c {
+    private Type objectType;
+
+    public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
+        New n = (New)this.node();
+        this.objectType = n.objectType().type();
+        return super.toJavaEnter(rw);
+    }
+
     public Expr exprToJava(JifToJavaRewriter rw) throws SemanticException {
         New n = (New) node();
         ConstructorInstance ci = n.constructorInstance();
-        ClassType ct = ci.container().toClass();
+        ClassType ct = objectType.toClass();
 
         if (! rw.jif_ts().isParamsRuntimeRep(ct) || (ct instanceof JifSubstType && !rw.jif_ts().isParamsRuntimeRep(((JifSubstType)ct).base()))) {
             // only rewrite creation of classes where params are runtime represented.

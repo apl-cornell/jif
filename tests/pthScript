@@ -65,7 +65,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Array2.jif ;
 	Array3.jif ;
 	ArrayLeak.jif (Semantic, "not a subtype") ;
-	ArrayLeak2.jif (Semantic, "not a subtype") ;
+#Removed the problematics String.getBytes method from the String signature
+#	ArrayLeak2.jif (Semantic, "not a subtype") ;
 	Authority01.jif ;
 	Authority02.jif ;
 	Authority03.jif ;
@@ -338,6 +339,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	RuntimeParams24d.jif (Semantic, "Can not instantiate .* with a non-principal");
 	RuntimeParams25.jif (Syntax);
 //KNOWN BAD: needs a fix in Polyglot	RuntimeParams26.jif (Semantic, "@@@@@"); // should be an initialization error
+	RuntimeParams27.jif ;
 	Simple.jif ;
 	Simple2.jif ;
 	Simple3.jif ;

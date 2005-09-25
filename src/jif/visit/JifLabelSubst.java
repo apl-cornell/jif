@@ -65,11 +65,7 @@ public class JifLabelSubst extends ContextVisitor
         }
         if (n instanceof CanonicalTypeNode) {
             CanonicalTypeNode tn = (CanonicalTypeNode) n;
-            Type lt = tn.type();
-            
-            if (ts.isLabeled(lt)) {
-                n = tn.type(bounds.applyTo(lt));
-            }
+            n = tn.type(bounds.applyTo(tn.type()));
         }
         
         if (n instanceof CanonicalLabelNode) {
