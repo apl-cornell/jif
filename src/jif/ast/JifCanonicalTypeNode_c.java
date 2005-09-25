@@ -42,7 +42,7 @@ public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements JifCa
                     "Parameterized type " + t + " is uninstantiated",
                     "The type " + t + " is a parameterized type, " +
                     		"and must be provided with parameters " +
-                    		"to instantiate it. Jif prevents the use of" +
+                    		"to instantiate it. Jif prevents the use of " +
                     		"uninstantiated parameterized types.",
                                         position());
         }
