@@ -153,7 +153,7 @@ public class NotNullChecker extends DataFlow
         else if (n instanceof Assign) {
             Assign x = (Assign)n; 
             AccessPath ap = PreciseClassChecker.findAccessPathForExpr(x.left());
-            if (ap != null) {
+            if (ap != null && x.operator() == Assign.ASSIGN) {
                 Set s = killAccessPath(dfIn.notNullAccessPaths, ap);
                 if (dfIn.exprIsNotNull(x.right())) {
                     s = addNotNull(s, ap);
