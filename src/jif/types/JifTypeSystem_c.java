@@ -726,8 +726,9 @@ public class JifTypeSystem_c
     public ActsForConstraint actsForConstraint(
         Position pos,
         Principal actor,
-        Principal granter) {
-        return new ActsForConstraint_c(this, pos, actor, granter);
+        Principal granter,
+        boolean isEquiv) {
+        return new ActsForConstraint_c(this, pos, actor, granter, isEquiv);
     }
 
     public AuthConstraint authConstraint(Position pos, List principals) {

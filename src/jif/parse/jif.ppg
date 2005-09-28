@@ -660,6 +660,8 @@ constraint ::=
         {: RESULT = parser.nf.CallerConstraintNode(parser.pos(x,y), a); :}
     |   principal:a actsfor principal:b 
         {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b); :}
+    |   principal:a EQUIV principal:b 
+        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b, true); :}
     ;
 
 // 19.9.1) Interface Declarations

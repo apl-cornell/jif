@@ -13,6 +13,9 @@ public interface LabelEnv
     // adds "p1 acts for p2" into the principal hierarchy
     void addActsFor(Principal p1, Principal p2);
     
+    // adds "p1 acts for p2" and "p2 acts for p1" into the principal hierarchy
+    void addEquiv(Principal p1, Principal p2);
+    
     // adds the assertion "L1 <= L2"
     void addAssertionLE(Label L1, Label L2);
     

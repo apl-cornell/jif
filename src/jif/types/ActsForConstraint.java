@@ -10,4 +10,6 @@ public interface ActsForConstraint extends Assertion {
 
     public Principal granter();
     public ActsForConstraint granter(Principal granter);
+    
+    public boolean isEquiv();
 }

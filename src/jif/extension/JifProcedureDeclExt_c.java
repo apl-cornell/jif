@@ -220,7 +220,12 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                 ActsForConstraint ac = (ActsForConstraint) c;
 		//A.addActsFor(A.instantiate(ac.actor()),
 		//	     A.instantiate(ac.granter()));
-		A.addActsFor(ac.actor(), ac.granter());
+                if (ac.isEquiv()) {
+                    A.addEquiv(ac.actor(), ac.granter());
+                }
+                else {
+                    A.addActsFor(ac.actor(), ac.granter());
+                }
 	    }
 	}
     }

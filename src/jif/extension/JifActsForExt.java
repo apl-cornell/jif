@@ -44,9 +44,11 @@ public class JifActsForExt extends JifStmtExt_c
 	
         A = (JifContext) A.pushBlock();
         A.setPc(X2.N().join(X2.NV()));
-        A.addActsFor(actor.principal(), granter.principal());
         if (af.kind() == ActsFor.EQUIV) {
-            A.addActsFor(granter.principal(), actor.principal());            
+            A.addEquiv(actor.principal(), granter.principal());            
+        }
+        else {
+            A.addActsFor(actor.principal(), granter.principal());            
         }
         
         Stmt S1 = (Stmt) lc.context(A).labelCheck(af.consequent());

@@ -103,17 +103,22 @@ public class JifContext_c extends Context_c implements JifContext
      * @param L1
      * @param L2
      */
-    public void addDefinitionalAssertionLE(Label L1, Label L2) {
+    public void addDefinitionalAssertionEquiv(Label L1, Label L2) {
         this.addAssertionLE(L1, L2);
+        this.addAssertionLE(L2, L1);
         JifContext_c jc = this;
         while (!jc.isCode()) {
             jc = (JifContext_c)jc.pop();
             if (jc != null) {
                 jc.addAssertionLE(L1, L2);
+                jc.addAssertionLE(L2, L1);
             }            
         }
     }
     
+    public void addEquiv(Principal p1, Principal p2) {
+        env.addEquiv(p1, p2);
+    }
     public void addActsFor(Principal p1, Principal p2) {
         env.addActsFor(p1, p2);
     }
@@ -121,18 +126,21 @@ public class JifContext_c extends Context_c implements JifContext
      * Adds the assertion to this context, and all outer contexts up to
      * the method/constructor/initializer level
      */
-    public void addDefinitionalActsFor(Principal p1, Principal p2) {
-        this.addActsFor(p1, p2);
+    public void addDefinitionalEquiv(Principal p1, Principal p2) {
+        this.addEquiv(p1, p2);
         JifContext_c jc = this;
         while (!jc.isCode()) {
             jc = (JifContext_c)jc.pop();
             if (jc != null) {
-                jc.addActsFor(p1, p2);
+                jc.addEquiv(p1, p2);
             }            
         }
     }
     public boolean actsFor(Principal p1, Principal p2) {
         return ph().actsFor(p1, p2);
+    }
+    public boolean equiv(Principal p1, Principal p2) {
+        return actsFor(p1, p2) && actsFor(p2, p1);
     }
     public boolean actsFor(Collection actorGrp, Collection grantorGrp) {
         return ph().actsFor(actorGrp, grantorGrp);

@@ -605,10 +605,19 @@ public class CallHelper {
                 Principal granter = jac.granter();
                 granter = instantiate(A, granter);
 
-                if (!A.actsFor(actor, granter)) {
-                    throw new SemanticDetailedException("The principal " + actor + " must act for " + granter + " to invoke " + jpi.debugString(),
-                                                        "The " + jpi.debugString() + " requires that the relationship " + actor + " actsfor " + granter + " holds at the call site.", position);
-
+                if (jac.isEquiv()) {
+	                if (!A.equiv(actor, granter)) {
+	                    throw new SemanticDetailedException("The principal " + actor + " must be equivalent to " + granter + " to invoke " + jpi.debugString(),
+	                                                        "The " + jpi.debugString() + " requires that the relationship " + jac + " holds at the call site.", position);
+	
+	                }                    
+                }
+                else {
+	                if (!A.actsFor(actor, granter)) {
+	                    throw new SemanticDetailedException("The principal " + actor + " must act for " + granter + " to invoke " + jpi.debugString(),
+	                                                        "The " + jpi.debugString() + " requires that the relationship " + actor + " actsfor " + granter + " holds at the call site.", position);
+	
+	                }
                 }
             }
         }

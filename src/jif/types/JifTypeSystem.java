@@ -93,7 +93,7 @@ public interface JifTypeSystem extends ParamTypeSystem
     boolean leq(Label L1, Label L2);
 
     /** Construct an acts-for constraint. */
-    ActsForConstraint actsForConstraint(Position pos, Principal actor, Principal granter);
+    ActsForConstraint actsForConstraint(Position pos, Principal actor, Principal granter, boolean isEquiv);
 
     /** Construct an authority constraint. */
     AuthConstraint authConstraint(Position pos, List principals);

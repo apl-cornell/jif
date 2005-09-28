@@ -39,7 +39,7 @@ public interface JifContext extends Context {
      * @param L1
      * @param L2
      */
-    void addDefinitionalAssertionLE(Label L1, Label L2);
+    void addDefinitionalAssertionEquiv(Label L1, Label L2);
 
     /* ************************************************
      * Prinicpal Hierarchy methods
@@ -50,15 +50,24 @@ public interface JifContext extends Context {
      * Add an actsfor relation to the principal hierarchy. 
      */
     void addActsFor(Principal p1, Principal p2);
+
+    /**
+     * Add an actsfor relation both ways to the principal hierarchy. 
+     */
+    void addEquiv(Principal p1, Principal p2);
     /**
      * Adds the assertion to this context, and all outer contexts up to
      * the method/constructor/initializer level
      */
-    void addDefinitionalActsFor(Principal p1, Principal p2);
+    void addDefinitionalEquiv(Principal p1, Principal p2);
     /**
      * Test an actsfor relation, using the principal hierarchy. 
      */
     boolean actsFor(Principal p1, Principal p2);
+    /**
+     * Test if p1 actsfor p2 and vice versa, using the principal hierarchy. 
+     */
+    boolean equiv(Principal p1, Principal p2);
     /**
      * Test an actsfor relation, using the principal hierarchy. 
      */

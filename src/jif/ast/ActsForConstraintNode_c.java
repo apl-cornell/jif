@@ -12,11 +12,13 @@ public class ActsForConstraintNode_c extends ConstraintNode_c implements ActsFor
 {
     protected PrincipalNode actor;
     protected PrincipalNode granter;
+    protected final boolean isEquiv;
 
-    public ActsForConstraintNode_c(Position pos, PrincipalNode actor, PrincipalNode granter) {
+    public ActsForConstraintNode_c(Position pos, PrincipalNode actor, PrincipalNode granter, boolean isEquiv) {
 	super(pos);
 	this.actor = actor;
 	this.granter = granter;
+	this.isEquiv = isEquiv;
     }
 
     /** Gets the actor principal. */
@@ -72,18 +74,19 @@ public class ActsForConstraintNode_c extends ConstraintNode_c implements ActsFor
             JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
             return constraint(ts.actsForConstraint(position(),
                                                   actor.principal(),
-                                                  granter.principal()));
+                                                  granter.principal(),
+                                                  isEquiv));
         }
 
         return this;
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        w.write("actsFor(");
         print(actor, w, tr);
-        w.write(", ");
+        w.write(" ");
+        w.write(isEquiv?"equiv":"actsfor");
+        w.write(" ");
         print(granter, w, tr);
-        w.write(")");
     }
 
     public void translate(CodeWriter w, Translator tr) {

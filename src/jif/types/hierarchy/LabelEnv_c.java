@@ -60,6 +60,13 @@ public class LabelEnv_c implements LabelEnv
         cache.clear();
         ph.add(p1, p2);
     }
+
+    public void addEquiv(Principal p1, Principal p2) {
+        // clear the cache of leq results
+        cache.clear();
+        ph.add(p1, p2);
+        ph.add(p2, p1);
+    }
     
     public void addAssertionLE(Label L1, Label L2) {
         // clear the cache of leq results

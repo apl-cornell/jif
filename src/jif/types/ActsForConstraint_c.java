@@ -11,12 +11,14 @@ public class ActsForConstraint_c extends TypeObject_c
 {
     protected Principal granter;
     protected Principal actor;
+    protected final boolean isEquiv;
 
     public ActsForConstraint_c(JifTypeSystem ts, Position pos,
-	                         Principal actor, Principal granter) {
-	super(ts, pos);
-	this.actor = actor;
-	this.granter = granter;
+            Principal actor, Principal granter, boolean isEquiv) {
+        super(ts, pos);
+        this.actor = actor;
+        this.granter = granter;
+        this.isEquiv = isEquiv;
     }
 
     public ActsForConstraint actor(Principal actor) {
@@ -39,8 +41,13 @@ public class ActsForConstraint_c extends TypeObject_c
 	return granter;
     }
 
+    public boolean isEquiv() {
+        return isEquiv;
+    }
+    
     public String toString() {
-	return "actsFor(" + actor + ", " + granter + ")";
+        
+	return actor + " " + (isEquiv?"equiv":"actsfor") + " " + granter;
     }
 
     public boolean isCanonical() {

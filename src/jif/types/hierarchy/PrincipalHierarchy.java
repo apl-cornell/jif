@@ -27,8 +27,26 @@ public class PrincipalHierarchy {
 	return "[" + actsForString()+ "]";
     }
     
+    private static void addAlreadyReported(Map alreadyReported, Principal p, Principal q) {
+        // record the fact that we have already reported that q actsfor p
+        Set s = (Set)alreadyReported.get(q);
+        if (s == null) {
+            s = new HashSet();
+            alreadyReported.put(q, s);
+        }
+        s.add(p);
+    }
+    private static boolean isAlreadyReported(Map alreadyReported, Principal p, Principal q) {
+        Set s = (Set)alreadyReported.get(p);        
+        if (s != null) {
+            return s.contains(q);
+        }
+        return false;
+    }
     public String actsForString() {
         StringBuffer sb = new StringBuffer();
+        Map alreadyReported = new HashMap();
+        boolean needsComma = false;
         for (Iterator i = actsfor.entrySet().iterator(); i.hasNext(); ) {
             Map.Entry e = (Map.Entry) i.next();
             Principal p = (Principal) e.getKey();
@@ -36,18 +54,26 @@ public class PrincipalHierarchy {
 
             for (Iterator j = a.iterator(); j.hasNext(); ) {
                 Principal q = (Principal) j.next();
-                sb.append("(");
-                sb.append(p.toString());
-                sb.append(" actsFor ");
-                sb.append(q.toString());
-                sb.append(")");
-                if (j.hasNext()) {
+                if (isAlreadyReported(alreadyReported, p, q)) {
+                    continue;
+                }
+                if (needsComma) {
                     sb.append(", ");
                 }                
+                sb.append("(");
+                sb.append(p.toString());
+                if (actsFor(q, p)) {
+                    // q also acts for p
+                    sb.append(" equiv ");
+                    addAlreadyReported(alreadyReported, p, q);
+                }
+                else {
+                    sb.append(" actsFor ");
+                }
+                sb.append(q.toString());
+                sb.append(")");
+                needsComma = true;
             }
-            if (i.hasNext() && !a.isEmpty()) {
-                sb.append(", ");
-            }                
         }
         return sb.toString();
     }

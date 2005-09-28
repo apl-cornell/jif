@@ -308,8 +308,11 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     }
 
     public ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter) {
+        return ActsForConstraintNode(pos, actor, granter, false);
+    }
+    public ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter, boolean isEquiv) {
         ActsForConstraintNode n = new ActsForConstraintNode_c(pos,
-                                                              actor, granter);
+                                                              actor, granter, isEquiv);
         n = (ActsForConstraintNode)n.ext(jifExtFactory().extActsForConstraintNode());
         n = (ActsForConstraintNode)n.del(delFactory().delNode());
         return n;
