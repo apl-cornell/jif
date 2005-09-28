@@ -43,7 +43,7 @@ public class Runtime {
      * the principal parameter of this <code>Runtime</code> object.
      */
     private Label defaultLabel() {
-        return Label.policy(dynp, new LinkedList());
+        return LabelUtil.privacyPolicyLabel(dynp, new LinkedList());
     }
 
     /**
@@ -80,7 +80,7 @@ public class Runtime {
 
         if (!existed) {
             fos.flush();
-            FileSystem.setPolicy(name, (PrivacyPolicy)L.policy());
+//            FileSystem.setPolicy(name, (PrivacyPolicy)L.policy());
         }
         return fos;
     }

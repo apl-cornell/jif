@@ -27,6 +27,6 @@ public class PolicyLabelToJavaExpr_c extends LabelToJavaExpr_c {
             set = rw.qq().parseExpr("(%E).add(%E)", set, pe);
         }
 
-        return rw.qq().parseExpr("new jif.lang.Label(new jif.lang.PrivacyPolicy((%E), (%E)))", owner, set);
+        return rw.qq().parseExpr("jif.lang.LabelUtil.privacyPolicyLabel(%E, (%E))", owner, set);
     }
 }

@@ -403,6 +403,9 @@ public class JifTypeSystem_c
             }
         }
 
+        if (type1 == type2) {
+            return type1;
+        }
 
         if (type1.isReference() && type2.isReference()) {
             // Don't consider interfaces.

@@ -1,0 +1,21 @@
+import java.io.PrintStream;
+import jif.runtime.Runtime;
+
+public class LabelUtil01
+{
+    public LabelUtil01() {}
+    public static void main{}(principal{} pp, String[]{} args)
+        throws (SecurityException)
+    {
+	final principal own = Alice;
+	principal{}[] readers = new principal[] {Bob, Chuck };
+
+        Runtime[pp] runtime = Runtime[pp].getRuntime();
+        try {
+            PrintStream[{pp:}] out = runtime.out();
+	    final label lb = LabelUtil.privacyPolicyLabel(new label {}, own, readers);
+            out.println("Label is " + LabelUtil.stringValue(lb));
+        }
+        catch (NullPointerException ignored) { }
+    }
+}

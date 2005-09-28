@@ -1,0 +1,15 @@
+package jif.lang;
+
+/**
+ * Utility methods for labels.
+ */
+public class LabelUtil {
+    public static native label bottom();
+
+    public static native label{owner; readers; *lbl; lbl} privacyPolicyLabel(label lbl, principal owner, principal{*lbl}[] readers);
+    public static native label join(label l1, label l2);
+    public static native boolean equivalentTo(label l1, label l2);
+    public static native boolean relabelsTo(label from, label to); 
+    
+    public static native String stringValue(label lb); 
+}

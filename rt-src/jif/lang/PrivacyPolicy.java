@@ -2,7 +2,7 @@ package jif.lang;
 
 import java.util.*;
 
-public class PrivacyPolicy implements Policy
+public class PrivacyPolicy extends AbstractLabel implements Policy, Label
 {
     private final Principal owner;
     private final Set readers;
@@ -22,6 +22,23 @@ public class PrivacyPolicy implements Policy
     
     public Set readers() {
 	return readers;
+    }
+
+    public boolean relabelsTo(Label l) {
+        if (l instanceof Policy) {
+            return relabelsTo((Policy)l);
+        }
+        if (l instanceof JoinLabel) {
+            // see if there is a component that we relabel to
+            JoinLabel jl = (JoinLabel)l;
+            for (Iterator iter = jl.components().iterator(); iter.hasNext(); ) {
+                Label comp = (Label)iter.next();
+                if (this.relabelsTo(comp)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public boolean relabelsTo(Policy p) {
@@ -86,7 +103,7 @@ public class PrivacyPolicy implements Policy
 	return false;
     }
     
-    public String toString() {
+    public String componentString() {
 	String str = (owner == null?"<null>":owner.name()) + ": ";
 	for (Iterator iter = readers.iterator(); iter.hasNext(); ) {
 	    Principal reader = (Principal) iter.next();
@@ -95,4 +112,5 @@ public class PrivacyPolicy implements Policy
 	}
 	return str;
     }
+
 }

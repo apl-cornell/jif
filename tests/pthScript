@@ -208,6 +208,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	LabelIf10.jif (Semantic, "NullPointerException.*declared");
 	LabelIf11.jif  (Semantic, "must .* final access path"), (Semantic, "must .* final access path");
 	LabelIf12.jif ;
+	LabelUtil01.jif ;
 	List.jif ;
 	List2.jif ;
 	ListTest.jif ;

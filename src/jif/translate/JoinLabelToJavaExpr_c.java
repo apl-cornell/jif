@@ -23,7 +23,7 @@ public class JoinLabelToJavaExpr_c extends LabelToJavaExpr_c {
         }
 
         if (L.components().isEmpty()) {
-            return rw.qq().parseExpr("jif.lang.Label.bottom()");
+            return rw.qq().parseExpr("jif.lang.LabelUtil.bottom()");
         }
         else {
             LinkedList l = new LinkedList(L.components());

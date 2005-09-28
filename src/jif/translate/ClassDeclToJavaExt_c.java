@@ -180,8 +180,9 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                                      "(c."+paramExpr+","+paramArgName+");");
             }
             else {
-                // e.g., c.equivTo(paramArgName)
-                sb.append("c."+paramExpr+"."+comparison+"("+paramArgName+");");
+                // e.g., LabelUtil.equivTo(paramArgName)
+                sb.append("jif.lang.LabelUtil."+comparison+
+                          "(c."+paramExpr+","+paramArgName+");");
             }
         }
 

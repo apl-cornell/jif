@@ -20,7 +20,7 @@ public class FileSystem
             readerList.add(new NativePrincipal(readers[i]));
         }
         jif.lang.Principal op = new NativePrincipal(owner);
-        return Label.policy(op, readerList);
+        return LabelUtil.privacyPolicyLabel(op, readerList);
     }
     
     /** Set the access(read) policy of <code>file</code>.  */

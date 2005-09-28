@@ -1,16 +1,10 @@
 package jif.translate;
 
+import jif.ast.LabelIf;
 import polyglot.ast.*;
-import polyglot.ext.jl.ast.*;
-import jif.ast.*;
-import polyglot.types.*;
-import polyglot.ext.jl.types.*;
-import jif.types.*;
-import polyglot.visit.*;
-
-import polyglot.util.InternalCompilerError;
-
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.visit.NodeVisitor;
 
 public class LabelIfToJavaExt_c extends ToJavaExt_c {
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
@@ -33,7 +27,7 @@ public class LabelIfToJavaExt_c extends ToJavaExt_c {
 
         if (alternative != null) {
             return rw.qq().parseStmt(
-                "if ((%E).relabelsTo(%E)) {" +
+                "if (jif.lang.LabelUtil.relabelsTo(%E, %E)) {" +
                 "   %S                                          " +
                 "} else {                                       " +
                 "   %S                                          " +
@@ -42,7 +36,7 @@ public class LabelIfToJavaExt_c extends ToJavaExt_c {
         }
         else {
             return rw.qq().parseStmt(
-                "if ((%E).relabelsTo(%E)) {" +
+                "if (jif.lang.LabelUtil.relabelsTo(%E, %E)) {" +
                 "   %S                                          " +
                 "}                                              ",
                 lhs, rhs, consequent);

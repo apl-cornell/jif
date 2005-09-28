@@ -24,7 +24,7 @@ public final class Capability {
             Capability c = (Capability) o;
             boolean ok = true;
             ok = ok && PrincipalUtil.equivalentTo(c.jif$jif_lang_Capability_P, jif$P);
-            ok = ok && c.jif$jif_lang_Capability_L.equivalentTo(jif$L);
+            ok = ok && LabelUtil.equivalentTo(c.jif$jif_lang_Capability_L, jif$L);
             return ok;
         }
         return false;

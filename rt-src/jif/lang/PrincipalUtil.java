@@ -171,7 +171,7 @@ public class PrincipalUtil {
                 || (p != null && closureP != null && p.equals(closureP) && closureP
                         .equals(p))) {
             // The principals agree.
-            if (closureL != null && closureL.equivalentTo(lb)) {
+            if (LabelUtil.equivalentTo(closureL, lb)) {
                 // the labels agree
                 if (p == null || p.isAuthorized(authPrf, c, lb)) {
                     // either p is null (and the "null" principal always
