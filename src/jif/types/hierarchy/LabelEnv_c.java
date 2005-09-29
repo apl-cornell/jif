@@ -210,7 +210,8 @@ public class LabelEnv_c implements LabelEnv
             }
             
             // try to use assertions
-            return result || leqApplyAssertions(L1, L2, (SearchState_c)state);
+            return result || leqApplyAssertions(L1, L2, (SearchState_c)state, true);
+            // try again, being dumb?
         }
         else if (L1.isSingleton()) {
             // if the components of L2 are connected by joins, 
@@ -240,7 +241,7 @@ public class LabelEnv_c implements LabelEnv
             }
 
             // haven't been able to prove it yet. Try the assertions
-            return leqApplyAssertions(L1, L2, (SearchState_c)state);
+            return leqApplyAssertions(L1, L2, (SearchState_c)state, true);
         }
         else {
             // L1 is not a singleton, and neither is L2.
@@ -269,9 +270,9 @@ public class LabelEnv_c implements LabelEnv
      * Bound the number different assertions that can be used; this bounds
      * the search in leqImpl.
      */
-    private static final int ASSERTION_TOTAL_BOUND = 3;
+    private static final int ASSERTION_TOTAL_BOUND = 12;
         
-    private boolean leqApplyAssertions(Label L1, Label L2, SearchState_c state) {
+    private boolean leqApplyAssertions(Label L1, Label L2, SearchState_c state, boolean beSmart) {
         AssertionUseCount auc = state.auc;
         if (!state.useAssertions || auc.size() >= ASSERTION_TOTAL_BOUND) return false;
 
@@ -292,6 +293,12 @@ public class LabelEnv_c implements LabelEnv
             Label cRHS = c.rhs();
             if (cRHS.hasVariables()) { 
                 cRHS = this.solver.applyBoundsTo(c.rhs());
+            }
+            if (beSmart) {
+                // only use assertions that match one or the other of our labels
+                if (!L1.equals(cLHS) && !L2.equals(cRHS)) {
+                    continue;
+                }
             }
             if (leq(L1, cLHS, newState) && 
                     leq(cRHS, L2, newState)) {
