@@ -15,6 +15,8 @@ public class Graph {
 
     private Set nodes;
     private Map edges;
+    
+    private final static boolean DEBUG = false;
 
     /** inputs:  Set of objects representing nodes
                  Map of dependencies between nodes (directed graph)
@@ -28,7 +30,7 @@ public class Graph {
     public Graph(Set nodes, Map edges)  {
         this.nodes = nodes;
         this.edges = edges;
-        validateGraph();
+        if (DEBUG) validateGraph();
     }
 
     /* validating that we are given a proper graph 
@@ -109,21 +111,22 @@ public class Graph {
        
        Algorithm from CLR 1st edition section 23.3
      */
-    public void DFS() {
-        // initialize stuff
-        DFSDone = false;
-        dfsFinishTimes = new LinkedHashMap();
-        dfsStartTimes = new LinkedHashMap();
-        dfsTime = 0;
-
-        Object n;
-        for (Iterator e = nodes.iterator(); e.hasNext();) {
-            n = e.next();
-            if (! dfsStartTimes.containsKey(n)) {
-                DFSVisit(n);
+    private void DFS() {
+        if (!DFSDone) {
+            // initialize stuff
+            dfsFinishTimes = new LinkedHashMap();
+            dfsStartTimes = new LinkedHashMap();
+            dfsTime = 0;
+            
+            Object n;
+            for (Iterator e = nodes.iterator(); e.hasNext();) {
+                n = e.next();
+                if (! dfsStartTimes.containsKey(n)) {
+                    DFSVisit(n);
+                }
             }
+            DFSDone = true;
         }
-        DFSDone = true;
     }
 
     private void DFSVisit(Object n) {
@@ -138,6 +141,7 @@ public class Graph {
             for (Iterator e = outEdges.iterator(); e.hasNext();) {
                 x = e.next();
                 if (! dfsStartTimes.containsKey(x)) {
+                    // haven't visited x yet.
                     DFSVisit(x);
                 }
             }
@@ -156,7 +160,10 @@ public class Graph {
        highest finish time first. Algorithm is taken from CLR, 1st 
        edition, section 23.4 */
 
+    private LinkedList topoSort = null;
     public LinkedList topoSort() {
+        if (topoSort != null) return topoSort;
+        
         // if DFS not done yet, do DFS, then continue
         if (! DFSDone) {
             DFS();
@@ -196,6 +203,7 @@ public class Graph {
             finishSort.remove(max);
             maxFinish = -1;
         }
+        topoSort = l;
         return l;
     }
 
@@ -206,7 +214,9 @@ public class Graph {
 
        Uses the algorithm in CLR first edition section 23.5
      */
-    public List getStrongConnectedComponents() {
+    private List strngConnectedComps = null;
+    private List getStrongConnectedComponents() {
+        if (strngConnectedComps != null) return strngConnectedComps;
         LinkedList l = new LinkedList();
         Set currentComponent, visited;
         visited = new LinkedHashSet();
@@ -233,6 +243,7 @@ public class Graph {
                 l.add(currentComponent);
             }
         }
+        strngConnectedComps = l;
         return l;
     }
 
@@ -324,7 +335,7 @@ public class Graph {
        getStrongConnectedComponents() as input. If any other is put
        in, I(the code) takes no responsibility whatsoever in what happens.
      */
-    public Graph getSuperNodeGraph(List superNodes) {
+    private Graph getSuperNodeGraph(List superNodes) {
         Set newNodeSet = new LinkedHashSet(superNodes);
         Map newEdgeMap = new LinkedHashMap();
 

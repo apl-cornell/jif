@@ -3,6 +3,7 @@ package jif.extension;
 import java.util.Iterator;
 import java.util.List;
 
+import jif.ast.*;
 import jif.ast.JifMethodDecl;
 import jif.ast.JifNodeFactory;
 import jif.translate.ToJavaExt;
@@ -39,7 +40,10 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 	A = (JifContext) mn.enterScope(A);
         lc = lc.context(A);
 
-	// First, check the arguments, adjusting the context.
+        // let the label checker know that we are about to enter a method decl
+        lc.enteringMethod(mi);
+
+        // First, check the arguments, adjusting the context.
 	Label Li = checkArguments(mi, lc);
 
 	Block body = null;
@@ -67,6 +71,9 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 
 	mn = (JifMethodDecl) X(mn.body(body), X);
 
+        // let the label checker know that we have left the method
+        mn = lc.leavingMethod(mn);
+    
 	return mn;
     }
 

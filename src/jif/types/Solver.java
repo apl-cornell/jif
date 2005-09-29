@@ -78,12 +78,16 @@ public abstract class Solver {
      * components, which are then sorted in topological order. If false, then
      * constraints are solved in the order they are added to the solver
      */
-    private static final boolean useSCC = true;
+    private static final boolean useSCC = false;
 
+    /**
+     * The name of the solver, for debugging purposes.
+     */
+    private String solverName;
     /**
      * Constructor
      */
-    public Solver(JifTypeSystem ts) {
+    public Solver(JifTypeSystem ts, String solverName) {
         this.ts = ts;
         Q = new LinkedList();
         equations = new LinkedHashSet();
@@ -96,7 +100,10 @@ public abstract class Solver {
         dynBounds = new VarMap(ts, getDefaultBound());
         scc = null;
         currentSCC = null;
+        this.solverName = solverName + " (#" + (++solverCounter) + ")";
     }
+    
+    private static int solverCounter;
 
     /**
      * Constructor
@@ -115,6 +122,7 @@ public abstract class Solver {
         dynBounds = js.dynBounds.copy();
         equations = new LinkedHashSet(js.equations);
         scc = new LinkedList(js.scc);
+        solverName = js.solverName;
     }
 
     /**
@@ -164,8 +172,8 @@ public abstract class Solver {
         Set removedEqns = new LinkedHashSet();
         // removing stuff of form x <= x (always true, as for all x, x <= x)
         // and removing stuff that has no variables
-        if (shouldReport(4))
-                report(4, "=====Equations excluded from solving loop=====");
+        if (shouldReport(5))
+                report(5, "=====Equations excluded from solving loop=====");
         for (Iterator e = nodes.iterator(); e.hasNext();) {
             Equation toCheck = (Equation)e.next();
             Label lhs = toCheck.lhs();
@@ -174,17 +182,17 @@ public abstract class Solver {
             if (lhs.equals(rhs)) {
                 removedEqns.add(toCheck);
                 e.remove();
-                if (shouldReport(4)) report(4, toCheck.toString());
+                if (shouldReport(5)) report(5, toCheck.toString());
             }
             else if (!toCheck.env().hasVariables() && !lhs.hasVariables()
                     && !rhs.hasVariables()) {
                 removedEqns.add(toCheck);
                 e.remove();
-                if (shouldReport(4)) report(4, toCheck.toString());
+                if (shouldReport(5)) report(5, toCheck.toString());
             }
         }
-        if (shouldReport(4))
-                report(4, "Equations excluded: " + removedEqns.size());
+        if (shouldReport(5))
+                report(5, "Equations excluded: " + removedEqns.size());
 
         // consistency check. uncomment if debugging
         /*
@@ -274,8 +282,8 @@ public abstract class Solver {
                 if (!(eqCnstr.env().leq(newBound, boundRHS) && eqCnstr.env()
                         .leq(boundRHS, newBound))) {
                     // the equality constraint has been violated!
-                    if (shouldReport(3)) {
-                        report(3, "Equality constraint violated: " + eqCnstr);
+                    if (shouldReport(4)) {
+                        report(4, "Equality constraint violated: " + eqCnstr);
                     }
                     // set the bound back to the original bound, to make the
                     // error message comprehensible.
@@ -308,24 +316,35 @@ public abstract class Solver {
 
         //bounds = new VarMap(ts, getDefaultBound());
 
+        if (shouldReport(1)) {
+            report(1, "===== Starting solver " + solverName + " =====");
+            report(1, "   " + equations.size() + " equations");
+        }
         if (useSCC) {
+//                System.err.println("  create graph start: " + new java.util.Date());
             Graph eqnGraph = createGraph();
 
             if (eqnGraph != null) {
-                if (shouldReport(4)) {
-                    report(4, "=====Equation Graph=====");
-                    report(4, eqnGraph.toString());
+                if (shouldReport(5)) {
+                    report(5, "=====Equation Graph=====");
+                    report(5, eqnGraph.toString());
                 }
             }
+//            System.err.println("  get super node start: " + new java.util.Date());
             Graph h = eqnGraph.getSuperNodeGraph();
-            if (shouldReport(4)) {
-                report(4, "=====Strongly Connected Equation Graph=====");
-                report(4, h.toStringSetNodes());
+            if (shouldReport(5)) {
+                report(5, "=====Strongly Connected Equation Graph=====");
+                report(5, h.toStringSetNodes());
             }
+//            System.err.println("  topo sort start: " + new java.util.Date());
             scc = h.topoSort();
             if ((scc == null) || (eqnGraph == null)) {
                 throw new InternalCompilerError("Unable to construct "
                         + "strongly connected components for equation graph");
+            }
+//            System.err.println("  done: " + new java.util.Date());
+            if (shouldReport(1)) {
+                report(1, "   " + scc.size() + " strongly connected components");
             }
         }
         else {
@@ -348,6 +367,9 @@ public abstract class Solver {
         try {
             VarMap soln = solve_bounds();
             status = STATUS_SOLVED;
+            if (shouldReport(1)) {
+                report(1, "   finished " + solverName);
+            }
             return soln;
         }
         catch (SemanticException e) {
@@ -375,11 +397,11 @@ public abstract class Solver {
         // Solve the system of constraints. bounds may already contain a
         // partial solution, in which case attempt to complete the solution.
 
-        if (shouldReport(2)) {
-            report(2, "======EQUATIONS======");
+        if (shouldReport(3)) {
+            report(3, "======EQUATIONS======");
             for (Iterator i = equations.iterator(); i.hasNext();) {
                 Equation eqn = (Equation)i.next();
-                report(2, eqn.toString());
+                report(3, eqn.toString());
             }
         }
 
@@ -395,14 +417,14 @@ public abstract class Solver {
                 Label rhsbound = bounds.applyTo(eqn.rhs());
 
                 if (eqn.env().leq(lhsbound, rhsbound)) {
-                    if (shouldReport(4))
-                            report(4, "constraint: " + eqn
+                    if (shouldReport(5))
+                            report(5, "constraint: " + eqn
                                     + " already satisfied: " + lhsbound + "<="
                                     + rhsbound);
                 }
                 else {
-                    if (shouldReport(3)) {
-                        report(3, "Considering constraint: " + eqn + " (line "
+                    if (shouldReport(4)) {
+                        report(4, "Considering constraint: " + eqn + " (line "
                                 + eqn.position().line() + ")");
                     }
                     // let the subclass deal with changing the bounds on
@@ -424,8 +446,8 @@ public abstract class Solver {
 
             checkCandidateSolution();
         }
-        if (shouldReport(1))
-                report(1, "Number of relaxation steps: " + counter);
+        if (shouldReport(2))
+                report(2, "Number of relaxation steps: " + counter);
         bounds.print();
 
         return bounds;
@@ -442,8 +464,8 @@ public abstract class Solver {
      * Check the candidate solution
      */
     protected final void checkCandidateSolution() throws SemanticException {
-        if (shouldReport(3)) {
-            report(3, "===== Checking candidate solution =====");
+        if (shouldReport(4)) {
+            report(4, "===== Checking candidate solution =====");
         }
         // We are done refining the upper bounds of the variables.
         // Make one final check that all equations are satisfied.
@@ -455,14 +477,14 @@ public abstract class Solver {
             Label lhsBound = bounds.applyTo(eqn.lhs());
             Label rhsBound = bounds.applyTo(eqn.rhs());
 
-            if (shouldReport(3)) {
-                report(3, "Checking equation: " + eqn);
+            if (shouldReport(4)) {
+                report(4, "Checking equation: " + eqn);
             }
 
-            if (shouldReport(5)) {
-                report(5, "LHS = " + eqn.lhs());
-                report(5, "LHS APP = " + lhsBound);
-                report(5, "RHS APP = " + rhsBound);
+            if (shouldReport(6)) {
+                report(6, "LHS = " + eqn.lhs());
+                report(6, "LHS APP = " + lhsBound);
+                report(6, "RHS APP = " + rhsBound);
             }
 
             // Check to see if it is currently satisfiable.
@@ -533,8 +555,8 @@ public abstract class Solver {
                     + "Cannot add more constraints");
         }
 
-        if (shouldReport(4)) report(4, (constraint_counter + 1) + ": " + c);
-        if (shouldReport(5)) report(5, ">>> " + c.msg());
+        if (shouldReport(5)) report(5, (constraint_counter + 1) + ": " + c);
+        if (shouldReport(6)) report(6, ">>> " + c.msg());
         inc_counter();
 
         if (!c.lhs().isCanonical() || !c.rhs().isCanonical()) {
@@ -574,8 +596,8 @@ public abstract class Solver {
                 // The equation has no variables. We can check now if it is
                 // satisfied or not
                 if (!eqn.evaluate()) {
-                    if (shouldReport(1)) {
-                        report(1, "Statically failed " + eqn);
+                    if (shouldReport(2)) {
+                        report(2, "Statically failed " + eqn);
                     }
                     // The equation is not satisfied.
                     throw new SemanticException(errorMsg(eqn.constraint()), eqn
@@ -587,7 +609,7 @@ public abstract class Solver {
                 }
             }
             else {
-                if (shouldReport(4)) report(4, "Adding equation: " + eqn);
+                if (shouldReport(5)) report(5, "Adding equation: " + eqn);
                 eqn.env().setSolver(this);
                 equations.add(eqn);
                 addDependencies(eqn);

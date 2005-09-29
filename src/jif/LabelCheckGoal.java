@@ -18,6 +18,6 @@ public class LabelCheckGoal extends SourceFileGoal {
         final JifTypeSystem ts = (JifTypeSystem) jifext.typeSystem();
         final JifNodeFactory nf = (JifNodeFactory) jifext.nodeFactory();
         return new LabelCheckPass(this, this.job(), 
-                                 new LabelChecker(this.job(), ts, nf, !jifext.getJifOptions().solveGlobally));
+                                 new LabelChecker(this.job(), ts, nf, !jifext.getJifOptions().solveGlobally, !jifext.getJifOptions().solveGlobally));
     }
 }

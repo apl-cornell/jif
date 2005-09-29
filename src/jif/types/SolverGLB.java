@@ -16,8 +16,8 @@ public class SolverGLB extends Solver {
     /**
      * Constructor
      */
-    public SolverGLB(JifTypeSystem ts) {
-        super(ts);
+    public SolverGLB(JifTypeSystem ts, String solverName) {
+        super(ts, solverName);
     }
 
     /**
@@ -41,8 +41,8 @@ public class SolverGLB extends Solver {
      * to no longer be satisfied.
      */
     protected void addDependencies(Equation eqn) {
-        if (shouldReport(4)) {
-            report(4, "Equation " + eqn + " depends on variables: "
+        if (shouldReport(5)) {
+            report(5, "Equation " + eqn + " depends on variables: "
                     + eqn.lhs().variables());
         }
 
@@ -191,8 +191,8 @@ public class SolverGLB extends Solver {
         Label lhsBound = bounds().applyTo(eqn.lhs());
         Label rhsBound = bounds().applyTo(eqn.rhs());
 
-        if (shouldReport(4)) report(4, "BOUND of " + v + " = " + vBound);
-        if (shouldReport(4)) report(4, "APP = " + lhsBound);
+        if (shouldReport(5)) report(5, "BOUND of " + v + " = " + vBound);
+        if (shouldReport(5)) report(5, "APP = " + lhsBound);
 
         // Try and raise v's bound just enough to satisfy the equation
         Collection needed = new ArrayList(lhsBound.components().size());
@@ -205,7 +205,7 @@ public class SolverGLB extends Solver {
         // everything not in needed is already satisfied
         Label join = vBound.join(ts.joinLabel(lhsBound.position(), needed));
 
-        if (shouldReport(3)) report(3, "JOIN: " + v + " := " + join);
+        if (shouldReport(4)) report(4, "JOIN: " + v + " := " + join);
 
         addTrace(v, eqn, join);
         setBound(v, join, eqn.constraint());
@@ -252,10 +252,10 @@ public class SolverGLB extends Solver {
         // check whether it is solvable given the current variables.
 
         Label rhsLabel = eqn.rhs();
-        if (shouldReport(3)) report(3, "RHS = " + rhsLabel);
+        if (shouldReport(4)) report(4, "RHS = " + rhsLabel);
 
         Label lhsBound = bounds().applyTo(eqn.lhs());
-        if (shouldReport(3)) report(3, "LHS APP = " + lhsBound);
+        if (shouldReport(4)) report(4, "LHS APP = " + lhsBound);
 
         // Check to see if it is currently satisfiable.
         if (!eqn.env().leq(lhsBound, rhsLabel)) {

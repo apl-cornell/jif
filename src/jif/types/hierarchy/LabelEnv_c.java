@@ -264,13 +264,13 @@ public class LabelEnv_c implements LabelEnv
      * Bound the number of times any particular assertion can be used; this bounds
      * the search in leqImpl.
      */
-    private static final int ASSERTION_USE_BOUND = 2;
+    private static final int ASSERTION_USE_BOUND = 1;
 
     /**
      * Bound the number different assertions that can be used; this bounds
      * the search in leqImpl.
      */
-    private static final int ASSERTION_TOTAL_BOUND = 12;
+    private static final int ASSERTION_TOTAL_BOUND = 6;
         
     private boolean leqApplyAssertions(Label L1, Label L2, SearchState_c state, boolean beSmart) {
         AssertionUseCount auc = state.auc;

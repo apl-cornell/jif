@@ -160,7 +160,7 @@ public interface JifTypeSystem extends ParamTypeSystem
     boolean isAccessible(MemberInstance mi, ClassType contextClass);
 
         /** Returns a new label constraint system solver. */
-    Solver solver();
+    Solver solver(String solverName);
 
     DefaultSignature defaultSignature();
 

@@ -1,13 +1,11 @@
 package jif.visit;
 
-import jif.ast.Jif;
-import jif.ast.JifClassDecl;
+import jif.ast.*;
 import jif.types.*;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
+import polyglot.types.*;
 import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 
@@ -46,6 +44,13 @@ public class LabelChecker implements Copy
     final private boolean solvePerClassBody;
     
     /**
+     * If true, then a new system of constraints will be used for each 
+     * method body, and upon leaving the method body, the system of constraints
+     * will be solved.
+     */
+    final private boolean solvePerMethod;
+    
+    /**
      * The <code>Solver</code> to add constraints to. Depending on 
      * <code>solveClassBodies</code>, a new <code>Solver</code> is used
      * for every class, or a single <code>Solver</code> used for the entire 
@@ -60,20 +65,24 @@ public class LabelChecker implements Copy
      */
     final private boolean doLabelSubst;
 
-    public LabelChecker(Job job, TypeSystem ts, NodeFactory nf, boolean solvePerClassBody) {
-        this(job, ts, nf, solvePerClassBody, true);
+    public LabelChecker(Job job, TypeSystem ts, NodeFactory nf, boolean solvePerClassBody, boolean solvePerMethod) {
+        this(job, ts, nf, solvePerClassBody, solvePerMethod, true);
     }
 
-    public LabelChecker(Job job, TypeSystem ts, NodeFactory nf, boolean solvePerClassBody, boolean doLabelSubst) {
+    public LabelChecker(Job job, TypeSystem ts, NodeFactory nf, boolean solvePerClassBody, boolean solvePerMethod, boolean doLabelSubst) {
         this.job = job;
         this.ts = (JifTypeSystem) ts;
         this.context = (JifContext) ts.createContext();
         this.nf = nf;
 
         this.solvePerClassBody = solvePerClassBody;
+        this.solvePerMethod = solvePerMethod;
+//        if (solvePerMethod && solvePerClassBody) {
+//            throw new InternalCompilerError("cant solve for both class and method!");
+//        }
         this.doLabelSubst = true;
-        if (!solvePerClassBody) {
-            this.solver = this.ts.solver();
+        if (!solvePerClassBody && !solvePerMethod) {
+            this.solver = this.ts.solver("Job solver: " + job.toString());
         }
     }
 
@@ -135,10 +144,22 @@ public class LabelChecker implements Copy
      * check a class body. This allows us to use a different solver if
      * required.
      */
-    public void enteringClassBody() {
+    public void enteringClassBody(ClassType ct) {
         if (solvePerClassBody) {
             // solving by class. Set a new solver for the class body
-            this.solver = ts.solver();
+            this.solver = ts.solver(ct.name());
+        }
+    }
+
+    /**
+     * Called by JifMethodDeclExt just before this label checker is used to
+     * check a method body. This allows us to use a different solver if
+     * required.
+     */
+    public void enteringMethod(MethodInstance mi) {
+        if (solvePerMethod) {
+            // solving by method. Set a new solver for the class body
+            this.solver = ts.solver(mi.container().toString() + "." + mi.name());
         }
     }
 
@@ -151,6 +172,19 @@ public class LabelChecker implements Copy
         if (solvePerClassBody) {
             // solving by class. We need to solve the constraints
             return (JifClassDecl)solveConstraints(n);
+        }
+        return n;
+    }
+
+    /**
+     * Called by JifClassDeclExt just after this label checker has been used to
+     * check a class body. This allows us to use a different solver if
+     * required.
+     */
+    public JifMethodDecl leavingMethod(JifMethodDecl n) {
+        if (solvePerMethod) {
+            // solving by class. We need to solve the constraints
+            return (JifMethodDecl)solveConstraints(n);
         }
         return n;
     }

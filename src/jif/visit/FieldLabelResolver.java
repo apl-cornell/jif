@@ -52,7 +52,7 @@ public class FieldLabelResolver extends ContextVisitor
         JifClassType ct = (JifClassType) context().currentClassScope();
 
         LabelChecker lc = new LabelChecker(job, ts,
-                                           (JifNodeFactory) nodeFactory(), false, false);
+                                           (JifNodeFactory) nodeFactory(), false, false, false);
 
         if (lc == null) {
             throw new InternalCompilerError("Could not label check " +

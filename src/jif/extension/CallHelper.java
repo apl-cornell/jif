@@ -654,7 +654,8 @@ public class CallHelper {
                                              new NamedLabel(receiverVarLabel.componentString(),
                                                             this.receiverLabel), 
                                              A.labelEnv(), 
-                                             this.position));
+                                             this.position, 
+                                             false));
         }
         else if (receiverVarLabel != null || this.receiverLabel != null) {
             throw new InternalCompilerError("Inconsistent receiver labels", position);
@@ -664,20 +665,21 @@ public class CallHelper {
         for (int i = 0; i < actualArgLabels.size(); i++) {
             VarLabel argVarLbl = (VarLabel)actualArgVarLabels.get(i);
             Label argLbl = (Label)this.actualArgLabels.get(i);
-            lc.constrain(new LabelConstraint(new NamedLabel(argVarLbl
-                    .componentString(), argVarLbl), LabelConstraint.EQUAL,
-                    new NamedLabel(argVarLbl.componentString(), argLbl), A
-                            .labelEnv(), this.position));
+            lc.constrain(new LabelConstraint(new NamedLabel(argVarLbl.componentString(), argVarLbl), 
+                                             LabelConstraint.EQUAL,
+                                             new NamedLabel(argVarLbl.componentString(), argLbl), 
+                                             A.labelEnv(), this.position, 
+                                             false));
         }
         
         // bind all the actual param var labels
         for (int i = 0; i < actualParamVarLabels.size(); i++) {
             VarLabel paramVarLbl = (VarLabel)actualArgVarLabels.get(i);
             Label paramLbl = (Label)this.actualArgLabels.get(i);
-            lc.constrain(new LabelConstraint(new NamedLabel(paramVarLbl
-                    .componentString(), paramVarLbl), LabelConstraint.EQUAL,
-                    new NamedLabel(paramVarLbl.componentString(), paramLbl), A
-                            .labelEnv(), this.position));
+            lc.constrain(new LabelConstraint(new NamedLabel(paramVarLbl.componentString(), paramVarLbl), 
+                                             LabelConstraint.EQUAL, new NamedLabel(paramVarLbl.componentString(), paramLbl), 
+                                             A.labelEnv(), this.position, 
+                                             false));
         }
 
     }

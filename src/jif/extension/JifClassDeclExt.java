@@ -71,7 +71,7 @@ public class JifClassDeclExt extends Jif_c {
         LabelChecker newLC = lc.context(A);
 	        
         // let the label checker know that we are about to enter a class body
-        newLC.enteringClassBody();
+        newLC.enteringClassBody(ct);
         
         // label check class conformance
 	labelCheckClassConformance(ct,newLC);

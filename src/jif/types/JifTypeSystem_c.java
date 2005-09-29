@@ -49,8 +49,8 @@ public class JifTypeSystem_c
         return o;
     }
 
-    public Solver solver() {
-        return new SolverGLB(this);
+    public Solver solver(String solverName) {
+        return new SolverGLB(this, solverName);
         //return new SolverLUB(this);
     }
 

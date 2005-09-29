@@ -138,8 +138,8 @@ public class VarMap {
     }	
     
     public void print() {
-        if (Solver.shouldReport(1)) {
-            Solver.report(1, "======== VAR MAP ========");
+        if (Solver.shouldReport(2)) {
+            Solver.report(2, "======== VAR MAP ========");
             for (Iterator i = bounds.entrySet().iterator(); i.hasNext(); ){
                 Map.Entry e = (Map.Entry) i.next();
                 VarLabel var = (VarLabel) e.getKey();
@@ -148,11 +148,11 @@ public class VarMap {
                 if (var.description() != null) {
                     s += "    \t" + var.description();
                 }
-                Solver.report(1, s);
+                Solver.report(2, s);
             }
-            Solver.report(1, "Variables not in this map will receive " +
+            Solver.report(2, "Variables not in this map will receive " +
                              "default label of " + defaultBound);
-            Solver.report(1, "=========================");
+            Solver.report(2, "=========================");
         }
     }
 
