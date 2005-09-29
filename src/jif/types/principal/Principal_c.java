@@ -12,6 +12,7 @@ import jif.types.LabelSubstitution;
 import polyglot.ast.Expr;
 import polyglot.ext.jl.types.TypeObject_c;
 import polyglot.types.SemanticException;
+import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
@@ -35,7 +36,9 @@ public abstract class Principal_c extends TypeObject_c implements Principal {
 
     public abstract boolean isCanonical();
     public abstract boolean isRuntimeRepresentable();
-
+    public abstract boolean equalsImpl(TypeObject o);
+    public abstract int hashCode();
+    
     public List throwTypes(TypeSystem ts) {
         return Collections.EMPTY_LIST;
     }

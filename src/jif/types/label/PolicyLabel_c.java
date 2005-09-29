@@ -62,11 +62,18 @@ public class PolicyLabel_c extends Label_c implements PolicyLabel {
         return true;
     }
     public boolean equalsImpl(TypeObject o) {
-        return this == o;
+        if (this == o) return true;
+        if (o instanceof PolicyLabel_c) {
+            PolicyLabel_c that = (PolicyLabel_c)o;
+            if (this.owner == that.owner || (this.owner != null && this.owner.equals(that.owner))) {
+                return this.readers.equals(that.readers);
+            }
+        }
+        return false;
     }
     
     public int hashCode() {
-        return owner.hashCode() + readers.hashCode();
+        return (owner==null?0:owner.hashCode()) + readers.hashCode();
     }
     
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {

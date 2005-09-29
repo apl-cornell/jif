@@ -33,6 +33,7 @@ public class ParamPrincipal_c extends Principal_c implements ParamPrincipal {
     }
 
     public boolean equalsImpl(TypeObject o) {
+        if (this == o) return true;
 	if (! (o instanceof ParamPrincipal)) {
 	    return false;
 	}

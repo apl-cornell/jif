@@ -33,6 +33,7 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
     }
     
     public boolean equalsImpl(TypeObject o) {
+        if (this == o) return true;
         if (! (o instanceof ThisLabel)) {
             return false;
         }           

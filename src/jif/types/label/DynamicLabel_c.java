@@ -45,6 +45,7 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
         return true;
     }
     public boolean equalsImpl(TypeObject o) {
+        if (this == o) return true;
         if (! (o instanceof DynamicLabel)) {
             return false;
         }           

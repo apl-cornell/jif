@@ -40,6 +40,7 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
 
 
     public boolean equalsImpl(TypeObject o) {
+        if (this == o) return true;
 	if (! (o instanceof DynamicPrincipal)) {
 	    return false;
 	}

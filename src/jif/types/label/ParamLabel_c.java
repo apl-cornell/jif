@@ -48,6 +48,7 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
         return paramInstance.hashCode();
     }
     public boolean equalsImpl(TypeObject o) {
+        if (this == o) return true;
         if (! (o instanceof ParamLabel)) {
             return false;
         }           

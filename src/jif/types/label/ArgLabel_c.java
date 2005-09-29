@@ -52,6 +52,7 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     protected boolean isDisambiguatedImpl() { return upperBound != null; }
     
     public boolean equalsImpl(TypeObject o) {
+        if (this == o) return true;
         if (! (o instanceof ArgLabel_c)) {
             return false;
         }           

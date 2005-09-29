@@ -87,7 +87,16 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     }
     
     public boolean equalsImpl(TypeObject o) {
-        return this == o; // @@@@@????
+        if (this == o) return true;
+        if (o instanceof JoinLabel_c) {
+            JoinLabel_c that = (JoinLabel_c)o;
+            return this.components.equals(that.components);
+        }
+        if (o instanceof Label) {
+            // see if it matches a singleton
+            return this.components.equals(Collections.singleton(o));
+        }
+        return false;
     }
     public int hashCode() {
         return components.hashCode();

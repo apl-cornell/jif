@@ -7,6 +7,7 @@ import jif.types.label.AccessPathRoot;
 import polyglot.ast.Expr;
 import polyglot.types.Resolver;
 import polyglot.types.SemanticException;
+import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -26,5 +27,13 @@ public class UnknownPrincipal_c extends Principal_c
 
     public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
 	throw new InternalCompilerError("Cannot translate an unknown principal.");
+    }
+
+    public boolean equalsImpl(TypeObject o) {
+        return this == o;
+    }
+
+    public int hashCode() {
+        return -572;
     }
 }

@@ -36,6 +36,7 @@ public class ExternalPrincipal_c extends Principal_c implements ExternalPrincipa
      *  and both principals have the same name. 
      */
     public boolean equalsImpl(TypeObject o) {
+        if (this == o) return true;
 	if (! (o instanceof ExternalPrincipal)) {
 	    return false;
 	}
