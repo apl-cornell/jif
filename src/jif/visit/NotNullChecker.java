@@ -352,8 +352,11 @@ public class NotNullChecker extends DataFlow
             checkField((Field)n, (DataFlowItem)inItem);
         }
         else if (n instanceof Call) {
-            Receiver r = ((Call)n).target();
+            Call c = (Call)n;
+            Receiver r = c.target();
             checkReceiver(r, n, (DataFlowItem)inItem);
+            // also check the type of the method instance container
+            checkType(c.methodInstance().container(), (DataFlowItem)inItem);
         }
         else if (n instanceof Throw) {
             Throw t = (Throw)n;
@@ -435,7 +438,9 @@ public class NotNullChecker extends DataFlow
     }
 
     private void checkTypeNode(TypeNode tn, DataFlowItem inItem) {
-        Type t = tn.type();
+        checkType(tn.type(), inItem);
+    }
+    private void checkType(Type t, DataFlowItem inItem) {
         if (t instanceof JifSubstType && ((JifTypeSystem)ts).isParamsRuntimeRep(t)) {            
             LabelNotNullSubst lnns = new LabelNotNullSubst(inItem);
             JifSubstType jst = (JifSubstType)t;
