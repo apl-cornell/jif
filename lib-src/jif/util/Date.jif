@@ -46,7 +46,7 @@ public final class Date[covariant label L] implements JifObject[L] {
      * At the moment, assume that the string is in the format YYYY/MM/DD
      * or DD-MM-YYYY
      */
-    public static Date[lbl] valueOf{*lbl}(label lbl, String{*lbl} d) throws (IllegalArgumentException{*lbl}) {
+    public static Date[lbl]{lbl} valueOf{*lbl}(label lbl, String{*lbl} d) throws (IllegalArgumentException{*lbl}) {
         if (d == null) {
             throw new IllegalArgumentException("null string");
         }
