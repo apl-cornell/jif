@@ -73,7 +73,7 @@ public final class Date[covariant label L] implements JifObject[L] {
             }
 
         }
-        else if (d.length() < 10) {
+        else if (d.length() != 10) {
             throw new IllegalArgumentException("invalid string: format should be DD-MM-YYYY");
         }
         
@@ -82,6 +82,9 @@ public final class Date[covariant label L] implements JifObject[L] {
             int month = Integer.parseInt(d.substring(monthStart,monthEnd));
             int day = Integer.parseInt(d.substring(dayStart,dayEnd));
             return new Date[lbl](year, month, day);
+        }
+        catch (NumberFormatException e) {
+            throw new IllegalArgumentException("invalid string: format should be DD-MM-YYYY");
         }
         catch (StringIndexOutOfBoundsException impossible) {
             return null;
