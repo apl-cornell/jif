@@ -9,6 +9,7 @@ public class PrivacyPolicy extends AbstractLabel implements Policy, Label
 
     public PrivacyPolicy(Principal owner, Collection readers) {
 	this.owner = owner;
+	if (readers == null) readers = Collections.EMPTY_SET; 
 	this.readers = Collections.unmodifiableSet(new HashSet(readers));
     }
 

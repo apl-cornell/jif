@@ -49,7 +49,7 @@ public interface Principal {
 	 * the principal's password, and the closure is one that the
 	 * principal expects to be asked to authorize.
 	 */
-	boolean{authPrf; closure; lb; this} isAuthorized(Object authPrf, 
+	boolean{authPrf; closure; lb; *lb; this} isAuthorized(Object authPrf, 
                                                      Closure[this, lb] closure,
                                                      label lb) where authority (this);
 

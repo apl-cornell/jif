@@ -31,6 +31,7 @@ public class LabelUtil
      * See the signature for the explanation of lbl.
      */
     public static Label privacyPolicyLabel(Label lbl, Principal owner, Principal[] readers) {
+        if (readers == null) return privacyPolicyLabel(owner, Collections.EMPTY_SET);
 	return privacyPolicyLabel(owner, Arrays.asList(readers));
     }
 
