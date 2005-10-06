@@ -1,5 +1,7 @@
 package jif.util;
 
+import jif.runtime.Runtime;
+
 /**
  * This class is a simple utility class for representing and comparing dates. 
  * It is not intended to replace or duplicate the functionality of 
@@ -95,10 +97,10 @@ public final class Date[covariant label L] implements JifObject[L] {
      * Set the date to the current day
      */
     public Date() {
-        // XXX to fix
-        this.year = 2005;
-        this.month = 10;
-        this.day = 2;                    
+        final principal p = PrincipalUtil.nullPrincipal();
+        this.year = Runtime[p].currentYear();
+        this.month = Runtime[p].currentMonth();
+        this.day = Runtime[p].currentDayOfMonth();
     }
     public Date(int{L; this} pYear, int{L; this} pMonth, int{L; this} pDay) throws (IllegalArgumentException{pYear; pMonth; pDay}){
         this.year = pYear;

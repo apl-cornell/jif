@@ -23,5 +23,10 @@ public class Runtime[principal P]
     public native PrintStream[{P:}]{P:} out();
     public native InputStream[{P:}]{P:} in();
     public native InputStream[{*L}]{*L;L} in(label L);
+    
+    // current time, but only to accuracy of the day.
+    public static native int{} currentYear();
+    public static native int{} currentMonth();
+    public static native int{} currentDayOfMonth();    
 }
 

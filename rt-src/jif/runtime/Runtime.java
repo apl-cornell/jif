@@ -1,6 +1,8 @@
 package jif.runtime;
 
 import java.io.*;
+import java.util.*;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
 import jif.lang.*;
@@ -164,6 +166,15 @@ public class Runtime {
 
     public static native String currentUser();
 
+    public static int currentYear(Principal dummy) {
+        return new GregorianCalendar().get(Calendar.YEAR);
+    }
+    public static int currentMonth(Principal dummy) {
+        return new GregorianCalendar().get(Calendar.MONTH) - Calendar.JANUARY + 1;
+    }
+    public static int currentDayOfMonth(Principal dummy) {
+        return new GregorianCalendar().get(Calendar.DAY_OF_MONTH);
+    }
     static {
         System.loadLibrary("jifrt");
     }

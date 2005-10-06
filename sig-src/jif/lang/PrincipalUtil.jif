@@ -106,4 +106,10 @@ public class PrincipalUtil {
      */
     public static native Capability[p, lb]{p; authPrf; c; lb} 
                 authorize(principal p, Object authPrf, Closure[p, lb] c, label lb);
+                
+    /**
+     * returns the null principal, the principal that every other principal can
+     * act for.
+     */                
+    public static native principal{} nullPrincipal();                
 }

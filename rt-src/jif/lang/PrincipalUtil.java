@@ -183,4 +183,13 @@ public class PrincipalUtil {
         }
         return null;
     }
+    
+    /**
+     * returns the null principal, the principal that every other principal can
+     * act for.
+     */                
+    public static Principal nullPrincipal() {
+        return null;
+    }
+    
 }
