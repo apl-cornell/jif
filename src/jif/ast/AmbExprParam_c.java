@@ -1,12 +1,14 @@
 package jif.ast;
 
 import jif.types.*;
+import polyglot.ast.*;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ext.jl.ast.Node_c;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
+import polyglot.types.ParsedClassType;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -61,6 +63,9 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
         return new AmbExprParam_c(this.position, expr, expectedPI); 
     }
     
+    private int expr_disamb_fail_count = 0;
+    private static final int EXPR_DISAMB_FAIL_LIMIT = 40;    
+    
     /** 
      * Always return a CanoncialLabelNode, and let the dynamic label be possibly 
      * changed to a dynamic principal later.
@@ -79,6 +84,18 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
         TypeChecker tc = new TypeChecker(sc.job(), ts, nf);
         tc = (TypeChecker) tc.context(sc.context());
 	expr = (Expr)expr.visit(tc);
+    
+        if (expr.type() == null || !expr.type().isCanonical()) {
+            if (++expr_disamb_fail_count < EXPR_DISAMB_FAIL_LIMIT) {
+                // keep trying until we exhaust our patience.
+                // needed for some cases where we can't distinguish if
+                // we need to push on regardless, or wait until the type
+                // really can be resolved.
+                Scheduler sched = sc.job().extensionInfo().scheduler();
+                Goal g = sched.Disambiguated(sc.job());
+                throw new MissingDependencyException(g);
+            }
+        }
 
 	if (expr instanceof PrincipalNode || 
             ts.isImplicitCastValid(expr.type(), ts.Principal()) ||
