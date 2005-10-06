@@ -28,4 +28,11 @@ public interface Collection[label L] extends JifObject[L] {
     boolean{L} removeAll{L}(Collection[L]{L} c);
     boolean{L} retainAll{L}(Collection[L]{L} c);
     void clear{L}();
+    
+    // all collections must provide a way of accessing elements by index.
+    // this allows clients to iterate over elements without the side-effects
+    // required by iterators.
+    JifObject[L]{L;index} get(int index):{L;index}
+       throws (IndexOutOfBoundsException{L;index});
+    
 }

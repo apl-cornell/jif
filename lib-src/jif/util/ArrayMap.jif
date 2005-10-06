@@ -391,6 +391,20 @@ class LocalKeySet[label K, label V] extends AbstractSet[K] {
 		catch (ArrayIndexOutOfBoundsException impossible) {return false;}
 		return true;
 	}
+
+    public JifObject[K]{K;index} get(int index):{K;index} 
+            throws (IndexOutOfBoundsException{K;index}) {
+        try
+        {
+            return parent.arrayOfKeys[index];
+        } 
+        catch (NullPointerException unlikely) {}
+        catch (ArrayIndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException();
+        }
+        // unreachable
+        return null;
+    }
 	
 	public String{K} toString()
 	{
