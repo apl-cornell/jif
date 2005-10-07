@@ -29,6 +29,24 @@ public class PrivacyPolicy extends AbstractLabel implements Policy, Label
         if (l instanceof Policy) {
             return relabelsTo((Policy)l);
         }
+        if (l instanceof ReadableByPrinLabel) {
+            ReadableByPrinLabel rbp = (ReadableByPrinLabel)l;
+            
+            // see if there is a reader (or the owner) that
+            // rbp.reader can act for
+            if (PrincipalUtil.actsFor(rbp.reader(), owner)) {
+                return true;
+            }
+
+            for (Iterator j = readers.iterator(); j.hasNext(); ) {
+                Principal rj = (Principal) j.next();
+                if (PrincipalUtil.actsFor(rbp.reader() , rj)) {
+                    return true;
+                }
+            }
+            return false;
+            
+        }
         if (l instanceof JoinLabel) {
             // see if there is a component that we relabel to
             JoinLabel jl = (JoinLabel)l;
