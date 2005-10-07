@@ -157,6 +157,7 @@ public abstract class AbstractList[label L] extends AbstractCollection[L]
                     s = s + ", ";
             }
             catch (IndexOutOfBoundsException e) {}
+            i++;
         }
         s = s + "]";
         return s;
