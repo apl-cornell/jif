@@ -1,5 +1,6 @@
 package jif.ast;
 
+import jif.extension.JifFormalDel;
 import jif.types.JifTypeSystem;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl.ast.Formal_c;
@@ -23,8 +24,9 @@ public class JifFormal_c extends Formal_c {
         boolean typeNotNull = type() != null && type().type() != null;
         JifTypeSystem jts = (JifTypeSystem)(typeNotNull ? type().type().typeSystem() : null);
         return super.isDisambiguated() && 
-                type() != null && 
+                (((JifFormalDel)del()).isCatchFormal() ||
+                (type() != null && 
                 type().type() != null &&
-                jts.isLabeled(type().type());
+                jts.isLabeled(type().type())));
     }
 }
