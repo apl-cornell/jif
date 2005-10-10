@@ -3,6 +3,8 @@ package jif.translate;
 import java.util.*;
 
 import jif.ast.JifConstructorDecl;
+import jif.types.JifPolyType;
+import jif.types.JifSubstType;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
@@ -24,17 +26,40 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
 
         ConstructorInstance ci = n.constructorInstance();
         ClassType ct = ci.container().toClass();
-
+        
         Node retVal;
         // only translate jif constructors
-        if (! rw.jif_ts().isParamsRuntimeRep(ct)) {
-            NodeFactory nf = rw.java_nf();
-            retVal = nf.ConstructorDecl(n.position(),
-                                      n.flags(),
-                                      n.name(),
-                                      n.formals(),
-                                      n.throwTypes(),
-                                      n.body());
+        if (! rw.jif_ts().isJifClass(ct)) {
+            if (rw.jif_ts().isParamsRuntimeRep(ct)) {
+                // It's a java class that represents parameters at runtime.
+                // Produce the correct signature for constructors in the
+                // Java class.
+                List formals = new ArrayList(n.formals().size() + 2);
+                if (ci.container() instanceof JifPolyType) {
+                    JifPolyType jpt = (JifPolyType)ci.container();
+                    formals.addAll(ClassDeclToJavaExt_c.produceParamFormals(jpt, rw, false));
+                }
+                formals.addAll(n.formals());
+                n = rw.java_nf().ConstructorDecl(n.position(), 
+                                                n.flags(), 
+                                                n.name(), 
+                                                formals, 
+                                                n.throwTypes(),
+                                                n.body());
+                n = n.constructorInstance(null);
+                retVal = n;
+            }
+            else {
+                // it's a non-Jif class that doesn't represent parameters
+                // at runtime.
+                NodeFactory nf = rw.java_nf();
+                retVal = nf.ConstructorDecl(n.position(),
+                                          n.flags(),
+                                          n.name(),
+                                          n.formals(),
+                                          n.throwTypes(),
+                                          n.body());
+            }
         }
         else {
             retVal = jifClassConstructorDecl(rw, n);
@@ -48,7 +73,8 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
         NodeFactory nf = rw.java_nf();
         ConstructorInstance ci = n.constructorInstance();
         ClassType ct = ci.container().toClass();
-
+        
+        
         Block body = n.body();
         List inits = new ArrayList(3);
 
@@ -64,11 +90,22 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
         else {
 
           // If this is a Jif class but the superclass is not a Jif class, then
-          // we need to remove any calls to super constructors from body.
+          // we need to remove any calls to super constructors from the body.
           // Previous checks should have ensured that the first statement
           // is either a this(...) call (permitted if the java superclass is
           // trusted) or the default super call, super().
           if (rw.jif_ts().isJifClass(ct) && !rw.jif_ts().isJifClass(ct.superType())) {
+              // first calculate the number of parameters that are being
+              // passed to super.
+              int numSuperParams = 0;
+              if (rw.jif_ts().isParamsRuntimeRep(ct.superType())) {
+                  // super class is representing runtime params
+                  Type superType = ct.superType();
+                  if (superType instanceof JifSubstType) {
+                      numSuperParams = ((JifPolyType)((JifSubstType)superType).base()).params().size();
+                  }
+              }
+
               // check that the first statement of the body is a constructor call
               Stmt s = (Stmt)body.statements().get(0);
               if (s instanceof ConstructorCall) {
@@ -76,10 +113,10 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
                   if (cc.kind() == ConstructorCall.SUPER) {
                       // it's a super call.
                       // check that it's the default constructor
-                      if (cc.arguments().size() > 0) {
+                      if (cc.arguments().size() != numSuperParams) {
                           throw new InternalCompilerError(body.position(),
-                                       "Expected super constructor call to be the" +                                       "default constructor as we have a " +
-                                       "Jif class with a non-Jif superclass.");
+                                       "Expected super constructor call to be the " +                                       "default constructor as we have a " +
+                                       "Jif class with a non-Jif superclass: " + cc);
                       }
     
                       // remove the default constructor.
@@ -98,7 +135,7 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
 
         body = nf.Block(n.position(), inits);
 
-        String name = (ct.fullName() + ".").replace('.', '$');
+        String name = ClassDeclToJavaExt_c.constructorTranslatedName(ct);
 
         TypeNode tn = rw.jif_nf().CanonicalTypeNode(n.position(), ct);
         tn = (TypeNode) tn.visit(rw);

@@ -12,6 +12,10 @@ import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
 
 public class ClassDeclToJavaExt_c extends ToJavaExt_c {
+    /*
+     * Some static final constants and methods for producing names of
+     * generated methods and fields.
+     */
     static final String INSTANCEOF_METHOD_NAME = "jif$Instanceof";
     static final String INITIALIZATIONS_METHOD_NAME = "jif$init";
     static final String castMethodName(ClassType ct) {
@@ -20,11 +24,33 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
     static final String interfaceClassImplName(String jifInterfaceName) {
         return jifInterfaceName + "_JIF_IMPL";
     }
+    static final String constructorTranslatedName(ClassType ct) {
+        return (ct.fullName() + ".").replace('.', '$');
+    }
+    
+    static final String DEFAULT_CONSTRUCTOR_INVOKER_METHOD_NAME = "jif$invokeDefConstructor";
+    
+    /*
+     * Code for translating ClassDecls 
+     */
+    private boolean hasDefaultConstructor = false;
+    private List defaultConstructorExceptions = null;
+    
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
         // Bypass params and authority.
         JifClassDecl n = (JifClassDecl) node();
 
         rw.enteringClass(n.type());
+        
+        ClassType ct = n.type();
+        for (Iterator iter = ct.constructors().iterator(); iter.hasNext(); ) {
+            ConstructorInstance ci = (ConstructorInstance)iter.next();
+            if (ci.formalTypes().isEmpty()) {
+                hasDefaultConstructor = true;
+                defaultConstructorExceptions = ci.throwTypes();
+                break;
+            }
+        }
 
         return rw.bypass(n.params()).bypass(n.authority());
     }
@@ -34,11 +60,13 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         JifPolyType jpt = (JifPolyType)n.type();
 
         ClassBody cb = n.body();
-        if (rw.jif_ts().isParamsRuntimeRep(jpt)) {
+        if (rw.jif_ts().isJifClass(jpt)) {
             if (!jpt.flags().isInterface()) {
                 // add constructor
                 cb = cb.addMember(produceConstructor(jpt, rw));
-
+                if (hasDefaultConstructor) {
+                    cb = cb.addMember(produceDefaultConstructorInvoker(jpt, rw, defaultConstructorExceptions));
+                }
                 if (!jpt.params().isEmpty()) {
                     // add instanceof and cast static methods to the class
                     cb = cb.addMember(produceInstanceOfMethod(jpt, rw, false));
@@ -113,6 +141,10 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
      */
     private static ClassBody addInterfaceParamGetters(ClassBody cb, JifPolyType baseClass, JifPolyType jpt, JifToJavaRewriter rw) throws SemanticException {
         // go through the interfaces of cb
+        if (!rw.jif_ts().isJifClass(jpt)) {
+            // don't bother adding interface methods for non-jif classes
+            return cb;
+        }
         for (Iterator iter = jpt.interfaces().iterator(); iter.hasNext(); ) {
             Type interf = (Type)iter.next();
             if (rw.jif_ts().isParamsRuntimeRep(interf) &&
@@ -292,4 +324,32 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                                             rw.java_nf().Block(Position.COMPILER_GENERATED,
                                                                inits));
     }
+
+    /**
+     * Produce a method (with a standard name) that will invoke the default
+     * constructor of the class. This method assumes that such a default 
+     * constructor exists.
+     */
+    private static ClassMember produceDefaultConstructorInvoker(ClassType ct, 
+                    JifToJavaRewriter rw, List throwTypes) throws SemanticException {
+        // add arguments for params.
+        if (throwTypes == null || throwTypes.isEmpty()) {
+            return rw.qq().parseMember("public void " + 
+                                       DEFAULT_CONSTRUCTOR_INVOKER_METHOD_NAME + "() {" +
+                                       "this." + constructorTranslatedName(ct)+ "();" + 
+                                            "}");
+        }
+        List typeNodes = new ArrayList(throwTypes.size());
+        for (Iterator iter = throwTypes.iterator(); iter.hasNext(); ) {
+            Type t = (Type)iter.next();
+            TypeNode tn = rw.java_nf().AmbTypeNode(Position.COMPILER_GENERATED, t.toClass().name());
+            typeNodes.add(tn);
+        }
+        return rw.qq().parseMember("public void " + 
+                                   DEFAULT_CONSTRUCTOR_INVOKER_METHOD_NAME + 
+                                   "() throws %LT {" +
+                                   "this." + constructorTranslatedName(ct)+ "();" + 
+                                        "}", (Object)typeNodes);
+        
+    }    
 }

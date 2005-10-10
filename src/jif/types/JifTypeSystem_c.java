@@ -825,7 +825,22 @@ public class JifTypeSystem_c
     }
     
     public boolean isParamsRuntimeRep(Type t) {
-        return isJifClass(t);
+        if (isJifClass(t)) {
+            return true;
+        }
+
+        ClassType ct = t.toClass();
+        if (ct != null) {
+            FieldInstance fi =
+                ct.fieldNamed("__JIF_PARAMS_RUNTIME_REPRESENTED$20051007");
+            if (fi != null
+                && fi.flags().isPrivate()
+                && fi.flags().isStatic()) {
+                return true;
+            }
+        }
+
+        return false;        
     }
 
     /**

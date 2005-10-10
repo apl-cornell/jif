@@ -77,6 +77,17 @@
 		<delete dir="${rt-classes}" />
 		<delete dir="${lib-classes}" />
 		<delete dir="${dist}" />
+        <fileset dir="${basedir}/tests">
+            <include name="**/*.class" />
+            <include name="**/*.java" />
+            <include name="**/*~" />
+            <include name="pthOutput*/**/*" />
+            <include name="pthOutput*" />
+        </fileset>
+        <fileset dir="${basedir}/examples">
+            <include name="**/*.class" />
+            <include name="battleship/**/*.java" />
+        </fileset>
 	</target>
 
 	<target name="dust" description="clean up the generated runtime, sig, and lib">
@@ -105,17 +116,6 @@
 				<include name="jifrt.jar" />
 				<include name="jifsig.jar" />
 				<include name="jiflib.jar" />
-			</fileset>
-			<fileset dir="${basedir}/tests">
-				<include name="**/*.class" />
-				<include name="**/*.java" />
-				<include name="**/*~" />
-				<include name="pthOutput*/**/*" />
-				<include name="pthOutput*" />
-			</fileset>
-			<fileset dir="${basedir}/examples">
-				<include name="**/*.class" />
-				<include name="battleship/**/*.java" />
 			</fileset>
 		</delete>
 		<delete file="${bin}/jif" />

@@ -24,6 +24,15 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
     }
 
     public Expr toJava(ParamInstance pi, JifToJavaRewriter rw) throws SemanticException {
+        if (!rw.jif_ts().isJifClass(pi.container())) {
+            // the parameter to be translated is in the code
+            // of a non-Jif class (which does have runtime representation
+            // of params).
+            // This code is not used at runtime, and we do not
+            // require the Java code with Jif signatures to have
+            // a standard name for parameters, so just return a placeholder.
+            return rw.qq().parseExpr("null");
+        }
         JifContext A = (JifContext)rw.context();
         if (A.inStaticContext()) {
             return rw.qq().parseExpr(paramArgName(pi));            

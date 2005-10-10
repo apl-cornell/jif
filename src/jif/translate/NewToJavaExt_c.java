@@ -19,7 +19,6 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
 
     public Expr exprToJava(JifToJavaRewriter rw) throws SemanticException {
         New n = (New) node();
-        ConstructorInstance ci = n.constructorInstance();
         ClassType ct = objectType.toClass();
 
         if (! rw.jif_ts().isParamsRuntimeRep(ct) || (ct instanceof JifSubstType && !rw.jif_ts().isParamsRuntimeRep(((JifSubstType)ct).base()))) {
@@ -28,8 +27,6 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
                                 n.arguments(), n.body());
             return n;
         }
-
-        String name = (ct.fullName() + ".").replace('.', '$');
 
         List paramargs = new ArrayList();
         
@@ -44,7 +41,20 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
             }
         }
 
-        return rw.qq().parseExpr("new %T(%LE).%s(%LE)",
-                                 n.objectType(), paramargs, name, n.arguments());
+        // use the appropriate string for the constructor invocation.
+        if (rw.jif_ts().isJifClass(ct)) {            
+            String name = ClassDeclToJavaExt_c.constructorTranslatedName(ct);
+            return rw.qq().parseExpr("new %T(%LE).%s(%LE)",
+                                     n.objectType(), paramargs, name, n.arguments());
+        }
+        else {
+            // ct represents params at runtime, but is a Java class with a
+            // Jif signature.
+            List allArgs = new ArrayList(paramargs.size() + n.arguments().size());
+            allArgs.addAll(paramargs);
+            allArgs.addAll(n.arguments());
+            return rw.qq().parseExpr("new %T(%LE)",
+                                     n.objectType(), allArgs);
+        }
     }
 }
