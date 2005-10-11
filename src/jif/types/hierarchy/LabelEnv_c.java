@@ -23,19 +23,17 @@ public class LabelEnv_c implements LabelEnv
      */
     private boolean hasVariables;
     
-    public LabelEnv_c(JifTypeSystem ts) {
-        this(ts, new PrincipalHierarchy(), new LinkedList(), false);
+    public LabelEnv_c(JifTypeSystem ts, boolean useCache) {
+        this(ts, new PrincipalHierarchy(), new LinkedList(), false, useCache);
     }
-    private LabelEnv_c() {
-        this(null);
-    }
-    private LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph, List assertions, boolean hasVariables) {
+    private LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph, List assertions, boolean hasVariables, boolean useCache) {
         this.ph = ph;
         this.assertions = assertions;
         this.hasVariables = false;
         this.solver = null;        
         this.hasVariables = hasVariables;
         this.ts = ts;
+        this.useCache = useCache;
     }
     
     public void setSolver(Solver s) {
@@ -90,7 +88,7 @@ public class LabelEnv_c implements LabelEnv
     }
     
     public LabelEnv copy() {
-        return new LabelEnv_c(ts, ph.copy(), new LinkedList(assertions), hasVariables);
+        return new LabelEnv_c(ts, ph.copy(), new LinkedList(assertions), hasVariables, useCache);
     }
     
     public boolean leq(Label L1, Label L2) { 
@@ -98,7 +96,7 @@ public class LabelEnv_c implements LabelEnv
                    new SearchState_c(new AssertionUseCount(), new HashSet()));
     }
 
-    /**
+    /*
      * Cache the results of leq(Label, Label, SearchState), when we are
      * using assertions only. Note that the rest of the
      * search state contains only information for pruning the search,
@@ -106,6 +104,8 @@ public class LabelEnv_c implements LabelEnv
      * the results. 
      */
     private final Map cache = new HashMap();
+    
+    private final boolean useCache;
     
     private static class LeqGoal {
         final Label lhs;
@@ -134,11 +134,14 @@ public class LabelEnv_c implements LabelEnv
      * Recursive implementation of L1 <= L2.
      */
     public boolean leq(Label L1, Label L2, SearchState state) {  
-        if (!((SearchState_c)state).useAssertions) {
+        if (!useCache || 
+                !((SearchState_c)state).useAssertions || 
+                this.hasVariables()) {
             return leqImpl(L1.simplify(), L2.simplify(), state);
         }
 
-        // only use the cache if we are using assertions.
+        // only use the cache if we are using assertions, and there are no
+        // variables
         LeqGoal g = new LeqGoal(L1, L2);
     
         Boolean b = (Boolean)cache.get(g);

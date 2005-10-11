@@ -21,7 +21,7 @@ public class JifTypeSystem_c
     implements JifTypeSystem {
     private final TypeSystem jlts;
 
-    private final LabelEnv emptyLabelEnv = new LabelEnv_c(this);
+    private final LabelEnv emptyLabelEnv = new LabelEnv_c(this, false);
 
     private final DefaultSignature ds;
 
@@ -696,6 +696,12 @@ public class JifTypeSystem_c
     }
 
     public Label joinLabel(Position pos, Collection components) {
+        if (components == null || components.isEmpty()) {
+            return bottomLabel(pos);
+        }
+        if (components.size() == 1) {
+            return (Label)components.iterator().next();
+        }
         Label t = new JoinLabel_c(components, this, pos);
         return t;
     }

@@ -192,7 +192,8 @@ public class SolverGLB extends Solver {
         Label rhsBound = bounds().applyTo(eqn.rhs());
 
         if (shouldReport(5)) report(5, "BOUND of " + v + " = " + vBound);
-        if (shouldReport(5)) report(5, "APP = " + lhsBound);
+        if (shouldReport(5)) report(5, "RHSBOUND = " + rhsBound);
+        if (shouldReport(5)) report(5, "LHSBOUND = " + lhsBound);
 
         // Try and raise v's bound just enough to satisfy the equation
         Collection needed = new ArrayList(lhsBound.components().size());

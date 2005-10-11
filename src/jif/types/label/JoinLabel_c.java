@@ -143,7 +143,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
      * less restrictive policies.
      */
     public Label simplify() {
-        if (!this.isDisambiguated()) {
+        if (!this.isDisambiguated() || components.isEmpty()) {
             return this;
         }
 
@@ -172,8 +172,9 @@ public class JoinLabel_c extends Label_c implements JoinLabel
                         break;
                     }
                     
-                    if (jts.leq(cj, ci)) 
+                    if (jts.leq(cj, ci)) { 
                         j.remove();
+                    }
                 }
                 
                 if (! subsumed)
