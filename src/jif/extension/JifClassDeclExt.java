@@ -116,7 +116,7 @@ public class JifClassDeclExt extends Jif_c {
                         // includes access protection checks.
                         if (mj.canOverrideImpl(mi, true)) {
                             // passes the java checks, now perform the label checks                                        
-                            CallHelper.OverrideHelper(mj, mi, lc).checkOverride(lc);
+                            CallHelper.OverrideHelper(mi, mj, lc).checkOverride(lc);
                         }
                     }
                     catch (SemanticException e) {

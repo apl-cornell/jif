@@ -249,6 +249,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Override07.jif (Semantic, "Cannot override .* return label") ;
 	Override08.jif (Semantic, "Cannot override .* return value label") ;
 	Override09.jif (Semantic, "Cannot override .* label of .* exception") ;
+	Override10.jif  ;
 	PairList2.jif ;
 	Params1.jif ;
 	Params1Test.jif ;
