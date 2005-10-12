@@ -52,6 +52,10 @@ public class LabelUtil
         return l1 != null && l2 != null && l1.relabelsTo(l2) && l2.relabelsTo(l1);
     }
 
+    public static boolean isReadableBy(Label lbl, Principal p) {
+        return relabelsTo(lbl, new ReadableByPrinLabel(p));
+    }
+
     public static boolean relabelsTo(Label from, Label to) {
         from = intern(from);
         to = intern(to);
