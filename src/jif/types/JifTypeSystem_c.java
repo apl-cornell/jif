@@ -317,6 +317,9 @@ public class JifTypeSystem_c
 
         return super.equals(t1, t2);
     }
+    public boolean typeEquals(Type t1, Type t2) {
+        return super.typeEquals(strip(t1), strip(t2));
+    }
 
     /**
      * Find out if the least common ancestor of subtype and supertype is
