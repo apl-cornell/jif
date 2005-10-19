@@ -48,7 +48,7 @@ public class JoinLabel extends AbstractLabel implements Label
     public String componentString() {
 	String str = "";
 	for (Iterator iter = components.iterator(); iter.hasNext(); ) {
-	    str += iter.next();
+	    str += ((Label)iter.next()).componentString();
 	    if (iter.hasNext()) str += "; ";
 	}
 	return str;
