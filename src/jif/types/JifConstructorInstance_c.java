@@ -5,6 +5,7 @@ import java.util.*;
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import polyglot.ext.jl.types.ConstructorInstance_c;
+import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.Position;
 import polyglot.util.TypedList;
@@ -124,7 +125,14 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
     }    
  
     public String debugString() {
-	String s = "constructor " + flags.translate() + container + "(";
+        return debugString(true);
+    }
+    private String debugString(boolean showInstanceKind) {
+        String s = "";
+        if (showInstanceKind) {
+            s = "constructor ";
+        }
+	s += flags.translate() + container + "(";
 
 	for (Iterator i = formalTypes.iterator(); i.hasNext(); ) {
 	    Type t = (Type) i.next();
@@ -141,7 +149,17 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
     }
     
     public String signature() {
-	String s = container + " " + startLabel +" (";
+        if (Report.should_report(Report.debug, 1)) { 
+            return fullSignature();
+        }
+        return debugString(false);
+    }
+    public String fullSignature() {
+	String s = container.toString();
+        if (!isDefaultStartLabel() || Report.should_report(Report.debug, 1)) {
+            s += startLabel;
+        }
+        s += "(";
 
         for (Iterator i = formalTypes.iterator(); i.hasNext(); ) {
             Type t = (Type) i.next();
@@ -151,8 +169,10 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
                 s += ",";
             }
         }
-
-        s += ") : " + returnLabel;
+        s += ")";
+        if (!isDefaultReturnLabel() || Report.should_report(Report.debug, 1)) {
+            s += ":" + returnLabel;
+        }
 
         return s;
     }

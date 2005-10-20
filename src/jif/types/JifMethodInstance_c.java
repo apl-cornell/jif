@@ -185,8 +185,15 @@ public class JifMethodInstance_c extends MethodInstance_c
 
 
     public String debugString() {
-	JifTypeSystem jts = (JifTypeSystem) ts;
-	String s = "method " + flags.translate() + jts.unlabel(returnType) +
+        return debugString(true);
+    }
+    private String debugString(boolean showInstanceKind) {
+        JifTypeSystem jts = (JifTypeSystem) ts;
+        String s = "";
+        if (showInstanceKind) {
+            s = "method ";
+        }
+	s += flags.translate() + jts.unlabel(returnType) +
 	    " " + name + "(";
 
 	for (Iterator i = formalTypes.iterator(); i.hasNext(); ) {
@@ -204,6 +211,12 @@ public class JifMethodInstance_c extends MethodInstance_c
     }
 
     public String signature() {
+        if (Report.should_report(Report.debug, 1)) { 
+            return fullSignature();
+        }
+        return debugString();
+    }
+    public String fullSignature() { 
 	StringBuffer sb = new StringBuffer();
         sb.append(name);
         if (!isDefaultStartLabel() || Report.should_report(Report.debug, 1)) {
@@ -232,9 +245,9 @@ public class JifMethodInstance_c extends MethodInstance_c
 
         sb.append(")");
         if (!isDefaultReturnLabel() || Report.should_report(Report.debug, 1)) {
-            sb.append(" : ");
+            sb.append(":");
             sb.append(returnLabel);
-       }
+        }
        return sb.toString();
 
     }
