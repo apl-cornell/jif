@@ -184,7 +184,7 @@
 		<delete file="${bin}/defs" />
 	</target>
 
-	<target name="executable-defs" description="creates a file containing common environment variable definitions">
+	<target name="executable-defs">
 		<condition property="defs.load_library_path" value="PATH">
 			<os family="windows" />
 		</condition>
@@ -203,8 +203,8 @@ RT_LIB_PATH='${lib}${path.separator}'$$${defs.load_library_path}
     </echo>
 	</target>
 
+    <!-- creates the executable scripts jifc and jif -->   
 	<target name="jif-executable"
-		description="creates the executable scripts jifc and jif"
 		unless="executables.up-to-date">
 
 		<!-- make sure the definitions file is around -->
@@ -238,8 +238,7 @@ ext="-extclass jif.ExtensionInfo"
 
 	<!-- Create jif.bat if needed -->
 	<target name="jif-executable-bat" 
-            if="os.isWindows" 
-	        description="Create jif.bat if needed. Should only be called from jif-executable">
+            if="os.isWindows">
 		<concat destfile="${jifc}.bat" append="no">
 @echo off
 rem DO NOT EDIT - This file was automatically generated.
@@ -257,7 +256,7 @@ sh ${jifc} %CMD_LINE_ARGS%
     </concat>
 	</target>
 
-	<target name="split-executable" description="creates the executable script splitc" unless="executables.up-to-date">
+	<target name="split-executable" unless="executables.up-to-date">
 		<!-- make sure the definitions file is around -->
 		<antcall target="executable-defs" />
 
@@ -447,7 +446,8 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
 		<antcall target="jif-runtime-native-windows" />
 	</target>
 
-	<target name="jif-runtime-native-unix" if="os.isUnix" description="compile the jif runtime native code for unix">
+    <!-- compile the jif runtime native code for unix -->   
+	<target name="jif-runtime-native-unix" if="os.isUnix">
 
 		<condition property="jif-native-unix.sharedflag" value="-shared">
 			<os name="linux" />
@@ -492,7 +492,8 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
 		</apply>
 	</target>
 
-	<target name="jif-runtime-native-windows" if="os.isWindows" description="compile the jif runtime native code for windows">
+    <!-- compile the jif runtime native code for windows -->   
+	<target name="jif-runtime-native-windows" if="os.isWindows">
 
 		<apply executable="g++" 
 		       failonerror="true"
@@ -540,38 +541,38 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
 		</apply>
 	</target>
 
-	<!-- Build the lexer for an extension, assuming that
-       they it is located in the standard place and named
-       the standard name that we usually use.
-       @param ext    The extension name.
-   -->
-	<target name="split-config-lexer">
-		<antcall target="jflex-lexer">
-			<param name="lexer.dir" value="${basedir}/split/src/split/config" />
-			<param name="lexer.class" value="Lexer_c" />
-			<param name="jflex.file" value="config.flex" />
-		</antcall>
-	</target>
-
-
-	<!-- Build the CUP parser for split-config files
-   -->
-	<target name="split-config-parser" depends="split-config-lexer">
-		<antcall target="cup-parser">
-			<param name="parser.dir" value="${basedir}/split/src/split/config" />
-			<param name="cup.file" value="config.cup" />
-			<param name="parser.class" value="Grm" />
-			<param name="symbol.class" value="sym" />
-		</antcall>
-	</target>
-
-
 
 	<!-- ****************************************
        Split targets
        ****************************************  -->
 
-	<!-- <target name="split" depends="split-config-parser,split-base,split-sig,split-lib,split-runtime"/> -->
+    <!-- Build the lexer for an extension, assuming that
+       they it is located in the standard place and named
+       the standard name that we usually use.
+       @param ext    The extension name.
+   -->
+    <target name="split-config-lexer">
+        <antcall target="jflex-lexer">
+            <param name="lexer.dir" value="${basedir}/split/src/split/config" />
+            <param name="lexer.class" value="Lexer_c" />
+            <param name="jflex.file" value="config.flex" />
+        </antcall>
+    </target>
+
+
+    <!-- Build the CUP parser for split-config files
+   -->
+    <target name="split-config-parser" depends="split-config-lexer">
+        <antcall target="cup-parser">
+            <param name="parser.dir" value="${basedir}/split/src/split/config" />
+            <param name="cup.file" value="config.cup" />
+            <param name="parser.class" value="Grm" />
+            <param name="symbol.class" value="sym" />
+        </antcall>
+    </target>
+
+
+                <!-- <target name="split" depends="split-config-parser,split-base,split-sig,split-lib,split-runtime"/> -->
 	<target name="split" depends="split-config-parser,split-base" />
 	<target name="split-base" depends="jif-base">
 		<antcall target="standard-ext">
@@ -686,7 +687,7 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
        @param ${ext}         the name of the extension
        @param ${ext.basedir} the base directory of the extension
     -->
-	<target name="compile-ext" description="compile an extension">
+	<target name="compile-ext">
 		<javac srcdir="${ext.basedir}/src" destdir="${classes}" debug="on" includes="${ext}/**">
 			<classpath refid="standard.classpath" />
 		</javac>
