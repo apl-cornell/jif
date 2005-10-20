@@ -239,45 +239,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         // Remove the field from the set of final vars, since it is
         // initialized here.
         uninitFinalVars.remove(assFi);
-
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
-        // deal with label and principal fields being initialzed 
-        if (assFi.flags().isFinal() && 
-                (ts.isLabel(assFi.type()) || ts.isImplicitCastValid(assFi.type(), ts.Principal())) && 
-                JifUtil.isFinalAccessExprOrConst(ts, ass.right())) {
-            
-            if (ts.isLabel(assFi.type())) {
-                DynamicLabel dl = ts.dynamicLabel(assFi.position(), JifUtil.varInstanceToAccessPath(assFi, assFi.position()));                
-                Label rhs_label = JifUtil.exprToLabel(ts, ass.right(), A);
-                A.addDefinitionalAssertionEquiv(dl, rhs_label);
-            }
-            if (ts.isImplicitCastValid(assFi.type(), ts.Principal())) {
-                DynamicPrincipal dp = ts.dynamicPrincipal(assFi.position(), JifUtil.varInstanceToAccessPath(assFi, assFi.position()));                
-                Principal rhs_principal = JifUtil.exprToPrincipal(ts, ass.right(), A);
-                A.addDefinitionalEquiv(dp, rhs_principal);                    
-            }
-        }                            
-
         
-        if (ts.isLabel(assFi.type())) {
-            // the field is a label. If it is being initialized from a
-            // final label, we want to equate the UIDs (Figure 4.45).      
-            Expr rhs = ass.right();            
-            JifVarInstance rhsVi = null;      
-            if (rhs instanceof Field) {
-                rhsVi = (JifVarInstance)((Field)rhs).fieldInstance();
-            }
-            else if (rhs instanceof Local) {
-                rhsVi = (JifVarInstance)((Local)rhs).localInstance();
-            }
-            
-            if (rhsVi != null && ts.isLabel(rhsVi.type()) && rhsVi.flags().isFinal()) {
-                // the RHS of the assignment is a final label.
-                //@@@@@ Here, I think we need to add an assertion to the appropriate hierarchy
-                // This probably needs to be done a whole bunch earlier...
-            }
-        }                    
-
         // Note that the constraints specified in check-inits for the "v = E"
         // case (Figure 4.44) are added when we visit the statement "s"
         // normally, so we don't need to handle them specially here.

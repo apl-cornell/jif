@@ -165,6 +165,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
                            (Semantic, "NullPointerException.*must .* be caught"),
                            (Semantic, "NullPointerException.*must .* be caught"),
                            (Semantic, "NullPointerException.*must .* be caught");
+	FieldAssign04.jif  ;
 	FieldLeak.jif (Semantic) ;
 	FieldParam1.jif  ;
 	FieldParam2.jif  ;
