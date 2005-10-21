@@ -40,8 +40,16 @@ public class LabelUtil
     }
 
     public static Label join(Label l1, Label l2) {
+        if (l1 == null) return l2;
+        if (l2 == null) return l1;
+        
         Set comps = new HashSet(flattenJoin(l1));
         comps.addAll(flattenJoin(l2));
+        comps = simplifyJoin(comps);
+        if (comps.size() == 1) {
+            return (Label)comps.iterator().next();
+        }
+
         return intern(new JoinLabel(comps));
     }
 
@@ -95,6 +103,31 @@ public class LabelUtil
             comps.addAll(flattenJoin(l));
         }
         return comps;
+    }
+    
+    private static Set simplifyJoin(Set labels) {
+        Set needed = new LinkedHashSet();
+        for (Iterator i = labels.iterator(); i.hasNext(); ) {
+            Label ci = (Label)i.next();
+            
+            boolean subsumed = false;
+            
+            for (Iterator j = needed.iterator(); j.hasNext(); ) {
+                Label cj = (Label) j.next();
+                if (relabelsTo(ci, cj)) {
+                    subsumed = true;
+                    break;
+                }
+                
+                if (relabelsTo(cj, ci)) { 
+                    j.remove();
+                }
+            }
+            
+            if (!subsumed) needed.add(ci);
+        }
+        
+        return needed;        
     }
     
 }
