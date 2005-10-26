@@ -264,7 +264,7 @@ public final class Date[covariant label L] implements JifObject[L] {
      * Return number of days that this is before when. Will return a negative
      * number if this is after when.
      */
-    public int{L} daysBefore{L}(Date[L]{L} when) {
+    public int{L} daysBefore(Date[L]{L} when) {
         if (when == null) return 0;
         int whenD = Date[L].daysAfterJan_1_1900(when.year, when.month, when.day);
         int thisD = Date[L].daysAfterJan_1_1900(this.year, this.month, this.day);
@@ -354,15 +354,15 @@ public final class Date[covariant label L] implements JifObject[L] {
     public Date[L]{L} day(int{L} day):{L; this} throws IllegalArgumentException {
         return new Date[L](this.year, this.month, day);
     }
-    public Date[L]{L} addYear{L}(int{L} yearDelta):{L; this} {
-        return lenientDate(L, this.year + yearDelta, this.month, this.day);
-    }
-    public Date[L]{L} addMonth{L}(int{L} monthDelta):{L; this} {
-        return lenientDate(L, this.year, this.month + monthDelta, this.day);
-    }
-    public Date[L]{L} addDay{L}(int{L} dayDelta):{L; this} {
-        return lenientDate(L, this.year, this.month, this.day + dayDelta);
-    }
+//    public Date[L]{L} addYear(int{L} yearDelta):{L; this} {
+//        return lenientDate(L, this.year + yearDelta, this.month, this.day);
+//    }
+//    public Date[L]{L} addMonth(int{L} monthDelta):{L; this} {
+//        return lenientDate(L, this.year, this.month + monthDelta, this.day);
+//    }
+//    public Date[L]{L} addDay(int{L} dayDelta):{L; this} {
+//        return lenientDate(L, this.year, this.month, this.day + dayDelta);
+//    }
     public static Date[lb]{*lb; lb; date; delta} addYear(label lb, Date[lb]{*lb} date, int{*lb} delta) {
         if (date == null) return null;
         return Date[lb].lenientDate(lb, date.getYear() + delta, date.getMonth(), date.getDay());

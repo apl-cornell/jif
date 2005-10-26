@@ -22,7 +22,13 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
     
 
     public boolean isRuntimeRepresentable() { return false; }
-    public boolean isCovariant() { return true; }
+    public boolean isCovariant() {
+        // the this label is not actually covariant, it's really an arg-label
+        // in disguise (think about the receiver of the method or field-access
+        // being passed in as an additional argument.
+        return false; 
+    }
+    
     public boolean isComparable() { return true; }
     public boolean isCanonical() { return true; }
     public boolean isDisambiguatedImpl() { return true; }

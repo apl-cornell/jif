@@ -14,6 +14,7 @@ import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** The Jif extension of the <code>ProcedureDecl</code> node. 
  * 
@@ -48,7 +49,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         JifClassType ct = (JifClassType) A.currentClass();
 	
 	// We begin by getting the start label.
-        Label Li = mi.externalPC();
+        Label Li = mi.startLabel();
 
 	if (!mi.flags().isStatic())  {
 	    // for non-static methods, we know the this label
@@ -59,63 +60,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         // let internal_pc = bottom, external_pc = Li
 	A.setPc(ts.bottomLabel(mi.position()));
 	A.setEntryPC(Li);
-
-	// Add constraints for the formal parameters.  Equate the declared
-	// label of each formal with the corresponding label variable in
-	// the method instance.
-	// @@@@@Check that this is correct!!! I think it is not needed, it is just insisting that <arg _ ub> <= ub
-	List formalNames = new LinkedList();
-	for (Iterator iter = mn.formals().iterator(); iter.hasNext(); ) 
-	    formalNames.add(((Formal)iter.next()).name());
-	
-        Iterator types = mi.formalTypes().iterator();
-	Iterator formals = mn.formals().iterator();
-
-	int index = 0;
-        while (types.hasNext() && formals.hasNext()) {
-            Type tj = (Type) types.next();
-	    Formal fj = (Formal) formals.next();
-
-	    JifLocalInstance lij = (JifLocalInstance) fj.localInstance();
-            Label Lj = lij.label();        
-        
-	    // instantiate argument types
-	    // lij.setType(A.instantiate(lij.type()));
-	    
-	    // This is the declared label of the parameter.
-	    Label argBj = ts.labelOfType(tj);
-	    // argBj = A.instantiate(argBj);
-
-	    A.addAssertionLE(Lj, argBj);
-
-	    /*if (ts.isLabeled(tj)) {
-		depGraph.addNode((VarLabel) Lj);
-
-		for (Iterator iter = argLj.components().iterator(); iter.hasNext(); ) {
-		    Label comp = (Label) iter.next();
-		    if (comp instanceof VarLabel) {
-			VarLabel vl = (VarLabel) comp;
-			if (formalNames.contains(vl.uid().name()))
-			    depGraph.addEdge((VarLabel) Lj, vl);
-		    }
-		}
-	    }*/
-	    
-            //lc.constrainEqual(Lj, argLj, fj.position(), 
-	    //	    "Lj == argLj (argument check)");
-
-	    index++;
-        }
-
-        if (types.hasNext() || formals.hasNext()) {
-	    throw new InternalCompilerError("Argument list mismatch.");
-	}
-	
-	// commented out by zlt: there is no need to check for circularity. 
-	/*if (depGraph.hasCycle())
-	    throw new InternalCompilerError(
-		    "Declared labels of formals contains circular
-		    references.");*/
 
         // Set the "auth" variable.
 	Set newAuth = constraintAuth(mi, A);
@@ -128,11 +72,8 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	}
 
 	addCallers(mi, A, newAuth);
-
-	A.setAuthority(newAuth);
-       
+	A.setAuthority(newAuth);       
 	constrainPH(mi, A);
-
 	return Li;
     }
 

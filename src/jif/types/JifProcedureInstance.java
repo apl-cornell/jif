@@ -20,8 +20,8 @@ public interface JifProcedureInstance extends ProcedureInstance
     boolean isDefaultStartLabel();
     boolean isDefaultReturnLabel();
 
-    /** A bound of the PC of the caller. In Jif, it's always the begin label.*/
-    Label externalPC(); 
+//    /** A bound of the PC of the caller. In Jif, it's always the begin label.*/
+//    Label externalPC(); 
     
     String debugString();
 

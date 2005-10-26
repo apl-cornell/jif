@@ -47,9 +47,9 @@ public class JifMethodInstance_c extends MethodInstance_c
 	return startLabel;
     }
 
-    public Label externalPC() {
-	return startLabel;
-    }
+//    public Label externalPC() {
+//	return startLabel;
+//    }
 
     public void setStartLabel(Label startLabel, boolean isDefault) {
         this.startLabel = startLabel;

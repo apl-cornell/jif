@@ -191,6 +191,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 #	InvariantClass7.jif (Semantic, "Invariant class .* cannot implement covariant interface");
 #	InvariantClass8.jif (Semantic, "Invariant class .* cannot implement covariant interface");
 #	InvariantClass9.jif (Semantic, "Covariant class .* cannot extend invariant class");
+	InvariantClass10.jif (Semantic, "start label .* can not be the covariant label");
+	InvariantClass11.jif (Semantic, "argument .* can not be labeled with the covariant label");
 	InvariantThis1.jif ;
 	InvariantThis2.jif (Semantic, "can not contain .*this");
 	InvariantThis3.jif (Semantic, "can not contain .*this");

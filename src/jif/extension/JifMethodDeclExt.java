@@ -1,20 +1,18 @@
 package jif.extension;
 
 import java.util.Iterator;
-import java.util.List;
 
-import jif.ast.*;
 import jif.ast.JifMethodDecl;
-import jif.ast.JifNodeFactory;
 import jif.translate.ToJavaExt;
 import jif.types.*;
+import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
-import polyglot.ast.Block;
-import polyglot.ast.MethodDecl;
-import polyglot.ast.Node;
+import polyglot.ast.*;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.Position;
 
 /** The Jif extension of the <code>JifMethodDecl</code> node. 
  * 
@@ -31,6 +29,9 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         JifMethodDecl mn = (JifMethodDecl) node();
         JifMethodInstance mi = (JifMethodInstance) mn.methodInstance();
 
+        // check covariance of labels
+        checkCovariance(mi, lc);
+        
         // check that the labels in the method signature conform to the
         // restrictions of the superclass and/or interface method declaration.
         overrideMethodLabelCheck(lc, mi);
@@ -78,6 +79,62 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
     }
 
     /**
+     * This method checks that covariant labels are not used in contravariant
+     * positions.
+     * @throws SemanticDetailedException
+     *
+     */
+    protected void checkCovariance(JifMethodInstance mi, LabelChecker lc) throws SemanticDetailedException {
+        if (mi.flags().isStatic()) {
+            // static methods are ok, since they do not override other methods.
+            return;
+        }
+        ProcedureDecl mn = (ProcedureDecl) node();
+        Position declPosition = mn.position();
+
+        // check pc bound
+        Label Li = mi.startLabel();
+        if (Li.isCovariant()) {
+            throw new SemanticDetailedException("The start label of a method " +
+                    "can not be the covariant label " + Li + ".",
+             "The start label of a method " +
+                    "can not be the covariant label " + Li + ". " +
+                "Otherwise, information may be leaked by casting the " +
+                "low-parameter class to a high-parameter class, and masking " +
+                "the low side-effects that invoking the method may cause.",
+                        declPosition);
+        }
+        
+        // check arguments
+        JifTypeSystem ts = lc.jifTypeSystem();
+        Iterator types = mi.formalTypes().iterator();
+
+        int index = 0;
+        while (types.hasNext()) {
+            Type tj = (Type) types.next();
+
+            // This is the declared label of the parameter.
+            Label argBj = ((ArgLabel)ts.labelOfType(tj)).upperBound();
+            if (argBj.isCovariant()) {
+                String name = ((Formal)mn.formals().get(index)).name();
+                throw new SemanticDetailedException("The method " +
+                        "argument " + name + 
+                        " can not be labeled with the covariant label " + argBj + ".",
+            "The method argument " + name + 
+                        " can not be labeled with the covariant label " + argBj + ". " +
+                    "Otherwise, information may be leaked by casting the " +
+                    "low-parameter class to a high-parameter class, and calling " +
+                    "the method with a high security parameter, which the " +
+                    "method regards as low security information.",
+                            argBj.position());
+            }
+
+            index++;
+        }
+
+    }
+    
+    /**
      * Check that this method instance <mi> conforms to the signatures of any
      * methods in the superclasses or interfaces that it is overriding.
      * 
@@ -87,8 +144,6 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
      */
     protected void overrideMethodLabelCheck(LabelChecker lc, final JifMethodInstance mi) throws SemanticException {
         JifTypeSystem ts = lc.jifTypeSystem();
-
-        MethodDecl md = (MethodDecl)this.node();
         for (Iterator iter = mi.implemented().iterator(); iter.hasNext(); ) {
             final JifMethodInstance mj = (JifMethodInstance) iter.next();
             
