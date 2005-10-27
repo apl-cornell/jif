@@ -2,8 +2,6 @@ package jif.translate;
 
 import java.util.*;
 
-import com.sun.rsasign.c;
-
 import jif.types.*;
 import jif.types.JifPolyType;
 import jif.types.JifSubstType;
