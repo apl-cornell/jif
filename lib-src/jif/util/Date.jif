@@ -264,7 +264,7 @@ public final class Date[covariant label L] implements JifObject[L] {
      * Return number of days that this is before when. Will return a negative
      * number if this is after when.
      */
-    public int{L} daysBefore(Date[L]{L} when) {
+    public int{L; when} daysBefore(Date[L] when) {
         if (when == null) return 0;
         int whenD = Date[L].daysAfterJan_1_1900(when.year, when.month, when.day);
         int thisD = Date[L].daysAfterJan_1_1900(this.year, this.month, this.day);
@@ -345,13 +345,13 @@ public final class Date[covariant label L] implements JifObject[L] {
     
     
     // Functional style methods
-    public Date[L]{L} year(int{L} year):{L; this} throws IllegalArgumentException {
+    public Date[L]{L} year(int{this} year):{L; this} throws IllegalArgumentException {
         return new Date[L](year, this.month, this.day);
     }
-    public Date[L]{L} month(int{L} month):{L; this} throws IllegalArgumentException {
+    public Date[L]{L} month(int{this} month):{L; this} throws IllegalArgumentException {
         return new Date[L](this.year, month, this.day);
     }
-    public Date[L]{L} day(int{L} day):{L; this} throws IllegalArgumentException {
+    public Date[L]{L} day(int{this} day):{L; this} throws IllegalArgumentException {
         return new Date[L](this.year, this.month, day);
     }
 //    public Date[L]{L} addYear(int{L} yearDelta):{L; this} {
