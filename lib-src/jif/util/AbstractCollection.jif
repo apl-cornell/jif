@@ -51,19 +51,20 @@ public abstract class AbstractCollection[label L] implements Collection[L] {
         return false;
     }
     
-    public boolean{L;c} containsAll{L}(Collection[L]{L} c):{c} 
+    public boolean{L;c} containsAll(Collection[L]{L} c):{c} 
         throws (NullPointerException{c}) {
 	    if (c == null) throw new NullPointerException();
-	    Iterator[L] e = c.iterator();
+	    int size = c.size();
+	    int i = 0;
 	    boolean containsAll = true;
-	    while (e != null && e.hasNext()) {
+	    while (i < size) {
 		try {
-		    if(!contains(e.next())) {
+		    if(!contains(c.get(i))) {
 			containsAll = false;
 			break;
 		    }
 		}
-		catch (NoSuchElementException impossible) { }
+		catch (IndexOutOfBoundsException impossible) { }
 	    }
 	    return containsAll;
 	}

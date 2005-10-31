@@ -21,7 +21,7 @@ public interface Collection[label L] extends JifObject[L] {
         throws (ClassCastException{L}, IllegalArgumentException{L});
     boolean{L} remove{L}(JifObject[L]{L} o);
 
-    boolean{L;c} containsAll{L}(Collection[L]{L} c)
+    boolean{L;c} containsAll(Collection[L]{L} c)
         throws (NullPointerException{c});
     boolean{L} addAll{L}(Collection[L]{L} c)
         throws (ClassCastException{L}, IllegalArgumentException{L});
