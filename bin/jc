@@ -1,0 +1,185 @@
+#!/usr/local/bin/perl
+# Produce statistics on Jif code.
+
+if ($#ARGV != 0) {
+    print "usage: TODO ...\n";
+    exit;
+}
+
+$inputfile = $ARGV[0];
+
+# print "Opening " . $inputfile . "...\n";
+open (IN, $inputfile) or die "Can't find file $inputfile.";
+
+
+# the counters for stats
+$linesTotal = 0;   # total lines in file
+$commentLines = 0; # number of comment lines
+$codeLines = 0;    # number of non-comment lines with at least one token
+$declassifies = 0; # number of declassify statements and expressions
+#UNIMPLEMENTED:
+#$annotations = 0;  # number of label annotations
+#$comments = 0;     # number of comments
+
+# two possible states, either in the middle of a multi-line comment, or not.
+$inMultilineComment = 0; 
+
+# Define the tokens in Java
+loadTokens();
+
+# read in each line of the file
+while ($line = <IN>) {
+    $linesTotal++;
+    #@@@TODO
+    $isMultilineCommentStart = (($line =~ /(\/\*)/) && ($line !~ /(\/\*).*\*\//) && !$inMultilineComment); 
+    $isCommentLine = ($line =~ /^\s*(\/[\/\*])/); 
+
+    if ($isMultilineCommentStart) {
+	# start if a multiline comment
+	$inMultilineComment = 1;
+	$isCommentLine = 1;
+    }
+    if ($inMultilineComment) {
+	$isCommentLine = 1;
+	$inMultilineComment = ($line !~ /\*\//)
+    }
+    
+#    print "line $linesTotal : multilineComStart $isMultilineCommentStart multilinecom $inMultilineComment iscom  $isCommentLine \n";
+
+    if ($isCommentLine) {
+	$commentLines++;
+    }
+    else {
+	# non-comment line
+	
+	# cut off any trailing comment (should be done more elegantly)
+	do {
+	    $oldLine = $line;
+	    $line =~ s/^(.*)(\/\/).*$/$1/;
+	    $line =~ s/^(.*)(\/\*).*$/$1/;
+	} until ($oldLine = $line);
+	
+	# count the number of declassify tokens.
+	$copy = $line;
+	$declassifies++ while $copy =~ /declassify/g;
+
+	# count the number of tokens
+	$tokens = 0;
+	$copy = $line;
+	# go through list of tokens, and for each one, count and remove occurances
+	foreach $toke (@KEYWORDS) {
+	    $tok = escapeToken($toke);
+	    $tokens++ while ($copy =~ s/(^|\W)$tok($|\W)/$1 $2/);
+	}
+
+	foreach $toke (@TOKENS) {
+	    $tok = escapeToken($toke);
+	    $tokens++ while ($copy =~ s/$tok/ /);
+	}
+
+	# now count words
+	$tokens++ while ($copy =~ s/(\S+)/ /);
+
+	$copy =~ /^\s*$/ or die "Tokenizing didn't work: $copy";
+
+	# count the number of annotations
+	# TODO
+
+	# increment codeLines only if there is more than one token
+	if ($tokens > 1) { $codeLines++; }
+    }
+}
+
+# print "Done!\n";
+close(IN);
+
+# output stats
+print "Total lines      : $linesTotal\n";
+print "Comment lines    : $commentLines\n";
+print "Code lines       : $codeLines\n";
+print "Declassify count : $declassifies\n";
+
+
+
+sub escapeToken {
+        my $tok = shift(@_);
+
+	# escape problematic characters
+	$tok =~ s/\+/\\\+/g;
+	$tok =~ s/\(/\\\(/g;
+	$tok =~ s/\)/\\\)/g;
+	$tok =~ s/\[/\\\[/g;
+	$tok =~ s/\]/\\\]/g;
+	$tok =~ s/\./\\\./g;
+	$tok =~ s/\?/\\\?/g;
+	$tok =~ s/\*/\\\*/g;
+	$tok =~ s/\^/\\\^/g;
+	$tok =~ s/\|/\\\|/g;
+
+	return $tok;
+    }
+
+
+sub loadTokens {
+@KEYWORDS = (
+    # keywords
+    "abstract", "assert", "boolean",  "break",  "byte",  "case",  "catch",   "char", 
+    "class",    "const",  "continue",   "default",  "do",  "double",  "else",  "extends", 
+    "final",  "finally",  "float",  "for",  "goto",  "if",  "implements",  "import", 
+    "instanceof", "int",  "interface",  "long",  "native",  "new",  "package",  "private", 
+    "protected",  "public",  "return",  "short",  "static",  "strictfp",  "super", 
+    "switch",  "synchronized",  "this",  "throw",  "throws",  "transient",  "try", 
+    "void",  "volatile",  "while",  "true",  "false", "null",
+    "where", "actsfor", "actsFor", "declassify"
+	   );
+@TOKENS = (
+# separators
+    "(",
+    ")",   
+    "{" ,  
+    "}"  , 
+    "["   ,
+    "]"   ,
+    ";"   ,
+    ","   ,
+    "."   ,
+# operators
+    "="   ,
+    ">"   ,
+    "<"   ,
+    "!"   ,
+    "~"   ,
+    "?"   ,
+    ":"   ,
+    "=="  ,
+    "<="  ,
+    ">="  ,
+    "!="  ,
+    "&&"  ,
+    "||"  ,
+    "++"  ,
+    "--"  ,
+    "+"   ,
+    "-"   ,
+    "*"   ,
+    "/"   ,
+    "&"   ,
+    "|"   ,
+    "^"   ,
+    "%"   ,
+    "<<"  ,
+    ">>"  ,
+    ">>>" ,
+    "+="  ,
+    "-="  ,
+    "*="  ,
+    "/="  ,
+    "&="  ,
+    "|="  ,
+    "^="  ,
+    "%="  ,
+    "<<=" ,
+    ">>=" ,
+    ">>>="
+	   );
+}
