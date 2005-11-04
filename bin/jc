@@ -1,5 +1,12 @@
 #!/usr/local/bin/perl
 # Produce statistics on Jif code.
+# Stephen Chong
+
+# TODOs:
+#  - correctly count number literals as one token?
+#  - produce annotation statistics
+#  - usage
+#  - allow more flexible command line, e.g., use stdin if no file specified
 
 if ($#ARGV != 0) {
     print "usage: TODO ...\n";
@@ -16,6 +23,7 @@ open (IN, $inputfile) or die "Can't find file $inputfile.";
 $linesTotal = 0;   # total lines in file
 $commentLines = 0; # number of comment lines
 $codeLines = 0;    # number of non-comment lines with at least one token
+$realCodeLines = 0;    # number of non-comment lines with more than one token
 $declassifies = 0; # number of declassify statements and expressions
 #UNIMPLEMENTED:
 #$annotations = 0;  # number of label annotations
@@ -85,8 +93,10 @@ while ($line = <IN>) {
 	# count the number of annotations
 	# TODO
 
-	# increment codeLines only if there is more than one token
-	if ($tokens > 1) { $codeLines++; }
+	# increment realCodeLines only if there is more than one token
+	if ($tokens > 1) { $realCodeLines++; }
+	# increment realCodeLines only if there is at least one token
+	if ($tokens > 0) { $codeLines++; }
     }
 }
 
@@ -97,6 +107,7 @@ close(IN);
 print "Total lines      : $linesTotal\n";
 print "Comment lines    : $commentLines\n";
 print "Code lines       : $codeLines\n";
+print "Real code lines  : $realCodeLines\n";
 print "Declassify count : $declassifies\n";
 
 
