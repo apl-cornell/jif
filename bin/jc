@@ -20,11 +20,14 @@ open (IN, $inputfile) or die "Can't find file $inputfile.";
 
 
 # the counters for stats
-$linesTotal = 0;   # total lines in file
-$commentLines = 0; # number of comment lines
-$codeLines = 0;    # number of non-comment lines with at least one token
-$realCodeLines = 0;    # number of non-comment lines with more than one token
-$declassifies = 0; # number of declassify statements and expressions
+$linesTotal = 0;    # total lines in file
+$commentLines = 0;  # number of lines containing nothing but comments
+$atLeastOneTokenLines = 0;     # number of non-comment lines with at least one token
+$atLeastTwoTokenLines = 0; # number of non-comment lines with more than one token
+$blankLines = 0;    # number of blank lines (doesn't include comment lines)
+$declassifies = 0;  # number of declassify statements and expressions
+$semicolons = 0;    # total number of semicolons
+$totalTokens = 0;   # total number of tokens
 #UNIMPLEMENTED:
 #$annotations = 0;  # number of label annotations
 #$comments = 0;     # number of comments
@@ -32,84 +35,109 @@ $declassifies = 0; # number of declassify statements and expressions
 # two possible states, either in the middle of a multi-line comment, or not.
 $inMultilineComment = 0; 
 
-# Define the tokens in Java
+# Define the tokens
 loadTokens();
 
 # read in each line of the file
 while ($line = <IN>) {
     $linesTotal++;
-    #@@@TODO
-    $isMultilineCommentStart = (($line =~ /(\/\*)/) && ($line !~ /(\/\*).*\*\//) && !$inMultilineComment); 
-    $isCommentLine = ($line =~ /^\s*(\/[\/\*])/); 
+    $strippedComment = 0; # did we strip a comment off this line?
 
-    if ($isMultilineCommentStart) {
-	# start if a multiline comment
-	$inMultilineComment = 1;
-	$isCommentLine = 1;
-    }
     if ($inMultilineComment) {
-	$isCommentLine = 1;
-	$inMultilineComment = ($line !~ /\*\//)
+	# scan forward until the comment ends, i.e., until line contains "*/"
+	while ($line && $line !~ /\*\//) { 
+	    $commentLines++;
+	    $line = <IN>;
+	    $linesTotal++;	    
+	}
+	$inMultilineComment = 0;
+
+	# cut off the comment, and process the rest of the line
+	$strippedComment = 1;
+	$line =~ s/^.*?\*\// /;   # leading comments " ... */" 
+    }
+    if (($line =~ /(\/\*)/) && ($line !~ /(\/\*).*\*\//)) {
+	# the line contains "/*" and doesn't contain "*/"
+	# so we are at the start of a multiline comment.
+	$inMultilineComment = 1;
+
+	# the comment will be stripped off and the start of the line processed.
+    } 
+
+    # strip off any contained and trailing comment (should be done more elegantly)
+    $strippedComment |= ($line =~ s/\/\*(.*?)\*\// /g);   # contained comments "/* ... */"
+    $strippedComment |= ($line =~ s/(\/[\*\/]).*$//);  # trailing comments, "/* ... " or "// ... "
+    
+
+    # -----------------------------------------------
+    # count the number of tokens
+    $tokens = 0;
+
+    # -----------------------------------------------
+    # count the number of declassify tokens.
+    while ($line =~ s/(^|\W)declassify($|\W)/$1 $2/) {
+	$declassifies++; 
+	$tokens++;	    
     }
     
-#    print "line $linesTotal : multilineComStart $isMultilineCommentStart multilinecom $inMultilineComment iscom  $isCommentLine \n";
-
-    if ($isCommentLine) {
-	$commentLines++;
+    # -----------------------------------------------
+    # count the number of semicolons.
+    while ($line =~ s/;/ /) {
+	$semicolons++; 
+	$tokens++;	    
     }
-    else {
-	# non-comment line
-	
-	# cut off any trailing comment (should be done more elegantly)
-	do {
-	    $oldLine = $line;
-	    $line =~ s/^(.*)(\/\/).*$/$1/;
-	    $line =~ s/^(.*)(\/\*).*$/$1/;
-	} until ($oldLine = $line);
-	
-	# count the number of declassify tokens.
-	$copy = $line;
-	$declassifies++ while $copy =~ /declassify/g;
 
-	# count the number of tokens
-	$tokens = 0;
-	$copy = $line;
-	# go through list of tokens, and for each one, count and remove occurances
-	foreach $toke (@KEYWORDS) {
-	    $tok = escapeToken($toke);
-	    $tokens++ while ($copy =~ s/(^|\W)$tok($|\W)/$1 $2/);
-	}
-
-	foreach $toke (@TOKENS) {
-	    $tok = escapeToken($toke);
-	    $tokens++ while ($copy =~ s/$tok/ /);
-	}
-
-	# now count words
-	$tokens++ while ($copy =~ s/(\S+)/ /);
-
-	$copy =~ /^\s*$/ or die "Tokenizing didn't work: $copy";
-
-	# count the number of annotations
-	# TODO
-
-	# increment realCodeLines only if there is more than one token
-	if ($tokens > 1) { $realCodeLines++; }
-	# increment realCodeLines only if there is at least one token
-	if ($tokens > 0) { $codeLines++; }
+    # go through list of tokens, and for each one, count and remove occurances
+    # Would be way way quicker to go through the string, and remove based on what is in there...
+    foreach $toke (@TOKENS) {
+	$tok = escapeToken($toke);
+	$tokens++ while ($line =~ s/$tok/ /);
     }
+
+    foreach $toke (@KEYWORDS) {
+	$tok = escapeToken($toke);
+	$tokens++ while ($line =~ s/(^|\W)$tok($|\W)/$1 $2/);
+    }
+
+    
+    # -----------------------------------------------
+    # now count identifiers
+    $tokens++ while ($line =~ s/(\S+)/ /);
+
+    $line =~ /^\s*$/ or die "Tokenizing didn't work, left over symbols: $copy";
+    $totalTokens += $tokens;
+    
+    # -----------------------------------------------
+    # count the number of annotations
+    # TODO
+    
+    # -----------------------------------------------
+    # increment linecounts
+    if ($tokens > 1) { $atLeastTwoTokenLines++; }
+    if ($tokens > 0) { $atLeastOneTokenLines++; }
+    if ($tokens == 0 && $strippedComment) { $commentLines++; }
+    if ($tokens == 0 && !$strippedComment) { $blankLines++; }
 }
+
 
 # print "Done!\n";
 close(IN);
 
+(($atLeastOneTokenLines + $commentLines + $blankLines) == $linesTotal) or die "invariant broken: comment lines + blank lines + lines with at least 1 token != total lines";
 # output stats
-print "Total lines      : $linesTotal\n";
-print "Comment lines    : $commentLines\n";
-print "Code lines       : $codeLines\n";
-print "Real code lines  : $realCodeLines\n";
-print "Declassify count : $declassifies\n";
+print<<END;
+Lines > 0 tokens : $atLeastOneTokenLines
+Comment lines    : $commentLines
+Blank lines      : $blankLines
+------------------------------
+Total lines      : $linesTotal
 
+Lines > 1 tokens : $atLeastTwoTokenLines
+
+Total tokens     : $totalTokens
+Semicolons       : $semicolons
+Declassify count : $declassifies
+END
 
 
 sub escapeToken {
@@ -133,64 +161,39 @@ sub escapeToken {
 
 sub loadTokens {
 @KEYWORDS = (
+
     # keywords
-    "abstract", "assert", "boolean",  "break",  "byte",  "case",  "catch",   "char", 
-    "class",    "const",  "continue",   "default",  "do",  "double",  "else",  "extends", 
+    "abstract", "assert",   "boolean",  "break"   ,  "byte"   ,  "case",  
+    "catch",   "char",     "class",    "const"  ,  "continue",  "default",  "do",  "double",  "else",  "extends", 
     "final",  "finally",  "float",  "for",  "goto",  "if",  "implements",  "import", 
     "instanceof", "int",  "interface",  "long",  "native",  "new",  "package",  "private", 
     "protected",  "public",  "return",  "short",  "static",  "strictfp",  "super", 
     "switch",  "synchronized",  "this",  "throw",  "throws",  "transient",  "try", 
     "void",  "volatile",  "while",  "true",  "false", "null",
-    "where", "actsfor", "actsFor", "declassify"
-	   );
+
+    # Jif specifc keywords
+    "where", "actsfor", "actsFor", "declassify", "authority", "equiv", "label", "principal"
+
+	     );
+
 @TOKENS = (
+
 # separators
-    "(",
-    ")",   
-    "{" ,  
-    "}"  , 
-    "["   ,
-    "]"   ,
-    ";"   ,
-    ","   ,
+    "("   ,    ")"   ,    "{"   ,    "}"   , 
+    "["   ,    "]"   ,    ";"   ,    ","   ,
     "."   ,
-# operators
-    "="   ,
-    ">"   ,
-    "<"   ,
-    "!"   ,
-    "~"   ,
-    "?"   ,
-    ":"   ,
-    "=="  ,
-    "<="  ,
-    ">="  ,
-    "!="  ,
-    "&&"  ,
-    "||"  ,
-    "++"  ,
-    "--"  ,
-    "+"   ,
-    "-"   ,
-    "*"   ,
-    "/"   ,
-    "&"   ,
-    "|"   ,
-    "^"   ,
-    "%"   ,
-    "<<"  ,
-    ">>"  ,
-    ">>>" ,
-    "+="  ,
-    "-="  ,
-    "*="  ,
-    "/="  ,
-    "&="  ,
-    "|="  ,
-    "^="  ,
-    "%="  ,
-    "<<=" ,
-    ">>=" ,
-    ">>>="
+
+# operators. Order is important, longer ones must go first
+    "<<=" ,    ">>=" ,    ">>>=",    
+    "=="  ,    "<="  ,    ">="  ,    "!="  ,
+    "&&"  ,    "||"  ,    "++"  ,    "--"  ,
+    "+"   ,    "-"   ,    "*"   ,    "/"   ,
+    "&"   ,    "|"   ,    "^"   ,    "%"   ,
+    "<<"  ,    ">>"  ,    ">>>" ,    "+="  ,
+    "-="  ,    "*="  ,    "/="  ,    "&="  ,
+    "|="  ,    "^="  ,    "%="  ,    "="   ,
+    ">"   ,    "<"   ,    "!"   ,    "~"   ,
+    "?"   ,    ":"   
+	   
 	   );
 }
