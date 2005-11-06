@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 
 import jif.types.hierarchy.LabelEnv;
-import jif.types.hierarchy.LabelEnv_c;
 import jif.types.label.*;
 import jif.types.principal.*;
 import polyglot.ext.param.types.ParamTypeSystem;
@@ -94,6 +93,9 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     /** Construct an acts-for constraint. */
     ActsForConstraint actsForConstraint(Position pos, Principal actor, Principal granter, boolean isEquiv);
+
+    /** Construct an acts-for constraint. */
+    LabelLeAssertion labelLeAssertion(Position pos, Label lhs, Label rhs);
 
     /** Construct an authority constraint. */
     AuthConstraint authConstraint(Position pos, List principals);

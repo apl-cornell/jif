@@ -73,7 +73,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
 	addCallers(mi, A, newAuth);
 	A.setAuthority(newAuth);       
-	constrainPH(mi, A);
+	constrainLabelEnv(mi, A);
 	return Li;
     }
 
@@ -151,7 +151,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * (Figure 4.39).  It returns the principal hierarchy used to check the
      * body of the method.
      */
-    protected void constrainPH(JifProcedureInstance mi, JifContext A)
+    protected void constrainLabelEnv(JifProcedureInstance mi, JifContext A)
 	throws SemanticException
     {
         for (Iterator i = mi.constraints().iterator(); i.hasNext(); ) {
@@ -168,6 +168,12 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                     A.addActsFor(ac.actor(), ac.granter());
                 }
 	    }
+            if (c instanceof LabelLeAssertion) {
+                LabelLeAssertion lla = (LabelLeAssertion)c;
+                A.addAssertionLE(lla.lhs(), lla.rhs()); // Could just 
+                                                        // pass the constraint 
+                                                        // in directly?
+            }
 	}
     }
 

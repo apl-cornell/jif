@@ -740,6 +740,12 @@ public class JifTypeSystem_c
         return new ActsForConstraint_c(this, pos, actor, granter, isEquiv);
     }
 
+    public LabelLeAssertion labelLeAssertion(Position pos,
+                                             Label lhs,
+                                             Label rhs) {
+        return new LabelLeAssertion_c(this, lhs, rhs);
+    }
+
     public AuthConstraint authConstraint(Position pos, List principals) {
         return new AuthConstraint_c(this, pos, principals);
     }

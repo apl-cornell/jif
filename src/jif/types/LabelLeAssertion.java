@@ -6,4 +6,8 @@ public interface LabelLeAssertion extends Assertion
 {
     Label lhs();
     Label rhs();
+    
+    LabelLeAssertion lhs(Label lhs);
+    LabelLeAssertion rhs(Label rhs);
+    
 }

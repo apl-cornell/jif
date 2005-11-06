@@ -317,6 +317,13 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         n = (ActsForConstraintNode)n.del(delFactory().delNode());
         return n;
     }
+    public LabelLeAssertionNode LabelLeAssertionNode(Position pos, LabelNode lhs, LabelNode rhs) {
+        LabelLeAssertionNode n = new LabelLeAssertionNode_c(pos,
+                                                            lhs, rhs, false);
+        n = (LabelLeAssertionNode)n.ext(jifExtFactory().extLabelLeAssertionNode());
+        n = (LabelLeAssertionNode)n.del(delFactory().delNode());
+        return n;
+    }
 
     public ActsFor ActsFor(Position pos, ActsFor.Kind kind, Principal actor, Principal granter, Stmt consequent, Stmt alternative) {
         PrincipalNode actorNode = CanonicalPrincipalNode(actor.position(), actor);

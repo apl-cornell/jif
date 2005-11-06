@@ -350,6 +350,11 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return postExtActsForConstraintNode(e);
     }
 
+    public final Ext extLabelLeAssertionNode() {
+        Ext e = extLabelLeAssertionNodeImpl();
+        return postExtLabelLeAssertionNode(e);
+    }
+
     public final Ext extActsFor() {
         Ext e = extActsForImpl();
         return postExtActsFor(e);
@@ -473,6 +478,10 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return extConstraintNode();
     }
 
+    protected Ext extLabelLeAssertionNodeImpl() {
+        return extConstraintNode();
+    }
+    
     protected Ext extActsForImpl() {
         return new JifActsForExt(new ActsForToJavaExt_c());
     }
@@ -586,6 +595,10 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext postExtActsForConstraintNode(Ext e) {
+        return postExtConstraintNode(e);
+    }
+
+    protected Ext postExtLabelLeAssertionNode(Ext e) {
         return postExtConstraintNode(e);
     }
 

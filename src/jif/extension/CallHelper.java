@@ -533,7 +533,7 @@ public class CallHelper {
             );
         }
 
-        satisfiesConstraints(lc.context());
+        satisfiesConstraints(lc);
 
         // A |- call-end(ct, pi, Aa, Li, LrvDef)
         if (shouldReport( 4))
@@ -557,13 +557,15 @@ public class CallHelper {
         callChecked = true;
     }
 
-    /** Check if the caller has sufficient authority.
+    /** Check if the caller has sufficient authority, and label constraints
+     * are satisfied
      *  Thesis, Figure 4.29
      */
-    private void satisfiesConstraints(JifContext A)
+    private void satisfiesConstraints(LabelChecker lc)
     throws SemanticException
     {
-        JifProcedureInstance jpi = pi;
+        JifContext A = lc.context();
+        final JifProcedureInstance jpi = pi;
 
         for (Iterator i = jpi.constraints().iterator(); i.hasNext();) {
             Assertion jc = (Assertion)i.next();
@@ -619,6 +621,31 @@ public class CallHelper {
 	
 	                }
                 }
+            }
+            else if (jc instanceof LabelLeAssertion) {
+                LabelLeAssertion lla = (LabelLeAssertion)jc;
+
+                final Label lhs = instantiate(A, lla.lhs());
+                final Label rhs = instantiate(A, lla.rhs());
+                lc.constrain(new LabelConstraint(new NamedLabel(lla.lhs().toString(),
+                                                                "LHS of label assertion",
+                                                                lhs),
+                                                 LabelConstraint.LEQ,
+                                                 new NamedLabel(lla.rhs().toString(),
+                                                                "RHS of label assertion",
+                                                                rhs),
+                                                 A.labelEnv(),
+                                                 position) {
+                    public String msg() {
+                        return "The label " + lhs + " must be less restrictive than " + rhs +" to invoke " + jpi.debugString();
+                    }
+
+                    public String detailMsg() {
+                        return "The " + jpi.debugString() + " requires that the " +
+                                "relationship " + lhs + " <= " + rhs + 
+                                " holds at the call site.";
+                    }
+                });
             }
         }
     }

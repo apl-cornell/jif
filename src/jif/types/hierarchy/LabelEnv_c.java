@@ -14,7 +14,7 @@ import polyglot.util.InternalCompilerError;
 public class LabelEnv_c implements LabelEnv
 {
     private final PrincipalHierarchy ph;
-    private final List assertions;
+    private final List labelAssertions; // a list of LabelLeAssertions
     private JifTypeSystem ts;
     private Solver solver;
     
@@ -28,7 +28,7 @@ public class LabelEnv_c implements LabelEnv
     }
     private LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph, List assertions, boolean hasVariables, boolean useCache) {
         this.ph = ph;
-        this.assertions = assertions;
+        this.labelAssertions = assertions;
         this.hasVariables = false;
         this.solver = null;        
         this.hasVariables = hasVariables;
@@ -78,7 +78,7 @@ public class LabelEnv_c implements LabelEnv
             // need to add it regardless.
             if (cmp.hasVariables() || L2.hasVariables() || 
                     !(this.leq(cmp, L2, new SearchState_c(new HashSet())))) {
-                assertions.add(new LabelLeAssertion_c(ts, cmp, L2));
+                labelAssertions.add(new LabelLeAssertion_c(ts, cmp, L2));
                 if (!this.hasVariables && (cmp.hasVariables() || L2.hasVariables())) {
                     // at least one assertion in this label env has a variable.
                     this.hasVariables = true;
@@ -88,7 +88,7 @@ public class LabelEnv_c implements LabelEnv
     }
     
     public LabelEnv copy() {
-        return new LabelEnv_c(ts, ph.copy(), new LinkedList(assertions), hasVariables, useCache);
+        return new LabelEnv_c(ts, ph.copy(), new LinkedList(labelAssertions), hasVariables, useCache);
     }
     
     public boolean leq(Label L1, Label L2) { 
@@ -279,7 +279,7 @@ public class LabelEnv_c implements LabelEnv
         AssertionUseCount auc = state.auc;
         if (!state.useAssertions || auc.size() >= ASSERTION_TOTAL_BOUND) return false;
 
-        for (Iterator i = assertions.iterator(); i.hasNext();) { 
+        for (Iterator i = labelAssertions.iterator(); i.hasNext();) { 
             LabelLeAssertion c = (LabelLeAssertion)i.next();
 
             if (auc.get(c) >= ASSERTION_USE_BOUND) {
@@ -316,13 +316,13 @@ public class LabelEnv_c implements LabelEnv
      * Is this enviornment empty, or does is contain some constraints?
      */
     public boolean isEmpty() {
-        return assertions.isEmpty() && ph.isEmpty();
+        return labelAssertions.isEmpty() && ph.isEmpty();
     }
     
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("[");
-        for (Iterator i = assertions.iterator(); i.hasNext(); ) {
+        for (Iterator i = labelAssertions.iterator(); i.hasNext(); ) {
             LabelLeAssertion c = (LabelLeAssertion) i.next();
             sb.append(c.lhs());
             sb.append(" <= ");
@@ -331,7 +331,7 @@ public class LabelEnv_c implements LabelEnv
                 sb.append(", ");
         }
         if (!ph().isEmpty()) {
-            if (!assertions.isEmpty()) {
+            if (!labelAssertions.isEmpty()) {
                 sb.append(", ");
             }
             sb.append(ph().actsForString());
@@ -353,7 +353,7 @@ public class LabelEnv_c implements LabelEnv
         Map defns = new LinkedHashMap();
         
         Set labelComponents = new LinkedHashSet();
-        for (Iterator iter = assertions.iterator(); iter.hasNext(); ) {
+        for (Iterator iter = labelAssertions.iterator(); iter.hasNext(); ) {
             LabelLeAssertion c = (LabelLeAssertion) iter.next();
             Label bound = bounds.applyTo(c.lhs());
             if (bound.isEnumerable() && !bound.components().isEmpty()) {                

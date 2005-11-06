@@ -662,6 +662,8 @@ constraint ::=
         {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b); :}
     |   principal:a EQUIV principal:b 
         {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b, true); :}
+    |   label:a LTEQ label:b
+        {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b); :}
     ;
 
 // 19.9.1) Interface Declarations

@@ -141,6 +141,12 @@ public class JifSubst_c extends Subst_c implements JifSubst
 	    c = c.granter(substPrincipal(c.granter()));
 	    return c;
 	}
+	else if (constraint instanceof LabelLeAssertion) {
+	    LabelLeAssertion c = (LabelLeAssertion) constraint;
+	    c = c.lhs(substLabel(c.lhs()));
+	    c = c.rhs(substLabel(c.rhs()));
+	    return c;
+	}
 	else if (constraint instanceof CallerConstraint) {
 	    CallerConstraint c = (CallerConstraint) constraint;
 	    List l = new CachingTransformingList(c.principals(),

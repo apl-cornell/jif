@@ -23,6 +23,18 @@ public class LabelLeAssertion_c extends TypeObject_c implements LabelLeAssertion
 	return rhs;
     }
     
+    public LabelLeAssertion lhs(Label lhs) {
+        LabelLeAssertion_c n = (LabelLeAssertion_c) copy();
+        n.lhs = lhs;
+        return n;
+    }
+    
+    public LabelLeAssertion rhs(Label rhs) {
+        LabelLeAssertion_c n = (LabelLeAssertion_c) copy();
+        n.rhs = rhs;
+        return n;
+    }
+
     public boolean isCanonical() {
 	return true;
     }
