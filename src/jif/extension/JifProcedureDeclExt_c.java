@@ -103,7 +103,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
     }
 
     /** Adds the caller's authorities into <code>auth</code> */
-    protected void addCallers(JifProcedureInstance mi, JifContext A, Set auth) {
+    protected static void addCallers(JifProcedureInstance mi, JifContext A, Set auth) {
         for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
             Assertion c = (Assertion) iter.next();
 
@@ -151,7 +151,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * (Figure 4.39).  It returns the principal hierarchy used to check the
      * body of the method.
      */
-    protected void constrainLabelEnv(JifProcedureInstance mi, JifContext A)
+    protected static void constrainLabelEnv(JifProcedureInstance mi, JifContext A)
 	throws SemanticException
     {
         for (Iterator i = mi.constraints().iterator(); i.hasNext(); ) {

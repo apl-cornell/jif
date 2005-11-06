@@ -533,7 +533,7 @@ public class CallHelper {
             );
         }
 
-        satisfiesConstraints(lc);
+        satisfiesConstraints(pi, lc);
 
         // A |- call-end(ct, pi, Aa, Li, LrvDef)
         if (shouldReport( 4))
@@ -561,11 +561,10 @@ public class CallHelper {
      * are satisfied
      *  Thesis, Figure 4.29
      */
-    private void satisfiesConstraints(LabelChecker lc)
+    private void satisfiesConstraints(final JifProcedureInstance jpi, LabelChecker lc)
     throws SemanticException
     {
         JifContext A = lc.context();
-        final JifProcedureInstance jpi = pi;
 
         for (Iterator i = jpi.constraints().iterator(); i.hasNext();) {
             Assertion jc = (Assertion)i.next();
@@ -593,8 +592,30 @@ public class CallHelper {
                     }
 
                     if (!sat) {
-                        throw new SemanticDetailedException("The caller must have the authority of the principal " + pi + " to invoke " + jpi.debugString(),
-                                                    "The " + jpi.debugString() + " requires that the caller of the method have the authority of the principal "  + pi +". The caller does not have this principal's authority.", position);
+                        if (!overrideChecker) {
+                            // being used as a normal call checker
+                            throw new SemanticDetailedException(
+                                "The caller must have the authority of the principal " + 
+                                    pi + " to invoke " + jpi.debugString(),
+                                "The " + jpi.debugString() + " requires that the " +
+                                    "caller of the method have the authority of " +
+                                    "the principal "  + pi +". The caller does " +
+                                    "not have this principal's authority.", 
+                                 position);
+                        }
+                        else {
+                            // being used as an override checker
+                            throw new SemanticDetailedException(
+                                "The subclass cannot assume the caller has the " +
+                                "authority of the principal " + 
+                                    pi,
+                                "The " + jpi.debugString() + " requires that the " +
+                                    "caller of the method have the authority of " +
+                                    "the principal "  + pi +". However, this " +
+                                    "method overrides the method in class " + this.pi.container() + 
+                                    " which does not make this requirement.", 
+                                 jcc.position());                            
+                        }
                     }
                 }
             }
@@ -608,18 +629,52 @@ public class CallHelper {
                 granter = instantiate(A, granter);
 
                 if (jac.isEquiv()) {
-	                if (!A.equiv(actor, granter)) {
-	                    throw new SemanticDetailedException("The principal " + actor + " must be equivalent to " + granter + " to invoke " + jpi.debugString(),
-	                                                        "The " + jpi.debugString() + " requires that the relationship " + jac + " holds at the call site.", position);
-	
-	                }                    
+                    if (!A.equiv(actor, granter)) {
+                        if (!overrideChecker) {
+                            // being used as a normal call checker
+                            throw new SemanticDetailedException(
+                               "The principal " + actor + " must be equivalent to " + 
+                                   granter + " to invoke " + jpi.debugString(),
+                               "The " + jpi.debugString() + " requires that the " +
+                                   " relationship " + jac + " holds at the call site.", 
+                               position);
+                        }
+                        else { 
+                            // being used as an override checker
+                            throw new SemanticDetailedException(
+                                "The subclass cannot assume that " + actor + " is " +
+                                        "equivalent to " + granter,
+                                "The " + jpi.debugString() + " requires that " + actor + " is " +
+                                    "equivalent to " + granter + ". However, this " +
+                                    "method overrides the method in class " + this.pi.container() + 
+                                    " which does not make this requirement.", 
+                                jac.position());                            
+                        }                    
+                    }
                 }
                 else {
-	                if (!A.actsFor(actor, granter)) {
-	                    throw new SemanticDetailedException("The principal " + actor + " must act for " + granter + " to invoke " + jpi.debugString(),
-	                                                        "The " + jpi.debugString() + " requires that the relationship " + actor + " actsfor " + granter + " holds at the call site.", position);
-	
-	                }
+                    if (!A.actsFor(actor, granter)) {
+                        if (!overrideChecker) {
+                            // being used as a normal call checker
+                            throw new SemanticDetailedException(
+                               "The principal " + actor + " must act for " + granter + 
+                                   " to invoke " + jpi.debugString(),
+                               "The " + jpi.debugString() + " requires that the " +
+                                    "relationship " + actor + " actsfor " + granter + 
+                                    " holds at the call site.", 
+                                position);
+                        }   
+                        else { 
+                            throw new SemanticDetailedException(
+                                "The subclass cannot assume that " + actor + " can " +
+                                        "actfor " + granter,
+                                "The " + jpi.debugString() + " requires that " + actor + " can " +
+                                    "actfor " + granter + ". However, this " +
+                                    "method overrides the method in class " + this.pi.container() + 
+                                    " which does not make this requirement.", 
+                                jac.position());                            
+                        }
+                    }
                 }
             }
             else if (jc instanceof LabelLeAssertion) {
@@ -627,6 +682,29 @@ public class CallHelper {
 
                 final Label lhs = instantiate(A, lla.lhs());
                 final Label rhs = instantiate(A, lla.rhs());
+                final String message;
+                final String detailedMessage;
+                Position pos = position;
+                if (!overrideChecker) {
+                    // being used as a normal call checker
+                    message = "The label " + lhs + " must be less restrictive " +
+                            "than " + rhs +" to invoke " + jpi.debugString();
+                    detailedMessage = "The " + jpi.debugString() + " requires that the " +
+                            "relationship " + lhs + " <= " + rhs + 
+                            " holds at the call site.";                    
+                }
+                else {
+                    // being used as an override checker
+                    message = "The subclass cannot assume that " + lhs +
+                        " <= " + rhs;
+                    detailedMessage = "The " + jpi.debugString() + " requires that " + lhs + 
+                        " <= " + rhs + ". However, this " +
+                        "method overrides the method in class " + this.pi.container() + 
+                        " which does not make this requirement.";
+                    pos = lla.position();
+                }
+
+                
                 lc.constrain(new LabelConstraint(new NamedLabel(lla.lhs().toString(),
                                                                 "LHS of label assertion",
                                                                 lhs),
@@ -635,15 +713,13 @@ public class CallHelper {
                                                                 "RHS of label assertion",
                                                                 rhs),
                                                  A.labelEnv(),
-                                                 position) {
+                                                 pos) {
                     public String msg() {
-                        return "The label " + lhs + " must be less restrictive than " + rhs +" to invoke " + jpi.debugString();
+                        return message;
                     }
 
                     public String detailMsg() {
-                        return "The " + jpi.debugString() + " requires that the " +
-                                "relationship " + lhs + " <= " + rhs + 
-                                " holds at the call site.";
+                        return detailedMessage;
                     }
                 });
             }
@@ -779,6 +855,17 @@ public class CallHelper {
         
         LabelChecker newlc = lc.context(A);
         
+        // add the "where caller" authority of the superclass only
+        Set newAuth = new HashSet();
+        JifProcedureDeclExt_c.addCallers(overridden, newlc.context(), newAuth);
+        A.setAuthority(newAuth);       
+
+        // add the where constraints of the superclass only.
+        JifProcedureDeclExt_c.constrainLabelEnv(overridden, newlc.context());        
+
+        // check that the where constraints of the subclass are implied by 
+        // those of the superclass.
+        satisfiesConstraints(overriding, newlc);
         
         // argument labels are contravariant:
         //      each argument label of mi may be more restrictive than the 

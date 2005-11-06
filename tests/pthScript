@@ -266,6 +266,14 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Override08.jif (Semantic, "Cannot override .* return value label") ;
 	Override09.jif (Semantic, "Cannot override .* label of .* exception") ;
 	Override10.jif  ;
+	Override11.jif  (Semantic, "cannot assume");
+	Override12.jif;
+	Override13.jif  (Semantic, "cannot assume");
+	Override14.jif;
+	Override15.jif;
+	Override16.jif;
+	Override17.jif  (Semantic, "cannot assume");
+	Override18.jif;
 	PairList2.jif ;
 	Params1.jif ;
 	Params1Test.jif ;
@@ -329,7 +337,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	RuntimeParams07.jif ;
 	RuntimeParams08.jif (Semantic, "Cannot override");
 	RuntimeParams09.jif ;
-	RuntimeParams10.jif (Semantic, "Cannot override");
+	RuntimeParams10.jif (Semantic, "can not be labeled with the covariant label");
 	RuntimeParams11.jif (Semantic, "Cannot override");
 	RuntimeParams12.jif (Semantic, "Cannot override");
 	RuntimeParams13.jif (Semantic, "Cannot override");

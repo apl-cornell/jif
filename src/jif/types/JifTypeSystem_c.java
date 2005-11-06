@@ -743,7 +743,7 @@ public class JifTypeSystem_c
     public LabelLeAssertion labelLeAssertion(Position pos,
                                              Label lhs,
                                              Label rhs) {
-        return new LabelLeAssertion_c(this, lhs, rhs);
+        return new LabelLeAssertion_c(this, lhs, rhs, pos);
     }
 
     public AuthConstraint authConstraint(Position pos, List principals) {

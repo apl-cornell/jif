@@ -6,6 +6,7 @@ import jif.types.*;
 import jif.types.label.*;
 import jif.types.principal.Principal;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * The wrapper of a set of assumptions that can be used to decide
@@ -78,7 +79,7 @@ public class LabelEnv_c implements LabelEnv
             // need to add it regardless.
             if (cmp.hasVariables() || L2.hasVariables() || 
                     !(this.leq(cmp, L2, new SearchState_c(new HashSet())))) {
-                labelAssertions.add(new LabelLeAssertion_c(ts, cmp, L2));
+                labelAssertions.add(new LabelLeAssertion_c(ts, cmp, L2, Position.COMPILER_GENERATED));
                 if (!this.hasVariables && (cmp.hasVariables() || L2.hasVariables())) {
                     // at least one assertion in this label env has a variable.
                     this.hasVariables = true;
