@@ -252,7 +252,7 @@ terminal Token DECLASSIFY;
 non terminal DeclassifyExpr declassify;
 non terminal DeclassifyStmt declassify_statement;
 non terminal TypeNode labeled_primitive_type;
-non terminal LabelNode label, label_opt, return_label_opt;
+non terminal LabelNode label, label_opt, return_label_opt, label_flexible;
 non terminal List component_list;
 non terminal LabelNode label_component;
 non terminal PrincipalNode principal;
@@ -295,6 +295,14 @@ label_opt ::=
             {: RESULT = null; :}
     |   label:a
             {: RESULT = a; :}
+    ;
+    
+label_flexible ::=
+      // LabelNode
+      label:a
+            {: RESULT = a; :}
+    | accesspath:a
+            {: RESULT = parser.nf.AmbDynamicLabelNode(parser.pos(a), a); :}
     ;
 component_list ::=
                     // List of LabelNode
@@ -662,7 +670,7 @@ constraint ::=
         {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b); :}
     |   principal:a EQUIV principal:b 
         {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b, true); :}
-    |   label:a LTEQ label:b
+    |   label_flexible:a LTEQ label_flexible:b
         {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b); :}
     ;
 
