@@ -214,7 +214,7 @@ public class JifMethodInstance_c extends MethodInstance_c
         if (Report.should_report(Report.debug, 1)) { 
             return fullSignature();
         }
-        return debugString();
+        return debugString(false);
     }
     public String fullSignature() { 
 	StringBuffer sb = new StringBuffer();
