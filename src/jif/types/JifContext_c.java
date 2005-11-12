@@ -104,14 +104,12 @@ public class JifContext_c extends Context_c implements JifContext
      * @param L2
      */
     public void addDefinitionalAssertionEquiv(Label L1, Label L2) {
-        this.addAssertionLE(L1, L2);
-        this.addAssertionLE(L2, L1);
+        labelEnv().addEquiv(L1, L2);
         JifContext_c jc = this;
         while (!jc.isCode()) {
             jc = (JifContext_c)jc.pop();
             if (jc != null) {
-                jc.addAssertionLE(L1, L2);
-                jc.addAssertionLE(L2, L1);
+                jc.labelEnv().addEquiv(L1, L2);
             }            
         }
     }

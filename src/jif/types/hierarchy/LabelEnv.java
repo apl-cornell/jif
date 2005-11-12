@@ -19,6 +19,9 @@ public interface LabelEnv
     // adds the assertion "L1 <= L2"
     void addAssertionLE(Label L1, Label L2);
     
+    // adds the assertions "L1 <= L2" and "L2 <= L1"
+    void addEquiv(Label L1, Label L2);
+    
     // returns true if "L1 <= L2"
     boolean leq(Label L1, Label L2);
 
