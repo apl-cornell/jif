@@ -76,6 +76,10 @@ public class LabelUtil
         if (lb == null) return "<null>";
         return lb.toString();
     }
+
+    public static String toString(Label lb) {
+        return stringValue(lb);
+    }
     
     private static Label intern(Label l) {
         Label in = (Label)intern.get(l);
@@ -110,9 +114,8 @@ public class LabelUtil
         for (Iterator i = labels.iterator(); i.hasNext(); ) {
             Label ci = (Label)i.next();
             
-            boolean subsumed = false;
-            
-            for (Iterator j = needed.iterator(); j.hasNext(); ) {
+            boolean subsumed = (ci == null); // null components are always subsumed.
+            for (Iterator j = needed.iterator(); !subsumed && j.hasNext(); ) {
                 Label cj = (Label) j.next();
                 if (relabelsTo(ci, cj)) {
                     subsumed = true;
