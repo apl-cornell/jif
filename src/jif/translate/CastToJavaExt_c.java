@@ -48,6 +48,6 @@ public class CastToJavaExt_c extends ToJavaExt_c {
         if (jst.flags().isInterface()) {
             jifImplClass = ClassDeclToJavaExt_c.interfaceClassImplName(jifImplClass);
         }
-        return rw.qq().parseExpr("%s.%s(%LE)", jifImplClass, ClassDeclToJavaExt_c.castMethodName(jst), args);
+        return rw.qq().parseExpr(jifImplClass + ".%s(%LE)", ClassDeclToJavaExt_c.castMethodName(jst), args);
     }
 }

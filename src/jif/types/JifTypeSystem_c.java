@@ -30,25 +30,6 @@ public class JifTypeSystem_c
         this.ds = new FixedSignature(this);
     }
 
-    public Object placeHolder(TypeObject o, Set roots) {
-        assert_(o);
-
-        if ((o instanceof ClassType) /*&& !(o instanceof SubstType)*/
-            ) {
-            ClassType ct = (ClassType)o;
-
-            // This should never happen: anonymous and local types cannot
-            // appear in signatures.
-            if (ct.isLocal() || ct.isAnonymous()) {
-                throw new InternalCompilerError("Cannot serialize " + o + ".");
-            }
-
-            return new JifPlaceHolder_c(ct);
-        }
-
-        return o;
-    }
-
     public Solver solver(String solverName) {
         return new SolverGLB(this, solverName);
         //return new SolverLUB(this);
@@ -65,7 +46,7 @@ public class JifTypeSystem_c
     /**
      * Initializes the type system and its internal constants.
      */
-    public void initialize(LoadedClassResolver loadedResolver, ExtensionInfo extInfo)
+    public void initialize(TopLevelResolver loadedResolver, ExtensionInfo extInfo)
         throws SemanticException {
         super.initialize(loadedResolver, extInfo);
 

@@ -82,7 +82,8 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo
             lr = new SourceClassResolver(compiler, this, 
                     getJifOptions().constructJifClasspath(),
                     compiler.loader(), false,
-		    getOptions().compile_command_line_only);
+		    getOptions().compile_command_line_only,
+                    getOptions().ignore_mod_times);
             ts.initialize(lr, this);
         }
         catch (SemanticException e) {
