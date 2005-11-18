@@ -1,6 +1,8 @@
 package jif.types;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
@@ -183,6 +185,27 @@ public class JifMethodInstance_c extends MethodInstance_c
         this.setThrowTypes(throwTypes);
     }
 
+    public void subst(LabelSubstitution subst) throws SemanticException {
+        TypeSubstitutor tsbs = new TypeSubstitutor(subst);
+        setStartLabel(startLabel().subst(subst), isDefaultStartLabel());
+        setReturnLabel(returnLabel().subst(subst), isDefaultReturnLabel());
+        setReturnType(tsbs.rewriteType(returnType()));
+
+        List formalTypes = new LinkedList();
+        for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
+            Type t = (Type) i.next();
+            formalTypes.add(tsbs.rewriteType(t));
+        }
+        this.setFormalTypes(formalTypes);
+
+        List throwTypes = new LinkedList();
+        for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
+            Type t = (Type) i.next();
+            throwTypes.add(tsbs.rewriteType(t));
+        }
+        this.setThrowTypes(throwTypes);
+        
+    }
 
     public String debugString() {
         return debugString(true);
