@@ -63,6 +63,8 @@ public abstract class AccessPath implements Serializable {
 
     public abstract PathMap labelcheck(JifContext A);
 
+    public abstract AccessPathRoot root();
+    
     public final Position position() {
         return position;
     }

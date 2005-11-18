@@ -46,6 +46,10 @@ public class AccessPathField extends AccessPath {
         return new AccessPathField(newPath, fi, fieldName, position());
     }
     
+    public final AccessPathRoot root() {
+        return path.root();
+    }
+
     public String toString() {
         return path + "." + fieldName;
     }
