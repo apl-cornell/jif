@@ -1,5 +1,6 @@
 package jif.extension;
 
+import jif.extension.JifFieldDeclExt_c.StaticFieldLabelChecker;
 import jif.types.*;
 import jif.types.label.Label;
 import jif.types.label.ThisLabel;
@@ -50,9 +51,8 @@ public class JifTypeNodeDel extends JifJL_c
             // AmbThisLabelNode_c because the static context is not set 
             // correctly when disambiguating method signatures.
             JifClassType ct = (JifClassType)tc.context().currentClass();
-            LabelSubstitutionVisitor lsv = 
-                new LabelSubstitutionVisitor(new StaticLabelChecker(tn.position(), ct.thisLabel()), true);
-            lsv.rewriteType(tn.type());
+            TypeSubstitutor tsb = new TypeSubstitutor(new StaticLabelChecker(tn.position(), ct.thisLabel()));
+            tsb.rewriteType(tn.type());
             
         }
         

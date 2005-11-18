@@ -77,33 +77,33 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 	//if [final] then invariant(type_part(Tf)) else invariant(type_part(Tf)) and invariant(label_part(Tf))
         {        
             Type fieldType = fi.type();
-            LabelSubstitutionVisitor lsv = new InvarianceLabelVisitor(decl.position());
+            TypeSubstitutor tsb = new InvarianceLabelSubstr(decl.position());
 
-            // use a LabelSubstitutionVisitor to check the type of the field,
+            // use a TypeSubstitutor to check the type of the field,
             // and make sure that it contains no convariant components.
-            // We use the Visitor to ensure that the entire type is traversed,
+            // We use the TypeSubstitutor to ensure that the entire type is traversed,
             // including e.g. actual parameters to polymorphic types, labels
             // of array elements, etc.
 
             if (decl.flags().isFinal()) {
-                lsv.rewriteType(ts.unlabel(fieldType));
+                tsb.rewriteType(ts.unlabel(fieldType));
             }
             else {
-                lsv.rewriteType(fieldType);
+                tsb.rewriteType(fieldType);
             }
         }
     
         // Make sure that static fields do not contain either parameters or 
         // the "this" label
         if (decl.flags().isStatic()) {
-            // use a LabelSubstitutionVisitor to check the type of the field,
+            // use a TypeSubstitutor to check the type of the field,
             // and make sure that it contains no parameters or the "this" label.
-            // We use the Visitor to ensure that the entire type is traversed,
+            // We use the TypeSubstitutor to ensure that the entire type is traversed,
             // including e.g. actual parameters to polymorphic types, labels
             // of array elements, etc.
-            LabelSubstitutionVisitor lsv = 
-                new LabelSubstitutionVisitor(new StaticFieldLabelChecker(decl.position()), true);
-            lsv.rewriteType(fi.type());
+            TypeSubstitutor tsb = new TypeSubstitutor(new StaticFieldLabelChecker(decl.position()));
+
+            tsb.rewriteType(fi.type());
            
         }
 
@@ -235,15 +235,15 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
      * Visitor to ensure that labels do not use
      * covariant labels in the wrong places 
      */    
-    protected static class InvarianceLabelVisitor extends LabelSubstitutionVisitor {
+    protected static class InvarianceLabelSubstr extends TypeSubstitutor {
         /* 
          * Don't check subst types, as the subtype checker will take care of those.
          */
         protected boolean recurseIntoSubstType(JifSubstType type) {
             return false;
         }
-        public InvarianceLabelVisitor(Position pos) {
-            super(new InvarianceLabelChecker(pos), true);
+        public InvarianceLabelSubstr(Position pos) {
+            super(new InvarianceLabelChecker(pos));
         }
         
     }
