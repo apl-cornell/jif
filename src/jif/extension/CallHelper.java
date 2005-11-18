@@ -4,9 +4,8 @@ import java.util.*;
 
 import jif.ast.*;
 import jif.types.*;
-import jif.types.label.ArgLabel;
-import jif.types.label.Label;
-import jif.types.label.VarLabel;
+import jif.types.label.*;
+import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
@@ -28,7 +27,8 @@ public class CallHelper {
         return Report.should_report(jif.Topics.labels, obscurity);
     }
 
-    private static void report(int obscurity, String s) {
+    private static void
+    report(int obscurity, String s) {
         Report.report(obscurity, "labels: " + s);
     }
 
@@ -367,16 +367,68 @@ public class CallHelper {
             sc.addSubtypeConstraints(lc, Ej.position(),
                                      instantiate(A, aj.formalInstance().type()), Ej.type());
 
-            // In addition, make sure that if the formal argument is of type
-            // principal or label, then the actual argument is either a
-            // final access path or a constant.
-            if (jts.isLabel(tj) && !JifUtil.isFinalAccessExprOrConst(jts, Ej)) {
-                throw new SemanticException("An argument of type label must be a final access path or a constant", Ej.position());
-            }
-            if (jts.isPrincipal(tj) && !JifUtil.isFinalAccessExprOrConst(jts, Ej)) {
-                throw new SemanticException("An argument of type principal must be a final access path or a constant", Ej.position());
-            }
         }
+        constrainFinalActualArgs(jts);
+    }
+
+    /**
+     * Make sure that the actual arg for
+     * any formal arg that appears in the signature is final.
+     * @throws SemanticException 
+     *
+     */
+    private void constrainFinalActualArgs(JifTypeSystem jts) throws SemanticException {
+        // find which formal arguments appear in the signature
+        final Set argInstances = new HashSet();
+        LabelSubstitution argLabelGather = new LabelSubstitution() {
+            public Label substLabel(Label L) throws SemanticException {
+                if (L instanceof DynamicLabel) {
+                    DynamicLabel dl = (DynamicLabel)L;
+                    extractRoot(dl.path().root());
+                }
+                return L;
+            }            
+            public Principal substPrincipal(Principal p) throws SemanticException {
+                if (p instanceof DynamicPrincipal) {
+                    DynamicPrincipal dp = (DynamicPrincipal)p;
+                    extractRoot(dp.path().root());
+                }
+                return p;
+            }
+            void extractRoot(AccessPathRoot root) {
+                if (root instanceof AccessPathLocal) {
+                    argInstances.add(((AccessPathLocal)root).localInstance());
+                }                
+            }
+        };
+        
+        pi.subst(argLabelGather);
+        
+        // now go through each of the actual and formal arguments, and
+        // check if the actual arg needs to be final. 
+        Iterator formalTypes = pi.formalTypes().iterator();
+        for (int j = 0; j < actualArgs.size(); j++) {
+            Type tj = (Type)formalTypes.next();
+            ArgLabel aj = (ArgLabel)jts.labelOfType(tj);
+            if (argInstances.contains(aj.formalInstance())) {
+                // this actual arg needs to be final!
+                Expr Ej = (Expr)actualArgs.get(j);
+                if (!JifUtil.isFinalAccessExprOrConst(jts, Ej)) {
+                    throw new SemanticDetailedException("The " + 
+                        StringUtil.nth(j+1) + 
+                        " argument must be a final access path or a " +
+                        "constant", 
+                        "The " + StringUtil.nth(j+1) + " formal argument " +
+                        "of " + pi.debugString() + 
+                        " is used to express a dynamic label or principal " +
+                        "in the procedure's signature. As such, " +
+                        "the actual argument must be a final " +
+                        "access path or a constant.",   
+                        Ej.position());
+                }
+            }
+
+        }               
     }
 
     private Label resolveStartLabel(JifContext A) throws SemanticException {

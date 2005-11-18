@@ -170,6 +170,14 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	FieldParam1.jif  ;
 	FieldParam2.jif  ;
 	FileTester.jif ;
+        FinalArgs01.jif (Semantic, "argument must be a final access path");
+        FinalArgs02.jif ;
+        FinalArgs03.jif (Semantic, "argument must be a final access path");
+        FinalArgs04.jif ;
+        FinalArgs05.jif (Semantic, "argument must be a final access path");
+        FinalArgs06.jif (Semantic, "argument must be a final access path");
+        FinalArgs07.jif (Semantic, "argument must be a final access path");
+        FinalArgs08.jif (Semantic, "argument must be a final access path");
 	For1.jif ;
 	Hierarchy1.jif ;
 	Heapsort.jif ;
@@ -201,7 +209,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	LabelIf2.jif (Semantic, "only be used in an if statement");
 	LabelIf3.jif (Semantic, "only be used in an if statement");
 	LabelIf4.jif ;
-	LabelIf5.jif ;
+	LabelIf5.jif LabeledObject.jif;
 	LabelIf6.jif (Semantic, "not less restrictive");
 	LabelIf6a.jif (Semantic, "not less restrictive");
 	LabelIf7.jif (Semantic, "not less restrictive");
