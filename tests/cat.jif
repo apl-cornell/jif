@@ -7,7 +7,14 @@ public class cat {
     public static void main{p:}(principal{} p, String{}[]{} args):{p:} throws NullPointerException {
 	final label{} lb = new label{p:};
 
-	Runtime[p] runtime = Runtime[p].getRuntime();
+	Runtime[p] runtime;
+	try {
+	    runtime = Runtime[p].getRuntime();
+	}
+	catch (SecurityException e) {
+	    runtime = null;
+	}
+
 	if (runtime == null) return;
 
 	PrintStream[{p:}]{p:} out = runtime.out();
