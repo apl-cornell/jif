@@ -1,20 +1,17 @@
 package jif.runtime;
 
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jif.lang.*;
-import jif.lang.Closure;
-import jif.lang.Principal;
-import jif.lang.PrincipalUtil;
 
 /**
  * A NativePrincipal represents the file system users and groups.
  */
 public class NativePrincipal implements Principal {
     private final String name;
-    protected final Set superiors = new HashSet();
+    protected final Set superiors = new LinkedHashSet();
     
     protected NativePrincipal(String name) {
         this.name = name;

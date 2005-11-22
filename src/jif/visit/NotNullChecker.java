@@ -47,13 +47,13 @@ public class NotNullChecker extends DataFlow
         Set notNullAccessPaths;
 
         DataFlowItem() {
-            notNullAccessPaths = new HashSet();
+            notNullAccessPaths = new LinkedHashSet();
         }
         DataFlowItem(Set notNullAccessPaths) {
             this.notNullAccessPaths = notNullAccessPaths;
         }
         DataFlowItem(DataFlowItem d) {
-            notNullAccessPaths = new HashSet(d.notNullAccessPaths);
+            notNullAccessPaths = new LinkedHashSet(d.notNullAccessPaths);
         }
         static boolean exprIsNotNullStatic(Expr e) {
             // expression is not null if it is a "new" expression, "this"
@@ -277,7 +277,7 @@ public class NotNullChecker extends DataFlow
     }        
     
     private static Set killAccessPath(Set paths, AccessPath ap) {
-        Set p = new HashSet(paths);
+        Set p = new LinkedHashSet(paths);
         boolean changed = p.remove(ap);
         if (ap instanceof AccessPathLocal) {
             // go through the set and remove any access paths rooted at this local
@@ -294,7 +294,7 @@ public class NotNullChecker extends DataFlow
     }
 
     private static Set addNotNull(Set notNullAccessPaths, AccessPath ap) {
-        Set s = new HashSet(notNullAccessPaths);
+        Set s = new LinkedHashSet(notNullAccessPaths);
         s.add(ap);
         return s;
     }
@@ -319,7 +319,7 @@ public class NotNullChecker extends DataFlow
         for (int i = 0; i < items.size(); i++) {
             Set m = ((DataFlowItem)items.get(i)).notNullAccessPaths;
             if (intersectSet == null ) {
-                intersectSet = new HashSet(m);
+                intersectSet = new LinkedHashSet(m);
             }
             else {
                 intersectSet.retainAll(m);

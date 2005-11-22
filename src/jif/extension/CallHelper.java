@@ -379,7 +379,7 @@ public class CallHelper {
      */
     private void constrainFinalActualArgs(JifTypeSystem jts) throws SemanticException {
         // find which formal arguments appear in the signature
-        final Set argInstances = new HashSet();
+        final Set argInstances = new LinkedHashSet();
         LabelSubstitution argLabelGather = new LabelSubstitution() {
             public Label substLabel(Label L) throws SemanticException {
                 if (L instanceof DynamicLabel) {
@@ -908,7 +908,7 @@ public class CallHelper {
         LabelChecker newlc = lc.context(A);
         
         // add the "where caller" authority of the superclass only
-        Set newAuth = new HashSet();
+        Set newAuth = new LinkedHashSet();
         JifProcedureDeclExt_c.addCallers(overridden, newlc.context(), newAuth);
         A.setAuthority(newAuth);       
 

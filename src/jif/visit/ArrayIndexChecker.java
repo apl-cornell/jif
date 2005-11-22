@@ -359,13 +359,13 @@ public class ArrayIndexChecker extends DataFlow
         if (trackThisObject(x)) {
             BoundSets s = (BoundSets)bounds.get(x);
             if (s == null) {
-                s = new BoundSets(new HashSet(), new HashSet());
+                s = new BoundSets(new LinkedHashSet(), new LinkedHashSet());
                 bounds.put(x, s);
             }
             else if (sharedBoundSets) {
                 // the bound sets are shared, we need to make a copy before
                 // we make any modifications.
-                s = new BoundSets(s.lowerBounds, new HashSet(s.upperBounds));
+                s = new BoundSets(s.lowerBounds, new LinkedHashSet(s.upperBounds));
                 bounds.put(x, s);
             }
             if (y instanceof Integer) {
@@ -386,13 +386,13 @@ public class ArrayIndexChecker extends DataFlow
         if (trackThisObject(y)) {
             BoundSets s = (BoundSets)bounds.get(y);
             if (s == null) {
-                s = new BoundSets(new HashSet(), new HashSet());
+                s = new BoundSets(new LinkedHashSet(), new LinkedHashSet());
                 bounds.put(y, s);
             }
             else if (sharedBoundSets) {
                 // the bound sets are shared, we need to make a copy before
                 // we make any modifications.
-                s = new BoundSets(new HashSet(s.lowerBounds), s.upperBounds);
+                s = new BoundSets(new LinkedHashSet(s.lowerBounds), s.upperBounds);
                 bounds.put(y, s);
             }
             if (x instanceof Integer) {
@@ -432,7 +432,7 @@ public class ArrayIndexChecker extends DataFlow
         Set lowerBounds = bs.lowerBounds;
         Set upperBounds = bs.upperBounds;
         
-        bs = new BoundSets(new HashSet(), new HashSet());
+        bs = new BoundSets(new LinkedHashSet(), new LinkedHashSet());
         flow.integerBounds.put(o, bs);
         
         // all the bounds in bs are now invalid, and will be removed. However,
@@ -444,7 +444,7 @@ public class ArrayIndexChecker extends DataFlow
                 // b.lowerBound is in the map...
                 BoundSets bs2 = (BoundSets)flow.integerBounds.get(b.lowerBound);
                 if (bs2 != null) {
-                    bs2 = new BoundSets(bs2.lowerBounds, new HashSet(bs2.upperBounds));
+                    bs2 = new BoundSets(bs2.lowerBounds, new LinkedHashSet(bs2.upperBounds));
                     flow.integerBounds.put(b.lowerBound, bs2);
                     bs2.upperBounds.remove(b);
                 }
@@ -456,7 +456,7 @@ public class ArrayIndexChecker extends DataFlow
                 // b.upperBound is in the map...
                 BoundSets bs2 = (BoundSets)flow.integerBounds.get(b.upperBound);
                 if (bs2 != null) {
-                    bs2 = new BoundSets(new HashSet(bs2.lowerBounds), bs2.upperBounds);
+                    bs2 = new BoundSets(new LinkedHashSet(bs2.lowerBounds), bs2.upperBounds);
                     flow.integerBounds.put(b.upperBound, bs2);
                     bs2.lowerBounds.remove(b);
                 }
@@ -488,8 +488,8 @@ public class ArrayIndexChecker extends DataFlow
         //    All the lowerbounds still hold. 
         // For a decrement:
         //    All the upperbounds still hold. 
-        BoundSets newBS = isIncr ? new BoundSets(bs.lowerBounds, new HashSet())
-                                 : new BoundSets(new HashSet(), bs.upperBounds);
+        BoundSets newBS = isIncr ? new BoundSets(bs.lowerBounds, new LinkedHashSet())
+                                 : new BoundSets(new LinkedHashSet(), bs.upperBounds);
         
         outFlow.integerBounds.put(li, newBS);
         Set bsBounds = isIncr ? bs.upperBounds : bs.lowerBounds; 
@@ -522,11 +522,11 @@ public class ArrayIndexChecker extends DataFlow
                 BoundSets otherBs = (BoundSets)outFlow.integerBounds.get(obj);
                 if (otherBs != null) {
                     if (isIncr) {
-                        otherBs = new BoundSets(new HashSet(otherBs.lowerBounds), otherBs.upperBounds);
+                        otherBs = new BoundSets(new LinkedHashSet(otherBs.lowerBounds), otherBs.upperBounds);
                         otherBs.lowerBounds.remove(bound);
                     }
                     else {
-                        otherBs = new BoundSets(otherBs.lowerBounds, new HashSet(otherBs.upperBounds));
+                        otherBs = new BoundSets(otherBs.lowerBounds, new LinkedHashSet(otherBs.upperBounds));
                         otherBs.upperBounds.remove(bound);                        
                     }
                     outFlow.integerBounds.put(obj, otherBs);
@@ -840,7 +840,7 @@ public class ArrayIndexChecker extends DataFlow
         
         
         // loop through current array instances 
-        Set itemsToCheck = new HashSet(items);
+        Set itemsToCheck = new LinkedHashSet(items);
         for (Iterator iter = items.iterator(); iter.hasNext(); ) {
             DataFlowItem item = (DataFlowItem)iter.next();
             itemsToCheck.remove(item);
@@ -1194,7 +1194,7 @@ public class ArrayIndexChecker extends DataFlow
                                                             ail, 
                                                             false,
                                                             ailIntLowerBound, 
-                                                            new HashSet());
+                                                            new LinkedHashSet());
                     }
 
                 }
@@ -1204,13 +1204,13 @@ public class ArrayIndexChecker extends DataFlow
                     accessThrowsException = !isGreaterThan(dfIn.integerBounds, 
                                                        li, 
                                                        new Integer(-1),
-                                                       new HashSet()) ||
+                                                       new LinkedHashSet()) ||
                                             !isLessThan(dfIn.integerBounds, 
                                                         li, 
                                                         ail, 
                                                         false,
                                                         ailIntLowerBound, 
-                                                        new HashSet());
+                                                        new LinkedHashSet());
                 }
             }
             if (!accessThrowsException) {

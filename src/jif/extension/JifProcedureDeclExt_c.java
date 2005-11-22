@@ -83,7 +83,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * method can act.
      */
     protected Set constraintAuth(JifProcedureInstance mi, JifContext A) {
-        Set newAuth = new HashSet();
+        Set newAuth = new LinkedHashSet();
 
         for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
             Assertion c = (Assertion) iter.next();

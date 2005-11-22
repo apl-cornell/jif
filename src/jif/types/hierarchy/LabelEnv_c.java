@@ -83,7 +83,7 @@ public class LabelEnv_c implements LabelEnv
             // cmp is less than L2. However, if it has variables, we
             // need to add it regardless.
             if (cmp.hasVariables() || L2.hasVariables() || 
-                    !(this.leq(cmp, L2, new SearchState_c(new HashSet())))) {
+                    !(this.leq(cmp, L2, new SearchState_c(new LinkedHashSet())))) {
                 labelAssertions.add(new LabelLeAssertion_c(ts, cmp, L2, Position.COMPILER_GENERATED));
                 if (!this.hasVariables && (cmp.hasVariables() || L2.hasVariables())) {
                     // at least one assertion in this label env has a variable.
@@ -114,7 +114,7 @@ public class LabelEnv_c implements LabelEnv
     
     public boolean leq(Label L1, Label L2) { 
         return leq(L1.simplify(), L2.simplify(), 
-                   new SearchState_c(new AssertionUseCount(), new HashSet()));
+                   new SearchState_c(new AssertionUseCount(), new LinkedHashSet()));
     }
 
     /*
@@ -207,7 +207,7 @@ public class LabelEnv_c implements LabelEnv
             // already have this subgoal on the stack
             return false;
         }
-        currentGoals = new HashSet(currentGoals);
+        currentGoals = new LinkedHashSet(currentGoals);
         currentGoals.add(newGoal);
         state = new SearchState_c(auc, currentGoals);        
         

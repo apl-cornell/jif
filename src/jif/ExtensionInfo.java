@@ -57,7 +57,7 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo
         return (JifOptions)this.getOptions();
     }
     
-    static public Set topics = new HashSet();
+    static public Set topics = new LinkedHashSet();
     static { topics.add("jif"); }
 
     private TypeSystem jlTypeSystem() {

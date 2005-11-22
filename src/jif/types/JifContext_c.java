@@ -42,7 +42,7 @@ public class JifContext_c extends Context_c implements JifContext
     public Object copy() {
         JifContext_c ctxt = (JifContext_c)super.copy();
         if (auth != null) {
-            ctxt.auth = new HashSet(auth);
+            ctxt.auth = new LinkedHashSet(auth);
         }
         ctxt.env = env.copy();
         return ctxt;        

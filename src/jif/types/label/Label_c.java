@@ -186,7 +186,7 @@ public abstract class Label_c extends TypeObject_c implements Label {
      * <code>VarLabel</code>s.
      */
     private static class LabelVarGatherer extends LabelSubstitution {
-        private final Set variables = new HashSet();
+        private final Set variables = new LinkedHashSet();
 
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof VarLabel) {

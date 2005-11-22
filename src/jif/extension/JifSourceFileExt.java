@@ -30,7 +30,7 @@ public class JifSourceFileExt extends Jif_c
 	JifContext A = lc.context();
 	A = (JifContext) n.enterScope(A);
 
-        A.setAuthority(new HashSet());
+        A.setAuthority(new LinkedHashSet());
         A.setPc(ts.bottomLabel());
 
         lc = lc.context(A);

@@ -508,7 +508,7 @@ public class JifTypeSystem_c
         if (pc.clazz() instanceof JifPolyType) {
             JifPolyType pt = (JifPolyType) pc.clazz();
 
-            Map subst = new HashMap();
+            Map subst = new LinkedHashMap();
 
             Iterator i = pt.params().iterator();
             

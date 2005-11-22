@@ -83,7 +83,7 @@ public class PathMap
 
     /** Return all paths in the map including NV and RV. */
     public Set allPaths() {
-	return new HashSet(map.keySet());
+	return new LinkedHashSet(map.keySet());
     }
 
     public PathMap join(PathMap m) {

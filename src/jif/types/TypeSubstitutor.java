@@ -1,7 +1,7 @@
 package jif.types;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import jif.types.label.Label;
@@ -44,7 +44,7 @@ public class TypeSubstitutor {
         }
         else if (t instanceof JifSubstType && recurseIntoSubstType((JifSubstType)t)) {
             JifSubstType jst = (JifSubstType)t;
-            Map newMap = new HashMap();
+            Map newMap = new LinkedHashMap();
             boolean diff = false;
 
             for (Iterator i = jst.entries(); i.hasNext();) {

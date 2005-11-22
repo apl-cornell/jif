@@ -70,8 +70,8 @@ public class FileSystem
     /** Returns the set of groups in which <code>p</code> belongs.
      */
     public static Set groups(NativePrincipal p) {
-        Set grps = new HashSet();
-        Set supers = new HashSet(p.superiors());
+        Set grps = new LinkedHashSet();
+        Set supers = new LinkedHashSet(p.superiors());
         
         while (!supers.isEmpty()) {
             jif.lang.Principal one = (jif.lang.Principal) supers.iterator().next();

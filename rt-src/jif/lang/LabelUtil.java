@@ -43,7 +43,7 @@ public class LabelUtil
         if (l1 == null) return l2;
         if (l2 == null) return l1;
         
-        Set comps = new HashSet(flattenJoin(l1));
+        Set comps = new LinkedHashSet(flattenJoin(l1));
         comps.addAll(flattenJoin(l2));
         comps = simplifyJoin(comps);
         if (comps.size() == 1) {
@@ -101,7 +101,7 @@ public class LabelUtil
         }
     }
     protected static Set flattenJoin(Set labels) {
-        Set comps = new HashSet();
+        Set comps = new LinkedHashSet();
         for (Iterator iter = labels.iterator(); iter.hasNext(); ) {
             Label l = (Label)iter.next();
             comps.addAll(flattenJoin(l));

@@ -7,7 +7,7 @@ public class PrincipalSet
     private Set set;
 
     public PrincipalSet() {
-	set = new HashSet();
+	set = new LinkedHashSet();
     }
 
     public PrincipalSet add(Principal p) {

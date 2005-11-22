@@ -65,7 +65,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
      * the given <code>ReferenceType</code> that do not have an initializer.
      */
     protected static Set uninitFinalFields(ReferenceType type) {
-        Set s = new HashSet();
+        Set s = new LinkedHashSet();
     
         for (Iterator iter = type.fields().iterator(); iter.hasNext(); ) {
             JifFieldInstance fi = (JifFieldInstance) iter.next();

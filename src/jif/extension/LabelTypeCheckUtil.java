@@ -254,7 +254,7 @@ public class LabelTypeCheckUtil {
         Type t = ts.unlabel(type);
         if (t instanceof JifSubstType) {            
             JifSubstType jst = (JifSubstType)t;
-            Set lis = new HashSet();
+            Set lis = new LinkedHashSet();
             for (Iterator i = jst.entries(); i.hasNext();) {
                 Map.Entry e = (Map.Entry)i.next();
                 Object arg = e.getValue();

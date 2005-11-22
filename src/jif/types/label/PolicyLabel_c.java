@@ -20,7 +20,7 @@ public class PolicyLabel_c extends Label_c implements PolicyLabel {
         super(ts, pos, new PolicyLabelToJavaExpr_c()); 
         if (owner == null) throw new InternalCompilerError("null owner");
         this.owner = owner;
-        this.readers = new HashSet(TypedList.copyAndCheck(new ArrayList(readers), Principal.class, true));
+        this.readers = new LinkedHashSet(TypedList.copyAndCheck(new ArrayList(readers), Principal.class, true));
     }
     
     public Principal owner() {
@@ -152,7 +152,7 @@ public class PolicyLabel_c extends Label_c implements PolicyLabel {
 
         Principal newOwner = owner.subst(substitution);
         if (newOwner != owner) changed = true;
-        Set newReaders = new HashSet(readers.size());
+        Set newReaders = new LinkedHashSet(readers.size());
         
         
         for (Iterator i = readers.iterator(); i.hasNext(); ) {

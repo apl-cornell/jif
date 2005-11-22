@@ -28,7 +28,7 @@ public class VarMap {
 
     public VarMap(JifTypeSystem ts, Label defaultBound) {
 	this.ts = ts;
-	this.bounds = new HashMap();
+	this.bounds = new LinkedHashMap();
         this.defaultBound = defaultBound;
         if (defaultBound == null) {
             throw new InternalCompilerError("defaultBound cannot be null");
@@ -37,7 +37,7 @@ public class VarMap {
 
     private VarMap(JifTypeSystem ts, Map bounds, Label defaultBound) {
 	this.ts = ts;
-	this.bounds = new HashMap(bounds);
+	this.bounds = new LinkedHashMap(bounds);
         this.defaultBound = defaultBound;
         if (defaultBound == null) {
             throw new IllegalArgumentException("defaultBound cannot be null");
@@ -103,7 +103,7 @@ public class VarMap {
         }
         else if (t instanceof JifSubstType) {
             JifSubstType jst = (JifSubstType)t;
-            Map newMap = new HashMap();
+            Map newMap = new LinkedHashMap();
             boolean diff = false;
 
             for (Iterator i = jst.entries(); i.hasNext();) {

@@ -94,7 +94,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
     public JifContext addAuthorityToContext(JifContext A) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         JifParsedPolyType ct = (JifParsedPolyType) this.type;
-        Set s = new HashSet(ct.authority());
+        Set s = new LinkedHashSet(ct.authority());
         if (ts.isSubtype(ct, ts.PrincipalClass())) {
             // This class implements jif.lang.Princpal, and as such
             // implcitly has the authority of the principal represented by
@@ -124,7 +124,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         ct.setInstantiatedFrom(pc);
         pc.clazz(ct);
 
-        Set names = new HashSet(params.size());
+        Set names = new LinkedHashSet(params.size());
 
         List newParams = new ArrayList(params.size());
         for (Iterator i = params.iterator(); i.hasNext();) {

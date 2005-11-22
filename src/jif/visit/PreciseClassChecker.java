@@ -174,10 +174,10 @@ public class PreciseClassChecker extends DataFlow
         Map m = new HashMap(map);
         Set s = (Set)m.get(ap);
         if (s == null) {
-            s = new HashSet();
+            s = new LinkedHashSet();
         }
         else {
-            s = new HashSet(s);
+            s = new LinkedHashSet(s);
         }
         m.put(ap, s);
         s.add(type);
@@ -221,7 +221,7 @@ public class PreciseClassChecker extends DataFlow
             for (Iterator iter = intersectMap.entrySet().iterator(); iter.hasNext(); ) {
                 Map.Entry e = (Entry)iter.next();
                 if (m.containsKey(e.getKey())) {
-                    Set s = new HashSet((Set)e.getValue());
+                    Set s = new LinkedHashSet((Set)e.getValue());
                     Set t = (Set)m.get(e.getKey());
                     s.retainAll(t); // could be more precise here, a la SubtypeSet
                 }

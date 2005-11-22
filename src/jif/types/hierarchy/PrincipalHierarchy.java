@@ -1,11 +1,6 @@
 package jif.types.hierarchy;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import jif.types.principal.Principal;
 
@@ -86,7 +81,7 @@ public class PrincipalHierarchy {
 
 	if (s == null) {
 	    // create a new set of granting principals
-	    s = new HashSet();
+	    s = new LinkedHashSet();
 	    actsfor.put(actor, s);
 	}
 
@@ -94,7 +89,7 @@ public class PrincipalHierarchy {
     }
 
     public boolean actsFor(Principal actor, Principal granter) {
-	return actsFor(actor, granter, new HashSet());
+	return actsFor(actor, granter, new LinkedHashSet());
     }
 
     protected boolean actsFor(Principal actor, Principal granter, Set visited) {
@@ -158,7 +153,7 @@ public class PrincipalHierarchy {
 	    Map.Entry e = (Map.Entry) i.next();
 	    Principal p = (Principal) e.getKey();
 	    Set s = (Set) e.getValue();
-	    dup.actsfor.put(p, new HashSet(s));
+	    dup.actsfor.put(p, new LinkedHashSet(s));
 	}
 
 	return dup;
