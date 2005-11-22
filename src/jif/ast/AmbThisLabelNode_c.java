@@ -40,9 +40,8 @@ public class AmbThisLabelNode_c extends AmbLabelNode_c
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
 	if (!ct.thisLabel().isCanonical()) {
-	    Scheduler sched = sc.job().extensionInfo().scheduler();
-	    Goal g = sched.Disambiguated(sc.job());
-	    throw new MissingDependencyException(g);
+            sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
 	}
 
         return nf.CanonicalLabelNode(position(), ct.thisLabel());

@@ -62,39 +62,42 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
         if (this.expr == expr) { return this; }
         return new AmbExprParam_c(this.position, expr, expectedPI); 
     }
-    
-    private int expr_disamb_fail_count = 0;
-    private static final int EXPR_DISAMB_FAIL_LIMIT = 40;    
-    
+        
     /** 
      * Always return a CanoncialLabelNode, and let the dynamic label be possibly 
      * changed to a dynamic principal later.
      */
-    public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-        if (!sc.isASTDisambiguated(expr)) {
-            Scheduler sched = sc.job().extensionInfo().scheduler();
-            Goal g = sched.Disambiguated(sc.job());
-            throw new MissingDependencyException(g);
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        if (!ar.isASTDisambiguated(expr)) {
+            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
         }
-        JifContext c = (JifContext)sc.context();
-        JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
-        JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
+        JifContext c = (JifContext)ar.context();
+        JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
+        JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
         // run the typechecker over expr.
-        TypeChecker tc = new TypeChecker(sc.job(), ts, nf);
-        tc = (TypeChecker) tc.context(sc.context());
+        TypeChecker tc = new TypeChecker(ar.job(), ts, nf);
+        tc = (TypeChecker) tc.context(ar.context());
 	expr = (Expr)expr.visit(tc);
     
-        if (expr.type() == null || !expr.type().isCanonical()) {
-            if (++expr_disamb_fail_count < EXPR_DISAMB_FAIL_LIMIT) {
-                // keep trying until we exhaust our patience.
-                // needed for some cases where we can't distinguish if
-                // we need to push on regardless, or wait until the type
-                // really can be resolved.
-                Scheduler sched = sc.job().extensionInfo().scheduler();
-                Goal g = sched.Disambiguated(sc.job());
-                throw new MissingDependencyException(g);
+        if (! expr.isTypeChecked()) {
+            if (expr instanceof Field) {
+                Field f = (Field)expr;
+                if (ts.unlabel(f.target().type()) instanceof ParsedClassType) {
+                    // disambiguate the class of the receiver of the field,
+                    // so that type checking will eventually go through.
+                    ParsedClassType pct = (ParsedClassType)ts.unlabel(f.target().type());
+                    Scheduler sched = ar.job().extensionInfo().scheduler();
+                    Goal g = sched.Disambiguated(pct.job());
+                    throw new MissingDependencyException(g);                        
+                }
             }
+//            Scheduler sched = ar.job().extensionInfo().scheduler();
+//            Goal g = sched.Disambiguated(ar.job());
+//            throw new MissingDependencyException(g);                        
+            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
         }
 
 	if (expr instanceof PrincipalNode || 

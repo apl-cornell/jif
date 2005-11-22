@@ -96,8 +96,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             Formal f = (Formal)i.next();
             if (!f.isDisambiguated()) {
                 // formals are not disambiguated yet.
-                Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
-                throw new MissingDependencyException(g);
+                ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                return this;
             }
             formalTypes.add(f.declType());
         }
@@ -106,8 +106,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         // return type
         if (!n.returnType().isDisambiguated()) {
             // return type node not disambiguated yet
-            Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
-            throw new MissingDependencyException(g);
+            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
         }
 
         DefaultSignature ds = jts.defaultSignature();
@@ -122,14 +122,14 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
 
         if (n.startLabel() != null && !n.startLabel().isDisambiguated()) {
             // the startlabel node hasn't been disambiguated yet
-            Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
-            throw new MissingDependencyException(g);
+            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
         }
 
         if (n.returnLabel() != null && !n.returnLabel().isDisambiguated()) {
             // the return label node hasn't been disambiguated yet
-            Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
-            throw new MissingDependencyException(g);
+            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
         }
 
         Label Li; // start label
@@ -161,8 +161,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             TypeNode tn = (TypeNode)i.next();
             if (!tn.isDisambiguated()) {
                 // throw types haven't been disambiguated yet.
-                Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
-                throw new MissingDependencyException(g);
+                ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                return this;
             }
             
             Type xt = tn.type();
@@ -179,8 +179,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             ConstraintNode cn = (ConstraintNode) i.next();
             if (!cn.isDisambiguated()) {
                 // constraint nodes haven't been disambiguated yet.
-                Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
-                throw new MissingDependencyException(g);
+                ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                return this;
             }
             constraints.add(cn.constraint());
         }

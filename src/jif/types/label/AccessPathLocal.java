@@ -1,9 +1,9 @@
 package jif.types.label;
 
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import polyglot.types.*;
-import polyglot.types.LocalInstance;
-import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -24,7 +24,7 @@ public class AccessPathLocal extends AccessPathRoot {
         }
     }
     
-    public boolean isCanonical() { return li.isCanonical(); }
+    public boolean isCanonical() { return !(li.type() instanceof UnknownType); }
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         if (r instanceof AccessPathLocal) {            
             if (li.equals(((AccessPathLocal)r).li)) {

@@ -3,13 +3,11 @@ package jif.ast;
 import jif.types.*;
 import jif.types.label.AccessPath;
 import jif.types.label.Label;
-import polyglot.ast.Expr;
-import polyglot.ast.Node;
+import polyglot.ast.*;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
-import polyglot.types.Context;
-import polyglot.types.SemanticException;
+import polyglot.types.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.*;
@@ -27,9 +25,6 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
     public String toString() {
 	return "*" + expr + "{amb}";
     }
-
-    private int expr_disamb_fail_count = 0;
-    private static final int EXPR_DISAMB_FAIL_LIMIT = 40;
     
     /** Disambiguate the type of this node. */
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
@@ -38,9 +33,8 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
     
         if (!sc.isASTDisambiguated(expr)) {
-            Scheduler sched = sc.job().extensionInfo().scheduler();
-            Goal g = sched.Disambiguated(sc.job());
-            throw new MissingDependencyException(g);
+            sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
         }
 
         // run the typechecker over expr.
@@ -49,15 +43,29 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         expr = (Expr)expr.visit(tc);
 	
         if (expr.type() == null || !expr.type().isCanonical()) {
-            if (++expr_disamb_fail_count < EXPR_DISAMB_FAIL_LIMIT) {
-                // keep trying until we exhaust our patience.
-                // needed for some cases where we can't distinguish if
-                // we need to push on regardless, or wait until the type
-                // really can be resolved.
-                Scheduler sched = sc.job().extensionInfo().scheduler();
-                Goal g = sched.Disambiguated(sc.job());
-                throw new MissingDependencyException(g);
+            if (expr instanceof Field) {
+                Field f = (Field)expr;
+                if (ts.unlabel(f.target().type()) instanceof ParsedClassType) {
+                    // disambiguate the class of the receiver of the field,
+                    // so that type checking will eventually go through.
+                    ParsedClassType pct = (ParsedClassType)ts.unlabel(f.target().type());
+                    Scheduler sched = sc.job().extensionInfo().scheduler();
+                    Goal g = sched.Disambiguated(pct.job());
+                    throw new MissingDependencyException(g);                        
+                }
+//                System.err.println("***Failed with " + expr + " : " + expr.getClass() + " " + expr.type());
+//                System.err.println("   unlabeled target type: " + ts.unlabel(f.target().type()));
+//                System.err.println("   target : " + f.target() + "  " + f.target().getClass());
+//                if (f.target() instanceof Local) {
+//                    Local loc = (Local)f.target();
+//                    System.err.println("   local context lookup: " + sc.context().findLocal(loc.name()));
+//                }
             }
+//            Scheduler sched = sc.job().extensionInfo().scheduler();
+//            Goal g = sched.Disambiguated(sc.job());
+//            throw new MissingDependencyException(g);                        
+            sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
         }
 
         if (expr.type() != null && expr.type().isCanonical() && 

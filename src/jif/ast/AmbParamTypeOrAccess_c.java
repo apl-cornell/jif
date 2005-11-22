@@ -84,9 +84,8 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 
 	if (!ar.isASTDisambiguated(prefix) || 
             (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr))) {
-            Scheduler sched = ar.job().extensionInfo().scheduler();
-            Goal g = sched.Disambiguated(ar.job());
-            throw new MissingDependencyException(g);
+            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
 	}
     
 	if (prefix instanceof TypeNode) {

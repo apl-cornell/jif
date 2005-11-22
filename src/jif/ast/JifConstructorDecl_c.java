@@ -102,8 +102,8 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             Formal f = (Formal)i.next();
             if (!f.isDisambiguated()) {
                 // formals are not disambiguated yet.
-                Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
-                throw new MissingDependencyException(g);
+                ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                return this;
             }
             formalTypes.add(f.declType());
         }
@@ -138,8 +138,8 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             TypeNode tn = (TypeNode)i.next();
             if (!tn.isDisambiguated()) {
                 // throw types haven't been disambiguated yet.
-                Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
-                throw new MissingDependencyException(g);
+                ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                return this;
             }
             
             Type xt = tn.type();
@@ -156,8 +156,8 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             ConstraintNode cn = (ConstraintNode) i.next();
             if (!cn.isDisambiguated()) {
                 // constraint nodes haven't been disambiguated yet.
-                Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
-                throw new MissingDependencyException(g);
+                ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                return this;
             }
             constraints.add(cn.constraint());
         }

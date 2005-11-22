@@ -70,20 +70,27 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Am
     }
 
     public boolean isDisambiguated() {
-        return typePart.isDisambiguated() && labelPart.isDisambiguated();
+        return false;
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (!this.typePart.isDisambiguated() || !this.labelPart.isDisambiguated()) {
+//        System.err.println("LabeledTypeNode.disamb: typepart: " + this.typePart + "   :::  labelPart: " + this.labelPart);
+        LabeledTypeNode_c n = this;
+        if (n.typePart.isDisambiguated()) {
+            // give n's type a partial disambiguation, even if we can't give
+            // the full one yet.
+            n = (LabeledTypeNode_c)n.type(n.typePart.type());
+        }
+        if (!n.typePart.isDisambiguated() || !n.labelPart.isDisambiguated()) {
             // the children haven't been disambiguated yet
-            Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
-            throw new MissingDependencyException(g);
+            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return n;
         }
 
         JifTypeSystem jts = (JifTypeSystem) ar.typeSystem();
 
-	Type t = typePart.type();
-	Label L = labelPart.label();
+	Type t = n.typePart.type();
+	Label L = n.labelPart.label();
     
 	if (t.isVoid()) {
 	    throw new SemanticException("The void type cannot be labeled.",
@@ -91,7 +98,7 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Am
 	}
 
 	return ar.nodeFactory().CanonicalTypeNode(position(), 
-	    jts.labeledType(position(), t, L));
+	    jts.labeledType(n.position(), t, L));
     }
 
     public String toString() {

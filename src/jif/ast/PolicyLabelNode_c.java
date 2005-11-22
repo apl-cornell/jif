@@ -68,9 +68,8 @@ public class PolicyLabelNode_c extends AmbLabelNode_c implements PolicyLabelNode
 	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
         if (!owner.isDisambiguated()) {
-            Scheduler sched = ar.job().extensionInfo().scheduler();
-            Goal g = sched.Disambiguated(ar.job());
-            throw new MissingDependencyException(g);
+            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
         }
 
         Principal o = owner.principal();
@@ -81,9 +80,8 @@ public class PolicyLabelNode_c extends AmbLabelNode_c implements PolicyLabelNode
 	for (Iterator i = this.readers.iterator(); i.hasNext(); ) {
 	    PrincipalNode r = (PrincipalNode) i.next();
             if (!r.isDisambiguated()) {
-                // reader is not yet ready...
-                Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
-                throw new MissingDependencyException(g);
+                ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                return this;
             }
 	    l.add(r.principal());
 	}

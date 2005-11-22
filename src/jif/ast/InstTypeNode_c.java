@@ -93,8 +93,8 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
         
         if (!base.isDisambiguated() || !b.isCanonical()) {
             //  not yet ready to disambiguate
-            Goal g = sc.job().extensionInfo().scheduler().Disambiguated(sc.job());
-            throw new MissingDependencyException(g);
+            sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
         }
 
         if (! (b instanceof JifPolyType) || ((JifPolyType)b).params().isEmpty()) {
@@ -112,8 +112,8 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
             
             if (!p.isDisambiguated()) {
                 // the param is not yet ready
-                Goal g = sc.job().extensionInfo().scheduler().Disambiguated(sc.job());
-                throw new MissingDependencyException(g);
+                sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                return this;
             }
             
             if (pi.isLabel() && !(p.parameter() instanceof Label)) {

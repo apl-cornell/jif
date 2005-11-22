@@ -112,9 +112,8 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
      */
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
 	if (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr)) {
-            Scheduler sched = ar.job().extensionInfo().scheduler();
-            Goal g = sched.Disambiguated(ar.job());
-            throw new MissingDependencyException(g);
+            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
 	}
 
 	JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
@@ -157,8 +156,8 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 		List l = new LinkedList();
                 if (!pn.isDisambiguated()) {
                     // the instance is not yet ready
-                    Goal g = ar.job().extensionInfo().scheduler().Disambiguated(ar.job());
-                    throw new MissingDependencyException(g);
+                    ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                    return this;
                 }
 
                 l.add(pn.parameter());

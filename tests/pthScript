@@ -123,6 +123,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Deref.jif ;
 	Deref2.jif ;
 	Disamb01.jif Disamb01A.jif ;
+	Disamb02.jif Disamb02A.jif Disamb02B.jif ;
 	DuplicateClass.jif (Semantic, "Duplicate class");
 	Dyn1.jif ;
 	Dyn2.jif ;

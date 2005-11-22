@@ -56,9 +56,8 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
 	for (Iterator i = this.components.iterator(); i.hasNext(); ) {
 	    LabelNode n = (LabelNode) i.next();
             if (!n.isDisambiguated()) {
-                Scheduler sched = sc.job().extensionInfo().scheduler();
-                Goal g = sched.Disambiguated(sc.job());
-                throw new MissingDependencyException(g);
+                sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                return this;
             }
 	    l.add(n.label());
 	}

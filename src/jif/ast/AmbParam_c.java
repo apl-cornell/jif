@@ -60,9 +60,8 @@ public class AmbParam_c extends Node_c implements AmbParam
 
         if (!vi.isCanonical() && pi == null) {
             // not yet ready to disambiguate
-            Scheduler sched = sc.job().extensionInfo().scheduler();
-            Goal g = sched.Disambiguated(sc.job());
-            throw new MissingDependencyException(g);
+            sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
         }
 	if (vi instanceof JifVarInstance) {
 	    return varToParam((JifVarInstance) vi, sc);

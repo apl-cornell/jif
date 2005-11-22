@@ -59,14 +59,18 @@ public class JifFormalDel extends JifJL_c
         Formal n = (Formal)super.disambiguate(ar);
         JifTypeSystem jts = (JifTypeSystem)ar.typeSystem();
 
+        JifLocalInstance li = (JifLocalInstance)n.localInstance();
+        li.setFlags(n.flags());
+        li.setName(n.name());
+        li.setType(n.declType());
+        //System.err.println("JifFormalDel.disamb: n.type: "  + n.type().getClass() );
+
         if (!n.type().isDisambiguated()) {
-	    Scheduler sched = ar.job().extensionInfo().scheduler();
-	    Goal g = sched.Disambiguated(ar.job());
-	    throw new MissingDependencyException(g);
+            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return n;
 	}
         
         
-        JifLocalInstance li = (JifLocalInstance)n.localInstance();
         if (!isCatchFormal) {
             ArgLabel al = (ArgLabel)li.label();
             if (al.upperBound() == null) {
@@ -92,10 +96,7 @@ public class JifFormalDel extends JifJL_c
                 n = n.type(n.type().type(lblType));                
             }
         }
-        li.setFlags(n.flags());
-        li.setName(n.name());
-        li.setType(n.declType());
-        
+
         return n;
     }
 }
