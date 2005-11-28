@@ -17,6 +17,8 @@ public interface List[label L] extends Collection[L] {
 
     int{L;o} indexOf(JifObject[L] o);
     int{L;o} lastIndexOf(JifObject[L] o);
+    int{L;*lbl;lbl;o} indexOf(label lbl, JifObject[lbl] o);
+    int{L;*lbl;lbl;o} lastIndexOf(label lbl, JifObject[lbl] o);
 
     ListIterator[L]{this} listIterator();
     ListIterator[L]{this;L} listIterator(int{L} index)

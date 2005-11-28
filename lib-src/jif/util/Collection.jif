@@ -13,6 +13,7 @@ public interface Collection[label L] extends JifObject[L] {
     int{L} size();
     boolean{L} isEmpty();
     boolean{L;o} contains(JifObject[L] o);
+    boolean{L;*lbl;lbl;o} contains(label lbl, JifObject[lbl] o);
     Iterator[L]{this} iterator();
 
     JifObject[L]{L}[]{L} toArray{L}();

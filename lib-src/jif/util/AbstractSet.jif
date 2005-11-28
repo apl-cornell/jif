@@ -8,6 +8,9 @@ public abstract class AbstractSet[label L] extends AbstractCollection[L]
     protected AbstractSet() {
     }
 
+    public boolean{L;o} equals(IDComparable[L] o) {
+        return equals(L, o);
+    }
     public boolean{L} removeAll{L}(Collection[L]{L} c) {
         if (c == null) return false;
 

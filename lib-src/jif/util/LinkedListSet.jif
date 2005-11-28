@@ -20,9 +20,9 @@ public class LinkedListSet[label L] extends AbstractSet[L]
     }
 
 
-    public boolean{L;o} contains(JifObject[L] o) {
+    public boolean{L;*lbl;lbl;o} contains(label lbl, JifObject[lbl] o) {
         try {
-            return list.contains(o);
+            return list.contains(lbl,o);
         }
         catch (NullPointerException impossible) { return false;}
     }
@@ -66,7 +66,7 @@ public class LinkedListSet[label L] extends AbstractSet[L]
         catch (NullPointerException impossible) { return 0;}
 
     }
-    public boolean{L;o} equals(IDComparable[L] o) {
+    public boolean{L;*lbl;lbl;o} equals(label lbl, IDComparable[lbl] o) {
         if (o == null) 
             return false;
             
@@ -76,14 +76,14 @@ public class LinkedListSet[label L] extends AbstractSet[L]
             // is currently no side effect free way of iterating through
             // a Set. So welll live with it at the moment by insisting that
             // they must be the same class...
-        if (!(o instanceof LinkedListSet[L]))
+        if (!(o instanceof LinkedListSet[lbl]))
             return false;
 
         if (o == this)
             return true;
 
 
-        LinkedListSet[L] that = (LinkedListSet[L])o;
+        LinkedListSet[lbl] that = (LinkedListSet[lbl])o;
 
         int sz = this.size();
         if (sz != that.size()) 
@@ -93,7 +93,7 @@ public class LinkedListSet[label L] extends AbstractSet[L]
         while (i < sz) {
             try {
                 JifObject[L] elem = this.list.get(i);
-                if (!that.contains(elem)) {
+                if (!that.contains(L, elem)) {
                     return false;
                 }                    
             }

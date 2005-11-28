@@ -321,10 +321,13 @@ public final class Date[covariant label L] implements JifObject[L] {
     }
 
     public boolean{L;o} equals(IDComparable[L] o) {
-        if (o == null || !(o instanceof Date[L])) {
+        return equals(L, o);
+    }
+    public boolean{L;*lbl;lbl;o} equals(label lbl, IDComparable[lbl] o) {
+        if (o == null || !(o instanceof Date[lbl])) {
             return false;
         }
-        Date[L] that = (Date[L])o;
+        Date[lbl] that = (Date[lbl])o;
         return this.year == that.year &&
             this.month == that.month &&
             this.day == that.day;

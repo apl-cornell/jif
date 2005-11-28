@@ -19,6 +19,10 @@ public abstract class AbstractCollection[label L] implements Collection[L] {
     }
 
     
+    public boolean{L;o} contains(JifObject[L] o) {
+        return contains(L, o);
+    }
+
     public boolean{L} add{L}(JifObject[L]{L} o):{L} throws (ClassCastException{L}, IllegalArgumentException{L})
     {
 	return false;

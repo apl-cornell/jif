@@ -34,19 +34,21 @@ public abstract class AbstractList[label L] extends AbstractCollection[L]
 
 
     // Search Operations
-
-    public boolean{L;elem} contains(JifObject[L] elem) {
-        return indexOf(elem) >= 0;
+    public boolean{L;*lbl;lbl;elem} contains(label lbl, JifObject[lbl] elem) {
+        return indexOf(lbl,elem) >= 0;
     }
 
 
     public int{L;o} indexOf(JifObject[L] o) {
+        return indexOf(L, o);
+    }
+    public int{L;*lbl;lbl;o} indexOf(label lbl, JifObject[lbl] o) {
         int i = 0;
         int sz = size();
         try {
             while (i < sz) {
                 JifObject[L] e = get(i);
-                if (o == e || (o != null && o.equals(e))) {
+                if (o == e || (o != null && o.equals(L, e))) {
                     return i;
                 }
                 i++;
@@ -57,11 +59,14 @@ public abstract class AbstractList[label L] extends AbstractCollection[L]
     }
 
     public int{L;o} lastIndexOf(JifObject[L] o) {
+        return lastIndexOf(L, o);
+    }
+    public int{L;*lbl;lbl;o} lastIndexOf(label lbl, JifObject[lbl] o) {
         int i = size() - 1;
         try {
             while (i >= 0) {
                 JifObject[L] e = get(i);
-                if (o == e || (o != null && o.equals(e))) {
+                if (o == e || (o != null && o.equals(L, e))) {
                     return i;
                 }
                 i--;
@@ -107,19 +112,23 @@ public abstract class AbstractList[label L] extends AbstractCollection[L]
         }
         return hashCode;
     }
-
+    
     public boolean{L;o} equals(IDComparable[L] o) {
+        return equals(L, o);
+    }
+
+    public boolean{L; *lbl; lbl; o} equals(label lbl, IDComparable[lbl] o) {
         if (o == null) 
             return false;
         
-        if (!(o instanceof List[L]))
+        if (!(o instanceof List[lbl]))
             return false;
         
         if (o == this)
             return true;
         
         
-        List[L] that = (List[L])o;
+        List[lbl] that = (List[lbl])o;
         
         int sz = this.size();
         if (sz != that.size()) 
@@ -128,10 +137,10 @@ public abstract class AbstractList[label L] extends AbstractCollection[L]
         int i = 0;
         while (i < sz) {
             try {
-                JifObject[L] o1 = that.get(i);
+                JifObject[lbl] o1 = that.get(i);
                 JifObject[L] o2 = this.get(i);
                 
-                if (!(o1==null ? o2==null : o1.equals(o2))) {
+                if (!(o1==null ? o2==null : o1.equals(L, o2))) {
                     return false;
                 }
             }

@@ -47,13 +47,13 @@ public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
 		
 	}
 	
-	public JifObject[V]{K;key} get(JifObject[K] key)
+	public JifObject[V]{K;*lbl;lbl;key} get(label lbl, JifObject[lbl] key)
 	{
 		try
 		{
 			for(int i = 0; i < numberOfElements; i++)
 			{
-				if(arrayOfKeys[i].equals(key))
+				if(arrayOfKeys[i].equals(lbl, key))
 				{
 					return arrayOfValues[i];
 				}
@@ -169,8 +169,11 @@ public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
 	  */
 	
 	// hashing and equals
-	public boolean{K;V;o} equals(IDComparable[{K;V}] o)
-	{
+        public boolean{K;V;o} equals(IDComparable[{K;V}] o)
+        {
+            return equals(new label {K;V}, o);
+        }
+        public boolean{K;V; *lbl; lbl; o} equals(label lbl, IDComparable[lbl] o) {
 		if(o == null)
 		{
 			return false;
@@ -299,13 +302,13 @@ class LocalKeySet[label K, label V] extends AbstractSet[K] {
 		return 0;
 	}	
 	
-	public boolean{K;o} contains(JifObject[K] o)
+	public boolean{K;*lbl;lbl;o} contains(label lbl, JifObject[lbl] o)
 	{
 		try
 		{
 			for(int i = 0; i < parent.numberOfElements; i++)
 			{
-				if(parent.arrayOfKeys[i].equals(o))
+				if(parent.arrayOfKeys[i].equals(lbl, o))
 				{
 					return true;
 				}
@@ -354,8 +357,12 @@ class LocalKeySet[label K, label V] extends AbstractSet[K] {
 	
 	
 	
-	public boolean{K;o} equals(IDComparable[K] o)
-	{
+        public boolean{K;o} equals(IDComparable[K] o)
+        {
+            return equals(K, o);
+        }
+        public boolean{K; *lbl; lbl; o} equals(label lbl, IDComparable[lbl] o) 
+        {
 		if(o == null)
 		{
 			return false;
@@ -365,12 +372,12 @@ class LocalKeySet[label K, label V] extends AbstractSet[K] {
 			return true;
 		}
 		
-		if(!(o instanceof Set[K]))
+		if(!(o instanceof Set[lbl]))
 		{
 			return false;
 		}
 		
-		Set[K] other = (Set[K])o;
+		Set[lbl] other = (Set[lbl])o;
 		
 		try
 		{
@@ -382,7 +389,7 @@ class LocalKeySet[label K, label V] extends AbstractSet[K] {
 			for(int i = 0; i < parent.numberOfElements; i++)
 			{
 				JifObject[K] nextKey = parent.arrayOfKeys[i];
-				if(!other.contains(nextKey))
+				if(!other.contains(K, nextKey))
 				{
 					return false;
 				}
