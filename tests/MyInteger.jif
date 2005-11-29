@@ -8,4 +8,7 @@ public class MyInteger implements JifObject[{}] {
     public boolean{o} equals(IDComparable[{}] o) {
         return false;
     }
+    public boolean{*lbl;lbl;o} equals(label lbl, IDComparable[lbl] o) {
+        return false;
+    }
 }
