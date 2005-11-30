@@ -185,41 +185,47 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         String name = jpt.name();
         StringBuffer sb = new StringBuffer();
         sb.append("static public boolean %s(%LF) {");
-        sb.append("if (o instanceof %s) { ");
-        sb.append("%s c = (%s)o; ");
-
-        // now test each of the params
-        boolean moreThanOneParam = (jpt.params().size() > 1);
-        sb.append(moreThanOneParam?"boolean ok = true;":"");
-        for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
-            ParamInstance pi = (ParamInstance)iter.next();
-            String paramFieldName = ParamToJavaExpr_c.paramFieldName(pi);
-            String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
-            String comparison = "equivalentTo";
-            if (pi.isCovariantLabel()) {
-                comparison = "relabelsTo";
+        if (jpt.params().isEmpty()) {
+            sb.append("return (o instanceof %s);");            
+        }
+        else {
+            sb.append("if (o instanceof %s) { ");
+            sb.append("%s c = (%s)o; ");
+    
+            // now test each of the params
+            boolean moreThanOneParam = (jpt.params().size() > 1);
+            sb.append(moreThanOneParam?"boolean ok = true;":"");
+            for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
+                ParamInstance pi = (ParamInstance)iter.next();
+                String paramFieldName = ParamToJavaExpr_c.paramFieldName(pi);
+                String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
+                String comparison = "equivalentTo";
+                if (pi.isCovariantLabel()) {
+                    comparison = "relabelsTo";
+                }
+    
+                sb.append(moreThanOneParam?"ok = ok && ":"return ");
+    
+                String paramExpr = paramFieldName;
+                if (useGetters) {
+                    paramExpr = ParamToJavaExpr_c.paramFieldNameGetter(pi) + "()";
+                }
+                if (pi.isPrincipal()) {  
+                    // e.g., PrincipalUtil.equivTo(c.expr, paramArgName)
+                    sb.append("jif.lang.PrincipalUtil."+comparison+
+                                         "(c."+paramExpr+","+paramArgName+");");
+                }
+                else {
+                    // e.g., LabelUtil.equivTo(paramArgName)
+                    sb.append("jif.lang.LabelUtil."+comparison+
+                              "(c."+paramExpr+","+paramArgName+");");
+                }
             }
-
-            sb.append(moreThanOneParam?"ok = ok && ":"return ");
-
-            String paramExpr = paramFieldName;
-            if (useGetters) {
-                paramExpr = ParamToJavaExpr_c.paramFieldNameGetter(pi) + "()";
-            }
-            if (pi.isPrincipal()) {  
-                // e.g., PrincipalUtil.equivTo(c.expr, paramArgName)
-                sb.append("jif.lang.PrincipalUtil."+comparison+
-                                     "(c."+paramExpr+","+paramArgName+");");
-            }
-            else {
-                // e.g., LabelUtil.equivTo(paramArgName)
-                sb.append("jif.lang.LabelUtil."+comparison+
-                          "(c."+paramExpr+","+paramArgName+");");
-            }
+            if (moreThanOneParam) sb.append("return ok;");
+            sb.append("}");
+            sb.append("return false;");
         }
 
-        sb.append(moreThanOneParam?"return ok; }":"}");
-        sb.append("return false;");
 
         sb.append("}");
 

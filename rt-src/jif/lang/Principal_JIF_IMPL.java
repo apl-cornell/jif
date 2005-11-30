@@ -5,8 +5,7 @@ package jif.lang;
  */
 public abstract class Principal_JIF_IMPL {
     public static boolean jif$Instanceof(final Object o) {
-        if (o instanceof Principal) { Principal c = (Principal) o; }
-        return false;
+        return o instanceof Principal;
     }
     
     public static Principal jif$cast$jif_lang_Principal(final Object o) {
