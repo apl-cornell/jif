@@ -6,6 +6,7 @@ import java.util.List;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.*;
 import jif.types.principal.*;
+import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.types.*;
 import polyglot.util.Position;
@@ -28,6 +29,8 @@ public interface JifTypeSystem extends ParamTypeSystem
     /** Returns a labeled type, type{label}. */
     LabeledType labeledType(Position pos, Type type, Label label);
 
+    ClassType nullInstantiate(Position pos, PClass pc);
+    
     /** Constructs a parameter instance for a class parameter declaration */
     ParamInstance paramInstance(Position pos, JifClassType container,
 				ParamInstance.Kind kind, String name);
