@@ -50,8 +50,7 @@ public class JifTypeNodeDel extends JifJL_c
             // We need to have check this here, as well as in 
             // AmbThisLabelNode_c because the static context is not set 
             // correctly when disambiguating method signatures.
-            JifClassType ct = (JifClassType)tc.context().currentClass();
-            TypeSubstitutor tsb = new TypeSubstitutor(new StaticLabelChecker(tn.position(), ct.thisLabel()));
+            TypeSubstitutor tsb = new TypeSubstitutor(new StaticLabelChecker(tn.position()));
             tsb.rewriteType(tn.type());
             
         }
@@ -65,12 +64,10 @@ public class JifTypeNodeDel extends JifJL_c
      * the This label
      */    
     protected static class StaticLabelChecker extends LabelSubstitution {
-        private Label thisLabel;
         private Position position;
 
-        StaticLabelChecker(Position position, Label thisLbl) {
+        StaticLabelChecker(Position position) {
             this.position = position;
-            this.thisLabel = thisLbl;
         }
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ThisLabel) { 

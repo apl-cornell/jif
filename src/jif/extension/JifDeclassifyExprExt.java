@@ -27,7 +27,6 @@ public class JifDeclassifyExprExt extends Jif_c
     public Node labelCheck(LabelChecker lc) throws SemanticException {
 	DeclassifyExpr d = (DeclassifyExpr) node();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
         A = (JifContext) d.enterScope(A);
 

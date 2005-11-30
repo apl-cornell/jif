@@ -39,8 +39,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
     protected Label checkArguments(JifProcedureInstance mi, LabelChecker lc)
 	throws SemanticException
     {
-	ProcedureDecl mn = (ProcedureDecl) node();
-	
 	if (Report.should_report(jif_verbose, 2))
 	    Report.report(2, "Adding constraints for header of " + mi);
 

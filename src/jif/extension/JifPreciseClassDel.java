@@ -17,9 +17,6 @@ public interface JifPreciseClassDel {
      */
     Expr getPreciseClassExpr();
 
-    /**
-     * @param object
-     */
     void setPreciseClass(Set preciseClasses);
 
 }

@@ -25,7 +25,6 @@ public class JifSynchronizedExt extends JifStmtExt_c
 	Synchronized ss = (Synchronized) node();
 
 	JifContext A = lc.jifContext();
-        JifTypeSystem ts = lc.jifTypeSystem();
 	A = (JifContext) ss.enterScope(A);
 
 	Expr e = (Expr) lc.context(A).labelCheck(ss.expr());

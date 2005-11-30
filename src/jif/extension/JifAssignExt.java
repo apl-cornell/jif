@@ -22,7 +22,6 @@ public abstract class JifAssignExt extends Jif_c
     public Node labelCheck(LabelChecker lc) throws SemanticException {
 	Assign a = (Assign) node();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
         A = (JifContext) a.enterScope(A);
 
