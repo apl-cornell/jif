@@ -66,33 +66,50 @@ public interface JifTypeSystem extends ParamTypeSystem
     // Label constructors
     VarLabel freshLabelVariable(Position pos, String s, String description);
 
+    LabelJ topLabelJ(Position pos);
+    LabelM topLabelM(Position pos);
     Label topLabel(Position pos);
+    LabelJ bottomLabelJ(Position pos);
+    LabelM bottomLabelM(Position pos);
     Label bottomLabel(Position pos);
+    Label noComponentsLabel(Position pos);
     Label notTaken(Position pos);
     Label runtimeLabel(Position pos);
 
     Label topLabel();
     Label bottomLabel();
+    Label noComponentsLabel();
     Label notTaken();
     Label runtimeLabel();
 
+    /* Label methods */
     CovariantParamLabel covariantLabel(Position pos, ParamInstance pi);
     ParamLabel paramLabel(Position pos, ParamInstance pi);
-    PolicyLabel policyLabel(Position pos, Principal owner, Collection readers);
-    Label joinLabel(Position pos, Collection components);
+    PairLabel pairLabel(Position pos, LabelJ labelJ, LabelM labelM);
     DynamicLabel dynamicLabel(Position pos, AccessPath path);
     ArgLabel argLabel(Position pos, VarInstance li);
     ThisLabel thisLabel(Position pos, JifClassType ct);
     ThisLabel thisLabel(JifClassType ct);
     UnknownLabel unknownLabel(Position pos);
 
-    /** Returns the join of L1 and L2. */
-    Label join(Label L1, Label L2);
+    ReaderPolicy readerPolicy(Position pos, Principal owner, Collection readers);
+    WriterPolicy writerPolicy(Position pos, Principal owner, Collection writers);
 
-    /** Returns true iff L1 <= L2 in <code>ph</code>. */
+    LabelJ joinLabelJ(Position pos, Collection components);
+    LabelM meetLabelM(Position pos, Collection components);
+    
+    /** Returns true iff L1 <= L2 in <code>env</code>. */
     boolean leq(Label L1, Label L2, LabelEnv env);
-
     boolean leq(Label L1, Label L2);
+    boolean leq(LabelJ L1, LabelJ L2);
+    boolean leq(LabelM L1, LabelM L2);
+
+    /** Returns the join of L1 and L2. */
+    LabelJ join(LabelJ L1, LabelJ L2);
+    LabelM meet(LabelM L1, LabelM L2);
+    Label join(Label L1, Label L2);
+    Label joinLabel(Position pos, Collection components);
+
 
     /** Construct an acts-for constraint. */
     ActsForConstraint actsForConstraint(Position pos, Principal actor, Principal granter, boolean isEquiv);

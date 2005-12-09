@@ -42,10 +42,10 @@ public interface Label extends Param {
      */
     boolean isCovariant();
 
-    /**
-     * Returns the join of this label and L.
-     */
-    Label join(Label L);
+//    /**
+//     * Returns the join of this label and L.
+//     */
+//    Label join(Label L);
 
     /**
      * Is this label comparable to other labels?
@@ -90,7 +90,7 @@ public interface Label extends Param {
      * @see jif.ast.Jif#labelCheck(LabelChecker)
      * @see jif.types.principal.Principal#labelCheck(JifContext)
      */
-    PathMap labelCheck(JifContext A);
+    PathMap labelCheck(JifContext A, LabelChecker lc);
 
     /**
      * Are the components of this label enumerable?

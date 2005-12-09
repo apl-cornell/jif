@@ -43,7 +43,7 @@ public class JifActsForExt extends JifStmtExt_c
 
 	
         A = (JifContext) A.pushBlock();
-        A.setPc(X2.N().join(X2.NV()));
+        A.setPc(lc.upperBound(X2.N(), X2.NV()));
         if (af.kind() == ActsFor.EQUIV) {
             A.addEquiv(actor.principal(), granter.principal());            
         }

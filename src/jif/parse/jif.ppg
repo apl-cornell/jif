@@ -259,7 +259,7 @@ non terminal PrincipalNode principal;
 non terminal Token actsfor;
 non terminal Expr accesspath;
 non terminal Expr accesspath_no_id;
-non terminal List principal_list, readers;
+non terminal List principal_list, principal_list_opt;
 
 non terminal List parameters_opt, parameters;
 non terminal ParamDecl parameter;
@@ -278,16 +278,10 @@ label ::=
                     // LabelNode
         LBRACE:x RBRACE:y
             {: RESULT = parser.nf.CanonicalLabelNode(parser.pos(x, y),
-                                        parser.ts.bottomLabel()); :}
+                                        parser.ts.noComponentsLabel()); :}
     |   LBRACE:x component_list:a RBRACE:y
             {: LabelNode ln;
-               if (a.size() == 1) {
-                   ln = (LabelNode)a.get(0);
-                   ln = (LabelNode)ln.position(parser.pos(x, y));
-               }
-               else {
-                   ln = parser.nf.JoinLabelNode(parser.pos(x, y), a);
-               }
+               ln = parser.nf.JoinLabelNode(parser.pos(x, y), a);
                RESULT = ln; :}
     ;
 label_opt ::=
@@ -316,8 +310,10 @@ component_list ::=
         ;
 label_component ::=
                     // LabelNode
-        principal:a COLON readers:b
-            {: RESULT = parser.nf.PolicyLabelNode(parser.pos(a, b), a, b); :}
+        principal:a COLON principal_list_opt:b
+            {: RESULT = parser.nf.ReaderPolicyLabelNode(parser.pos(a, b), a, b); :}
+    |   principal:a NOT COLON principal_list_opt:b
+            {: RESULT = parser.nf.WriterPolicyLabelNode(parser.pos(a, b), a, b); :}
     |   MULT:x accesspath:a
             {: RESULT = parser.nf.AmbDynamicLabelNode(parser.pos(x, a),
 						      a); :}
@@ -327,7 +323,7 @@ label_component ::=
             {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),
 						  a.getIdentifier()); :}
     ;
-readers ::=
+principal_list_opt ::=
                     // List of PrincipalNode
             {: RESULT = new TypedList(new LinkedList(), PrincipalNode.class,
 				      false); :}

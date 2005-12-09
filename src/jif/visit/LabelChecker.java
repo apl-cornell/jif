@@ -1,7 +1,10 @@
 package jif.visit;
 
-import jif.ast.*;
+import jif.ast.Jif;
+import jif.ast.JifClassDecl;
+import jif.ast.JifMethodDecl;
 import jif.types.*;
+import jif.types.label.Label;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -124,6 +127,13 @@ public class LabelChecker implements Copy
 
     public Solver solver() {
         return this.solver;
+    }
+    
+    /**
+     * Returns an upper bound for L1 and L2
+     */
+    public Label upperBound(Label L1, Label L2) {
+        return ts.join(L1, L2);
     }
 
     public Node labelCheck(Node n) throws SemanticException {

@@ -219,7 +219,7 @@ public class CallHelper {
             actualParamLabels = new ArrayList(Xparams.size());
             for (Iterator iter = Xparams.iterator(); iter.hasNext();) {
                 PathMap Xj = (PathMap)iter.next();
-                actualParamLabels.add(Xj.NV().copy());
+                actualParamLabels.add(Xj.NV());
             }
         }
         else if (this.pi instanceof ConstructorInstance) {
@@ -236,7 +236,7 @@ public class CallHelper {
             int counter = 0;
             for (Iterator iter = Xparams.iterator(); iter.hasNext();) {
                 PathMap Xj = (PathMap)iter.next();
-                actualParamLabels.add(Xj.NV().copy());
+                actualParamLabels.add(Xj.NV());
                 final int count = ++counter;
                 lc.constrain(new LabelConstraint(new NamedLabel("actual_param_"+count,
                                                                 "the label of the " + StringUtil.nth(count) + " actual parameter",
@@ -296,7 +296,7 @@ public class CallHelper {
 
             Xj = Jif_c.X(Ej);
             argPathMaps.add(Xj);
-            actualArgLabels.add(Xj.NV().copy());
+            actualArgLabels.add(Xj.NV());
 
             Xjoin = Xjoin.join(Xj);
         }
@@ -431,7 +431,7 @@ public class CallHelper {
         }               
     }
 
-    private Label resolveStartLabel(JifContext A) throws SemanticException {
+    private Label resolveStartLabel(JifContext A, LabelChecker lc) throws SemanticException {
         return instantiate(A, pi.startLabel());
     }
 
@@ -439,7 +439,7 @@ public class CallHelper {
      * Returns the instantiated return label.
      * @throws SemanticException
      */
-    private Label resolveReturnLabel(JifContext A) throws SemanticException {
+    private Label resolveReturnLabel(JifContext A, LabelChecker lc) throws SemanticException {
         return instantiate(A, pi.returnLabel());
     }
 
@@ -447,7 +447,7 @@ public class CallHelper {
      * Returns the instantiated return value label joined with returnLabel.
      * @throws SemanticException
      */
-    private Label resolveReturnValueLabel(JifContext A, Label returnLabel) throws SemanticException {
+    private Label resolveReturnValueLabel(JifContext A, LabelChecker lc, Label returnLabel) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         Label L = null;
 
@@ -459,12 +459,10 @@ public class CallHelper {
             L = ts.bottomLabel(pi.position());
         }
 
-        L = L.join(returnLabel);
-
-        return L;
+        return lc.upperBound(L, returnLabel);
     }
 
-    private PathMap excPathMap(JifContext A, Label returnLabel, List throwTypes) throws SemanticException {
+    private PathMap excPathMap(JifContext A, LabelChecker lc, Label returnLabel, List throwTypes) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         PathMap Xexn = ts.pathMap();
 
@@ -473,7 +471,7 @@ public class CallHelper {
             Label Le = ts.labelOfType(te, returnLabel);
             Le = instantiate(A, Le);
             Jif_c.checkAndRemoveThrowType(throwTypes, te);
-            Xexn = Xexn.exception(te, Le.join(A.pc()));
+            Xexn = Xexn.exception(te, lc.upperBound(Le, A.pc()));
         }
 
         return Xexn;
@@ -509,7 +507,7 @@ public class CallHelper {
         constrainArguments(lc);
 
         // A |- X_{maxj}[N] + entry_pc <= Li
-        Label Li = resolveStartLabel(A);
+        Label Li = resolveStartLabel(A, lc);
         if (Li != null) {
             final ProcedureInstance callee = pi;
 
@@ -591,12 +589,12 @@ public class CallHelper {
         if (shouldReport( 4))
             report( 4, ">>>>> call-end");
 
-        Label Lr = resolveReturnLabel(A);
-        Label Lrv = resolveReturnValueLabel(A, Lr);
+        Label Lr = resolveReturnLabel(A, lc);
+        Label Lrv = resolveReturnValueLabel(A, lc, Lr);
 
-        X = Xjoin.N(Lr.join(A.pc()));
-        X = X.NV(Lrv.join(A.pc()));
-        X = X.join(excPathMap(A, Lr, throwTypes));
+        X = Xjoin.N(lc.upperBound(Lr, A.pc()));
+        X = X.NV(lc.upperBound(Lrv, A.pc()));
+        X = X.join(excPathMap(A, lc, Lr, throwTypes));
 
         if (pi instanceof MethodInstance) {
             returnType = instantiate(A, ((MethodInstance)pi).returnType());

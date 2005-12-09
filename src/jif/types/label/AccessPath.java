@@ -6,7 +6,10 @@ import java.util.List;
 
 import jif.types.JifContext;
 import jif.types.PathMap;
-import polyglot.types.*;
+import jif.visit.LabelChecker;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
 /**
@@ -61,7 +64,7 @@ public abstract class AccessPath implements Serializable {
 
     public abstract boolean isNeverNull();
 
-    public abstract PathMap labelcheck(JifContext A);
+    public abstract PathMap labelcheck(JifContext A, LabelChecker lc);
 
     public abstract AccessPathRoot root();
     

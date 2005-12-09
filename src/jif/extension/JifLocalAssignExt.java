@@ -41,7 +41,7 @@ public class JifLocalAssignExt extends JifAssignExt
         if (assign.operator() != Assign.ASSIGN) {
             PathMap Xv = ts.pathMap();
             Xv = Xv.N(A.pc());
-            Xv = Xv.NV(L.join(A.pc()));
+            Xv = Xv.NV(lc.upperBound(L, A.pc()));
 
             if (assign.throwsArithmeticException()) {
                 Type arithExc = ts.ArithmeticException();

@@ -141,7 +141,7 @@ public class JifFieldExt extends Jif_c
 		fe = (Field)fe.type(ft);
 	}
 
-	PathMap X = Xe.set(Path.NV, L.join(Xe.NV()));
+	PathMap X = Xe.set(Path.NV, lc.upperBound(L, Xe.NV()));
 	
         checkThrowTypes(throwTypes);
 	return X(fe, X);

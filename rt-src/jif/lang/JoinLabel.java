@@ -4,53 +4,71 @@ import java.util.*;
 
 /**
  * A Label is the runtime representation of a Jif label. A Label consists of a
- * set of components, each of which is a {@link jif.lang.Policy Policy}.
+ * set of components, each of which is a {@link jif.lang.IntegPolicy Policy}.
  *  
  */
-public class JoinLabel extends AbstractLabel implements Label
+public final class JoinLabel implements Label
 {
-    private Set components;
+    private Set components; // Set of ConfIntegPairs
     JoinLabel() {
-	components = Collections.EMPTY_SET;
+        components = Collections.EMPTY_SET;
     }
 
-    JoinLabel(Set labels) {
-	components = Collections.unmodifiableSet(labels);
+    JoinLabel(ConfIntegPair cip) {
+        components = Collections.singleton(cip);
     }
-
-    public Set components() {
-	return components;
+    
+    JoinLabel(Set confIntegpairs) {
+        components = Collections.unmodifiableSet(confIntegpairs);
     }
-
+    
+    public Set joinComponents() {
+        return components;
+    }
+    
     public boolean relabelsTo(Label l) {
-	// Check if this <= l
-
+        // this == {... Ci ...}
+        // l == { ... Dj ... }
+        // this <= l if for each Ci, there exists a Dj such that Ci <= Dj
+        // Check if this <= l
+        
         // If this = { .. Ci .. }, check that for all i, Ci <= l
-	for (Iterator i = components.iterator(); i.hasNext(); ) {
-	    Label Ci = (Label) i.next();
-	    if (!Ci.relabelsTo(l)) {
-	        return false;
-	    }
-	}
-	return true;
-    }
-
-    public boolean equals(Object o) {
-        if (o instanceof JoinLabel) {
-            JoinLabel that = (JoinLabel)o;
-            return this.components().equals(that.components());
-        }        
-        if (this.components().size() == 1) {
-            return this.components().iterator().next().equals(o);
+        for (Iterator i = components.iterator(); i.hasNext(); ) {
+            ConfIntegPair Ci = (ConfIntegPair) i.next();
+            boolean sat = false;
+            
+            for (Iterator j = l.joinComponents().iterator(); j.hasNext(); ) {
+                ConfIntegPair Dj = (ConfIntegPair) j.next();
+                if (Ci.relabelsTo(Dj)) {
+                    sat = true;
+                    break;
+                }
+            }
+            if (!sat) return false;
         }
+        return true;
+    }
+    
+    public boolean equals(Object o) {
+        if (o instanceof Label) {
+            Label that = (Label)o;
+            return this.joinComponents().equals(that.joinComponents());
+        }        
         return false;
     }
+    public final String toString() {
+        return "{" + this.componentString() + "}";
+    }
+    
+    public final Label join(Label l) {
+        return LabelUtil.join(this, l);
+    }
     public String componentString() {
-	String str = "";
-	for (Iterator iter = components.iterator(); iter.hasNext(); ) {
-	    str += ((Label)iter.next()).componentString();
-	    if (iter.hasNext()) str += "; ";
-	}
-	return str;
+        String str = "";
+        for (Iterator iter = components.iterator(); iter.hasNext(); ) {
+            str += ((Label)iter.next()).componentString();
+            if (iter.hasNext()) str += "; ";
+        }
+        return str;
     }
 }

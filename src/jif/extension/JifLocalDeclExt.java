@@ -32,7 +32,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
         
         PathMap X = ts.pathMap();
         X = X.N(A.pc());
-        
+
         final JifLocalInstance li = (JifLocalInstance) decl.localInstance();
         
         if (polyglot.main.Report.should_report(jif.Topics.jif, 4))
@@ -62,7 +62,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
         
         if (ts.isLabeled(t)) {
             Label declaredLabel = ts.labelOfType(t);
-            
+
             lc.constrain(new LabelConstraint(new NamedLabel("local_label", 
                                                             "inferred label of local var " + li.name(), 
                                                             L), 
@@ -70,7 +70,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
                                                             new NamedLabel("PC", 
                                                                            "Information revealed by program counter being at this program point", 
                                                                            A.pc()).
-                                                                           join("declared label of local var " + li.name(), declaredLabel), 
+                                                                           join(lc, "declared label of local var " + li.name(), declaredLabel), 
                                                                            A.labelEnv(),
                                                                            decl.position()) {
                 public String msg() {

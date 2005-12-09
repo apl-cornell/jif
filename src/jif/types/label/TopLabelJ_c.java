@@ -3,22 +3,23 @@ package jif.types.label;
 
 import java.util.Set;
 
+import jif.translate.JifToJavaRewriter;
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
+import polyglot.ast.Expr;
 import polyglot.types.*;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
 import polyglot.util.*;
 
-/** An implementation of the <code>TopLabel</code> interface. 
+/** An implementation of the <code>TopLabelJ</code> interface. 
  */
-public class TopLabel_c extends Label_c implements TopLabel {
-    protected TopLabel_c() {
+public class TopLabelJ_c extends LabelJ_c implements TopLabelJ {
+    protected TopLabelJ_c() {
     }
     
-    public TopLabel_c(JifTypeSystem ts, Position pos) {
+    public TopLabelJ_c(JifTypeSystem ts, Position pos) {
         super(ts, pos);
-        setDescription("Top of the label lattice, the most private label possible");
     }
     
     public boolean isTop() { return true; }    
@@ -36,10 +37,14 @@ public class TopLabel_c extends Label_c implements TopLabel {
         return "<top>";
     }    
     public boolean equalsImpl(TypeObject o) {
-        return o instanceof TopLabel;
+        return o instanceof TopLabelJ;
     }    
     public int hashCode() { return 390230; }
-    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
+    public boolean leq_(LabelJ L, LabelEnv env) {
         return L.isTop();
+    }
+
+    public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
+        throw new InternalCompilerError("Cannot to java");
     }
 }

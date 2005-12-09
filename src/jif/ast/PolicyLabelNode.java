@@ -8,6 +8,6 @@ public interface PolicyLabelNode extends LabelNode {
     PrincipalNode owner();
     PolicyLabelNode owner(PrincipalNode owner);
 
-    List readers();
-    PolicyLabelNode readers(List readers);
+    List principals();
+    PolicyLabelNode principals(List principals);
 }

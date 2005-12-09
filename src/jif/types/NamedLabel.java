@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import jif.types.label.Label;
-
+import jif.visit.LabelChecker;
 import polyglot.util.Position;
 
 /** A Jif label with names for the debuging use. 
@@ -28,7 +28,13 @@ public class NamedLabel
     
     public NamedLabel(String name, String descrip, Label l) {
         this(l.position());
-        this.join(name, descrip, l);
+        nameToLabels.put(name, l);
+        if (descrip != null) {
+            nameToDescrip.put(name, descrip);
+        }
+        
+        label = l;
+        if (pos == null) pos = l.position();
     }
 
     public NamedLabel(Position pos) {
@@ -42,11 +48,11 @@ public class NamedLabel
 	return pos;
     }
     
-    public NamedLabel join(String name, Label l) {
-        return join(name, null, l);
+    public NamedLabel join(LabelChecker lc, String name, Label l) {
+        return join(lc, name, null, l);
         
     }
-    public NamedLabel join(String name, String descrip, Label l) {
+    public NamedLabel join(LabelChecker lc, String name, String descrip, Label l) {
         nameToLabels.put(name, l);
         if (descrip != null) {
             nameToDescrip.put(name, descrip);
@@ -57,7 +63,7 @@ public class NamedLabel
 	    if (pos == null) pos = l.position();
 	}
         else {
-            label = label.join(l);
+            label = lc.upperBound(label, l);
         }
 	return this;
     }

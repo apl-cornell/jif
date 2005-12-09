@@ -53,7 +53,7 @@ public class JifLabelIfExt extends JifStmtExt_c
 
 	A = (JifContext) A.pushBlock();
         
-        A.setPc(X2.N().join(X2.NV()));
+        A.setPc(lc.upperBound(X2.N(), X2.NV()));
         
         A = (JifContext) A.pushBlock();
         // add the assertion that the conditional is true to check

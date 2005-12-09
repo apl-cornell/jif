@@ -1,15 +1,15 @@
 package jif.translate;
 
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.*;
-import jif.ast.*;
-import polyglot.types.*;
-import polyglot.ext.jl.types.*;
-import jif.types.*;
+import java.io.Serializable;
+
 import jif.types.label.Label;
-import jif.visit.*;
-import java.io.*;
+import jif.types.label.LabelJ;
+import jif.types.label.LabelM;
+import polyglot.ast.Expr;
+import polyglot.types.SemanticException;
 
 public interface LabelToJavaExpr extends Serializable {
     public Expr toJava(Label label, JifToJavaRewriter rw) throws SemanticException;
+    public Expr toJava(LabelJ label, JifToJavaRewriter rw) throws SemanticException;
+    public Expr toJava(LabelM label, JifToJavaRewriter rw) throws SemanticException;
 }

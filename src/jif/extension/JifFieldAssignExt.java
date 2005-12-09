@@ -106,7 +106,7 @@ public class JifFieldAssignExt extends JifAssignExt
             Label Lr = A.constructorReturnLabel();
 
             if (Lr != null) 
-                L = L.join(Lr);
+                L = lc.upperBound(L, Lr);
             
             // if it is a final field being initialized,
             // add a definitional assertion that the field is equivalent
@@ -192,7 +192,7 @@ public class JifFieldAssignExt extends JifAssignExt
 
         if (assign.operator() != Assign.ASSIGN) {
             // e.g. f += 1
-            X = X.set(Path.NV, X.NV().join(Lf));
+            X = X.set(Path.NV, lc.upperBound(X.NV(), Lf));
         }
 
         Expr lhs = (Expr) X(fe, X);

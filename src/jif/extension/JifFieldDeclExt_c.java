@@ -128,7 +128,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                                          new NamedLabel("PC", 
                                                         "Information revealed by program counter being at this program point", 
                                                         A.pc()).
-                                             join("declared label of field " + fi.name(), declaredLabel), 
+                                             join(lc, "declared label of field " + fi.name(), declaredLabel), 
                                          A.labelEnv(),
                                          decl.position()));
 

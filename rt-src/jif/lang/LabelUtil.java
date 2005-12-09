@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * A Label is the runtime representation of a Jif label. A Label consists of a
- * set of components, each of which is a {@link jif.lang.Policy Policy}.
+ * set of components, each of which is a {@link jif.lang.IntegPolicy Policy}.
  *  
  */
 public class LabelUtil
@@ -23,20 +23,88 @@ public class LabelUtil
 	return BOTTOM;
     }
 
-    public static Label privacyPolicyLabel(Principal owner, Collection readers) {
-        return intern(new PrivacyPolicy(owner, readers));
+    public static ConfPolicy readerPolicyLabel(Principal owner, Collection readers) {
+        return intern(new ReaderPolicy(owner, readers));
     }
 
     /**
-     * See the signature for the explanation of lbl.
+     * See the Jif signature for the explanation of lbl.
      */
-    public static Label privacyPolicyLabel(Label lbl, Principal owner, Principal[] readers) {
-        if (readers == null) return privacyPolicyLabel(owner, Collections.EMPTY_SET);
-	return privacyPolicyLabel(owner, Arrays.asList(readers));
+    public static ConfPolicy readerPolicyLabel(Label lbl, Principal owner, Principal[] readers) {
+        if (readers == null) return readerPolicyLabel(owner, Collections.EMPTY_SET);
+        return readerPolicyLabel(owner, Arrays.asList(readers));
     }
 
-    public static Label privacyPolicyLabel(Principal owner, PrincipalSet readers) {
-	return privacyPolicyLabel(owner, readers.getSet());
+    public static ConfPolicy readerPolicyLabel(Principal owner, PrincipalSet readers) {
+        return readerPolicyLabel(owner, readers.getSet());
+    }
+
+    public static IntegPolicy writerPolicyLabel(Principal owner, Collection writers) {
+        return intern(new WriterPolicy(owner, writers));
+    }
+
+    /**
+     * See the Jif signature for the explanation of lbl.
+     */
+    public static IntegPolicy writerPolicyLabel(Label lbl, Principal owner, Principal[] writers) {
+        if (writers == null) return writerPolicyLabel(owner, Collections.EMPTY_SET);
+        return writerPolicyLabel(owner, Arrays.asList(writers));
+    }
+
+    public static IntegPolicy writerPolicyLabel(Principal owner, PrincipalSet writers) {
+        return writerPolicyLabel(owner, writers.getSet());
+    }
+
+    public static ConfIntegPair pairLabel(ConfCollection confPols, IntegCollection integPols) {
+        return intern(new ConfIntegPair(confPols, integPols));        
+    }
+    public static ConfIntegPair pairLabel(ConfPolicy confPol, IntegPolicy integPol) {
+        return intern(new ConfIntegPair(confCollection(confPol), 
+                                        integCollection(integPol)));        
+    }
+    
+    public static Label label(ConfIntegPair pair) {
+        return intern(new JoinLabel(pair));
+    }
+    public static ConfCollection bottomConf() {
+        return new ConfCollection();
+    }
+    public static ConfCollection confCollection(ConfPolicy cp) {
+        return new ConfCollection(cp);        
+    }
+    
+    public static IntegCollection topInteg() {
+        return new IntegCollection();
+    }
+    public static IntegCollection integCollection(IntegPolicy ip) {
+        return new IntegCollection(ip);        
+    }
+    
+    public static ConfCollection join(ConfCollection cc, ConfPolicy cp) {
+        if (cp == null) return cc;
+        if (cc == null) return new ConfCollection(cp);
+        
+        for (Iterator comps = cc.joinComponents().iterator(); comps.hasNext(); ) {
+            ConfPolicy c = (ConfPolicy)comps.next();
+            if (cp.relabelsTo(c)) return cc;
+        }
+        Set comps = new LinkedHashSet(cc.joinComponents());
+        comps.add(cp);
+
+        return new ConfCollection(comps);
+    }
+    public static IntegCollection meet(IntegCollection ic, IntegPolicy ip) {
+        if (ip == null) return ic;
+        if (ic == null) return new IntegCollection(ip);
+        
+        for (Iterator comps = ic.meetComponents().iterator(); comps.hasNext(); ) {
+            IntegPolicy c = (IntegPolicy)comps.next();
+            if (c.relabelsTo(ip)) return ic;
+        }
+        Set comps = new LinkedHashSet(ic.meetComponents());
+        comps.add(ip);
+
+        return new IntegCollection(comps);
     }
 
     public static Label join(Label l1, Label l2) {
@@ -61,7 +129,9 @@ public class LabelUtil
     }
 
     public static boolean isReadableBy(Label lbl, Principal p) {
-        return relabelsTo(lbl, new ReadableByPrinLabel(p));
+        ConfPolicy readable = new ReadableByPrinPolicy(p);
+        ConfCollection confCol = new ConfCollection(readable);
+        return relabelsTo(lbl, new JoinLabel(new ConfIntegPair(confCol, new IntegCollection())));
     }
 
     public static boolean relabelsTo(Label from, Label to) {
@@ -81,6 +151,30 @@ public class LabelUtil
         return stringValue(lb);
     }
     
+    private static ConfIntegPair intern(ConfIntegPair cip) {
+        ConfIntegPair in = (ConfIntegPair)intern.get(cip);
+        if (in == null) {
+            in = cip;
+            intern.put(in, in);
+        }
+        return in;        
+    }
+    private static ConfPolicy intern(ConfPolicy confPol) {
+        ConfPolicy in = (ConfPolicy)intern.get(confPol);
+        if (in == null) {
+            in = confPol;
+            intern.put(in, in);
+        }
+        return in;        
+    }
+    private static IntegPolicy intern(IntegPolicy integPol) {
+        IntegPolicy in = (IntegPolicy)intern.get(integPol);
+        if (in == null) {
+            in = integPol;
+            intern.put(in, in);
+        }
+        return in;        
+    }
     private static Label intern(Label l) {
         Label in = (Label)intern.get(l);
         if (in == null) {
@@ -93,7 +187,7 @@ public class LabelUtil
     protected static Set flattenJoin(Label l) {
         if (l instanceof JoinLabel) {
             JoinLabel jl = (JoinLabel)l;
-            return jl.components();
+            return jl.joinComponents();
             
         }
         else {

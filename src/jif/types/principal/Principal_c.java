@@ -7,8 +7,7 @@ import jif.translate.CannotPrincipalToJavaExpr_c;
 import jif.translate.JifToJavaRewriter;
 import jif.translate.PrincipalToJavaExpr;
 import jif.types.*;
-import jif.types.JifTypeSystem;
-import jif.types.LabelSubstitution;
+import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
 import polyglot.ext.jl.types.TypeObject_c;
 import polyglot.types.SemanticException;
@@ -47,7 +46,7 @@ public abstract class Principal_c extends TypeObject_c implements Principal {
         return substitution.substPrincipal(this);
     }
 
-    public PathMap labelCheck(JifContext A) {
+    public PathMap labelCheck(JifContext A, LabelChecker lc) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         return ts.pathMap().N(A.pc()).NV(A.pc());
     }        

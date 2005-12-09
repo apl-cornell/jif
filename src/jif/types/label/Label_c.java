@@ -5,6 +5,7 @@ import java.util.*;
 import jif.translate.*;
 import jif.types.*;
 import jif.types.principal.Principal;
+import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
 import polyglot.ext.jl.types.TypeObject_c;
 import polyglot.types.*;
@@ -140,13 +141,6 @@ public abstract class Label_c extends TypeObject_c implements Label {
         return result[0];
     }
 
-    /**
-     * Join this label to L. The result is generally a JoinLabel
-     */
-    public final Label join(Label L) {
-        return ((JifTypeSystem)ts).join(this, L);
-    }
-
     public String toString() {
         return "{" + componentString(new HashSet()) + "}";
     }
@@ -175,7 +169,7 @@ public abstract class Label_c extends TypeObject_c implements Label {
         return substitution.substLabel(this);
     }
 
-    public PathMap labelCheck(JifContext A) {
+    public PathMap labelCheck(JifContext A, LabelChecker lc) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         return ts.pathMap().N(A.pc()).NV(A.pc());
     }

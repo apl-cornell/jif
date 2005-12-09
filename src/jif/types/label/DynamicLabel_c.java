@@ -7,6 +7,7 @@ import jif.ast.JifUtil;
 import jif.translate.DynamicLabelToJavaExpr_c;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
+import jif.visit.LabelChecker;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
@@ -93,7 +94,7 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         return substitution.substLabel(this);
     }
-    public PathMap labelCheck(JifContext A) {
-        return path.labelcheck(A);
+    public PathMap labelCheck(JifContext A, LabelChecker lc) {
+        return path.labelcheck(A, lc);
     }
 }

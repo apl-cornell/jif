@@ -83,14 +83,22 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public PolicyLabelNode PolicyLabelNode(Position pos, PrincipalNode owner, List readers) {
-        PolicyLabelNode n = new PolicyLabelNode_c(pos, owner,
+    public PolicyLabelNode ReaderPolicyLabelNode(Position pos, PrincipalNode owner, List readers) {
+        PolicyLabelNode n = new ReaderPolicyLabelNode_c(pos, owner,
                                                   readers);
         n = (PolicyLabelNode)n.ext(jifExtFactory().extPolicyLabelNode());
         n = (PolicyLabelNode)n.del(delFactory().delNode());
         return n;
     }
 
+    public PolicyLabelNode WriterPolicyLabelNode(Position pos, PrincipalNode owner, List writers) {
+        PolicyLabelNode n = new WriterPolicyLabelNode_c(pos, owner,
+                                                  writers);
+        n = (PolicyLabelNode)n.ext(jifExtFactory().extPolicyLabelNode());
+        n = (PolicyLabelNode)n.del(delFactory().delNode());
+        return n;
+    }
+    
     public AmbDynamicLabelNode AmbDynamicLabelNode(Position pos, Expr expr) {
         AmbDynamicLabelNode n = new AmbDynamicLabelNode_c(pos, expr);
         n = (AmbDynamicLabelNode)n.ext(jifExtFactory().extAmbDynamicLabelNode());

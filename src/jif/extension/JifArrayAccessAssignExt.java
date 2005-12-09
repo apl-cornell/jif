@@ -58,7 +58,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         if (((JifArrayAccessDel)assign.left().del()).outOfBoundsExcThrown()) {
             // an out of bounds exception may be thrown
             checkAndRemoveThrowType(throwTypes, oob);
-             X2 = X2.exc(Xa.NV().join(Xb.NV()), oob);
+             X2 = X2.exc(lc.upperBound(Xa.NV(), Xb.NV()), oob);
         }
 
         A = (JifContext) A.pushBlock();
@@ -82,7 +82,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
 
         
         if (assign.operator() != Assign.ASSIGN) {
-            PathMap X3 = X2.N(ts.notTaken()).NV(La.join(X2.NV())).join(Xv);
+            PathMap X3 = X2.N(ts.notTaken()).NV(lc.upperBound(La, X2.NV())).join(Xv);
 
             if (assign.throwsArithmeticException()) {
                 checkAndRemoveThrowType(throwTypes, are);
@@ -96,7 +96,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         }
         else if (assign.throwsArrayStoreException()) {
             checkAndRemoveThrowType(throwTypes, ase);
-            X = X2.exc(Xa.NV().join(Xv.NV()), ase);
+            X = X2.exc(lc.upperBound(Xa.NV(), Xv.NV()), ase);
         }
         else {
             X = X2;
@@ -108,7 +108,8 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         lc.constrain(new LabelConstraint(new NamedLabel("rhs.nv", 
                                                         "label of successful evaluation of right hand of assignment",
                                                         Xv.NV()).
-                                                   join("lhs.n", 
+                                                   join(lc, 
+                                                        "lhs.n", 
                                                         "label of successful evaluation of array access " + aie,
                                                         X.N()), 
                                          LabelConstraint.LEQ, 

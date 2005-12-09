@@ -17,6 +17,8 @@ public interface Label
      * Returns true iff this <= l
      */
     Label join(Label l);
+
+    Set joinComponents();
     
     /**
      * String to print if this label is a component of a larger label

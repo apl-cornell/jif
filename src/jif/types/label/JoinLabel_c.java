@@ -5,6 +5,7 @@ import java.util.*;
 import jif.translate.JoinLabelToJavaExpr_c;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
+import jif.visit.LabelChecker;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
@@ -21,14 +22,11 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         super(ts, pos, new JoinLabelToJavaExpr_c());
         this.components = Collections.unmodifiableSet(new LinkedHashSet(flatten(components)));
         
-        if (isBottom()) {
-            setDescription("Bottom of the label lattice, the most public label possible");        
+        if (this.components.isEmpty()) {
+            throw new InternalCompilerError("Join label must be nonempty");
         }
     }
     
-    public boolean isBottom() {
-        return components.isEmpty();
-    }
     public boolean isRuntimeRepresentable() {
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label c = (Label) i.next();
@@ -83,6 +81,32 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return true;
     }
     public boolean isEnumerable() {
+        return true;
+    }
+    
+    public boolean isBottom() {
+        if (components.isEmpty()) return false;
+        for (Iterator i = components.iterator(); i.hasNext(); ) {
+            Label c = (Label) i.next();
+            
+            if (! c.isBottom()) {
+                return false;
+            }
+        }
+        // all components are bottom.
+        return true;
+    }
+
+    public boolean isTop() {
+        if (components.isEmpty()) return false;
+        for (Iterator i = components.iterator(); i.hasNext(); ) {
+            Label c = (Label) i.next();
+            
+            if (! c.isTop()) {
+                return false;
+            }
+        }
+        // all components are top
         return true;
     }
     
@@ -198,7 +222,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         for (Iterator i = comps.iterator(); i.hasNext(); ) {
             Label L = (Label) i.next();
             
-            if (L instanceof TopLabel) {
+            if (L.isTop()) {
                 return Collections.singleton(L);
             }
             
@@ -208,7 +232,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
                 for (Iterator j = lComps.iterator(); j.hasNext(); ) {
                     Label Lj = (Label) j.next();
                     
-                    if (Lj instanceof TopLabel) {
+                    if (Lj.isTop()) {
                         return Collections.singleton(Lj);
                     }
                     
@@ -256,7 +280,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return substitution.substLabel(newJoinLabel).simplify();
     }
 
-    public PathMap labelCheck(JifContext A) {
+    public PathMap labelCheck(JifContext A, LabelChecker lc) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         PathMap X = ts.pathMap().N(A.pc()).NV(A.pc());
         
@@ -269,7 +293,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             A.setPc(X.N());
             Label c = (Label) i.next();
-            PathMap Xc = c.labelCheck(A);
+            PathMap Xc = c.labelCheck(A, lc);
             X = X.join(Xc);            
         }
         return X;

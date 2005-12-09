@@ -204,7 +204,8 @@ public class SolverGLB extends Solver {
             }
         }
         // everything not in needed is already satisfied
-        Label join = vBound.join(ts.joinLabel(lhsBound.position(), needed));
+        
+        Label join =  ts.join(vBound, ts.joinLabel(lhsBound.position(), needed));
 
         if (shouldReport(4)) report(4, "JOIN: " + v + " := " + join);
 

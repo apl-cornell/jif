@@ -204,7 +204,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	// fold "this" label into the return label because it is protected
 	// at the caller side.
 	if (!mi.flags().isStatic())  {
-	    Lr = Lr.join(ct.thisLabel());
+	    Lr = lc.upperBound(Lr, ct.thisLabel());
 	}
 	        
         //Hack: If no other paths, the procedure must return. Therefore,
@@ -227,7 +227,8 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	lc.constrain(new LabelConstraint(new NamedLabel("X.n",
                                                         "information that may be gained by the body terminating normally",
                                                         X.N()).
-                                                   join("X.r",
+                                                   join(lc,
+                                                        "X.r",
                                                         "information that may be gained by exiting the body with a return statement",
                                                         X.R()),
                                          LabelConstraint.LEQ,
@@ -264,7 +265,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	Label Lrv = null;
 
 	if (ts.isLabeled(returnType)) {
-	    Lrv = ts.labelOfType(returnType).join(Lr);
+	    Lrv = lc.upperBound(ts.labelOfType(returnType), Lr);
 	}
 	else if (returnType.isVoid()) {
 	    Lrv = ts.notTaken();
@@ -278,7 +279,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
             lc.constrain(new LabelConstraint(new NamedLabel("X(body).rv",
                                                                 "the label of values returned by the body of the method via a return statement",
                                                                 X.RV()).
-                                                           join("X(body).nv",
+                                                           join(lc, "X(body).nv",
                                                                 "the label of values returned by the body of the method",
                                                                 X.NV()),
                                                  LabelConstraint.LEQ,
@@ -339,7 +340,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 		// throw type, because it is protected
 		// at the caller side.
 		if (!mi.flags().isStatic())  {
-		    Lj = Lj.join(ct.thisLabel());
+		    Lj = lc.upperBound(Lj, ct.thisLabel());
 		}
 
 		if (ts.isImplicitCastValid(pathType, tj)) {

@@ -1,8 +1,9 @@
 package jif.types.label;
 
-import polyglot.util.Position;
 import jif.types.JifContext;
 import jif.types.PathMap;
+import jif.visit.LabelChecker;
+import polyglot.util.Position;
 
 
 /**
@@ -23,7 +24,7 @@ public abstract class AccessPathRoot extends AccessPath {
         return this;
     }
     
-    public PathMap labelcheck(JifContext A) {
+    public PathMap labelcheck(JifContext A, LabelChecker lc) {
         throw new UnsupportedOperationException("Cannot labelcheck an " + this.getClass());
     }
 }

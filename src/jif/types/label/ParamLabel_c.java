@@ -8,6 +8,7 @@ import jif.types.*;
 import jif.types.JifTypeSystem;
 import jif.types.ParamInstance;
 import jif.types.hierarchy.LabelEnv;
+import jif.visit.LabelChecker;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.types.Resolver;
@@ -63,7 +64,7 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
         return this.paramInstance.name();
     }
 
-    public PathMap labelCheck(JifContext A) {
+    public PathMap labelCheck(JifContext A, LabelChecker lc) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         Label l;
         if (A.inStaticContext()) {

@@ -5,16 +5,11 @@ import java.util.Set;
 
 import jif.translate.ParamToJavaExpr_c;
 import jif.types.*;
-import jif.types.JifTypeSystem;
-import jif.types.ParamInstance;
 import jif.types.hierarchy.LabelEnv;
+import jif.visit.LabelChecker;
 import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
-import polyglot.util.*;
-import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** An implementation of the <code>CovariantLabel</code> interface. 
  */
@@ -64,7 +59,7 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
         return this.paramInstance.name();
     }
 
-    public PathMap labelCheck(JifContext A) {
+    public PathMap labelCheck(JifContext A, LabelChecker lc) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         Label l;
         if (A.inStaticContext()) {

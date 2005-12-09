@@ -6,7 +6,7 @@ import jif.types.principal.Principal;
 
 /** The policy label of the form <code>owner: r1,&period;&period;&period;,rn</code>
  */
-public interface PolicyLabel extends Label {
+public interface ReaderPolicy extends LabelJ {
     Principal owner();
     Collection readers();
 }

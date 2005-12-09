@@ -34,7 +34,7 @@ public class VarSignature implements DefaultSignature
 	for (Iterator i = pd.throwTypes().iterator(); i.hasNext(); ) {
 	    TypeNode tn = (TypeNode) i.next();
 	    Label excLabel = ts.labelOfType(tn.type(), ts.bottomLabel());
-	    Lr = Lr.join(excLabel);	
+	    Lr = ts.join(Lr, excLabel);	
 	}	
 
 	return Lr;
@@ -51,12 +51,10 @@ public class VarSignature implements DefaultSignature
         
         
         JifProcedureInstance pi = (JifProcedureInstance)pd.procedureInstance();
-        JifTypeSystem jts = (JifTypeSystem)pi.typeSystem();
-
         for (Iterator i = pi.formalTypes().iterator(); i.hasNext(); ) {
             Type t = (Type)i.next();
-            ArgLabel a = (ArgLabel)jts.labelOfType(t);
-            Lrv = Lrv.join(a);
+            ArgLabel a = (ArgLabel)ts.labelOfType(t);
+            Lrv = ts.join(Lrv, a);
         }
         
 	return Lrv;	

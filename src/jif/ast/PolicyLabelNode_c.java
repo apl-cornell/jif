@@ -1,29 +1,31 @@
 package jif.ast;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import jif.types.JifTypeSystem;
+import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
-import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.Scheduler;
-import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 
 /** An implementation of the <code>PolicyLabel</code> interface.
  */
-public class PolicyLabelNode_c extends AmbLabelNode_c implements PolicyLabelNode
+public abstract class PolicyLabelNode_c extends AmbLabelNode_c implements PolicyLabelNode
 {
     protected PrincipalNode owner;
-    protected List readers;
+    protected List principals;
 
-    public PolicyLabelNode_c(Position pos, PrincipalNode owner, List readers) {
+    public PolicyLabelNode_c(Position pos, PrincipalNode owner, List principals) {
 	super(pos);
         if (owner == null) throw new InternalCompilerError("null owner");
 	this.owner = owner;
-	this.readers = TypedList.copyAndCheck(readers, PrincipalNode.class, true);
+	this.principals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
     }
 
     public PrincipalNode owner() {
@@ -36,21 +38,21 @@ public class PolicyLabelNode_c extends AmbLabelNode_c implements PolicyLabelNode
 	return n;
     }
 
-    public List readers() {
-	return this.readers;
+    public List principals() {
+	return this.principals;
     }
 
-    public PolicyLabelNode readers(List readers) {
+    public PolicyLabelNode principals(List principals) {
 	PolicyLabelNode_c n = (PolicyLabelNode_c) copy();
-	n.readers = TypedList.copyAndCheck(readers, PrincipalNode.class, true);
+	n.principals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
 	return n;
     }
 
-    protected PolicyLabelNode_c reconstruct(PrincipalNode owner, List readers) {
-	if (owner != this.owner || ! CollectionUtil.equals(readers, this.readers)) {
+    protected PolicyLabelNode_c reconstruct(PrincipalNode owner, List principals) {
+	if (owner != this.owner || ! CollectionUtil.equals(principals, this.principals)) {
 	    PolicyLabelNode_c n = (PolicyLabelNode_c) copy();
 	    n.owner = owner;
-	    n.readers = TypedList.copyAndCheck(readers, PrincipalNode.class, true);
+	    n.principals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
 	    return n;
 	}
 
@@ -59,7 +61,7 @@ public class PolicyLabelNode_c extends AmbLabelNode_c implements PolicyLabelNode
 
     public Node visitChildren(NodeVisitor v) {
 	PrincipalNode owner = (PrincipalNode) visitChild(this.owner, v);
-	List readers = visitList(this.readers, v);
+	List readers = visitList(this.principals, v);
 	return reconstruct(owner, readers);
     }
 
@@ -77,7 +79,7 @@ public class PolicyLabelNode_c extends AmbLabelNode_c implements PolicyLabelNode
 
 	List l = new LinkedList();
 
-	for (Iterator i = this.readers.iterator(); i.hasNext(); ) {
+	for (Iterator i = this.principals.iterator(); i.hasNext(); ) {
 	    PrincipalNode r = (PrincipalNode) i.next();
             if (!r.isDisambiguated()) {
                 ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
@@ -85,17 +87,17 @@ public class PolicyLabelNode_c extends AmbLabelNode_c implements PolicyLabelNode
             }
 	    l.add(r.principal());
 	}
-
-	return nf.CanonicalLabelNode(position(),
-		                     ts.policyLabel(position(), o, l));
+	return nf.CanonicalLabelNode(position(), producePairLabel(ts, o, l));
     }
+    
+    protected abstract Label producePairLabel(JifTypeSystem ts, Principal owner, List principals);
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         print(owner, w, tr);
 
         w.write(": ");
 
-	for (Iterator i = this.readers.iterator(); i.hasNext(); ) {
+	for (Iterator i = this.principals.iterator(); i.hasNext(); ) {
 	    PrincipalNode n = (PrincipalNode) i.next();
             print(n, w, tr);
             if (i.hasNext()) {

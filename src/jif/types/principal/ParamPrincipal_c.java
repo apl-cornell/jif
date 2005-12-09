@@ -4,6 +4,7 @@ import jif.translate.ParamToJavaExpr_c;
 import jif.types.*;
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
+import jif.visit.LabelChecker;
 import polyglot.main.Report;
 import polyglot.types.TypeObject;
 import polyglot.util.Position;
@@ -46,7 +47,7 @@ public class ParamPrincipal_c extends Principal_c implements ParamPrincipal {
 	return paramInstance.hashCode();
     }
 
-    public PathMap labelCheck(JifContext A) {
+    public PathMap labelCheck(JifContext A, LabelChecker lc) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         Label l;
         if (A.inStaticContext()) {

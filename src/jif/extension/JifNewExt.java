@@ -64,7 +64,7 @@ public class JifNewExt extends Jif_c
 	helper.checkCall(lc, throwTypes);
 
 	PathMap retX = helper.X();
-	PathMap X = retX.NV(retX.NV().join(newLabel));
+	PathMap X = retX.NV(lc.upperBound(retX.NV(), newLabel));
 
 	checkThrowTypes(throwTypes);
 	return X(noe.arguments(helper.labelCheckedArgs()), X);

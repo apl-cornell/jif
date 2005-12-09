@@ -65,7 +65,7 @@ public class JifDeclassifyStmtExt extends JifStmtExt_c
         lc.constrain(new LabelConstraint(new NamedLabel("pc", A.pc()), 
                                          LabelConstraint.LEQ, 
                                          new NamedLabel("declass_to_label", L).
-                                                   join("auth_label", auth),
+                                                   join(lc, "auth_label", auth),
                                          A.labelEnv(),
                                          ds.position()) {
                      public String msg() {
@@ -121,7 +121,7 @@ public class JifDeclassifyStmtExt extends JifStmtExt_c
             X = Xs;
         }
         else {          
-            X = Xs.set(Path.N, Xs.N().join(A.pc()));
+            X = Xs.set(Path.N, lc.upperBound(Xs.N(), A.pc()));
         }
 	
 	return X(ds.body(body), X);

@@ -41,7 +41,7 @@ public class JifLabeledExt extends JifStmtExt_c
 	A.gotoLabel(polyglot.ast.Branch.CONTINUE, label, L1);
 	A.gotoLabel(polyglot.ast.Branch.BREAK, label, L2);
 
-	A.setPc(A.pc().join(L1));
+	A.setPc(lc.upperBound(A.pc(), L1));
 
 	Stmt s = (Stmt) lc.context(A).labelCheck(ls.statement());
 
@@ -49,7 +49,7 @@ public class JifLabeledExt extends JifStmtExt_c
 
 	PathMap Xs = X(s);
 
-	PathMap X = Xs.N(Xs.N().join(L2));
+	PathMap X = Xs.N(lc.upperBound(Xs.N(), L2));
 
 	X = X.set(ts.gotoPath(polyglot.ast.Branch.CONTINUE, label),
 		ts.notTaken());

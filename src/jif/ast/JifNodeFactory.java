@@ -17,7 +17,8 @@ public interface JifNodeFactory extends NodeFactory {
     AmbNewArray AmbNewArray(Position pos, TypeNode base, Object expr, List dims);
     AmbParamTypeOrAccess AmbParamTypeOrAccess(Position pos, Receiver base, Object expr);
     JoinLabelNode JoinLabelNode(Position pos, List components);
-    PolicyLabelNode PolicyLabelNode(Position pos, PrincipalNode owner, List readers);
+    PolicyLabelNode ReaderPolicyLabelNode(Position pos, PrincipalNode owner, List readers);
+    PolicyLabelNode WriterPolicyLabelNode(Position pos, PrincipalNode owner, List writers);
     AmbDynamicLabelNode AmbDynamicLabelNode(Position pos, Expr expr);
     AmbVarLabelNode AmbVarLabelNode(Position pos, String name);
     AmbThisLabelNode AmbThisLabelNode(Position pos);

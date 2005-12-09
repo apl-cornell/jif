@@ -12,19 +12,26 @@ public class FileSystem
     /** Get the security label of <code>file</code>. */
     public static Label labelOf(String file) {
         String[] readers = readers(file);
+//        String[] writers = writers(file);
         String owner = owner(file);
         
-        List readerList = new LinkedList();    
-        
+        List readerList = new LinkedList();            
         for (int i = 0; i < readers.length; i++) {
             readerList.add(new NativePrincipal(readers[i]));
         }
+//        List writerList = new LinkedList();            
+//        for (int i = 0; i < writers.length; i++) {
+//            writerList.add(new NativePrincipal(writers[i]));
+//        }
         jif.lang.Principal op = new NativePrincipal(owner);
-        return LabelUtil.privacyPolicyLabel(op, readerList);
+        ConfPolicy readerPol = LabelUtil.readerPolicyLabel(op, readerList);
+//        IntegPolicy writerPol = LabelUtil.writerPolicyLabel(op, writerList);
+        ConfIntegPair pair = LabelUtil.pairLabel(LabelUtil.confCollection(readerPol), LabelUtil.topInteg());
+        return LabelUtil.label(pair);
     }
     
     /** Set the access(read) policy of <code>file</code>.  */
-    public static void setPolicy(String file, PrivacyPolicy p) 
+    public static void setPolicy(String file, ReaderPolicy p) 
     throws IOException
     {
         if (!(p.owner() instanceof NativePrincipal)) {
@@ -41,12 +48,12 @@ public class FileSystem
         //set has to be adjusted. 
         if (os.equals("Linux") || os.equals("SunOS") || os.equals("Mac OS X")) {
             Set groups = groups(owner);
-            Policy p1 = null;
+            ReaderPolicy p1 = null;
             for (Iterator iter = groups.iterator(); iter.hasNext(); ) {
                 jif.lang.Principal reader = (jif.lang.Principal) iter.next();
                 List readerSet = new LinkedList();
                 readerSet.add(reader);
-                p1 = new PrivacyPolicy(owner, readerSet);
+                p1 = new ReaderPolicy(owner, readerSet);
                 if (p.relabelsTo(p1) && p1.relabelsTo(p)) {
                     readers = new String[1];
                     readers[0] = reader.name();
@@ -89,6 +96,7 @@ public class FileSystem
             String[] readers);							      
     
     private static native String[] readers(String file);
+//    private static native String[] writers(String file);
     
     private static native String owner(String file);
     

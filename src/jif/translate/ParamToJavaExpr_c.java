@@ -3,13 +3,12 @@ package jif.translate;
 import jif.types.JifClassType;
 import jif.types.JifContext;
 import jif.types.ParamInstance;
-import jif.types.label.CovariantParamLabel;
-import jif.types.label.Label;
-import jif.types.label.ParamLabel;
+import jif.types.label.*;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
+import polyglot.util.InternalCompilerError;
 
 public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
     public Expr toJava(Label label, JifToJavaRewriter rw) throws SemanticException {
@@ -17,6 +16,12 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
             return toJava(((ParamLabel)label).paramInstance(), rw);
         }
         return toJava(((CovariantParamLabel)label).paramInstance(), rw);
+    }
+    public Expr toJava(LabelJ label, JifToJavaRewriter rw) throws SemanticException {
+        throw new InternalCompilerError("Should never be called");
+    }
+    public Expr toJava(LabelM label, JifToJavaRewriter rw) throws SemanticException {
+        throw new InternalCompilerError("Should never be called");
     }
 
     public Expr toJava(Principal principal, JifToJavaRewriter rw) throws SemanticException {

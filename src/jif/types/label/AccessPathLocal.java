@@ -3,6 +3,7 @@ package jif.types.label;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.PathMap;
+import jif.visit.LabelChecker;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -64,13 +65,13 @@ public class AccessPathLocal extends AccessPathRoot {
         return li.type();
     }
 
-    public PathMap labelcheck(JifContext A) {
+    public PathMap labelcheck(JifContext A, LabelChecker lc) {
     	JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
     	Label L = ts.labelOfLocal(li, A.pc());
 
     	PathMap X = ts.pathMap();
     	X = X.N(A.pc());
-    	X = X.NV(L.join(A.pc()));
+    	X = X.NV(lc.upperBound(L, A.pc()));
         
         return X;
     }

@@ -18,6 +18,13 @@ import polyglot.visit.TypeChecker;
  */
 public class LabelTypeCheckUtil {
     
+    /**
+     * Check the type of any access path contained in a dynamic principal. All such access paths should have type
+     * Principal. 
+     * @param tc
+     * @param principal
+     * @throws SemanticException
+     */
     public static void typeCheckPrincipal(TypeChecker tc, Principal principal) throws SemanticException {
         if (principal instanceof DynamicPrincipal) {
             JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
@@ -45,6 +52,12 @@ public class LabelTypeCheckUtil {
         }        
     }
     
+    /**
+     * Check that all access paths occurring in label Lbl have the appropriate type.
+     * @param tc
+     * @param Lbl
+     * @throws SemanticException
+     */
     public static void typeCheckLabel(TypeChecker tc, Label Lbl) throws SemanticException {
         for (Iterator comps = Lbl.components().iterator(); comps.hasNext(); ) {
             Label l = (Label)comps.next();
@@ -72,18 +85,26 @@ public class LabelTypeCheckUtil {
                                                         dl.position());
                 }
             }        
-            else if (l instanceof PolicyLabel) {
-                PolicyLabel pl = (PolicyLabel)l;
-                typeCheckPrincipal(tc, pl.owner());
-                for (Iterator i = pl.readers().iterator(); i.hasNext(); ) {
-                    Principal r = (Principal)i.next();
-                    typeCheckPrincipal(tc, r);                
-                }
+            else if (l instanceof PairLabel) {
+                PairLabel pl = (PairLabel)l;
+                typeCheckLabelJ(tc, pl.labelJ());
             }
         }
         
     }
     
+    public static void typeCheckLabelJ(TypeChecker tc, LabelJ lbl) throws SemanticException {
+        if (lbl instanceof ReaderPolicy) {
+            ReaderPolicy rp = (ReaderPolicy)lbl;
+            typeCheckPrincipal(tc, rp.owner());
+            for (Iterator i = rp.readers().iterator(); i.hasNext(); ) {
+                Principal r = (Principal)i.next();
+                typeCheckPrincipal(tc, r);                
+            }
+        }
+        
+    }
+
     public static void typeCheckType(TypeChecker tc, Type t) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
 
@@ -172,7 +193,7 @@ public class LabelTypeCheckUtil {
                     }
                     
                     A.setPc(X.N());    
-                    PathMap Xj = L.labelCheck(A);
+                    PathMap Xj = L.labelCheck(A, lc);
                     throwTypes.removeAll(L.throwTypes(ts));
                     Xparams.add(Xj);
                     X = X.join(Xj);
@@ -195,7 +216,7 @@ public class LabelTypeCheckUtil {
                     
                     
                     A.setPc(X.N());            
-                    PathMap Xj = p.labelCheck(A);
+                    PathMap Xj = p.labelCheck(A, lc);
                     throwTypes.removeAll(p.throwTypes(ts));
                     Xparams.add(Xj);
                     X = X.join(Xj);

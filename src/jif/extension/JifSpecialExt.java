@@ -75,7 +75,7 @@ public class JifSpecialExt extends Jif_c
 	
 	// X(this).NV = this_label, which is upper-bounded
 	// by the begin label. 
-	X = X.NV(ct.thisLabel().join(A.pc()));	
+	X = X.NV(lc.upperBound(ct.thisLabel(), A.pc()));	
 
 	return X(se, X);
     }

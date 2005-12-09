@@ -1,9 +1,10 @@
 package jif.types.label;
 
 import jif.types.*;
+import jif.visit.LabelChecker;
 import polyglot.main.Report;
-import polyglot.types.*;
 import polyglot.types.ClassType;
+import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -68,7 +69,7 @@ public class AccessPathThis extends AccessPathRoot {
         return ct;
     }
     
-    public PathMap labelcheck(JifContext A) {
+    public PathMap labelcheck(JifContext A, LabelChecker lc) {
     	JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
     	JifClassType ct = (JifClassType)A.currentClass();
     	
@@ -77,7 +78,7 @@ public class AccessPathThis extends AccessPathRoot {
     	X = X.N(A.pc());
     	
     	// X(this).NV = this_label, which is upper-bounded by the begin label. 
-    	X = X.NV(ct.thisLabel().join(A.pc()));	    	
+    	X = X.NV(lc.upperBound(ct.thisLabel(), A.pc()));	    	
         return X;
     }
     public void verify(JifContext A) throws SemanticException {

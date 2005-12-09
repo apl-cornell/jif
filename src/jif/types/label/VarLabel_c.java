@@ -4,6 +4,7 @@ import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
+import polyglot.ext.jl.types.TypeObject_c;
 import polyglot.main.Report;
 import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
@@ -24,7 +25,7 @@ public class VarLabel_c extends Label_c implements VarLabel {
         this.name = name;
         setDescription(description);
     }
-    
+       
     public boolean isEnumerable() { return true; }
     public boolean isComparable() { return true; }    
     public boolean isCanonical() { return true; }     
@@ -34,7 +35,7 @@ public class VarLabel_c extends Label_c implements VarLabel {
     
     public String componentString(Set printedLabels) {
         if (Report.should_report(Report.debug, 2)) { 
-            return "<var " + name + " " + uid + ">";
+            return "<var " + name + " " + uid +  " " + System.identityHashCode(this)+ ">";
         }
         if (Report.should_report(Report.debug, 1)) { 
             return "<var " + name + ">";

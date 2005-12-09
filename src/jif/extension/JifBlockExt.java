@@ -50,6 +50,7 @@ public class JifBlockExt extends JifStmtExt_c
 	    // At this point, the environment A should have been extended
 	    // to include any declarations of s.  Reset the PC label.
 	    A.setPc(Xs.N());
+        
 	    Xblock = Xblock.N(ts.notTaken()).join(Xs);
 	}
 

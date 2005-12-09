@@ -1,10 +1,10 @@
 package jif.types.label;
 
 import jif.types.*;
-import jif.types.JifContext;
-import jif.types.PathMap;
+import jif.visit.LabelChecker;
 import polyglot.main.Report;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.Type;
 import polyglot.util.Position;
 
 /**
@@ -51,7 +51,7 @@ public class AccessPathClass extends AccessPathRoot {
         return -2030;
     }
 
-    public PathMap labelcheck(JifContext A) {
+    public PathMap labelcheck(JifContext A, LabelChecker lc) {
     	JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
     	
     	// there is no information gained by accessing a class statically.

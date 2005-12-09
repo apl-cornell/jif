@@ -44,7 +44,7 @@ public interface Principal extends Param {
      * @see jif.ast.Jif#labelCheck(LabelChecker)
      * @see Label#labelCheck(JifContext)
      */
-    PathMap labelCheck(JifContext A);
+    PathMap labelCheck(JifContext A, LabelChecker lc);
 
     Expr toJava(JifToJavaRewriter rw) throws SemanticException;
 

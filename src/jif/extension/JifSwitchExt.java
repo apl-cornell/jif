@@ -55,7 +55,7 @@ public class JifSwitchExt extends JifStmtExt_c
 	    l.add(s);
 
 	    PathMap Xs = X(s);
-	    A.setPc(A.pc().join(Xs.N()));
+	    A.setPc(lc.upperBound(A.pc(), Xs.N()));
 	    Xa = Xa.join(Xs);
 	}
 

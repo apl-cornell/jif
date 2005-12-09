@@ -75,7 +75,7 @@ public class JifTryExt extends JifStmtExt_c
 	    }
 
 	    // Constrain the variable label to be at least as much as the exc-label.
-	    Label pc_i = excLabel(Xs, cb.catchType(), ts);
+	    Label pc_i = excLabel(Xs, cb.catchType(), lc, ts);
 
 	    final String catchTypeName = ts.unlabel(cb.catchType()).toClass().name();
             lc.constrain(new LabelConstraint(
@@ -126,12 +126,12 @@ public class JifTryExt extends JifStmtExt_c
 	    Label finalPath = ts.bottomLabel();
 	    for (Iterator iter = X2.paths().iterator(); iter.hasNext(); ) {
 		Path p = (Path) iter.next();
-		finalPath = finalPath.join(X2.get(p));
+		finalPath = lc.upperBound(finalPath, X2.get(p));
 	    }
 	    for (Iterator iter = Xall.paths().iterator(); iter.hasNext(); ) {
 		Path p = (Path) iter.next();
 		if (p instanceof ExceptionPath) {
-		    Xall = Xall.set(p, Xall.get(p).join(finalPath));
+		    Xall = Xall.set(p, lc.upperBound(Xall.get(p), finalPath));
 		}
 	    }
 	    X = Xall.join(X2);
@@ -178,7 +178,7 @@ public class JifTryExt extends JifStmtExt_c
 	return Xp;
     }
 
-    private Label excLabel(PathMap X, Type ct, JifTypeSystem ts)
+    private Label excLabel(PathMap X, Type ct, LabelChecker lc, JifTypeSystem ts)
 	throws SemanticException {
 
 	Label L = ts.bottomLabel(ct.position());
@@ -191,7 +191,7 @@ public class JifTryExt extends JifStmtExt_c
 
 		if (ts.isSubtype(ct, ep.exception()) ||
 		    ts.isSubtype(ep.exception(), ct)) {
-		    L = L.join(X.get(ep));
+		    L = lc.upperBound(L, X.get(ep));
 		}
 	    }
 	}

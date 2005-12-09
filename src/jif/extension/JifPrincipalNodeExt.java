@@ -6,7 +6,9 @@ import java.util.List;
 import jif.ast.Jif_c;
 import jif.ast.PrincipalNode;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Node;
@@ -34,7 +36,7 @@ public class JifPrincipalNodeExt extends Jif_c {
                     pn.position());
         }
 
-        PathMap X1 = p.labelCheck(A);
+        PathMap X1 = p.labelCheck(A, lc);
         throwTypes.removeAll(p.throwTypes(ts));
         A = (JifContext)A.pop();
         

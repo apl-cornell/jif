@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jif.ast.JifInstantiator;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
+import jif.visit.LabelChecker;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -79,8 +82,8 @@ public class AccessPathField extends AccessPath {
         return fi.type();
     }
 
-    public PathMap labelcheck(JifContext A) {
-    	PathMap Xt = path.labelcheck(A);
+    public PathMap labelcheck(JifContext A, LabelChecker lc) {
+    	PathMap Xt = path.labelcheck(A, lc);
 
     	JifTypeSystem ts = (JifTypeSystem)A.typeSystem();    	
 
@@ -93,7 +96,7 @@ public class AccessPathField extends AccessPath {
         Label L = ts.labelOfField(fi, A.pc());
         L = JifInstantiator.instantiate(L, A, path, path.type().toReference(), Xt.NV());
 
-        X = X.NV(L.join(X.NV()));
+        X = X.NV(lc.upperBound(L, X.NV()));
         return X;
     }
     

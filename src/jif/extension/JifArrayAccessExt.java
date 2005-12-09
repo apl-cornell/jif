@@ -59,7 +59,7 @@ public class JifArrayAccessExt extends Jif_c
         if (((JifArrayAccessDel)node().del()).outOfBoundsExcThrown()) {
             // an out of bounds exception may be thrown
             checkAndRemoveThrowType(throwTypes, oob);
-             X2 = X2.exc(Xa.NV().join(Xb.NV()), oob);
+             X2 = X2.exc(lc.upperBound(Xa.NV(), Xb.NV()), oob);
         }
 
         // Xv is a path map with paths N and NV equal to the path value for 
@@ -69,12 +69,13 @@ public class JifArrayAccessExt extends Jif_c
 	Xv = Xv.NV(X2.N());
 
         // X is the pathmap for the increment. 
-	PathMap X = X2.N(ts.notTaken()).NV(La.join(X2.NV())).join(Xv);
+	PathMap X = X2.N(ts.notTaken()).NV(lc.upperBound(La, X2.NV())).join(Xv);
 
         lc.constrain(new LabelConstraint(new NamedLabel("X.nv", 
                                                         "Label of the value " + aie,
                                                         X.NV()).
-                                                   join("X.n", 
+                                                   join(lc,
+                                                        "X.n", 
                                                         "label of successful evaluation of array access " + aie,
                                                         X.N()), 
                                          LabelConstraint.LEQ, 
@@ -140,10 +141,10 @@ public class JifArrayAccessExt extends Jif_c
         if (((JifArrayAccessDel)node().del()).outOfBoundsExcThrown()) {
             // an out of bounds exception may be thrown
             checkAndRemoveThrowType(throwTypes, oob);
-             X2 = X2.exc(Xa.NV().join(Xb.NV()), oob);
+             X2 = X2.exc(lc.upperBound(Xa.NV(), Xb.NV()), oob);
         }
 
-	PathMap X = X2.NV(La.join(X2.NV()));
+	PathMap X = X2.NV(lc.upperBound(La, X2.NV()));
 
         checkThrowTypes(throwTypes);
 	return X(aie.index(index).array(array), X);

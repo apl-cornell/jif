@@ -66,7 +66,7 @@ public class JifDeclassifyExprExt extends Jif_c
         lc.constrain(new LabelConstraint(new NamedLabel("expr.nv", Xe.NV()), 
                                          LabelConstraint.LEQ, 
                                          new NamedLabel("declass_to_label", L).
-                                                   join("auth_label", authLabel),
+                                                   join(lc, "auth_label", authLabel),
                                          A.labelEnv(),
                                          d.position()) {
                      public String msg() {
@@ -107,7 +107,7 @@ public class JifDeclassifyExprExt extends Jif_c
          );
 
 	//_pc_ is not declassified. 
-	PathMap X = Xe.NV(A.pc().join(L));
+	PathMap X = Xe.NV(lc.upperBound(A.pc(), L));
 
 	return X(d.expr(e), X);
     }

@@ -43,7 +43,8 @@ public class JifInitializerExt extends Jif_c
 	PathMap X = X(body);
 
 	// X[node()] join X[r] <= Lr (== Li) 
-        lc.constrain(new LabelConstraint(new NamedLabel("X(initializer).n", X.N()).join("X(initializer).r", X.R()), 
+        lc.constrain(new LabelConstraint(new NamedLabel("X(initializer).n", X.N()).
+                                             join(lc, "X(initializer).r", X.R()), 
                                          LabelConstraint.LEQ, 
                                          new NamedLabel("init_pc", Li),
                                          A.labelEnv(),

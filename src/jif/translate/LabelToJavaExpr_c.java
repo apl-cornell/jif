@@ -1,14 +1,20 @@
 package jif.translate;
 
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.*;
-import jif.ast.*;
-import polyglot.types.*;
-import polyglot.ext.jl.types.*;
-import jif.types.*;
 import jif.types.label.Label;
-import jif.visit.*;
+import jif.types.label.LabelJ;
+import jif.types.label.LabelM;
+import polyglot.ast.Expr;
+import polyglot.types.SemanticException;
+import polyglot.util.InternalCompilerError;
 
 public abstract class LabelToJavaExpr_c implements LabelToJavaExpr {
-    public abstract Expr toJava(Label label, JifToJavaRewriter rw) throws SemanticException;
+    public Expr toJava(Label label, JifToJavaRewriter rw) throws SemanticException {
+        throw new InternalCompilerError("Should never be called");
+    }
+    public Expr toJava(LabelJ label, JifToJavaRewriter rw) throws SemanticException {
+        throw new InternalCompilerError("Should never be called");
+    }
+    public Expr toJava(LabelM label, JifToJavaRewriter rw) throws SemanticException {
+        throw new InternalCompilerError("Should never be called: " + label.getClass());
+    }
 }

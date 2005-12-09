@@ -34,7 +34,7 @@ public class JifLocalExt extends Jif_c
 
 	PathMap X = ts.pathMap();
 	X = X.N(A.pc());
-	X = X.NV(L.join(A.pc()));
+	X = X.NV(lc.upperBound(L, A.pc()));
 
         // original constraint was X.NV() <= L
         // simplified to the equivalent constraint A.pc() <= L
@@ -85,7 +85,7 @@ public class JifLocalExt extends Jif_c
 
 	PathMap X = ts.pathMap();
 	X = X.N(A.pc());
-	X = X.NV(L.join(A.pc()));
+	X = X.NV(lc.upperBound(L, A.pc()));
 
 	return X(lve, X);
     }
