@@ -1,20 +1,12 @@
 package jif.types.label;
 
 import java.util.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
-import jif.translate.JifToJavaRewriter;
 import jif.translate.PairLabelToJavaExpr_c;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
-import jif.types.hierarchy.PrincipalHierarchy;
 import jif.visit.LabelChecker;
-import polyglot.ast.Expr;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeObject;
-import polyglot.types.TypeSystem;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -81,7 +73,6 @@ public class PairLabel_c extends Label_c implements PairLabel {
 
         L = L.singletonComponent();
         
-        PrincipalHierarchy ph = env.ph();
         if (L instanceof PairLabel) {
             PairLabel that = (PairLabel) L;
             return env.leq(this.labelJ, that.labelJ()) &&
@@ -91,7 +82,14 @@ public class PairLabel_c extends Label_c implements PairLabel {
     }
 
     public String componentString(Set printedLabels) {
-        return "<" + this.labelJ.toString() + "; " + this.labelM.toString() + ">";
+        StringBuffer sb = new StringBuffer();
+        sb.append(this.labelJ.componentString(printedLabels));
+        String s = this.labelM.componentString(printedLabels);
+        if (s.length() > 0 && sb.length() > 0) {
+            sb.append("; ");
+        }
+        sb.append(s);
+        return sb.toString();
     }
     
     public List throwTypes(TypeSystem ts) {
@@ -111,10 +109,8 @@ public class PairLabel_c extends Label_c implements PairLabel {
         return substitution.substLabel(pl);
     }
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         A = (JifContext)A.pushBlock();
-        PathMap X = this.labelJ.labelCheck(A, lc);
-                
+        PathMap X = this.labelJ.labelCheck(A, lc);                
         A.setPc(X.N());
         X = X.join(this.labelM.labelCheck(A, lc));            
         return X;

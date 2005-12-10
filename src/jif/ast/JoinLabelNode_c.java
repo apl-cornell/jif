@@ -64,7 +64,10 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
                 sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
                 return this;
             }
-            if (n.label() instanceof PairLabel) {
+            if (n instanceof NestedPolicyLabelNode) {
+                l.add(n.label());                
+            }
+            else if (n.label() instanceof PairLabel) {
                 pairLabels.add(n.label());
             }
             else {
@@ -89,7 +92,7 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
             l.add(ts.pairLabel(position(), lj, lm));
         }
 
-	return nf.CanonicalLabelNode(position(), ts.joinLabel(position(), l));
+        return nf.CanonicalLabelNode(position(), ts.joinLabel(position(), l));
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

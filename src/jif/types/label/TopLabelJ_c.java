@@ -31,10 +31,7 @@ public class TopLabelJ_c extends LabelJ_c implements TopLabelJ {
     public boolean isCovariant() { return false; }
     
     public String componentString(Set printedLabels) {
-        return "<top>";
-    }    
-    public String toString() {
-        return "<top>";
+        return "<top conf>";
     }    
     public boolean equalsImpl(TypeObject o) {
         return o instanceof TopLabelJ;

@@ -26,10 +26,7 @@ public class BottomLabelM_c extends LabelM_c implements BottomLabelM {
     public boolean isRuntimeRepresentable() { return false; }
     
     public String componentString(Set printedLabels) {
-        return "<bot>";
-    }    
-    public String toString() {
-        return "<bot>";
+        return "<bot integ>";
     }    
     public boolean equalsImpl(TypeObject o) {
         return o instanceof BottomLabelM;
