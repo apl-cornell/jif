@@ -23,36 +23,56 @@ public class LabelUtil
 	return BOTTOM;
     }
 
-    public static ConfPolicy readerPolicyLabel(Principal owner, Collection readers) {
-        return intern(new ReaderPolicy(owner, readers));
+    public static ConfPolicy readerPolicy(Principal owner, Principal reader) {
+        return intern(new ReaderPolicy(owner, reader));
+    }
+    public static ConfPolicy readerPolicy(Principal owner, Collection readers) {
+        return intern(new ReaderPolicy(owner, PrincipalUtil.disjunction(readers)));
+    }
+    
+    public static Label readerPolicyLabel(Principal owner, Principal reader) {
+        return toLabel(intern(new ReaderPolicy(owner, reader)));
+    }
+    public static Label readerPolicyLabel(Principal owner, Collection readers) {        
+        Label l = toLabel(intern(new ReaderPolicy(owner, PrincipalUtil.disjunction(readers))));
+        return l;
     }
 
     /**
      * See the Jif signature for the explanation of lbl.
      */
-    public static ConfPolicy readerPolicyLabel(Label lbl, Principal owner, Principal[] readers) {
+    public static Label readerPolicyLabel(Label lbl, Principal owner, Principal[] readers) {
         if (readers == null) return readerPolicyLabel(owner, Collections.EMPTY_SET);
         return readerPolicyLabel(owner, Arrays.asList(readers));
     }
 
-    public static ConfPolicy readerPolicyLabel(Principal owner, PrincipalSet readers) {
-        return readerPolicyLabel(owner, readers.getSet());
+    public static Label readerPolicyLabel(Principal owner, PrincipalSet readers) {
+        return readerPolicyLabel(owner, PrincipalUtil.disjunction(readers.getSet()));
     }
 
-    public static IntegPolicy writerPolicyLabel(Principal owner, Collection writers) {
-        return intern(new WriterPolicy(owner, writers));
+    public static IntegPolicy writerPolicy(Principal owner, Principal writer) {
+        return intern(new WriterPolicy(owner, writer));
+    }
+    public static IntegPolicy writerPolicy(Principal owner, Collection writers) {
+        return intern(new WriterPolicy(owner, PrincipalUtil.disjunction(writers)));
+    }
+    public static Label writerPolicyLabel(Principal owner, Principal writer) {
+        return toLabel(intern(new WriterPolicy(owner, writer)));
+    }
+    public static Label writerPolicyLabel(Principal owner, Collection writers) {
+        return toLabel(intern(new WriterPolicy(owner, PrincipalUtil.disjunction(writers))));
     }
 
     /**
      * See the Jif signature for the explanation of lbl.
      */
-    public static IntegPolicy writerPolicyLabel(Label lbl, Principal owner, Principal[] writers) {
-        if (writers == null) return writerPolicyLabel(owner, Collections.EMPTY_SET);
-        return writerPolicyLabel(owner, Arrays.asList(writers));
+    public static IntegPolicy writerPolicy(Label lbl, Principal owner, Principal[] writers) {
+        if (writers == null) return writerPolicy(owner, Collections.EMPTY_SET);
+        return writerPolicy(owner, Arrays.asList(writers));
     }
 
-    public static IntegPolicy writerPolicyLabel(Principal owner, PrincipalSet writers) {
-        return writerPolicyLabel(owner, writers.getSet());
+    public static IntegPolicy writerPolicy(Principal owner, PrincipalSet writers) {
+        return writerPolicy(owner, writers.getSet());
     }
 
     public static ConfIntegPair pairLabel(ConfCollection confPols, IntegCollection integPols) {
@@ -63,9 +83,18 @@ public class LabelUtil
                                         integCollection(integPol)));        
     }
     
-    public static Label label(ConfIntegPair pair) {
+    public static Label toLabel(ConfIntegPair pair) {
         return intern(new JoinLabel(pair));
     }
+    public static Label toLabel(ConfPolicy pol) {
+        return toLabel(new ConfIntegPair(confCollection(pol), 
+                                         new IntegCollection(Collections.EMPTY_SET)));
+    }
+    public static Label toLabel(IntegPolicy pol) {
+        return toLabel(new ConfIntegPair(new ConfCollection(Collections.EMPTY_SET), 
+                                         integCollection(pol)));
+    }
+
     public static ConfCollection bottomConf() {
         return new ConfCollection();
     }

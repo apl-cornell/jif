@@ -21,51 +21,30 @@ import polyglot.util.TypedList;
  */
 public class ReaderPolicy_c extends LabelJ_c implements ReaderPolicy {
     private final Principal owner;
-    private final Collection readers;
+    private final Principal reader;
     
-    public ReaderPolicy_c(Principal owner, Collection readers, JifTypeSystem ts, Position pos) {
+    public ReaderPolicy_c(Principal owner, Principal reader, JifTypeSystem ts, Position pos) {
         super(ts, pos); 
         if (owner == null) throw new InternalCompilerError("null owner");
         this.owner = owner;
-        this.readers = new LinkedHashSet(TypedList.copyAndCheck(new ArrayList(readers), Principal.class, true));
+        this.reader = reader;
     }
     
     public Principal owner() {
         return this.owner;
     }
-    public Collection readers() {
-        return readers;
+    public Principal reader() {
+        return reader;
     }
     public boolean isComparable() { return true; }
     
     public boolean isEnumerable() { return true; }
     public boolean isCanonical() {
-        if (! owner.isCanonical()) {
-            return false;
-        }        
-        for (Iterator i = readers.iterator(); i.hasNext(); ) {
-            Principal r = (Principal) i.next();            
-            if (! r.isCanonical()) {
-                return false;
-            }
-        }        
-        return true;
+        return owner.isCanonical() && reader.isCanonical();
     }
     public boolean isDisambiguatedImpl() { return isCanonical(); }
     public boolean isRuntimeRepresentable() {
-        if (! owner.isRuntimeRepresentable()) {
-            return false;
-        }
-        
-        for (Iterator i = readers.iterator(); i.hasNext(); ) {
-            Principal r = (Principal) i.next();
-            
-            if (! r.isRuntimeRepresentable()) {
-                return false;
-            }
-        }
-        
-        return true;
+        return owner.isRuntimeRepresentable() && reader.isRuntimeRepresentable();
     }
         
     public boolean equalsImpl(TypeObject o) {
@@ -73,14 +52,14 @@ public class ReaderPolicy_c extends LabelJ_c implements ReaderPolicy {
         if (o instanceof ReaderPolicy_c) {
             ReaderPolicy_c that = (ReaderPolicy_c)o;
             if (this.owner == that.owner || (this.owner != null && this.owner.equals(that.owner))) {
-                return this.readers.equals(that.readers);
+                return this.reader.equals(that.reader);
             }
         }
         return false;
     }
     
     public int hashCode() {
-        return (owner==null?0:owner.hashCode()) ^ readers.hashCode();
+        return (owner==null?0:owner.hashCode()) ^ reader.hashCode() ^ 948234;
     }
     
     public boolean leq_(LabelJ L, LabelEnv env) {
@@ -95,28 +74,8 @@ public class ReaderPolicy_c extends LabelJ_c implements ReaderPolicy {
                 return false;
             }
             
-            // for all j . rj' >= o || exists i . rj' >= ri
-            for (Iterator j = that.readers().iterator(); j.hasNext(); ) {
-                Principal rj = (Principal) j.next();                
-                boolean sat = false;                
-                if (ph.actsFor(rj, this.owner)) {
-                    sat = true;
-                }
-                else {
-                    for (Iterator i = this.readers.iterator(); i.hasNext(); ) {
-                        Principal ri = (Principal) i.next();                        
-                        if (ph.actsFor(rj, ri)) {
-                            sat = true;
-                            break;
-                        }
-                    }
-                }
-                
-                if (!sat) {
-                    return false;
-                }
-            }            
-            return true;
+            return ph.actsFor(that.reader(), this.owner()) ||
+                    ph.actsFor(that.reader(), this.reader());
         }        
         return false;
     }
@@ -124,23 +83,14 @@ public class ReaderPolicy_c extends LabelJ_c implements ReaderPolicy {
     public String componentString(Set printedLabels) {
         StringBuffer sb = new StringBuffer(owner.toString());
         sb.append(": ");        
-        for (Iterator i = readers.iterator(); i.hasNext(); ) {
-            Principal p = (Principal) i.next();
-            sb.append(p);        
-            if (i.hasNext()) {
-                sb.append(", ");        
-            }
-        }        
+        sb.append(reader.toString());        
         return sb.toString();
     }
     
     public List throwTypes(TypeSystem ts) {
         List throwTypes = new ArrayList();
         throwTypes.addAll(owner.throwTypes(ts));
-        for (Iterator i = readers.iterator(); i.hasNext(); ) {
-            Principal r = (Principal) i.next();
-            throwTypes.addAll(r.throwTypes(ts));
-        }
+        throwTypes.addAll(reader.throwTypes(ts));
         return throwTypes; 
     }
 
@@ -149,31 +99,21 @@ public class ReaderPolicy_c extends LabelJ_c implements ReaderPolicy {
 
         Principal newOwner = owner.subst(substitution);
         if (newOwner != owner) changed = true;
-        Set newReaders = new LinkedHashSet(readers.size());
-        
-        
-        for (Iterator i = readers.iterator(); i.hasNext(); ) {
-            Principal rd = (Principal) i.next();
-            Principal newRd = rd.subst(substitution);
-            if (newRd != rd) changed = true;
-            newReaders.add(newRd);
-        }
-        
+        Principal newReader = reader.subst(substitution);
+        if (newReader != reader) changed = true;
+                
         if (!changed) return substitution.substLabelJ(this);
 
         JifTypeSystem ts = (JifTypeSystem)typeSystem();
-        ReaderPolicy newLabel = ts.readerPolicy(this.position(), newOwner, newReaders);
+        ReaderPolicy newLabel = ts.readerPolicy(this.position(), newOwner, newReader);
         return substitution.substLabelJ(newLabel);
     }
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         // check each principal in turn.
         PathMap X = owner.labelCheck(A, lc);
-        for (Iterator i = readers.iterator(); i.hasNext(); ) {
-            A.setPc(X.N());
-            Principal r = (Principal) i.next();
-            PathMap Xr = r.labelCheck(A, lc);
-            X = X.join(Xr);            
-        }
+        A.setPc(X.N());
+        PathMap Xr = reader.labelCheck(A, lc);
+        X = X.join(Xr);            
         return X;
     }
 

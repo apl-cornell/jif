@@ -7,8 +7,8 @@ package jif.lang;
  * Objects that implement this interface can be coerced to values 
  * of the primitive type <code>principal</code>. For example,
  * <pre>
-   jif.lang.Principal o = ...;
-   principal p = o;
+ jif.lang.Principal o = ...;
+ principal p = o;
  * </pre>
  * <p>If the object <code>o</code> is <code>null</code>, then
  * the principal value is the special <code>NullPrincipal</code>
@@ -27,73 +27,41 @@ public interface Principal {
      * <code>o.name().equals(p.name())</code>.
      */
     String{this} name();
-
+    
     /**
      * Does this principal delegate its authority to the 
      * principal p?
      */
-	boolean{this;p} delegatesTo(principal p);
-
+    boolean{this;p} delegatesTo(principal p);
+    
     /**
      * Is this principal equal to the Principal p?
      */
-	boolean{this;p} equals(Principal p);
-
-	/**
-	 * Does the <code>authPrf<code> provide
-	 * sufficient proof of this principal's authority to
-	 * execute the closure <code>closure</code>?
-	 * For example, <code>authPrf<code> may be
-	 * a password (or a password digest, or a certificate, etc.), 
-	 * and this method will return true if that password matches
-	 * the principal's password, and the closure is one that the
-	 * principal expects to be asked to authorize.
-	 */
-	boolean{authPrf; closure; lb; *lb; this} isAuthorized(Object authPrf, 
-                                                     Closure[this, lb] closure,
-                                                     label lb) where authority (this);
-
+    boolean{this;p} equals(Principal p);
+    
     /**
-     * Search for a chain of principals <code>a</code> of length L such that
-     *   <pre>
-     *     a[L-1] == this
-     *     a[L-1] delegates to a[L-2]
-     *     ...
-     *     a[1] delegates to a[0]
-     *     a[0] == p
-     *   </pre>.
-     * 
-     * A class implementing this may assume that this.delegatesTo(p) returns false.
-     *  
-     * Any class implementing this interface should attempt to return non-null
-     * values from at least one of the two methods
-     * <code>findChainUpto(Principal)</code> and 
-     * <code>findChainDownto(Principal)</code>. 
-     * 
-     * @return a chain as described above, or <code>null</code> 
-     *     if no such chain can be found.   
+     * Does the <code>authPrf<code> provide
+     * sufficient proof of this principal's authority to
+     * execute the closure <code>closure</code>?
+     * For example, <code>authPrf<code> may be
+     * a password (or a password digest, or a certificate, etc.), 
+     * and this method will return true if that password matches
+     * the principal's password, and the closure is one that the
+     * principal expects to be asked to authorize.
      */
-    Principal{this;p}[]{this;p} findChainUpto{p;this}(Principal p);
-
+    boolean{authPrf; closure; lb; *lb; this} isAuthorized(Object authPrf, 
+                                                          Closure[this, lb] closure,
+                                                          label lb) where authority (this);
+    
     /**
-     * Search for a chain of principals <code>a</code> of length L such that
-     *   <pre>
-     *     a[L-1] == q
-     *     a[L-1] delegates to a[L-2]
-     *     ...
-     *     a[1] delegates to a[0]
-     *     a[0] == this
-     *   </pre>.
-     *  
-     * A class implementing this may assume that q.delegatesTo(this) returns false.
-     * 
-     * Any class implementing this interface should attempt to return non-null
-     * values from at least one of the two methods
-     * <code>findChainUpto(Principal)</code> and 
-     * <code>findChainDownto(Principal)</code>. 
-     * 
-     * @return a chain as described above, or <code>null</code> 
-     *     if no such chain can be found.   
+     * Search for a proof that the principal p can act for this principal.
+     * Return null if no such proof can be found.
      */
-    Principal{this;q}[]{this;q} findChainDownto{q;this}(Principal q);
+    ActsForProof{this;p} findProofUpto(Principal p);
+    
+    /**
+     * Search for a proof that this principal can act for the principal q.
+     * Return null if no such proof can be found.
+     */
+    ActsForProof{this;q} findProofDownto(Principal q);    
 }

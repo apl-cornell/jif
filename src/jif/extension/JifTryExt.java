@@ -116,7 +116,7 @@ public class JifTryExt extends JifStmtExt_c
 	
 	PathMap X;
 
-	Block f = (Block) trs.finallyBlock();
+	Block f = trs.finallyBlock();
 
 	if (f != null) {
 	    f = (Block) lc.context(A).labelCheck(f);

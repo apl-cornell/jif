@@ -1,30 +1,39 @@
 package jif.translate;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 
+import jif.types.JifTypeSystem;
 import jif.types.label.*;
-import jif.types.principal.Principal;
 import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
-import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 public class LabelMToJavaExpr_c extends LabelToJavaExpr_c {
     public Expr toJava(WriterPolicy label, JifToJavaRewriter rw) throws SemanticException {
         Expr e = toIntegPolJava(label, rw);
         return rw.qq().parseExpr("jif.lang.LabelUtil.integCollection(%E)", e);
     }
+    public Expr toJava(BottomLabelM label, JifToJavaRewriter rw) throws SemanticException {
+        JifTypeSystem jts = (JifTypeSystem)rw.typeSystem();
+        Position pos = label.position();
+        return toJava(jts.writerPolicy(pos,
+                                       jts.topPrincipal(pos),
+                                       jts.topPrincipal(pos)),
+                      rw);
+    }
+    
     public Expr toIntegPolJava(WriterPolicy L, JifToJavaRewriter rw) throws SemanticException {
         Expr owner = rw.principalToJava(L.owner());
+        Expr writer = rw.principalToJava(L.writer());
         
-        Expr set = rw.qq().parseExpr("new jif.lang.PrincipalSet()");
-        
-        for (Iterator i = L.writers().iterator(); i.hasNext(); ) {
-            Principal p = (Principal) i.next();
-            Expr pe = rw.principalToJava(p);
-            set = rw.qq().parseExpr("(%E).add(%E)", set, pe);
-        }
-        return rw.qq().parseExpr("jif.lang.LabelUtil.writerPolicyLabel(%E, (%E))", owner, set);
+//        Expr set = rw.qq().parseExpr("new jif.lang.PrincipalSet()");
+//        
+//        for (Iterator i = L.writers().iterator(); i.hasNext(); ) {
+//            Principal p = (Principal) i.next();
+//            Expr pe = rw.principalToJava(p);
+//            set = rw.qq().parseExpr("(%E).add(%E)", set, pe);
+//        }
+        return rw.qq().parseExpr("jif.lang.LabelUtil.writerPolicy(%E, %E)", owner, writer);
     }
 
     // returns an expr of type ConfCollection 

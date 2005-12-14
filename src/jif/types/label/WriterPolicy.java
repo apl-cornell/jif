@@ -8,6 +8,6 @@ import jif.types.principal.Principal;
  */
 public interface WriterPolicy extends LabelM {
     Principal owner();
-    Collection writers();
+    Principal writer();
 }
 

@@ -42,7 +42,7 @@ public interface Principal extends Param {
      * </pre>
      * 
      * @see jif.ast.Jif#labelCheck(LabelChecker)
-     * @see Label#labelCheck(JifContext)
+     * @see Label#labelCheck(JifContext, LabelChecker)
      */
     PathMap labelCheck(JifContext A, LabelChecker lc);
 
@@ -55,4 +55,7 @@ public interface Principal extends Param {
      * If the principal cannot be evaluated at runtime, an empty list should be returned.  
      */
     List throwTypes(TypeSystem ts);
+    
+    boolean isTopPrincipal();
+    boolean isBottomPrincipal();
 }

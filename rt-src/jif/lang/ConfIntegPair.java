@@ -20,7 +20,7 @@ public class ConfIntegPair implements Label
     }
     
     public Label join(Label l) {
-        return LabelUtil.label(this).join(l);                
+        return LabelUtil.toLabel(this).join(l);                
     }
     public Set joinComponents() {
         return Collections.singleton(this);                
@@ -29,7 +29,7 @@ public class ConfIntegPair implements Label
         if (l instanceof ConfIntegPair) {
             return relabelsTo((ConfIntegPair)l);
         }
-        return LabelUtil.label(this).relabelsTo(l);        
+        return LabelUtil.toLabel(this).relabelsTo(l);        
     }
     public boolean relabelsTo(ConfIntegPair l) {
         return this.confPols != null && this.confPols.relabelsTo(l.confPolicies()) &&
@@ -58,12 +58,15 @@ public class ConfIntegPair implements Label
     
     public String componentString() {
         StringBuffer sb = new StringBuffer();
-        //TODO needs work
         if (this.confPols != null) {
             sb.append(this.confPols.componentString());
         }
+        String s = "";
         if (this.integPols != null) {
-            sb.append(this.confPols.componentString());
+            s = this.integPols.componentString();
+        }
+        if (sb.length() > 0 && s.length() > 0) {
+            sb.append("; ");
         }
         return sb.toString();
     }

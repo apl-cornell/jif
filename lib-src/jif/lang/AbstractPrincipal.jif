@@ -11,16 +11,16 @@ public abstract class AbstractPrincipal implements Principal {
     protected AbstractPrincipal(String{this} name) {
         this.name = name;
     }
-
+    
     public String{this} name() {
         return name;
     }
-
-        public boolean{this;p} delegatesTo(principal p) {
+    
+    public boolean{this;p} delegatesTo(principal p) {
         return superiorsContains((Principal)p);
     }
-
-        public void addDelegatesTo{this:}(principal{this} p) where caller (this) {
+    
+    public void addDelegatesTo{this:}(principal{this} p) where caller (this) {
         if (superiorsContains((Principal)p)) {
             return;
         }
@@ -59,44 +59,44 @@ public abstract class AbstractPrincipal implements Principal {
         }
         return declassify(result, {this;p});
     }
-
-        public boolean{authPrf; closure; lb; *lb; this} isAuthorized(Object authPrf, 
-                                                     Closure[this, lb] closure,
-                                                     label lb) where authority (this) {
+    
+    public boolean{authPrf; closure; lb; *lb; this} isAuthorized(Object authPrf, 
+                                                                 Closure[this, lb] closure,
+                                                                 label lb) where authority (this) {
         // The default is that this principal authorizes no closures.
         return false;
     }
     
-    public Principal{this;q}[]{this;q} findChainDownto{q;this}(Principal q) {
+    
+    public ActsForProof{this;q} findProofDownto(Principal q) {    
         // don't even try! We don't have any information
         // about who we can act for.
         return null;
     }
-
-    public Principal{this;p}[]{this;p} findChainUpto{p;this}(Principal p) where authority (this) {
-        int{this;p} d = 0;
-        // go through our set of superiors, and see if we can find a chain
-        // from them to p.
-        Principal{this;p}[] chain;
+    
+    public ActsForProof{this;p} findProofUpto(Principal p) where authority (this) {
+        // go through each superior s, and see if we can find a proof
+        // from p to s.
+        ActsForProof prf;
         
-        Principal{this:}[]{this} sprs = declassify(superiors, {this});
+        Principal{this:}[]{this} sprs = declassify(superiors, {this; {}});
         
         for (int i = 0; sprs != null && i < sprs.length; i++) {
             try {
                 Principal{this} s = declassify(sprs[i], {this});
-                chain = PrincipalUtil.findDelegatesChain(p, s);
-                if (chain != null) {
+                prf = PrincipalUtil.findActsForProof(p, s);
+                if (prf != null) {
                     // success!
-                    // create a longer chain with this at the bottom 
-                    return addToChainBottom(chain, this, d);
+                    // create a bigger proof 
+                    return new TransitiveProof(prf, s, new DelegatesProof(s, this));
                 }
             }
             catch (ArrayIndexOutOfBoundsException impossible) {}
         }
-
+        
         return null;
     }
-
+    
     public boolean{this;o} equals(Object o) {
         if (o == null) return false;
         if (o instanceof Principal) {
@@ -105,72 +105,11 @@ public abstract class AbstractPrincipal implements Principal {
         return false;
     }
     
-        public boolean{this;p} equals(Principal p) {
-            if (p == null) return false;
+    public boolean{this;p} equals(Principal p) {
+        if (p == null) return false;
         return (this.name == p.name() || (this.name != null && 
                 this.name.equals(p.name()))) &&
-                        this.getClass() == p.getClass();        
+                this.getClass() == p.getClass();        
     }
     
-    /**
-     * Create a new chain of length <code>chain.length+1</code>, such that
-     * the last element of the new chain is <code>p</code>, and 
-     * all other elements are copied over from <code>chain</code>.
-     */
-    static protected Principal{dummy; p; chain}[]{chain} 
-        addToChainBottom{dummy; p; chain}(Principal{dummy}[] chain, Principal p, int dummy) {
-        if (chain == null) {
-            Principal{dummy; p; chain}[] newChain = new Principal[1];
-            try {
-                    newChain[0] = p;
-                }
-                catch (ArrayStoreException impossible) {}
-            catch (ArrayIndexOutOfBoundsException impossible) {}
-
-            return newChain;
-        }
-        
-        Principal{dummy; p; chain}[] newChain = new Principal[chain.length + 1];
-        try {
-            for (int i = 0; i < chain.length; i++) {
-                newChain[i] = chain[i];
-            }
-            newChain[chain.length] = p;
-        }
-        catch (ArrayStoreException impossible) {}
-        catch (ArrayIndexOutOfBoundsException impossible) {}
-
-        return newChain;
-    }
-
-    /**
-     * Create a new chain of length <code>chain.length+1</code>, such that
-     * the first element of the new chain is <code>p</code>, and 
-     * all other elements are copied over from <code>chain</code>, offset by one.
-     */
-    static protected Principal{dummy; p; chain}[]{chain} 
-               addToChainTop{dummy; p; chain}(Principal p, Principal[] chain, int dummy) {
-        if (chain == null) {
-            Principal{dummy; p; chain}[] newChain = new Principal[1];
-            try {
-	            newChain[0] = p;
-	        }
-	        catch (ArrayStoreException impossible) {}
-            catch (ArrayIndexOutOfBoundsException impossible) {}
-
-            return newChain;
-        }
-        
-        Principal{dummy; p; chain}[] newChain = new Principal[chain.length + 1];
-        try {
-            newChain[0] = p;
-            for (int i = 0; i < chain.length; i++) {
-                newChain[i+1] = chain[i];
-            }
-        }
-        catch (ArrayStoreException impossible) {}
-        catch (ArrayIndexOutOfBoundsException impossible) {}
-
-        return newChain;
-    }
 }

@@ -3,8 +3,10 @@ package jif.types.label;
 
 import java.util.Set;
 
+import jif.translate.JifToJavaRewriter;
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
+import polyglot.ast.Expr;
 import polyglot.types.*;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
@@ -35,4 +37,7 @@ public class BottomLabelM_c extends LabelM_c implements BottomLabelM {
     public boolean leq_(LabelM L, LabelEnv env) {
         return true;
     }
+    public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
+        return toJava.toJava(this, rw);               
+    }        
 }

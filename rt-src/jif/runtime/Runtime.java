@@ -45,9 +45,9 @@ public class Runtime {
      * the principal parameter of this <code>Runtime</code> object.
      */
     private Label defaultLabel() {
-        ConfPolicy cp = LabelUtil.readerPolicyLabel(dynp, new LinkedList());
-        IntegPolicy ip = LabelUtil.writerPolicyLabel(dynp, new LinkedList());
-        return LabelUtil.label(LabelUtil.pairLabel(cp, ip));
+        ConfPolicy cp = LabelUtil.readerPolicy(dynp, new LinkedList());
+        IntegPolicy ip = LabelUtil.writerPolicy(dynp, new LinkedList());
+        return LabelUtil.toLabel(LabelUtil.pairLabel(cp, ip));
     }
 
     /**

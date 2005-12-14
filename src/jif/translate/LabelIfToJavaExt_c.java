@@ -13,9 +13,6 @@ public class LabelIfToJavaExt_c extends ToJavaExt_c {
     }
 
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
-        TypeSystem ts = rw.java_ts();
-        NodeFactory nf = rw.java_nf();
-
         LabelIf n = (LabelIf) node();
 
         // Now visit the principals.

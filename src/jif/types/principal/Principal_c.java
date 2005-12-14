@@ -33,6 +33,8 @@ public abstract class Principal_c extends TypeObject_c implements Principal {
         return toJava.toJava(this, rw);
     }
 
+    public boolean isTopPrincipal() { return false; }
+    public boolean isBottomPrincipal() { return false; }
     public abstract boolean isCanonical();
     public abstract boolean isRuntimeRepresentable();
     public abstract boolean equalsImpl(TypeObject o);

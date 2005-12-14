@@ -63,7 +63,7 @@ public final class IntegCollection
     public String componentString() {
         String str = "";
         for (Iterator iter = components.iterator(); iter.hasNext(); ) {
-            str += ((Label)iter.next()).componentString();
+            str += ((IntegPolicy)iter.next()).componentString();
             if (iter.hasNext()) str += "; ";
         }
         return str;

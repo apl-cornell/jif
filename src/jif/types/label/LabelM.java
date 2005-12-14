@@ -64,7 +64,7 @@ public interface LabelM extends TypeObject {
      * </pre>
      * 
      * @see jif.ast.Jif#labelCheck(LabelChecker)
-     * @see jif.types.principal.Principal#labelCheck(JifContext)
+     * @see jif.types.principal.Principal#labelCheck(JifContext, LabelChecker)
      */
     PathMap labelCheck(JifContext A, LabelChecker lc);
 

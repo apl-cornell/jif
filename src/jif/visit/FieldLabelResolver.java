@@ -51,8 +51,7 @@ public class FieldLabelResolver extends ContextVisitor
     private void labelCheckClassBody(ClassBody d) throws SemanticException {
         JifClassType ct = (JifClassType) context().currentClassScope();
 
-        LabelChecker lc = new LabelChecker(job, ts,
-                                           (JifNodeFactory) nodeFactory(), false, false, false);
+        LabelChecker lc = new LabelChecker(job, ts, nodeFactory(), false, false, false);
 
         if (lc == null) {
             throw new InternalCompilerError("Could not label check " +

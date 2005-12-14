@@ -38,41 +38,7 @@ public class PrincipalUtil {
      * @param q
      * @return A delegates-chain between p and q, or null if non can be found.
      */
-    public static Principal{p;q}[]{p;q} findDelegatesChain{p;q}(Principal p, Principal q) {
-        // try the dumb things first.
-        if (p == q) {
-            Principal{p;q}[] chain = new Principal[1];
-            try {
-	            chain[0] = p;
-	        }
-	        catch (ArrayStoreException impossible) {}
-	        catch (ArrayIndexOutOfBoundsException impossible) {}
-            return chain;
-        }
-        if (q == null || (p != null && p.equals(q) && q.equals(p))) {
-            Principal{p;q}[] chain = new Principal[2];
-            try {
-                chain[0] = p;
-                chain[1] = q;
-	        }
-	        catch (ArrayStoreException impossible) {}
-	        catch (ArrayIndexOutOfBoundsException impossible) {}
-            return chain;
-        }
-        
-        // try searching upwards from q.
-        Principal{p;q}[] chain = q.findChainUpto(p);
-        if (chain != null) return chain;
-
-        // try searching downards from p.
-        if (p != null) {
-            chain = p.findChainDownto(q);
-            if (chain != null) return chain;
-        }
-        
-        // have failed!
-        return null;
-    }
+    public static native ActsForProof findActsForProof(Principal p, Principal q);
 
     /**
      * Verify that the chain is a valid delegates-chain between p and q. That is,
@@ -80,26 +46,8 @@ public class PrincipalUtil {
      * p acts for q.
 
      */
-    public static boolean{chain;p;q} verifyChain(Principal{p;q}[]{p;q} chain, Principal p, Principal q) {
-        if (chain == null || chain.length == 0) return false;
-        try {
-	        if (chain[0] != p || chain[chain.length-1] != q) return false;
-        
-	        // now go through the chain and check it
-	        for (int i = 0; i < chain.length-1; i++) {
-	            // either i+1 has to be null, or i+1 has to delegate to i
-	            final Principal left = chain[i];
-	            final Principal right = chain[i+1];
-	            if (right != null && !right.delegatesTo(left)) {
-	                return false;
-	            }
-	        }
-	        return true;
-	    }
-        catch (ArrayIndexOutOfBoundsException impossible) {
-            return false;
-        }
-    }
+    public static native boolean verifyProof(ActsForProof{p;q} proof, 
+                                             Principal p, Principal q);
     
     /**
      * Obtain a Capability for the given principal and closure.

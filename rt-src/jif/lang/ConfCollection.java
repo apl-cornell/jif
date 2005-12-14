@@ -61,7 +61,7 @@ public final class ConfCollection
     public String componentString() {
         String str = "";
         for (Iterator iter = components.iterator(); iter.hasNext(); ) {
-            str += ((Label)iter.next()).componentString();
+            str += ((ConfPolicy)iter.next()).componentString();
             if (iter.hasNext()) str += "; ";
         }
         return str;

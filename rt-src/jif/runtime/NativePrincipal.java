@@ -1,8 +1,6 @@
 package jif.runtime;
 
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import jif.lang.*;
 
@@ -34,23 +32,23 @@ public class NativePrincipal implements Principal {
         return false;
     }
     
-    public Principal[] findChainDownto(Principal q) {
+    public ActsForProof findProofDownto(Principal q) {
         // don't even try! We don't have any information
         // about who we can act for.
         return null;
     }
 
-    public Principal[] findChainUpto(Principal p) {
+    public ActsForProof findProofUpto(Principal p) {
         // go through our set of superiors, and see if we can find a chain
         // from them to p.
-        Principal[] chain;
+        ActsForProof prf;
         for (Iterator iter = superiors.iterator(); iter.hasNext(); ) {
             Principal s = (Principal)iter.next();
-            chain = PrincipalUtil.findDelegatesChain(p, s);
-            if (chain != null) {
+            prf = PrincipalUtil.findActsForProof(p, s);
+            if (prf != null) {
                 // success!
                 // create a longer chain with this at the bottom 
-                return addToChainBottom(chain, this);
+                return new TransitiveProof(prf, s, new DelegatesProof(s, this));
             }
         }
         return null;

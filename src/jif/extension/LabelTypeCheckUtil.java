@@ -4,8 +4,7 @@ import java.util.*;
 
 import jif.types.*;
 import jif.types.label.*;
-import jif.types.principal.DynamicPrincipal;
-import jif.types.principal.Principal;
+import jif.types.principal.*;
 import jif.visit.LabelChecker;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -49,7 +48,17 @@ public class LabelTypeCheckUtil {
                                             dp.path().type() + ".",
                                             principal.position());
             }
-        }        
+        } 
+        if (principal instanceof ConjunctivePrincipal) {
+            ConjunctivePrincipal p = (ConjunctivePrincipal)principal;
+            typeCheckPrincipal(tc, p.conjunctLeft());
+            typeCheckPrincipal(tc, p.conjunctRight());
+        }
+        if (principal instanceof DisjunctivePrincipal) {
+            DisjunctivePrincipal p = (DisjunctivePrincipal)principal;
+            typeCheckPrincipal(tc, p.disjunctLeft());
+            typeCheckPrincipal(tc, p.disjunctRight());
+        }
     }
     
     /**
@@ -88,6 +97,7 @@ public class LabelTypeCheckUtil {
             else if (l instanceof PairLabel) {
                 PairLabel pl = (PairLabel)l;
                 typeCheckLabelJ(tc, pl.labelJ());
+                typeCheckLabelM(tc, pl.labelM());
             }
         }
         
@@ -97,10 +107,14 @@ public class LabelTypeCheckUtil {
         if (lbl instanceof ReaderPolicy) {
             ReaderPolicy rp = (ReaderPolicy)lbl;
             typeCheckPrincipal(tc, rp.owner());
-            for (Iterator i = rp.readers().iterator(); i.hasNext(); ) {
-                Principal r = (Principal)i.next();
-                typeCheckPrincipal(tc, r);                
-            }
+            typeCheckPrincipal(tc, rp.reader());                
+        }        
+    }
+    public static void typeCheckLabelM(TypeChecker tc, LabelM lbl) throws SemanticException {
+        if (lbl instanceof WriterPolicy) {
+            WriterPolicy wp = (WriterPolicy)lbl;
+            typeCheckPrincipal(tc, wp.owner());
+            typeCheckPrincipal(tc, wp.writer());                
         }
         
     }

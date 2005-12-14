@@ -128,10 +128,24 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     
     public String componentString(Set printedLabels) {
         String s = "";
-        boolean multipleComps = (components.size() > 1); 
+        boolean multiplePairs = false; 
+        boolean onePair = false;
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label c = (Label) i.next();
-            if (multipleComps && c instanceof PairLabel) {
+            if (c instanceof PairLabel) {
+                if (!onePair) {
+                    onePair = true;
+                }
+                else {
+                    multiplePairs = true;
+                    break;
+                }
+            }
+        }
+
+        for (Iterator i = components.iterator(); i.hasNext(); ) {
+            Label c = (Label) i.next();
+            if (multiplePairs && c instanceof PairLabel) {
                 s += c.toString(printedLabels);
             }
             else

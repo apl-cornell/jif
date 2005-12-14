@@ -8,6 +8,6 @@ import jif.types.principal.Principal;
  */
 public interface ReaderPolicy extends LabelJ {
     Principal owner();
-    Collection readers();
+    Principal reader();
 }
 

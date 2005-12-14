@@ -1,7 +1,6 @@
 package jif.lang;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Utility methods for principals.
@@ -9,7 +8,8 @@ import java.util.Map;
  * See the Jif source code, in lib-src/jif/lang/PrincipalUtil.jif
  */
 public class PrincipalUtil {
-    private static Map chainCache = new HashMap();
+    private static Map proofCache = new HashMap();    
+    private static Principal TOP_PRINCIPAL = new TopPrincipal();
 
     /**
      * Returns true if and only if the principal p acts for the principal q. A
@@ -25,6 +25,7 @@ public class PrincipalUtil {
     public static boolean actsFor(Principal p, Principal q) {
         // anyone can act for the "null" principal
         if (q == null) return true;
+        if (p == TOP_PRINCIPAL) return true;
 
         // if the two principals are ==-equal, or if they
         // both agree that they are equal to each other, then
@@ -34,22 +35,22 @@ public class PrincipalUtil {
         if (q.equals(p) && p != null && p.equals(q)) return true;
 
         // try a simple test first
-        if (q.delegatesTo(p)) return true;
+        if (delegatesTo(q, p)) return true;
 
         // try the cache
         PrincipalPair pp = new PrincipalPair(p, q);
-        Principal[] chain = (Principal[])chainCache.get(pp);
-        if (chain != null) {
-            if (verifyChain(chain, p, q)) return true;
+        ActsForProof prf = (ActsForProof)proofCache.get(pp);
+        if (prf != null) {
+            if (verifyProof(prf, p, q)) return true;
             // chain is no longer valid
-            chainCache.remove(pp);
+            proofCache.remove(pp);
         }
 
         // try searching
-        chain = findDelegatesChain(p, q);
-        if (chain != null && verifyChain(chain, p, q)) {
+        prf = findActsForProof(p, q);
+        if (prf != null && verifyProof(prf, p, q)) {
             // cache the chain to avoid searching later.
-            chainCache.put(pp, chain);
+            proofCache.put(pp, prf);
             return true;
         }
 
@@ -58,48 +59,42 @@ public class PrincipalUtil {
     }
 
     /**
-     * Search for a delegates-chain between p and q. An delegates-chain between
-     * p and q is a Principal array <code>a</code> of length L such that
-     * 
-     * <pre>
-     * 
-     *  
-     *       a[L-1] == q
-     *       a[L-1] delegates to a[L-2]
-     *       ...
-     *       a[1] delegates to a[0]
-     *       a[0] == p
-     *     
-     *  
-     * </pre>. Thus, a valid delegate chain between p and q implies that p acts
-     * for q.
-     * 
+     * Search for an ActsForProof between p and q. An ActsForProof between
+     * p and q is a a checkable proof object.
      * @param p
      * @param q
-     * @return A delegates-chain between p and q, or null if non can be found.
+     * @return An ActsForPoorf between p and q, or null if none can be found.
      */
-    public static Principal[] findDelegatesChain(Principal p, Principal q) {
+    public static ActsForProof findActsForProof(Principal p, Principal q) {
         // try the dumb things first.
         if (p == q) {
-            Principal[] chain = new Principal[1];
-            chain[0] = p;
-            return chain;
+            return new ReflexiveProof(p, q);
         }
-        if (q == null || (p != null && p.equals(q) && q.equals(p))) {
-            Principal[] chain = new Principal[2];
-            chain[0] = p;
-            chain[1] = q;
-            return chain;
+        if (q == null) {
+            return new DelegatesProof(p, q);            
+        }
+        if (p != null && p.equals(q) && q.equals(p)) {
+            return new ReflexiveProof(p, q);
+        }
+        
+        // if we're going from a dis/conjunctive principal, try finding a downwards
+        // proof first
+        ActsForProof prf;
+        boolean doneDownTo = false;
+        if (p instanceof ConjunctivePrincipal || p instanceof DisjunctivePrincipal) {
+            prf = p.findProofDownto(q);
+            if (prf != null) return prf;            
+            doneDownTo = true;
         }
 
         // try searching upwards from q.
-        Principal[] chain = q.findChainUpto(p);
-        if (chain != null) return chain;
+        prf = q.findProofUpto(p);
+        if (prf != null) return prf;
 
         // try searching downards from p.
-        if (p != null) {
-            chain = p.findChainDownto(q);
-            if (chain != null) return chain;
+        if (!doneDownTo && p != null) {
+            prf = p.findProofDownto(q);
+            if (prf != null) return prf;
         }
 
         // have failed!
@@ -112,21 +107,60 @@ public class PrincipalUtil {
      * i.e., p acts for q.
      *  
      */
-    public static boolean verifyChain(Principal[] chain, Principal p,
-            Principal q) {
-        if (chain == null || chain.length == 0) return false;
-        if (chain[0] != p || chain[chain.length - 1] != q) return false;
-
-        // now go through the chain and check it
-        for (int i = 0; i < chain.length - 1; i++) {
-            // either i+1 has to be null, or i+1 has to delegate to i
-            if (chain[i + 1] != null && !chain[i + 1].delegatesTo(chain[i])) {
-                return false;
-            }
+    public static boolean verifyProof(ActsForProof prf, Principal actor,
+            Principal granter) {
+        if (prf == null) return false;
+        if (prf.getActor() != actor || prf.getGranter() != granter) return false;
+        
+        if (prf instanceof DelegatesProof) {
+            return delegatesTo(granter, actor);
         }
-        return true;
+        else if (prf instanceof ReflexiveProof) {
+            return actor == granter || (actor != null && granter != null && actor.equals(granter) && granter.equals(actor));
+        }
+        else if (prf instanceof TransitiveProof) {
+            TransitiveProof proof = (TransitiveProof)prf;
+            return verifyProof(proof.getActorToP(), proof.getActor(), proof.getP()) &&
+                   verifyProof(proof.getPToGranter(), proof.getP(), proof.getGranter());
+        }
+        else if (prf instanceof FromDisjunctProof) {
+            FromDisjunctProof proof = (FromDisjunctProof)prf;
+            if (actor instanceof DisjunctivePrincipal) {
+                DisjunctivePrincipal dp = (DisjunctivePrincipal)actor;
+                return verifyProof(proof.getLeftToGranter(), dp.disjunctL, granter) &&
+                       verifyProof(proof.getRightToGranter(), dp.disjunctR, granter);
+            }
+            
+        }
+        else if (prf instanceof ToConjunctProof) {
+            ToConjunctProof proof = (ToConjunctProof)prf;
+            if (granter instanceof ConjunctivePrincipal) {
+                ConjunctivePrincipal cp = (ConjunctivePrincipal)granter;
+                return verifyProof(proof.getActorToLeft(), actor, cp.conjunctL) &&
+                       verifyProof(proof.getActorToRight(), actor, cp.conjunctR);
+            }
+            
+        }
+        
+        // unknown proof!
+        return false;
     }
 
+    public static boolean delegatesTo(Principal granter, Principal superior) {
+        if (superior instanceof ConjunctivePrincipal) {
+            ConjunctivePrincipal cp = (ConjunctivePrincipal)superior;
+            if (cp.conjunctL.equals(granter)) return true;
+            if (cp.conjunctR.equals(granter)) return true;
+        }
+        if (granter instanceof DisjunctivePrincipal) {
+            DisjunctivePrincipal dp = (DisjunctivePrincipal)granter;
+            if (dp.disjunctL.equals(superior)) return true;
+            if (dp.disjunctR.equals(superior)) return true;
+        }
+        if (granter == null) return true;
+        return granter.delegatesTo(superior);
+    }
+    
     private static class PrincipalPair {
         final Principal p;
 
@@ -191,5 +225,45 @@ public class PrincipalUtil {
     public static Principal nullPrincipal() {
         return null;
     }
+
+    public static Principal bottomPrincipal() {
+        return nullPrincipal();
+    }
+    public static Principal topPrincipal() {
+        return TOP_PRINCIPAL;
+    }
+
+    public static Principal disjunction(Principal left, Principal right) {
+        if (left == null || right == null) return null;
+        if (actsFor(left, right)) return right;
+        if (actsFor(right, left)) return left;
+        return new DisjunctivePrincipal(left, right);
+    }
     
+    public static Principal conjunction(Principal left, Principal right) {
+        if (left == null) return right;
+        if (right == null) return left;
+        if (actsFor(left, right)) return left;
+        if (actsFor(right, left)) return right;
+        return new ConjunctivePrincipal(left, right);
+    }
+    
+    public static Principal disjunction(Collection principals) {
+        LinkedList ll = new LinkedList(principals);
+        if (ll.isEmpty()) return topPrincipal(); 
+        Principal p = (Principal)ll.removeFirst();
+        if (ll.size() == 1) return p;
+        return disjunction(p, disjunction(ll));
+    }
+    
+    private static final class TopPrincipal implements Principal {
+        private TopPrincipal() { }
+        public String name() { return "*"; }
+        public boolean delegatesTo(Principal p) { return false; }
+        public boolean equals(Principal p) { return p == this; }
+        public boolean isAuthorized(Object authPrf, Closure closure, Label lb) { return false; }
+        public ActsForProof findProofUpto(Principal p) { return null; }
+        public ActsForProof findProofDownto(Principal q) { return null; }
+        
+    }
 }

@@ -3,12 +3,14 @@ package jif.extension;
 import java.util.Iterator;
 import java.util.List;
 
+import jif.ast.JifProcedureDecl;
+import jif.types.*;
+import jif.types.principal.Principal;
 import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.types.Context;
+import polyglot.types.SemanticException;
 import polyglot.util.Position;
-import polyglot.util.SubtypeSet;
-import polyglot.visit.ExceptionChecker;
-import polyglot.visit.NodeVisitor;
+import polyglot.visit.TypeChecker;
 
 /** The Jif delegate the <code>ProcedureDecl</code> node. 
  * 
@@ -30,4 +32,40 @@ public class JifProcedureDeclDel extends JifJL_c
 
         return c;
     }
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        JifProcedureDecl pd = (JifProcedureDecl)super.typeCheck(tc);
+        JifProcedureInstance jpi = (JifProcedureInstance)pd.procedureInstance(); 
+        for (Iterator iter = jpi.constraints().iterator(); iter.hasNext(); ) {
+            Assertion a = (Assertion)iter.next();
+            if (a instanceof AuthConstraint) {
+                AuthConstraint ac = (AuthConstraint)a;
+                ensureNotTopPrincipal(ac.principals(), a.position());
+            }
+            else if (a instanceof CallerConstraint) {
+                CallerConstraint cc = (CallerConstraint)a;
+                ensureNotTopPrincipal(cc.principals(), a.position());
+            }
+            else if (a instanceof ActsForConstraint) {
+                ActsForConstraint afc = (ActsForConstraint)a;
+                ensureNotTopPrincipal(afc.actor(), a.position());
+                ensureNotTopPrincipal(afc.granter(), a.position());
+            }
+        }
+        return pd;
+    }
+    
+    protected void ensureNotTopPrincipal(List principals, Position pos) throws SemanticException {
+        for (Iterator iter = principals.iterator(); iter.hasNext(); ) {
+            Principal p = (Principal)iter.next();            
+            ensureNotTopPrincipal(p, pos);
+        }
+    }
+    protected void ensureNotTopPrincipal(Principal p, Position pos) throws SemanticException {
+        if (p.isTopPrincipal()) {
+            throw new SemanticException("The top principal " + p + 
+                                        " cannot appear in a constraint.", pos);
+        }
+    }
+    
 }
+

@@ -614,6 +614,18 @@ public class JifTypeSystem_c
         UnknownPrincipal t = new UnknownPrincipal_c(this, pos);
         return t;
     }
+    public TopPrincipal topPrincipal(Position pos) {
+        return new TopPrincipal_c(this, pos);
+    }
+    public BottomPrincipal bottomPrincipal(Position pos) {
+        return new BottomPrincipal_c(this, pos);
+    }
+    public ConjunctivePrincipal conjunctivePrincipal(Position pos, Principal l, Principal r) {
+        return new ConjunctivePrincipal_c(l, r, this, pos);
+    }
+    public DisjunctivePrincipal disjunctivePrincipal(Position pos, Principal l, Principal r) {
+        return new DisjunctivePrincipal_c(l, r, this, pos);
+    }
 
     private Label top = null;
     private Label bottom = null;
@@ -664,7 +676,8 @@ public class JifTypeSystem_c
     }
     
     public Label noComponentsLabel(Position pos) {
-        return pairLabel(pos, bottomLabelJ(pos), topLabelM(pos));
+        return bottomLabel();
+//        return pairLabel(pos, bottomLabelJ(pos), topLabelM(pos));
     }
 
     public Label notTaken(Position pos) {
@@ -704,14 +717,34 @@ public class JifTypeSystem_c
         return t;
     }
 
-    public ReaderPolicy readerPolicy(Position pos, Principal owner, Collection readers) {
-        ReaderPolicy t = new ReaderPolicy_c(owner, readers, this, pos);
+    public ReaderPolicy readerPolicy(Position pos, Principal owner, Principal reader) {
+        ReaderPolicy t = new ReaderPolicy_c(owner, reader, this, pos);
         return t;
     }
+    public ReaderPolicy readerPolicy(Position pos, Principal owner, Collection readers) {
+        Principal r = collectionToDisjunct(pos, new LinkedList(readers));
+        return readerPolicy(pos, owner, r);
+    }
 
-    public WriterPolicy writerPolicy(Position pos, Principal owner, Collection writers) {
-        WriterPolicy t = new WriterPolicy_c(owner, writers, this, pos);
+    public WriterPolicy writerPolicy(Position pos, Principal owner, Principal writer) {
+        WriterPolicy t = new WriterPolicy_c(owner, writer, this, pos);
         return t;
+    }
+    public WriterPolicy writerPolicy(Position pos, Principal owner, Collection writers) {
+        Principal w = collectionToDisjunct(pos, new LinkedList(writers));
+        return writerPolicy(pos, owner, w);
+    }
+    
+    private Principal collectionToDisjunct(Position pos, LinkedList ps) {
+        if (ps.isEmpty()) {
+            return topPrincipal(pos);
+        }
+        if (ps.size() == 1) {
+            return (Principal)ps.getLast();
+        }
+        Principal p = (Principal)ps.removeFirst();
+        Principal r = collectionToDisjunct(pos, ps);
+        return disjunctivePrincipal(pos, p, r);
     }
 
     public LabelJ joinLabelJ(Position pos, Collection components) {

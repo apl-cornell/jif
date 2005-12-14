@@ -62,6 +62,10 @@ public interface JifTypeSystem extends ParamTypeSystem
     DynamicPrincipal dynamicPrincipal(Position pos, AccessPath path);
     ExternalPrincipal externalPrincipal(Position pos, String name);
     UnknownPrincipal unknownPrincipal(Position pos);
+    TopPrincipal topPrincipal(Position pos);
+    BottomPrincipal bottomPrincipal(Position pos);
+    ConjunctivePrincipal conjunctivePrincipal(Position pos, Principal conjunctLeft, Principal conjunctRight);
+    DisjunctivePrincipal disjunctivePrincipal(Position pos, Principal disjunctLeft, Principal disjunctRight);
 
     // Label constructors
     VarLabel freshLabelVariable(Position pos, String s, String description);
@@ -92,7 +96,9 @@ public interface JifTypeSystem extends ParamTypeSystem
     ThisLabel thisLabel(JifClassType ct);
     UnknownLabel unknownLabel(Position pos);
 
+    ReaderPolicy readerPolicy(Position pos, Principal owner, Principal reader);
     ReaderPolicy readerPolicy(Position pos, Principal owner, Collection readers);
+    WriterPolicy writerPolicy(Position pos, Principal owner, Principal writer);
     WriterPolicy writerPolicy(Position pos, Principal owner, Collection writers);
 
     LabelJ joinLabelJ(Position pos, Collection components);
@@ -188,9 +194,6 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     /**
      * Compares t1 to t2 without stripping off all the parameters and labels
-     * @param t1
-     * @param t2
-     * @return
      */
     boolean equalsNoStrip(TypeObject t1, TypeObject t2);
 }

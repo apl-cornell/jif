@@ -16,15 +16,16 @@ public class LabelJToJavaExpr_c extends LabelToJavaExpr_c {
     }
     public Expr toConfPolJava(ReaderPolicy L, JifToJavaRewriter rw) throws SemanticException {        
         Expr owner = rw.principalToJava(L.owner());
+        Expr reader = rw.principalToJava(L.reader());
         
-        Expr set = rw.qq().parseExpr("new jif.lang.PrincipalSet()");
-        
-        for (Iterator i = L.readers().iterator(); i.hasNext(); ) {
-            Principal p = (Principal) i.next();
-            Expr pe = rw.principalToJava(p);
-            set = rw.qq().parseExpr("(%E).add(%E)", set, pe);
-        }
-        return rw.qq().parseExpr("jif.lang.LabelUtil.readerPolicyLabel(%E, (%E))", owner, set);
+//        Expr set = rw.qq().parseExpr("new jif.lang.PrincipalSet()");
+//        
+//        for (Iterator i = L.readers().iterator(); i.hasNext(); ) {
+//            Principal p = (Principal) i.next();
+//            Expr pe = rw.principalToJava(p);
+//            set = rw.qq().parseExpr("(%E).add(%E)", set, pe);
+//        }
+        return rw.qq().parseExpr("jif.lang.LabelUtil.readerPolicy(%E, (jif.lang.Principal)%E)", owner, reader);
     }
 
     // returns an expr of type ConfCollection 

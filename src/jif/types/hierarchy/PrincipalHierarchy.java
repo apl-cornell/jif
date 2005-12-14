@@ -2,7 +2,7 @@ package jif.types.hierarchy;
 
 import java.util.*;
 
-import jif.types.principal.Principal;
+import jif.types.principal.*;
 
 /** The principal hierarchy that defines the acts-for relationships
  *  between principals. 
@@ -15,11 +15,11 @@ public class PrincipalHierarchy {
     private final Map actsfor;
 
     public PrincipalHierarchy() {
-	this.actsfor = new HashMap();
+        this.actsfor = new HashMap();
     }
 
     public String toString() {
-	return "[" + actsForString()+ "]";
+        return "[" + actsForString()+ "]";
     }
     
     private static void addAlreadyReported(Map alreadyReported, Principal p, Principal q) {
@@ -93,8 +93,12 @@ public class PrincipalHierarchy {
     }
 
     protected boolean actsFor(Principal actor, Principal granter, Set visited) {
-	if (visited.contains(actor)) 
+        if (actor.isTopPrincipal()) return true;
+        if (granter.isBottomPrincipal()) return true;
+        
+	if (visited.contains(actor)) { 
 	    return false;
+        }
 	
 	// Check the reflexive part of actsFor relation.
 	if (actor.equals(granter)) {
@@ -103,18 +107,49 @@ public class PrincipalHierarchy {
 
 	Set s = (Set) actsfor.get(actor);
 
-	if (s == null) {
-	    return false;
-	}
-
-	if (s.contains(granter)) {
+	if (s != null && s.contains(granter)) {
 	    return true;
 	}
 
-	visited.add(actor);
+        // special cases for conjunctive and disjunctive principals.
+        if (actor instanceof ConjunctivePrincipal) {
+            ConjunctivePrincipal cp = (ConjunctivePrincipal)actor;
+            if (actsFor(cp.conjunctLeft(), granter, visited) || 
+                    actsFor(cp.conjunctRight(), granter, visited)) {
+                // Cache the result.
+                s.add(granter);
+                return true;                
+            }            
+        }
+        if (actor instanceof DisjunctivePrincipal) {
+            DisjunctivePrincipal dp = (DisjunctivePrincipal)actor;
+            if (actsFor(dp.disjunctLeft(), granter, visited) && 
+                    actsFor(dp.disjunctRight(), granter, visited)) {
+                return true;                
+            }            
+        }
+        
+        if (granter instanceof DisjunctivePrincipal) {
+            DisjunctivePrincipal dp = (DisjunctivePrincipal)granter;
+            if (actsFor(actor, dp.disjunctLeft(), visited) || 
+                    actsFor(actor, dp.disjunctRight(), visited)) {
+                return true;                
+            }            
+        }
 
-	// Check the transitive part of actsFor relation.
-	for (Iterator iter = s.iterator(); iter.hasNext(); ) {
+        if (granter instanceof ConjunctivePrincipal) {
+            ConjunctivePrincipal cp = (ConjunctivePrincipal)granter;
+            if (actsFor(actor, cp.conjunctLeft(), visited) && 
+                    actsFor(actor, cp.conjunctRight(), visited)) {
+                return true;                
+            }            
+        }
+
+        // Check the transitive part of actsFor relation.
+        if (s == null) return false;
+        visited.add(actor);
+
+        for (Iterator iter = s.iterator(); iter.hasNext(); ) {
 	    Principal p = (Principal) iter.next();
 
 	    if (actsFor(p, granter, visited)) {

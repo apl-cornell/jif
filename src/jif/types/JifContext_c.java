@@ -197,16 +197,17 @@ public class JifContext_c extends Context_c implements JifContext
         JifTypeSystem jts = (JifTypeSystem)ts;
         
         Set readPols = new LinkedHashSet();
-        Set writePols = new LinkedHashSet();
+//        Set writePols = new LinkedHashSet();
+//        Set allPrincipals = Collections.singleton(jifts.bottomPrincipal(currentCode().position()));
 	for (Iterator i = auth.iterator(); i.hasNext(); ) {
 	    Principal p = (Principal) i.next();
-            readPols.add(jifts.readerPolicy(p.position(), p, Collections.EMPTY_SET));
-            writePols.add(jifts.writerPolicy(p.position(), p, Collections.EMPTY_SET));
+            readPols.add(jifts.readerPolicy(p.position(), p, jifts.topPrincipal(p.position())));
+            //writePols.add(jifts.writerPolicy(p.position(), p, allPrincipals));
 	}
 
         Label L = jifts.pairLabel(currentCode().position(), 
                                    jts.joinLabelJ(null, readPols),
-                                   jts.meetLabelM(null, writePols));
+                                   jts.topLabelM(null));
 	return L;
     }
 

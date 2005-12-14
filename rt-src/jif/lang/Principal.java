@@ -12,7 +12,7 @@ public interface Principal {
     
     boolean isAuthorized(final Object authPrf, final Closure closure, final Label lb);
     
-    Principal[] findChainUpto(final Principal p);
+    ActsForProof findProofUpto(final Principal p);
     
-    Principal[] findChainDownto(final Principal q);
+    ActsForProof findProofDownto(final Principal q);
 }

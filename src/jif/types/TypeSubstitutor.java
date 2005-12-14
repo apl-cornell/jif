@@ -52,10 +52,10 @@ public class TypeSubstitutor {
                 Object arg = e.getValue();
                 Param p;
                 if (arg instanceof Label) {
-                    p = (Label)rewriteLabel((Label)arg);
+                    p = rewriteLabel((Label)arg);
                 }
                 else if (arg instanceof Principal) {
-                    p = (Principal)rewritePrincipal((Principal)arg);
+                    p = rewritePrincipal((Principal)arg);
                 }
                 else {
                     throw new InternalCompilerError(

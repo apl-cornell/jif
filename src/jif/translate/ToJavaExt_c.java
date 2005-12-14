@@ -15,7 +15,7 @@ public class ToJavaExt_c extends Ext_c implements ToJavaExt {
     }
 
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
-        Node n = (Node) node();
+        Node n = node();
         return n.del(null);
     }
 }

@@ -24,14 +24,15 @@ public class FileSystem
 //            writerList.add(new NativePrincipal(writers[i]));
 //        }
         jif.lang.Principal op = new NativePrincipal(owner);
-        ConfPolicy readerPol = LabelUtil.readerPolicyLabel(op, readerList);
+        ConfPolicy readerPol = LabelUtil.readerPolicy(op, readerList);
 //        IntegPolicy writerPol = LabelUtil.writerPolicyLabel(op, writerList);
         ConfIntegPair pair = LabelUtil.pairLabel(LabelUtil.confCollection(readerPol), LabelUtil.topInteg());
-        return LabelUtil.label(pair);
+        return LabelUtil.toLabel(pair);
     }
     
     /** Set the access(read) policy of <code>file</code>.  */
-    public static void setPolicy(String file, ReaderPolicy p) 
+    /*
+     public static void setPolicy(String file, ReaderPolicy p) 
     throws IOException
     {
         if (!(p.owner() instanceof NativePrincipal)) {

@@ -20,8 +20,8 @@ public class JifDoExt extends JifStmtExt_c
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
 	Do ds = (Do) node();
 
-	JifTypeSystem ts = (JifTypeSystem) lc.typeSystem();
-	JifContext A = (JifContext) lc.context();
+	JifTypeSystem ts = lc.typeSystem();
+	JifContext A = lc.context();
         A = (JifContext) ds.enterScope(A);
 
         Label L1 = ts.freshLabelVariable(node().position(), "do", 

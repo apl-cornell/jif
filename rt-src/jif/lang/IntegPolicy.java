@@ -1,7 +1,7 @@
 package jif.lang;
 
 
-public interface IntegPolicy
-{    
-    public boolean relabelsTo(IntegPolicy p);
+public interface IntegPolicy {    
+    boolean relabelsTo(IntegPolicy p);
+    String componentString();
 }

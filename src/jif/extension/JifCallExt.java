@@ -61,7 +61,7 @@ public class JifCallExt extends Jif_c
                 if (!((JifCallDel)node().del()).targetIsNeverNull()) {
                     // the target may be null		    
                     npExc = true;
-                    excPath = (Label) Xs.N();
+                    excPath = Xs.N();
                 }
                 objLabel = Xs.NV();
                 A.setPc(Xs.NV());

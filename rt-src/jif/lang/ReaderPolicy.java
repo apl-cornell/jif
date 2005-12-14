@@ -5,39 +5,29 @@ import java.util.*;
 public class ReaderPolicy implements ConfPolicy
 {
     private final Principal owner;
-    private final Set readers;
+    private final Principal reader;
+    private final Principal effectiveReader; // disjunction of owner and reader
     
-    public ReaderPolicy(Principal owner, Collection readers) {
+    public ReaderPolicy(Principal owner, Principal reader) {
         this.owner = owner;
-        if (readers == null) readers = Collections.EMPTY_SET; 
-        this.readers = Collections.unmodifiableSet(new LinkedHashSet(readers));
-    }
-    
-    public ReaderPolicy(Principal owner, PrincipalSet readers) {
-        this(owner, readers.getSet());
+        this.reader = reader;
+        this.effectiveReader = PrincipalUtil.disjunction(owner, reader);
     }
     
     public Principal owner() {
         return owner;
     }
     
-    public Set readers() {
-        return readers;
+    public Principal reader() {
+        return reader;
     }
     
     
     public boolean relabelsTo(ConfPolicy p) {
         if (p instanceof ReadableByPrinPolicy) {
             ReadableByPrinPolicy rbpp = (ReadableByPrinPolicy)p;
-            if (PrincipalUtil.actsFor(rbpp.reader(),this.owner)) {
+            if (PrincipalUtil.actsFor(rbpp.reader(),this.effectiveReader)) {
                 return true;
-            }
-            for (Iterator i = readers.iterator(); i.hasNext(); ) {
-                Principal ri = (Principal) i.next();
-                
-                if (PrincipalUtil.actsFor(rbpp.reader(), ri)) {
-                    return true;
-                }
             }
             return false;            
         }
@@ -54,36 +44,11 @@ public class ReaderPolicy implements ConfPolicy
         if (! PrincipalUtil.actsFor(pp.owner, owner)) {
             return false;
         }
-        
-        // for all j . rj' >= o || exists i . rj' >= ri
-        for (Iterator j = pp.readers.iterator(); j.hasNext(); ) {
-            Principal rj = (Principal) j.next();
-            
-            boolean sat = false;
-            
-            if (PrincipalUtil.actsFor(rj, owner)) {
-                sat = true;
-            }
-            else {
-                for (Iterator i = readers.iterator(); i.hasNext(); ) {
-                    Principal ri = (Principal) i.next();
-                    
-                    if (PrincipalUtil.actsFor(rj, ri)) {
-                        sat = true;
-                        break;
-                    }
-                }
-            }
-            
-            if (! sat) {
-                return false;
-            }
-        }
-        return true;
+        return PrincipalUtil.actsFor(pp.reader, reader);        
     }
     
     public int hashCode() {
-        return (owner==null?0:owner.hashCode()) + readers.size();
+        return (owner==null?0:owner.hashCode()) ^ (reader==null?0:reader.hashCode()) ^ 4238;
     }
     
     public boolean equals(Object o) {
@@ -93,10 +58,10 @@ public class ReaderPolicy implements ConfPolicy
         
         ReaderPolicy policy = (ReaderPolicy) o;
         
-        if (owner == policy || (owner != null && owner.equals(policy.owner)
+        if (owner == policy.owner || (owner != null && owner.equals(policy.owner)
                 && policy.owner != null && policy.owner.equals(owner))) {
-            return readers.containsAll(policy.readers) && 
-            policy.readers.containsAll(readers);
+            return (reader == policy.reader || (reader != null && reader.equals(policy.reader)
+                    && policy.reader != null && policy.reader.equals(reader)));
         }
         
         return false;
@@ -104,11 +69,7 @@ public class ReaderPolicy implements ConfPolicy
     
     public String componentString() {
         String str = (owner == null?"<null>":owner.name()) + ": ";
-        for (Iterator iter = readers.iterator(); iter.hasNext(); ) {
-            Principal reader = (Principal) iter.next();
-            str += (reader == null?"<null>":reader.name());
-            if (iter.hasNext()) str += ",";
-        }
+        str += (reader == null?"<null>":reader.name());
         return str;
     }
     

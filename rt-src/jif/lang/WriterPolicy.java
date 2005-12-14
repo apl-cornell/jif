@@ -5,24 +5,21 @@ import java.util.*;
 public class WriterPolicy implements IntegPolicy
 {
     private final Principal owner;
-    private final Set writers;
+    private final Principal writer;
+    private final Principal effectiveWriter; // disjunction of owner and writer
     
-    public WriterPolicy(Principal owner, Collection writers) {
+    public WriterPolicy(Principal owner, Principal writer) {
         this.owner = owner;
-        if (writers == null) writers = Collections.EMPTY_SET; 
-        this.writers = Collections.unmodifiableSet(new LinkedHashSet(writers));
-    }
-    
-    public WriterPolicy(Principal owner, PrincipalSet writers) {
-        this(owner, writers.getSet());
+        this.writer = writer;
+        this.effectiveWriter = PrincipalUtil.disjunction(owner, writer);
     }
     
     public Principal owner() {
         return owner;
     }
     
-    public Set writers() {
-        return writers;
+    public Principal writer() {
+        return writer;
     }
     
     
@@ -42,34 +39,11 @@ public class WriterPolicy implements IntegPolicy
         }
         
         // for all j . rj' >= o || exists i . rj' >= ri
-        for (Iterator j = this.writers.iterator(); j.hasNext(); ) {
-            Principal rj = (Principal) j.next();
-            
-            boolean sat = false;
-            
-            if (PrincipalUtil.actsFor(rj, pp.owner)) {
-                sat = true;
-            }
-            else {
-                for (Iterator i = pp.writers.iterator(); i.hasNext(); ) {
-                    Principal ri = (Principal) i.next();
-                    
-                    if (PrincipalUtil.actsFor(rj, ri)) {
-                        sat = true;
-                        break;
-                    }
-                }
-            }
-            
-            if (! sat) {
-                return false;
-            }
-        }
-        return true;
+        return PrincipalUtil.actsFor(this.effectiveWriter, pp.effectiveWriter);
     }
     
     public int hashCode() {
-        return (owner==null?0:owner.hashCode()) + writers.size();
+        return (owner==null?0:owner.hashCode()) ^ (writer==null?0:writer.hashCode()) ^ -124978;
     }
     
     public boolean equals(Object o) {
@@ -79,22 +53,18 @@ public class WriterPolicy implements IntegPolicy
         
         WriterPolicy policy = (WriterPolicy) o;
         
-        if (owner == policy || (owner != null && owner.equals(policy.owner)
+        if (owner == policy.owner || (owner != null && owner.equals(policy.owner)
                 && policy.owner != null && policy.owner.equals(owner))) {
-            return writers.containsAll(policy.writers) && 
-            policy.writers.containsAll(writers);
+            return (writer == policy.writer || (writer != null && writer.equals(policy.writer)
+                    && policy.writer != null && policy.writer.equals(writer)));
         }
         
         return false;
     }
     
     public String componentString() {
-        String str = (owner == null?"<null>":owner.name()) + ": ";
-        for (Iterator iter = writers.iterator(); iter.hasNext(); ) {
-            Principal writer = (Principal) iter.next();
-            str += (writer == null?"<null>":writer.name());
-            if (iter.hasNext()) str += ",";
-        }
+        String str = (owner == null?"<null>":owner.name()) + "!: ";
+        str += (writer == null?"<null>":writer.name());
         return str;
     }
     
