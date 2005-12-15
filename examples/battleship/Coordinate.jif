@@ -27,13 +27,16 @@ class Coordinate[label L] implements JifObject[L] {
         return 13 * this.x ^ 23 * this.y;
     }
 
-    public boolean{L;o} equals(IDComparable[L] o) {
-        if (o == null || !(o instanceof Coordinate[L])) {
+    public boolean{lbl;*lbl;L;o} equals(label lbl, IDComparable[lbl] o) {
+        if (o == null || !(o instanceof Coordinate[lbl])) {
             return false;
         }
 
-        Coordinate[L] that = (Coordinate[L])o;
+        Coordinate[lbl] that = (Coordinate[lbl])o;
         return this.x == that.x && this.y == that.y;
+    }
+    public boolean{L;o} equals(IDComparable[L] o) {
+        return equals(L, o);
     }
 }
 
