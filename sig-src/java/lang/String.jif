@@ -58,7 +58,7 @@ public final class String implements java.io.Serializable /*,  Comparable*/ {
     public native String{this} trim();
     public native String{this} toString();
     public native char{this}[]{this} toCharArray();
-    public native static String{obj} valueOf(Object obj);
+//    public native static String{obj} valueOf(Object obj);
 //    public native static String{data} valueOf(char{}[] data) throws (NullPointerException{data});
 //    public native static String{data;offset;count} valueOf(char{}[] data, int offset, int count) throws (NullPointerException{data});
 //    public native static String{data;offset;count} copyValueOf(char{}[] data, int{data} offset, int{data} count) throws (NullPointerException{data});

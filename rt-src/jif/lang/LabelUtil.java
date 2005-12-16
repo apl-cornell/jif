@@ -74,74 +74,18 @@ public class LabelUtil
     public static IntegPolicy writerPolicy(Principal owner, PrincipalSet writers) {
         return writerPolicy(owner, writers.getSet());
     }
-
-    public static ConfIntegPair pairLabel(ConfCollection confPols, IntegCollection integPols) {
-        return intern(new ConfIntegPair(confPols, integPols));        
-    }
-    public static ConfIntegPair pairLabel(ConfPolicy confPol, IntegPolicy integPol) {
-        return intern(new ConfIntegPair(confCollection(confPol), 
-                                        integCollection(integPol)));        
+    
+    public static Label toLabel(Policy policy) {
+        return intern(new JoinLabel(Collections.singleton(policy)));
     }
     
-    public static Label toLabel(ConfIntegPair pair) {
-        return intern(new JoinLabel(pair));
-    }
-    public static Label toLabel(ConfPolicy pol) {
-        return toLabel(new ConfIntegPair(confCollection(pol), 
-                                         new IntegCollection(Collections.EMPTY_SET)));
-    }
-    public static Label toLabel(IntegPolicy pol) {
-        return toLabel(new ConfIntegPair(new ConfCollection(Collections.EMPTY_SET), 
-                                         integCollection(pol)));
-    }
-
-    public static ConfCollection bottomConf() {
-        return new ConfCollection();
-    }
-    public static ConfCollection confCollection(ConfPolicy cp) {
-        return new ConfCollection(cp);        
-    }
-    
-    public static IntegCollection topInteg() {
-        return new IntegCollection();
-    }
-    public static IntegCollection integCollection(IntegPolicy ip) {
-        return new IntegCollection(ip);        
-    }
-    
-    public static ConfCollection join(ConfCollection cc, ConfPolicy cp) {
-        if (cp == null) return cc;
-        if (cc == null) return new ConfCollection(cp);
-        
-        for (Iterator comps = cc.joinComponents().iterator(); comps.hasNext(); ) {
-            ConfPolicy c = (ConfPolicy)comps.next();
-            if (cp.relabelsTo(c)) return cc;
-        }
-        Set comps = new LinkedHashSet(cc.joinComponents());
-        comps.add(cp);
-
-        return new ConfCollection(comps);
-    }
-    public static IntegCollection meet(IntegCollection ic, IntegPolicy ip) {
-        if (ip == null) return ic;
-        if (ic == null) return new IntegCollection(ip);
-        
-        for (Iterator comps = ic.meetComponents().iterator(); comps.hasNext(); ) {
-            IntegPolicy c = (IntegPolicy)comps.next();
-            if (c.relabelsTo(ip)) return ic;
-        }
-        Set comps = new LinkedHashSet(ic.meetComponents());
-        comps.add(ip);
-
-        return new IntegCollection(comps);
-    }
 
     public static Label join(Label l1, Label l2) {
         if (l1 == null) return l2;
         if (l2 == null) return l1;
         
-        Set comps = new LinkedHashSet(flattenJoin(l1));
-        comps.addAll(flattenJoin(l2));
+        Set comps = new LinkedHashSet(l1.joinComponents());
+        comps.addAll(l2.joinComponents());
         comps = simplifyJoin(comps);
         if (comps.size() == 1) {
             return (Label)comps.iterator().next();
@@ -158,9 +102,8 @@ public class LabelUtil
     }
 
     public static boolean isReadableBy(Label lbl, Principal p) {
-        ConfPolicy readable = new ReadableByPrinPolicy(p);
-        ConfCollection confCol = new ConfCollection(readable);
-        return relabelsTo(lbl, new JoinLabel(new ConfIntegPair(confCol, new IntegCollection())));
+        Label L = toLabel(new ReadableByPrinPolicy(p));
+        return relabelsTo(lbl, L);
     }
 
     public static boolean relabelsTo(Label from, Label to) {
@@ -171,6 +114,14 @@ public class LabelUtil
         return from != null && from.relabelsTo(to);
     }
 
+    private static boolean relabelsTo(Policy from, Policy to) {
+        from = intern(from);
+        to = intern(to);
+        if (from == to) return true;
+        
+        return from != null && from.relabelsTo(to);
+    }
+    
     public static String stringValue(Label lb) {
         if (lb == null) return "<null>";
         return lb.toString();
@@ -180,29 +131,19 @@ public class LabelUtil
         return stringValue(lb);
     }
     
-    private static ConfIntegPair intern(ConfIntegPair cip) {
-        ConfIntegPair in = (ConfIntegPair)intern.get(cip);
+    private static Policy intern(Policy pol) {
+        Policy in = (Policy)intern.get(pol);
         if (in == null) {
-            in = cip;
+            in = pol;
             intern.put(in, in);
         }
         return in;        
     }
     private static ConfPolicy intern(ConfPolicy confPol) {
-        ConfPolicy in = (ConfPolicy)intern.get(confPol);
-        if (in == null) {
-            in = confPol;
-            intern.put(in, in);
-        }
-        return in;        
+        return (ConfPolicy)intern((Policy)confPol);        
     }
     private static IntegPolicy intern(IntegPolicy integPol) {
-        IntegPolicy in = (IntegPolicy)intern.get(integPol);
-        if (in == null) {
-            in = integPol;
-            intern.put(in, in);
-        }
-        return in;        
+        return (IntegPolicy)intern((Policy)integPol);        
     }
     private static Label intern(Label l) {
         Label in = (Label)intern.get(l);
@@ -213,21 +154,11 @@ public class LabelUtil
         return in;
     }
 
-    protected static Set flattenJoin(Label l) {
-        if (l instanceof JoinLabel) {
-            JoinLabel jl = (JoinLabel)l;
-            return jl.joinComponents();
-            
-        }
-        else {
-            return Collections.singleton(l);
-        }
-    }
     protected static Set flattenJoin(Set labels) {
         Set comps = new LinkedHashSet();
         for (Iterator iter = labels.iterator(); iter.hasNext(); ) {
             Label l = (Label)iter.next();
-            comps.addAll(flattenJoin(l));
+            comps.addAll(l.joinComponents());
         }
         return comps;
     }
@@ -235,11 +166,11 @@ public class LabelUtil
     private static Set simplifyJoin(Set labels) {
         Set needed = new LinkedHashSet();
         for (Iterator i = labels.iterator(); i.hasNext(); ) {
-            Label ci = (Label)i.next();
+            Policy ci = (Policy)i.next();
             
             boolean subsumed = (ci == null); // null components are always subsumed.
             for (Iterator j = needed.iterator(); !subsumed && j.hasNext(); ) {
-                Label cj = (Label) j.next();
+                Policy cj = (Policy) j.next();
                 if (relabelsTo(ci, cj)) {
                     subsumed = true;
                     break;

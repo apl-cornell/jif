@@ -118,50 +118,6 @@ public class LabelEnv_c implements LabelEnv
         return leq(L1.simplify(), L2.simplify(), 
                    new SearchState_c(new AssertionUseCount(), new LinkedHashSet()));
     }
-    public boolean leq(LabelJ L1, LabelJ L2) {
-        L1 = L1.simplify();
-        L2 = L2.simplify();
-        if (L2.isTop()) return true;
-        if (L1.isBottom()) return true;
-        
-        if (L2 instanceof JoinLabelJ) {
-            // L1 <= {C1; ...; Cn} if there is some Ci such that L1 <= Ci
-            JoinLabelJ jlj2 = (JoinLabelJ)L2;
-            for (Iterator comps = jlj2.components().iterator(); comps.hasNext(); ) {
-                LabelJ ci = (LabelJ)comps.next();
-                if (leq(L1, ci)) return true;
-            }
-        }
-        
-        return L1.leq_(L2, this);
-    }
-
-    public boolean leq(LabelM L1, LabelM L2) {
-        L1 = L1.simplify();
-        L2 = L2.simplify();
-        if (L2.isTop()) return true;
-        if (L1.isBottom()) return true;
-        
-        if (L1 instanceof MeetLabelM) {
-            // {C1; ...; Cn} <= L2 if there is some Ci such that Ci <= L2
-            MeetLabelM mlm1 = (MeetLabelM)L1;            
-            for (Iterator comps = mlm1.components().iterator(); comps.hasNext(); ) {
-                LabelM ci = (LabelM)comps.next();
-                if (leq(ci, L2)) return true;
-            }
-            return false;
-        }
-        if (L2 instanceof MeetLabelM) {
-            // L1 <= {C1; ...; Cn} if for all Ci, L1 <= Ci
-            MeetLabelM mlm2 = (MeetLabelM)L2;
-            for (Iterator comps = mlm2.components().iterator(); comps.hasNext(); ) {
-                LabelM ci = (LabelM)comps.next();
-                if (!leq(L1, ci)) return false;
-            }
-            return true;
-        }
-        return L1.leq_(L2, this);
-    }
 
     /*
      * Cache the results of leq(Label, Label, SearchState), when we are
@@ -177,9 +133,6 @@ public class LabelEnv_c implements LabelEnv
     private static class LeqGoal {
         final Object lhs;
         final Object rhs;
-        LeqGoal(LabelJ lhs, LabelJ rhs) { 
-            this.lhs = lhs; this.rhs = rhs;
-        }
         LeqGoal(Label lhs, Label rhs) { 
             this.lhs = lhs; this.rhs = rhs;
         }

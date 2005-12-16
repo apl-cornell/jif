@@ -94,31 +94,20 @@ public class LabelTypeCheckUtil {
                                                         dl.position());
                 }
             }        
-            else if (l instanceof PairLabel) {
-                PairLabel pl = (PairLabel)l;
-                typeCheckLabelJ(tc, pl.labelJ());
-                typeCheckLabelM(tc, pl.labelM());
+            else if (l instanceof ReaderPolicy) {
+                ReaderPolicy pol = (ReaderPolicy)l;
+                typeCheckPrincipal(tc, pol.owner());
+                typeCheckPrincipal(tc, pol.reader());
+            }
+            else if (l instanceof WriterPolicy) {
+                WriterPolicy pol = (WriterPolicy)l;
+                typeCheckPrincipal(tc, pol.owner());
+                typeCheckPrincipal(tc, pol.writer());
             }
         }
         
     }
     
-    public static void typeCheckLabelJ(TypeChecker tc, LabelJ lbl) throws SemanticException {
-        if (lbl instanceof ReaderPolicy) {
-            ReaderPolicy rp = (ReaderPolicy)lbl;
-            typeCheckPrincipal(tc, rp.owner());
-            typeCheckPrincipal(tc, rp.reader());                
-        }        
-    }
-    public static void typeCheckLabelM(TypeChecker tc, LabelM lbl) throws SemanticException {
-        if (lbl instanceof WriterPolicy) {
-            WriterPolicy wp = (WriterPolicy)lbl;
-            typeCheckPrincipal(tc, wp.owner());
-            typeCheckPrincipal(tc, wp.writer());                
-        }
-        
-    }
-
     public static void typeCheckType(TypeChecker tc, Type t) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
 

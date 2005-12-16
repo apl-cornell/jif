@@ -70,11 +70,7 @@ public interface JifTypeSystem extends ParamTypeSystem
     // Label constructors
     VarLabel freshLabelVariable(Position pos, String s, String description);
 
-    LabelJ topLabelJ(Position pos);
-    LabelM topLabelM(Position pos);
     Label topLabel(Position pos);
-    LabelJ bottomLabelJ(Position pos);
-    LabelM bottomLabelM(Position pos);
     Label bottomLabel(Position pos);
     Label noComponentsLabel(Position pos);
     Label notTaken(Position pos);
@@ -89,7 +85,6 @@ public interface JifTypeSystem extends ParamTypeSystem
     /* Label methods */
     CovariantParamLabel covariantLabel(Position pos, ParamInstance pi);
     ParamLabel paramLabel(Position pos, ParamInstance pi);
-    PairLabel pairLabel(Position pos, LabelJ labelJ, LabelM labelM);
     DynamicLabel dynamicLabel(Position pos, AccessPath path);
     ArgLabel argLabel(Position pos, VarInstance li);
     ThisLabel thisLabel(Position pos, JifClassType ct);
@@ -101,18 +96,12 @@ public interface JifTypeSystem extends ParamTypeSystem
     WriterPolicy writerPolicy(Position pos, Principal owner, Principal writer);
     WriterPolicy writerPolicy(Position pos, Principal owner, Collection writers);
 
-    LabelJ joinLabelJ(Position pos, Collection components);
-    LabelM meetLabelM(Position pos, Collection components);
     
     /** Returns true iff L1 <= L2 in <code>env</code>. */
     boolean leq(Label L1, Label L2, LabelEnv env);
     boolean leq(Label L1, Label L2);
-    boolean leq(LabelJ L1, LabelJ L2);
-    boolean leq(LabelM L1, LabelM L2);
 
     /** Returns the join of L1 and L2. */
-    LabelJ join(LabelJ L1, LabelJ L2);
-    LabelM meet(LabelM L1, LabelM L2);
     Label join(Label L1, Label L2);
     Label joinLabel(Position pos, Collection components);
 

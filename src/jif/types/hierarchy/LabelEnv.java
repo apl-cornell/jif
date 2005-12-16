@@ -6,8 +6,6 @@ import java.util.Set;
 import jif.types.Solver;
 import jif.types.VarMap;
 import jif.types.label.Label;
-import jif.types.label.LabelJ;
-import jif.types.label.LabelM;
 import jif.types.principal.Principal;
 
 public interface LabelEnv
@@ -29,15 +27,6 @@ public interface LabelEnv
 
     // returns true if "L1 <= L2"
     boolean leq(Label L1, Label L2, SearchState state);
-
-    // returns true if "L1 <= L2"
-    boolean leq(LabelJ L1, LabelJ L2);
-
-    // returns true if "L1 <= L2"
-    boolean leq(LabelM L1, LabelM L2);
-//
-//    // returns true if "L1 <= L2"
-//    boolean leq(LabelJ L1, LabelJ L2, SearchState state);
 
     PrincipalHierarchy ph();
 

@@ -15,6 +15,18 @@ public class LabelUtil01
             PrintStream[{pp:}] out = runtime.out();
 	    final label lb = LabelUtil.readerPolicyLabel(new label {}, own, readers);
             out.println("Label is " + LabelUtil.stringValue(lb));
+            
+            final label lb2 = new label {Alice:Bob,Chuck; Bob:Chuck}; 
+            out.println("Label2 is " + LabelUtil.stringValue(lb2));
+
+            final label lb3 = LabelUtil.join(lb, lb2); 
+            out.println("Label3 is " + LabelUtil.stringValue(lb3));
+
+            final label lb4 = new label {Alice:Alice; Alice:Bob}; 
+            out.println("Label4 is " + LabelUtil.stringValue(lb4));
+            out.println("Label1 is equivalent to Label4? " + LabelUtil.equivalentTo(lb, lb4));
+            out.println("Label1 relabels to Label4? " + LabelUtil.relabelsTo(lb, lb4));
+            
         }
         catch (NullPointerException ignored) { }
     }

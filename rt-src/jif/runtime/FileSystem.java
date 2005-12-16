@@ -24,10 +24,7 @@ public class FileSystem
 //            writerList.add(new NativePrincipal(writers[i]));
 //        }
         jif.lang.Principal op = new NativePrincipal(owner);
-        ConfPolicy readerPol = LabelUtil.readerPolicy(op, readerList);
-//        IntegPolicy writerPol = LabelUtil.writerPolicyLabel(op, writerList);
-        ConfIntegPair pair = LabelUtil.pairLabel(LabelUtil.confCollection(readerPol), LabelUtil.topInteg());
-        return LabelUtil.toLabel(pair);
+        return LabelUtil.readerPolicyLabel(op, readerList);
     }
     
     /** Set the access(read) policy of <code>file</code>.  */

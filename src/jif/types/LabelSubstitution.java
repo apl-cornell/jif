@@ -3,8 +3,6 @@ package jif.types;
 import java.util.LinkedList;
 
 import jif.types.label.Label;
-import jif.types.label.LabelJ;
-import jif.types.label.LabelM;
 import jif.types.principal.Principal;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
@@ -28,23 +26,11 @@ public abstract class LabelSubstitution {
     public Label substLabel(Label L) throws SemanticException {
         return L;
     }
-    public LabelJ substLabelJ(LabelJ L) throws SemanticException {
-        return L;
-    }
-    public LabelM substLabelM(LabelM L) throws SemanticException {
-        return L;
-    }
     public Principal substPrincipal(Principal p) throws SemanticException {
         return p;
     }    
     
     private LinkedList stack = null;
-    public void pushLabel(LabelJ l) {
-        pushLabel((Object)l);        
-    }
-    public void pushLabel(LabelM l) {
-        pushLabel((Object)l);        
-    }
     public void pushLabel(Label l) {
         pushLabel((Object)l);
     }
@@ -59,23 +45,7 @@ public abstract class LabelSubstitution {
             throw new InternalCompilerError("Stack discipline not obeyed");
         }
     }
-    public void popLabel(LabelJ l) {
-        if (l != stack.removeLast()) {
-            throw new InternalCompilerError("Stack discipline not obeyed");
-        }
-    }
-    public void popLabel(LabelM l) {
-        if (l != stack.removeLast()) {
-            throw new InternalCompilerError("Stack discipline not obeyed");
-        }
-    }
     public boolean stackContains(Label l) {
-        return stack != null && stack.contains(l);
-    }
-    public boolean stackContains(LabelJ l) {
-        return stack != null && stack.contains(l);
-    }
-    public boolean stackContains(LabelM l) {
         return stack != null && stack.contains(l);
     }
 }

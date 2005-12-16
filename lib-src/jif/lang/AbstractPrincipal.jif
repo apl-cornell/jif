@@ -79,7 +79,7 @@ public abstract class AbstractPrincipal implements Principal {
         // from p to s.
         ActsForProof prf;
         
-        Principal{this:}[]{this} sprs = declassify(superiors, {this; {}});
+        Principal{this:}[]{this} sprs = declassify(superiors, {this});
         
         for (int i = 0; sprs != null && i < sprs.length; i++) {
             try {

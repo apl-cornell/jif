@@ -9,17 +9,13 @@ import java.util.*;
  */
 public final class JoinLabel implements Label
 {
-    private Set components; // Set of ConfIntegPairs
+    private Set components; // Set of Policies
     JoinLabel() {
         components = Collections.EMPTY_SET;
     }
-
-    JoinLabel(ConfIntegPair cip) {
-        components = Collections.singleton(cip);
-    }
     
-    JoinLabel(Set confIntegpairs) {
-        components = Collections.unmodifiableSet(confIntegpairs);
+    JoinLabel(Set policies) {
+        components = Collections.unmodifiableSet(policies);
     }
     
     public Set joinComponents() {
@@ -34,11 +30,11 @@ public final class JoinLabel implements Label
         
         // If this = { .. Ci .. }, check that for all i, Ci <= l
         for (Iterator i = components.iterator(); i.hasNext(); ) {
-            ConfIntegPair Ci = (ConfIntegPair) i.next();
+            Policy Ci = (Policy) i.next();
             boolean sat = false;
             
             for (Iterator j = l.joinComponents().iterator(); j.hasNext(); ) {
-                ConfIntegPair Dj = (ConfIntegPair) j.next();
+                Policy Dj = (Policy) j.next();
                 if (Ci.relabelsTo(Dj)) {
                     sat = true;
                     break;
@@ -66,7 +62,7 @@ public final class JoinLabel implements Label
     public String componentString() {
         String str = "";
         for (Iterator iter = components.iterator(); iter.hasNext(); ) {
-            str += ((Label)iter.next()).componentString();
+            str += ((Policy)iter.next()).componentString();
             if (iter.hasNext()) str += "; ";
         }
         return str;

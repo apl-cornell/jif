@@ -118,6 +118,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Constraints3.jif ;
 	Constraints5.jif ;
 	ConstructorTest.jif ;
+	DateTest.jif ;
 	Declassify.jif ;
 	Default1.jif ;
 	Deref.jif ;
@@ -337,6 +338,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	PreciseClass07.jif (Semantic, "ClassCastException.*declared");
 	PreciseClass08.jif (Semantic, "ClassCastException.*declared");
 	PreciseClass09.jif ;
+	PrincipalUtil01.jif ;
 	Protected.jif ;
 	Recursive.jif ;
 	RuntimeParams01.jif ;

@@ -194,7 +194,6 @@ public class JifContext_c extends Context_c implements JifContext
 
     public Label authLabel() {
 	Set auth = authority();
-        JifTypeSystem jts = (JifTypeSystem)ts;
         
         Set readPols = new LinkedHashSet();
 //        Set writePols = new LinkedHashSet();
@@ -205,9 +204,8 @@ public class JifContext_c extends Context_c implements JifContext
             //writePols.add(jifts.writerPolicy(p.position(), p, allPrincipals));
 	}
 
-        Label L = jifts.pairLabel(currentCode().position(), 
-                                   jts.joinLabelJ(null, readPols),
-                                   jts.topLabelM(null));
+        Label L = jifts.joinLabel(currentCode().position(), 
+                                   readPols);
 	return L;
     }
 

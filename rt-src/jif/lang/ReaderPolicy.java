@@ -2,7 +2,7 @@ package jif.lang;
 
 import java.util.*;
 
-public class ReaderPolicy implements ConfPolicy
+public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
 {
     private final Principal owner;
     private final Principal reader;
@@ -23,7 +23,7 @@ public class ReaderPolicy implements ConfPolicy
     }
     
     
-    public boolean relabelsTo(ConfPolicy p) {
+    public boolean relabelsTo(Policy p) {
         if (p instanceof ReadableByPrinPolicy) {
             ReadableByPrinPolicy rbpp = (ReadableByPrinPolicy)p;
             if (PrincipalUtil.actsFor(rbpp.reader(),this.effectiveReader)) {

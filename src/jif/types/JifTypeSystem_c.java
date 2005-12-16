@@ -634,17 +634,15 @@ public class JifTypeSystem_c
     private Label runtime = null;
 
     public Label topLabel(Position pos) {
-        return pairLabel(pos, topLabelJ(pos), topLabelM(pos));
+        return joinLabel(pos, 
+              CollectionUtil.list(readerPolicy(pos, 
+                                               topPrincipal(pos), 
+                                               Collections.singleton(topPrincipal(pos))),
+                                  writerPolicy(pos, 
+                                               bottomPrincipal(pos), 
+                                               Collections.singleton(bottomPrincipal(pos)))));
     }
 
-    public LabelJ topLabelJ(Position pos) {
-        return new TopLabelJ_c(this, pos);
-    }
-
-    public LabelM topLabelM(Position pos) {
-        return new MeetLabelM_c(Collections.EMPTY_SET, this, pos);
-    }
-    
     public Label topLabel() {
         if (top == null)
             top = topLabel(null);
@@ -652,14 +650,7 @@ public class JifTypeSystem_c
     }
 
     public Label bottomLabel(Position pos) {
-        return pairLabel(pos, bottomLabelJ(pos), bottomLabelM(pos));
-    }
-
-    public LabelJ bottomLabelJ(Position pos) {
-        return new JoinLabelJ_c(Collections.EMPTY_SET, this, pos);        
-    }
-    public LabelM bottomLabelM(Position pos) {
-        return new BottomLabelM_c(this, pos);        
+        return joinLabel(pos, Collections.EMPTY_SET);
     }
     
     public Label bottomLabel() {
@@ -677,7 +668,6 @@ public class JifTypeSystem_c
     
     public Label noComponentsLabel(Position pos) {
         return bottomLabel();
-//        return pairLabel(pos, bottomLabelJ(pos), topLabelM(pos));
     }
 
     public Label notTaken(Position pos) {
@@ -712,11 +702,6 @@ public class JifTypeSystem_c
         return t;
     }
 
-    public PairLabel pairLabel(Position pos, LabelJ labelJ, LabelM labelM) {
-        PairLabel t = new PairLabel_c(this, labelJ, labelM, pos);
-        return t;
-    }
-
     public ReaderPolicy readerPolicy(Position pos, Principal owner, Principal reader) {
         ReaderPolicy t = new ReaderPolicy_c(owner, reader, this, pos);
         return t;
@@ -746,29 +731,10 @@ public class JifTypeSystem_c
         Principal r = collectionToDisjunct(pos, ps);
         return disjunctivePrincipal(pos, p, r);
     }
-
-    public LabelJ joinLabelJ(Position pos, Collection components) {
-        if (components == null || components.isEmpty()) {
-            return new JoinLabelJ_c(Collections.EMPTY_SET, this, pos);
-        }
-        if (components.size() == 1) {
-            return (LabelJ)components.iterator().next();
-        }
-        return new JoinLabelJ_c(components, this, pos);
-    }
-    public LabelM meetLabelM(Position pos, Collection components) {
-        if (components == null || components.isEmpty()) {
-            return new MeetLabelM_c(Collections.EMPTY_SET, this, pos);
-        }
-        if (components.size() == 1) {
-            return (LabelM)components.iterator().next();
-        }
-        return new MeetLabelM_c(components, this, pos);
-    }
     
     public Label joinLabel(Position pos, Collection components) {
-        if (components == null || components.isEmpty()) {
-            return noComponentsLabel(pos);
+        if (components == null) {
+            components = Collections.EMPTY_SET;
         }
         if (components.size() == 1) {
             return (Label)components.iterator().next();
@@ -995,31 +961,6 @@ public class JifTypeSystem_c
         return false;
     }
 
-    public LabelJ join(LabelJ L1, LabelJ L2) {
-        if (L1.isBottom()) return L2.simplify();
-        if (L2.isBottom()) return L1.simplify();
-        if (L1.isTop()) return L1.simplify();
-        if (L2.isTop()) return L2.simplify();
-        
-        List l = CollectionUtil.list(L1, L2);
-        Position pos = L1.position();
-        if (pos == null) pos = L2.position();
-
-        return joinLabelJ(pos, l).simplify();
-        
-    }
-    public LabelM meet(LabelM L1, LabelM L2) {
-        if (L1.isBottom()) return L1.simplify();
-        if (L2.isBottom()) return L2.simplify();
-        if (L1.isTop()) return L2.simplify();
-        if (L2.isTop()) return L1.simplify();
-        
-        List l = CollectionUtil.list(L1, L2);
-        Position pos = L1.position();
-        if (pos == null) pos = L2.position();
-
-        return meetLabelM(pos, l).simplify();        
-    }
     public Label join(Label L1, Label L2) {
 //        if (!L1.isCanonical()) {
 //            return unknownLabel(L1.position());
@@ -1059,14 +1000,6 @@ public class JifTypeSystem_c
     }
 
     public boolean leq(Label L1, Label L2) {
-        return emptyLabelEnv.leq(L1, L2);
-    }
-
-    public boolean leq(LabelJ L1, LabelJ L2) {
-        return emptyLabelEnv.leq(L1, L2);
-    }
-
-    public boolean leq(LabelM L1, LabelM L2) {
         return emptyLabelEnv.leq(L1, L2);
     }
 

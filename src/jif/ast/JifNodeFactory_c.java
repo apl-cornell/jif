@@ -83,13 +83,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public NestedPolicyLabelNode NestedPolicyLabelNode(Position pos, LabelNode nested) {
-        NestedPolicyLabelNode n = new NestedPolicyLabelNode_c(pos, nested);
-        n = (NestedPolicyLabelNode)n.ext(jifExtFactory().extLabelNode());
-        n = (NestedPolicyLabelNode)n.del(delFactory().delNode());
-        return n;
-    }
-
     public PolicyLabelNode ReaderPolicyLabelNode(Position pos, PrincipalNode owner, List readers) {
         PolicyLabelNode n = new ReaderPolicyLabelNode_c(pos, owner,
                                                   readers);

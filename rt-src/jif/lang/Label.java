@@ -13,11 +13,11 @@ public interface Label
      */
     boolean relabelsTo(Label l);
     
-    /**
-     * Returns true iff this <= l
-     */
     Label join(Label l);
 
+    /**
+     * Set of Policies
+     */
     Set joinComponents();
     
     /**

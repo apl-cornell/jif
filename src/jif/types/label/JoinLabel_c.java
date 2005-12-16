@@ -20,11 +20,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     
     public JoinLabel_c(Collection components, JifTypeSystem ts, Position pos) {
         super(ts, pos, new JoinLabelToJavaExpr_c());
-        this.components = Collections.unmodifiableSet(new LinkedHashSet(flatten(components)));
-        
-        if (this.components.isEmpty()) {
-            throw new InternalCompilerError("Join label must be nonempty");
-        }
+        this.components = Collections.unmodifiableSet(new LinkedHashSet(flatten(components)));        
     }
     
     public boolean isRuntimeRepresentable() {
@@ -85,29 +81,26 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     }
     
     public boolean isBottom() {
-        if (components.isEmpty()) return false;
-        for (Iterator i = components.iterator(); i.hasNext(); ) {
-            Label c = (Label) i.next();
-            
-            if (! c.isBottom()) {
-                return false;
-            }
-        }
-        // all components are bottom.
-        return true;
+        return (components.isEmpty());
     }
 
     public boolean isTop() {
         if (components.isEmpty()) return false;
+        boolean haveTopConf = false;
+        boolean haveTopInteg = false;
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label c = (Label) i.next();
-            
-            if (! c.isTop()) {
-                return false;
+            if (c.isTop()) {
+                return true;
             }
+            if (c instanceof Policy) {
+                Policy p = (Policy)c;
+                if (p.isTopConfidentiality()) haveTopConf = true;
+                if (p.isTopIntegrity()) haveTopInteg = true;
+            }
+            if (haveTopConf && haveTopInteg) return true;
         }
-        // all components are top
-        return true;
+        return false;
     }
     
     public boolean equalsImpl(TypeObject o) {
@@ -128,28 +121,9 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     
     public String componentString(Set printedLabels) {
         String s = "";
-        boolean multiplePairs = false; 
-        boolean onePair = false;
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label c = (Label) i.next();
-            if (c instanceof PairLabel) {
-                if (!onePair) {
-                    onePair = true;
-                }
-                else {
-                    multiplePairs = true;
-                    break;
-                }
-            }
-        }
-
-        for (Iterator i = components.iterator(); i.hasNext(); ) {
-            Label c = (Label) i.next();
-            if (multiplePairs && c instanceof PairLabel) {
-                s += c.toString(printedLabels);
-            }
-            else
-                s += c.componentString(printedLabels);
+            s += c.componentString(printedLabels);
             
             if (i.hasNext()) {
                 s += "; ";

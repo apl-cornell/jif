@@ -2,8 +2,7 @@ package jif.types.label;
 
 import java.util.*;
 
-import jif.translate.JifToJavaRewriter;
-import jif.translate.LabelJToJavaExpr_c;
+import jif.translate.*;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
@@ -19,12 +18,12 @@ import polyglot.util.TypedList;
 
 /** An implementation of the <code>PolicyLabel</code> interface. 
  */
-public class WriterPolicy_c extends LabelM_c implements WriterPolicy {
+public class WriterPolicy_c extends Label_c implements WriterPolicy {
     private final Principal owner;
     private final Principal writer;
     
     public WriterPolicy_c(Principal owner, Principal writer, JifTypeSystem ts, Position pos) {
-        super(ts, pos); 
+        super(ts, pos, new WriterPolicyToJavaExpr_c()); 
         if (owner == null) throw new InternalCompilerError("null owner");
         this.owner = owner;
         this.writer = writer;
@@ -37,6 +36,7 @@ public class WriterPolicy_c extends LabelM_c implements WriterPolicy {
         return writer;
     }
     public boolean isComparable() { return true; }
+    public boolean isCovariant() { return false; }
     
     public boolean isEnumerable() { return true; }
     public boolean isCanonical() {
@@ -62,7 +62,7 @@ public class WriterPolicy_c extends LabelM_c implements WriterPolicy {
         return (owner==null?0:owner.hashCode()) ^ writer.hashCode()  ^ 1234352;
     }
     
-    public boolean leq_(LabelM L, LabelEnv env) {
+    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         PrincipalHierarchy ph = env.ph();
         if (L instanceof WriterPolicy) {
             WriterPolicy that = (WriterPolicy) L;            
@@ -95,7 +95,7 @@ public class WriterPolicy_c extends LabelM_c implements WriterPolicy {
         return throwTypes; 
     }
 
-    public LabelM subst(LabelSubstitution substitution) throws SemanticException {
+    public Label subst(LabelSubstitution substitution) throws SemanticException {
         boolean changed = false;
 
         Principal newOwner = owner.subst(substitution);
@@ -103,11 +103,11 @@ public class WriterPolicy_c extends LabelM_c implements WriterPolicy {
         Principal newWriter = writer.subst(substitution);
         if (newWriter != writer) changed = true;
 
-        if (!changed) return substitution.substLabelM(this);
+        if (!changed) return substitution.substLabel(this);
 
         JifTypeSystem ts = (JifTypeSystem)typeSystem();
         WriterPolicy newLabel = ts.writerPolicy(this.position(), newOwner, newWriter);
-        return substitution.substLabelM(newLabel);
+        return substitution.substLabel(newLabel);
     }
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         // check each principal in turn.
@@ -120,5 +120,14 @@ public class WriterPolicy_c extends LabelM_c implements WriterPolicy {
     
     public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
         return toJava.toJava((WriterPolicy)this, rw);               
+    }
+
+    public boolean isBottomConfidentiality() { return false; }
+    public boolean isTopConfidentiality() { return false; }
+    public boolean isBottomIntegrity() {
+        return owner.isTopPrincipal() && writer.isTopPrincipal();
+    }
+    public boolean isTopIntegrity() {
+        return owner.isBottomPrincipal() && writer.isBottomPrincipal();
     }        
 }

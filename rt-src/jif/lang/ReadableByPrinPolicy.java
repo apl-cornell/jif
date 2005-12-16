@@ -14,7 +14,7 @@ public class ReadableByPrinPolicy implements ConfPolicy
 	return reader;
     }
     
-    public boolean relabelsTo(ConfPolicy l) {
+    public boolean relabelsTo(Policy l) {
         if (l instanceof ReadableByPrinPolicy) {
             ReadableByPrinPolicy rbp = (ReadableByPrinPolicy)l;
             return PrincipalUtil.actsFor(rbp.reader, this.reader);

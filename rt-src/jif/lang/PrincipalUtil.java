@@ -256,6 +256,13 @@ public class PrincipalUtil {
         return disjunction(p, disjunction(ll));
     }
     
+    public static String toString(Principal p) {
+        return p== null?"null":p.name();
+    }
+    public static String stringValue(Principal p) {
+        return toString(p);
+    }
+    
     private static final class TopPrincipal implements Principal {
         private TopPrincipal() { }
         public String name() { return "*"; }

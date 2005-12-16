@@ -3,32 +3,29 @@ package jif.types.label;
 import java.util.*;
 
 import jif.translate.JifToJavaRewriter;
-import jif.translate.LabelJToJavaExpr_c;
+import jif.translate.ReaderPolicyToJavaExpr_c;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeObject;
-import polyglot.types.TypeSystem;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.util.TypedList;
 
 /** An implementation of the <code>PolicyLabel</code> interface. 
  */
-public class ReaderPolicy_c extends LabelJ_c implements ReaderPolicy {
+public class ReaderPolicy_c extends Label_c implements ReaderPolicy {
     private final Principal owner;
     private final Principal reader;
     
     public ReaderPolicy_c(Principal owner, Principal reader, JifTypeSystem ts, Position pos) {
-        super(ts, pos); 
+        super(ts, pos, new ReaderPolicyToJavaExpr_c()); 
         if (owner == null) throw new InternalCompilerError("null owner");
         this.owner = owner;
         this.reader = reader;
-    }
+    }    
     
     public Principal owner() {
         return this.owner;
@@ -36,8 +33,9 @@ public class ReaderPolicy_c extends LabelJ_c implements ReaderPolicy {
     public Principal reader() {
         return reader;
     }
-    public boolean isComparable() { return true; }
-    
+        
+    public boolean isComparable() { return true; }    
+    public boolean isCovariant() { return false; }
     public boolean isEnumerable() { return true; }
     public boolean isCanonical() {
         return owner.isCanonical() && reader.isCanonical();
@@ -62,7 +60,7 @@ public class ReaderPolicy_c extends LabelJ_c implements ReaderPolicy {
         return (owner==null?0:owner.hashCode()) ^ reader.hashCode() ^ 948234;
     }
     
-    public boolean leq_(LabelJ L, LabelEnv env) {
+    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         PrincipalHierarchy ph = env.ph();
         if (L instanceof ReaderPolicy) {
             ReaderPolicy that = (ReaderPolicy) L;            
@@ -94,7 +92,7 @@ public class ReaderPolicy_c extends LabelJ_c implements ReaderPolicy {
         return throwTypes; 
     }
 
-    public LabelJ subst(LabelSubstitution substitution) throws SemanticException {
+    public Label subst(LabelSubstitution substitution) throws SemanticException {
         boolean changed = false;
 
         Principal newOwner = owner.subst(substitution);
@@ -102,11 +100,11 @@ public class ReaderPolicy_c extends LabelJ_c implements ReaderPolicy {
         Principal newReader = reader.subst(substitution);
         if (newReader != reader) changed = true;
                 
-        if (!changed) return substitution.substLabelJ(this);
+        if (!changed) return substitution.substLabel(this);
 
         JifTypeSystem ts = (JifTypeSystem)typeSystem();
         ReaderPolicy newLabel = ts.readerPolicy(this.position(), newOwner, newReader);
-        return substitution.substLabelJ(newLabel);
+        return substitution.substLabel(newLabel);
     }
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         // check each principal in turn.
@@ -117,7 +115,12 @@ public class ReaderPolicy_c extends LabelJ_c implements ReaderPolicy {
         return X;
     }
 
-    public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
-        return toJava.toJava((ReaderPolicy)this, rw);
-    }    
+    public boolean isBottomConfidentiality() {
+        return owner.isBottomPrincipal() && reader.isBottomPrincipal();
+    }
+    public boolean isTopConfidentiality() {
+        return owner.isTopPrincipal() && reader.isTopPrincipal();
+    }
+    public boolean isBottomIntegrity() { return false; }
+    public boolean isTopIntegrity() { return false; }    
 }

@@ -23,7 +23,7 @@ public class WriterPolicy implements IntegPolicy
     }
     
     
-    public boolean relabelsTo(IntegPolicy p) {
+    public boolean relabelsTo(Policy p) {
         if (!(p instanceof WriterPolicy))
             return false;
         

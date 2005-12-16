@@ -87,10 +87,10 @@ public abstract class PolicyLabelNode_c extends AmbLabelNode_c implements Policy
             }
 	    l.add(r.principal());
 	}
-	return nf.CanonicalLabelNode(position(), producePairLabel(ts, o, l));
+	return nf.CanonicalLabelNode(position(), produceLabel(ts, o, l));
     }
     
-    protected abstract Label producePairLabel(JifTypeSystem ts, Principal owner, List principals);
+    protected abstract Label produceLabel(JifTypeSystem ts, Principal owner, List principals);
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         print(owner, w, tr);

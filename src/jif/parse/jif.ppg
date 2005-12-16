@@ -252,7 +252,7 @@ terminal Token DECLASSIFY;
 non terminal DeclassifyExpr declassify;
 non terminal DeclassifyStmt declassify_statement;
 non terminal TypeNode labeled_primitive_type;
-non terminal LabelNode label, label_opt, return_label_opt, label_flexible, policy_only_label;
+non terminal LabelNode label, label_opt, return_label_opt, label_flexible;
 non terminal List component_list, policy_list;
 non terminal LabelNode label_component;
 non terminal LabelNode label_component_policy;
@@ -292,18 +292,6 @@ label_opt ::=
             {: RESULT = a; :}
     ;
     
-policy_only_label ::=
-                    // LabelNode
-        LBRACE:x RBRACE:y
-            {: LabelNode ln = parser.nf.CanonicalLabelNode(parser.pos(x, y),
-                                        parser.ts.noComponentsLabel()); 
-               RESULT = parser.nf.NestedPolicyLabelNode(parser.pos(x, y), ln); :}
-    |   LBRACE:x policy_list:a RBRACE:y
-            {: LabelNode ln;
-               ln = parser.nf.JoinLabelNode(parser.pos(x, y), a);
-               RESULT = parser.nf.NestedPolicyLabelNode(parser.pos(x, y), ln); :}
-    ;
-    
 label_flexible ::=
       // LabelNode
       label:a
@@ -323,8 +311,6 @@ component_list ::=
         ;
 label_component ::=
         label_component_policy:a
-            {: RESULT = a; :}   
-    |   policy_only_label:a
             {: RESULT = a; :}   
     |   MULT:x accesspath:a
             {: RESULT = parser.nf.AmbDynamicLabelNode(parser.pos(x, a),

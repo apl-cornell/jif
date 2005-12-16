@@ -20,10 +20,8 @@ public class ReaderPolicyLabelNode_c extends PolicyLabelNode_c
     }
 
     
-    protected Label producePairLabel(JifTypeSystem ts, Principal owner, List principals) {
-        return ts.pairLabel(position(), 
-                            ts.readerPolicy(position(), owner, principals),
-                            ts.topLabelM(position()));
+    protected Label produceLabel(JifTypeSystem ts, Principal owner, List principals) {
+        return ts.readerPolicy(position(), owner, principals);
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
