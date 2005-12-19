@@ -1,7 +1,7 @@
 /*
  * Check that subtype checker is checking exceptions
  */
-class SubtypeChecker4[label H] {
+class SubtypeChecker4 {
     public static void main(String[] args) {
 	int{} low = 0;
 	try {

@@ -1,7 +1,7 @@
 class StaticMethod[label H] {
     public static void n() {}
     public static int{} f;
-    public static void main(String[] args) {
+    public static void m(String[] args) {
 	n();
 	int x = f;
     }

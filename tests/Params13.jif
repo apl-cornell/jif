@@ -4,11 +4,7 @@ import java.io.PrintStream;
 class Params13a[covariant label L] {
 }
 
-class Params13[label M] extends Params13a[M] {
-    int{M} data = 7;
-
-
-
+class Params13 {
     public static void main{}(principal{} pp, String[]{} args) {
 	Runtime[pp] runtime = null;
 	try {
@@ -23,19 +19,23 @@ class Params13[label M] extends Params13a[M] {
 	    }
 	    catch (SecurityException ignored) { }
 	}
-	new Params13[{Alice:}]().leak(out, pp);
+	new Params13b[{Alice:}]().leak(out, pp);
     }
+}
+
+class Params13b[label M] extends Params13a[M] {
+    int{M} data = 7;
 
     void leak{pp:}(PrintStream[{pp:}]{pp:} out, principal{} pp)  {
 	Params13a[{pp:;M}] a;
 	Params13a[{pp:}] b;
-	Params13[{pp:;M}] x = null;
-	Params13[{pp:}] y = new Params13[{pp:}]();
+	Params13b[{pp:;M}] x = null;
+	Params13b[{pp:}] y = new Params13b[{pp:}]();
 
 	b = y; // OK as it is a super class 
 	a = b; // OK as it is covariant
 	try {
-	    x = (Params13[{pp:;M}])a; // Unsafe downcast!! will throw a class cast exception.
+	    x = (Params13b[{pp:;M}])a; // Unsafe downcast!! will throw a class cast exception.
 	    if (out != null) out.println("failure! ");
 	}
 	catch (ClassCastException e) {

@@ -3,8 +3,7 @@ package jif.extension;
 import java.util.List;
 
 import jif.ast.JifMethodDecl;
-import jif.types.JifMethodInstance;
-import jif.types.JifTypeSystem;
+import jif.types.*;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -27,6 +26,16 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
         JifMethodDecl jmd = (JifMethodDecl)this.node();
         JifMethodInstance mi = (JifMethodInstance)jmd.methodInstance(); 
         if ("main".equals(mi.name()) && mi.flags().isStatic()) {
+            // check that the class is not parameterized.
+            JifClassType currClass = (JifClassType)tc.context().currentClass();
+            if (currClass.actuals().size() > 0) {                
+                throw new SemanticDetailedException(
+                      "A parameterized class can not have a \"main\" method.",
+                      "Parameterized classes cannot have a main method, as " +
+                      "the invoker of the main method has no way to specify " +
+                      "instantiations of the class parameters.",
+                      mi.position());
+            }
             // ensure the signature of mi is either main(String[]) or
             // main(principal, String[])
             boolean wrongSig = true;

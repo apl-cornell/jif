@@ -2,24 +2,27 @@ import jif.runtime.Runtime;
 import java.io.PrintStream;
 
 
-class Params16[label L, label M] extends D[{L;M}] {
-    int{L} f = 6;
-    int{M} g = 6;
+class Params16 {
 
     public static void main{}(principal{} pp, String[]{} args) {
         try {
 	    Runtime[pp] runtime = Runtime[pp].getRuntime();
 	    PrintStream[{pp:}] out = runtime.stdout(new label{pp:});
-	    new Params16[{}, {pp:}]().m(out, pp);
+	    new Params16a[{}, {pp:}]().m(out, pp);
 	}
 	catch (NullPointerException ignored) { }
 	catch (SecurityException ignored) { }
     }
+}
+
+class Params16a[label L, label M] extends D[{L;M}] {
+    int{L} f = 6;
+    int{M} g = 6;
     void m{pp:}(PrintStream[{pp:}]{pp:} out, principal pp) {
-	Params16[L,M] o = new Params16[L,M]();
-	if (o instanceof Params16[M, L]) { // attempt to leak things by swapping the labels. will be false.
+	Params16a[L,M] o = new Params16a[L,M]();
+	if (o instanceof Params16a[M, L]) { // attempt to leak things by swapping the labels. will be false.
 	    if (out != null) out.println("failure! ");
-	    Params16[M,L] that = (Params16[M,L])o; 
+	    Params16a[M,L] that = (Params16a[M,L])o; 
 	    o.f = that.g; // bad!
 	}
 	else {
