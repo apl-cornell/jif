@@ -51,13 +51,17 @@ public class LabelTypeCheckUtil {
         } 
         if (principal instanceof ConjunctivePrincipal) {
             ConjunctivePrincipal p = (ConjunctivePrincipal)principal;
-            typeCheckPrincipal(tc, p.conjunctLeft());
-            typeCheckPrincipal(tc, p.conjunctRight());
+            for (Iterator iter = p.conjuncts().iterator(); iter.hasNext(); ) {
+                Principal q = (Principal)iter.next();
+                typeCheckPrincipal(tc, q);
+            }
         }
         if (principal instanceof DisjunctivePrincipal) {
             DisjunctivePrincipal p = (DisjunctivePrincipal)principal;
-            typeCheckPrincipal(tc, p.disjunctLeft());
-            typeCheckPrincipal(tc, p.disjunctRight());
+            for (Iterator iter = p.disjuncts().iterator(); iter.hasNext(); ) {
+                Principal q = (Principal)iter.next();
+                typeCheckPrincipal(tc, q);
+            }
         }
     }
     

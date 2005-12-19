@@ -6,7 +6,10 @@ package jif.lang;
 public class LabelUtil {
     public static native label bottom();
 
-    public static native label{owner; readers; *lbl; lbl} readerPolicyLabel(label lbl, principal owner, principal{*lbl}[] readers);
+    public static native label{owner; readers; *lbl; lbl} 
+       readerPolicyLabel(label lbl, principal owner, principal{*lbl}[] readers);
+    public static native label{owner; writers; *lbl; lbl} 
+       writerPolicyLabel(label lbl, principal owner, principal{*lbl}[] writers);
     public static native label join(label l1, label l2);
     public static native boolean equivalentTo(label l1, label l2);
     public static native boolean relabelsTo(label from, label to); 

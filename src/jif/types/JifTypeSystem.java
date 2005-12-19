@@ -64,8 +64,10 @@ public interface JifTypeSystem extends ParamTypeSystem
     UnknownPrincipal unknownPrincipal(Position pos);
     TopPrincipal topPrincipal(Position pos);
     BottomPrincipal bottomPrincipal(Position pos);
-    ConjunctivePrincipal conjunctivePrincipal(Position pos, Principal conjunctLeft, Principal conjunctRight);
-    DisjunctivePrincipal disjunctivePrincipal(Position pos, Principal disjunctLeft, Principal disjunctRight);
+    Principal conjunctivePrincipal(Position pos, Principal conjunctLeft, Principal conjunctRight);
+    Principal conjunctivePrincipal(Position pos, Collection principals);
+    Principal disjunctivePrincipal(Position pos, Principal disjunctLeft, Principal disjunctRight);
+    Principal disjunctivePrincipal(Position pos, Collection principals);
 
     // Label constructors
     VarLabel freshLabelVariable(Position pos, String s, String description);

@@ -13,9 +13,23 @@ public class PrincipalHierarchy {
      * p' is in the set actsfor.get(p)
      */
     private final Map actsfor;
+    
+    
+    /**
+     * Map from Principal to Set[Principal], where if p' actsfor p, then
+     * p' is in the set actsfor.get(p)
+     */
+    private final Map grants;
+
+    /**
+     * Cache of results, same domain and range as actsfor.
+     */
+    private final Map actorCache;
 
     public PrincipalHierarchy() {
         this.actsfor = new HashMap();
+        this.grants = new HashMap();
+        this.actorCache = new HashMap();
     }
 
     public String toString() {
@@ -57,7 +71,8 @@ public class PrincipalHierarchy {
                 }                
                 sb.append("(");
                 sb.append(p.toString());
-                if (actsFor(q, p)) {
+                Set b = (Set)actsfor.get(q); 
+                if (b != null && b.contains(p)) {
                     // q also acts for p
                     sb.append(" equiv ");
                     addAlreadyReported(alreadyReported, p, q);
@@ -78,25 +93,53 @@ public class PrincipalHierarchy {
     }
     public void add(Principal actor, Principal granter) {
 	Set s = (Set) actsfor.get(actor);
-
 	if (s == null) {
 	    // create a new set of granting principals
 	    s = new LinkedHashSet();
 	    actsfor.put(actor, s);
 	}
-
 	s.add(granter);
+
+        Set t = (Set) grants.get(granter);
+        if (t == null) {
+            // create a new set of granting principals
+            t = new LinkedHashSet();
+            grants.put(granter, t);
+        }
+        t.add(actor);        
     }
 
     public boolean actsFor(Principal actor, Principal granter) {
-	return actsFor(actor, granter, new LinkedHashSet());
+	return actsFor(actor, granter, new LinkedList());
     }
 
-    protected boolean actsFor(Principal actor, Principal granter, Set visited) {
+    private static class PrincipalPair {
+        PrincipalPair(Principal actor, Principal granter) {
+            this.actor = actor;
+            this.granter = granter;
+        }
+        final Principal actor;
+        final Principal granter;
+        public int hashCode() { return actor.hashCode() ^ granter.hashCode(); }
+        public boolean equals(Object o) {
+            if (o instanceof PrincipalPair) {
+                PrincipalPair that = (PrincipalPair)o;
+                return this.actor.equals(that.actor) && this.granter.equals(that.granter);
+            }
+            return false;
+        }
+    }
+    protected boolean actsFor(Principal actor, Principal granter, LinkedList goalStack) {
         if (actor.isTopPrincipal()) return true;
         if (granter.isBottomPrincipal()) return true;
         
-	if (visited.contains(actor)) { 
+        Set actorCached = (Set)actorCache.get(actor);
+        if (actorCached != null && actorCached.contains(granter))
+            return true;
+                
+        PrincipalPair currentGoal = new PrincipalPair(actor, granter);
+	if (goalStack.contains(currentGoal)) { 
+            // this goal is already on the stack.
 	    return false;
         }
 	
@@ -104,62 +147,111 @@ public class PrincipalHierarchy {
 	if (actor.equals(granter)) {
 	    return true;
 	}
-
+        
 	Set s = (Set) actsfor.get(actor);
-
 	if (s != null && s.contains(granter)) {
+            // explicit actsfor in the hierarchy
+            cacheResult(actor, granter);
 	    return true;
-	}
+	}               
+
+        // push this goal on the stack before making recursive calls
+        goalStack.addLast(currentGoal);
 
         // special cases for conjunctive and disjunctive principals.
         if (actor instanceof ConjunctivePrincipal) {
             ConjunctivePrincipal cp = (ConjunctivePrincipal)actor;
-            if (actsFor(cp.conjunctLeft(), granter, visited) || 
-                    actsFor(cp.conjunctRight(), granter, visited)) {
-                // Cache the result.
-                s.add(granter);
-                return true;                
-            }            
+            // cp actsfor granter if at least one of the conjucts act for granter
+            for (Iterator iter = cp.conjuncts().iterator(); iter.hasNext();) {
+                Principal p = (Principal)iter.next();
+                if (actsFor(p, granter, goalStack)) {
+                    cacheResult(actor, granter);
+                    return true;                    
+                }
+            }
         }
         if (actor instanceof DisjunctivePrincipal) {
             DisjunctivePrincipal dp = (DisjunctivePrincipal)actor;
-            if (actsFor(dp.disjunctLeft(), granter, visited) && 
-                    actsFor(dp.disjunctRight(), granter, visited)) {
-                return true;                
-            }            
+            // dp actsfor granter if all of the disjucts act for granter
+            boolean all = true;
+            for (Iterator iter = dp.disjuncts().iterator(); iter.hasNext();) {
+                Principal p = (Principal)iter.next();
+                if (!actsFor(p, granter, goalStack)) {
+                    all = false; 
+                    break;
+                }
+            }
+            if (all) {
+                cacheResult(actor, granter);
+                return true;                                
+            }
         }
         
         if (granter instanceof DisjunctivePrincipal) {
             DisjunctivePrincipal dp = (DisjunctivePrincipal)granter;
-            if (actsFor(actor, dp.disjunctLeft(), visited) || 
-                    actsFor(actor, dp.disjunctRight(), visited)) {
-                return true;                
-            }            
+            // actor actsfor dp if there is one disjunct that actor can act for
+            for (Iterator iter = dp.disjuncts().iterator(); iter.hasNext();) {
+                Principal p = (Principal)iter.next();
+                if (actsFor(actor, p, goalStack)) {
+                    cacheResult(actor, granter);
+                    return true;                    
+                }
+            }
         }
 
         if (granter instanceof ConjunctivePrincipal) {
             ConjunctivePrincipal cp = (ConjunctivePrincipal)granter;
-            if (actsFor(actor, cp.conjunctLeft(), visited) && 
-                    actsFor(actor, cp.conjunctRight(), visited)) {
-                return true;                
-            }            
+            // actor actsfor cp if actor actsfor all conjuncts
+            boolean all = true;
+            for (Iterator iter = cp.conjuncts().iterator(); iter.hasNext();) {
+                Principal p = (Principal)iter.next();
+                if (!actsFor(actor, p, goalStack)) {
+                    all = false; 
+                    break;
+                }                
+            }
+            if (all) {
+                cacheResult(actor, granter);
+                return true;                                
+            }
+            
+            
         }
 
-        // Check the transitive part of actsFor relation.
-        if (s == null) return false;
-        visited.add(actor);
-
-        for (Iterator iter = s.iterator(); iter.hasNext(); ) {
-	    Principal p = (Principal) iter.next();
-
-	    if (actsFor(p, granter, visited)) {
-		// Cache the result.
-		s.add(granter);
-		return true;
-	    }
-	}
-
+        // Check the transitive part of actsFor relation.        
+        if (s != null) {
+            for (Iterator iter = s.iterator(); iter.hasNext(); ) {
+                Principal p = (Principal) iter.next();
+                if (actsFor(p, granter, goalStack)) {
+                    cacheResult(actor, granter);
+                    return true;
+                }
+            }
+        }
+        
+        // now also go through the grants set
+        Set t = (Set)grants.get(granter);
+        if (t != null) {
+            for (Iterator iter = t.iterator(); iter.hasNext(); ) {
+                Principal p = (Principal) iter.next();
+                if (actsFor(actor, p, goalStack)) {
+                    cacheResult(actor, granter);
+                    return true;
+                }
+            }
+        }
+        
+        // we've failed, remove the current goal from the stack.
+        goalStack.removeLast();
 	return false;
+    }
+    private void cacheResult(Principal actor, Principal granter) {
+        Set s = (Set) actorCache.get(actor);
+        if (s == null) {
+            s = new HashSet();
+            actorCache.put(actor, s);
+        }
+        s.add(granter);   
     }
 
     public boolean actsFor(Collection actorGrp, Collection grantorGrp) {
@@ -184,12 +276,18 @@ public class PrincipalHierarchy {
     public PrincipalHierarchy copy() {
         PrincipalHierarchy dup = new PrincipalHierarchy();
 
-	for (Iterator i = actsfor.entrySet().iterator(); i.hasNext(); ) {
-	    Map.Entry e = (Map.Entry) i.next();
-	    Principal p = (Principal) e.getKey();
-	    Set s = (Set) e.getValue();
-	    dup.actsfor.put(p, new LinkedHashSet(s));
-	}
+        for (Iterator i = actsfor.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry e = (Map.Entry) i.next();
+            Principal p = (Principal) e.getKey();
+            Set s = (Set) e.getValue();
+            dup.actsfor.put(p, new LinkedHashSet(s));
+        }
+        for (Iterator i = grants.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry e = (Map.Entry) i.next();
+            Principal p = (Principal) e.getKey();
+            Set s = (Set) e.getValue();
+            dup.grants.put(p, new LinkedHashSet(s));
+        }
 
 	return dup;
     }

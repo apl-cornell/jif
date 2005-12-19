@@ -1,19 +1,15 @@
 package jif.lang;
 
-public final class FromDisjunctProof extends ActsForProof {
-    private final ActsForProof leftToGranter;
-    private final ActsForProof rightToGranter;
-    FromDisjunctProof(DisjunctivePrincipal actor, Principal granter, 
-                      ActsForProof leftToGranter, ActsForProof rightToGranter) {
-        super(actor, granter);
-        this.leftToGranter = leftToGranter;
-        this.rightToGranter = rightToGranter;
-    }
-    ActsForProof getLeftToGranter() {
-        return leftToGranter;
-    }
-    ActsForProof getRightToGranter() {
-        return rightToGranter;
-    }
+import java.util.Map;
 
+public final class FromDisjunctProof extends ActsForProof {
+    private final Map disjunctProofs; // map from disjuncts to proofs to Granter 
+    FromDisjunctProof(DisjunctivePrincipal actor, Principal granter, 
+                      Map disjunctProofs) {
+        super(actor, granter);
+        this.disjunctProofs = disjunctProofs;
+    }
+    Map getDisjunctProofs() {
+        return disjunctProofs;
+    }
 }

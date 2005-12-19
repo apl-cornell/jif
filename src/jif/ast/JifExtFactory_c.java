@@ -385,6 +385,11 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return postExtLabelExpr(e);
     }
 
+    public final Ext extPrincipalExpr() {
+        Ext e = extPrincipalExprImpl();
+        return postExtPrincipalExpr(e);
+    }
+
 
     //----------------------------------------------------------------
     // Jif-specific nodes Impls
@@ -503,6 +508,9 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
     protected Ext extLabelExprImpl() {
         return new JifLabelExprExt(new LabelExprToJavaExt_c());
+    }
+    protected Ext extPrincipalExprImpl() {
+        return new JifPrincipalExprExt(new PrincipalExprToJavaExt_c());
     }
 
     //----------------------------------------------------------------
@@ -623,6 +631,9 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext postExtLabelExpr(Ext e) {
+        return postExtExpr(e);
+    }
+    protected Ext postExtPrincipalExpr(Ext e) {
         return postExtExpr(e);
     }
 }

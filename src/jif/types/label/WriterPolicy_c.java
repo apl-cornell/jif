@@ -84,7 +84,7 @@ public class WriterPolicy_c extends Label_c implements WriterPolicy {
     public String componentString(Set printedLabels) {
         StringBuffer sb = new StringBuffer(owner.toString());
         sb.append("!: ");        
-        sb.append(writer.toString());        
+        if (!writer.isTopPrincipal()) sb.append(writer.toString());        
         return sb.toString();
     }
     

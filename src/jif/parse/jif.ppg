@@ -253,10 +253,10 @@ non terminal DeclassifyExpr declassify;
 non terminal DeclassifyStmt declassify_statement;
 non terminal TypeNode labeled_primitive_type;
 non terminal LabelNode label, label_opt, return_label_opt, label_flexible;
-non terminal List component_list, policy_list;
+non terminal List component_list;
 non terminal LabelNode label_component;
 non terminal LabelNode label_component_policy;
-non terminal PrincipalNode principal;
+non terminal PrincipalNode principal, principal_conjunctive, principal_disjunctive, principal_base;
 non terminal Token actsfor;
 non terminal Expr accesspath;
 non terminal Expr accesspath_no_id;
@@ -324,22 +324,11 @@ label_component ::=
     
 label_component_policy ::=
                     // LabelNode
-        principal:a COLON principal_list_opt:b
+        principal_disjunctive:a COLON principal_list_opt:b
             {: RESULT = parser.nf.ReaderPolicyLabelNode(parser.pos(a, b), a, b); :}
-    |   principal:a NOT COLON principal_list_opt:b
+    |   principal_disjunctive:a NOT COLON principal_list_opt:b
             {: RESULT = parser.nf.WriterPolicyLabelNode(parser.pos(a, b), a, b); :}
     ;
-
-policy_list ::=
-                    // List of LabelNode
-        label_component_policy:a
-            {: List l = new TypedList(new LinkedList(), LabelNode.class, false);
-               l.add(a);
-               RESULT = l; :}
-    |   policy_list:a SEMICOLON label_component_policy:b
-            {: RESULT = a;
-               a.add(b); :}
-        ;
 
 principal_list_opt ::=
                     // List of PrincipalNode
@@ -350,21 +339,38 @@ principal_list_opt ::=
     ;
 principal_list ::=
                     // List of PrincipalNode
-        principal:a
+        principal_conjunctive:a
             {: List l = new TypedList(new LinkedList(), PrincipalNode.class, false);
            l.add(a);
                RESULT = l; :}
-    |   principal_list:a COMMA principal:b
+    |   principal_list:a COMMA principal_conjunctive:b
             {: RESULT = a;
                a.add(b); :}
     ;
 principal ::=
+       principal_conjunctive:a
+            {: RESULT = a; :}
+    ;            
+principal_disjunctive ::=
+       principal_conjunctive:a
+            {: RESULT = a; :}
+    |  principal:a COMMA principal_conjunctive:b
+            {: RESULT = parser.nf.AmbDisjunctivePrincipalNode(parser.pos(a,b),a,b); :}    
+    ;
+principal_conjunctive ::=
+       principal_base:a
+            {: RESULT = a; :}    
+    |  principal_conjunctive:a AND principal_base:b
+            {: RESULT = parser.nf.AmbConjunctivePrincipalNode(parser.pos(a,b),a,b); :}    
+    ;
+principal_base ::=
                     // PrincipalNode
         accesspath_no_id:a
             {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a), a); :}
     |  IDENTIFIER:a
             {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a), a.getIdentifier()); :}
-
+    |  LPAREN:a principal_disjunctive:b RPAREN:c
+            {: RESULT = b; :}
     ;
 
 accesspath ::=
@@ -746,6 +752,8 @@ declassify_statement ::=
 extend primary ::=
         NEW:n LABEL label:a
             {: RESULT = parser.nf.NewLabel(parser.pos(n, a), a); :}
+    |   NEW:n PRINCIPAL LPAREN principal_disjunctive:a RPAREN:z
+            {: RESULT = parser.nf.PrincipalExpr(parser.pos(n, z), a); :}
     |   NEW:n objtype_or_expr:a
             {: RESULT = a.toNewArray(parser.pos(n, a)); :}
     ;

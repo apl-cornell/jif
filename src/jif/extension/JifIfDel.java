@@ -31,6 +31,9 @@ public class JifIfDel extends JifJL_c {
             PrincipalNode actor, granter;
             if (left instanceof PrincipalNode)
                 actor = (PrincipalNode)left;
+            else if (left instanceof PrincipalExpr) {
+                actor = ((PrincipalExpr)left).principal();                
+            }
             else {
                 // try running the type checker on left
                 left = checkPrincipalExpr(ar, left);
@@ -39,6 +42,9 @@ public class JifIfDel extends JifJL_c {
             
             if (right instanceof PrincipalNode) {
                 granter = (PrincipalNode)right;
+            }
+            else if (right instanceof PrincipalExpr) {
+                granter = ((PrincipalExpr)right).principal();                
             }
             else {
                 // try running the type checker on right

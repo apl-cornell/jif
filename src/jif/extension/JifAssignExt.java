@@ -1,12 +1,12 @@
 package jif.extension;
 
+import jif.ast.Jif;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
-import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import jif.visit.LabelChecker;
-import polyglot.ast.Assign;
-import polyglot.ast.Node;
+import polyglot.ast.*;
 import polyglot.types.SemanticException;
 
 /** The Jif extension of the <code>Assign</code> node. 
@@ -37,6 +37,7 @@ public abstract class JifAssignExt extends Jif_c
 					         checked.left().type(),
 					         checked.right().type());
 	}
+        
         return checked;
     }
     

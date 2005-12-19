@@ -141,6 +141,22 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
+    public AmbPrincipalNode AmbConjunctivePrincipalNode(Position pos,
+            PrincipalNode left, PrincipalNode right) {
+        AmbPrincipalNode n = new AmbJunctivePrincipalNode_c(pos, left, right, true);
+        n = (AmbPrincipalNode)n.ext(jifExtFactory().extAmbPrincipalNode());
+        n = (AmbPrincipalNode)n.del(delFactory().delExpr());
+        return n;
+    }
+
+    public AmbPrincipalNode AmbDisjunctivePrincipalNode(Position pos,
+            PrincipalNode left, PrincipalNode right) {
+        AmbPrincipalNode n = new AmbJunctivePrincipalNode_c(pos, left, right, false);
+        n = (AmbPrincipalNode)n.ext(jifExtFactory().extAmbPrincipalNode());
+        n = (AmbPrincipalNode)n.del(delFactory().delExpr());
+        return n;
+    }
+
     public CanonicalPrincipalNode CanonicalPrincipalNode(Position pos, Principal principal) {
         CanonicalPrincipalNode n = new CanonicalPrincipalNode_c(pos,
                                                                 principal);
@@ -389,6 +405,12 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         NewLabel n = new NewLabel_c(pos, label);
         n = (NewLabel)n.ext(jifExtFactory().extNewLabel());
         n = (NewLabel)n.del(delFactory().delExpr());
+        return n;
+    }
+    public PrincipalExpr PrincipalExpr(Position pos, PrincipalNode principal) {
+        PrincipalExpr n = new PrincipalExpr_c(pos, principal);
+        n = (PrincipalExpr)n.ext(jifExtFactory().extPrincipalExpr());
+        n = (PrincipalExpr)n.del(delFactory().delExpr());
         return n;
     }
     

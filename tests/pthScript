@@ -208,6 +208,13 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	InvariantThis2.jif (Semantic, "can not contain .*this");
 	InvariantThis3.jif (Semantic, "can not contain .*this");
 	InvariantThis4.jif (Semantic, "can not contain .*this");
+	JunctivePrincipals01.jif;
+	JunctivePrincipals02.jif (Semantic, "not less restrictive"), (Semantic, "not less restrictive"),
+                                 (Semantic, "not less restrictive"), (Semantic, "not less restrictive");
+	JunctivePrincipals03.jif (Semantic, "not less restrictive");
+	JunctivePrincipals04.jif;
+	JunctivePrincipals05.jif;
+	JunctivePrincipals06.jif;
 	LabelIf1.jif ;
 	LabelIf2.jif (Semantic, "only be used in an if statement");
 	LabelIf3.jif (Semantic, "only be used in an if statement");
@@ -236,6 +243,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	LabelLeConstraint11.jif (Semantic, "must be less restrictive");
 	LabelLeConstraint12.jif ;
 	LabelUtil01.jif ;
+	LabelUtil02.jif ;
 	List.jif ;
 	List2.jif ;
 	ListTest.jif ;
@@ -325,6 +333,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Params33.jif (Semantic, "Wrong number of actual parameters");
 	Params34.jif ;
 	Params35.jif (Semantic, "Illegal principal parameter");
+	Params37.jif (Semantic, "can not have a .*main.* method");
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;

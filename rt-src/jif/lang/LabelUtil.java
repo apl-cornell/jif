@@ -62,6 +62,13 @@ public class LabelUtil
     public static Label writerPolicyLabel(Principal owner, Collection writers) {
         return toLabel(intern(new WriterPolicy(owner, PrincipalUtil.disjunction(writers))));
     }
+    /**
+     * See the Jif signature for the explanation of lbl.
+     */
+    public static Label writerPolicyLabel(Label lbl, Principal owner, Principal[] writers) {
+        if (writers == null) return writerPolicyLabel(owner, Collections.EMPTY_SET);
+        return writerPolicyLabel(owner, Arrays.asList(writers));
+    }
 
     /**
      * See the Jif signature for the explanation of lbl.
@@ -87,9 +94,6 @@ public class LabelUtil
         Set comps = new LinkedHashSet(l1.joinComponents());
         comps.addAll(l2.joinComponents());
         comps = simplifyJoin(comps);
-        if (comps.size() == 1) {
-            return (Label)comps.iterator().next();
-        }
 
         return intern(new JoinLabel(comps));
     }
@@ -163,9 +167,9 @@ public class LabelUtil
         return comps;
     }
     
-    private static Set simplifyJoin(Set labels) {
+    private static Set simplifyJoin(Set policies) {
         Set needed = new LinkedHashSet();
-        for (Iterator i = labels.iterator(); i.hasNext(); ) {
+        for (Iterator i = policies.iterator(); i.hasNext(); ) {
             Policy ci = (Policy)i.next();
             
             boolean subsumed = (ci == null); // null components are always subsumed.

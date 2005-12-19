@@ -63,8 +63,9 @@ public class WriterPolicy implements IntegPolicy
     }
     
     public String componentString() {
-        String str = (owner == null?"<null>":owner.name()) + "!: ";
-        str += (writer == null?"<null>":writer.name());
+        String str = PrincipalUtil.toString(owner) + ": ";
+        if (!PrincipalUtil.isTopPrincipal(writer))
+            str += PrincipalUtil.toString(writer);
         return str;
     }
     

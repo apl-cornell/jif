@@ -1,63 +1,85 @@
 package jif.lang;
 
+import java.util.*;
+import java.util.Iterator;
+import java.util.Set;
+
 /**
- * A conjunction of two (non-null) principals
+ * A conjunction of two or more (non-null) principals
  */
 public final class ConjunctivePrincipal implements Principal {
-    final Principal conjunctL;
-    final Principal conjunctR;
+    final Set conjuncts;
     
-    ConjunctivePrincipal(Principal conjunctL, Principal conjunctR) {
-        this.conjunctL = conjunctL;
-        this.conjunctR = conjunctR;
+    ConjunctivePrincipal(Set conjuncts) {
+        this.conjuncts = conjuncts;
     }
     public String name() {
-        return conjunctL.name() + "&" + conjunctR.name();
+        StringBuffer sb = new StringBuffer();
+        for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
+            Principal p = (Principal)iter.next(); 
+            sb.append(PrincipalUtil.toString(p));
+            if (iter.hasNext()) sb.append("&");
+        }
+        return sb.toString();
     }
 
     public boolean delegatesTo(Principal p) {
-        return conjunctL.delegatesTo(p) && conjunctR.delegatesTo(p);
+        if (p instanceof ConjunctivePrincipal) {
+            ConjunctivePrincipal cp = (ConjunctivePrincipal)p;
+            return cp.conjuncts.containsAll(this.conjuncts);
+        }
+        for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
+            Principal q = (Principal)iter.next();
+            if (!PrincipalUtil.delegatesTo(q, p)) return false;
+        }
+        // every conjuct is equal to p.
+        return true;
     }
 
     public boolean equals(Principal p) {
         if (p instanceof ConjunctivePrincipal) {
             ConjunctivePrincipal that = (ConjunctivePrincipal)p;
-            return this.conjunctL.equals(that.conjunctL) &&
-                this.conjunctR.equals(that.conjunctR);
+            return this.conjuncts.equals(that.conjuncts) &&
+                that.conjuncts.equals(this.conjuncts);
         }
         return false;
     }
 
     public boolean isAuthorized(Object authPrf, Closure closure, Label lb) {
-        return conjunctL.isAuthorized(authPrf, closure, lb) && conjunctR.isAuthorized(authPrf, closure, lb);
+        for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
+            Principal p = (Principal)iter.next();
+            if (!p.isAuthorized(authPrf, closure, lb)) return false;
+        }
+        // all conjuncts authorize the closure.
+        return true;
     }
+    
 
     public ActsForProof findProofUpto(Principal p) {
-        ActsForProof prfLeft = conjunctL.findProofUpto(p);
-        if (prfLeft == null) return null;
+        Map proofs = new HashMap();
+        for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
+            Principal q = (Principal)iter.next();
+            ActsForProof prf = PrincipalUtil.findActsForProof(p, q);
+            if (prf == null) return null;
+            proofs.put(q, prf);
+        }
         
-        ActsForProof prfRight = conjunctR.findProofUpto(p);
-        if (prfRight == null) return null;
-        
-        // there is a proof from p to left, and from p to right, which
-        // is enough to make a proof to this conjunct.
-        return new ToConjunctProof(p, this, prfLeft, prfRight);
+        // proofs contains a proof for every conjunct,
+        // which is sufficent for a proof to the conjunctive principal
+        return new ToConjunctProof(p, this, proofs);
+
     }
 
     public ActsForProof findProofDownto(Principal q) {
-        Principal witness = conjunctL;
-        ActsForProof prf = conjunctL.findProofDownto(q);
-        
-        if (prf == null) {
-            witness = conjunctR;
-            prf = conjunctR.findProofDownto(q);
+        for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
+            Principal witness = (Principal)iter.next();
+            ActsForProof prf = PrincipalUtil.findActsForProof(witness, q);
+            if (prf != null) {
+                // have found a proof from witness to q
+                DelegatesProof step = new DelegatesProof(this, witness);
+                return new TransitiveProof(step, witness, prf);
+            }
         }
-        
-        if (prf == null) return null;
-        
-        // have found a proof from one of left or right down to q.
-        // prf is now a proof from witness to q
-        DelegatesProof step = new DelegatesProof(this, witness);
-        return new TransitiveProof(step, witness, prf);
+        return null;
     }
 }

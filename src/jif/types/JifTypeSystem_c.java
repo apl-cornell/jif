@@ -620,11 +620,50 @@ public class JifTypeSystem_c
     public BottomPrincipal bottomPrincipal(Position pos) {
         return new BottomPrincipal_c(this, pos);
     }
-    public ConjunctivePrincipal conjunctivePrincipal(Position pos, Principal l, Principal r) {
-        return new ConjunctivePrincipal_c(l, r, this, pos);
+    public Principal conjunctivePrincipal(Position pos, Principal l, Principal r) {
+        return conjunctivePrincipal(pos, CollectionUtil.list(l, r));
     }
-    public DisjunctivePrincipal disjunctivePrincipal(Position pos, Principal l, Principal r) {
-        return new DisjunctivePrincipal_c(l, r, this, pos);
+    public Principal conjunctivePrincipal(Position pos, Collection ps) {
+        if (ps.isEmpty()) return bottomPrincipal(pos);
+        if (ps.size() == 1) return (Principal)ps.iterator().next();
+        return new ConjunctivePrincipal_c(flattenConjuncts(ps), this, pos);
+    }
+    public Principal disjunctivePrincipal(Position pos, Principal l, Principal r) {
+        return disjunctivePrincipal(pos, CollectionUtil.list(l, r));
+    }
+    public Principal disjunctivePrincipal(Position pos, Collection ps) {
+        if (ps.isEmpty()) return topPrincipal(pos);
+        if (ps.size() == 1) return (Principal)ps.iterator().next();
+        return new DisjunctivePrincipal_c(flattenDisjuncts(ps), this, pos);
+    }
+
+    private Collection flattenConjuncts(Collection ps) {
+        Set newps = new LinkedHashSet();
+        for (Iterator iter = ps.iterator(); iter.hasNext();) {
+            Principal p = (Principal)iter.next();
+            if (p instanceof ConjunctivePrincipal) {
+                ConjunctivePrincipal cp = (ConjunctivePrincipal)p;
+                newps.addAll(cp.conjuncts());
+            }
+            else {
+                newps.add(p);
+            }
+        }
+        return newps;
+    }
+    private Collection flattenDisjuncts(Collection ps) {
+        Set newps = new LinkedHashSet();
+        for (Iterator iter = ps.iterator(); iter.hasNext();) {
+            Principal p = (Principal)iter.next();
+            if (p instanceof DisjunctivePrincipal) {
+                DisjunctivePrincipal dp = (DisjunctivePrincipal)p;
+                newps.addAll(dp.disjuncts());
+            }
+            else {
+                newps.add(p);
+            }
+        }
+        return newps;
     }
 
     private Label top = null;
@@ -707,7 +746,7 @@ public class JifTypeSystem_c
         return t;
     }
     public ReaderPolicy readerPolicy(Position pos, Principal owner, Collection readers) {
-        Principal r = collectionToDisjunct(pos, new LinkedList(readers));
+        Principal r = disjunctivePrincipal(pos, readers);
         return readerPolicy(pos, owner, r);
     }
 
@@ -716,22 +755,10 @@ public class JifTypeSystem_c
         return t;
     }
     public WriterPolicy writerPolicy(Position pos, Principal owner, Collection writers) {
-        Principal w = collectionToDisjunct(pos, new LinkedList(writers));
+        Principal w = disjunctivePrincipal(pos, writers);
         return writerPolicy(pos, owner, w);
     }
-    
-    private Principal collectionToDisjunct(Position pos, LinkedList ps) {
-        if (ps.isEmpty()) {
-            return topPrincipal(pos);
-        }
-        if (ps.size() == 1) {
-            return (Principal)ps.getLast();
-        }
-        Principal p = (Principal)ps.removeFirst();
-        Principal r = collectionToDisjunct(pos, ps);
-        return disjunctivePrincipal(pos, p, r);
-    }
-    
+        
     public Label joinLabel(Position pos, Collection components) {
         if (components == null) {
             components = Collections.EMPTY_SET;

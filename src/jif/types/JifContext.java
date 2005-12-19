@@ -111,7 +111,7 @@ public interface JifContext extends Context {
     /**
      * Get the authority of the current code, represented as a privacy label.
      */    
-    Label authLabel();
+    Label authLabel();//@@@REMOVE THIS
 
 
 

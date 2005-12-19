@@ -81,7 +81,7 @@ public class ReaderPolicy_c extends Label_c implements ReaderPolicy {
     public String componentString(Set printedLabels) {
         StringBuffer sb = new StringBuffer(owner.toString());
         sb.append(": ");        
-        sb.append(reader.toString());        
+        if (!reader.isTopPrincipal()) sb.append(reader.toString());        
         return sb.toString();
     }
     

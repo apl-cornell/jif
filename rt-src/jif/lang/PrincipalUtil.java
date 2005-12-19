@@ -2,6 +2,8 @@ package jif.lang;
 
 import java.util.*;
 
+import polyglot.util.CollectionUtil;
+
 /**
  * Utility methods for principals.
  * 
@@ -32,7 +34,7 @@ public class PrincipalUtil {
         // we return true (since the acts-for relation is
         // reflexive).
         if (p == q) return true;
-        if (q.equals(p) && p != null && p.equals(q)) return true;
+        if (equals(p,q)) return true;
 
         // try a simple test first
         if (delegatesTo(q, p)) return true;
@@ -127,8 +129,15 @@ public class PrincipalUtil {
             FromDisjunctProof proof = (FromDisjunctProof)prf;
             if (actor instanceof DisjunctivePrincipal) {
                 DisjunctivePrincipal dp = (DisjunctivePrincipal)actor;
-                return verifyProof(proof.getLeftToGranter(), dp.disjunctL, granter) &&
-                       verifyProof(proof.getRightToGranter(), dp.disjunctR, granter);
+                // go though each disjunct, and make sure there is a proof
+                // from the disjunct to the granter
+                for (Iterator iter = dp.disjuncts.iterator(); iter.hasNext(); ) {
+                    Principal disjunct = (Principal)iter.next();
+                    ActsForProof pr = (ActsForProof)proof.getDisjunctProofs().get(disjunct);
+                    if (!verifyProof(pr, disjunct, granter)) return false;
+                }
+                // we have verified a proof from each disjunct to the granter
+                return true;
             }
             
         }
@@ -136,8 +145,15 @@ public class PrincipalUtil {
             ToConjunctProof proof = (ToConjunctProof)prf;
             if (granter instanceof ConjunctivePrincipal) {
                 ConjunctivePrincipal cp = (ConjunctivePrincipal)granter;
-                return verifyProof(proof.getActorToLeft(), actor, cp.conjunctL) &&
-                       verifyProof(proof.getActorToRight(), actor, cp.conjunctR);
+                // go though each conjunct, and make sure there is a proof
+                // from actor to the conjunct
+                for (Iterator iter = cp.conjuncts.iterator(); iter.hasNext(); ) {
+                    Principal conjunct = (Principal)iter.next();
+                    ActsForProof pr = (ActsForProof)proof.getConjunctProofs().get(conjunct);
+                    if (!verifyProof(pr, actor, conjunct)) return false;
+                }
+                // we have verified a proof from actor to each conjunct.
+                return true;
             }
             
         }
@@ -147,17 +163,14 @@ public class PrincipalUtil {
     }
 
     public static boolean delegatesTo(Principal granter, Principal superior) {
+        if (granter == null) return true;
         if (superior instanceof ConjunctivePrincipal) {
             ConjunctivePrincipal cp = (ConjunctivePrincipal)superior;
-            if (cp.conjunctL.equals(granter)) return true;
-            if (cp.conjunctR.equals(granter)) return true;
+            for (Iterator iter = cp.conjuncts.iterator(); iter.hasNext();) {
+                Principal conjunct = (Principal)iter.next();
+                if (equals(conjunct, granter)) return true;                
+            }
         }
-        if (granter instanceof DisjunctivePrincipal) {
-            DisjunctivePrincipal dp = (DisjunctivePrincipal)granter;
-            if (dp.disjunctL.equals(superior)) return true;
-            if (dp.disjunctR.equals(superior)) return true;
-        }
-        if (granter == null) return true;
         return granter.delegatesTo(superior);
     }
     
@@ -192,6 +205,10 @@ public class PrincipalUtil {
 
     public static boolean equivalentTo(Principal p, Principal q) {
         return actsFor(p, q) && actsFor(q, p);
+    }
+    public static boolean equals(Principal p, Principal q) {
+        return p == q || 
+                (p != null && q != null && q.equals(p) &&  p.equals(q));        
     }
 
     /**
@@ -232,12 +249,15 @@ public class PrincipalUtil {
     public static Principal topPrincipal() {
         return TOP_PRINCIPAL;
     }
+    static boolean isTopPrincipal(Principal p) {
+        return p == TOP_PRINCIPAL;
+    }
 
     public static Principal disjunction(Principal left, Principal right) {
         if (left == null || right == null) return null;
         if (actsFor(left, right)) return right;
         if (actsFor(right, left)) return left;
-        return new DisjunctivePrincipal(left, right);
+        return disjunction(CollectionUtil.list(left, right));
     }
     
     public static Principal conjunction(Principal left, Principal right) {
@@ -245,19 +265,68 @@ public class PrincipalUtil {
         if (right == null) return left;
         if (actsFor(left, right)) return left;
         if (actsFor(right, left)) return right;
-        return new ConjunctivePrincipal(left, right);
+        return conjunction(CollectionUtil.list(left, right));
     }
     
-    public static Principal disjunction(Collection principals) {
-        LinkedList ll = new LinkedList(principals);
-        if (ll.isEmpty()) return topPrincipal(); 
-        Principal p = (Principal)ll.removeFirst();
-        if (ll.size() == 1) return p;
-        return disjunction(p, disjunction(ll));
+    public static Principal disjunction(Collection principals) {        
+        if (principals == null || principals.isEmpty()) {
+            return topPrincipal();
+        }
+        if (principals.size() == 1) {
+            Object o = principals.iterator().next();
+            if (o == null || o instanceof Principal) return (Principal)o;
+            return topPrincipal();
+        }
+        
+        // go through the collection of principals, and flatten them
+        Set needed = new LinkedHashSet();
+        for (Iterator iter = principals.iterator(); iter.hasNext(); ) {
+            Object o = iter.next();
+            Principal p = null;
+            if (o instanceof Principal) p = (Principal)o;
+            if (p == null) return p;
+            if (PrincipalUtil.isTopPrincipal(p)) continue;
+            if (p instanceof DisjunctivePrincipal) {
+                needed.addAll(((DisjunctivePrincipal)p).disjuncts);
+            }
+            else {
+                needed.add(p);
+            }
+        }
+        return new DisjunctivePrincipal(needed);
     }
     
+    public static Principal conjunction(Collection principals) {        
+        if (principals == null || principals.isEmpty()) {
+            return bottomPrincipal();
+        }
+        if (principals.size() == 1) {
+            Object o = principals.iterator().next();
+            if (o == null || o instanceof Principal) return (Principal)o;
+            return bottomPrincipal();
+        }
+        
+        // go through the collection of principals, and flatten them
+        Set needed = new LinkedHashSet();
+        for (Iterator iter = principals.iterator(); iter.hasNext(); ) {
+            Object o = iter.next();
+            Principal p = null;
+            if (o instanceof Principal) p = (Principal)o;
+            
+            if (p == null) continue; // ignore bottom principals
+            if (PrincipalUtil.isTopPrincipal(p)) return p;
+            if (p instanceof ConjunctivePrincipal) {
+                needed.addAll(((ConjunctivePrincipal)p).conjuncts);
+            }
+            else {
+                needed.add(p);
+            }
+        }
+        return new ConjunctivePrincipal(needed);
+    }
+
     public static String toString(Principal p) {
-        return p== null?"null":p.name();
+        return p== null?"<null>":p.name();
     }
     public static String stringValue(Principal p) {
         return toString(p);

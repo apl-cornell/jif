@@ -123,24 +123,22 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
     protected void checkActsForAuthority(Principal p, JifContext A)
 	throws SemanticException
     {
-	for (Iterator iter = A.authority().iterator(); iter.hasNext(); ) {
-	    Principal pp = (Principal) iter.next();
-
-	    if (A.actsFor(pp, p)) {
-		return;
-	    }
-	}
+        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        Principal authority = ts.conjunctivePrincipal(null, A.authority()); 
+        if (A.actsFor(authority, p)) {
+            return;
+        }
 
 	String codeName = A.currentCode().toString();
         if (A.currentCode() instanceof JifProcedureInstance) {
             codeName = ((JifProcedureInstance)A.currentCode()).debugString();
         }
 	throw new SemanticDetailedException(
-	    "No principal found in authority set that acts for principal " +
-	    p + ".", 
+	    "The authority of the class " + A.currentClass().name() + 
+            " is insufficient to act for principal " + p + ".", 
             "The " + codeName + " states that it has the authority of the " +
-            "principal " + p + ". However, there is no principal listed " +
-            "in the authority set of the class that can act for " + p + ".",
+            "principal " + p + ". However, the conjunction of the authority" +
+            " set of the class is insufficient to act for " + p + ".",
             A.currentCode().position());
     }
 

@@ -119,6 +119,10 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return components.hashCode();
     }
     
+    public String toString() {
+        if (isTop()) return "<top>";
+        return super.toString();
+    }
     public String componentString(Set printedLabels) {
         String s = "";
         for (Iterator i = components.iterator(); i.hasNext(); ) {

@@ -25,6 +25,8 @@ public interface JifNodeFactory extends NodeFactory {
     CanonicalLabelNode CanonicalLabelNode(Position pos, Label label);
     AmbPrincipalNode AmbPrincipalNode(Position pos, Expr expr);
     AmbPrincipalNode AmbPrincipalNode(Position pos, String name);
+    AmbPrincipalNode AmbConjunctivePrincipalNode(Position pos, PrincipalNode left, PrincipalNode right);
+    AmbPrincipalNode AmbDisjunctivePrincipalNode(Position pos, PrincipalNode left, PrincipalNode right);
     CanonicalPrincipalNode CanonicalPrincipalNode(Position pos, Principal principal);
     JifClassDecl JifClassDecl(Position pos, Flags flags, String name, List params, TypeNode superClass, List interfaces, List authority, ClassBody body);
     JifMethodDecl JifMethodDecl(Position pos, Flags flags, TypeNode returnType, String name, LabelNode startLabel, List arguments, LabelNode endLabel, List exceptions, List constraints, Block body);
@@ -46,4 +48,5 @@ public interface JifNodeFactory extends NodeFactory {
     DeclassifyStmt DeclassifyStmt(Position pos, LabelNode bound, LabelNode label, Stmt body);
     DeclassifyExpr DeclassifyExpr(Position pos, Expr expr, LabelNode bound, LabelNode label);
     NewLabel NewLabel(Position pos, LabelNode label);
+    PrincipalExpr PrincipalExpr(Position pos, PrincipalNode principal);
 }

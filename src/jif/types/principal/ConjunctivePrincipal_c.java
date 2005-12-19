@@ -1,55 +1,71 @@
 package jif.types.principal;
 
-import jif.translate.CannotPrincipalToJavaExpr_c;
+import java.util.*;
+
 import jif.translate.ConjunctivePrincipalToJavaExpr_c;
 import jif.types.JifTypeSystem;
 import polyglot.main.Report;
 import polyglot.types.TypeObject;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePrincipal {
-    private final Principal conjunctL;
-    private final Principal conjunctR;
-    public ConjunctivePrincipal_c(Principal conjunctL, Principal conjunctR, 
+    private final Set conjuncts;
+    public ConjunctivePrincipal_c(Collection conjuncts, 
                                   JifTypeSystem ts, Position pos) {
         super(ts, pos, new ConjunctivePrincipalToJavaExpr_c());
-        this.conjunctL = conjunctL;
-        this.conjunctR = conjunctR;
+        this.conjuncts = new LinkedHashSet(conjuncts);
+        if (conjuncts.size() < 2) {
+            throw new InternalCompilerError("ConjunctivePrincipal should " +
+                        "have at least 2 members");
+        }
     }
     
-    public boolean isRuntimeRepresentable() { 
-        return conjunctL.isRuntimeRepresentable() && conjunctR.isRuntimeRepresentable(); 
+    public boolean isRuntimeRepresentable() {
+        for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
+            Principal p = (Principal)iter.next();
+            if (!p.isRuntimeRepresentable()) return false;
+        }
+        return true;
     }
     public boolean isCanonical() { 
-        return conjunctL.isCanonical() && conjunctR.isCanonical(); 
+        for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
+            Principal p = (Principal)iter.next();
+            if (!p.isCanonical()) return false;
+        }
+        return true;
     }
-    
+
     public String toString() {
+        StringBuffer sb = new StringBuffer();
+        String sep = "&";
         if (Report.should_report(Report.debug, 1)) {
-            return "<" + conjunctL + " and " + conjunctR+ ">";
+            sb.append("<");
+            sep = " and ";
         }
         else if (Report.should_report(Report.debug, 2)) {
-            return "<conjunction: " + conjunctL + " and " + conjunctR+ ">";
+            sb.append("<conjunction: ");
+            sep = " and ";
         }
-        StringBuffer sb = new StringBuffer();
-        if (conjunctL instanceof DisjunctivePrincipal) {
-            sb.append('(');
-            sb.append(conjunctL);
-            sb.append(')');
-        }
-        else {
-            sb.append(conjunctL);            
-        }
-        sb.append('&');
-        if (conjunctR instanceof DisjunctivePrincipal) {
-            sb.append('(');
-            sb.append(conjunctR);
-            sb.append(')');
-        }
-        else {
-            sb.append(conjunctR);            
+        for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
+            Principal p = (Principal)iter.next(); 
+            if (p instanceof DisjunctivePrincipal) {
+                sb.append('(');
+                sb.append(p);
+                sb.append(')');
+            }
+            else {
+                sb.append(p);            
+            }
+            if (iter.hasNext()) sb.append(sep);
         }
         
+        if (Report.should_report(Report.debug, 1)) {
+            sb.append(">");
+        }
+        else if (Report.should_report(Report.debug, 2)) {
+            sb.append(">");
+        }
         return sb.toString();
     }
     
@@ -57,21 +73,16 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
         if (this == o) return true;
         if (o instanceof ConjunctivePrincipal) {
             ConjunctivePrincipal that = (ConjunctivePrincipal)o;
-            return this.conjunctL.equals(that.conjunctLeft()) &&
-                this.conjunctR.equals(that.conjunctRight());
+            return this.conjuncts.equals(that.conjuncts());
         }
         return false;
     }
     
     public int hashCode() {
-        return conjunctL.hashCode() ^ conjunctR.hashCode() ^ 23789;
+        return conjuncts.hashCode();
     }
 
-    public Principal conjunctLeft() {
-        return conjunctL;
-    }
-
-    public Principal conjunctRight() {
-        return conjunctR;
+    public Set conjuncts() {
+        return conjuncts;
     }
 }

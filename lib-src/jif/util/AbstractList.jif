@@ -161,7 +161,7 @@ public abstract class AbstractList[label L] extends AbstractCollection[L]
         while (i <= maxIndex) {
             try {
                 JifObject[L] obj = get(i);
-                s = s + (String.valueOf(obj));
+                s = s + (obj==null?"null":obj.toString());
                 if (i < maxIndex)
                     s = s + ", ";
             }

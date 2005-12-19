@@ -68,8 +68,9 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
     }
     
     public String componentString() {
-        String str = (owner == null?"<null>":owner.name()) + ": ";
-        str += (reader == null?"<null>":reader.name());
+        String str = PrincipalUtil.toString(owner) + ": ";
+        if (!PrincipalUtil.isTopPrincipal(reader))
+            str += PrincipalUtil.toString(reader);
         return str;
     }
     
