@@ -2,16 +2,18 @@ import java.io.PrintStream;
 import jif.runtime.Runtime;
 
 class Authority03 {
-    public static void main{}(String[] args) {
+    public static void main{}(principal{} pp, String[] args) where caller (pp) {
 	final Principal me = new TestPrincipal("Steve");
 	
 	final principal nullP = null;
         Runtime[nullP] runtime;
 	PrintStream[{}] out = null;
 	try {
-	    runtime = Runtime[nullP].getRuntime();
-	    if (runtime == null) return;
-	    out = runtime.stdout(new label {});
+	    if (pp actsfor nullP) {
+		runtime = Runtime[nullP].getRuntime();
+		if (runtime == null) return;
+		out = declassify(runtime.stdout(new label {}), {});
+	    }
 	}
 	catch (SecurityException e) { }
 	if (out == null) return;

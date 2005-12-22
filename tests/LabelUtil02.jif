@@ -12,7 +12,7 @@ public class LabelUtil02
 
         Runtime[pp] runtime = Runtime[pp].getRuntime();
         try {
-            PrintStream[{pp:}] out = runtime.out();
+            PrintStream[{pp:;_!:_}] out = runtime.out();
 	    final label lb = LabelUtil.writerPolicyLabel(new label {}, own, ps);
             out.println("Label is " + LabelUtil.stringValue(lb));
             

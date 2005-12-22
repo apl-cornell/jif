@@ -9,20 +9,20 @@ public class Runtime[principal P]
     public static native Runtime[P] getRuntime() throws SecurityException;
     public static native principal{} user();
 
-    public native FileOutputStream[{*L}]{*L;L} openFileWrite(String{*L} name, boolean{*L} append, label L)
+    public native FileOutputStream[{*L}]{P:} openFileWrite(String{*L} name, boolean{*L} append, label L)
 	throws (IOException{*L;L}, SecurityException{*L;L});
-    public native FileInputStream[{*L}]{*L;L} openFileRead(String{*L} name, label L)
+    public native FileInputStream[{*L}]{P:} openFileRead(String{*L} name, label L)
 	throws (FileNotFoundException{*L;L}, SecurityException{*L;L});
 
-    public native PrintStream[{*L}]{*L;L} stdout(label L) throws (SecurityException{*L;L});
-    public native InputStream[{*L}]{*L;L} stdin(label L) throws (SecurityException{*L;L});
-    public native PrintStream[{*L}]{*L;L} stderr(label L) throws (SecurityException{*L;L});
+    public native PrintStream[{*L}]{P:} stdout(label L) throws (SecurityException{*L;L});
+    public native InputStream[{*L}]{P:} stdin(label L) throws (SecurityException{*L;L});
+    public native PrintStream[{*L}]{P:} stderr(label L) throws (SecurityException{*L;L});
 
-    //the default label is {P:}
-    public native PrintStream[{P:}]{P:} err();
-    public native PrintStream[{P:}]{P:} out();
-    public native InputStream[{P:}]{P:} in();
-    public native InputStream[{*L}]{*L;L} in(label L);
+    //the default label is {P:;_!:_} for output, {P:;P!:} for input 
+    public native PrintStream[{P:;_!:_}]{P:} err();
+    public native PrintStream[{P:;_!:_}]{P:} out();
+    public native InputStream[{P:;P!:}]{P:} in();
+    public native InputStream[{*L}]{P:} in(label L);
     
     // current time, but only to accuracy of the day.
     public static native int{} currentYear();

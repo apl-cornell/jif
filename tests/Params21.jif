@@ -12,7 +12,7 @@ class Params21 {
     public static void main{}(principal{} pp, String[]{} args)
         throws (SecurityException) {
         Runtime[pp] runtime = Runtime[pp].getRuntime();
-	PrintStream[{pp:}] out = null;
+	PrintStream[{pp:;_!:_}] out = null;
         try {
             out = runtime.out();
  

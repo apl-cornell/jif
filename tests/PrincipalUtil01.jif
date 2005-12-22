@@ -13,7 +13,7 @@ public class PrincipalUtil01
 
         Runtime[pp] runtime = Runtime[pp].getRuntime();
         try {
-            PrintStream[{pp:}] out = runtime.out();
+            PrintStream[{pp:;_!:_}] out = runtime.out();
             out.println("nullP is " + PrincipalUtil.toString(nullP));
             out.println("stupid1 is " + PrincipalUtil.stringValue(stupid1));
             out.println("stupid1 actsfor stupid2? " + PrincipalUtil.acts_for(stupid1, stupid2));

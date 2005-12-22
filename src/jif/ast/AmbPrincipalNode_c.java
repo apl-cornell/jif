@@ -107,6 +107,13 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
                                          ts.dynamicPrincipal(position(), JifUtil.exprToAccessPath(expr, (JifContext)ar.context())));
     }
     protected Node disambiguateName(AmbiguityRemover ar, String name) throws SemanticException {
+        if ("_".equals(name)) {
+            // "_" is the bottom principal
+            JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
+            JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
+            return nf.CanonicalPrincipalNode(position(),
+                                             ts.bottomPrincipal(position()));
+        }
         Context c = ar.context();
         VarInstance vi = c.findVariable(name);
         

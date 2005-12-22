@@ -17,8 +17,8 @@ public class cat {
 
 	if (runtime == null) return;
 
-	PrintStream[{p:}]{p:} out = runtime.out();
-	PrintStream[{p:}]{p:} err = runtime.err();
+	PrintStream[{p:;_!:_}]{p:} out = runtime.out();
+	PrintStream[{p:;_!:_}]{p:} err = runtime.err();
 	if (err == null || out == null) { return; }
 
 	try {

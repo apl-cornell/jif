@@ -90,7 +90,7 @@ class JunctivePrincipals06 {
     {
         Runtime[pp] runtime = Runtime[pp].getRuntime();
         try {
-            PrintStream[{pp:}] out = runtime.out();
+            PrintStream[{pp:;_!:_}] out = runtime.out();
 	    JunctivePrincipals06a[Alice,Bob,Chuck] x = new JunctivePrincipals06a[Alice,Bob,Chuck]();
 	    out.println("test 1 ok: " + x.m());
 	    out.println("test 2 ok: " + x.n());
