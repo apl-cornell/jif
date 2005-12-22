@@ -15,8 +15,8 @@ public class FileSystem
 //        String[] writers = writers(file);
         String owner = owner(file);
         
-        List readerList = new LinkedList();            
-        for (int i = 0; i < readers.length; i++) {
+        List readerList = new LinkedList();
+        for (int i = 0; readers != null && i < readers.length; i++) {
             readerList.add(new NativePrincipal(readers[i]));
         }
 //        List writerList = new LinkedList();            

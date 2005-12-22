@@ -406,28 +406,30 @@ Principal* GetFileOwner(LPCTSTR fname)
 
 int GetFileReaders(LPCTSTR fname, DWORD* pNum, LPBYTE* buf) {
     PSECURITY_DESCRIPTOR pSD;
-    PSID pSID;
-    PACL pDACL;
-    HANDLE hFile;
+    PSID pSID = NULL;
+    PSID pSIDGroup = NULL;
+    PACL pDACL = NULL;
+    PACL pSACL = NULL;
+    HANDLE hFile = NULL;
     ULONG err;
 
-
-    hFile = CreateFile(fname, GENERIC_READ, FILE_SHARE_READ, NULL, 
-	    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    
-    err = GetSecurityInfo(hFile, SE_FILE_OBJECT, 
-	    OWNER_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION,
-	    &pSID, NULL, &pDACL, NULL, &pSD);
-
-    if (err != ERROR_SUCCESS) {
-	printf("GetSecurityInfo Error: %ld\n", GetLastError());
-	return 0;
-    }   
-
-
-    CloseHandle(hFile);
-
-    return GetReadersFromACL(pDACL, pNum, buf);
+      if (DEBUG) printf("GetFileReaders: Got security info, pDacl null? %d %d\n", (pDACL == NULL), GetLastError());
+      hFile = CreateFile(fname, GENERIC_READ, FILE_SHARE_READ, NULL, 
+ 	    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+      if (hFile != NULL) {
+          if (DEBUG) printf("GetFileReaders: Got security info, pDacl null? %d %d\n", (pDACL == NULL), GetLastError());
+          err = GetSecurityInfo(hFile, SE_FILE_OBJECT, 
+              OWNER_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION,
+              &pSID, &pSIDGroup, &pDACL, &pSACL, &pSD);
+          if (DEBUG) printf("Got security info, pDacl null? %d %d  err is %d   ERROR_INSUFF = %d\n", (pDACL == NULL), GetLastError(), err, ERROR_INSUFFICIENT_BUFFER);
+          CloseHandle(hFile);
+      }
+      
+      if (err == ERROR_SUCCESS && pDACL != NULL) {
+          err = GetReadersFromACL(pDACL, pNum, buf);
+      }
+      
+      return err;
 }
 
 //-----------------------------------------------------------------
@@ -439,22 +441,23 @@ int GetReadersFromACL(PACL pACL, DWORD* num, LPBYTE* buf) {
     DWORD readerNum = 0;
 
     try {
-	if (pACL == NULL)
-	    throw TEXT("NULL DACL \n");
+	if (pACL == NULL) 
+	    throw "NULL DACL\n";
 
 	ACL_SIZE_INFORMATION aclSize;
+	
 	if (!GetAclInformation(pACL, &aclSize, sizeof(aclSize),
 	    AclSizeInformation)) 
-	    throw TEXT("GetAclInformation Error");
+	    throw "GetAclInformation Error";
 
-	if (DEBUG) _tprintf(TEXT("ACL ACE count: %d\n"), aclSize.AceCount);
+	if (DEBUG) _tprintf("ACL ACE count: %d\n", aclSize.AceCount);
 	
 	readers = (Principal**) calloc(aclSize.AceCount, sizeof(Principal*));
 
 	for (ULONG i = 0; i < aclSize.AceCount; i++){
 	    ACCESS_ALLOWED_ACE* pACE;
 	    if (!GetAce(pACL, i, (PVOID*)&pACE))
-		throw TEXT("GetAce Error");
+		throw "GetAce Error";
 
 	    if (DEBUG) _tprintf(TEXT("\nACE #%d\n"), i);
 	    
@@ -473,6 +476,7 @@ int GetReadersFromACL(PACL pACL, DWORD* num, LPBYTE* buf) {
     }
     catch (LPTSTR msg) {
 	_tprintf("%s\n", msg);
+	throw msg;
     }
 
     return GetLastError();
@@ -536,6 +540,7 @@ Principal* GetCurrentUser() {
 
 int main(int argc, char* argv[]) {
     //get the current user
+    printf("Test harness\n");
     Principal* user = GetCurrentUser();
     
     if (user != NULL)
@@ -624,13 +629,15 @@ int main(int argc, char* argv[]) {
     
     PSID sid = GetSID(name);
 
-    PSID_IDENTIFIER_AUTHORITY psia = GetSidIdentifierAuthority(sid);
-    if (psia != NULL)
-	for (int i = 0; i < 6; i++) 
-	    printf("value[%d] = %d\n", i, psia->Value[i]);
+    if (sid != NULL) {
+        PSID_IDENTIFIER_AUTHORITY psia = GetSidIdentifierAuthority(sid);
+        if (psia != NULL)
+	    for (int i = 0; i < 6; i++) 
+                printf("value[%d] = %d\n", i, psia->Value[i]);
 
-    free(sid);
-
+        free(sid);
+    }
+    
     PSECURITY_DESCRIPTOR pSD;
     PSID pSID;
     PACL pDACL;
@@ -664,6 +671,7 @@ int main(int argc, char* argv[]) {
     }
 
     DumpACL(pDACL);
+    wprintf(L"\n\n");
 
     Principal** readers;
 
@@ -685,6 +693,16 @@ int main(int argc, char* argv[]) {
 
     LocalFree(pSD);
     CloseHandle(hFile);
+    
+    err = GetFileReaders("test.txt", &num, (LPBYTE*) readers);
+    if (err == ERROR_SUCCESS) {
+	for (DWORD i=0; i < num; i++) {
+	    wprintf(L"reader %d: %s\n", i+1, readers[i]->FullName());
+	    delete readers[i];
+	}
+
+	free(readers);
+    }	
 
     const char* reader1[] = { "zlt", "Everyone" };
 

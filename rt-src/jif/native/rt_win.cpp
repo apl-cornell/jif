@@ -39,14 +39,15 @@ JNIEXPORT jobjectArray JNICALL Java_jif_runtime_FileSystem_readers
 {
     LPCSTR f = env->GetStringUTFChars(fname, 0);
     DWORD num = 0;
-    Principal** readers;
-    jobjectArray newArr;
+    Principal** readers = NULL;
+    jobjectArray newArr = NULL;
     int err;
     
     try {
 	err = GetFileReaders(f, &num, (LPBYTE*) &readers);
-	if (err != ERROR_SUCCESS) 
+	if (err != ERROR_SUCCESS) {
 	    throw "GetFileReaders Error";
+	}
 	
 	jint jnum = num;
 	
@@ -64,7 +65,12 @@ JNIEXPORT jobjectArray JNICALL Java_jif_runtime_FileSystem_readers
 	    delete readers[i];
 	}
     }
-    catch (...) { }
+    catch (LPTSTR msg) {
+        _tprintf("Error in jif_runtime_FileSystem_readers: %s\n", msg);
+    }
+    catch (...) { 
+        printf("Error in jif_runtime_FileSystem_readers: %d\n", GetLastError());
+    }
 
     if (readers!=NULL)
 	free(readers);
