@@ -333,6 +333,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Params33.jif (Semantic, "Wrong number of actual parameters");
 	Params34.jif ;
 	Params35.jif (Semantic, "Illegal principal parameter");
+	Params36.jif ;
 	Params37.jif (Semantic, "can not have a .*main.* method");
 	ParamsActsFor.jif ;
 	Password.jif ;
