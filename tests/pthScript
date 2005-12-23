@@ -335,6 +335,10 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Params35.jif (Semantic, "Illegal principal parameter");
 	Params36.jif ;
 	Params37.jif (Semantic, "can not have a .*main.* method");
+	Params38.jif ;
+	Params39.jif (Semantic, "not a subtype") ;
+	Params40.jif (Semantic, "not a subtype") ;
+	Params41.jif ;
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;

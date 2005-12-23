@@ -917,9 +917,9 @@ public class CallHelper {
         // those of the superclass.
         satisfiesConstraints(overriding, newlc);
         
-        // argument labels are contravariant:
+        // argument labels and types are contravariant:
         //      each argument label of mi may be more restrictive than the 
-        //      correponding argument label in mj
+        //      correponding argument label in mj        
         Iterator miargs = overriding.formalTypes().iterator();
         Iterator mjargs = overridden.formalTypes().iterator();
         int c=0;
@@ -951,6 +951,12 @@ public class CallHelper {
                             }
                        }
             );
+            
+            // make sure any parameterized type are in fact subtypes
+            new SubtypeChecker().addSubtypeConstraints(lc, 
+                                                       overriding.position(),
+                                                       ts.unlabel(i), 
+                                                       ts.unlabel(j));
         }
 
         
