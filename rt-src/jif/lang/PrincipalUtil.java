@@ -2,8 +2,6 @@ package jif.lang;
 
 import java.util.*;
 
-import polyglot.util.CollectionUtil;
-
 /**
  * Utility methods for principals.
  * 
@@ -257,7 +255,10 @@ public class PrincipalUtil {
         if (left == null || right == null) return null;
         if (actsFor(left, right)) return right;
         if (actsFor(right, left)) return left;
-        return disjunction(CollectionUtil.list(left, right));
+        Collection c = new ArrayList(2);
+        c.add(left);
+        c.add(right);
+        return disjunction(c);
     }
     
     public static Principal conjunction(Principal left, Principal right) {
@@ -265,7 +266,10 @@ public class PrincipalUtil {
         if (right == null) return left;
         if (actsFor(left, right)) return left;
         if (actsFor(right, left)) return right;
-        return conjunction(CollectionUtil.list(left, right));
+        Collection c = new ArrayList(2);
+        c.add(left);
+        c.add(right);
+        return conjunction(c);
     }
     
     public static Principal disjunction(Collection principals) {        
