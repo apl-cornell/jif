@@ -105,6 +105,8 @@ public class JifDeclassifyStmtExt extends JifStmtExt_c
                      }                     
          }
          );
+        
+        JifDeclassifyExprExt.checkRobustDecl(lc, A.pc(), L, ds.position());
 
 	A = (JifContext) A.pushBlock();
 	A.setPc(L);

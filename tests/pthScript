@@ -355,6 +355,10 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	PrincipalUtil01.jif ;
 	Protected.jif ;
 	Recursive.jif ;
+	RobustDecl01.jif ;
+	RobustDecl02.jif (Semantic, "not robust");
+	RobustDecl03.jif (Semantic, "not robust");
+	RobustDecl04.jif ;
 	RuntimeParams01.jif ;
 	RuntimeParams02.jif ;
 	RuntimeParams03.jif ;

@@ -792,6 +792,10 @@ public class JifTypeSystem_c
         UnknownLabel t = new UnknownLabel_c(this, pos);
         return t;
     }
+    public WritersToReadersLabel writersToReadersLabel(Position pos, Label L) {
+        WritersToReadersLabel t = new WritersToReadersLabel_c(L, this, pos);
+        return t;
+    }
 
     public ActsForConstraint actsForConstraint(
         Position pos,

@@ -3,6 +3,7 @@ package jif.types;
 import java.util.*;
 
 import jif.JifOptions;
+import jif.types.hierarchy.LabelEnv;
 import jif.types.label.*;
 import polyglot.main.Options;
 import polyglot.main.Report;
@@ -144,6 +145,24 @@ public abstract class Solver {
         return bounds.applyTo(L);
     }
 
+    protected Label triggerTransforms(Label label, final LabelEnv env) {
+        LabelSubstitution subst = new LabelSubstitution() {
+            public Label substLabel(Label L) throws SemanticException {
+                if (L instanceof WritersToReadersLabel) {
+                    return ((WritersToReadersLabel)L).transform(env);
+                }
+                return L;
+            }            
+        };
+        
+        try {
+            return label.subst(subst);
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected SemanticException", e);
+        }
+    }
+    
     protected List getQueue() {
         return Collections.unmodifiableList(Q);
     }
@@ -354,7 +373,7 @@ public abstract class Solver {
         }
 
         // pre-initialize the queue with the first strongly connected
-        // componenet
+        // component
         if (scc.isEmpty()) {
             Q = new LinkedList();
             currentSCC = new LinkedHashSet();
@@ -413,8 +432,8 @@ public abstract class Solver {
             while (!Q.isEmpty()) {
                 counter++;
                 Equation eqn = (Equation)Q.removeFirst();
-                Label lhsbound = bounds.applyTo(eqn.lhs());
-                Label rhsbound = bounds.applyTo(eqn.rhs());
+                Label lhsbound = triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
+                Label rhsbound = triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());                                
 
                 if (eqn.env().leq(lhsbound, rhsbound)) {
                     if (shouldReport(5))
@@ -474,8 +493,8 @@ public abstract class Solver {
         for (Iterator i = equations.iterator(); i.hasNext();) {
             Equation eqn = (Equation)i.next();
 
-            Label lhsBound = bounds.applyTo(eqn.lhs());
-            Label rhsBound = bounds.applyTo(eqn.rhs());
+            Label lhsBound = triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
+            Label rhsBound = triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());
 
             if (shouldReport(4)) {
                 report(4, "Checking equation: " + eqn);
@@ -591,17 +610,22 @@ public abstract class Solver {
         Equation eqn = null;
         for (Iterator i = eqns.iterator(); i.hasNext();) {
             eqn = (Equation)i.next();
-            if (!eqn.env().hasVariables() && !eqn.lhs().hasVariables()
-                    && !eqn.rhs().hasVariables()) {
+            LabelEnv eqnEnv = eqn.env();
+            Label lhs = eqn.lhs();
+            Label rhs = eqn.rhs();
+            if (!eqnEnv.hasVariables() && !lhs.hasVariables()
+                    && !rhs.hasVariables()) {
                 // The equation has no variables. We can check now if it is
-                // satisfied or not
-                if (!eqn.evaluate()) {
+                // satisfied or not                    
+                
+                if (!eqnEnv.leq(triggerTransforms(lhs, eqnEnv), 
+                                triggerTransforms(rhs, eqnEnv))) {                    
                     if (shouldReport(2)) {
                         report(2, "Statically failed " + eqn);
                     }
                     // The equation is not satisfied.
-                    throw new SemanticException(errorMsg(eqn.constraint()), eqn
-                            .position());
+                    throw new SemanticException(errorMsg(eqn.constraint()), 
+                                                eqn.position());
                 }
                 else {
                     // The equation is satisfied, no need to add it to
@@ -610,7 +634,7 @@ public abstract class Solver {
             }
             else {
                 if (shouldReport(5)) report(5, "Adding equation: " + eqn);
-                eqn.env().setSolver(this);
+                eqnEnv.setSolver(this);
                 equations.add(eqn);
                 addDependencies(eqn);
             }

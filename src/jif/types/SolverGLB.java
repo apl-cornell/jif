@@ -188,8 +188,8 @@ public class SolverGLB extends Solver {
     protected void refineVariableEquation(VarLabel v, Equation eqn)
             throws SemanticException {
         Label vBound = bounds().boundOf(v);
-        Label lhsBound = bounds().applyTo(eqn.lhs());
-        Label rhsBound = bounds().applyTo(eqn.rhs());
+        Label lhsBound = triggerTransforms(bounds().applyTo(eqn.lhs()), eqn.env());
+        Label rhsBound = triggerTransforms(bounds().applyTo(eqn.rhs()), eqn.env());
 
         if (shouldReport(5)) report(5, "BOUND of " + v + " = " + vBound);
         if (shouldReport(5)) report(5, "RHSBOUND = " + rhsBound);
@@ -256,7 +256,7 @@ public class SolverGLB extends Solver {
         Label rhsLabel = eqn.rhs();
         if (shouldReport(4)) report(4, "RHS = " + rhsLabel);
 
-        Label lhsBound = bounds().applyTo(eqn.lhs());
+        Label lhsBound = triggerTransforms(bounds().applyTo(eqn.lhs()), eqn.env());
         if (shouldReport(4)) report(4, "LHS APP = " + lhsBound);
 
         // Check to see if it is currently satisfiable.
@@ -277,7 +277,7 @@ public class SolverGLB extends Solver {
             // The LHS is has a single VarLabel, so we may be able to find
             // an equation that contradicts this one.
             VarLabel v = (VarLabel)c.lhs().variables().iterator().next();
-            return findTrace(v, bounds().applyTo(c.rhs()), false);
+            return findTrace(v, triggerTransforms(bounds().applyTo(c.rhs()), c.env()), false);
         }
         // TODO: could try some other ways to find contradictive
         // equation, or could produce a different error message.

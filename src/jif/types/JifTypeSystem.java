@@ -92,6 +92,7 @@ public interface JifTypeSystem extends ParamTypeSystem
     ThisLabel thisLabel(Position pos, JifClassType ct);
     ThisLabel thisLabel(JifClassType ct);
     UnknownLabel unknownLabel(Position pos);
+    WritersToReadersLabel writersToReadersLabel(Position pos, Label L);
 
     ReaderPolicy readerPolicy(Position pos, Principal owner, Principal reader);
     ReaderPolicy readerPolicy(Position pos, Principal owner, Collection readers);

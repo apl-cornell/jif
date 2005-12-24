@@ -83,15 +83,7 @@ public class Equation
                 constraint.lhs() + constraint.kind() + constraint.rhs() + ") " +
                 position();
     }
-    
-    /**
-     * Evaluate this equation. This method is shorthand for the code
-     * <code>this.env().leq(this.lhs(), this.rhs())</code>.
-     */
-    public boolean evaluate() {
-        return env().leq(lhs, rhs);
-    }
-    
+        
     /**
      * Replace the <code>lhs</code> and <code>rhs</code> with the result of 
      * <code>lhs.subst(subst)</code> and <code>rhs.subst(subst)</code> 
