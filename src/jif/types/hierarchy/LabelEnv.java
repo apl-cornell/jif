@@ -34,6 +34,13 @@ public interface LabelEnv
     LabelEnv copy(); 
 
     /**
+     * Finds an upper bound for L using the assertions in this environment.
+     * May return the top label if there is insufficient information to
+     * determine a more precise bound. 
+     */
+    Label findUpperBound(Label L);
+    
+    /**
      * Returns a Map of Strings to List[String]s which is the descriptions of any 
      * components that appear in the environment. This map is used for verbose 
      * output to the user, to help explain the meaning of constraints and 

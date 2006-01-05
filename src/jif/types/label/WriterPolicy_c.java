@@ -125,9 +125,9 @@ public class WriterPolicy_c extends Label_c implements WriterPolicy {
     public boolean isBottomConfidentiality() { return false; }
     public boolean isTopConfidentiality() { return false; }
     public boolean isBottomIntegrity() {
-        return owner.isTopPrincipal() && writer.isTopPrincipal();
+        return owner.isBottomPrincipal() && writer.isTopPrincipal();
     }
     public boolean isTopIntegrity() {
-        return owner.isBottomPrincipal() && writer.isBottomPrincipal();
+        return owner.isTopPrincipal() && writer.isBottomPrincipal();
     }        
 }

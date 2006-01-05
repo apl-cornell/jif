@@ -625,16 +625,18 @@ public class JifTypeSystem_c
     }
     public Principal conjunctivePrincipal(Position pos, Collection ps) {
         if (ps.isEmpty()) return bottomPrincipal(pos);
+        ps = flattenConjuncts(ps);
         if (ps.size() == 1) return (Principal)ps.iterator().next();
-        return new ConjunctivePrincipal_c(flattenConjuncts(ps), this, pos);
+        return new ConjunctivePrincipal_c(ps, this, pos);
     }
     public Principal disjunctivePrincipal(Position pos, Principal l, Principal r) {
         return disjunctivePrincipal(pos, CollectionUtil.list(l, r));
     }
     public Principal disjunctivePrincipal(Position pos, Collection ps) {
         if (ps.isEmpty()) return topPrincipal(pos);
+        ps = flattenDisjuncts(ps);
         if (ps.size() == 1) return (Principal)ps.iterator().next();
-        return new DisjunctivePrincipal_c(flattenDisjuncts(ps), this, pos);
+        return new DisjunctivePrincipal_c(ps, this, pos);
     }
 
     private Collection flattenConjuncts(Collection ps) {
@@ -649,7 +651,20 @@ public class JifTypeSystem_c
                 newps.add(p);
             }
         }
-        return newps;
+        Set needed = new LinkedHashSet();
+        for (Iterator iter = newps.iterator(); iter.hasNext();) {
+            Principal p = (Principal)iter.next();
+            boolean essential = true;
+            for (Iterator iter2 = needed.iterator(); iter2.hasNext();) {
+                Principal q = (Principal)iter2.next();
+                if (this.emptyLabelEnv.ph().actsFor(q, p)) {
+                    essential = false;
+                    break;
+                }
+            }
+            if (essential) needed.add(p);            
+        }
+        return needed;
     }
     private Collection flattenDisjuncts(Collection ps) {
         Set newps = new LinkedHashSet();
@@ -663,7 +678,20 @@ public class JifTypeSystem_c
                 newps.add(p);
             }
         }
-        return newps;
+        Set needed = new LinkedHashSet();
+        for (Iterator iter = newps.iterator(); iter.hasNext();) {
+            Principal p = (Principal)iter.next();
+            boolean essential = true;
+            for (Iterator iter2 = needed.iterator(); iter2.hasNext();) {
+                Principal q = (Principal)iter2.next();
+                if (this.emptyLabelEnv.ph().actsFor(p, q)) {
+                    essential = false;
+                    break;
+                }
+            }
+            if (essential) needed.add(p);            
+        }
+        return needed;
     }
 
     private Label top = null;
@@ -676,10 +704,10 @@ public class JifTypeSystem_c
         return joinLabel(pos, 
               CollectionUtil.list(readerPolicy(pos, 
                                                topPrincipal(pos), 
-                                               Collections.singleton(topPrincipal(pos))),
+                                               topPrincipal(pos)),
                                   writerPolicy(pos, 
-                                               bottomPrincipal(pos), 
-                                               Collections.singleton(bottomPrincipal(pos)))));
+                                               topPrincipal(pos), 
+                                               bottomPrincipal(pos))));
     }
 
     public Label topLabel() {

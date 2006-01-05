@@ -115,6 +115,7 @@ public class JifDeclassifyExprExt extends Jif_c
 	return X(d.expr(e), X);
     }
 
+    private static final boolean CHECK_ROBUSTNESS = false; 
     /**
      * Check the robust declassification condition
      * @param lc
@@ -126,6 +127,8 @@ public class JifDeclassifyExprExt extends Jif_c
                                  Label labelFrom, 
                                  Label labelTo, Position pos) 
         throws SemanticException {
+        if (!CHECK_ROBUSTNESS) return;
+        
         JifTypeSystem jts = lc.typeSystem();
         JifContext A = lc.context();
         Label pcInteg = jts.writersToReadersLabel(pos, A.pc());
@@ -146,6 +149,28 @@ public class JifDeclassifyExprExt extends Jif_c
                          "allowed to read the information after " +
                          "declassification may be able to influence the " +
                          "decision to declassify.";
+                     }
+         }
+         );
+
+        Label fromInteg = jts.writersToReadersLabel(pos, labelFrom);
+        lc.constrain(new LabelConstraint(new NamedLabel("declass_from_label", labelFrom), 
+                                         LabelConstraint.LEQ, 
+                                         new NamedLabel("declass_to_label", labelTo).
+                                                   join(lc, "from_label_integrity", fromInteg),
+                                         A.labelEnv(),
+                                         pos) {
+                     public String msg() {
+                         return "Declassification not robust: a new reader " +
+                                        "may influence the data to be " +
+                                        "declassified.";
+                     }
+                     public String detailMsg() { 
+                         return "The declassification of this expression is " +
+                         "not robust; at least one of principals that is " +
+                         "allowed to read the information after " +
+                         "declassification may be able to influence the " +
+                         "data to be declassified.";
                      }
          }
          );

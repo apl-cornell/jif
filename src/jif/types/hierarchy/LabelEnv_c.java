@@ -474,6 +474,40 @@ public class LabelEnv_c implements LabelEnv
         return labelAssertions.isEmpty() && ph.isEmpty();
     }
     
+    public Label findUpperBound(Label L) {
+        if (!L.isSingleton()) {
+            Label ret = ts.bottomLabel();
+            for (Iterator iter = L.components().iterator(); iter.hasNext();) {
+                Label comp = (Label)iter.next();
+                ts.join(ret, this.findUpperBound(comp));
+            }
+            return ret;
+        }
+        // L is a singleton.
+        if (L instanceof Policy) return L;
+        
+        // check the assertions
+        for (Iterator i = labelAssertions.iterator(); i.hasNext();) { 
+            LabelLeAssertion c = (LabelLeAssertion)i.next();
+
+            Label cLHS = c.lhs();
+            if (cLHS.hasVariables()) { 
+                cLHS = this.solver.applyBoundsTo(c.lhs());
+            }
+            Label cRHS = c.rhs();
+            if (cRHS.hasVariables()) { 
+                cRHS = this.solver.applyBoundsTo(c.rhs());
+            }
+            if (L.equals(cLHS)) {
+                return cRHS;
+            }
+        }
+        // assertions didn't help
+        return ts.topLabel();
+        
+                
+    }
+    
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("[");

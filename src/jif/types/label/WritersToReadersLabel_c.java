@@ -4,13 +4,9 @@ import java.util.*;
 
 import jif.translate.CannotLabelToJavaExpr_c;
 import jif.types.*;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
 import polyglot.types.*;
-import polyglot.types.TypeObject;
-import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -59,18 +55,18 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
         }
         return "writersToReaders("+label()+")";
     }
-
+    
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         return false;
     }
-
+    
     public List throwTypes(TypeSystem ts) {
         return Collections.EMPTY_LIST;
     }
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         WritersToReadersLabel lbl = this;
         Label newLabel = lbl.label().subst(substitution);
-            
+        
         if (newLabel != lbl.label()) {
             JifTypeSystem ts = (JifTypeSystem)typeSystem();
             lbl = ts.writersToReadersLabel(lbl.position(), newLabel);
@@ -79,70 +75,150 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
     }
     
     
-    public Label transform(LabelEnv env) {
-        return transform(env, label(), new HashSet(), true);
+    public ReaderPolicy transform(LabelEnv env) {        
+        ReaderPolicy rp = transform(env, label());
+//        System.out.println(this.toString() + " becomes " + rp);
+        return rp;
     }
     
-    protected static Label transform(LabelEnv env, Label label, Set visited, boolean topLevel) {
-        JifTypeSystem ts = (JifTypeSystem)label.typeSystem();
-        if (visited.contains(label)) return ts.bottomLabel();
-
-        if (label.isBottom()) 
-            return ts.readerPolicy(label.position(), 
-                                   ts.topPrincipal(label.position()), 
-                                   ts.topPrincipal(label.position()));
+    protected static ReaderPolicy transform(LabelEnv env, Label label) {
+        // We are implementing the following transformation:
+        // writersToReaders( {o1:!w1; ...; ok:!wk; ok1:r1; ...; okn:rn})
+        //         = { o1 and ... and ok : w1 or ... wk or o1 or ... or ok }
         
-        if (label instanceof WriterPolicy) {
-            WriterPolicy L = (WriterPolicy)label;
-            return ts.readerPolicy(L.position(), L.owner(), L.writer());
-        }
-        else if (label instanceof ReaderPolicy) {
-            ReaderPolicy L = (ReaderPolicy)label;
-            if (topLevel) {
-                // this label only has a reader policy, so the writer policy
-                // is effectively {*!:*}
-                return ts.readerPolicy(label.position(), 
-                                       ts.topPrincipal(label.position()), 
-                                       ts.topPrincipal(label.position()));
+        // If the label contains something other than reader and writer policies, then
+        // we find an upper bound of the label with reader and writer policies, and use 
+        // that instead.
+        
+        JifTypeSystem ts = (JifTypeSystem)label.typeSystem();
+        
+        
+        Set owners = new HashSet();
+        Set writers = new HashSet();
+        for (Iterator iter = label.components().iterator(); iter.hasNext();) {
+            Label c = (Label)iter.next();
+            if (c instanceof ReaderPolicy) {
+                // ignore reader policies
+                continue;
             }
-            return ts.bottomLabel();
+            else if (c instanceof WriterPolicy) {
+                WriterPolicy wp = (WriterPolicy)c;
+                owners.add(wp.owner());
+                writers.add(wp.writer());
+            }
+            else if (c instanceof ArgLabel) {
+                Label L = findPolicyUpperBound(c, env, new HashSet());
+                processPolicies(L,owners,writers);
+            }
+            else if (c instanceof ParamLabel) {
+                Label L = findPolicyUpperBound(c, env, new HashSet());
+                processPolicies(L,owners,writers);
+            }
+            else if (c instanceof CovariantParamLabel) {
+                Label L = findPolicyUpperBound(c, env, new HashSet());
+                processPolicies(L,owners,writers);
+            }    
+            else if (c instanceof DynamicLabel) {
+                Label L = findPolicyUpperBound(c, env, new HashSet());
+                processPolicies(L,owners,writers);
+            }    
+            else if (c instanceof ThisLabel) {
+                Label L = findPolicyUpperBound(c, env, new HashSet());
+                processPolicies(L,owners,writers);
+            }    
+            else {
+                throw new InternalCompilerError("WritersToReaders undefined " +
+                                                "for " + label);
+            }            
         }
-        else if (label instanceof JoinLabel) {
-            JoinLabel L = (JoinLabel)label;
+        Position pos = label.position();
+        
+        // all owners are implicitly writers
+        writers.addAll(owners);
+        if (owners.isEmpty()) {
+            // no labels at all. We can be a bit more precise and return a label that permits no readers
+            return ts.readerPolicy(pos,
+                                   ts.topPrincipal(pos),
+                                   ts.topPrincipal(pos));
+        }
+        return ts.readerPolicy(pos,
+                               ts.conjunctivePrincipal(pos, owners),
+                               ts.disjunctivePrincipal(pos, writers));
+    }
+    
+    private static Label findPolicyUpperBound(Label label, LabelEnv env, Set visited) {
+        // Find a label consisting only of reader and writer 
+        // policies that is an upper bound for the label L
+        
+        JifTypeSystem ts = (JifTypeSystem)label.typeSystem();
+        if (visited.contains(label)) {
+            // recursively defined upper bound
+            // return a conservative answer            
+            return ts.topLabel(label.position());
+        }
+        visited.add(label);
 
-            Label result = ts.bottomLabel();
-            for (Iterator iter = L.components().iterator(); iter.hasNext();) {
-                Label c = (Label)iter.next();
-                result = ts.join(result, transform(env, c, visited, false));
+        Set newPolicies = new HashSet();
+        for (Iterator iter = label.components().iterator(); iter.hasNext();) {
+            Label c = (Label)iter.next();
+            if (c instanceof Policy) {
+                newPolicies.add(c);
+                continue;
             }
-            return result;
+            Label ub;
+            if (c instanceof ArgLabel) {
+                ArgLabel L = (ArgLabel)c;
+                ub = findPolicyUpperBound(L.upperBound(), env, visited);
+            }
+            else if (c instanceof ParamLabel) {
+                ParamLabel L = (ParamLabel)c;
+                ub = findPolicyUpperBound(env.findUpperBound(L), env, visited);
+            }
+            else if (c instanceof CovariantParamLabel) {
+                CovariantParamLabel L = (CovariantParamLabel)c;
+                ub = findPolicyUpperBound(env.findUpperBound(L), env, visited);
+            }    
+            else if (c instanceof DynamicLabel) {
+                DynamicLabel L = (DynamicLabel)c;
+                ub = findPolicyUpperBound(env.findUpperBound(L), env, visited);
+            }    
+            else if (c instanceof ThisLabel) {
+                ThisLabel L = (ThisLabel)c;
+                ub = findPolicyUpperBound(env.findUpperBound(L), env, visited);
+            }
+            else {
+                throw new InternalCompilerError("Unexpected label type");
+            }
+            newPolicies.addAll(ub.components());
         }
-        else if (label instanceof ArgLabel) {
-            ArgLabel L = (ArgLabel)label;
-            visited.add(L);
-            return transform(env, L.upperBound(), visited, true);
+        return ts.joinLabel(label.position(), newPolicies);
+    }
+    
+    /**
+     * Add the writers and writers from label l to the sets owners and writers
+     */
+    private static void processPolicies(Label l, Set owners, Set writers) {
+        if (l instanceof ReaderPolicy) {
+            // ignore reader policies
+            return;
         }
-        else if (label instanceof ParamLabel) {
-            ParamLabel L = (ParamLabel)label;
-            return ts.bottomLabel();            
+        else if (l instanceof WriterPolicy) {
+            WriterPolicy wp = (WriterPolicy)l;
+            owners.add(wp.owner());
+            writers.add(wp.writer());
         }
-        else if (label instanceof CovariantParamLabel) {
-            CovariantParamLabel L = (CovariantParamLabel)label;
-            return ts.bottomLabel();            
-        }    
-        else if (label instanceof DynamicLabel) {
-            DynamicLabel L = (DynamicLabel)label;
-            return ts.bottomLabel();            
-        }    
-        else if (label instanceof ThisLabel) {
-            ThisLabel L = (ThisLabel)label;
-//            Label thisUpperBound = A.entryPC();
-//            return transform(env, thisUpperBound, visited, true);
-            return ts.bottomLabel();            
-        }    
+        else if (l.components().isEmpty()) {
+            // ignore empty labels
+        }
+        else if (!l.isSingleton()) {
+            for (Iterator iter = l.components().iterator(); iter.hasNext();) {
+                Label c = (Label)iter.next();
+                processPolicies(c, owners, writers);
+            }
+        }
         else {
-            throw new InternalCompilerError("WritersToReaders undefined " +
-                        "for " + label);
+            throw new InternalCompilerError("Can't process non policy: " + l);
         }
+        
     }
 }
