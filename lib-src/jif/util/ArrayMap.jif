@@ -3,7 +3,7 @@ package jif.util;
 /* This class does not allow null keys or values in this version */
 
 public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
-	static int{} INITIAL_SIZE=10;
+	static int{*!:*} INITIAL_SIZE=10;
 	
 	// This is the number of actual (key,value) pairs stored in the Map
 	int{K} numberOfElements;

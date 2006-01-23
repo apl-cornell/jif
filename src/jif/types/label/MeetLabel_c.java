@@ -131,17 +131,17 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         if (! L.isComparable() || ! L.isEnumerable())
             throw new InternalCompilerError("Cannot compare " + L);
         
-        // If this = { p1 meet .. meet pn } check that for all i,
+        // If this = { p1 meet .. meet pn } check that there exists an i,
         // that Pi <= L
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label pi = (Label) i.next();
             
-            if (! env.leq(pi, L, state)) {
-                return false;
+            if (env.leq(pi, L, state)) {
+                return true;
             }
         }
         
-        return true;
+        return false;
     }
     
     public Collection meetComponents() {

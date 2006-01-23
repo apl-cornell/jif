@@ -3,7 +3,7 @@
 
 public interface List2[label L] {
   public Object{L} first() throws (Exception);
-  public List2[L] rest() throws (Exception);
+  public List2[L]{} rest() throws (Exception);
   public Object{i; L} get(int i):{i;L} throws (Exception);
-  public int size();
+  public int{} size();
 }

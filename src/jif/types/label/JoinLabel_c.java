@@ -134,8 +134,8 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         if (! L.isComparable() || ! L.isEnumerable())
             throw new InternalCompilerError("Cannot compare " + L);
         
-        // If this = { .. Pi .. } and L = { .. Pj' .. }, check if for all i,
-        // there exists a j, such that Pi <= Pj'
+        // If this = {c1 join ... join cn } , check if for all i,
+        // we have Pi <= L
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label ci = (Label) i.next();
             

@@ -1,8 +1,8 @@
 class LabelIf5
 {
-     final LabeledObject{} f = new LabeledObject(new label {}, null);
+     final LabeledObject{*!:*} f = new LabeledObject(new label {}, null);
 
-     void m1{*this.f.L}(label{} arg, label{} arg2):{this;arg;Alice:}  {
+     void m1{*this.f.L}(label{*!:*} arg, label{*!:*} arg2):{this;arg;Alice:}  {
   	 final label lbl = new label {Alice:};
   	 int{*arg} a = 0;
   	 int{*arg2} b = 0;
@@ -38,7 +38,7 @@ class LabelIf5
 	 }
 
  }
-     void m2{*this.f.L}(label{} arg):{this;arg;Alice:}  {
+     void m2{*this.f.L}(label{*!:*} arg):{this;arg;Alice:}  {
 	 final label lbl = new label {Alice:};
 	 int{*arg} a = 0;
 	 int{*lbl} c = 0;
@@ -73,7 +73,7 @@ class LabelIf5
 	     int{Bob:;*lbl2} zz = c;
 	 }
      }
-     void m3{*this.f.L}(label{} arg):{this;arg;Alice:}  {
+     void m3{*this.f.L}(label{*!:*} arg):{this;arg;Alice:}  {
   	 final label lbl = new label {Alice:};
   	 int{*arg; this} g;
   	 int{*lbl; this} h;
@@ -122,7 +122,7 @@ class LabelIf5
 	 }
 	 catch (NullPointerException e) {}
      }
-     void m4{*this.f.L}(label{} arg):{this;arg;Alice:}  {
+     void m4{*this.f.L}(label{*!:*} arg):{this;arg;Alice:}  {
   	 final label lbl = new label {Alice:};
   	 int{*arg} a = 0;
   	 int{*lbl} c = 0;
@@ -156,7 +156,7 @@ class LabelIf5
 	     int{*arg;*lbl} zz = d;
 	 }
      }
-     void m6(label{} arg):{this;arg;Alice:}  {
+     void m6(label{*!:*} arg):{this;arg;Alice:}  {
   	 final label lbl = new label {Alice:};
 
 	 // join join

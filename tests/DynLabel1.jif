@@ -1,13 +1,13 @@
 class DynLabel1 {
-    final label{} f;
-    final DynLabel1{} g;
+    final label{*!:*} f;
+    final DynLabel1{*!:*} g;
 
-    DynLabel1(label{} l, DynLabel1{} o) {
+    DynLabel1(label{*!:*} l, DynLabel1{*!:*} o) {
 	this.f = l;
 	this.g = o;
     }
   
-    void m(label{} q, DynLabel1 arg) throws NullPointerException {	
+    void m(label{*!:*} q, DynLabel1 arg) throws NullPointerException {	
 	final DynLabel1 local = new DynLabel1(q, null);
 
 	int{*q} x; // ok

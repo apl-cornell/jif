@@ -6,7 +6,7 @@
 
  */
 class  ArgLabelSubst2[principal q] {
-    public String{q:} foo(ArgLabelSubst2[y]{} x, principal y, principal z) {
+    public String{q:} foo(ArgLabelSubst2[y]{*!:*} x, principal y, principal z) {
 	if (x == null) return "asdf";
 
 	String{y:} answer2 = null;
@@ -19,7 +19,7 @@ class  ArgLabelSubst2[principal q] {
 }
 
 class  D[label q] {
-    public String{q} foo(D[{y}]{} x, label y, label z) {
+    public String{q} foo(D[{y}]{*!:*} x, label y, label z) {
 	if (x == null) return "asdf";
 
 	String{y} answer2 = null;

@@ -1,8 +1,8 @@
 import jif.lang.*;
 
 public class C {
-    final C foo = null;
-    C bar = null;
+    final C{*!:*} foo = null;
+    C{*!:*} bar = null;
     public C m() {
 	C o = null;
 	if (o != null && o.foo != null && o.foo.foo != null) {

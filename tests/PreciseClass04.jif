@@ -1,5 +1,5 @@
 class C {
-    final C foo = null;
+    final C{*!:*} foo = null;
     public void m() throws NullPointerException {       
 	C o = new C();
 	D x = null;

@@ -6,7 +6,7 @@ public class PairList2[label L] implements List2[L]
     private final Object{L} head;
     private final List2[L]{this} tail;
 
-    PairList2{L}(Object{L} head, List2[L]{} tail) {
+    PairList2{L}(Object{L} head, List2[L]{this} tail) {
 	this.head = head;
 	this.tail = tail;
     }
@@ -24,7 +24,7 @@ public class PairList2[label L] implements List2[L]
 	else return tail.get(i-1);
     }
 
-    public int size() {
+    public int{} size() {
 	try {
 	    return 1 + tail.size();
 	} catch (final NullPointerException e) {
