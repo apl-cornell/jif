@@ -3,6 +3,7 @@ package jif.ast;
 import java.util.*;
 
 import jif.types.JifTypeSystem;
+import jif.types.label.*;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.*;
@@ -16,7 +17,7 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
 
     public JoinLabelNode_c(Position pos, List components) {
 	super(pos);
-	this.components = TypedList.copyAndCheck(components, LabelNode.class, true);
+	this.components = TypedList.copyAndCheck(components, Node.class, true);
     }
 
     public List components() {
@@ -25,14 +26,14 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
 
     public JoinLabelNode components(List components) {
 	JoinLabelNode_c n = (JoinLabelNode_c) copy();
-	n.components = TypedList.copyAndCheck(components, LabelNode.class, true);
+	n.components = TypedList.copyAndCheck(components, Node.class, true);
 	return n;
     }
 
     protected JoinLabelNode_c reconstruct(List components) {
 	if (! CollectionUtil.equals(components, this.components)) {
 	    JoinLabelNode_c n = (JoinLabelNode_c) copy();
-	    n.components = TypedList.copyAndCheck(components, LabelNode.class, true);
+	    n.components = TypedList.copyAndCheck(components, Node.class, true);
 	    return n;
 	}
 
@@ -50,14 +51,44 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
 
         List l = new LinkedList();
 
+        List confPolicies = new ArrayList();
+        List integPolicies = new ArrayList();
 	for (Iterator i = this.components.iterator(); i.hasNext(); ) {
-	    LabelNode n = (LabelNode) i.next();
+	    Node n = (Node) i.next();
             if (!n.isDisambiguated()) {
                 sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
                 return this;
             }
-            l.add(n.label());
+            if (n instanceof PolicyNode) {
+                Policy pol = ((PolicyNode)n).policy();
+                if (pol instanceof ConfPolicy) {
+                    confPolicies.add(pol);
+                }
+                else {
+                    integPolicies.add(pol);
+                }
+            }
+            else if (n instanceof LabelNode) {
+                l.add(((LabelNode)n).label());
+                
+            }
+            else {
+                throw new InternalCompilerError("Unexpected node: " + n);
+            }
 	}
+        
+        if (!confPolicies.isEmpty() || !integPolicies.isEmpty()) {                
+            ConfPolicy cp = ts.bottomConfPolicy(position());
+            IntegPolicy ip = ts.topIntegPolicy(position());
+            if (!confPolicies.isEmpty()) {
+                cp = ts.joinConfPolicy(position(), confPolicies);
+            }
+            if (!integPolicies.isEmpty()) {
+                ip = ts.joinIntegPolicy(position(), integPolicies);
+            }
+            PairLabel pl = ts.pairLabel(position(), cp, ip);
+            l.add(pl);           
+        }
         
         return nf.CanonicalLabelNode(position(), ts.joinLabel(position(), l));
     }

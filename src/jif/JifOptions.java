@@ -16,6 +16,12 @@ public class JifOptions extends Options {
     /*
      * Fields for storing values for options.
      */
+    /**
+     * Should the checking for the robustness condition be disabled?
+     */
+    public boolean noRobustness = true;
+
+    
      /**
       * Use a single Solver to infer labels globally, or solve on a class
       * by class basis.
@@ -61,6 +67,7 @@ public class JifOptions extends Options {
         super.setDefaultValues();
         solveGlobally = false;
         explainErrors = false;
+        noRobustness = false;
     }
 
     /**
@@ -85,7 +92,10 @@ public class JifOptions extends Options {
             index++;
             explainErrors = true;
         }
-
+        else if (args[index].equals("-norobust")) {
+            index++;
+            noRobustness = true;
+        }
         else if (args[index].equals("-sigcp")) {
             index++;
             this.sigcp = args[index++];
@@ -127,6 +137,7 @@ public class JifOptions extends Options {
         super.usage(out);
         usageForFlag(out, "-e -explain", "provide more detailed " +
                                          "explanations of failed label checking.");
+        usageForFlag(out, "-norobust", "disable checking of robustness conditions for declassification");
         usageForFlag(out, "-debug <n>", "set debug level to n. Prints more information about labels.");
         usageForFlag(out, "-stop_constraint <n>", "halt when the nth constraint is added");
         usageForFlag(out, "-globalsolve", "infer label variables globally (default: per class)");

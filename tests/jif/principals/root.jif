@@ -5,8 +5,8 @@ public class root extends ExternalPrincipal {
 	super("root");
     }
 
-    private static root{} P;
-    public static Principal getInstance{}() {
+    private static root{*!:*} P;
+    public static Principal getInstance{*!:*}() {
 	if (P == null) {
 	    P = new root();
 	}

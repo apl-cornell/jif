@@ -1,5 +1,6 @@
 package jif.translate;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import jif.types.label.*;
@@ -10,24 +11,19 @@ public class JoinLabelToJavaExpr_c extends LabelToJavaExpr_c {
     public Expr toJava(Label label, JifToJavaRewriter rw) throws SemanticException {
         JoinLabel L = (JoinLabel) label;
 
-        if (L.components().size() == 1) {
-            LinkedList l = new LinkedList(L.components());
-            Label head = (Label) l.removeFirst(); 
-            return rw.labelToJava(head);
+        if (L.joinComponents().size() == 1) {
+            return rw.labelToJava((Label)L.joinComponents().iterator().next());
         }
 
-        if (L.components().isEmpty()) {
-            return rw.qq().parseExpr("jif.lang.LabelUtil.bottom()");
+        LinkedList l = new LinkedList(L.joinComponents());
+        Iterator iter = l.iterator();            
+        Label head = (Label)iter.next();
+        Expr e = rw.labelToJava(head);
+        while (iter.hasNext()) {
+            head = (Label)iter.next();
+            Expr f = rw.labelToJava(head);
+            e = rw.qq().parseExpr("%E.join(%E)", e, f);
         }
-        else {
-            LinkedList l = new LinkedList(L.components());
-            Label head = (Label) l.removeFirst(); 
-            Label tail = rw.jif_ts().joinLabel(L.position(), l);
-
-            Expr x = rw.labelToJava(head);
-            Expr y = rw.labelToJava(tail);
-
-            return rw.qq().parseExpr("%E.join(%E)", x, y);
-        }
+        return e;            
     }
 }

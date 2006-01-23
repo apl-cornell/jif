@@ -16,11 +16,12 @@ import polyglot.util.Position;
  */
 public class JoinLabel_c extends Label_c implements JoinLabel
 {
-    private Set components;
+    private final Set components;
     
     public JoinLabel_c(Collection components, JifTypeSystem ts, Position pos) {
         super(ts, pos, new JoinLabelToJavaExpr_c());
-        this.components = Collections.unmodifiableSet(new LinkedHashSet(flatten(components)));        
+        this.components = Collections.unmodifiableSet(new LinkedHashSet(flatten(components)));
+        if (this.components.isEmpty()) throw new InternalCompilerError("No empty joins");
     }
     
     public boolean isRuntimeRepresentable() {
@@ -86,19 +87,11 @@ public class JoinLabel_c extends Label_c implements JoinLabel
 
     public boolean isTop() {
         if (components.isEmpty()) return false;
-        boolean haveTopConf = false;
-        boolean haveTopInteg = false;
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label c = (Label) i.next();
             if (c.isTop()) {
                 return true;
             }
-            if (c instanceof Policy) {
-                Policy p = (Policy)c;
-                if (p.isTopConfidentiality()) haveTopConf = true;
-                if (p.isTopIntegrity()) haveTopInteg = true;
-            }
-            if (haveTopConf && haveTopInteg) return true;
         }
         return false;
     }
@@ -138,7 +131,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     }
     
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
-        if (! L.isSingleton() || ! L.isComparable() || ! L.isEnumerable())
+        if (! L.isComparable() || ! L.isEnumerable())
             throw new InternalCompilerError("Cannot compare " + L);
         
         // If this = { .. Pi .. } and L = { .. Pj' .. }, check if for all i,
@@ -154,19 +147,52 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return true;
     }
     
-    public Collection components() {
+    public Collection joinComponents() {
         return Collections.unmodifiableCollection(components);
     }
 
+    public Label normalize() {
+        if (components.size() == 1) {
+            return (Label)components.iterator().next();
+        }
+        // if there is more than one PairLabel, combine them.
+        JifTypeSystem ts = (JifTypeSystem)typeSystem();
+        PairLabel pl = null;
+        boolean combinedPL = false;
+        Set nonPairLabels = new LinkedHashSet();
+        for (Iterator iter = joinComponents().iterator(); iter.hasNext();) {
+            Label lbl = (Label)iter.next();
+            if (lbl instanceof PairLabel) {
+                PairLabel p = (PairLabel)lbl;
+                if (pl == null) {
+                    pl = p;
+                }
+                else {
+                    combinedPL = true;
+                    pl = ts.pairLabel(position(),
+                                      pl.confPolicy().join(p.confPolicy()),
+                                      pl.integPolicy().join(p.integPolicy()));                    
+                }
+            }
+            else {
+                nonPairLabels.add(lbl);
+            }
+        }
+        if (combinedPL) {
+            nonPairLabels.add(pl);
+            return ts.joinLabel(position(), nonPairLabels);
+        }
+        return this;
+    }
     /**
      * @return An equivalent label with fewer components by pulling out
      * less restrictive policies.
      */
-    public Label simplify() {
+    protected Label simplifyImpl() {
         if (!this.isDisambiguated() || components.isEmpty()) {
             return this;
         }
-
+        
         Collection comps = flatten(components);
         Set needed = new LinkedHashSet();
         JifTypeSystem jts = (JifTypeSystem) ts;
@@ -222,8 +248,8 @@ public class JoinLabel_c extends Label_c implements JoinLabel
                 return Collections.singleton(L);
             }
             
-            if (L instanceof JoinLabel_c) {
-                Collection lComps = flatten(L.components());
+            if (L instanceof JoinLabel) {
+                Collection lComps = flatten(((JoinLabel)L).joinComponents());
                 
                 for (Iterator j = lComps.iterator(); j.hasNext(); ) {
                     Label Lj = (Label) j.next();
@@ -276,6 +302,15 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return substitution.substLabel(newJoinLabel).simplify();
     }
 
+    public Set variableComponents() {
+        Set s = new LinkedHashSet();
+        for (Iterator iter = joinComponents().iterator(); iter.hasNext();) {
+            Label ci = (Label)iter.next();
+            s.addAll(ci.variableComponents());
+        }
+        return s;
+    }
+
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         PathMap X = ts.pathMap().N(A.pc()).NV(A.pc());
@@ -293,6 +328,5 @@ public class JoinLabel_c extends Label_c implements JoinLabel
             X = X.join(Xc);            
         }
         return X;
-    }
-    
+    }    
 }

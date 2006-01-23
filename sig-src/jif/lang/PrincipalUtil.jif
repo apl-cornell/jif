@@ -59,7 +59,7 @@ public class PrincipalUtil {
      * returns the null principal, the principal that every other principal can
      * act for.
      */                
-    public static native principal{} nullPrincipal();
+    public static native principal{*!:*} nullPrincipal();
     
     public static native String stringValue(principal p); 
     public static native String toString(principal p); 

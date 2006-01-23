@@ -2,8 +2,8 @@ package jif.types;
 
 import java.util.*;
 
-import jif.types.label.Label;
-import jif.types.label.VarLabel;
+import jif.types.hierarchy.LabelEnv;
+import jif.types.label.*;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 
@@ -101,20 +101,16 @@ public class SolverGLB extends Solver {
         // has a variable...
 
         // get a count of them, to figure out if we need to do a search...
-        List rhsVariables = new ArrayList(eqn.rhs().components().size());
-        for (Iterator i = eqn.rhs().components().iterator(); i.hasNext();) {
-            Label lb = (Label)i.next();
-            if (lb instanceof VarLabel) {
-                rhsVariables.add(lb);
-            }
-        }
-
+        List rhsVariables = new ArrayList(eqn.rhs().variableComponents());
         if (rhsVariables.size() == 1) {
             // only a single component is a variable
             refineVariableEquation((VarLabel)rhsVariables.get(0), eqn);
         }
         else {
             if (!allActivesAreMultiVarRHS()) {
+                // some of the active equations have single variables
+                // on the RHS. Satisfy those first, to reduce the search 
+                // effort.
                 if (shouldReport(3))
                         report(3, "Deferring multi var RHS constraint");
                 addEquationToQueue(eqn);
@@ -123,15 +119,6 @@ public class SolverGLB extends Solver {
 
             // we will do a very simple search, not delaying the
             // solution of any constraints...
-            /*
-             * TODO: We could do a more complicated/efficient search, by
-             * delaying the satisfaction of equations with more than 1 variable
-             * on the RHS until all equations with at most one variable on the
-             * RHS have been satisfied. This would mean that we satisfy the most
-             * restricted eqns first in an effort to reduce the cost of the
-             * search. 
-             */
-
             // we only need one of the components to satisfy the constraints.
             // we will just try each one in turn.
             // copy the bounds before we start modifying anything, so we can
@@ -168,13 +155,7 @@ public class SolverGLB extends Solver {
     protected boolean allActivesAreMultiVarRHS() {
         for (Iterator i = getQueue().iterator(); i.hasNext();) {
             Equation eqn = (Equation)i.next();
-            int modCompCount = 0;
-            for (Iterator j = eqn.rhs().components().iterator(); j.hasNext();) {
-                if (j.next() instanceof VarLabel) {
-                    modCompCount++;
-                }
-            }
-            if (modCompCount <= 1) {
+            if (eqn.rhs().variableComponents().size() <= 1){ 
                 return false;
             }
         }
@@ -196,22 +177,61 @@ public class SolverGLB extends Solver {
         if (shouldReport(5)) report(5, "LHSBOUND = " + lhsBound);
 
         // Try and raise v's bound just enough to satisfy the equation
-        Collection needed = new ArrayList(lhsBound.components().size());
-        for (Iterator comps = lhsBound.components().iterator(); comps.hasNext();) {
-            Label comp = (Label)comps.next();
-            if (!eqn.env().leq(comp, rhsBound)) {
-                needed.add(comp);
-            }
-        }
-        // everything not in needed is already satisfied
+        Label needed = findNeeded(lhsBound, rhsBound, eqn.env());
+//        Collection needed = new ArrayList(lhsBound.components().size());
+//        for (Iterator comps = lhsBound.components().iterator(); comps.hasNext();) {
+//            Label comp = (Label)comps.next();
+//            if (!eqn.env().leq(comp, rhsBound)) {
+//                needed.add(comp);
+//            }
+//        }
+//        // everything not in needed is already satisfied
         
-        Label join =  ts.join(vBound, ts.joinLabel(lhsBound.position(), needed));
+        Label join =  ts.join(vBound, needed);
 
         if (shouldReport(4)) report(4, "JOIN: " + v + " := " + join);
 
         addTrace(v, eqn, join);
         setBound(v, join, eqn.constraint());
         wakeUp(v);
+    }
+    
+    /**
+     * Return the most permissive label L such that lhs <= rhs join L
+     */
+    protected Label findNeeded(Label lhs, Label rhs, LabelEnv env) {
+        if (lhs instanceof JoinLabel) {
+            JoinLabel jl = (JoinLabel)lhs;
+            Set needed = new LinkedHashSet();
+            // jl = c1 join ... join cn
+            // Want L to be the join of all ci such that ci is not <= rhs
+            for (Iterator iter = jl.joinComponents().iterator(); iter.hasNext();) {
+                Label ci = (Label)iter.next();
+                if (!env.leq(ci, rhs)) {
+                    needed.add(findNeeded(ci, rhs, env));
+                }
+            }
+            return ts.joinLabel(lhs.position(), needed);
+        }
+        else if (lhs instanceof MeetLabel) {
+            MeetLabel ml = (MeetLabel)lhs;
+            // ml = c1 meet ... meet cn
+            // Want L to pick one of the ci, the lowest we can find.
+            // TODO: take in the existing value of the variable, to have some
+            // idea of what the smallest increase we want is.
+            Label best = null;
+            for (Iterator iter = ml.meetComponents().iterator(); iter.hasNext();) {
+                Label ci = (Label)iter.next();
+                Label n = findNeeded(ci, rhs, env);
+                if (best == null || env.leq(n, best)) {
+                    best = n;
+                }
+            }
+            return best;
+        }
+        else {
+            return lhs;
+        }
     }
 
     /**

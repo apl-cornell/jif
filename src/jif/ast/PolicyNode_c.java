@@ -1,39 +1,49 @@
 package jif.ast;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
+import jif.types.label.Policy;
 import jif.types.principal.Principal;
+import polyglot.ast.Ambiguous;
 import polyglot.ast.Node;
+import polyglot.ext.jl.ast.Node_c;
 import polyglot.types.SemanticException;
 import polyglot.util.*;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
+import polyglot.visit.*;
 
 /** An implementation of the <code>PolicyLabel</code> interface.
  */
-public abstract class PolicyLabelNode_c extends AmbLabelNode_c implements PolicyLabelNode
+public class PolicyNode_c extends Node_c implements PolicyNode
 {
     protected PrincipalNode owner;
     protected List principals;
+    protected Policy policy = null;
 
-    public PolicyLabelNode_c(Position pos, PrincipalNode owner, List principals) {
+    public PolicyNode_c(Position pos, Policy policy) {
+        super(pos);
+        this.policy = policy;
+        this.owner = null; 
+        this.principals = null;
+    }
+    public PolicyNode_c(Position pos, PrincipalNode owner, List principals) {
 	super(pos);
         if (owner == null) throw new InternalCompilerError("null owner");
 	this.owner = owner;
 	this.principals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
     }
 
+    public Policy policy() {
+        return this.policy;
+    }
+
     public PrincipalNode owner() {
 	return this.owner;
     }
-
-    public PolicyLabelNode owner(PrincipalNode owner) {
-	PolicyLabelNode_c n = (PolicyLabelNode_c) copy();
+   
+    public PolicyNode owner(PrincipalNode owner) {
+	PolicyNode_c n = (PolicyNode_c) copy();
 	n.owner = owner;
 	return n;
     }
@@ -42,15 +52,15 @@ public abstract class PolicyLabelNode_c extends AmbLabelNode_c implements Policy
 	return this.principals;
     }
 
-    public PolicyLabelNode principals(List principals) {
-	PolicyLabelNode_c n = (PolicyLabelNode_c) copy();
+    public PolicyNode principals(List principals) {
+	PolicyNode_c n = (PolicyNode_c) copy();
 	n.principals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
 	return n;
     }
 
-    protected PolicyLabelNode_c reconstruct(PrincipalNode owner, List principals) {
+    protected PolicyNode_c reconstruct(PrincipalNode owner, List principals) {
 	if (owner != this.owner || ! CollectionUtil.equals(principals, this.principals)) {
-	    PolicyLabelNode_c n = (PolicyLabelNode_c) copy();
+	    PolicyNode_c n = (PolicyNode_c) copy();
 	    n.owner = owner;
 	    n.principals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
 	    return n;
@@ -65,10 +75,11 @@ public abstract class PolicyLabelNode_c extends AmbLabelNode_c implements Policy
 	return reconstruct(owner, readers);
     }
 
+    public boolean isDisambiguated() {
+        return policy != null;
+    }
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
 	JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
-	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
-
         if (!owner.isDisambiguated()) {
             ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
             return this;
@@ -87,10 +98,13 @@ public abstract class PolicyLabelNode_c extends AmbLabelNode_c implements Policy
             }
 	    l.add(r.principal());
 	}
-	return nf.CanonicalLabelNode(position(), produceLabel(ts, o, l));
+        this.policy = producePolicy(ts, o, l);
+        return this;
     }
     
-    protected abstract Label produceLabel(JifTypeSystem ts, Principal owner, List principals);
+    protected Policy producePolicy(JifTypeSystem ts, Principal owner, List principals) {
+        return null;
+    }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         print(owner, w, tr);

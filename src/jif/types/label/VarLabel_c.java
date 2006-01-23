@@ -1,5 +1,6 @@
 package jif.types.label;
 
+import java.util.*;
 import java.util.Set;
 
 import jif.types.JifTypeSystem;
@@ -49,6 +50,10 @@ public class VarLabel_c extends Label_c implements VarLabel {
     
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {   
         throw new InternalCompilerError("Cannot compare " + this + ".");
+    }
+    
+    public Set variableComponents() {
+        return Collections.singleton(this);
     }
     
 }

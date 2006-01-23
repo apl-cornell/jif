@@ -72,7 +72,8 @@ public class LabelTypeCheckUtil {
      * @throws SemanticException
      */
     public static void typeCheckLabel(TypeChecker tc, Label Lbl) throws SemanticException {
-        for (Iterator comps = Lbl.components().iterator(); comps.hasNext(); ) {
+        Collection components = labelComponents(Lbl);
+        for (Iterator comps = components.iterator(); comps.hasNext(); ) {
             Label l = (Label)comps.next();
             if (l instanceof DynamicLabel) {
                 JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
@@ -98,18 +99,55 @@ public class LabelTypeCheckUtil {
                                                         dl.position());
                 }
             }        
-            else if (l instanceof ReaderPolicy) {
-                ReaderPolicy pol = (ReaderPolicy)l;
-                typeCheckPrincipal(tc, pol.owner());
-                typeCheckPrincipal(tc, pol.reader());
-            }
-            else if (l instanceof WriterPolicy) {
-                WriterPolicy pol = (WriterPolicy)l;
-                typeCheckPrincipal(tc, pol.owner());
-                typeCheckPrincipal(tc, pol.writer());
+            else if (l instanceof PairLabel) {
+               PairLabel pl = (PairLabel)l;
+               typeCheckPolicy(tc, pl.confPolicy());
+               typeCheckPolicy(tc, pl.integPolicy());
             }
         }
         
+    }
+
+    public static Collection labelComponents(Label L) {
+        if (L instanceof JoinLabel) {
+            return ((JoinLabel)L).joinComponents();
+        }
+        else if (L instanceof MeetLabel) {
+            return ((MeetLabel)L).meetComponents();
+        }
+        else {
+            return Collections.singleton(L);
+        }        
+    }
+    
+    public static void typeCheckPolicy(TypeChecker tc, Policy p) throws SemanticException {
+        if (p instanceof JoinPolicy_c) {
+            JoinPolicy_c jp = (JoinPolicy_c)p;
+            for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
+                Policy pol = (Policy)iter.next();
+                typeCheckPolicy(tc, pol);
+            }
+        }
+        else if (p instanceof MeetPolicy_c) {
+            MeetPolicy_c mp = (MeetPolicy_c)p;
+            for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
+                Policy pol = (Policy)iter.next();
+                typeCheckPolicy(tc, pol);
+            }
+        } 
+        else if (p instanceof ReaderPolicy) {
+            ReaderPolicy pol = (ReaderPolicy)p;
+            typeCheckPrincipal(tc, pol.owner());
+            typeCheckPrincipal(tc, pol.reader());
+        }
+        else if (p instanceof WriterPolicy) {
+            WriterPolicy pol = (WriterPolicy)p;
+            typeCheckPrincipal(tc, pol.owner());
+            typeCheckPrincipal(tc, pol.writer());
+        }        
+        else {
+            throw new InternalCompilerError("Unexpected policy " + p);
+        }
     }
     
     public static void typeCheckType(TypeChecker tc, Type t) throws SemanticException {

@@ -5,8 +5,8 @@ public class Alice extends ExternalPrincipal {
 	super("Alice");
     }
 
-    private static Alice{} P;
-    public static Principal getInstance{}() {
+    private static Alice{*!:*} P;
+    public static Principal getInstance{*!:*}() {
 	if (P == null) {
 	    P = new Alice();
 	}

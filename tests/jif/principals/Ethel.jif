@@ -5,8 +5,8 @@ public class Ethel extends ExternalPrincipal {
 	super("Ethel");
     }
 
-    private static Ethel{} P;
-    public static Principal getInstance{}() {
+    private static Ethel{*!:*} P;
+    public static Principal getInstance{*!:*}() {
 	if (P == null) {
 	    P = new Ethel();
 	}

@@ -10,5 +10,4 @@ import java.util.*;
 public interface Policy
 {
     boolean relabelsTo(Policy l);    
-    String componentString();
 }

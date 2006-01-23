@@ -18,12 +18,12 @@ import polyglot.util.TypedList;
 
 /** An implementation of the <code>PolicyLabel</code> interface. 
  */
-public class WriterPolicy_c extends Label_c implements WriterPolicy {
+public class WriterPolicy_c extends Policy_c implements WriterPolicy {
     private final Principal owner;
     private final Principal writer;
     
     public WriterPolicy_c(Principal owner, Principal writer, JifTypeSystem ts, Position pos) {
-        super(ts, pos, new WriterPolicyToJavaExpr_c()); 
+        super(ts, pos); 
         if (owner == null) throw new InternalCompilerError("null owner");
         this.owner = owner;
         this.writer = writer;
@@ -35,16 +35,19 @@ public class WriterPolicy_c extends Label_c implements WriterPolicy {
     public Principal writer() {
         return writer;
     }
-    public boolean isComparable() { return true; }
-    public boolean isCovariant() { return false; }
-    
-    public boolean isEnumerable() { return true; }
+
+    public boolean isSingleton() {
+        return true;
+    }
     public boolean isCanonical() {
         return owner.isCanonical() && writer.isCanonical();
     }
-    public boolean isDisambiguatedImpl() { return isCanonical(); }
     public boolean isRuntimeRepresentable() {
         return owner.isRuntimeRepresentable() && writer.isRuntimeRepresentable();
+    }
+
+    public Policy simplify() {
+        return this;
     }
         
     public boolean equalsImpl(TypeObject o) {
@@ -62,10 +65,10 @@ public class WriterPolicy_c extends Label_c implements WriterPolicy {
         return (owner==null?0:owner.hashCode()) ^ writer.hashCode()  ^ 1234352;
     }
     
-    public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
+    public boolean leq_(IntegPolicy p, LabelEnv env) {
         PrincipalHierarchy ph = env.ph();
-        if (L instanceof WriterPolicy) {
-            WriterPolicy that = (WriterPolicy) L;            
+        if (p instanceof WriterPolicy) {
+            WriterPolicy that = (WriterPolicy) p;            
             // this = { o  !: .. wi .. }
             // that = { o' !: .. wj' .. }
             
@@ -81,7 +84,7 @@ public class WriterPolicy_c extends Label_c implements WriterPolicy {
         return false;
     }
 
-    public String componentString(Set printedLabels) {
+    public String toString() {
         StringBuffer sb = new StringBuffer(owner.toString());
         sb.append("!: ");        
         if (!writer.isTopPrincipal()) sb.append(writer.toString());        
@@ -95,7 +98,7 @@ public class WriterPolicy_c extends Label_c implements WriterPolicy {
         return throwTypes; 
     }
 
-    public Label subst(LabelSubstitution substitution) throws SemanticException {
+    public Policy subst(LabelSubstitution substitution) throws SemanticException {
         boolean changed = false;
 
         Principal newOwner = owner.subst(substitution);
@@ -103,11 +106,11 @@ public class WriterPolicy_c extends Label_c implements WriterPolicy {
         Principal newWriter = writer.subst(substitution);
         if (newWriter != writer) changed = true;
 
-        if (!changed) return substitution.substLabel(this);
+        if (!changed) return substitution.substPolicy(this).simplify();
 
         JifTypeSystem ts = (JifTypeSystem)typeSystem();
-        WriterPolicy newLabel = ts.writerPolicy(this.position(), newOwner, newWriter);
-        return substitution.substLabel(newLabel);
+        WriterPolicy newPolicy = ts.writerPolicy(this.position(), newOwner, newWriter);
+        return substitution.substPolicy(newPolicy).simplify();
     }
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         // check each principal in turn.
@@ -118,16 +121,28 @@ public class WriterPolicy_c extends Label_c implements WriterPolicy {
         return X;
     }
     
-    public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
-        return toJava.toJava((WriterPolicy)this, rw);               
-    }
+//    public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
+//        return toJava.toJava((WriterPolicy)this, rw);               
+//    }
 
-    public boolean isBottomConfidentiality() { return false; }
-    public boolean isTopConfidentiality() { return false; }
     public boolean isBottomIntegrity() {
-        return owner.isBottomPrincipal() && writer.isTopPrincipal();
+        return owner.isTopPrincipal() && writer.isTopPrincipal();
     }
     public boolean isTopIntegrity() {
-        return owner.isTopPrincipal() && writer.isBottomPrincipal();
+        return owner.isBottomPrincipal() && writer.isBottomPrincipal();
     }        
+    public boolean isTop() {
+        return isTopIntegrity();
+    }
+    public boolean isBottom() {
+        return isBottomIntegrity();
+    }
+    public IntegPolicy meet(IntegPolicy p) {
+        JifTypeSystem ts = (JifTypeSystem)this.ts;
+        return ts.meet(this, p);
+    }
+    public IntegPolicy join(IntegPolicy p) {
+        JifTypeSystem ts = (JifTypeSystem)this.ts;
+        return ts.join(this, p);
+    }    
 }

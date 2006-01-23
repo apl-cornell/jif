@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import jif.types.hierarchy.LabelEnv;
-import jif.types.label.Label;
+import jif.types.label.*;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -37,10 +37,14 @@ public class Equation
 	this.rhs = rhs.simplify();
 	this.constraint = constraint;
 
-	if (!lhs.isSingleton()) {
-	    throw new InternalCompilerError(
-		"LHS of equation must be a singleton.");
-	}
+        if (lhs instanceof JoinLabel) {
+            throw new InternalCompilerError(
+                "LHS of equation must not be a join label.");
+        }
+        if (rhs instanceof MeetLabel) {
+            throw new InternalCompilerError(
+                "LHS of equation must not be a meet label.");
+        }
     }
     
     

@@ -2,7 +2,7 @@ import java.io.PrintStream;
 import jif.runtime.Runtime;
 
 class JunctivePrincipals01 {
-    public static void main{}(principal{} pp, String[]{} args)
+    public static void main{*!:*}(principal{*!:*} pp, String[]{*!:*} args)
         throws (SecurityException)
     {
 	

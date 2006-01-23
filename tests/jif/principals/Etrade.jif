@@ -5,8 +5,8 @@ public class Etrade extends ExternalPrincipal {
 	super("Etrade");
     }
 
-    private static Etrade{} P;
-    public static Principal getInstance{}() {
+    private static Etrade{*!:*} P;
+    public static Principal getInstance{*!:*}() {
 	if (P == null) {
 	    P = new Etrade();
 	}

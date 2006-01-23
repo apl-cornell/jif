@@ -58,6 +58,6 @@ public class FixedSignature implements DefaultSignature
     }
 
     public Label defaultFieldLabel(FieldDecl fd) {
-        return ts.bottomLabel();
+        return ts.noComponentsLabel();
     }
 }

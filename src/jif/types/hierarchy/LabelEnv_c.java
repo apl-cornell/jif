@@ -72,33 +72,45 @@ public class LabelEnv_c implements LabelEnv
     public void addAssertionLE(Label L1, Label L2) {
         addAssertionLE(L1, L2, true);
     }
-    public void addAssertionLE(Label L1, Label L2, boolean updateDisplayString) {
+    public boolean addAssertionLE(Label L1, Label L2, boolean updateDisplayString) {
         // clear the cache of leq results
         cache.clear();
         boolean added = false;
         // break up the components
-        for (Iterator c = L1.components().iterator(); c.hasNext(); ) {
-            Label cmp = (Label)c.next();
-
+        if (L1 instanceof JoinLabel) {
+            for (Iterator c = ((JoinLabel)L1).joinComponents().iterator(); c.hasNext(); ) {
+                Label cmp = (Label)c.next();
+                added = addAssertionLE(cmp, L2, false) || added;                
+            }            
+        }
+        else if (L2 instanceof MeetLabel) {
+            for (Iterator c = ((MeetLabel)L2).meetComponents().iterator(); c.hasNext(); ) {
+                Label cmp = (Label)c.next();
+                added = addAssertionLE(L1, cmp, false) || added;                
+            }                        
+        }
+        else {
             // don't bother adding the assertion if we already know 
-            // cmp is less than L2. However, if it has variables, we
+            // L1 is less than L2. However, if it has variables, we
             // need to add it regardless.
-            if (cmp.hasVariables() || L2.hasVariables() || 
-                    !(this.leq(cmp, L2, new SearchState_c(new LinkedHashSet())))) {
-                labelAssertions.add(new LabelLeAssertion_c(ts, cmp, L2, Position.COMPILER_GENERATED));
+            if (L1.hasVariables() || L2.hasVariables() || 
+                    !(this.leq(L1, L2, new SearchState_c(new LinkedHashSet())))) {
+                labelAssertions.add(new LabelLeAssertion_c(ts, L1, L2, Position.COMPILER_GENERATED));
                 added = true;
-                if (!this.hasVariables && (cmp.hasVariables() || L2.hasVariables())) {
+                if (!this.hasVariables && (L1.hasVariables() || L2.hasVariables())) {
                     // at least one assertion in this label env has a variable.
                     this.hasVariables = true;
                 }
             }            
         }
+        
         if (updateDisplayString && added) {
             if (displayLabelAssertions.length() > 0) {
                 displayLabelAssertions += ", ";
             }
             displayLabelAssertions += L1 + " <= " + L2;
         }
+        return added;
     }
 
     public void addEquiv(Label L1, Label L2) {
@@ -205,8 +217,8 @@ public class LabelEnv_c implements LabelEnv
         AssertionUseCount auc = ((SearchState_c)state).auc;
         Set currentGoals = ((SearchState_c)state).currentGoals;
         
-        if (L1.isSingleton()) L1 = L1.singletonComponent();
-        if (L2.isSingleton()) L2 = L2.singletonComponent();
+        L1 = L1.normalize();
+        L2 = L2.normalize();
 
         if (! L1.isComparable() || ! L2.isComparable()) {
             throw new InternalCompilerError("Cannot compare " + L1 +
@@ -247,65 +259,46 @@ public class LabelEnv_c implements LabelEnv
             throw new InternalCompilerError("Cannot compare " + L1 +
                                             " <= " + L2);
         }
-                
-        if (L2.isSingleton()) {
-            L2 = L2.singletonComponent();
-            boolean result = L1.leq_(L2, this, state);            
-            if (!result && L1 instanceof ArgLabel) {
-                ArgLabel al = (ArgLabel)L1;
-                // recurse on upper bound.
-                result = leq(al.upperBound(), L2, state);
+        
+        if (L2 instanceof MeetLabel) {
+            // L1 <= C1 meet ... meet Cn if
+            // for all j L1 <= Cj
+            MeetLabel ml = (MeetLabel)L2;
+            boolean allSat = true;
+            for (Iterator j = ml.meetComponents().iterator(); j.hasNext(); ) {
+                Label cj = (Label) j.next();
+                if (!leq(L1, cj, state)) {
+                    allSat = false;
+                    break;
+                }
             }
-            
-            // try to use assertions
-            return result || leqApplyAssertions(L1, L2, (SearchState_c)state, true);
-            // try again, being dumb?
+            if (allSat) return true;            
         }
-        else if (L1.isSingleton()) {
-            // if the components of L2 are connected by joins, 
-            // then L1 <= L2 if there exists a component cj of L2 
+        if (L2 instanceof JoinLabel) {
+            // L1 <= c1 join ... join cn if there exists a cj 
             // such that L1 <= cj
-            for (Iterator j = L2.components().iterator(); j.hasNext(); ) {
+            JoinLabel jl = (JoinLabel)L2;
+            for (Iterator j = jl.joinComponents().iterator(); j.hasNext(); ) {
                 Label cj = (Label) j.next();
                 if (leq(L1, cj, state)) {
                     return true;
                 }
-            }
-            
-            // haven't been able to prove it yet.
-            // try testing L1 against all of L2. This is needed
-            // if, say, L1 is an arg label with upper bound L join L',
-            // and L2 = L join L'.
-            if (L1.leq_(L2, this, state)) {
-                return true;
-            }
-            
-            if (L1 instanceof ArgLabel) {
-                ArgLabel al = (ArgLabel)L1;
-                // recurse on upper bound.
-                if (leq(al.upperBound(), L2, state)) {
-                    return true;
-                }
-            }
-
-            // haven't been able to prove it yet. Try the assertions
-            return leqApplyAssertions(L1, L2, (SearchState_c)state, true);
+            }            
         }
-        else {
-            // L1 is not a singleton, and neither is L2.
-
-            // We need to break L1 down...
-            // if the components of L1 are connected by joins, 
-            // then L1 <= L2 if for all components ci of L1 
-            // we have ci <= L2
-            for (Iterator i = L1.components().iterator(); i.hasNext(); ) {
-                Label ci = (Label) i.next();
-                if (!leq(ci, L2, state)) {
-                    return false;
-                }
-            }	
+        
+        if (L1.leq_(L2, this, state)) {
             return true;
-        }            
+        }
+        
+        boolean result = false;
+        if (L1 instanceof ArgLabel) {
+            ArgLabel al = (ArgLabel)L1;
+            // recurse on upper bound.
+            result = leq(al.upperBound(), L2, state);
+        }
+        // try to use assertions
+        return result || leqApplyAssertions(L1, L2, (SearchState_c)state, true);
+        
     }
     
 //    /**
@@ -467,6 +460,79 @@ public class LabelEnv_c implements LabelEnv
 
     }
     
+    
+    public boolean leq(Policy p1, Policy p2) {
+        p1 = p1.simplify();
+        p2 = p2.simplify();
+        if (p1 instanceof ConfPolicy && p2 instanceof ConfPolicy) {
+            return leq((ConfPolicy)p1, (ConfPolicy)p2);
+        }
+        if (p1 instanceof IntegPolicy && p2 instanceof IntegPolicy) {
+            return leq((IntegPolicy)p1, (IntegPolicy)p2);
+        }
+        return false;
+    }
+    
+    public boolean leq(ConfPolicy p1, ConfPolicy p2) {
+        if (p2.isSingleton() || !p1.isSingleton()) {
+            return p1.leq_(p2, this);
+        }
+        if (p2 instanceof JoinPolicy_c) {
+            // we need to find one element ci of p2 such that p1 <= ci
+            JoinPolicy_c jp = (JoinPolicy_c)p2;
+            for (Iterator i = jp.joinComponents().iterator(); i.hasNext(); ) {
+                ConfPolicy ci = (ConfPolicy) i.next();
+                
+                if (leq(p1, ci)) {
+                    return true;
+                }
+            }
+        }
+        else if (p2 instanceof MeetPolicy_c) {
+            // for all elements ci of p2 we require p1 <= ci             
+            MeetPolicy_c mp = (MeetPolicy_c)p2;
+            boolean allSat = true;
+            for (Iterator i = mp.meetComponents().iterator(); i.hasNext(); ) {
+                ConfPolicy ci = (ConfPolicy) i.next();                
+                if (!leq(p1, ci)) {
+                    allSat = false;
+                    break;
+                }
+            }
+            if (allSat) return true;
+        }
+        return p1.leq_(p2, this);
+    }
+    public boolean leq(IntegPolicy p1, IntegPolicy p2) {
+        if (p2.isSingleton() || !p1.isSingleton()) {
+            return p1.leq_(p2, this);
+        }
+        if (p2 instanceof JoinPolicy_c) {
+            // we need to find one element ci of p2 such that p1 <= ci
+            JoinPolicy_c jp = (JoinPolicy_c)p2;
+            for (Iterator i = jp.joinComponents().iterator(); i.hasNext(); ) {
+                IntegPolicy ci = (IntegPolicy) i.next();
+                
+                if (leq(p1, ci)) {
+                    return true;
+                }
+            }
+        }
+        else if (p2 instanceof MeetPolicy_c) {
+            // for all elements ci of p2 we require p1 <= ci             
+            MeetPolicy_c mp = (MeetPolicy_c)p2;
+            boolean allSat = true;
+            for (Iterator i = mp.meetComponents().iterator(); i.hasNext(); ) {
+                IntegPolicy ci = (IntegPolicy) i.next();                
+                if (!leq(p1, ci)) {
+                    allSat = false;
+                    break;
+                }
+            }
+            if (allSat) return true;
+        }
+        return p1.leq_(p2, this);        
+    }
     /**
      * Is this enviornment empty, or does is contain some constraints?
      */
@@ -474,17 +540,31 @@ public class LabelEnv_c implements LabelEnv
         return labelAssertions.isEmpty() && ph.isEmpty();
     }
     
+    /**
+     * Finds a PairLabel upper bound
+     *
+     */
     public Label findUpperBound(Label L) {
-        if (!L.isSingleton()) {
+        if (L instanceof JoinLabel) {
+            JoinLabel jl = (JoinLabel)L;
             Label ret = ts.bottomLabel();
-            for (Iterator iter = L.components().iterator(); iter.hasNext();) {
+            for (Iterator iter = jl.joinComponents().iterator(); iter.hasNext();) {
                 Label comp = (Label)iter.next();
                 ts.join(ret, this.findUpperBound(comp));
             }
             return ret;
         }
-        // L is a singleton.
-        if (L instanceof Policy) return L;
+        if (L instanceof MeetLabel) {
+            MeetLabel ml = (MeetLabel)L;
+            Label ret = ts.topLabel();
+            for (Iterator iter = ml.meetComponents().iterator(); iter.hasNext();) {
+                Label comp = (Label)iter.next();
+                ts.meet(ret, this.findUpperBound(comp));
+            }
+            return ret;
+        }
+        // L is a pair label.
+        if (L instanceof PairLabel) return L;
         
         // check the assertions
         for (Iterator i = labelAssertions.iterator(); i.hasNext();) { 
@@ -546,25 +626,35 @@ public class LabelEnv_c implements LabelEnv
         for (Iterator iter = labelAssertions.iterator(); iter.hasNext(); ) {
             LabelLeAssertion c = (LabelLeAssertion) iter.next();
             Label bound = bounds.applyTo(c.lhs());
-            if (bound.isEnumerable() && !bound.components().isEmpty()) {                
-                for (Iterator i = bound.components().iterator(); i.hasNext(); ) {
-                    Label l = (Label)i.next();
-                    labelComponents.add(l);
-                }
+            Collection components;
+            if (bound instanceof JoinLabel) {
+                components = ((JoinLabel)bound).joinComponents();
+            }
+            else if (bound instanceof MeetLabel) {
+                components = ((MeetLabel)bound).meetComponents();
             }
             else {
-                labelComponents.add(bound);                
+                components = Collections.singleton(bound);
+            }
+            
+            for (Iterator i = components.iterator(); i.hasNext(); ) {
+                Label l = (Label)i.next();
+                labelComponents.add(l);
             }
             
             bound = bounds.applyTo(c.rhs());
-            if (bound.isEnumerable() && !bound.components().isEmpty()) {                
-                for (Iterator i = bound.components().iterator(); i.hasNext(); ) {
-                    Label l = (Label)i.next();
-                    labelComponents.add(l);
-                }
-            }            
+            if (bound instanceof JoinLabel) {
+                components = ((JoinLabel)bound).joinComponents();
+            }
+            else if (bound instanceof MeetLabel) {
+                components = ((MeetLabel)bound).meetComponents();
+            }
             else {
-                labelComponents.add(bound);                
+                components = Collections.singleton(bound);
+            }
+            for (Iterator i = components.iterator(); i.hasNext(); ) {
+                Label l = (Label)i.next();
+                labelComponents.add(l);
             }
         }
         

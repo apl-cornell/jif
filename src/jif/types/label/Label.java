@@ -116,24 +116,33 @@ public interface Label extends Param {
      * 
      * This collection should not be modified.
      */
-    Collection components();
+//    Collection components();
+
+//    /**
+//     * Does this label represent only a single label?
+//     * <p>
+//     * For example, a JoinLabel with more than one component returns false, a
+//     * MeetLabel with more than one component returns false, most other Labels
+//     * return true.
+//     */
+//    boolean isSingleton();
+
+//    /**
+//     * Retrieve the singleton component that this label represents. Should only
+//     * be called is isSingleton returns true.
+//     */
+//    Label singletonComponent();
 
     /**
-     * Does this label represent only a single label?
-     * <p>
-     * For example, a JoinLabel with more than one component returns false, a
-     * MeetLabel with more than one component returns false, most other Labels
-     * return true.
+     * Simplify the label, using leq if needed
      */
-    boolean isSingleton();
-
-    /**
-     * Retrieve the singleton component that this label represents. Should only
-     * be called is isSingleton returns true.
-     */
-    Label singletonComponent();
-
     Label simplify();
+    
+    /**
+     * Normalize the label. Essentially, simplify as much as possible without
+     * using the leq ordering
+     */
+    Label normalize();
 
     /**
      * Does the label contain any variables, that is, labels of type VarLabel?
@@ -141,9 +150,16 @@ public interface Label extends Param {
     boolean hasVariables();
 
     /**
-     * The set of variables that this contains, i.e., labels of type VarLabel?
+     * The set of variables that this label contains, i.e., labels of type VarLabel
      */
     Set variables();
+
+    /**
+     * The set of variables that this label contains as components. This
+     * is a subset of variables(), since it does not count var labels contained
+     * in upper bounds of arg labels.
+     */
+    Set variableComponents();
 
     /**
      * Implementation of leq, should only be called by JifTypeSystem

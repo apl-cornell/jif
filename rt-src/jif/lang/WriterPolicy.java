@@ -24,7 +24,27 @@ public class WriterPolicy implements IntegPolicy
     
     
     public boolean relabelsTo(Policy p) {
-        if (!(p instanceof WriterPolicy))
+        if (p instanceof JoinIntegPolicy) {
+            JoinPolicy jp = (JoinPolicy)p;
+            // this <= p1 join ... join p2 if there exists a pi such that
+            // this <= pi
+            for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
+                Policy pi = (Policy)iter.next();
+                if (relabelsTo(pi)) return true;                
+            }
+            return false;
+        }
+        else if (p instanceof MeetIntegPolicy) {
+            MeetPolicy mp = (MeetPolicy)p;
+            // this <= p1 meet ... meet p2 if for all pi 
+            // this <= pi
+            for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
+                Policy pi = (Policy)iter.next();
+                if (!relabelsTo(pi)) return false;                
+            }
+            return true;            
+        }
+        else if (!(p instanceof WriterPolicy))
             return false;
         
         WriterPolicy pp = (WriterPolicy) p;
@@ -62,11 +82,19 @@ public class WriterPolicy implements IntegPolicy
         return false;
     }
     
-    public String componentString() {
+    public String toString() {
         String str = PrincipalUtil.toString(owner) + ": ";
         if (!PrincipalUtil.isTopPrincipal(writer))
             str += PrincipalUtil.toString(writer);
         return str;
+    }
+
+    public IntegPolicy join(IntegPolicy p) {
+        return LabelUtil.join(this, p);
+    }
+
+    public IntegPolicy meet(IntegPolicy p) {
+        return LabelUtil.meet(this, p);
     }
     
 }

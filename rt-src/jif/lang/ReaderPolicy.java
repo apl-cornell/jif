@@ -31,7 +31,27 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
             }
             return false;            
         }
-        if (!(p instanceof ReaderPolicy))
+        else if (p instanceof JoinConfPolicy) {
+            JoinPolicy jp = (JoinPolicy)p;
+            // this <= p1 join ... join p2 if there exists a pi such that
+            // this <= pi
+            for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
+                Policy pi = (Policy)iter.next();
+                if (relabelsTo(pi)) return true;                
+            }
+            return false;
+        }
+        else if (p instanceof MeetConfPolicy) {
+            MeetPolicy mp = (MeetPolicy)p;
+            // this <= p1 meet ... meet p2 if for all pi 
+            // this <= pi
+            for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
+                Policy pi = (Policy)iter.next();
+                if (!relabelsTo(pi)) return false;                
+            }
+            return true;            
+        }
+        else if (!(p instanceof ReaderPolicy))
             return false;
         
         ReaderPolicy pp = (ReaderPolicy) p;
@@ -67,11 +87,19 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
         return false;
     }
     
-    public String componentString() {
+    public String toString() {
         String str = PrincipalUtil.toString(owner) + ": ";
         if (!PrincipalUtil.isTopPrincipal(reader))
             str += PrincipalUtil.toString(reader);
         return str;
+    }
+
+    public ConfPolicy join(ConfPolicy p) {
+        return LabelUtil.join(this, p);
+    }
+
+    public ConfPolicy meet(ConfPolicy p) {
+        return LabelUtil.meet(this, p);
     }
     
 }

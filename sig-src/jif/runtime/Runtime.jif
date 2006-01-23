@@ -4,10 +4,10 @@ import java.io.*;
 
 public class Runtime[principal P]
 {
-    private Runtime(principal{this} pp) {}
+    private Runtime(principal{this} pp) { }
 
     public static native Runtime[P] getRuntime() throws SecurityException;
-    public static native principal{} user();
+    public static native principal{*!:*} user();
 
     public native FileOutputStream[{*L}]{P:} openFileWrite(String{*L} name, boolean{*L} append, label L)
 	throws (IOException{*L;L}, SecurityException{*L;L});
@@ -25,8 +25,8 @@ public class Runtime[principal P]
     public native InputStream[{*L}]{P:} in(label L);
     
     // current time, but only to accuracy of the day.
-    public static native int{} currentYear();
-    public static native int{} currentMonth();
-    public static native int{} currentDayOfMonth();    
+    public static native int{*!:*} currentYear();
+    public static native int{*!:*} currentMonth();
+    public static native int{*!:*} currentDayOfMonth();    
 }
 

@@ -92,12 +92,17 @@ public interface JifTypeSystem extends ParamTypeSystem
     ThisLabel thisLabel(Position pos, JifClassType ct);
     ThisLabel thisLabel(JifClassType ct);
     UnknownLabel unknownLabel(Position pos);
+    PairLabel pairLabel(Position pos, ConfPolicy confPol, IntegPolicy integPol);
     WritersToReadersLabel writersToReadersLabel(Position pos, Label L);
 
     ReaderPolicy readerPolicy(Position pos, Principal owner, Principal reader);
     ReaderPolicy readerPolicy(Position pos, Principal owner, Collection readers);
     WriterPolicy writerPolicy(Position pos, Principal owner, Principal writer);
     WriterPolicy writerPolicy(Position pos, Principal owner, Collection writers);
+    ConfPolicy bottomConfPolicy(Position pos);
+    IntegPolicy bottomIntegPolicy(Position pos);
+    ConfPolicy topConfPolicy(Position pos);
+    IntegPolicy topIntegPolicy(Position pos);
 
     
     /** Returns true iff L1 <= L2 in <code>env</code>. */
@@ -108,7 +113,22 @@ public interface JifTypeSystem extends ParamTypeSystem
     Label join(Label L1, Label L2);
     Label joinLabel(Position pos, Collection components);
 
+    /** Returns the meet of L1 and L2. */
+    Label meet(Label L1, Label L2);
+    Label meetLabel(Position pos, Collection components);
 
+    /* methods for policies */
+    boolean leq(Policy p1, Policy p2, LabelEnv env);
+    boolean leq(Policy p1, Policy p2);
+    ConfPolicy joinConfPolicy(Position pos, Collection components);
+    IntegPolicy joinIntegPolicy(Position pos, Collection components);
+    ConfPolicy meetConfPolicy(Position pos, Collection components);
+    IntegPolicy meetIntegPolicy(Position pos, Collection components);
+    ConfPolicy join(ConfPolicy p1, ConfPolicy p2);
+    ConfPolicy meet(ConfPolicy p1, ConfPolicy p2);
+    IntegPolicy join(IntegPolicy p1, IntegPolicy p2);
+    IntegPolicy meet(IntegPolicy p1, IntegPolicy p2);
+    
     /** Construct an acts-for constraint. */
     ActsForConstraint actsForConstraint(Position pos, Principal actor, Principal granter, boolean isEquiv);
 

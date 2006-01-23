@@ -29,7 +29,7 @@ public class VarSignature implements DefaultSignature
     }
 
     public Label defaultReturnLabel(ProcedureDecl pd) {
-	Label Lr = ts.bottomLabel();
+	Label Lr = ts.noComponentsLabel();
 	
 	for (Iterator i = pd.throwTypes().iterator(); i.hasNext(); ) {
 	    TypeNode tn = (TypeNode) i.next();

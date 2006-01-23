@@ -5,8 +5,8 @@ public class Citibank extends ExternalPrincipal {
 	super("Citibank");
     }
 
-    private static Citibank{} P;
-    public static Principal getInstance{}() {
+    private static Citibank{*!:*} P;
+    public static Principal getInstance{*!:*}() {
 	if (P == null) {
 	    P = new Citibank();
 	}

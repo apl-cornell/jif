@@ -9,7 +9,7 @@ package java.io;
 public abstract class Reader[label L] {
     private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
 
-    protected Reader() {}
+    protected Reader() { }
     public native int{L} read{L}() throws (IOException{L});
     public native int{L;cbuf} read{L;cbuf}(char{L}[] cbuf) throws (IOException{L;cbuf});
     abstract public int{L;cbuf} read{L;cbuf}(char{L}[] cbuf, int{L} off, int{L} len) throws (IOException{L;cbuf});

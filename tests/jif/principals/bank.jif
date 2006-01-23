@@ -5,8 +5,8 @@ public class bank extends ExternalPrincipal {
 	super("bank");
     }
 
-    private static bank{} P;
-    public static Principal getInstance{}() {
+    private static bank{*!:*} P;
+    public static Principal getInstance{*!:*}() {
 	if (P == null) {
 	    P = new bank();
 	}

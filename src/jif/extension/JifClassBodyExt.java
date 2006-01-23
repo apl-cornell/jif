@@ -30,7 +30,7 @@ public class JifClassBodyExt extends Jif_c {
 
 	JifContext A = lc.context();
         A = (JifContext) n.enterScope(A);
-        A.setEntryPC(jts.bottomLabel());
+        A.setEntryPC(jts.notTaken());
         lc = lc.context(A);
 
 	//find all the final fields that have an initializer

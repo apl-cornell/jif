@@ -3,6 +3,7 @@ package jif.types;
 import java.util.LinkedList;
 
 import jif.types.label.Label;
+import jif.types.label.Policy;
 import jif.types.principal.Principal;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
@@ -25,6 +26,9 @@ import polyglot.util.InternalCompilerError;
 public abstract class LabelSubstitution {
     public Label substLabel(Label L) throws SemanticException {
         return L;
+    }
+    public Policy substPolicy(Policy p) throws SemanticException {
+        return p;
     }
     public Principal substPrincipal(Principal p) throws SemanticException {
         return p;

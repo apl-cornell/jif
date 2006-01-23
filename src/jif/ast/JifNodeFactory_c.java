@@ -6,6 +6,7 @@ import java.util.List;
 import jif.types.Assertion;
 import jif.types.ParamInstance;
 import jif.types.label.Label;
+import jif.types.label.Policy;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.NodeFactory_c;
@@ -83,19 +84,33 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public PolicyLabelNode ReaderPolicyLabelNode(Position pos, PrincipalNode owner, List readers) {
-        PolicyLabelNode n = new ReaderPolicyLabelNode_c(pos, owner,
-                                                  readers);
-        n = (PolicyLabelNode)n.ext(jifExtFactory().extPolicyLabelNode());
-        n = (PolicyLabelNode)n.del(delFactory().delNode());
+    public MeetLabelNode MeetLabelNode(Position pos, List components) {
+        MeetLabelNode n = new MeetLabelNode_c(pos, components);
+        n = (MeetLabelNode)n.ext(jifExtFactory().extMeetLabelNode());
+        n = (MeetLabelNode)n.del(delFactory().delNode());
         return n;
     }
 
-    public PolicyLabelNode WriterPolicyLabelNode(Position pos, PrincipalNode owner, List writers) {
-        PolicyLabelNode n = new WriterPolicyLabelNode_c(pos, owner,
+    public PolicyNode ReaderPolicyNode(Position pos, PrincipalNode owner, List readers) {
+        PolicyNode n = new ReaderPolicyNode_c(pos, owner,
+                                                  readers);
+        n = (PolicyNode)n.ext(jifExtFactory().extPolicyNode());
+        n = (PolicyNode)n.del(delFactory().delNode());
+        return n;
+    }
+
+    public PolicyNode WriterPolicyNode(Position pos, PrincipalNode owner, List writers) {
+        PolicyNode n = new WriterPolicyNode_c(pos, owner,
                                                   writers);
-        n = (PolicyLabelNode)n.ext(jifExtFactory().extPolicyLabelNode());
-        n = (PolicyLabelNode)n.del(delFactory().delNode());
+        n = (PolicyNode)n.ext(jifExtFactory().extPolicyNode());
+        n = (PolicyNode)n.del(delFactory().delNode());
+        return n;
+    }
+    
+    public PolicyNode PolicyNode(Position pos, Policy policy) {
+        PolicyNode n = new PolicyNode_c(pos, policy);
+        n = (PolicyNode)n.ext(jifExtFactory().extPolicyNode());
+        n = (PolicyNode)n.del(delFactory().delNode());
         return n;
     }
     

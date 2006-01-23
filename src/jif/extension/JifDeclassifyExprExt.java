@@ -3,6 +3,7 @@ package jif.extension;
 import java.util.Iterator;
 import java.util.Set;
 
+import jif.JifOptions;
 import jif.ast.DeclassifyExpr;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
@@ -115,7 +116,6 @@ public class JifDeclassifyExprExt extends Jif_c
 	return X(d.expr(e), X);
     }
 
-    private static final boolean CHECK_ROBUSTNESS = false; 
     /**
      * Check the robust declassification condition
      * @param lc
@@ -127,7 +127,8 @@ public class JifDeclassifyExprExt extends Jif_c
                                  Label labelFrom, 
                                  Label labelTo, Position pos) 
         throws SemanticException {
-        if (!CHECK_ROBUSTNESS) return;
+        
+        if (((JifOptions)JifOptions.global).noRobustness) return;
         
         JifTypeSystem jts = lc.typeSystem();
         JifContext A = lc.context();
@@ -164,14 +165,14 @@ public class JifDeclassifyExprExt extends Jif_c
                          return "Declassification not robust: a new reader " +
                                         "may influence the data to be " +
                                         "declassified.";
-                     }
+    }
                      public String detailMsg() { 
                          return "The declassification of this expression is " +
                          "not robust; at least one of principals that is " +
                          "allowed to read the information after " +
                          "declassification may be able to influence the " +
                          "data to be declassified.";
-                     }
+}
          }
          );
     }

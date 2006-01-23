@@ -5,8 +5,8 @@ public class cra1 extends ExternalPrincipal {
 	super("cra1");
     }
 
-    private static cra1{} P;
-    public static Principal getInstance{}() {
+    private static cra1{*!:*} P;
+    public static Principal getInstance{*!:*}() {
 	if (P == null) {
 	    P = new cra1();
 	}

@@ -9,7 +9,7 @@ package java.io;
 public class FileInputStream[label L] extends InputStream[L] {
     private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
 
-    private FileInputStream() {}
+    private FileInputStream() { }
 
     public native int{L} read{L}() throws (IOException{L});
     public final native FileDescriptor{L} getFD()  throws (IOException{L});

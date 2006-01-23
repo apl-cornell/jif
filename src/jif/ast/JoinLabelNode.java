@@ -6,7 +6,7 @@ import java.util.*;
  *  label node by itself. 
  */
 public interface JoinLabelNode extends LabelNode {
-    /** Gets the list of join components. */
+    /** Gets the list of join components, which are either label nodes or policy nodes. */
     List components();
     
     /** Returns a copy of this object with <code>components</code> updated.

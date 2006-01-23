@@ -5,8 +5,8 @@ public class Chuck extends ExternalPrincipal {
 	super("Chuck");
     }
 
-    private static Chuck{} P;
-    public static Principal getInstance{}() {
+    private static Chuck{*!:*} P;
+    public static Principal getInstance{*!:*}() {
 	if (P == null) {
 	    P = new Chuck();
 	}

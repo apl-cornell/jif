@@ -5,8 +5,8 @@ public class broker extends ExternalPrincipal {
 	super("broker");
     }
 
-    private static broker{} P;
-    public static Principal getInstance{}() {
+    private static broker{*!:*} P;
+    public static Principal getInstance{*!:*}() {
 	if (P == null) {
 	    P = new broker();
 	}

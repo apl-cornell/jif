@@ -9,19 +9,16 @@ import java.util.*;
  */
 public class LabelUtil
 {
-    private static final Label BOTTOM = new JoinLabel();
+    private static final ConfPolicy BOTTOM_CONF;
+    private static final IntegPolicy TOP_INTEG;
     private static final Map intern = new HashMap();
 
     static {
-	intern.put(BOTTOM, BOTTOM);
+        BOTTOM_CONF = new ReaderPolicy(null, null);
+        TOP_INTEG = new WriterPolicy(null, null);
     }
 
     private LabelUtil() { }
-
-
-    public static Label bottom() {
-	return BOTTOM;
-    }
 
     public static ConfPolicy readerPolicy(Principal owner, Principal reader) {
         return intern(new ReaderPolicy(owner, reader));
@@ -82,8 +79,14 @@ public class LabelUtil
         return writerPolicy(owner, writers.getSet());
     }
     
-    public static Label toLabel(Policy policy) {
-        return intern(new JoinLabel(Collections.singleton(policy)));
+    public static Label toLabel(ConfPolicy cPolicy, IntegPolicy iPolicy) {
+        return intern(new PairLabel(cPolicy, iPolicy));        
+    }
+    public static Label toLabel(ConfPolicy policy) {
+        return intern(new PairLabel(policy, TOP_INTEG));
+    }
+    public static Label toLabel(IntegPolicy policy) {
+        return intern(new PairLabel(BOTTOM_CONF, policy));
     }
     
 
@@ -91,12 +94,116 @@ public class LabelUtil
         if (l1 == null) return l2;
         if (l2 == null) return l1;
         
-        Set comps = new LinkedHashSet(l1.joinComponents());
-        comps.addAll(l2.joinComponents());
-        comps = simplifyJoin(comps);
-
-        return intern(new JoinLabel(comps));
+        if (l1 instanceof PairLabel && l2 instanceof PairLabel) {
+            PairLabel pl1 = (PairLabel)l1;
+            PairLabel pl2 = (PairLabel)l2;
+                        
+            return intern(new PairLabel(pl1.confPolicy().join(pl2.confPolicy()),
+                                        pl1.integPolicy().join(pl2.integPolicy())));
+        }
+        // error! non pair labels!
+        return null;
     }
+    public static Label meet(Label l1, Label l2) {
+        if (l1 == null) return l2;
+        if (l2 == null) return l1;
+        
+        if (l1 instanceof PairLabel && l2 instanceof PairLabel) {
+            PairLabel pl1 = (PairLabel)l1;
+            PairLabel pl2 = (PairLabel)l2;
+                        
+            return intern(new PairLabel(pl1.confPolicy().meet(pl2.confPolicy()),
+                                        pl1.integPolicy().meet(pl2.integPolicy())));
+        }
+        // error! non pair labels!
+        return null;
+    }
+    public static ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {        
+        Set comps = new LinkedHashSet();
+        if (p1 instanceof JoinConfPolicy) {
+            comps.addAll(((JoinConfPolicy)p1).joinComponents());
+        }
+        else {
+            comps.add(p1);
+        }
+        if (p2 instanceof JoinConfPolicy) {
+            comps.addAll(((JoinConfPolicy)p2).joinComponents());
+        }
+        else {
+            comps.add(p2);
+        }
+        comps = simplifyJoin(comps);
+        
+        if (comps.size() == 1) {
+            return (ConfPolicy)comps.iterator().next();
+        }
+        return new JoinConfPolicy(comps);
+    }
+    public static IntegPolicy join(IntegPolicy p1, IntegPolicy p2) {        
+        Set comps = new LinkedHashSet();
+        if (p1 instanceof JoinIntegPolicy) {
+            comps.addAll(((JoinIntegPolicy)p1).joinComponents());
+        }
+        else {
+            comps.add(p1);
+        }
+        if (p2 instanceof JoinIntegPolicy) {
+            comps.addAll(((JoinIntegPolicy)p2).joinComponents());
+        }
+        else {
+            comps.add(p2);
+        }
+        comps = simplifyJoin(comps);
+        
+        if (comps.size() == 1) {
+            return (IntegPolicy)comps.iterator().next();
+        }
+        return new JoinIntegPolicy(comps);
+    }
+    public static ConfPolicy meet(ConfPolicy p1, ConfPolicy p2) {        
+        Set comps = new LinkedHashSet();
+        if (p1 instanceof MeetConfPolicy) {
+            comps.addAll(((MeetConfPolicy)p1).meetComponents());
+        }
+        else {
+            comps.add(p1);
+        }
+        if (p2 instanceof MeetConfPolicy) {
+            comps.addAll(((MeetConfPolicy)p2).meetComponents());
+        }
+        else {
+            comps.add(p2);
+        }
+        comps = simplifyMeet(comps);
+        
+        if (comps.size() == 1) {
+            return (ConfPolicy)comps.iterator().next();
+        }
+        return new MeetConfPolicy(comps);
+    }
+    public static IntegPolicy meet(IntegPolicy p1, IntegPolicy p2) {        
+        Set comps = new LinkedHashSet();
+        if (p1 instanceof MeetIntegPolicy) {
+            comps.addAll(((MeetIntegPolicy)p1).meetComponents());
+        }
+        else {
+            comps.add(p1);
+        }
+        if (p2 instanceof MeetIntegPolicy) {
+            comps.addAll(((MeetIntegPolicy)p2).meetComponents());
+        }
+        else {
+            comps.add(p2);
+        }
+        comps = simplifyMeet(comps);
+        
+        if (comps.size() == 1) {
+            return (IntegPolicy)comps.iterator().next();
+        }
+        return new MeetIntegPolicy(comps);
+    }
+
+    
 
     public static boolean equivalentTo(Label l1, Label l2) {
         l1 = intern(l1);
@@ -158,15 +265,6 @@ public class LabelUtil
         return in;
     }
 
-    protected static Set flattenJoin(Set labels) {
-        Set comps = new LinkedHashSet();
-        for (Iterator iter = labels.iterator(); iter.hasNext(); ) {
-            Label l = (Label)iter.next();
-            comps.addAll(l.joinComponents());
-        }
-        return comps;
-    }
-    
     private static Set simplifyJoin(Set policies) {
         Set needed = new LinkedHashSet();
         for (Iterator i = policies.iterator(); i.hasNext(); ) {
@@ -181,6 +279,29 @@ public class LabelUtil
                 }
                 
                 if (relabelsTo(cj, ci)) { 
+                    j.remove();
+                }
+            }
+            
+            if (!subsumed) needed.add(ci);
+        }
+        
+        return needed;        
+    }
+    private static Set simplifyMeet(Set policies) {
+        Set needed = new LinkedHashSet();
+        for (Iterator i = policies.iterator(); i.hasNext(); ) {
+            Policy ci = (Policy)i.next();
+            
+            boolean subsumed = (ci == null); // null components are always subsumed.
+            for (Iterator j = needed.iterator(); !subsumed && j.hasNext(); ) {
+                Policy cj = (Policy) j.next();
+                if (relabelsTo(cj, ci)) {
+                    subsumed = true;
+                    break;
+                }
+                
+                if (relabelsTo(ci, cj)) { 
                     j.remove();
                 }
             }

@@ -20,8 +20,8 @@ public class Dolores extends ExternalPrincipal {
 	// addDelegatesTo(Chuck);
     }
 
-    private static Dolores{} P;
-    public static Principal getInstance{}() {
+    private static Dolores{*!:*} P;
+    public static Principal getInstance{*!:*}() {
 	if (P == null) {
 	    P = new Dolores();
 	}

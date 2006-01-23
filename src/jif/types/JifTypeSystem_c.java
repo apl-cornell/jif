@@ -660,7 +660,7 @@ public class JifTypeSystem_c
                 if (this.emptyLabelEnv.ph().actsFor(q, p)) {
                     essential = false;
                     break;
-                }
+    }
             }
             if (essential) needed.add(p);            
         }
@@ -687,7 +687,7 @@ public class JifTypeSystem_c
                 if (this.emptyLabelEnv.ph().actsFor(p, q)) {
                     essential = false;
                     break;
-                }
+    }
             }
             if (essential) needed.add(p);            
         }
@@ -701,13 +701,7 @@ public class JifTypeSystem_c
     private Label runtime = null;
 
     public Label topLabel(Position pos) {
-        return joinLabel(pos, 
-              CollectionUtil.list(readerPolicy(pos, 
-                                               topPrincipal(pos), 
-                                               topPrincipal(pos)),
-                                  writerPolicy(pos, 
-                                               topPrincipal(pos), 
-                                               bottomPrincipal(pos))));
+        return pairLabel(pos, topConfPolicy(pos), topIntegPolicy(pos));
     }
 
     public Label topLabel() {
@@ -717,7 +711,7 @@ public class JifTypeSystem_c
     }
 
     public Label bottomLabel(Position pos) {
-        return joinLabel(pos, Collections.EMPTY_SET);
+        return pairLabel(pos, bottomConfPolicy(pos), bottomIntegPolicy(pos));
     }
     
     public Label bottomLabel() {
@@ -734,7 +728,7 @@ public class JifTypeSystem_c
     }
     
     public Label noComponentsLabel(Position pos) {
-        return bottomLabel();
+        return pairLabel(pos, bottomConfPolicy(pos), topIntegPolicy(pos));
     }
 
     public Label notTaken(Position pos) {
@@ -786,6 +780,19 @@ public class JifTypeSystem_c
         Principal w = disjunctivePrincipal(pos, writers);
         return writerPolicy(pos, owner, w);
     }
+    public ConfPolicy bottomConfPolicy(Position pos) {
+        return readerPolicy(pos, bottomPrincipal(pos), bottomPrincipal(pos));
+    }
+    public IntegPolicy bottomIntegPolicy(Position pos) {
+        return writerPolicy(pos, topPrincipal(pos), topPrincipal(pos));
+    }
+    public ConfPolicy topConfPolicy(Position pos) {
+        return readerPolicy(pos, topPrincipal(pos), topPrincipal(pos));        
+    }
+    public IntegPolicy topIntegPolicy(Position pos) {
+        return writerPolicy(pos, bottomPrincipal(pos), bottomPrincipal(pos));        
+    }
+    
         
     public Label joinLabel(Position pos, Collection components) {
         if (components == null) {
@@ -795,6 +802,17 @@ public class JifTypeSystem_c
             return (Label)components.iterator().next();
         }
         Label t = new JoinLabel_c(components, this, pos);
+        return t;
+    }
+
+    public Label meetLabel(Position pos, Collection components) {
+        if (components == null) {
+            components = Collections.EMPTY_SET;
+        }
+        if (components.size() == 1) {
+            return (Label)components.iterator().next();
+        }
+        Label t = new MeetLabel_c(components, this, pos);
         return t;
     }
 
@@ -820,6 +838,13 @@ public class JifTypeSystem_c
         UnknownLabel t = new UnknownLabel_c(this, pos);
         return t;
     }
+    
+    public PairLabel pairLabel(Position pos, 
+                               ConfPolicy confPol, 
+                               IntegPolicy integPol) {
+        return new PairLabel_c(this, confPol, integPol, pos);
+    }
+    
     public WritersToReadersLabel writersToReadersLabel(Position pos, Label L) {
         WritersToReadersLabel t = new WritersToReadersLabel_c(L, this, pos);
         return t;
@@ -1021,14 +1046,6 @@ public class JifTypeSystem_c
     }
 
     public Label join(Label L1, Label L2) {
-//        if (!L1.isCanonical()) {
-//            return unknownLabel(L1.position());
-//        }
-//
-//        if (!L2.isCanonical()) {
-//            return unknownLabel(L2.position());
-//        }
-//
         if (L1 instanceof NotTaken) {
             return L2.simplify();
         }
@@ -1053,6 +1070,27 @@ public class JifTypeSystem_c
 
         return joinLabel(pos, l).simplify();
     }
+    
+    public Label meet(Label L1, Label L2) {
+        if (L1.isTop() || L2.isBottom()) {
+            return L2.simplify();
+        }
+        if (L2.isTop() || L1.isBottom()) {
+            return L1.simplify();
+        }
+        if (L1 instanceof RuntimeLabel && L2.isRuntimeRepresentable()) {
+            return L2.simplify();
+        }
+        if (L2 instanceof RuntimeLabel && L1.isRuntimeRepresentable()) {
+            return L1.simplify();
+        }
+        List l = CollectionUtil.list(L1, L2);
+        Position pos = L1.position();
+        if (pos == null) pos = L2.position();
+
+        return meetLabel(pos, l).simplify();
+    }
+    
 
     public boolean leq(Label L1, Label L2, LabelEnv env) {
         return env.leq(L1, L2);
@@ -1061,6 +1099,103 @@ public class JifTypeSystem_c
     public boolean leq(Label L1, Label L2) {
         return emptyLabelEnv.leq(L1, L2);
     }
+
+    public boolean leq(Policy p1, Policy p2, LabelEnv env) {
+        return env.leq(p1, p2);
+    }
+
+    public boolean leq(Policy p1, Policy p2) {
+        return emptyLabelEnv.leq(p1, p2);
+    }
+    public ConfPolicy joinConfPolicy(Position pos, Collection components) {
+        if (components.isEmpty()) {
+            return bottomConfPolicy(pos);
+        }
+        else if (components.size() == 1) {
+            return (ConfPolicy)components.iterator().next();
+        }
+        return new JoinConfPolicy_c(components, this, pos);
+    }
+    public IntegPolicy joinIntegPolicy(Position pos, Collection components) {
+        if (components.isEmpty()) {
+            return bottomIntegPolicy(pos);
+        }
+        else if (components.size() == 1) {
+            return (IntegPolicy)components.iterator().next();
+        }
+        return new JoinIntegPolicy_c(components, this, pos);        
+    }
+    public ConfPolicy meetConfPolicy(Position pos, Collection components) {
+        if (components.isEmpty()) {
+            return topConfPolicy(pos);
+        }
+        else if (components.size() == 1) {
+            return (ConfPolicy)components.iterator().next();
+        }
+        return new MeetConfPolicy_c(components, this, pos);        
+    }
+    public IntegPolicy meetIntegPolicy(Position pos, Collection components) {
+        if (components.isEmpty()) {
+            return topIntegPolicy(pos);
+        }
+        else if (components.size() == 1) {
+            return (IntegPolicy)components.iterator().next();
+        }
+        return new MeetIntegPolicy_c(components, this, pos);        
+    }
+    public ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {
+        if (p1.isTop() || p2.isBottom()) {
+            return (ConfPolicy)p1.simplify();
+        }
+        if (p2.isTop() || p1.isBottom()) {
+            return (ConfPolicy)p2.simplify();
+        }
+        List l = CollectionUtil.list(p1, p2);
+        Position pos = p1.position();
+        if (pos == null) pos = p2.position();
+
+        return (ConfPolicy)joinConfPolicy(pos, l).simplify();
+    }
+    public IntegPolicy join(IntegPolicy p1, IntegPolicy p2) {
+        if (p1.isTop() || p2.isBottom()) {
+            return (IntegPolicy)p1.simplify();
+        }
+        if (p2.isTop() || p1.isBottom()) {
+            return (IntegPolicy)p2.simplify();
+        }
+        List l = CollectionUtil.list(p1, p2);
+        Position pos = p1.position();
+        if (pos == null) pos = p2.position();
+
+        return (IntegPolicy)joinIntegPolicy(pos, l).simplify();
+    }
+    public ConfPolicy meet(ConfPolicy p1, ConfPolicy p2) {
+        if (p1.isTop() || p2.isBottom()) {
+            return (ConfPolicy)p2.simplify();
+        }
+        if (p2.isTop() || p1.isBottom()) {
+            return (ConfPolicy)p1.simplify();
+        }
+        List l = CollectionUtil.list(p1, p2);
+        Position pos = p1.position();
+        if (pos == null) pos = p2.position();
+
+        return (ConfPolicy)meetConfPolicy(pos, l).simplify();
+    }
+    public IntegPolicy meet(IntegPolicy p1, IntegPolicy p2) {
+        if (p1.isTop() || p2.isBottom()) {
+            return (IntegPolicy)p2.simplify();
+        }
+        if (p2.isTop() || p1.isBottom()) {
+            return (IntegPolicy)p1.simplify();
+        }
+        List l = CollectionUtil.list(p1, p2);
+        Position pos = p1.position();
+        if (pos == null) pos = p2.position();
+
+        return (IntegPolicy)meetIntegPolicy(pos, l).simplify();
+    }
+    
 
     public String translateClass(Resolver c, ClassType t)
     {

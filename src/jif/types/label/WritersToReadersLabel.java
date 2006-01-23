@@ -19,5 +19,5 @@ public interface WritersToReadersLabel extends Label
     /**
      * Apply this operator to the nested label.
      */
-    ReaderPolicy transform(LabelEnv env);
+    Label transform(LabelEnv env);
 }

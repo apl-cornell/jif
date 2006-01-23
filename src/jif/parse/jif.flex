@@ -113,6 +113,7 @@ import java.util.HashMap;
         keywords.put("label",         new Integer(sym.LABEL));
         keywords.put("principal",     new Integer(sym.PRINCIPAL));
         keywords.put("where",         new Integer(sym.WHERE));
+        keywords.put("meet",          new Integer(sym.MEET));
     }
 
     public String file() {

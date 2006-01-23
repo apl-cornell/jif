@@ -5,8 +5,8 @@ public class irs extends ExternalPrincipal {
 	super("irs");
     }
 
-    private static irs{} P;
-    public static Principal getInstance{}() {
+    private static irs{*!:*} P;
+    public static Principal getInstance{*!:*}() {
 	if (P == null) {
 	    P = new irs();
 	}

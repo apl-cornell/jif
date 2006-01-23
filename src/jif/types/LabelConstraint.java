@@ -2,10 +2,10 @@ package jif.types;
 
 import java.util.*;
 
+import jif.extension.LabelTypeCheckUtil;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
-import jif.types.label.Label;
-import jif.types.label.VarLabel;
+import jif.types.label.*;
 
 import polyglot.util.Enum;
 import polyglot.util.InternalCompilerError;
@@ -215,39 +215,28 @@ public class LabelConstraint
             Label bound = bounds.applyTo((Label)namedLabels.get(s));
             l.add(bound.toString());
             
-            if (bound.isEnumerable() && !bound.components().isEmpty()) {                
-                for (Iterator i = bound.components().iterator(); i.hasNext(); ) {
-                    Label lb = (Label)i.next();
-                    labelComponents.add(lb);
-                }
-            }
-            else {
-                labelComponents.add(bound);                
+            Collection components = LabelTypeCheckUtil.labelComponents(bound);
+            for (Iterator i = components.iterator(); i.hasNext(); ) {
+                Label lb = (Label)i.next();
+                labelComponents.add(lb);
             }
         }
         
         // in case there are no named labels, add all components of the lhs and
         // rhs bounds.
         Label bound = bounds.applyTo(lhs);
-        if (bound.isEnumerable() && !bound.components().isEmpty()) {                
-            for (Iterator i = bound.components().iterator(); i.hasNext(); ) {
-                Label l = (Label)i.next();
-                labelComponents.add(l);
-            }
+        Collection components = LabelTypeCheckUtil.labelComponents(bound);
+        for (Iterator i = components.iterator(); i.hasNext(); ) {
+            Label lb = (Label)i.next();
+            labelComponents.add(lb);
         }
-        else {
-            labelComponents.add(bound);                
-        }
+
         bound = bounds.applyTo(rhs);
-        if (bound.isEnumerable() && !bound.components().isEmpty()) {                
-            for (Iterator i = bound.components().iterator(); i.hasNext(); ) {
-                Label l = (Label)i.next();
-                labelComponents.add(l);
-            }
+        components = LabelTypeCheckUtil.labelComponents(bound);
+        for (Iterator i = components.iterator(); i.hasNext(); ) {
+            Label l = (Label)i.next();
+            labelComponents.add(l);
         }
-        else {
-            labelComponents.add(bound);                
-        }        
 
         // get definitions for the label components.
         for (Iterator iter = labelComponents.iterator(); iter.hasNext(); ) {
@@ -273,11 +262,11 @@ public class LabelConstraint
         Collection eqns = new LinkedList();
         
         if (kind == LEQ) {
-            getLEQEqns(eqns, lhs, rhs);
+            addLEQEqns(eqns, lhs, rhs);
         }
         else if (kind == EQUAL) {
-            getLEQEqns(eqns, lhs, rhs);
-            getLEQEqns(eqns, rhs, lhs);
+            addLEQEqns(eqns, lhs, rhs);
+            addLEQEqns(eqns, rhs, lhs);
         }
         else {
             throw new InternalCompilerError("Unknown kind of equation: " + kind);
@@ -291,20 +280,24 @@ public class LabelConstraint
      * Produce equations that require <code>left</code> to be less than or 
      * equal to <code>right</code>, and add them to <code>eqns</code>.
      */
-    protected void getLEQEqns(Collection eqns, Label left, Label right) {
+    protected void addLEQEqns(Collection eqns, Label left, Label right) {
         left = left.simplify();
-        for (Iterator i = left.components().iterator(); i.hasNext(); ) {
-            Label jc = (Label) i.next();
-            
-            if (! jc.isSingleton()) {
-                throw new InternalCompilerError(
-                        "Non-singleton in component list.");
-            }
-            
-            Equation eqn = new Equation(jc, right, this);
-
-                
-            eqns.add(eqn);
+        right = right.simplify();
+        if (left instanceof JoinLabel) {
+            for (Iterator i = ((JoinLabel)left).joinComponents().iterator(); i.hasNext(); ) {
+                Label jc = (Label) i.next();
+                addLEQEqns(eqns, jc, right);                
+            }            
+        }
+        else if (right instanceof MeetLabel) {
+            for (Iterator i = ((MeetLabel)right).meetComponents().iterator(); i.hasNext(); ) {
+                Label mc = (Label) i.next();
+                addLEQEqns(eqns, left, mc);                
+            }                        
+        }
+        else {
+            Equation eqn = new Equation(left, right, this);
+            eqns.add(eqn);            
         }
     } 
 }

@@ -1,23 +1,27 @@
 package jif.types.label;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
-import jif.translate.JifToJavaRewriter;
 import jif.types.*;
-import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
-import polyglot.ast.Expr;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
+
+import polyglot.types.*;
+
 
 /**
- * This class represents the Jif security label.
+ * This class is the common super class for integrity polices and 
+ * confidentiality policies.
  */
-public interface Policy extends Label {
-    boolean isBottomConfidentiality();
-    boolean isTopConfidentiality();
-    boolean isBottomIntegrity();
-    boolean isTopIntegrity();
+public interface Policy extends TypeObject { 
+    boolean isCanonical();
+    boolean isSingleton();
+    boolean isRuntimeRepresentable();
+    boolean isTop();
+    boolean isBottom();
+    
+    List throwTypes(TypeSystem ts);
+    Policy subst(LabelSubstitution substitution) throws SemanticException;
+    Policy simplify();
+    
+    PathMap labelCheck(JifContext A, LabelChecker lc);
 }

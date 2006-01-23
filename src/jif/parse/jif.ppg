@@ -238,6 +238,7 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
 :};
 
 terminal Token WHERE;
+terminal Token MEET;
 terminal Token PRINCIPAL;
 terminal Token LABEL;
 terminal Token COVARIANT;
@@ -253,9 +254,11 @@ non terminal DeclassifyExpr declassify;
 non terminal DeclassifyStmt declassify_statement;
 non terminal TypeNode labeled_primitive_type;
 non terminal LabelNode label, label_opt, return_label_opt, label_flexible;
-non terminal List component_list;
-non terminal LabelNode label_component;
-non terminal LabelNode label_component_policy;
+non terminal List join_component_list;
+non terminal Object join_label_component; // either a LabelNode or PolicyNode
+non terminal List meet_component_list;
+non terminal Object label_component; // either a LabelNode or PolicyNode
+non terminal PolicyNode label_component_policy;
 non terminal PrincipalNode principal, principal_conjunctive, principal_disjunctive, principal_base;
 non terminal Token actsfor;
 non terminal Expr accesspath;
@@ -280,7 +283,7 @@ label ::=
         LBRACE:x RBRACE:y
             {: RESULT = parser.nf.CanonicalLabelNode(parser.pos(x, y),
                                         parser.ts.noComponentsLabel()); :}
-    |   LBRACE:x component_list:a RBRACE:y
+    |   LBRACE:x join_component_list:a RBRACE:y
             {: LabelNode ln;
                ln = parser.nf.JoinLabelNode(parser.pos(x, y), a);
                RESULT = ln; :}
@@ -299,17 +302,40 @@ label_flexible ::=
     | accesspath:a
             {: RESULT = parser.nf.AmbDynamicLabelNode(parser.pos(a), a); :}
     ;
-component_list ::=
-                    // List of LabelNode
-        label_component:a
-            {: List l = new TypedList(new LinkedList(), LabelNode.class, false);
+join_component_list ::=
+                    // List of LabelNode or PolicyNode. Implicitly a join 
+                    // between them
+        join_label_component:a
+            {: List l = new TypedList(new LinkedList(), Node.class, false);
                l.add(a);
                RESULT = l; :}
-    |   component_list:a SEMICOLON label_component:b
+    |   join_component_list:a SEMICOLON join_label_component:b
             {: RESULT = a;
                a.add(b); :}
         ;
+join_label_component ::=
+                    // LabelNode or PolicyNode
+        meet_component_list:a
+            {: Object o;
+               if (a.size() > 1) {
+                  o = parser.nf.MeetLabelNode(parser.pos(a), a);
+               }
+               else o = a.iterator().next();
+               RESULT = o;
+               :}   
+         ;
+meet_component_list ::=
+                    // List of LabelNode or PolicyNode
+        label_component:a
+            {: List l = new ArrayList();
+               l.add(a);
+               RESULT = l; :}
+    |   meet_component_list:a MEET label_component:b
+            {: RESULT = a;
+               a.add(b); :}
+    ;
 label_component ::=
+                    // LabelNode or PolicyNode
         label_component_policy:a
             {: RESULT = a; :}   
     |   MULT:x accesspath:a
@@ -323,11 +349,11 @@ label_component ::=
     ;
     
 label_component_policy ::=
-                    // LabelNode
+                    // PolicyNode
         principal_disjunctive:a COLON principal_list_opt:b
-            {: RESULT = parser.nf.ReaderPolicyLabelNode(parser.pos(a, b), a, b); :}
+            {: RESULT = parser.nf.ReaderPolicyNode(parser.pos(a, b), a, b); :}
     |   principal_disjunctive:a NOT COLON principal_list_opt:b
-            {: RESULT = parser.nf.WriterPolicyLabelNode(parser.pos(a, b), a, b); :}
+            {: RESULT = parser.nf.WriterPolicyNode(parser.pos(a, b), a, b); :}
     ;
 
 principal_list_opt ::=
@@ -367,6 +393,8 @@ principal_base ::=
                     // PrincipalNode
         accesspath_no_id:a
             {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a), a); :}
+    |  MULT:a // top principal
+            {: RESULT = parser.nf.CanonicalPrincipalNode(parser.pos(a), parser.ts.topPrincipal(parser.pos(a))); :}
     |  IDENTIFIER:a
             {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a), a.getIdentifier()); :}
     |  LPAREN:a principal_disjunctive:b RPAREN:c

@@ -1,5 +1,7 @@
 package jif.types.label;
 
+import java.util.Collection;
+
 
 
 /** The join of several labels. 
@@ -7,4 +9,5 @@ package jif.types.label;
 public interface JoinLabel extends Label
 {
     //Label flatten();
+    Collection joinComponents();
 }

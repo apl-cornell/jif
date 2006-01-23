@@ -56,7 +56,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	}
 
         // let internal_pc = bottom, external_pc = Li
-	A.setPc(ts.bottomLabel(mi.position()));
+	A.setPc(ts.bottomLabel(mi.position())); //XXX TO CHANGE? SC Jan 2006
 	A.setEntryPC(Li);
 
         // Set the "auth" variable.

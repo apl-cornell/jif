@@ -264,9 +264,14 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return postExtJoinLabelNode(e);
     }
 
-    public final Ext extPolicyLabelNode() {
-        Ext e = extPolicyLabelNodeImpl();
-        return postExtPolicyLabelNode(e);
+    public final Ext extMeetLabelNode() {
+        Ext e = extMeetLabelNodeImpl();
+        return postExtMeetLabelNode(e);
+    }
+
+    public final Ext extPolicyNode() {
+        Ext e = extPolicyNodeImpl();
+        return postExtPolicyNode(e);
     }
 
     public final Ext extAmbDynamicLabelNode() {
@@ -414,7 +419,11 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return extLabelNode();
     }
 
-    protected Ext extPolicyLabelNodeImpl() {
+    protected Ext extMeetLabelNodeImpl() {
+        return extLabelNode();
+    }
+
+    protected Ext extPolicyNodeImpl() {
         return extLabelNode();
     }
 
@@ -536,8 +545,12 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return postExtLabelNode(e);
     }
 
-    protected Ext postExtPolicyLabelNode(Ext e) {
+    protected Ext postExtMeetLabelNode(Ext e) {
         return postExtLabelNode(e);
+    }
+
+    protected Ext postExtPolicyNode(Ext e) {
+        return postExtNode(e);
     }
 
     protected Ext postExtAmbDynamicLabelNode(Ext e) {

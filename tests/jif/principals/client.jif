@@ -5,8 +5,8 @@ public class client extends ExternalPrincipal {
 	super("client");
     }
 
-    private static client{} P;
-    public static Principal getInstance{}() {
+    private static client{*!:*} P;
+    public static Principal getInstance{*!:*}() {
 	if (P == null) {
 	    P = new client();
 	}

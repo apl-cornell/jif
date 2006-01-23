@@ -1,13 +1,15 @@
 package jif.ast;
 
-import jif.types.*;
+import java.util.List;
+
+import jif.types.Assertion;
+import jif.types.ParamInstance;
 import jif.types.label.Label;
+import jif.types.label.Policy;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-
-import java.util.*;
+import polyglot.types.Flags;
+import polyglot.util.Position;
 
 /** The node factory of the Jif extension. 
  */
@@ -17,8 +19,10 @@ public interface JifNodeFactory extends NodeFactory {
     AmbNewArray AmbNewArray(Position pos, TypeNode base, Object expr, List dims);
     AmbParamTypeOrAccess AmbParamTypeOrAccess(Position pos, Receiver base, Object expr);
     JoinLabelNode JoinLabelNode(Position pos, List components);
-    PolicyLabelNode ReaderPolicyLabelNode(Position pos, PrincipalNode owner, List readers);
-    PolicyLabelNode WriterPolicyLabelNode(Position pos, PrincipalNode owner, List writers);
+    MeetLabelNode MeetLabelNode(Position pos, List components);
+    PolicyNode ReaderPolicyNode(Position pos, PrincipalNode owner, List readers);
+    PolicyNode WriterPolicyNode(Position pos, PrincipalNode owner, List writers);
+    PolicyNode PolicyNode(Position pos, Policy pol);
     AmbDynamicLabelNode AmbDynamicLabelNode(Position pos, Expr expr);
     AmbVarLabelNode AmbVarLabelNode(Position pos, String name);
     AmbThisLabelNode AmbThisLabelNode(Position pos);

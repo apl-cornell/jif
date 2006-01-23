@@ -31,7 +31,7 @@ public class JifSourceFileExt extends Jif_c
 	A = (JifContext) n.enterScope(A);
 
         A.setAuthority(new LinkedHashSet());
-        A.setPc(ts.bottomLabel());
+        A.setPc(ts.notTaken());
 
         lc = lc.context(A);
 

@@ -5,8 +5,8 @@ public class preparer extends ExternalPrincipal {
 	super("preparer");
     }
 
-    private static preparer{} P;
-    public static Principal getInstance{}() {
+    private static preparer{*!:*} P;
+    public static Principal getInstance{*!:*}() {
 	if (P == null) {
 	    P = new preparer();
 	}

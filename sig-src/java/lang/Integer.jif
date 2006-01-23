@@ -9,8 +9,8 @@ package java.lang;
 public final class Integer /*extends Number implements Comparable*/ {
     private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
 
-    public static final int{}   MIN_VALUE = 0x80000000;
-    public static final int{}   MAX_VALUE = 0x7fffffff;
+    public static final int{*!:*}   MIN_VALUE = 0x80000000;
+    public static final int{*!:*}   MAX_VALUE = 0x7fffffff;
     public static native String{i;radix} toString(int i, int radix);
     public static native String{i} toHexString(int i);
     public static native String{i} toOctalString(int i);
@@ -21,7 +21,7 @@ public final class Integer /*extends Number implements Comparable*/ {
     public static native Integer{s;radix} valueOf(String s, int radix) throws (NumberFormatException{s;radix});
     public static native Integer{s} valueOf(String s) throws (NumberFormatException{s});
 
-    public Integer(int{this} value) {}
+    public Integer(int{this} value) { }
     public Integer(String{this} s) throws (NumberFormatException{s}) {
 	this(parseInt(s));
     }

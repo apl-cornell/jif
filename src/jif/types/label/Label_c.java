@@ -70,9 +70,9 @@ public abstract class Label_c extends TypeObject_c implements Label {
     /**
      * By default, the components of a label is simply the label itself.
      */
-    public Collection components() {
-        return Collections.singleton(this);
-    }
+//    public Collection components() {
+//        return Collections.singleton(this);
+//    }
 
     //
     /**
@@ -90,29 +90,29 @@ public abstract class Label_c extends TypeObject_c implements Label {
         return !isCovariant();
     }
 
-    /**
-     * A label is a singleton if it only has a single component.
-     */
-    public boolean isSingleton() {
-        return components().size() <= 1;
-    }
-
-    /**
-     * Return the single component.
-     * 
-     * @throws InternalCompilerError if this label is not a singleton.
-     */
-    public Label singletonComponent() {
-        if (!isSingleton()) {
-            throw new InternalCompilerError(
-                    "Cannot get singleton component of a non-singleton label.");
-        }
-
-        if (isBottom())
-            return this;
-        else
-            return (Label)components().toArray()[0];
-    }
+//    /**
+//     * A label is a singleton if it only has a single component.
+//     */
+//    public boolean isSingleton() {
+//        return components().size() <= 1;
+//    }
+//
+//    /**
+//     * Return the single component.
+//     * 
+//     * @throws InternalCompilerError if this label is not a singleton.
+//     */
+//    public Label singletonComponent() {
+//        if (!isSingleton()) {
+//            throw new InternalCompilerError(
+//                    "Cannot get singleton component of a non-singleton label.");
+//        }
+//
+//        if (isBottom())
+//            return this;
+//        else
+//            return (Label)components().toArray()[0];
+//    }
     
     /**
      * Check if the label is disambiguated, without recursing into child labels.
@@ -157,7 +157,14 @@ public abstract class Label_c extends TypeObject_c implements Label {
 
     public abstract boolean equalsImpl(TypeObject t);
 
-    public Label simplify() {
+    public final Label simplify() {
+        return ((Label_c)this.normalize()).simplifyImpl();
+    }
+    protected Label simplifyImpl() {
+        return this;
+    }
+    
+    public Label normalize() {
         return this;
     }
 
@@ -174,6 +181,10 @@ public abstract class Label_c extends TypeObject_c implements Label {
         return ts.pathMap().N(A.pc()).NV(A.pc());
     }
 
+    public Set variableComponents() {
+        return Collections.EMPTY_SET;
+    }
+    
     /**
      * This class is used to implement
      * {@link Label#variables() Label.variables()}. It constructs a set of

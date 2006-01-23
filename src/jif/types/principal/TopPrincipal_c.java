@@ -16,7 +16,7 @@ public class TopPrincipal_c extends Principal_c implements TopPrincipal {
     public boolean isCanonical() { return true; }
     
     public String toString() {
-        if (Report.should_report(Report.debug, 1)) {
+        if (Report.should_report(Report.debug, 2)) {
             return "<top principal>";
         }
         return "*";

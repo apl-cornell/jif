@@ -285,7 +285,7 @@ public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
 
 class LocalKeySet[label K, label V] extends AbstractSet[K] {
 	
-	private final ArrayMap[K,V]{} parent;
+	private final ArrayMap[K,V]{this} parent;
 	LocalKeySet(ArrayMap[K,V] parent):{parent}
 	{
 		this.parent = parent;
@@ -438,7 +438,7 @@ class LocalKeySet[label K, label V] extends AbstractSet[K] {
 
 class LocalKeyIterator[label K, label V] implements Iterator[K] {
 	
-	private final ArrayMap[K,V] parent;
+	private final ArrayMap[K,V]{this} parent;
 	int{K} position;
 	boolean{K} nextCalled;
 	

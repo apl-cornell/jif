@@ -14,14 +14,9 @@ public interface Label
     boolean relabelsTo(Label l);
     
     Label join(Label l);
-
-    /**
-     * Set of Policies
-     */
-    Set joinComponents();
+    Label meet(Label l);
     
-    /**
-     * String to print if this label is a component of a larger label
-     */
-    String componentString();
+    ConfPolicy confPolicy();
+    IntegPolicy integPolicy();
+    
 }

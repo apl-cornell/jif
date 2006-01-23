@@ -9,7 +9,7 @@ package java.io;
 public final class FileDescriptor {
     private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
 
-    public FileDescriptor() {}
+    public FileDescriptor() { }
     public native boolean{this} valid();
 
 }
