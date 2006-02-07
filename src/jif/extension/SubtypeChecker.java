@@ -36,7 +36,7 @@ public class SubtypeChecker
             origSupertype = supertype;
             origSubtype = subtype;
 
-            if (! recursiveAddSubtypeConstraints(lc, pos, supertype, subtype)) {
+            if (! recursiveAddSubtypeConstraints(lc, pos, supertype, subtype, false)) {
                 throw new SemanticException(subtype + " is not a subtype of " +
                     supertype + ".", pos);
             }
@@ -169,7 +169,7 @@ public class SubtypeChecker
 
     /** Check that subtype <= supertype */
     private boolean recursiveAddSubtypeConstraints(LabelChecker lc,
-	Position pos, Type supertype, Type subtype) throws SemanticException
+	Position pos, Type supertype, Type subtype, final boolean inArrayType) throws SemanticException
     {
 	if (Report.should_report(Report.types, 2))
 	    Report.report(2, "Adding subtype constraints: " + supertype + " >= " + subtype);
@@ -196,10 +196,19 @@ public class SubtypeChecker
                                                             A.labelEnv(),
                                                             pos) {
                                         public String msg() {
-                                            return lOrigSubtype + " is not a subtype of " + 
+                                            String s = lOrigSubtype + " is not a subtype of " + 
                                                   lOrigSupertype + ".";
+                                            if (inArrayType) {
+                                                s += " The base type of arrays must be equivalent.";
+                                            }
+                                            return s;
                                         }
                                         public String detailMsg() {
+                                            if (inArrayType) {
+                                                return lOrigSubtype + " is not a subtype of " + 
+                                                lOrigSupertype + ". Subtyping requires " +
+                                                "the base types of arrays to be equivalent.";                                                
+                                            }
                                             return lOrigSubtype + " is not a subtype of " + 
                                                   lOrigSupertype + ". Subtyping requires " +
                                                   "the label of the subtype to be less " +
@@ -228,13 +237,13 @@ public class SubtypeChecker
 		Type subParent = sub.superType();
 
 		if (subParent != null && 
-			recursiveAddSubtypeConstraints(lc, pos, sup, subParent)) 
+			recursiveAddSubtypeConstraints(lc, pos, sup, subParent, inArrayType)) 
 			return true;
 
 		for (Iterator iter = sub.interfaces().iterator(); iter.hasNext(); ) {
 		    Type subInterface = (Type) iter.next();
 
-		    if (recursiveAddSubtypeConstraints(lc, pos, sup, subInterface)) 
+		    if (recursiveAddSubtypeConstraints(lc, pos, sup, subInterface, inArrayType)) 
 			return true;
 		}
 
@@ -249,8 +258,8 @@ public class SubtypeChecker
             Type subBase = ((ArrayType)unlblSubtype).base();  
             Type supBase = ((ArrayType)unlblSupertype).base();
 
-            if (!recursiveAddSubtypeConstraints(lc, pos, subBase, supBase) ||
-                !recursiveAddSubtypeConstraints(lc, pos, supBase, subBase)) {
+            if (!recursiveAddSubtypeConstraints(lc, pos, subBase, supBase, true) ||
+                !recursiveAddSubtypeConstraints(lc, pos, supBase, subBase, true)) {
                 return false; 
             }
         }
