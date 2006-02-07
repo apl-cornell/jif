@@ -1092,16 +1092,8 @@ public class JifTypeSystem_c
     }
     
 
-    public boolean leq(Label L1, Label L2, LabelEnv env) {
-        return env.leq(L1, L2);
-    }
-
     public boolean leq(Label L1, Label L2) {
         return emptyLabelEnv.leq(L1, L2);
-    }
-
-    public boolean leq(Policy p1, Policy p2, LabelEnv env) {
-        return env.leq(p1, p2);
     }
 
     public boolean leq(Policy p1, Policy p2) {

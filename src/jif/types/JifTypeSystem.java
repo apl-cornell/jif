@@ -106,7 +106,6 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     
     /** Returns true iff L1 <= L2 in <code>env</code>. */
-    boolean leq(Label L1, Label L2, LabelEnv env);
     boolean leq(Label L1, Label L2);
 
     /** Returns the join of L1 and L2. */
@@ -118,7 +117,6 @@ public interface JifTypeSystem extends ParamTypeSystem
     Label meetLabel(Position pos, Collection components);
 
     /* methods for policies */
-    boolean leq(Policy p1, Policy p2, LabelEnv env);
     boolean leq(Policy p1, Policy p2);
     ConfPolicy joinConfPolicy(Position pos, Collection components);
     IntegPolicy joinIntegPolicy(Position pos, Collection components);
