@@ -106,7 +106,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                    return "The expression to declassify has label " + 
                           namedRhs()+ ", and the expression " +
                           "should be downgraded to label " +
-                          "downgrade_to_label. However, the method has " +
+                          "declass_to. However, the method has " +
                           "the authority of " + sb.toString() + ". " +
                           "The authority of other principals is " +
                           "required to perform the declassify.";
@@ -136,9 +136,9 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
         
         JifTypeSystem jts = lc.typeSystem();
         Label pcInteg = jts.writersToReadersLabel(pos, A.pc());
-        lc.constrain(new LabelConstraint(new NamedLabel("declass_from_label", labelFrom), 
+        lc.constrain(new LabelConstraint(new NamedLabel("declass_from", labelFrom), 
                                          LabelConstraint.LEQ, 
-                                         new NamedLabel("declass_to_label", labelTo).
+                                         new NamedLabel("declass_to", labelTo).
                                                    join(lc, "pc_integrity", pcInteg),
                                          A.labelEnv(),
                                          pos) {
