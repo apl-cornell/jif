@@ -5,6 +5,7 @@ import java.util.*;
 import jif.translate.JoinLabelToJavaExpr_c;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
+import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.visit.LabelChecker;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
@@ -61,11 +62,11 @@ public abstract class MeetPolicy_c extends Policy_c {
         return meetComponents.hashCode();
     }
     
-    public String toString() {
+    public String toString(Set printedLabels) {
         String s = "";
         for (Iterator i = meetComponents.iterator(); i.hasNext(); ) {
             Policy c = (Policy) i.next();
-            s += c.toString();
+            s += c.toString(printedLabels);
             
             if (i.hasNext()) {
                 s += " meet ";
@@ -75,13 +76,13 @@ public abstract class MeetPolicy_c extends Policy_c {
         return s;
     }
     
-    protected boolean leq_(Policy p, LabelEnv env) {
+    protected boolean leq_(Policy p, LabelEnv env, SearchState state) {
         // If this = { .. Pi .. , check there exists an i
         // such that Pi <= p
         for (Iterator i = meetComponents.iterator(); i.hasNext(); ) {
             Policy pi = (Policy) i.next();
             
-            if (env.leq(pi, p)) {
+            if (env.leq(pi, p, state)) {
                 return true;
             }
         }

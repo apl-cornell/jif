@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
+import jif.types.hierarchy.LabelEnv.SearchState;
 import polyglot.util.Position;
 import polyglot.util.TypedList;
 
@@ -31,8 +32,8 @@ public class MeetConfPolicy_c extends MeetPolicy_c implements ConfPolicy {
         return isTop();
     }
 
-    public boolean leq_(ConfPolicy p, LabelEnv env) {
-        return leq_((Policy)p, env);
+    public boolean leq_(ConfPolicy p, LabelEnv env, SearchState state) {
+        return leq_((Policy)p, env, state);
     }
     
     public ConfPolicy meet(ConfPolicy p) {

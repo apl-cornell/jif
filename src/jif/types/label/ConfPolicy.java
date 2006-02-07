@@ -10,7 +10,7 @@ import jif.types.hierarchy.LabelEnv;
 public interface ConfPolicy extends Policy {
     boolean isBottomConfidentiality();
     boolean isTopConfidentiality();
-    boolean leq_(ConfPolicy p, LabelEnv env);
+    boolean leq_(ConfPolicy p, LabelEnv env, LabelEnv.SearchState state);
     ConfPolicy join(ConfPolicy p);
     ConfPolicy meet(ConfPolicy p);
 }

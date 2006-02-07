@@ -82,29 +82,34 @@ public class PairLabel_c extends Label_c implements PairLabel {
     }
         
     public String toString() {
-        return toString(true);        
+        return toString(new HashSet());
+    }
+    public String toString(Set printedLabels) {
+        return toString(printedLabels, true);        
     }
     
     public String componentString(Set printedLabels) {
-        return toString(false);
+        return toString(printedLabels, false);
     }
-    public String toString(boolean topLevel) {
+    public String toString(Set printedLabels, boolean topLevel) {
         StringBuffer sb = new StringBuffer();
         if (topLevel) sb.append("{");
         if (Report.should_report(Report.debug, 2)) { 
-            sb.append("<pair " + confPolicy.toString() + " ; " + integPolicy.toString() + ">");
+            sb.append("<pair " + confPolicy.toString(printedLabels) + 
+                      " ; " + integPolicy.toString(printedLabels) + ">");
         }
         else if (Report.should_report(Report.debug, 1)) { 
-            sb.append(confPolicy.toString() + "; " + integPolicy.toString());
+            sb.append(confPolicy.toString(printedLabels) + 
+                      "; " + integPolicy.toString(printedLabels));
         }
         else {
             String cs = "";
             if (!topLevel || !confPolicy.isBottomConfidentiality()) {
-                cs = confPolicy.toString();
+                cs = confPolicy.toString(printedLabels);
             }
             String is = "";
             if (!topLevel || !integPolicy.isTopIntegrity()) {
-                is = integPolicy.toString();
+                is = integPolicy.toString(printedLabels);
             }
             if (cs.length() > 0 && is.length() > 0) {
                 sb.append(cs + "; " + is);
@@ -125,8 +130,8 @@ public class PairLabel_c extends Label_c implements PairLabel {
 //            System.out.println("   and " + this.integPolicy() + " to " + that.integPolicy());
 //            System.out.println("   " + env.leq(this.confPolicy(), that.confPolicy()));
 //            System.out.println("   " + env.leq(this.integPolicy(), that.integPolicy()));
-            return env.leq(this.confPolicy(), that.confPolicy()) &&
-                   env.leq(this.integPolicy(), that.integPolicy());
+            return env.leq(this.confPolicy(), that.confPolicy(), state) &&
+                   env.leq(this.integPolicy(), that.integPolicy(), state);
         }
         return false;
     }

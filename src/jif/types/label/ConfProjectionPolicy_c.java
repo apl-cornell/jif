@@ -1,9 +1,11 @@
 package jif.types.label;
 
 import java.util.List;
+import java.util.Set;
 
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
+import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.visit.LabelChecker;
 import polyglot.types.*;
 import polyglot.util.Position;
@@ -50,17 +52,17 @@ public class ConfProjectionPolicy_c extends Policy_c implements ConfPolicy {
         return label.hashCode();
     }
     
-    public boolean leq_(ConfPolicy p, LabelEnv env) {
+    public boolean leq_(ConfPolicy p, LabelEnv env, SearchState state) {
         if (p instanceof ConfProjectionPolicy_c) {
-            return env.leq(this.label(), ((ConfProjectionPolicy_c)p).label());
+            return env.leq(this.label(), ((ConfProjectionPolicy_c)p).label(), state);
         }
         if (p.isTopConfidentiality()) return true;
         Label ub = env.findUpperBound(this.label);
-        return env.leq(ub.confProjection(), p);
+        return env.leq(ub.confProjection(), p, state);
     }
 
-    public String toString() {
-        return "C(" + label.componentString() + ")";
+    public String toString(Set printedLabels) {
+        return "C(" + label.componentString(printedLabels) + ")";
     }
     
     public List throwTypes(TypeSystem ts) {

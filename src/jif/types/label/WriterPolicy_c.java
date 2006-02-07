@@ -6,6 +6,7 @@ import jif.translate.*;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
+import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
@@ -65,7 +66,7 @@ public class WriterPolicy_c extends Policy_c implements WriterPolicy {
         return (owner==null?0:owner.hashCode()) ^ writer.hashCode()  ^ 1234352;
     }
     
-    public boolean leq_(IntegPolicy p, LabelEnv env) {
+    public boolean leq_(IntegPolicy p, LabelEnv env, SearchState state) {
         if (this.isBottomIntegrity() || p.isTopIntegrity())
             return true;
         
@@ -87,7 +88,7 @@ public class WriterPolicy_c extends Policy_c implements WriterPolicy {
         return false;
     }
 
-    public String toString() {
+    public String toString(Set printedLabels) {
         StringBuffer sb = new StringBuffer(owner.toString());
         sb.append("!: ");        
         if (!writer.isTopPrincipal()) sb.append(writer.toString());        

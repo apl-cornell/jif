@@ -6,6 +6,7 @@ import jif.translate.*;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
+import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
@@ -58,17 +59,17 @@ public class IntegProjectionPolicy_c extends Policy_c implements IntegPolicy {
         return label.hashCode();
     }
     
-    public boolean leq_(IntegPolicy p, LabelEnv env) {
+    public boolean leq_(IntegPolicy p, LabelEnv env, SearchState state) {
         if (p instanceof IntegProjectionPolicy_c) {
-            return env.leq(this.label(), ((IntegProjectionPolicy_c)p).label());
+            return env.leq(this.label(), ((IntegProjectionPolicy_c)p).label(), state);
         }
         if (p.isTopIntegrity()) return true;
         Label ub = env.findUpperBound(this.label);
-        return env.leq(ub.integProjection(), p);
+        return env.leq(ub.integProjection(), p, state);
     }
 
-    public String toString() {
-        return "I(" + label.componentString() + ")";
+    public String toString(Set printedLabels) {
+        return "I(" + label.componentString(printedLabels) + ")";
     }
     
     public List throwTypes(TypeSystem ts) {

@@ -7,6 +7,7 @@ import jif.translate.PairLabelToJavaExpr_c;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
+import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
@@ -63,7 +64,7 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
         return (owner==null?0:owner.hashCode()) ^ reader.hashCode() ^ 948234;
     }
     
-    public boolean leq_(ConfPolicy p, LabelEnv env) {
+    public boolean leq_(ConfPolicy p, LabelEnv env, SearchState state) {
         if (this.isBottomConfidentiality() || p.isTopConfidentiality())
             return true;
 
@@ -84,7 +85,7 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
         return false;
     }
 
-    public String toString() {
+    public String toString(Set printedLabels) {
         StringBuffer sb = new StringBuffer(owner.toString());
         sb.append(": ");        
         if (!reader.isTopPrincipal()) sb.append(reader.toString());        

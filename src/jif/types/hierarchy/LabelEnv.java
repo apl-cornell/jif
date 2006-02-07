@@ -30,6 +30,7 @@ public interface LabelEnv
     boolean leq(Label L1, Label L2, SearchState state);
 
     boolean leq(Policy p1, Policy p2);
+    boolean leq(Policy p1, Policy p2, SearchState state);
 
     PrincipalHierarchy ph();
 

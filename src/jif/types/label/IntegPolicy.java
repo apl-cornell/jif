@@ -10,7 +10,7 @@ import jif.types.hierarchy.LabelEnv;
 public interface IntegPolicy extends Policy {
     boolean isBottomIntegrity();
     boolean isTopIntegrity();   
-    boolean leq_(IntegPolicy p, LabelEnv env);
+    boolean leq_(IntegPolicy p, LabelEnv env, LabelEnv.SearchState state);
     IntegPolicy join(IntegPolicy p);
     IntegPolicy meet(IntegPolicy p);
 }

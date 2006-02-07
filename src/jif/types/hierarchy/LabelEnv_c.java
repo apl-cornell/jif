@@ -145,6 +145,9 @@ public class LabelEnv_c implements LabelEnv
     private static class LeqGoal {
         final Object lhs;
         final Object rhs;
+        LeqGoal(Policy lhs, Policy rhs) { 
+            this.lhs = lhs; this.rhs = rhs;
+        }
         LeqGoal(Label lhs, Label rhs) { 
             this.lhs = lhs; this.rhs = rhs;
         }
@@ -304,9 +307,9 @@ public class LabelEnv_c implements LabelEnv
             ConfPolicy conf2 = ts.confProjection(L2);
             IntegPolicy integ1 = ts.integProjection(L1);
             IntegPolicy integ2 = ts.integProjection(L2);
-            
-            if (leq(conf1, conf2) && leq(integ1, integ2)) {
-                return true;
+                        
+            if (leq(conf1, conf2, state) && leq(integ1, integ2, state)) {
+                    return true;
             }
         }
         
@@ -314,6 +317,8 @@ public class LabelEnv_c implements LabelEnv
         return result || leqApplyAssertions(L1, L2, (SearchState_c)state, true);
         
     }
+    
+    static int j = 0;
     
 //    /**
 //     * Non-caching implementation of L1 <= L2
@@ -476,20 +481,34 @@ public class LabelEnv_c implements LabelEnv
     
     
     public boolean leq(Policy p1, Policy p2) {
-        p1 = p1.simplify();
-        p2 = p2.simplify();
+        return leq(p1.simplify(), p2.simplify(), new SearchState_c(new AssertionUseCount(), new LinkedHashSet()));
+    }
+    public boolean leq(Policy p1, Policy p2, SearchState state) {
+        // check the current goals
+        AssertionUseCount auc = ((SearchState_c)state).auc;
+        Set currentGoals = ((SearchState_c)state).currentGoals;
+        LeqGoal newGoal = new LeqGoal(p1, p2);
+        if (currentGoals.contains(newGoal)) {
+            // already have this subgoal on the stack
+            return false;
+        }
+        currentGoals = new LinkedHashSet(currentGoals);
+        currentGoals.add(newGoal);
+        state = new SearchState_c(auc, currentGoals);        
+
+        
         if (p1 instanceof ConfPolicy && p2 instanceof ConfPolicy) {
-            return leq((ConfPolicy)p1, (ConfPolicy)p2);
+            return leq((ConfPolicy)p1, (ConfPolicy)p2, state);
         }
         if (p1 instanceof IntegPolicy && p2 instanceof IntegPolicy) {
-            return leq((IntegPolicy)p1, (IntegPolicy)p2);
+            return leq((IntegPolicy)p1, (IntegPolicy)p2, state);
         }
         return false;
     }
     
-    public boolean leq(ConfPolicy p1, ConfPolicy p2) {
+    public boolean leq(ConfPolicy p1, ConfPolicy p2, SearchState state) {
         if (p2.isSingleton() || !p1.isSingleton()) {
-            return p1.leq_(p2, this);
+            return p1.leq_(p2, this, state);
         }
         if (p2 instanceof JoinPolicy_c) {
             // we need to find one element ci of p2 such that p1 <= ci
@@ -497,7 +516,7 @@ public class LabelEnv_c implements LabelEnv
             for (Iterator i = jp.joinComponents().iterator(); i.hasNext(); ) {
                 ConfPolicy ci = (ConfPolicy) i.next();
                 
-                if (leq(p1, ci)) {
+                if (leq(p1, ci, state)) {
                     return true;
                 }
             }
@@ -508,18 +527,18 @@ public class LabelEnv_c implements LabelEnv
             boolean allSat = true;
             for (Iterator i = mp.meetComponents().iterator(); i.hasNext(); ) {
                 ConfPolicy ci = (ConfPolicy) i.next();                
-                if (!leq(p1, ci)) {
+                if (!leq(p1, ci, state)) {
                     allSat = false;
                     break;
                 }
             }
             if (allSat) return true;
         }
-        return p1.leq_(p2, this);
+        return p1.leq_(p2, this, state);
     }
-    public boolean leq(IntegPolicy p1, IntegPolicy p2) {
+    public boolean leq(IntegPolicy p1, IntegPolicy p2, SearchState state) {
         if (p2.isSingleton() || !p1.isSingleton()) {
-            return p1.leq_(p2, this);
+            return p1.leq_(p2, this, state);
         }
         if (p2 instanceof JoinPolicy_c) {
             // we need to find one element ci of p2 such that p1 <= ci
@@ -527,7 +546,7 @@ public class LabelEnv_c implements LabelEnv
             for (Iterator i = jp.joinComponents().iterator(); i.hasNext(); ) {
                 IntegPolicy ci = (IntegPolicy) i.next();
                 
-                if (leq(p1, ci)) {
+                if (leq(p1, ci, state)) {
                     return true;
                 }
             }
@@ -538,14 +557,14 @@ public class LabelEnv_c implements LabelEnv
             boolean allSat = true;
             for (Iterator i = mp.meetComponents().iterator(); i.hasNext(); ) {
                 IntegPolicy ci = (IntegPolicy) i.next();                
-                if (!leq(p1, ci)) {
+                if (!leq(p1, ci, state)) {
                     allSat = false;
                     break;
                 }
             }
             if (allSat) return true;
         }
-        return p1.leq_(p2, this);        
+        return p1.leq_(p2, this, state);        
     }
     /**
      * Is this enviornment empty, or does is contain some constraints?
@@ -554,8 +573,9 @@ public class LabelEnv_c implements LabelEnv
         return labelAssertions.isEmpty() && ph.isEmpty();
     }
     
+    
     /**
-     * Finds a PairLabel upper bound
+     * Finds a PairLabel upper bound. It does not use leq
      *
      */
     public Label findUpperBound(Label L) {

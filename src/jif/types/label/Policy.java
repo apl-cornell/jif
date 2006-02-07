@@ -1,11 +1,15 @@
 package jif.types.label;
 
 import java.util.List;
+import java.util.Set;
 
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.LabelSubstitution;
+import jif.types.PathMap;
 import jif.visit.LabelChecker;
-
-import polyglot.types.*;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 
 
 /**
@@ -22,6 +26,6 @@ public interface Policy extends TypeObject {
     List throwTypes(TypeSystem ts);
     Policy subst(LabelSubstitution substitution) throws SemanticException;
     Policy simplify();
-    
+    String toString(Set printedLabels);
     PathMap labelCheck(JifContext A, LabelChecker lc);
 }
