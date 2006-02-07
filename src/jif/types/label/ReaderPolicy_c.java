@@ -64,6 +64,9 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
     }
     
     public boolean leq_(ConfPolicy p, LabelEnv env) {
+        if (this.isBottomConfidentiality() || p.isTopConfidentiality())
+            return true;
+
         PrincipalHierarchy ph = env.ph();
         if (p instanceof ReaderPolicy) {
             ReaderPolicy that = (ReaderPolicy) p;            

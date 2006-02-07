@@ -168,6 +168,14 @@ public abstract class Label_c extends TypeObject_c implements Label {
         return this;
     }
 
+    public ConfPolicy confProjection() {
+        return ((JifTypeSystem)ts).confProjection(this);
+    }
+
+    public IntegPolicy integProjection() {
+        return ((JifTypeSystem)ts).integProjection(this);
+    }
+
     public List throwTypes(TypeSystem ts) {
         return Collections.EMPTY_LIST;
     }

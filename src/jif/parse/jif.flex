@@ -110,6 +110,7 @@ import java.util.HashMap;
         keywords.put("covariant",     new Integer(sym.COVARIANT));
         keywords.put("invariant",     new Integer(sym.INVARIANT));
         keywords.put("declassify",    new Integer(sym.DECLASSIFY));
+        keywords.put("endorse",       new Integer(sym.ENDORSE));
         keywords.put("label",         new Integer(sym.LABEL));
         keywords.put("principal",     new Integer(sym.PRINCIPAL));
         keywords.put("where",         new Integer(sym.WHERE));

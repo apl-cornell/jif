@@ -15,13 +15,13 @@ import polyglot.ast.Stmt;
 import polyglot.types.SemanticException;
 import polyglot.util.Position;
 
-/** The Jif extension of the <code>DeclassifyStmt</code> node. 
+/** The Jif extension of the <code>EndorseStmt</code> node. 
  * 
- *  @see jif.ast.DeclassifyStmt
+ *  @see jif.ast.EndorseStmt
  */
-public class JifDeclassifyStmtExt extends JifDowngradeStmtExt
+public class JifEndorseStmtExt extends JifDowngradeStmtExt
 {
-    public JifDeclassifyStmtExt(ToJavaExt toJava) {
+    public JifEndorseStmtExt(ToJavaExt toJava) {
         super(toJava);
     }
 
@@ -30,7 +30,7 @@ public class JifDeclassifyStmtExt extends JifDowngradeStmtExt
                                   Label labelFrom, 
                                   Label labelTo, Position pos) 
             throws SemanticException {
-        JifDeclassifyExprExt.checkAuth(lc, A, labelFrom, labelTo, pos);
+        JifEndorseExprExt.checkAuth(lc, A, labelFrom, labelTo, pos);
     }
 
     protected void checkRobustness(LabelChecker lc, 
@@ -38,6 +38,6 @@ public class JifDeclassifyStmtExt extends JifDowngradeStmtExt
                                    Label labelFrom, 
                                    Label labelTo, Position pos) 
     throws SemanticException {
-        JifDeclassifyExprExt.checkRobustDecl(lc, A, labelFrom, labelTo, pos);
+        JifEndorseExprExt.checkRobustEndorse(lc, A, labelFrom, labelTo, pos);
     }
 }

@@ -51,6 +51,8 @@ public interface JifNodeFactory extends NodeFactory {
     LabelExpr LabelExpr(Position pos, Label l);
     DeclassifyStmt DeclassifyStmt(Position pos, LabelNode bound, LabelNode label, Stmt body);
     DeclassifyExpr DeclassifyExpr(Position pos, Expr expr, LabelNode bound, LabelNode label);
+    EndorseStmt EndorseStmt(Position pos, LabelNode bound, LabelNode label, Stmt body);
+    EndorseExpr EndorseExpr(Position pos, Expr expr, LabelNode bound, LabelNode label);
     NewLabel NewLabel(Position pos, LabelNode label);
     PrincipalExpr PrincipalExpr(Position pos, PrincipalNode principal);
 }

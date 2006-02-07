@@ -193,22 +193,41 @@ public class JifContext_c extends Context_c implements JifContext
     public PrincipalHierarchy ph() { return env.ph(); }
 
     public Label authLabel() {
-	Set auth = authority();
+        Set auth = authority();
         
         Set labels = new LinkedHashSet();
-	for (Iterator i = auth.iterator(); i.hasNext(); ) {
-	    Principal p = (Principal) i.next();
+        for (Iterator i = auth.iterator(); i.hasNext(); ) {
+            Principal p = (Principal) i.next();
             PairLabel pl = jifts.pairLabel(p.position(),
                                            jifts.readerPolicy(p.position(),
                                                               p,
                                                               jifts.topPrincipal(p.position())),
                                            jifts.topIntegPolicy(p.position()));
             labels.add(pl);
-	}
+        }
 
         Label L = jifts.joinLabel(currentCode().position(), 
                                    labels);
-	return L;
+        return L;
+    }
+
+    public Label authLabelInteg() {
+        Set auth = authority();
+        
+        Set labels = new LinkedHashSet();
+        for (Iterator i = auth.iterator(); i.hasNext(); ) {
+            Principal p = (Principal) i.next();
+            PairLabel pl = jifts.pairLabel(p.position(),
+                                           jifts.bottomConfPolicy(p.position()),
+                                           jifts.writerPolicy(p.position(),
+                                                              p,
+                                                              jifts.topPrincipal(p.position())));
+            labels.add(pl);
+        }
+
+        Label L = jifts.meetLabel(currentCode().position(), 
+                                   labels);
+        return L;
     }
 
     public boolean checkingInits() {

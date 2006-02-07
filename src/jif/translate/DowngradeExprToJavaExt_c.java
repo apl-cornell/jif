@@ -8,7 +8,7 @@ import polyglot.ext.jl.types.*;
 import jif.types.*;
 import polyglot.visit.*;
 
-public class DeclassifyExprToJavaExt_c extends ToJavaExt_c {
+public class DowngradeExprToJavaExt_c extends ToJavaExt_c {
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
         DeclassifyExpr n = (DeclassifyExpr) node();
         return rw.bypass(n.bound()).bypass(n.label());

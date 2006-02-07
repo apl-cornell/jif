@@ -249,9 +249,12 @@ terminal Token ACTSFOR;
 terminal Token ACTSFOR_LOWER;
 terminal Token EQUIV;
 terminal Token DECLASSIFY;
+terminal Token ENDORSE;
 
 non terminal DeclassifyExpr declassify;
 non terminal DeclassifyStmt declassify_statement;
+non terminal EndorseExpr endorse;
+non terminal EndorseStmt endorse_statement;
 non terminal TypeNode labeled_primitive_type;
 non terminal LabelNode label, label_opt, return_label_opt, label_flexible;
 non terminal List join_component_list;
@@ -765,6 +768,8 @@ extend statement ::=
                     // Stmt
        declassify_statement:a
             {: RESULT = a; :}
+    |  endorse_statement:a
+            {: RESULT = a; :}
     ;
 declassify_statement ::=
                     // DeclassifyStmt
@@ -775,6 +780,17 @@ declassify_statement ::=
     |   DECLASSIFY:n LPAREN label:a COMMA label:b RPAREN statement:c
             {: RESULT = parser.nf.DeclassifyStmt(parser.pos(n, c), a, b, c); :}
     ;
+
+endorse_statement ::=
+                    // EndorseStmt
+        ENDORSE:n LPAREN label:a RPAREN statement:b
+            {: RESULT = parser.nf.EndorseStmt(parser.pos(n, b),
+                            parser.nf.CanonicalLabelNode(parser.pos(n), parser.ts.topLabel(parser.pos(n))),
+                            a, b); :}
+    |   ENDORSE:n LPAREN label:a COMMA label:b RPAREN statement:c
+            {: RESULT = parser.nf.EndorseStmt(parser.pos(n, c), a, b, c); :}
+    ;
+
 
 // 19.12) Expr           // Expr
 extend primary ::=
@@ -791,6 +807,8 @@ extend primary_no_new_array ::=
     ;
 primary_no_array ::=
        declassify:a
+            {: RESULT = a; :}
+    |  endorse:a
             {: RESULT = a; :}
     ;
 transfer primary_no_new_array to primary_no_array {
@@ -890,6 +908,17 @@ declassify ::=
 	    :}
     |   DECLASSIFY:x LPAREN expression:a COMMA label:b COMMA label:c RPAREN:y
             {: RESULT = parser.nf.DeclassifyExpr(parser.pos(x,y), a, b, c); :}
+    ;
+
+endorse ::=
+                    // DeclassifyExpr
+        ENDORSE:x LPAREN expression:a COMMA label:b RPAREN:y
+            {: RESULT = parser.nf.EndorseExpr(parser.pos(x,y), a,
+			parser.nf.CanonicalLabelNode(parser.pos(b),
+			parser.ts.topLabel(parser.pos(b)) ), b);
+	    :}
+    |   ENDORSE:x LPAREN expression:a COMMA label:b COMMA label:c RPAREN:y
+            {: RESULT = parser.nf.EndorseExpr(parser.pos(x,y), a, b, c); :}
     ;
 
 param_or_expr_list ::=

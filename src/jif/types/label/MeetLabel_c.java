@@ -114,10 +114,18 @@ public class MeetLabel_c extends Label_c implements MeetLabel
     }
     
     public String componentString(Set printedLabels) {
+        return componentString(printedLabels, false);
+    }
+    private String componentString(Set printedLabels, boolean topLevel) {
         String s = "";
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label c = (Label) i.next();
-            s += c.componentString(printedLabels);
+            if (topLevel) {
+                s += c.toString(printedLabels);
+            }
+            else {
+                s += c.componentString(printedLabels);                
+            }
             
             if (i.hasNext()) {
                 s += " meet ";
@@ -126,6 +134,15 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         
         return s;
     }
+
+    public String toString() {
+        return "{" + componentString(new HashSet(), true) + "}";
+    }
+
+    public String toString(Set printedLabels) {
+        return "{" + componentString(printedLabels, true) + "}";
+    }
+    
     
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         if (! L.isComparable() || ! L.isEnumerable())
@@ -263,6 +280,23 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         }
         
         return c;
+    }
+
+    public ConfPolicy confProjection() {
+        Set confPols = new HashSet();
+        for (Iterator iter = components.iterator(); iter.hasNext();) {
+            Label c = (Label)iter.next();
+            confPols.add(c.confProjection());
+        }
+        return ((JifTypeSystem)ts).meetConfPolicy(position, confPols);
+    }
+    public IntegPolicy integProjection() {
+        Set integPols = new HashSet();
+        for (Iterator iter = components.iterator(); iter.hasNext();) {
+            Label c = (Label)iter.next();
+            integPols.add(c.integProjection());
+        }
+        return ((JifTypeSystem)ts).meetIntegPolicy(position, integPols);
     }
 
     public List throwTypes(TypeSystem ts) {

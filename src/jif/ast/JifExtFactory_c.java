@@ -380,6 +380,16 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return postExtDeclassifyExpr(e);
     }
 
+    public final Ext extEndorseStmt() {
+        Ext e = extEndorseStmtImpl();
+        return postExtEndorseStmt(e);
+    }
+
+    public final Ext extEndorseExpr() {
+        Ext e = extEndorseExprImpl();
+        return postExtEndorseExpr(e);
+    }
+
     public final Ext extNewLabel() {
         Ext e = extNewLabelImpl();
         return postExtNewLabel(e);
@@ -504,12 +514,21 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return new JifLabelIfExt(new LabelIfToJavaExt_c());
     }
 
+
     protected Ext extDeclassifyStmtImpl() {
-        return new JifDeclassifyStmtExt(new DeclassifyStmtToJavaExt_c());
+        return new JifDeclassifyStmtExt(new DowngradeStmtToJavaExt_c());
     }
 
     protected Ext extDeclassifyExprImpl() {
-        return new JifDeclassifyExprExt(new DeclassifyExprToJavaExt_c());
+        return new JifDeclassifyExprExt(new DowngradeExprToJavaExt_c());
+    }
+
+    protected Ext extEndorseStmtImpl() {
+        return new JifEndorseStmtExt(new DowngradeStmtToJavaExt_c());
+    }
+
+    protected Ext extEndorseExprImpl() {
+        return new JifEndorseExprExt(new DowngradeExprToJavaExt_c());
     }
 
     protected Ext extNewLabelImpl() {
@@ -631,12 +650,28 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return postExtStmt(e);
     }
 
-    protected Ext postExtDeclassifyStmt(Ext e) {
+    protected Ext postExtDowngradeStmt(Ext e) {
         return postExtStmt(e);
     }
 
-    protected Ext postExtDeclassifyExpr(Ext e) {
+    protected Ext postExtDowngradeExpr(Ext e) {
         return postExtExpr(e);
+    }
+
+    protected Ext postExtDeclassifyStmt(Ext e) {
+        return postExtDowngradeStmt(e);
+    }
+
+    protected Ext postExtDeclassifyExpr(Ext e) {
+        return postExtDowngradeExpr(e);
+    }
+
+    protected Ext postExtEndorseStmt(Ext e) {
+        return postExtDowngradeStmt(e);
+    }
+
+    protected Ext postExtEndorseExpr(Ext e) {
+        return postExtDowngradeExpr(e);
     }
 
     protected Ext postExtNewLabel(Ext e) {

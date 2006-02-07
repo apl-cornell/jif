@@ -136,6 +136,13 @@ public class LabelChecker implements Copy
         return ts.join(L1, L2);
     }
 
+    /**
+     * Returns a lower bound for L1 and L2
+     */
+    public Label lowerBound(Label L1, Label L2) {
+        return ts.meet(L1, L2);
+    }
+
     public Node labelCheck(Node n) throws SemanticException {
         if (n.ext() instanceof Jif) {
 	    n = ((Jif) n.ext()).del().labelCheck(this);

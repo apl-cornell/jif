@@ -269,6 +269,24 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return c;
     }
 
+    public ConfPolicy confProjection() {
+        Set confPols = new HashSet();
+        for (Iterator iter = components.iterator(); iter.hasNext();) {
+            Label c = (Label)iter.next();
+            confPols.add(c.confProjection());
+        }
+        return ((JifTypeSystem)ts).joinConfPolicy(position, confPols);
+    }
+
+    public IntegPolicy integProjection() {
+        Set integPols = new HashSet();
+        for (Iterator iter = components.iterator(); iter.hasNext();) {
+            Label c = (Label)iter.next();
+            integPols.add(c.integProjection());
+        }
+        return ((JifTypeSystem)ts).joinIntegPolicy(position, integPols);
+    }
+    
     public List throwTypes(TypeSystem ts) {
         List throwTypes = new ArrayList();
         for (Iterator i = components.iterator(); i.hasNext(); ) {

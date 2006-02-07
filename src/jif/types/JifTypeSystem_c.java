@@ -1196,6 +1196,19 @@ public class JifTypeSystem_c
         return (IntegPolicy)meetIntegPolicy(pos, l).simplify();
     }
     
+    public ConfPolicy confProjection(Label L) {
+        if (L instanceof MeetLabel || L instanceof JoinLabel || L instanceof PairLabel)
+            return L.confProjection();
+        
+        return new ConfProjectionPolicy_c(L, this, L.position());
+    }
+    public IntegPolicy integProjection(Label L) {
+        if (L instanceof MeetLabel || L instanceof JoinLabel || L instanceof PairLabel)
+            return L.integProjection();
+
+        return new IntegProjectionPolicy_c(L, this, L.position());
+    }
+    
 
     public String translateClass(Resolver c, ClassType t)
     {

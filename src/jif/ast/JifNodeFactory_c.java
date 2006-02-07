@@ -404,6 +404,24 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
+    public EndorseStmt EndorseStmt(Position pos, LabelNode bound, LabelNode label, Stmt body) {
+        EndorseStmt n = new EndorseStmt_c(pos, bound, label,
+                                                body);
+        n = (EndorseStmt)n.ext(jifExtFactory().extEndorseStmt());
+        n = (EndorseStmt)n.del(delFactory().delStmt());
+        return n;
+    }
+
+    public EndorseExpr EndorseExpr(Position pos, Expr expr, LabelNode bound,
+                                         LabelNode label) 
+    {
+        EndorseExpr n = new EndorseExpr_c(pos, expr, bound,
+                                                label);
+        n = (EndorseExpr)n.ext(jifExtFactory().extEndorseExpr());
+        n = (EndorseExpr)n.del(delFactory().delExpr());
+        return n;
+    }
+
     public LabelExpr LabelExpr(Position pos, Label l) {
         LabelNode ln = CanonicalLabelNode(pos, l);
         return LabelExpr(pos, ln);

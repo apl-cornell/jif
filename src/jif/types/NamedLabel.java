@@ -14,6 +14,7 @@ public class NamedLabel
 {
     protected Map nameToLabels;
     protected Map nameToDescrip;
+    protected String totalName;
 
     protected Label label;
     protected Position pos;
@@ -35,6 +36,7 @@ public class NamedLabel
         
         label = l;
         if (pos == null) pos = l.position();
+        this.totalName = name;
     }
 
     public NamedLabel(Position pos) {
@@ -58,14 +60,37 @@ public class NamedLabel
             nameToDescrip.put(name, descrip);
         }
         
-	if (label==null) {
-	    label = l;
-	    if (pos == null) pos = l.position();
-	}
+        if (label==null) {
+            label = l;
+            if (pos == null) pos = l.position();
+            this.totalName = name;
+        }
         else {
             label = lc.upperBound(label, l);
+            this.totalName += " join " + name;
         }
-	return this;
+        return this;
+    }
+    public NamedLabel meet(LabelChecker lc, String name, Label l) {
+        return meet(lc, name, null, l);
+        
+    }
+    public NamedLabel meet(LabelChecker lc, String name, String descrip, Label l) {
+        nameToLabels.put(name, l);
+        if (descrip != null) {
+            nameToDescrip.put(name, descrip);
+        }
+        
+        if (label==null) {
+            label = l;
+            if (pos == null) pos = l.position();
+            this.totalName = name;
+        }
+        else {
+            label = lc.lowerBound(label, l);
+            this.totalName += " meet " + name;
+        }
+        return this;
     }
     
     public Label label() {
@@ -73,15 +98,7 @@ public class NamedLabel
     }
     
     public String toString() {
-	StringBuffer sb = new StringBuffer();
-	for (Iterator iter = nameToLabels.keySet().iterator(); iter.hasNext(); ) {
-	    String name = (String) iter.next();
-	    sb.append(name);
-	    if (iter.hasNext()) 
-                sb.append(" + ");
-	}
-
-	return sb.toString();
+        return totalName;
     }
     
     public Label label(String name) {

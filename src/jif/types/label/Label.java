@@ -173,6 +173,9 @@ public interface Label extends Param {
 
     boolean isRuntimeRepresentable();
 
+    ConfPolicy confProjection();
+    IntegPolicy integProjection();
+    
     /**
      * If the label is runtime representable, when it is evaluated at runtime it
      * may throw exceptions. This method returns a list of the exceptions that
@@ -187,5 +190,5 @@ public interface Label extends Param {
 
     String componentString(Set printedLabels);
 
-    String toString(Set printedLabels);
+    String toString(Set printedLabels);    
 }

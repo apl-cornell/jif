@@ -296,6 +296,20 @@ public class LabelEnv_c implements LabelEnv
             // recurse on upper bound.
             result = leq(al.upperBound(), L2, state);
         }
+        
+        if (L1 instanceof MeetLabel || L1 instanceof JoinLabel ||
+                L2 instanceof MeetLabel || L2 instanceof JoinLabel) {
+            // see if using a conf and integ projections will work
+            ConfPolicy conf1 = ts.confProjection(L1);
+            ConfPolicy conf2 = ts.confProjection(L2);
+            IntegPolicy integ1 = ts.integProjection(L1);
+            IntegPolicy integ2 = ts.integProjection(L2);
+            
+            if (leq(conf1, conf2) && leq(integ1, integ2)) {
+                return true;
+            }
+        }
+        
         // try to use assertions
         return result || leqApplyAssertions(L1, L2, (SearchState_c)state, true);
         

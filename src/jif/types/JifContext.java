@@ -108,10 +108,16 @@ public interface JifContext extends Context {
      */    
     Set authority();
     void setAuthority(Set authority);
+
     /**
-     * Get the authority of the current code, represented as a privacy label.
+     * Get the authority of the current code, represented as a confidentiality label.
      */    
-    Label authLabel();//@@@REMOVE THIS
+    Label authLabel();
+
+    /**
+     * Get the authority of the current code, represented as an integrity label.
+     */    
+    Label authLabelInteg();
 
 
 

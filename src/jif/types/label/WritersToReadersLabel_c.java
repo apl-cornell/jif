@@ -37,6 +37,11 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
     public boolean isEnumerable() {
         return true;
     }
+
+    public IntegPolicy integProjection() {
+        return ((JifTypeSystem)ts).bottomIntegPolicy(position());
+    }
+
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (! (o instanceof WritersToReadersLabel)) {

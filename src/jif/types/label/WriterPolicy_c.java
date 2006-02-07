@@ -66,6 +66,9 @@ public class WriterPolicy_c extends Policy_c implements WriterPolicy {
     }
     
     public boolean leq_(IntegPolicy p, LabelEnv env) {
+        if (this.isBottomIntegrity() || p.isTopIntegrity())
+            return true;
+        
         PrincipalHierarchy ph = env.ph();
         if (p instanceof WriterPolicy) {
             WriterPolicy that = (WriterPolicy) p;            

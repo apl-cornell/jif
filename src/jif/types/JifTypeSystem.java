@@ -129,6 +129,9 @@ public interface JifTypeSystem extends ParamTypeSystem
     IntegPolicy join(IntegPolicy p1, IntegPolicy p2);
     IntegPolicy meet(IntegPolicy p1, IntegPolicy p2);
     
+    ConfPolicy confProjection(Label L);
+    IntegPolicy integProjection(Label L);
+    
     /** Construct an acts-for constraint. */
     ActsForConstraint actsForConstraint(Position pos, Principal actor, Principal granter, boolean isEquiv);
 

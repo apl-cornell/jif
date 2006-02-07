@@ -20,118 +20,121 @@ import polyglot.util.Position;
  * 
  *  @see jif.ast.DeclassifyExpr
  */
-public class JifDeclassifyExprExt extends Jif_c
+public class JifDeclassifyExprExt extends JifDowngradeExprExt
 {
     public JifDeclassifyExprExt(ToJavaExt toJava) {
         super(toJava);
     }
 
-    public Node labelCheck(LabelChecker lc) throws SemanticException {
-	DeclassifyExpr d = (DeclassifyExpr) node();
-
-	JifContext A = lc.jifContext();
-        A = (JifContext) d.enterScope(A);
-
-	Expr e = (Expr) lc.context(A).labelCheck(d.expr());
-	PathMap Xe = X(e);
-
-	Label L = d.label().label();
-
-	Label authLabel = A.authLabel();
-        
-        lc.constrain(new LabelConstraint(new NamedLabel("expr.nv", Xe.NV()), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("declass_bound", d.bound().label()),
-                                         A.labelEnv(),
-                                         d.position()) {
-                     public String msg() {
-                         return "The label of the expression to declassify is " + 
-                                "more restrictive than label of data that " +
-                                "the declassify expression is allowed to declassify.";
-                     }
-                     public String detailMsg() {
-                         return "This declassify expression is allowed to " +
-                                 "declassify information labeled up to " +
-                                 namedRhs() + ". However, the label of the " +
-                                 "expression to declassify is " +
-                                 namedLhs() + ", which is more restrictive than " +
-                                 "allowed.";
-                     }
-                     public String technicalMsg() {
-                         return "Invalid declassify: NV of the " + 
-                                "expression is out of bound.";
-                     }                     
-         }
-         );
-	
-        final JifContext constraintA = A;
-        lc.constrain(new LabelConstraint(new NamedLabel("expr.nv", Xe.NV()), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("declass_to_label", L).
-                                                   join(lc, "auth_label", authLabel),
-                                         A.labelEnv(),
-                                         d.position()) {
-                     public String msg() {
-                         return "The method does not have sufficient " +
-                                "authority to declassify this expression.";
-                     }
-                     public String detailMsg() { 
-                         StringBuffer sb = new StringBuffer();
-                         Set authorities = constraintA.authority();
-                         if (authorities.isEmpty()) {
-                             sb.append("no principals");
-                         }
-                         else {
-                             sb.append("the following principals: ");
-                         }
-                         for (Iterator iter = authorities.iterator(); iter.hasNext() ;) {
-                             Principal p = (Principal)iter.next();
-                             sb.append(p.toString());
-                             if (iter.hasNext()) {
-                                 sb.append(", ");
-                             }
-                         }
-                         
-                          
-                         return "The expression to declassify has label " + 
-                                namedRhs()+ ", and the expression " +
-                                "should be declassified to label " +
-                                "declass_to_label. However, the method has " +
-                                "the authority of " + sb.toString() + ". " +
-                                "The authority of other principals is " +
-                                "required to perform the declassification.";
-                     }
-                     public String technicalMsg() {
-                         return "Invalid declassify: the method does " +
-                                "not have sufficient authorities.";
-                     }                     
-         }
-         );
-        
-        checkRobustDecl(lc, Xe.NV(), L, d.position());
-
-	//_pc_ is not declassified. 
-	PathMap X = Xe.NV(lc.upperBound(A.pc(), L));
-
-	return X(d.expr(e), X);
-    }
-
-    /**
-     * Check the robust declassification condition
-     * @param lc
-     * @param labelFrom
-     * @param labelTo
-     * @throws SemanticException 
-     */
-    protected static void checkRobustDecl(LabelChecker lc, 
+    protected void checkOneDimenOnly(LabelChecker lc, 
+                                  final JifContext A,
+                                  Label labelFrom, 
+                                  Label labelTo, Position pos) 
+         throws SemanticException {
+       checkOneDimen(lc, A, labelFrom, labelTo, pos);
+   }
+   protected static void checkOneDimen(LabelChecker lc, 
+                                 final JifContext A,
                                  Label labelFrom, 
                                  Label labelTo, Position pos) 
         throws SemanticException {
+       JifTypeSystem jts = lc.jifTypeSystem();
+       Label topConfLabel = jts.pairLabel(pos, 
+                                          jts.topConfPolicy(pos),
+                                          jts.bottomIntegPolicy(pos));
+       
+       lc.constrain(new LabelConstraint(new NamedLabel("declass_from", labelFrom), 
+                                        LabelConstraint.LEQ, 
+                                        new NamedLabel("declass_to", labelTo).
+                                           join(lc, "top_confidentiality", topConfLabel),
+                                        A.labelEnv(),       
+                                        pos) {
+                public String msg() {
+                    return "Declassify expressions cannot downgrade integrity.";
+                }
+                public String detailMsg() { 
+                    return "The declass_from label has lower integrity than the " +
+                                "declass_to label; declassify expressions " +
+                                "cannot downgrade integrity.";
+                }                     
+    }
+    );
+   }
+   
+   protected void checkAuthority(LabelChecker lc, 
+                                 final JifContext A,
+                                 Label labelFrom, 
+                                 Label labelTo, Position pos) 
+        throws SemanticException {
+      checkAuth(lc, A, labelFrom, labelTo, pos);
+  }
+  protected static void checkAuth(LabelChecker lc, 
+                                final JifContext A,
+                                Label labelFrom, 
+                                Label labelTo, Position pos) 
+       throws SemanticException {
+  
+      Label authLabel = A.authLabel();    
+  lc.constrain(new LabelConstraint(new NamedLabel("declass_from", labelFrom), 
+                                   LabelConstraint.LEQ, 
+                                   new NamedLabel("declass_to", labelTo).
+                                             join(lc, "auth_label", authLabel),
+                                   A.labelEnv(),
+                                   pos) {
+               public String msg() {
+                   return "The method does not have sufficient " +
+                          "authority to declassify this expression.";
+               }
+               public String detailMsg() { 
+                   StringBuffer sb = new StringBuffer();
+                   Set authorities = A.authority();
+                   if (authorities.isEmpty()) {
+                       sb.append("no principals");
+                   }
+                   else {
+                       sb.append("the following principals: ");
+                   }
+                   for (Iterator iter = authorities.iterator(); iter.hasNext() ;) {
+                       Principal p = (Principal)iter.next();
+                       sb.append(p.toString());
+                       if (iter.hasNext()) {
+                           sb.append(", ");
+                       }
+                   }
+                   
+                    
+                   return "The expression to declassify has label " + 
+                          namedRhs()+ ", and the expression " +
+                          "should be downgraded to label " +
+                          "downgrade_to_label. However, the method has " +
+                          "the authority of " + sb.toString() + ". " +
+                          "The authority of other principals is " +
+                          "required to perform the declassify.";
+               }
+               public String technicalMsg() {
+                   return "Invalid declassify: the method does " +
+                          "not have sufficient authorities.";
+               }                     
+   }
+   );
+  }
+    
+    protected void checkRobustness(LabelChecker lc, 
+                                   JifContext A,
+                                   Label labelFrom, 
+                                   Label labelTo, Position pos) 
+                 throws SemanticException {
+        checkRobustDecl(lc, A, labelFrom, labelTo, pos);
+    }
+
+    protected static void checkRobustDecl(LabelChecker lc, 
+                                          JifContext A,
+                                          Label labelFrom, 
+                                          Label labelTo, Position pos) 
+        throws SemanticException {
         
-        if (((JifOptions)JifOptions.global).noRobustness) return;
         
         JifTypeSystem jts = lc.typeSystem();
-        JifContext A = lc.context();
         Label pcInteg = jts.writersToReadersLabel(pos, A.pc());
         lc.constrain(new LabelConstraint(new NamedLabel("declass_from_label", labelFrom), 
                                          LabelConstraint.LEQ, 
@@ -176,4 +179,6 @@ public class JifDeclassifyExprExt extends Jif_c
          }
          );
     }
+
+
 }

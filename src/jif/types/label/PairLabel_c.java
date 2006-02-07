@@ -69,6 +69,14 @@ public class PairLabel_c extends Label_c implements PairLabel {
         }
         return this;
     }
+
+    public ConfPolicy confProjection() {
+        return confPolicy();
+    }
+    public IntegPolicy integProjection() {
+        return integPolicy();
+    }
+    
     public int hashCode() {
         return confPolicy.hashCode() ^ integPolicy.hashCode();
     }
