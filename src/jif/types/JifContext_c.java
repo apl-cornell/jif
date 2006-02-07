@@ -221,11 +221,11 @@ public class JifContext_c extends Context_c implements JifContext
                                            jifts.bottomConfPolicy(p.position()),
                                            jifts.writerPolicy(p.position(),
                                                               p,
-                                                              jifts.topPrincipal(p.position())));
+                                                              jifts.bottomPrincipal(p.position())));
             labels.add(pl);
         }
 
-        Label L = jifts.meetLabel(currentCode().position(), 
+        Label L = jifts.joinLabel(currentCode().position(), 
                                    labels);
         return L;
     }

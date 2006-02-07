@@ -75,10 +75,10 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                   Label labelTo, Position pos) 
          throws SemanticException {
         Label authLabel = A.authLabelInteg();    
-        lc.constrain(new LabelConstraint(new NamedLabel("endorse_from", labelFrom).
-                                         meet(lc, "auth_label", authLabel), 
+        lc.constrain(new LabelConstraint(new NamedLabel("endorse_from", labelFrom),
                                          LabelConstraint.LEQ, 
-                                         new NamedLabel("endorse_to", labelTo),
+                                         new NamedLabel("endorse_to", labelTo).
+                                             join(lc, "auth_label", authLabel),
                                          A.labelEnv(),
                                          pos) {
             public String msg() {
@@ -106,7 +106,7 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                 return "The expression to endorse has label " + 
                 namedRhs()+ ", and the expression " +
                 "should be downgraded to label " +
-                "downgrade_to_label. However, the method has " +
+                "endorse_to. However, the method has " +
                 "the authority of " + sb.toString() + ". " +
                 "The authority of other principals is " +
                 "required to perform the endorse.";

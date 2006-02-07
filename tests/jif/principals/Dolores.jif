@@ -1,7 +1,7 @@
 package jif.principals;
 
 public class Dolores extends ExternalPrincipal {
-    public Dolores{this:}() where authority (this) {
+    public Dolores{this:;*!:*}() where authority (this) {
 	super("Dolores");
 
         // Dolores allows Chuck to act for her.

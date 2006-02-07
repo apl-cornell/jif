@@ -6,7 +6,7 @@ package jif.lang;
  */
 public abstract class AbstractPrincipal implements Principal {
     private final String{this} name;
-    protected Principal{this:}[]{this:} superiors = null;
+    protected Principal{this:;*!:*}[]{this:;*!:*} superiors = null;
     
     protected AbstractPrincipal(String{this} name) {
         this.name = name;
@@ -20,7 +20,7 @@ public abstract class AbstractPrincipal implements Principal {
         return superiorsContains((Principal)p);
     }
     
-    public void addDelegatesTo{this:}(principal{this} p) where caller (this) {
+    public void addDelegatesTo{this:;*!:*}(principal{this} p) where caller (this) {
         if (superiorsContains((Principal)p)) {
             return;
         }
@@ -31,7 +31,7 @@ public abstract class AbstractPrincipal implements Principal {
                 superiors[0] = (Principal)p;            
             }
             else {
-                Principal{this:}[] old = superiors;
+                Principal{this:;*!:*}[] old = superiors;
                 superiors = new Principal[old.length+1];
                 for (int i = 0; i < old.length; i++) {
                     superiors[i] = old[i];
@@ -46,7 +46,7 @@ public abstract class AbstractPrincipal implements Principal {
     
     protected boolean{this;p} superiorsContains(Principal p) where authority (this) {
         boolean result = false;
-        Principal{this:}[] sprs = superiors;
+        Principal{this:;*!:*}[] sprs = superiors;
         for (int i = 0; sprs != null && i < sprs.length; i++) {
             try {
                 Principal pi = sprs[i];                        
@@ -79,11 +79,12 @@ public abstract class AbstractPrincipal implements Principal {
         // from p to s.
         ActsForProof prf;
         
-        Principal{this:}[]{this} sprs = declassify(superiors, {this});
+        Principal{this:;*!:*}[]{this;*!:*} sprs = declassify(superiors, {this;*!:*});
         
         for (int i = 0; sprs != null && i < sprs.length; i++) {
             try {
-                Principal{this} s = declassify(sprs[i], {this});
+                Principal t = declassify(sprs[i], {this;*!:*});
+                Principal{this} s = endorse(t, {this});
                 prf = PrincipalUtil.findActsForProof(p, s);
                 if (prf != null) {
                     // success!
