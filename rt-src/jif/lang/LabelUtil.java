@@ -20,6 +20,10 @@ public class LabelUtil
 
     private LabelUtil() { }
 
+    public static Label noComponents() {
+        return intern(new PairLabel(BOTTOM_CONF, TOP_INTEG));
+    }
+    
     public static ConfPolicy readerPolicy(Principal owner, Principal reader) {
         return intern(new ReaderPolicy(owner, reader));
     }

@@ -4,7 +4,7 @@ package jif.lang;
  * Utility methods for labels.
  */
 public class LabelUtil {
-    public static native label bottom();
+    public static native label noComponents();
 
     public static native label{owner; readers; *lbl; lbl} 
        readerPolicyLabel(label lbl, principal owner, principal{*lbl}[] readers);
