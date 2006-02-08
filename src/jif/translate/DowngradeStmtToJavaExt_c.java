@@ -10,12 +10,12 @@ import polyglot.visit.*;
 
 public class DowngradeStmtToJavaExt_c extends ToJavaExt_c {
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
-        DeclassifyStmt n = (DeclassifyStmt) node();
+        DowngradeStmt n = (DowngradeStmt) node();
         return rw.bypass(n.bound()).bypass(n.label());
     }
 
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
-        DeclassifyStmt n = (DeclassifyStmt) node();
+        DowngradeStmt n = (DowngradeStmt) node();
         return n.body();
     }
 }
