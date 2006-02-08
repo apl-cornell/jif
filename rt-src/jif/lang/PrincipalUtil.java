@@ -250,7 +250,10 @@ public class PrincipalUtil {
     static boolean isTopPrincipal(Principal p) {
         return p == TOP_PRINCIPAL;
     }
-
+    public static ConfPolicy readableByPrinPolicy(Principal p) {
+        return new ReaderPolicy(topPrincipal(), p);
+    }
+    
     public static Principal disjunction(Principal left, Principal right) {
         if (left == null || right == null) return null;
         if (actsFor(left, right)) return right;

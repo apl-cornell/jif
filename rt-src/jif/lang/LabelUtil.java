@@ -217,7 +217,7 @@ public class LabelUtil
     }
 
     public static boolean isReadableBy(Label lbl, Principal p) {
-        Label L = toLabel(new ReadableByPrinPolicy(p));
+        Label L = toLabel(PrincipalUtil.readableByPrinPolicy(p));
         return relabelsTo(lbl, L);
     }
 

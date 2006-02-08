@@ -1,17 +1,15 @@
 package jif.lang;
 
-import java.util.*;
+import java.util.Iterator;
 
 public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
 {
     private final Principal owner;
     private final Principal reader;
-    private final Principal effectiveReader; // disjunction of owner and reader
     
     public ReaderPolicy(Principal owner, Principal reader) {
         this.owner = owner;
         this.reader = reader;
-        this.effectiveReader = PrincipalUtil.disjunction(owner, reader);
     }
     
     public Principal owner() {
@@ -24,14 +22,7 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
     
     
     public boolean relabelsTo(Policy p) {
-        if (p instanceof ReadableByPrinPolicy) {
-            ReadableByPrinPolicy rbpp = (ReadableByPrinPolicy)p;
-            if (PrincipalUtil.actsFor(rbpp.reader(),this.effectiveReader)) {
-                return true;
-            }
-            return false;            
-        }
-        else if (p instanceof JoinConfPolicy) {
+        if (p instanceof JoinConfPolicy) {
             JoinPolicy jp = (JoinPolicy)p;
             // this <= p1 join ... join p2 if there exists a pi such that
             // this <= pi
