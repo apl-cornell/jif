@@ -75,10 +75,10 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                   Label labelTo, Position pos) 
          throws SemanticException {
         Label authLabel = A.authLabelInteg();    
-        lc.constrain(new LabelConstraint(new NamedLabel("endorse_from", labelFrom),
+        lc.constrain(new LabelConstraint(new NamedLabel("endorse_from", labelFrom).
+                                         meet(lc, "auth_label", authLabel),
                                          LabelConstraint.LEQ, 
-                                         new NamedLabel("endorse_to", labelTo).
-                                             join(lc, "auth_label", authLabel),
+                                         new NamedLabel("endorse_to", labelTo),
                                          A.labelEnv(),
                                          pos) {
             public String msg() {
