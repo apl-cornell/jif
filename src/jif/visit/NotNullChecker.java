@@ -64,7 +64,7 @@ public class NotNullChecker extends DataFlow
 		(e instanceof Special ) ||
 		(e instanceof Lit && !(e instanceof NullLit)) ||
 		(e instanceof Cast && exprIsNotNullStatic(((Cast)e).expr())) ||
-		(e instanceof DeclassifyExpr && exprIsNotNullStatic(((DeclassifyExpr)e).expr()));
+                (e instanceof DowngradeExpr && exprIsNotNullStatic(((DowngradeExpr)e).expr()));
         }        
         boolean exprIsNotNull(Expr e) {
             // expression is not null if it is a "new" expression,
@@ -75,7 +75,7 @@ public class NotNullChecker extends DataFlow
             return exprIsNotNullStatic(e) ||
                     (ap != null && notNullAccessPaths.contains(ap)) ||
                     (e instanceof Cast && exprIsNotNull(((Cast)e).expr())) ||
-                    (e instanceof DeclassifyExpr && exprIsNotNull(((DeclassifyExpr)e).expr()));
+                    (e instanceof DowngradeExpr && exprIsNotNull(((DowngradeExpr)e).expr()));
         }        
 
         public boolean equals(Object o) {

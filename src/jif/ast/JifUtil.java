@@ -92,8 +92,8 @@ public class JifUtil
         else if (e instanceof Cast) {
             return exprToAccessPath(((Cast)e).expr(), context);            
         }
-        else if (e instanceof DeclassifyExpr) {
-            return exprToAccessPath(((DeclassifyExpr)e).expr(), context);            
+        else if (e instanceof DowngradeExpr) {
+            return exprToAccessPath(((DowngradeExpr)e).expr(), context);            
         }
         throw new SemanticDetailedException("Expression " + e + " not suitable for an access path.",
                                             "The expression " + e + " is not suitable for a final access " +
@@ -133,8 +133,8 @@ public class JifUtil
         if (e instanceof Cast) {
             return isFinalAccessExpr(ts, ((Cast)e).expr());        
         }
-        if (e instanceof DeclassifyExpr) {
-            return isFinalAccessExpr(ts, ((DeclassifyExpr)e).expr());        
+        if (e instanceof DowngradeExpr) {
+            return isFinalAccessExpr(ts, ((DowngradeExpr)e).expr());        
         }
         return false;
     }
@@ -143,14 +143,14 @@ public class JifUtil
             e instanceof LabelExpr || 
             e instanceof PrincipalNode ||
            (e instanceof Cast && isFinalAccessExprOrConst(ts, ((Cast)e).expr())) ||
-           (e instanceof DeclassifyExpr && isFinalAccessExprOrConst(ts, ((DeclassifyExpr)e).expr()));
+           (e instanceof DowngradeExpr && isFinalAccessExprOrConst(ts, ((DowngradeExpr)e).expr()));
     }
     public static Label exprToLabel(JifTypeSystem ts, Expr e, JifContext context) throws SemanticException {
         if (e instanceof LabelExpr) {
             return ((LabelExpr)e).label().label();
         }
-        if (e instanceof DeclassifyExpr) {
-            return exprToLabel(ts, ((DeclassifyExpr)e).expr(), context);            
+        if (e instanceof DowngradeExpr) {
+            return exprToLabel(ts, ((DowngradeExpr)e).expr(), context);            
         }
         if (isFinalAccessExpr(ts, e)) {
             return ts.dynamicLabel(e.position(), exprToAccessPath(e, context));
@@ -164,8 +164,8 @@ public class JifUtil
         if (e instanceof Cast) {
             return exprToPrincipal(ts, ((Cast)e).expr(), context);            
         }
-        if (e instanceof DeclassifyExpr) {
-            return exprToPrincipal(ts, ((DeclassifyExpr)e).expr(), context);            
+        if (e instanceof DowngradeExpr) {
+            return exprToPrincipal(ts, ((DowngradeExpr)e).expr(), context);            
         }
         if (isFinalAccessExpr(ts, e)) {
             return ts.dynamicPrincipal(e.position(), exprToAccessPath(e, context));
