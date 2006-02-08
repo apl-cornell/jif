@@ -26,6 +26,7 @@ $atLeastOneTokenLines = 0;     # number of non-comment lines with at least one t
 $atLeastTwoTokenLines = 0; # number of non-comment lines with more than one token
 $blankLines = 0;    # number of blank lines (doesn't include comment lines)
 $declassifies = 0;  # number of declassify statements and expressions
+$endorses = 0;      # number of endorse statements and expressions
 $semicolons = 0;    # total number of semicolons
 $totalTokens = 0;   # total number of tokens
 #UNIMPLEMENTED:
@@ -38,33 +39,37 @@ $inMultilineComment = 0;
 # Define the tokens
 loadTokens();
 
+# patterns to recognise annotations
+$policy = "\w+|\*[\.\w]*|[\.\w]*:[\.\w]*(,[\.\w]*)*"; # needs some white space
+$label = 
+
 # read in each line of the file
 while ($line = <IN>) {
     $linesTotal++;
     $strippedComment = 0; # did we strip a comment off this line?
 
     if ($inMultilineComment) {
-	# scan forward until the comment ends, i.e., until line contains "*/"
-	while ($line && $line !~ /\*\//) { 
-	    $commentLines++;
-	    $line = <IN>;
-	    $linesTotal++;	    
-	}
-	$inMultilineComment = 0;
+        # scan forward until the comment ends, i.e., until line contains "*/"
+        while ($line && $line !~ /\*\//) { 
+            $commentLines++;
+            $line = <IN>;
+            $linesTotal++;            
+        }
+        $inMultilineComment = 0;
 
-	# cut off the comment, and process the rest of the line
-	$strippedComment = 1;
-	$line =~ s/^.*?\*\// /;   # leading comments " ... */" 
+        # cut off the comment, and process the rest of the line
+        $strippedComment = 1;
+        $line =~ s/^.*?\*\// /;   # leading comments " ... */" 
     }
     if (($line =~ /(\/\*)/) && ($line !~ /(\/\*).*\*\//)) {
-	# the line contains "/*" and doesn't contain "*/"
-	# so we are at the start of a multiline comment.
-	$inMultilineComment = 1;
+        # the line contains "/*" and doesn't contain "*/"
+        # so we are at the start of a multiline comment.
+        $inMultilineComment = 1;
 
-	# the comment will be stripped off and the start of the line processed.
+        # the comment will be stripped off and the start of the line processed.
     } 
 
-    # strip off any contained and trailing comment (should be done more elegantly)
+    # strip off any contained and trailing comment
     $strippedComment |= ($line =~ s/\/\*(.*?)\*\// /g);   # contained comments "/* ... */"
     $strippedComment |= ($line =~ s/(\/[\*\/]).*$//);  # trailing comments, "/* ... " or "// ... "
     
@@ -76,28 +81,35 @@ while ($line = <IN>) {
     # -----------------------------------------------
     # count the number of declassify tokens.
     while ($line =~ s/(^|\W)declassify($|\W)/$1 $2/) {
-	$declassifies++; 
-	$tokens++;	    
+        $declassifies++; 
+        $tokens++;            
+    }
+    
+    # -----------------------------------------------
+    # count the number of endorse tokens.
+    while ($line =~ s/(^|\W)endorse($|\W)/$1 $2/) {
+        $endorses++; 
+        $tokens++;            
     }
     
     # -----------------------------------------------
     # count the number of semicolons.
     while ($line =~ s/;/ /) {
-	$semicolons++; 
-	$tokens++;	    
+        $semicolons++; 
+        $tokens++;            
     }
 
     # go through list of tokens, and for each one, count and remove occurances
     # Would be way way quicker to go through the string, and remove based on what is in there...
     foreach $toke (@TOKENS) {
-	$tok = escapeToken($toke);
-	$tokens++ while ($line =~ s/$tok/ /);
+        $tok = escapeToken($toke);
+        $tokens++ while ($line =~ s/$tok/ /);
     }
 
-    foreach $toke (@KEYWORDS) {
-	$tok = escapeToken($toke);
-	$tokens++ while ($line =~ s/(^|\W)$tok($|\W)/$1 $2/);
-    }
+#    foreach $toke (@KEYWORDS) {
+#        $tok = escapeToken($toke);
+#        $tokens++ while ($line =~ s/(^|\W)$tok($|\W)/$1 $2/);
+#    }
 
     
     # -----------------------------------------------
@@ -137,25 +149,26 @@ Lines > 1 tokens : $atLeastTwoTokenLines
 Total tokens     : $totalTokens
 Semicolons       : $semicolons
 Declassify count : $declassifies
+Endorse count    : $endorses
 END
 
 
 sub escapeToken {
         my $tok = shift(@_);
 
-	# escape problematic characters
-	$tok =~ s/\+/\\\+/g;
-	$tok =~ s/\(/\\\(/g;
-	$tok =~ s/\)/\\\)/g;
-	$tok =~ s/\[/\\\[/g;
-	$tok =~ s/\]/\\\]/g;
-	$tok =~ s/\./\\\./g;
-	$tok =~ s/\?/\\\?/g;
-	$tok =~ s/\*/\\\*/g;
-	$tok =~ s/\^/\\\^/g;
-	$tok =~ s/\|/\\\|/g;
+        # escape problematic characters
+        $tok =~ s/\+/\\\+/g;
+        $tok =~ s/\(/\\\(/g;
+        $tok =~ s/\)/\\\)/g;
+        $tok =~ s/\[/\\\[/g;
+        $tok =~ s/\]/\\\]/g;
+        $tok =~ s/\./\\\./g;
+        $tok =~ s/\?/\\\?/g;
+        $tok =~ s/\*/\\\*/g;
+        $tok =~ s/\^/\\\^/g;
+        $tok =~ s/\|/\\\|/g;
 
-	return $tok;
+        return $tok;
     }
 
 
@@ -172,18 +185,18 @@ sub loadTokens {
     "void",  "volatile",  "while",  "true",  "false", "null",
 
     # Jif specifc keywords
-    "where", "actsfor", "actsFor", "declassify", "authority", "equiv", "label", "principal"
+    "where", "actsfor", "actsFor", "declassify", "endorse", "authority", "equiv", "label", "principal"
 
-	     );
+             );
 
 @TOKENS = (
 
-# separators
+    # separators
     "("   ,    ")"   ,    "{"   ,    "}"   , 
     "["   ,    "]"   ,    ";"   ,    ","   ,
     "."   ,
 
-# operators. Order is important, longer ones must go first
+    # operators. Order is important, longer ones must go first
     "<<=" ,    ">>=" ,    ">>>=",    
     "=="  ,    "<="  ,    ">="  ,    "!="  ,
     "&&"  ,    "||"  ,    "++"  ,    "--"  ,
@@ -194,6 +207,6 @@ sub loadTokens {
     "|="  ,    "^="  ,    "%="  ,    "="   ,
     ">"   ,    "<"   ,    "!"   ,    "~"   ,
     "?"   ,    ":"   
-	   
-	   );
+           
+    );
 }
