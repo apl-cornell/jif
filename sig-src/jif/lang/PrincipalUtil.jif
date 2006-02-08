@@ -11,14 +11,14 @@ public class PrincipalUtil {
     /**
      * Does the principal p act for the principal q? 
      */
-    public static native boolean{p;q} acts_for(Principal p, Principal q);
+    public static native boolean{p;q;q!:} acts_for(Principal p, Principal q);
 
     /**
      * Are the principals p and q equivalent to each other? That is,
      * does p act for q, and q act for p?
      * 
      */
-    public static boolean{p;q} equivalentTo(Principal p, Principal q) {
+    public static boolean{p;q;p!:;q!:} equivalentTo(Principal p, Principal q) {
         return acts_for(p, q) && acts_for(q, p);
     }
 
@@ -38,7 +38,7 @@ public class PrincipalUtil {
      * @param q
      * @return A delegates-chain between p and q, or null if non can be found.
      */
-    public static native ActsForProof findActsForProof(Principal p, Principal q);
+    public static native ActsForProof{p;q;q!:} findActsForProof(Principal p, Principal q);
 
     /**
      * Verify that the chain is a valid delegates-chain between p and q. That is,
@@ -46,7 +46,7 @@ public class PrincipalUtil {
      * p acts for q.
 
      */
-    public static native boolean verifyProof(ActsForProof{p;q} proof, 
+    public static native boolean verifyProof(ActsForProof{p;q;q!:} proof, 
                                              Principal p, Principal q);
     
     /**

@@ -6,7 +6,7 @@ package jif.lang;
  */
 public abstract class AbstractPrincipal implements Principal {
     private final String{this} name;
-    protected Principal{this:;*!:*}[]{this:;*!:*} superiors = null;
+    protected Principal{this:;this!:*}[]{this:;this!:*} superiors = null;
     
     protected AbstractPrincipal(String{this} name) {
         this.name = name;
@@ -16,11 +16,11 @@ public abstract class AbstractPrincipal implements Principal {
         return name;
     }
     
-    public boolean{this;p} delegatesTo(principal p) {
+    public boolean{this;p;this!:} delegatesTo(principal p) {
         return superiorsContains((Principal)p);
     }
     
-    public void addDelegatesTo{this:;*!:*}(principal{this} p) where caller (this) {
+    public void addDelegatesTo{this:;this!:*}(principal{this} p) where caller (this) {
         if (superiorsContains((Principal)p)) {
             return;
         }
@@ -31,7 +31,7 @@ public abstract class AbstractPrincipal implements Principal {
                 superiors[0] = (Principal)p;            
             }
             else {
-                Principal{this:;*!:*}[] old = superiors;
+                Principal{this:;this!:*}[] old = superiors;
                 superiors = new Principal[old.length+1];
                 for (int i = 0; i < old.length; i++) {
                     superiors[i] = old[i];
@@ -44,9 +44,9 @@ public abstract class AbstractPrincipal implements Principal {
         catch (ArrayIndexOutOfBoundsException impossible) {}
     }
     
-    protected boolean{this;p} superiorsContains(Principal p) where authority (this) {
+    protected boolean{this;p;this!:} superiorsContains(Principal p) where authority (this) {
         boolean result = false;
-        Principal{this:;*!:*}[] sprs = superiors;
+        Principal{this:;this!:*}[] sprs = superiors;
         for (int i = 0; sprs != null && i < sprs.length; i++) {
             try {
                 Principal pi = sprs[i];                        
@@ -57,10 +57,10 @@ public abstract class AbstractPrincipal implements Principal {
             }
             catch (ArrayIndexOutOfBoundsException impossible) {}
         }
-        return declassify(result, {this;p});
+        return declassify(result, {this;p;this!:});
     }
     
-    public boolean{authPrf; closure; lb; *lb; this} isAuthorized(Object authPrf, 
+    public boolean{authPrf; closure; lb; *lb; this; this!:} isAuthorized(Object authPrf, 
                                                                  Closure[this, lb] closure,
                                                                  label lb) where authority (this) {
         // The default is that this principal authorizes no closures.
@@ -68,34 +68,39 @@ public abstract class AbstractPrincipal implements Principal {
     }
     
     
-    public ActsForProof{this;q} findProofDownto(Principal q) {    
+    public ActsForProof findProofDownto(Principal q) {    
         // don't even try! We don't have any information
         // about who we can act for.
         return null;
     }
     
-    public ActsForProof{this;p} findProofUpto(Principal p) where authority (this) {
+    public ActsForProof{this;p;this!:;p!:} findProofUpto(Principal p) where authority (this) {
         // go through each superior s, and see if we can find a proof
         // from p to s.
         ActsForProof prf;
         
-        Principal{this:;*!:*}[]{this;*!:*} sprs = declassify(superiors, {this;*!:*});
-        
+        Principal{this:;this!:*}[]{this;this!:*} sprs = declassify(superiors, {this;this!:*});
+        ActsForProof{this;p;this!:;p!:} result = null;
         for (int i = 0; sprs != null && i < sprs.length; i++) {
             try {
-                Principal t = declassify(sprs[i], {this;*!:*});
-                Principal{this} s = endorse(t, {this});
+                final Principal s = declassify(sprs[i], {this;this!:*});
                 prf = PrincipalUtil.findActsForProof(p, s);
                 if (prf != null) {
                     // success!
                     // create a bigger proof 
-                    return new TransitiveProof(prf, s, new DelegatesProof(s, this));
+                    if (s actsfor this) {
+                        // always true, since s is in the delegates set.
+                        // we need it in order to get the right label for the
+                        // return value.
+                        result = new TransitiveProof(prf, s, new DelegatesProof(s, this));
+                        break;
+                    }
                 }
             }
             catch (ArrayIndexOutOfBoundsException impossible) {}
         }
         
-        return null;
+        return result;
     }
     
     public boolean{this;o} equals(Object o) {

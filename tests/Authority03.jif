@@ -37,9 +37,11 @@ class AddBobClosure[principal P] extends TestClosure[P, {}] {
     public Object{this} invoke{}() where caller (P) {
 	final Principal p = P;
 	if (p instanceof TestPrincipal) {
-	    final TestPrincipal tp = (TestPrincipal)p;
-	    if (out != null) out.println("Hi mum, from " + tp.name());
-	    tp.addDelegatesTo(Bob);
+            endorse ({p!:}) {
+                final TestPrincipal tp = endorse((TestPrincipal)p, {p!:});
+                tp.addDelegatesTo(Bob);
+                if (out != null) out.println("Hi mum, from " + tp.name());
+            }
 	}
 	return null;
     }

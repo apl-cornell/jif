@@ -1,13 +1,17 @@
 package jif.extension;
 
+import java.util.Collections;
+
 import jif.ast.ActsFor;
 import jif.ast.PrincipalNode;
 import jif.translate.ToJavaExt;
 import jif.types.*;
+import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.Node;
 import polyglot.ast.Stmt;
 import polyglot.types.SemanticException;
+import polyglot.util.Position;
 
 /** The Jif extension of the <code>ActsFor</code> node. 
  */
@@ -43,7 +47,16 @@ public class JifActsForExt extends JifStmtExt_c
 
 	
         A = (JifContext) A.pushBlock();
-        A.setPc(lc.upperBound(X2.N(), X2.NV()));
+        Label newPC = lc.upperBound(X2.N(), X2.NV());
+        // need to join the result with the integrity of the granter.
+        // see the Jif signature for PrincipalUtil.actsfor(actor,granter)
+        Label resultLabel = ts.pairLabel(Position.COMPILER_GENERATED,
+                                         ts.bottomConfPolicy(Position.COMPILER_GENERATED),
+                                         ts.writerPolicy(Position.COMPILER_GENERATED,
+                                                         granter.principal(),
+                                                         Collections.EMPTY_SET));
+        newPC = lc.upperBound(newPC, resultLabel);
+        A.setPc(newPC);
         if (af.kind() == ActsFor.EQUIV) {
             A.addEquiv(actor.principal(), granter.principal());            
         }
