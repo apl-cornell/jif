@@ -6,6 +6,6 @@ class D extends C {
     int{Alice:} secret;
     int{} m() where caller(Alice) // ok
     { 
-	return declassify(secret, {this}); 
+	return declassify(secret, {this;_!:_}); 
     }
 }

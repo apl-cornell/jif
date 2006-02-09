@@ -4,7 +4,7 @@ import jif.runtime.Runtime;
 public class PrincipalUtil01
 {
     public PrincipalUtil01() {}
-    public static void main{}(principal{} pp, String[]{} args)
+    public static void main{*!:*}(principal{} pp, String[]{} args)
         throws (SecurityException)
     {
         final principal nullP = PrincipalUtil.nullPrincipal();
@@ -34,7 +34,7 @@ class StupidPrincipal extends AbstractPrincipal {
     public StupidPrincipal(String{this} name) {
         super(name);
     }
-    public StupidPrincipal{this:}(String{this} name, principal{this} del) where authority (this) {
+    public StupidPrincipal{this:;this!:}(String{this} name, principal{this} del) where authority (this) {
         super(name);
         addDelegatesTo(del);
     }

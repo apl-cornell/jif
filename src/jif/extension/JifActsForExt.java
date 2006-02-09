@@ -55,7 +55,7 @@ public class JifActsForExt extends JifStmtExt_c
                                          ts.writerPolicy(Position.COMPILER_GENERATED,
                                                          granter.principal(),
                                                          Collections.EMPTY_SET));
-        newPC = lc.upperBound(newPC, resultLabel);
+//        newPC = lc.upperBound(newPC, resultLabel);
         A.setPc(newPC);
         if (af.kind() == ActsFor.EQUIV) {
             A.addEquiv(actor.principal(), granter.principal());            
