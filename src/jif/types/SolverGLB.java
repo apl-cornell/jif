@@ -142,9 +142,11 @@ public class SolverGLB extends Solver {
             }
 
             // if we fall through to here, then the search failed.
-            throw new SemanticException("Search for refinement to "
-                    + "constraint " + eqn + " failed.", eqn.position());
-
+            if (shouldReport(1)) {
+                report(1, "Search for refinement to constraint " + eqn + " failed.");
+            }
+            reportError(eqn.constraint(), eqn.variables());
+            
         }
 
     }
