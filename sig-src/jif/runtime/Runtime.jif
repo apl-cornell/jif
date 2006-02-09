@@ -22,7 +22,6 @@ public class Runtime[principal P]
     public native PrintStream[{P:;_!:_}]{P:} err();
     public native PrintStream[{P:;_!:_}]{P:} out();
     public native InputStream[{P:;P!:}]{P:} in();
-    public native InputStream[{*L}]{P:} in(label L);
     
     // current time, but only to accuracy of the day.
     public static native int{*!:*} currentYear();
