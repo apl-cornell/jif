@@ -3,6 +3,7 @@ package jif.types;
 import java.util.*;
 
 import jif.JifOptions;
+import jif.Topics;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.*;
 import polyglot.main.Options;
@@ -69,7 +70,7 @@ public abstract class Solver {
 
     private Map traces; //Map from variables to their histories of refining
 
-    private static Collection topics = CollectionUtil.list("solver", "jif");
+    private static Collection topics = CollectionUtil.list(Topics.jif, Topics.solver);
 
     /**
      * This boolean is used to turn on or off whether the strongly connected

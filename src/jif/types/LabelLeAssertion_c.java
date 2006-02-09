@@ -39,4 +39,8 @@ public class LabelLeAssertion_c extends TypeObject_c implements LabelLeAssertion
     public boolean isCanonical() {
 	return true;
     }
+    
+    public String toString() {
+        return lhs + " assert<= " + rhs;
+    }
 }

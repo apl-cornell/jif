@@ -2,11 +2,12 @@ package jif.types.hierarchy;
 
 import java.util.*;
 
+import jif.Topics;
 import jif.types.*;
 import jif.types.label.*;
 import jif.types.principal.Principal;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
+import polyglot.main.Report;
+import polyglot.util.*;
 
 /**
  * The wrapper of a set of assumptions that can be used to decide
@@ -24,7 +25,12 @@ public class LabelEnv_c implements LabelEnv
      * Do any of the assertions have variables in them?
      */
     private boolean hasVariables;
-    
+
+    /**
+     * Topics to report
+     */
+    private static Collection topics = CollectionUtil.list(Topics.jif, Topics.labelEnv);
+
     public LabelEnv_c(JifTypeSystem ts, boolean useCache) {
         this(ts, new PrincipalHierarchy(), new LinkedList(), "", false, useCache);
     }
@@ -127,6 +133,9 @@ public class LabelEnv_c implements LabelEnv
     }
     
     public boolean leq(Label L1, Label L2) { 
+        if (Report.should_report(topics, 1))
+            Report.report(1, "Testing " + L1 + " <= " + L2);
+
         return leq(L1.simplify(), L2.simplify(), 
                    new SearchState_c(new AssertionUseCount(), new LinkedHashSet()));
     }
@@ -183,6 +192,9 @@ public class LabelEnv_c implements LabelEnv
     
         Boolean b = (Boolean)cache.get(g);
         if (b != null) {
+            if (Report.should_report(topics, 3))
+                Report.report(3, "Found cache value for " + L1 + " <= " + L2 
+                              + " : " + b.booleanValue());
             return b.booleanValue();
         }        
         boolean result = leqImpl(L1, L2, state);
@@ -244,6 +256,8 @@ public class LabelEnv_c implements LabelEnv
         LeqGoal newGoal = new LeqGoal(L1, L2);
         if (currentGoals.contains(newGoal)) {
             // already have this subgoal on the stack
+            if (Report.should_report(topics, 3))
+                Report.report(3, "Goal " + L1 + " <= " + L2 + " already on goal stack");
             return false;
         }
         currentGoals = new LinkedHashSet(currentGoals);
@@ -445,6 +459,8 @@ public class LabelEnv_c implements LabelEnv
     private boolean leqApplyAssertions(Label L1, Label L2, SearchState_c state, boolean beSmart) {
         AssertionUseCount auc = state.auc;
         if (!state.useAssertions || auc.size() >= ASSERTION_TOTAL_BOUND) return false;
+        if (Report.should_report(topics, 2))
+            Report.report(2, "Applying assertions for " + L1 + " <= " + L2);
 
         for (Iterator i = labelAssertions.iterator(); i.hasNext();) { 
             LabelLeAssertion c = (LabelLeAssertion)i.next();
@@ -464,12 +480,18 @@ public class LabelEnv_c implements LabelEnv
             if (cRHS.hasVariables()) { 
                 cRHS = this.solver.applyBoundsTo(c.rhs());
             }
+            if (Report.should_report(topics, 4))
+                Report.report(4, "Considering assertion " + c + " for " + L1 + " <= " + L2);
+
+            System.err.println(L1.equals(cLHS) + "  " + L2.equals(cRHS));
             if (beSmart) {
                 // only use assertions that match one or the other of our labels
                 if (!L1.equals(cLHS) && !L2.equals(cRHS)) {
                     continue;
                 }
             }
+            if (Report.should_report(topics, 3))
+                Report.report(3, "Trying assertion " + c + " for " + L1 + " <= " + L2);
             if (leq(L1, cLHS, newState) && 
                     leq(cRHS, L2, newState)) {
                 return true;
