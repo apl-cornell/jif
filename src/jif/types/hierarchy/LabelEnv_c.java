@@ -483,7 +483,6 @@ public class LabelEnv_c implements LabelEnv
             if (Report.should_report(topics, 4))
                 Report.report(4, "Considering assertion " + c + " for " + L1 + " <= " + L2);
 
-            System.err.println(L1.equals(cLHS) + "  " + L2.equals(cRHS));
             if (beSmart) {
                 // only use assertions that match one or the other of our labels
                 if (!L1.equals(cLHS) && !L2.equals(cRHS)) {
