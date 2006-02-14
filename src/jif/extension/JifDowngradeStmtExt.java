@@ -69,6 +69,14 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
 	A.setPc(L);
 	A.setEntryPC(L);
 
+        // add a restriction on the "this" label.
+        if (!A.currentCode().flags().isStatic())  {
+            // for non-static methods, we know the this label
+            // must be bounded above by the start label
+            JifClassType jct = (JifClassType)A.currentClass();
+            A.addAssertionLE(jct.thisLabel(), L);       
+        }
+
 	Stmt body = (Stmt) lc.context(A).labelCheck(ds.body());
 	PathMap Xs = X(body);
 
