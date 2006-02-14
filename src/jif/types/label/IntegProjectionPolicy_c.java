@@ -104,7 +104,13 @@ public class IntegProjectionPolicy_c extends Policy_c implements IntegPolicy {
     public boolean isBottom() {
         return isBottomIntegrity();
     }
-    public IntegPolicy meet(IntegPolicy p) {
+    public boolean hasWritersToReaders() {
+        return label.hasWritersToReaders();        
+    }    
+    public boolean hasVariables() {
+        return label.hasVariables();        
+    }    
+   public IntegPolicy meet(IntegPolicy p) {
         JifTypeSystem ts = (JifTypeSystem)this.ts;
         return ts.meet(this, p);
     }

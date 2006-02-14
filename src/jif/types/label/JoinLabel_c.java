@@ -200,7 +200,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         for (Iterator i = comps.iterator(); i.hasNext(); ) {
             Label ci = ((Label) i.next()).simplify();
             
-            if (ci.hasVariables()) {
+            if (ci.hasVariables() || ci.hasWritersToReaders()) {
                 needed.add(ci);
             }
             else {
@@ -209,7 +209,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
                 for (Iterator j = needed.iterator(); j.hasNext(); ) {
                     Label cj = (Label) j.next();
                     
-                    if (cj.hasVariables()) {
+                    if (cj.hasVariables() || cj.hasWritersToReaders()) {
                         continue;
                     }
 
@@ -327,6 +327,14 @@ public class JoinLabel_c extends Label_c implements JoinLabel
             s.addAll(ci.variableComponents());
         }
         return s;
+    }
+    
+    public boolean hasWritersToReaders() {
+        for (Iterator iter = joinComponents().iterator(); iter.hasNext();) {
+            Label ci = (Label)iter.next();
+            if (ci.hasWritersToReaders()) return true;
+        }
+        return false;        
     }
 
     public PathMap labelCheck(JifContext A, LabelChecker lc) {

@@ -115,21 +115,30 @@ public abstract class JoinPolicy_c extends Policy_c {
             
             boolean subsumed = false;
             
-            for (Iterator j = needed.iterator(); j.hasNext(); ) {
-                Policy cj = (Policy) j.next();
-                
-                if (jts.leq(ci, cj)) {
-                    subsumed = true;
-                    break;
-                }
-                
-                if (jts.leq(cj, ci)) { 
-                    j.remove();
-                }
-            }
-                
-            if (! subsumed)
+            if (ci.hasVariables() || ci.hasWritersToReaders()) {
                 needed.add(ci);
+            }
+            else {
+                for (Iterator j = needed.iterator(); j.hasNext(); ) {
+                    Policy cj = (Policy) j.next();
+                    
+                    if (cj.hasVariables() || cj.hasWritersToReaders()) {
+                        continue;
+                    }
+                    
+                    if (jts.leq(ci, cj)) {
+                        subsumed = true;
+                        break;
+                    }
+                    
+                    if (jts.leq(cj, ci)) { 
+                        j.remove();
+                    }
+                }
+                
+                if (! subsumed)
+                    needed.add(ci);
+            }
         }
         
         if (needed.equals(joinComponents)) {
@@ -197,6 +206,22 @@ public abstract class JoinPolicy_c extends Policy_c {
         Policy newJoinPolicy = constructJoinPolicy(flatten(s), position);
         return substitution.substPolicy(newJoinPolicy).simplify();
     }
+    
+    public boolean hasWritersToReaders() {
+        for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
+            Policy c = (Policy) i.next();
+            if (c.hasWritersToReaders()) return true;
+        }
+        return false;
+    }    
+
+    public boolean hasVariables() {
+        for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
+            Policy c = (Policy) i.next();
+            if (c.hasVariables()) return true;
+        }
+        return false;
+    }    
 
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();

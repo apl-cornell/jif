@@ -2,6 +2,8 @@ package jif.types.label;
 
 import java.util.*;
 
+import jif.ExtensionInfo;
+import jif.Topics;
 import jif.translate.CannotLabelToJavaExpr_c;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
@@ -15,7 +17,7 @@ import polyglot.util.Position;
 public class WritersToReadersLabel_c extends Label_c implements WritersToReadersLabel {
     final Label label;
     public WritersToReadersLabel_c(Label label, JifTypeSystem ts, Position pos) {
-        super(ts, pos, new CannotLabelToJavaExpr_c()); 
+        super(ts, pos, new CannotLabelToJavaExpr_c());
         this.label = label;
         setDescription("converts the writers of " + label
                        + " into readers");
@@ -79,6 +81,10 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
         return substitution.substLabel(lbl);
     }
     
+    public boolean hasWritersToReaders() {
+        return true;        
+    }
+    
     
     public Label transform(LabelEnv env) {
         return transform(env, label(), new HashSet());
@@ -91,7 +97,11 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
         if (label instanceof PairLabel) {
             PairLabel pl = (PairLabel)label;   
             ConfPolicy newCP = transformIntegToCong(pl.integPolicy());
-            return ts.pairLabel(pl.position(), newCP, ts.bottomIntegPolicy(pl.position()));
+            Label result = ts.pairLabel(pl.position(), newCP, ts.bottomIntegPolicy(pl.position()));
+            if (Report.should_report(Topics.jif, 3)) { 
+                Report.report(3, "Transformed " + label + " to " + result);
+            }
+            return result;
         }
         else if (label instanceof JoinLabel) {
             JoinLabel L = (JoinLabel)label;
@@ -100,6 +110,9 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
             for (Iterator iter = L.joinComponents().iterator(); iter.hasNext();) {
                 Label c = (Label)iter.next();
                 result = ts.meet(result, transform(env, c, visited));
+            }
+            if (Report.should_report(Topics.jif, 3)) { 
+                Report.report(3, "Transformed " + label + " to " + result);
             }
             return result;
         }
@@ -134,8 +147,20 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
             ThisLabel L = (ThisLabel)label;
 //            Label thisUpperBound = A.entryPC();
 //            return transform(env, thisUpperBound, visited, true);
-            return transform(env, env.findUpperBound(L), visited);            
-        }    
+            Label thisUpperBound = env.findUpperBound(L);
+            Label result = transform(env, thisUpperBound, visited);  
+            if (Report.should_report(Topics.jif, 3)) { 
+                Report.report(3, "Transformed " + label + " with ub " + 
+                              thisUpperBound + " in env " + env + 
+                              " to " + result);
+            }
+            return result;
+
+        }  
+        else if (label instanceof VarLabel_c) {
+            // cant do anything.
+            return ts.writersToReadersLabel(label.position(), label);
+        }
         else {
             throw new InternalCompilerError("WritersToReaders undefined " +
                         "for " + label);

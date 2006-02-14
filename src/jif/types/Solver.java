@@ -1,5 +1,6 @@
 package jif.types;
 
+import java.io.IOException;
 import java.util.*;
 
 import jif.JifOptions;
@@ -145,23 +146,9 @@ public abstract class Solver {
     public Label applyBoundsTo(Label L) {
         return bounds.applyTo(L);
     }
-
+    
     protected Label triggerTransforms(Label label, final LabelEnv env) {
-        LabelSubstitution subst = new LabelSubstitution() {
-            public Label substLabel(Label L) throws SemanticException {
-                if (L instanceof WritersToReadersLabel) {
-                    return ((WritersToReadersLabel)L).transform(env);
-                }
-                return L;
-            }            
-        };
-        
-        try {
-            return label.subst(subst);
-        }
-        catch (SemanticException e) {
-            throw new InternalCompilerError("Unexpected SemanticException", e);
-        }
+        return env.triggerTransforms(label);
     }
     
     protected List getQueue() {
@@ -510,7 +497,7 @@ public abstract class Solver {
             // Check to see if it is currently satisfiable.
             if (!eqn.env().leq(lhsBound, rhsBound)) {
                 //if (!dynCheck(lhsBound, rhsBound, eqn.env())) {
-                reportError(eqn.constraint(), eqn.variables());
+                reportError(eqn.constraint(), eqn.variableComponents());
                 //}
             }
         }
@@ -560,7 +547,7 @@ public abstract class Solver {
     protected final void inc_counter() {
         constraint_counter++;
         if (constraint_counter == stop_constraint) {
-            System.err.println("Halting at constraint " + stop_constraint);
+//            System.err.println("Halting at constraint " + stop_constraint);
             throw new RuntimeException("Halting at constraint "
                     + stop_constraint);
         }

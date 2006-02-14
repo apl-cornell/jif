@@ -41,8 +41,16 @@ public abstract class Label_c extends TypeObject_c implements Label {
         this.description = d;
     }
 
+    public boolean hasVariableComponents() {
+        return !variableComponents().isEmpty();
+    }
+
     public final boolean hasVariables() {
         return !variables().isEmpty();
+    }
+
+    public boolean hasWritersToReaders() {
+        return false;
     }
 
     public final Set variables() {
@@ -192,7 +200,7 @@ public abstract class Label_c extends TypeObject_c implements Label {
     public Set variableComponents() {
         return Collections.EMPTY_SET;
     }
-    
+
     /**
      * This class is used to implement
      * {@link Label#variables() Label.variables()}. It constructs a set of
@@ -204,10 +212,10 @@ public abstract class Label_c extends TypeObject_c implements Label {
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof VarLabel) {
                 variables.add(L);
-            }
+    }
             return L;
         }
-
+    
     }
-
+    
 }

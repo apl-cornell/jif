@@ -135,10 +135,10 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
         
         
         JifTypeSystem jts = lc.typeSystem();
-        Label pcInteg = jts.join(A.pc(),
+        Label pcInteg = lc.upperBound(A.pc(),
                                  jts.pairLabel(pos,
                                                jts.topConfPolicy(pos),
-                                               jts.bottomIntegPolicy(pos)));
+                                               jts.bottomIntegPolicy(pos)));        
         
         lc.constrain(new LabelConstraint(new NamedLabel("endorse_from_label", labelFrom).
                                                   meet(lc, "pc_integrity", pcInteg), 

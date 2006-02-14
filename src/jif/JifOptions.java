@@ -19,7 +19,7 @@ public class JifOptions extends Options {
     /**
      * Should the checking for the robustness condition be disabled?
      */
-    public boolean noRobustness = true;
+    public boolean noRobustness;
 
     
      /**
@@ -58,6 +58,7 @@ public class JifOptions extends Options {
      */
     public JifOptions(ExtensionInfo extension) {
         super(extension);
+        setDefaultValues();
     }
 
     /**
@@ -67,7 +68,7 @@ public class JifOptions extends Options {
         super.setDefaultValues();
         solveGlobally = false;
         explainErrors = false;
-        noRobustness = false;
+        noRobustness = true;
     }
 
     /**

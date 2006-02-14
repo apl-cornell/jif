@@ -145,14 +145,21 @@ public interface Label extends Param {
     Label normalize();
 
     /**
-     * Does the label contain any variables, that is, labels of type VarLabel?
+     * Does the label contain any writersToReaders constructs?
      */
-    boolean hasVariables();
+    boolean hasWritersToReaders();
+    
+    /**
+     * Does the label contain any variables as components? This does not include variables
+     * that are in bounds of arg labels.
+     */
+    boolean hasVariableComponents();
 
     /**
-     * The set of variables that this label contains, i.e., labels of type VarLabel
+     * Does the label contain any variables at all? This includes variables
+     * that are in bounds of arg labels.
      */
-    Set variables();
+    boolean hasVariables();
 
     /**
      * The set of variables that this label contains as components. This

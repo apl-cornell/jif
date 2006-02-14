@@ -7,6 +7,7 @@ import jif.types.*;
 import jif.types.label.*;
 import jif.types.principal.Principal;
 import polyglot.main.Report;
+import polyglot.types.SemanticException;
 import polyglot.util.*;
 
 /**
@@ -135,8 +136,8 @@ public class LabelEnv_c implements LabelEnv
     public boolean leq(Label L1, Label L2) { 
         if (Report.should_report(topics, 1))
             Report.report(1, "Testing " + L1 + " <= " + L2);
-
-        return leq(L1.simplify(), L2.simplify(), 
+        
+        return leq(L1, L2, 
                    new SearchState_c(new AssertionUseCount(), new LinkedHashSet()));
     }
 
@@ -183,7 +184,12 @@ public class LabelEnv_c implements LabelEnv
         if (!useCache || 
                 !((SearchState_c)state).useAssertions || 
                 this.hasVariables()) {
-            return leqImpl(L1.simplify(), L2.simplify(), state);
+            if (Report.should_report(topics, 3))
+                Report.report(3, "Not using cache for " + L1 + " <= " + L2 + 
+                              " : useCache = " + useCache + 
+                              "; state.useAssertions = " +((SearchState_c)state).useAssertions + 
+                              "; this.hasVariables() = " + this.hasVariables());
+            return leqImpl(L1, L2, state);
         }
 
         // only use the cache if we are using assertions, and there are no
@@ -235,7 +241,22 @@ public class LabelEnv_c implements LabelEnv
         L1 = L1.normalize();
         L2 = L2.normalize();
 
+        if (L1 instanceof WritersToReadersLabel) {
+            Label tL1 = triggerTransforms(L1).normalize();
+            if (Report.should_report(topics, 3))
+                Report.report(3, "Transforming " + L1 + " to " + tL1);
+            if (!L1.equals(tL1)) return leq(tL1, L2, state); 
+        }
+        if (L2 instanceof WritersToReadersLabel) {
+            Label tL2 = triggerTransforms(L2).normalize(); 
+            if (Report.should_report(topics, 3))
+                Report.report(3, "Transforming " + L2 + " to " + tL2);
+            if (!L2.equals(tL2)) return leq(L1, tL2, state); 
+        }
+
         if (! L1.isComparable() || ! L2.isComparable()) {
+            if (Report.should_report(topics, 3))
+                Report.report(3, "Goal " + L1 + " <= " + L2 + " already on goal stack");
             throw new InternalCompilerError("Cannot compare " + L1 +
                                             " with " + L2 + ".");
         }
@@ -307,11 +328,11 @@ public class LabelEnv_c implements LabelEnv
             return true;
         }
         
-        boolean result = false;
         if (L1 instanceof ArgLabel) {
             ArgLabel al = (ArgLabel)L1;
             // recurse on upper bound.
-            result = leq(al.upperBound(), L2, state);
+            if (leq(al.upperBound(), L2, state))
+                return true;
         }
         
         if (L1 instanceof MeetLabel || L1 instanceof JoinLabel ||
@@ -328,7 +349,7 @@ public class LabelEnv_c implements LabelEnv
         }
         
         // try to use assertions
-        return result || leqApplyAssertions(L1, L2, (SearchState_c)state, true);
+        return leqApplyAssertions(L1, L2, (SearchState_c)state, true);
         
     }
     
@@ -607,6 +628,8 @@ public class LabelEnv_c implements LabelEnv
                 Label comp = (Label)iter.next();
                 ts.join(ret, this.findUpperBound(comp));
             }
+            if (Report.should_report(topics, 4))
+                Report.report(4, "Using " + ret + " as upper bound for " + L);
             return ret;
         }
         if (L instanceof MeetLabel) {
@@ -616,6 +639,8 @@ public class LabelEnv_c implements LabelEnv
                 Label comp = (Label)iter.next();
                 ts.meet(ret, this.findUpperBound(comp));
             }
+            if (Report.should_report(topics, 4))
+                Report.report(4, "Using " + ret + " as upper bound for " + L);
             return ret;
         }
         // L is a pair label.
@@ -634,10 +659,14 @@ public class LabelEnv_c implements LabelEnv
                 cRHS = this.solver.applyBoundsTo(c.rhs());
             }
             if (L.equals(cLHS)) {
+                if (Report.should_report(topics, 4))
+                    Report.report(4, "Using " + cRHS + " as upper bound for " + L);
                 return cRHS;
             }
         }
         // assertions didn't help
+        if (Report.should_report(topics, 4))
+            Report.report(4, "Using top as upper bound for " + L);
         return ts.topLabel();
         
                 
@@ -727,6 +756,31 @@ public class LabelEnv_c implements LabelEnv
         
         return defns;
     }   
+    
+    /**
+     * Trigger the transformation of WritersToReaders labels. Not guaranteed
+     * to remove all writersToReaders labels. 
+     * @param label
+     * @param env
+     * @return
+     */
+    public Label triggerTransforms(Label label) {
+        LabelSubstitution subst = new LabelSubstitution() {
+            public Label substLabel(Label L) throws SemanticException {
+                if (L instanceof WritersToReadersLabel) {
+                    return ((WritersToReadersLabel)L).transform(LabelEnv_c.this);
+                }
+                return L;
+            }            
+        };
+        
+        try {
+            return label.subst(subst);
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected SemanticException", e);
+        }
+    }
     
     /**
      * Class used to keep track of how many times each constraint has been used 

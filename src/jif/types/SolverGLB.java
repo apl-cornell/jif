@@ -43,17 +43,17 @@ public class SolverGLB extends Solver {
     protected void addDependencies(Equation eqn) {
         if (shouldReport(5)) {
             report(5, "Equation " + eqn + " depends on variables: "
-                    + eqn.lhs().variables());
+                    + eqn.lhs().variableComponents());
         }
 
         // Build dependency maps for this equation.
-        for (Iterator j = eqn.rhs().variables().iterator(); j.hasNext();) {
+        for (Iterator j = eqn.rhs().variableComponents().iterator(); j.hasNext();) {
             VarLabel v = (VarLabel)j.next();
 
             // If this equation is examined, then the bound for v may be changed
             addDependency(eqn, v);
         }
-        for (Iterator j = eqn.lhs().variables().iterator(); j.hasNext();) {
+        for (Iterator j = eqn.lhs().variableComponents().iterator(); j.hasNext();) {
             VarLabel v = (VarLabel)j.next();
 
             // If the bound for v is changed (upward), then we may need to
@@ -87,8 +87,8 @@ public class SolverGLB extends Solver {
         // we will need to try all possible ways of satisfying this equation,
         // trying the simple ones (i.e. var labels) first.
 
-        if (!eqn.rhs().hasVariables()) {
-            // the RHS has no variables in it, it has nothing for us to
+        if (!eqn.rhs().hasVariableComponents()) {
+            // the RHS has no variable components in it, it has nothing for us to
             // modify the bound of. It had better hold...
 
             // L <= L', where L' cannot contain variables. Failure will throw
@@ -145,7 +145,7 @@ public class SolverGLB extends Solver {
             if (shouldReport(1)) {
                 report(1, "Search for refinement to constraint " + eqn + " failed.");
             }
-            reportError(eqn.constraint(), eqn.variables());
+            reportError(eqn.constraint(), eqn.variableComponents());
             
         }
 
@@ -267,7 +267,7 @@ public class SolverGLB extends Solver {
      * @throws InternalCompilerError if eqn contains variables
      */
     protected void checkEquation(Equation eqn) throws SemanticException {
-        if (eqn.rhs().hasVariables()) {
+        if (eqn.rhs().hasVariableComponents()) {
             throw new InternalCompilerError("RHS of equation " + eqn
                     + " should not contain variables.");
         }
@@ -275,7 +275,7 @@ public class SolverGLB extends Solver {
         // This equation must have been woken up. We need to
         // check whether it is solvable given the current variables.
 
-        Label rhsLabel = eqn.rhs();
+        Label rhsLabel = triggerTransforms(bounds().applyTo(eqn.rhs()), eqn.env());
         if (shouldReport(4)) report(4, "RHS = " + rhsLabel);
 
         Label lhsBound = triggerTransforms(bounds().applyTo(eqn.lhs()), eqn.env());
@@ -287,7 +287,7 @@ public class SolverGLB extends Solver {
             //            if (dynCheck(lhsBound, rhsLabel, eqn.env())) return;
 
             // This equation isn't satisfiable.
-            reportError(eqn.constraint(), eqn.variables());
+            reportError(eqn.constraint(), eqn.variableComponents());
         }
     }
 
@@ -295,11 +295,11 @@ public class SolverGLB extends Solver {
      * Find a contradicting equation.
      */
     protected Equation findContradictiveEqn(LabelConstraint c) {
-        if (c.lhs().variables().size() == 1) {
+        if (c.lhs().variableComponents().size() == 1) {
             // The LHS is has a single VarLabel, so we may be able to find
             // an equation that contradicts this one.
-            VarLabel v = (VarLabel)c.lhs().variables().iterator().next();
-            return findTrace(v, triggerTransforms(bounds().applyTo(c.rhs()), c.env()), false);
+            VarLabel v = (VarLabel)c.lhs().variableComponents().iterator().next();
+            return findTrace(v, bounds().applyTo(c.rhs()), false);
         }
         // TODO: could try some other ways to find contradictive
         // equation, or could produce a different error message.

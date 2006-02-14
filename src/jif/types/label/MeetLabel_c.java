@@ -214,7 +214,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         for (Iterator i = comps.iterator(); i.hasNext(); ) {
             Label ci = ((Label) i.next()).simplify();
             
-            if (ci.hasVariables()) {
+            if (ci.hasVariables() || ci.hasWritersToReaders()) {
                 needed.add(ci);
             }
             else {
@@ -223,7 +223,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
                 for (Iterator j = needed.iterator(); j.hasNext(); ) {
                     Label cj = (Label) j.next();
                     
-                    if (cj.hasVariables()) {
+                    if (cj.hasVariables() || cj.hasWritersToReaders()) {
                         continue;
                     }
 
@@ -332,6 +332,15 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         return substitution.substLabel(newmeetLabel).simplify();
     }
 
+    public boolean hasWritersToReaders() {
+        for (Iterator iter = meetComponents().iterator(); iter.hasNext();) {
+            Label ci = (Label)iter.next();
+            if (ci.hasWritersToReaders()) return true;
+        }
+        return false;        
+    }
+
+    
     public Set variableComponents() {
         Set s = new LinkedHashSet();
         for (Iterator iter = meetComponents().iterator(); iter.hasNext();) {

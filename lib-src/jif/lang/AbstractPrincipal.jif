@@ -6,7 +6,7 @@ package jif.lang;
  */
 public abstract class AbstractPrincipal implements Principal {
     private final String{this} name;
-    protected Principal{this:;this!:*}[]{this:;this!:*} superiors = null;
+    protected Principal{this!:*}[]{this!:*} superiors = null;
     
     protected AbstractPrincipal(String{this} name) {
         this.name = name;
@@ -25,28 +25,35 @@ public abstract class AbstractPrincipal implements Principal {
             return;
         }
         // need to add p to the superiors.
-        try {
-            if (superiors == null) {
-                superiors = new Principal[1];
-                superiors[0] = (Principal)p;            
-            }
-            else {
-                Principal{this:;this!:*}[] old = superiors;
-                superiors = new Principal[old.length+1];
-                for (int i = 0; i < old.length; i++) {
-                    superiors[i] = old[i];
+        declassify ({this!:}) {
+//            Principal{this!:*}[]{this!:*} sprs = declassify(superiors, {this!:});
+//            Principal{this!:*}[]{this!:*} sprs = superiors;
+            try {
+                if (superiors == null) {
+                    superiors = new Principal[1];
+                    superiors[0] = (Principal)p;            
+//                    sprs[0] = (Principal)declassify(p, {this!:});            
                 }
-                superiors[old.length] = (Principal)p;            
+                else {
+                    Principal{this!:*}[] old = superiors;
+                    superiors = new Principal[old.length+1];
+                    for (int i = 0; i < old.length; i++) {
+                        superiors[i] = old[i];
+                    }
+//                    sprs[old.length] = (Principal)declassify(p, {this!:});            
+                    superiors[old.length] = (Principal)p;            
+                }
             }
+            catch (NullPointerException impossible) {}
+            catch (ArrayStoreException impossible) {}
+            catch (ArrayIndexOutOfBoundsException impossible) {}
+            //superiors = sprs;
         }
-        catch (NullPointerException impossible) {}
-        catch (ArrayStoreException impossible) {}
-        catch (ArrayIndexOutOfBoundsException impossible) {}
     }
     
     protected boolean{this;p;this!:} superiorsContains(Principal p) where authority (this) {
-        boolean result = false;
-        Principal{this:;this!:*}[] sprs = superiors;
+        boolean{this;p;this!:} result = false;
+        Principal{this!:*}[] sprs = superiors;
         for (int i = 0; sprs != null && i < sprs.length; i++) {
             try {
                 Principal pi = sprs[i];                        
@@ -57,7 +64,7 @@ public abstract class AbstractPrincipal implements Principal {
             }
             catch (ArrayIndexOutOfBoundsException impossible) {}
         }
-        return declassify(result, {this;p;this!:});
+        return result;
     }
     
     public boolean{authPrf; closure; lb; *lb; this; this!:} isAuthorized(Object authPrf, 
@@ -74,16 +81,16 @@ public abstract class AbstractPrincipal implements Principal {
         return null;
     }
     
-    public ActsForProof{this;p;this!:;p!:} findProofUpto(Principal p) where authority (this) {
+    public ActsForProof{this;p;this!:;p!:} findProofUpto{this!:}(Principal p) where authority (this) {
         // go through each superior s, and see if we can find a proof
         // from p to s.
         ActsForProof prf;
         
-        Principal{this:;this!:*}[]{this;this!:*} sprs = declassify(superiors, {this;this!:*});
+        Principal{this!:*}[] sprs = superiors;
         ActsForProof{this;p;this!:;p!:} result = null;
         for (int i = 0; sprs != null && i < sprs.length; i++) {
             try {
-                final Principal s = declassify(sprs[i], {this;this!:*});
+                final Principal s = sprs[i];
                 prf = PrincipalUtil.findActsForProof(p, s);
                 if (prf != null) {
                     // success!

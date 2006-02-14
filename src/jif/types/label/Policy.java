@@ -22,6 +22,9 @@ public interface Policy extends TypeObject {
     boolean isRuntimeRepresentable();
     boolean isTop();
     boolean isBottom();
+    boolean hasVariables();
+    boolean hasWritersToReaders();
+    
     
     List throwTypes(TypeSystem ts);
     Policy subst(LabelSubstitution substitution) throws SemanticException;

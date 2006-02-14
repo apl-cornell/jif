@@ -55,13 +55,13 @@ public class Equation
     public Position position() {return constraint().position();}
 
     /**
-     * Return a <code>List</code> of variables that occur in either the 
+     * Return a <code>List</code> of variable components that occur in either the 
      * left or right hand side.
      */
-    public List variables() {
+    public List variableComponents() {
 	List l = new LinkedList();
-	l.addAll(lhs.variables());
-	l.addAll(rhs.variables());
+	l.addAll(lhs.variableComponents());
+	l.addAll(rhs.variableComponents());
 	return l;
     }
 

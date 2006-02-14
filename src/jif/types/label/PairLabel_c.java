@@ -153,6 +153,11 @@ public class PairLabel_c extends Label_c implements PairLabel {
         throwTypes.addAll(integPolicy.throwTypes(ts));
         return throwTypes; 
     }
+        
+    public boolean hasWritersToReaders() {
+        return confPolicy.hasWritersToReaders() ||
+               integPolicy.hasWritersToReaders();        
+    }
     
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();

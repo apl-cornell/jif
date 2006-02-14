@@ -56,6 +56,13 @@ public interface LabelEnv
     Map definitions(VarMap bounds, Set seenComponents);
 
     /**
+     * Trigger any writersToReaders transforms in label, and return the result.
+     * @param label
+     * @return
+     */
+    Label triggerTransforms(Label label);
+    
+    /**
      * Is this enviornment empty, or does is contain some constraints?
      */
     boolean isEmpty();

@@ -1,7 +1,6 @@
 package jif.types.label;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
@@ -97,6 +96,12 @@ public class ConfProjectionPolicy_c extends Policy_c implements ConfPolicy {
     public boolean isBottom() {
         return isBottomConfidentiality();
     }
+    public boolean hasWritersToReaders() {
+        return label.hasWritersToReaders();        
+    }    
+    public boolean hasVariables() {
+        return label.hasVariables();        
+    }    
     public ConfPolicy meet(ConfPolicy p) {
         JifTypeSystem ts = (JifTypeSystem)this.ts;
         return ts.meet(this, p);
