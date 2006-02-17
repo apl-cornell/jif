@@ -2,10 +2,12 @@ import java.io.PrintStream;
 import jif.runtime.Runtime;
 
 class Authority03 {
-    public static void main{}(principal{} pp, String[] args) where caller (pp) {
-	final Principal me = new TestPrincipal("Steve");
+    public static void main{*!:*}(principal{*!:*} pp, String[] args) where caller (pp) {
+	final Principal{*!:*} me = new TestPrincipal("Steve");
 	
-	final principal nullP = null;
+        foo(me);
+
+        final principal nullP = null;
         Runtime[nullP] runtime;
 	PrintStream[{}] out = null;
 	try {
@@ -13,35 +15,32 @@ class Authority03 {
 		runtime = Runtime[nullP].getRuntime();
 		if (runtime == null) return;
 		out = declassify(runtime.stdout(new label {}), {});
+		if (out != null) out.println("Hi mum, from " + me.name());
 	    }
 	}
 	catch (SecurityException e) { }
-	if (out == null) return;
-	
-	// try invoking a closure
-	AddBobClosure[me] abc = new AddBobClosure[me](out);
-	Capability[me, {}] cap = PrincipalUtil.authorize(me, null, abc, new label {});
-	if (cap != null) {
-	    cap.invoke();
-	}
+    }
+    
+    private static void foo{me!:}(principal{me!:} me) {
+        // try invoking a closure
+        AddBobClosure[me]{me!:} abc = new AddBobClosure[me]();
+        Capability[me, {me!:}]{me!:} cap = PrincipalUtil.authorize(me, null, abc, new label {me!:});
+        if (cap != null) {
+            cap.invoke();
+        }        
     }
 }
 
-class AddBobClosure[principal P] extends TestClosure[P, {}] {
-    final PrintStream[{}]{} out;
-    AddBobClosure(PrintStream[{}]{} out) {
-	this.out = out;
+class AddBobClosure[principal P] extends TestClosure[P, {P!:}] {
+    AddBobClosure() {
 	super();
     }
     
-    public Object{this} invoke{}() where caller (P) {
+    public Object{this} invoke{P!:}() where caller (P) {
 	final Principal p = P;
 	if (p instanceof TestPrincipal) {
-            endorse ({p!:}) {
-                final TestPrincipal tp = endorse((TestPrincipal)p, {p!:});
-                tp.addDelegatesTo(Bob);
-                if (out != null) out.println("Hi mum, from " + tp.name());
-            }
+	    final TestPrincipal tp = (TestPrincipal)p;
+	    tp.addDelegatesTo(Bob);
 	}
 	return null;
     }

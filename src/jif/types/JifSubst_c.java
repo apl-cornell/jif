@@ -76,7 +76,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
         if (mi instanceof JifProcedureInstance) {
             JifProcedureInstance jmi = (JifProcedureInstance)mi;
 
-            jmi.setStartLabel(substLabel(jmi.startLabel()), jmi.isDefaultStartLabel());
+            jmi.setPCBound(substLabel(jmi.pcBound()), jmi.isDefaultPCBound());
             jmi.setReturnLabel(substLabel(jmi.returnLabel()), jmi.isDefaultReturnLabel());
             jmi.setConstraints(new CachingTransformingList(jmi.constraints(),
                                                               new ConstraintXform()));
@@ -93,7 +93,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
         if (ci instanceof JifProcedureInstance) {
             JifProcedureInstance jci = (JifProcedureInstance) ci;
 
-            jci.setStartLabel(substLabel(jci.startLabel()), jci.isDefaultStartLabel());
+            jci.setPCBound(substLabel(jci.pcBound()), jci.isDefaultPCBound());
             jci.setReturnLabel(substLabel(jci.returnLabel()), jci.isDefaultReturnLabel());
             jci.setConstraints(new CachingTransformingList(jci.constraints(),
                                                               new ConstraintXform()));

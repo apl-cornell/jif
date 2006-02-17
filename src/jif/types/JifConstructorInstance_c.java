@@ -17,25 +17,25 @@ import polyglot.util.TypedList;
 public class JifConstructorInstance_c extends ConstructorInstance_c
 				     implements JifConstructorInstance
 {
-    protected Label startLabel;
+    protected Label pcBound;
     protected Label returnLabel;
     protected List constraints;
-    protected boolean isDefaultStartLabel;
+    protected boolean isDefaultPCBound;
     protected boolean isDefaultReturnLabel;
 
     public JifConstructorInstance_c(JifTypeSystem ts, Position pos,
 	    ClassType container, Flags flags,
-	    Label startLabel, boolean isDefaultStartLabel, Label returnLabel, 
+	    Label pcBound, boolean isDefaultPCBound, Label returnLabel, 
             boolean isDefaultReturnLabel, List formalTypes, List formalArgLabels,
 	    List excTypes, List constraints) {
 
 	super(ts, pos, container, flags, formalTypes, excTypes);
-	this.startLabel = startLabel;
+	this.pcBound = pcBound;
 	this.returnLabel = returnLabel;
 	this.constraints = TypedList.copyAndCheck(constraints, Assertion.class, true);
 
-	this.startLabel = startLabel;
-        this.isDefaultStartLabel = isDefaultStartLabel;
+	this.pcBound = pcBound;
+        this.isDefaultPCBound = isDefaultPCBound;
 	this.returnLabel = returnLabel;
         this.isDefaultReturnLabel = isDefaultReturnLabel;
 	this.throwTypes = TypedList.copyAndCheck(throwTypes, 
@@ -47,12 +47,12 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
     }
 
 
-    public Label startLabel() {
-	return startLabel;
+    public Label pcBound() {
+	return pcBound;
     }
 
     public Label externalPC() {
-	return startLabel;
+	return pcBound;
     }
 
     public Label returnLabel() {
@@ -68,13 +68,13 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
         return isDefaultReturnLabel;
     }
 
-    public void  setStartLabel(Label startLabel, boolean isDefault) {
-	this.startLabel = startLabel;
-	this.isDefaultStartLabel = isDefault;
+    public void  setPCBound(Label pcBound, boolean isDefault) {
+	this.pcBound = pcBound;
+	this.isDefaultPCBound = isDefault;
     }
 
-    public boolean isDefaultStartLabel() {
-        return isDefaultStartLabel;
+    public boolean isDefaultPCBound() {
+        return isDefaultPCBound;
     }
 
     public List constraints() {
@@ -87,7 +87,7 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
 
     public boolean isCanonical() {
         if (!(super.isCanonical()
-                && startLabel.isCanonical()
+                && pcBound.isCanonical()
                 && returnLabel.isCanonical()
                 && listIsCanonical(constraints)
                 && formalTypes != null)) {
@@ -104,8 +104,8 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
     }
     
     public void subst(VarMap bounds) {
-	if (this.startLabel != null) 
-	    this.startLabel = bounds.applyTo(startLabel);
+	if (this.pcBound != null) 
+	    this.pcBound = bounds.applyTo(pcBound);
 	
 	if (this.returnLabel != null) 
 	    this.returnLabel = bounds.applyTo(returnLabel);
@@ -128,7 +128,7 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
  
     public void subst(LabelSubstitution subst) throws SemanticException {
         TypeSubstitutor tsbs = new TypeSubstitutor(subst);
-        setStartLabel(startLabel().subst(subst), isDefaultStartLabel());
+        setPCBound(pcBound().subst(subst), isDefaultPCBound());
         setReturnLabel(returnLabel().subst(subst), isDefaultReturnLabel());
 
         List formalTypes = new LinkedList();
@@ -178,8 +178,8 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
     }
     public String fullSignature() {
 	String s = container.toString();
-        if (!isDefaultStartLabel() || Report.should_report(Report.debug, 1)) {
-            s += startLabel;
+        if (!isDefaultPCBound() || Report.should_report(Report.debug, 1)) {
+            s += pcBound;
         }
         s += "(";
 

@@ -112,6 +112,12 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
 
         DefaultSignature ds = jts.defaultSignature();
         
+        if (n.startLabel() != null && !n.startLabel().isDisambiguated()) {
+            // the startlabel node hasn't been disambiguated yet
+            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            return this;
+        }
+
         Type declrt = n.returnType().type();
         if (! declrt.isVoid() && !jts.isLabeled(declrt)) {
             // return type isn't labeled. Add the default label.
@@ -120,28 +126,22 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             jmi.setReturnType(declrt);
         }
 
-        if (n.startLabel() != null && !n.startLabel().isDisambiguated()) {
-            // the startlabel node hasn't been disambiguated yet
-            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
-            return this;
-        }
-
         if (n.returnLabel() != null && !n.returnLabel().isDisambiguated()) {
             // the return label node hasn't been disambiguated yet
             ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
             return this;
         }
 
-        Label Li; // start label
-        boolean isDefaultStartLabel = false;
+        Label Li; // pc bound for the method
+        boolean isDefaultPCBound = false;
         if (n.startLabel() == null) {
-            Li = ds.defaultStartLabel(n.position(), n.name());
-            isDefaultStartLabel = true;
+            Li = ds.defaultPCBound(n.position(), n.name());
+            isDefaultPCBound = true;
         } 
         else {
             Li = n.startLabel().label();
         }
-        jmi.setStartLabel(Li, isDefaultStartLabel);
+        jmi.setPCBound(Li, isDefaultPCBound);
 
         Label Lr; // return label
         boolean isDefaultReturnLabel = false;

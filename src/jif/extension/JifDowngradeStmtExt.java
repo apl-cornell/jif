@@ -67,7 +67,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
 
 	A = (JifContext) A.pushBlock();
 	A.setPc(L);
-	A.setEntryPC(L);
+	A.setCurrentCodePCBound(L);
 
         // add a restriction on the "this" label.
         if (!A.currentCode().flags().isStatic())  {

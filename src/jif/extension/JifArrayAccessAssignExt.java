@@ -141,7 +141,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
 
         lc.constrain(new LabelConstraint(new NamedLabel("Li", 
                                                         "Lower bound for side-effects", 
-                                                        A.entryPC()), 
+                                                        A.currentCodePCBound()), 
                                          LabelConstraint.LEQ, 
                                          namedLa,
                                          A.labelEnv(),

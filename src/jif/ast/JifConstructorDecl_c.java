@@ -110,16 +110,16 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         jci.setFormalTypes(formalTypes);
 
         Label Li; // start label
-        boolean isDefaultStartLabel = false;
+        boolean isDefaultPCBound = false;
         DefaultSignature ds = jts.defaultSignature();
         if (n.startLabel() == null) {
-            Li = ds.defaultStartLabel(n.position(), n.name());
-            isDefaultStartLabel = true;
+            Li = ds.defaultPCBound(n.position(), n.name());
+            isDefaultPCBound = true;
         } 
         else {
             Li = n.startLabel().label();
         }
-        jci.setStartLabel(Li, isDefaultStartLabel);
+        jci.setPCBound(Li, isDefaultPCBound);
     
         Label Lr; // return label
         boolean isDefaultReturnLabel = false;

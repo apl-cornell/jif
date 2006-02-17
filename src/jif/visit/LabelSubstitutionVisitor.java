@@ -127,7 +127,7 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
 
                 JifProcedureInstance mi = (JifProcedureInstance)md.procedureInstance();
                 mi.setReturnLabel(rewriteLabel(mi.returnLabel()), mi.isDefaultReturnLabel());
-                mi.setStartLabel(rewriteLabel(mi.startLabel()), mi.isDefaultStartLabel());
+                mi.setPCBound(rewriteLabel(mi.pcBound()), mi.isDefaultPCBound());
                 
                 List throwTypes = new ArrayList(mi.throwTypes());
                 for (int i = 0; i < throwTypes.size(); i++) {

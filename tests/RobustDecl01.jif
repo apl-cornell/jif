@@ -1,5 +1,5 @@
 class C authority (Alice) {
-    void m() where authority (Alice) {
+    void m{Alice!:}() where authority (Alice) {
 	boolean{Alice!:Bob} bool = false;
 	int{Alice:Bob; Alice!:Bob} x = 7;
 	if (bool) {

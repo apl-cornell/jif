@@ -11,12 +11,13 @@ public class TestPrincipal extends AbstractPrincipal {
 	super(name);
     }
 
-    public boolean{authPrf; closure; lb; this; this!:} isAuthorized(Object authPrf, 
+    public boolean{authPrf; closure; lb; this; this!:} isAuthorized{this!:}(Object authPrf, 
                                                      Closure[this, lb] closure,
                                                      label lb) where authority (this) {
 	// check the password (need to declassify the result)
-	boolean passwordOK = declassify((password == null || 
-                password.equals(authPrf)), {authPrf;this;this!:});
+        String{this!:} pw = declassify(password, {this;this!:});
+	boolean passwordOK = (pw == null || pw.equals(authPrf));
+
 	// allow only Test closures, and check the password if one exists
 	return passwordOK && (closure instanceof TestClosure[this, lb]);
     }

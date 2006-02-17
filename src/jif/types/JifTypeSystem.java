@@ -89,6 +89,7 @@ public interface JifTypeSystem extends ParamTypeSystem
     ParamLabel paramLabel(Position pos, ParamInstance pi);
     DynamicLabel dynamicLabel(Position pos, AccessPath path);
     ArgLabel argLabel(Position pos, VarInstance li);
+    Label callSitePCLabel(JifProcedureInstance pi);
     ThisLabel thisLabel(Position pos, JifClassType ct);
     ThisLabel thisLabel(JifClassType ct);
     UnknownLabel unknownLabel(Position pos);

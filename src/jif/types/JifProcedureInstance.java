@@ -11,19 +11,16 @@ import polyglot.types.SemanticException;
  */
 public interface JifProcedureInstance extends ProcedureInstance
 {
-    Label startLabel();
+    Label pcBound();
     Label returnLabel();
     List constraints();
-    void setStartLabel(Label startLabel, boolean isDefault);
+    void setPCBound(Label startLabel, boolean isDefault);
     void setReturnLabel(Label returnLabel, boolean isDefault);
     void setConstraints(List constraints);
 
-    boolean isDefaultStartLabel();
+    boolean isDefaultPCBound();
     boolean isDefaultReturnLabel();
 
-//    /** A bound of the PC of the caller. In Jif, it's always the begin label.*/
-//    Label externalPC(); 
-    
     String debugString();
 
     void subst(VarMap bounds);

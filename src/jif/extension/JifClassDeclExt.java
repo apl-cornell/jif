@@ -32,7 +32,7 @@ public class JifClassDeclExt extends Jif_c {
         A = n.addParamsToContext(A);
         A = n.addAuthorityToContext(A);
 
-        A.setEntryPC(jts.notTaken());
+        A.setCurrentCodePCBound(jts.notTaken());
 
 	JifParsedPolyType ct = (JifParsedPolyType) n.type();
 

@@ -138,7 +138,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 
 	if (decl.init() != null) {
 	    A = (JifContext) A.pushBlock();
-	    A.setEntryPC(ts.topLabel());
+	    A.setCurrentCodePCBound(ts.topLabel());
 	    init = (Expr) lc.context(A).labelCheck(decl.init());
 
             if (init instanceof ArrayInit) {

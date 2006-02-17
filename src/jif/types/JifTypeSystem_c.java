@@ -825,6 +825,15 @@ public class JifTypeSystem_c
         ArgLabel t = new ArgLabel_c(this, vi, pos);
         return t;
     }
+    
+    public Label callSitePCLabel(JifProcedureInstance pi) {
+        ArgLabel pcLabel = new ArgLabel_c(this, pi, "caller_pc", pi.position());
+        pcLabel.setUpperBound(pi.pcBound());
+        pcLabel.setDescription("The pc at the call site of this " + 
+                               pi.designator() + " (bounded above by " +
+                               pi.pcBound() + ")");
+        return pcLabel;
+    }
 
     public ThisLabel thisLabel(JifClassType ct) {
         return thisLabel(ct.position(), ct);
@@ -1106,7 +1115,7 @@ public class JifTypeSystem_c
         else if (components.size() == 1) {
             return (ConfPolicy)components.iterator().next();
         }
-        return new JoinConfPolicy_c(components, this, pos);
+        return (ConfPolicy)new JoinConfPolicy_c(components, this, pos).simplify();
     }
     public IntegPolicy joinIntegPolicy(Position pos, Collection components) {
         if (components.isEmpty()) {
@@ -1115,7 +1124,7 @@ public class JifTypeSystem_c
         else if (components.size() == 1) {
             return (IntegPolicy)components.iterator().next();
         }
-        return new JoinIntegPolicy_c(components, this, pos);        
+        return (IntegPolicy)new JoinIntegPolicy_c(components, this, pos).simplify();        
     }
     public ConfPolicy meetConfPolicy(Position pos, Collection components) {
         if (components.isEmpty()) {
@@ -1124,7 +1133,7 @@ public class JifTypeSystem_c
         else if (components.size() == 1) {
             return (ConfPolicy)components.iterator().next();
         }
-        return new MeetConfPolicy_c(components, this, pos);        
+        return (ConfPolicy)new MeetConfPolicy_c(components, this, pos).simplify();        
     }
     public IntegPolicy meetIntegPolicy(Position pos, Collection components) {
         if (components.isEmpty()) {
@@ -1133,7 +1142,7 @@ public class JifTypeSystem_c
         else if (components.size() == 1) {
             return (IntegPolicy)components.iterator().next();
         }
-        return new MeetIntegPolicy_c(components, this, pos);        
+        return (IntegPolicy)new MeetIntegPolicy_c(components, this, pos).simplify();        
     }
     public ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {
         if (p1.isTop() || p2.isBottom()) {

@@ -21,6 +21,6 @@ public interface List[label L] extends Collection[L] {
     int{L;*lbl;lbl;o} lastIndexOf(label lbl, JifObject[lbl] o);
 
     ListIterator[L]{this} listIterator();
-    ListIterator[L]{this;L} listIterator(int{L} index)
+    ListIterator[L]{this;L} listIterator{L}(int{L} index)
 	throws (IndexOutOfBoundsException{L});
 }

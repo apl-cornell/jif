@@ -20,7 +20,7 @@ public class JifContext_c extends Context_c implements JifContext
 
     private Set auth;
     private Label pc; //internal pc
-    private Label entryPC; //external pc
+    private Label currentCodePCBound; //external pc
 
 
     /**
@@ -50,7 +50,7 @@ public class JifContext_c extends Context_c implements JifContext
 
     public VarInstance findVariableSilent(String name) {
         VarInstance vi = super.findVariableSilent(name);
-
+        
         if (vi != null) {
             return vi;
         }
@@ -181,8 +181,10 @@ public class JifContext_c extends Context_c implements JifContext
         gotos.put(new Key(kind, label), L);
     }
 
-    public Label entryPC() { return entryPC; }
-    public void setEntryPC(Label entryPC) { this.entryPC = entryPC; }
+    public Label currentCodePCBound() { return currentCodePCBound; }
+    public void setCurrentCodePCBound(Label currentCodePCBound) { 
+        this.currentCodePCBound = currentCodePCBound; 
+    }
 
     public Label pc() { return pc; }
     public void setPc(Label pc) { this.pc = pc; }

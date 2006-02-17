@@ -4,8 +4,8 @@ class C extends jif.lang.AbstractPrincipal {
 	super(name);
     }
 
-    public void m() where authority (this) {
-	int{this:} x = 5;
+    public void m{this:;this!:}() where authority (this) {
+	int{this:;this!:} x = 5;
 	int{} y = declassify(x, {});
     }
 }

@@ -67,7 +67,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 	    // normal termination path to the entry PC of the
 	    // method.
 	    X = ts.pathMap();
-	    X = X.N(A.entryPC());
+	    X = X.N(A.currentCodePCBound());
 	}
 
 	mn = (JifMethodDecl) X(mn.body(body), X);
@@ -93,11 +93,11 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         Position declPosition = mn.position();
 
         // check pc bound
-        Label Li = mi.startLabel();
+        Label Li = mi.pcBound();
         if (Li.isCovariant()) {
-            throw new SemanticDetailedException("The start label of a method " +
+            throw new SemanticDetailedException("The pc bound of a method " +
                     "can not be the covariant label " + Li + ".",
-             "The start label of a method " +
+             "The pc bound of a method " +
                     "can not be the covariant label " + Li + ". " +
                 "Otherwise, information may be leaked by casting the " +
                 "low-parameter class to a high-parameter class, and masking " +
@@ -138,7 +138,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
      * Check that this method instance <mi> conforms to the signatures of any
      * methods in the superclasses or interfaces that it is overriding.
      * 
-     * In particular, argument labels and start labels are contravariant,
+     * In particular, argument labels and pc bounds are contravariant,
      * return labels, return value labels and labels on exception types are 
      * covariant.
      */

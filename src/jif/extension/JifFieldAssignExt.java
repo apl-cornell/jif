@@ -163,7 +163,7 @@ public class JifFieldAssignExt extends JifAssignExt
         else {
             lc.constrain(new LabelConstraint(new NamedLabel("Li", 
                                                             "Lower bound for side-effects", 
-                                                            A.entryPC()), 
+                                                            A.currentCodePCBound()), 
                                              LabelConstraint.LEQ, 
                                              new NamedLabel("label of field " + fi.name(), L),
                                              A.labelEnv(),

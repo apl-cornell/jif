@@ -87,7 +87,7 @@ public abstract class AbstractList[label L] extends AbstractCollection[L]
         return new ListItr[L](this);
     }    
 
-    public ListIterator[L]{this;L} listIterator(int{L} index) 
+    public ListIterator[L]{this;L} listIterator{L}(int{L} index) 
         throws (IndexOutOfBoundsException{L}) {
         if (index<0 || index>size())
             throw new IndexOutOfBoundsException("Index: "+index);

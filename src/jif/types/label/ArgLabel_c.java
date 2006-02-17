@@ -14,25 +14,38 @@ import polyglot.util.Position;
  * The purpose is to avoid having to re-interpret labels at each call.
  */
 public class ArgLabel_c extends Label_c implements ArgLabel {
-    private final VarInstance vi;
+    private final TypeObject vi; // either a VarInstance or a ProcedureInstance
+    private final String name;
     private Label upperBound;
+    
     
     protected ArgLabel_c() {
         vi = null;
+        name =  null;
     }
     public ArgLabel_c(JifTypeSystem ts, VarInstance vi, Position pos) {
         super(ts, pos);        
         this.vi = vi;
+        this.name = vi.name();
         setDescription();
+    }
+
+    public ArgLabel_c(JifTypeSystem ts, ProcedureInstance pi, String name, Position pos) {
+        super(ts, pos);        
+        this.vi = pi;
+        this.name = name;
     }
     
     private void setDescription() {
+        if (vi instanceof VarInstance) 
         this.setDescription("polymorphic label of the formal argument " + 
-                            vi.name() + " (bounded above by " + 
+                            ((VarInstance)vi).name() + " (bounded above by " + 
                             upperBound + ")");
     }
     public VarInstance formalInstance() {
-        return vi;
+        if (vi instanceof VarInstance)
+            return (VarInstance)vi;
+        return null;
     }
     
     public Label upperBound() {
@@ -66,24 +79,24 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     public String componentString(Set printedLabels) {
         if (printedLabels.contains(this)) {
             if (Report.should_report(Report.debug, 2)) { 
-                return "<arg " + vi.name() + ">";
+                return "<arg " + name + ">";
             }
             else if (Report.should_report(Report.debug, 1)) {
-                return "<arg " + vi.name() + ">";
+                return "<arg " + name + ">";
             }
-            return vi.name();            
+            return name;            
         }
         printedLabels.add(this);
         
         if (Report.should_report(Report.debug, 2)) { 
             String ub = upperBound==null?"-":upperBound.toString(printedLabels);
-            return "<arg " + vi.name() + " " + ub + ">";
+            return "<arg " + name + " " + ub + ">";
         }
         else if (Report.should_report(Report.debug, 1)) {
             String ub = upperBound==null?"-":upperBound.toString(printedLabels);
-            return "<arg " + vi.name() + " " + ub + ">";
+            return "<arg " + name + " " + ub + ">";
         }
-        return vi.name();
+        return name;
     }
 
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {

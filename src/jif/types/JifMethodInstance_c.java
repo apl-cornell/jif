@@ -17,15 +17,15 @@ import polyglot.util.TypedList;
 public class JifMethodInstance_c extends MethodInstance_c
                                 implements JifMethodInstance
 {
-    protected Label startLabel;
+    protected Label pcBound;
     protected Label returnLabel;
     protected List constraints;
-    protected boolean isDefaultStartLabel;
+    protected boolean isDefaultPCBound;
     protected boolean isDefaultReturnLabel;
 
     public JifMethodInstance_c(JifTypeSystem ts, Position pos,
 	    ReferenceType container, Flags flags, Type returnType,
-	    String name, Label startLabel, boolean isDefaultStartLabel,
+	    String name, Label pcBound, boolean isDefaultPCBound,
             List formalTypes, List formalArgLabels,
 	    Label returnLabel, boolean isDefaultReturnLabel,
             List excTypes, List constraints) {
@@ -33,8 +33,8 @@ public class JifMethodInstance_c extends MethodInstance_c
 	super(ts, pos, container, flags, returnType, name, formalTypes, excTypes);
 	this.constraints = TypedList.copyAndCheck(constraints, Assertion.class, true);
 
-	this.startLabel = startLabel;
-        this.isDefaultStartLabel = isDefaultStartLabel;
+	this.pcBound = pcBound;
+        this.isDefaultPCBound = isDefaultPCBound;
 	this.returnLabel = returnLabel;
         this.isDefaultReturnLabel = isDefaultReturnLabel;
 	this.throwTypes = TypedList.copyAndCheck(throwTypes,
@@ -45,20 +45,16 @@ public class JifMethodInstance_c extends MethodInstance_c
 	                                          true);
     }
 
-    public Label startLabel() {
-	return startLabel;
+    public Label pcBound() {
+	return pcBound;
     }
 
-//    public Label externalPC() {
-//	return startLabel;
-//    }
-
-    public void setStartLabel(Label startLabel, boolean isDefault) {
-        this.startLabel = startLabel;
-        this.isDefaultStartLabel = isDefault;
+    public void setPCBound(Label pcBound, boolean isDefault) {
+        this.pcBound = pcBound;
+        this.isDefaultPCBound = isDefault;
     }
-    public boolean isDefaultStartLabel() {
-        return isDefaultStartLabel;
+    public boolean isDefaultPCBound() {
+        return isDefaultPCBound;
     }
 
     public Label returnLabel() {
@@ -93,8 +89,8 @@ public class JifMethodInstance_c extends MethodInstance_c
 	String s = "method " + flags.translate() + returnType +
 	    " " + name;
 
-	if (startLabel != null) {
-	    s += startLabel.toString();
+	if (pcBound != null) {
+	    s += pcBound.toString();
 	}
 
 	s += "(";
@@ -147,7 +143,7 @@ public class JifMethodInstance_c extends MethodInstance_c
 
     public boolean isCanonical() {
         if (!(super.isCanonical()
-                && startLabel.isCanonical()
+                && pcBound.isCanonical()
                 && returnLabel.isCanonical()
                 && listIsCanonical(constraints)
                 && formalTypes != null)) {
@@ -166,7 +162,7 @@ public class JifMethodInstance_c extends MethodInstance_c
     }
 
     public void subst(VarMap bounds) {
-	this.startLabel = bounds.applyTo(startLabel);
+	this.pcBound = bounds.applyTo(pcBound);
 	this.returnLabel = bounds.applyTo(returnLabel);
 	this.returnType = bounds.applyTo(returnType);
 
@@ -187,7 +183,7 @@ public class JifMethodInstance_c extends MethodInstance_c
 
     public void subst(LabelSubstitution subst) throws SemanticException {
         TypeSubstitutor tsbs = new TypeSubstitutor(subst);
-        setStartLabel(startLabel().subst(subst), isDefaultStartLabel());
+        setPCBound(pcBound().subst(subst), isDefaultPCBound());
         setReturnLabel(returnLabel().subst(subst), isDefaultReturnLabel());
         setReturnType(tsbs.rewriteType(returnType()));
 
@@ -242,8 +238,8 @@ public class JifMethodInstance_c extends MethodInstance_c
     public String fullSignature() { 
 	StringBuffer sb = new StringBuffer();
         sb.append(name);
-        if (!isDefaultStartLabel() || Report.should_report(Report.debug, 1)) {
-            sb.append(startLabel);
+        if (!isDefaultPCBound() || Report.should_report(Report.debug, 1)) {
+            sb.append(pcBound);
         }
         sb.append("(");
 

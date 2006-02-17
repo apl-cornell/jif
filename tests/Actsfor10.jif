@@ -2,7 +2,7 @@ class ActsFor10[principal P]
 {
     static final principal PRIN = Alice;
 
-    public void p(principal{} a, principal{} b) throws NullPointerException {
+    public void p{}(principal{} a, principal{} b) throws NullPointerException {
         int{a:} x = 0;
         int{b:} y = 0;
 	int{Alice:} z = 0;

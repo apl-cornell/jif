@@ -85,11 +85,12 @@ public interface JifContext extends Context {
     void setPc(Label label);
 
     /**
-     * The entry PC is the upper bound on the PC of the caller of the current
-     * code.
+     * The currentCodePCBound is an upper bound on the 
+     * PC of the caller of the current code, and a lower bound
+     * on the observable effects of the current code.
      */
-    Label entryPC();
-    void setEntryPC(Label label);
+    Label currentCodePCBound();
+    void setCurrentCodePCBound(Label label);
 
     /**
      * Retrieve the <code>Label</code> associated with branching to the 

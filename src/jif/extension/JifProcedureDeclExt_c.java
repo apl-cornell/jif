@@ -8,13 +8,10 @@ import jif.types.*;
 import jif.types.label.*;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import polyglot.ast.Formal;
 import polyglot.ast.ProcedureDecl;
 import polyglot.main.Report;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
 
 /** The Jif extension of the <code>ProcedureDecl</code> node. 
  * 
@@ -46,18 +43,21 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
       	JifContext A = lc.jifContext();
         JifClassType ct = (JifClassType) A.currentClass();
 	
-	// We begin by getting the start label.
-        Label Li = mi.startLabel();
+	// We begin by getting the pc bound of this procedure.
+        Label Li = mi.pcBound();
 
-	if (!mi.flags().isStatic())  {
+        // the initial pc is the special arglabel, pcLabel, which is
+        // bounded above by Li.
+        Label pcLabel = ts.callSitePCLabel(mi);
+        A.setPc(pcLabel); 
+        A.setCurrentCodePCBound(Li);
+
+        if (!mi.flags().isStatic())  {
 	    // for non-static methods, we know the this label
 	    // must be bounded above by the start label
-	    A.addAssertionLE(ct.thisLabel(), Li);	
+	    A.addAssertionLE(ct.thisLabel(), pcLabel);	
 	}
 
-        // let internal_pc = bottom, external_pc = Li
-	A.setPc(ts.bottomLabel(mi.position())); //XXX TO CHANGE? SC Jan 2006
-	A.setEntryPC(Li);
 
         // Set the "auth" variable.
 	Set newAuth = constraintAuth(mi, A);
@@ -199,11 +199,13 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	
 	Label Lr = mi.returnLabel(); 
 
-	// fold "this" label into the return label because it is protected
-	// at the caller side.
-	if (!mi.flags().isStatic())  {
-	    Lr = lc.upperBound(Lr, ct.thisLabel());
-	}
+        // fold the call site pc into the return label
+        Lr = lc.upperBound(Lr, ts.callSitePCLabel(mi));
+//	// fold "this" label into the return label because it is protected
+//	// at the caller side.
+//	if (!mi.flags().isStatic())  {
+//	    Lr = lc.upperBound(Lr, ct.thisLabel());
+//	}
 	        
         //Hack: If no other paths, the procedure must return. Therefore,
         //X.n is not taken, and X.r doesn't contain any information. 
@@ -334,12 +336,14 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 		final Type tj = (Type) j.next();
 		Label Lj = ts.labelOfType(tj, Lr);
 		
-		// fold "this" label into the label of the declared
-		// throw type, because it is protected
-		// at the caller side.
-		if (!mi.flags().isStatic())  {
-		    Lj = lc.upperBound(Lj, ct.thisLabel());
-		}
+                // fold the call site pc into the return label
+                Lj = lc.upperBound(Lj, ts.callSitePCLabel(mi));
+//                // fold "this" label into the label of the declared
+//		// throw type, because it is protected
+//		// at the caller side.
+//		if (!mi.flags().isStatic())  {
+//		    Lj = lc.upperBound(Lj, ct.thisLabel());
+//		}
 
 		if (ts.isImplicitCastValid(pathType, tj)) {
 		    subtypeChecker.addSubtypeConstraints(lc, mn.position(),

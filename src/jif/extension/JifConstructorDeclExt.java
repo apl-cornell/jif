@@ -111,6 +111,9 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
             Lr = ts.bottomLabel(ci.position());
         }
 
+        // pc can be set to bottom during the init checking phase.
+        A.setPc(ts.bottomLabel()); 
+
         A.setConstructorReturnLabel(Lr);
 
         // stmts is the statements in the constructor body.
@@ -170,6 +173,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                             // initializations in the constructor.
                             A.setCheckingInits(false);
                             A.setConstructorReturnLabel(null);    
+                            A.setPc(lc.upperBound(A.pc(), ts.callSitePCLabel(ci)));
 
                             // We must make sure that all final variables of
                             // this class are initialized before the super call.                            
@@ -205,6 +209,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         // initializations in the constructor.
         A.setCheckingInits(false);
         A.setConstructorReturnLabel(null);    
+        A.setPc(lc.upperBound(A.pc(), ts.callSitePCLabel(ci)));
 
         A = (JifContext) A.pop();
         return (Block) X(body.statements(stmts), X);

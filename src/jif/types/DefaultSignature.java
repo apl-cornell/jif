@@ -6,7 +6,7 @@ import polyglot.util.Position;
 
 public interface DefaultSignature
 {
-    Label defaultStartLabel(Position pos, String name);    
+    Label defaultPCBound(Position pos, String name);    
     Label defaultArgBound(Formal f);
     Label defaultReturnValueLabel(ProcedureDecl pd);    
     Label defaultReturnLabel(ProcedureDecl pd);    

@@ -45,7 +45,7 @@ public class JifNewExt extends Jif_c
 
 	if (ts.isLabeled(noe.type()) ) {
             // error messages for equality constraints aren't displayed, so no
-            // need top define error messages.  
+            // need to define error messages.  
             lc.constrain(new LabelConstraint(new NamedLabel("new_label",
                                                             "label of the reference to the newly created " + ct.name(), 
                                                             newLabel), 

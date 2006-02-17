@@ -52,7 +52,7 @@ public class PrincipalUtil {
     /**
      * Obtain a Capability for the given principal and closure.
      */
-    public static native Capability[p, lb]{p; authPrf; c; lb} 
+    public static native Capability[p, lb]
                 authorize(principal p, Object authPrf, Closure[p, lb] c, label lb);
                 
     /**

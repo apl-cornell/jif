@@ -431,8 +431,8 @@ public class CallHelper {
         }               
     }
 
-    private Label resolveStartLabel(JifContext A, LabelChecker lc) throws SemanticException {
-        return instantiate(A, pi.startLabel());
+    private Label resolvePCBound(JifContext A, LabelChecker lc) throws SemanticException {
+        return instantiate(A, pi.pcBound());
     }
 
     /**
@@ -507,7 +507,7 @@ public class CallHelper {
         constrainArguments(lc);
 
         // A |- X_{maxj}[N] + entry_pc <= Li
-        Label Li = resolveStartLabel(A, lc);
+        Label Li = resolvePCBound(A, lc);
         if (Li != null) {
             final ProcedureInstance callee = pi;
 
@@ -553,7 +553,7 @@ public class CallHelper {
             );
             lc.constrain(new LabelConstraint(new NamedLabel("caller_PC_bound",
                                                             "lower bound on the side effects of caller",
-                                                            A.entryPC()),
+                                                            A.currentCodePCBound()),
                                                             LabelConstraint.LEQ,
                                                             namedLi,
                                                             A.labelEnv(),
@@ -965,10 +965,10 @@ public class CallHelper {
         //    label on mj
         NamedLabel starti = new NamedLabel("sub_start_label",
                                            "Start label of method " + overriding.name() + " in " + overriding.container(), 
-                                           overriding.startLabel());
+                                           overriding.pcBound());
         NamedLabel startj = new NamedLabel("sup_start_label",
                                            "Start label of method " + overridden.name() + " in " + overridden.container(), 
-                                           instantiate(A, overridden.startLabel()));
+                                           instantiate(A, overridden.pcBound()));
         newlc.constrain(new LabelConstraint(startj,
                                             LabelConstraint.LEQ,
                                             starti,

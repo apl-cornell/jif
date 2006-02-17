@@ -366,15 +366,15 @@ public final class Date[covariant label L] implements JifObject[L] {
 //    public Date[L]{L} addDay(int{L} dayDelta):{L; this} {
 //        return lenientDate(L, this.year, this.month, this.day + dayDelta);
 //    }
-    public static Date[lb]{*lb; lb; date; delta} addYear(label lb, Date[lb]{*lb} date, int{*lb} delta) {
+    public static Date[lb]{*lb; lb; date; delta} addYear{*lb}(label lb, Date[lb]{*lb} date, int{*lb} delta) {
         if (date == null) return null;
         return Date[lb].lenientDate(lb, date.getYear() + delta, date.getMonth(), date.getDay());
     }
-    public static Date[lb]{*lb; lb; date; delta} addMonth(label lb, Date[lb]{*lb} date, int{*lb} delta) {
+    public static Date[lb]{*lb; lb; date; delta} addMonth{*lb}(label lb, Date[lb]{*lb} date, int{*lb} delta) {
         if (date == null) return null;
         return Date[lb].lenientDate(lb, date.getYear(), date.getMonth() +  + delta, date.getDay());
     }
-    public static Date[lb]{*lb; lb; date; delta} addDay(label lb, Date[lb]{*lb} date, int{*lb} delta) {
+    public static Date[lb]{*lb; lb; date; delta} addDay{*lb}(label lb, Date[lb]{*lb} date, int{*lb} delta) {
         if (date == null) return null;
         return Date[lb].lenientDate(lb, date.getYear(), date.getMonth(), date.getDay() + delta);
     }

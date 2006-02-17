@@ -75,10 +75,10 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
         } catch (NullPointerException unlikely) {}
     }
     
-    public final boolean{K;key} containsKey(String{K} key) {
+    public final boolean{K;key} containsKey{K}(String{K} key) {
         return this.containsKey(new JifString[K](key));
     }
-    public final JifObject[V]{K; key} get(String{K} key) {
+    public final JifObject[V]{K; key} get{K}(String{K} key) {
         return this.get(new JifString[K](key));
     }
     public final JifObject[V]{K} put{K}(String{K} key, JifObject[V]{K} value) {

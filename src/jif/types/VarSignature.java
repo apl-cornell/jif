@@ -17,7 +17,7 @@ public class VarSignature implements DefaultSignature
 	this.ts = ts;
     }
     
-    public Label defaultStartLabel(Position pos, String methodName) {
+    public Label defaultPCBound(Position pos, String methodName) {
 	return ts.freshLabelVariable(pos, methodName, 
                  "start label for the method " + methodName);
     }
