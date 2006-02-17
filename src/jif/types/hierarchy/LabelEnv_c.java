@@ -645,7 +645,7 @@ public class LabelEnv_c implements LabelEnv
         }
         // L is a pair label.
         if (L instanceof PairLabel) return L;
-        
+                
         // check the assertions
         for (Iterator i = labelAssertions.iterator(); i.hasNext();) { 
             LabelLeAssertion c = (LabelLeAssertion)i.next();
@@ -665,12 +665,40 @@ public class LabelEnv_c implements LabelEnv
             }
         }
         // assertions didn't help
+        if (L instanceof ArgLabel) {
+            ArgLabel al = (ArgLabel)L;
+            // we want to make sure that we don't end up recursing.
+            // Check that al.upperbound() is not recursively defined.            
+            if (!argLabelBoundRecursive(al)) {
+                return al.upperBound();
+            }
+        }
+        
         if (Report.should_report(topics, 4))
             Report.report(4, "Using top as upper bound for " + L);
         return ts.topLabel();
-        
-                
     }
+    
+    private boolean argLabelBoundRecursive(ArgLabel al) {
+        ArgLabelGatherer alg = new ArgLabelGatherer();
+        try {
+            al.upperBound().subst(alg);
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpcted SemanticError");
+        }
+        return alg.argLabels.contains(al);        
+    }
+    private static class ArgLabelGatherer extends LabelSubstitution {
+        private final Set argLabels = new LinkedHashSet();
+        
+        public Label substLabel(Label L) throws SemanticException {
+            if (L instanceof ArgLabel) {
+                argLabels.add(L);
+            }
+            return L;
+        }        
+    }        
     
     public String toString() {
         StringBuffer sb = new StringBuffer();
