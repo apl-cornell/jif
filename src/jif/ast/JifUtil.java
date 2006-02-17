@@ -89,6 +89,10 @@ public class JifUtil
             PrincipalNode pn = (PrincipalNode)e;
             return new AccessPathConstant(pn.principal(), pn.position());
         }
+        else if (e instanceof NullLit) {
+            Principal bot = ((JifTypeSystem)context.typeSystem()).bottomPrincipal(e.position());
+            return new AccessPathConstant(bot, e.position());
+        }
         else if (e instanceof Cast) {
             return exprToAccessPath(((Cast)e).expr(), context);            
         }
@@ -143,7 +147,8 @@ public class JifUtil
             e instanceof LabelExpr || 
             e instanceof PrincipalNode ||
            (e instanceof Cast && isFinalAccessExprOrConst(ts, ((Cast)e).expr())) ||
-           (e instanceof DowngradeExpr && isFinalAccessExprOrConst(ts, ((DowngradeExpr)e).expr()));
+           (e instanceof DowngradeExpr && isFinalAccessExprOrConst(ts, ((DowngradeExpr)e).expr())) ||
+           e instanceof NullLit;
     }
     public static Label exprToLabel(JifTypeSystem ts, Expr e, JifContext context) throws SemanticException {
         if (e instanceof LabelExpr) {
@@ -166,6 +171,9 @@ public class JifUtil
         }
         if (e instanceof DowngradeExpr) {
             return exprToPrincipal(ts, ((DowngradeExpr)e).expr(), context);            
+        }
+        if (e instanceof NullLit) {
+            return ts.bottomPrincipal(e.position());
         }
         if (isFinalAccessExpr(ts, e)) {
             return ts.dynamicPrincipal(e.position(), exprToAccessPath(e, context));
