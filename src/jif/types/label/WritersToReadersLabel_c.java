@@ -87,84 +87,83 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
     
     
     public Label transform(LabelEnv env) {
-        return transform(env, label(), new HashSet());
+        return transform(env, label(), new LinkedList());
     }
     
-    protected static Label transform(LabelEnv env, Label label, Set visited) {
+    protected static Label transform(LabelEnv env, Label label, List visited) {
         JifTypeSystem ts = (JifTypeSystem)label.typeSystem();
         if (visited.contains(label)) return ts.bottomLabel();
 
+        Label result = null;
         if (label instanceof PairLabel) {
             PairLabel pl = (PairLabel)label;   
             ConfPolicy newCP = transformIntegToCong(pl.integPolicy());
-            Label result = ts.pairLabel(pl.position(), newCP, ts.bottomIntegPolicy(pl.position()));
-            if (Report.should_report(Topics.jif, 3)) { 
-                Report.report(3, "Transformed " + label + " to " + result);
-            }
-            return result;
+            result = ts.pairLabel(pl.position(), newCP, ts.bottomIntegPolicy(pl.position()));
         }
         else if (label instanceof JoinLabel) {
             JoinLabel L = (JoinLabel)label;
 
-            Label result = ts.topLabel();
+            Set comps = new LinkedHashSet();
             for (Iterator iter = L.joinComponents().iterator(); iter.hasNext();) {
                 Label c = (Label)iter.next();
-                result = ts.meet(result, transform(env, c, visited));
+                comps.add(transform(env, c, visited));
             }
-            if (Report.should_report(Topics.jif, 3)) { 
-                Report.report(3, "Transformed " + label + " to " + result);
-            }
-            return result;
+            result = ts.meetLabel(label.position(), comps);
         }
         else if (label instanceof MeetLabel) {
             MeetLabel L = (MeetLabel)label;
 
-            Label result = ts.bottomLabel();
+            Set comps = new LinkedHashSet();
             for (Iterator iter = L.meetComponents().iterator(); iter.hasNext();) {
                 Label c = (Label)iter.next();
-                result = ts.join(result, transform(env, c, visited));
+                comps.add(transform(env, c, visited));
             }
-            return result;
+            result = ts.joinLabel(label.position(), comps);
         }
         else if (label instanceof ArgLabel) {
             ArgLabel L = (ArgLabel)label;
-            visited.add(L);
-            return transform(env, L.upperBound(), visited);
+            visited.add(0, L);
+            result = transform(env, L.upperBound(), visited);
+            if (L != visited.remove(0)) {
+                throw new InternalCompilerError("Stack discipline broken");
+            }
         }
         else if (label instanceof ParamLabel) {
             ParamLabel L = (ParamLabel)label;
-            return transform(env, env.findUpperBound(L), visited);            
+            result = transform(env, env.findUpperBound(L), visited);
         }
         else if (label instanceof CovariantParamLabel) {
             CovariantParamLabel L = (CovariantParamLabel)label;
-            return transform(env, env.findUpperBound(L), visited);            
+            result = transform(env, env.findUpperBound(L), visited);            
         }    
         else if (label instanceof DynamicLabel) {
             DynamicLabel L = (DynamicLabel)label;
-            return transform(env, env.findUpperBound(L), visited);            
+            result = transform(env, env.findUpperBound(L), visited);            
         }    
         else if (label instanceof ThisLabel) {
             ThisLabel L = (ThisLabel)label;
 //            Label thisUpperBound = A.entryPC();
 //            return transform(env, thisUpperBound, visited, true);
             Label thisUpperBound = env.findUpperBound(L);
-            Label result = transform(env, thisUpperBound, visited);  
+            result = transform(env, thisUpperBound, visited);  
             if (Report.should_report(Topics.jif, 3)) { 
-                Report.report(3, "Transformed " + label + " with ub " + 
+                Report.report(3, "Transforming " + label + " with ub " + 
                               thisUpperBound + " in env " + env + 
                               " to " + result);
             }
-            return result;
-
         }  
         else if (label instanceof VarLabel_c) {
             // cant do anything.
-            return ts.writersToReadersLabel(label.position(), label);
+            result = ts.writersToReadersLabel(label.position(), label);
         }
         else {
             throw new InternalCompilerError("WritersToReaders undefined " +
                         "for " + label);
         }
+        if (Report.should_report(Topics.jif, 3)) { 
+            Report.report(3, "Transformed " + label + " to " + result);
+        }
+        return result;        
     }
     
     protected static ConfPolicy transformIntegToCong(IntegPolicy pol) {
