@@ -112,8 +112,7 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
             Label newBound = lbl.upperBound().subst(substitution);
             
             if (newBound != lbl.upperBound()) {
-                JifTypeSystem ts = (JifTypeSystem)typeSystem();
-                lbl = ts.argLabel(lbl.position(), lbl.formalInstance());
+                lbl = (ArgLabel)lbl.copy();
                 lbl.setUpperBound(newBound);
             }
             substitution.popLabel(this);
