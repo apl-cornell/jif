@@ -36,7 +36,7 @@ public class JifCastExt extends Jif_c
 	// label check the type too, since the type may leak information
 	A = (JifContext) A.pushBlock();
 	A.setPc(Xe.N());
-	PathMap Xct = LabelTypeCheckUtil.labelCheckType(c.castType().type(), lc, throwTypes, pos);
+	PathMap Xct = ts.labelTypeCheckUtil().labelCheckType(c.castType().type(), lc, throwTypes, pos);
         A = (JifContext) A.pop();
 	PathMap X = Xe.N(ts.notTaken()).join(Xct);
 

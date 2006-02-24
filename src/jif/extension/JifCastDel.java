@@ -50,7 +50,7 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
 
         this.isToSubstJifClass = (castType instanceof JifSubstType && ((JifSubstType)castType).entries().hasNext());
 
-        LabelTypeCheckUtil.typeCheckType(tc, castType);
+        ts.labelTypeCheckUtil().typeCheckType(tc, castType);
         return super.typeCheck(tc);
     }
     
@@ -62,8 +62,8 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
             ex.remove(ts.ClassCastException());            
         }
         if (c.castType().type() instanceof JifClassType) {
-            ex.addAll(LabelTypeCheckUtil.throwTypes((JifClassType)c.castType().type(), 
-                                                    (JifTypeSystem)ts));
+            LabelTypeCheckUtil ltcu = ((JifTypeSystem)ts).labelTypeCheckUtil();
+            ex.addAll(ltcu.throwTypes((JifClassType)c.castType().type()));
         }
         return ex;
     }

@@ -33,8 +33,8 @@ public class JifInitChecker extends InitChecker {
             TypeNode tn = (TypeNode)n;
             Type t = tn.type();
             if (t instanceof JifClassType) {
-                Set lis = LabelTypeCheckUtil.localInstancesUsed((JifClassType)t, 
-                                                                (JifTypeSystem)t.typeSystem());
+                JifTypeSystem ts = (JifTypeSystem)t.typeSystem();
+                Set lis = ts.labelTypeCheckUtil().localInstancesUsed((JifClassType)t);
                 for (Iterator iter = lis.iterator(); iter.hasNext(); ) {
                     LocalInstance li = (LocalInstance)iter.next();
                     checkLocalInstanceInit(li, dfIn, tn.position());

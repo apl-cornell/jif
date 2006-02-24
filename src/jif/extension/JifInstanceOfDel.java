@@ -50,15 +50,15 @@ public class JifInstanceOfDel extends JifJL_c
         }
         this.isToSubstJifClass = (compareType instanceof JifSubstType && ((JifSubstType)compareType).entries().hasNext());
 
-        LabelTypeCheckUtil.typeCheckType(tc, compareType);
+        ts.labelTypeCheckUtil().typeCheckType(tc, compareType);
         return super.typeCheck(tc);
     }
     public List throwTypes(TypeSystem ts) {
         List ex = new ArrayList(super.throwTypes(ts));
         Instanceof io = (Instanceof)this.node();
         if (io.compareType().type() instanceof JifClassType) {
-            ex.addAll(LabelTypeCheckUtil.throwTypes((JifClassType)io.compareType().type(), 
-                                                    (JifTypeSystem)ts));
+            LabelTypeCheckUtil ltcu = ((JifTypeSystem)ts).labelTypeCheckUtil();
+            ex.addAll(ltcu.throwTypes((JifClassType)io.compareType().type()));
         }
         return ex;
     }

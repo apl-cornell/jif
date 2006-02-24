@@ -85,7 +85,7 @@ public class LabelChecker implements Copy
 //        }
         this.doLabelSubst = true;
         if (!solvePerClassBody && !solvePerMethod) {
-            this.solver = this.ts.solver("Job solver: " + job.toString());
+            this.solver = this.ts.createSolver("Job solver: " + job.toString());
         }
     }
 
@@ -164,7 +164,7 @@ public class LabelChecker implements Copy
     public void enteringClassBody(ClassType ct) {
         if (solvePerClassBody) {
             // solving by class. Set a new solver for the class body
-            this.solver = ts.solver(ct.name());
+            this.solver = ts.createSolver(ct.name());
         }
     }
 
@@ -176,7 +176,7 @@ public class LabelChecker implements Copy
     public void enteringMethod(MethodInstance mi) {
         if (solvePerMethod) {
             // solving by method. Set a new solver for the class body
-            this.solver = ts.solver(mi.container().toString() + "." + mi.name());
+            this.solver = ts.createSolver(mi.container().toString() + "." + mi.name());
         }
     }
 

@@ -203,6 +203,8 @@ public class LabelConstraint
         Set labelComponents = new LinkedHashSet();
         Map namedLabels = this.namedLabels();
         Map namedDescrips = this.namedDescrips();
+        LabelTypeCheckUtil ltcu = ((JifTypeSystem)lhs.typeSystem()).labelTypeCheckUtil();
+        
         for (Iterator iter = namedLabels.keySet().iterator(); 
              iter.hasNext(); ) {
             String s = (String) iter.next();
@@ -215,7 +217,7 @@ public class LabelConstraint
             Label bound = bounds.applyTo((Label)namedLabels.get(s));
             l.add(bound.toString());
             
-            Collection components = LabelTypeCheckUtil.labelComponents(bound);
+            Collection components = ltcu.labelComponents(bound);
             for (Iterator i = components.iterator(); i.hasNext(); ) {
                 Label lb = (Label)i.next();
                 labelComponents.add(lb);
@@ -225,14 +227,14 @@ public class LabelConstraint
         // in case there are no named labels, add all components of the lhs and
         // rhs bounds.
         Label bound = bounds.applyTo(lhs);
-        Collection components = LabelTypeCheckUtil.labelComponents(bound);
+        Collection components = ltcu.labelComponents(bound);
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label lb = (Label)i.next();
             labelComponents.add(lb);
         }
 
         bound = bounds.applyTo(rhs);
-        components = LabelTypeCheckUtil.labelComponents(bound);
+        components = ltcu.labelComponents(bound);
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label l = (Label)i.next();
             labelComponents.add(l);

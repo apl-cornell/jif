@@ -49,7 +49,8 @@ public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements JifCa
 
         // typecheck the type, make sure principal parameters are instantiated 
         // with principals, label parameters with labels.
-        LabelTypeCheckUtil.typeCheckType(tc, t);
+        LabelTypeCheckUtil ltcu = ((JifTypeSystem)tc.typeSystem()).labelTypeCheckUtil(); 
+        ltcu.typeCheckType(tc, t);
         
         return tn;
         

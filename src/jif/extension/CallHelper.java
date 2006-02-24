@@ -208,14 +208,15 @@ public class CallHelper {
     private PathMap labelCheckAndConstrainParams(LabelChecker lc, List throwTypes) throws SemanticException {
         PathMap Xjoin;
         JifTypeSystem ts = lc.typeSystem();
+        LabelTypeCheckUtil ltcu = ts.labelTypeCheckUtil();
 
         // If it's a constructor or a static method call, label check
         // the class type, since that may reveal some information.
         // if the method call is a constructor call, or a static method call,
         // then we need to check the pathmap.
         if (this.pi.flags().isStatic()) {
-            Xjoin = LabelTypeCheckUtil.labelCheckType(pi.container(), lc, throwTypes, position);
-            List Xparams = LabelTypeCheckUtil.labelCheckTypeParams(pi.container(), lc, throwTypes, position);
+            Xjoin = ltcu.labelCheckType(pi.container(), lc, throwTypes, position);
+            List Xparams = ltcu.labelCheckTypeParams(pi.container(), lc, throwTypes, position);
             actualParamLabels = new ArrayList(Xparams.size());
             for (Iterator iter = Xparams.iterator(); iter.hasNext();) {
                 PathMap Xj = (PathMap)iter.next();
@@ -223,9 +224,9 @@ public class CallHelper {
             }
         }
         else if (this.pi instanceof ConstructorInstance) {
-            Xjoin = LabelTypeCheckUtil.labelCheckType(pi.container(), lc, throwTypes, position);
+            Xjoin = ltcu.labelCheckType(pi.container(), lc, throwTypes, position);
             // now constraint params, pretending that they will be args to the constructor with upper bound {this}.
-            List Xparams = LabelTypeCheckUtil.labelCheckTypeParams(pi.container(), lc, throwTypes, position);
+            List Xparams = ltcu.labelCheckTypeParams(pi.container(), lc, throwTypes, position);
             actualParamLabels = new ArrayList(Xparams.size());
             JifContext A = lc.context();
 

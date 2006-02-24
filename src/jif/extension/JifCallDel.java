@@ -76,10 +76,10 @@ public class JifCallDel extends JifJL_c
         // if the method instance is static, and the target type is a 
         // parameterized class, we may need to evaluate some parameters
         // at runtime, and need to account for them here.
+        LabelTypeCheckUtil ltcu = ((JifTypeSystem)ts).labelTypeCheckUtil();
         if (mi.flags().isStatic()) {
             if (mi.container() instanceof JifClassType) {
-                l.addAll(LabelTypeCheckUtil.throwTypes((JifClassType)mi.container(), 
-                                                       (JifTypeSystem)ts));
+                l.addAll(ltcu.throwTypes((JifClassType)mi.container()));
             }            
         }
         return l;

@@ -18,9 +18,9 @@ import polyglot.util.Position;
  * @see jif.types.label.AccessPath
  */
 public class AccessPathField extends AccessPath {
-    private FieldInstance fi;
-    private String fieldName;
-    private AccessPath path;
+    protected FieldInstance fi;
+    protected String fieldName;
+    protected final AccessPath path;
     private boolean neverNull = false;
 
     public AccessPathField(AccessPath path, FieldInstance fi, String fieldName, Position pos) {

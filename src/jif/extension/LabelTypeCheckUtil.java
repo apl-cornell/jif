@@ -16,7 +16,11 @@ import polyglot.visit.TypeChecker;
  * Contains some common utility code to type check dynamic labels and principals
  */
 public class LabelTypeCheckUtil {
+    protected final JifTypeSystem ts;
     
+    public LabelTypeCheckUtil(JifTypeSystem ts) {
+        this.ts = ts;
+    }
     /**
      * Check the type of any access path contained in a dynamic principal. All such access paths should have type
      * Principal. 
@@ -24,9 +28,8 @@ public class LabelTypeCheckUtil {
      * @param principal
      * @throws SemanticException
      */
-    public static void typeCheckPrincipal(TypeChecker tc, Principal principal) throws SemanticException {
+    public void typeCheckPrincipal(TypeChecker tc, Principal principal) throws SemanticException {
         if (principal instanceof DynamicPrincipal) {
-            JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
             DynamicPrincipal dp = (DynamicPrincipal)principal;
             
             // Make sure that the access path is set correctly
@@ -71,12 +74,11 @@ public class LabelTypeCheckUtil {
      * @param Lbl
      * @throws SemanticException
      */
-    public static void typeCheckLabel(TypeChecker tc, Label Lbl) throws SemanticException {
+    public void typeCheckLabel(TypeChecker tc, Label Lbl) throws SemanticException {
         Collection components = labelComponents(Lbl);
         for (Iterator comps = components.iterator(); comps.hasNext(); ) {
             Label l = (Label)comps.next();
             if (l instanceof DynamicLabel) {
-                JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
                 DynamicLabel dl = (DynamicLabel)l;
                 
                 // Make sure that the access path is set correctly
@@ -108,7 +110,7 @@ public class LabelTypeCheckUtil {
         
     }
 
-    public static Collection labelComponents(Label L) {
+    public Collection labelComponents(Label L) {
         if (L instanceof JoinLabel) {
             return ((JoinLabel)L).joinComponents();
         }
@@ -120,7 +122,7 @@ public class LabelTypeCheckUtil {
         }        
     }
     
-    public static void typeCheckPolicy(TypeChecker tc, Policy p) throws SemanticException {
+    public void typeCheckPolicy(TypeChecker tc, Policy p) throws SemanticException {
         if (p instanceof JoinPolicy_c) {
             JoinPolicy_c jp = (JoinPolicy_c)p;
             for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
@@ -150,9 +152,7 @@ public class LabelTypeCheckUtil {
         }
     }
     
-    public static void typeCheckType(TypeChecker tc, Type t) throws SemanticException {
-        JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-
+    public void typeCheckType(TypeChecker tc, Type t) throws SemanticException {
         t = ts.unlabel(t);
         
         if (t instanceof JifSubstType) {            
@@ -178,9 +178,8 @@ public class LabelTypeCheckUtil {
         }
     }
 
-    public static PathMap labelCheckType(Type t, LabelChecker lc, List throwTypes, Position pos) throws SemanticException {
+    public PathMap labelCheckType(Type t, LabelChecker lc, List throwTypes, Position pos) throws SemanticException {
         JifContext A = lc.context();
-        JifTypeSystem ts = lc.typeSystem();
         PathMap X = ts.pathMap().N(A.pc());            
 
         List Xparams = labelCheckTypeParams(t, lc, throwTypes, pos);
@@ -198,8 +197,7 @@ public class LabelTypeCheckUtil {
      * @return List of <code>PathMap</code>s, one for each parameter of the subst type.
      * @throws SemanticException
      */
-    public static List labelCheckTypeParams(Type t, LabelChecker lc, List throwTypes, Position pos) throws SemanticException {
-        JifTypeSystem ts = lc.typeSystem();
+    public List labelCheckTypeParams(Type t, LabelChecker lc, List throwTypes, Position pos) throws SemanticException {
         t = ts.unlabel(t);
         List Xparams;
         
@@ -284,11 +282,10 @@ public class LabelTypeCheckUtil {
      * of the type <code>type</code>.
      * 
      * @param type
-     * @param ts
      * @return the types that may be thrown by a runtime evalution
      * of the type <code>type</code>.
      */
-    public static List throwTypes(JifClassType type, JifTypeSystem ts) {
+    public List throwTypes(JifClassType type) {
         Type t = ts.unlabel(type);
         if (t instanceof JifSubstType && ts.isParamsRuntimeRep(t)) {            
             JifSubstType jst = (JifSubstType)t;
@@ -316,7 +313,7 @@ public class LabelTypeCheckUtil {
     /**
      * Returns a set of local instances that are used in the type.
      */
-    public static Set localInstancesUsed(JifClassType type, JifTypeSystem ts) {
+    public Set localInstancesUsed(JifClassType type) {
         Type t = ts.unlabel(type);
         if (t instanceof JifSubstType) {            
             JifSubstType jst = (JifSubstType)t;

@@ -23,7 +23,8 @@ public class JifNew_c extends New_c implements New
 	JifNew_c n = (JifNew_c) super.typeCheck(tc);
 
 	Type t = n.tn.type();
-        LabelTypeCheckUtil.typeCheckType(tc, t);
+        LabelTypeCheckUtil ltcu = ((JifTypeSystem)tc.typeSystem()).labelTypeCheckUtil(); 
+        ltcu.typeCheckType(tc, t);
         
         n = (JifNew_c) n.type(t);
 	
@@ -32,9 +33,10 @@ public class JifNew_c extends New_c implements New
     public List throwTypes(TypeSystem ts) {
         List ex = new ArrayList(super.throwTypes(ts));
         New n = (New)this.node();
+        LabelTypeCheckUtil ltcu = ((JifTypeSystem)ts).labelTypeCheckUtil(); 
+        
         if (n.objectType().type() instanceof JifClassType) {
-            ex.addAll(LabelTypeCheckUtil.throwTypes((JifClassType)n.objectType().type(), 
-                                                    (JifTypeSystem)ts));
+            ex.addAll(ltcu.throwTypes((JifClassType)n.objectType().type()));
         }
         return ex;
     }

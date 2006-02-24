@@ -13,8 +13,8 @@ import polyglot.util.Position;
  * @see jif.types.label.AccessPath
  */
 public class AccessPathLocal extends AccessPathRoot {
-    private LocalInstance li;
-    private String name;
+    protected LocalInstance li;
+    protected String name;
     private boolean neverNull = false;
     public AccessPathLocal(LocalInstance li, String name, Position pos) {
         super(pos);

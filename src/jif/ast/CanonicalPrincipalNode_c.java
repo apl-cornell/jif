@@ -28,7 +28,8 @@ public class CanonicalPrincipalNode_c extends PrincipalNode_c implements Canonic
     }    
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        LabelTypeCheckUtil.typeCheckPrincipal(tc, principal);        
+        LabelTypeCheckUtil ltcu = ((JifTypeSystem)tc.typeSystem()).labelTypeCheckUtil(); 
+        ltcu.typeCheckPrincipal(tc, principal);        
         return super.typeCheck(tc);
     }
 

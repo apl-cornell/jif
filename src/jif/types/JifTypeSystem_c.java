@@ -2,6 +2,7 @@ package jif.types;
 
 import java.util.*;
 
+import jif.extension.LabelTypeCheckUtil;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv_c;
 import jif.types.label.*;
@@ -21,7 +22,7 @@ public class JifTypeSystem_c
     implements JifTypeSystem {
     private final TypeSystem jlts;
 
-    private final LabelEnv emptyLabelEnv = new LabelEnv_c(this, false);
+    private final LabelEnv emptyLabelEnv = this.createEmptyLabelEnv();
 
     private final DefaultSignature ds;
 
@@ -30,9 +31,17 @@ public class JifTypeSystem_c
         this.ds = new FixedSignature(this);
     }
 
-    public Solver solver(String solverName) {
+    public Solver createSolver(String solverName) {
         return new SolverGLB(this, solverName);
         //return new SolverLUB(this);
+    }
+
+    protected LabelEnv createEmptyLabelEnv() {
+        return new LabelEnv_c(this, false);
+    }
+
+    public LabelEnv createLabelEnv() {
+        return new LabelEnv_c(this, true);
     }
 
     public MuPClass mutablePClass(Position pos) {
@@ -1273,5 +1282,12 @@ public class JifTypeSystem_c
                                       Collections.EMPTY_LIST,
                                       Collections.EMPTY_LIST,
                                       Collections.EMPTY_LIST);
+    }
+
+    protected LabelTypeCheckUtil ltcu = null;
+    public LabelTypeCheckUtil labelTypeCheckUtil() {
+        if (ltcu == null)
+            ltcu = new LabelTypeCheckUtil(this);
+        return ltcu;
     }
 }

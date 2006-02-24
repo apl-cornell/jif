@@ -1,6 +1,7 @@
 package jif.ast;
 
 import jif.extension.LabelTypeCheckUtil;
+import jif.types.JifTypeSystem;
 import jif.types.label.Label;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
@@ -23,7 +24,8 @@ public class CanonicalLabelNode_c extends LabelNode_c implements CanonicalLabelN
             // label should be canonical by the time we start typechecking.
             throw new InternalCompilerError(this.label() + " is not canonical.");
         }
-        LabelTypeCheckUtil.typeCheckLabel(tc, label());        
+        LabelTypeCheckUtil ltcu = ((JifTypeSystem)tc.typeSystem()).labelTypeCheckUtil(); 
+        ltcu.typeCheckLabel(tc, label());        
         return super.typeCheck(tc);
     }
 }

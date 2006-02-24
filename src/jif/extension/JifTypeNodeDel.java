@@ -29,7 +29,7 @@ public class JifTypeNodeDel extends JifJL_c
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
         if (ts.isLabeled(tn.type())) {
             Label L = ts.labelOfType(tn.type());
-            LabelTypeCheckUtil.typeCheckLabel(tc, L);
+            ts.labelTypeCheckUtil().typeCheckLabel(tc, L);
         }
         
         Type unlabeledType = ts.unlabel(tn.type()); 
@@ -55,7 +55,7 @@ public class JifTypeNodeDel extends JifJL_c
             
         }
         
-        LabelTypeCheckUtil.typeCheckType(tc, unlabeledType);                
+        ts.labelTypeCheckUtil().typeCheckType(tc, unlabeledType);                
         return tn;
     }
 

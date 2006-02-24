@@ -3,6 +3,7 @@ package jif.types;
 import java.util.Collection;
 import java.util.List;
 
+import jif.extension.LabelTypeCheckUtil;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.*;
 import jif.types.principal.*;
@@ -201,8 +202,10 @@ public interface JifTypeSystem extends ParamTypeSystem
      */
     boolean isAccessible(MemberInstance mi, ClassType contextClass);
 
-        /** Returns a new label constraint system solver. */
-    Solver solver(String solverName);
+    /** Returns a new label constraint system solver. */
+    Solver createSolver(String solverName);
+    
+    LabelEnv createLabelEnv();
 
     DefaultSignature defaultSignature();
 
@@ -210,4 +213,6 @@ public interface JifTypeSystem extends ParamTypeSystem
      * Compares t1 to t2 without stripping off all the parameters and labels
      */
     boolean equalsNoStrip(TypeObject t1, TypeObject t2);
+
+    LabelTypeCheckUtil labelTypeCheckUtil();
 }

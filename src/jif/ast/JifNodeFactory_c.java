@@ -25,6 +25,9 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     protected JifNodeFactory_c(ExtFactory extFact) {
         super(extFact, new JifDelFactory_c());
     }
+    protected JifNodeFactory_c(ExtFactory extFact, DelFactory delFact) {
+        super(extFact, delFact);
+    }
 
     /**
      * Get the JifExtFactory_c instance.
@@ -36,7 +39,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return jifExtFact;
     }
     /** cache the result of looking for the JifExtFactory */
-    JifExtFactory_c jifExtFact = null;
+    protected JifExtFactory_c jifExtFact = null;
 
     public Disamb disamb() {
         return new JifDisamb_c();

@@ -60,7 +60,7 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo
     static public Set topics = new LinkedHashSet();
     static { topics.add("jif"); }
 
-    private TypeSystem jlTypeSystem() {
+    protected TypeSystem jlTypeSystem() {
         // Use a JL type system for looking up principals.
         return jlrtext.typeSystem();
     }

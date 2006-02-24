@@ -16,29 +16,29 @@ import polyglot.util.*;
  */
 public class LabelEnv_c implements LabelEnv
 {
-    private final PrincipalHierarchy ph;
-    private final List labelAssertions; // a list of LabelLeAssertions
-    private String displayLabelAssertions; 
-    private JifTypeSystem ts;
-    private Solver solver;
+    protected final PrincipalHierarchy ph;
+    protected final List labelAssertions; // a list of LabelLeAssertions
+    protected final StringBuffer displayLabelAssertions; 
+    protected final JifTypeSystem ts;
+    protected Solver solver;
     
     /**
      * Do any of the assertions have variables in them?
      */
-    private boolean hasVariables;
+    protected boolean hasVariables;
 
     /**
      * Topics to report
      */
-    private static Collection topics = CollectionUtil.list(Topics.jif, Topics.labelEnv);
+    protected static Collection topics = CollectionUtil.list(Topics.jif, Topics.labelEnv);
 
     public LabelEnv_c(JifTypeSystem ts, boolean useCache) {
         this(ts, new PrincipalHierarchy(), new LinkedList(), "", false, useCache);
     }
-    private LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph, List assertions, String displayLabelAssertions, boolean hasVariables, boolean useCache) {
+    protected LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph, List assertions, String displayLabelAssertions, boolean hasVariables, boolean useCache) {
         this.ph = ph;
         this.labelAssertions = assertions;
-        this.displayLabelAssertions = displayLabelAssertions;
+        this.displayLabelAssertions = new StringBuffer(displayLabelAssertions);
         this.hasVariables = false;
         this.solver = null;        
         this.hasVariables = hasVariables;
@@ -113,9 +113,9 @@ public class LabelEnv_c implements LabelEnv
         
         if (updateDisplayString && added) {
             if (displayLabelAssertions.length() > 0) {
-                displayLabelAssertions += ", ";
+                displayLabelAssertions.append(", ");
             }
-            displayLabelAssertions += L1 + " <= " + L2;
+            displayLabelAssertions.append(L1 + " <= " + L2);
         }
         return added;
     }
@@ -124,13 +124,15 @@ public class LabelEnv_c implements LabelEnv
         addAssertionLE(L1, L2, false);
         addAssertionLE(L2, L1, false);
         if (displayLabelAssertions.length() > 0) {
-            displayLabelAssertions += ", ";
+            displayLabelAssertions.append(", ");
         }
-        displayLabelAssertions += L1 + " equiv " + L2;        
+        displayLabelAssertions.append(L1 + " equiv " + L2);        
     }
     
     public LabelEnv copy() {
-        return new LabelEnv_c(ts, ph.copy(), new LinkedList(labelAssertions), displayLabelAssertions, hasVariables, useCache);
+        return new LabelEnv_c(ts, ph.copy(), new LinkedList(labelAssertions), 
+                              displayLabelAssertions.toString(), 
+                              hasVariables, useCache);
     }
     
     public boolean leq(Label L1, Label L2) { 
@@ -150,7 +152,7 @@ public class LabelEnv_c implements LabelEnv
      */
     private final Map cache = new HashMap();
     
-    private final boolean useCache;
+    protected final boolean useCache;
     
     private static class LeqGoal {
         final Object lhs;
