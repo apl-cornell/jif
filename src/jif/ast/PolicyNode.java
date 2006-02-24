@@ -14,7 +14,4 @@ public interface PolicyNode extends Node {
     
     PrincipalNode owner();
     PolicyNode owner(PrincipalNode owner);
-
-    List principals();
-    PolicyNode principals(List principals);
 }

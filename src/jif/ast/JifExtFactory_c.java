@@ -434,7 +434,7 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extPolicyNodeImpl() {
-        return extLabelNode();
+        return extNode();
     }
 
     protected Ext extAmbDynamicLabelNodeImpl() {
