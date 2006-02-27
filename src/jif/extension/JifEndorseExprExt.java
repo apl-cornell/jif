@@ -53,7 +53,7 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                        return "Endorse expressions cannot downgrade confidentiality.";
                    }
                    public String detailMsg() { 
-                       return "The endorse_from label has lower confidentiality than the" +
+                       return "The endorse_from label has lower confidentiality than the " +
                                    "endorse_to label; endorse expressions " +
                                    "cannot downgrade confidentiality.";
                    }                     
