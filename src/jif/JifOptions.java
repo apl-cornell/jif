@@ -97,6 +97,10 @@ public class JifOptions extends Options {
             index++;
             noRobustness = true;
         }
+        else if (args[index].equals("-robust")) {
+            index++;
+            noRobustness = false;
+        }
         else if (args[index].equals("-sigcp")) {
             index++;
             this.sigcp = args[index++];
