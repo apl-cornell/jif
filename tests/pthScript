@@ -202,7 +202,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 #	InvariantClass7.jif (Semantic, "Invariant class .* cannot implement covariant interface");
 #	InvariantClass8.jif (Semantic, "Invariant class .* cannot implement covariant interface");
 #	InvariantClass9.jif (Semantic, "Covariant class .* cannot extend invariant class");
-	InvariantClass10.jif (Semantic, "start label .* can not be the covariant label");
+	InvariantClass10.jif (Semantic, "pc bound .* can not be the covariant label");
 	InvariantClass11.jif (Semantic, "argument .* can not be labeled with the covariant label");
 	InvariantThis1.jif ;
 	InvariantThis2.jif (Semantic, "can not contain .*this");
@@ -284,7 +284,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Override03.jif;
 	Override04.jif;
 	Override05.jif (Semantic, "Cannot override .* label of .* argument") ;
-	Override06.jif (Semantic, "Cannot override .* start label") ;
+	Override06.jif (Semantic, "Cannot override .* program counter bound") ;
 	Override07.jif (Semantic, "Cannot override .* return label") ;
 	Override08.jif (Semantic, "Cannot override .* return value label") ;
 	Override09.jif (Semantic, "Cannot override .* label of .* exception") ;
@@ -297,6 +297,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Override16.jif;
 	Override17.jif  (Semantic, "cannot assume");
 	Override18.jif;
+	Override19.jif;
 	PairList2.jif ;
 	Params1.jif ;
 	Params1Test.jif ;

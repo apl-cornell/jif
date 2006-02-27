@@ -71,7 +71,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
 	addCallers(mi, A, newAuth);
 	A.setAuthority(newAuth);       
-	constrainLabelEnv(mi, A);
+	constrainLabelEnv(mi, A, null);
 	return Li;
     }
 
@@ -147,7 +147,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * (Figure 4.39).  It returns the principal hierarchy used to check the
      * body of the method.
      */
-    protected static void constrainLabelEnv(JifProcedureInstance mi, JifContext A)
+    protected static void constrainLabelEnv(JifProcedureInstance mi, JifContext A, CallHelper ch)
 	throws SemanticException
     {
         for (Iterator i = mi.constraints().iterator(); i.hasNext(); ) {
@@ -157,18 +157,29 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                 ActsForConstraint ac = (ActsForConstraint) c;
 		//A.addActsFor(A.instantiate(ac.actor()),
 		//	     A.instantiate(ac.granter()));
+                Principal actor = ac.actor();
+                Principal granter = ac.granter();
+                if (ch != null) {
+                    actor = ch.instantiate(A, actor);
+                    granter = ch.instantiate(A, granter);
+                }
+
                 if (ac.isEquiv()) {
-                    A.addEquiv(ac.actor(), ac.granter());
+                    A.addEquiv(actor, granter);
                 }
                 else {
-                    A.addActsFor(ac.actor(), ac.granter());
+                    A.addActsFor(actor, granter);
                 }
 	    }
             if (c instanceof LabelLeAssertion) {
                 LabelLeAssertion lla = (LabelLeAssertion)c;
-                A.addAssertionLE(lla.lhs(), lla.rhs()); // Could just 
-                                                        // pass the constraint 
-                                                        // in directly?
+                Label lhs = lla.lhs();
+                Label rhs = lla.rhs();
+                if (ch != null) {
+                    lhs = ch.instantiate(A, lhs);
+                    rhs = ch.instantiate(A, rhs);
+                }
+                A.addAssertionLE(lhs, rhs); 
             }
 	}
     }

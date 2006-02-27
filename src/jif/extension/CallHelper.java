@@ -678,7 +678,7 @@ public class CallHelper {
 
                 Principal granter = jac.granter();
                 granter = instantiate(A, granter);
-
+                
                 if (jac.isEquiv()) {
                     if (!A.equiv(actor, granter)) {
                         if (!overrideChecker) {
@@ -849,7 +849,7 @@ public class CallHelper {
         return formalArgLabels;
     }
 
-    private Label instantiate(JifContext A, Label L) throws SemanticException {
+    public Label instantiate(JifContext A, Label L) throws SemanticException {
         return JifInstantiator.instantiate(L, A, receiverExpr, calleeContainer, receiverLabel,
                                            getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem()),
                                            this.actualArgLabels,
@@ -862,14 +862,14 @@ public class CallHelper {
      * replaces any signature ArgPrincipal with the appropriate prinicipal.
      * @throws SemanticException
      */
-    private Principal instantiate(JifContext A, Principal p) throws SemanticException {
+    public Principal instantiate(JifContext A, Principal p) throws SemanticException {
         return JifInstantiator.instantiate(p, A, receiverExpr, calleeContainer, receiverLabel,
                                            getArgLabelsFromFormalTypes(this.pi.formalTypes(), (JifTypeSystem)this.pi.typeSystem()),
                                            this.actualArgs,
                              this.actualParamLabels);
     }
 
-    private Type instantiate(JifContext A, Type t) throws SemanticException {
+    public Type instantiate(JifContext A, Type t) throws SemanticException {
         return JifInstantiator.instantiate(t, A, receiverExpr, calleeContainer, receiverLabel,
                                            getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem()),
                                            this.actualArgLabels,
@@ -912,7 +912,7 @@ public class CallHelper {
         A.setAuthority(newAuth);       
 
         // add the where constraints of the superclass only.
-        JifProcedureDeclExt_c.constrainLabelEnv(overridden, newlc.context());        
+        JifProcedureDeclExt_c.constrainLabelEnv(overridden, newlc.context(), this);        
 
         // check that the where constraints of the subclass are implied by 
         // those of the superclass.
@@ -961,14 +961,14 @@ public class CallHelper {
         }
 
         
-        // start labels are contravariant:
-        //    the start label on mi may be more restrictive than the start 
-        //    label on mj
-        NamedLabel starti = new NamedLabel("sub_start_label",
-                                           "Start label of method " + overriding.name() + " in " + overriding.container(), 
+        // pc bounds  are contravariant:
+        //    the pc bound on mi may be more restrictive than the 
+        // pc bound on mj
+        NamedLabel starti = new NamedLabel("sub_pc_bound",
+                                           "PC bound of method " + overriding.name() + " in " + overriding.container(), 
                                            overriding.pcBound());
-        NamedLabel startj = new NamedLabel("sup_start_label",
-                                           "Start label of method " + overridden.name() + " in " + overridden.container(), 
+        NamedLabel startj = new NamedLabel("sup_pc_bound",
+                                           "PC bound of method " + overridden.name() + " in " + overridden.container(), 
                                            instantiate(A, overridden.pcBound()));
         newlc.constrain(new LabelConstraint(startj,
                                             LabelConstraint.LEQ,
@@ -979,7 +979,7 @@ public class CallHelper {
                             return "Cannot override " + overridden.signature() + 
                                    " in " + overridden.container() + " with " + 
                                    overriding.signature() + " in " + 
-                                   overriding.container() + ". The start label of the " + 
+                                   overriding.container() + ". The program counter bound of the " + 
                                    "overriding method " +
                                    "cannot be less restrictive than in " +
                                    "the overridden method.";                
@@ -987,9 +987,10 @@ public class CallHelper {
                         }
                         public String detailMsg() {
                             return msg() + 
-                                " The start label of a method is a lower " +
+                                " The program counter bound of a method is a lower " +
                                 "bound on the observable side effects that " +
-                                "the method may perform (such as updates to fields).";                
+                                "the method may perform (such as updates to fields), and " +
+                                "an upper bound of the program counter label at the call site.";                
 
                         }
                    }

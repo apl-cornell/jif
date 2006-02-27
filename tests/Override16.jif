@@ -1,10 +1,10 @@
 class C {
-    int{} m() where caller(Alice)  { return 5; }
+    int{} m{Alice:}() where caller(Alice)  { return 5; }
 }
 
 class D extends C {
     int{Alice:} secret;
-    int{} m() where caller(Alice) // ok
+    int{} m{Alice:}() where caller(Alice) // ok
     { 
 	return declassify(secret, {this;_!:_}); 
     }
