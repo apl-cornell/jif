@@ -27,6 +27,7 @@ public interface Map[label K, label V] extends JifObject[{K;V}] {
     // Note: when keys are returned, they will be returned as JifString[K]s
     boolean{K;key} containsKey{K}(String{K} key);
     JifObject[V]{K; key} get{K}(String{K} key);
+    JifObject[V]{K; *lbl; lbl; key} get{*lbl}(label lbl, String{*lbl} key);
     JifObject[V]{K} put{K}(String{K} key, JifObject[V]{K} value);
     JifObject[V]{K} remove{K}(String{K} key);
 

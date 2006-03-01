@@ -81,6 +81,9 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
     public final JifObject[V]{K; key} get{K}(String{K} key) {
         return this.get(new JifString[K](key));
     }
+    public final JifObject[V]{K; *lbl; lbl; key} get{*lbl}(label lbl, String{*lbl} key) {
+        return this.get(lbl, new JifString[lbl](key));
+    }
     public final JifObject[V]{K} put{K}(String{K} key, JifObject[V]{K} value) {
         return this.put(new JifString[K](key), value);
     }
