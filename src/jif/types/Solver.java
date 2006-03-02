@@ -905,7 +905,8 @@ public abstract class Solver {
      */
     protected void reportError(LabelConstraint c, Collection variables)
             throws SemanticException {
-        while (!c.report()) {
+        int count = 0;
+        while (!c.report() && (count++) < 1000) {
             // we don't want to blame this constraint for the error, if
             // possible. Try to find the constraint that made this one
             // unsatisfiable.
