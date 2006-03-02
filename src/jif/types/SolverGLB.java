@@ -129,7 +129,11 @@ public class SolverGLB extends Solver {
                 VarLabel comp = (VarLabel)i.next();
 
                 refineVariableEquation(comp, eqn);
-                if (search(eqn)) {
+                // check that the equation is now satisfied.
+                Label lhsbound = triggerTransforms(bounds().applyTo(eqn.lhs()), eqn.env());
+                Label rhsbound = triggerTransforms(bounds().applyTo(eqn.rhs()), eqn.env());
+                
+                if (eqn.env().leq(lhsbound, rhsbound) && search(eqn)) {
                     // we were successfully able to find a solution to the
                     // constraints!
                     return;
@@ -180,6 +184,7 @@ public class SolverGLB extends Solver {
 
         // Try and raise v's bound just enough to satisfy the equation
         Label needed = findNeeded(lhsBound, rhsBound, eqn.env());
+        
 //        Collection needed = new ArrayList(lhsBound.components().size());
 //        for (Iterator comps = lhsBound.components().iterator(); comps.hasNext();) {
 //            Label comp = (Label)comps.next();
