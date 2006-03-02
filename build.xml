@@ -342,8 +342,8 @@ ext="-extclass split.ExtensionInfo"
             <arg value="lib-classes" />
             <arg value="-sourcepath" />
             <arg value="lib-src" />
-            <!--      
       <arg value="-e" />
+            <!--      
       <arg value="-report" />
       <arg value="debug=1" />
 -->

@@ -83,7 +83,7 @@ public class WriterPolicy implements IntegPolicy
     }
     
     public String toString() {
-        String str = PrincipalUtil.toString(owner) + ": ";
+        String str = PrincipalUtil.toString(owner) + "!: ";
         if (!PrincipalUtil.isTopPrincipal(writer))
             str += PrincipalUtil.toString(writer);
         return str;
