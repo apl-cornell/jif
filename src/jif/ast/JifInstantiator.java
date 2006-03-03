@@ -59,18 +59,43 @@ public class JifInstantiator
         }
         JifTypeSystem ts = (JifTypeSystem)receiverType.typeSystem();
         if (L != null) {
-            // go through each formal arglabel, and replace it appropriately...
-            Iterator iArgLabels = formalArgLabels.iterator();
+            // First replace each formalArgLabels with a new label. This
+            // is essentially equivalent to renaming, to ensure
+            // that if some of the actualArgLabels contains some of the
+            // formalArgLabels, we don't get the substitution screwing things
+            // up...
+            // go through and replace the formal labels with the temp labels
+            // QUESTION: Do we also need to do something similar for the 
+            // access paths and the this label? i.e., replace the access path
+            // roots in dynamic labels and principals for formal args with 
+            // some temp var instance. Would need to do this in other methods 
+            // too.
+            Label[] temp = new Label[formalArgLabels.size()];
+            for (int i = 0; i < temp.length; i++) {
+                temp[i] = ts.unknownLabel(Position.COMPILER_GENERATED);
+
+                ArgLabel formalArgLbl = (ArgLabel)formalArgLabels.get(i);
+                try {
+                    L = L.subst(new LabelInstantiator(formalArgLbl, temp[i]));
+                }
+                catch (SemanticException e) {
+                    throw new InternalCompilerError("Unexpected SemanticException " +
+                                                    "during label substitution: " + e.getMessage(), L.position());
+                }
+            }            
+            
+            // now go through each temp arglabel, and replace it appropriately...
             Iterator iActualArgLabels = actualArgLabels.iterator();
             Iterator iActualArgExprs = null;
             if (actualArgExprs != null) {
                 iActualArgExprs = actualArgExprs.iterator();
             }
-            while (iArgLabels.hasNext()) {
-                ArgLabel formalArgLbl = (ArgLabel)iArgLabels.next();
+            for (int i = 0; i < temp.length; i++) {
+                Label formalArgTempLbl = temp[i];
+                ArgLabel formalArgLbl = (ArgLabel)formalArgLabels.get(i);
                 Label actualArgLbl = (Label)iActualArgLabels.next();
                 try {
-                    L = L.subst(new LabelInstantiator(formalArgLbl, actualArgLbl));
+                    L = L.subst(new ExactLabelInstantiator(formalArgTempLbl, actualArgLbl));
                 }
                 catch (SemanticException e) {
                     throw new InternalCompilerError("Unexpected SemanticException " +
@@ -98,8 +123,7 @@ public class JifInstantiator
                     }
                 }
             }
-            if (iArgLabels.hasNext() || 
-                    iActualArgLabels.hasNext() || 
+            if (iActualArgLabels.hasNext() || 
                     (iActualArgExprs != null && iActualArgExprs.hasNext())) {
                 throw new InternalCompilerError("Inconsistent arg lists");
             }
@@ -540,7 +564,7 @@ public class JifInstantiator
     }
     
     /**
-     * Replaces srcLabel with trgLabel 
+     * Replaces L with trgLabel if srcLabel.equals(L) 
      */
     private static class LabelInstantiator extends LabelSubstitution {
         private Label srcLabel;
@@ -552,6 +576,25 @@ public class JifInstantiator
         
         public Label substLabel(Label L) {
             if (srcLabel.equals(L)) {
+                return trgLabel;
+            }
+            return L;
+        }
+    }
+
+    /**
+     * Replaces L with trgLabel if srcLabel == L 
+     */
+    private static class ExactLabelInstantiator extends LabelSubstitution {
+        private Label srcLabel;
+        private Label trgLabel;
+        protected ExactLabelInstantiator(Label srcLabel, Label trgLabel) {
+            this.srcLabel = srcLabel;
+            this.trgLabel = trgLabel;
+        }
+        
+        public Label substLabel(Label L) {
+            if (srcLabel == L) {
                 return trgLabel;
             }
             return L;

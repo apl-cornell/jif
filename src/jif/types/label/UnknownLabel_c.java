@@ -37,7 +37,7 @@ public class UnknownLabel_c extends Label_c implements UnknownLabel
     }
     
     public boolean equalsImpl(TypeObject o) {
-        return o instanceof UnknownLabel;
+        return o == this;
     }    
     public int hashCode() { return 234334; }
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
