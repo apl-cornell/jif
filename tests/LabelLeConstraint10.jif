@@ -7,7 +7,7 @@ class C[label L] {
 }
 
 class D {
-    void foo() {
+    void foo{*!:}() {
 	final C[{Alice:}] c = new C[{Alice:}]();
 
 	c.n(new label {Alice:;Bob:}); // ok

@@ -1,5 +1,5 @@
 class C[principal p] {
-    void m() {
-	C[null] x = null; // prevent or allow null to be used?
+    void m{*!:}() {
+	C[null] x = null; // OK, null is the bottom principal
     }
 }

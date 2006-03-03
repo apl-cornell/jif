@@ -1,7 +1,7 @@
 // Test authority of calling classes for static methods of param classes.
 class C[principal P, principal Q] authority (P, Q) { 
-    static int{} m() where authority (P) {
-	int{P:} x = 3;
+    static int{} m{P:}() where authority (P) {
+	int{P:;P!:} x = 3;
 	return declassify(x, {});
     }
 }

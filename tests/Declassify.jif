@@ -3,7 +3,7 @@ public class Declassify {
     int{Alice:} b;
     int{Alice:} c;
 
-    public int{Alice:Bob} sum() where caller(Alice) {
+    public int{Alice:Bob} sum{this}() where caller(Alice) {
 	// return declassify(a+b+c, {Alice:Bob});
 
 	// The above declassification does not work,
