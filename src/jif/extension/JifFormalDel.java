@@ -44,7 +44,7 @@ public class JifFormalDel extends JifJL_c
         }
         else {
             // method and constructor formals have an ArgLabel 
-	        ArgLabel al = jts.argLabel(n.position(), li);
+	        ArgLabel al = jts.argLabel(n.position(), li, null);
 	        li.setLabel(al);
         }
                 
@@ -73,6 +73,9 @@ public class JifFormalDel extends JifJL_c
         
         if (!isCatchFormal) {
             ArgLabel al = (ArgLabel)li.label();
+            
+            al.setCodeInstance(ar.context().currentCode());
+            
             if (al.upperBound() == null) {
                 // haven't set the arg label yet
                 // do so now.

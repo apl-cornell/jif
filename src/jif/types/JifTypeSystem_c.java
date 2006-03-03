@@ -830,8 +830,12 @@ public class JifTypeSystem_c
         return t;
     }
 
-    public ArgLabel argLabel(Position pos, VarInstance vi) {
-        ArgLabel t = new ArgLabel_c(this, vi, pos);
+    public ArgLabel argLabel(Position pos, LocalInstance vi, CodeInstance ci) {
+        ArgLabel t = new ArgLabel_c(this, vi, ci, pos);
+        return t;
+    }
+    public ArgLabel argLabel(Position pos, ParamInstance pi) {
+        ArgLabel t = new ArgLabel_c(this, pi, null, pos);
         return t;
     }
     

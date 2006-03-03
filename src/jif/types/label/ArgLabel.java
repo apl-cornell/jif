@@ -1,5 +1,6 @@
 package jif.types.label;
 
+import polyglot.types.CodeInstance;
 import polyglot.types.VarInstance;
 
 
@@ -11,4 +12,5 @@ public interface ArgLabel extends Label {
     VarInstance formalInstance();
     Label upperBound();
     void setUpperBound(Label upperBound);
+    void setCodeInstance(CodeInstance ci);
 }

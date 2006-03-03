@@ -14,38 +14,40 @@ import polyglot.util.Position;
  * The purpose is to avoid having to re-interpret labels at each call.
  */
 public class ArgLabel_c extends Label_c implements ArgLabel {
-    private final TypeObject vi; // either a VarInstance or a ProcedureInstance
+    private final VarInstance vi; 
+    private CodeInstance ci; // code instance containing vi, if relevant
     private final String name;
     private Label upperBound;
     
     
     protected ArgLabel_c() {
         vi = null;
+        ci = null;
         name =  null;
     }
-    public ArgLabel_c(JifTypeSystem ts, VarInstance vi, Position pos) {
+    public ArgLabel_c(JifTypeSystem ts, VarInstance vi, CodeInstance ci, Position pos) {
         super(ts, pos);        
         this.vi = vi;
+        this.ci = ci;
         this.name = vi.name();
         setDescription();
     }
 
     public ArgLabel_c(JifTypeSystem ts, ProcedureInstance pi, String name, Position pos) {
         super(ts, pos);        
-        this.vi = pi;
+        this.vi = null;
+        this.ci = pi;
         this.name = name;
     }
     
     private void setDescription() {
-        if (vi instanceof VarInstance) 
+        if (vi != null) 
         this.setDescription("polymorphic label of the formal argument " + 
-                            ((VarInstance)vi).name() + " (bounded above by " + 
+                            vi.name() + " (bounded above by " + 
                             upperBound + ")");
     }
     public VarInstance formalInstance() {
-        if (vi instanceof VarInstance)
-            return (VarInstance)vi;
-        return null;
+        return vi;
     }
     
     public Label upperBound() {
@@ -55,6 +57,10 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     public void setUpperBound(Label upperBound) {
         this.upperBound = upperBound;
         setDescription();
+    }
+
+    public void setCodeInstance(CodeInstance ci) {
+        this.ci = ci;
     }
 
     public boolean isRuntimeRepresentable() { return false; }
@@ -70,10 +76,11 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
             return false;
         }           
         ArgLabel_c that = (ArgLabel_c) o;
-        return (this.vi.equals(that.vi));
+        return (this.ci == that.ci || (this.ci != null && this.ci.equals(that.ci))) &&
+               (this.vi == that.vi || (this.vi != null && this.vi.equals(that.vi)));
     }
     public int hashCode() {
-        return vi.hashCode();
+        return (vi==null?234:vi.hashCode()) ^ 2346882;
     }
         
     public String componentString(Set printedLabels) {
