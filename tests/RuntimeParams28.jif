@@ -5,6 +5,6 @@ class C[label L] {
 class D {
     void m(principal p) {
 	final label bnd = new label {Alice:};
-	C[bnd] x = new C[bnd]();
+	C[{bnd}] x = new C[{bnd}](); // BAD since {bnd} is the label of the var bnd, which is caller_pc
     }
 }

@@ -3,7 +3,7 @@ public class Deref2 {
 	return x;
     }
 
-    public static void g() {
+    public static void g{*!:*}() {
 	final label L = new label { Alice : };
 	final label M = new label { Bob : };
 

@@ -7,7 +7,7 @@ class DynLabel1 {
 	this.g = o;
     }
   
-    void m(label{*!:*} q, DynLabel1 arg) throws NullPointerException {	
+    void m{*!:*}(label{*!:*} q, DynLabel1 arg) throws NullPointerException {	
 	final DynLabel1 local = new DynLabel1(q, null);
 
 	int{*q} x; // ok

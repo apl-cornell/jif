@@ -402,6 +402,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	RuntimeParams25.jif (Syntax);
 //KNOWN BAD: needs a fix in Polyglot	RuntimeParams26.jif (Semantic, "@@@@@"); // should be an initialization error
 	RuntimeParams27.jif ;
+	RuntimeParams28.jif (Semantic, "runtime.*representable");
 	Simple.jif ;
 	Simple2.jif ;
 	Simple3.jif ;

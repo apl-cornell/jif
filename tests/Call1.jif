@@ -4,7 +4,7 @@ class Call1
 	return a;
     }
     
-    int{Alice:Bob} m2() {
+    int{Alice:Bob} m2{*!:*}() {
 	int x = 10;
 	return m(x);
     }

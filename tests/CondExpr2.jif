@@ -1,5 +1,5 @@
 class C[covariant label L] {
-    void m(boolean{} b) {
+    void m{*!:}(boolean{} b) {
 	C[{}] x = b?null:foo(new label {});
 	
 	D{Alice:} d = new D();

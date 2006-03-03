@@ -11,7 +11,7 @@ class JunctivePrincipals01 {
             PrintStream[{pp:;_!:_}] out = runtime.out();
 
 	    // some simple conjunctive and disjunctive labels
-	    label[] lbls = new label[9];
+	    label{pp!:}[] lbls = new label[9];
 	    lbls[0] = new label {Alice: Bob&Chuck};
 	    lbls[1] = new label {Alice: Bob&Chuck, Chuck&Dolores};
 	    lbls[2] = new label {Alice: Bob&(Chuck,Dolores)};

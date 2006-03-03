@@ -6,7 +6,7 @@ class Dyn1
 	return 10;
     }
 
-    void test() {
+    void test{*!:*}() {
 	int{Alice:} a = m(new label{Alice:});
 	//int{*f} b = m(f);
 	

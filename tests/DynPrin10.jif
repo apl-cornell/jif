@@ -11,7 +11,7 @@ class DynPrin10 {
     void m9(label{*M} L, label{L} M) {}
     void m10(label{M} L, label{*L} M) {}
 
-    void m() {
+    void m{*!:*}() {
 	final principal{Alice:} a = Alice;
 	m1(a);
 

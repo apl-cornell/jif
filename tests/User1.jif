@@ -4,7 +4,7 @@ class User1
 	return 0;
     }
 
-    int{Alice:} m1() {
+    int{Alice:} m1{*!:*}() {
 	return m(Alice);
     }
 }

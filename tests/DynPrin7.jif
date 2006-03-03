@@ -8,7 +8,7 @@ class DynPrin7 {
 	this.g = o;
     }
   
-    void m(principal{} q) {	
+    void m{*!:*}(principal{} q) {	
 	final DynPrin7 local = new DynPrin7(q, null);
 
 	int{m.p:} x1; // ok
