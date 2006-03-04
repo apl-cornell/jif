@@ -27,421 +27,264 @@ import polyglot.util.Position;
  */
 public class JifInstantiator
 {
-    private JifInstantiator() {}
+    private final JifTypeSystem ts;
+    private final ReferenceType receiverType;
+    private final Label receiverLbl;
+    private final Label formalThisLbl;
+    private final AccessPath receiverPath;
+    private final List formalArgLabels; 
+    private final List actualArgLabels; 
+    private final List actualArgExprs;
+    private final List actualParamLabels; 
+    private final JifContext callerContext;
     
-    /**
-     * Perform instantiation on the label L
-     *  
-     * @param L the Label to substitute
-     * @param receiverType
-     * @param formalArgLabels List of ArgLabels, the labels of the formal
-     *            arguments of the procedure being called
-     * @param actualArgLabels List of Labels, the labels of the actuals
-     *            arguments of the procedure being called
-     * @param actualArgExprs List of Exprs, the actual arguments.
-     * @param actualParamLabels List of Labels, the label of the evaluation of
-     *            the actual parameters. These are only really needed for static
-     *            methods (including constructors), where the actual parameters
-     *            need to be evaluated at runtime.
-     * @param callerContext the context of the caller of the method
-     * @return the instantiated Label
-     */
-    private static Label instantiate(Label L, 
-                                     ReferenceType receiverType, 
-                                     List formalArgLabels, 
-                                     List actualArgLabels, 
-                                     List actualArgExprs, 
-                                     List actualParamLabels, 
-                                     JifContext callerContext) {
-        if (formalArgLabels.size() != actualArgLabels.size() || 
-                (actualArgExprs != null && formalArgLabels.size() != actualArgExprs.size())) {
-            throw new InternalCompilerError("Inconsistent sized lists of args");
+    // temp labels and paths
+    private final List formalTempLabels;
+    private final List formalTempAccessPathRoots;
+    private final AccessPathRoot tempThisRoot;
+    private final Label tempThisLbl;
+    
+    private JifInstantiator(ReferenceType receiverType,
+                            Label receiverLbl,
+                            AccessPath receiverPath,
+                            List formalArgLabels,
+                            List actualArgLabels,
+                            List actualArgExprs,
+                            List actualParamLabels,
+                            JifContext callerContext) {
+        this.callerContext = callerContext;
+        this.receiverType = receiverType;
+        this.receiverLbl = receiverLbl;
+        this.receiverPath = receiverPath;
+        this.formalArgLabels = formalArgLabels;
+        this.actualArgLabels = actualArgLabels;
+        this.actualArgExprs = actualArgExprs;
+        this.actualParamLabels = actualParamLabels;
+        
+        this.ts = (JifTypeSystem)callerContext.typeSystem();
+        
+        if (receiverType != null && receiverType.isClass()) {
+            this.formalThisLbl = ts.thisLabel(receiverType.position(), 
+                                              (JifClassType)receiverType.toClass());
         }
-        JifTypeSystem ts = (JifTypeSystem)receiverType.typeSystem();
-        if (L != null) {
-            // First replace each formalArgLabels with a new label. This
-            // is essentially equivalent to renaming, to ensure
-            // that if some of the actualArgLabels contains some of the
-            // formalArgLabels, we don't get the substitution screwing things
-            // up...
-            // go through and replace the formal labels with the temp labels
-            // QUESTION: Do we also need to do something similar for the 
-            // access paths and the this label? i.e., replace the access path
-            // roots in dynamic labels and principals for formal args with 
-            // some temp var instance. Would need to do this in other methods 
-            // too.
-            Label[] temp = new Label[formalArgLabels.size()];
-            for (int i = 0; i < temp.length; i++) {
-                temp[i] = ts.unknownLabel(Position.COMPILER_GENERATED);
+        else {
+            this.formalThisLbl = null;
+        }
 
-                ArgLabel formalArgLbl = (ArgLabel)formalArgLabels.get(i);
-                try {
-                    L = L.subst(new LabelInstantiator(formalArgLbl, temp[i]));
-                }
-                catch (SemanticException e) {
-                    throw new InternalCompilerError("Unexpected SemanticException " +
-                                                    "during label substitution: " + e.getMessage(), L.position());
-                }
-            }            
-            
-            // now go through each temp arglabel, and replace it appropriately...
-            Iterator iActualArgLabels = actualArgLabels.iterator();
-            Iterator iActualArgExprs = null;
-            if (actualArgExprs != null) {
-                iActualArgExprs = actualArgExprs.iterator();
-            }
-            for (int i = 0; i < temp.length; i++) {
-                Label formalArgTempLbl = temp[i];
-                ArgLabel formalArgLbl = (ArgLabel)formalArgLabels.get(i);
-                Label actualArgLbl = (Label)iActualArgLabels.next();
-                try {
-                    L = L.subst(new ExactLabelInstantiator(formalArgTempLbl, actualArgLbl));
-                }
-                catch (SemanticException e) {
-                    throw new InternalCompilerError("Unexpected SemanticException " +
-                                                    "during label substitution: " + e.getMessage(), L.position());
-                }
-
-                if (iActualArgExprs != null) {
-                    Expr actualExpr = (Expr)iActualArgExprs.next();
-                
-                    try {
-                        Position pos = actualExpr.position();
-                        AccessPathRoot root = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), pos);                            
-                        AccessPath target;
-                        if (JifUtil.isFinalAccessExprOrConst(ts, actualExpr)) {
-                            target = JifUtil.exprToAccessPath(actualExpr, callerContext);
-                        }
-                        else {
-                            target = new AccessPathUninterpreted(actualExpr, pos);                            
-                        }
-                        L = L.subst(new AccessPathInstantiator(root, target));
-                    }
-                    catch (SemanticException e) {
-                        throw new InternalCompilerError("Unexpected SemanticException " +
-                                                        "during label substitution: " + e.getMessage(), L.position());
-                    }
-                }
-            }
-            if (iActualArgLabels.hasNext() || 
-                    (iActualArgExprs != null && iActualArgExprs.hasNext())) {
-                throw new InternalCompilerError("Inconsistent arg lists");
-            }
-            
-            // also instantiate the param arg labels. They only occur in static methods
-            // of parameterized classes, but no harm in always instantiating them.
-            if (!actualParamLabels.isEmpty()) {
-                // go through the formal params, and the actual param labels.
-                JifSubstType jst = (JifSubstType)receiverType;
-                JifPolyType jpt = (JifPolyType)jst.base();
-                Iterator iFormalParams = jpt.params().iterator();
-                Iterator iActualParamLabels = actualParamLabels.iterator();
-                
-                // go through each formal and actual param, and make substitutions.
-                while (iActualParamLabels.hasNext()) {
-                    Label actualParamLabel = (Label)iActualParamLabels.next();                    
-                    ParamInstance pi = (ParamInstance)iFormalParams.next();
-                    ArgLabel paramArgLabel = ts.argLabel(pi.position(), pi);
-                    paramArgLabel.setUpperBound(ts.topLabel());
-                    try {
-                        L = L.subst(new LabelInstantiator(paramArgLabel, actualParamLabel));
-                    }
-                    catch (SemanticException e) {
-                        throw new InternalCompilerError("Unexpected SemanticException " +
-                                                        "during label substitution: " + e.getMessage(), L.position());
-                    }                    
-                }
-                if (iActualParamLabels.hasNext() || iFormalParams.hasNext()) {
-                    throw new InternalCompilerError("Inconsistent param lists");
-                }
+        if (formalArgLabels != null) {
+            this.formalTempAccessPathRoots = new ArrayList(formalArgLabels.size());
+            this.formalTempLabels = new ArrayList(formalArgLabels.size());
+            for (int i = 0; i < formalArgLabels.size(); i++) {
+                formalTempLabels.add(ts.unknownLabel(Position.COMPILER_GENERATED));
+                formalTempAccessPathRoots.add(new AccessPathUninterpreted("temp arg path", 
+                                                                          Position.COMPILER_GENERATED,
+                                                                          true));
             }
         }
-        return L;
+        else {
+            this.formalTempAccessPathRoots = null;
+            this.formalTempLabels = null;            
+        }
+        this.tempThisLbl = ts.unknownLabel(Position.COMPILER_GENERATED);
+        this.tempThisRoot = new AccessPathUninterpreted("temp this", 
+                                                        Position.COMPILER_GENERATED,
+                                                        true);  
+        
     }
     
-    /**
-     * Perform instantiation on the principal p
-     *  
-     * @param p the principal to substitute
-     * @param receiverType
-     * @param formalArgLabels List of ArgLabels, the labels of the formal
-     *            arguments of the procedure being called
-     * @param actualArgExprs List of Exprs, the actual arguments.
-     * @param actualParamLabels List of Labels, the label of the evaluation of
-     *            the actual parameters. These are only really needed for static
-     *            methods (including constructors), where the actual parameters
-     *            need to be evaluated at runtime.
-     * @param callerContext the context of the caller of the method
-     * @return the instantiated Label
-     */
-    private static Principal instantiate(Principal p, 
-                                         ReferenceType receiverType, 
-                                         List formalArgLabels, 
-                                         List actualArgExprs, 
-                                         List actualParamLabels, 
-                                         JifContext callerContext) {
-        if (formalArgLabels.size() != actualArgExprs.size()) {
-            throw new InternalCompilerError("Inconsistent sized lists of args");
-        }
-        JifTypeSystem ts = (JifTypeSystem)receiverType.typeSystem();
-        if (p != null) {
-            // go through each formal arglabel, and replace it appropriately...
-            Iterator iArgLabels = formalArgLabels.iterator();
-            Iterator iActualArgExprs = actualArgExprs.iterator();
-            while (iArgLabels.hasNext()) {
-                ArgLabel formalArgLbl = (ArgLabel)iArgLabels.next();
-                Expr actualExpr = (Expr)iActualArgExprs.next();
+
+    // replace the formal argLabels, formal arg 
+    // AccessPathRoots, the "this" label, and the "this"
+    // access path root with appropriate temporary values.
+    private Object substTempsForFormals(Object L, Position pos) {
+        if (L == null) return null;
                 
+        // formal argLabels to formalTempLabels
+        for (int i = 0; formalArgLabels != null && i < formalArgLabels.size(); i++) {
+            Label temp = (Label)formalTempLabels.get(i);
+            ArgLabel formalArgLbl = (ArgLabel)formalArgLabels.get(i);            
+            try {
+                L = substImpl(L, new LabelInstantiator(formalArgLbl, temp, false));
+            }
+            catch (SemanticException e) {
+                throw new InternalCompilerError("Unexpected SemanticException " +
+                                                "during label substitution: " + e.getMessage(), pos);
+            }
+        }            
+
+        // formal this label to temp this label
+        if (formalThisLbl != null) {
+            try {
+                L = substImpl(L, new LabelInstantiator(formalThisLbl, tempThisLbl));
+            }
+            catch (SemanticException e) {
+                throw new InternalCompilerError("Unexpected SemanticException " +
+                                                "during label substitution: " + e.getMessage(), pos);
+            }
+        }
+        
+        // formal arg access paths to temp access paths
+        for (int i = 0; formalArgLabels != null && i < formalArgLabels.size(); i++) {
+
+            try {
+                ArgLabel formalArgLbl = (ArgLabel)formalArgLabels.get(i);            
+                AccessPathRoot formalRoot = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), formalArgLbl.position());
+                AccessPathRoot tempRoot = (AccessPathRoot)formalTempAccessPathRoots.get(i);
+
+                L = substImpl(L, new AccessPathInstantiator(formalRoot, tempRoot));
+            }
+            catch (SemanticException e) {
+                throw new InternalCompilerError("Unexpected SemanticException " + e.getMessage(), pos);
+            }
+        }            
+
+
+        // formal this access path to temp this access path
+        if (receiverType != null && receiverType.isClass()) {
+            AccessPathRoot formalThisRoot = new AccessPathThis(receiverType.toClass(), receiverType.position());
+            try {
+                L = substImpl(L, new AccessPathInstantiator(formalThisRoot, tempThisRoot));
+            }
+            catch (SemanticException e) {
+                throw new InternalCompilerError("Unexpected SemanticException " + e.getMessage(), pos);
+            }
+        }
+        
+        return L;
+        
+    }
+    
+    private Object instantiateImpl(Object L, Position pos) {
+        if (L == null) return L;
+        
+        // now go through and substitute things...
+
+        // this label and params
+        ThisLabelAndParamInstantiator labelInstantiator = new ThisLabelAndParamInstantiator();
+        try {
+            L = substImpl(L, labelInstantiator);
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected SemanticException " +
+                                            "during label substitution: " + e.getMessage(), pos);
+        }
+                
+        // this access path
+        try {                
+            L = substImpl(L, new AccessPathInstantiator(tempThisRoot, receiverPath));
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected SemanticException " +
+                                            "during label substitution: " + e.getMessage(), pos);
+        }
+        
+        // replace arg labels
+        for (int i = 0; formalTempLabels != null && i < formalTempLabels.size(); i++) {
+            Label formalArgTempLbl = (Label)formalTempLabels.get(i);
+            if (actualArgLabels != null) {
+                Label actualArgLbl = (Label)actualArgLabels.get(i);
                 try {
-                    Position pos = actualExpr.position();
-                    AccessPathRoot root = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), pos);                            
+                    L = substImpl(L, new ExactLabelInstantiator(formalArgTempLbl, actualArgLbl));
+                }
+                catch (SemanticException e) {
+                    throw new InternalCompilerError("Unexpected SemanticException " +
+                                                    "during label substitution: " + e.getMessage(), pos);
+                }
+            }
+
+            // arg access paths
+            if (actualArgExprs != null) {
+                try {
+                    Expr actualExpr = (Expr)actualArgExprs.get(i);
                     AccessPath target;
                     if (JifUtil.isFinalAccessExprOrConst(ts, actualExpr)) {
                         target = JifUtil.exprToAccessPath(actualExpr, callerContext);
                     }
                     else {
-                        target = new AccessPathUninterpreted(actualExpr, pos);                            
+                        target = new AccessPathUninterpreted(actualExpr, actualExpr.position());                            
                     }
-                    p = p.subst(new AccessPathInstantiator(root, target));
+                    
+                    AccessPathRoot formalTempRoot = (AccessPathRoot)formalTempAccessPathRoots.get(i);
+                    
+                    L = substImpl(L, new AccessPathInstantiator(formalTempRoot, target));                    
                 }
                 catch (SemanticException e) {
                     throw new InternalCompilerError("Unexpected SemanticException " +
-                                                    "during label substitution: " + e.getMessage(), p.position());
-                }
-            }
-            if (iArgLabels.hasNext() || iActualArgExprs.hasNext()) {
-                throw new InternalCompilerError("Inconsistent arg lists");
-            }
-            
-            // also instantiate the param arg labels. They only occur in static methods
-            // of parameterized classes, but no harm in always instantiating them.
-            if (!actualParamLabels.isEmpty()) {
-                // go through the formal params, and the actual param labels.
-                JifSubstType jst = (JifSubstType)receiverType;
-                JifPolyType jpt = (JifPolyType)jst.base();
-                Iterator iFormalParams = jpt.params().iterator();
-                Iterator iActualParamLabels = actualParamLabels.iterator();
-                
-                // go through each formal and actual param, and make substitutions.
-                while (iActualParamLabels.hasNext()) {
-                    Label actualParamLabel = (Label)iActualParamLabels.next();
-                    ParamInstance pi = (ParamInstance)iFormalParams.next();
-                    ArgLabel paramArgLabel = ts.argLabel(pi.position(), pi);
-                    paramArgLabel.setUpperBound(ts.topLabel());
-                    try {
-                        p = p.subst(new LabelInstantiator(paramArgLabel, actualParamLabel));
-                    }
-                    catch (SemanticException e) {
-                        throw new InternalCompilerError("Unexpected SemanticException " +
-                                                        "during label substitution: " + e.getMessage(), p.position());
-                    }                    
-                }
-                if (iActualParamLabels.hasNext() || iFormalParams.hasNext()) {
-                    throw new InternalCompilerError("Inconsistent param lists");
+                                                    "during label substitution: " + e.getMessage(), pos);
                 }
             }
         }
         
-        return p;   
-    }
-
-    /**
-     * Perform instantiation on the label L
-     *  
-     * @param L the Label to substitute
-     * @param A the context of the caller of the method
-     * @param receiverExpr the receiver expression, e.g., "e" in "e.m()".
-     * @param receiverType the type of the receiver
-     * @param receiverLbl the label of the receiver expression
-     * @return the instantiated Label
-     */
-    public static Label instantiate(Label L, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) throws SemanticException {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
-        AccessPath receiverPath;
-        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, A);
+                        
+        // param arg labels
+        // rhey only occur in static methods
+        // of parameterized classes, but no harm in always instantiating them.
+        if (actualParamLabels != null && !actualParamLabels.isEmpty() &&
+                receiverType != null) {
+            // go through the formal params, and the actual param labels.
+            JifSubstType jst = (JifSubstType)receiverType;
+            JifPolyType jpt = (JifPolyType)jst.base();
+            Iterator iFormalParams = jpt.params().iterator();
+            Iterator iActualParamLabels = actualParamLabels.iterator();
+            
+            // go through each formal and actual param, and make substitutions.
+            while (iActualParamLabels.hasNext()) {
+                Label actualParamLabel = (Label)iActualParamLabels.next();                    
+                ParamInstance pi = (ParamInstance)iFormalParams.next();
+                ArgLabel paramArgLabel = ts.argLabel(pi.position(), pi);
+                paramArgLabel.setUpperBound(ts.topLabel());
+                try {
+                    L = substImpl(L, new LabelInstantiator(paramArgLabel, actualParamLabel));
+                }
+                catch (SemanticException e) {
+                    throw new InternalCompilerError("Unexpected SemanticException " +
+                                                    "during label substitution: " + e.getMessage(), pos);
+                }                    
+            }
+            if (iActualParamLabels.hasNext() || iFormalParams.hasNext()) {
+                throw new InternalCompilerError("Inconsistent param lists");
+            }
         }
-        else {
-            receiverPath = new AccessPathUninterpreted(receiverExpr, L.position()); 
-        }
-        return instantiate(L, A, receiverPath, receiverType, receiverLbl);
-    }
 
-    /**
-     * Perform instantiation on the label L
-     *  
-     * @param L the Label to substitute
-     * @param A the context of the caller of the method
-     * @param receiverPath the access path of the receiver expression, e.g., "e" in "e.m()".
-     * @param receiverType the type of the receiver
-     * @param receiverLbl the label of the receiver expression
-     * @return the instantiated Label
-     */
-    public static Label instantiate(Label L, JifContext A, AccessPath receiverPath, ReferenceType receiverType, Label receiverLbl) {
-        if (L == null) return L;
-
-        ThisLabelAndParamInstantiator labelInstantiator = new ThisLabelAndParamInstantiator(receiverLbl, receiverType);
+        
+        // check if L is ill-formed
         try {
-            L = L.subst(labelInstantiator);
+            substImpl(L, new CheckLeftOvers());
         }
         catch (SemanticException e) {
             throw new InternalCompilerError("Unexpected SemanticException " +
-                                            "during label substitution: " + e.getMessage(), L.position());
+                                            "during label substitution: " + e.getMessage(), pos);
         }
         
-        if (receiverType.isClass()) {            
-            try {
-                AccessPathRoot root = new AccessPathThis(receiverType.toClass(), L.position());
-                L = L.subst(new AccessPathInstantiator(root, receiverPath));
-            }
-            catch (SemanticException e) {
-                throw new InternalCompilerError("Unexpected SemanticException " +
-                                                "during label substitution: " + e.getMessage(), L.position());
-            }
-        }
+        
         return L;
     }
-
-    /**
-     * Perform instantiation on the label L
-     *  
-     * @param L the Label to substitute
-     * @param A the context of the caller of the method
-     * @param receiverExpr the receiver expression, e.g., "e" in "e.m()".
-     * @param receiverType the type of the receiver
-     * @param receiverLbl the label of the receiver expression
-     * @param formalArgLabels List of ArgLabels, the labels of the formal
-     *            arguments of the procedure being called
-     * @param actualArgLabels List of Labels, the labels of the actuals
-     *            arguments of the procedure being called
-     * @param actualArgExprs List of Exprs, the actual arguments.
-     * @param actualParamLabels List of Labels, the label of the evaluation of
-     *            the actual parameters. These are only really needed for static
-     *            methods (including constructors), where the actual parameters
-     *            need to be evaluated at runtime.
-     * @return the instantiated Label
-     */
-    public static Label instantiate(Label L, 
-                                    JifContext A, 
-                                    Expr receiverExpr, 
-                                    ReferenceType receiverType, 
-                                    Label receiverLbl, 
-                                    List formalArgLabels, 
-                                    List actualArgLabels, 
-                                    List actualArgExprs, 
-                                    List actualParamLabels) throws SemanticException {
-        L = instantiate(L, A, receiverExpr, receiverType, receiverLbl);
-        return instantiate(L, receiverType, formalArgLabels, actualArgLabels, actualArgExprs, actualParamLabels, A);
+    
+    private Object substImpl(Object o, LabelSubstitution lblsubst) throws SemanticException {
+        if (o instanceof Principal) {
+            return ((Principal)o).subst(lblsubst);
+        }
+        return ((Label)o).subst(lblsubst);
+    }
+    public Principal instantiate(Principal p) {
+        p = (Principal)substTempsForFormals(p, p.position());
+        return (Principal)instantiateImpl(p, p.position());
+    }
+    public Label instantiate(Label L) {
+        L = (Label)substTempsForFormals(L, L.position());
+        return (Label)instantiateImpl(L, L.position());
     }
 
-    /**
-     * Perform instantiation on the principal p
-     *  
-     * @param p the principal to substitute
-     * @param A the context of the caller of the method
-     * @param receiverExpr the receiver expression, e.g., "e" in "e.m()".
-     * @param receiverType the type of the receiver
-     * @param receiverLbl the label of the receiver expression
-     * @return the instantiated principal
-     * @throws SemanticException
-     */
-    private static Principal instantiate(Principal p, 
-                                         JifContext A, 
-                                         Expr receiverExpr, 
-                                         ReferenceType receiverType, 
-                                         Label receiverLbl) throws SemanticException {
-        if (p == null) return p;
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
-
-        ThisLabelAndParamInstantiator labelInstantiator = new ThisLabelAndParamInstantiator(receiverLbl, receiverType);
-        try {
-            p = p.subst(labelInstantiator);
-        }
-        catch (SemanticException e) {
-            throw new InternalCompilerError("Unexpected SemanticException " +
-                                            "during label substitution: " + e.getMessage(), p.position());
-        }
-        AccessPath receiverPath;
-        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, A);
-        }
-        else {
-            receiverPath = new AccessPathUninterpreted(receiverExpr, p.position());
-        }
-        
-        if (receiverType.isClass()) {
-            try {
-                AccessPathRoot root = new AccessPathThis(receiverType.toClass(), p.position());
-                p = p.subst(new AccessPathInstantiator(root, receiverPath));
-            }
-            catch (SemanticException e) {
-                throw new InternalCompilerError("Unexpected SemanticException " +
-                                                "during label substitution: " + e.getMessage(), p.position());
-            }
-        }
-        return p;
-    }
-
-    /**
-     * Perform instantiation on the principal p
-     *  
-     * @param p the principal to instantiate
-     * @param A the context of the caller of the method
-     * @param receiverExpr the receiver expression, e.g., "e" in "e.m()".
-     * @param receiverType the type of the receiver
-     * @param receiverLbl the label of the receiver expression
-     * @param formalArgLabels List of ArgLabels, the labels of the formal
-     *            arguments of the procedure being called
-     * @param actualArgExprs List of Exprs, the actual arguments.
-     * @param actualParamLabels List of Labels, the label of the evaluation of
-     *            the actual parameters. These are only really needed for static
-     *            methods (including constructors), where the actual parameters
-     *            need to be evaluated at runtime.
-     * @return the instantiated principal
-     */
-    public static Principal instantiate(Principal p, 
-                                        JifContext A, 
-                                        Expr receiverExpr, 
-                                        ReferenceType receiverType, 
-                                        Label receiverLbl, 
-                                        List formalArgLabels, 
-                                        List actualArgExprs, 
-                                        List actualParamLabels) throws SemanticException {
-        p = instantiate(p, A, receiverExpr, receiverType, receiverLbl);
-        return instantiate(p, receiverType, formalArgLabels, actualArgExprs, actualParamLabels, A);
-    }
-
-    /**
-     * Perform instantiation on the type t
-     *  
-     * @param t the Type to substitute
-     * @param A the context of the caller of the method
-     * @param receiverExpr the receiver expression, e.g., "e" in "e.m()".
-     * @param receiverType the type of the receiver
-     * @param receiverLbl the label of the receiver expression
-     * @param formalArgLabels List of ArgLabels, the labels of the formal
-     *            arguments of the procedure being called
-     * @param actualArgLabels List of Labels, the labels of the actuals
-     *            arguments of the procedure being called
-     * @param actualArgExprs List of Exprs, the actual arguments.
-     * @param actualParamLabels List of Labels, the label of the evaluation of
-     *            the actual parameters. These are only really needed for static
-     *            methods (including constructors), where the actual parameters
-     *            need to be evaluated at runtime.
-     * @return the instantiated type
-     */
-    public static Type instantiate(Type t, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl, List formalArgLabels, List actualArgLabels, List actualArgExprs, List actualParamLabels) throws SemanticException {
-        t = instantiate(t, A, receiverExpr, receiverType, receiverLbl);
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+    public Type instantiate(Type t) {
         if (t instanceof ArrayType) {
             ArrayType at = (ArrayType)t;
             Type baseType = at.base();
-            t = at.base(instantiate(baseType, A, receiverExpr, receiverType, receiverLbl, formalArgLabels, actualArgLabels, actualArgExprs, actualParamLabels));
+            t = at.base(instantiate(baseType));
         }
         
         if (ts.isLabeled(t)) {
-            Label newL = instantiate(ts.labelOfType(t), A, receiverExpr, receiverType, receiverLbl, formalArgLabels, actualArgLabels, actualArgExprs, actualParamLabels);
-            Type newT = instantiate(ts.unlabel(t), A, receiverExpr, receiverType, receiverLbl, formalArgLabels, actualArgLabels, actualArgExprs, actualParamLabels);
+            Label newL = instantiate(ts.labelOfType(t));
+            Type newT = instantiate(ts.unlabel(t));
             return ts.labeledType(t.position(), newT, newL);
         }
         
@@ -455,10 +298,10 @@ public class JifInstantiator
                 Object arg = e.getValue();
                 Param p;
                 if (arg instanceof Label) {
-                    p = instantiate((Label)arg, A, receiverExpr, receiverType, receiverLbl, formalArgLabels, actualArgLabels, actualArgExprs, actualParamLabels);
+                    p = instantiate((Label)arg);
                 }
                 else if (arg instanceof Principal) {
-                    p = instantiate((Principal)arg, A, receiverExpr, receiverType, receiverLbl, formalArgLabels, actualArgExprs, actualParamLabels);
+                    p = instantiate((Principal)arg);
                 }
                 else {
                     throw new InternalCompilerError(
@@ -474,75 +317,20 @@ public class JifInstantiator
                 t = ts.subst(jit.base(), newMap);
             }
         }
-        return t;
+        
+        return t;        
     }
     
-    /**
-     * Perform instantiation on the type t
-     *  
-     * @param t the Type to substitute
-     * @param A the context of the caller of the method
-     * @param receiverExpr the receiver expression, e.g., "e" in "e.m()".
-     * @param receiverType the type of the receiver
-     * @param receiverLbl the label of the receiver expression
-     * @return the instantiated type
-     */
-    public static Type instantiate(Type t, JifContext A, Expr receiverExpr, ReferenceType receiverType, Label receiverLbl) throws SemanticException {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
-        if (t instanceof JifSubstType) {
-            JifSubstType jit = (JifSubstType) t;
-            Map newMap = new HashMap();
-            boolean diff = false;
-            for (Iterator i = jit.entries(); i.hasNext(); ) {
-                Map.Entry e = (Map.Entry) i.next();
-                Object arg = e.getValue();
-                Param p;
-                if (arg instanceof Label)
-                    p = instantiate((Label)arg, A, receiverExpr, receiverType, receiverLbl);
-                else {
-                    p = instantiate((Principal)arg, A, receiverExpr, receiverType, receiverLbl);
-                }
-                
-                newMap.put(e.getKey(), p);
-                
-                if (p != arg)
-                    diff = true;
-            }
-            if (diff) {
-                return ts.subst(jit.base(), newMap);
-            }
-        }
-        if (t instanceof ArrayType) {
-            ArrayType at = (ArrayType) t;
-            Type baseType = at.base();
-            return at.base(instantiate(baseType, A, receiverExpr, receiverType, receiverLbl));
-        }
-        if (ts.isLabeled(t)) {
-            Label newL = instantiate(ts.labelOfType(t), A, receiverExpr, receiverType, receiverLbl);
-            Type newT = instantiate(ts.unlabel(t), A, receiverExpr, receiverType, receiverLbl);
-            return ts.labeledType(newT.position(), newT, newL);
-        }
-        
-        return t;
-    }    
-
     /**
      * Replaces the "this" label with receiverLabel, and uses
      * receiverType to perform substitution of actual parameters for formal 
      * parameters of a parameterized type.
      */
-    private static class ThisLabelAndParamInstantiator extends LabelSubstitution {
-        private Label receiverLabel;
-        private Type receiverType;
-        protected ThisLabelAndParamInstantiator(Label receiverLabel, Type receiverType) {
-            this.receiverLabel = receiverLabel;
-            this.receiverType = receiverType;            
-        }
-        
+    private class ThisLabelAndParamInstantiator extends LabelSubstitution {        
         public Label substLabel(Label L) {
             Label result = L;
-            if (receiverLabel != null && result instanceof ThisLabel) {
-                result = receiverLabel;
+            if (receiverLbl != null && result == tempThisLbl) {
+                result = receiverLbl;
             }
 
             if (receiverType instanceof JifSubstType) {
@@ -562,6 +350,53 @@ public class JifInstantiator
         }
 
     }
+
+    /**
+     * Check there are no temp labels or access paths still hanging around
+     */
+    private class CheckLeftOvers extends LabelSubstitution {
+        Set thisClasses = new HashSet();
+        public Label substLabel(Label L) {
+            if (L instanceof ThisLabel) {
+                ThisLabel tl = (ThisLabel)L;
+                if (thisClasses.contains(tl.classType())) {
+                    throw new InternalCompilerError("multiple this classes: " + L);                    
+                }
+                thisClasses.add(tl.classType());
+                
+            }
+            if (L instanceof DynamicLabel) {
+                DynamicLabel dl = (DynamicLabel)L;
+                AccessPathRoot root = dl.path().root();
+                if (tempThisRoot == root) {
+                    throw new InternalCompilerError("Left over: " + L);
+                }
+                if (formalTempAccessPathRoots != null && formalTempAccessPathRoots.contains(root)) {
+                    throw new InternalCompilerError("Left over: " + L);
+                }
+            }
+
+            if (formalTempLabels != null && formalTempLabels.contains(L)) {
+                throw new InternalCompilerError("Left over: " + L);                
+            }
+            return L;
+        }
+
+        public Principal substPrincipal(Principal p) {
+            if (p instanceof DynamicPrincipal) {
+                DynamicPrincipal dp = (DynamicPrincipal)p;
+                AccessPathRoot root = dp.path().root();
+                if (tempThisRoot == root) {
+                    throw new InternalCompilerError("Left over: " + p);
+                }
+                if (formalTempAccessPathRoots != null && formalTempAccessPathRoots.contains(root)) {
+                    throw new InternalCompilerError("Left over: " + p);
+                }
+            }
+            return p;
+        }
+
+    }
     
     /**
      * Replaces L with trgLabel if srcLabel.equals(L) 
@@ -569,9 +404,14 @@ public class JifInstantiator
     private static class LabelInstantiator extends LabelSubstitution {
         private Label srcLabel;
         private Label trgLabel;
+        private boolean recurseArgLabelBounds;
         protected LabelInstantiator(Label srcLabel, Label trgLabel) {
+            this(srcLabel, trgLabel, true);
+        }
+        protected LabelInstantiator(Label srcLabel, Label trgLabel, boolean recurseArgLabelBounds) {
             this.srcLabel = srcLabel;
             this.trgLabel = trgLabel;
+            this.recurseArgLabelBounds = recurseArgLabelBounds;
         }
         
         public Label substLabel(Label L) {
@@ -580,6 +420,11 @@ public class JifInstantiator
             }
             return L;
         }
+
+        public boolean recurseIntoChildren(Label L) {
+            return recurseArgLabelBounds || !(L instanceof ArgLabel);
+        }
+        
     }
 
     /**
@@ -625,5 +470,148 @@ public class JifInstantiator
             return p;
         }
     }
+
+    public static Label instantiate(Label L, 
+                                    JifContext callerContext, 
+                                    Expr receiverExpr, 
+                                    ReferenceType receiverType, 
+                                    Label receiverLabel, 
+                                    List formalArgLabels, 
+                                    List actualArgLabels, 
+                                    List actualArgExprs, 
+                                    List actualParamLabels) throws SemanticException {
+        JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
+        AccessPath receiverPath;
+        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
+            receiverPath = JifUtil.exprToAccessPath(receiverExpr, callerContext);
+        }
+        else {
+            receiverPath = new AccessPathUninterpreted(receiverExpr, L.position()); 
+        }
+        JifInstantiator inst = new JifInstantiator(receiverType,
+                                                   receiverLabel,
+                                                   receiverPath,
+                                                   formalArgLabels,
+                                                   actualArgLabels,
+                                                   actualArgExprs,
+                                                   actualParamLabels,
+                                                   callerContext);
+        return inst.instantiate(L);
+    }
+
+    public static Label instantiate(Label L, 
+                                    JifContext callerContext, 
+                                    Expr receiverExpr, 
+                                    ReferenceType receiverType, 
+                                    Label receiverLbl) throws SemanticException {
+        JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
+        AccessPath receiverPath;
+        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
+            receiverPath = JifUtil.exprToAccessPath(receiverExpr, callerContext);
+        }
+        else {
+            receiverPath = new AccessPathUninterpreted(receiverExpr, L.position()); 
+        }
+        return instantiate(L, callerContext, receiverPath, receiverType, receiverLbl);
+    }
     
+    public static Label instantiate(Label L, 
+                                    JifContext callerContext, 
+                                    AccessPath receiverPath, 
+                                    ReferenceType receiverType, 
+                                    Label receiverLbl) {        
+        JifInstantiator inst = new JifInstantiator(receiverType,
+                                                   receiverLbl,
+                                                   receiverPath,
+                                                   null,
+                                                   null,
+                                                   null,
+                                                   null,
+                                                   callerContext);
+        return inst.instantiate(L);
+
+    }
+    
+    public static Principal instantiate(Principal p, 
+            JifContext callerContext, 
+            Expr receiverExpr, 
+            ReferenceType receiverType, 
+            Label receiverLabel, 
+            List formalArgLabels, 
+            List actualArgExprs, 
+            List actualParamLabels) throws SemanticException {
+        JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
+        AccessPath receiverPath;
+        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
+            receiverPath = JifUtil.exprToAccessPath(receiverExpr, callerContext);
+        }
+        else {
+            receiverPath = new AccessPathUninterpreted(receiverExpr, p.position()); 
+        }
+        JifInstantiator inst = new JifInstantiator(receiverType,
+                                                   receiverLabel,
+                                                   receiverPath,
+                                                   formalArgLabels,
+                                                   null,
+                                                   actualArgExprs,
+                                                   actualParamLabels,
+                                                   callerContext);
+        return inst.instantiate(p);
+    }
+
+
+    public static Type instantiate(Type t, 
+            JifContext callerContext, 
+            Expr receiverExpr, 
+            ReferenceType receiverType, 
+            Label receiverLabel, 
+            List formalArgLabels, 
+            List actualArgLabels, 
+            List actualArgExprs, 
+            List actualParamLabels) throws SemanticException {
+        JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
+        AccessPath receiverPath;
+        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
+            receiverPath = JifUtil.exprToAccessPath(receiverExpr, callerContext);
+        }
+        else {
+            receiverPath = new AccessPathUninterpreted(receiverExpr, t.position()); 
+        }
+        JifInstantiator inst = new JifInstantiator(receiverType,
+                                                   receiverLabel,
+                                                   receiverPath,
+                                                   formalArgLabels,
+                                                   actualArgLabels,
+                                                   actualArgExprs,
+                                                   actualParamLabels,
+                                                   callerContext);
+        return inst.instantiate(t);
+    }
+
+
+    public static Type instantiate(Type t, 
+            JifContext callerContext, 
+            Expr receiverExpr, 
+            ReferenceType receiverType, 
+            Label receiverLbl) throws SemanticException {
+        
+        JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
+        AccessPath receiverPath;
+        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
+            receiverPath = JifUtil.exprToAccessPath(receiverExpr, callerContext);
+        }
+        else {
+            receiverPath = new AccessPathUninterpreted(receiverExpr, t.position()); 
+        }
+        JifInstantiator inst = new JifInstantiator(receiverType,
+                                                   receiverLbl,
+                                                   receiverPath,
+                                                   null,
+                                                   null,
+                                                   null,
+                                                   null,
+                                                   callerContext);
+        return inst.instantiate(t);
+        
+    }
 }

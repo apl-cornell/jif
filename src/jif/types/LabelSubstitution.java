@@ -34,6 +34,10 @@ public abstract class LabelSubstitution {
         return p;
     }    
     
+    public boolean recurseIntoChildren(Label L) {
+        return true;
+    }
+    
     private LinkedList stack = null;
     public void pushLabel(Label l) {
         pushLabel((Object)l);

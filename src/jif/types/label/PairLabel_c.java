@@ -138,11 +138,13 @@ public class PairLabel_c extends Label_c implements PairLabel {
  
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         PairLabel lbl = this;
-        ConfPolicy newCP = (ConfPolicy)lbl.confPolicy().subst(substitution);
-        IntegPolicy newIP = (IntegPolicy)lbl.integPolicy().subst(substitution);
-        
-        if (newCP != this.confPolicy || newIP != this.integPolicy) {
-            lbl = ((JifTypeSystem)ts).pairLabel(position, newCP, newIP);
+        if  (substitution.recurseIntoChildren(lbl)) {
+            ConfPolicy newCP = (ConfPolicy)lbl.confPolicy().subst(substitution);
+            IntegPolicy newIP = (IntegPolicy)lbl.integPolicy().subst(substitution);
+            
+            if (newCP != this.confPolicy || newIP != this.integPolicy) {
+                lbl = ((JifTypeSystem)ts).pairLabel(position, newCP, newIP);
+            }
         }
         return substitution.substLabel(lbl);
     }

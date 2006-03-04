@@ -46,10 +46,18 @@ import polyglot.util.Position;
  * @see jif.ast.JifInstantiator
  */
 public class AccessPathUninterpreted extends AccessPathRoot {
-    Expr expr;
+    String expr;
+    private final boolean allowSubst;
     public AccessPathUninterpreted(Expr expr, Position pos) {
+        this(String.valueOf(expr), pos);
+    }
+    public AccessPathUninterpreted(String expr, Position pos) {
+        this(expr, pos, false);
+    }
+    public AccessPathUninterpreted(String expr, Position pos, boolean allowSubst) {
         super(pos);
         this.expr = expr;
+        this.allowSubst = allowSubst;
     }
 
     public boolean isCanonical() {
@@ -62,6 +70,9 @@ public class AccessPathUninterpreted extends AccessPathRoot {
     }
 
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
+        if (allowSubst) {
+            if (r == this) return e;
+        }
         return this;
     }
 

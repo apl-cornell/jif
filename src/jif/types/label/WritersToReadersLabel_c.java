@@ -72,11 +72,13 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
     }
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         WritersToReadersLabel lbl = this;
-        Label newLabel = lbl.label().subst(substitution);
-            
-        if (newLabel != lbl.label()) {
-            JifTypeSystem ts = (JifTypeSystem)typeSystem();
-            lbl = ts.writersToReadersLabel(lbl.position(), newLabel);
+        if (substitution.recurseIntoChildren(lbl)) {
+            Label newLabel = lbl.label().subst(substitution);
+                
+            if (newLabel != lbl.label()) {
+                JifTypeSystem ts = (JifTypeSystem)typeSystem();
+                lbl = ts.writersToReadersLabel(lbl.position(), newLabel);
+            }
         }
         return substitution.substLabel(lbl);
     }

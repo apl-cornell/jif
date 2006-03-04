@@ -2,6 +2,7 @@ package jif.types.label;
 
 import java.util.Set;
 
+import jif.types.JifProcedureInstance;
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
@@ -41,10 +42,20 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     }
     
     private void setDescription() {
-        if (vi != null) 
-        this.setDescription("polymorphic label of the formal argument " + 
-                            vi.name() + " (bounded above by " + 
-                            upperBound + ")");
+        if (vi != null) {
+            StringBuffer sb = new StringBuffer();
+            sb.append("polymorphic label of the formal argument ");
+            sb.append(vi.name());
+            if (ci instanceof JifProcedureInstance) {
+                sb.append(" of ");
+                sb.append(((JifProcedureInstance)ci).debugString());
+            }
+            sb.append(" (bounded above by ");
+            sb.append(upperBound);
+            sb.append(")");
+            
+            this.setDescription(sb.toString());
+        }
     }
     public VarInstance formalInstance() {
         return vi;
@@ -114,19 +125,21 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
  
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         ArgLabel lbl = this;
-        if (!substitution.stackContains(this)) {
-            substitution.pushLabel(this);
-            Label newBound = lbl.upperBound().subst(substitution);
-            
-            if (newBound != lbl.upperBound()) {
-                lbl = (ArgLabel)lbl.copy();
-                lbl.setUpperBound(newBound);
+        if (substitution.recurseIntoChildren(lbl)) {
+            if (!substitution.stackContains(this)) {
+                substitution.pushLabel(this);
+                Label newBound = lbl.upperBound().subst(substitution);
+                
+                if (newBound != lbl.upperBound()) {
+                    lbl = (ArgLabel)lbl.copy();
+                    lbl.setUpperBound(newBound);
+                }
+                substitution.popLabel(this);
             }
-            substitution.popLabel(this);
-        }
-        else {
-            // the stack already contains this label, so don't call the 
-            // substitution recursively
+            else {
+                // the stack already contains this label, so don't call the 
+                // substitution recursively
+            }
         }
         return substitution.substLabel(lbl);
 

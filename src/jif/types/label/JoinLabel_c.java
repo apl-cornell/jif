@@ -297,7 +297,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     }
 
     public Label subst(LabelSubstitution substitution) throws SemanticException {        
-        if (components.isEmpty() || substitution.stackContains(this)) {
+        if (components.isEmpty() || substitution.stackContains(this) || !substitution.recurseIntoChildren(this)) {
             return substitution.substLabel(this);
         }
         substitution.pushLabel(this);
