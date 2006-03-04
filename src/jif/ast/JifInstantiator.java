@@ -30,7 +30,6 @@ public class JifInstantiator
     private final JifTypeSystem ts;
     private final ReferenceType receiverType;
     private final Label receiverLbl;
-    private final Label formalThisLbl;
     private final AccessPath receiverPath;
     private final List formalArgLabels; 
     private final List actualArgLabels; 
@@ -63,14 +62,6 @@ public class JifInstantiator
         
         this.ts = (JifTypeSystem)callerContext.typeSystem();
         
-        if (receiverType != null && receiverType.isClass()) {
-            this.formalThisLbl = ts.thisLabel(receiverType.position(), 
-                                              (JifClassType)receiverType.toClass());
-        }
-        else {
-            this.formalThisLbl = null;
-        }
-
         if (formalArgLabels != null) {
             this.formalTempAccessPathRoots = new ArrayList(formalArgLabels.size());
             this.formalTempLabels = new ArrayList(formalArgLabels.size());
@@ -113,14 +104,12 @@ public class JifInstantiator
         }            
 
         // formal this label to temp this label
-        if (formalThisLbl != null) {
-            try {
-                L = substImpl(L, new LabelInstantiator(formalThisLbl, tempThisLbl));
-            }
-            catch (SemanticException e) {
-                throw new InternalCompilerError("Unexpected SemanticException " +
-                                                "during label substitution: " + e.getMessage(), pos);
-            }
+        try {
+            L = substImpl(L, new ThisLabelInstantiator(tempThisLbl));
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected SemanticException " +
+                                            "during label substitution: " + e.getMessage(), pos);
         }
         
         // formal arg access paths to temp access paths
@@ -322,7 +311,7 @@ public class JifInstantiator
     }
     
     /**
-     * Replaces the "this" label with receiverLabel, and uses
+     * Replaces the temp "this" label with receiverLabel, and uses
      * receiverType to perform substitution of actual parameters for formal 
      * parameters of a parameterized type.
      */
@@ -359,7 +348,7 @@ public class JifInstantiator
         public Label substLabel(Label L) {
             if (L instanceof ThisLabel) {
                 ThisLabel tl = (ThisLabel)L;
-                if (thisClasses.contains(tl.classType())) {
+                if (!thisClasses.contains(tl.classType()) && !thisClasses.isEmpty()) {
                     throw new InternalCompilerError("multiple this classes: " + L);                    
                 }
                 thisClasses.add(tl.classType());
@@ -423,8 +412,7 @@ public class JifInstantiator
 
         public boolean recurseIntoChildren(Label L) {
             return recurseArgLabelBounds || !(L instanceof ArgLabel);
-        }
-        
+        }        
     }
 
     /**
@@ -446,6 +434,23 @@ public class JifInstantiator
         }
     }
 
+    /**
+     * Replaces all ThisLabels with trgLabel 
+     */
+    private static class ThisLabelInstantiator extends LabelSubstitution {
+        private Label trgLabel;
+        protected ThisLabelInstantiator(Label trgLabel) {
+            this.trgLabel = trgLabel;
+        }
+        
+        public Label substLabel(Label L) {
+            if (L instanceof ThisLabel) {
+                return trgLabel;
+            }
+            return L;
+        }
+    }
+    
     /**
      * Replaces srcRoot with trgPath in dynamic labels and principals 
      */
