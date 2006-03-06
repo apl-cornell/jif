@@ -144,6 +144,10 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         return substitution.substLabel(lbl);
 
     }
+    public String description() {
+        setDescription();
+        return super.description();
+    }
     
     
 }
