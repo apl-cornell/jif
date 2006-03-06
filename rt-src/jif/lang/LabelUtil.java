@@ -30,6 +30,17 @@ public class LabelUtil
     public static ConfPolicy readerPolicy(Principal owner, Collection readers) {
         return intern(new ReaderPolicy(owner, PrincipalUtil.disjunction(readers)));
     }
+    /**
+     * See the Jif signature for the explanation of lbl.
+     */
+    public static ConfPolicy readerPolicy(Label lbl, Principal owner, Principal[] readers) {
+        if (readers == null) return readerPolicy(owner, Collections.EMPTY_SET);
+        return readerPolicy(owner, Arrays.asList(readers));
+    }
+
+    public static ConfPolicy readerPolicy(Principal owner, PrincipalSet writers) {
+        return readerPolicy(owner, writers.getSet());
+    }
     
     public static Label readerPolicyLabel(Principal owner, Principal reader) {
         return toLabel(intern(new ReaderPolicy(owner, reader)));
