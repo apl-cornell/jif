@@ -69,12 +69,19 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
 	A.setPc(L);
 	A.setCurrentCodePCBound(L);
 
-        // add a restriction on the "this" label.
+        // add a restriction on the "callerPC" label.
         if (!A.currentCode().flags().isStatic())  {
             // for non-static methods, we know the this label
             // must be bounded above by the start label
-            JifClassType jct = (JifClassType)A.currentClass();
-            A.addAssertionLE(jct.thisLabel(), L);       
+            if (A.currentCode() instanceof JifProcedureInstance) {
+                JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+                Label callPC = ts.callSitePCLabel((JifProcedureInstance)A.currentCode());
+                A.addAssertionLE(callPC, L);
+            }
+            else {
+                JifClassType jct = (JifClassType)A.currentClass();
+                A.addAssertionLE(jct.thisLabel(), L);
+            }
         }
 
 	Stmt body = (Stmt) lc.context(A).labelCheck(ds.body());
