@@ -6,12 +6,10 @@ public class WriterPolicy implements IntegPolicy
 {
     private final Principal owner;
     private final Principal writer;
-    private final Principal effectiveWriter; // disjunction of owner and writer
     
     public WriterPolicy(Principal owner, Principal writer) {
         this.owner = owner;
         this.writer = writer;
-        this.effectiveWriter = PrincipalUtil.disjunction(owner, writer);
     }
     
     public Principal owner() {
@@ -59,7 +57,8 @@ public class WriterPolicy implements IntegPolicy
         }
         
         // for all j . rj' >= o || exists i . rj' >= ri
-        return PrincipalUtil.actsFor(this.effectiveWriter, pp.effectiveWriter);
+        return PrincipalUtil.actsFor(this.writer, pp.writer) ||
+               PrincipalUtil.actsFor(this.writer, pp.owner);
     }
     
     public int hashCode() {

@@ -55,7 +55,8 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
         if (! PrincipalUtil.actsFor(pp.owner, owner)) {
             return false;
         }
-        return PrincipalUtil.actsFor(pp.reader, reader);        
+        return PrincipalUtil.actsFor(pp.reader, reader) || 
+               PrincipalUtil.actsFor(pp.reader, owner);        
     }
     
     public int hashCode() {
