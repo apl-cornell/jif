@@ -2,9 +2,7 @@ package jif.types.label;
 
 import java.util.Set;
 
-import jif.types.JifProcedureInstance;
-import jif.types.JifTypeSystem;
-import jif.types.LabelSubstitution;
+import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
 import polyglot.types.*;
@@ -44,11 +42,21 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     private void setDescription() {
         if (vi != null) {
             StringBuffer sb = new StringBuffer();
-            sb.append("polymorphic label of the formal argument ");
+            sb.append("polymorphic label of formal argument ");
             sb.append(vi.name());
             if (ci instanceof JifProcedureInstance) {
                 sb.append(" of ");
-                sb.append(((JifProcedureInstance)ci).debugString());
+                if (ci instanceof JifMethodInstance) {
+                    sb.append("method ");
+                    sb.append(((JifMethodInstance)ci).name());
+                    
+                }
+                else if (ci instanceof JifConstructorInstance) {
+                    sb.append("constructor");
+                }
+                else {
+                    sb.append(((JifProcedureInstance)ci).debugString());
+                }
             }
             sb.append(" (bounded above by ");
             sb.append(upperBound);
