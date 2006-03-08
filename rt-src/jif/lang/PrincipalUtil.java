@@ -333,7 +333,7 @@ public class PrincipalUtil {
     }
 
     public static String toString(Principal p) {
-        return p== null?"<null>":p.name();
+        return p== null?"_":p.name();
     }
     public static String stringValue(Principal p) {
         return toString(p);
