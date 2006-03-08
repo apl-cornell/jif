@@ -464,13 +464,19 @@ public class JifInstantiator
         
         public Label substLabel(Label L) {            
             if (L instanceof DynamicLabel) {
-                return ((DynamicLabel)L).subst(srcRoot, trgPath);
+                DynamicLabel dl = (DynamicLabel)L;
+                if (dl.path().root().equals(srcRoot)) 
+                    return dl.subst(srcRoot, trgPath);
+                return dl;
             }
             return L;
         }
         public Principal substPrincipal(Principal p) {
             if (p instanceof DynamicPrincipal) {
-                return ((DynamicPrincipal)p).subst(srcRoot, trgPath);
+                DynamicPrincipal dp = (DynamicPrincipal)p;
+                if (dp.path().root().equals(srcRoot)) 
+                    return dp.subst(srcRoot, trgPath);
+                return dp;
             }
             return p;
         }
