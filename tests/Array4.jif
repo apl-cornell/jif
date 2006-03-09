@@ -1,0 +1,11 @@
+class C[principal p] { }
+class D extends C[Alice] { }
+
+class E {
+    void m() {
+	C[Alice][] arr = new C[Alice][] {
+	    new D(), // is a C, so it should be ok.
+	    new D()
+	};
+    }
+}
