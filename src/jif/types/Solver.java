@@ -431,8 +431,8 @@ public abstract class Solver {
                 }
                 else {
                     if (shouldReport(4)) {
-                        report(4, "Considering constraint: " + eqn + " (line "
-                                + eqn.position().line() + ")");
+                        report(4, "Considering constraint: " + eqn + " ("
+                                + (eqn.position()==null?"null":("line "+eqn.position().line())) + ")");
                     }
                     // let the subclass deal with changing the bounds on
                     // variables
