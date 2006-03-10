@@ -250,6 +250,7 @@ terminal Token ACTSFOR_LOWER;
 terminal Token EQUIV;
 terminal Token DECLASSIFY;
 terminal Token ENDORSE;
+terminal Token TO;
 
 non terminal DeclassifyExpr declassify;
 non terminal DeclassifyStmt declassify_statement;
@@ -777,7 +778,7 @@ declassify_statement ::=
             {: RESULT = parser.nf.DeclassifyStmt(parser.pos(n, b),
                             parser.nf.CanonicalLabelNode(parser.pos(n), parser.ts.topLabel(parser.pos(n))),
                             a, b); :}
-    |   DECLASSIFY:n LPAREN label:a COMMA label:b RPAREN statement:c
+    |   DECLASSIFY:n LPAREN label:a TO label:b RPAREN statement:c
             {: RESULT = parser.nf.DeclassifyStmt(parser.pos(n, c), a, b, c); :}
     ;
 
@@ -787,7 +788,7 @@ endorse_statement ::=
             {: RESULT = parser.nf.EndorseStmt(parser.pos(n, b),
                             parser.nf.CanonicalLabelNode(parser.pos(n), parser.ts.topLabel(parser.pos(n))),
                             a, b); :}
-    |   ENDORSE:n LPAREN label:a COMMA label:b RPAREN statement:c
+    |   ENDORSE:n LPAREN label:a TO label:b RPAREN statement:c
             {: RESULT = parser.nf.EndorseStmt(parser.pos(n, c), a, b, c); :}
     ;
 
@@ -906,7 +907,7 @@ declassify ::=
 			parser.nf.CanonicalLabelNode(parser.pos(b),
 			parser.ts.topLabel(parser.pos(b)) ), b);
 	    :}
-    |   DECLASSIFY:x LPAREN expression:a COMMA label:b COMMA label:c RPAREN:y
+    |   DECLASSIFY:x LPAREN expression:a COMMA label:b TO label:c RPAREN:y
             {: RESULT = parser.nf.DeclassifyExpr(parser.pos(x,y), a, b, c); :}
     ;
 
@@ -917,7 +918,7 @@ endorse ::=
 			parser.nf.CanonicalLabelNode(parser.pos(b),
 			parser.ts.topLabel(parser.pos(b)) ), b);
 	    :}
-    |   ENDORSE:x LPAREN expression:a COMMA label:b COMMA label:c RPAREN:y
+    |   ENDORSE:x LPAREN expression:a COMMA label:b TO label:c RPAREN:y
             {: RESULT = parser.nf.EndorseExpr(parser.pos(x,y), a, b, c); :}
     ;
 

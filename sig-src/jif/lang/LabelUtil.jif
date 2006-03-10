@@ -21,7 +21,7 @@ public class LabelUtil {
        
     public static native label join(label l1, label l2);
     public static native boolean equivalentTo(label l1, label l2);
-    public static native boolean relabelsTo(label from, label to); 
+    public static native boolean relabelsTo(label fromLbl, label toLbl); 
 
     public static native boolean isReadableBy(label lbl, principal p); 
     
