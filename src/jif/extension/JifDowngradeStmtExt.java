@@ -57,7 +57,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
          }
          );
 
-        //checkOneDimenOnly(lc, A, A.pc(), L, d.position());
+        checkOneDimenOnly(lc, A, A.pc(), L, ds.position());
         
         checkAuthority(lc, A, A.pc(), L, ds.position());
         
@@ -100,6 +100,20 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
 	
 	return X(ds.body(body), X);
     }
+    /**
+     * Check that only the integrity/confidentiality is downgraded, and not
+     * the other dimension.
+     * @param lc
+     * @param labelFrom
+     * @param labelTo
+     * @throws SemanticException 
+     */
+    protected abstract void checkOneDimenOnly(LabelChecker lc, 
+                                           JifContext A,
+                                           Label labelFrom, 
+                                           Label labelTo, Position pos) 
+            throws SemanticException;
+
     /**
      * Check the authority condition
      * @param lc
