@@ -29,11 +29,20 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
 	JifContext A = lc.jifContext();
         A = (JifContext) ds.enterScope(A);
 
-	Label L = ds.label().label();
+	Label downgradeTo = ds.label().label();
+        Label downgradeFrom = null;
+        if (ds.bound() != null) {
+            downgradeFrom = ds.bound().label();
+        }
+        else {
+            downgradeFrom = lc.typeSystem().freshLabelVariable(ds.position(), 
+                                              "downgrade_from", 
+                                              "The label the downgrade statement is downgrading from");
+        }
 
         lc.constrain(new LabelConstraint(new NamedLabel("pc", A.pc()), 
                                          LabelConstraint.LEQ, 
-                                         new NamedLabel("declass_bound", ds.bound().label()),
+                                         new NamedLabel("declass_bound", downgradeFrom),
                                          A.labelEnv(),
                                          ds.position()) {
                      public String msg() {
@@ -57,17 +66,17 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
          }
          );
 
-        checkOneDimenOnly(lc, A, A.pc(), L, ds.position());
+        checkOneDimenOnly(lc, A, downgradeFrom, downgradeTo, ds.position());
         
-        checkAuthority(lc, A, A.pc(), L, ds.position());
+        checkAuthority(lc, A, downgradeFrom, downgradeTo, ds.position());
         
         if (!((JifOptions)JifOptions.global).noRobustness) {
-            checkRobustness(lc, A, A.pc(), L, ds.position());
+            checkRobustness(lc, A, downgradeFrom, downgradeTo, ds.position());
         }
 
 	A = (JifContext) A.pushBlock();
-	A.setPc(L);
-	A.setCurrentCodePCBound(L);
+	A.setPc(downgradeTo);
+	A.setCurrentCodePCBound(downgradeTo);
 
         // add a restriction on the "callerPC" label.
         if (!A.currentCode().flags().isStatic())  {
@@ -76,11 +85,11 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
             if (A.currentCode() instanceof JifProcedureInstance) {
                 JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
                 Label callPC = ts.callSitePCLabel((JifProcedureInstance)A.currentCode());
-                A.addAssertionLE(callPC, L);
+                A.addAssertionLE(callPC, downgradeTo);
             }
             else {
                 JifClassType jct = (JifClassType)A.currentClass();
-                A.addAssertionLE(jct.thisLabel(), L);
+                A.addAssertionLE(jct.thisLabel(), downgradeTo);
             }
         }
 

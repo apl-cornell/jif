@@ -397,24 +397,50 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
+    public DeclassifyStmt DeclassifyStmt(Position pos, LabelNode label, Stmt body) {
+        DeclassifyStmt n = new DeclassifyStmt_c(pos, null, label, body);
+        n = (DeclassifyStmt)n.ext(jifExtFactory().extDeclassifyStmt());
+        n = (DeclassifyStmt)n.del(delFactory().delStmt());
+        return n;
+    }
+
     public DeclassifyExpr DeclassifyExpr(Position pos, Expr expr, LabelNode bound,
                                          LabelNode label) 
     {
-        DeclassifyExpr n = new DeclassifyExpr_c(pos, expr, bound,
-                                                label);
+        DeclassifyExpr n = new DeclassifyExpr_c(pos, expr, bound, label);
+        n = (DeclassifyExpr)n.ext(jifExtFactory().extDeclassifyExpr());
+        n = (DeclassifyExpr)n.del(delFactory().delExpr());
+        return n;
+    }
+    public DeclassifyExpr DeclassifyExpr(Position pos, Expr expr, LabelNode label) 
+    {
+        DeclassifyExpr n = new DeclassifyExpr_c(pos, expr, null, label);
         n = (DeclassifyExpr)n.ext(jifExtFactory().extDeclassifyExpr());
         n = (DeclassifyExpr)n.del(delFactory().delExpr());
         return n;
     }
 
     public EndorseStmt EndorseStmt(Position pos, LabelNode bound, LabelNode label, Stmt body) {
-        EndorseStmt n = new EndorseStmt_c(pos, bound, label,
-                                                body);
+        EndorseStmt n = new EndorseStmt_c(pos, bound, label, body);
         n = (EndorseStmt)n.ext(jifExtFactory().extEndorseStmt());
         n = (EndorseStmt)n.del(delFactory().delStmt());
         return n;
     }
 
+    public EndorseStmt EndorseStmt(Position pos, LabelNode label, Stmt body) {
+        EndorseStmt n = new EndorseStmt_c(pos, null, label, body);
+        n = (EndorseStmt)n.ext(jifExtFactory().extEndorseStmt());
+        n = (EndorseStmt)n.del(delFactory().delStmt());
+        return n;
+    }
+
+    public EndorseExpr EndorseExpr(Position pos, Expr expr, LabelNode label) 
+    {
+        EndorseExpr n = new EndorseExpr_c(pos, expr, null, label);
+        n = (EndorseExpr)n.ext(jifExtFactory().extEndorseExpr());
+        n = (EndorseExpr)n.del(delFactory().delExpr());
+        return n;
+    }
     public EndorseExpr EndorseExpr(Position pos, Expr expr, LabelNode bound,
                                          LabelNode label) 
     {
