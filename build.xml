@@ -102,7 +102,7 @@
         <delete dir="${lib-classes}" />
     </target>
 
-    <target name="clobber" depends="clean">
+    <target name="clobber" depends="clean" description="removes all generated files">
         <delete includeemptydirs="true">
             <fileset dir="${src}">
                 <include name="**/Grm.java" />
@@ -301,6 +301,7 @@ ext="-extclass split.ExtensionInfo"
 		       relative="true" 
 		       skipemptyfilesets="true" 
 		       vmlauncher="false">
+            <arg value="-e" />
             <arg value="-d" />
             <arg value="sig-classes" />
             <arg value="-sourcepath" />
@@ -317,6 +318,7 @@ ext="-extclass split.ExtensionInfo"
 		       relative="true" 
 		       skipemptyfilesets="true" 
 		       vmlauncher="false">
+            <arg value="-e" />
             <arg value="-d" />
             <arg value="sig-classes" />
             <arg value="-sourcepath" />
@@ -338,6 +340,7 @@ ext="-extclass split.ExtensionInfo"
 		       relative="true" 
 		       skipemptyfilesets="true" 
 		       vmlauncher="false">
+            <arg value="-e" />
             <arg value="-d" />
             <arg value="lib-classes" />
             <arg value="-sourcepath" />
