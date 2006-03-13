@@ -67,18 +67,14 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         JifTypeSystem ts = lc.jifTypeSystem();
         JifClassType ct = (JifClassType) A.currentClass();
         Label Li = mi.pcBound();
+        Label endorseTo = ts.topLabel();
 
-        final Set autoEndorses = new LinkedHashSet(); 
         for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
             Assertion c = (Assertion) iter.next();
 
             if (c instanceof AutoEndorseConstraint) {
                 AutoEndorseConstraint ac = (AutoEndorseConstraint) c;
-
-                for (Iterator i = ac.principals().iterator(); i.hasNext(); ) {
-                    Principal pi = (Principal) i.next();
-                    autoEndorses.add(pi);
-                }
+                endorseTo = ts.meet(endorseTo, ac.endorseTo());
             }
         }
 
@@ -92,33 +88,18 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         A.setPc(callerPcLabel); 
         Label initialPCBound = Li;
         
-        if (!autoEndorses.isEmpty()) {
-            Label autoEndorseIntegLabel = A.authLabelInteg(autoEndorses);
-   
-            // check that for each principal in the auto endorse set, 
-            // there is at least one principal in the authority set that 
-            // can act for it
-            Principal allAuthority = ts.conjunctivePrincipal(mi.position(), A.authority());
-            for (Iterator autos = autoEndorses.iterator(); autos.hasNext();) {
-                Principal ae = (Principal)autos.next();
-                if (!A.actsFor(allAuthority, ae)) {
-                    throw new SemanticDetailedException(
-                       "The method does not have sufficient authority to " +
-                       "autoendorse for " + ae + ".", 
-                       "To autoendorse for the principal " + ae + ", " +
-                                "the method must have the authority of " + ae + 
-                                " or a principal that can act for " + ae + ".", 
-                                mi.position());
-                }
-            }
+        if (!endorseTo.isTop()) {
+            // check that there is sufficient authority to endorse to 
+            // the label endorseTo.
+            JifEndorseExprExt.checkOneDimen(lc, A, Li, endorseTo, mi.position(), false, true);
+            JifEndorseExprExt.checkAuth(lc, A, Li, endorseTo, mi.position(), false, true);            
             
-            // the initial pc is the meet of pcLabel the appropriate integrity
-            // label.
-            initialPCBound = ts.meet(initialPCBound, autoEndorseIntegLabel);
+            // the initial pc bound is the endorseTo label
+            initialPCBound = endorseTo;
                         
             // add a restriction on the "callerPC" label. It is less
-            // than the appropriate autoendorse label
-            A.addAssertionLE(callerPcLabel, autoEndorseIntegLabel);
+            // than the endorseTo label
+            A.addAssertionLE(callerPcLabel, endorseTo);
         }
         
         A.setCurrentCodePCBound(initialPCBound);        

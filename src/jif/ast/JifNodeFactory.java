@@ -42,7 +42,7 @@ public interface JifNodeFactory extends NodeFactory {
     CanonicalConstraintNode CanonicalConstraintNode(Position pos, Assertion constraint);
     AuthConstraintNode AuthConstraintNode(Position pos, List principals);
     CallerConstraintNode CallerConstraintNode(Position pos, List principals);
-    AutoEndorseConstraintNode AutoEndorseConstraintNode(Position pos, List principals);
+    AutoEndorseConstraintNode AutoEndorseConstraintNode(Position pos, LabelNode endorseTo);
     ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter);
     ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter, boolean isEquiv);
     LabelLeAssertionNode LabelLeAssertionNode(Position pos, LabelNode actor, LabelNode granter);

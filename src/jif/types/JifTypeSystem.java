@@ -146,7 +146,7 @@ public interface JifTypeSystem extends ParamTypeSystem
     CallerConstraint callerConstraint(Position pos, List principals);
 
     /** Construct an autoendorse constraint. */
-    AutoEndorseConstraint autoEndorseConstraint(Position pos, List principals);
+    AutoEndorseConstraint autoEndorseConstraint(Position pos, Label endorseTo);
 
     /** Get the label of the field, folding in the PC if appropriate. */
     Label labelOfField(FieldInstance vi, Label pc);

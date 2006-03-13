@@ -1,11 +1,10 @@
 package jif.types;
 
-import polyglot.util.*;
-import java.util.*;
+import jif.types.label.Label;
 
 /** The auto endorse constraint. 
  */
 public interface AutoEndorseConstraint extends Assertion {
-    List principals();
-    AutoEndorseConstraint principals(List principals);
+    Label endorseTo();
+    AutoEndorseConstraint endorseTo(Label endorseTo);
 }

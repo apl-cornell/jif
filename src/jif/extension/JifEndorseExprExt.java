@@ -31,13 +31,14 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                      Label labelFrom, 
                                      Label labelTo, Position pos) 
             throws SemanticException {
-          checkOneDimen(lc, A, labelFrom, labelTo, pos, true);
+          checkOneDimen(lc, A, labelFrom, labelTo, pos, true, false);
       }
       protected static void checkOneDimen(LabelChecker lc, 
                                     final JifContext A,
                                     Label labelFrom, 
                                     Label labelTo, Position pos,
-                                    boolean isExpr) 
+                                    boolean isExpr,
+                                    final boolean isAutoEndorse) 
            throws SemanticException {
           final String exprOrStmt = (isExpr?"expression":"statement");
           JifTypeSystem jts = lc.jifTypeSystem();
@@ -45,16 +46,18 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                              jts.topConfPolicy(pos),
                                              jts.bottomIntegPolicy(pos));
           
-          lc.constrain(new LabelConstraint(new NamedLabel("endorse_from", labelFrom).
+          lc.constrain(new LabelConstraint(new NamedLabel(isAutoEndorse?"pcBound":"endorse_from", labelFrom).
                                               meet(lc, "bottom_integ", botIntegLabel), 
                                            LabelConstraint.LEQ, 
-                                           new NamedLabel("endorse_to", labelTo),
+                                           new NamedLabel(isAutoEndorse?"autoendorse_to":"endorse_to", labelTo),
                                            A.labelEnv(),       
                                            pos) {
                    public String msg() {
+                       if (isAutoEndorse) return "Auto-endorse cannot downgrade confidentiality.";
                        return "Endorse " + exprOrStmt + "s cannot downgrade confidentiality.";
                    }
                    public String detailMsg() { 
+                       if (isAutoEndorse) return "The auto endorse label has lower confidentiality than the start label of the method.";
                        return "The endorse_to label has lower confidentiality than the " +
                                    "endorse_from label; endorse " + exprOrStmt + "s " +
                                    "cannot downgrade confidentiality.";
@@ -68,26 +71,27 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                    Label labelFrom, 
                                    Label labelTo, Position pos) 
           throws SemanticException {
-        checkAuth(lc, A, labelFrom, labelTo, pos, true);
+        checkAuth(lc, A, labelFrom, labelTo, pos, true, false);
     }
 
     protected static void checkAuth(LabelChecker lc, 
                                   final JifContext A,
                                   Label labelFrom, 
                                   Label labelTo, Position pos,
-                                  boolean isExpr) 
+                                  boolean isExpr,
+                                  final boolean isAutoEndorse) 
          throws SemanticException {
         Label authLabel = A.authLabelInteg();
         final String exprOrStmt = (isExpr?"expression":"statement");
-        lc.constrain(new LabelConstraint(new NamedLabel("endorse_from", labelFrom).
+        lc.constrain(new LabelConstraint(new NamedLabel(isAutoEndorse?"pcBound":"endorse_from", labelFrom).
                                          meet(lc, "auth_label", authLabel),
                                          LabelConstraint.LEQ, 
-                                         new NamedLabel("endorse_to", labelTo),
+                                         new NamedLabel(isAutoEndorse?"autoendorse_to":"endorse_to", labelTo),
                                          A.labelEnv(),
                                          pos) {
             public String msg() {
                 return "The method does not have sufficient " +
-                "authority to endorse this " + exprOrStmt + ".";
+                "authority to " + (isAutoEndorse?"auto-endorse this method":"endorse this " + exprOrStmt) + ".";
             }
             public String detailMsg() { 
                 StringBuffer sb = new StringBuffer();
@@ -106,11 +110,19 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                     }
                 }
                 
+                if (isAutoEndorse) {
+                    return "The start label of this method is " + namedLhs() + 
+                    ", and the auto-endorse label is " + namedRhs() + 
+                    ". However, the method has " +
+                    "the authority of " + sb.toString() + ". " +
+                    "The authority of other principals is " +
+                    "required to perform the endorse.";
+                }
                 
                 return "The " + exprOrStmt + " to endorse has label " + 
-                namedRhs()+ ", and the " + exprOrStmt + " " +
-                "should be downgraded to label " +
-                "endorse_to. However, the method has " +
+                namedLhs()+ ", and the " + exprOrStmt + " " +
+                "should be downgraded to label " + namedRhs() +
+                ". However, the method has " +
                 "the authority of " + sb.toString() + ". " +
                 "The authority of other principals is " +
                 "required to perform the endorse.";

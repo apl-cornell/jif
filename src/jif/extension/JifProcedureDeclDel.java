@@ -41,10 +41,6 @@ public class JifProcedureDeclDel extends JifJL_c
                 AuthConstraint ac = (AuthConstraint)a;
                 ensureNotTopPrincipal(ac.principals(), a.position());
             }
-            else if (a instanceof AutoEndorseConstraint) {
-                AutoEndorseConstraint ac = (AutoEndorseConstraint)a;
-                ensureNotTopPrincipal(ac.principals(), a.position());
-            }
             else if (a instanceof CallerConstraint) {
                 CallerConstraint cc = (CallerConstraint)a;
                 ensureNotTopPrincipal(cc.principals(), a.position());

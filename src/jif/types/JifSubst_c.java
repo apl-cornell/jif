@@ -161,9 +161,8 @@ public class JifSubst_c extends Subst_c implements JifSubst
         }
         else if (constraint instanceof AutoEndorseConstraint) {
             AutoEndorseConstraint c = (AutoEndorseConstraint) constraint;
-            List l = new CachingTransformingList(c.principals(),
-                                                 new PrincipalXform());
-            return c.principals(l);
+            c = c.endorseTo(substLabel(c.endorseTo()));
+            return c;
         }
 
 	return constraint;

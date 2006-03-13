@@ -10,57 +10,43 @@ import polyglot.visit.*;
 
 public class AutoEndorseConstraintNode_c extends ConstraintNode_c implements AutoEndorseConstraintNode
 {
-    protected List principals;
+    protected LabelNode endorseTo;
 
-    public AutoEndorseConstraintNode_c(Position pos, List principals) {
+    public AutoEndorseConstraintNode_c(Position pos, LabelNode endorseTo) {
 	super(pos);
-	this.principals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
+	this.endorseTo = endorseTo;
     }
 
-    public List principals() {
-	return this.principals;
+    public LabelNode endorseTo() {
+	return this.endorseTo;
     }
 
-    public AutoEndorseConstraintNode principals(List principals) {
+    public AutoEndorseConstraintNode endorseTo(LabelNode endorseTo) {
 	AutoEndorseConstraintNode_c n = (AutoEndorseConstraintNode_c) copy();
-	n.principals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
-        if (constraint()!=null) {
-            List l = new LinkedList();
-            for (Iterator i = principals.iterator(); i.hasNext(); ) {
-                PrincipalNode p = (PrincipalNode) i.next();
-                l.add(p.principal());
-            }
-            n.constraint = ((AutoEndorseConstraint_c)constraint()).principals(l);
+	n.endorseTo = endorseTo;
+        if (constraint() != null) {
+            n.constraint = ((AutoEndorseConstraint_c)constraint()).endorseTo(endorseTo.label());
         }
 	return n;
     }
 
-    protected AutoEndorseConstraintNode_c reconstruct(List principals) {
-	if (! CollectionUtil.equals(principals, this.principals)) {
-            List newPrincipals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
-            return (AutoEndorseConstraintNode_c)this.principals(newPrincipals);
+    protected AutoEndorseConstraintNode_c reconstruct(LabelNode endorseTo) {
+	if (this.endorseTo != endorseTo) {
+            return (AutoEndorseConstraintNode_c)this.endorseTo(endorseTo);
 	}
 
 	return this;
     }
 
     public Node visitChildren(NodeVisitor v) {
-	List principals = visitList(this.principals, v);
-	return reconstruct(principals);
+        LabelNode endorseTo = (LabelNode) visitChild(this.endorseTo, v);
+        return reconstruct(endorseTo);
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (constraint() == null) {
             JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
-
-            List l = new LinkedList();
-
-            for (Iterator i = this.principals.iterator(); i.hasNext(); ) {
-                PrincipalNode p = (PrincipalNode) i.next();
-                l.add(p.principal());
-            }
-
-            return constraint(ts.autoEndorseConstraint(position(), l));
+            return constraint(ts.autoEndorseConstraint(position(), endorseTo.label()));
         }
 
         return this;
@@ -68,14 +54,7 @@ public class AutoEndorseConstraintNode_c extends ConstraintNode_c implements Aut
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("autoendorse(");
-
-        for (Iterator i = principals.iterator(); i.hasNext(); ) {
-            PrincipalNode p = (PrincipalNode) i.next();
-            print(p, w, tr);
-            w.write(",");
-            w.allowBreak(0, " ");
-        }
-
+        print(endorseTo, w, tr);
         w.write(")");
     }
 

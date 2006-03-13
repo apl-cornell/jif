@@ -1,41 +1,37 @@
 package jif.types;
 
-import polyglot.ext.jl.types.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
+import jif.types.label.Label;
 import jif.types.principal.Principal;
+import polyglot.ext.jl.types.TypeObject_c;
+import polyglot.util.Position;
 
 /** An implementation of the <code>CallerConstraint</code> interface. 
  */
 public class AutoEndorseConstraint_c extends TypeObject_c implements AutoEndorseConstraint {
-    protected List principals;
+    protected Label endorseTo;
 
     public AutoEndorseConstraint_c(JifTypeSystem ts, Position pos,
-	                        List principals) {
+	                        Label endorseTo) {
 	super(ts, pos);
-	this.principals = TypedList.copyAndCheck(principals, Principal.class, true);
+	this.endorseTo = endorseTo;
     }
 
-    public AutoEndorseConstraint principals(List principals) {
+    public AutoEndorseConstraint endorseTo(Label endorseTo) {
 	AutoEndorseConstraint_c n = (AutoEndorseConstraint_c) copy();
-	n.principals = TypedList.copyAndCheck(principals, Principal.class, true);
+	n.endorseTo = endorseTo;
 	return n;
     }
 
-    public List principals() {
-	return principals;
+    public Label endorseTo() {
+	return endorseTo;
     }
 
     public String toString() {
 	String s = "autoendorse(";
-	for (Iterator i = principals.iterator(); i.hasNext(); ) {
-	    Principal p = (Principal) i.next();
-	    s += p;
-	    if (i.hasNext()) {
-		s += ", ";
-	    }
-	}
+	s += endorseTo.toString();
 	s += ")";
 	return s;
     }

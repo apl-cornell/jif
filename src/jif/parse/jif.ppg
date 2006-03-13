@@ -250,7 +250,6 @@ terminal Token ACTSFOR_LOWER;
 terminal Token EQUIV;
 terminal Token DECLASSIFY;
 terminal Token ENDORSE;
-terminal Token AUTOENDORSE;
 terminal Token TO;
 
 non terminal DeclassifyExpr declassify;
@@ -719,7 +718,7 @@ constraint ::=
         {: RESULT = parser.nf.AuthConstraintNode(parser.pos(x,y), a); :}
     |   CALLER:x LPAREN principal_list:a RPAREN:y
         {: RESULT = parser.nf.CallerConstraintNode(parser.pos(x,y), a); :}
-    |   AUTOENDORSE:x LPAREN principal_list:a RPAREN:y
+    |   ENDORSE:x LPAREN label_flexible:a RPAREN:y
         {: RESULT = parser.nf.AutoEndorseConstraintNode(parser.pos(x,y), a); :}
     |   principal:a actsfor principal:b 
         {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b); :}

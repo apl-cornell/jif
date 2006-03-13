@@ -120,12 +120,6 @@ public interface JifContext extends Context {
      */    
     Label authLabelInteg();
 
-    /**
-     * Given a set of principals p1,...,pm returns an integrity label
-     * {p1!: meet ... meet pn!:;}
-     */    
-    Label authLabelInteg(Set principals);
-
 
     /* ************************************************
      * Miscellaneous contextual information for label checking
