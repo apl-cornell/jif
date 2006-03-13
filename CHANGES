@@ -3,6 +3,15 @@ Jif Change Log
 
 This file documents changes between releases of Jif.
 
+2006-03-13    Jif 2.0.1
+    * Numerous bug fixes.
+    * Label less-than-or-equal constraints for methods.
+    * Map implementation in jif.util library.
+    * Simple runtime class analysis removes the need to statically handle 
+            some spurious ClassCastExceptions
+    * jif.lang.IDComparable interface now with additional method
+            equals(label lbl, IDComparable[lbl] o)
+        
 2005-08-26    Jif 2.0.0
     * Class parameters now represented at runtime.
     * Dynamic labels and principals more expressive: now allow access paths.
