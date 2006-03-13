@@ -890,6 +890,10 @@ public class JifTypeSystem_c
         return new AuthConstraint_c(this, pos, principals);
     }
 
+    public AutoEndorseConstraint autoEndorseConstraint(Position pos, List principals) {
+        return new AutoEndorseConstraint_c(this, pos, principals);
+    }
+
     public CallerConstraint callerConstraint(Position pos, List principals) {
         return new CallerConstraint_c(this, pos, principals);
     }

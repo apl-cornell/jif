@@ -341,6 +341,14 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
+    public AutoEndorseConstraintNode AutoEndorseConstraintNode(Position pos, List principals) {
+        AutoEndorseConstraintNode n = new AutoEndorseConstraintNode_c(pos,
+                                                            principals);
+        n = (AutoEndorseConstraintNode)n.ext(jifExtFactory().extAutoEndorseConstraintNode());
+        n = (AutoEndorseConstraintNode)n.del(delFactory().delNode());
+        return n;
+    }
+
     public CallerConstraintNode CallerConstraintNode(Position pos, List principals) {
         CallerConstraintNode n = new CallerConstraintNode_c(pos,
                                                             principals);

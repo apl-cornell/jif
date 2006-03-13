@@ -214,10 +214,12 @@ public class JifContext_c extends Context_c implements JifContext
     }
 
     public Label authLabelInteg() {
-        Set auth = authority();
-        
+        return authLabelInteg(authority());
+    }
+
+    public Label authLabelInteg(Set principals) {
         Set labels = new LinkedHashSet();
-        for (Iterator i = auth.iterator(); i.hasNext(); ) {
+        for (Iterator i = principals.iterator(); i.hasNext(); ) {
             Principal p = (Principal) i.next();
             PairLabel pl = jifts.pairLabel(p.position(),
                                            jifts.bottomConfPolicy(p.position()),

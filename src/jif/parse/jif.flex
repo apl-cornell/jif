@@ -111,6 +111,7 @@ import java.util.HashMap;
         keywords.put("invariant",     new Integer(sym.INVARIANT));
         keywords.put("declassify",    new Integer(sym.DECLASSIFY));
         keywords.put("endorse",       new Integer(sym.ENDORSE));
+        keywords.put("autoendorse",   new Integer(sym.AUTOENDORSE));
         keywords.put("to",            new Integer(sym.TO));
         keywords.put("label",         new Integer(sym.LABEL));
         keywords.put("principal",     new Integer(sym.PRINCIPAL));

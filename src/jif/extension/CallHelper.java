@@ -620,7 +620,7 @@ public class CallHelper {
         for (Iterator i = jpi.constraints().iterator(); i.hasNext();) {
             Assertion jc = (Assertion)i.next();
 
-            if (jc instanceof AuthConstraint) {
+            if (jc instanceof AuthConstraint || jc instanceof AutoEndorseConstraint) {
                 continue;
             }
             else if (jc instanceof CallerConstraint) {

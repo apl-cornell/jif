@@ -39,7 +39,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         lc = lc.context(A);
 
         // First, check the arguments, adjusting the context.
-        Label Li = checkArguments(ci, lc);
+        Label Li = checkEnforceSignature(ci, lc);
     
         Block body = null;
         PathMap X;

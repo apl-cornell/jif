@@ -78,6 +78,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	                (Semantic, "Cannot cast the expression of type");
 	Authority06.jif ;
 	Authority07.jif ;
+	AutoEndorse01.jif (Semantic, "sufficient authority to autoendorse");
+	AutoEndorse02.jif ;
 	BadNullExcept1.jif (Semantic, "NullPointerException.*must .* be caught") ;
 	BadNullExcept2.jif (Semantic, "NullPointerException.*must .* be caught") ;
 	BadNullExcept3.jif (Semantic, "NullPointerException.*must .* be caught") ;

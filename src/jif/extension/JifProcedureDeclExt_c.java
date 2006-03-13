@@ -33,34 +33,16 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * thesis (Figure 4.37).  It returns the start label of the method.
      * It mutates the local context (to the A'' in the rule).
      */
-    protected Label checkArguments(JifProcedureInstance mi, LabelChecker lc)
+    protected Label checkEnforceSignature(JifProcedureInstance mi, LabelChecker lc)
 	throws SemanticException
     {
 	if (Report.should_report(jif_verbose, 2))
 	    Report.report(2, "Adding constraints for header of " + mi);
 
-	JifTypeSystem ts = lc.jifTypeSystem();
       	JifContext A = lc.jifContext();
-        JifClassType ct = (JifClassType) A.currentClass();
-	
-	// We begin by getting the pc bound of this procedure.
-        Label Li = mi.pcBound();
-
-        // the initial pc is the special arglabel, pcLabel, which is
-        // bounded above by Li.
-        Label pcLabel = ts.callSitePCLabel(mi);
-        A.setPc(pcLabel); 
-        A.setCurrentCodePCBound(Li);
-
-        if (!mi.flags().isStatic())  {
-	    // for non-static methods, we know the this label
-	    // must be bounded above by the start label
-	    A.addAssertionLE(ct.thisLabel(), pcLabel);	
-	}
-
-
+        
         // Set the "auth" variable.
-	Set newAuth = constraintAuth(mi, A);
+	Set newAuth = constrainAuth(mi, A);
 
 	for (Iterator iter = newAuth.iterator(); iter.hasNext(); ) {
 	    Principal p = (Principal) iter.next();
@@ -69,10 +51,79 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	    checkActsForAuthority(p, A);
 	}
 
-	addCallers(mi, A, newAuth);
-	A.setAuthority(newAuth);       
-	constrainLabelEnv(mi, A, null);
+        addCallers(mi, A, newAuth);
+        A.setAuthority(newAuth);       
+
+        // check that any autoendorse constraints are satisfied,
+        // and set and constrain the inital PC
+        Label Li = checkAutoEndorseConstrainPC(mi, lc);
+
+        constrainLabelEnv(mi, A, null);
 	return Li;
+    }
+
+    protected Label checkAutoEndorseConstrainPC(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
+        final JifContext A = lc.jifContext();
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifClassType ct = (JifClassType) A.currentClass();
+        Label Li = mi.pcBound();
+
+        final Set autoEndorses = new LinkedHashSet(); 
+        for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
+            Assertion c = (Assertion) iter.next();
+
+            if (c instanceof AutoEndorseConstraint) {
+                AutoEndorseConstraint ac = (AutoEndorseConstraint) c;
+
+                for (Iterator i = ac.principals().iterator(); i.hasNext(); ) {
+                    Principal pi = (Principal) i.next();
+                    autoEndorses.add(pi);
+                }
+            }
+        }
+
+        Label callerPcLabel = ts.callSitePCLabel(mi);
+        if (!mi.flags().isStatic())  {
+            // for non-static methods, we know the this label
+            // must be bounded above by the start label
+            A.addAssertionLE(ct.thisLabel(), callerPcLabel);  
+        }
+
+        A.setPc(callerPcLabel); 
+        Label initialPCBound = Li;
+        
+        if (!autoEndorses.isEmpty()) {
+            Label autoEndorseIntegLabel = A.authLabelInteg(autoEndorses);
+   
+            // check that for each principal in the auto endorse set, 
+            // there is at least one principal in the authority set that 
+            // can act for it
+            Principal allAuthority = ts.conjunctivePrincipal(mi.position(), A.authority());
+            for (Iterator autos = autoEndorses.iterator(); autos.hasNext();) {
+                Principal ae = (Principal)autos.next();
+                if (!A.actsFor(allAuthority, ae)) {
+                    throw new SemanticDetailedException(
+                       "The method does not have sufficient authority to " +
+                       "autoendorse for " + ae + ".", 
+                       "To autoendorse for the principal " + ae + ", " +
+                                "the method must have the authority of " + ae + 
+                                " or a principal that can act for " + ae + ".", 
+                                mi.position());
+                }
+            }
+            
+            // the initial pc is the meet of pcLabel the appropriate integrity
+            // label.
+            initialPCBound = ts.meet(initialPCBound, autoEndorseIntegLabel);
+                        
+            // add a restriction on the "callerPC" label. It is less
+            // than the appropriate autoendorse label
+            A.addAssertionLE(callerPcLabel, autoEndorseIntegLabel);
+        }
+        
+        A.setCurrentCodePCBound(initialPCBound);        
+        return initialPCBound;
+        
     }
 
     /**
@@ -80,7 +131,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * thesis (Figure 4.39).  It returns the set of principals for which the
      * method can act.
      */
-    protected Set constraintAuth(JifProcedureInstance mi, JifContext A) {
+    protected Set constrainAuth(JifProcedureInstance mi, JifContext A) {
         Set newAuth = new LinkedHashSet();
 
         for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
@@ -91,7 +142,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
 		for (Iterator i = ac.principals().iterator(); i.hasNext(); ) {
 		    Principal pi = (Principal) i.next();
-		    //newAuth.add(A.instantiate(pi));
 		    newAuth.add(pi);
 		}
             }

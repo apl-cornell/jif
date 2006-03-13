@@ -45,7 +45,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         lc.enteringMethod(mi);
 
         // First, check the arguments, adjusting the context.
-	Label Li = checkArguments(mi, lc);
+	Label Li = checkEnforceSignature(mi, lc);
 
 	Block body = null;
 	PathMap X;

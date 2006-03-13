@@ -153,12 +153,18 @@ public class JifSubst_c extends Subst_c implements JifSubst
                                                  new PrincipalXform());
 	    return c.principals(l);
 	}
-	else if (constraint instanceof AuthConstraint) {
-	    AuthConstraint c = (AuthConstraint) constraint;
-	    List l = new CachingTransformingList(c.principals(),
+        else if (constraint instanceof AuthConstraint) {
+            AuthConstraint c = (AuthConstraint) constraint;
+            List l = new CachingTransformingList(c.principals(),
                                                  new PrincipalXform());
-	    return c.principals(l);
-	}
+            return c.principals(l);
+        }
+        else if (constraint instanceof AutoEndorseConstraint) {
+            AutoEndorseConstraint c = (AutoEndorseConstraint) constraint;
+            List l = new CachingTransformingList(c.principals(),
+                                                 new PrincipalXform());
+            return c.principals(l);
+        }
 
 	return constraint;
     }

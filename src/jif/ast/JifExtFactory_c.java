@@ -345,6 +345,11 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return postExtAuthConstraintNode(e);
     }
 
+    public final Ext extAutoEndorseConstraintNode() {
+        Ext e = extAutoEndorseConstraintNodeImpl();
+        return postExtAutoEndorseConstraintNode(e);
+    }
+
     public final Ext extCallerConstraintNode() {
         Ext e = extCallerConstraintNodeImpl();
         return postExtCallerConstraintNode(e);
@@ -494,6 +499,10 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return extConstraintNode();
     }
 
+    protected Ext extAutoEndorseConstraintNodeImpl() {
+        return extConstraintNode();
+    }
+
     protected Ext extCallerConstraintNodeImpl() {
         return extConstraintNode();
     }
@@ -627,6 +636,10 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext postExtAuthConstraintNode(Ext e) {
+        return postExtConstraintNode(e);
+    }
+
+    protected Ext postExtAutoEndorseConstraintNode(Ext e) {
         return postExtConstraintNode(e);
     }
 
