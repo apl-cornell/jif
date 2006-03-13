@@ -24,7 +24,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
 
     public final Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
-	DowngradeStmt ds = (DowngradeStmt) node();
+        DowngradeStmt ds = (DowngradeStmt) node();
 
 	JifContext A = lc.jifContext();
         A = (JifContext) ds.enterScope(A);
@@ -79,18 +79,16 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
 	A.setCurrentCodePCBound(downgradeTo);
 
         // add a restriction on the "callerPC" label.
-        if (!A.currentCode().flags().isStatic())  {
-            // for non-static methods, we know the this label
-            // must be bounded above by the start label
-            if (A.currentCode() instanceof JifProcedureInstance) {
-                JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
-                Label callPC = ts.callSitePCLabel((JifProcedureInstance)A.currentCode());
-                A.addAssertionLE(callPC, downgradeTo);
-            }
-            else {
-                JifClassType jct = (JifClassType)A.currentClass();
-                A.addAssertionLE(jct.thisLabel(), downgradeTo);
-            }
+        // for non-static methods, we know the this label
+        // must be bounded above by the start label
+        if (A.currentCode() instanceof JifProcedureInstance) {
+            JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+            Label callPC = ts.callSitePCLabel((JifProcedureInstance)A.currentCode());
+            A.addAssertionLE(callPC, downgradeTo);
+        }
+        else if (!A.currentCode().flags().isStatic())  {
+            JifClassType jct = (JifClassType)A.currentClass();
+            A.addAssertionLE(jct.thisLabel(), downgradeTo);
         }
 
 	Stmt body = (Stmt) lc.context(A).labelCheck(ds.body());
@@ -109,6 +107,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
 	
 	return X(ds.body(body), X);
     }
+    
     /**
      * Check that only the integrity/confidentiality is downgraded, and not
      * the other dimension.

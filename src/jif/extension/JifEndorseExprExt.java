@@ -31,13 +31,15 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                      Label labelFrom, 
                                      Label labelTo, Position pos) 
             throws SemanticException {
-          checkOneDimen(lc, A, labelFrom, labelTo, pos);
+          checkOneDimen(lc, A, labelFrom, labelTo, pos, true);
       }
       protected static void checkOneDimen(LabelChecker lc, 
                                     final JifContext A,
                                     Label labelFrom, 
-                                    Label labelTo, Position pos) 
+                                    Label labelTo, Position pos,
+                                    boolean isExpr) 
            throws SemanticException {
+          final String exprOrStmt = (isExpr?"expression":"statement");
           JifTypeSystem jts = lc.jifTypeSystem();
           Label botIntegLabel = jts.pairLabel(pos, 
                                              jts.topConfPolicy(pos),
@@ -50,11 +52,11 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                            A.labelEnv(),       
                                            pos) {
                    public String msg() {
-                       return "Endorse expressions cannot downgrade confidentiality.";
+                       return "Endorse " + exprOrStmt + "s cannot downgrade confidentiality.";
                    }
                    public String detailMsg() { 
                        return "The endorse_to label has lower confidentiality than the " +
-                                   "endorse_from label; endorse expressions " +
+                                   "endorse_from label; endorse " + exprOrStmt + "s " +
                                    "cannot downgrade confidentiality.";
                    }                     
           }
@@ -66,15 +68,17 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                    Label labelFrom, 
                                    Label labelTo, Position pos) 
           throws SemanticException {
-        checkAuth(lc, A, labelFrom, labelTo, pos);
+        checkAuth(lc, A, labelFrom, labelTo, pos, true);
     }
 
     protected static void checkAuth(LabelChecker lc, 
                                   final JifContext A,
                                   Label labelFrom, 
-                                  Label labelTo, Position pos) 
+                                  Label labelTo, Position pos,
+                                  boolean isExpr) 
          throws SemanticException {
-        Label authLabel = A.authLabelInteg();    
+        Label authLabel = A.authLabelInteg();
+        final String exprOrStmt = (isExpr?"expression":"statement");
         lc.constrain(new LabelConstraint(new NamedLabel("endorse_from", labelFrom).
                                          meet(lc, "auth_label", authLabel),
                                          LabelConstraint.LEQ, 
@@ -83,7 +87,7 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                          pos) {
             public String msg() {
                 return "The method does not have sufficient " +
-                "authority to endorse this expression.";
+                "authority to endorse this " + exprOrStmt + ".";
             }
             public String detailMsg() { 
                 StringBuffer sb = new StringBuffer();
@@ -103,8 +107,8 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                 }
                 
                 
-                return "The expression to endorse has label " + 
-                namedRhs()+ ", and the expression " +
+                return "The " + exprOrStmt + " to endorse has label " + 
+                namedRhs()+ ", and the " + exprOrStmt + " " +
                 "should be downgraded to label " +
                 "endorse_to. However, the method has " +
                 "the authority of " + sb.toString() + ". " +
@@ -124,17 +128,19 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                    Label labelFrom, 
                                    Label labelTo, Position pos) 
                  throws SemanticException {
-        checkRobustEndorse(lc, A, labelFrom, labelTo, pos);
+        checkRobustEndorse(lc, A, labelFrom, labelTo, pos, true);
     }
 
     protected static void checkRobustEndorse(LabelChecker lc, 
                                           JifContext A,
                                           Label labelFrom, 
-                                          Label labelTo, Position pos) 
+                                          Label labelTo, Position pos, 
+                                          boolean isExpr) 
         throws SemanticException {
         
         
         JifTypeSystem jts = lc.typeSystem();
+        final String exprOrStmt = (isExpr?"expression":"statement");
         Label pcInteg = lc.upperBound(A.pc(),
                                  jts.pairLabel(pos,
                                                jts.topConfPolicy(pos),
@@ -152,7 +158,7 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                         "endorse.";
                      }
                      public String detailMsg() { 
-                         return "The endorsement of this expression is " +
+                         return "The endorsement of this " + exprOrStmt + " is " +
                          "not robust; at least one of principals that is " +
                          "allowed to read the information after " +
                          "endorsement may be able to influence the " +

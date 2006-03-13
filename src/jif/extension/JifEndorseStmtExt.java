@@ -30,27 +30,7 @@ public class JifEndorseStmtExt extends JifDowngradeStmtExt
             Label labelFrom, 
             Label labelTo, Position pos) 
     throws SemanticException {
-        JifTypeSystem jts = lc.jifTypeSystem();
-        Label botIntegLabel = jts.pairLabel(pos, 
-                                            jts.topConfPolicy(pos),
-                                            jts.bottomIntegPolicy(pos));
-        
-        lc.constrain(new LabelConstraint(new NamedLabel("endorse_from", labelFrom).
-                                         meet(lc, "bottom_integ", botIntegLabel), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("endorse_to", labelTo),
-                                         A.labelEnv(),       
-                                         pos) {
-            public String msg() {
-                return "Endorse statements cannot downgrade confidentiality.";
-            }
-            public String detailMsg() { 
-                return "The endorse_to label has lower confidentiality than the " +
-                "endorse_from label; endorse statements " +
-                "cannot downgrade confidentiality.";
-            }                     
-        }
-        );
+        JifEndorseExprExt.checkOneDimen(lc, A, labelFrom, labelTo, pos, false);
     }
 
 protected void checkAuthority(LabelChecker lc, 
@@ -58,7 +38,7 @@ protected void checkAuthority(LabelChecker lc,
                                   Label labelFrom, 
                                   Label labelTo, Position pos) 
             throws SemanticException {
-        JifEndorseExprExt.checkAuth(lc, A, labelFrom, labelTo, pos);
+        JifEndorseExprExt.checkAuth(lc, A, labelFrom, labelTo, pos, false);
     }
 
     protected void checkRobustness(LabelChecker lc, 
@@ -66,6 +46,6 @@ protected void checkAuthority(LabelChecker lc,
                                    Label labelFrom, 
                                    Label labelTo, Position pos) 
     throws SemanticException {
-        JifEndorseExprExt.checkRobustEndorse(lc, A, labelFrom, labelTo, pos);
+        JifEndorseExprExt.checkRobustEndorse(lc, A, labelFrom, labelTo, pos, false);
     }
 }

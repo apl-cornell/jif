@@ -31,13 +31,16 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                                   Label labelFrom, 
                                   Label labelTo, Position pos) 
          throws SemanticException {
-       checkOneDimen(lc, A, labelFrom, labelTo, pos);
+       checkOneDimen(lc, A, labelFrom, labelTo, pos, true);
    }
    protected static void checkOneDimen(LabelChecker lc, 
                                  final JifContext A,
                                  Label labelFrom, 
-                                 Label labelTo, Position pos) 
+                                 Label labelTo, Position pos,
+                                 boolean isExpr) 
         throws SemanticException {
+       final String exprOrStmt = (isExpr?"expression":"statement");
+       
        JifTypeSystem jts = lc.jifTypeSystem();
        Label topConfLabel = jts.pairLabel(pos, 
                                           jts.topConfPolicy(pos),
@@ -50,11 +53,11 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                                         A.labelEnv(),       
                                         pos) {
                 public String msg() {
-                    return "Declassify expressions cannot downgrade integrity.";
+                    return "Declassify " + exprOrStmt + "s cannot downgrade integrity.";
                 }
                 public String detailMsg() { 
                     return "The declass_from label has lower integrity than the " +
-                                "declass_to label; declassify expressions " +
+                                "declass_to label; declassify " + exprOrStmt + "s " +
                                 "cannot downgrade integrity.";
                 }                     
     }
@@ -66,14 +69,15 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                                  Label labelFrom, 
                                  Label labelTo, Position pos) 
         throws SemanticException {
-      checkAuth(lc, A, labelFrom, labelTo, pos);
+      checkAuth(lc, A, labelFrom, labelTo, pos, true);
   }
   protected static void checkAuth(LabelChecker lc, 
                                 final JifContext A,
                                 Label labelFrom, 
-                                Label labelTo, Position pos) 
+                                Label labelTo, Position pos, boolean isExpr) 
        throws SemanticException {
-  
+      final String exprOrStmt = (isExpr?"expression":"statement");
+
       Label authLabel = A.authLabel();    
   lc.constrain(new LabelConstraint(new NamedLabel("declass_from", labelFrom), 
                                    LabelConstraint.LEQ, 
@@ -83,7 +87,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                                    pos) {
                public String msg() {
                    return "The method does not have sufficient " +
-                          "authority to declassify this expression.";
+                          "authority to declassify this " + exprOrStmt + ".";
                }
                public String detailMsg() { 
                    StringBuffer sb = new StringBuffer();
@@ -103,8 +107,8 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                    }
                    
                     
-                   return "The expression to declassify has label " + 
-                          namedRhs()+ ", and the expression " +
+                   return "The " + exprOrStmt + " to declassify has label " + 
+                          namedRhs()+ ", and the " + exprOrStmt + " " +
                           "should be downgraded to label " +
                           "declass_to. However, the method has " +
                           "the authority of " + sb.toString() + ". " +
@@ -124,15 +128,16 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                                    Label labelFrom, 
                                    Label labelTo, Position pos) 
                  throws SemanticException {
-        checkRobustDecl(lc, A, labelFrom, labelTo, pos);
+        checkRobustDecl(lc, A, labelFrom, labelTo, pos, true);
     }
 
     protected static void checkRobustDecl(LabelChecker lc, 
                                           JifContext A,
                                           Label labelFrom, 
-                                          Label labelTo, Position pos) 
+                                          Label labelTo, Position pos, boolean isExpr) 
         throws SemanticException {
         
+        final String exprOrStmt = (isExpr?"expression":"statement");
         
         JifTypeSystem jts = lc.typeSystem();
         Label pcInteg = jts.writersToReadersLabel(pos, A.pc());
@@ -149,7 +154,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                                         "declassify.";
                      }
                      public String detailMsg() { 
-                         return "The declassification of this expression is " +
+                         return "The declassification of this " + exprOrStmt + " is " +
                          "not robust; at least one of principals that is " +
                          "allowed to read the information after " +
                          "declassification may be able to influence the " +
@@ -171,7 +176,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                                         "declassified.";
     }
                      public String detailMsg() { 
-                         return "The declassification of this expression is " +
+                         return "The declassification of this " + exprOrStmt + " is " +
                          "not robust; at least one of principals that is " +
                          "allowed to read the information after " +
                          "declassification may be able to influence the " +
