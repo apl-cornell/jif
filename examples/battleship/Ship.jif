@@ -97,25 +97,30 @@ public class Ship[label L] implements JifObject[L] {
 	    (isHorizontal ? 97 : 0);
     }
 
-    public boolean{L;o} equals(IDComparable[L] o) {
-	if (o == null || !(o instanceof Ship[L])) {
+    public boolean{lbl;*lbl;L;o} equals(label lbl, IDComparable[lbl] o) {
+	if (o == null || !(o instanceof Ship[lbl])) {
 	    return false;
 	}
 
 
-        Ship[L] that = (Ship[L])o;
+        Ship[lbl] that = (Ship[lbl])o;
 
             // use local variables to allow the NullPointerException
             // analysis to work.
         Coordinate[L] thispos = this.pos;
-        Coordinate[L] thatpos = that.pos;
+        Coordinate[lbl] thatpos = that.pos;
 
 
         return this.length == that.length && 
             this.isHorizontal == that.isHorizontal &&
             (thispos == thatpos || 
-             (thispos != null && thispos.equals(thatpos)));
+             (thispos != null && thispos.equals(lbl, thatpos)));
     }
+    
+    public boolean{L;o} equals(IDComparable[L] o) {
+        return equals(L, o);
+    }
+    
 }
 
 
