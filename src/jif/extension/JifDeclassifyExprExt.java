@@ -155,7 +155,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                      }
                      public String detailMsg() { 
                          return "The declassification of this " + exprOrStmt + " is " +
-                         "not robust; at least one of principals that is " +
+                         "not robust; at least one of the principals that is " +
                          "allowed to read the information after " +
                          "declassification may be able to influence the " +
                          "decision to declassify.";
@@ -177,7 +177,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
     }
                      public String detailMsg() { 
                          return "The declassification of this " + exprOrStmt + " is " +
-                         "not robust; at least one of principals that is " +
+                         "not robust; at least one of the principals that is " +
                          "allowed to read the information after " +
                          "declassification may be able to influence the " +
                          "data to be declassified.";

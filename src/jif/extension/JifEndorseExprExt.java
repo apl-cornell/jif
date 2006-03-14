@@ -165,14 +165,14 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                          A.labelEnv(),
                                          pos) {
                      public String msg() {
-                         return "Endorsement not robust: a new reader " +
+                         return "Endorsement not robust: a removed writer " +
                                         "may influence the decision to " +
                                         "endorse.";
                      }
                      public String detailMsg() { 
                          return "The endorsement of this " + exprOrStmt + " is " +
-                         "not robust; at least one of principals that is " +
-                         "allowed to read the information after " +
+                         "not robust; at least one of the principals that is " +
+                         "regarded as no longer influencing the information after " +
                          "endorsement may be able to influence the " +
                          "decision to endorse.";
                      }
