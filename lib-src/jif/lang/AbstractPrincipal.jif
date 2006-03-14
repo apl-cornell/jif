@@ -20,19 +20,16 @@ public abstract class AbstractPrincipal implements Principal {
         return superiorsContains((Principal)p);
     }
     
-    public void addDelegatesTo{this:;this!:*}(principal{this} p) where caller (this) {
+    public void addDelegatesTo{this:;this!:}(principal{this:;this!:} p) where caller (this) {
         if (superiorsContains((Principal)p)) {
             return;
         }
         // need to add p to the superiors.
         declassify ({this!:}) {
-//            Principal{this!:*}[]{this!:*} sprs = declassify(superiors, {this!:});
-//            Principal{this!:*}[]{this!:*} sprs = superiors;
             try {
                 if (superiors == null) {
                     superiors = new Principal[1];
-                    superiors[0] = (Principal)p;            
-//                    sprs[0] = (Principal)declassify(p, {this!:});            
+                    superiors[0] = (Principal)declassify(p, {this!:});            
                 }
                 else {
                     Principal{this!:*}[] old = superiors;
@@ -40,14 +37,12 @@ public abstract class AbstractPrincipal implements Principal {
                     for (int i = 0; i < old.length; i++) {
                         superiors[i] = old[i];
                     }
-//                    sprs[old.length] = (Principal)declassify(p, {this!:});            
-                    superiors[old.length] = (Principal)p;            
+                    superiors[old.length] = (Principal)declassify(p, {this!:});            
                 }
             }
             catch (NullPointerException impossible) {}
             catch (ArrayStoreException impossible) {}
             catch (ArrayIndexOutOfBoundsException impossible) {}
-            //superiors = sprs;
         }
     }
     
