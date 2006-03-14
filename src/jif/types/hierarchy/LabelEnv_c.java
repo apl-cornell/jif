@@ -209,30 +209,7 @@ public class LabelEnv_c implements LabelEnv
         cache.put(g, Boolean.valueOf(result));
         return result;
     }
-    
-    /** 
-     * Recursive implementation of L1 <= L2.
-     */
-//    public boolean leq(LabelJ L1, LabelJ L2, SearchState state) {  
-//        if (!useCache || 
-//                !((SearchState_c)state).useAssertions || 
-//                this.hasVariables()) {
-//            return leqImpl(L1.simplify(), L2.simplify(), state);
-//        }
-//
-//        // only use the cache if we are using assertions, and there are no
-//        // variables
-//        LeqGoal g = new LeqGoal(L1, L2);
-//    
-//        Boolean b = (Boolean)cache.get(g);
-//        if (b != null) {
-//            return b.booleanValue();
-//        }        
-//        boolean result = leqImpl(L1, L2, state);
-//        cache.put(g, Boolean.valueOf(result));
-//        return result;
-//    }
-    
+        
     /**
      * Non-caching implementation of L1 <= L2
      */
@@ -552,7 +529,7 @@ public class LabelEnv_c implements LabelEnv
     
     public boolean leq(ConfPolicy p1, ConfPolicy p2, SearchState state) {
         if (p2.isSingleton() || !p1.isSingleton()) {
-            return p1.leq_(p2, this, state);
+            if (p1.leq_(p2, this, state)) return true;
         }
         if (p2 instanceof JoinPolicy_c) {
             // we need to find one element ci of p2 such that p1 <= ci
@@ -578,11 +555,12 @@ public class LabelEnv_c implements LabelEnv
             }
             if (allSat) return true;
         }
+        if (p2.isSingleton() || !p1.isSingleton()) return false;
         return p1.leq_(p2, this, state);
     }
     public boolean leq(IntegPolicy p1, IntegPolicy p2, SearchState state) {
         if (p2.isSingleton() || !p1.isSingleton()) {
-            return p1.leq_(p2, this, state);
+            if (p1.leq_(p2, this, state)) return true;
         }
         if (p2 instanceof JoinPolicy_c) {
             // we need to find one element ci of p2 such that p1 <= ci
@@ -596,7 +574,7 @@ public class LabelEnv_c implements LabelEnv
             }
         }
         else if (p2 instanceof MeetPolicy_c) {
-            // for all elements ci of p2 we require p1 <= ci             
+            // for all elements ci of p2 we require p1 <= ci
             MeetPolicy_c mp = (MeetPolicy_c)p2;
             boolean allSat = true;
             for (Iterator i = mp.meetComponents().iterator(); i.hasNext(); ) {
@@ -608,6 +586,7 @@ public class LabelEnv_c implements LabelEnv
             }
             if (allSat) return true;
         }
+        if (p2.isSingleton() || !p1.isSingleton()) return false;
         return p1.leq_(p2, this, state);        
     }
     /**
@@ -623,30 +602,37 @@ public class LabelEnv_c implements LabelEnv
      *
      */
     public Label findUpperBound(Label L) {
+        return findUpperBound(L, Collections.EMPTY_SET);
+    }
+    private Label findUpperBound(Label L, Collection seen) {        
+        // L is a pair label.
+        if (L instanceof PairLabel) return L;
+        
+        if (seen.contains(L)) return ts.topLabel();
+        
+        Collection newSeen = new ArrayList(seen.size() + 1);
+        newSeen.addAll(seen);
+        newSeen.add(L);
+                
+        Set allBounds = new LinkedHashSet();
         if (L instanceof JoinLabel) {
             JoinLabel jl = (JoinLabel)L;
             Label ret = ts.bottomLabel();
             for (Iterator iter = jl.joinComponents().iterator(); iter.hasNext();) {
                 Label comp = (Label)iter.next();
-                ts.join(ret, this.findUpperBound(comp));
+                ret = ts.join(ret, this.findUpperBound(comp, newSeen));
             }
-            if (Report.should_report(topics, 4))
-                Report.report(4, "Using " + ret + " as upper bound for " + L);
-            return ret;
+            allBounds.add(ret);
         }
         if (L instanceof MeetLabel) {
             MeetLabel ml = (MeetLabel)L;
             Label ret = ts.topLabel();
             for (Iterator iter = ml.meetComponents().iterator(); iter.hasNext();) {
                 Label comp = (Label)iter.next();
-                ts.meet(ret, this.findUpperBound(comp));
+                ret = ts.meet(ret, this.findUpperBound(comp, newSeen));
             }
-            if (Report.should_report(topics, 4))
-                Report.report(4, "Using " + ret + " as upper bound for " + L);
-            return ret;
+            allBounds.add(ret);
         }
-        // L is a pair label.
-        if (L instanceof PairLabel) return L;
                 
         // check the assertions
         for (Iterator i = labelAssertions.iterator(); i.hasNext();) { 
@@ -661,21 +647,33 @@ public class LabelEnv_c implements LabelEnv
                 cRHS = this.solver.applyBoundsTo(c.rhs());
             }
             if (L.equals(cLHS)) {
-                if (Report.should_report(topics, 4))
-                    Report.report(4, "Using " + cRHS + " as upper bound for " + L);
-                return cRHS;
+                allBounds.add(findUpperBound(cRHS, newSeen));
             }
         }
+
         // assertions didn't help
         if (L instanceof ArgLabel) {
             ArgLabel al = (ArgLabel)L;
             // we want to make sure that we don't end up recursing.
             // Check that al.upperbound() is not recursively defined.            
             if (!argLabelBoundRecursive(al)) {
-                return al.upperBound();
+                allBounds.add(findUpperBound(al.upperBound(), newSeen));
             }
         }
         
+        if (!allBounds.isEmpty()) {
+            Label upperBound;
+            if (allBounds.size() == 1) {
+                upperBound = (Label)allBounds.iterator().next();
+            }
+            else {
+                upperBound = ts.meetLabel(L.position(), allBounds);
+            }
+            if (Report.should_report(topics, 4))
+                Report.report(4, "Using " + upperBound + " as upper bound for " + L);
+            return upperBound;
+        }
+
         if (Report.should_report(topics, 4))
             Report.report(4, "Using top as upper bound for " + L);
         return ts.topLabel();

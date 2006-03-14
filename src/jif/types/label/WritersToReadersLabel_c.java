@@ -125,7 +125,7 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
         else if (label instanceof ArgLabel) {
             ArgLabel L = (ArgLabel)label;
             visited.add(0, L);
-            result = transform(env, L.upperBound(), visited);
+            result = transform(env, env.findUpperBound(L), visited);
             if (L != visited.remove(0)) {
                 throw new InternalCompilerError("Stack discipline broken");
             }
@@ -140,7 +140,7 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
         }    
         else if (label instanceof DynamicLabel) {
             DynamicLabel L = (DynamicLabel)label;
-            result = transform(env, env.findUpperBound(L), visited);            
+            result = transform(env, env.findUpperBound(L), visited);
         }    
         else if (label instanceof ThisLabel) {
             ThisLabel L = (ThisLabel)label;
@@ -165,6 +165,7 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
         if (Report.should_report(Topics.jif, 3)) { 
             Report.report(3, "Transformed " + label + " to " + result);
         }
+//        System.err.println("Transformed " + label + " to " + result);
         return result;        
     }
     
