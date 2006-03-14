@@ -611,6 +611,9 @@ public abstract class Solver {
                     if (shouldReport(2)) {
                         report(2, "Statically failed " + eqn);
                     }
+                    if (shouldReport(3)) {
+                        report(3, "Statically failed " + triggerTransforms(lhs, eqnEnv) + " <= " + triggerTransforms(rhs, eqnEnv));
+                    }
                     // The equation is not satisfied.
                     throw new SemanticException(errorMsg(eqn.constraint()), 
                                                 eqn.position());
