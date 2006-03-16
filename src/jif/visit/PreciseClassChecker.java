@@ -3,6 +3,7 @@ package jif.visit;
 import java.util.*;
 import java.util.Map.Entry;
 
+import jif.ast.DowngradeExpr;
 import jif.extension.JifPreciseClassDel;
 import polyglot.ast.*;
 import polyglot.frontend.Job;
@@ -275,6 +276,14 @@ public class PreciseClassChecker extends DataFlow
                 if (target == null) return null;
                 return new AccessPathFinalField(target, f.fieldInstance());
             }
+        }
+        if (expr instanceof DowngradeExpr) {
+            DowngradeExpr de = (DowngradeExpr)expr;
+            return findAccessPathForExpr(de.expr());
+        }
+        if (expr instanceof Cast) {
+            Cast ce = (Cast)expr;
+            return findAccessPathForExpr(ce.expr());
         }
         return null;
     }
