@@ -216,18 +216,13 @@ public class SolverGLB extends Solver {
         else if (lhs instanceof MeetLabel) {
             MeetLabel ml = (MeetLabel)lhs;
             // ml = c1 meet ... meet cn
-            // Want L to pick one of the ci, the lowest we can find.
-            // TODO: take in the existing value of the variable, to have some
-            // idea of what the smallest increase we want is.
-            Label best = null;
+            // find the needed components of each of the ci.
+            Set needed = new LinkedHashSet();
             for (Iterator iter = ml.meetComponents().iterator(); iter.hasNext();) {
                 Label ci = (Label)iter.next();
-                Label n = findNeeded(ci, rhs, env);
-                if (best == null || env.leq(n, best)) {
-                    best = n;
-                }
+                needed.add(findNeeded(ci, rhs, env));
             }
-            return best;
+            return ts.meetLabel(lhs.position(), needed);
         }
         else if (lhs instanceof PairLabel) {
             PairLabel pl = (PairLabel)lhs;
@@ -256,19 +251,13 @@ public class SolverGLB extends Solver {
         }
         else if (lhs instanceof MeetPolicy_c) {
             MeetPolicy_c mp = (MeetPolicy_c)lhs;
-            // ml = c1 meet ... meet cn
-            // Want L to pick one of the ci, the lowest we can find.
-            // TODO: take in the existing value of the variable, to have some
-            // idea of what the smallest increase we want is.
-            ConfPolicy best = null;
+            // find the needed components of each of the ci.
+            Set needed = new LinkedHashSet();
             for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
                 ConfPolicy ci = (ConfPolicy)iter.next();
-                ConfPolicy n = findNeeded(ci, rhs, env);
-                if (best == null || env.leq(n, best)) {
-                    best = n;
-                }
+                needed.add(findNeeded(ci, rhs, env));
             }
-            return best;
+            return ts.meetConfPolicy(lhs.position(), needed);
         }
         else {
             return lhs;
@@ -290,19 +279,13 @@ public class SolverGLB extends Solver {
         }
         else if (lhs instanceof MeetPolicy_c) {
             MeetPolicy_c mp = (MeetPolicy_c)lhs;
-            // ml = c1 meet ... meet cn
-            // Want L to pick one of the ci, the lowest we can find.
-            // TODO: take in the existing value of the variable, to have some
-            // idea of what the smallest increase we want is.
-            IntegPolicy best = null;
+            // find the needed components of each of the ci.
+            Set needed = new LinkedHashSet();
             for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
                 IntegPolicy ci = (IntegPolicy)iter.next();
-                IntegPolicy n = findNeeded(ci, rhs, env);
-                if (best == null || env.leq(n, best)) {
-                    best = n;
-                }
+                needed.add(findNeeded(ci, rhs, env));
             }
-            return best;
+            return ts.meetIntegPolicy(lhs.position(), needed);
         }
         else {
             return lhs;
