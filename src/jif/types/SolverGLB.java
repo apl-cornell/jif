@@ -184,19 +184,12 @@ public class SolverGLB extends Solver {
 
         // Try and raise v's bound just enough to satisfy the equation
         Label needed = findNeeded(lhsBound, rhsBound, eqn.env());
-        
-//        Collection needed = new ArrayList(lhsBound.components().size());
-//        for (Iterator comps = lhsBound.components().iterator(); comps.hasNext();) {
-//            Label comp = (Label)comps.next();
-//            if (!eqn.env().leq(comp, rhsBound)) {
-//                needed.add(comp);
-//            }
-//        }
-//        // everything not in needed is already satisfied
-        
+                
+        if (shouldReport(5)) report(4, "NEEDED = " + needed);
+
         Label join =  ts.join(vBound, needed);
 
-        if (shouldReport(4)) report(4, "JOIN: " + v + " := " + join);
+        if (shouldReport(4)) report(4, "JOIN (" + v + ", NEEDED) := " + join);
 
         addTrace(v, eqn, join);
         setBound(v, join, eqn.constraint());
@@ -236,11 +229,85 @@ public class SolverGLB extends Solver {
             }
             return best;
         }
+        else if (lhs instanceof PairLabel) {
+            PairLabel pl = (PairLabel)lhs;
+            ConfPolicy cp = findNeeded(pl.confPolicy(), ts.confProjection(rhs), env);
+            IntegPolicy ip = findNeeded(pl.integPolicy(), ts.integProjection(rhs), env);
+            return ts.pairLabel(lhs.position(), cp, ip);
+        }
         else {
             return lhs;
         }
     }
 
+    protected ConfPolicy findNeeded(ConfPolicy lhs, ConfPolicy rhs, LabelEnv env) {
+        if (lhs instanceof JoinPolicy_c) {
+            JoinPolicy_c jp = (JoinPolicy_c)lhs;
+            Set needed = new LinkedHashSet();
+            // jl = c1 join ... join cn
+            // Want L to be the join of all ci such that ci is not <= rhs
+            for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
+                ConfPolicy ci = (ConfPolicy)iter.next();
+                if (!env.leq(ci, rhs)) {
+                    needed.add(findNeeded(ci, rhs, env));
+                }
+            }
+            return ts.joinConfPolicy(lhs.position(), needed);
+        }
+        else if (lhs instanceof MeetPolicy_c) {
+            MeetPolicy_c mp = (MeetPolicy_c)lhs;
+            // ml = c1 meet ... meet cn
+            // Want L to pick one of the ci, the lowest we can find.
+            // TODO: take in the existing value of the variable, to have some
+            // idea of what the smallest increase we want is.
+            ConfPolicy best = null;
+            for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
+                ConfPolicy ci = (ConfPolicy)iter.next();
+                ConfPolicy n = findNeeded(ci, rhs, env);
+                if (best == null || env.leq(n, best)) {
+                    best = n;
+                }
+            }
+            return best;
+        }
+        else {
+            return lhs;
+        }        
+    }
+    protected IntegPolicy findNeeded(IntegPolicy lhs, IntegPolicy rhs, LabelEnv env) {
+        if (lhs instanceof JoinPolicy_c) {
+            JoinPolicy_c jp = (JoinPolicy_c)lhs;
+            Set needed = new LinkedHashSet();
+            // jl = c1 join ... join cn
+            // Want L to be the join of all ci such that ci is not <= rhs
+            for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
+                IntegPolicy ci = (IntegPolicy)iter.next();
+                if (!env.leq(ci, rhs)) {
+                    needed.add(findNeeded(ci, rhs, env));
+                }
+            }
+            return ts.joinIntegPolicy(lhs.position(), needed);
+        }
+        else if (lhs instanceof MeetPolicy_c) {
+            MeetPolicy_c mp = (MeetPolicy_c)lhs;
+            // ml = c1 meet ... meet cn
+            // Want L to pick one of the ci, the lowest we can find.
+            // TODO: take in the existing value of the variable, to have some
+            // idea of what the smallest increase we want is.
+            IntegPolicy best = null;
+            for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
+                IntegPolicy ci = (IntegPolicy)iter.next();
+                IntegPolicy n = findNeeded(ci, rhs, env);
+                if (best == null || env.leq(n, best)) {
+                    best = n;
+                }
+            }
+            return best;
+        }
+        else {
+            return lhs;
+        }        
+    }
     /**
      * Search recursively for solution to system of constraints.
      */
