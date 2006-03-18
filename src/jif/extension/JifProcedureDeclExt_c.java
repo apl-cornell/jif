@@ -54,11 +54,12 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         addCallers(mi, A, newAuth);
         A.setAuthority(newAuth);       
 
+        constrainLabelEnv(mi, A, null);
+
         // check that any autoendorse constraints are satisfied,
         // and set and constrain the inital PC
         Label Li = checkAutoEndorseConstrainPC(mi, lc);
 
-        constrainLabelEnv(mi, A, null);
 	return Li;
     }
 
