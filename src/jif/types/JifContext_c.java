@@ -208,6 +208,9 @@ public class JifContext_c extends Context_c implements JifContext
             labels.add(pl);
         }
 
+        if (labels.isEmpty()) {
+            return jifts.bottomLabel(currentCode().position());
+        }
         Label L = jifts.joinLabel(currentCode().position(), 
                                    labels);
         return L;
