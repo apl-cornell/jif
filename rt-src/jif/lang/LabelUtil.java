@@ -119,6 +119,9 @@ public class LabelUtil
         // error! non pair labels!
         return null;
     }
+    public static Label meetLbl(Label l1, Label l2) {
+        return meet(l1, l2);
+    }
     public static Label meet(Label l1, Label l2) {
         if (l1 == null) return l2;
         if (l2 == null) return l1;
