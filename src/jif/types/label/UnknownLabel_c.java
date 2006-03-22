@@ -5,6 +5,7 @@ import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
+import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
@@ -33,6 +34,9 @@ public class UnknownLabel_c extends Label_c implements UnknownLabel
         return "<unknown label>";
     }    
     public String toString() {
+        if (Report.should_report(Report.debug, 1) && this.description() != null) {
+            return "<unknown label: " + this.description() + ">"; 
+        }
         return "<unknown label>";
     }
     

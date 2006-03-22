@@ -12,7 +12,7 @@ class  ArgLabelSubst2[principal q] {
 	String{y:} answer2 = null;
 
 	answer2 = x.foo(null, z, y); // the return result should have label {y:}
-	// however, it will replace it and get {q:}, which is incorrect.
+	// however, it will replace it and get {z:}, which is incorrect.
 
 	return "asdfg";
     }
@@ -24,8 +24,8 @@ class  D[label q] {
 
 	String{y} answer2 = null;
 
-	answer2 = x.foo(null, new label {Alice:}, y); // the return result should have label {y}
-	// however, it will replace it and get {*q}, which is incorrect.
+	answer2 = x.foo(null, z, y); // the return result should have label {y}
+	// however, it will replace it and get {z}, which is incorrect.
 
 	return "asdfg";
     }

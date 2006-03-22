@@ -60,6 +60,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	ArgLabel2.jif ;
 	ArgLabelSubst.jif ;
 	ArgLabelSubst2.jif ;
+	ArgLabelSubst3.jif ;
 	Array.jif ;
 	Array1.jif (Semantic, "not a subtype") ;
 	Array2.jif ;

@@ -66,7 +66,9 @@ public class JifInstantiator
             this.formalTempAccessPathRoots = new ArrayList(formalArgLabels.size());
             this.formalTempLabels = new ArrayList(formalArgLabels.size());
             for (int i = 0; i < formalArgLabels.size(); i++) {
-                formalTempLabels.add(ts.unknownLabel(Position.COMPILER_GENERATED));
+                Label t = ts.unknownLabel(Position.COMPILER_GENERATED);
+                t.setDescription("temp formal arg " + i);
+                formalTempLabels.add(t);
                 formalTempAccessPathRoots.add(new AccessPathUninterpreted("temp arg path", 
                                                                           Position.COMPILER_GENERATED,
                                                                           true));
@@ -77,6 +79,7 @@ public class JifInstantiator
             this.formalTempLabels = null;            
         }
         this.tempThisLbl = ts.unknownLabel(Position.COMPILER_GENERATED);
+        this.tempThisLbl.setDescription("temp this");
         this.tempThisRoot = new AccessPathUninterpreted("temp this", 
                                                         Position.COMPILER_GENERATED,
                                                         true);  
@@ -206,7 +209,7 @@ public class JifInstantiator
         
                         
         // param arg labels
-        // rhey only occur in static methods
+        // they only occur in static methods
         // of parameterized classes, but no harm in always instantiating them.
         if (actualParamLabels != null && !actualParamLabels.isEmpty() &&
                 receiverType != null) {
