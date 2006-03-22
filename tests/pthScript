@@ -78,7 +78,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	                (Semantic, "Cannot cast the expression of type");
 	Authority06.jif ;
 	Authority07.jif ;
-	AutoEndorse01.jif (Semantic, "sufficient authority to autoendorse");
+	AutoEndorse01.jif (Semantic, "sufficient authority to auto-endorse");
 	AutoEndorse02.jif ;
 	BadNullExcept1.jif (Semantic, "NullPointerException.*must .* be caught") ;
 	BadNullExcept2.jif (Semantic, "NullPointerException.*must .* be caught") ;
@@ -406,6 +406,9 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 //KNOWN BAD: needs a fix in Polyglot	RuntimeParams26.jif (Semantic, "@@@@@"); // should be an initialization error
 	RuntimeParams27.jif ;
 	RuntimeParams28.jif (Semantic, "runtime.*representable");
+	ShortCircuit01.jif (Semantic, "more restrictive");
+	ShortCircuit02.jif (Semantic, "not less restrictive");
+	ShortCircuit03.jif (Semantic, "not less restrictive");
 	Simple.jif ;
 	Simple2.jif ;
 	Simple3.jif ;

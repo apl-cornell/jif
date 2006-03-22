@@ -39,8 +39,19 @@ public class JifBinaryExt extends Jif_c
 	PathMap Xl = X(left);
 
 	A = (JifContext) A.pushBlock();
-
-	A.setPc(Xl.N());
+        
+        if (be.operator() == Binary.COND_AND || be.operator() == Binary.COND_OR) {
+            // if it's a short circuit evaluation, then
+            // whether the right is executed or not depends on the _value_
+            // of the left sub-expression.
+            A.setPc(Xl.NV());            
+        }
+        else {
+            // non-short circuit operator, the right sub-expression
+            // will always be evaluated, provided the left sub-expression
+            // terminated normally.
+            A.setPc(Xl.N());            
+        }
 
 	Expr right = (Expr) lc.context(A).labelCheck(be.right());
 	PathMap Xr = X(right);
