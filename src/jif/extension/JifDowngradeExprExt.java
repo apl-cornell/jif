@@ -37,20 +37,24 @@ public abstract class JifDowngradeExprExt extends Jif_c
 
 	Label downgradeTo = d.label().label();
         Label downgradeFrom = null;
+        boolean boundSpecified;
         if (d.bound() != null) {
+            boundSpecified = true;
             downgradeFrom = d.bound().label();
         }
         else {
+            boundSpecified = false;
             downgradeFrom = lc.typeSystem().freshLabelVariable(d.position(), 
                                               "downgrade_from", 
                                               "The label the downgrade expression is downgrading from");
         }
         
         lc.constrain(new LabelConstraint(new NamedLabel("expr.nv", Xe.NV()), 
-                                         LabelConstraint.LEQ, 
+                                         boundSpecified?LabelConstraint.LEQ:LabelConstraint.EQUAL, 
                                          new NamedLabel("downgrade_bound", downgradeFrom),
                                          A.labelEnv(),
-                                         d.position()) {
+                                         d.position(),
+                                         boundSpecified) /* report this constraint if the bound was specified*/ {
                      public String msg() {
                          return "The label of the expression to " + 
                                 d.downgradeKind()+" is " + 

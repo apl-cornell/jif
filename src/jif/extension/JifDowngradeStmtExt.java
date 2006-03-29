@@ -31,20 +31,24 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
 
 	Label downgradeTo = ds.label().label();
         Label downgradeFrom = null;
+        boolean boundSpecified;
         if (ds.bound() != null) {
+            boundSpecified = true;
             downgradeFrom = ds.bound().label();
         }
         else {
+            boundSpecified = false;
             downgradeFrom = lc.typeSystem().freshLabelVariable(ds.position(), 
                                               "downgrade_from", 
                                               "The label the downgrade statement is downgrading from");
         }
 
         lc.constrain(new LabelConstraint(new NamedLabel("pc", A.pc()), 
-                                         LabelConstraint.LEQ, 
+                                         boundSpecified?LabelConstraint.LEQ:LabelConstraint.EQUAL, 
                                          new NamedLabel("declass_bound", downgradeFrom),
                                          A.labelEnv(),
-                                         ds.position()) {
+                                         ds.position(),
+                                         boundSpecified) /* report this constraint if the bound was specified*/ {
                      public String msg() {
                          return "The label of the program counter at this " +
                                 "program point is " + 
