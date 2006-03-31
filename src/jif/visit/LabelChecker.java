@@ -10,6 +10,7 @@ import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
 import polyglot.types.*;
 import polyglot.util.Copy;
+import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 
 /** 
@@ -128,6 +129,11 @@ public class LabelChecker implements Copy
     public Solver solver() {
         return this.solver;
     }
+
+    public ErrorQueue errorQueue() {
+        return job.compiler().errorQueue();
+    }
+    
     
     /**
      * Returns an upper bound for L1 and L2

@@ -375,28 +375,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public ActsFor ActsFor(Position pos, ActsFor.Kind kind, Principal actor, Principal granter, Stmt consequent, Stmt alternative) {
-        PrincipalNode actorNode = CanonicalPrincipalNode(actor.position(), actor);
-        PrincipalNode granterNode = CanonicalPrincipalNode(granter.position(), granter);
-        return ActsFor(pos, kind, actorNode, granterNode, consequent, alternative);
-        
-    }
-    public ActsFor ActsFor(Position pos, ActsFor.Kind kind, PrincipalNode actor, PrincipalNode granter, Stmt consequent, Stmt alternative) {
-        ActsFor n = new ActsFor_c(pos, kind, actor, granter, consequent,
-                                  alternative);
-        n = (ActsFor)n.ext(jifExtFactory().extActsFor());
-        n = (ActsFor)n.del(delFactory().delStmt());
-        return n;
-    }
-
-    public LabelIf LabelIf(Position pos, LabelExpr lhs, LabelExpr rhs, Stmt consequent, Stmt alternative) {
-        LabelIf n = new LabelIf_c(pos, lhs, rhs, consequent,
-                                  alternative);
-        n = (LabelIf)n.ext(jifExtFactory().extLabelIf());
-        n = (LabelIf)n.del(delFactory().delStmt());
-        return n;
-    }
-
     public DeclassifyStmt DeclassifyStmt(Position pos, LabelNode bound, LabelNode label, Stmt body) {
         DeclassifyStmt n = new DeclassifyStmt_c(pos, bound, label,
                                                 body);

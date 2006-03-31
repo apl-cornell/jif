@@ -71,7 +71,7 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extBinaryImpl() {
-        return new JifBinaryExt(new ExprToJavaExt_c());
+        return new JifBinaryExt(new BinaryToJavaExt_c());
     }
 
     protected Ext extBlockImpl() {
@@ -365,16 +365,6 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return postExtLabelLeAssertionNode(e);
     }
 
-    public final Ext extActsFor() {
-        Ext e = extActsForImpl();
-        return postExtActsFor(e);
-    }
-
-    public final Ext extLabelIf() {
-        Ext e = extLabelIfImpl();
-        return postExtLabelIf(e);
-    }
-
     public final Ext extDeclassifyStmt() {
         Ext e = extDeclassifyStmtImpl();
         return postExtDeclassifyStmt(e);
@@ -515,15 +505,6 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return extConstraintNode();
     }
     
-    protected Ext extActsForImpl() {
-        return new JifActsForExt(new ActsForToJavaExt_c());
-    }
-
-    protected Ext extLabelIfImpl() {
-        return new JifLabelIfExt(new LabelIfToJavaExt_c());
-    }
-
-
     protected Ext extDeclassifyStmtImpl() {
         return new JifDeclassifyStmtExt(new DowngradeStmtToJavaExt_c());
     }
@@ -653,14 +634,6 @@ public class JifExtFactory_c extends AbstractExtFactory_c
 
     protected Ext postExtLabelLeAssertionNode(Ext e) {
         return postExtConstraintNode(e);
-    }
-
-    protected Ext postExtActsFor(Ext e) {
-        return postExtStmt(e);
-    }
-
-    protected Ext postExtLabelIf(Ext e) {
-        return postExtStmt(e);
     }
 
     protected Ext postExtDowngradeStmt(Ext e) {

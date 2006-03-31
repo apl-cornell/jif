@@ -6,6 +6,6 @@ class LabelIf2
 	int{*L1} x = 4;
 	int{*L2} y = 4;
 
-	boolean b = (L1 <= L2); // not allowed
+	boolean b = (L1 <= L2); // OK
     }
 }

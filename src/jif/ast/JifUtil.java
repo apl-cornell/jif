@@ -166,6 +166,9 @@ public class JifUtil
         if (e instanceof PrincipalNode) {
             return ((PrincipalNode)e).principal();
         }
+        if (e instanceof PrincipalExpr) {
+            return ((PrincipalExpr)e).principal().principal();
+        }
         if (e instanceof Cast) {
             return exprToPrincipal(ts, ((Cast)e).expr(), context);            
         }

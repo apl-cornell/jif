@@ -6,8 +6,8 @@ class LabelIf3
 	int{*L1} x = 4;
 	int{*L2} y = 4;
 
-	if (L1 <= L2 || false) { // not allowed
-	    y = x;	    
+	if (L1 <= L2 || false) { // OK, but warning
+	    //y = x;  
 	}
     }
 }

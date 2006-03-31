@@ -44,15 +44,15 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	ActsFor6.jif ;
 	ActsFor7.jif (Semantic, "not less restrictive");
 	ActsFor8.jif ;
-	ActsFor9.jif (Semantic, "actsfor .* can only be used");
+	ActsFor9.jif (Semantic, "not less restrictive"), (Warning);
 	ActsFor10.jif ;
 	ActsFor11.jif (Semantic, "not less restrictive");
 	ActsFor12.jif (Semantic, "not less restrictive");
 	ActsFor13.jif ;
 	ActsFor14.jif ;
 	ActsFor15.jif (Semantic, "not less restrictive");
-	ActsFor16.jif (Semantic, "not suitable for an access path");
-	ActsFor16b.jif (Semantic, "not suitable for an access path");
+	ActsFor16.jif (Semantic, "requires both operands to be principals");
+	ActsFor16b.jif (Semantic, "requires both operands to be principals");
 	ActsFor16c.jif ;
 	ActsFor17.jif (Semantic, "Non-final local variable"),
 		      (Semantic, "Non-final local variable");
@@ -118,6 +118,9 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	CondExpr5.jif ; 
 	CondExpr6.jif (Semantic, "not a subtype") ; 
 	ConditionalLeak.jif (Semantic, "not a subtype") ;
+	ConjunctTest01.jif ;
+	ConjunctTest02.jif (Warning);
+	ConjunctTest03.jif ;
 	Constraints1.jif ;
 	Constraints3.jif ;
 	Constraints5.jif ;
@@ -220,8 +223,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	JunctivePrincipals05.jif;
 	JunctivePrincipals06.jif;
 	LabelIf1.jif ;
-	LabelIf2.jif (Semantic, "only be used in an if statement");
-	LabelIf3.jif (Semantic, "only be used in an if statement");
+	LabelIf2.jif ;
+	LabelIf3.jif (Warning);
 	LabelIf4.jif ;
 	LabelIf5.jif LabeledObject.jif;
 	LabelIf6.jif (Semantic, "not less restrictive");
