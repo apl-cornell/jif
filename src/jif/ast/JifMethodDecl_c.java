@@ -3,11 +3,11 @@ package jif.ast;
 import java.util.*;
 
 import jif.types.*;
-import jif.types.label.Label;
+import jif.types.label.*;
+import jif.types.principal.DynamicPrincipal;
+import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.MethodDecl_c;
-import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.AmbiguityRemover;
@@ -185,7 +185,145 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             constraints.addAll(cn.constraints());
         }
         jmi.setConstraints(constraints);
+        
+        renameArgs(jmi, new TypeSubstitutor(new ArgRenamer(false)));
+        
         return n.methodInstance(jmi);
+    }
+
+    /**
+     * Rename the arg labels and arg roots. This is needed to make sure
+     * that during substitution of args in a recursive method call,
+     * we don't confuse the 
+     */
+    public static JifMethodInstance unrenameArgs(JifMethodInstance jmi) {
+        jmi = (JifMethodInstance)jmi.copy();
+        try {
+            renameArgs(jmi, new TypeSubstitutor(new ArgRenamer(true)));
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected semantic", e);
+        }
+        return jmi;
+    }
+    /**
+     * Rename the arg labels and arg roots. This is needed to make sure
+     * that during substitution of args in a recursive method call,
+     * we don't confuse the 
+     */
+    private static void renameArgs(JifMethodInstance jmi, TypeSubstitutor tsub) throws SemanticException {
+        // formal types
+        List formalTypes = new ArrayList(jmi.formalTypes().size());
+        for (Iterator i = jmi.formalTypes().iterator(); i.hasNext(); ) {
+            Type t = (Type)i.next();
+            formalTypes.add(tsub.rewriteType(t));
+        }
+        jmi.setFormalTypes(formalTypes);
+
+        // return type
+        jmi.setReturnType(tsub.rewriteType(jmi.returnType()));
+
+        // pc bound label
+        jmi.setPCBound(tsub.rewriteLabel(jmi.pcBound()), jmi.isDefaultPCBound());
+
+        // return label
+        jmi.setReturnLabel(tsub.rewriteLabel(jmi.returnLabel()), jmi.isDefaultReturnLabel());
+
+        // throw types
+        List throwTypes = new ArrayList(jmi.throwTypes().size());
+        for (Iterator i = jmi.throwTypes().iterator(); i.hasNext(); ) {
+            Type t = (Type)i.next();
+            throwTypes.add(tsub.rewriteType(t));
+        }
+        jmi.setThrowTypes(throwTypes);
+        
+
+        // constraints
+        List constraints = new ArrayList(jmi.constraints().size());
+        for (Iterator i = jmi.constraints().iterator(); i.hasNext(); ) {
+            Assertion c = (Assertion) i.next();
+            constraints.add(tsub.rewriteAssertion(c));
+        }
+        jmi.setConstraints(constraints);
+    }
+
+    
+    private static class ArgRenamer extends LabelSubstitution {
+        boolean revertToOriginal;
+        ArgRenamer(boolean revertToOriginal) {
+            this.revertToOriginal = revertToOriginal;
+        }
+        public Label substLabel(Label L) {
+            if (L instanceof ArgLabel) {
+                ArgLabel al = (ArgLabel)L;
+                if (!revertToOriginal && !al.name().endsWith("'")) {
+                    // change the name to end with a prime
+                    al = (ArgLabel)al.copy();
+                    al.setName(al.name() + "'");
+                    return al;
+                }
+                if (revertToOriginal && al.name().endsWith("'")) {
+                    // change the name to remove the prime
+                    al = (ArgLabel)al.copy();
+                    al.setName(al.name().substring(0, al.name().length()-1));
+                    return al;
+                }
+            }
+
+            if (L instanceof DynamicLabel) {
+                DynamicLabel dl = (DynamicLabel)L;
+                AccessPathRoot r = dl.path().root();
+                if (r instanceof AccessPathLocal) {
+                    AccessPathLocal apl = (AccessPathLocal)r;
+                    if (!revertToOriginal && !apl.name().endsWith("'")) {
+                        apl = new AccessPathLocal(apl.localInstance(),
+                                                  apl.name() + "'",
+                                                  apl.position());
+                        AccessPath newPath = dl.path().subst(r, apl);
+                        dl = ((JifTypeSystem)dl.typeSystem()).dynamicLabel(dl.position(), newPath);
+                        return dl;
+                    }
+                    if (revertToOriginal && apl.name().endsWith("'")) {
+                        apl = new AccessPathLocal(apl.localInstance(),
+                                                  apl.name().substring(0, apl.name().length()-1),
+                                                  apl.position());
+                        AccessPath newPath = dl.path().subst(r, apl);
+                        dl = ((JifTypeSystem)dl.typeSystem()).dynamicLabel(dl.position(), newPath);
+                        return dl;
+                    }
+                }
+                
+            }
+            return L;
+        }
+        
+        public Principal substPrincipal(Principal p) {
+            if (p instanceof DynamicPrincipal) {
+                DynamicPrincipal dp = (DynamicPrincipal)p;
+                AccessPathRoot r = dp.path().root();
+                if (r instanceof AccessPathLocal) {
+                    AccessPathLocal apl = (AccessPathLocal)r;
+                    if (!revertToOriginal && !apl.name().endsWith("'")) {
+                        apl = new AccessPathLocal(apl.localInstance(),
+                                                  apl.name() + "'",
+                                                  apl.position());
+                        AccessPath newPath = dp.path().subst(r, apl);
+                        dp = ((JifTypeSystem)dp.typeSystem()).dynamicPrincipal(dp.position(), newPath);
+                        return dp;
+                    }
+                    if (revertToOriginal && apl.name().endsWith("'")) {
+                        apl = new AccessPathLocal(apl.localInstance(),
+                                                  apl.name().substring(0, apl.name().length()-1),
+                                                  apl.position());
+                        AccessPath newPath = dp.path().subst(r, apl);
+                        dp = ((JifTypeSystem)dp.typeSystem()).dynamicPrincipal(dp.position(), newPath);
+                        return dp;
+                    }
+                }
+                
+            }
+            return p;
+        }        
     }
 }
 

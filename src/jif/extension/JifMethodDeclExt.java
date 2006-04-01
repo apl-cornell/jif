@@ -3,6 +3,7 @@ package jif.extension;
 import java.util.Iterator;
 
 import jif.ast.JifMethodDecl;
+import jif.ast.JifMethodDecl_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.types.label.ArgLabel;
@@ -27,18 +28,19 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         JifMethodDecl mn = (JifMethodDecl) node();
-        JifMethodInstance mi = (JifMethodInstance) mn.methodInstance();
+        JifMethodInstance renamedMI = (JifMethodInstance) mn.methodInstance();
+        JifMethodInstance mi = JifMethodDecl_c.unrenameArgs(renamedMI);
 
         // check covariance of labels
         checkCovariance(mi, lc);
         
         // check that the labels in the method signature conform to the
         // restrictions of the superclass and/or interface method declaration.
-        overrideMethodLabelCheck(lc, mi);
+        overrideMethodLabelCheck(lc, renamedMI);
 
 	JifTypeSystem ts = lc.jifTypeSystem();
       	JifContext A = lc.jifContext();
-	A = (JifContext) mn.enterScope(A);
+	A = (JifContext) mn.del().enterScope(A);
         lc = lc.context(A);
 
         // let the label checker know that we are about to enter a method decl

@@ -15,7 +15,7 @@ import polyglot.util.Position;
 public class ArgLabel_c extends Label_c implements ArgLabel {
     private final VarInstance vi; 
     private CodeInstance ci; // code instance containing vi, if relevant
-    private final String name;
+    private String name;
     private Label upperBound;
     
     
@@ -73,6 +73,14 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         return upperBound;
     }
     
+    public String name() {
+        return name;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
     public void setUpperBound(Label upperBound) {
         this.upperBound = upperBound;
         setDescription();
@@ -96,8 +104,10 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         }           
         ArgLabel_c that = (ArgLabel_c) o;
         return (this.ci == that.ci || (this.ci != null && this.ci.equals(that.ci))) &&
-               (this.vi == that.vi || (this.vi != null && this.vi.equals(that.vi)));
+               (this.vi == that.vi || (this.vi != null && this.vi.equals(that.vi))) &&
+               this.name.equals(that.name);
     }
+    
     public int hashCode() {
         return (vi==null?234:vi.hashCode()) ^ 2346882;
     }
@@ -105,12 +115,12 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     public String componentString(Set printedLabels) {
         if (printedLabels.contains(this)) {
             if (Report.should_report(Report.debug, 2)) { 
-                return "<arg " + name + ">";
+                return "<arg " + nicename() + ">";
             }
             else if (Report.should_report(Report.debug, 1)) {
                 return "<arg " + name + ">";
             }
-            return name;            
+            return nicename();            
         }
         printedLabels.add(this);
         
@@ -120,9 +130,13 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         }
         else if (Report.should_report(Report.debug, 1)) {
             String ub = upperBound==null?"-":upperBound.toString(printedLabels);
-            return "<arg " + name + " " + ub + ">";
+            return "<arg " + nicename() + " " + ub + ">";
         }
-        return name;
+        return nicename();
+    }
+    
+    private String nicename() {
+        return vi==null?name:vi.name();
     }
 
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
@@ -135,14 +149,16 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         ArgLabel lbl = this;
         if (substitution.recurseIntoChildren(lbl)) {
             if (!substitution.stackContains(this)) {
-                substitution.pushLabel(this);
-                Label newBound = lbl.upperBound().subst(substitution);
-                
-                if (newBound != lbl.upperBound()) {
-                    lbl = (ArgLabel)lbl.copy();
-                    lbl.setUpperBound(newBound);
+                if (lbl.upperBound() != null) {
+                    substitution.pushLabel(this);
+                    Label newBound = lbl.upperBound().subst(substitution);
+                    
+                    if (newBound != lbl.upperBound()) {
+                        lbl = (ArgLabel)lbl.copy();
+                        lbl.setUpperBound(newBound);
+                    }
+                    substitution.popLabel(this);
                 }
-                substitution.popLabel(this);
             }
             else {
                 // the stack already contains this label, so don't call the 

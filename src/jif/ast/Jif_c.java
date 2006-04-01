@@ -100,7 +100,7 @@ public class Jif_c extends Ext_c implements Jif
 
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         JifContext A = lc.jifContext(); 
-        A = (JifContext) node().enterScope(A);
+        A = (JifContext) node().del().enterScope(A);
         return node();
     }
 

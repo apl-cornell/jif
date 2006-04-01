@@ -25,11 +25,14 @@ public class JifUtil
     }
     
     public static AccessPath varInstanceToAccessPath(VarInstance vi, Position pos) throws SemanticException {
+        return varInstanceToAccessPath(vi, vi.name(), pos);
+    }
+    public static AccessPath varInstanceToAccessPath(VarInstance vi, String name, Position pos) throws SemanticException {
         if (!vi.flags().isFinal()) {
             throw new SemanticException("Only final fields and final local variables may be used as access paths.", pos);
         }
         if (vi instanceof LocalInstance) {
-            return new AccessPathLocal((LocalInstance)vi, vi.name(), pos);
+            return new AccessPathLocal((LocalInstance)vi, name, pos);
         }
         else if (vi instanceof FieldInstance) {
             FieldInstance fi = (FieldInstance)vi;
@@ -40,7 +43,7 @@ public class JifUtil
             else {
                 root = new AccessPathThis(fi.container().toClass(), pos);
             }
-            return new AccessPathField(root, fi, fi.name(), pos);
+            return new AccessPathField(root, fi, name, pos);
         }
         throw new InternalCompilerError("Unexpected var instance " + vi.getClass());
     }    

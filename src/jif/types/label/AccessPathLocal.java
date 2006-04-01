@@ -20,7 +20,7 @@ public class AccessPathLocal extends AccessPathRoot {
         super(pos);
         this.li = li;
         this.name = name;
-        if (li != null && !name.equals(li.name())) {
+        if (li != null && !name.startsWith(li.name())) {
             throw new InternalCompilerError("Inconsistent local names");
         }
     }
@@ -41,18 +41,28 @@ public class AccessPathLocal extends AccessPathRoot {
     public void setIsNeverNull() {
         this.neverNull = true;
     }
-    public String toString() {
-        return name;
+    public String toString() {        
+        return niceName();
     }
     public String exprString() {
+        return niceName();
+    }
+    private String niceName() {
+        if (li != null && li.name() != null && name.startsWith(li.name())) return li.name();
         return name;
     }
+    public String name() {
+        return name;
+    }
+    
     public LocalInstance localInstance() {
         return this.li;
     }
     public boolean equals(Object o) {
         if (o instanceof AccessPathLocal) {
-            return li.equals(((AccessPathLocal)o).li);
+            AccessPathLocal that = (AccessPathLocal)o;
+            return this.name.equals(that.name) && 
+                         li.equals(that.li);
         }
         return false;        
     }

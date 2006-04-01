@@ -1,13 +1,13 @@
 class Heapsort {
 
-    public void sort{arr}(int{arr} arr[]):{arr}
+    public void sort{a}(label lbl, int{*lbl}[]{*lbl} a):{*lbl;a}
         throws (NullPointerException, IndexOutOfBoundsException)
     {
-        int len = arr.length;
-        sort(arr, len);
+        int len = a.length;
+        sort(lbl, a, len);
     }
 
-    private void sort{arr}(int{arr} arr[], int len):{arr}
+    private void sort{arr}(label lbl, int{*lbl}[]{*lbl} arr, int len):{*lbl;arr}
         throws (NullPointerException, IndexOutOfBoundsException)
     {
         int arrlen = arr.length;
@@ -19,7 +19,7 @@ class Heapsort {
                 depth ++;
                 modDepthAt = modDepthAt << 1;
             }
-            swiftDown(arr, hp, arrlen, depth);
+            swiftDown(lbl, arr, hp, arrlen, depth);
         }
         depth = 0;
         modDepthAt = 0;
@@ -32,16 +32,16 @@ class Heapsort {
         modDepthAt = (modDepthAt - 1) >> 1;
 
         for (int hp=arrlen -1 ; hp>0; hp--) {
-            swap(arr, 0, hp);
+            swap(lbl, arr, 0, hp);
             if (hp == modDepthAt) {
                 depth --;
                 modDepthAt = (modDepthAt-1) >> 1;
             }
-            swiftDown(arr, 0, hp, depth);
+            swiftDown(lbl, arr, 0, hp, depth);
         }
     }
 
-    private void swiftDown{arr}(int arr[], int{arr} elemIx_a, int{arr} hpLimIx, int{arr} depth):{arr}
+    private void swiftDown{arr}(label lbl, int{*lbl}[]{*lbl} arr, int{arr} elemIx_a, int{arr} hpLimIx, int{arr} depth):{*lbl;arr}
         throws (IndexOutOfBoundsException, NullPointerException)
     {
         int elemIx = elemIx_a;
@@ -58,14 +58,14 @@ class Heapsort {
             else
                 ch = chL;
             if (arr[ch] > arr[elemIx])
-                swap(arr, ch, elemIx);
+                swap(lbl, arr, ch, elemIx);
             else
-                dont_swap(arr, ch, elemIx);
+                dont_swap(lbl, arr, ch, elemIx);
             elemIx = ch;
         }
     }
 
-    private void swap{arr}(int{arr} arr[], int{arr} ix1, int{arr} ix2):{arr}
+    private void swap{arr}(label lbl, int{*lbl}[]{*lbl} arr, int{arr} ix1, int{arr} ix2):{*lbl;arr}
         throws (IndexOutOfBoundsException, NullPointerException)
     {
         int tmp1 = arr[ix1];
@@ -74,7 +74,7 @@ class Heapsort {
         arr[ix2] = tmp1;
     }
 
-    private void dont_swap{arr}(int{arr} arr[], int{arr} ix1, int{arr} ix2):{arr}
+    private void dont_swap{arr}(label lbl, int{*lbl}[]{*lbl} arr, int{arr} ix1, int{arr} ix2):{*lbl;arr}
         throws (IndexOutOfBoundsException, NullPointerException)
     {
         int tmp1 = arr[ix1];

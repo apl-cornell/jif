@@ -145,7 +145,7 @@ public class CallHelper {
             if (jts.isLabeled(t)) {
                 ArgLabel al = (ArgLabel)jts.labelOfType(t);
                 LocalInstance formalInst = (LocalInstance)al.formalInstance();
-                Local l = nf.Local(formalInst.position(), formalInst.name()).
+                Local l = nf.Local(formalInst.position(), al.name()).
     				localInstance(formalInst);
                 actualArgs.add(l);
             }
@@ -366,8 +366,7 @@ public class CallHelper {
             // labels.
             SubtypeChecker sc = new SubtypeChecker();
             sc.addSubtypeConstraints(lc, Ej.position(),
-                                     instantiate(A, aj.formalInstance().type()), Ej.type());
-
+                                     instantiate(A, jts.unlabel(tj)), jts.unlabel(Ej.type()));
         }
         constrainFinalActualArgs(jts);
     }
@@ -592,7 +591,7 @@ public class CallHelper {
 
         Label Lr = resolveReturnLabel(A, lc);
         Label Lrv = resolveReturnValueLabel(A, lc, Lr);
-
+        
         X = Xjoin.N(lc.upperBound(Lr, A.pc()));
         X = X.NV(lc.upperBound(Lrv, A.pc()));
         X = X.join(excPathMap(A, lc, Lr, throwTypes));
@@ -957,7 +956,7 @@ public class CallHelper {
             new SubtypeChecker().addSubtypeConstraints(lc, 
                                                        overriding.position(),
                                                        ts.unlabel(i), 
-                                                       ts.unlabel(j));
+                                                       instantiate(A, ts.unlabel(j)));
         }
 
         

@@ -1,8 +1,6 @@
 package jif.types;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import jif.types.label.Label;
 import jif.types.principal.Principal;
@@ -90,12 +88,51 @@ public class TypeSubstitutor {
         return true;
     }
 
-    protected Label rewriteLabel(Label L) throws SemanticException {
+    public Label rewriteLabel(Label L) throws SemanticException {
         if (L == null) return L;
         return L.subst(substitution);
     }
     protected Principal rewritePrincipal(Principal p) throws SemanticException {
         if (p == null) return p;
         return p.subst(substitution);
+    }
+    public Assertion rewriteAssertion(Assertion a) throws SemanticException {
+        if (a instanceof ActsForConstraint) {
+            ActsForConstraint c = (ActsForConstraint)a.copy();
+            c = c.actor(rewritePrincipal(c.actor()));
+            c = c.granter(rewritePrincipal(c.granter()));
+            return c;
+        }
+        else if (a instanceof AuthConstraint) {
+            AuthConstraint c = (AuthConstraint)a.copy();
+            c = c.principals(rewritePrincipalList(c.principals()));
+            return c;
+        }
+        else if (a instanceof AutoEndorseConstraint) {
+            AutoEndorseConstraint c = (AutoEndorseConstraint)a.copy();
+            c = c.endorseTo(rewriteLabel(c.endorseTo()));
+            return c;
+        }
+        else if (a instanceof CallerConstraint) {
+            CallerConstraint c = (CallerConstraint)a.copy();
+            c = c.principals(rewritePrincipalList(c.principals()));
+            return c;
+        }
+        else if (a instanceof LabelLeAssertion) {
+            LabelLeAssertion c = (LabelLeAssertion)a.copy();
+            c = c.lhs(rewriteLabel(c.lhs()));
+            c = c.rhs(rewriteLabel(c.rhs()));
+            return c;
+        }
+        throw new InternalCompilerError("Unexpected assertion " + a);
+    }
+
+    private List rewritePrincipalList(List list) throws SemanticException {
+        List newList = new ArrayList(list.size());
+        for (Iterator iter = list.iterator(); iter.hasNext();) {
+            Principal p = (Principal)iter.next();
+            newList.add(rewritePrincipal(p));            
+        }
+        return newList;
     }
 }

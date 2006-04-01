@@ -117,10 +117,9 @@ public class JifInstantiator
         
         // formal arg access paths to temp access paths
         for (int i = 0; formalArgLabels != null && i < formalArgLabels.size(); i++) {
-
             try {
                 ArgLabel formalArgLbl = (ArgLabel)formalArgLabels.get(i);            
-                AccessPathRoot formalRoot = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), formalArgLbl.position());
+                AccessPathRoot formalRoot = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), formalArgLbl.name(), formalArgLbl.position());
                 AccessPathRoot tempRoot = (AccessPathRoot)formalTempAccessPathRoots.get(i);
 
                 L = substImpl(L, new AccessPathInstantiator(formalRoot, tempRoot));

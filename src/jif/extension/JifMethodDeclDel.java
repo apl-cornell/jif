@@ -3,8 +3,11 @@ package jif.extension;
 import java.util.List;
 
 import jif.ast.JifMethodDecl;
+import jif.ast.JifMethodDecl_c;
 import jif.types.*;
 import polyglot.ast.Node;
+import polyglot.main.Report;
+import polyglot.types.*;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.ErrorInfo;
@@ -19,12 +22,21 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
     public JifMethodDeclDel() {
     }
     
+    public Context enterScope(Context c) {
+        JifMethodDecl jmd = (JifMethodDecl)this.node();
+        JifMethodInstance mi = JifMethodDecl_c.unrenameArgs((JifMethodInstance)jmd.methodInstance()); 
+        c = c.pushCode(mi);
+        addFormalsToScope(c);
+        return c;
+    }
+    
+    
     /**
      * @see polyglot.ext.jl.ast.JL_c#typeCheck(polyglot.visit.TypeChecker)
      */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JifMethodDecl jmd = (JifMethodDecl)this.node();
-        JifMethodInstance mi = (JifMethodInstance)jmd.methodInstance(); 
+        JifMethodInstance mi = JifMethodDecl_c.unrenameArgs((JifMethodInstance)jmd.methodInstance()); 
         if ("main".equals(mi.name()) && mi.flags().isStatic()) {
             // check that the class is not parameterized.
             JifClassType currClass = (JifClassType)tc.context().currentClass();

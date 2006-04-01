@@ -11,6 +11,8 @@ import polyglot.types.VarInstance;
 public interface ArgLabel extends Label {
     VarInstance formalInstance();
     Label upperBound();
+    String name();
+    void setName(String name);
     void setUpperBound(Label upperBound);
     void setCodeInstance(CodeInstance ci);
 }
