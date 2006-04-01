@@ -27,7 +27,7 @@ public class JifNewArrayExt extends Jif_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
-	A = (JifContext) nae.enterScope(A);
+	A = (JifContext) nae.del().enterScope(A);
 
 	A = (JifContext) A.pushBlock();
 

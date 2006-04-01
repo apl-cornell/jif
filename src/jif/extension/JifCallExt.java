@@ -28,7 +28,7 @@ public class JifCallExt extends Jif_c
         Call me = (Call) node();
         
         JifContext A = lc.jifContext();
-        A = (JifContext) me.enterScope(A);
+        A = (JifContext) me.del().enterScope(A);
         JifTypeSystem ts = lc.jifTypeSystem();
         
         List throwTypes = new ArrayList(me.del().throwTypes(ts));

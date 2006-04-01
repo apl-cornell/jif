@@ -27,7 +27,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
         DowngradeStmt ds = (DowngradeStmt) node();
 
 	JifContext A = lc.jifContext();
-        A = (JifContext) ds.enterScope(A);
+        A = (JifContext) ds.del().enterScope(A);
 
 	Label downgradeTo = ds.label().label();
         Label downgradeFrom = null;

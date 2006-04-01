@@ -23,7 +23,7 @@ public abstract class JifAssignExt extends Jif_c
 	Assign a = (Assign) node();
 
 	JifContext A = lc.jifContext();
-        A = (JifContext) a.enterScope(A);
+        A = (JifContext) a.del().enterScope(A);
 
 	Assign checked = (Assign)labelCheckLHS(lc);
 

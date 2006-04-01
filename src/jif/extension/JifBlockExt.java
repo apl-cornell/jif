@@ -30,7 +30,7 @@ public class JifBlockExt extends JifStmtExt_c
 
         JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-        A = (JifContext) bs.enterScope(A);
+        A = (JifContext) bs.del().enterScope(A);
 
 	// A path map incorporating all statements in the block seen so far.
 	PathMap Xblock = ts.pathMap();

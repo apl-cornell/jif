@@ -79,7 +79,7 @@ public abstract class JifStmtExt_c extends Jif_c implements JifStmtExt
     {
         JifTypeSystem ts = lc.typeSystem();
 	JifContext A = lc.jifContext();
-	A = (JifContext) node().enterScope(A);
+	A = (JifContext) node().del().enterScope(A);
         
         // Redispatch in case we're not the first delegate.
         Node n = ((JifStmtExt) node().ext()).stmtDel().labelCheckStmt(lc.context(A));

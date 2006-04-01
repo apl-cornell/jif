@@ -25,7 +25,7 @@ public class JifSynchronizedExt extends JifStmtExt_c
 	Synchronized ss = (Synchronized) node();
 
 	JifContext A = lc.jifContext();
-	A = (JifContext) ss.enterScope(A);
+	A = (JifContext) ss.del().enterScope(A);
 
 	Expr e = (Expr) lc.context(A).labelCheck(ss.expr());
 	PathMap Xe = X(e);

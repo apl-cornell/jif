@@ -236,7 +236,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 	ProcedureDecl mn = (ProcedureDecl) node();
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-        JifClassType ct = (JifClassType) A.currentClass();
 
 	// Add the return termination constraints.
 	

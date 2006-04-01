@@ -30,7 +30,7 @@ public abstract class JifDowngradeExprExt extends Jif_c
 	final DowngradeExpr d = (DowngradeExpr) node();
 
 	JifContext A = lc.jifContext();
-        A = (JifContext) d.enterScope(A);
+        A = (JifContext) d.del().enterScope(A);
 
 	Expr e = (Expr) lc.context(A).labelCheck(d.expr());
 	PathMap Xe = X(e);

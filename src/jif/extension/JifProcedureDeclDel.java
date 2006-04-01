@@ -24,13 +24,15 @@ public class JifProcedureDeclDel extends JifJL_c
     // add the formals to the context before visiting the formals
     public Context enterScope(Context c) {
         c = super.enterScope(c);
+        addFormalsToScope(c);
+        return c;
+    }
+    protected void addFormalsToScope(Context c) {
         ProcedureDecl pd = (ProcedureDecl) node();
         for (Iterator i = pd.formals().iterator(); i.hasNext(); ) {
             Formal f = (Formal) i.next();
             c.addVariable(f.localInstance());
-        }
-
-        return c;
+        }        
     }
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JifProcedureDecl pd = (JifProcedureDecl)super.typeCheck(tc);

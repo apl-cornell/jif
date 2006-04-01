@@ -26,7 +26,7 @@ public class JifInitializerExt extends Jif_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-	A = (JifContext) ib.enterScope(A);
+	A = (JifContext) ib.del().enterScope(A);
 
 	// @@@@@What this hell is this?
         //!@!

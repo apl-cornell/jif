@@ -31,7 +31,7 @@ public class JifNewExt extends Jif_c
 
 	JifTypeSystem ts = lc.typeSystem();
         JifContext A = lc.jifContext();
-	A = (JifContext) noe.enterScope(A);
+	A = (JifContext) noe.del().enterScope(A);
 
 	List throwTypes = new ArrayList(noe.del().throwTypes(ts));
     

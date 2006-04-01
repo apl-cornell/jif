@@ -29,7 +29,7 @@ public class JifIfExt extends JifStmtExt_c
 
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
-        A = (JifContext) is.enterScope(A);
+        A = (JifContext) is.del().enterScope(A);
 
 	Expr e = (Expr) lc.context(A).labelCheck(is.cond());
 

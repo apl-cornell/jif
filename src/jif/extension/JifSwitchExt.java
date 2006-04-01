@@ -31,7 +31,7 @@ public class JifSwitchExt extends JifStmtExt_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-	A = (JifContext) ss.enterScope(A);
+	A = (JifContext) ss.del().enterScope(A);
 
 	Label notTaken = ts.notTaken();
 

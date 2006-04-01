@@ -34,7 +34,7 @@ public class JifPrincipalExprExt extends Jif_c
                     pe.position());
         }
 
-        A = (JifContext) pe.enterScope(A);
+        A = (JifContext) pe.del().enterScope(A);
 
         PathMap X1 = p.labelCheck(A, lc);
         throwTypes.removeAll(p.throwTypes(ts));

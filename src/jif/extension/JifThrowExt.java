@@ -25,7 +25,7 @@ public class JifThrowExt extends JifStmtExt_c
 
         JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-	A = (JifContext) ths.enterScope(A);
+	A = (JifContext) ths.del().enterScope(A);
 
         List throwTypes = new ArrayList(ths.del().throwTypes(ts));
 

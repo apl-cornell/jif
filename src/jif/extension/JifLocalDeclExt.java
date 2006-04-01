@@ -28,7 +28,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
         
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
-        A = (JifContext) decl.enterScope(A);
+        A = (JifContext) decl.del().enterScope(A);
         
         PathMap X = ts.pathMap();
         X = X.N(A.pc());

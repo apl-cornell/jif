@@ -58,7 +58,7 @@ public class JifSpecialExt extends Jif_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-	A = (JifContext) se.enterScope(A);
+	A = (JifContext) se.del().enterScope(A);
 
 	if (se.kind() != Special.THIS) {
 	    throw new SemanticException(

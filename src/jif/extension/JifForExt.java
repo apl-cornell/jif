@@ -26,7 +26,7 @@ public class JifForExt extends JifStmtExt_c
 
 	JifTypeSystem ts = lc.jifTypeSystem();
 	JifContext A = lc.jifContext();
-        A = (JifContext) fs.enterScope(A);
+        A = (JifContext) fs.del().enterScope(A);
 
 	Label notTaken = ts.notTaken();
 
