@@ -31,7 +31,7 @@ public class ActsForConstraintNode_c extends ConstraintNode_c implements ActsFor
 	ActsForConstraintNode_c n = (ActsForConstraintNode_c) copy();
 	n.actor = actor;
 	if (constraint() != null) {
-	    n.constraint = ((ActsForConstraint)constraint()).actor(actor.principal());
+	    n.setConstraint(((ActsForConstraint)constraint()).actor(actor.principal()));
 	}
 	return n;
     }
@@ -46,7 +46,7 @@ public class ActsForConstraintNode_c extends ConstraintNode_c implements ActsFor
 	ActsForConstraintNode_c n = (ActsForConstraintNode_c) copy();
 	n.granter = granter;
 	if (constraint() != null) {
-	    n.constraint = ((ActsForConstraint)constraint).granter(granter.principal());
+	    n.setConstraint(((ActsForConstraint)constraint()).granter(granter.principal()));
 	}
 	return n;
     }

@@ -25,7 +25,7 @@ public class AutoEndorseConstraintNode_c extends ConstraintNode_c implements Aut
 	AutoEndorseConstraintNode_c n = (AutoEndorseConstraintNode_c) copy();
 	n.endorseTo = endorseTo;
         if (constraint() != null) {
-            n.constraint = ((AutoEndorseConstraint_c)constraint()).endorseTo(endorseTo.label());
+            n.setConstraint(((AutoEndorseConstraint_c)constraint()).endorseTo(endorseTo.label()));
         }
 	return n;
     }

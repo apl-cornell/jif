@@ -33,7 +33,7 @@ public class AuthConstraintNode_c extends ConstraintNode_c implements AuthConstr
                 PrincipalNode p = (PrincipalNode) i.next();
                 l.add(p.principal());
             }
-            n.constraint = ((AuthConstraint_c)constraint()).principals(l);
+            n.setConstraint(((AuthConstraint_c)constraint()).principals(l));
         }
 	return n;
     }

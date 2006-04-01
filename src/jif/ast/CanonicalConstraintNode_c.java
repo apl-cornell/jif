@@ -11,11 +11,14 @@ public class CanonicalConstraintNode_c extends ConstraintNode_c implements Canon
 {
     public CanonicalConstraintNode_c(Position pos, Assertion constraint) {
 	super(pos);
-	this.constraint = constraint;
+	this.setConstraint(constraint);
     }
 
+    public Assertion constraint() {
+        return super.constraint();
+    }
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        w.write(constraint.toString());
+        w.write(constraint().toString());
     }
 
     public void translate(CodeWriter w, Translator tr) {

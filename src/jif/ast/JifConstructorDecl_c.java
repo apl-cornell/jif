@@ -159,7 +159,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
                 ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
                 return this;
             }
-            constraints.add(cn.constraint());
+            constraints.addAll(cn.constraints());
         }
         jci.setConstraints(constraints);
 

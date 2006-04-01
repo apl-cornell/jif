@@ -33,7 +33,7 @@ public class CallerConstraintNode_c extends ConstraintNode_c implements CallerCo
                 PrincipalNode p = (PrincipalNode) i.next();
                 l.add(p.principal());
             }
-            n.constraint = ((CallerConstraint_c)constraint()).principals(l);
+            n.setConstraint(((CallerConstraint_c)constraint()).principals(l));
         }
 	return n;
     }

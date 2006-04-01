@@ -1,5 +1,8 @@
 package jif.ast;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jif.types.JifTypeSystem;
 import jif.types.LabelLeAssertion;
 import polyglot.ast.Node;
@@ -30,8 +33,9 @@ public class LabelLeAssertionNode_c extends ConstraintNode_c implements LabelLeA
     public LabelLeAssertionNode lhs(LabelNode lhs) {
 	LabelLeAssertionNode_c n = (LabelLeAssertionNode_c) copy();
 	n.lhs = lhs;
-	if (constraint() != null) {
-	    n.constraint = ((LabelLeAssertion)constraint()).lhs(lhs.label());
+	if (constraints() != null) {
+            LabelLeAssertion c = (LabelLeAssertion)constraints().iterator().next();
+            n = n.setConstraints((JifTypeSystem)c.typeSystem());
 	}
 	return n;
     }
@@ -45,8 +49,9 @@ public class LabelLeAssertionNode_c extends ConstraintNode_c implements LabelLeA
     public LabelLeAssertionNode rhs(LabelNode rhs) {
 	LabelLeAssertionNode_c n = (LabelLeAssertionNode_c) copy();
 	n.rhs = rhs;
-	if (constraint() != null) {
-	    n.constraint = ((LabelLeAssertion)constraint).rhs(rhs.label());
+	if (constraints() != null) {
+            LabelLeAssertion c = (LabelLeAssertion)constraints().iterator().next();
+            n = n.setConstraints((JifTypeSystem)c.typeSystem());
 	}
 	return n;
     }
@@ -70,14 +75,29 @@ public class LabelLeAssertionNode_c extends ConstraintNode_c implements LabelLeA
 
     /** Builds the type of this node. */
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-	if (constraint() == null) {
+	if (constraints() == null) {
             JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
-            return constraint(ts.labelLeAssertion(position(),
-                                                  lhs.label(),
-                                                  rhs.label()));
+            return setConstraints(ts);
         }
 
         return this;
+    }
+    
+    private LabelLeAssertionNode_c setConstraints(JifTypeSystem ts) {
+        if (isEquiv) {
+            Set cs = new HashSet();
+            cs.add(ts.labelLeAssertion(position(),
+                                       lhs.label(),
+                                       rhs.label()));
+            cs.add(ts.labelLeAssertion(position(),
+                                       rhs.label(),
+                                       lhs.label()));
+            return (LabelLeAssertionNode_c)constraints(cs);
+        }
+        return (LabelLeAssertionNode_c)constraint(ts.labelLeAssertion(position(),
+                                              lhs.label(),
+                                              rhs.label()));
+        
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

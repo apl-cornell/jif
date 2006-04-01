@@ -121,6 +121,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	ConjunctTest01.jif ;
 	ConjunctTest02.jif (Warning);
 	ConjunctTest03.jif ;
+	ConjunctTest04.jif ;
 	Constraints1.jif ;
 	Constraints3.jif ;
 	Constraints5.jif ;
@@ -249,6 +250,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	LabelLeConstraint10.jif ;
 	LabelLeConstraint11.jif (Semantic, "must be less restrictive");
 	LabelLeConstraint12.jif ;
+	LabelLeConstraint13.jif ;
 	LabelUtil01.jif ;
 	LabelUtil02.jif ;
 	List.jif ;
@@ -366,10 +368,6 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	PrincipalUtil01.jif ;
 	Protected.jif ;
 	Recursive.jif ;
-	RobustDecl01.jif ;
-	RobustDecl02.jif (Semantic, "not robust");
-	RobustDecl03.jif (Semantic, "not robust");
-	RobustDecl04.jif ;
 	RuntimeParams01.jif ;
 	RuntimeParams02.jif ;
 	RuntimeParams03.jif ;
@@ -451,4 +449,12 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	User1.jif ;
 	Vec.jif ;
 	While.jif ;
+}
+
+# the robustness test cases. Turn robustness on.
+jif.ExtensionInfo  "-robust -sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:../lib/jifrt.jar" {
+	RobustDecl01.jif ;
+	RobustDecl02.jif (Semantic, "not robust");
+	RobustDecl03.jif (Semantic, "not robust");
+	RobustDecl04.jif ;
 }

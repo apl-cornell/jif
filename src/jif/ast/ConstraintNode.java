@@ -1,11 +1,12 @@
 package jif.ast;
 
-import polyglot.ast.*;
-import jif.types.*;
+import java.util.Set;
+
+import polyglot.ast.Node;
 
 /** The root of various constraint nodes. 
  */
 public interface ConstraintNode extends Node {
-    Assertion constraint();
-    ConstraintNode constraint(Assertion constraint);
+    Set constraints();
+    ConstraintNode constraints(Set constraint);
 }

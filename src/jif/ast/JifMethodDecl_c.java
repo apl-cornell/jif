@@ -182,7 +182,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
                 ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
                 return this;
             }
-            constraints.add(cn.constraint());
+            constraints.addAll(cn.constraints());
         }
         jmi.setConstraints(constraints);
         return n.methodInstance(jmi);

@@ -1,8 +1,11 @@
 package jif.ast;
 
+import java.util.*;
+
 import jif.types.Assertion;
 import polyglot.ext.jl.ast.Node_c;
 import polyglot.types.SemanticException;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
@@ -11,26 +14,47 @@ import polyglot.visit.NodeVisitor;
  */
 public class ConstraintNode_c extends Node_c implements ConstraintNode
 {
-    protected Assertion constraint;
+    protected Set constraints; // of Assertion 
 
     public ConstraintNode_c(Position pos) {
 	super(pos);
     }
 
     public boolean isDisambiguated() {
-        return constraint != null && constraint.isCanonical() && super.isDisambiguated();
+        if (constraints == null) return false;
+        for (Iterator iter = constraints.iterator(); iter.hasNext(); ) {
+            Assertion a = (Assertion)iter.next();
+            if (!a.isCanonical()) return false;
+        }
+        return super.isDisambiguated();
     }
 
-    public Assertion constraint() {
-	return constraint;
+    public Set constraints() {
+	return constraints;
     }
 
-    public ConstraintNode constraint(Assertion constraint) {
+    public ConstraintNode constraints(Set constraints) {
 	ConstraintNode_c n = (ConstraintNode_c) copy();
-	n.constraint = constraint;
+	n.constraints = constraints;
 	return n;
     }
+    
+    protected Assertion constraint() {
+        if (constraints == null) return null;
+        if (constraints.size() > 1)  throw new InternalCompilerError("Multiple constraints");
+        return (Assertion)constraints.iterator().next();
+    }
 
+    protected ConstraintNode constraint(Assertion constraint) {
+        ConstraintNode_c n = (ConstraintNode_c) copy();
+        n.constraints = Collections.singleton(constraint);
+        return n;
+    }
+    
+    protected void setConstraint(Assertion constraint) {
+        constraints = Collections.singleton(constraint);
+    }
+    
     /**
      * Bypass all children when peforming an exception check. Constraints
      * aren't examined at runtime.
@@ -44,8 +68,8 @@ public class ConstraintNode_c extends Node_c implements ConstraintNode
 
     
     public String toString() {
-	if (constraint != null) {
-	    return constraint.toString();
+	if (constraints != null) {
+	    return constraints.toString();
 	}
 	else {
 	    return "<unknown-constraint>";

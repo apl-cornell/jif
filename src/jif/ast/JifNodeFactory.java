@@ -45,7 +45,7 @@ public interface JifNodeFactory extends NodeFactory {
     AutoEndorseConstraintNode AutoEndorseConstraintNode(Position pos, LabelNode endorseTo);
     ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter);
     ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter, boolean isEquiv);
-    LabelLeAssertionNode LabelLeAssertionNode(Position pos, LabelNode actor, LabelNode granter);
+    LabelLeAssertionNode LabelLeAssertionNode(Position pos, LabelNode actor, LabelNode granter, boolean isEquiv);
     LabelExpr LabelExpr(Position pos, Label l);
     DeclassifyStmt DeclassifyStmt(Position pos, LabelNode bound, LabelNode label, Stmt body);
     DeclassifyStmt DeclassifyStmt(Position pos, LabelNode label, Stmt body);
