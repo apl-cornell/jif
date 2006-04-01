@@ -98,7 +98,6 @@
         <!-- Delete the ${classes} and ${dist} directory trees -->
         <delete dir="${sig-classes}" />
         <delete dir="${rt-classes}" />
-        <delete dir="${rt-classes}" />
         <delete dir="${lib-classes}" />
     </target>
 
@@ -501,7 +500,7 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
 
     <!-- compile the jif runtime native code for windows -->
     <target name="jif-runtime-native-windows" if="os.isWindows">
-
+        <echo>Compiling windows runtime</echo>
         <apply executable="g++" 
 		       failonerror="true"
 		       dest="${rt-src}" 

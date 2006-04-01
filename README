@@ -1,4 +1,4 @@
-Jif 2.0.0
+Jif 2.0.1
 
 			     The Jif Compiler
 			     ----------------
@@ -33,7 +33,7 @@ environment. Jif is compiled with the Ant build tool
 g++ are in your path.
 
 Softare Versions: We recommend that you use JDK 1.4.2 or later.  Ant
-   1.6.5 is known to work with Jif 2.0.0. 
+   1.6.5 is known to work with Jif 2.0.1. 
 
 Jif and Cygwin: Jif can be built and used on a Windows platform running 
    Cygwin. Several issues are worth pointing out however. 
@@ -48,8 +48,8 @@ Jif and Cygwin: Jif can be built and used on a Windows platform running
        the string "/cygdrive/c/data/jif", which cannot be interpreted by
        javac correctly.
        In addition, note that the path separator on a Windows platform is
-       the semicolon (';'), for example, class paths should be set 
-       accordingly , for example:
+       the semicolon (';'), and, class paths should be set accordingly, 
+       for example:
           setenv CLASSPATH "$POLYGLOT/polyglot.jar;$POLYGLOT/lib/jflex.jar;$POLYGLOT/lib/java_cup.jar"
      - We have had some reports that some versions of Cygwin are 
        incompatible with building Jif, however, cygwin-1.5.16-1 appears to 
@@ -206,8 +206,8 @@ University Computer Science Department. Many people have contributed
 to this software.
 
 This release of the Jif compiler was prepared by Stephen Chong. Thanks
-to Boniface Hicks, Karl Mazurak, Steve Zdancewic, Aslan Askarov, and
-Andrei Sabelfeld, who provided bug reports and feedback for the
+to Daniel Hedin, Boniface Hicks, Karl Mazurak, Steve Zdancewic, Aslan Askarov, 
+and Andrei Sabelfeld, who provided bug reports and feedback for the
 previous version of Jif.
 
 Lantian Zheng, Steve Zdancewic, and Nate Nystrom helped implement
