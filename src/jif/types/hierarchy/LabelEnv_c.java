@@ -159,9 +159,13 @@ public class LabelEnv_c implements LabelEnv
         final Object rhs;
         LeqGoal(Policy lhs, Policy rhs) { 
             this.lhs = lhs; this.rhs = rhs;
+            if (lhs == null || rhs == null) 
+                throw new InternalCompilerError("Null policy!");
         }
         LeqGoal(Label lhs, Label rhs) { 
             this.lhs = lhs; this.rhs = rhs;
+            if (lhs == null || rhs == null) 
+                throw new InternalCompilerError("Null label!");
         }
         public int hashCode() {
             return lhs.hashCode() + rhs.hashCode();
