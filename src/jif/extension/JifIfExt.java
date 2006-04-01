@@ -78,7 +78,7 @@ public class JifIfExt extends JifStmtExt_c
 
     private JifContext extendContext(LabelChecker lc, JifContext A, Expr e) throws SemanticException {
         JifTypeSystem ts = lc.typeSystem();
-        if (allEnvExtension(ts, e)) {
+        if (allEnvExtensionAsConjuncts(ts, e)) {
             return extendContext(lc, A, (Binary)e);
         }
         else if (someEnvExtension(ts, e)) {
@@ -129,13 +129,13 @@ public class JifIfExt extends JifStmtExt_c
                 return extendContext(lc, A1, (Binary)b.right());
             }
         }
-        throw new InternalCompilerError("Unexpected expression: " + b + " " + b.left().type() + " " + b.right().type());
+        return A;
     }
 
     /**
-     * Return true if and only if e consists only of conjunctions of label and actsfor tests  
+     * Return true if and only if all label and actsfor tests appear as conjuncts  
      */
-    private boolean allEnvExtension(JifTypeSystem ts, Expr e) {
+    private boolean allEnvExtensionAsConjuncts(JifTypeSystem ts, Expr e) {
         if (e instanceof Binary) {
             Binary b = (Binary)e;
             if (b.operator() == JifBinaryDel.ACTSFOR || b.operator() == JifBinaryDel.EQUIV) {
@@ -145,8 +145,10 @@ public class JifIfExt extends JifStmtExt_c
                 return true;
             }
             if (b.operator() == Binary.BIT_AND || b.operator() == Binary.COND_AND) {
-                return allEnvExtension(ts, b.left()) && allEnvExtension(ts, b.right());
-            }            
+                return allEnvExtensionAsConjuncts(ts, b.left()) && allEnvExtensionAsConjuncts(ts, b.right());
+            }       
+            // return false if the left or the right has some env extension
+            return !(someEnvExtension(ts, b.left()) || someEnvExtension(ts, b.right()));
         }
         return false;
     }
