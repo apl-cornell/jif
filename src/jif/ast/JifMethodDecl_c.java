@@ -123,8 +123,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             // return type isn't labeled. Add the default label.
             declrt = jts.labeledType(declrt.position(), declrt, ds.defaultReturnValueLabel(n));
             n = (JifMethodDecl)n.returnType(n.returnType().type(declrt));
-            jmi.setReturnType(declrt);
         }
+        jmi.setReturnType(declrt);
 
         if (n.returnLabel() != null && !n.returnLabel().isDisambiguated()) {
             // the return label node hasn't been disambiguated yet
@@ -190,7 +190,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         
         return n.methodInstance(jmi);
     }
-
+    
     /**
      * Rename the arg labels and arg roots. This is needed to make sure
      * that during substitution of args in a recursive method call,
