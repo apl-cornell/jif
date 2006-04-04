@@ -2,6 +2,8 @@ package jif.ast;
 
 import java.util.List;
 
+import jif.types.JifTypeSystem;
+
 import polyglot.ast.*;
 import polyglot.ext.jl.ast.Expr_c;
 import polyglot.types.SemanticException;
@@ -82,7 +84,15 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, this);
+        JifTypeSystem ts = (JifTypeSystem)v.typeSystem();
+        if (ts.Boolean().equals(ts.unlabel(expr.type()))) {
+            // allow more precise dataflow when downgrading a boolean expression. 
+            v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this, 
+                             FlowGraph.EDGE_KEY_FALSE, this);
+        }
+        else {
+            v.visitCFG(expr, this);
+        }
         return succs;
     }
 

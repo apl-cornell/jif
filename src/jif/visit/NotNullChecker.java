@@ -13,6 +13,7 @@ import jif.visit.PreciseClassChecker.AccessPathLocal;
 import polyglot.ast.*;
 import polyglot.frontend.Job;
 import polyglot.types.*;
+import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.visit.*;
 
@@ -187,6 +188,12 @@ public class NotNullChecker extends DataFlow
             }
             return checkNPE(ret, n); 
         } 
+        else if (n instanceof DowngradeExpr && ((Expr)n).type().isBoolean()) {
+            if (trueItem == null) trueItem = dfIn;
+            if (falseItem == null) falseItem = dfIn;
+            Map ret =  itemsToMap(trueItem, falseItem, dfIn, succEdgeKeys);
+            return checkNPE(ret, n);             
+        }
 
         return checkNPE(itemToMap(dfIn, succEdgeKeys), n);
     }

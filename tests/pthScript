@@ -288,6 +288,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	NullExcept18.jif ;
 	NullExcept19.jif ;
 	NullExcept20.jif (Semantic, "NullPointerException.*must .* be caught") ;
+	NullExcept21.jif ;
 	PairList.jif  List.jif;
 	Override01.jif;
 	Override02.jif;
