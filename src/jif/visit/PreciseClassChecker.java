@@ -145,6 +145,12 @@ public class PreciseClassChecker extends DataFlow
             }
             return ret; 
         } 
+        else if (n instanceof DowngradeExpr && ((Expr)n).type().isBoolean()) {
+            if (trueItem == null) trueItem = dfIn;
+            if (falseItem == null) falseItem = dfIn;
+            return itemsToMap(trueItem, falseItem, dfIn, succEdgeKeys);
+        }
+
         return itemToMap(dfIn, succEdgeKeys);
     }
     
