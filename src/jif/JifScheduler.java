@@ -16,13 +16,13 @@ import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 
 public class JifScheduler extends JLScheduler {
-   OutputExtensionInfo jlext;
+   protected OutputExtensionInfo jlext;
    /**
     * Hack to ensure that we track the job for java.lang.Object specially.
     * In particular, ensure that it is submitted for re-writing before
     * any other job.
     */
-   private Job objectJob = null;
+   protected Job objectJob = null;
 
     public JifScheduler(jif.ExtensionInfo extInfo, OutputExtensionInfo jlext) {
         super(extInfo);

@@ -13,9 +13,8 @@ import polyglot.ext.jl.qq.QQ;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Job;
 import polyglot.frontend.Source;
-import polyglot.types.ClassType;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
+import polyglot.types.*;
+import polyglot.types.Package;
 import polyglot.util.*;
 import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
@@ -149,6 +148,61 @@ public class JifToJavaRewriter extends ContextVisitor
 
     public Expr principalToJava(Principal principal) throws SemanticException {
         return principal.toJava(this);
+    }
+
+    public TypeNode typeToJava(Type t, Position pos) throws SemanticException {
+        NodeFactory nf = this.java_nf();
+        TypeSystem ts = this.java_ts();
+        
+        if (t.isNull()) return canonical(nf, ts.Null(), pos);
+        if (t.isVoid()) return canonical(nf, ts.Void(), pos);
+        if (t.isBoolean()) return canonical(nf, ts.Boolean(), pos);
+        if (t.isByte()) return canonical(nf, ts.Byte(), pos);
+        if (t.isChar()) return canonical(nf, ts.Char(), pos);
+        if (t.isShort()) return canonical(nf, ts.Short(), pos);
+        if (t.isInt()) return canonical(nf, ts.Int(), pos);
+        if (t.isLong()) return canonical(nf, ts.Long(), pos);
+        if (t.isFloat()) return canonical(nf, ts.Float(), pos);
+        if (t.isDouble()) return canonical(nf, ts.Double(), pos);
+        
+        if (this.jif_ts().isLabel(t)) {
+            return nf.AmbTypeNode(pos,
+                                  nf.PackageNode(pos,
+                                                 ts.packageForName("jif.lang")),
+            "Label");
+        }
+        
+        if (this.jif_ts().isPrincipal(t)) {
+            return nf.AmbTypeNode(pos,
+                                  nf.PackageNode(pos,
+                                                 ts.packageForName("jif.lang")),
+            "Principal");
+        }
+        
+        if (t.isArray()) {
+            return nf.ArrayTypeNode(pos,
+                                    typeToJava(t.toArray().base(), pos));
+        }
+        
+        if (t.isClass()) {
+            Package p = t.toClass().package_();
+            String name = t.toClass().name();
+            if (p == null) {
+                return nf.AmbTypeNode(pos, name);
+            }
+            else {
+                return nf.AmbTypeNode(pos,
+                                      nf.PackageNode(pos,
+                                                     ts.packageForName(p.fullName())),
+                                                     name);
+            }
+        }
+        
+        throw new InternalCompilerError("Cannot translate type " + t + ".");
+    }
+    
+    protected TypeNode canonical(NodeFactory nf, Type t, Position pos) {
+        return nf.CanonicalTypeNode(pos, t);
     }
 
     public QQ qq() {

@@ -235,7 +235,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
     private static TypeNode typeNodeForParam(ParamInstance pi, JifToJavaRewriter rw) throws SemanticException {
         Type paramType = pi.isPrincipal() ? rw.jif_ts().Principal() : rw.jif_ts().Label();
-        return CanonicalTypeNodeToJavaExt_c.translate(rw, paramType, Position.COMPILER_GENERATED);
+        return rw.typeToJava(paramType, Position.COMPILER_GENERATED);
     }
     private static ClassMember produceCastMethod(JifPolyType jpt, JifToJavaRewriter rw) throws SemanticException {
         Context A = rw.context();
@@ -249,7 +249,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
         List formals = produceParamFormals(jpt, rw, true);
         List args = produceParamArgs(jpt, rw);
-        TypeNode tn = CanonicalTypeNodeToJavaExt_c.translate(rw, jpt, Position.COMPILER_GENERATED);;
+        TypeNode tn = rw.typeToJava(jpt, Position.COMPILER_GENERATED);;
         return rw.qq().parseMember(sb.toString(), tn, castMethodName(jpt), formals, INSTANCEOF_METHOD_NAME, args, tn);
     }
 
