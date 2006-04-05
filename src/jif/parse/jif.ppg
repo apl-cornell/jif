@@ -235,6 +235,22 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
 		    }
 		}
     }
+
+    public static final String TYPE_ANNOTATION = "labeled types";
+    public static final String PC_BOUND_ANNOTATION = "pc bound";
+    public static final String END_LABEL_ANNOTATION = "end labels";
+    public static final String METHOD_AUTH_ANNOTATION = "authority where-constraints";
+    public static final String METHOD_CALLER_ANNOTATION = "caller where-constraints";
+    public static final String METHOD_AUTO_ENDORSE_ANNOTATION = "auto-endorse where-constraints";
+    public static final String METHOD_ACTSFOR_ANNOTATION = "actsfor where-constraints";
+    public static final String METHOD_LABEL_ASSERTION_ANNOTATION = "label leq where-constraints";
+
+
+    public void countAnnotation(String key) {
+        String countKey = "Jif annotations: " + key;
+        ts.extensionInfo().getStats().accumPassTimes(countKey, 1, 1);
+    }
+
 :};
 
 terminal Token WHERE;
@@ -306,7 +322,7 @@ label_opt ::=
     |   label:a
             {: RESULT = a; :}
     ;
-    
+
 label_flexible ::=
       // LabelNode
       label:a
@@ -315,7 +331,7 @@ label_flexible ::=
             {: RESULT = parser.nf.AmbDynamicLabelNode(parser.pos(a), a); :}
     ;
 join_component_list ::=
-                    // List of LabelNode or PolicyNode. Implicitly a join 
+                    // List of LabelNode or PolicyNode. Implicitly a join
                     // between them
         join_label_component:a
             {: List l = new TypedList(new LinkedList(), Node.class, false);
@@ -334,7 +350,7 @@ join_label_component ::=
                }
                else o = a.iterator().next();
                RESULT = o;
-               :}   
+               :}
          ;
 meet_component_list ::=
                     // List of LabelNode or PolicyNode
@@ -349,7 +365,7 @@ meet_component_list ::=
 label_component ::=
                     // LabelNode or PolicyNode
         label_component_policy:a
-            {: RESULT = a; :}   
+            {: RESULT = a; :}
     |   MULT:x accesspath:a
             {: RESULT = parser.nf.AmbDynamicLabelNode(parser.pos(x, a),
 						      a); :}
@@ -359,7 +375,7 @@ label_component ::=
             {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),
 						  a.getIdentifier()); :}
     ;
-    
+
 label_component_policy ::=
                     // PolicyNode
         principal_disjunctive:a COLON principal_list_opt:b
@@ -388,18 +404,18 @@ principal_list ::=
 principal ::=
        principal_conjunctive:a
             {: RESULT = a; :}
-    ;            
+    ;
 principal_disjunctive ::=
        principal_conjunctive:a
             {: RESULT = a; :}
     |  principal:a COMMA principal_conjunctive:b
-            {: RESULT = parser.nf.AmbDisjunctivePrincipalNode(parser.pos(a,b),a,b); :}    
+            {: RESULT = parser.nf.AmbDisjunctivePrincipalNode(parser.pos(a,b),a,b); :}
     ;
 principal_conjunctive ::=
        principal_base:a
-            {: RESULT = a; :}    
+            {: RESULT = a; :}
     |  principal_conjunctive:a AND principal_base:b
-            {: RESULT = parser.nf.AmbConjunctivePrincipalNode(parser.pos(a,b),a,b); :}    
+            {: RESULT = parser.nf.AmbConjunctivePrincipalNode(parser.pos(a,b),a,b); :}
     ;
 principal_base ::=
                     // PrincipalNode
@@ -454,7 +470,9 @@ labeled_primitive_type  ::=
         primitive_type:a
             {: RESULT = a; :}
     |   primitive_type:a label:b
-            {: RESULT = parser.nf.LabeledTypeNode(parser.pos(a, b), a, b); :}
+            {: RESULT = parser.nf.LabeledTypeNode(parser.pos(a, b), a, b);
+               parser.countAnnotation(parser.TYPE_ANNOTATION);
+            :}
     ;
 
 drop { reference_type ::= array_type | class_or_interface_type; }
@@ -555,7 +573,9 @@ method_header ::=
             {: RESULT = parser.nf.JifMethodDecl(parser.pos(b,c,c), a,
                         parser.array(b, e.intValue()),
                         c.getIdentifier(),
-                                                i, d, r, f, w, null); :}
+                                                i, d, r, f, w, null);
+               if (i != null) parser.countAnnotation(parser.PC_BOUND_ANNOTATION);
+             :}
     |   modifiers_opt:a VOID:b IDENTIFIER:c label_opt:i
         LPAREN formal_parameter_list_opt:d RPAREN
         dims_opt:e return_label_opt:r throws_opt:f constraints_opt:w
@@ -563,7 +583,9 @@ method_header ::=
                         parser.nf.CanonicalTypeNode(parser.pos(b),
                                    parser.ts.Void()),
                         c.getIdentifier(),
-                                                i, d, r, f, w, null); :}
+                                                i, d, r, f, w, null);
+               if (i != null) parser.countAnnotation(parser.PC_BOUND_ANNOTATION);
+            :}
     ;
 
 override formal_parameter ::=
@@ -589,7 +611,10 @@ return_label_opt ::=
                     // LabelNode
             {: RESULT = null; :}
     |   COLON label:a
-            {: RESULT = a; :}
+            {:
+               RESULT = a;
+               parser.countAnnotation(parser.END_LABEL_ANNOTATION);
+            :}
     ;
 
 // 19.8.4) Static Initializers
@@ -691,15 +716,18 @@ parameter ::=
     LABEL:x IDENTIFIER:a
         {: RESULT = parser.nf.ParamDecl(parser.pos(x, a),
                                         ParamInstance.INVARIANT_LABEL,
-                                        a.getIdentifier()); :}
+                                        a.getIdentifier());
+                                        :}
     |   COVARIANT:x LABEL IDENTIFIER:a
         {: RESULT = parser.nf.ParamDecl(parser.pos(x, a),
                                         ParamInstance.COVARIANT_LABEL,
-                                        a.getIdentifier()); :}
+                                        a.getIdentifier());
+                                        :}
     |   PRINCIPAL:x IDENTIFIER:a
         {: RESULT = parser.nf.ParamDecl(parser.pos(x, a),
                                         ParamInstance.PRINCIPAL,
-                                        a.getIdentifier()); :}
+                                        a.getIdentifier());
+                                        :}
     ;
 
 
@@ -723,19 +751,33 @@ constraints ::=
 constraint ::=
         // ConstraintNode
         AUTHORITY:x LPAREN principal_list:a RPAREN:y
-        {: RESULT = parser.nf.AuthConstraintNode(parser.pos(x,y), a); :}
+        {: RESULT = parser.nf.AuthConstraintNode(parser.pos(x,y), a);
+           parser.countAnnotation(parser.METHOD_AUTH_ANNOTATION);
+        :}
     |   CALLER:x LPAREN principal_list:a RPAREN:y
-        {: RESULT = parser.nf.CallerConstraintNode(parser.pos(x,y), a); :}
+        {: RESULT = parser.nf.CallerConstraintNode(parser.pos(x,y), a);
+           parser.countAnnotation(parser.METHOD_CALLER_ANNOTATION);
+        :}
     |   ENDORSE:x LPAREN label_flexible:a RPAREN:y
-        {: RESULT = parser.nf.AutoEndorseConstraintNode(parser.pos(x,y), a); :}
-    |   principal:a actsfor principal:b 
-        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b); :}
-    |   principal:a EQUIV principal:b 
-        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b, true); :}
+        {: RESULT = parser.nf.AutoEndorseConstraintNode(parser.pos(x,y), a);
+           parser.countAnnotation(parser.METHOD_AUTO_ENDORSE_ANNOTATION);
+        :}
+    |   principal:a actsfor principal:b
+        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b);
+           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION);
+        :}
+    |   principal:a EQUIV principal:b
+        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b, true);
+           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION);
+        :}
     |   label_flexible:a LTEQ label_flexible:b
-        {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b, false); :}
+        {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b, false);
+           parser.countAnnotation(parser.METHOD_LABEL_ASSERTION_ANNOTATION);
+        :}
     |   label:a EQUIV label:b
-        {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b, true); :}
+        {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b, true);
+           parser.countAnnotation(parser.METHOD_LABEL_ASSERTION_ANNOTATION);
+        :}
     ;
 
 // 19.9.1) Interface Declarations
@@ -939,7 +981,7 @@ param_or_expr_list ::=
 	    {: a.add(b); RESULT = a; :}
     |   param_or_expr_list:a COMMA label:b
 	    {: a.add(b); RESULT = a; :}
-    |  param_or_expr_list:a COMMA accesspath_no_id:b 
+    |  param_or_expr_list:a COMMA accesspath_no_id:b
         {:  a.add(b); RESULT = a;  :}
     ;
 
@@ -973,7 +1015,9 @@ reftype_or_expr ::=
     |   reftype_or_expr:a LBRACK RBRACK:y
             {: RESULT = new Array(parser, parser.pos(a,y), a.toType()); :}
     |   reftype_or_expr:a label:b
-            {: RESULT = new LabeledExpr(parser, parser.pos(a,b), a, b); :}
+            {: RESULT = new LabeledExpr(parser, parser.pos(a,b), a, b);
+               parser.countAnnotation(parser.TYPE_ANNOTATION);
+            :}
     ;
 drop {
     array_access ::=
