@@ -4,6 +4,7 @@ package jif.parse;
 import polyglot.lex.Lexer;
 import polyglot.lex.Identifier;
 import polyglot.lex.Token;
+import polyglot.frontend.Job;
 
 import polyglot.ext.jl.ast.*;
 import jif.ast.*;
@@ -247,8 +248,11 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
 
 
     public void countAnnotation(String key) {
-        String countKey = "Jif annotations: " + key;
+        Job job = ts.extensionInfo().scheduler().currentJob();
+        String countKey = "Jif annotations: " + job + " : " + key;
+        String countAllKey = "Jif annotations: all " + key;
         ts.extensionInfo().getStats().accumPassTimes(countKey, 1, 1);
+        ts.extensionInfo().getStats().accumPassTimes(countAllKey, 1, 1);
     }
 
 :};
