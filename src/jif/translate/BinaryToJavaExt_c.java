@@ -39,7 +39,7 @@ public class BinaryToJavaExt_c extends ExprToJavaExt_c {
         }
         
         if (b.operator() == Binary.LE && ts.isLabel(this.lhsType)) {
-            return labelTestToJava(rw, true);
+            return labelTestToJava(rw, false);
         }
         
         Precedence precedence = b.precedence();
