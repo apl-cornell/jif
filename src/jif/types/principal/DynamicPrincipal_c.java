@@ -3,14 +3,17 @@ package jif.types.principal;
 import java.util.List;
 
 import jif.translate.DynamicPrincipalToJavaExpr_c;
+import jif.types.*;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.PathMap;
+import jif.types.label.*;
 import jif.types.label.AccessPath;
 import jif.types.label.AccessPathConstant;
 import jif.types.label.AccessPathRoot;
 import jif.visit.LabelChecker;
 import polyglot.main.Report;
+import polyglot.types.*;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
@@ -75,9 +78,18 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
             return (Principal)apc.constantValue();
         }
         
-        return ((JifTypeSystem)typeSystem()).dynamicPrincipal(this.position(), newPath);
+        return ((JifTypeSystem)typeSystem()).pathToPrincipal(this.position(), newPath);
     }
-    
+
+    public Principal subst(LabelSubstitution substitution) throws SemanticException {
+        AccessPath newPath = substitution.substAccessPath(path);
+        if (newPath != path) {
+            JifTypeSystem ts = (JifTypeSystem)typeSystem();
+            Principal newDP = ts.pathToPrincipal(this.position(), newPath);
+            return substitution.substPrincipal(newDP);
+        }
+        return substitution.substPrincipal(this);
+    }
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         return path.labelcheck(A, lc);
     }

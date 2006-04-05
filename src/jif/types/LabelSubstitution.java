@@ -2,8 +2,7 @@ package jif.types;
 
 import java.util.LinkedList;
 
-import jif.types.label.Label;
-import jif.types.label.Policy;
+import jif.types.label.*;
 import jif.types.principal.Principal;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
@@ -32,6 +31,9 @@ public abstract class LabelSubstitution {
     }
     public Principal substPrincipal(Principal p) throws SemanticException {
         return p;
+    }    
+    public AccessPath substAccessPath(AccessPath ap) throws SemanticException {
+        return ap;
     }    
     
     public boolean recurseIntoChildren(Label L) {

@@ -356,35 +356,21 @@ public class JifInstantiator
                 thisClasses.add(tl.classType());
                 
             }
-            if (L instanceof DynamicLabel) {
-                DynamicLabel dl = (DynamicLabel)L;
-                AccessPathRoot root = dl.path().root();
-                if (tempThisRoot == root) {
-                    throw new InternalCompilerError("Left over: " + L);
-                }
-                if (formalTempAccessPathRoots != null && formalTempAccessPathRoots.contains(root)) {
-                    throw new InternalCompilerError("Left over: " + L);
-                }
-            }
 
             if (formalTempLabels != null && formalTempLabels.contains(L)) {
                 throw new InternalCompilerError("Left over: " + L);                
             }
             return L;
         }
-
-        public Principal substPrincipal(Principal p) {
-            if (p instanceof DynamicPrincipal) {
-                DynamicPrincipal dp = (DynamicPrincipal)p;
-                AccessPathRoot root = dp.path().root();
-                if (tempThisRoot == root) {
-                    throw new InternalCompilerError("Left over: " + p);
-                }
-                if (formalTempAccessPathRoots != null && formalTempAccessPathRoots.contains(root)) {
-                    throw new InternalCompilerError("Left over: " + p);
-                }
+        public AccessPath substAccessPath(AccessPath ap) {            
+            AccessPathRoot root = ap.root();
+            if (tempThisRoot == root) {
+                throw new InternalCompilerError("Left over: " + ap);
             }
-            return p;
+            if (formalTempAccessPathRoots != null && formalTempAccessPathRoots.contains(root)) {
+                throw new InternalCompilerError("Left over: " + ap);
+            }
+            return ap;
         }
 
     }
@@ -464,23 +450,10 @@ public class JifInstantiator
             this.trgPath = trgPath;
         }
         
-        public Label substLabel(Label L) {            
-            if (L instanceof DynamicLabel) {
-                DynamicLabel dl = (DynamicLabel)L;
-                if (dl.path().root().equals(srcRoot)) 
-                    return dl.subst(srcRoot, trgPath);
-                return dl;
-            }
-            return L;
-        }
-        public Principal substPrincipal(Principal p) {
-            if (p instanceof DynamicPrincipal) {
-                DynamicPrincipal dp = (DynamicPrincipal)p;
-                if (dp.path().root().equals(srcRoot)) 
-                    return dp.subst(srcRoot, trgPath);
-                return dp;
-            }
-            return p;
+        public AccessPath substAccessPath(AccessPath ap) {            
+            if (ap.root().equals(srcRoot))
+                return ap.subst(srcRoot, trgPath);
+            return ap;
         }
     }
 

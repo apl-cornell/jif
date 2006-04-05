@@ -486,19 +486,9 @@ public class NotNullChecker extends DataFlow
         LabelNotNullSubst(DataFlowItem inItem) {
             this.inItem = inItem;
         }
-        public Label substLabel(Label L) throws SemanticException {
-            if (L instanceof DynamicLabel) {
-                DynamicLabel dl = (DynamicLabel)L;
-                checkPath(dl.path());                
-            }
-            return L;
-        }
-        public Principal substPrincipal(Principal p) throws SemanticException {
-            if (p instanceof DynamicPrincipal) {
-                DynamicPrincipal dp = (DynamicPrincipal)p;
-                checkPath(dp.path());                
-            }
-            return p;
+        public jif.types.label.AccessPath substAccessPath(jif.types.label.AccessPath ap) {            
+            checkPath(ap);                
+            return ap;
         }
         private void checkPath(jif.types.label.AccessPath p) {
             while (p instanceof AccessPathField) {

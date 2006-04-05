@@ -602,6 +602,17 @@ public class JifTypeSystem_c
         DynamicPrincipal t = new DynamicPrincipal_c(path, this, pos);
         return t;
     }
+    public Principal pathToPrincipal(Position pos, AccessPath path) {
+        if (path instanceof AccessPathConstant) {
+            AccessPathConstant apc = (AccessPathConstant)path;
+            if (!apc.isPrincipalConstant()) {
+                throw new InternalCompilerError("Dynamic principal with a constant access path: " + apc);
+            }
+            return (Principal)apc.constantValue();
+        }
+        DynamicPrincipal t = new DynamicPrincipal_c(path, this, pos);
+        return t;
+    }
 
 //    static Map externalUIDs = new HashMap();
 
@@ -826,6 +837,19 @@ public class JifTypeSystem_c
     }
 
     public DynamicLabel dynamicLabel(Position pos, AccessPath path) {
+        DynamicLabel t = new DynamicLabel_c(path, this, pos);
+        return t;
+    }
+
+    public Label pathToLabel(Position pos, AccessPath path) {
+        if (path instanceof AccessPathConstant) {
+            AccessPathConstant apc = (AccessPathConstant)path;
+            if (!apc.isLabelConstant()) {
+                throw new InternalCompilerError("Dynamic label with a constant access path: " + apc);
+            }
+            return (Label)apc.constantValue();
+        }
+        
         DynamicLabel t = new DynamicLabel_c(path, this, pos);
         return t;
     }

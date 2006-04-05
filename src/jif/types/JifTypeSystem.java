@@ -69,6 +69,7 @@ public interface JifTypeSystem extends ParamTypeSystem
     Principal conjunctivePrincipal(Position pos, Collection principals);
     Principal disjunctivePrincipal(Position pos, Principal disjunctLeft, Principal disjunctRight);
     Principal disjunctivePrincipal(Position pos, Collection principals);
+    Principal pathToPrincipal(Position pos, AccessPath path);
 
     // Label constructors
     VarLabel freshLabelVariable(Position pos, String s, String description);
@@ -97,6 +98,7 @@ public interface JifTypeSystem extends ParamTypeSystem
     UnknownLabel unknownLabel(Position pos);
     PairLabel pairLabel(Position pos, ConfPolicy confPol, IntegPolicy integPol);
     WritersToReadersLabel writersToReadersLabel(Position pos, Label L);
+    Label pathToLabel(Position pos, AccessPath path);
 
     ReaderPolicy readerPolicy(Position pos, Principal owner, Principal reader);
     ReaderPolicy readerPolicy(Position pos, Principal owner, Collection readers);

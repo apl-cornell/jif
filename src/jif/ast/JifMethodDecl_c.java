@@ -270,59 +270,29 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
                 }
             }
 
-            if (L instanceof DynamicLabel) {
-                DynamicLabel dl = (DynamicLabel)L;
-                AccessPathRoot r = dl.path().root();
-                if (r instanceof AccessPathLocal) {
-                    AccessPathLocal apl = (AccessPathLocal)r;
-                    if (!revertToOriginal && !apl.name().endsWith("'")) {
-                        apl = new AccessPathLocal(apl.localInstance(),
-                                                  apl.name() + "'",
-                                                  apl.position());
-                        AccessPath newPath = dl.path().subst(r, apl);
-                        dl = ((JifTypeSystem)dl.typeSystem()).dynamicLabel(dl.position(), newPath);
-                        return dl;
-                    }
-                    if (revertToOriginal && apl.name().endsWith("'")) {
-                        apl = new AccessPathLocal(apl.localInstance(),
-                                                  apl.name().substring(0, apl.name().length()-1),
-                                                  apl.position());
-                        AccessPath newPath = dl.path().subst(r, apl);
-                        dl = ((JifTypeSystem)dl.typeSystem()).dynamicLabel(dl.position(), newPath);
-                        return dl;
-                    }
-                }
-                
-            }
             return L;
         }
         
-        public Principal substPrincipal(Principal p) {
-            if (p instanceof DynamicPrincipal) {
-                DynamicPrincipal dp = (DynamicPrincipal)p;
-                AccessPathRoot r = dp.path().root();
-                if (r instanceof AccessPathLocal) {
-                    AccessPathLocal apl = (AccessPathLocal)r;
-                    if (!revertToOriginal && !apl.name().endsWith("'")) {
-                        apl = new AccessPathLocal(apl.localInstance(),
-                                                  apl.name() + "'",
-                                                  apl.position());
-                        AccessPath newPath = dp.path().subst(r, apl);
-                        dp = ((JifTypeSystem)dp.typeSystem()).dynamicPrincipal(dp.position(), newPath);
-                        return dp;
-                    }
-                    if (revertToOriginal && apl.name().endsWith("'")) {
-                        apl = new AccessPathLocal(apl.localInstance(),
-                                                  apl.name().substring(0, apl.name().length()-1),
-                                                  apl.position());
-                        AccessPath newPath = dp.path().subst(r, apl);
-                        dp = ((JifTypeSystem)dp.typeSystem()).dynamicPrincipal(dp.position(), newPath);
-                        return dp;
-                    }
+        public AccessPath substAccessPath(AccessPath ap) {            
+            AccessPathRoot r = ap.root();
+            if (r instanceof AccessPathLocal) {
+                AccessPathLocal apl = (AccessPathLocal)r;
+                if (!revertToOriginal && !apl.name().endsWith("'")) {
+                    apl = new AccessPathLocal(apl.localInstance(),
+                                              apl.name() + "'",
+                                              apl.position());
+                    AccessPath newPath = ap.subst(r, apl);
+                    return newPath;
                 }
-                
+                if (revertToOriginal && apl.name().endsWith("'")) {
+                    apl = new AccessPathLocal(apl.localInstance(),
+                                              apl.name().substring(0, apl.name().length()-1),
+                                              apl.position());
+                    AccessPath newPath = ap.subst(r, apl);
+                    return newPath;
+                }
             }
-            return p;
+            return ap;
         }        
     }
 }

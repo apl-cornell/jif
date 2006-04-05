@@ -88,10 +88,16 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
             }
             return (Label)apc.constantValue();
         }
-        return ((JifTypeSystem)typeSystem()).dynamicLabel(this.position(), newPath);
+        return ((JifTypeSystem)typeSystem()).pathToLabel(this.position(), newPath);
     }
 
     public Label subst(LabelSubstitution substitution) throws SemanticException {
+        AccessPath newPath = substitution.substAccessPath(path);
+        if (newPath != path) {
+            JifTypeSystem ts = (JifTypeSystem)typeSystem();
+            Label newDL = ts.pathToLabel(this.position(), newPath);
+            return substitution.substLabel(newDL);
+        }
         return substitution.substLabel(this);
     }
     public PathMap labelCheck(JifContext A, LabelChecker lc) {

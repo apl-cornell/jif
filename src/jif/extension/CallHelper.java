@@ -381,20 +381,10 @@ public class CallHelper {
         // find which formal arguments appear in the signature
         final Set argInstances = new LinkedHashSet();
         LabelSubstitution argLabelGather = new LabelSubstitution() {
-            public Label substLabel(Label L) throws SemanticException {
-                if (L instanceof DynamicLabel) {
-                    DynamicLabel dl = (DynamicLabel)L;
-                    extractRoot(dl.path().root());
-                }
-                return L;
+            public AccessPath substAccessPath(AccessPath ap) {            
+                extractRoot(ap.root());
+                return ap;
             }            
-            public Principal substPrincipal(Principal p) throws SemanticException {
-                if (p instanceof DynamicPrincipal) {
-                    DynamicPrincipal dp = (DynamicPrincipal)p;
-                    extractRoot(dp.path().root());
-                }
-                return p;
-            }
             void extractRoot(AccessPathRoot root) {
                 if (root instanceof AccessPathLocal) {
                     argInstances.add(((AccessPathLocal)root).localInstance());

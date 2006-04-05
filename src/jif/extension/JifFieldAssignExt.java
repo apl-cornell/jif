@@ -116,7 +116,7 @@ public class JifFieldAssignExt extends JifAssignExt
                     JifUtil.isFinalAccessExprOrConst(ts, assign.right())) {
                 
                 if (ts.isLabel(fi.type())) {
-                    DynamicLabel dl = ts.dynamicLabel(fi.position(), JifUtil.varInstanceToAccessPath(fi, fi.position()));                
+                    Label dl = ts.dynamicLabel(fi.position(), JifUtil.varInstanceToAccessPath(fi, fi.position()));                
                     Label rhs_label = JifUtil.exprToLabel(ts, assign.right(), A);
                     A.addDefinitionalAssertionEquiv(dl, rhs_label);
                 }

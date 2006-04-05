@@ -45,7 +45,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
                 JifUtil.isFinalAccessExprOrConst(ts, decl.init())) {
             
             if (ts.isLabel(li.type())) {
-                DynamicLabel dl = ts.dynamicLabel(decl.position(), JifUtil.varInstanceToAccessPath(li, li.position()));                
+                Label dl = ts.dynamicLabel(decl.position(), JifUtil.varInstanceToAccessPath(li, li.position()));                
                 Label rhs_label = JifUtil.exprToLabel(ts, decl.init(), lc.context());
                 lc.context().addDefinitionalAssertionEquiv(dl, rhs_label);
             }
