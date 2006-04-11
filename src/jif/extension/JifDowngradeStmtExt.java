@@ -21,6 +21,10 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
     public JifDowngradeStmtExt(ToJavaExt toJava) {
         super(toJava);
     }
+    
+    protected JifContext declassifyConstraintContext(JifContext A) {
+        return A;
+    }    
 
     public final Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
@@ -70,12 +74,13 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
          }
          );
 
-        checkOneDimenOnly(lc, A, downgradeFrom, downgradeTo, ds.position());
+        JifContext dA = declassifyConstraintContext(A);
+        checkOneDimenOnly(lc, dA, downgradeFrom, downgradeTo, ds.position());
         
-        checkAuthority(lc, A, downgradeFrom, downgradeTo, ds.position());
+        checkAuthority(lc, dA, downgradeFrom, downgradeTo, ds.position());
         
         if (!((JifOptions)JifOptions.global).noRobustness) {
-            checkRobustness(lc, A, downgradeFrom, downgradeTo, ds.position());
+            checkRobustness(lc, dA, downgradeFrom, downgradeTo, ds.position());
         }
 
 	A = (JifContext) A.pushBlock();

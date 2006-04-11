@@ -34,6 +34,11 @@ public interface JifContext extends Context {
     void addAssertionLE(Label L1, Label L2);
 
     /**
+     * Add an equivalence to the label environment. 
+     */
+    void addEquiv(Label L1, Label L2);
+
+    /**
      * Adds the assertion to this context, and all outer contexts up to
      * the method/constructor/initializer level
      * @param L1

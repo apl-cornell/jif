@@ -20,7 +20,7 @@ import polyglot.util.*;
 public class JifTypeSystem_c
     extends ParamTypeSystem_c
     implements JifTypeSystem {
-    private final TypeSystem jlts;
+    protected final TypeSystem jlts;
 
     private final LabelEnv emptyLabelEnv = this.createEmptyLabelEnv();
 

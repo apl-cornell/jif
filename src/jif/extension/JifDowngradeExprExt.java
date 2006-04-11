@@ -26,6 +26,10 @@ public abstract class JifDowngradeExprExt extends Jif_c
         super(toJava);
     }
 
+    protected JifContext declassifyConstraintContext(JifContext A) {
+        return A;
+    }
+    
     public final Node labelCheck(LabelChecker lc) throws SemanticException {
 	final DowngradeExpr d = (DowngradeExpr) node();
 
@@ -48,6 +52,7 @@ public abstract class JifDowngradeExprExt extends Jif_c
                                               "downgrade_from", 
                                               "The label the downgrade expression is downgrading from");
         }
+        
         
         lc.constrain(new LabelConstraint(new NamedLabel("expr.nv", Xe.NV()), 
                                          boundSpecified?LabelConstraint.LEQ:LabelConstraint.EQUAL, 
@@ -76,12 +81,13 @@ public abstract class JifDowngradeExprExt extends Jif_c
          }
          );
 
-        checkOneDimenOnly(lc, A, downgradeFrom, downgradeTo, d.position());
+        JifContext dA = declassifyConstraintContext(A);
+        checkOneDimenOnly(lc, dA, downgradeFrom, downgradeTo, d.position());
         
-        checkAuthority(lc, A, downgradeFrom, downgradeTo, d.position());
+        checkAuthority(lc, dA, downgradeFrom, downgradeTo, d.position());
         
         if (!((JifOptions)JifOptions.global).noRobustness) {
-            checkRobustness(lc, A, downgradeFrom, downgradeTo, d.position());
+            checkRobustness(lc, dA, downgradeFrom, downgradeTo, d.position());
         }
 
 	//_pc_ is not downgraded. 

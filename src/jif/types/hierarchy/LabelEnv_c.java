@@ -841,6 +841,9 @@ public class LabelEnv_c implements LabelEnv
             return tally.toString();
         }
     }
+    protected SearchState freshSearchState() {
+        return new SearchState_c(new LinkedHashSet());
+    }
     private static class SearchState_c implements SearchState {
         public final AssertionUseCount auc;
         public final Set currentGoals;

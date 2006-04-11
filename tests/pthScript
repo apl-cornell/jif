@@ -121,6 +121,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	ConditionalLeak.jif (Semantic, "not a subtype") ;
 	ConjunctTest01.jif ;
 	ConjunctTest02.jif (Warning);
+	ConjunctTest02a.jif (Warning), (Warning);
 	ConjunctTest03.jif ;
 	ConjunctTest04.jif ;
 	Constraints1.jif ;

@@ -32,7 +32,7 @@ public class JifContext_c extends Context_c implements JifContext
     private boolean inConstructorCall;
     private Label constructorReturnLabel;
     
-    JifContext_c(JifTypeSystem ts, TypeSystem jlts) {
+    protected JifContext_c(JifTypeSystem ts, TypeSystem jlts) {
 	super(ts);
         this.jlts = jlts;
         this.jifts = ts;
@@ -114,6 +114,9 @@ public class JifContext_c extends Context_c implements JifContext
         }
     }
     
+    public void addEquiv(Label L1, Label L2) {
+        env.addEquiv(L1, L2);
+    }
     public void addEquiv(Principal p1, Principal p2) {
         env.addEquiv(p1, p2);
     }
