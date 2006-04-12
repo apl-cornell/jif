@@ -261,6 +261,7 @@ public class LabelUtil
     }
     
     public static int hashCode(Label lb) {
+        if (lb == null) return 0;
     	return lb.hashCode();
     }
     

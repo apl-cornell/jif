@@ -6,7 +6,7 @@ import java.util.*;
  * Abstract class representing the join of policies. All the policies should be
  * of the same kind, either all IntegPolicies or all ConfPolicies.
  */
-abstract class JoinPolicy implements Policy
+abstract class JoinPolicy extends AbstractPolicy implements Policy
 {
     private Set components; // Set of Policies
     JoinPolicy(Set policies) {
@@ -67,6 +67,10 @@ abstract class JoinPolicy implements Policy
         return false;
     }
 
+    public final int hashCode() {
+        return components.hashCode();
+    }
+    
     public final String toString() {
         String str = "";
         for (Iterator iter = components.iterator(); iter.hasNext(); ) {

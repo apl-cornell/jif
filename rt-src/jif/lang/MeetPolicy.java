@@ -6,7 +6,7 @@ import java.util.*;
  * Abstract class representing the meet of policies. All the policies should be
  * of the same kind, either all IntegPolicies or all ConfPolicies.
  */
-abstract class MeetPolicy implements Policy
+abstract class MeetPolicy extends AbstractPolicy implements Policy
 {
     private Set components; // Set of Policies    
     MeetPolicy(Set policies) {
@@ -62,6 +62,10 @@ abstract class MeetPolicy implements Policy
             return this.meetComponents().equals(that.meetComponents());
         }        
         return false;
+    }
+    
+    public final int hashCode() {
+        return components.hashCode();
     }
 
     public final String toString() {

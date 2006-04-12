@@ -2,7 +2,7 @@ package jif.lang;
 
 import java.util.*;
 
-public class WriterPolicy implements IntegPolicy
+public class WriterPolicy extends AbstractPolicy implements IntegPolicy
 {
     private final Principal owner;
     private final Principal writer;

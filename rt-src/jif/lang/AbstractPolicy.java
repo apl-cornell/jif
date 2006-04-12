@@ -9,5 +9,6 @@ import java.util.*;
  */
 public abstract class AbstractPolicy implements Policy
 {
-    
+    abstract public boolean equals(Object that);
+    abstract public int hashCode();
 }

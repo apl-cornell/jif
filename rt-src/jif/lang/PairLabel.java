@@ -27,7 +27,7 @@ public final class PairLabel implements Label
     }
     
     public int hashCode() {
-    	return confPol.hashCode() + integPol.hashCode();
+    	return confPol.hashCode() ^ integPol.hashCode();
     }
     
     public boolean equals(Object o) {
