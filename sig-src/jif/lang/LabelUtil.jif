@@ -27,5 +27,6 @@ public class LabelUtil {
     public static native boolean isReadableBy(label lbl, principal p); 
     
     public static native String stringValue(label lb); 
-    public static native String toString(label lb); 
+    public static native String toString(label lb);
+    public static native int hashCode(label lb);
 }

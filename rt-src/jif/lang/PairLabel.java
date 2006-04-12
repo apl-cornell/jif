@@ -26,6 +26,10 @@ public final class PairLabel implements Label
         return false;
     }
     
+    public int hashCode() {
+    	return confPol.hashCode() + integPol.hashCode();
+    }
+    
     public boolean equals(Object o) {
         if (o instanceof PairLabel) {
             PairLabel that = (PairLabel)o;

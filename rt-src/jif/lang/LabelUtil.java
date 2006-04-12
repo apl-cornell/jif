@@ -260,6 +260,10 @@ public class LabelUtil
         return stringValue(lb);
     }
     
+    public static int hashCode(Label lb) {
+    	return lb.hashCode();
+    }
+    
     private static Policy intern(Policy pol) {
         Policy in = (Policy)intern.get(pol);
         if (in == null) {
