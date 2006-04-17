@@ -806,6 +806,9 @@ public class JifTypeSystem_c
         if (components == null) {
             components = Collections.EMPTY_SET;
         }
+        if (components.isEmpty()) {
+            return bottomLabel(pos);
+        }
         if (components.size() == 1) {
             return (Label)components.iterator().next();
         }
@@ -816,6 +819,9 @@ public class JifTypeSystem_c
     public Label meetLabel(Position pos, Collection components) {
         if (components == null) {
             components = Collections.EMPTY_SET;
+        }
+        if (components.isEmpty()) {
+            return topLabel(pos);
         }
         if (components.size() == 1) {
             return (Label)components.iterator().next();
