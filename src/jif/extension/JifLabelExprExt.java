@@ -26,21 +26,14 @@ public class JifLabelExprExt extends Jif_c
         JifTypeSystem ts = lc.jifTypeSystem();
 
         List throwTypes = new ArrayList(le.del().throwTypes(ts));
+
         // make sure the label is runtime representable
-        lc.constrain(new LabelConstraint(new NamedLabel("label_expr",
-                                                        l),
-                                         LabelConstraint.LEQ,
-                                         new NamedLabel("RUNTIME_REPRESENTABLE",
-                                                        ts.runtimeLabel()),
-                                         A.labelEnv(),
-                                         le.position()) {
-            public String msg() {
-                return "Label expression not representable at runtime.";
-            }
-            public String detailMsg() {
-                return "A label expression must be representable at runtime. Arg labels and \"this\" labels are not represented at runtime.";
-            }
-        });
+        if (!l.isRuntimeRepresentable()) {
+            throw new SemanticDetailedException(
+                     "Label expression not representable at runtime.",
+                     "A label expression must be representable at runtime. Arg labels and \"this\" labels are not represented at runtime.",
+                     le.position());
+        }
 
         A = (JifContext) le.del().enterScope(A);
 

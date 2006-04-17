@@ -718,8 +718,7 @@ public class JifTypeSystem_c
     private Label bottom = null;
     private Label noComponents = null;
     private Label notTaken = null;
-    private Label runtime = null;
-
+    
     public Label topLabel(Position pos) {
         return pairLabel(pos, topConfPolicy(pos), topIntegPolicy(pos));
     }
@@ -760,17 +759,6 @@ public class JifTypeSystem_c
         if (notTaken == null)
             notTaken = notTaken(null);
         return notTaken;
-    }
-
-    public Label runtimeLabel(Position pos) {
-        Label t = new RuntimeLabel_c(this, pos);
-        return t;
-    }
-
-    public Label runtimeLabel() {
-        if (runtime == null)
-            runtime = runtimeLabel(null);
-        return runtime;
     }
 
     public CovariantParamLabel covariantLabel(Position pos, ParamInstance pi) {

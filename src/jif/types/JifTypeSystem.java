@@ -78,13 +78,11 @@ public interface JifTypeSystem extends ParamTypeSystem
     Label bottomLabel(Position pos);
     Label noComponentsLabel(Position pos);
     Label notTaken(Position pos);
-    Label runtimeLabel(Position pos);
 
     Label topLabel();
     Label bottomLabel();
     Label noComponentsLabel();
     Label notTaken();
-    Label runtimeLabel();
 
     /* Label methods */
     CovariantParamLabel covariantLabel(Position pos, ParamInstance pi);
