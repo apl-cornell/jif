@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 # Produce statistics on Jif code.
 # Stephen Chong
 
@@ -40,8 +40,8 @@ $inMultilineComment = 0;
 loadTokens();
 
 # patterns to recognise annotations
-$policy = "\w+|\*[\.\w]*|[\.\w]*:[\.\w]*(,[\.\w]*)*"; # needs some white space
-$label = 
+# $policy = "\w+|\*[\.\w]*|[\.\w]*:[\.\w]*(,[\.\w]*)*"; # needs some white space
+#$label = 
 
 # read in each line of the file
 while ($line = <IN>) {
