@@ -178,6 +178,9 @@ public class LabelUtil
         }
         return new JoinIntegPolicy(comps);
     }
+    public static ConfPolicy meetPol(ConfPolicy p1, ConfPolicy p2) {
+        return meet(p1, p2);
+    }
     public static ConfPolicy meet(ConfPolicy p1, ConfPolicy p2) {        
         Set comps = new LinkedHashSet();
         if (p1 instanceof MeetConfPolicy) {
@@ -198,6 +201,9 @@ public class LabelUtil
             return (ConfPolicy)comps.iterator().next();
         }
         return new MeetConfPolicy(comps);
+    }
+    public static IntegPolicy meetPol(IntegPolicy p1, IntegPolicy p2) {
+        return meet(p1, p2);
     }
     public static IntegPolicy meet(IntegPolicy p1, IntegPolicy p2) {        
         Set comps = new LinkedHashSet();
