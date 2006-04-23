@@ -257,10 +257,12 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	LabelUtil02.jif ;
 	List.jif ;
 	List2.jif ;
+    List2Test.jif ;
 	ListTest.jif ;
 	Main1.jif (Warning, "signature of.*main method.*should either be"),
                   (Semantic, "Only one static method named \"main\" allowed per class");
 	Main2.jif ;
+    MapTest.jif ;
 	Meet01.jif ;
 	Meet02.jif ;
 	Meet03.jif (Semantic, "Incompatible .* policies") ;
