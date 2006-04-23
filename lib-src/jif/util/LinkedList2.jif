@@ -48,33 +48,35 @@ public class LinkedList2[label S, label C] extends AbstractList2[S,C]
         return true;
     }
 
-    // Seems impossible to implement this interface
-//    public boolean{S} remove{S}(JifObject[C]{S} o) {
-//        LinkedListEntry2[S,C] e = head;
-//        while (e != null) {
-//            if (e.data == o || (o != null && o.equals(e.data))) {
-//                // remove it...
-//                LinkedListEntry2[S,C] f = e.prev;
-//                if (f != null) {
-//                    f.next = e.next;
-//                }
-//                f = e.next;
-//                if (f != null) {
-//                    f.prev = e.prev;
-//                }
-//                if (tail == e) {
-//                    tail = e.prev;
-//                }
-//                if (head == e) {
-//                    head = e.next;
-//                }
-//                
-//                return true;
-//            }
-//            e = e.next;
-//        }
-//        return false;
-//    }
+    	// The semantics of this method is to remove this particular object reference from the list
+    	// without looking at the value inside it. This is different from the standard remove method
+    	// available in Collections
+    public boolean{S} remove{S}(JifObject[C]{S} o) {
+        LinkedListEntry2[S,C] e = head;
+        while (e != null) {
+            if (e.data == o) {
+                // remove it...
+                LinkedListEntry2[S,C] f = e.prev;
+                if (f != null) {
+                    f.next = e.next;
+                }
+                f = e.next;
+                if (f != null) {
+                    f.prev = e.prev;
+                }
+                if (tail == e) {
+                    tail = e.prev;
+                }
+                if (head == e) {
+                    head = e.next;
+                }
+                
+                return true;
+            }
+            e = e.next;
+        }
+        return false;
+    }
 
     public JifObject[C]{S} remove{S}(int{S} index) throws (IndexOutOfBoundsException{S}) {
         int s = 0;

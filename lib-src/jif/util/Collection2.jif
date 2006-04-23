@@ -22,7 +22,8 @@ public interface Collection2[label S, label C] extends JifObject[{S;C}] {
         throws (ClassCastException{S}, IllegalArgumentException{S});
         
 //		Seems impossible to implement removing a specific object
-//    boolean{S;C} remove{S}(JifObject[C]{S} o);
+//		Could implement with slightly modified semantics, i.e. "Remove this particular object reference from the list"      
+    boolean{S;C} remove{S}(JifObject[C]{S} o);
 
 //    boolean{L;c} containsAll(Collection[L]{L} c)
 //        throws (NullPointerException{c});
