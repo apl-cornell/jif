@@ -8,10 +8,13 @@ package jif.util;
 public interface List2[label S, label C] extends Collection2[S,C] {
     JifObject[C]{S;index} get(int index):{S;index}
 	throws (IndexOutOfBoundsException{S;index});
+        
     JifObject[C]{S} set{S}(int{S} index, JifObject[C]{S} element):{S}
 	throws (IndexOutOfBoundsException{S});
+        
     void add{S}(int{S} index, JifObject[C]{S} element):{S}
 	throws (IndexOutOfBoundsException{S});
+        
     JifObject[C]{S} remove{S}(int{S} index)
 	throws (IndexOutOfBoundsException{S});
 

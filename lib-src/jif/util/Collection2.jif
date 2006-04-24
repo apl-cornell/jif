@@ -23,8 +23,10 @@ public interface Collection2[label S, label C] extends JifObject[{S;C}] {
         
 //		Seems impossible to implement removing a specific object
 //		Could implement with slightly modified semantics, i.e. "Remove this particular object reference from the list"      
-    boolean{S;C} remove{S}(JifObject[C]{S} o);
+    boolean{S;C} removeByRef{S}(JifObject[C]{S} o);
 
+    public boolean{S} remove{S}(JifObject[C]{S} o) where {C} <= {S};
+    
 //    boolean{L;c} containsAll(Collection[L]{L} c)
 //        throws (NullPointerException{c});
 //    boolean{L} addAll{L}(Collection[L]{L} c)
