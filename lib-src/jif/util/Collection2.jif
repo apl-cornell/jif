@@ -14,7 +14,7 @@ public interface Collection2[label S, label C] extends JifObject[{S;C}] {
     boolean{S} isEmpty();
     boolean{S;C;o} contains(JifObject[C] o);
     boolean{S;C;*lbl;lbl;o} contains(label lbl, JifObject[lbl] o);
-//    Iterator2[S,C]{this} iterator();
+    Iterator2[S,C]{this} iterator();
 
 //    JifObject[C]{S}[]{S} toArray{C}();
 
@@ -29,8 +29,8 @@ public interface Collection2[label S, label C] extends JifObject[{S;C}] {
     
 //    boolean{L;c} containsAll(Collection[L]{L} c)
 //        throws (NullPointerException{c});
-//    boolean{L} addAll{L}(Collection[L]{L} c)
-//        throws (ClassCastException{L}, IllegalArgumentException{L});
+    boolean{S} addAll{S}(Collection2[S,C]{S} c)
+        throws (ClassCastException{S}, IllegalArgumentException{S});
 //    boolean{L} removeAll{L}(Collection[L]{L} c);
 //    boolean{L} retainAll{L}(Collection[L]{L} c);
 

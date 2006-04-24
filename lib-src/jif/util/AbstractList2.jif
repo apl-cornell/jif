@@ -76,23 +76,59 @@ public abstract class AbstractList2[label S, label C] extends AbstractCollection
         return -1;
     }
 
+    public int{S;o} indexOfByRef(JifObject[C] o) {
+        return indexOfByRef(C, o);
+    }
+    public int{S;lbl;o} indexOfByRef(label lbl, JifObject[lbl] o) {
+        int i = 0;
+        int sz = size();
+        try {
+            while (i < sz) {
+                JifObject[C] e = get(i);
+                if (o == e) {
+                    return i;
+                }
+                i++;
+            }
+        }
+        catch (IndexOutOfBoundsException e) { /* cant happen */ }
+        return -1;
+    }
 
-//    // Iterators
-//
-//    public Iterator[L]{this} iterator() {
-//        return listIterator();
-//    }    
-//
-//    public ListIterator[L]{this} listIterator() {
-//        return new ListItr[L](this);
-//    }    
-//
-//    public ListIterator[L]{this;L} listIterator{L}(int{L} index) 
-//        throws (IndexOutOfBoundsException{L}) {
-//        if (index<0 || index>size())
-//            throw new IndexOutOfBoundsException("Index: "+index);
-//        return new ListItr[L](this, index);
-//    }    
+    public int{S;o} lastIndexOfByRef(JifObject[C] o) {
+        return lastIndexOfByRef(C, o);
+    }
+    public int{S;lbl;o} lastIndexOfByRef(label lbl, JifObject[lbl] o) {
+        int i = size() - 1;
+        try {
+            while (i >= 0) {
+                JifObject[C] e = get(i);
+                if (o == e) {
+                    return i;
+                }
+                i--;
+            }
+        }
+        catch (IndexOutOfBoundsException e) { /* cant happen */ }
+        return -1;
+    }
+
+    // Iterators
+
+    public Iterator2[S,C]{this} iterator() {
+        return listIterator();
+    }    
+
+    public ListIterator2[S,C]{this} listIterator() {
+        return new ListItr2[S,C](this);
+    }    
+
+    public ListIterator2[S,C]{this;S} listIterator{S}(int{S} index) 
+        throws (IndexOutOfBoundsException{S}) {
+        if (index<0 || index>size())
+            throw new IndexOutOfBoundsException("Index: "+index);
+        return new ListItr2[S,C](this, index);
+    }    
 
 
 
@@ -171,5 +207,150 @@ public abstract class AbstractList2[label S, label C] extends AbstractCollection
         s = s + "]";
         return s;
     }
+}
 
+class ListItr2[label S, label C]  implements ListIterator2[S,C] {
+    // This class maintains the invariant that 0 <= nextIndex <= list.size()
+    private int{S} nextIndex;
+    private int{S} lastIndexReturned;
+
+    private final List2[S,C]{this} list;
+    
+    protected ListItr2(List2[S,C]{this} l) {
+        nextIndex = 0;
+        lastIndexReturned = -1;
+        list = l;
+    }
+
+    protected ListItr2(List2[S,C]{this} l, int{S} index) {
+        nextIndex = index;
+        lastIndexReturned = -1;
+        list = l;
+    }
+    
+    public boolean{S} hasNext() {
+        List2[S,C] l = this.list;
+        
+        if (l != null) {
+            return nextIndex != l.size();
+        }
+
+        return false;
+    }
+    
+    public JifObject[C]{S} next{S}():{S} 
+        throws (NoSuchElementException) {
+            lastIndexReturned = nextIndex;
+
+            List2[S,C] l = this.list;
+            if (l == null) 
+                return null; 
+
+            if (nextIndex == l.size()) {
+                lastIndexReturned = -1;
+                throw new NoSuchElementException();
+            }
+
+            try {
+                nextIndex++;
+                return l.get(lastIndexReturned);
+            }
+            catch (IndexOutOfBoundsException e) {
+                // cannot happen...
+                return null;
+            }
+
+        }
+
+    public boolean{S} hasPrevious() {
+        List2[S,C] l = this.list;
+        
+        if (l != null) {
+            return nextIndex > 0;
+        }
+        
+        return false;
+    }
+
+    public JifObject[C]{S} previous{S}():{S} 
+        throws (NoSuchElementException) {
+            lastIndexReturned = nextIndex - 1;
+
+            List2[S,C] l = this.list;
+            if (l == null) 
+                return null;
+        
+            if (nextIndex <= 0) {
+                lastIndexReturned = -1;
+                throw new NoSuchElementException();
+            }
+        
+            try {
+                nextIndex--;
+                return l.get(lastIndexReturned);
+            }
+            catch (IndexOutOfBoundsException e) {
+                // cannot happen...
+                return null;
+            }
+        }
+
+    public int{S} nextIndex() {
+        return nextIndex;
+    }
+    
+    public int{S} previousIndex() {
+        return nextIndex-1;
+    }
+
+    public void remove{S}():{S} throws (IllegalStateException{S}) {
+        List2[S,C] l = this.list;
+        if (l == null) 
+            return;
+
+        if (nextIndex > l.size() || nextIndex <= 0)
+            throw new IllegalStateException();
+
+        try {
+            int n = nextIndex - 1;
+            l.remove(n);
+        }
+        catch (IndexOutOfBoundsException e) {
+            // cannot happen...
+        }
+        nextIndex = nextIndex - 1;
+        lastIndexReturned = -1;
+    }
+
+    public void set{S}(JifObject[C]{S} o):{S} 
+        throws (IllegalStateException{S}) {
+            List2[S,C] l = this.list;
+            if (l == null) 
+                return;
+
+            if (lastIndexReturned >= l.size() || lastIndexReturned < 0)
+                throw new IllegalStateException();
+
+            try {
+                l.set(lastIndexReturned, o);
+            }
+            catch (IndexOutOfBoundsException e) {
+                // cannot happen...
+            }
+        }
+
+    public void add{S}(JifObject[C]{S} o):{S} 
+        throws (ClassCastException{S}, IllegalArgumentException{S}) {
+            List2[S,C] l = this.list;
+            if (l == null) return;
+
+            try {
+                l.add(nextIndex, o);
+            }
+            catch (IndexOutOfBoundsException e) {
+                // cannot happen
+            }
+          
+            lastIndexReturned = -1;
+        }
 }
