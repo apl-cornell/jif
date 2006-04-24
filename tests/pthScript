@@ -357,6 +357,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Params39.jif (Semantic, "not a subtype") ;
 	Params40.jif (Semantic, "not a subtype") ;
 	Params41.jif ;
+	Params42.jif ; # return a more reasonable error.
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;

@@ -1,0 +1,3 @@
+class C[label L, label M] {
+    void remove() where L <= M;
+}
