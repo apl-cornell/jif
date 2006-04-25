@@ -28,7 +28,7 @@ public class ParamPrincipal_c extends Principal_c implements ParamPrincipal {
 
     public String toString() {
         if (Report.should_report(Report.debug, 1)) {
-            return "<pr-param " + paramInstance + ">";
+            return "<param-" + paramInstance + ">";
         }
         return paramInstance.name();
     }
