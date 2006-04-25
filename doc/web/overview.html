@@ -1,0 +1,57 @@
+<html>
+
+<head>
+<link rel=StyleSheet href="jifdoc.css" type="text/css">
+<title>Overview</title>
+</head>
+
+<body>
+
+<h1><a name="overview">Overview</a></h1>
+
+<p>
+Jif is an extension to the Java programming language that adds
+static analysis of information flow for improved security
+assurance.  The primary goal is to prevent confidential information
+from being used improperly; in some versions of Jif, the goal is
+also to protect the integrity of trusted information.
+</p>
+
+<p>
+The largest difference between Jif and Java is the addition of
+<em>labels</em> that express security policies as
+restrictions on how information may be used.
+These labels facilitate
+statically tracking information flow. The
+analysis of information flow is performed mostly statically, at
+compile time. However, Jif does also support some forms of
+run-time security enforcement.
+</p>
+
+<p>
+Static checking of information flow
+in Jif programs is performed as part of type checking. If a Jif program
+type-checks, the compiler translates it into Java code that can be
+compiled with a standard Java compiler. The Jif compiler and run-time
+system are available from the
+<a href="http://www.cs.cornell.edu/jif">Jif web site</a>.
+</p>
+
+<p>
+Jif is based on the JFlow language described in the <a
+href="http://www.cs.cornell.edu/andru/papers/popl99/myers-popl99.ps.gz">Practical
+Mostly-Static Information Flow Control</a>, published in the <i>Proceedings of the
+26th ACM Symposium on Principles of Programming Languages</i> (POPL),
+pp. 228-241, January 1999, by Andrew C. Myers.
+</p>
+
+<p>
+Another source of documentation for Jif can be found in Andrew Myers'
+thesis, linked to from the <a
+href="http://www.cs.cornell.edu/jif/">Jif web site</a>. However, the
+language has developed since that time, and some features in this
+version of Jif are not documented in the thesis.
+</p>
+</body>
+
+</html>
