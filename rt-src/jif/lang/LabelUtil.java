@@ -12,20 +12,33 @@ public class LabelUtil
     private static long totalTime = 0;
     private static long enterStartTime = 0;
     private static int callStackCount = 0;
-    private static boolean COUNT_TIME = true;
-    synchronized static void enterTiming() {
-        if (COUNT_TIME && callStackCount++ == 0) {
-            enterStartTime = System.currentTimeMillis();
+    private static boolean COUNT_TIME = false;
+    static void enterTiming() {
+        if (COUNT_TIME) {
+            synchronized (LabelUtil.class) {
+                if (callStackCount++ == 0) {
+                    enterStartTime = System.currentTimeMillis();
+                }
+            }
         }
     }
-    synchronized static void exitTiming() {
-        if (COUNT_TIME && (--callStackCount) == 0) {
-            totalTime += (System.currentTimeMillis() - enterStartTime);
+    static void exitTiming() {
+        if (COUNT_TIME) {
+            synchronized (LabelUtil.class) {
+                if ((--callStackCount) == 0) {
+                    totalTime += (System.currentTimeMillis() - enterStartTime);
+                }
+            }
         }
     }
-    public synchronized long getAndClearTime() {
-        long r = totalTime;
-        totalTime = 0;
+    public static long getAndClearTime() {
+        long r = -1;
+        if (COUNT_TIME) {
+            synchronized (LabelUtil.class) {
+                r = totalTime;
+                totalTime = 0;
+            }
+        }
         return r;        
     }
     
