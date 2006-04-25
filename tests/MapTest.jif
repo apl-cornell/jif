@@ -43,46 +43,31 @@ public class MapTest
 }
 
 class Key[label L] implements JifObject[L] {
-	private final int{this} number;
-	
-	Key(int{this} num)
-	{
-		number = num;
-	}
-	
-	public boolean{L; obj} equals(IDComparable[L] obj)
-	{
-		if(obj == null)
-		{
-			return false;
-		}
-		if(obj == this)
-		{
-			return true;
-		}
-		
-		Key[L] other = null;
-		
-		try
-		{
-			other = (Key[L])obj;
-		} catch (ClassCastException e) {return false;}
-		
-		if(other.number == this.number)
-		{
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public int{L} hashCode()
-	{
-		return number;
-	}
-	
-	public String{L} toString()
-	{
-		return "#number - " + Integer.toString(number) + " ";
-	}
+    private final int{this} number;
+    
+    Key(int{this} num) {
+        number = num;
+    }
+    
+    public boolean{L; *lbl; lbl; obj} equals(label lbl, IDComparable[lbl] obj) {
+        if(obj == this) return true;
+        if (obj instanceof Key[lbl]) {                
+            Key[lbl] other = (Key[lbl])obj;
+            
+            return (other.number == this.number);
+        }
+        
+        return false;            
+    }
+    public boolean{L; obj} equals(IDComparable[L] obj) {
+        return equals(L, obj);
+    }
+    
+    public int{L} hashCode() {
+        return number;
+    }
+    
+    public String{L} toString() {
+        return "#number - " + Integer.toString(number) + " ";
+    }
 }
