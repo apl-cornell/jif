@@ -91,7 +91,7 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         // the expression type may not yet be fully determined, but
         // that's ok, as type checking will ensure that it is
         // a suitable expression.
-        Label L = ts.dynamicLabel(position(), JifUtil.exprToAccessPath(expr, (JifContext)c));
+        Label L = JifUtil.exprToLabel(ts, expr, (JifContext)c);
         return nf.CanonicalLabelNode(position(), L);
     }
 

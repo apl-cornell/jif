@@ -1,3 +1,8 @@
 class C[label L, label M] {
-    void remove() where L <= M;
+    void remove() where L <= M { 
+        int{L} x = 5;
+        int{M} y = 5;
+        
+        y = x;
+    }
 }
