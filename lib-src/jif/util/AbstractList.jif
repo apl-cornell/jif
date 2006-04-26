@@ -97,7 +97,6 @@ public abstract class AbstractList[label L] extends AbstractCollection[L]
 
 
     // Comparison and hashing
-
     public int{L} hashCode() {
         int hashCode = 1;
         int i = 0;
@@ -149,27 +148,6 @@ public abstract class AbstractList[label L] extends AbstractCollection[L]
             i++;
         }
         return true;
-    }
-
-    //  String conversion
-
-    public String{L} toString() {
-        String s = "[";
-        int i = 0;
-        
-        int maxIndex = size() - 1;
-        while (i <= maxIndex) {
-            try {
-                JifObject[L] obj = get(i);
-                s = s + (obj==null?"null":obj.toString());
-                if (i < maxIndex)
-                    s = s + ", ";
-            }
-            catch (IndexOutOfBoundsException e) {}
-            i++;
-        }
-        s = s + "]";
-        return s;
     }
 
 }

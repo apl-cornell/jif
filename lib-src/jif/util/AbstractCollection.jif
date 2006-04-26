@@ -154,4 +154,27 @@ public abstract class AbstractCollection[label L] implements Collection[L] {
         }
         return newArray;
     }
+    
+    public String{L} toString() {
+        String s = "[";
+        int i = 0;
+        
+        while (i < size()) {
+            try {
+                JifObject[L] obj = get(i);                
+                if (obj == this) {
+                    s += "(this Collection)";
+                }
+                else {
+                    s += (obj==null?"null":obj.toString());
+                }
+                if (i < size()) s += ", ";
+            }
+            catch (IndexOutOfBoundsException e) {}
+            i++;
+        }
+        s = s + "]";
+        return s;
+    }
+    
 }

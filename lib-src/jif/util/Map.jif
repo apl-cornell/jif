@@ -41,6 +41,6 @@ public interface Map[label K, label V] extends JifObject[{K;V}] {
     // the following is removed since it can be emulated with the keySet and get methods
     //Collection[{K;V}] values();
 
-    // the following is removed since it can be emulated with the keySet and get methods
-    //Set[{K;V}] entrySet(); // Set[K] ?
+    // Set of MapEntry[K,V]
+    Set[K] entrySet(); 
 }

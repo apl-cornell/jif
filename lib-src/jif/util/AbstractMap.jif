@@ -1,5 +1,4 @@
 package jif.util;
-import jif.util.Map$Entry;
 
 /**
  * Jif Implementation of the Abstractmap class
@@ -11,14 +10,7 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
     }
     
     // Query Operations
-    
-    public int{K} size() {
-        try {
-            return keySet().size();
-        } 
-        catch (NullPointerException unlikely) {return 0;}
-    }
-    
+        
     public boolean{K} isEmpty() {
         return size() == 0;
     }
@@ -26,17 +18,7 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
     public boolean{K;key} containsKey(JifObject[K] key)
     {
         return containsKey(K, key);
-    }
-    public boolean{K;*lbl;lbl;key} containsKey(label lbl, JifObject[lbl] key)
-    {
-        try {
-            return keySet().contains(lbl, key);
-        }         
-        catch (NullPointerException unlikely) {}
-        
-        return false;
-    }
-    
+    }    
     public JifObject[V]{K; key} get(JifObject[K] key) {
         return get(K, key);
     }
@@ -67,14 +49,7 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
      catch (ClassCastException unlikely) {}
      }
      */
-    
-    public void clear{K}() {
-        try
-        {
-            keySet().clear();
-        } catch (NullPointerException unlikely) {}
-    }
-    
+        
     public final boolean{K;key} containsKey{K}(String{K} key) {
         return this.containsKey(new JifString[K](key));
     }
@@ -94,237 +69,128 @@ public abstract class AbstractMap[label K, label V] implements Map[K,V] {
     
     // Views
     
-    /**
-     * Each of these fields are initialized to contain an instance of the
-     * appropriate view the first time this view is requested.  The views are
-     * stateless, so there's no reason to create more than one of each.
-     */
-    //final transient volatile Set[K]{this}       keySet = null;
-    //transient volatile Collection[V] values = null;
+    public Set[K] keySet() {
+        return new AbstractMapKeySet[K,V](this);
+    }
+    protected Iterator[K] entrySetIterator() {
+        Set[K] es = entrySet();
+        if (es != null) return es.iterator();
+        return null;
+    }
     
+    // Comparison and hashing    
+    public boolean{K;V;o} equals(IDComparable[{K;V}] o)
+    {
+        return equals(new label {K;V}, o);
+    }
+    public boolean{K;V; *lbl; lbl; o} equals(label lbl, IDComparable[lbl] o) {
+        if (o == this) return true;        
+        if (!(o instanceof Map[K,V])) return false;
+        
+        Map[K,V] t = (Map[K,V])o;
+        if (t.size() != size()) return false;
+        
+        try {
+            Set[K] es = entrySet();
+            for (int i = 0; es != null && i < es.size(); i++) {
+                MapEntry[K,V] e = (MapEntry[K,V])es.get(i);
+                if (e == null) continue;
+                JifObject[K] key = e.getKey();
+                JifObject[V] value = e.getValue();
+                if (value == null) {
+                    if (!(t.get(key)==null && t.containsKey(key))) {
+                        return false;
+                    }
+                } else {
+                    if (!value.equals(t.get(key)))
+                        return false;
+                }
+            }
+        } 
+        catch(ClassCastException unused) { return false; } 
+        catch (IndexOutOfBoundsException imposs) { }        
+        return true;
+    }
+    public int{K;V} hashCode() {
+        int h=0;        
+        Set[K] es = entrySet();
+        for (int i = 0; es != null && i < es.size(); i++) {
+            try {
+                MapEntry[K,V] e = (MapEntry[K,V])es.get(i);
+                h += e==null?0:e.hashCode();
+            }
+            catch (ClassCastException imposs) { }
+            catch (IndexOutOfBoundsException imposs) { }
+        }
+        return h;        
+    }
+        
+    public String{K;V} toString() {
+        String buf = "{";
+        Set[K] es = entrySet();
+        for (int i = 0; es != null && i < es.size(); i++) {
+            try {
+                MapEntry[K,V] e = (MapEntry[K,V])es.get(i);
+                if (e == null) continue;
+                JifObject[K] key = e.getKey();
+                JifObject[V] value = e.getValue();
+                String k = key == this ?"(this Map)" : (key==null?"null":key.toString());
+                String v = value == this ?"(this Map)" : (value==null?"null":value.toString());
+                buf += (k + "=" + v);
+                if (i < es.size()-1) buf += ", ";
+            }
+            catch (NullPointerException ignore) { }
+            catch (ClassCastException ignore) { }
+            catch (IndexOutOfBoundsException imposs) { }
+        }
+        return buf + "}";            
+    }
+}
+
+class AbstractMapKeySet[label K, label V] extends AbstractSet[K] {
+    private final Set[K]{this} parentEntrySet;
+    private final AbstractMap[K,V]{this} parent;
+    AbstractMapKeySet(AbstractMap[K,V]{this} parent) {
+        this.parent = parent;
+        this.parentEntrySet = parent==null?null:parent.entrySet();
+        super();
+    }
+    public Iterator[K] iterator() {
+        return new AbstractMapKeySetIterator[K,V](parent); 
+    }
+
+    public JifObject[K]{K;index} get(int index):{K;index} throws (IndexOutOfBoundsException{K;index}) {
+        JifObject[K] n = parentEntrySet==null?null:parentEntrySet.get(index);
+        if (n instanceof MapEntry[K,V]) return ((MapEntry[K,V])n).getKey(); 
+        return null;
+    }
+
+    public int{K} size() {
+        return parent==null?0:parent.size();
+    }
     
-    public abstract Set[K] keySet();
-    /*
-     public Set[K] keySet() {
-     if (keySet == null) {
-     keySet = new AbstractMap$AbstractSet[K,V](this);
-     }
-     return keySet;
-     }
-     */
-    
-    /**
-     * Returns a collection view of the values contained in this map.  The
-     * collection is backed by the map, so changes to the map are reflected in
-     * the collection, and vice-versa.  (If the map is modified while an
-     * iteration over the collection is in progress, the results of the
-     * iteration are undefined.)  The collection supports element removal,
-     * which removes the corresponding entry from the map, via the
-     * <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>,
-     * <tt>removeAll</tt>, <tt>retainAll</tt> and <tt>clear</tt> operations.
-     * It does not support the <tt>add</tt> or <tt>addAll</tt> operations.<p>
-     *
-     * This implementation returns a collection that subclasses abstract
-     * collection.  The subclass's iterator method returns a "wrapper object"
-     * over this map's <tt>entrySet()</tt> iterator.  The size method
-     * delegates to this map's size method and the contains method delegates
-     * to this map's containsValue method.<p>
-     *
-     * The collection is created the first time this method is called, and
-     * returned in response to all subsequent calls.  No synchronization is
-     * performed, so there is a slight chance that multiple calls to this
-     * method will not all return the same Collection.
-     *
-     * @return a collection view of the values contained in this map.
-     */
-    
-    //public abstract Collection[V] values();
-    /*
-     public Collection[V] values()
-     {
-     if (values == null) {
-     values = new AbstractMap$AbstractCollection[K, V](this);
-     }
-     return values;
-     }
-     */
-    
-    /**
-     * Returns a set view of the mappings contained in this map.  Each element
-     * in this set is a Map.Entry.  The set is backed by the map, so changes
-     * to the map are reflected in the set, and vice-versa.  (If the map is
-     * modified while an iteration over the set is in progress, the results of
-     * the iteration are undefined.)  The set supports element removal, which
-     * removes the corresponding entry from the map, via the
-     * <tt>Iterator.remove</tt>, <tt>Set.remove</tt>, <tt>removeAll</tt>,
-     * <tt>retainAll</tt> and <tt>clear</tt> operations.  It does not support
-     * the <tt>add</tt> or <tt>addAll</tt> operations.
-     *
-     * @return a set view of the mappings contained in this map.
-     */
-    //public abstract Set[K] entrySet();
-    
-    
-    // Comparison and hashing
-    
-    /**
-     * Compares the specified object with this map for equality.  Returns
-     * <tt>true</tt> if the given object is also a map and the two maps
-     * represent the same mappings.  More formally, two maps <tt>t1</tt> and
-     * <tt>t2</tt> represent the same mappings if
-     * <tt>t1.keySet().equals(t2.keySet())</tt> and for every key <tt>k</tt>
-     * in <tt>t1.keySet()</tt>, <tt> (t1.get(k)==null ? t2.get(k)==null :
-     * t1.get(k).equals(t2.get(k))) </tt>.  This ensures that the
-     * <tt>equals</tt> method works properly across different implementations
-     * of the map interface.<p>
-     *
-     * This implementation first checks if the specified object is this map;
-     * if so it returns <tt>true</tt>.  Then, it checks if the specified
-     * object is a map whose size is identical to the size of this set; if
-     * not, it it returns <tt>false</tt>.  If so, it iterates over this map's
-     * <tt>entrySet</tt> collection, and checks that the specified map
-     * contains each mapping that this map contains.  If the specified map
-     * fails to contain such a mapping, <tt>false</tt> is returned.  If the
-     * iteration completes, <tt>true</tt> is returned.
-     *
-     * @param o object to be compared for equality with this map.
-     * @return <tt>true</tt> if the specified object is equal to this map.
-     */
-    
-    
-    /*
-     public boolean{K;V;o} equals{K}(IDComparable[{K;V}] o) {
-     if (o == this)
-     return true;
-     
-     if (!(o instanceof Map[K,V]))
-     return false;
-     Map[K,V] t = (Map[K,V]) o;
-     if (t.size() != size())
-     return false;
-     
-     try {
-     Iterator[K] i = entrySet().iterator();
-     while (i.hasNext()) {
-     Map$Entry[K,V] e = (Map$Entry[K,V]) i.next();
-     JifObject[K] key = e.getKey();
-     JifObject[V] value = e.getValue();
-     if (value == null) {
-     if (!(t.get(key)==null && t.containsKey(key)))
-     return false;
-     } else {
-     if (!value.equals(t.get(key)))
-     return false;
-     }
-     }
-     } catch(ClassCastException unused)   {
-     return false;
-     } catch(NullPointerException unused) {
-     return false;
-     } catch (NoSuchElementException unlikely) {
-     return false;
-     }
-     
-     return true;
-     }
-     */
-    
-    /**
-     * Returns the hash code value for this map.  The hash code of a map is
-     * defined to be the sum of the hash codes of each entry in the map's
-     * <tt>entrySet()</tt> view.  This ensures that <tt>t1.equals(t2)</tt>
-     * implies that <tt>t1.hashCode()==t2.hashCode()</tt> for any two maps
-     * <tt>t1</tt> and <tt>t2</tt>, as required by the general contract of
-     * Object.hashCode.<p>
-     *
-     * This implementation iterates over <tt>entrySet()</tt>, calling
-     * <tt>hashCode</tt> on each element (entry) in the Collection, and adding
-     * up the results.
-     *
-     * @return the hash code value for this map.
-     * @see Map.Entry#hashCode()
-     * @see Object#hashCode()
-     * @see Object#equals(Object)
-     * @see Set#equals(Object)
-     */
-    /*
-     public int{K} hashCode() {
-     int{K} h = 0;
-     try
-     {
-     Iterator[K] i = entrySet().iterator();
-     while (i.hasNext())
-     h += i.next().hashCode();
-     } catch (NullPointerException unlikely) {}
-     catch (NoSuchElementException unlikely) {}
-     
-     return h;
-     }
-     */
-    
-    /**
-     * Returns a string representation of this map.  The string representation
-     * consists of a list of key-value mappings in the order returned by the
-     * map's <tt>entrySet</tt> view's iterator, enclosed in braces
-     * (<tt>"{}"</tt>).  Adjacent mappings are separated by the characters
-     * <tt>", "</tt> (comma and space).  Each key-value mapping is rendered as
-     * the key followed by an equals sign (<tt>"="</tt>) followed by the
-     * associated value.  Keys and values are converted to strings as by
-     * <tt>String.valueOf(Object)</tt>.<p>
-     *
-     * This implementation creates an empty string buffer, appends a left
-     * brace, and iterates over the map's <tt>entrySet</tt> view, appending
-     * the string representation of each <tt>map.entry</tt> in turn.  After
-     * appending each entry except the last, the string <tt>", "</tt> is
-     * appended.  Finally a right brace is appended.  A string is obtained
-     * from the stringbuffer, and returned.
-     *
-     * @return a String representation of this map.
-     */
-    /*
-     public String{K;V} toString() {
-     
-     String buf = "";
-     
-     try
-     {
-     
-     buf = buf + "{";
-     
-     Iterator[{K;V}] i = entrySet().iterator();
-     boolean hasNext = i.hasNext();
-     while (hasNext) {
-     Map$Entry[K,V] e = (Map$Entry[K,V]) (i.next());
-     JifObject[K] key = e.getKey();
-     JifObject[V] value = e.getValue();
-     buf = buf + ((key == this ?"(this Map)" : key.toString()) + "=" + 
-     (value == this ? "(this Map)": value.toString()));
-     
-     hasNext = i.hasNext();
-     if (hasNext)
-     buf = buf + ", ";
-     }
-     
-     buf = buf + "}";
-     } catch (NullPointerException unlikely) {}
-     catch (NoSuchElementException unlikely) {}
-     catch (ClassCastException unlikely) {}
-     return buf;
-     }
-     */
-    
-    /**
-     * Returns a shallow copy of this <tt>AbstractMap</tt> instance: the keys
-     * and values themselves are not cloned.
-     *
-     * @return a shallow copy of this map.
-     */
-    /*
-     protected JifObject[{K;V}] clone() throws CloneNotSupportedException {
-     AbstractMap result = (AbstractMap)super.clone();
-     result.keySet = null;
-     result.values = null;
-     return result;
-     }
-     */
+    public boolean{K;*lbl;lbl;o} contains(label lbl, JifObject[lbl] o) {
+        return parent==null?false:parent.containsKey(lbl, o);
+    }
+}
+
+class AbstractMapKeySetIterator[label K, label V] implements Iterator[K] {
+    private final Iterator[K]{this} i;
+    AbstractMapKeySetIterator(AbstractMap[K,V]{this} parent) {
+        i = parent==null?null:parent.entrySetIterator();
+    }
+
+    public boolean{K} hasNext() {
+        return i==null?false:i.hasNext();
+    }
+
+    public JifObject[K]{K} next{K}() throws (NoSuchElementException{K}) {
+        JifObject[K] n = (i==null?null:i.next());
+        if (n instanceof MapEntry[K,V]) return ((MapEntry[K,V])n).getKey(); 
+        return null;
+    }
+
+    public void remove{K}() throws (IllegalStateException{K}) {
+        if (i != null) i.remove();
+    }
 }
