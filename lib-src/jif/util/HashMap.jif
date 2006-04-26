@@ -543,142 +543,6 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
         size++;
     }
 
-//    private abstract class HashIterator implements Iterator {
-//        Entry next;                  // next entry to return
-//        int expectedModCount;        // For fast-fail 
-//        int index;                   // current slot 
-//        Entry current;               // current entry
-//
-//        HashIterator() {
-//            expectedModCount = modCount;
-//            Entry[] t = table;
-//            int i = t.length;
-//            Entry n = null;
-//            if (size != 0) { // advance to first entry
-//                while (i > 0 && (n = t[--i]) == null)
-//                    ;
-//            }
-//            next = n;
-//            index = i;
-//        }
-//
-//        public boolean hasNext() {
-//            return next != null;
-//        }
-//
-//        Entry nextEntry() { 
-//            if (modCount != expectedModCount)
-//                throw new ConcurrentModificationException();
-//            Entry e = next;
-//            if (e == null) 
-//                throw new NoSuchElementException();
-//                
-//            Entry n = e.next;
-//            Entry[] t = table;
-//            int i = index;
-//            while (n == null && i > 0)
-//                n = t[--i];
-//            index = i;
-//            next = n;
-//            return current = e;
-//        }
-//
-//        public void remove() {
-//            if (current == null)
-//                throw new IllegalStateException();
-//            if (modCount != expectedModCount)
-//                throw new ConcurrentModificationException();
-//            Object k = current.key;
-//            current = null;
-//            HashMap.this.removeEntryForKey(k);
-//            expectedModCount = modCount;
-//        }
-//
-//    }
-//
-//    private class ValueIterator extends HashIterator {
-//        public Object next() {
-//            return nextEntry().value;
-//        }
-//    }
-//
-//    private class KeyIterator extends HashIterator {
-//        public Object next() {
-//            return nextEntry().getKey();
-//        }
-//    }
-//
-//    private class EntryIterator extends HashIterator {
-//        public Object next() {
-//            return nextEntry();
-//        }
-//    }
-
-//    // Subclass overrides these to alter behavior of views' iterator() method
-//    Iterator newKeyIterator()   {
-//        return new KeyIterator();
-//    }
-//    Iterator newValueIterator()   {
-//        return new ValueIterator();
-//    }
-//    Iterator newEntryIterator()   {
-//        return new EntryIterator();
-//    }
-
-
-    // Views
-
-//    private transient Set entrySet = null;
-
-//    private class KeySet extends AbstractSet {
-//        public Iterator iterator() {
-//            return newKeyIterator();
-//        }
-//        public int size() {
-//            return size;
-//        }
-//        public boolean contains(Object o) {
-//            return containsKey(o);
-//        }
-//        public boolean remove(Object o) {
-//            return HashMap.this.removeEntryForKey(o) != null;
-//        }
-//        public void clear() {
-//            HashMap.this.clear();
-//        }
-//    }
-//
-//    /**
-//     * Returns a collection view of the values contained in this map.  The
-//     * collection is backed by the map, so changes to the map are reflected in
-//     * the collection, and vice-versa.  The collection supports element
-//     * removal, which removes the corresponding mapping from this map, via the
-//     * <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>,
-//     * <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt> operations.
-//     * It does not support the <tt>add</tt> or <tt>addAll</tt> operations.
-//     *
-//     * @return a collection view of the values contained in this map.
-//     */
-//    public Collection values() {
-//        Collection vs = values;
-//        return (vs != null ? vs : (values = new Values()));
-//    }
-//
-//    private class Values extends AbstractCollection {
-//        public Iterator iterator() {
-//            return newValueIterator();
-//        }
-//        public int size() {
-//            return size;
-//        }
-//        public boolean contains(Object o) {
-//            return containsValue(o);
-//        }
-//        public void clear() {
-//            HashMap.this.clear();
-//        }
-//    }
-//
     /**
      * Returns a collection view of the mappings contained in this map.  Each
      * element in the returned collection is a <tt>Map.Entry</tt>.  The
@@ -695,6 +559,60 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
     public Set[K] entrySet() {
         return entrySet;
     }
+    
+    public boolean{K;V; *lbl; lbl; o} equals(label lbl, IDComparable[lbl] o) {
+        if (o == this) return true;        
+        if (!(o instanceof Map[K,V])) return false;
+        
+        Map[K,V] t = (Map[K,V])o;
+        if (t.size() != size()) return false;
+        
+        HashMapEntry[K,V] e = header;
+        while (e != null && e.after != header) {
+            e = e.after;
+            if (e == null) continue;
+            JifObject[K] key = e.getKey();
+            JifObject[V] value = e.getValue();
+            if (value == null) {
+                if (!(t.get(key)==null && t.containsKey(key))) {
+                    return false;
+                }
+            } else {
+                if (!value.equals(t.get(key)))
+                    return false;
+            }                
+        }
+        return true;
+    }
+    public int{K;V} hashCode() {
+        int h=0;        
+        HashMapEntry[K,V] e = header;
+        while (e != null && e.after != header) {
+            e = e.after;
+            h += e==null?0:e.hashCode();
+        }
+        return h;        
+    }
+        
+    public String{K;V} toString() {
+        String buf = "{";
+        HashMapEntry[K,V] e = header;
+        while (e != null && e.after != header) {
+            e = e.after;
+            if (e == null) continue;
+            try {
+                JifObject[K] key = e.getKey();
+                JifObject[V] value = e.getValue();
+                String k = key == this ?"(this Map)" : (key==null?"null":key.toString());
+                String v = value == this ?"(this Map)" : (value==null?"null":value.toString());
+                buf += (k + "=" + v);
+                if (e.after != header) buf += ", ";
+            }
+            catch (NullPointerException ignore) { }
+        }
+        return buf + "}";            
+    }
+    
 }
 
 class HashMapEntry[label K, label V] implements MapEntry[K,V] {
@@ -833,7 +751,11 @@ class HashMapEntrySetIterator[label K, label V] implements Iterator[K] {
     }
 
     public boolean{K} hasNext() {
-        if (next == null) return false;
+        if (next == null) {
+            // haven't initialized current and next yet.
+            // hasNext if the map is non-empty
+            return (parent==null?-1:parent.size()) > 0;            
+        }
         return next != (parent==null?null:parent.header);
     }
 
