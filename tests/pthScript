@@ -262,7 +262,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Main1.jif (Warning, "signature of.*main method.*should either be"),
                   (Semantic, "Only one static method named \"main\" allowed per class");
 	Main2.jif ;
-    MapTest.jif ;
+	MapTest.jif ;
 	Meet01.jif ;
 	Meet02.jif ;
 	Meet03.jif (Semantic, "Incompatible .* policies") ;
@@ -414,6 +414,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 //KNOWN BAD: needs a fix in Polyglot	RuntimeParams26.jif (Semantic, "@@@@@"); // should be an initialization error
 	RuntimeParams27.jif ;
 	RuntimeParams28.jif (Semantic, "runtime.*representable");
+	SetTest.jif ;
 	ShortCircuit01.jif (Semantic, "more restrictive");
 	ShortCircuit02.jif (Semantic, "not less restrictive");
 	ShortCircuit03.jif (Semantic, "not less restrictive");
