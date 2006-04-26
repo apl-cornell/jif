@@ -168,10 +168,9 @@ public abstract class AbstractCollection[label L] implements Collection[L] {
                 else {
                     s += (obj==null?"null":obj.toString());
                 }
-                if (i < size()) s += ", ";
+                if (++i < size()) s += ", ";
             }
             catch (IndexOutOfBoundsException e) {}
-            i++;
         }
         s = s + "]";
         return s;
