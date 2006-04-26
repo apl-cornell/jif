@@ -1,6 +1,6 @@
 package jif.extension;
 
-import java.util.Iterator;
+import java.util.*;
 
 import jif.types.*;
 import jif.types.label.Label;
@@ -227,28 +227,38 @@ public class SubtypeChecker
 	    JifClassType sub = (JifClassType) unlblSubtype;
 	    JifClassType sup = (JifClassType) unlblSupertype;
 
-	    if (ts.equals(polyTypeForClass(sub), polyTypeForClass(sup))) {
-		// Insert constraints between parameters.
-		addParamConstraints(lc, pos, sup, sub);
-		return true;
-	    }
-	    else {
-		// Search for some super type of sub.
-		Type subParent = sub.superType();
-
-		if (subParent != null && 
-			recursiveAddSubtypeConstraints(lc, pos, sup, subParent, inArrayType)) 
-			return true;
-
-		for (Iterator iter = sub.interfaces().iterator(); iter.hasNext(); ) {
-		    Type subInterface = (Type) iter.next();
-
-		    if (recursiveAddSubtypeConstraints(lc, pos, sup, subInterface, inArrayType)) 
-			return true;
-		}
-
-		return false;
-	    }
+            
+            LinkedList subPossibles = new LinkedList();
+            subPossibles.add(sub);
+            Set checkedPossibles = new HashSet();
+            while (!subPossibles.isEmpty()) {
+                JifClassType poss = (JifClassType)subPossibles.removeFirst();
+                if (ts.equals(polyTypeForClass(poss), polyTypeForClass(sup))) {
+                    // Insert constraints between parameters.
+                    addParamConstraints(lc, pos, sup, poss);
+                    return true;
+                }
+                // poss isn't the appropriate polytype.
+                checkedPossibles.add(poss);
+                
+                // add the superclass and all interfaces of poss to the set of candidates.
+                Type possParent = poss.superType();
+                if (possParent instanceof JifClassType && 
+                        !checkedPossibles.contains(possParent) && 
+                        !subPossibles.contains(possParent)) {
+                    subPossibles.add(possParent);
+                }
+                
+                for (Iterator iter = poss.interfaces().iterator(); iter.hasNext(); ) {
+                    Type possInterface = (Type) iter.next();
+                    if (possInterface instanceof JifClassType && 
+                            !checkedPossibles.contains(possInterface) && 
+                            !subPossibles.contains(possInterface)) {
+                        subPossibles.add(possInterface);
+                    }
+                }
+            }
+            return false;
 	}
 	
         if (unlblSubtype instanceof ArrayType && unlblSupertype instanceof ArrayType) {
