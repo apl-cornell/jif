@@ -29,9 +29,9 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
     transient HashMapEntry[K,V]{K}[]{K} table;
     
     /**
-     * the list of entries, used to give the key set a precise order
+     * Head of the doubly linked list of entries.
      */
-    transient LinkedList[K]{K} entryList;
+    HashMapEntry[K,V]{K} header;
 
     /**
      * Just use a single entry set, for efficiency
@@ -75,7 +75,6 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
         this.loadFactor = loadFactor;
         threshold = (int)(capacity * loadFactor);
         table = new HashMapEntry[K,V][capacity];
-        entryList = new LinkedList[K]();
         entrySet = new HashMapEntrySet[K,V](this);
         super();
         init();
@@ -93,7 +92,6 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
         this.loadFactor = DEFAULT_LOAD_FACTOR;
         threshold = (int)(DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
         table = new HashMapEntry[K,V][DEFAULT_INITIAL_CAPACITY];
-        entryList = new LinkedList[K]();
         entrySet = new HashMapEntrySet[K,V](this);
         super();
         init();
@@ -115,6 +113,11 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
      * require explicit knowledge of subclasses.)
      */
     void init{K}() {
+        // set up the doubly linked list
+        HashMapEntry[K,V] h = new HashMapEntry[K,V](-1, null, null, null);
+        header = h;
+        h.before = header;
+        h.after = header;
     }
 
     /**
@@ -196,25 +199,28 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
     }
 
 
-//    /**
-//     * Returns the entry associated with the specified key in the
-//     * HashMap.  Returns null if the HashMap contains no mapping
-//     * for this key.
-//     */
-//    Entry getEntry(Object key) {
-//        Object k = maskNull(key);
-//        int hash = hash(k);
-//        int i = indexFor(hash, table);
-//    HashMapEntry[K,V] e = null;
-//    try {
-//        e = table[i]; 
-//    }
-//    catch (NullPointerException imposs) { }
-//    catch (ArrayIndexOutOfBoundsException imposs) { }
-//        while (e != null && !(e.hash == hash && eq(k, e.key)))
-//            e = e.next;
-//        return e;
-//    }
+    /**
+     * Returns the entry associated with the specified key in the
+     * HashMap.  Returns null if the HashMap contains no mapping
+     * for this key.
+     */
+    HashMapEntry[K,V]{K; *lbl; lbl; key} getEntry(label lbl, JifObject[lbl] key) {
+        int hash = hash(lbl, key);
+        int i = indexFor(hash, table);
+        HashMapEntry[K,V] e = null;
+        try {
+            e = table[i]; 
+        }
+        catch (NullPointerException imposs) { }
+        catch (ArrayIndexOutOfBoundsException imposs) { }
+        while (true) {
+            if (e == null) return null;
+            if (e.hash == hash && eq(lbl, key, K, e.key)) {
+                return e;
+            }
+            e = e.next;
+        }
+    }
   
     public JifObject[V]{K} put{K}(JifObject[K]{K} key, JifObject[V]{K} value) {
         int hash = hash(K, key);
@@ -362,8 +368,6 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
                 else if (prev != null) {
                     prev.next = next;
                 }
-                List[K] els = entryList;
-                if (els != null) els.remove(e);                
                 e.recordRemoval(this);
                 return e;
             }
@@ -410,8 +414,6 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
                     if (prev != null) prev.next = next;
                 }
 
-                List[K] els = entryList;
-                if (els != null) els.remove(e);                
                 e.recordRemoval(this);
                 return e;
             }
@@ -435,8 +437,12 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
         catch (ArrayIndexOutOfBoundsException imposs) { }
         catch (ArrayStoreException imposs) { }
         size = 0;
-        List[K] els = entryList;
-        if (els != null) els.clear();                
+        // clear the doubly linked list
+        try {
+            header.before = header;
+            header.after = header;
+        }
+        catch (NullPointerException imposs) { }
     }
 
 //    /**
@@ -507,7 +513,7 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
         try {
             e = new HashMapEntry[K,V](hash, key, value, table[bucketIndex]);
             table[bucketIndex] = e;
-            entryList.add(e);
+            e.addBefore(header);
             if (size++ >= threshold) 
                 resize(2 * table.length);
         }
@@ -529,7 +535,7 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
         try {
             e = new HashMapEntry[K,V](hash, key, value, table[bucketIndex]);
             table[bucketIndex] = e;
-            entryList.add(e);
+            e.addBefore(header);
         }
         catch (NullPointerException imposs) { }
         catch (ArrayIndexOutOfBoundsException imposs) { }
@@ -697,6 +703,9 @@ class HashMapEntry[label K, label V] implements MapEntry[K,V] {
     final int{this} hash;
     HashMapEntry[K,V]{K} next;
 
+    HashMapEntry[K,V]{K} before;
+    HashMapEntry[K,V]{K} after;
+    
     /**
      * Create new entry.
      */
@@ -736,6 +745,16 @@ class HashMapEntry[label K, label V] implements MapEntry[K,V] {
         return (key==null ? "null" : key.toString()) + " entry";
     }
 
+    void addBefore{K}(HashMapEntry[K,V]{K} existingEntry) {
+        try {
+            this.after  = existingEntry;
+            this.before = existingEntry.before;
+            this.before.after = this;
+            this.after.before = this;
+        }
+        catch (NullPointerException imposs) { }            
+    }
+    
     /**
      * This method is invoked whenever the value in an entry is
      * overwritten by an invocation of put(k,v) for a key k that's already
@@ -749,6 +768,12 @@ class HashMapEntry[label K, label V] implements MapEntry[K,V] {
      * removed from the table.
      */
     void recordRemoval(HashMap[K,V]{this} m) {
+        // update the doubly linked list.
+        try {
+            before.after = after;
+            after.before = before;
+        }
+        catch (NullPointerException imposs) { }
     }
     
 }
@@ -764,9 +789,17 @@ class HashMapEntrySet[label K, label V] extends AbstractSet[K] {
     }
 
     public JifObject[K]{K;index} get(int index):{K;index} throws (IndexOutOfBoundsException{K;index}) {
-        List[K] els = parent==null?null:parent.entryList;
-        if (els == null) return null;
-        return els.get(index);
+        if (index < 0 || index >= size()) throw new IndexOutOfBoundsException();
+        try {
+            HashMapEntry[K,V] c = parent.header.after;
+    
+            for (int i = 0; i < index; i++) {
+                c = c.after;
+            }
+            return c;
+        }
+        catch (NullPointerException imposs) { }
+        return null;
     }
 
     public int{K} size() {
@@ -774,9 +807,11 @@ class HashMapEntrySet[label K, label V] extends AbstractSet[K] {
     }
     
     public boolean{K;*lbl;lbl;o} contains(label lbl, JifObject[lbl] o) {
-        List[K] els = parent==null?null:parent.entryList;
-        if (els == null) return false;
-        return els.contains(lbl, o);
+        if (o instanceof HashMapEntry[K,V] && parent != null) {
+            HashMapEntry[K,V] e = (HashMapEntry[K,V])o;
+            return parent.getEntry(K, e.key) == o;
+        }
+        return false;
     }
 
     public boolean{K} remove{K}(JifObject[K]{K} o) {
@@ -790,34 +825,47 @@ class HashMapEntrySet[label K, label V] extends AbstractSet[K] {
 
 class HashMapEntrySetIterator[label K, label V] implements Iterator[K] {
     private final HashMap[K,V]{this} parent;
-    private final Iterator[K]{this} i;
-    JifObject[K]{K} current = null;               // current entry
+    private HashMapEntry[K, V]{K} current = null;
+    private HashMapEntry[K, V]{K} next = null;
 
     HashMapEntrySetIterator(HashMap[K,V]{this} parent) {
-        this.parent = parent;
-        List[K] els = parent==null?null:parent.entryList;
-        this.i = els==null?null:els.iterator();
+        this.parent = parent;        
     }
 
     public boolean{K} hasNext() {
-        return i==null?false:i.hasNext();
+        if (next == null) return false;
+        return next != (parent==null?null:parent.header);
     }
 
     public JifObject[K]{K} next{K}() throws (NoSuchElementException{K}) {
-        if (i == null) return null;
-        current = null; // assign current null first, in case next() throws exception
-        current = i.next();
-        return current;
+        if (parent != null) {
+            if (next == null) {
+                // initialization that we couldn't do in the constructor.
+                try {
+                    current = parent.header;
+                    next = current.after;
+                }
+                catch (NullPointerException imposs) { }
+            }
+
+            if (next == parent.header) throw new NoSuchElementException();
+            current = next; // assign current null first, in case next() throws exception
+            try {
+                next = current.after;
+            }
+            catch (NullPointerException imposs) { }
+            return current;
+        }
+        return null;
     }
 
     public void remove{K}() throws (IllegalStateException{K}) {
-        if (current == null || parent == null) throw new IllegalStateException();
-        try {
-            HashMapEntry[K,V] c = (HashMapEntry[K,V])current;
+        if (parent != null) {
+            if (current == null || current == parent.header) throw new IllegalStateException();
+            HashMapEntry[K,V] c = current;
             JifObject[K] k = c==null?null:c.key;
-            current = null;
+            current = parent.header;
             parent.removeEntryForKey(k);
         }
-        catch (ClassCastException imposs) { }
     }
 }
