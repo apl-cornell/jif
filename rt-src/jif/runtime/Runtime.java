@@ -37,7 +37,7 @@ public class Runtime {
     /** Get the current user  */
     public static Principal user(Principal parameter) {
         String username = currentUser();
-        return (new NativePrincipal(username));
+        return NativePrincipal.getInstance(username);
     }
 
     /**

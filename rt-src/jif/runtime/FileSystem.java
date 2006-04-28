@@ -17,13 +17,13 @@ public class FileSystem
         
         List readerList = new LinkedList();
         for (int i = 0; readers != null && i < readers.length; i++) {
-            readerList.add(new NativePrincipal(readers[i]));
+            readerList.add(NativePrincipal.getInstance(readers[i]));
         }
 //        List writerList = new LinkedList();            
 //        for (int i = 0; i < writers.length; i++) {
 //            writerList.add(new NativePrincipal(writers[i]));
 //        }
-        jif.lang.Principal op = new NativePrincipal(owner);
+        jif.lang.Principal op = NativePrincipal.getInstance(owner);
         return LabelUtil.readerPolicyLabel(op, readerList);
     }
     

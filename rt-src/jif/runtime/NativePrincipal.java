@@ -8,10 +8,22 @@ import jif.lang.*;
  * A NativePrincipal represents the file system users and groups.
  */
 public class NativePrincipal implements Principal {
+    
+    static private final Map allNatives = new LinkedHashMap();  
+
+    static NativePrincipal getInstance(String name) {
+        NativePrincipal p = (NativePrincipal)allNatives.get(name);
+        if (p == null) {
+            p = new NativePrincipal(name);
+            allNatives.put(name,p);            
+        }
+        return p;
+    }
+    
     private final String name;
     protected final Set superiors = new LinkedHashSet();
-    
-    protected NativePrincipal(String name) {
+            
+    private NativePrincipal(String name) {
         this.name = name;
     }
 
@@ -22,6 +34,12 @@ public class NativePrincipal implements Principal {
     public Set superiors() {
         return this.superiors;
     }
+
+//    public void addDelegateTo(Principal superior) {
+//        if (!this.equals(superior)) {  // avoid cyclic dependency
+//            superiors.add(superior);
+//        }
+//    }
 
     public boolean delegatesTo(Principal p) {
         return superiors.contains(p);
