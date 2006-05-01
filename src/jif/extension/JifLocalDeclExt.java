@@ -57,34 +57,36 @@ public class JifLocalDeclExt extends JifStmtExt_c
         }                            
         
         // Equate the variable label with the declared label.
-        VarLabel L = (VarLabel)li.label();
+        Label L = li.label();
         Type t = decl.declType();
-        
-        if (ts.isLabeled(t)) {
-            Label declaredLabel = ts.labelOfType(t);
-
-            lc.constrain(new LabelConstraint(new NamedLabel("local_label", 
-                                                            "inferred label of local var " + li.name(), 
-                                                            L), 
-                                                            LabelConstraint.EQUAL, 
-                                                            new NamedLabel("PC", 
-                                                                           "Information revealed by program counter being at this program point", 
-                                                                           A.pc()).
-                                                                           join(lc, "declared label of local var " + li.name(), declaredLabel), 
-                                                                           A.labelEnv(),
-                                                                           decl.position()) {
-                public String msg() {
-                    return "Declared label of local variable " + li.name() + 
-                    " is incompatible with label constraints.";
+        if (L instanceof VarLabel) {
+            
+            if (ts.isLabeled(t)) {
+                Label declaredLabel = ts.labelOfType(t);
+                
+                lc.constrain(new LabelConstraint(new NamedLabel("local_label", 
+                                                                "inferred label of local var " + li.name(), 
+                                                                L), 
+                                                                LabelConstraint.EQUAL, 
+                                                                new NamedLabel("PC", 
+                                                                               "Information revealed by program counter being at this program point", 
+                                                                               A.pc()).
+                                                                               join(lc, "declared label of local var " + li.name(), declaredLabel), 
+                                                                               A.labelEnv(),
+                                                                               decl.position()) {
+                    public String msg() {
+                        return "Declared label of local variable " + li.name() + 
+                        " is incompatible with label constraints.";
+                    }
                 }
+                );
             }
-            );
-        }
-        else {
-            // Label the type, and update the node and local instance to reflect it.
-            t = ts.labeledType(t.position(), t, L);
-            li.setType(t);
-            decl = decl.type(decl.type().type(t));
+            else {
+                // Label the type, and update the node and local instance to reflect it.
+                t = ts.labeledType(t.position(), t, L);
+                li.setType(t);
+                decl = decl.type(decl.type().type(t));
+            }
         }
         
         PathMap Xd;

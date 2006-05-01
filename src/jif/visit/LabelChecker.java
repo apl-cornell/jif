@@ -130,6 +130,10 @@ public class LabelChecker implements Copy
         return this.solver;
     }
 
+    public Job job() {
+        return this.job;
+    }
+
     public ErrorQueue errorQueue() {
         return job.compiler().errorQueue();
     }
