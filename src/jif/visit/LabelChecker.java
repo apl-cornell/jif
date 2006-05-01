@@ -9,6 +9,7 @@ import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
 import polyglot.types.*;
+import polyglot.util.*;
 import polyglot.util.Copy;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
@@ -244,5 +245,10 @@ public class LabelChecker implements Copy
             jls.finish(newN);
         }
         return newN;
+    }
+
+    public void reportSemanticException(SemanticException e) {
+        Position pos = e.position() != null ? e.position() : job().ast().position();
+        errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), pos);
     }
 }

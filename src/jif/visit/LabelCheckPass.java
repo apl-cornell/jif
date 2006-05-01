@@ -35,9 +35,7 @@ public class LabelCheckPass extends AbstractPass
             ast = lc.finishedLabelCheckPass(ast);
         }
         catch (SemanticException e) {
-            Position pos = e.position() != null
-                         ? e.position() : ast.position();
-            q.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), pos);
+            lc.reportSemanticException(e);
         }
 
         int nErrsAfter = q.errorCount();

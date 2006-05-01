@@ -13,6 +13,8 @@ import polyglot.ast.ClassBody;
 import polyglot.ast.ClassMember;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.util.ErrorInfo;
+import polyglot.util.Position;
 
 /** The extension of the <code>ClassBody</code> node. 
  * 
@@ -23,7 +25,7 @@ public class JifClassBodyExt extends Jif_c {
         super(toJava);
     }
 
-    public Node labelCheck(LabelChecker lc) throws SemanticException {
+    public Node labelCheck(LabelChecker lc) {
 	ClassBody n = (ClassBody) node();
 
 	JifTypeSystem jts = lc.typeSystem();
@@ -37,8 +39,14 @@ public class JifClassBodyExt extends Jif_c {
         List members = new LinkedList();
 
 	for (Iterator iter = n.members().iterator(); iter.hasNext(); ) {
-	    ClassMember cm = (ClassMember) iter.next();
-            members.add(lc.context(A).labelCheck(cm));
+	    try {
+    	        ClassMember cm = (ClassMember) iter.next();
+                members.add(lc.context(A).labelCheck(cm));
+            }
+            catch (SemanticException e) {
+                // report it and keep going.
+                lc.reportSemanticException(e);                
+            }
 	}
 
         return n.members(members);
