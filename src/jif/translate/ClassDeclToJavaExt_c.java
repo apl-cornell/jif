@@ -85,6 +85,9 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 // translated constructer.                
                 cb = addInitializer(cb, rw);
                 
+                // add any static initializers             
+                cb = addStaticInitializers(cb, rw);
+                
                 // add getter methods for any params declared in interfaces
                 cb = addInterfaceParamGetters(cb, jpt, jpt, rw);
                 
@@ -132,6 +135,30 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                                               INITIALIZATIONS_METHOD_NAME,
                                               inits));
     }
+
+    /**
+     * Create methods for static initializations, and add it to cb.
+     * 
+     */
+    private ClassBody addStaticInitializers(ClassBody cb, JifToJavaRewriter rw) {
+        if (rw.getStaticInitializations().isEmpty()) {
+            return cb;
+        }
+        List inits = new ArrayList(rw.getStaticInitializations());
+        rw.getStaticInitializations().clear();   
+
+        Block b;
+        if (inits.size() == 1) {
+            b = (Block)inits.get(0);
+        }
+        else {
+            b = rw.java_nf().Block(Position.COMPILER_GENERATED, inits);
+        }
+        return cb.addMember(rw.java_nf().Initializer(Position.COMPILER_GENERATED,
+                                                     Flags.STATIC,
+                                                     b));
+    }
+
     /**
      * Go through the interfaces, and add any required fields and getters for the fields.
      * @param cb

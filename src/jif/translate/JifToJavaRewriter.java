@@ -32,6 +32,7 @@ public class JifToJavaRewriter extends ContextVisitor
     protected Collection newSourceFiles;
     
     protected List initializations;
+    protected List staticInitializations;
 
     public JifToJavaRewriter(Job job,
                              JifTypeSystem jif_ts,
@@ -47,6 +48,7 @@ public class JifToJavaRewriter extends ContextVisitor
         this.additionalClassDecls = new LinkedList();
         this.newSourceFiles = new LinkedList();
         this.initializations = new ArrayList();
+        this.staticInitializations = new ArrayList();
     }
 
     public void finish(Node ast) {
@@ -234,6 +236,13 @@ public class JifToJavaRewriter extends ContextVisitor
         return this.initializations;
     }
 
+    public void addStaticInitializer(Block s) {
+        this.staticInitializations.add(s);                
+    }
+    public List getStaticInitializations() {
+        return this.staticInitializations;
+    }
+
     public void addAdditionalClassDecl(ClassDecl cd) {
         this.additionalClassDecls.add(cd);
     }
@@ -276,5 +285,6 @@ public class JifToJavaRewriter extends ContextVisitor
     public void inConstructor(boolean flag) {
         this.inConstructor = flag;
     }
+
 
 }
