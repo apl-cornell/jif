@@ -139,7 +139,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
      * @param rw
      * @throws SemanticException
      */
-    private static ClassBody addInterfaceParamGetters(ClassBody cb, JifPolyType baseClass, JifPolyType jpt, JifToJavaRewriter rw) throws SemanticException {
+    protected ClassBody addInterfaceParamGetters(ClassBody cb, JifPolyType baseClass, JifPolyType jpt, JifToJavaRewriter rw) throws SemanticException {
         // go through the interfaces of cb
         if (!rw.jif_ts().isJifClass(jpt)) {
             // don't bother adding interface methods for non-jif classes
@@ -178,7 +178,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         return cb;
 
     }
-    private static ClassMember produceInstanceOfMethod(JifPolyType jpt, JifToJavaRewriter rw, boolean useGetters) throws SemanticException {
+    protected ClassMember produceInstanceOfMethod(JifPolyType jpt, JifToJavaRewriter rw, boolean useGetters) throws SemanticException {
         Context A = rw.context();
         rw = (JifToJavaRewriter)rw.context(A.pushStatic());
 
@@ -237,7 +237,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         Type paramType = pi.isPrincipal() ? rw.jif_ts().Principal() : rw.jif_ts().Label();
         return rw.typeToJava(paramType, Position.COMPILER_GENERATED);
     }
-    private static ClassMember produceCastMethod(JifPolyType jpt, JifToJavaRewriter rw) throws SemanticException {
+    protected ClassMember produceCastMethod(JifPolyType jpt, JifToJavaRewriter rw) throws SemanticException {
         Context A = rw.context();
         rw = (JifToJavaRewriter)rw.context(A.pushStatic());
 
@@ -253,7 +253,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         return rw.qq().parseMember(sb.toString(), tn, castMethodName(jpt), formals, INSTANCEOF_METHOD_NAME, args, tn);
     }
 
-    static List produceParamFormals(JifPolyType jpt, JifToJavaRewriter rw, boolean addObjectFormal) throws SemanticException {
+    static protected List produceParamFormals(JifPolyType jpt, JifToJavaRewriter rw, boolean addObjectFormal) throws SemanticException {
         List formals = new ArrayList(jpt.params().size() + 1);
         Position pos = Position.COMPILER_GENERATED;
         for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
@@ -272,7 +272,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         return formals;
     }
 
-    private static List produceParamArgs(JifPolyType jpt, JifToJavaRewriter rw) {
+    protected List produceParamArgs(JifPolyType jpt, JifToJavaRewriter rw) {
         List args = new ArrayList(jpt.params().size() + 1);
         for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
             ParamInstance pi = (ParamInstance)iter.next();
@@ -285,7 +285,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         return args;
     }
 
-    private static ClassMember produceConstructor(JifPolyType jpt, JifToJavaRewriter rw) throws SemanticException {
+    protected ClassMember produceConstructor(JifPolyType jpt, JifToJavaRewriter rw) throws SemanticException {
         // add arguments for params.
         List formals = produceParamFormals(jpt, rw, false);
 
@@ -321,6 +321,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             inits.add(rw.qq().parseStmt("this." + paramFieldName + " = " + paramArgName + ";"));
         }
 
+        inits.addAll(additionalConstructorCode(rw));
 
         return rw.java_nf().ConstructorDecl(Position.COMPILER_GENERATED,
                                             Flags.PUBLIC,
@@ -331,12 +332,15 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                                                                inits));
     }
 
+    protected List additionalConstructorCode(JifToJavaRewriter rw) {
+        return Collections.EMPTY_LIST;
+    }
     /**
      * Produce a method (with a standard name) that will invoke the default
      * constructor of the class. This method assumes that such a default 
      * constructor exists.
      */
-    private static ClassMember produceDefaultConstructorInvoker(ClassType ct, 
+    protected ClassMember produceDefaultConstructorInvoker(ClassType ct, 
                     JifToJavaRewriter rw, List throwTypes) throws SemanticException {
         // add arguments for params.
         if (throwTypes == null || throwTypes.isEmpty()) {

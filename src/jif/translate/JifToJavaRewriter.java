@@ -28,10 +28,10 @@ public class JifToJavaRewriter extends ContextVisitor
     private Job job;
     private QQ qq;
     
-    private Collection additionalClassDecls;
-    private Collection newSourceFiles;
+    protected Collection additionalClassDecls;
+    protected Collection newSourceFiles;
     
-    private List initializations;
+    protected List initializations;
 
     public JifToJavaRewriter(Job job,
                              JifTypeSystem jif_ts,
@@ -222,7 +222,11 @@ public class JifToJavaRewriter extends ContextVisitor
     public void leavingClass() {
         this.currentClass = null;
     }
-    public void addInitializer(Stmt s) {
+    public void addInitializer(Block s) {
+        this.initializations.add(s);        
+    }
+    public void addInitializer(FieldInstance fi, Expr init) {
+        Stmt s = qq().parseStmt(fi.name() + " = %E;", init);
         this.initializations.add(s);
     }
 

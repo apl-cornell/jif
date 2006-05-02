@@ -130,10 +130,14 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
           inits.add(body);
         }
         
+        inits.addAll(additionalInits(rw));
+        
         // Add an explicit return to the body.
         inits.add(nf.Return(n.position(), nf.This(n.position())));
 
         body = nf.Block(n.position(), inits);
+        
+        body = jifConstructorBody(rw, body);
 
         String name = ClassDeclToJavaExt_c.constructorTranslatedName(ct);
 
@@ -145,5 +149,19 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
         m = m.methodInstance(null);
 
         return m;
+    }
+
+    /**
+     * Allow subclasses to modify the Jif constructor body.
+     */
+    protected Block jifConstructorBody(JifToJavaRewriter rw, Block body) {
+        return body;
+    }
+
+    /**
+     * Allow subclasses to add additional initializations
+     */
+    protected List additionalInits(JifToJavaRewriter rw) {
+        return Collections.EMPTY_LIST;
     }
 }
