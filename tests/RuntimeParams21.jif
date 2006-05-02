@@ -8,7 +8,7 @@ class D {
     final D{Alice:} d;
     final label{} lb;
 
-    D(D d, label lb) {
+    D(D{Alice:} d, label{} lb) {
   	this.d = d;
   	this.lb = lb;
     }
