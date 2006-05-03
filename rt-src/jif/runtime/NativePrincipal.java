@@ -50,19 +50,19 @@ public class NativePrincipal implements Principal {
         return false;
     }
     
-    public ActsForProof findProofDownto(Principal q) {
+    public ActsForProof findProofDownto(Principal q, Object searchState) {
         // don't even try! We don't have any information
         // about who we can act for.
         return null;
     }
 
-    public ActsForProof findProofUpto(Principal p) {
+    public ActsForProof findProofUpto(Principal p, Object searchState) {
         // go through our set of superiors, and see if we can find a chain
         // from them to p.
         ActsForProof prf;
         for (Iterator iter = superiors.iterator(); iter.hasNext(); ) {
             Principal s = (Principal)iter.next();
-            prf = PrincipalUtil.findActsForProof(p, s);
+            prf = PrincipalUtil.findActsForProof(p, s, searchState);
             if (prf != null) {
                 // success!
                 // create a longer chain with this at the bottom 

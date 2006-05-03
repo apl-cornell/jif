@@ -50,13 +50,13 @@ public final class DisjunctivePrincipal implements Principal {
         return false;
     }
 
-    public ActsForProof findProofUpto(Principal p) {
+    public ActsForProof findProofUpto(Principal p, Object searchState) {
         if (delegatesTo(p)) {
             return new DelegatesProof(p, this);
         }
         for (Iterator iter = disjuncts.iterator(); iter.hasNext(); ) {
             Principal witness = (Principal)iter.next();
-            ActsForProof prf = PrincipalUtil.findActsForProof(p, witness);
+            ActsForProof prf = PrincipalUtil.findActsForProof(p, witness, searchState);
             if (prf != null) {
                 // have found a proof from p to witness.
                 DelegatesProof step = new DelegatesProof(witness, this);
@@ -66,11 +66,11 @@ public final class DisjunctivePrincipal implements Principal {
         return null;
     }
 
-    public ActsForProof findProofDownto(Principal q) {
+    public ActsForProof findProofDownto(Principal q, Object searchState) {
         Map proofs = new HashMap();
         for (Iterator iter = disjuncts.iterator(); iter.hasNext(); ) {
             Principal p = (Principal)iter.next();
-            ActsForProof prf = PrincipalUtil.findActsForProof(p, q);
+            ActsForProof prf = PrincipalUtil.findActsForProof(p, q, searchState);
             if (prf == null) return null;
             proofs.put(p, prf);
         }

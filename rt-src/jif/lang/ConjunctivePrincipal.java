@@ -55,11 +55,11 @@ public final class ConjunctivePrincipal implements Principal {
     }
     
 
-    public ActsForProof findProofUpto(Principal p) {
+    public ActsForProof findProofUpto(Principal p, Object searchState) {
         Map proofs = new HashMap();
         for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
             Principal q = (Principal)iter.next();
-            ActsForProof prf = PrincipalUtil.findActsForProof(p, q);
+            ActsForProof prf = PrincipalUtil.findActsForProof(p, q, searchState);
             if (prf == null) return null;
             proofs.put(q, prf);
         }
@@ -70,10 +70,10 @@ public final class ConjunctivePrincipal implements Principal {
 
     }
 
-    public ActsForProof findProofDownto(Principal q) {
+    public ActsForProof findProofDownto(Principal q, Object searchState) {
         for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
             Principal witness = (Principal)iter.next();
-            ActsForProof prf = PrincipalUtil.findActsForProof(witness, q);
+            ActsForProof prf = PrincipalUtil.findActsForProof(witness, q, searchState);
             if (prf != null) {
                 // have found a proof from witness to q
                 DelegatesProof step = new DelegatesProof(this, witness);

@@ -55,7 +55,7 @@ public class PrincipalUtil {
             }
             
             // try searching
-            prf = findActsForProof(p, q);
+            prf = findActsForProof(p, q, null);
             if (prf != null && verifyProof(prf, p, q)) {
                 // cache the chain to avoid searching later.
                 proofCache.put(pp, prf);
@@ -76,39 +76,62 @@ public class PrincipalUtil {
      * p and q is a a checkable proof object.
      * @param p
      * @param q
+     * @param searchState records the goals that we are in the middle of attempting
      * @return An ActsForPoorf between p and q, or null if none can be found.
      */
-    public static ActsForProof findActsForProof(Principal p, Principal q) {
+    public static ActsForProof findActsForProof(Principal p, Principal q, Object searchState) {
         try {
             LabelUtil.enterTiming();
             // try the dumb things first.
-            if (p == q) {
+            if (eq(p, q)) {
                 return new ReflexiveProof(p, q);
             }
             if (q == null) {
                 return new DelegatesProof(p, q);            
             }
-            if (p != null && p.equals(q) && q.equals(p)) {
-                return new ReflexiveProof(p, q);
+            
+            // check the search state
+            Principal[] newss;
+            int ind = 0;
+            if (searchState instanceof Principal[]) {
+                Principal[] ss = (Principal[])searchState; 
+                newss = new Principal[ss.length + 2];
+                // ss is an array of principals, such that ss[2i],ss[2i+1] is goal on the goal stack.
+                for (;ind+1 < ss.length; ind += 2) {
+                    // check that p and q are not equal to ss[i] and ss[i+1]
+                    if (eq(p, ss[ind]) && eq(q, ss[ind+1])) {
+                        // p and q are already on the goal stack. Prevent an infinite recursion.
+                        return null;
+                    }
+                                        
+                    newss[ind] = ss[ind];
+                    newss[ind+1] = ss[ind+1];
+                }
             }
+            else {
+                newss = new Principal[2];
+            }
+            // ind+1 is now less than newss.length
+            newss[ind] = p;
+            newss[ind+1] = q;
             
             // if we're going from a dis/conjunctive principal, try finding a downwards
             // proof first
             ActsForProof prf;
             boolean doneDownTo = false;
             if (p instanceof ConjunctivePrincipal || p instanceof DisjunctivePrincipal) {
-                prf = p.findProofDownto(q);
+                prf = p.findProofDownto(q, newss);
                 if (prf != null) return prf;            
                 doneDownTo = true;
             }
             
             // try searching upwards from q.
-            prf = q.findProofUpto(p);
+            prf = q.findProofUpto(p, newss);
             if (prf != null) return prf;
             
             // try searching downards from p.
             if (!doneDownTo && p != null) {
-                prf = p.findProofDownto(q);
+                prf = p.findProofDownto(q, newss);
                 if (prf != null) return prf;
             }
             
@@ -119,6 +142,14 @@ public class PrincipalUtil {
             LabelUtil.exitTiming();            
         }
         
+    }
+    
+    /**
+     * Return whether principals p and q are equal. p and q must either be references to the same object,
+     * both be null, or agree that they are equal to the other.
+     */
+    private static boolean eq(Principal p, Principal q) {
+        return p == q || (p != null && q != null && p.equals(q) && q.equals(p));
     }
     
     /**
@@ -138,7 +169,7 @@ public class PrincipalUtil {
                 return delegatesTo(granter, actor);
             }
             else if (prf instanceof ReflexiveProof) {
-                return actor == granter || (actor != null && granter != null && actor.equals(granter) && granter.equals(actor));
+                return eq(actor, granter);
             }
             else if (prf instanceof TransitiveProof) {
                 TransitiveProof proof = (TransitiveProof)prf;
@@ -219,11 +250,7 @@ public class PrincipalUtil {
         public boolean equals(Object o) {
             if (o instanceof PrincipalPair) {
                 PrincipalPair that = (PrincipalPair)o;
-                return (this.p == that.p || (this.p != null && that.p != null
-                        && this.p.equals(that.p) && that.p.equals(this.p)))
-                        && (this.q == that.q || (this.q != null
-                                && that.q != null && this.q.equals(that.q) && that.q
-                                .equals(this.q)));
+                return eq(this.p, that.p) && eq(this.q, that.q);
                 
             }
             return false;
@@ -248,8 +275,7 @@ public class PrincipalUtil {
     public static boolean equals(Principal p, Principal q) {
         try {
             LabelUtil.enterTiming();
-            return p == q || 
-            (p != null && q != null && q.equals(p) &&  p.equals(q));        
+            return eq(p,q);        
         }
         finally {
             LabelUtil.exitTiming();            
@@ -456,8 +482,8 @@ public class PrincipalUtil {
         public boolean delegatesTo(Principal p) { return false; }
         public boolean equals(Principal p) { return p == this; }
         public boolean isAuthorized(Object authPrf, Closure closure, Label lb) { return false; }
-        public ActsForProof findProofUpto(Principal p) { return null; }
-        public ActsForProof findProofDownto(Principal q) { return null; }
+        public ActsForProof findProofUpto(Principal p, Object searchState) { return null; }
+        public ActsForProof findProofDownto(Principal q, Object searchState) { return null; }
         
     }
 }

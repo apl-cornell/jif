@@ -38,7 +38,7 @@ public class PrincipalUtil {
      * @param q
      * @return A delegates-chain between p and q, or null if non can be found.
      */
-    public static native ActsForProof{p;q;q!:} findActsForProof(Principal p, Principal q);
+    public static native ActsForProof{p;q;q!:} findActsForProof(Principal p, Principal q, Object searchState);
 
     /**
      * Verify that the chain is a valid delegates-chain between p and q. That is,

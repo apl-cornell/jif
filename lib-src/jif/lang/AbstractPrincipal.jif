@@ -70,13 +70,13 @@ public abstract class AbstractPrincipal implements Principal {
     }
     
     
-    public ActsForProof findProofDownto(Principal q) {    
+    public ActsForProof{this;q;this!:;q!:} findProofDownto(Principal q, Object searchState) {    
         // don't even try! We don't have any information
         // about who we can act for.
         return null;
     }
     
-    public ActsForProof{this;p;this!:;p!:} findProofUpto{this!:}(Principal p) where authority (this) {
+    public ActsForProof{this;p;this!:;p!:} findProofUpto{this!:}(Principal p, Object searchState) where authority (this) {
         // go through each superior s, and see if we can find a proof
         // from p to s.
         ActsForProof prf;
@@ -86,7 +86,7 @@ public abstract class AbstractPrincipal implements Principal {
         for (int i = 0; sprs != null && i < sprs.length; i++) {
             try {
                 final Principal s = sprs[i];
-                prf = PrincipalUtil.findActsForProof(p, s);
+                prf = PrincipalUtil.findActsForProof(p, s, searchState);
                 if (prf != null) {
                     // success!
                     // create a bigger proof 

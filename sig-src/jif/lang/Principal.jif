@@ -57,11 +57,11 @@ public interface Principal {
      * Search for a proof that the principal p can act for this principal.
      * Return null if no such proof can be found.
      */
-    ActsForProof{this;p;this!:;p!:} findProofUpto{this!:}(Principal p);
+    ActsForProof{this;p;this!:;p!:} findProofUpto{this!:}(Principal p, Object searchState);
     
     /**
      * Search for a proof that this principal can act for the principal q.
      * Return null if no such proof can be found.
      */
-    ActsForProof{this;q;q!:;this!:} findProofDownto{this!:}(Principal q);    
+    ActsForProof{this;q;q!:;this!:} findProofDownto{this!:}(Principal q, Object searchState);    
 }

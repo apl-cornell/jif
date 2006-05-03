@@ -20,7 +20,7 @@ public class PrincipalUtil01
             out.println("stupid2 actsfor stupid1? " + PrincipalUtil.acts_for(stupid2, stupid1));
             out.println("stupid1 actsfor nullP " + PrincipalUtil.acts_for(stupid1, nullP));
 
-            ActsForProof prf = PrincipalUtil.findActsForProof(stupid1, stupid2);
+            ActsForProof prf = PrincipalUtil.findActsForProof(stupid1, stupid2, null);
             out.println("proof between stupid1 and stupid2 verified? " + PrincipalUtil.verifyProof(prf, stupid1, stupid2));
             out.println("(false) proof between stupid1 and stupid1 verified? " + PrincipalUtil.verifyProof(prf, stupid1, stupid1));
             out.println("(false) proof between stupid1 and stupid1 verified? " + PrincipalUtil.verifyProof(null, stupid1, nullP));
