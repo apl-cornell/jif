@@ -26,11 +26,11 @@ public abstract class JifDowngradeExprExt extends Jif_c
         super(toJava);
     }
 
-    protected JifContext declassifyConstraintContext(JifContext A) {
+    protected JifContext declassifyConstraintContext(LabelChecker lc, JifContext A, Label downgradeFrom, Label downgradeTo) {
         return A;
     }
     
-    public final Node labelCheck(LabelChecker lc) throws SemanticException {
+    public Node labelCheck(LabelChecker lc) throws SemanticException {
 	final DowngradeExpr d = (DowngradeExpr) node();
 
 	JifContext A = lc.jifContext();
@@ -38,7 +38,9 @@ public abstract class JifDowngradeExprExt extends Jif_c
 
 	Expr e = (Expr) lc.context(A).labelCheck(d.expr());
 	PathMap Xe = X(e);
-
+        
+        Xe = downgradeExprPathMap(lc, A, Xe);
+        
 	Label downgradeTo = d.label().label();
         Label downgradeFrom = null;
         boolean boundSpecified;
@@ -81,7 +83,7 @@ public abstract class JifDowngradeExprExt extends Jif_c
          }
          );
 
-        JifContext dA = declassifyConstraintContext(A);
+        JifContext dA = declassifyConstraintContext(lc, A, downgradeFrom, downgradeTo);
         checkOneDimenOnly(lc, dA, downgradeFrom, downgradeTo, d.position());
         
         checkAuthority(lc, dA, downgradeFrom, downgradeTo, d.position());
@@ -90,10 +92,14 @@ public abstract class JifDowngradeExprExt extends Jif_c
             checkRobustness(lc, dA, downgradeFrom, downgradeTo, d.position());
         }
 
-	//_pc_ is not downgraded. 
-	PathMap X = Xe.NV(lc.upperBound(A.pc(), downgradeTo));
+        PathMap X = Xe.NV(lc.upperBound(dA.pc(), downgradeTo));           
+
 
 	return X(d.expr(e), X);
+    }
+
+    protected PathMap downgradeExprPathMap(LabelChecker lc, JifContext A, PathMap Xe) throws SemanticException {
+        return Xe;
     }
 
     /**
