@@ -26,7 +26,7 @@ public abstract class JifDowngradeExprExt extends Jif_c
         super(toJava);
     }
 
-    protected JifContext declassifyConstraintContext(LabelChecker lc, JifContext A, Label downgradeFrom, Label downgradeTo) {
+    protected JifContext declassifyConstraintContext(LabelChecker lc, JifContext A, Label downgradeFrom, Label downgradeTo) throws SemanticException {
         return A;
     }
     
