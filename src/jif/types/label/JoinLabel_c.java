@@ -317,7 +317,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         
         JifTypeSystem ts = (JifTypeSystem)this.typeSystem();
         Label newJoinLabel = ts.joinLabel(this.position(), flatten(s));
-        return substitution.substLabel(newJoinLabel).simplify();
+        return substitution.substLabel(newJoinLabel);
     }
 
     public Set variableComponents() {
