@@ -75,22 +75,6 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
         return path.throwTypes(ts);
     }
 
-    public Label subst(AccessPathRoot r, AccessPath e) {
-        AccessPath newPath = path.subst(r, e);
-        if (newPath == path) {
-            return this;
-        }
-        
-        if (newPath instanceof AccessPathConstant) {
-            AccessPathConstant apc = (AccessPathConstant)newPath;
-            if (!apc.isLabelConstant()) {
-                throw new InternalCompilerError("Replaced a dynamic label with a non-label!");
-            }
-            return (Label)apc.constantValue();
-        }
-        return ((JifTypeSystem)typeSystem()).pathToLabel(this.position(), newPath);
-    }
-
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         AccessPath newPath = substitution.substAccessPath(path);
         if (newPath != path) {

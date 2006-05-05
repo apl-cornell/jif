@@ -7,5 +7,4 @@ import jif.types.label.AccessPathRoot;
  */
 public interface DynamicPrincipal extends Principal {
     AccessPath path();
-    public Principal subst(AccessPathRoot r, AccessPath e);
 }

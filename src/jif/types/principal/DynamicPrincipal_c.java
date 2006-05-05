@@ -64,22 +64,6 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
     public List throwTypes(TypeSystem ts) {
         return path.throwTypes(ts);
     }
-    public Principal subst(AccessPathRoot r, AccessPath e) {
-        AccessPath newPath = path.subst(r, e);
-        if (newPath == path) {
-            return this;
-        }
-
-        if (newPath instanceof AccessPathConstant) {
-            AccessPathConstant apc = (AccessPathConstant)newPath;
-            if (!apc.isPrincipalConstant()) {
-                throw new InternalCompilerError("Replaced a dynamic principal with a non-principal!");
-            }
-            return (Principal)apc.constantValue();
-        }
-        
-        return ((JifTypeSystem)typeSystem()).pathToPrincipal(this.position(), newPath);
-    }
 
     public Principal subst(LabelSubstitution substitution) throws SemanticException {
         AccessPath newPath = substitution.substAccessPath(path);
