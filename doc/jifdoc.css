@@ -40,6 +40,19 @@ ol {
       color: rgb(20,20,30);
 }
 
+.mathdisplay {
+      width: 90ex;
+      font-family: Courier New, courier, fixed;
+      font-size: 90%;
+      background-color: rgb(230,230,230);
+      border: solid;
+      border-color: rgb(200,200,200);
+      border-width: 1;
+      margin: 5;
+      padding: 5;
+      color: rgb(20,20,30);
+}
+
 span.comment {
     color: rgb(150,0,0)
 }
