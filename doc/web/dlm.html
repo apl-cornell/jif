@@ -1,4 +1,4 @@
-<html>
+ <html>
 
 <head>
 <link rel=StyleSheet href="jifdoc.css" type="text/css">
@@ -7,12 +7,292 @@
 
 <body>
 
-<h1><a name="XXX">Decentralized label model</a></h1>
+<h1><a name="dlm">Decentralized label model</a></h1>
 XXX TODO
 
-<h2><a name="dlm">Principals</a></h2>
-<h2><a name="dlm">Policies</a></h2>
-<h2><a name="dlm">Labels</a></h2>
+<h2><a name="dlm_principals">Principals</a></h2>
+
+<p>A <em>principal</em> is an entity with security concerns, and the power to
+observe and change certain aspects of the system. Jif provides a flexible, 
+open-ended mechanism for defining principals, which allows applications
+to model users, processes, user groups, or application-specific entities 
+with security concerns.</p>
+
+
+<p>A principal <i class="math">p</i> may delegate authority to another principal
+<i class="math">q</i>, in which case
+<i class="math">q</i> is said to <em>act for</em> <i class="math">p</i>. 
+The <i class="math">acts-for</i> relation is
+reflexive and transitive, and is similar to the <i class="math">speaks-for</i>
+relation&nbsp;[LABW91]. The <i class="math">acts-for</i> relation is needed to express
+trust relationships between principals, and can encode groups and roles.
+Jif supports a <em>top
+principal</em> &#8868; able to act for all principals, and a <em>bottom
+principal</em> &#8869; that allows all principals to act for it.
+</p>
+
+<p>Jif allows principals to be composed together to form
+<em>conjunctive</em> and <em>disjunctive</em>
+principals&nbsp;[LABW91,TZ05]. A conjunctive principal, written &quot;<i
+class="math">p</i>&<i class="math">q</i>&quot;, is able to act for
+both the principals <i class="math">p</i> and <i class="math">q</i>. A
+disjunctive principal, written &quot;<i class="math">p,q</i>&quot; delegates its authority to <i class="math">p</i>
+and <i class="math">q</i>, that is, <i class="math">p</i> can act for
+<i class="math">p,q</i>, and <i
+class="math">q</i> can act for <i class="math">p,q</i>. Conjunctions and disjunctions are associative,
+commutative and idempotent.</p>
+
+<p>Principals express their security concerns with <em>labels</em>. A label
+is a pair of a confidentiality policy and an integrity policy. Labels
+are associated with information, and the Jif compiler 
+ensures that the policies of a label are enforced on the appropriate
+information. Confidentiality policies are formed from conjunctions and
+disjunctions of <em>reader policies</em>, and integrity policies are formed
+from conjunctions and disjunctions of <em>writer policies</em>.
+ Each reader
+policy and writer policy has an owning principal; a policy owned by a
+principal <i class="math">p</i> is a statement of <i class="math">p</i>'s 
+beliefs or requirements about the security of information.
+</p>
+
+
+<h2><a name="dlm_conf_poicies">Confidentiality policies</a></h2>
+
+<p>A <em>reader policy</em> allows the owner of the policy to specify
+which principals the owner permits to read a given piece of
+information. A reader policy is written <i class="math">o</i>&rarr;<i class="math">r</i>, where the principal <i
+class="math">o</i> is the owner of the policy, and the principal
+<i class="math">r</i> is the specified reader. A reader policy
+<i class="math">o</i>&rarr;<i class="math">r</i> says that <i class="math">o</i> permits a principal <i class="math">q</i> to
+read information only if <i class="math">q</i> can act for either the owner of the policy or
+the specified reader <i class="math">r</i>. As a formal semantics for
+reader policies, we define the function \readers{p}{c} to be the set
+of principals that principal <i class="math">p</i> believes should be allowed to read
+information according to reader policy <i class="math">c</i>:</p>
+
+\begin{align*}
+\readers{p}{\readpol{o}{r_1,\dots,r_n}} \defeq \{q ~|~ \text{if }
+\actsfor{o}{p} \text{ then } \qquad \\ \hfill (\actsfor{q}{o} \text{
+or } \exists i\in 1.. n.~ \actsfor{q}{r_i})\} \end{align*}
+
+<p>
+A principal <i class="math">p</i> believes that a reader policy <i class="math">c</i> should restrict the
+readers of information only if the owner of the policy can act for
+<i class="math">p</i>. The parameterization on <i class="math">p</i> is important in the presence of mutual
+distrust, because it allows the significance of the policy to be expressed
+for every principal independently. 
+If principal <i class="math">o</i> owns a policy that restricts the readers
+of information, it does not necessarily mean that
+another principal <i class="math">p</i> also believes those
+restrictions should apply.
+Thus, if <i class="math">o</i> does not act for <i class="math">p</i>, then
+\readers{p}{\readpol{o}{r_1,\dots,r_n}} is the set of all principals;
+in other words, <i class="math">p</i> does not credit the policy with any significance.
+While this semantics is expressed differently, it is consistent with
+the original DLM semantics&nbsp;[ML00].
+</p>
+
+<p><strong>Conjunction and disjunction.</strong>
+Greater expressiveness can be achieved by taking conjunctions and
+disjunctions of reader policies.
+We define <em>confidentiality policies</em> to be the smallest set containing
+all reader policies and closed under the binary operators &#8852; and
+&#8851;. That is, if <i class="math">c</i> and <i class="math">d</i> are confidentiality policies, then
+both <i class="math">c</i>&#8851;<i class="math">d</i> and 
+<i class="math">c</i>&#8852;<i class="math">d</i> are too.
+</p>
+
+<p>
+The operator &#8852; is conjunction for confidentiality policies: <i class="math">c</i>&#8852;<i class="math">d</i> is the policy that enforces both <i class="math">c</i> and <i class="math">d</i>. The policy <i class="math">c</i>&#8852;<i class="math">d</i> permits a principal to read information only if both <i class="math">c</i> and
+<i class="math">d</i> allow it. Thus, <i class="math">c</i>&#8852;<i class="math">d</i> is at least as restrictive
+as both <i class="math">c</i> and <i class="math">d</i>.
+The operator &#8851; is disjunction for confidentiality policies: <i class="math">c</i>&#8851;<i class="math">d</i> allows a principal to read information if either <i class="math">c</i> or <i class="math">d</i>
+allows it. Thus, <i class="math">c</i>&#8851;<i class="math">d</i> is no more restrictive than
+either <i class="math">c</i> or <i class="math">d</i>.
+</p>
+
+<p>
+We extend \readers{p}{c} for confidentiality policies. Since <i
+class="math">c</i>&#8852;<i class="math">d</i> enforces both <i
+class="math">c</i> and <i class="math">d</i>, the reader sets for <i
+class="math">c</i> and <i class="math">d</i> are intersected; for <i
+class="math">c</i>&#8851;<i class="math">d</i> the reader sets are
+combined.
+</p>
+
+\begin{align*} 
+\readers{p}{c &#8852; d} &\defeq \readers{p}{c} \cap \readers{p}{d}  \\
+\readers{p}{c &#8851; d} &\defeq \readers{p}{c} \cup \readers{p}{d}  
+\end{align*}
+
+<p><strong>Ordering confidentiality policies.</strong> Using the
+\readers{\cdot}{\cdot} function, we can define a &quot;no more
+restrictive than&quot; relation &#8849;<sub>C</sub> on confidentiality
+policies. For two confidentiality policies <i class="math">c</i> and
+<i class="math">d</i>, we have <i
+class="math">c</i> &#8849;<sub>C</sub> <i class="math">d</i> if and only
+if for all principals <i class="math">p</i>, $\readers{p}{c} \supseteq
+\readers{p}{d}$. If <i class="math">c</i> &#8849;<sub>C</sub> <i
+class="math">d</i> then every principal <i class="math">p</i> believes
+that <i class="math">c</i> permits at least as many readers as <i
+class="math">d</i> does. The confidentiality policy <i
+class="math">c</i> is thus of lower (or equal) confidentiality than <i
+class="math">d</i>, and so information labeled <i class="math">c</i>
+can be used in at least as many places as information labeled <i
+class="math">d</i>: policy <i class="math">c</i> is no more
+restrictive than policy <i class="math">d</i>.</p>
+
+<p>The relation &#8849;<sub>C</sub> forms a pre-order over confidentiality
+policies, and the equivalence classes form a lattice. The operators
+&#8852; and &#8851; are the join and meet operators of this lattice.
+The least restrictive confidentiality policy is the reader policy
+\readpol{\bot}{\bot}, where &#8869; is a principal that all principals
+can act for, since all principals believe that information labeled
+\readpol{\bot}{\bot} is allowed to be read by any principal.
+The most restrictive expressible confidentiality policy is
+\readpol{\top}{\top}, where &#8868; is a principal that can act for all
+principals; information labeled \readpol{\top}{\top} is allowed to
+be read only by principal &#8868;.</p>
+
+<h2><a name="dlm_conf_poicies">Integrity policies</a></h2>
+
+<p>Integrity and confidentiality are well-known duals, and we define
+integrity policies dually to confidentiality policies. The set of <em>integrity
+policies</em> is formed by closing <em>writer policies</em> under conjunction
+and disjunction.</p>
+
+<p>A <em>writer policy</em> <i class="math">o</i>&larr;<i class="math">w</i> allows the owner
+to specify which principals may
+have influenced (&quot;written&quot;) the value of a given piece of information.
+The policy
+<i class="math">o</i>&larr;<i class="math">w</i> means that
+according to the owner <i class="math">o</i>, a principal <i class="math">q</i> could have
+influenced the value of the information only if <i class="math">q</i> can act for the
+owner <i class="math">o</i> or the specified writer <i class="math">w</i>. 
+Writer policies describe the integrity of information in terms of its 
+provenance.</p>
+
+<p>We define the function \writers{p}{c} to be the set of principals that
+principal <i class="math">p</i> believes may have influenced information according to
+writer policy <i class="math">c</i>. Like reader policies, a principal <i class="math">p</i> believes
+that writer policy <i class="math">o</i>&larr;<i class="math">w</i> describes the writers of information only if
+<i class="math">o</i> can act for <i class="math">p</i>.</p>
+
+\begin{align*} 
+\writers{p}{<i class="math">o</i>&larr;<i class="math">w</i>} \defeq \{q ~|~ \text{if } \actsfor{o}{p}
+\text{ then } \qquad \\ \hfill
+(\actsfor{q}{o} \text{ or } \exists i\in 1.. n.~ \actsfor{q}{w_i})\}
+\end{align*}
+
+
+<p>Dually to confidentiality policies, we denote disjunction for
+integrity policies with the operator &#8852;, and conjunction with
+&#8851;.  The integrity policy <i class="math">c</i>&#8851;<i
+class="math">d</i> is the conjunction of <i class="math">c</i> and <i
+class="math">d</i>, meaning that a principal <i class="math">p</i>
+could have influenced information labeled <i class="math">c</i>&#8851;<i
+class="math">d</i> only if both
+<i class="math">c</i> and <i class="math">d</i> agree that <i
+class="math">p</i> could have influenced it. The writer sets for <i
+class="math">c</i> and <i class="math">d</i> are thus intersected to
+produce the writer set for <i class="math">c</i>&#8851;<i
+class="math">d</i>.  The integrity policy <i class="math">c</i>&#8852;<i
+class="math">d</i> is the disjunction of <i class="math">c</i> and <i
+class="math">d</i>; the writer set for <i class="math">c</i>&#8852;<i
+class="math">d</i> is thus the union
+of the writer sets for <i class="math">c</i> and <i
+class="math">d</i>.</p>
+
+\begin{align*} 
+\writers{p}{c &#8851; d} &\defeq \writers{p}{c} \cap \writers{p}{d}  \\
+\writers{p}{c &#8852; d} &\defeq \writers{p}{c} \cup \writers{p}{d}  
+\end{align*}
+
+<p>The &quot;no more restrictive than&quot; relation &#8849;<sub>I</sub> on integrity
+policies is defined dually to the relation &#8849;<sub>C</sub>: for two
+integrity policies <i class="math">c</i> and <i class="math">d</i>, we have $c &#8849;<sub>I</sub> d$ if and only if
+for all principals <i class="math">p</i>, $\writers{p}{c} \subseteq
+\writers{p}{d}$. Intuitively, information with a smaller
+writer set has higher integrity than information with a larger writer set,
+since fewer principals may have influenced the value of the former;
+the higher the integrity of information, the fewer restrictions on
+where that information may be used.</p>
+
+
+<p>The relation &#8849;<sub>I</sub> forms a pre-order over integrity policies, and the
+equivalence classes form a lattice, with join and meet operators  &#8852; and &#8851;
+respectively.
+The most restrictive integrity policy is <i class="math">\bot</i>&larr;<i class="math">\bot</i>, since
+all principals believe that any principal may have influenced the
+information.
+The policy <i class="math">\top</i>&larr;<i class="math">\top</i> is the least restrictive
+expressible integrity policy, as all principals believe that only
+principal &#8868; (who can act for all other principals) has
+influenced the information.</p>
+
+
+
+<h2><a name="dlm_labels">Labels</a></h2>
+
+<p>A label is a pair of a confidentiality policy and an integrity
+policy.  We write a label {<i class="math">c</i>;<i class="math">d</i>}, where <i class="math">c</i> is a
+confidentiality policy, and <i class="math">d</i> is an integrity policy.  The
+confidentiality projection of {<i class="math">c</i>;<i class="math">d</i>}, written $C(\{c;d\})$,
+is <i class="math">c</i>, and the integrity projection $I(\{c;d\})$ is <i class="math">d</i>.</p>
+
+<p>We extend the \readers{\cdot}{\cdot} and \writers{\cdot}{\cdot}
+functions appropriately:</p>
+
+\begin{align*}
+\readers{p}{\{c;d\}} &\defeq \readers{p}{c} \\
+\writers{p}{\{c;d\}} &\defeq \writers{p}{d}
+\end{align*}
+
+<p><strong>Example.</strong>
+Consider the following label. 
+\begin{align*}
+&\{\readpol{\Alice}{\Bob, \Chuck}~~;\\
+&\hspace{4em}<i class="math">\Alice</i>&larr;<i class="math">\Chuck</i>~&#8852;~ <i class="math">\Bob</i>&larr;<i class="math">\Chuck, \Dave</i> \}
+\end{align*}
+The
+confidentiality policy of this label is a single reader
+policy, and the integrity policy is the disjunction of two writer
+policies. The reader policy is owned by Alice, and permits any
+principal that can act for Bob, Chuck, or Alice to
+read information. No other principal specifies a reader policy, so 
+principals for whom Alice cannot act for allow all
+principals to read the information; principals that Alice can act for
+adhere to Alice's restrictions, and permit only principals that can
+act for Bob, Chuck, or Alice to read information. Of the two writer
+policies, one is owned by Alice and the other by Bob. Alice believes
+that only Chuck or Alice could have influenced the
+information, while Bob believes only principals that can act for
+any of Chuck, Dave, or Bob could have influenced the information. Principals
+that neither Alice nor Bob can act for implicitly believe that the
+information may have been influenced by any principal at all, and is
+thus completely untrustworthy. A principal that both Alice and Bob
+can act for believes that principals that can act for Alice, Bob, Chuck,
+or Dave may have influenced the information.</p>
+
+<p><strong>Ordering labels.</strong> We define the &quot;no more
+restrictive than&quot; relation &#8849; on labels using the relations
+&#8849;<sub>C</sub> and &#8849;<sub>I</sub>. In particular, $\{c;d\} &#8849; \{c';d'\}$ if
+and only if $c &#8849;<sub>C</sub> c'$ and $d &#8849;<sub>I</sub> d'$.  For labels <i
+class="math">L</i><sub>1</sub> and <i class="math">L</i><sub>2</sub>,
+<i class="math">L</i><sub>1</sub> &#8849; L<sub>2</sub> holds if there
+are the same or more restrictions on uses of information labeled with
+<i class="math">L</i><sub>2</sub> as there are on information labeled
+with <i class="math">L</i><sub>1</sub>. </p>
+
+<p>The relation &#8849; forms a pre-order, whose equivalence classes form
+a lattice. We use &#8852; and &#8851; for the join and meet operations
+over this lattice,</p>
+\begin{align*}
+L<sub>1</sub> &#8852; L<sub>2</sub> &\defeq \{C(L<sub>1</sub>) &#8852; C(L<sub>2</sub>)~~;~~ I(L<sub>1</sub>) &#8852; I(L<sub>2</sub>)\} \\
+L<sub>1</sub> &#8851; L<sub>2</sub> &\defeq \{C(L<sub>1</sub>) &#8851; C(L<sub>2</sub>)~~;~~ I(L<sub>1</sub>) &#8851; I(L<sub>2</sub>)\}
+\end{align*}
+
+<h2><a name="dlm_syntax">Label syntax in Jif</a></h2>
 
 </body>
 
