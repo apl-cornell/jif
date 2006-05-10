@@ -9,10 +9,19 @@ p {
     width: 80ex;
     font-size: 100%;
 }
+table {
+    width: 80ex;
+}
+table.bigtable {
+    width: 120ex;
+}
+td {
+    vertical-align: top;
+}
 i.math {
     font-family: serif
 }
-ul {
+.ultext ul {
     width: 75ex;
     font-size: 100%;
 }
@@ -42,7 +51,6 @@ ol {
 
 .mathdisplay {
       width: 90ex;
-      font-family: Courier New, courier, fixed;
       font-size: 90%;
       background-color: rgb(230,230,230);
       border: solid;

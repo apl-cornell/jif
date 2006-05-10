@@ -8,7 +8,14 @@
 <body>
 
 <h1><a name="dlm">Decentralized label model</a></h1>
-XXX TODO
+
+<p>Jif allows mutually distrusting entities to express
+information-flow security policies for confidentiality and
+integrity. Security policies are expressed using the <i>decentralized
+label model</i> (DLM)&nbsp;[ML00].  In this section, we describe the
+core concepts of the DLM: principals, policies, and labels, and
+present the syntax used to write labels in Jif programs. 
+</p>
 
 <h2><a name="dlm_principals">Principals</a></h2>
 
@@ -307,6 +314,223 @@ over this lattice,</p>
 
 
 <h2><a name="dlm_syntax">Label syntax in Jif</a></h2>
+
+<p>Labels are used to annotate types in Jif programs. The following
+table shows the appropriate syntax for writing principals, policies,
+and labels in Jif programs.</p>
+
+<TABLE border="1" class="bigtable">
+  <TR>
+    <TH></TH>
+    <TH>Symbol</TH>
+    <TH>Jif syntax</TH>
+    <TH>Example</TH>
+  </TR>
+  <TR>
+    <TD>Top principal</TD>
+    <TD>&#8868;</TD>
+    <TD><code>_</code></TD>
+    <TD>&nbsp;</TD>
+  </TR>
+  <TR>
+    <TD>Bottom principal</TD>
+    <TD>&#8869;</TD>
+    <TD><code>*</code></TD>
+    <TD>&nbsp;</TD>
+  </TR>
+  <TR>
+    <TD>Conjunctive principal</TD>
+    <TD><i class="math">p</i>&<i class="math">q</i></TD>
+    <TD><code>p&q</code></TD>
+    <TD>
+       <ul>
+       <li><code>Alice&Bob</code> 
+       <li><code>Alice&(Bob,Chuck)&Dave</code> 
+       </ul>
+    </TD>
+  </TR>
+  <TR>
+    <TD>Disjunctive principal</TD>
+    <TD><i class="math">p</i>,<i class="math">q</i></TD>
+    <TD><code>p,q</code></TD>
+    <TD>
+       <ul>
+       <li><code>Alice, Bob, Chuck</code> 
+       <li><code>Alice, Bob&Chuck, Chuck&Dolores</code> 
+       </ul>
+    </TD>
+  </TR>
+  <TR>
+    <TD>Reader policy</TD>
+    <TD><i class="math">o</i>&rarr;<i class="math">r</i></TD>
+    <TD><code>o:r</code></TD>
+    <TD>
+        <ul>
+        <li><code>_:_</code> is the least restrictive reader policy.
+        <li><code>*:*</code> is the most restrictive reader policy.
+
+        <li>If no principal appears to the right of the colon, by default
+        the top principal is used. Thus <code>Alice:</code> is
+        equivalent to <code>Alice:*</code>.
+        </ul>
+    </TD>
+  </TR>
+  <TR>
+    <TD>Writer policy</TD>
+    <TD><i class="math">o</i>&larr;<i class="math">w</i></TD>
+    <TD><code>o!:w</code></TD>
+    <TD>
+        <ul>
+        <li><code>_!:_</code> is the most restrictive (lowest integrity) writer policy.<br>
+        <li><code>*!:*</code> is the least restrictive (highest integrity) writer policy.<br>
+
+        <li>If no principal appears to the right of the colon, by default
+        the top principal is used. Thus <code>Alice!:</code> is
+        equivalent to <code>Alice!:*</code>.
+        <ul>
+    </TD>
+  </TR>
+  <TR>
+    <TD>Reader policy joins and meets</TD>
+    <TD><i class="math">o</i>&rarr;<i class="math">r</i>&nbsp;&#8852;&nbsp;<i class="math">o'</i>&rarr;<i class="math">r'</i> <br>
+        <i class="math">o</i>&rarr;<i class="math">r</i>&nbsp;&#8851;&nbsp;<i class="math">o'</i>&rarr;<i class="math">r'</i>
+   </TD>
+    <TD><code>o:r;o':r'</code><br>
+        <code>o:r&nbsp;meet&nbsp;o':r'</code>
+    </TD>
+    <TD>
+        <ul>
+        <li><code>Alice:; Bob:Chuck</code>
+        <li><code>Alice: meet Bob:Chuck </code>
+        <li><code>Alice: meet Bob:Chuck; Chuck:</code> is the meet
+             <code>Alice: meet Bob:Chuck</code> joined with
+             <code>Chuck:</code>. Meets of joins of policies can be
+             expressed using the label syntax below.
+        </ul>
+    </TD>
+  </TR>
+  <TR>
+    <TD>Writer policy joins and meets</TD>
+    <TD><i class="math">o</i>&rarr;<i class="math">r</i>&nbsp;&#8852;&nbsp;<i class="math">o'</i>&rarr;<i class="math">r'</i> <br>
+        <i class="math">o</i>&rarr;<i class="math">r</i>&nbsp;&#8851;&nbsp;<i class="math">o'</i>&rarr;<i class="math">r'</i>
+   </TD>
+    <TD><code>o!:r;o'!:r'</code><br>
+        <code>o!:r&nbsp;meet&nbsp;o'!:r'</code>
+    </TD>
+    <TD>
+        <ul>
+        <li><code>Alice!:; Bob!:Chuck</code>
+        <li><code>Alice!: meet Bob!:Chuck </code>
+        <li><code>Alice!: meet Bob!:Chuck; Chuck!:</code> is the meet
+             <code>Alice!: meet Bob!:Chuck</code> joined with
+             <code>Chuck!:</code>. Meets of joins of policies can be
+             expressed using the label syntax below.
+        </ul>
+    </TD>
+  </TR>
+  <TR>
+    <TD>Labels</TD>
+    <TD>{<i class="math">c</i>;<i class="math">d</i>} 
+   </TD>
+    <TD><code>{c;d}</code>
+    </TD>
+    <TD>
+        <ul>
+        <li><code>{Alice:Bob; Alice!:Chuck}</code>
+        <li><code>{Alice!:Chuck; Alice:Bob meet Bob:Bob; Chuck!:}</code> 
+                  The order of policies appearing in the label does
+                  not matter.  This label is equivalent to
+                  <code>{Alice:Bob meet Bob:Bob; Alice!:Chuck;
+                  Chuck!:}</code>, which has confidentiality policy
+                  <code>Alice:Bob meet Bob:Bob</code> and integrity
+                  policy <code>Alice!:Chuck; Chuck!:</code>.
+ 
+        <li><code>{Alice:Bob}</code> 
+                  If no integrity policy is specified, then by default
+                  <code>_!:_</code> is
+                  assumed. <code>{Alice:Bob}</code> is equivalent
+                  to <code>{Alice:Bob; _!:_}</code>.
+
+        <li><code>{Bob!:Alice&Chuck}</code> 
+                  If no confidentiality policy is specified, then by default
+                  <code>_:_</code> is
+                  assumed. <code>{Bob!:Alice&Chuck}</code> is equivalent
+                  to <code>{_:_; Bob!:Alice&Chuck}</code>.
+
+        <li><code>{}</code> As neither a confidentiality poilcy or
+                  an integrity policy is specified, this label is
+                  equivalent to <code>{_:_; _!:_}</code>.
+        </ul>
+    </TD>
+  <TR>
+    <TD>Label joins</TD>
+    <TD>{<i class="math">c</i>;<i class="math">d</i>}&#8852;{<i class="math">c'</i>;<i class="math">d'</i>}
+   </TD>
+    <TD><code>{c;c';d;d'}</code>
+    </TD>
+    <TD>&nbsp;
+    </TD>
+  </TR>
+  <TR>
+    <TD>Label meets</TD>
+    <TD>{<i class="math">c</i>;<i class="math">d</i>}&#8851;{<i class="math">c'</i>;<i class="math">d'</i>}
+   </TD>
+    <TD><code>{c&nbsp;meet&nbsp;c'; d&nbsp;meet&nbsp;d'}</code> or <br>
+       <code>{c;d}&nbsp;meet&nbsp;{c';d'}</code>
+    </TD>
+    <TD>
+        <ul>
+        <li><code>{Alice:Bob meet Chuck:Dave; Alice!: meet Chuck!:}</code>
+        <li><code>{Alice:Bob; Alice!:} meet {Chuck:Dave; Chuck!:}</code>
+    </TD>
+  </TR>
+</TABLE>
+
+
+<p>Several Jif language features estend the expressiveness of labels
+that can be used in annotations. These features include <a
+href="language.html#label-principal-params">label parameters</a>, <a
+href="language.html#dynamic-labels">dynamic labels</a>, and
+polymorphic <a href="language.html#label-polymorphism">argument
+labels</a>. Label parameters, dynamic labels and argument labels can
+all appear in labels. XXX Explain algorithm for interpreting Jif labels.
+
+L, M are label parameters
+
+x, y, z are arg labels
+
+lbl1, lbl2 are dynamic labels
+
+<TABLE border="1" class="bigtable">
+  <TR>
+    <TH>Jif label</TH>
+    <TH>Meaning</TH>
+  </TR>
+  <TR>
+    <TD><code>{Alice:; L; Alice!:Bob}</code></TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD><code>{*lbl1; x; L meet *lbl2}</code></TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD><code>{*lbl1; Alice!:}</code></TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD><code>{*lbl1}</code></TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD><code>{*lbl1 meet Alice:}</code></TD>
+    <TD>Error! </TD>
+  </TR>
+  <TR>
+    <TD><code>{*lbl1} meet {Alice:}</code></TD>
+    <TD>Error! </TD>
+  </TR>
+</table>
 
 </body>
 
