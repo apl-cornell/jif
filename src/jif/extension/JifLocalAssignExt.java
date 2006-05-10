@@ -35,7 +35,7 @@ public class JifLocalAssignExt extends JifAssignExt
         Label L = ts.labelOfLocal(li, A.pc());
 
         Expr rhs = (Expr) lc.context(A).labelCheck(assign.right());
-        PathMap Xr = X(rhs);
+        PathMap Xr = rhsPathMap(lc.context(A), rhs);
         PathMap X;
 
         if (assign.operator() != Assign.ASSIGN) {
@@ -86,5 +86,9 @@ public class JifLocalAssignExt extends JifAssignExt
         Expr lhs = (Expr) X(lve, X);
         checkThrowTypes(throwTypes);
         return (Assign) X(assign.right(rhs).left(lhs), X);
+    }
+
+    protected PathMap rhsPathMap(LabelChecker lc, Expr rhs) {
+        return X(rhs);
     }
 }

@@ -39,7 +39,7 @@ public abstract class JifDowngradeExprExt extends Jif_c
 	Expr e = (Expr) lc.context(A).labelCheck(d.expr());
 	PathMap Xe = X(e);
         
-        Xe = downgradeExprPathMap(lc, A, Xe);
+        Xe = downgradeExprPathMap(lc.context(A), Xe);
         
 	Label downgradeTo = d.label().label();
         Label downgradeFrom = null;
@@ -98,7 +98,7 @@ public abstract class JifDowngradeExprExt extends Jif_c
 	return X(d.expr(e), X);
     }
 
-    protected PathMap downgradeExprPathMap(LabelChecker lc, JifContext A, PathMap Xe) throws SemanticException {
+    protected PathMap downgradeExprPathMap(LabelChecker lc, PathMap Xe) throws SemanticException {
         return Xe;
     }
 
