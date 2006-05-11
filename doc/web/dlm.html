@@ -457,7 +457,7 @@ and labels in Jif programs.</p>
                   assumed. <code>{Bob!:Alice&Chuck}</code> is equivalent
                   to <code>{_:_; Bob!:Alice&Chuck}</code>.
 
-        <li><code>{}</code> As neither a confidentiality poilcy or
+        <li><code>{}</code> As neither a confidentiality policy or
                   an integrity policy is specified, this label is
                   equivalent to <code>{_:_; _!:_}</code>.
         </ul>
@@ -487,19 +487,22 @@ and labels in Jif programs.</p>
 </TABLE>
 
 
-<p>Several Jif language features estend the expressiveness of labels
-that can be used in annotations. These features include <a
-href="language.html#label-principal-params">label parameters</a>, <a
-href="language.html#dynamic-labels">dynamic labels</a>, and
-polymorphic <a href="language.html#label-polymorphism">argument
-labels</a>. Label parameters, dynamic labels and argument labels can
-all appear in labels. XXX Explain algorithm for interpreting Jif labels.
+<p>Jif extends the expressiveness of labels with several language
+mechanisms.  <a href="language.html#label-principal-params">Label
+parameters</a>, <a href="language.html#dynamic-labels">dynamic
+labels</a>, and polymorphic <a
+href="language.html#label-polymorphism">argument labels</a> can all
+appear within labels. To interpret a label in which elements other
+confidentiality and integrity policies appear, the following algorithm
+is followed: (1) all integrity and confidentiality policies are
+separated and interpreted as a normal label, {<i class="math">c</i>;<i
+class="math">d</i>}; (2) other elements in the label are joined with
+{<i class="math">c</i>;<i class="math">d</i>}.</p>
 
-L, M are label parameters
-
-x, y, z are arg labels
-
-lbl1, lbl2 are dynamic labels
+<p>The following table gives examples of how to interpret Jif
+labels.  <code>L</code> is a label parameter, <code>x</code> is an
+argument label, and <code>lbl1</code> and <code>lbl2</code> are
+dynamic labels.</p>
 
 <TABLE border="1" class="bigtable">
   <TR>
@@ -508,27 +511,34 @@ lbl1, lbl2 are dynamic labels
   </TR>
   <TR>
     <TD><code>{Alice:; L; Alice!:Bob}</code></TD>
-    <TD></TD>
+    <TD>{Alice&rarr;&#8868;;Alice&larr;Bob} &#8852; L</TD>
   </TR>
   <TR>
     <TD><code>{*lbl1; x; L meet *lbl2}</code></TD>
-    <TD></TD>
+    <TD>lbl1 &#8852; x &#8852; (L &#8851; lbl2) <br>
+        No integrity or confidentiality policies appear in this label.
+   </TD>
   </TR>
   <TR>
     <TD><code>{*lbl1; Alice!:}</code></TD>
-    <TD></TD>
+    <TD>{&#8869;&rarr;&#8869;;Alice&larr;&#8868;} &#8852; lbl1<br>
+        Since an integrity policy appears, the default confidentiality policy &#8869;&rarr;&#8869; is used.
+    </TD>
   </TR>
   <TR>
     <TD><code>{*lbl1}</code></TD>
-    <TD></TD>
+    <TD>lbl1<br>
+        No integrity or confidentiality policy appears.
+    </TD>
   </TR>
   <TR>
     <TD><code>{*lbl1 meet Alice:}</code></TD>
-    <TD>Error! </TD>
+    <TD>Error! Attempting to take the meet of a label (<code>*lbl1</code>) and a confidentiality policy (<code>Alice:</code>).</TD>
   </TR>
   <TR>
     <TD><code>{*lbl1} meet {Alice:}</code></TD>
-    <TD>Error! </TD>
+    <TD>{Alice&rarr;&#8868;;&#8869;&larr;&#8869;} &#8851; lbl1
+    </TD>
   </TR>
 </table>
 
