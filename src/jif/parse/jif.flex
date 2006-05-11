@@ -43,7 +43,7 @@ import java.math.BigInteger;
     }
 
     public Lexer_c(java.io.Reader reader, FileSource file, ErrorQueue eq) {
-        this(new EscapedUnicodeReader(reader));
+        this(reader);
         this.file = file.name();
         this.path = file.path();
         this.eq = eq;

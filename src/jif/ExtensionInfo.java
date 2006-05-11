@@ -163,4 +163,10 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo
         // touch Topics to force the static initializer to be loaded.
         Topics.jif.toLowerCase();
     }
+
+    public polyglot.frontend.FileSource createFileSource(java.io.File f,
+    							 boolean user)
+    {
+	return new jif.parse.UTF8FileSource(f, user);
+    }
 }
