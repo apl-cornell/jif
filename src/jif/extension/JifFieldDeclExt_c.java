@@ -144,6 +144,14 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             if (init instanceof ArrayInit) {
                 ((JifArrayInitExt)(init.ext())).labelCheckElements(lc, decl.type().type()); 
             }
+            else {
+                // Must check that the expression type is a subtype of the
+                // declared type.  Most of this is done in typeCheck, but if
+                // they are instantitation types, we must add constraints for
+                // the labels.
+                subtypeChecker.addSubtypeConstraints(lc, init.position(),
+                                                     t, init.type());                
+            }
 
 	    PathMap Xe = X(init);
             lc.constrain(new LabelConstraint(new NamedLabel("init.nv", 
@@ -174,12 +182,6 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 
 	    Xd = Xe;
 
-	    // Must check that the expression type is a subtype of the
-	    // declared type.  Most of this is done in typeCheck, but if
-	    // they are instantitation types, we must add constraints for
-	    // the labels.
-	    subtypeChecker.addSubtypeConstraints(lc, init.position(),
-		                                 t, init.type());
 	    A = (JifContext) A.pop();
 	}
 	else {

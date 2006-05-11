@@ -109,6 +109,14 @@ public class JifTypeSystem_c
     public Context createContext() {
         return new JifContext_c(this, jlts);
     }
+    
+    
+    protected ArrayType arrayType(Position pos, Type type) {
+        if (!isLabeled(type)) {
+            type = labeledType(pos, type, defaultSignature().defaultArrayBaseLabel());
+        }
+        return super.arrayType(pos, type);
+    }
 
     public InitializerInstance initializerInstance(
         Position pos,
@@ -956,7 +964,7 @@ public class JifTypeSystem_c
         }
         return type;
     }
-
+    
     public Type unlabel(Type type) {
         if (type instanceof LabeledType) {
             return ((LabeledType)type).typePart();

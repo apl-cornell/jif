@@ -68,6 +68,10 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Array3.jif ;
 	Array4.jif ;
 	Array5.jif ;
+	Array6.jif (Semantic, "not less restrictive");
+	Array7.jif (Semantic, "not less restrictive");
+	Array8.jif (Semantic, "not less restrictive");
+	Array9.jif (Semantic, "not less restrictive");
 	ArrayBaseLabel01.jif (Semantic, "base type of arrays must be equivalent");
 	ArrayLeak.jif (Semantic, "not a subtype") ;
 #Removed the problematics String.getBytes method from the String signature

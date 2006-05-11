@@ -63,4 +63,8 @@ public class VarSignature implements DefaultSignature
     public Label defaultFieldLabel(FieldDecl fd) {
         return ts.bottomLabel();
     }
+    
+    public Label defaultArrayBaseLabel() {
+        return ts.noComponentsLabel();
+    }    
 }

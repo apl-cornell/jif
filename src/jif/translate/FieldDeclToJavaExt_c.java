@@ -1,11 +1,8 @@
 package jif.translate;
 
 import polyglot.ast.*;
-import polyglot.ast.FieldDecl;
-import polyglot.ast.Node;
-import polyglot.types.FieldInstance;
-import polyglot.types.Flags;
-import polyglot.types.SemanticException;
+import polyglot.types.*;
+import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
 
 public class FieldDeclToJavaExt_c extends ToJavaExt_c {
@@ -22,8 +19,13 @@ public class FieldDeclToJavaExt_c extends ToJavaExt_c {
         
         // if it is an instance field with an initializing expression, we need 
         // the initialiazation to the initializer method.
-        if (!n.flags().isStatic() && n.init() != null) {
-            rw.addInitializer(fi, n.init());
+        if (!n.flags().isStatic() && n.init() != null) {   
+            Expr init = n.init();
+            if (init instanceof ArrayInit) {
+                Type base = fi.type().toArray().base();
+                init = rw.java_nf().NewArray(Position.COMPILER_GENERATED, rw.typeToJava(base, Position.COMPILER_GENERATED), 1, (ArrayInit)init);
+            }
+            rw.addInitializer(fi, init);
             n = n.init(null);
         }
 

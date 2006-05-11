@@ -11,4 +11,5 @@ public interface DefaultSignature
     Label defaultReturnValueLabel(ProcedureDecl pd);    
     Label defaultReturnLabel(ProcedureDecl pd);    
     Label defaultFieldLabel(FieldDecl fd);
+    Label defaultArrayBaseLabel();
 }

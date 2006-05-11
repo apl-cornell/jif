@@ -39,10 +39,9 @@ public class JifInstanceOfDel extends JifJL_c
                                         "not represent the parameters at runtime.", 
                                         io.position());
         }
-
         if (compareType.isArray()) {
             while (compareType.isArray()) {
-                compareType = compareType.toArray().base();
+                compareType = ts.unlabel(compareType.toArray().base());
             }
             if (compareType instanceof JifSubstType && ((JifSubstType)compareType).entries().hasNext()) {
                 throw new SemanticException("Jif does not currently support instanceof to an array of a parameterized type.", io.position());

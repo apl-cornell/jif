@@ -4,6 +4,7 @@ import java.util.*;
 
 import jif.types.*;
 import jif.types.label.Label;
+import jif.types.label.VarLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.main.Report;
@@ -194,7 +195,8 @@ public class SubtypeChecker
                                                                "label of type " + supertype,
                                                                 ts.labelOfType(supertype)), 
                                                             A.labelEnv(),
-                                                            pos) {
+                                                            pos,
+                                                            !(ts.labelOfType(subtype) instanceof VarLabel || ts.labelOfType(supertype) instanceof VarLabel )) {
                                         public String msg() {
                                             String s = lOrigSubtype + " is not a subtype of " + 
                                                   lOrigSupertype + ".";

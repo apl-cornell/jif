@@ -19,7 +19,12 @@ public class JifDelFactory_c extends AbstractDelFactory_c {
   protected JL delArrayAccessAssignImpl() {
       return new JifArrayAccessAssignDel();
   }
-  protected JL delBinaryImpl() {
+  
+  protected JL delArrayInitImpl() {
+    return new JifArrayInitDel();
+}
+
+protected JL delBinaryImpl() {
       return new JifBinaryDel();
   }
   protected JL delCallImpl() {
@@ -55,6 +60,11 @@ public class JifDelFactory_c extends AbstractDelFactory_c {
   protected JL delLocalDeclImpl() {
       return new JifLocalDeclDel();
   }
+  
+  protected JL delNewArrayImpl() {
+      return new JifNewArrayDel();
+  }
+
   protected JL delThrowImpl() {
       return new JifThrowDel();
   }

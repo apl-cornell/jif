@@ -60,4 +60,9 @@ public class FixedSignature implements DefaultSignature
     public Label defaultFieldLabel(FieldDecl fd) {
         return ts.noComponentsLabel();
     }
+
+    public Label defaultArrayBaseLabel() {
+        return ts.noComponentsLabel();
+    }
+    
 }

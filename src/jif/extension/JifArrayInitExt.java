@@ -6,9 +6,8 @@ import java.util.List;
 
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.PathMap;
+import jif.types.*;
+import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.ArrayInit;
 import polyglot.ast.Expr;
@@ -62,13 +61,12 @@ public class JifArrayInitExt extends Jif_c
     public void labelCheckElements(LabelChecker lc, Type lhsType) throws SemanticException {
         ArrayInit init = (ArrayInit) node();
 
-        // Must check that the initializer is a subtype of the
-        // declared type. 
-        subtypeChecker.addSubtypeConstraints(lc, init.position(),
-                                     lhsType, init.type());
-
         // Check if we can assign each individual element.
         Type t = lhsType.toArray().base();
+        Label L = null;
+        if (lc.typeSystem().isLabeled(t)) {
+            L = lc.typeSystem().labelOfType(t);
+        }
 
         for (Iterator i = init.elements().iterator(); i.hasNext(); ) {
             Expr e = (Expr) i.next();
@@ -79,6 +77,31 @@ public class JifArrayInitExt extends Jif_c
             }
 
             subtypeChecker.addSubtypeConstraints(lc, e.position(), t, s);
+         
+            if (L != null) {
+                // check that the element can be assigned to the base type.
+                PathMap Xe = X(e);
+                lc.constrain(new LabelConstraint(new NamedLabel("array_init_elem.nv", 
+                                                                "label of successful evaluation of array element " + e, 
+                                                                Xe.NV()), 
+                                                                LabelConstraint.LEQ, 
+                                                                new NamedLabel("label of array base type" , L),
+                                                                lc.context().labelEnv(),
+                                                                e.position()) {
+                    public String msg() {
+                        return "Label of the array element not less " + 
+                        "restrictive than the label of the array base type.";
+                    }
+                    public String detailMsg() { 
+                        return "More information is revealed by the successful " +
+                        "evaluation of the intializing expression " +
+                        "than is allowed to flow to " +
+                        "the array base type.";
+                    }
+                }
+                );
+            }
+            
         }        
     }
 }

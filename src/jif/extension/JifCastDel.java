@@ -41,7 +41,7 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
         
         if (castType.isArray()) {
             while (castType.isArray()) {
-                castType = castType.toArray().base();
+                castType = ts.unlabel(castType.toArray().base());
             }
             if (castType instanceof JifSubstType && ((JifSubstType)castType).entries().hasNext()) {
                 throw new SemanticException("Jif does not currently support casts to an array of a parameterized type.", c.position());
