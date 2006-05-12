@@ -1,10 +1,22 @@
-1. Modify $JIF/CHANGES with date of release
-2. Record version number of polyglot in $JIF/README, and $JIF/CHANGES
-3. Check out clean copy of Jif
-4. Run  "ant dist"
-5. Copy polyglot.jar, JFlex.jar and java_cup.jar into the distribution's lib directory
-6. Tar it all up
-7. Publish files $JIF/doc/jifdoc.css and $JIF/doc/web/* on the web, at 
+1. Change the version number in the file $JIF/src/jif/Version.java.
+
+2. Modify $JIF/CHANGES with date of release and modifications since
+   the last version.
+
+3. Record version number of Polyglot and Jif in $JIF/README,
+   $JIF/CHANGES, and $JIF/doc/web/overview.html and and
+   $JIF/doc/index.html
+
+4. Check out clean copy of Jif
+
+5. Run  "ant dist"
+
+6. Copy polyglot.jar, JFlex.jar and java_cup.jar into the
+   distribution's lib directory
+
+7. Tar it all up
+
+8. Publish files $JIF/doc/jifdoc.css and $JIF/doc/web/* on the web, at 
    http://www.cs.cornell.edu/jif/doc/jif-x.x.x/. (There is a link to the
-   reference manual from $JIF/doc/index.html.)
+   reference manual from $JIF/doc/index.html that you updated in step 2.)
 

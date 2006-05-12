@@ -14,12 +14,17 @@ building interesting programs in a security-typed language:
 
 <div class="ultext">
 <ul>
-<li>A <strong>declassification</strong> mechanism gives the programmer
-an explicit escape hatch for releasing information when that is necessary.
+
+<li>A <strong>downgrading</strong> mechanism gives the programmer an
+explicit escape hatch for downgrading the security of information when
+that is necessary. Downgrading confidentiality is called
+<strong>declassification</strong>, whereas downgrading integrity is called
+<strong>endorsement</strong>.
+
 <li><strong>Principals</strong>, the entities that have security requirements,
 are explicitly represented in the Jif language, 
     both as type annotations and as values that can be manipulated at
-    run time. A new feature of Jif 2.0.0 is the ability to create
+    run time. Jif provides the ability to create
     <strong>user-defined principals</strong>, so that programs can define
     their own authentication and authorization procedures.
 <li><strong>Statically checked access control</strong> makes it possible
@@ -37,8 +42,7 @@ makes it unnecessary to write many type annotations.
 <li><strong>Run-time label checking and first-class label values</strong>
 makes it possible to discover and to define new policies at run time. Run-time
 checks are statically checked to ensure that information is not leaked by
-the success or failure of the run-time check itself.  Jif 2.0.0 significantly
-improves the expressive power of this important language feature.
+the success or failure of the run-time check itself.  
 </ul>
 </div>
 
@@ -55,7 +59,7 @@ does not eliminate all possible information leaks
 In Jif, every value has a <em>labeled type</em> that consists of two parts:
 an ordinary Java type such as <code>int</code>,
 and a <em>label</em> that describes how
-the information can be used.
+the value can be used.
 Any type expression <i class="math">t</i>
 may be labeled with any label expression <i class="math">l</i>.
 This labeled type expression is written <code><i class="math">t</i>{<i class="math">l</i>}</code>; for example, the
@@ -77,9 +81,9 @@ A policy expression <code><i class="math">owner</i>:
 <i class="math">reader</i><sub>1</sub>,
 <i class="math">reader</i><sub>2</sub>, ...</code>
 means that the
-principal <code><i>owner</i></code> wants to allow the labeled
+principal <code><i class="math">owner</i></code> wants to allow the labeled
 information to flow to at most the principals
-<code><i>reader<sub>i</sub></i></code>. Labels built from these
+<code><i class="math">reader<sub>i</sub></i></code>. Labels built from these
 policies are called <em>decentralized labels</em> because they
 enforce security on behalf of the owning principals, not on
 behalf of an implicitly centralized policy specifier.
@@ -100,8 +104,8 @@ defines a preorder on labels in which the equivalence
 classes form a join semilattice.)
 </p>
 <p>
-When differently labeled inputs are
-combined, the result may reveal information about
+When computation combines several input values to produce a result,
+the result may reveal information about
 any of the inputs. For example, when two variables
 <code>x</code> and <code>y</code> are added, the sum
 <code>x+y</code> may reveal information about both
@@ -165,7 +169,7 @@ In the decentralized label model implemented by Jif,
 information is owned by, updated by,
 and released to <em>principals</em>: users and other
 authority entities such as groups or roles.  For example, both users and
-groups in Unix would be modeled as principals.
+groups in Unix could be modeled as principals.
 </p>
 
 <p>
@@ -204,9 +208,9 @@ the knowledge that the relationship exists when checking
 information flows and comparing security policies.
 </p>
 
-<p>As discussed <a href="#user-defined-principals">below</a>, Jif 2.0.0
-adds support for user-defined principals and user-defined
-authentication mechanisms.</p>
+<p>Jif also provides support for <a
+href="#user-defined-principals">user-defined principals</a> and
+user-defined authentication mechanisms.</p>
 
 <h3><a name="implicit-flows">Implicit flows and
 program-counter labels</a></h3>
@@ -226,9 +230,9 @@ the knowledge that the statement or expression was evaluated.
 <p>
 For example, consider the following program, which is obviously
 equivalent to the statement <code>l = h</code>, assuming
-<code>h</code> is a boolean variable:
+<code>h</code> and <code>l</code> are boolean variables:
 <div class="code"><pre>
-boolean l = false;
+l = false;
 if (h) {
     l = true;
 }
@@ -236,27 +240,28 @@ if (h) {
 </p>
 
 <p class="cont">
-If <code>l</code> contains public (low) information and <code>h</code>
-contains secret (high) information, this program is not secure.
-The solution is that by conditioning on the variable <code>h</code>,
-the <code>if</code> statement makes the <u>pc</u> of the assignment
-to <code>l</code> at least as restrictive as <code>{h}</code>.
-Assume no information can be learned from the fact that the
-program is executed (that is, initially <u>pc</u>&nbsp;=&nbsp;<code>{}</code>).
-In this case, the value of <u>pc</u> during the consequent clause is
-<code>{h}</code>.
-After the <code>if</code> statement, it is again true that <u>pc</u> = <code>{}</code>,
-because no information
-about <code>h</code> can be deduced from the fact that the statement after the <code>if</code>
-statement is executed. (It is not true in general that the value of <u>pc</u>
-reverts after <code>if</code> statements,
-but is true here because this <code>if</code> statement always terminates
-without exceptions.)
-The label of a literal expression (e.g., <code>true</code>) is the same as its <u>pc</u>, or <code>{h}</code>
-in this case.
-So the assignment is permitted only if the label <code>{l}</code> is
-at least as restrictive as the label <code>{h}</code>. This would not be
-true if <code>l</code> were public and <code>h</code> secret.
+If <code>l</code> contains public (low confidentiality) information
+and <code>h</code> contains secret (high confidentiality) information,
+this program is not secure.  The solution is that by conditioning on
+the variable <code>h</code>, the <code>if</code> statement makes the
+<u>pc</u> of the assignment to <code>l</code> at least as restrictive
+as <code>{h}</code>.  Assume no information can be learned from the
+fact that the program is executed, and that the program executes with
+the highest possible integrity (that is, initially
+<u>pc</u>&nbsp;=&nbsp;<code>{*!:*}</code>).  In this case, the value
+of <u>pc</u> during the consequent clause is <code>{h}</code>.  After
+the <code>if</code> statement, it is again true that <u>pc</u> =
+<code>{*!:*}</code>, because no information about <code>h</code> can be
+deduced from the fact that the statement after the <code>if</code>
+statement is executed. (It is not true in general that the value of
+<u>pc</u> reverts after <code>if</code> statements, but is true here
+because this <code>if</code> statement always terminates without
+throwing an exception.)  The label of a literal expression (e.g.,
+<code>true</code>) is the same as its <u>pc</u>, or <code>{h}</code>
+in this case.  So the assignment is permitted only if the label
+<code>{l}</code> is at least as restrictive as the label
+<code>{h}</code>. This would not be true if <code>l</code> were public
+and <code>h</code> secret.
 </p>
 
 <p>
@@ -266,7 +271,7 @@ In general, the flow of control within a program depends on the values of
 certain expressions. At any given point during execution, various values
 <i class="math">v<sub>i</sub></i> have been observed in order to decide to arrive at the
 current basic block; therefore, the labels of these values affect the
-current <u>pc</u>. The Jif type system will ensure that the <u>pc</u>
+current <u>pc</u>. The Jif type system ensures that the <u>pc</u>
 label is at least as restrictive as the labels of all the variables on
 which the program counter depends.
 </p>
@@ -277,8 +282,8 @@ the termination or non-termination of a program.
 Consider the execution of a <code>while</code> statement
 <code>while (h != 0) { ... }</code>.
 According to the Jif type system,
-assuming that initially <u>pc</u>=<code>{}</code>, then
-after the statement terminates, <u>pc</u>=<code>{}</code>, using the
+assuming that initially <u>pc</u>=<code>{*!:*}</code>, then
+after the statement terminates, <u>pc</u>=<code>{*!:*}</code>, using the
 same reasoning as for the <code>if</code> statement. This
 labeling might seem strange, because we
 know the value of <code>h</code> when we arrive at the final basic block.
@@ -293,9 +298,8 @@ the Java thread model for concurrent programming.
 
 <h3><a name="method-decls">Method declarations</a></h3>
 <p>
-The syntax of a Jif method
-declaration has some extensions
-when compared to Java syntax;
+Jif method
+declaration syntax extends Java syntax;
 there are a few optional annotations,
 including annotations for
 controlling information flow and for managing
@@ -304,11 +308,11 @@ code authority.
 
 <p>
 In a Jif method declaration, the return value, the arguments, and
-the exceptions each may be given their own individual label.
-There are two optional labels in a method declaration called the
+the exceptions may each be annotated with a label.
+There are additionally two optional labels in a method declaration called the
 <em>begin-label</em> and the <em>end-label</em>. 
-The begin-label is used to specify any
-restriction on <u>pc</u> at the point of invocation of the method.
+The begin-label specifies an upper bound
+on <u>pc</u> at the point of invocation of the method.
 The begin-label allows information about the <u>pc</u> of the caller to
 be used for statically checking the implementation, thereby
 preventing assignments within the method from creating implicit flows
@@ -325,11 +329,11 @@ public class Vector[label L] extends AbstractList[L] {
 
     public Vector() ...
     public Object elementAt(int i):{L; i}
-	            throws (IndexOutOfBoundsException) {
+	            throws IndexOutOfBoundsException {
         ...
 	return elements[i];
     }
-    public void setElementAt{L}(Object{} o, int{} i) ...
+    public void setElementAt{L}(Object{L} o, int{L} i) ...
     public int{L} size() { return length; }
     public void clear{L}() ...
     ...
@@ -345,21 +349,27 @@ polymorphism over labels is discussed <a href="#parameterized-classes">later</a>
 </p>
 
 <p>
-The method <code>setElementAt</code> in this declaration
-is prevented from leaking information
-by its declared begin-label, <code>{L}</code>.
-It can be called only if the <u>pc</u> of the
-caller is no more restrictive than <code>{L}</code>. The labels of the
-arguments <code>o</code> and <code>i</code> are written as
-<code>{}</code>, but as discussed in the
-following section, argument labels automatically
-include the begin-label,
-so both arguments are effectively labeled by <code>{L}</code>.
+The method <code>setElementAt</code> has a declared begin-label,
+<code>{L}</code>, occuring between the method name and the list of
+arguments. The begin-label ensures that the method can be called only
+if the <u>pc</u> of the caller is no more restrictive than
+<code>{L}</code>; the begin-label also ensures that the method can
+only update locations with a label at least as restrictive as
+<code>{L}</code> (such as the <code>elements</code> array). These two
+restrictions combined ensure that there will not be implicit
+information flow via invocation of the method.</p>
+
+<p>
+The labels of the formal arguments <code>o</code> and <code>i</code>
+of the method <code>setElementAt</code> are <code>{L}</code>, meaning
+that <code>{L}</code> is an upper bound on the label of any actual
+arguments.  Argument labels are discussed more fully in the following
+section.
 </p>
 <p>
 The end-label of a method specifies the <u>pc</u> at the point of termination
-of the method, and captures the restrictions on the information that
-can be learned by observing whether the method terminates normally.
+of the method, and is an upper bound on the information that
+may be learned by observing whether the method terminates normally.
 Individual exceptions and the return value itself
 also may have their own distinct labels, allowing static
 label checking to track information flow at fine granularity. For
@@ -390,14 +400,15 @@ default labels:</p>
 
 <div class="ultext">
 <ul> 
-<li>Default field label: the bottom label, <code>{}</code>
+<li>Default field label: the empty label, <code>{}</code>
 <br>
 If a field's type declaration does not include a label, then by
-default its label is <code>{}</code>, which is conservative because no
-confidential data can be stored in the field.
+default its label is <code>{}</code>. This label is the least
+confidential, and the least trusted. This conservatively ensures that
+no confidential or trusted data can be stored in the field.
 </li>
 
-<li> Default argument label: the top label, <code>&lt;top&gt;</code>
+<li> Default argument label: the top label, <code>{*:}</code>
 <br>
 The label on the type of a formal argument is an upper bound for
 labels of actual arguments. See the section on <a
@@ -405,11 +416,11 @@ href="#label-polymorphism">label polymorphism</a>.
 </li>
 
 
-<li> Default method begin-label: the top label, <code>&lt;top&gt;</code>
+<li> Default method begin-label: the top label, <code>{*:}</code>
 <br>
 The method begin-label is an upper bound on the <u>pc</u> of the caller, and
 a lower bound on the side effects of the method.  The default method begin
-label is <code>&lt;top&gt;</code>, the most restrictive label, meaning
+label is <code>{*:}</code>, the most restrictive label, meaning
 that the method has no side effects.
 </li>
 
@@ -421,7 +432,7 @@ the method terminates normally) is by default the join of the declared
 labels of any exceptions that the method declares that it
 throws. Thus, if the method does not throw any exceptions, or if the
 declared exceptions do not have any labels, the default method
-end-label is the bottom label, <code>{}</code>.
+end-label is the bottom label, <code>{*!:}</code>.
 </li>
 
 <li> Default method result label: the join of all the argument labels and the end-label. 
@@ -443,9 +454,12 @@ exception type, then by default it is assumed to be the same as the
 method end-label.
 </li>
 
-<li> Default array base label.
+<li> Default array base label: the empty label, <code>{}</code>
 <br>
-XXX TODO
+The base type of an array is a labeled type. If no label is provided
+for the base type of an array, then the empty label, <code>{}</code>
+is assumed. Thus, for example, the array type <code>int[]</code> is
+equivalent to the array type <code>int{}[]</code>, that is, an array of <code>int{}</code>.
 </li>
 </ul>
 </div>
@@ -486,7 +500,7 @@ principal hierarchy dynamically, using the
 
 <p>
 A program can use its authority to declassify information according to
-the the decentralized label model. Declassification weakens
+the decentralized label model. Declassification weakens
 the policies restricting how the information can be used. It
 provides an escape hatch from strict information flow
 control, which is important for writing realistic programs.
@@ -496,7 +510,7 @@ static authority of the program.
 
 <p>
 The expression <code>declassify(<i>e</i>,
-<i>L</i><sub>1</sub>, <i>L</i><sub>2</sub>)</code>
+<i>L</i><sub>1</sub> to <i>L</i><sub>2</sub>)</code>
 relabels the result of an expression <code><i>e</i></code>
 from the initial label <code><i>L</i><sub>1</sub></code> to
 the label <code><i>L</i></code><sub>2</sub>.
@@ -652,7 +666,7 @@ provide adequate power, they are easier and cheaper to use.
 
 <p>When formal variables have declared labels, the method is
 still polymorphic with respect to the label of the argument;
-however, the declared label serves as a bound on the allowed
+however, the declared label serves as an upper bound on the allowed
 argument labels.
 For example, in the following method
 signature, the method <code>m</code> returns a <code>String</code> whose
@@ -682,7 +696,8 @@ the label of the formal argument <code>a</code> is that <code>{Alice:
 
 <div class="code"><pre>
 String{a} m(int{Alice: ; Bob:} a) {
-    int{Alice:} i = a; <span class="comment">// ILLEGAL!  Don't know that {a} <= {Alice:}</span>
+    int{Alice:} i = a; <span class="comment">// ILLEGAL!  Don't know </span>
+                       <span class="comment">//    that {a} <= {Alice:}</span>
     int{Alice: ; Bob: ; Chuck: } j = a; <span class="comment">// OK</span>
     ...
 }
@@ -739,11 +754,11 @@ public class Vector[label L] extends AbstractList[L] {
 
     public Vector() ...
     public Object elementAt(int i):{L; i}
-	            throws (IndexOutOfBoundsException) {
+	            throws IndexOutOfBoundsException {
         ...
 	return elements[i];
     }
-    public void setElementAt{L}(Object{} o, int{} i) ...
+    public void setElementAt{L}(Object{L} o, int{L} i) ...
     public int{L} size() { return length; }
     public void clear{L}() ...
     ...
@@ -753,8 +768,8 @@ public class Vector[label L] extends AbstractList[L] {
 <p class="cont">
  The <code>Vector</code> class is parameterized on a label <code>L</code> that represents the
 label of the contained elements. Assuming that
-<code>secret</code> and <code>public</code> are appropriately defined,
-the types <code>Vector[{secret}]</code> and <code>Vector[{public}]</code> would represent
+<code>secret</code> and <code>public</code> are appropriately defined dynamic labels,
+the types <code>Vector[secret]</code> and <code>Vector[public]</code> would represent
 vectors of elements of differing sensitivity. These types are referred
 to as <em>instantiations</em> of the parameterized type <code>Vector</code>. Without the 
 ability to instantiate
@@ -768,7 +783,7 @@ example:
 
 <div class="code"><pre>
 class paramCell[principal p, principal q] {
-    int{p: q} contents;
+    int{p:q; p!:q} contents;
 }
 </pre></div>
 
@@ -776,15 +791,15 @@ class paramCell[principal p, principal q] {
 This class may be instantiated with any
 two principals <code>p</code> and <code>q</code>. For example,
 the instantiation <code>paramCell[Bob,Amy]</code> has
-a field <code>contents</code> with the label <code>{Bob: Amy}</code>.
+a field <code>contents</code> with the label <code>{Bob:Amy; Bob!:Amy}</code>.
 </p>
 
 <h3><A NAME="param-interact-object-types">Interactions with object types</A></h3>
 
 <p>
 When a parameterized or unparameterized type inherits from a superclass,
-or implements an interface, the supertype may be an instantiation.  The
-instantiation that is inherited from or implemented must be a legal type
+or implements an interface, the supertype may be an instantiated class.  The
+supertype that is inherited from or implemented must be a legal type
 within the scope of the class that is inheriting from or implementing
 it. This is a specific instance of a more general rule in Jif:
 within a parameterized class or interface, the formal parameters
@@ -807,8 +822,8 @@ to the variable occurred between them.
 
 <p>
 Subtyping is ordinarily invariant on class parameters. For example,
-even if <code>{public}</code> &#8849; <code>{secret}</code>, it is not the case
-that <code>Vector[{public}]</code> &le; <code>Vector[{secret}]</code>.
+even if <code>{*public}</code> &#8849; <code>{*secret}</code>, it is not the case
+that <code>Vector[public]</code> &le; <code>Vector[secret]</code>.
 (The label ordering is denoted here as &#8849,
 and the subtype relation is denoted by &le;.) This subtype
 relation would be unsound because <code>Vector</code> is mutable.
@@ -845,19 +860,18 @@ defaults to <code>{}</code>.  For example, the types <code>int[]</code> and
 
 <h3><A NAME="params-runtime">Using parameters at run time</A></h3>
 <p>
-A new feature in Jif 2.0.0 is that
-all class parameters are represented and accessible
+All class parameters are represented and accessible
 at run time. Thus, the following code,
 which uses the parameters <code>L</code> and <code>P</code> at runtime, 
 is permitted.  
 
 <div class="code"><pre>
 class C[label L, principal P] {
-    private final label{this} lb = L;         <span class="comment">// runtime use of L</span>
+    private final label{this} lb = L;      <span class="comment">// runtime use of L</span>
 
     private void m() {
-        label foo = new label {L; Alice:};    <span class="comment">// runtime use of L</span>
-        principal bar = P;                    <span class="comment">// runtime use of P</span>
+        label foo = new label {L; Alice:}; <span class="comment">// runtime use of L</span>
+        principal bar = P;                 <span class="comment">// runtime use of P</span>
     }
 }
 </pre>
@@ -870,7 +884,16 @@ knowing the run-time value of a parameter is the same as the
 information that may be conveyed by the reference to the current
 object. Thus, if the label of the final field <code>lb</code> in the
 example above was not at least as restrictive as the label
-<code>{this}</code>, the example would not compile.
+<code>{this}</code>, the example would not compile.</p>
+
+<p>
+Class parameters may also be used in static contexts, such as a static
+method. However, in static contexts, there is no <code>this</code>
+object, and so the label of parameters cannot be the label
+<code>{this}</code>. Instead, in static contexts, class parameters are
+treated as if they were an argument to the context; thus the label of
+a class parameter in a static context is essentially unknown.
+</p>
 
 <h2><a name="dynamic-labels"></a>Dynamic labels and principals</h2>
 
@@ -888,7 +911,7 @@ class C[label L] { ... }
 ...
 
 void m() {
-    final label lb = new label {Alice: Bob};
+    final label lb = new label {Alice: Bob; Alice!:};
 
     int{*lb; Bob:} x = 4;
 
@@ -900,7 +923,7 @@ void m() {
 
 <p>Here we see a local variable <code>lb</code>, of type
 <code>label</code>. At runtime, this variable will contain a
-representation of the label <code>{Alice: Bob}</code>. The type of the
+representation of the label <code>{Alice: Bob; Alice!:}</code>. The type of the
 variable <code>x</code> is declared to be <code>int{*lb; Bob:}</code>,
 that is, an integer whose label the policy <code>{Bob:}</code> joined
 with the <i>value</i> stored in the variable <code>lb</code>. This is
@@ -912,14 +935,15 @@ that is stored in the variable <code>lb</code>. This type is
 equivalent to the type <code>C[{*lb}]</code>, since the label stored
 in the variable <code>lb</code> is equivalent to the label <code>{*lb}</code>.
 
-<p>Jif's allows more than just local variables of type
+<p>Jif allows more than just local variables of type
 <code>label</code> and <code>principal</code> to be used to construct
 new labels and types. in fact, any <i>final access path</i> expression
 may be used. A final access path expression is an expression of the
-form <i>r.f<sub>1</sub>.f<sub>2</sub>. ... .f<sub>n</sub></i>, where <i>r</i> is either a final local
-variable, or the expression <code>this</code>, and each
-<i>f<sub>i</sub></i> is an access to a final field. Thus, the following are all examples of legal uses of dynamic labels
-and principals.
+form <i>r.f<sub>1</sub>.f<sub>2</sub>. ... .f<sub>n</sub></i>, where
+<i>r</i> is either a final local variable, or the expression
+<code>this</code>, and each <i>f<sub>i</sub></i> is an access to a
+final field. () Thus, the following are all examples of legal uses of
+dynamic labels and principals. </p>
 
 <div class="code"><pre>
 class C[label L, principal P] {
@@ -930,7 +954,7 @@ class C[label L, principal P] {
     public C() { ... }
 
     void m(principal pp) throws NullPointerException {
-        final C[this.next.lb, pp] foo = new C[this.next.lb, pp]();
+        final C[next.lb, pp] foo = new C[this.next.lb, pp]();
         C[{Alice: foo.q}, P] quux = null;
 
         int{foo.next.q: ; *this.lb} x = 8;        
