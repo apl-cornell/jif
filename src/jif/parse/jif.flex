@@ -400,6 +400,12 @@ OctalEscape = \\ [0-7]
 
     /* 3.6 White Space */
     {WhiteSpace}                 { /* ignore */ }
+    
+    /* Jif extensions */
+    "\u2293" { return op(sym.MEET); }
+    "\u2294" { return op(sym.JOIN); }
+    "\u2190" { return op(sym.LEFTARROW); }
+    "\u2192" { return op(sym.RIGHTARROW); }
 }
 
 <TRADITIONAL_COMMENT> {

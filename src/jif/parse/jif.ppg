@@ -272,6 +272,10 @@ terminal Token DECLASSIFY;
 terminal Token ENDORSE;
 terminal Token TO;
 
+terminal Token JOIN;
+terminal Token RIGHTARROW;
+terminal Token LEFTARROW;
+
 non terminal DeclassifyExpr declassify;
 non terminal DeclassifyStmt declassify_statement;
 non terminal EndorseExpr endorse;
@@ -299,6 +303,7 @@ non terminal List param_or_expr_list;
 non terminal Expr primary_no_array;
 non terminal TypeNode primitive_array_type;
 non terminal ConstructorCall explicit_super_constructor_invocation;
+non terminal Token leftarrow, rightarrow;
 start with goal;
 
 // Jif labels
@@ -318,6 +323,14 @@ label ::=
                col.add(ln);
                col.add(c);
                LabelNode mn = parser.nf.MeetLabelNode(parser.pos(x,c), col);
+               RESULT = mn; :}
+    |   LBRACE:x join_component_list:a RBRACE:y JOIN label:c
+            {: LabelNode ln;
+               ln = parser.nf.JoinLabelNode(parser.pos(x, y), a);
+               List col = new ArrayList(2);
+               col.add(ln);
+               col.add(c);
+               LabelNode mn = parser.nf.JoinLabelNode(parser.pos(x,c), col);
                RESULT = mn; :}
     ;
 label_opt ::=
@@ -380,11 +393,14 @@ label_component ::=
 						  a.getIdentifier()); :}
     ;
 
+rightarrow ::= COLON | RIGHTARROW | MINUS GT ;
+leftarrow ::= NOT COLON | LEFTARROW | LT MINUS ;
+
 label_component_policy ::=
                     // PolicyNode
-        principal_disjunctive:a COLON principal_list_opt:b
+        principal_disjunctive:a rightarrow principal_list_opt:b
             {: RESULT = parser.nf.ReaderPolicyNode(parser.pos(a, b), a, b); :}
-    |   principal_disjunctive:a NOT COLON principal_list_opt:b
+    |   principal_disjunctive:a leftarrow principal_list_opt:b
             {: RESULT = parser.nf.WriterPolicyNode(parser.pos(a, b), a, b); :}
     ;
 

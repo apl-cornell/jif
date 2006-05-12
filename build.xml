@@ -174,7 +174,7 @@
         <fail unless="cp_existence.polyglot.param"
 	      message="The Polyglot param extension must be compiled."/>
         <fail unless="env.JAVA_HOME.defined"
-	      message="The envirnoment variable JAVA_HOME must be defined."/>
+	      message="The environment variable JAVA_HOME must be defined."/>
     </target>
 
     <target name="executables">
