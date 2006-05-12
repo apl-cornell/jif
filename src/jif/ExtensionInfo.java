@@ -1,5 +1,6 @@
 package jif;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
 
@@ -8,8 +9,6 @@ import jif.ast.JifNodeFactory_c;
 import jif.types.JifTypeSystem;
 import jif.types.JifTypeSystem_c;
 import jif.visit.*;
-import jif.visit.JifLabelSubst;
-import jif.visit.NotNullChecker;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
 import polyglot.frontend.Compiler;
@@ -164,8 +163,7 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo
         Topics.jif.toLowerCase();
     }
 
-    public polyglot.frontend.FileSource createFileSource(java.io.File f,
-    							 boolean user)
+    public FileSource createFileSource(java.io.File f, boolean user) throws IOException
     {
 	return new jif.parse.UTF8FileSource(f, user);
     }
