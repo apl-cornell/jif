@@ -317,7 +317,9 @@ over this lattice,</p>
 
 <p>Labels are used to annotate types in Jif programs. The following
 table shows the appropriate syntax for writing principals, policies,
-and labels in Jif programs.</p>
+and labels in Jif programs. Some non-ASCII characters may be used
+when writing Jif programs. See <a class="secref" href="language.html#lexical">Lexical considerations</a> for more information.
+</p>
 
 <TABLE border="1" class="bigtable">
   <TR>
@@ -329,15 +331,13 @@ and labels in Jif programs.</p>
   <TR>
     <TD>Top principal</TD>
     <TD>&#8868;</TD>
-    <TD><code>_</code><br>
-        <code>&#8868;</code></TD>
+    <TD><code>*</code> <i>or</i> <code>&#8868;</code></TD>
     <TD>&nbsp;</TD>
   </TR>
   <TR>
     <TD>Bottom principal</TD>
     <TD>&perp;</TD>
-    <TD><code>*</code><br>
-        <code>&perp;</code></TD>
+    <TD><code>_</code> <i>or</i> <code>&perp;</code></TD>
     <TD>&nbsp;</TD>
   </TR>
   <TR>
@@ -364,8 +364,8 @@ and labels in Jif programs.</p>
   </TR>
   <TR>
     <TD>Reader policy</TD>
-    <TD><i class="math">o</i>&rarr;<i class="math">r</i></TD>
-    <TD><code>o:r</code> or <code>o&rarr;r</code></TD>
+    <TD><span class="math"><i>o</i>&rarr;<i>r</i></span></TD>
+    <TD><code>o:r</code><br><code>o&rarr;r</code><br><code>o-&gt;r</TD>
     <TD>
         <ul>
         <li><code>_:_</code> is the least restrictive reader policy.
@@ -380,15 +380,15 @@ and labels in Jif programs.</p>
   <TR>
     <TD>Writer policy</TD>
     <TD><i class="math">o</i>&larr;<i class="math">w</i></TD>
-    <TD><code>o!:w</code> or <code>o&larr;r</code></TD>
+    <TD><code>o!:w</code> <small><i>(deprecated)</i></small><br><code>o&larr;r</code><br><code>o&lt;-r</code></TD>
     <TD>
         <ul>
-        <li><code>_!:_</code> is the most restrictive (lowest integrity) writer policy.<br>
-        <li><code>*!:*</code> is the least restrictive (highest integrity) writer policy.<br>
+        <li><code>_&larr;_</code> is the most restrictive (lowest integrity) writer policy.<br>
+        <li><code>*&larr;*</code> is the least restrictive (highest integrity) writer policy.<br>
 
-        <li>If no principal appears to the right of the colon, by default
-        the top principal is used. Thus <code>Alice!:</code> is
-        equivalent to <code>Alice!:*</code>.
+        <li>If no principal appears on the right-hand side, by default
+        the top principal is used. Thus <code>Alice&larr;</code> is
+        equivalent to <code>Alice&larr;*</code>.
         <ul>
     </TD>
   </TR>
@@ -399,6 +399,7 @@ and labels in Jif programs.</p>
    </TD>
     <TD><code>o:r;o':r'</code><br>
         <code>o:r&nbsp;meet&nbsp;o':r'</code>
+        <code>o:r&nbsp;&#8851;&nbsp;o':r'</code>
     </TD>
     <TD>
         <ul>
@@ -416,12 +417,12 @@ and labels in Jif programs.</p>
     <TD><i class="math">o</i>&rarr;<i class="math">r</i>&nbsp;&#8852;&nbsp;<i class="math">o'</i>&rarr;<i class="math">r'</i> <br>
         <i class="math">o</i>&rarr;<i class="math">r</i>&nbsp;&#8851;&nbsp;<i class="math">o'</i>&rarr;<i class="math">r'</i>
    </TD>
-    <TD><code>o!:r;o'!:r'</code><br>
-        <code>o!:r&nbsp;meet&nbsp;o'!:r'</code>
+    <TD><code>o&larr;;o'&larr;r'</code><br>
+        <code>o&larr;r&nbsp;meet&nbsp;o'&larr;r'</code>
     </TD>
     <TD>
         <ul>
-        <li><code>Alice!:; Bob!:Chuck</code>
+        <li><code>Alice&lt;-; Bob&lt;-Chuck</code>
         <li><code>Alice!: meet Bob!:Chuck </code>
         <li><code>Alice!: meet Bob!:Chuck; Chuck!:</code> is the meet
              <code>Alice!: meet Bob!:Chuck</code> joined with
@@ -438,37 +439,37 @@ and labels in Jif programs.</p>
     </TD>
     <TD>
         <ul>
-        <li><code>{Alice:Bob; Alice!:Chuck}</code>
-        <li><code>{Alice!:Chuck; Alice:Bob meet Bob:Bob; Chuck!:}</code> 
+        <li><code>{Alice:Bob; Alice&lt;-Chuck}</code>
+        <li><code>{Alice&larr;Chuck; Alice&rarr;Bob &#8851; Bob&rarr;Bob; Chuck&larr;}</code> 
                   The order of policies appearing in the label does
                   not matter.  This label is equivalent to
                   <code>{Alice:Bob meet Bob:Bob; Alice!:Chuck;
                   Chuck!:}</code>, which has confidentiality policy
-                  <code>Alice:Bob meet Bob:Bob</code> and integrity
-                  policy <code>Alice!:Chuck; Chuck!:</code>.
+                  <code>Alice&rarr;Bob &#8851; Bob&rarr;Bob</code> and integrity
+                  policy <code>Alice&larr;Chuck; Chuck&larr;&#8868;</code>.
  
         <li><code>{Alice:Bob}</code> 
                   If no integrity policy is specified, then by default
-                  <code>_!:_</code> is
+                  <code>_&larr;_</code> is
                   assumed. <code>{Alice:Bob}</code> is equivalent
-                  to <code>{Alice:Bob; _!:_}</code>.
+                  to <code>{Alice&rarr;Bob; _&larr;_}</code>.
 
-        <li><code>{Bob!:Alice&amp;Chuck}</code> 
+        <li><code>{Bob&lt;-Alice&amp;Chuck}</code> 
                   If no confidentiality policy is specified, then by default
-                  <code>_:_</code> is
-                  assumed. <code>{Bob!:Alice&amp;Chuck}</code> is equivalent
-                  to <code>{_:_; Bob!:Alice&amp;Chuck}</code>.
+                  <code>_&rarr;_</code> is
+                  assumed. <code>{Bob&larr;Alice&amp;Chuck}</code> is equivalent
+                  to <code>{_:_; Bob&lt;-Alice&amp;Chuck}</code>.
 
         <li><code>{}</code> As neither a confidentiality policy or
                   an integrity policy is specified, this label is
-                  equivalent to <code>{_:_; _!:_}</code>.
+                  equivalent to <code>{_&rarr;_ ; _&larr;_}</code>.
         </ul>
     </TD>
   <TR>
     <TD>Label joins</TD>
     <TD>{<i class="math">c</i>;<i class="math">d</i>}&#8852;{<i class="math">c'</i>;<i class="math">d'</i>}
    </TD>
-    <TD><code>{c;c';d;d'}</code>
+    <TD><code>{c;c';d;d'}</code> <i>or</i> <code>{c;d}&#8852;{c':d'}</code>
     </TD>
     <TD>&nbsp;
     </TD>
@@ -477,13 +478,13 @@ and labels in Jif programs.</p>
     <TD>Label meets</TD>
     <TD>{<i class="math">c</i>;<i class="math">d</i>}&#8851;{<i class="math">c'</i>;<i class="math">d'</i>}
    </TD>
-    <TD><code>{c&nbsp;meet&nbsp;c'; d&nbsp;meet&nbsp;d'}</code> or <br>
+    <TD><code>{c&nbsp;meet&nbsp;c';&nbsp;d&nbsp;meet&nbsp;d'}</code> <i>or</i>
        <code>{c;d}&nbsp;meet&nbsp;{c';d'}</code>
     </TD>
     <TD>
         <ul>
-        <li><code>{Alice:Bob meet Chuck:Dave; Alice!: meet Chuck!:}</code>
-        <li><code>{Alice:Bob; Alice!:} meet {Chuck:Dave; Chuck!:}</code>
+        <li><code>{Alice&rarr;Bob meet Chuck&rarr;Dave; Alice&larr; meet Chuck&larr;}</code>
+        <li><code>{Alice&rarr;Bob; Alice&larr;} meet {Chuck&rarr;Dave; Chuck&larr;}</code>
     </TD>
   </TR>
 </TABLE>
@@ -513,23 +514,23 @@ dynamic labels.</p>
   </TR>
   <TR>
     <TD><code>{Alice:; L; Alice!:Bob}</code></TD>
-    <TD>{Alice&rarr;&#8868;;Alice&larr;Bob} &#8852; L</TD>
+    <TD><span class="math">{Alice&rarr;&#8868;; Alice&larr;Bob} &#8852; L</span></TD>
   </TR>
   <TR>
     <TD><code>{*lbl1; x; L meet *lbl2}</code></TD>
-    <TD>lbl1 &#8852; x &#8852; (L &#8851; lbl2) <br>
+    <TD><span class="math">lbl1 &#8852; x &#8852; (L &#8851; lbl2)</span> <br>
         No integrity or confidentiality policies appear in this label.
    </TD>
   </TR>
   <TR>
-    <TD><code>{*lbl1; Alice!:}</code></TD>
-    <TD>{&perp;&rarr;&perp;;Alice&larr;&#8868;} &#8852; lbl1<br>
+    <TD><code>{*lbl1; Alice&larr;}</code></TD>
+    <TD>{&perp;&rarr;&perp; ; Alice&larr;&#8868;} &#8852; lbl1<br>
         Since an integrity policy appears, the default confidentiality policy &perp;&rarr;&perp; is used.
     </TD>
   </TR>
   <TR>
     <TD><code>{*lbl1}</code></TD>
-    <TD>lbl1<br>
+    <TD><span class="math">lbl1</span><br>
         No integrity or confidentiality policy appears.
     </TD>
   </TR>

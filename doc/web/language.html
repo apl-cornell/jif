@@ -53,6 +53,26 @@ does not eliminate all possible information leaks
 (particularly, various kinds of <em>timing channels</em>).
 </p>
 
+<h2><a name="lexical">Lexical considerations</a></h2>
+<!-- Where does this belong in the manual? -->
+
+<p>
+Like Java programs, Jif programs are sequences of Unicode characters.  Certain
+parts of Jif syntax may be written using either ASCII characters or Unicode
+characters. The Unicode characters are the preferred presentation form. The Jif
+compiler expects files to be in <a
+href="http://en.wikipedia.org/wiki/UTF-8">UTF-8 encoding</a>, which means that
+pure ASCII input will work correctly, and that editors supporting UTF-8
+(e.g., <a href="http://www.vim.org">vim</a>) will
+display any Unicode characters correctly. Standard Java Unicode escapes
+(starting with <code>\u</code>) are also supported.
+</p>
+
+<p>The non-ASCII characters that are special lexical tokens for Jif are the
+following: &perp;, &#8869;, &rarr;, &larr;, &#8851;, &#8852;. They are used for
+writing label expressions.
+</p>
+
 <h2><a name="labeltypes">Labeled types</a></h2>
 
 <p>
