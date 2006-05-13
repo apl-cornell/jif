@@ -18,8 +18,8 @@ table.bigtable {
 td {
     vertical-align: top;
 }
-i.math {
-    font-family: serif
+.math {
+    font-family: serif;
 }
 .ultext ul {
     width: 75ex;
@@ -69,3 +69,5 @@ h1 { font-family: sans-serif }
 h2 { font-family: sans-serif }
 h3 { font-family: sans-serif }
 h4 { font-family: sans-serif }
+
+a.secref {font-family: sans-serif; font-weight: bold }
