@@ -67,7 +67,7 @@ display any Unicode characters correctly. Standard Java Unicode escapes
 </p>
 
 <p>The non-ASCII characters that are special lexical tokens for Jif are the
-following: &perp;, &#8869;, &rarr;, &larr;, &#8851;, &#8852;. They are used for
+following: &perp;, &#8868;, &rarr;, &larr;, &#8851;, &#8852;. They are used for
 writing label expressions.
 </p>
 
@@ -347,9 +347,9 @@ public class Vector[label L] extends AbstractList[L] {
 
     public Vector() ...
     public Object elementAt(int i):{L; i}
-	            throws IndexOutOfBoundsException {
+                    throws IndexOutOfBoundsException {
         ...
-	return elements[i];
+        return elements[i];
     }
     public void setElementAt{L}(Object{L} o, int{L} i) ...
     public int{L} size() { return length; }
@@ -368,7 +368,7 @@ polymorphism over labels is discussed <a href="#parameterized-classes">later</a>
 
 <p>
 The method <code>setElementAt</code> has a declared begin-label,
-<code>{L}</code>, occuring between the method name and the list of
+<code>{L}</code>, occurring between the method name and the list of
 arguments. The begin-label ensures that the method can be called only
 if the <u>pc</u> of the caller is no more restrictive than
 <code>{L}</code>; the begin-label also ensures that the method can
@@ -480,95 +480,24 @@ equivalent to the array type <code>int{}[]</code>, that is, an array of <code>in
 </li>
 </ul>
 
-<h2><a name="access-control"></a>Authority and access control</h2>
-!@! @@@ XXX change to Downgrading section, so that we can talk about robustness?
-
+<h2><a name="authority">Authority and access control</a></h2>
 <p>
-A method executes with some
-<em>authority</em> that has been granted to it. The authority is essentially the
-capability to act for some set of principals, and
-controls the ability to declassify data. This simple authority mechanism
-can be used to build more complex access control mechanisms.
-It is also useful for releasing information.
+A method executes with some <em>authority</em> that has been granted
+to it. The authority is essentially the capability to act for some set
+of principals. The authority of a principal is required to perform
+actions that may compromise the security of a principal, such as <a
+href="#downgrading">downgrading information</a>.  This simple
+authority mechanism can be used to build more complex access control
+mechanisms.
 </p>
 
 <p>
-At any given point within a program, the compiler understands the
-code to be running with the ability to act for some set of
-principals; the static authority of the code at that point. The actual
-authority may be greater, because the known principals may be able to act
-for other principals. The static authority can never exceed the actual
-authority unless revocation occurs while the program is running.
-</p>
-
-<p>
-The static checker maintains a notion of the <em>static principal
-hierarchy</em> at every point in the program. The static principal hierarchy
-is a set of acts-for relations that are known to exist. The static
-principal hierarchy is a subset of the acts-for relations that exist in
-the true principal hierarchy.
-The static authority of a method may be augmented by testing the
-principal hierarchy dynamically, using the
-<a href="#actsfor"><code>actsfor</code> test</a>.
-</p>
-
-<h3><a name="declassification">Declassification</a></h3>
-
-<p>
-A program can use its authority to declassify information according to
-the decentralized label model. Declassification weakens
-the policies restricting how the information can be used. It
-provides an escape hatch from strict information flow
-control, which is important for writing realistic programs.
-Importantly, the use of declassification is mediated by the
-static authority of the program.
-</p>
-
-<p>
-The expression <code>declassify(<i>e</i>,
-<i>L</i><sub>1</sub> to <i>L</i><sub>2</sub>)</code>
-relabels the result of an expression <code><i>e</i></code>
-from the initial label <code><i>L</i><sub>1</sub></code> to
-the label <code><i>L</i></code><sub>2</sub>.
-Declassification is checked statically, using the static
-authority at the point of declassification. The
-<code>declassify</code> expression
-may relax only the policies owned by principals in the static authority.
-It is also possible to omit the label
-<code><i>L</i><sub>1</sub></code> in the expression, though
-this form is deprecated.
-</p>
-
-<p>
-A program also can use its authority to declassify the program-counter
-label. This functionality is provided by the Jif statement
-<code>declassify(<i>L</i>) <i>S</i></code>,
-which executes the statement <code><i>S</i></code>
-using the program-counter label <code><i>L</i></code>.
-This form of declassification is
-also checked statically. For example, the following is an example of
-a <code>declassify</code> statement.
-<div class="code"><pre>
-int b;
-int y = 0;
-if (b) {
-    declassify ({y}) y = 1;
-}
-</pre></div>
-</p>
-
-<p>
-Assuming that the label of <code>y</code> is not more restrictive than
-the label of <code>b</code>, this program declassifies the implicit flow
-from <code>b</code> into <code>y</code>. For the duration of
-the assignment into <code>y</code>,
-the program-counter label is relaxed until it is no more restrictive than
-<code>y</code> itself.  The legitimacy of the declassification is 
-statically checked using the label of <code>y</code> and the static authority
-of the program at this point. Note that the labels of
-<code>b</code> and <code>y</code> are
-both automatically inferred in this example; these automatically inferred
-labels are not a problem for checking declassification statically.
+For any given method body, the compiler understands the method body to
+have the authority of some set of principals; the static authority of
+the code at that point. The actual authority may be greater, because
+the known principals may be able to act for other principals. The
+static authority can never exceed the actual authority unless
+revocation occurs while the program is running.
 </p>
 
 <h3><a name="authority-decls">Authority declarations</a></h3>
@@ -588,48 +517,58 @@ principal <code>referee</code>:
 
 <div class="code"><pre>class Game authority(referee) {
     void start() where authority(referee) {
-	<span class="comment">// this entire method body has the authority of referee</span>
-	...
+        <span class="comment">// this entire method body has the authority of referee</span>
+        ...
     }
 
     void halftimeShow() {
-	<span class="comment">// this method body does not have the authority of referee
-	// (no "where authority" clause)</span>
-	...
+        <span class="comment">// this method body does not have the authority of referee</span>
+        <span class="comment">// (no "where authority" clause)</span>
+        ...
     }
 }
-</div>
+</pre></div>
  
-<p>
-The second way for a method to acquire authority is for the
-method to receive authority passed from another method. If the
-receiving method signature contains a clause of the form
-<code>where caller(p)</code>, then it can be called only
-from code that is statically known to have the authority of
-principal <code>p</code>. For example, the following method
-receives authority for a principal <code>p</code> that is
-determined at run time and passed as an argument to the
-method.
+<p class="cont">
+Note that if a <a href="">principal parameter</a> appears in the
+<code>authority</code> clause of a class, such as in the example
+below, then any code that calls a constructor of the class must have the authority of the instantiation principal.
 </p>
-
 <div class="code"><pre>
-    void m(principal p) where caller(p) {
-	<span class="comment">// this method body has the 
-        // authority of the dynamic principal p</span>
-	...
+class C[principal P] authority(P) {
+    void m() where authority(P) {
+        ...
     }
 }
+
+...
+<span class="comment">// this code requires the authority of Alice to construct a C[Alice] object</span>
+C[Alice] foo = new C[Alice]();
 </pre>
 </div>
 
+
 <p>
-A final annotation for method declarations is a clause of
-the form <code>where <i>p</i> actsfor <i>q</i></code>. When
-this clause is present, the method can be called only from a
-context where the specified relationship can be statically
-determined to hold. The body of the method is checked under
-the assumption that the specified relationship does hold.
-</p>
+The second way for a method to acquire authority is for the method to
+receive authority passed from another method. If the receiving method
+signature contains a clause of the form <code>where caller(p)</code>,
+then it can be called only from code that is statically known to have
+the authority of principal <code>p</code>. For example, in the
+following code, the method <code>m</code> executes with the authority
+of <code>Alice</code>, and the principals <code>P</code>
+and <code>prin</code>, whose identities are not yet determined at
+compile time.</p>
+
+<div class="code"><pre>
+class C[principal P] {
+    void m(principal prin) 
+                 where caller(P, Alice, prin) 
+    { 
+        <span class="comment">// the method body has the authority of P, Alice, and prin</span>
+        ... 
+    }
+}
+</pre></div>
 
 <p>
 These mechanisms can be used to implement access control
@@ -640,6 +579,144 @@ offers more security assurance than stack inspection because
 it also controls information flow.
 </p>
 
+<h2><a name="downgrading">Downgrading</a></h2>
+
+<p>Jif's label checking ensures that security policies are enforced on
+information as the information flows through a program. However, many
+applications need to weaken the security policies of information as
+part of their intended functionality. For example, a login program
+must declassify some information about the (confidential) password
+when it accepts or rejects the user's login attempt.
+</p>
+
+<p>Jif provides mechanisms to downgrade the confidentiality and the
+integrity of information, via explicit program annotations.  The
+expression <code>declassify(<i>e</i>, <i>L</i><sub>1</sub> to
+<i>L</i><sub>2</sub>)</code> relabels the result of an expression
+<code><i>e</i></code> from the initial label
+<code><i>L</i><sub>1</sub></code> to the label
+<code><i>L</i></code><sub>2</sub>, where the integrity specified by
+<code><i>L</i></code><sub>2</sub> must be at least as restrictive as
+the integrity specified by <code><i>L</i><sub>1</sub></code>. That
+is, a <code>declassify</code> expression can weaken only the
+confidentiality, not the integrity, of information.  Similarly, the
+expression <code>endorse(<i>e</i>, <i>L</i><sub>1</sub> to
+<i>L</i><sub>2</sub>)</code> relabels the result of an expression
+<code><i>e</i></code> from <code><i>L</i><sub>1</sub></code> to
+<code><i>L</i></code><sub>2</sub>, where the confidentiality specified
+by <code><i>L</i></code><sub>2</sub> must be at least as restrictive
+as the confidentiality specified by
+<code><i>L</i><sub>1</sub></code>. It is possible to omit the label
+<code><i>L</i><sub>1</sub></code> in the expression, though
+this form is deprecated.
+</p>
+
+
+<p>
+A program may also downgrade the program-counter label <u>pc</u>. This
+functionality is provided by the Jif statements
+<code>declassify(<i>L</i><sub>1</sub> to <i>L</i><sub>2</sub>)
+<i>S</i></code> and <code>endorse(<i>L</i><sub>1</sub> to
+<i>L</i><sub>2</sub>) <i>S</i></code>, which each execute the
+statement <code><i>S</i></code> using the program-counter label
+<code><i>L</i><sub>2</sub></code>.  A <code>declassify</code>
+statement can weaken only the confidentiality of the program-counter
+label, whereas an <code>endorse</code> statement can weaken only the
+integrity. Again, it is possible to omit the label
+<code><i>L</i><sub>1</sub></code> in the expression, though
+this form is deprecated. For example, the following is an example of
+a <code>declassify</code> statement.
+<div class="code"><pre>
+int{Alice:;Alice!:} b;
+int{Alice:Bob;Alice!:} y = 0;
+if (b) {
+    <span class="comment">// pc is at level {Alice:;Alice!:} at this point.</span>
+    declassify ({Alice:;Alice!:} to {y}) {
+        <span class="comment">// at this point, pc has been declassified to the label of the local </span>
+        <span class="comment">// variable y (that is,  {Alice:Bob;Alice!:} ) permitting the </span>
+        <span class="comment">// assignment to y</span>
+        y = 1;
+    }
+}
+</pre></div>
+
+<p class="cont">This program declassifies the implicit flow
+from <code>b</code> into <code>y</code>. For the duration of
+the assignment into <code>y</code>,
+the program-counter label is relaxed until it is no more restrictive than
+<code>y</code> itself.
+</p>
+
+
+<p>
+The <code>declassify</code> and <code>endorse</code> expressions and
+statements weaken security policies, and as such are powerful and
+potentially dangerous mechanisms. To limit the misuse of these
+mechanisms, Jif imposes limitations upon their use, to enforce the
+security conditions of <em>selective downgrading</em> and
+<em>robustness</em>.</p>
+
+
+<h3><a name="selective-downgrading">Selective downgrading</a></h3>
+
+<p>Selective downgrading&nbsp;[ML00,PC00] combines access control with
+downgrading, ensuring that any downgrading performed by a program has
+appropriate authorization. For Jif, this means that any downgrading
+expression or statement that weakens a policy owned by a principal
+<code>p</code> must have the authority of <code>p</code>. The Jif
+compiler checks selective downgrading statically, using the static
+authority at the point of downgrading.</p>
+
+
+<h3><a name="robustness">Robustness</a></h3>
+
+<p>Intuitively, robustness&nbsp;[ZM01,MSZ04,CM06] is the property that
+a principal is unable to affect what the release of information to the
+principal. That is, a principal cannot influence what information is
+released to him, or when that information is released.</p>
+
+<p>The Jif compiler can statically check constraints that enforce
+robustness against all possible principals. When invoking the Jif
+compiler, if the flag <code>-robust</code> is specified, then
+additional constraints are checked at every <code>declassify</code>
+and <code>endorse</code> expression or statement. In brief, these
+additional constraints ensure the <u>pc</u> label at any
+declassification or endorsement has sufficiently high integrity, and
+moreover, the label of any information being declassified must also be
+of sufficiently high integrity. More information is provided in [CM05]
+and in the <a href="label_checking.html#robustness">label checking</a>
+section of the manual.</p>
+
+<p>Enforcing robustness requires that both the information to be
+downgraded and the decision to downgrade are of sufficiently high
+integrity. However, in some situations a principal may be willing to
+downgrade information regardless of the integrity of the decision to
+downgrade. For example, an application may be prepared to declassify
+the average age of all employees when requested, regardless of which
+user has requested it. Jif thus contains an <em>auto-endorsement</em>
+mechanism, whereby a principal <code>p</code> may automatically vest
+the body of a method <code>m</code> with <code>p</code>'s trust. The
+method body will execute with higher integrity, due to the addition of
+<code>p</code>'s trust.</p>
+
+<p>An auto-endorsement is specified with a <code>where
+endorse(<i>L</i>)</code> clause. A method declaration with method body
+<code>S</code> and an auto-endorsement clause <code>where
+endorse(<i>L</i>)</code> is similar to a method declaration with body
+<code>endorse(<i>L</i><sub>0</sub> to <i>L</i>) S</code>, where
+<code><i>L</i><sub>0</sub></code> is the method's begin
+label. However, the robustness constraints are not enforced on an
+auto-endorsement, although the selective downgrading constraints are,
+that is, the method requires the authority of any principal whose
+security policy is weakened by the auto-endorsement.
+</p>
+
+<p>Selective downgrading and robustness against all attackers are
+orthogonal: each provides separate guarantees regarding the
+downgrading of information. The access control mechanism of selective
+downgrading interacts with robustness via the auto-endorsement
+of methods, as a method can only be auto-endorsed if it has sufficient
+authority.</p>
 
 
 
@@ -728,10 +805,10 @@ that manipulates run-time labels is thus illegal.
 <div class="code"><pre>
 void foo(int{Bob:} a) {
     label lb = new label {Alice: ; a};
-	<span class="comment">// ILLEGAL! Label of a is not runtime representable.</span>
+        <span class="comment">// ILLEGAL! Label of a is not runtime representable.</span>
 
     if (new label {a} &lt;= new label {Bob: Chuck})
-	<span class="comment">// ILLEGAL! Label of a is not runtime representable.</span>
+        <span class="comment">// ILLEGAL! Label of a is not runtime representable.</span>
     { ... }
 }
 </pre></div>
@@ -770,9 +847,9 @@ public class Vector[label L] extends AbstractList[L] {
 
     public Vector() ...
     public Object elementAt(int i):{L; i}
-	            throws IndexOutOfBoundsException {
+                    throws IndexOutOfBoundsException {
         ...
-	return elements[i];
+        return elements[i];
     }
     public void setElementAt{L}(Object{L} o, int{L} i) ...
     public int{L} size() { return length; }
@@ -1031,8 +1108,8 @@ class D {
             boolean{Alice:; this} x = (o instanceof C[{this.f.p:}]);
         }
         catch (NullPointerException e) {
-	    <span class="comment">// may be thrown by the evaluation of "this.f.p"</span>
-	} 
+            <span class="comment">// may be thrown by the evaluation of "this.f.p"</span>
+        } 
     }
 }
 </pre>
@@ -1290,6 +1367,9 @@ external principals in a similar way. See the <code>README</code> file in $JIF/t
 information about creating external principals.
 
 
+<h2><a name="method-constraints">Method constraints</a></h2>
+XXX TODO. Where constraints on principal hierarchy and label environments.
+
 <h2><a name="java-changes">Other changes to Java</a></h2>
 
 <p>
@@ -1361,9 +1441,9 @@ class C {
                 String foo = another.f; 
             }
             catch (NullPointerException e) { 
-		<span class="comment">// need to catch the NPE, since this.another is not a </span>
-		<span class="comment">// final access path, and the analysis does not track </span>
-		<span class="comment">// if it is non-null</span>
+                <span class="comment">// need to catch the NPE, since this.another is not a </span>
+                <span class="comment">// final access path, and the analysis does not track </span>
+                <span class="comment">// if it is non-null</span>
             }
         }
     }
@@ -1389,9 +1469,9 @@ class B extends A {
     final principal p;
     String {p:} name;
     B(principal{} q, String{q:} n) {
-	p = q;
-	super(n);
-	name = n;
+        p = q;
+        super(n);
+        name = n;
     }
 }
 </pre></div>

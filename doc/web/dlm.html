@@ -365,7 +365,7 @@ when writing Jif programs. See <a class="secref" href="language.html#lexical">Le
   <TR>
     <TD>Reader policy</TD>
     <TD><span class="math"><i>o</i>&rarr;<i>r</i></span></TD>
-    <TD><code>o:r</code><br><code>o&rarr;r</code><br><code>o-&gt;r</TD>
+    <TD><code>o:r</code> <i>or</i> <code>o&rarr;r</code> <i>or</i> <code>o-&gt;r</TD>
     <TD>
         <ul>
         <li><code>_:_</code> is the least restrictive reader policy.
@@ -380,7 +380,7 @@ when writing Jif programs. See <a class="secref" href="language.html#lexical">Le
   <TR>
     <TD>Writer policy</TD>
     <TD><i class="math">o</i>&larr;<i class="math">w</i></TD>
-    <TD><code>o!:w</code> <small><i>(deprecated)</i></small><br><code>o&larr;r</code><br><code>o&lt;-r</code></TD>
+    <TD><code>o!:w</code> <small><i>(deprecated)</i></small>  <i>or</i> <code>o&larr;r</code>  <i>or</i> <code>o&lt;-r</code></TD>
     <TD>
         <ul>
         <li><code>_&larr;_</code> is the most restrictive (lowest integrity) writer policy.<br>
@@ -398,7 +398,7 @@ when writing Jif programs. See <a class="secref" href="language.html#lexical">Le
         <i class="math">o</i>&rarr;<i class="math">r</i>&nbsp;&#8851;&nbsp;<i class="math">o'</i>&rarr;<i class="math">r'</i>
    </TD>
     <TD><code>o:r;o':r'</code><br>
-        <code>o:r&nbsp;meet&nbsp;o':r'</code>
+        <code>o:r&nbsp;meet&nbsp;o':r'</code>  <i>or</i> 
         <code>o:r&nbsp;&#8851;&nbsp;o':r'</code>
     </TD>
     <TD>
@@ -418,7 +418,8 @@ when writing Jif programs. See <a class="secref" href="language.html#lexical">Le
         <i class="math">o</i>&rarr;<i class="math">r</i>&nbsp;&#8851;&nbsp;<i class="math">o'</i>&rarr;<i class="math">r'</i>
    </TD>
     <TD><code>o&larr;;o'&larr;r'</code><br>
-        <code>o&larr;r&nbsp;meet&nbsp;o'&larr;r'</code>
+        <code>o&larr;r&nbsp;meet&nbsp;o'&larr;r'</code> <i>or</i> 
+        <code>o&larr;r&nbsp;&#8851;&nbsp;o'&larr;r'</code>
     </TD>
     <TD>
         <ul>
