@@ -483,10 +483,24 @@ when writing Jif programs. See <a class="secref" href="language.html#lexical">Le
     </TD>
     <TD>
         <ul>
-        <li><code>{Alice&rarr;Bob meet Chuck&rarr;Dave; Alice&larr; meet Chuck&larr;}</code>
-        <li><code>{Alice&rarr;Bob; Alice&larr;} meet {Chuck&rarr;Dave; Chuck&larr;}</code>
+        <li><code>{Alice&rarr;Bob &#8851; Chuck&rarr;Dave; Alice&larr; &#8851; Chuck&larr;}</code>
+        <li><code>{Alice&rarr;Bob; Alice&larr;} meet {Chuck&rarr;Dave; Chuck&larr;}. Braces are useful for specifying the order in which </code>
     </TD>
   </TR>
+  <tr>
+    <td>Grouping</td>
+    <td><span class="math">(<i>L</i>)</span></td>
+    <td><code>{L}</code></td>
+    <td>
+      <ul>
+	<li><code>{{Bob&rarr;}&#8852;{Alice&rarr;}}</code>.
+	   This is the same as <code>{Bob&rarr; ; Alice&rarr;}</code>; the extra
+	   layer of braces has no effect.
+	</li>
+	<li><code>{{Bob&rarr;}&#8852;{Alice&rarr;}}&#8851;{Chuck&larr;Dave}</code></li>
+	Grouping specifies the order of label operations.
+      </ul>
+    </td>
 </TABLE>
 
 
