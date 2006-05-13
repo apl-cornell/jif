@@ -23,20 +23,9 @@ public class PrincipalUtil {
     }
 
     /**
-     * Search for a delegates-chain between p and q. An delegates-chain
-     * between p and q is a Principal array <code>a</code> of 
-     * length L such that
-     *   <pre>
-     *     a[L-1] == q
-     *     a[L-1] delegates to a[L-2]
-     *     ...
-     *     a[1] delegates to a[0]
-     *     a[0] == p
-     *   </pre>.
-     *  Thus, a valid delegate chain between p and q implies that p acts for q.
-     * @param p
-     * @param q
-     * @return A delegates-chain between p and q, or null if non can be found.
+     * Search for an actsfor proof between p and q. An actsfor proof
+     * between p and q is a proof that p acts for q. See the subclasses
+     * of ActsForProof for more information.
      */
     public static native ActsForProof{p;q;q!:} findActsForProof(Principal p, Principal q, Object searchState);
 

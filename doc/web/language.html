@@ -12,8 +12,7 @@
 Jif has a number of unique features that are important for
 building interesting programs in a security-typed language:
 
-<div class="ultext">
-<ul>
+<ul class="ulpara">
 
 <li>A <strong>downgrading</strong> mechanism gives the programmer an
 explicit escape hatch for downgrading the security of information when
@@ -44,7 +43,6 @@ makes it possible to discover and to define new policies at run time. Run-time
 checks are statically checked to ensure that information is not leaked by
 the success or failure of the run-time check itself.  
 </ul>
-</div>
 
 <p>
 Jif is not completely a superset of Java. Certain features have
@@ -418,8 +416,7 @@ end-label, result label and arguments' labels. When these labels
 are missing, some conservatives rules are used to assign restrictive
 default labels:</p> 
 
-<div class="ultext">
-<ul> 
+<ul class="ulpara">
 <li>Default field label: the empty label, <code>{}</code>
 <br>
 If a field's type declaration does not include a label, then by
@@ -482,7 +479,6 @@ is assumed. Thus, for example, the array type <code>int[]</code> is
 equivalent to the array type <code>int{}[]</code>, that is, an array of <code>int{}</code>.
 </li>
 </ul>
-</div>
 
 <h2><a name="access-control"></a>Authority and access control</h2>
 !@! @@@ XXX change to Downgrading section, so that we can talk about robustness?
@@ -962,8 +958,10 @@ may be used. A final access path expression is an expression of the
 form <i>r.f<sub>1</sub>.f<sub>2</sub>. ... .f<sub>n</sub></i>, where
 <i>r</i> is either a final local variable, or the expression
 <code>this</code>, and each <i>f<sub>i</sub></i> is an access to a
-final field. () Thus, the following are all examples of legal uses of
-dynamic labels and principals. </p>
+final field. (An access path of the form
+<i>f<sub>1</sub>.f<sub>2</sub>. ... .f<sub>n</sub></i> is equivalent to
+<i>this.f<sub>1</sub>.f<sub>2</sub>. ... .f<sub>n</sub></i>.) Thus, the following are all examples of legal
+uses of dynamic labels and principals. </p>
 
 <div class="code"><pre>
 class C[label L, principal P] {
@@ -983,12 +981,12 @@ class C[label L, principal P] {
 </pre>
 </div>
 <p>
-Unlike in Java, method arguments in Jif are always implicitly
-<code>final</code>. This change makes the use of first-class principals and labels
-more convenient.  This simple change does not
-remove any significant power from the language, since code that assigns
-to an argument variable always can be rewritten to use a local variable
-instead.
+Unlike in Java, formal arguments in Jif are always implicitly
+<code>final</code>, meaning that formal arguments may always be used
+as the root of final access path expressions. This simple change does
+not remove any significant power from the language, since code that
+assigns to an argument variable always can be rewritten to use a
+non-final local variable instead.
 </p>
 
 
@@ -1070,7 +1068,7 @@ the label <code>L1</code>. Thus, the following code compiles correctly.
 void m(int{*lbl} i, label{} lbl) {
     int{Alice:} x;
     if (lbl <= new label {Alice:}) {
-        x = i; <span class="comment">// OK, since {*lb} &lt;= {Alice:}</span>
+        x = i; <span class="comment">// OK, since {*lbl} &#8849; {Alice:}</span>
     }
     else {
         x = 0;
@@ -1106,7 +1104,7 @@ principal <code>P1</code> can act for the principal
 void m(int{Alice: pr} i, principal{} pr) {
     int{Alice: Bob} x;
     if (Bob actsfor pr) {
-        x = i; <span class="comment">// OK, since {Alice: pr} &lt;= {Alice: Bob}</span>
+        x = i; <span class="comment">// OK, since {Alice: pr} &#8849; {Alice: Bob}</span>
     }
     else {
         x = 0;
@@ -1118,6 +1116,33 @@ void m(int{Alice: pr} i, principal{} pr) {
 <p class="cont">
 Note that this construct replaces the <code>actsfor { ... } else { ... }</code> construct that existed in previous versions of Jif.
 </p>
+
+<p>
+More generally, the dynamic tests for labels and principals can be
+used as arbitrary boolean-valued expressions. However, the Jif
+compiler will only be able to reason about the additional information
+flows permitted by the dynamic tests if the tests occur as a conjunct of the condition of an <code>if</code> statement.
+</p>
+
+<div class="code"><pre>
+void m(int{Alice: pr} i, principal{} pr, int{*lbl} i, label{} lbl) {
+    <span class="comment">// dynamic label and actsfor tests can be used as boolean-valued</span>
+    <span class="comment">// expressions</span>
+    boolean b = (lbl <= new label {Alice: pr} || Alice actsfor pr);
+
+    int{Alice: Bob} x;
+    if (8 < 4 || Bob actsfor pr) {
+        x = i; <span class="comment">// BAD: actsfor test is not a </span>
+               <span class="comment">// conjunct of the condition of an if-statement</span>
+    }
+
+    if (lbl <= new label {Alice:pr} && Bob actsfor pr) {
+        x = i; <span class="comment">// OK, compiler can reason that lbl &#8849; {Alice:}</span>
+               <span class="comment">//  and Bob actsfor pr</span>
+    }
+}
+</pre></div>
+
 
 <h3><a name="user-defined-principals"></a>User-defined principals</h3>
 
@@ -1136,53 +1161,117 @@ as follows:
 <div class="code"><pre>
 public interface Principal {
     String name();
-    boolean delegatesTo(principal p);
+    boolean{this;p;this!:} delegatesTo(principal p);
     boolean equals(Principal p);
-    boolean isAuthorized(Object authPrf, 
-		         Closure[this, lb] closure,
-		         label lb) where authority (this);
-
-    Principal{this;p}[] findChainUpto{p;this}(Principal p);
-    Principal{this;q}[] findChainDownto{q;this}(Principal q);
+    boolean{authPrf; closure; lb; *lb; this; this!:} 
+                     isAuthorized{this!:}(Object authPrf, 
+                                          Closure[this, lb] closure,
+                                          label lb) where authority (this);
+    
+    ActsForProof{this;p;this!:;p!:} 
+                     findProofUpto{this!:}(Principal p, Object searchState);
+    
+    ActsForProof{this;q;q!:;this!:} 
+                     findProofDownto{this!:}(Principal q, Object searchState);    
 }
 </pre></div>
 
 <p>The method <code>name()</code> returns the name of the
 principal. The <code>equals(Principal p)</code> method is used to
-determine if the receiver object is the same as the principal p; two
-principals <code>p</code> and <code>q</code> are regarded as being
-equal only if <code>p.equals(q) && q.equals(p)</code>.
+determine if the receiver object is the same as the principal <code>p</code>; 
+principals <code>p</code> and <code>q</code> are regarded as 
+equal only if <code>p.equals(q) &amp;&amp; q.equals(p)</code>.
 
 <p>The method <code>delegatesTo(principal p)</code> returns true if the
 principal represented by the receiver object has delegated its
 authority to the principal <code>p</code> (and thus <code>p</code> can
 act for the principal represented by the receiver object).
 
-<p>The methods <code>findChainUpto(Principal p)</code> and
-<code>findChainDownto(Principal p)</code> are used to search for a
-"delegates chain", a chain of principals between two principals, which
-is proof that the principal at the head of the chain is able to act
-for the principal at the tail of the chain.
+<p>The methods <code>findProofUpto(Principal p, Object
+searchState)</code> and <code>findProofDownto(Principal p, Object
+searchState)</code> are used to search for an
+<code>ActsForProof</code> object. An <code>ActsForProof</code> is in
+essence a sequence of principals <code>p</code><sub>1</sub>, ...,
+<code>p</code><sub>n</sub>, such that each <code>p</code><sub>i</sub>
+delegates its authority to <code>p</code><sub>i+1</sub>, and is thus a
+proof that <code>p</code><sub>n</sub> can act for
+<code>p</code><sub>1</sub>. (In order to handle conjunctive and
+disjunctive principals, an <code>ActsForProof</code> has slightly more
+structure than simply a chain; however, this implementation detail is
+hidden from Jif programmers.)  </p>
 
-<p>The method <code>isAuthorized(Object authPrf, Closure[this, lb]
-closure, label lb)</code> is used to determine if the object
-<code>authCode</code> is sufficient proof for the principal
-represented by the receiver object to grant its authority to execute
-the <code>Closure</code>. The form of the authorization proof will
-depend on the principal implementation, but could be, for example, a
-password, or a certificate, or some other capability.
+<p>The parameter <code>searchState</code> is used to prevent infinite
+recursion when searching for <code>ActsForProof</code>s;
+Implementations of the <code>Principal</code> interface can ignore the
+structure of the <code>searchState</code> object, and are just
+required to pass it as an additional parameter when recursively trying
+to find an <code>ActsForProof</code> (i.e., when calling the method
+<code>jif.lang.PrincipalUtil.findActsForProof(Principal p, Principal
+q, Object searchState)</code>).
+</p>
 
-<p>A <code>Closure[principal P, label L]</code> (see
-$JIF/sig-src/jif/lang/Closure.java) is code that needs the authority of
-the principal P to execute, and whose side effects are bounded below
-by L. To execute a closure, a <code>Capability</code> (see
-$JIF/sig-src/jif/lang/Capability.java) is required. A capability can only
-be obtained by calling the method
+<p>The authority of principals is required for certain operations,
+such as downgrading information. The authority of principals whose
+identity is known at compile time may be obtained by these principals
+examining and approving the code that requires authorization. However,
+for dynamic principals, whose identity is not known at compile time, a
+different mechanism is required. Jif provides a mechanism
+for dynamically authorizing closures.</p>
+
+<p>An <i>authorization closure</i> is an implementation of the
+interface <code>jif.lang.Closure</code>, shown below.  The
+<code>Closure</code> interface has a single method
+<code>invoke</code>, and is parameterized on a principal <code>P</code>.  Any
+code that calls the <code>invoke</code> method must have the authority of
+principal <code>P</code>, indicated by the <code>where caller(P)</code> annotation.</p>
+
+<div class="code"><pre>
+public interface Closure[principal P, label L] authority(P) {
+    Object{this} invoke{L}() where caller(P);
+}
+</pre></div>
+
+<p>The method <code>Principal.isAuthorized(Object authPrf, Closure[this, lb]
+closure, label lb)</code> is used to authorize closures,
+It takes two arguments: a <code>Closure</code> object instantiated
+with the principal represented by the <code>this</code> object, and an
+application-specific proof of authentication and/or authorization. The
+proof might be a password, or a checkable proof that
+the closure satisfies certain safety requirements. The implementation
+of the <code>isAuthorized</code> method examines the closure and the proof
+object, and returns <code>true</code> if the principal grants its
+authority to the closure.</p>
+
+<p>
+If a principal grants its authority to a closure, the Jif run-time
+library constructs a <i>capability</i>, an instance of the class
+<code>jif.lang.Capability</code> (shown below) which encapsulates the
+closure along with the authority of the appropriate principal. Code
+without the authority of the principal may invoke the capability,
+which will execute the <code>invoke</code> method of the contained
+closure. Thus, obtaining a capability for a closure corresponds to
+obtaining a principal's authority to execute the closure. A capability
+can only be obtained by calling the method
 <code>jif.lang.PrincipalUtil.authorize(principal p, Object authPrf,
 Closure[p, lb] c, label lb)</code>, which returns a Capability to
-execute the closure if the method <code>isAuthorized(authPrf, c,
-lb)</code> called with receiver principal <code>p</code> returns true, and null
-otherwise.
+execute the closure if the method <code>p.isAuthorized(authPrf, c,
+lb)</code> returns <code>true</code>, and <code>null</code>
+otherwise.</p>
+
+<div class="code"><pre>
+public final class Capability[principal P, label L] authority(P) {
+    private Capability(Closure[P,L]{this} closure) { this.closure = closure; }
+    
+    private final Closure[P, L]{this} closure;
+
+    public Closure[P,L]{this} getClosure() { return closure; }
+
+    public Object{closure; L} invoke{L}() where authority(P) {
+        if (closure == null) return null;
+        return closure.invoke();
+    }
+}
+</pre></div>
 
 
 <p>The class <code>jif.lang.AbstractPrincipal</code> (found in the
@@ -1190,15 +1279,14 @@ $JIF/lib-src directory) is an abstract implementation of
 <code>jif.lang.Principal</code> that many principal implementations
 will find useful. The class <code>jif.lang.PrincipalUtil</code>
 contains several utility methods to help in searching for
-delegates-chains and also for obtaining capabilities to execute
+ActsForProof objects and also for obtaining capabilities to execute
 closures.
 
 <p>External principals (e.g., the principals Alice and
 Bob mentioned in Jif code; see $JIF/tests/jif/lang/Alice.jif) are
 implemented using the class <code>jif.lang.ExternalPrincipal</code>
 (found in the $JIF/lib-src directory). You can create your own
-external principals in a similar way. See the <a
-href="../tests/README">README</a> file in $JIF/tests for more
+external principals in a similar way. See the <code>README</code> file in $JIF/tests for more
 information about creating external principals.
 
 
@@ -1221,7 +1309,7 @@ expression, the expression must contain only constant values. Without
 this restriction, the initializing expression could be used to convey
 information about when the class is loaded (e.g., by calling a
 method), which may depend on sensitive information.</li>
-<li>The label of a static field cannot mention <code>this</code> (as the expression <code>this</code> is not valid in a static context).</li>
+<li>The label of a static field cannot mention <code>this</code> (as <code>this</code> is not valid in a static context).</li>
 <li>The label of a static field cannot mention any class parameters (as class parameters are specific to an instance of the class).</li>
 </ol>
 </p>
@@ -1233,16 +1321,22 @@ method), which may depend on sensitive information.</li>
 and <code>ArrayIndexOutOfBoundsException</code>) are <i>unchecked</i>;
 they may be thrown by a method without being declared in the
 <code>throws</code> clause of the method signature. Unchecked
-exceptions can serve as covert channels. To prevent this covert
+exceptions can serve as covert channels. To control this covert
 channel, Jif requires subclasses of
 <code>RuntimeException</code> to be checked.
 
 To reduce the additional programming burden of handling runtime
-exceptions, this version of Jif has a simple not-null analysis, which
-tracks whether local variables and final fields of the
-<code>this</code> object are definitely not-null. Thus, in the following 
-example, the method <code>m(Object, String)</code> cannot throw a
-<code>NullPointerException</code>, and does not need to declare that it does.
+exceptions, Jif has two simple dataflow analyses: a not-null analysis,
+which tracks whether local variables and final access paths are
+definitely not-null; and a runtime class analysis, which tracks the
+precise runtime class of local variables and final access paths via
+casts and <code>instanceof</code> tests.
+
+
+Thus, in the following example, the method <code>m(Object,
+String)</code> cannot throw either a <code>NullPointerException</code>
+or a <code>ClassCastException</code>, and does not need to declare
+that it does.
 
 <div class="code"><pre>
 class C {
@@ -1255,25 +1349,21 @@ class C {
         }
         s.length(); <span class="comment">// OK, s known to be not-null</span>
         if (o instanceof String) {
-            try { 
-                ((String)o).length();
-		    <span class="comment">// OK, if instanceof succeeds, o is not-null</span>
-            }
-            catch (ClassCastException e) { 
-                <span class="comment">// still need to catch the ClassCastException</span>
-            }
-            
+            <span class="comment">// At this point, o is known to be a non-null String object</span>
+            ((String)o).length();  <span class="comment">// OK, o cannot be null, </span>
+                                   <span class="comment">// and the cast will always succeed</span>            
         }
         if (f != null) { 
-            f.length(); <span class="comment">// OK, f is final field of this.</span>
+            f.length(); <span class="comment">// OK, this.f is known to be non-null here.</span>
         }
-        if (another.f != null) { 
+        if (another != null) { 
             try {
-                f.length(); 
+                String foo = another.f; 
             }
             catch (NullPointerException e) { 
-		<span class="comment">// still need to catch the NPE, as we cannot reason
-                // about fields of objects other than this.</span>
+		<span class="comment">// need to catch the NPE, since this.another is not a </span>
+		<span class="comment">// final access path, and the analysis does not track </span>
+		<span class="comment">// if it is non-null</span>
             }
         }
     }
@@ -1306,15 +1396,15 @@ class B extends A {
 }
 </pre></div>
 
-<p class="cont">The assignment to the field <code>p</code> must occur
-before the call to <code>super</code>. In fact, in Java no code may
+<p class="cont">In Jif, the field <code>p</code> must be initialized
+before the call to <code>super</code>. In Java, no code is allowed to
 precede the call to <code>super</code>.
 </p>
 
 <p>
 Note that this example has an assignment from <code>n</code> (with label 
 <code>{q:}</code>) to the field <code>name</code> (with label 
-<code>{p:}</code>). The assignment is permitted because
+<code>{this.p:}</code>). The assignment is permitted because
 the Jif compiler knows from the assignment <code>p=q</code> that these
 principals are equal. It uses this fact to determine that
 the assignment from <code>n</code> to <code>name</code> is

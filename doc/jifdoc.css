@@ -21,7 +21,7 @@ td {
 .math {
     font-family: serif;
 }
-.ultext ul {
+ul.ulpara {
     width: 75ex;
     font-size: 100%;
 }
