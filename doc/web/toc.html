@@ -7,64 +7,71 @@
 </head>
 
 <body>
-<h3>Jif manual</h3>
+<h3>Jif Reference Manual</h3>
 <div class="toc">
 <ul>
-  <li><a href="overview.html#overview">Overview</a>
-  <li><a href="dlm.html">Decentralized label model</a>
-  <li><a href="language.html#features">Language features</a>
+  <li><a class="secreftoc" href="overview.html#introduction">Introduction</a>
+  <li><a class="secreftoc" href="dlm.html">Decentralized label model</a>
     <ul>
-      <li><a href="language.html#lexical">Lexical considerations</a>
-      <li><a href="language.html#labeltypes">Labeled types</a>
+      <li><a class="secreftoc" href="dlm.html#dlm_principals">Principals</a>
+      <li><a class="secreftoc" href="dlm.html#dlm_conf_policies">Confidentiality policies</a>
+      <li><a class="secreftoc" href="dlm.html#dlm_int_policies">Integrity policies</a>
+      <li><a class="secreftoc" href="dlm.html#dlm_labels">Labels</a>
+      <li><a class="secreftoc" href="dlm.html#dlm_labels">Label syntax in Jif</a>
+    </ul>
+  <li><a class="secreftoc" href="language.html#features">Language features</a>
+    <ul>
+      <li><a class="secreftoc" href="language.html#lexical">Lexical considerations</a>
+      <li><a class="secreftoc" href="language.html#labeltypes">Labeled types</a>
         <ul>
-          <li><a href="language.html#principal-hierarchy">Principals</a>
-	  <li><a href="language.html#implicit-flows">Implicit flows and program-counter labels</a>
-	  <li><a href="language.html#method-decls">Method declarations</a>
-	  <li><a href="language.html#default-labels">Default labels</a>
+          <li><a class="secreftoc" href="language.html#principal-hierarchy">Principals and <code>actsfor</code></a>
+	  <li><a class="secreftoc" href="language.html#implicit-flows">Implicit flows and program-counter labels</a>
+	  <li><a class="secreftoc" href="language.html#method-decls">Method declarations</a>
+	  <li><a class="secreftoc" href="language.html#default-labels">Default labels</a>
 	</ul>
-      <li><a href="language.html#authority">Authority and access control</a>
+      <li><a class="secreftoc" href="language.html#authority">Authority and access control</a>
         <ul>
-	  <li><a href="language.html#authority-decls">Authority declarations</a>
+	  <li><a class="secreftoc" href="language.html#authority-decls">Authority declarations</a>
         </ul>
-      <li><a href="language.html#downgrading">Downgrading</a>
+      <li><a class="secreftoc" href="language.html#downgrading">Downgrading</a>
         <ul>
-	  <li><a href="language.html#selective-downgrading">Selective downgrading</a>
-	  <li><a href="language.html#robustness">Robustness</a>
+	  <li><a class="secreftoc" href="language.html#selective-downgrading">Selective downgrading</a>
+	  <li><a class="secreftoc" href="language.html#robustness">Robustness</a>
         </ul>
-      <li><a href="language.html#label-polymorphism">Polymorphism</a>
-      <li><a href="language.html#parameterized-classes">Parameterized classes</a>
+      <li><a class="secreftoc" href="language.html#label-polymorphism">Polymorphism</a>
+      <li><a class="secreftoc" href="language.html#parameterized-classes">Parameterized classes</a>
         <ul>
-	  <li><a href="language.html#label-principal-params">Label and principal parameters</a>
-	  <li><a href="language.html#param-interact-object-types">Interactions with object types</a>
-	  <li><a href="language.html#params-runtime">Using parameters at run time</a>
+	  <li><a class="secreftoc" href="language.html#label-principal-params">Label and principal parameters</a>
+	  <li><a class="secreftoc" href="language.html#param-interact-object-types">Interactions with object types</a>
+	  <li><a class="secreftoc" href="language.html#params-runtime">Using parameters at run time</a>
 	</ul>
-      <li><a href="language.html#dynamic-labels">Dynamic labels and principals</a>
+      <li><a class="secreftoc" href="language.html#dynamic-labels">Dynamic labels and principals</a>
         <ul>
-	  <li><a href="language.html#runtime-tests">Runtime tests of labels and principals</a>
-	  <li><a href="language.html#user-defined-principals">User-defined principals</a>
+	  <li><a class="secreftoc" href="language.html#runtime-tests">Runtime tests of labels and principals</a>
+	  <li><a class="secreftoc" href="language.html#user-defined-principals">User-defined principals</a>
 	</ul>
-       <li><a href="language.html#method-constraints">Method constraints</a>
-       <li><a href="language.html#java-changes">Other changes to Java</a>
+       <li><a class="secreftoc" href="language.html#method-constraints">Method constraints</a>
+       <li><a class="secreftoc" href="language.html#java-changes">Other changes to Java</a>
          <ul>
-	   <li><a href="language.html#static-fields">Static fields</a>
-	   <li><a href="language.html#runtime-exceptions">Runtime exceptions</a>
-	   <li><a href="language.html#constructors">Final field initialization</a>
-	   <li><a href="language.html#unsupported-java">Unsupported Java features</a>
+	   <li><a class="secreftoc" href="language.html#static-fields">Static fields</a>
+	   <li><a class="secreftoc" href="language.html#runtime-exceptions">Runtime exceptions</a>
+	   <li><a class="secreftoc" href="language.html#constructors">Final field initialization</a>
+	   <li><a class="secreftoc" href="language.html#unsupported-java">Unsupported Java features</a>
         </ul>
     </ul>
-  <li><a href="label_checking.html#XXX">Label checking</a>
-  <li><a href="misc.html#java">Interacting with Java</a>
+  <li><a class="secreftoc" href="label_checking.html#XXX">Label checking</a>
+  <li><a class="secreftoc" href="misc.html#java">Interacting with Java</a>
     <ul>
-      <li><a href="misc.html#main">The <code>main</code> method</a>
-      <li><a href="misc.html#java-classes">Interacting with Java classes</a>
+      <li><a class="secreftoc" href="misc.html#main">The <code>main</code> method</a>
+      <li><a class="secreftoc" href="misc.html#java-classes">Interacting with Java classes</a>
     </ul>
-  <li><a href="misc.html#debugging">Debugging Jif Programs</a>
+  <li><a class="secreftoc" href="misc.html#debugging">Debugging Jif programs</a>
     <ul>
-      <li><a href="misc.html#explain">Constraint explanations</a>
-      <li><a href="misc.html#report">Detailed reporting</a>
+      <li><a class="secreftoc" href="misc.html#explain">Constraint explanations</a>
+      <li><a class="secreftoc" href="misc.html#report">Detailed reporting</a>
     </ul>
-  <li><a href="misc.html#runtime-interface">Jif Runtime Interface</a>
-  <li><a href="bibliography.html#bibliography">Bibliography</a></ul>
+  <li><a class="secreftoc" href="misc.html#runtime-interface">Jif runtime interface</a>
+  <li><a class="secreftoc" href="bibliography.html#bibliography">Bibliography</a></ul>
 </ul>
 </div>
 

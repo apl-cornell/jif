@@ -7,7 +7,7 @@
 
 <body>
 
-<h1><a name="overview">Overview</a></h1>
+<h1><a name="introduction">Introduction</a></h1>
 
 <p>
 Jif is an extension to the Java programming language that adds static
@@ -17,22 +17,10 @@ from being used improperly.
 </p>
 
 <p>
-The largest difference between Jif and Java is the addition of
-<em>labels</em> that express security policies as
-restrictions on how information may be used.
-These labels facilitate
-statically tracking information flow. The
-analysis of information flow is performed mostly statically, at
-compile time. However, Jif does also support some forms of
-run-time security enforcement.
-</p>
-
-<p>
-Static checking of information flow
-in Jif programs is performed as part of type checking. If a Jif program
-type-checks, the compiler translates it into Java code that can be
-compiled with a standard Java compiler. The Jif compiler and run-time
-system are available from the
+This document describes Jif 3.0.0, and is the most current
+documentation for the Jif language and compiler.
+The current release of the Jif compiler and
+run-time system are available from the
 <a href="http://www.cs.cornell.edu/jif">Jif web site</a>.
 </p>
 
@@ -52,9 +40,39 @@ language has developed since that time, and some features in this
 version of Jif are not documented in the thesis. 
 </p>
 
+<h2><a name="language_overview">Language overview</a></h2>
+
 <p>
-This document describes Jif 3.0.0, and is the most current
-documentation of the Jif compiler. 
+Jif extends Java by adding
+<em>labels</em> that express restrictions on how information may be used.
+For example, the following variable declaration declares not only that
+the variable <code>x</code> is an <code>int</code>, but also that the
+information in <code>x</code> is governed by a security policy:
+</p>
+
+<div class="code"><pre>
+int {Alice&rarr;Bob} x;
+</pre>
+</div>
+
+<p>In this case, the security policy says that the information in <code>x</code>
+is controlled by the principal Alice, and that Alice permits this information
+to be seen by the principal Bob.
+</p>
+
+<p>
+Using label annotations like this one, the Jif compiler analyses how
+information flows within programs and determines whether security policies
+for the confidentiality or integrity of information are enforced by the 
+program. Enforcement is mostly done during type checking, at compile time, but
+Jif does also allow some enforcement to take place at run time.
+</p>
+
+<p>
+If a Jif program type-checks, the compiler translates it into Java code
+that can be compiled with a standard Java compiler. The program can then
+be executed with a standard Java virtual machine; in general, it will
+also require the Jif run-time system library.
 </p>
 
 </body>

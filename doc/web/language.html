@@ -90,22 +90,10 @@ int{p:} x = 2;
 </p>
 
 <p>
-In general,
-a label is written as a set of <em>policy expressions</em>,
-separated by semicolons. For example,
-the label expression
-<code>{o<sub>1</sub>: r<sub>1</sub>,r<sub>2</sub>; o<sub>2</sub>: r<sub>2</sub>,r<sub>3</sub>}</code> contains two policy expressions.
-A policy expression <code><i class="math">owner</i>:
-<i class="math">reader</i><sub>1</sub>,
-<i class="math">reader</i><sub>2</sub>, ...</code>
-means that the
-principal <code><i class="math">owner</i></code> wants to allow the labeled
-information to flow to at most the principals
-<code><i class="math">reader<sub>i</sub></i></code>. Labels built from these
-policies are called <em>decentralized labels</em> because they
-enforce security on behalf of the owning principals, not on
-behalf of an implicitly centralized policy specifier.
+The syntax of labels is as described in the section
+<a class="secref" href="dlm.html#dlm_syntax">Label syntax in Jif</a>.
 </p>
+
 <p>
 The compiler permits information to flow between locations
 with different labels only if that information flow does not
@@ -115,11 +103,9 @@ able to flow from a location with label <i class="math">L</i><sub>1</sub>
 to a location with label <i class="math">L</i><sub>2</sub>, the
 label <i class="math">L</i><sub>2</sub> must be more restrictive
 than <i class="math">L</i><sub>1</sub></i>, or equally restrictive.
-This is written formally as
+In other words, the compiler checks that
 <i class="math">L</i><sub>1</sub></i> &#8849; 
-<i class="math">L</i><sub>2</sub></i>. (The ordering &#8849;
-defines a preorder on labels in which the equivalence
-classes form a join semilattice.)
+<i class="math">L</i><sub>2</sub></i>.
 </p>
 <p>
 When computation combines several input values to produce a result,
@@ -180,49 +166,18 @@ class="math">L</i><sub>2</sub>,
 [<a href="bibliography.html#VSI96">VSI96</a>])
 </p>
 
-<h3><a name="principal-hierarchy"></a>Principals</h3>
+<h3><a name="principal-hierarchy"></a>Principals and <code>actsfor</code></h3>
 
-<p>
-In the decentralized label model implemented by Jif,
-information is owned by, updated by,
-and released to <em>principals</em>: users and other
-authority entities such as groups or roles.  For example, both users and
-groups in Unix could be modeled as principals.
-</p>
-
-<p>
-Some principals may be authorized to <em>act for</em>
-other principals. If the principal <code>p</code> acts for the
-principal <code>q</code>, any action taken by <code>p</code>
-is implicitly assumed to be authorized by <code>q</code>.
-The acts-for relation is reflexive and transitive,
-defining a hierarchy or partial order
-of principals. This relation is similar to the <em>speaks for</em>
-relation used in various authentication logics (e.g., [<a href="bibliography.html#LABW91">LABW91</a>]);
-the hierarchy of principals is also similar to a <em>role hierarchy</em>
-[<a href="bibliography.html#RBAC">RBAC</a>].
-</p>
-
-<p>
-The acts-for relation can be used to model groups and
-roles conveniently. A group principal, such as <code>students</code>,
-is modeled by authorizing all of the principals
-representing members of the group
-to act for the group principal. That is, the group principal delegates
-its authority to all of the group members.  A
-role, a restricted form of a user's authority, is modeled by
-authorizing the user's principal to act for the role principal.
-</p>
-
+ 
 <p><a name="actsfor"></a>
-The acts-for relationship between two principals can be tested
-in a Jif program using the built-in <code>actsfor</code> operator. The
-boolean expression <code>p actsfor
-q</code> evaluates to <code>true</code>
-if the
-specified relationship exists. Within the body of an <code>if</code>
-statement conditioned on this test (see <a href="#runtime-tests">below</a>), the compiler makes use of
-the knowledge that the relationship exists when checking
+Jif supports principals as defined in the DLM (see
+<a class="secref" href="dlm.html#dlm_principals">Principals</a>).
+The acts-for relationship between two principals can be tested in a Jif program
+using the built-in <code>actsfor</code> operator. The boolean expression
+<code>p actsfor q</code> evaluates to <code>true</code> if the specified
+relationship exists. Within the body of an <code>if</code> statement
+conditioned on this test (see <a href="#runtime-tests">below</a>), the compiler
+makes use of the knowledge that the relationship exists when checking
 information flows and comparing security policies.
 </p>
 
@@ -790,7 +745,7 @@ the label of the formal argument <code>a</code> is that <code>{Alice:
 <div class="code"><pre>
 String{a} m(int{Alice: ; Bob:} a) {
     int{Alice:} i = a; <span class="comment">// ILLEGAL!  Don't know </span>
-                       <span class="comment">//    that {a} <= {Alice:}</span>
+                       <span class="comment">//    that {a} &#8849; {Alice:}</span>
     int{Alice: ; Bob: ; Chuck: } j = a; <span class="comment">// OK</span>
     ...
 }

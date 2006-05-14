@@ -1,4 +1,4 @@
- <html>
+<html>
 
 <head>
 <link rel=StyleSheet href="jifdoc.css" type="text/css">
@@ -19,24 +19,47 @@ present the syntax used to write labels in Jif programs.
 
 <h2><a name="dlm_principals">Principals</a></h2>
 
-<p>A <em>principal</em> is an entity with security concerns, and the power to
-observe and change certain aspects of the system. Jif provides a flexible, 
+<p>A <em>principal</em> is an entity with some power to
+observe and change certain aspects of the system. The goal of Jif is
+to permit principals to express security requirements and to enforce them.
+Jif provides a flexible, 
 open-ended mechanism for defining principals, which allows applications
 to model users, processes, user groups, or application-specific entities 
 with security concerns.</p>
 
-
 <p>A principal <i class="math">p</i> may delegate authority to another principal
 <i class="math">q</i>, in which case
-<i class="math">q</i> is said to <em>act for</em> <i class="math">p</i>, written <i class="math">q</i>&#8829;<i class="math">p</i>
+<i class="math">q</i> is said to <em>act for</em> <i class="math">p</i>, written <i class="math">q</i>&#8829;<i class="math">p</i>.
+If the principal <code>p</code> acts for the
+principal <code>q</code>, any action taken by <code>p</code>
+is implicitly assumed to be authorized by <code>q</code>.
+Thus, the <i class="math">acts-for</i> relation expresses trust
+relationships between principals.
 The <i class="math">acts-for</i> relation is
 reflexive and transitive, and is similar to the <i class="math">speaks-for</i>
-relation&nbsp;[<a href="bibliography.html#LABW91">LABW91</a>]. The <i class="math">acts-for</i> relation is needed to express
-trust relationships between principals, and can encode groups and roles.
+relation&nbsp;[<a href="bibliography.html#LABW91">LABW91</a>] used in
+authentication logics.
+The hierarchy of principals is also similar to a <em>role hierarchy</em>
+[<a href="bibliography.html#RBAC">RBAC</a>].
+</p>
+
+<p>
+The acts-for relation can be used to model groups and
+roles conveniently. A group principal, such as <code>students</code>,
+is modeled by authorizing all of the principals
+representing members of the group
+to act for the group principal. That is, the group principal delegates
+its authority to all of the group members.  A
+role, a restricted form of a user's authority, is modeled by
+authorizing the user's principal to act for the role principal.
+</p>
+
+<p>
 Jif supports a <em>top
 principal</em> &#8868; able to act for all principals, and a <em>bottom
 principal</em> &perp; that allows all principals to act for it.
 </p>
+
 
 <p>Jif allows principals to be composed together to form
 <em>conjunctive</em> and <em>disjunctive</em>
@@ -49,21 +72,10 @@ and <i class="math">q</i>, that is, <i class="math">p</i> can act for
 class="math">q</i> can act for <i class="math">p,q</i>. Conjunctions and disjunctions are associative,
 commutative and idempotent.</p>
 
-<p>Principals express their security concerns with <em>labels</em>. A label
-is a pair of a confidentiality policy and an integrity policy. Labels
-are associated with information, and the Jif compiler 
-ensures that the policies of a label are enforced on the appropriate
-information. Confidentiality policies are formed from conjunctions and
-disjunctions of <em>reader policies</em>, and integrity policies are formed
-from conjunctions and disjunctions of <em>writer policies</em>.
- Each reader
-policy and writer policy has an owning principal; a policy owned by a
-principal <i class="math">p</i> is a statement of <i class="math">p</i>'s 
-beliefs or requirements about the security of information.
-</p>
+<h2><a name="dlm_conf_policies">Confidentiality policies</a></h2>
 
-
-<h2><a name="dlm_conf_poicies">Confidentiality policies</a></h2>
+<p>Principals express their security concerns with <em>labels</em>
+containing security policies.</p>
 
 <p>A <em>reader policy</em> allows the owner of the policy to specify
 which principals the owner permits to read a given piece of
@@ -104,8 +116,8 @@ While this semantics is expressed differently, it is consistent with
 the original DLM semantics&nbsp;[<a href="bibliography.html#ML00">ML00</a>].
 </p>
 
-<p><strong>Conjunction and disjunction.</strong>
-Greater expressiveness can be achieved by taking conjunctions and
+<p class="sssec"><strong>Conjunction and disjunction.</strong>
+Greater expressiveness is achieved by allowing conjunctions and
 disjunctions of reader policies.
 We define <em>confidentiality policies</em> to be the smallest set containing
 all reader policies and closed under the binary operators &#8852; and
@@ -140,7 +152,7 @@ combined.
                        <i class="math">readers</i>(<i class="math">p</i>, <i class="math">c</i>) &cup; <i class="math">readers</i>(<i class="math">p</i>, <i class="math">d</i>)  
 </div>
 
-<p><strong>Ordering confidentiality policies.</strong> Using the
+<p class="sssec"><strong>Ordering confidentiality policies.</strong> Using the
 <i class="math">readers</i>(&#8729;, &#8729;) function, we can define a &quot;no more
 restrictive than&quot; relation &#8849;<sub>C</sub> on confidentiality
 policies. For two confidentiality policies <i class="math">c</i> and
@@ -158,7 +170,7 @@ class="math">d</i>: policy <i class="math">c</i> is no more
 restrictive than policy <i class="math">d</i>.</p>
 
 <p>The relation &#8849;<sub>C</sub> forms a pre-order over confidentiality
-policies, and the equivalence classes form a lattice. The operators
+policies, and its equivalence classes form a lattice. The operators
 &#8852; and &#8851; are the join and meet operators of this lattice.
 The least restrictive confidentiality policy is the reader policy
 &perp;&rarr;&perp;, where &perp; is a principal that all principals
@@ -169,7 +181,7 @@ The most restrictive expressible confidentiality policy is
 principals; information labeled &#8868;&rarr;&#8868; is allowed to
 be read only by principal &#8868;.</p>
 
-<h2><a name="dlm_conf_poicies">Integrity policies</a></h2>
+<h2><a name="dlm_int_policies">Integrity policies</a></h2>
 
 <p>Integrity and confidentiality are well-known duals, and we define
 integrity policies dually to confidentiality policies. The set of <em>integrity
@@ -270,7 +282,8 @@ functions appropriately:</p>
 <i class="math">writers</i>(<i class="math">p</i>, {<i class="math">c</i>;<i class="math">d</i>}) &#8796; <i class="math">writers</i>(<i class="math">p</i>, <i class="math">d</i>)
 </div>
 
-<p><strong>Example.</strong>
+<blockquote>
+<p class="sssec"><strong>Example.</strong>
 Consider the following label: {Alice&rarr;Bob,Chuck ; Alice&larr;Chuck &#8852; Bob&larr;Chuck,Dave}.
 The
 confidentiality policy of this label is a single reader
@@ -291,8 +304,9 @@ information may have been influenced by any principal at all, and is
 thus completely untrustworthy. A principal that both Alice and Bob
 can act for believes that principals that can act for Alice, Bob, Chuck,
 or Dave may have influenced the information.</p>
+</blockquote>
 
-<p><strong>Ordering labels.</strong> We define the &quot;no more
+<p class="sssec"><strong>Ordering labels.</strong> We define the &quot;no more
 restrictive than&quot; relation &#8849; on labels using the relations
 &#8849;<sub>C</sub> and &#8849;<sub>I</sub>. In particular, {<i class="math">c</i>;<i class="math">d</i>} &#8849; {<i class="math">c</i>';<i class="math">d</i>'} if
 and only if <i class="math">c</i> &#8849;<sub>C</sub> <i class="math">c</i>' and <i class="math">d</i> &#8849;<sub>I</sub> <i class="math">d</i>'.  For labels <i
