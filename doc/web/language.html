@@ -266,10 +266,10 @@ the variable <code>h</code>, the <code>if</code> statement makes the
 as <code>{h}</code>.  Assume no information can be learned from the
 fact that the program is executed, and that the program executes with
 the highest possible integrity (that is, initially
-<u>pc</u>&nbsp;=&nbsp;<code>{*!:*}</code>).  In this case, the value
+<u>pc</u>&nbsp;=&nbsp;<code>{*&larr;*}</code>).  In this case, the value
 of <u>pc</u> during the consequent clause is <code>{h}</code>.  After
 the <code>if</code> statement, it is again true that <u>pc</u> =
-<code>{*!:*}</code>, because no information about <code>h</code> can be
+<code>{*&larr;*}</code>, because no information about <code>h</code> can be
 deduced from the fact that the statement after the <code>if</code>
 statement is executed. (It is not true in general that the value of
 <u>pc</u> reverts after <code>if</code> statements, but is true here
@@ -300,8 +300,8 @@ the termination or non-termination of a program.
 Consider the execution of a <code>while</code> statement
 <code>while (h != 0) { ... }</code>.
 According to the Jif type system,
-assuming that initially <u>pc</u>=<code>{*!:*}</code>, then
-after the statement terminates, <u>pc</u>=<code>{*!:*}</code>, using the
+assuming that initially <u>pc</u>=<code>{*&larr;*}</code>, then
+after the statement terminates, <u>pc</u>=<code>{*&larr;*}</code>, using the
 same reasoning as for the <code>if</code> statement. This
 labeling might seem strange, because we
 know the value of <code>h</code> when we arrive at the final basic block.
@@ -449,7 +449,7 @@ the method terminates normally) is by default the join of the declared
 labels of any exceptions that the method declares that it
 throws. Thus, if the method does not throw any exceptions, or if the
 declared exceptions do not have any labels, the default method
-end-label is the bottom label, <code>{*!:}</code>.
+end-label is the bottom label, <code>{*&larr;}</code>.
 </li>
 
 <li> Default method result label: the join of all the argument labels and the end-label. 
@@ -627,13 +627,13 @@ integrity. Again, it is possible to omit the label
 this form is deprecated. For example, the following is an example of
 a <code>declassify</code> statement.
 <div class="code"><pre>
-int{Alice:;Alice!:} b;
-int{Alice:Bob;Alice!:} y = 0;
+int{Alice:;Alice&larr;} b;
+int{Alice:Bob;Alice&larr;} y = 0;
 if (b) {
-    <span class="comment">// pc is at level {Alice:;Alice!:} at this point.</span>
-    declassify ({Alice:;Alice!:} to {y}) {
+    <span class="comment">// pc is at level {Alice:;Alice&larr;} at this point.</span>
+    declassify ({Alice:;Alice&larr;} to {y}) {
         <span class="comment">// at this point, pc has been declassified to the label of the local </span>
-        <span class="comment">// variable y (that is,  {Alice:Bob;Alice!:} ) permitting the </span>
+        <span class="comment">// variable y (that is,  {Alice:Bob;Alice&larr;} ) permitting the </span>
         <span class="comment">// assignment to y</span>
         y = 1;
     }
@@ -876,7 +876,7 @@ example:
 
 <div class="code"><pre>
 class paramCell[principal p, principal q] {
-    int{p:q; p!:q} contents;
+    int{p:q; p&larr;q} contents;
 }
 </pre></div>
 
@@ -884,7 +884,7 @@ class paramCell[principal p, principal q] {
 This class may be instantiated with any
 two principals <code>p</code> and <code>q</code>. For example,
 the instantiation <code>paramCell[Bob,Amy]</code> has
-a field <code>contents</code> with the label <code>{Bob:Amy; Bob!:Amy}</code>.
+a field <code>contents</code> with the label <code>{Bob:Amy; Bob&larr;Amy}</code>.
 </p>
 
 <h3><A NAME="param-interact-object-types">Interactions with object types</A></h3>
@@ -1004,7 +1004,7 @@ class C[label L] { ... }
 ...
 
 void m() {
-    final label lb = new label {Alice: Bob; Alice!:};
+    final label lb = new label {Alice: Bob; Alice&larr;};
 
     int{*lb; Bob:} x = 4;
 
@@ -1016,7 +1016,7 @@ void m() {
 
 <p>Here we see a local variable <code>lb</code>, of type
 <code>label</code>. At runtime, this variable will contain a
-representation of the label <code>{Alice: Bob; Alice!:}</code>. The type of the
+representation of the label <code>{Alice: Bob; Alice&larr;}</code>. The type of the
 variable <code>x</code> is declared to be <code>int{*lb; Bob:}</code>,
 that is, an integer whose label the policy <code>{Bob:}</code> joined
 with the <i>value</i> stored in the variable <code>lb</code>. This is
@@ -1238,18 +1238,18 @@ as follows:
 <div class="code"><pre>
 public interface Principal {
     String name();
-    boolean{this;p;this!:} delegatesTo(principal p);
+    boolean{this;p;this&larr;} delegatesTo(principal p);
     boolean equals(Principal p);
-    boolean{authPrf; closure; lb; *lb; this; this!:} 
-                     isAuthorized{this!:}(Object authPrf, 
+    boolean{authPrf; closure; lb; *lb; this; this&larr;} 
+                     isAuthorized{this&larr;}(Object authPrf, 
                                           Closure[this, lb] closure,
                                           label lb) where authority (this);
     
-    ActsForProof{this;p;this!:;p!:} 
-                     findProofUpto{this!:}(Principal p, Object searchState);
+    ActsForProof{this;p;this&larr;;p&larr;} 
+                     findProofUpto{this&larr;}(Principal p, Object searchState);
     
-    ActsForProof{this;q;q!:;this!:} 
-                     findProofDownto{this!:}(Principal q, Object searchState);    
+    ActsForProof{this;q;q&larr;;this&larr;} 
+                     findProofDownto{this&larr;}(Principal q, Object searchState);    
 }
 </pre></div>
 
