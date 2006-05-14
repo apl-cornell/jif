@@ -12,7 +12,7 @@
 <p>Jif allows mutually distrusting entities to express
 information-flow security policies for confidentiality and
 integrity. Security policies are expressed using the <i>decentralized
-label model</i> (DLM)&nbsp;[ML00].  In this section, we describe the
+label model</i> (DLM)&nbsp;[<a href="bibliography.html#ML00">ML00</a>].  In this section, we describe the
 core concepts of the DLM: principals, policies, and labels, and
 present the syntax used to write labels in Jif programs. 
 </p>
@@ -31,7 +31,7 @@ with security concerns.</p>
 <i class="math">q</i> is said to <em>act for</em> <i class="math">p</i>, written <i class="math">q</i>&#8829;<i class="math">p</i>
 The <i class="math">acts-for</i> relation is
 reflexive and transitive, and is similar to the <i class="math">speaks-for</i>
-relation&nbsp;[LABW91]. The <i class="math">acts-for</i> relation is needed to express
+relation&nbsp;[<a href="bibliography.html#LABW91">LABW91</a>]. The <i class="math">acts-for</i> relation is needed to express
 trust relationships between principals, and can encode groups and roles.
 Jif supports a <em>top
 principal</em> &#8868; able to act for all principals, and a <em>bottom
@@ -40,7 +40,7 @@ principal</em> &perp; that allows all principals to act for it.
 
 <p>Jif allows principals to be composed together to form
 <em>conjunctive</em> and <em>disjunctive</em>
-principals&nbsp;[LABW91,TZ05]. A conjunctive principal, written &quot;<i
+principals&nbsp;[<a href="bibliography.html#LABW91">LABW91</a>,<a href="bibliography.html#TZ05">TZ05</a>]. A conjunctive principal, written &quot;<i
 class="math">p</i>&amp;<i class="math">q</i>&quot;, is able to act for
 both the principals <i class="math">p</i> and <i class="math">q</i>. A
 disjunctive principal, written &quot;<i class="math">p,q</i>&quot; delegates its authority to <i class="math">p</i>
@@ -101,7 +101,7 @@ then <i class="math">readers</i>(p, <i class="math">o</i>&rarr;<i
 class="math">r</i>) is the set of all principals; in other words, <i
 class="math">p</i> does not credit the policy with any significance.
 While this semantics is expressed differently, it is consistent with
-the original DLM semantics&nbsp;[ML00].
+the original DLM semantics&nbsp;[<a href="bibliography.html#ML00">ML00</a>].
 </p>
 
 <p><strong>Conjunction and disjunction.</strong>
