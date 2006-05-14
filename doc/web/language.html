@@ -449,7 +449,7 @@ the method terminates normally) is by default the join of the declared
 labels of any exceptions that the method declares that it
 throws. Thus, if the method does not throw any exceptions, or if the
 declared exceptions do not have any labels, the default method
-end-label is the bottom label, <code>{*&larr;}</code>.
+end-label is the bottom label, <code>{*&larr;*}</code>.
 </li>
 
 <li> Default method result label: the join of all the argument labels and the end-label. 
@@ -551,9 +551,9 @@ C[Alice] foo = new C[Alice]();
 <p>
 The second way for a method to acquire authority is for the method to
 receive authority passed from another method. If the receiving method
-signature contains a clause of the form <code>where caller(p)</code>,
+signature contains a clause of the form <code>where caller(<i>p</i>)</code>,
 then it can be called only from code that is statically known to have
-the authority of principal <code>p</code>. For example, in the
+the authority of principal <code><i>p</i></code>. For example, in the
 following code, the method <code>m</code> executes with the authority
 of <code>Alice</code>, and the principals <code>P</code>
 and <code>prin</code>, whose identities are not yet determined at
@@ -627,13 +627,13 @@ integrity. Again, it is possible to omit the label
 this form is deprecated. For example, the following is an example of
 a <code>declassify</code> statement.
 <div class="code"><pre>
-int{Alice:;Alice&larr;} b;
-int{Alice:Bob;Alice&larr;} y = 0;
+int{Alice:;Alice&larr;*} b;
+int{Alice:Bob;Alice&larr;*} y = 0;
 if (b) {
-    <span class="comment">// pc is at level {Alice:;Alice&larr;} at this point.</span>
-    declassify ({Alice:;Alice&larr;} to {y}) {
+    <span class="comment">// pc is at level {Alice:;Alice&larr;*} at this point.</span>
+    declassify ({Alice:;Alice&larr;*} to {y}) {
         <span class="comment">// at this point, pc has been declassified to the label of the local </span>
-        <span class="comment">// variable y (that is,  {Alice:Bob;Alice&larr;} ) permitting the </span>
+        <span class="comment">// variable y (that is,  {Alice:Bob;Alice&larr;*} ) permitting the </span>
         <span class="comment">// assignment to y</span>
         y = 1;
     }
@@ -1004,7 +1004,7 @@ class C[label L] { ... }
 ...
 
 void m() {
-    final label lb = new label {Alice: Bob; Alice&larr;};
+    final label lb = new label {Alice: Bob; Alice&larr;*};
 
     int{*lb; Bob:} x = 4;
 
@@ -1016,7 +1016,7 @@ void m() {
 
 <p>Here we see a local variable <code>lb</code>, of type
 <code>label</code>. At runtime, this variable will contain a
-representation of the label <code>{Alice: Bob; Alice&larr;}</code>. The type of the
+representation of the label <code>{Alice: Bob; Alice&larr;*}</code>. The type of the
 variable <code>x</code> is declared to be <code>int{*lb; Bob:}</code>,
 that is, an integer whose label the policy <code>{Bob:}</code> joined
 with the <i>value</i> stored in the variable <code>lb</code>. This is
@@ -1238,18 +1238,18 @@ as follows:
 <div class="code"><pre>
 public interface Principal {
     String name();
-    boolean{this;p;this&larr;} delegatesTo(principal p);
+    boolean{this;p;this&larr;*} delegatesTo(principal p);
     boolean equals(Principal p);
-    boolean{authPrf; closure; lb; *lb; this; this&larr;} 
-                     isAuthorized{this&larr;}(Object authPrf, 
+    boolean{authPrf; closure; lb; *lb; this; this&larr;*} 
+                     isAuthorized{this&larr;*}(Object authPrf, 
                                           Closure[this, lb] closure,
                                           label lb) where authority (this);
     
-    ActsForProof{this;p;this&larr;;p&larr;} 
-                     findProofUpto{this&larr;}(Principal p, Object searchState);
+    ActsForProof{this;p;this&larr;*;p&larr;*} 
+                     findProofUpto{this&larr;*}(Principal p, Object searchState);
     
-    ActsForProof{this;q;q&larr;;this&larr;} 
-                     findProofDownto{this&larr;}(Principal q, Object searchState);    
+    ActsForProof{this;q;q&larr;*;this&larr;*} 
+                     findProofDownto{this&larr;*}(Principal q, Object searchState);    
 }
 </pre></div>
 
@@ -1368,7 +1368,54 @@ information about creating external principals.
 
 
 <h2><a name="method-constraints">Method constraints</a></h2>
-XXX TODO. Where constraints on principal hierarchy and label environments.
+
+<p>Method declarations may contain <code>where</code> clauses, which
+may be assumed to hold true during the execution of the method body,
+and which the compiler guarantees are true at the method call
+sites. We have already seen several of these clauses, in particular,
+<a href="#authority-decls">authority declarations</a>
+(<code>authority(<i>p</i>)</code> and<code>caller(<i>p</i>)</code> clauses), and <a
+href="#robustness">auto-endorsements</a>. There are two additional
+method constraints that may be specified: actsfor clauses, and label
+clauses.</p>
+
+<p>An actsfor clause is of the form <code>where <i>p</i> actsfor
+<i>q</i></code>, and specifies that the principal <i>p</i> is able to
+act for the principal <i>q</i>. Code in the method body may assume
+that this relationship between <i>p</i> and <i>q</i> holds, and code
+that calls the method must prove that the relationship holds, possibly
+through a dynamic <a href="#runtime-tests"><code>actsfor</code>
+test</a>. A variant of an actsfor clause is of the form <code>where
+<i>p</i> equiv <i>q</i></code>, which is equivalent to <code>where
+<i>p</i> actsfor <i>q</i>,<i>q</i> actsfor <i>p</i></code>, that is,
+it states that <i>p</i> acts for <i>q</i> and vice versa.
+</p>
+
+<p>An label clause is of the form <code>where <i>L</i><sub>1</sub> &lt;=
+<i>L</i><sub>2</sub></code>, and specifies that the label
+<i>L</i><sub>1</sub> is the same or less restrictive than the label
+<i>L</i><sub>2</sub>.  Code in the method body may assume that this
+relationship between <i>L</i><sub>1</sub> and <i>L</i><sub>2</sub>
+holds, and code that calls the method must prove that the relationship
+holds, possibly through a dynamic <a href="#runtime-tests">label
+test</a>. The clause <code>where <i>L</i><sub>1</sub> equiv
+<i>L</i><sub>2</sub></code> is equivalent to <code>where
+<i>L</i><sub>1</sub> &lt;= <i>L</i><sub>2</sub>, <i>L</i><sub>2</sub> &lt;=
+<i>L</i><sub>1</sub></code>, that is, it states that <i>L</i><sub>1</sub> and
+<i>L</i><sub>2</sub> are equivalent labels.
+</p>
+
+<div class="code"><pre>
+int{*lbl} m{*lbl}(label{*lbl} lbl, principal{*lbl} p, int{Alice:p} i) 
+    where {Alice:Bob} <= lbl, Bob actsfor p 
+{
+    <span class="comment">// since Bob actsfor p, {Alice:p} <= {Alice:Bob},</span>
+    <span class="comment">// and since {Alice:Bob} <= lbl, the label of the argument i</span> 
+    <span class="comment">// is <= {*lbl}. Therefore, we can return i+1.</span>
+   return i+1;
+}
+</pre></div>
+
 
 <h2><a name="java-changes">Other changes to Java</a></h2>
 

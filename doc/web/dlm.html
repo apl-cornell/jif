@@ -417,14 +417,14 @@ when writing Jif programs. See <a class="secref" href="language.html#lexical">Le
     <TD><i class="math">o</i>&rarr;<i class="math">r</i>&nbsp;&#8852;&nbsp;<i class="math">o'</i>&rarr;<i class="math">r'</i> <br>
         <i class="math">o</i>&rarr;<i class="math">r</i>&nbsp;&#8851;&nbsp;<i class="math">o'</i>&rarr;<i class="math">r'</i>
    </TD>
-    <TD><code>o&larr;;o'&larr;r'</code><br>
+    <TD><code>o&larr;r;o'&larr;r'</code><br>
         <code>o&larr;r&nbsp;meet&nbsp;o'&larr;r'</code> <i>or</i> 
         <code>o&larr;r&nbsp;&#8851;&nbsp;o'&larr;r'</code>
     </TD>
     <TD>
         <ul>
         <li><code>Alice&lt;-; Bob&lt;-Chuck</code>
-        <li><code>Alice!: meet Bob!:Chuck </code>
+        <li><code>Alice&larr;&#8868; meet Bob&larr;Chuck </code>
         <li><code>Alice!: meet Bob!:Chuck; Chuck!:</code> is the meet
              <code>Alice!: meet Bob!:Chuck</code> joined with
              <code>Chuck!:</code>. Meets of joins of policies can be
@@ -451,19 +451,19 @@ when writing Jif programs. See <a class="secref" href="language.html#lexical">Le
  
         <li><code>{Alice:Bob}</code> 
                   If no integrity policy is specified, then by default
-                  <code>_&larr;_</code> is
+                  <code>&perp;&larr;&perp;</code> is
                   assumed. <code>{Alice:Bob}</code> is equivalent
-                  to <code>{Alice&rarr;Bob; _&larr;_}</code>.
+                  to <code>{Alice&rarr;Bob; &perp;&larr;&perp;}</code>.
 
         <li><code>{Bob&lt;-Alice&amp;Chuck}</code> 
                   If no confidentiality policy is specified, then by default
-                  <code>_&rarr;_</code> is
-                  assumed. <code>{Bob&larr;Alice&amp;Chuck}</code> is equivalent
-                  to <code>{_:_; Bob&lt;-Alice&amp;Chuck}</code>.
+                  <code>&perp;&rarr;&perp;</code> is
+                  assumed. <code>{Bob&lt;-Alice&amp;Chuck}</code> is equivalent
+                  to <code>{&perp;&rarr;&perp;; Bob&lt;-Alice&amp;Chuck}</code>.
 
         <li><code>{}</code> As neither a confidentiality policy or
                   an integrity policy is specified, this label is
-                  equivalent to <code>{_&rarr;_ ; _&larr;_}</code>.
+                  equivalent to <code>{&perp;&rarr;&perp; ; &perp;&larr;&perp;}</code>.
         </ul>
     </TD>
   <TR>
@@ -484,8 +484,8 @@ when writing Jif programs. See <a class="secref" href="language.html#lexical">Le
     </TD>
     <TD>
         <ul>
-        <li><code>{Alice&rarr;Bob &#8851; Chuck&rarr;Dave; Alice&larr; &#8851; Chuck&larr;}</code>
-        <li><code>{Alice&rarr;Bob; Alice&larr;} meet {Chuck&rarr;Dave; Chuck&larr;}. Braces are useful for specifying the order in which </code>
+        <li><code>{Alice&rarr;Bob &#8851; Chuck&rarr;Dave; Alice&larr;&#8868; &#8851; Chuck&larr;&#8868;}</code>
+        <li><code>{Alice&rarr;Bob; Alice&larr;&#8868;} meet {Chuck&rarr;Dave; Chuck&larr;&#8868;}</code>. Braces are useful for specifying the order of label operations.
     </TD>
   </TR>
   <tr>
@@ -494,11 +494,11 @@ when writing Jif programs. See <a class="secref" href="language.html#lexical">Le
     <td><code>{L}</code></td>
     <td>
       <ul>
-	<li><code>{{Bob&rarr;}&#8852;{Alice&rarr;}}</code>.
-	   This is the same as <code>{Bob&rarr; ; Alice&rarr;}</code>; the extra
+	<li><code>{{Bob&rarr;*}&#8852;{Alice&rarr;*}}</code>.
+	   This is the same as <code>{Bob&rarr;* ; Alice&rarr;*}</code>; the extra
 	   layer of braces has no effect.
 	</li>
-	<li><code>{{Bob&rarr;}&#8852;{Alice&rarr;}}&#8851;{Chuck&larr;Dave}</code></li>
+	<li><code>{{Bob&rarr;&#8868;}&#8852;{Alice&rarr;&#8868;}}&#8851;{Chuck&larr;Dave}</code></li>
 	Grouping specifies the order of label operations.
       </ul>
     </td>
