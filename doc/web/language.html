@@ -90,8 +90,7 @@ int{p:} x = 2;
 </p>
 
 <p>
-The syntax of labels is as described in the section
-<a class="secref" href="dlm.html#dlm_syntax">Label syntax in Jif</a>.
+The syntax of labels is described earlier (see <a class="secref" href="dlm.html#dlm_syntax">Label syntax in Jif</a>).
 </p>
 
 <p>
@@ -137,14 +136,14 @@ indicating
 that the labeled value should be as restricted as <code>a</code> is, and also that
 the principal <code>o</code> restricts the value to be read by at most
 the principal <code>r</code>.
-Other kinds of label components will be introduced later.
+Other kinds of label components are introduced later.
 </p>
 
 <p>
 A labeled type may occur in a Jif program almost anywhere a type
 may occur in a Java program. In fact, if the label is omitted from a type,
 the Jif compiler automatically generates a label for that type according
-to rules that are discussed later.
+to certain rules (see <a class="secref" href="#default-labels">Default labels</a>).
 </p>
 
 <p>
@@ -176,7 +175,7 @@ The acts-for relationship between two principals can be tested in a Jif program
 using the built-in <code>actsfor</code> operator. The boolean expression
 <code>p actsfor q</code> evaluates to <code>true</code> if the specified
 relationship exists. Within the body of an <code>if</code> statement
-conditioned on this test (see <a href="#runtime-tests">below</a>), the compiler
+conditioned on this test (see <a class="secref" href="#runtime-tests">Run-time tests of labels and principals</a>), the compiler
 makes use of the knowledge that the relationship exists when checking
 information flows and comparing security policies.
 </p>
@@ -317,8 +316,9 @@ public class Vector[label L] extends AbstractList[L] {
 This code provides several examples of Jif method
 declarations. The class is generic with respect to a label 
 parameter <code>L</code>, permitting Vectors to be used to
-store information of any one desired label. (Parametric
-polymorphism over labels is discussed <a href="#parameterized-classes">later</a>).
+store information of any one desired label. (See
+<a class="secref" href="#parameterized-classes">Parameterized classes</a>
+for information on parametric polymorphism over labels).
 </p>
 
 <p>
@@ -383,8 +383,8 @@ no confidential or trusted data can be stored in the field.
 <li> Default argument label: the top label, <code>{*:}</code>
 <br>
 The label on the type of a formal argument is an upper bound for
-labels of actual arguments. See the section on <a
-href="#label-polymorphism">label polymorphism</a>.  
+labels of actual arguments.
+(See <a class="secref" href="#label-polymorphism">Polymorphism</a>).  
 </li>
 
 
@@ -411,9 +411,9 @@ end-label is the bottom label, <code>{*&larr;*}</code>.
 <br>
 The method result label (the label of the value returned by the
 method) is by default the method end-label joined with all of the
-argument labels (<i>not</i> the upper bounds of the argument labels;
-see the section on <a href="#method-polymorphism">polymorphic
-methods</a>).  This is the common case, as most of the time the value
+argument labels (<i>not</i> the upper bounds of the argument labels 
+(see <a class="secref" href="#label-polymorphism">Polymorphism</a>).
+This is the common case, as most of the time the value
 returned by a method is the result of computation on all of its
 arguments.
 </li>
@@ -642,7 +642,7 @@ of sufficiently high integrity. More information is provided in [CM05]
 and in the <a href="label_checking.html#robustness">label checking</a>
 section of the manual.</p>
 
-<p>Enforcing robustness requires that both the information to be
+<p class="sssec"><strong>Auto-Endorsement</strong>. Enforcing robustness requires that both the information to be
 downgraded and the decision to downgrade are of sufficiently high
 integrity. However, in some situations a principal may be willing to
 downgrade information regardless of the integrity of the decision to
@@ -654,15 +654,15 @@ the body of a method <code>m</code> with <code>p</code>'s trust. The
 method body will execute with higher integrity, due to the addition of
 <code>p</code>'s trust.</p>
 
-<p>An auto-endorsement is specified with a <code>where
-endorse(<i>L</i>)</code> clause. A method declaration with method body
+<p>Auto-endorsement is specified with a clause <code>where
+endorse(<i>L</i>)</code>. A method declaration with method body
 <code>S</code> and an auto-endorsement clause <code>where
 endorse(<i>L</i>)</code> is similar to a method declaration with body
 <code>endorse(<i>L</i><sub>0</sub> to <i>L</i>) S</code>, where
 <code><i>L</i><sub>0</sub></code> is the method's begin
-label. However, the robustness constraints are not enforced on an
-auto-endorsement, although the selective downgrading constraints are,
-that is, the method requires the authority of any principal whose
+label. However, robustness constraints are not enforced on an
+auto-endorsement; only selective downgrading constraints are.
+That is, the method requires the authority of any principal whose
 security policy is weakened by the auto-endorsement.
 </p>
 
@@ -672,8 +672,6 @@ downgrading of information. The access control mechanism of selective
 downgrading interacts with robustness via the auto-endorsement
 of methods, as a method can only be auto-endorsed if it has sufficient
 authority.</p>
-
-
 
 <h2><a name="label-polymorphism">Polymorphism</a></h2>
 
@@ -705,7 +703,7 @@ with any label.
 <p>
 Without label polymorphism, there are two strategies: reimplement it
 for every argument label ever used, or implement it using run-time labels
-(discussed <a href="#dynamic-labels">later</a>).
+(see <a class="secref" href="#dynamic-labels">Dynamic labels and principals</a>).
 The former approach is clearly infeasible.
 Implicit labels have the advantage
 over run-time labels that when they
@@ -771,8 +769,7 @@ void foo(int{Bob:} a) {
 
 <p>If no label is specified for a formal argument, then it is assumed
 that there are no restrictions on the labels of the actual arguments
-that may be passed in. See the section on <a
-href="#default-labels">default labels</a>.
+that may be passed in. (See <a class="secref" href="#default-labels">Default labels</a>).
 
 <h2><a name="parameterized-classes"></a>Parameterized classes</h2> 
 
@@ -1071,7 +1068,7 @@ class D {
 </div>
 
 
-<h3><a name="runtime-tests"></a>Runtime tests of labels and principals</h3>
+<h3><a name="runtime-tests"></a>Run-time tests of labels and principals</h3>
 
 <p>Jif provides a mechanism for comparing runtime labels, and also a
 mechanism for comparing runtime principals. Both mechanisms use a
