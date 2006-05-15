@@ -332,6 +332,8 @@ label ::=
                col.add(c);
                LabelNode mn = parser.nf.JoinLabelNode(parser.pos(x,c), col);
                RESULT = mn; :}
+    |    LBRACE label:l RBRACE
+            {: RESULT = l; :}
     ;
 label_opt ::=
                     // LabelNode
