@@ -9,16 +9,309 @@
 
 <h1><a name="label-checking">Label checking</a></h1>
 
-XXX TODO INTRO. This section will explain the label checking rules informally.
+<p>In addition to the standard type-checking performed by Java
+compilers, the Jif compiler performs <em>label checking</em>, ensuring
+that programs respect the security policies contained in the labels of
+information. The label checking rules are intended to enforce the
+following two properties.</p>
+
+<ol>
+<li> The apparent label of every expression is at least as restrictive
+as the actual label of every value it might produce.</li> 
+
+<li> The actual label of a value is at least as restrictive as the
+label of any value that might affect it (modulo downgrading).
+</li>
+</ol>
+
+This section describes informally the label checking rules used in the
+Jif compiler.
+
+
 <h2><a name="key-concepts">Key concepts</a></h2>
 
-pc,
+<h3><a name="pc-label">Program counter labels</a></h3>
+<p>Every program
+point has a program counter label <u>pc</u> (introduced in <a
+class="secref" href="language.html#implicit-flows">Implicit flows and
+program-counter labels</a>). For any given program point, <u>pc</u> is
+an upper bound on the information that may be deduced by knowing that
+program execution reaches the program point. Equivalently, <u>pc</u>
+can be regarded as an upper bound on the labels of all values that
+have affected the control flow of the program to reach the program point.</p>
 
-exceptions, normal termination (try to present without introducing path maps),
+<h3><a name="path-maps">Normal and exceptional termination</a></h3>
+<p>The evaluation of an expression or statement may result in the
+throwing of an exception. As described in <a class="secref"
+href="language.html#runtime-exceptions">Runtime exceptions</a>,
+exceptions are a covert information channel, and label checking must
+therefore carefully track the information encoded in the presence or
+absence of exceptions. For every expression and statement in a
+program, a label is assoicated with every subclass of
+<code>Exception</code>; this label is an upper bound on the
+information that may be deduced by observing that the expression or
+statement throws an object of that class. (Equivalently, the label is
+an upper bound on the labels of all values that may influence the
+throwing of the exception.) In addition, a label is associated with
+the <em>normal termination</em> of each expression and statement, that
+is an upper bound of the informatoin that may be deduced by the
+termination of the expression or statement without an exception.</p>
 
-label environment
+<p>For example, consider the following (compound) statement.</p>
+<div class="code"><pre>
+if (i == 0) x = o.foo; else x = x/a;
+</pre></div>
 
-<h2><a name="arithmetic">Literals and arithmetic</a></h2>
+<p class="cont">The statement could throw a
+<code>NullPointerException</code> only if the local variable
+<code>i</code> is zero and the local variable <code>o</code> is
+<code>null</code>. The statement could throw an
+<code>ArithmeticException</code> only if the local variable
+<code>i</code> is non-zero and the integer variable <code>a</code> is
+zero. The statement will terminate normally if <code>i</code> and
+<code>a</code> are non-zero, or if <code>i</code> is non-zero and
+<code>o</code> is not <code>null</code>. Therefore, the label
+associated with normal termination is
+<code>{i;a;o}</code>&#8852;<u>pc</u>, where <code>{i;a;o}</code> is
+the join of the labels of the local variables <code>i</code>,
+<code>a</code>, and <code>o</code>, and <u>pc</u> is the program
+counter label associated with the program point at the start of this
+statement. Similarly, the label associated with a
+<code>NullPointerException</code> being thrown is
+<code>{i;o}</code>&#8852;<u>pc</u>, and the label associated with an
+<code>ArithmeticException</code> is
+<code>{i;a}</code>&#8852;<u>pc</u>. The statement cannot throw any
+other exception. Note that the labels for normal termination and the
+exceptions do not mention the variable <code>x</code>, which appears
+in the statement, but does not affect whether an exception is
+thrown. In general, the label associated with normal termination is at
+least as restrictive as the label associated with each possible
+exception, as an expression or statement terminates normally only if
+it does not throw an exception.
+</p>
+
+<h3><a name="nv-label">Normal value label</a></h3>
+<p>Label checking also determines for every expression an upper bound
+on the label of any value that the expression may evaluate to. This
+label is called the <em>normal value</em> label of the expression (or
+often, the label of the expression) and is in general be at least as
+restrictive as the normal termination label of the expression, since
+the expression will only evaluate to a value it does not throw an
+exception.</p>
+
+<h3><a name="label-envs">Label environments</a></h3>
+<p>Each program point in a Jif program also has a <em>label
+environment</em> associated with it. A label environment records the
+relationships statically known to hold between labels, as well as the
+<code>actsfor</code> relationships statically known to hold between
+principals. Relationships between labels and between principals are
+known to hold statically through the use of label and actsfor <a
+href="language.html#method-constraints">method constraints</a>, and
+through the use of <a href="language.html#runtime-tests">runtime
+tests</a> of label and principal relationships.  All label checking
+constraints are checked using the label environment at the program
+point where the constraint arises. For example, in the following code,
+label checking requires that at the assignment, the label of <code>y</code> is no
+more restrictive than the label of <code>x</code>. Due to the actsfor relation
+contained in the label environment at that point, this constraint does
+indeed hold.
+</p>
+<div class="code"><pre>
+int{Alice: Bob} x;
+int{Alice: Chuck} y;
+if (Bob actsfor Chuck) {
+    x = y; <span class="comment">// OK, since {Alice: Chuck} &#8849; {Alice: Bob} is deducible from </span>
+           <span class="comment">// the label environment at this point</span>
+}
+</pre></div>
+
+<h2><a name="basics">Basics of label checking</a></h2>
+
+<p>Label checking closely follows the operational semantics of Java.
+As an example, consider label checking an integer division expression
+<i class="math">e</i><sub>1</sub>/<i class="math">e</i><sub>2</sub>,
+assuming that <u>pc</u><sub>0</sub> is the program counter label for
+this expression. This expression is evaluated by first evaluating <i
+class="math">e</i><sub>1</sub>, then evaluating <i
+class="math">e</i><sub>2</sub>, and then performing the division
+operation. Label checking this division expression requires first
+label checking <i class="math">e</i><sub>1</sub>, using
+<u>pc</u><sub>0</sub> as the program counter label. Since <i
+class="math">e</i><sub>2</sub> will be evaluated only if <i
+class="math">e</i><sub>1</sub> terminates normally, the program
+counter label for checking <i class="math">e</i><sub>2</sub> is the
+normal termination label for <i class="math">e</i><sub>1</sub>, which
+is at least as restrictive as <u>pc</u><sub>0</sub>. If the evaluation
+of <i class="math">e</i><sub>2</sub> terminates normally, then the
+division operation occurs. Integer division will throw an
+<code>ArithmeticException</code> if <i class="math">e</i><sub>2</sub>
+evaluates to 0. Thus, label checking associates the normal value label
+of <i class="math">e</i><sub>2</sub> with the
+<code>ArithmeticException</code> that may be thrown by the division
+operation.
+</p>
+
+<p>
+What exceptions can be thrown by the expression <i
+class="math">e</i><sub>1</sub>/<i class="math">e</i><sub>2</sub>, and
+what labels are associated with these exceptions? Clearly, <i
+class="math">e</i><sub>1</sub>/<i class="math">e</i><sub>2</sub> may
+throw any exception thrown by <i class="math">e</i><sub>1</sub>, or <i
+class="math">e</i><sub>2</sub>, and the division operation itself may
+throw an <code>ArithmeticException</code>. Thus, the label associated
+with an <code>ArithmeticException</code> is the normal value label of
+<i class="math">e</i><sub>2</sub>, joined with the label associated
+with <code>ArithmeticException</code> by <i
+class="math">e</i><sub>1</sub>, joined with the label associated with
+<code>ArithmeticException</code> by <i
+class="math">e</i><sub>2</sub>. Similarly, for any other exception
+type <code>T</code>, the label associated with it is the label
+associated with <code>T</code> by <i class="math">e</i><sub>1</sub>,
+joined with the label associated with <code>T</code> by <i
+class="math">e</i><sub>2</sub>.</p>
+
+<p>
+The normal termination label of <i class="math">e</i><sub>1</sub>/<i
+class="math">e</i><sub>2</sub> is an upper bound on information that
+may be gained by knowing <i class="math">e</i><sub>1</sub>/<i
+class="math">e</i><sub>2</sub> terminates normally, which happens if
+<i class="math">e</i><sub>2</sub> terminates normally, and
+evaluates to a non-zero value. Thus,
+the normal termination label of <i class="math">e</i><sub>1</sub>/<i
+class="math">e</i><sub>2</sub> is the normal termination label of <i
+class="math">e</i><sub>2</sub> joined with the normal value label of
+<i class="math">e</i><sub>2</sub>.</p>
+
+<p>The normal value label of <i class="math">e</i><sub>1</sub>/<i
+class="math">e</i><sub>2</sub> is an upper bound on the information
+that may be gained by knowing what value the expression evaluates
+to. The value of <i class="math">e</i><sub>1</sub>/<i
+class="math">e</i><sub>2</sub> depends on the values of <i
+class="math">e</i><sub>1</sub> and <i class="math">e</i><sub>2</sub>,
+and thus the normal value label of <i
+class="math">e</i><sub>1</sub>/<i class="math">e</i><sub>2</sub> is
+the normal value label of <i class="math">e</i><sub>1</sub> joined
+with the normal value label of <i class="math">e</i><sub>2</sub>.
+</p>
+
+<p>
+The example of label checking <i class="math">e</i><sub>1</sub>/<i
+class="math">e</i><sub>2</sub> highlights two general principles
+used in Jif's label checking rules. 
+</p>
+<ul class="ulpara">
+<li> 
+If evaluation of expression
+(or statement) <i class="math">e'</i> immediately follows the
+successful evaluation of expression (or statement) <i
+class="math">e</i>, then the program counter label used to label check
+<i class="math">e'</i> is the normal termination label of <i
+class="math">e</i>.</li>
+<li>The label associated with any exception
+thrown by an expression or statement is the join of the labels
+assoicated with the exception in any sub-expressions or
+sub-statements, and (if the expression or statement itself can throw
+the exception), joined with the label associated with the exception by
+the expression or statement itself.
+</li>
+</ul>
+
+<p>
+Jif's label checking rules preserve several invariants.</p>
+<ul class="ulpara">
+<li> The normal value label of an expression is at least as
+restrictive as the normal termination label of the expression.</li>
+
+<li> The normal termiantion label of an expression or statement is at
+least as restrictive as the program counter label for the expression
+or statement.</li>
+
+<li> The normal termiantion label of an expression or statement is at
+least as restrictive as the labels associated with each exception that
+the expression or statement may throw.</li>
+</ul>
+
+<p>
+The label checking rules used in Jif are in large part explained by
+applying the general principles presented above to the operational
+semantics of Java, while ensuring that the invariants are
+preserved. In the presentation of the label checking rules in the
+remainder of the section, unless otherwise stated, these principles
+and invariants should be assumed to apply.
+</p>
+
+<p>
+An additional label checking rule permits increased precision in
+checking expressions and statements. The <em>single path rule</em>
+states that if an expression or statement <i class="math">e</i> can
+only terminate normally (that is, <i class="math">e</i> cannot throw
+any exceptions, and does not contain any <code>return</code>
+statements), then the normal termination label of <i
+class="math">e</i> is the program counter label of <i
+class="math">e</i>. In the following example, even though an exception
+may be thrown depending on the value of <code>i</code>, the
+<code>try-catch</code> block can only terminated normally: no
+additional information is gained by knowing that execution of the
+<code>try-catch</code> block terminates successfully.  Thus, by the
+single path rule, the normal termination label of the
+<code>try-catch</code> block is the same as the program counter label.
+</p>
+<div class="code"><pre>
+try {
+    if (i < 0) 
+        throw new Exception();
+}
+catch (Exception e) { }
+</pre></div>
+
+
+
+<h2><a name="arithmetic">Literals, binary and unary operators</a></h2>
+
+<p>The normal value label of a literal expression (including numeric literals
+such as <code>42</code>, <code>0.5f</code>, and <code>'r'</code>, and
+string literals such as <code>&quot;Hello world&quot;</code>) is the
+<u>pc</u> label at the program point where the expression
+occurs. Since literal expressions cannot throw exceptions, the
+label of normal termination label of a literal expression is just the
+<u>pc</u> label.</p>
+
+<p>A binary expression <i class="math">e</i><sub>1</sub>&oplus;<i
+class="math">e</i><sub>2</sub> is evaluated by first evaluating <i
+class="math">e</i><sub>1</sub>, then evaluating <i
+class="math">e</i><sub>2</sub>, and then performing the binary
+operation. For short-circuit evaluation operators
+<code>&amp;&amp;</code> and <code>||</code>, the evaluation of <i
+class="math">e</i><sub>2</sub> depends on the value of <i
+class="math">e</i><sub>1</sub>, and so the <u>pc</u> label for <i
+class="math">e</i><sub>2</sub> is the normal value of <i
+class="math">e</i><sub>1</sub>; for all other binary operators the
+<u>pc</u> label for evaluating <i class="math">e</i><sub>2</sub> is
+the normal termination label of <i class="math">e</i><sub>2</sub>.
+</p>
+
+
+<p>Jif conservatively assumes that any division or modulo operation
+may throw an <code>ArithmeticException</code>, depending on the value
+of <i class="math">e</i><sub>2</sub>. Thus, the label of such an
+<code>ArithmeticException</code> is the normal value label of <i
+class="math">e</i><sub>2</sub>.</p>
+
+
+<p>Pre- and post-increment and decrement operators are label checked
+as if they were assignments. For example <code>e++</code> is label
+checked as if it were <code>e=e+1</code>. A slight exception is made
+for increments and decrements of array elements,
+e.g. <code>a[e]++</code> is not label checked as if it were
+<code>a[e]=a[e]+1</code>, since the index expression <code>e</code> is
+evaluated only once in <code>a[e]++</code>, but twice in an assignment
+<code>a[e]=a[e]+1</code>.</p>
+
+<p>Label checking for other unary expressions, such as
+<code>!e</code>, <code>~e</code>, and <code>-e</code>, is identical to
+label checking for the subexpression <code>e</code>.
+
+
 <h2><a name="local-vars">Local variables</a></h2>
 <h2><a name="var-access">Variable access</a></h2>
 locals, args, and fields

@@ -1377,7 +1377,7 @@ necessary in order to reason securely about information
 flow.
 </p>
 
-<h3><a name="static-fields"></a>Static fields</h3>
+<h3><a name="static-fields">Static fields</a></h3>
 
 <p>Static fields of classes are supported in Jif, subject to the following restrictions.
 </p>
@@ -1393,7 +1393,7 @@ method), which may depend on sensitive information.</li>
 </ol>
 </p>
 
-<h3><a name="runtime-exceptions"></a>Runtime exceptions</h3>
+<h3><a name="runtime-exceptions">Runtime exceptions</a></h3>
 
 <p>In Java, subclasses of <code>RuntimeException</code> (such as
 <code>NullPointerException</code>, <code>ClassCastException</code>,
@@ -1402,20 +1402,20 @@ they may be thrown by a method without being declared in the
 <code>throws</code> clause of the method signature. Unchecked
 exceptions can serve as covert channels. To control this covert
 channel, Jif requires subclasses of
-<code>RuntimeException</code> to be checked.
+<code>RuntimeException</code> to be checked.</p>
 
-To reduce the additional programming burden of handling runtime
+<p>To reduce the additional programming burden of handling runtime
 exceptions, Jif has two simple dataflow analyses: a not-null analysis,
 which tracks whether local variables and final access paths are
 definitely not-null; and a runtime class analysis, which tracks the
 precise runtime class of local variables and final access paths via
-casts and <code>instanceof</code> tests.
+casts and <code>instanceof</code> tests.</p>
 
 
-Thus, in the following example, the method <code>m(Object,
+<p>Thus, in the following example, the method <code>m(Object,
 String)</code> cannot throw either a <code>NullPointerException</code>
 or a <code>ClassCastException</code>, and does not need to declare
-that it does.
+that it does.</p>
 
 <div class="code"><pre>
 class C {
