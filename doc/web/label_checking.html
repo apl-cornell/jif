@@ -47,14 +47,14 @@ href="language.html#runtime-exceptions">Runtime exceptions</a>,
 exceptions are a covert information channel, and label checking must
 therefore carefully track the information encoded in the presence or
 absence of exceptions. For every expression and statement in a
-program, a label is assoicated with every subclass of
+program, a label is associated with every subclass of
 <code>Exception</code>; this label is an upper bound on the
 information that may be deduced by observing that the expression or
 statement throws an object of that class. (Equivalently, the label is
 an upper bound on the labels of all values that may influence the
 throwing of the exception.) In addition, a label is associated with
 the <em>normal termination</em> of each expression and statement, that
-is an upper bound of the informatoin that may be deduced by the
+is an upper bound of the information that may be deduced by the
 termination of the expression or statement without an exception.</p>
 
 <p>For example, consider the following (compound) statement.</p>
@@ -120,8 +120,8 @@ indeed hold.
 int{Alice: Bob} x;
 int{Alice: Chuck} y;
 if (Bob actsfor Chuck) {
-    x = y; <span class="comment">// OK, since {Alice: Chuck} &#8849; {Alice: Bob} is deducible from </span>
-           <span class="comment">// the label environment at this point</span>
+    x = y; <span class="comment">// OK, since {Alice: Chuck} &#8849; {Alice: Bob} is</span>
+           <span class="comment">// deducible from the label environment at this point</span>
 }
 </pre></div>
 
@@ -209,7 +209,7 @@ class="math">e</i>, then the program counter label used to label check
 class="math">e</i>.</li>
 <li>The label associated with any exception
 thrown by an expression or statement is the join of the labels
-assoicated with the exception in any sub-expressions or
+associated with the exception in any sub-expressions or
 sub-statements, and (if the expression or statement itself can throw
 the exception), joined with the label associated with the exception by
 the expression or statement itself.
@@ -222,11 +222,11 @@ Jif's label checking rules preserve several invariants.</p>
 <li> The normal value label of an expression is at least as
 restrictive as the normal termination label of the expression.</li>
 
-<li> The normal termiantion label of an expression or statement is at
+<li> The normal termination label of an expression or statement is at
 least as restrictive as the program counter label for the expression
 or statement.</li>
 
-<li> The normal termiantion label of an expression or statement is at
+<li> The normal termination label of an expression or statement is at
 least as restrictive as the labels associated with each exception that
 the expression or statement may throw.</li>
 </ul>
@@ -312,16 +312,104 @@ evaluated only once in <code>a[e]++</code>, but twice in an assignment
 label checking for the subexpression <code>e</code>.
 
 
-<h2><a name="local-vars">Local variables</a></h2>
+<h2><a name="local-vars">Local variable declarations</a></h2>
+
+<p>
+Declarations of local variables may optionally contain a label
+annotation, called the <em>declared label</em> of the local
+variable. The label of the local variable is the join of the declared
+label with the program counter label for the declaration. If no
+declared label is supplied, then the local variable's label is
+inferred.</p>
+
+<p>
+A local variable declaration may contain an initializing
+expression. Similar to assignments, the label-checking rules require
+that the normal value label of the initializing expression is no more
+restrictive than the label of the local variable. The label checking
+rules for array initializing expressions are described under <a
+class="secref" href="#arrays">Arrays</a>.
+</p>
+
+<p>
+If the local variable is declared <code>final</code> and is of type
+<code>label</code>, <code>principal</code>, or a subclass of
+<code>jif.lang.Principal</code>, and the initializing expression is a
+<a href="language.html#dynamic-labels">final access path</a>, then the
+label environment is extended to record that the local variable is
+equivalent to the label or principal denoted by the initializing
+expression.
+</p>
+
 <h2><a name="var-access">Variable access</a></h2>
-locals, args, and fields
+
+<p>A local variable access, such as the expression <code>x</code>,
+cannot throw an exception, and so the normal termination label of a
+local variable access is just the program counter label. The normal
+value label of a local variable access is the label of the local
+variable joined with the program counter label. Accesses to formal
+arguments are just a special case of local variable accesses, where
+the label of a formal argument is a <a
+href="language.html#label-polymorphism">polymorphic argument
+label</a>.</p>
+
+
+<p>A field access <code>e.f</code> may throw a
+<code>NullPointerException</code> if the target <code>e</code> is
+<code>null</code>. The Jif compiler uses a simple intra-procedural
+dataflow analysis to track whether local variables and final access
+path expressions are known to be non-null. If this dataflow analysis
+is unable to determine that the target <code>e</code> is definitely
+not-null, then the label associated with the
+<code>NullPointerException</code> is the normal value label of the
+target <code>e</code>. The normal termination label of a field access
+is thus the normal value of the target <code>e</code>.</p>
+
+<p>The normal value label of a field access <code>e.f</code> is the
+join of the normal value label of the target <code>e</code> with the
+label of the field <code>f</code>. Let <i class="math">L</i> be the
+declared label of the field <code>f</code>; the label of the field
+<code>f</code> is obtained by substituting all occurrences of
+<code>this</code> appearing in the access paths of dynamic label or
+principals with <code>e</code>, as well as substituting actual label
+and principal parameters for formal label and principal parameters as
+appropriate. For example, consider the following declaration of the
+class <Code>C</code>.</p>
+
+<div class="code"><pre>
+class C[principal P] {
+    label{} lbl;
+    int{P: Alice; *this.lbl} foo;
+}
+
+...
+
+C[Bob] c = ...;
+int x = c.foo;
+</pre></div>
+
+<p class="cont">
+When the field <code>foo</code> is accessed in the field access
+<code>c.foo</code>, the label of the field <code>foo</code> is
+<code>{Bob: Alice; *c.lbl}</code>. Thus, the normal value label of the
+field access is join of the normal value label of <code>c</code> and
+<code>{Bob: Alice; *c.lbl}</code>.
+</p>
+
+
 <h2><a name="var-assignment">Variable assignment</a></h2>
 locals and fields
 <h2><a name="arrays">Arrays</a></h2>
 
 declaration, access, assignment
 
+
+special .length field
+array inits.
+
 <h2><a name="subtyping">Subtyping</a></h2>
+
+e.g., assignments, returns, declarations with initializing expressions.
 
 in/co-variant parameters, invariance of array base types.
 
