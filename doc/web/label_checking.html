@@ -94,7 +94,7 @@ it does not throw an exception.
 <p>Label checking also determines for every expression an upper bound
 on the label of any value that the expression may evaluate to. This
 label is called the <em>normal value</em> label of the expression (or
-often, the label of the expression) and is in general be at least as
+often, the label of the expression) and is in general at least as
 restrictive as the normal termination label of the expression, since
 the expression will only evaluate to a value it does not throw an
 exception.</p>
@@ -250,7 +250,7 @@ statements), then the normal termination label of <i
 class="math">e</i> is the program counter label of <i
 class="math">e</i>. In the following example, even though an exception
 may be thrown depending on the value of <code>i</code>, the
-<code>try-catch</code> block can only terminated normally: no
+<code>try-catch</code> block can only terminate normally: no
 additional information is gained by knowing that execution of the
 <code>try-catch</code> block terminates successfully.  Thus, by the
 single path rule, the normal termination label of the
@@ -398,7 +398,26 @@ field access is join of the normal value label of <code>c</code> and
 
 
 <h2><a name="var-assignment">Variable assignment</a></h2>
-locals and fields
+<p>A variable assignment of the form <code>x = e</code>, where <code>x</code> is a local variable,
+requires the normal value label of <code>e</code> to be no more restrictive than 
+the label of <code>x</code>, which is the declared label joined with the program
+ counter label at the point where <code>x</code> is declared. If <code>x</code>
+does not have a declared label, it is inferred. If the assignment
+expression is of the form <code>e<sub>1</sub>.f = e</code>, the normal value label
+of <code>e</code> is required to be no more restrictive than the label on the field <code>f</code>.
+</p>
+
+<p>If <code>x</code> is a local variable, the expression <code>x = e</code> throws only those
+exceptions thrown by <code>e</code>. The normal and exception termination labels
+are therefore the same as that for <code>e</code>. The normal value label of the assigment 
+expression is also the same as that of <code>e</code>. 
+</p>
+
+<p>An assignment expression of the form <code>e<sub>1</sub>.f = e</code> could throw a <code>NullPointerException</code>
+if <code>e<sub>1</sub></code> evaluates to null. The exception label for this would be the normal
+value label of <code>e<sub>1</sub></code>.
+</p>
+
 <h2><a name="arrays">Arrays</a></h2>
 
 declaration, access, assignment
