@@ -457,7 +457,50 @@ try to present without introducing path maps.
 
 <p>
 Java has two language features that allow dynamic type discrimination:
-<code>instanceof</code> comparisons, and casts.
+the <code>instanceof</code> operator, and checked run-time type casts.</p>
+
+<p>Jif places some restrictions on the comparison type <code>T</code>
+that may occur in <code>e instanceof T</code> expressions , and casts
+<code>(T)e</code>. The comparison type <code>T</code> cannot be a
+labeled type, such as <code>Foo{Alice:}</code>, but may be a
+parameterized class, for example, <code>Bar[Alice,
+this.lbl]</code>. The type <code>T</code> cannot be an array
+type. (This is because Jif cannot represent at runtime the label of
+the array's base class, leading to potential unsoundnesses.)</p>
+
+<p>The evaluation of both <code>e instanceof T</code> and
+<code>(T)e</code> is performed by first evaluating <code>e</code>, and
+then by &quot;evaluating&quot; the type <code>T</code>, which means
+evaluating any actual parameters to the class type. For example,
+<code>this.foo instanceof Bar[pr, this.lbl]</code> is evaluated by
+first evaluating <code>this.foo</code>, then <code>pr</code> and
+<code>this.lbl</code>, and finally evaluating the
+<code>instanceof</code> operator.</p>
+
+
+<p>Both <code>e instanceof T</code> and <code>(T)e</code> may
+throw any exception that <code>e</code> throws, and any
+<code>NullPointerException</code> that the final access paths of the
+actual parameters of <code>T</code> may throw. In addition, a cast
+operator will throw a <code>ClassCastException</code> if
+<code>e</code> does not evaluate to an object of type <code>T</code>;
+the label associated with this exception is the normal value label of
+of <code>e</code> joined with the normal value label of
+<code>T</code>.</p>
+
+<p>The normal termination label of <code>e instanceof T</code> is the
+normal termination label of <code>e</code> joined with the normal
+termination label of <code>T</code>. The normal termination label of
+<code>(T)e</code> is the join of the normal value label of
+<code>e</code> and the normal value label of <code>T</code> (due to
+the possibility of a <code>ClassCastException</code>).
+</p>
+
+<p>The normal value label of <code>e instanceof T</code> and
+<code>(T)e</code> is the normal value label of <code>e</code> joined
+with the normal value label of <code>T</code>.</p>
+
+
 
 <h2><a name="dynamic-tests">Dynamic label and actsfor tests</a></h2>
 <h2><a name="dynamic-tests">Label expressions</a></h2>
