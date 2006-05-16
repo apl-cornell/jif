@@ -397,26 +397,41 @@ field access is join of the normal value label of <code>c</code> and
 </p>
 
 
-<h2><a name="var-assignment">Variable assignment</a></h2>
-<p>A variable assignment of the form <code>x = e</code>, where <code>x</code> is a local variable,
-requires the normal value label of <code>e</code> to be no more restrictive than 
-the label of <code>x</code>, which is the declared label joined with the program
- counter label at the point where <code>x</code> is declared. If <code>x</code>
-does not have a declared label, it is inferred. If the assignment
-expression is of the form <code>e<sub>1</sub>.f = e</code>, the normal value label
-of <code>e</code> is required to be no more restrictive than the label on the field <code>f</code>.
+<h2><a name="var-assignment">Variable assignment</a></h2> 
+
+<p>A variable assignment of the form <code>x=e</code>, where
+<code>x</code> is a local variable, requires the normal value label of
+<code>e</code> to be no more restrictive than the label of
+<code>x</code>. See <a class="secref" href="#local-vars">Local variable declarations</a> for details of the
+label of a local variable.</p>
+
+
+<p>For a field assignment <code>e<sub>1</sub>.f = e</code>, the normal
+value label of <code>e</code> is required to be no more restrictive
+than the label of the field <code>f</code>, which is defined to be XXX. XXX Evaluation order for <code>e<sub>1</sub>.f = e</code>?
 </p>
 
-<p>If <code>x</code> is a local variable, the expression <code>x = e</code> throws only those
+<p>If <code>x</code> is a local variable, the expression <code>x=e</code> throws only those
 exceptions thrown by <code>e</code>. The normal and exception termination labels
 are therefore the same as that for <code>e</code>. The normal value label of the assigment 
 expression is also the same as that of <code>e</code>. 
 </p>
 
-<p>An assignment expression of the form <code>e<sub>1</sub>.f = e</code> could throw a <code>NullPointerException</code>
-if <code>e<sub>1</sub></code> evaluates to null. The exception label for this would be the normal
-value label of <code>e<sub>1</sub></code>.
+<p>An assignment expression of the form <code>e<sub>1</sub>.f=e</code>
+could throw a <code>NullPointerException</code> if
+<code>e<sub>1</sub></code> evaluates to null. XXX When? Evaluation
+order is important here! and also <code>e</code> may throw
+exceptions. And also metion the not-null dataflow analysis. The
+exception label for this would be the normal value label of
+<code>e<sub>1</sub></code>.
 </p>
+
+<p>PC bound XXX. Maybe do this section by first describing everything for locals, and then everything for fields.
+
+<p>XXX assignments may throw arithmetic exceptions. Also, the NV of an <code>op=</code> assignment is different to an <code>=</code> assignment.
+
+<p>XXX field assignments treated slightly differently if they occur in the constructor prologure. See Section XXX.
+
 
 <h2><a name="arrays">Arrays</a></h2>
 
@@ -439,6 +454,11 @@ in/co-variant parameters, invariance of array base types.
 try to present without introducing path maps.
 
 <h2><a name="dynamic-type-discrimination">Dynamic type discrimination</a></h2>
+
+<p>
+Java has two language features that allow dynamic type discrimination:
+<code>instanceof</code> comparisons, and casts.
+
 <h2><a name="dynamic-tests">Dynamic label and actsfor tests</a></h2>
 <h2><a name="dynamic-tests">Label expressions</a></h2>
 <code>new label {...}</code>
