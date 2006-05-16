@@ -26,7 +26,7 @@ public interface Principal {
      * <code>o.getClass() == p.getClass()</code> and 
      * <code>o.name().equals(p.name())</code>.
      */
-    String name();
+    String{this} name();
     
     /**
      * Does this principal delegate its authority to the 
