@@ -40,12 +40,13 @@ public class JifInstanceOfDel extends JifJL_c
                                         io.position());
         }
         if (compareType.isArray()) {
-            while (compareType.isArray()) {
-                compareType = ts.unlabel(compareType.toArray().base());
-            }
-            if (compareType instanceof JifSubstType && ((JifSubstType)compareType).entries().hasNext()) {
-                throw new SemanticException("Jif does not currently support instanceof to an array of a parameterized type.", io.position());
-            }
+            throw new SemanticException("Jif does not currently support instanceof to arrays.", io.position());
+//            while (compareType.isArray()) {
+//                compareType = ts.unlabel(compareType.toArray().base());
+//            }
+//            if (compareType instanceof JifSubstType && ((JifSubstType)compareType).entries().hasNext()) {
+//                throw new SemanticException("Jif does not currently support instanceof to an array of a parameterized type.", io.position());
+//            }
         }
         this.isToSubstJifClass = (compareType instanceof JifSubstType && ((JifSubstType)compareType).entries().hasNext());
 
