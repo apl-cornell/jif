@@ -192,7 +192,7 @@ public class JifFieldAssignExt extends JifAssignExt
 
         if (assign.operator() != Assign.ASSIGN) {
             // e.g. f += 1
-            X = X.set(Path.NV, lc.upperBound(X.NV(), Lf));
+            X = X.NV(lc.upperBound(X.NV(), Lf));
         }
 
         Expr lhs = (Expr) X(fe, X);

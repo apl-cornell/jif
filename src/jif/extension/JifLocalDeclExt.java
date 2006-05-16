@@ -137,7 +137,6 @@ public class JifLocalDeclExt extends JifStmtExt_c
             Xd = Xe;            
         }
         else {
-            // There is no PC label at field nodes.
             Xd = ts.pathMap();
             Xd = Xd.N(A.pc());
         }

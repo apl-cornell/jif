@@ -22,7 +22,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
         super(toJava);
     }
     
-    protected JifContext declassifyConstraintContext(JifContext A) {
+    protected JifContext declassifyConstraintContext(JifContext A) throws SemanticException {
         return A;
     }    
 
@@ -47,7 +47,10 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
                                               "The label the downgrade statement is downgrading from");
         }
 
-        lc.constrain(new LabelConstraint(new NamedLabel("pc", A.pc()), 
+        PathMap initMap = initPathMap(lc);
+        Label pc = lc.upperBound(A.pc(), initMap.N());
+        
+        lc.constrain(new LabelConstraint(new NamedLabel("pc", pc), 
                                          boundSpecified?LabelConstraint.LEQ:LabelConstraint.EQUAL, 
                                          new NamedLabel("declass_bound", downgradeFrom),
                                          A.labelEnv(),
@@ -111,10 +114,13 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
             X = Xs;
         }
         else {          
-            X = Xs.set(Path.N, lc.upperBound(Xs.N(), A.pc()));
+            X = Xs.N(lc.upperBound(Xs.N(), A.pc()));
         }
 	
 	return X(ds.body(body), X);
+    }
+    protected PathMap initPathMap(LabelChecker lc) throws SemanticException {
+        return lc.typeSystem().pathMap();
     }
     
     /**

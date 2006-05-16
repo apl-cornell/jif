@@ -54,7 +54,7 @@ public class JifBinaryExt extends Jif_c
 
         A = (JifContext) A.pop();
 
-	PathMap X = Xl.set(Path.N, ts.notTaken()).join(Xr);
+	PathMap X = Xl.N(ts.notTaken()).join(Xr);
 
 	if (be.throwsArithmeticException()) {
             checkAndRemoveThrowType(throwTypes, ts.ArithmeticException());
