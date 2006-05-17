@@ -827,7 +827,104 @@ constraints are given <a href="#downgrade-from-to-restrictions">above</a>.
 
 <h2><a name="method-decls">Method declarations</a></h2>
 
-don't forget caller pc, this label.
+<p>Jif method declarations include a number of labels. These labels
+are described in <a class="secref"
+href="language.html#method-decls">Method declarations</a>. All Jif
+methods have these labels; if they are not specified explicitly, then
+appropriate <a class="secref"
+href="language.html#default-labels">defaults</a> are used. Every Jif
+method declaration has the following labels.</p>
+<ul>
+<li> Begin-label.
+<li> End-label.
+<li> Each argument has a label associated with it.
+<li> Every exception declared in the <code>throws</code> clause has a label associated with it.
+<li> Return value label (if the return type is not <code>void</code>).
+</ul>
+
+<p>In addition, a method may have a number of <code>where</code> clauses, which may take any of the following forms.</p>
+<ul>
+<li> Label clause: <i class="math">L</i><sub>1</sub><code> &lt;= </code><i class="math">L</i><sub>2</sub>
+<li> Actsfor clause: <i class="math">p</i><sub>1</sub><code> actsfor </code><i class="math">p</i><sub>2</sub>
+<li> Authority clause: <code>authority(<i class="math">p</i>)</code>
+<li> Caller authority clause: <code>caller(<i class="math">p</i>)</code>
+<li> Auto-endorse clause: <code>endorse(<i class="math">L<sub>en</sub></i>)</code>
+</ul>
+
+<p>The label environment used to check the method body has all of the
+label and actsfor clauses added to it. Any principal that appears in
+am <code>authority(<i class="math">p</i>)</code> clause of a method
+must also appear in the class's <code>authority(<i
+class="math">p</i>)</code> clause.
+</p>
+
+
+<p>The program counter label used to label check the method body is
+set to a special polymorphic label <code>caller_pc</code>. The label
+<code>caller_pc</code> represents the program counter label at the
+call site of the method, that is, where the method is being called
+from. The <code>caller_pc</code> is thus known to be bounded above by
+the method's begin-label. In addition, for every auto-endorse clause
+<code>endorse(<i class="math">L<sub>en</sub></i>)</code>, the label
+environment contains the constraint that
+<code>caller_pc</code> &#8849; <i class="math">L<sub>en</sub></i>. The
+label environment also contains the fact that the receiver object
+<code>{this}</code> is bounded above by <code>caller_pc</code>, which
+must be true because the method is invoked only after evaluating the
+receiver of the method call, and the normal value label of the
+receiver call is the instantiation of the label <code>{this}</code>
+for the method call.</p>
+
+<p>The normal termination label for the method body must be no more
+restrictive than the end-label of the method joined with the
+<code>caller_pc</code> label. (Joining the end-label with the
+<code>caller_pc</code> label is more permissive while remaining
+sound.) Similarly, the information that is gained by knowing the
+method terminates via a <code>return</code> statement must be no more
+restrictive than the end-label of the method joined with the
+<code>caller_pc</code> label.</p>
+
+<p>In addition, the label associated with
+any exception thrown by the method body must be no more restrictive
+than the labels for the appropriate exceptions declared in the
+<code>throws</code> clause of the method, joined with the
+<code>caller_pc</code> label. More precisely, if label checking the
+method body determines that the method body may throw an exception of
+class <code>C</code> with label <i class="math">L<sub>C</sub></i>, and
+the method declaration says that the method may throw an exception of
+class <code>D</code> with label <i class="math">L<sub>D</sub></i>,
+where <code>C</code> is a subclass of <code>D</code>, then we must
+have <i class="math">L<sub>C</sub></i> &#8849; <i
+class="math">L<sub>D</sub></i> &#8852;
+<code>caller_pc</code>. </p>
+
+<p>Any value that is returned by method body must be no more
+restrictive than the return value label of the method, joined with the
+end-label of the method, joined with <code>caller_pc</code>. That is,
+if the statement <code>return <i class="math">e</i>;</code> appears in
+the method body, and label checking determines that the normal value
+label of expression <i class="math">e</i> is <i
+class="math">L<sub>e</sub></i>, then it must be the case that <i
+class="math">L<sub>e</sub></i> is less than the join of the return
+value label, the end-label, and <code>caller_pc</code>.
+</p>
+
+
+<p>Neither the method begin-label nor any of the argument labels may
+contain a covariant label parameter. This is because the method
+begin-label and argument labels appear in contravariant positions, and
+allow covariant label parameters to appear would introduce
+unsoundnesses.</p>
+
+<p>XXX Talk about auto-endorses and what constraints they must satisfy.
+
+<h3><a name="method-conformance">Method conformance</a></h3>
+
+constraints
+
+co and contravariance of labels
+
+
 
 <h2><a name="method-calls">Method calls</a></h2>
 
@@ -838,7 +935,13 @@ include static methods (i.e., mention runtime parameters)
 mention runtime parameters.
 
 <h2><a name="classes">Classes</a></h2>
+
+label checks each member, including method decls and field decls. Label checking of inits.
+
+authority sets of classes: Authority set of subclass must be superset of authority set of super class.
+
    authority, conformance (i.e., co/contra variance of methods, where clauses)
+
 
 XXX TODO
 </body>

@@ -37,7 +37,11 @@ public static void main(principal p, String[] args) where caller(p)
 }
 </pre></div>
 
-A class may have at most one static method named <code>main</code>.
+<p>A class may have at most one static method named
+<code>main</code>. Classes with label or principal parameters cannot
+have a <code>main</code> method, as there is no way to specify
+appropriate instantiations for the parameters when invoking the
+<code>main</code> method.</p>
 
 <h2><a name="java-classes"></a>Interacting with Java classes</h2>
 
