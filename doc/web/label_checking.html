@@ -62,10 +62,10 @@ termination of the expression or statement without an exception.</p>
 if (i == 0) x = o.foo; else x = x/a;
 </pre></div>
 
-<p class="cont">The statement could throw a
+<p class="cont">The statement throws a
 <code>NullPointerException</code> only if the local variable
 <code>i</code> is zero and the local variable <code>o</code> is
-<code>null</code>. The statement could throw an
+<code>null</code>. The statement throws an
 <code>ArithmeticException</code> only if the local variable
 <code>i</code> is non-zero and the integer variable <code>a</code> is
 zero. The statement will terminate normally if <code>i</code> and
@@ -588,6 +588,7 @@ subexpression <i class="math">e</i> must be bounded above by the label
 <i class="math">L<sub>from</sub></i>. Thus, a downgrading expression
 downgrades the normal value label of an expression.</p>
 
+<a name="downgrade-from-to-restrictions"/>
 <p>
 XXX single dimension only
 
@@ -632,12 +633,12 @@ site of the current method, are no more restrictive than <i
 class="math">L<sub>to</sub></i>. Normally, both of these labels are
 bounded above by the start label of the current method.</p>
 
-<p>If <code>S</code> can complete normally, then the normal
+<p>If <i class="math">S</i> can complete normally, then the normal
 termination label of the downgrade statement is the normal termination
-label of <code>S</code> joined with the program counter label for the
+label of <i class="math">S</i> joined with the program counter label for the
 downgrade statement (that is, the program counter label just before it
 is downgraded). Any exception that may be thrown by the statement
-<code>S</code> may also be thrown by the downgrading statement, with
+<i class="math">S</i> may also be thrown by the downgrading statement, with
 the same label associated with it.
 </p>
 
@@ -649,7 +650,7 @@ confidentiality, whereas an <code>endorse</code> statement may only
 downgrade integrity; (2) a downgrade statement must have sufficient
 authority to perform the downgrade; and (3) if robustness is being
 enforced, the downgrade must be robust. More details of these
-constraints are given <a href="#downgrading-exprs">above</a>.
+constraints are given <a href="#downgrade-from-to-restrictions">above</a>.
 </p>
 
 
