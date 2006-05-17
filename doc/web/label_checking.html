@@ -548,7 +548,7 @@ expressions, and may thus throw
 <code>Alice</code>, &#8868; and &perp;) are label checked like
 literals. The normal value label of a label parameter or principal
 parameter is <code>{this}</code> joined with the program counter
-label, except when the paramter occurs in a static context, in which
+label, except when the parameter occurs in a static context, in which
 case the normal value label is a polymorphic argument label whose
 upper bound is the top label
 <code>{&#8868;&rarr;&#8868;;&perp;&larr;&perp;}</code>.
@@ -589,14 +589,185 @@ subexpression <i class="math">e</i> must be bounded above by the label
 downgrades the normal value label of an expression.</p>
 
 <a name="downgrade-from-to-restrictions"/>
+<p>The Jif compiler enforces several constraints on the labels <i
+class="math">L<sub>from</sub></i> and <i
+class="math">L<sub>to</sub></i>. 
+</p>
+
+<h4>Single dimension</h4> 
+
+<p>A <code>declassify</code> expression may
+only downgrade the confidentiality of a label. Label checking enforces
+this by requiring that the following constraint is satisfied.</p>
+
+<div class="mathdisplay">
+<i class="math">L<sub>from</sub></i> &#8849; <i
+class="math">L<sub>to</sub></i> &#8852; {&#8868;&rarr;&#8868;;
+&#8868;&larr;&#8868;}
+</div>
+
+<p class="cont">The label {&#8868;&rarr;&#8868;;
+&#8868;&larr;&#8868;} contains the most restrictive confidentiality
+policy, and the least restrictive integrity policy, and so the
+constraint ensures that the integrity of <i
+class="math">L<sub>from</sub></i> is no more restrictive that the
+integrity of <i class="math">L<sub>to</sub></i>.</p>
+
+<p>  Dually, an
+<code>endorse</code> expression may only downgrade the integrity of a
+label, which is enforce by requiring </p>
+<div class="mathdisplay">
+{&#8868;&rarr;&#8868;; &#8868;&larr;&#8868;} &#8851; <i
+class="math">L<sub>from</sub></i> &#8849; <i
+class="math">L<sub>to</sub></i>
+</div>
+<p class="cont">is satisfied. This constraint
+ensures that the confidentiality of <i
+class="math">L<sub>from</sub></i> is no more restrictive that the
+confidentiality of <i class="math">L<sub>to</sub></i>.<p>
+
+<h4>Selective downgrading</h4> 
 <p>
-XXX single dimension only
+To enforce <a href="language.html#selective-downgrading">delective
+downgrading</a>m  Jif requires
+that all downgrade expressions have sufficient authority, namely, that
+if a policy owned by principal <i class="math">p</i> is weakened
+during a downgrade operation, then then the code that performs the
+downgrade must have the authority of <i class="math">p</i> (or a
+principal able to act for <i class="math">p</i>). If the code has the
+authority of principals <i class="math">p</i><sub>1</sub>, ..., <i
+class="math">p</i><sub>n</sub> (as described in <a class="secref"
+href="language.html#authority">Authority and access control</a>, then
+the Jif compiler requires that <code>declassify</code> expressions satisfy the following constraint.</p>
+
+<div class="mathdisplay">
+<i
+class="math">L<sub>from</sub></i> &#8849; <i
+class="math">L<sub>to</sub></i> &#8852; {<i class="math">p</i><sub>1</sub> &larr;&#8868; &#8852; ... &#8852; <i
+class="math">p</i><sub>n</sub>&larr;&#8868; ; &perp;&rarr;&perp;}
+</div>
+
+<p class="cont">This constraint represents the authority of the code
+as the confidentiality policy <i class="math">p</i><sub>1</sub>
+&larr;&#8868; &#8852; ... &#8852; <i
+class="math">p</i><sub>n</sub>&larr;&#8868;, and uses this policy to
+limit what policies may be weakened by the <code>declassify</code>
+expression. For example, suppose <i class="math">L<sub>from</sub></i>
+is {Alice&larr;Bob} and <i class="math">L<sub>to</sub></i> is
+{Alice&larr;Bob,Chuck}, and the code has the authority of Alice. This
+declassification should be allowed, and indeed, the constraint
+{Alice&larr;Bob} &#8849; {Alice&larr;Bob,Chuck} &#8852; {Alice
+&larr;&#8868;} is satisfied. By contrast, if the code had the
+authority of Bob, but not Alice (and assuming Bob cannot act for
+Alice), then the constraint {Alice&larr;Bob} &#8849;
+{Alice&larr;Bob,Chuck} &#8852; {Bob &larr;&#8868;} would not be
+satisfied: the code would have insufficient authority to perform the
+declassification.
+</p>
 
 <p>
-XXX authority
+The dual case for endorsement is that the following constraint must be satisfied.</p>
+<div class="mathdisplay">
+<i
+class="math">L<sub>from</sub></i> &#8851;
+{&perp;&larr;&perp;; <i class="math">p</i><sub>1</sub> &rarr;&#8868; &#8851; ... &#8851; <i
+class="math">p</i><sub>n</sub>&rarr;&#8868;}
+&#8849; <i
+class="math">L<sub>to</sub></i>
+</div>
+<p class="cont">
+Here, the authority of the code is represented by the integrity policy
+<i class="math">p</i><sub>1</sub> &rarr;&#8868; &#8851; ... &#8851; <i
+class="math">p</i><sub>n</sub>&rarr;&#8868;, which is used to limit
+which integrity policies may be weakened by an
+<code>endorsement</code> expression.</p>
+
+<h4>Robustness</h4> 
 
 <p>
-XXX robustness
+<a href="language.html#robustness">Robustness</a> is a useful security
+condition, which ensures that the decision and data to downgrade are
+of high enough integrity that an attacker cannot abuse the downgrade
+operation to view or modify information that they shouldn't. The Jif
+compiler can optionally enforce label constraints for robustness, as
+described in [<a href="bibliography.html#CM06">CM06</a>]. We describe
+here the constraints that are implemented in the Jif compiler to
+enforce robustness, but refer the interested reader to [<a
+href="bibliography.html#CM06">CM06</a>] for details of the security
+condition itself, and the motivation for the constraints.
+</p>
+
+<p>For <code>declassify</code> expressions, robustness requires that
+both the decision to declassify, and the information being
+declassified are high integrity. In particular, this requires the
+following two constraints to be satisfied, where <u>pc</u> is the
+program counter label for the <code>declassify</code> expression.</p>
+
+<div class="mathdisplay">
+<i
+class="math">L<sub>from</sub></i> &#8849; <i class="math">L<sub>to</sub></i> &#8852; writersToReaders(<u>pc</u>)<br>
+<i class="math">L<sub>from</sub></i> &#8849; <i class="math">L<sub>to</sub></i> &#8852; writersToReaders(<i class="math">L<sub>from</sub></i>)
+</div>
+
+<p class="cont">In these constraints the operator writersToReaders(<i
+class="math">L</i>) converts the writers of the label <i
+class="math">L</i> into readers. In particular, for all principals <i
+class="math">p</i>, we have the property that <i
+class="math">writers</i>(<i class="math">p</i>, <i class="math">L</i>)
+&sube; <i class="math">readers</i>(writersToReaders(<i
+class="math">p</i>, <i class="math">L</i>)).
+
+<p>The writersToReaders(<i class="math">L</i>) operator works by first
+finding an upper bound <i class="math">L'</i> for <i
+class="math">L</i>, such that <i class="math">L'</i> consists only of
+reader and writer policies. Then, the writer policies of the upper
+bound <i class="math">L'</i> are converted into reader policies, by
+reversing the direction of the arrow. The writersToReaders(<i
+class="math">L</i>) operator is defined more formally below.
+<div class="mathdisplay">
+writersToReaders(<i class="math">L</i><sub>1</sub> &#8852; <i class="math">L</i><sub>2</sub>) &#8796;
+                 writersToReaders(<i class="math">L</i><sub>1</sub>) &#8851; writersToReaders(<i class="math">L</i><sub>2</sub>)
+<br>
+writersToReaders(<i class="math">L</i><sub>1</sub> &#8851; <i class="math">L</i><sub>2</sub>) &#8796;
+                 writersToReaders(<i class="math">L</i><sub>1</sub>) &#8852; writersToReaders(<i class="math">L</i><sub>2</sub>)
+<br>
+writersToReaders({<i class="math">c</i>;<i class="math">d</i>}) &#8796;
+                 {wtr(<i class="math">d</i>) ; &#8868;&larr;&#8868;}
+<br>
+writersToReaders(<i class="math">L</i>) &#8796;
+                 writersToReaders(<i class="math">L'</i>) where <i
+                      class="math">L'</i> is an upper bound of <i
+                      class="math">L</i>, and <i class="math">L</i> is
+                      a dynamic label, label parameter, or polymorphic
+                      argument label. <i class="math">L'</i> is found
+                      taking the meet of all upper bounds of <i
+                      class="math">L'</i> that can be found by
+                      examining the facts in the label environment.
+<br>
+<br>
+wtr(<i class="math">c</i><sub>1</sub> &#8852; <i class="math">c</i><sub>2</sub>) &#8796;
+                 wtr(<i class="math">c</i><sub>1</sub>) &#8851; wtr(<i class="math">c</i><sub>2</sub>)
+<br>
+wtr(<i class="math">c</i><sub>1</sub> &#8851; <i class="math">c</i><sub>2</sub>) &#8796;
+                 wtr(<i class="math">c</i><sub>1</sub>) &#8852; wtr(<i class="math">c</i><sub>2</sub>)
+<br>
+wtr(<i class="math">p</i>&larr;<i class="math">q</i>) &#8796; <i class="math">p</i>&rarr;<i class="math">q</i>             
+</div>
+
+<p>For <code>endorse</code> expressions, weaker constraints are
+enforced. Robustness for endorsement requires the decision to endorse
+data is high integrity, but the data itself is (by definition) low
+integrity.<p>
+
+<div class="mathdisplay">
+<i
+class="math">L<sub>from</sub></i> &#8851; writersOnly(<u>pc</u>) &#8849; <i class="math">L<sub>to</sub></i><br>
+</div>
+
+<p>The writersOnly(<i class="math">L</i>) operator removes the
+confidentiality policy of <i class="math">L</i>, and is just
+equivalent to <i class="math">L</i> &#8852;
+{&#8868;&rarr;&#8868;;&#8868;&larr;&#8868;}.</p>
 
 <h3><a name="downgrading-stmts">Downgrading statements</a></h3>
 
