@@ -384,10 +384,10 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Recursive.jif ;
 	RuntimeParams01.jif ;
 	RuntimeParams02.jif ;
-	RuntimeParams03.jif ;
-	RuntimeParams04.jif (Semantic, "does not .* support .* array of a parameterized type");
-	RuntimeParams05.jif (Semantic, "does not .* support .* array of a parameterized type");
-	RuntimeParams06.jif (Semantic, "does not .* support .* array of a parameterized type");
+	RuntimeParams03.jif (Semantic, "does not .* support"), (Semantic, "does not .* support");
+	RuntimeParams04.jif (Semantic, "does not .* support");
+	RuntimeParams05.jif (Semantic, "does not .* support");
+	RuntimeParams06.jif (Semantic, "does not .* support");
 	RuntimeParams07.jif ;
 	RuntimeParams08.jif (Semantic, "Cannot override");
 	RuntimeParams09.jif ;
