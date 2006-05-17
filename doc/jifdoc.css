@@ -64,6 +64,12 @@ ol {
 span.comment {
     color: rgb(150,0,0)
 }
+span.bibtitle {
+    font-weight: bold;
+}
+span.bibbook {
+    font-style: italic;
+}
 
 h1 { font-family: sans-serif }
 h2 { font-family: sans-serif }

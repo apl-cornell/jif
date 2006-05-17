@@ -629,7 +629,7 @@ confidentiality of <i class="math">L<sub>to</sub></i>.<p>
 <h4>Selective downgrading</h4> 
 <p>
 To enforce <a href="language.html#selective-downgrading">delective
-downgrading</a>m  Jif requires
+downgrading</a>  Jif requires
 that all downgrade expressions have sufficient authority, namely, that
 if a policy owned by principal <i class="math">p</i> is weakened
 during a downgrade operation, then then the code that performs the
@@ -637,7 +637,7 @@ downgrade must have the authority of <i class="math">p</i> (or a
 principal able to act for <i class="math">p</i>). If the code has the
 authority of principals <i class="math">p</i><sub>1</sub>, ..., <i
 class="math">p</i><sub>n</sub> (as described in <a class="secref"
-href="language.html#authority">Authority and access control</a>, then
+href="language.html#authority">Authority and access control</a>), then
 the Jif compiler requires that <code>declassify</code> expressions satisfy the following constraint.</p>
 
 <div class="mathdisplay">
@@ -680,15 +680,15 @@ Here, the authority of the code is represented by the integrity policy
 <i class="math">p</i><sub>1</sub> &rarr;&#8868; &#8851; ... &#8851; <i
 class="math">p</i><sub>n</sub>&rarr;&#8868;, which is used to limit
 which integrity policies may be weakened by an
-<code>endorsement</code> expression.</p>
+<code>endorse</code> expression.</p>
 
 <h4>Robustness</h4> 
 
 <p>
 <a href="language.html#robustness">Robustness</a> is a useful security
-condition, which ensures that the decision and data to downgrade are
-of high enough integrity that an attacker cannot abuse the downgrade
-operation to view or modify information that they shouldn't. The Jif
+condition, which ensures that both the decision to downgrade and the data to downgrade are
+of sufficiently high integrity that an attacker cannot abuse the downgrade
+operation to inappropriately view or modify information. The Jif
 compiler can optionally enforce label constraints for robustness, as
 described in [<a href="bibliography.html#CM06">CM06</a>]. We describe
 here the constraints that are implemented in the Jif compiler to
@@ -765,7 +765,7 @@ class="math">L<sub>from</sub></i> &#8851; writersOnly(<u>pc</u>) &#8849; <i clas
 </div>
 
 <p>The writersOnly(<i class="math">L</i>) operator removes the
-confidentiality policy of <i class="math">L</i>, and is just
+confidentiality policy of <i class="math">L</i>, and is simply
 equivalent to <i class="math">L</i> &#8852;
 {&#8868;&rarr;&#8868;;&#8868;&larr;&#8868;}.</p>
 
