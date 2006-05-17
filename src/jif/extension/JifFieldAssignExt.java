@@ -43,22 +43,19 @@ public class JifFieldAssignExt extends JifAssignExt
 
         // check rhs
         A = (JifContext) A.pushBlock();
-
+        A.setPc(Xe.N()); 
 
         Expr rhs = (Expr) lc.context(A).labelCheck(assign.right());
         PathMap Xr = rhsPathMap(lc.context(A), rhs);
 
         A = (JifContext) A.pop();
 
-        PathMap Xa; 
-        PathMap X;
+        PathMap X = Xe.join(Xr); 
 
         if (assign.throwsArithmeticException()) {
             checkAndRemoveThrowType(throwTypes, are);
-            Xa = Xe.join(Xr).exc(Xr.NV(), are);
+            X = X.exc(Xr.NV(), are);
         }
-        else 
-            Xa = Xe.join(Xr);	
 
         if (fe.target() instanceof Special) {
             // explicitly ignore the the evaluation of the target Xe, as it
@@ -66,13 +63,10 @@ public class JifFieldAssignExt extends JifAssignExt
             // "this" label <= A.pc
             X = Xr;
         }
-        else if (((JifFieldDel)fe.del()).targetIsNeverNull()) {
-            // Can't raise a NullPointerException.
-            X = Xa;
-        }
-        else {
+        else if (!((JifFieldDel)fe.del()).targetIsNeverNull()) {
+            // may throw a null pointer exception
             checkAndRemoveThrowType(throwTypes, npe);
-            X = Xa.exc(Xe.NV(), npe);
+            X = X.exc(lc.upperBound(Xe.NV(), Xr.N()), npe);
         }
         
 
