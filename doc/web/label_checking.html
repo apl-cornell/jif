@@ -554,6 +554,105 @@ upper bound is the top label
 <code>{&#8868;&rarr;&#8868;;&perp;&larr;&perp;}</code>.
 
 <h2><a name="downgrading">Downgrading</a></h2>
+
+<p>As described in the section on <a class="secref"
+href="langauge.html#downgrading">Downgrading</a>, Jif provides a
+mechanism to weaken the security policies enforced on information. Jif
+allows the declassification (downgrading of confidentiality) and
+endorsement (downgrading of integrity) of expressions and statements.</p>
+
+<h3><a name="downgrading-exprs">Downgrading expressions</a></h3>
+
+<p>The expression <code>declassify(<i class="math">e</i>,<i
+class="math">L<sub>from</sub></i> to <i
+class="math">L<sub>to</sub></i>)</code> downgrades the confidentiality
+of expression <i class="math">e</i> from the label <i
+class="math">L<sub>from</sub></i> to the label <i
+class="math">L<sub>to</sub></i>. Similarly, <code>endorse(<i
+class="math">e</i>,<i class="math">L<sub>from</sub></i> to <i
+class="math">L<sub>to</sub></i>)</code> downgrades the integrity of
+expression <i class="math">e</i> from the label <i
+class="math">L<sub>from</sub></i> to the label <i
+class="math">L<sub>to</sub></i>. Downgrades are checked statically, so
+a downgrading expression is evaluated just by evaluating the
+subexpression <i class="math">e</i>. Thus, a downgrading expression
+may throw any exception that <i class="math">e</i> may throw, and
+label checking for a downgrading expression associates the same labels
+to exceptions that label checking <i class="math">e</i> does. The
+normal termination label of a downgrading expression is the same as
+the normal termination label of <i class="math">e</i>.</p>
+
+<p>The normal value label of a downgrading expression is <i
+class="math">L<sub>to</sub></i>, and the normal value label of the
+subexpression <i class="math">e</i> must be bounded above by the label
+<i class="math">L<sub>from</sub></i>. Thus, a downgrading expression
+downgrades the normal value label of an expression.</p>
+
+<p>
+XXX single dimension only
+
+<p>
+XXX authority
+
+<p>
+XXX robustness
+
+<h3><a name="downgrading-stmts">Downgrading statements</a></h3>
+
+<p>The statement <code>declassify(<i class="math">L<sub>from</sub></i>
+to <i class="math">L<sub>to</sub></i>) <i class="math">S</i></code>
+downgrades the confidentiality of the program counter label from <i
+class="math">L<sub>from</sub></i> to <i
+class="math">L<sub>to</sub></i> for the label checking of the
+statement <i class="math">S</i>. Similarly, <code>endorse(<i
+class="math">L<sub>from</sub></i> to <i
+class="math">L<sub>to</sub></i>) <i class="math">S</i></code>
+downgrades the integrity of the program counter label from <i
+class="math">L<sub>from</sub></i> to <i
+class="math">L<sub>to</sub></i> for the label checking of the
+statement <i class="math">S</i>. Label checking of downgrades is done
+completely statically, so the labels <i
+class="math">L<sub>from</sub></i> and <i
+class="math">L<sub>to</sub></i> are not evaluated at run-time.
+</p>
+
+<p>The contained statement <i class="math">S</i> is label checked with
+the program counter label set to <i
+class="math">L<sub>to</sub></i>. In addition, label checking for <i
+class="math">S</i> assumes that <i class="math">L<sub>to</sub></i> is
+the lower bound for side-effects such as field update. (The lower
+bound for side-effects is normally equal to the start label of the
+current method.) The label environment for label checking <i
+class="math">S</i> has two new facts added to it:
+<code>{this}</code>&#8849;<i class="math">L<sub>to</sub></i> and
+<code>caller_pc</code>&#8849;<i class="math">L<sub>to</sub></i>. These
+facts state that both the label of the reference to the
+<code>this</code> object, and the program counter label at the call
+site of the current method, are no more restrictive than <i
+class="math">L<sub>to</sub></i>. Normally, both of these labels are
+bounded above by the start label of the current method.</p>
+
+<p>If <code>S</code> can complete normally, then the normal
+termination label of the downgrade statement is the normal termination
+label of <code>S</code> joined with the program counter label for the
+downgrade statement (that is, the program counter label just before it
+is downgraded). Any exception that may be thrown by the statement
+<code>S</code> may also be thrown by the downgrading statement, with
+the same label associated with it.
+</p>
+
+<p>The restrictions on <i class="math">L<sub>from</sub></i> and <i
+class="math">L<sub>to</sub></i> that are applied to downgrading
+expressions are also applied to downgrading statements. In particular:
+(1) a <code>declassify</code> statement may only downgrade
+confidentiality, whereas an <code>endorse</code> statement may only
+downgrade integrity; (2) a downgrade statement must have sufficient
+authority to perform the downgrade; and (3) if robustness is being
+enforced, the downgrade must be robust. More details of these
+constraints are given <a href="#downgrading-exprs">above</a>.
+</p>
+
+
 <h2><a name="method-decls">Method declarations</a></h2>
 
 don't forget caller pc, this label.
