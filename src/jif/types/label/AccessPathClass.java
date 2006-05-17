@@ -55,6 +55,7 @@ public class AccessPathClass extends AccessPathRoot {
     	JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
     	
     	// there is no information gained by accessing a class statically.
-    	return ts.pathMap();
+    	return ts.pathMap().N(A.pc()).NV(A.pc());
+        
     }
 }

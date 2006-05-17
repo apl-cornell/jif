@@ -153,7 +153,8 @@ public class JifFieldExt extends Jif_c
         JifTypeSystem ts = lc.jifTypeSystem();
 
         if (! (fe.target() instanceof Expr)) {
-            return (Receiver) X(fe.target(), ts.pathMap());
+            JifContext A = lc.context();
+            return (Receiver) X(fe.target(), ts.pathMap().N(A.pc()).NV(A.pc()));
         }		
 
         Expr target = (Expr) lc.labelCheck(fe.target());

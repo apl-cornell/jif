@@ -46,7 +46,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         // let the label checker know that we are about to enter a method decl
         lc.enteringMethod(mi);
 
-        // First, check the arguments, adjusting the context.
+        // First, check the arguments, and adjust the context.
 	Label Li = checkEnforceSignature(mi, lc);
 
 	Block body = null;
