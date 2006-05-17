@@ -266,7 +266,7 @@ catch (Exception e) { }
 
 
 
-<h2><a name="arithmetic">Literals, binary and unary operators</a></h2>
+<h2><a name="lits-ops">Literals, binary and unary operators</a></h2>
 
 <p>The normal value label of a literal expression (including numeric literals
 such as <code>42</code>, <code>0.5f</code>, and <code>'r'</code>, and
@@ -503,8 +503,56 @@ with the normal value label of <code>T</code>.</p>
 
 
 <h2><a name="dynamic-tests">Dynamic label and actsfor tests</a></h2>
-<h2><a name="dynamic-tests">Label expressions</a></h2>
-<code>new label {...}</code>
+
+<p>Jif provides mechanisms for <a
+href="language.html#runtime-tests">run-time tests</a> of labels and
+principals: the <code>&lt;=</code> operator for labels, and the
+<code>actsfor</code> operator for principals. Label checking for
+expressions using these operators is exactly as for other <a
+href="#lits-ops">binary expressions</a>. </p>
+
+<p>However, label and principal tests can in addition modify the label
+environment used for label checking. If an expression <i
+class="math">e</i><sub>1</sub><code>&lt;=</code><i
+class="math">e</i><sub>2</sub> appears as a conjunct of an
+<code>if</code> statement condition, and <i
+class="math">e</i><sub>1</sub> and <i class="math">e</i><sub>2</sub>
+are both either <code>new label {...}</code> expressions, or constants
+or final access paths of type <code>label</code>, then the label
+environment of the <code>true</code> branch of the <code>if</code>
+statement will contain the fact <i class="math">e</i><sub>1</sub>
+&#8849; <i class="math">e</i><sub>2</sub>. Similarly, if an expression
+<i class="math">e</i><sub>1</sub><code> actsfor </code><i
+class="math">e</i><sub>2</sub> appears as a conjunct of an
+<code>if</code> statement condition, and <i
+class="math">e</i><sub>1</sub> and <i class="math">e</i><sub>2</sub>
+are both either constants or final access paths of type
+<code>principal</code> or a subtype of
+<code>jif.lang.Principal</code>, then the label environment of the
+<code>true</code> branch of the <code>if</code> statement will contain
+the fact <i class="math">e</i><sub>1</sub> &#8829; <i
+class="math">e</i><sub>2</sub>.
+</p>
+
+<h2><a name="label-exprs">Label expressions</a></h2>
+
+<p>Label expressions are explicit run-time representations of labels,
+such as <code>new label {Alice:Bob; *!:*}</code>. In general, a label
+expression may contain any run-time representable label, such as a
+dynamic label, a label parameter, or an integrity or confidentiality
+policy consisting of runtime representable principals. Label checking
+of label expressions consists of label checking each label component
+in turn. Dynamic labels and principals are final access path
+expressions, and may thus throw
+<code>NullPointerException</code>s. Constant principals (such as
+<code>Alice</code>, &#8868; and &perp;) are label checked like
+literals. The normal value label of a label parameter or principal
+parameter is <code>{this}</code> joined with the program counter
+label, except when the paramter occurs in a static context, in which
+case the normal value label is a polymorphic argument label whose
+upper bound is the top label
+<code>{&#8868;&rarr;&#8868;;&perp;&larr;&perp;}</code>.
+
 <h2><a name="downgrading">Downgrading</a></h2>
 <h2><a name="method-decls">Method declarations</a></h2>
 

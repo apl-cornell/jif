@@ -1067,8 +1067,31 @@ class D {
 </pre>
 </div>
 
+<h4><a name="label-exprs">Label expressions</a></h4>
 
-<h3><a name="runtime-tests"></a>Run-time tests of labels and principals</h3>
+<p>A label expression <code>new label {<i class="math">L</i>}</code>
+is an explicit run-time representation of the label <i
+class="math">L</i>. Several examples of valid label expressions are
+shown below, where <code>L</code> is a label parameter,
+<code>lbl</code> is a dynamic label, and and <code>pr</code> is a
+dynamic principal.</p>
+
+<div class="code"><pre>
+new label {Alice-&gt;Bob; Alice&lt;-Chuck}
+new label {*lbl; Alice-&gt;Bob}
+new label {L; pr-&gt;Alice}
+new label {*lbl meet L; Bob-&gt;Alice&amp;pr}
+new label {*:*; _!:_}
+</pre>
+</div>
+
+<p>Some labels are not run-time representable, and thus cannot appear
+in label expressions. Polymorphic argument labels, and the
+<code>this</code> label are not run-time representable.
+</p>
+
+
+<h3><a name="runtime-tests">Run-time tests of labels and principals</a></h3>
 
 <p>Jif provides a mechanism for comparing runtime labels, and also a
 mechanism for comparing runtime principals. Both mechanisms use a
@@ -1150,7 +1173,11 @@ Note that this construct replaces the <code>actsfor { ... } else { ... }</code> 
 More generally, the dynamic tests for labels and principals can be
 used as arbitrary boolean-valued expressions. However, the Jif
 compiler will only be able to reason about the additional information
-flows permitted by the dynamic tests if the tests occur as a conjunct of the condition of an <code>if</code> statement.
+flows permitted by the dynamic tests if the tests occur as a conjunct
+of the condition of an <code>if</code> statement, and the operands are
+either constants, <code>new label {...}</code> expressions, or final
+access paths.
+
 </p>
 
 <div class="code"><pre>
