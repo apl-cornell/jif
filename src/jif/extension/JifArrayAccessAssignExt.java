@@ -41,65 +41,70 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         Type are = ts.ArithmeticException();
 
         final Expr array = (Expr) lc.context(A).labelCheck(aie.array());
-        PathMap Xa = X(array);
+        PathMap Xarr = X(array);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xa.N());
+        A.setPc(Xarr.N());
 
         Expr index = (Expr) lc.context(A).labelCheck(aie.index());
-        PathMap Xb = X(index);
+        PathMap Xind = X(index);
 
-        PathMap X2 = Xa.join(Xb);
-        if (!((JifArrayAccessDel)assign.left().del()).arrayIsNeverNull()) {
-            // a null pointer exception may be thrown
-            checkAndRemoveThrowType(throwTypes, npe);
-            X2 = X2.exc(Xa.NV(), npe);             
-        }
-        if (((JifArrayAccessDel)assign.left().del()).outOfBoundsExcThrown()) {
-            // an out of bounds exception may be thrown
-            checkAndRemoveThrowType(throwTypes, oob);
-             X2 = X2.exc(lc.upperBound(Xa.NV(), Xb.NV()), oob);
-        }
-
+        PathMap Xlhs = Xarr.join(Xind);
         A = (JifContext) A.pushBlock();
 
         if (assign.operator() != Assign.ASSIGN) {
-            A.setPc(X2.N());
+            // op= assignments evaluate the value in the lhs before evaluating the rhs
+            // Thus, the evaluation of the RHS occurs after the NPE or OOB exceptions may have been thrown.
+            if (!((JifArrayAccessDel)assign.left().del()).arrayIsNeverNull()) {
+                // a null pointer exception may be thrown
+                checkAndRemoveThrowType(throwTypes, npe);
+                Xlhs = Xlhs.exc(lc.upperBound(Xarr.NV(), Xind.N()), npe);             
+            }
+            if (((JifArrayAccessDel)assign.left().del()).outOfBoundsExcThrown()) {
+                // an out of bounds exception may be thrown
+                checkAndRemoveThrowType(throwTypes, oob);
+                Xlhs = Xlhs.exc(lc.upperBound(Xarr.NV(), Xind.NV()), oob);
+            }
         }
-        else {
-            A.setPc(Xb.N());
-        }
+        A.setPc(Xlhs.N());
 
         Expr rhs = (Expr) lc.context(A).labelCheck(assign.right());
-        PathMap Xv = X(rhs);
+        PathMap Xrhs = X(rhs);
 
         A = (JifContext) A.pop();
         A = (JifContext) A.pop();
 
         Label La = arrayBaseLabel(array, ts);
 
-        PathMap X;
-
+        PathMap X = Xlhs.join(Xrhs);
         
         if (assign.operator() != Assign.ASSIGN) {
-            PathMap X3 = X2.N(ts.notTaken()).NV(lc.upperBound(La, X2.NV())).join(Xv);
+            // the normal value include the value that was already in the array 
+            X = X.NV(lc.upperBound(La, X.NV()));
 
             if (assign.throwsArithmeticException()) {
                 checkAndRemoveThrowType(throwTypes, are);
-                X = X3.exc(Xv.NV(), are);
+                X = X.exc(Xrhs.NV(), are);
             }
-            else {
-                X = X3;
-            }
-
-            Xv = Xv.join(X);
-        }
-        else if (assign.throwsArrayStoreException()) {
-            checkAndRemoveThrowType(throwTypes, ase);
-            X = X2.exc(lc.upperBound(Xa.NV(), Xv.NV()), ase);
+            Xrhs = X; // the value computed to store in the array actually depends on everything computed so far 
         }
         else {
-            X = X2;
+            // at this point here, for an = assignment, evaluation may decide to throw a NPE or OOB
+            if (!((JifArrayAccessDel)assign.left().del()).arrayIsNeverNull()) {
+                // a null pointer exception may be thrown
+                checkAndRemoveThrowType(throwTypes, npe);
+                X = X.exc(lc.upperBound(Xarr.NV(), X.N()), npe);             
+            }
+            if (((JifArrayAccessDel)assign.left().del()).outOfBoundsExcThrown()) {
+                // an out of bounds exception may be thrown
+                checkAndRemoveThrowType(throwTypes, oob);
+                X = X.exc(lc.upperBound(Xarr.NV(), Xind.NV(), X.N()), oob);
+            }
+
+            if (assign.throwsArrayStoreException()) {
+                checkAndRemoveThrowType(throwTypes, ase);
+                X = X.exc(lc.upperBound(Xarr.NV(), Xrhs.NV(), X.N()), ase);
+            }
         }
 
         NamedLabel namedLa = new NamedLabel("La",
@@ -107,7 +112,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
                                             La);
         lc.constrain(new LabelConstraint(new NamedLabel("rhs.nv", 
                                                         "label of successful evaluation of right hand of assignment",
-                                                        Xv.NV()).
+                                                        Xrhs.NV()).
                                                    join(lc, 
                                                         "lhs.n", 
                                                         "label of successful evaluation of array access " + aie,

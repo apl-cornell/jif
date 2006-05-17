@@ -147,6 +147,10 @@ public class LabelChecker implements Copy
         return ts.join(L1, L2);
     }
 
+    public Label upperBound(Label L1, Label L2, Label L3) {
+        return ts.join(ts.join(L1, L2), L3);
+    }
+
     /**
      * Returns a lower bound for L1 and L2
      */
