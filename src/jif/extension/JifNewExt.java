@@ -61,7 +61,7 @@ public class JifNewExt extends Jif_c
                                            noe.arguments(),
 		                           node().position());
 
-	helper.checkCall(lc, throwTypes);
+	helper.checkCall(lc, throwTypes, false);
 
 	PathMap retX = helper.X();
 	PathMap X = retX.NV(lc.upperBound(retX.NV(), newLabel));

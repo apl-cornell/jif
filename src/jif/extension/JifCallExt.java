@@ -58,11 +58,8 @@ public class JifCallExt extends Jif_c
             A.setPc(Xs.N());
             
             if (! (target instanceof Special)) {
-                if (!((JifCallDel)node().del()).targetIsNeverNull()) {
-                    // the target may be null		    
-                    npExc = true;
-                    excPath = Xs.N();
-                }
+                // a NPE may be thrown depending on the target.
+                npExc = (!((JifCallDel)node().del()).targetIsNeverNull());
                 objLabel = Xs.NV();
                 A.setPc(Xs.NV());
             }
@@ -73,7 +70,7 @@ public class JifCallExt extends Jif_c
         
         CallHelper helper = new CallHelper(objLabel, target, mi.container(), mi, me.arguments(), node().position());
         LabelChecker callLC = lc.context(A);
-        helper.checkCall(callLC, throwTypes);
+        helper.checkCall(callLC, throwTypes, npExc);
         
         // now use the call helper to bind the var labels that were created
         // during type checking of the call (see JifCallDel#typeCheck)
@@ -91,11 +88,7 @@ public class JifCallExt extends Jif_c
         }
         
         if (npExc) {
-            // a null pointer exception may be thrown
             checkAndRemoveThrowType(throwTypes, ts.NullPointerException());
-            checkThrowTypes(throwTypes);
-            return X(me.target(target).arguments(helper.labelCheckedArgs()), 
-                     helper.X().exc(excPath, ts.NullPointerException()));
         }
         
         checkThrowTypes(throwTypes);

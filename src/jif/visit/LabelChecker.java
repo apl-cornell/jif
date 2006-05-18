@@ -103,6 +103,9 @@ public class LabelChecker implements Copy
     public JifContext context() {
         return context;
     }
+    public JifContext jifContext() {
+        return context;
+    }
 
     public LabelChecker context(JifContext c) {
         if (c == this.context) return this;
@@ -112,19 +115,14 @@ public class LabelChecker implements Copy
     }
 
     public JifTypeSystem typeSystem() {
-	return ts;
+        return ts;
     }
-
     public JifTypeSystem jifTypeSystem() {
-	return ts;
+        return ts;
     }
 
     public NodeFactory nodeFactory() {
 	return nf;
-    }
-
-    public JifContext jifContext() {
-	return context;
     }
 
     public Solver solver() {
