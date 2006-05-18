@@ -189,10 +189,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 	    Xd = ts.pathMap();
 	}
 
-	PathMap X = ts.pathMap();
-	X = X.N(ts.notTaken()).join(Xd);
-
-	decl = (FieldDecl) X(decl.init(init), X);
+	decl = (FieldDecl) X(decl.init(init), Xd);
 
 	return decl;
     }
