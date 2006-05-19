@@ -916,34 +916,227 @@ begin-label and argument labels appear in contravariant positions, and
 allow covariant label parameters to appear would introduce
 unsoundnesses.</p>
 
-<p>XXX Talk about auto-endorses and what constraints they must satisfy.
+<p>Auto-endorse clauses downgrade the integrity of the begin-label. As
+such, they must satsify the all conditions for downgrading, described
+<a href="#downgrading">above</a>, with the exception that even if
+robustness checking is enabled, auto-endorse clauses do not need to
+satisfy the robustness constraints.</p>
+
 
 <h3><a name="method-conformance">Method conformance</a></h3>
 
-constraints
+<p>When a method declaration overrides or implements a method declared
+in a ancestor class or interface, the method declaration must conform
+with the previous declaration.  Method conformance in Jif extends
+method conformance in Java, due to the addition of labels and
+<code>where</code> clauses associated with method declarations.</p>
 
-co and contravariance of labels
+<p>Any label clause <i class="math">L</i><sub>1</sub><code> &lt;=
+</code><i class="math">L</i><sub>2</sub> or actsfor clause <i
+class="math">p</i><sub>1</sub><code> actsfor </code><i
+class="math">p</i><sub>2</sub> appearing in the overriding method
+declaration must be implied by the label clauses and actsfor clauses
+of the overridden method. In the following example, the label and
+actsfor clauses of the method <code>D.m</code> are implied by the
+clauses of <code>C.m</code>, but this is not true for the method
+<code>D.m</code>.</p>
 
+<div class="code"><pre>
+abstract class C {
+    abstract void m(label lbl, principal pr) 
+        where lbl &lt;= {Alice: pr}, 
+              Bob actsfor pr, 
+              pr actsfor Chuck;
+}
+class D extends C {
+    void m(label lbl, principal pr) 
+        where lbl &lt;= {Alice: Bob}, Bob actsfor Chuck
+        <span class="comment">// These where clauses are implied by</span>
+        <span class="comment">// the where clauses for C.m</span>
+    {
+        ...
+    }
+}
+class E extends C {
+    void m(label lbl, principal pr) 
+        where lbl &lt;= {pr: }, Alice actsfor Bob
+        <span class="comment">// These where clauses are NOT implied by</span>
+        <span class="comment">// the where clauses for C.m</span>
+    {
+        ...
+    }
+}
+</pre></div>
+
+
+<p>The return value label, end-label and exception labels of a method
+are covariant. This means, for example, that if <i
+class="math">L<sub>sub</sub></i> is the return value label of the
+overriding method, and <i class="math">L<sub>sup</sub></i> is the
+return value label of the overridden method, then we must have <i
+class="math">L<sub>sub</sub></i> &#8849; <i
+class="math">L<sub>sup</sub></i>. By contrast, the begin-label and
+argument labels of a method are contravariant, meaning that if <i
+class="math">L<sub>sub</sub></i> is the begin-label of the overriding
+method, and <i class="math">L<sub>sup</sub></i> is the begin-label of
+the overridden method, then we must have <i
+class="math">L<sub>sup</sub></i> &#8849; <i
+class="math">L<sub>sub</sub></i>.</p>
 
 
 <h2><a name="method-calls">Method calls</a></h2>
 
-include static methods (i.e., mention runtime parameters)
+<p>Evaluation of a method call <code><i class="math">e</i>.m(<i
+class="math">e</i><sub>1</sub>, ..., <i
+class="math">e</i><sub>n</sub>)</code> proceeds by evaluting <i
+class="math">e</i>, and then evaluating <i
+class="math">e</i><sub>1</sub> to <i class="math">e</i><sub>n</sub> in
+turn. Then, if <i class="math">e</i> evaluated to <code>null</code>, a
+<code>NullPointerException</code> is thrown. Otherwise, the method
+<code>m</code> is invoked.</p>
 
-<h2><a name="constructor-calls">Constructor calls</a></h2>
+<p>A static method call <code><i class="math">T</i>.m(<i
+class="math">e</i><sub>1</sub>, ..., <i
+class="math">e</i><sub>n</sub>)</code> first &quot;evaluates&quot; the
+type <i class="math">T</i>, and then the arguments <i
+class="math">e</i><sub>1</sub> to <i
+class="math">e</i><sub>n</sub>. Evaluating the type <i
+class="math">T</i> means evaluating any actual parameters to the class
+type. For example, <code>Bar[pr, this.lbl].m(2+5)</code> is evaluated
+by first evaluating <code>pr</code> and <code>this.lbl</code>, then
+the argument <code>2+5</code>, and finally invoking the
+method.</p>
 
-mention runtime parameters.
+<p>The principals and labels of a method signature may mention the
+formal arguments of the method, the formal parameters of the class, or
+the <code>this</code> object. To label check a method call, the
+principals and labels in the method signature have substitution
+performed on them: formal arguments are replaced with actual
+arguments, formal parameters are replaced with actual parameters based
+on the type of the receiver, and <code>this</code> is replaced with
+the receiver of the method call. The example below demonstrates this.</p>
+
+<div class="code"><pre>
+int{*foo.lbl; x; p&lt;-*} m{*this.bound}(C foo, 
+                                      principal p, 
+                                      int{p:} x) { ... }
+...
+a.b.m(bar, Alice, y);
+<span class="comment">// after substitution, the begin-label is {*a.b.bound}, </span>
+<span class="comment">//    the return value label is {*bar.lbl; y; Alice&lt;-*}, </span>
+<span class="comment">//    and the label of the 3rd argument is {Alice:}</span>
+</pre></div>
+
+<p class="cont">For the remainder of this section, we
+assume that the labels of the method signature have had substitution
+performed on them.</p>
+ 
+<p>The labels of the actual arguments must be no more restrictive than
+the labels of the arguments of the method signature. In particular, if
+<i class="math">L<sub>i</sub></i> is the normal value label of the <i
+class="math">i</i>th actual argument, and <i
+class="math">L'<sub>i</sub></i> is the label of the <i
+class="math">i</i>th formal argument, then we must have <i
+class="math">L<sub>i</sub></i> &#8849; <i
+class="math">L'<sub>i</sub></i>.</p>
+
+<p>Let <u>pc</u><sub>inv</sub> be the program counter label just
+before the method is invoked, that is, <u>pc</u><sub>inv</sub> is the
+normal termination label after evaluating the receiver <i
+class="math">e</i> and arguments <i class="math">e</i><sub>1</sub> to
+<i class="math">e</i><sub>n</sub> (and possibly throwing the
+<code>NullPointerException</code>). We require that
+<u>pc</u><sub>inv</sub> must be no more restrictive than the method's
+begin-label, since the method's begin-label is an upper bound on the
+program counter label at the method call.  Also, the begin-label of
+the current method must be no more restrictive than the method's
+begin-label, since the current method's begin label is a lower bound
+on side-effects of the method, and the method's begin-label is a lower
+bound on the side-effects that may occur during the invocation of the
+method.</p>
+
+
+<p>Any <code>where</code> label clauses and actsfor clauses of the
+callee method must be implied by the label environment at the call
+site.</p>
+
+<p>The normal termination label of a method call is the join of
+<u>pc</u><sub>inv</sub> and the method's end-label. The method
+invocation may throw an exception, in accordance with the method's
+<code>throws</code> clause. The label associated with an exception
+thrown by the method invocation is <u>pc</u><sub>inv</sub> joined with
+label of the exception as declared in the method's <code>throws</code>
+clause. If the method returns a value, then the normal value label of
+the method invocation is the join of <u>pc</u><sub>inv</sub> and the
+method's return value label.
+</p>
+
+
+<h2><a name="constructors">Constructors</a></h2>
+
+<p>Constructing a new object by calling <code>new <i
+class="math">T</i>(<i class="math">e</i><sub>1</sub>, ..., <i
+class="math">e</i><sub>n</sub>)</code> is label checked very much like
+a static method call. The normal value label of a <code>new</code>
+expression is the join of the end-label of the constructor with the
+program counter label just before the constructor is invoked (that is,
+the normal termination label of <i
+class="math">e</i><sub>n</sub>). </p>
+
+<p>Label checking of constructor declarations differs from label
+checking method declarations. For soundness, all final fields of a
+class must be initialized before the call to the super class
+constructor. Thus, in Jif constructor declarations, code may appear
+before the call to <code>super(...)</code>; this code is called the
+<em>constructor prologue</em>. 
+
+<p>During the constructor prologue, no references to the
+<code>this</code> object are allowed to escape. This means that the
+<code>this</code> object cannot appear as the target of any method
+call, or as the argument to any method call, or as the value of any
+assignment.  Because of these restrictions, label checking for the
+constructor prologue can be more permissive. In particular, the
+program counter label for checking the constructor prologue is
+initially the least restrictive label
+{&perp;&rarr;&perp;;&#8868;&larr;&#8868;}, and assignments to fields
+of the <code>this</code> object are not considered side effects (since
+they are not observable) and so the label of the assigned field does
+not have to be bounded below by the constructor's begin-label.</p>
+
+
+<p>Invoking a constructor via a <code>super(...)</code> call or
+<code>this(...)</code> call within a constructor declaration is label
+checked like a static method call. Code after the invocation of the
+<code>super(...)</code> constructor is label checked like normal Jif
+code.
+</p>
+
+
 
 <h2><a name="classes">Classes</a></h2>
 
-label checks each member, including method decls and field decls. Label checking of inits.
+<p>Label checking a class requires label checking each class member,
+including constructor declarations, method declarations, and field
+declarations.</p>
 
-authority sets of classes: Authority set of subclass must be superset of authority set of super class.
+<p> Jif supports static fields, but the declared labels of static
+fields cannot contain the label <code>{this}</code> or any label or
+principal parameters. If the label of a (non-static) field contains
+the label <code>{this}</code> or a covariant label parameter, then the
+field must be declared <code>final</code>. If a field declaration
+includes an initializing expression, then the normal value label of
+the initializing expression must be no more restrictive than the
+declared label of the field.</p>
 
-   authority, conformance (i.e., co/contra variance of methods, where clauses)
+<p>Jif does not currently support instance initializer blocks or static initializer blocks.</p>
 
+<p>Jif classes may optionally declare an authority set (see <a
+class="secref" href="language.html#authority">Authority and access
+control</a>). If the immediate superclass of the class being declared
+has the authority of a principal <i class="math">p</i>, then the class
+being declared must also have the authority of the principal <i
+class="math">p</i>.</p>
 
-XXX TODO
 </body>
 
 </html>

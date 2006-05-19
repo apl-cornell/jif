@@ -1127,7 +1127,7 @@ syntax similar to that of if statements.
 
 <p>An <i>if-label</i> statement allows the runtime comparison of labels. It has the following form: 
 <div class="code"><pre>
-if (L1 <= L2) { 
+if (L1 &lt;= L2) { 
     ... 
 } 
 else { 
@@ -1147,7 +1147,7 @@ the label <code>L1</code>. Thus, the following code compiles correctly.
 <div class="code"><pre>
 void m(int{*lbl} i, label{} lbl) {
     int{Alice:} x;
-    if (lbl <= new label {Alice:}) {
+    if (lbl &lt;= new label {Alice:}) {
         x = i; <span class="comment">// OK, since {*lbl} &#8849; {Alice:}</span>
     }
     else {
@@ -1212,7 +1212,7 @@ access paths.
 void m(int{Alice: pr} i, principal{} pr, int{*lbl} i, label{} lbl) {
     <span class="comment">// dynamic label and actsfor tests can be used as boolean-valued</span>
     <span class="comment">// expressions</span>
-    boolean b = (lbl <= new label {Alice: pr} || Alice actsfor pr);
+    boolean b = (lbl &lt;= new label {Alice: pr} || Alice actsfor pr);
 
     int{Alice: Bob} x;
     if (8 < 4 || Bob actsfor pr) {
@@ -1220,7 +1220,7 @@ void m(int{Alice: pr} i, principal{} pr, int{*lbl} i, label{} lbl) {
                <span class="comment">// conjunct of the condition of an if-statement</span>
     }
 
-    if (lbl <= new label {Alice:pr} && Bob actsfor pr) {
+    if (lbl &lt;= new label {Alice:pr} && Bob actsfor pr) {
         x = i; <span class="comment">// OK, compiler can reason that lbl &#8849; {Alice:}</span>
                <span class="comment">//  and Bob actsfor pr</span>
     }
@@ -1414,11 +1414,11 @@ test</a>. The clause <code>where <i>L</i><sub>1</sub> equiv
 
 <div class="code"><pre>
 int{*lbl} m{*lbl}(label{*lbl} lbl, principal{*lbl} p, int{Alice:p} i) 
-    where {Alice:Bob} <= lbl, Bob actsfor p 
+    where {Alice:Bob} &lt;= lbl, Bob actsfor p 
 {
-    <span class="comment">// since Bob actsfor p, {Alice:p} <= {Alice:Bob},</span>
-    <span class="comment">// and since {Alice:Bob} <= lbl, the label of the argument i</span> 
-    <span class="comment">// is <= {*lbl}. Therefore, we can return i+1.</span>
+    <span class="comment">// since Bob actsfor p, {Alice:p} &lt;= {Alice:Bob},</span>
+    <span class="comment">// and since {Alice:Bob} &lt;= lbl, the label of the argument i</span> 
+    <span class="comment">// is &lt;= {*lbl}. Therefore, we can return i+1.</span>
    return i+1;
 }
 </pre></div>
