@@ -443,15 +443,79 @@ array inits.
 
 <h2><a name="subtyping">Subtyping</a></h2>
 
-e.g., assignments, returns, declarations with initializing expressions.
+<p>Many statements in Jif require checking a subtype relationship
+between two types. For example, the type of the right hand side of an
+assignment must be a subtype of the assigned location's type; the type
+of expression <i class="math">e</i> in a statement <code>return <i
+class="math">e</i>;</code> must be a subtype of the method's return
+type. Checking subtype relationships in Jif may require checking label
+relationships.</p>
 
-in/co-variant parameters, invariance of array base types.
+<p>An array type <code><i class="math">T</i>{<i
+class="math">L</i>}[]</code> is a subtype type of array type <code><i
+class="math">T'</i>{<i class="math">L'</i>}[]</code> if and only if <i
+class="math">L</i> and <i class="math">L'</i> are equivalent (that is,
+<i class="math">L</i> &#8849; <i class="math">L'</i> and <i
+class="math">L'</i> &#8849; <i class="math">L</i>) and the types <i
+class="math">T</i> and <i class="math">T'</i> are equivalent (that is,
+<i class="math">T</i> is a subtype of <i class="math">T'</i> and vice
+versa).</p>
+
+<p>Suppose <code>C</code> is a class with a label parameter <i
+class="math">Q</i> occurring as the <i class="math">i</i>th
+parameter. If <i class="math">Q</i> is an invariant label parameter
+(the default), then <code>C[<i class="math">..., L, ...</i>]</code> is
+a subtype of <code>C[<i class="math">..., L', ...</i>]</code> if and
+only if <i class="math">L</i> and <i class="math">L'</i> are
+equivalent. On the other hand, if <i class="math">Q</i> is a
+covariant label parameter, then <code>C[<i
+class="math">..., L, ...</i>]</code> is a subtype of <code>C[<i
+class="math">..., L', ...</i>]</code> if and only if <i
+class="math">L</i> &#8849; <i class="math">L'</i>.</p>
+
+<p>Consider the following example.</p>
+<div class="code"><pre>
+class C[covariant label L, label M] { } 
+class D[covariant label L] extends C[L, {Alice:}] { }
+</pre></div>
+<ul>
+<li> <code>C[{Bob:Chuck}, {Dave:}]</code> is a subtype of
+<code>C[{Bob:}, {Dave:}]</code>
+
+<li> <code>C[{Bob:}, {Dave:Chuck}]</code> is <b>not</b> a subtype of
+<code>C[{Bob:}, {Dave:}]</code>
+
+<li> <code>C[{Bob:}, {Dave:}]</code> is <b>not</b> a subtype of
+<code>C[{Bob:Chuck}, {Dave:}]</code>
+
+<li> <code>D[{Bob:Chuck,Dave}]</code> is a subtype of
+<code>C[{Bob:Chuck}, {Alice:}]</code>
+
+<li> <code>D[lbl]</code> is a subtype of <code>C[{Bob:Chuck},
+{Alice:}]</code> if it can be shown than <code>lbl &#8849; {Bob:Chuck}</code>.
+</ul>
+
+<p>If the class <code>C</code> has a principal parameter occurring as
+the <i class="math">i</i>th parameter, then <code>C[<i
+class="math">..., p, ...</i>]</code> is a subtype of <code>C[<i
+class="math">..., p', ...</i>]</code> if and only if <i
+class="math">p</i> and <i class="math">p'</i> are equivalent, that is,
+<i class="math">p</i> can act for <i class="math">p'</i>, and vice
+versa.</p>
+
 
 <h2><a name="compound-stmts">Compound statements</a></h2>
+blocks, loops (while, for, do-while), if, switch
+
 <h2><a name="goto-stmts">Goto-like statements</a></h2>
+labeled statements, break, continue, switch, return
+
 <h2><a name="exceptions">Exceptions</a></h2>
 
-try to present without introducing path maps.
+<p>try-catch-finally
+
+<p>throw statements
+
 
 <h2><a name="dynamic-type-discrimination">Dynamic type discrimination</a></h2>
 
