@@ -568,7 +568,18 @@ authority ::=
         {: RESULT = a; :}
     ;
 drop { class_body_declaration ::= block | static_initializer ; }
-
+extend class_body_declaration ::=
+      block:a 
+          {: 
+              parser.report_error ("Jif does not currently support initializer blocks.", parser.pos(a));
+              if (true) throw new Exception();
+           :}
+    | static_initializer:a
+          {: 
+              parser.report_error ("Jif does not currently support initializer blocks.", parser.pos(a));
+              if (true) throw new Exception();
+           :}    
+    ;
 drop {
     class_member_declaration ::=
 	modifiers_opt:a CLASS:n IDENTIFIER:b
@@ -641,7 +652,7 @@ return_label_opt ::=
 
 // 19.8.4) Static Initializers
 
-drop { static_initializer }
+// drop { static_initializer }
 
 // 19.8.5) Constructor Declarations
 
