@@ -6,15 +6,13 @@ import jif.ast.JifConstructorDecl;
 import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.label.DynamicLabel;
 import jif.types.label.Label;
-import jif.types.principal.DynamicPrincipal;
-import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
 import polyglot.main.Report;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
+import polyglot.visit.NodeVisitor;
 
 /** The Jif extension of the <code>JifConstructorDecl</code> node. 
  * 
@@ -90,7 +88,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         JifTypeSystem ts = lc.jifTypeSystem();
     
         A = (JifContext) A.pushBlock();
-    
+        lc = lc.context(A);
+        
         PathMap X = ts.pathMap();
         X = X.N(A.pc());
 
@@ -104,7 +103,6 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         // let the context know that we are label checking a constructor
         // body, and what the return label of the constructor is.
         A.setCheckingInits(true);
-//        lc.checkingInits(true);
     
         Label Lr = ci.returnLabel();
         if (Lr==null) {
@@ -125,11 +123,22 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         // "untrusted" Java ancestor, 
         //          i.e. ts.hasUntrustedAncestor(ci.container()) != null.
         boolean preDangerousSuperCall = true;
+        
+        boolean seenSuperCall = false;
 
         Iterator iter = body.statements().iterator();
         while (iter.hasNext()) {
             Stmt s = (Stmt) iter.next();
-            s = (Stmt) lc.context(A).labelCheck(s);
+            
+            if (seenSuperCall && uninitFinalVars.isEmpty() && 
+                    A.checkingInits() && isEscapingThis(s)) {
+                // there won't be a "dangerousSuperCall", 
+                // and the next statement wants to let a reference to "this"
+                // escape, so mark this as the end of the init checking.
+                setEndOfInitChecking(lc, ci);
+            }
+            
+            s = (Stmt) lc.labelCheck(s);
             stmts.add(s);
             
             PathMap Xs = X(s);
@@ -139,63 +148,17 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                 // can do check to see if we are assigning to a final label
                 // field.
                 checkFinalFieldAssignment(s, uninitFinalVars, A);
-
+                
                 if (s instanceof ConstructorCall) {
                     ConstructorCall ccs = (ConstructorCall) s;
-
-                    if (ccs.kind() == ConstructorCall.SUPER) {    
-                        // we are making a super constructor call. Is it
-                        // a potentially dangerous one?
-                                        
-                        if (!ts.isJifClass(ci.container())) {
-                            // the class is not a Jif class, but just a signature
-                            // for a java class. Don't bother throwing any errors.
-                        }
-                        else if (ts.isJifClass(ci.container()) &&
-                            !ts.isJifClass(ci.container().superType()) &&
-                            ts.hasUntrustedAncestor(ci.container()) == null) {
-                            // Not a potentially dangerous super call.
-                            // The immediate super class is a trusted Java
-                            // class.
-                            // Although there are uninitialized final vars before
-                            // the call to super, it's OK, as this is a Jif class, 
-                            // the immediate ancestor (and all ancestors) are
-                            // "trusted" java classes, which do not access
-                            // these fields before they are initialized.
-                        } 
-                        else {
-                            // This is a potentially dangerous super call,
-                            // as code in one of the ancestor classes may
-                            // access a final field of this class. 
-                            preDangerousSuperCall = false;
-
-                            // Let the context know that we are no longer checking field
-                            // initializations in the constructor.
-                            A.setCheckingInits(false);
-                            A.setConstructorReturnLabel(null);    
-                            A.setPc(lc.upperBound(A.pc(), ts.callSitePCLabel(ci)));
-
-                            // We must make sure that all final variables of
-                            // this class are initialized before the super call.                            
-                            for (Iterator i = uninitFinalVars.iterator(); i.hasNext();) {
-                                JifFieldInstance fi = (JifFieldInstance)i.next();
-                                throw new SemanticDetailedException(
-                                    "Final field \"" + fi.name()
-                                    + "\" must be initialized before "
-                                    + "calling the superclass constructor.",
-                                    "All final fields of a class must " +
-                                    "be initialized before the superclass " +
-                                    "constructor is called, to prevent " +
-                                    "ancestor classes from reading " +
-                                    "uninitialized final fields. The " +
-                                    "final field \"" + fi.name() + "\" needs to " +
-                                    "be initialized before the superclass " +
-                                    "constructor call.",
-                                ccs.position());
-                            }
-                        }
+                    boolean wasDangerousSuperCall = processConstructorCall(ccs, lc, ci, uninitFinalVars);
+                    if (wasDangerousSuperCall) {
+                        preDangerousSuperCall = false;
                     }
-                }
+                    if (ccs.kind() == ConstructorCall.SUPER) {
+                        seenSuperCall = true;
+                    }
+                }                
             }
             
             // At this point, the environment A should have been extended
@@ -207,12 +170,110 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
 
         // Let the context know that we are no longer checking field
         // initializations in the constructor.
-        A.setCheckingInits(false);
-        A.setConstructorReturnLabel(null);    
-        A.setPc(lc.upperBound(A.pc(), ts.callSitePCLabel(ci)));
+        setEndOfInitChecking(lc, ci);
 
         A = (JifContext) A.pop();
         return (Block) X(body.statements(stmts), X);
+    }
+
+    /**
+     * Does the statement s possibly allow a reference to this to escape?
+     */
+    private boolean isEscapingThis(Stmt s) {
+        final boolean[] result = new boolean[] {false};
+        s.visit(new NodeVisitor() {
+            public Node leave( Node old, Node n, NodeVisitor v ) {
+                if (n instanceof Call) {
+                    Call c = (Call)n;
+                    if (c.target() instanceof Expr && JifUtil.effectiveExpr((Expr)c.target()) instanceof Special) {
+                        result[0] = true;                        
+                    }
+                    for (Iterator iter = c.arguments().iterator(); iter.hasNext();) {
+                        Expr arg = (Expr)iter.next();
+                        if (JifUtil.effectiveExpr(arg) instanceof Special) {
+                            result[0] = true;                        
+                        }                        
+                    }
+                }
+                else if (n instanceof Assign && JifUtil.effectiveExpr(((Assign)n).right()) instanceof Special) {
+                    result[0] = true;
+                }
+                return n;
+            }
+            });
+        
+        return result[0];
+    }
+
+    private boolean processConstructorCall(ConstructorCall ccs, LabelChecker lc, JifConstructorInstance ci, Set uninitFinalVars) 
+    throws SemanticException {
+        JifTypeSystem ts = lc.jifTypeSystem();
+        boolean wasDangerousSuperCall = false;
+
+        
+        if (ccs.kind() == ConstructorCall.THIS) {
+            // calling a this(...) constructor.
+            // that means we've definitely finished checking inits.
+            setEndOfInitChecking(lc, ci);
+        }
+        else if (ccs.kind() == ConstructorCall.SUPER) {
+            // we are making a super constructor call. Is it
+            // a potentially dangerous one?
+                            
+            if (!ts.isJifClass(ci.container())) {
+                // the class is not a Jif class, but just a signature
+                // for a java class. Don't bother throwing any errors.
+            }
+            else if (ts.isJifClass(ci.container()) &&
+                !ts.isJifClass(ci.container().superType()) &&
+                ts.hasUntrustedAncestor(ci.container()) == null) {
+                // Not a potentially dangerous super call.
+                // The immediate super class is a trusted Java
+                // class.
+                // Although there are uninitialized final vars before
+                // the call to super, it's OK, as this is a Jif class, 
+                // the immediate ancestor (and all ancestors) are
+                // "trusted" java classes, which do not access
+                // these fields before they are initialized.
+            } 
+            else {
+                // This is a potentially dangerous super call,
+                // as code in one of the ancestor classes may
+                // access a final field of this class. 
+                wasDangerousSuperCall = true;
+
+                // Let the context know that we are no longer checking field
+                // initializations in the constructor.
+                setEndOfInitChecking(lc, ci);
+
+                // We must make sure that all final variables of
+                // this class are initialized before the super call.                            
+                for (Iterator i = uninitFinalVars.iterator(); i.hasNext();) {
+                    JifFieldInstance fi = (JifFieldInstance)i.next();
+                    throw new SemanticDetailedException(
+                        "Final field \"" + fi.name()
+                        + "\" must be initialized before "
+                        + "calling the superclass constructor.",
+                        "All final fields of a class must " +
+                        "be initialized before the superclass " +
+                        "constructor is called, to prevent " +
+                        "ancestor classes from reading " +
+                        "uninitialized final fields. The " +
+                        "final field \"" + fi.name() + "\" needs to " +
+                        "be initialized before the superclass " +
+                        "constructor call.",
+                    ccs.position());
+                }
+            }                                
+        }
+        return wasDangerousSuperCall;
+    }
+
+    private void setEndOfInitChecking(LabelChecker lc, JifConstructorInstance ci) {
+        JifContext A = lc.context();
+        A.setCheckingInits(false);
+        A.setConstructorReturnLabel(null);    
+        A.setPc(lc.upperBound(A.pc(), lc.typeSystem().callSitePCLabel(ci)));        
     }
 
     /**

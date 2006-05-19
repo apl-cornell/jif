@@ -193,4 +193,18 @@ public class JifUtil
         }
         return "dynamic " + kind + " represented by the final access path " + path;
     }
+
+    /**
+     * Returns the "effective expression" for expr. That is, it strips
+     * away casts and downgrade expressiions.
+     */
+    public static Expr effectiveExpr(Expr expr) {
+        if (expr instanceof Cast) {
+            return effectiveExpr(((Cast)expr).expr());
+        }
+        if (expr instanceof DowngradeExpr) {
+            return effectiveExpr(((DowngradeExpr)expr).expr());            
+        }
+        return expr;
+    }
 }

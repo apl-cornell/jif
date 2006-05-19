@@ -136,6 +136,13 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Constraints3.jif ;
 	Constraints5.jif ;
 	ConstructorTest.jif ;
+	ConstructorPrologue01.jif (Semantic, "constructor prologue");
+	ConstructorPrologue02.jif (Semantic, "constructor prologue");
+	ConstructorPrologue03.jif (Semantic, "constructor prologue");
+	ConstructorPrologue04.jif;
+	ConstructorPrologue05.jif (Semantic, "constructor prologue");
+	ConstructorPrologue06.jif (Semantic, "constructor prologue");
+	ConstructorPrologue07.jif (Semantic, "constructor prologue");
 	DateTest.jif ;
 	Declassify.jif ;
 	Default1.jif ;

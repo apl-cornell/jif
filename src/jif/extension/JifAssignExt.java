@@ -1,12 +1,14 @@
 package jif.extension;
 
-import jif.ast.Jif;
+import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
-import jif.types.PathMap;
+import jif.types.SemanticDetailedException;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.Assign;
+import polyglot.ast.Node;
+import polyglot.ast.Special;
 import polyglot.types.SemanticException;
 
 /** The Jif extension of the <code>Assign</code> node. 
@@ -24,6 +26,19 @@ public abstract class JifAssignExt extends Jif_c
 
 	JifContext A = lc.jifContext();
         A = (JifContext) a.del().enterScope(A);
+
+        if (A.checkingInits()) {
+            // in the constructor prologue, the this object cannot value on the RHS
+            if (JifUtil.effectiveExpr(a.right()) instanceof Special) {
+                throw new SemanticDetailedException("The \"this\" object cannot be the value assigned in a constructor prologue.", 
+                                                    "In a constructor body before the call to the super class, no " +
+                                                    "reference to the \"this\" object is allowed to escape. This means " +
+                                                    "that the right hand side of an assignment is not allowed to refer " +
+                                                    "to the \"this\" object.", 
+                                                    a.right().position());
+            }
+        }
+        
 
 	Assign checked = (Assign)labelCheckLHS(lc);
 

@@ -1,8 +1,10 @@
 package jif.extension;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
@@ -30,6 +32,29 @@ public class JifCallExt extends Jif_c
         JifContext A = lc.jifContext();
         A = (JifContext) me.del().enterScope(A);
         JifTypeSystem ts = lc.jifTypeSystem();
+        
+        if (A.checkingInits()) {
+            // in the constructor prologue, the this object cannot be the receiver or an argument
+            if (me.target() instanceof Expr && JifUtil.effectiveExpr((Expr)me.target()) instanceof Special) {
+                throw new SemanticDetailedException("No methods may be called on \"this\" object in a constructor prologue.", 
+                                                    "In a constructor body before the call to the super class, no " +
+                                                    "reference to the \"this\" object is allowed to escape. This means " +
+                                                    "that no methods of the current object may be called.", 
+                                                    me.position());
+            }
+            for (Iterator iter = me.arguments().iterator(); iter.hasNext();) {
+                Expr arg = (Expr)iter.next();
+                if (JifUtil.effectiveExpr(arg) instanceof Special) {
+                    throw new SemanticDetailedException("The \"this\" object cannot be used as a method argument in a constructor prologue.", 
+                                                        "In a constructor body before the call to the super class, no " +
+                                                        "reference to the \"this\" object is allowed to escape. This means " +
+                                                        "that the \"this\" object cannot be used as a method argument.", 
+                                                        arg.position());
+                }
+                
+            }
+            
+        }
         
         List throwTypes = new ArrayList(me.del().throwTypes(ts));
         
