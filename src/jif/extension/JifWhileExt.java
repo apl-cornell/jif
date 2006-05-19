@@ -25,15 +25,17 @@ public class JifWhileExt extends JifStmtExt_c
 
 	Label notTaken = ts.notTaken();
 
-	Label L1 = ts.freshLabelVariable(ws.position(), "while",
-                    "label of PC for the while statement at " + ws.position());
+        Label L1 = ts.freshLabelVariable(ws.position(), "while",
+                                         "label of PC for the while statement at " + ws.position());
+        Label L2 = ts.freshLabelVariable(ws.position(), "while",
+                                         "label of PC for end of the while statement at " + ws.position());
         Label loopEntryPC = A.pc(); 
 
 	A = (JifContext) A.pushBlock();
 
 	A.setPc(L1);
 	A.gotoLabel(Branch.CONTINUE, null, L1);
-	A.gotoLabel(Branch.BREAK, null, L1);
+	A.gotoLabel(Branch.BREAK, null, L2);
 
 	Expr e = (Expr) lc.context(A).labelCheck(ws.cond());
 	PathMap Xe = X(e);
@@ -83,7 +85,8 @@ public class JifWhileExt extends JifStmtExt_c
 
 	PathMap X = Xe.join(Xs);
 	X = X.set(ts.gotoPath(Branch.BREAK, null), notTaken);
-	X = X.set(ts.gotoPath(Branch.CONTINUE, null), notTaken);
+        X = X.set(ts.gotoPath(Branch.CONTINUE, null), notTaken);
+        X = X.N(lc.upperBound(X.N(), L2));
 
 	return X(ws.body(S).cond(e), X);
     }

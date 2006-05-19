@@ -26,13 +26,15 @@ public class JifDoExt extends JifStmtExt_c
         lc = lc.context(A);
 
         Label L1 = ts.freshLabelVariable(node().position(), "do", 
-                    "label of PC for the do statement at " + node().position());
+                                         "label of PC for the do statement at " + node().position());
+        Label L2 = ts.freshLabelVariable(node().position(), "do", 
+                                         "label of PC at end of do statement at " + node().position());
         Label loopEntryPC = A.pc();         
 
         A = (JifContext) A.pushBlock();
         A.setPc(L1);
         A.gotoLabel(Branch.CONTINUE, null, L1);
-        A.gotoLabel(Branch.BREAK, null, L1);
+        A.gotoLabel(Branch.BREAK, null, L2);
 
 	Stmt s = (Stmt) lc.context(A).labelCheck(ds.body());
         PathMap Xs = X(s);
@@ -79,6 +81,7 @@ public class JifDoExt extends JifStmtExt_c
         PathMap X = Xe.join(Xs);
 	X = X.set(ts.gotoPath(Branch.BREAK, null), ts.notTaken());
 	X = X.set(ts.gotoPath(Branch.CONTINUE, null), ts.notTaken());
+        X = X.N(lc.upperBound(X.N(), L2));
 
 	return X(ds.cond(e).body(s), X);
     }

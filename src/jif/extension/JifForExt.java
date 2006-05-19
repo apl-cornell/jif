@@ -55,15 +55,17 @@ public class JifForExt extends JifStmtExt_c
 	}
 
 	// Now handle the loop body, condition, and iterators.
-	Label L1 = ts.freshLabelVariable(fs.position(), "for",
-                    "label of PC for the for statement at " + node().position());
+        Label L1 = ts.freshLabelVariable(fs.position(), "for",
+                                         "label of PC for the for statement at " + node().position());
+        Label L2 = ts.freshLabelVariable(fs.position(), "for",
+                                         "label of PC for end of the for statement at " + node().position());
 
 	A = (JifContext) A.pushBlock();
         Label loopEntryPC = A.pc();         
 
 	A.setPc(L1);
 	A.gotoLabel(Branch.CONTINUE, null, L1);
-	A.gotoLabel(Branch.BREAK, null, L1);
+	A.gotoLabel(Branch.BREAK, null, L2);
 
 	PathMap Xe;
 	Expr cond = fs.cond();
@@ -137,7 +139,8 @@ public class JifForExt extends JifStmtExt_c
 	// Compute the path map for "loop" == "while (cond) body".
 	PathMap Xloop = Xe.join(Xbody);
 	Xloop = Xloop.set(ts.gotoPath(Branch.CONTINUE, null), notTaken);
-	Xloop = Xloop.set(ts.gotoPath(Branch.BREAK, null), notTaken);
+        Xloop = Xloop.set(ts.gotoPath(Branch.BREAK, null), notTaken);
+        Xloop = Xloop.N(lc.upperBound(Xloop.N(), L2));
 
 	// Compute the path map for "init ; loop"
 	PathMap X = Xinit.N(notTaken).join(Xloop);
