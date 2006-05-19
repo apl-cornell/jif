@@ -387,8 +387,20 @@ public class JifTypeSystem_c
         if (type1.isArray() && type2.isArray()) {
             Type base1 = type1.toArray().base();
             Type base2 = type2.toArray().base();
-            if (leq(labelOfType(base1), labelOfType(base2)) &&
-                leq(labelOfType(base2), labelOfType(base1))) {
+            Label L1 = labelOfType(base1);
+            Label L2 = labelOfType(base2);
+            Label arrL = null;
+            if (L1 instanceof VarLabel) {
+                arrL = L2;
+            }
+            else if (L2 instanceof VarLabel) {
+                arrL = L1;                
+            }
+            else if (leq(L1, L2) && leq(L2, L1)) { 
+                arrL = L1;
+            }
+            
+            if (arrL != null) {
                 // Both base types are labelled with the same label.
                 // (Either or both types may be unlabelled, in which case
                 // we are using the default label).
@@ -396,7 +408,7 @@ public class JifTypeSystem_c
                 return arrayOf(labeledType(base1.position(),
                                           leastCommonAncestor(unlabel(base1),
                                                               unlabel(base2)),
-                                          labelOfType(base1)));
+                                          arrL));
             }
             else {
                 // the labels of the base types are different.
