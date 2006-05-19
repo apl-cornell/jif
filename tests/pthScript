@@ -461,6 +461,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Super6.jif (Semantic, "Final field.*must be initialized") ;
 	Super7.jif (Semantic, "requires .* authority .* principal");
 	Super8.jif (Semantic, "requires .* authority .* principal");
+	Super9.jif ;
 	SwitchLabel.jif (Semantic, "not representable at runtime");
 	SwitchLabel2.jif (Semantic, "not representable at runtime");
 	SwitchLabel3.jif (Semantic, "not representable at runtime");

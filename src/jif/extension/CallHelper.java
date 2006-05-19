@@ -246,9 +246,17 @@ public class CallHelper {
                         return "The actual parameter is more restrictive than " +
                         "permitted.";
                     }
+                });
             }
-                );
-        }
+            if (lc.context().inConstructorCall()) {
+                // the evaluation of the parameters in a constructor call
+                // super(...) or this(...) type doesn't reveal any info, since
+                // they are either constants or formal params. As such, in the
+                // same way we can treat the initial pc of a constructor as
+                // the bottom label, we can ignore the "this" label that is
+                // introduced by label checking formal params.
+                Xjoin = Xjoin.N(lc.context().pc());                
+            }
         }
         else {
             Xjoin = ts.pathMap().N(lc.context().pc());
