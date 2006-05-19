@@ -61,8 +61,7 @@ public class JifIfExt extends JifStmtExt_c
 	else {
 	    // Simulate the effect of an empty statement.
 	    // X0[node() := A[pc := Xe[nv][pc]]] == Xe[nv]
-	    X2 = ts.pathMap();
-	    X2 = X2.N(Xe.NV());
+	    X2 = ts.pathMap().N(Xe.NV());
 	}
 
 	/*
@@ -76,7 +75,7 @@ public class JifIfExt extends JifStmtExt_c
 	return X(is.cond(e).consequent(S1).alternative(S2), X);
     }
 
-    private void extendContext(LabelChecker lc, JifContext A, Expr e, boolean warn) throws SemanticException {
+    protected void extendContext(LabelChecker lc, JifContext A, Expr e, boolean warn) throws SemanticException {
         if (e instanceof Binary) {
             Binary b = (Binary)e;
             if (b.operator() == Binary.BIT_AND || b.operator() == Binary.COND_AND) {

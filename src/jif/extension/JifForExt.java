@@ -34,8 +34,7 @@ public class JifForExt extends JifStmtExt_c
 
 	// INIT: A.pushBlock();
 
-	PathMap Xinit = ts.pathMap();
-	Xinit = Xinit.N(A.pc());
+	PathMap Xinit = ts.pathMap().N(A.pc());
 
 	List inits = new LinkedList();
 
@@ -60,18 +59,21 @@ public class JifForExt extends JifStmtExt_c
                     "label of PC for the for statement at " + node().position());
 
 	A = (JifContext) A.pushBlock();
+        Label loopEntryPC = A.pc();         
 
 	A.setPc(L1);
 	A.gotoLabel(Branch.CONTINUE, null, L1);
 	A.gotoLabel(Branch.BREAK, null, L1);
 
-	PathMap Xe = ts.pathMap();
+	PathMap Xe;
 	Expr cond = fs.cond();
-	if (cond!=null) {
+	if (cond != null) {
 	    cond = (Expr) lc.context(A).labelCheck(fs.cond());
 	    Xe = X(cond);
 	}
-	else Xe = Xe.NV(A.pc());
+	else {
+            Xe = ts.pathMap().NV(A.pc()).N(A.pc());
+        }
 
 	A = (JifContext) A.pushBlock();	
 	A.setPc(Xe.NV());
@@ -79,6 +81,7 @@ public class JifForExt extends JifStmtExt_c
 	PathMap Xbody = X(body);
 
 	A = (JifContext) A.pushBlock();
+        A.setPc(Xbody.N());
 
 	List iters = new LinkedList();
 
@@ -97,29 +100,18 @@ public class JifForExt extends JifStmtExt_c
 	    Xbody = Xbody.N(notTaken).join(Xs);
 	}
 
-	// Pop the iterator scope.
-        A = (JifContext) A.pop();
-
-	// Pop the body scope.
-        A = (JifContext) A.pop();
-
-	// Pop the condition scope.
-        A = (JifContext) A.pop();
-
-	// Pop all the initializer scope.
-	// INIT: A = (JifContext) A.pop();
-
-	// Pop the for loop scope.
-        A = (JifContext) A.pop();
-
         lc.constrain(new LabelConstraint(new NamedLabel("for_body.N",
                                                         "label of normal termination of the loop body", 
-                                                        Xbody.N()), 
+                                                        Xbody.N()).
+                                                  join(lc,
+                                                       "loop_entry_pc",
+                                                       "label of the program counter just before the loop is executed",
+                                                       loopEntryPC), 
                                          LabelConstraint.LEQ, 
                                          new NamedLabel("loop_pc",
                                                         "label of the program counter at the top of the loop",
                                                         L1),
-                                         A.labelEnv(),
+                                         lc.context().labelEnv(),
                                          fs.position(), 
                                          false) {
                      public String msg() {
@@ -128,6 +120,13 @@ public class JifForExt extends JifStmtExt_c
                                 "may be more restrictive than the " +
                                 "information that should be revealed by " +
                                 "reaching the top of the loop.";
+                     }
+                     public String detailMsg() {
+                         return "The program counter label at the start of the loop is at least as restrictive " +
+                                        "as the normal termination label of the loop body, and the entry " +
+                                        "program counter label (that is, the program counter label just " +
+                                        "before the loop is executed for the first time).";
+                         
                      }
                      public String technicalMsg() {
                          return "X(loopbody).n <= _pc_ of the for statement";

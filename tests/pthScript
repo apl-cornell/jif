@@ -206,7 +206,6 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
         FinalArgs06.jif (Semantic, "argument must be a final access path");
         FinalArgs07.jif (Semantic, "argument must be a final access path");
         FinalArgs08.jif (Semantic, "argument must be a final access path");
-	For1.jif ;
 	Hierarchy1.jif ;
 	Heapsort.jif ;
 	Hello.jif ;
@@ -472,6 +471,15 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	User1.jif ;
 	Vec.jif ;
 	While.jif ;
+	While2.jif (Semantic, "not less restrictive");
+	While3.jif (Semantic, "not less restrictive");
+	Do.jif ;
+	Do2.jif (Semantic, "not less restrictive");
+	Do3.jif (Semantic, "not less restrictive");
+	For1.jif ;
+	For2.jif (Semantic, "not less restrictive");
+	For3.jif (Semantic, "not less restrictive");
+	For4.jif (Semantic, "not less restrictive");
 }
 
 # the robustness test cases. Turn robustness on.

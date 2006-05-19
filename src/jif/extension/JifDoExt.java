@@ -26,6 +26,7 @@ public class JifDoExt extends JifStmtExt_c
 
         Label L1 = ts.freshLabelVariable(node().position(), "do", 
                     "label of PC for the do statement at " + node().position());
+        Label loopEntryPC = A.pc();         
 
         A = (JifContext) A.pushBlock();
 
@@ -48,7 +49,11 @@ public class JifDoExt extends JifStmtExt_c
 
         lc.constrain(new LabelConstraint(new NamedLabel("do_while_body.N",
                                                         "label of normal termination of the loop body", 
-                                                        Xs.N()), 
+                                                        Xs.N()).
+                                                  join(lc,
+                                                       "loop_entry_pc",
+                                                       "label of the program counter just before the loop is executed",
+                                                       loopEntryPC), 
                                          LabelConstraint.LEQ, 
                                          new NamedLabel("loop_pc",
                                                         "label of the program counter at the top of the loop",
@@ -62,6 +67,13 @@ public class JifDoExt extends JifStmtExt_c
                                 "may be more restrictive than the " +
                                 "information that should be revealed by " +
                                 "reaching the top of the loop.";
+                     }
+                     public String detailMsg() {
+                         return "The program counter label at the start of the loop is at least as restrictive " +
+                                        "as the normal termination label of the loop body, and the entry " +
+                                        "program counter label (that is, the program counter label just " +
+                                        "before the loop is executed for the first time).";
+                         
                      }
                      public String technicalMsg() {
                          return "X(loopbody).n <= _pc_ of the do-while statement";
