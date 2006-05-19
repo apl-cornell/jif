@@ -26,6 +26,9 @@ public class JifThrowDel extends JifJL_c
     public void setThrownIsNeverNull() {
         isThrownNeverNull = true;
     }
+    public boolean thrownIsNeverNull() {
+        return isThrownNeverNull;
+    }
     
     /** 
      *  List of Types of exceptions that might get thrown.
@@ -39,7 +42,7 @@ public class JifThrowDel extends JifJL_c
 
         // if the exception that a throw statement is given to throw is null,
         // then a NullPointerException will be thrown.
-        if (!isThrownNeverNull) {
+        if (!isThrownNeverNull && !ts.NullPointerException().equals(t.expr().type())) {
             return CollectionUtil.list(t.expr().type(), ts.NullPointerException());
         }
         return Collections.singletonList(t.expr().type());

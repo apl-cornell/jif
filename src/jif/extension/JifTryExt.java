@@ -119,6 +119,7 @@ public class JifTryExt extends JifStmtExt_c
 	Block f = trs.finallyBlock();
 
 	if (f != null) {
+            // the pc of A is the same pc used to label check the try block
 	    f = (Block) lc.context(A).labelCheck(f);
 
 	    PathMap X2 = X(f);

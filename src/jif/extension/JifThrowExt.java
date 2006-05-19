@@ -31,11 +31,17 @@ public class JifThrowExt extends JifStmtExt_c
 
         Expr e = (Expr) lc.context(A).labelCheck(ths.expr());
 	PathMap Xe = X(e);
+        PathMap X = Xe;
 
+        if (!((JifThrowDel)ths.del()).thrownIsNeverNull() && !ts.NullPointerException().equals(e.type())) {
+            checkAndRemoveThrowType(throwTypes, ts.NullPointerException());
+            X = X.exc(Xe.NV(), ts.NullPointerException());            
+        }
         checkAndRemoveThrowType(throwTypes, e.type());
-	PathMap X = Xe.exc(Xe.NV(), e.type());
-	X = X.N(ts.notTaken());
-	X = X.NV(ts.notTaken());
+	X = X.exc(Xe.NV(), e.type());
+        
+        // the evaluation doesn't terminate normally.
+	X = X.N(ts.notTaken()).NV(ts.notTaken());
 
         checkThrowTypes(throwTypes);
 	return X(ths, X);
