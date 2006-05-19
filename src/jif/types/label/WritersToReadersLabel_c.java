@@ -19,8 +19,8 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
     public WritersToReadersLabel_c(Label label, JifTypeSystem ts, Position pos) {
         super(ts, pos, new CannotLabelToJavaExpr_c());
         this.label = label;
-        setDescription("converts the writers of " + label
-                       + " into readers");
+        setDescription("finds an upper bound of " + label
+                       + " and converts the writers of the bound into readers");
     }
     public Label label() {
         return label;
@@ -89,18 +89,19 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
     
     
     public Label transform(LabelEnv env) {
-        return transform(env, label(), new LinkedList());
+        Label bound = env.findUpperBound(label());
+        return transformImpl(bound);
     }
-    
-    protected static Label transform(LabelEnv env, Label label, List visited) {
+    protected static Label transformImpl(Label label) {
         JifTypeSystem ts = (JifTypeSystem)label.typeSystem();
-        if (visited.contains(label)) return ts.bottomLabel();
-
-        Label result = null;
-        if (label instanceof PairLabel) {
+        if (label instanceof VarLabel_c) {
+            // cant do anything.
+            return ts.writersToReadersLabel(label.position(), label);
+        }        
+        else if (label instanceof PairLabel) {
             PairLabel pl = (PairLabel)label;   
             ConfPolicy newCP = transformIntegToCong(pl.integPolicy());
-            result = ts.pairLabel(pl.position(), newCP, ts.bottomIntegPolicy(pl.position()));
+            return ts.pairLabel(pl.position(), newCP, ts.bottomIntegPolicy(pl.position()));
         }
         else if (label instanceof JoinLabel) {
             JoinLabel L = (JoinLabel)label;
@@ -108,9 +109,9 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
             Set comps = new LinkedHashSet();
             for (Iterator iter = L.joinComponents().iterator(); iter.hasNext();) {
                 Label c = (Label)iter.next();
-                comps.add(transform(env, c, visited));
+                comps.add(transformImpl(c));
             }
-            result = ts.meetLabel(label.position(), comps);
+            return ts.meetLabel(label.position(), comps);
         }
         else if (label instanceof MeetLabel) {
             MeetLabel L = (MeetLabel)label;
@@ -118,57 +119,14 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
             Set comps = new LinkedHashSet();
             for (Iterator iter = L.meetComponents().iterator(); iter.hasNext();) {
                 Label c = (Label)iter.next();
-                comps.add(transform(env, c, visited));
+                comps.add(transformImpl(c));
             }
-            result = ts.joinLabel(label.position(), comps);
+            return ts.joinLabel(label.position(), comps);
         }
-        else if (label instanceof ArgLabel) {
-            ArgLabel L = (ArgLabel)label;
-            visited.add(0, L);
-            result = transform(env, env.findUpperBound(L), visited);
-            if (L != visited.remove(0)) {
-                throw new InternalCompilerError("Stack discipline broken");
-            }
-        }
-        else if (label instanceof ParamLabel) {
-            ParamLabel L = (ParamLabel)label;
-            result = transform(env, env.findUpperBound(L), visited);
-        }
-        else if (label instanceof CovariantParamLabel) {
-            CovariantParamLabel L = (CovariantParamLabel)label;
-            result = transform(env, env.findUpperBound(L), visited);            
-        }    
-        else if (label instanceof DynamicLabel) {
-            DynamicLabel L = (DynamicLabel)label;
-            result = transform(env, env.findUpperBound(L), visited);
-        }    
-        else if (label instanceof ThisLabel) {
-            ThisLabel L = (ThisLabel)label;
-//            Label thisUpperBound = A.entryPC();
-//            return transform(env, thisUpperBound, visited, true);
-            Label thisUpperBound = env.findUpperBound(L);
-            result = transform(env, thisUpperBound, visited);  
-            if (Report.should_report(Topics.jif, 3)) { 
-                Report.report(3, "Transforming " + label + " with ub " + 
-                              thisUpperBound + " in env " + env + 
-                              " to " + result);
-            }
-        }  
-        else if (label instanceof VarLabel_c) {
-            // cant do anything.
-            result = ts.writersToReadersLabel(label.position(), label);
-        }
-        else {
-            throw new InternalCompilerError("WritersToReaders undefined " +
-                        "for " + label);
-        }
-        if (Report.should_report(Topics.jif, 3)) { 
-            Report.report(3, "Transformed " + label + " to " + result);
-        }
-//        System.err.println("Transformed " + label + " to " + result);
-        return result;        
+        throw new InternalCompilerError("WritersToReaders undefined " +
+                                        "for " + label);
     }
-    
+        
     protected static ConfPolicy transformIntegToCong(IntegPolicy pol) {
         JifTypeSystem ts = (JifTypeSystem)pol.typeSystem();
         if (pol instanceof WriterPolicy) {

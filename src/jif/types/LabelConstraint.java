@@ -247,7 +247,13 @@ public class LabelConstraint
                 String s = l.componentString();
                 if (s.length() == 0)
                     s = l.toString();
-                defns.put(s, Collections.singletonList(l.description()));
+                List list = new ArrayList(2); 
+                list.add(l.description());
+                defns.put(s, list);
+                if (l instanceof WritersToReadersLabel) {
+                    // add the transform of the writersToReaders label
+                    list.add(env.triggerTransforms(l).toString());                    
+                }
             }
         } 
         

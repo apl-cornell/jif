@@ -611,6 +611,10 @@ public class LabelEnv_c implements LabelEnv
     private Label findUpperBound(Label L, Collection seen) {        
         // L is a pair label.
         if (L instanceof PairLabel) return L;
+        if (L instanceof VarLabel_c) {
+            // cant do anything.
+            return L;
+        }        
         
         if (seen.contains(L)) return ts.topLabel();
         
@@ -807,7 +811,7 @@ public class LabelEnv_c implements LabelEnv
         };
         
         try {
-            return label.subst(subst);
+            return label.subst(subst).simplify();
         }
         catch (SemanticException e) {
             throw new InternalCompilerError("Unexpected SemanticException", e);
