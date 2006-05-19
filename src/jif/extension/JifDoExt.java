@@ -23,33 +23,29 @@ public class JifDoExt extends JifStmtExt_c
 	JifTypeSystem ts = lc.typeSystem();
 	JifContext A = lc.context();
         A = (JifContext) ds.del().enterScope(A);
+        lc = lc.context(A);
 
         Label L1 = ts.freshLabelVariable(node().position(), "do", 
                     "label of PC for the do statement at " + node().position());
         Label loopEntryPC = A.pc();         
 
         A = (JifContext) A.pushBlock();
-
         A.setPc(L1);
         A.gotoLabel(Branch.CONTINUE, null, L1);
         A.gotoLabel(Branch.BREAK, null, L1);
 
-	Expr e = (Expr) lc.context(A).labelCheck(ds.cond());
-        PathMap Xe = X(e);
-
-        A = (JifContext) A.pushBlock();
-
-        A.setPc(Xe.NV());
-
 	Stmt s = (Stmt) lc.context(A).labelCheck(ds.body());
         PathMap Xs = X(s);
 
-        A = (JifContext) A.pop();
-        A = (JifContext) A.pop();
+        A = (JifContext) A.pushBlock();
+        A.setPc(Xs.N());
 
-        lc.constrain(new LabelConstraint(new NamedLabel("do_while_body.N",
-                                                        "label of normal termination of the loop body", 
-                                                        Xs.N()).
+        Expr e = (Expr) lc.context(A).labelCheck(ds.cond());
+        PathMap Xe = X(e);
+
+        lc.constrain(new LabelConstraint(new NamedLabel("do_while_guard.NV",
+                                                        "label of evaluation of the loop guard", 
+                                                        Xe.NV()).
                                                   join(lc,
                                                        "loop_entry_pc",
                                                        "label of the program counter just before the loop is executed",
@@ -58,7 +54,7 @@ public class JifDoExt extends JifStmtExt_c
                                          new NamedLabel("loop_pc",
                                                         "label of the program counter at the top of the loop",
                                                         L1),
-                                         A.labelEnv(),
+                                         lc.context().labelEnv(),
                                          ds.position(), 
                                          false) {
                      public String msg() {
