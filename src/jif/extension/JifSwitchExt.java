@@ -38,15 +38,15 @@ public class JifSwitchExt extends JifStmtExt_c
 	Expr e = (Expr) lc.context(A).labelCheck(ss.expr());
 	PathMap Xe = X(e);
 
-	PathMap Xa = Xe.N(notTaken);
 
         Label L = ts.freshLabelVariable(ss.position(), "switch",
-            "label of PC at break target for switch statement at " + node().position());
+           "label of PC at break target for switch statement at " + node().position());
 
 	A = (JifContext) A.pushBlock();
 	A.setPc(Xe.NV());
         A.gotoLabel(Branch.BREAK, null, L);
 
+        PathMap Xa = Xe.N(notTaken);
 	List l = new LinkedList();
 
 	for (Iterator iter = ss.elements().iterator(); iter.hasNext(); ) {
@@ -60,7 +60,6 @@ public class JifSwitchExt extends JifStmtExt_c
 	}
 
         A = (JifContext) A.pop();
-
         lc.constrain(new LabelConstraint(new NamedLabel("label of normal termination of swtich statement", Xa.N()),
                                          LabelConstraint.LEQ,
                                          new NamedLabel("label of break target for the switch stmt", L),
@@ -83,7 +82,8 @@ public class JifSwitchExt extends JifStmtExt_c
                      );
 	
 	PathMap X = Xa.set(ts.gotoPath(Branch.BREAK, null), notTaken);
-	X = X.NV(ts.notTaken());
+        X = X.NV(ts.notTaken());
+        X = X.N(L);
 
 	return X(ss.elements(l), X);
     }

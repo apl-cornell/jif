@@ -476,10 +476,15 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	Do.jif ;
 	Do2.jif (Semantic, "not less restrictive");
 	Do3.jif (Semantic, "not less restrictive");
+	Do4.jif (Semantic, "not less restrictive");
 	For1.jif ;
 	For2.jif (Semantic, "not less restrictive");
 	For3.jif (Semantic, "not less restrictive");
 	For4.jif (Semantic, "not less restrictive");
+	Switch01.jif (Semantic, "not less restrictive");
+	Switch02.jif (Semantic, "not less restrictive");
+	Switch03.jif (Semantic, "not less restrictive");
+	Switch04.jif (Semantic, "not less restrictive");
 }
 
 # the robustness test cases. Turn robustness on.

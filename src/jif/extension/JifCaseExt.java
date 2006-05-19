@@ -28,17 +28,14 @@ public class JifCaseExt extends JifStmtExt_c
 	JifContext A = lc.jifContext();
         A = (JifContext) cs.del().enterScope(A);
 
-	PathMap X = ts.pathMap();
+	PathMap X;
 	
 	if (!cs.isDefault()) {
 	    Expr e = (Expr) lc.context(A).labelCheck(cs.expr());
-	    PathMap Xe = X(e);
-
-	    // is it right to null out the NV?
-	    X = Xe.NV(ts.notTaken());
+	    X = X(e).NV(ts.notTaken());
 	}
 	else {
-	    X = X.N(A.pc());
+	    X = ts.pathMap().N(A.pc());
 	}
 
 	return X(cs, X);

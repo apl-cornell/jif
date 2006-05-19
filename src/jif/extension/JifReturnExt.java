@@ -43,22 +43,15 @@ public class JifReturnExt extends JifStmtExt_c
 	    e = (Expr) lc.context(A).labelCheck(rs.expr());
 
 	    PathMap Xe = X(e);
-
-	    PathMap X1 = Xe.N(ts.notTaken());
-	    PathMap X2 = ts.pathMap();
-	    X2 = X2.R(Xe.N());
-	    X2 = X2.RV(Xe.NV());
-	    X = X1.join(X2);
+            
+            X = Xe.N(ts.notTaken()).NV(ts.notTaken());
+            X = X.R(Xe.N()).RV(Xe.NV());
 
 	    CodeInstance ci = A.currentCode();
-
 	    if (! (ci instanceof MethodInstance)) {
 	        throw new SemanticException(
 		    "Cannot return a value from " + ci + ".");
 	    }
-        
-        
-
 	    MethodInstance mi = (MethodInstance) ci;
             // Type retType = A.instantiate(mi.returnType()); 
             Type retType = mi.returnType();

@@ -44,6 +44,9 @@ public class JifContext_c extends Context_c implements JifContext
         if (auth != null) {
             ctxt.auth = new LinkedHashSet(auth);
         }
+        if (gotos != null) {
+            ctxt.gotos = new HashMap(gotos);
+        }
         ctxt.env = env.copy();
         return ctxt;        
     }
@@ -164,13 +167,16 @@ public class JifContext_c extends Context_c implements JifContext
         public int hashCode() {
             return kind.hashCode() + (label == null ? 0 : label.hashCode());
         }
+        public String toStrong() {
+            return kind.toString() + label;
+        }
 
-        public boolean equalsImpl(TypeObject o) {
-            return o instanceof Key
-                && ((Key) o).kind.equals(kind)
-                && (((Key) o).label == null
-                    ? label == null
-                    : ((Key) o).label.equals(label));
+        public boolean equals(Object o) {
+            if (o instanceof Key) {
+                Key that = (Key)o;
+                return this.kind.equals(that.kind) && (this.label == that.label || (this.label != null && this.label.equals(that.label))); 
+            }
+            return false;
         }
     }
 
