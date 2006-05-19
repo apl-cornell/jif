@@ -358,9 +358,9 @@ label</a>.</p>
 <code>NullPointerException</code> if the target <code>e</code> is
 <code>null</code>. The Jif compiler uses a simple intra-procedural
 dataflow analysis to track whether local variables and final access
-path expressions are known to be non-null. If this dataflow analysis
+path expressions are known to be non-<code>null</code>. If this dataflow analysis
 is unable to determine that the target <code>e</code> is definitely
-not-null, then the label associated with the
+non-<code>null</code>, then the label associated with the
 <code>NullPointerException</code> is the normal value label of the
 target <code>e</code>. The normal termination label of a field access
 is thus the normal value of the target <code>e</code>.</p>
@@ -495,12 +495,12 @@ class D[covariant label L] extends C[L, {Alice:}] { }
 {Alice:}]</code> if it can be shown than <code>lbl &#8849; {Bob:Chuck}</code>.
 </ul>
 
-<p>If the class <code>C</code> has a principal parameter occurring as
+<p>If the class <code>C</code> has a principal parameter as
 the <i class="math">i</i>th parameter, then <code>C[<i
 class="math">..., p, ...</i>]</code> is a subtype of <code>C[<i
 class="math">..., p', ...</i>]</code> if and only if <i
 class="math">p</i> and <i class="math">p'</i> are equivalent, that is,
-<i class="math">p</i> can act for <i class="math">p'</i>, and vice
+if and only if <i class="math">p</i> can act for <i class="math">p'</i>, and vice
 versa.</p>
 
 
@@ -512,9 +512,85 @@ labeled statements, break, continue, switch, return
 
 <h2><a name="exceptions">Exceptions</a></h2>
 
-<p>try-catch-finally
+<p>An exception may be explicitly thrown by a <code>throw <i
+class="math">e</i>;</code> statement. A <code>throw</code> is
+evaluated by first evaluating the expression <i class="math">e</i>.
+If <i class="math">e</i> evaluated to <code>null</code>, a
+<code>NullPointerException</code> is thrown; otherwise the
+<code>Throwable</code> object that <i class="math">e</i> evaluated to
+is thrown. Whichever exception is thrown, the label associated with it
+is the normal value label of <i class="math">e</i>. Jif's not-null
+dataflow analysis can sometimes determine that the expression <i
+class="math">e</i> cannot evaluate to <code>null</code>, in which case
+the <code>NullPointerException</code> cannot be thrown. Since a
+<code>throw</code> statement never terminates normally, it does not
+have a normal termination label or normal value label.
+</p>
 
-<p>throw statements
+<p>A <code>try-catch-finally</code> statement (which may contain zero
+or more <code>catch</code> blocks, and an optional
+<code>finally</code> block) is evaluated as follows. First, the
+<code>try</code> block is evaluated. If the <code>try</code> throws an
+exception, then each <code>catch</code> block is considered in turn,
+and if the class of the exception thrown is a subclass of the declared
+<code>catch</code> formal, then the <code>catch</code> block is
+evaluated. The <code>finally</code> block is then executed, regardless
+of the evaluation of the <code>try</code> or any <code>catch</code>
+blocks. The <code>finally</code> block may throw an
+exception. Otherwise, if the <code>finally</code> block terminated
+normally, the <code>try-catch-finally</code> terminates as did the
+<code>catch</code> block (if one was executed) or the <code>try</code>
+block.</p>
+
+<p>The <code>try</code> block is label checked using the program
+counter label for the <code>try-catch-finally</code> block. Label
+checking of the <code>try</code> block will determine that it may
+throw various exceptions, and will associate a label with each such
+exception.</p>
+
+<p>A <code>catch (<i class="math">C</i>{<i class="math">L</i>} x) {
+... }</code> block contains a formal variable <code>x</code>, which
+may have a declared label <i class="math">L</i>. If the formal has no
+declared label, then the label for the formal will be inferred, as
+with a local variable declaration. The label of the formal must be at
+least as restrictive as the label associated with any exception in the
+<code>try</code> block that may be caught by the <code>catch</code>
+block. That is, if the <code>try</code> block throws an exception of
+class <i class="math">C'</i> with label <i class="math">L'</i>, and
+either <i class="math">C'</i> is a subclass of <i class="math">C</i>
+or <i class="math">C</i> is a subclass of <i class="math">C'</i>, then
+the <code>catch</code> block may catch the exception, and so we must
+have <i class="math">L'</i> &#8849; <i class="math">L</i>. The
+<code>catch</code> block is label checked using the label <i
+class="math">L</i> of the formal as the initial program counter label.
+Note that the catch block's formal variable <code>x</code> will always
+be non-<code>null</code> in the body of the <code>catch</code>
+block.</p>
+
+<p>The <code>finally</code> block, if present, is label checked using
+the same initial program counter label as the <code>try</code> block
+(since the <code>finally</code> block will always be evaluated,
+regardless of the behavior of the <code>try</code> or
+<code>catch</code> blocks).</p>
+
+<p>A <code>try-catch-finally</code> statement will terminate normally
+if the <code>finally</code> block terminates normally, and either the
+<code>try</code> block terminated normally, or the <code>try</code>
+block threw an exception that was caught by a <code>catch</code> block
+that terminated normally. Thus, the normal termination label of a
+<code>try-catch-finally</code> is the join of the normal termination
+labels of each of the <code>try</code> block, <code>catch</code>
+blocks, and <code>finally</code> block. A
+<code>try-catch-finally</code> will terminate with an exception if the
+<code>finally</code> terminates exceptionally, if a <code>catch</code>
+block terminates exceptionally, or the <code>try</code> block throws
+an exception that is not caught by one of the <code>catch</code>
+blocks. The label associated with an exception for a
+<code>try-catch-finally</code> is thus the join of the labels
+associated with it in the <code>catch</code> blocks,
+<code>finally</code> block, and (if it is an exception that is not
+caught by any <code>catch</code> block) the <code>try</code>
+block.</p>
 
 
 <h2><a name="dynamic-type-discrimination">Dynamic type discrimination</a></h2>
@@ -530,7 +606,7 @@ labeled type, such as <code>Foo{Alice:}</code>, but may be a
 parameterized class, for example, <code>Bar[Alice,
 this.lbl]</code>. The type <code>T</code> cannot be an array
 type. (This is because Jif cannot represent at runtime the label of
-the array's base class, leading to potential unsoundnesses.)</p>
+the array's base class, leading to potential unsoundness.)</p>
 
 <p>The evaluation of both <code>e instanceof T</code> and
 <code>(T)e</code> is performed by first evaluating <code>e</code>, and
@@ -692,7 +768,7 @@ confidentiality of <i class="math">L<sub>to</sub></i>.<p>
 
 <h4>Selective downgrading</h4> 
 <p>
-To enforce <a href="language.html#selective-downgrading">delective
+To enforce <a href="language.html#selective-downgrading">selective
 downgrading</a>  Jif requires
 that all downgrade expressions have sufficient authority, namely, that
 if a policy owned by principal <i class="math">p</i> is weakened
@@ -978,10 +1054,10 @@ value label, the end-label, and <code>caller_pc</code>.
 contain a covariant label parameter. This is because the method
 begin-label and argument labels appear in contravariant positions, and
 allow covariant label parameters to appear would introduce
-unsoundnesses.</p>
+unsoundness.</p>
 
 <p>Auto-endorse clauses downgrade the integrity of the begin-label. As
-such, they must satsify the all conditions for downgrading, described
+such, they must satisfy the all conditions for downgrading, described
 <a href="#downgrading">above</a>, with the exception that even if
 robustness checking is enabled, auto-endorse clauses do not need to
 satisfy the robustness constraints.</p>
@@ -1052,7 +1128,7 @@ class="math">L<sub>sub</sub></i>.</p>
 
 <p>Evaluation of a method call <code><i class="math">e</i>.m(<i
 class="math">e</i><sub>1</sub>, ..., <i
-class="math">e</i><sub>n</sub>)</code> proceeds by evaluting <i
+class="math">e</i><sub>n</sub>)</code> proceeds by evaluating <i
 class="math">e</i>, and then evaluating <i
 class="math">e</i><sub>1</sub> to <i class="math">e</i><sub>n</sub> in
 turn. Then, if <i class="math">e</i> evaluated to <code>null</code>, a
