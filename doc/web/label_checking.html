@@ -240,7 +240,7 @@ remainder of the section, unless otherwise stated, these principles
 and invariants should be assumed to apply.
 </p>
 
-<p>
+<p><a name="single-path-rule"/>
 An additional label checking rule permits increased precision in
 checking expressions and statements. The <em>single path rule</em>
 states that if an expression or statement <i class="math">e</i> can
@@ -504,11 +504,194 @@ if and only if <i class="math">p</i> can act for <i class="math">p'</i>, and vic
 versa.</p>
 
 
-<h2><a name="compound-stmts">Compound statements</a></h2>
-blocks, loops (while, for, do-while), if, switch
+<h2><a name="compound-stmts">Compound statements</a></h2> 
+
+<p> A block <code>{<i class="math">S</i><sub>1</sub> ... <i
+class="math">S</i><sub>n</sub>}</code> is a sequence of zero or more
+statements. The first statement in the block is label checked using
+the same program counter label as the block itself, and the program
+counter label used to label check each subsequent statement is the
+normal termination label of the previous statement. A block may throw
+any exception that its statements may throw; the label associated with
+an exception thrown by a block is the join of the labels associated
+with that exception by each constituent statement.</p>
+
+<p>A conditional statement <code>if (<i class="math">e</i>) <i
+class="math">S<sub>t</sub></i> else <i
+class="math">S<sub>f</sub></i></code> executes one of <i
+class="math">S<sub>t</sub></i> and <i class="math">S<sub>f</sub></i>
+dependent on expression <i class="math">e</i>. The expression <i
+class="math">e</i> is label checked using the same program counter
+label as for the conditional statement. The program counter label for
+label checking both <i class="math">S<sub>t</sub></i> and <i
+class="math">S<sub>f</sub></i> is the normal value label of <i
+class="math">e</i>. The label environment for label checking <i
+class="math">S<sub>t</sub></i> may be <a
+href="#dynamic-tests">extended</a> as a result of label tests and
+actsfor tests appearing in expression <i class="math">e</i>.  The
+normal termination label of the conditional statement is the join of
+the normal termination labels of <i class="math">S<sub>t</sub></i> and
+<i class="math">S<sub>f</sub></i>. The label for an exception is the
+join of the label of the exception for <i
+class="math">S<sub>t</sub></i> with the label of the exception for <i
+class="math">S<sub>f</sub></i>. Note that if neither <i
+class="math">S<sub>t</sub></i> or <i class="math">S<sub>f</sub></i>
+can throw an exception (or execute a <code>return</code> statement),
+then the <a href="#single-path-rule">single path rule</a> applies, and
+so the normal termination label of the conditional statement would be
+the initial program counter label for the statement, since no
+information can be gained by observing that the conditional statement
+terminates normally.</p>
+
+<p>To evaluate a loop <code>while(<i class="math">e</i>) <i
+class="math">S</i></code>, the expression <i class="math">e</i> is
+evaluated, and if it is <code>true</code>, then the statement <i
+class="math">S</i> is evaluated; if <i class="math">S</i> terminates
+normally, the evaluation of the loop repeats. To label check a
+<code>while</code> statement, we define a label <u>pc</u><sub><i
+class="math">loop</i></sub>, which is the program counter label
+immediately before the evaluation of the loop guard <i
+class="math">e</i>. The loop guard <i class="math">e</i> is label
+checked using <u>pc</u><sub><i class="math">loop</i></sub> as the
+program counter label. The loop body <i class="math">S</i> is label
+checked using the normal value label of <i class="math">e</i> as the
+program counter label. We require that <u>pc</u><sub><i
+class="math">loop</i></sub> is at least as restrictive as both the
+program counter label of the <code>while</code> statement, and normal
+termination label of the loop body <i class="math">S</i>. The normal
+termination label a <code>while</code> statement is the normal
+termination label of the loop guard joined with the normal termination
+label of the loop body. Note that if neither the loop guard or the
+loop body can throw an exception, then the <a
+href="#single-path-rule">single path rule</a> applies, and the normal
+termination label of the <code>while</code> statement is the same as
+the program counter label for the <code>while</code> statement (which
+may be less restrictive than <u>pc</u><sub><i
+class="math">loop</i></sub>). Thus, Jif's label checking is
+termination insensitive, since the normal termination label of the
+<code>while</code> statement may not be as restrictive as the normal
+value label of the loop guard.</p>
+
+<p>A <code>do <i class="math">S</i> while(<i
+class="math">e</i>);</code> loop is very similar to a
+<code>while</code> loop. To label check a <code>do-while</code> loop,
+we define a label <u>pc</u><sub><i class="math">loop</i></sub>, which
+is the program counter label immediately before the evaluation of the
+loop body <i class="math">S</i>. The loop body <i class="math">S</i>
+is label checked using <u>pc</u><sub><i class="math">loop</i></sub> as
+the program counter label. The loop guard <i class="math">e</i> is
+label checked using the normal termination label of <i
+class="math">S</i> as the program counter label. We require that
+<u>pc</u><sub><i class="math">loop</i></sub> is at least as
+restrictive as both the program counter label of the
+<code>do-while</code> statement, and normal value label of the loop
+guard <i class="math">e</i>. Like <code>while</code> loops, the normal
+termination label a <code>do-while</code> statement is the join of the
+normal termination labels of the loop guard and the loop body.</p>
+
+
+<p>A loop <code>for (<i
+class="math">S<sub>init</sub></i>; <i class="math">e</i>; <i
+class="math">S<sub>inc</sub></i>) <i class="math">S</i></code> is
+label checked as if it were the code <code><i
+class="math">S<sub>init</sub></i>; while(<i class="math">e</i>){<i
+class="math">S</i>; <i class="math">S<sub>inc</sub></i>;}</code>.
 
 <h2><a name="goto-stmts">Goto-like statements</a></h2>
-labeled statements, break, continue, switch, return
+
+<p>Several Java statements transfer control non-locally. We discuss <a
+class"secref" href="#exceptions">Exceptions</a> in a separate section.</p>
+
+<p>The statement <code>return <i class="math">e</i>;</code> evaluates
+the expression <i class="math">e</i>, and if the evaluation terminates
+normally, returns from the current method body. The program counter
+label for the label checking of expression <i class="math">e</i> is
+the same as the program counter label for the <code>return</code>
+statement. The normal termination label of the expression <i
+class="math">e</i> must be no more restrictive than the end-label of
+the current method. Similarly, the normal value label of <i
+class="math">e</i> must be no more restrictive than the join of the
+current method's end-label and the current method's return value
+label. Since a <code>return</code> statement cannot terminate
+normally, it has no normal termination label.</p>
+
+<p>A variant of the <a href="#single-path-rule">single path rule</a>
+applies to statements which can only terminate by <code>return</code>
+statements. If the execution of a statement <code>S</code> can only
+terminate via <code>return</code> statements, then no additional
+information is gained by knowing that the statement exited by
+executing a <code>return</code>. Thus the requirement that the normal
+termination label of the expression <i class="math">e</i> must be no
+more restrictive than the end-label of the current method can be
+weakened. For example, the following code is sound, and passes label
+checking, even though the program counter label for the
+<code>return</code> statements is more restrictive than the method's end-label.</p>
+
+<div class="code"><pre>
+int{secret} m{*&lt;-*}(boolean secret):{*&lt;-*} {
+    <span class="comment">// method body can only exit by return</span>
+    <span class="comment">// statements, no exceptions possible</span>
+    if (secret) {
+        <span class="comment">// normal termination label of the return</span>
+        <span class="comment">// expression is {secret}, which is more</span>
+        <span class="comment">// restrictive than the end-label {*&lt;-*}</span>
+        return 7;
+    }
+    else {
+        return 42;
+    }
+}
+</pre></div>
+
+
+
+<p>The evaluation of the branch statement <code>continue <i
+class="math">l</i>;</code> very simply jumps to the top of the loop
+labeled <i class="math">l</i>. Similarly, the branch statement
+<code>break <i class="math">l</i>;</code> jumps to the end of the loop
+labeled <i class="math">l</i>. If no branch label <i
+class="math">l</i> is specified, the innermost loop is used. (A
+<code>break;</code> statement's target may also be the end of a
+<code>switch</code> statement.) Label checking of branch statements is
+similarly straightforward: the program counter label of the branch
+statement must be no more restrictive than the program counter label
+at the program point where control will jump to. Jif's label checking
+uses the label environment track to the program counter labels for all
+possible <code>continue</code> and <code>break</code> targets. Since
+branch statements do not terminate normally, they have no normal
+termination label.
+</p>
+
+
+<p>A <code>switch(<i class="math">e</i>){<i
+class="math">S<sub>1</sub></i> ... <i
+class="math">S<sub>n</sub></i>}</code> is executed by evaluating the
+expression <i class="math">e</i>, then, considering each statement <i
+class="math">S<sub>i</sub></i> in turn, if the statement is <code>case
+<i class="math">e<sub>i</sub></i>:</code> and <i
+class="math">e<sub>i</sub></i> evaluates to the switch value, then the
+statements from the point onwards are executed. A
+<code>default:</code> statement may also be included in the
+<code>switch</code> body, which matches all possible switch values.
+Label checking of a <code>switch</code> statement first label checks
+the switch expression <i class="math">e</i>; the program counter label
+used to label check <i class="math">e</i> is as the same program
+counter label for the <code>switch</code> statement. Each statement in
+the switch body is then label checked, using the join of the normal
+value label of <i class="math">e</i> and the normal termination label
+of the previous statement for the program counter label. This
+correctly tracks the information flow that may occur due to jumping to
+an appropriate <code>case</code> statement, or by &quot;falling
+through&quot; from a previous case. The normal termination label of a
+<code>switch</code> statement is the join of the normal termination
+label of the final statement in the switch body with the program
+counter labels of all the <code>break</code> statements that occur in
+the switch body. (This is just the standard label checking for branch
+statements, described above: the program counter label of the target
+of a <code>break</code> statement must be at least as restrictive as
+the program counter label of the <code>break</code> statement
+itself.)</p>
+
 
 <h2><a name="exceptions">Exceptions</a></h2>
 
