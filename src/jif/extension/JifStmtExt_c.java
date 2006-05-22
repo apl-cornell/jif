@@ -92,7 +92,7 @@ public abstract class JifStmtExt_c extends Jif_c implements JifStmtExt
 	for (Iterator i = X.paths().iterator(); i.hasNext(); ) {
 	    Path p = (Path) i.next();
 
-	    if (p.equals(Path.NV) || p.equals(Path.RV)) {
+	    if (p.equals(Path.NV)) {
 		continue;
 	    }
 

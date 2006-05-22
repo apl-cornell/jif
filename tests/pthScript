@@ -377,6 +377,8 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;
+	PathMap01.jif ;
+	PathMap02.jif ;
 	Poly.jif ;
 	PreciseClass01.jif ;
 	PreciseClass02.jif ;

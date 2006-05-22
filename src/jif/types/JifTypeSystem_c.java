@@ -522,7 +522,7 @@ public class JifTypeSystem_c
     }
 
     public ExceptionPath exceptionPath(Type type) {
-        return new ExceptionPath_c(type);
+        return new ExceptionPath_c(unlabel(type));
     }
 
     public Path gotoPath(polyglot.ast.Branch.Kind kind, String target) {

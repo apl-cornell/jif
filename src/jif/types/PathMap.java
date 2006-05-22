@@ -53,9 +53,6 @@ public class PathMap
     public Label R() { return get(Path.R); }
     public PathMap R(Label label) { return set(Path.R, label); }
 
-    public Label RV() { return get(Path.RV); }
-    public PathMap RV(Label label) { return set(Path.RV, label); }
-
     public PathMap exception(Type type, Label label) {
 	return set(ts.exceptionPath(type), label);
     }
@@ -72,16 +69,15 @@ public class PathMap
 	return this.N(n).NV(nv).set(C, c);
     }
 
-    /** Return all paths in the map except NV and RV (which aren't really
-     * paths). */
+    /** Return all paths in the map except NV (which isn't really a
+     * path). */
     public Set paths() {
 	Set s = allPaths();
 	s.remove(Path.NV);
-	s.remove(Path.RV);
 	return s;
     }
 
-    /** Return all paths in the map including NV and RV. */
+    /** Return all paths in the map including NV. */
     public Set allPaths() {
 	return new LinkedHashSet(map.keySet());
     }

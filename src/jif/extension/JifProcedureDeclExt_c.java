@@ -239,15 +239,10 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
 	// Add the return termination constraints.
 	
-	Label Lr = mi.returnLabel(); 
 
         // fold the call site pc into the return label
-        Lr = lc.upperBound(Lr, ts.callSitePCLabel(mi));
-//	// fold "this" label into the return label because it is protected
-//	// at the caller side.
-//	if (!mi.flags().isStatic())  {
-//	    Lr = lc.upperBound(Lr, ct.thisLabel());
-//	}
+	Label Lr = lc.upperBound(mi.returnLabel(), ts.callSitePCLabel(mi)); 
+
 	        
         //Hack: If no other paths, the procedure must return. Therefore,
         //X.n is not taken, and X.r doesn't contain any information. 
@@ -303,55 +298,11 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                          }
                      }
         );
-	// Add the return value constraints.
-	Label Lrv = null;
 
-	if (ts.isLabeled(returnType)) {
-	    Lrv = lc.upperBound(ts.labelOfType(returnType), Lr);
-	}
-	else if (returnType.isVoid()) {
-	    Lrv = ts.notTaken();
-	}
-	else {
-	    throw new InternalCompilerError("Unexpected return type: " + returnType);
-	}
-	// Lrv = A.instantiate(Lrv);
+	// return value constraints are implemented at the "return" statement, in order
+        // to make use of the (more precise) label environment there.
 
-	if (! (Lrv instanceof NotTaken)) {
-            lc.constrain(new LabelConstraint(new NamedLabel("X(body).rv",
-                                                                "the label of values returned by the body of the method via a return statement",
-                                                                X.RV()).
-                                                           join(lc, "X(body).nv",
-                                                                "the label of values returned by the body of the method",
-                                                                X.NV()),
-                                                 LabelConstraint.LEQ,
-                                                 new NamedLabel("Lrv", 
-                                                                "return value label of the method",
-                                                                Lrv),
-                                                 A.labelEnv(),
-                                                 mn.position())
-                             {
-                             public String msg() { 
-                                 return "This method may return a value with " +
-                                        "a more restrictive label than the " +
-                                        "declared return value label.";
-                             }
-                             public String detailMsg() { 
-                                 return msg() + " The declared return type " +
-                                        "of this method is " + returnType + 
-                                        ". As such, values returned by this " +  
-                                        "method can have a label of at most " +
-                                        namedRhs() +".";
-                             }
-                             public String technicalMsg() {
-                                 return "this method may return a value " +
-                                        "with a more restrictive label " + 
-                                        "than the declared return value label.";
-                             }
-                         }
-                );
-	}
-	
+        
 	// Add the exception path constraints.
 	for (Iterator iter = X.paths().iterator(); iter.hasNext(); ) {
 	    Path path = (Path) iter.next();
@@ -380,12 +331,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 		
                 // fold the call site pc into the return label
                 Lj = lc.upperBound(Lj, ts.callSitePCLabel(mi));
-//                // fold "this" label into the label of the declared
-//		// throw type, because it is protected
-//		// at the caller side.
-//		if (!mi.flags().isStatic())  {
-//		    Lj = lc.upperBound(Lj, ct.thisLabel());
-//		}
 
 		if (ts.isImplicitCastValid(pathType, tj)) {
 		    subtypeChecker.addSubtypeConstraints(lc, mn.position(),
@@ -419,53 +364,5 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 		}
 	    }
 	}
-    }
-    
-    static class Graph {
-	Hashtable nodes;
-	List freeList;
-	
-	public Graph() {
-	    nodes = new Hashtable();
-	    freeList = new LinkedList();
-	}
-	
-	public void addNode(VarLabel vl) {
-	    nodes.put(vl, new LinkedList());
-	}
-	
-	public void addEdge(VarLabel v1, VarLabel v2) {
-	    List outs = (List) nodes.get(v1);
-	    if (outs!=null) {
-		if (!outs.contains(v2))
-		    outs.add(v2);
-	    }
-	}
-	
-	public boolean hasCycle() {
-	    while (true) {
-		int old = nodes.size();
-		for (Iterator iter=nodes.entrySet().iterator(); iter.hasNext(); ) {
-		    Map.Entry entry = (Map.Entry) iter.next();
-		    VarLabel v = (VarLabel) entry.getKey();
-		    List deps = (List) entry.getValue();
-		    boolean free = true;
-		    for (Iterator i2 = deps.iterator(); i2.hasNext(); ) {
-			Object n = i2.next();
-			if (nodes.contains(n) && !freeList.contains(n)) {
-			    free = false;
-			    break;
-			}
-		    }
-		    if (free) {
-			freeList.add(v);
-			iter.remove();
-		    }
-		}
-		if (old == nodes.size()) break;
-	    }
-	    
-	    return !nodes.isEmpty();
-	}
-    }
+    }    
 }

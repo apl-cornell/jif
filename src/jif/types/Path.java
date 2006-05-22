@@ -15,9 +15,6 @@ public interface Path
     // Normal value label
     public static final Path NV = new FixedPath("NV");
 
-    // Return value label
-    public static final Path RV = new FixedPath("RV");
-
     public static class FixedPath extends Enum implements Path {
 	FixedPath(String name) { super(name); }
     }
