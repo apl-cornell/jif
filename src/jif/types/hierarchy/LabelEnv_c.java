@@ -20,6 +20,7 @@ public class LabelEnv_c implements LabelEnv
     protected final List labelAssertions; // a list of LabelLeAssertions
     protected final StringBuffer displayLabelAssertions; 
     protected final JifTypeSystem ts;
+    protected final LabelEnv_c parent; // a more general (i.e., fewer assertions) LabelEnv, used only for cache lookup.
     protected Solver solver;
     
     /**
@@ -33,9 +34,9 @@ public class LabelEnv_c implements LabelEnv
     protected static Collection topics = CollectionUtil.list(Topics.jif, Topics.labelEnv);
 
     public LabelEnv_c(JifTypeSystem ts, boolean useCache) {
-        this(ts, new PrincipalHierarchy(), new LinkedList(), "", false, useCache);
+        this(ts, new PrincipalHierarchy(), new LinkedList(), "", false, useCache, null);
     }
-    protected LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph, List assertions, String displayLabelAssertions, boolean hasVariables, boolean useCache) {
+    protected LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph, List assertions, String displayLabelAssertions, boolean hasVariables, boolean useCache, LabelEnv_c parent) {
         this.ph = ph;
         this.labelAssertions = assertions;
         this.displayLabelAssertions = new StringBuffer(displayLabelAssertions);
@@ -44,6 +45,7 @@ public class LabelEnv_c implements LabelEnv
         this.hasVariables = hasVariables;
         this.ts = ts;
         this.useCache = useCache;
+        this.parent = parent;
     }
     
     public void setSolver(Solver s) {
@@ -64,14 +66,14 @@ public class LabelEnv_c implements LabelEnv
     }
     
     public void addActsFor(Principal p1, Principal p2) {
-        // clear the cache of leq results
-        cache.clear();
+        // clear the cache of false leq results, since this may let us prove more results
+        cacheFalse.clear();
         ph.add(p1, p2);
     }
 
     public void addEquiv(Principal p1, Principal p2) {
-        // clear the cache of leq results
-        cache.clear();
+        // clear the cache of false leq results, since this may let us prove more results
+        cacheFalse.clear();
         ph.add(p1, p2);
         ph.add(p2, p1);
     }
@@ -80,8 +82,8 @@ public class LabelEnv_c implements LabelEnv
         addAssertionLE(L1, L2, true);
     }
     public boolean addAssertionLE(Label L1, Label L2, boolean updateDisplayString) {
-        // clear the cache of leq results
-        cache.clear();
+        // clear the cache of false leq results, since this may let us prove more results
+        cacheFalse.clear();
         boolean added = false;
         // break up the components
         if (L1 instanceof JoinLabel) {
@@ -132,7 +134,7 @@ public class LabelEnv_c implements LabelEnv
     public LabelEnv copy() {
         return new LabelEnv_c(ts, ph.copy(), new LinkedList(labelAssertions), 
                               displayLabelAssertions.toString(), 
-                              hasVariables, useCache);
+                              hasVariables, useCache, this);
     }
     
     public boolean leq(Label L1, Label L2) { 
@@ -150,7 +152,8 @@ public class LabelEnv_c implements LabelEnv
      * and so we can ignore it and consider only L1 and L2 when caching 
      * the results. 
      */
-    private final Map cache = new HashMap();
+    private final Set cacheTrue = new HashSet();
+    private final Set cacheFalse = new HashSet();
     
     protected final boolean useCache;
     
@@ -168,7 +171,10 @@ public class LabelEnv_c implements LabelEnv
                 throw new InternalCompilerError("Null label!");
         }
         public int hashCode() {
-            return lhs.hashCode() + rhs.hashCode();
+            int lhash = lhs.hashCode(); 
+            int rhash = rhs.hashCode();
+            if (lhash == rhash) return lhash;
+            return lhash ^ rhash;
         }
         public boolean equals(Object o) {
             if (o instanceof LeqGoal) {
@@ -202,7 +208,7 @@ public class LabelEnv_c implements LabelEnv
         // variables
         LeqGoal g = new LeqGoal(L1, L2);
     
-        Boolean b = (Boolean)cache.get(g);
+        Boolean b = checkCache(g);
         if (b != null) {
             if (Report.should_report(topics, 3))
                 Report.report(3, "Found cache value for " + L1 + " <= " + L2 
@@ -210,8 +216,54 @@ public class LabelEnv_c implements LabelEnv
             return b.booleanValue();
         }        
         boolean result = leqImpl(L1, L2, state);
-        cache.put(g, Boolean.valueOf(result));
+        cacheResult(g, result);
         return result;
+    }
+    
+    protected Boolean checkCache(LeqGoal g) {
+        if (!useCache || this.hasVariables()) {
+            return null;
+        }
+        if (cacheTrue.contains(g)) return Boolean.TRUE;
+        if (cacheFalse.contains(g)) return Boolean.FALSE;
+        
+        // try looking in the trueCache of more general label envs
+        LabelEnv_c ancestor = this.parent;
+        while (ancestor != null) {
+            if (!ancestor.useCache || ancestor.hasVariables()) {
+                break;
+            }
+            
+            if (ancestor.cacheTrue.contains(g)) {
+                this.cacheTrue.add(g);
+                return Boolean.TRUE;
+            }
+            
+            ancestor = ancestor.parent;
+        }
+        return null;
+    }
+    
+    protected void cacheResult(LeqGoal g, boolean result) {
+        if (!useCache || this.hasVariables()) {
+            return;
+        }
+        
+        if (result) {   
+            cacheTrue.add(g); 
+        }
+        else {
+            cacheFalse.add(g);          
+            // cache the False result in more general label envs
+            LabelEnv_c ancestor = this.parent;
+            while (ancestor != null) {
+                if (!ancestor.useCache || ancestor.hasVariables()) {
+                    break;
+                }                
+                ancestor.cacheFalse.add(g);                
+                ancestor = ancestor.parent;
+            }            
+        }
     }
         
     /**
