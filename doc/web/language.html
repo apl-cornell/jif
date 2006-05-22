@@ -1071,31 +1071,8 @@ class D {
 </pre>
 </div>
 
-<h4><a name="label-exprs">Label expressions</a></h4>
+<h3><a name="label-exprs">Label expressions</a></h3>
 
-<<<<<<< language.html
-<p>A label expression <code>new label {<i class="math">L</i>}</code>
-is an explicit run-time representation of the label <i
-class="math">L</i>. Several examples of valid
-label expressions are shown below, where <code>L</code> is a label parameter,
-<code>lbl</code> is a dynamic label, and and <code>pr</code> is a dynamic principal.</p>
-
-<div class="code"><pre>
-new label {Alice-&gt;Bob; Alice&lt;-Chuck}
-new label {*lbl; Alice-&gt;Bob}
-new label {L; pr-&gt;Alice}
-new label {*lbl meet L; Bob-&gt;Alice&amp;pr}
-</pre>
-</div>
-
-<p>Some labels are not run-time representable, and thus cannot appear
-in label expressions. Polymorphic argument labels, and the
-<code>this</code> label are not run-time representable.
-</p>
-
-
-<h3><a name="runtime-tests">Run-time tests of labels and principals</a></h3>
-=======
 <p>A label expression <code>new label {<i class="math">L</i>}</code>
 is an explicit run-time representation of the label <i
 class="math">L</i>. Several examples of valid label expressions are
@@ -1119,7 +1096,6 @@ in label expressions. Polymorphic argument labels, and the
 
 
 <h3><a name="runtime-tests">Run-time tests of labels and principals</a></h3>
->>>>>>> 1.18
 
 <p>Jif provides a mechanism for comparing runtime labels, and also a
 mechanism for comparing runtime principals. Both mechanisms use a
