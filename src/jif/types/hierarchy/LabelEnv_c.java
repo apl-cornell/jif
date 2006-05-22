@@ -46,6 +46,8 @@ public class LabelEnv_c implements LabelEnv
         this.ts = ts;
         this.useCache = useCache;
         this.parent = parent;
+        this.cacheTrue = new HashSet();
+        this.cacheFalse = new HashSet();        
     }
     
     public void setSolver(Solver s) {
@@ -152,8 +154,8 @@ public class LabelEnv_c implements LabelEnv
      * and so we can ignore it and consider only L1 and L2 when caching 
      * the results. 
      */
-    private final Set cacheTrue = new HashSet();
-    private final Set cacheFalse = new HashSet();
+    private final Set cacheTrue;
+    private final Set cacheFalse;
     
     protected final boolean useCache;
     
@@ -192,7 +194,7 @@ public class LabelEnv_c implements LabelEnv
     /** 
      * Recursive implementation of L1 <= L2.
      */
-    public boolean leq(Label L1, Label L2, SearchState state) {  
+    public boolean leq(Label L1, Label L2, SearchState state) {
         if (!useCache || 
                 !((SearchState_c)state).useAssertions || 
                 this.hasVariables()) {
@@ -253,16 +255,7 @@ public class LabelEnv_c implements LabelEnv
             cacheTrue.add(g); 
         }
         else {
-            cacheFalse.add(g);          
-            // cache the False result in more general label envs
-            LabelEnv_c ancestor = this.parent;
-            while (ancestor != null) {
-                if (!ancestor.useCache || ancestor.hasVariables()) {
-                    break;
-                }                
-                ancestor.cacheFalse.add(g);                
-                ancestor = ancestor.parent;
-            }            
+            cacheFalse.add(g);
         }
     }
         
@@ -387,119 +380,7 @@ public class LabelEnv_c implements LabelEnv
         return leqApplyAssertions(L1, L2, (SearchState_c)state, true);
         
     }
-    
-    static int j = 0;
-    
-//    /**
-//     * Non-caching implementation of L1 <= L2
-//     */
-//    private boolean leqImpl(LabelJ L1, LabelJ L2, SearchState state) {
-//        AssertionUseCount auc = ((SearchState_c)state).auc;
-//        Set currentGoals = ((SearchState_c)state).currentGoals;
-//        
-//        if (L1.isSingleton()) L1 = L1.singletonComponent();
-//        if (L2.isSingleton()) L2 = L2.singletonComponent();
-//
-//        if (! L1.isComparable() || ! L2.isComparable()) {
-//            throw new InternalCompilerError("Cannot compare " + L1 +
-//                                            " with " + L2 + ".");
-//        }
-//        
-//                
-//        // do some easy tests firsts.
-//        if (L1.isBottom()) return true;
-//        //if (L2.isBottom()) return false;
-//        
-//        if (L2.isTop()) return true;
-//        if (L1.isTop()) return false;
-//        
-//        if (L2 instanceof RuntimeLabel) return L1.isRuntimeRepresentable();
-//        if (L1 instanceof RuntimeLabel) return false; // <= RT and TOP only.
-//         
-//        // check the current goals, to make sure we don't go into an infinite
-//        // recursion...
-//        LeqGoal newGoal = new LeqGoal(L1, L2);
-//        if (currentGoals.contains(newGoal)) {
-//            // already have this subgoal on the stack
-//            return false;
-//        }
-//        currentGoals = new LinkedHashSet(currentGoals);
-//        currentGoals.add(newGoal);
-//        state = new SearchState_c(auc, currentGoals);        
-//        
-//        if (L1.equals(L2)) return true;        
-//
-//        // L1 <= L2 if there for all components of L1, there is one component
-//        // of L2 that is greater.  We need to filter out all L1, and L2
-//        // that are not enumerable.        
-//        if (! L1.isEnumerable()) {
-//            return L1.leq_(L2, this, state);        
-//        }
-//        if (! L1.isEnumerable() || ! L2.isEnumerable()) {
-//            throw new InternalCompilerError("Cannot compare " + L1 +
-//                                            " <= " + L2);
-//        }
-//                
-//        if (L2.isSingleton()) {
-//            L2 = L2.singletonComponent();
-//            boolean result = L1.leq_(L2, this, state);            
-//            if (!result && L1 instanceof ArgLabel) {
-//                ArgLabel al = (ArgLabel)L1;
-//                // recurse on upper bound.
-//                result = leq(al.upperBound(), L2, state);
-//            }
-//            
-//            // try to use assertions
-//            return result || leqApplyAssertions(L1, L2, (SearchState_c)state, true);
-//            // try again, being dumb?
-//        }
-//        else if (L1.isSingleton()) {
-//            // if the components of L2 are connected by joins, 
-//            // then L1 <= L2 if there exists a component cj of L2 
-//            // such that L1 <= cj
-//            for (Iterator j = L2.components().iterator(); j.hasNext(); ) {
-//                Label cj = (Label) j.next();
-//                if (leq(L1, cj, state)) {
-//                    return true;
-//                }
-//            }
-//            
-//            // haven't been able to prove it yet.
-//            // try testing L1 against all of L2. This is needed
-//            // if, say, L1 is an arg label with upper bound L join L',
-//            // and L2 = L join L'.
-//            if (L1.leq_(L2, this, state)) {
-//                return true;
-//            }
-//            
-//            if (L1 instanceof ArgLabel) {
-//                ArgLabel al = (ArgLabel)L1;
-//                // recurse on upper bound.
-//                if (leq(al.upperBound(), L2, state)) {
-//                    return true;
-//                }
-//            }
-//
-//            // haven't been able to prove it yet. Try the assertions
-//            return leqApplyAssertions(L1, L2, (SearchState_c)state, true);
-//        }
-//        else {
-//            // L1 is not a singleton, and neither is L2.
-//
-//            // We need to break L1 down...
-//            // if the components of L1 are connected by joins, 
-//            // then L1 <= L2 if for all components ci of L1 
-//            // we have ci <= L2
-//            for (Iterator i = L1.components().iterator(); i.hasNext(); ) {
-//                Label ci = (Label) i.next();
-//                if (!leq(ci, L2, state)) {
-//                    return false;
-//                }
-//            }   
-//            return true;
-//        }            
-//    }
-
+        
     /**
      * Bound the number of times any particular assertion can be used; this bounds
      * the search in leqImpl.
@@ -848,9 +729,6 @@ public class LabelEnv_c implements LabelEnv
     /**
      * Trigger the transformation of WritersToReaders labels. Not guaranteed
      * to remove all writersToReaders labels. 
-     * @param label
-     * @param env
-     * @return
      */
     public Label triggerTransforms(Label label) {
         LabelSubstitution subst = new LabelSubstitution() {
