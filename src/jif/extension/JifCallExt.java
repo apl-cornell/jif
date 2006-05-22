@@ -111,11 +111,7 @@ public class JifCallExt extends Jif_c
         if (helper.returnType() != me.type()) {
             me = (Call) me.type(helper.returnType());
         }
-        
-        if (npExc) {
-            checkAndRemoveThrowType(throwTypes, ts.NullPointerException());
-        }
-        
+                
         checkThrowTypes(throwTypes);
         return X(me.target(target).arguments(helper.labelCheckedArgs()), helper.X());
     }
