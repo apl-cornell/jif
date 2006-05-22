@@ -124,7 +124,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
                      public String msg() {
                          return "Label of succesful evaluation of array " +
                                 "access and right hand side of the " +
-                                "assignment is more restrictive than " +
+                                "assignment is not less restrictive than " +
                                 "the label for the array base type.";
                      }
                      public String detailMsg() { 
@@ -138,7 +138,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
                      }
                      public String technicalMsg() {
                          return "Invalid assignment: " + namedLhs().toString() + 
-                                " is more restrictive than the label of " +
+                                " is not less restrictive than the label of " +
                                 "array element.";
                      }                     
          }

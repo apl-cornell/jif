@@ -3,13 +3,14 @@ package jif.extension;
 import java.util.ArrayList;
 import java.util.List;
 
-import jif.ast.Jif_c;
+import jif.ast.*;
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
 import polyglot.types.*;
+import polyglot.util.Position;
 
 /** The Jif extension of the <code>ArrayAccess</code> node. 
  */
@@ -21,90 +22,15 @@ public class JifArrayAccessExt extends Jif_c
 
     public Node labelCheckIncrement(LabelChecker lc) throws SemanticException
     {
-	JifContext A = lc.jifContext();
-	final JifTypeSystem ts = lc.jifTypeSystem();
+        JifNodeFactory nf = new JifNodeFactory_c();
+        ArrayAccess ae = (ArrayAccess) node();
+        Position pos = ae.position();
+        ArrayAccessAssign aae = nf.ArrayAccessAssign(pos, ae, Assign.ADD_ASSIGN, 
+                              nf.IntLit(pos, IntLit.INT, 1));
 
-	final ArrayAccess aie = (ArrayAccess) node();
-        List throwTypes = new ArrayList(aie.del().throwTypes(ts));
-	Type npe = ts.NullPointerException();
-	Type oob = ts.OutOfBoundsException();
+        aae = (ArrayAccessAssign)((JifArrayAccessAssignExt) aae.ext()).labelCheck(lc);
 
-	final Expr array = (Expr) lc.context(A).labelCheck(aie.array());
-
-        // Xa is the path map for evaluating the array expression
-	PathMap Xa = X(array);
-
-	A = (JifContext) A.pushBlock();
-	A.setPc(Xa.N());
-
-	Expr index = (Expr) lc.context(A).labelCheck(aie.index());
-
-        // Xb is the path map for evaluating the index expression
-	PathMap Xb = X(index);
-
-        A = (JifContext) A.pop();
-
-	Label La = arrayBaseLabel(array, ts);
-
-        // X2 is the path map for the array access expression, including paths
-        // for the NullPointerException (thrown if the array is null) and 
-        // the ArrayIndexOutOfBoundsException (thrown if the index is less than
-        // 0 or not less than the length of the array).
-        PathMap X2 = Xa.join(Xb);
-        if (!((JifArrayAccessDel)node().del()).arrayIsNeverNull()) {
-            // a null pointer exception may be thrown
-            checkAndRemoveThrowType(throwTypes, npe);
-            X2 = X2.exc(Xa.NV(), npe);             
-        }
-        if (((JifArrayAccessDel)node().del()).outOfBoundsExcThrown()) {
-            // an out of bounds exception may be thrown
-            checkAndRemoveThrowType(throwTypes, oob);
-             X2 = X2.exc(lc.upperBound(Xa.NV(), Xb.NV()), oob);
-        }
-
-        // Xv is a path map with paths N and NV equal to the path value for 
-        // X2.N.
-	PathMap Xv = ts.pathMap();
-	Xv = Xv.N(X2.N());
-	Xv = Xv.NV(X2.N());
-
-        // X is the pathmap for the increment. 
-	PathMap X = X2.N(ts.notTaken()).NV(lc.upperBound(La, X2.NV())).join(Xv);
-
-        lc.constrain(new LabelConstraint(new NamedLabel("X.nv", 
-                                                        "Label of the value " + aie,
-                                                        X.NV()).
-                                                   join(lc,
-                                                        "X.n", 
-                                                        "label of successful evaluation of array access " + aie,
-                                                        X.N()), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("La",
-                                                        "Label of the array base type",
-                                                        La),
-                                         A.labelEnv(),
-                                         aie.position()) {
-                     public String msg() {
-                         return "Label of array access is not less " + 
-                                "restrictive than the label for the array " +
-                                "base type.";
-                     }
-                     public String detailMsg() { 
-                         return "More information is revealed by the successul " +
-                                "evaluation of the array access " + aie + 
-                                " than is allowed to flow to elements of the " + 
-                                "array. Elements of the array can only " +
-                                "contain information up to the label of the " +
-                                "array base type, La.";
-                     }
-                     public String technicalMsg() {
-                         return "Invalid increment: " + namedLhs() + " is more " +
-                                "restrictive than the label of array element.";
-                     }                     
-         }
-         );
-        checkThrowTypes(throwTypes);
-	return X(aie.index(index).array(array), X);
+        return aae.left();
     }
  
     public Node labelCheck(LabelChecker lc)

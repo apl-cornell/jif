@@ -76,7 +76,7 @@ public class JifLocalAssignExt extends JifAssignExt
                      }
                      public String technicalMsg() {
                          return "Invalid assignment: path NV of rhs is " +
-                                "more restrictive than the declared label " +
+                                "not less restrictive than the declared label " +
                                 "of the local variable <" + li.name() + ">.";
                      }
                      

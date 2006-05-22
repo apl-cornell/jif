@@ -79,6 +79,7 @@ jif.ExtensionInfo  "-sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:
 #	ArrayLeak2.jif (Semantic, "not a subtype") ;
 	ArrayLeak3.jif (Semantic, "does not currently support") ;
 	ArrayLeak4.jif (Semantic, "does not currently support") ;
+	ArrayLeak5.jif (Semantic, "not less restrictive") ;
 	Authority01.jif ;
 	Authority02.jif ;
 	Authority03.jif ;
