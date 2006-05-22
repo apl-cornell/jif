@@ -57,13 +57,7 @@ public class JifFieldAssignExt extends JifAssignExt
             X = X.exc(Xr.NV(), are);
         }
 
-        if (fe.target() instanceof Special) {
-            // explicitly ignore the the evaluation of the target Xe, as it
-            // will be tainted with the "this" label.          
-            // "this" label <= A.pc
-            X = Xr;
-        }
-        else if (!((JifFieldDel)fe.del()).targetIsNeverNull()) {
+        if (!((JifFieldDel)fe.del()).targetIsNeverNull()) {
             // may throw a null pointer exception
             checkAndRemoveThrowType(throwTypes, npe);
             X = X.exc(lc.upperBound(Xe.NV(), Xr.N()), npe);

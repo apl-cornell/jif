@@ -138,8 +138,17 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                 setEndOfInitChecking(lc, ci);
             }
             
-            s = (Stmt) lc.labelCheck(s);
+            A = (JifContext)A.pushBlock();
+            if (A.checkingInits()) {
+                // when we are checking inits, the pc is lower than 
+                // the start-label of the method, so we explicitly add
+                // as an assertion that the caller_pc is less than the pc.
+                A.addAssertionLE(ts.callSitePCLabel(ci), A.pc());                
+            }
+            
+            s = (Stmt) lc.context(A).labelCheck(s);
             stmts.add(s);
+            A = (JifContext)A.pop();
             
             PathMap Xs = X(s);
             
