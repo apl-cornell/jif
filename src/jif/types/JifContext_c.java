@@ -16,7 +16,7 @@ public class JifContext_c extends Context_c implements JifContext
     private final TypeSystem jlts;
     private final JifTypeSystem jifts;
     
-    private LabelEnv env; // label environment (ph, constraints known to be true)
+    private LabelEnv_c env; // label environment (ph, constraints known to be true)
 
     private Set auth;
     private Label pc; //internal pc
@@ -36,7 +36,7 @@ public class JifContext_c extends Context_c implements JifContext
 	super(ts);
         this.jlts = jlts;
         this.jifts = ts;
-        this.env = ts.createLabelEnv();
+        this.env = (LabelEnv_c)ts.createLabelEnv();
     }
 
     public Object copy() {
@@ -47,7 +47,6 @@ public class JifContext_c extends Context_c implements JifContext
         if (gotos != null) {
             ctxt.gotos = new HashMap(gotos);
         }
-        ctxt.env = env.copy();
         return ctxt;        
     }
 
@@ -95,9 +94,24 @@ public class JifContext_c extends Context_c implements JifContext
     public LabelEnv labelEnv() {
 	return env;
     }
+    
+    /*
+     * Called when the label environment is about to be modified.
+     * This makes sure that we are dealing with a copy of the environment,
+     * and do not accidentally modify the parent's environment
+     */
+    private void envModification() {
+        JifContext_c jifOuter = (JifContext_c)this.outer;
+        if (jifOuter != null && jifOuter.env == this.env) {
+            // the outer's label environment points to the same object as this
+            // one. Create a new label env.
+            this.env = this.env.copy();
+        }
+    }
 
     public void addAssertionLE(Label L1, Label L2) {
-        labelEnv().addAssertionLE(L1, L2);
+        envModification();
+        env.addAssertionLE(L1, L2);
     }
     
     /**
@@ -107,23 +121,32 @@ public class JifContext_c extends Context_c implements JifContext
      * @param L2
      */
     public void addDefinitionalAssertionEquiv(Label L1, Label L2) {
-        labelEnv().addEquiv(L1, L2);
+        // don't bother copying the environment, as we'll be
+        // propogating it upwards anyway.
+        // envModification();
+        env.addEquiv(L1, L2);
         JifContext_c jc = this;
+        LabelEnv_c lastEnvAddedTo = env;
         while (!jc.isCode()) {
             jc = (JifContext_c)jc.pop();
-            if (jc != null) {
-                jc.labelEnv().addEquiv(L1, L2);
+            if (jc != null && jc.env != lastEnvAddedTo) {
+                // only add to env we haven't seen yet.
+                jc.env.addEquiv(L1, L2);
+                lastEnvAddedTo = jc.env;
             }            
         }
     }
     
     public void addEquiv(Label L1, Label L2) {
+        envModification();
         env.addEquiv(L1, L2);
     }
     public void addEquiv(Principal p1, Principal p2) {
+        envModification();
         env.addEquiv(p1, p2);
     }
     public void addActsFor(Principal p1, Principal p2) {
+        envModification();
         env.addActsFor(p1, p2);
     }
     /**
@@ -131,12 +154,17 @@ public class JifContext_c extends Context_c implements JifContext
      * the method/constructor/initializer level
      */
     public void addDefinitionalEquiv(Principal p1, Principal p2) {
+        // don't bother copying the environment, as we'll be
+        // propogating it upwards anyway.
+        // envModification();
         this.addEquiv(p1, p2);
         JifContext_c jc = this;
+        LabelEnv_c lastEnvAddedTo = env;
         while (!jc.isCode()) {
             jc = (JifContext_c)jc.pop();
-            if (jc != null) {
-                jc.addEquiv(p1, p2);
+            if (jc != null && jc.env != lastEnvAddedTo) {
+                jc.env.addEquiv(p1, p2);
+                lastEnvAddedTo = jc.env;
             }            
         }
     }
@@ -152,6 +180,7 @@ public class JifContext_c extends Context_c implements JifContext
 
 
     public void clearPH() {
+        envModification();
 	env.ph().clear();
     }
 
@@ -267,6 +296,21 @@ public class JifContext_c extends Context_c implements JifContext
         return A;
     }
     
+    
+    public Context pushClass(ParsedClassType classScope, ClassType type) {
+        JifContext_c jc = (JifContext_c)super.pushClass(classScope, type);
+        // force a new label environment
+        jc.envModification();
+        return jc;
+    }
+
+    public Context pushCode(CodeInstance ci) {
+        JifContext_c jc = (JifContext_c)super.pushCode(ci);
+        // force a new label environment
+        jc.envModification();
+        return jc;
+    }
+
     public boolean inConstructorCall() {
         return this.inConstructorCall;
     }

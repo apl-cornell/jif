@@ -11,18 +11,6 @@ import jif.types.principal.Principal;
 
 public interface LabelEnv
 {
-    // adds "p1 acts for p2" into the principal hierarchy
-    void addActsFor(Principal p1, Principal p2);
-    
-    // adds "p1 acts for p2" and "p2 acts for p1" into the principal hierarchy
-    void addEquiv(Principal p1, Principal p2);
-    
-    // adds the assertion "L1 <= L2"
-    void addAssertionLE(Label L1, Label L2);
-    
-    // adds the assertions "L1 <= L2" and "L2 <= L1"
-    void addEquiv(Label L1, Label L2);
-    
     // returns true if "L1 <= L2"
     boolean leq(Label L1, Label L2);
 
@@ -33,9 +21,6 @@ public interface LabelEnv
     boolean leq(Policy p1, Policy p2, SearchState state);
 
     PrincipalHierarchy ph();
-
-    // make a copy of this environment
-    LabelEnv copy(); 
 
     /**
      * Finds an upper bound for L using the assertions in this environment.
@@ -57,8 +42,6 @@ public interface LabelEnv
 
     /**
      * Trigger any writersToReaders transforms in label, and return the result.
-     * @param label
-     * @return
      */
     Label triggerTransforms(Label label);
     

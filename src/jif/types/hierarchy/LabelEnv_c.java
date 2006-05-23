@@ -83,7 +83,7 @@ public class LabelEnv_c implements LabelEnv
     public void addAssertionLE(Label L1, Label L2) {
         addAssertionLE(L1, L2, true);
     }
-    public boolean addAssertionLE(Label L1, Label L2, boolean updateDisplayString) {
+    private boolean addAssertionLE(Label L1, Label L2, boolean updateDisplayString) {
         // clear the cache of false leq results, since this may let us prove more results
         cacheFalse.clear();
         boolean added = false;
@@ -133,7 +133,7 @@ public class LabelEnv_c implements LabelEnv
         displayLabelAssertions.append(L1 + " equiv " + L2);        
     }
     
-    public LabelEnv copy() {
+    public LabelEnv_c copy() {
         return new LabelEnv_c(ts, ph.copy(), new LinkedList(labelAssertions), 
                               displayLabelAssertions.toString(), 
                               hasVariables, useCache, this);
@@ -218,7 +218,7 @@ public class LabelEnv_c implements LabelEnv
             return b.booleanValue();
         }        
         boolean result = leqImpl(L1, L2, state);
-        cacheResult(g, result);
+        cacheResult(g, state, result);
         return result;
     }
     
@@ -246,17 +246,13 @@ public class LabelEnv_c implements LabelEnv
         return null;
     }
     
-    protected void cacheResult(LeqGoal g, boolean result) {
-        if (!useCache || this.hasVariables()) {
+    protected void cacheResult(LeqGoal g, SearchState s, boolean result) {
+        if (!useCache || this.hasVariables() || !((SearchState_c)s).auc.allZero()) {
             return;
         }
         
-        if (result) {   
-            cacheTrue.add(g); 
-        }
-        else {
-            cacheFalse.add(g);
-        }
+        // add the result to the correct cache.
+        (result?cacheTrue:cacheFalse).add(g); 
     }
         
     /**
@@ -761,6 +757,9 @@ public class LabelEnv_c implements LabelEnv
             this.tally = new HashMap(auc.tally);
         }
         
+        public boolean allZero() {
+            return tally.isEmpty();
+        }
         public int get(Assertion a) {
             Integer i = (Integer)tally.get(a);
             return i==null?0:i.intValue();
