@@ -53,7 +53,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
 
         if (ts.isLabeled(t)) {
             return ts.labeledType(t.position(),
-                                  substType(ts.unlabel(t)),
+                                  uncachedSubstType(ts.unlabel(t)),
                                   substLabel(ts.labelOfType(t)));
         }
 
@@ -72,7 +72,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
 
     public MethodInstance substMethod(MethodInstance mi) {
         mi = super.substMethod(mi);
-
+        
         if (mi instanceof JifProcedureInstance) {
             JifProcedureInstance jmi = (JifProcedureInstance)mi;
 
