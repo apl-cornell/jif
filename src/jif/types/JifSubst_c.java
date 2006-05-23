@@ -47,13 +47,21 @@ public class JifSubst_c extends Subst_c implements JifSubst
     ////////////////////////////////////////////////////////////////
     // Override substitution methods to handle Jif constructs
 
-
+    protected boolean cacheTypeEquality(Type t1, Type t2) {
+        // don't strip away the instantiation info. At worst, we'll return
+        // false more often than we need to, resulting in more instantiations.
+        // But at least it'll be correct, otherwise we end up with, say,
+        // C[L1] and C[L2] being regarded as equal, and thus having the same
+        // substitution.
+        return ((JifTypeSystem)ts).equalsNoStrip(t1, t2);
+    }
+    
     public Type uncachedSubstType(Type t) {
         JifTypeSystem ts = (JifTypeSystem) this.ts;
 
         if (ts.isLabeled(t)) {
             return ts.labeledType(t.position(),
-                                  uncachedSubstType(ts.unlabel(t)),
+                                  substType(ts.unlabel(t)),
                                   substLabel(ts.labelOfType(t)));
         }
 

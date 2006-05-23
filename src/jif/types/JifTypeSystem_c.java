@@ -304,7 +304,7 @@ public class JifTypeSystem_c
     public boolean equalsNoStrip(TypeObject t1, TypeObject t2) {
         return super.equals(t1, t2);        
     }
-    public boolean equals(TypeObject t1, TypeObject t2) {
+    public boolean equalsStrip(TypeObject t1, TypeObject t2) {
         if (t1 instanceof Type) {
             t1 = strip((Type)t1);
         }
@@ -313,10 +313,15 @@ public class JifTypeSystem_c
             t2 = strip((Type)t2);
         }
 
-        return super.equals(t1, t2);
+        return super.equals(t1, t2);        
     }
+    
+    public boolean equals(TypeObject t1, TypeObject t2) {
+        return equalsStrip(t1, t2);
+    }
+    
     public boolean typeEquals(Type t1, Type t2) {
-        return super.typeEquals(strip(t1), strip(t2));
+        return equals(t1, t2);
     }
 
     /**
@@ -1098,7 +1103,7 @@ public class JifTypeSystem_c
      * primitive, or it has a toString() method.
      */
     public boolean canCoerceToString(Type t, Context c) {
-        if (this.equals(t, this.String()) || (t.isPrimitive() && 
+        if (this.equalsStrip(t, this.String()) || (t.isPrimitive() && 
                                               !isPrincipal(t) && !isLabel(t))) {
             return true;
         }

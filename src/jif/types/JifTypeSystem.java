@@ -217,6 +217,10 @@ public interface JifTypeSystem extends ParamTypeSystem
      * Compares t1 to t2 without stripping off all the parameters and labels
      */
     boolean equalsNoStrip(TypeObject t1, TypeObject t2);
+    /**
+     * Compares t1 to t2, stripping off all the parameters and labels
+     */
+    boolean equalsStrip(TypeObject t1, TypeObject t2);
 
     LabelTypeCheckUtil labelTypeCheckUtil();
 }

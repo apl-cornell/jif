@@ -235,7 +235,7 @@ public class SubtypeChecker
             Set checkedPossibles = new HashSet();
             while (!subPossibles.isEmpty()) {
                 JifClassType poss = (JifClassType)subPossibles.removeFirst();
-                if (ts.equals(polyTypeForClass(poss), polyTypeForClass(sup))) {
+                if (ts.equalsStrip(polyTypeForClass(poss), polyTypeForClass(sup))) {
                     // Insert constraints between parameters.
                     addParamConstraints(lc, pos, sup, poss);
                     return true;
