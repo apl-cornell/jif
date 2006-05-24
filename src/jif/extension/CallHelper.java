@@ -454,7 +454,7 @@ public class CallHelper {
     }
 
     private PathMap excPathMap(LabelChecker lc, Label returnLabel, Label pcPriorToInvoke, List throwTypes) throws SemanticException {
-        JifTypeSystem ts = (JifTypeSystem)lc.typeSystem();
+        JifTypeSystem ts = lc.typeSystem();
         PathMap Xexn = ts.pathMap();
 
         for (Iterator e = pi.throwTypes().iterator(); e.hasNext();) {

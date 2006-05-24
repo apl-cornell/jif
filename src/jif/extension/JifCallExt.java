@@ -69,8 +69,6 @@ public class JifCallExt extends Jif_c
         A = (JifContext) A.pushBlock();
         
         boolean npExc = false;
-        Label excPath = null;
-        
         Label objLabel = null;
         
         if (target instanceof Expr) {
