@@ -1,8 +1,8 @@
 /**
  * This class represents a Ship in the BattleShip game.
  *
- * A ship has a length, the bottom left position, and whether the ship
- * is laid out horizontally or vertically.  
+ * A ship has a length, a coordinate for the bottom left position, and 
+ * a flag indicating whether the ship is laid out horizontally or vertically.  
  *
  * It is parameterized by the label L, which is the level of information 
  * that the ship contains.
@@ -35,7 +35,7 @@ public class Ship[label L] implements JifObject[L] {
     /**
      * Does the ship cover the co-ordinate coord?
      */
-    public boolean{L;coord} covers(Coordinate[L] coord) {
+    public boolean{*lbl;L;coord} covers(Coordinate[lbl] coord, label lbl) {
 	Coordinate[L] pos = this.pos;
 	if (coord == null || pos == null) 
 	    return false;
@@ -56,12 +56,11 @@ public class Ship[label L] implements JifObject[L] {
      * Does this Ship intersect with the Ship ship?
      */
     public boolean{L;ship} intersects(Ship[L] ship) {
-	if (ship == null)
-	    return false;
+	if (ship == null) return false;
 
 	Coordinate[L] c = this.pos;
 	for (int i = 0; i < length && c != null; i++) {
-	    if (ship.covers(c)) 
+	    if (ship.covers(c, L)) 
 		return true;
 
 	    if (isHorizontal) {
@@ -92,9 +91,9 @@ public class Ship[label L] implements JifObject[L] {
 	Coordinate[L] pos = this.pos;
 	if (pos == null) pos = new Coordinate[L](0,0);
 	return 
-	    pos.hashCode() + 
-	    31 * length + 
-	    (isHorizontal ? 97 : 0);
+	    pos.hashCode() ^ 
+	    (4007 * length) ^ 
+	    (isHorizontal ? 1861 : 2713);
     }
 
     public boolean{lbl;*lbl;L;o} equals(label lbl, IDComparable[lbl] o) {
@@ -105,8 +104,8 @@ public class Ship[label L] implements JifObject[L] {
 
         Ship[lbl] that = (Ship[lbl])o;
 
-            // use local variables to allow the NullPointerException
-            // analysis to work.
+        // use local variables to allow the NullPointerException
+        // analysis to work.
         Coordinate[L] thispos = this.pos;
         Coordinate[lbl] thatpos = that.pos;
 
