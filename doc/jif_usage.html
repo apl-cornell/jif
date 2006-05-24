@@ -24,6 +24,10 @@ where [options] includes:
   -bootclasspath &lt;path&gt;    path for bootstrap class files
   -ext &lt;extension&gt;         use language extension
   -extclass &lt;ext-class&gt;    use language extension
+  -commandlineonly         only compile files named on the command-line (may
+                           also require -c)
+  -preferclassfiles        prefer class files to source files even if the 
+                           source is newer
   -fqcn                    use fully-qualified class names
   -sx &lt;ext&gt;                set source extension
   -ox &lt;ext&gt;                set output extension
@@ -35,25 +39,32 @@ where [options] includes:
   -noserial                disable class serialization
   -nooutput                delete output files after compilation
   -c                       compile only to .java
+  -outputamb               allow generating code from ambiguous nodes
   -post &lt;compiler&gt;         run javac-like compiler after translation
   -v -verbose              print verbose debugging information
-  -report &lt;topic&gt;=&lt;level&gt;  print verbose debugging information about topic
+  -report &lt;topic&gt;=&lt;level&gt;  print verbose debugging information about topic 
                            at specified verbosity
-        Allowed topics: imports, jl, serialize, types, frontend, time,
-        resolver, cfg, visit, dataflow, debug, errors, context, loader,
-        verbose, qq
+        Allowed topics: imports, jl, labelEnv, serialize, types, frontend, 
+        time, resolver, cfg, visit, labels, error, dataflow, solver, jif, 
+        debug, errors, context, loader, verbose, qq
   -version                 print version info
   -h                       print this message
-  -e -explain              provide more detailed explanations of failed
+  -e -explain              provide more detailed explanations of failed 
                            label checking.
-  -debug &lt;n&gt;               set debug level to n. Prints more information
+  -robust                  enable checking of robustness conditions for 
+                           downgrading
+  -debug &lt;n&gt;               set debug level to n. Prints more information 
                            about labels.
   -stop_constraint &lt;n&gt;     halt when the nth constraint is added
-  -globalsolve             infer label variables globally (default: per
+  -globalsolve             infer label variables globally (default: per 
                            class)
-  -sigcp &lt;path&gt;            path for Jif signatures (e.g. for
+  -sigcp &lt;path&gt;            path for Jif signatures (e.g. for 
                            java.lang.Object)
+  -addsigcp &lt;path&gt;         additional path for Jif signatures; prepended to 
+                           sigcp
   -rtcp &lt;path&gt;             path for Jif runtime classes
+  -addrtcp &lt;path&gt;          additional path for Jif runtime classes; 
+                           prepended to rtcp
 </pre></div>
 
 

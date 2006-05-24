@@ -3,6 +3,41 @@ Jif Change Log
 
 This file documents changes between releases of Jif.
 
+2006-05-29    Jif 3.0.0
+    * Added integrity
+       * See the Jif manual for a full explanation.
+       * Labels now form a complete lattice (meet operation supported).
+       * Top and bottom principals now explicitly represented.
+    * Optional checking for robustness
+       * See the Jif manual for a full explanation.
+       * Label checking rules to enforce robustness for downgrading
+         can be turned on using the "-robust" command line option.
+    * More flexible syntax for labels.
+       * See the Jif manual for a full explanation.
+       * UTF-8 encoded source files accepted
+       * A reader policy "p:q" can also be written "p->q" or "p→q" (Unicode character )
+       * A reader policy "p<-q" can also be written "p->q" or "p←q" (Unicode character )
+       
+robustness
+ - syntax for policies, incl UTF-8 encoding
+
+conjunctive and disjunctive principals
+
+modification to downgrade syntax i.e. declassify(e, L to L')
+
+actsfor and label tests may be used as arbitrary boolean expressions. if used as a conjunct of an if-statement, they will update the label env of the consequent
+
+expanded manual
+
+equiv for where constraints and label and principal tests
+
+hashmap and hashset implementations
+
+script for producing statistics on Jif code. Use $JIF/bin/jc, and the "-report time=1" flag to generate info on the number of downgrades, number of annotations, etc.
+
+bug fixes
+
+
 2006-03-13    Jif 2.0.1
     * Numerous bug fixes.
     * Label less-than-or-equal constraints for methods.
