@@ -394,39 +394,99 @@ field access is join of the normal value label of <code>c</code> and
 
 <h2><a name="var-assignment">Variable assignment</a></h2> 
 
-<p>A variable assignment of the form <code>x=e</code>, where
-<code>x</code> is a local variable, requires the normal value label of
-<code>e</code> to be no more restrictive than the label of
-<code>x</code>. See <a class="secref" href="#local-vars">Local variable declarations</a> for details of the
-label of a local variable.</p>
+<p>Variable assignments include assignments to both local variables
+and to fields. Assignments to elements of arrays are described <a
+href="#arrays">below</a>.</p>
 
-
-<p>For a field assignment <code>e<sub>1</sub>.f = e</code>, the normal
-value label of <code>e</code> is required to be no more restrictive
-than the label of the field <code>f</code>, which is defined to be XXX. XXX Evaluation order for <code>e<sub>1</sub>.f = e</code>?
+<p>For a local variable <code>x</code>, an assignment <code>x=<i
+class="math">e</i></code> is evaluated by first evaluating the
+expression <i class="math">e</i>, and then performing the
+assignment. The label checking of <code>x=<i class="math">e</i></code>
+is straightforward: the expression <i class="math">e</i> is label
+checked using the same program counter label as the assignment itself,
+and the normal value label of <i class="math">e</i> is required to be
+no more restrictive than the label of <code>x</code>. See <a
+class="secref" href="#local-vars">Local variable declarations</a> for
+the definition of the label of a local variable. The assignment
+<code>x=<i class="math">e</i></code> throws only the exceptions thrown
+by <i class="math">e</i>. The normal and exception termination labels
+are therefore the same as that for <i class="math">e</i>. The normal
+value label of the assignment expression is also the same as that of <i
+class="math">e</i>.
 </p>
 
-<p>If <code>x</code> is a local variable, the expression <code>x=e</code> throws only those
-exceptions thrown by <code>e</code>. The normal and exception termination labels
-are therefore the same as that for <code>e</code>. The normal value label of the assigment 
-expression is also the same as that of <code>e</code>. 
+<p>An assignment <code>x <i class="math">op</i>= <i
+class="math">e</i></code> for local variable <code>x</code> (such as
+<code>x*=4+y</code>) is label checked as if it were the assignment
+<code>x = x <i class="math">op</i> <i class="math">e</i></code> . In
+particular, if <i class="math">op</i> is the division
+('<code>/</code>') or modulo ('<code>%</code>') operator, operator,
+then label checking conservatively assumes that an
+<code>ArithmeticException</code> may be thrown, and the label
+associated with this expression is the normal value label of the
+expression <i class="math">e</i>. The normal value label for the right
+hand side of the assignment is the label of <code>x</code> joined with
+the normal value label of <i class="math">e</i>.</p>
+
+<p>An assignment to a field, <code><i class="math">e</i><sub>1</sub>.f
+= <i class="math">e</i><sub>2</sub></code>, is evaluated by first
+evaluating <code><i class="math">e</i><sub>1</sub></code>, then
+evaluating <code><i class="math">e</i><sub>2</sub></code>. At this
+point, if <code><i class="math">e</i><sub>1</sub></code> evaluated to
+<code>null</code>, then a <code>NullPointerException</code> is
+thrown. Otherwise, the assignment proceeds. Label checking a field
+assignment first label checks <code><i
+class="math">e</i><sub>1</sub></code> using the same program counter
+label as the program counter label for the assignment itself. The
+normal termination label of <code><i
+class="math">e</i><sub>1</sub></code> is then used as the program
+counter label to label check <code><i
+class="math">e</i><sub>2</sub></code>. If Jif's not-null dataflow
+analysis is unable to determine that the expression <code><i
+class="math">e</i><sub>1</sub></code> is always non-<code>null</code>,
+then a <code>NullPointerException</code> may be thrown, and the label
+associated with it is the normal value label of <code><i
+class="math">e</i><sub>1</sub></code> joined with the normal
+termination label of <code><i class="math">e</i><sub>2</sub></code>.
+The normal termination label of a field assignment (and also its
+normal value label) is thus the join of the normal value label of
+<code><i class="math">e</i><sub>1</sub></code> and the normal
+termination label of <code><i class="math">e</i><sub>2</sub></code>.
 </p>
 
-<p>An assignment expression of the form <code>e<sub>1</sub>.f=e</code>
-could throw a <code>NullPointerException</code> if
-<code>e<sub>1</sub></code> evaluates to null. XXX When? Evaluation
-order is important here! and also <code>e</code> may throw
-exceptions. And also metion the not-null dataflow analysis. The
-exception label for this would be the normal value label of
-<code>e<sub>1</sub></code>.
-</p>
 
-<p>PC bound XXX. Maybe do this section by first describing everything for locals, and then everything for fields.
+<p>We require that the information that may be revealed by the
+assignment occurring is allowed to flow into the field location. That
+is, the normal value labels of <code><i
+class="math">e</i><sub>1</sub></code> and <code><i
+class="math">e</i><sub>2</sub></code> must be no more restrictive than
+the label of the field <code><i
+class="math">e</i><sub>1</sub>.f</code>, which is defined to be the
+declared label of <code>f</code> with appropriate substitutions
+applied. That is, any formal label parameter or principal parameter
+occurring in the declared label of <code>f</code> is substituted based
+on the type of the expression of the target <code><i
+class="math">e</i><sub>1</sub></code>, and any occurrence of
+<code>this</code> in the final access paths of dynamic labels or
+principals is replaced with <code><i
+class="math">e</i><sub>1</sub></code>. Since an assignment to a field
+may be observable in other scopes, the label of the field <code><i
+class="math">e</i><sub>1</sub>.f</code> must be bounded below by the
+start-label of the current method, which is a lower bound on
+observable side-effects of the method.
 
-<p>XXX assignments may throw arithmetic exceptions. Also, the NV of an <code><i
-class="math">op</i>=</code> assignment is different to an <code>=</code> assignment.
 
-<p>XXX field assignments treated slightly differently if they occur in the constructor prologure. See Section XXX.
+<p>The label checking of an assignment <code><i
+class="math">e</i><sub>1</sub>.f <i class="math">op</i>= <i
+class="math">e</i><sub>2</sub></code> is identical to the label
+checking of the assignment <code><i class="math">e</i><sub>1</sub>.f =
+<i class="math">e</i><sub>1</sub>.f <i class="math">op</i> <i
+class="math">e</i><sub>2</sub></code>. </p> 
+
+<p>Assignments to fields that occur in a constructor prologue (that
+is, in a constructor body prior to the call to <code>super(...)</code>)
+are label checked slightly differently. Refer to <a class="secref"
+href="#constructors">Constructors</a> for more details.</p>
 
 
 <h2><a name="arrays">Arrays</a></h2>
