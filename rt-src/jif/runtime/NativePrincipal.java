@@ -81,7 +81,7 @@ public class NativePrincipal implements Principal {
     }
     
     public boolean equals(Principal p) {
-        return (this.name == p.name() || (this.name != null && 
+        return p != null && (this.name == p.name() || (this.name != null && 
                 this.name.equals(p.name()))) &&
                 	this.getClass() == p.getClass();        
     }
