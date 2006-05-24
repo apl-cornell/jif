@@ -129,13 +129,18 @@ public class JifTryExt extends JifStmtExt_c
 		Path p = (Path) iter.next();
 		finalPath = lc.upperBound(finalPath, X2.get(p));
 	    }
+            // at this point, final path is equal to the upper bound on all paths out of the finally block 
+            // This should be the normal path of f. Seeing an exception throw by the try or a catch block
+            // reveals that the finally block terminated normally.
+            
 	    for (Iterator iter = Xall.paths().iterator(); iter.hasNext(); ) {
 		Path p = (Path) iter.next();
 		if (p instanceof ExceptionPath) {
 		    Xall = Xall.set(p, lc.upperBound(Xall.get(p), finalPath));
 		}
 	    }
-	    X = Xall.join(X2);
+
+            X = Xall.join(X2);
 	}
 	else {
 	    X = Xall;

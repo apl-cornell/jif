@@ -292,10 +292,7 @@ public class LabelEnv_c implements LabelEnv
         
         if (L2.isTop()) return true;
         if (L1.isTop()) return false;
-        
-        if (L2 instanceof RuntimeLabel) return L1.isRuntimeRepresentable();
-        if (L1 instanceof RuntimeLabel) return false; // <= RT and TOP only.
-         
+                 
         // check the current goals, to make sure we don't go into an infinite
         // recursion...
         LeqGoal newGoal = new LeqGoal(L1, L2);

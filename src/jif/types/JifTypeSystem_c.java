@@ -1127,12 +1127,6 @@ public class JifTypeSystem_c
         if (L2.isTop() || L1.isBottom()) {
             return L2.simplify();
         }
-        if (L1 instanceof RuntimeLabel && L2.isRuntimeRepresentable()) {
-            return L1.simplify();
-        }
-        if (L2 instanceof RuntimeLabel && L1.isRuntimeRepresentable()) {
-            return L2.simplify();
-        }
         List l = CollectionUtil.list(L1, L2);
         Position pos = L1.position();
         if (pos == null) pos = L2.position();
@@ -1145,12 +1139,6 @@ public class JifTypeSystem_c
             return L2.simplify();
         }
         if (L2.isTop() || L1.isBottom()) {
-            return L1.simplify();
-        }
-        if (L1 instanceof RuntimeLabel && L2.isRuntimeRepresentable()) {
-            return L2.simplify();
-        }
-        if (L2 instanceof RuntimeLabel && L1.isRuntimeRepresentable()) {
             return L1.simplify();
         }
         List l = CollectionUtil.list(L1, L2);
