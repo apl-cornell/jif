@@ -142,7 +142,7 @@ public class JifOptions extends Options {
         super.usage(out);
         usageForFlag(out, "-e -explain", "provide more detailed " +
                                          "explanations of failed label checking.");
-        usageForFlag(out, "-norobust", "disable checking of robustness conditions for declassification");
+        usageForFlag(out, "-robust", "enable checking of robustness conditions for downgrading");
         usageForFlag(out, "-debug <n>", "set debug level to n. Prints more information about labels.");
         usageForFlag(out, "-stop_constraint <n>", "halt when the nth constraint is added");
         usageForFlag(out, "-globalsolve", "infer label variables globally (default: per class)");
