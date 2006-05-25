@@ -6,37 +6,38 @@ This file documents changes between releases of Jif.
 2006-05-29    Jif 3.0.0
     * Added integrity
        * See the Jif manual for a full explanation.
-       * Labels now form a complete lattice (meet operation supported).
-       * Top and bottom principals now explicitly represented.
+       * Labels now form a complete lattice (meet operation
+         supported).
     * Optional checking for robustness
        * See the Jif manual for a full explanation.
-       * Label checking rules to enforce robustness for downgrading
-         can be turned on using the "-robust" command line option.
-    * More flexible syntax for labels.
-       * See the Jif manual for a full explanation.
+       * Label checking rules to enforce robustness against all
+         attackers can be turned on using the "-robust" command line
+         option.
+    * Syntactical/lexical changes
        * UTF-8 encoded source files accepted
-       * A reader policy "p:q" can also be written "p->q" or "p→q" (Unicode character )
-       * A reader policy "p<-q" can also be written "p->q" or "p←q" (Unicode character )
-       
-robustness
- - syntax for policies, incl UTF-8 encoding
-
-conjunctive and disjunctive principals
-
-modification to downgrade syntax i.e. declassify(e, L to L')
-
-actsfor and label tests may be used as arbitrary boolean expressions. if used as a conjunct of an if-statement, they will update the label env of the consequent
-
-expanded manual
-
-equiv for where constraints and label and principal tests
-
-hashmap and hashset implementations
-
-script for producing statistics on Jif code. Use $JIF/bin/jc, and the "-report time=1" flag to generate info on the number of downgrades, number of annotations, etc.
-
-bug fixes
-
+       * A reader policy "p:q" can also be written "p->q" or
+         "p&#8594;q" (the arrow is Unicode character 8594)
+       * A writer policy "p<-q" can also be written "p->q" or
+         "p&#8592;q" (the arrow is Unicode character 8592)
+       * Downgrades now explicitly mention the from and to labels
+            e.g., declassify(h, {Alice:} to {Alice:Bob})
+    * Richer principals       
+       * Top and bottom principals now explicitly represented.
+       * Conjunctive and disjunctive principals now supported.
+    * Runtime label and principal tests
+       * A new binary operator "equiv" added. For principals, "p equiv
+         q" is equivalent to "p actsfor q" and "q actsfor p". For
+         labels, "L1 equiv L2" is equivalent to "L1 <= L2" and "L2 <=
+         L1".
+       * Principal and label comparisons can be used as arbitrary
+         boolean expressions. e.g., "boolean b = (p actsfor q);" if a
+         principal or label test occurs as a conjunct of an
+         if-statement, then the label environment used to label check
+         the consequent will include this fact.
+    * Jif manual significantly expanded, including section on the
+      label checking rules in Jif.
+    * Jif library code now has HashMap and HashSet implementations.
+    * Numerous bug fixes.
 
 2006-03-13    Jif 2.0.1
     * Numerous bug fixes.
@@ -71,7 +72,7 @@ bug fixes
       more information.
     * Misc bug fixes, including:
           * The label "this" cannot be used in a static context.
-          * Incorrect labels missing colons (e.g., {Alice}") are detected.
+          * Incorrect labels missing colons (e.g., "{Alice}") are detected.
           * Parameterized classes cannot be subclasses of 
             "java.lang.Throwable".
           * Final local variables require an initializer.
