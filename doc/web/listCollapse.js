@@ -1,10 +1,12 @@
 /***************************************************************************************
-        Nested list collapsing script written by Mark Wilton-Jones - 21/11/2003
+    Nested list collapsing script written by Mark Wilton-Jones - 21/11/2003
 Version 2.2.0 - this script takes existing HTML nested UL or OL lists, and collapses them
-            Updated 13/02/2004 to allow links in root of expanding branch
-                  Updated 09/09/2004 to allow state to be saved
-          Updated 07/10/2004 to allow page address links to be highlighted
+        Updated 13/02/2004 to allow links in root of expanding branch
+          Updated 09/09/2004 to allow state to be saved
+      Updated 07/10/2004 to allow page address links to be highlighted
 Updated 28/11/2004 to allow you to force expand/collapse links to use just the extraHTML
+Updated 23/5/2006 by Andrew Myers to animate the bullets and get rid of some unwanted
+                  functionality
 ****************************************************************************************
 
 Please see http://www.howtocreate.co.uk/jslibs/ for details and a demo of this script
@@ -18,7 +20,7 @@ _________________________________________________________________________
 
 Inbetween the <head> tags, put:
 
-	<script src="PATH TO SCRIPT/listCollapse.js" type="text/javascript" language="javascript1.2"></script>
+    <script src="PATH TO SCRIPT/listCollapse.js" type="text/javascript" language="javascript1.2"></script>
 _________________________________________________________________________
 
 Define the HTML. Note that to correctly nest lists, child OLs or ULs should be children of an LI element,
@@ -27,29 +29,29 @@ between the <li> tag and the <UL/OL/A> tag, and should only contain HTML that is
 element. Note; Opera 7 will lose any style attributes you define in this text - use classes instead.
 
 <ul id="someID">
-	<li>Book 1
-		<ul>
-			<li><a href="someHref">Chapter 1</a></li>
-			<li><a href="someHref">Chapter 2</a></li>
-		</ul>
-	</li>
-	<li><a href="elsewhere.html">Book 2</a>
-		<ul>
-			<li><a href="someHref">Chapter 1</a></li>
-			<li><a href="someHref">Chapter 2</a></li>
-		</ul>
-	</li>
-	<li>Book 3
-		<ul>
-			<li><a href="someHref">Chapter 1</a></li>
-			<li>Cha<span class="doMore">pt</span>er 2
-				<ul>
-					<li><a href="someHref">Sub 1</a></li>
-					<li><a href="someHref">Sub 2</a></li>
-				</ul>
-			</li>
-		</ul>
-	</li>
+    <li>Book 1
+        <ul>
+            <li><a href="someHref">Chapter 1</a></li>
+            <li><a href="someHref">Chapter 2</a></li>
+        </ul>
+    </li>
+    <li><a href="elsewhere.html">Book 2</a>
+        <ul>
+            <li><a href="someHref">Chapter 1</a></li>
+            <li><a href="someHref">Chapter 2</a></li>
+        </ul>
+    </li>
+    <li>Book 3
+        <ul>
+            <li><a href="someHref">Chapter 1</a></li>
+            <li>Cha<span class="doMore">pt</span>er 2
+                <ul>
+                    <li><a href="someHref">Sub 1</a></li>
+                    <li><a href="someHref">Sub 2</a></li>
+                </ul>
+            </li>
+        </ul>
+    </li>
 </ul>
 ________________________________________________________________________
 Now you need to trigger the collapsing, using <body onload, window.onload or by putting the collapse
@@ -100,72 +102,93 @@ selfLink(theRootID,newClass,shouldExpandBranch);
   address hash and port are not included in the comparison - links containing href="#" are always ignored
 
 My cookie script is available on http://www.howtocreate.co.uk/jslibs/
-	<body onload="compactMenu('someID',true,'&plusmn; ');stateToFromStr(theRootID,retrieveCookie('menuState'));"
-	onunload="setCookie('menuState',stateToFromStr(theRootID),31536000);">
+    <body onload="compactMenu('someID',true,'&plusmn; ');stateToFromStr(theRootID,retrieveCookie('menuState'));"
+    onunload="setCookie('menuState',stateToFromStr(theRootID),31536000);">
 ____________________________________________________________________________________________________*/
 var openLists = [], oIcount = 0;
-function compactMenu(oID,oAutoCol,oPlMn,oMinimalLink) {
-	if( !document.getElementsByTagName || !document.childNodes || !document.createElement ) { return; }
-	var baseElement = document.getElementById( oID ); if( !baseElement ) { return; }
-	compactChildren( baseElement, 0, oID, oAutoCol, oPlMn, baseElement.tagName.toUpperCase(), oMinimalLink && oPlMn );
+
+function compactMenu(oID,oAutoCol,oMinimalLink) {
+    if( !document.getElementsByTagName || !document.childNodes || !document.createElement ) { return; }
+    var baseElement = document.getElementById( oID );
+    if( !baseElement ) { return; }
+    compactChildren( baseElement, 0, oID, oAutoCol, baseElement.tagName.toUpperCase(), oMinimalLink && oPlMn );
 }
-function compactChildren( oOb, oLev, oBsID, oCol, oPM, oT, oML ) {
-	if( !oLev ) { oBsID = escape(oBsID); if( oCol ) { openLists[oBsID] = []; } }
-	for( var x = 0, y = oOb.childNodes; x < y.length; x++ ) { if( y[x].tagName ) {
-		//for each immediate LI child
-		var theNextUL = y[x].getElementsByTagName( oT )[0];
-		if( theNextUL ) {
-			//collapse the first UL/OL child
-			theNextUL.style.display = 'none';
-			//create a link for expanding/collapsing
-			var newLink = document.createElement('A');
-			newLink.setAttribute( 'href', '#' );
-			newLink.onclick = new Function( 'clickSmack(this,' + oLev + ',\'' + oBsID + '\',' + oCol + ',\'' + escape(oT) + '\');return false;' );
-			//wrap everything upto the child U/OL in the link
-			if( oML ) { var theHTML = ''; } else {
-				var theT = y[x].innerHTML.toUpperCase().indexOf('<'+oT);
-				var theA = y[x].innerHTML.toUpperCase().indexOf('<A');
-				var theHTML = y[x].innerHTML.substr(0, ( theA + 1 && theA < theT ) ? theA : theT );
-				while( !y[x].childNodes[0].tagName || ( y[x].childNodes[0].tagName.toUpperCase() != oT && y[x].childNodes[0].tagName.toUpperCase() != 'A' ) ) {
-					y[x].removeChild( y[x].childNodes[0] ); }
-			}
-			y[x].insertBefore(newLink,y[x].childNodes[0]);
-			y[x].childNodes[0].innerHTML = oPM + theHTML.replace(/^\s*|\s*$/g,'');
-			theNextUL.MWJuniqueID = oIcount++;
-			compactChildren( theNextUL, oLev + 1, oBsID, oCol, oPM, oT, oML );
-} } } }
-function clickSmack( oThisOb, oLevel, oBsID, oCol, oT ) {
-	if( oThisOb.blur ) { oThisOb.blur(); }
-	oThisOb = oThisOb.parentNode.getElementsByTagName( unescape(oT) )[0];
-	if( oCol ) {
-		for( var x = openLists[oBsID].length - 1; x >= oLevel; x-=1 ) { if( openLists[oBsID][x] ) {
-			openLists[oBsID][x].style.display = 'none'; if( oLevel != x ) { openLists[oBsID][x] = null; }
-		} }
-		if( oThisOb == openLists[oBsID][oLevel] ) { openLists[oBsID][oLevel] = null; }
-		else { oThisOb.style.display = 'block'; openLists[oBsID][oLevel] = oThisOb; }
-	} else { oThisOb.style.display = ( oThisOb.style.display == 'block' ) ? 'none' : 'block'; }
+
+function compactChildren( base, oLev, oBsID, oCol, oT, oML) {
+    if( !oLev ) { oBsID = escape(oBsID); if( oCol ) { openLists[oBsID] = []; } }
+    for( var x = 0, y = base.childNodes; x < y.length; x++ ) {
+      if( y[x].tagName ) {
+        //for each immediate LI child
+        var theNextUL = y[x].getElementsByTagName( oT )[0];
+        if( theNextUL ) {
+            //collapse the first UL/OL child
+            theNextUL.style.display = 'none';
+            //create a link for expanding/collapsing
+            var newLink = document.createElement('A');
+            newLink.setAttribute( 'href', '#' );
+            newLink.onclick = new Function( 'clickSmack(this,' + oLev + ',\'' + oBsID + '\',' + oCol + ',\'' + escape(oT) + '\');return false;' );
+	    newLink.insertBefore(document.createTextNode(closedBullet), newLink.childNodes[0]);
+            //wrap everything upto the child U/OL in the link
+            if( oML ) { var theHTML = ''; } else {
+                var theT = y[x].innerHTML.toUpperCase().indexOf('<'+oT);
+                var theA = y[x].innerHTML.toUpperCase().indexOf('<A');
+                var theHTML = y[x].innerHTML.substr(0, ( theA + 1 && theA < theT ) ? theA : theT );
+                while( !y[x].childNodes[0].tagName ||
+                    ( y[x].childNodes[0].tagName.toUpperCase() != oT && y[x].childNodes[0].tagName.toUpperCase() != 'A' ) ) {
+                    y[x].removeChild( y[x].childNodes[0] ); }
+            }
+            y[x].insertBefore(newLink, y[x].childNodes[0]);
+            //y[x].childNodes[0].innerHTML = theHTML.replace(/^\s*|\s*$/g,'');
+            theNextUL.MWJuniqueID = oIcount++;
+            compactChildren( theNextUL, oLev + 1, oBsID, oCol, oT, oML, leafBullet );
+	} else {
+	    y[x].insertBefore(document.createTextNode(leafBullet), y[x].childNodes[0]);
+	}
+      }
+    }
+}
+
+function clickSmack( thisObj, oLevel, oBsID, oCol, oT ) {
+    var p = thisObj.parentNode;
+    var body = p.getElementsByTagName(unescape(oT))[0];
+    var abullet = thisObj;
+    abullet.removeChild(abullet.childNodes[0]);
+    if (body.style.display == 'block') {
+	body.style.display = 'none';
+	abullet.insertBefore(document.createTextNode(closedBullet), abullet.childNodes[0]);
+    } else {
+	body.style.display = 'block';
+	abullet.insertBefore(document.createTextNode(openBullet), abullet.childNodes[0]);
+    }
 }
 function stateToFromStr(oID,oFStr) {
-	if( !document.getElementsByTagName || !document.childNodes || !document.createElement ) { return ''; }
-	var baseElement = document.getElementById( oID ); if( !baseElement ) { return ''; }
-	if( !oFStr && typeof(oFStr) != 'undefined' ) { return ''; } if( oFStr ) { oFStr = oFStr.split(':'); }
-	for( var oStr = '', l = baseElement.getElementsByTagName(baseElement.tagName), x = 0; l[x]; x++ ) {
-		if( oFStr && MWJisInTheArray( l[x].MWJuniqueID, oFStr ) && l[x].style.display == 'none' ) { l[x].parentNode.getElementsByTagName('a')[0].onclick(); }
-		else if( l[x].style.display != 'none' ) { oStr += (oStr?':':'') + l[x].MWJuniqueID; }
-	}
-	return oStr;
+    if( !document.getElementsByTagName || !document.childNodes || !document.createElement ) { return ''; }
+    var baseElement = document.getElementById( oID ); if( !baseElement ) { return ''; }
+    if( !oFStr && typeof(oFStr) != 'undefined' ) { return ''; } if( oFStr ) { oFStr = oFStr.split(':'); }
+    for( var oStr = '', l = baseElement.getElementsByTagName(baseElement.tagName), x = 0; l[x]; x++ ) {
+        if( oFStr && MWJisInTheArray( l[x].MWJuniqueID, oFStr ) && l[x].style.display == 'none' ) { l[x].parentNode.getElementsByTagName('a')[0].onclick(); }
+        else if( l[x].style.display != 'none' ) { oStr += (oStr?':':'') + l[x].MWJuniqueID; }
+    }
+    return oStr;
 }
 function MWJisInTheArray(oNeed,oHay) { for( var i = 0; i < oHay.length; i++ ) { if( oNeed == oHay[i] ) { return true; } } return false; }
 function selfLink(oRootElement,oClass,oExpand) {
-	if(!document.getElementsByTagName||!document.childNodes) { return; }
-	oRootElement = document.getElementById(oRootElement);
-	for( var x = 0, y = oRootElement.getElementsByTagName('a'); y[x]; x++ ) {
-		if( y[x].getAttribute('href') && !y[x].href.match(/#$/) && getRealAddress(y[x]) == getRealAddress(location) ) {
-			y[x].className = (y[x].className?(y[x].className+' '):'') + oClass;
-			if( oExpand ) {
-				oExpand = false;
-				for( var oEl = y[x].parentNode, ulStr = ''; oEl != oRootElement && oEl != document.body; oEl = oEl.parentNode ) {
-					if( oEl.tagName && oEl.tagName == oRootElement.tagName ) { ulStr = oEl.MWJuniqueID + (ulStr?(':'+ulStr):''); } }
-				stateToFromStr(oRootElement.id,ulStr);
+    if(!document.getElementsByTagName||!document.childNodes) { return; }
+    oRootElement = document.getElementById(oRootElement);
+    for( var x = 0, y = oRootElement.getElementsByTagName('a'); y[x]; x++ ) {
+        if( y[x].getAttribute('href') && !y[x].href.match(/#$/) && getRealAddress(y[x]) == getRealAddress(location) ) {
+            y[x].className = (y[x].className?(y[x].className+' '):'') + oClass;
+            if( oExpand ) {
+                oExpand = false;
+                for( var oEl = y[x].parentNode, ulStr = ''; oEl != oRootElement && oEl != document.body; oEl = oEl.parentNode ) {
+                    if( oEl.tagName && oEl.tagName == oRootElement.tagName ) { ulStr = oEl.MWJuniqueID + (ulStr?(':'+ulStr):''); } }
+                stateToFromStr(oRootElement.id,ulStr);
 } } } }
-function getRealAddress(oOb) { return oOb.protocol + ( ( oOb.protocol.indexOf( ':' ) + 1 ) ? '' : ':' ) + oOb.hostname + ( ( typeof(oOb.pathname) == typeof(' ') && oOb.pathname.indexOf('/') != 0 ) ? '/' : '' ) + oOb.pathname + oOb.search; }
+
+function getRealAddress(base) {
+    return base.protocol + ( ( base.protocol.indexOf( ':' ) + 1 ) ? '' : ':' ) +
+	base.hostname + ( ( typeof(base.pathname) == typeof(' ') &&
+			   base.pathname.indexOf('/') != 0 ) ? '/' : '' ) +
+	base.pathname + base.search;
+}
+
