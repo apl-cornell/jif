@@ -60,12 +60,6 @@ public class JifSpecialExt extends Jif_c
 	JifContext A = lc.jifContext();
 	A = (JifContext) se.del().enterScope(A);
 
-	if (se.kind() != Special.THIS) {
-	    throw new SemanticException(
-		"Jif does not currently support the expression \"super\". " +
-                "Use \"this\" instead.", se.position());
-	}
-
 	JifClassType ct = (JifClassType) A.currentClass();
 	
 	se = (Special)se.type(ts.labeledType(se.position(), ct, ct.thisLabel()));
