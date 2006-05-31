@@ -76,9 +76,8 @@ span.bibbook {
 
 h1, h2, h3, h4, a.secref { font-family: sans-serif; font-weight: bold }
 
-li.sec { list-style-type: none }
-li.sec a { font-family: sans-serif }
-li.ssec { list-style-type: none }
-li.ssec a { font-family: sans-serif; font-size: 90% }
-li.sssec { list-style-type: none }
-li.sssec a { font-family: sans-serif; font-size: 85% }
+li.sec, li.ssec, li.sssec { list-style-type: none; font-family: sans-serif }
+
+li.sec a { font-size: 100% }
+li.ssec a { font-size: 90% }
+li.sssec a { font-size: 85% }
