@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import jif.lang.Label;
+
 /**
  * This class provides some useful utilities for Jif programs using Java's
  * sockets.
@@ -17,12 +19,13 @@ public class SocketUtil {
      * @param ss
      * @param a
      */
-    public void acceptConnections(ServerSocket ss, final SocketAcceptor a) {
+    public void acceptConnections(Label lbl, ServerSocket ss, final SocketAcceptor a) {
         if (ss == null || a == null) return;
         while (true) {
             try {
-                Socket s = ss.accept();                
-                new Thread(new SocketAcceptorRunner(a,s)).run();                               
+                Socket s = ss.accept();  
+                new Thread(new SocketAcceptorRunner(a,s)).run();   
+                s.close();
             }
             catch (Exception e) {
                 // recover silently

@@ -6,9 +6,11 @@
  */
 package jif.net;
 
+import java.net.*;
+
 public class SocketUtil {
     private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
     private SocketUtil() { }
 
-    public native void acceptConnections{}(ServerSocket{} ss, final SocketAcceptor{} a);
+    public native void acceptConnections{}(label lbl, ServerSocket[lbl]{} ss, final SocketAcceptor{} a);
 }

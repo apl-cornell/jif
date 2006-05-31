@@ -1017,7 +1017,7 @@ public class JifTypeSystem_c
             FieldInstance fi =
                 ct.fieldNamed("__JIF_SIG_OF_JAVA_CLASS$20030619");
             if (fi != null
-                && fi.flags().isPrivate()
+                && (fi.flags().isPrivate() || ct.flags().isInterface())
                 && fi.flags().isStatic()) {
                 return false;
             }
