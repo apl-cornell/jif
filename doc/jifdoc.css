@@ -41,7 +41,7 @@ ol {
 }
 .code {
       width: 90ex;
-      font-family: Courier New, courier, fixed;
+      font-family: Courier New, courier, System, fixed;
       font-size: 90%;
       background-color: rgb(230,230,230);
       border: solid;
@@ -75,6 +75,8 @@ span.bibbook {
 }
 
 h1, h2, h3, h4, a.secref { font-family: sans-serif; font-weight: bold }
+
+a.secref { font-size: 90% }
 
 li.sec, li.ssec, li.sssec { list-style-type: none; font-family: sans-serif }
 
