@@ -280,7 +280,7 @@ ext="-extclass split.ExtensionInfo"
        Jif targets
        ****************************************  -->
 
-    <target name="jif" depends="jif-base,jif-runtime,jif-sig,jif-lib" />
+    <target name="jif" depends="jif-base,jif-runtime,jif-sig,jif-lib" description="Build the Jif compiler and libraries"/>
 
     <target name="jif-base" depends="init,configure">
         <antcall target="standard-ext">
