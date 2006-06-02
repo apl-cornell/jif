@@ -19,7 +19,7 @@ public class SocketUtil {
      * @param ss
      * @param a
      */
-    public void acceptConnections(Label lbl, ServerSocket ss, final SocketAcceptor a) {
+    public static void acceptConnections(Label lbl, ServerSocket ss, final SocketAcceptor a) {
         if (ss == null || a == null) return;
         while (true) {
             try {
@@ -33,7 +33,7 @@ public class SocketUtil {
         }
         
     }
-    private class SocketAcceptorRunner implements Runnable {
+    private static class SocketAcceptorRunner implements Runnable {
         private final SocketAcceptor a;
         private final Socket s;
         SocketAcceptorRunner(SocketAcceptor a, Socket s) {
