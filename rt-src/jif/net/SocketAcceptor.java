@@ -1,5 +1,6 @@
 package jif.net;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -8,5 +9,5 @@ import java.io.OutputStream;
  * SocketUtil.acceptConnections.
  */
 public interface SocketAcceptor {
-    void accept(InputStream input, OutputStream output);
+    void accept(InputStream input, OutputStream output) throws IOException;
 }
