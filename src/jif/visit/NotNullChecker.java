@@ -69,9 +69,10 @@ public class NotNullChecker extends DataFlow
 		(e instanceof ArrayInit ) ||
 		(e instanceof Special ) ||
 		(e instanceof Lit && !(e instanceof NullLit)) ||
+                (e instanceof Binary && ((Binary)e).type().typeSystem().String().equals(((Binary)e).type())) ||
 		(e instanceof Cast && exprIsNotNullStatic(((Cast)e).expr())) ||
                 (e instanceof DowngradeExpr && exprIsNotNullStatic(((DowngradeExpr)e).expr())) ||
-                (e instanceof Conditional && exprIsNotNullStatic(((Conditional)e).consequent()) && exprIsNotNullStatic(((Conditional)e).alternative()));
+                (e instanceof Conditional && exprIsNotNullStatic(((Conditional)e).consequent()) && exprIsNotNullStatic(((Conditional)e).alternative()));                
         }        
         boolean exprIsNotNull(Expr e) {
             // expression is not null if it is a "new" expression,
