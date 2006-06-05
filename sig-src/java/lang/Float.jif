@@ -6,7 +6,7 @@
  */
 package java.lang;
 
-public final class Float /*extends Number implements Comparable*/ {
+public final class Float extends Number /*implements Comparable*/ {
     private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
 
     public static final float{*!:*} POSITIVE_INFINITY = 1.0f; // PLACEHOLDER ONLY
