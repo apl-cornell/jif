@@ -10,5 +10,5 @@ import java.io.*;
 
 public interface SocketAcceptor {
     static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
-    void accept{}(InputStream[{}]{} input, OutputStream[{}]{} output);
+    void accept{}(InputStream[{}]{} input, OutputStream[{}]{} output) throws (IOException{});
 }
