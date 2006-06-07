@@ -60,7 +60,7 @@ i.e. you have a file <code>Foo.java</code>, and a file
 Jif signature for the class <code>Foo</code>; at compile time, your Jif code will
 be compiled against the signature you provide, but at runtime the
 original <code>Foo.class</code> will be loaded. The steps for doing this are as
-follows:
+follows:</p>
 
 <ol>
 <li> In a file <code>Foo.jif</code> write an appropriate Jif signature for the
@@ -95,7 +95,58 @@ follows:
 </li>
 </ol>
 
-Two other indicator fields can also be used in the Jif signature file of a 
+<p>More explicitly, here is a suggested directory structure.</p>
+<div class="code"><pre>
+jif-src/
+   Bar.jif <span class="comment">// Jif code that uses the Java class Foo</span>
+
+java-src/
+   Foo.java <span class="comment">// Java source code</span>
+   Quux.java <span class="comment">// More Java source code, not used by any Jif code</span>
+
+sig-src/
+   Foo.jif <span class="comment">// Jif signature for the Java source code</span>
+</pre></div>
+
+<p>
+Now compile the Java code. (You'll need to create the directory <code>java-classes</code> first.)
+<div class="code"><pre>
+$ javac -d java-classes -sourcepath java-src java-src/*.java
+</pre></div>
+
+<p class="cont">
+Now compile the Jif signatures of the Java code. (Create the directory <code>sig-classes</code> first.)
+<div class="code"><pre>
+$ $JIF/bin/jifc -d sig-classes -sourcepath sig-src \
+      sig-src/Foo.jif
+</pre></div>
+
+
+<p class="cont">
+Now compile the Jif code. (Create the directory <code>jif-classes</code> first.)
+<div class="code"><pre>
+$ $JIF/bin/jifc -d jif-classes -sourcepath jif-src \ 
+      -addsigcp sig-classes \ 
+      -classpath &quot;java-classes:$CLASSPATH&quot; jif-src/Bar.jif
+</pre></div>
+
+<p class="cont">
+Note that the signature class is added to the signature classpath
+using <code>-addsigcp sig-classes</code>, and the Java classes are put
+on the classpath using <code>-classpath
+&quot;java-classes:$CLASSPATH&quot;</code>.
+
+<p>
+To run code, make sure that the classpath contains both
+<code>java-classes</code> and <code>jif-classes</code>, but that it
+<b>does not</b> contain <code>sig-classes</code>: 
+
+<div class="code"><pre>
+$ $JIF/bin/jif -classpath &quot;java-classes:jif-classes:$CLASSPATH&quot; Bar
+</pre></div>
+
+
+<p>Two other indicator fields can also be used in the Jif signature file of a 
 Java class:
 <ul>
 <li> <code>__JIF_SAFE_CONSTRUCTORS$20050907</code>
@@ -107,7 +158,7 @@ is no possible way to access a final field of a subclass of the class
 or by leaking a reference to the object being created to some class that
 may attempt to access a final field of the class). Accessing final fields before
 they are initialized may be leveraged to leak information; the Jif typing rules
-prevent any access to final fields before they are accessed.
+prevent any access to final fields before they are accessed.</p>
 
 <p>The assertion that the Java constructors are &quot;safe&quot; means the Jif
 compiler can impose fewer restrictions in the constructor bodies of Jif 
@@ -129,7 +180,7 @@ the class states that the class has <i class="math">n</i> parameters:
  or <code>principal</code>, and <i class="math">q<sub>i</sub></i> is the name
  of the <i class="math">i</i>th parameter.
  
-Then the Java class <code>C</code> must conform to the following conventions:
+<p>Then the Java class <code>C</code> must conform to the following conventions:
 <ol>
 <li> <p>If <code>C</code> is not an interface, then a method 
     <code>public static boolean 
