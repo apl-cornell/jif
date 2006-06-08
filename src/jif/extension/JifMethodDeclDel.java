@@ -32,7 +32,7 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
     
     
     /**
-     * @see polyglot.ext.jl.ast.JL_c#typeCheck(polyglot.visit.TypeChecker)
+     * @see polyglot.ast.JL_c#typeCheck(polyglot.visit.TypeChecker)
      */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JifMethodDecl jmd = (JifMethodDecl)this.node();

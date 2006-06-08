@@ -11,7 +11,7 @@ import polyglot.util.InternalCompilerError;
 
 /** The Jif extension of the <code>Branch</code> node. 
  *  
- *  @see polyglot.ext.jl.ast.Branch_c
+ *  @see polyglot.ast.Branch_c
  */
 public class JifBranchExt extends JifStmtExt_c
 {

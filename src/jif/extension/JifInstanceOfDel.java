@@ -11,7 +11,7 @@ import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>Cast</code> node.
  *
- *  @see polyglot.ext.jl.ast.Cast_c
+ *  @see polyglot.ast.Cast_c
  */
 public class JifInstanceOfDel extends JifJL_c
 {

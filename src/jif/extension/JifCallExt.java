@@ -16,7 +16,7 @@ import polyglot.util.InternalCompilerError;
 
 /** The Jif extension of the <code>Call</code> node. 
  * 
- *  @see polyglot.ext.jl.ast.Call_c
+ *  @see polyglot.ast.Call_c
  */
 public class JifCallExt extends Jif_c
 {

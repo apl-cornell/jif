@@ -12,7 +12,7 @@ import polyglot.types.SemanticException;
 
 /** The Jif extension of the <code>Binary</code> node. 
  *  
- *  @see polyglot.ext.jl.ast.Binary_c
+ *  @see polyglot.ast.Binary_c
  */
 public class JifBinaryExt extends Jif_c 
 {

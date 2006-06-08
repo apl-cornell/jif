@@ -12,7 +12,7 @@ import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>Call</code> node. 
  * 
- *  @see polyglot.ext.jl.ast.Call_c
+ *  @see polyglot.ast.Call_c
  */
 public class JifCallDel extends JifJL_c
 {

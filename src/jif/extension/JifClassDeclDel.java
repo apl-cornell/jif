@@ -19,7 +19,7 @@ public class JifClassDeclDel extends JifJL_c {
     }
 
     /**
-     * @see polyglot.ext.jl.ast.JL_c#typeCheck(polyglot.visit.TypeChecker)
+     * @see polyglot.ast.JL_c#typeCheck(polyglot.visit.TypeChecker)
      */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JifClassDecl cd = (JifClassDecl)this.node();

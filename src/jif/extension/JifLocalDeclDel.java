@@ -39,7 +39,7 @@ public class JifLocalDeclDel extends JifJL_c {
     }
 
     /**
-     * @see polyglot.ext.jl.ast.JL_c#typeCheck(polyglot.visit.TypeChecker)
+     * @see polyglot.ast.JL_c#typeCheck(polyglot.visit.TypeChecker)
      */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         LocalDecl ld = (LocalDecl)this.node();

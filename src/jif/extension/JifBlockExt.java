@@ -16,7 +16,7 @@ import polyglot.types.SemanticException;
 
 /** The Jif extension of the <code>Block</code> node. 
  * 
- *  @see polyglot.ext.jl.ast.Block_c
+ *  @see polyglot.ast.Block_c
  */
 public class JifBlockExt extends JifStmtExt_c
 {
