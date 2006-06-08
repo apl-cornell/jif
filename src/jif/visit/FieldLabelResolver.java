@@ -1,16 +1,20 @@
 package jif.visit;
 
-import jif.ast.*;
-import jif.extension.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import jif.extension.JifFieldDeclExt;
 import jif.types.*;
 import jif.types.label.Label;
 import jif.types.label.VarLabel;
-import polyglot.visit.*;
 import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
 import polyglot.frontend.Job;
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.InternalCompilerError;
+import polyglot.visit.ContextVisitor;
+import polyglot.visit.NodeVisitor;
 
 /** A visitor used to resolving field labels. We want to resolving
  *  field labels of all the classes before the label checking pass,

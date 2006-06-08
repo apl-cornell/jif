@@ -1,7 +1,11 @@
 package jif.types.principal;
 
 import jif.translate.ParamToJavaExpr_c;
-import jif.types.*;
+import jif.types.JifClassType;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.ParamInstance;
+import jif.types.PathMap;
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;

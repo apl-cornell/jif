@@ -1,11 +1,11 @@
 package jif.ast;
 
 import jif.extension.JifFormalDel;
-import polyglot.ast.*;
 import polyglot.ast.Block;
 import polyglot.ast.Catch;
+import polyglot.ast.Catch_c;
 import polyglot.ast.Formal;
-import polyglot.ext.jl.ast.Catch_c;
+import polyglot.ast.JL;
 import polyglot.util.Position;
 
 public class JifCatch_c extends Catch_c

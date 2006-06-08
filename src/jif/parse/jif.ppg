@@ -1,4 +1,4 @@
-include "polyglot/ext/jl/parse/java12.cup"
+include "polyglot/parse/java12.cup"
 
 package jif.parse;
 import polyglot.lex.Lexer;
@@ -6,14 +6,14 @@ import polyglot.lex.Identifier;
 import polyglot.lex.Token;
 import polyglot.frontend.Job;
 
-import polyglot.ext.jl.ast.*;
+import polyglot.ast.*;
 import jif.ast.*;
 import jif.types.*;
 import jif.extension.JifBinaryDel;
 
 import java.util.*;
 
-parser Grm extends polyglot.ext.jl.parse.Grm {:
+parser Grm extends polyglot.parse.Grm {:
 
     public final JifNodeFactory nf; /* shadows BaseParser.nf */
     public final JifTypeSystem ts; /* shadows BaseParser.ts */

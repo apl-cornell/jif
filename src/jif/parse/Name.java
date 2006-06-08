@@ -1,11 +1,11 @@
 package jif.parse;
 
-import polyglot.ast.*;
-import polyglot.visit.*;
-import polyglot.types.*;
-import polyglot.util.*;
-
-import java.util.*;
+import polyglot.ast.Expr;
+import polyglot.ast.PackageNode;
+import polyglot.ast.Prefix;
+import polyglot.ast.Receiver;
+import polyglot.ast.TypeNode;
+import polyglot.util.Position;
 
 /**
  * A <code>Name</code> represents a <code>Amp</code> of the form "n | P.n".  

@@ -2,10 +2,17 @@ package jif.ast;
 
 import java.util.List;
 
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.Stmt_c;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.ast.Node;
+import polyglot.ast.Stmt;
+import polyglot.ast.Stmt_c;
+import polyglot.ast.Term;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
 
 /** An implementation of the <code>DowngradeStmt</code> interface.
  */

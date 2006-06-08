@@ -2,10 +2,7 @@ package jif.types.principal;
 
 import jif.translate.ExternalPrincipalToJavaExpr_c;
 import jif.types.JifTypeSystem;
-import jif.types.label.AccessPath;
-import jif.types.label.AccessPathRoot;
 import polyglot.main.Report;
-import polyglot.types.Resolver;
 import polyglot.types.TypeObject;
 import polyglot.util.Position;
 

@@ -2,10 +2,12 @@ package jif.types;
 
 import java.util.*;
 
-import jif.types.hierarchy.*;
-import jif.types.label.*;
+import jif.types.hierarchy.LabelEnv;
+import jif.types.hierarchy.LabelEnv_c;
+import jif.types.hierarchy.PrincipalHierarchy;
+import jif.types.label.Label;
+import jif.types.label.PairLabel;
 import jif.types.principal.Principal;
-import polyglot.ext.jl.types.Context_c;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 

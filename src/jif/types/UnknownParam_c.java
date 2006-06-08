@@ -1,8 +1,7 @@
 package jif.types;
 
-import polyglot.ext.jl.types.*;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.types.TypeObject_c;
+import polyglot.util.Position;
 
 /** An implementation of the <code>UnknownParam</code> interface. 
  */

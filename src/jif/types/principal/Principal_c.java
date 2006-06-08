@@ -6,12 +6,15 @@ import java.util.List;
 import jif.translate.CannotPrincipalToJavaExpr_c;
 import jif.translate.JifToJavaRewriter;
 import jif.translate.PrincipalToJavaExpr;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
+import jif.types.PathMap;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
-import polyglot.ext.jl.types.TypeObject_c;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
+import polyglot.types.TypeObject_c;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 

@@ -1,10 +1,11 @@
 package jif.extension;
 
-import jif.extension.JifFieldDeclExt_c.StaticFieldLabelChecker;
-import jif.types.*;
+import jif.types.JifParsedPolyType;
+import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
+import jif.types.TypeSubstitutor;
 import jif.types.label.Label;
 import jif.types.label.ThisLabel;
-import jif.visit.LabelSubstitutionVisitor;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.types.SemanticException;

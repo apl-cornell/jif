@@ -1,14 +1,17 @@
 package jif.ast;
 
-import polyglot.ext.jl.ast.*;
-import jif.types.*;
-import jif.visit.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-
-import java.util.*;
+import jif.types.JifPolyType;
+import jif.types.JifTypeSystem;
+import jif.types.ParamInstance;
+import polyglot.ast.Node;
+import polyglot.ast.Node_c;
+import polyglot.types.Context;
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeBuilder;
 
 /** An implementation of the <code>ParamDecl</code> interface. 
  */

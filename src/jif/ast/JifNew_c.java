@@ -6,9 +6,14 @@ import java.util.List;
 import jif.extension.LabelTypeCheckUtil;
 import jif.types.JifClassType;
 import jif.types.JifTypeSystem;
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.New_c;
-import polyglot.types.*;
+import polyglot.ast.ClassBody;
+import polyglot.ast.New;
+import polyglot.ast.New_c;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.visit.TypeChecker;
 

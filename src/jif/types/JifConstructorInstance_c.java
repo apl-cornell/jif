@@ -6,9 +6,12 @@ import java.util.List;
 
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
-import polyglot.ext.jl.types.ConstructorInstance_c;
 import polyglot.main.Report;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance_c;
+import polyglot.types.Flags;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.Position;
 import polyglot.util.TypedList;
 

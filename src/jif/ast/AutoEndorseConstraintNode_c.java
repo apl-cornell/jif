@@ -1,12 +1,16 @@
 package jif.ast;
 
-import java.util.*;
-
-import jif.types.*;
+import jif.types.AutoEndorseConstraint_c;
+import jif.types.JifTypeSystem;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
 
 public class AutoEndorseConstraintNode_c extends ConstraintNode_c implements AutoEndorseConstraintNode
 {

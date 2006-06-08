@@ -2,8 +2,8 @@ package jif.ast;
 
 import jif.extension.JifFormalDel;
 import jif.types.JifTypeSystem;
+import polyglot.ast.Formal_c;
 import polyglot.ast.TypeNode;
-import polyglot.ext.jl.ast.Formal_c;
 import polyglot.types.Flags;
 import polyglot.util.Position;
 

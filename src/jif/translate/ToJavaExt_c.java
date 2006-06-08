@@ -1,13 +1,9 @@
 package jif.translate;
 
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.*;
-import jif.ast.*;
-import polyglot.types.*;
-import polyglot.ext.jl.types.*;
-import jif.types.*;
-import jif.visit.*;
-import polyglot.visit.*;
+import polyglot.ast.Ext_c;
+import polyglot.ast.Node;
+import polyglot.types.SemanticException;
+import polyglot.visit.NodeVisitor;
 
 public class ToJavaExt_c extends Ext_c implements ToJavaExt {
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {

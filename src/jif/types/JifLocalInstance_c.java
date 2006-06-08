@@ -1,8 +1,8 @@
 package jif.types;
 
 import jif.types.label.Label;
-import polyglot.ext.jl.types.LocalInstance_c;
 import polyglot.types.Flags;
+import polyglot.types.LocalInstance_c;
 import polyglot.types.Type;
 import polyglot.util.Position;
 

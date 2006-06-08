@@ -3,14 +3,14 @@ package jif.translate;
 import java.util.ArrayList;
 import java.util.List;
 
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.*;
-import jif.ast.*;
 import jif.extension.JifBinaryDel;
-import polyglot.types.*;
-import polyglot.ext.jl.types.*;
-import jif.types.*;
-import polyglot.visit.*;
+import jif.types.JifTypeSystem;
+import polyglot.ast.Binary;
+import polyglot.ast.Expr;
+import polyglot.ast.Precedence;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.visit.NodeVisitor;
 
 public class BinaryToJavaExt_c extends ExprToJavaExt_c {
     private Type lhsType;

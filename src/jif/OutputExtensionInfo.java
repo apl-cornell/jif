@@ -2,9 +2,10 @@ package jif;
 
 import jif.visit.JifTranslator;
 import polyglot.ast.Node;
-import polyglot.ext.jl.JLScheduler;
 import polyglot.frontend.*;
-import polyglot.frontend.goals.*;
+import polyglot.frontend.goals.CodeGenerated;
+import polyglot.frontend.goals.Goal;
+import polyglot.frontend.goals.SourceFileGoal;
 import polyglot.main.Options;
 import polyglot.types.LoadedClassResolver;
 import polyglot.types.SemanticException;
@@ -18,7 +19,7 @@ import polyglot.util.InternalCompilerError;
  * the passes after EXC_CHECK_ALL: that is those which deal with
  * translation.
  */
-public class OutputExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
+public class OutputExtensionInfo extends JLExtensionInfo {
     ExtensionInfo jifExtInfo;
     
     public OutputExtensionInfo(ExtensionInfo jifExtInfo) {

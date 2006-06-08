@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.*;
-import jif.ast.*;
-import polyglot.types.*;
-import polyglot.ext.jl.types.*;
-import jif.types.*;
-import polyglot.visit.*;
+import jif.types.JifPolyType;
+import jif.types.JifSubst;
+import jif.types.JifSubstType;
+import jif.types.ParamInstance;
+import polyglot.ast.Call;
+import polyglot.ast.Expr;
+import polyglot.types.MethodInstance;
+import polyglot.types.SemanticException;
 
 public class CallToJavaExt_c extends ExprToJavaExt_c {
     public Expr exprToJava(JifToJavaRewriter rw) throws SemanticException {

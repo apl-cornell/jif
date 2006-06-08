@@ -2,12 +2,11 @@ package jif.ast;
 
 import java.util.List;
 
-import jif.types.*;
-import jif.types.label.AccessPath;
-import jif.types.principal.DynamicPrincipal;
+import jif.types.JifTypeSystem;
+import jif.types.Param;
 import jif.types.principal.Principal;
+import polyglot.ast.Expr_c;
 import polyglot.ast.Node;
-import polyglot.ext.jl.ast.Expr_c;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;

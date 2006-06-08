@@ -2,12 +2,16 @@ package jif.types.label;
 
 import java.util.*;
 
-import jif.translate.JoinLabelToJavaExpr_c;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
+import jif.types.PathMap;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.visit.LabelChecker;
-import polyglot.types.*;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 

@@ -1,9 +1,6 @@
 package jif.ast;
 
-import java.util.List;
-
 import jif.types.label.Policy;
-
 import polyglot.ast.Node;
 
 /** A policy label node. A policy label is like <code>owner: r1, r2,...rn</code>. 

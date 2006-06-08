@@ -1,11 +1,10 @@
 package jif.types.label;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import jif.types.JifTypeSystem;
-import polyglot.ext.jl.types.TypeObject_c;
+import polyglot.types.TypeObject_c;
 import polyglot.util.Position;
 
 /** An implementation of the <code>PolicyLabel</code> interface. 

@@ -1,16 +1,20 @@
 package jif.types;
 
-import java.io.IOException;
 import java.util.*;
 
 import jif.JifOptions;
 import jif.Topics;
 import jif.types.hierarchy.LabelEnv;
-import jif.types.label.*;
+import jif.types.label.Label;
+import jif.types.label.NotTaken;
+import jif.types.label.VarLabel;
 import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
-import polyglot.util.*;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Pair;
+import polyglot.util.Position;
 
 /**
  * A solver of Jif constraints. Finds solution to constraints essentially by

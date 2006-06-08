@@ -2,9 +2,9 @@ package jif.parse;
 
 import java.util.List;
 
+import polyglot.ast.Expr_c;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
-import polyglot.ext.jl.ast.Expr_c;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 

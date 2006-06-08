@@ -2,7 +2,6 @@ package jif.translate;
 
 import java.util.Iterator;
 
-import jif.types.principal.*;
 import jif.types.principal.DisjunctivePrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.Expr;

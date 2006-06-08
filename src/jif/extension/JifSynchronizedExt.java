@@ -2,10 +2,12 @@ package jif.extension;
 
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
-import jif.types.JifTypeSystem;
 import jif.types.PathMap;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.Block;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.Synchronized;
 import polyglot.types.SemanticException;
 
 /** Jif extension of the <code>Synchronized</code> node.

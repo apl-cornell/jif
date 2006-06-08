@@ -2,7 +2,6 @@ package jif.types;
 
 import java.util.List;
 
-import jif.types.label.Label;
 import polyglot.ext.param.types.PClass;
 import polyglot.types.ParsedClassType;
 

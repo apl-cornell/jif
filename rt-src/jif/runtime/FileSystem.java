@@ -1,8 +1,12 @@
 package jif.runtime;
 
-import jif.lang.*;
-import java.util.*;
-import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import jif.lang.Label;
+import jif.lang.LabelUtil;
 
 /** This class represents the file system, through which you can query
  *  and set the security labels of files.

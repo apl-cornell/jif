@@ -1,10 +1,14 @@
 package jif.ast;
 
-import jif.types.*;
-import polyglot.ast.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.Param;
+import jif.types.ParamInstance;
+import jif.types.SemanticDetailedException;
 import polyglot.ast.Expr;
+import polyglot.ast.Field;
 import polyglot.ast.Node;
-import polyglot.ext.jl.ast.Node_c;
+import polyglot.ast.Node_c;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;

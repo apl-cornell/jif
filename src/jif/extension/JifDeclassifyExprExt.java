@@ -3,16 +3,14 @@ package jif.extension;
 import java.util.Iterator;
 import java.util.Set;
 
-import jif.JifOptions;
-import jif.ast.DeclassifyExpr;
-import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.NamedLabel;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import polyglot.ast.Expr;
-import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.Position;
 

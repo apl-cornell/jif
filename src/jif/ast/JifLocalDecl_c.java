@@ -1,9 +1,9 @@
 package jif.ast;
 
 import polyglot.ast.Expr;
+import polyglot.ast.LocalDecl_c;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
-import polyglot.ext.jl.ast.LocalDecl_c;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
 import polyglot.util.Position;

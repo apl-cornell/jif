@@ -1,9 +1,11 @@
 package jif.ast;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Set;
 
 import jif.types.Assertion;
-import polyglot.ext.jl.ast.Node_c;
+import polyglot.ast.Node_c;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;

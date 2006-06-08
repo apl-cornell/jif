@@ -1,11 +1,7 @@
 package jif.ast;
 
-import java.util.List;
-
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.Stmt_c;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.ast.Stmt;
+import polyglot.util.Position;
 
 /** An implementation of the <code>EndorseStmt</code> interface.
  */

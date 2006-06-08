@@ -1,6 +1,5 @@
 package jif.ast;
 
-import java.util.List;
 
 /** An auto endorse constraint node. It automatically endorses the
  * initial pc of the method body to the specified label.

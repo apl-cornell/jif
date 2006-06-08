@@ -2,7 +2,6 @@ package jif.extension;
 
 import jif.types.JifTypeSystem;
 import polyglot.ast.ArrayInit;
-import polyglot.ast.NewArray;
 import polyglot.ast.Node;
 import polyglot.types.ArrayType;
 import polyglot.types.SemanticException;

@@ -1,12 +1,12 @@
 package jif.visit;
 
-import jif.JifScheduler;
 import polyglot.ast.Node;
 import polyglot.frontend.AbstractPass;
 import polyglot.frontend.Job;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
-import polyglot.util.*;
+import polyglot.util.ErrorQueue;
+import polyglot.util.InternalCompilerError;
 
 /** A pass which runs a visitor. */
 public class LabelCheckPass extends AbstractPass

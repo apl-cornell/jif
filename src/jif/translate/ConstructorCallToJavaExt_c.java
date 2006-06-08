@@ -1,14 +1,17 @@
 package jif.translate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import jif.types.*;
 import jif.types.JifPolyType;
 import jif.types.JifSubstType;
-import jif.types.label.Label;
-import jif.types.principal.Principal;
-import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.SemanticException;
 import polyglot.util.Position;
 
 public class ConstructorCallToJavaExt_c extends ToJavaExt_c {

@@ -2,10 +2,7 @@ package jif.types.principal;
 
 import jif.translate.JifToJavaRewriter;
 import jif.types.JifTypeSystem;
-import jif.types.label.AccessPath;
-import jif.types.label.AccessPathRoot;
 import polyglot.ast.Expr;
-import polyglot.types.Resolver;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;

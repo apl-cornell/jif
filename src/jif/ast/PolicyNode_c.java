@@ -1,17 +1,9 @@
 package jif.ast;
 
-import java.util.*;
-
-import jif.types.JifTypeSystem;
-import jif.types.label.Label;
 import jif.types.label.Policy;
-import jif.types.principal.Principal;
-import polyglot.ast.Ambiguous;
-import polyglot.ast.Node;
-import polyglot.ext.jl.ast.Node_c;
-import polyglot.types.SemanticException;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.ast.Node_c;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** An implementation of the <code>PolicyLabel</code> interface.
  */

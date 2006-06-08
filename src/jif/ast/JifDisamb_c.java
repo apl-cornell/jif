@@ -1,12 +1,18 @@
 package jif.ast;
 
-import jif.types.*;
+import jif.types.JifParsedPolyType;
+import jif.types.JifTypeSystem;
+import jif.types.ParamInstance;
+import jif.types.PrincipalInstance;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
+import polyglot.ast.Disamb_c;
 import polyglot.ast.Node;
 import polyglot.ast.Receiver;
-import polyglot.ext.jl.ast.Disamb_c;
-import polyglot.types.*;
+import polyglot.types.FieldInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 
 /**

@@ -2,11 +2,10 @@ package jif.types;
 
 import java.io.IOException;
 
-import polyglot.ext.jl.types.VarInstance_c;
 import polyglot.main.Report;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
-import polyglot.types.VarInstance;
+import polyglot.types.VarInstance_c;
 import polyglot.util.Position;
 
 /** An implementation of the <code>ParamInstance</code> interface.

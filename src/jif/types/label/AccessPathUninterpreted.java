@@ -1,6 +1,5 @@
 package jif.types.label;
 
-import jif.types.JifContext;
 import polyglot.ast.Expr;
 import polyglot.main.Report;
 import polyglot.types.Type;

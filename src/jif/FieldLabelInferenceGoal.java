@@ -3,8 +3,6 @@ package jif;
 import jif.ast.JifNodeFactory;
 import jif.types.JifTypeSystem;
 import jif.visit.FieldLabelResolver;
-import jif.visit.LabelCheckPass;
-import jif.visit.LabelChecker;
 import polyglot.frontend.Job;
 import polyglot.frontend.Pass;
 import polyglot.frontend.VisitorPass;

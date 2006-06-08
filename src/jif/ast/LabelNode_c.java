@@ -2,8 +2,10 @@ package jif.ast;
 
 import jif.types.Param;
 import jif.types.label.Label;
-import polyglot.ext.jl.ast.Node_c;
-import polyglot.util.*;
+import polyglot.ast.Node_c;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 

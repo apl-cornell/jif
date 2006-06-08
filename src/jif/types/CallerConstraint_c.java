@@ -1,10 +1,12 @@
 package jif.types;
 
-import polyglot.ext.jl.types.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 import jif.types.principal.Principal;
+import polyglot.types.TypeObject_c;
+import polyglot.util.Position;
+import polyglot.util.TypedList;
 
 /** An implementation of the <code>CallerConstraint</code> interface. 
  */

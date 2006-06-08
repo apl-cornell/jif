@@ -1,13 +1,8 @@
 package jif.parse;
 
-import polyglot.ast.*;
-import polyglot.visit.*;
-import polyglot.types.*;
-import polyglot.util.*;
-
-import java.util.*;
-
-import jif.ast.*;
+import jif.ast.LabelNode;
+import polyglot.ast.TypeNode;
+import polyglot.util.Position;
 
 public class LabeledExpr extends Amb {
     // prefix{L}

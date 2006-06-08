@@ -2,20 +2,32 @@ package jif.visit;
 
 import java.util.*;
 
-import jif.ast.*;
-import jif.extension.*;
-import jif.types.*;
-import jif.types.label.*;
-import jif.types.principal.DynamicPrincipal;
+import jif.ast.DowngradeExpr;
+import jif.ast.LabelExpr;
+import jif.ast.PrincipalNode;
+import jif.extension.JifArrayAccessDel;
+import jif.extension.JifCallDel;
+import jif.extension.JifFieldDel;
+import jif.extension.JifFormalDel;
+import jif.extension.JifThrowDel;
+import jif.types.JifSubstType;
+import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
+import jif.types.label.AccessPathClass;
+import jif.types.label.AccessPathField;
+import jif.types.label.Label;
 import jif.types.principal.Principal;
 import jif.visit.PreciseClassChecker.AccessPath;
 import jif.visit.PreciseClassChecker.AccessPathLocal;
 import polyglot.ast.*;
 import polyglot.frontend.Job;
-import polyglot.types.*;
-import polyglot.util.CollectionUtil;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
-import polyglot.visit.*;
+import polyglot.visit.DataFlow;
+import polyglot.visit.FlowGraph;
+import polyglot.visit.NodeVisitor;
 
 /**
  * Visitor which determines at which program points local variables and

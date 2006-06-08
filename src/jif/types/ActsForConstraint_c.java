@@ -1,8 +1,8 @@
 package jif.types;
 
 import jif.types.principal.Principal;
-import polyglot.ext.jl.types.*;
-import polyglot.util.*;
+import polyglot.types.TypeObject_c;
+import polyglot.util.Position;
 
 /** An implementation of the <code>ActsForConstraint</code> interface.
  */

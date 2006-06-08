@@ -7,13 +7,17 @@ import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv_c;
 import jif.types.label.*;
 import jif.types.principal.*;
-import polyglot.ext.jl.types.PrimitiveType_c;
-import polyglot.ext.param.types.*;
+import polyglot.ext.param.types.MuPClass;
+import polyglot.ext.param.types.PClass;
+import polyglot.ext.param.types.ParamTypeSystem_c;
+import polyglot.ext.param.types.Subst;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Source;
 import polyglot.types.*;
 import polyglot.types.Package;
-import polyglot.util.*;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** An implementation of the <code>JifTypeSystem</code> interface.
  */

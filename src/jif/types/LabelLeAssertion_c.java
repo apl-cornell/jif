@@ -1,7 +1,7 @@
 package jif.types;
 
 import jif.types.label.Label;
-import polyglot.ext.jl.types.TypeObject_c;
+import polyglot.types.TypeObject_c;
 import polyglot.util.Position;
 
 

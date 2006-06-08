@@ -2,8 +2,10 @@ package jif.extension;
 
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.*;
-import jif.types.label.Label;
+import jif.types.JifClassType;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import jif.visit.LabelChecker;
 import polyglot.ast.Node;
 import polyglot.ast.Special;

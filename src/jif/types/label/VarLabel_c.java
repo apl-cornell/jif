@@ -1,11 +1,10 @@
 package jif.types.label;
 
-import java.util.*;
+import java.util.Collections;
 import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
-import polyglot.ext.jl.types.TypeObject_c;
 import polyglot.main.Report;
 import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;

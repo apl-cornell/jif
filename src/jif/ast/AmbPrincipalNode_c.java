@@ -2,17 +2,31 @@ package jif.ast;
 
 import java.util.List;
 
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.JifVarInstance;
+import jif.types.ParamInstance;
+import jif.types.PrincipalInstance;
+import jif.types.SemanticDetailedException;
 import jif.types.label.AccessPath;
 import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
-import polyglot.ast.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Node;
+import polyglot.ast.Term;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
-import polyglot.types.*;
+import polyglot.types.Context;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.VarInstance;
 import polyglot.util.Position;
-import polyglot.visit.*;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>AmbPrincipalNode</code> interface. 
  */

@@ -1,15 +1,33 @@
 package jif.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import jif.types.*;
-import jif.types.label.*;
-import jif.types.principal.DynamicPrincipal;
-import jif.types.principal.Principal;
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.MethodDecl_c;
-import polyglot.types.*;
-import polyglot.util.*;
+import jif.types.Assertion;
+import jif.types.DefaultSignature;
+import jif.types.JifMethodInstance;
+import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
+import jif.types.TypeSubstitutor;
+import jif.types.label.AccessPath;
+import jif.types.label.AccessPathLocal;
+import jif.types.label.AccessPathRoot;
+import jif.types.label.ArgLabel;
+import jif.types.label.Label;
+import polyglot.ast.Block;
+import polyglot.ast.Formal;
+import polyglot.ast.MethodDecl_c;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
+import polyglot.types.Flags;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.TypedList;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 

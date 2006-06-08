@@ -2,18 +2,32 @@ package jif.extension;
 
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.*;
-import jif.types.label.*;
+import jif.types.JifClassType;
+import jif.types.JifContext;
+import jif.types.JifFieldInstance;
+import jif.types.JifSubstType;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.LabelSubstitution;
+import jif.types.NamedLabel;
+import jif.types.PathMap;
+import jif.types.SemanticDetailedException;
+import jif.types.TypeSubstitutor;
+import jif.types.label.CovariantParamLabel;
+import jif.types.label.Label;
+import jif.types.label.ParamLabel;
+import jif.types.label.ThisLabel;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import jif.visit.LabelSubstitutionVisitor;
-import polyglot.ast.*;
+import polyglot.ast.ArrayInit;
+import polyglot.ast.Expr;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.visit.AmbiguityRemover;
 
 /** The Jif extension of the <code>FieldDecl</code> node. 
  * 

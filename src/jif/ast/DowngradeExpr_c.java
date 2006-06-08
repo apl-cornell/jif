@@ -3,12 +3,21 @@ package jif.ast;
 import java.util.List;
 
 import jif.types.JifTypeSystem;
-
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.Expr_c;
+import polyglot.ast.Expr;
+import polyglot.ast.Expr_c;
+import polyglot.ast.Node;
+import polyglot.ast.Precedence;
+import polyglot.ast.Term;
 import polyglot.types.SemanticException;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.FlowGraph;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeChecker;
 
 /** An implemenation of the <code>DowngradeExpr</code> interface.
  */

@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.*;
-import jif.ast.*;
-import jif.extension.JifCastDel;
 import jif.extension.JifInstanceOfDel;
-import polyglot.types.*;
-import polyglot.ext.jl.types.*;
-import jif.types.*;
-import polyglot.visit.*;
+import jif.types.JifPolyType;
+import jif.types.JifSubst;
+import jif.types.JifSubstType;
+import jif.types.ParamInstance;
+import polyglot.ast.Instanceof;
+import polyglot.ast.Node;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.visit.NodeVisitor;
 
 public class InstanceOfToJavaExt_c extends ToJavaExt_c {
     private Type compareType;

@@ -6,14 +6,25 @@ import java.util.List;
 import jif.ast.JifInstantiator;
 import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
-import jif.types.*;
-import jif.types.label.DynamicLabel;
+import jif.types.JifClassType;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.NamedLabel;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.ast.Assign;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Node;
+import polyglot.ast.Receiver;
+import polyglot.ast.Special;
+import polyglot.types.FieldInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 
 /** The Jif extension of the <code>LocalAssign</code> node. 
  */

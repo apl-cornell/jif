@@ -1,9 +1,9 @@
 package jif.types;
 
 import jif.types.label.Label;
-import polyglot.ext.jl.types.*;
 import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** An implementation of the <code>JifFieldInstance</code> interface.
  */

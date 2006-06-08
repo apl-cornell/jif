@@ -1,8 +1,8 @@
 package jif.ast;
 
 import jif.extension.*;
+import polyglot.ast.AbstractDelFactory_c;
 import polyglot.ast.JL;
-import polyglot.ext.jl.ast.AbstractDelFactory_c;
 
 /**
  * Constructs Jif delegates

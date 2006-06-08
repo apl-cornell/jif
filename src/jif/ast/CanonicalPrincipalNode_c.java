@@ -3,16 +3,18 @@ package jif.ast;
 import java.util.List;
 
 import jif.extension.LabelTypeCheckUtil;
-import jif.types.JifContext;
 import jif.types.JifTypeSystem;
-import jif.types.label.AccessPath;
-import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.types.SemanticException;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeChecker;
 
 /** An implemenation of the <code>CanonicalPrincipal</code> interface. 
  */

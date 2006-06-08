@@ -1,16 +1,25 @@
 package jif.ast;
 
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.SemanticDetailedException;
 import jif.types.label.AccessPath;
 import jif.types.label.Label;
-import polyglot.ast.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Node;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
-import polyglot.types.*;
+import polyglot.types.Context;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
-import polyglot.visit.*;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /** An implementation of the <tt>AmbDynamicLabel</tt> interface. */
 public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicLabelNode

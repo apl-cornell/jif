@@ -1,15 +1,37 @@
 package jif.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifParsedPolyType;
+import jif.types.JifTypeSystem;
+import jif.types.ParamInstance;
 import jif.types.label.AccessPathThis;
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.ClassDecl_c;
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl_c;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
 import polyglot.ext.param.types.MuPClass;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.types.ClassType;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.TypedList;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeBuilder;
 
 /** An implementation of the <code>JifClassDecl</code> interface.
  */

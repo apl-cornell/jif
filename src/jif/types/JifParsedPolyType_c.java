@@ -1,17 +1,24 @@
 package jif.types;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import jif.types.label.*;
-import jif.types.label.Label;
 import jif.types.label.ParamLabel;
+import jif.types.label.ThisLabel;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
-import polyglot.ext.jl.types.ParsedClassType_c;
 import polyglot.ext.param.types.PClass;
 import polyglot.frontend.Source;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.types.ClassType;
+import polyglot.types.FieldInstance;
+import polyglot.types.LazyClassInitializer;
+import polyglot.types.ParsedClassType_c;
+import polyglot.types.TypeObject;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.TypedList;
 
 /** An implementation of the <code>JifParsedPolyType</code> interface. 
  */

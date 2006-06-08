@@ -1,9 +1,9 @@
 package jif.types;
 
 import jif.types.principal.ExternalPrincipal;
-import polyglot.ext.jl.types.*;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.types.Type;
+import polyglot.types.VarInstance_c;
+import polyglot.util.Position;
 
 /** An implementation of the <code>PrincipalInstance</code> interface. 
  */

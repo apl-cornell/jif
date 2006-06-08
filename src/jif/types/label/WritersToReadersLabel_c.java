@@ -2,13 +2,14 @@ package jif.types.label;
 
 import java.util.*;
 
-import jif.ExtensionInfo;
-import jif.Topics;
 import jif.translate.CannotLabelToJavaExpr_c;
-import jif.types.*;
+import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
-import polyglot.types.*;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 

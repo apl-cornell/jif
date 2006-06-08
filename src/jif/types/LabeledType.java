@@ -1,10 +1,7 @@
 package jif.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import jif.ast.*;
 import jif.types.label.Label;
-import polyglot.ext.jl.types.*;
+import polyglot.types.Type;
 
 /** A labeled type. 
  */

@@ -1,6 +1,5 @@
 package jif.lang;
 
-import java.util.*;
 
 /**
  * A Label is the runtime representation of a Jif label. A Label consists of a

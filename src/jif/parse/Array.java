@@ -1,11 +1,8 @@
 package jif.parse;
 
-import polyglot.ast.*;
-import polyglot.visit.*;
-import polyglot.types.*;
-import polyglot.util.*;
-
-import java.util.*;
+import polyglot.ast.Receiver;
+import polyglot.ast.TypeNode;
+import polyglot.util.Position;
 
 /**
  * An <code>Array</code> represents a <code>Amb</code> of the form "P[]".  

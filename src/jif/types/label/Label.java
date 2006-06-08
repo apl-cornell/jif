@@ -1,11 +1,13 @@
 package jif.types.label;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import jif.translate.JifToJavaRewriter;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.LabelSubstitution;
+import jif.types.Param;
+import jif.types.PathMap;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;

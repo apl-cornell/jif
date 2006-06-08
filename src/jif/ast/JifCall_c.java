@@ -4,8 +4,8 @@ import java.util.List;
 
 import jif.types.JifParsedPolyType;
 import jif.types.JifTypeSystem;
+import polyglot.ast.Call_c;
 import polyglot.ast.Receiver;
-import polyglot.ext.jl.ast.Call_c;
 import polyglot.types.MethodInstance;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;

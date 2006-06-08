@@ -2,8 +2,8 @@ package jif.extension;
 
 import jif.ast.JifUtil;
 import jif.types.JifTypeSystem;
+import polyglot.ast.JL_c;
 import polyglot.ast.Node;
-import polyglot.ext.jl.ast.JL_c;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;

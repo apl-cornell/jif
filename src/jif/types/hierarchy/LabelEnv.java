@@ -7,7 +7,6 @@ import jif.types.Solver;
 import jif.types.VarMap;
 import jif.types.label.Label;
 import jif.types.label.Policy;
-import jif.types.principal.Principal;
 
 public interface LabelEnv
 {

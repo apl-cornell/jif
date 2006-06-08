@@ -1,7 +1,6 @@
 package jif.types;
 
-import polyglot.ext.jl.types.SchedulerClassInitializer;
-import polyglot.types.ParsedClassType;
+import polyglot.types.SchedulerClassInitializer;
 import polyglot.types.TypeSystem;
 
 /**

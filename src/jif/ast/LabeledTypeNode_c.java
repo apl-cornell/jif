@@ -2,14 +2,22 @@ package jif.ast;
 
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.TypeNode_c;
-import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.goals.Goal;
+import polyglot.ast.Ambiguous;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
+import polyglot.ast.TypeNode_c;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>LabeledTypeNode</code> interface. 
  */

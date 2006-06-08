@@ -3,14 +3,16 @@ package jif.visit;
 import java.util.Iterator;
 import java.util.Set;
 
-import jif.extension.LabelTypeCheckUtil;
 import jif.types.JifClassType;
 import jif.types.JifTypeSystem;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.TypeNode;
 import polyglot.frontend.Job;
-import polyglot.types.*;
+import polyglot.types.LocalInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.InitChecker;
 

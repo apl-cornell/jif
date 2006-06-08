@@ -2,17 +2,10 @@ package jif.extension;
 
 import jif.types.JifLocalInstance;
 import jif.types.JifTypeSystem;
-import jif.types.label.Label;
-import polyglot.ast.*;
-import polyglot.ast.Expr;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
-import polyglot.types.*;
 import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
-import polyglot.util.Position;
-import polyglot.visit.*;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;

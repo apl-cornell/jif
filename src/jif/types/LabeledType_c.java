@@ -1,11 +1,9 @@
 package jif.types;
 
-import polyglot.ext.jl.types.*;
 import jif.types.label.Label;
-import jif.visit.*;
 import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** An implementation of the <code>LabeledType</code> interface. 
  */

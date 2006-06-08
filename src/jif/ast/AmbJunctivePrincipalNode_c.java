@@ -2,17 +2,15 @@ package jif.ast;
 
 import java.util.List;
 
-import jif.types.*;
-import jif.types.label.AccessPath;
-import jif.types.principal.ExternalPrincipal;
+import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
-import polyglot.ast.*;
-import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.Scheduler;
-import polyglot.frontend.goals.Goal;
-import polyglot.types.*;
+import polyglot.ast.Node;
+import polyglot.ast.Term;
+import polyglot.types.SemanticException;
 import polyglot.util.Position;
-import polyglot.visit.*;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
 
 /** An implementation of the <code>AmbPrincipalNode</code> interface,
  * representing an ambiguous conjunctive or disjunctive principal. 
