@@ -3,7 +3,7 @@ Jif Change Log
 
 This file documents changes between releases of Jif.
 
-2006-05-29    Jif 3.0.0
+2006-06-09    Jif 3.0.0
     * Added integrity
        * See the Jif manual for a full explanation.
        * Labels now form a complete lattice (meet operation
