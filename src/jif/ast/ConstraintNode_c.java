@@ -58,7 +58,7 @@ public class ConstraintNode_c extends Node_c implements ConstraintNode
     }
     
     /**
-     * Bypass all children when peforming an exception check. Constraints
+     * Bypass all children when performing an exception check. Constraints
      * aren't examined at runtime.
      */
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)

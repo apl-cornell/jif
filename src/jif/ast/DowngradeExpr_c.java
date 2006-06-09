@@ -19,7 +19,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
-/** An implemenation of the <code>DowngradeExpr</code> interface.
+/** An implementation of the <code>DowngradeExpr</code> interface.
  */
 public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
 {

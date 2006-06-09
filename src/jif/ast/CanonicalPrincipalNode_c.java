@@ -16,7 +16,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
-/** An implemenation of the <code>CanonicalPrincipal</code> interface. 
+/** An implementation of the <code>CanonicalPrincipal</code> interface. 
  */
 public class CanonicalPrincipalNode_c extends PrincipalNode_c implements CanonicalPrincipalNode
 {

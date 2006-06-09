@@ -115,7 +115,7 @@ public class Jif_c extends Ext_c implements Jif
 
     /**
      * Check that the type excType is indeed in the list of types thrown, 
-     * thowTypes, and remoive excType from that list.
+     * throwTypes, and remove excType from that list.
      * @param throwTypes
      * @param excType
      */
@@ -128,7 +128,7 @@ public class Jif_c extends Ext_c implements Jif
 
     /**
      * Check that the list of types thrown, 
-     * thowTypes, does not contain any checked exceptions, i.e., all throw 
+     * throwTypes, does not contain any checked exceptions, i.e., all throw 
      * types have been correctly label checked.
      * @param throwTypes
      */

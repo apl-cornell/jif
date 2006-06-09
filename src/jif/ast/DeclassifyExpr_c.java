@@ -3,7 +3,7 @@ package jif.ast;
 import polyglot.ast.Expr;
 import polyglot.util.Position;
 
-/** An implemenation of the <code>DeclassifyExpr</code> interface.
+/** An implementation of the <code>DeclassifyExpr</code> interface.
  */
 public class DeclassifyExpr_c extends DowngradeExpr_c implements DeclassifyExpr
 {

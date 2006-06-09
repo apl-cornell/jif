@@ -119,7 +119,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         Set s = new LinkedHashSet(ct.authority());
         if (ts.isSubtype(ct, ts.PrincipalClass())) {
             // This class implements jif.lang.Princpal, and as such
-            // implcitly has the authority of the principal represented by
+            // implicitly has the authority of the principal represented by
             // "this"
             s.add(ts.dynamicPrincipal(ct.position(), 
                                       new AccessPathThis(ct, ct.position())));

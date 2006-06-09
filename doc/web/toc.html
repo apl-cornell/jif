@@ -9,6 +9,11 @@ var closedBullet = '▸ ';
 var openBullet = '▾ ';
 var leafBullet = '• ';
 
+if (navigator.appName == "Microsoft Internet Explorer") {
+    closedBullet = '+ ';
+    openBullet = '- ';
+    leafBullet = '∙ ';
+}
 
 window.onload = function () {
   compactMenu('tocul', false, false);

@@ -192,7 +192,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
     
     /**
      * Checks that if there is an explicit constructor call in the constructor
-     * body that the call is alright.
+     * body that the call is all right.
      * 
      * In particular, if this is a java class or one of the ancestors of this 
      * class is "untrusted" then the explicit constructor call must be 
@@ -238,7 +238,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             // call, or a "super()" call. That is, the constructor cannot
             // call any super constructor other than the default constuctor,
             // since in translation, the Jif class has no opportunity to
-            // marshall the arguments before the super constructor call 
+            // marshal the arguments before the super constructor call 
             // happens.
             checkFirstStmtConstructorCall("The first statement of a " +
                            "constructor of a Jif class with a Java superclass " +

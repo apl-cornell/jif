@@ -9,7 +9,7 @@ import polyglot.types.SemanticException;
 import polyglot.util.*;
 import polyglot.visit.*;
 
-/** An implmentation of the <code>AuthConstraintNode</code> interface.
+/** An implementation of the <code>AuthConstraintNode</code> interface.
  */
 public class AuthConstraintNode_c extends ConstraintNode_c implements AuthConstraintNode
 {

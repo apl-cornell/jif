@@ -3,7 +3,7 @@ package jif.ast;
 import polyglot.ast.Expr;
 import polyglot.util.Position;
 
-/** An implemenation of the <code>EndorseExpr</code> interface.
+/** An implementation of the <code>EndorseExpr</code> interface.
  */
 public class EndorseExpr_c extends DowngradeExpr_c implements EndorseExpr
 {

@@ -196,7 +196,7 @@ public class JifUtil
 
     /**
      * Returns the "effective expression" for expr. That is, it strips
-     * away casts and downgrade expressiions.
+     * away casts and downgrade expressions.
      */
     public static Expr effectiveExpr(Expr expr) {
         if (expr instanceof Cast) {
