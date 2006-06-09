@@ -4,7 +4,7 @@ import java.util.List;
 
 /** A caller constraint node. It requests the caller of
  *  a method are granted certain authorities. 
- *  <p>Grammer: <tt>caller(principal_list)</tt>
+ *  <p>Grammar: <tt>caller(principal_list)</tt>
  */
 public interface CallerConstraintNode extends ConstraintNode
 {
