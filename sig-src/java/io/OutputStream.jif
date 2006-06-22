@@ -8,6 +8,7 @@ package java.io;
 
 public abstract class OutputStream[label L] {
     private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
+    private static int __JIF_SAFE_CONSTRUCTORS$20050907 = 0;
 
     public abstract void write{L}(int{L} b) throws (IOException{L});
     public native void write{L}(byte{L}[]{L} b) throws (IOException{L});

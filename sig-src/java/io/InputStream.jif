@@ -8,6 +8,7 @@ package java.io;
 
 public abstract class InputStream[label L] {
     private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
+    private static int __JIF_SAFE_CONSTRUCTORS$20050907 = 0;
 
     public abstract int{L} read{L}() throws (IOException{L});
     public native int{L;b} read{L;b}(byte{L}[] b) throws (IOException{L;b});
