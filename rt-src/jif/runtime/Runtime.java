@@ -47,7 +47,7 @@ public class Runtime {
     private Label defaultLabel() {
         ConfPolicy cp = LabelUtil.readerPolicy(dynp, new LinkedList());
         IntegPolicy ip = LabelUtil.writerPolicy(dynp, new LinkedList());
-        return LabelUtil.join(LabelUtil.toLabel(cp), LabelUtil.toLabel(ip));
+        return LabelUtil.toLabel(cp, ip);
     }
 
     /**
