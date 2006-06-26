@@ -66,7 +66,7 @@ public class JifFieldDeclDel extends JifJL_c
 	    if (init != null) {
                 // if the static field has an initializer, then the 
                 // initialization expression must be constant.
-		ConstChecker cc = new ConstChecker();
+		ConstChecker cc = new ConstChecker(tc.context().currentClass());
 		init.visit(cc);
 		if (!cc.isConst()) { 
 		    throw new SemanticDetailedException("Jif does not support " +
