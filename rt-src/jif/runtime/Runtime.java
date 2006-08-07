@@ -177,6 +177,12 @@ public class Runtime {
     public static int currentDayOfMonth(Principal dummy) {
         return new GregorianCalendar().get(Calendar.DAY_OF_MONTH);
     }
+    public static int currentHour(Principal dummy) {
+        return new GregorianCalendar().get(Calendar.HOUR_OF_DAY);
+    }
+    public static int currentMinute(Principal dummy) {
+        return new GregorianCalendar().get(Calendar.MINUTE);
+    }
     static {
         System.loadLibrary("jifrt");
     }

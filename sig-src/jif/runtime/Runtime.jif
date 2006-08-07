@@ -27,5 +27,7 @@ public class Runtime[principal P]
     public static native int{*!:*} currentYear();
     public static native int{*!:*} currentMonth();
     public static native int{*!:*} currentDayOfMonth();    
+    public static native int{*!:*} currentHour();
+    public static native int{*!:*} currentMinute();
 }
 

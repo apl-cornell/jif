@@ -6,7 +6,7 @@ import jif.runtime.Runtime;
  * This class is a simple utility class for representing and comparing dates. 
  * It is not intended to replace or duplicate the functionality of 
  * java.util.Date.
- * It provides precision only to the day.
+ * It provides precision only to the minute.
  * It is immutable.
  * It provides no way to get the current time.
  */
@@ -14,6 +14,8 @@ public final class Date[covariant label L] implements JifObject[L] {
     private final int{L} year;
     private final int{L} month;
     private final int{L} day;
+    private final int{L} hour;
+    private final int{L} minute;
 
     public static final String{*!:*}[]{*!:*} monthNames = {
             "NOT A VALID MONTH",
@@ -45,8 +47,8 @@ public final class Date[covariant label L] implements JifObject[L] {
     };
 
     /**
-     * At the moment, assume that the string is in the format YYYY/MM/DD
-     * or DD-MM-YYYY
+     * At the moment, assume that the string is in the format YYYY/MM/DD hh:mm
+     * or DD-MM-YYYY hh:mm
      */
     public static Date[lbl]{lbl} valueOf{*lbl}(label lbl, String{*lbl} d) throws (IllegalArgumentException{*lbl}) {
         if (d == null) {
@@ -58,6 +60,10 @@ public final class Date[covariant label L] implements JifObject[L] {
         int monthEnd = 7;
         int dayStart = 8;
         int dayEnd = 10;
+        int hourStart = -1;
+        int hourEnd = -1;
+        int minStart = -1;
+        int minEnd = -1;
         int i = d.indexOf('-', 0);
         if (i > 0) { 
             // date is of the form dd-mm-yyyy
@@ -68,25 +74,39 @@ public final class Date[covariant label L] implements JifObject[L] {
             if (j > 0) { 
                 monthEnd = j; 
                 yearStart = j + 1;
-                yearEnd = d.length();
+                yearEnd = yearStart + 4;
             }
             else {
                 throw new IllegalArgumentException("invalid string: format should be DD-MM-YYYY");
             }
-
+        }
+        if (yearEnd != d.length()) {
+            // the time is included
+            hourStart = yearEnd + 1;
+            hourEnd = d.indexOf(':', hourStart);
+            minStart = hourEnd+1;
+            minEnd = minStart+2;
         }
         else if (d.length() != 10) {
-            throw new IllegalArgumentException("invalid string: format should be DD-MM-YYYY");
+            throw new IllegalArgumentException("invalid string: format should be DD-MM-YYYY [hh:mm]" + d.length());
         }
         
         try {
             int year = Integer.parseInt(d.substring(yearStart,yearEnd));
             int month = Integer.parseInt(d.substring(monthStart,monthEnd));
             int day = Integer.parseInt(d.substring(dayStart,dayEnd));
-            return new Date[lbl](year, month, day);
+            int hour = 0;
+            int min = 0;
+            if (hourStart > 0) {
+                hour = Integer.parseInt(d.substring(hourStart,hourEnd));
+            }
+            if (minStart > 0) {
+                min = Integer.parseInt(d.substring(minStart,minEnd));
+            }
+            return new Date[lbl](year, month, day, hour, min);
         }
         catch (NumberFormatException e) {
-            throw new IllegalArgumentException("invalid string: format should be DD-MM-YYYY");
+            throw new IllegalArgumentException("invalid string: format should be DD-MM-YYYY [hh:mm]");
         }
         catch (StringIndexOutOfBoundsException impossible) {
             return null;
@@ -94,23 +114,36 @@ public final class Date[covariant label L] implements JifObject[L] {
     }
  
     /**
-     * Set the date to the current day
+     * Set the date to the current time
      */
     public Date() {
         final principal p = PrincipalUtil.nullPrincipal();
         this.year = Runtime[p].currentYear();
         this.month = Runtime[p].currentMonth();
         this.day = Runtime[p].currentDayOfMonth();
+        this.hour = Runtime[p].currentHour();
+        this.minute = Runtime[p].currentMinute();
     }
     public Date(int{L; this} pYear, int{L; this} pMonth, int{L; this} pDay) throws (IllegalArgumentException{pYear; pMonth; pDay}){
+        this(pYear, pMonth, pDay, 0, 0);
+    }
+    public Date(int{L; this} pYear, int{L; this} pMonth, int{L; this} pDay, int{L; this} pHour, int{L; this} pMinute) throws (IllegalArgumentException{pYear; pMonth; pDay; pHour; pMinute}){
         this.year = pYear;
         this.month = pMonth;
         this.day = pDay;            
-        checkDateValid(pYear, pMonth, pDay);
+        this.hour = pHour;            
+        this.minute = pMinute;            
+        checkDateValid(pYear, pMonth, pDay, pHour, pMinute);
     }
     public Date(int{L} pYear, String{L} pMonth, int{L} pDay) throws (IllegalArgumentException{pYear; pMonth; pDay}) {
+        this(pYear, pMonth, pDay, 0, 0);
+    }
+    public Date(int{L} pYear, String{L} pMonth, int{L} pDay, int{L} pHour, int{L} pMinute) throws (IllegalArgumentException{pYear; pMonth; pDay; pHour; pMinute}) {
+        
         this.year = pYear;
         this.day = pDay;
+        this.hour = pHour;
+        this.minute = pMinute;
         int theMonth = 0;
         for (int i = 1; i <= 12; i++) {
             try {
@@ -126,7 +159,7 @@ public final class Date[covariant label L] implements JifObject[L] {
             throw new IllegalArgumentException("Invalid month: " + pMonth);
         }
         this.month = theMonth;
-        checkDateValid(pYear, theMonth, pDay);
+        checkDateValid(pYear, theMonth, pDay, pHour, pMinute);
     }
     
     public static int daysInMonth(int month, int year) {
@@ -141,7 +174,7 @@ public final class Date[covariant label L] implements JifObject[L] {
         catch (ArrayIndexOutOfBoundsException impossible) { }
         return -1;
     }
-    private static void checkDateValid(int pYear, int pMonth, int pDay)  throws (IllegalArgumentException{pYear; pMonth; pDay}) {
+    private static void checkDateValid(int pYear, int pMonth, int pDay, int pHour, int pMinute)  throws (IllegalArgumentException{pYear; pMonth; pDay; pHour; pMinute}) {
         if (pMonth < 1 || pMonth > 12) {
             throw new IllegalArgumentException("Invalid month: " + pMonth);
         }
@@ -153,11 +186,17 @@ public final class Date[covariant label L] implements JifObject[L] {
         }
         catch(ArrayIndexOutOfBoundsException impossible) { }
         catch(NullPointerException impossible) { }
+        if (pHour < 0 || pHour > 23) {
+            throw new IllegalArgumentException("Invalid hour: " + pHour);
+        }
+        if (pMinute < 0 || pMinute > 59) {
+            throw new IllegalArgumentException("Invalid minute: " + pMinute);
+        }
 
     }
     
     public static Date[lbl] lenientDate(label lbl, int{*lbl} year, 
-                                        int{*lbl} month, int{*lbl} day) {
+            int{*lbl} month, int{*lbl} day) {
         int y = year;
         int m = month;
         int d = day;
@@ -183,10 +222,55 @@ public final class Date[covariant label L] implements JifObject[L] {
         catch (IllegalArgumentException impossible) { }
         return null;
     }
+    public static Date[lbl] lenientDate(label lbl, int{*lbl} year, 
+                                        int{*lbl} month, int{*lbl} day,
+                                        int{*lbl} hour, int{*lbl} minute) {
+        int y = year;
+        int m = month;
+        int d = day;
+        int h = hour;
+        int min = minute;
+        while (min > 59) {
+            min -= 60; h++;
+        }
+        while (min < 0) {
+            min += 60; h--;
+        }
+        while (h > 23) {
+            h -= 24; d++;
+        }
+        while (h < 0) {
+            h += 24; d--;
+        }
+    
+        try {
+            while (m > 12 || m < 1 || d < 1 || d > daysInMonth(m, y)) {
+                while (m > 12) {
+                    m -= 12; y++;
+                }
+                while (m < 1) {
+                    m += 12; y--;
+                }
+                // m is now between 1 and 12 inclusive
+                if (d > daysInMonth(m, y)) {
+                    d -= daysInMonth(m, y); m++;
+                }
+                if (d < 1) {
+                    d += daysInMonth((m+10)%12+1, y); m--;
+                }
+            }
+            return new Date[lbl](y, m, d, h, min);
+        }
+        catch (ArithmeticException impossible) { }
+        catch (IllegalArgumentException impossible) { }
+        return null;
+    }
 
     public int{L} getYear() { return this.year; }
     public int{L} getMonth() { return this.month; }
     public int{L} getDay() { return this.day; }
+    public int{L} getHour() { return this.hour; }
+    public int{L} getMinute() { return this.minute; }
     public int{L} getDayOfWeek() { 
         try {
             // Jan 1 1900 was a monday, so its index is 1.
@@ -247,7 +331,9 @@ public final class Date[covariant label L] implements JifObject[L] {
         }
         return (this.year < that.year) ||
             (this.year == that.year && this.month < that.month) ||
-            (this.year == that.year && this.month == that.month && this.day < that.day);
+            (this.year == that.year && this.month == that.month && this.day < that.day) ||
+            (this.year == that.year && this.month == that.month && this.day == that.day && this.hour < that.hour) ||
+            (this.year == that.year && this.month == that.month && this.day == that.day && this.hour == that.hour && this.minute < that.minute);
     }
 
     public boolean{L; when} after(Date[L] when) {
@@ -257,7 +343,9 @@ public final class Date[covariant label L] implements JifObject[L] {
         }
         return (this.year > that.year) ||
             (this.year == that.year && this.month > that.month) ||
-            (this.year == that.year && this.month == that.month && this.day > that.day);
+            (this.year == that.year && this.month == that.month && this.day > that.day) ||
+            (this.year == that.year && this.month == that.month && this.day == that.day && this.hour > that.hour) || 
+            (this.year == that.year && this.month == that.month && this.day == that.day && this.hour == that.hour && this.minute > that.minute);
     }
     
     /**
@@ -330,32 +418,52 @@ public final class Date[covariant label L] implements JifObject[L] {
         Date[lbl] that = (Date[lbl])o;
         return this.year == that.year &&
             this.month == that.month &&
-            this.day == that.day;
+            this.day == that.day &&
+            this.hour == that.hour&&
+            this.minute == that.minute;
+            
     }
 
     public int{L} hashCode() {
         return (year) ^
-            (month * 37) &
-            (day * 113);
+            (month * 256) ^
+            (day * 1024) ^ 
+            (hour * 13) ^
+            minute;
     }
     // formatting methods
     public String{L} toLongString() {
-        return day + " " + getMonthName() + " " + year;
+        String min = "" + minute;
+        if (min.length() < 2) min = "0" + min;
+        String h = "" + hour;
+        if (h.length() < 2) h = "0" + h;
+        
+        return day + " " + getMonthName() + " " + year + " " + h + ":" + min;
     }
     public String{L} toShortString() {
-        return day + "-" + month + "-" + year;
+        String min = "" + minute;
+        if (min.length() < 2) min = "0" + min;
+        String h = "" + hour;
+        if (h.length() < 2) h = "0" + h;
+        return day + "-" + month + "-" + year + " " + h + ":" + min;
     }
     
     
     // Functional style methods
     public Date[L]{L} year(int{this} year):{L; this} throws IllegalArgumentException {
-        return new Date[L](year, this.month, this.day);
+        return new Date[L](year, this.month, this.day, this.hour, this.minute);
     }
     public Date[L]{L} month(int{this} month):{L; this} throws IllegalArgumentException {
-        return new Date[L](this.year, month, this.day);
+        return new Date[L](this.year, month, this.day, this.hour, this.minute);
     }
     public Date[L]{L} day(int{this} day):{L; this} throws IllegalArgumentException {
-        return new Date[L](this.year, this.month, day);
+        return new Date[L](this.year, this.month, day, this.hour, this.minute);
+    }
+    public Date[L]{L} hour(int{this} hour):{L; this} throws IllegalArgumentException {
+        return new Date[L](this.year, this.month, this.day, hour, this.minute);
+    }
+    public Date[L]{L} minute(int{this} minute):{L; this} throws IllegalArgumentException {
+        return new Date[L](this.year, this.month, this.day, this.hour, minute);
     }
 //    public Date[L]{L} addYear(int{L} yearDelta):{L; this} {
 //        return lenientDate(L, this.year + yearDelta, this.month, this.day);
@@ -377,5 +485,13 @@ public final class Date[covariant label L] implements JifObject[L] {
     public static Date[lb]{*lb; lb; date; delta} addDay{*lb}(label lb, Date[lb]{*lb} date, int{*lb} delta) {
         if (date == null) return null;
         return Date[lb].lenientDate(lb, date.getYear(), date.getMonth(), date.getDay() + delta);
+    }
+    public static Date[lb]{*lb; lb; date; delta} addHour{*lb}(label lb, Date[lb]{*lb} date, int{*lb} delta) {
+        if (date == null) return null;
+        return Date[lb].lenientDate(lb, date.getYear(), date.getMonth(), date.getDay(), date.getHour() + delta, date.getMinute());
+    }
+    public static Date[lb]{*lb; lb; date; delta} addMinute{*lb}(label lb, Date[lb]{*lb} date, int{*lb} delta) {
+        if (date == null) return null;
+        return Date[lb].lenientDate(lb, date.getYear(), date.getMonth(), date.getDay(), date.getHour(), date.getMinute()+ delta);
     }
 }
