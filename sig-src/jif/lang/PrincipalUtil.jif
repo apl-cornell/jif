@@ -8,6 +8,7 @@ package jif.lang;
  * principal to execute a Closure.
  */
 public class PrincipalUtil {
+    private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
     /**
      * Does the principal p act for the principal q? 
      */

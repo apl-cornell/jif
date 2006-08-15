@@ -155,40 +155,50 @@ public class JifOptions extends Options {
         usageForFlag(out, "-addrtcp <path>", "additional path for Jif runtime classes; prepended to rtcp");
     }
 
-    public String constructJifClasspath() {
+    protected String constructSignatureClasspath() {
         // use the signature classpath if it exists for compiling Jif classes
         String scp = "";
         for (Iterator iter = addSigcp.iterator(); iter.hasNext(); ) {
-            scp += ((String)iter.next()) + File.pathSeparator;            
+            scp += ((String)iter.next());
+            if (iter.hasNext()) {
+                scp += File.pathSeparator;            
+            }
         }
         if (sigcp != null) {
-            scp += sigcp + File.pathSeparator;
+            scp += File.pathSeparator + sigcp;
         }
-        return scp + constructFullClasspath();
+        return scp;
+    }
+
+    public String constructJifClasspath() {
+        return constructSignatureClasspath() +  
+                File.pathSeparator + constructFullClasspath();
     }
 
     protected String constructRuntimeClassPath() {
         String rcp = "";
         for (Iterator iter = addRtcp.iterator(); iter.hasNext(); ) {
-            rcp += ((String)iter.next()) + File.pathSeparator;            
+            rcp += ((String)iter.next());
+            if (iter.hasNext()) {
+                rcp += File.pathSeparator;            
+            }
         }
         if (rtcp != null) {
-            rcp += rtcp + File.pathSeparator;
+            rcp += File.pathSeparator + rtcp;
         }
         return rcp;        
     }
     
     public String constructOutputExtClasspath() {
         // use the runtime classpath if it exists for compiling the output classes
-        // Note that we do not want to use the signature class path, since it contains
-        // labels and principals as primitives.
-        return constructRuntimeClassPath() + constructFullClasspath();
+        return constructRuntimeClassPath() + File.pathSeparator + constructJifClasspath();
     }
 
     public String constructPostCompilerClasspath() {
-        return constructRuntimeClassPath() + 
-            super.constructPostCompilerClasspath() + File.pathSeparator
+        String cp = constructRuntimeClassPath() + File.pathSeparator
+                + super.constructPostCompilerClasspath() + File.pathSeparator
                 + constructFullClasspath();
+        return cp;
     }
 
 }

@@ -19,6 +19,7 @@ package jif.lang;
  * the principal represented by an object of the class.
  */
 public interface Principal {
+    static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
     /**
      * The name of this principal. Names should be unique within an 
      * implementation class, that is, given two Principal objects, o and p,
