@@ -3,6 +3,8 @@ package java.math;
 import java.io.*;
 
 public class BigInteger extends Number /*implements Comparable*/ {
+    private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
+    
     public BigInteger(byte{this}[]{this} val) throws (NumberFormatException{val}) { }  
     public BigInteger(int{this} signum, byte{this}[]{this} magnitude) throws (NumberFormatException{signum;magnitude}) { } 
     public BigInteger(String{this} val, int{this} radix) throws (NumberFormatException{val;radix}) { } 
