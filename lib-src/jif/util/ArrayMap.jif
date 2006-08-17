@@ -21,7 +21,7 @@ public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
     
     // extend the size by INITIAL_CAPACITY
     private void extendCapacity{K}() {
-        int newCapacity  = capacity + INITIAL_CAPACITY;
+        int newCapacity  = 1+(int)(capacity * 1.5);
         
         ArrayMapEntry[K,V]{K}[]{K} newEntryArray = new ArrayMapEntry[K,V][newCapacity];
         

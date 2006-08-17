@@ -18,7 +18,7 @@ public class ArrayList[label L]
      * The size of the ArrayList (the number of elements it contains).
      *
      */
-    private int{L} size;
+    private int{L} size = 0;
 
     /**
      * Constructs an empty list 
@@ -42,7 +42,7 @@ public class ArrayList[label L]
             int oldCapacity = ed.length;
             if (minCapacity > oldCapacity) {
                 JifObject[L]{L}[] oldData = ed;
-                int newCapacity = 10;//(oldCapacity * 2) + 1;
+                int newCapacity = 1 + (int)(oldCapacity * 1.5);
                 if (newCapacity < minCapacity) {
                     newCapacity = minCapacity;
                 }
