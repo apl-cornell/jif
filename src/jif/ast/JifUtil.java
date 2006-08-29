@@ -128,7 +128,7 @@ public class JifUtil
                 Flags flgs = f.flags();
                 return flgs.isFinal() && 
                     (flgs.isStatic() || 
-                     isFinalAccessExpr(ts, (Expr)f.target()));
+                     (f.target() instanceof Expr && isFinalAccessExpr(ts, (Expr)f.target())));
             }
             else {
                 return true;
