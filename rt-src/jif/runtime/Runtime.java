@@ -2,8 +2,6 @@ package jif.runtime;
 
 import java.io.*;
 import java.util.*;
-import java.util.GregorianCalendar;
-import java.util.LinkedList;
 
 import jif.lang.*;
 
@@ -183,6 +181,19 @@ public class Runtime {
     public static int currentMinute(Principal dummy) {
         return new GregorianCalendar().get(Calendar.MINUTE);
     }
+    public static void sleep(Principal dummy, int s) {
+        try {
+            // add some noise...
+            double noise = 0.15; 
+            double multiplier = 1 + ((2 * Math.random() - 1) * noise); // = 1 plus or minus noise
+            long ms = (long)((long)s * 1000 * multiplier);
+            Thread.sleep(ms);
+        }
+        catch (InterruptedException e) {
+            // ignore the interrupted exception
+        }
+    }
+    
     static {
         System.loadLibrary("jifrt");
     }

@@ -29,5 +29,8 @@ public class Runtime[principal P]
     public static native int{*!:*} currentDayOfMonth();    
     public static native int{*!:*} currentHour();
     public static native int{*!:*} currentMinute();
+    
+    // sleep for approximately s seconds.
+    public static native void sleep(int s);
 }
 
