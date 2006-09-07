@@ -52,13 +52,11 @@ public class JifTryExt extends JifStmtExt_c
 	    // label check the formal
 	    f = (Formal) lc.context(A).labelCheck(cb.formal());
 	    
-	    LabelConstraint.Kind pc_constraint_kind = LabelConstraint.EQUAL;
 	    // If there is a declared label, bind the label of the formal to
 	    // be equivalent to it, and force this declared label to
 	    // be at least as high as the pc flow.
 	    if (ts.isLabeled(f.type().type())) {
 	        Label declaredLabel = ts.labelOfType(f.type().type());
-	        pc_constraint_kind = LabelConstraint.LEQ;
 	        lc.constrain(new LabelConstraint(new NamedLabel("local_label", 
 	                                                        "inferred label of " + f.name(), 
 	                                                        Li), 
@@ -84,7 +82,7 @@ public class JifTryExt extends JifStmtExt_c
                                     "by the exception " + catchTypeName + " " +
                                     "being thrown", 
                                     pc_i), 
-                     pc_constraint_kind, // use EQUALS or LEQ depending on if there was a declared label
+                     LabelConstraint.LEQ,
                      new NamedLabel("label_exc_i", 
                                     "label of variable " + vi.name(), 
                                     Li), 
