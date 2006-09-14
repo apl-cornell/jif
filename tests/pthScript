@@ -376,6 +376,7 @@ jif.ExtensionInfo  "-cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.j
 	Params40.jif (Semantic, "not a subtype") ;
 	Params41.jif ;
 	Params42.jif ; # return a more reasonable error.
+	Params43.jif ;
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;

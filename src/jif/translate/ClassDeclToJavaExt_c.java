@@ -179,36 +179,44 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         for (Iterator iter = jpt.interfaces().iterator(); iter.hasNext(); ) {
             Type interf = (Type)iter.next();
             if (rw.jif_ts().isParamsRuntimeRep(interf) &&
-                    !rw.jif_ts().isSubtype(baseClass.superType(), interf) &&
-                    interf instanceof JifSubstType) {
+                    !rw.jif_ts().isSubtype(baseClass.superType(), interf)) {                
                 // the interface is not implemented in a super class,
                 // so add fields and params for runtime representation of params
-                JifSubstType interfST = (JifSubstType)interf;
-                JifSubst subst = (JifSubst)interfST.subst();
-                JifPolyType interfPT = (JifPolyType)interfST.base();
-                for (Iterator iter2 = interfPT.params().iterator(); iter2.hasNext(); ) {
-                    ParamInstance pi = (ParamInstance)iter2.next();
-                    String paramFieldName = ParamToJavaExpr_c.paramFieldName(pi);
-                    String paramFieldNameGetter = ParamToJavaExpr_c.paramFieldNameGetter(pi);
-                    TypeNode tn = typeNodeForParam(pi, rw);
-                    Expr lblExpr = rw.paramToJava(subst.get(pi));
-                    if (rw.jif_ts().isJifClass(jpt)) {
-                        // it's a real Jif class, so add a real implementation
-                        cb = cb.addMember(rw.qq().parseMember("private %T %s;", tn, paramFieldName));
-                        cb = cb.addMember(rw.qq().parseMember(
-                                                              "public final %T %s() { "
-                                                              + " if (this.%s==null) this.%s = %E; "
-                                                              + "return this.%s; }",
-                                                              tn, paramFieldNameGetter, paramFieldName,
-                                                              paramFieldName, lblExpr, paramFieldName));
-                    }
-                    else {
-                        // it's just a signature file, add the method sig but nothing else.
-                        cb = cb.addMember(rw.qq().parseMember("public final native %T %s();", tn, paramFieldNameGetter));
+                JifPolyType interfPT = null;
+                if (interf instanceof JifSubstType) {
+                    JifSubstType interfST = (JifSubstType)interf;
+                    JifSubst subst = (JifSubst)interfST.subst();
+                    interfPT = (JifPolyType)interfST.base();
+                    for (Iterator iter2 = interfPT.params().iterator(); iter2.hasNext(); ) {
+                        ParamInstance pi = (ParamInstance)iter2.next();
+                        String paramFieldName = ParamToJavaExpr_c.paramFieldName(pi);
+                        String paramFieldNameGetter = ParamToJavaExpr_c.paramFieldNameGetter(pi);
+                        TypeNode tn = typeNodeForParam(pi, rw);
+                        Expr lblExpr = rw.paramToJava(subst.get(pi));
+                        if (rw.jif_ts().isJifClass(jpt)) {
+                            // it's a real Jif class, so add a real implementation
+                            cb = cb.addMember(rw.qq().parseMember("private %T %s;", tn, paramFieldName));
+                            cb = cb.addMember(rw.qq().parseMember(
+                                                                  "public final %T %s() { "
+                                                                  + " if (this.%s==null) this.%s = %E; "
+                                                                  + "return this.%s; }",
+                                                                  tn, paramFieldNameGetter, paramFieldName,
+                                                                  paramFieldName, lblExpr, paramFieldName));
+                        }
+                        else {
+                            // it's just a signature file, add the method sig but nothing else.
+                            cb = cb.addMember(rw.qq().parseMember("public final native %T %s();", tn, paramFieldNameGetter));
+                        }
                     }
                 }
+                else if (interf instanceof JifPolyType) {
+                    interfPT = (JifPolyType)interf;
+                }
 
-                cb = addInterfaceParamGetters(cb, baseClass, interfPT, rw);
+                if (interfPT != null) {
+                    // recurse on the supertype of interfaces.
+                    cb = addInterfaceParamGetters(cb, baseClass, interfPT, rw);
+                }
 
             }
         }
@@ -293,6 +301,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
         StringBuffer sb = new StringBuffer();
         sb.append("static public %T %s(%LF) {");
+        sb.append("if (o == null) return null;");
         sb.append("if (%s(%LE)) return (%T)o;");
         sb.append("throw new ClassCastException();");
         sb.append("}");
