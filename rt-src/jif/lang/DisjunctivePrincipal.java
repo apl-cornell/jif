@@ -42,10 +42,10 @@ public final class DisjunctivePrincipal implements Principal {
         return false;
     }
 
-    public boolean isAuthorized(Object authPrf, Closure closure, Label lb) {
+    public boolean isAuthorized(Object authPrf, Closure closure, Label lb, boolean executeNow) {
         for (Iterator iter = disjuncts.iterator(); iter.hasNext(); ) {
             Principal p = (Principal)iter.next();
-            if (p.isAuthorized(authPrf, closure, lb)) return true;
+            if (p.isAuthorized(authPrf, closure, lb, executeNow)) return true;
         }
         return false;
     }

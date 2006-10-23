@@ -103,8 +103,9 @@ public class Runtime {
         
         if (acLabel.relabelsTo(L)) return new FileInputStream(name);
         
-        throw new SecurityException("The file has more restrictive access "
-                + "control permissions than " + L.toString());
+        throw new SecurityException("The file has label " + LabelUtil.stringValue(acLabel) + 
+                                    ", which is more restrictive than " +
+                                    L.toString());
     }
 
     /**

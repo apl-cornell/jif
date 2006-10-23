@@ -13,6 +13,7 @@ public abstract class Closure_JIF_IMPL {
     }
     
     public static Closure jif$cast$jif_lang_Closure(final Principal jif$P, final Label jif$L, final Object o) {
+        if (o == null) return null; 
         if (jif$Instanceof(jif$P, jif$L, o)) return (Closure) o;
         throw new ClassCastException();
     }

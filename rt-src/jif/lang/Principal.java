@@ -10,7 +10,7 @@ public interface Principal {
     
     boolean equals(final Principal p);
     
-    boolean isAuthorized(final Object authPrf, final Closure closure, final Label lb);
+    boolean isAuthorized(final Object authPrf, final Closure closure, final Label lb, final boolean executeNow);
     
     ActsForProof findProofUpto(final Principal p, final Object searchState);
     

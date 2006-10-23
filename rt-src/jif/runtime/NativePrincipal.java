@@ -45,7 +45,7 @@ public class NativePrincipal implements Principal {
         return superiors.contains(p);
     }
 
-    public boolean isAuthorized(Object authorizationProof, Closure closure, Label lb) {
+    public boolean isAuthorized(Object authorizationProof, Closure closure, Label lb, boolean executeNow) {
         // The default is that this principal authorizes no closures.
         return false;
     }

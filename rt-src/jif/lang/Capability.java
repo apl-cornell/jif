@@ -31,6 +31,7 @@ public final class Capability {
     }
     
     public static Capability jif$cast$jif_lang_Capability(final Principal jif$P, final Label jif$L, final Object o) {
+        if (o == null) return null; 
         if (jif$Instanceof(jif$P, jif$L, o)) return (Capability) o;
         throw new ClassCastException();
     }    

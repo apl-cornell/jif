@@ -45,10 +45,10 @@ public final class ConjunctivePrincipal implements Principal {
         return false;
     }
 
-    public boolean isAuthorized(Object authPrf, Closure closure, Label lb) {
+    public boolean isAuthorized(Object authPrf, Closure closure, Label lb, boolean executeNow) {
         for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
             Principal p = (Principal)iter.next();
-            if (!p.isAuthorized(authPrf, closure, lb)) return false;
+            if (!p.isAuthorized(authPrf, closure, lb, executeNow)) return false;
         }
         // all conjuncts authorize the closure.
         return true;

@@ -41,7 +41,8 @@ class StupidPrincipal extends AbstractPrincipal {
 
     public boolean{authPrf; closure; lb; this} isAuthorized(Object authPrf, 
                                                      Closure[this, lb] closure,
-                                                     label lb) where authority (this) {
+                                                     label lb,
+                                                     boolean executeNow) where authority (this) {
         return true;
     }
     

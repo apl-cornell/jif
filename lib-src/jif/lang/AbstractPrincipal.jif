@@ -62,9 +62,10 @@ public abstract class AbstractPrincipal implements Principal {
         return result;
     }
     
-    public boolean{authPrf; closure; lb; *lb; this; this!:} isAuthorized{this!:}(Object authPrf, 
+    public boolean{authPrf; closure; lb; *lb; executeNow; this; this!:} isAuthorized{this!:}(Object authPrf, 
                                                                  Closure[this, lb] closure,
-                                                                 label lb) where authority (this) {
+                                                                 label lb,
+                                                                 boolean executeNow) where authority (this) {
         // The default is that this principal authorizes no closures.
         return false;
     }

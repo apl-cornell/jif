@@ -46,6 +46,11 @@ public class PrincipalUtil {
                 authorize(principal p, Object authPrf, Closure[p, lb] c, label lb);
                 
     /**
+     * Execute the closure for the given principal.
+     */
+    public static native Object{c;lb;authPrf;p;*lb} execute{*lb}(principal p, Object authPrf, Closure[p, lb] c, label lb);
+
+    /**
      * returns the null principal, the principal that every other principal can
      * act for.
      */                

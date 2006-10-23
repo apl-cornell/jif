@@ -54,7 +54,10 @@ public class LabeledType_c extends Type_c implements LabeledType
     }
 
     public boolean equalsImpl(TypeObject t) {
-        throw new InternalCompilerError(this + ".equalsImpl(" + t + ") called");
+        // only return pointer equals. This method may occassionally be called, due to
+        // the existence of the JifTypeSystem.equalsNoStrip method.
+        return this == t;
+        // throw new InternalCompilerError(this + ".equalsImpl(" + t + ") called");
     }
     
     public ClassType toClass() { return typePart.toClass(); }

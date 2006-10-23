@@ -284,10 +284,26 @@ public class PrincipalUtil {
     }
     
     /**
+     * Execute the given closure, if the principal agrees.
+     */
+    public static Object execute(Principal p, Object authPrf, Closure c,
+            Label lb) {
+        Capability cap = authorize(p, authPrf, c, lb, true);
+        if (cap != null) {
+            return cap.invoke();
+        }
+        return null;
+    }
+
+    /**
      * Obtain a Capability for the given principal and closure.
      */
     public static Capability authorize(Principal p, Object authPrf, Closure c,
-                                       Label lb) {
+            Label lb) {
+        return authorize(p, authPrf, c, lb, false);
+    }
+    private static Capability authorize(Principal p, Object authPrf, Closure c,
+                                       Label lb, boolean executeNow) {
         try {
             LabelUtil.enterTiming();
             Principal closureP = c.jif$getjif_lang_Closure_P();
@@ -298,7 +314,7 @@ public class PrincipalUtil {
                 // The principals agree.
                 if (LabelUtil.equivalentTo(closureL, lb)) {
                     // the labels agree
-                    if (p == null || p.isAuthorized(authPrf, c, lb)) {
+                    if (p == null || p.isAuthorized(authPrf, c, lb, executeNow)) {
                         // either p is null (and the "null" principal always
                         // gives authority!) or p grants authority to execute the
                         // closure.
@@ -481,7 +497,7 @@ public class PrincipalUtil {
         public String name() { return "*"; }
         public boolean delegatesTo(Principal p) { return false; }
         public boolean equals(Principal p) { return p == this; }
-        public boolean isAuthorized(Object authPrf, Closure closure, Label lb) { return false; }
+        public boolean isAuthorized(Object authPrf, Closure closure, Label lb, boolean executeNow) { return false; }
         public ActsForProof findProofUpto(Principal p, Object searchState) { return null; }
         public ActsForProof findProofDownto(Principal q, Object searchState) { return null; }
         

@@ -9,6 +9,7 @@ public abstract class Principal_JIF_IMPL {
     }
     
     public static Principal jif$cast$jif_lang_Principal(final Object o) {
+        if (o == null) return null; 
         if (jif$Instanceof(o)) return (Principal) o;
         throw new ClassCastException();
     }

@@ -43,16 +43,19 @@ public interface Principal {
     /**
      * Does the <code>authPrf<code> provide
      * sufficient proof of this principal's authority to
-     * execute the closure <code>closure</code>?
+     * execute the closure <code>closure</code>? If <code>executeNow</code>, then
+     * the closure will be executed immediately; otherwise,
+     * a capability will be created.
      * For example, <code>authPrf<code> may be
      * a password (or a password digest, or a certificate, etc.), 
      * and this method will return true if that password matches
      * the principal's password, and the closure is one that the
      * principal expects to be asked to authorize.
      */
-    boolean{authPrf; closure; lb; *lb; this; this!:} isAuthorized{this!:}(Object authPrf, 
+    boolean{authPrf; closure; lb; *lb; executeNow; this; this!:} isAuthorized{this!:}(Object authPrf, 
                                                           Closure[this, lb] closure,
-                                                          label lb) where authority (this);
+                                                          label lb,
+                                                          boolean executeNow) where authority (this);
     
     /**
      * Search for a proof that the principal p can act for this principal.
