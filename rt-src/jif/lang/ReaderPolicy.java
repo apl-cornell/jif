@@ -22,6 +22,8 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
     
     
     public boolean relabelsTo(Policy p) {
+        if (this == p || this.equals(p)) return true;
+        
         if (p instanceof JoinConfPolicy) {
             JoinPolicy jp = (JoinPolicy)p;
             // this <= p1 join ... join p2 if there exists a pi such that
@@ -64,6 +66,7 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
     }
     
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (! (o instanceof ReaderPolicy)) {
             return false;
         }

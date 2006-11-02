@@ -18,6 +18,8 @@ abstract class MeetPolicy extends AbstractPolicy implements Policy
     }
     
     public boolean relabelsTo(Policy pol) {
+        if (this == pol || this.equals(pol)) return true;
+
         // this == c1 meet ... meet cn
         // this <= pol if there is a Ci such that Ci <= pol
         for (Iterator i = components.iterator(); i.hasNext(); ) {
@@ -59,7 +61,7 @@ abstract class MeetPolicy extends AbstractPolicy implements Policy
     public boolean equals(Object o) {
         if (o instanceof MeetPolicy) {
             MeetPolicy that = (MeetPolicy)o;
-            return this.meetComponents().equals(that.meetComponents());
+            return this == that || this.meetComponents().equals(that.meetComponents());
         }        
         return false;
     }

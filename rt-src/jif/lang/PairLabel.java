@@ -18,7 +18,8 @@ public final class PairLabel implements Label
 
     public boolean relabelsTo(Label l) {
         if (l instanceof PairLabel) {
-            PairLabel that = (PairLabel)l;
+            PairLabel that = (PairLabel)l;            
+            if (this == that || this.equals(that)) return true;
             return (this.confPol.relabelsTo(that.confPol) &&
                     this.integPol.relabelsTo(that.integPol));
         }
@@ -32,7 +33,7 @@ public final class PairLabel implements Label
     public boolean equals(Object o) {
         if (o instanceof PairLabel) {
             PairLabel that = (PairLabel)o;
-            return (this.confPol.equals(that.confPol) &&
+            return (this == that) || (this.confPol.equals(that.confPol) &&
                     this.integPol.equals(that.integPol));
         }
         return false;

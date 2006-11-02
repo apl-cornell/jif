@@ -107,9 +107,11 @@ public abstract class AbstractPrincipal implements Principal {
     }
     
     public boolean equals(Object o) {
-        if (o == null) return false;
         if (o instanceof Principal) {
-            return equals((Principal)o);
+            Principal p = (Principal)o;
+            return (this.name == p.name() || (this.name != null && 
+                    this.name.equals(p.name()))) &&
+                    this.getClass() == p.getClass();        
         }
         return false;
     }

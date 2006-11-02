@@ -18,6 +18,8 @@ abstract class JoinPolicy extends AbstractPolicy implements Policy
     }
     
     public boolean relabelsTo(Policy pol) {
+        if (this == pol || this.equals(pol)) return true;
+        
         // this == c1 join ... join cn
         // this <= pol if for all Ci, Ci <= pol
         boolean sat = true;
@@ -61,8 +63,8 @@ abstract class JoinPolicy extends AbstractPolicy implements Policy
     
     public boolean equals(Object o) {
         if (o instanceof JoinPolicy) {
-            JoinPolicy that = (JoinPolicy)o;
-            return this.joinComponents().equals(that.joinComponents());
+            JoinPolicy that = (JoinPolicy)o;            
+            return this == that || this.joinComponents().equals(that.joinComponents());
         }        
         return false;
     }

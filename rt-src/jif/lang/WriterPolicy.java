@@ -22,6 +22,7 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy
     
     
     public boolean relabelsTo(Policy p) {
+        if (this == p || this.equals(p)) return true;
         if (p instanceof JoinIntegPolicy) {
             JoinPolicy jp = (JoinPolicy)p;
             // this <= p1 join ... join p2 if there exists a pi such that
@@ -66,6 +67,7 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy
     }
     
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (! (o instanceof WriterPolicy)) {
             return false;
         }
