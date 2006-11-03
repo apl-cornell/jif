@@ -24,7 +24,8 @@ import polyglot.util.Position;
 /** Represents a join of a number of policies. 
  */
 public abstract class JoinPolicy_c extends Policy_c {
-    private Set joinComponents;
+    private final Set joinComponents;
+    private Integer hashCode = null;
     
     public JoinPolicy_c(Collection components, JifTypeSystem ts, Position pos) {
         super(ts, pos);
@@ -60,7 +61,7 @@ public abstract class JoinPolicy_c extends Policy_c {
         if (this == o) return true;
         if (o instanceof JoinPolicy_c) {
             JoinPolicy_c that = (JoinPolicy_c)o;
-            return this.joinComponents.equals(that.joinComponents);
+            return this.hashCode() == that.hashCode() && this.joinComponents.equals(that.joinComponents);
         }
         if (o instanceof Policy) {
             // see if it matches a singleton
@@ -69,7 +70,10 @@ public abstract class JoinPolicy_c extends Policy_c {
         return false;
     }
     public int hashCode() {
-        return joinComponents.hashCode();
+        if (hashCode == null) {
+            hashCode = new Integer(joinComponents.hashCode());
+        }
+        return hashCode.intValue();
     }
     
     public String toString(Set printedLabels) {

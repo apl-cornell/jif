@@ -7,6 +7,7 @@ import java.util.*;
  */
 public final class DisjunctivePrincipal implements Principal {
     final Set disjuncts;
+    private Integer hashCode = null;
     
     DisjunctivePrincipal(Set disjuncts) {
         this.disjuncts = disjuncts;
@@ -33,10 +34,17 @@ public final class DisjunctivePrincipal implements Principal {
         return false;
     }
 
+    public int hashCode() {
+        if (hashCode == null) {
+            hashCode = new Integer(disjuncts.hashCode()); 
+        }
+        return hashCode.intValue();
+    }
+
     public boolean equals(Principal p) {
         if (p instanceof DisjunctivePrincipal) {
             DisjunctivePrincipal that = (DisjunctivePrincipal)p;
-            return this.disjuncts.equals(that.disjuncts) &&
+            return this.hashCode() == that.hashCode() && this.disjuncts.equals(that.disjuncts) &&
                 that.disjuncts.equals(this.disjuncts);
         }
         return false;

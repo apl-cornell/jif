@@ -10,6 +10,7 @@ public final class PairLabel implements Label
 {
     private final ConfPolicy confPol;
     private final IntegPolicy integPol;
+    private Integer hashCode = null;
     
     public PairLabel(ConfPolicy confPol, IntegPolicy integPol) {
         this.confPol = confPol;
@@ -27,14 +28,17 @@ public final class PairLabel implements Label
     }
     
     public int hashCode() {
-    	return confPol.hashCode() ^ integPol.hashCode();
+        if (hashCode == null) {
+            hashCode = new Integer(confPol.hashCode() ^ integPol.hashCode());
+        }
+        return hashCode.intValue();
     }
     
     public boolean equals(Object o) {
         if (o instanceof PairLabel) {
             PairLabel that = (PairLabel)o;
-            return (this == that) || (this.confPol.equals(that.confPol) &&
-                    this.integPol.equals(that.integPol));
+            return this.hashCode() == that.hashCode() && (this == that || (this.confPol.equals(that.confPol) &&
+                    this.integPol.equals(that.integPol)));
         }
         return false;
     }

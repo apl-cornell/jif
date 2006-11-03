@@ -9,6 +9,7 @@ import java.util.Set;
  */
 public final class ConjunctivePrincipal implements Principal {
     final Set conjuncts;
+    private Integer hashCode;
     
     ConjunctivePrincipal(Set conjuncts) {
         this.conjuncts = conjuncts;
@@ -36,10 +37,17 @@ public final class ConjunctivePrincipal implements Principal {
         return true;
     }
 
+    public int hashCode() {
+        if (hashCode == null) {
+            hashCode = new Integer(conjuncts.hashCode()); 
+        }
+        return hashCode.intValue();
+    }
+
     public boolean equals(Principal p) {
         if (p instanceof ConjunctivePrincipal) {
             ConjunctivePrincipal that = (ConjunctivePrincipal)p;
-            return this.conjuncts.equals(that.conjuncts) &&
+            return this.hashCode() == that.hashCode() && this.conjuncts.equals(that.conjuncts) &&
                 that.conjuncts.equals(this.conjuncts);
         }
         return false;
