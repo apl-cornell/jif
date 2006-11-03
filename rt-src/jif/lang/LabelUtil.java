@@ -13,6 +13,13 @@ public class LabelUtil
     private static long enterStartTime = 0;
     private static int callStackCount = 0;
     private static boolean COUNT_TIME = false;
+    
+    // caches
+    private static Map cacheLabelRelabels = new HashMap();
+    private static Map cachePolicyRelabels = new HashMap();
+    private static Map cacheLabelJoins = new HashMap();
+    private static Map cacheLabelMeets = new HashMap();
+    
     static void enterTiming() {
         if (COUNT_TIME) {
             synchronized (LabelUtil.class) {
@@ -44,29 +51,24 @@ public class LabelUtil
     
     private static final ConfPolicy BOTTOM_CONF;
     private static final IntegPolicy TOP_INTEG;
-    private static final Map intern = new HashMap();
+    private static final Label NO_COMPONENTS; 
     
     static {
         BOTTOM_CONF = new ReaderPolicy(null, null);
         TOP_INTEG = new WriterPolicy(null, null);
+        NO_COMPONENTS = new PairLabel(BOTTOM_CONF, TOP_INTEG);
     }
     
     private LabelUtil() { }
     
     public static Label noComponents() {
-        try {
-            enterTiming();
-            return intern(new PairLabel(BOTTOM_CONF, TOP_INTEG));
-        }
-        finally {
-            exitTiming();
-        }
+        return NO_COMPONENTS;
     }
     
     public static ConfPolicy readerPolicy(Principal owner, Principal reader) {
         try {
             enterTiming();
-            return intern(new ReaderPolicy(owner, reader));
+            return new ReaderPolicy(owner, reader);
         }
         finally {
             exitTiming();
@@ -75,7 +77,7 @@ public class LabelUtil
     public static ConfPolicy readerPolicy(Principal owner, Collection readers) {
         try {
             enterTiming();
-            return intern(new ReaderPolicy(owner, PrincipalUtil.disjunction(readers)));
+            return new ReaderPolicy(owner, PrincipalUtil.disjunction(readers));
         }
         finally {
             exitTiming();
@@ -108,7 +110,7 @@ public class LabelUtil
     public static Label readerPolicyLabel(Principal owner, Principal reader) {
         try {
             enterTiming();
-            return toLabel(intern(new ReaderPolicy(owner, reader)));
+            return toLabel(new ReaderPolicy(owner, reader));
         }
         finally {
             exitTiming();
@@ -117,7 +119,7 @@ public class LabelUtil
     public static Label readerPolicyLabel(Principal owner, Collection readers) {        
         try {
             enterTiming();
-            Label l = toLabel(intern(new ReaderPolicy(owner, PrincipalUtil.disjunction(readers))));
+            Label l = toLabel(new ReaderPolicy(owner, PrincipalUtil.disjunction(readers)));
             return l;
         }
         finally {
@@ -152,7 +154,7 @@ public class LabelUtil
     public static IntegPolicy writerPolicy(Principal owner, Principal writer) {
         try {
             enterTiming();
-            return intern(new WriterPolicy(owner, writer));
+            return new WriterPolicy(owner, writer);
         }
         finally {
             exitTiming();
@@ -161,7 +163,7 @@ public class LabelUtil
     public static IntegPolicy writerPolicy(Principal owner, Collection writers) {
         try {
             enterTiming();
-            return intern(new WriterPolicy(owner, PrincipalUtil.disjunction(writers)));
+            return new WriterPolicy(owner, PrincipalUtil.disjunction(writers));
         }
         finally {
             exitTiming();
@@ -170,7 +172,7 @@ public class LabelUtil
     public static Label writerPolicyLabel(Principal owner, Principal writer) {
         try {
             enterTiming();
-            return toLabel(intern(new WriterPolicy(owner, writer)));
+            return toLabel(new WriterPolicy(owner, writer));
         }
         finally {
             exitTiming();
@@ -179,7 +181,7 @@ public class LabelUtil
     public static Label writerPolicyLabel(Principal owner, Collection writers) {
         try {
             enterTiming();
-            return toLabel(intern(new WriterPolicy(owner, PrincipalUtil.disjunction(writers))));
+            return toLabel(new WriterPolicy(owner, PrincipalUtil.disjunction(writers)));
         }
         finally {
             exitTiming();
@@ -226,7 +228,7 @@ public class LabelUtil
     public static Label toLabel(ConfPolicy cPolicy, IntegPolicy iPolicy) {
         try {
             enterTiming();
-            return intern(new PairLabel(cPolicy, iPolicy));        
+            return new PairLabel(cPolicy, iPolicy);        
         }
         finally {
             exitTiming();
@@ -235,7 +237,7 @@ public class LabelUtil
     public static Label toLabel(ConfPolicy policy) {
         try {
             enterTiming();
-            return intern(new PairLabel(policy, TOP_INTEG));
+            return new PairLabel(policy, TOP_INTEG);
         }
         finally {
             exitTiming();
@@ -244,7 +246,7 @@ public class LabelUtil
     public static Label toLabel(IntegPolicy policy) {
         try {
             enterTiming();
-            return intern(new PairLabel(BOTTOM_CONF, policy));
+            return new PairLabel(BOTTOM_CONF, policy);
         }
         finally {
             exitTiming();
@@ -259,11 +261,17 @@ public class LabelUtil
             if (l2 == null) return l1;
             
             if (l1 instanceof PairLabel && l2 instanceof PairLabel) {
-                PairLabel pl1 = (PairLabel)l1;
-                PairLabel pl2 = (PairLabel)l2;
+                Pair pair = new Pair(l1, l2);
+                Label result = (Label)cacheLabelJoins.get(pair);
+                if (result == null) {
+                    PairLabel pl1 = (PairLabel)l1;
+                    PairLabel pl2 = (PairLabel)l2;
+                    result = new PairLabel(pl1.confPolicy().join(pl2.confPolicy()),
+                                           pl1.integPolicy().join(pl2.integPolicy()));
+                    cacheLabelJoins.put(pair, result);
+                }
+                return result;            
                 
-                return intern(new PairLabel(pl1.confPolicy().join(pl2.confPolicy()),
-                                            pl1.integPolicy().join(pl2.integPolicy())));
             }
             // error! non pair labels!
             return null;
@@ -288,12 +296,18 @@ public class LabelUtil
             if (l2 == null) return l1;
             
             if (l1 instanceof PairLabel && l2 instanceof PairLabel) {
-                PairLabel pl1 = (PairLabel)l1;
-                PairLabel pl2 = (PairLabel)l2;
-                
-                return intern(new PairLabel(pl1.confPolicy().meet(pl2.confPolicy()),
-                                            pl1.integPolicy().meet(pl2.integPolicy())));
+                Pair pair = new Pair(l1, l2);
+                Label result = (Label)cacheLabelMeets.get(pair);
+                if (result == null) {
+                    PairLabel pl1 = (PairLabel)l1;
+                    PairLabel pl2 = (PairLabel)l2;
+                    result = new PairLabel(pl1.confPolicy().meet(pl2.confPolicy()),
+                                           pl1.integPolicy().meet(pl2.integPolicy()));
+                    cacheLabelMeets.put(pair, result);
+                }
+                return result;                            
             }
+
             // error! non pair labels!
             return null;
         }
@@ -424,9 +438,7 @@ public class LabelUtil
     public static boolean equivalentTo(Label l1, Label l2) {
         try {
             enterTiming();
-            l1 = intern(l1);
-            l2 = intern(l2);
-            if (l1 == l2) return true;
+            if (l1 == l2 || (l1 != null && l1.equals(l2))) return true;
             return l1 != null && l2 != null && l1.relabelsTo(l2) && l2.relabelsTo(l1);
         }
         finally {
@@ -448,25 +460,33 @@ public class LabelUtil
     public static boolean relabelsTo(Label from, Label to) {
         try {
             enterTiming();
-            from = intern(from);
-            to = intern(to);
-            if (from == to) return true;
-            
-            return from != null && from.relabelsTo(to);
+            if (from == null || to == null) return false;
+            if (from == to || from.equals(to)) return true;
+            Pair pair = new Pair(from, to);
+            Boolean result = (Boolean)cacheLabelRelabels.get(pair);
+            if (result == null) {
+                result = Boolean.valueOf(from != null && from.relabelsTo(to));
+                cacheLabelRelabels.put(pair, result);
+            }
+            return result.booleanValue();            
         }
         finally {
             exitTiming();
         }
     }
-    
+
     private static boolean relabelsTo(Policy from, Policy to) {
         try {
             enterTiming();
-            from = intern(from);
-            to = intern(to);
-            if (from == to) return true;
-            
-            return from != null && from.relabelsTo(to);
+            if (from == null || to == null) return false;
+            if (from == to || from.equals(to)) return true;
+            Pair pair = new Pair(from, to);
+            Boolean result = (Boolean)cachePolicyRelabels.get(pair);
+            if (result == null) {
+                result = Boolean.valueOf(from != null && from.relabelsTo(to));
+                cachePolicyRelabels.put(pair, result);
+            }
+            return result.booleanValue();            
         }
         finally {
             exitTiming();
@@ -504,30 +524,7 @@ public class LabelUtil
             exitTiming();
         }
     }
-    
-    private static Policy intern(Policy pol) {
-        Policy in = (Policy)intern.get(pol);
-        if (in == null) {
-            in = pol;
-            intern.put(in, in);
-        }
-        return in;        
-    }
-    private static ConfPolicy intern(ConfPolicy confPol) {
-        return (ConfPolicy)intern((Policy)confPol);        
-    }
-    private static IntegPolicy intern(IntegPolicy integPol) {
-        return (IntegPolicy)intern((Policy)integPol);        
-    }
-    private static Label intern(Label l) {
-        Label in = (Label)intern.get(l);
-        if (in == null) {
-            in = l;
-            intern.put(in, in);
-        }
-        return in;
-    }
-    
+        
     private static Set simplifyJoin(Set policies) {
         Set needed = new LinkedHashSet();
         for (Iterator i = policies.iterator(); i.hasNext(); ) {
@@ -573,6 +570,29 @@ public class LabelUtil
         }
         
         return needed;        
+    }
+
+    /**
+     * Internal representation of a pair of objects, used for the caches
+     */
+    private static class Pair {
+        final Object left; // must be non null
+        final Object right; // must be non null
+        public Pair(Object left, Object right) {
+            this.left = left;
+            this.right = right;
+        }
+        public int hashCode() {
+            return left.hashCode() ^ right.hashCode();
+        }
+        public boolean equals(Object o) {
+            if (o instanceof Pair) {
+                Pair that = (Pair)o;
+                return (this.left == that.left || this.left.equals(that.left)) && 
+                       (this.right == that.right || this.right.equals(that.right));
+            }
+            return false;
+        }
     }
     
 }
