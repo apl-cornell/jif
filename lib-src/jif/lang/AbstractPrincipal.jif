@@ -37,8 +37,9 @@ public abstract class AbstractPrincipal implements Principal {
                     for (int i = 0; i < old.length; i++) {
                         superiors[i] = old[i];
                     }
-                    superiors[old.length] = (Principal)declassify(p, {this!:});            
+                    superiors[old.length] = (Principal)declassify(p, {this!:});
                 }
+                PrincipalUtil.notifyNewDelegation(this, p);
             }
             catch (NullPointerException impossible) {}
             catch (ArrayStoreException impossible) {}
@@ -46,6 +47,42 @@ public abstract class AbstractPrincipal implements Principal {
         }
     }
     
+    public void removeDelegatesTo{this:;this!:}(principal{this:;this!:} p) where caller (this) {
+        if (superiors == null || !superiorsContains((Principal)p)) {
+            return;
+        }
+        // need to remove p to the superiors.
+        declassify ({this!:}) {
+            principal dp = declassify(p, {this!:});
+            try {
+
+                Principal{this!:*}[] old = superiors;
+                int j = 0;
+                for (int i = 0; i < old.length; i++) {
+                    Principal q = old[i];
+                    if (q == dp || (q != null && q.equals(dp))) {
+                        // this is a principal we need to remove
+                        PrincipalUtil.notifyRevokeDelegation(this, q);
+                    }
+                    else {
+                        // this is a principal we want to keep
+                        old[j] = old[i];
+                        j++;
+                    }
+                }
+                // we now want to keep only the first j elements of the array
+                
+                superiors = new Principal[j];
+                for (int i = 0; i < j; i++) {
+                    superiors[i] = old[i];
+                }   
+            }
+            catch (NullPointerException impossible) {}
+            catch (ArrayStoreException impossible) {}
+            catch (ArrayIndexOutOfBoundsException impossible) {}
+        }
+    }
+
     protected boolean{this;p;this!:} superiorsContains(Principal p) where authority (this) {
         boolean{this;p;this!:} result = false;
         Principal{this!:*}[] sprs = superiors;

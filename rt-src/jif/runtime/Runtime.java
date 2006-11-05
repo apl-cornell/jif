@@ -72,7 +72,7 @@ public class Runtime {
 
         if (existed) {
             Label acLabel = FileSystem.labelOf(name);
-            if (!L.relabelsTo(acLabel)) {
+            if (!LabelUtil.relabelsTo(L, acLabel)) {
                 throw new SecurityException("The file " + name
                         + "doesn't have sufficient access restrictions.");
             }
@@ -101,7 +101,7 @@ public class Runtime {
             throws FileNotFoundException, SecurityException {
         Label acLabel = FileSystem.labelOf(name);
         
-        if (acLabel.relabelsTo(L)) return new FileInputStream(name);
+        if (LabelUtil.relabelsTo(acLabel, L)) return new FileInputStream(name);
         
         throw new SecurityException("The file has label " + LabelUtil.stringValue(acLabel) + 
                                     ", which is more restrictive than " +
@@ -113,7 +113,7 @@ public class Runtime {
      * The output channel is parameterized by <code>l</code>.
      */
     public PrintStream stderr(Label l) {
-        if (l.relabelsTo(defaultLabel())) return System.err;
+        if (LabelUtil.relabelsTo(l, defaultLabel())) return System.err;
 
         throw new SecurityException("The standard error output is not "
                 + "sufficiently secure.");
@@ -124,7 +124,7 @@ public class Runtime {
      * This output channel is parameterized by <code>l</code>.
      */
     public PrintStream stdout(Label l) {
-        if (l.relabelsTo(defaultLabel())) return System.out;
+        if (LabelUtil.relabelsTo(l, defaultLabel())) return System.out;
         
         throw new SecurityException("The standard output is not "
                 + "sufficiently secure.");
@@ -135,7 +135,7 @@ public class Runtime {
      * This input channel is parameterized by <code>l</code>.
      */
     public InputStream stdin(Label l) {
-        if (defaultLabel().relabelsTo(l)) return System.in;
+        if (LabelUtil.relabelsTo(defaultLabel(), l)) return System.in;
         
         throw new SecurityException("The standard output is not "
                 + "sufficiently secure.");

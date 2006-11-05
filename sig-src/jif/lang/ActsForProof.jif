@@ -19,5 +19,4 @@ public abstract class ActsForProof {
     public principal{this} getGranter() {
         return granter;
     }
-
 }

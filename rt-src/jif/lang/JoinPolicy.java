@@ -17,20 +17,26 @@ abstract class JoinPolicy extends AbstractPolicy implements Policy
         return components;
     }
     
-    public boolean relabelsTo(Policy pol) {
+    public boolean relabelsTo(Policy pol, Set s) {
         if (this == pol || this.equals(pol)) return true;
         
+        Set temp = new HashSet();
         // this == c1 join ... join cn
         // this <= pol if for all Ci, Ci <= pol
         boolean sat = true;
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Policy Ci = (Policy) i.next();
-            if (!Ci.relabelsTo(pol)) {
+            if (!LabelUtil.relabelsTo(Ci, pol, temp)) {
                 sat = false;
                 break;
             }
         }
-        if (sat) return true;
+        if (sat) {
+            s.addAll(temp);
+            return true;
+        }
+        
+        temp.clear();
         
         // failed so far, try taking advantage of structure on the RHS
         if (pol instanceof MeetPolicy) {
@@ -40,20 +46,25 @@ abstract class JoinPolicy extends AbstractPolicy implements Policy
             sat = true;
             for (Iterator i = mp.meetComponents().iterator(); i.hasNext(); ) {
                 Policy Di = (Policy) i.next();
-                if (!this.relabelsTo(Di)) {
+                if (!LabelUtil.relabelsTo(this, Di, temp)) {
                     sat = false;
                     break;
                 }
             }
-            if (sat) return true;            
+            if (sat) {
+                s.addAll(temp);
+                return true;            
+            }
         }
         if (pol instanceof JoinPolicy) {
             // this <= d1 join ... join dn if there is some di
             // such that this <= di
             JoinPolicy jp = (JoinPolicy)pol;
             for (Iterator i = jp.joinComponents().iterator(); i.hasNext(); ) {
+                temp.clear();
                 Policy Di = (Policy) i.next();
-                if (this.relabelsTo(Di)) {
+                if (LabelUtil.relabelsTo(this, Di, temp)) {
+                    s.addAll(temp);
                     return true;
                 }
             }

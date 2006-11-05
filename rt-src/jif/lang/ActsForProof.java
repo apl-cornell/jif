@@ -1,5 +1,7 @@
 package jif.lang;
 
+import java.util.Set;
+
 public abstract class ActsForProof {
     private final Principal actor;
     private final Principal granter;
@@ -15,5 +17,10 @@ public abstract class ActsForProof {
     public Principal getGranter() {
         return granter;
     }
+    
+    /* Gather the set of PrincipalUtil.DelegationPairs that
+     * this proof relies on.
+     */
+    void gatherDelegationDependencies(Set s) { }
 
 }

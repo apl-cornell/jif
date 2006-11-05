@@ -1,6 +1,8 @@
 package jif.lang;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
 {
@@ -21,7 +23,7 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
     }
     
     
-    public boolean relabelsTo(Policy p) {
+    public boolean relabelsTo(Policy p, Set s) {
         if (this == p || this.equals(p)) return true;
         
         if (p instanceof JoinConfPolicy) {
@@ -30,7 +32,7 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
             // this <= pi
             for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
                 Policy pi = (Policy)iter.next();
-                if (relabelsTo(pi)) return true;                
+                if (LabelUtil.relabelsTo(this, pi, s)) return true;                
             }
             return false;
         }
@@ -38,10 +40,12 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
             MeetPolicy mp = (MeetPolicy)p;
             // this <= p1 meet ... meet p2 if for all pi 
             // this <= pi
+            Set temp = new HashSet();
             for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
                 Policy pi = (Policy)iter.next();
-                if (!relabelsTo(pi)) return false;                
+                if (!LabelUtil.relabelsTo(this, pi, temp)) return false;                
             }
+            s.addAll(temp);
             return true;            
         }
         else if (!(p instanceof ReaderPolicy))
@@ -53,12 +57,24 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
         // p    = { o' : .. rj' .. }
         
         // o' >= o?
-        
-        if (! PrincipalUtil.actsFor(pp.owner, owner)) {
+    
+        ActsForProof ownersProof = PrincipalUtil.actsForProof(pp.owner, owner);
+        if (ownersProof == null) {
             return false;
         }
-        return PrincipalUtil.actsFor(pp.reader, reader) || 
-               PrincipalUtil.actsFor(pp.reader, owner);        
+        ActsForProof readerReaderProof = PrincipalUtil.actsForProof(pp.reader, this.reader);
+        if (readerReaderProof != null) {
+            ownersProof.gatherDelegationDependencies(s);
+            readerReaderProof.gatherDelegationDependencies(s);
+            return true;
+        }
+        ActsForProof readerOwnerProof = PrincipalUtil.actsForProof(pp.reader, this.owner);
+        if (readerOwnerProof != null) {
+            ownersProof.gatherDelegationDependencies(s);
+            readerOwnerProof.gatherDelegationDependencies(s);      
+            return true;
+        }
+        return false;
     }
     
     public int hashCode() {
@@ -89,12 +105,19 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
         return str;
     }
 
+    public ConfPolicy join(ConfPolicy p, Set s) {
+        return LabelUtil.join(this, p, s);
+    }
+
     public ConfPolicy join(ConfPolicy p) {
         return LabelUtil.join(this, p);
     }
 
+    public ConfPolicy meet(ConfPolicy p, Set s) {
+        return LabelUtil.meet(this, p, s);
+    }
     public ConfPolicy meet(ConfPolicy p) {
-        return LabelUtil.meet(this, p);
+        return LabelUtil.meetPol(this, p);
     }
     
 }

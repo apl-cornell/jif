@@ -33,7 +33,7 @@ public final class ConjunctivePrincipal implements Principal {
             Principal q = (Principal)iter.next();
             if (!PrincipalUtil.delegatesTo(q, p)) return false;
         }
-        // every conjuct is equal to p.
+        // every conjuct delegates to p.
         return true;
     }
 

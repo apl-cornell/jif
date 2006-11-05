@@ -40,6 +40,19 @@ public class PrincipalUtil {
                                              Principal p, Principal q);
     
     /**
+     * Notification that a new delegation has been added. All principals
+     * should call this method when adding a delegation, or risk an out-of-date
+     * cache.
+     */
+    public static native void notifyNewDelegation(Principal granter, Principal superior);
+    /**
+     * Notification that an existing delegation has been revoked. All principals
+     * should call this method when revoking a delegation, or risk an out-of-date
+     * cache.
+     */
+    public static native void notifyRevokeDelegation(Principal granter, Principal superior);
+
+        /**
      * Obtain a Capability for the given principal and closure.
      */
     public static native Capability[p, lb]

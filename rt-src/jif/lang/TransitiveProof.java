@@ -1,5 +1,7 @@
 package jif.lang;
 
+import java.util.Set;
+
 public final class TransitiveProof extends ActsForProof {
     private final ActsForProof actorToP;
     private final ActsForProof pToGranter;
@@ -19,6 +21,10 @@ public final class TransitiveProof extends ActsForProof {
     }
     Principal getP() {
         return p;
+    }
+    void gatherDelegationDependencies(Set s) {
+        actorToP.gatherDelegationDependencies(s);
+        pToGranter.gatherDelegationDependencies(s);
     }
 
 }

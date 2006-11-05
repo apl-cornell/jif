@@ -2,6 +2,8 @@ package jif.lang;
 
 import java.util.*;
 
+import jif.lang.PrincipalUtil.DelegationPair;
+
 /**
  * A Label is the runtime representation of a Jif label. A Label consists of a
  * set of components, each of which is a {@link jif.lang.IntegPolicy Policy}.
@@ -15,10 +17,16 @@ public class LabelUtil
     private static boolean COUNT_TIME = false;
     
     // caches
-    private static Map cacheLabelRelabels = new HashMap();
-    private static Map cachePolicyRelabels = new HashMap();
+    private static Set/*<Pair>*/ cacheTrueLabelRelabels = new HashSet();
+    private static Set/*<Pair>*/ cacheFalseLabelRelabels = new HashSet();
+    private static Map/*<DelegationPair to Set<Pair>>*/ cacheTrueLabelRelabelsDependencies= new HashMap();
+    private static Map/*<Pair> to Set<DelegationPair>*/ cacheTruePolicyRelabels = new HashMap();
+    private static Set/*<Pair>*/ cacheFalsePolicyRelabels = new HashSet();
+    private static Map/*<DelegationPair to Set<Pair>>*/ cacheTruePolicyRelabelsDependencies = new HashMap();
     private static Map cacheLabelJoins = new HashMap();
     private static Map cacheLabelMeets = new HashMap();
+    private static Map/*<DelegationPair to Set<Pair>>*/ cacheLabelJoinDependencies = new HashMap();
+    private static Map/*<DelegationPair to Set<Pair>>*/ cacheLabelMeetDependencies = new HashMap();
     
     static void enterTiming() {
         if (COUNT_TIME) {
@@ -266,8 +274,20 @@ public class LabelUtil
                 if (result == null) {
                     PairLabel pl1 = (PairLabel)l1;
                     PairLabel pl2 = (PairLabel)l2;
-                    result = new PairLabel(pl1.confPolicy().join(pl2.confPolicy()),
-                                           pl1.integPolicy().join(pl2.integPolicy()));
+                    Set dependencies = new HashSet();
+                    result = new PairLabel(pl1.confPolicy().join(pl2.confPolicy(), dependencies),
+                                           pl1.integPolicy().join(pl2.integPolicy(), dependencies));
+                    // add dependencies from delegations to the cache result
+                    // i.e., what dependencies does this result rely on?
+                    for (Iterator iter = dependencies.iterator(); iter.hasNext();) {
+                        DelegationPair del = (DelegationPair)iter.next();
+                        Set deps = (Set)cacheLabelJoinDependencies.get(del);
+                        if (deps == null) {
+                            deps = new HashSet();
+                            cacheLabelJoinDependencies.put(del, deps);
+                        }
+                        deps.add(pair);
+                    }
                     cacheLabelJoins.put(pair, result);
                 }
                 return result;            
@@ -301,8 +321,20 @@ public class LabelUtil
                 if (result == null) {
                     PairLabel pl1 = (PairLabel)l1;
                     PairLabel pl2 = (PairLabel)l2;
-                    result = new PairLabel(pl1.confPolicy().meet(pl2.confPolicy()),
-                                           pl1.integPolicy().meet(pl2.integPolicy()));
+                    Set dependencies = new HashSet();
+                    result = new PairLabel(pl1.confPolicy().meet(pl2.confPolicy(), dependencies),
+                                           pl1.integPolicy().meet(pl2.integPolicy(), dependencies));
+                    // add dependencies from delegations to the cache result
+                    // i.e., what dependencies does this result rely on?
+                    for (Iterator iter = dependencies.iterator(); iter.hasNext();) {
+                        DelegationPair del = (DelegationPair)iter.next();
+                        Set deps = (Set)cacheLabelMeetDependencies.get(del);
+                        if (deps == null) {
+                            deps = new HashSet();
+                            cacheLabelMeetDependencies.put(del, deps);
+                        }
+                        deps.add(pair);
+                    }
                     cacheLabelMeets.put(pair, result);
                 }
                 return result;                            
@@ -315,7 +347,10 @@ public class LabelUtil
             exitTiming();
         }
     }
-    public static ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {        
+    static public ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {        
+        return join(p1, p2, new HashSet());
+    }
+    static ConfPolicy join(ConfPolicy p1, ConfPolicy p2, Set s) {        
         try {
             enterTiming();
             Set comps = new LinkedHashSet();
@@ -331,7 +366,7 @@ public class LabelUtil
             else {
                 comps.add(p2);
             }
-            comps = simplifyJoin(comps);
+            comps = simplifyJoin(comps, s);
             
             if (comps.size() == 1) {
                 return (ConfPolicy)comps.iterator().next();
@@ -343,7 +378,11 @@ public class LabelUtil
         }
         
     }
-    public static IntegPolicy join(IntegPolicy p1, IntegPolicy p2) {        
+    static public IntegPolicy join(IntegPolicy p1, IntegPolicy p2) {
+        return join(p1, p2, new HashSet());
+        
+    }
+    static IntegPolicy join(IntegPolicy p1, IntegPolicy p2, Set s) {        
         try {
             enterTiming();
             Set comps = new LinkedHashSet();
@@ -359,7 +398,7 @@ public class LabelUtil
             else {
                 comps.add(p2);
             }
-            comps = simplifyJoin(comps);
+            comps = simplifyJoin(comps, s);
             
             if (comps.size() == 1) {
                 return (IntegPolicy)comps.iterator().next();
@@ -372,9 +411,9 @@ public class LabelUtil
         
     }
     public static ConfPolicy meetPol(ConfPolicy p1, ConfPolicy p2) {
-        return meet(p1, p2);
+        return meet(p1, p2, new HashSet());
     }
-    public static ConfPolicy meet(ConfPolicy p1, ConfPolicy p2) {        
+    static ConfPolicy meet(ConfPolicy p1, ConfPolicy p2, Set s) {        
         try {
             enterTiming();
             Set comps = new LinkedHashSet();
@@ -390,7 +429,7 @@ public class LabelUtil
             else {
                 comps.add(p2);
             }
-            comps = simplifyMeet(comps);
+            comps = simplifyMeet(comps, s);
             
             if (comps.size() == 1) {
                 return (ConfPolicy)comps.iterator().next();
@@ -401,10 +440,10 @@ public class LabelUtil
             exitTiming();
         }
     }
-    public static IntegPolicy meetPol(IntegPolicy p1, IntegPolicy p2) {
-        return meet(p1, p2);
+    static public IntegPolicy meetPol(IntegPolicy p1, IntegPolicy p2) {
+        return meet(p1, p2, new HashSet());
     }
-    public static IntegPolicy meet(IntegPolicy p1, IntegPolicy p2) {        
+     static IntegPolicy meet(IntegPolicy p1, IntegPolicy p2, Set s) {        
         try {
             enterTiming();
             Set comps = new LinkedHashSet();
@@ -420,7 +459,7 @@ public class LabelUtil
             else {
                 comps.add(p2);
             }
-            comps = simplifyMeet(comps);
+            comps = simplifyMeet(comps, s);
             
             if (comps.size() == 1) {
                 return (IntegPolicy)comps.iterator().next();
@@ -439,7 +478,7 @@ public class LabelUtil
         try {
             enterTiming();
             if (l1 == l2 || (l1 != null && l1.equals(l2))) return true;
-            return l1 != null && l2 != null && l1.relabelsTo(l2) && l2.relabelsTo(l1);
+            return relabelsTo(l1, l2) && relabelsTo(l2, l1);
         }
         finally {
             exitTiming();
@@ -463,30 +502,66 @@ public class LabelUtil
             if (from == null || to == null) return false;
             if (from == to || from.equals(to)) return true;
             Pair pair = new Pair(from, to);
-            Boolean result = (Boolean)cacheLabelRelabels.get(pair);
-            if (result == null) {
-                result = Boolean.valueOf(from != null && from.relabelsTo(to));
-                cacheLabelRelabels.put(pair, result);
+            if (cacheTrueLabelRelabels.contains(pair)) return true;
+            if (cacheFalseLabelRelabels.contains(pair)) return false;
+            Set dependencies = new HashSet();
+            boolean result = from != null && from.relabelsTo(to, dependencies);
+            if (!result) {
+                cacheFalseLabelRelabels.add(pair);
             }
-            return result.booleanValue();            
+            else {
+                cacheTrueLabelRelabels.add(pair);
+                // add dependencies from delegations to the cache result
+                // i.e., what dependencies does this result rely on?
+                for (Iterator iter = dependencies.iterator(); iter.hasNext();) {
+                    DelegationPair del = (DelegationPair)iter.next();
+                    Set deps = (Set)cacheTrueLabelRelabelsDependencies.get(del);
+                    if (deps == null) {
+                        deps = new HashSet();
+                        cacheTrueLabelRelabelsDependencies.put(del, deps);
+                    }
+                    deps.add(pair);
+                }
+            }
+            return result;            
         }
         finally {
             exitTiming();
         }
     }
 
-    private static boolean relabelsTo(Policy from, Policy to) {
+    static boolean relabelsTo(Policy from, Policy to, Set s) {
         try {
             enterTiming();
             if (from == null || to == null) return false;
             if (from == to || from.equals(to)) return true;
             Pair pair = new Pair(from, to);
-            Boolean result = (Boolean)cachePolicyRelabels.get(pair);
-            if (result == null) {
-                result = Boolean.valueOf(from != null && from.relabelsTo(to));
-                cachePolicyRelabels.put(pair, result);
+            if (cacheTruePolicyRelabels.containsKey(pair)) {
+                s.addAll((Set)cacheTruePolicyRelabels.get(pair));
+                return true;
             }
-            return result.booleanValue();            
+            if (cacheFalsePolicyRelabels.contains(pair)) return false;
+            Set dependencies = new HashSet();
+            boolean result = from.relabelsTo(to, dependencies);
+            if (!result) {
+                cacheFalsePolicyRelabels.add(pair);
+            }
+            else {
+                cacheTruePolicyRelabels.put(pair, dependencies);
+                // add dependencies from delegations to the cache result
+                // i.e., what dependencies does this result rely on?
+                for (Iterator iter = dependencies.iterator(); iter.hasNext();) {
+                    DelegationPair del = (DelegationPair)iter.next();
+                    Set deps = (Set)cacheTruePolicyRelabelsDependencies.get(del);
+                    if (deps == null) {
+                        deps = new HashSet();
+                        cacheTruePolicyRelabelsDependencies.put(del, deps);
+                    }
+                    deps.add(pair);
+                }
+                s.addAll(dependencies);
+            }
+            return result;            
         }
         finally {
             exitTiming();
@@ -525,7 +600,7 @@ public class LabelUtil
         }
     }
         
-    private static Set simplifyJoin(Set policies) {
+    private static Set simplifyJoin(Set policies, Set dependencies) {
         Set needed = new LinkedHashSet();
         for (Iterator i = policies.iterator(); i.hasNext(); ) {
             Policy ci = (Policy)i.next();
@@ -533,12 +608,12 @@ public class LabelUtil
             boolean subsumed = (ci == null); // null components are always subsumed.
             for (Iterator j = needed.iterator(); !subsumed && j.hasNext(); ) {
                 Policy cj = (Policy) j.next();
-                if (relabelsTo(ci, cj)) {
+                if (relabelsTo(ci, cj, dependencies)) {
                     subsumed = true;
                     break;
                 }
                 
-                if (relabelsTo(cj, ci)) { 
+                if (relabelsTo(cj, ci, dependencies)) { 
                     j.remove();
                 }
             }
@@ -548,7 +623,7 @@ public class LabelUtil
         
         return needed;        
     }
-    private static Set simplifyMeet(Set policies) {
+    private static Set simplifyMeet(Set policies, Set dependencies) {
         Set needed = new LinkedHashSet();
         for (Iterator i = policies.iterator(); i.hasNext(); ) {
             Policy ci = (Policy)i.next();
@@ -556,12 +631,12 @@ public class LabelUtil
             boolean subsumed = (ci == null); // null components are always subsumed.
             for (Iterator j = needed.iterator(); !subsumed && j.hasNext(); ) {
                 Policy cj = (Policy) j.next();
-                if (relabelsTo(cj, ci)) {
+                if (relabelsTo(cj, ci, dependencies)) {
                     subsumed = true;
                     break;
                 }
                 
-                if (relabelsTo(ci, cj)) { 
+                if (relabelsTo(ci, cj, dependencies)) { 
                     j.remove();
                 }
             }
@@ -592,6 +667,54 @@ public class LabelUtil
                        (this.right == that.right || this.right.equals(that.right));
             }
             return false;
+        }
+        public String toString() {
+            return left + "-" + right;
+        }
+    }
+
+    static void notifyNewDelegation(Principal granter, Principal superior) {
+        // XXX for the moment, just clear out the caches.
+        cacheFalseLabelRelabels.clear();
+        cacheFalsePolicyRelabels.clear();
+        
+        // the label meets and joins can be soundly left, they just
+        // may not be as simplified as they could be. However, to maintain
+        // compatability with previous behavior, we will clear the caches
+        cacheLabelJoins.clear();
+        cacheLabelMeets.clear();
+        cacheLabelJoinDependencies.clear();
+        cacheLabelMeetDependencies.clear();
+    }
+    static void notifyRevokeDelegation(Principal granter, Principal superior) {
+        DelegationPair del = new DelegationPair(superior, granter);
+        Set deps = (Set)cacheTrueLabelRelabelsDependencies.remove(del);
+        if (deps != null) {
+            for (Iterator iter = deps.iterator(); iter.hasNext();) {
+                Pair afp = (Pair)iter.next();
+                cacheTrueLabelRelabels.remove(afp);
+            }
+        }
+        deps = (Set)cacheTruePolicyRelabelsDependencies.remove(del);
+        if (deps != null) {
+            for (Iterator iter = deps.iterator(); iter.hasNext();) {
+                Pair afp = (Pair)iter.next();
+                cacheTruePolicyRelabels.remove(afp);
+            }
+        }
+        deps = (Set)cacheLabelJoinDependencies.remove(del);
+        if (deps != null) {
+            for (Iterator iter = deps.iterator(); iter.hasNext();) {
+                Pair afp = (Pair)iter.next();
+                cacheLabelJoins.remove(afp);
+            }
+        }
+        deps = (Set)cacheLabelMeetDependencies.remove(del);
+        if (deps != null) {
+            for (Iterator iter = deps.iterator(); iter.hasNext();) {
+                Pair afp = (Pair)iter.next();
+                cacheLabelMeets.remove(afp);
+            }
         }
     }
     

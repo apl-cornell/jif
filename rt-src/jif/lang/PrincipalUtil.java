@@ -8,8 +8,16 @@ import java.util.*;
  * See the Jif source code, in lib-src/jif/lang/PrincipalUtil.jif
  */
 public class PrincipalUtil {
-    private static Map proofCache = new HashMap();    
     private static Principal TOP_PRINCIPAL = new TopPrincipal();
+
+    // caches
+    private static final Map cacheActsFor = new HashMap(); // Map from ActsForPairs to ActsForProofs
+    private static final Set cacheNotActsFor = new HashSet(); // Set of ActsForPairs
+    
+    //  map from DelegationPairs to sets of ActsForPairs. If (p, q) is
+    // in the set of the map of delegation d, then p actsfor q, and the 
+    // proof depends on the delegation d
+    private static final Map cacheActsForDependencies = new HashMap(); 
     
     /**
      * Returns true if and only if the principal p acts for the principal q. A
@@ -29,46 +37,84 @@ public class PrincipalUtil {
      * Returns true if and only if the principal p acts for the principal q.
      */
     public static boolean actsFor(Principal p, Principal q) {
+        return actsForProof(p, q) != null;
+    }
+    
+    /**
+     * Returns an actsfor proof if and only if the principal p acts for the principal q.
+     */
+    static ActsForProof actsForProof(Principal p, Principal q) {
         try {
             LabelUtil.enterTiming();
-            // anyone can act for the "null" principal
-            if (q == null) return true;
-            if (p == TOP_PRINCIPAL) return true;
-            
+            // try cache
+            ActsForPair pair = new ActsForPair(p, q);
+            if (cacheActsFor.containsKey(pair))  {
+                return (ActsForProof)cacheActsFor.get(pair);
+            }
+            if (cacheNotActsFor.contains(pair)) return null;
+
+            if (delegatesTo(q, p)) return new DelegatesProof(p, q);
+
             // if the two principals are ==-equal, or if they
             // both agree that they are equal to each other, then
             // we return true (since the acts-for relation is
             // reflexive).
-            if (p == q) return true;
-            if (equals(p,q)) return true;
-            
-            // try a simple test first
-            if (delegatesTo(q, p)) return true;
-            
-            // try the cache
-            PrincipalPair pp = new PrincipalPair(p, q);
-            ActsForProof prf = (ActsForProof)proofCache.get(pp);
-            if (prf != null) {
-                if (verifyProof(prf, p, q)) return true;
-                // chain is no longer valid
-                proofCache.remove(pp);
-            }
+            if (eq(p,q)) return new ReflexiveProof(p, q);
             
             // try searching
-            prf = findActsForProof(p, q, null);
-            if (prf != null && verifyProof(prf, p, q)) {
-                // cache the chain to avoid searching later.
-                proofCache.put(pp, prf);
-                return true;
+            ActsForProof prf = findActsForProof(p, q, null);
+            if (prf != null && (verifyProof(prf, p, q))) {
+                cacheActsFor.put(pair, prf);
+                // add dependencies that this actsfor replies on.
+                Set s = new HashSet();
+                prf.gatherDelegationDependencies(s);
+                // for each DelegationPair in s, if that delegation is removed, the proof is no longer valid.
+                for (Iterator iter = s.iterator(); iter.hasNext();) {
+                    DelegationPair del = (DelegationPair)iter.next();
+                    Set deps = (Set)cacheActsForDependencies.get(del);
+                    if (deps == null) {
+                        deps = new HashSet();
+                        cacheActsForDependencies.put(del, deps);
+                    }
+                    deps.add(pair);
+                }                
+                return prf;
             }
-            
-            // can't do anything more!
-            return false;
+            cacheNotActsFor.add(pair);
+            return null;
         }
         finally {
             LabelUtil.exitTiming();            
-        }
+        }        
+    }
+    
+    /**
+     * Notification that a new delegation has been created.
+     */
+    public static void notifyNewDelegation(Principal granter, Principal superior) {
+        // double check that the delegation occured
+        if (!delegatesTo(granter, superior)) return;
+        // XXX for the moment, just clear out all cached negative results
+        cacheNotActsFor.clear();
         
+        // need to notify the label cache too
+        LabelUtil.notifyNewDelegation(granter, superior);
+    }
+    
+    /**
+     * Notification that an existing delegation has been revoked.
+     */
+    public static void notifyRevokeDelegation(Principal granter, Principal superior) {
+        DelegationPair del = new DelegationPair(superior, granter);
+        Set deps = (Set)cacheActsForDependencies.remove(del);
+        if (deps != null) {
+            for (Iterator iter = deps.iterator(); iter.hasNext();) {
+                ActsForPair afp = (ActsForPair)iter.next();
+                cacheActsFor.remove(afp);
+            }
+        }
+        // need to notify the label cache too
+        LabelUtil.notifyRevokeDelegation(granter, superior);
     }
     
     /**
@@ -222,6 +268,7 @@ public class PrincipalUtil {
         try {
             LabelUtil.enterTiming();
             if (granter == null) return true;
+            if (topPrincipal().equals(superior)) return true;
             if (superior instanceof ConjunctivePrincipal) {
                 ConjunctivePrincipal cp = (ConjunctivePrincipal)superior;
                 for (Iterator iter = cp.conjuncts.iterator(); iter.hasNext();) {
@@ -235,31 +282,6 @@ public class PrincipalUtil {
             LabelUtil.exitTiming();            
         }
         
-    }
-    
-    private static class PrincipalPair {
-        final Principal p;
-        
-        final Principal q;
-        
-        PrincipalPair(Principal p, Principal q) {
-            this.p = p;
-            this.q = q;
-        }
-        
-        public boolean equals(Object o) {
-            if (o instanceof PrincipalPair) {
-                PrincipalPair that = (PrincipalPair)o;
-                return eq(this.p, that.p) && eq(this.q, that.q);
-                
-            }
-            return false;
-        }
-        
-        public int hashCode() {
-            return (p == null ? -4234 : p.hashCode())
-            + (q == null ? 23 : q.hashCode());
-        }
     }
     
     public static boolean equivalentTo(Principal p, Principal q) {
@@ -501,5 +523,41 @@ public class PrincipalUtil {
         public ActsForProof findProofUpto(Principal p, Object searchState) { return null; }
         public ActsForProof findProofDownto(Principal q, Object searchState) { return null; }
         
+    }
+    
+    private abstract static class PrincipalPair {
+        final Principal p;
+        final Principal q;
+        
+        PrincipalPair(Principal p, Principal q) {
+            this.p = p;
+            this.q = q;
+        }
+        
+        public boolean equals(Object o) {
+            if (o != null && o.getClass().equals(this.getClass())) {
+                PrincipalPair that = (PrincipalPair)o;
+                return eq(this.p, that.p) && eq(this.q, that.q);
+            }
+            return false;
+        }
+        
+        public int hashCode() {
+            return (p == null?-4234:p.hashCode())^(q==null?23:q.hashCode());
+        }
+        
+        public String toString() {
+            return p.name() + "-" + q.name();
+        }
+    }
+    private static class ActsForPair extends PrincipalPair {
+        ActsForPair(Principal superior, Principal inferior) {
+            super(superior, inferior);
+        }        
+    }
+    static class DelegationPair extends PrincipalPair {
+        DelegationPair(Principal actor, Principal granter) {
+            super(actor, granter);
+        }   
     }
 }

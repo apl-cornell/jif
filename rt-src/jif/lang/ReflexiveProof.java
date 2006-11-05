@@ -1,5 +1,7 @@
 package jif.lang;
 
+import java.util.Set;
+
 public final class ReflexiveProof extends ActsForProof {
 
     /**
@@ -9,6 +11,10 @@ public final class ReflexiveProof extends ActsForProof {
      */
     ReflexiveProof(Principal p, Principal q) {
         super(p, q);
+    }
+
+    void gatherDelegationDependencies(Set s) {
+        // no dependencies
     }
 
 }

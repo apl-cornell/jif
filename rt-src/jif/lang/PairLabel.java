@@ -1,5 +1,8 @@
 package jif.lang;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 /**
  * A Label is the runtime representation of a Jif label. A Label consists of a
@@ -17,12 +20,16 @@ public final class PairLabel implements Label
         this.integPol = integPol;
     }
 
-    public boolean relabelsTo(Label l) {
+    public boolean relabelsTo(Label l, Set s) {
         if (l instanceof PairLabel) {
             PairLabel that = (PairLabel)l;            
             if (this == that || this.equals(that)) return true;
-            return (this.confPol.relabelsTo(that.confPol) &&
-                    this.integPol.relabelsTo(that.integPol));
+            Set temp = new HashSet();
+            if (LabelUtil.relabelsTo(this.confPol, that.confPol, temp) &&
+                    LabelUtil.relabelsTo(this.integPol, that.integPol, temp)) {
+                s.addAll(temp);
+                return true;
+            }
         }
         return false;
     }
