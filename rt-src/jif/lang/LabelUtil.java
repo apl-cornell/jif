@@ -530,6 +530,10 @@ public class LabelUtil
         }
     }
 
+    public static boolean relabelsTo(Policy from, Policy to) {
+        return relabelsTo(from, to, new HashSet());
+    }
+
     static boolean relabelsTo(Policy from, Policy to, Set s) {
         try {
             enterTiming();
