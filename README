@@ -38,7 +38,9 @@ Softare Versions: We recommend that you use JDK 1.4.2 or later.  Ant
 Jif and Cygwin: Jif can be built and used on a Windows platform running 
    Cygwin. Several issues are worth pointing out however. 
      - The GNU C++ compiler, g++, must be installed in order to build the 
-       Jif native runtime library. 
+       Jif native runtime library.
+     - The w32api package must be installed, to ensure the appropriate 
+       Windows header files are present.
      - Great care must be taken in specifying class paths and environment
        variables. Any classpath used when compiling Jif programs must be
        understandable by both the javac compiler and ant. Thus, for 
