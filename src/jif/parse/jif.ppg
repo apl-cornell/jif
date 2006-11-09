@@ -247,12 +247,20 @@ parser Grm extends polyglot.parse.Grm {:
     public static final String METHOD_LABEL_ASSERTION_ANNOTATION = "label leq where-constraints";
 
 
-    public void countAnnotation(String key) {
+	private static final Set linesSeen = new HashSet();
+    public void countAnnotation(String key, Position pos) {
         Job job = ts.extensionInfo().scheduler().currentJob();
         String countKey = "Jif annotations: " + job + " : " + key;
         String countAllKey = "Jif annotations: all " + key;
         ts.extensionInfo().getStats().accumPassTimes(countKey, 1, 1);
         ts.extensionInfo().getStats().accumPassTimes(countAllKey, 1, 1);
+        String posString = new Position(pos.path(), pos.file(), pos.line()).toString();
+        // check if the position is already recorded.
+        
+        if (!linesSeen.contains(posString)) {
+        	linesSeen.add(posString);
+	        ts.extensionInfo().getStats().accumPassTimes("Jif annotations: TOTAL LINES WITH ANNOTATION", 1, 1);        	
+        }
     }
 
 :};
@@ -493,7 +501,7 @@ labeled_primitive_type  ::=
             {: RESULT = a; :}
     |   primitive_type:a label:b
             {: RESULT = parser.nf.LabeledTypeNode(parser.pos(a, b), a, b);
-               parser.countAnnotation(parser.TYPE_ANNOTATION);
+               parser.countAnnotation(parser.TYPE_ANNOTATION, RESULT.position());
             :}
     ;
 
@@ -607,7 +615,7 @@ method_header ::=
                         parser.array(b, e.intValue()),
                         c.getIdentifier(),
                                                 i, d, r, f, w, null);
-               if (i != null) parser.countAnnotation(parser.PC_BOUND_ANNOTATION);
+               if (i != null) parser.countAnnotation(parser.PC_BOUND_ANNOTATION, RESULT.position());
              :}
     |   modifiers_opt:a VOID:b IDENTIFIER:c label_opt:i
         LPAREN formal_parameter_list_opt:d RPAREN
@@ -617,7 +625,7 @@ method_header ::=
                                    parser.ts.Void()),
                         c.getIdentifier(),
                                                 i, d, r, f, w, null);
-               if (i != null) parser.countAnnotation(parser.PC_BOUND_ANNOTATION);
+               if (i != null) parser.countAnnotation(parser.PC_BOUND_ANNOTATION, RESULT.position());
             :}
     ;
 
@@ -646,7 +654,7 @@ return_label_opt ::=
     |   COLON label:a
             {:
                RESULT = a;
-               parser.countAnnotation(parser.END_LABEL_ANNOTATION);
+               parser.countAnnotation(parser.END_LABEL_ANNOTATION, RESULT.position());
             :}
     ;
 
@@ -785,31 +793,31 @@ constraint ::=
         // ConstraintNode
         AUTHORITY:x LPAREN principal_list:a RPAREN:y
         {: RESULT = parser.nf.AuthConstraintNode(parser.pos(x,y), a);
-           parser.countAnnotation(parser.METHOD_AUTH_ANNOTATION);
+           parser.countAnnotation(parser.METHOD_AUTH_ANNOTATION, RESULT.position());
         :}
     |   CALLER:x LPAREN principal_list:a RPAREN:y
         {: RESULT = parser.nf.CallerConstraintNode(parser.pos(x,y), a);
-           parser.countAnnotation(parser.METHOD_CALLER_ANNOTATION);
+           parser.countAnnotation(parser.METHOD_CALLER_ANNOTATION, RESULT.position());
         :}
     |   ENDORSE:x LPAREN label_flexible:a RPAREN:y
         {: RESULT = parser.nf.AutoEndorseConstraintNode(parser.pos(x,y), a);
-           parser.countAnnotation(parser.METHOD_AUTO_ENDORSE_ANNOTATION);
+           parser.countAnnotation(parser.METHOD_AUTO_ENDORSE_ANNOTATION, RESULT.position());
         :}
     |   principal:a actsfor principal:b
         {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b);
-           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION);
+           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}
     |   principal:a EQUIV principal:b
         {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b, true);
-           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION);
+           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}
     |   label_flexible:a LTEQ label_flexible:b
         {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b, false);
-           parser.countAnnotation(parser.METHOD_LABEL_ASSERTION_ANNOTATION);
+           parser.countAnnotation(parser.METHOD_LABEL_ASSERTION_ANNOTATION, RESULT.position());
         :}
     |   label:a EQUIV label:b
         {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b, true);
-           parser.countAnnotation(parser.METHOD_LABEL_ASSERTION_ANNOTATION);
+           parser.countAnnotation(parser.METHOD_LABEL_ASSERTION_ANNOTATION, RESULT.position());
         :}
     ;
 
@@ -1049,7 +1057,7 @@ reftype_or_expr ::=
             {: RESULT = new Array(parser, parser.pos(a,y), a.toType()); :}
     |   reftype_or_expr:a label:b
             {: RESULT = new LabeledExpr(parser, parser.pos(a,b), a, b);
-               parser.countAnnotation(parser.TYPE_ANNOTATION);
+               parser.countAnnotation(parser.TYPE_ANNOTATION, parser.pos(a,b));
             :}
     ;
 drop {
