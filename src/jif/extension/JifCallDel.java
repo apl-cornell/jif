@@ -148,7 +148,7 @@ public class JifCallDel extends JifJL_c
                                                     receiverExpr, 
                                                     mi.container(), 
                                                     del.receiverVarLabel,
-                                                    CallHelper.getArgLabelsFromFormalTypes(mi.formalTypes(), ts),
+                                                    CallHelper.getArgLabelsFromFormalTypes(mi.formalTypes(), ts, mi.position()),
                                                     del.argVarLabels,
                                                     c.arguments(),
                                                     del.paramVarLabels);

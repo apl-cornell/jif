@@ -842,11 +842,15 @@ public class CallHelper {
     }
 
     protected static List getArgLabelsFromFormalTypes(List formalTypes,
-            JifTypeSystem jts) {
+            JifTypeSystem jts, Position pos) throws SemanticException {
         List formalArgLabels = new ArrayList(formalTypes.size());
         for (Iterator iter = formalTypes.iterator(); iter.hasNext();) {
             Type t = (Type)iter.next();
-            ArgLabel al = (ArgLabel)jts.labelOfType(t);
+            Label l = jts.labelOfType(t);
+            if (!(l instanceof ArgLabel)) {
+                throw new SemanticException("Internal label error, probably caused by an earlier error.", pos);
+            }
+            ArgLabel al = (ArgLabel)l;
             formalArgLabels.add(al);
         }
         return formalArgLabels;
@@ -854,7 +858,7 @@ public class CallHelper {
 
     public Label instantiate(JifContext A, Label L) throws SemanticException {
         return JifInstantiator.instantiate(L, A, receiverExpr, calleeContainer, receiverLabel,
-                                           getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem()),
+                                           getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem(), pi.position()),
                                            this.actualArgLabels,
                                            this.actualArgs,
                                            this.actualParamLabels);
@@ -867,14 +871,14 @@ public class CallHelper {
      */
     public Principal instantiate(JifContext A, Principal p) throws SemanticException {
         return JifInstantiator.instantiate(p, A, receiverExpr, calleeContainer, receiverLabel,
-                                           getArgLabelsFromFormalTypes(this.pi.formalTypes(), (JifTypeSystem)this.pi.typeSystem()),
+                                           getArgLabelsFromFormalTypes(this.pi.formalTypes(), (JifTypeSystem)this.pi.typeSystem(), this.pi.position()),
                                            this.actualArgs,
                              this.actualParamLabels);
     }
 
     public Type instantiate(JifContext A, Type t) throws SemanticException {
         return JifInstantiator.instantiate(t, A, receiverExpr, calleeContainer, receiverLabel,
-                                           getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem()),
+                                           getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem(), pi.position()),
                                            this.actualArgLabels,
                                            this.actualArgs,
                                            this.actualParamLabels);
