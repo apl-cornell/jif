@@ -44,8 +44,10 @@ public final class PairLabel implements Label
     public boolean equals(Object o) {
         if (o instanceof PairLabel) {
             PairLabel that = (PairLabel)o;
-            return this.hashCode() == that.hashCode() && (this == that || (this.confPol.equals(that.confPol) &&
-                    this.integPol.equals(that.integPol)));
+            return this == that || 
+                    (this.hashCode() == that.hashCode() && 
+                            this.confPol.equals(that.confPol) &&
+                            this.integPol.equals(that.integPol));
         }
         return false;
     }
