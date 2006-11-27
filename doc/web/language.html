@@ -1349,6 +1349,19 @@ implemented using the class <code>jif.lang.ExternalPrincipal</code>
 external principals in a similar way. See the <code>README</code> file in $JIF/tests for more
 information about creating external principals.
 
+<p><b>NOTE:</b> implementations of the <code>Principal</code>
+interface should ensure that the Jif runtime system is notified of any
+change in the delegation of authority. In particular, when a principal
+adds a delegation, the method
+<code>PrincipalUtil.notifyNewDelegation</code> should be called, and
+when a delegation is revoked, the method
+<code>PrincipalUtil.notifyRevokeDelegation</code> should be
+called. These notifications allow the Jif runtime system to correctly
+cache acts-for relations.  The class
+<code>jif.lang.AbstractPrincipal</code> provides convenience methods
+for adding and revoking delegations; these convenience methods
+correctly notify the Jif runtime system.
+
 
 <h2><a name="method-constraints">Method constraints</a></h2>
 

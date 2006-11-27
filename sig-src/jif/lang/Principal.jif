@@ -17,6 +17,12 @@ package jif.lang;
  * <p>Any class that implements the <code>Principal</code> interface
  * implicitly has the authority of the principal "this", that is,
  * the principal represented by an object of the class.
+ * 
+ * <p>Notification of any change in delegation of authority should be
+ * given to the Jif runtime system via calls to 
+ * <code>PrincipalUtil.notifyNewDelegation</code>
+ * and <code>PrincipalUtil.notifyRevokeDelegation</code>. These allow
+ * the Jif runtime system to correctly cache results for acts-for queries. 
  */
 public interface Principal {
     static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
