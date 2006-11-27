@@ -247,7 +247,7 @@ public class JifToJavaRewriter extends ContextVisitor
     public void addInitializer(Block s) {
         this.initializations.add(s);        
     }
-    public void addInitializer(FieldInstance fi, Expr init) {
+    public void addInitializer(FieldInstance fi, Expr init) throws SemanticException {
         Stmt s = qq().parseStmt(fi.name() + " = %E;", init);
         this.initializations.add(s);
     }

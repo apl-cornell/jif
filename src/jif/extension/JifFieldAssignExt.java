@@ -57,7 +57,7 @@ public class JifFieldAssignExt extends JifAssignExt
         A.setPc(Xe.N()); 
 
         Expr rhs = (Expr) lc.context(A).labelCheck(assign.right());
-        PathMap Xr = rhsPathMap(lc.context(A), rhs);
+        PathMap Xr = rhsPathMap(lc.context(A), rhs, throwTypes);
 
         A = (JifContext) A.pop();
 
@@ -199,7 +199,7 @@ public class JifFieldAssignExt extends JifAssignExt
         checkThrowTypes(throwTypes);
         return (Assign) X(assign.right(rhs).left(lhs), X);
     }
-    protected PathMap rhsPathMap(LabelChecker lc, Expr rhs) {
+    protected PathMap rhsPathMap(LabelChecker lc, Expr rhs, List throwTypes) {
         return X(rhs);
     }
 }
