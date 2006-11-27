@@ -14,7 +14,7 @@ public final class FromDisjunctProof extends ActsForProof {
     Map getDisjunctProofs() {
         return disjunctProofs;
     }
-    void gatherDelegationDependencies(Set s) {
+    public void gatherDelegationDependencies(Set s) {
         DisjunctivePrincipal dp = (DisjunctivePrincipal)getActor();
         for (Iterator iter = dp.disjuncts.iterator(); iter.hasNext(); ) {
             Principal disjunct = (Principal)iter.next();

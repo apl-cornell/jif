@@ -5,6 +5,7 @@ import java.util.Set;
 
 import jif.ast.JifUtil;
 import jif.translate.DynamicLabelToJavaExpr_c;
+import jif.translate.LabelToJavaExpr;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
@@ -20,8 +21,8 @@ import polyglot.util.Position;
 public class DynamicLabel_c extends Label_c implements DynamicLabel {
     private final AccessPath path;
 
-    public DynamicLabel_c(AccessPath path, JifTypeSystem ts, Position pos) {
-        super(ts, pos, new DynamicLabelToJavaExpr_c()); 
+    public DynamicLabel_c(AccessPath path, JifTypeSystem ts, Position pos, LabelToJavaExpr trans) {
+        super(ts, pos, trans); 
         this.path = path;
         if (path instanceof AccessPathConstant) {
             throw new InternalCompilerError("Don't expect to get AccessPathConstants for dynamic labels");

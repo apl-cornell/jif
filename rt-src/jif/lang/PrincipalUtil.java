@@ -43,7 +43,7 @@ public class PrincipalUtil {
     /**
      * Returns an actsfor proof if and only if the principal p acts for the principal q.
      */
-    static ActsForProof actsForProof(Principal p, Principal q) {
+    public static ActsForProof actsForProof(Principal p, Principal q) {
         try {
             LabelUtil.enterTiming();
             // try cache

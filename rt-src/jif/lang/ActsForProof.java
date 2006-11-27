@@ -21,6 +21,6 @@ public abstract class ActsForProof {
     /* Gather the set of PrincipalUtil.DelegationPairs that
      * this proof relies on.
      */
-    void gatherDelegationDependencies(Set s) { }
+    public void gatherDelegationDependencies(Set s) { }
 
 }

@@ -13,7 +13,7 @@ public final class ReflexiveProof extends ActsForProof {
         super(p, q);
     }
 
-    void gatherDelegationDependencies(Set s) {
+    public void gatherDelegationDependencies(Set s) {
         // no dependencies
     }
 

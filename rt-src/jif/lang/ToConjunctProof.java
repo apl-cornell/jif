@@ -14,7 +14,7 @@ public final class ToConjunctProof extends ActsForProof {
     Map getConjunctProofs() {
         return conjunctProofs;
     }
-    void gatherDelegationDependencies(Set s) {
+    public void gatherDelegationDependencies(Set s) {
         ConjunctivePrincipal cp = (ConjunctivePrincipal)getGranter();
         for (Iterator iter = cp.conjuncts.iterator(); iter.hasNext(); ) {
             Principal conjunct = (Principal)iter.next();

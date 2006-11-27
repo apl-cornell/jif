@@ -29,14 +29,14 @@ public class JifInitializerExt extends Jif_c
 	A = (JifContext) ib.del().enterScope(A);
 
 	// @@@@@What this hell is this?
-        //!@!
+	//!@!
     //Label Li = ts.freshCovariantLabel(ib.position(), "static");
 	Label Li = ts.unknownLabel(ib.position()); // temporarily replace with this to get it compiling
 	A.setPc(Li);
-        A.setCurrentCodePCBound(Li);
+	A.setCurrentCodePCBound(Li);
 
-        // reset "ph"
-        A.clearPH();
+	// reset "ph"
+	A.clearPH();
 
 	// Now, check the body of the method in the new context.
 

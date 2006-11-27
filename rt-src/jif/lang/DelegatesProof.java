@@ -7,7 +7,7 @@ public final class DelegatesProof extends ActsForProof {
         super(actor, granter);
     }
 
-    void gatherDelegationDependencies(Set s) {
+    public void gatherDelegationDependencies(Set s) {
         // don't count delegations from "p" to "p and ..." or delegations from con/dis-junctive principals
         
         if (getGranter() instanceof DisjunctivePrincipal || getGranter() instanceof ConjunctivePrincipal) {

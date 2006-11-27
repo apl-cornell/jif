@@ -6,7 +6,7 @@ import java.util.*;
  * Abstract class representing the meet of policies. All the policies should be
  * of the same kind, either all IntegPolicies or all ConfPolicies.
  */
-abstract class MeetPolicy extends AbstractPolicy implements Policy
+public abstract class MeetPolicy extends AbstractPolicy implements Policy
 {
     private Set components; // Set of Policies    
     MeetPolicy(Set policies) {

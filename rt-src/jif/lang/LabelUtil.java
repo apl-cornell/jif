@@ -67,7 +67,7 @@ public class LabelUtil
         NO_COMPONENTS = new PairLabel(BOTTOM_CONF, TOP_INTEG);
     }
     
-    private LabelUtil() { }
+    protected LabelUtil() { }
     
     public static Label noComponents() {
         return NO_COMPONENTS;
@@ -350,7 +350,7 @@ public class LabelUtil
     static public ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {        
         return join(p1, p2, new HashSet());
     }
-    static ConfPolicy join(ConfPolicy p1, ConfPolicy p2, Set s) {        
+    static protected ConfPolicy join(ConfPolicy p1, ConfPolicy p2, Set s) {        
         try {
             enterTiming();
             Set comps = new LinkedHashSet();
@@ -413,7 +413,7 @@ public class LabelUtil
     public static ConfPolicy meetPol(ConfPolicy p1, ConfPolicy p2) {
         return meet(p1, p2, new HashSet());
     }
-    static ConfPolicy meet(ConfPolicy p1, ConfPolicy p2, Set s) {        
+    protected static ConfPolicy meet(ConfPolicy p1, ConfPolicy p2, Set s) {        
         try {
             enterTiming();
             Set comps = new LinkedHashSet();
@@ -534,7 +534,7 @@ public class LabelUtil
         return relabelsTo(from, to, new HashSet());
     }
 
-    static boolean relabelsTo(Policy from, Policy to, Set s) {
+    protected static boolean relabelsTo(Policy from, Policy to, Set s) {
         try {
             enterTiming();
             if (from == null || to == null) return false;

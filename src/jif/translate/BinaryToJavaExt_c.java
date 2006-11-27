@@ -60,7 +60,7 @@ public class BinaryToJavaExt_c extends ExprToJavaExt_c {
     public Expr labelTestToJava(JifToJavaRewriter rw, boolean isEquiv) throws SemanticException {
         Binary b = (Binary) node();
         String meth = isEquiv?"equivalentTo":"relabelsTo";
-        String comparison = "jif.lang.LabelUtil." + meth + "((%E), (%E))";
+        String comparison = rw.runtimeLabelUtil() + "." + meth + "((%E), (%E))";
         
         List l = new ArrayList(2);
         l.add(b.left());

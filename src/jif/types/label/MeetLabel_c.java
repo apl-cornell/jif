@@ -2,9 +2,11 @@ package jif.types.label;
 
 import java.util.*;
 
+import jif.translate.LabelToJavaExpr;
 import jif.translate.MeetLabelToJavaExpr_c;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
+import jif.types.JifTypeSystem_c;
 import jif.types.LabelSubstitution;
 import jif.types.PathMap;
 import jif.types.hierarchy.LabelEnv;
@@ -21,8 +23,8 @@ public class MeetLabel_c extends Label_c implements MeetLabel
 {
     private final Set components;
     
-    public MeetLabel_c(Collection components, JifTypeSystem ts, Position pos) {
-        super(ts, pos, new MeetLabelToJavaExpr_c());
+    public MeetLabel_c(Collection components, JifTypeSystem ts, Position pos, LabelToJavaExpr trans) {
+        super(ts, pos, trans);
         this.components = Collections.unmodifiableSet(new LinkedHashSet(flatten(components)));
         if (this.components.isEmpty()) throw new InternalCompilerError("No empty meets");
     }
@@ -251,7 +253,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
             return (Label)needed.iterator().next();
         }
 
-        return new MeetLabel_c(needed, (JifTypeSystem)ts, position());
+        return new MeetLabel_c(needed, (JifTypeSystem)ts, position(), ((JifTypeSystem_c)ts).meetLabelTranslator());
     }
     
     private static Collection flatten(Collection comps) {

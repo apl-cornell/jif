@@ -2,6 +2,7 @@ package jif.types.label;
 
 import java.util.*;
 
+import jif.translate.LabelToJavaExpr;
 import jif.translate.PairLabelToJavaExpr_c;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
@@ -17,8 +18,9 @@ public class PairLabel_c extends Label_c implements PairLabel {
     public PairLabel_c(JifTypeSystem ts, 
                        ConfPolicy confPolicy, 
                        IntegPolicy integPolicy, 
-                       Position pos) {
-        super(ts, pos, new PairLabelToJavaExpr_c());        
+                       Position pos, 
+                       LabelToJavaExpr trans) {
+        super(ts, pos, trans);        
         this.confPolicy = confPolicy;
         this.integPolicy = integPolicy;        
     }

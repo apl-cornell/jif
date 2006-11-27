@@ -3,6 +3,7 @@ package jif.types.label;
 import java.util.*;
 
 import jif.translate.JoinLabelToJavaExpr_c;
+import jif.translate.LabelToJavaExpr;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
@@ -18,8 +19,8 @@ public class JoinLabel_c extends Label_c implements JoinLabel
 {
     private final Set components;
     
-    public JoinLabel_c(Collection components, JifTypeSystem ts, Position pos) {
-        super(ts, pos, new JoinLabelToJavaExpr_c());
+    public JoinLabel_c(Collection components, JifTypeSystem ts, Position pos, LabelToJavaExpr trans) {
+        super(ts, pos, trans);
         this.components = Collections.unmodifiableSet(new LinkedHashSet(flatten(components)));
         if (this.components.isEmpty()) throw new InternalCompilerError("No empty joins");
     }
@@ -235,7 +236,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
             return (Label)needed.iterator().next();
         }
 
-        return new JoinLabel_c(needed, (JifTypeSystem)ts, position());
+        return new JoinLabel_c(needed, (JifTypeSystem)ts, position(), ((JifTypeSystem_c)ts).joinLabelTranslator());
     }
     
     private static Collection flatten(Collection comps) {

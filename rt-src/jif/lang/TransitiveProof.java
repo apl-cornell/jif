@@ -22,7 +22,7 @@ public final class TransitiveProof extends ActsForProof {
     Principal getP() {
         return p;
     }
-    void gatherDelegationDependencies(Set s) {
+    public void gatherDelegationDependencies(Set s) {
         actorToP.gatherDelegationDependencies(s);
         pToGranter.gatherDelegationDependencies(s);
     }

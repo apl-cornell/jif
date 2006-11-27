@@ -3,6 +3,11 @@ package jif.types;
 import java.util.*;
 
 import jif.extension.LabelTypeCheckUtil;
+import jif.translate.DynamicLabelToJavaExpr_c;
+import jif.translate.JoinLabelToJavaExpr_c;
+import jif.translate.LabelToJavaExpr;
+import jif.translate.MeetLabelToJavaExpr_c;
+import jif.translate.PairLabelToJavaExpr_c;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv_c;
 import jif.types.label.*;
@@ -841,8 +846,12 @@ public class JifTypeSystem_c
         if (components.size() == 1) {
             return (Label)components.iterator().next();
         }
-        Label t = new JoinLabel_c(components, this, pos);
+        Label t = new JoinLabel_c(components, this, pos, joinLabelTranslator());
         return t;
+    }
+
+    public LabelToJavaExpr joinLabelTranslator() {
+        return new JoinLabelToJavaExpr_c();
     }
 
     public Label meetLabel(Position pos, Collection components) {
@@ -855,12 +864,16 @@ public class JifTypeSystem_c
         if (components.size() == 1) {
             return (Label)components.iterator().next();
         }
-        Label t = new MeetLabel_c(components, this, pos);
+        Label t = new MeetLabel_c(components, this, pos, meetLabelTranslator());
         return t;
     }
 
+    public LabelToJavaExpr meetLabelTranslator() {
+        return new MeetLabelToJavaExpr_c();
+    }
+
     public DynamicLabel dynamicLabel(Position pos, AccessPath path) {
-        DynamicLabel t = new DynamicLabel_c(path, this, pos);
+        DynamicLabel t = new DynamicLabel_c(path, this, pos, dynamicLabelTranslator());
         return t;
     }
 
@@ -873,9 +886,14 @@ public class JifTypeSystem_c
             return (Label)apc.constantValue();
         }
         
-        DynamicLabel t = new DynamicLabel_c(path, this, pos);
+        DynamicLabel t = new DynamicLabel_c(path, this, pos, dynamicLabelTranslator());
         return t;
     }
+    
+    protected LabelToJavaExpr dynamicLabelTranslator() {
+        return new DynamicLabelToJavaExpr_c();
+    }
+
 
     public ArgLabel argLabel(Position pos, LocalInstance vi, CodeInstance ci) {
         ArgLabel t = new ArgLabel_c(this, vi, ci, pos);
@@ -911,9 +929,13 @@ public class JifTypeSystem_c
     public PairLabel pairLabel(Position pos, 
                                ConfPolicy confPol, 
                                IntegPolicy integPol) {
-        return new PairLabel_c(this, confPol, integPol, pos);
+        return new PairLabel_c(this, confPol, integPol, pos, pairLabelTranslator());
     }
     
+    protected LabelToJavaExpr pairLabelTranslator() {
+        return new PairLabelToJavaExpr_c();
+    }
+
     public WritersToReadersLabel writersToReadersLabel(Position pos, Label L) {
         WritersToReadersLabel t = new WritersToReadersLabel_c(L, this, pos);
         return t;
