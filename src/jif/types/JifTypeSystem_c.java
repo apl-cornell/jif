@@ -1040,8 +1040,7 @@ public class JifTypeSystem_c
     public boolean isJifClass(Type type) {
         ClassType ct = type.toClass();
         if (ct != null) {
-            FieldInstance fi =
-                ct.fieldNamed("__JIF_SIG_OF_JAVA_CLASS$20030619");
+            FieldInstance fi = ct.fieldNamed(JIF_SIG_OF_JAVA_MARKER);
             if (fi != null
                 && (fi.flags().isPrivate() || ct.flags().isInterface())
                 && fi.flags().isStatic()) {
@@ -1052,6 +1051,15 @@ public class JifTypeSystem_c
         return true;
     }
     
+    public boolean isMarkerFieldName(String s) {
+        return JIF_SIG_OF_JAVA_MARKER.equals(s) ||
+               JIF_PARAMS_RUNTIME_MARKER.equals(s) ||
+               JIF_SAFE_CONSTRUCTOR_MARKER.equals(s);
+    }
+    static String JIF_SIG_OF_JAVA_MARKER = "__JIF_SIG_OF_JAVA_CLASS$20030619";
+    static String JIF_PARAMS_RUNTIME_MARKER = "__JIF_PARAMS_RUNTIME_REPRESENTED$20051007";
+    static String JIF_SAFE_CONSTRUCTOR_MARKER = "__JIF_SAFE_CONSTRUCTORS$20050907";
+    
     public boolean isParamsRuntimeRep(Type t) {
         if (isJifClass(t)) {
             return true;
@@ -1059,8 +1067,7 @@ public class JifTypeSystem_c
 
         ClassType ct = t.toClass();
         if (ct != null) {
-            FieldInstance fi =
-                ct.fieldNamed("__JIF_PARAMS_RUNTIME_REPRESENTED$20051007");
+            FieldInstance fi = ct.fieldNamed(JIF_PARAMS_RUNTIME_MARKER);
             if (fi != null
                 && fi.flags().isPrivate()
                 && fi.flags().isStatic()) {
@@ -1114,8 +1121,7 @@ public class JifTypeSystem_c
             return true;
         }
         if (ct != null) {
-            FieldInstance fi = ct
-                    .fieldNamed("__JIF_SAFE_CONSTRUCTORS$20050907");
+            FieldInstance fi = ct.fieldNamed(JIF_SAFE_CONSTRUCTOR_MARKER);
             if (fi != null && fi.flags().isPrivate() && fi.flags().isStatic()) {
                 return true;
             }

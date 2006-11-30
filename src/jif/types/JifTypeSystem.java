@@ -223,4 +223,9 @@ public interface JifTypeSystem extends ParamTypeSystem
     boolean equalsStrip(TypeObject t1, TypeObject t2);
 
     LabelTypeCheckUtil labelTypeCheckUtil();
+
+    /**
+     * Is the string s a special marker field name?
+     */
+    boolean isMarkerFieldName(String s);
 }

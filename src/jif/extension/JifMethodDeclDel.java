@@ -36,6 +36,10 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
      */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JifMethodDecl jmd = (JifMethodDecl)this.node();
+        if (jmd.name().indexOf('$') >= 0) {
+            throw new SemanticException("Method names can not contain the character '$'.");
+        }
+        
         JifMethodInstance mi = JifMethodDecl_c.unrenameArgs((JifMethodInstance)jmd.methodInstance()); 
         if ("main".equals(mi.name()) && mi.flags().isStatic()) {
             // check that the class is not parameterized.

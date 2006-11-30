@@ -283,6 +283,12 @@ jif.ExtensionInfo  "-cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.j
 	Meet02.jif ;
 	Meet03.jif (Semantic, "Incompatible .* policies") ;
 	MyInteger.jif ;
+	Names01.jif (Semantic, "can not contain .* character"), 
+	            (Semantic, "can not contain .* character"),
+	            (Semantic, "can not contain .* character"),
+	            (Semantic, "can not contain .* character"),
+	            (Semantic, "can not contain .* character"),
+	            (Semantic, "can not contain .* character");
 	NewLabel.jif ;
 	NewLabel2.jif ;
 	NewLabel3.jif (Semantic, "not representable at runtime");

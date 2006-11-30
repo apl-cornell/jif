@@ -59,6 +59,11 @@ public class JifFieldDeclDel extends JifJL_c
     
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	FieldDecl fd = (FieldDecl) node();
+    if (fd.name().indexOf('$') >= 0 && 
+            !((JifTypeSystem)tc.typeSystem()).isMarkerFieldName(fd.name())) {
+        // check that the field isn't one of the special marker fields
+        throw new SemanticException("Field names can not contain the character '$'.");
+    }
 
 	if (fd.fieldInstance().flags().isStatic()) {
 	    Expr init = fd.init();
