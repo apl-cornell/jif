@@ -12,8 +12,9 @@ public final class Capability {
         return closure.invoke();
     }       
     
-    Capability(final Principal jif$P, final Label jif$L, final Closure closure) {
-        super();
+    Capability(final Principal jif$P,
+	       final Label jif$L,
+	       final Closure closure) {
         this.jif$jif_lang_Capability_P = jif$P;
         this.jif$jif_lang_Capability_L = jif$L;
         this.closure = closure;
