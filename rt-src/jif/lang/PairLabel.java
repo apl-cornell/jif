@@ -14,8 +14,10 @@ public final class PairLabel implements Label
     private final ConfPolicy confPol;
     private final IntegPolicy integPol;
     private Integer hashCode = null;
+    private LabelUtil labelUtil;
     
-    public PairLabel(ConfPolicy confPol, IntegPolicy integPol) {
+    public PairLabel(LabelUtil labelUtil, ConfPolicy confPol, IntegPolicy integPol) {
+        this.labelUtil = labelUtil;
         this.confPol = confPol;
         this.integPol = integPol;
     }
@@ -25,8 +27,8 @@ public final class PairLabel implements Label
             PairLabel that = (PairLabel)l;            
             if (this == that || this.equals(that)) return true;
             Set temp = new HashSet();
-            if (LabelUtil.relabelsTo(this.confPol, that.confPol, temp) &&
-                    LabelUtil.relabelsTo(this.integPol, that.integPol, temp)) {
+            if (labelUtil.relabelsTo(this.confPol, that.confPol, temp) &&
+                    labelUtil.relabelsTo(this.integPol, that.integPol, temp)) {
                 s.addAll(temp);
                 return true;
             }
@@ -63,11 +65,11 @@ public final class PairLabel implements Label
     }
     
     public final Label join(Label l) {
-        return LabelUtil.join(this, l);
+        return labelUtil.join(this, l);
     }
 
     public Label meet(Label l) {
-        return LabelUtil.meet(this, l);
+        return labelUtil.meet(this, l);
     }
 
     public ConfPolicy confPolicy() {

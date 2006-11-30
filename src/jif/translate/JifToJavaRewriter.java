@@ -1,11 +1,6 @@
 package jif.translate;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import jif.ast.Jif;
 import jif.ast.JifNodeFactory;
@@ -13,29 +8,14 @@ import jif.types.JifTypeSystem;
 import jif.types.Param;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
-import polyglot.ast.Block;
-import polyglot.ast.ClassDecl;
-import polyglot.ast.Expr;
-import polyglot.ast.Node;
-import polyglot.ast.NodeFactory;
-import polyglot.ast.SourceCollection;
-import polyglot.ast.SourceFile;
-import polyglot.ast.Stmt;
-import polyglot.ast.TypeNode;
+import polyglot.ast.*;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Job;
 import polyglot.frontend.Source;
 import polyglot.qq.QQ;
-import polyglot.types.ClassType;
-import polyglot.types.FieldInstance;
+import polyglot.types.*;
 import polyglot.types.Package;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
-import polyglot.util.ErrorInfo;
-import polyglot.util.ErrorQueue;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
+import polyglot.util.*;
 import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
 

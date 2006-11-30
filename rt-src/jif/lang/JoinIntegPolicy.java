@@ -8,21 +8,21 @@ import java.util.*;
  */
 public final class JoinIntegPolicy extends JoinPolicy implements IntegPolicy
 {
-    JoinIntegPolicy(Set policies) {
-        super(policies);
+    JoinIntegPolicy(LabelUtil labelUtil, Set policies) {
+        super(labelUtil, policies);
     }
 
     public IntegPolicy join(IntegPolicy p, Set s) {
-        return LabelUtil.join(this, p, s);
+        return labelUtil.join(this, p, s);
     }
     public IntegPolicy join(IntegPolicy p) {
-        return LabelUtil.join(this, p);
+        return labelUtil.join(this, p);
     }
 
     public IntegPolicy meet(IntegPolicy p, Set s) {
-        return LabelUtil.meet(this, p, s);
+        return labelUtil.meet(this, p, s);
     }
     public IntegPolicy meet(IntegPolicy p) {
-        return LabelUtil.meetPol(this, p);
+        return labelUtil.meetPol(this, p);
     }
 }

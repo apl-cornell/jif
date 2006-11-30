@@ -9,7 +9,8 @@ import java.util.*;
 public abstract class MeetPolicy extends AbstractPolicy implements Policy
 {
     private Set components; // Set of Policies    
-    MeetPolicy(Set policies) {
+    MeetPolicy(LabelUtil labelUtil, Set policies) {
+        super(labelUtil);
         components = Collections.unmodifiableSet(policies);
     }
     
@@ -24,7 +25,7 @@ public abstract class MeetPolicy extends AbstractPolicy implements Policy
         // this <= pol if there is a Ci such that Ci <= pol
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Policy Ci = (Policy) i.next();
-            if (LabelUtil.relabelsTo(Ci, pol, s)) {
+            if (labelUtil.relabelsTo(Ci, pol, s)) {
                 return true;
             }
         }
@@ -38,7 +39,7 @@ public abstract class MeetPolicy extends AbstractPolicy implements Policy
             Set temp = new HashSet();
             for (Iterator i = mp.meetComponents().iterator(); i.hasNext(); ) {
                 Policy Di = (Policy) i.next();
-                if (!LabelUtil.relabelsTo(this, Di, temp)) {
+                if (!labelUtil.relabelsTo(this, Di, temp)) {
                     sat = false;
                     break;
                 }
@@ -54,7 +55,7 @@ public abstract class MeetPolicy extends AbstractPolicy implements Policy
             JoinPolicy jp = (JoinPolicy)pol;
             for (Iterator i = jp.joinComponents().iterator(); i.hasNext(); ) {
                 Policy Di = (Policy) i.next();
-                if (LabelUtil.relabelsTo(this, Di, s)) {
+                if (labelUtil.relabelsTo(this, Di, s)) {
                     return true;
                 }
             }

@@ -28,7 +28,7 @@ public class FileSystem
 //            writerList.add(new NativePrincipal(writers[i]));
 //        }
         jif.lang.Principal op = NativePrincipal.getInstance(owner);
-        return LabelUtil.readerPolicyLabel(op, readerList);
+        return LabelUtil.singleton().readerPolicyLabel(op, readerList);
     }
     
     /** Set the access(read) policy of <code>file</code>.  */

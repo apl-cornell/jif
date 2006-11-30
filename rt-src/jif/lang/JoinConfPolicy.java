@@ -8,22 +8,22 @@ import java.util.*;
  */
 public final class JoinConfPolicy extends JoinPolicy implements ConfPolicy
 {
-    JoinConfPolicy(Set policies) {
-        super(policies);
+    JoinConfPolicy(LabelUtil labelUtil, Set policies) {
+        super(labelUtil, policies);
     }
 
     public ConfPolicy join(ConfPolicy p, Set s) {
-        return LabelUtil.join(this, p, s);
+        return labelUtil.join(this, p, s);
     }
 
     public ConfPolicy meet(ConfPolicy p, Set s) {
-        return LabelUtil.meet(this, p, s);
+        return labelUtil.meet(this, p, s);
     }
     public ConfPolicy join(ConfPolicy p) {
-        return LabelUtil.join(this, p);
+        return labelUtil.join(this, p);
     }
 
     public ConfPolicy meet(ConfPolicy p) {
-        return LabelUtil.meetPol(this, p);
+        return labelUtil.meetPol(this, p);
     }
 }

@@ -23,7 +23,7 @@ class JunctivePrincipals01 {
 	    lbls[6] = new label {Bob&(Chuck,Dolores):};
 	    lbls[7] = new label {Chuck,Bob&Dolores:};
 	    for (int i = 0; i < lbls.length; i++) {
-		out.println("label " + i + ": " + LabelUtil.stringValue(lbls[i]));
+		out.println("label " + i + ": " + LabelUtil.singleton().stringValue(lbls[i]));
 	    }
 
         }

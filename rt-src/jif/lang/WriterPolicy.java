@@ -7,7 +7,8 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy
     private final Principal owner;
     private final Principal writer;
     
-    public WriterPolicy(Principal owner, Principal writer) {
+    public WriterPolicy(LabelUtil labelUtil, Principal owner, Principal writer) {
+        super(labelUtil);
         this.owner = owner;
         this.writer = writer;
     }
@@ -29,7 +30,7 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy
             // this <= pi
             for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
                 Policy pi = (Policy)iter.next();
-                if (LabelUtil.relabelsTo(this, pi, s)) return true;                
+                if (labelUtil.relabelsTo(this, pi, s)) return true;                
             }
             return false;
         }
@@ -40,7 +41,7 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy
             Set temp = new HashSet();
             for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
                 Policy pi = (Policy)iter.next();
-                if (!LabelUtil.relabelsTo(this, pi, temp)) return false;                
+                if (!labelUtil.relabelsTo(this, pi, temp)) return false;                
             }
             s.addAll(temp);
             return true;            
@@ -105,17 +106,17 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy
     }
 
     public IntegPolicy join(IntegPolicy p, Set s) {
-        return LabelUtil.join(this, p, s);
+        return labelUtil.join(this, p, s);
     }
 
     public IntegPolicy meet(IntegPolicy p, Set s) {
-        return LabelUtil.meet(this, p, s);
+        return labelUtil.meet(this, p, s);
     }    
     public IntegPolicy join(IntegPolicy p) {
-        return LabelUtil.join(this, p);
+        return labelUtil.join(this, p);
     }
 
     public IntegPolicy meet(IntegPolicy p) {
-        return LabelUtil.meetPol(this, p);
+        return labelUtil.meetPol(this, p);
     }    
 }

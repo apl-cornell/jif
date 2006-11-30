@@ -13,21 +13,21 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
         PairLabel pl = (PairLabel)label;
         Expr cexp = policyToJava(pl.confPolicy(), rw);
         Expr iexp = policyToJava(pl.integPolicy(), rw); 
-        return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".toLabel(%E, %E)", cexp, iexp); 
+        return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".singleton().toLabel(%E, %E)", cexp, iexp); 
     }
     public Expr policyToJava(Policy p, JifToJavaRewriter rw) throws SemanticException {
         if (p instanceof WriterPolicy) {
             WriterPolicy policy = (WriterPolicy)p;
             Expr owner = rw.principalToJava(policy.owner());
             Expr writer = rw.principalToJava(policy.writer());
-            return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".writerPolicy(%E, %E)", owner, writer);      
+            return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".singleton().writerPolicy(%E, %E)", owner, writer);      
         }
 
         if (p instanceof ReaderPolicy) {
             ReaderPolicy policy = (ReaderPolicy)p;
             Expr owner = rw.principalToJava(policy.owner());
             Expr reader = rw.principalToJava(policy.reader());
-            return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".readerPolicy(%E, %E)", owner, reader);
+            return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".singleton().readerPolicy(%E, %E)", owner, reader);
         }
         
         if (p instanceof JoinPolicy_c) {

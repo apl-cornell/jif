@@ -38,14 +38,13 @@ public class Runtime {
         return NativePrincipal.getInstance(username);
     }
 
-    /**
-     * Returns <code>{p:}</code> as the default label, where <code>p</code> is
-     * the principal parameter of this <code>Runtime</code> object.
-     */
-    private Label defaultLabel() {
-        ConfPolicy cp = LabelUtil.readerPolicy(dynp, new LinkedList());
-        IntegPolicy ip = LabelUtil.writerPolicy(dynp, new LinkedList());
-        return LabelUtil.toLabel(cp, ip);
+    private Label defaultOutputLabel() {
+        ConfPolicy cp = LabelUtil.singleton().readerPolicy(dynp, new LinkedList());
+        return LabelUtil.singleton().toLabel(cp);
+    }
+    private Label defaultInputLabel() {
+        IntegPolicy ip = LabelUtil.singleton().writerPolicy(dynp, new LinkedList());
+        return LabelUtil.singleton().toLabel(ip);
     }
 
     /**
@@ -72,7 +71,7 @@ public class Runtime {
 
         if (existed) {
             Label acLabel = FileSystem.labelOf(name);
-            if (!LabelUtil.relabelsTo(L, acLabel)) {
+            if (!LabelUtil.singleton().relabelsTo(L, acLabel)) {
                 throw new SecurityException("The file " + name
                         + "doesn't have sufficient access restrictions.");
             }
@@ -101,9 +100,9 @@ public class Runtime {
             throws FileNotFoundException, SecurityException {
         Label acLabel = FileSystem.labelOf(name);
         
-        if (LabelUtil.relabelsTo(acLabel, L)) return new FileInputStream(name);
+        if (LabelUtil.singleton().relabelsTo(acLabel, L)) return new FileInputStream(name);
         
-        throw new SecurityException("The file has label " + LabelUtil.stringValue(acLabel) + 
+        throw new SecurityException("The file has label " + LabelUtil.singleton().stringValue(acLabel) + 
                                     ", which is more restrictive than " +
                                     L.toString());
     }
@@ -113,7 +112,7 @@ public class Runtime {
      * The output channel is parameterized by <code>l</code>.
      */
     public PrintStream stderr(Label l) {
-        if (LabelUtil.relabelsTo(l, defaultLabel())) return System.err;
+        if (LabelUtil.singleton().relabelsTo(l, defaultOutputLabel())) return System.err;
 
         throw new SecurityException("The standard error output is not "
                 + "sufficiently secure.");
@@ -124,8 +123,7 @@ public class Runtime {
      * This output channel is parameterized by <code>l</code>.
      */
     public PrintStream stdout(Label l) {
-        if (LabelUtil.relabelsTo(l, defaultLabel())) return System.out;
-        
+        if (LabelUtil.singleton().relabelsTo(l, defaultOutputLabel())) return System.out;
         throw new SecurityException("The standard output is not "
                 + "sufficiently secure.");
     }
@@ -135,7 +133,7 @@ public class Runtime {
      * This input channel is parameterized by <code>l</code>.
      */
     public InputStream stdin(Label l) {
-        if (LabelUtil.relabelsTo(defaultLabel(), l)) return System.in;
+        if (LabelUtil.singleton().relabelsTo(defaultInputLabel(), l)) return System.in;
         
         throw new SecurityException("The standard output is not "
                 + "sufficiently secure.");

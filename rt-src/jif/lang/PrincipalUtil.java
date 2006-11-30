@@ -25,11 +25,11 @@ public class PrincipalUtil {
      */
     public static boolean acts_for(Principal p, Principal q) {
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             return actsFor(p, q);
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
     }
     
@@ -45,7 +45,7 @@ public class PrincipalUtil {
      */
     public static ActsForProof actsForProof(Principal p, Principal q) {
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             // try cache
             ActsForPair pair = new ActsForPair(p, q);
             if (cacheActsFor.containsKey(pair))  {
@@ -84,7 +84,7 @@ public class PrincipalUtil {
             return null;
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }        
     }
     
@@ -98,7 +98,7 @@ public class PrincipalUtil {
         cacheNotActsFor.clear();
         
         // need to notify the label cache too
-        LabelUtil.notifyNewDelegation(granter, superior);
+        LabelUtil.singleton().notifyNewDelegation(granter, superior);
     }
     
     /**
@@ -114,7 +114,7 @@ public class PrincipalUtil {
             }
         }
         // need to notify the label cache too
-        LabelUtil.notifyRevokeDelegation(granter, superior);
+        LabelUtil.singleton().notifyRevokeDelegation(granter, superior);
     }
     
     /**
@@ -127,7 +127,7 @@ public class PrincipalUtil {
      */
     public static ActsForProof findActsForProof(Principal p, Principal q, Object searchState) {
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             // try the dumb things first.
             if (eq(p, q)) {
                 return new ReflexiveProof(p, q);
@@ -185,7 +185,7 @@ public class PrincipalUtil {
             return null;
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }
@@ -207,7 +207,7 @@ public class PrincipalUtil {
     public static boolean verifyProof(ActsForProof prf, Principal actor,
                                       Principal granter) {
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             if (prf == null) return false;
             if (prf.getActor() != actor || prf.getGranter() != granter) return false;
             
@@ -259,14 +259,14 @@ public class PrincipalUtil {
             return false;
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }
     
     public static boolean delegatesTo(Principal granter, Principal superior) {
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             if (granter == null) return true;
             if (topPrincipal().equals(superior)) return true;
             if (superior instanceof ConjunctivePrincipal) {
@@ -279,28 +279,28 @@ public class PrincipalUtil {
             return granter.delegatesTo(superior);
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }
     
     public static boolean equivalentTo(Principal p, Principal q) {
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             return actsFor(p, q) && actsFor(q, p);
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }
     public static boolean equals(Principal p, Principal q) {
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             return eq(p,q);        
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }
@@ -327,14 +327,14 @@ public class PrincipalUtil {
     private static Capability authorize(Principal p, Object authPrf, Closure c,
                                        Label lb, boolean executeNow) {
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             Principal closureP = c.jif$getjif_lang_Closure_P();
             Label closureL = c.jif$getjif_lang_Closure_L();
             if (closureP == p
                     || (p != null && closureP != null && p.equals(closureP) && closureP
                             .equals(p))) {
                 // The principals agree.
-                if (LabelUtil.equivalentTo(closureL, lb)) {
+                if (LabelUtil.singleton().equivalentTo(closureL, lb)) {
                     // the labels agree
                     if (p == null || p.isAuthorized(authPrf, c, lb, executeNow)) {
                         // either p is null (and the "null" principal always
@@ -347,7 +347,7 @@ public class PrincipalUtil {
             return null;
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }
@@ -362,11 +362,11 @@ public class PrincipalUtil {
     
     public static Principal bottomPrincipal() {
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             return nullPrincipal();
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }
@@ -378,18 +378,18 @@ public class PrincipalUtil {
     }
     public static ConfPolicy readableByPrinPolicy(Principal p) {
         try {
-            LabelUtil.enterTiming();
-            return new ReaderPolicy(topPrincipal(), p);
+            LabelUtil.singleton().enterTiming();
+            return new ReaderPolicy(LabelUtil.singleton(), topPrincipal(), p);
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }
     
     public static Principal disjunction(Principal left, Principal right) {
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             if (left == null || right == null) return null;
             if (actsFor(left, right)) return right;
             if (actsFor(right, left)) return left;
@@ -399,14 +399,14 @@ public class PrincipalUtil {
             return disjunction(c);
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }
     
     public static Principal conjunction(Principal left, Principal right) {
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             if (left == null) return right;
             if (right == null) return left;
             if (actsFor(left, right)) return left;
@@ -417,14 +417,14 @@ public class PrincipalUtil {
             return conjunction(c);
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }
     
     public static Principal disjunction(Collection principals) {        
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             if (principals == null || principals.isEmpty()) {
                 return topPrincipal();
             }
@@ -452,14 +452,14 @@ public class PrincipalUtil {
             return new DisjunctivePrincipal(needed);
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }
     
     public static Principal conjunction(Collection principals) {        
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             if (principals == null || principals.isEmpty()) {
                 return bottomPrincipal();
             }
@@ -488,28 +488,28 @@ public class PrincipalUtil {
             return new ConjunctivePrincipal(needed);
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }
     
     public static String toString(Principal p) {
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             return p== null?"_":p.name();
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }
     public static String stringValue(Principal p) {
         try {
-            LabelUtil.enterTiming();
+            LabelUtil.singleton().enterTiming();
             return toString(p);
         }
         finally {
-            LabelUtil.exitTiming();            
+            LabelUtil.singleton().exitTiming();            
         }
         
     }

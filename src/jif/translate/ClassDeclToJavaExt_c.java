@@ -269,7 +269,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 }
                 else {
                     // e.g., LabelUtil.equivTo(paramArgName)
-                    sb.append(rw.runtimeLabelUtil() + "."+comparison+ 
+                    sb.append(rw.runtimeLabelUtil() + ".singleton()."+comparison+ 
                               "(c."+paramExpr+","+paramArgName+");");
                 }
             }
