@@ -144,7 +144,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
      * Create methods for static initializations, and add it to cb.
      * 
      */
-    private ClassBody addStaticInitializers(ClassBody cb, JifToJavaRewriter rw) {
+    protected ClassBody addStaticInitializers(ClassBody cb, JifToJavaRewriter rw) {
         if (rw.getStaticInitializations().isEmpty()) {
             return cb;
         }

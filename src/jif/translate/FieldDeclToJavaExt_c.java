@@ -33,7 +33,7 @@ public class FieldDeclToJavaExt_c extends ToJavaExt_c {
                                    n.name(), n.init());
         if (n.init() == null && n.flags().isFinal()) {
             // Strip "final" to allow translated constructor to assign to it.
-	    n = n.flags(n.flags().clear(Flags.FINAL));
+            n = n.flags(n.flags().clear(Flags.FINAL));
         }
         n = n.fieldInstance(null);
 
