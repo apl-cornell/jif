@@ -298,6 +298,7 @@ non terminal PolicyNode label_component_policy;
 non terminal PrincipalNode principal, principal_conjunctive, principal_disjunctive, principal_base;
 non terminal Token actsfor;
 non terminal Expr accesspath;
+non terminal Receiver accesspath_receiver;
 non terminal Expr accesspath_no_id;
 non terminal List principal_list, principal_list_opt;
 
@@ -462,7 +463,16 @@ principal_base ::=
 accesspath ::=
         THIS:a {:  RESULT = parser.nf.This(parser.pos(a));  :}
     |   IDENTIFIER:a {: RESULT = new Name(parser, parser.pos(a), a.getIdentifier()).toExpr(); :}
-    | accesspath:a DOT IDENTIFIER:b
+    | accesspath_receiver:a DOT IDENTIFIER:b
+             {: RESULT = parser.nf.Field(parser.pos(a, b),
+	                     a,
+			        b.getIdentifier()); :}
+     ;
+
+accesspath_receiver ::=
+        THIS:a {:  RESULT = parser.nf.This(parser.pos(a));  :}
+    |   IDENTIFIER:a {: RESULT = new Name(parser, parser.pos(a), a.getIdentifier()).toReceiver(); :}
+    | accesspath_receiver:a DOT IDENTIFIER:b
              {: RESULT = parser.nf.Field(parser.pos(a, b),
 	                     a,
 			        b.getIdentifier()); :}
@@ -470,7 +480,7 @@ accesspath ::=
 
 accesspath_no_id ::=
         THIS:a {:  RESULT = parser.nf.This(parser.pos(a));  :}
-    | accesspath:a DOT IDENTIFIER:b
+    | accesspath_receiver:a DOT IDENTIFIER:b
              {: RESULT = parser.nf.Field(parser.pos(a, b), a, b.getIdentifier()); :};
 
 // 19.4) Types, Values, and Variables

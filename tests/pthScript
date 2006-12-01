@@ -182,6 +182,7 @@ jif.ExtensionInfo  "-cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.j
 	DynLabel8.jif ;
 	DynLabel9.jif ;
 	DynLabel10.jif ;
+	DynLabel11.jif ;
 	EmptyList.jif List.jif;
 	EmptyList2.jif ;
 	Exc.jif ;
