@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jif.ast.JifMethodDecl;
+import jif.types.JifMethodInstance;
 import jif.types.JifPolyType;
 import polyglot.ast.*;
 import polyglot.types.Flags;
@@ -13,9 +14,14 @@ import polyglot.util.CollectionUtil;
 import polyglot.visit.NodeVisitor;
 
 public class MethodDeclToJavaExt_c extends ToJavaExt_c {
+    protected JifMethodInstance mi;
+    protected List formals;
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
         // Bypass labels and constraints
         JifMethodDecl n = (JifMethodDecl) node();
+        
+        mi = (JifMethodInstance)n.methodInstance();
+        formals = new ArrayList(n.formals());
 
         // Bypass startLabel, returnLabel and constraints.
         return rw.bypass(n.startLabel()).bypass(n.returnLabel()).bypass(n.constraints());
