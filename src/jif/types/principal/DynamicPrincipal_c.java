@@ -3,6 +3,7 @@ package jif.types.principal;
 import java.util.List;
 
 import jif.translate.DynamicPrincipalToJavaExpr_c;
+import jif.translate.PrincipalToJavaExpr;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
@@ -22,8 +23,8 @@ import polyglot.util.Position;
 public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal {
     private final AccessPath path;
 
-    public DynamicPrincipal_c(AccessPath path, JifTypeSystem ts, Position pos) {
-	super(ts, pos, new DynamicPrincipalToJavaExpr_c());
+    public DynamicPrincipal_c(AccessPath path, JifTypeSystem ts, Position pos, PrincipalToJavaExpr toJava) {
+	super(ts, pos, toJava);
         this.path = path;
         if (path instanceof AccessPathConstant) {
             throw new InternalCompilerError("Don't expect to get AccessPathConstants for dynamic labels");

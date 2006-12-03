@@ -3,11 +3,7 @@ package jif.types;
 import java.util.*;
 
 import jif.extension.LabelTypeCheckUtil;
-import jif.translate.DynamicLabelToJavaExpr_c;
-import jif.translate.JoinLabelToJavaExpr_c;
-import jif.translate.LabelToJavaExpr;
-import jif.translate.MeetLabelToJavaExpr_c;
-import jif.translate.PairLabelToJavaExpr_c;
+import jif.translate.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv_c;
 import jif.types.label.*;
@@ -633,9 +629,13 @@ public class JifTypeSystem_c
     }
 
     public DynamicPrincipal dynamicPrincipal(Position pos, AccessPath path) {
-        DynamicPrincipal t = new DynamicPrincipal_c(path, this, pos);
+        DynamicPrincipal t = new DynamicPrincipal_c(path, this, pos, dynamicPrincipalTranslator());
         return t;
     }
+    protected PrincipalToJavaExpr dynamicPrincipalTranslator() {
+        return new DynamicPrincipalToJavaExpr_c();
+    }
+
     public Principal pathToPrincipal(Position pos, AccessPath path) {
         if (path instanceof AccessPathConstant) {
             AccessPathConstant apc = (AccessPathConstant)path;
@@ -644,7 +644,7 @@ public class JifTypeSystem_c
             }
             return (Principal)apc.constantValue();
         }
-        DynamicPrincipal t = new DynamicPrincipal_c(path, this, pos);
+        DynamicPrincipal t = new DynamicPrincipal_c(path, this, pos, dynamicPrincipalTranslator());
         return t;
     }
 

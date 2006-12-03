@@ -3,6 +3,9 @@ package jif.translate;
 import java.util.*;
 
 import jif.ast.JifConstructorDecl;
+import jif.ast.JifMethodDecl;
+import jif.types.JifConstructorInstance;
+import jif.types.JifMethodInstance;
 import jif.types.JifPolyType;
 import jif.types.JifSubstType;
 import polyglot.ast.*;
@@ -11,10 +14,15 @@ import polyglot.util.InternalCompilerError;
 import polyglot.visit.NodeVisitor;
 
 public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
+    protected JifConstructorInstance ci;
+    protected List formals;
+
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
         JifConstructorDecl n = (JifConstructorDecl) node();
 
         rw.inConstructor(true);
+        ci = (JifConstructorInstance)n.constructorInstance();
+        formals = new ArrayList(n.formals());
 
         // Bypass startLabel, returnLabel and constraints.
         return rw.bypass(n.startLabel()).bypass(n.returnLabel()).bypass(n.constraints());
@@ -24,7 +32,6 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         ConstructorDecl n = (ConstructorDecl) node();
 
-        ConstructorInstance ci = n.constructorInstance();
         ClassType ct = ci.container().toClass();
         
         Node retVal;
