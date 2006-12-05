@@ -93,12 +93,16 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 	    TypeNode tn = (TypeNode) prefix;
 
 	    if (! (tn.type() instanceof JifPolyType)) {
-		throw new SemanticException(tn.type() + " is not a parameterized type.", position());
+	        throw new SemanticException(tn.type() + " is not a parameterized type.", position());
 	    }
 	    JifPolyType pt = (JifPolyType)tn.type();
 
+        if (pt.params().isEmpty()) {
+            throw new SemanticException(tn.type() + " is not a parameterized type.", position());            
+        }
+        
 	    ParamNode n;
-            ParamInstance pi = (ParamInstance)pt.params().get(0);
+	    ParamInstance pi = (ParamInstance)pt.params().get(0);
 	    if (expr instanceof Expr) {
 	        n = nf.AmbParam(position(), (Expr)expr, pi);
 	        n = (ParamNode) n.disambiguate(ar);
@@ -108,9 +112,9 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
 	        n = (ParamNode) n.disambiguate(ar);
 	        if (!n.isDisambiguated()) {
 	            throw new SemanticException("\"" + expr + "\" is not " + 
-                                            "suitable as a parameter.", position());
-                        
-                }
+	                                        "suitable as a parameter.", position());
+
+	        }
 	    }
 
 	    List l = new LinkedList();
