@@ -11,11 +11,20 @@ import polyglot.util.InternalCompilerError;
 public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
     public Expr toJava(Label label, JifToJavaRewriter rw) throws SemanticException {
         PairLabel pl = (PairLabel)label;
+        if (pl.confPolicy().isBottomConfidentiality() && pl.integPolicy().isTopIntegrity()) {
+            return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".singleton().noComponents()");
+        }
         Expr cexp = policyToJava(pl.confPolicy(), rw);
         Expr iexp = policyToJava(pl.integPolicy(), rw); 
         return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".singleton().toLabel(%E, %E)", cexp, iexp); 
     }
     public Expr policyToJava(Policy p, JifToJavaRewriter rw) throws SemanticException {
+        if (p instanceof ConfPolicy && ((ConfPolicy)p).isBottomConfidentiality()) {
+            return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".singleton().bottomConf()");                  
+        }
+        if (p instanceof IntegPolicy && ((IntegPolicy)p).isTopIntegrity()) {
+            return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".singleton().topInteg()");                  
+        }
         if (p instanceof WriterPolicy) {
             WriterPolicy policy = (WriterPolicy)p;
             Expr owner = rw.principalToJava(policy.owner());

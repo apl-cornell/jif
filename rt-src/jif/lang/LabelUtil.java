@@ -79,6 +79,13 @@ public class LabelUtil
         return NO_COMPONENTS;
     }
     
+    public ConfPolicy bottomConf() {
+        return BOTTOM_CONF;
+    }
+    public IntegPolicy topInteg() {
+        return TOP_INTEG;
+    }
+
     public ConfPolicy readerPolicy(Principal owner, Principal reader) {
         try {
             enterTiming();
