@@ -218,7 +218,6 @@ public final class Date[covariant label L] implements JifObject[L] {
             }
             return new Date[lbl](y, m, d);
         }
-        catch (ArithmeticException impossible) { }
         catch (IllegalArgumentException impossible) { }
         return null;
     }
@@ -261,7 +260,6 @@ public final class Date[covariant label L] implements JifObject[L] {
             }
             return new Date[lbl](y, m, d, h, min);
         }
-        catch (ArithmeticException impossible) { }
         catch (IllegalArgumentException impossible) { }
         return null;
     }
@@ -272,14 +270,11 @@ public final class Date[covariant label L] implements JifObject[L] {
     public int{L} getHour() { return this.hour; }
     public int{L} getMinute() { return this.minute; }
     public int{L} getDayOfWeek() { 
-        try {
-            // Jan 1 1900 was a monday, so its index is 1.
-            // add the number of days since then, and take mod 7
-            // could be a negative number, so add seven to be safe...
-            int thisD = Date[L].daysAfterJan_1_1900(this.year, this.month, this.day);
-            return ((thisD % 7) + 8) % 7;
-        }
-        catch (ArithmeticException unlikely) { return 0; }
+        // Jan 1 1900 was a monday, so its index is 1.
+        // add the number of days since then, and take mod 7
+        // could be a negative number, so add seven to be safe...
+        int thisD = Date[L].daysAfterJan_1_1900(this.year, this.month, this.day);
+        return ((thisD % 7) + 8) % 7;
     }
     
     public String{L} getMonthName() { 
@@ -396,12 +391,7 @@ public final class Date[covariant label L] implements JifObject[L] {
      * (i.e. is divisible by 100), except for every fourth century.
      */
     public static boolean{pYear} isLeapYear(int pYear) {
-        try {
             return (pYear % 4 == 0 && (pYear % 100 != 0 || pYear % 400 == 0));
-        }
-        catch (ArithmeticException  e) {
-            return false;
-        }
     }
 
     public String{L} toString() {

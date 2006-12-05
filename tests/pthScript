@@ -152,6 +152,8 @@ jif.ExtensionInfo  "-cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.j
 	Deref2.jif ;
 	Disamb01.jif Disamb01A.jif ;
 	Disamb02.jif Disamb02A.jif Disamb02B.jif ;
+	Division01.jif ;
+	Division02.jif ;
 	DuplicateClass.jif (Semantic, "Duplicate class");
 	Dyn1.jif ;
 	Dyn2.jif ;

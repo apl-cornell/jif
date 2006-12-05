@@ -8,28 +8,8 @@ import jif.types.ParamInstance;
 import jif.types.label.Label;
 import jif.types.label.Policy;
 import jif.types.principal.Principal;
-import polyglot.ast.Block;
-import polyglot.ast.Call;
-import polyglot.ast.CanonicalTypeNode;
-import polyglot.ast.Catch;
-import polyglot.ast.ClassBody;
-import polyglot.ast.ClassDecl;
-import polyglot.ast.ConstructorCall;
-import polyglot.ast.ConstructorDecl;
-import polyglot.ast.DelFactory;
-import polyglot.ast.Disamb;
-import polyglot.ast.Expr;
-import polyglot.ast.ExtFactory;
-import polyglot.ast.Formal;
-import polyglot.ast.LocalClassDecl;
-import polyglot.ast.LocalDecl;
-import polyglot.ast.MethodDecl;
-import polyglot.ast.New;
-import polyglot.ast.NodeFactory_c;
-import polyglot.ast.Receiver;
-import polyglot.ast.Special;
-import polyglot.ast.Stmt;
-import polyglot.ast.TypeNode;
+import polyglot.ast.*;
+import polyglot.ast.Binary.Operator;
 import polyglot.types.Flags;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
@@ -502,4 +482,13 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         n = (Formal)n.del(delFactory().delFormal());
         return n;
     }
+
+    public Binary Binary(Position pos, Expr left, Operator op, Expr right) {
+        Binary n = new JifBinary_c(pos, left, op, right);
+        n = (Binary)n.ext(extFactory().extBinary());
+        n = (Binary)n.del(delFactory().delBinary());
+        return n;
+    }
+    
+    
 }
