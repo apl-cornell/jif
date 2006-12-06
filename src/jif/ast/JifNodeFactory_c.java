@@ -489,6 +489,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         n = (Binary)n.del(delFactory().delBinary());
         return n;
     }
-    
-    
+    public TypeNode ConstArrayTypeNode(Position pos, TypeNode base) {
+        return new ConstArrayTypeNode_c(pos, base);
+    }
+           
 }

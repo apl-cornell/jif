@@ -2,18 +2,23 @@ package jif.extension;
 
 import jif.types.JifLocalInstance;
 import jif.types.JifTypeSystem;
+import jif.types.SemanticDetailedException;
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
+import jif.visit.ConstChecker;
+import polyglot.ast.*;
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
+import polyglot.types.ArrayType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>Formal</code> node. 
  * 
@@ -102,4 +107,17 @@ public class JifFormalDel extends JifJL_c
 
         return n;
     }
+    
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        Formal f = (Formal) node();
+        
+        // if the declared type is an array type, make sure it is the same all the way through
+        if (f.localInstance().type().isArray()) {
+            JifTypeSystem jts = (JifTypeSystem)tc.typeSystem(); 
+            ArrayType at = jts.unlabel(f.localInstance().type()).toArray();
+            JifLocalDeclDel.checkArrayTypeConsistency(at);
+        }
+        return super.typeCheck(tc);
+    }
+    
 }

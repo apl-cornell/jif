@@ -23,11 +23,15 @@ public class JifNewArrayDel extends JifJL_c
     }
 
     private ArrayType relabelBaseType(ArrayType type, JifTypeSystem ts) {
+        // replace the array type with a const array type.
+        type = ts.constArrayOf(type.position(), type.base(), 1, true);
+        
         Type base = ts.unlabel(type.base());
         if (base.isArray()) {
+
             base = relabelBaseType(base.toArray(), ts);
         }
         base = ts.labeledType(base.position(), base, ts.freshLabelVariable(base.position(), "array_base", "label of base type of array"));
         return type.base(base);
-    }
+    }    
 }

@@ -57,4 +57,5 @@ public interface JifNodeFactory extends NodeFactory {
     EndorseExpr EndorseExpr(Position pos, Expr expr, LabelNode label);
     NewLabel NewLabel(Position pos, LabelNode label);
     PrincipalExpr PrincipalExpr(Position pos, PrincipalNode principal);
+    TypeNode ConstArrayTypeNode(Position position, TypeNode node);
 }

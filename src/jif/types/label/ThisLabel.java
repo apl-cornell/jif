@@ -1,6 +1,6 @@
 package jif.types.label;
 
-import jif.types.JifClassType;
+import polyglot.types.ReferenceType;
 
 
 /**
@@ -13,5 +13,5 @@ import jif.types.JifClassType;
  * the special "this". 
  */
 public interface ThisLabel extends Label {
-    JifClassType classType();
+    ReferenceType classType();
 }

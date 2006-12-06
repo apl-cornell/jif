@@ -2,21 +2,30 @@ package jif.types.label;
 
 import java.util.Set;
 
-import jif.types.*;
+import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 public class ThisLabel_c extends Label_c implements ThisLabel {
-    private final JifClassType ct;
+    private final ReferenceType ct;
     private final String fullName;
     
-    public ThisLabel_c(JifTypeSystem ts, JifClassType ct, Position pos) {
+    public ThisLabel_c(JifTypeSystem ts, ReferenceType ct, Position pos) {
         super(ts, pos);
         this.ct = ct;
-        this.fullName = ct.fullName();
+        if (ct.isClass()) {
+            this.fullName = ct.toClass().fullName();
+        }
+        else if (ct.isArray()) {
+            this.fullName = ct.toArray().base().toString() + "[]";
+        }
+        else throw new InternalCompilerError("Only class types and arrays allowed");
         setDescription("label of the special variable \"this\"");
     }
     
@@ -34,7 +43,7 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
     public boolean isDisambiguatedImpl() { return true; }
     public boolean isEnumerable() { return true; }
     
-    public JifClassType classType() {
+    public ReferenceType classType() {
         return ct;
     }
     
@@ -52,10 +61,10 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
     
     public String componentString(Set printedLabels) {
         if (Report.should_report(Report.debug, 2)) { 
-            return "<this (of " + ct.fullName() + ")>";
+            return "<this (of " + fullName + ")>";
         }
         else if (Report.should_report(Report.debug, 1)) {
-            return "<this (of " + ct.name() + ")>";
+            return "<this (of " + fullName + ")>";
         }
         return "this";            
     }

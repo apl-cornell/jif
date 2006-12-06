@@ -2,28 +2,13 @@ package jif.extension;
 
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.JifClassType;
-import jif.types.JifContext;
-import jif.types.JifFieldInstance;
-import jif.types.JifSubstType;
-import jif.types.JifTypeSystem;
-import jif.types.LabelConstraint;
-import jif.types.LabelSubstitution;
-import jif.types.NamedLabel;
-import jif.types.PathMap;
-import jif.types.SemanticDetailedException;
-import jif.types.TypeSubstitutor;
-import jif.types.label.CovariantParamLabel;
-import jif.types.label.Label;
-import jif.types.label.ParamLabel;
-import jif.types.label.ThisLabel;
+import jif.types.*;
+import jif.types.label.*;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import polyglot.ast.ArrayInit;
-import polyglot.ast.Expr;
-import polyglot.ast.FieldDecl;
-import polyglot.ast.Node;
+import polyglot.ast.*;
+import polyglot.types.ArrayType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
@@ -94,7 +79,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             TypeSubstitutor tsb = new InvarianceLabelSubstr(decl.position());
 
             // use a TypeSubstitutor to check the type of the field,
-            // and make sure that it contains no convariant components.
+            // and make sure that it contains no covariant components.
             // We use the TypeSubstitutor to ensure that the entire type is traversed,
             // including e.g. actual parameters to polymorphic types, labels
             // of array elements, etc.
@@ -254,6 +239,16 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
          */
         protected boolean recurseIntoSubstType(JifSubstType type) {
             return false;
+        }
+        /* 
+         * Don't check const array types
+         */
+        protected boolean recurseIntoArrayType(ArrayType type) {
+            if (type instanceof ConstArrayType) {
+                ConstArrayType cat = (ConstArrayType)type;
+                if (cat.isConst()) return false;
+            }
+            return true;
         }
         public InvarianceLabelSubstr(Position pos) {
             super(new InvarianceLabelChecker(pos));

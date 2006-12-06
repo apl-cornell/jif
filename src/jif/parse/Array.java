@@ -10,15 +10,23 @@ import polyglot.util.Position;
  */  
 public class Array extends Amb {
     // prefix[]
-    TypeNode prefix;
+    final TypeNode prefix;
+    final boolean isConst;
 
     public Array(Grm parser, Position pos, TypeNode prefix) {
-	super(parser, pos);
-	this.prefix = prefix;
+        this(parser, pos, prefix, false);
+    }
+    public Array(Grm parser, Position pos, TypeNode prefix, boolean isConst) {
+        super(parser, pos);
+        this.prefix = prefix;
+        this.isConst = isConst;
     }
 
     public TypeNode toType() {
-	return parser.nf.ArrayTypeNode(pos, prefix);
+        if (isConst) {
+            return parser.nf.ConstArrayTypeNode(pos, prefix);
+        }
+        return parser.nf.ArrayTypeNode(pos, prefix);
     }
 
     public TypeNode toUnlabeledType() { return toType(); }

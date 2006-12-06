@@ -116,11 +116,42 @@ public class JifTypeSystem_c
     }
     
     
+    public ConstArrayType constArrayOf(Type type) {
+        return constArrayOf(type.position(), type);
+    }
+
+    public ConstArrayType constArrayOf(Position pos, Type type) {
+        return constArrayOf(pos, type, false);
+    }
+    public ConstArrayType constArrayOf(Position pos, Type type, boolean castableToNonConst) {
+        return new ConstArrayType_c(this, pos, type, true, castableToNonConst);
+    }
+
+    public ConstArrayType constArrayOf(Type type, int dims) {
+        return constArrayOf(null, type, dims);
+    }
+
+    public ConstArrayType constArrayOf(Position pos, Type type, int dims) {
+        return constArrayOf(pos, type, dims, false);        
+    }
+    public ConstArrayType constArrayOf(Position pos, Type type, int dims, boolean castableToNonConst) {
+        if (dims > 1) {
+            return constArrayOf(pos, constArrayOf(pos, type, dims-1, castableToNonConst));
+        }
+        else if (dims == 1) {
+            return constArrayOf(pos, type, castableToNonConst);
+        }
+        else {
+            throw new InternalCompilerError(
+            "Must call constArrayOf(type, dims) with dims > 0");
+        }
+    }
+
     protected ArrayType arrayType(Position pos, Type type) {
         if (!isLabeled(type)) {
             type = labeledType(pos, type, defaultSignature().defaultArrayBaseLabel());
         }
-        return super.arrayType(pos, type);
+        return new ConstArrayType_c(this, pos, type, false);
     }
 
     public InitializerInstance initializerInstance(
@@ -287,7 +318,7 @@ public class JifTypeSystem_c
         if (Principal().equals(strpToType) && isSubtype(strpFromType, PrincipalClass())) {
             return true;
         }
-        
+
         return super.isImplicitCastValid(strpFromType, strpToType);
     }
 
@@ -916,8 +947,14 @@ public class JifTypeSystem_c
     public ThisLabel thisLabel(JifClassType ct) {
         return thisLabel(ct.position(), ct);
     }
+    public ThisLabel thisLabel(ArrayType at) {
+        return thisLabel(at.position(), at);
+    }
 
     public ThisLabel thisLabel(Position pos, JifClassType ct) {
+        return thisLabel(pos, (ReferenceType)ct);
+    }
+    public ThisLabel thisLabel(Position pos, ReferenceType ct) {
         return new ThisLabel_c(this, ct, pos);
     }
 

@@ -4,18 +4,22 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import jif.types.JifPolyType;
-import jif.types.JifSubst;
-import jif.types.JifSubstType;
-import jif.types.ParamInstance;
+import jif.types.*;
 import polyglot.ast.Call;
 import polyglot.ast.Expr;
+import polyglot.types.ArrayType;
 import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
 
 public class CallToJavaExt_c extends ExprToJavaExt_c {
     public Expr exprToJava(JifToJavaRewriter rw) throws SemanticException {
         Call n = (Call) node();
+        
+        if (n.name().equals("clone") && n.target().type().isArray()) {
+            ArrayType at = n.target().type().toArray();
+            return rw.qq().parseExpr("(%T)jif.runtime.Runtime.arrayCopy(%E)", rw.typeToJava(at, at.position()), n.target());
+        }
+        
         List args = new ArrayList();
         
         MethodInstance mi = n.methodInstance();

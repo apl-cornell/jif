@@ -125,11 +125,6 @@ public class JifFieldExt extends Jif_c
 	FieldInstance fi = fe.fieldInstance();
 	Label L = ts.labelOfField(fi, A.pc());
 
-	// hack to deal with the special length field of arrays
-	if (L == null && fe.name().equals("length") && ts.unlabel(fe.target().type()).isArray()) {
-	    // the label of the field "length" is just the label of the array expression.
-	    L = Xe.NV();
-	}
 	if (target instanceof Expr) {
 	    Label objLabel = X(target).NV();
 	    

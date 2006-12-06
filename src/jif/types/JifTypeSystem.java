@@ -10,6 +10,7 @@ import jif.types.principal.*;
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.types.*;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /** Jif type system.
@@ -40,6 +41,29 @@ public interface JifTypeSystem extends ParamTypeSystem
     PrincipalInstance principalInstance(Position pos,
 	                                ExternalPrincipal principal);
 
+    /* constant array constructors */
+    ConstArrayType constArrayOf(Type type);
+
+    ConstArrayType constArrayOf(Position pos, Type type);
+
+    ConstArrayType constArrayOf(Type type, int dims);
+
+    ConstArrayType constArrayOf(Position pos, Type type, int dims);
+    ArrayType constArrayOf(Position position, Type type, int dims, boolean castableToNonConst);
+    
+    JifMethodInstance jifMethodInstance(Position pos,
+            ReferenceType container,
+            Flags flags,
+            Type returnType,
+            String name,
+            Label startLabel,
+            boolean isDefaultStartLabel,
+            List formalTypes, List formalArgLabels,
+            Label endLabel,
+            boolean isDefaultEndLabel,
+            List excTypes,
+            List constraints);
+    
     /** Tests if the type is "principal". */
     boolean isPrincipal(Type t);
 
@@ -93,6 +117,7 @@ public interface JifTypeSystem extends ParamTypeSystem
     Label callSitePCLabel(JifProcedureInstance pi);
     ThisLabel thisLabel(Position pos, JifClassType ct);
     ThisLabel thisLabel(JifClassType ct);
+    ThisLabel thisLabel(ArrayType ct);
     UnknownLabel unknownLabel(Position pos);
     PairLabel pairLabel(Position pos, ConfPolicy confPol, IntegPolicy integPol);
     WritersToReadersLabel writersToReadersLabel(Position pos, Label L);

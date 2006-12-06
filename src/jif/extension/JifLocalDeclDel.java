@@ -1,11 +1,11 @@
 package jif.extension;
 
+import jif.types.ConstArrayType;
 import jif.types.JifLocalInstance;
 import jif.types.JifTypeSystem;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
-import polyglot.types.LocalInstance;
-import polyglot.types.SemanticException;
+import polyglot.types.*;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
@@ -48,7 +48,36 @@ public class JifLocalDeclDel extends JifJL_c {
                 "an initializing expression.", ld.position());
         }
         
+        // if the declared type is an array type, make sure it is the same all the way through
+        if (ld.localInstance().type().isArray()) {
+            JifTypeSystem jts = (JifTypeSystem)tc.typeSystem(); 
+            ArrayType at = jts.unlabel(ld.localInstance().type()).toArray();
+            checkArrayTypeConsistency(at);
+        }
+
         return super.typeCheck(tc);
+    }
+
+
+    static void checkArrayTypeConsistency(ArrayType at) throws SemanticException {
+        boolean isConst = false;
+        if (at instanceof ConstArrayType) {
+            ConstArrayType cat = (ConstArrayType)at;
+            isConst = cat.isConst();
+        }
+        JifTypeSystem jts = (JifTypeSystem)at.typeSystem(); 
+        Type base = jts.unlabel(at.base());
+        if (base.isArray()) {
+            boolean baseConst = false;
+            if (base instanceof ConstArrayType) {
+                ConstArrayType cat = (ConstArrayType)base;
+                baseConst = cat.isConst();
+            }
+            if (isConst != baseConst) {
+                throw new SemanticException("A const modifier for an array must apply to all dimensions.");
+            }
+            checkArrayTypeConsistency(base.toArray());
+        }
     }
 
 }

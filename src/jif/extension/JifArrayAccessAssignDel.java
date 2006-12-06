@@ -3,8 +3,13 @@ package jif.extension;
 import java.util.ArrayList;
 import java.util.List;
 
+import jif.types.ConstArrayType;
+
+import polyglot.ast.*;
 import polyglot.ast.ArrayAccessAssign;
+import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
+import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>ArrayAccessAssign</code> node. 
  */
@@ -35,4 +40,16 @@ public class JifArrayAccessAssignDel extends JifJL_c {
 
         return l;
     }
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        ArrayAccessAssign aa = (ArrayAccessAssign)super.typeCheck(tc);
+        Expr array = ((ArrayAccess)aa.left()).array();
+        if (array.type() instanceof ConstArrayType) {
+            ConstArrayType cat = (ConstArrayType)array.type();
+            if (cat.isConst()) {
+                throw new SemanticException("Cannot assign to elements of const arrays.", aa.position());
+            }
+        }
+        return aa;        
+    }
+    
 }

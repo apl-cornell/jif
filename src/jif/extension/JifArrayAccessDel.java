@@ -3,7 +3,14 @@ package jif.extension;
 import java.util.ArrayList;
 import java.util.List;
 
+import jif.types.ConstArrayType;
+
+import polyglot.ast.ArrayAccess;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
+import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>ArrayAccess</code> node. 
  */
@@ -61,4 +68,5 @@ public class JifArrayAccessDel extends JifJL_c
 
         return l;
     }
+    
 }

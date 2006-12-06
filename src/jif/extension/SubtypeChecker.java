@@ -269,6 +269,29 @@ public class SubtypeChecker
             // we insist that C[] >= D[] iff C >= D and D >= C.
             Type subBase = ((ArrayType)unlblSubtype).base();  
             Type supBase = ((ArrayType)unlblSupertype).base();
+            
+            // check that the const-ness of the arrays is suitable.
+            boolean superConst = false;
+            if (supBase instanceof ConstArrayType) {
+                ConstArrayType supBaseCat = (ConstArrayType)supBase; 
+                superConst = supBaseCat.isConst();
+                if (supBaseCat.isConst() && supBaseCat.isNonConst()) {
+                    throw new InternalCompilerError("Base type of super should not be able to be 'either'");
+                }
+            }
+            if (superConst) {
+                // sub must be const
+                if (!(subBase instanceof ConstArrayType) || 
+                        !((ConstArrayType)subBase).isConst()) {
+                    throw new SemanticException("A normal array is not a subtype of a const array", pos);
+                }
+            }
+            else {
+                // sub must be not-const
+                if (subBase instanceof ConstArrayType && !((ConstArrayType)subBase).isNonConst()) {
+                    throw new SemanticException("A const array is not a subtype of a non-const array", pos);
+                }
+            }
 
             if (!recursiveAddSubtypeConstraints(lc, pos, subBase, supBase, true) ||
                 !recursiveAddSubtypeConstraints(lc, pos, supBase, subBase, true)) {

@@ -73,6 +73,7 @@ jif.ExtensionInfo  "-cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.j
 	Array8.jif (Semantic, "not less restrictive");
 	Array9.jif (Semantic, "not less restrictive");
 	Array10.jif ;
+	Array11.jif ;
 	ArrayBaseLabel01.jif (Semantic, "base type of arrays must be equivalent");
 	ArrayLeak.jif (Semantic, "not a subtype") ;
 #Removed the problematics String.getBytes method from the String signature
@@ -134,6 +135,23 @@ jif.ExtensionInfo  "-cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.j
 	ConjunctTest02a.jif (Warning), (Warning);
 	ConjunctTest03.jif ;
 	ConjunctTest04.jif ;
+	ConstArray01.jif ;
+	ConstArray02.jif (Semantic, "Cannot assign to .* const");
+	ConstArray03.jif (Semantic, "does not match");
+	ConstArray03a.jif;
+	ConstArray04.jif (Semantic, "does not match");
+	ConstArray04a.jif ;
+	ConstArray05.jif ;
+	ConstArray06.jif ;
+	ConstArray06a.jif (Semantic, "can not contain .*this");
+	ConstArray07.jif ;
+	ConstArray08.jif ;
+	ConstArray09.jif (Syntax);
+	ConstArray10.jif (Syntax);
+	ConstArray10a.jif (Semantic, "all.*dimensions");
+	ConstArray10b.jif (Semantic, "all.*dimensions");
+	ConstArray10c.jif (Semantic, "all.*dimensions");
+	ConstArray11.jif (Semantic, "Cannot assign to .* const"), (Semantic, "Cannot assign to .* const");
 	Constraints1.jif ;
 	Constraints3.jif ;
 	Constraints5.jif ;

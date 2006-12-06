@@ -190,6 +190,25 @@ parser Grm extends polyglot.parse.Grm {:
 	}
 	return l;
     }
+
+    /**
+      * Return a TypeNode representing a <code>dims</code>-dimensional
+      * const array of <code>n</code>.
+      */
+    public TypeNode constArray(TypeNode n, int dims) throws Exception {
+        if (dims > 0) {
+            if (n instanceof CanonicalTypeNode) {
+                Type t = ((CanonicalTypeNode) n).type();
+                return nf.CanonicalTypeNode(n.position(),
+                                            ts.constArrayOf(n.position(),
+                                                            t, dims));
+            }
+            return nf.ConstArrayTypeNode(n.position(), constArray(n, dims-1));
+        }
+        else {
+            return n;
+        }
+    }
 	
 
     /**
@@ -307,7 +326,7 @@ non terminal ParamDecl parameter;
 non terminal List constraints, constraints_opt;
 non terminal List authority, authority_opt;
 non terminal ConstraintNode constraint;
-non terminal Amb reftype_or_expr, objtype_or_expr;
+non terminal Amb reftype_or_expr, reftype_or_expr_no_const, objtype_or_expr;
 non terminal List param_or_expr_list;
 non terminal Expr primary_no_array;
 non terminal TypeNode primitive_array_type;
@@ -534,6 +553,8 @@ primitive_array_type ::=
                     // TypeNode
         labeled_primitive_type:a dims:b
             {: RESULT = parser.array(a, b.intValue()); :}
+    |   labeled_primitive_type:a CONST dims:b
+            {: RESULT = parser.constArray(a, b.intValue()); :}
     ;
 // 19.5) Names
 // 19.6) Packages
@@ -1058,18 +1079,39 @@ reftype_or_expr ::=
         IDENTIFIER:a
             {: RESULT = new Name(parser, parser.pos(a), null,
                                  a.getIdentifier()); :}
-    |   reftype_or_expr:a DOT IDENTIFIER:b
+    |   reftype_or_expr_no_const:a DOT IDENTIFIER:b
             {: RESULT = new Name(parser, parser.pos(a,b), a,
                                  b.getIdentifier()); :}
-    |   reftype_or_expr:a LBRACK param_or_expr_list:b RBRACK
+    |   reftype_or_expr_no_const:a LBRACK param_or_expr_list:b RBRACK
             {:  RESULT = parser.makeAccessOrInst(a,b); :}
-    |   reftype_or_expr:a LBRACK RBRACK:y
+    |   reftype_or_expr_no_const:a LBRACK RBRACK:y
             {: RESULT = new Array(parser, parser.pos(a,y), a.toType()); :}
-    |   reftype_or_expr:a label:b
+    |   reftype_or_expr_no_const:a label:b
+            {: RESULT = new LabeledExpr(parser, parser.pos(a,b), a, b);
+               parser.countAnnotation(parser.TYPE_ANNOTATION, parser.pos(a,b));
+            :}
+    |   reftype_or_expr_no_const:a CONST LBRACK param_or_expr_list:b RBRACK:y
+            {: RESULT = new Array(parser, parser.pos(a,y), a.toType(), true); :}
+    |   reftype_or_expr_no_const:a CONST LBRACK RBRACK:y
+            {: RESULT = new Array(parser, parser.pos(a,y), a.toType(), true); :}
+    ;
+reftype_or_expr_no_const ::=
+        IDENTIFIER:a
+            {: RESULT = new Name(parser, parser.pos(a), null,
+                                 a.getIdentifier()); :}
+    |   reftype_or_expr_no_const:a DOT IDENTIFIER:b
+            {: RESULT = new Name(parser, parser.pos(a,b), a,
+                                 b.getIdentifier()); :}
+    |   reftype_or_expr_no_const:a LBRACK param_or_expr_list:b RBRACK
+            {:  RESULT = parser.makeAccessOrInst(a,b); :}
+    |   reftype_or_expr_no_const:a LBRACK RBRACK:y
+            {: RESULT = new Array(parser, parser.pos(a,y), a.toType()); :}
+    |   reftype_or_expr_no_const:a label:b
             {: RESULT = new LabeledExpr(parser, parser.pos(a,b), a, b);
                parser.countAnnotation(parser.TYPE_ANNOTATION, parser.pos(a,b));
             :}
     ;
+
 drop {
     array_access ::=
         name LBRACK expression RBRACK
