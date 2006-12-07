@@ -152,6 +152,7 @@ jif.ExtensionInfo  "-cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.j
 	ConstArray10b.jif (Semantic, "all.*dimensions");
 	ConstArray10c.jif (Semantic, "all.*dimensions");
 	ConstArray11.jif (Semantic, "Cannot assign to .* const"), (Semantic, "Cannot assign to .* const");
+	ConstArray12.jif ;
 	Constraints1.jif ;
 	Constraints3.jif ;
 	Constraints5.jif ;

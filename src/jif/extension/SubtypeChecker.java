@@ -170,7 +170,7 @@ public class SubtypeChecker
 
     /** Check that subtype <= supertype */
     private boolean recursiveAddSubtypeConstraints(LabelChecker lc,
-	Position pos, Type supertype, Type subtype, final boolean inArrayType) throws SemanticException
+	Position pos, Type supertype, Type subtype, final boolean inNonConstArrayType) throws SemanticException
     {
 	if (Report.should_report(Report.types, 2))
 	    Report.report(2, "Adding subtype constraints: " + supertype + " >= " + subtype);
@@ -200,13 +200,13 @@ public class SubtypeChecker
                                         public String msg() {
                                             String s = lOrigSubtype + " is not a subtype of " + 
                                                   lOrigSupertype + ".";
-                                            if (inArrayType) {
+                                            if (inNonConstArrayType) {
                                                 s += " The base type of arrays must be equivalent.";
                                             }
                                             return s;
                                         }
                                         public String detailMsg() {
-                                            if (inArrayType) {
+                                            if (inNonConstArrayType) {
                                                 return lOrigSubtype + " is not a subtype of " + 
                                                 lOrigSupertype + ". Subtyping requires " +
                                                 "the base types of arrays to be equivalent.";                                                
@@ -271,31 +271,45 @@ public class SubtypeChecker
             Type supBase = ((ArrayType)unlblSupertype).base();
             
             // check that the const-ness of the arrays is suitable.
-            boolean superConst = false;
-            if (supBase instanceof ConstArrayType) {
-                ConstArrayType supBaseCat = (ConstArrayType)supBase; 
-                superConst = supBaseCat.isConst();
-                if (supBaseCat.isConst() && supBaseCat.isNonConst()) {
-                    throw new InternalCompilerError("Base type of super should not be able to be 'either'");
-                }
+            boolean superIsConst = false;
+            boolean superIsNonConst = false;
+            boolean subIsBoth = false;
+            if (unlblSupertype instanceof ConstArrayType) {
+                ConstArrayType unlblSuperCat = (ConstArrayType)unlblSupertype; 
+                superIsConst = unlblSuperCat.isConst();
+                superIsNonConst = unlblSuperCat.isNonConst();
             }
-            if (superConst) {
+            if (unlblSubtype instanceof ConstArrayType) {
+                ConstArrayType unlblSubCat = (ConstArrayType)unlblSubtype; 
+                subIsBoth = unlblSubCat.isConst() && unlblSubCat.isNonConst();
+            }
+            if (superIsConst) {
                 // sub must be const
-                if (!(subBase instanceof ConstArrayType) || 
-                        !((ConstArrayType)subBase).isConst()) {
+                if (!subIsBoth && (!(unlblSubtype instanceof ConstArrayType) || 
+                        !((ConstArrayType)unlblSubtype).isConst())) {
                     throw new SemanticException("A normal array is not a subtype of a const array", pos);
                 }
             }
-            else {
+            if (superIsNonConst) {
                 // sub must be not-const
-                if (subBase instanceof ConstArrayType && !((ConstArrayType)subBase).isNonConst()) {
+                if (!subIsBoth && unlblSubtype instanceof ConstArrayType && !((ConstArrayType)unlblSubtype).isNonConst()) {
                     throw new SemanticException("A const array is not a subtype of a non-const array", pos);
                 }
             }
 
-            if (!recursiveAddSubtypeConstraints(lc, pos, subBase, supBase, true) ||
-                !recursiveAddSubtypeConstraints(lc, pos, supBase, subBase, true)) {
-                return false; 
+            if (superIsConst || subIsBoth) {
+                // the super and sub types are both const arrays, and so are covariant
+                // or the sub type is for a cloned array, or an array initializer.
+                if (!recursiveAddSubtypeConstraints(lc, pos, supBase, subBase, false)) {
+                        return false; 
+                    }
+            }
+            else  {
+                // the super and sub types are both non-const arrays, and so are invariant.
+                if (!recursiveAddSubtypeConstraints(lc, pos, subBase, supBase, true) ||
+                        !recursiveAddSubtypeConstraints(lc, pos, supBase, subBase, true)) {
+                    return false; 
+                }
             }
         }
 

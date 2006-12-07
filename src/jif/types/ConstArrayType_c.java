@@ -26,9 +26,15 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
     }
 
     public String toString() {
-        if (isConst && !isNonConst) return base.toString() + " const[]";
-        if (isConst && isNonConst) return base.toString() + " const?[]";
-        return base.toString() + "[]";
+        Type ultbase = ultimateBase();
+        String braces = "";
+        for (int i = 0; i < dims(); i++) {
+            braces += "[]";
+        }
+        
+        if (isConst && !isNonConst) return ultbase.toString() + " const"+braces;
+        if (isConst && isNonConst) return ultbase.toString() + " const?"+braces;
+        return ultbase.toString() + braces;
     }
 
     public boolean equalsImpl(TypeObject o) {
