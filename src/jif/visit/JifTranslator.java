@@ -5,12 +5,12 @@ import polyglot.ast.SourceFile;
 import polyglot.frontend.Job;
 import polyglot.frontend.TargetFactory;
 import polyglot.types.TypeSystem;
-import polyglot.visit.Translator;
+import polyglot.visit.TypedTranslator;
 
 /** The Jif translator is used to generate Java files from
  *  the current ASTs.
  */
-public class JifTranslator extends Translator
+public class JifTranslator extends TypedTranslator
 {
     public JifTranslator(Job job, TypeSystem ts, NodeFactory nf, TargetFactory tf) {
 	super(job, ts, nf, tf);
