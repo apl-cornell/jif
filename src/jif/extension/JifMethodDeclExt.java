@@ -24,62 +24,62 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
     public JifMethodDeclExt(ToJavaExt toJava) {
         super(toJava);
     }
-
+    
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         JifMethodDecl mn = (JifMethodDecl) node();
         JifMethodInstance renamedMI = (JifMethodInstance) mn.methodInstance();
         JifMethodInstance mi = JifMethodDecl_c.unrenameArgs(renamedMI);
-
+        
         // check covariance of labels
         checkCovariance(mi, lc);
         
         // check that the labels in the method signature conform to the
         // restrictions of the superclass and/or interface method declaration.
         overrideMethodLabelCheck(lc, renamedMI);
-
-	JifTypeSystem ts = lc.jifTypeSystem();
-      	JifContext A = lc.jifContext();
-	A = (JifContext) mn.del().enterScope(A);
+        
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
+        A = (JifContext) mn.del().enterScope(A);
         lc = lc.context(A);
-
+        
         // let the label checker know that we are about to enter a method decl
         lc.enteringMethod(mi);
-
+        
         // First, check the arguments, and adjust the context.
-	Label Li = checkEnforceSignature(mi, lc);
-
-	Block body = null;
-	PathMap X;
-
-	if (! mn.flags().isAbstract() && ! mn.flags().isNative()) {
-	    // Now, check the body of the method in the new context.
-
-	    // Visit only the body, not the formal parameters.
-	    body = (Block) lc.context(A).labelCheck(mn.body());
-	    X = X(body);
-
-	    if (Report.should_report(jif_verbose, 3))
-		Report.report(3, "Body path labels = " + X);
-
-	    addReturnConstraints(Li, X, mi, lc, mi.returnType());
-	}
-	else {
-	    // for an abstract or native method, just set the 
-	    // normal termination path to the entry PC of the
-	    // method.
-	    X = ts.pathMap();
-	    X = X.N(A.currentCodePCBound());
-	}
-
-	mn = (JifMethodDecl) X(mn.body(body), X);
-
+        Label Li = checkEnforceSignature(mi, lc);
+        
+        Block body = null;
+        PathMap X;
+        
+        if (! mi.flags().isAbstract() && ! mi.flags().isNative()) {
+            // Now, check the body of the method in the new context.
+            
+            // Visit only the body, not the formal parameters.
+            body = (Block) lc.context(A).labelCheck(mn.body());
+            X = X(body);
+            
+            if (Report.should_report(jif_verbose, 3))
+                Report.report(3, "Body path labels = " + X);
+            
+            addReturnConstraints(Li, X, mi, lc, mi.returnType());
+        }
+        else {
+            // for an abstract or native method, just set the 
+            // normal termination path to the entry PC of the
+            // method.
+            X = ts.pathMap();
+            X = X.N(A.currentCodePCBound());
+        }
+        
+        mn = (JifMethodDecl) X(mn.body(body), X);
+        
         // let the label checker know that we have left the method
         mn = lc.leavingMethod(mn);
-    
-	return mn;
+        
+        return mn;
     }
-
+    
     /**
      * This method checks that covariant labels are not used in contravariant
      * positions.
@@ -93,47 +93,47 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         }
         ProcedureDecl mn = (ProcedureDecl) node();
         Position declPosition = mn.position();
-
+        
         // check pc bound
         Label Li = mi.pcBound();
         if (Li.isCovariant()) {
             throw new SemanticDetailedException("The pc bound of a method " +
-                    "can not be the covariant label " + Li + ".",
-             "The pc bound of a method " +
-                    "can not be the covariant label " + Li + ". " +
-                "Otherwise, information may be leaked by casting the " +
-                "low-parameter class to a high-parameter class, and masking " +
-                "the low side-effects that invoking the method may cause.",
-                        declPosition);
+                                                "can not be the covariant label " + Li + ".",
+                                                "The pc bound of a method " +
+                                                "can not be the covariant label " + Li + ". " +
+                                                "Otherwise, information may be leaked by casting the " +
+                                                "low-parameter class to a high-parameter class, and masking " +
+                                                "the low side-effects that invoking the method may cause.",
+                                                declPosition);
         }
         
         // check arguments
         JifTypeSystem ts = lc.jifTypeSystem();
         Iterator types = mi.formalTypes().iterator();
-
+        
         int index = 0;
         while (types.hasNext()) {
             Type tj = (Type) types.next();
-
+            
             // This is the declared label of the parameter.
             Label argBj = ((ArgLabel)ts.labelOfType(tj)).upperBound();
             if (argBj.isCovariant()) {
                 String name = ((Formal)mn.formals().get(index)).name();
                 throw new SemanticDetailedException("The method " +
-                        "argument " + name + 
-                        " can not be labeled with the covariant label " + argBj + ".",
-            "The method argument " + name + 
-                        " can not be labeled with the covariant label " + argBj + ". " +
-                    "Otherwise, information may be leaked by casting the " +
-                    "low-parameter class to a high-parameter class, and calling " +
-                    "the method with a high security parameter, which the " +
-                    "method regards as low security information.",
-                            argBj.position());
+                                                    "argument " + name + 
+                                                    " can not be labeled with the covariant label " + argBj + ".",
+                                                    "The method argument " + name + 
+                                                    " can not be labeled with the covariant label " + argBj + ". " +
+                                                    "Otherwise, information may be leaked by casting the " +
+                                                    "low-parameter class to a high-parameter class, and calling " +
+                                                    "the method with a high security parameter, which the " +
+                                                    "method regards as low security information.",
+                                                    argBj.position());
             }
-
+            
             index++;
         }
-
+        
     }
     
     /**
@@ -155,5 +155,5 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             CallHelper.OverrideHelper(mj, mi, lc).checkOverride(lc);
         }
     }
-
+    
 }
