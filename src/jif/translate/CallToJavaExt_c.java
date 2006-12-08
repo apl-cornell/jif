@@ -14,10 +14,10 @@ import polyglot.types.SemanticException;
 public class CallToJavaExt_c extends ExprToJavaExt_c {
     public Expr exprToJava(JifToJavaRewriter rw) throws SemanticException {
         Call n = (Call) node();
-        
-        if (n.name().equals("clone") && n.target().type().isArray()) {
-            ArrayType at = n.target().type().toArray();
-            return rw.qq().parseExpr("(%T)jif.runtime.Runtime.arrayCopy(%E)", rw.typeToJava(at, at.position()), n.target());
+
+        if (n.name().equals("clone") && n.methodInstance().container().isArray()) {
+            ArrayType at = n.methodInstance().container().toArray();
+            return rw.qq().parseExpr("(%T)%E.clone()", rw.typeToJava(at, at.position()), n.target());
         }
         
         List args = new ArrayList();

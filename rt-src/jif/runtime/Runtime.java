@@ -195,58 +195,6 @@ public class Runtime {
         }
     }
     
-    public static boolean[] arrayCopy(boolean[] a) throws NullPointerException {
-        boolean[] n = new boolean[a.length];
-        System.arraycopy(a, 0, n, 0, a.length);
-        return n;
-        
-    }
-    public static byte[] arrayCopy(byte[] a) throws NullPointerException {
-        byte[] n = new byte[a.length];
-        System.arraycopy(a, 0, n, 0, a.length);
-        return n;
-        
-    }
-    public static char[] arrayCopy(char[] a) throws NullPointerException {
-        char[] n = new char[a.length];
-        System.arraycopy(a, 0, n, 0, a.length);
-        return n;
-        
-    }
-    public static short[] arrayCopy(short[] a) throws NullPointerException {
-        short[] n = new short[a.length];
-        System.arraycopy(a, 0, n, 0, a.length);
-        return n;
-        
-    }
-    public static int[] arrayCopy(int[] a) throws NullPointerException {
-        int[] n = new int[a.length];
-        System.arraycopy(a, 0, n, 0, a.length);
-        return n;
-        
-    }
-    public static long[] arrayCopy(long[] a) throws NullPointerException {
-        long[] n = new long[a.length];
-        System.arraycopy(a, 0, n, 0, a.length);
-        return n;
-        
-    }
-    public static float[] arrayCopy(float[] a) throws NullPointerException {
-        float[] n = new float[a.length];
-        System.arraycopy(a, 0, n, 0, a.length);
-        return n;
-        
-    }
-    public static double[] arrayCopy(double[] a) throws NullPointerException {
-        double[] n = new double[a.length];
-        System.arraycopy(a, 0, n, 0, a.length);
-        return n;
-        
-    }
-    public static Object[] arrayCopy(Object[] a) throws NullPointerException {
-        return a.clone();
-    }
-
     static {
         System.loadLibrary("jifrt");
     }

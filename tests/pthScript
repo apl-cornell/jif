@@ -147,7 +147,7 @@ jif.ExtensionInfo  "-cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.j
 	ConstArray07.jif ;
 	ConstArray08.jif ;
 	ConstArray09.jif (Syntax);
-	ConstArray10.jif (Syntax);
+	ConstArray10.jif ;
 	ConstArray10a.jif (Semantic, "all.*dimensions");
 	ConstArray10b.jif (Semantic, "all.*dimensions");
 	ConstArray10c.jif (Semantic, "all.*dimensions");
