@@ -49,6 +49,7 @@
 
     <!-- jifc executable -->
     <property name="jifc" location="${bin}/jifc" />
+    <property name="jif" location="${bin}/jif" />
 
     <!-- set the prefix for accessing environment variables -->
     <property environment="env" />
@@ -64,8 +65,23 @@
     </path>
 
 
-
-
+	<!-- establish the os -->
+    <condition property="os.isWindows">
+        <os family="windows" />
+    </condition>
+    <condition property="os.isUnix">
+        <os family="unix" />
+    </condition>
+    <condition property="os.unsupported-os">
+        <and>
+            <not>
+                <os family="windows" />
+            </not>
+            <not>
+                <os family="unix" />
+            </not>
+        </and>
+    </condition>
 
     <!-- ****************************************
        Clean up targets and other admin tasks
@@ -121,8 +137,6 @@
                 <include name="jiflib.jar" />
             </fileset>
         </delete>
-        <delete file="${bin}/jif" />
-        <delete file="${jifc}" />
         <delete file="${jifc}.bat" />
         <delete file="${bin}/splitc" />
     </target>
@@ -145,7 +159,7 @@
        ****************************************  -->
     <target name="configure" description="Configure jif">
         <antcall target="check-classpath" />
-        <antcall target="executables" />
+        <antcall target="jif-executable-bat" />
     </target>
 
     <target name="check-classpath" description="Check the classpath contains the appropriate directories/jars">
@@ -177,69 +191,7 @@
 	      message="The environment variable JAVA_HOME must be defined."/>
     </target>
 
-    <target name="executables">
-        <uptodate property="executables.up-to-date">
-            <srcfiles dir="${bin}" includes="*.in" />
-            <mapper type="glob" from="*.in" to="*" />
-        </uptodate>
-        <antcall target="jif-executable" />
-        <antcall target="split-executable" />
-        <delete file="${bin}/defs" />
-    </target>
-
-    <target name="executable-defs">
-        <condition property="defs.load_library_path" value="PATH">
-            <os family="windows" />
-        </condition>
-        <condition property="defs.load_library_path" value="LD_LIBRARY_PATH">
-            <os family="unix" />
-        </condition>
-
-        <echo file="${bin}/defs" append="no">#!/bin/sh
-# DO NOT EDIT - This file was automatically generated.
-
-JAVA='${java.home}/bin/java'
-FILE_SEP='${file.separator}'
-PATH_SEP='${path.separator}'
-TOP='${basedir}'
-RT_LIB_PATH='${lib}${path.separator}'$$${defs.load_library_path}
-    </echo>
-    </target>
-
-    <!-- creates the executable scripts jifc and jif -->
-    <target name="jif-executable"
-		unless="executables.up-to-date">
-
-        <!-- make sure the definitions file is around -->
-        <antcall target="executable-defs" />
-
-        <!-- Create jifc -->
-        <concat destfile="${jifc}" append="no">
-            <filelist dir="${bin}" files="defs" />
-        </concat>
-        <concat destfile="${jifc}" append="yes">
-ext="-extclass jif.ExtensionInfo"
-    </concat>
-        <concat destfile="${jifc}" append="yes">
-            <filelist dir="${bin}" files="jifc.in" />
-        </concat>
-        <chmod perm="+x" file="${jifc}" />
-
-
-
-        <!-- Create jif -->
-        <concat destfile="${bin}/jif" append="no">
-            <filelist dir="${bin}" files="defs,jif.in" />
-        </concat>
-        <chmod perm="+x" file="${bin}/jif" />
-
-        <condition property="os.isWindows">
-            <os family="windows" />
-        </condition>
-        <antcall target="jif-executable-bat" />
-    </target>
-
-    <!-- Create jif.bat if needed -->
+    <!-- Create jif.bat and jifc.bat if needed -->
     <target name="jif-executable-bat" 
             if="os.isWindows">
         <concat destfile="${jifc}.bat" append="no">
@@ -257,23 +209,21 @@ goto setupArgs
 :doneStart
 sh ${jifc} %CMD_LINE_ARGS%
     </concat>
-    </target>
+        <concat destfile="${jif}.bat" append="no">
+@echo off
+rem DO NOT EDIT - This file was automatically generated.
 
-    <target name="split-executable" unless="executables.up-to-date">
-        <!-- make sure the definitions file is around -->
-        <antcall target="executable-defs" />
-
-        <!-- Create splitc -->
-        <concat destfile="${bin}/splitc" append="no">
-            <filelist dir="${bin}" files="defs" />
-        </concat>
-        <concat destfile="${bin}/splitc" append="yes">
-ext="-extclass split.ExtensionInfo"
+set CMD_LINE_ARGS=%1
+if ""%1""=="""" goto doneStart
+shift
+:setupArgs
+if ""%1""=="""" goto doneStart
+set CMD_LINE_ARGS=%CMD_LINE_ARGS% %1
+shift
+goto setupArgs
+:doneStart
+sh ${jif} %CMD_LINE_ARGS%
     </concat>
-        <concat destfile="${bin}/splitc" append="yes">
-            <filelist dir="${bin}" files="jifc.in" />
-        </concat>
-        <chmod perm="+x" file="${bin}/splitc" />
     </target>
 
     <!-- ****************************************
@@ -381,22 +331,6 @@ ext="-extclass split.ExtensionInfo"
             </classpath>
         </javah>
 
-        <condition property="os.isWindows">
-            <os family="windows" />
-        </condition>
-        <condition property="os.isUnix">
-            <os family="unix" />
-        </condition>
-        <condition property="os.unsupported-os">
-            <and>
-                <not>
-                    <os family="windows" />
-                </not>
-                <not>
-                    <os family="unix" />
-                </not>
-            </and>
-        </condition>
         <fail if="os.unsupported-os" message="Cannot compile the native runtime code. This is not a supported OS." />
 
         <!-- Make sure we can find the appropriate OS specific native include directory -->
@@ -548,58 +482,6 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
     </target>
 
 
-    <!-- ****************************************
-       Split targets
-       ****************************************  -->
-
-    <!-- Build the lexer for an extension, assuming that
-       they it is located in the standard place and named
-       the standard name that we usually use.
-       @param ext    The extension name.
-   -->
-    <target name="split-config-lexer">
-        <antcall target="jflex-lexer">
-            <param name="lexer.dir" value="${basedir}/split/src/split/config" />
-            <param name="lexer.class" value="Lexer_c" />
-            <param name="jflex.file" value="config.flex" />
-        </antcall>
-    </target>
-
-
-    <!-- Build the CUP parser for split-config files
-   -->
-    <target name="split-config-parser" depends="split-config-lexer">
-        <antcall target="cup-parser">
-            <param name="parser.dir" value="${basedir}/split/src/split/config" />
-            <param name="cup.file" value="config.cup" />
-            <param name="parser.class" value="Grm" />
-            <param name="symbol.class" value="sym" />
-        </antcall>
-    </target>
-
-
-    <!-- <target name="split" depends="split-config-parser,split-base,split-sig,split-lib,split-runtime"/> -->
-    <target name="split" depends="split-config-parser,split-base" />
-    <target name="split-base" depends="jif-base">
-        <antcall target="standard-ext">
-            <param name="ext" value="split" />
-            <param name="ext.basedir" value="${basedir}/split" />
-            <param name="parser.type" value="ppg" />
-        </antcall>
-    </target>
-
-    <target name="split-sig" depends="split-base">
-        <fail message="This target unimplemented." />
-    </target>
-    <target name="split-lib" depends="split-base,split-sig">
-        <fail message="This target unimplemented." />
-    </target>
-    <target name="split-runtime" depends="split-base,split-sig,split-lib">
-        <fail message="This target unimplemented." />
-    </target>
-
-
-
 
     <!-- ****************************************
        Javadoc and distribution targets
@@ -676,14 +558,6 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
         </copy>
 
     </target>
-
-
-    <target name="split-dist" depends="split">
-        <fail message="split distribution unimplemented" />
-    </target>
-
-
-
 
     <!-- ****************************************
        "Reusable" targets

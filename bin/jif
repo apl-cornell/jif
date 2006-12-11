@@ -1,0 +1,109 @@
+#!/bin/sh
+
+prg=`basename "$0"`
+dir=`dirname "$0"`/..
+
+usage() {
+  jif -h
+  cat <<EOF
+  -j <jvm-options>         pass options to the Java VM
+  -J <jvm>                 use a different Java VM (default java in path)
+  -V                       echo the java command
+EOF
+}
+
+fixclasspath() {
+  windows=0
+
+  if [ `uname | grep -c CYGWIN` -ne 0 ]; then
+    windows=1
+  fi
+
+  cp="$1"
+  if [ "$windows" = 1 ]; then 
+      echo ":$cp" | sed -e 's!/!\\!g' -e 's!:!;!g' -e 's/\\cygdrive\\\([a-z]\)/\1:/g'
+  else
+      echo "$cp"
+  fi
+}
+
+runtime_lib_path=
+runtime_classpath=
+lib_classpath=
+extra_cp=
+args=
+vmargs=
+classpath=
+java=java
+
+jif() {
+  eval "$java" "$vmargs" -Djava.library.path="'$runtime_lib_path'" -classpath "'$classpath'" "$@"
+}
+jifprint() {
+  echo "$java" "$vmargs" -Djava.library.path="'$runtime_lib_path'" -classpath "'$classpath'" "$@"
+}
+
+while true; do
+    case "$1" in
+        "")
+            break
+            ;;
+        -V)
+            verbose=1
+            shift
+            ;;
+        -classpath)
+            shift
+            extra_cp="$extra_cp:$1"
+            echo "$extra_cp"            
+            shift
+            ;;
+        -j)
+            shift
+            vmargs="$vmargs '$1'"
+            shift
+            ;;
+        -J)
+            shift
+            java="'$1'"
+            shift
+            ;;
+        -h)
+            usage=1
+            break
+            ;;
+        *)
+            args="$args '$1'"
+            shift
+            ;;
+    esac
+done
+
+classpath="$extra_cp"
+classpath=`fixclasspath "$classpath"`
+
+
+runtime_lib_path="$dir/lib:$PATH"
+runtime_classpath="$dir/rt-classes:$dir/lib/jifrt.jar"
+lib_classpath="$dir/lib-classes:$dir/lib/jiflib.jar"
+
+runtime_lib_path=`fixclasspath "$runtime_lib_path"`
+runtime_classpath=`fixclasspath "$runtime_classpath"`
+lib_classpath=`fixclasspath "$lib_classpath"`
+
+
+if [ "$usage" = 1 ]; then
+  usage
+  exit 0
+fi
+
+
+JIFCP="${rt_cp}${extra_cp}${PATH_SEP}${lib_cp}${PATH_SEP}${CLASSPATH}"
+
+
+
+if [ "$verbose" = 1 ]; then
+    jifprint "$args"
+fi
+
+jif "$args"
