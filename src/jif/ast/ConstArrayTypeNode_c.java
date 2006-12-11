@@ -4,6 +4,7 @@ import jif.types.JifTypeSystem;
 import polyglot.ast.*;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeBuilder;
@@ -26,13 +27,14 @@ public class ConstArrayTypeNode_c extends ArrayTypeNode_c implements ConstArrayT
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)ar.typeSystem();
         NodeFactory nf = ar.nodeFactory();
+        if (! base.isDisambiguated()) {
+            return this;
+        }
 
         Type baseType = base.type();
 
         if (! baseType.isCanonical()) {
-            throw new SemanticException(
-                "Base type " + baseType + " of array could not be resolved.",
-                base.position());
+            return this;
         }
 
         return nf.CanonicalTypeNode(position(),
