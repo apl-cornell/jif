@@ -26,15 +26,25 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
     }
 
     public String toString() {
-        Type ultbase = ultimateBase();
-        String braces = "";
-        for (int i = 0; i < dims(); i++) {
-            braces += "[]";
+        Type base = base();
+        Type ultBase = ultimateBase();
+        JifTypeSystem ts = (JifTypeSystem)this.typeSystem();
+        boolean isBaseArray = base.isArray();
+        if (isBaseArray && ts.isLabeled(base) && ts.isLabeled(ultBase)) {
+            // both the base of this array is labeled, and the
+            // ultimate base of this array is labeled. Don't print
+            // the label for the base if it is the same as
+            // the ultimate base.
+            if (ts.labelOfType(base).equals(ts.labelOfType(ultBase))) {
+                base = ts.unlabel(base);
+            }
         }
+
+        String s = base.toString();
         
-        if (isConst && !isNonConst) return ultbase.toString() + " const"+braces;
-        if (isConst && isNonConst) return ultbase.toString() + " const?"+braces;
-        return ultbase.toString() + braces;
+        if (!isBaseArray && isConst && !isNonConst) return s + " const[]";
+        if (!isBaseArray && isConst && isNonConst) return s + " const?[]";
+        return s + "[]";
     }
 
     public boolean equalsImpl(TypeObject o) {

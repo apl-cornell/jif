@@ -68,7 +68,7 @@ class AddDelClosure[principal P] extends TestClosure[P, {P:;P!:}] {
 	super();
     }
     
-    public Object{this} invoke{P:;P!:}() where caller (P) {
+    public Object{P:;P!:} invoke{P:;P!:}() where caller (P) {
         final Principal p = P;
         if (p instanceof TestPrincipal) {
             final TestPrincipal tp = endorse((TestPrincipal)p, {P:;P!:});

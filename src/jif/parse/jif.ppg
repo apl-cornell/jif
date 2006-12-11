@@ -192,26 +192,6 @@ parser Grm extends polyglot.parse.Grm {:
     }
 
     /**
-      * Return a TypeNode representing a <code>dims</code>-dimensional
-      * const array of <code>n</code>.
-      */
-    public TypeNode constArray(TypeNode n, int dims) throws Exception {
-        if (dims > 0) {
-            if (n instanceof CanonicalTypeNode) {
-                Type t = ((CanonicalTypeNode) n).type();
-                return nf.CanonicalTypeNode(n.position(),
-                                            ts.constArrayOf(n.position(),
-                                                            t, dims));
-            }
-            return nf.ConstArrayTypeNode(n.position(), constArray(n, dims-1));
-        }
-        else {
-            return n;
-        }
-    }
-	
-
-    /**
      * Return the source position of the Parse.
      */
     public static Position pos(Amb n) {
@@ -551,11 +531,17 @@ drop { array_type }
 
 primitive_array_type ::=
                     // TypeNode
-        labeled_primitive_type:a dims:b
-            {: RESULT = parser.array(a, b.intValue()); :}
-    |   labeled_primitive_type:a CONST dims:b
-            {: RESULT = parser.constArray(a, b.intValue()); :}
-    ;
+        labeled_primitive_type:a LBRACK RBRACK:y
+            {: RESULT = new Array(parser, parser.pos(a,y), a).toType(); :}
+    |   labeled_primitive_type:a CONST LBRACK RBRACK:y
+            {: RESULT = new Array(parser, parser.pos(a,y), a, true).toType(); :}
+    |   primitive_array_type:a label_opt:b LBRACK RBRACK:y
+            {: if (b != null) {
+                   a = parser.nf.LabeledTypeNode(parser.pos(a, b), a, b);
+               }
+               RESULT = new Array(parser, parser.pos(a,y), a).toType();
+               if (b != null) parser.countAnnotation(parser.TYPE_ANNOTATION, RESULT.position());
+            :};
 // 19.5) Names
 // 19.6) Packages
 // 19.7) Productions used only in the LALR(1) grammar

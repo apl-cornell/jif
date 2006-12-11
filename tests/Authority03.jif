@@ -36,7 +36,7 @@ class AddBobClosure[principal P] extends TestClosure[P, {P!:}] {
 	super();
     }
     
-    public Object{this} invoke{P!:}() where caller (P) {
+    public Object{P!:} invoke{P!:}() where caller (P) {
 	final Principal p = P;
 	if (p instanceof TestPrincipal) {
 	    final TestPrincipal tp = (TestPrincipal)p;

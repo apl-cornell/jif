@@ -1,5 +1,6 @@
 package jif.parse;
 
+import jif.ast.ConstArrayTypeNode;
 import polyglot.ast.Receiver;
 import polyglot.ast.TypeNode;
 import polyglot.util.Position;
@@ -23,7 +24,8 @@ public class Array extends Amb {
     }
 
     public TypeNode toType() {
-        if (isConst) {
+        // if the base type is an array, inherit the constness from that.
+        if (isConst || (prefix instanceof ConstArrayTypeNode)) {
             return parser.nf.ConstArrayTypeNode(pos, prefix);
         }
         return parser.nf.ArrayTypeNode(pos, prefix);

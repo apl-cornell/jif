@@ -149,7 +149,7 @@ public class JifTypeSystem_c
 
     protected ArrayType arrayType(Position pos, Type type) {
         if (!isLabeled(type)) {
-            type = labeledType(pos, type, defaultSignature().defaultArrayBaseLabel());
+            type = labeledType(pos, type, defaultSignature().defaultArrayBaseLabel(type));
         }
         return new ConstArrayType_c(this, pos, type, false);
     }

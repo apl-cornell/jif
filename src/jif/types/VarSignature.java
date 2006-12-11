@@ -64,7 +64,13 @@ public class VarSignature implements DefaultSignature
         return ts.bottomLabel();
     }
     
-    public Label defaultArrayBaseLabel() {
+    public Label defaultArrayBaseLabel(Type baseType) {
+        if (baseType.isArray()) {
+            // default label is the same label as the ultimate base
+            if (ts.isLabeled(baseType.toArray().ultimateBase())) {
+                return ts.labelOfType(baseType.toArray().ultimateBase());
+            }
+        }
         return ts.noComponentsLabel();
     }    
 }
