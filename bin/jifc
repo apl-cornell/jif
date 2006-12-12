@@ -92,18 +92,19 @@ if [ -n "$POLYGLOT" ]; then
     classpath="$classpath:$POLYGLOT/classes:$POLYGLOT/lib/polyglot.jar"
     classpath="$classpath:$POLYGLOT/lib/java_cup.jar:$POLYGLOT/lib/JFlex.jar"
 fi
-classpath=`fixclasspath "$classpath"`
 
 
 runtime_lib_path="$dir/lib:$PATH"
 sig_classpath="$dir/sig-classes:$dir/lib/jifsig.jar"
 runtime_classpath="$dir/rt-classes:$dir/lib/jifrt.jar"
 lib_classpath="$dir/lib-classes:$dir/lib/jiflib.jar"
+classpath="$classpath:$lib_classpath"
 
 runtime_lib_path=`fixclasspath "$runtime_lib_path"`
 sig_classpath=`fixclasspath "$sig_classpath"`
 runtime_classpath=`fixclasspath "$runtime_classpath"`
 lib_classpath=`fixclasspath "$lib_classpath"`
+classpath=`fixclasspath "$classpath"`
 
 
 if [ "$usage" = 1 ]; then
