@@ -78,6 +78,7 @@ jif.ExtensionInfo  "-cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.j
 	Array13.jif ;
 	Array14.jif (Semantic, "not a subtype");
 	Array15.jif ;
+	Array16.jif ;
 	ArrayBaseLabel01.jif (Semantic, "base type of arrays must be equivalent");
 	ArrayLeak.jif (Semantic, "not a subtype") ;
 #Removed the problematics String.getBytes method from the String signature

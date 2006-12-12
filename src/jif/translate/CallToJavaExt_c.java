@@ -17,6 +17,9 @@ public class CallToJavaExt_c extends ExprToJavaExt_c {
 
         if (n.name().equals("clone") && n.methodInstance().container().isArray()) {
             ArrayType at = n.methodInstance().container().toArray();
+            if (at.base().isArray()) {
+                return rw.qq().parseExpr("(%T)jif.runtime.Runtime.arrayDeepClone(%E)", rw.typeToJava(at, at.position()), n.target());                
+            }
             return rw.qq().parseExpr("(%T)%E.clone()", rw.typeToJava(at, at.position()), n.target());
         }
         

@@ -112,7 +112,7 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
             methods = new ArrayList(1);
             
             // Add method public T const?[] clone()
-            Type retType = ts.constArrayOf(position(), this.base(), 1, true);
+            Type retType = ts.constArrayOf(position(), this.base(), 1, true, true);
             
             methods.add(ts.jifMethodInstance(position(),
                                           this,

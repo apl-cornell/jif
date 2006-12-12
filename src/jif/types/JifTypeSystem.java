@@ -49,7 +49,8 @@ public interface JifTypeSystem extends ParamTypeSystem
     ConstArrayType constArrayOf(Type type, int dims);
 
     ConstArrayType constArrayOf(Position pos, Type type, int dims);
-    ArrayType constArrayOf(Position position, Type type, int dims, boolean castableToNonConst);
+    ConstArrayType constArrayOf(Position position, Type type, int dims, boolean castableToNonConst);
+    ConstArrayType constArrayOf(Position position, Type type, int dims, boolean castableToNonConst, boolean recurseIntoBaseType);
     
     JifMethodInstance jifMethodInstance(Position pos,
             ReferenceType container,

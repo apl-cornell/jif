@@ -1,6 +1,7 @@
 package jif.runtime;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
@@ -195,9 +196,30 @@ public class Runtime {
         }
     }
     
+    
+    public static Object[] arrayDeepClone(Object[] a) {
+        if (a == null) return null;
+        Object[] c = (Object[])a.clone();
+        for (int i = 0; i < a.length; i++) {
+            Object o = a[i];
+            if (o != null && o.getClass().isArray()) {
+                if (o.getClass().getComponentType().isPrimitive()) {
+                    // o is of type e.g., int[]. Need to clone it.
+                    int length = Array.getLength(o);
+                    o = Array.newInstance(o.getClass().getComponentType(), length);
+                    System.arraycopy(a[i], 0, o, 0, length);
+                }
+                else {
+                    // o i of type C[]
+                    o = arrayDeepClone((Object[])o);
+                }
+            }
+            c[i] = o;
+        }
+        return c;
+    }
+       
     static {
         System.loadLibrary("jifrt");
-    }
-    
-    
+    }   
 }

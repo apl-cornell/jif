@@ -135,6 +135,13 @@ public class JifTypeSystem_c
         return constArrayOf(pos, type, dims, false);        
     }
     public ConstArrayType constArrayOf(Position pos, Type type, int dims, boolean castableToNonConst) {
+        return constArrayOf(pos, type, dims, castableToNonConst, false);        
+    }
+    public ConstArrayType constArrayOf(Position pos, Type type, int dims, boolean castableToNonConst, boolean recurseIntoBaseType) {
+        if (recurseIntoBaseType && type.isArray()) {
+            ArrayType baseArray = type.toArray();
+            type = constArrayOf(pos, baseArray.base(), 1, castableToNonConst, recurseIntoBaseType);
+        }
         if (dims > 1) {
             return constArrayOf(pos, constArrayOf(pos, type, dims-1, castableToNonConst));
         }
@@ -146,6 +153,7 @@ public class JifTypeSystem_c
             "Must call constArrayOf(type, dims) with dims > 0");
         }
     }
+    
 
     protected ArrayType arrayType(Position pos, Type type) {
         if (!isLabeled(type)) {
