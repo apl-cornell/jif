@@ -147,7 +147,6 @@ public abstract class AbstractCollection[label L] implements Collection[L] {
                 JifObject[L] o = e.next();
                 newArray[index] = o;
             }
-            catch (ArrayStoreException impossible) { }
             catch (NoSuchElementException impossible) { }
             catch (ArrayIndexOutOfBoundsException impossible) { }
             index++;

@@ -54,7 +54,6 @@ public class ArrayList[label L]
                         ed[i] = oldData[i];
                     }
                     catch (ArrayIndexOutOfBoundsException e) {}
-                    catch (ArrayStoreException e) {}
                 }
                 elementData = ed;
             }
@@ -113,7 +112,6 @@ public class ArrayList[label L]
 	    }
 	    catch (NullPointerException e) {}
 	    catch (ArrayIndexOutOfBoundsException e) {}
-	    catch (ArrayStoreException e) {} 
         
 	    return oldValue;
 	}
@@ -131,7 +129,6 @@ public class ArrayList[label L]
         }
         catch (NullPointerException e) {}
         catch (ArrayIndexOutOfBoundsException e) {}
-        catch (ArrayStoreException e) {}
 
         return true;
     }
@@ -161,7 +158,6 @@ public class ArrayList[label L]
 	    }
 	    catch (NullPointerException e) {}
 	    catch (ArrayIndexOutOfBoundsException e) {}
-	    catch (ArrayStoreException e) {}
 
 	    size++;
 	}
@@ -184,7 +180,6 @@ public class ArrayList[label L]
                 return obj;
             }
             catch (ArrayIndexOutOfBoundsException e) { /*cannot happen*/ }
-            catch (ArrayStoreException e) { /*cannot happen*/ }
         }
         return null;
     }

@@ -183,6 +183,13 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
+    public ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess left, polyglot.ast.Assign.Operator op, Expr right) {
+        ArrayAccessAssign n = new JifArrayAccessAssign_c(pos, left, op, right);
+        n = (ArrayAccessAssign)n.ext(extFactory().extArrayAccessAssign());
+        n = (ArrayAccessAssign)n.del(delFactory().delArrayAccessAssign());
+        return n;
+    }
+
     public ClassDecl ClassDecl(Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body) {
         ClassDecl n = new JifClassDecl_c(pos, flags, name,
                 Collections.EMPTY_LIST, superClass, interfaces, 

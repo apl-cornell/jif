@@ -32,7 +32,6 @@ public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
         } 
         catch (ArrayIndexOutOfBoundsException impossible) {}
         catch (NullPointerException impossible) {}
-        catch (ArrayStoreException impossible) {}
         
         entryArray = newEntryArray;
         capacity = newCapacity;
@@ -101,7 +100,6 @@ public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
         } 
         catch (ArrayIndexOutOfBoundsException impossible) {}
         catch (NullPointerException impossible) {}
-        catch (ArrayStoreException impossible) {}
         
         return null;        
     }
@@ -132,7 +130,6 @@ public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
                 entryArray[j] = entryArray[j+1];
             }
         } 
-        catch (ArrayStoreException impossible) {}
         catch (NullPointerException impossible) {}        
     }
 

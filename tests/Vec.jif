@@ -15,8 +15,7 @@ public class Vec[label L]
     }
 
     public void set {L} (int{L} i, Object{L} o): {L; i; o}
-	throws (NullPointerException, ArrayIndexOutOfBoundsException,
-	    ArrayStoreException)
+	throws (NullPointerException, ArrayIndexOutOfBoundsException)
     {
 	if (0 <= i && i < length) {
 	elements[i] = o;

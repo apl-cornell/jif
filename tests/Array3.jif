@@ -4,7 +4,6 @@ public class Test[label L]  {
         try {
             x[0] = "a";
         } catch (ArrayIndexOutOfBoundsException i) {
-        } catch (ArrayStoreException i) {
         }
     }
 

@@ -310,7 +310,6 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
             }
             catch (NullPointerException imposs) { }
             catch (ArrayIndexOutOfBoundsException imposs) { }
-            catch (ArrayStoreException imposs) { }
         }
     }
 
@@ -363,7 +362,6 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
                     }
                     catch (NullPointerException imposs) { }
                     catch (ArrayIndexOutOfBoundsException imposs) { }
-                    catch (ArrayStoreException imposs) { }
                 }
                 else if (prev != null) {
                     prev.next = next;
@@ -408,7 +406,6 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
                     }
                     catch (NullPointerException imposs) { }
                     catch (ArrayIndexOutOfBoundsException imposs) { }
-                    catch (ArrayStoreException imposs) { }
                 }
                 else {
                     if (prev != null) prev.next = next;
@@ -435,7 +432,6 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
         }
         catch (NullPointerException imposs) { }
         catch (ArrayIndexOutOfBoundsException imposs) { }
-        catch (ArrayStoreException imposs) { }
         size = 0;
         // clear the doubly linked list
         try {
@@ -519,7 +515,6 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
         }
         catch (NullPointerException imposs) { }
         catch (ArrayIndexOutOfBoundsException imposs) { }
-        catch (ArrayStoreException imposs) { }
     }
 
     /**
@@ -539,7 +534,6 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
         }
         catch (NullPointerException imposs) { }
         catch (ArrayIndexOutOfBoundsException imposs) { }
-        catch (ArrayStoreException imposs) { }
         size++;
     }
 

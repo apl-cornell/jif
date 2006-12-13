@@ -42,7 +42,6 @@ public abstract class AbstractPrincipal implements Principal {
                 PrincipalUtil.notifyNewDelegation(this, p);
             }
             catch (NullPointerException impossible) {}
-            catch (ArrayStoreException impossible) {}
             catch (ArrayIndexOutOfBoundsException impossible) {}
         }
     }
@@ -78,7 +77,6 @@ public abstract class AbstractPrincipal implements Principal {
                 }   
             }
             catch (NullPointerException impossible) {}
-            catch (ArrayStoreException impossible) {}
             catch (ArrayIndexOutOfBoundsException impossible) {}
         }
     }
