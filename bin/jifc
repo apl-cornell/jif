@@ -55,7 +55,7 @@ while true; do
             ;;
         -classpath)
             shift
-            if [-z "$extra_cp"]; then
+            if [ -z "$extra_cp" ]; then
               extra_cp="$1"
             else
               extra_cp="$extra_cp:$1"
