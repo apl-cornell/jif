@@ -24,23 +24,23 @@ public abstract class Solver {
     private LinkedList Q; // Queue of active equations to work on
 
     private LinkedList scc; // List of strongly connected components that
-
-    // are left to work on
-    private Collection currentSCC; // Set of equations that is the current
-                                   // strongly
+                            // are left to work on
+    
+    private List currentSCC; // Equations in the strongly connected component that we are currently working on
 
     // connected component that is being worked on
     private Collection equations; // Set of all equations
 
     /**
-     * Map from variables to Set of equations containing them. If the bound of
+     * Map from variables to (Set of) equations that may be invalidated by
+     * the variable changing. That is, if the bound of
      * the variable v changes, then we may need to re-examine all equations in
      * (Set)varEqnDependencies.get(v)
      */
     private Map varEqnDependencies;
 
     /**
-     * Map from equations to Set of variables whose bound may be modified as a
+     * Map from equations to (Set of) variables whose bound may be modified as a
      * result of solving that equation. If the bound of variables in the
      * equation eqn are modified, then the variables will be contained in
      * (Set)eqnVarDependencies.get(eqn)
@@ -48,14 +48,19 @@ public abstract class Solver {
     private Map eqnVarDependencies;
 
     /**
-     * Map from variables to collection of equality constraints on those
-     * variables. This map allows us to detect early if some constraint violates
-     * an equality constraint. Note that early checking of equality constraints
-     * does not affect the soundness of the solver, just when we determine that
-     * the constraints cannot be satisfied, and which constraint we decide to
-     * blame for this.
+     * Map from variables to (Set of) equations that may change the value
+     * of the variable. That is, when satisfying any equation in 
+     * (Set)varEqnReverseDependencies.get(v), the value of v may be changed.
      */
-    private Map varEqualConstraints;
+    private Map varEqnReverseDependencies;
+
+    /**
+     * Map from equations to (Set of) variables in which a change in value
+     * may invalidate this equation. That is, when the value of any variable
+     * in (Set)eqnVarReverseDependencies.get(e), changes, the
+     * equation e may be invalidated.
+     */
+    private Map eqnVarReverseDependencies;
 
     protected static final int STATUS_NOT_SOLVED = 0;
 
@@ -68,8 +73,6 @@ public abstract class Solver {
     private int status; // true if the current system has been solved
 
     private VarMap bounds; // Current bounds on label variables
-
-    protected VarMap dynBounds; // bounds of dynamic labels
 
     protected JifTypeSystem ts;
 
@@ -90,7 +93,7 @@ public abstract class Solver {
     /**
      * The name of the solver, for debugging purposes.
      */
-    private String solverName;
+    private final String solverName;
     /**
      * Constructor
      */
@@ -100,11 +103,11 @@ public abstract class Solver {
         equations = new LinkedHashSet();
         varEqnDependencies = new LinkedHashMap();
         eqnVarDependencies = new LinkedHashMap();
-        varEqualConstraints = new LinkedHashMap();
+        varEqnReverseDependencies = new LinkedHashMap();
+        eqnVarReverseDependencies = new LinkedHashMap();
         traces = new LinkedHashMap();
         status = STATUS_NOT_SOLVED;
         bounds = new VarMap(ts, getDefaultBound());
-        dynBounds = new VarMap(ts, getDefaultBound());
         scc = null;
         currentSCC = null;
         this.solverName = solverName + " (#" + (++solverCounter) + ")";
@@ -122,11 +125,9 @@ public abstract class Solver {
 
         varEqnDependencies = js.varEqnDependencies;
         eqnVarDependencies = js.eqnVarDependencies;
-        varEqualConstraints = js.varEqualConstraints;
         traces = new LinkedHashMap(js.traces);
         status = js.status;
         bounds = js.bounds.copy();
-        dynBounds = js.dynBounds.copy();
         equations = new LinkedHashSet(js.equations);
         scc = new LinkedList(js.scc);
         solverName = js.solverName;
@@ -167,85 +168,6 @@ public abstract class Solver {
         Q.addFirst(eqn);
     }
 
-    /**
-     * Creating the equation graph with edges based on information gathered
-     * during the addConstraint method.
-     * 
-     * TODO: XXX Maybe do most of this work while adding constraints?
-     */
-    protected final Graph createGraph() {
-        Set nodes = new LinkedHashSet(equations);
-        // edges going from equations to equations
-        // there is an edge from equation e1 to e2 iff
-        // solving e1 may modify the bound of a variable and thus invalidate e2
-        Map edges = new LinkedHashMap();
-
-        Set removedEqns = new LinkedHashSet();
-        // removing stuff of form x <= x (always true, as for all x, x <= x)
-        // and removing stuff that has no variables
-        if (shouldReport(5))
-                report(5, "=====Equations excluded from solving loop=====");
-        for (Iterator e = nodes.iterator(); e.hasNext();) {
-            Equation toCheck = (Equation)e.next();
-            Label lhs = toCheck.lhs();
-            Label rhs = toCheck.rhs();
-
-            if (lhs.equals(rhs)) {
-                removedEqns.add(toCheck);
-                e.remove();
-                if (shouldReport(5)) report(5, toCheck.toString());
-            }
-            else if (!toCheck.env().hasVariables() && !lhs.hasVariables()
-                    && !rhs.hasVariables()) {
-                removedEqns.add(toCheck);
-                e.remove();
-                if (shouldReport(5)) report(5, toCheck.toString());
-            }
-        }
-        if (shouldReport(5))
-                report(5, "Equations excluded: " + removedEqns.size());
-
-        // consistency check. uncomment if debugging
-        /*
-         * if (removedEqns.size() + nodes.size() != equations.size()) {
-         * System.out.println("removed: " + removedEqns.size());
-         * System.out.println("nodes: " + nodes.size());
-         * System.out.println("equations: " + equations.size());
-         * System.out.println("Something doesn't add up."); }
-         */
-
-        for (Iterator e = nodes.iterator(); e.hasNext();) {
-            Equation toCheck = (Equation)e.next();
-
-            // get the equations that are dependent on the equation toCheck
-            // by finding the variables that toCheck may alter, and then
-            // finding the equations that depend on those variables.
-            Set dependentEqns = eqnEqnDependencies(toCheck);
-            if (!dependentEqns.isEmpty()) {
-                Set s = (Set)edges.get(toCheck);
-                if (s == null) {
-                    s = new LinkedHashSet();
-                    edges.put(toCheck, s);
-                }
-                s.addAll(dependentEqns);
-
-                // not exactly efficient but it works
-                s.removeAll(removedEqns);
-            }
-        }
-
-        // removing all mappings to empty sets
-        // other way to do this is to iterate accross the equation list
-        // from the dependency graph but that gets... interesting
-        for (Iterator e = edges.values().iterator(); e.hasNext();) {
-            Set s = (Set)e.next();
-            if (s.isEmpty()) {
-                e.remove();
-            }
-        }
-
-        return new Graph(nodes, edges);
-    }
 
     /**
      * Get the bounds for this Solver.
@@ -272,37 +194,7 @@ public abstract class Solver {
      */
     public void setBound(VarLabel v, Label newBound, LabelConstraint responsible)
             throws SemanticException {
-        Label oldBound = bounds.applyTo(v);
         bounds.setBound(v, newBound);
-
-        Collection eqConstraints = (Collection)varEqualConstraints.get(v);
-        if (eqConstraints != null) {
-            // check that the new bound does not violate the equality
-            // constraints.
-            for (Iterator iter = eqConstraints.iterator(); iter.hasNext();) {
-                LabelConstraint eqCnstr = (LabelConstraint)iter.next();
-                if (eqCnstr.rhs().hasVariables()) {
-                    // the right hand side has variables.
-                    // this means it may be tricky to perform early checking
-                    // of equality constraints.
-                    // we'll skip it.
-                    continue;
-                }
-
-                Label boundRHS = bounds.applyTo(eqCnstr.rhs());
-                if (!(eqCnstr.env().leq(newBound, boundRHS) && eqCnstr.env()
-                        .leq(boundRHS, newBound))) {
-                    // the equality constraint has been violated!
-                    if (shouldReport(4)) {
-                        report(4, "Equality constraint violated: " + eqCnstr);
-                    }
-                    // set the bound back to the original bound, to make the
-                    // error message comprehensible.
-                    bounds.setBound(v, oldBound);
-                    reportError(responsible, Collections.singletonList(v));
-                }
-            }
-        }
     }
 
     /**
@@ -332,46 +224,45 @@ public abstract class Solver {
             report(1, "   " + equations.size() + " equations");
         }
         if (useSCC) {
-//                System.err.println("  create graph start: " + new java.util.Date());
-            Graph eqnGraph = createGraph();
+            LinkedList pair = findSCCs();
+            Equation[] by_scc = (Equation[])pair.getFirst();
+            int[] scc_head = (int[])pair.getLast();
 
-            if (eqnGraph != null) {
-                if (shouldReport(5)) {
-                    report(5, "=====Equation Graph=====");
-                    report(5, eqnGraph.toString());
+            scc = new LinkedList();
+            List currentScc = null;
+            for (int i = 0; i < scc_head.length; i++) {
+                if (scc_head[i] == -1) {
+                    // it's the start of a new scc
+                    // add what we've already gathered to the set of strongly connected
+                    // components 
+                    if (currentScc != null) {
+                        scc.add(currentScc);
+                        currentScc = null;
+                    }
                 }
+                if (currentScc == null) currentScc = new ArrayList();
+                currentScc.add(by_scc[i]);
             }
-//            System.err.println("  get super node start: " + new java.util.Date());
-            Graph h = eqnGraph.getSuperNodeGraph();
-            if (shouldReport(5)) {
-                report(5, "=====Strongly Connected Equation Graph=====");
-                report(5, h.toStringSetNodes());
-            }
-//            System.err.println("  topo sort start: " + new java.util.Date());
-            scc = h.topoSort();
-            if ((scc == null) || (eqnGraph == null)) {
-                throw new InternalCompilerError("Unable to construct "
-                        + "strongly connected components for equation graph");
-            }
-//            System.err.println("  done: " + new java.util.Date());
-            if (shouldReport(1)) {
-                report(1, "   " + scc.size() + " strongly connected components");
+            if (currentScc != null) {
+                scc.add(currentScc);
+                currentScc = null;
             }
         }
         else {
-            // not using SCC
+            // not using SCC, so pretend that 
+            // we have a single SCC consisting of all equations
             scc = new LinkedList();
-            scc.add(equations);
+            scc.add(new ArrayList(equations));
         }
 
         // pre-initialize the queue with the first strongly connected
         // component
         if (scc.isEmpty()) {
+            currentSCC = Collections.EMPTY_LIST;
             Q = new LinkedList();
-            currentSCC = new LinkedHashSet();
         }
         else {
-            currentSCC = new LinkedHashSet((Collection)scc.removeFirst());
+            currentSCC = (List)scc.removeFirst();
             Q = new LinkedList(currentSCC);
         }
 
@@ -450,15 +341,14 @@ public abstract class Solver {
                 // done this way instead of an outer loop because of the
                 // way the search method works
                 if (Q.isEmpty() && !scc.isEmpty()) {
-                    currentSCC = new LinkedHashSet((Set)scc.removeFirst());
+                    currentSCC = (List)scc.removeFirst();
                     Q.addAll(currentSCC);
                 }
             } // end while
 
             checkCandidateSolution();
         }
-        if (shouldReport(2))
-                report(2, "Number of relaxation steps: " + counter);
+        if (shouldReport(2)) report(2, "Number of relaxation steps: " + counter);
         bounds.print();
 
         return bounds;
@@ -520,9 +410,7 @@ public abstract class Solver {
                 // if its in the current strongly connected set
                 // and its not in the Queue, add it
                 if (!Q.contains(eqn)
-                        && (currentSCC == null || currentSCC.contains(eqn))) // offensive
-                                                                             // but
-                                                                             // simple
+                   && (!useSCC || currentSCC.contains(eqn))) // offensive but simple
                         Q.add(eqn);
             }
         }
@@ -587,14 +475,9 @@ public abstract class Solver {
         }
 
         if (c.lhs() instanceof VarLabel && c.kind() == LabelConstraint.EQUAL) {
-            // this is an equality constraint on a variable. Let's record it!
+            // this is an equality constraint on a variable. Let's jump start the 
+            // solving by setting it immediately
             VarLabel v = (VarLabel)c.lhs();
-            Collection eqCnstrnts = (Collection)varEqualConstraints.get(v);
-            if (eqCnstrnts == null) {
-                eqCnstrnts = new LinkedList();
-                varEqualConstraints.put(v, eqCnstrnts);
-            }
-            eqCnstrnts.add(c);
             bounds.setBound(v, bounds.applyTo(c.rhs()));
         }
 
@@ -662,13 +545,19 @@ public abstract class Solver {
      */
     protected void addDependency(VarLabel var, Equation eqn) {
         Set eqns = (Set)varEqnDependencies.get(var);
-
         if (eqns == null) {
             eqns = new LinkedHashSet();
             varEqnDependencies.put(var, eqns);
         }
-
         eqns.add(eqn);
+        
+        Set vars = (Set)eqnVarReverseDependencies.get(eqn);
+        if (vars == null) {
+            vars = new LinkedHashSet();
+            eqnVarReverseDependencies.put(eqn, vars);
+        }
+        vars.add(var);
+
     }
 
     /**
@@ -681,13 +570,18 @@ public abstract class Solver {
      */
     protected void addDependency(Equation eqn, VarLabel var) {
         Set vars = (Set)eqnVarDependencies.get(eqn);
-
         if (vars == null) {
             vars = new LinkedHashSet();
             eqnVarDependencies.put(eqn, vars);
         }
-
         vars.add(var);
+        
+        Set eqns = (Set)varEqnReverseDependencies.get(var);
+        if (eqns == null) {
+            eqns = new LinkedHashSet();
+            varEqnReverseDependencies.put(var, eqns);
+        }
+        eqns.add(eqn);
     }
 
     /**
@@ -715,15 +609,29 @@ public abstract class Solver {
     }
 
     /**
-     * Binds a dynamic label to an actual label. This kind of binding is caused
-     * by assignments like final label lb = new label{L};
+     * Returns the equations that are reverse dependent on the equation eqn by finding
+     * the variables that may invalidate eqn (using the map
+     * eqnVarReverseDependencies), and then finding the equations
+     * that may alter those variables (using the map varEqnReverseDependencies)
      */
-    //    public final void bind(DynamicLabel dl, Label l) {
-    //        dynBounds.setBound(dl, l);
-    //    }
-    // *********************************************************
-    //
-    // Error reporting
+    private Set eqnEqnReverseDependencies(Equation eqn) {
+        Set vars = (Set)eqnVarReverseDependencies.get(eqn);
+
+        if (vars == null || vars.isEmpty()) {
+            return Collections.EMPTY_SET;
+        }
+
+        Set eqns = new LinkedHashSet();
+        for (Iterator i = vars.iterator(); i.hasNext();) {
+            VarLabel v = (VarLabel)i.next();
+            Set s = (Set)varEqnReverseDependencies.get(v);
+            if (s != null) {
+                eqns.addAll(s);
+            }
+        }
+        return eqns;
+    }
+
     /**
      * Record the fact that label variable v, in the constraint eqn had its
      * bound set to the label lb.
@@ -938,4 +846,131 @@ public abstract class Solver {
     }
 
     protected abstract Equation findContradictiveEqn(LabelConstraint c);
+    
+    /** Returns the linked list [by_scc, scc_head] where
+     *  by_scc is an array in which SCCs occur in topologically
+     *  order. 
+     *  scc_head[n] where n is the first peer in an SCC is set to -1.
+     *  scc_head[n] where n is the last peer in a (non-singleton) SCC is set
+     *  to the index of the first peer. Otherwise it is -2. 
+     *  
+     *   by_scc contains the peers grouped by SCC.
+     *   scc_head marks where the SCCs are. The SCC
+     *    begins with a -1 and ends with the index of
+     *     the beginning of the SCC.
+     *  */
+    protected LinkedList findSCCs() {
+        
+        Equation[] sorted = new Equation[equations.size()];
+
+        // First, topologically sort the nodes (put in postorder)
+        int n = 0;
+        LinkedList stack = new LinkedList();
+        Set reachable = new HashSet();
+        for (Iterator i = equations.iterator(); i.hasNext(); ) {
+            Equation eq = (Equation)i.next();
+            if (!reachable.contains(eq)) {
+                reachable.add(eq);
+                stack.addFirst(new Frame(eq, true));
+                while (!stack.isEmpty()) {
+                    Frame top = (Frame)stack.getFirst();
+                    if (top.edges.hasNext()) {
+                        Equation eqTo = (Equation)top.edges.next();
+                        if (!reachable.contains(eqTo)) {
+                            reachable.add(eqTo);
+                            stack.addFirst(new Frame(eqTo, true));
+                        }
+                    } else {
+                        stack.removeFirst();
+                        sorted[n++] = top.eqn;
+                    }
+                }
+            }
+        }
+        
+//      Now, walk the transposed graph picking nodes in reverse
+//      postorder, thus picking out one SCC at a time and
+//      appending it to "by_scc".
+        Equation[] by_scc = new Equation[n];
+        int[] scc_head = new int[n];
+        Set visited = new HashSet();
+        int head = 0;
+        for (int i=n-1; i>=0; i--) {
+            if (!visited.contains(sorted[i])) {
+                // First, find all the nodes in the SCC
+                Set SCC = new HashSet();
+                visited.add(sorted[i]);
+                stack.add(new Frame(sorted[i], false));
+                while (!stack.isEmpty()) {
+                    Frame top = (Frame)stack.getFirst();
+                    if (top.edges.hasNext()) {
+                        Equation eqTo = (Equation)top.edges.next();
+                        if (reachable.contains(eqTo) && !visited.contains(eqTo)) {
+                            visited.add(eqTo);
+                            Frame f = new Frame(eqTo, false);
+                            stack.addFirst(f);
+                        }
+                    } else {
+                        stack.removeFirst();
+                        SCC.add(top.eqn);
+                    }
+                }
+                // Now, topologically sort the SCC (as much as possible)
+                // and place into by_scc[head..head+scc_size-1]
+                stack.add(new Frame(sorted[i], true));
+                Set revisited = new HashSet();
+                revisited.add(sorted[i]);
+                int scc_size = SCC.size();
+                int nsorted = 0;
+                while (stack.size() != 0) {
+                    Frame top = (Frame)stack.getFirst();
+                    if (top.edges.hasNext()) {
+                        Equation eqTo = (Equation)top.edges.next();
+                        if (SCC.contains(eqTo) && !revisited.contains(eqTo)) {
+                            revisited.add(eqTo);
+                            Frame f = new Frame(eqTo, true);
+                            stack.addFirst(f);
+                        }
+                    } else {
+                        stack.removeFirst();
+                        int n3 = head + scc_size - nsorted - 1;
+                        scc_head[n3] = -2;
+                        by_scc[n3] = top.eqn;
+                        nsorted++;
+                    }
+                }
+                scc_head[head+scc_size-1] = head;
+                scc_head[head] = -1;
+                head = head + scc_size;
+            }
+        }
+//        for (int j = 0; j < n; j++) {
+//            switch(scc_head[j]) {
+//            case -1: Report.report(2, j + "[HEAD] : " + by_scc[j]); break;
+//            case -2: Report.report(2, j + "       : " + by_scc[j]); break;
+//            default: Report.report(2, j + " ->"+ scc_head[j] + " : " + by_scc[j]);
+//            }
+//            for (Iterator i = eqnEqnDependencies(by_scc[j]).iterator(); i.hasNext(); ) {
+//                Report.report(3, "     successor: " + ((Equation)i.next()));
+//            }
+//        }
+        LinkedList ret = new LinkedList();
+        ret.addFirst(scc_head);
+        ret.addFirst(by_scc);
+        return ret;
+    }
+    private class Frame {
+        private Equation eqn;
+        private Iterator edges;
+        Frame(Equation e, boolean forward) {
+            eqn = e;
+            if (forward) {
+                edges = eqnEqnDependencies(e).iterator();
+            }
+            else {
+                edges = eqnEqnReverseDependencies(e).iterator();
+            }
+        }
+    }
+
 }

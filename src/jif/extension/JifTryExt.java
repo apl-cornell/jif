@@ -63,7 +63,8 @@ public class JifTryExt extends JifStmtExt_c
 	                                                        LabelConstraint.EQUAL, 
 	                                                        new NamedLabel("declared label of " + f.name(), declaredLabel), 
 	                                                                       A.labelEnv(),
-	                                                                       f.position()) {
+	                                                                       f.position(),
+	                                           false) {
 	            public String msg() {
 	                return "Declared label of catch block variable " + vi.name() + 
 	                " is incompatible with label constraints.";
@@ -77,7 +78,7 @@ public class JifTryExt extends JifStmtExt_c
 
 	    final String catchTypeName = ts.unlabel(cb.catchType()).toClass().name();
             lc.constrain(new LabelConstraint(
-                     new NamedLabel("join(pc|where exc_i coulb be thrown)", 
+                     new NamedLabel("join(pc|where exc_i could be thrown)", 
                                     "the information that could be revealed " +
                                     "by the exception " + catchTypeName + " " +
                                     "being thrown", 
@@ -87,7 +88,8 @@ public class JifTryExt extends JifStmtExt_c
                                     "label of variable " + vi.name(), 
                                     Li), 
                      A.labelEnv(),
-                     f.position()) {
+                     f.position(),
+                     false) {
                 public String msg() {
                     return "Label of thrown exceptions of type " + catchTypeName + 
                            " not less restrictive than the label of " + vi.name();

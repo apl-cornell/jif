@@ -73,7 +73,8 @@ public class JifLocalDeclExt extends JifStmtExt_c
                                                                                A.pc()).
                                                                                join(lc, "declared label of local var " + li.name(), declaredLabel), 
                                                                                A.labelEnv(),
-                                                                               decl.position()) {
+                                                                               decl.position(), 
+                                                                               false) {
                     public String msg() {
                         return "Declared label of local variable " + li.name() + 
                         " is incompatible with label constraints.";
