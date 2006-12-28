@@ -1,6 +1,6 @@
 package jif.types.label;
 
-import java.util.Collection;
+import java.util.Set;
 
 
 
@@ -9,5 +9,5 @@ import java.util.Collection;
 public interface MeetLabel extends Label
 {
     //Label flatten();
-    Collection meetComponents();
+    Set meetComponents();
 }

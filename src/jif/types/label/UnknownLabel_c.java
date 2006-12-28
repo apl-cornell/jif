@@ -1,14 +1,13 @@
 package jif.types.label;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
 import polyglot.types.*;
-import polyglot.types.Resolver;
-import polyglot.types.TypeObject;
 import polyglot.util.*;
 
 /** An implementation of the <code>UnknownLabel</code> interface. 
@@ -47,4 +46,8 @@ public class UnknownLabel_c extends Label_c implements UnknownLabel
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         throw new InternalCompilerError("Cannot compare unknown label.");
     }    
+    public Set variables() {
+        return Collections.EMPTY_SET;        
+    }
+    
 }

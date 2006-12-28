@@ -30,6 +30,8 @@ public abstract class Label_c extends TypeObject_c implements Label {
     protected String description;
 
     protected LabelToJavaExpr toJava;
+    
+    protected Set variables = null; // memoized
 
     protected Label_c() {
         super();
@@ -64,15 +66,18 @@ public abstract class Label_c extends TypeObject_c implements Label {
         return false;
     }
 
-    public final Set variables() {
-        LabelVarGatherer lvg = new LabelVarGatherer();
-        try {
-            this.subst(lvg);
+    public Set variables() {
+        if (variables == null) {
+            LabelVarGatherer lvg = new LabelVarGatherer();
+            try {
+                this.subst(lvg);
+            }
+            catch (SemanticException e) {
+                throw new InternalCompilerError(e);
+            }
+            variables = lvg.variables;
         }
-        catch (SemanticException e) {
-            throw new InternalCompilerError(e);
-        }
-        return lvg.variables;
+        return variables;
     }
 
     public Expr toJava(JifToJavaRewriter rw) throws SemanticException {

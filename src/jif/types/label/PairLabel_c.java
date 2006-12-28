@@ -150,6 +150,9 @@ public class PairLabel_c extends Label_c implements PairLabel {
         }
         return substitution.substLabel(lbl);
     }
+    public Set variables() {
+        return Collections.EMPTY_SET;        
+    }
     
     public List throwTypes(TypeSystem ts) {
         List throwTypes = new ArrayList();

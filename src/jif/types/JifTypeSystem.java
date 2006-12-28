@@ -2,6 +2,7 @@ package jif.types;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import jif.extension.LabelTypeCheckUtil;
 import jif.types.hierarchy.LabelEnv;
@@ -10,7 +11,6 @@ import jif.types.principal.*;
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.types.*;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /** Jif type system.
@@ -139,11 +139,11 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     /** Returns the join of L1 and L2. */
     Label join(Label L1, Label L2);
-    Label joinLabel(Position pos, Collection components);
+    Label joinLabel(Position pos, Set components);
 
     /** Returns the meet of L1 and L2. */
     Label meet(Label L1, Label L2);
-    Label meetLabel(Position pos, Collection components);
+    Label meetLabel(Position pos, Set components);
 
     /* methods for policies */
     boolean leq(Policy p1, Policy p2);

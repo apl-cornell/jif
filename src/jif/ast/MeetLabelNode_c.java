@@ -1,8 +1,10 @@
 package jif.ast;
 
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.label.ConfPolicy;
@@ -25,46 +27,46 @@ public class MeetLabelNode_c extends AmbLabelNode_c implements MeetLabelNode
     protected List components;
 
     public MeetLabelNode_c(Position pos, List components) {
-	super(pos);
-	this.components = TypedList.copyAndCheck(components, Node.class, true);
+        super(pos);
+        this.components = TypedList.copyAndCheck(components, Node.class, true);
     }
 
     public List components() {
-	return this.components;
+        return this.components;
     }
 
     public MeetLabelNode components(List components) {
-	MeetLabelNode_c n = (MeetLabelNode_c) copy();
-	n.components = TypedList.copyAndCheck(components, Node.class, true);
-	return n;
+        MeetLabelNode_c n = (MeetLabelNode_c) copy();
+        n.components = TypedList.copyAndCheck(components, Node.class, true);
+        return n;
     }
 
     protected MeetLabelNode_c reconstruct(List components) {
-	if (! CollectionUtil.equals(components, this.components)) {
-	    MeetLabelNode_c n = (MeetLabelNode_c) copy();
-	    n.components = TypedList.copyAndCheck(components, Node.class, true);
-	    return n;
-	}
+        if (! CollectionUtil.equals(components, this.components)) {
+            MeetLabelNode_c n = (MeetLabelNode_c) copy();
+            n.components = TypedList.copyAndCheck(components, Node.class, true);
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     public Node visitChildren(NodeVisitor v) {
-	List components = visitList(this.components, v);
-	return reconstruct(components);
+        List components = visitList(this.components, v);
+        return reconstruct(components);
     }
 
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-	JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
-	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
+        JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
+        JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
-        List labels = new LinkedList();
+        Set labels = new LinkedHashSet();
         List policies = new LinkedList();
 
         boolean policyTypeIsConf = false;
-        
-	for (Iterator i = this.components.iterator(); i.hasNext(); ) {
-	    Node n = (Node) i.next();
+
+        for (Iterator i = this.components.iterator(); i.hasNext(); ) {
+            Node n = (Node) i.next();
             if (!n.isDisambiguated()) {
                 sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
                 return this;
@@ -77,7 +79,7 @@ public class MeetLabelNode_c extends AmbLabelNode_c implements MeetLabelNode
                 else {
                     if (policyTypeIsConf != (pol instanceof ConfPolicy)) {
                         throw new SemanticException("Incompatible kinds of " +
-                            "policies for the meet expression.", position);
+                                                    "policies for the meet expression.", position);
                     }
                 }
                 policies.add(pol);
@@ -86,7 +88,7 @@ public class MeetLabelNode_c extends AmbLabelNode_c implements MeetLabelNode
                 labels.add(((LabelNode)n).label());                
             }
             else throw new InternalCompilerError("Unexpected node " + n);
-	}
+        }
         if (!labels.isEmpty() && !policies.isEmpty()) {
             throw new SemanticException("Cannot take the meet of labels and policies.", position);            
         }
@@ -104,8 +106,8 @@ public class MeetLabelNode_c extends AmbLabelNode_c implements MeetLabelNode
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	for (Iterator i = this.components.iterator(); i.hasNext(); ) {
-	    LabelNode n = (LabelNode) i.next();
+        for (Iterator i = this.components.iterator(); i.hasNext(); ) {
+            LabelNode n = (LabelNode) i.next();
             print(n, w, tr);
             if (i.hasNext()) {
                 w.write(";");

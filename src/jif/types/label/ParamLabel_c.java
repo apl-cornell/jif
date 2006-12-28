@@ -1,18 +1,15 @@
 package jif.types.label;
 
 
+import java.util.Collections;
 import java.util.Set;
 
 import jif.translate.ParamToJavaExpr_c;
 import jif.types.*;
-import jif.types.JifTypeSystem;
-import jif.types.ParamInstance;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
 import polyglot.main.Report;
 import polyglot.types.*;
-import polyglot.types.Resolver;
-import polyglot.types.TypeObject;
 import polyglot.util.*;
 
 /** An implementation of the <code>ParamLabel</code> interface. 
@@ -89,4 +86,8 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
         // this method is called.
         return false;
     }
+    public Set variables() {
+        return Collections.EMPTY_SET;        
+    }
+
 }

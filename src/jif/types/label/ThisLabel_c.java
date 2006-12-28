@@ -1,5 +1,6 @@
 package jif.types.label;
 
+import java.util.Collections;
 import java.util.Set;
 
 import jif.types.JifTypeSystem;
@@ -75,8 +76,8 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
         return false;
     }
  
-    public Label subst(LabelSubstitution substitution) throws SemanticException {
-        return substitution.substLabel(this);
+    public Set variables() {
+        return Collections.EMPTY_SET;        
     }
     
     

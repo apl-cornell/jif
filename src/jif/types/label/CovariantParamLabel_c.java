@@ -1,6 +1,7 @@
 package jif.types.label;
 
 
+import java.util.Collections;
 import java.util.Set;
 
 import jif.translate.ParamToJavaExpr_c;
@@ -84,4 +85,8 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
         // this method is called.
         return false;
     }
+    public Set variables() {
+        return Collections.EMPTY_SET;        
+    }
+
 }

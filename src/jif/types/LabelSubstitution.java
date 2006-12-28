@@ -1,8 +1,11 @@
 package jif.types;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
-import jif.types.label.*;
+import jif.types.label.AccessPath;
+import jif.types.label.Label;
+import jif.types.label.Policy;
 import jif.types.principal.Principal;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
@@ -40,18 +43,18 @@ public abstract class LabelSubstitution {
         return true;
     }
     
-    private LinkedList stack = null;
+    private ArrayList stack = null;
     public void pushLabel(Label l) {
         pushLabel((Object)l);
     }
     private void pushLabel(Object l) {
         if (stack == null) {
-            stack = new LinkedList();
+            stack = new ArrayList();
         }
-        stack.addLast(l);
+        stack.add(l);
     }
     public void popLabel(Label l) {
-        if (l != stack.removeLast()) {
+        if (l != stack.remove(stack.size()-1)) {
             throw new InternalCompilerError("Stack discipline not obeyed");
         }
     }

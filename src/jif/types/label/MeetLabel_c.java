@@ -3,7 +3,6 @@ package jif.types.label;
 import java.util.*;
 
 import jif.translate.LabelToJavaExpr;
-import jif.translate.MeetLabelToJavaExpr_c;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.JifTypeSystem_c;
@@ -17,15 +16,15 @@ import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
-/** An implementation of the <code>JoinLabel</code> interface. 
+/** An implementation of the <code>MeetLabel</code> interface. 
  */
 public class MeetLabel_c extends Label_c implements MeetLabel
 {
     private final Set components;
     
-    public MeetLabel_c(Collection components, JifTypeSystem ts, Position pos, LabelToJavaExpr trans) {
+    public MeetLabel_c(Set components, JifTypeSystem ts, Position pos, LabelToJavaExpr trans) {
         super(ts, pos, trans);
-        this.components = Collections.unmodifiableSet(new LinkedHashSet(flatten(components)));
+        this.components = Collections.unmodifiableSet(flatten(components));
         if (this.components.isEmpty()) throw new InternalCompilerError("No empty meets");
     }
     
@@ -165,8 +164,8 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         return false;
     }
     
-    public Collection meetComponents() {
-        return Collections.unmodifiableCollection(components);
+    public Set meetComponents() {
+        return Collections.unmodifiableSet(components);
     }
 
     public Label normalize() {
@@ -256,27 +255,31 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         return new MeetLabel_c(needed, (JifTypeSystem)ts, position(), ((JifTypeSystem_c)ts).meetLabelTranslator());
     }
     
-    private static Collection flatten(Collection comps) {
-        Collection c = new LinkedHashSet();
-        
+    private static Set flatten(Set comps) {
+        // check if there are any meet labels in there.
+        boolean needFlattening = false;
         for (Iterator i = comps.iterator(); i.hasNext(); ) {
             Label L = (Label) i.next();
             
-            if (L.isBottom()) {
+            if (L instanceof MeetLabel) {
+                needFlattening = true;
+                break;
+            }
+        }
+        
+        if (!needFlattening) return comps;
+        
+        Set c = new LinkedHashSet();
+        for (Iterator i = comps.iterator(); i.hasNext(); ) {
+            Label L = (Label) i.next();
+            
+            if (L.isTop()) {
                 return Collections.singleton(L);
             }
             
             if (L instanceof MeetLabel) {
-                Collection lComps = flatten(((MeetLabel)L).meetComponents());
-                
-                for (Iterator j = lComps.iterator(); j.hasNext(); ) {
-                    Label Lj = (Label) j.next();
-                    
-                    if (Lj.isBottom()) {
-                        return Collections.singleton(Lj);
-                    }                    
-                    c.add(Lj);
-                }
+                Collection lComps = ((MeetLabel)L).meetComponents();
+                c.addAll(lComps);                
             }
             else {
                 c.add(L);

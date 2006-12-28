@@ -875,7 +875,7 @@ public class JifTypeSystem_c
     }
     
         
-    public Label joinLabel(Position pos, Collection components) {
+    public Label joinLabel(Position pos, Set components) {
         if (components == null) {
             components = Collections.EMPTY_SET;
         }
@@ -893,7 +893,7 @@ public class JifTypeSystem_c
         return new JoinLabelToJavaExpr_c();
     }
 
-    public Label meetLabel(Position pos, Collection components) {
+    public Label meetLabel(Position pos, Set components) {
         if (components == null) {
             components = Collections.EMPTY_SET;
         }
@@ -1204,11 +1204,14 @@ public class JifTypeSystem_c
         if (L2.isTop() || L1.isBottom()) {
             return L2.simplify();
         }
-        List l = CollectionUtil.list(L1, L2);
+        
+        Set s = new LinkedHashSet();
+        s.add(L1);
+        s.add(L2);
         Position pos = L1.position();
         if (pos == null) pos = L2.position();
 
-        return joinLabel(pos, l).simplify();
+        return joinLabel(pos, s).simplify();
     }
     
     public Label meet(Label L1, Label L2) {
@@ -1218,11 +1221,13 @@ public class JifTypeSystem_c
         if (L2.isTop() || L1.isBottom()) {
             return L1.simplify();
         }
-        List l = CollectionUtil.list(L1, L2);
+        Set s = new LinkedHashSet();
+        s.add(L1);
+        s.add(L2);
         Position pos = L1.position();
         if (pos == null) pos = L2.position();
 
-        return meetLabel(pos, l).simplify();
+        return meetLabel(pos, s).simplify();
     }
     
 

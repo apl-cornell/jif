@@ -54,5 +54,8 @@ public class VarLabel_c extends Label_c implements VarLabel {
     public Set variableComponents() {
         return Collections.singleton(this);
     }
+    public Set variables() {
+        return Collections.singleton(this);        
+    }
     
 }

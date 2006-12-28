@@ -105,7 +105,7 @@ public class LabelEnv_c implements LabelEnv
             // L1 is less than L2. However, if it has variables, we
             // need to add it regardless.
             if (L1.hasVariables() || L2.hasVariables() || 
-                    !(this.leq(L1, L2, new SearchState_c(new LinkedHashSet())))) {
+                    !(this.leq(L1, L2, freshSearchState()))) {
                 labelAssertions.add(new LabelLeAssertion_c(ts, L1, L2, Position.COMPILER_GENERATED));
                 added = true;
                 if (!this.hasVariables && (L1.hasVariables() || L2.hasVariables())) {
@@ -144,7 +144,7 @@ public class LabelEnv_c implements LabelEnv
             Report.report(1, "Testing " + L1 + " <= " + L2);
         
         return leq(L1, L2, 
-                   new SearchState_c(new AssertionUseCount(), new LinkedHashSet()));
+                   new SearchState_c(new AssertionUseCount()));
     }
 
     /*
@@ -203,7 +203,7 @@ public class LabelEnv_c implements LabelEnv
                               " : useCache = " + useCache + 
                               "; state.useAssertions = " +((SearchState_c)state).useAssertions + 
                               "; this.hasVariables() = " + this.hasVariables());
-            return leqImpl(L1, L2, state);
+            return leqImpl(L1, L2, (SearchState_c)state);
         }
 
         // only use the cache if we are using assertions, and there are no
@@ -217,7 +217,7 @@ public class LabelEnv_c implements LabelEnv
                               + " : " + b.booleanValue());
             return b.booleanValue();
         }        
-        boolean result = leqImpl(L1, L2, state);
+        boolean result = leqImpl(L1, L2, (SearchState_c)state);
         cacheResult(g, state, result);
         return result;
     }
@@ -258,9 +258,8 @@ public class LabelEnv_c implements LabelEnv
     /**
      * Non-caching implementation of L1 <= L2
      */
-    private boolean leqImpl(Label L1, Label L2, SearchState state) {
-        AssertionUseCount auc = ((SearchState_c)state).auc;
-        Set currentGoals = ((SearchState_c)state).currentGoals;
+    private boolean leqImpl(Label L1, Label L2, SearchState_c state) {
+        AssertionUseCount auc = state.auc;
         
         L1 = L1.normalize();
         L2 = L2.normalize();
@@ -296,15 +295,13 @@ public class LabelEnv_c implements LabelEnv
         // check the current goals, to make sure we don't go into an infinite
         // recursion...
         LeqGoal newGoal = new LeqGoal(L1, L2);
-        if (currentGoals.contains(newGoal)) {
+        if (state.containsGoal(newGoal)) {
             // already have this subgoal on the stack
             if (Report.should_report(topics, 3))
                 Report.report(3, "Goal " + L1 + " <= " + L2 + " already on goal stack");
             return false;
         }
-        currentGoals = new LinkedHashSet(currentGoals);
-        currentGoals.add(newGoal);
-        state = new SearchState_c(auc, currentGoals);        
+        state = new SearchState_c(auc, state, newGoal);        
         
         if (L1.equals(L2)) return true;        
 
@@ -400,7 +397,7 @@ public class LabelEnv_c implements LabelEnv
             }
             AssertionUseCount newAUC = new AssertionUseCount(auc);
             newAUC.use(c);
-            SearchState newState = new SearchState_c(newAUC, state.currentGoals);
+            SearchState newState = new SearchState_c(newAUC, state, null);
 
             Label cLHS = c.lhs();
             if (cLHS.hasVariables()) { 
@@ -432,20 +429,18 @@ public class LabelEnv_c implements LabelEnv
     
     
     public boolean leq(Policy p1, Policy p2) {
-        return leq(p1.simplify(), p2.simplify(), new SearchState_c(new AssertionUseCount(), new LinkedHashSet()));
+        return leq(p1.simplify(), p2.simplify(), new SearchState_c(new AssertionUseCount()));
     }
-    public boolean leq(Policy p1, Policy p2, SearchState state) {
+    public boolean leq(Policy p1, Policy p2, SearchState state_) {
         // check the current goals
-        AssertionUseCount auc = ((SearchState_c)state).auc;
-        Set currentGoals = ((SearchState_c)state).currentGoals;
+        SearchState_c state = (SearchState_c)state_;
+        AssertionUseCount auc = state.auc;
         LeqGoal newGoal = new LeqGoal(p1, p2);
-        if (currentGoals.contains(newGoal)) {
+        if (state.containsGoal(newGoal)) {
             // already have this subgoal on the stack
             return false;
         }
-        currentGoals = new LinkedHashSet(currentGoals);
-        currentGoals.add(newGoal);
-        state = new SearchState_c(auc, currentGoals);        
+        state = new SearchState_c(auc, state, newGoal);        
 
         
         if (p1 instanceof ConfPolicy && p2 instanceof ConfPolicy) {
@@ -772,19 +767,30 @@ public class LabelEnv_c implements LabelEnv
         }
     }
     protected SearchState freshSearchState() {
-        return new SearchState_c(new LinkedHashSet());
+        return new SearchState_c(null, null, null);
     }
     private static class SearchState_c implements SearchState {
         public final AssertionUseCount auc;
-        public final Set currentGoals;
+        public final LeqGoal currentGoal;
+        public final SearchState_c prevState;
         public final boolean useAssertions;
-        SearchState_c(AssertionUseCount auc, Set currentGoals) {
+        SearchState_c(AssertionUseCount auc, SearchState_c prevState, LeqGoal currentGoal) {
             this.useAssertions = (auc != null);
             this.auc = auc;
-            this.currentGoals = currentGoals;
+            this.prevState = prevState;
+            this.currentGoal = currentGoal;
         }
-        SearchState_c(Set currentGoals) {
-            this(null, currentGoals);
-        }        
+        public SearchState_c(AssertionUseCount auc) {
+            this(auc, null, null);
+        }
+        public boolean containsGoal(LeqGoal g) {
+            if (currentGoal != null && currentGoal.equals(g)) {
+                return true;
+            }
+            if (prevState != null) {
+                return prevState.containsGoal(g);
+            }
+            return false;
+        }
     }
 }

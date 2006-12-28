@@ -1,13 +1,12 @@
 package jif.types.label;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.types.*;
-import polyglot.types.Resolver;
-import polyglot.types.TypeObject;
 import polyglot.util.*;
 
 /**
@@ -46,4 +45,8 @@ public class NotTaken_c extends Label_c implements NotTaken {
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         throw new InternalCompilerError("Cannot compare \"" + this + "\".");
     }
+    public Set variables() {
+        return Collections.EMPTY_SET;        
+    }
+
 }

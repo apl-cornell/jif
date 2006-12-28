@@ -2,9 +2,12 @@ package jif.types.label;
 
 import java.util.*;
 
-import jif.translate.JoinLabelToJavaExpr_c;
 import jif.translate.LabelToJavaExpr;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.JifTypeSystem_c;
+import jif.types.LabelSubstitution;
+import jif.types.PathMap;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
 import polyglot.types.SemanticException;
@@ -19,9 +22,9 @@ public class JoinLabel_c extends Label_c implements JoinLabel
 {
     private final Set components;
     
-    public JoinLabel_c(Collection components, JifTypeSystem ts, Position pos, LabelToJavaExpr trans) {
+    public JoinLabel_c(Set components, JifTypeSystem ts, Position pos, LabelToJavaExpr trans) {
         super(ts, pos, trans);
-        this.components = Collections.unmodifiableSet(new LinkedHashSet(flatten(components)));
+        this.components = Collections.unmodifiableSet(flatten(components));
         if (this.components.isEmpty()) throw new InternalCompilerError("No empty joins");
     }
     
@@ -194,11 +197,10 @@ public class JoinLabel_c extends Label_c implements JoinLabel
             return this;
         }
         
-        Collection comps = flatten(components);
         Set needed = new LinkedHashSet();
         JifTypeSystem jts = (JifTypeSystem) ts;
 
-        for (Iterator i = comps.iterator(); i.hasNext(); ) {
+        for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label ci = ((Label) i.next()).simplify();
             
             if (ci.hasVariables() || ci.hasWritersToReaders()) {
@@ -239,9 +241,22 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return new JoinLabel_c(needed, (JifTypeSystem)ts, position(), ((JifTypeSystem_c)ts).joinLabelTranslator());
     }
     
-    private static Collection flatten(Collection comps) {
-        Collection c = new LinkedHashSet();
+    private static Set flatten(Set comps) {
+
+        // check if there are any join labels in there.
+        boolean needFlattening = false;
+        for (Iterator i = comps.iterator(); i.hasNext(); ) {
+            Label L = (Label) i.next();
+            
+            if (L instanceof JoinLabel) {
+                needFlattening = true;
+                break;
+            }
+        }
         
+        if (!needFlattening) return comps;
+        
+        Set c = new LinkedHashSet();
         for (Iterator i = comps.iterator(); i.hasNext(); ) {
             Label L = (Label) i.next();
             
@@ -250,17 +265,8 @@ public class JoinLabel_c extends Label_c implements JoinLabel
             }
             
             if (L instanceof JoinLabel) {
-                Collection lComps = flatten(((JoinLabel)L).joinComponents());
-                
-                for (Iterator j = lComps.iterator(); j.hasNext(); ) {
-                    Label Lj = (Label) j.next();
-                    
-                    if (Lj.isTop()) {
-                        return Collections.singleton(Lj);
-                    }
-                    
-                    c.add(Lj);
-                }
+                Collection lComps = ((JoinLabel)L).joinComponents();
+                c.addAll(lComps);                
             }
             else {
                 c.add(L);
@@ -303,13 +309,22 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         }
         substitution.pushLabel(this);
         boolean changed = false;
-        Set s = new LinkedHashSet();
+        Set s = null;
         
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label c = (Label) i.next();
             Label newc = c.subst(substitution);
-            if (newc != c) changed = true;
-            s.add(newc);
+            if (!changed && newc != c) {
+                changed = true;
+                s = new LinkedHashSet();
+                // add all the previous laebls
+                for (Iterator j = components.iterator(); j.hasNext(); ) {
+                    Label d = (Label) j.next();
+                    if (c == d) break;
+                    s.add(d);
+                }
+            }
+            if (changed) s.add(newc);
         }
         
         substitution.popLabel(this);
