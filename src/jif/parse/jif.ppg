@@ -543,6 +543,17 @@ primitive_array_type ::=
                if (b != null) parser.countAnnotation(parser.TYPE_ANNOTATION, RESULT.position());
             :};
 // 19.5) Names
+override simple_name ::=
+                    // Name
+        IDENTIFIER:a
+            {: RESULT = new Name(parser, parser.pos(a), a.getIdentifier()); :}
+    ;
+override qualified_name ::=
+                    // Name
+        name:a DOT IDENTIFIER:b
+            {: RESULT = new Name(parser, parser.pos(a, b), a, b.getIdentifier()); :}
+    ;
+
 // 19.6) Packages
 // 19.7) Productions used only in the LALR(1) grammar
 // 19.8) Classes
@@ -876,6 +887,13 @@ drop { interface_member_declaration ::=
 
 // 19.11) Blocks and Statements
 drop { block_statement ::= class_declaration ; }
+override identifier_opt ::=
+                    // Name
+            {: RESULT = null; :}
+    |   IDENTIFIER:a
+            {: RESULT = new Name(parser, parser.pos(a), 
+                a.getIdentifier()); :}
+    ;
 
 extend statement ::=
                     // Stmt
