@@ -27,9 +27,9 @@
 #
 # When invoking this script, it will probably be necessary to supply
 # an appropriate class path, to make sure that pth can find the Jif compiler.
-#    $ pth pthScript -cp "../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:."
+#    $ pth pthScript -classpath "../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:."
 
-jif.ExtensionInfo  "-cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:../lib/jifrt.jar" {
+jif.ExtensionInfo  "-classpath ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:../lib/jifrt.jar" {
         OwnedObject.jif;
         LabeledObject.jif;
         TestPrincipal.jif;
