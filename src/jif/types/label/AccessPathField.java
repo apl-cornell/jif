@@ -7,8 +7,12 @@ import jif.ast.JifInstantiator;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.PathMap;
+import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
-import polyglot.types.*;
+import polyglot.types.FieldInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -137,5 +141,14 @@ public class AccessPathField extends AccessPath {
         
         return throwTypes;
     }
-    
+    public boolean equivalentTo(AccessPath p, LabelEnv env) {
+        if (p instanceof AccessPathField) {
+            AccessPathField apf = (AccessPathField)p;
+            if (this.fieldInstance().equals(apf.fieldInstance())) {
+                return env.equivalentAccessPaths(this.path(), apf.path());
+            }
+        }
+        return false;
+    }
+ 
 }

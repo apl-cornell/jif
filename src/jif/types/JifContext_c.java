@@ -5,6 +5,7 @@ import java.util.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv_c;
 import jif.types.hierarchy.PrincipalHierarchy;
+import jif.types.label.AccessPath;
 import jif.types.label.Label;
 import jif.types.label.PairLabel;
 import jif.types.principal.Principal;
@@ -139,6 +140,23 @@ public class JifContext_c extends Context_c implements JifContext
         }
     }
     
+    public void addDefinitionalAssertionEquiv(AccessPath p, AccessPath q) {
+        // don't bother copying the environment, as we'll be
+        // propogating it upwards anyway.
+        // envModification();
+        env.addEquiv(p, q);
+        JifContext_c jc = this;
+        LabelEnv_c lastEnvAddedTo = env;
+        while (!jc.isCode()) {
+            jc = (JifContext_c)jc.pop();
+            if (jc != null && jc.env != lastEnvAddedTo) {
+                // only add to env we haven't seen yet.
+                jc.env.addEquiv(p, q);
+                lastEnvAddedTo = jc.env;
+            }            
+        }
+    }
+
     public void addEquiv(Label L1, Label L2) {
         envModification();
         env.addEquiv(L1, L2);
@@ -198,7 +216,7 @@ public class JifContext_c extends Context_c implements JifContext
         public int hashCode() {
             return kind.hashCode() + (label == null ? 0 : label.hashCode());
         }
-        public String toStrong() {
+        public String toString() {
             return kind.toString() + label;
         }
 

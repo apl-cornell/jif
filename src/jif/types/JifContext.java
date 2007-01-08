@@ -5,6 +5,7 @@ import java.util.Set;
 
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
+import jif.types.label.AccessPath;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.Branch;
@@ -45,6 +46,16 @@ public interface JifContext extends Context {
      * @param L2
      */
     void addDefinitionalAssertionEquiv(Label L1, Label L2);
+
+    /**
+     * Adds the assertion that the access path p is equivalent to the
+     * access path q to this context, and all outer contexts up to
+     * the method/constructor/initializer level
+     * @param L1
+     * @param L2
+     */
+    void addDefinitionalAssertionEquiv(AccessPath p, AccessPath q);
+
 
     /* ************************************************
      * Prinicpal Hierarchy methods

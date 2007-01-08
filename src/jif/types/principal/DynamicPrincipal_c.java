@@ -24,7 +24,7 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
     private final AccessPath path;
 
     public DynamicPrincipal_c(AccessPath path, JifTypeSystem ts, Position pos, PrincipalToJavaExpr toJava) {
-	super(ts, pos, toJava);
+        super(ts, pos, toJava);
         this.path = path;
         if (path instanceof AccessPathConstant) {
             throw new InternalCompilerError("Don't expect to get AccessPathConstants for dynamic labels");
@@ -32,7 +32,7 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
     }
 
     public AccessPath path() {
-	return path;
+        return path;
     }
 
     public boolean isRuntimeRepresentable() { return true; }
@@ -48,18 +48,18 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
 
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
-	if (! (o instanceof DynamicPrincipal)) {
-	    return false;
-	}
+        if (! (o instanceof DynamicPrincipal)) {
+            return false;
+        }
 
-	DynamicPrincipal that = (DynamicPrincipal) o;
+        DynamicPrincipal that = (DynamicPrincipal) o;
         return (this.path.equals(that.path()));
     }
 
     public int hashCode() {
-	return path.hashCode();
+        return path.hashCode();
     }
-    
+
     public List throwTypes(TypeSystem ts) {
         return path.throwTypes(ts);
     }
@@ -76,5 +76,5 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         return path.labelcheck(A, lc);
     }
-    
+
 }

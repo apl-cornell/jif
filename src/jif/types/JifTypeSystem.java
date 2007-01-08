@@ -147,10 +147,10 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     /* methods for policies */
     boolean leq(Policy p1, Policy p2);
-    ConfPolicy joinConfPolicy(Position pos, Collection components);
-    IntegPolicy joinIntegPolicy(Position pos, Collection components);
-    ConfPolicy meetConfPolicy(Position pos, Collection components);
-    IntegPolicy meetIntegPolicy(Position pos, Collection components);
+    ConfPolicy joinConfPolicy(Position pos, Set components);
+    IntegPolicy joinIntegPolicy(Position pos, Set components);
+    ConfPolicy meetConfPolicy(Position pos, Set components);
+    IntegPolicy meetIntegPolicy(Position pos, Set components);
     ConfPolicy join(ConfPolicy p1, ConfPolicy p2);
     ConfPolicy meet(ConfPolicy p1, ConfPolicy p2);
     IntegPolicy join(IntegPolicy p1, IntegPolicy p2);

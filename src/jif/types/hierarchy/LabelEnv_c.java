@@ -1,10 +1,12 @@
 package jif.types.hierarchy;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import jif.Topics;
 import jif.types.*;
 import jif.types.label.*;
+import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
@@ -20,6 +22,14 @@ public class LabelEnv_c implements LabelEnv
     protected final List labelAssertions; // a list of LabelLeAssertions
     protected final StringBuffer displayLabelAssertions; 
     protected final JifTypeSystem ts;
+
+    /**
+     * A map from AccessPath to representatives of the
+     * equivalent set of the AcessPath. No mapping if the
+     * element is its own representative.
+     */
+    protected final Map accessPathEquivReps;
+
     protected final LabelEnv_c parent; // a more general (i.e., fewer assertions) LabelEnv, used only for cache lookup.
     protected Solver solver;
     
@@ -34,11 +44,12 @@ public class LabelEnv_c implements LabelEnv
     protected static Collection topics = CollectionUtil.list(Topics.jif, Topics.labelEnv);
 
     public LabelEnv_c(JifTypeSystem ts, boolean useCache) {
-        this(ts, new PrincipalHierarchy(), new LinkedList(), "", false, useCache, null);
+        this(ts, new PrincipalHierarchy(), new LinkedList(), "", false, useCache, new LinkedHashMap(), null);
     }
-    protected LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph, List assertions, String displayLabelAssertions, boolean hasVariables, boolean useCache, LabelEnv_c parent) {
+    protected LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph, List assertions, String displayLabelAssertions, boolean hasVariables, boolean useCache, Map accessPathEquivReps, LabelEnv_c parent) {
         this.ph = ph;
         this.labelAssertions = assertions;
+        this.accessPathEquivReps = accessPathEquivReps;
         this.displayLabelAssertions = new StringBuffer(displayLabelAssertions);
         this.hasVariables = false;
         this.solver = null;        
@@ -136,7 +147,17 @@ public class LabelEnv_c implements LabelEnv
     public LabelEnv_c copy() {
         return new LabelEnv_c(ts, ph.copy(), new LinkedList(labelAssertions), 
                               displayLabelAssertions.toString(), 
-                              hasVariables, useCache, this);
+                              hasVariables, useCache, 
+                              new LinkedHashMap(this.accessPathEquivReps), this);
+    }
+    
+    public boolean actsFor(Principal p, Principal q) {
+        if (p instanceof DynamicPrincipal && q instanceof DynamicPrincipal) {
+            DynamicPrincipal dp = (DynamicPrincipal)p;
+            DynamicPrincipal dq = (DynamicPrincipal)q;
+            if (equivalentAccessPaths(dp.path(), dq.path())) return true;
+        }
+        return ph.actsFor(p, q);
     }
     
     public boolean leq(Label L1, Label L2) { 
@@ -146,7 +167,33 @@ public class LabelEnv_c implements LabelEnv
         return leq(L1, L2, 
                    new SearchState_c(new AssertionUseCount()));
     }
+    
+    public boolean equivalentAccessPaths(AccessPath p, AccessPath q) {
+        if (p == q) return true;
+        if (findAccessPathRepr(p).equals(findAccessPathRepr(q))) {
+            return true;
+        }
+        return p.equivalentTo(q, this);
+    }
 
+    /**
+     * Returns the representative of the equivalence class of p. 
+     * Provided p is not-null, returns a not-null value.
+     */
+    private AccessPath findAccessPathRepr(AccessPath p) {
+        AccessPath last = p;
+        AccessPath next = (AccessPath)accessPathEquivReps.get(last);
+        while (next != null) {
+            last = next;
+            next = (AccessPath)accessPathEquivReps.get(last);
+        }
+        return last;
+    }
+    public void addEquiv(AccessPath p, AccessPath q) {
+        // clear the cache of false leq results, since this may let us prove more results
+        cacheFalse.clear();
+        accessPathEquivReps.put(p, findAccessPathRepr(q));
+    }
     /*
      * Cache the results of leq(Label, Label, SearchState), when we are
      * using assertions only. Note that the rest of the
@@ -160,28 +207,40 @@ public class LabelEnv_c implements LabelEnv
     protected final boolean useCache;
     
     private static class LeqGoal {
+        final int hash;
         final Object lhs;
         final Object rhs;
         LeqGoal(Policy lhs, Policy rhs) { 
             this.lhs = lhs; this.rhs = rhs;
             if (lhs == null || rhs == null) 
                 throw new InternalCompilerError("Null policy!");
+
+            int lhash = lhs.hashCode(); 
+            int rhash = rhs.hashCode();
+            if (lhash == rhash)
+                this.hash = lhash;
+            else
+                this.hash = lhash ^ rhash;
         }
         LeqGoal(Label lhs, Label rhs) { 
             this.lhs = lhs; this.rhs = rhs;
             if (lhs == null || rhs == null) 
                 throw new InternalCompilerError("Null label!");
-        }
-        public int hashCode() {
             int lhash = lhs.hashCode(); 
             int rhash = rhs.hashCode();
-            if (lhash == rhash) return lhash;
-            return lhash ^ rhash;
+            if (lhash == rhash)
+                this.hash = lhash;
+            else
+                this.hash = lhash ^ rhash;
+        }
+        public int hashCode() {
+            return hash;
         }
         public boolean equals(Object o) {
             if (o instanceof LeqGoal) {
                 LeqGoal that = (LeqGoal)o;
-                return this.lhs.equals(that.lhs) && this.rhs.equals(that.rhs);
+                return this.hash == that.hash &&
+                     this.lhs.equals(that.lhs) && this.rhs.equals(that.rhs);
                 
             }
             return false;
@@ -260,7 +319,6 @@ public class LabelEnv_c implements LabelEnv
      */
     private boolean leqImpl(Label L1, Label L2, SearchState_c state) {
         AssertionUseCount auc = state.auc;
-        
         L1 = L1.normalize();
         L2 = L2.normalize();
 
@@ -646,6 +704,16 @@ public class LabelEnv_c implements LabelEnv
                 sb.append(", ");
             }
             sb.append(ph().actsForString());
+        }
+        if (Report.should_report(Report.debug, 1) && !accessPathEquivReps.isEmpty()) {
+            for (Iterator iter = accessPathEquivReps.entrySet().iterator(); iter.hasNext(); ) {
+                if (sb.length() > 1) sb.append(", ");
+
+                Map.Entry e = (Entry)iter.next();
+                sb.append(((AccessPath)e.getKey()).exprString());
+                sb.append("==");
+                sb.append(((AccessPath)e.getValue()).exprString());
+            }
         }
         sb.append("]");
         return sb.toString();

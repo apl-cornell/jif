@@ -5,8 +5,10 @@ import java.util.Set;
 
 import jif.types.Solver;
 import jif.types.VarMap;
+import jif.types.label.AccessPath;
 import jif.types.label.Label;
 import jif.types.label.Policy;
+import jif.types.principal.Principal;
 
 public interface LabelEnv
 {
@@ -19,7 +21,7 @@ public interface LabelEnv
     boolean leq(Policy p1, Policy p2);
     boolean leq(Policy p1, Policy p2, SearchState state);
 
-    PrincipalHierarchy ph();
+    boolean actsFor(Principal p, Principal q);
 
     /**
      * Finds an upper bound for L using the assertions in this environment.
@@ -65,4 +67,6 @@ public interface LabelEnv
      * Encapsulates the solvers search state. 
      */
     public interface SearchState { }
+
+    boolean equivalentAccessPaths(AccessPath p, AccessPath q);
 }

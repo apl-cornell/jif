@@ -9,7 +9,6 @@ import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.PathMap;
 import jif.types.hierarchy.LabelEnv;
-import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
@@ -50,6 +49,13 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
     }
     
     public Policy simplify() {
+//        if (reader().isBottomPrincipal()) {
+//            if (owner().isBottomPrincipal()) return this;
+//            // of the form o:_, can simplify it to _:_.
+//            System.out.println("Simplifying " + this + " at " + this.position());
+//            return ((JifTypeSystem)typeSystem()).bottomConfPolicy(this.position());
+//        }
+
         return this;
     }
         
@@ -72,19 +78,18 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
         if (this.isBottomConfidentiality() || p.isTopConfidentiality())
             return true;
 
-        PrincipalHierarchy ph = env.ph();
         if (p instanceof ReaderPolicy) {
             ReaderPolicy that = (ReaderPolicy) p;            
             // this = { o  : .. ri .. }
             // that = { o' : .. rj' .. }
             
             // o' >= o
-            if (!ph.actsFor(that.owner(), this.owner)) {
+            if (!env.actsFor(that.owner(), this.owner)) {
                 return false;
             }
             
-            return ph.actsFor(that.reader(), this.owner()) ||
-                    ph.actsFor(that.reader(), this.reader());
+            return env.actsFor(that.reader(), this.owner()) ||
+                    env.actsFor(that.reader(), this.reader());
         }            
         return false;
     }

@@ -750,7 +750,7 @@ public class JifTypeSystem_c
             boolean essential = true;
             for (Iterator iter2 = needed.iterator(); iter2.hasNext();) {
                 Principal q = (Principal)iter2.next();
-                if (this.emptyLabelEnv.ph().actsFor(q, p)) {
+                if (this.emptyLabelEnv.actsFor(q, p)) {
                     essential = false;
                     break;
     }
@@ -777,7 +777,7 @@ public class JifTypeSystem_c
             boolean essential = true;
             for (Iterator iter2 = needed.iterator(); iter2.hasNext();) {
                 Principal q = (Principal)iter2.next();
-                if (this.emptyLabelEnv.ph().actsFor(p, q)) {
+                if (this.emptyLabelEnv.actsFor(p, q)) {
                     essential = false;
                     break;
     }
@@ -1238,7 +1238,7 @@ public class JifTypeSystem_c
     public boolean leq(Policy p1, Policy p2) {
         return emptyLabelEnv.leq(p1, p2);
     }
-    public ConfPolicy joinConfPolicy(Position pos, Collection components) {
+    public ConfPolicy joinConfPolicy(Position pos, Set components) {
         if (components.isEmpty()) {
             return bottomConfPolicy(pos);
         }
@@ -1247,7 +1247,7 @@ public class JifTypeSystem_c
         }
         return (ConfPolicy)new JoinConfPolicy_c(components, this, pos).simplify();
     }
-    public IntegPolicy joinIntegPolicy(Position pos, Collection components) {
+    public IntegPolicy joinIntegPolicy(Position pos, Set components) {
         if (components.isEmpty()) {
             return bottomIntegPolicy(pos);
         }
@@ -1256,7 +1256,7 @@ public class JifTypeSystem_c
         }
         return (IntegPolicy)new JoinIntegPolicy_c(components, this, pos).simplify();        
     }
-    public ConfPolicy meetConfPolicy(Position pos, Collection components) {
+    public ConfPolicy meetConfPolicy(Position pos, Set components) {
         if (components.isEmpty()) {
             return topConfPolicy(pos);
         }
@@ -1265,7 +1265,7 @@ public class JifTypeSystem_c
         }
         return (ConfPolicy)new MeetConfPolicy_c(components, this, pos).simplify();        
     }
-    public IntegPolicy meetIntegPolicy(Position pos, Collection components) {
+    public IntegPolicy meetIntegPolicy(Position pos, Set components) {
         if (components.isEmpty()) {
             return topIntegPolicy(pos);
         }
@@ -1281,11 +1281,13 @@ public class JifTypeSystem_c
         if (p2.isTop() || p1.isBottom()) {
             return (ConfPolicy)p2.simplify();
         }
-        List l = CollectionUtil.list(p1, p2);
+        Set s = new HashSet();
+        s.add(p1);
+        s.add(p2);
         Position pos = p1.position();
         if (pos == null) pos = p2.position();
 
-        return (ConfPolicy)joinConfPolicy(pos, l).simplify();
+        return (ConfPolicy)joinConfPolicy(pos, s).simplify();
     }
     public IntegPolicy join(IntegPolicy p1, IntegPolicy p2) {
         if (p1.isTop() || p2.isBottom()) {
@@ -1294,11 +1296,13 @@ public class JifTypeSystem_c
         if (p2.isTop() || p1.isBottom()) {
             return (IntegPolicy)p2.simplify();
         }
-        List l = CollectionUtil.list(p1, p2);
+        Set s = new HashSet();
+        s.add(p1);
+        s.add(p2);
         Position pos = p1.position();
         if (pos == null) pos = p2.position();
 
-        return (IntegPolicy)joinIntegPolicy(pos, l).simplify();
+        return (IntegPolicy)joinIntegPolicy(pos, s).simplify();
     }
     public ConfPolicy meet(ConfPolicy p1, ConfPolicy p2) {
         if (p1.isTop() || p2.isBottom()) {
@@ -1307,11 +1311,13 @@ public class JifTypeSystem_c
         if (p2.isTop() || p1.isBottom()) {
             return (ConfPolicy)p1.simplify();
         }
-        List l = CollectionUtil.list(p1, p2);
+        Set s = new HashSet();
+        s.add(p1);
+        s.add(p2);
         Position pos = p1.position();
         if (pos == null) pos = p2.position();
 
-        return (ConfPolicy)meetConfPolicy(pos, l).simplify();
+        return (ConfPolicy)meetConfPolicy(pos, s).simplify();
     }
     public IntegPolicy meet(IntegPolicy p1, IntegPolicy p2) {
         if (p1.isTop() || p2.isBottom()) {
@@ -1320,11 +1326,13 @@ public class JifTypeSystem_c
         if (p2.isTop() || p1.isBottom()) {
             return (IntegPolicy)p1.simplify();
         }
-        List l = CollectionUtil.list(p1, p2);
+        Set s = new HashSet();
+        s.add(p1);
+        s.add(p2);
         Position pos = p1.position();
         if (pos == null) pos = p2.position();
 
-        return (IntegPolicy)meetIntegPolicy(pos, l).simplify();
+        return (IntegPolicy)meetIntegPolicy(pos, s).simplify();
     }
     
     public ConfPolicy confProjection(Label L) {

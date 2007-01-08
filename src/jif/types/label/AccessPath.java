@@ -6,6 +6,7 @@ import java.util.List;
 
 import jif.types.JifContext;
 import jif.types.PathMap;
+import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -93,4 +94,6 @@ public abstract class AccessPath implements Serializable {
     public List throwTypes(TypeSystem ts) {
         return Collections.EMPTY_LIST;
     }
+
+    public abstract boolean equivalentTo(AccessPath p, LabelEnv env);
 }

@@ -65,27 +65,26 @@ public class WriterPolicy_c extends Policy_c implements WriterPolicy {
     }
     
     public int hashCode() {
-        return (owner==null?0:owner.hashCode()) ^ writer.hashCode()  ^ 1234352;
+        return (owner==null?0:owner.hashCode()) ^ (writer==null?0:writer.hashCode())  ^ 1234352;
     }
     
     public boolean leq_(IntegPolicy p, LabelEnv env, SearchState state) {
         if (this.isBottomIntegrity() || p.isTopIntegrity())
             return true;
         
-        PrincipalHierarchy ph = env.ph();
         if (p instanceof WriterPolicy) {
             WriterPolicy that = (WriterPolicy) p;            
             // this = { o  !: .. wi .. }
             // that = { o' !: .. wj' .. }
             
             // o >= o'
-            if (!ph.actsFor(this.owner, that.owner())) {
+            if (!env.actsFor(this.owner, that.owner())) {
                 return false;
             }
             
             // for all i . wi >= o || exists j . wi >= wj'
-            return ph.actsFor(this.writer(), that.owner()) ||
-                ph.actsFor(this.writer(), that.writer());
+            return env.actsFor(this.writer(), that.owner()) ||
+                env.actsFor(this.writer(), that.writer());
         }        
         return false;
     }

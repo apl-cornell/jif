@@ -13,8 +13,8 @@ public class PrincipalHierarchy {
      * p' is in the set actsfor.get(p)
      */
     private final Map actsfor;
-    
-    
+
+
     /**
      * Map from Principal to Set[Principal], where if p' actsfor p, then
      * p' is in the set actsfor.get(p)
@@ -35,7 +35,7 @@ public class PrincipalHierarchy {
     public String toString() {
         return "[" + actsForString()+ "]";
     }
-    
+
     private static void addAlreadyReported(Map alreadyReported, Principal p, Principal q) {
         // record the fact that we have already reported that q actsfor p
         Set s = (Set)alreadyReported.get(q);
@@ -92,13 +92,13 @@ public class PrincipalHierarchy {
         return actsfor.isEmpty();
     }
     public void add(Principal actor, Principal granter) {
-	Set s = (Set) actsfor.get(actor);
-	if (s == null) {
-	    // create a new set of granting principals
-	    s = new LinkedHashSet();
-	    actsfor.put(actor, s);
-	}
-	s.add(granter);
+        Set s = (Set) actsfor.get(actor);
+        if (s == null) {
+            // create a new set of granting principals
+            s = new LinkedHashSet();
+            actsfor.put(actor, s);
+        }
+        s.add(granter);
 
         Set t = (Set) grants.get(granter);
         if (t == null) {
@@ -110,7 +110,7 @@ public class PrincipalHierarchy {
     }
 
     public boolean actsFor(Principal actor, Principal granter) {
-	return actsFor(actor, granter, new LinkedList());
+        return actsFor(actor, granter, new LinkedList());
     }
 
     private static class PrincipalPair {
@@ -132,28 +132,28 @@ public class PrincipalHierarchy {
     protected boolean actsFor(Principal actor, Principal granter, LinkedList goalStack) {
         if (actor.isTopPrincipal()) return true;
         if (granter.isBottomPrincipal()) return true;
-        
+
         Set actorCached = (Set)actorCache.get(actor);
         if (actorCached != null && actorCached.contains(granter))
             return true;
-                
+
         PrincipalPair currentGoal = new PrincipalPair(actor, granter);
-	if (goalStack.contains(currentGoal)) { 
+        if (goalStack.contains(currentGoal)) { 
             // this goal is already on the stack.
-	    return false;
+            return false;
         }
-	
-	// Check the reflexive part of actsFor relation.
-	if (actor.equals(granter)) {
-	    return true;
-	}
-        
-	Set s = (Set) actsfor.get(actor);
-	if (s != null && s.contains(granter)) {
+
+        // Check the reflexive part of actsFor relation.
+        if (actor.equals(granter)) {
+            return true;
+        }
+
+        Set s = (Set) actsfor.get(actor);
+        if (s != null && s.contains(granter)) {
             // explicit actsfor in the hierarchy
             cacheResult(actor, granter);
-	    return true;
-	}               
+            return true;
+        }               
 
         // push this goal on the stack before making recursive calls
         goalStack.addLast(currentGoal);
@@ -186,7 +186,7 @@ public class PrincipalHierarchy {
                 return true;                                
             }
         }
-        
+
         if (granter instanceof DisjunctivePrincipal) {
             DisjunctivePrincipal dp = (DisjunctivePrincipal)granter;
             // actor actsfor dp if there is one disjunct that actor can act for
@@ -214,8 +214,8 @@ public class PrincipalHierarchy {
                 cacheResult(actor, granter);
                 return true;                                
             }
-            
-            
+
+
         }
 
         // Check the transitive part of actsFor relation.        
@@ -228,7 +228,7 @@ public class PrincipalHierarchy {
                 }
             }
         }
-        
+
         // now also go through the grants set
         Set t = (Set)grants.get(granter);
         if (t != null) {
@@ -240,10 +240,10 @@ public class PrincipalHierarchy {
                 }
             }
         }
-        
+
         // we've failed, remove the current goal from the stack.
         goalStack.removeLast();
-	return false;
+        return false;
     }
     private void cacheResult(Principal actor, Principal granter) {
         Set s = (Set) actorCache.get(actor);
@@ -255,22 +255,22 @@ public class PrincipalHierarchy {
     }
 
     public boolean actsFor(Collection actorGrp, Collection grantorGrp) {
-	for (Iterator i = grantorGrp.iterator(); i.hasNext(); ) {
-	    Principal gi = (Principal) i.next();
-	    boolean sat = false;
-	    for (Iterator j = actorGrp.iterator(); j.hasNext(); ) {
-		Principal aj = (Principal) j.next();
+        for (Iterator i = grantorGrp.iterator(); i.hasNext(); ) {
+            Principal gi = (Principal) i.next();
+            boolean sat = false;
+            for (Iterator j = actorGrp.iterator(); j.hasNext(); ) {
+                Principal aj = (Principal) j.next();
 
-		if (actsFor(aj, gi)) {
-		    sat = true;
-		    break;
-		}
-	    }
+                if (actsFor(aj, gi)) {
+                    sat = true;
+                    break;
+                }
+            }
 
-	    if (! sat) 
-		return false;
-	}
-	return true;
+            if (! sat) 
+                return false;
+        }
+        return true;
     }
 
     public PrincipalHierarchy copy() {
@@ -289,10 +289,10 @@ public class PrincipalHierarchy {
             dup.grants.put(p, new LinkedHashSet(s));
         }
 
-	return dup;
+        return dup;
     }
 
     public void clear() {
-	actsfor.clear();
+        actsfor.clear();
     }
 }

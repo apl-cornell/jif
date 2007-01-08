@@ -6,22 +6,12 @@ import java.util.List;
 import jif.ast.JifInstantiator;
 import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
-import jif.types.JifClassType;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.LabelConstraint;
-import jif.types.NamedLabel;
-import jif.types.PathMap;
+import jif.types.*;
 import jif.types.label.Label;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import polyglot.ast.Assign;
-import polyglot.ast.Expr;
-import polyglot.ast.Field;
-import polyglot.ast.Node;
-import polyglot.ast.Receiver;
-import polyglot.ast.Special;
+import polyglot.ast.*;
 import polyglot.types.FieldInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -110,19 +100,21 @@ public class JifFieldAssignExt extends JifAssignExt
             // if it is a final field being initialized,
             // add a definitional assertion that the field is equivalent
             // to the expression being assigned to it.
-            if (fi.flags().isFinal() && 
-                    (ts.isLabel(fi.type()) || ts.isImplicitCastValid(fi.type(), ts.Principal())) && 
-                    JifUtil.isFinalAccessExprOrConst(ts, assign.right())) {
-                
+            if (fi.flags().isFinal() && JifUtil.isFinalAccessExprOrConst(ts, assign.right())) { 
                 if (ts.isLabel(fi.type())) {
                     Label dl = ts.dynamicLabel(fi.position(), JifUtil.varInstanceToAccessPath(fi, fi.position()));                
                     Label rhs_label = JifUtil.exprToLabel(ts, assign.right(), A);
                     A.addDefinitionalAssertionEquiv(dl, rhs_label);
                 }
-                if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
+                else if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
                     DynamicPrincipal dp = ts.dynamicPrincipal(fi.position(), JifUtil.varInstanceToAccessPath(fi, fi.position()));                
                     Principal rhs_principal = JifUtil.exprToPrincipal(ts, assign.right(), A);
                     A.addDefinitionalEquiv(dp, rhs_principal);                    
+                }
+                else {
+                    // record that this field and the value assigned to it are the same.
+                    A.addDefinitionalAssertionEquiv(JifUtil.varInstanceToAccessPath(fi, fi.position()),
+                                                    JifUtil.exprToAccessPath(assign.right(), A)); 
                 }
             }                            
             
