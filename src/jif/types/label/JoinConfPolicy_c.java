@@ -1,7 +1,7 @@
 package jif.types.label;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
@@ -14,13 +14,13 @@ import polyglot.util.TypedList;
  */
 public class JoinConfPolicy_c extends JoinPolicy_c implements ConfPolicy {
 
-    public JoinConfPolicy_c(Collection components, JifTypeSystem ts, Position pos) {
+    public JoinConfPolicy_c(Set components, JifTypeSystem ts, Position pos) {
         super(components, ts, pos);
         // check that all the components are confidentiality policies
         TypedList.check(new ArrayList(components), ConfPolicy.class);
     }
 
-    protected Policy constructJoinPolicy(Collection components, Position pos) {
+    protected Policy constructJoinPolicy(Set components, Position pos) {
         return new JoinConfPolicy_c(components, (JifTypeSystem)ts, pos);
     }
     public boolean isBottomConfidentiality() {

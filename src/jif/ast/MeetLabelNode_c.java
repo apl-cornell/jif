@@ -61,7 +61,7 @@ public class MeetLabelNode_c extends AmbLabelNode_c implements MeetLabelNode
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
         Set labels = new LinkedHashSet();
-        List policies = new LinkedList();
+        Set policies = new LinkedHashSet();
 
         boolean policyTypeIsConf = false;
 

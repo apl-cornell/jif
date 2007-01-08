@@ -273,7 +273,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         for (Iterator i = comps.iterator(); i.hasNext(); ) {
             Label L = (Label) i.next();
             
-            if (L.isTop()) {
+            if (L.isBottom()) {
                 return Collections.singleton(L);
             }
             
@@ -326,8 +326,17 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label c = (Label) i.next();
             Label newc = c.subst(substitution);
-            if (newc != c) changed = true;
-            s.add(newc);
+            if (!changed && newc != c) {
+                changed = true;
+                s = new LinkedHashSet();
+                // add all the previous laebls
+                for (Iterator j = components.iterator(); j.hasNext(); ) {
+                    Label d = (Label) j.next();
+                    if (c == d) break;
+                    s.add(d);
+                }
+            }
+            if (changed) s.add(newc);
         }
         
         substitution.popLabel(this);
@@ -336,7 +345,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         
         JifTypeSystem ts = (JifTypeSystem)this.typeSystem();
         Label newmeetLabel = ts.meetLabel(this.position(), flatten(s));
-        return substitution.substLabel(newmeetLabel).simplify();
+        return substitution.substLabel(newmeetLabel);
     }
 
     public boolean hasWritersToReaders() {

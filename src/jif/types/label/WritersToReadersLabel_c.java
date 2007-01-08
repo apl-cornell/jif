@@ -136,7 +136,7 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
         }
         if (pol instanceof JoinIntegPolicy_c) {
             JoinPolicy_c jp = (JoinPolicy_c)pol;
-            Collection newPols = new ArrayList(jp.joinComponents().size());
+            Set newPols = new HashSet(jp.joinComponents().size());
             for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
                 IntegPolicy ip = (IntegPolicy)iter.next();
                 ConfPolicy cp = transformIntegToCong(ip);
@@ -146,7 +146,7 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
         }
         if (pol instanceof MeetIntegPolicy_c) {
             MeetPolicy_c mp = (MeetPolicy_c)pol;
-            Collection newPols = new ArrayList(mp.meetComponents().size());
+            Set newPols = new HashSet(mp.meetComponents().size());
             for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
                 IntegPolicy ip = (IntegPolicy)iter.next();
                 ConfPolicy cp = transformIntegToCong(ip);

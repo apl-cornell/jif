@@ -1,7 +1,7 @@
 package jif.types.label;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
@@ -14,13 +14,13 @@ import polyglot.util.TypedList;
  */
 public class MeetIntegPolicy_c extends MeetPolicy_c implements IntegPolicy {
 
-    public MeetIntegPolicy_c(Collection components, JifTypeSystem ts, Position pos) {
+    public MeetIntegPolicy_c(Set components, JifTypeSystem ts, Position pos) {
         super(components, ts, pos);
         // check that all the components are integrity policies
         TypedList.check(new ArrayList(components), IntegPolicy.class);
     }
 
-    protected Policy constructMeetPolicy(Collection components, Position pos) {
+    protected Policy constructMeetPolicy(Set components, Position pos) {
         return new MeetIntegPolicy_c(components, (JifTypeSystem)ts, pos);
     }
 

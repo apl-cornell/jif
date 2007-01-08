@@ -21,7 +21,7 @@ public class Equation
 {
     private Label lhs;
     private Label rhs;
-    
+
     /**
      * The <code>LabelConstraint</code> that generated this 
      * <code>Equation</code>.
@@ -33,21 +33,21 @@ public class Equation
      */
     Equation(Label lhs, Label rhs, LabelConstraint constraint) 
     {
-	this.lhs = lhs;
-	this.rhs = rhs.simplify();
-	this.constraint = constraint;
+        this.lhs = lhs;
+        this.rhs = rhs.simplify();
+        this.constraint = constraint;
 
         if (lhs instanceof JoinLabel) {
             throw new InternalCompilerError(
-                "LHS of equation must not be a join label.");
+            "LHS of equation must not be a join label.");
         }
         if (rhs instanceof MeetLabel) {
             throw new InternalCompilerError(
-                "LHS of equation must not be a meet label.");
+            "LHS of equation must not be a meet label.");
         }
     }
-    
-    
+
+
     public Label lhs() {return lhs;}
     public Label rhs() {return rhs;}
     public LabelConstraint constraint() { return constraint; }
@@ -59,35 +59,33 @@ public class Equation
      * left or right hand side.
      */
     public List variableComponents() {
-	List l = new LinkedList();
-	l.addAll(lhs.variableComponents());
-	l.addAll(rhs.variableComponents());
-	return l;
+        List l = new LinkedList();
+        l.addAll(lhs.variableComponents());
+        l.addAll(rhs.variableComponents());
+        return l;
     }
 
-    public int hashCode() { return lhs.hashCode() + rhs.hashCode(); }
+    public int hashCode() { return lhs.hashCode() ^ rhs.hashCode(); }
 
     public boolean equals(Object o) {
-	if (! (o instanceof Equation)) {
-	    return false;
-	} 
+        if (! (o instanceof Equation)) {
+            return false;
+        } 
 
-	Equation eqn = (Equation) o;
-
-	if (! lhs.equals(eqn.lhs) || ! rhs.equals(eqn.rhs)) {
-	    return false;
-	}
-
-	return constraint == eqn.constraint;
+        Equation eqn = (Equation) o;
+        
+        if (this.constraint != eqn.constraint) return false;
+        
+        return lhs.equals(eqn.lhs) && rhs.equals(eqn.rhs);
     }
 
     public String toString() {
-	return lhs.toString() + " <= " + rhs.toString() + " in environment " +
-                env() + " (produced from " + 
-                constraint.lhs() + constraint.kind() + constraint.rhs() + ") " +
-                position();
+        return lhs.toString() + " <= " + rhs.toString() + " in environment " +
+        env() + " (produced from " + 
+        constraint.lhs() + constraint.kind() + constraint.rhs() + ") " +
+        position();
     }
-        
+
     /**
      * Replace the <code>lhs</code> and <code>rhs</code> with the result of 
      * <code>lhs.subst(subst)</code> and <code>rhs.subst(subst)</code> 

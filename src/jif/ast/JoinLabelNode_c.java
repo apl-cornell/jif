@@ -51,8 +51,8 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
 
         Set s = new LinkedHashSet();
 
-        List confPolicies = new ArrayList();
-        List integPolicies = new ArrayList();
+        Set confPolicies = new LinkedHashSet();
+        Set integPolicies = new LinkedHashSet();
         for (Iterator i = this.components.iterator(); i.hasNext(); ) {
             Node n = (Node) i.next();
             if (!n.isDisambiguated()) {

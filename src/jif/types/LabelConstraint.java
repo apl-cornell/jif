@@ -110,9 +110,9 @@ public class LabelConstraint
 	return env;
     }
     
-    public PrincipalHierarchy ph() {
-	return env.ph();
-    }
+//    public PrincipalHierarchy ph() {
+//	return env.ph();
+//    }
     
     public Position position() {
         return pos;

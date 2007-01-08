@@ -1,12 +1,6 @@
 package jif.types.label;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
@@ -27,9 +21,9 @@ public abstract class JoinPolicy_c extends Policy_c {
     private final Set joinComponents;
     private Integer hashCode = null;
     
-    public JoinPolicy_c(Collection components, JifTypeSystem ts, Position pos) {
+    public JoinPolicy_c(Set components, JifTypeSystem ts, Position pos) {
         super(ts, pos);
-        this.joinComponents = Collections.unmodifiableSet(new LinkedHashSet(flatten(components)));
+        this.joinComponents = Collections.unmodifiableSet(flatten(components));
         if (this.joinComponents.isEmpty()) {
             throw new InternalCompilerError("Empty collection!");
         }
@@ -165,24 +159,33 @@ public abstract class JoinPolicy_c extends Policy_c {
         return constructJoinPolicy(needed, position);
     }
     
-    protected abstract Policy constructJoinPolicy(Collection components, Position pos);
+    protected abstract Policy constructJoinPolicy(Set components, Position pos);
     
-    private static Collection flatten(Collection comps) {
-        Collection c = new LinkedHashSet();        
+    private static Set flatten(Set comps) {
+        // check if there are any join policies in there.
+        boolean needFlattening = false;
         for (Iterator i = comps.iterator(); i.hasNext(); ) {
-            Policy p = (Policy) i.next();            
+            Policy p = (Policy) i.next();
+            
+            if (p instanceof JoinPolicy_c) {
+                needFlattening = true;
+                break;
+            }
+        }
+        
+        if (!needFlattening) return comps;
+        
+        Set c = new LinkedHashSet();
+        for (Iterator i = comps.iterator(); i.hasNext(); ) {
+            Policy p = (Policy) i.next();
+            
             if (p.isTop()) {
                 return Collections.singleton(p);
-            }            
+            }
+            
             if (p instanceof JoinPolicy_c) {
-                Collection lComps = flatten(((JoinPolicy_c)p).joinComponents());                
-                for (Iterator j = lComps.iterator(); j.hasNext(); ) {
-                    Policy pj = (Policy) j.next();                    
-                    if (pj.isTop()) {
-                        return Collections.singleton(pj);
-                    }                    
-                    c.add(pj);
-                }
+                Collection lComps = ((JoinPolicy_c)p).joinComponents();
+                c.addAll(lComps);                
             }
             else {
                 c.add(p);

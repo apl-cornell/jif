@@ -5,12 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import jif.types.Assertion;
-import jif.types.DefaultSignature;
-import jif.types.JifMethodInstance;
-import jif.types.JifTypeSystem;
-import jif.types.LabelSubstitution;
-import jif.types.TypeSubstitutor;
+import jif.types.*;
 import jif.types.label.AccessPath;
 import jif.types.label.AccessPathLocal;
 import jif.types.label.AccessPathRoot;

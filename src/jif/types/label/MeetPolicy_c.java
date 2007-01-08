@@ -21,9 +21,9 @@ public abstract class MeetPolicy_c extends Policy_c {
     private final Set meetComponents;
     private Integer hashCode = null;
     
-    public MeetPolicy_c(Collection components, JifTypeSystem ts, Position pos) {
+    public MeetPolicy_c(Set components, JifTypeSystem ts, Position pos) {
         super(ts, pos);
-        this.meetComponents = Collections.unmodifiableSet(new LinkedHashSet(flatten(components)));
+        this.meetComponents = Collections.unmodifiableSet(flatten(components));
         if (this.meetComponents.isEmpty()) {
             throw new InternalCompilerError("Empty collection!");
         }
@@ -159,24 +159,33 @@ public abstract class MeetPolicy_c extends Policy_c {
         return constructMeetPolicy(needed, position);
     }
     
-    protected abstract Policy constructMeetPolicy(Collection components, Position pos);
+    protected abstract Policy constructMeetPolicy(Set components, Position pos);
     
-    private static Collection flatten(Collection comps) {
-        Collection c = new LinkedHashSet();        
+    private static Set flatten(Set comps) {
+        // check if there are any meet policies in there.
+        boolean needFlattening = false;
         for (Iterator i = comps.iterator(); i.hasNext(); ) {
-            Policy p = (Policy) i.next();            
+            Policy p = (Policy) i.next();
+            
+            if (p instanceof MeetPolicy_c) {
+                needFlattening = true;
+                break;
+            }
+        }
+        
+        if (!needFlattening) return comps;
+        
+        Set c = new LinkedHashSet();
+        for (Iterator i = comps.iterator(); i.hasNext(); ) {
+            Policy p = (Policy) i.next();
+            
             if (p.isBottom()) {
                 return Collections.singleton(p);
-            }            
+            }
+            
             if (p instanceof MeetPolicy_c) {
-                Collection lComps = flatten(((MeetPolicy_c)p).meetComponents());                
-                for (Iterator j = lComps.iterator(); j.hasNext(); ) {
-                    Policy pj = (Policy) j.next();                    
-                    if (pj.isBottom()) {
-                        return Collections.singleton(pj);
-                    }                    
-                    c.add(pj);
-                }
+                Collection lComps = ((MeetPolicy_c)p).meetComponents();
+                c.addAll(lComps);                
             }
             else {
                 c.add(p);
