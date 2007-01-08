@@ -61,6 +61,12 @@ public abstract class Solver {
      * equation e may be invalidated.
      */
     private Map eqnVarReverseDependencies;
+    
+    /**
+     * Set of VarLabels that had their initial value fixed when the constraint
+     * was added.
+     */
+    private Set fixedValueVars;
 
     protected static final int STATUS_NOT_SOLVED = 0;
 
@@ -111,6 +117,7 @@ public abstract class Solver {
         scc = null;
         currentSCC = null;
         this.solverName = solverName + " (#" + (++solverCounter) + ")";
+        this.fixedValueVars = new HashSet();
     }
     
     private static int solverCounter;
@@ -131,6 +138,7 @@ public abstract class Solver {
         equations = new LinkedHashSet(js.equations);
         scc = new LinkedList(js.scc);
         solverName = js.solverName;
+        fixedValueVars = js.fixedValueVars;
     }
 
     /**
@@ -439,12 +447,15 @@ public abstract class Solver {
     protected final void inc_counter() {
         constraint_counter++;
         if (constraint_counter == stop_constraint) {
-//            System.err.println("Halting at constraint " + stop_constraint);
             throw new RuntimeException("Halting at constraint "
                     + stop_constraint);
         }
     }
 
+    protected boolean isFixedValueVar(VarLabel v) {
+        return fixedValueVars.contains(v);
+    }
+    
     /**
      * Add the constraint c to the system
      */
@@ -478,7 +489,10 @@ public abstract class Solver {
             // this is an equality constraint on a variable. Let's jump start the 
             // solving by setting it immediately
             VarLabel v = (VarLabel)c.lhs();
-            bounds.setBound(v, bounds.applyTo(c.rhs()));
+            Label initialBound = bounds.applyTo(c.rhs());
+            addTrace(v, (Equation)c.getEquations().iterator().next(), initialBound);
+            setBound(v, initialBound, c);
+            fixedValueVars.add(v);
         }
 
         Collection eqns = c.getEquations();

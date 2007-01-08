@@ -102,12 +102,15 @@ public class SolverGLB extends Solver {
 
         // get a count of them, to figure out if we need to do a search...
         List rhsVariables = new ArrayList(eqn.rhs().variableComponents());
-        if (rhsVariables.size() == 1) {
+        boolean isSingleVar = (rhsVariables.size() == 1);
+        VarLabel singleVar = null;
+        if (isSingleVar) singleVar = (VarLabel)rhsVariables.get(0);
+        if (isSingleVar && (!isFixedValueVar(singleVar) || eqn.constraint().kind() == LabelConstraint.EQUAL)) {
             // only a single component is a variable
-            refineVariableEquation((VarLabel)rhsVariables.get(0), eqn);
+            refineVariableEquation(singleVar, eqn);
         }
         else {
-            if (!allActivesAreMultiVarRHS()) {
+            if (!isSingleVar && !allActivesAreMultiVarRHS()) {
                 // some of the active equations have single variables
                 // on the RHS. Satisfy those first, to reduce the search 
                 // effort.
@@ -128,6 +131,12 @@ public class SolverGLB extends Solver {
             for (Iterator i = rhsVariables.iterator(); i.hasNext();) {
                 VarLabel comp = (VarLabel)i.next();
 
+                if (isFixedValueVar(comp) && eqn.constraint().kind() != LabelConstraint.EQUAL) {
+                    // this var label had it's value fixed when it's constraint
+                    // was added. Do not try to alter it's value.                   
+                    continue;
+                }
+                
                 refineVariableEquation(comp, eqn);
                 // check that the equation is now satisfied.
                 Label lhsbound = triggerTransforms(bounds().applyTo(eqn.lhs()), eqn.env());
