@@ -17,23 +17,27 @@ public interface Collection[label L] extends JifObject[L] {
     Iterator[L]{this} iterator();
 
     JifObject[L]{L}[]{L} toArray{L}();
+    JifObject[L]{L}const[]{L} toConstArray{L}();
 
-    boolean{L} add{L}(JifObject[L]{L} o):{L}
-        throws (ClassCastException{L}, IllegalArgumentException{L});
+    boolean{L} add{L}(JifObject[L]{L} o):{L} throws (ClassCastException{L}, IllegalArgumentException{L});
     boolean{L} remove{L}(JifObject[L]{L} o);
 
     boolean{L;c} containsAll(Collection[L]{L} c)
-        throws (NullPointerException{c});
+    throws (NullPointerException{c});
     boolean{L} addAll{L}(Collection[L]{L} c)
-        throws (ClassCastException{L}, IllegalArgumentException{L});
+    throws (ClassCastException{L}, IllegalArgumentException{L});
     boolean{L} removeAll{L}(Collection[L]{L} c);
     boolean{L} retainAll{L}(Collection[L]{L} c);
     void clear{L}();
-    
+
     // all collections must provide a way of accessing elements by index.
     // this allows clients to iterate over elements without the side-effects
     // required by iterators.
     JifObject[L]{L;index} get(int index):{L;index}
-       throws (IndexOutOfBoundsException{L;index});
-    
+    throws (IndexOutOfBoundsException{L;index});
+
+    // convenience methods that automatically convert Strings to JifStrings.
+    // Note: when keys are returned, they will be returned as JifString[L]s
+    boolean{L} add{L}(String{L} o):{L} throws (ClassCastException{L}, IllegalArgumentException{L});
+    boolean{L} remove{L}(String{L} o);
 }

@@ -58,7 +58,7 @@ public class ArrayList[label L]
                 elementData = ed;
             }
         }
-    }
+    }    
 
     /**
      * Returns the number of elements in this list.
