@@ -39,7 +39,7 @@ public class IntegProjectionPolicy_c extends Policy_c implements IntegPolicy {
         return label.isRuntimeRepresentable();
     }
 
-    public Policy simplify() {
+    protected Policy simplifyImpl() {
         return this;
     }
         

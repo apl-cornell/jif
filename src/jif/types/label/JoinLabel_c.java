@@ -3,11 +3,7 @@ package jif.types.label;
 import java.util.*;
 
 import jif.translate.LabelToJavaExpr;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.JifTypeSystem_c;
-import jif.types.LabelSubstitution;
-import jif.types.PathMap;
+import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
 import polyglot.types.SemanticException;
@@ -155,7 +151,22 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return Collections.unmodifiableCollection(components);
     }
 
+    public Object copy() {
+        JoinLabel_c l = (JoinLabel_c)super.copy();
+        l.normalized = null;
+        return l;
+    }
+
+    private Label normalized = null;
     public Label normalize() {
+        if (normalized == null) {
+            // memoize the result
+            normalized = normalizeImpl();
+        }
+        return normalized;
+    }
+    private Label normalizeImpl() {
+        
         if (components.size() == 1) {
             return (Label)components.iterator().next();
         }
@@ -163,7 +174,6 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         JifTypeSystem ts = (JifTypeSystem)typeSystem();
         PairLabel pl = null;
         boolean combinedPL = false;
-        Set nonPairLabels = new LinkedHashSet();
         for (Iterator iter = joinComponents().iterator(); iter.hasNext();) {
             Label lbl = (Label)iter.next();
             if (lbl instanceof PairLabel) {
@@ -178,13 +188,18 @@ public class JoinLabel_c extends Label_c implements JoinLabel
                                       pl.integPolicy().join(p.integPolicy()));                    
                 }
             }
-            else {
-                nonPairLabels.add(lbl);
-            }
         }
         if (combinedPL) {
-            nonPairLabels.add(pl);
-            return ts.joinLabel(position(), nonPairLabels);
+            Set comps = new LinkedHashSet();
+            comps.add(pl);
+            for (Iterator iter = joinComponents().iterator(); iter.hasNext();) {
+                Label lbl = (Label)iter.next();
+                if (!(lbl instanceof PairLabel)) {
+                    comps.add(lbl);
+                }
+            }
+            
+            return ts.joinLabel(position(), comps);
         }
         return this;
     }

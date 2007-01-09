@@ -106,7 +106,7 @@ public abstract class JoinPolicy_c extends Policy_c {
      * @return An equivalent label with fewer components by pulling out
      * less restrictive policies.
      */
-    public Policy simplify() {
+    protected Policy simplifyImpl() {
         if (joinComponents.isEmpty()) {
             return this;
         }

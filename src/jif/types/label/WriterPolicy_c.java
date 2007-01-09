@@ -49,7 +49,7 @@ public class WriterPolicy_c extends Policy_c implements WriterPolicy {
         return owner.isRuntimeRepresentable() && writer.isRuntimeRepresentable();
     }
 
-    public Policy simplify() {
+    protected Policy simplifyImpl() {
         return this;
     }
         

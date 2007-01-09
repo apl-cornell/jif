@@ -45,6 +45,12 @@ public abstract class Label_c extends TypeObject_c implements Label {
     public Label_c(JifTypeSystem ts, Position pos) {
         this(ts, pos, new CannotLabelToJavaExpr_c());
     }
+    public Object copy() {
+        Label_c l = (Label_c)super.copy();
+        l.variables = null;
+        l.simplified = null;
+        return l;
+    }
 
     public String description() {
         return description;
@@ -84,20 +90,6 @@ public abstract class Label_c extends TypeObject_c implements Label {
         return toJava.toJava(this, rw);
     }
 
-    //    /**
-    //     * By default, a label is enumerable
-    //     */
-    //    public boolean isEnumerable() {
-    //	return true;
-    //    }
-    //
-    /**
-     * By default, the components of a label is simply the label itself.
-     */
-//    public Collection components() {
-//        return Collections.singleton(this);
-//    }
-
     //
     /**
      * By default, a label is not Bottom
@@ -113,30 +105,6 @@ public abstract class Label_c extends TypeObject_c implements Label {
     public boolean isInvariant() {
         return !isCovariant();
     }
-
-//    /**
-//     * A label is a singleton if it only has a single component.
-//     */
-//    public boolean isSingleton() {
-//        return components().size() <= 1;
-//    }
-//
-//    /**
-//     * Return the single component.
-//     * 
-//     * @throws InternalCompilerError if this label is not a singleton.
-//     */
-//    public Label singletonComponent() {
-//        if (!isSingleton()) {
-//            throw new InternalCompilerError(
-//                    "Cannot get singleton component of a non-singleton label.");
-//        }
-//
-//        if (isBottom())
-//            return this;
-//        else
-//            return (Label)components().toArray()[0];
-//    }
     
     /**
      * Check if the label is disambiguated, without recursing into child labels.
@@ -181,8 +149,13 @@ public abstract class Label_c extends TypeObject_c implements Label {
 
     public abstract boolean equalsImpl(TypeObject t);
 
+    private Label simplified = null;
     public final Label simplify() {
-        return ((Label_c)this.normalize()).simplifyImpl();
+        // memoize the result
+        if (simplified == null) {
+            simplified = ((Label_c)this.normalize()).simplifyImpl();
+        }
+        return simplified;
     }
     protected Label simplifyImpl() {
         return this;

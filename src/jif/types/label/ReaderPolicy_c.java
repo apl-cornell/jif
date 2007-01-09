@@ -48,14 +48,7 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
         return owner.isRuntimeRepresentable() && reader.isRuntimeRepresentable();
     }
     
-    public Policy simplify() {
-//        if (reader().isBottomPrincipal()) {
-//            if (owner().isBottomPrincipal()) return this;
-//            // of the form o:_, can simplify it to _:_.
-//            System.out.println("Simplifying " + this + " at " + this.position());
-//            return ((JifTypeSystem)typeSystem()).bottomConfPolicy(this.position());
-//        }
-
+    protected Policy simplifyImpl() {
         return this;
     }
         

@@ -33,7 +33,7 @@ public class ConfProjectionPolicy_c extends Policy_c implements ConfPolicy {
         return label.isRuntimeRepresentable();
     }
 
-    public Policy simplify() {
+    protected Policy simplifyImpl() {
         return this;
     }
         
