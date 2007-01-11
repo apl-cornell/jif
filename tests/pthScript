@@ -79,6 +79,7 @@ jif.ExtensionInfo  "-classpath ../classes:../lib-classes:../lib/jif.jar:../lib/j
 	Array14.jif (Semantic, "not a subtype");
 	Array15.jif ;
 	Array16.jif ;
+	Array17.jif ;
 	ArrayBaseLabel01.jif (Semantic, "base type of arrays must be equivalent");
 	ArrayLeak.jif (Semantic, "not a subtype") ;
 #Removed the problematics String.getBytes method from the String signature
@@ -201,6 +202,7 @@ jif.ExtensionInfo  "-classpath ../classes:../lib-classes:../lib/jif.jar:../lib/j
 	DynPrin11.jif (Semantic, "actual argument is more restrictive");
 	DynPrin12.jif ;
 	DynPrin13.jif ;
+	DynPrin14.jif ;
 	DynLabel1.jif ;
 	DynLabel2.jif (Semantic, "Non-final.*access path"), (Semantic, "Non-final.*access path");
 	DynLabel3.jif (Semantic, "Field.*is not final"), (Semantic, "Field.*is not final");
@@ -212,6 +214,7 @@ jif.ExtensionInfo  "-classpath ../classes:../lib-classes:../lib/jif.jar:../lib/j
 	DynLabel9.jif ;
 	DynLabel10.jif ;
 	DynLabel11.jif ;
+	DynLabel12.jif ;
 	EmptyList.jif List.jif;
 	EmptyList2.jif ;
 	Exc.jif ;
