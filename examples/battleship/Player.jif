@@ -129,15 +129,12 @@ class Player[principal P, principal O] authority (P) {
 	}
 
 	// update nextQuery.
-	try {
-	    boolean direction = ((c.x + c.y)%2 == 0);
-	    int newX = c.x + (direction?1:-1);
-	    int newY = c.y + (direction?-1:1);
-	    if (newX < 0) newX = 0;
-	    if (newY < 0) newY = 0;
-	    this.nextQuery = new Coordinate[{P->*; P<-*}](newX, newY);
-	}
-	catch (ArithmeticException ignored) {}
+	boolean direction = ((c.x + c.y)%2 == 0);
+	int newX = c.x + (direction?1:-1);
+	int newY = c.y + (direction?-1:1);
+	if (newX < 0) newX = 0;
+	if (newY < 0) newY = 0;
+	this.nextQuery = new Coordinate[{P->*; P<-*}](newX, newY);
 
 	// we now have our secret query c, which needs to be declassified.
 	Coordinate[{P<-*}] d = new Coordinate[{P<-*}](
