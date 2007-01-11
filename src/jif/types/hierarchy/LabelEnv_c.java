@@ -436,10 +436,10 @@ public class LabelEnv_c implements LabelEnv
     private static final int ASSERTION_USE_BOUND = 1;
 
     /**
-     * Bound the number different assertions that can be used; this bounds
+     * Bound the total number of assertion uses; this bounds
      * the search in leqImpl.
      */
-    private static final int ASSERTION_TOTAL_BOUND = 6;
+    private static final int ASSERTION_TOTAL_BOUND = 6 * ASSERTION_USE_BOUND;
         
     private boolean leqApplyAssertions(Label L1, Label L2, SearchState_c state, boolean beSmart) {
         AssertionUseCount auc = state.auc;
@@ -453,8 +453,7 @@ public class LabelEnv_c implements LabelEnv
             if (auc.get(c) >= ASSERTION_USE_BOUND) {
                 continue;
             }
-            AssertionUseCount newAUC = new AssertionUseCount(auc);
-            newAUC.use(c);
+            AssertionUseCount newAUC = new AssertionUseCount(auc, c);
             SearchState newState = new SearchState_c(newAUC, state, null);
 
             Label cLHS = c.lhs();
@@ -809,30 +808,40 @@ public class LabelEnv_c implements LabelEnv
      * during the search to solve label inequality.
      */
     private static class AssertionUseCount {
-        private final Map tally;
+        private final AssertionUseCount previousAUC;
+        private final Assertion use;
+        private final int size;
         AssertionUseCount() {
-            this.tally = new HashMap();
+            this.use = null;
+            this.previousAUC = null;
+            this.size = 0;
         }
-        AssertionUseCount(AssertionUseCount auc) {
-            this.tally = new HashMap(auc.tally);
+        AssertionUseCount(AssertionUseCount auc, Assertion a) {
+            this.use = a;
+            this.previousAUC = auc;
+            int s = 0;
+            if (previousAUC != null) {
+                s = previousAUC.size();
+            }
+            if (use != null) s++;
+            this.size = s;
         }
         
         public boolean allZero() {
-            return tally.isEmpty();
+            return size() == 0;
         }
         public int get(Assertion a) {
-            Integer i = (Integer)tally.get(a);
-            return i==null?0:i.intValue();
-        }
-        public void use(Assertion a) {
-            tally.put(a, new Integer(get(a) + 1)); 
+            int prev = 0;
+            if (previousAUC != null) prev = previousAUC.get(a);
+            if (use != null && use.equals(a)) return 1 + prev;
+            return prev;
         }
         public int size() {
-            return tally.size();
+            return size;
         }
-        public String toString() {
-            return tally.toString();
-        }
+//        public String toString() {
+//            return tally.toString();
+//        }
     }
     protected SearchState freshSearchState() {
         return new SearchState_c(null, null, null);
