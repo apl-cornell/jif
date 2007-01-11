@@ -49,7 +49,7 @@ public abstract class LabelSubstitution {
     }
     private void pushLabel(Object l) {
         if (stack == null) {
-            stack = new ArrayList();
+            stack = new ArrayList(5);
         }
         stack.add(l);
     }

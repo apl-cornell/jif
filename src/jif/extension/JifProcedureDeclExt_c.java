@@ -34,22 +34,22 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * It mutates the local context (to the A'' in the rule).
      */
     protected Label checkEnforceSignature(JifProcedureInstance mi, LabelChecker lc)
-	throws SemanticException
+    throws SemanticException
     {
-	if (Report.should_report(jif_verbose, 2))
-	    Report.report(2, "Adding constraints for header of " + mi);
+        if (Report.should_report(jif_verbose, 2))
+            Report.report(2, "Adding constraints for header of " + mi);
 
-      	JifContext A = lc.jifContext();
-        
+        JifContext A = lc.jifContext();
+
         // Set the "auth" variable.
-	Set newAuth = constrainAuth(mi, A);
+        Set newAuth = constrainAuth(mi, A);
 
-	for (Iterator iter = newAuth.iterator(); iter.hasNext(); ) {
-	    Principal p = (Principal) iter.next();
-	    // Check that there is a p' in the old "auth" set such that
-	    // p' actsFor p.
-	    checkActsForAuthority(p, A);
-	}
+        for (Iterator iter = newAuth.iterator(); iter.hasNext(); ) {
+            Principal p = (Principal) iter.next();
+            // Check that there is a p' in the old "auth" set such that
+            // p' actsFor p.
+            checkActsForAuthority(p, A);
+        }
 
         addCallers(mi, A, newAuth);
         A.setAuthority(newAuth);       
@@ -60,7 +60,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         // and set and constrain the inital PC
         Label Li = checkAutoEndorseConstrainPC(mi, lc);
 
-	return Li;
+        return Li;
     }
 
     protected Label checkAutoEndorseConstrainPC(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
@@ -88,24 +88,24 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
         A.setPc(callerPcLabel); 
         Label initialPCBound = Li;
-        
+
         if (!endorseTo.isTop()) {
             // check that there is sufficient authority to endorse to 
             // the label endorseTo.
             JifEndorseExprExt.checkOneDimen(lc, A, Li, endorseTo, mi.position(), false, true);
             JifEndorseExprExt.checkAuth(lc, A, Li, endorseTo, mi.position(), false, true);            
-            
+
             // the initial pc bound is the endorseTo label
             initialPCBound = endorseTo;
-                        
+
             // add a restriction on the "callerPC" label. It is less
             // than the endorseTo label
             A.addAssertionLE(callerPcLabel, endorseTo);
         }
-        
+
         A.setCurrentCodePCBound(initialPCBound);        
         return initialPCBound;
-        
+
     }
 
     /**
@@ -122,14 +122,14 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
             if (c instanceof AuthConstraint) {
                 AuthConstraint ac = (AuthConstraint) c;
 
-		for (Iterator i = ac.principals().iterator(); i.hasNext(); ) {
-		    Principal pi = (Principal) i.next();
-		    newAuth.add(pi);
-		}
+                for (Iterator i = ac.principals().iterator(); i.hasNext(); ) {
+                    Principal pi = (Principal) i.next();
+                    newAuth.add(pi);
+                }
             }
         }
 
-	return newAuth;
+        return newAuth;
     }
 
     /** Adds the caller's authorities into <code>auth</code> */
@@ -140,11 +140,11 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
             if (c instanceof CallerConstraint) {
                 CallerConstraint cc = (CallerConstraint) c;
 
-		for (Iterator i = cc.principals().iterator(); i.hasNext(); ) {
-		    Principal pi = (Principal) i.next();
-		    // auth.add(A.instantiate(pi));
-		    auth.add(pi);
-		}
+                for (Iterator i = cc.principals().iterator(); i.hasNext(); ) {
+                    Principal pi = (Principal) i.next();
+                    // auth.add(A.instantiate(pi));
+                    auth.add(pi);
+                }
             }
         }
     }
@@ -153,7 +153,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * Check that there is a p' in the old "auth" set such that p' actsFor p.
      */
     protected void checkActsForAuthority(Principal p, JifContext A)
-	throws SemanticException
+    throws SemanticException
     {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         Principal authority = ts.conjunctivePrincipal(null, A.authority()); 
@@ -161,17 +161,17 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
             return;
         }
 
-	String codeName = A.currentCode().toString();
+        String codeName = A.currentCode().toString();
         if (A.currentCode() instanceof JifProcedureInstance) {
             codeName = ((JifProcedureInstance)A.currentCode()).debugString();
         }
-	throw new SemanticDetailedException(
-	    "The authority of the class " + A.currentClass().name() + 
-            " is insufficient to act for principal " + p + ".", 
-            "The " + codeName + " states that it has the authority of the " +
-            "principal " + p + ". However, the conjunction of the authority" +
-            " set of the class is insufficient to act for " + p + ".",
-            A.currentCode().position());
+        throw new SemanticDetailedException(
+                                            "The authority of the class " + A.currentClass().name() + 
+                                            " is insufficient to act for principal " + p + ".", 
+                                            "The " + codeName + " states that it has the authority of the " +
+                                            "principal " + p + ". However, the conjunction of the authority" +
+                                            " set of the class is insufficient to act for " + p + ".",
+                                            A.currentCode().position());
     }
 
     /**
@@ -180,15 +180,15 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * body of the method.
      */
     protected static void constrainLabelEnv(JifProcedureInstance mi, JifContext A, CallHelper ch)
-	throws SemanticException
+    throws SemanticException
     {
         for (Iterator i = mi.constraints().iterator(); i.hasNext(); ) {
             Assertion c = (Assertion) i.next();
 
             if (c instanceof ActsForConstraint) {
                 ActsForConstraint ac = (ActsForConstraint) c;
-		//A.addActsFor(A.instantiate(ac.actor()),
-		//	     A.instantiate(ac.granter()));
+                //A.addActsFor(A.instantiate(ac.actor()),
+                //	     A.instantiate(ac.granter()));
                 Principal actor = ac.actor();
                 Principal granter = ac.granter();
                 if (ch != null) {
@@ -202,7 +202,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                 else {
                     A.addActsFor(actor, granter);
                 }
-	    }
+            }
             if (c instanceof LabelLeAssertion) {
                 LabelLeAssertion lla = (LabelLeAssertion)c;
                 Label lhs = lla.lhs();
@@ -213,7 +213,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                 }
                 A.addAssertionLE(lhs, rhs); 
             }
-	}
+        }
     }
 
     /**
@@ -228,25 +228,25 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * the declared labels in the methods "throws" clause.
      */
     protected void addReturnConstraints(Label Li, PathMap X,
-	JifProcedureInstance mi, LabelChecker lc, final Type returnType) throws SemanticException
-    {
-	if (Report.should_report(jif_verbose, 2))
-	    Report.report(2, "Adding constraints for result of " + mi);
+            JifProcedureInstance mi, LabelChecker lc, final Type returnType) throws SemanticException
+            {
+        if (Report.should_report(jif_verbose, 2))
+            Report.report(2, "Adding constraints for result of " + mi);
 
-	ProcedureDecl mn = (ProcedureDecl) node();
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
+        ProcedureDecl mn = (ProcedureDecl) node();
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
 
-	// Add the return termination constraints.
-	
+        // Add the return termination constraints.
+
 
         // fold the call site pc into the return label
-	Label Lr = lc.upperBound(mi.returnLabel(), ts.callSitePCLabel(mi)); 
+        Label Lr = lc.upperBound(mi.returnLabel(), ts.callSitePCLabel(mi)); 
 
-	        
+
         //Hack: If no other paths, the procedure must return. Therefore,
         //X.n is not taken, and X.r doesn't contain any information. 
-	//TODO: implement a more precise single-path rule.
+        //TODO: implement a more precise single-path rule.
         if (! (X.N() instanceof NotTaken)) {
             boolean singlePath = true;
             for (Iterator iter = X.paths().iterator(); iter.hasNext(); ) {
@@ -261,108 +261,108 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
             }
         }            
 
-	lc.constrain(new LabelConstraint(new NamedLabel("X.n",
+        lc.constrain(new LabelConstraint(new NamedLabel("X.n",
                                                         "information that may be gained by the body terminating normally",
                                                         X.N()).
-                                                   join(lc,
-                                                        "X.r",
-                                                        "information that may be gained by exiting the body with a return statement",
-                                                        X.R()),
-                                         LabelConstraint.LEQ,
-                                         new NamedLabel("Lr", 
-                                                        "return label of the method",
-                                                        Lr),
-                                         A.labelEnv(),
-                                         mn.position())
-                     {
-                         public String msg() { 
-                             return "The non-exception termination of the " +
-                                    "method body may reveal more information " +
-                                    "than is declared by the method return label.";
-                         }
-                         public String detailMsg() { 
-                             return "The method return label, " + namedRhs() + 
-                                    ", is an upper bound on how much " +
-                                    "information can be gained by observing " +
-                                    "that this method terminates normally " +
-                                    "(i.e., terminates without throwing " +
-                                    "an exception). The method body may " +
-                                    "reveal more information than this. The " +
-                                    "return label of a method is declared " +
-                                    "after the variables, e.g. " +
-                                    "\"void m(int i):{" + namedRhs() + "}\".";
-                         }
-                         public String technicalMsg() {
-                             return "the return(end) label is less restrict than " +
-                                    namedLhs() + " of the body.";
-                         }
-                     }
+                                                        join(lc,
+                                                             "X.r",
+                                                             "information that may be gained by exiting the body with a return statement",
+                                                             X.R()),
+                                                             LabelConstraint.LEQ,
+                                                             new NamedLabel("Lr", 
+                                                                            "return label of the method",
+                                                                            Lr),
+                                                                            A.labelEnv(),
+                                                                            mn.position())
+        {
+            public String msg() { 
+                return "The non-exception termination of the " +
+                "method body may reveal more information " +
+                "than is declared by the method return label.";
+            }
+            public String detailMsg() { 
+                return "The method return label, " + namedRhs() + 
+                ", is an upper bound on how much " +
+                "information can be gained by observing " +
+                "that this method terminates normally " +
+                "(i.e., terminates without throwing " +
+                "an exception). The method body may " +
+                "reveal more information than this. The " +
+                "return label of a method is declared " +
+                "after the variables, e.g. " +
+                "\"void m(int i):{" + namedRhs() + "}\".";
+            }
+            public String technicalMsg() {
+                return "the return(end) label is less restrict than " +
+                namedLhs() + " of the body.";
+            }
+        }
         );
 
-	// return value constraints are implemented at the "return" statement, in order
+        // return value constraints are implemented at the "return" statement, in order
         // to make use of the (more precise) label environment there.
 
-        
-	// Add the exception path constraints.
-	for (Iterator iter = X.paths().iterator(); iter.hasNext(); ) {
-	    Path path = (Path) iter.next();
 
-	    if (! (path instanceof ExceptionPath)) {
-		continue;
-	    }
+        // Add the exception path constraints.
+        for (Iterator iter = X.paths().iterator(); iter.hasNext(); ) {
+            Path path = (Path) iter.next();
 
-	    ExceptionPath ep = (ExceptionPath) path;
+            if (! (path instanceof ExceptionPath)) {
+                continue;
+            }
 
-	    Label pathLabel = X.get(ep);
+            ExceptionPath ep = (ExceptionPath) path;
 
-	    if (pathLabel instanceof NotTaken)
-	        throw new InternalCompilerError(
-		    "An exception path cannot be not taken");
+            Label pathLabel = X.get(ep);
 
-	    Type pathType = ep.exception();
+            if (pathLabel instanceof NotTaken)
+                throw new InternalCompilerError(
+                "An exception path cannot be not taken");
+
+            Type pathType = ep.exception();
             NamedLabel pathNamedLabel = new NamedLabel("exc_"+pathType.toClass().name(), 
-                         "upper bound on information that may be gained " +
-                         "by observing the method throwing the exception " + pathType.toClass().name(),
-                         pathLabel);
-    
+                                                       "upper bound on information that may be gained " +
+                                                       "by observing the method throwing the exception " + pathType.toClass().name(),
+                                                       pathLabel);
+
             for (Iterator j = mi.throwTypes().iterator(); j.hasNext(); ) {
-		final Type tj = (Type) j.next();
-		Label Lj = ts.labelOfType(tj, Lr);
-		
+                final Type tj = (Type) j.next();
+                Label Lj = ts.labelOfType(tj, Lr);
+
                 // fold the call site pc into the return label
                 Lj = lc.upperBound(Lj, ts.callSitePCLabel(mi));
 
-		if (ts.isImplicitCastValid(pathType, tj)) {
-		    subtypeChecker.addSubtypeConstraints(lc, mn.position(),
-			                                 tj, pathType);
-		    if (Report.should_report(jif_verbose, 4))
-			Report.report(4,
-			">>> X[C'] <= Lj (for exception " + tj + ")");
+                if (ts.isImplicitCastValid(pathType, tj)) {
+                    subtypeChecker.addSubtypeConstraints(lc, mn.position(),
+                                                         tj, pathType);
+                    if (Report.should_report(jif_verbose, 4))
+                        Report.report(4,
+                                      ">>> X[C'] <= Lj (for exception " + tj + ")");
 
                     lc.constrain(new LabelConstraint(pathNamedLabel,
                                                      LabelConstraint.LEQ,
-                                                      new NamedLabel("decl_exc_"+tj.toClass().name(),
-                       "declared upper bound on information that may be " +
-                       "gained by observing the method throwing the exception " + tj.toClass().name(),
-                                                                     Lj),
-                                                      A.labelEnv(),
-                                                      mi.position())
-                                     {
-                                     public String msg() { 
-                                         return "More information may be gained " + 
-                                           "by observing a " + tj.toClass().fullName() +
-                                           " exception than is permitted by the " +
-                                           "method/coonstructor signature";
-                                     }
-                                     public String technicalMsg() {
-                                         return "the path of <" + tj + "> may leak information " +
-                                                "more restrictive than the join of the declared " +
-                                                "exception label and the return(end) label";
-                                     }
-                                 }
-                        );
-		}
-	    }
-	}
-    }    
+                                                     new NamedLabel("decl_exc_"+tj.toClass().name(),
+                                                                    "declared upper bound on information that may be " +
+                                                                    "gained by observing the method throwing the exception " + tj.toClass().name(),
+                                                                    Lj),
+                                                                    A.labelEnv(),
+                                                                    mi.position())
+                    {
+                        public String msg() { 
+                            return "More information may be gained " + 
+                            "by observing a " + tj.toClass().fullName() +
+                            " exception than is permitted by the " +
+                            "method/coonstructor signature";
+                        }
+                        public String technicalMsg() {
+                            return "the path of <" + tj + "> may leak information " +
+                            "more restrictive than the join of the declared " +
+                            "exception label and the return(end) label";
+                        }
+                    }
+                    );
+                }
+            }
+        }
+            }    
 }

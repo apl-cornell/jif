@@ -25,8 +25,8 @@ public abstract class Amb
     public TypeNode toType() throws Exception { parser.die(pos); return null; }
     public TypeNode toUnlabeledType() throws Exception { parser.die(pos); return null; }
     public TypeNode toClassType() throws Exception { parser.die(pos); return null; }
-    public Expr toNewArray(Position p) throws Exception { parser.die(pos); return null; }
-    public Expr toNewArrayPrefix(Position p) throws Exception { parser.die(pos); return null; }
+    public Expr toNewArray(Position p, Integer extraDims) throws Exception { parser.die(pos); return null; }
+    public Expr toNewArrayPrefix(Position p, Integer extraDims) throws Exception { parser.die(pos); return null; }
     public String toIdentifier() throws Exception { parser.die(pos); return null; }
     public String toName() throws Exception { parser.die(pos); return null; }
 }

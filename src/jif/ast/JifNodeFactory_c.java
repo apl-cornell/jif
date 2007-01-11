@@ -65,8 +65,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public AmbNewArray AmbNewArray(Position pos, TypeNode baseType, Object expr, List dims) {
-        AmbNewArray n = new AmbNewArray_c(pos, baseType, expr, dims);
+    public AmbNewArray AmbNewArray(Position pos, TypeNode baseType, Object expr, List dims, int addDims) {
+        AmbNewArray n = new AmbNewArray_c(pos, baseType, expr, dims, addDims);
         n = (AmbNewArray)n.ext(jifExtFactory().extAmbNewArray());
         n = (AmbNewArray)n.del(delFactory().delAmbExpr());
         return n;

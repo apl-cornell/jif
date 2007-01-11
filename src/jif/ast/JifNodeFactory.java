@@ -16,7 +16,7 @@ import polyglot.util.Position;
 public interface JifNodeFactory extends NodeFactory {
     InstTypeNode InstTypeNode(Position pos, TypeNode type, List params);
     LabeledTypeNode LabeledTypeNode(Position pos, TypeNode type, LabelNode label);
-    AmbNewArray AmbNewArray(Position pos, TypeNode base, Object expr, List dims);
+    AmbNewArray AmbNewArray(Position pos, TypeNode base, Object expr, List dims, int addDims);
     AmbParamTypeOrAccess AmbParamTypeOrAccess(Position pos, Receiver base, Object expr);
     JoinLabelNode JoinLabelNode(Position pos, List components);
     MeetLabelNode MeetLabelNode(Position pos, List components);

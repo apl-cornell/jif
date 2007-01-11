@@ -59,8 +59,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
         // Equate the variable label with the declared label.
         Label L = li.label();
         Type t = decl.declType();
-        if (L instanceof VarLabel) {
-            
+        if (L instanceof VarLabel) {            
             if (ts.isLabeled(t)) {
                 Label declaredLabel = ts.labelOfType(t);
                 

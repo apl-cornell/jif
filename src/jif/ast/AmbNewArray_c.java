@@ -33,12 +33,14 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
     /** The ambiguous expr. May be a parameter or an array dimension. */
     protected Object expr;
     protected List dims;
+    protected int addDims;
 
-    public AmbNewArray_c(Position pos, TypeNode baseType, Object expr, List dims) {
-	super(pos);
-	this.baseType = baseType;
-	this.expr = expr;
-	this.dims = TypedList.copyAndCheck(dims, Expr.class, true);
+    public AmbNewArray_c(Position pos, TypeNode baseType, Object expr, List dims, int addDims) {
+        super(pos);
+        this.baseType = baseType;
+        this.expr = expr;
+        this.dims = TypedList.copyAndCheck(dims, Expr.class, true);
+        this.addDims = addDims;
     }
 
     public boolean isDisambiguated() {
@@ -47,51 +49,51 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 
     /** Gets the base type.     */
     public TypeNode baseType() {
-	return this.baseType;
+        return this.baseType;
     }
 
     /** Returns a copy of this node with <code>baseType</code> updated. */
     public AmbNewArray baseType(TypeNode baseType) {
-	AmbNewArray_c n = (AmbNewArray_c) copy();
-	n.baseType = baseType;
-	return n;
+        AmbNewArray_c n = (AmbNewArray_c) copy();
+        n.baseType = baseType;
+        return n;
     }
 
     /** Gets the expr. */
     public Object expr() {
-	return this.expr;
+        return this.expr;
     }
 
     /** Returns a copy of this node with <code>name</code> updated. */
-//    public AmbNewArray expr(Expr expr) {
-//	AmbNewArray_c n = (AmbNewArray_c) copy();
-//	n.expr = expr;
-//	return n;
-//    }
+//  public AmbNewArray expr(Expr expr) {
+//  AmbNewArray_c n = (AmbNewArray_c) copy();
+//  n.expr = expr;
+//  return n;
+//  }
 
     /** Gets the additional dimensions. */
     public List dims() {
-	return this.dims;
+        return this.dims;
     }
 
     /** Returns a copy of this node with <code>dims</code> updated. */
     public AmbNewArray dims(List dims) {
-	AmbNewArray_c n = (AmbNewArray_c) copy();
-	n.dims = TypedList.copyAndCheck(dims, Expr.class, true);
-	return n;
+        AmbNewArray_c n = (AmbNewArray_c) copy();
+        n.dims = TypedList.copyAndCheck(dims, Expr.class, true);
+        return n;
     }
 
     /** Reconstructs the node. */
     protected AmbNewArray_c reconstruct(TypeNode baseType, Object expr, List dims) {
-	if (baseType != this.baseType || expr != this.expr || ! CollectionUtil.equals(dims, this.dims)) {
-	    AmbNewArray_c n = (AmbNewArray_c) copy();
-	    n.baseType = baseType;
-	    n.expr = expr;
-	    n.dims = TypedList.copyAndCheck(dims, Expr.class, true);
-	    return n;
-	}
+        if (baseType != this.baseType || expr != this.expr || ! CollectionUtil.equals(dims, this.dims)) {
+            AmbNewArray_c n = (AmbNewArray_c) copy();
+            n.baseType = baseType;
+            n.expr = expr;
+            n.dims = TypedList.copyAndCheck(dims, Expr.class, true);
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /**
@@ -107,53 +109,53 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 
     /** Visits the children of this node. */
     public Node visitChildren(NodeVisitor v) {
-	TypeNode baseType = (TypeNode) visitChild(this.baseType, v);
-	List dims = visitList(this.dims, v);
-	Object expr = this.expr;
-	if (expr instanceof Expr) {
-	    expr = visitChild((Expr)expr, v);
-	}
-	return reconstruct(baseType, expr, dims);
+        TypeNode baseType = (TypeNode) visitChild(this.baseType, v);
+        List dims = visitList(this.dims, v);
+        Object expr = this.expr;
+        if (expr instanceof Expr) {
+            expr = visitChild((Expr)expr, v);
+        }
+        return reconstruct(baseType, expr, dims);
     }
 
     public String toString() {
-	return "new " + baseType + "[" + expr + "]...{amb}";
+        return "new " + baseType + "[" + expr + "]...{amb}";
     }
 
     /** Disambiguates
      */
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-	if (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr)) {
+        if (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr)) {
             ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
             return this;
-	}
+        }
+        
+        JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
+        JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
-	JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
-	JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
-	
-	if (dims.isEmpty()) {
-	    throw new InternalCompilerError(position(),
-		"Cannot disambiguate ambiguous new array with no " +
-		"dimension expressions.");
-	}
+        if (dims.isEmpty()) {
+            throw new InternalCompilerError(position(),
+                                            "Cannot disambiguate ambiguous new array with no " +
+            "dimension expressions.");
+        }
 
-	Type t = baseType.type();
+        Type t = baseType.type();
 
-	if (t instanceof JifPolyType) {
-	    JifPolyType pt = (JifPolyType) t;
+        if (t instanceof JifPolyType) {
+            JifPolyType pt = (JifPolyType) t;
 
-	    if (pt.params().size() > 1) {
-		//this node shouldn't be ambiguous.
-		throw new SemanticDetailedException(
-		          "Not enough parameters for parameterized type " + pt + ".",
-		          "The type " + pt + " is a parameterized type with " +
-		          pt.params().size() + " parameters. So, to instantiate this type, " +
-		          "you must supply " + pt.params().size() + "",
-		          this.position());
-	    }
-	    else if (pt.params().size() == 1) {
-		// "name" is a parameter.  Instantiate the base type with the
-		// parameter and use it as the new base type.
+            if (pt.params().size() > 1) {
+                //this node shouldn't be ambiguous.
+                throw new SemanticDetailedException(
+                                                    "Not enough parameters for parameterized type " + pt + ".",
+                                                    "The type " + pt + " is a parameterized type with " +
+                                                    pt.params().size() + " parameters. So, to instantiate this type, " +
+                                                    "you must supply " + pt.params().size() + "",
+                                                    this.position());
+            }
+            else if (pt.params().size() == 1) {
+                // "name" is a parameter.  Instantiate the base type with the
+                // parameter and use it as the new base type.
                 ParamNode pn;
                 ParamInstance pi = (ParamInstance)pt.params().get(0);
                 if (expr instanceof Expr) {
@@ -165,7 +167,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 
                 pn = (ParamNode) pn.disambiguate(ar);
 
-		List l = new LinkedList();
+                List l = new LinkedList();
                 if (!pn.isDisambiguated()) {
                     // the instance is not yet ready
                     ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
@@ -174,32 +176,33 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 
                 l.add(pn.parameter());
 
-		Type base = ts.instantiate(baseType.position(),
+                Type base = ts.instantiate(baseType.position(),
                                            pt.instantiatedFrom(), l);
 
-		return nf.NewArray(position(),
-			           nf.CanonicalTypeNode(baseType.position(),
-				                        base),
-				   dims);
-	    }
-	}
+                return nf.NewArray(position(),
+                                   nf.CanonicalTypeNode(baseType.position(),
+                                                        base),
+                                   dims,
+                                   addDims);
+            }
+        }
 
-	// "name" is an expression.  Prepend it to the list of dimensions.
-	Expr e;
-	if (expr instanceof Expr) {
-	    e = (Expr) ((Expr)expr).visit(ar);
-	}
-	else {
-	    e = nf.AmbExpr(position(), (String)expr);
-	    e = (Expr) e.visit(ar);
-	}
+        // "name" is an expression.  Prepend it to the list of dimensions.
+        Expr e;
+        if (expr instanceof Expr) {
+            e = (Expr) ((Expr)expr).visit(ar);
+        }
+        else {
+            e = nf.AmbExpr(position(), (String)expr);
+            e = (Expr) e.visit(ar);
+        }
 
 
-	List l = new LinkedList();
-	l.add(e);
-	l.addAll(dims);
+        List l = new LinkedList();
+        l.add(e);
+        l.addAll(dims);
 
-	return nf.NewArray(position(), baseType, dims);
+        return nf.NewArray(position(), baseType, l, addDims);
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

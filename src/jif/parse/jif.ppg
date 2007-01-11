@@ -925,8 +925,8 @@ extend primary ::=
             {: RESULT = parser.nf.NewLabel(parser.pos(n, a), a); :}
     |   NEW:n PRINCIPAL LPAREN principal_disjunctive:a RPAREN:z
             {: RESULT = parser.nf.PrincipalExpr(parser.pos(n, z), a); :}
-    |   NEW:n objtype_or_expr:a
-            {: RESULT = a.toNewArray(parser.pos(n, a)); :}
+    |   NEW:n objtype_or_expr:a dims_opt:b
+            {: RESULT = a.toNewArray(parser.pos(n, a), b); :}
     ;
 extend primary_no_new_array ::=
         primary_no_array:a
