@@ -18,7 +18,7 @@ import polyglot.util.TypedList;
 /** An implementation of the <code>JifConstructorInstance</code> interface. 
  */
 public class JifConstructorInstance_c extends ConstructorInstance_c
-				     implements JifConstructorInstance
+implements JifConstructorInstance
 {
     protected Label pcBound;
     protected Label returnLabel;
@@ -27,43 +27,43 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
     protected boolean isDefaultReturnLabel;
 
     public JifConstructorInstance_c(JifTypeSystem ts, Position pos,
-	    ClassType container, Flags flags,
-	    Label pcBound, boolean isDefaultPCBound, Label returnLabel, 
+            ClassType container, Flags flags,
+            Label pcBound, boolean isDefaultPCBound, Label returnLabel, 
             boolean isDefaultReturnLabel, List formalTypes, List formalArgLabels,
-	    List excTypes, List constraints) {
+            List excTypes, List constraints) {
 
-	super(ts, pos, container, flags, formalTypes, excTypes);
-	this.pcBound = pcBound;
-	this.returnLabel = returnLabel;
-	this.constraints = TypedList.copyAndCheck(constraints, Assertion.class, true);
+        super(ts, pos, container, flags, formalTypes, excTypes);
+        this.pcBound = pcBound;
+        this.returnLabel = returnLabel;
+        this.constraints = TypedList.copyAndCheck(constraints, Assertion.class, true);
 
-	this.pcBound = pcBound;
+        this.pcBound = pcBound;
         this.isDefaultPCBound = isDefaultPCBound;
-	this.returnLabel = returnLabel;
+        this.returnLabel = returnLabel;
         this.isDefaultReturnLabel = isDefaultReturnLabel;
-	this.throwTypes = TypedList.copyAndCheck(throwTypes, 
-					       Type.class, 
-					       true);
-	this.formalTypes = TypedList.copyAndCheck(formalTypes, 
-					       Type.class, 
-					       true);
+        this.throwTypes = TypedList.copyAndCheck(throwTypes, 
+                                                 Type.class, 
+                                                 true);
+        this.formalTypes = TypedList.copyAndCheck(formalTypes, 
+                                                  Type.class, 
+                                                  true);
     }
 
 
     public Label pcBound() {
-	return pcBound;
+        return pcBound;
     }
 
     public Label externalPC() {
-	return pcBound;
+        return pcBound;
     }
 
     public Label returnLabel() {
-	return returnLabel;
+        return returnLabel;
     }
-    
+
     public void setReturnLabel(Label returnLabel, boolean isDefault) {
-	this.returnLabel = returnLabel;
+        this.returnLabel = returnLabel;
         this.isDefaultReturnLabel = isDefault;
     }
 
@@ -72,8 +72,8 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
     }
 
     public void  setPCBound(Label pcBound, boolean isDefault) {
-	this.pcBound = pcBound;
-	this.isDefaultPCBound = isDefault;
+        this.pcBound = pcBound;
+        this.isDefaultPCBound = isDefault;
     }
 
     public boolean isDefaultPCBound() {
@@ -81,11 +81,11 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
     }
 
     public List constraints() {
-	return constraints;
+        return constraints;
     }
 
     public void setConstraints(List constraints) {
-	this.constraints = TypedList.copyAndCheck(constraints, Assertion.class, true);
+        this.constraints = TypedList.copyAndCheck(constraints, Assertion.class, true);
     }
 
     public boolean isCanonical() {
@@ -96,7 +96,7 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
                 && formalTypes != null)) {
             return false;
         }
-        
+
         JifTypeSystem jts = (JifTypeSystem)typeSystem();
         // also need to make sure that every formal type is labeled with an arg label
         for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
@@ -105,30 +105,30 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
         }    
         return true;
     }
-    
+
     public void subst(VarMap bounds) {
-	if (this.pcBound != null) 
-	    this.pcBound = bounds.applyTo(pcBound);
-	
-	if (this.returnLabel != null) 
-	    this.returnLabel = bounds.applyTo(returnLabel);
-	
-	List formalTypes = new LinkedList();
-	for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
-	    Type t = (Type) i.next();
-	    formalTypes.add(bounds.applyTo(t));
-	}
-	this.formalTypes(formalTypes);
-	
+        if (this.pcBound != null) 
+            this.pcBound = bounds.applyTo(pcBound);
+
+        if (this.returnLabel != null) 
+            this.returnLabel = bounds.applyTo(returnLabel);
+
+        List formalTypes = new LinkedList();
+        for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
+            Type t = (Type) i.next();
+            formalTypes.add(bounds.applyTo(t));
+        }
+        this.setFormalTypes(formalTypes);
+
         List throwTypes = new LinkedList();
         for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
             Type t = (Type) i.next();
             throwTypes.add(bounds.applyTo(t));
         }
-        
-        this.throwTypes(throwTypes);
+
+        this.setThrowTypes(throwTypes);
     }    
- 
+
     public void subst(LabelSubstitution subst) throws SemanticException {
         TypeSubstitutor tsbs = new TypeSubstitutor(subst);
         setPCBound(pcBound().subst(subst), isDefaultPCBound());
@@ -147,7 +147,7 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
             throwTypes.add(tsbs.rewriteType(t));
         }
         this.setThrowTypes(throwTypes);
-        
+
     }
     public String debugString() {
         return debugString(true);
@@ -157,22 +157,22 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
         if (showInstanceKind) {
             s = "constructor ";
         }
-	s += flags.translate() + container + "(";
+        s += flags.translate() + container + "(";
 
-	for (Iterator i = formalTypes.iterator(); i.hasNext(); ) {
-	    Type t = (Type) i.next();
-	    s += ((JifTypeSystem)ts).unlabel(t).toString();
+        for (Iterator i = formalTypes.iterator(); i.hasNext(); ) {
+            Type t = (Type) i.next();
+            s += ((JifTypeSystem)ts).unlabel(t).toString();
 
-	    if (i.hasNext()) {
-	        s += ", ";
-	    }
-	}
+            if (i.hasNext()) {
+                s += ", ";
+            }
+        }
 
-	s += ")";
+        s += ")";
 
-	return s;
+        return s;
     }
-    
+
     public String signature() {
         if (Report.should_report(Report.debug, 1)) { 
             return fullSignature();
@@ -180,7 +180,7 @@ public class JifConstructorInstance_c extends ConstructorInstance_c
         return debugString(false);
     }
     public String fullSignature() {
-	String s = container.toString();
+        String s = container.toString();
         if (!isDefaultPCBound() || Report.should_report(Report.debug, 1)) {
             s += pcBound;
         }
