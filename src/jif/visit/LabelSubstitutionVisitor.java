@@ -184,7 +184,7 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
 
     protected Label rewriteLabel(Label L) throws SemanticException {
         if (L == null) return L;
-        return L.subst(substitution);
+        return L.subst(substitution).simplify();
     }
     protected Principal rewritePrincipal(Principal p) throws SemanticException {
         if (p == null) return p;
