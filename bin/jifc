@@ -28,6 +28,22 @@ fixclasspath() {
   fi
 }
 
+unixfilename() {
+  windows=0
+
+  if [ `uname | grep -c CYGWIN` -ne 0 ]; then
+    windows=1
+  fi
+
+  cp="$1"
+
+  if [ "$windows" = 1 ]; then 
+    cygpath -u "$cp"
+  else
+    echo "$cp"
+  fi
+}
+
 runtime_lib_path=
 sig_classpath=
 runtime_classpath=
@@ -88,8 +104,9 @@ classpath="$dir/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar:$dir/lib/JFl
 classpath="$classpath:$dir/classes:$dir/lib/jif.jar"
 classpath="$classpath:$extra_cp"
 if [ -n "$POLYGLOT" ]; then 
-    classpath="$classpath:$POLYGLOT/classes:$POLYGLOT/lib/polyglot.jar"
-    classpath="$classpath:$POLYGLOT/lib/java_cup.jar:$POLYGLOT/lib/JFlex.jar"
+    polyglot_unix=`unixfilename "$POLYGLOT"` 
+    classpath="$classpath:$polyglot_unix/classes:$polyglot_unix/lib/polyglot.jar"
+    classpath="$classpath:$polyglot_unix/lib/java_cup.jar:$polyglot_unix/lib/JFlex.jar"
 fi
 
 
