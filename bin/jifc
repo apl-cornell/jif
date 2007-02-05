@@ -61,6 +61,8 @@ jifcprint() {
   echo "$java" "$vmargs" -Djava.library.path="'$runtime_lib_path'" -classpath "'$classpath'" polyglot.main.Main "$@"
 }
 
+dir=`unixfilename "$dir"`
+
 while true; do
     case "$1" in
         "")
