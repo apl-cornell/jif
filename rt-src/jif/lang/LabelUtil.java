@@ -19,10 +19,22 @@ public class LabelUtil
     public static LabelUtil singleton() {
         return singleton;
     }
-    private static long totalTime = 0;
-    private static long enterStartTime = 0;
-    private static int callStackCount = 0;
-    private static boolean COUNT_TIME = false;
+    
+    /*
+     * fields and class for collecting timing statistics.
+     * timing statistics are collected on a per-thread basis.
+     */
+    private static class Stats {
+        private long totalTime = 0;
+        private long enterStartTime = 0;
+        private int callStackCount = 0;
+    }
+    private ThreadLocal statsPerThread = new ThreadLocal() {
+        protected Object initialValue() {
+            return new Stats();
+        }   
+    };
+    private static final boolean COUNT_TIME = false;
     
     // caches
     private Set/*<Pair>*/ cacheTrueLabelRelabels = new HashSet();
@@ -36,31 +48,43 @@ public class LabelUtil
     private Map/*<DelegationPair to Set<Pair>>*/ cacheLabelJoinDependencies = new HashMap();
     private Map/*<DelegationPair to Set<Pair>>*/ cacheLabelMeetDependencies = new HashMap();
     
+    /*
+     * Record that we are entering a section of code that we want to
+     * record the timing of.
+     */
     void enterTiming() {
         if (COUNT_TIME) {
-            synchronized (LabelUtil.class) {
-                if (callStackCount++ == 0) {
-                    enterStartTime = System.currentTimeMillis();
-                }
+            Stats stats = (Stats)statsPerThread.get();
+            if (stats.callStackCount++ == 0) {
+                stats.enterStartTime = System.currentTimeMillis();
             }
         }
     }
+
+    /*
+     * Record that we are exiting a section of code that we want to
+     * record the timing of.
+     */
     void exitTiming() {
         if (COUNT_TIME) {
-            synchronized (LabelUtil.class) {
-                if ((--callStackCount) == 0) {
-                    totalTime += (System.currentTimeMillis() - enterStartTime);
-                }
+            Stats stats = (Stats)statsPerThread.get();
+            if ((--stats.callStackCount) == 0) {
+                stats.totalTime += (System.currentTimeMillis() - stats.enterStartTime);
             }
         }
     }
+    /*
+     * Return the total time spent by the current thread in code
+     * we recorded the timing of, since the last time this method was called,
+     * and/or the thread created (whichever was last). Also clears the total
+     * time recorded for this thread.
+     */
     public long getAndClearTime() {
         long r = -1;
         if (COUNT_TIME) {
-            synchronized (LabelUtil.class) {
-                r = totalTime;
-                totalTime = 0;
-            }
+            Stats stats = (Stats)statsPerThread.get();
+            r = stats.totalTime;
+            stats.totalTime = 0;
         }
         return r;        
     }
@@ -361,7 +385,13 @@ public class LabelUtil
         }
     }
     public ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {        
-        return join(p1, p2, new HashSet());
+        try {
+            enterTiming();
+            return join(p1, p2, new HashSet());
+        }
+        finally {
+            exitTiming();
+        }
     }
     protected ConfPolicy join(ConfPolicy p1, ConfPolicy p2, Set s) {        
         try {
@@ -392,8 +422,13 @@ public class LabelUtil
         
     }
     public IntegPolicy join(IntegPolicy p1, IntegPolicy p2) {
-        return join(p1, p2, new HashSet());
-        
+        try {
+            enterTiming();
+            return join(p1, p2, new HashSet());
+        }
+        finally {
+            exitTiming();
+        }        
     }
     IntegPolicy join(IntegPolicy p1, IntegPolicy p2, Set s) {        
         try {
@@ -424,7 +459,13 @@ public class LabelUtil
         
     }
     public ConfPolicy meetPol(ConfPolicy p1, ConfPolicy p2) {
-        return meet(p1, p2, new HashSet());
+        try {
+            enterTiming();
+            return meet(p1, p2, new HashSet());
+        }
+        finally {
+            exitTiming();
+        }
     }
     protected ConfPolicy meet(ConfPolicy p1, ConfPolicy p2, Set s) {        
         try {
@@ -454,7 +495,13 @@ public class LabelUtil
         }
     }
     public IntegPolicy meetPol(IntegPolicy p1, IntegPolicy p2) {
-        return meet(p1, p2, new HashSet());
+        try {
+            enterTiming();
+            return meet(p1, p2, new HashSet());
+        }
+        finally {
+            exitTiming();
+        }
     }
      IntegPolicy meet(IntegPolicy p1, IntegPolicy p2, Set s) {        
         try {
@@ -544,7 +591,13 @@ public class LabelUtil
     }
 
     public boolean relabelsTo(Policy from, Policy to) {
-        return relabelsTo(from, to, new HashSet());
+        try {
+            enterTiming();
+            return relabelsTo(from, to, new HashSet());
+        }
+        finally {
+            exitTiming();
+        }
     }
 
     protected boolean relabelsTo(Policy from, Policy to, Set s) {
@@ -691,47 +744,59 @@ public class LabelUtil
     }
 
     void notifyNewDelegation(Principal granter, Principal superior) {
-        // XXX for the moment, just clear out the caches.
-        cacheFalseLabelRelabels.clear();
-        cacheFalsePolicyRelabels.clear();
-        
-        // the label meets and joins can be soundly left, they just
-        // may not be as simplified as they could be. However, to maintain
-        // compatability with previous behavior, we will clear the caches
-        cacheLabelJoins.clear();
-        cacheLabelMeets.clear();
-        cacheLabelJoinDependencies.clear();
-        cacheLabelMeetDependencies.clear();
+        try {
+            enterTiming();
+            // XXX for the moment, just clear out the caches.
+            cacheFalseLabelRelabels.clear();
+            cacheFalsePolicyRelabels.clear();
+            
+            // the label meets and joins can be soundly left, they just
+            // may not be as simplified as they could be. However, to maintain
+            // compatability with previous behavior, we will clear the caches
+            cacheLabelJoins.clear();
+            cacheLabelMeets.clear();
+            cacheLabelJoinDependencies.clear();
+            cacheLabelMeetDependencies.clear();
+        }
+        finally {
+            exitTiming();
+        }
     }
     void notifyRevokeDelegation(Principal granter, Principal superior) {
-        DelegationPair del = new DelegationPair(superior, granter);
-        Set deps = (Set)cacheTrueLabelRelabelsDependencies.remove(del);
-        if (deps != null) {
-            for (Iterator iter = deps.iterator(); iter.hasNext();) {
-                Pair afp = (Pair)iter.next();
-                cacheTrueLabelRelabels.remove(afp);
+        try {
+            enterTiming();
+            DelegationPair del = new DelegationPair(superior, granter);
+            Set deps = (Set)cacheTrueLabelRelabelsDependencies.remove(del);
+            if (deps != null) {
+                for (Iterator iter = deps.iterator(); iter.hasNext();) {
+                    Pair afp = (Pair)iter.next();
+                    cacheTrueLabelRelabels.remove(afp);
+                }
+            }
+            deps = (Set)cacheTruePolicyRelabelsDependencies.remove(del);
+            if (deps != null) {
+                for (Iterator iter = deps.iterator(); iter.hasNext();) {
+                    Pair afp = (Pair)iter.next();
+                    cacheTruePolicyRelabels.remove(afp);
+                }
+            }
+            deps = (Set)cacheLabelJoinDependencies.remove(del);
+            if (deps != null) {
+                for (Iterator iter = deps.iterator(); iter.hasNext();) {
+                    Pair afp = (Pair)iter.next();
+                    cacheLabelJoins.remove(afp);
+                }
+            }
+            deps = (Set)cacheLabelMeetDependencies.remove(del);
+            if (deps != null) {
+                for (Iterator iter = deps.iterator(); iter.hasNext();) {
+                    Pair afp = (Pair)iter.next();
+                    cacheLabelMeets.remove(afp);
+                }
             }
         }
-        deps = (Set)cacheTruePolicyRelabelsDependencies.remove(del);
-        if (deps != null) {
-            for (Iterator iter = deps.iterator(); iter.hasNext();) {
-                Pair afp = (Pair)iter.next();
-                cacheTruePolicyRelabels.remove(afp);
-            }
-        }
-        deps = (Set)cacheLabelJoinDependencies.remove(del);
-        if (deps != null) {
-            for (Iterator iter = deps.iterator(); iter.hasNext();) {
-                Pair afp = (Pair)iter.next();
-                cacheLabelJoins.remove(afp);
-            }
-        }
-        deps = (Set)cacheLabelMeetDependencies.remove(del);
-        if (deps != null) {
-            for (Iterator iter = deps.iterator(); iter.hasNext();) {
-                Pair afp = (Pair)iter.next();
-                cacheLabelMeets.remove(afp);
-            }
+        finally {
+            exitTiming();
         }
     }
 }
