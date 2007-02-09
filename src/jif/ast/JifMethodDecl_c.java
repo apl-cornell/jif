@@ -6,16 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import jif.types.*;
-import jif.types.label.AccessPath;
-import jif.types.label.AccessPathLocal;
-import jif.types.label.AccessPathRoot;
-import jif.types.label.ArgLabel;
-import jif.types.label.Label;
-import polyglot.ast.Block;
-import polyglot.ast.Formal;
-import polyglot.ast.MethodDecl_c;
-import polyglot.ast.Node;
-import polyglot.ast.TypeNode;
+import jif.types.label.*;
+import polyglot.ast.*;
 import polyglot.types.Flags;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -35,74 +27,75 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
     protected List constraints;
 
     public JifMethodDecl_c(Position pos, Flags flags, TypeNode returnType,
-	    String name, LabelNode startLabel, List formals, LabelNode returnLabel,
-	    List throwTypes, List constraints, Block body) {
-	super(pos, flags, returnType, name, formals, throwTypes, body);
-	this.startLabel = startLabel;
-	this.returnLabel = returnLabel;
-	this.constraints = TypedList.copyAndCheck(constraints, 
-		ConstraintNode.class, true);    
+            Id name, LabelNode startLabel, List formals, LabelNode returnLabel,
+            List throwTypes, List constraints, Block body) {
+        super(pos, flags, returnType, name, formals, throwTypes, body);
+        this.startLabel = startLabel;
+        this.returnLabel = returnLabel;
+        this.constraints = TypedList.copyAndCheck(constraints, 
+                                                  ConstraintNode.class, true);    
     }
 
     public LabelNode startLabel() {
-	return this.startLabel;
+        return this.startLabel;
     }
 
     public JifMethodDecl startLabel(LabelNode startLabel) {
-	JifMethodDecl_c n = (JifMethodDecl_c) copy();
-	n.startLabel = startLabel;
-	return n;
+        JifMethodDecl_c n = (JifMethodDecl_c) copy();
+        n.startLabel = startLabel;
+        return n;
     }
 
     public LabelNode returnLabel() {
-	return this.returnLabel;
+        return this.returnLabel;
     }
 
     public JifMethodDecl returnLabel(LabelNode returnLabel) {
-	JifMethodDecl_c n = (JifMethodDecl_c) copy();
-	n.returnLabel = returnLabel;
-	return n;
+        JifMethodDecl_c n = (JifMethodDecl_c) copy();
+        n.returnLabel = returnLabel;
+        return n;
     }
 
     public List constraints() {
-	return this.constraints;
+        return this.constraints;
     }
 
     public JifMethodDecl constraints(List constraints) {
-	JifMethodDecl_c n = (JifMethodDecl_c) copy();
-	n.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
-	return n;
+        JifMethodDecl_c n = (JifMethodDecl_c) copy();
+        n.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
+        return n;
     }
 
     public Node visitChildren(NodeVisitor v) {
+        Id name = (Id)visitChild(this.name, v);
         TypeNode returnType = (TypeNode) visitChild(this.returnType, v);
-	LabelNode startLabel = (LabelNode) visitChild(this.startLabel, v);
+        LabelNode startLabel = (LabelNode) visitChild(this.startLabel, v);
         List formals = visitList(this.formals, v);
-	LabelNode returnLabel = (LabelNode) visitChild(this.returnLabel, v);
+        LabelNode returnLabel = (LabelNode) visitChild(this.returnLabel, v);
         List throwTypes = visitList(this.throwTypes, v);
-	List constraints = visitList(this.constraints, v);
-	Block body = (Block) visitChild(this.body, v);
-	return reconstruct(returnType, startLabel, formals, returnLabel, throwTypes, constraints, body);
+        List constraints = visitList(this.constraints, v);
+        Block body = (Block) visitChild(this.body, v);
+        return reconstruct(name, returnType, startLabel, formals, returnLabel, throwTypes, constraints, body);
     }
 
-    protected JifMethodDecl_c reconstruct(TypeNode returnType, LabelNode startLabel, List formals, LabelNode returnLabel, List throwTypes, List constraints, Block body) {
-      if (startLabel != this.startLabel || returnLabel != this.returnLabel || ! CollectionUtil.equals(constraints, this.constraints)) {
-          JifMethodDecl_c n = (JifMethodDecl_c) copy();
-          n.startLabel = startLabel;
-          n.returnLabel = returnLabel;
-          n.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
-          return (JifMethodDecl_c) n.reconstruct(returnType, formals, throwTypes, body);
-      }
+    protected JifMethodDecl_c reconstruct(Id name, TypeNode returnType, LabelNode startLabel, List formals, LabelNode returnLabel, List throwTypes, List constraints, Block body) {
+        if (startLabel != this.startLabel || returnLabel != this.returnLabel || ! CollectionUtil.equals(constraints, this.constraints)) {
+            JifMethodDecl_c n = (JifMethodDecl_c) copy();
+            n.startLabel = startLabel;
+            n.returnLabel = returnLabel;
+            n.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
+            return (JifMethodDecl_c) n.reconstruct(returnType, name, formals, throwTypes, body);
+        }
 
-      return (JifMethodDecl_c) super.reconstruct(returnType, formals, throwTypes, body);
+        return (JifMethodDecl_c) super.reconstruct(returnType, name, formals, throwTypes, body);
     }
-    
+
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         JifMethodDecl n = (JifMethodDecl)super.disambiguate(ar);
 
         JifMethodInstance jmi = (JifMethodInstance)n.methodInstance();
         JifTypeSystem jts = (JifTypeSystem)ar.typeSystem();        
-        
+
         // set the formal types
         List formalTypes = new ArrayList(n.formals().size());
         for (Iterator i = n.formals().iterator(); i.hasNext(); ) {
@@ -124,7 +117,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         }
 
         DefaultSignature ds = jts.defaultSignature();
-        
+
         if (n.startLabel() != null && !n.startLabel().isDisambiguated()) {
             // the startlabel node hasn't been disambiguated yet
             ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
@@ -166,7 +159,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             Lr = n.returnLabel().label();
         }        
         jmi.setReturnLabel(Lr, isDefaultReturnLabel);
-                
+
 
         // set the labels for the throwTypes.
         List throwTypes = new LinkedList();        
@@ -177,7 +170,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
                 ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
                 return this;
             }
-            
+
             Type xt = tn.type();
             if (!jts.isLabeled(xt)) {
                 // default exception label is the return label
@@ -198,12 +191,12 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             constraints.addAll(cn.constraints());
         }
         jmi.setConstraints(constraints);
-        
+
         renameArgs(jmi, new TypeSubstitutor(new ArgRenamer(false)));
-        
+
         return n.methodInstance(jmi);
     }
-    
+
     /**
      * Rename the arg labels and arg roots. This is needed to make sure
      * that during substitution of args in a recursive method call,
@@ -249,7 +242,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             throwTypes.add(tsub.rewriteType(t));
         }
         jmi.setThrowTypes(throwTypes);
-        
+
 
         // constraints
         List constraints = new ArrayList(jmi.constraints().size());
@@ -260,7 +253,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         jmi.setConstraints(constraints);
     }
 
-    
+
     private static class ArgRenamer extends LabelSubstitution {
         boolean revertToOriginal;
         ArgRenamer(boolean revertToOriginal) {
@@ -285,7 +278,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
 
             return L;
         }
-        
+
         public AccessPath substAccessPath(AccessPath ap) {            
             AccessPathRoot r = ap.root();
             if (r instanceof AccessPathLocal) {
@@ -316,37 +309,37 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
  * labels/principals.
  */
 //class SignatureArgSubstitution extends ArgLabelSubstitution {
-//    public SignatureArgSubstitution(List nonSigArgLabels) {
-//        super(nonSigArgLabels, false);
-//    }
-//    public Label substLabel(Label L) {
-//        L = super.substLabel(L);
-//
-//        if (L instanceof DynamicArgLabel) {
-//            DynamicArgLabel dal = (DynamicArgLabel)L;
-//            JifTypeSystem jts = (JifTypeSystem)dal.typeSystem();
-//            L = jts.dynamicArgLabel(dal.position(), 
-//                                    dal.uid(), 
-//                                    dal.name(), 
-//                                    dal.label(), 
-//                                    dal.index(), 
-//                                    false);
-//        }
-//        return L;
-//    }
-//
-//    public Principal substPrincipal(Principal p) {
-//        p = super.substPrincipal(p);
-//        if (p instanceof ArgPrincipal) {
-//            ArgPrincipal dap = (ArgPrincipal)p;
-//            JifTypeSystem jts = (JifTypeSystem)dap.typeSystem();
-//            p = jts.argPrincipal(dap.position(),
-//                                 dap.uid(),
-//                                 dap.name(),
-//                                 dap.label(),
-//                                 dap.index(),
-//                                 false);
-//        }
-//        return p;
-//    }
+//public SignatureArgSubstitution(List nonSigArgLabels) {
+//super(nonSigArgLabels, false);
+//}
+//public Label substLabel(Label L) {
+//L = super.substLabel(L);
+
+//if (L instanceof DynamicArgLabel) {
+//DynamicArgLabel dal = (DynamicArgLabel)L;
+//JifTypeSystem jts = (JifTypeSystem)dal.typeSystem();
+//L = jts.dynamicArgLabel(dal.position(), 
+//dal.uid(), 
+//dal.name(), 
+//dal.label(), 
+//dal.index(), 
+//false);
+//}
+//return L;
+//}
+
+//public Principal substPrincipal(Principal p) {
+//p = super.substPrincipal(p);
+//if (p instanceof ArgPrincipal) {
+//ArgPrincipal dap = (ArgPrincipal)p;
+//JifTypeSystem jts = (JifTypeSystem)dap.typeSystem();
+//p = jts.argPrincipal(dap.position(),
+//dap.uid(),
+//dap.name(),
+//dap.label(),
+//dap.index(),
+//false);
+//}
+//return p;
+//}
 //}

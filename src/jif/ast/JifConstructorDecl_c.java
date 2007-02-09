@@ -9,13 +9,7 @@ import jif.types.DefaultSignature;
 import jif.types.JifConstructorInstance;
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
-import polyglot.ast.Block;
-import polyglot.ast.ConstructorCall;
-import polyglot.ast.ConstructorDecl_c;
-import polyglot.ast.Formal;
-import polyglot.ast.Node;
-import polyglot.ast.Stmt;
-import polyglot.ast.TypeNode;
+import polyglot.ast.*;
 import polyglot.types.ClassType;
 import polyglot.types.Flags;
 import polyglot.types.SemanticException;
@@ -36,21 +30,21 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
     protected LabelNode returnLabel;
     protected List constraints;
 
-    public JifConstructorDecl_c(Position pos, Flags flags, String name, LabelNode startLabel, LabelNode returnLabel, List formals, List throwTypes, List constraints, Block body) {
-	super(pos, flags, name, formals, throwTypes, body);
-	this.startLabel = startLabel;
+    public JifConstructorDecl_c(Position pos, Flags flags, Id name, LabelNode startLabel, LabelNode returnLabel, List formals, List throwTypes, List constraints, Block body) {
+        super(pos, flags, name, formals, throwTypes, body);
+        this.startLabel = startLabel;
         this.returnLabel = returnLabel;
-	this.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
+        this.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
     }
 
     public LabelNode startLabel() {
-	return this.startLabel;
+        return this.startLabel;
     }
 
     public JifConstructorDecl startLabel(LabelNode startLabel) {
-	JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
-	n.startLabel = startLabel;
-	return n;
+        JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
+        n.startLabel = startLabel;
+        return n;
     }
 
     public LabelNode returnLabel() {
@@ -58,41 +52,42 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
     }
 
     public JifConstructorDecl returnLabel(LabelNode returnLabel) {
-	JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
-	n.returnLabel = returnLabel;
-	return n;
+        JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
+        n.returnLabel = returnLabel;
+        return n;
     }
 
     public List constraints() {
-	return this.constraints;
+        return this.constraints;
     }
 
     public JifConstructorDecl constraints(List constraints) {
-	JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
-	n.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
-	return n;
+        JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
+        n.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
+        return n;
     }
 
-    protected JifConstructorDecl_c reconstruct(LabelNode startLabel, LabelNode returnLabel, List formals, List throwTypes, List constraints, Block body) {
-	if (startLabel != this.startLabel || returnLabel != this.returnLabel || !CollectionUtil.equals(constraints, this.constraints)) {
-	    JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
-	    n.startLabel = startLabel;
-	    n.returnLabel = returnLabel;
-	    n.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
-	    return (JifConstructorDecl_c) n.reconstruct(formals, throwTypes, body);
-	}
+    protected JifConstructorDecl_c reconstruct(Id name, LabelNode startLabel, LabelNode returnLabel, List formals, List throwTypes, List constraints, Block body) {
+        if (startLabel != this.startLabel || returnLabel != this.returnLabel || !CollectionUtil.equals(constraints, this.constraints)) {
+            JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
+            n.startLabel = startLabel;
+            n.returnLabel = returnLabel;
+            n.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
+            return (JifConstructorDecl_c) n.reconstruct(name, formals, throwTypes, body);
+        }
 
-	return (JifConstructorDecl_c) super.reconstruct(formals, throwTypes, body);
+        return (JifConstructorDecl_c) super.reconstruct(name, formals, throwTypes, body);
     }
 
     public Node visitChildren(NodeVisitor v) {
+        Id name = (Id)visitChild(this.name, v);
         LabelNode startLabel = (LabelNode) visitChild(this.startLabel, v);
         LabelNode returnLabel = (LabelNode) visitChild(this.returnLabel, v);
         List formals = visitList(this.formals, v);
         List throwTypes = visitList(this.throwTypes, v);
-	List constraints = visitList(this.constraints, v);
-	Block body = (Block) visitChild(this.body, v);
-	return reconstruct(startLabel, returnLabel, formals, throwTypes, constraints, body);
+        List constraints = visitList(this.constraints, v);
+        Block body = (Block) visitChild(this.body, v);
+        return reconstruct(name, startLabel, returnLabel, formals, throwTypes, constraints, body);
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
@@ -135,7 +130,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             Li = n.startLabel().label();
         }
         jci.setPCBound(Li, isDefaultPCBound);
-    
+
         Label Lr; // return label
         boolean isDefaultReturnLabel = false;
         if (n.returnLabel() == null) {
@@ -156,7 +151,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
                 ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
                 return this;
             }
-            
+
             Type xt = tn.type();
             if (!jts.isLabeled(xt)) {
                 // default exception label is the return label
@@ -165,7 +160,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             throwTypes.add(xt);
         }
         jci.setThrowTypes(throwTypes);
-        
+
         List constraints = new ArrayList(n.constraints().size());
         for (Iterator i = n.constraints().iterator(); i.hasNext(); ) {
             ConstraintNode cn = (ConstraintNode) i.next();
@@ -182,14 +177,14 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        
-	Node n = super.typeCheck(tc);    
+
+        Node n = super.typeCheck(tc);    
         JifConstructorDecl_c jcd = (JifConstructorDecl_c)n;
         jcd.checkConstructorCall(tc);
-    
+
         return jcd;
     }
-    
+
     /**
      * Checks that if there is an explicit constructor call in the constructor
      * body that the call is all right.
@@ -203,7 +198,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
      * @throws SemanticException
      */
     private void checkConstructorCall(TypeChecker tc) throws SemanticException {
-        
+
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
 
         ClassType ct = tc.context().currentClass();
@@ -218,7 +213,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             // had better be a constructor call (which is the normal Java
             // rule).
             checkFirstStmtConstructorCall("The first statement of a constructor " +
-                    "of a Java class must be a constructor call.", true, false);
+                                          "of a Java class must be a constructor call.", true, false);
         }
         else if (ts.isJifClass(ct) && untrusted != null) {
             // If ct is a Jif class, but the super class is an
@@ -228,9 +223,9 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             // Jif constructors, a malicious (non-Jif) superclass access
             // final fields before they have been initialized.
             checkFirstStmtConstructorCall("The first statement of a constructor " +
-                    "of a Jif class with an untrusted Java superclass " +
-                    "must be an explicit call to the default super constructor," +
-                    "\"super()\".", false, true);
+                                          "of a Jif class with an untrusted Java superclass " +
+                                          "must be an explicit call to the default super constructor," +
+                                          "\"super()\".", false, true);
         }        
         else if (ts.isJifClass(ct) && !ts.isJifClass(ct.superType())) {
             // this is a Jif class, but it's superclass is a trusted Java class.
@@ -241,14 +236,14 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             // marshal the arguments before the super constructor call 
             // happens.
             checkFirstStmtConstructorCall("The first statement of a " +
-                           "constructor of a Jif class with a Java superclass " +
-                           "must be either a \"this(...)\" constructor call, or " +
-                           "a call to the default super constructor, " +
-                           "\"super()\".", 
-                           true, true);
+                                          "constructor of a Jif class with a Java superclass " +
+                                          "must be either a \"this(...)\" constructor call, or " +
+                                          "a call to the default super constructor, " +
+                                          "\"super()\".", 
+                                          true, true);
         }
     }
-    
+
     /**
      * 
      * @param message
@@ -256,9 +251,9 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
      * @throws SemanticException
      */
     private void checkFirstStmtConstructorCall(String message, 
-                                               boolean allowThisCalls,
-                                               boolean superCallMustBeDefault) 
-                                 throws SemanticException {
+            boolean allowThisCalls,
+            boolean superCallMustBeDefault) 
+    throws SemanticException {
         if (body().statements().size() < 1) {
             throw new SemanticException("Empty constructor body.", position());
         }
@@ -266,16 +261,16 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         if (!(s instanceof ConstructorCall)) {
             throw new SemanticException(message, position());
         }
-        
+
         ConstructorCall cc = (ConstructorCall)s;
         if (!allowThisCalls && cc.kind() == ConstructorCall.THIS) {
             throw new SemanticException(message, position());                
         }
-        
+
         if (superCallMustBeDefault && cc.kind() == ConstructorCall.SUPER &&
                 cc.arguments().size() > 0) {
             throw new SemanticException(message, position());                
         }
-        
+
     }
 }

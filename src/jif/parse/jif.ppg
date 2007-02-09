@@ -5,7 +5,7 @@ import polyglot.lex.Lexer;
 import polyglot.lex.Identifier;
 import polyglot.lex.Token;
 import polyglot.frontend.Job;
-
+import polyglot.parse.VarDeclarator;
 import polyglot.ast.*;
 import jif.ast.*;
 import jif.types.*;
@@ -92,7 +92,7 @@ parser Grm extends polyglot.parse.Grm {:
             if (w.amb instanceof Name) {
                 Name a = (Name) w.amb;
                 if (a.prefix == null) {
-                    return nf.AmbParam(pos(e), a.name);
+                    return nf.AmbParam(pos(e), a.toIdentifier());
                 }
             }
         }
@@ -146,7 +146,7 @@ parser Grm extends polyglot.parse.Grm {:
 
             if (n instanceof Name) {
                 params.add(nf.AmbParam(((Name) n).pos,
-                                ((Name) n).name));
+                                ((Name) n).toIdentifier()));
             }
             else if (n instanceof ParamNode) {
                 params.add(n);
@@ -400,7 +400,7 @@ label_component ::=
             {: RESULT = parser.nf.AmbThisLabelNode(parser.pos(a)); :}
     |   IDENTIFIER:a
             {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),
-						  a.getIdentifier()); :}
+						  parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
     ;
 
 rightarrow ::= COLON | RIGHTARROW | MINUS GT ;
@@ -454,7 +454,7 @@ principal_base ::=
     |  MULT:a // top principal
             {: RESULT = parser.nf.CanonicalPrincipalNode(parser.pos(a), parser.ts.topPrincipal(parser.pos(a))); :}
     |  IDENTIFIER:a
-            {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a), a.getIdentifier()); :}
+            {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a), parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
     |  LPAREN:a principal_disjunctive:b RPAREN:c
             {: RESULT = b; :}
     ;
@@ -569,7 +569,7 @@ extend class_declaration ::=
                 parameters_opt:p super_opt:c
                 interfaces_opt:d authority_opt:u class_body:e
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n, b),
-                                               a, b.getIdentifier(),
+                                               a, parser.nf.Id(parser.pos(b), b.getIdentifier()),
                                                p, c, d, u, e); :}
     ;
 
@@ -641,7 +641,7 @@ method_header ::=
         dims_opt:e return_label_opt:r throws_opt:f constraints_opt:w
             {: RESULT = parser.nf.JifMethodDecl(parser.pos(b,c,c), a,
                         parser.array(b, e.intValue()),
-                        c.getIdentifier(),
+                        parser.nf.Id(parser.pos(c), c.getIdentifier()),
                                                 i, d, r, f, w, null);
                if (i != null) parser.countAnnotation(parser.PC_BOUND_ANNOTATION, RESULT.position());
              :}
@@ -651,7 +651,7 @@ method_header ::=
             {: RESULT = parser.nf.JifMethodDecl(parser.pos(b,c), a,
                         parser.nf.CanonicalTypeNode(parser.pos(b),
                                    parser.ts.Void()),
-                        c.getIdentifier(),
+                                   parser.nf.Id(parser.pos(c), c.getIdentifier()),
                                                 i, d, r, f, w, null);
                if (i != null) parser.countAnnotation(parser.PC_BOUND_ANNOTATION, RESULT.position());
             :}
@@ -703,7 +703,7 @@ constructor_declaration ::=
         modifiers_opt:a reftype_or_expr:q
         LPAREN formal_parameter_list_opt:c RPAREN:y return_label_opt:r
         throws_opt:d constraints_opt:w constructor_body:e
-            {: String b; LabelNode i;
+            {: Id b; LabelNode i;
                // Pick apart the reftype_or_expr node.
                // It can be either an identifier "a" or an
                // identifier and label "a{L}".
@@ -785,17 +785,17 @@ parameter ::=
     LABEL:x IDENTIFIER:a
         {: RESULT = parser.nf.ParamDecl(parser.pos(x, a),
                                         ParamInstance.INVARIANT_LABEL,
-                                        a.getIdentifier());
+                                        parser.nf.Id(parser.pos(a), a.getIdentifier()));
                                         :}
     |   COVARIANT:x LABEL IDENTIFIER:a
         {: RESULT = parser.nf.ParamDecl(parser.pos(x, a),
                                         ParamInstance.COVARIANT_LABEL,
-                                        a.getIdentifier());
+                                        parser.nf.Id(parser.pos(a), a.getIdentifier()));
                                         :}
     |   PRINCIPAL:x IDENTIFIER:a
         {: RESULT = parser.nf.ParamDecl(parser.pos(x, a),
                                         ParamInstance.PRINCIPAL,
-                                        a.getIdentifier());
+                                        parser.nf.Id(parser.pos(a), a.getIdentifier()));
                                         :}
     ;
 
@@ -856,7 +856,7 @@ override interface_declaration ::=
                 parameters_opt:p
                 extends_interfaces_opt:d authority_opt:u interface_body:e
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n,b),
-		    a.set(Flags.INTERFACE), b.getIdentifier(),
+		    a.set(Flags.INTERFACE), parser.nf.Id(parser.pos(b), b.getIdentifier()),
 		    p, null, d, u, e); :}
     ;
 drop { extends_interfaces ::=

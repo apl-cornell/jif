@@ -1,10 +1,6 @@
 package jif.parse;
 
-import polyglot.ast.Expr;
-import polyglot.ast.PackageNode;
-import polyglot.ast.Prefix;
-import polyglot.ast.Receiver;
-import polyglot.ast.TypeNode;
+import polyglot.ast.*;
 import polyglot.util.Position;
 
 public abstract class Amb 
@@ -13,8 +9,8 @@ public abstract class Amb
     Grm parser;
 
     Amb(Grm parser, Position pos) {
-	this.parser = parser;
-	this.pos = pos;
+        this.parser = parser;
+        this.pos = pos;
     }
 
     public Expr wrap() throws Exception { return new Wrapper(this); }
@@ -27,7 +23,7 @@ public abstract class Amb
     public TypeNode toClassType() throws Exception { parser.die(pos); return null; }
     public Expr toNewArray(Position p, Integer extraDims) throws Exception { parser.die(pos); return null; }
     public Expr toNewArrayPrefix(Position p, Integer extraDims) throws Exception { parser.die(pos); return null; }
-    public String toIdentifier() throws Exception { parser.die(pos); return null; }
+    public Id toIdentifier() throws Exception { parser.die(pos); return null; }
     public String toName() throws Exception { parser.die(pos); return null; }
 }
 

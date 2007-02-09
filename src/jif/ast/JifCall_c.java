@@ -5,6 +5,7 @@ import java.util.List;
 import jif.types.JifParsedPolyType;
 import jif.types.JifTypeSystem;
 import polyglot.ast.Call_c;
+import polyglot.ast.Id;
 import polyglot.ast.Receiver;
 import polyglot.types.MethodInstance;
 import polyglot.types.Type;
@@ -13,7 +14,7 @@ import polyglot.util.Position;
 
 public class JifCall_c extends Call_c
 {
-    public JifCall_c(Position pos, Receiver target, String name, List args) {
+    public JifCall_c(Position pos, Receiver target, Id name, List args) {
         super(pos, target, name, args);
     }
 

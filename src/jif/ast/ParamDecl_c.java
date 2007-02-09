@@ -3,6 +3,7 @@ package jif.ast;
 import jif.types.JifPolyType;
 import jif.types.JifTypeSystem;
 import jif.types.ParamInstance;
+import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
 import polyglot.types.Context;
@@ -18,14 +19,14 @@ import polyglot.visit.TypeBuilder;
 public class ParamDecl_c extends Node_c implements ParamDecl
 {
     ParamInstance pi;
-    String name;
+    Id name;
     ParamInstance.Kind kind;
 
     public ParamDecl_c(Position pos, ParamInstance.Kind kind,
-	               String name) {
-	super(pos);
-	this.kind = kind;
-	this.name = name;
+            Id name) {
+        super(pos);
+        this.kind = kind;
+        this.name = name;
     }
 
     public boolean isDisambiguated() {
@@ -33,68 +34,68 @@ public class ParamDecl_c extends Node_c implements ParamDecl
     }
 
     public ParamInstance.Kind kind() {
-	return this.kind;
+        return this.kind;
     }
 
     public ParamDecl kind(ParamInstance.Kind kind) {
-	ParamDecl_c n = (ParamDecl_c) copy();
-	n.kind = kind;
-	return n;
+        ParamDecl_c n = (ParamDecl_c) copy();
+        n.kind = kind;
+        return n;
     }
 
     public String name() {
-	return this.name;
+        return this.name.id();
     }
 
     public ParamDecl name(String name) {
-	ParamDecl_c n = (ParamDecl_c) copy();
-	n.name = name;
-	return n;
+        ParamDecl_c n = (ParamDecl_c) copy();
+        n.name = n.name.id(name);
+        return n;
     }
 
     public ParamInstance paramInstance() {
-	return pi;
+        return pi;
     }
 
     public ParamDecl paramInstance(ParamInstance pi) {
-	ParamDecl_c n = (ParamDecl_c) copy();
-	n.pi = pi;
-	return n;
+        ParamDecl_c n = (ParamDecl_c) copy();
+        n.pi = pi;
+        return n;
     }
 
     public boolean isPrincipal() {
-	return kind == ParamInstance.PRINCIPAL;
+        return kind == ParamInstance.PRINCIPAL;
     }
 
     public boolean isLabel() {
-	return kind == ParamInstance.INVARIANT_LABEL ||
-	       kind == ParamInstance.COVARIANT_LABEL;
+        return kind == ParamInstance.INVARIANT_LABEL ||
+        kind == ParamInstance.COVARIANT_LABEL;
     }
 
     public boolean isInvariantLabel() {
-	return kind == ParamInstance.INVARIANT_LABEL;
+        return kind == ParamInstance.INVARIANT_LABEL;
     }
 
     public boolean isCovariantLabel() {
-	return kind == ParamInstance.COVARIANT_LABEL;
+        return kind == ParamInstance.COVARIANT_LABEL;
     }
 
     public void leaveScope(Context c) {
-	c.addVariable(pi);
+        c.addVariable(pi);
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-	JifTypeSystem ts = (JifTypeSystem) tb.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) tb.typeSystem();
 
-	JifPolyType ct = (JifPolyType) tb.currentClass();
+        JifPolyType ct = (JifPolyType) tb.currentClass();
 
-	ParamInstance pi = ts.paramInstance(position(), ct, kind, name);
+        ParamInstance pi = ts.paramInstance(position(), ct, kind, name.id());
 
-	return paramInstance(pi);
+        return paramInstance(pi);
     }
 
     public String toString() {
-	return kind.toString();
+        return kind.toString();
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
@@ -108,7 +109,7 @@ public class ParamDecl_c extends Node_c implements ParamDecl
             w.write("principal ");
         }
 
-        w.write(name);
+        w.write(name.id());
     }
 
     public void translate(CodeWriter w, Translator tr) { } 

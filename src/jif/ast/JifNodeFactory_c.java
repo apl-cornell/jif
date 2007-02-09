@@ -69,7 +69,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         AmbNewArray n = new AmbNewArray_c(pos, baseType, expr, dims, addDims);
         n = (AmbNewArray)n.ext(jifExtFactory().extAmbNewArray());
         n = (AmbNewArray)n.del(delFactory().delAmbExpr());
-        return n;
+        return n;        
     }
 
     public AmbParamTypeOrAccess AmbParamTypeOrAccess(Position pos, Receiver base, Object expr) {
@@ -96,7 +96,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
 
     public PolicyNode ReaderPolicyNode(Position pos, PrincipalNode owner, List readers) {
         PolicyNode n = new ReaderPolicyNode_c(pos, owner,
-                                                  readers);
+                                              readers);
         n = (PolicyNode)n.ext(jifExtFactory().extPolicyNode());
         n = (PolicyNode)n.del(delFactory().delNode());
         return n;
@@ -104,19 +104,19 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
 
     public PolicyNode WriterPolicyNode(Position pos, PrincipalNode owner, List writers) {
         PolicyNode n = new WriterPolicyNode_c(pos, owner,
-                                                  writers);
+                                              writers);
         n = (PolicyNode)n.ext(jifExtFactory().extPolicyNode());
         n = (PolicyNode)n.del(delFactory().delNode());
         return n;
     }
-    
+
     public PolicyNode PolicyNode(Position pos, Policy policy) {
         PolicyNode n = new PolicyNode_c(pos, policy);
         n = (PolicyNode)n.ext(jifExtFactory().extPolicyNode());
         n = (PolicyNode)n.del(delFactory().delNode());
         return n;
     }
-    
+
     public AmbDynamicLabelNode AmbDynamicLabelNode(Position pos, Expr expr) {
         AmbDynamicLabelNode n = new AmbDynamicLabelNode_c(pos, expr);
         n = (AmbDynamicLabelNode)n.ext(jifExtFactory().extAmbDynamicLabelNode());
@@ -124,7 +124,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public AmbVarLabelNode AmbVarLabelNode(Position pos, String name) {
+    public AmbVarLabelNode AmbVarLabelNode(Position pos, Id name) {
         AmbVarLabelNode n = new AmbVarLabelNode_c(pos, name);
         n = (AmbVarLabelNode)n.ext(jifExtFactory().extAmbVarLabelNode());
         n = (AmbVarLabelNode)n.del(delFactory().delNode());
@@ -152,7 +152,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public AmbPrincipalNode AmbPrincipalNode(Position pos, String name) {
+    public AmbPrincipalNode AmbPrincipalNode(Position pos, Id name) {
         AmbPrincipalNode n = new AmbPrincipalNode_c(pos, name);
         n = (AmbPrincipalNode)n.ext(jifExtFactory().extAmbPrincipalNode());
         n = (AmbPrincipalNode)n.del(delFactory().delExpr());
@@ -190,10 +190,10 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public ClassDecl ClassDecl(Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body) {
+    public ClassDecl ClassDecl(Position pos, Flags flags, Id name, TypeNode superClass, List interfaces, ClassBody body) {
         ClassDecl n = new JifClassDecl_c(pos, flags, name,
-                Collections.EMPTY_LIST, superClass, interfaces, 
-                Collections.EMPTY_LIST, body);
+                                         Collections.EMPTY_LIST, superClass, interfaces, 
+                                         Collections.EMPTY_LIST, body);
         n = (ClassDecl)n.ext(extFactory().extClassDecl());
         n = (ClassDecl)n.del(delFactory().delClassDecl());
         return n;
@@ -202,18 +202,18 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     public LocalClassDecl LocalClassDecl(Position pos, ClassDecl decl) {
         throw new InternalCompilerError("Jif does not support inner classes.");
     }
-    
+
     public LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type,
-            String name, Expr init) {
+            Id name, Expr init) {
         LocalDecl n = new JifLocalDecl_c(pos, flags, type, name, init);
         n = (LocalDecl)n.ext(extFactory().extLocalDecl());
         n = (LocalDecl)n.del(delFactory().delLocalDecl());
         return n;
     }
-    public JifClassDecl JifClassDecl(Position pos, Flags flags, String name,
-                                     List params, 
-                                     TypeNode superClass, List interfaces,
-                                     List authority, ClassBody body) {
+    public JifClassDecl JifClassDecl(Position pos, Flags flags, Id name,
+            List params, 
+            TypeNode superClass, List interfaces,
+            List authority, ClassBody body) {
         JifClassDecl n = new JifClassDecl_c(pos, flags, name,
                                             params, superClass, interfaces, authority, body);
         n = (JifClassDecl)n.ext(extFactory().extClassDecl());
@@ -222,40 +222,40 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     }
 
     public MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
-            String name, List formals, List throwTypes, Block body) {
+            Id name, List formals, List throwTypes, Block body) {
         MethodDecl n = new JifMethodDecl_c(pos, flags,
-                                   returnType, name, null, formals, null,
-                                   throwTypes, Collections.EMPTY_LIST, body);
+                                           returnType, name, null, formals, null,
+                                           throwTypes, Collections.EMPTY_LIST, body);
         n = (MethodDecl)n.ext(extFactory().extMethodDecl());
         n = (MethodDecl)n.del(delFactory().delMethodDecl());
         return n;
     }
 
     public JifMethodDecl JifMethodDecl(Position pos, Flags flags, 
-                                       TypeNode returnType, String name, LabelNode startLabel, 
-                                       List formals, LabelNode endLabel, List throwTypes, 
-                                       List constraints, Block body) {
-//        //add default return value label node
-//        if (! (returnType instanceof LabeledTypeNode) &&
-//            (! (returnType instanceof CanonicalTypeNode) ||
-//             !returnType.type().isVoid()) ) {
-//            List comps = new LinkedList();
-//            if (endLabel != null)
-//                if (endLabel instanceof JoinLabelNode) 
-//                    comps = TypedList.copyAndCheck(
-//                                                   ((JoinLabelNode)endLabel).components(), 
-//                                                   LabelNode.class, false);
-//                else	    
-//                    comps.add(endLabel.copy());
-//
-//            for (Iterator iter = formals.iterator(); iter.hasNext(); ) {
-//                Formal arg = (Formal) iter.next();
-//                comps.add(AmbVarLabelNode(arg.position(), arg.name()));
-//            }
-//            LabelNode LrvNode = JoinLabelNode(returnType.position(), comps);
-//            returnType = LabeledTypeNode(returnType.position(), returnType,
-//                                         LrvNode);
-//        }
+            TypeNode returnType, Id name, LabelNode startLabel, 
+            List formals, LabelNode endLabel, List throwTypes, 
+            List constraints, Block body) {
+//      //add default return value label node
+//if (! (returnType instanceof LabeledTypeNode) &&
+//      (! (returnType instanceof CanonicalTypeNode) ||
+//      !returnType.type().isVoid()) ) {
+//      List comps = new LinkedList();
+//      if (endLabel != null)
+//      if (endLabel instanceof JoinLabelNode) 
+//      comps = TypedList.copyAndCheck(
+//      ((JoinLabelNode)endLabel).components(), 
+//      LabelNode.class, false);
+//      else	    
+//      comps.add(endLabel.copy());
+
+//      for (Iterator iter = formals.iterator(); iter.hasNext(); ) {
+//      Formal arg = (Formal) iter.next();
+//      comps.add(AmbVarLabelNode(arg.position(), arg.name()));
+//      }
+//      LabelNode LrvNode = JoinLabelNode(returnType.position(), comps);
+//      returnType = LabeledTypeNode(returnType.position(), returnType,
+//      LrvNode);
+//      }
 
         JifMethodDecl n = new JifMethodDecl_c(pos, flags, 
                                               returnType, name, startLabel, formals, endLabel, 
@@ -271,16 +271,16 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return super.ConstructorCall(pos, kind, outer, args);
     }
 
-    public ConstructorDecl ConstructorDecl(Position pos, Flags flags, String name, List formals, List throwTypes, Block body) {
+    public ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name, List formals, List throwTypes, Block body) {
         ConstructorDecl n = new JifConstructorDecl_c(pos, flags, name, null, null, formals,
-                                        throwTypes, Collections.EMPTY_LIST,
-                                        body);
+                                                     throwTypes, Collections.EMPTY_LIST,
+                                                     body);
         n = (ConstructorDecl)n.ext(extFactory().extConstructorDecl());
         n = (ConstructorDecl)n.del(delFactory().delConstructorDecl());
         return n;
     }
 
-    public JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, String name, LabelNode startLabel, LabelNode returnLabel, List formals, List throwTypes, List constraints, Block body) {
+    public JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, Id name, LabelNode startLabel, LabelNode returnLabel, List formals, List throwTypes, List constraints, Block body) {
         JifConstructorDecl n = new JifConstructorDecl_c(pos, flags,
                                                         name, startLabel, returnLabel, formals, throwTypes,
                                                         constraints, body);
@@ -288,7 +288,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         n = (JifConstructorDecl)n.del(delFactory().delConstructorDecl());
         return n;
     }
-    
+
     public New New(Position pos, Expr outer, TypeNode objectType, List args, ClassBody body) {
         if (body != null) 
             throw new InternalCompilerError("Jif does not support inner classes.");
@@ -305,10 +305,10 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return super.Special(pos, kind, outer);
     }
 
-    public AmbParam AmbParam(Position pos, String name) {
+    public AmbParam AmbParam(Position pos, Id name) {
         return AmbParam(pos, name, null);
     }
-    public AmbParam AmbParam(Position pos, String name, ParamInstance pi) {
+    public AmbParam AmbParam(Position pos, Id name, ParamInstance pi) {
         AmbParam n = new AmbParam_c(pos, name, pi);
         n = (AmbParam)n.ext(jifExtFactory().extAmbParam());
         n = (AmbParam)n.del(delFactory().delNode());
@@ -322,7 +322,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public ParamDecl ParamDecl(Position pos, ParamInstance.Kind kind, String name) {
+    public ParamDecl ParamDecl(Position pos, ParamInstance.Kind kind, Id name) {
         ParamDecl n = new ParamDecl_c(pos, kind, name);
         n = (ParamDecl)n.ext(jifExtFactory().extParamDecl());
         n = (ParamDecl)n.del(delFactory().delNode());
@@ -398,7 +398,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     }
 
     public DeclassifyExpr DeclassifyExpr(Position pos, Expr expr, LabelNode bound,
-                                         LabelNode label) 
+            LabelNode label) 
     {
         DeclassifyExpr n = new DeclassifyExpr_c(pos, expr, bound, label);
         n = (DeclassifyExpr)n.ext(jifExtFactory().extDeclassifyExpr());
@@ -435,10 +435,10 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
     public EndorseExpr EndorseExpr(Position pos, Expr expr, LabelNode bound,
-                                         LabelNode label) 
+            LabelNode label) 
     {
         EndorseExpr n = new EndorseExpr_c(pos, expr, bound,
-                                                label);
+                                          label);
         n = (EndorseExpr)n.ext(jifExtFactory().extEndorseExpr());
         n = (EndorseExpr)n.del(delFactory().delExpr());
         return n;
@@ -468,8 +468,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         n = (PrincipalExpr)n.del(delFactory().delExpr());
         return n;
     }
-    
-    public Call Call(Position pos, Receiver target, String name, List args) {
+
+    public Call Call(Position pos, Receiver target, Id name, List args) {
         Call n = new JifCall_c(pos, target, name, args);
         n = (Call)n.ext(extFactory().extCall());
         n = (Call)n.del(delFactory().delCall());
@@ -483,7 +483,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public Formal Formal(Position pos, Flags flags, TypeNode type, String name) {
+    public Formal Formal(Position pos, Flags flags, TypeNode type, Id name) {
         Formal n = new JifFormal_c(pos, flags, type, name);
         n = (Formal)n.ext(extFactory().extFormal());
         n = (Formal)n.del(delFactory().delFormal());
@@ -499,5 +499,5 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     public TypeNode ConstArrayTypeNode(Position pos, TypeNode base) {
         return new ConstArrayTypeNode_c(pos, base);
     }
-           
+
 }

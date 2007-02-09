@@ -8,18 +8,10 @@ import jif.types.JifPolyType;
 import jif.types.JifTypeSystem;
 import jif.types.ParamInstance;
 import jif.types.SemanticDetailedException;
-import polyglot.ast.Expr;
-import polyglot.ast.Expr_c;
-import polyglot.ast.Node;
-import polyglot.ast.Term;
-import polyglot.ast.TypeNode;
+import polyglot.ast.*;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.CodeWriter;
-import polyglot.util.CollectionUtil;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.util.TypedList;
+import polyglot.util.*;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -39,6 +31,9 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
         super(pos);
         this.baseType = baseType;
         this.expr = expr;
+        if (!(expr instanceof Expr) && !(expr instanceof Id)) {
+            throw new InternalCompilerError("wrong type for expr: " + expr.getClass().getName());
+        }
         this.dims = TypedList.copyAndCheck(dims, Expr.class, true);
         this.addDims = addDims;
     }
@@ -162,7 +157,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
                     pn = nf.AmbParam(position(), (Expr)expr, pi);                    
                 }
                 else {
-                    pn = nf.AmbParam(position(), (String)expr, pi);                                        
+                    pn = nf.AmbParam(position(), (Id)expr, pi);                                        
                 }
 
                 pn = (ParamNode) pn.disambiguate(ar);
@@ -193,7 +188,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
             e = (Expr) ((Expr)expr).visit(ar);
         }
         else {
-            e = nf.AmbExpr(position(), (String)expr);
+            e = nf.AmbExpr(position(), (Id)expr);
             e = (Expr) e.visit(ar);
         }
 
@@ -213,7 +208,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
             print((Expr)expr, w, tr);
         }
         else {
-            w.write((String)expr);            
+            w.write(((Id)expr).id());            
         }
         w.write("]");
 

@@ -74,9 +74,9 @@ public class InstOrAccess extends Amb {
         return a.toNewArray(p, extraDims);
     }
 
-    private Object paramToExprOrString() {
+    private Object paramToExprOrString() throws Exception {
         if (param instanceof Name) {
-            return ((Name)param).name;
+            return ((Name)param).toIdentifier();
         }
         param = (Expr) ((Expr)param).visit(new UnwrapVisitor());
         return param;

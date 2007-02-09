@@ -1,37 +1,17 @@
 package jif.ast;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import jif.types.JifContext;
 import jif.types.JifParsedPolyType;
 import jif.types.JifTypeSystem;
 import jif.types.ParamInstance;
 import jif.types.label.AccessPathThis;
-import polyglot.ast.ClassBody;
-import polyglot.ast.ClassDecl_c;
-import polyglot.ast.Node;
-import polyglot.ast.TypeNode;
+import polyglot.ast.*;
 import polyglot.ext.param.types.MuPClass;
-import polyglot.types.ClassType;
-import polyglot.types.Context;
-import polyglot.types.Flags;
-import polyglot.types.ParsedClassType;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.util.CodeWriter;
-import polyglot.util.CollectionUtil;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.util.TypedList;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.Translator;
-import polyglot.visit.TypeBuilder;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
 
 /** An implementation of the <code>JifClassDecl</code> interface.
  */
@@ -40,52 +20,53 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
     protected List params;
     protected List authority;
 
-    public JifClassDecl_c(Position pos, Flags flags, String name,
-	    List params, TypeNode superClass, List interfaces,
-	    List authority, ClassBody body) {
-	super(pos, flags, name, superClass, interfaces, body);
-	this.params = TypedList.copyAndCheck(params, ParamDecl.class, true);
-	this.authority = TypedList.copyAndCheck(authority, PrincipalNode.class, true);
+    public JifClassDecl_c(Position pos, Flags flags, Id name,
+            List params, TypeNode superClass, List interfaces,
+            List authority, ClassBody body) {
+        super(pos, flags, name, superClass, interfaces, body);
+        this.params = TypedList.copyAndCheck(params, ParamDecl.class, true);
+        this.authority = TypedList.copyAndCheck(authority, PrincipalNode.class, true);
     }
 
     public List params() {
-	return this.params;
+        return this.params;
     }
 
     public JifClassDecl params(List params) {
-	JifClassDecl_c n = (JifClassDecl_c) copy();
-	n.params = TypedList.copyAndCheck(params, ParamDecl.class, true);
-	return n;
+        JifClassDecl_c n = (JifClassDecl_c) copy();
+        n.params = TypedList.copyAndCheck(params, ParamDecl.class, true);
+        return n;
     }
 
     public List authority() {
-	return this.authority;
+        return this.authority;
     }
 
     public JifClassDecl authority(List authority) {
-	JifClassDecl_c n = (JifClassDecl_c) copy();
-	n.authority = TypedList.copyAndCheck(authority, PrincipalNode.class, true);
-	return n;
+        JifClassDecl_c n = (JifClassDecl_c) copy();
+        n.authority = TypedList.copyAndCheck(authority, PrincipalNode.class, true);
+        return n;
     }
 
-    protected JifClassDecl_c reconstruct(List params, TypeNode superClass, List interfaces, List authority, ClassBody body) {
-	if (! CollectionUtil.equals(params, this.params) || ! CollectionUtil.equals(authority, this.authority)) {
-	    JifClassDecl_c n = (JifClassDecl_c) copy();
-	    n.params = TypedList.copyAndCheck(params, ParamDecl.class, true);
-	    n.authority = TypedList.copyAndCheck(authority, PrincipalNode.class, true);
-	    return (JifClassDecl_c) n.reconstruct(superClass, interfaces, body);
-	}
+    protected JifClassDecl_c reconstruct(Id name, List params, TypeNode superClass, List interfaces, List authority, ClassBody body) {
+        if (! CollectionUtil.equals(params, this.params) || ! CollectionUtil.equals(authority, this.authority)) {
+            JifClassDecl_c n = (JifClassDecl_c) copy();
+            n.params = TypedList.copyAndCheck(params, ParamDecl.class, true);
+            n.authority = TypedList.copyAndCheck(authority, PrincipalNode.class, true);
+            return (JifClassDecl_c) n.reconstruct(name, superClass, interfaces, body);
+        }
 
-	return (JifClassDecl_c) super.reconstruct(superClass, interfaces, body);
+        return (JifClassDecl_c) super.reconstruct(name, superClass, interfaces, body);
     }
 
     public Node visitChildren(NodeVisitor v) {
-	List params = visitList(this.params, v);
-	TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
-	List interfaces = visitList(this.interfaces, v);
-	List authority = visitList(this.authority, v);
-	ClassBody body = (ClassBody) visitChild(this.body, v);
-	return reconstruct(params, superClass, interfaces, authority, body);
+        Id name = (Id)visitChild(this.name, v);
+        List params = visitList(this.params, v);
+        TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
+        List interfaces = visitList(this.interfaces, v);
+        List authority = visitList(this.authority, v);
+        ClassBody body = (ClassBody) visitChild(this.body, v);
+        return reconstruct(name, params, superClass, interfaces, authority, body);
     }
 
     public Context enterScope(Context c) {
@@ -155,7 +136,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             //check for renaming error
             if (names.contains(p.name()))
                 throw new SemanticException("Redefined Parameter Error.", p
-                        .position());
+                                            .position());
             else
                 names.add(p.name());
         }
@@ -193,7 +174,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             w.write("class ");
         }
 
-        w.write(name);
+        w.write(name.id());
 
         if (! params.isEmpty()) {
             w.write("[");
@@ -247,17 +228,17 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         w.write(" {");
     }
 
-//    public Node typeCheck(TypeChecker tc) throws SemanticException {
-//        // The invariantness of the class must agree with its super class
-//        // and its interfaces.
-//        Type superClass = null;
-//        if (this.superClass() != null) {
-//            superClass = this.superClass().type();
-//        }
-//
-//        return super.typeCheck(tc);
-//
-//    }
+//  public Node typeCheck(TypeChecker tc) throws SemanticException {
+//  // The invariantness of the class must agree with its super class
+//  // and its interfaces.
+//  Type superClass = null;
+//  if (this.superClass() != null) {
+//  superClass = this.superClass().type();
+//  }
+
+//  return super.typeCheck(tc);
+
+//  }
 
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("cannot translate " + this);

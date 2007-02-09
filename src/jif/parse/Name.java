@@ -1,10 +1,6 @@
 package jif.parse;
 
-import polyglot.ast.Expr;
-import polyglot.ast.PackageNode;
-import polyglot.ast.Prefix;
-import polyglot.ast.Receiver;
-import polyglot.ast.TypeNode;
+import polyglot.ast.*;
 import polyglot.util.Position;
 
 /**
@@ -79,12 +75,12 @@ public class Name extends Amb {
     public TypeNode toClassType() throws Exception { return toType(); }
     public TypeNode toUnlabeledType() throws Exception { return toType(); }
     
-    public String toIdentifier() throws Exception {
+    public Id toIdentifier() throws Exception {
         if (prefix != null) {
             parser.die(pos);
         }
         
-        return name;
+        return parser.nf.Id(pos, name);
     }
     
     public String toName() throws Exception {

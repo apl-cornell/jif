@@ -2,19 +2,11 @@ package jif.ast;
 
 import java.util.List;
 
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.JifVarInstance;
-import jif.types.ParamInstance;
-import jif.types.PrincipalInstance;
-import jif.types.SemanticDetailedException;
+import jif.types.*;
 import jif.types.label.AccessPath;
 import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
-import polyglot.ast.Expr;
-import polyglot.ast.Field;
-import polyglot.ast.Node;
-import polyglot.ast.Term;
+import polyglot.ast.*;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
@@ -33,7 +25,7 @@ import polyglot.visit.TypeChecker;
 public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalNode
 {
     protected Expr expr;
-    protected String name;
+    protected Id name;
     
     public AmbPrincipalNode_c(Position pos, Expr expr) {
         super(pos);
@@ -41,7 +33,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         this.name = null;
     }
     
-    public AmbPrincipalNode_c(Position pos, String name) {
+    public AmbPrincipalNode_c(Position pos, Id name) {
         super(pos);
         this.expr = null;
         this.name = name;
@@ -120,8 +112,8 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         return nf.CanonicalPrincipalNode(position(),
                                          ts.dynamicPrincipal(position(), JifUtil.exprToAccessPath(expr, (JifContext)ar.context())));
     }
-    protected Node disambiguateName(AmbiguityRemover ar, String name) throws SemanticException {
-        if ("_".equals(name)) {
+    protected Node disambiguateName(AmbiguityRemover ar, Id name) throws SemanticException {
+        if ("_".equals(name.id())) {
             // "_" is the bottom principal
             JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
             JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
@@ -129,7 +121,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
                                              ts.bottomPrincipal(position()));
         }
         Context c = ar.context();
-        VarInstance vi = c.findVariable(name);
+        VarInstance vi = c.findVariable(name.id());
         
         if (vi instanceof JifVarInstance) {
             return varToPrincipal((JifVarInstance) vi, ar);
@@ -195,11 +187,22 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         return this;    
     }
     public Node visitChildren(NodeVisitor v) {
-        if (this.expr == null) return this;
-        
-        Expr expr = (Expr) visitChild(this.expr, v);
-        if (this.expr == expr) { return this; }
-        return new AmbPrincipalNode_c(this.position, expr); 
+        Expr expr = this.expr;
+        Id name = this.name;
+        if (this.expr != null) {
+            expr = (Expr) visitChild(this.expr, v);
+        }
+        if (this.name != null) {
+            name = (Id) visitChild(this.name, v);
+        }
+
+        if (this.expr != expr) { 
+            return new AmbPrincipalNode_c(this.position, expr);             
+        }
+        if (this.name != name) { 
+            return new AmbPrincipalNode_c(this.position, name);             
+        }
+        return this;
     }
     
 }
