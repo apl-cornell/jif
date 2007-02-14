@@ -6,6 +6,7 @@ import jif.ast.JifMethodDecl;
 import jif.ast.JifMethodDecl_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
+import jif.types.label.*;
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
@@ -134,6 +135,20 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             index++;
         }
         
+        // check label constraints
+        for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
+            Assertion a = (Assertion)iter.next();
+            if (a instanceof LabelLeAssertion) {
+                LabelLeAssertion lla = (LabelLeAssertion)a;
+                // no covariant labels can occur on the RHS of a constraint,
+                // as subtypes may violate this constraint.
+                // They may, however, occur on the LHS, since if a supertype
+                // satisfies the constraint, then the subtype will too.
+                CovariantLabelChecker clc = new CovariantLabelChecker(a.position());
+//!@!                lla.rhs().subst(clc);
+            }
+        }
+        
     }
     
     /**
@@ -155,5 +170,49 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             CallHelper.OverrideHelper(mj, mi, lc).checkOverride(lc);
         }
     }
+    
+    /**
+     * Checker to ensure that no covariant label occurs in the label
+     */    
+    protected static class CovariantLabelChecker extends LabelSubstitution {
+        private final Position errPosition;
+
+        CovariantLabelChecker(Position errPosition) {
+            this.errPosition = errPosition;
+        }
+        public Label substLabel(Label L) throws SemanticException {
+            if (L instanceof ThisLabel) {
+//                throw new SemanticDetailedException("The \"this\" label " +
+//                                                    "can not occur on the right hand side of " +
+//                                                    "a label constraint.", 
+//                                                    "The \"this\" label " +
+//                                                    "can not occur on the right hand side of " +
+//                                                    "a label constraint, since it is covariant, and " +
+//                                                    "subclasses may " +
+//                                                    "not satisfy the constraint.",
+//                                                    errPosition);
+            }
+            else if (L.isCovariant()) {
+                throw new SemanticDetailedException("Covariant labels " +
+                                "can not occur on the right hand side of " +
+                                "a label constraint.", 
+                                "Covariant labels " +
+                                "can not occur on the right hand side of " +
+                                "a label constraint, since subclasses may " +
+                                "not satisfy the constraint.",
+                                errPosition);
+            }
+            return L;
+        }
+
+        /**
+         * We do not want to check the labelOf components of fields.
+         */
+        public boolean recurseIntoLabelOf() {
+            return false;
+        }
+
+    }
+    
     
 }
