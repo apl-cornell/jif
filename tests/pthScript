@@ -416,6 +416,7 @@ jif.ExtensionInfo  "-classpath ../classes:../lib-classes:../lib/jif.jar:../lib/j
 	Params41.jif ;
 	Params42.jif ; # return a more reasonable error.
 	Params43.jif ;
+	Params44.jif (Semantic, "not less restrictive");
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;
