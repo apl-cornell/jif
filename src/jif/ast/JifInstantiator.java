@@ -1,34 +1,12 @@
 package jif.ast;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import jif.types.JifContext;
-import jif.types.JifPolyType;
-import jif.types.JifSubst;
-import jif.types.JifSubstType;
-import jif.types.JifTypeSystem;
-import jif.types.LabelSubstitution;
-import jif.types.Param;
-import jif.types.ParamInstance;
-import jif.types.label.AccessPath;
-import jif.types.label.AccessPathRoot;
-import jif.types.label.AccessPathThis;
-import jif.types.label.AccessPathUninterpreted;
-import jif.types.label.ArgLabel;
-import jif.types.label.Label;
-import jif.types.label.ThisLabel;
+import jif.types.*;
+import jif.types.label.*;
 import jif.types.principal.Principal;
 import polyglot.ast.Expr;
-import polyglot.types.ArrayType;
-import polyglot.types.ReferenceType;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -240,6 +218,9 @@ public class JifInstantiator
             Iterator iActualParamLabels = actualParamLabels.iterator();
             
             // go through each formal and actual param, and make substitutions.
+            if (jpt.params().size() != actualParamLabels.size()) {
+                throw new InternalCompilerError("Inconsistent sizes for params. Error, please contact a Jif developer");
+            }
             while (iActualParamLabels.hasNext()) {
                 Label actualParamLabel = (Label)iActualParamLabels.next();                    
                 ParamInstance pi = (ParamInstance)iFormalParams.next();

@@ -87,7 +87,7 @@ public class JifCallDel extends JifJL_c
     
     protected VarLabel receiverVarLabel;
     protected List argVarLabels; // list of var labels for the actual args
-    protected List paramVarLabels; // list of var labels for the actual parameters of the type.
+    protected List paramVarLabels; // list of var labels for the actual parameters of the return type.
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Call c = (Call)super.typeCheck(tc);
@@ -126,14 +126,12 @@ public class JifCallDel extends JifJL_c
             del.argVarLabels.add(argLbl);
         }
 
-        Type t = mi.returnType();
-        if (t instanceof JifSubstType) {            
-            JifSubstType jst = (JifSubstType)t;
-            del.paramVarLabels = new ArrayList(jst.subst().substitutions().size());
+        if (ts.unlabel(mi.container()) instanceof JifSubstType) {            
+            JifSubstType jst = (JifSubstType)ts.unlabel(mi.container());
+            del.paramVarLabels = new ArrayList(jst.instantiatedFrom().formals().size());
             
-            for (Iterator i = jst.entries(); i.hasNext();) {
-                Map.Entry e = (Map.Entry)i.next();
-                Param param = (Param)e.getValue();
+            for (Iterator i = jst.actuals().iterator(); i.hasNext();) {
+                Param param = (Param)i.next();
                 VarLabel paramLbl =  ts.freshLabelVariable(param.position(), 
                                                          "param_"+param+"_label",
                                                          "label of param " + param + " of call " + c.toString());
@@ -143,6 +141,7 @@ public class JifCallDel extends JifJL_c
         else {
             del.paramVarLabels = Collections.EMPTY_LIST;
         }
+        Type t = mi.returnType();
         
         Type retType =  JifInstantiator.instantiate(t, A, 
                                                     receiverExpr, 

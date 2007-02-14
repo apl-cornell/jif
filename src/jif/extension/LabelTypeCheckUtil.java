@@ -158,9 +158,8 @@ public class LabelTypeCheckUtil {
         if (t instanceof JifSubstType) {            
             JifSubstType jst = (JifSubstType)t;
             
-            for (Iterator i = jst.entries(); i.hasNext();) {
-                Map.Entry e = (Map.Entry)i.next();
-                Object arg = e.getValue();
+            for (Iterator i = jst.actuals().iterator(); i.hasNext();) {
+                Object arg = i.next();
                 if (arg instanceof Label) {
                     Label L = (Label)arg;
                     typeCheckLabel(tc, L);
@@ -207,9 +206,8 @@ public class LabelTypeCheckUtil {
             JifSubstType jst = (JifSubstType)t;
             Xparams = new ArrayList(jst.subst().substitutions().size());
             
-            for (Iterator i = jst.entries(); i.hasNext();) {
-                Map.Entry e = (Map.Entry)i.next();
-                Object arg = e.getValue();
+            for (Iterator i = jst.actuals().iterator(); i.hasNext();) {
+                Object arg = i.next();
                 if (arg instanceof Label) {
                     Label L = (Label)arg;
                     A = (JifContext)A.pushBlock();
@@ -282,9 +280,8 @@ public class LabelTypeCheckUtil {
         if (t instanceof JifSubstType && ts.isParamsRuntimeRep(t)) {            
             JifSubstType jst = (JifSubstType)t;
             List exc = new ArrayList();
-            for (Iterator i = jst.entries(); i.hasNext();) {
-                Map.Entry e = (Map.Entry)i.next();
-                Object arg = e.getValue();
+            for (Iterator i = jst.actuals().iterator(); i.hasNext();) {
+                Object arg = i.next();
                 if (arg instanceof Label) {
                     exc.addAll(((Label)arg).throwTypes(ts));
                 }
@@ -310,9 +307,8 @@ public class LabelTypeCheckUtil {
         if (t instanceof JifSubstType) {            
             JifSubstType jst = (JifSubstType)t;
             Set lis = new LinkedHashSet();
-            for (Iterator i = jst.entries(); i.hasNext();) {
-                Map.Entry e = (Map.Entry)i.next();
-                Object arg = e.getValue();
+            for (Iterator i = jst.actuals().iterator(); i.hasNext();) {
+                Object arg = i.next();
                 AccessPath p = null;
                 if (arg instanceof DynamicLabel) {
                     p = ((DynamicLabel)arg).path();

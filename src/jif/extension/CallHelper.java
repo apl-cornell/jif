@@ -141,7 +141,7 @@ public class CallHelper {
             if (jts.isLabeled(t)) {
                 ArgLabel al = (ArgLabel)jts.labelOfType(t);
                 LocalInstance formalInst = (LocalInstance)al.formalInstance();
-                Local l = nf.Local(formalInst.position(), al.name()).
+                Local l = nf.Local(formalInst.position(), nf.Id(al.position(), al.name())).
     				localInstance(formalInst);
                 actualArgs.add(l);
             }
@@ -829,16 +829,24 @@ public class CallHelper {
                                              false));
         }
         
-        // bind all the actual param var labels
-        for (int i = 0; i < actualParamVarLabels.size(); i++) {
-            VarLabel paramVarLbl = (VarLabel)actualArgVarLabels.get(i);
-            Label paramLbl = (Label)this.actualArgLabels.get(i);
-            lc.constrain(new LabelConstraint(new NamedLabel(paramVarLbl.componentString(), paramVarLbl), 
-                                             LabelConstraint.EQUAL, new NamedLabel(paramVarLbl.componentString(), paramLbl), 
-                                             A.labelEnv(), this.position, 
-                                             false));
+        // bind all the actual param var labels.
+        // that is, the labels of the parameter values in the type are bound
+        // to the variables that represent them.
+        // e.g., in the constructor call "new C[lbl1, o.lbl2]()", the values
+        // of the expression "lbl1" and "o.lbl2" may reveal information, and
+        // thus the labels of the expressions need to be considered. This only
+        // needs to be done for static methods and constructor calls.
+        
+        if (this.pi.flags().isStatic() || this.pi instanceof ConstructorInstance) {
+            for (int i = 0; i < actualParamVarLabels.size(); i++) {
+                VarLabel paramVarLbl = (VarLabel)actualParamVarLabels.get(i);
+                Label paramLbl = (Label)this.actualParamLabels.get(i);
+                lc.constrain(new LabelConstraint(new NamedLabel(paramVarLbl.componentString(), paramVarLbl), 
+                                                 LabelConstraint.EQUAL, new NamedLabel(paramVarLbl.componentString(), paramLbl), 
+                                                 A.labelEnv(), this.position, 
+                                                 false));
+            }
         }
-
     }
 
     protected static List getArgLabelsFromFormalTypes(List formalTypes,

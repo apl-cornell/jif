@@ -31,7 +31,7 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
         }
 
         if (!ts.isParamsRuntimeRep(castType)) {
-            if ((castType instanceof JifSubstType && ((JifSubstType)castType).entries().hasNext()) ||
+            if ((castType instanceof JifSubstType && !((JifSubstType)castType).actuals().isEmpty()) ||
                 (castType instanceof JifPolyType && !((JifPolyType)castType).params().isEmpty()))                    
             throw new SemanticException("Cannot cast to " + castType +
                                         ", since it does " +
@@ -49,7 +49,7 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
 //            }
         }
 
-        this.isToSubstJifClass = (castType instanceof JifSubstType && ((JifSubstType)castType).entries().hasNext());
+        this.isToSubstJifClass = (castType instanceof JifSubstType && !((JifSubstType)castType).actuals().isEmpty());
 
         ts.labelTypeCheckUtil().typeCheckType(tc, castType);
         return super.typeCheck(tc);

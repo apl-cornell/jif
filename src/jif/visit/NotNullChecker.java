@@ -492,9 +492,8 @@ public class NotNullChecker extends DataFlow
         if (t instanceof JifSubstType && ((JifTypeSystem)ts).isParamsRuntimeRep(t)) {            
             LabelNotNullSubst lnns = new LabelNotNullSubst(inItem);
             JifSubstType jst = (JifSubstType)t;
-            for (Iterator i = jst.entries(); i.hasNext();) {
-                Map.Entry e = (Map.Entry)i.next();
-                Object arg = e.getValue();
+            for (Iterator i = jst.actuals().iterator(); i.hasNext();) {
+                Object arg = i.next();
                 if (arg instanceof Label) {
                     Label L = (Label)arg;
                     try {

@@ -32,7 +32,7 @@ public class JifInstanceOfDel extends JifJL_c
         }
 
         if (!ts.isParamsRuntimeRep(compareType)) {
-            if ((compareType instanceof JifSubstType && ((JifSubstType)compareType).entries().hasNext()) ||
+            if ((compareType instanceof JifSubstType && !((JifSubstType)compareType).actuals().isEmpty()) ||
                 (compareType instanceof JifPolyType && !((JifPolyType)compareType).params().isEmpty()))                    
             throw new SemanticException("Cannot perform instanceof on " + compareType +
                                         ", since it does " +
