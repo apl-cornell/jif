@@ -34,6 +34,13 @@ public abstract class AbstractCollection[label L] implements Collection[L] {
     public boolean{L} remove{L}(String{L} o) {
         return remove(new JifString[L](o));        
     }
+    public boolean{L;o} contains{L}(String{L} o) {
+        return contains(new JifString[L](o));                
+    }
+    public boolean{L;*lbl;lbl;o} contains{*lbl}(label lbl, String{*lbl} o) {
+        return contains(lbl, new JifString[lbl](o));                        
+    }
+
 
 
     public boolean{L} remove{L}(JifObject[L]{L} o) {

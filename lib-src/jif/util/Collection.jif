@@ -40,4 +40,6 @@ public interface Collection[label L] extends JifObject[L] {
     // Note: when keys are returned, they will be returned as JifString[L]s
     boolean{L} add{L}(String{L} o):{L} throws (ClassCastException{L}, IllegalArgumentException{L});
     boolean{L} remove{L}(String{L} o);
+    boolean{L;o} contains{L}(String{L} o);
+    boolean{L;*lbl;lbl;o} contains{*lbl}(label lbl, String{*lbl} o);
 }
