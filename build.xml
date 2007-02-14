@@ -160,6 +160,8 @@
     <target name="configure" description="Configure jif">
         <antcall target="check-classpath" />
         <antcall target="jif-executable-bat" />
+    	<chmod file="${jif}" perm="a+x"/>
+    	<chmod file="${jifc}" perm="a+x"/>
     </target>
 
     <target name="check-classpath" description="Check the classpath contains the appropriate directories/jars">
