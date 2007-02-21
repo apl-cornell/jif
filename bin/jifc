@@ -129,8 +129,8 @@ if [ -n "$POLYGLOT" ]; then
 fi
 
 
-PATH=`unixpath $PATH`
-runtime_lib_path="$dir/lib:$PATH"
+PATH_unix=`unixpath $PATH`
+runtime_lib_path="$dir/lib:$PATH_unix"
 sig_classpath="$dir/sig-classes:$dir/lib/jifsig.jar"
 runtime_classpath="$dir/rt-classes:$dir/lib/jifrt.jar"
 lib_classpath="$dir/lib-classes:$dir/lib/jiflib.jar"
