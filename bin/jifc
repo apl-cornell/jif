@@ -12,7 +12,7 @@ usage() {
 EOF
 }
 
-fixclasspath() {
+fixpath() {
   windows=0
 
   if [ `uname | grep -c CYGWIN` -ne 0 ]; then
@@ -39,6 +39,22 @@ unixfilename() {
 
   if [ "$windows" = 1 ]; then 
     cygpath -u "$cp"
+  else
+    echo "$cp"
+  fi
+}
+
+unixpath() {
+  windows=0
+
+  if [ `uname | grep -c CYGWIN` -ne 0 ]; then
+    windows=1
+  fi
+
+  cp="$1"
+
+  if [ "$windows" = 1 ]; then 
+    cygpath -pu "$cp"
   else
     echo "$cp"
   fi
@@ -102,6 +118,7 @@ while true; do
     esac
 done
 
+classpath=`unixpath $classpath`
 classpath="$dir/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar:$dir/lib/JFlex.jar"
 classpath="$classpath:$dir/classes:$dir/lib/jif.jar"
 classpath="$classpath:$extra_cp"
@@ -112,17 +129,18 @@ if [ -n "$POLYGLOT" ]; then
 fi
 
 
+PATH=`unixpath $PATH`
 runtime_lib_path="$dir/lib:$PATH"
 sig_classpath="$dir/sig-classes:$dir/lib/jifsig.jar"
 runtime_classpath="$dir/rt-classes:$dir/lib/jifrt.jar"
 lib_classpath="$dir/lib-classes:$dir/lib/jiflib.jar"
 classpath="$classpath:$lib_classpath"
 
-runtime_lib_path=`fixclasspath "$runtime_lib_path"`
-sig_classpath=`fixclasspath "$sig_classpath"`
-runtime_classpath=`fixclasspath "$runtime_classpath"`
-lib_classpath=`fixclasspath "$lib_classpath"`
-classpath=`fixclasspath "$classpath"`
+runtime_lib_path=`fixpath "$runtime_lib_path"`
+sig_classpath=`fixpath "$sig_classpath"`
+runtime_classpath=`fixpath "$runtime_classpath"`
+lib_classpath=`fixpath "$lib_classpath"`
+classpath=`fixpath "$classpath"`
 
 
 if [ "$usage" = 1 ]; then
