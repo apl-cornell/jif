@@ -4,6 +4,7 @@ import java.util.List;
 
 import jif.types.label.Label;
 import polyglot.types.ProcedureInstance;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 
 /** Jif procedure instance. A wrapper of all the type information 
@@ -25,4 +26,6 @@ public interface JifProcedureInstance extends ProcedureInstance
 
     void subst(VarMap bounds);
     void subst(LabelSubstitution subst) throws SemanticException;
+    
+    ReferenceType container();
 }
