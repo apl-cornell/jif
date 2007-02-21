@@ -118,8 +118,8 @@ while true; do
     esac
 done
 
-classpath=`unixpath $classpath`
-classpath="$dir/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar:$dir/lib/JFlex.jar"
+classpath=`unixpath $CLASSPATH`
+classpath="$classpath:$dir/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar:$dir/lib/JFlex.jar"
 classpath="$classpath:$dir/classes:$dir/lib/jif.jar"
 classpath="$classpath:$extra_cp"
 if [ -n "$POLYGLOT" ]; then 
