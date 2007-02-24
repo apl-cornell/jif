@@ -7,29 +7,25 @@ import jif.translate.JifToJavaRewriter;
 import jif.types.JifSubstType;
 import jif.types.JifTypeSystem;
 import jif.visit.JifInitChecker;
+import jif.visit.NotNullChecker;
+import jif.visit.PreciseClassChecker;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.frontend.CyclicDependencyException;
-import polyglot.frontend.JLScheduler;
-import polyglot.frontend.Job;
-import polyglot.frontend.Source;
+import polyglot.frontend.*;
 import polyglot.frontend.goals.FieldConstantsChecked;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.VisitorGoal;
-import polyglot.types.FieldInstance;
-import polyglot.types.ParsedClassType;
-import polyglot.types.ParsedTypeObject;
-import polyglot.types.TypeSystem;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 
 public class JifScheduler extends JLScheduler {
-   protected OutputExtensionInfo jlext;
-   /**
-    * Hack to ensure that we track the job for java.lang.Object specially.
-    * In particular, ensure that it is submitted for re-writing before
-    * any other job.
-    */
-   protected Job objectJob = null;
+    protected OutputExtensionInfo jlext;
+    /**
+     * Hack to ensure that we track the job for java.lang.Object specially.
+     * In particular, ensure that it is submitted for re-writing before
+     * any other job.
+     */
+    protected Job objectJob = null;
 
     public JifScheduler(jif.ExtensionInfo extInfo, OutputExtensionInfo jlext) {
         super(extInfo);
@@ -37,19 +33,78 @@ public class JifScheduler extends JLScheduler {
     }
 
     public LabelCheckGoal LabelsChecked(Job job) {
-        return (LabelCheckGoal)internGoal(new LabelCheckGoal(job));
+        LabelCheckGoal g = (LabelCheckGoal)internGoal(new LabelCheckGoal(job));
+
+        try {
+            addPrerequisiteDependency(g, this.FieldLabelInference(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
+
     }
 
     public FieldLabelInferenceGoal FieldLabelInference(Job job) {
-        return (FieldLabelInferenceGoal)internGoal(new FieldLabelInferenceGoal(job));
+        FieldLabelInferenceGoal g = (FieldLabelInferenceGoal)internGoal(new FieldLabelInferenceGoal(job));
+
+        try {
+            addPrerequisiteDependency(g, this.ExceptionsChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
+
+    }
+
+    public Goal PreciseClassChecker(Job job) {
+        Goal g = internGoal(new VisitorGoal(job, new PreciseClassChecker(job)));
+
+        try {
+            addPrerequisiteDependency(g, this.ReachabilityChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
+
+    }
+
+    public Goal NotNullChecker(Job job) {
+        Goal g = internGoal(new VisitorGoal(job, new NotNullChecker(job)));
+
+        try {
+            addPrerequisiteDependency(g, this.ReachabilityChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
+
+    }
+
+
+    public Goal ExceptionsChecked(Job job) {
+        Goal g = super.ExceptionsChecked(job);
+        try {
+            addPrerequisiteDependency(g, this.NotNullChecker(job));
+            addPrerequisiteDependency(g, this.PreciseClassChecker(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
 
     public Goal JifToJavaRewritten(Job job) {
         JifTypeSystem ts = (JifTypeSystem) extInfo.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) extInfo.nodeFactory();
         Goal g = internGoal(new VisitorGoal(job, new JifToJavaRewriter(job, ts, nf, jlext)));     
-        
+
         try {
+            addPrerequisiteDependency(g, this.Serialized(job));
+            
             // make sure that if Object.jif is being compiled, it is always
             // written to Java before any other job.
             if (objectJob != null && job != objectJob)
@@ -61,6 +116,18 @@ public class JifScheduler extends JLScheduler {
         }
         return g;
     }
+
+    public Goal Serialized(Job job) {
+        Goal g = super.Serialized(job);
+        try {
+            addPrerequisiteDependency(g, this.LabelsChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
+    }
+
     public Goal FieldConstantsChecked(FieldInstance fi) {
         Goal g = internGoal(new JifFieldConstantsChecked(fi));
         try {
@@ -104,7 +171,7 @@ public class JifScheduler extends JLScheduler {
         }
         return false;
     }
-    
+
     private static class JifFieldConstantsChecked extends FieldConstantsChecked {
         public JifFieldConstantsChecked(FieldInstance fi) {
             super(fi);
@@ -140,4 +207,5 @@ public class JifScheduler extends JLScheduler {
         }
         return j;
     }
+
 }

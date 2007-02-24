@@ -23,6 +23,10 @@ public class PreciseClassChecker extends DataFlow
         EDGE_KEY_CLASS_CAST_EXC = null; 
     }
 
+    public PreciseClassChecker(Job job) {
+        this(job, job.extensionInfo().typeSystem(), job.extensionInfo().nodeFactory());
+    }
+
     private FlowGraph.ExceptionEdgeKey EDGE_KEY_CLASS_CAST_EXC;
     
     public NodeVisitor begin() {

@@ -43,12 +43,12 @@ import polyglot.util.InternalCompilerError;
  */
 public class ExtensionInfo extends JLExtensionInfo
 {
-//    protected boolean doInfer = false;
+//  protected boolean doInfer = false;
     protected OutputExtensionInfo jlext = new OutputExtensionInfo(this);
     protected OutputExtensionInfo jlrtext = new OutputExtensionInfo(this);
 
     public String defaultFileExtension() {
-	return "jif";
+        return "jif";
     }
 
     public String compilerName() {
@@ -62,7 +62,7 @@ public class ExtensionInfo extends JLExtensionInfo
     public JifOptions getJifOptions() {
         return (JifOptions)this.getOptions();
     }
-    
+
     static public Set topics = new LinkedHashSet();
     static { topics.add("jif"); }
 
@@ -73,7 +73,7 @@ public class ExtensionInfo extends JLExtensionInfo
 
     protected TypeSystem createTypeSystem() {
         // For looking up Java code during rewriting.
-	return new JifTypeSystem_c(jlTypeSystem());
+        return new JifTypeSystem_c(jlTypeSystem());
     }
 
     public void initCompiler(Compiler compiler) {
@@ -86,43 +86,43 @@ public class ExtensionInfo extends JLExtensionInfo
         try {
             LoadedClassResolver lr;
             lr = new SourceClassResolver(compiler, this, 
-                    getJifOptions().constructJifClasspath(),
-                    compiler.loader(), false,
-		    getOptions().compile_command_line_only,
-                    getOptions().ignore_mod_times);
+                                         getJifOptions().constructJifClasspath(),
+                                         compiler.loader(), false,
+                                         getOptions().compile_command_line_only,
+                                         getOptions().ignore_mod_times);
             ts.initialize(lr, this);
         }
         catch (SemanticException e) {
             throw new InternalCompilerError(
-                "Unable to initialize type system: ", e);
+                                            "Unable to initialize type system: ", e);
         }
     }
 
     protected NodeFactory createNodeFactory() {
-	return new JifNodeFactory_c();
+        return new JifNodeFactory_c();
     }
 
     public polyglot.main.Version version() {
-	return new Version();
+        return new Version();
     }
 
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
 
-      polyglot.lex.Lexer lexer =
-          new jif.parse.Lexer_c(reader, source, eq);
-      polyglot.parse.BaseParser grm =
-          new jif.parse.Grm(lexer, (JifTypeSystem)ts,
-					 (JifNodeFactory)nf, eq);
+        polyglot.lex.Lexer lexer =
+            new jif.parse.Lexer_c(reader, source, eq);
+        polyglot.parse.BaseParser grm =
+            new jif.parse.Grm(lexer, (JifTypeSystem)ts,
+                              (JifNodeFactory)nf, eq);
 
-      return new CupParser(grm, source, eq);
+        return new CupParser(grm, source, eq);
     }
 
     public static class JifJobExt implements JobExt {
-      public JifJobExt(JifTypeSystem ts) {     }
+        public JifJobExt(JifTypeSystem ts) {     }
     }
 
     public JobExt jobExt() {
-      return new JifJobExt((JifTypeSystem) typeSystem());
+        return new JifJobExt((JifTypeSystem) typeSystem());
     }
 
     protected Scheduler createScheduler() {
@@ -131,39 +131,7 @@ public class ExtensionInfo extends JLExtensionInfo
 
     public Goal getCompileGoal(Job job) {
         JifScheduler jifScheduler = (JifScheduler)scheduler();
-        
-        List l = new ArrayList();
-
-        // add not null check and precise classes check before exception checking
-        l.add(jifScheduler.ReachabilityChecked(job));
-
-        l.add(jifScheduler.internGoal(new VisitorGoal(job, new NotNullChecker(job, ts, nf))));
-        l.add(jifScheduler.internGoal(new VisitorGoal(job, new PreciseClassChecker(job, ts, nf))));
-
-        l.add(jifScheduler.ExceptionsChecked(job));
-
-        // add field label inference after exception checking.
-        FieldLabelInferenceGoal fliGoal = jifScheduler.FieldLabelInference(job);
-        l.add(fliGoal);
-
-        // add label checking after field label inference.
-        LabelCheckGoal labelCheckGoal = jifScheduler.LabelsChecked(job);
-        l.add(labelCheckGoal);
-
-        l.add(jifScheduler.Serialized(job));
-
-        // add the jif to java rewrite at the end of the list.
-        Goal g = jifScheduler.internGoal(jifScheduler.JifToJavaRewritten(job));
-        l.add(g);
-
-        try {
-            jifScheduler.addPrerequisiteDependencyChain(l);
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
-
-        return g;
+        return jifScheduler.JifToJavaRewritten(job);
     }
     static {
         // touch Topics to force the static initializer to be loaded.
@@ -172,6 +140,6 @@ public class ExtensionInfo extends JLExtensionInfo
 
     public FileSource createFileSource(java.io.File f, boolean user) throws IOException
     {
-	return new jif.parse.UTF8FileSource(f, user);
+        return new jif.parse.UTF8FileSource(f, user);
     }
 }

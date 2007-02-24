@@ -43,6 +43,10 @@ public class NotNullChecker extends DataFlow
         EDGE_KEY_NPE = null; 
     }
 
+    public NotNullChecker(Job job) {
+        this(job, job.extensionInfo().typeSystem(), job.extensionInfo().nodeFactory());
+    }
+
     private FlowGraph.ExceptionEdgeKey EDGE_KEY_NPE;
     
     public NodeVisitor begin() {
