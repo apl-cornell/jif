@@ -27,19 +27,19 @@ package jif.lang;
 public interface Principal {
     static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
     /**
-     * The name of this principal. Names should be unique within an 
-     * implementation class, that is, given two Principal objects, o and p,
-     * o and p are considered to represent the same principal if
-     * <code>o.getClass() == p.getClass()</code> and 
+     * The name of this principal. Names should be unique within an
+     * implementation class, that is, given two Principal objects, o and p, o
+     * and p are considered to represent the same principal if
+     * <code>o.getClass() == p.getClass()</code> and
      * <code>o.name().equals(p.name())</code>.
      */
     String{this} name();
     
     /**
-     * Does this principal delegate its authority to the 
-     * principal p?
+     * Does this principal delegate its authority to the principal p?
      */
-    boolean{this;p;this!:} delegatesTo(principal p);
+
+    boolean{this; p; this←} delegatesTo(principal p);
     
     /**
      * Is this principal equal to the Principal p?
@@ -47,31 +47,32 @@ public interface Principal {
     boolean equals(Principal p);
     
     /**
-     * Does the <code>authPrf<code> provide
-     * sufficient proof of this principal's authority to
-     * execute the closure <code>closure</code>? If <code>executeNow</code>, then
-     * the closure will be executed immediately; otherwise,
-     * a capability will be created.
-     * For example, <code>authPrf<code> may be
-     * a password (or a password digest, or a certificate, etc.), 
-     * and this method will return true if that password matches
-     * the principal's password, and the closure is one that the
+     * Does the <code>authPrf<code> provide sufficient proof of this
+     * principal's authority to execute the closure <code>closure</code>? If
+     * <code>executeNow</code>, then the closure will be executed immediately;
+     * otherwise, a capability will be created.  For example,
+     * <code>authPrf<code> may be a password (or a password digest, or a
+     * certificate, etc.), and this method will return true if that password
+     * matches the principal's password, and the closure is one that the
      * principal expects to be asked to authorize.
      */
-    boolean{authPrf; closure; lb; *lb; executeNow; this; this!:} isAuthorized{this!:}(Object authPrf, 
-                                                          Closure[this, lb] closure,
-                                                          label lb,
-                                                          boolean executeNow) where authority (this);
+    boolean{authPrf; closure; lb; *lb; executeNow; this; this←}
+	isAuthorized{this←}(Object authPrf, 
+			    Closure[this, lb] closure,
+			    label lb,
+			    boolean executeNow) where authority (this);
     
     /**
      * Search for a proof that the principal p can act for this principal.
      * Return null if no such proof can be found.
      */
-    ActsForProof{this;p;this!:;p!:} findProofUpto{this!:}(Principal p, Object searchState);
+    ActsForProof{this; p; this←; p←}
+	findProofUpto{this←}(Principal p, Object searchState);
     
     /**
      * Search for a proof that this principal can act for the principal q.
      * Return null if no such proof can be found.
      */
-    ActsForProof{this;q;q!:;this!:} findProofDownto{this!:}(Principal q, Object searchState);    
+    ActsForProof{this; q; q←; this←}
+	findProofDownto{this←}(Principal q, Object searchState);    
 }

@@ -12,14 +12,14 @@ public class PrincipalUtil {
     /**
      * Does the principal p act for the principal q? 
      */
-    public static native boolean{p;q;q!:} acts_for(Principal p, Principal q);
+    public static native boolean{p;q;q←} acts_for(Principal p, Principal q);
 
     /**
      * Are the principals p and q equivalent to each other? That is,
      * does p act for q, and q act for p?
      * 
      */
-    public static boolean{p;q;p!:;q!:} equivalentTo(Principal p, Principal q) {
+    public static boolean{p;q;p←;q←} equivalentTo(Principal p, Principal q) {
         return acts_for(p, q) && acts_for(q, p);
     }
 
@@ -28,7 +28,8 @@ public class PrincipalUtil {
      * between p and q is a proof that p acts for q. See the subclasses
      * of ActsForProof for more information.
      */
-    public static native ActsForProof{p;q;q!:} findActsForProof(Principal p, Principal q, Object searchState);
+    public static native ActsForProof{p;q;q←}
+	findActsForProof(Principal p, Principal q, Object searchState);
 
     /**
      * Verify that the chain is a valid delegates-chain between p and q. That is,
@@ -36,7 +37,7 @@ public class PrincipalUtil {
      * p acts for q.
 
      */
-    public static native boolean verifyProof(ActsForProof{p;q;q!:} proof, 
+    public static native boolean verifyProof(ActsForProof{p;q;q←} proof, 
                                              Principal p, Principal q);
     
     /**
@@ -50,9 +51,10 @@ public class PrincipalUtil {
      * should call this method when revoking a delegation, or risk an out-of-date
      * cache.
      */
-    public static native void notifyRevokeDelegation(Principal granter, Principal superior);
+    public static native void notifyRevokeDelegation(Principal granter,
+						     Principal superior);
 
-        /**
+    /**
      * Obtain a Capability for the given principal and closure.
      */
     public static native Capability[p, lb]
@@ -61,15 +63,15 @@ public class PrincipalUtil {
     /**
      * Execute the closure for the given principal.
      */
-    public static native Object{c;lb;authPrf;p;*lb} execute{*lb}(principal p, Object authPrf, Closure[p, lb] c, label lb);
+    public static native Object{c;lb;authPrf;p;*lb}
+	execute{*lb}(principal p, Object authPrf, Closure[p, lb] c, label lb);
 
     /**
      * returns the null principal, the principal that every other principal can
      * act for.
      */                
-    public static native principal{*!:*} nullPrincipal();
+    public static native principal{*←*} nullPrincipal();
     
     public static native String stringValue(principal p); 
     public static native String toString(principal p); 
-    
 }
