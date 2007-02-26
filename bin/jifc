@@ -122,12 +122,6 @@ classpath=`unixpath $CLASSPATH`
 classpath="$classpath:$dir/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar:$dir/lib/JFlex.jar"
 classpath="$classpath:$dir/classes:$dir/lib/jif.jar"
 classpath="$classpath:$extra_cp"
-if [ -n "$POLYGLOT" ]; then 
-    polyglot_unix=`unixfilename "$POLYGLOT"` 
-    classpath="$classpath:$polyglot_unix/classes:$polyglot_unix/lib/polyglot.jar"
-    classpath="$classpath:$polyglot_unix/lib/java_cup.jar:$polyglot_unix/lib/JFlex.jar"
-fi
-
 
 PATH_unix=`unixpath $PATH`
 runtime_lib_path="$dir/lib:$PATH_unix"
@@ -135,6 +129,12 @@ sig_classpath="$dir/sig-classes:$dir/lib/jifsig.jar"
 runtime_classpath="$dir/rt-classes:$dir/lib/jifrt.jar"
 lib_classpath="$dir/lib-classes:$dir/lib/jiflib.jar"
 classpath="$classpath:$lib_classpath"
+
+if [ -n "$POLYGLOT" ]; then 
+    polyglot_unix=`unixfilename "$POLYGLOT"` 
+    classpath="$classpath:$polyglot_unix/classes:$polyglot_unix/lib/polyglot.jar"
+    classpath="$classpath:$polyglot_unix/lib/java_cup.jar:$polyglot_unix/lib/JFlex.jar"
+fi
 
 runtime_lib_path=`fixpath "$runtime_lib_path"`
 sig_classpath=`fixpath "$sig_classpath"`
