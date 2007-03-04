@@ -118,10 +118,10 @@ while true; do
     esac
 done
 
-classpath=`unixpath $CLASSPATH`
+unixclasspath=`unixpath $CLASSPATH`
+classpath="$extra_cp"
 classpath="$classpath:$dir/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar:$dir/lib/JFlex.jar"
 classpath="$classpath:$dir/classes:$dir/lib/jif.jar"
-classpath="$classpath:$extra_cp"
 
 PATH_unix=`unixpath $PATH`
 runtime_lib_path="$dir/lib:$PATH_unix"
@@ -135,6 +135,8 @@ if [ -n "$POLYGLOT" ]; then
     classpath="$classpath:$polyglot_unix/classes:$polyglot_unix/lib/polyglot.jar"
     classpath="$classpath:$polyglot_unix/lib/java_cup.jar:$polyglot_unix/lib/JFlex.jar"
 fi
+
+classpath="$classpath:$unixclasspath"
 
 runtime_lib_path=`fixpath "$runtime_lib_path"`
 sig_classpath=`fixpath "$sig_classpath"`

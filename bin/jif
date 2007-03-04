@@ -115,8 +115,8 @@ while true; do
     esac
 done
 
-classpath=`unixpath $CLASSPATH`
-classpath="$classpath:$extra_cp"
+unixclasspath=`unixpath $CLASSPATH`
+classpath="$extra_cp:$unixclasspath"
 classpath=`fixclasspath "$classpath"`
 
 
