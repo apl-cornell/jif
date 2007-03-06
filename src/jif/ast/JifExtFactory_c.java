@@ -82,6 +82,7 @@ import jif.translate.SourceFileToJavaExt_c;
 import jif.translate.ToJavaExt_c;
 import polyglot.ast.AbstractExtFactory_c;
 import polyglot.ast.Ext;
+import polyglot.ast.ExtFactory;
 
 /**
  * This class provides is Jif's Extension factory, creating the appropriate
@@ -92,6 +93,10 @@ public class JifExtFactory_c extends AbstractExtFactory_c
 
     public JifExtFactory_c() {
         super();
+    }
+
+    public JifExtFactory_c(ExtFactory nextExtFactory) {
+        super(nextExtFactory);
     }
 
     protected Ext extNodeImpl() {
