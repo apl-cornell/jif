@@ -107,11 +107,10 @@ public class PathMap
             Map.Entry e = (Map.Entry) i.next();
             Path p = (Path) e.getKey();
             Label L = (Label) e.getValue();
-            n.map.put(p, subst.substLabel(L));
+            n.map.put(p, L.subst(subst));
         }
 
         return n;
-        
     }
     
     public PathMap subst(VarMap bounds) {
