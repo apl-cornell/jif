@@ -67,7 +67,9 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         return n;
     }
 
-    protected JifConstructorDecl_c reconstruct(Id name, LabelNode startLabel, LabelNode returnLabel, List formals, List throwTypes, List constraints, Block body) {
+    protected JifConstructorDecl_c reconstruct(Id name, LabelNode startLabel, 
+	    LabelNode returnLabel, List formals, List throwTypes, 
+	    List constraints, Block body) {
         if (startLabel != this.startLabel || returnLabel != this.returnLabel || !CollectionUtil.equals(constraints, this.constraints)) {
             JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
             n.startLabel = startLabel;

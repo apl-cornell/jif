@@ -88,7 +88,8 @@ import polyglot.ast.ExtFactory;
  * This class provides is Jif's Extension factory, creating the appropriate
  * Ext objects as required.
  */
-public class JifExtFactory_c extends AbstractExtFactory_c
+public class JifExtFactory_c extends AbstractExtFactory_c 
+    implements JifStmtExtFactory
 {
 
     public JifExtFactory_c() {
@@ -324,11 +325,7 @@ public class JifExtFactory_c extends AbstractExtFactory_c
 
     public final Ext extInstTypeNode() {
         Ext e = extInstTypeNodeImpl();
-        if (nextExtFactory() != null && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory_c nextFactory = (JifExtFactory_c)nextExtFactory(); 
-            Ext e2 = nextFactory.extInstTypeNode();
-            e = composeExts(e, e2);
-        }
+
         return postExtInstTypeNode(e);
     }
 
@@ -455,6 +452,12 @@ public class JifExtFactory_c extends AbstractExtFactory_c
 
     public final Ext extDeclassifyStmt() {
         Ext e = extDeclassifyStmtImpl();
+        if (nextExtFactory() != null && 
+		nextExtFactory() instanceof JifStmtExtFactory) {
+            JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory(); 
+            Ext e2 = nextFac.extDeclassifyStmt();
+            e = composeExts(e2, e);
+        }
         return postExtDeclassifyStmt(e);
     }
 
@@ -465,6 +468,13 @@ public class JifExtFactory_c extends AbstractExtFactory_c
 
     public final Ext extEndorseStmt() {
         Ext e = extEndorseStmtImpl();
+        if (nextExtFactory() != null && 
+		nextExtFactory() instanceof JifStmtExtFactory) {
+            JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory(); 
+            Ext e2 = nextFac.extEndorseStmt();
+            e = composeExts(e2, e);
+        }
+
         return postExtEndorseStmt(e);
     }
 
