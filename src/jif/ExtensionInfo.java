@@ -45,7 +45,6 @@ public class ExtensionInfo extends JLExtensionInfo
 {
 //  protected boolean doInfer = false;
     protected OutputExtensionInfo jlext = new OutputExtensionInfo(this);
-    protected OutputExtensionInfo jlrtext = new OutputExtensionInfo(this);
 
     public String defaultFileExtension() {
         return "jif";
@@ -68,17 +67,17 @@ public class ExtensionInfo extends JLExtensionInfo
 
     protected TypeSystem jlTypeSystem() {
         // Use a JL type system for looking up principals.
-        return jlrtext.typeSystem();
+        return jlext.typeSystem();
     }
 
     protected TypeSystem createTypeSystem() {
-        // For looking up Java code during rewriting.
+        // Need to pass it the jlTypeSystem() so that
+        // it can look up jif.lang.Principal.
         return new JifTypeSystem_c(jlTypeSystem());
     }
 
     public void initCompiler(Compiler compiler) {
         jlext.initCompiler(compiler);
-        jlrtext.initCompiler(compiler);
         super.initCompiler(compiler);
     }
 
