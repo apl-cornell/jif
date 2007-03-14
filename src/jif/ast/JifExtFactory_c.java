@@ -49,37 +49,7 @@ import jif.extension.JifThrowExt;
 import jif.extension.JifTryExt;
 import jif.extension.JifUnaryExt;
 import jif.extension.JifWhileExt;
-import jif.translate.BinaryToJavaExt_c;
-import jif.translate.CallToJavaExt_c;
-import jif.translate.CannotToJavaExt_c;
-import jif.translate.CanonicalLabelNodeToJavaExt_c;
-import jif.translate.CanonicalPrincipalNodeToJavaExt_c;
-import jif.translate.CanonicalTypeNodeToJavaExt_c;
-import jif.translate.CaseToJavaExt_c;
-import jif.translate.CastToJavaExt_c;
-import jif.translate.ClassBodyToJavaExt_c;
-import jif.translate.ClassDeclToJavaExt_c;
-import jif.translate.ConstructorCallToJavaExt_c;
-import jif.translate.ConstructorDeclToJavaExt_c;
-import jif.translate.DowngradeExprToJavaExt_c;
-import jif.translate.DowngradeStmtToJavaExt_c;
-import jif.translate.ExprToJavaExt_c;
-import jif.translate.FieldDeclToJavaExt_c;
-import jif.translate.FieldToJavaExt_c;
-import jif.translate.FormalToJavaExt_c;
-import jif.translate.InitializerToJavaExt_c;
-import jif.translate.InstanceOfToJavaExt_c;
-import jif.translate.LabelExprToJavaExt_c;
-import jif.translate.LocalDeclToJavaExt_c;
-import jif.translate.LocalToJavaExt_c;
-import jif.translate.MethodDeclToJavaExt_c;
-import jif.translate.NewLabelToJavaExt_c;
-import jif.translate.NewToJavaExt_c;
-import jif.translate.PackageNodeToJavaExt_c;
-import jif.translate.PrincipalExprToJavaExt_c;
-import jif.translate.ReturnToJavaExt_c;
-import jif.translate.SourceFileToJavaExt_c;
-import jif.translate.ToJavaExt_c;
+import jif.translate.*;
 import polyglot.ast.AbstractExtFactory_c;
 import polyglot.ast.Ext;
 import polyglot.ast.ExtFactory;
@@ -107,6 +77,10 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     protected Ext extExprImpl() {
         return new Jif_c(new ExprToJavaExt_c());
     }
+    
+     protected Ext extIdImpl() {
+       return new Jif_c(new IdToJavaExt_c());
+     }
 
     /**
      * This method returns a vanilla Jif extensions (Jif_c) with a
