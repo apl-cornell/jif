@@ -39,22 +39,22 @@ public class JifOptions extends Options {
      /**
       * The classpath for the Jif signatures of java.lang objects.
       */
-     String sigcp = null;
+     public String sigcp = null;
 
      /**
       * Additional classpath entries for Jif signatures.
       */
-     List addSigcp = new ArrayList();
+     public List addSigcp = new ArrayList();
 
       /**
       * The classpath for the Jif runtime library
       */
-     String rtcp = null;
+     public String rtcp = null;
 
      /**
       * Additional classpath entries for Jif runtime code.
       */
-     List addRtcp = new ArrayList();
+     public List addRtcp = new ArrayList();
 
     /**
      * Constructor
@@ -155,7 +155,7 @@ public class JifOptions extends Options {
         usageForFlag(out, "-addrtcp <path>", "additional path for Jif runtime classes; prepended to rtcp");
     }
 
-    protected String constructSignatureClasspath() {
+    public String constructSignatureClasspath() {
         // use the signature classpath if it exists for compiling Jif classes
         String scp = "";
         for (Iterator iter = addSigcp.iterator(); iter.hasNext(); ) {
@@ -175,7 +175,7 @@ public class JifOptions extends Options {
                 File.pathSeparator + constructFullClasspath();
     }
 
-    protected String constructRuntimeClassPath() {
+    public String constructRuntimeClassPath() {
         String rcp = "";
         for (Iterator iter = addRtcp.iterator(); iter.hasNext(); ) {
             rcp += ((String)iter.next());
