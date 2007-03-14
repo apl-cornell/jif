@@ -324,6 +324,11 @@ public class JifExtFactory_c extends AbstractExtFactory_c
 
     public final Ext extInstTypeNode() {
         Ext e = extInstTypeNodeImpl();
+        if (nextExtFactory() != null && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory_c nextFactory = (JifExtFactory_c)nextExtFactory(); 
+            Ext e2 = nextFactory.extInstTypeNode();
+            e = composeExts(e, e2);
+        }
         return postExtInstTypeNode(e);
     }
 
