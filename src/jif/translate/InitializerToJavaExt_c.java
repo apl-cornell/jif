@@ -11,12 +11,11 @@ public class InitializerToJavaExt_c extends ToJavaExt_c {
         // the initializer method.
         if (!n.flags().isStatic()) {
             rw.addInitializer(n.body());
-            Block empty = rw.nodeFactory().Block(n.position());
-            n = rw.nodeFactory().Initializer(n.position(), n.flags(), empty);
+            Block empty = rw.java_nf().Block(n.position());
+            n = rw.java_nf().Initializer(n.position(), n.flags(), empty);
         }
         else {
-            n = (Initializer) super.toJava(rw);
-            n = n.initializerInstance(null);
+            n = rw.java_nf().Initializer(n.position(), n.flags(), n.body());
         }
         return n;
     }

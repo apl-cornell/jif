@@ -8,7 +8,7 @@ public class CaseToJavaExt_c extends ToJavaExt_c {
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         Case n = (Case) node();
         long value = n.value();
-        n = (Case) super.toJava(rw);
+        n = rw.java_nf().Case(n.position(), n.expr());
         n = n.value(value);
         return n;
     }

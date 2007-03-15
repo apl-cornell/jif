@@ -27,7 +27,7 @@ public class InstanceOfToJavaExt_c extends ToJavaExt_c {
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         Instanceof io = (Instanceof)this.node();
         if (!((JifInstanceOfDel)io.del()).isToSubstJifClass()) {
-            return super.toJava(rw);
+            return rw.java_nf().Instanceof(io.position(), io.expr(), io.compareType());
         }
 
         List args = new ArrayList();

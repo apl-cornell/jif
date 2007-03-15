@@ -70,13 +70,13 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         super(nextExtFactory);
     }
 
-    protected Ext extNodeImpl() {
-        return new Jif_c(new ToJavaExt_c());
-    }
-
-    protected Ext extExprImpl() {
-        return new Jif_c(new ExprToJavaExt_c());
-    }
+//    protected Ext extNodeImpl() {
+//        return new Jif_c(new ToJavaExt_c());
+//    }
+//
+//    protected Ext extExprImpl() {
+//        return new Jif_c(new ExprToJavaExt_c());
+//    }
     
      protected Ext extIdImpl() {
        return new Jif_c(new IdToJavaExt_c());
@@ -111,21 +111,21 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extArrayAccessImpl() {
-        return new JifArrayAccessExt(new ExprToJavaExt_c());
+        return new JifArrayAccessExt(new ArrayAccessToJavaExt_c());
     }
 
     protected Ext extArrayInitImpl() {
-        return new JifArrayInitExt(new ExprToJavaExt_c());
+        return new JifArrayInitExt(new ArrayInitToJavaExt_c());
     }
 
     protected Ext extLocalAssignImpl() {
-        return new JifLocalAssignExt(new ExprToJavaExt_c());
+        return new JifLocalAssignExt(new LocalAssignToJavaExt_c());
     }
     protected Ext extFieldAssignImpl() {
-        return new JifFieldAssignExt(new ExprToJavaExt_c());
+        return new JifFieldAssignExt(new FieldAssignToJavaExt_c());
     }
     protected Ext extArrayAccessAssignImpl() {
-        return new JifArrayAccessAssignExt(new ExprToJavaExt_c());
+        return new JifArrayAccessAssignExt(new ArrayAccessAssignToJavaExt_c());
     }
 
     protected Ext extBinaryImpl() {
@@ -133,15 +133,15 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extBlockImpl() {
-        return new JifBlockExt(new ToJavaExt_c());
+        return new JifBlockExt(new BlockToJavaExt_c());
     }
 
     protected Ext extSwitchBlockImpl() {
-        return new JifBlockExt(new ToJavaExt_c());
+        return new JifBlockExt(new SwitchBlockToJavaExt_c());
     }
 
     protected Ext extBranchImpl() {
-        return new JifBranchExt(new ToJavaExt_c());
+        return new JifBranchExt(new BranchToJavaExt_c());
     }
 
     protected Ext extCallImpl() {
@@ -165,7 +165,7 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extConditionalImpl() {
-        return new JifConditionalExt(new ToJavaExt_c());
+        return new JifConditionalExt(new ConditionalToJavaExt_c());
     }
 
     protected Ext extConstructorCallImpl() {
@@ -181,15 +181,15 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extDoImpl() {
-            return new JifDoExt(new ToJavaExt_c());
+            return new JifDoExt(new DoToJavaExt_c());
     }
 
     protected Ext extEmptyImpl() {
-        return new JifEmptyExt(new ToJavaExt_c());
+        return new JifEmptyExt(new EmptyToJavaExt_c());
     }
 
     protected Ext extEvalImpl() {
-        return new JifEvalExt(new ToJavaExt_c());
+        return new JifEvalExt(new EvalToJavaExt_c());
     }
 
     protected Ext extFieldImpl() {
@@ -197,7 +197,7 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extForImpl() {
-            return new JifForExt(new ToJavaExt_c());
+            return new JifForExt(new ForToJavaExt_c());
     }
 
     protected Ext extFormalImpl() {
@@ -205,7 +205,7 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extIfImpl() {
-        return new JifIfExt(new ToJavaExt_c());
+        return new JifIfExt(new IfToJavaExt_c());
     }
 
     protected Ext extInitializerImpl() {
@@ -217,11 +217,11 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extLabeledImpl() {
-        return new JifLabeledExt(new ToJavaExt_c());
+        return new JifLabeledExt(new LabeledToJavaExt_c());
     }
 
     protected Ext extLitImpl() {
-        return new JifLiteralExt(new ToJavaExt_c());
+        return new JifLiteralExt(new LitToJavaExt_c());
     }
 
     protected Ext extLocalImpl() {
@@ -242,7 +242,7 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extNewArrayImpl() {
-        return new JifNewArrayExt(new ExprToJavaExt_c());
+        return new JifNewArrayExt(new NewArrayToJavaExt_c());
     }
 
     protected Ext extReturnImpl() {
@@ -254,23 +254,23 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extSpecialImpl() {
-        return new JifSpecialExt(new ExprToJavaExt_c());
+        return new JifSpecialExt(new SpecialToJavaExt_c());
     }
 
     protected Ext extSwitchImpl() {
-        return new JifSwitchExt(new ToJavaExt_c());
+        return new JifSwitchExt(new SwitchToJavaExt_c());
     }
 
     protected Ext extSynchronizedImpl() {
-        return new JifSynchronizedExt(new ToJavaExt_c());
+        return new JifSynchronizedExt(new SynchronizedToJavaExt_c());
     }
 
     protected Ext extThrowImpl() {
-        return new JifThrowExt(new ToJavaExt_c());
+        return new JifThrowExt(new ThrowToJavaExt_c());
     }
 
     protected Ext extTryImpl() {
-            return new JifTryExt(new ToJavaExt_c());
+            return new JifTryExt(new TryToJavaExt_c());
     }
 
     protected Ext extArrayTypeNodeImpl() {
@@ -286,11 +286,11 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extUnaryImpl() {
-        return new JifUnaryExt(new ExprToJavaExt_c());
+        return new JifUnaryExt(new UnaryToJavaExt_c());
     }
 
     protected Ext extWhileImpl() {
-        return new JifWhileExt(new ToJavaExt_c());
+        return new JifWhileExt(new WhileToJavaExt_c());
     }
 
     //----------------------------------------------------------------

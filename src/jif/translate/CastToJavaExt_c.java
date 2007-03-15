@@ -5,10 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import jif.extension.JifCastDel;
-import jif.types.*;
+import jif.types.JifPolyType;
+import jif.types.JifSubst;
+import jif.types.JifSubstType;
+import jif.types.ParamInstance;
 import polyglot.ast.Cast;
 import polyglot.ast.Node;
-import polyglot.ast.TypeNode;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.visit.NodeVisitor;
@@ -26,7 +28,8 @@ public class CastToJavaExt_c extends ToJavaExt_c {
         Cast c = (Cast)this.node();
 
         if (!((JifCastDel)c.del()).isToSubstJifClass()) {
-            return super.toJava(rw);
+            return rw.java_nf().Cast(c.position(), c.castType(), c.expr());
+            
         }
 
         List args = new ArrayList();

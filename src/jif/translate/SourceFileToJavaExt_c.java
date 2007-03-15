@@ -9,7 +9,7 @@ public class SourceFileToJavaExt_c extends ToJavaExt_c {
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         SourceFile n = (SourceFile) node();
         Source source = n.source();
-        n = (SourceFile) super.toJava(rw);
+        n = (SourceFile) rw.java_nf().SourceFile(n.position(), n.decls());
         n = n.source(source);
         return rw.leavingSourceFile(n);
     }

@@ -43,7 +43,7 @@ public class BinaryToJavaExt_c extends ExprToJavaExt_c {
         }
         
         Precedence precedence = b.precedence();
-        b = (Binary) super.exprToJava(rw);
+        b = rw.java_nf().Binary(b.position(), b.left(), b.operator(), b.right());
         b = b.precedence(precedence);
         return b;
     }

@@ -7,8 +7,7 @@ import polyglot.types.SemanticException;
 public class FieldToJavaExt_c extends ExprToJavaExt_c {
     public Expr exprToJava(JifToJavaRewriter rw) throws SemanticException {
         Field n = (Field) node();
-        n = (Field) super.exprToJava(rw);
-        n = n.fieldInstance(null);
+        n = (Field) rw.java_nf().Field(n.position(), n.id());
         return n;
     }
 }
