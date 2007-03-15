@@ -39,10 +39,8 @@ public class CallToJavaExt_c extends ExprToJavaExt_c {
             }
         }
         args.addAll(n.arguments());
-        
-        n = (Call)n.arguments(args);        
-        n = n.methodInstance(null);
-        n = (Call)n.del(null);
+                
+        n = rw.java_nf().Call(n.position(), n.target(), n.id(), args);
         return n;
     }
 }
