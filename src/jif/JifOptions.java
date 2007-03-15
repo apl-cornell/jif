@@ -22,7 +22,7 @@ public class JifOptions extends Options {
     /**
      * Should the checking for the robustness condition be disabled?
      */
-    public boolean noRobustness;
+    public boolean nonRobustness;
 
     
      /**
@@ -71,7 +71,7 @@ public class JifOptions extends Options {
         super.setDefaultValues();
         solveGlobally = false;
         explainErrors = false;
-        noRobustness = true;
+        nonRobustness = false;
     }
 
     /**
@@ -96,13 +96,13 @@ public class JifOptions extends Options {
             index++;
             explainErrors = true;
         }
-        else if (args[index].equals("-norobust")) {
+        else if (args[index].equals("-nonrobust")) {
             index++;
-            noRobustness = true;
+            nonRobustness = true;
         }
         else if (args[index].equals("-robust")) {
             index++;
-            noRobustness = false;
+            nonRobustness = false;
         }
         else if (args[index].equals("-sigcp")) {
             index++;
@@ -155,7 +155,7 @@ public class JifOptions extends Options {
         usageForFlag(out, "-addrtcp <path>", "additional path for Jif runtime classes; prepended to rtcp");
     }
 
-    public String constructSignatureClasspath() {
+    public String constructSignatureClasspath() {        
         // use the signature classpath if it exists for compiling Jif classes
         String scp = "";
         for (Iterator iter = addSigcp.iterator(); iter.hasNext(); ) {

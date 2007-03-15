@@ -87,7 +87,7 @@ public abstract class JifDowngradeExprExt extends Jif_c
         
         checkAuthority(lc, dA, downgradeFrom, downgradeTo, d.position());
         
-        if (!((JifOptions)JifOptions.global).noRobustness) {
+        if (!((JifOptions)JifOptions.global).nonRobustness) {
             checkRobustness(lc, dA, downgradeFrom, downgradeTo, d.position());
         }
 
