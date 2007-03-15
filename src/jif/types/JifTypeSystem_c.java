@@ -687,18 +687,7 @@ public class JifTypeSystem_c
         return t;
     }
 
-//    static Map externalUIDs = new HashMap();
-
     public ExternalPrincipal externalPrincipal(Position pos, String name) {
-//        // All external principals with the same name should have the same
-//        // uid.
-//        UID uid = (UID)externalUIDs.get(name);
-//
-//        if (uid == null) {
-//            uid = new UID(name);
-//            externalUIDs.put(name, uid);
-//        }
-//
         ExternalPrincipal t = new ExternalPrincipal_c(name, this, pos);
         return t;
     }

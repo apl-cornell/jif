@@ -18,7 +18,7 @@ public class JifContext_c extends Context_c implements JifContext
 {
     private final TypeSystem jlts;
     private final JifTypeSystem jifts;
-    
+
     private LabelEnv_c env; // label environment (ph, constraints known to be true)
 
     private Set auth;
@@ -34,9 +34,9 @@ public class JifContext_c extends Context_c implements JifContext
     private boolean checkingInits;
     private boolean inConstructorCall;
     private Label constructorReturnLabel;
-    
+
     protected JifContext_c(JifTypeSystem ts, TypeSystem jlts) {
-	super(ts);
+        super(ts);
         this.jlts = jlts;
         this.jifts = ts;
         this.env = (LabelEnv_c)ts.createLabelEnv();
@@ -55,7 +55,7 @@ public class JifContext_c extends Context_c implements JifContext
 
     public VarInstance findVariableSilent(String name) {
         VarInstance vi = super.findVariableSilent(name);
-        
+
         if (vi != null) {
             return vi;
         }
@@ -63,7 +63,7 @@ public class JifContext_c extends Context_c implements JifContext
         // Principals are masquerading as classes.   Find the class
         // and pull the principal out of the class.  Ick.
         ClassType principal;
-        
+
         try {
             principal = (ClassType)jlts.typeForName("jif.lang.Principal");
         }
@@ -83,21 +83,20 @@ public class JifContext_c extends Context_c implements JifContext
         if (n instanceof Type) {
             Type t = (Type) n;
             if (t.isClass()) {
-                Type st = t.toClass().superType();
 
-                if (jlts.isSubtype(st, principal)) {
+                if (jlts.isSubtype(t.toClass(), principal)) {
                     return jifts.principalInstance(null,
-                        jifts.externalPrincipal(null, name));
-                }
+                                                   jifts.externalPrincipal(null, name));
+                }                
             }
         }
         return null;
     }
 
     public LabelEnv labelEnv() {
-	return env;
+        return env;
     }
-    
+
     /*
      * Called when the label environment is about to be modified.
      * This makes sure that we are dealing with a copy of the environment,
@@ -116,7 +115,7 @@ public class JifContext_c extends Context_c implements JifContext
         envModification();
         env.addAssertionLE(L1, L2);
     }
-    
+
     /**
      * Adds the assertion to this context, and all outer contexts up to
      * the method/constructor/initializer level
@@ -139,7 +138,7 @@ public class JifContext_c extends Context_c implements JifContext
             }            
         }
     }
-    
+
     public void addDefinitionalAssertionEquiv(AccessPath p, AccessPath q) {
         // don't bother copying the environment, as we'll be
         // propogating it upwards anyway.
@@ -201,7 +200,7 @@ public class JifContext_c extends Context_c implements JifContext
 
     public void clearPH() {
         envModification();
-	env.ph().clear();
+        env.ph().clear();
     }
 
     static class Key {
@@ -254,7 +253,7 @@ public class JifContext_c extends Context_c implements JifContext
 
     public Label authLabel() {
         Set auth = authority();
-        
+
         Set labels = new LinkedHashSet();
         for (Iterator i = auth.iterator(); i.hasNext(); ) {
             Principal p = (Principal) i.next();
@@ -262,7 +261,7 @@ public class JifContext_c extends Context_c implements JifContext
                                            jifts.readerPolicy(p.position(),
                                                               p,
                                                               jifts.topPrincipal(p.position())),
-                                           jifts.topIntegPolicy(p.position()));
+                                                              jifts.topIntegPolicy(p.position()));
             labels.add(pl);
         }
 
@@ -270,7 +269,7 @@ public class JifContext_c extends Context_c implements JifContext
             return jifts.bottomLabel(currentCode().position());
         }
         Label L = jifts.joinLabel(currentCode().position(), 
-                                   labels);
+                                  labels);
         return L;
     }
 
@@ -290,7 +289,7 @@ public class JifContext_c extends Context_c implements JifContext
             return jifts.topLabel(currentCode().position());
         }
         Label L = jifts.meetLabel(currentCode().position(), 
-                                   labels);
+                                  labels);
         return L;
     }
 
@@ -315,8 +314,8 @@ public class JifContext_c extends Context_c implements JifContext
         A.inConstructorCall = true;
         return A;
     }
-    
-    
+
+
     public Context pushClass(ParsedClassType classScope, ClassType type) {
         JifContext_c jc = (JifContext_c)super.pushClass(classScope, type);
         // force a new label environment

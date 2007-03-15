@@ -1,6 +1,7 @@
 package jif.types.principal;
 
 import jif.translate.ExternalPrincipalToJavaExpr_c;
+import jif.translate.PrincipalToJavaExpr;
 import jif.types.JifTypeSystem;
 import polyglot.main.Report;
 import polyglot.types.TypeObject;
@@ -11,8 +12,12 @@ import polyglot.util.Position;
 public class ExternalPrincipal_c extends Principal_c implements ExternalPrincipal {
     private final String name;
     public ExternalPrincipal_c(String name, JifTypeSystem ts, Position pos) {
-	super(ts, pos, new ExternalPrincipalToJavaExpr_c());
-	this.name = name;
+        super(ts, pos, new ExternalPrincipalToJavaExpr_c());
+        this.name = name;
+    }
+    public ExternalPrincipal_c(String name, JifTypeSystem ts, PrincipalToJavaExpr toJava, Position pos) {
+        super(ts, pos, toJava);
+        this.name = name;
     }
 
     public String name() {
@@ -24,7 +29,7 @@ public class ExternalPrincipal_c extends Principal_c implements ExternalPrincipa
         if (Report.should_report(Report.debug, 1)) { 
             return "<pr-external " + name + ">";
         }
-	return name();
+        return name();
     }
 
 
@@ -34,15 +39,15 @@ public class ExternalPrincipal_c extends Principal_c implements ExternalPrincipa
      */
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
-	if (! (o instanceof ExternalPrincipal)) {
-	    return false;
-	}
+        if (! (o instanceof ExternalPrincipal)) {
+            return false;
+        }
 
-	ExternalPrincipal that = (ExternalPrincipal) o;
-	return this.name.equals(that.name());
+        ExternalPrincipal that = (ExternalPrincipal) o;
+        return this.name.equals(that.name());
     }
 
     public int hashCode() {
-	return name.hashCode();
+        return name.hashCode();
     }
 }
