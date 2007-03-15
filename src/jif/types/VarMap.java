@@ -1,10 +1,16 @@
 package jif.types;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import jif.types.label.*;
+import jif.types.label.Label;
+import jif.types.label.Policy;
+import jif.types.label.VarLabel;
 import jif.types.principal.Principal;
-import polyglot.types.*;
+import polyglot.types.ArrayType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 
@@ -68,16 +74,28 @@ public class VarMap {
         bounds.put(v, bound);
     }
     
+    private class VarMapLabelSubstitution extends LabelSubstitution {
+        public Label substLabel(Label L) throws SemanticException {
+            if (L instanceof VarLabel) {
+                VarLabel v = (VarLabel)L;
+                return VarMap.this.boundOf(v);
+            }
+            return L;
+        }            
+    }
+    
+    public Policy applyTo(Policy p) {
+        LabelSubstitution s = new VarMapLabelSubstitution() ;
+        try {
+            return p.subst(s);
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected SemanticException", e);
+        }
+        
+    }
     public Label applyTo(Label c) {
-        LabelSubstitution s = new LabelSubstitution() {
-            public Label substLabel(Label L) throws SemanticException {
-                if (L instanceof VarLabel) {
-                    VarLabel v = (VarLabel)L;
-                    return VarMap.this.boundOf(v);
-                }
-                return L;
-            }            
-        };
+        LabelSubstitution s = new VarMapLabelSubstitution() ;
         try {
             return c.subst(s);
         }
