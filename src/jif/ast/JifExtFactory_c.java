@@ -1,54 +1,6 @@
 package jif.ast;
 
-import jif.extension.JifArrayAccessAssignExt;
-import jif.extension.JifArrayAccessExt;
-import jif.extension.JifArrayInitExt;
-import jif.extension.JifBinaryExt;
-import jif.extension.JifBlockExt;
-import jif.extension.JifBranchExt;
-import jif.extension.JifCallExt;
-import jif.extension.JifCaseExt;
-import jif.extension.JifCastExt;
-import jif.extension.JifClassBodyExt;
-import jif.extension.JifClassDeclExt;
-import jif.extension.JifConditionalExt;
-import jif.extension.JifConstructorCallExt;
-import jif.extension.JifConstructorDeclExt;
-import jif.extension.JifDeclassifyExprExt;
-import jif.extension.JifDeclassifyStmtExt;
-import jif.extension.JifDoExt;
-import jif.extension.JifEmptyExt;
-import jif.extension.JifEndorseExprExt;
-import jif.extension.JifEndorseStmtExt;
-import jif.extension.JifEvalExt;
-import jif.extension.JifFieldAssignExt;
-import jif.extension.JifFieldDeclExt_c;
-import jif.extension.JifFieldExt;
-import jif.extension.JifForExt;
-import jif.extension.JifFormalExt;
-import jif.extension.JifIfExt;
-import jif.extension.JifInitializerExt;
-import jif.extension.JifInstanceofExt;
-import jif.extension.JifLabelExprExt;
-import jif.extension.JifLabeledExt;
-import jif.extension.JifLiteralExt;
-import jif.extension.JifLocalAssignExt;
-import jif.extension.JifLocalDeclExt;
-import jif.extension.JifLocalExt;
-import jif.extension.JifMethodDeclExt;
-import jif.extension.JifNewArrayExt;
-import jif.extension.JifNewExt;
-import jif.extension.JifPrincipalExprExt;
-import jif.extension.JifPrincipalNodeExt;
-import jif.extension.JifReturnExt;
-import jif.extension.JifSourceFileExt;
-import jif.extension.JifSpecialExt;
-import jif.extension.JifSwitchExt;
-import jif.extension.JifSynchronizedExt;
-import jif.extension.JifThrowExt;
-import jif.extension.JifTryExt;
-import jif.extension.JifUnaryExt;
-import jif.extension.JifWhileExt;
+import jif.extension.*;
 import jif.translate.*;
 import polyglot.ast.AbstractExtFactory_c;
 import polyglot.ast.Ext;
@@ -70,9 +22,9 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         super(nextExtFactory);
     }
 
-//    protected Ext extNodeImpl() {
-//        return new Jif_c(new ToJavaExt_c());
-//    }
+    protected Ext extNodeImpl() {
+        return new Jif_c(new CannotToJavaExt_c());
+    }
 //
 //    protected Ext extExprImpl() {
 //        return new Jif_c(new ExprToJavaExt_c());
@@ -155,6 +107,9 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     protected Ext extCastImpl() {
         return new JifCastExt(new CastToJavaExt_c());
     }
+    protected Ext extCatchImpl() {
+        return new Jif_c(new CatchToJavaExt_c());
+    }
 
     protected Ext extClassBodyImpl() {
         return new JifClassBodyExt(new ClassBodyToJavaExt_c());
@@ -206,6 +161,10 @@ public class JifExtFactory_c extends AbstractExtFactory_c
 
     protected Ext extIfImpl() {
         return new JifIfExt(new IfToJavaExt_c());
+    }
+
+    protected Ext extImportImpl() {
+        return new Jif_c(new ImportToJavaExt_c());
     }
 
     protected Ext extInitializerImpl() {

@@ -21,6 +21,9 @@ public class JifUtil
     
     public static Node X(Node n, PathMap X) {
         Jif ext = (Jif) n.ext();
+        if (ext == null || ext.del() == null) {
+            System.out.println("got a " + n.getClass());
+        }
         return n.ext(ext.del().X(X));
     }
     

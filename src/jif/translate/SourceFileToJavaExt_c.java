@@ -8,8 +8,9 @@ import polyglot.types.SemanticException;
 public class SourceFileToJavaExt_c extends ToJavaExt_c {
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         SourceFile n = (SourceFile) node();
-        Source source = n.source();
-        n = (SourceFile) rw.java_nf().SourceFile(n.position(), n.decls());
+        Source source = n.source();        
+//        n = rw.java_nf().SourceFile(n.position(), n.decls());
+        n = (SourceFile)n.del(null);
         n = n.source(source);
         return rw.leavingSourceFile(n);
     }
