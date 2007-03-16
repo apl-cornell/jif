@@ -76,7 +76,7 @@ public class ConfProjectionPolicy_c extends Policy_c implements ConfPolicy {
         }
 
         JifTypeSystem ts = (JifTypeSystem)typeSystem();
-        Policy newPolicy = ts.confProjection(this.label());
+        Policy newPolicy = ts.confProjection(newLabel);
         return substitution.substPolicy(newPolicy).simplify();
     }
     
