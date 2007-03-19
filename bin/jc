@@ -3,13 +3,14 @@
 # Stephen Chong
 
 # TODOs:
-#  - correctly count number literals as one token?
+#  - correctly count number literals (with decimal points) as one token?
 #  - produce annotation statistics
-#  - usage
 #  - allow more flexible command line, e.g., use stdin if no file specified
 
 if ($#ARGV != 0) {
-    print "usage: TODO ...\n";
+    print "usage: jc inputfile\n";
+    print "   inputfile should be a Jif program.";
+    print "   jc will report various statistics about the code.";
     exit;
 }
 
