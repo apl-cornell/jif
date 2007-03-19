@@ -116,20 +116,23 @@ public class JifContext_c extends Context_c implements JifContext
         env.addAssertionLE(L1, L2);
     }
 
+    public void addDefinitionalAssertionEquiv(Label L1, Label L2) {
+        addDefinitionalAssertionEquiv(L1, L2, false);
+    }
     /**
      * Adds the assertion to this context, and all outer contexts up to
      * the method/constructor/initializer level
      * @param L1
      * @param L2
      */
-    public void addDefinitionalAssertionEquiv(Label L1, Label L2) {
+    public void addDefinitionalAssertionEquiv(Label L1, Label L2, boolean addToClass) {
         // don't bother copying the environment, as we'll be
         // propogating it upwards anyway.
         // envModification();
         env.addEquiv(L1, L2);
         JifContext_c jc = this;
         LabelEnv_c lastEnvAddedTo = env;
-        while (!jc.isCode()) {
+        while (jc != null && (!jc.isCode() || addToClass)) {
             jc = (JifContext_c)jc.pop();
             if (jc != null && jc.env != lastEnvAddedTo) {
                 // only add to env we haven't seen yet.

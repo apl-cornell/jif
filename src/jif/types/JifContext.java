@@ -48,6 +48,16 @@ public interface JifContext extends Context {
     void addDefinitionalAssertionEquiv(Label L1, Label L2);
 
     /**
+     * Adds the assertion to this context, and all outer contexts up to
+     * the method/constructor/initializer level. If addToClass is true,
+     * then the definition will also be added to the class. This should
+     * only be used for assignments to final fields.
+     * @param L1
+     * @param L2
+     */
+    void addDefinitionalAssertionEquiv(Label L1, Label L2, boolean addToClass);
+
+    /**
      * Adds the assertion that the access path p is equivalent to the
      * access path q to this context, and all outer contexts up to
      * the method/constructor/initializer level
