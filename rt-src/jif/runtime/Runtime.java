@@ -189,7 +189,9 @@ public class Runtime {
             double noise = 0.15; 
             double multiplier = 1 + ((2 * Math.random() - 1) * noise); // = 1 plus or minus noise
             long ms = (long)((long)s * 1000 * multiplier);
-            Thread.sleep(ms);
+            if (!Thread.interrupted()) {
+                Thread.sleep(ms);
+            }
         }
         catch (InterruptedException e) {
             // ignore the interrupted exception
