@@ -27,7 +27,7 @@ public class SocketUtil {
                 if (DEBUG) System.out.println("Listening on port " + ss.getLocalPort());
                 Socket s = ss.accept();  
                 if (DEBUG) System.out.println("Got socket: " + s.getPort());
-                new Thread(new SocketAcceptorRunner(a,s)).run();   
+                new Thread(new SocketAcceptorRunner(a,s)).start();   
             }
             catch (Exception e) {
                 // recover silently
