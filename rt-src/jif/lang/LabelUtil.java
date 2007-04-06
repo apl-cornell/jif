@@ -28,12 +28,14 @@ public class LabelUtil
         private long totalTime = 0;
         private long enterStartTime = 0;
         private int callStackCount = 0;
+        private int callCount = 0;
     }
     private ThreadLocal statsPerThread = new ThreadLocal() {
         protected Object initialValue() {
             return new Stats();
         }   
     };
+
     private static final boolean COUNT_TIME = false;
     
     static final boolean USE_CACHING = true;
@@ -57,6 +59,7 @@ public class LabelUtil
     void enterTiming() {
         if (COUNT_TIME) {
             Stats stats = (Stats)statsPerThread.get();
+            stats.callCount++;
             if (stats.callStackCount++ == 0) {
                 stats.enterStartTime = System.currentTimeMillis();
                 if (stats.callStackCount > 1) {
@@ -93,6 +96,24 @@ public class LabelUtil
         }
         return r;        
     }
+
+    /*
+     * Return the total count of calls to enterTiming() 
+     * since the last time this method was called,
+     * and/or the thread created (whichever was last). Also clears the total
+     * time recorded for this thread.
+     */
+    public long getAndClearCount() {
+        long r = -1;
+        if (COUNT_TIME) {
+            Stats stats = (Stats)statsPerThread.get();
+            r = stats.callCount;
+            stats.callCount = 0;
+        }
+        return r;        
+    }
+    
+
 
     private final ConfPolicy BOTTOM_CONF;
     private final IntegPolicy TOP_INTEG;
