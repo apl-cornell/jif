@@ -13,12 +13,12 @@ public class PrincipalUtil {
     // caches
     private static final Map cacheActsFor = new HashMap(); // Map from ActsForPairs to ActsForProofs
     private static final Set cacheNotActsFor = new HashSet(); // Set of ActsForPairs
-    
+
     //  map from DelegationPairs to sets of ActsForPairs. If (p, q) is
     // in the set of the map of delegation d, then p actsfor q, and the 
     // proof depends on the delegation d
     private static final Map cacheActsForDependencies = new HashMap(); 
-    
+
     /**
      * Returns true if and only if the principal p acts for the principal q. A
      * synonym for the <code>actsFor</code> method.
@@ -32,91 +32,106 @@ public class PrincipalUtil {
             LabelUtil.singleton().exitTiming();            
         }
     }
-    
+
     /**
      * Returns true if and only if the principal p acts for the principal q.
      */
     public static boolean actsFor(Principal p, Principal q) {
         return actsForProof(p, q) != null;
     }
-    
+
     /**
      * Returns an actsfor proof if and only if the principal p acts for the principal q.
      */
     public static ActsForProof actsForProof(Principal p, Principal q) {
         try {
             LabelUtil.singleton().enterTiming();
-            // try cache
-            ActsForPair pair = new ActsForPair(p, q);
-            if (cacheActsFor.containsKey(pair))  {
-                return (ActsForProof)cacheActsFor.get(pair);
-            }
-            if (cacheNotActsFor.contains(pair)) return null;
+            return actsForProofImpl(p, q);
+        }
+        finally {
+            LabelUtil.singleton().exitTiming();            
+        }
+    }
+    public static ActsForProof actsForProofImpl(Principal p, Principal q) {
+        // try cache
+        ActsForPair pair = new ActsForPair(p, q);
+        if (cacheActsFor.containsKey(pair))  {
+            return (ActsForProof)cacheActsFor.get(pair);
+        }
+        if (cacheNotActsFor.contains(pair)) return null;
 
-            if (delegatesTo(q, p)) return new DelegatesProof(p, q);
+        if (delegatesToImpl(q, p)) return new DelegatesProof(p, q);
 
-            // if the two principals are ==-equal, or if they
-            // both agree that they are equal to each other, then
-            // we return true (since the acts-for relation is
-            // reflexive).
-            if (eq(p,q)) return new ReflexiveProof(p, q);
-            
-            // try searching
-            ActsForProof prf = findActsForProof(p, q, null);
-            if (prf != null && (verifyProof(prf, p, q))) {
-                cacheActsFor.put(pair, prf);
-                // add dependencies that this actsfor replies on.
-                Set s = new HashSet();
-                prf.gatherDelegationDependencies(s);
-                // for each DelegationPair in s, if that delegation is removed, the proof is no longer valid.
-                for (Iterator iter = s.iterator(); iter.hasNext();) {
-                    DelegationPair del = (DelegationPair)iter.next();
-                    Set deps = (Set)cacheActsForDependencies.get(del);
-                    if (deps == null) {
-                        deps = new HashSet();
-                        cacheActsForDependencies.put(del, deps);
-                    }
-                    deps.add(pair);
-                }                
-                return prf;
-            }
-            cacheNotActsFor.add(pair);
-            return null;
+        // if the two principals are ==-equal, or if they
+        // both agree that they are equal to each other, then
+        // we return true (since the acts-for relation is
+        // reflexive).
+        if (eq(p,q)) return new ReflexiveProof(p, q);
+
+        // try searching
+        ActsForProof prf = findActsForProofImpl(p, q, null);
+        if (prf != null && (verifyProofImpl(prf, p, q))) {
+            cacheActsFor.put(pair, prf);
+            // add dependencies that this actsfor replies on.
+            Set s = new HashSet();
+            prf.gatherDelegationDependencies(s);
+            // for each DelegationPair in s, if that delegation is removed, the proof is no longer valid.
+            for (Iterator iter = s.iterator(); iter.hasNext();) {
+                DelegationPair del = (DelegationPair)iter.next();
+                Set deps = (Set)cacheActsForDependencies.get(del);
+                if (deps == null) {
+                    deps = new HashSet();
+                    cacheActsForDependencies.put(del, deps);
+                }
+                deps.add(pair);
+            }                
+            return prf;
+        }
+        cacheNotActsFor.add(pair);
+        return null;
+    }
+
+    /**
+     * Notification that a new delegation has been created.
+     */
+    public static void notifyNewDelegation(Principal granter, Principal superior) {
+        try {
+            LabelUtil.singleton().enterTiming();
+            // double check that the delegation occured
+            if (!delegatesToImpl(granter, superior)) return;
+            // XXX for the moment, just clear out all cached negative results
+            cacheNotActsFor.clear();
+
+            // need to notify the label cache too
+            LabelUtil.singleton().notifyNewDelegationImpl(granter, superior);
         }
         finally {
             LabelUtil.singleton().exitTiming();            
         }        
     }
-    
-    /**
-     * Notification that a new delegation has been created.
-     */
-    public static void notifyNewDelegation(Principal granter, Principal superior) {
-        // double check that the delegation occured
-        if (!delegatesTo(granter, superior)) return;
-        // XXX for the moment, just clear out all cached negative results
-        cacheNotActsFor.clear();
-        
-        // need to notify the label cache too
-        LabelUtil.singleton().notifyNewDelegation(granter, superior);
-    }
-    
+
     /**
      * Notification that an existing delegation has been revoked.
      */
     public static void notifyRevokeDelegation(Principal granter, Principal superior) {
-        DelegationPair del = new DelegationPair(superior, granter);
-        Set deps = (Set)cacheActsForDependencies.remove(del);
-        if (deps != null) {
-            for (Iterator iter = deps.iterator(); iter.hasNext();) {
-                ActsForPair afp = (ActsForPair)iter.next();
-                cacheActsFor.remove(afp);
+        try {
+            LabelUtil.singleton().enterTiming();
+            DelegationPair del = new DelegationPair(superior, granter);
+            Set deps = (Set)cacheActsForDependencies.remove(del);
+            if (deps != null) {
+                for (Iterator iter = deps.iterator(); iter.hasNext();) {
+                    ActsForPair afp = (ActsForPair)iter.next();
+                    cacheActsFor.remove(afp);
+                }
             }
+            // need to notify the label cache too
+            LabelUtil.singleton().notifyRevokeDelegationImpl(granter, superior);
         }
-        // need to notify the label cache too
-        LabelUtil.singleton().notifyRevokeDelegation(granter, superior);
+        finally {
+            LabelUtil.singleton().exitTiming();            
+        }        
     }
-    
+
     /**
      * Search for an ActsForProof between p and q. An ActsForProof between
      * p and q is a a checkable proof object.
@@ -128,76 +143,79 @@ public class PrincipalUtil {
     public static ActsForProof findActsForProof(Principal p, Principal q, Object searchState) {
         try {
             LabelUtil.singleton().enterTiming();
-            // try the dumb things first.
-            if (eq(p, q)) {
-                return new ReflexiveProof(p, q);
-            }
-            if (q == null) {
-                return new DelegatesProof(p, q);            
-            }
-            
-            // check the search state
-            Principal[] newss;
-            int ind = 0;
-            if (searchState instanceof Principal[]) {
-                Principal[] ss = (Principal[])searchState; 
-                newss = new Principal[ss.length + 2];
-                // ss is an array of principals, such that ss[2i],ss[2i+1] is goal on the goal stack.
-                for (;ind+1 < ss.length; ind += 2) {
-                    // check that p and q are not equal to ss[i] and ss[i+1]
-                    if (eq(p, ss[ind]) && eq(q, ss[ind+1])) {
-                        // p and q are already on the goal stack. Prevent an infinite recursion.
-                        return null;
-                    }
-                                        
-                    newss[ind] = ss[ind];
-                    newss[ind+1] = ss[ind+1];
-                }
-            }
-            else {
-                newss = new Principal[2];
-            }
-            // ind+1 is now less than newss.length
-            newss[ind] = p;
-            newss[ind+1] = q;
-            
-            // if we're going from a dis/conjunctive principal, try finding a downwards
-            // proof first
-            ActsForProof prf;
-            boolean doneDownTo = false;
-            if (p instanceof ConjunctivePrincipal || p instanceof DisjunctivePrincipal) {
-                prf = p.findProofDownto(q, newss);
-                if (prf != null) return prf;            
-                doneDownTo = true;
-            }
-            
-            // try searching upwards from q.
-            prf = q.findProofUpto(p, newss);
-            if (prf != null) return prf;
-            
-            // try searching downards from p.
-            if (!doneDownTo && p != null) {
-                prf = p.findProofDownto(q, newss);
-                if (prf != null) return prf;
-            }
-            
-            // have failed!
-            return null;
+            return findActsForProofImpl(p, q, searchState);            
         }
         finally {
             LabelUtil.singleton().exitTiming();            
         }
-        
+
     }
-    
+    public static ActsForProof findActsForProofImpl(Principal p, Principal q, Object searchState) {
+        // try the dumb things first.
+        if (eq(p, q)) {
+            return new ReflexiveProof(p, q);
+        }
+        if (q == null) {
+            return new DelegatesProof(p, q);            
+        }
+
+        // check the search state
+        Principal[] newss;
+        int ind = 0;
+        if (searchState instanceof Principal[]) {
+            Principal[] ss = (Principal[])searchState; 
+            newss = new Principal[ss.length + 2];
+            // ss is an array of principals, such that ss[2i],ss[2i+1] is goal on the goal stack.
+            for (;ind+1 < ss.length; ind += 2) {
+                // check that p and q are not equal to ss[i] and ss[i+1]
+                if (eq(p, ss[ind]) && eq(q, ss[ind+1])) {
+                    // p and q are already on the goal stack. Prevent an infinite recursion.
+                    return null;
+                }
+
+                newss[ind] = ss[ind];
+                newss[ind+1] = ss[ind+1];
+            }
+        }
+        else {
+            newss = new Principal[2];
+        }
+        // ind+1 is now less than newss.length
+        newss[ind] = p;
+        newss[ind+1] = q;
+
+        // if we're going from a dis/conjunctive principal, try finding a downwards
+        // proof first
+        ActsForProof prf;
+        boolean doneDownTo = false;
+        if (p instanceof ConjunctivePrincipal || p instanceof DisjunctivePrincipal) {
+            prf = p.findProofDownto(q, newss);
+            if (prf != null) return prf;            
+            doneDownTo = true;
+        }
+
+        // try searching upwards from q.
+        prf = q.findProofUpto(p, newss);
+        if (prf != null) return prf;
+
+        // try searching downards from p.
+        if (!doneDownTo && p != null) {
+            prf = p.findProofDownto(q, newss);
+            if (prf != null) return prf;
+        }
+
+        // have failed!
+        return null;        
+    }
+
     /**
      * Return whether principals p and q are equal. p and q must either be references to the same object,
      * both be null, or agree that they are equal to the other.
      */
-    private static boolean eq(Principal p, Principal q) {
+    static boolean eq(Principal p, Principal q) {
         return p == q || (p != null && q != null && p.equals(q) && q.equals(p));
     }
-    
+
     /**
      * Verify that the chain is a valid delegates-chain between p and q. That
      * is, q == chain[n], chain[n] delegates to chain[n-1], ..., chain[0] == p,
@@ -205,85 +223,92 @@ public class PrincipalUtil {
      *  
      */
     public static boolean verifyProof(ActsForProof prf, Principal actor,
-                                      Principal granter) {
+            Principal granter) {
         try {
             LabelUtil.singleton().enterTiming();
-            if (prf == null) return false;
-            if (prf.getActor() != actor || prf.getGranter() != granter) return false;
-            
-            if (prf instanceof DelegatesProof) {
-                return delegatesTo(granter, actor);
-            }
-            else if (prf instanceof ReflexiveProof) {
-                return eq(actor, granter);
-            }
-            else if (prf instanceof TransitiveProof) {
-                TransitiveProof proof = (TransitiveProof)prf;
-                return verifyProof(proof.getActorToP(), proof.getActor(), proof.getP()) &&
-                verifyProof(proof.getPToGranter(), proof.getP(), proof.getGranter());
-            }
-            else if (prf instanceof FromDisjunctProof) {
-                FromDisjunctProof proof = (FromDisjunctProof)prf;
-                if (actor instanceof DisjunctivePrincipal) {
-                    DisjunctivePrincipal dp = (DisjunctivePrincipal)actor;
-                    // go though each disjunct, and make sure there is a proof
-                    // from the disjunct to the granter
-                    for (Iterator iter = dp.disjuncts.iterator(); iter.hasNext(); ) {
-                        Principal disjunct = (Principal)iter.next();
-                        ActsForProof pr = (ActsForProof)proof.getDisjunctProofs().get(disjunct);
-                        if (!verifyProof(pr, disjunct, granter)) return false;
-                    }
-                    // we have verified a proof from each disjunct to the granter
-                    return true;
-                }
-                
-            }
-            else if (prf instanceof ToConjunctProof) {
-                ToConjunctProof proof = (ToConjunctProof)prf;
-                if (granter instanceof ConjunctivePrincipal) {
-                    ConjunctivePrincipal cp = (ConjunctivePrincipal)granter;
-                    // go though each conjunct, and make sure there is a proof
-                    // from actor to the conjunct
-                    for (Iterator iter = cp.conjuncts.iterator(); iter.hasNext(); ) {
-                        Principal conjunct = (Principal)iter.next();
-                        ActsForProof pr = (ActsForProof)proof.getConjunctProofs().get(conjunct);
-                        if (!verifyProof(pr, actor, conjunct)) return false;
-                    }
-                    // we have verified a proof from actor to each conjunct.
-                    return true;
-                }
-                
-            }
-            
-            // unknown proof!
-            return false;
+            return verifyProofImpl(prf, actor, granter);
         }
         finally {
             LabelUtil.singleton().exitTiming();            
         }
-        
     }
-    
+
+    private static boolean verifyProofImpl(ActsForProof prf, Principal actor,
+            Principal granter) {
+        if (prf == null) return false;
+        if (prf.getActor() != actor || prf.getGranter() != granter) return false;
+
+        if (prf instanceof DelegatesProof) {
+            return delegatesToImpl(granter, actor);
+        }
+        else if (prf instanceof ReflexiveProof) {
+            return eq(actor, granter);
+        }
+        else if (prf instanceof TransitiveProof) {
+            TransitiveProof proof = (TransitiveProof)prf;
+            return verifyProofImpl(proof.getActorToP(), proof.getActor(), proof.getP()) &&
+            verifyProofImpl(proof.getPToGranter(), proof.getP(), proof.getGranter());
+        }
+        else if (prf instanceof FromDisjunctProof) {
+            FromDisjunctProof proof = (FromDisjunctProof)prf;
+            if (actor instanceof DisjunctivePrincipal) {
+                DisjunctivePrincipal dp = (DisjunctivePrincipal)actor;
+                // go though each disjunct, and make sure there is a proof
+                // from the disjunct to the granter
+                for (Iterator iter = dp.disjuncts.iterator(); iter.hasNext(); ) {
+                    Principal disjunct = (Principal)iter.next();
+                    ActsForProof pr = (ActsForProof)proof.getDisjunctProofs().get(disjunct);
+                    if (!verifyProofImpl(pr, disjunct, granter)) return false;
+                }
+                // we have verified a proof from each disjunct to the granter
+                return true;
+            }
+
+        }
+        else if (prf instanceof ToConjunctProof) {
+            ToConjunctProof proof = (ToConjunctProof)prf;
+            if (granter instanceof ConjunctivePrincipal) {
+                ConjunctivePrincipal cp = (ConjunctivePrincipal)granter;
+                // go though each conjunct, and make sure there is a proof
+                // from actor to the conjunct
+                for (Iterator iter = cp.conjuncts.iterator(); iter.hasNext(); ) {
+                    Principal conjunct = (Principal)iter.next();
+                    ActsForProof pr = (ActsForProof)proof.getConjunctProofs().get(conjunct);
+                    if (!verifyProofImpl(pr, actor, conjunct)) return false;
+                }
+                // we have verified a proof from actor to each conjunct.
+                return true;
+            }
+
+        }
+
+        // unknown proof!
+        return false;
+    }
+
     public static boolean delegatesTo(Principal granter, Principal superior) {
         try {
             LabelUtil.singleton().enterTiming();
-            if (granter == null) return true;
-            if (topPrincipal().equals(superior)) return true;
-            if (superior instanceof ConjunctivePrincipal) {
-                ConjunctivePrincipal cp = (ConjunctivePrincipal)superior;
-                for (Iterator iter = cp.conjuncts.iterator(); iter.hasNext();) {
-                    Principal conjunct = (Principal)iter.next();
-                    if (equals(conjunct, granter)) return true;                
-                }
-            }
-            return granter.delegatesTo(superior);
+            return delegatesToImpl(granter, superior);
         }
         finally {
             LabelUtil.singleton().exitTiming();            
         }
-        
+
     }
-    
+    public static boolean delegatesToImpl(Principal granter, Principal superior) {
+        if (granter == null) return true;
+        if (topPrincipal().equals(superior)) return true;
+        if (superior instanceof ConjunctivePrincipal) {
+            ConjunctivePrincipal cp = (ConjunctivePrincipal)superior;
+            for (Iterator iter = cp.conjuncts.iterator(); iter.hasNext();) {
+                Principal conjunct = (Principal)iter.next();
+                if (eq(conjunct, granter)) return true;                
+            }
+        }
+        return granter.delegatesTo(superior);
+    }
+
     public static boolean equivalentTo(Principal p, Principal q) {
         try {
             LabelUtil.singleton().enterTiming();
@@ -292,7 +317,7 @@ public class PrincipalUtil {
         finally {
             LabelUtil.singleton().exitTiming();            
         }
-        
+
     }
     public static boolean equals(Principal p, Principal q) {
         try {
@@ -301,10 +326,9 @@ public class PrincipalUtil {
         }
         finally {
             LabelUtil.singleton().exitTiming();            
-        }
-        
+        }        
     }
-    
+
     /**
      * Execute the given closure, if the principal agrees.
      */
@@ -325,7 +349,7 @@ public class PrincipalUtil {
         return authorize(p, authPrf, c, lb, false);
     }
     private static Capability authorize(Principal p, Object authPrf, Closure c,
-                                       Label lb, boolean executeNow) {
+            Label lb, boolean executeNow) {
         try {
             LabelUtil.singleton().enterTiming();
             Principal closureP = c.jif$getjif_lang_Closure_P();
@@ -334,7 +358,7 @@ public class PrincipalUtil {
                     || (p != null && closureP != null && p.equals(closureP) && closureP
                             .equals(p))) {
                 // The principals agree.
-                if (LabelUtil.singleton().equivalentTo(closureL, lb)) {
+                if (LabelUtil.singleton().equivalentToImpl(closureL, lb)) {
                     // the labels agree
                     if (p == null || p.isAuthorized(authPrf, c, lb, executeNow)) {
                         // either p is null (and the "null" principal always
@@ -349,9 +373,9 @@ public class PrincipalUtil {
         finally {
             LabelUtil.singleton().exitTiming();            
         }
-        
+
     }
-    
+
     /**
      * returns the null principal, the principal that every other principal can
      * act for.
@@ -359,7 +383,7 @@ public class PrincipalUtil {
     public static Principal nullPrincipal() {
         return null;
     }
-    
+
     public static Principal bottomPrincipal() {
         try {
             LabelUtil.singleton().enterTiming();
@@ -368,7 +392,10 @@ public class PrincipalUtil {
         finally {
             LabelUtil.singleton().exitTiming();            
         }
-        
+
+    }
+    public static Principal bottomPrincipalImpl() {
+        return nullPrincipal();        
     }
     public static Principal topPrincipal() {
         return TOP_PRINCIPAL;
@@ -384,136 +411,152 @@ public class PrincipalUtil {
         finally {
             LabelUtil.singleton().exitTiming();            
         }
-        
+
     }
-    
+
     public static Principal disjunction(Principal left, Principal right) {
         try {
             LabelUtil.singleton().enterTiming();
-            if (left == null || right == null) return null;
-            if (actsFor(left, right)) return right;
-            if (actsFor(right, left)) return left;
-            Collection c = new ArrayList(2);
-            c.add(left);
-            c.add(right);
-            return disjunction(c);
+            return disjunctionImpl(left, right);
         }
         finally {
             LabelUtil.singleton().exitTiming();            
         }
-        
+
     }
-    
+    public static Principal disjunctionImpl(Principal left, Principal right) {
+        if (left == null || right == null) return null;
+        if (actsFor(left, right)) return right;
+        if (actsFor(right, left)) return left;
+        Collection c = new ArrayList(2);
+        c.add(left);
+        c.add(right);
+        return disjunctionImpl(c);
+    }
+
     public static Principal conjunction(Principal left, Principal right) {
         try {
             LabelUtil.singleton().enterTiming();
-            if (left == null) return right;
-            if (right == null) return left;
-            if (actsFor(left, right)) return left;
-            if (actsFor(right, left)) return right;
-            Collection c = new ArrayList(2);
-            c.add(left);
-            c.add(right);
-            return conjunction(c);
+            return conjunctionImpl(left, right);
         }
         finally {
             LabelUtil.singleton().exitTiming();            
         }
-        
+
     }
-    
+    public static Principal conjunctionImpl(Principal left, Principal right) {
+        LabelUtil.singleton().enterTiming();
+        if (left == null) return right;
+        if (right == null) return left;
+        if (actsFor(left, right)) return left;
+        if (actsFor(right, left)) return right;
+        Collection c = new ArrayList(2);
+        c.add(left);
+        c.add(right);
+        return conjunctionImpl(c);        
+    }
+
     public static Principal disjunction(Collection principals) {        
         try {
             LabelUtil.singleton().enterTiming();
-            if (principals == null || principals.isEmpty()) {
-                return topPrincipal();
-            }
-            if (principals.size() == 1) {
-                Object o = principals.iterator().next();
-                if (o == null || o instanceof Principal) return (Principal)o;
-                return topPrincipal();
-            }
-            
-            // go through the collection of principals, and flatten them
-            Set needed = new LinkedHashSet();
-            for (Iterator iter = principals.iterator(); iter.hasNext(); ) {
-                Object o = iter.next();
-                Principal p = null;
-                if (o instanceof Principal) p = (Principal)o;
-                if (p == null) return p;
-                if (PrincipalUtil.isTopPrincipal(p)) continue;
-                if (p instanceof DisjunctivePrincipal) {
-                    needed.addAll(((DisjunctivePrincipal)p).disjuncts);
-                }
-                else {
-                    needed.add(p);
-                }
-            }
-            return new DisjunctivePrincipal(needed);
+            return disjunctionImpl(principals);
         }
         finally {
             LabelUtil.singleton().exitTiming();            
         }
-        
     }
-    
+
+    public static Principal disjunctionImpl(Collection principals) {        
+        if (principals == null || principals.isEmpty()) {
+            return topPrincipal();
+        }
+        if (principals.size() == 1) {
+            Object o = principals.iterator().next();
+            if (o == null || o instanceof Principal) return (Principal)o;
+            return topPrincipal();
+        }
+
+        // go through the collection of principals, and flatten them
+        Set needed = new LinkedHashSet();
+        for (Iterator iter = principals.iterator(); iter.hasNext(); ) {
+            Object o = iter.next();
+            Principal p = null;
+            if (o instanceof Principal) p = (Principal)o;
+            if (p == null) return p;
+            if (PrincipalUtil.isTopPrincipal(p)) continue;
+            if (p instanceof DisjunctivePrincipal) {
+                needed.addAll(((DisjunctivePrincipal)p).disjuncts);
+            }
+            else {
+                needed.add(p);
+            }
+        }
+        return new DisjunctivePrincipal(needed);
+
+    }
+
     public static Principal conjunction(Collection principals) {        
         try {
             LabelUtil.singleton().enterTiming();
-            if (principals == null || principals.isEmpty()) {
-                return bottomPrincipal();
-            }
-            if (principals.size() == 1) {
-                Object o = principals.iterator().next();
-                if (o == null || o instanceof Principal) return (Principal)o;
-                return bottomPrincipal();
-            }
-            
-            // go through the collection of principals, and flatten them
-            Set needed = new LinkedHashSet();
-            for (Iterator iter = principals.iterator(); iter.hasNext(); ) {
-                Object o = iter.next();
-                Principal p = null;
-                if (o instanceof Principal) p = (Principal)o;
-                
-                if (p == null) continue; // ignore bottom principals
-                if (PrincipalUtil.isTopPrincipal(p)) return p;
-                if (p instanceof ConjunctivePrincipal) {
-                    needed.addAll(((ConjunctivePrincipal)p).conjuncts);
-                }
-                else {
-                    needed.add(p);
-                }
-            }
-            return new ConjunctivePrincipal(needed);
+            return conjunctionImpl(principals);
         }
         finally {
             LabelUtil.singleton().exitTiming();            
-        }
-        
+        }        
     }
-    
+
+    public static Principal conjunctionImpl(Collection principals) {        
+        if (principals == null || principals.isEmpty()) {
+            return bottomPrincipalImpl();
+        }
+        if (principals.size() == 1) {
+            Object o = principals.iterator().next();
+            if (o == null || o instanceof Principal) return (Principal)o;
+            return bottomPrincipalImpl();
+        }
+
+        // go through the collection of principals, and flatten them
+        Set needed = new LinkedHashSet();
+        for (Iterator iter = principals.iterator(); iter.hasNext(); ) {
+            Object o = iter.next();
+            Principal p = null;
+            if (o instanceof Principal) p = (Principal)o;
+
+            if (p == null) continue; // ignore bottom principals
+            if (PrincipalUtil.isTopPrincipal(p)) return p;
+            if (p instanceof ConjunctivePrincipal) {
+                needed.addAll(((ConjunctivePrincipal)p).conjuncts);
+            }
+            else {
+                needed.add(p);
+            }
+        }
+        return new ConjunctivePrincipal(needed);        
+    }
+
     public static String toString(Principal p) {
         try {
             LabelUtil.singleton().enterTiming();
-            return p== null?"_":p.name();
+            return toStringImpl(p);
         }
         finally {
             LabelUtil.singleton().exitTiming();            
-        }
-        
+        }        
+    }
+    public static String toStringImpl(Principal p) {
+        return p== null?"_":p.name();
     }
     public static String stringValue(Principal p) {
         try {
             LabelUtil.singleton().enterTiming();
-            return toString(p);
+            return toStringImpl(p);
         }
         finally {
             LabelUtil.singleton().exitTiming();            
         }
-        
+
     }
-    
+
     private static final class TopPrincipal implements Principal {
         private TopPrincipal() { }
         public String name() { return "*"; }
@@ -522,18 +565,18 @@ public class PrincipalUtil {
         public boolean isAuthorized(Object authPrf, Closure closure, Label lb, boolean executeNow) { return false; }
         public ActsForProof findProofUpto(Principal p, Object searchState) { return null; }
         public ActsForProof findProofDownto(Principal q, Object searchState) { return null; }
-        
+
     }
-    
+
     private abstract static class PrincipalPair {
         final Principal p;
         final Principal q;
-        
+
         PrincipalPair(Principal p, Principal q) {
             this.p = p;
             this.q = q;
         }
-        
+
         public boolean equals(Object o) {
             if (o != null && o.getClass().equals(this.getClass())) {
                 PrincipalPair that = (PrincipalPair)o;
@@ -541,11 +584,11 @@ public class PrincipalUtil {
             }
             return false;
         }
-        
+
         public int hashCode() {
             return (p == null?-4234:p.hashCode())^(q==null?23:q.hashCode());
         }
-        
+
         public String toString() {
             return p.name() + "-" + q.name();
         }

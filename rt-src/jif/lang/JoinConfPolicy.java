@@ -13,17 +13,17 @@ public final class JoinConfPolicy extends JoinPolicy implements ConfPolicy
     }
 
     public ConfPolicy join(ConfPolicy p, Set s) {
-        return labelUtil.join(this, p, s);
+        return labelUtil.joinImpl(this, p, s);
     }
 
     public ConfPolicy meet(ConfPolicy p, Set s) {
-        return labelUtil.meet(this, p, s);
+        return labelUtil.meetImpl(this, p, s);
     }
     public ConfPolicy join(ConfPolicy p) {
-        return labelUtil.join(this, p);
+        return labelUtil.joinImpl(this, p);
     }
 
     public ConfPolicy meet(ConfPolicy p) {
-        return labelUtil.meetPol(this, p);
+        return labelUtil.meetPolImpl(this, p);
     }
 }
