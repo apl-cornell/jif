@@ -57,6 +57,9 @@ public class LabelUtil
             Stats stats = (Stats)statsPerThread.get();
             if (stats.callStackCount++ == 0) {
                 stats.enterStartTime = System.currentTimeMillis();
+                if (stats.callStackCount > 1) {
+                    throw new Error("Instrumentation failed.");
+                }
             }
         }
     }
