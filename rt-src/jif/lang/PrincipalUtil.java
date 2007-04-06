@@ -55,10 +55,12 @@ public class PrincipalUtil {
     public static ActsForProof actsForProofImpl(Principal p, Principal q) {
         // try cache
         ActsForPair pair = new ActsForPair(p, q);
-        if (cacheActsFor.containsKey(pair))  {
-            return (ActsForProof)cacheActsFor.get(pair);
+        if (LabelUtil.USE_CACHING) {
+            if (cacheActsFor.containsKey(pair))  {
+                return (ActsForProof)cacheActsFor.get(pair);
+            }
+            if (cacheNotActsFor.contains(pair)) return null;
         }
-        if (cacheNotActsFor.contains(pair)) return null;
 
         if (delegatesToImpl(q, p)) return new DelegatesProof(p, q);
 
@@ -71,23 +73,27 @@ public class PrincipalUtil {
         // try searching
         ActsForProof prf = findActsForProofImpl(p, q, null);
         if (prf != null && (verifyProofImpl(prf, p, q))) {
-            cacheActsFor.put(pair, prf);
-            // add dependencies that this actsfor replies on.
-            Set s = new HashSet();
-            prf.gatherDelegationDependencies(s);
-            // for each DelegationPair in s, if that delegation is removed, the proof is no longer valid.
-            for (Iterator iter = s.iterator(); iter.hasNext();) {
-                DelegationPair del = (DelegationPair)iter.next();
-                Set deps = (Set)cacheActsForDependencies.get(del);
-                if (deps == null) {
-                    deps = new HashSet();
-                    cacheActsForDependencies.put(del, deps);
+            if (LabelUtil.USE_CACHING) {
+                cacheActsFor.put(pair, prf);
+                // add dependencies that this actsfor replies on.
+                Set s = new HashSet();
+                prf.gatherDelegationDependencies(s);
+                // for each DelegationPair in s, if that delegation is removed, the proof is no longer valid.
+                for (Iterator iter = s.iterator(); iter.hasNext();) {
+                    DelegationPair del = (DelegationPair)iter.next();
+                    Set deps = (Set)cacheActsForDependencies.get(del);
+                    if (deps == null) {
+                        deps = new HashSet();
+                        cacheActsForDependencies.put(del, deps);
+                    }
+                    deps.add(pair);
                 }
-                deps.add(pair);
-            }                
+            }
             return prf;
         }
-        cacheNotActsFor.add(pair);
+        if (LabelUtil.USE_CACHING) {
+            cacheNotActsFor.add(pair);
+        }
         return null;
     }
 
@@ -95,41 +101,45 @@ public class PrincipalUtil {
      * Notification that a new delegation has been created.
      */
     public static void notifyNewDelegation(Principal granter, Principal superior) {
-        try {
-            LabelUtil.singleton().enterTiming();
-            // double check that the delegation occured
-            if (!delegatesToImpl(granter, superior)) return;
-            // XXX for the moment, just clear out all cached negative results
-            cacheNotActsFor.clear();
+        if (LabelUtil.USE_CACHING) {
+            try {
+                LabelUtil.singleton().enterTiming();
+                // double check that the delegation occured
+                if (!delegatesToImpl(granter, superior)) return;
+                // XXX for the moment, just clear out all cached negative results
+                cacheNotActsFor.clear();
 
-            // need to notify the label cache too
-            LabelUtil.singleton().notifyNewDelegationImpl(granter, superior);
+                // need to notify the label cache too
+                LabelUtil.singleton().notifyNewDelegationImpl(granter, superior);
+            }
+            finally {
+                LabelUtil.singleton().exitTiming();            
+            }
         }
-        finally {
-            LabelUtil.singleton().exitTiming();            
-        }        
     }
 
     /**
      * Notification that an existing delegation has been revoked.
      */
     public static void notifyRevokeDelegation(Principal granter, Principal superior) {
-        try {
-            LabelUtil.singleton().enterTiming();
-            DelegationPair del = new DelegationPair(superior, granter);
-            Set deps = (Set)cacheActsForDependencies.remove(del);
-            if (deps != null) {
-                for (Iterator iter = deps.iterator(); iter.hasNext();) {
-                    ActsForPair afp = (ActsForPair)iter.next();
-                    cacheActsFor.remove(afp);
+        if (LabelUtil.USE_CACHING) {
+            try {
+                LabelUtil.singleton().enterTiming();
+                DelegationPair del = new DelegationPair(superior, granter);
+                Set deps = (Set)cacheActsForDependencies.remove(del);
+                if (deps != null) {
+                    for (Iterator iter = deps.iterator(); iter.hasNext();) {
+                        ActsForPair afp = (ActsForPair)iter.next();
+                        cacheActsFor.remove(afp);
+                    }
                 }
+                // need to notify the label cache too
+                LabelUtil.singleton().notifyRevokeDelegationImpl(granter, superior);
             }
-            // need to notify the label cache too
-            LabelUtil.singleton().notifyRevokeDelegationImpl(granter, superior);
+            finally {
+                LabelUtil.singleton().exitTiming();            
+            }
         }
-        finally {
-            LabelUtil.singleton().exitTiming();            
-        }        
     }
 
     /**
