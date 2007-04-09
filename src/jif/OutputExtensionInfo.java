@@ -9,6 +9,7 @@ import polyglot.frontend.goals.SourceFileGoal;
 import polyglot.main.Options;
 import polyglot.types.LoadedClassResolver;
 import polyglot.types.SemanticException;
+import polyglot.types.SourceClassResolver;
 import polyglot.util.InternalCompilerError;
 
 /**
@@ -115,11 +116,11 @@ public class OutputExtensionInfo extends JLExtensionInfo {
     protected void initTypeSystem() {
         try {
             LoadedClassResolver lr;
-            lr = new LoadedClassResolver(typeSystem(), 
-                    jifExtInfo.getJifOptions().constructOutputExtClasspath(),
-                    compiler.loader(), 
-                    version(), 
-                    true);
+            lr = new SourceClassResolver(compiler, this, 
+                                         jifExtInfo.getJifOptions().constructOutputExtClasspath(),
+                                         compiler.loader(), true,
+                                         getOptions().compile_command_line_only,
+                                         getOptions().ignore_mod_times);
             ts.initialize(lr, this);
         }
         catch (SemanticException e) {
