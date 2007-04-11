@@ -69,7 +69,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         A.setPc(Xlhs.N());
 
         Expr rhs = (Expr) lc.context(A).labelCheck(assign.right());
-        PathMap Xrhs = X(rhs);
+        PathMap Xrhs = rhsPathMap(lc.context(A), rhs, throwTypes);
 
         A = (JifContext) A.pop();
         A = (JifContext) A.pop();
@@ -175,6 +175,10 @@ public class JifArrayAccessAssignExt extends JifAssignExt
 
         checkThrowTypes(throwTypes);
         return (Assign) X(assign.right(rhs).left(lhs), X);
+    }
+
+    protected PathMap rhsPathMap(LabelChecker checker, Expr rhs, List throwTypes) {
+        return X(rhs);
     }
 
     private Label arrayBaseLabel(Expr array, JifTypeSystem ts) {        
