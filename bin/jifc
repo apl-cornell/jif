@@ -62,7 +62,6 @@ unixpath() {
 
 runtime_lib_path=
 sig_classpath=
-runtime_classpath=
 lib_classpath=
 extra_cp=
 args=
@@ -91,9 +90,9 @@ while true; do
         -classpath)
             shift
             if [ -z "$extra_cp" ]; then
-              extra_cp="$1"
+	            extra_cp="`unixpath "$1"`"
             else
-              extra_cp="$extra_cp:$1"
+	            extra_cp="$extra_cp:`unixpath "$1"`"
             fi
             shift
             ;;
@@ -126,8 +125,7 @@ classpath="$classpath:$dir/classes:$dir/lib/jif.jar"
 PATH_unix=`unixpath $PATH`
 runtime_lib_path="$dir/lib:$PATH_unix"
 sig_classpath="$dir/sig-classes:$dir/lib/jifsig.jar"
-runtime_classpath="$dir/rt-classes:$dir/lib/jifrt.jar"
-lib_classpath="$dir/lib-classes:$dir/lib/jiflib.jar"
+lib_classpath="$dir/lib-classes:$dir/lib/jiflib.jar:$dir/rt-classes:$dir/lib/jifrt.jar"
 classpath="$classpath:$lib_classpath"
 
 if [ -n "$POLYGLOT" ]; then 
@@ -140,7 +138,6 @@ classpath="$classpath:$unixclasspath"
 
 runtime_lib_path=`fixpath "$runtime_lib_path"`
 sig_classpath=`fixpath "$sig_classpath"`
-runtime_classpath=`fixpath "$runtime_classpath"`
 lib_classpath=`fixpath "$lib_classpath"`
 classpath=`fixpath "$classpath"`
 
@@ -150,7 +147,6 @@ if [ "$usage" = 1 ]; then
   exit 0
 fi
 
-args="-rtcp '$runtime_classpath' $args"
 args="-sigcp '$sig_classpath' $args"
 args="-extclass jif.ExtensionInfo $args"
 

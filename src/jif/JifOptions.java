@@ -46,16 +46,6 @@ public class JifOptions extends Options {
       */
      public List addSigcp = new ArrayList();
 
-      /**
-      * The classpath for the Jif runtime library
-      */
-     public String rtcp = null;
-
-     /**
-      * Additional classpath entries for Jif runtime code.
-      */
-     public List addRtcp = new ArrayList();
-
     /**
      * Constructor
      */
@@ -112,14 +102,6 @@ public class JifOptions extends Options {
             index++;
             this.addSigcp.add(args[index++]);
         }
-        else if (args[index].equals("-rtcp")) {
-            index++;
-            this.rtcp = args[index++];
-        }
-        else if (args[index].equals("-addrtcp")) {
-            index++;
-            this.addRtcp.add(args[index++]);
-        }
         else if (args[index].equals("-debug")) {
             index++;
             int level=0;
@@ -151,8 +133,6 @@ public class JifOptions extends Options {
         usageForFlag(out, "-globalsolve", "infer label variables globally (default: per class)");
         usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");
         usageForFlag(out, "-addsigcp <path>", "additional path for Jif signatures; prepended to sigcp");
-        usageForFlag(out, "-rtcp <path>", "path for Jif runtime classes");
-        usageForFlag(out, "-addrtcp <path>", "additional path for Jif runtime classes; prepended to rtcp");
     }
 
     public String constructSignatureClasspath() {        
@@ -174,29 +154,13 @@ public class JifOptions extends Options {
         return constructSignatureClasspath() +  
                 File.pathSeparator + constructFullClasspath();
     }
-
-    public String constructRuntimeClassPath() {
-        String rcp = "";
-        for (Iterator iter = addRtcp.iterator(); iter.hasNext(); ) {
-            rcp += ((String)iter.next());
-            if (iter.hasNext()) {
-                rcp += File.pathSeparator;            
-            }
-        }
-        if (rtcp != null) {
-            rcp += File.pathSeparator + rtcp;
-        }
-        return rcp;        
-    }
     
     public String constructOutputExtClasspath() {
-        // use the runtime classpath if it exists for compiling the output classes
-        return constructRuntimeClassPath() + File.pathSeparator + constructJifClasspath();
+        return constructFullClasspath();
     }
 
     public String constructPostCompilerClasspath() {
-        String cp = constructRuntimeClassPath() + File.pathSeparator
-                + super.constructPostCompilerClasspath() + File.pathSeparator
+        String cp = super.constructPostCompilerClasspath() + File.pathSeparator
                 + constructFullClasspath();
         return cp;
     }
