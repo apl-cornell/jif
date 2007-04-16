@@ -2,27 +2,19 @@ package jif;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import jif.ast.JifNodeFactory;
 import jif.ast.JifNodeFactory_c;
 import jif.types.JifTypeSystem;
 import jif.types.JifTypeSystem_c;
-import jif.visit.NotNullChecker;
-import jif.visit.PreciseClassChecker;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
 import polyglot.frontend.Compiler;
 import polyglot.frontend.goals.Goal;
-import polyglot.frontend.goals.VisitorGoal;
 import polyglot.main.Options;
-import polyglot.types.LoadedClassResolver;
-import polyglot.types.SemanticException;
-import polyglot.types.SourceClassResolver;
-import polyglot.types.TypeSystem;
+import polyglot.types.*;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 

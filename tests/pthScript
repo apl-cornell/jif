@@ -417,6 +417,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Params42.jif ; # return a more reasonable error.
 	Params43.jif ;
 	Params44.jif (Semantic, "not less restrictive");
+	Params45.jif (Semantic, "Only final variables");
 	ParamsActsFor.jif ;
 	Password.jif ;
 	Password2.jif ;

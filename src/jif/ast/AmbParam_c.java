@@ -3,7 +3,6 @@ package jif.ast;
 import jif.types.*;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
-import polyglot.ast.Expr;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
@@ -58,6 +57,22 @@ public class AmbParam_c extends Node_c implements AmbParam
     }
 
 
+    /**
+     * Count the number of times disambiguate has been called, to allow reporting
+     * of meaningful error messages.
+     */
+    private int disambCount = 0;
+    
+    /**
+     * The maximum number of times that disambiguate can be called before
+     * we allow an error message to be reported. Should be less than
+     * polyglot.frontend.Scheduler.MAX_RUN_COUNT, but big enough so that
+     * the largest cycle of recursive formals can be resolved. e.g.,
+     * m(int{a1} a0, int{a2} a1, ...., int{a0} ak),  MAX_DISAMB_CALLS would
+     * need to be bigger than k.
+     */
+    protected static final int MAX_DISAMB_CALLS = 100;
+    
     /** Disambiguates <code>name</code>.
      *  If <code>name</code> is a <tt>VarInstance</tt>, we get a dynamic label/principal
      *  node. If <code>name</code> is a <tt>PrincipalInstance</tt>, we get the same 
@@ -68,11 +83,12 @@ public class AmbParam_c extends Node_c implements AmbParam
         Context c = sc.context();
         VarInstance vi = c.findVariable(name.id());
 
-        if (!vi.isCanonical() && pi == null) {
+        if (!vi.isCanonical() && pi == null && disambCount++ < MAX_DISAMB_CALLS) {
             // not yet ready to disambiguate
             sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
             return this;
         }
+        
         if (vi instanceof JifVarInstance) {
             return varToParam((JifVarInstance) vi, sc);
         }
