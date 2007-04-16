@@ -29,7 +29,7 @@
 # an appropriate class path, to make sure that pth can find the Jif compiler.
 #    $ pth pthScript -classpath "../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:."
 
-jif.ExtensionInfo  "-classpath ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:../lib/jifrt.jar" {
+jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:../rt-classes:/../lib/jifrt.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar" {
         OwnedObject.jif;
         LabeledObject.jif;
         TestPrincipal.jif;
@@ -538,7 +538,7 @@ jif.ExtensionInfo  "-classpath ../classes:../lib-classes:../lib/jif.jar:../lib/j
 }
 
 # the robustness test cases. Turn robustness on.
-jif.ExtensionInfo  "-robust -cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar -rtcp ../rt-classes:../lib/jifrt.jar" {
+jif.ExtensionInfo  "-robust -cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:../rt-classes:../lib/jifrt.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar" {
 	RobustDecl01.jif ;
 	RobustDecl02.jif (Semantic, "not robust");
 	RobustDecl03.jif (Semantic, "not robust");
