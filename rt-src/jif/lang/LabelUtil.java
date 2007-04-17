@@ -696,16 +696,16 @@ public class LabelUtil
         return result;            
     }
 
-//    public boolean relabelsTo(Policy from, Policy to) {
-//        try {
-//            enterTiming();
-//            return relabelsToImpl(from, to, new HashSet());
-//        }
-//        finally {
-//            exitTiming();
-//        }
-//    }
-//
+    public boolean relabelsTo(Policy from, Policy to) {
+        try {
+            enterTiming();
+            return relabelsToImpl(from, to, new HashSet());
+        }
+        finally {
+            exitTiming();
+        }
+    }
+
     protected boolean relabelsToImpl(Policy from, Policy to, Set s) {
         try {
             enterTiming();
