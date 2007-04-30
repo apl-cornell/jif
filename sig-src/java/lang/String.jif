@@ -6,7 +6,7 @@
  */
 package java.lang;
 
-public final class String implements java.io.Serializable /*,  Comparable*/ {
+public final class String implements java.io.Serializable, CharSequence /*,  Comparable*/ {
     private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
     public String() {  }
 
@@ -20,6 +20,7 @@ public final class String implements java.io.Serializable /*,  Comparable*/ {
     //    public String(StringBuffer{this} buffer) { }
     public native int{this} length();
     public native char{this; index} charAt(int index) throws (StringIndexOutOfBoundsException{this; index});
+    public native CharSequence{this;start;end} subSequence(int start, int end)  throws (IndexOutOfBoundsException{this;start;end});
     public native void getChars{this}(int{this} srcBegin, int{this} srcEnd, char{this}[]{this} dst, int{this} dstBegin) throws (StringIndexOutOfBoundsException{this});
     public native boolean{this; anObject} equals(Object anObject);
     public native boolean{this; anotherString} equalsIgnoreCase(String anotherString);

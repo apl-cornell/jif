@@ -25,7 +25,7 @@ public class PrintStream[label L] extends FilterOutputStream[L] {
     public native void print{L}(double{L} d);
     public native void print{L}(char{L}[]{L} s);
     public native void print{L}(String{L} s);
-    public native void print{L}(Object{L} obj);
+//    public native void print{L}(Object{L} obj);
     public native void println{L}();
     public native void println{L}(boolean{L} x);
     public native void println{L}(char{L} x);
@@ -35,5 +35,5 @@ public class PrintStream[label L] extends FilterOutputStream[L] {
     public native void println{L}(double{L} x);
     public native void println{L}(char{L}[]{L} x);
     public native void println{L}(String{L} x);
-    public native void println{L}(Object{L} x);
+//    public native void println{L}(Object{L} x);
 }
