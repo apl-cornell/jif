@@ -62,9 +62,9 @@ public class LabelUtil
             stats.callCount++;
             if (stats.callStackCount++ == 0) {
                 stats.enterStartTime = System.currentTimeMillis();
-                if (stats.callStackCount > 1) {
-                    throw new Error("Instrumentation failed.");
-                }
+            }
+            if (stats.callStackCount > 1) {
+                throw new Error("Instrumentation failed.");
             }
         }
     }
