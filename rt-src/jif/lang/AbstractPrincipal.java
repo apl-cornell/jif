@@ -12,6 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class AbstractPrincipal implements Principal {
     private String name;
+    private static Principal NULL_PRINCIPAL = new AbstractPrincipal("NULL PRINCIPAL") { 
+        public boolean equals(Object o) { return this == o; }
+    };
+
     private Map<Principal, Principal> superiors = new ConcurrentHashMap<Principal, Principal>(); // treat this like a set
 
     public AbstractPrincipal() { super(); }
@@ -37,17 +41,20 @@ public abstract class AbstractPrincipal implements Principal {
     }
 
     public void addDelegatesTo(Principal p) {
+        if (p == null) p = NULL_PRINCIPAL;
         if (this.superiors.put(p, this) == null) {
             PrincipalUtil.notifyNewDelegation(this, p);
         }
     }
     public void removeDelegatesTo(Principal p) {
+        if (p == null) p = NULL_PRINCIPAL;
         if (this.superiors.remove(p) != null) {
             PrincipalUtil.notifyRevokeDelegation(this, p);            
         }
     }
 
     protected boolean superiorsContains(Principal p) {
+        if (p == null) p = NULL_PRINCIPAL;
         return this.superiors.containsKey(p);
     }
 
