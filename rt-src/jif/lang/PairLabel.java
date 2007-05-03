@@ -27,8 +27,8 @@ public final class PairLabel implements Label
             PairLabel that = (PairLabel)l;            
             if (this == that || this.equals(that)) return true;
             Set temp = new HashSet();
-            if (labelUtil.relabelsToImpl(this.confPol, that.confPol, temp) &&
-                    labelUtil.relabelsToImpl(this.integPol, that.integPol, temp)) {
+            if (labelUtil.relabelsTo(this.confPol, that.confPol, temp) &&
+                    labelUtil.relabelsTo(this.integPol, that.integPol, temp)) {
                 s.addAll(temp);
                 return true;
             }
@@ -65,11 +65,11 @@ public final class PairLabel implements Label
     }
     
     public final Label join(Label l) {
-        return labelUtil.joinImpl(this, l);
+        return labelUtil.join(this, l);
     }
 
     public Label meet(Label l) {
-        return labelUtil.meetImpl(this, l);
+        return labelUtil.meet(this, l);
     }
 
     public ConfPolicy confPolicy() {

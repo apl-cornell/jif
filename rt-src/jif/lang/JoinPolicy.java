@@ -27,7 +27,7 @@ public abstract class JoinPolicy extends AbstractPolicy implements Policy
         boolean sat = true;
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Policy Ci = (Policy) i.next();
-            if (!labelUtil.relabelsToImpl(Ci, pol, temp)) {
+            if (!labelUtil.relabelsTo(Ci, pol, temp)) {
                 sat = false;
                 break;
             }
@@ -47,7 +47,7 @@ public abstract class JoinPolicy extends AbstractPolicy implements Policy
             sat = true;
             for (Iterator i = mp.meetComponents().iterator(); i.hasNext(); ) {
                 Policy Di = (Policy) i.next();
-                if (!labelUtil.relabelsToImpl(this, Di, temp)) {
+                if (!labelUtil.relabelsTo(this, Di, temp)) {
                     sat = false;
                     break;
                 }
@@ -64,7 +64,7 @@ public abstract class JoinPolicy extends AbstractPolicy implements Policy
             for (Iterator i = jp.joinComponents().iterator(); i.hasNext(); ) {
                 temp.clear();
                 Policy Di = (Policy) i.next();
-                if (labelUtil.relabelsToImpl(this, Di, temp)) {
+                if (labelUtil.relabelsTo(this, Di, temp)) {
                     s.addAll(temp);
                     return true;
                 }

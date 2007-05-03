@@ -30,7 +30,7 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy
             // this <= pi
             for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
                 Policy pi = (Policy)iter.next();
-                if (labelUtil.relabelsToImpl(this, pi, s)) return true;                
+                if (labelUtil.relabelsTo(this, pi, s)) return true;                
             }
             return false;
         }
@@ -41,7 +41,7 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy
             Set temp = new HashSet();
             for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
                 Policy pi = (Policy)iter.next();
-                if (!labelUtil.relabelsToImpl(this, pi, temp)) return false;                
+                if (!labelUtil.relabelsTo(this, pi, temp)) return false;                
             }
             s.addAll(temp);
             return true;            
@@ -56,19 +56,19 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy
         
         // o' >= o?
         
-        ActsForProof ownersProof = PrincipalUtil.actsForProofImpl(owner, pp.owner);
+        ActsForProof ownersProof = PrincipalUtil.actsForProof(owner, pp.owner);
         if (ownersProof == null) {
             return false;
         }
         
         // for all j . rj' >= o || exists i . rj' >= ri
-        ActsForProof writerWriterProof = PrincipalUtil.actsForProofImpl(this.writer, pp.writer);
+        ActsForProof writerWriterProof = PrincipalUtil.actsForProof(this.writer, pp.writer);
         if (writerWriterProof != null) {
             ownersProof.gatherDelegationDependencies(s);
             writerWriterProof.gatherDelegationDependencies(s);
             return true;
         }
-        ActsForProof writerOwnerProof = PrincipalUtil.actsForProofImpl(this.writer, pp.owner);
+        ActsForProof writerOwnerProof = PrincipalUtil.actsForProof(this.writer, pp.owner);
         if (writerOwnerProof != null) {
             ownersProof.gatherDelegationDependencies(s);
             writerOwnerProof.gatherDelegationDependencies(s);      
@@ -106,17 +106,17 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy
     }
 
     public IntegPolicy join(IntegPolicy p, Set s) {
-        return labelUtil.joinImpl(this, p, s);
+        return labelUtil.join(this, p, s);
     }
 
     public IntegPolicy meet(IntegPolicy p, Set s) {
-        return labelUtil.meetImpl(this, p, s);
+        return labelUtil.meet(this, p, s);
     }    
     public IntegPolicy join(IntegPolicy p) {
-        return labelUtil.joinImpl(this, p);
+        return labelUtil.join(this, p);
     }
 
     public IntegPolicy meet(IntegPolicy p) {
-        return labelUtil.meetPolImpl(this, p);
+        return labelUtil.meetPol(this, p);
     }    
 }
