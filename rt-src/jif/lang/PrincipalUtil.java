@@ -47,11 +47,13 @@ public class PrincipalUtil {
         try {
             LabelUtil.singleton().enterTiming();
             // try cache
-            ActsForPair pair = new ActsForPair(p, q);
-            if (cacheActsFor.containsKey(pair))  {
-                return (ActsForProof)cacheActsFor.get(pair);
+            if(LabelUtil.USE_CACHING) {
+                ActsForPair pair = new ActsForPair(p, q);
+                if (cacheActsFor.containsKey(pair))  {
+                    return (ActsForProof)cacheActsFor.get(pair);
+                }
+                if (cacheNotActsFor.contains(pair)) return null;
             }
-            if (cacheNotActsFor.contains(pair)) return null;
 
             if (delegatesTo(q, p)) return new DelegatesProof(p, q);
 
@@ -64,23 +66,30 @@ public class PrincipalUtil {
             // try searching
             ActsForProof prf = findActsForProof(p, q, null);
             if (prf != null && (verifyProof(prf, p, q))) {
-                cacheActsFor.put(pair, prf);
+                if(LabelUtil.USE_CACHING) {
+                    cacheActsFor.put(pair, prf);
+                }
                 // add dependencies that this actsfor replies on.
                 Set s = new HashSet();
                 prf.gatherDelegationDependencies(s);
                 // for each DelegationPair in s, if that delegation is removed, the proof is no longer valid.
-                for (Iterator iter = s.iterator(); iter.hasNext();) {
-                    DelegationPair del = (DelegationPair)iter.next();
-                    Set deps = (Set)cacheActsForDependencies.get(del);
-                    if (deps == null) {
-                        deps = new HashSet();
-                        cacheActsForDependencies.put(del, deps);
+                if(LabelUtil.USE_CACHING) {
+                    for (Iterator iter = s.iterator(); iter.hasNext();) {
+                        DelegationPair del = (DelegationPair)iter.next();
+                        Set deps = (Set)cacheActsForDependencies.get(del);
+                        if (deps == null) {
+                            deps = new HashSet();
+                            cacheActsForDependencies.put(del, deps);
+                        }
+                        deps.add(pair);
                     }
-                    deps.add(pair);
-                }                
+                }
                 return prf;
             }
-            cacheNotActsFor.add(pair);
+            
+            if(LabelUtil.USE_CACHING) {            
+                cacheNotActsFor.add(pair);
+            }
             return null;
         }
         finally {
@@ -94,8 +103,11 @@ public class PrincipalUtil {
     public static void notifyNewDelegation(Principal granter, Principal superior) {
         // double check that the delegation occured
         if (!delegatesTo(granter, superior)) return;
+
         // XXX for the moment, just clear out all cached negative results
-        cacheNotActsFor.clear();
+        if(LabelUtil.USE_CACHING) {        
+            cacheNotActsFor.clear();
+        }
         
         // need to notify the label cache too
         LabelUtil.singleton().notifyNewDelegation(granter, superior);
@@ -105,12 +117,14 @@ public class PrincipalUtil {
      * Notification that an existing delegation has been revoked.
      */
     public static void notifyRevokeDelegation(Principal granter, Principal superior) {
-        DelegationPair del = new DelegationPair(superior, granter);
-        Set deps = (Set)cacheActsForDependencies.remove(del);
-        if (deps != null) {
-            for (Iterator iter = deps.iterator(); iter.hasNext();) {
-                ActsForPair afp = (ActsForPair)iter.next();
-                cacheActsFor.remove(afp);
+        if(LabelUtil.USE_CACHING) {        
+            DelegationPair del = new DelegationPair(superior, granter);
+            Set deps = (Set)cacheActsForDependencies.remove(del);
+            if (deps != null) {
+                for (Iterator iter = deps.iterator(); iter.hasNext();) {
+                    ActsForPair afp = (ActsForPair)iter.next();
+                    cacheActsFor.remove(afp);
+                }
             }
         }
         // need to notify the label cache too
