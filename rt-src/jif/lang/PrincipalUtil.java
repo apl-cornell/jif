@@ -47,8 +47,8 @@ public class PrincipalUtil {
         try {
             LabelUtil.singleton().enterTiming();
             // try cache
+            ActsForPair pair = new ActsForPair(p, q);
             if(LabelUtil.USE_CACHING) {
-                ActsForPair pair = new ActsForPair(p, q);
                 if (cacheActsFor.containsKey(pair))  {
                     return (ActsForProof)cacheActsFor.get(pair);
                 }

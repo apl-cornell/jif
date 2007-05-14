@@ -29,15 +29,16 @@ public class LabelUtil
         private long enterStartTime = 0;
         private int callStackCount = 0;
         private int callCount = 0;
+        private int topCallCount = 0;
     }
     private ThreadLocal statsPerThread = new ThreadLocal() {
         protected Object initialValue() {
             return new Stats();
         }   
     };
-    private static final boolean COUNT_TIME = false;
+    public static final boolean COUNT_TIME = false;
     
-    static final boolean USE_CACHING = true;
+    public static final boolean USE_CACHING = false;
 
     // caches
     private Set/*<Pair>*/ cacheTrueLabelRelabels = new HashSet();
@@ -60,6 +61,7 @@ public class LabelUtil
             Stats stats = (Stats)statsPerThread.get();
             stats.callCount++;
             if (stats.callStackCount++ == 0) {
+                stats.topCallCount++;
                 stats.enterStartTime = System.currentTimeMillis();          
             }
         }
@@ -99,8 +101,8 @@ public class LabelUtil
      * and/or the thread created (whichever was last). Also clears the total
      * time recorded for this thread.
      */
-    public long getAndClearCount() {
-        long r = -1;
+    public int getAndClearCount() {
+        int r = -1;
         if (COUNT_TIME) {
             Stats stats = (Stats)statsPerThread.get();
             r = stats.callCount;
@@ -108,9 +110,17 @@ public class LabelUtil
         }
         return r;        
     }
+
+    public int getAndClearTopCount() {
+        int r = -1;
+        if (COUNT_TIME) {
+            Stats stats = (Stats)statsPerThread.get();
+            r = stats.topCallCount;
+            stats.topCallCount = 0;
+        }
+        return r;        
+    }
     
-
-
     private final ConfPolicy BOTTOM_CONF;
     private final IntegPolicy TOP_INTEG;
     private final Label NO_COMPONENTS; 
