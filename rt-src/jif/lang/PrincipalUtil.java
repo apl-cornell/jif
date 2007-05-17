@@ -1,6 +1,7 @@
 package jif.lang;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utility methods for principals.
@@ -11,13 +12,13 @@ public class PrincipalUtil {
     private static Principal TOP_PRINCIPAL = new TopPrincipal();
 
     // caches
-    private static final Map cacheActsFor = new HashMap(); // Map from ActsForPairs to ActsForProofs
-    private static final Set cacheNotActsFor = new HashSet(); // Set of ActsForPairs
+    private static final Map<ActsForPair, ActsForProof> cacheActsFor = new ConcurrentHashMap<ActsForPair, ActsForProof>(); 
+    private static final Map<ActsForPair, ActsForPair> cacheNotActsFor = new ConcurrentHashMap<ActsForPair, ActsForPair>(); // effectively a set 
     
     //  map from DelegationPairs to sets of ActsForPairs. If (p, q) is
     // in the set of the map of delegation d, then p actsfor q, and the 
     // proof depends on the delegation d
-    private static final Map cacheActsForDependencies = new HashMap(); 
+    private static final Map<DelegationPair, Set<ActsForPair>> cacheActsForDependencies = new ConcurrentHashMap<DelegationPair, Set<ActsForPair>>(); 
     
     /**
      * Returns true if and only if the principal p acts for the principal q. A
@@ -50,9 +51,9 @@ public class PrincipalUtil {
             ActsForPair pair = new ActsForPair(p, q);
             if(LabelUtil.USE_CACHING) {
                 if (cacheActsFor.containsKey(pair))  {
-                    return (ActsForProof)cacheActsFor.get(pair);
+                    return cacheActsFor.get(pair);
                 }
-                if (cacheNotActsFor.contains(pair)) return null;
+                if (cacheNotActsFor.containsKey(pair)) return null;
             }
 
             if (delegatesTo(q, p)) return new DelegatesProof(p, q);
@@ -76,9 +77,9 @@ public class PrincipalUtil {
                 if(LabelUtil.USE_CACHING) {
                     for (Iterator iter = s.iterator(); iter.hasNext();) {
                         DelegationPair del = (DelegationPair)iter.next();
-                        Set deps = (Set)cacheActsForDependencies.get(del);
+                        Set<ActsForPair> deps = cacheActsForDependencies.get(del);
                         if (deps == null) {
-                            deps = new HashSet();
+                            deps = new HashSet<ActsForPair>();
                             cacheActsForDependencies.put(del, deps);
                         }
                         deps.add(pair);
@@ -88,7 +89,7 @@ public class PrincipalUtil {
             }
             
             if(LabelUtil.USE_CACHING) {            
-                cacheNotActsFor.add(pair);
+                cacheNotActsFor.put(pair, pair);
             }
             return null;
         }
@@ -119,7 +120,7 @@ public class PrincipalUtil {
     public static void notifyRevokeDelegation(Principal granter, Principal superior) {
         if(LabelUtil.USE_CACHING) {        
             DelegationPair del = new DelegationPair(superior, granter);
-            Set deps = (Set)cacheActsForDependencies.remove(del);
+            Set deps = cacheActsForDependencies.remove(del);
             if (deps != null) {
                 for (Iterator iter = deps.iterator(); iter.hasNext();) {
                     ActsForPair afp = (ActsForPair)iter.next();
@@ -407,7 +408,7 @@ public class PrincipalUtil {
             if (left == null || right == null) return null;
             if (actsFor(left, right)) return right;
             if (actsFor(right, left)) return left;
-            Collection c = new ArrayList(2);
+            Collection<Principal> c = new ArrayList<Principal>(2);
             c.add(left);
             c.add(right);
             return disjunction(c);
@@ -425,7 +426,7 @@ public class PrincipalUtil {
             if (right == null) return left;
             if (actsFor(left, right)) return left;
             if (actsFor(right, left)) return right;
-            Collection c = new ArrayList(2);
+            Collection<Principal> c = new ArrayList<Principal>(2);
             c.add(left);
             c.add(right);
             return conjunction(c);
@@ -436,7 +437,7 @@ public class PrincipalUtil {
         
     }
     
-    public static Principal disjunction(Collection principals) {        
+    public static Principal disjunction(Collection<Principal> principals) {        
         try {
             LabelUtil.singleton().enterTiming();
             if (principals == null || principals.isEmpty()) {
@@ -449,8 +450,8 @@ public class PrincipalUtil {
             }
             
             // go through the collection of principals, and flatten them
-            Set needed = new LinkedHashSet();
-            for (Iterator iter = principals.iterator(); iter.hasNext(); ) {
+            Set<Principal> needed = new LinkedHashSet<Principal>();
+            for (Iterator<Principal> iter = principals.iterator(); iter.hasNext(); ) {
                 Object o = iter.next();
                 Principal p = null;
                 if (o instanceof Principal) p = (Principal)o;
@@ -471,7 +472,7 @@ public class PrincipalUtil {
         
     }
     
-    public static Principal conjunction(Collection principals) {        
+    public static Principal conjunction(Collection<Principal> principals) {        
         try {
             LabelUtil.singleton().enterTiming();
             if (principals == null || principals.isEmpty()) {
@@ -484,8 +485,8 @@ public class PrincipalUtil {
             }
             
             // go through the collection of principals, and flatten them
-            Set needed = new LinkedHashSet();
-            for (Iterator iter = principals.iterator(); iter.hasNext(); ) {
+            Set<Principal> needed = new LinkedHashSet<Principal>();
+            for (Iterator<Principal> iter = principals.iterator(); iter.hasNext(); ) {
                 Object o = iter.next();
                 Principal p = null;
                 if (o instanceof Principal) p = (Principal)o;
