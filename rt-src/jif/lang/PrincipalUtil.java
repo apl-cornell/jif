@@ -68,7 +68,6 @@ public class PrincipalUtil {
             ActsForProof prf = findActsForProof(p, q, null);
             if (prf != null && (verifyProof(prf, p, q))) {
                 if(LabelUtil.USE_CACHING) {
-                    ActsForPair pair = new ActsForPair(p, q);
                     cacheActsFor.put(pair, prf);
                 }
                 // add dependencies that this actsfor replies on.
@@ -83,7 +82,6 @@ public class PrincipalUtil {
                             deps = new HashSet<ActsForPair>();
                             cacheActsForDependencies.put(del, deps);
                         }
-                        ActsForPair pair = new ActsForPair(p, q);
                         deps.add(pair);
                     }
                 }

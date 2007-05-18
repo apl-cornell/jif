@@ -411,7 +411,6 @@ public class LabelUtil
                             if (deps == null) {
                                 deps = new HashSet<Pair>();
                                 cacheLabelMeetDependencies.put(del, deps);
-                                }
                             }
                             deps.add(pair);
                         }
