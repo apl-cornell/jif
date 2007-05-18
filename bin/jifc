@@ -129,7 +129,7 @@ lib_classpath="$dir/lib-classes:$dir/lib/jiflib.jar:$dir/rt-classes:$dir/lib/jif
 classpath="$classpath:$lib_classpath"
 
 if [ -n "$POLYGLOT" ]; then 
-    polyglot_unix=`unixfilename "$POLYGLOT"` 
+    polyglot_unix=`unixpath "$POLYGLOT"` 
     classpath="$classpath:$polyglot_unix/classes:$polyglot_unix/lib/polyglot.jar"
     classpath="$classpath:$polyglot_unix/lib/java_cup.jar:$polyglot_unix/lib/JFlex.jar"
 fi

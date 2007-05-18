@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="rt-src"/>
+	<classpathentry kind="src" output="rt-classes" path="rt-src"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="lib-classes"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Polyglot"/>
 	<classpathentry kind="lib" path="/Polyglot/lib/java_cup.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib-classes"/>
+	<classpathentry kind="lib" path="/Polyglot/lib/JFlex.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

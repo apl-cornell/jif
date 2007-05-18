@@ -39,7 +39,7 @@ public class LabelUtil
     };
     public static final boolean COUNT_TIME = false;
     
-    public static final boolean USE_CACHING = false;
+    public static final boolean USE_CACHING = true;
 
     // caches
     private Map<Pair, Pair> cacheTrueLabelRelabels = new ConcurrentHashMap<Pair, Pair>(); // effectively a set
@@ -411,6 +411,7 @@ public class LabelUtil
                             if (deps == null) {
                                 deps = new HashSet<Pair>();
                                 cacheLabelMeetDependencies.put(del, deps);
+                                }
                             }
                             deps.add(pair);
                         }
