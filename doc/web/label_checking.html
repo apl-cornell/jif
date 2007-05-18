@@ -90,6 +90,11 @@ exception, as an expression or statement terminates normally only if
 it does not throw an exception.
 </p>
 
+<p>Note that in Jif, unlike Java, all subtypes of
+<code>Exception</code> are checked. That is, subtypes of
+<code>RuntimeException</code>s must be either caught or declared to be
+thrown.</p>
+
 <h3><a name="nv-label">Normal value label</a></h3>
 <p>Label checking also determines for every expression an upper bound
 on the label of any value that the expression may evaluate to. This
@@ -939,6 +944,14 @@ associated with it in the <code>catch</code> blocks,
 <code>finally</code> block, and (if it is an exception that is not
 caught by any <code>catch</code> block) the <code>try</code>
 block.</p>
+
+<p>Note that in Jif, unlike Java, all subtypes of
+<code>Exception</code> are checked. That is, subtypes of
+<code>RuntimeException</code>s must be either caught or declared to be
+thrown, and thus information obtained by observing
+<code>RuntimeException</code>s is tracked. See the section on <a
+class="secref" href="language.html#runtime-exceptions">Runtime
+exceptions</a> for more information.</p>
 
 
 <h2><a name="dynamic-type-discrimination">Dynamic type discrimination</a></h2>
