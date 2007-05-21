@@ -1,0 +1,15 @@
+class C {
+    void m{*!:*}() { 
+        // test negative size arrays
+        int[] c = new int[-1]; // will throw
+    }
+    int n{*!:*}() { 
+        // test negative size arrays
+        int[] c = new int[0]; // won't throw
+        return 2;
+    }
+    void o{*!:*}() { 
+        // test negative size arrays
+        int[] c = new int[n()]; // may throw
+    }
+}

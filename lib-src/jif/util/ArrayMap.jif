@@ -1,7 +1,7 @@
 package jif.util;
 
 public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
-    static int{*!:*} INITIAL_CAPACITY=10;
+    static final int{*!:*} INITIAL_CAPACITY = 10;
     
     // This is the number of actual (key,value) pairs stored in the Map
     int{K} size;
@@ -23,18 +23,19 @@ public class ArrayMap[label K, label V] extends AbstractMap[K,V] {
     private void extendCapacity{K}() {
         int newCapacity  = 1+(int)(capacity * 1.5);
         
-        ArrayMapEntry[K,V]{K}[]{K} newEntryArray = new ArrayMapEntry[K,V][newCapacity];
         
         try {
+            ArrayMapEntry[K,V]{K}[]{K} newEntryArray = new ArrayMapEntry[K,V][newCapacity];
             for(int i = 0; i < size; i++) {
                 newEntryArray[i] = entryArray[i];
             }
+            entryArray = newEntryArray;
+            capacity = newCapacity;
         } 
+        catch (NegativeArraySizeException impossible) {}
         catch (ArrayIndexOutOfBoundsException impossible) {}
         catch (NullPointerException impossible) {}
         
-        entryArray = newEntryArray;
-        capacity = newCapacity;
         
     }
     

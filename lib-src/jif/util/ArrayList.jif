@@ -47,13 +47,18 @@ public class ArrayList[label L]
                     newCapacity = minCapacity;
                 }
 
-                ed = new JifObject[L][newCapacity];
+                try {
+                    ed = new JifObject[L][newCapacity];
+                }
+                catch (NegativeArraySizeException imposs) {}
+                
                 // copy the old array to the new array
                 for (int i = 0; i < size ; i++) {
                     try {
                         ed[i] = oldData[i];
                     }
                     catch (ArrayIndexOutOfBoundsException e) {}
+                    catch (NullPointerException e) {}
                 }
                 elementData = ed;
             }

@@ -403,15 +403,27 @@ label_component ::=
 						  parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
     ;
 
-rightarrow ::= COLON | RIGHTARROW | MINUS GT ;
-leftarrow ::= NOT COLON | LEFTARROW | LT MINUS ;
+rightarrow ::= COLON:a 
+            {: RESULT = a; :}     
+     | RIGHTARROW:a 
+            {: RESULT = a; :}     
+     | MINUS GT:a 
+            {: RESULT = a; :}     
+     ;
+leftarrow ::= NOT COLON:a
+            {: RESULT = a; :}     
+     | LEFTARROW:a 
+            {: RESULT = a; :}     
+     | LT MINUS:a 
+            {: RESULT = a; :}     
+     ;
 
 label_component_policy ::=
                     // PolicyNode
-        principal_disjunctive:a rightarrow principal_list_opt:b
-            {: RESULT = parser.nf.ReaderPolicyNode(parser.pos(a, b), a, b); :}
-    |   principal_disjunctive:a leftarrow principal_list_opt:b
-            {: RESULT = parser.nf.WriterPolicyNode(parser.pos(a, b), a, b); :}
+        principal_disjunctive:a rightarrow:arr principal_list_opt:b
+            {: RESULT = parser.nf.ReaderPolicyNode(parser.pos(a, parser.pos(b)==null?arr:b), a, b); :}
+    |   principal_disjunctive:a leftarrow:arr principal_list_opt:b
+            {: RESULT = parser.nf.WriterPolicyNode(parser.pos(a, parser.pos(b)==null?arr:b), a, b); :}
     ;
 
 principal_list_opt ::=
@@ -989,7 +1001,7 @@ override array_creation_expression ::=
             {: RESULT = parser.nf.NewArray(parser.pos(n,c), a.toType(),
                                        b.intValue(), c); :}
     |   NEW:n primitive_type:a dim_exprs:b dims_opt:c
-            {: RESULT = parser.nf.NewArray(parser.pos(n,c), a, b,
+            {: RESULT = parser.nf.NewArray(parser.pos(n,b), a, b,
                                            c.intValue()); :}
     |   NEW:n primitive_type:a dims:b array_initializer:c
             {: RESULT = parser.nf.NewArray(parser.pos(n,c), a,

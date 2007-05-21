@@ -1,13 +1,23 @@
 package jif.extension;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
+import jif.types.label.Label;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.ArrayInit;
+import polyglot.ast.Expr;
+import polyglot.ast.NewArray;
+import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 
 /** The Jif extension of the <code>NewArray</code> node. 
  * 
@@ -23,41 +33,55 @@ public class JifNewArrayExt extends Jif_c
 
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
-	NewArray nae = (NewArray) node();
+        JifTypeSystem ts = lc.jifTypeSystem();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
+        NewArray nae = (NewArray) node();
+        List throwTypes = new ArrayList(nae.del().throwTypes(ts));
+
         JifContext A = lc.jifContext();
-	A = (JifContext) nae.del().enterScope(A);
+        A = (JifContext) nae.del().enterScope(A);
 
-	A = (JifContext) A.pushBlock();
+        A = (JifContext) A.pushBlock();
 
-	PathMap Xs = ts.pathMap();
-	Xs = Xs.N(A.pc());
+        PathMap Xs = ts.pathMap();
+        Xs = Xs.N(A.pc());
 
-	List dims = new LinkedList();
+        List dims = new LinkedList();
 
-	for (Iterator iter = nae.dims().iterator(); iter.hasNext(); ) {
-	    Expr e = (Expr) iter.next(); 
-	    e = (Expr) lc.context(A).labelCheck(e);
-	    dims.add(e);
+        Label dimsNV = ts.bottomLabel();
+        for (Iterator iter = nae.dims().iterator(); iter.hasNext(); ) {
+            Expr e = (Expr) iter.next(); 
+            e = (Expr) lc.context(A).labelCheck(e);
+            dims.add(e);
 
-	    PathMap Xe = X(e);
-	    Xs = Xs.N(ts.notTaken()).join(Xe);
+            PathMap Xe = X(e);
+            Xs = Xs.N(ts.notTaken()).join(Xe);
 
-	    A.setPc(Xs.N());
-	}
+            A.setPc(Xs.N());
+            dimsNV = ts.join(dimsNV, Xe.NV());
+        }
 
-	ArrayInit init = null;
+        ArrayInit init = null;
 
-	if (nae.init() != null) {
-	    init = (ArrayInit) lc.context(A).labelCheck(nae.init());
+        if (nae.init() != null) {
+            init = (ArrayInit) lc.context(A).labelCheck(nae.init());
             ((JifArrayInitExt)(init.ext())).labelCheckElements(lc, nae.type()); 
-	    PathMap Xinit = X(init);
-	    Xs = Xs.N(ts.notTaken()).join(Xinit);
-	}
+            PathMap Xinit = X(init);
+            Xs = Xs.N(ts.notTaken()).join(Xinit);
+        }
+
+        if (!((JifNewArrayDel)node().del()).noNegArraySizeExcThrown()) {
+            // a NegativeArraySizeExcepiton may be thrown, depending
+            // on the value of the dimensions.
+            Type nase = ts.typeForName("java.lang.NegativeArraySizeException");
+            checkAndRemoveThrowType(throwTypes, nase);
+            Xs = Xs.exc(dimsNV, nase);
+        }
 
         A = (JifContext) A.pop();
 
-	return X(nae.dims(dims).init(init), Xs);
+        checkThrowTypes(throwTypes);
+
+        return X(nae.dims(dims).init(init), Xs);
     }
 }

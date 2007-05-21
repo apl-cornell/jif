@@ -74,7 +74,14 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
     
         this.loadFactor = loadFactor;
         threshold = (int)(capacity * loadFactor);
-        table = new HashMapEntry[K,V][capacity];
+        
+        HashMapEntry[K,V]{K}[] ttable = null;
+        try {
+            ttable = new HashMapEntry[K,V][capacity];
+        }
+        catch (NegativeArraySizeException imposs) { }
+        this.table = ttable;
+        
         entrySet = new HashMapEntrySet[K,V](this);
         super();
         init();
@@ -285,10 +292,13 @@ public class HashMap[label K, label V] extends AbstractMap[K,V] {
             return;
         }
 
-        HashMapEntry[K,V]{K}[] newTable = new HashMapEntry[K,V][newCapacity];
-        transfer(newTable);
-        table = newTable;
-        threshold = (int)(newCapacity * loadFactor);
+        try {
+            HashMapEntry[K,V]{K}[] newTable = new HashMapEntry[K,V][newCapacity];
+            transfer(newTable);
+            table = newTable;
+            threshold = (int)(newCapacity * loadFactor);
+        }
+        catch (NegativeArraySizeException imposs) { }
     }
 
     void transfer{K}(HashMapEntry[K,V]{K}[]{K} newTable) {

@@ -1,9 +1,16 @@
 package jif.extension;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import jif.types.JifTypeSystem;
+import polyglot.ast.Expr;
 import polyglot.ast.NewArray;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 import polyglot.visit.TypeChecker;
 
 
@@ -19,5 +26,42 @@ public class JifNewArrayDel extends JifJL_c
             
         }
         return na;
+    }
+    /** 
+     *  List of Types of exceptions that might get thrown.
+     * 
+     * This differs from the method defined in NewArray_c in that it does not
+     * throw a negative array size exception if the indices is guaranteed to be 
+     * non-null
+     */
+    public List throwTypes(TypeSystem ts) {
+        List l = new ArrayList(1);
+        if (!noNegArraySizeExcThrown()) {
+            try {
+                l.add(ts.typeForName("java.lang.NegativeArraySizeException"));
+            }
+            catch (SemanticException e) {
+                throw new InternalCompilerError("Cannot find class java.lang.NegativeArraySizeException", e);
+            }
+        }
+        return l;
+    }
+    /**
+     * Check the dim expressions to see if any of them can cause 
+     * a NegativeArraySizeException to be thrown
+     */
+    public boolean noNegArraySizeExcThrown() {
+        NewArray na = (NewArray)node();
+        List dims = na.dims();
+        if (dims == null) return true;
+        for (Iterator iter = dims.iterator(); iter.hasNext();) {
+            Expr d = (Expr)iter.next();
+            if (!d.isConstant()) return false;
+            Object o = d.constantValue();
+            if (!(o instanceof Number) || ((Number)o).longValue() < 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }
