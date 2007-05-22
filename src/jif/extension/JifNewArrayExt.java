@@ -23,7 +23,7 @@ import polyglot.types.Type;
  * 
  *  @see polyglot.ast.NewArray
  */
-public class JifNewArrayExt extends Jif_c 
+public class JifNewArrayExt extends JifExprExt 
 {
     public JifNewArrayExt(ToJavaExt toJava) {
         super(toJava);

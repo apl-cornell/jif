@@ -13,7 +13,7 @@ import polyglot.types.SemanticException;
 
 /** The Jif extension of the <code>Assign</code> node. 
  */
-public abstract class JifAssignExt extends Jif_c
+public abstract class JifAssignExt extends JifExprExt
 {
     public JifAssignExt(ToJavaExt toJava) {
         super(toJava);

@@ -56,9 +56,15 @@ public class JifNewArrayDel extends JifJL_c
         if (dims == null) return true;
         for (Iterator iter = dims.iterator(); iter.hasNext();) {
             Expr d = (Expr)iter.next();
-            if (!d.isConstant()) return false;
-            Object o = d.constantValue();
-            if (!(o instanceof Number) || ((Number)o).longValue() < 0) {
+            JifExprExt ext = (JifExprExt)d.ext();
+
+            Long bound = ext.getNumericLowerBound();
+            // if bound is not null, then bound < d
+            if (bound == null || bound.longValue() < -1) {
+                // the value of d may be less than 0, and so
+                // a NegativeArraySizeException may be thrown
+                
+//                System.err.println("Bound for " +  d + " is " + bound);
                 return false;
             }
         }

@@ -13,7 +13,7 @@ import polyglot.types.SemanticException;
  * 
  *  @see polyglot.ast.Lit
  */
-public class JifLiteralExt extends Jif_c
+public class JifLiteralExt extends JifExprExt
 {
     public JifLiteralExt(ToJavaExt toJava) {
         super(toJava);

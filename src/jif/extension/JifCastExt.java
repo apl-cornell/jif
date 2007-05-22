@@ -14,7 +14,7 @@ import polyglot.util.Position;
  *
  *  @see polyglot.ast.Cast
  */
-public class JifCastExt extends Jif_c
+public class JifCastExt extends JifExprExt
 {
     public JifCastExt(ToJavaExt toJava) {
         super(toJava);

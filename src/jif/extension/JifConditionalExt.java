@@ -16,7 +16,7 @@ import polyglot.types.Type;
  * 
  *  @see polyglot.ast.Conditional
  */
-public class JifConditionalExt extends Jif_c
+public class JifConditionalExt extends JifExprExt
 {
     public JifConditionalExt(ToJavaExt toJava) {
         super(toJava);

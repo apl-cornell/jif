@@ -12,7 +12,7 @@ import jif.visit.LabelChecker;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 
-public class JifLabelExprExt extends Jif_c
+public class JifLabelExprExt extends JifExprExt
 {
     public JifLabelExprExt(ToJavaExt toJava) {
         super(toJava);

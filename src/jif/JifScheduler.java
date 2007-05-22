@@ -6,16 +6,23 @@ import jif.ast.JifNodeFactory;
 import jif.translate.JifToJavaRewriter;
 import jif.types.JifSubstType;
 import jif.types.JifTypeSystem;
+import jif.visit.IntegerBoundsChecker;
 import jif.visit.JifInitChecker;
 import jif.visit.NotNullChecker;
 import jif.visit.PreciseClassChecker;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.frontend.*;
+import polyglot.frontend.CyclicDependencyException;
+import polyglot.frontend.JLScheduler;
+import polyglot.frontend.Job;
+import polyglot.frontend.Source;
 import polyglot.frontend.goals.FieldConstantsChecked;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.VisitorGoal;
-import polyglot.types.*;
+import polyglot.types.FieldInstance;
+import polyglot.types.ParsedClassType;
+import polyglot.types.ParsedTypeObject;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 
 public class JifScheduler extends JLScheduler {
@@ -37,6 +44,7 @@ public class JifScheduler extends JLScheduler {
 
         try {
             addPrerequisiteDependency(g, this.FieldLabelInference(job));
+            addPrerequisiteDependency(g, this.IntegerBoundsChecker(job));
         }
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
@@ -58,6 +66,18 @@ public class JifScheduler extends JLScheduler {
 
     }
 
+    public Goal IntegerBoundsChecker(Job job) {
+        Goal g = internGoal(new VisitorGoal(job, new IntegerBoundsChecker(job)));
+
+        try {
+            addPrerequisiteDependency(g, this.ReachabilityChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
+
+    }
     public Goal PreciseClassChecker(Job job) {
         Goal g = internGoal(new VisitorGoal(job, new PreciseClassChecker(job)));
 
@@ -90,6 +110,7 @@ public class JifScheduler extends JLScheduler {
         try {
             addPrerequisiteDependency(g, this.NotNullChecker(job));
             addPrerequisiteDependency(g, this.PreciseClassChecker(job));
+            addPrerequisiteDependency(g, this.IntegerBoundsChecker(job));
         }
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);

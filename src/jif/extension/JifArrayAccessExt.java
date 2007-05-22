@@ -14,7 +14,7 @@ import polyglot.util.Position;
 
 /** The Jif extension of the <code>ArrayAccess</code> node. 
  */
-public class JifArrayAccessExt extends Jif_c
+public class JifArrayAccessExt extends JifExprExt
 {
     public JifArrayAccessExt(ToJavaExt toJava) {
         super(toJava);

@@ -25,10 +25,10 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     protected Ext extNodeImpl() {
         return new Jif_c(new CannotToJavaExt_c());
     }
-//
-//    protected Ext extExprImpl() {
-//        return new Jif_c(new ExprToJavaExt_c());
-//    }
+
+    protected Ext extExprImpl() {
+        return new JifExprExt(new CannotToJavaExt_c());
+    }
     
      protected Ext extIdImpl() {
        return new Jif_c(new IdToJavaExt_c());

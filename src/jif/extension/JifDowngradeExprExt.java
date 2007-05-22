@@ -19,7 +19,7 @@ import polyglot.util.Position;
  * 
  *  @see jif.ast.DowngradeExpr
  */
-public abstract class JifDowngradeExprExt extends Jif_c
+public abstract class JifDowngradeExprExt extends JifExprExt
 {
     public JifDowngradeExprExt(ToJavaExt toJava) {
         super(toJava);

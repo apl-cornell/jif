@@ -12,4 +12,9 @@ class C {
         // test negative size arrays
         int[] c = new int[n()]; // may throw
     }
+    void p{*!:*}() { 
+        // test negative size arrays
+        int d = n();
+        int[] c = new int[d<0?9:d]; // will never throw
+    }
 }

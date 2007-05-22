@@ -12,7 +12,7 @@ import polyglot.util.InternalCompilerError;
  *  
  *  @see polyglot.ast.Unary
  */
-public class JifUnaryExt extends Jif_c
+public class JifUnaryExt extends JifExprExt
 {
     public JifUnaryExt(ToJavaExt toJava) {
         super(toJava);

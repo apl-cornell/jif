@@ -14,7 +14,7 @@ import polyglot.types.SemanticException;
  *  
  *  @see polyglot.ast.Binary_c
  */
-public class JifBinaryExt extends Jif_c 
+public class JifBinaryExt extends JifExprExt 
 {
     public JifBinaryExt(ToJavaExt toJava) {
         super(toJava);

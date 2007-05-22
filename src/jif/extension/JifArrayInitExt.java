@@ -17,7 +17,7 @@ import polyglot.types.Type;
 
 /** The Jif extension of the <code>ArrayInit</code> node. 
  */
-public class JifArrayInitExt extends Jif_c
+public class JifArrayInitExt extends JifExprExt
 {
     public JifArrayInitExt(ToJavaExt toJava) {
         super(toJava);

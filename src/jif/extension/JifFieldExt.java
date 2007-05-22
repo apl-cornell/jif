@@ -17,7 +17,7 @@ import polyglot.util.Position;
  * 
  *  @see polyglot.ast.Field
  */
-public class JifFieldExt extends Jif_c
+public class JifFieldExt extends JifExprExt
 {
     public JifFieldExt(ToJavaExt toJava) {
         super(toJava);

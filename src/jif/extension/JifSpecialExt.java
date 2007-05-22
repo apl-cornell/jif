@@ -15,7 +15,7 @@ import polyglot.types.SemanticException;
  * 
  *  @see polyglot.ast.Special
  */
-public class JifSpecialExt extends Jif_c
+public class JifSpecialExt extends JifExprExt
 {
     public JifSpecialExt(ToJavaExt toJava) {
         super(toJava);

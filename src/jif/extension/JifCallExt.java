@@ -18,7 +18,7 @@ import polyglot.util.InternalCompilerError;
  * 
  *  @see polyglot.ast.Call_c
  */
-public class JifCallExt extends Jif_c
+public class JifCallExt extends JifExprExt
 {
     public JifCallExt(ToJavaExt toJava) {
         super(toJava);
