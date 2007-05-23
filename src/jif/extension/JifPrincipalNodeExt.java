@@ -3,7 +3,6 @@ package jif.extension;
 import java.util.ArrayList;
 import java.util.List;
 
-import jif.ast.Jif_c;
 import jif.ast.PrincipalNode;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
@@ -14,7 +13,7 @@ import jif.visit.LabelChecker;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 
-public class JifPrincipalNodeExt extends Jif_c {
+public class JifPrincipalNodeExt extends JifExprExt {
     public JifPrincipalNodeExt(ToJavaExt toJava) {
         super(toJava);
     }

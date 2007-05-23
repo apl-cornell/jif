@@ -143,6 +143,9 @@ public class IntegerBoundsChecker extends DataFlow
         // apply the updates to the data flow item.
         DataFlowItem outDFItem = inDFItem.update(updates, invalid);
 
+        if (n instanceof Expr && ((Expr)n).type().isNumeric()) {
+            ((JifExprExt)n.ext()).setNumericLowerBound(findNumericLowerBound((Expr)n, inDFItem));
+        }
         if (n instanceof Expr && ((Expr)n).type().isBoolean() && 
                 (n instanceof Binary || n instanceof Unary)) {
             // flow over boolean conditions (e.g. &&, ||, !, etc) if we can.
@@ -183,6 +186,7 @@ public class IntegerBoundsChecker extends DataFlow
                 // lnum < left < rli, so lnum + 1 < rli
                 lnum = Long.valueOf(lnum.longValue() + 1);
             }
+            //System.err.println(rli.name()+" liLowerBounds="+liLowerBounds + " numLowerBound="+lnum);
         }
         if (liLowerBounds.isEmpty() && lnum == null) return;
         
@@ -371,25 +375,31 @@ public class IntegerBoundsChecker extends DataFlow
      */
     private Long findNumericLowerBound(Expr expr, DataFlowItem df) {
         if (!expr.type().isNumeric()) return null;
+        Long best = null, existing = null;
+        if (df == null) {
+            existing = ((JifExprExt)expr.ext()).getNumericLowerBound();
+        }
+        
         if (expr instanceof Local) {
             LocalInstance li = ((Local)expr).localInstance();
-            return findNumericLowerBound(li, df);
+            best = max(best, findNumericLowerBound(li, df));
         }
         if (expr.isConstant() && expr.constantValue() instanceof Number) {
-            return Long.valueOf(((Number)expr.constantValue()).longValue() - 1); // needs to be a strict bound
+            best = max(best, Long.valueOf(((Number)expr.constantValue()).longValue() - 1)); // needs to be a strict bound
         }
         if (expr instanceof Unary) {
             Unary u = (Unary)expr;
             Long b = findNumericLowerBound(u.expr(), df);
-            if (b == null) return null;
-            if (u.operator().equals(Unary.POST_DEC) || u.operator().equals(Unary.POST_INC)) {
-                return b;
-            }
-            if (u.operator().equals(Unary.PRE_DEC)) {
-                return Long.valueOf(b.longValue() - 1);
-            }
-            if (u.operator().equals(Unary.PRE_INC)) {
-                return Long.valueOf(b.longValue() + 1);
+            if (b != null) {
+                if (u.operator().equals(Unary.POST_DEC) || u.operator().equals(Unary.POST_INC)) {
+                    best = max(best, b);
+                }
+                if (u.operator().equals(Unary.PRE_DEC)) {
+                    best = max(best, Long.valueOf(b.longValue() - 1));
+                }
+                if (u.operator().equals(Unary.PRE_INC)) {
+                    best = max(best, Long.valueOf(b.longValue() + 1));
+                }
             }
         }
         if (expr instanceof Conditional) {
@@ -399,7 +409,7 @@ public class IntegerBoundsChecker extends DataFlow
                 Long alt = ((JifExprExt)c.alternative().ext()).getNumericLowerBound();
                 if (alt != null) {
                     // return the min of them
-                    return (con.longValue() < alt.longValue()) ? con : alt;
+                    best = max(best, (con.longValue() < alt.longValue()) ? con : alt);
                 }
             }
         }
@@ -410,20 +420,40 @@ public class IntegerBoundsChecker extends DataFlow
                 Long right = findNumericLowerBound(b.right(), df);
                 if (left != null && right != null) {
                     // leftB < left, rightB < right, so leftB + rightB + 1 < left + right 
-                    return Long.valueOf(left.longValue() + right.longValue() + 1);
+                    best = max(best, Long.valueOf(left.longValue() + right.longValue() + 1));
                 }
             }
         }
         if (expr instanceof Assign) {
-            Assign a = (Assign)expr;
-            Long left = findNumericLowerBound(a.left(), df);
-            Long right = findNumericLowerBound(a.right(), df);
-            if (left == null) return right;
-            if (right == null) return left;
-            // return the max of them
-            return (left.longValue() < right.longValue()) ? right : left;
+            Assign a = (Assign)expr;            
+            if (a.left() instanceof Local) {
+                // it's an assignment to a local, which we 
+                // track pretty precisely, so just look at the local.
+                best = max(best, findNumericLowerBound(a.left(), df));                
+            }
+            else {
+                // the LHS is not a local, so it's ok to use the same
+                // dataflowitem.
+                best = max(best, findNumericLowerBound(a.right(), df));                                
+            }
         }
-        return null;
+        if (expr instanceof Field) {
+            Field f = (Field)expr;
+            if ("length".equals(f.name()) && 
+                    f.type().isInt() && 
+                    f.target().type().isArray()) {
+                // it's an array length, e.g., x.length.
+                // thus it is of non-negative length
+                best = max(best, Long.valueOf(-1));
+            }
+        }
+        return max(best, existing);
+    }
+    
+    private static Long max(Long a, Long b) {
+        if (a == null) return b;
+        if (b == null) return a;
+        return a.longValue() < b.longValue() ? b : a;
     }
     
     private abstract static class Bound {
@@ -537,7 +567,7 @@ public class IntegerBoundsChecker extends DataFlow
                 return this;
             }
             
-            // System.err.println("Update " + updates + " invalid " + invalid + " to " + this.lowerBounds);
+            //System.err.println("Update " + updates + " invalid " + invalid + " to " + this.lowerBounds);
             
             // create a copy of the bounds map.
             HashMap<LocalInstance, Bounds> newBounds = new HashMap<LocalInstance, Bounds>(lowerBounds);
