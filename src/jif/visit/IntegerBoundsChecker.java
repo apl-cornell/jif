@@ -3,6 +3,7 @@ package jif.visit;
 import java.util.*;
 import java.util.Map.Entry;
 
+import jif.ast.DowngradeExpr;
 import jif.extension.JifExprExt;
 import polyglot.ast.*;
 import polyglot.ast.Binary.Operator;
@@ -10,6 +11,7 @@ import polyglot.frontend.Job;
 import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
+import polyglot.util.Position;
 import polyglot.visit.DataFlow;
 import polyglot.visit.FlowGraph;
 
@@ -75,9 +77,16 @@ public class IntegerBoundsChecker extends DataFlow
         }
         else if (n instanceof LocalAssign) {
             LocalAssign la = (LocalAssign)n;
+            Expr right = la.right();
+            if (!la.operator().equals(Assign.ASSIGN)) {
+                // fake the experssion.
+                Binary.Operator op = la.operator().binaryOperator();
+                right = nodeFactory().Binary(Position.compilerGenerated(), la.left(), op, la.right());
+                right = right.type(la.left().type());
+            }
             // li = e, so add li <= e, and e <= li
-            addBound(updates, la.left(), false, la.right());
-            addBound(updates, la.right(), false, (Local)la.left());
+            addBound(updates, la.left(), false, right);
+            addBound(updates, right, false, (Local)la.left());
             invalid = ((Local)la.left()).localInstance();
         }
         else if (n instanceof Unary) {
@@ -367,7 +376,6 @@ public class IntegerBoundsChecker extends DataFlow
                 num = lbb;
             }
         }
-        b.numericBound = num;
         return num;
     }
     /**
@@ -413,6 +421,10 @@ public class IntegerBoundsChecker extends DataFlow
                 }
             }
         }
+        if (expr instanceof DowngradeExpr) {
+            DowngradeExpr e = (DowngradeExpr)expr;
+            best = max(best, findNumericLowerBound(e.expr(), df));
+        }
         if (expr instanceof Binary) {
             Binary b = (Binary)expr;
             if (b.operator().equals(Binary.ADD)) {
@@ -421,6 +433,17 @@ public class IntegerBoundsChecker extends DataFlow
                 if (left != null && right != null) {
                     // leftB < left, rightB < right, so leftB + rightB + 1 < left + right 
                     best = max(best, Long.valueOf(left.longValue() + right.longValue() + 1));
+                }
+            }
+            if (b.operator().equals(Binary.MUL)) {
+                Long left = findNumericLowerBound(b.left(), df);
+                Long right = findNumericLowerBound(b.right(), df);
+                if (left != null && right != null) {
+                    // expression is l * r, where lb < l, and rb < r.
+                    // if lb > 0 or rb > 0, then lb * rb < l * r
+                    if (left.longValue() > 0 || right.longValue() > 0) {
+                        best = max(best, Long.valueOf(left.longValue() * right.longValue()));
+                    }
                 }
             }
         }
@@ -491,7 +514,7 @@ public class IntegerBoundsChecker extends DataFlow
     }
     private static class Bounds {
         Long numericBound; // is always strict
-        Set<Bound> bounds;
+        final Set<Bound> bounds;
         Bounds() {
             bounds = new HashSet<Bound>();
         }
