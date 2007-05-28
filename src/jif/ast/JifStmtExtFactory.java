@@ -6,4 +6,5 @@ public interface JifStmtExtFactory
 {
     public Ext extDeclassifyStmt();
     public Ext extEndorseStmt(); 
+    public Ext extCheckedEndorseStmt(); 
 }

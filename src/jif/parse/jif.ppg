@@ -312,6 +312,10 @@ non terminal Expr primary_no_array;
 non terminal TypeNode primitive_array_type;
 non terminal ConstructorCall explicit_super_constructor_invocation;
 non terminal Token leftarrow, rightarrow;
+
+// make the pre and post inc/dec operators highest precedence
+precedence nonassoc PLUSPLUS, MINUSMINUS;
+
 start with goal;
 
 // Jif labels
@@ -928,6 +932,10 @@ endorse_statement ::=
             {: RESULT = parser.nf.EndorseStmt(parser.pos(n, b), a, b); :}
     |   ENDORSE:n LPAREN label:a TO label:b RPAREN statement:c
             {: RESULT = parser.nf.EndorseStmt(parser.pos(n, c), a, b, c); :}
+    |   ENDORSE:n LPAREN expression:e COMMA label:b RPAREN statement:c
+            {: RESULT = parser.nf.CheckedEndorseStmt(parser.pos(n, c), e, b, c); :}
+    |   ENDORSE:n LPAREN expression:e COMMA label:a TO label:b RPAREN statement:c
+            {: RESULT = parser.nf.CheckedEndorseStmt(parser.pos(n, c), e, a, b, c); :}
     ;
 
 

@@ -23,18 +23,14 @@ public class JifLocalExt extends JifExprExt
 
     public Node labelCheckIncrement(LabelChecker lc) throws SemanticException
     {
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
 
-	Local lve = (Local) node();
+        Local lve = (Local) node();
 
-	final LocalInstance li = lve.localInstance();
-
-	Label L = ts.labelOfLocal(li, A.pc());
-
-	PathMap X = ts.pathMap();
-	X = X.N(A.pc());
-	X = X.NV(lc.upperBound(L, A.pc()));
+        final LocalInstance li = lve.localInstance();
+        PathMap X = A.pathMapForLocal(li, lc);
+        Label L = ts.labelOfLocal(li, A.pc());
 
         // original constraint was X.NV() <= L
         // simplified to the equivalent constraint A.pc() <= L
@@ -42,51 +38,46 @@ public class JifLocalExt extends JifExprExt
         lc.constrain(new LabelConstraint(new NamedLabel("pc", 
                                                         "information revealed by reaching this program point", 
                                                         A.pc()), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("label of local variable " + li.name(), L),
-                                         A.labelEnv(),
-                                         lve.position()) {
-                 public String msg() {
-                     return "Program counter at increment " + 
-                            "more restrictive than the label for " + 
-                            "local variable " + li.name();
-                 }
-                 public String detailMsg() { 
-                     return "More information may be revealed by the program " +
-                            "reaching this program point " +
-                            "than is allowed to flow to " +
-                            "the local variable " + li.name() + ". Because " +
-                            li.name() + " is updated at this program point, " +
-                            "the value of " + li.name() + " can reveal " +
-                            "information at level A.pc. But this is more " +
-                            "information than is allowed to flow to " + 
-                            li.name() + ".";
-                 }
-                 public String technicalMsg() {
-                     return "Invalid increment: [Xe.nv <= label(" + li.name() + 
-                            ")] is not satisfied.";
-                 }                     
-         }
-         );
+                                                        LabelConstraint.LEQ, 
+                                                        new NamedLabel("label of local variable " + li.name(), L),
+                                                        A.labelEnv(),
+                                                        lve.position()) {
+            public String msg() {
+                return "Program counter at increment " + 
+                "more restrictive than the label for " + 
+                "local variable " + li.name();
+            }
+            public String detailMsg() { 
+                return "More information may be revealed by the program " +
+                "reaching this program point " +
+                "than is allowed to flow to " +
+                "the local variable " + li.name() + ". Because " +
+                li.name() + " is updated at this program point, " +
+                "the value of " + li.name() + " can reveal " +
+                "information at level A.pc. But this is more " +
+                "information than is allowed to flow to " + 
+                li.name() + ".";
+            }
+            public String technicalMsg() {
+                return "Invalid increment: [Xe.nv <= label(" + li.name() + 
+                ")] is not satisfied.";
+            }                     
+        }
+        );
 
-	return X(lve, X);
+        return X(lve, X);
     }
 
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
+        JifContext A = lc.jifContext();
 
-	Local lve = (Local) node();
+        Local lve = (Local) node();
 
-	LocalInstance li = lve.localInstance();
+        LocalInstance li = lve.localInstance();
+        
+        PathMap X = A.pathMapForLocal(li, lc);
 
-	Label L = ts.labelOfLocal(li, A.pc());
-
-	PathMap X = ts.pathMap();
-	X = X.N(A.pc());
-	X = X.NV(lc.upperBound(L, A.pc()));
-
-	return X(lve, X);
+        return X(lve, X);
     }
 }

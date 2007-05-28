@@ -1,7 +1,6 @@
 package jif.extension;
 
 import jif.ast.JifUtil;
-import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.SemanticDetailedException;
@@ -22,9 +21,9 @@ public abstract class JifAssignExt extends JifExprExt
     SubtypeChecker subtypeChecker = new SubtypeChecker();
 
     public Node labelCheck(LabelChecker lc) throws SemanticException {
-	Assign a = (Assign) node();
+        Assign a = (Assign) node();
 
-	JifContext A = lc.jifContext();
+        JifContext A = lc.jifContext();
         A = (JifContext) a.del().enterScope(A);
 
         if (A.checkingInits()) {
@@ -38,23 +37,26 @@ public abstract class JifAssignExt extends JifExprExt
                                                     a.right().position());
             }
         }
-        
 
-	Assign checked = (Assign)labelCheckLHS(lc);
+        if (!A.updateAllowed(a.left())) {
+            throw new SemanticException("Cannot assign to \"" + a.left() + "\" in this context.", a.left().position());
+        }
+
+        Assign checked = (Assign)labelCheckLHS(lc);
 
         // Only need subtype constraints for "=" operator.  No other
-	// assignment operator works with class types.
-	if (a.operator() == Assign.ASSIGN) {
-	    // Must check that the RHS is a subtype of the LHS.
-	    // Most of this is done in typeCheck, but if lhs and rhs are
-	    // instantitation types, we must add constraints for the labels.
-	    subtypeChecker.addSubtypeConstraints(lc, a.position(),
-					         checked.left().type(),
-					         checked.right().type());
-	}
-        
+        // assignment operator works with class types.
+        if (a.operator() == Assign.ASSIGN) {
+            // Must check that the RHS is a subtype of the LHS.
+            // Most of this is done in typeCheck, but if lhs and rhs are
+            // instantitation types, we must add constraints for the labels.
+            subtypeChecker.addSubtypeConstraints(lc, a.position(),
+                                                 checked.left().type(),
+                                                 checked.right().type());
+        }
+
         return checked;
     }
-    
+
     protected abstract Node labelCheckLHS(LabelChecker lc) throws SemanticException;
 }

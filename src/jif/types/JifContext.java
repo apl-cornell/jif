@@ -8,8 +8,11 @@ import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.AccessPath;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
+import jif.visit.LabelChecker;
 import polyglot.ast.Branch;
+import polyglot.ast.Expr;
 import polyglot.types.Context;
+import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 
 /** 
@@ -186,5 +189,20 @@ public interface JifContext extends Context {
      * or "this(...)"? 
      */
     boolean inConstructorCall();
+
+    /**
+     * Return the path map for evaluating a local variable
+     */
+    PathMap pathMapForLocal(LocalInstance li, LabelChecker lc);
+
+    /**
+     * Can this expression be updated, e.g. is "e++" or "e = e'" allowed?
+     */
+    boolean updateAllowed(Expr e);
+    
+    /**
+     * Add a checked endorse for the local instance li.
+     */
+    void addCheckedEndorse(LocalInstance li, Label downgradeTo);
     
 }

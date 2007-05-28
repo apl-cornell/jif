@@ -101,6 +101,8 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Authority07.jif ;
 	AutoEndorse01.jif (Semantic, "sufficient authority to auto-endorse");
 	AutoEndorse02.jif ;
+	CheckedEndorse01.jif ;
+	CheckedEndorse02.jif (Semantic, "Cannot assign .* in this context");
 	BadNullExcept1.jif (Semantic, "NullPointerException.*must .* be caught") ;
 	BadNullExcept2.jif (Semantic, "NullPointerException.*must .* be caught") ;
 	BadNullExcept3.jif (Semantic, "NullPointerException.*must .* be caught") ;

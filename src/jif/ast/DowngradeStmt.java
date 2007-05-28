@@ -15,5 +15,10 @@ public interface DowngradeStmt extends CompoundStmt
     DowngradeStmt body(Stmt body);
     
     LabelNode bound();
-    DowngradeStmt bound(LabelNode bound); 
+    DowngradeStmt bound(LabelNode bound);
+    
+    /**
+     * @return Name of the kind of downgrade, e.g. "declassify" or "endorse"
+     */
+    String downgradeKind();
 }

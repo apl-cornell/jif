@@ -26,9 +26,9 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
     private LabelNode label;
     private LabelNode bound;
     private Expr expr;
-    
+
     public DowngradeExpr_c(Position pos, Expr expr, 
-                            LabelNode bound, LabelNode label) {
+            LabelNode bound, LabelNode label) {
         super(pos);
         this.expr = expr;
         this.bound = bound;
@@ -36,29 +36,29 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
     }
 
     public Expr expr() {
-	return expr;
+        return expr;
     }
 
     public DowngradeExpr expr(Expr expr) {
-	DowngradeExpr_c n = (DowngradeExpr_c) copy();
-	n.expr = expr;
-	return n;
+        DowngradeExpr_c n = (DowngradeExpr_c) copy();
+        n.expr = expr;
+        return n;
     }
 
     public LabelNode label() {
-	return label;
+        return label;
     }
 
     public DowngradeExpr label(LabelNode label) {
-	DowngradeExpr_c n = (DowngradeExpr_c) copy();
-	n.label = label;
-	return n;
+        DowngradeExpr_c n = (DowngradeExpr_c) copy();
+        n.label = label;
+        return n;
     }
-    
+
     public LabelNode bound() {
         return bound;
     }
-    
+
     public DowngradeExpr bound(LabelNode b) {
         DowngradeExpr_c n = (DowngradeExpr_c) copy();
         n.bound = b;
@@ -66,26 +66,26 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
     }
 
     protected DowngradeExpr_c reconstruct(Expr expr, LabelNode bound, LabelNode label) {
-	if (this.expr != expr || this.bound != bound || this.label != label) {
-	    DowngradeExpr_c n = (DowngradeExpr_c) copy();
-	    n.expr = expr;
+        if (this.expr != expr || this.bound != bound || this.label != label) {
+            DowngradeExpr_c n = (DowngradeExpr_c) copy();
+            n.expr = expr;
             n.bound = bound;
             n.label = label;
-	    return n;
-	}
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     public Node visitChildren(NodeVisitor v) {
-	Expr expr = (Expr) visitChild(this.expr, v);
+        Expr expr = (Expr) visitChild(this.expr, v);
         LabelNode bound = this.bound==null?null:((LabelNode) visitChild(this.bound, v));
         LabelNode label = (LabelNode) visitChild(this.label, v);
-	return reconstruct(expr, bound, label);
+        return reconstruct(expr, bound, label);
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	return type(expr.type());
+        return type(expr.type());
     }
 
     public Term entry() {
@@ -97,7 +97,7 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
         if (ts.Boolean().equals(ts.unlabel(expr.type()))) {
             // allow more precise dataflow when downgrading a boolean expression. 
             v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this, 
-                             FlowGraph.EDGE_KEY_FALSE, this);
+                       FlowGraph.EDGE_KEY_FALSE, this);
         }
         else {
             v.visitCFG(expr, this);
@@ -114,16 +114,16 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
         print(label, w, tr);
         w.write(")");
     }
-    
+
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("cannot translate " + this);
     }
 
     public String toString() {
-	return downgradeKind() + "(" + expr + ", " + label + ")";
+        return downgradeKind() + "(" + expr + ", " + label + ")";
     }
 
     public Precedence precedence() {
-	return expr.precedence();
+        return expr.precedence();
     }
 }

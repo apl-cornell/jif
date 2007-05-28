@@ -402,9 +402,20 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     public final Ext extEndorseStmt() {
         Ext e = extEndorseStmtImpl();
         if (nextExtFactory() != null && 
-		nextExtFactory() instanceof JifStmtExtFactory) {
+        nextExtFactory() instanceof JifStmtExtFactory) {
             JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extEndorseStmt();
+            e = composeExts(e2, e);
+        }
+
+        return postExtEndorseStmt(e);
+    }
+    public final Ext extCheckedEndorseStmt() {
+        Ext e = extCheckedEndorseStmtImpl();
+        if (nextExtFactory() != null && 
+        nextExtFactory() instanceof JifStmtExtFactory) {
+            JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory(); 
+            Ext e2 = nextFac.extCheckedEndorseStmt();
             e = composeExts(e2, e);
         }
 
@@ -546,6 +557,10 @@ public class JifExtFactory_c extends AbstractExtFactory_c
 
     protected Ext extEndorseStmtImpl() {
         return new JifEndorseStmtExt(new DowngradeStmtToJavaExt_c());
+    }
+
+    protected Ext extCheckedEndorseStmtImpl() {
+        return new JifCheckedEndorseStmtExt(new DowngradeStmtToJavaExt_c());
     }
 
     protected Ext extEndorseExprImpl() {

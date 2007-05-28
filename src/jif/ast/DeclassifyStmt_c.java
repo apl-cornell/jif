@@ -12,7 +12,7 @@ public class DeclassifyStmt_c extends DowngradeStmt_c implements DeclassifyStmt
 	super(pos, bound, label, body);
     }
 
-    protected String downgradeKind() {
+    public String downgradeKind() {
         return "declassify";
     }
 }

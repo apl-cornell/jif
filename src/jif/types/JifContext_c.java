@@ -9,6 +9,9 @@ import jif.types.label.AccessPath;
 import jif.types.label.Label;
 import jif.types.label.PairLabel;
 import jif.types.principal.Principal;
+import jif.visit.LabelChecker;
+import polyglot.ast.Expr;
+import polyglot.ast.Local;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 
@@ -24,6 +27,12 @@ public class JifContext_c extends Context_c implements JifContext
     private Set auth;
     private Label pc; //internal pc
     private Label currentCodePCBound; //external pc
+    
+    /**
+     * Map of local variables that have been endorsed
+     * using a checked endorse statement
+     */
+    private Map<LocalInstance, Label> checkedEndorsements;
 
 
     /**
@@ -335,5 +344,39 @@ public class JifContext_c extends Context_c implements JifContext
 
     public boolean inConstructorCall() {
         return this.inConstructorCall;
+    }
+
+    public PathMap pathMapForLocal(LocalInstance li, LabelChecker lc) {
+        JifTypeSystem ts = lc.jifTypeSystem();
+        Label L = null;
+        if (checkedEndorsements != null && checkedEndorsements.containsKey(li)) {
+            L = checkedEndorsements.get(li);
+        }
+        else {
+            L = ts.labelOfLocal(li, this.pc());
+        }
+
+        PathMap X = ts.pathMap();
+        X = X.N(this.pc());
+        X = X.NV(lc.upperBound(L, this.pc()));
+        return X;
+    }
+
+    public boolean updateAllowed(Expr e) {
+        if (e instanceof Local && checkedEndorsements != null) {
+            // cannot update locals that are involved in a checked endorse
+            return !checkedEndorsements.containsKey(((Local)e).localInstance());
+        }
+        return true;
+    }
+
+    public void addCheckedEndorse(LocalInstance li, Label downgradeTo) {
+        if (this.checkedEndorsements == null) {
+            this.checkedEndorsements = new HashMap<LocalInstance, Label>();
+        }
+        else {
+            this.checkedEndorsements = new HashMap<LocalInstance, Label>(this.checkedEndorsements);            
+        }
+        this.checkedEndorsements.put(li, downgradeTo);
     }
 }

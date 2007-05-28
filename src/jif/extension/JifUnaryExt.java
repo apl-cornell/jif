@@ -1,6 +1,5 @@
 package jif.extension;
 
-import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.visit.LabelChecker;
@@ -20,17 +19,21 @@ public class JifUnaryExt extends JifExprExt
 
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
-	Unary ue = (Unary) node();
+        Unary ue = (Unary) node();
 
         JifContext A = lc.jifContext();
-	A = (JifContext) ue.del().enterScope(A);
+        A = (JifContext) ue.del().enterScope(A);
 
-	Expr e = ue.expr();
+        Expr e = ue.expr();
 
-	if (ue.operator() == Unary.POST_INC ||
-	    ue.operator() == Unary.POST_DEC ||
-	    ue.operator() == Unary.PRE_INC ||
-	    ue.operator() == Unary.PRE_DEC) {
+        if (ue.operator() == Unary.POST_INC ||
+                ue.operator() == Unary.POST_DEC ||
+                ue.operator() == Unary.PRE_INC ||
+                ue.operator() == Unary.PRE_DEC) {
+
+            if (!A.updateAllowed(e)) {
+                throw new SemanticException("Cannot assign to \"" + e + "\" in this context.", e.position());
+            }
 
             if (e instanceof Local) {
                 e = (Expr)((JifLocalExt)e.ext()).labelCheckIncrement(lc.context(A));
@@ -44,11 +47,11 @@ public class JifUnaryExt extends JifExprExt
             else {
                 throw new InternalCompilerError("Cannot perform unary operation on a " + e.type());
             }
-	}
-	else {
-	    e = (Expr) lc.context(A).labelCheck(e);
-	}
+        }
+        else {
+            e = (Expr) lc.context(A).labelCheck(e);
+        }
 
-	return X(ue.expr(e), X(e));
+        return X(ue.expr(e), X(e));
     }
 }

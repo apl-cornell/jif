@@ -12,7 +12,7 @@ public class EndorseStmt_c extends DowngradeStmt_c implements EndorseStmt
 	super(pos, bound, label, body);
     }
 
-    protected String downgradeKind() {
+    public String downgradeKind() {
         return "endorse";
     }
 
