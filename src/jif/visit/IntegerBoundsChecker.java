@@ -206,12 +206,12 @@ public class IntegerBoundsChecker extends DataFlow
         }
         for (Iterator<LocalInstance> iter = liLowerBounds.iterator(); iter.hasNext();) {
             LocalInstance lli = iter.next();
-            b.bounds.add(new LocalBound(strict, lli));            
+            b.lowerBounds.add(new LocalBound(strict, lli));            
         }
 
         if (lnum != null) {
-            if (b.numericBound == null || b.numericBound.longValue() < lnum.longValue()) {
-                b = new Bounds(lnum, b.bounds);
+            if (b.numericLowerBound == null || b.numericLowerBound.longValue() < lnum.longValue()) {
+                b = new Bounds(lnum, b.lowerBounds);
                 updates.put(rli, b);
             }
         }
@@ -286,15 +286,15 @@ public class IntegerBoundsChecker extends DataFlow
         for (Iterator iter = items.iterator(); iter.hasNext();) {
             DataFlowItem df = (DataFlowItem)iter.next();
             if (newMap == null) {
-                newMap = new HashMap<LocalInstance, Bounds>(df.lowerBounds);
+                newMap = new HashMap<LocalInstance, Bounds>(df.bounds);
                 continue;
             }
 
             for (Iterator<LocalInstance> iterator = newMap.keySet().iterator(); iterator.hasNext();) {                
                 LocalInstance li = iterator.next();
-                if (df.lowerBounds.containsKey(li)) {
+                if (df.bounds.containsKey(li)) {
                     // merge the the bounds
-                    newMap.put(li, mergeBounds(newMap.get(li), df.lowerBounds.get(li)));                    
+                    newMap.put(li, mergeBounds(newMap.get(li), df.bounds.get(li)));                    
                 }
                 else {
                     // the local does not exist in both, so conservatively we ignore it.
@@ -312,19 +312,19 @@ public class IntegerBoundsChecker extends DataFlow
      * and the set of locals is the intersection of both.
      */
     protected static Bounds mergeBounds(Bounds b0, Bounds b1) {
-        if (b0.numericBound == null || (b1.numericBound != null && b0.numericBound <= b1.numericBound)) {                
-            if (b1.bounds.containsAll(b0.bounds)) {
+        if (b0.numericLowerBound == null || (b1.numericLowerBound != null && b0.numericLowerBound <= b1.numericLowerBound)) {                
+            if (b1.lowerBounds.containsAll(b0.lowerBounds)) {
                 // the merge is just b0, so save some time and memory...
                 return b0;
             }
         }
         
         Set<Bound> bnds = new HashSet<Bound>();
-        bnds.addAll(b0.bounds);
-        bnds.retainAll(b1.bounds);
-        Long numBnd = b0.numericBound;        
-        if (b1.numericBound == null || (numBnd != null && numBnd > b1.numericBound)) {
-            numBnd = b1.numericBound;
+        bnds.addAll(b0.lowerBounds);
+        bnds.retainAll(b1.lowerBounds);
+        Long numBnd = b0.numericLowerBound;        
+        if (b1.numericLowerBound == null || (numBnd != null && numBnd > b1.numericLowerBound)) {
+            numBnd = b1.numericLowerBound;
         }
         return new Bounds(numBnd, bnds);
     }
@@ -335,19 +335,19 @@ public class IntegerBoundsChecker extends DataFlow
      * of the two, and the set of locals is the union of both.
      */
     protected static Bounds mergeBoundsNonconservative(Bounds b0, Bounds b1) {
-        if (b1.numericBound == null || (b0.numericBound != null && b0.numericBound >= b1.numericBound)) {
-            if (b0.bounds.containsAll(b1.bounds)) {
+        if (b1.numericLowerBound == null || (b0.numericLowerBound != null && b0.numericLowerBound >= b1.numericLowerBound)) {
+            if (b0.lowerBounds.containsAll(b1.lowerBounds)) {
                 // the merge is just b0, so save some time and memory...
                 return b0;                
             }
         }
         
         Set<Bound> bnds = new HashSet<Bound>();
-        bnds.addAll(b0.bounds);
-        bnds.addAll(b1.bounds);
-        Long numBnd = b0.numericBound;
-        if (numBnd == null || (b1.numericBound != null && numBnd < b1.numericBound)) {
-            numBnd = b1.numericBound;
+        bnds.addAll(b0.lowerBounds);
+        bnds.addAll(b1.lowerBounds);
+        Long numBnd = b0.numericLowerBound;
+        if (numBnd == null || (b1.numericLowerBound != null && numBnd < b1.numericLowerBound)) {
+            numBnd = b1.numericLowerBound;
         }
         return new Bounds(numBnd, bnds);
     }
@@ -367,10 +367,10 @@ public class IntegerBoundsChecker extends DataFlow
         if (seen.contains(li)) return null;
         seen.add(li);        
         
-        Bounds b = df.lowerBounds.get(li);
+        Bounds b = df.bounds.get(li);
         if (b == null) return null;
-        Long num = b.numericBound;
-        for (Iterator iter = b.bounds.iterator(); iter.hasNext();) {
+        Long num = b.numericLowerBound;
+        for (Iterator iter = b.lowerBounds.iterator(); iter.hasNext();) {
             LocalBound lb = (LocalBound)iter.next();
             Long lbb = findNumericLowerBound(lb.li, df, seen);
             if (lbb != null && (num == null || num.longValue() < lbb.longValue())) {
@@ -521,31 +521,32 @@ public class IntegerBoundsChecker extends DataFlow
         }
     }
     private static class Bounds {
-        final Long numericBound; // is always strict
-        final Set<Bound> bounds;
+        final Long numericLowerBound; // is always strict
+        final Set<Bound> lowerBounds;
+
         Bounds() {
-            bounds = new HashSet<Bound>();
-            numericBound = null;
+            lowerBounds = new HashSet<Bound>();
+            numericLowerBound = null;
         }
         Bounds(Long numericBound, Set<Bound> bounds) {
-            this.numericBound = numericBound;
-            this.bounds = bounds;
+            this.numericLowerBound = numericBound;
+            this.lowerBounds = bounds;
         }
         public String toString() {
-            return "(" + numericBound + ", " + bounds + ")";
+            return "(" + numericLowerBound + ", " + lowerBounds + ")";
         }
         public boolean equals(Object o) {
             if (o instanceof Bounds) {
                 Bounds that = (Bounds)o;
-                if (this.numericBound == that.numericBound || 
-                        (this.numericBound != null && this.numericBound.equals(that.numericBound))) {
-                    return this.bounds.equals(that.bounds);
+                if (this.numericLowerBound == that.numericLowerBound || 
+                        (this.numericLowerBound != null && this.numericLowerBound.equals(that.numericLowerBound))) {
+                    return this.lowerBounds.equals(that.lowerBounds);
                 }
             }
             return false;
         }
         public int hashCode() {
-            return (numericBound==null?0:numericBound.hashCode()) ^ bounds.hashCode();
+            return (numericLowerBound==null?0:numericLowerBound.hashCode()) ^ lowerBounds.hashCode();
         }
 
     }
@@ -560,33 +561,33 @@ public class IntegerBoundsChecker extends DataFlow
          * map from LocalInstances (of type int) a set of lower bounds. Elements in
          * the set are either Number or LocalInstances
          */
-        final Map<LocalInstance, Bounds> lowerBounds;
+        final Map<LocalInstance, Bounds> bounds;
 
 
         DataFlowItem() {
-            lowerBounds = Collections.emptyMap();
+            bounds = Collections.emptyMap();
         }
         private DataFlowItem(Map<LocalInstance, Bounds> lowerBounds) {
-            this.lowerBounds = lowerBounds;
+            this.bounds = lowerBounds;
         }
         DataFlowItem(DataFlowItem d) {
-            lowerBounds = new HashMap<LocalInstance, Bounds>(d.lowerBounds);
+            bounds = new HashMap<LocalInstance, Bounds>(d.bounds);
         }
 
         public boolean equals(Object o) {
             if (o instanceof DataFlowItem) {
-                return (this.lowerBounds == ((DataFlowItem)o).lowerBounds || 
-                        this.lowerBounds.equals(((DataFlowItem)o).lowerBounds));
+                return (this.bounds == ((DataFlowItem)o).bounds || 
+                        this.bounds.equals(((DataFlowItem)o).bounds));
             }
             return false;
         }
 
         public int hashCode() {
-            return lowerBounds.hashCode();
+            return bounds.hashCode();
         }
 
         public String toString() {
-            return lowerBounds.toString();
+            return bounds.toString();
         }        
         /**
          * Produce a new DataFlowItem that is updated with the updates. In particular, the bounds
@@ -602,7 +603,7 @@ public class IntegerBoundsChecker extends DataFlow
             //System.err.println("Update " + updates + " invalid " + invalid + " to " + this.lowerBounds);
             
             // create a copy of the bounds map.
-            HashMap<LocalInstance, Bounds> newBounds = new HashMap<LocalInstance, Bounds>(lowerBounds);
+            HashMap<LocalInstance, Bounds> newBounds = new HashMap<LocalInstance, Bounds>(bounds);
             boolean changed = false;
 
             if (invalid != null) {
@@ -623,18 +624,18 @@ public class IntegerBoundsChecker extends DataFlow
                     // the lower bounds of the old value are lower bounds for the new value.
                     LocalBound invalidStrict = new LocalBound(true, invalid);
                     LocalBound invalidNonStrict = new LocalBound(false, invalid);
-                    if (this.lowerBounds.containsKey(invalid) && (b0.bounds.contains(invalidStrict) || b0.bounds.contains(invalidNonStrict))) {
+                    if (this.bounds.containsKey(invalid) && (b0.lowerBounds.contains(invalidStrict) || b0.lowerBounds.contains(invalidNonStrict))) {
                         // NOTE: if invalidBounds.bounds.contains(invalidStrict), then we can be more precise, as all
                         // the old bounds are now strict bounds.
-                        Bounds oldInvBounds = this.lowerBounds.get(invalid);
-                        Long numBound = b0.numericBound; 
-                        if (numBound == null || (oldInvBounds.numericBound != null && 
-                                numBound.longValue() < oldInvBounds.numericBound.longValue())) {
-                            numBound = oldInvBounds.numericBound;
+                        Bounds oldInvBounds = this.bounds.get(invalid);
+                        Long numBound = b0.numericLowerBound; 
+                        if (numBound == null || (oldInvBounds.numericLowerBound != null && 
+                                numBound.longValue() < oldInvBounds.numericLowerBound.longValue())) {
+                            numBound = oldInvBounds.numericLowerBound;
                         }
                         changed = true;
-                        b0 = new Bounds(numBound, new HashSet<Bound>(b0.bounds));
-                        b0.bounds.addAll(oldInvBounds.bounds);
+                        b0 = new Bounds(numBound, new HashSet<Bound>(b0.lowerBounds));
+                        b0.lowerBounds.addAll(oldInvBounds.lowerBounds);
                     }                    
                 }
                 Bounds b1 = newBounds.get(li);
@@ -662,11 +663,11 @@ public class IntegerBoundsChecker extends DataFlow
                     Entry<LocalInstance, Bounds> entry = (Entry<LocalInstance, Bounds>)iter.next();
                     
                     Bounds b = entry.getValue();
-                    if (b.bounds.contains(invalidStrict) || b.bounds.contains(invalidNonStrict)) {
+                    if (b.lowerBounds.contains(invalidStrict) || b.lowerBounds.contains(invalidNonStrict)) {
                         changed = true;
-                        b = new Bounds(b.numericBound, new HashSet<Bound>(b.bounds));
-                        b.bounds.remove(invalidStrict);
-                        b.bounds.remove(invalidNonStrict);
+                        b = new Bounds(b.numericLowerBound, new HashSet<Bound>(b.lowerBounds));
+                        b.lowerBounds.remove(invalidStrict);
+                        b.lowerBounds.remove(invalidNonStrict);
                         
                     }
                     cleanedBounds.put(entry.getKey(), b);                    
