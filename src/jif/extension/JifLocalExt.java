@@ -65,7 +65,7 @@ public class JifLocalExt extends JifExprExt
         }
         );
 
-        return X(lve, X);
+        return updatePathMap(lve, X);
     }
 
     public Node labelCheck(LabelChecker lc) throws SemanticException
@@ -75,9 +75,9 @@ public class JifLocalExt extends JifExprExt
         Local lve = (Local) node();
 
         LocalInstance li = lve.localInstance();
-        
+
         PathMap X = A.pathMapForLocal(li, lc);
 
-        return X(lve, X);
+        return updatePathMap(lve, X);
     }
 }

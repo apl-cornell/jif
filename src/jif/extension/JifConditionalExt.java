@@ -26,12 +26,12 @@ public class JifConditionalExt extends JifExprExt
 
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
-	Conditional te = (Conditional) node();
+        Conditional te = (Conditional) node();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
         A = (JifContext) te.del().enterScope(A);
-        
+
         Type t1 = te.consequent().type();
         Type t2 = te.alternative().type();
         if (t1.isReference() && t2.isReference()) {
@@ -45,27 +45,27 @@ public class JifConditionalExt extends JifExprExt
         }
 
 
-	Expr e = (Expr) lc.context(A).labelCheck(te.cond());
-	PathMap Xe = X(e);
+        Expr e = (Expr) lc.context(A).labelCheck(te.cond());
+        PathMap Xe = getPathMap(e);
 
-	A = (JifContext) A.pushBlock();
-	A.setPc(Xe.NV());
+        A = (JifContext) A.pushBlock();
+        A.setPc(Xe.NV());
 
-	Expr t = (Expr) lc.context(A).labelCheck(te.consequent());
-	PathMap Xt = X(t);
-
-        A = (JifContext) A.pop();
-
-	A = (JifContext) A.pushBlock();
-	A.setPc(Xe.NV());
-
-	Expr f = (Expr) lc.context(A).labelCheck(te.alternative());
-	PathMap Xf = X(f);
+        Expr t = (Expr) lc.context(A).labelCheck(te.consequent());
+        PathMap Xt = getPathMap(t);
 
         A = (JifContext) A.pop();
 
-	PathMap X = Xe.N(ts.notTaken()).join(Xt).join(Xf);
+        A = (JifContext) A.pushBlock();
+        A.setPc(Xe.NV());
 
-	return X(te, X);
+        Expr f = (Expr) lc.context(A).labelCheck(te.alternative());
+        PathMap Xf = getPathMap(f);
+
+        A = (JifContext) A.pop();
+
+        PathMap X = Xe.N(ts.notTaken()).join(Xt).join(Xf);
+
+        return updatePathMap(te, X);
     }
 }

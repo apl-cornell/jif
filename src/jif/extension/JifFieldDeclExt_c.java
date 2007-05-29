@@ -167,7 +167,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                                                      t, init.type());                
             }
 
-            PathMap Xe = X(init);
+            PathMap Xe = getPathMap(init);
             lc.constrain(new LabelConstraint(new NamedLabel("init.nv", 
                                                             "label of successful evaluation of initializing expression", 
                                                             Xe.NV()), 
@@ -203,7 +203,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             Xd = ts.pathMap();
         }
 
-        decl = (FieldDecl) X(decl.init(init), Xd);
+        decl = (FieldDecl) updatePathMap(decl.init(init), Xd);
 
         return decl;
     }

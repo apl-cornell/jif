@@ -33,28 +33,28 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         JifContext A = lc.jifContext();
         A = (JifContext) mn.del().enterScope(A);
         JifConstructorInstance ci = (JifConstructorInstance) mn.constructorInstance();
-    
+
         lc = lc.context(A);
 
         // First, check the arguments, adjusting the context.
         Label Li = checkEnforceSignature(ci, lc);
-    
+
         Block body = null;
         PathMap X;
-    
+
         // Now, check the body of the method in the new context.
 
         // Visit only the body, not the formal parameters.
         body = checkInitsAndBody(Li, ci, mn.body(), lc);
-        X = X(body);
+        X = getPathMap(body);
 
         if (Report.should_report(jif_verbose, 3))
-        Report.report(3, "Body path labels = " + X);
+            Report.report(3, "Body path labels = " + X);
 
         addReturnConstraints(Li, X, ci, lc, ts.Void());
-    
-        mn = (JifConstructorDecl) X(mn.body(body), X);
-    
+
+        mn = (JifConstructorDecl) updatePathMap(mn.body(body), X);
+
         return mn;
     }
 
@@ -64,14 +64,14 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
      */
     protected static Set uninitFinalFields(ReferenceType type) {
         Set s = new LinkedHashSet();
-    
+
         for (Iterator iter = type.fields().iterator(); iter.hasNext(); ) {
             JifFieldInstance fi = (JifFieldInstance) iter.next();
             if (fi.flags().isFinal() && !fi.hasInitializer()) {
                 s.add(fi);
             }
         }
-    
+
         return s;
     }
 
@@ -80,16 +80,16 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
      * (Figures 4.41-45).
      */
     protected Block checkInitsAndBody(Label Li, 
-                                      JifConstructorInstance ci,
-                                      Block body, 
-                                      LabelChecker lc) throws SemanticException
-    {
+            JifConstructorInstance ci,
+            Block body, 
+            LabelChecker lc) throws SemanticException
+            {
         JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.jifTypeSystem();
-    
+
         A = (JifContext) A.pushBlock();
         lc = lc.context(A);
-        
+
         PathMap X = ts.pathMap();
         X = X.N(A.pc());
 
@@ -103,7 +103,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         // let the context know that we are label checking a constructor
         // body, and what the return label of the constructor is.
         A.setCheckingInits(true);
-    
+
         Label Lr = ci.returnLabel();
         if (Lr==null) {
             Lr = ts.bottomLabel(ci.position());
@@ -116,20 +116,20 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
 
         // stmts is the statements in the constructor body.
         List stmts = new LinkedList();
-        
+
         // The flag preDangerousSuperCall indicates if we are before a call
         // to a "dangerous" super constructor call. A super call is dangerous
         // if the immediate superclass is a Jif class, or if this class has an
         // "untrusted" Java ancestor, 
         //          i.e. ts.hasUntrustedAncestor(ci.container()) != null.
         boolean preDangerousSuperCall = true;
-        
+
         boolean seenSuperCall = false;
 
         Iterator iter = body.statements().iterator();
         while (iter.hasNext()) {
             Stmt s = (Stmt) iter.next();
-            
+
             if (seenSuperCall && uninitFinalVars.isEmpty() && 
                     A.checkingInits() && isEscapingThis(s)) {
                 // there won't be a "dangerousSuperCall", 
@@ -137,7 +137,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                 // escape, so mark this as the end of the init checking.
                 setEndOfInitChecking(lc, ci);
             }
-            
+
             A = (JifContext)A.pushBlock();
             if (A.checkingInits()) {
                 // when we are checking inits, the pc is lower than 
@@ -145,19 +145,19 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                 // as an assertion that the caller_pc is less than the pc.
                 A.addAssertionLE(ts.callSitePCLabel(ci), A.pc());                
             }
-            
+
             s = (Stmt) lc.context(A).labelCheck(s);
             stmts.add(s);
             A = (JifContext)A.pop();
-            
-            PathMap Xs = X(s);
-            
+
+            PathMap Xs = getPathMap(s);
+
             if (preDangerousSuperCall) {
                 // we're before a potentially dangerous super call, so we
                 // can do check to see if we are assigning to a final label
                 // field.
                 checkFinalFieldAssignment(s, uninitFinalVars, A);
-                
+
                 if (s instanceof ConstructorCall) {
                     ConstructorCall ccs = (ConstructorCall) s;
                     boolean wasDangerousSuperCall = processConstructorCall(ccs, lc, ci, uninitFinalVars);
@@ -169,11 +169,11 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                     }
                 }                
             }
-            
+
             // At this point, the environment A should have been extended
             // to include any declarations of s.  Reset the PC label.
             A.setPc(Xs.N());
-            
+
             X = X.N(ts.notTaken()).join(Xs);
         }
 
@@ -182,8 +182,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         setEndOfInitChecking(lc, ci);
 
         A = (JifContext) A.pop();
-        return (Block) X(body.statements(stmts), X);
-    }
+        return (Block) updatePathMap(body.statements(stmts), X);
+            }
 
     /**
      * Does the statement s possibly allow a reference to this to escape?
@@ -209,8 +209,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                 }
                 return n;
             }
-            });
-        
+        });
+
         return result[0];
     }
 
@@ -219,7 +219,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         JifTypeSystem ts = lc.jifTypeSystem();
         boolean wasDangerousSuperCall = false;
 
-        
+
         if (ccs.kind() == ConstructorCall.THIS) {
             // calling a this(...) constructor.
             // that means we've definitely finished checking inits.
@@ -228,14 +228,14 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         else if (ccs.kind() == ConstructorCall.SUPER) {
             // we are making a super constructor call. Is it
             // a potentially dangerous one?
-                            
+
             if (!ts.isJifClass(ci.container())) {
                 // the class is not a Jif class, but just a signature
                 // for a java class. Don't bother throwing any errors.
             }
             else if (ts.isJifClass(ci.container()) &&
-                !ts.isJifClass(ci.container().superType()) &&
-                ts.hasUntrustedAncestor(ci.container()) == null) {
+                    !ts.isJifClass(ci.container().superType()) &&
+                    ts.hasUntrustedAncestor(ci.container()) == null) {
                 // Not a potentially dangerous super call.
                 // The immediate super class is a trusted Java
                 // class.
@@ -260,18 +260,18 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                 for (Iterator i = uninitFinalVars.iterator(); i.hasNext();) {
                     JifFieldInstance fi = (JifFieldInstance)i.next();
                     throw new SemanticDetailedException(
-                        "Final field \"" + fi.name()
-                        + "\" must be initialized before "
-                        + "calling the superclass constructor.",
-                        "All final fields of a class must " +
-                        "be initialized before the superclass " +
-                        "constructor is called, to prevent " +
-                        "ancestor classes from reading " +
-                        "uninitialized final fields. The " +
-                        "final field \"" + fi.name() + "\" needs to " +
-                        "be initialized before the superclass " +
-                        "constructor call.",
-                    ccs.position());
+                                                        "Final field \"" + fi.name()
+                                                        + "\" must be initialized before "
+                                                        + "calling the superclass constructor.",
+                                                        "All final fields of a class must " +
+                                                        "be initialized before the superclass " +
+                                                        "constructor is called, to prevent " +
+                                                        "ancestor classes from reading " +
+                                                        "uninitialized final fields. The " +
+                                                        "final field \"" + fi.name() + "\" needs to " +
+                                                        "be initialized before the superclass " +
+                                                        "constructor call.",
+                                                        ccs.position());
                 }
             }                                
         }
@@ -298,23 +298,23 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
             // to a field
             return;
         }
-        
+
         FieldAssign ass = (FieldAssign)((Eval)s).expr();
         Field f = (Field) ass.left();
         JifFieldInstance assFi = (JifFieldInstance) f.fieldInstance();
-            
+
         if (! (ass.operator() == Assign.ASSIGN &&
-               f.target() instanceof Special && 
-               ((Special)f.target()).kind() == Special.THIS && 
-               assFi.flags().isFinal())) {
+                f.target() instanceof Special && 
+                ((Special)f.target()).kind() == Special.THIS && 
+                assFi.flags().isFinal())) {
             // assignment to something other than a final field of this. 
             return;
         }    
-    
+
         // Remove the field from the set of final vars, since it is
         // initialized here.
         uninitFinalVars.remove(assFi);
-        
+
         // Note that the constraints specified in check-inits for the "v = E"
         // case (Figure 4.44) are added when we visit the statement "s"
         // normally, so we don't need to handle them specially here.

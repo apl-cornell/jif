@@ -1,6 +1,7 @@
 package jif.ast;
 
 import polyglot.ast.Expr;
+import polyglot.ast.If;
 import polyglot.ast.Node;
 import polyglot.ast.Stmt;
 import polyglot.util.CodeWriter;
@@ -14,9 +15,9 @@ public class CheckedEndorseStmt_c extends EndorseStmt_c implements CheckedEndors
 {
     private Expr expr;
     public CheckedEndorseStmt_c(Position pos, Expr e, LabelNode bound,
-            LabelNode label, Stmt body) {
+            LabelNode label, If body) {
         super(pos, bound, label, body);
-        expr = e;
+        this.expr = e;
     }
 
     public Expr expr() {

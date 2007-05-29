@@ -22,20 +22,20 @@ public class JifBinaryExt extends JifExprExt
 
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
-	Binary be = (Binary) node();
+        Binary be = (Binary) node();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
-		
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
+
         List throwTypes = new ArrayList(be.del().throwTypes(ts));
 
         A = (JifContext) be.del().enterScope(A);
 
-	Expr left = (Expr) lc.context(A).labelCheck(be.left());
-	PathMap Xl = X(left);
+        Expr left = (Expr) lc.context(A).labelCheck(be.left());
+        PathMap Xl = getPathMap(left);
 
-	A = (JifContext) A.pushBlock();
-        
+        A = (JifContext) A.pushBlock();
+
         if (be.operator() == Binary.COND_AND || be.operator() == Binary.COND_OR) {
             // if it's a short circuit evaluation, then
             // whether the right is executed or not depends on the _value_
@@ -49,19 +49,19 @@ public class JifBinaryExt extends JifExprExt
             A.setPc(Xl.N());            
         }
 
-	Expr right = (Expr) lc.context(A).labelCheck(be.right());
-	PathMap Xr = X(right);
+        Expr right = (Expr) lc.context(A).labelCheck(be.right());
+        PathMap Xr = getPathMap(right);
 
         A = (JifContext) A.pop();
 
-	PathMap X = Xl.N(ts.notTaken()).join(Xr);
+        PathMap X = Xl.N(ts.notTaken()).join(Xr);
 
-	if (be.throwsArithmeticException()) {
+        if (be.throwsArithmeticException()) {
             checkAndRemoveThrowType(throwTypes, ts.ArithmeticException());
-	    X = X.exc(Xr.NV(), ts.ArithmeticException());
-	}
+            X = X.exc(Xr.NV(), ts.ArithmeticException());
+        }
 
         checkThrowTypes(throwTypes);
-	return X(be.left(left).right(right), X);
+        return updatePathMap(be.left(left).right(right), X);
     }
 }

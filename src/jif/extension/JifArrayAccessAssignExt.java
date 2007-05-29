@@ -20,7 +20,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
     }
 
     public Node labelCheckLHS(LabelChecker lc)
-        throws SemanticException
+    throws SemanticException
     {
         ArrayAccessAssign assign = (ArrayAccessAssign)node();
         final ArrayAccess aie = (ArrayAccess) assign.left();
@@ -32,7 +32,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
 
         if (assign.left() != aie) {
             throw new InternalCompilerError(aie +
-                    " is not the left hand side of " + assign);
+                                            " is not the left hand side of " + assign);
         }
 
         Type npe = ts.NullPointerException();
@@ -41,13 +41,13 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         Type are = ts.ArithmeticException();
 
         final Expr array = (Expr) lc.context(A).labelCheck(aie.array());
-        PathMap Xarr = X(array);
+        PathMap Xarr = getPathMap(array);
 
         A = (JifContext) A.pushBlock();
         A.setPc(Xarr.N());
 
         Expr index = (Expr) lc.context(A).labelCheck(aie.index());
-        PathMap Xind = X(index);
+        PathMap Xind = getPathMap(index);
 
         PathMap Xlhs = Xarr.join(Xind);
         A = (JifContext) A.pushBlock();
@@ -77,7 +77,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         Label La = arrayBaseLabel(array, ts);
 
         PathMap X = Xlhs.join(Xrhs);
-        
+
         if (assign.operator() != Assign.ASSIGN) {
             // the normal value include the value that was already in the array 
             X = X.NV(lc.upperBound(La, X.NV()));
@@ -113,72 +113,72 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         lc.constrain(new LabelConstraint(new NamedLabel("rhs.nv", 
                                                         "label of successful evaluation of right hand of assignment",
                                                         Xrhs.NV()).
-                                                   join(lc, 
-                                                        "lhs.n", 
-                                                        "label of successful evaluation of array access " + aie,
-                                                        X.N()), 
-                                         LabelConstraint.LEQ, 
-                                         namedLa,
-                                         A.labelEnv(),
-                                         aie.position()) {
-                     public String msg() {
-                         return "Label of succesful evaluation of array " +
-                                "access and right hand side of the " +
-                                "assignment is not less restrictive than " +
-                                "the label for the array base type.";
-                     }
-                     public String detailMsg() { 
-                         return "More information may be revealed by the successul " +
-                                "evaluation of the array access " + aie + 
-                                " and the right hand side of the assignment " +
-                                "than is allowed to flow to elements of the " + 
-                                "array. Elements of the array can only " +
-                                "contain information up to the label of the " +
-                                "array base type, La.";
-                     }
-                     public String technicalMsg() {
-                         return "Invalid assignment: " + namedLhs().toString() + 
-                                " is not less restrictive than the label of " +
-                                "array element.";
-                     }                     
-         }
-         );
+                                                        join(lc, 
+                                                             "lhs.n", 
+                                                             "label of successful evaluation of array access " + aie,
+                                                             X.N()), 
+                                                             LabelConstraint.LEQ, 
+                                                             namedLa,
+                                                             A.labelEnv(),
+                                                             aie.position()) {
+            public String msg() {
+                return "Label of succesful evaluation of array " +
+                "access and right hand side of the " +
+                "assignment is not less restrictive than " +
+                "the label for the array base type.";
+            }
+            public String detailMsg() { 
+                return "More information may be revealed by the successul " +
+                "evaluation of the array access " + aie + 
+                " and the right hand side of the assignment " +
+                "than is allowed to flow to elements of the " + 
+                "array. Elements of the array can only " +
+                "contain information up to the label of the " +
+                "array base type, La.";
+            }
+            public String technicalMsg() {
+                return "Invalid assignment: " + namedLhs().toString() + 
+                " is not less restrictive than the label of " +
+                "array element.";
+            }                     
+        }
+        );
 
         lc.constrain(new LabelConstraint(new NamedLabel("Li", 
                                                         "Lower bound for side-effects", 
                                                         A.currentCodePCBound()), 
-                                         LabelConstraint.LEQ, 
-                                         namedLa,
-                                         A.labelEnv(),
-                                         aie.position()) {
-                     public String msg() {
-                         return "Effect of assignment to array " + array + 
-                                " is not bounded below by the PC bound.";
-                     }
-                     public String detailMsg() { 
-                         return "Assignment to the array " + array + 
-                                " is a side effect which reveals more" +
-                                " information than this method is allowed" +
-                                " to; the side effects of this method must" +
-                                " be bounded below by the method's PC" +
-                                " bound, Li.";
-                     }
-                     public String technicalMsg() {
-                         return "Invalid assignment: Li is more " +
-                                "restrictive than array base label.";
-                     }
-                     
-         }
-         );
+                                                        LabelConstraint.LEQ, 
+                                                        namedLa,
+                                                        A.labelEnv(),
+                                                        aie.position()) {
+            public String msg() {
+                return "Effect of assignment to array " + array + 
+                " is not bounded below by the PC bound.";
+            }
+            public String detailMsg() { 
+                return "Assignment to the array " + array + 
+                " is a side effect which reveals more" +
+                " information than this method is allowed" +
+                " to; the side effects of this method must" +
+                " be bounded below by the method's PC" +
+                " bound, Li.";
+            }
+            public String technicalMsg() {
+                return "Invalid assignment: Li is more " +
+                "restrictive than array base label.";
+            }
 
-        Expr lhs = (Expr) X(aie.index(index).array(array), X);
+        }
+        );
+
+        Expr lhs = (Expr) updatePathMap(aie.index(index).array(array), X);
 
         checkThrowTypes(throwTypes);
-        return (Assign) X(assign.right(rhs).left(lhs), X);
+        return (Assign) updatePathMap(assign.right(rhs).left(lhs), X);
     }
 
     protected PathMap rhsPathMap(LabelChecker checker, Expr rhs, List throwTypes) {
-        return X(rhs);
+        return getPathMap(rhs);
     }
 
     private Label arrayBaseLabel(Expr array, JifTypeSystem ts) {        

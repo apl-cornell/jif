@@ -29,9 +29,9 @@ public class JifPrincipalExprExt extends JifExprExt
         // make sure the principal is runtime representable
         if (!p.isRuntimeRepresentable()) {
             throw new SemanticDetailedException(
-                    "Principal expression not representable at runtime.",
-                    "A principal expression must be representable at runtime.",
-                    pe.position());
+                                                "Principal expression not representable at runtime.",
+                                                "A principal expression must be representable at runtime.",
+                                                pe.position());
         }
 
         A = (JifContext) pe.del().enterScope(A);
@@ -41,7 +41,7 @@ public class JifPrincipalExprExt extends JifExprExt
 
         A = (JifContext) A.pop();
         checkThrowTypes(throwTypes);
-        return X(pe, X1);
+        return updatePathMap(pe, X1);
     }
 
 }

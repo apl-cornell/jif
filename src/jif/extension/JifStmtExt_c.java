@@ -66,7 +66,7 @@ public abstract class JifStmtExt_c extends Jif_c implements JifStmtExt
     }
 
     public abstract Node labelCheckStmt(LabelChecker lc)
-	throws SemanticException;
+    throws SemanticException;
 
     /** Label check a statement. 
      *  After invoking the overrided <code>labelCheckStmt</code> statement,
@@ -78,43 +78,43 @@ public abstract class JifStmtExt_c extends Jif_c implements JifStmtExt
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         JifTypeSystem ts = lc.typeSystem();
-	JifContext A = lc.jifContext();
-	A = (JifContext) node().del().enterScope(A);
-        
+        JifContext A = lc.jifContext();
+        A = (JifContext) node().del().enterScope(A);
+
         // Redispatch in case we're not the first delegate.
         Node n = ((JifStmtExt) node().ext()).stmtDel().labelCheckStmt(lc.context(A));
 
-	// Apply the "single path rule"
-	PathMap X = X(n).NV(ts.notTaken());
+        // Apply the "single path rule"
+        PathMap X = getPathMap(n).NV(ts.notTaken());
 
-	Path singlePath = null;
+        Path singlePath = null;
 
-	for (Iterator i = X.paths().iterator(); i.hasNext(); ) {
-	    Path p = (Path) i.next();
+        for (Iterator i = X.paths().iterator(); i.hasNext(); ) {
+            Path p = (Path) i.next();
 
-	    if (p.equals(Path.NV)) {
-		continue;
-	    }
+            if (p.equals(Path.NV)) {
+                continue;
+            }
 
-	    if (X.get(p) instanceof NotTaken) {
-		continue;
-	    }
+            if (X.get(p) instanceof NotTaken) {
+                continue;
+            }
 
-	    if (singlePath != null) {
-		// No change.
-		return X(n, X);
-	    }
+            if (singlePath != null) {
+                // No change.
+                return updatePathMap(n, X);
+            }
 
-	    singlePath = p;
-	}
-	
+            singlePath = p;
+        }
 
-	if (singlePath != null) {
-	    if (singlePath.equals(Path.N) || singlePath.equals(Path.R)) {
-		return X(n, X.set(singlePath, A.pc()));
-	    }
-	}
 
-	return X(n, X);
+        if (singlePath != null) {
+            if (singlePath.equals(Path.N) || singlePath.equals(Path.R)) {
+                return updatePathMap(n, X.set(singlePath, A.pc()));
+            }
+        }
+
+        return updatePathMap(n, X);
     }
 }

@@ -22,52 +22,52 @@ public class JifInitializerExt extends Jif_c
 
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
-	Initializer ib = (Initializer) node();
+        Initializer ib = (Initializer) node();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
-	A = (JifContext) ib.del().enterScope(A);
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
+        A = (JifContext) ib.del().enterScope(A);
 
-	// @@@@@What this hell is this?
-	//!@!
-    //Label Li = ts.freshCovariantLabel(ib.position(), "static");
-	Label Li = ts.unknownLabel(ib.position()); // temporarily replace with this to get it compiling
-	A.setPc(Li);
-	A.setCurrentCodePCBound(Li);
+        // @@@@@What this hell is this?
+        //!@!
+        //Label Li = ts.freshCovariantLabel(ib.position(), "static");
+        Label Li = ts.unknownLabel(ib.position()); // temporarily replace with this to get it compiling
+        A.setPc(Li);
+        A.setCurrentCodePCBound(Li);
 
-	// reset "ph"
-	A.clearPH();
+        // reset "ph"
+        A.clearPH();
 
-	// Now, check the body of the method in the new context.
+        // Now, check the body of the method in the new context.
 
-	Block body = (Block) lc.context(A).labelCheck(ib.body());
-	PathMap X = X(body);
+        Block body = (Block) lc.context(A).labelCheck(ib.body());
+        PathMap X = getPathMap(body);
 
-	// X[node()] join X[r] <= Lr (== Li) 
+        // X[node()] join X[r] <= Lr (== Li) 
         lc.constrain(new LabelConstraint(new NamedLabel("X(initializer).n", X.N()).
-                                             join(lc, "X(initializer).r", X.R()), 
+                                         join(lc, "X(initializer).r", X.R()), 
                                          LabelConstraint.LEQ, 
                                          new NamedLabel("init_pc", Li),
                                          A.labelEnv(),
                                          ib.position(), 
                                          false) {
-                     public String msg() {
-                         return "The information revealed by the normal " +
-                                "termination of the initializer " +
-                                "may be more restrictive than the " +
-                                "information that should be revealed by " +
-                                "the execution of this initializer";
-                     }
-                     public String technicalMsg() {
-                         return "Invalid initializer: " + namedLhs() + 
-                                " contains secret information.";
-                     }                     
-         }
-         );
+            public String msg() {
+                return "The information revealed by the normal " +
+                "termination of the initializer " +
+                "may be more restrictive than the " +
+                "information that should be revealed by " +
+                "the execution of this initializer";
+            }
+            public String technicalMsg() {
+                return "Invalid initializer: " + namedLhs() + 
+                " contains secret information.";
+            }                     
+        }
+        );
 
-	// X[nv] join X[rv] <= Lrv (== 0)
-	// lc.constrainLE(X.NV().join(X.RV()), ts.notTaken(), ib.position());
+        // X[nv] join X[rv] <= Lrv (== 0)
+        // lc.constrainLE(X.NV().join(X.RV()), ts.notTaken(), ib.position());
 
-	return X(ib.body(body), X);
+        return updatePathMap(ib.body(body), X);
     }
 }

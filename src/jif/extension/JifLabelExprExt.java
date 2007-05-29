@@ -30,9 +30,9 @@ public class JifLabelExprExt extends JifExprExt
         // make sure the label is runtime representable
         if (!l.isRuntimeRepresentable()) {
             throw new SemanticDetailedException(
-                     "Label expression not representable at runtime.",
-                     "A label expression must be representable at runtime. Arg labels and \"this\" labels are not represented at runtime.",
-                     le.position());
+                                                "Label expression not representable at runtime.",
+                                                "A label expression must be representable at runtime. Arg labels and \"this\" labels are not represented at runtime.",
+                                                le.position());
         }
 
         A = (JifContext) le.del().enterScope(A);
@@ -42,7 +42,7 @@ public class JifLabelExprExt extends JifExprExt
 
         A = (JifContext) A.pop();
         checkThrowTypes(throwTypes);
-        return X(le, X1);
+        return updatePathMap(le, X1);
     }
 
 }

@@ -427,19 +427,13 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    public CheckedEndorseStmt CheckedEndorseStmt(Position pos, Expr e, LabelNode bound, LabelNode label, Stmt body) {
+    public CheckedEndorseStmt CheckedEndorseStmt(Position pos, Expr e, LabelNode bound, LabelNode label, If body) {
         CheckedEndorseStmt n = new CheckedEndorseStmt_c(pos, e, bound, label, body);
         n = (CheckedEndorseStmt)n.ext(jifExtFactory().extCheckedEndorseStmt());
         n = (CheckedEndorseStmt)n.del(delFactory().delStmt());
         return n;
     }
 
-    public CheckedEndorseStmt CheckedEndorseStmt(Position pos, Expr e, LabelNode label, Stmt body) {
-        CheckedEndorseStmt n = new CheckedEndorseStmt_c(pos, e, null, label, body);
-        n = (CheckedEndorseStmt)n.ext(jifExtFactory().extCheckedEndorseStmt());
-        n = (CheckedEndorseStmt)n.del(delFactory().delStmt());
-        return n;
-    }
 
     public EndorseExpr EndorseExpr(Position pos, Expr expr, LabelNode label) 
     {

@@ -21,15 +21,15 @@ public class JifBranchExt extends JifStmtExt_c
 
     /** Label check the branch statement. See Figure 4.21. */
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
-	Branch bs = (Branch) node();
+        Branch bs = (Branch) node();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
         A = (JifContext) bs.del().enterScope(A);
 
-	Label pc = A.pc();
-	Label gotoLabel = A.gotoLabel(bs.kind(), bs.label());
-	
+        Label pc = A.pc();
+        Label gotoLabel = A.gotoLabel(bs.kind(), bs.label());
+
         if (gotoLabel == null) {
             throw new InternalCompilerError("Can't find target for " + bs.kind() + " " + bs.label());
         }
@@ -66,10 +66,10 @@ public class JifBranchExt extends JifStmtExt_c
         }
         );
 
-	PathMap X = ts.pathMap();
+        PathMap X = ts.pathMap();
         // prevent the single path rule from being used.
-	X = X.set(ts.gotoPath(bs.kind(), bs.label()), ts.topLabel());
+        X = X.set(ts.gotoPath(bs.kind(), bs.label()), ts.topLabel());
 
-	return X(bs, X);
+        return updatePathMap(bs, X);
     }
 }

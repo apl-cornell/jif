@@ -26,36 +26,36 @@ public class JifBlockExt extends JifStmtExt_c
 
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
-	Block bs = (Block) node();
+        Block bs = (Block) node();
 
         JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
+        JifContext A = lc.jifContext();
         A = (JifContext) bs.del().enterScope(A);
 
-	// A path map incorporating all statements in the block seen so far.
-	PathMap Xblock = ts.pathMap();
-	Xblock = Xblock.N(A.pc());
+        // A path map incorporating all statements in the block seen so far.
+        PathMap Xblock = ts.pathMap();
+        Xblock = Xblock.N(A.pc());
 
-	A = (JifContext) A.pushBlock();
+        A = (JifContext) A.pushBlock();
 
-	List l = new ArrayList(bs.statements().size());
+        List l = new ArrayList(bs.statements().size());
 
-	for (Iterator i = bs.statements().iterator(); i.hasNext(); ) {
-	    Stmt s = (Stmt) i.next();
-	    s = (Stmt) lc.context(A).labelCheck(s);
-	    l.add(s);
+        for (Iterator i = bs.statements().iterator(); i.hasNext(); ) {
+            Stmt s = (Stmt) i.next();
+            s = (Stmt) lc.context(A).labelCheck(s);
+            l.add(s);
 
-	    PathMap Xs = X(s);
+            PathMap Xs = getPathMap(s);
 
-	    // At this point, the environment A should have been extended
-	    // to include any declarations of s.  Reset the PC label.
-	    A.setPc(Xs.N());
-        
-	    Xblock = Xblock.N(ts.notTaken()).join(Xs);
-	}
+            // At this point, the environment A should have been extended
+            // to include any declarations of s.  Reset the PC label.
+            A.setPc(Xs.N());
+
+            Xblock = Xblock.N(ts.notTaken()).join(Xs);
+        }
 
         A = (JifContext) A.pop();
 
-	return X(bs.statements(l), Xblock);
+        return updatePathMap(bs.statements(l), Xblock);
     }
 }

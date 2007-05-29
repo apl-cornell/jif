@@ -27,37 +27,37 @@ public class JifSwitchExt extends JifStmtExt_c
      */
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
-	Switch ss = (Switch) node();
+        Switch ss = (Switch) node();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
-	A = (JifContext) ss.del().enterScope(A);
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
+        A = (JifContext) ss.del().enterScope(A);
 
-	Label notTaken = ts.notTaken();
+        Label notTaken = ts.notTaken();
 
-	Expr e = (Expr) lc.context(A).labelCheck(ss.expr());
-	PathMap Xe = X(e);
+        Expr e = (Expr) lc.context(A).labelCheck(ss.expr());
+        PathMap Xe = getPathMap(e);
 
 
         Label L = ts.freshLabelVariable(ss.position(), "switch",
-           "label of PC at break target for switch statement at " + node().position());
+                                        "label of PC at break target for switch statement at " + node().position());
 
-	A = (JifContext) A.pushBlock();
-	A.setPc(Xe.NV());
+        A = (JifContext) A.pushBlock();
+        A.setPc(Xe.NV());
         A.gotoLabel(Branch.BREAK, null, L);
 
         PathMap Xa = Xe.N(notTaken);
-	List l = new LinkedList();
+        List l = new LinkedList();
 
-	for (Iterator iter = ss.elements().iterator(); iter.hasNext(); ) {
-	    Stmt s = (Stmt) iter.next();
-	    s = (Stmt) lc.context(A).labelCheck(s);
-	    l.add(s);
+        for (Iterator iter = ss.elements().iterator(); iter.hasNext(); ) {
+            Stmt s = (Stmt) iter.next();
+            s = (Stmt) lc.context(A).labelCheck(s);
+            l.add(s);
 
-	    PathMap Xs = X(s);
-	    A.setPc(lc.upperBound(A.pc(), Xs.N()));
-	    Xa = Xa.join(Xs);
-	}
+            PathMap Xs = getPathMap(s);
+            A.setPc(lc.upperBound(A.pc(), Xs.N()));
+            Xa = Xa.join(Xs);
+        }
 
         A = (JifContext) A.pop();
         lc.constrain(new LabelConstraint(new NamedLabel("label of normal termination of swtich statement", Xa.N()),
@@ -66,25 +66,25 @@ public class JifSwitchExt extends JifStmtExt_c
                                          A.labelEnv(),
                                          ss.position(),
                                          false) {
-                         public String msg() { 
-                             return "The information revealed by the normal " +
-                                    "termination of the switch statement " +
-                                    "may be more restrictive than the " +
-                                    "information that can be revealed by " +
-                                    "a break statement being executed in the " +
-                                    "switch statement.";
-                         }
-                         public String technicalMsg() {
-                             return "[join(X(branch_i).n) <= L(break)] is not satisfied.";
-                         }
+            public String msg() { 
+                return "The information revealed by the normal " +
+                "termination of the switch statement " +
+                "may be more restrictive than the " +
+                "information that can be revealed by " +
+                "a break statement being executed in the " +
+                "switch statement.";
+            }
+            public String technicalMsg() {
+                return "[join(X(branch_i).n) <= L(break)] is not satisfied.";
+            }
 
-                     }
-                     );
-	
-	PathMap X = Xa.set(ts.gotoPath(Branch.BREAK, null), notTaken);
+        }
+        );
+
+        PathMap X = Xa.set(ts.gotoPath(Branch.BREAK, null), notTaken);
         X = X.NV(ts.notTaken());
         X = X.N(L);
 
-	return X(ss.elements(l), X);
+        return updatePathMap(ss.elements(l), X);
     }
 }

@@ -25,11 +25,11 @@ public class JifFieldAssignExt extends JifAssignExt
     }
 
     public Node labelCheckLHS(LabelChecker lc)
-        throws SemanticException
+    throws SemanticException
     {
         Assign assign = (Assign) node();
         Field fe = (Field) assign.left();
-        
+
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
         // commented out by zlt
@@ -40,7 +40,7 @@ public class JifFieldAssignExt extends JifAssignExt
         Type are = ts.ArithmeticException();
 
         Receiver target = JifFieldExt.checkTarget(lc, fe);
-        PathMap Xe = X(target);
+        PathMap Xe = getPathMap(target);
 
         // check rhs
         A = (JifContext) A.pushBlock();
@@ -63,7 +63,7 @@ public class JifFieldAssignExt extends JifAssignExt
             checkAndRemoveThrowType(throwTypes, npe);
             X = X.exc(lc.upperBound(Xe.NV(), Xr.N()), npe);
         }
-        
+
 
         // Must be done after visiting target to get PC right.
         final FieldInstance fi = fe.fieldInstance();
@@ -71,7 +71,7 @@ public class JifFieldAssignExt extends JifAssignExt
 
         if (target instanceof Expr) {
             if (!(target instanceof Special)) {
-                Lf = JifInstantiator.instantiate(Lf, A, (Expr)target, JifFieldExt.targetType(ts, A, target, fe), X(target).NV());
+                Lf = JifInstantiator.instantiate(Lf, A, (Expr)target, JifFieldExt.targetType(ts, A, target, fe), getPathMap(target).NV());
             }
             else {
                 JifClassType jct = (JifClassType) A.currentClass();
@@ -83,10 +83,10 @@ public class JifFieldAssignExt extends JifAssignExt
 
         if (target instanceof Expr) {
             // instantiate the type of the field
-            Type ft = JifInstantiator.instantiate(fe.type(), A, (Expr)target, JifFieldExt.targetType(ts, A, target, fe), X(target).NV());         
+            Type ft = JifInstantiator.instantiate(fe.type(), A, (Expr)target, JifFieldExt.targetType(ts, A, target, fe), getPathMap(target).NV());         
             fe = (Field)fe.type(ft);
         }
-        
+
         if (target instanceof Special && A.checkingInits()) {
             // Relax the constraint: instead of X[nv] <= L, use
             // X[nv] <= {L; Lr}, where Lr is the return label of the
@@ -96,7 +96,7 @@ public class JifFieldAssignExt extends JifAssignExt
 
             if (Lr != null) 
                 L = lc.upperBound(L, Lr);
-            
+
             // if it is a final field being initialized,
             // add a definitional assertion that the field is equivalent
             // to the expression being assigned to it.
@@ -117,35 +117,35 @@ public class JifFieldAssignExt extends JifAssignExt
                                                     JifUtil.exprToAccessPath(assign.right(), A)); 
                 }
             }                            
-            
+
         }
 
         lc.constrain(new LabelConstraint(new NamedLabel("rhs.nv", 
                                                         "label of successful evaluation of right hand of assignment", 
                                                         X.NV()), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("label of field " + fi.name(), L),
-                                         A.labelEnv(),
-                                         fe.position()) {
-                     public String msg() {
-                         return "Label of right hand side not less " + 
-                                "restrictive than the label for field " + 
-                                fi.name();
-                     }
-                     public String detailMsg() { 
-                         return "More information is revealed by the successful " +
-                                "evaluation of the right hand side of the " +
-                                "assignment than is allowed to flow to " +
-                                "the field " + fi.name() + ".";
-                     }
-                     public String technicalMsg() {
-                         return "Invalid assignment: path NV of rhs is " +
-                                "more restrictive than the declared label " +
-                                "of the field <" + fi.name() + ">.";
-                     }
-                     
-         }
-         );
+                                                        LabelConstraint.LEQ, 
+                                                        new NamedLabel("label of field " + fi.name(), L),
+                                                        A.labelEnv(),
+                                                        fe.position()) {
+            public String msg() {
+                return "Label of right hand side not less " + 
+                "restrictive than the label for field " + 
+                fi.name();
+            }
+            public String detailMsg() { 
+                return "More information is revealed by the successful " +
+                "evaluation of the right hand side of the " +
+                "assignment than is allowed to flow to " +
+                "the field " + fi.name() + ".";
+            }
+            public String technicalMsg() {
+                return "Invalid assignment: path NV of rhs is " +
+                "more restrictive than the declared label " +
+                "of the field <" + fi.name() + ">.";
+            }
+
+        }
+        );
 
         if (target instanceof Special && A.checkingInits()) {
             // In constructors, assignments to fields are not
@@ -155,30 +155,30 @@ public class JifFieldAssignExt extends JifAssignExt
             lc.constrain(new LabelConstraint(new NamedLabel("Li", 
                                                             "Lower bound for side-effects", 
                                                             A.currentCodePCBound()), 
-                                             LabelConstraint.LEQ, 
-                                             new NamedLabel("label of field " + fi.name(), L),
-                                             A.labelEnv(),
-                                             fe.position()) {
-                         public String msg() {
-                             return "Effect of assignment to field " + fi.name() + 
-                                    " is not bounded below by the PC bound.";
-                         }
-                         public String detailMsg() { 
-                             return "Assignment to the field " + fi.name() + 
-                                    " is a side effect which reveals more" +
-                                    " information than this method is allowed" +
-                                    " to; the side effects of this method must" +
-                                    " be bounded below by the method's PC" +
-                                    " bound, Li.";
-                         }
-                         public String technicalMsg() {
-                             return "Invalid assignment: Li is more " +
-                                    "restrictive than the declared label " +
-                                    "of the field <" + fi.name() + ">.";
-                         }
-                     
-             }
-             );
+                                                            LabelConstraint.LEQ, 
+                                                            new NamedLabel("label of field " + fi.name(), L),
+                                                            A.labelEnv(),
+                                                            fe.position()) {
+                public String msg() {
+                    return "Effect of assignment to field " + fi.name() + 
+                    " is not bounded below by the PC bound.";
+                }
+                public String detailMsg() { 
+                    return "Assignment to the field " + fi.name() + 
+                    " is a side effect which reveals more" +
+                    " information than this method is allowed" +
+                    " to; the side effects of this method must" +
+                    " be bounded below by the method's PC" +
+                    " bound, Li.";
+                }
+                public String technicalMsg() {
+                    return "Invalid assignment: Li is more " +
+                    "restrictive than the declared label " +
+                    "of the field <" + fi.name() + ">.";
+                }
+
+            }
+            );
         }
 
         if (assign.operator() != Assign.ASSIGN) {
@@ -186,12 +186,12 @@ public class JifFieldAssignExt extends JifAssignExt
             X = X.NV(lc.upperBound(X.NV(), Lf));
         }
 
-        Expr lhs = (Expr) X(fe, X);
+        Expr lhs = (Expr) updatePathMap(fe, X);
 
         checkThrowTypes(throwTypes);
-        return (Assign) X(assign.right(rhs).left(lhs), X);
+        return (Assign) updatePathMap(assign.right(rhs).left(lhs), X);
     }
     protected PathMap rhsPathMap(LabelChecker lc, Expr rhs, List throwTypes) {
-        return X(rhs);
+        return getPathMap(rhs);
     }
 }

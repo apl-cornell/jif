@@ -4,14 +4,14 @@ class C {
         int{p!:} checked = 0;
         int{} unchecked = userInput();
         
-        endorse(unchecked, {} to {p!:}) {
-            if (unchecked > 0) {
-                checked = unchecked;
-            }
-            else {
-                checked = -1;
-            }
-        }        
+        endorse(unchecked, {} to {p!:}) 
+        if (unchecked > 0) {
+            checked = unchecked;
+        }
+        else {
+            checked = -1;
+        }
+        
     }   
     
     // the checked endorse should be equivalent in terms of
@@ -20,14 +20,12 @@ class C {
         int{p!:} checked = 0;
         int{} unchecked = userInput();
         
-        endorse({} to {p!:}) {
-            final int uncheckedp = endorse(unchecked, {} to {p!:});
-            if (uncheckedp > 0) {
-                checked = uncheckedp;
-            }
-            else {
-                checked = -1;
-            }
+        final int uncheckedp = endorse(unchecked, {} to {p!:});
+        if (uncheckedp > 0) {
+            checked = uncheckedp;
+        }
+        else {
+            checked = -1;
         }
         
     }

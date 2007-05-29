@@ -5,7 +5,9 @@ class C {
         int{} unchecked = userInput();
         
         endorse(unchecked, {} to {Alice:; p!:}) {
-            unchecked = secret;
+            if (unchecked < 10) {
+                unchecked = secret;
+            }
         }
         
     }

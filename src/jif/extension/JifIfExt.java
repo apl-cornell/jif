@@ -25,57 +25,57 @@ public class JifIfExt extends JifStmtExt_c
     }
 
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
-	If is = (If) node();
+        If is = (If) node();
 
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
         A = (JifContext) is.del().enterScope(A);
 
-	Expr e = (Expr) lc.context(A).labelCheck(is.cond());
+        Expr e = (Expr) lc.context(A).labelCheck(is.cond());
 
-	PathMap Xe = X(e);
-	
-	A = (JifContext) A.pushBlock();
-	A.setPc(Xe.NV());
-        
+        PathMap Xe = getPathMap(e);
+
+        A = (JifContext) A.pushBlock();
+        A.setPc(Xe.NV());
+
         // extend the context with any label tests or actsfor tests
         extendContext(lc, A, e, false);
 
-	Stmt S1 = (Stmt) lc.context(A).labelCheck(is.consequent());
+        Stmt S1 = (Stmt) lc.context(A).labelCheck(is.consequent());
 
         A = (JifContext) A.pop();
-	PathMap X1 = X(S1);
+        PathMap X1 = getPathMap(S1);
 
-	Stmt S2 = null;
-	PathMap X2;
+        Stmt S2 = null;
+        PathMap X2;
 
-	if (is.alternative() != null) {
-	    A = (JifContext) A.pushBlock();
-	    A.setPc(Xe.NV());
+        if (is.alternative() != null) {
+            A = (JifContext) A.pushBlock();
+            A.setPc(Xe.NV());
 
-	    S2 = (Stmt) lc.context(A).labelCheck(is.alternative());
+            S2 = (Stmt) lc.context(A).labelCheck(is.alternative());
 
             A = (JifContext) A.pop();
-	    X2 = X(S2);
-	}
-	else {
-	    // Simulate the effect of an empty statement.
-	    // X0[node() := A[pc := Xe[nv][pc]]] == Xe[nv]
-	    X2 = ts.pathMap().N(Xe.NV());
-	}
+            X2 = getPathMap(S2);
+        }
+        else {
+            // Simulate the effect of an empty statement.
+            // X0[node() := A[pc := Xe[nv][pc]]] == Xe[nv]
+            X2 = ts.pathMap().N(Xe.NV());
+        }
 
-	/*
+        /*
 	trace("Xe == " + Xe);
 	trace("X1 == " + X1);
 	trace("X2 == " + X2);
-	*/
+         */
 
-	PathMap X = Xe.N(ts.notTaken()).join(X1).join(X2);
-	X = X.NV(ts.notTaken());
-	return X(is.cond(e).consequent(S1).alternative(S2), X);
+        PathMap X = Xe.N(ts.notTaken()).join(X1).join(X2);
+        X = X.NV(ts.notTaken());
+        return updatePathMap(is.cond(e).consequent(S1).alternative(S2), X);
     }
 
-    protected void extendContext(LabelChecker lc, JifContext A, Expr e, boolean warn) throws SemanticException {
+    protected static void extendContext(LabelChecker lc, JifContext A, Expr e, boolean warn) throws SemanticException {
         if (e instanceof Binary) {
             Binary b = (Binary)e;
             if (b.operator() == Binary.BIT_AND || b.operator() == Binary.COND_AND) {
@@ -96,10 +96,10 @@ public class JifIfExt extends JifStmtExt_c
         extendFact(lc, A, e, warn);
     }
 
-    protected void extendFact(LabelChecker lc, 
-                                    JifContext A, 
-                                    Expr e, 
-                                    boolean warn) throws SemanticException {
+    protected static void extendFact(LabelChecker lc, 
+            JifContext A, 
+            Expr e, 
+            boolean warn) throws SemanticException {
         if (e instanceof Binary) {
             extendFact(lc, A, (Binary)e, warn);
         }       
@@ -110,12 +110,12 @@ public class JifIfExt extends JifStmtExt_c
             }
         }
     }
-        
-        
-    protected void extendFact(LabelChecker lc, JifContext A, Binary b, boolean warn) throws SemanticException {
+
+
+    protected static void extendFact(LabelChecker lc, JifContext A, Binary b, boolean warn) throws SemanticException {
         JifTypeSystem ts = lc.typeSystem();
         Binary.Operator op = b.operator();
-        
+
         if (op == JifBinaryDel.ACTSFOR) {            
             Principal actor = JifUtil.exprToPrincipal(ts, b.left(), A);
             Principal granter = JifUtil.exprToPrincipal(ts, b.right(), A);
@@ -127,7 +127,7 @@ public class JifIfExt extends JifStmtExt_c
                            "actsfor tests if they occur as conjuncts in the " +
                            "conditional of an if statement.",
                            b.position());
-                
+
             }
             else {
                 A.addActsFor(actor, granter);
@@ -144,7 +144,7 @@ public class JifIfExt extends JifStmtExt_c
                            "actsfor tests if they occur as conjuncts in the " +
                            "conditional of an if statement.",
                            b.position());
-                
+
             }
             else {
                 A.addEquiv(left, right);                            
@@ -153,7 +153,7 @@ public class JifIfExt extends JifStmtExt_c
         else if (op == JifBinaryDel.EQUIV && ts.isLabel(b.left().type())) {
             Label lhs = JifUtil.exprToLabel(ts, b.left(), A);
             Label rhs = JifUtil.exprToLabel(ts, b.right(), A);
-            
+
             if (warn) {
                 // give a warning.
                 ErrorQueue eq = lc.errorQueue();
@@ -162,7 +162,7 @@ public class JifIfExt extends JifStmtExt_c
                            "if they occur as conjuncts in the " +
                            "conditional of an if statement.",
                            b.position());
-                
+
             }
             else {
                 A.addEquiv(lhs, rhs);
@@ -179,7 +179,7 @@ public class JifIfExt extends JifStmtExt_c
                            "if they occur as conjuncts in the " +
                            "conditional of an if statement.",
                            b.position());
-                
+
             }
             else {
                 A.addAssertionLE(lhs, rhs);

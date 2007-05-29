@@ -49,30 +49,30 @@ public class JifSpecialExt extends JifExprExt
 	throw new SemanticException("Unrecognized parameter type for " + vi,
 		                    pos);
     }
-    */
-    
+     */
+
     /** label check the special expression.
      * 
      *  X.nv = X.n = A.pc ( the expression itself does not contain any information.)
      */
     public Node labelCheck(LabelChecker lc) throws SemanticException {
-	Special se = (Special) node();
+        Special se = (Special) node();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
-	A = (JifContext) se.del().enterScope(A);
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
+        A = (JifContext) se.del().enterScope(A);
 
-	JifClassType ct = (JifClassType) A.currentClass();
-	
-	se = (Special)se.type(ts.labeledType(se.position(), ct, ct.thisLabel()));
+        JifClassType ct = (JifClassType) A.currentClass();
 
-	PathMap X = ts.pathMap();
-	X = X.N(A.pc());
-	
-	// X(this).NV = this_label, which is upper-bounded
-	// by the begin label. 
-	X = X.NV(lc.upperBound(ct.thisLabel(), A.pc()));	
+        se = (Special)se.type(ts.labeledType(se.position(), ct, ct.thisLabel()));
 
-	return X(se, X);
+        PathMap X = ts.pathMap();
+        X = X.N(A.pc());
+
+        // X(this).NV = this_label, which is upper-bounded
+        // by the begin label. 
+        X = X.NV(lc.upperBound(ct.thisLabel(), A.pc()));	
+
+        return updatePathMap(se, X);
     }
 }

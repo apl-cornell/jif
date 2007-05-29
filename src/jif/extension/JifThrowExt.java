@@ -21,16 +21,16 @@ public class JifThrowExt extends JifStmtExt_c
 
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
-	Throw ths = (Throw) node();
+        Throw ths = (Throw) node();
 
         JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
-	A = (JifContext) ths.del().enterScope(A);
+        JifContext A = lc.jifContext();
+        A = (JifContext) ths.del().enterScope(A);
 
         List throwTypes = new ArrayList(ths.del().throwTypes(ts));
 
         Expr e = (Expr) lc.context(A).labelCheck(ths.expr());
-	PathMap Xe = X(e);
+        PathMap Xe = getPathMap(e);
         PathMap X = Xe;
 
         if (!((JifThrowDel)ths.del()).thrownIsNeverNull() && !ts.NullPointerException().equals(e.type())) {
@@ -38,12 +38,12 @@ public class JifThrowExt extends JifStmtExt_c
             X = X.exc(Xe.NV(), ts.NullPointerException());            
         }
         checkAndRemoveThrowType(throwTypes, e.type());
-	X = X.exc(Xe.NV(), e.type());
-        
+        X = X.exc(Xe.NV(), e.type());
+
         // the evaluation doesn't terminate normally.
-	X = X.N(ts.notTaken()).NV(ts.notTaken());
+        X = X.N(ts.notTaken()).NV(ts.notTaken());
 
         checkThrowTypes(throwTypes);
-	return X(ths, X);
+        return updatePathMap(ths, X);
     }
 }

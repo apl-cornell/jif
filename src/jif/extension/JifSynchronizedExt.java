@@ -24,21 +24,21 @@ public class JifSynchronizedExt extends JifStmtExt_c
      *  Just lets the label checker visit its children. 
      */
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
-	Synchronized ss = (Synchronized) node();
+        Synchronized ss = (Synchronized) node();
 
-	JifContext A = lc.jifContext();
-	A = (JifContext) ss.del().enterScope(A);
+        JifContext A = lc.jifContext();
+        A = (JifContext) ss.del().enterScope(A);
 
-	Expr e = (Expr) lc.context(A).labelCheck(ss.expr());
-	PathMap Xe = X(e);
+        Expr e = (Expr) lc.context(A).labelCheck(ss.expr());
+        PathMap Xe = getPathMap(e);
 
-	A.setPc(Xe.N());
+        A.setPc(Xe.N());
 
-	Block s = (Block) lc.context(A).labelCheck(ss.body());
-	PathMap Xs = X(s);
+        Block s = (Block) lc.context(A).labelCheck(ss.body());
+        PathMap Xs = getPathMap(s);
 
-	PathMap X = Xe.join(Xs);
+        PathMap X = Xe.join(Xs);
 
-	return X(ss, X);
+        return updatePathMap(ss, X);
     }
 }

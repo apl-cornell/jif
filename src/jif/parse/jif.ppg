@@ -287,6 +287,7 @@ non terminal DeclassifyExpr declassify;
 non terminal DeclassifyStmt declassify_statement;
 non terminal EndorseExpr endorse;
 non terminal EndorseStmt endorse_statement;
+non terminal LabelNode downgrade_to_label_opt;
 non terminal TypeNode labeled_primitive_type;
 non terminal LabelNode label, label_opt, return_label_opt, label_flexible;
 non terminal List join_component_list;
@@ -312,9 +313,6 @@ non terminal Expr primary_no_array;
 non terminal TypeNode primitive_array_type;
 non terminal ConstructorCall explicit_super_constructor_invocation;
 non terminal Token leftarrow, rightarrow;
-
-// make the pre and post inc/dec operators highest precedence
-precedence nonassoc PLUSPLUS, MINUSMINUS;
 
 start with goal;
 
@@ -920,24 +918,28 @@ extend statement ::=
     ;
 declassify_statement ::=
                     // DeclassifyStmt
-        DECLASSIFY:n LPAREN label:a RPAREN statement:b
-            {: RESULT = parser.nf.DeclassifyStmt(parser.pos(n, b), a, b); :}
-    |   DECLASSIFY:n LPAREN label:a TO label:b RPAREN statement:c
-            {: RESULT = parser.nf.DeclassifyStmt(parser.pos(n, c), a, b, c); :}
+        DECLASSIFY:n LPAREN label:b downgrade_to_label_opt:a RPAREN statement:c
+            {: RESULT = parser.nf.DeclassifyStmt(parser.pos(n, c), a==null?null:b, a==null?b:a, c); :}
     ;
 
 endorse_statement ::=
                     // EndorseStmt
-        ENDORSE:n LPAREN label:a RPAREN statement:b
-            {: RESULT = parser.nf.EndorseStmt(parser.pos(n, b), a, b); :}
-    |   ENDORSE:n LPAREN label:a TO label:b RPAREN statement:c
-            {: RESULT = parser.nf.EndorseStmt(parser.pos(n, c), a, b, c); :}
-    |   ENDORSE:n LPAREN expression:e COMMA label:b RPAREN statement:c
-            {: RESULT = parser.nf.CheckedEndorseStmt(parser.pos(n, c), e, b, c); :}
-    |   ENDORSE:n LPAREN expression:e COMMA label:a TO label:b RPAREN statement:c
-            {: RESULT = parser.nf.CheckedEndorseStmt(parser.pos(n, c), e, a, b, c); :}
+        ENDORSE:n LPAREN label:b downgrade_to_label_opt:a RPAREN statement:c
+            {: RESULT = parser.nf.EndorseStmt(parser.pos(n, c), a==null?null:b, a==null?b:a, c); :}
+    |   ENDORSE:n LPAREN expression:e COMMA label:b downgrade_to_label_opt:a RPAREN if_then_statement:its
+            {: RESULT = parser.nf.CheckedEndorseStmt(parser.pos(n, its), e, a==null?null:b, a==null?b:a, its); :}
+    |   ENDORSE:n LPAREN expression:e COMMA label:b downgrade_to_label_opt:a RPAREN if_then_else_statement:its
+            {: RESULT = parser.nf.CheckedEndorseStmt(parser.pos(n, its), e, a==null?null:b, a==null?b:a, its); :}
+    |   ENDORSE:n LPAREN expression:e COMMA label:b downgrade_to_label_opt:a RPAREN LBRACE if_then_statement:its RBRACE:z
+            {: RESULT = parser.nf.CheckedEndorseStmt(parser.pos(n, z), e, a==null?null:b, a==null?b:a, its); :}
+    |   ENDORSE:n LPAREN expression:e COMMA label:b downgrade_to_label_opt:a RPAREN LBRACE if_then_else_statement:its RBRACE:z
+            {: RESULT = parser.nf.CheckedEndorseStmt(parser.pos(n, z), e, a==null?null:b, a==null?b:a, its); :}
     ;
 
+downgrade_to_label_opt ::=
+        TO label:a {: RESULT = a; :}
+    | {: RESULT = null; :}
+    ;
 
 // 19.12) Expr           // Expr
 extend primary ::=
@@ -1048,20 +1050,14 @@ extend method_invocation ::=
 
 declassify ::=
                     // DeclassifyExpr
-        DECLASSIFY:x LPAREN expression:a COMMA label:b RPAREN:y
-            {: RESULT = parser.nf.DeclassifyExpr(parser.pos(x,y), a, b);
-	    :}
-    |   DECLASSIFY:x LPAREN expression:a COMMA label:b TO label:c RPAREN:y
-            {: RESULT = parser.nf.DeclassifyExpr(parser.pos(x,y), a, b, c); :}
+        DECLASSIFY:x LPAREN expression:a COMMA label:c downgrade_to_label_opt:b RPAREN:y
+            {: RESULT = parser.nf.DeclassifyExpr(parser.pos(x,y), a, b==null?null:c, b==null?c:b); :}
     ;
 
 endorse ::=
                     // DeclassifyExpr
-        ENDORSE:x LPAREN expression:a COMMA label:b RPAREN:y
-            {: RESULT = parser.nf.EndorseExpr(parser.pos(x,y), a, b);
-	    :}
-    |   ENDORSE:x LPAREN expression:a COMMA label:b TO label:c RPAREN:y
-            {: RESULT = parser.nf.EndorseExpr(parser.pos(x,y), a, b, c); :}
+        ENDORSE:x LPAREN expression:a COMMA label:c downgrade_to_label_opt:b RPAREN:y
+            {: RESULT = parser.nf.EndorseExpr(parser.pos(x,y), a, b==null?null:c, b==null?c:b); :}
     ;
 
 param_or_expr_list ::=

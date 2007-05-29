@@ -27,46 +27,46 @@ public class JifNewExt extends JifExprExt
     protected SubtypeChecker subtypeChecker = new SubtypeChecker();
 
     public Node labelCheck(LabelChecker lc) throws SemanticException {
-	New noe = (New) node();
+        New noe = (New) node();
 
-	JifTypeSystem ts = lc.typeSystem();
+        JifTypeSystem ts = lc.typeSystem();
         JifContext A = lc.jifContext();
-	A = (JifContext) noe.del().enterScope(A);
+        A = (JifContext) noe.del().enterScope(A);
 
-	List throwTypes = new ArrayList(noe.del().throwTypes(ts));
-    
-	ClassType ct = (ClassType) ts.unlabel(noe.type());
+        List throwTypes = new ArrayList(noe.del().throwTypes(ts));
 
-	constructorChecker.checkConstructorAuthority(ct, A, noe.position());
+        ClassType ct = (ClassType) ts.unlabel(noe.type());
 
-	Label newLabel = ts.freshLabelVariable(noe.position(), "new" + ct.name(),
-                            "label of the reference to the newly created " +
-                            ct.name() + " object, at " + noe.position());
+        constructorChecker.checkConstructorAuthority(ct, A, noe.position());
 
-	if (ts.isLabeled(noe.type()) ) {
+        Label newLabel = ts.freshLabelVariable(noe.position(), "new" + ct.name(),
+                                               "label of the reference to the newly created " +
+                                               ct.name() + " object, at " + noe.position());
+
+        if (ts.isLabeled(noe.type()) ) {
             // error messages for equality constraints aren't displayed, so no
             // need to define error messages.  
             lc.constrain(new LabelConstraint(new NamedLabel("new_label",
                                                             "label of the reference to the newly created " + ct.name(), 
                                                             newLabel), 
-                                             LabelConstraint.EQUAL, 
-                                             new NamedLabel("declared_label", 
-                                                            "declared label of the newly created " + ct.name(), 
-                                                            ts.labelOfType(noe.type())), 
-                                             A.labelEnv(),
-                                             noe.position()));
+                                                            LabelConstraint.EQUAL, 
+                                                            new NamedLabel("declared_label", 
+                                                                           "declared label of the newly created " + ct.name(), 
+                                                                           ts.labelOfType(noe.type())), 
+                                                                           A.labelEnv(),
+                                                                           noe.position()));
         }
-	CallHelper helper = new CallHelper(newLabel, ct, 
+        CallHelper helper = new CallHelper(newLabel, ct, 
                                            (JifProcedureInstance)noe.constructorInstance(), 
                                            noe.arguments(),
-		                           node().position());
+                                           node().position());
 
-	helper.checkCall(lc, throwTypes, false);
+        helper.checkCall(lc, throwTypes, false);
 
-	PathMap retX = helper.X();
-	PathMap X = retX.NV(lc.upperBound(retX.NV(), newLabel));
+        PathMap retX = helper.X();
+        PathMap X = retX.NV(lc.upperBound(retX.NV(), newLabel));
 
-	checkThrowTypes(throwTypes);
-	return X(noe.arguments(helper.labelCheckedArgs()), X);
+        checkThrowTypes(throwTypes);
+        return updatePathMap(noe.arguments(helper.labelCheckedArgs()), X);
     }
 }

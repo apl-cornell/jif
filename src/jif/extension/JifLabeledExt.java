@@ -21,41 +21,41 @@ public class JifLabeledExt extends JifStmtExt_c
 
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
-	Labeled ls = (Labeled) node();
+        Labeled ls = (Labeled) node();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
-	A = (JifContext) ls.del().enterScope(A);
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
+        A = (JifContext) ls.del().enterScope(A);
 
-	String label = ls.label();
+        String label = ls.label();
 
-	Label L1 = ts.freshLabelVariable(node().position(), label, 
-                    "label of the PC at the labeled position " + label + " (" +
-                    ls.position()+")");
-	Label L2 = ts.freshLabelVariable(node().position(), label,
-                    "label of the PC at the labeled position " + label + " (" +
-                    ls.position()+")");
-    
+        Label L1 = ts.freshLabelVariable(node().position(), label, 
+                                         "label of the PC at the labeled position " + label + " (" +
+                                         ls.position()+")");
+        Label L2 = ts.freshLabelVariable(node().position(), label,
+                                         "label of the PC at the labeled position " + label + " (" +
+                                         ls.position()+")");
 
-	A = (JifContext) A.pushBlock();
-	A.gotoLabel(polyglot.ast.Branch.CONTINUE, label, L1);
-	A.gotoLabel(polyglot.ast.Branch.BREAK, label, L2);
 
-	A.setPc(lc.upperBound(A.pc(), L1));
+        A = (JifContext) A.pushBlock();
+        A.gotoLabel(polyglot.ast.Branch.CONTINUE, label, L1);
+        A.gotoLabel(polyglot.ast.Branch.BREAK, label, L2);
 
-	Stmt s = (Stmt) lc.context(A).labelCheck(ls.statement());
+        A.setPc(lc.upperBound(A.pc(), L1));
+
+        Stmt s = (Stmt) lc.context(A).labelCheck(ls.statement());
 
         A = (JifContext) A.pop();
 
-	PathMap Xs = X(s);
+        PathMap Xs = getPathMap(s);
 
-	PathMap X = Xs.N(lc.upperBound(Xs.N(), L2));
+        PathMap X = Xs.N(lc.upperBound(Xs.N(), L2));
 
-	X = X.set(ts.gotoPath(polyglot.ast.Branch.CONTINUE, label),
-		ts.notTaken());
-	X = X.set(ts.gotoPath(polyglot.ast.Branch.BREAK, label),
-		ts.notTaken());
+        X = X.set(ts.gotoPath(polyglot.ast.Branch.CONTINUE, label),
+                  ts.notTaken());
+        X = X.set(ts.gotoPath(polyglot.ast.Branch.BREAK, label),
+                  ts.notTaken());
 
-	return X(ls.statement(s), X);
+        return updatePathMap(ls.statement(s), X);
     }
 }

@@ -31,7 +31,7 @@ public class JifCastExt extends JifExprExt
         Position pos = c.position();
 
         Expr e = (Expr) lc.context(A).labelCheck(c.expr());
-        PathMap Xe = X(e);
+        PathMap Xe = getPathMap(e);
 
         // label check the type too, since the type may leak information
         A = (JifContext) A.pushBlock();
@@ -47,6 +47,6 @@ public class JifCastExt extends JifExprExt
         }
 
         checkThrowTypes(throwTypes);
-        return X(c.expr(e), X);
+        return updatePathMap(c.expr(e), X);
     }
 }

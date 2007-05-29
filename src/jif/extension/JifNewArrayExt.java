@@ -54,7 +54,7 @@ public class JifNewArrayExt extends JifExprExt
             e = (Expr) lc.context(A).labelCheck(e);
             dims.add(e);
 
-            PathMap Xe = X(e);
+            PathMap Xe = getPathMap(e);
             Xs = Xs.N(ts.notTaken()).join(Xe);
 
             A.setPc(Xs.N());
@@ -66,7 +66,7 @@ public class JifNewArrayExt extends JifExprExt
         if (nae.init() != null) {
             init = (ArrayInit) lc.context(A).labelCheck(nae.init());
             ((JifArrayInitExt)(init.ext())).labelCheckElements(lc, nae.type()); 
-            PathMap Xinit = X(init);
+            PathMap Xinit = getPathMap(init);
             Xs = Xs.N(ts.notTaken()).join(Xinit);
         }
 
@@ -82,6 +82,6 @@ public class JifNewArrayExt extends JifExprExt
 
         checkThrowTypes(throwTypes);
 
-        return X(nae.dims(dims).init(init), Xs);
+        return updatePathMap(nae.dims(dims).init(init), Xs);
     }
 }

@@ -20,30 +20,30 @@ public class JifLocalDeclExt extends JifStmtExt_c
     public JifLocalDeclExt(ToJavaExt toJava) {
         super(toJava);
     }
-    
+
     SubtypeChecker subtypeChecker = new SubtypeChecker();
-    
+
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         LocalDecl decl = (LocalDecl) node();
-        
+
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
         A = (JifContext) decl.del().enterScope(A);
-        
+
         PathMap X = ts.pathMap();
         X = X.N(A.pc());
 
         final JifLocalInstance li = (JifLocalInstance) decl.localInstance();
-        
+
         if (polyglot.main.Report.should_report(jif.Topics.jif, 4))
             polyglot.main.Report.report(4, "Processing declaration for " + li);
-        
+
         //deal with the special cases "final label l = new label(...)"
         // and "final principal p = ..."
         if (li.flags().isFinal() && 
                 (ts.isLabel(li.type()) || ts.isImplicitCastValid(li.type(), ts.Principal())) && 
                 JifUtil.isFinalAccessExprOrConst(ts, decl.init())) {
-            
+
             if (ts.isLabel(li.type())) {
                 Label dl = ts.dynamicLabel(decl.position(), JifUtil.varInstanceToAccessPath(li, li.position()));                
                 Label rhs_label = JifUtil.exprToLabel(ts, decl.init(), lc.context());
@@ -55,14 +55,14 @@ public class JifLocalDeclExt extends JifStmtExt_c
                 lc.context().addDefinitionalEquiv(dp, rhs_principal);                    
             }
         }                            
-        
+
         // Equate the variable label with the declared label.
         Label L = li.label();
         Type t = decl.declType();
         if (L instanceof VarLabel) {            
             if (ts.isLabeled(t)) {
                 Label declaredLabel = ts.labelOfType(t);
-                
+
                 lc.constrain(new LabelConstraint(new NamedLabel("local_label", 
                                                                 "inferred label of local var " + li.name(), 
                                                                 L), 
@@ -88,13 +88,13 @@ public class JifLocalDeclExt extends JifStmtExt_c
                 decl = decl.type(decl.type().type(t));
             }
         }
-        
+
         PathMap Xd;
         Expr init = null;
-        
+
         if (decl.init() != null) {
             init = (Expr) lc.context(A).labelCheck(decl.init());
-            
+
             if (init instanceof ArrayInit) {
                 ((JifArrayInitExt)(init.ext())).labelCheckElements(lc, decl.type().type()); 
             }
@@ -106,9 +106,9 @@ public class JifLocalDeclExt extends JifStmtExt_c
                 subtypeChecker.addSubtypeConstraints(lc, init.position(),
                                                      t, init.type());
             }
-            
-            PathMap Xe = X(init);
-            
+
+            PathMap Xe = getPathMap(init);
+
             lc.constrain(new LabelConstraint(new NamedLabel("init.nv", 
                                                             "label of successful evaluation of initializing expression", 
                                                             Xe.NV()), 
@@ -140,10 +140,10 @@ public class JifLocalDeclExt extends JifStmtExt_c
             Xd = ts.pathMap();
             Xd = Xd.N(A.pc());
         }
-        
+
         X = X.N(ts.notTaken()).join(Xd);
-        
-        decl = (LocalDecl) X(decl.init(init), X);
+
+        decl = (LocalDecl) updatePathMap(decl.init(init), X);
         return decl;
     }
 }

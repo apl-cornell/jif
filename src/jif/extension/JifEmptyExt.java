@@ -18,12 +18,12 @@ public class JifEmptyExt extends JifStmtExt_c
     }
 
     public Node labelCheckStmt(LabelChecker lc) {
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
         A = (JifContext) node().del().enterScope(A);
 
-	PathMap X = ts.pathMap();
-	X = X.N(A.pc());
-	return X(node(), X);
+        PathMap X = ts.pathMap();
+        X = X.N(A.pc());
+        return updatePathMap(node(), X);
     }
 }

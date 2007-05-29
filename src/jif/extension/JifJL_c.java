@@ -17,11 +17,11 @@ public class JifJL_c extends JL_c
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem) tb.typeSystem();
         Node n = super.buildTypes(tb);
-        return JifUtil.X(n, ts.pathMap());
+        return JifUtil.updatePathMap(n, ts.pathMap());
     }
 
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("cannot translate " + node() +
-                                        "; still has a Jif extension");
+        "; still has a Jif extension");
     }
 }

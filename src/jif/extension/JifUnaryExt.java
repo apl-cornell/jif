@@ -52,6 +52,6 @@ public class JifUnaryExt extends JifExprExt
             e = (Expr) lc.context(A).labelCheck(e);
         }
 
-        return X(ue.expr(e), X(e));
+        return updatePathMap(ue.expr(e), getPathMap(e));
     }
 }

@@ -28,11 +28,11 @@ public class JifCallExt extends JifExprExt
 
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         Call me = (Call) node();
-        
+
         JifContext A = lc.jifContext();
         A = (JifContext) me.del().enterScope(A);
         JifTypeSystem ts = lc.jifTypeSystem();
-        
+
         if (A.checkingInits()) {
             // in the constructor prologue, the this object cannot be the receiver or an argument
             if (me.target() instanceof Expr && JifUtil.effectiveExpr((Expr)me.target()) instanceof Special) {
@@ -51,35 +51,35 @@ public class JifCallExt extends JifExprExt
                                                         "that the \"this\" object cannot be used as a method argument.", 
                                                         arg.position());
                 }
-                
+
             }
-            
+
         }
-        
+
         List throwTypes = new ArrayList(me.del().throwTypes(ts));
-        
+
         JifMethodInstance mi = (JifMethodInstance)me.methodInstance();
-        
+
         if (mi.flags().isStatic()) {
             new ConstructorChecker().checkStaticMethodAuthority(mi, A, me.position());
         }
-        
+
         Receiver target = (Receiver) lc.context(A).labelCheck(me.target());
-        
+
         A = (JifContext) A.pushBlock();
-        
+
         boolean npExc = false;
         Label objLabel = null;
-        
+
         if (target instanceof Expr) {
             Expr e = (Expr) target;
-            
+
             if (e.type() == null) 
                 throw new InternalCompilerError("Type of " + e + " is null", e.position());
-            
-            PathMap Xs = X(target);
+
+            PathMap Xs = getPathMap(target);
             A.setPc(Xs.N());
-            
+
             if (! (target instanceof Special)) {
                 // a NPE may be thrown depending on the target.
                 npExc = (!((JifCallDel)node().del()).targetIsNeverNull());
@@ -90,11 +90,11 @@ public class JifCallExt extends JifExprExt
                 objLabel = ((JifClassType) lc.context().currentClass()).thisLabel();
             }
         }
-        
+
         CallHelper helper = new CallHelper(objLabel, target, mi.container(), mi, me.arguments(), node().position());
         LabelChecker callLC = lc.context(A);
         helper.checkCall(callLC, throwTypes, npExc);
-        
+
         // now use the call helper to bind the var labels that were created
         // during type checking of the call (see JifCallDel#typeCheck)
         JifCallDel del = (JifCallDel)me.del();
@@ -102,15 +102,15 @@ public class JifCallExt extends JifExprExt
                              del.receiverVarLabel, 
                              del.argVarLabels, 
                              del.paramVarLabels);
-        
+
         A = (JifContext) A.pop();
-        
+
         //subst arguments of inst_type
         if (helper.returnType() != me.type()) {
             me = (Call) me.type(helper.returnType());
         }
-                
+
         checkThrowTypes(throwTypes);
-        return X(me.target(target).arguments(helper.labelCheckedArgs()), helper.X());
+        return updatePathMap(me.target(target).arguments(helper.labelCheckedArgs()), helper.X());
     }
 }

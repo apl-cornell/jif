@@ -14,12 +14,12 @@ import polyglot.util.Position;
 public class JifUtil
 {
     // Some utility functions used to avoid casts.
-    public static PathMap X(Node n) {
+    public static PathMap getPathMap(Node n) {
         Jif ext = (Jif) n.ext();
         return ext.del().X();
     }
     
-    public static Node X(Node n, PathMap X) {
+    public static Node updatePathMap(Node n, PathMap X) {
         Jif ext = (Jif) n.ext();
         if (ext == null || ext.del() == null) {
             System.out.println("got a " + n.getClass());

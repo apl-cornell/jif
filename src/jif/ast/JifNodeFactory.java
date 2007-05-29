@@ -53,8 +53,7 @@ public interface JifNodeFactory extends NodeFactory {
     DeclassifyExpr DeclassifyExpr(Position pos, Expr expr, LabelNode label);
     EndorseStmt EndorseStmt(Position pos, LabelNode bound, LabelNode label, Stmt body);
     EndorseStmt EndorseStmt(Position pos, LabelNode label, Stmt body);
-    CheckedEndorseStmt CheckedEndorseStmt(Position pos, Expr e, LabelNode bound, LabelNode label, Stmt body);
-    CheckedEndorseStmt CheckedEndorseStmt(Position pos, Expr e, LabelNode label, Stmt body);
+    CheckedEndorseStmt CheckedEndorseStmt(Position pos, Expr e, LabelNode bound, LabelNode label, If body);
     EndorseExpr EndorseExpr(Position pos, Expr expr, LabelNode bound, LabelNode label);
     EndorseExpr EndorseExpr(Position pos, Expr expr, LabelNode label);
     NewLabel NewLabel(Position pos, LabelNode label);

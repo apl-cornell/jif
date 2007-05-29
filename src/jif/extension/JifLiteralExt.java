@@ -20,13 +20,13 @@ public class JifLiteralExt extends JifExprExt
     }
 
     public Node labelCheck(LabelChecker lc) throws SemanticException {
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
-	A = (JifContext) node().del().enterScope(A);
-	
-	PathMap X = ts.pathMap();
-	X = X.N(A.pc());
-	X = X.NV(A.pc());
-	return X(node(), X);
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
+        A = (JifContext) node().del().enterScope(A);
+
+        PathMap X = ts.pathMap();
+        X = X.N(A.pc());
+        X = X.NV(A.pc());
+        return updatePathMap(node(), X);
     }
 }

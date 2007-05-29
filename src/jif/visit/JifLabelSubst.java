@@ -57,10 +57,10 @@ public class JifLabelSubst extends ContextVisitor
         }
         
         if (n.ext() instanceof Jif) {
-            PathMap X = Jif_c.X(n);
+            PathMap X = Jif_c.getPathMap(n);
             
             if (X != null) {
-                n = Jif_c.X(n, X.subst(bounds));
+                n = Jif_c.updatePathMap(n, X.subst(bounds));
             }
         }
         if (n instanceof CanonicalTypeNode) {

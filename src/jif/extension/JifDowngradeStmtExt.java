@@ -50,6 +50,34 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
         PathMap initMap = initPathMap(lc);
         Label pc = lc.upperBound(A.pc(), initMap.N());
 
+        checkPCconstraint(lc, A, pc, downgradeFrom, boundSpecified);
+
+        JifContext dA = declassifyConstraintContext(A);
+        checkOneDimenOnly(lc, dA, downgradeFrom, downgradeTo, ds.position());
+        checkAuthority(lc, dA, downgradeFrom, downgradeTo, ds.position());
+        checkAdditionalConstraints(lc, dA, downgradeFrom, downgradeTo, ds.position());
+
+        if (!((JifOptions)JifOptions.global).nonRobustness) {
+            checkRobustness(lc, dA, downgradeFrom, downgradeTo, ds.position());
+        }
+
+        Stmt body = checkBody(lc, A, downgradeFrom, downgradeTo);
+        PathMap Xs = getPathMap(body);
+
+        PathMap X = null;
+
+        if (Xs.N() instanceof NotTaken) {
+            X = Xs;
+        }
+        else {          
+            X = Xs.N(lc.upperBound(Xs.N(), A.pc()));
+        }
+
+        return updatePathMap(ds.body(body), X);
+    }
+
+    protected void checkPCconstraint(LabelChecker lc, JifContext A, Label pc, Label downgradeFrom, boolean boundSpecified) throws SemanticException {
+        final DowngradeStmt ds = (DowngradeStmt)this.node();
         lc.constrain(new LabelConstraint(new NamedLabel("pc", pc), 
                                          boundSpecified?LabelConstraint.LEQ:LabelConstraint.EQUAL, 
                                                  new NamedLabel("downgrade_bound", downgradeFrom),
@@ -76,33 +104,14 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
             }                     
         }
         );
-
-        JifContext dA = declassifyConstraintContext(A);
-        checkOneDimenOnly(lc, dA, downgradeFrom, downgradeTo, ds.position());
-        checkAuthority(lc, dA, downgradeFrom, downgradeTo, ds.position());
-        checkAdditionalConstraints(lc, dA, downgradeFrom, downgradeTo, ds.position());
-
-        if (!((JifOptions)JifOptions.global).nonRobustness) {
-            checkRobustness(lc, dA, downgradeFrom, downgradeTo, ds.position());
-        }
-
-        JifContext bA = bodyContext(A, downgradeFrom, downgradeTo);
-
-        Stmt body = (Stmt) lc.context(bA).labelCheck(ds.body());
-        PathMap Xs = X(body);
-
-        PathMap X = null;
-
-        if (Xs.N() instanceof NotTaken) {
-            X = Xs;
-        }
-        else {          
-            X = Xs.N(lc.upperBound(Xs.N(), A.pc()));
-        }
-
-        return X(ds.body(body), X);
     }
-    
+
+    protected Stmt checkBody(LabelChecker lc, JifContext A, Label downgradeFrom, Label downgradeTo) throws SemanticException {
+        JifContext bA = bodyContext(A, downgradeFrom, downgradeTo);
+        DowngradeStmt ds = (DowngradeStmt)this.node();
+        return (Stmt) lc.context(bA).labelCheck(ds.body());
+    }
+
     protected JifContext bodyContext(JifContext A, Label downgradeFrom, Label downgradeTo) {
         A = (JifContext) A.pushBlock();
         A.setPc(downgradeTo);

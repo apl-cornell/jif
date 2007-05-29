@@ -21,16 +21,16 @@ public class JifEvalExt extends JifStmtExt_c
     }
 
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
-	Eval eval = (Eval) node();
+        Eval eval = (Eval) node();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
         A = (JifContext) eval.del().enterScope(A);
 
-	Expr e = (Expr) lc.context(A).labelCheck(eval.expr());
+        Expr e = (Expr) lc.context(A).labelCheck(eval.expr());
 
-	PathMap X = X(e);
-	X = X.NV(ts.notTaken());
-	return X(eval.expr(e), X);
+        PathMap X = getPathMap(e);
+        X = X.NV(ts.notTaken());
+        return updatePathMap(eval.expr(e), X);
     }
 }

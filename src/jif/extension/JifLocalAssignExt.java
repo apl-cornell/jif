@@ -19,7 +19,7 @@ public class JifLocalAssignExt extends JifAssignExt
     }
 
     public Node labelCheckLHS(LabelChecker lc)
-        throws SemanticException
+    throws SemanticException
     {
         final Assign assign = (Assign) node();
         Local lve = (Local) assign.left();
@@ -29,7 +29,7 @@ public class JifLocalAssignExt extends JifAssignExt
         A = (JifContext) lve.del().enterScope(A);
 
         List throwTypes = new ArrayList(assign.del().throwTypes(ts));
-        
+
         final LocalInstance li = lve.localInstance();
 
         Label L = ts.labelOfLocal(li, A.pc());
@@ -59,36 +59,36 @@ public class JifLocalAssignExt extends JifAssignExt
         lc.constrain(new LabelConstraint(new NamedLabel("rhs.nv", 
                                                         "label of successful evaluation of right hand of assignment", 
                                                         X.NV()), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("label of var " + li.name(), L),
-                                         A.labelEnv(),
-                                         lve.position()) {
-                     public String msg() {
-                         return "Label of right hand side not less " + 
-                                "restrictive than the label for local variable " + 
-                                li.name();
-                     }
-                     public String detailMsg() { 
-                         return "More information is revealed by the successful " +
-                                "evaluation of the right hand side of the " +
-                                "assignment than is allowed to flow to " +
-                                "the local variable " + li.name() + ".";
-                     }
-                     public String technicalMsg() {
-                         return "Invalid assignment: path NV of rhs is " +
-                                "not less restrictive than the declared label " +
-                                "of the local variable <" + li.name() + ">.";
-                     }
-                     
-         }
-         );
+                                                        LabelConstraint.LEQ, 
+                                                        new NamedLabel("label of var " + li.name(), L),
+                                                        A.labelEnv(),
+                                                        lve.position()) {
+            public String msg() {
+                return "Label of right hand side not less " + 
+                "restrictive than the label for local variable " + 
+                li.name();
+            }
+            public String detailMsg() { 
+                return "More information is revealed by the successful " +
+                "evaluation of the right hand side of the " +
+                "assignment than is allowed to flow to " +
+                "the local variable " + li.name() + ".";
+            }
+            public String technicalMsg() {
+                return "Invalid assignment: path NV of rhs is " +
+                "not less restrictive than the declared label " +
+                "of the local variable <" + li.name() + ">.";
+            }
 
-        Expr lhs = (Expr) X(lve, X);
+        }
+        );
+
+        Expr lhs = (Expr) updatePathMap(lve, X);
         checkThrowTypes(throwTypes);
-        return (Assign) X(assign.right(rhs).left(lhs), X);
+        return (Assign) updatePathMap(assign.right(rhs).left(lhs), X);
     }
 
     protected PathMap rhsPathMap(LabelChecker lc, Expr rhs, List throwTypes) {
-        return X(rhs);
+        return getPathMap(rhs);
     }
 }

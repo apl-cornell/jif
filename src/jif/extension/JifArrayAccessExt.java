@@ -26,37 +26,37 @@ public class JifArrayAccessExt extends JifExprExt
         ArrayAccess ae = (ArrayAccess) node();
         Position pos = ae.position();
         ArrayAccessAssign aae = nf.ArrayAccessAssign(pos, ae, Assign.ADD_ASSIGN, 
-                              nf.IntLit(pos, IntLit.INT, 1));
+                                                     nf.IntLit(pos, IntLit.INT, 1));
 
         aae = (ArrayAccessAssign)((JifArrayAccessAssignExt) aae.ext()).labelCheck(lc);
 
         return aae.left();
     }
- 
+
     public Node labelCheck(LabelChecker lc)
-	throws SemanticException
+    throws SemanticException
     {
-	JifContext A = lc.jifContext();
-	JifTypeSystem ts = lc.jifTypeSystem();
-	ArrayAccess aie = (ArrayAccess) node();
+        JifContext A = lc.jifContext();
+        JifTypeSystem ts = lc.jifTypeSystem();
+        ArrayAccess aie = (ArrayAccess) node();
 
-	List throwTypes = new ArrayList(aie.del().throwTypes(ts));
+        List throwTypes = new ArrayList(aie.del().throwTypes(ts));
 
-	Expr array = (Expr) lc.context(A).labelCheck(aie.array());
-	PathMap Xa = X(array);
+        Expr array = (Expr) lc.context(A).labelCheck(aie.array());
+        PathMap Xa = getPathMap(array);
 
-	A = (JifContext) A.pushBlock();
-	A.setPc(Xa.N());
+        A = (JifContext) A.pushBlock();
+        A.setPc(Xa.N());
 
-	Expr index = (Expr) lc.context(A).labelCheck(aie.index());
-	PathMap Xb = X(index);
+        Expr index = (Expr) lc.context(A).labelCheck(aie.index());
+        PathMap Xb = getPathMap(index);
 
         A = (JifContext) A.pop();
 
-	Label La = arrayBaseLabel(array, ts);
+        Label La = arrayBaseLabel(array, ts);
 
-	Type npe = ts.NullPointerException();
-	Type oob = ts.OutOfBoundsException();
+        Type npe = ts.NullPointerException();
+        Type oob = ts.OutOfBoundsException();
 
         PathMap X2 = Xa.join(Xb);
         if (!((JifArrayAccessDel)node().del()).arrayIsNeverNull()) {
@@ -67,13 +67,13 @@ public class JifArrayAccessExt extends JifExprExt
         if (((JifArrayAccessDel)node().del()).outOfBoundsExcThrown()) {
             // an out of bounds exception may be thrown
             checkAndRemoveThrowType(throwTypes, oob);
-             X2 = X2.exc(lc.upperBound(Xa.NV(), Xb.NV()), oob);
+            X2 = X2.exc(lc.upperBound(Xa.NV(), Xb.NV()), oob);
         }
 
-	PathMap X = X2.NV(lc.upperBound(La, X2.NV()));
+        PathMap X = X2.NV(lc.upperBound(La, X2.NV()));
 
         checkThrowTypes(throwTypes);
-	return X(aie.index(index).array(array), X);
+        return updatePathMap(aie.index(index).array(array), X);
     }
 
     private Type arrayType(Expr array, JifTypeSystem ts) {

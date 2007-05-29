@@ -18,10 +18,10 @@ public class JifDoExt extends JifStmtExt_c
     }
 
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
-	Do ds = (Do) node();
+        Do ds = (Do) node();
 
-	JifTypeSystem ts = lc.typeSystem();
-	JifContext A = lc.context();
+        JifTypeSystem ts = lc.typeSystem();
+        JifContext A = lc.context();
         A = (JifContext) ds.del().enterScope(A);
         lc = lc.context(A);
 
@@ -36,53 +36,53 @@ public class JifDoExt extends JifStmtExt_c
         A.gotoLabel(Branch.CONTINUE, null, L1);
         A.gotoLabel(Branch.BREAK, null, L2);
 
-	Stmt s = (Stmt) lc.context(A).labelCheck(ds.body());
-        PathMap Xs = X(s);
+        Stmt s = (Stmt) lc.context(A).labelCheck(ds.body());
+        PathMap Xs = getPathMap(s);
 
         A = (JifContext) A.pushBlock();
         A.setPc(Xs.N());
 
         Expr e = (Expr) lc.context(A).labelCheck(ds.cond());
-        PathMap Xe = X(e);
+        PathMap Xe = getPathMap(e);
 
         lc.constrain(new LabelConstraint(new NamedLabel("do_while_guard.NV",
                                                         "label of evaluation of the loop guard", 
                                                         Xe.NV()).
-                                                  join(lc,
-                                                       "loop_entry_pc",
-                                                       "label of the program counter just before the loop is executed",
-                                                       loopEntryPC), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("loop_pc",
-                                                        "label of the program counter at the top of the loop",
-                                                        L1),
-                                         lc.context().labelEnv(),
-                                         ds.position(), 
-                                         false) {
-                     public String msg() {
-                         return "The information revealed by the normal " +
-                                "termination of the body of the do-while loop " +
-                                "may be more restrictive than the " +
-                                "information that should be revealed by " +
-                                "reaching the top of the loop.";
-                     }
-                     public String detailMsg() {
-                         return "The program counter label at the start of the loop is at least as restrictive " +
-                                        "as the normal termination label of the loop body, and the entry " +
-                                        "program counter label (that is, the program counter label just " +
-                                        "before the loop is executed for the first time).";
-                         
-                     }
-                     public String technicalMsg() {
-                         return "X(loopbody).n <= _pc_ of the do-while statement";
-                     }                     
-         }
-         );
+                                                        join(lc,
+                                                             "loop_entry_pc",
+                                                             "label of the program counter just before the loop is executed",
+                                                             loopEntryPC), 
+                                                             LabelConstraint.LEQ, 
+                                                             new NamedLabel("loop_pc",
+                                                                            "label of the program counter at the top of the loop",
+                                                                            L1),
+                                                                            lc.context().labelEnv(),
+                                                                            ds.position(), 
+                                                                            false) {
+            public String msg() {
+                return "The information revealed by the normal " +
+                "termination of the body of the do-while loop " +
+                "may be more restrictive than the " +
+                "information that should be revealed by " +
+                "reaching the top of the loop.";
+            }
+            public String detailMsg() {
+                return "The program counter label at the start of the loop is at least as restrictive " +
+                "as the normal termination label of the loop body, and the entry " +
+                "program counter label (that is, the program counter label just " +
+                "before the loop is executed for the first time).";
+
+            }
+            public String technicalMsg() {
+                return "X(loopbody).n <= _pc_ of the do-while statement";
+            }                     
+        }
+        );
         PathMap X = Xe.join(Xs);
-	X = X.set(ts.gotoPath(Branch.BREAK, null), ts.notTaken());
-	X = X.set(ts.gotoPath(Branch.CONTINUE, null), ts.notTaken());
+        X = X.set(ts.gotoPath(Branch.BREAK, null), ts.notTaken());
+        X = X.set(ts.gotoPath(Branch.CONTINUE, null), ts.notTaken());
         X = X.N(lc.upperBound(X.N(), L2));
 
-	return X(ds.cond(e).body(s), X);
+        return updatePathMap(ds.cond(e).body(s), X);
     }
 }

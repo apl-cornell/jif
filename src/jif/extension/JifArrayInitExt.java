@@ -27,37 +27,37 @@ public class JifArrayInitExt extends JifExprExt
 
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
-	ArrayInit init = (ArrayInit) node();
+        ArrayInit init = (ArrayInit) node();
 
-	JifTypeSystem ts = lc.jifTypeSystem();
+        JifTypeSystem ts = lc.jifTypeSystem();
 
 
-	JifContext A = lc.jifContext();
+        JifContext A = lc.jifContext();
         A = (JifContext) init.del().enterScope(A);
 
-	A = (JifContext) A.pushBlock();
+        A = (JifContext) A.pushBlock();
 
-	PathMap X = ts.pathMap();
-	X = X.N(A.pc());
+        PathMap X = ts.pathMap();
+        X = X.N(A.pc());
 
-	List l = new ArrayList(init.elements().size());
+        List l = new ArrayList(init.elements().size());
 
-	for (Iterator i = init.elements().iterator(); i.hasNext(); ) {
-	    Expr e = (Expr) i.next(); 
-	    e = (Expr) lc.context(A).labelCheck(e);
-	    l.add(e);
+        for (Iterator i = init.elements().iterator(); i.hasNext(); ) {
+            Expr e = (Expr) i.next(); 
+            e = (Expr) lc.context(A).labelCheck(e);
+            l.add(e);
 
-	    PathMap Xe = X(e);
-	    X = X.N(ts.notTaken()).join(Xe);
+            PathMap Xe = getPathMap(e);
+            X = X.N(ts.notTaken()).join(Xe);
 
-	    A.setPc(X.N());
-	}
+            A.setPc(X.N());
+        }
 
         A = (JifContext) A.pop();
 
-	return X(init.elements(l), X);
+        return updatePathMap(init.elements(l), X);
     }
-    
+
     public void labelCheckElements(LabelChecker lc, Type lhsType) throws SemanticException {
         ArrayInit init = (ArrayInit) node();
 
@@ -71,16 +71,16 @@ public class JifArrayInitExt extends JifExprExt
         for (Iterator i = init.elements().iterator(); i.hasNext(); ) {
             Expr e = (Expr) i.next();
             Type s = e.type();
-    
+
             if (e instanceof ArrayInit) {
                 ((JifArrayInitExt) e.ext()).labelCheckElements(lc, t);
             }
 
             subtypeChecker.addSubtypeConstraints(lc, e.position(), t, s);
-         
+
             if (L != null) {
                 // check that the element can be assigned to the base type.
-                PathMap Xe = X(e);
+                PathMap Xe = getPathMap(e);
                 lc.constrain(new LabelConstraint(new NamedLabel("array_init_elem.nv", 
                                                                 "label of successful evaluation of array element " + e, 
                                                                 Xe.NV()), 
@@ -101,7 +101,7 @@ public class JifArrayInitExt extends JifExprExt
                 }
                 );
             }
-            
+
         }        
     }
 }

@@ -22,22 +22,22 @@ public class JifCaseExt extends JifStmtExt_c
 
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
-	Case cs = (Case) node();
-	
-	JifTypeSystem ts = lc.jifTypeSystem();
-	JifContext A = lc.jifContext();
+        Case cs = (Case) node();
+
+        JifTypeSystem ts = lc.jifTypeSystem();
+        JifContext A = lc.jifContext();
         A = (JifContext) cs.del().enterScope(A);
 
-	PathMap X;
-	
-	if (!cs.isDefault()) {
-	    Expr e = (Expr) lc.context(A).labelCheck(cs.expr());
-	    X = X(e).NV(ts.notTaken());
-	}
-	else {
-	    X = ts.pathMap().N(A.pc());
-	}
+        PathMap X;
 
-	return X(cs, X);
+        if (!cs.isDefault()) {
+            Expr e = (Expr) lc.context(A).labelCheck(cs.expr());
+            X = getPathMap(e).NV(ts.notTaken());
+        }
+        else {
+            X = ts.pathMap().N(A.pc());
+        }
+
+        return updatePathMap(cs, X);
     }
 }

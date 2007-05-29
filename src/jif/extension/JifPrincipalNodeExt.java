@@ -26,21 +26,21 @@ public class JifPrincipalNodeExt extends JifExprExt {
         JifTypeSystem ts = lc.jifTypeSystem();
 
         List throwTypes = new ArrayList(pn.del().throwTypes(ts));
-        
+
         Principal p = pn.principal();
         // make sure the principal is runtime representable
         if (!p.isRuntimeRepresentable()) {
             throw new SemanticException(
-                    "A principal used in an expression must be representable at runtime.",
-                    pn.position());
+                                        "A principal used in an expression must be representable at runtime.",
+                                        pn.position());
         }
 
         PathMap X1 = p.labelCheck(A, lc);
         throwTypes.removeAll(p.throwTypes(ts));
         A = (JifContext)A.pop();
-        
+
         checkThrowTypes(throwTypes);
-        return X(pn, X1);
+        return updatePathMap(pn, X1);
     }
 
 }

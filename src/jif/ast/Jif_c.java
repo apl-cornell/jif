@@ -105,12 +105,12 @@ public class Jif_c extends Ext_c implements Jif
     }
 
     // Some utility functions used to avoid casts.
-    public static PathMap X(Node n) {
-        return JifUtil.X(n);
+    public static PathMap getPathMap(Node n) {
+        return JifUtil.getPathMap(n);
     }
 
-    public static Node X(Node n, PathMap X) {
-        return JifUtil.X(n, X);
+    public static Node updatePathMap(Node n, PathMap X) {
+        return JifUtil.updatePathMap(n, X);
     }   
 
     /**

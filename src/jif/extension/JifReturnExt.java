@@ -24,41 +24,41 @@ public class JifReturnExt extends JifStmtExt_c
 
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
-	Return rs = (Return) node();
+        Return rs = (Return) node();
 
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
-	A = (JifContext) rs.del().enterScope(A);
+        A = (JifContext) rs.del().enterScope(A);
 
-	Expr e = null;
+        Expr e = null;
 
-	PathMap X;
+        PathMap X;
 
-	if (rs.expr() == null) {
-	    X = ts.pathMap();
-	    X = X.R(A.pc());
-	    X = X.NV(ts.notTaken());
-	}
-	else {
-	    e = (Expr) lc.context(A).labelCheck(rs.expr());
+        if (rs.expr() == null) {
+            X = ts.pathMap();
+            X = X.R(A.pc());
+            X = X.NV(ts.notTaken());
+        }
+        else {
+            e = (Expr) lc.context(A).labelCheck(rs.expr());
 
-	    PathMap Xe = X(e);
-            
+            PathMap Xe = getPathMap(e);
+
             X = Xe.N(ts.notTaken()).NV(ts.notTaken());
             X = X.R(Xe.N());
 
-	    CodeInstance ci = A.currentCode();
-	    if (! (ci instanceof MethodInstance)) {
-	        throw new SemanticException(
-		    "Cannot return a value from " + ci + ".");
-	    }
-	    JifMethodInstance mi = (JifMethodInstance) ci;
+            CodeInstance ci = A.currentCode();
+            if (! (ci instanceof MethodInstance)) {
+                throw new SemanticException(
+                                            "Cannot return a value from " + ci + ".");
+            }
+            JifMethodInstance mi = (JifMethodInstance) ci;
             // Type retType = A.instantiate(mi.returnType()); 
             final Type retType = mi.returnType();
 
             Label Lr = lc.upperBound(mi.returnLabel(), ts.callSitePCLabel(mi));
             Label Lrv = null;
-            
+
             if (ts.isLabeled(retType)) {
                 Lrv = lc.upperBound(ts.labelOfType(retType), Lr);
             }
@@ -75,34 +75,34 @@ public class JifReturnExt extends JifStmtExt_c
                                                                            Lrv),
                                                                            A.labelEnv(),
                                                                            rs.position())
-                    {
-                         public String msg() { 
-                             return "This method may return a value with " +
-                                    "a more restrictive label than the " +
-                                    "declared return value label.";
-                         }
-                         public String detailMsg() { 
-                             return msg() + " The declared return type " +
-                                    "of this method is " + retType + 
-                                    ". As such, values returned by this " +  
-                                    "method can have a label of at most " +
-                                    namedRhs() +".";
-                         }
-                         public String technicalMsg() {
-                             return "this method may return a value " +
-                                    "with a more restrictive label " + 
-                                    "than the declared return value label.";
-                         }
-                     }
+            {
+                public String msg() { 
+                    return "This method may return a value with " +
+                    "a more restrictive label than the " +
+                    "declared return value label.";
+                }
+                public String detailMsg() { 
+                    return msg() + " The declared return type " +
+                    "of this method is " + retType + 
+                    ". As such, values returned by this " +  
+                    "method can have a label of at most " +
+                    namedRhs() +".";
+                }
+                public String technicalMsg() {
+                    return "this method may return a value " +
+                    "with a more restrictive label " + 
+                    "than the declared return value label.";
+                }
+            }
             );
-            
-	    // Must check that the expression type is a subtype of the declared
-	    // return type.  Most of this is done in typeCheck, but if they are
-	    // instantitation types, we must add constraints for the labels.
-            subtypeChecker.addSubtypeConstraints(lc.context(A), e.position(),
-						 retType, e.type());
-	}
 
-	return X(rs.expr(e), X);
+            // Must check that the expression type is a subtype of the declared
+            // return type.  Most of this is done in typeCheck, but if they are
+            // instantitation types, we must add constraints for the labels.
+            subtypeChecker.addSubtypeConstraints(lc.context(A), e.position(),
+                                                 retType, e.type());
+        }
+
+        return updatePathMap(rs.expr(e), X);
     }
 }
