@@ -44,7 +44,7 @@ public class IntegerBoundsChecker extends DataFlow
         return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, edgeKeys);
     }
 
-    private static Set<Operator> INTERESTING_BINARY_OPERATORS = new HashSet<Operator>(Arrays.asList(
+    protected static final Set<Operator> INTERESTING_BINARY_OPERATORS = new HashSet<Operator>(Arrays.asList(
                                                                                 new Binary.Operator[] {
                                                                                         Binary.EQ,
                                                                                         Binary.LE,
@@ -57,7 +57,7 @@ public class IntegerBoundsChecker extends DataFlow
                                      falseItem, FlowGraph.EDGE_KEY_FALSE,
                                      otherItem, FlowGraph.EDGE_KEY_OTHER,
                                      n, graph);
-//        System.err.println("flow for " + n + " : in " + inItem);
+        System.err.println("flow for " + n + " : in " + inItem);
 
         DataFlowItem inDFItem = ((DataFlowItem)inItem);
         
@@ -172,7 +172,7 @@ public class IntegerBoundsChecker extends DataFlow
      * Add a bound. If strict is true, then it is left < rli. If strict is false, it is
      * left <= rli.
      */
-    private void addBound(Map<LocalInstance, Bounds> updates, Object left, boolean strict, Expr right) {
+    protected void addBound(Map<LocalInstance, Bounds> updates, Object left, boolean strict, Expr right) {
         if (right instanceof Local) {
             addBound(updates, left, strict, ((Local)right).localInstance());
         }
@@ -182,7 +182,7 @@ public class IntegerBoundsChecker extends DataFlow
      * Add a bound. If strict is true, then it is left < rli. If strict is false, it is
      * left <= rli.
      */
-    private void addBound(Map<LocalInstance, Bounds> updates, Object left, boolean strict, LocalInstance rli) {
+    protected void addBound(Map<LocalInstance, Bounds> updates, Object left, boolean strict, LocalInstance rli) {
         Set<LocalInstance> liLowerBounds = Collections.emptySet();
         Long lnum = null;
         if (left instanceof LocalInstance) {
@@ -219,7 +219,7 @@ public class IntegerBoundsChecker extends DataFlow
     /**
      * Returns the set of LocalInstances that are (non-strict) lower bounds on the expression
      */
-    private Set<LocalInstance> findLocalInstanceLowerBounds(Expr expr) {
+    protected Set<LocalInstance> findLocalInstanceLowerBounds(Expr expr) {
         if (expr instanceof Local) {
             return Collections.singleton(((Local)expr).localInstance());
         }
@@ -294,7 +294,7 @@ public class IntegerBoundsChecker extends DataFlow
                 LocalInstance li = iterator.next();
                 if (df.bounds.containsKey(li)) {
                     // merge the the bounds
-                    newMap.put(li, mergeBounds(newMap.get(li), df.bounds.get(li)));                    
+                    newMap.put(li, newMap.get(li).merge(df.bounds.get(li)));                    
                 }
                 else {
                     // the local does not exist in both, so conservatively we ignore it.
@@ -307,62 +307,16 @@ public class IntegerBoundsChecker extends DataFlow
     }
     
     /**
-     * Merge two bounds. The merge is conservative, meaning that
-     * the numeric (greatest lower) bound is the lower of the two,
-     * and the set of locals is the intersection of both.
-     */
-    protected static Bounds mergeBounds(Bounds b0, Bounds b1) {
-        if (b0.numericLowerBound == null || (b1.numericLowerBound != null && b0.numericLowerBound <= b1.numericLowerBound)) {                
-            if (b1.lowerBounds.containsAll(b0.lowerBounds)) {
-                // the merge is just b0, so save some time and memory...
-                return b0;
-            }
-        }
-        
-        Set<Bound> bnds = new HashSet<Bound>();
-        bnds.addAll(b0.lowerBounds);
-        bnds.retainAll(b1.lowerBounds);
-        Long numBnd = b0.numericLowerBound;        
-        if (b1.numericLowerBound == null || (numBnd != null && numBnd > b1.numericLowerBound)) {
-            numBnd = b1.numericLowerBound;
-        }
-        return new Bounds(numBnd, bnds);
-    }
-    
-    /**
-     * Merge two bounds. The merge is not conservative, meaning that
-     * the facts in both branches are true. So the numeric (greatest lower) bound is the greater 
-     * of the two, and the set of locals is the union of both.
-     */
-    protected static Bounds mergeBoundsNonconservative(Bounds b0, Bounds b1) {
-        if (b1.numericLowerBound == null || (b0.numericLowerBound != null && b0.numericLowerBound >= b1.numericLowerBound)) {
-            if (b0.lowerBounds.containsAll(b1.lowerBounds)) {
-                // the merge is just b0, so save some time and memory...
-                return b0;                
-            }
-        }
-        
-        Set<Bound> bnds = new HashSet<Bound>();
-        bnds.addAll(b0.lowerBounds);
-        bnds.addAll(b1.lowerBounds);
-        Long numBnd = b0.numericLowerBound;
-        if (numBnd == null || (b1.numericLowerBound != null && numBnd < b1.numericLowerBound)) {
-            numBnd = b1.numericLowerBound;
-        }
-        return new Bounds(numBnd, bnds);
-    }
-
-    /**
      * Find the greatest numeric lower bound for li, such that B < li 
      */
-    private Long findNumericLowerBound(LocalInstance li, DataFlowItem df) {
+    protected Long findNumericLowerBound(LocalInstance li, DataFlowItem df) {
         return findNumericLowerBound(li, df, new HashSet<LocalInstance>());
     }
     
     /**
      * Finds the greatest lower bound B it can for li, such that B < li
      */
-    private Long findNumericLowerBound(LocalInstance li, DataFlowItem df, Set<LocalInstance> seen) {
+    protected Long findNumericLowerBound(LocalInstance li, DataFlowItem df, Set<LocalInstance> seen) {
         if (df == null) return null;
         if (seen.contains(li)) return null;
         seen.add(li);        
@@ -382,7 +336,7 @@ public class IntegerBoundsChecker extends DataFlow
     /**
      * Finds the greatest lower bound B it can for expr, such that B < expr
      */
-    private Long findNumericLowerBound(Expr expr, DataFlowItem df) {
+    protected Long findNumericLowerBound(Expr expr, DataFlowItem df) {
         if (!expr.type().isNumeric()) return null;
         Long best = null, existing = null;
         if (df == null) {
@@ -481,28 +435,29 @@ public class IntegerBoundsChecker extends DataFlow
         return max(best, existing);
     }
     
-    private static Long max(Long a, Long b) {
+    protected static Long max(Long a, Long b) {
         if (a == null) return b;
         if (b == null) return a;
         return a.longValue() < b.longValue() ? b : a;
     }
     
-    private abstract static class Bound {
-        final boolean strict;        
-        Bound(boolean strict) {
+    protected static abstract class Bound {
+        protected final boolean strict;        
+        public Bound(boolean strict) {
             this.strict = strict;
         }
-        abstract Bound strict(boolean strict);
+        public abstract Bound strict(boolean strict);
         public abstract int hashCode();
         public abstract boolean equals(Object o);
     }
-    private static class LocalBound extends Bound {
-        final LocalInstance li;
+    
+    protected static class LocalBound extends Bound {
+        protected final LocalInstance li;
         LocalBound(boolean strict, LocalInstance bound) {
             super(strict);
             this.li = bound;
         }
-        Bound strict(boolean strict) {
+        public Bound strict(boolean strict) {
             if (this.strict == strict) return this;
             return new LocalBound(strict, li);
         }
@@ -520,15 +475,16 @@ public class IntegerBoundsChecker extends DataFlow
             return li.hashCode();
         }
     }
-    private static class Bounds {
-        final Long numericLowerBound; // is always strict
-        final Set<Bound> lowerBounds;
+    
+    protected static class Bounds {
+        protected final Long numericLowerBound; // is always strict
+        protected final Set<Bound> lowerBounds;
 
-        Bounds() {
+        public Bounds() {
             lowerBounds = new HashSet<Bound>();
             numericLowerBound = null;
         }
-        Bounds(Long numericBound, Set<Bound> bounds) {
+        public Bounds(Long numericBound, Set<Bound> bounds) {
             this.numericLowerBound = numericBound;
             this.lowerBounds = bounds;
         }
@@ -549,19 +505,70 @@ public class IntegerBoundsChecker extends DataFlow
             return (numericLowerBound==null?0:numericLowerBound.hashCode()) ^ lowerBounds.hashCode();
         }
 
+        /**
+         * Merge two bounds. The merge is conservative, meaning that
+         * the numeric (greatest lower) bound is the lower of the two,
+         * and the set of locals is the intersection of both.
+         */
+        public Bounds merge(Bounds b1) {
+        	Bounds b0 = this;
+        	
+            if (b0.numericLowerBound == null || (b1.numericLowerBound != null && b0.numericLowerBound <= b1.numericLowerBound)) {                
+                if (b1.lowerBounds.containsAll(b0.lowerBounds)) {
+                    // the merge is just b0, so save some time and memory...
+                    return b0;
+                }
+            }
+            
+            Set<Bound> bnds = new HashSet<Bound>();
+            bnds.addAll(b0.lowerBounds);
+            bnds.retainAll(b1.lowerBounds);
+            Long numBnd = b0.numericLowerBound;        
+            if (b1.numericLowerBound == null || (numBnd != null && numBnd > b1.numericLowerBound)) {
+                numBnd = b1.numericLowerBound;
+            }
+            return new Bounds(numBnd, bnds);
+        }
+        
+        /**
+         * Merge two bounds. The merge is not conservative, meaning that
+         * the facts in both branches are true. So the numeric (greatest lower) bound is the greater 
+         * of the two, and the set of locals is the union of both.
+         */
+        public Bounds mergeNonconservative(Bounds b1) {
+        	Bounds b0 = this;
+        	
+            if (b1.numericLowerBound == null || (b0.numericLowerBound != null && b0.numericLowerBound >= b1.numericLowerBound)) {
+                if (b0.lowerBounds.containsAll(b1.lowerBounds)) {
+                    // the merge is just b0, so save some time and memory...
+                    return b0;                
+                }
+            }
+            
+            Set<Bound> bnds = new HashSet<Bound>();
+            bnds.addAll(b0.lowerBounds);
+            bnds.addAll(b1.lowerBounds);
+            Long numBnd = b0.numericLowerBound;
+            if (numBnd == null || (b1.numericLowerBound != null && numBnd < b1.numericLowerBound)) {
+                numBnd = b1.numericLowerBound;
+            }
+            return new Bounds(numBnd, bnds);
+        }
+
     }
+    
     /**
      * The items that this dataflow analysis operates on is essetially a set
      * of integer constraints.
      * 
      * There is a Map from LocalInstances (of type int) to a set of lower bounds.
      */
-    static class DataFlowItem extends Item {
+    protected static class DataFlowItem extends Item {
         /**
          * map from LocalInstances (of type int) a set of lower bounds. Elements in
          * the set are either Number or LocalInstances
          */
-        final Map<LocalInstance, Bounds> bounds;
+        private final Map<LocalInstance, Bounds> bounds;
 
 
         DataFlowItem() {
@@ -588,7 +595,8 @@ public class IntegerBoundsChecker extends DataFlow
 
         public String toString() {
             return bounds.toString();
-        }        
+        }
+        
         /**
          * Produce a new DataFlowItem that is updated with the updates. In particular, the bounds
          * in updates are known to be true. Information about the LocalInstance invalid is no longer
@@ -645,7 +653,7 @@ public class IntegerBoundsChecker extends DataFlow
                 }
                 else {
                     // already had some bounds. Merge them, knowing that all the facts in both are correct.
-                    Bounds b2 = mergeBoundsNonconservative(b1, b0);
+                    Bounds b2 = b1.mergeNonconservative(b0);
                     if (b2 != b1) {
                         newBounds.put(li, b2);
                         changed = true;
