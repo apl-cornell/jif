@@ -206,18 +206,20 @@ public class IntegerBoundsChecker extends DataFlow
         }
         for (Iterator<LocalInstance> iter = liLowerBounds.iterator(); iter.hasNext();) {
             LocalInstance lli = iter.next();
-            b.lowerBounds.add(new LocalBound(strict, lli));            
+            b.bounds.add(new LocalBound(Bound.GT.strict(strict), lli));            
         }
 
         if (lnum != null) {
-            if (b.numericLowerBound == null || b.numericLowerBound.longValue() < lnum.longValue()) {
-                b = new Bounds(lnum, b.lowerBounds);
+            if (b.range.lower == null || b.range.lower < lnum) {
+                b = new Bounds(lnum, b.bounds);
                 updates.put(rli, b);
             }
         }
     }
+    
     /**
-     * Returns the set of LocalInstances that are (non-strict) lower bounds on the expression
+     * Returns the set of LocalInstances that are (non-strict) lower bounds on
+     * the expression
      */
     protected Set<LocalInstance> findLocalInstanceLowerBounds(Expr expr) {
         if (expr instanceof Local) {
@@ -323,14 +325,20 @@ public class IntegerBoundsChecker extends DataFlow
         
         Bounds b = df.bounds.get(li);
         if (b == null) return null;
-        Long num = b.numericLowerBound;
-        for (Iterator iter = b.lowerBounds.iterator(); iter.hasNext();) {
-            LocalBound lb = (LocalBound)iter.next();
-            Long lbb = findNumericLowerBound(lb.li, df, seen);
-            if (lbb != null && (num == null || num.longValue() < lbb.longValue())) {
-                num = lbb;
+        Long num = b.range.lower;
+        
+        for (Iterator<Bound> iter = b.bounds.iterator(); iter.hasNext();) {
+            LocalBound lb = (LocalBound) iter.next();
+            
+            if (lb.type.isLower()) {
+                Long lbb = findNumericLowerBound(lb.li, df, seen);
+                
+                if (lbb != null && (num == null || num.longValue() < lbb.longValue())) {
+                    num = lbb;
+                }
             }
         }
+        
         return num;
     }
     /**
@@ -438,73 +446,266 @@ public class IntegerBoundsChecker extends DataFlow
     protected static Long max(Long a, Long b) {
         if (a == null) return b;
         if (b == null) return a;
-        return a.longValue() < b.longValue() ? b : a;
+        return a < b ? b : a;
+    }
+
+    protected static Long min(Long a, Long b) {
+        if (a == null) return b;
+        if (b == null) return a;
+        return a < b ? a : b;
     }
     
     protected static abstract class Bound {
-        protected final boolean strict;        
-        public Bound(boolean strict) {
-            this.strict = strict;
+        
+        public static enum Type {
+            
+            LT("<"), LE("<="), GT(">"), GE(">=");
+            
+            private final String name;
+            
+            private Type(String name) {
+                this.name = name;
+            }
+            
+            public boolean isStrict() {
+                return this == LT || this == GT;
+            }
+            
+            public boolean isLower() {
+                return this == LT || this == LE;
+            }
+            
+            public boolean isUpper() {
+                return this == GT || this == GE;
+            }
+            
+            public Type strict() {
+                switch (this) {
+                case LE: return LT;
+                case GE: return GT;
+                default: return this;
+                }
+            }
+            
+            public Type nonStrict() {
+                switch (this) {
+                case LT: return LE;
+                case GT: return GE;
+                default: return this;
+                }
+            }
+            
+            public Type strict(boolean strict) {
+                return strict ? strict() : nonStrict();
+            }
+            
+            public String toString() {
+                return name;
+            }
+            
         }
+        
+        public static final Type LT = Type.LT;
+        public static final Type LE = Type.LE;
+        public static final Type GT = Type.GT;
+        public static final Type GE = Type.GE;
+        
+        protected final Type type;
+        
+        public Bound(Type type) {
+            this.type = type;
+        }
+
+        public boolean equals(Object o) {
+            if (o instanceof Bound) {
+                Bound other = (Bound) o;
+                return type == other.type;
+            } else {
+                return false;
+            }
+        }
+
+        public int hashCode() {
+            return type.hashCode();
+        }
+        
+        public String toString() {
+            return type.toString();
+        }
+        
         public abstract Bound strict(boolean strict);
-        public abstract int hashCode();
-        public abstract boolean equals(Object o);
+        
     }
     
     protected static class LocalBound extends Bound {
+        
         protected final LocalInstance li;
-        LocalBound(boolean strict, LocalInstance bound) {
-            super(strict);
+        
+        public LocalBound(Type type, LocalInstance bound) {
+            super(type);
             this.li = bound;
         }
+        
         public Bound strict(boolean strict) {
-            if (this.strict == strict) return this;
-            return new LocalBound(strict, li);
+            if (type.isStrict() == strict) return this;
+            return new LocalBound(type.strict(strict), li);
         }
-        public String toString() {
-            return li.name() + (strict?"<":"<=");
-        }
+        
         public boolean equals(Object o) {
             if (o instanceof LocalBound) {
-                LocalBound that = (LocalBound)o;
-                return this.strict == that.strict && this.li.equals(that.li);
+                LocalBound other = (LocalBound) o;
+                return super.equals(o) && li.equals(other.li);
+            } else {
+                return false;
             }
-            return false;
         }
+        
         public int hashCode() {
-            return li.hashCode();
+            return super.hashCode() ^ li.hashCode();
+        }
+
+        public String toString() {
+            return type + li.name();
+        }
+        
+    }
+    
+    /**
+     * Checks two reference for object equality. Deals with null pointers.
+     * Should really be a utility method somewhere...
+     */
+    protected static boolean nullableEquals(Object o1, Object o2) {
+        if (o1 == o2) {
+            return true;  // includes null == null
+        } else if (o1 == null || o2 == null) {
+            return false;  // can't both be null
+        } else {
+            return o1.equals(o2);  // both non-null
         }
     }
     
+    /**
+     * Gets the hash code for a given object, dealing with null pointers.
+     */
+    protected static int nullableHashCode(Object o) {
+        if (o == null) {
+            return 0;
+        } else {
+            return o.hashCode();
+        }
+    }
+    
+    /**
+     * An interval over the integers.
+     */
+    protected static class Interval {
+        
+        public static final Interval FULL = new Interval(null, null);
+        
+        protected final Long lower;
+        protected final Long upper;
+        
+        public Interval(Long lower, Long upper) {
+            this.lower = lower;
+            this.upper = upper;
+        }
+
+        public Long getLower() {
+            return lower;
+        }
+
+        public Long getUpper() {
+            return upper;
+        }
+        
+        /**
+         * Returns whether this interval is a superset of the other.
+         */
+        public boolean contains(Interval other) {
+            boolean low = lower == null || 
+                (other.lower != null && lower <= other.lower);
+            boolean high = upper == null ||
+                (other.upper != null && upper >= other.upper);
+            return low && high;
+        }
+        
+        /**
+         * Returns the smallest interval that contains this and the other
+         * interval.
+         */
+        public Interval union(Interval other) {
+            Long low = min(lower, other.lower);
+            Long high = max(upper, other.upper);
+            return new Interval(low, high);
+        }
+        
+        /**
+         * Returns the intersection of this and the other interval.
+         */
+        public Interval intersect(Interval other) {
+            Long low = max(lower, other.lower);
+            Long high = min(upper, other.upper);
+            return new Interval(low, high);
+        }
+        
+        public boolean equals(Object o) {
+            if (o instanceof Interval) {
+                Interval that = (Interval) o;
+                return nullableEquals(this.lower, that.lower) &&
+                    nullableEquals(this.upper, that.upper);
+            } else {
+                return false;
+            }
+        }
+        
+        public int hashCode() {
+            return nullableHashCode(lower) ^ nullableHashCode(upper);
+        }
+        
+        private static String nullableLong(Long i) {
+            return i == null ? "-" : i.toString();
+        }
+        
+        public String toString() {
+            return "[" + nullableLong(lower) + "," + nullableLong(upper) + "]";
+        }
+
+    }
+    
     protected static class Bounds {
-        protected final Long numericLowerBound; // is always strict
-        protected final Set<Bound> lowerBounds;
+        protected final Interval range;  // is always strict
+        protected final Set<Bound> bounds;
 
         public Bounds() {
-            lowerBounds = new HashSet<Bound>();
-            numericLowerBound = null;
+            range = Interval.FULL;
+            bounds = new HashSet<Bound>();
         }
-        public Bounds(Long numericBound, Set<Bound> bounds) {
-            this.numericLowerBound = numericBound;
-            this.lowerBounds = bounds;
-        }
-        public String toString() {
-            return "(" + numericLowerBound + ", " + lowerBounds + ")";
-        }
-        public boolean equals(Object o) {
-            if (o instanceof Bounds) {
-                Bounds that = (Bounds)o;
-                if (this.numericLowerBound == that.numericLowerBound || 
-                        (this.numericLowerBound != null && this.numericLowerBound.equals(that.numericLowerBound))) {
-                    return this.lowerBounds.equals(that.lowerBounds);
-                }
+        
+        public Bounds(Interval range, Set<Bound> bounds) {
+            if (range == null || bounds == null) {
+                throw new NullPointerException();
             }
-            return false;
+            
+            this.range = range;
+            this.bounds = bounds;
         }
-        public int hashCode() {
-            return (numericLowerBound==null?0:numericLowerBound.hashCode()) ^ lowerBounds.hashCode();
+        
+        public Bounds(Long lowerBound, Long upperBound, Set<Bound> bounds) {
+            this(new Interval(lowerBound, upperBound), bounds);
         }
-
+        
+        public Bounds(Long lowerBound, Set<Bound> bounds) {
+            this(lowerBound, null, bounds);
+        }
+        
+        public Long getNumericLower() {
+            return range.lower;
+        }
+        
+        public Long getNumericUpper() {
+            return range.upper;
+        }
+        
         /**
          * Merge two bounds. The merge is conservative, meaning that
          * the numeric (greatest lower) bound is the lower of the two,
@@ -513,48 +714,54 @@ public class IntegerBoundsChecker extends DataFlow
         public Bounds merge(Bounds b1) {
         	Bounds b0 = this;
         	
-            if (b0.numericLowerBound == null || (b1.numericLowerBound != null && b0.numericLowerBound <= b1.numericLowerBound)) {                
-                if (b1.lowerBounds.containsAll(b0.lowerBounds)) {
-                    // the merge is just b0, so save some time and memory...
-                    return b0;
-                }
+            if (b0.range.contains(b1.range) && b1.bounds.containsAll(b0.bounds)) {
+                // the merge is just b0, so save some time and memory...
+                return b0;
             }
-            
-            Set<Bound> bnds = new HashSet<Bound>();
-            bnds.addAll(b0.lowerBounds);
-            bnds.retainAll(b1.lowerBounds);
-            Long numBnd = b0.numericLowerBound;        
-            if (b1.numericLowerBound == null || (numBnd != null && numBnd > b1.numericLowerBound)) {
-                numBnd = b1.numericLowerBound;
-            }
-            return new Bounds(numBnd, bnds);
+
+            Interval rng = b0.range.union(b1.range);
+            Set<Bound> bnds = new HashSet<Bound>(b0.bounds);
+            bnds.retainAll(b1.bounds);
+            return new Bounds(rng, bnds);
         }
         
         /**
-         * Merge two bounds. The merge is not conservative, meaning that
-         * the facts in both branches are true. So the numeric (greatest lower) bound is the greater 
-         * of the two, and the set of locals is the union of both.
+         * Merge two bounds. The merge is not conservative, meaning that the
+         * facts in both branches are true. So the numeric (greatest lower)
+         * bound is the greater of the two, and the set of locals is the union
+         * of both.
          */
         public Bounds mergeNonconservative(Bounds b1) {
         	Bounds b0 = this;
         	
-            if (b1.numericLowerBound == null || (b0.numericLowerBound != null && b0.numericLowerBound >= b1.numericLowerBound)) {
-                if (b0.lowerBounds.containsAll(b1.lowerBounds)) {
-                    // the merge is just b0, so save some time and memory...
-                    return b0;                
-                }
+            if (b1.range.contains(b0.range) && b0.bounds.containsAll(b1.bounds)) {
+                // the merge is just b0, so save some time and memory...
+                return b0;                
             }
-            
-            Set<Bound> bnds = new HashSet<Bound>();
-            bnds.addAll(b0.lowerBounds);
-            bnds.addAll(b1.lowerBounds);
-            Long numBnd = b0.numericLowerBound;
-            if (numBnd == null || (b1.numericLowerBound != null && numBnd < b1.numericLowerBound)) {
-                numBnd = b1.numericLowerBound;
-            }
-            return new Bounds(numBnd, bnds);
+
+            Interval rng = b0.range.intersect(b1.range);
+            Set<Bound> bnds = new HashSet<Bound>(b0.bounds);
+            bnds.addAll(b1.bounds);
+            return new Bounds(rng, bnds);
         }
 
+        public boolean equals(Object o) {
+            if (o instanceof Bounds) {
+                Bounds that = (Bounds) o;
+                return range.equals(that.range) && bounds.equals(that.bounds);
+            } else {
+                return false;
+            }
+        }
+        
+        public int hashCode() {
+            return range.hashCode() ^ bounds.hashCode();
+        }
+
+        public String toString() {
+            return "(" + range + ", " + bounds + ")";
+        }
+        
     }
     
     /**
@@ -623,27 +830,30 @@ public class IntegerBoundsChecker extends DataFlow
             }
             
             // apply each of the updates.
-            for (Iterator iterator = updates.entrySet().iterator(); iterator.hasNext();) {
-                Entry<LocalInstance, Bounds> entry = (Entry<LocalInstance, Bounds>)iterator.next();
+            for (Iterator<Entry<LocalInstance, Bounds>> iterator = 
+                    updates.entrySet().iterator(); iterator.hasNext();) {
+                Entry<LocalInstance, Bounds> entry = iterator.next();
                 LocalInstance li = entry.getKey();
                 Bounds b0 = entry.getValue();
                 if (li.equals(invalid)) {
                     // if the old value of the invalid is a lower bound for the new value of the invalid,
                     // the lower bounds of the old value are lower bounds for the new value.
-                    LocalBound invalidStrict = new LocalBound(true, invalid);
-                    LocalBound invalidNonStrict = new LocalBound(false, invalid);
-                    if (this.bounds.containsKey(invalid) && (b0.lowerBounds.contains(invalidStrict) || b0.lowerBounds.contains(invalidNonStrict))) {
+                    LocalBound invalidStrict = new LocalBound(Bound.GT, invalid);
+                    LocalBound invalidNonStrict = new LocalBound(Bound.GE, invalid);
+                    
+                    if (this.bounds.containsKey(invalid) && 
+                            (b0.bounds.contains(invalidStrict) || 
+                                    b0.bounds.contains(invalidNonStrict))) {
                         // NOTE: if invalidBounds.bounds.contains(invalidStrict), then we can be more precise, as all
                         // the old bounds are now strict bounds.
                         Bounds oldInvBounds = this.bounds.get(invalid);
-                        Long numBound = b0.numericLowerBound; 
-                        if (numBound == null || (oldInvBounds.numericLowerBound != null && 
-                                numBound.longValue() < oldInvBounds.numericLowerBound.longValue())) {
-                            numBound = oldInvBounds.numericLowerBound;
+                        Interval rng = b0.range; 
+                        if (rng.contains(oldInvBounds.range)) {
+                            rng = oldInvBounds.range;
                         }
                         changed = true;
-                        b0 = new Bounds(numBound, new HashSet<Bound>(b0.lowerBounds));
-                        b0.lowerBounds.addAll(oldInvBounds.lowerBounds);
+                        b0 = new Bounds(rng, new HashSet<Bound>(b0.bounds));
+                        b0.bounds.addAll(oldInvBounds.bounds);
                     }                    
                 }
                 Bounds b1 = newBounds.get(li);
@@ -664,18 +874,19 @@ public class IntegerBoundsChecker extends DataFlow
             // take care of the invalidated local instance
             if (invalid != null) {
                 // remove any reference to the invalid local variable
-                LocalBound invalidStrict = new LocalBound(true, invalid);
-                LocalBound invalidNonStrict = new LocalBound(false, invalid);
+                LocalBound invalidStrict = new LocalBound(Bound.GT, invalid);
+                LocalBound invalidNonStrict = new LocalBound(Bound.GE, invalid);
                 Map<LocalInstance, Bounds> cleanedBounds = new HashMap<LocalInstance, Bounds>();
-                for (Iterator iter = newBounds.entrySet().iterator(); iter.hasNext();) {
-                    Entry<LocalInstance, Bounds> entry = (Entry<LocalInstance, Bounds>)iter.next();
+                for (Iterator<Entry<LocalInstance, Bounds>> iter = 
+                        newBounds.entrySet().iterator(); iter.hasNext();) {
+                    Entry<LocalInstance, Bounds> entry = iter.next();
                     
                     Bounds b = entry.getValue();
-                    if (b.lowerBounds.contains(invalidStrict) || b.lowerBounds.contains(invalidNonStrict)) {
+                    if (b.bounds.contains(invalidStrict) || b.bounds.contains(invalidNonStrict)) {
                         changed = true;
-                        b = new Bounds(b.numericLowerBound, new HashSet<Bound>(b.lowerBounds));
-                        b.lowerBounds.remove(invalidStrict);
-                        b.lowerBounds.remove(invalidNonStrict);
+                        b = new Bounds(b.range, new HashSet<Bound>(b.bounds));
+                        b.bounds.remove(invalidStrict);
+                        b.bounds.remove(invalidNonStrict);
                         
                     }
                     cleanedBounds.put(entry.getKey(), b);                    
