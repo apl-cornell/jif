@@ -36,6 +36,7 @@ public class IntegerBoundsChecker extends DataFlow
     protected Item createInitialItem(FlowGraph graph, Term node) {
         return new DataFlowItem();
     }
+    
     /**
      * We use boolean flows for this dataflow analysis, i.e., we want to track
      * different information on the true and false branches.
@@ -44,15 +45,12 @@ public class IntegerBoundsChecker extends DataFlow
         return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, edgeKeys);
     }
 
-    protected static final Set<Operator> INTERESTING_BINARY_OPERATORS = new HashSet<Operator>(Arrays.asList(
-                                                                                new Binary.Operator[] {
-                                                                                        Binary.EQ,
-                                                                                        Binary.LE,
-                                                                                        Binary.LT,
-                                                                                        Binary.GE,
-                                                                                        Binary.GT,
-                                                                                } ));
-    public Map flow(Item trueItem, Item falseItem, Item otherItem, FlowGraph graph, Term n, Set succEdgeKeys) {
+    protected static final Set<Operator> INTERESTING_BINARY_OPERATORS = 
+        new HashSet<Operator>(Arrays.asList(new Binary.Operator[] { 
+                Binary.EQ, Binary.LE, Binary.LT, Binary.GE, Binary.GT, }));
+    
+    public Map flow(Item trueItem, Item falseItem, Item otherItem, 
+            FlowGraph graph, Term n, Set succEdgeKeys) {
         Item inItem = safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, 
                                      falseItem, FlowGraph.EDGE_KEY_FALSE,
                                      otherItem, FlowGraph.EDGE_KEY_OTHER,
@@ -63,8 +61,9 @@ public class IntegerBoundsChecker extends DataFlow
         
         // create a map of updates, that is, the information that we know to
         // be true as a result of flowing over the term n
-        Map<LocalInstance, Bounds> updates = new HashMap<LocalInstance, Bounds>(); 
-        LocalInstance invalid = null; // if any local variable is invalidated
+        Map<LocalInstance, Bounds> updates = new HashMap<LocalInstance, Bounds>();
+        // if the value of a local changes, it goes in one of these two, or both
+        LocalInstance increased = null, decreased = null;
 
         if (n instanceof LocalDecl) {
             LocalDecl ld = (LocalDecl)n;
@@ -73,7 +72,9 @@ public class IntegerBoundsChecker extends DataFlow
                 addBound(updates, ld.localInstance(), false, ld.init());
                 addBound(updates, ld.init(), false, ld.localInstance());
             }
-            invalid = ld.localInstance();
+            
+            // XXX can be smarter and decide if only increases or decreases
+            increased = decreased = ld.localInstance();
         }
         else if (n instanceof LocalAssign) {
             LocalAssign la = (LocalAssign)n;
@@ -87,17 +88,20 @@ public class IntegerBoundsChecker extends DataFlow
             // li = e, so add li <= e, and e <= li
             addBound(updates, la.left(), false, right);
             addBound(updates, right, false, (Local)la.left());
-            invalid = ((Local)la.left()).localInstance();
+            
+            // XXX can be smarter and decide if only increases or decreases
+            increased = decreased = ((Local) la.left()).localInstance();
         }
         else if (n instanceof Unary) {
             Unary u = (Unary)n;
             if (u.expr() instanceof Local) {
                 Local l = (Local)u.expr();
-                if (u.operator().equals(Unary.POST_INC) || u.operator().equals(Unary.PRE_INC) ||
-                        u.operator().equals(Unary.POST_DEC) || u.operator().equals(Unary.PRE_DEC)) {
-                    // x = x + 1, or x = x -1 , therefore x < x
-                    addBound(updates, l, true, l);
-                    invalid = l.localInstance();
+                if (u.operator().equals(Unary.POST_INC) || 
+                        u.operator().equals(Unary.PRE_INC)) {
+                    increased = l.localInstance();
+                } else if (u.operator().equals(Unary.POST_DEC) ||
+                        u.operator().equals(Unary.PRE_DEC)) {
+                    decreased = l.localInstance();
                 }
             }
         }
@@ -143,14 +147,14 @@ public class IntegerBoundsChecker extends DataFlow
             }
             if (flowedOverBinary) {
                 // track the true and false branches precisely.
-                DataFlowItem trueOutDFItem = inDFItem.update(updates, invalid);
-                DataFlowItem falseOutDFItem = inDFItem.update(falseupdates, invalid);
+                DataFlowItem trueOutDFItem = inDFItem.update(updates, increased, decreased);
+                DataFlowItem falseOutDFItem = inDFItem.update(falseupdates, increased, decreased);
                 return itemsToMap(trueOutDFItem, falseOutDFItem, null, succEdgeKeys);
             }
             
         }
         // apply the updates to the data flow item.
-        DataFlowItem outDFItem = inDFItem.update(updates, invalid);
+        DataFlowItem outDFItem = inDFItem.update(updates, increased, decreased);
 
         if (n instanceof Expr && ((Expr)n).type().isNumeric()) {
             ((JifExprExt)n.ext()).setNumericLowerBound(findNumericLowerBound((Expr)n, inDFItem));
@@ -206,7 +210,7 @@ public class IntegerBoundsChecker extends DataFlow
         }
         for (Iterator<LocalInstance> iter = liLowerBounds.iterator(); iter.hasNext();) {
             LocalInstance lli = iter.next();
-            b.bounds.add(new LocalBound(Bound.GT.strict(strict), lli));            
+            b.bounds.add(new LocalBound(Bound.lower(strict), lli));            
         }
 
         if (lnum != null) {
@@ -330,7 +334,7 @@ public class IntegerBoundsChecker extends DataFlow
         for (Iterator<Bound> iter = b.bounds.iterator(); iter.hasNext();) {
             LocalBound lb = (LocalBound) iter.next();
             
-            if (lb.type.isLower()) {
+            if (lb.isLower()) {
                 Long lbb = findNumericLowerBound(lb.li, df, seen);
                 
                 if (lbb != null && (num == null || num.longValue() < lbb.longValue())) {
@@ -341,6 +345,7 @@ public class IntegerBoundsChecker extends DataFlow
         
         return num;
     }
+    
     /**
      * Finds the greatest lower bound B it can for expr, such that B < expr
      */
@@ -457,7 +462,7 @@ public class IntegerBoundsChecker extends DataFlow
     
     protected static abstract class Bound {
         
-        public static enum Type {
+        protected static enum Type {
             
             LT("<"), LE("<="), GT(">"), GE(">=");
             
@@ -469,14 +474,6 @@ public class IntegerBoundsChecker extends DataFlow
             
             public boolean isStrict() {
                 return this == LT || this == GT;
-            }
-            
-            public boolean isLower() {
-                return this == LT || this == LE;
-            }
-            
-            public boolean isUpper() {
-                return this == GT || this == GE;
             }
             
             public Type strict() {
@@ -510,12 +507,28 @@ public class IntegerBoundsChecker extends DataFlow
         public static final Type GT = Type.GT;
         public static final Type GE = Type.GE;
         
+        public static Type lower(boolean strict) {
+            return GT.strict(strict);
+        }
+        
+        public static Type upper(boolean strict) {
+            return LT.strict(strict);
+        }
+        
         protected final Type type;
         
         public Bound(Type type) {
             this.type = type;
         }
 
+        public boolean isUpper() {
+            return type == LT || type == LE;
+        }
+        
+        public boolean isLower() {
+            return type == GT || type == GE;
+        }
+        
         public boolean equals(Object o) {
             if (o instanceof Bound) {
                 Bound other = (Bound) o;
@@ -596,11 +609,21 @@ public class IntegerBoundsChecker extends DataFlow
     }
     
     /**
-     * An interval over the integers.
+     * An (open) interval over the integers.
      */
     protected static class Interval {
         
+        /**
+         * Interval representing all integers.
+         */
         public static final Interval FULL = new Interval(null, null);
+
+        /**
+         * Returns an interval containing only one integer.
+         */
+        public static Interval singleton(long i) {
+            return new Interval(i - 1, i + 1);
+        }
         
         protected final Long lower;
         protected final Long upper;
@@ -648,11 +671,20 @@ public class IntegerBoundsChecker extends DataFlow
             return new Interval(low, high);
         }
         
+        /**
+         * Returns an interval that is this one shifted by the given amount.
+         */
+        public Interval shift(long i) {
+            Long low = lower == null ? null : lower + i;
+            Long high = upper == null ? null : upper + i;
+            return new Interval(low, high);
+        }
+        
         public boolean equals(Object o) {
             if (o instanceof Interval) {
-                Interval that = (Interval) o;
-                return nullableEquals(this.lower, that.lower) &&
-                    nullableEquals(this.upper, that.upper);
+                Interval other = (Interval) o;
+                return nullableEquals(this.lower, other.lower) &&
+                    nullableEquals(this.upper, other.upper);
             } else {
                 return false;
             }
@@ -673,6 +705,7 @@ public class IntegerBoundsChecker extends DataFlow
     }
     
     protected static class Bounds {
+        
         protected final Interval range;  // is always strict
         protected final Set<Bound> bounds;
 
@@ -706,6 +739,19 @@ public class IntegerBoundsChecker extends DataFlow
             return range.upper;
         }
         
+        public Set<Bound> getBounds() {
+            return bounds;
+        }
+        
+        /**
+         * Returns whether these bounds are at least as tight as the other
+         * bounds.
+         */
+        public boolean isTighterThan(Bounds other) {
+            return other.range.contains(this.range) && 
+                this.bounds.containsAll(other.bounds);
+        }
+        
         /**
          * Merge two bounds. The merge is conservative, meaning that
          * the numeric (greatest lower) bound is the lower of the two,
@@ -714,9 +760,11 @@ public class IntegerBoundsChecker extends DataFlow
         public Bounds merge(Bounds b1) {
         	Bounds b0 = this;
         	
-            if (b0.range.contains(b1.range) && b1.bounds.containsAll(b0.bounds)) {
+            if (b1.isTighterThan(b0)) {
                 // the merge is just b0, so save some time and memory...
                 return b0;
+            } else if (b0.isTighterThan(b1)) {
+                return b1;
             }
 
             Interval rng = b0.range.union(b1.range);
@@ -731,12 +779,14 @@ public class IntegerBoundsChecker extends DataFlow
          * bound is the greater of the two, and the set of locals is the union
          * of both.
          */
-        public Bounds mergeNonconservative(Bounds b1) {
+        public Bounds refine(Bounds b1) {
         	Bounds b0 = this;
         	
-            if (b1.range.contains(b0.range) && b0.bounds.containsAll(b1.bounds)) {
+            if (b0.isTighterThan(b1)) {
                 // the merge is just b0, so save some time and memory...
                 return b0;                
+            } else if (b1.isTighterThan(b0)) {
+                return b1;
             }
 
             Interval rng = b0.range.intersect(b1.range);
@@ -771,29 +821,32 @@ public class IntegerBoundsChecker extends DataFlow
      * There is a Map from LocalInstances (of type int) to a set of lower bounds.
      */
     protected static class DataFlowItem extends Item {
+        
         /**
          * map from LocalInstances (of type int) a set of lower bounds. Elements in
          * the set are either Number or LocalInstances
          */
-        private final Map<LocalInstance, Bounds> bounds;
+        protected final Map<LocalInstance, Bounds> bounds;
 
-
-        DataFlowItem() {
+        public DataFlowItem() {
             bounds = Collections.emptyMap();
         }
-        private DataFlowItem(Map<LocalInstance, Bounds> lowerBounds) {
-            this.bounds = lowerBounds;
+        
+        protected DataFlowItem(Map<LocalInstance, Bounds> bounds) {
+            this.bounds = bounds;
         }
-        DataFlowItem(DataFlowItem d) {
+        
+        public DataFlowItem(DataFlowItem d) {
             bounds = new HashMap<LocalInstance, Bounds>(d.bounds);
         }
 
         public boolean equals(Object o) {
             if (o instanceof DataFlowItem) {
-                return (this.bounds == ((DataFlowItem)o).bounds || 
-                        this.bounds.equals(((DataFlowItem)o).bounds));
+                DataFlowItem other = (DataFlowItem) o;
+                return bounds.equals(other.bounds);
+            } else {
+                return false;
             }
-            return false;
         }
 
         public int hashCode() {
@@ -805,9 +858,12 @@ public class IntegerBoundsChecker extends DataFlow
         }
         
         /**
-         * Produce a new DataFlowItem that is updated with the updates. In particular, the bounds
-         * in updates are known to be true. Information about the LocalInstance invalid is no longer
-         * true; otherwise, all other facts in this DataFlowItem continue to be true.
+         * Produce a new DataFlowItem that is updated with the updates. In
+         * particular, the bounds in updates are known to be true. Information
+         * about the LocalInstance invalid is no longer true; otherwise, all
+         * other facts in this DataFlowItem continue to be true.
+         * 
+         * @deprecated Use update(Map, LocalInstance, LocalInstance).
          */
         public DataFlowItem update(Map<LocalInstance, Bounds> updates, LocalInstance invalid) {
             if (invalid == null && (updates == null || updates.isEmpty())) {
@@ -818,7 +874,7 @@ public class IntegerBoundsChecker extends DataFlow
             //System.err.println("Update " + updates + " invalid " + invalid + " to " + this.lowerBounds);
             
             // create a copy of the bounds map.
-            HashMap<LocalInstance, Bounds> newBounds = new HashMap<LocalInstance, Bounds>(bounds);
+            Map<LocalInstance, Bounds> newBounds = new HashMap<LocalInstance, Bounds>(bounds);
             boolean changed = false;
 
             if (invalid != null) {
@@ -838,8 +894,8 @@ public class IntegerBoundsChecker extends DataFlow
                 if (li.equals(invalid)) {
                     // if the old value of the invalid is a lower bound for the new value of the invalid,
                     // the lower bounds of the old value are lower bounds for the new value.
-                    LocalBound invalidStrict = new LocalBound(Bound.GT, invalid);
-                    LocalBound invalidNonStrict = new LocalBound(Bound.GE, invalid);
+                    LocalBound invalidStrict = new LocalBound(Bound.lower(true), invalid);
+                    LocalBound invalidNonStrict = new LocalBound(Bound.lower(false), invalid);
                     
                     if (this.bounds.containsKey(invalid) && 
                             (b0.bounds.contains(invalidStrict) || 
@@ -863,7 +919,7 @@ public class IntegerBoundsChecker extends DataFlow
                 }
                 else {
                     // already had some bounds. Merge them, knowing that all the facts in both are correct.
-                    Bounds b2 = b1.mergeNonconservative(b0);
+                    Bounds b2 = b1.refine(b0);
                     if (b2 != b1) {
                         newBounds.put(li, b2);
                         changed = true;
@@ -874,8 +930,8 @@ public class IntegerBoundsChecker extends DataFlow
             // take care of the invalidated local instance
             if (invalid != null) {
                 // remove any reference to the invalid local variable
-                LocalBound invalidStrict = new LocalBound(Bound.GT, invalid);
-                LocalBound invalidNonStrict = new LocalBound(Bound.GE, invalid);
+                LocalBound invalidStrict = new LocalBound(Bound.lower(true), invalid);
+                LocalBound invalidNonStrict = new LocalBound(Bound.lower(false), invalid);
                 Map<LocalInstance, Bounds> cleanedBounds = new HashMap<LocalInstance, Bounds>();
                 for (Iterator<Entry<LocalInstance, Bounds>> iter = 
                         newBounds.entrySet().iterator(); iter.hasNext();) {
@@ -891,6 +947,8 @@ public class IntegerBoundsChecker extends DataFlow
                     }
                     cleanedBounds.put(entry.getKey(), b);                    
                 }
+                
+                newBounds = cleanedBounds;
             }            
                 
             DataFlowItem result = this;
@@ -898,5 +956,102 @@ public class IntegerBoundsChecker extends DataFlow
             return result;
         }
 
+        /**
+         * Produce a new DataFlowItem that is updated with the updates. In
+         * particular, the bounds in updates are known to be true. If a
+         * LocalInstance has changed, it can be specified as increased,
+         * decreased, or both.
+         */
+        public DataFlowItem update(Map<LocalInstance, Bounds> updates, 
+                LocalInstance increased, LocalInstance decreased) {
+            if (increased == null && decreased == null && 
+                    (updates == null || updates.isEmpty())) {
+                // no changes
+                return this;
+            }
+            
+            boolean changed = false;
+            Map<LocalInstance, Bounds> updated = 
+                new HashMap<LocalInstance, Bounds>(this.bounds);
+            
+            if (increased != null || decreased != null) {
+                // go through current bounds and invalidate ones that might
+                // no longer hold
+                for (LocalInstance li : bounds.keySet()) {
+                    Bounds bnds = bounds.get(li);
+                    Set<Bound> old = bnds.bounds;
+                    Set<Bound> now = new HashSet<Bound>(old);
+                    Interval rng = bnds.range;
+                    
+                    // see if the tracked instance itself changed
+                    if (li == increased || li == decreased) {
+                        for (Bound b : old) {
+                            if (b.isLower() && li == decreased) {
+                                // since li decreased, remove all old lower bounds
+                                now.remove(b);
+                            } else if (b.isUpper() && li == increased) {
+                                // li increased, removed old upper bounds
+                                now.remove(b);
+                            }
+                        }
+                        
+                        // endpoints of numeric range might be invalid now
+                        Long low = li == decreased ? null : rng.lower;
+                        Long high = li == increased ? null : rng.upper;
+                        rng = new Interval(low, high);
+                    } else {  // see if changed instance is in symbolic bounds
+                        for (Bound b : old) {
+                            if (b instanceof LocalBound) {
+                                LocalBound lb = (LocalBound) b;
+                                
+                                if (lb.li == li) {
+                                    if (lb.isLower() && li == increased) {
+                                        // li was a lower bound but has now increased,
+                                        // so it might not be a lower bound any more
+                                        now.remove(lb);
+                                    } else if (lb.isUpper() && li == decreased) {
+                                        // was upper bound but has decreased
+                                        now.remove(lb);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (old.size() != now.size() || !bnds.range.equals(rng)) {
+                        updated.put(li, new Bounds(rng, now));
+                        changed = true;
+                    }
+                }
+            }
+            
+            // now apply new bounds
+            for (LocalInstance li : updates.keySet()) {
+                Bounds b0 = updates.get(li);
+                Bounds b1 = updated.get(li);
+                
+                if (b1 == null) {
+                    updated.put(li, b0);
+                    changed = true;
+                } else {
+                    // already had some bounds. Merge them, knowing that all the
+                    // facts in both are correct
+                    b0 = b1.refine(b0);
+                    
+                    if (b0 != b1) {
+                        updated.put(li, b0);
+                        changed = true;
+                    }
+                }
+            }
+            
+            if (changed) {
+                return new DataFlowItem(updated);
+            } else {
+                return this;
+            }
+        }
+        
     }
+    
 }
