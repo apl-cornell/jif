@@ -223,7 +223,9 @@ public class IntegerBoundsChecker extends DataFlow
     
     /**
      * Returns the set of LocalInstances that are (non-strict) lower bounds on
-     * the expression
+     * the expression.
+     * 
+     * @deprecated Use findLocalInstanceBounds.
      */
     protected Set<LocalInstance> findLocalInstanceLowerBounds(Expr expr) {
         if (expr instanceof Local) {
@@ -269,13 +271,69 @@ public class IntegerBoundsChecker extends DataFlow
     }
 
     /**
+     * Returns the set of LocalInstances that are (non-strict) lower bounds on
+     * the expression
+     */
+    protected Set<LocalInstance> findLocalInstanceBounds(Expr expr, Bound.Type type) {
+        if (expr instanceof Local) {
+            return Collections.singleton(((Local) expr).localInstance());
+        } else if (expr instanceof Unary) {
+            Unary u = (Unary) expr;
+            
+            if (u.operator().equals(Unary.PRE_INC) || u.operator().equals(Unary.PRE_DEC)) {
+                return findLocalInstanceBounds(u.expr(), type);
+            } else if (u.operator().equals(Unary.POST_INC) && type.isUpper()) {
+                return findLocalInstanceBounds(u.expr(), type);
+            } else if (u.operator().equals(Unary.POST_DEC) && type.isLower()) {
+                return findLocalInstanceBounds(u.expr(), type);
+            }
+        } else if (expr instanceof Conditional) {
+            Conditional c = (Conditional) expr;
+            Set<LocalInstance> con = findLocalInstanceBounds(c.consequent(), type);
+            Set<LocalInstance> alt = findLocalInstanceBounds(c.alternative(), type);
+            // return the intersection of con and alt.
+            con.retainAll(alt);
+            return con;
+        } else if (expr instanceof Binary) {
+            Binary b = (Binary) expr;
+            
+            if (b.operator().equals(Binary.ADD)) {
+                Set<LocalInstance> left = findLocalInstanceBounds(b.left(), type);                
+                Set<LocalInstance> right = findLocalInstanceBounds(b.right(), type);                
+                Long leftNum = findNumericRange(b.left(), null).lower;
+                Long rightNum = findNumericRange(b.right(), null).lower;
+                Set<LocalInstance> result = new HashSet<LocalInstance>();
+                
+                if (leftNum != null && leftNum >= -1) {
+                    result.addAll(right);
+                }
+                
+                if (rightNum != null && rightNum >= -1) {
+                    result.addAll(left);
+                }
+                
+                return result;
+            }
+        }
+        if (expr instanceof Assign) {
+            Assign a = (Assign) expr;
+            
+            if (a.left() instanceof Local && a.operator().equals(Assign.ASSIGN)) {
+                return Collections.singleton(((Local) a.left()).localInstance());
+            }
+        }
+        
+        return Collections.emptySet();
+    }
+
+    /**
      * Record the bounds information. We could be extensible here, and allow
      * other uses of the info.
      */
     public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
         DataFlowItem dfIn = (DataFlowItem)inItem;
         if (n instanceof Expr && ((Expr)n).type().isNumeric()) {
-            Long bound = findNumericLowerBound((Expr)n, dfIn);
+            Long bound = findNumericRange((Expr)n, dfIn).lower;
 //            System.err.println("bound for " + n + " : " + bound);
             if (bound != null) {
                 ((JifExprExt)n.ext()).setNumericLowerBound(bound);
@@ -313,41 +371,93 @@ public class IntegerBoundsChecker extends DataFlow
     }
     
     /**
-     * Find the greatest numeric lower bound for li, such that B < li 
+     * Find the greatest numeric lower bound for li, such that B < li.
+     * 
+     * @deprecated Use findNumericBound.
      */
     protected Long findNumericLowerBound(LocalInstance li, DataFlowItem df) {
         return findNumericLowerBound(li, df, new HashSet<LocalInstance>());
     }
     
     /**
-     * Finds the greatest lower bound B it can for li, such that B < li
+     * Finds the greatest lower bound B it can for li, such that B < li.
+     * 
+     * @deprecated Use findNumericBound.
      */
-    protected Long findNumericLowerBound(LocalInstance li, DataFlowItem df, Set<LocalInstance> seen) {
-        if (df == null) return null;
-        if (seen.contains(li)) return null;
-        seen.add(li);        
+    protected Long findNumericLowerBound(LocalInstance li, DataFlowItem df, 
+            Set<LocalInstance> seen) {
+        if (df == null || seen.contains(li)) {
+            return null;
+        }
         
-        Bounds b = df.bounds.get(li);
-        if (b == null) return null;
-        Long num = b.range.lower;
+        seen.add(li);
+        Bounds bnds = df.bounds.get(li);
         
-        for (Iterator<Bound> iter = b.bounds.iterator(); iter.hasNext();) {
-            LocalBound lb = (LocalBound) iter.next();
-            
-            if (lb.isLower()) {
-                Long lbb = findNumericLowerBound(lb.li, df, seen);
+        if (bnds == null) {
+            return null;
+        }
+        
+        Long low = bnds.getNumericLower();
+        
+        for (Bound b : bnds.bounds) {
+            if (b instanceof LocalBound) {
+                LocalBound lb = (LocalBound) b;
                 
-                if (lbb != null && (num == null || num.longValue() < lbb.longValue())) {
-                    num = lbb;
+                if (lb.isLower()) {
+                    low = max(low, findNumericLowerBound(lb.li, df, seen));
                 }
             }
         }
         
-        return num;
+        return low;
+    }
+
+    /**
+     * Finds the greatest lower bound or least upper bound B it can for li, such
+     * that B < li or li < B, respectively.
+     */
+    protected Long findNumericBound(LocalInstance li, DataFlowItem df, 
+            Bound.Type type) {
+        return findNumericBound(li, df, type, new HashSet<LocalInstance>());
     }
     
     /**
-     * Finds the greatest lower bound B it can for expr, such that B < expr
+     * Finds the greatest lower bound or least upper bound B it can for li, such
+     * that B < li or li < B, respectively.
+     */
+    protected Long findNumericBound(LocalInstance li, DataFlowItem df, 
+            Bound.Type type, Set<LocalInstance> seen) {
+        if (df == null || seen.contains(li)) {
+            return null;
+        }
+        
+        seen.add(li);
+        Bounds bnds = df.bounds.get(li);
+        
+        if (bnds == null) {
+            return null;
+        }
+        
+        Long best = bnds.getNumericBound(type);
+        
+        for (Bound b : bnds.bounds) {
+            if (b instanceof LocalBound) {
+                LocalBound lb = (LocalBound) b;
+                
+                if (type.isLower() == lb.isLower()) {
+                    best = Bounds.refine(best, 
+                            findNumericBound(lb.li, df, type, seen), type);
+                }
+            }
+        }
+        
+        return best;
+    }
+    
+    /**
+     * Finds the greatest lower bound B it can for expr, such that B < expr.
+     * 
+     * @deprecated Use findNumericRange.
      */
     protected Long findNumericLowerBound(Expr expr, DataFlowItem df) {
         if (!expr.type().isNumeric()) return null;
@@ -358,7 +468,7 @@ public class IntegerBoundsChecker extends DataFlow
         
         if (expr instanceof Local) {
             LocalInstance li = ((Local)expr).localInstance();
-            best = max(best, findNumericLowerBound(li, df));
+            best = max(best, findNumericBound(li, df, Bound.lower(true)));
         }
         if (expr.isConstant() && expr.constantValue() instanceof Number) {
             best = max(best, Long.valueOf(((Number)expr.constantValue()).longValue() - 1)); // needs to be a strict bound
@@ -447,6 +557,101 @@ public class IntegerBoundsChecker extends DataFlow
         }
         return max(best, existing);
     }
+
+    /**
+     * Finds the greatest lower bound or least upper bound B it can for expr,
+     * such that B < expr or expr < B, respectively.
+     */
+    protected Interval findNumericRange(Expr expr, DataFlowItem df) {
+        if (!expr.type().isNumeric()) {
+            return null;
+        }
+        
+        Interval best = Interval.FULL, existing = Interval.FULL;
+        
+        // TODO storing upper bounds in JifExprExt as well?
+        if (df == null) {
+            existing = new Interval(((JifExprExt)expr.ext()).getNumericLowerBound(), null);
+        }
+        
+        if (expr instanceof Local) {
+            LocalInstance li = ((Local) expr).localInstance();
+            Long low = findNumericBound(li, df, Bound.lower(true));
+            Long high = findNumericBound(li, df, Bound.upper(true));
+            best = best.intersect(new Interval(low, high));
+        } else if (expr.isConstant() && expr.constantValue() instanceof Number) {
+            // needs to be a strict bound
+            long n = ((Number) expr.constantValue()).longValue();
+            best = best.intersect(Interval.singleton(n));
+        } else if (expr instanceof Unary) {
+            Unary u = (Unary)expr;
+            Interval r = findNumericRange(u.expr(), df);
+            
+            if (u.operator().equals(Unary.PRE_INC) || u.operator().equals(Unary.PRE_DEC)) {
+                best = best.intersect(r);
+            } else if (u.operator().equals(Unary.POST_INC)) {
+                best = best.intersect(r.shift(-1));
+            } else if (u.operator().equals(Unary.POST_DEC)) {
+                best = best.intersect(r.shift(1));
+            }
+        } else if (expr instanceof Conditional) {
+            Conditional c = (Conditional) expr;
+            // TODO storing intervals?
+            Interval con = new Interval(((JifExprExt) c.consequent().ext()).getNumericLowerBound(), null);
+            Interval alt = new Interval(((JifExprExt)c.alternative().ext()).getNumericLowerBound(), null);
+            best = best.intersect(con.union(alt));
+        } else if (expr instanceof DowngradeExpr) {
+            DowngradeExpr e = (DowngradeExpr) expr;
+            best = best.intersect(findNumericRange(e.expr(), df));
+        } else if (expr instanceof Binary) {
+            Binary b = (Binary) expr;
+            
+            if (b.operator().equals(Binary.ADD)) {
+                Interval left = findNumericRange(b.left(), df);
+                Interval right = findNumericRange(b.right(), df);
+                best = best.intersect(left.add(right));
+            }
+            if (b.operator().equals(Binary.MUL)) {
+                // TODO
+                //Interval left = findNumericRange(b.left(), df);
+                //Interval right = findNumericRange(b.right(), df);
+                //best = best.intersect(left.multiply(right));
+            }
+        } else if (expr instanceof Assign) {
+            Assign a = (Assign) expr;
+            
+            if (a.left() instanceof Local) {
+                // it's an assignment to a local, which we 
+                // track pretty precisely, so just look at the local.
+                best = best.intersect(findNumericRange(a.left(), df));                
+            } else {
+                // the LHS is not a local, so it's ok to use the same
+                // dataflowitem.
+                Expr right = a.right();
+                
+                if (!a.operator().equals(Assign.ASSIGN)) {
+                    // fake the experssion.
+                    Binary.Operator op = a.operator().binaryOperator();
+                    right = nodeFactory().Binary(Position.compilerGenerated(), 
+                            a.left(), op, a.right());
+                    right = right.type(a.left().type());
+                }
+                
+                best = best.intersect(findNumericRange(right, df));                                
+            }
+        } else if (expr instanceof Field) {
+            Field f = (Field) expr;
+            
+            if ("length".equals(f.name()) && f.type().isInt() && 
+                    f.target().type().isArray()) {
+                // it's an array length, e.g., x.length.
+                // thus it is of non-negative length
+                best = best.intersect(new Interval(-1L, null));
+            }
+        }
+        
+        return best.intersect(existing);
+    }
     
     protected static Long max(Long a, Long b) {
         if (a == null) return b;
@@ -470,6 +675,14 @@ public class IntegerBoundsChecker extends DataFlow
             
             private Type(String name) {
                 this.name = name;
+            }
+            
+            public boolean isLower() {
+                return this == GT || this == GE;
+            }
+            
+            public boolean isUpper() {
+                return this == LT || this == LE;
             }
             
             public boolean isStrict() {
@@ -521,12 +734,12 @@ public class IntegerBoundsChecker extends DataFlow
             this.type = type;
         }
 
-        public boolean isUpper() {
-            return type == LT || type == LE;
+        public boolean isLower() {
+            return type.isLower();
         }
         
-        public boolean isLower() {
-            return type == GT || type == GE;
+        public boolean isUpper() {
+            return type.isUpper();
         }
         
         public boolean equals(Object o) {
@@ -680,6 +893,20 @@ public class IntegerBoundsChecker extends DataFlow
             return new Interval(low, high);
         }
         
+        public Interval add(Interval other) {
+            Long low = null, high = null;
+            
+            if (lower != null && other.lower != null) {
+                low = lower + other.lower + 1;
+            }
+            
+            if (upper != null && other.upper != null) {
+                high = upper + other.upper - 1;
+            }
+            
+            return new Interval(low, high);
+        }
+        
         public boolean equals(Object o) {
             if (o instanceof Interval) {
                 Interval other = (Interval) o;
@@ -705,6 +932,14 @@ public class IntegerBoundsChecker extends DataFlow
     }
     
     protected static class Bounds {
+        
+        public static Long refine(Long i, Long j, Bound.Type type) {
+            if (type.isLower()) {
+                return max(i, j);
+            } else {
+                return min(i, j);
+            }
+        }
         
         protected final Interval range;  // is always strict
         protected final Set<Bound> bounds;
@@ -741,6 +976,14 @@ public class IntegerBoundsChecker extends DataFlow
         
         public Set<Bound> getBounds() {
             return bounds;
+        }
+        
+        public Long getNumericBound(Bound.Type type) {
+            if (type.isLower()) {
+                return range.lower;
+            } else {
+                return range.upper;
+            }
         }
         
         /**
