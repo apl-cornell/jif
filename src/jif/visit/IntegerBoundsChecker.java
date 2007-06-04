@@ -75,8 +75,7 @@ public class IntegerBoundsChecker extends DataFlow
             
             // XXX can be smarter and decide if only increases or decreases
             increased = decreased = ld.localInstance();
-        }
-        else if (n instanceof LocalAssign) {
+        } else if (n instanceof LocalAssign) {
             LocalAssign la = (LocalAssign)n;
             Expr right = la.right();
             if (!la.operator().equals(Assign.ASSIGN)) {
@@ -91,8 +90,7 @@ public class IntegerBoundsChecker extends DataFlow
             
             // XXX can be smarter and decide if only increases or decreases
             increased = decreased = ((Local) la.left()).localInstance();
-        }
-        else if (n instanceof Unary) {
+        } else if (n instanceof Unary) {
             Unary u = (Unary)n;
             if (u.expr() instanceof Local) {
                 Local l = (Local)u.expr();
@@ -104,61 +102,59 @@ public class IntegerBoundsChecker extends DataFlow
                     decreased = l.localInstance();
                 }
             }
-        }
-        else if (n instanceof Binary && ((Binary)n).type().isBoolean() &&
+        } else if (n instanceof Binary && ((Binary)n).type().isBoolean() &&
                 ((Binary)n).left().type().isNumeric() &&  
                 INTERESTING_BINARY_OPERATORS.contains(((Binary)n).operator())) {
-            
             // it's a comparison operation! We care about tracking the
             // information that may be gained by these comparisons
-            
-            Map<LocalInstance, Bounds> falseupdates = new HashMap<LocalInstance, Bounds>();
+            Map<LocalInstance, Bounds> falseupdates = 
+                new HashMap<LocalInstance, Bounds>();
             
             Binary b = (Binary)n;
             Expr left = b.left();
             Expr right = b.right();
             
             boolean flowedOverBinary = false;
+            
             if (b.operator().equals(Binary.LT)) {
                 addBound(updates, left, true, right);       // left < right
                 addBound(falseupdates, right, false, left); // !(left < right) => right <= left
                 flowedOverBinary = true;
-            }
-            if (b.operator().equals(Binary.LE)) {
+            } else if (b.operator().equals(Binary.LE)) {
                 addBound(updates, left, false, right);       // left <= right
                 addBound(falseupdates, right, true, left);   // negation: right < left    
                 flowedOverBinary = true;
-            }
-            if (b.operator().equals(Binary.GT)) {
+            } else if (b.operator().equals(Binary.GT)) {
                 addBound(updates, right, true, left);       // right < left               
                 addBound(falseupdates, left, false, right); // negation: left <= right
                 flowedOverBinary = true;
-            }
-            if (b.operator().equals(Binary.GE)) {
+            } else if (b.operator().equals(Binary.GE)) {
                 addBound(updates, right, false, left);      // right <= left           
                 addBound(falseupdates, left, true, right);  // negation: left < right                    
                 flowedOverBinary = true;
-            }
-            if (b.operator().equals(Binary.EQ)) {
+            } else if (b.operator().equals(Binary.EQ)) {
                 addBound(updates, left, false, right);        // left <= right, and right <= left        
                 addBound(updates, right, false, left);
                 // note: no negation, since we don't know why the equality failed
                 flowedOverBinary = true;
             }
+            
             if (flowedOverBinary) {
                 // track the true and false branches precisely.
                 DataFlowItem trueOutDFItem = inDFItem.update(updates, increased, decreased);
                 DataFlowItem falseOutDFItem = inDFItem.update(falseupdates, increased, decreased);
                 return itemsToMap(trueOutDFItem, falseOutDFItem, null, succEdgeKeys);
             }
-            
         }
+        
         // apply the updates to the data flow item.
         DataFlowItem outDFItem = inDFItem.update(updates, increased, decreased);
 
         if (n instanceof Expr && ((Expr)n).type().isNumeric()) {
-            ((JifExprExt)n.ext()).setNumericLowerBound(findNumericLowerBound((Expr)n, inDFItem));
+            // TODO store intervals?
+            ((JifExprExt)n.ext()).setNumericLowerBound(findNumericRange((Expr)n, inDFItem).lower);
         }
+        
         if (n instanceof Expr && ((Expr)n).type().isBoolean() && 
                 (n instanceof Binary || n instanceof Unary)) {
             // flow over boolean conditions (e.g. &&, ||, !, etc) if we can.
@@ -190,14 +186,22 @@ public class IntegerBoundsChecker extends DataFlow
         Set<LocalInstance> liLowerBounds = Collections.emptySet();
         Long lnum = null;
         if (left instanceof LocalInstance) {
-            liLowerBounds = Collections.singleton((LocalInstance)left);
+            LocalInstance li = (LocalInstance) left;
+            
+            if (li.type().isNumeric()) {
+                liLowerBounds = Collections.singleton((LocalInstance)left);
+            }
         }
         else if (left instanceof Expr) {
-            liLowerBounds = findLocalInstanceLowerBounds((Expr)left);
-            lnum = findNumericLowerBound((Expr)left, null);
-            if (strict && lnum != null) {
-                // lnum < left < rli, so lnum + 1 < rli
-                lnum = Long.valueOf(lnum.longValue() + 1);
+            Expr e = (Expr) left;
+            
+            if (e.type().isNumeric()) {
+                liLowerBounds = findLocalInstanceBounds(e, Bound.lower(true));
+                lnum = findNumericRange(e, null).lower;
+                if (strict && lnum != null) {
+                    // lnum <= left < rli, so lnum + 1 <= rli
+                    lnum = Long.valueOf(lnum.longValue() + 1);
+                }
             }
             //System.err.println(rli.name()+" liLowerBounds="+liLowerBounds + " numLowerBound="+lnum);
         }
@@ -215,7 +219,7 @@ public class IntegerBoundsChecker extends DataFlow
 
         if (lnum != null) {
             if (b.range.lower == null || b.range.lower < lnum) {
-                b = new Bounds(lnum, b.bounds);
+                b = new Bounds(lnum, Bounds.POS_INF, b.bounds);
                 updates.put(rli, b);
             }
         }
@@ -304,11 +308,11 @@ public class IntegerBoundsChecker extends DataFlow
                 Long rightNum = findNumericRange(b.right(), null).lower;
                 Set<LocalInstance> result = new HashSet<LocalInstance>();
                 
-                if (leftNum != null && leftNum >= -1) {
+                if (leftNum != null && leftNum >= 0) {
                     result.addAll(right);
                 }
                 
-                if (rightNum != null && rightNum >= -1) {
+                if (rightNum != null && rightNum >= 0) {
                     result.addAll(left);
                 }
                 
@@ -428,14 +432,14 @@ public class IntegerBoundsChecker extends DataFlow
     protected Long findNumericBound(LocalInstance li, DataFlowItem df, 
             Bound.Type type, Set<LocalInstance> seen) {
         if (df == null || seen.contains(li)) {
-            return null;
+            return type.isLower() ? Bounds.NEG_INF : Bounds.POS_INF;
         }
         
         seen.add(li);
         Bounds bnds = df.bounds.get(li);
         
         if (bnds == null) {
-            return null;
+            return type.isLower() ? Bounds.NEG_INF : Bounds.POS_INF;
         }
         
         Long best = bnds.getNumericBound(type);
@@ -564,14 +568,15 @@ public class IntegerBoundsChecker extends DataFlow
      */
     protected Interval findNumericRange(Expr expr, DataFlowItem df) {
         if (!expr.type().isNumeric()) {
-            return null;
+            throw new IllegalArgumentException();
         }
         
         Interval best = Interval.FULL, existing = Interval.FULL;
         
         // TODO storing upper bounds in JifExprExt as well?
         if (df == null) {
-            existing = new Interval(((JifExprExt)expr.ext()).getNumericLowerBound(), null);
+            Long n = ((JifExprExt)expr.ext()).getNumericLowerBound();
+            existing = new Interval(n == null ? Bounds.NEG_INF : n, Bounds.POS_INF);
         }
         
         if (expr instanceof Local) {
@@ -597,8 +602,10 @@ public class IntegerBoundsChecker extends DataFlow
         } else if (expr instanceof Conditional) {
             Conditional c = (Conditional) expr;
             // TODO storing intervals?
-            Interval con = new Interval(((JifExprExt) c.consequent().ext()).getNumericLowerBound(), null);
-            Interval alt = new Interval(((JifExprExt)c.alternative().ext()).getNumericLowerBound(), null);
+            Long n = ((JifExprExt) c.consequent().ext()).getNumericLowerBound();
+            Interval con = new Interval(n == null ? Bounds.NEG_INF : n, Bounds.POS_INF);
+            n = ((JifExprExt)c.alternative().ext()).getNumericLowerBound();
+            Interval alt = new Interval(n == null ? Bounds.NEG_INF : n, Bounds.POS_INF);
             best = best.intersect(con.union(alt));
         } else if (expr instanceof DowngradeExpr) {
             DowngradeExpr e = (DowngradeExpr) expr;
@@ -610,12 +617,10 @@ public class IntegerBoundsChecker extends DataFlow
                 Interval left = findNumericRange(b.left(), df);
                 Interval right = findNumericRange(b.right(), df);
                 best = best.intersect(left.add(right));
-            }
-            if (b.operator().equals(Binary.MUL)) {
-                // TODO
-                //Interval left = findNumericRange(b.left(), df);
-                //Interval right = findNumericRange(b.right(), df);
-                //best = best.intersect(left.multiply(right));
+            } else if (b.operator().equals(Binary.MUL)) {
+                Interval left = findNumericRange(b.left(), df);
+                Interval right = findNumericRange(b.right(), df);
+                best = best.intersect(left.multiply(right));
             }
         } else if (expr instanceof Assign) {
             Assign a = (Assign) expr;
@@ -646,7 +651,7 @@ public class IntegerBoundsChecker extends DataFlow
                     f.target().type().isArray()) {
                 // it's an array length, e.g., x.length.
                 // thus it is of non-negative length
-                best = best.intersect(new Interval(-1L, null));
+                best = best.intersect(Interval.POS);
             }
         }
         
@@ -654,14 +659,14 @@ public class IntegerBoundsChecker extends DataFlow
     }
     
     protected static Long max(Long a, Long b) {
-        if (a == null) return b;
-        if (b == null) return a;
+        if (a == Bounds.NEG_INF) return b;
+        if (b == Bounds.NEG_INF) return a;
         return a < b ? b : a;
     }
 
     protected static Long min(Long a, Long b) {
-        if (a == null) return b;
-        if (b == null) return a;
+        if (a == Bounds.POS_INF) return b;
+        if (b == Bounds.POS_INF) return a;
         return a < b ? a : b;
     }
     
@@ -822,26 +827,36 @@ public class IntegerBoundsChecker extends DataFlow
     }
     
     /**
-     * An (open) interval over the integers.
+     * A closed interval over the integers.
      */
     protected static class Interval {
         
         /**
          * Interval representing all integers.
          */
-        public static final Interval FULL = new Interval(null, null);
-
+        public static final Interval FULL = 
+            new Interval(Bounds.NEG_INF, Bounds.POS_INF);
+        
+        /**
+         * The non-negative integers (includes 0).
+         */
+        public static final Interval POS = new Interval(0L, Bounds.POS_INF);
+        
         /**
          * Returns an interval containing only one integer.
          */
         public static Interval singleton(long i) {
-            return new Interval(i - 1, i + 1);
+            return new Interval(i, i);
         }
         
         protected final Long lower;
         protected final Long upper;
         
         public Interval(Long lower, Long upper) {
+            if (lower == null || upper == null) {
+                throw new NullPointerException();
+            }
+            
             this.lower = lower;
             this.upper = upper;
         }
@@ -858,11 +873,7 @@ public class IntegerBoundsChecker extends DataFlow
          * Returns whether this interval is a superset of the other.
          */
         public boolean contains(Interval other) {
-            boolean low = lower == null || 
-                (other.lower != null && lower <= other.lower);
-            boolean high = upper == null ||
-                (other.upper != null && upper >= other.upper);
-            return low && high;
+            return lower <= other.lower && upper >= other.upper;
         }
         
         /**
@@ -888,22 +899,62 @@ public class IntegerBoundsChecker extends DataFlow
          * Returns an interval that is this one shifted by the given amount.
          */
         public Interval shift(long i) {
-            Long low = lower == null ? null : lower + i;
-            Long high = upper == null ? null : upper + i;
+            Long low = lower == Bounds.NEG_INF ? Bounds.NEG_INF : lower + i;
+            Long high = upper == Bounds.POS_INF ? Bounds.POS_INF : upper + i;
             return new Interval(low, high);
         }
         
         public Interval add(Interval other) {
-            Long low = null, high = null;
+            Long low = Bounds.NEG_INF, high = Bounds.POS_INF;
             
-            if (lower != null && other.lower != null) {
-                low = lower + other.lower + 1;
+            if (lower != Bounds.NEG_INF && other.lower != Bounds.NEG_INF) {
+                low = lower + other.lower;
             }
             
-            if (upper != null && other.upper != null) {
-                high = upper + other.upper - 1;
+            if (upper != Bounds.POS_INF && other.upper != Bounds.POS_INF) {
+                high = upper + other.upper;
             }
             
+            return new Interval(low, high);
+        }
+        
+        protected Long longMult(Long i, Long j) {
+            if (i == 0 || j == 0) {
+                return 0L;
+            }
+
+            if ((i == Bounds.POS_INF && j > 0) ||
+                    (j == Bounds.POS_INF && i > 0)) {
+                return Bounds.POS_INF;
+            }
+            
+            if ((i == Bounds.POS_INF && j < 0) |
+                    (j == Bounds.POS_INF && i < 0)) {
+                return Bounds.NEG_INF;
+            }
+            
+            if ((i == Bounds.NEG_INF && j > 0) ||
+                    (j == Bounds.NEG_INF && i > 0)) {
+                return Bounds.NEG_INF;
+            }
+            
+            if ((i == Bounds.NEG_INF && j < 0) ||
+                    (j == Bounds.NEG_INF && i < 0)) {
+                return Bounds.POS_INF;
+            }
+            
+            return i * j;
+        }
+        
+        public Interval multiply(Interval other) {
+            // [a, b] x [c, d] = [min{ac, ad, bc, bd}, max{ac, ad, bc, bd}]
+            Long ac = longMult(lower, other.lower);
+            Long ad = longMult(lower, other.upper);
+            Long bc = longMult(upper, other.lower);
+            Long bd = longMult(upper, other.upper);
+            
+            Long low = min(min(ac, ad), min(bc, bd));
+            Long high = max(max(ac, ad), max(bc, bd));
             return new Interval(low, high);
         }
         
@@ -921,17 +972,24 @@ public class IntegerBoundsChecker extends DataFlow
             return nullableHashCode(lower) ^ nullableHashCode(upper);
         }
         
-        private static String nullableLong(Long i) {
-            return i == null ? "-" : i.toString();
+        private static String longString(Long i) {
+            if (i == Bounds.POS_INF || i == Bounds.NEG_INF) {
+                return "-";
+            } else {
+                return i.toString();
+            }
         }
         
         public String toString() {
-            return "[" + nullableLong(lower) + "," + nullableLong(upper) + "]";
+            return "[" + longString(lower) + "," + longString(upper) + "]";
         }
 
     }
     
     protected static class Bounds {
+        
+        public static final Long POS_INF = new Long(Long.MAX_VALUE);
+        public static final Long NEG_INF = new Long(Long.MIN_VALUE);
         
         public static Long refine(Long i, Long j, Bound.Type type) {
             if (type.isLower()) {
@@ -941,7 +999,7 @@ public class IntegerBoundsChecker extends DataFlow
             }
         }
         
-        protected final Interval range;  // is always strict
+        protected final Interval range;
         protected final Set<Bound> bounds;
 
         public Bounds() {
@@ -960,10 +1018,6 @@ public class IntegerBoundsChecker extends DataFlow
         
         public Bounds(Long lowerBound, Long upperBound, Set<Bound> bounds) {
             this(new Interval(lowerBound, upperBound), bounds);
-        }
-        
-        public Bounds(Long lowerBound, Set<Bound> bounds) {
-            this(lowerBound, null, bounds);
         }
         
         public Long getNumericLower() {
@@ -1239,8 +1293,8 @@ public class IntegerBoundsChecker extends DataFlow
                         }
                         
                         // endpoints of numeric range might be invalid now
-                        Long low = li == decreased ? null : rng.lower;
-                        Long high = li == increased ? null : rng.upper;
+                        Long low = li == decreased ? Bounds.NEG_INF : rng.lower;
+                        Long high = li == increased ? Bounds.POS_INF : rng.upper;
                         rng = new Interval(low, high);
                     } else {  // see if changed instance is in symbolic bounds
                         for (Bound b : old) {
