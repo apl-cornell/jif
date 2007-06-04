@@ -1467,7 +1467,7 @@ class C {
     C another;
     
     void m(Object{} o, String{} s) {
-        if (s != null) {
+        if (s == null) {
             return;
         }
         s.length(); <span class="comment">// OK, s known to be not-null</span>
