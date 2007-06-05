@@ -66,75 +66,84 @@ public class IntegerBoundsChecker extends DataFlow
         LocalInstance increased = null, decreased = null;
 
         if (n instanceof LocalDecl) {
-            LocalDecl ld = (LocalDecl)n;
-            if (ld.init() != null) {
-                // li = init, so add li <= init, and init <= li
-                addBound(updates, ld.localInstance(), false, ld.init());
-                addBound(updates, ld.init(), false, ld.localInstance());
-            }
+            LocalDecl ld = (LocalDecl) n;
             
-            // XXX can be smarter and decide if only increases or decreases
-            increased = decreased = ld.localInstance();
+            if (ld.init() != null) {
+                Local l = (Local) nodeFactory().Local(
+                        Position.compilerGenerated(), ld.id()).localInstance(
+                                ld.localInstance()).type(ld.localInstance().type());
+                // li = init, so add li <= init, and init <= li
+                addBounds(updates, l, false, ld.init());
+                addBounds(updates, ld.init(), false, l);
+                
+                increased = decreased = ld.localInstance();
+            }
         } else if (n instanceof LocalAssign) {
-            LocalAssign la = (LocalAssign)n;
+            LocalAssign la = (LocalAssign) n;
             Expr right = la.right();
-            if (!la.operator().equals(Assign.ASSIGN)) {
+            
+            if (la.operator() != Assign.ASSIGN) {
                 // fake the experssion.
                 Binary.Operator op = la.operator().binaryOperator();
                 right = nodeFactory().Binary(Position.compilerGenerated(), la.left(), op, la.right());
                 right = right.type(la.left().type());
             }
+            
             // li = e, so add li <= e, and e <= li
-            addBound(updates, la.left(), false, right);
-            addBound(updates, right, false, (Local)la.left());
+            addBounds(updates, la.left(), false, right);
+            addBounds(updates, right, false, (Local) la.left());
             
             // XXX can be smarter and decide if only increases or decreases
             increased = decreased = ((Local) la.left()).localInstance();
         } else if (n instanceof Unary) {
-            Unary u = (Unary)n;
+            Unary u = (Unary) n;
+            
             if (u.expr() instanceof Local) {
-                Local l = (Local)u.expr();
-                if (u.operator().equals(Unary.POST_INC) || 
-                        u.operator().equals(Unary.PRE_INC)) {
+                Local l = (Local) u.expr();
+                
+                if (u.operator() == Unary.POST_INC || 
+                        u.operator() == Unary.PRE_INC) {
+                    // TODO increment range;
                     increased = l.localInstance();
-                } else if (u.operator().equals(Unary.POST_DEC) ||
-                        u.operator().equals(Unary.PRE_DEC)) {
+                } else if (u.operator() == Unary.POST_DEC ||
+                        u.operator() == Unary.PRE_DEC) {
+                    // TODO decrement range
                     decreased = l.localInstance();
                 }
             }
         } else if (n instanceof Binary && ((Binary)n).type().isBoolean() &&
                 ((Binary)n).left().type().isNumeric() &&  
-                INTERESTING_BINARY_OPERATORS.contains(((Binary)n).operator())) {
+                INTERESTING_BINARY_OPERATORS.contains(((Binary) n).operator())) {
             // it's a comparison operation! We care about tracking the
             // information that may be gained by these comparisons
             Map<LocalInstance, Bounds> falseupdates = 
                 new HashMap<LocalInstance, Bounds>();
             
-            Binary b = (Binary)n;
+            Binary b = (Binary) n;
             Expr left = b.left();
             Expr right = b.right();
             
             boolean flowedOverBinary = false;
             
-            if (b.operator().equals(Binary.LT)) {
-                addBound(updates, left, true, right);       // left < right
-                addBound(falseupdates, right, false, left); // !(left < right) => right <= left
+            if (b.operator() == Binary.LT) {
+                addBounds(updates, left, true, right);       // left < right
+                addBounds(falseupdates, right, false, left); // !(left < right) => right <= left
                 flowedOverBinary = true;
-            } else if (b.operator().equals(Binary.LE)) {
-                addBound(updates, left, false, right);       // left <= right
-                addBound(falseupdates, right, true, left);   // negation: right < left    
+            } else if (b.operator() == Binary.LE) {
+                addBounds(updates, left, false, right);       // left <= right
+                addBounds(falseupdates, right, true, left);   // negation: right < left    
                 flowedOverBinary = true;
-            } else if (b.operator().equals(Binary.GT)) {
-                addBound(updates, right, true, left);       // right < left               
-                addBound(falseupdates, left, false, right); // negation: left <= right
+            } else if (b.operator() == Binary.GT) {
+                addBounds(updates, right, true, left);       // right < left               
+                addBounds(falseupdates, left, false, right); // negation: left <= right
                 flowedOverBinary = true;
-            } else if (b.operator().equals(Binary.GE)) {
-                addBound(updates, right, false, left);      // right <= left           
-                addBound(falseupdates, left, true, right);  // negation: left < right                    
+            } else if (b.operator() == Binary.GE) {
+                addBounds(updates, right, false, left);      // right <= left           
+                addBounds(falseupdates, left, true, right);  // negation: left < right                    
                 flowedOverBinary = true;
-            } else if (b.operator().equals(Binary.EQ)) {
-                addBound(updates, left, false, right);        // left <= right, and right <= left        
-                addBound(updates, right, false, left);
+            } else if (b.operator() == Binary.EQ) {
+                addBounds(updates, left, false, right);        // left <= right, and right <= left        
+                addBounds(updates, right, false, left);
                 // note: no negation, since we don't know why the equality failed
                 flowedOverBinary = true;
             }
@@ -171,6 +180,8 @@ public class IntegerBoundsChecker extends DataFlow
     /**
      * Add a bound. If strict is true, then it is left < rli. If strict is false, it is
      * left <= rli.
+     * 
+     * @deprecated Use addBounds.
      */
     protected void addBound(Map<LocalInstance, Bounds> updates, Object left, boolean strict, Expr right) {
         if (right instanceof Local) {
@@ -181,18 +192,20 @@ public class IntegerBoundsChecker extends DataFlow
     /**
      * Add a bound. If strict is true, then it is left < rli. If strict is false, it is
      * left <= rli.
+     * 
+     * @deprecated Use addBounds.
      */
     protected void addBound(Map<LocalInstance, Bounds> updates, Object left, boolean strict, LocalInstance rli) {
         Set<LocalInstance> liLowerBounds = Collections.emptySet();
         Long lnum = null;
+        
         if (left instanceof LocalInstance) {
             LocalInstance li = (LocalInstance) left;
             
             if (li.type().isNumeric()) {
                 liLowerBounds = Collections.singleton((LocalInstance)left);
             }
-        }
-        else if (left instanceof Expr) {
+        } else if (left instanceof Expr) {
             Expr e = (Expr) left;
             
             if (e.type().isNumeric()) {
@@ -205,16 +218,19 @@ public class IntegerBoundsChecker extends DataFlow
             }
             //System.err.println(rli.name()+" liLowerBounds="+liLowerBounds + " numLowerBound="+lnum);
         }
+        
         if (liLowerBounds.isEmpty() && lnum == null) return;
         
         Bounds b = updates.get(rli);
+        
         if (b == null) {
             b = new Bounds();
             updates.put(rli, b);
         }
+        
         for (Iterator<LocalInstance> iter = liLowerBounds.iterator(); iter.hasNext();) {
             LocalInstance lli = iter.next();
-            b.bounds.add(new LocalBound(Bound.lower(strict), lli));            
+            b.bounds.add(new LocalBound(Bound.lower(strict), lli));
         }
 
         if (lnum != null) {
@@ -222,6 +238,63 @@ public class IntegerBoundsChecker extends DataFlow
                 b = new Bounds(lnum, Bounds.POS_INF, b.bounds);
                 updates.put(rli, b);
             }
+        }
+    }
+
+    /**
+     * Add bounds to updates given left < right or left <= right, depending on
+     * whether strict is set.
+     */
+    protected void addBounds(Map<LocalInstance, Bounds> updates, 
+            Expr left, boolean strict, Expr right) {
+        if (!left.type().isNumeric() || !right.type().isNull()) {
+            return;
+        }
+        
+        Set<LocalInstance> lli = findLocalInstanceBounds(left, Bound.lower(false));
+        Set<LocalInstance> rli = findLocalInstanceBounds(right, Bound.upper(false));
+        
+        Interval lrng = findNumericRange(left, null);
+        Interval rrng = findNumericRange(right, null);
+        
+        for (LocalInstance l : lli) {
+            Bounds b = updates.get(l);
+            
+            if (b == null) {
+                b = new Bounds();
+            }
+            
+            Long lupper = b.range.upper;
+            
+            if (rrng.upper != Bounds.POS_INF && rrng.upper <= lupper) {
+                lupper = strict? rrng.upper - 1 : rrng.upper;
+            }
+            
+            for (LocalInstance r : rli) {
+                b.bounds.add(new LocalBound(Bound.upper(strict), r));
+            }
+            
+            updates.put(l, b);
+        }
+
+        for (LocalInstance r : rli) {
+            Bounds b = updates.get(r);
+            
+            if (b == null) {
+                b = new Bounds();
+            }
+            
+            Long rlower = b.range.lower;
+            
+            if (lrng.lower != Bounds.NEG_INF && lrng.lower >= rlower) {
+                rlower = strict? lrng.lower + 1 : lrng.lower;
+            }
+            
+            for (LocalInstance l : rli) {
+                b.bounds.add(new LocalBound(Bound.lower(strict), l));
+            }
+            
+            updates.put(r, b);
         }
     }
     
@@ -284,11 +357,11 @@ public class IntegerBoundsChecker extends DataFlow
         } else if (expr instanceof Unary) {
             Unary u = (Unary) expr;
             
-            if (u.operator().equals(Unary.PRE_INC) || u.operator().equals(Unary.PRE_DEC)) {
+            if (u.operator()== Unary.PRE_INC || u.operator() == Unary.PRE_DEC) {
                 return findLocalInstanceBounds(u.expr(), type);
-            } else if (u.operator().equals(Unary.POST_INC) && type.isUpper()) {
+            } else if (u.operator() == Unary.POST_INC && type.isUpper()) {
                 return findLocalInstanceBounds(u.expr(), type);
-            } else if (u.operator().equals(Unary.POST_DEC) && type.isLower()) {
+            } else if (u.operator() == Unary.POST_DEC && type.isLower()) {
                 return findLocalInstanceBounds(u.expr(), type);
             }
         } else if (expr instanceof Conditional) {
@@ -301,30 +374,37 @@ public class IntegerBoundsChecker extends DataFlow
         } else if (expr instanceof Binary) {
             Binary b = (Binary) expr;
             
-            if (b.operator().equals(Binary.ADD)) {
+            if (b.operator() == Binary.ADD) {
                 Set<LocalInstance> left = findLocalInstanceBounds(b.left(), type);                
                 Set<LocalInstance> right = findLocalInstanceBounds(b.right(), type);                
-                Long leftNum = findNumericRange(b.left(), null).lower;
-                Long rightNum = findNumericRange(b.right(), null).lower;
+                Interval lrng = findNumericRange(b.left(), null);
+                Interval rrng = findNumericRange(b.right(), null);
                 Set<LocalInstance> result = new HashSet<LocalInstance>();
                 
-                if (leftNum != null && leftNum >= 0) {
+                if ((type.isLower() && lrng.lower >= 0) ||
+                        (type.isUpper() && lrng.upper <= 0)) {
                     result.addAll(right);
                 }
                 
-                if (rightNum != null && rightNum >= 0) {
+                if ((type.isLower() && rrng.lower >= 0) ||
+                        (type.isUpper() && rrng.upper <= 0)) {
                     result.addAll(left);
                 }
                 
                 return result;
+            } else if (b.operator() == Binary.SUB) {
+                
             }
-        }
-        if (expr instanceof Assign) {
+        } else if (expr instanceof Assign) {
             Assign a = (Assign) expr;
+            Set<LocalInstance> result = new HashSet<LocalInstance>();
             
-            if (a.left() instanceof Local && a.operator().equals(Assign.ASSIGN)) {
-                return Collections.singleton(((Local) a.left()).localInstance());
+            if (a.left() instanceof Local && a.operator() == Assign.ASSIGN) {
+                result.add(((Local) a.left()).localInstance());
             }
+            
+            result.addAll(findLocalInstanceBounds(a.right(), type));
+            return result;
         }
         
         return Collections.emptySet();
@@ -590,14 +670,14 @@ public class IntegerBoundsChecker extends DataFlow
             best = best.intersect(Interval.singleton(n));
         } else if (expr instanceof Unary) {
             Unary u = (Unary)expr;
-            Interval r = findNumericRange(u.expr(), df);
+            Interval rng = findNumericRange(u.expr(), df);
             
-            if (u.operator().equals(Unary.PRE_INC) || u.operator().equals(Unary.PRE_DEC)) {
-                best = best.intersect(r);
-            } else if (u.operator().equals(Unary.POST_INC)) {
-                best = best.intersect(r.shift(-1));
-            } else if (u.operator().equals(Unary.POST_DEC)) {
-                best = best.intersect(r.shift(1));
+            if (u.operator() == Unary.PRE_INC || u.operator() == Unary.PRE_DEC) {
+                best = best.intersect(rng);
+            } else if (u.operator() == Unary.POST_INC) {
+                best = best.intersect(rng.shift(-1));
+            } else if (u.operator() == Unary.POST_DEC) {
+                best = best.intersect(rng.shift(1));
             }
         } else if (expr instanceof Conditional) {
             Conditional c = (Conditional) expr;
@@ -613,11 +693,15 @@ public class IntegerBoundsChecker extends DataFlow
         } else if (expr instanceof Binary) {
             Binary b = (Binary) expr;
             
-            if (b.operator().equals(Binary.ADD)) {
+            if (b.operator() == Binary.ADD) {
                 Interval left = findNumericRange(b.left(), df);
                 Interval right = findNumericRange(b.right(), df);
                 best = best.intersect(left.add(right));
-            } else if (b.operator().equals(Binary.MUL)) {
+            } else if (b.operator() == Binary.SUB) {
+                Interval left = findNumericRange(b.left(), df);
+                Interval right = findNumericRange(b.right(), df);
+                best = best.intersect(left.subtract(right));
+            } else if (b.operator() == Binary.MUL) {
                 Interval left = findNumericRange(b.left(), df);
                 Interval right = findNumericRange(b.right(), df);
                 best = best.intersect(left.multiply(right));
@@ -634,7 +718,7 @@ public class IntegerBoundsChecker extends DataFlow
                 // dataflowitem.
                 Expr right = a.right();
                 
-                if (!a.operator().equals(Assign.ASSIGN)) {
+                if (a.operator() != Assign.ASSIGN) {
                     // fake the experssion.
                     Binary.Operator op = a.operator().binaryOperator();
                     right = nodeFactory().Binary(Position.compilerGenerated(), 
@@ -913,6 +997,20 @@ public class IntegerBoundsChecker extends DataFlow
             
             if (upper != Bounds.POS_INF && other.upper != Bounds.POS_INF) {
                 high = upper + other.upper;
+            }
+            
+            return new Interval(low, high);
+        }
+        
+        public Interval subtract(Interval other) {
+            Long low = Bounds.NEG_INF, high = Bounds.POS_INF;
+            
+            if (lower != Bounds.NEG_INF && other.upper != Bounds.POS_INF) {
+                low = lower - other.upper;
+            }
+            
+            if (upper != Bounds.POS_INF && other.lower != Bounds.NEG_INF) {
+                high = upper - other.lower;
             }
             
             return new Interval(low, high);
