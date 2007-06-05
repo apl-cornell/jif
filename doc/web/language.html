@@ -607,6 +607,28 @@ the program-counter label is relaxed until it is no more restrictive than
 </p>
 
 
+<p class="sssec"><strong>Checked endorse</strong>. 
+Jif provides a special form of the <code>endorse</code> 
+statement to cater for the common case of validating untrusted 
+data. When untrusted data is 
+validated, the data will typically be endorsed only if it passes the 
+validation checks. The <em>checked endorse</em> statement reduces the number of 
+annotations required in this case. A checked endorse is of the following form: 
+
+<div class="code"><pre>
+endorse (<em>x</em>, <em>L</em> to <em>L'</em>) 
+    if (<em>e</em>) <em>S</em> else <em>S'</em>
+</pre></div>
+where <code><em>x</em></code> is a local variable, and 
+<code><em>L</em></code> and <code><em>L'</em></code> are labels. The
+alternate branch (<code>else <em>S'</em></code>) is optional. 
+The local variable <code><em>x</em></code> has label <code><em>L'</em></code>
+in the scope of expression <code><em>e</em></code> and statement 
+<code><em>S</em></code>, but has its standard label in the scope 
+of <code><em>S'</em></code>. The local variable <code><em>x</em></code>
+cannot be updated in <code><em>e</em></code> or <code><em>S</em></code>.
+</p>
+
 <p>
 The <code>declassify</code> and <code>endorse</code> expressions and
 statements weaken security policies, and as such are powerful and
@@ -676,6 +698,8 @@ downgrading of information. The access control mechanism of selective
 downgrading interacts with robustness via the auto-endorsement
 of methods, as a method can only be auto-endorsed if it has sufficient
 authority.</p>
+
+
 
 <h2><a name="label-polymorphism">Polymorphism</a></h2>
 
