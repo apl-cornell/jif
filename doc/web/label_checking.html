@@ -296,9 +296,10 @@ the normal termination label of <i class="math">e</i><sub>2</sub>.
 </p>
 
 
-<p>Jif conservatively assumes that any division or modulo operation
-may throw an <code>ArithmeticException</code>, depending on the value
-of <i class="math">e</i><sub>2</sub>. Thus, the label of such an
+<p>Unless a simple dataflow analysis is able to prove that the value
+of <i class="math">e</i><sub>2</sub> is non-zero, 
+Jif conservatively assumes that any division or modulo operation
+may throw an <code>ArithmeticException</code>. Thus, the label of such an
 <code>ArithmeticException</code> is the normal value label of <i
 class="math">e</i><sub>2</sub>.</p>
 
@@ -425,10 +426,11 @@ class="math">e</i></code> for local variable <code>x</code> (such as
 <code>x*=4+y</code>) is label checked as if it were the assignment
 <code>x = x <i class="math">op</i> <i class="math">e</i></code> . In
 particular, if <i class="math">op</i> is the division
-('<code>/</code>') or modulo ('<code>%</code>') operator, operator,
+('<code>/</code>') or modulo ('<code>%</code>') operator, 
 then label checking conservatively assumes that an
-<code>ArithmeticException</code> may be thrown, and the label
-associated with this expression is the normal value label of the
+<code>ArithmeticException</code> may be thrown (unless a simple 
+dataflow analysis can prove that <i class="math">e</i> is non-zero), and the label
+associated with this exception is the normal value label of the
 expression <i class="math">e</i>. The normal value label for the right
 hand side of the assignment is the label of <code>x</code> joined with
 the normal value label of <i class="math">e</i>.</p>
@@ -501,10 +503,16 @@ restrictions. Arrays must always have a labeled type as their base
 type. When declaring a local, field, or method argument with an array
 type, if no label is given for the base type, then the <a
 href="language.html#default-labels">default</a> label for the base
-type is the empty label <code>{}</code>. For fields with array type,
-the base type of the array cannot contain the <code>{this}</code>
-label, or a covariant label parameter. This requirement must hold
-whether or not the field is declared <code>final</code>. Jif does not
+type is the empty label <code>{}</code>. </p>
+
+<p>Jif allows <a 
+href="language.html#const-arrays">constant arrays</a>: the contents of a constant array cannot be changed after initialization. 
+Constant arrays have less restrictive label checking requirements. In 
+particular, the base type of a non-constant array cannot contain the <code>{this}</code>
+label, or a covariant label parameter; this restriction does not apply 
+to constant arrays.</p>
+
+<p>Jif does not
 support <code>instanceof</code> and run-time casts to array types.</p>
 
 <p>An array initialization expression <code>new <i
@@ -604,7 +612,8 @@ the location is read, which may result in a
 hand side <i class="math">e</i> is then evaluated, after which the
 assignment occurs. Jif conservatively assumes that all <code>/=</code>
 and <code>%=</code> may throw an <code>ArithmeticException</code> when
-the assignment occurs. The label associated with this exception is the
+the assignment occurs, unless a simple dataflow analysis can prove
+that the operand is non-zero. The label associated with this exception is the
 normal value label of <i class="math">e</i> joined with the label of
 termination reaching the assignment without throwing an
 exception. Note that no <code>ArrayStoreException</code> can be

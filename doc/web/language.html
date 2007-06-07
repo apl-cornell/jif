@@ -1437,6 +1437,85 @@ int{*lbl} m{*lbl}(label{*lbl} lbl, principal{*lbl} p, int{Alice:p} i)
 </pre></div>
 
 
+<h2><a name="const-arrays">Constant arrays</a></h2>
+
+<p>Jif allows the base type of an array to be declared constant, meaning 
+that the contents of the array cannot change after initialization. The base 
+type of an array is declared constant by writing <code>const</code> before the 
+brackets. 
+</p>
+<div class="code"><pre>
+    <span class="comment">// foo is a const array</span>
+    int{Alice:} const [] foo = {1, 2, 3}; 
+
+    foo[0] = 2; <span class="comment">// BAD: cannot assign to an element of</span>
+                <span class="comment">// a constant array</span>
+</pre></div>
+
+<p>
+The <code>const</code> modifier applies to all array dimensions. That is, either all 
+the dimensions of an array are constant, or none of them are.
+</p>
+
+<div class="code"><pre>
+    int const[][] foo = {{1,2,3}, {4,5,6}}; 
+    foo[0] = null; <span class="comment">// BAD, const applies to all dimensions</span>
+    foo[0][0] = 4; <span class="comment">// BAD, const applies to all dimensions</span>
+    
+    int [] const [] bar; <span class="comment">// BAD, either all or no dimensions</span>
+                         <span class="comment">// should be const</span>
+</pre></div>
+<p>
+New arrays can be cast to either <code>const</code> or non-<code>const</code> arrays. 
+This includes new arrays created by calling the <code>clone()</code> method of arrays. Note that
+Jif ensures that calls to the <code>clone()</code> method on arrays 
+perform deep copies of the arrays. That is, if
+<code>clone()</code> is called on a multi-dimensional array, then the 
+<code>clone()</code> method is called on each sub-array.
+</p>
+<div class="code"><pre>
+    <span class="comment">// Same new array expression can be cast</span>
+    <span class="comment">// to both const and non-const arrays</span>
+    int{} [] foo = {1, 2, 3}; 
+    int{} const [] foo2 = {1, 2, 3}; 
+    
+    int{} const [] bar = foo.clone(); <span class="comment">// OK, since foo.clone()</span>
+                                      <span class="comment">// is a new array</span>
+</pre></div>
+
+<p>Constant arrays cannot be cast to non-const arrays, nor vice-versa.
+</p>
+<div class="code"><pre>
+    int{} const[] foo = {1, 2, 3};
+    int{}[] bar = foo; <span class="comment">// BAD, cannot assign from a const</span>
+                       <span class="comment">// array to a non-const array</span>
+    foo = bar; <span class="comment">// BAD, cannot assign from a non-const</span>
+               <span class="comment">// array to a const array</span>
+</pre></div>
+
+<p>
+
+<p>Constant arrays are covariant, meaning that the label of the base type
+of the array may change covariantly. This means, for example, that
+the base type of a constant array can have the label <code>{this}</code>, which
+is not allowed with a non-constant array.
+</p>
+<div class="code"><pre>
+    int{Alice:Bob} const[] foo = {1,2,3}; 
+    int{Alice:} const[] bar = foo; <span class="comment">// OK, since const arrays</span>
+                                   <span class="comment">// are covariant and </span>
+                                   <span class="comment">// {Alice:Bob} <= {Alice:}</span>
+
+    <span class="comment">// use of the {this} label for base types is ok</span>
+    final int{this} const[]{this} bar = {1,2,3}; 
+    
+    
+    final int{this}[]{this} baz = {1,2,3}; <span class="comment">// BAD, cannot use </span>
+                             <span class="comment">// the {this} label for base type</span>
+                             <span class="comment">// of non-const array</span>
+</pre></div>
+
+
 <h2><a name="java-changes">Other changes to Java</a></h2>
 
 <p>
