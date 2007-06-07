@@ -1,11 +1,27 @@
 package jif.visit;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import jif.ast.DowngradeExpr;
 import jif.extension.JifExprExt;
-import polyglot.ast.*;
+import polyglot.ast.Assign;
+import polyglot.ast.Binary;
+import polyglot.ast.Conditional;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Local;
+import polyglot.ast.LocalAssign;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Term;
+import polyglot.ast.Unary;
 import polyglot.ast.Binary.Operator;
 import polyglot.frontend.Job;
 import polyglot.types.LocalInstance;
@@ -191,13 +207,7 @@ public class IntegerBoundsChecker extends DataFlow
     protected void setExprBounds(Expr e, Long bound) {
         // TODO store intervals?
         JifExprExt ext = (JifExprExt) e.ext();
-        Long b = ext.getNumericLowerBound();
-        
-        if (b == null || bound < b) {
-            b = bound;
-        }
-        
-        ext.setNumericLowerBound(b);
+        ext.setNumericLowerBound(bound);
     }
 
     /**
@@ -278,7 +288,9 @@ public class IntegerBoundsChecker extends DataFlow
      */
     protected Set<LocalInstance> findLocalInstanceBounds(Expr expr, Bound.Type type) {
         if (expr instanceof Local) {
-            return Collections.singleton(((Local) expr).localInstance());
+            Set<LocalInstance> result = new HashSet<LocalInstance>(1);
+            result.add(((Local) expr).localInstance());
+            return result;
         } else if (expr instanceof Unary) {
             Unary u = (Unary) expr;
             
@@ -367,7 +379,15 @@ public class IntegerBoundsChecker extends DataFlow
                 LocalInstance li = iterator.next();
                 if (df.bounds.containsKey(li)) {
                     // merge the the bounds
-                    newMap.put(li, newMap.get(li).merge(df.bounds.get(li)));                    
+                    Bounds b0 = newMap.get(li);
+                    Bounds b1 = df.bounds.get(li);
+                    int mergeCount = Math.max(b0.mergeCount, b1.mergeCount);
+                    
+                    if (mergeCount < 10) {
+                        newMap.put(li, newMap.get(li).merge(df.bounds.get(li)));
+                    } else {
+                        newMap.put(li, new Bounds(mergeCount));
+                    }
                 }
                 else {
                     // the local does not exist in both, so conservatively we ignore it.
@@ -879,10 +899,19 @@ public class IntegerBoundsChecker extends DataFlow
         
         protected final Interval range;
         protected final Set<Bound> bounds;
+        
+        protected final int mergeCount;
 
         public Bounds() {
             range = Interval.FULL;
             bounds = new HashSet<Bound>();
+            mergeCount = 0;
+        }
+
+        public Bounds(int mergeCount) {
+            range = Interval.FULL;
+            bounds = new HashSet<Bound>();
+            this.mergeCount = mergeCount;
         }
         
         public Bounds(Interval range, Set<Bound> bounds) {
@@ -892,6 +921,17 @@ public class IntegerBoundsChecker extends DataFlow
             
             this.range = range;
             this.bounds = bounds;
+            this.mergeCount = 0;
+        }
+
+        public Bounds(Interval range, Set<Bound> bounds, int mergeCount) {
+            if (range == null || bounds == null) {
+                throw new NullPointerException();
+            }
+            
+            this.range = range;
+            this.bounds = bounds;
+            this.mergeCount = mergeCount;
         }
         
         public Bounds(Long lowerBound, Long upperBound, Set<Bound> bounds) {
@@ -934,18 +974,21 @@ public class IntegerBoundsChecker extends DataFlow
          */
         public Bounds merge(Bounds b1) {
         	Bounds b0 = this;
+            int mergeCount = Math.max(b0.mergeCount, b1.mergeCount);
         	
-            if (b1.isTighterThan(b0)) {
+            /*
+            if (b1.isTighterThan(b0) && b0.mergeCount == mergeCount) {
                 // the merge is just b0, so save some time and memory...
                 return b0;
-            } else if (b0.isTighterThan(b1)) {
+            } else if (b0.isTighterThan(b1) && b1.mergeCount == mergeCount) {
                 return b1;
             }
+            */
 
             Interval rng = b0.range.union(b1.range);
             Set<Bound> bnds = new HashSet<Bound>(b0.bounds);
             bnds.retainAll(b1.bounds);
-            return new Bounds(rng, bnds);
+            return new Bounds(rng, bnds, mergeCount + 1);
         }
         
         /**
@@ -956,18 +999,19 @@ public class IntegerBoundsChecker extends DataFlow
          */
         public Bounds refine(Bounds b1) {
         	Bounds b0 = this;
+            int mergeCount = Math.max(b0.mergeCount, b1.mergeCount);
         	
-            if (b0.isTighterThan(b1)) {
+            if (b0.isTighterThan(b1) && b0.mergeCount == mergeCount) {
                 // the merge is just b0, so save some time and memory...
                 return b0;                
-            } else if (b1.isTighterThan(b0)) {
+            } else if (b1.isTighterThan(b0) && b1.mergeCount == mergeCount) {
                 return b1;
             }
 
             Interval rng = b0.range.intersect(b1.range);
             Set<Bound> bnds = new HashSet<Bound>(b0.bounds);
             bnds.addAll(b1.bounds);
-            return new Bounds(rng, bnds);
+            return new Bounds(rng, bnds, mergeCount);
         }
 
         public boolean equals(Object o) {
@@ -984,7 +1028,7 @@ public class IntegerBoundsChecker extends DataFlow
         }
 
         public String toString() {
-            return "(" + range + ", " + bounds + ")";
+            return "(" + range + ", " + bounds + ", " + mergeCount + ")";
         }
         
     }
@@ -1034,105 +1078,6 @@ public class IntegerBoundsChecker extends DataFlow
         
         /**
          * Produce a new DataFlowItem that is updated with the updates. In
-         * particular, the bounds in updates are known to be true. Information
-         * about the LocalInstance invalid is no longer true; otherwise, all
-         * other facts in this DataFlowItem continue to be true.
-         * 
-         * @deprecated Use update(Map, LocalInstance, LocalInstance).
-         */
-        public DataFlowItem update(Map<LocalInstance, Bounds> updates, LocalInstance invalid) {
-            if (invalid == null && (updates == null || updates.isEmpty())) {
-                // no changes
-                return this;
-            }
-            
-            //System.err.println("Update " + updates + " invalid " + invalid + " to " + this.lowerBounds);
-            
-            // create a copy of the bounds map.
-            Map<LocalInstance, Bounds> newBounds = new HashMap<LocalInstance, Bounds>(bounds);
-            boolean changed = false;
-
-            if (invalid != null) {
-                // the bounds information for invalid no longer holds.
-                if (newBounds.containsKey(invalid)) {
-                    newBounds.remove(invalid);
-                    changed = true;
-                }
-            }
-            
-            // apply each of the updates.
-            for (Iterator<Entry<LocalInstance, Bounds>> iterator = 
-                    updates.entrySet().iterator(); iterator.hasNext();) {
-                Entry<LocalInstance, Bounds> entry = iterator.next();
-                LocalInstance li = entry.getKey();
-                Bounds b0 = entry.getValue();
-                if (li.equals(invalid)) {
-                    // if the old value of the invalid is a lower bound for the new value of the invalid,
-                    // the lower bounds of the old value are lower bounds for the new value.
-                    LocalBound invalidStrict = new LocalBound(Bound.lower(true), invalid);
-                    LocalBound invalidNonStrict = new LocalBound(Bound.lower(false), invalid);
-                    
-                    if (this.bounds.containsKey(invalid) && 
-                            (b0.bounds.contains(invalidStrict) || 
-                                    b0.bounds.contains(invalidNonStrict))) {
-                        // NOTE: if invalidBounds.bounds.contains(invalidStrict), then we can be more precise, as all
-                        // the old bounds are now strict bounds.
-                        Bounds oldInvBounds = this.bounds.get(invalid);
-                        Interval rng = b0.range; 
-                        if (rng.contains(oldInvBounds.range)) {
-                            rng = oldInvBounds.range;
-                        }
-                        changed = true;
-                        b0 = new Bounds(rng, new HashSet<Bound>(b0.bounds));
-                        b0.bounds.addAll(oldInvBounds.bounds);
-                    }                    
-                }
-                Bounds b1 = newBounds.get(li);
-                if (b1 == null) {
-                    newBounds.put(li, b0);
-                    changed = true;
-                }
-                else {
-                    // already had some bounds. Merge them, knowing that all the facts in both are correct.
-                    Bounds b2 = b1.refine(b0);
-                    if (b2 != b1) {
-                        newBounds.put(li, b2);
-                        changed = true;
-                    }
-                }
-            }
-
-            // take care of the invalidated local instance
-            if (invalid != null) {
-                // remove any reference to the invalid local variable
-                LocalBound invalidStrict = new LocalBound(Bound.lower(true), invalid);
-                LocalBound invalidNonStrict = new LocalBound(Bound.lower(false), invalid);
-                Map<LocalInstance, Bounds> cleanedBounds = new HashMap<LocalInstance, Bounds>();
-                for (Iterator<Entry<LocalInstance, Bounds>> iter = 
-                        newBounds.entrySet().iterator(); iter.hasNext();) {
-                    Entry<LocalInstance, Bounds> entry = iter.next();
-                    
-                    Bounds b = entry.getValue();
-                    if (b.bounds.contains(invalidStrict) || b.bounds.contains(invalidNonStrict)) {
-                        changed = true;
-                        b = new Bounds(b.range, new HashSet<Bound>(b.bounds));
-                        b.bounds.remove(invalidStrict);
-                        b.bounds.remove(invalidNonStrict);
-                        
-                    }
-                    cleanedBounds.put(entry.getKey(), b);                    
-                }
-                
-                newBounds = cleanedBounds;
-            }            
-                
-            DataFlowItem result = this;
-            if (changed) result = new DataFlowItem(newBounds);
-            return result;
-        }
-
-        /**
-         * Produce a new DataFlowItem that is updated with the updates. In
          * particular, the bounds in updates are known to be true. If a
          * LocalInstance has changed, it can be specified as increased,
          * decreased, or both.
@@ -1157,6 +1102,7 @@ public class IntegerBoundsChecker extends DataFlow
                     Set<Bound> old = bnds.bounds;
                     Set<Bound> now = new HashSet<Bound>(old);
                     Interval rng = bnds.range;
+                    int mergeCount = bnds.mergeCount;
                     
                     // see if the tracked instance itself changed
                     if (li == increased || li == decreased) {
@@ -1194,7 +1140,7 @@ public class IntegerBoundsChecker extends DataFlow
                     }
 
                     if (old.size() != now.size() || !bnds.range.equals(rng)) {
-                        updated.put(li, new Bounds(rng, now));
+                        updated.put(li, new Bounds(rng, now, mergeCount));
                         changed = true;
                     }
                 }

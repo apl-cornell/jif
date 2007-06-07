@@ -20,5 +20,13 @@ class IntBounds {
             String s = "x > -1";
         }
     }
+    
+    public void f3(int j) {
+        int i = 0;
+        
+        while (j > 100) {
+            i -= 100;
+        }
+    }
 
 }
