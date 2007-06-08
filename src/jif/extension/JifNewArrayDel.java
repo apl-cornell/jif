@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import jif.types.JifTypeSystem;
+import jif.visit.IntegerBoundsChecker;
 import polyglot.ast.Expr;
 import polyglot.ast.NewArray;
 import polyglot.ast.Node;
@@ -58,9 +59,9 @@ public class JifNewArrayDel extends JifJL_c
             Expr d = (Expr)iter.next();
             JifExprExt ext = (JifExprExt)d.ext();
 
-            Long bound = ext.getNumericLowerBound();
+            IntegerBoundsChecker.Interval bounds = ext.getNumericBounds();
             // if bound is not null, then bound < d
-            if (bound == null || bound.longValue() < -1) {
+            if (bounds == null || bounds.getLower() < 0) {
                 // the value of d may be less than 0, and so
                 // a NegativeArraySizeException may be thrown
                 

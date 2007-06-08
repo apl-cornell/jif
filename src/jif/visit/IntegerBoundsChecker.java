@@ -96,18 +96,13 @@ public class IntegerBoundsChecker extends DataFlow
             }
         } else if (n instanceof LocalAssign) {
             LocalAssign la = (LocalAssign) n;
-            Expr right = la.right();
             
-            if (la.operator() != Assign.ASSIGN) {
-                // fake the experssion.
-                Binary.Operator op = la.operator().binaryOperator();
-                right = nodeFactory().Binary(Position.compilerGenerated(), la.left(), op, la.right());
-                right = right.type(la.left().type());
+            if (la.operator() == Assign.ASSIGN) {
+                // li = e, so add li <= e, and e <= li
+                addBounds(updates, la.left(), false, la.right());
+                addBounds(updates, la.right(), false, la.left());
+                
             }
-            
-            // li = e, so add li <= e, and e <= li
-            addBounds(updates, la.left(), false, right);
-            addBounds(updates, right, false, la.left());
             
             // XXX can be smarter and decide if only increases or decreases
             increased = decreased = ((Local) la.left()).localInstance();
@@ -119,23 +114,9 @@ public class IntegerBoundsChecker extends DataFlow
                 
                 if (u.operator() == Unary.POST_INC || 
                         u.operator() == Unary.PRE_INC) {
-                    Bounds b = inDFItem.bounds.get(l.localInstance());
-                    
-                    if (b != null) {
-                        addRangeBound(updates, l.localInstance(),
-                                b.range.shift(1));
-                    }
-                    
                     increased = l.localInstance();
                 } else if (u.operator() == Unary.POST_DEC ||
                         u.operator() == Unary.PRE_DEC) {
-                    Bounds b = inDFItem.bounds.get(l.localInstance());
-                    
-                    if (b != null) {
-                        addRangeBound(updates, l.localInstance(),
-                                b.range.shift(-1));
-                    }
-                    
                     decreased = l.localInstance();
                 }
             }
@@ -188,26 +169,82 @@ public class IntegerBoundsChecker extends DataFlow
         DataFlowItem outDFItem = inDFItem.update(updates, increased, decreased);
 
         if (n instanceof Expr && ((Expr)n).type().isNumeric()) {
-            setExprBounds((Expr) n, findNumericRange((Expr) n, inDFItem).lower);
+            setExprBounds((Expr) n, findNumericRange((Expr) n, inDFItem));
         }
         
         if (n instanceof Expr && ((Expr)n).type().isBoolean() && 
                 (n instanceof Binary || n instanceof Unary)) {
             // flow over boolean conditions (e.g. &&, ||, !, etc) if we can.
             DataFlowItem otherDFItem = outDFItem;
-            if (trueItem == null) trueItem = outDFItem;
-            if (falseItem == null) falseItem = outDFItem;
-            Map m = flowBooleanConditions(trueItem, falseItem, otherDFItem, graph, (Expr)n, succEdgeKeys);            
-            if (m != null) return m;
+            trueItem = trueItem == null ? outDFItem : trueItem;
+            falseItem = falseItem == null ? outDFItem : falseItem;
+            Map m = flowBooleanConditions(trueItem, falseItem, otherDFItem,
+                    graph, (Expr) n, succEdgeKeys);
+            
+            if (m != null) {
+                return m;
+            }
         } 
 
         return itemToMap(outDFItem, succEdgeKeys);
     }
+
+    /**
+     * Record the bounds information. We could be extensible here, and allow
+     * other uses of the info.
+     */
+    public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
+        DataFlowItem dfIn = (DataFlowItem) inItem;
+        
+        if (n instanceof Expr && ((Expr)n).type().isNumeric()) {
+            Interval bounds = findNumericRange((Expr) n, dfIn);
+            //System.err.println("bound for " + n + " : " + bounds);
+            if (bounds != null) {
+                setExprBounds((Expr) n, bounds);
+            }
+        }
+    }
+
+    /**
+     * The confluence of a list of items. Only facts that are true of all
+     * items should be retained.
+     */
+    protected Item confluence(List items, Term node, FlowGraph graph) {
+        Map<LocalInstance, Bounds> newMap = null;
+        for (Iterator iter = items.iterator(); iter.hasNext();) {
+            DataFlowItem df = (DataFlowItem)iter.next();
+            if (newMap == null) {
+                newMap = new HashMap<LocalInstance, Bounds>(df.bounds);
+                continue;
+            }
+
+            for (Iterator<LocalInstance> iterator = newMap.keySet().iterator(); iterator.hasNext();) {                
+                LocalInstance li = iterator.next();
+                if (df.bounds.containsKey(li)) {
+                    // merge the the bounds
+                    Bounds b0 = newMap.get(li);
+                    Bounds b1 = df.bounds.get(li);
+                    newMap.put(li, b0.merge(b1));
+                }
+                else {
+                    // the local does not exist in both, so conservatively we ignore it.
+                    iterator.remove();
+                }
+            }
+        }
+        Item result = new DataFlowItem(newMap);
+        return result;
+    }
     
-    protected void setExprBounds(Expr e, Long bound) {
-        // TODO store intervals?
+    protected void setExprBounds(Expr e, Interval bounds) {
         JifExprExt ext = (JifExprExt) e.ext();
-        ext.setNumericLowerBound(bound);
+        ext.setNumericBounds(bounds);
+    }
+    
+    protected Interval getExprBounds(Expr e) {
+        JifExprExt ext = (JifExprExt) e.ext();
+        Interval rng = ext.getNumericBounds();
+        return rng == null ? Interval.FULL : rng;
     }
 
     /**
@@ -271,26 +308,13 @@ public class IntegerBoundsChecker extends DataFlow
         }
     }
 
-    protected void addRangeBound(Map<LocalInstance, Bounds> updates, 
-            LocalInstance li, Interval rng) {
-        Bounds b = updates.get(li);
-        
-        if (b == null) {
-            b = new Bounds();
-        }
-        
-        updates.put(li, new Bounds(b.range.intersect(rng), b.bounds));
-    }
-    
     /**
-     * Returns the set of LocalInstances that are (non-strict) lower bounds on
-     * the expression
+     * Returns the set of LocalInstances that are (non-strict) lower or upper
+     * bounds on the expression
      */
     protected Set<LocalInstance> findLocalInstanceBounds(Expr expr, Bound.Type type) {
         if (expr instanceof Local) {
-            Set<LocalInstance> result = new HashSet<LocalInstance>(1);
-            result.add(((Local) expr).localInstance());
-            return result;
+            return Collections.singleton(((Local) expr).localInstance());
         } else if (expr instanceof Unary) {
             Unary u = (Unary) expr;
             
@@ -305,9 +329,10 @@ public class IntegerBoundsChecker extends DataFlow
             Conditional c = (Conditional) expr;
             Set<LocalInstance> con = findLocalInstanceBounds(c.consequent(), type);
             Set<LocalInstance> alt = findLocalInstanceBounds(c.alternative(), type);
-            // return the intersection of con and alt.
-            con.retainAll(alt);
-            return con;
+            // return the intersection of con and alt
+            Set<LocalInstance> result = new HashSet<LocalInstance>(con);
+            result.retainAll(alt);
+            return result;
         } else if (expr instanceof Binary) {
             Binary b = (Binary) expr;
             
@@ -330,75 +355,35 @@ public class IntegerBoundsChecker extends DataFlow
                 
                 return result;
             } else if (b.operator() == Binary.SUB) {
+                Set<LocalInstance> left = findLocalInstanceBounds(b.left(), type);
+                Interval rrng = findNumericRange(b.right(), null);
+                Set<LocalInstance> result = new HashSet<LocalInstance>();
                 
+                if ((type.isLower() && rrng.upper <= 0) ||
+                        (type.isUpper() && rrng.lower >= 0)) {
+                    result.addAll(left);
+                }
+                
+                return result;
             }
         } else if (expr instanceof Assign) {
             Assign a = (Assign) expr;
             Set<LocalInstance> result = new HashSet<LocalInstance>();
             
-            if (a.left() instanceof Local && a.operator() == Assign.ASSIGN) {
+            if (a instanceof LocalAssign) {
                 result.add(((Local) a.left()).localInstance());
             }
             
-            result.addAll(findLocalInstanceBounds(a.right(), type));
+            if (a.operator() == Assign.ASSIGN) {
+                result.addAll(findLocalInstanceBounds(a.right(), type));
+            }
+            
             return result;
         }
         
         return Collections.emptySet();
     }
 
-    /**
-     * Record the bounds information. We could be extensible here, and allow
-     * other uses of the info.
-     */
-    public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
-        DataFlowItem dfIn = (DataFlowItem)inItem;
-        if (n instanceof Expr && ((Expr)n).type().isNumeric()) {
-            Long bound = findNumericRange((Expr)n, dfIn).lower;
-//            System.err.println("bound for " + n + " : " + bound);
-            if (bound != null) {
-                setExprBounds((Expr) n, bound);
-            }
-        }
-    }
-
-    /**
-     * The confluence of a list of items. Only facts that are true of all
-     * items should be retained.
-     */
-    protected Item confluence(List items, Term node, FlowGraph graph) {
-        Map<LocalInstance, Bounds> newMap = null;
-        for (Iterator iter = items.iterator(); iter.hasNext();) {
-            DataFlowItem df = (DataFlowItem)iter.next();
-            if (newMap == null) {
-                newMap = new HashMap<LocalInstance, Bounds>(df.bounds);
-                continue;
-            }
-
-            for (Iterator<LocalInstance> iterator = newMap.keySet().iterator(); iterator.hasNext();) {                
-                LocalInstance li = iterator.next();
-                if (df.bounds.containsKey(li)) {
-                    // merge the the bounds
-                    Bounds b0 = newMap.get(li);
-                    Bounds b1 = df.bounds.get(li);
-                    int mergeCount = Math.max(b0.mergeCount, b1.mergeCount);
-                    
-                    if (mergeCount < 10) {
-                        newMap.put(li, newMap.get(li).merge(df.bounds.get(li)));
-                    } else {
-                        newMap.put(li, new Bounds(mergeCount));
-                    }
-                }
-                else {
-                    // the local does not exist in both, so conservatively we ignore it.
-                    iterator.remove();
-                }
-            }
-        }
-        Item result = new DataFlowItem(newMap);
-        return result;
-    }
-    
     /**
      * Finds the tightest numeric bound possible for li. Type can be
      * lower/upper, strict/non-strict.
@@ -450,21 +435,25 @@ public class IntegerBoundsChecker extends DataFlow
     }
     
     /**
-     * Finds the greatest lower bound or least upper bound B it can for expr,
-     * such that B < expr or expr < B, respectively.
+     * Finds the tightest numeric range for expr, given dataflow information
+     * available immediately before evaluation of this expression (but after any
+     * sub-expressions).
      */
     protected Interval findNumericRange(Expr expr, DataFlowItem df) {
         if (!expr.type().isNumeric()) {
             throw new IllegalArgumentException();
         }
         
-        Interval best = Interval.FULL, existing = Interval.FULL;
-        
-        // TODO storing upper bounds in JifExprExt as well?
-        if (df == null) {
-            Long n = ((JifExprExt)expr.ext()).getNumericLowerBound();
-            existing = new Interval(n == null ? Bounds.NEG_INF : n, Bounds.POS_INF);
+        if (expr.isConstant() && expr.constantValue() instanceof Number) {
+            long n = ((Number) expr.constantValue()).longValue();
+            return Interval.singleton(n);
         }
+        
+        if (df == null) {
+            return Interval.FULL;
+        }
+        
+        Interval best = Interval.FULL;
         
         if (expr instanceof Local) {
             LocalInstance li = ((Local) expr).localInstance();
@@ -472,62 +461,53 @@ public class IntegerBoundsChecker extends DataFlow
             Long high = findNumericBound(li, df, Bound.upper(false));
             best = best.intersect(new Interval(low, high));
         } else if (expr.isConstant() && expr.constantValue() instanceof Number) {
-            // needs to be a strict bound
             long n = ((Number) expr.constantValue()).longValue();
             best = best.intersect(Interval.singleton(n));
         } else if (expr instanceof Unary) {
-            Unary u = (Unary)expr;
-            Interval rng = findNumericRange(u.expr(), df);
+            Unary u = (Unary) expr;
+            Interval rng = getExprBounds(u.expr());
             
-            if (u.operator() == Unary.PRE_INC || u.operator() == Unary.PRE_DEC) {
+            if (u.operator() == Unary.POST_INC || u.operator() == Unary.POST_DEC) {
                 best = best.intersect(rng);
-            } else if (u.operator() == Unary.POST_INC) {
-                best = best.intersect(rng.shift(-1));
-            } else if (u.operator() == Unary.POST_DEC) {
+            } else if (u.operator() == Unary.PRE_INC) {
                 best = best.intersect(rng.shift(1));
+            } else if (u.operator() == Unary.PRE_DEC) {
+                best = best.intersect(rng.shift(-1));
             }
         } else if (expr instanceof Conditional) {
             Conditional c = (Conditional) expr;
-            // TODO storing intervals?
-            Long n = ((JifExprExt) c.consequent().ext()).getNumericLowerBound();
-            Interval con = new Interval(n == null ? Bounds.NEG_INF : n, Bounds.POS_INF);
-            n = ((JifExprExt)c.alternative().ext()).getNumericLowerBound();
-            Interval alt = new Interval(n == null ? Bounds.NEG_INF : n, Bounds.POS_INF);
+            Interval con = getExprBounds(c.consequent());
+            Interval alt = getExprBounds(c.alternative());
             best = best.intersect(con.union(alt));
         } else if (expr instanceof DowngradeExpr) {
             DowngradeExpr e = (DowngradeExpr) expr;
-            best = best.intersect(findNumericRange(e.expr(), df));
+            best = best.intersect(getExprBounds(e.expr()));
         } else if (expr instanceof Binary) {
             Binary b = (Binary) expr;
+            Interval left = getExprBounds(b.left());
+            Interval right = getExprBounds(b.right());
             
             if (b.operator() == Binary.ADD) {
-                Interval left = findNumericRange(b.left(), df);
-                Interval right = findNumericRange(b.right(), df);
                 best = best.intersect(left.add(right));
             } else if (b.operator() == Binary.SUB) {
-                Interval left = findNumericRange(b.left(), df);
-                Interval right = findNumericRange(b.right(), df);
                 best = best.intersect(left.subtract(right));
             } else if (b.operator() == Binary.MUL) {
-                Interval left = findNumericRange(b.left(), df);
-                Interval right = findNumericRange(b.right(), df);
                 best = best.intersect(left.multiply(right));
             }
         } else if (expr instanceof Assign) {
             Assign a = (Assign) expr;
+            Interval left = getExprBounds(a.left());
+            Interval right = getExprBounds(a.right());
 
-            best = best.intersect(findNumericRange(a.left(), df));
-            Expr right = a.right();
-
-            if (a.operator() != Assign.ASSIGN) {
-                // fake the experssion.
-                Binary.Operator op = a.operator().binaryOperator();
-                right = nodeFactory().Binary(Position.compilerGenerated(),
-                        a.left(), op, a.right());
-                right = right.type(a.left().type());
+            if (a.operator() == Assign.ASSIGN) {
+                best = best.intersect(right);
+            } else if (a.operator() == Assign.ADD_ASSIGN) {
+                best = best.intersect(left.add(right));
+            } else if (a.operator() == Assign.SUB_ASSIGN) {
+                best = best.intersect(left.subtract(right));
+            } else if (a.operator() == Assign.MUL_ASSIGN) {
+                best = best.intersect(left.multiply(right));
             }
-
-            best = best.intersect(findNumericRange(right, df));     
         } else if (expr instanceof Field) {
             Field f = (Field) expr;
             
@@ -539,7 +519,7 @@ public class IntegerBoundsChecker extends DataFlow
             }
         }
         
-        return best.intersect(existing);
+        return best;
     }
     
     protected static Long max(Long a, Long b) {
@@ -713,7 +693,7 @@ public class IntegerBoundsChecker extends DataFlow
     /**
      * A closed interval over the integers.
      */
-    protected static class Interval {
+    public static class Interval {
         
         /**
          * Interval representing all integers.
@@ -900,20 +880,11 @@ public class IntegerBoundsChecker extends DataFlow
         protected final Interval range;
         protected final Set<Bound> bounds;
         
-        protected final int mergeCount;
-
         public Bounds() {
             range = Interval.FULL;
             bounds = new HashSet<Bound>();
-            mergeCount = 0;
         }
 
-        public Bounds(int mergeCount) {
-            range = Interval.FULL;
-            bounds = new HashSet<Bound>();
-            this.mergeCount = mergeCount;
-        }
-        
         public Bounds(Interval range, Set<Bound> bounds) {
             if (range == null || bounds == null) {
                 throw new NullPointerException();
@@ -921,19 +892,8 @@ public class IntegerBoundsChecker extends DataFlow
             
             this.range = range;
             this.bounds = bounds;
-            this.mergeCount = 0;
         }
 
-        public Bounds(Interval range, Set<Bound> bounds, int mergeCount) {
-            if (range == null || bounds == null) {
-                throw new NullPointerException();
-            }
-            
-            this.range = range;
-            this.bounds = bounds;
-            this.mergeCount = mergeCount;
-        }
-        
         public Bounds(Long lowerBound, Long upperBound, Set<Bound> bounds) {
             this(new Interval(lowerBound, upperBound), bounds);
         }
@@ -974,21 +934,18 @@ public class IntegerBoundsChecker extends DataFlow
          */
         public Bounds merge(Bounds b1) {
         	Bounds b0 = this;
-            int mergeCount = Math.max(b0.mergeCount, b1.mergeCount);
-        	
-            /*
-            if (b1.isTighterThan(b0) && b0.mergeCount == mergeCount) {
+            
+            if (b1.isTighterThan(b0)) {
                 // the merge is just b0, so save some time and memory...
                 return b0;
-            } else if (b0.isTighterThan(b1) && b1.mergeCount == mergeCount) {
+            } else if (b0.isTighterThan(b1)) {
                 return b1;
             }
-            */
 
             Interval rng = b0.range.union(b1.range);
             Set<Bound> bnds = new HashSet<Bound>(b0.bounds);
             bnds.retainAll(b1.bounds);
-            return new Bounds(rng, bnds, mergeCount + 1);
+            return new Bounds(rng, bnds);
         }
         
         /**
@@ -999,19 +956,18 @@ public class IntegerBoundsChecker extends DataFlow
          */
         public Bounds refine(Bounds b1) {
         	Bounds b0 = this;
-            int mergeCount = Math.max(b0.mergeCount, b1.mergeCount);
         	
-            if (b0.isTighterThan(b1) && b0.mergeCount == mergeCount) {
+            if (b0.isTighterThan(b1)) {
                 // the merge is just b0, so save some time and memory...
                 return b0;                
-            } else if (b1.isTighterThan(b0) && b1.mergeCount == mergeCount) {
+            } else if (b1.isTighterThan(b0)) {
                 return b1;
             }
 
             Interval rng = b0.range.intersect(b1.range);
             Set<Bound> bnds = new HashSet<Bound>(b0.bounds);
             bnds.addAll(b1.bounds);
-            return new Bounds(rng, bnds, mergeCount);
+            return new Bounds(rng, bnds);
         }
 
         public boolean equals(Object o) {
@@ -1028,7 +984,7 @@ public class IntegerBoundsChecker extends DataFlow
         }
 
         public String toString() {
-            return "(" + range + ", " + bounds + ", " + mergeCount + ")";
+            return "(" + range + ", " + bounds + ")";
         }
         
     }
@@ -1102,7 +1058,6 @@ public class IntegerBoundsChecker extends DataFlow
                     Set<Bound> old = bnds.bounds;
                     Set<Bound> now = new HashSet<Bound>(old);
                     Interval rng = bnds.range;
-                    int mergeCount = bnds.mergeCount;
                     
                     // see if the tracked instance itself changed
                     if (li == increased || li == decreased) {
@@ -1140,7 +1095,7 @@ public class IntegerBoundsChecker extends DataFlow
                     }
 
                     if (old.size() != now.size() || !bnds.range.equals(rng)) {
-                        updated.put(li, new Bounds(rng, now, mergeCount));
+                        updated.put(li, new Bounds(rng, now));
                         changed = true;
                     }
                 }

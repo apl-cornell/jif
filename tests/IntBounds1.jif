@@ -18,6 +18,7 @@ class IntBounds {
 
         if (x > y++) {
             String s = "x > -1";
+            x = y;
         }
     }
     

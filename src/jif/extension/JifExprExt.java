@@ -17,12 +17,13 @@ public class JifExprExt extends Jif_c
      * we can determine a strict lower bound, then this
      * value is set by the {@link IntegerBoundsChecker}. 
      */
-    private Long numericLowerBound = null;
+    private IntegerBoundsChecker.Interval numericBounds = null;
     
-    public void setNumericLowerBound(Long bound) {
-        this.numericLowerBound = bound;
+    public void setNumericBounds(IntegerBoundsChecker.Interval numericBounds) {
+        this.numericBounds = numericBounds;
     }
-    public Long getNumericLowerBound() {
-        return this.numericLowerBound;
+    
+    public IntegerBoundsChecker.Interval getNumericBounds() {
+        return this.numericBounds;
     }
 }
