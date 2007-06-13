@@ -1071,42 +1071,70 @@ mechanism to weaken the security policies enforced on information. Jif
 allows the declassification (downgrading of confidentiality) and
 endorsement (downgrading of integrity) of expressions and statements.</p>
 
-<h3><a name="downgrading-exprs">Downgrading expressions</a></h3>
+<p>
+Both declassifications and endorsements are required to satisfy several constraints.
+<ul>
+<li> 
+ <b>Single dimension.</b> 
+ <p> Declassifications may only downgrade
+  confidentiality, and endorsements may only downgrade integrity.</p>
+</li>
+<li> 
+ <b><a href="language.html#selective-downgrading">Selective downgrading</a>.</b>
+ <p>All declassifications and endorsements must have sufficient authority. In particular,
+ if a declassification or endorsement weakens or removes a policy owned by principal
+ <i class="math">p</i>, then the code that performs the downgrade must have the authority
+  of <i class="math">p</i> (or a principal able to act for <i class="math">p</i>).
+ </p>
+</li>
+<li> 
+ <b><a href="language.html#robustness">Robustness</a>.</b>
+ <p>
+ Robustness is a useful security
+condition, which ensures that both the decision to downgrade and the data to downgrade are
+of sufficiently high integrity that an attacker cannot abuse the downgrade
+operation to inappropriately view or modify information. The Jif
+compiler enforces label constraints for robustness, as
+described in [<a href="bibliography.html#CM06">CM06</a>], which provides details of the security
+condition, and the motivation for the constraints.
+</p>
+</li>
+</ul>
+</p>
+
+<p>
+The actual label constraints to enforce these requirements are given below,
+during the presentation of declassification expressions, endorsement expressions, 
+declassification statements, and endorsement statements.
+</p>
+
+
+<h3><a name="declass-exprs">Declassification expressions</a></h3>
 
 <p>The expression <code>declassify(<i class="math">e</i>,<i
 class="math">L<sub>from</sub></i> to <i
 class="math">L<sub>to</sub></i>)</code> downgrades the confidentiality
 of expression <i class="math">e</i> from the label <i
 class="math">L<sub>from</sub></i> to the label <i
-class="math">L<sub>to</sub></i>. Similarly, <code>endorse(<i
-class="math">e</i>,<i class="math">L<sub>from</sub></i> to <i
-class="math">L<sub>to</sub></i>)</code> downgrades the integrity of
-expression <i class="math">e</i> from the label <i
-class="math">L<sub>from</sub></i> to the label <i
-class="math">L<sub>to</sub></i>. Downgrades are checked statically, so
-a downgrading expression is evaluated just by evaluating the
-subexpression <i class="math">e</i>. Thus, a downgrading expression
+class="math">L<sub>to</sub></i>. A declassify expression is evaluated 
+just by evaluating the
+subexpression <i class="math">e</i>; that is, a declassification has 
+no runtime effect and the labels <i
+class="math">L<sub>from</sub></i> and <i
+class="math">L<sub>to</sub></i> are not evaluated at run-time. Thus, a declassification expression
 may throw any exception that <i class="math">e</i> may throw, and
-label checking for a downgrading expression associates the same labels
+label checking for a declassification expression associates the same labels
 to exceptions that label checking <i class="math">e</i> does. The
-normal termination label of a downgrading expression is the same as
+normal termination label of a declassification expression is the same as
 the normal termination label of <i class="math">e</i>.</p>
 
-<p>The normal value label of a downgrading expression is <i
+<p>The normal value label of a declassification expression is <i
 class="math">L<sub>to</sub></i>, and the normal value label of the
 subexpression <i class="math">e</i> must be bounded above by the label
-<i class="math">L<sub>from</sub></i>. Thus, a downgrading expression
-downgrades the normal value label of an expression.</p>
+<i class="math">L<sub>from</sub></i>. Thus, a declassification expression
+declassifies the normal value label of an expression.</p>
 
-<a name="downgrade-from-to-restrictions"/>
-<p>The Jif compiler enforces several constraints on the labels <i
-class="math">L<sub>from</sub></i> and <i
-class="math">L<sub>to</sub></i>. 
-</p>
-
-<h4><A NAME="single-dim">Single dimension</A></h4> 
-
-<p>A <code>declassify</code> expression may
+<p><b>Single dimension.</b> A <code>declassify</code> expression may
 only downgrade the confidentiality of a label. Label checking enforces
 this by requiring that the following constraint is satisfied.</p>
 
@@ -1123,27 +1151,10 @@ constraint ensures that the integrity of <i
 class="math">L<sub>from</sub></i> is no more restrictive that the
 integrity of <i class="math">L<sub>to</sub></i>.</p>
 
-<p>  Dually, an
-<code>endorse</code> expression may only downgrade the integrity of a
-label, which is enforce by requiring </p>
-<div class="mathdisplay">
-{&#8868;&rarr;&#8868;; &#8868;&larr;&#8868;} &#8851; <i
-class="math">L<sub>from</sub></i> &#8849; <i
-class="math">L<sub>to</sub></i>
-</div>
-<p class="cont">is satisfied. This constraint
-ensures that the confidentiality of <i
-class="math">L<sub>from</sub></i> is no more restrictive that the
-confidentiality of <i class="math">L<sub>to</sub></i>.<p>
 
-<h4><A NAME="selective-downgrading">Selective downgrading</A></h4> 
-<p>
-To enforce <a href="language.html#selective-downgrading">selective
-downgrading</a>  Jif requires
-that all downgrade expressions have sufficient authority, namely, that
-if a policy owned by principal <i class="math">p</i> is weakened
-during a downgrade operation, then then the code that performs the
-downgrade must have the authority of <i class="math">p</i> (or a
+<p><b>Selective downgrading.</b> If a declassification weakens or removes
+a confidentiality policy owned by principal <i class="math">p</i>, then the code that performs the
+declassification must have the authority of <i class="math">p</i> (or a
 principal able to act for <i class="math">p</i>). If the code has the
 authority of principals <i class="math">p</i><sub>1</sub>, ..., <i
 class="math">p</i><sub>n</sub> (as described in <a class="secref"
@@ -1175,39 +1186,7 @@ satisfied: the code would have insufficient authority to perform the
 declassification.
 </p>
 
-<p>
-The dual case for endorsement is that the following constraint must be satisfied.</p>
-<div class="mathdisplay">
-<i
-class="math">L<sub>from</sub></i> &#8851;
-{&perp;&larr;&perp;; <i class="math">p</i><sub>1</sub> &rarr;&#8868; &#8851; ... &#8851; <i
-class="math">p</i><sub>n</sub>&rarr;&#8868;}
-&#8849; <i
-class="math">L<sub>to</sub></i>
-</div>
-<p class="cont">
-Here, the authority of the code is represented by the integrity policy
-<i class="math">p</i><sub>1</sub> &rarr;&#8868; &#8851; ... &#8851; <i
-class="math">p</i><sub>n</sub>&rarr;&#8868;, which is used to limit
-which integrity policies may be weakened by an
-<code>endorse</code> expression.</p>
-
-<h4><A NAME="robustness">Robustness</A></h4> 
-
-<p>
-<a href="language.html#robustness">Robustness</a> is a useful security
-condition, which ensures that both the decision to downgrade and the data to downgrade are
-of sufficiently high integrity that an attacker cannot abuse the downgrade
-operation to inappropriately view or modify information. The Jif
-compiler can optionally enforce label constraints for robustness, as
-described in [<a href="bibliography.html#CM06">CM06</a>]. We describe
-here the constraints that are implemented in the Jif compiler to
-enforce robustness, but refer the interested reader to [<a
-href="bibliography.html#CM06">CM06</a>] for details of the security
-condition itself, and the motivation for the constraints.
-</p>
-
-<p>For <code>declassify</code> expressions, robustness requires that
+<p><b>Robustness.</b> For <code>declassify</code> expressions, robustness requires that
 both the decision to declassify, and the information being
 declassified are high integrity. In particular, this requires the
 following two constraints to be satisfied, where <u>pc</u> is the
@@ -1264,10 +1243,77 @@ wtr(<i class="math">c</i><sub>1</sub> &#8851; <i class="math">c</i><sub>2</sub>)
 wtr(<i class="math">p</i>&larr;<i class="math">q</i>) &#8796; <i class="math">p</i>&rarr;<i class="math">q</i>             
 </div>
 
-<p>For <code>endorse</code> expressions, weaker constraints are
-enforced. Robustness for endorsement requires the decision to endorse
-data is high integrity, but the data itself is (by definition) low
-integrity.<p>
+
+
+
+<h3><a name="endorse-exprs">Endorse expressions</a></h3>
+<p>The expression <code>endorse(<i class="math">e</i>,<i
+class="math">L<sub>from</sub></i> to <i
+class="math">L<sub>to</sub></i>)</code> downgrades the integrity
+of expression <i class="math">e</i> from the label <i
+class="math">L<sub>from</sub></i> to the label <i
+class="math">L<sub>to</sub></i>. Endorsements are checked statically, so
+a downgrading expression is evaluated just by evaluating the
+subexpression <i class="math">e</i>; the labels <i
+class="math">L<sub>from</sub></i> and <i
+class="math">L<sub>to</sub></i> are not evaluated at run-time. Thus, an endorse expression
+may throw any exception that <i class="math">e</i> may throw, and
+label checking for an endorsement expression associates the same labels
+to exceptions that label checking <i class="math">e</i> does. The
+normal termination label of an endorse expression is the same as
+the normal termination label of <i class="math">e</i>.</p>
+
+<p>The normal value label of an endorse expression is <i
+class="math">L<sub>to</sub></i>, and the normal value label of the
+subexpression <i class="math">e</i> must be bounded above by the label
+<i class="math">L<sub>from</sub></i>. Thus, an endorse expression
+endorses the normal value label of an expression.</p>
+
+<p><b>Single dimension.</b> An <code>endorse</code> expression may
+downgrade the integrity of a label. Label checking enforces
+this by requiring that the following constraint is satisfied.</p>
+
+<div class="mathdisplay">
+{&#8868;&rarr;&#8868;; &#8868;&larr;&#8868;} &#8851; <i
+class="math">L<sub>from</sub></i> &#8849; <i
+class="math">L<sub>to</sub></i>
+</div>
+<p>The label {&#8868;&rarr;&#8868;; &#8868;&larr;&#8868;} contains the most
+ restrictive integrity policy, and the least restrictive confidentiality policy, and so 
+this constraint
+ensures that the integrity of <i
+class="math">L<sub>from</sub></i> is no more restrictive that the
+integrity of <i class="math">L<sub>to</sub></i>.<p>
+
+<p><b>Selective downgrading.</b> If an endorsement weakens or removes
+an integrity policy owned by principal <i class="math">p</i>, then the code that performs the
+endorsement must have the authority of <i class="math">p</i> (or a
+principal able to act for <i class="math">p</i>). If the code has the
+authority of principals <i class="math">p</i><sub>1</sub>, ..., <i
+class="math">p</i><sub>n</sub> (as described in <a class="secref"
+href="language.html#authority">Authority and access control</a>), then
+the Jif compiler requires that <code>endorse</code> expressions satisfy the following constraint.</p>
+
+<div class="mathdisplay">
+<i
+class="math">L<sub>from</sub></i> &#8851;
+{&perp;&larr;&perp;; <i class="math">p</i><sub>1</sub> &rarr;&#8868; &#8851; ... &#8851; <i
+class="math">p</i><sub>n</sub>&rarr;&#8868;}
+&#8849; <i
+class="math">L<sub>to</sub></i>
+</div>
+<p class="cont">
+Here, the authority of the code is represented by the integrity policy
+<i class="math">p</i><sub>1</sub> &rarr;&#8868; &#8851; ... &#8851; <i
+class="math">p</i><sub>n</sub>&rarr;&#8868;, which is used to limit
+which integrity policies may be weakened by an
+<code>endorse</code> expression.</p>
+
+
+<p><b>Robustness.</b> For <code>endorse</code> expressions, robustness requires that
+ the decision to endorse is high integrity. Unlike declassification, the information being
+endorsed is (by definition) low integrity. In particular, the following constraint must be
+satisfied.
 
 <div class="mathdisplay">
 <i
@@ -1279,21 +1325,19 @@ confidentiality policy of <i class="math">L</i>, and is simply
 equivalent to <i class="math">L</i> &#8852;
 {&#8868;&rarr;&#8868;;&#8868;&larr;&#8868;}.</p>
 
-<h3><a name="downgrading-stmts">Downgrading statements</a></h3>
+
+
+
+
+<h3><a name="declass-stmts">Declassification statements</a></h3>
 
 <p>The statement <code>declassify(<i class="math">L<sub>from</sub></i>
 to <i class="math">L<sub>to</sub></i>) <i class="math">S</i></code>
 downgrades the confidentiality of the program counter label from <i
 class="math">L<sub>from</sub></i> to <i
 class="math">L<sub>to</sub></i> for the label checking of the
-statement <i class="math">S</i>. Similarly, <code>endorse(<i
-class="math">L<sub>from</sub></i> to <i
-class="math">L<sub>to</sub></i>) <i class="math">S</i></code>
-downgrades the integrity of the program counter label from <i
-class="math">L<sub>from</sub></i> to <i
-class="math">L<sub>to</sub></i> for the label checking of the
-statement <i class="math">S</i>. Label checking of downgrades is done
-completely statically, so the labels <i
+statement <i class="math">S</i>. Label checking of declassification statements is done
+completely static, so the labels <i
 class="math">L<sub>from</sub></i> and <i
 class="math">L<sub>to</sub></i> are not evaluated at run-time.
 </p>
@@ -1315,25 +1359,102 @@ class="math">L<sub>to</sub></i>. Normally, both of these labels are
 bounded above by the start label of the current method.</p>
 
 <p>If <i class="math">S</i> can complete normally, then the normal
-termination label of the downgrade statement is the normal termination
+termination label of the declassify statement is the normal termination
 label of <i class="math">S</i> joined with the program counter label for the
-downgrade statement (that is, the program counter label just before it
-is downgraded). Any exception that may be thrown by the statement
-<i class="math">S</i> may also be thrown by the downgrading statement, with
+declassify statement (that is, the program counter label just before it
+is declassified). Any exception that may be thrown by the statement
+<i class="math">S</i> may also be thrown by the declassify statement, with
 the same label associated with it.
 </p>
 
 <p>The restrictions on <i class="math">L<sub>from</sub></i> and <i
-class="math">L<sub>to</sub></i> that are applied to downgrading
-expressions are also applied to downgrading statements. In particular:
+class="math">L<sub>to</sub></i> that are applied to declassification
+expressions are also applied to declassification statements. In particular:
 (1) a <code>declassify</code> statement may only downgrade
-confidentiality, whereas an <code>endorse</code> statement may only
-downgrade integrity; (2) a downgrade statement must have sufficient
-authority to perform the downgrade; and (3) if robustness is being
-enforced, the downgrade must be robust. More details of these
-constraints are given <a href="#downgrade-from-to-restrictions">above</a>.
+confidentiality; (2) a declassify statement must have sufficient
+authority to perform the declassification; and (3) the declassification
+must be robust. More details of these
+constraints are given <a href="#declass-exprs">above</a>.
 </p>
 
+
+
+
+<h3><a name="endorse-stmts">Endorse statements</a></h3>
+
+<p>The statement <code>endorse(<i class="math">L<sub>from</sub></i>
+to <i class="math">L<sub>to</sub></i>) <i class="math">S</i></code>
+downgrades the integrity of the program counter label from <i
+class="math">L<sub>from</sub></i> to <i
+class="math">L<sub>to</sub></i> for the label checking of the
+statement <i class="math">S</i>. Label checking of endorse statements is done
+completely static, so the labels <i
+class="math">L<sub>from</sub></i> and <i
+class="math">L<sub>to</sub></i> are not evaluated at run-time.
+</p>
+
+<p>The contained statement <i class="math">S</i> is label checked with
+the program counter label set to <i
+class="math">L<sub>to</sub></i>. In addition, label checking for <i
+class="math">S</i> assumes that <i class="math">L<sub>to</sub></i> is
+the lower bound for side-effects such as field update. (The lower
+bound for side-effects is normally equal to the start label of the
+current method.) The label environment for label checking <i
+class="math">S</i> has two new facts added to it:
+<code>{this}</code>&#8849;<i class="math">L<sub>to</sub></i> and
+<code>caller_pc</code>&#8849;<i class="math">L<sub>to</sub></i>. These
+facts state that both the label of the reference to the
+<code>this</code> object, and the program counter label at the call
+site of the current method, are no more restrictive than <i
+class="math">L<sub>to</sub></i>. Normally, both of these labels are
+bounded above by the start label of the current method.</p>
+
+<p>If <i class="math">S</i> can complete normally, then the normal
+termination label of the endorse statement is the normal termination
+label of <i class="math">S</i> joined with the program counter label for the
+endorse statement (that is, the program counter label just before it
+is endorsed). Any exception that may be thrown by the statement
+<i class="math">S</i> may also be thrown by the endorse statement, with
+the same label associated with it.
+</p>
+
+<p>The restrictions on <i class="math">L<sub>from</sub></i> and <i
+class="math">L<sub>to</sub></i> that are applied to endorsement
+expressions are also applied to endorsement statements. In particular:
+(1) an <code>endorse</code> statement may only
+downgrade integrity; (2) an endorse statement must have sufficient
+authority to perform the endorsement; and (3) the endorsement
+must be robust. More details of these
+constraints are given <a href="#endorse-exprs">above</a>.
+</p>
+
+
+<p class="sssec"><strong>Checked endorse</strong>. 
+The <a href="language.html#checked-endorse">checked endorse</a> statement caters
+for the common case of validating untrusted 
+data, and takes the following form: 
+</p>
+<div class="code"><pre>
+endorse (<em>x</em>, <i class="math">L<sub>from</sub></i> to <i class="math">L<sub>to</sub></i>) 
+    if (<em>e</em>) <em>S</em> else <em>S'</em>
+</pre></div>
+<p class="cont">where <code><em>x</em></code> is a local variable, and 
+<code><i class="math">L<sub>from</sub></i></code> and <code><i class="math">L<sub>to</sub></i></code> are labels.</p>
+
+<p> The label checking of checked endorse statements proceeds as if the checked endorse statement
+were equivalent to the statement</p>
+<div class="code"><pre>
+<em>x'</em> = endorse (<em>x</em>, <i class="math">L<sub>from</sub></i> to <i class="math">L<sub>to</sub></i>);
+if (<em>e</em>[<em>x'</em>/<em>x</em>]) <em>S</em>[<em>x'</em>/<em>x</em>] else <em>S'</em>
+</pre></div>
+<p class="cont">where <code><em>x'</em></code> is a fresh local variable of the appropriate type,
+and  <code><em>e</em>[<em>x'</em>/<em>x</em>]</code> and 
+<code><em>S</em>[<em>x'</em>/<em>x</em>]</code> denote 
+<em>e</em> and <em>S</em> respectively, with all occurrences of <code><em>x</em></code> replaced
+with <code><em>x'</em></code>. Thus, the label checking
+for a checked endorse statement is more like the label 
+checking for an endorse expression, than for a standard endorse statement.
+</p>
 
 <h2><a name="method-decls">Method declarations</a></h2>
 

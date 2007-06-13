@@ -607,6 +607,7 @@ the program-counter label is relaxed until it is no more restrictive than
 </p>
 
 
+<a name="checked-endorse">
 <p class="sssec"><strong>Checked endorse</strong>. 
 Jif provides a special form of the <code>endorse</code> 
 statement to cater for the common case of validating untrusted 
@@ -614,12 +615,12 @@ data. When untrusted data is
 validated, the data will typically be endorsed only if it passes the 
 validation checks. The <em>checked endorse</em> statement reduces the number of 
 annotations required in this case. A checked endorse is of the following form: 
-
+</p>
 <div class="code"><pre>
 endorse (<em>x</em>, <em>L</em> to <em>L'</em>) 
     if (<em>e</em>) <em>S</em> else <em>S'</em>
 </pre></div>
-where <code><em>x</em></code> is a local variable, and 
+<p class="cont">where <code><em>x</em></code> is a local variable, and 
 <code><em>L</em></code> and <code><em>L'</em></code> are labels. The
 alternate branch (<code>else <em>S'</em></code>) is optional. 
 The local variable <code><em>x</em></code> has label <code><em>L'</em></code>
