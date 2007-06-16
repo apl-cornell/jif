@@ -62,8 +62,8 @@ public class LabelExpr_c extends Expr_c implements LabelExpr
         return label().label().throwTypes(ts);
     }
     
-    public Term entry() {
-        return this;
+    public Term firstChild() {
+        return null;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {

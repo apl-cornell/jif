@@ -35,8 +35,8 @@ public class Wrapper extends Expr_c {
         return succs;
     }
 
-    public Term entry() {
-        return this;    
+    public Term firstChild() {
+        return null;
     }
 }
 

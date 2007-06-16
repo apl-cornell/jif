@@ -9,7 +9,6 @@ class IntBounds {
         }
 
         j++;
-        return;
     }
 
     public void f2() {

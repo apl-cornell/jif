@@ -49,7 +49,7 @@ public class CanonicalPrincipalNode_c extends PrincipalNode_c implements Canonic
     public List acceptCFG(CFGBuilder v, List succs) {
         return succs;
     }
-    public Term entry() {
-        return this;    
+    public Term firstChild() {
+        return null;
     }
 }

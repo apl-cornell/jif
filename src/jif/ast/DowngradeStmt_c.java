@@ -79,12 +79,12 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt
         return reconstruct(bound, label, body);
     }
 
-    public Term entry() {
-        return body.entry();
+    public Term firstChild() {
+        return body;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(body, this);
+        v.visitCFG(body, this, false);
         return succs;
     }
 

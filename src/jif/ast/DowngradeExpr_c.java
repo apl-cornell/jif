@@ -88,19 +88,19 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
         return type(expr.type());
     }
 
-    public Term entry() {
-        return expr.entry();
+    public Term firstChild() {
+        return expr;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
         JifTypeSystem ts = (JifTypeSystem)v.typeSystem();
         if (ts.Boolean().equals(ts.unlabel(expr.type()))) {
             // allow more precise dataflow when downgrading a boolean expression. 
-            v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this, 
-                       FlowGraph.EDGE_KEY_FALSE, this);
+            v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this, false, 
+                       FlowGraph.EDGE_KEY_FALSE, this, false);
         }
         else {
-            v.visitCFG(expr, this);
+            v.visitCFG(expr, this, false);
         }
         return succs;
     }

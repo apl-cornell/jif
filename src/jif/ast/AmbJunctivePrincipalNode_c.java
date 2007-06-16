@@ -62,8 +62,8 @@ public class AmbJunctivePrincipalNode_c extends PrincipalNode_c implements AmbJu
     public List acceptCFG(CFGBuilder v, List succs) {
         return succs;
     }
-    public Term entry() {
-        return this;    
+    public Term firstChild() {
+        return null;
     }
     public Node visitChildren(NodeVisitor v) {        
         PrincipalNode l = (PrincipalNode) visitChild(this.left, v);

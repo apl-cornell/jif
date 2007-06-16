@@ -60,8 +60,8 @@ public class PrincipalExpr_c extends Expr_c implements PrincipalExpr
         return principal().principal().throwTypes(ts);
     }
     
-    public Term entry() {
-        return this;
+    public Term firstChild() {
+        return null;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {

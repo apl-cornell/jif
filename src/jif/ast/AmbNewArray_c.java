@@ -98,8 +98,8 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
         return succs;
     }
 
-    public Term entry() {
-        return this;    
+    public Term firstChild() {
+        return null;
     }
 
     /** Visits the children of this node. */
