@@ -1,12 +1,10 @@
 package jif.ast;
 
-import java.util.List;
-
+import jif.extension.JifExprExt;
+import jif.visit.IntegerBoundsChecker.Interval;
 import polyglot.ast.Binary;
 import polyglot.ast.Binary_c;
 import polyglot.ast.Expr;
-import polyglot.ast.Binary.Operator;
-import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
 public class JifBinary_c extends Binary_c implements Binary
@@ -27,6 +25,14 @@ public class JifBinary_c extends Binary_c implements Binary
                 Object o = right.constantValue();
                 if (o instanceof Number && ((Number)o).longValue() != 0) {
                     return false;
+                }
+            }
+            if (((JifExprExt)right().del()).getNumericBounds() != null) {
+                Interval i = ((JifExprExt)right().del()).getNumericBounds();
+                if ((i.getLower() != null && i.getLower().longValue() > 0) ||
+                        (i.getUpper() != null && i.getUpper().longValue() < 0)) {
+                    // the right operand is non zero
+                    return false;                    
                 }
             }
             return true;
