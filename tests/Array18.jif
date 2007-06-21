@@ -23,4 +23,10 @@ class C {
         d = d < 0 ? 0 : d;
         int[] c = new int[d]; // will never throw
     }
+    void r{*!:*}() { 
+        // test negative size arrays
+        int d = n();
+        int e = d < 0 ? 0 : d;
+        int[] c = new int[e]; // will never throw
+    }
 }

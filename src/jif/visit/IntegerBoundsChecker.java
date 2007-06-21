@@ -1,27 +1,10 @@
 package jif.visit;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import jif.ast.DowngradeExpr;
 import jif.extension.JifExprExt;
-import polyglot.ast.Assign;
-import polyglot.ast.Binary;
-import polyglot.ast.Conditional;
-import polyglot.ast.Expr;
-import polyglot.ast.Field;
-import polyglot.ast.Local;
-import polyglot.ast.LocalAssign;
-import polyglot.ast.LocalDecl;
-import polyglot.ast.NodeFactory;
-import polyglot.ast.Term;
-import polyglot.ast.Unary;
+import polyglot.ast.*;
 import polyglot.ast.Binary.Operator;
 import polyglot.frontend.Job;
 import polyglot.types.LocalInstance;
@@ -86,7 +69,7 @@ public class IntegerBoundsChecker extends DataFlow
             
             if (ld.init() != null) {
                 // li = init, so add li <= init, and init <= li
-                int result = addBoundsAssign(updates, ld.localInstance(), ld.init(), inDFItem);
+                int result = addBoundsAssign(updates, ld.localInstance(), ld.init(), inDFItem, null);
                 if ((result | MAY_INCREASE) != 0) increased = ld.localInstance(); 
                 if ((result | MAY_DECREASE) != 0) decreased = ld.localInstance(); 
             }
@@ -103,7 +86,7 @@ public class IntegerBoundsChecker extends DataFlow
             }
 
             // li = e, so add li <= e, and e <= li
-            int result = addBoundsAssign(updates, li , right, inDFItem);                                            
+            int result = addBoundsAssign(updates, li , right, inDFItem, ((JifExprExt)la.ext()).getNumericBounds());                                            
             if ((result | MAY_INCREASE) != 0) increased = li; 
             if ((result | MAY_DECREASE) != 0) decreased = li;
             
@@ -314,11 +297,13 @@ public class IntegerBoundsChecker extends DataFlow
     /**
      * Add the bounds for an assignment li = right. Returns an
      * int indicating if the value of li may have increased or
-     * decreased as a result of the assignment.
+     * decreased as a result of the assignment. existingNumericBounds
+     * is the existing numeric bounds recorded for the assignment, and is
+     * used to detect if we may be increasing upper bound without end, or 
+     * decreasing the lower bound without end.
      */
     protected int addBoundsAssign(Map<LocalInstance, Bounds> updates, 
-            LocalInstance li, Expr right, DataFlowItem df) {
-//        System.err.println("Bounds for " + li.name() + " = " + right);
+            LocalInstance li, Expr right, DataFlowItem df, Interval existingNumericBounds) {
 
         int result = MAY_INCREASE | MAY_DECREASE;
         if (!li.type().isNumeric() || !right.type().isNumeric()) {
@@ -351,9 +336,8 @@ public class IntegerBoundsChecker extends DataFlow
             }
             else {
                 // the old value of li is an upper bound for
-                // the new value. There for the value did not increase
+                // the new value. Therefore the value did not increase
                 result &= ~MAY_INCREASE; 
-//                System.err.println(r.name() + " did not increase");
             }
         }
         
@@ -376,26 +360,28 @@ public class IntegerBoundsChecker extends DataFlow
             }
             else {
                 // the old value of li is a lower bound for
-                // the new value. There for the value did not decrease
+                // the new value. Therefore the value did not decrease
                 result &= ~MAY_DECREASE; 
-//                System.err.println(r.name() + " did not decrease");
             }
         }
         
         // find the numeric bounds.
         Interval rrng = findNumericRange(right, df);
-//        System.err.println("range for  " + right + " is " + rrng);
-
-        if ((result & MAY_INCREASE) != 0) {
-            // the assignment may result in the value increasing
-            rrng = new Interval(rrng.lower, Bounds.POS_INF);
+        if (existingNumericBounds != null) {            
+            if ((result & MAY_INCREASE) != 0 && rrng.upper > existingNumericBounds.upper) {
+                // the upper bound is increasing from the old upper bound. Be conservative, and
+                // assume it may go all the way up.
+                rrng = new Interval(rrng.lower, Bounds.POS_INF);
+            }
+            if ((result & MAY_DECREASE) != 0 && rrng.lower < existingNumericBounds.lower) {
+                // the lower numeric bound is decreasing from the old lower bound.
+                // Be conservative, and assume that it may go all the way down.
+                rrng = new Interval(Bounds.NEG_INF, rrng.upper);
+            }
         }
-        if ((result & MAY_DECREASE) != 0) {
-            // the assignment may result in the value decreasing
-            rrng = new Interval(Bounds.NEG_INF, rrng.upper);
-        }
-//        System.err.println("  range now for  " + right + " is " + rrng);
 
+//        System.err.println("Numeric bounds for " + li.name() + " are " + rrng);
+        
         updates.put(li, new Bounds(rrng, b.bounds));
         return result;
     }
