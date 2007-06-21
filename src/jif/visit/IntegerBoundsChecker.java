@@ -71,7 +71,7 @@ public class IntegerBoundsChecker extends DataFlow
                                      falseItem, FlowGraph.EDGE_KEY_FALSE,
                                      otherItem, FlowGraph.EDGE_KEY_OTHER,
                                      n, graph);
-//        System.err.println("flow for " + n + " : in " + inItem);
+        //System.err.println("flow for " + n + " : in " + inItem);
 
         DataFlowItem inDFItem = ((DataFlowItem)inItem);
         
@@ -85,27 +85,28 @@ public class IntegerBoundsChecker extends DataFlow
             LocalDecl ld = (LocalDecl) n;
             
             if (ld.init() != null) {
-                Local l = (Local) nodeFactory().Local(
-                        Position.compilerGenerated(), ld.id()).localInstance(
-                                ld.localInstance()).type(ld.localInstance().type());
                 // li = init, so add li <= init, and init <= li
-                addBounds(updates, l, false, ld.init());
-                addBounds(updates, ld.init(), false, l);
-                
-                increased = decreased = ld.localInstance();
+                int result = addBoundsAssign(updates, ld.localInstance(), ld.init(), inDFItem);
+                if ((result | MAY_INCREASE) != 0) increased = ld.localInstance(); 
+                if ((result | MAY_DECREASE) != 0) decreased = ld.localInstance(); 
             }
         } else if (n instanceof LocalAssign) {
             LocalAssign la = (LocalAssign) n;
             
+            LocalInstance li = ((Local)la.left()).localInstance();
             if (la.operator() == Assign.ASSIGN) {
                 // li = e, so add li <= e, and e <= li
-                addBounds(updates, la.left(), false, la.right());
-                addBounds(updates, la.right(), false, la.left());
-                
+                int result = addBoundsAssign(updates, li , la.right(), inDFItem);                                            
+                if ((result | MAY_INCREASE) != 0) increased = li; 
+                if ((result | MAY_DECREASE) != 0) decreased = li;
+                // !@!
+                if (increased == null) System.err.println(li.name() + " did not increase");
+                if (decreased == null) System.err.println(li.name() + " did not decrease");
             }
+            // !@! deal with opassign
             
             // XXX can be smarter and decide if only increases or decreases
-            increased = decreased = ((Local) la.left()).localInstance();
+            increased = decreased = li;
         } else if (n instanceof Unary) {
             Unary u = (Unary) n;
             
@@ -306,6 +307,97 @@ public class IntegerBoundsChecker extends DataFlow
             
             updates.put(r, new Bounds(rlower, b.range.upper, b.bounds));
         }
+    }
+
+    private static final int MAY_INCREASE = 1;
+    private static final int MAY_DECREASE = 2;
+    /**
+     * Add the bounds for an assignment li = right. Returns an
+     * int indicating if the value of li may have increased or
+     * decreased as a result of the assignment.
+     */
+    protected int addBoundsAssign(Map<LocalInstance, Bounds> updates, 
+            LocalInstance li, Expr right, DataFlowItem df) {
+//        System.err.println("Bounds for " + li.name() + " = " + right);
+
+        int result = MAY_INCREASE | MAY_DECREASE;
+        if (!li.type().isNumeric() || !right.type().isNumeric()) {
+            return result;
+        }
+        
+        Bounds b = updates.get(li);
+
+        if (b == null) {
+            b = new Bounds();
+        }
+        
+        // set of upper bounds of the RHS
+        Set<LocalInstance> rupperli = findLocalInstanceBounds(right, Bound.upper(false));
+        
+        
+        for (LocalInstance r : rupperli) {
+            if (r != li) {
+                // upper bounds on the RHS are now upper bounds for li 
+                b.bounds.add(new LocalBound(Bound.upper(false), r));
+
+                // li is now a lower bound of r 
+                Bounds br = updates.get(r);
+                
+                if (br == null) {
+                    br = new Bounds();
+                    updates.put(r, br);
+                }
+                br.bounds.add(new LocalBound(Bound.lower(false), li));
+            }
+            else {
+                // the old value of li is an upper bound for
+                // the new value. There for the value did not increase
+                result &= ~MAY_INCREASE; 
+//                System.err.println(r.name() + " did not increase");
+            }
+        }
+        
+        
+        // set of lower bounds of the RHS
+        Set<LocalInstance> rlowerli = findLocalInstanceBounds(right, Bound.lower(false));
+        for (LocalInstance r : rlowerli) {
+            if (r != li) {
+                // lower bounds on the RHS are now lower bounds for li 
+                b.bounds.add(new LocalBound(Bound.lower(false), r));
+                
+                // li is now an upper bound of r 
+                Bounds br = updates.get(r);
+                
+                if (br == null) {
+                    br = new Bounds();
+                    updates.put(r, br);
+                }
+                br.bounds.add(new LocalBound(Bound.upper(false), li));
+            }
+            else {
+                // the old value of li is a lower bound for
+                // the new value. There for the value did not decrease
+                result &= ~MAY_DECREASE; 
+//                System.err.println(r.name() + " did not decrease");
+            }
+        }
+        
+        // find the numeric bounds.
+        Interval rrng = findNumericRange(right, df);
+//        System.err.println("range for  " + right + " is " + rrng);
+
+        if ((result & MAY_INCREASE) != 0) {
+            // the assignment may result in the value increasing
+            rrng = new Interval(rrng.lower, Bounds.POS_INF);
+        }
+        if ((result & MAY_DECREASE) != 0) {
+            // the assignment may result in the value decreasing
+            rrng = new Interval(Bounds.NEG_INF, rrng.upper);
+        }
+//        System.err.println("  range now for  " + right + " is " + rrng);
+
+        updates.put(li, new Bounds(rrng, b.bounds));
+        return result;
     }
 
     /**
@@ -1036,7 +1128,10 @@ public class IntegerBoundsChecker extends DataFlow
          * Produce a new DataFlowItem that is updated with the updates. In
          * particular, the bounds in updates are known to be true. If a
          * LocalInstance has changed, it can be specified as increased,
-         * decreased, or both.
+         * decreased, or both. If increased is true, then it means that
+         * the value for the local instance may have increased; similarly,
+         * if decreased is true, it means that the value of the local instance
+         * may have decreased.
          */
         public DataFlowItem update(Map<LocalInstance, Bounds> updates, 
                 LocalInstance increased, LocalInstance decreased) {
@@ -1082,11 +1177,11 @@ public class IntegerBoundsChecker extends DataFlow
                                 
                                 if (lb.li == li) {
                                     if (lb.isLower() && li == increased) {
-                                        // li was a lower bound but has now increased,
+                                        // li was a lower bound but may have increased,
                                         // so it might not be a lower bound any more
                                         now.remove(lb);
                                     } else if (lb.isUpper() && li == decreased) {
-                                        // was upper bound but has decreased
+                                        // was upper bound but may have decreased
                                         now.remove(lb);
                                     }
                                 }

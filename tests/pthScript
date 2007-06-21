@@ -253,6 +253,9 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	If1.jif ;
 	Implicit.jif ;
 	Implicit2.jif ;
+	IntBounds1.jif ;
+	IntBounds2.jif ;
+	IntBounds3.jif ;
 	IntPair.jif ;
 	InterfaceTest.jif ;
 #	InvariantClass.jif (Semantic, "Invariant class .* cannot extend covariant class");
