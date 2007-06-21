@@ -94,19 +94,19 @@ public class IntegerBoundsChecker extends DataFlow
             LocalAssign la = (LocalAssign) n;
             
             LocalInstance li = ((Local)la.left()).localInstance();
-            if (la.operator() == Assign.ASSIGN) {
-                // li = e, so add li <= e, and e <= li
-                int result = addBoundsAssign(updates, li , la.right(), inDFItem);                                            
-                if ((result | MAY_INCREASE) != 0) increased = li; 
-                if ((result | MAY_DECREASE) != 0) decreased = li;
-                // !@!
-                if (increased == null) System.err.println(li.name() + " did not increase");
-                if (decreased == null) System.err.println(li.name() + " did not decrease");
+            Expr right = la.right();
+            if (!la.operator().equals(Assign.ASSIGN)) {
+                // fake the experssion.
+                Binary.Operator op = la.operator().binaryOperator();
+                right = nodeFactory().Binary(Position.compilerGenerated(), la.left(), op, la.right());
+                right = right.type(la.left().type());
             }
-            // !@! deal with opassign
+
+            // li = e, so add li <= e, and e <= li
+            int result = addBoundsAssign(updates, li , right, inDFItem);                                            
+            if ((result | MAY_INCREASE) != 0) increased = li; 
+            if ((result | MAY_DECREASE) != 0) decreased = li;
             
-            // XXX can be smarter and decide if only increases or decreases
-            increased = decreased = li;
         } else if (n instanceof Unary) {
             Unary u = (Unary) n;
             
