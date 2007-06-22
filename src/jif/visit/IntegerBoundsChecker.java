@@ -32,7 +32,7 @@ public class IntegerBoundsChecker extends DataFlow
      * Create an initial Item for the dataflow analysis. By default, the 
      * map of integer bounds is empty.
      */
-    protected Item createInitialItem(FlowGraph graph, Term node) {
+    protected Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
         return new DataFlowItem();
     }
     
@@ -40,8 +40,10 @@ public class IntegerBoundsChecker extends DataFlow
      * We use boolean flows for this dataflow analysis, i.e., we want to track
      * different information on the true and false branches.
      */
-    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, Term n, Set edgeKeys) {
-        return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, edgeKeys);
+    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, Term n,
+            boolean entry, Set edgeKeys) {
+        return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, entry, 
+                edgeKeys);
     }
 
     protected static final Set<Operator> INTERESTING_BINARY_OPERATORS = 
@@ -49,12 +51,16 @@ public class IntegerBoundsChecker extends DataFlow
                 Binary.EQ, Binary.LE, Binary.LT, Binary.GE, Binary.GT, }));
     
     public Map flow(Item trueItem, Item falseItem, Item otherItem, 
-            FlowGraph graph, Term n, Set succEdgeKeys) {
+            FlowGraph graph, Term n, boolean entry, Set succEdgeKeys) {
         Item inItem = safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, 
                                      falseItem, FlowGraph.EDGE_KEY_FALSE,
                                      otherItem, FlowGraph.EDGE_KEY_OTHER,
-                                     n, graph);
+                                     n, entry, graph);
         //System.err.println("flow for " + n + " : in " + inItem);
+        
+        if (entry) {
+            return itemToMap(inItem, succEdgeKeys);
+        }
 
         DataFlowItem inDFItem = ((DataFlowItem)inItem);
         
@@ -70,8 +76,8 @@ public class IntegerBoundsChecker extends DataFlow
             if (ld.init() != null) {
                 // li = init, so add li <= init, and init <= li
                 int result = addBoundsAssign(updates, ld.localInstance(), ld.init(), inDFItem, null);
-                if ((result | MAY_INCREASE) != 0) increased = ld.localInstance(); 
-                if ((result | MAY_DECREASE) != 0) decreased = ld.localInstance(); 
+                if ((result & MAY_INCREASE) != 0) increased = ld.localInstance(); 
+                if ((result & MAY_DECREASE) != 0) decreased = ld.localInstance(); 
             }
         } else if (n instanceof LocalAssign) {
             LocalAssign la = (LocalAssign) n;
@@ -87,8 +93,8 @@ public class IntegerBoundsChecker extends DataFlow
 
             // li = e, so add li <= e, and e <= li
             int result = addBoundsAssign(updates, li , right, inDFItem, ((JifExprExt)la.ext()).getNumericBounds());                                            
-            if ((result | MAY_INCREASE) != 0) increased = li; 
-            if ((result | MAY_DECREASE) != 0) decreased = li;
+            if ((result & MAY_INCREASE) != 0) increased = li; 
+            if ((result & MAY_DECREASE) != 0) decreased = li;
             
         } else if (n instanceof Unary) {
             Unary u = (Unary) n;
@@ -177,7 +183,8 @@ public class IntegerBoundsChecker extends DataFlow
      * Record the bounds information. We could be extensible here, and allow
      * other uses of the info.
      */
-    public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
+    public void check(FlowGraph graph, Term n, boolean entry, Item inItem, 
+            Map outItems) throws SemanticException {
         DataFlowItem dfIn = (DataFlowItem) inItem;
         
         if (n instanceof Expr && ((Expr)n).type().isNumeric()) {
@@ -193,7 +200,8 @@ public class IntegerBoundsChecker extends DataFlow
      * The confluence of a list of items. Only facts that are true of all
      * items should be retained.
      */
-    protected Item confluence(List items, Term node, FlowGraph graph) {
+    protected Item confluence(List items, Term node, boolean entry, 
+            FlowGraph graph) {
         Map<LocalInstance, Bounds> newMap = null;
         for (Iterator iter = items.iterator(); iter.hasNext();) {
             DataFlowItem df = (DataFlowItem)iter.next();

@@ -124,12 +124,13 @@ public class NotNullChecker extends DataFlow
      * Create an initial Item for the dataflow analysis. By default, the 
      * set of not null variables is empty.
      */
-    protected Item createInitialItem(FlowGraph graph, Term node) {
+    protected Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
         return new DataFlowItem();
     }
 
-    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, Term n, Set edgeKeys) {
-        return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, edgeKeys);
+    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, 
+            Term n, boolean entry, Set edgeKeys) {
+        return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, entry, edgeKeys);
     }
 
     /**
@@ -138,11 +139,16 @@ public class NotNullChecker extends DataFlow
      * expression then the variable is not null; if a local variable is assigned
      * a possibly null expression, then the local variable is possibly null.
      */
-    public Map flow(Item trueItem, Item falseItem, Item otherItem, FlowGraph graph, Term n, Set succEdgeKeys) {
+    public Map flow(Item trueItem, Item falseItem, Item otherItem, 
+            FlowGraph graph, Term n, boolean entry, Set succEdgeKeys) {
         DataFlowItem dfIn = (DataFlowItem)safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, 
                                      falseItem, FlowGraph.EDGE_KEY_FALSE,
                                      otherItem, FlowGraph.EDGE_KEY_OTHER,
-                                     n, graph);
+                                     n, entry, graph);
+        
+        if (entry) {
+            return itemToMap(dfIn, succEdgeKeys);
+        }
 
         if (n instanceof LocalDecl) {
             LocalDecl x = (LocalDecl)n;
@@ -353,7 +359,7 @@ public class NotNullChecker extends DataFlow
      * The confluence operator is intersection: a variable is not null only
      * if it is not null on all paths flowing in. 
      */
-    protected Item confluence(List items, Term node, FlowGraph graph) {
+    protected Item confluence(List items, Term node, boolean entry, FlowGraph graph) {
         return intersect(items);
     }
         
@@ -391,7 +397,12 @@ public class NotNullChecker extends DataFlow
      * suppress the NullPointerExceptions that they would otherwise declare
      * would be thrown.
      */
-    protected void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
+    protected void check(FlowGraph graph, Term n, boolean entry, 
+            Item inItem, Map outItems) throws SemanticException {
+        if (entry) {
+            return;
+        }
+        
         if (n instanceof Assign) {
             if (n instanceof FieldAssign) {
                 checkField((Field)((Assign)n).left(), (DataFlowItem)inItem);

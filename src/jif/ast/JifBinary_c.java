@@ -27,8 +27,8 @@ public class JifBinary_c extends Binary_c implements Binary
                     return false;
                 }
             }
-            if (((JifExprExt)right().del()).getNumericBounds() != null) {
-                Interval i = ((JifExprExt)right().del()).getNumericBounds();
+            if (((JifExprExt) right().ext()).getNumericBounds() != null) {
+                Interval i = ((JifExprExt) right().ext()).getNumericBounds();
                 if ((i.getLower() != null && i.getLower().longValue() > 0) ||
                         (i.getUpper() != null && i.getUpper().longValue() < 0)) {
                     // the right operand is non zero
