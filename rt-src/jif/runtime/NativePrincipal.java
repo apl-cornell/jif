@@ -1,6 +1,10 @@
 package jif.runtime;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import jif.lang.*;
 
@@ -9,13 +13,12 @@ import jif.lang.*;
  */
 public class NativePrincipal implements Principal {
     
-    static private final Map allNatives = new LinkedHashMap();  
+    static private final ConcurrentMap allNatives = new ConcurrentHashMap();  
 
     static NativePrincipal getInstance(String name) {
         NativePrincipal p = (NativePrincipal)allNatives.get(name);
         if (p == null) {
-            p = new NativePrincipal(name);
-            allNatives.put(name,p);            
+            return (NativePrincipal)allNatives.putIfAbsent(name, new NativePrincipal(name));
         }
         return p;
     }

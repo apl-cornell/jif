@@ -40,6 +40,10 @@ public class Runtime {
         String username = currentUser();
         return NativePrincipal.getInstance(username);
     }
+    /** Get a native user  */
+    public static Principal getUser(Principal parameter, String username) {
+        return NativePrincipal.getInstance(username);
+    }
 
     private Label defaultOutputLabel() {
         ConfPolicy cp = LabelUtil.singleton().readerPolicy(dynp, new LinkedList());
