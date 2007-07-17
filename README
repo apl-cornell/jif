@@ -1,4 +1,4 @@
-Jif 3.0.0
+Jif 3.1.0
 
 			     The Jif Compiler
 			     ----------------
@@ -222,11 +222,12 @@ The Jif project is supervised by Andrew Myers at the Cornell
 University Computer Science Department. Many people have contributed
 to this software.
 
-This release of the Jif compiler was prepared by Stephen Chong. Thanks
-to Aslan Askarov, Daniel Hedin, Boniface Hicks, Karl Mazurak, Andrei
-Sabelfeld, and Steve Zdancewic, who provided bug reports and feedback
-for previous versions of Jif. Lantian Zheng, Steve Zdancewic, and Nate
-Nystrom helped implement earlier versions.
+This release of the Jif compiler was prepared by Stephen Chong and Xin 
+Zheng. Thanks to Aslan Askarov, Doaa Hassan, Daniel Hedin, Boniface
+Hicks, Dave King, Karl Mazurak, Andrei Sabelfeld, and Steve Zdancewic, 
+who provided bug reports and feedback for previous versions of Jif. 
+Lantian Zheng, Steve Zdancewic, and Nate Nystrom helped implement
+earlier versions.
 
 Restrictions on use
 -------------------

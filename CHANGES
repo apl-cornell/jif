@@ -3,6 +3,22 @@ Jif Change Log
 
 This file documents changes between releases of Jif.
 
+2007-07-XX    Jif 3.1.0
+    * Checked endorse construct
+       * A useful form of the endorse statement for the common
+         case of validating an untrusted value. See the Jif 
+         manual for more details.
+    * Constant arrays
+       * Arrays can be declared constant, meaning their
+         contents will not change after initialization. This
+         allows more permissive label checking. See the Jif 
+         manual for more details.
+    * Dataflow analysis for array bounds
+       * Analysis is able to determine if some array access
+         and new array expressions will not throw
+         runtime exceptions.
+    * Numerous bug fixes
+    
 2006-06-09    Jif 3.0.0
     * Added integrity
        * See the Jif manual for a full explanation.
