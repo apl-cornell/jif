@@ -319,6 +319,9 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Main1.jif (Warning, "signature of.*main method.*should either be"),
                   (Semantic, "Only one static method named \"main\" allowed per class");
 	Main2.jif ;
+	Main3.jif (Semantic, "can only have a where caller constraint");
+	Main4.jif (Semantic, "can not have .* constraint"), (Semantic, "can not have .* constraint");
+	Main5.jif ;
 	MapTest.jif ;
 	Meet01.jif ;
 	Meet02.jif ;
@@ -330,6 +333,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	            (Semantic, "can not contain .* character"),
 	            (Semantic, "can not contain .* character"),
 	            (Semantic, "can not contain .* character");
+	NativePrincipal01.jif ;
 	NewLabel.jif ;
 	NewLabel2.jif ;
 	NewLabel3.jif (Semantic, "not representable at runtime");
