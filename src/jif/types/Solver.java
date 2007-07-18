@@ -21,12 +21,12 @@ import polyglot.util.Position;
  * propogating upper bounds backwards.
  */
 public abstract class Solver {
-    private LinkedList Q; // Queue of active equations to work on
+    private EquationQueue Q; // Queue of active equations to work on
 
     private LinkedList scc; // List of strongly connected components that
                             // are left to work on
     
-    private List currentSCC; // Equations in the strongly connected component that we are currently working on
+    private Set currentSCC; // Equations in the strongly connected component that we are currently working on
 
     // connected component that is being worked on
     private Collection equations; // Set of all equations
@@ -105,7 +105,7 @@ public abstract class Solver {
      */
     public Solver(JifTypeSystem ts, String solverName) {
         this.ts = ts;
-        Q = new LinkedList();
+        Q = new EquationQueue();
         equations = new LinkedHashSet();
         varEqnDependencies = new LinkedHashMap();
         eqnVarDependencies = new LinkedHashMap();
@@ -127,7 +127,7 @@ public abstract class Solver {
      */
     protected Solver(Solver js) {
         this.ts = js.ts;
-        Q = new LinkedList(js.Q);
+        Q = new EquationQueue(js.Q);
         equations = new LinkedHashSet(js.equations);
 
         varEqnDependencies = js.varEqnDependencies;
@@ -165,7 +165,7 @@ public abstract class Solver {
     }
     
     protected List getQueue() {
-        return Collections.unmodifiableList(Q);
+        return Collections.unmodifiableList(Q.list);
     }
 
     protected void addEquationToQueue(Equation eqn) {
@@ -237,7 +237,7 @@ public abstract class Solver {
             int[] scc_head = (int[])pair.getLast();
 
             scc = new LinkedList();
-            List currentScc = null;
+            Set currentScc = null;
             for (int i = 0; i < scc_head.length; i++) {
                 if (scc_head[i] == -1) {
                     // it's the start of a new scc
@@ -248,7 +248,7 @@ public abstract class Solver {
                         currentScc = null;
                     }
                 }
-                if (currentScc == null) currentScc = new ArrayList();
+                if (currentScc == null) currentScc = new LinkedHashSet();
                 currentScc.add(by_scc[i]);
             }
             if (currentScc != null) {
@@ -260,18 +260,18 @@ public abstract class Solver {
             // not using SCC, so pretend that 
             // we have a single SCC consisting of all equations
             scc = new LinkedList();
-            scc.add(new ArrayList(equations));
+            scc.add(new LinkedHashSet(equations));
         }
 
         // pre-initialize the queue with the first strongly connected
         // component
         if (scc.isEmpty()) {
-            currentSCC = Collections.EMPTY_LIST;
-            Q = new LinkedList();
+            currentSCC = Collections.EMPTY_SET;
+            Q = new EquationQueue();
         }
         else {
-            currentSCC = (List)scc.removeFirst();
-            Q = new LinkedList(currentSCC);
+            currentSCC = (Set)scc.removeFirst();
+            Q = new EquationQueue(currentSCC);
         }
 
         try {
@@ -322,7 +322,7 @@ public abstract class Solver {
         while (!Q.isEmpty()) {
             while (!Q.isEmpty()) {
                 counter++;
-                Equation eqn = (Equation)Q.removeFirst();
+                Equation eqn = Q.removeFirst();
                 Label lhsbound = triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
                 Label rhsbound = triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());                                
 
@@ -349,7 +349,7 @@ public abstract class Solver {
                 // done this way instead of an outer loop because of the
                 // way the search method works
                 if (Q.isEmpty() && !scc.isEmpty()) {
-                    currentSCC = (List)scc.removeFirst();
+                    currentSCC = (Set)scc.removeFirst();
                     Q.addAll(currentSCC);
                 }
             } // end while
@@ -987,4 +987,57 @@ public abstract class Solver {
         }
     }
 
+    /**
+     * A queue for equations. This class ensures that an equation
+     * is in the queue at most once.
+     */
+    private static class EquationQueue {
+        private final LinkedList list;
+        private final Set elements;
+        public EquationQueue() {
+            list = new LinkedList();
+            elements = new HashSet();
+        }
+        public EquationQueue(Collection c) {
+            list = new LinkedList(c);
+            elements = new HashSet(c);
+        }
+        public EquationQueue(EquationQueue q) {
+            list = new LinkedList(q.list);
+            elements = new HashSet(q.elements);
+        }
+        public boolean contains(Equation eqn) {
+            return elements.contains(eqn);
+        }
+        public void addAll(Collection c) {
+            if (c != null) {
+                for (Iterator iter = c.iterator(); iter.hasNext();) {
+                    Equation e = (Equation)iter.next();
+                    add(e);
+                }
+            }
+        }
+        public Equation removeFirst() {
+            Equation e = (Equation)list.removeFirst();
+            elements.remove(e);
+            return e;
+        }
+        public boolean isEmpty() {
+            return list.isEmpty();
+        }
+        public void add(Equation eqn) {
+            if (!elements.contains(eqn)) {
+                list.add(eqn);
+                elements.add(eqn);
+            }
+        }
+        public void addFirst(Equation eqn) {
+            if (elements.contains(eqn)) {
+                // already in the queue. remove it.
+                list.remove(eqn);
+            }
+            list.addFirst(eqn);
+            elements.add(eqn);                        
+        }
+    }
 }
