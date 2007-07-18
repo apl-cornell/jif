@@ -18,7 +18,7 @@ import polyglot.util.Position;
 
 /**
  * A solver of Jif constraints. Finds solution to constraints essentially by
- * propogating upper bounds backwards.
+ * propagating upper bounds backwards.
  */
 public abstract class Solver {
     private EquationQueue Q; // Queue of active equations to work on
