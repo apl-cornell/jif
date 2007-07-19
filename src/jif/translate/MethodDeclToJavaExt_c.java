@@ -11,6 +11,7 @@ import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
 
 public class MethodDeclToJavaExt_c extends ToJavaExt_c {
@@ -50,7 +51,8 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
 
         formals.addAll(n.formals());
         n = rw.java_nf().MethodDecl(n.position(), n.flags(), n.returnType(),
-                                    n.name(), formals, n.throwTypes(),
+                                    rw.java_nf().Id(Position.compilerGenerated(), n.name()), 
+                                    formals, n.throwTypes(),
                                     n.body());
         n = n.methodInstance(null);
         return n;
@@ -73,7 +75,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
             rw.java_nf().LocalDecl(origBody.position(),
                                Flags.FINAL,
                                type,
-                               formal0.name(),
+                               rw.java_nf().Id(Position.compilerGenerated(), formal0.name()),
                                init);
         Block newBody = rw.java_nf().Block(origBody.position(),
                                            declPrincipal,
@@ -82,7 +84,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
         n = rw.java_nf().MethodDecl(n.position(),
                                     n.flags(),
                                     n.returnType(),
-                                    n.name(),
+                                    rw.java_nf().Id(Position.compilerGenerated(), n.name()),
                                     formalList,
                                     n.throwTypes(),
                                     newBody);
