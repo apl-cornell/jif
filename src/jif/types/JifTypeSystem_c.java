@@ -37,7 +37,7 @@ public class JifTypeSystem_c
     }
 
     public Solver createSolver(String solverName) {
-        return new SolverGLB(this, solverName);
+        return new SolverGLB(this, extInfo.compiler(), solverName);
         //return new SolverLUB(this);
     }
 

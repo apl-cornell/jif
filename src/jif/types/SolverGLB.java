@@ -16,8 +16,8 @@ public class SolverGLB extends Solver {
     /**
      * Constructor
      */
-    public SolverGLB(JifTypeSystem ts, String solverName) {
-        super(ts, solverName);
+    public SolverGLB(JifTypeSystem ts, polyglot.frontend.Compiler compiler, String solverName) {
+        super(ts, compiler, solverName);
     }
 
     /**

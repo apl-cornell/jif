@@ -8,13 +8,11 @@ import jif.types.hierarchy.LabelEnv;
 import jif.types.label.Label;
 import jif.types.label.NotTaken;
 import jif.types.label.VarLabel;
+import polyglot.frontend.Compiler;
 import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
-import polyglot.util.CollectionUtil;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Pair;
-import polyglot.util.Position;
+import polyglot.util.*;
 
 /**
  * A solver of Jif constraints. Finds solution to constraints essentially by
@@ -81,6 +79,16 @@ public abstract class Solver {
     private VarMap bounds; // Current bounds on label variables
 
     protected JifTypeSystem ts;
+    
+    /**
+     * Constraints that were added to the solver, and failed statically.
+     * If the flag THROW_STATIC_FAILED_CONSTRAINTS is true, then the
+     * constraint will be thrown immediately, otherwise the constraint
+     * will be added to this set, and thrown when solve() is called.
+     */
+    private Set staticFailedConstraints;
+    private static final boolean THROW_STATIC_FAILED_CONSTRAINTS = false;
+    private final Compiler compiler;
 
     private Map traces; //Map from variables to their histories of refining
 
@@ -96,6 +104,7 @@ public abstract class Solver {
      */
     private static final boolean useSCC = false;
 
+
     /**
      * The name of the solver, for debugging purposes.
      */
@@ -103,8 +112,9 @@ public abstract class Solver {
     /**
      * Constructor
      */
-    public Solver(JifTypeSystem ts, String solverName) {
+    public Solver(JifTypeSystem ts, Compiler compiler, String solverName) {
         this.ts = ts;
+        this.compiler = compiler;
         Q = new EquationQueue();
         equations = new LinkedHashSet();
         varEqnDependencies = new LinkedHashMap();
@@ -127,6 +137,7 @@ public abstract class Solver {
      */
     protected Solver(Solver js) {
         this.ts = js.ts;
+        this.compiler = js.compiler;
         Q = new EquationQueue(js.Q);
         equations = new LinkedHashSet(js.equations);
 
@@ -231,6 +242,24 @@ public abstract class Solver {
             report(1, "===== Starting solver " + solverName + " =====");
             report(1, "   " + equations.size() + " equations");
         }
+        
+        // check for static failures.
+        if (staticFailedConstraints != null && !staticFailedConstraints.isEmpty()) {
+            report(1, "   " + staticFailedConstraints.size() + " statically failed constraint");
+            status = STATUS_NO_SOLUTION;
+            for (Iterator iter = staticFailedConstraints.iterator(); iter.hasNext();) {
+                Equation eqn = (Equation)iter.next();
+                SemanticException ex = new SemanticException(errorMsg(eqn.constraint()), 
+                                                             eqn.position()); 
+                if (!iter.hasNext()) {
+                    // throw the last one
+                    throw ex;
+                }
+                // add all but the last to the queue.
+                compiler.errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR, ex.getMessage(), ex.position());
+            }
+        }
+        
         if (useSCC) {
             LinkedList pair = findSCCs();
             Equation[] by_scc = (Equation[])pair.getFirst();
@@ -516,8 +545,16 @@ public abstract class Solver {
                         report(3, "Statically failed " + triggerTransforms(lhs, eqnEnv) + " <= " + triggerTransforms(rhs, eqnEnv));
                     }
                     // The equation is not satisfied.
-                    throw new SemanticException(errorMsg(eqn.constraint()), 
-                                                eqn.position());
+                    if (THROW_STATIC_FAILED_CONSTRAINTS) {
+                        throw new SemanticException(errorMsg(eqn.constraint()), 
+                                                    eqn.position());
+                    }
+                    else {
+                        if (staticFailedConstraints == null) {
+                            staticFailedConstraints = new LinkedHashSet();
+                        }
+                        staticFailedConstraints.add(eqn);
+                    }
                 }
                 else {
                     // The equation is satisfied, no need to add it to
