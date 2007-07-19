@@ -63,13 +63,6 @@ public class LabelChecker implements Copy
      */
     private Solver solver;
 
-    /**
-     * If true, then upon solving the system of constraints, a label 
-     * substitution pass will be performed, replacing variables with
-     * the inferred labels.
-     */
-    final private boolean doLabelSubst;
-
     public LabelChecker(Job job, TypeSystem ts, NodeFactory nf, boolean solvePerClassBody, boolean solvePerMethod) {
         this(job, ts, nf, solvePerClassBody, solvePerMethod, true);
     }
@@ -85,7 +78,6 @@ public class LabelChecker implements Copy
 //        if (solvePerMethod && solvePerClassBody) {
 //            throw new InternalCompilerError("cant solve for both class and method!");
 //        }
-        this.doLabelSubst = true;
         if (!solvePerClassBody && !solvePerMethod) {
             this.solver = this.ts.createSolver("Job solver: " + job.toString());
         }
@@ -232,11 +224,7 @@ public class LabelChecker implements Copy
         return n;        
     }
     
-    private Node solveConstraints(Node n) {
-        if (!doLabelSubst) {
-            return n;
-        }
-        
+    protected Node solveConstraints(Node n) {        
         Node newN = n;
         JifLabelSubst jls = new JifLabelSubst(this.job, this.ts, this.nf, this.solver);
         

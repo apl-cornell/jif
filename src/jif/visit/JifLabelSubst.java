@@ -31,14 +31,23 @@ public class JifLabelSubst extends ContextVisitor
     
     public Node leaveCall(Node old, Node n, NodeVisitor v)
     throws SemanticException {
-        //VarMap bounds;
         try {
-            bounds = solver.solve();
+            solve();
         }
         catch (SemanticException e) {
             eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), e.position());
             return n;
         }
+        n = updateNode(n);
+        
+        return n;
+    }
+    
+    protected void solve() throws SemanticException {
+        bounds = solver.solve();
+    }
+    
+    protected Node updateNode(Node n) {
         if (n instanceof ProcedureDecl) {
             JifProcedureInstance pi = (JifProcedureInstance)((ProcedureDecl)n).procedureInstance();
             pi.subst(bounds);
@@ -72,7 +81,6 @@ public class JifLabelSubst extends ContextVisitor
             CanonicalLabelNode ln = (CanonicalLabelNode) n;
             n = ln.label(bounds.applyTo(ln.label()));
         }
-        
         return n;
-    }
+    }    
 }

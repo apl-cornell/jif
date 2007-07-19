@@ -29,7 +29,7 @@ public class JifOptions extends Options {
       * Use a single Solver to infer labels globally, or solve on a class
       * by class basis.
       */
-     boolean solveGlobally;
+     public boolean solveGlobally;
 
      /**
       * Provide more detailed explanation of solver error messages?
