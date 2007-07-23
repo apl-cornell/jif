@@ -224,6 +224,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	EmptyList2.jif ;
 	Exc.jif ;
 	Exc2.jif ;
+	Exc3.jif  (Semantic, "More information .* than is permitted");
 	FieldAssign01.jif  ;
 	FieldAssign02.jif  (Semantic, "NullPointerException.*must .* be caught"),
                            (Semantic, "NullPointerException.*must .* be caught"),

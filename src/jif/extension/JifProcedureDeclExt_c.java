@@ -332,9 +332,16 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                 // fold the call site pc into the return label
                 Lj = lc.upperBound(Lj, ts.callSitePCLabel(mi));
 
-                if (ts.isImplicitCastValid(pathType, tj)) {
-                    subtypeChecker.addSubtypeConstraints(lc, mn.position(),
-                                                         tj, pathType);
+                if (ts.isSubtype(pathType, tj) ||
+                        ts.isSubtype(tj, pathType)) {
+                    if (ts.isSubtype(pathType, tj)) {
+                        subtypeChecker.addSubtypeConstraints(lc, mn.position(),
+                                                             tj, pathType);
+                    }
+                    else {
+                        subtypeChecker.addSubtypeConstraints(lc, mn.position(),
+                                                             pathType, tj);                        
+                    }
                     if (Report.should_report(jif_verbose, 4))
                         Report.report(4,
                                       ">>> X[C'] <= Lj (for exception " + tj + ")");
@@ -352,7 +359,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                             return "More information may be gained " + 
                             "by observing a " + tj.toClass().fullName() +
                             " exception than is permitted by the " +
-                            "method/coonstructor signature";
+                            "method/constructor signature";
                         }
                         public String technicalMsg() {
                             return "the path of <" + tj + "> may leak information " +
