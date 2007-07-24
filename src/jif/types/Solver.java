@@ -245,12 +245,14 @@ public abstract class Solver {
         
         // check for static failures.
         if (staticFailedConstraints != null && !staticFailedConstraints.isEmpty()) {
-            report(1, "   " + staticFailedConstraints.size() + " statically failed constraint");
+            if (shouldReport(1)) {
+                report(1, "   " + staticFailedConstraints.size() + " statically failed constraint");
+            }
             status = STATUS_NO_SOLUTION;
             for (Iterator iter = staticFailedConstraints.iterator(); iter.hasNext();) {
-                Equation eqn = (Equation)iter.next();
-                SemanticException ex = new SemanticException(errorMsg(eqn.constraint()), 
-                                                             eqn.position()); 
+                LabelConstraint cons = (LabelConstraint)iter.next();
+                SemanticException ex = new SemanticException(errorMsg(cons), 
+                                                             cons.position()); 
                 if (!iter.hasNext()) {
                     // throw the last one
                     throw ex;
@@ -553,7 +555,7 @@ public abstract class Solver {
                         if (staticFailedConstraints == null) {
                             staticFailedConstraints = new LinkedHashSet();
                         }
-                        staticFailedConstraints.add(eqn);
+                        staticFailedConstraints.add(eqn.constraint());
                     }
                 }
                 else {
