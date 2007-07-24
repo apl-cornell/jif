@@ -258,7 +258,7 @@ public class JifToJavaRewriter extends ContextVisitor
             ClassDecl cd = (ClassDecl)iter.next();
             if (cd.flags().isPublic()) {
                 // cd is public, we will put it in it's own source file.
-                SourceFile sf = java_nf().SourceFile(Position.COMPILER_GENERATED, 
+                SourceFile sf = java_nf().SourceFile(Position.compilerGenerated(), 
                                                      n.package_(), 
                                                      Collections.EMPTY_LIST,
                                                      Collections.singletonList(cd));

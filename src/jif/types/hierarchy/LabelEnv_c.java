@@ -117,7 +117,7 @@ public class LabelEnv_c implements LabelEnv
             // need to add it regardless.
             if (L1.hasVariables() || L2.hasVariables() || 
                     !(this.leq(L1, L2, freshSearchState()))) {
-                labelAssertions.add(new LabelLeAssertion_c(ts, L1, L2, Position.COMPILER_GENERATED));
+                labelAssertions.add(new LabelLeAssertion_c(ts, L1, L2, Position.compilerGenerated()));
                 added = true;
                 if (!this.hasVariables && (L1.hasVariables() || L2.hasVariables())) {
                     // at least one assertion in this label env has a variable.

@@ -23,7 +23,7 @@ public class FieldDeclToJavaExt_c extends ToJavaExt_c {
             Expr init = n.init();
             if (init instanceof ArrayInit) {
                 Type base = fi.type().toArray().base();
-                init = rw.java_nf().NewArray(Position.COMPILER_GENERATED, rw.typeToJava(base, Position.COMPILER_GENERATED), 1, (ArrayInit)init);
+                init = rw.java_nf().NewArray(Position.compilerGenerated(), rw.typeToJava(base, Position.compilerGenerated()), 1, (ArrayInit)init);
             }
             rw.addInitializer(fi, init);
             n = n.init(null);

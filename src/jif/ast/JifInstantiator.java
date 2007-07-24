@@ -65,11 +65,11 @@ public class JifInstantiator
             this.formalTempAccessPathRoots = new ArrayList(formalArgLabels.size());
             this.formalTempLabels = new ArrayList(formalArgLabels.size());
             for (int i = 0; i < formalArgLabels.size(); i++) {
-                Label t = ts.unknownLabel(Position.COMPILER_GENERATED);
+                Label t = ts.unknownLabel(Position.compilerGenerated());
                 t.setDescription("temp formal arg " + i);
                 formalTempLabels.add(t);
                 formalTempAccessPathRoots.add(new AccessPathUninterpreted("temp arg path", 
-                                                                          Position.COMPILER_GENERATED,
+                                                                          Position.compilerGenerated(),
                                                                           true));
             }
         }
@@ -77,10 +77,10 @@ public class JifInstantiator
             this.formalTempAccessPathRoots = null;
             this.formalTempLabels = null;            
         }
-        this.tempThisLbl = ts.unknownLabel(Position.COMPILER_GENERATED);
+        this.tempThisLbl = ts.unknownLabel(Position.compilerGenerated());
         this.tempThisLbl.setDescription("temp this");
         this.tempThisRoot = new AccessPathUninterpreted("temp this", 
-                                                        Position.COMPILER_GENERATED,
+                                                        Position.compilerGenerated(),
                                                         true);  
         
     }

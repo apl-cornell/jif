@@ -98,11 +98,11 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         else {
             // it's an interface
             if (rw.jif_ts().isParamsRuntimeRep(jpt)) {
-                ClassBody implBody = rw.java_nf().ClassBody(Position.COMPILER_GENERATED, new ArrayList(2));
+                ClassBody implBody = rw.java_nf().ClassBody(Position.compilerGenerated(), new ArrayList(2));
                 implBody = implBody.addMember(produceInstanceOfMethod(jpt, rw, true));
                 implBody = implBody.addMember(produceCastMethod(jpt, rw));
                 
-                ClassDecl implDecl = rw.java_nf().ClassDecl(Position.COMPILER_GENERATED,
+                ClassDecl implDecl = rw.java_nf().ClassDecl(Position.compilerGenerated(),
                                                             n.flags().clearInterface().Abstract(),
                                                             interfaceClassImplName(n.name()),
                                                             null,
@@ -156,9 +156,9 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             b = (Block)inits.get(0);
         }
         else {
-            b = rw.java_nf().Block(Position.COMPILER_GENERATED, inits);
+            b = rw.java_nf().Block(Position.compilerGenerated(), inits);
         }
-        return cb.addMember(rw.java_nf().Initializer(Position.COMPILER_GENERATED,
+        return cb.addMember(rw.java_nf().Initializer(Position.compilerGenerated(),
                                                      Flags.STATIC,
                                                      b));
     }
@@ -285,13 +285,13 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
     private static TypeNode typeNodeForParam(ParamInstance pi, JifToJavaRewriter rw) throws SemanticException {
         Type paramType = pi.isPrincipal() ? rw.jif_ts().Principal() : rw.jif_ts().Label();
-        return rw.typeToJava(paramType, Position.COMPILER_GENERATED);
+        return rw.typeToJava(paramType, Position.compilerGenerated());
     }
     protected ClassMember produceCastMethod(JifPolyType jpt, JifToJavaRewriter rw) throws SemanticException {
         Context A = rw.context();
         rw = (JifToJavaRewriter)rw.context(A.pushStatic());
 
-        TypeNode tn = rw.typeToJava(jpt, Position.COMPILER_GENERATED);;
+        TypeNode tn = rw.typeToJava(jpt, Position.compilerGenerated());;
         List formals = produceParamFormals(jpt, rw, true);
         if (!rw.jif_ts().isJifClass(jpt)) {
             // just produce a header
@@ -312,7 +312,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
     static protected List produceParamFormals(JifPolyType jpt, JifToJavaRewriter rw, boolean addObjectFormal) throws SemanticException {
         List formals = new ArrayList(jpt.params().size() + 1);
-        Position pos = Position.COMPILER_GENERATED;
+        Position pos = Position.compilerGenerated();
         for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
             ParamInstance pi = (ParamInstance)iter.next();
             String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
@@ -380,12 +380,12 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
         inits.addAll(additionalConstructorCode(rw));
 
-        return rw.java_nf().ConstructorDecl(Position.COMPILER_GENERATED,
+        return rw.java_nf().ConstructorDecl(Position.compilerGenerated(),
                                             Flags.PUBLIC,
                                             jpt.name(),
                                             formals,
                                             Collections.EMPTY_LIST,
-                                            rw.java_nf().Block(Position.COMPILER_GENERATED,
+                                            rw.java_nf().Block(Position.compilerGenerated(),
                                                                inits));
     }
 
@@ -409,7 +409,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         List typeNodes = new ArrayList(throwTypes.size());
         for (Iterator iter = throwTypes.iterator(); iter.hasNext(); ) {
             Type t = (Type)iter.next();
-            TypeNode tn = rw.java_nf().AmbTypeNode(Position.COMPILER_GENERATED, t.toClass().name());
+            TypeNode tn = rw.java_nf().AmbTypeNode(Position.compilerGenerated(), t.toClass().name());
             typeNodes.add(tn);
         }
         return rw.qq().parseMember("public void " + 

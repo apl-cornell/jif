@@ -37,7 +37,7 @@ public class ConstructorCallToJavaExt_c extends ToJavaExt_c {
                 jpt = (JifPolyType)((JifSubstType)ci.container()).base();
             }
             if (jpt != null) {
-                Expr placeholder = rw.java_nf().NullLit(Position.COMPILER_GENERATED);
+                Expr placeholder = rw.java_nf().NullLit(Position.compilerGenerated());
                 for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
                     iter.next();
                     arguments.add(placeholder);
