@@ -44,6 +44,6 @@ public class JifThrowExt extends JifStmtExt_c
         X = X.N(ts.notTaken()).NV(ts.notTaken());
 
         checkThrowTypes(throwTypes);
-        return updatePathMap(ths, X);
+        return updatePathMap(ths.expr(e), X);
     }
 }
