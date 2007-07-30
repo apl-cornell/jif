@@ -24,7 +24,7 @@ public class LabelCheckPass extends AbstractPass
 	Node ast = job.ast();
 
 	if (ast == null) {
-	    throw new InternalCompilerError("Null AST: did the parser run?");
+	    throw new InternalCompilerError("Null AST for job " + job + ": did the parser run?");
 	}
 
         ErrorQueue q = job.compiler().errorQueue();
