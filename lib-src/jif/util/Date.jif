@@ -466,15 +466,15 @@ public final class Date[covariant label L] implements JifObject[L] {
 //    }
     public static Date[lb]{*lb; lb; date; delta} addYear{*lb}(label lb, Date[lb]{*lb} date, int{*lb} delta) {
         if (date == null) return null;
-        return Date[lb].lenientDate(lb, date.getYear() + delta, date.getMonth(), date.getDay());
+        return Date[lb].lenientDate(lb, date.getYear() + delta, date.getMonth(), date.getDay(), date.getHour(), date.getMinute());
     }
     public static Date[lb]{*lb; lb; date; delta} addMonth{*lb}(label lb, Date[lb]{*lb} date, int{*lb} delta) {
         if (date == null) return null;
-        return Date[lb].lenientDate(lb, date.getYear(), date.getMonth() +  + delta, date.getDay());
+        return Date[lb].lenientDate(lb, date.getYear(), date.getMonth() +  + delta, date.getDay(), date.getHour(), date.getMinute());
     }
     public static Date[lb]{*lb; lb; date; delta} addDay{*lb}(label lb, Date[lb]{*lb} date, int{*lb} delta) {
         if (date == null) return null;
-        return Date[lb].lenientDate(lb, date.getYear(), date.getMonth(), date.getDay() + delta);
+        return Date[lb].lenientDate(lb, date.getYear(), date.getMonth(), date.getDay() + delta, date.getHour(), date.getMinute());
     }
     public static Date[lb]{*lb; lb; date; delta} addHour{*lb}(label lb, Date[lb]{*lb} date, int{*lb} delta) {
         if (date == null) return null;
