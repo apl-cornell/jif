@@ -139,7 +139,7 @@ public class JifFieldExt extends JifExprExt
         PathMap X = Xe.NV(lc.upperBound(L, Xe.NV()));
 
         checkThrowTypes(throwTypes);
-        return updatePathMap(fe, X);
+        return updatePathMap(fe.target(target), X);
     }
 
     static protected Receiver checkTarget(LabelChecker lc, Field fe) 
