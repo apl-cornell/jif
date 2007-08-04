@@ -39,6 +39,6 @@ public class JifSynchronizedExt extends JifStmtExt_c
 
         PathMap X = Xe.join(Xs);
 
-        return updatePathMap(ss, X);
+        return updatePathMap(ss.body(s), X);
     }
 }

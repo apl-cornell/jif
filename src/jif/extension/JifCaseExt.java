@@ -29,15 +29,15 @@ public class JifCaseExt extends JifStmtExt_c
         A = (JifContext) cs.del().enterScope(A);
 
         PathMap X;
-
+        Expr e = cs.expr();
         if (!cs.isDefault()) {
-            Expr e = (Expr) lc.context(A).labelCheck(cs.expr());
+            e = (Expr) lc.context(A).labelCheck(cs.expr());
             X = getPathMap(e).NV(ts.notTaken());
         }
         else {
             X = ts.pathMap().N(A.pc());
         }
 
-        return updatePathMap(cs, X);
+        return updatePathMap(cs.expr(e), X);
     }
 }
