@@ -143,8 +143,9 @@ public class JifContext_c extends Context_c implements JifContext
         LabelEnv_c lastEnvAddedTo = env;
         while (jc != null && (!jc.isCode() || addToClass)) {
             jc = (JifContext_c)jc.pop();
-            if (jc != null && jc.env != lastEnvAddedTo) {
-                // only add to env we haven't seen yet.
+            if (jc != null && jc.scope == this.scope && jc.env != lastEnvAddedTo) {
+                // only add to env we haven't seen yet, and
+                // envs in the scope of the same class as us.
                 jc.env.addEquiv(L1, L2);
                 lastEnvAddedTo = jc.env;
             }            
@@ -160,8 +161,9 @@ public class JifContext_c extends Context_c implements JifContext
         LabelEnv_c lastEnvAddedTo = env;
         while (!jc.isCode()) {
             jc = (JifContext_c)jc.pop();
-            if (jc != null && jc.env != lastEnvAddedTo) {
-                // only add to env we haven't seen yet.
+            if (jc != null && jc.scope == this.scope && jc.env != lastEnvAddedTo) {
+                // only add to env we haven't seen yet, and
+                // envs in the scope of the same class as us.
                 jc.env.addEquiv(p, q);
                 lastEnvAddedTo = jc.env;
             }            
@@ -193,7 +195,9 @@ public class JifContext_c extends Context_c implements JifContext
         LabelEnv_c lastEnvAddedTo = env;
         while (!jc.isCode()) {
             jc = (JifContext_c)jc.pop();
-            if (jc != null && jc.env != lastEnvAddedTo) {
+            if (jc != null && jc.scope == this.scope && jc.env != lastEnvAddedTo) {
+                // only add to env we haven't seen yet, and
+                // envs in the scope of the same class as us.
                 jc.env.addEquiv(p1, p2);
                 lastEnvAddedTo = jc.env;
             }            
