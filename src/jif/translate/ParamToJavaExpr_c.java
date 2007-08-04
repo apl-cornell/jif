@@ -30,7 +30,16 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
             return rw.qq().parseExpr("null");
         }
         JifContext A = (JifContext)rw.context();
-        if (A.inStaticContext()) {
+        if (A.inStaticContext() && !rw.inConstructor()) {
+            // We are in a static context, so we do not have
+            // the field instances available. Instead, the
+            // params will have been given to us as method
+            // arguments.
+            // (note that if we are translating a constructor
+            // and are in a static context, then we must
+            // be in a constructor call (i.e., this(...) or
+            // super(...)), and we do in fact have the
+            // fields available to us. Hence the "!rw.inConstructor()") 
             return rw.qq().parseExpr(paramArgName(pi));            
         }
         else {
