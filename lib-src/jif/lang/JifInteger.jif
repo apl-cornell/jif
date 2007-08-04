@@ -11,7 +11,8 @@ public final class JifInteger[covariant label L] implements JifObject[L] {
     public JifInteger(Integer{L} s) { this.s = s; }
     public JifInteger(int{L} value) { this.s = new Integer(value); }
     public JifInteger(String{L} s) throws (NumberFormatException{s}) {
-        this(parseInt(s));
+        int i = parseInt(s); 
+        this.s = new Integer(i);
     }
     
     public static final int{*!:*}   MIN_VALUE = 0x80000000;
