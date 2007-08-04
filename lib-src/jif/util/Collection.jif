@@ -28,6 +28,7 @@ public interface Collection[label L] extends JifObject[L] {
     throws (ClassCastException{L}, IllegalArgumentException{L});
     boolean{L} removeAll{L}(Collection[L]{L} c);
     boolean{L} retainAll{L}(Collection[L]{L} c);
+    boolean{L} retainAll{L}(label lbl, Collection[lbl]{L} c) where lbl <= L;
     void clear{L}();
 
     // all collections must provide a way of accessing elements by index.

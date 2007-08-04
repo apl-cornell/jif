@@ -124,12 +124,16 @@ public abstract class AbstractCollection[label L] implements Collection[L] {
     }
 
     public boolean{L} retainAll{L}(Collection[L]{L} c) {
+      return retainAll(L, c);
+    }
+    
+    public boolean{L} retainAll{L}(label lbl, Collection[lbl]{L} c) where lbl <= L {
         boolean modified = false;
         Iterator[L] e = iterator();
         while (e != null && e.hasNext()) {
             try {
                 JifObject[L] o = e.next();
-                if(c == null || !c.contains(o)) {
+                if(c == null || !c.contains(L, o)) {
                     e.remove();
                     modified = true;
                 }
