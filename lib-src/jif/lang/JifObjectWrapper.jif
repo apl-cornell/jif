@@ -6,7 +6,7 @@ package jif.lang;
  */
 public final class JifObjectWrapper[covariant label L] implements JifObject[L] {
   
-  protected final Object{L} obj;
+  public final Object{L} obj;
   
   public JifObjectWrapper(Object{L} obj) {
     this.obj = obj;
