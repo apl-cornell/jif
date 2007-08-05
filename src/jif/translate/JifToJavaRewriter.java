@@ -4,6 +4,7 @@ import java.util.*;
 
 import jif.ast.Jif;
 import jif.ast.JifNodeFactory;
+import jif.ast.JifUtil;
 import jif.types.JifTypeSystem;
 import jif.types.Param;
 import jif.types.label.Label;
@@ -95,8 +96,8 @@ public class JifToJavaRewriter extends ContextVisitor
 
     public NodeVisitor enterCall(Node n) {
         try {
-            Jif ext = (Jif) n.ext();
-            return ext.del().toJava().toJavaEnter(this);
+            Jif ext = JifUtil.jifExt(n);
+            return ext.toJava().toJavaEnter(this);
         }
         catch (SemanticException e) {
             Position position = e.position();
@@ -114,8 +115,8 @@ public class JifToJavaRewriter extends ContextVisitor
 
     public Node leaveCall(Node old, Node n, NodeVisitor v) {
         try {
-            Jif ext = (Jif) n.ext();
-            Node m = ext.del().toJava().toJava(this);
+            Jif ext = JifUtil.jifExt(n);
+            Node m = ext.toJava().toJava(this);
             if (m.del() instanceof Jif)
                 throw new InternalCompilerError(m + " is still a Jif node.");
             return m;

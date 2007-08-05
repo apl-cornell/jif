@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import jif.ast.JifUtil;
 import jif.extension.JifFieldDeclExt;
 import jif.types.*;
 import jif.types.label.Label;
@@ -66,7 +67,7 @@ public class FieldLabelResolver extends ContextVisitor
             ClassMember m = (ClassMember) i.next();
 
             if (m instanceof FieldDecl) {
-                JifFieldDeclExt ext = (JifFieldDeclExt) m.ext();
+                JifFieldDeclExt ext = (JifFieldDeclExt) JifUtil.jifExt(m);
                 ext.labelCheckField(lc, ct);
             }
         }

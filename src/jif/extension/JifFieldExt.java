@@ -32,7 +32,7 @@ public class JifFieldExt extends JifExprExt
                                          nf.IntLit(pos, IntLit.INT, 1));
 
 
-        fae = (FieldAssign)((JifFieldAssignExt) fae.ext()).labelCheck(lc);
+        fae = (FieldAssign)((JifFieldAssignExt) JifUtil.jifExt(fae)).labelCheck(lc);
 
         return fae.left();
     }

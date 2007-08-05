@@ -96,7 +96,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
             init = (Expr) lc.context(A).labelCheck(decl.init());
 
             if (init instanceof ArrayInit) {
-                ((JifArrayInitExt)(init.ext())).labelCheckElements(lc, decl.type().type()); 
+                ((JifArrayInitExt)(JifUtil.jifExt(init))).labelCheckElements(lc, decl.type().type()); 
             }
             else {
                 // Must check that the expression type is a subtype of the

@@ -1,5 +1,6 @@
 package jif.extension;
 
+import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.visit.LabelChecker;
@@ -36,13 +37,13 @@ public class JifUnaryExt extends JifExprExt
             }
 
             if (e instanceof Local) {
-                e = (Expr)((JifLocalExt)e.ext()).labelCheckIncrement(lc.context(A));
+                e = (Expr)((JifLocalExt)JifUtil.jifExt(e)).labelCheckIncrement(lc.context(A));
             }
             else if (e instanceof Field) {
-                e = (Expr)((JifFieldExt)e.ext()).labelCheckIncrement(lc.context(A));
+                e = (Expr)((JifFieldExt)JifUtil.jifExt(e)).labelCheckIncrement(lc.context(A));
             }
             else if (e instanceof ArrayAccess) {
-                e = (Expr)((JifArrayAccessExt)e.ext()).labelCheckIncrement(lc.context(A));
+                e = (Expr)((JifArrayAccessExt)JifUtil.jifExt(e)).labelCheckIncrement(lc.context(A));
             }
             else {
                 throw new InternalCompilerError("Cannot perform unary operation on a " + e.type());

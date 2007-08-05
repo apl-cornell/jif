@@ -15,9 +15,6 @@ public interface Jif extends Ext
     ToJavaExt toJava();
     Jif toJava(ToJavaExt toJava);
 
-    Jif del(Jif del);
-    Jif del();
-
     /** Gets the path map of this extension. */
     PathMap X();
     

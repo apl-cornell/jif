@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import jif.ast.JifUtil;
 import jif.types.JifTypeSystem;
 import jif.visit.IntegerBoundsChecker;
 import polyglot.ast.Expr;
@@ -57,7 +58,7 @@ public class JifNewArrayDel extends JifJL_c
         if (dims == null) return true;
         for (Iterator iter = dims.iterator(); iter.hasNext();) {
             Expr d = (Expr)iter.next();
-            JifExprExt ext = (JifExprExt)d.ext();
+            JifExprExt ext = (JifExprExt)JifUtil.jifExt(d);
 
             IntegerBoundsChecker.Interval bounds = ext.getNumericBounds();
             // if bound is not null, then bound < d

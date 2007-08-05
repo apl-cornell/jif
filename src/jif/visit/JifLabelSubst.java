@@ -65,7 +65,7 @@ public class JifLabelSubst extends ContextVisitor
             li.subst(bounds);
         }
         
-        if (n.ext() instanceof Jif) {
+        if (JifUtil.jifExt(n) != null) {
             PathMap X = Jif_c.getPathMap(n);
             
             if (X != null) {

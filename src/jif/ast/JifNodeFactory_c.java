@@ -22,24 +22,17 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     public JifNodeFactory_c() {
         this(new JifExtFactory_c());
     }
-    protected JifNodeFactory_c(ExtFactory extFact) {
+    protected JifNodeFactory_c(JifExtFactory extFact) {
         super(extFact, new JifDelFactory_c());
     }
-    protected JifNodeFactory_c(ExtFactory extFact, DelFactory delFact) {
+    protected JifNodeFactory_c(JifExtFactory extFact, DelFactory delFact) {
         super(extFact, delFact);
     }
 
-    /**
-     * Get the JifExtFactory_c instance.
-     */
-    protected JifExtFactory_c jifExtFactory() {
-        if (jifExtFact == null) {
-            jifExtFact = (JifExtFactory_c)findExtFactInstance(JifExtFactory_c.class);
-        }            
-        return jifExtFact;
+    protected JifExtFactory jifExtFactory() {
+        return (JifExtFactory)this.extFactory();
     }
-    /** cache the result of looking for the JifExtFactory */
-    protected JifExtFactory_c jifExtFact = null;
+    
 
     public Disamb disamb() {
         return new JifDisamb_c();

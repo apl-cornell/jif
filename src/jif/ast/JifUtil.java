@@ -15,16 +15,21 @@ public class JifUtil
 {
     // Some utility functions used to avoid casts.
     public static PathMap getPathMap(Node n) {
-        Jif ext = (Jif) n.ext();
-        return ext.del().X();
+        Jif ext = jifExt(n);
+        return ext.X();
     }
     
-    public static Node updatePathMap(Node n, PathMap X) {
-        Jif ext = (Jif) n.ext();
-        if (ext == null || ext.del() == null) {
-            System.out.println("got a " + n.getClass());
+    public static Jif jifExt(Node n) {
+        Ext ext = n.ext();
+        while (ext != null && !(ext instanceof Jif)) {
+            ext = ext.ext();
         }
-        return n.ext(ext.del().X(X));
+        return (Jif)ext;
+    }
+
+    public static Node updatePathMap(Node n, PathMap X) {
+        Jif ext = jifExt(n);
+        return n.ext(ext.X(X));
     }
     
     public static AccessPath varInstanceToAccessPath(VarInstance vi, Position pos) throws SemanticException {

@@ -156,7 +156,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             }                            
 
             if (init instanceof ArrayInit) {
-                ((JifArrayInitExt)(init.ext())).labelCheckElements(lc, decl.type().type()); 
+                ((JifArrayInitExt)(JifUtil.jifExt(init))).labelCheckElements(lc, decl.type().type()); 
             }
             else {
                 // Must check that the expression type is a subtype of the

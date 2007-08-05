@@ -3,6 +3,7 @@ package jif.visit;
 import java.util.*;
 
 import jif.ast.DowngradeExpr;
+import jif.ast.JifUtil;
 import jif.extension.JifExprExt;
 import polyglot.ast.*;
 import polyglot.ast.Binary.Operator;
@@ -92,7 +93,7 @@ public class IntegerBoundsChecker extends DataFlow
             }
 
             // li = e, so add li <= e, and e <= li
-            int result = addBoundsAssign(updates, li , right, inDFItem, ((JifExprExt)la.ext()).getNumericBounds());                                            
+            int result = addBoundsAssign(updates, li , right, inDFItem, ((JifExprExt)JifUtil.jifExt(la)).getNumericBounds());                                            
             if ((result & MAY_INCREASE) != 0) increased = li; 
             if ((result & MAY_DECREASE) != 0) decreased = li;
             
@@ -229,12 +230,12 @@ public class IntegerBoundsChecker extends DataFlow
     }
     
     protected void setExprBounds(Expr e, Interval bounds) {
-        JifExprExt ext = (JifExprExt) e.ext();
+        JifExprExt ext = (JifExprExt) JifUtil.jifExt(e);
         ext.setNumericBounds(bounds);
     }
     
     protected Interval getExprBounds(Expr e) {
-        JifExprExt ext = (JifExprExt) e.ext();
+        JifExprExt ext = (JifExprExt) JifUtil.jifExt(e);
         Interval rng = ext.getNumericBounds();
         return rng == null ? Interval.FULL : rng;
     }

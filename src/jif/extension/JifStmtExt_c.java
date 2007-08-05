@@ -3,6 +3,7 @@ package jif.extension;
 import java.util.Iterator;
 
 import jif.ast.Jif;
+import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
@@ -20,13 +21,13 @@ public abstract class JifStmtExt_c extends Jif_c implements JifStmtExt
 {
     protected JifStmtExt stmtDel;
 
-    public JifStmtExt_c(Jif del, JifStmtExt stmtDel, ToJavaExt toJava) {
-        super(del, toJava);
+    public JifStmtExt_c(JifStmtExt stmtDel, ToJavaExt toJava) {
+        super(toJava);
         this.stmtDel = stmtDel;
     }
 
     public JifStmtExt_c(ToJavaExt toJava) {
-        this(null, null, toJava);
+        this(null, toJava);
     }
 
     public JifStmtExt stmtDel() {
@@ -82,7 +83,7 @@ public abstract class JifStmtExt_c extends Jif_c implements JifStmtExt
         A = (JifContext) node().del().enterScope(A);
 
         // Redispatch in case we're not the first delegate.
-        Node n = ((JifStmtExt) node().ext()).stmtDel().labelCheckStmt(lc.context(A));
+        Node n = ((JifStmtExt) JifUtil.jifExt(node())).stmtDel().labelCheckStmt(lc.context(A));
 
         // Apply the "single path rule"
         PathMap X = getPathMap(n).NV(ts.notTaken());

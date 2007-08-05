@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
@@ -65,7 +66,7 @@ public class JifNewArrayExt extends JifExprExt
 
         if (nae.init() != null) {
             init = (ArrayInit) lc.context(A).labelCheck(nae.init());
-            ((JifArrayInitExt)(init.ext())).labelCheckElements(lc, nae.type()); 
+            ((JifArrayInitExt)(JifUtil.jifExt(init))).labelCheckElements(lc, nae.type()); 
             PathMap Xinit = getPathMap(init);
             Xs = Xs.N(ts.notTaken()).join(Xinit);
         }

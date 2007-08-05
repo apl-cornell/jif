@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
@@ -73,7 +74,7 @@ public class JifArrayInitExt extends JifExprExt
             Type s = e.type();
 
             if (e instanceof ArrayInit) {
-                ((JifArrayInitExt) e.ext()).labelCheckElements(lc, t);
+                ((JifArrayInitExt) JifUtil.jifExt(e)).labelCheckElements(lc, t);
             }
 
             subtypeChecker.addSubtypeConstraints(lc, e.position(), t, s);

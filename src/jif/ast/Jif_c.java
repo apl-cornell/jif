@@ -18,15 +18,9 @@ import polyglot.util.InternalCompilerError;
 public class Jif_c extends Ext_c implements Jif
 {
     protected PathMap X;
-    protected Jif del;
     protected ToJavaExt toJava;
 
     public Jif_c(ToJavaExt toJava) {
-        this(null, toJava);
-    }
-
-    public Jif_c(Jif del, ToJavaExt toJava) {
-        this.del = del;
         this.toJava = toJava;
     }
 
@@ -37,9 +31,6 @@ public class Jif_c extends Ext_c implements Jif
     public void init(Node node) {
         super.init(node);
         toJava.init(node);
-        if (del != null) {
-            del.init(node);
-        }
     }
 
     public Jif toJava(ToJavaExt toJava) {
@@ -61,32 +52,9 @@ public class Jif_c extends Ext_c implements Jif
         if (toJava != null) {
             copy.toJava = (ToJavaExt) toJava.copy();
         }
-        if (del != null) {
-            copy.del = (Jif) del.copy();
-        }
         return copy;
     }
 
-    public Jif del(Jif del) {
-        if (del == this.del) {
-            return this;
-        }
-
-        Jif old = this.del;
-        this.del = null;
-
-        Jif_c copy = (Jif_c) copy();
-        copy.del = del != this ? del : null;
-
-        // Restore the old pointer.
-        this.del = old;
-
-        return copy;
-    }
-
-    public Jif del() {
-        return del != null ? del : this;
-    }
 
     public PathMap X() {
 	return X;

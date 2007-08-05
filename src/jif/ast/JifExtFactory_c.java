@@ -10,10 +10,8 @@ import polyglot.ast.ExtFactory;
  * This class provides is Jif's Extension factory, creating the appropriate
  * Ext objects as required.
  */
-public class JifExtFactory_c extends AbstractExtFactory_c 
-    implements JifStmtExtFactory
+public class JifExtFactory_c extends AbstractJifExtFactory_c 
 {
-
     public JifExtFactory_c() {
         super();
     }
@@ -252,200 +250,6 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return new JifWhileExt(new WhileToJavaExt_c());
     }
 
-    //----------------------------------------------------------------
-    // Jif-specific nodes
-    //-----------------------------------------------------------------
-
-    public final Ext extInstTypeNode() {
-        Ext e = extInstTypeNodeImpl();
-
-        return postExtInstTypeNode(e);
-    }
-
-    public final Ext extLabeledTypeNode() {
-        Ext e = extLabeledTypeNodeImpl();
-        return postExtLabeledTypeNode(e);
-    }
-
-    public final Ext extAmbNewArray() {
-        Ext e = extAmbNewArrayImpl();
-        return postExtAmbNewArray(e);
-    }
-
-    public final Ext extAmbParamTypeOrAccess() {
-        Ext e = extAmbParamTypeOrAccessImpl();
-        return postExtAmbParamTypeOrAccess(e);
-    }
-
-    public final Ext extJoinLabelNode() {
-        Ext e = extJoinLabelNodeImpl();
-        return postExtJoinLabelNode(e);
-    }
-
-    public final Ext extMeetLabelNode() {
-        Ext e = extMeetLabelNodeImpl();
-        return postExtMeetLabelNode(e);
-    }
-
-    public final Ext extPolicyNode() {
-        Ext e = extPolicyNodeImpl();
-        return postExtPolicyNode(e);
-    }
-
-    public final Ext extAmbDynamicLabelNode() {
-        Ext e = extAmbDynamicLabelNodeImpl();
-        return postExtAmbDynamicLabelNode(e);
-    }
-
-    public final Ext extAmbVarLabelNode() {
-        Ext e = extAmbVarLabelNodeImpl();
-        return postExtAmbVarLabelNode(e);
-    }
-
-    public final Ext extAmbThisLabelNode() {
-        Ext e = extAmbThisLabelNodeImpl();
-        return postExtAmbThisLabelNode(e);
-    }
-
-    public final Ext extCanonicalLabelNode() {
-        Ext e = extCanonicalLabelNodeImpl();
-        return postExtCanonicalLabelNode(e);
-    }
-
-    public final Ext extParamNode() {
-        Ext e = extParamNodeImpl();
-        return postExtParamNode(e);
-    }
-
-    public final Ext extLabelNode() {
-        Ext e = extLabelNodeImpl();
-        return postExtLabelNode(e);
-    }
-
-    public final Ext extPrincipalNode() {
-        Ext e = extPrincipalNodeImpl();
-        return postExtPrincipalNode(e);
-    }
-
-    public final Ext extAmbPrincipalNode() {
-        Ext e = extAmbPrincipalNodeImpl();
-        return postExtAmbPrincipalNode(e);
-    }
-
-
-    public final Ext extCanonicalPrincipalNode() {
-        Ext e = extCanonicalPrincipalNodeImpl();
-        return postExtCanonicalPrincipalNode(e);
-    }
-
-    public final Ext extAmbParam() {
-        Ext e = extAmbParamImpl();
-        return postExtAmbParam(e);
-    }
-
-    public final Ext extParamDecl() {
-        Ext e = extParamDeclImpl();
-        return postExtParamDecl(e);
-    }
-
-    public final Ext extConstraintNode() {
-        Ext e = extConstraintNodeImpl();
-        return postExtConstraintNode(e);
-    }
-
-    public final Ext extCanonicalConstraintNode() {
-        Ext e = extCanonicalConstraintNodeImpl();
-        return postExtCanonicalConstraintNode(e);
-    }
-
-    public final Ext extAuthConstraintNode() {
-        Ext e = extAuthConstraintNodeImpl();
-        return postExtAuthConstraintNode(e);
-    }
-
-    public final Ext extAutoEndorseConstraintNode() {
-        Ext e = extAutoEndorseConstraintNodeImpl();
-        return postExtAutoEndorseConstraintNode(e);
-    }
-
-    public final Ext extCallerConstraintNode() {
-        Ext e = extCallerConstraintNodeImpl();
-        return postExtCallerConstraintNode(e);
-    }
-
-    public final Ext extActsForConstraintNode() {
-        Ext e = extActsForConstraintNodeImpl();
-        return postExtActsForConstraintNode(e);
-    }
-
-    public final Ext extLabelLeAssertionNode() {
-        Ext e = extLabelLeAssertionNodeImpl();
-        return postExtLabelLeAssertionNode(e);
-    }
-
-    public final Ext extDeclassifyStmt() {
-        Ext e = extDeclassifyStmtImpl();
-        if (nextExtFactory() != null && 
-		nextExtFactory() instanceof JifStmtExtFactory) {
-            JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory(); 
-            Ext e2 = nextFac.extDeclassifyStmt();
-            e = composeExts(e2, e);
-        }
-        return postExtDeclassifyStmt(e);
-    }
-
-    public final Ext extDeclassifyExpr() {
-        Ext e = extDeclassifyExprImpl();
-        return postExtDeclassifyExpr(e);
-    }
-
-    public final Ext extEndorseStmt() {
-        Ext e = extEndorseStmtImpl();
-        if (nextExtFactory() != null && 
-        nextExtFactory() instanceof JifStmtExtFactory) {
-            JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory(); 
-            Ext e2 = nextFac.extEndorseStmt();
-            e = composeExts(e2, e);
-        }
-
-        return postExtEndorseStmt(e);
-    }
-    public final Ext extCheckedEndorseStmt() {
-        Ext e = extCheckedEndorseStmtImpl();
-        if (nextExtFactory() != null && 
-        nextExtFactory() instanceof JifStmtExtFactory) {
-            JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory(); 
-            Ext e2 = nextFac.extCheckedEndorseStmt();
-            e = composeExts(e2, e);
-        }
-
-        return postExtEndorseStmt(e);
-    }
-
-    public final Ext extEndorseExpr() {
-        Ext e = extEndorseExprImpl();
-        return postExtEndorseExpr(e);
-    }
-
-    public final Ext extNewLabel() {
-        Ext e = extNewLabelImpl();
-        return postExtNewLabel(e);
-    }
-
-    public final Ext extLabelExpr() {
-        Ext e = extLabelExprImpl();
-        return postExtLabelExpr(e);
-    }
-
-    public final Ext extPrincipalExpr() {
-        Ext e = extPrincipalExprImpl();
-        return postExtPrincipalExpr(e);
-    }
-
-
-    //----------------------------------------------------------------
-    // Jif-specific nodes Impls
-    //-----------------------------------------------------------------
     protected Ext extInstTypeNodeImpl() {
         return extCannotToJavaImpl();
     }
@@ -462,30 +266,6 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return extCannotToJavaImpl();
     }
 
-    protected Ext extJoinLabelNodeImpl() {
-        return extLabelNode();
-    }
-
-    protected Ext extMeetLabelNodeImpl() {
-        return extLabelNode();
-    }
-
-    protected Ext extPolicyNodeImpl() {
-        return extNode();
-    }
-
-    protected Ext extAmbDynamicLabelNodeImpl() {
-        return extLabelNode();
-    }
-
-    protected Ext extAmbVarLabelNodeImpl() {
-        return extLabelNode();
-    }
-
-    protected Ext extAmbThisLabelNodeImpl() {
-        return extLabelNode();
-    }
-
     protected Ext extCanonicalLabelNodeImpl() {
         return new Jif_c(new CanonicalLabelNodeToJavaExt_c());
     }
@@ -494,26 +274,12 @@ public class JifExtFactory_c extends AbstractExtFactory_c
         return extCannotToJavaImpl();
     }
 
-    protected Ext extLabelNodeImpl() {
-        return extParamNode();
-    }
-
-    protected Ext extPrincipalNodeImpl() {
-        return extParamNode();
-    }
-
-    protected Ext extAmbPrincipalNodeImpl() {
-        return extPrincipalNode();
-    }
 
 
     protected Ext extCanonicalPrincipalNodeImpl() {
         return new JifPrincipalNodeExt(new CanonicalPrincipalNodeToJavaExt_c());
     }
 
-    protected Ext extAmbParamImpl() {
-        return extParamNode();
-    }
 
     protected Ext extParamDeclImpl() {
         return extCannotToJavaImpl();
@@ -521,30 +287,6 @@ public class JifExtFactory_c extends AbstractExtFactory_c
 
     protected Ext extConstraintNodeImpl() {
         return extCannotToJavaImpl();
-    }
-
-    protected Ext extCanonicalConstraintNodeImpl() {
-        return extConstraintNode();
-    }
-
-    protected Ext extAuthConstraintNodeImpl() {
-        return extConstraintNode();
-    }
-
-    protected Ext extAutoEndorseConstraintNodeImpl() {
-        return extConstraintNode();
-    }
-
-    protected Ext extCallerConstraintNodeImpl() {
-        return extConstraintNode();
-    }
-
-    protected Ext extActsForConstraintNodeImpl() {
-        return extConstraintNode();
-    }
-
-    protected Ext extLabelLeAssertionNodeImpl() {
-        return extConstraintNode();
     }
     
     protected Ext extDeclassifyStmtImpl() {
@@ -575,145 +317,5 @@ public class JifExtFactory_c extends AbstractExtFactory_c
     }
     protected Ext extPrincipalExprImpl() {
         return new JifPrincipalExprExt(new PrincipalExprToJavaExt_c());
-    }
-
-    //----------------------------------------------------------------
-    // Jif-specific nodes Post methods
-    //-----------------------------------------------------------------
-    protected Ext postExtInstTypeNode(Ext e) {
-        return postExtTypeNode(e);
-    }
-
-    protected Ext postExtLabeledTypeNode(Ext e) {
-        return postExtTypeNode(e);
-    }
-
-    protected Ext postExtAmbNewArray(Ext e) {
-        return postExtNode(e);
-    }
-
-    protected Ext postExtAmbParamTypeOrAccess(Ext e) {
-        return postExtNode(e);
-    }
-
-    protected Ext postExtJoinLabelNode(Ext e) {
-        return postExtLabelNode(e);
-    }
-
-    protected Ext postExtMeetLabelNode(Ext e) {
-        return postExtLabelNode(e);
-    }
-
-    protected Ext postExtPolicyNode(Ext e) {
-        return postExtNode(e);
-    }
-
-    protected Ext postExtAmbDynamicLabelNode(Ext e) {
-        return postExtLabelNode(e);
-    }
-
-    protected Ext postExtAmbVarLabelNode(Ext e) {
-        return postExtLabelNode(e);
-    }
-
-    protected Ext postExtAmbThisLabelNode(Ext e) {
-        return postExtLabelNode(e);
-    }
-
-    protected Ext postExtCanonicalLabelNode(Ext e) {
-        return postExtLabelNode(e);
-    }
-
-    protected Ext postExtParamNode(Ext e) {
-        return postExtNode(e);
-    }
-
-    protected Ext postExtLabelNode(Ext e) {
-        return postExtParamNode(e);
-    }
-
-    protected Ext postExtPrincipalNode(Ext e) {
-        return postExtParamNode(e);
-    }
-
-    protected Ext postExtAmbPrincipalNode(Ext e) {
-        return postExtPrincipalNode(e);
-    }
-
-
-    protected Ext postExtCanonicalPrincipalNode(Ext e) {
-        return postExtPrincipalNode(e);
-    }
-
-    protected Ext postExtAmbParam(Ext e) {
-        //return postExtAmbParam(e);
-	return postExtNode(e);
-    }
-
-    protected Ext postExtParamDecl(Ext e) {
-        return postExtNode(e);
-    }
-
-    protected Ext postExtConstraintNode(Ext e) {
-        return postExtNode(e);
-    }
-
-    protected Ext postExtCanonicalConstraintNode(Ext e) {
-        return postExtConstraintNode(e);
-    }
-
-    protected Ext postExtAuthConstraintNode(Ext e) {
-        return postExtConstraintNode(e);
-    }
-
-    protected Ext postExtAutoEndorseConstraintNode(Ext e) {
-        return postExtConstraintNode(e);
-    }
-
-    protected Ext postExtCallerConstraintNode(Ext e) {
-        return postExtConstraintNode(e);
-    }
-
-    protected Ext postExtActsForConstraintNode(Ext e) {
-        return postExtConstraintNode(e);
-    }
-
-    protected Ext postExtLabelLeAssertionNode(Ext e) {
-        return postExtConstraintNode(e);
-    }
-
-    protected Ext postExtDowngradeStmt(Ext e) {
-        return postExtStmt(e);
-    }
-
-    protected Ext postExtDowngradeExpr(Ext e) {
-        return postExtExpr(e);
-    }
-
-    protected Ext postExtDeclassifyStmt(Ext e) {
-        return postExtDowngradeStmt(e);
-    }
-
-    protected Ext postExtDeclassifyExpr(Ext e) {
-        return postExtDowngradeExpr(e);
-    }
-
-    protected Ext postExtEndorseStmt(Ext e) {
-        return postExtDowngradeStmt(e);
-    }
-
-    protected Ext postExtEndorseExpr(Ext e) {
-        return postExtDowngradeExpr(e);
-    }
-
-    protected Ext postExtNewLabel(Ext e) {
-        return postExtLabelExpr(e);
-    }
-
-    protected Ext postExtLabelExpr(Ext e) {
-        return postExtExpr(e);
-    }
-    protected Ext postExtPrincipalExpr(Ext e) {
-        return postExtExpr(e);
     }
 }

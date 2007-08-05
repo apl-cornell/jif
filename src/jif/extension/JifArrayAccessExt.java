@@ -28,7 +28,7 @@ public class JifArrayAccessExt extends JifExprExt
         ArrayAccessAssign aae = nf.ArrayAccessAssign(pos, ae, Assign.ADD_ASSIGN, 
                                                      nf.IntLit(pos, IntLit.INT, 1));
 
-        aae = (ArrayAccessAssign)((JifArrayAccessAssignExt) aae.ext()).labelCheck(lc);
+        aae = (ArrayAccessAssign)((JifArrayAccessAssignExt) JifUtil.jifExt(aae)).labelCheck(lc);
 
         return aae.left();
     }
