@@ -431,7 +431,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extCanonicalLabelNodeImpl() {
-        return new Jif_c(new CanonicalLabelNodeToJavaExt_c());
+        return extNodeImpl();
     }
 
     protected Ext extParamNodeImpl() {
@@ -452,7 +452,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
 
 
     protected Ext extCanonicalPrincipalNodeImpl() {
-        return new JifPrincipalNodeExt(new CanonicalPrincipalNodeToJavaExt_c());
+        return extNodeImpl();
     }
 
     protected Ext extAmbParamImpl() {
@@ -492,33 +492,33 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
     }
     
     protected Ext extDeclassifyStmtImpl() {
-        return new JifDeclassifyStmtExt(new DowngradeStmtToJavaExt_c());
+        return extStmtImpl();
     }
 
     protected Ext extDeclassifyExprImpl() {
-        return new JifDeclassifyExprExt(new DowngradeExprToJavaExt_c());
+        return extExprImpl();
     }
 
     protected Ext extEndorseStmtImpl() {
-        return new JifEndorseStmtExt(new DowngradeStmtToJavaExt_c());
+        return extStmtImpl();
     }
 
     protected Ext extCheckedEndorseStmtImpl() {
-        return new JifCheckedEndorseStmtExt(new DowngradeStmtToJavaExt_c());
+        return extEndorseStmtImpl();
     }
 
     protected Ext extEndorseExprImpl() {
-        return new JifEndorseExprExt(new DowngradeExprToJavaExt_c());
+        return extExprImpl();
     }
 
     protected Ext extNewLabelImpl() {
-        return new JifLabelExprExt(new NewLabelToJavaExt_c());
+        return extLabelExprImpl();
     }
     protected Ext extLabelExprImpl() {
-        return new JifLabelExprExt(new LabelExprToJavaExt_c());
+        return extExprImpl();
     }
     protected Ext extPrincipalExprImpl() {
-        return new JifPrincipalExprExt(new PrincipalExprToJavaExt_c());
+        return extExprImpl();
     }
 
     //----------------------------------------------------------------

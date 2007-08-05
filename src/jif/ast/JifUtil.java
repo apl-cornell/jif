@@ -29,9 +29,18 @@ public class JifUtil
 
     public static Node updatePathMap(Node n, PathMap X) {
         Jif ext = jifExt(n);
-        return n.ext(ext.X(X));
+        return updateJifExt(n, ext.X(X));
     }
     
+    private static Node updateJifExt(Node n, Jif jif) {
+        return n.ext(updateJifExt(n.ext(), jif));
+    }
+    private static Ext updateJifExt(Ext e, Jif jif) {
+        if (e instanceof Jif) return jif;
+        if (e == null) return e;
+        return e.ext(updateJifExt(e.ext(), jif));
+    }
+
     public static AccessPath varInstanceToAccessPath(VarInstance vi, Position pos) throws SemanticException {
         return varInstanceToAccessPath(vi, vi.name(), pos);
     }
