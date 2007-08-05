@@ -62,6 +62,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	ArgLabelSubst2.jif ;
 	ArgLabelSubst3.jif ;
 	ArgLabelSubst4.jif ;
+	LabelSubst01.jif ;
 	Array.jif ;
 	Array1.jif (Semantic, "not a subtype") ;
 	Array2.jif ;

@@ -1,4 +1,4 @@
-public class Test[label L]  { 
+public class C[label L]  { 
     public void fooString {L} () {
         String {L}[]{L}x  = new String[1];
         try {

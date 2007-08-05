@@ -11,6 +11,7 @@ import jif.types.*;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
+import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 
@@ -58,13 +59,22 @@ public class JifCallExt extends JifExprExt
 
         List throwTypes = new ArrayList(me.del().throwTypes(ts));
 
-        JifMethodInstance mi = (JifMethodInstance)me.methodInstance();
+        Receiver target = (Receiver) lc.context(A).labelCheck(me.target());
 
+        // Find the method instance again. This ensures that
+        // we have the correctly instantiated type, as label checking
+        // of the target may have produced a new type for the target.
+        JifMethodInstance mi = (JifMethodInstance)ts.findMethod(target.type().toReference(), 
+                                          me.name(), 
+                                          me.methodInstance().formalTypes(), 
+                                          A.currentClass());
+
+        me = me.methodInstance(mi);
+        
         if (mi.flags().isStatic()) {
             new ConstructorChecker().checkStaticMethodAuthority(mi, A, me.position());
         }
 
-        Receiver target = (Receiver) lc.context(A).labelCheck(me.target());
 
         A = (JifContext) A.pushBlock();
 

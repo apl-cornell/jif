@@ -122,7 +122,12 @@ public class JifFieldExt extends JifExprExt
 
         // Must be done after visiting target to get PC right.
 
-        FieldInstance fi = fe.fieldInstance();
+        // Find the field instance again. This ensures that
+        // we have the correctly instantiated type, as label checking
+        // of the target may have produced a new type for the target.
+        FieldInstance fi = ts.findField(fe.target().type().toReference(), fe.name());
+        fe = fe.fieldInstance(fi);
+        
         Label L = ts.labelOfField(fi, A.pc());
 
         if (target instanceof Expr) {
@@ -130,10 +135,9 @@ public class JifFieldExt extends JifExprExt
 
             L = JifInstantiator.instantiate(L, A, (Expr)target, targetType(ts, A, target, fe), objLabel);
 
-            Type ft = JifInstantiator.instantiate(fe.type(), A, (Expr)target, targetType(ts, A, target, fe), objLabel); 
+            Type ft = JifInstantiator.instantiate(fi.type(), A, (Expr)target, targetType(ts, A, target, fe), objLabel); 
 
-            if (ft != fe.type())
-                fe = (Field)fe.type(ft);
+            fe = (Field)fe.type(ft);
         }
 
         PathMap X = Xe.NV(lc.upperBound(L, Xe.NV()));
