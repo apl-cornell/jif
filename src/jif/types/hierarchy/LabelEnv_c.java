@@ -363,7 +363,7 @@ public class LabelEnv_c implements LabelEnv
         
         if (L1.equals(L2)) return true;        
 
-        // L1 <= L2 if there for all components of L1, there is one component
+        // L1 <= L2 if for all components of L1, there is one component
         // of L2 that is greater.  We need to filter out all L1, and L2
         // that are not enumerable.        
         if (! L1.isEnumerable()) {

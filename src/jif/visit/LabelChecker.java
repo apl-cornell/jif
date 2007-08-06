@@ -178,7 +178,7 @@ public class LabelChecker implements Copy
      */
     public void enteringMethod(MethodInstance mi) {
         if (solvePerMethod) {
-            // solving by method. Set a new solver for the class body
+            // solving by method. Set a new solver for the method body
             this.solver = ts.createSolver(mi.container().toString() + "." + mi.name());
         }
     }
