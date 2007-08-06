@@ -383,7 +383,7 @@ public final class Date[covariant label L] implements JifObject[L] {
         count += d-1;
         return count;
     }
-    private static final int{} DAYS_IN_400_YEARS = 146097;
+    private static final int{*!:*} DAYS_IN_400_YEARS = 146097;
 
     /**
      * Determine if the given year is a leap years. A year is a leap year
