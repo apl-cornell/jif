@@ -55,7 +55,7 @@ public class ConstructorCallToJavaExt_c extends ToJavaExt_c {
             return rw.qq().parseStmt("this.%s(%LE);", name, n.arguments());
         }
         else {
-            return rw.qq().parseStmt("super.%s(%LE);", name, n.arguments());
+            return rw.qq().parseStmt("this.%s(%LE);", name, n.arguments());
         }        
     }
 }
