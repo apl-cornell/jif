@@ -146,9 +146,18 @@ public class LabelChecker implements Copy
         return ts.meet(L1, L2);
     }
 
+    protected Node preLabelCheck(Node n) {
+        return n;
+    }
+    protected Node postLabelCheck(Node old, Node n) {
+        return n;
+    }
     public Node labelCheck(Node n) throws SemanticException {
         if (JifUtil.jifExt(n) != null) {
-	    n = JifUtil.jifExt(n).labelCheck(this);
+            n = preLabelCheck(n);
+	    Node newNode = JifUtil.jifExt(n).labelCheck(this);
+            newNode = postLabelCheck(n, newNode);
+            n = newNode;
 	}
         return n;
     }

@@ -39,7 +39,7 @@ public class JifScheduler extends JLScheduler {
         this.jlext = jlext;
     }
 
-    public LabelCheckGoal LabelsChecked(Job job) {
+    public Goal LabelsChecked(Job job) {
         LabelCheckGoal g = (LabelCheckGoal)internGoal(new LabelCheckGoal(job));
 
         try {
@@ -50,7 +50,6 @@ public class JifScheduler extends JLScheduler {
             throw new InternalCompilerError(e);
         }
         return g;
-
     }
 
     public FieldLabelInferenceGoal FieldLabelInference(Job job) {

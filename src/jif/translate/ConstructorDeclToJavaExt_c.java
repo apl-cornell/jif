@@ -1,16 +1,21 @@
 package jif.translate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import jif.ast.JifConstructorDecl;
-import jif.ast.JifMethodDecl;
 import jif.types.JifConstructorInstance;
-import jif.types.JifMethodInstance;
 import jif.types.JifPolyType;
 import jif.types.JifSubstType;
 import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
 
 public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
@@ -140,7 +145,7 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
         inits.addAll(additionalInits(rw));
         
         // Add an explicit return to the body.
-        inits.add(nf.Return(n.position(), nf.This(n.position())));
+        addConstructorReturn(rw, (JifConstructorInstance)ci, inits, n.position());
 
         body = nf.Block(n.position(), inits);
         
@@ -156,6 +161,14 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
         m = m.methodInstance(null);
 
         return m;
+    }
+
+    protected void addConstructorReturn(JifToJavaRewriter rw, 
+            JifConstructorInstance ci, 
+            List inits, 
+            Position pos) {
+        NodeFactory nf = rw.java_nf();
+        inits.add(nf.Return(pos, nf.This(pos)));
     }
 
     /**
