@@ -3,13 +3,21 @@ package jif.extension;
 import java.util.ArrayList;
 import java.util.List;
 
-import jif.ast.*;
+import jif.ast.JifInstantiator;
+import jif.ast.JifNodeFactory;
+import jif.ast.JifNodeFactory_c;
+import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.types.FieldInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -32,7 +40,7 @@ public class JifFieldExt extends JifExprExt
                                          nf.IntLit(pos, IntLit.INT, 1));
 
 
-        fae = (FieldAssign)((JifFieldAssignExt) JifUtil.jifExt(fae)).labelCheck(lc);
+        fae = (FieldAssign)lc.labelCheck(fae);
 
         return fae.left();
     }
