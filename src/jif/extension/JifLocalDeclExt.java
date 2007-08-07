@@ -40,21 +40,24 @@ public class JifLocalDeclExt extends JifStmtExt_c
 
         //deal with the special cases "final label l = new label(...)"
         // and "final principal p = ..."
-        if (li.flags().isFinal() && 
-                (ts.isLabel(li.type()) || ts.isImplicitCastValid(li.type(), ts.Principal())) && 
-                JifUtil.isFinalAccessExprOrConst(ts, decl.init())) {
-
+        if (li.flags().isFinal() && JifUtil.isFinalAccessExprOrConst(ts, decl.init())) { 
             if (ts.isLabel(li.type())) {
                 Label dl = ts.dynamicLabel(decl.position(), JifUtil.varInstanceToAccessPath(li, li.position()));                
                 Label rhs_label = JifUtil.exprToLabel(ts, decl.init(), lc.context());
                 lc.context().addDefinitionalAssertionEquiv(dl, rhs_label);
             }
-            if (ts.isImplicitCastValid(li.type(), ts.Principal())) {
+            else if (ts.isImplicitCastValid(li.type(), ts.Principal())) {
                 DynamicPrincipal dp = ts.dynamicPrincipal(decl.position(), JifUtil.varInstanceToAccessPath(li, li.position()));                
                 Principal rhs_principal = JifUtil.exprToPrincipal(ts, decl.init(), lc.context());
                 lc.context().addDefinitionalEquiv(dp, rhs_principal);                    
             }
-        }                            
+            else {
+                // we can also add an access path equivalence
+                lc.context().addEquiv(JifUtil.varInstanceToAccessPath(li, li.position()),
+                                      JifUtil.exprToAccessPath(decl.init(), lc.context()));
+
+            }
+        }
 
         // Equate the variable label with the declared label.
         Label L = li.label();

@@ -41,7 +41,7 @@ public interface JifContext extends Context {
      * Add an equivalence to the label environment. 
      */
     void addEquiv(Label L1, Label L2);
-
+    
     /**
      * Adds the assertion to this context, and all outer contexts up to
      * the method/constructor/initializer level
@@ -59,6 +59,12 @@ public interface JifContext extends Context {
      * @param L2
      */
     void addDefinitionalAssertionEquiv(Label L1, Label L2, boolean addToClass);
+
+    /**
+     * Adds the assertion that the access path p is equivalent to the
+     * access path q to this context
+     */
+    void addEquiv(AccessPath p, AccessPath q);
 
     /**
      * Adds the assertion that the access path p is equivalent to the

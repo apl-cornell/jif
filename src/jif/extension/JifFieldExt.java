@@ -133,7 +133,8 @@ public class JifFieldExt extends JifExprExt
         // Find the field instance again. This ensures that
         // we have the correctly instantiated type, as label checking
         // of the target may have produced a new type for the target.
-        FieldInstance fi = ts.findField(fe.target().type().toReference(), fe.name());
+        ReferenceType targetType = targetType(ts, A, target, fe);
+        FieldInstance fi = ts.findField(targetType, fe.name());
         fe = fe.fieldInstance(fi);
         
         Label L = ts.labelOfField(fi, A.pc());
@@ -141,9 +142,9 @@ public class JifFieldExt extends JifExprExt
         if (target instanceof Expr) {
             Label objLabel = getPathMap(target).NV();
 
-            L = JifInstantiator.instantiate(L, A, (Expr)target, targetType(ts, A, target, fe), objLabel);
+            L = JifInstantiator.instantiate(L, A, (Expr)target, targetType, objLabel);
 
-            Type ft = JifInstantiator.instantiate(fi.type(), A, (Expr)target, targetType(ts, A, target, fe), objLabel); 
+            Type ft = JifInstantiator.instantiate(fi.type(), A, (Expr)target, targetType, objLabel); 
 
             fe = (Field)fe.type(ft);
         }

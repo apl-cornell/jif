@@ -10,7 +10,12 @@ import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
-import polyglot.util.*;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeObject_c;
+import polyglot.types.TypeSystem;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * The wrapper of a set of assumptions that can be used to decide
@@ -183,17 +188,42 @@ public class LabelEnv_c implements LabelEnv
     private AccessPath findAccessPathRepr(AccessPath p) {
         AccessPath last = p;
         AccessPath next = (AccessPath)accessPathEquivReps.get(last);
-        while (next != null) {
+        while (next != null && next != last) {
             last = next;
-            next = (AccessPath)accessPathEquivReps.get(last);
+            next = (AccessPath)accessPathEquivReps.get(last);            
         }
         return last;
     }
     public void addEquiv(AccessPath p, AccessPath q) {
         // clear the cache of false leq results, since this may let us prove more results
         cacheFalse.clear();
-        accessPathEquivReps.put(p, findAccessPathRepr(q));
+        AccessPath repr1 = findAccessPathRepr(p);
+        AccessPath repr2 = findAccessPathRepr(q);
+        accessPathEquivReps.put(p, repr2);
+        if (repr1 != p) {
+            accessPathEquivReps.put(repr1, repr2);            
+        }
+        if (!accessPathEquivReps.containsKey(q)) {
+            accessPathEquivReps.put(q, repr2);            
+        }
     }
+    
+    protected Set equivAccessPaths(AccessPathRoot p) {
+        if (!accessPathEquivReps.containsKey(p)) {
+            return Collections.EMPTY_SET;
+        }
+        Set s = new LinkedHashSet();
+        AccessPath repr = findAccessPathRepr(p);
+        
+        for (Iterator iter = accessPathEquivReps.keySet().iterator(); iter.hasNext();) {
+            AccessPath q = (AccessPath)iter.next();
+            if (repr == findAccessPathRepr(q)) {
+                s.add(q);
+            }
+        }
+        return s;
+    }
+    
     /*
      * Cache the results of leq(Label, Label, SearchState), when we are
      * using assertions only. Note that the rest of the
@@ -436,14 +466,27 @@ public class LabelEnv_c implements LabelEnv
     private static final int ASSERTION_USE_BOUND = 1;
 
     /**
+     * Bound the number of times any particular assertion can be used; this bounds
+     * the search in leqImpl.
+     */
+    private static final int EQUIV_PATH_USE_BOUND = 1;
+
+    /**
      * Bound the total number of assertion uses; this bounds
      * the search in leqImpl.
      */
     private static final int ASSERTION_TOTAL_BOUND = 6 * ASSERTION_USE_BOUND;
         
+    /**
+     * Bound the total number of assertion uses; this bounds
+     * the search in leqImpl.
+     */
+    private static final int EQUIV_PATH_TOTAL_BOUND = 12 * EQUIV_PATH_USE_BOUND;
+
     private boolean leqApplyAssertions(Label L1, Label L2, SearchState_c state, boolean beSmart) {
         AssertionUseCount auc = state.auc;
-        if (!state.useAssertions || auc.size() >= ASSERTION_TOTAL_BOUND) return false;
+        if (!state.useAssertions || auc.size() >= ASSERTION_TOTAL_BOUND || auc.accessPathSize() > EQUIV_PATH_TOTAL_BOUND) 
+            return false;
         if (Report.should_report(topics, 2))
             Report.report(2, "Applying assertions for " + L1 + " <= " + L2);
 
@@ -479,6 +522,52 @@ public class LabelEnv_c implements LabelEnv
                     leq(cRHS, L2, newState)) {
                 return true;
             }
+        }
+        
+        // now try to use the access path equivalences
+        if (L2 instanceof DynamicLabel) {
+            AccessPath p2 = ((DynamicLabel)L2).path();
+            AccessPathRoot p2root = p2.root();
+            // see if there are any other access paths equivalent
+            Set equivAccessPaths = equivAccessPaths(p2root);
+            for (Iterator iter = equivAccessPaths.iterator(); iter.hasNext(); ) {
+                AccessPath p = (AccessPath)iter.next();
+                if (p.equals(p2root)) continue;
+                AccessPathEquivalence ea = new AccessPathEquivalence(p, p2root); 
+                if (auc.get(ea) >= EQUIV_PATH_USE_BOUND) {
+                    continue;
+                }
+                AssertionUseCount newAUC = new AssertionUseCount(auc, ea);
+                SearchState newState = new SearchState_c(newAUC, state, null);
+                Label equiv = ts.dynamicLabel(Position.compilerGenerated(),
+                                              p2.subst(p2root, p));
+                if (leq(L1, equiv, newState)) {
+                    return true;
+                }
+            }
+        }
+        if (L1 instanceof DynamicLabel) {
+            AccessPath p1 = ((DynamicLabel)L1).path();
+            AccessPathRoot p1root = p1.root();
+            // see if there are any other access paths equivalent
+            Set equivAccessPaths = equivAccessPaths(p1root);
+            for (Iterator iter = equivAccessPaths.iterator(); iter.hasNext(); ) {
+                AccessPath p = (AccessPath)iter.next();
+                if (p.equals(p1root)) continue;
+                AccessPathEquivalence ea = new AccessPathEquivalence(p, p1root); 
+                if (auc.get(ea) >= EQUIV_PATH_USE_BOUND) {
+                    continue;
+                }
+                AssertionUseCount newAUC = new AssertionUseCount(auc, ea);
+                SearchState newState = new SearchState_c(newAUC, state, null);
+                Label equiv = ts.dynamicLabel(Position.compilerGenerated(),
+                                              p1.subst(p1root, p));
+                if (leq(equiv, L2, newState)) {
+                    return true;
+                }
+                
+            }
+            
         }
         return false;
 
@@ -704,11 +793,11 @@ public class LabelEnv_c implements LabelEnv
             }
             sb.append(ph().actsForString());
         }
-        if (Report.should_report(Report.debug, 1) && !accessPathEquivReps.isEmpty()) {
+        if (/*Report.should_report(Report.debug, 1) && */!accessPathEquivReps.isEmpty()) {
             for (Iterator iter = accessPathEquivReps.entrySet().iterator(); iter.hasNext(); ) {
-                if (sb.length() > 1) sb.append(", ");
-
                 Map.Entry e = (Entry)iter.next();
+                if (e.getKey() == e.getValue()) continue;
+                if (sb.length() > 1) sb.append(", ");
                 sb.append(((AccessPath)e.getKey()).exprString());
                 sb.append("==");
                 sb.append(((AccessPath)e.getValue()).exprString());
@@ -809,26 +898,46 @@ public class LabelEnv_c implements LabelEnv
      */
     private static class AssertionUseCount {
         private final AssertionUseCount previousAUC;
-        private final Assertion use;
+        private final Object use;
         private final int size;
+        private final int accesspathsize;
         AssertionUseCount() {
             this.use = null;
             this.previousAUC = null;
             this.size = 0;
+            this.accesspathsize = 0;
         }
         AssertionUseCount(AssertionUseCount auc, Assertion a) {
             this.use = a;
             this.previousAUC = auc;
-            int s = 0;
+            int s = 0, aps = 0;
             if (previousAUC != null) {
                 s = previousAUC.size();
+                aps = previousAUC.accessPathSize();
             }
-            if (use != null) s++;
+            if (use != null) {                
+                s++;
+            }
             this.size = s;
+            this.accesspathsize = aps;
+        }
+        AssertionUseCount(AssertionUseCount auc, AccessPathEquivalence a) {
+            this.use = a;
+            this.previousAUC = auc;
+            int s = 0, aps = 0;
+            if (previousAUC != null) {
+                s = previousAUC.size();
+                aps = previousAUC.accessPathSize();
+            }
+            if (use != null) {                
+                aps++;
+            }
+            this.size = s;
+            this.accesspathsize = aps;
         }
         
         public boolean allZero() {
-            return size() == 0;
+            return size() == 0 && accessPathSize() == 0;
         }
         public int get(Assertion a) {
             int prev = 0;
@@ -836,8 +945,17 @@ public class LabelEnv_c implements LabelEnv
             if (use != null && use.equals(a)) return 1 + prev;
             return prev;
         }
+        public int get(AccessPathEquivalence a) {
+            int prev = 0;
+            if (previousAUC != null) prev = previousAUC.get(a);
+            if (use != null && use.equals(a)) return 1 + prev;
+            return prev;
+        }
         public int size() {
             return size;
+        }
+        public int accessPathSize() {
+            return accesspathsize;
         }
 //        public String toString() {
 //            return tally.toString();
@@ -870,4 +988,21 @@ public class LabelEnv_c implements LabelEnv
             return false;
         }
     }
+    
+    private static class AccessPathEquivalence {
+        final private AccessPath p;
+        final private AccessPath q;
+        AccessPathEquivalence(AccessPath p, AccessPath q) {
+            this.p = p;
+            this.q = q;
+        }
+        public boolean equalsImpl(TypeObject t) {
+            if (t instanceof AccessPathEquivalence) {
+                AccessPathEquivalence that = (AccessPathEquivalence)t;
+                return (this.p.equals(that.p) && this.q.equals(that.q)) ||
+                       (this.p.equals(that.q) && this.q.equals(that.p));
+            }
+            return false;
+        }
+    }    
 }

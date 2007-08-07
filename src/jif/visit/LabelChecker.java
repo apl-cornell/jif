@@ -153,7 +153,8 @@ public class LabelChecker implements Copy
         return n;
     }
     public Node labelCheck(Node n) throws SemanticException {
-        if (JifUtil.jifExt(n) != null) {
+        if (JifUtil.jifExt(n) != null) {            
+            this.context().labelEnv().setSolver(this.solver());
             n = preLabelCheck(n);
 	    Node newNode = JifUtil.jifExt(n).labelCheck(this);
             newNode = postLabelCheck(n, newNode);

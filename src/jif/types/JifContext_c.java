@@ -12,6 +12,7 @@ import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
 import polyglot.ast.Local;
+import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 
@@ -182,6 +183,28 @@ public class JifContext_c extends Context_c implements JifContext
         envModification();
         env.addActsFor(p1, p2);
     }
+    public void addEquiv(AccessPath p, AccessPath q) {
+        //envModification(); XXX add the equivalence to the current environment.
+//        env.addEquiv(p, q);
+        // don't bother copying the environment, as we'll be
+        // propogating it upwards anyway.
+        // envModification();
+        env.addEquiv(p, q);
+        JifContext_c jc = this;
+        LabelEnv_c lastEnvAddedTo = env;
+        boolean lastJCBlock = (jc.kind == Context_c.BLOCK);
+        while (!jc.isCode() && !lastJCBlock) {
+            jc = (JifContext_c)jc.pop();
+            if (jc != null && jc.scope == this.scope && jc.env != lastEnvAddedTo) {
+                // only add to env we haven't seen yet, and
+                // envs in the scope of the same class as us.
+                jc.env.addEquiv(p, q);
+                lastEnvAddedTo = jc.env;
+            }            
+            lastJCBlock = (jc.kind == Context_c.BLOCK);
+        }
+        
+    }
     /**
      * Adds the assertion to this context, and all outer contexts up to
      * the method/constructor/initializer level
@@ -345,6 +368,12 @@ public class JifContext_c extends Context_c implements JifContext
         jc.envModification();
         return jc;
     }
+//    public Context pushBlock() {
+//        JifContext_c jc = (JifContext_c)super.pushBlock();
+//        // force a new label environment
+//        jc.envModification();
+//        return jc;
+//    }
 
     public boolean inConstructorCall() {
         return this.inConstructorCall;
