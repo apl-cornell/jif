@@ -481,7 +481,7 @@ public class LabelEnv_c implements LabelEnv
      * Bound the total number of assertion uses; this bounds
      * the search in leqImpl.
      */
-    private static final int EQUIV_PATH_TOTAL_BOUND = 12 * EQUIV_PATH_USE_BOUND;
+    private static final int EQUIV_PATH_TOTAL_BOUND = 8 * EQUIV_PATH_USE_BOUND;
 
     private boolean leqApplyAssertions(Label L1, Label L2, SearchState_c state, boolean beSmart) {
         AssertionUseCount auc = state.auc;
@@ -524,7 +524,7 @@ public class LabelEnv_c implements LabelEnv
             }
         }
         
-        // now try to use the access path equivalences
+        // try to use the access path equivalences
         if (L2 instanceof DynamicLabel) {
             AccessPath p2 = ((DynamicLabel)L2).path();
             AccessPathRoot p2root = p2.root();
