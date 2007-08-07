@@ -48,28 +48,12 @@ public class JifNewArrayDel extends JifJL_c
         }
         return l;
     }
-    /**
-     * Check the dim expressions to see if any of them can cause 
-     * a NegativeArraySizeException to be thrown
-     */
+    
+    private boolean noNegArraySizeExcThrown = false;
+    public void setNoNegArraySizeExcThrown() {
+        noNegArraySizeExcThrown = true;
+    }
     public boolean noNegArraySizeExcThrown() {
-        NewArray na = (NewArray)node();
-        List dims = na.dims();
-        if (dims == null) return true;
-        for (Iterator iter = dims.iterator(); iter.hasNext();) {
-            Expr d = (Expr)iter.next();
-            JifExprExt ext = (JifExprExt)JifUtil.jifExt(d);
-
-            IntegerBoundsChecker.Interval bounds = ext.getNumericBounds();
-            // if bound is not null, then bound < d
-            if (bounds == null || bounds.getLower() < 0) {
-                // the value of d may be less than 0, and so
-                // a NegativeArraySizeException may be thrown
-                
-//                System.err.println("Bound for " +  d + " is " + bound);
-                return false;
-            }
-        }
-        return true;
+        return noNegArraySizeExcThrown;
     }
 }

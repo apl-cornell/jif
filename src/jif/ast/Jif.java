@@ -22,5 +22,11 @@ public interface Jif extends Ext
     Jif X(PathMap X);
 
     /** Label check the node to which this extension is attached. */
-    Node labelCheck(LabelChecker lc) throws SemanticException;    
+    Node labelCheck(LabelChecker lc) throws SemanticException;
+    
+    /**
+     * A method that is called to notify the extension that
+     * the numeric bounds have been calculated.
+     */
+    void numericBoundsCalculated();    
 }

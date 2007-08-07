@@ -114,5 +114,9 @@ public class Jif_c extends Ext_c implements Jif
         }
     }
 
+    public void numericBoundsCalculated() {
+        
+    }
+
     
 }

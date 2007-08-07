@@ -1,3 +1,7 @@
+    /**
+     * Check the dim expressions to see if any of them can cause 
+     * a NegativeArraySizeException to be thrown
+     */
 package jif.extension;
 
 import java.util.ArrayList;
@@ -6,12 +10,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import jif.ast.JifUtil;
-import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.PathMap;
 import jif.types.label.Label;
+import jif.visit.IntegerBoundsChecker;
 import jif.visit.LabelChecker;
 import polyglot.ast.ArrayInit;
 import polyglot.ast.Expr;
@@ -85,4 +89,36 @@ public class JifNewArrayExt extends JifExprExt
 
         return updatePathMap(nae.dims(dims).init(init), Xs);
     }
+
+    public void numericBoundsCalculated() {
+        super.numericBoundsCalculated();
+        boolean noNegArraySizeExcThrown = noNegArraySizeExcThrown();
+        if (noNegArraySizeExcThrown) {
+            JifNewArrayDel del = (JifNewArrayDel)this.node().del();
+            del.setNoNegArraySizeExcThrown();
+        }
+    }
+    
+    private boolean noNegArraySizeExcThrown() {
+        NewArray na = (NewArray)node();
+        List dims = na.dims();
+        if (dims == null) return true;
+        for (Iterator iter = dims.iterator(); iter.hasNext();) {
+            Expr d = (Expr)iter.next();
+            JifExprExt ext = (JifExprExt)JifUtil.jifExt(d);
+
+            IntegerBoundsChecker.Interval bounds = ext.getNumericBounds();
+            // if bound is not null, then bound < d
+            if (bounds == null || bounds.getLower() < 0) {
+                // the value of d may be less than 0, and so
+                // a NegativeArraySizeException may be thrown
+                
+//                System.err.println("Bound for " +  d + " is " + bound);
+                return false;
+            }
+        }
+        return true;        
+    }
+    
+    
 }

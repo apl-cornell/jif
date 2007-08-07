@@ -3,6 +3,7 @@ package jif.visit;
 import java.util.*;
 
 import jif.ast.DowngradeExpr;
+import jif.ast.Jif;
 import jif.ast.JifUtil;
 import jif.extension.JifExprExt;
 import polyglot.ast.*;
@@ -14,6 +15,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.visit.DataFlow;
 import polyglot.visit.FlowGraph;
+import polyglot.visit.NodeVisitor;
 
 /**
  * This class finds integral bounds on expressions. It uses that information to
@@ -180,6 +182,10 @@ public class IntegerBoundsChecker extends DataFlow
         return itemToMap(outDFItem, succEdgeKeys);
     }
 
+    protected void post(FlowGraph graph, Term root) throws SemanticException {
+        super.post(graph, root);
+        notifyAllNodes(root);
+    }
     /**
      * Record the bounds information. We could be extensible here, and allow
      * other uses of the info.
@@ -195,6 +201,18 @@ public class IntegerBoundsChecker extends DataFlow
                 setExprBounds((Expr) n, bounds);
             }
         }
+    }
+    
+    protected void notifyAllNodes(Node n) {
+        n.visit(new NodeVisitor() {
+            public Node leave(Node old, Node n, NodeVisitor v) {
+                // let the node know that the numeric bounds have been set.
+                Jif ext = JifUtil.jifExt(n);
+                ext.numericBoundsCalculated();
+                return n;
+            }
+            
+        });
     }
 
     /**
