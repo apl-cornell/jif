@@ -16,19 +16,19 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
      * Some static final constants and methods for producing names of
      * generated methods and fields.
      */
-    static final String INSTANCEOF_METHOD_NAME = "jif$Instanceof";
-    static final String INITIALIZATIONS_METHOD_NAME = "jif$init";
-    static final String castMethodName(ClassType ct) {
+    protected static final String INSTANCEOF_METHOD_NAME = "jif$Instanceof";
+    protected static final String INITIALIZATIONS_METHOD_NAME = "jif$init";
+    protected static final String castMethodName(ClassType ct) {
         return "jif$cast$"+ct.fullName().replace('.','_');
     }
-    static final String interfaceClassImplName(String jifInterfaceName) {
+    protected static final String interfaceClassImplName(String jifInterfaceName) {
         return jifInterfaceName + "_JIF_IMPL";
     }
-    static final String constructorTranslatedName(ClassType ct) {
+    protected static final String constructorTranslatedName(ClassType ct) {
         return (ct.fullName() + ".").replace('.', '$');
     }
     
-    static final String DEFAULT_CONSTRUCTOR_INVOKER_METHOD_NAME = "jif$invokeDefConstructor";
+    protected static final String DEFAULT_CONSTRUCTOR_INVOKER_METHOD_NAME = "jif$invokeDefConstructor";
     
     /*
      * Code for translating ClassDecls 
