@@ -201,23 +201,27 @@ public class IntegerBoundsChecker extends DataFlow
             if (bounds != null) {
                 setExprBounds((Expr) n, bounds);
             }            
-        }
 
-        ArrayAccess aa = null;
-        
-        if (n instanceof ArrayAccess) {
-            aa = (ArrayAccess)n;
-        }
-        else if (n instanceof ArrayAccessAssign) {
-            ArrayAccessAssign aaa = (ArrayAccessAssign)n;
-            aa = (ArrayAccess)aaa.left();
-        }
-        if (aa != null && aa.array() instanceof Local) {
-            Local arr = (Local)aa.array();
-            Set arrays = findArrayLengthBounds(aa.index(), true, dfIn);
-            if (arrays.contains(arr.localInstance())) {
-                JifArrayAccessDel jaad = (JifArrayAccessDel)aa.del();
-                jaad.setNoOutOfBoundsExcThrown();
+            ArrayAccess aa = null;
+
+            if (n instanceof ArrayAccess) {
+                aa = (ArrayAccess)n;
+            }
+            else if (n instanceof ArrayAccessAssign) {
+                ArrayAccessAssign aaa = (ArrayAccessAssign)n;
+                aa = (ArrayAccess)aaa.left();
+            }
+            if (aa != null && aa.array() instanceof Local) {
+                Interval indBounds = getExprBounds(aa.index());
+                if (indBounds.getLower() != null && indBounds.getLower().longValue() >= 0L) {
+                    // lower bound is ok, now check the upper bound.
+                    Local arr = (Local)aa.array();            
+                    Set arrays = findArrayLengthBounds(aa.index(), true, dfIn);
+                    if (arrays.contains(arr.localInstance())) {
+                        JifArrayAccessDel jaad = (JifArrayAccessDel)aa.del();
+                        jaad.setNoOutOfBoundsExcThrown();
+                    }
+                }
             }
         }
     }
@@ -617,6 +621,19 @@ public class IntegerBoundsChecker extends DataFlow
         if (expr instanceof Local) {
             Local l = (Local)expr;
             return findArrayLengthBounds(l.localInstance(), strict, df);
+        }
+        else if (expr instanceof Binary) {
+            Binary b = (Binary) expr;
+            // special case for "exp - exp2"
+            if (b.operator() == Binary.SUB) {
+                Interval right = getExprBounds(b.right());
+                if (Interval.POS.contains(right)) {
+                    // right is positive
+                    boolean newStrict = strict;
+                    if (right.getLower().longValue() > 0) newStrict = false;
+                    return findArrayLengthBounds(b.left(), newStrict, df);
+                }
+            }
         }
         return Collections.EMPTY_SET;
     }
