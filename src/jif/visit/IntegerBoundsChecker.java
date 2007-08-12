@@ -214,7 +214,7 @@ public class IntegerBoundsChecker extends DataFlow
         }
         if (aa != null && aa.array() instanceof Local) {
             Local arr = (Local)aa.array();
-            Set arrays = findArrayLengthBounds(aa.index(), dfIn);
+            Set arrays = findArrayLengthBounds(aa.index(), true, dfIn);
             if (arrays.contains(arr.localInstance())) {
                 JifArrayAccessDel jaad = (JifArrayAccessDel)aa.del();
                 jaad.setNoOutOfBoundsExcThrown();
@@ -611,25 +611,25 @@ public class IntegerBoundsChecker extends DataFlow
 
     /**
      * Finds the local instances that are arrays, and whose length
-     * is a strict upper bound on the expression expr.
+     * is a (strict or non-strict) upper bound on the expression expr.
      */
-    protected Set<LocalInstance> findArrayLengthBounds(Expr expr, DataFlowItem df) {
+    protected Set<LocalInstance> findArrayLengthBounds(Expr expr, boolean strict, DataFlowItem df) {
         if (expr instanceof Local) {
             Local l = (Local)expr;
-            return findArrayLengthBounds(l.localInstance(), df);
+            return findArrayLengthBounds(l.localInstance(), strict, df);
         }
         return Collections.EMPTY_SET;
     }
 
 
-    protected Set<LocalInstance> findArrayLengthBounds(LocalInstance li, DataFlowItem df) {
-        return findArrayLengthBounds(li, df, new HashSet());
+    protected Set<LocalInstance> findArrayLengthBounds(LocalInstance li, boolean strict, DataFlowItem df) {
+        return findArrayLengthBounds(li, strict, df, new HashSet());
     }
     /**
      * Finds the local instances that are arrays, and whose length
      * is a strict upper bound on the value of the local variable li.
      */
-    protected Set<LocalInstance> findArrayLengthBounds(LocalInstance li, DataFlowItem df, Set<LocalInstance> seen) {
+    protected Set<LocalInstance> findArrayLengthBounds(LocalInstance li, boolean strict, DataFlowItem df, Set<LocalInstance> seen) {
         if (seen.contains(li)) return Collections.EMPTY_SET;
         seen.add(li);
         Bounds bnds = df.bounds.get(li);
@@ -639,12 +639,15 @@ public class IntegerBoundsChecker extends DataFlow
         }
         Set<LocalInstance> s = new HashSet<LocalInstance>();
         for (Bound b : bnds.bounds) {
-            if (b instanceof ArrayLengthBound && b.isUpper() && b.isStrict()) {
-                s.add(((ArrayLengthBound)b).array);
+            if (b instanceof ArrayLengthBound && b.isUpper()) {
+                if (!strict || b.isStrict()) {
+                    s.add(((ArrayLengthBound)b).array);
+                }
             }
             else if (b instanceof LocalBound && b.isUpper()) {
                 LocalBound lb = (LocalBound)b;
-                s.addAll(findArrayLengthBounds(lb.li, df, seen));
+                boolean newStrict = (strict && !b.isStrict());
+                s.addAll(findArrayLengthBounds(lb.li, newStrict, df, seen));
             }
         }
         return s;
@@ -718,11 +721,20 @@ public class IntegerBoundsChecker extends DataFlow
             return Interval.singleton(n);
         }
         
+        Interval best = Interval.FULL;
+
+        if (expr instanceof Field) {
+            Field f = (Field)expr;
+            if (f.name().equals("length") && f.target().type().isArray()) {
+                // it's an expression x.length, so it must be non negative
+                best = best.intersect(Interval.POS);
+              
+            }
+        }
         if (df == null) {
-            return Interval.FULL;
+            return best;
         }
         
-        Interval best = Interval.FULL;
         
         if (expr instanceof Local) {
             LocalInstance li = ((Local) expr).localInstance();
