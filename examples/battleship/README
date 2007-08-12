@@ -40,11 +40,6 @@ To compile and run the BattleShip example:
    The $JIF/tests directory must be included on the classpath so the
    Jif compiler can locate the principals Alice and Bob.
    
-   The BattleShip classes satisfy the rules for robustness. The BattleShip 
-   classes may also be compiled with the robustness checking turned on:
-
-        $ $JIF/bin/jifc -classpath $JIF/tests *.jif -robust
-
 4. Execute the BattleShip example
 
         $ cd $JIF/examples/battleship
