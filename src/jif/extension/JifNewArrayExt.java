@@ -90,8 +90,8 @@ public class JifNewArrayExt extends JifExprExt
         return updatePathMap(nae.dims(dims).init(init), Xs);
     }
 
-    public void numericBoundsCalculated() {
-        super.numericBoundsCalculated();
+    public void integerBoundsCalculated() {
+        super.integerBoundsCalculated();
         boolean noNegArraySizeExcThrown = noNegArraySizeExcThrown();
         if (noNegArraySizeExcThrown) {
             JifNewArrayDel del = (JifNewArrayDel)this.node().del();

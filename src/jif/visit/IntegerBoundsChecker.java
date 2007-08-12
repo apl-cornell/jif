@@ -5,6 +5,7 @@ import java.util.*;
 import jif.ast.DowngradeExpr;
 import jif.ast.Jif;
 import jif.ast.JifUtil;
+import jif.extension.JifArrayAccessDel;
 import jif.extension.JifExprExt;
 import polyglot.ast.*;
 import polyglot.ast.Binary.Operator;
@@ -196,9 +197,27 @@ public class IntegerBoundsChecker extends DataFlow
         
         if (n instanceof Expr && ((Expr)n).type().isNumeric()) {
             Interval bounds = findNumericRange((Expr) n, dfIn);
-            //System.err.println("bound for " + n + " : " + bounds);
+            //System.err.println("bound for " + n + " : " + bounds);            
             if (bounds != null) {
                 setExprBounds((Expr) n, bounds);
+            }            
+        }
+
+        ArrayAccess aa = null;
+        
+        if (n instanceof ArrayAccess) {
+            aa = (ArrayAccess)n;
+        }
+        else if (n instanceof ArrayAccessAssign) {
+            ArrayAccessAssign aaa = (ArrayAccessAssign)n;
+            aa = (ArrayAccess)aaa.left();
+        }
+        if (aa != null && aa.array() instanceof Local) {
+            Local arr = (Local)aa.array();
+            Set arrays = findArrayLengthBounds(aa.index(), dfIn);
+            if (arrays.contains(arr.localInstance())) {
+                JifArrayAccessDel jaad = (JifArrayAccessDel)aa.del();
+                jaad.setNoOutOfBoundsExcThrown();
             }
         }
     }
@@ -208,7 +227,7 @@ public class IntegerBoundsChecker extends DataFlow
             public Node leave(Node old, Node n, NodeVisitor v) {
                 // let the node know that the numeric bounds have been set.
                 Jif ext = JifUtil.jifExt(n);
-                ext.numericBoundsCalculated();
+                ext.integerBoundsCalculated();
                 return n;
             }
             
@@ -270,6 +289,8 @@ public class IntegerBoundsChecker extends DataFlow
         
         Set<LocalInstance> lli = findLocalInstanceBounds(left, Bound.lower(false));
         Set<LocalInstance> rli = findLocalInstanceBounds(right, Bound.upper(false));
+        Set<LocalInstance> arrayLengthLli = findArrayLengthBounds(left, Bound.lower(false));
+        Set<LocalInstance> arrayLengthRli = findArrayLengthBounds(right, Bound.upper(false));
         
         Interval lrng = findNumericRange(left, null);
         Interval rrng = findNumericRange(right, null);
@@ -281,16 +302,22 @@ public class IntegerBoundsChecker extends DataFlow
                 b = new Bounds();
             }
             
-            Long lupper = b.range.upper;
-            
+            // work out the numeric upper bound for l
+            Long lupper = b.range.upper;            
             if (rrng.upper != Bounds.POS_INF && rrng.upper <= lupper) {
                 lupper = strict ? rrng.upper - 1 : rrng.upper;
             }
             
+            // add local instance bounds for l
             for (LocalInstance r : rli) {
                 if (r != l) {
                     b.bounds.add(new LocalBound(Bound.upper(strict), r));
                 }
+            }
+            
+            // add array length bounds for l
+            for (LocalInstance r : arrayLengthRli) {
+                b.bounds.add(new ArrayLengthBound(Bound.upper(strict), r));
             }
             
             updates.put(l, new Bounds(b.range.lower, lupper, b.bounds));
@@ -303,16 +330,22 @@ public class IntegerBoundsChecker extends DataFlow
                 b = new Bounds();
             }
             
-            Long rlower = b.range.lower;
-            
+            // work out the numeric lower bound for r
+            Long rlower = b.range.lower;            
             if (lrng.lower != Bounds.NEG_INF && lrng.lower >= rlower) {
                 rlower = strict ? lrng.lower + 1 : lrng.lower;
             }
             
-            for (LocalInstance l : rli) {
+            // add local instance bounds for l
+            for (LocalInstance l : lli) {
                 if (l != r) {
                     b.bounds.add(new LocalBound(Bound.lower(strict), l));
                 }
+            }
+
+            // add array length bounds for l
+            for (LocalInstance l : arrayLengthLli) {
+                b.bounds.add(new ArrayLengthBound(Bound.lower(strict), l));
             }
             
             updates.put(r, new Bounds(rlower, b.range.upper, b.bounds));
@@ -392,6 +425,17 @@ public class IntegerBoundsChecker extends DataFlow
             }
         }
         
+        Set<LocalInstance> rupperarray = findArrayLengthBounds(right, Bound.upper(false));
+        for (LocalInstance r : rupperarray) {
+            // upper bounds on the RHS are now upper bounds for li 
+            b.bounds.add(new ArrayLengthBound(Bound.upper(false), r));
+        }
+        Set<LocalInstance> rlowerarray = findArrayLengthBounds(right, Bound.lower(false));
+        for (LocalInstance r : rlowerarray) {
+            // lower bounds on the RHS are now lower bounds for li 
+            b.bounds.add(new ArrayLengthBound(Bound.lower(false), r));
+        }
+
         // find the numeric bounds.
         Interval rrng = findNumericRange(right, df);
         if (existingNumericBounds != null) {            
@@ -490,6 +534,124 @@ public class IntegerBoundsChecker extends DataFlow
     }
 
     /**
+     * Returns the set of LocalInstances of locals that are arrays, and whose lengths 
+     * are (non-strict) lower or upper bounds on the expression
+     */
+    protected Set<LocalInstance> findArrayLengthBounds(Expr expr, Bound.Type type) {
+        if (expr instanceof Field) {
+            Field f = (Field)expr;
+            if (f.target() instanceof Local) {
+                if (f.name().equals("length") && f.target().type().isArray()) {
+                    // we have an expression of the form x.length!
+                    return Collections.singleton(((Local) f.target()).localInstance());
+                }
+            }
+        }
+        else if (expr instanceof Conditional) {
+            Conditional c = (Conditional) expr;
+            Set<LocalInstance> con = findArrayLengthBounds(c.consequent(), type);
+            Set<LocalInstance> alt = findArrayLengthBounds(c.alternative(), type);
+            // return the intersection of con and alt
+            Set<LocalInstance> result = new HashSet<LocalInstance>(con);
+            result.retainAll(alt);
+            return result;
+        } else if (expr instanceof Binary) {
+            Binary b = (Binary) expr;
+            
+            if (b.operator() == Binary.ADD) {
+                Set<LocalInstance> left = findArrayLengthBounds(b.left(), type);                
+                Set<LocalInstance> right = findArrayLengthBounds(b.right(), type);                
+                Interval lrng = findNumericRange(b.left(), null);
+                Interval rrng = findNumericRange(b.right(), null);
+                Set<LocalInstance> result = new HashSet<LocalInstance>();
+                
+                if ((type.isLower() && lrng.lower >= 0) ||
+                        (type.isUpper() && lrng.upper <= 0)) {
+                    result.addAll(right);
+                }
+                
+                if ((type.isLower() && rrng.lower >= 0) ||
+                        (type.isUpper() && rrng.upper <= 0)) {
+                    result.addAll(left);
+                }
+                
+                return result;
+            } else if (b.operator() == Binary.SUB) {
+                Set<LocalInstance> left = findArrayLengthBounds(b.left(), type);
+                Interval rrng = findNumericRange(b.right(), null);
+                Set<LocalInstance> result = new HashSet<LocalInstance>();
+                
+                if ((type.isLower() && rrng.upper <= 0) ||
+                        (type.isUpper() && rrng.lower >= 0)) {
+                    result.addAll(left);
+                }
+                
+                return result;
+            }
+        } else if (expr instanceof Assign) {
+            Assign a = (Assign) expr;
+            Set<LocalInstance> result = new HashSet<LocalInstance>();
+            
+            if (a instanceof LocalAssign) {
+                Local aleft = (Local)a.left();
+                if (aleft.type().isArray()) {
+                    result.add(aleft.localInstance());
+                }
+            }
+            
+            if (a.operator() == Assign.ASSIGN) {
+                result.addAll(findArrayLengthBounds(a.right(), type));
+            }
+            
+            return result;
+        }
+        
+        return Collections.emptySet();
+    }
+
+    /**
+     * Finds the local instances that are arrays, and whose length
+     * is a strict upper bound on the expression expr.
+     */
+    protected Set<LocalInstance> findArrayLengthBounds(Expr expr, DataFlowItem df) {
+        if (expr instanceof Local) {
+            Local l = (Local)expr;
+            return findArrayLengthBounds(l.localInstance(), df);
+        }
+        return Collections.EMPTY_SET;
+    }
+
+
+    protected Set<LocalInstance> findArrayLengthBounds(LocalInstance li, DataFlowItem df) {
+        return findArrayLengthBounds(li, df, new HashSet());
+    }
+    /**
+     * Finds the local instances that are arrays, and whose length
+     * is a strict upper bound on the value of the local variable li.
+     */
+    protected Set<LocalInstance> findArrayLengthBounds(LocalInstance li, DataFlowItem df, Set<LocalInstance> seen) {
+        if (seen.contains(li)) return Collections.EMPTY_SET;
+        seen.add(li);
+        Bounds bnds = df.bounds.get(li);
+        
+        if (bnds == null) {
+            return Collections.EMPTY_SET;
+        }
+        Set<LocalInstance> s = new HashSet<LocalInstance>();
+        for (Bound b : bnds.bounds) {
+            if (b instanceof ArrayLengthBound && b.isUpper() && b.isStrict()) {
+                s.add(((ArrayLengthBound)b).array);
+            }
+            else if (b instanceof LocalBound && b.isUpper()) {
+                LocalBound lb = (LocalBound)b;
+                s.addAll(findArrayLengthBounds(lb.li, df, seen));
+            }
+        }
+        return s;
+    }
+
+    
+    /**
      * Finds the tightest numeric bound possible for li. Type can be
      * lower/upper, strict/non-strict.
      */
@@ -526,6 +688,8 @@ public class IntegerBoundsChecker extends DataFlow
                             findNumericBound(lb.li, df, lb.type, seen), type);
                 }
             }
+            // XXX TODO Could try to use array length bounds to get a better estimate...
+            
         }
         
         if (best != Bounds.POS_INF && best != Bounds.NEG_INF && type.isStrict()) {
@@ -715,6 +879,9 @@ public class IntegerBoundsChecker extends DataFlow
         public boolean isUpper() {
             return type.isUpper();
         }
+        public boolean isStrict() {
+            return type.isStrict();
+        }
         
         public boolean equals(Object o) {
             if (o instanceof Bound) {
@@ -770,6 +937,42 @@ public class IntegerBoundsChecker extends DataFlow
         
     }
     
+    protected static class ArrayLengthBound extends Bound {
+        /**
+         * A local instance of array type.
+         */
+        protected final LocalInstance array;
+        
+        public ArrayLengthBound(Type type, LocalInstance array) {
+            super(type);
+            this.array = array;
+            assert(array.type().isArray());
+        }
+        
+        public Bound strict(boolean strict) {
+            if (type.isStrict() == strict) return this;
+            return new ArrayLengthBound(type.strict(strict), array);
+        }
+        
+        public boolean equals(Object o) {
+            if (o instanceof ArrayLengthBound) {
+                ArrayLengthBound other = (ArrayLengthBound) o;
+                return super.equals(o) && array.equals(other.array);
+            } else {
+                return false;
+            }
+        }
+        
+        public int hashCode() {
+            return super.hashCode() ^ array.hashCode() ^ -98798387;
+        }
+
+        public String toString() {
+            return type + array.name() + ".length";
+        }
+        
+    }
+
     /**
      * Checks two reference for object equality. Deals with null pointers.
      * Should really be a utility method somewhere...
@@ -1158,6 +1361,7 @@ public class IntegerBoundsChecker extends DataFlow
             Map<LocalInstance, Bounds> updated = 
                 new HashMap<LocalInstance, Bounds>(this.bounds);
             
+            
             if (increased != null || decreased != null) {
                 // go through current bounds and invalidate ones that might
                 // no longer hold
@@ -1197,6 +1401,13 @@ public class IntegerBoundsChecker extends DataFlow
                                         // was upper bound but may have decreased
                                         now.remove(lb);
                                     }
+                                }
+                            }
+                            else if (b instanceof ArrayLengthBound) {
+                                ArrayLengthBound alb = (ArrayLengthBound)b;
+                                if (alb.array == increased || alb.array == decreased) {
+                                    // the array has changed, this bound is no longer valid.
+                                    now.remove(alb);
                                 }
                             }
                         }

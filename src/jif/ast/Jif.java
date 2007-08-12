@@ -28,5 +28,5 @@ public interface Jif extends Ext
      * A method that is called to notify the extension that
      * the numeric bounds have been calculated.
      */
-    void numericBoundsCalculated();    
+    void integerBoundsCalculated();    
 }
