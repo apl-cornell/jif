@@ -96,6 +96,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	ArrayLength03.jif ;
 	ArrayLength04.jif ;
 	ArrayLength05.jif ;
+	ArrayLength06.jif ;
 	Authority01.jif ;
 	Authority02.jif ;
 	Authority03.jif ;

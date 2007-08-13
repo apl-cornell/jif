@@ -201,26 +201,26 @@ public class IntegerBoundsChecker extends DataFlow
             if (bounds != null) {
                 setExprBounds((Expr) n, bounds);
             }            
+        }
+        
+        ArrayAccess aa = null;
 
-            ArrayAccess aa = null;
-
-            if (n instanceof ArrayAccess) {
-                aa = (ArrayAccess)n;
-            }
-            else if (n instanceof ArrayAccessAssign) {
-                ArrayAccessAssign aaa = (ArrayAccessAssign)n;
-                aa = (ArrayAccess)aaa.left();
-            }
-            if (aa != null && aa.array() instanceof Local) {
-                Interval indBounds = getExprBounds(aa.index());
-                if (indBounds.getLower() != null && indBounds.getLower().longValue() >= 0L) {
-                    // lower bound is ok, now check the upper bound.
-                    Local arr = (Local)aa.array();            
-                    Set arrays = findArrayLengthBounds(aa.index(), true, dfIn);
-                    if (arrays.contains(arr.localInstance())) {
-                        JifArrayAccessDel jaad = (JifArrayAccessDel)aa.del();
-                        jaad.setNoOutOfBoundsExcThrown();
-                    }
+        if (n instanceof ArrayAccess) {
+            aa = (ArrayAccess)n;
+        }
+        else if (n instanceof ArrayAccessAssign) {
+            ArrayAccessAssign aaa = (ArrayAccessAssign)n;
+            aa = (ArrayAccess)aaa.left();
+        }
+        if (aa != null && aa.array() instanceof Local) {
+            Interval indBounds = getExprBounds(aa.index());
+            if (indBounds.getLower() != null && indBounds.getLower().longValue() >= 0L) {
+                // lower bound is ok, now check the upper bound.
+                Local arr = (Local)aa.array();            
+                Set arrays = findArrayLengthBounds(aa.index(), true, dfIn);
+                if (arrays.contains(arr.localInstance())) {
+                    JifArrayAccessDel jaad = (JifArrayAccessDel)aa.del();
+                    jaad.setNoOutOfBoundsExcThrown();
                 }
             }
         }
