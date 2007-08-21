@@ -1,0 +1,33 @@
+#!/bin/sh
+
+if test $# = 1
+then
+  envvars="$1"
+else
+  envvars="setup/env-vars"
+fi
+
+if test ! -f "$envvars"
+then
+  echo "Environment variable file not found: $envvars"
+  echo "Usage: $0 <file of environment variable names>"
+  exit 1
+fi
+
+pat='('
+for varname in `cat env-vars`
+do
+    case "$pat" in
+	'(') pat="$pat^$varname";;
+	*) pat="$pat|^$varname";;
+    esac
+done
+pat="$pat)"
+
+printenv | egrep "$pat" | sed -e 's/=\(.*\)$/=\"\1\"/' |
+(
+  case "$SHELL" in
+    */ksh|*/sh|*/bash) sed -e 's/^/export /';;
+    *) sed -e 's/^/setenv /' -e 's/=/ /' ;;
+  esac
+)
