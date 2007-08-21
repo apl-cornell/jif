@@ -15,7 +15,7 @@ then
 fi
 
 pat='('
-for varname in `cat env-vars`
+for varname in `cat $envvars`
 do
     case "$pat" in
 	'(') pat="$pat^$varname";;
