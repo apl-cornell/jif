@@ -1,5 +1,6 @@
 package jif.types.hierarchy;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -11,8 +12,6 @@ import jif.types.principal.Principal;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
-import polyglot.types.TypeObject_c;
-import polyglot.types.TypeSystem;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -24,7 +23,7 @@ import polyglot.util.Position;
 public class LabelEnv_c implements LabelEnv
 {
     protected final PrincipalHierarchy ph;
-    protected final List labelAssertions; // a list of LabelLeAssertions
+    protected final List<LabelLeAssertion_c> labelAssertions; // a list of LabelLeAssertions
     protected final StringBuffer displayLabelAssertions; 
     protected final JifTypeSystem ts;
 
@@ -33,7 +32,7 @@ public class LabelEnv_c implements LabelEnv
      * equivalent set of the AcessPath. No mapping if the
      * element is its own representative.
      */
-    protected final Map accessPathEquivReps;
+    protected final Map<AccessPath, AccessPath> accessPathEquivReps;
 
     protected final LabelEnv_c parent; // a more general (i.e., fewer assertions) LabelEnv, used only for cache lookup.
     protected Solver solver;
@@ -51,7 +50,7 @@ public class LabelEnv_c implements LabelEnv
     public LabelEnv_c(JifTypeSystem ts, boolean useCache) {
         this(ts, new PrincipalHierarchy(), new LinkedList(), "", false, useCache, new LinkedHashMap(), null);
     }
-    protected LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph, List assertions, String displayLabelAssertions, boolean hasVariables, boolean useCache, Map accessPathEquivReps, LabelEnv_c parent) {
+    protected LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph, List<LabelLeAssertion_c> assertions, String displayLabelAssertions, boolean hasVariables, boolean useCache, Map<AccessPath, AccessPath> accessPathEquivReps, LabelEnv_c parent) {
         this.ph = ph;
         this.labelAssertions = assertions;
         this.accessPathEquivReps = accessPathEquivReps;
@@ -62,7 +61,7 @@ public class LabelEnv_c implements LabelEnv
         this.ts = ts;
         this.useCache = useCache;
         this.parent = parent;
-        this.cacheTrue = new HashSet();
+        this.cacheTrue = new HashSet<LeqGoal>();
         this.cacheFalse = new HashSet();        
     }
     
@@ -105,14 +104,14 @@ public class LabelEnv_c implements LabelEnv
         boolean added = false;
         // break up the components
         if (L1 instanceof JoinLabel) {
-            for (Iterator c = ((JoinLabel)L1).joinComponents().iterator(); c.hasNext(); ) {
-                Label cmp = (Label)c.next();
+            for (Iterator<Label> c = ((JoinLabel)L1).joinComponents().iterator(); c.hasNext(); ) {
+                Label cmp = c.next();
                 added = addAssertionLE(cmp, L2, false) || added;                
             }            
         }
         else if (L2 instanceof MeetLabel) {
-            for (Iterator c = ((MeetLabel)L2).meetComponents().iterator(); c.hasNext(); ) {
-                Label cmp = (Label)c.next();
+            for (Iterator<Label> c = ((MeetLabel)L2).meetComponents().iterator(); c.hasNext(); ) {
+                Label cmp = c.next();
                 added = addAssertionLE(L1, cmp, false) || added;                
             }                        
         }
@@ -150,19 +149,32 @@ public class LabelEnv_c implements LabelEnv
     }
     
     public LabelEnv_c copy() {
-        return new LabelEnv_c(ts, ph.copy(), new LinkedList(labelAssertions), 
+        return new LabelEnv_c(ts, ph.copy(), new LinkedList<LabelLeAssertion_c>(labelAssertions), 
                               displayLabelAssertions.toString(), 
                               hasVariables, useCache, 
-                              new LinkedHashMap(this.accessPathEquivReps), this);
+                              new LinkedHashMap<AccessPath, AccessPath>(this.accessPathEquivReps), this);
     }
     
     public boolean actsFor(Principal p, Principal q) {
-        if (p instanceof DynamicPrincipal && q instanceof DynamicPrincipal) {
-            DynamicPrincipal dp = (DynamicPrincipal)p;
-            DynamicPrincipal dq = (DynamicPrincipal)q;
-            if (equivalentAccessPaths(dp.path(), dq.path())) return true;
+        // try converting the principals to dynamic principals and trying again
+        AccessPath pathp = null;
+        AccessPath pathq = null;
+        if (p instanceof DynamicPrincipal) {
+            pathp = ((DynamicPrincipal)p).path();
         }
-        return ph.actsFor(p, q);
+        else if (p.isRuntimeRepresentable()) {
+            pathp = new AccessPathConstant(p, p.position());
+        }
+        if (q instanceof DynamicPrincipal) {
+            pathq = ((DynamicPrincipal)q).path();
+        }
+        else if (q.isRuntimeRepresentable()) {
+            pathq = new AccessPathConstant(q, q.position());
+        }
+
+        if (pathp != null && pathq != null && equivalentAccessPaths(pathp, pathq)) return true;
+
+        return (ph.actsFor(p, q));        
     }
     
     public boolean leq(Label L1, Label L2) { 
@@ -187,10 +199,10 @@ public class LabelEnv_c implements LabelEnv
      */
     private AccessPath findAccessPathRepr(AccessPath p) {
         AccessPath last = p;
-        AccessPath next = (AccessPath)accessPathEquivReps.get(last);
+        AccessPath next = accessPathEquivReps.get(last);
         while (next != null && next != last) {
             last = next;
-            next = (AccessPath)accessPathEquivReps.get(last);            
+            next = accessPathEquivReps.get(last);            
         }
         return last;
     }
@@ -208,15 +220,15 @@ public class LabelEnv_c implements LabelEnv
         }
     }
     
-    protected Set equivAccessPaths(AccessPathRoot p) {
+    protected Set<Serializable> equivAccessPaths(AccessPathRoot p) {
         if (!accessPathEquivReps.containsKey(p)) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
-        Set s = new LinkedHashSet();
+        Set<Serializable> s = new LinkedHashSet<Serializable>();
         AccessPath repr = findAccessPathRepr(p);
         
-        for (Iterator iter = accessPathEquivReps.keySet().iterator(); iter.hasNext();) {
-            AccessPath q = (AccessPath)iter.next();
+        for (Iterator<AccessPath> iter = accessPathEquivReps.keySet().iterator(); iter.hasNext();) {
+            AccessPath q = iter.next();
             if (repr == findAccessPathRepr(q)) {
                 s.add(q);
             }
@@ -231,7 +243,7 @@ public class LabelEnv_c implements LabelEnv
      * and so we can ignore it and consider only L1 and L2 when caching 
      * the results. 
      */
-    private final Set cacheTrue;
+    private final Set<LeqGoal> cacheTrue;
     private final Set cacheFalse;
     
     protected final boolean useCache;
@@ -409,8 +421,8 @@ public class LabelEnv_c implements LabelEnv
             // for all j L1 <= Cj
             MeetLabel ml = (MeetLabel)L2;
             boolean allSat = true;
-            for (Iterator j = ml.meetComponents().iterator(); j.hasNext(); ) {
-                Label cj = (Label) j.next();
+            for (Iterator<Label> j = ml.meetComponents().iterator(); j.hasNext(); ) {
+                Label cj = j.next();
                 if (!leq(L1, cj, state)) {
                     allSat = false;
                     break;
@@ -422,8 +434,8 @@ public class LabelEnv_c implements LabelEnv
             // L1 <= c1 join ... join cn if there exists a cj 
             // such that L1 <= cj
             JoinLabel jl = (JoinLabel)L2;
-            for (Iterator j = jl.joinComponents().iterator(); j.hasNext(); ) {
-                Label cj = (Label) j.next();
+            for (Iterator<Label> j = jl.joinComponents().iterator(); j.hasNext(); ) {
+                Label cj = j.next();
                 if (leq(L1, cj, state)) {
                     return true;
                 }
@@ -490,8 +502,8 @@ public class LabelEnv_c implements LabelEnv
         if (Report.should_report(topics, 2))
             Report.report(2, "Applying assertions for " + L1 + " <= " + L2);
 
-        for (Iterator i = labelAssertions.iterator(); i.hasNext();) { 
-            LabelLeAssertion c = (LabelLeAssertion)i.next();
+        for (Iterator<LabelLeAssertion_c> i = labelAssertions.iterator(); i.hasNext();) { 
+            LabelLeAssertion c = i.next();
 
             if (auc.get(c) >= ASSERTION_USE_BOUND) {
                 continue;
@@ -529,8 +541,8 @@ public class LabelEnv_c implements LabelEnv
             AccessPath p2 = ((DynamicLabel)L2).path();
             AccessPathRoot p2root = p2.root();
             // see if there are any other access paths equivalent
-            Set equivAccessPaths = equivAccessPaths(p2root);
-            for (Iterator iter = equivAccessPaths.iterator(); iter.hasNext(); ) {
+            Set<Serializable> equivAccessPaths = equivAccessPaths(p2root);
+            for (Iterator<Serializable> iter = equivAccessPaths.iterator(); iter.hasNext(); ) {
                 AccessPath p = (AccessPath)iter.next();
                 if (p.equals(p2root)) continue;
                 AccessPathEquivalence ea = new AccessPathEquivalence(p, p2root); 
@@ -550,8 +562,8 @@ public class LabelEnv_c implements LabelEnv
             AccessPath p1 = ((DynamicLabel)L1).path();
             AccessPathRoot p1root = p1.root();
             // see if there are any other access paths equivalent
-            Set equivAccessPaths = equivAccessPaths(p1root);
-            for (Iterator iter = equivAccessPaths.iterator(); iter.hasNext(); ) {
+            Set<Serializable> equivAccessPaths = equivAccessPaths(p1root);
+            for (Iterator<Serializable> iter = equivAccessPaths.iterator(); iter.hasNext(); ) {
                 AccessPath p = (AccessPath)iter.next();
                 if (p.equals(p1root)) continue;
                 AccessPathEquivalence ea = new AccessPathEquivalence(p, p1root); 
@@ -675,7 +687,7 @@ public class LabelEnv_c implements LabelEnv
     public Label findUpperBound(Label L) {
         return findUpperBound(L, Collections.EMPTY_SET);
     }
-    private Label findUpperBound(Label L, Collection seen) {        
+    private Label findUpperBound(Label L, Collection<Serializable> seen) {        
         // L is a pair label.
         if (L instanceof PairLabel) return L;
         if (L instanceof VarLabel_c) {
@@ -685,16 +697,16 @@ public class LabelEnv_c implements LabelEnv
         
         if (seen.contains(L)) return ts.topLabel();
         
-        Collection newSeen = new ArrayList(seen.size() + 1);
+        Collection<Serializable> newSeen = new ArrayList<Serializable>(seen.size() + 1);
         newSeen.addAll(seen);
         newSeen.add(L);
                 
-        Set allBounds = new LinkedHashSet();
+        Set<Label> allBounds = new LinkedHashSet<Label>();
         if (L instanceof JoinLabel) {
             JoinLabel jl = (JoinLabel)L;
             Label ret = ts.bottomLabel();
-            for (Iterator iter = jl.joinComponents().iterator(); iter.hasNext();) {
-                Label comp = (Label)iter.next();
+            for (Iterator<Label> iter = jl.joinComponents().iterator(); iter.hasNext();) {
+                Label comp = iter.next();
                 ret = ts.join(ret, this.findUpperBound(comp, newSeen));
             }
             allBounds.add(ret);
@@ -702,16 +714,16 @@ public class LabelEnv_c implements LabelEnv
         if (L instanceof MeetLabel) {
             MeetLabel ml = (MeetLabel)L;
             Label ret = ts.topLabel();
-            for (Iterator iter = ml.meetComponents().iterator(); iter.hasNext();) {
-                Label comp = (Label)iter.next();
+            for (Iterator<Label> iter = ml.meetComponents().iterator(); iter.hasNext();) {
+                Label comp = iter.next();
                 ret = ts.meet(ret, this.findUpperBound(comp, newSeen));
             }
             allBounds.add(ret);
         }
                 
         // check the assertions
-        for (Iterator i = labelAssertions.iterator(); i.hasNext();) { 
-            LabelLeAssertion c = (LabelLeAssertion)i.next();
+        for (Iterator<LabelLeAssertion_c> i = labelAssertions.iterator(); i.hasNext();) { 
+            LabelLeAssertion c = i.next();
 
             Label cLHS = c.lhs();
             if (cLHS.hasVariables()) { 
@@ -739,7 +751,7 @@ public class LabelEnv_c implements LabelEnv
         if (!allBounds.isEmpty()) {
             Label upperBound;
             if (allBounds.size() == 1) {
-                upperBound = (Label)allBounds.iterator().next();
+                upperBound = allBounds.iterator().next();
             }
             else {
                 upperBound = ts.meetLabel(L.position(), allBounds);
@@ -765,7 +777,7 @@ public class LabelEnv_c implements LabelEnv
         return alg.argLabels.contains(al);        
     }
     private static class ArgLabelGatherer extends LabelSubstitution {
-        private final Set argLabels = new LinkedHashSet();
+        private final Set<Label> argLabels = new LinkedHashSet<Label>();
         
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ArgLabel) {
@@ -816,14 +828,14 @@ public class LabelEnv_c implements LabelEnv
      * Seen components is a Set of Labels whose definitions will not be 
      * displayed.
      */
-    public Map definitions(VarMap bounds, Set seenComponents) {
-        Map defns = new LinkedHashMap();
+    public Map<String, List<String>> definitions(VarMap bounds, Set seenComponents) {
+        Map<String, List<String>> defns = new LinkedHashMap<String, List<String>>();
         
-        Set labelComponents = new LinkedHashSet();
-        for (Iterator iter = labelAssertions.iterator(); iter.hasNext(); ) {
-            LabelLeAssertion c = (LabelLeAssertion) iter.next();
+        Set<Label> labelComponents = new LinkedHashSet<Label>();
+        for (Iterator<LabelLeAssertion_c> iter = labelAssertions.iterator(); iter.hasNext(); ) {
+            LabelLeAssertion c = iter.next();
             Label bound = bounds.applyTo(c.lhs());
-            Collection components;
+            Collection<Label> components;
             if (bound instanceof JoinLabel) {
                 components = ((JoinLabel)bound).joinComponents();
             }
@@ -834,8 +846,8 @@ public class LabelEnv_c implements LabelEnv
                 components = Collections.singleton(bound);
             }
             
-            for (Iterator i = components.iterator(); i.hasNext(); ) {
-                Label l = (Label)i.next();
+            for (Iterator<Label> i = components.iterator(); i.hasNext(); ) {
+                Label l = i.next();
                 labelComponents.add(l);
             }
             
@@ -849,16 +861,16 @@ public class LabelEnv_c implements LabelEnv
             else {
                 components = Collections.singleton(bound);
             }
-            for (Iterator i = components.iterator(); i.hasNext(); ) {
-                Label l = (Label)i.next();
+            for (Iterator<Label> i = components.iterator(); i.hasNext(); ) {
+                Label l = i.next();
                 labelComponents.add(l);
             }
         }
         
         labelComponents.removeAll(seenComponents);
         
-        for (Iterator iter = labelComponents.iterator(); iter.hasNext(); ) {
-            Label l = (Label)iter.next();
+        for (Iterator<Label> iter = labelComponents.iterator(); iter.hasNext(); ) {
+            Label l = iter.next();
             if (l.description() != null) {
                 String s = l.componentString();
                 if (s.length() == 0)
