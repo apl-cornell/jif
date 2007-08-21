@@ -26,8 +26,6 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         super(toJava);
     }
 
-    SubtypeChecker subtypeChecker = new SubtypeChecker();
-
     /** Extracts the declared label of this field. 
      */
     public void labelCheckField(LabelChecker lc, JifClassType ct) throws SemanticException {
@@ -163,8 +161,8 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                 // declared type.  Most of this is done in typeCheck, but if
                 // they are instantitation types, we must add constraints for
                 // the labels.
-                subtypeChecker.addSubtypeConstraints(lc, init.position(),
-                                                     t, init.type());                
+                SubtypeChecker subtypeChecker = new SubtypeChecker(t, init.type());
+                subtypeChecker.addSubtypeConstraints(lc, init.position());                
             }
 
             PathMap Xe = getPathMap(init);

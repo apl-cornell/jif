@@ -20,8 +20,6 @@ public class JifReturnExt extends JifStmtExt_c
         super(toJava);
     }
 
-    SubtypeChecker subtypeChecker = new SubtypeChecker();
-
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
         Return rs = (Return) node();
@@ -99,8 +97,8 @@ public class JifReturnExt extends JifStmtExt_c
             // Must check that the expression type is a subtype of the declared
             // return type.  Most of this is done in typeCheck, but if they are
             // instantitation types, we must add constraints for the labels.
-            subtypeChecker.addSubtypeConstraints(lc.context(A), e.position(),
-                                                 retType, e.type());
+            SubtypeChecker subtypeChecker = new SubtypeChecker(retType, e.type());
+            subtypeChecker.addSubtypeConstraints(lc.context(A), e.position());
         }
 
         return updatePathMap(rs.expr(e), X);

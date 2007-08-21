@@ -25,8 +25,6 @@ public class JifCallExt extends JifExprExt
         super(toJava);
     }
 
-    protected SubtypeChecker subtypeChecker = new SubtypeChecker();
-
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         Call me = (Call) node();
 

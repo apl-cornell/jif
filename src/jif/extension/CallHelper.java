@@ -367,9 +367,8 @@ public class CallHelper {
         // Most of this is done in typeCheck, but if actual and formal
         // are instantitation types, we must add constraints for the
         // labels.
-        SubtypeChecker sc = new SubtypeChecker();
-        sc.addSubtypeConstraints(lc, Ej.position(),
-                                 instantiate(A, jts.unlabel(formalType)), jts.unlabel(Ej.type()));
+        SubtypeChecker sc = new SubtypeChecker(instantiate(A, jts.unlabel(formalType)), jts.unlabel(Ej.type()));
+        sc.addSubtypeConstraints(lc, Ej.position());
     }
 
     /**
@@ -969,10 +968,9 @@ public class CallHelper {
             );
 
             // make sure any parameterized type are in fact subtypes
-            new SubtypeChecker().addSubtypeConstraints(lc, 
-                                                       overriding.position(),
-                                                       ts.unlabel(i), 
-                                                       instantiate(A, ts.unlabel(j)));
+            new SubtypeChecker(ts.unlabel(i), 
+                               instantiate(A, ts.unlabel(j))).addSubtypeConstraints(lc, 
+                                                       overriding.position());
         }
 
 

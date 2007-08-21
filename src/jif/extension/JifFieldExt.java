@@ -6,7 +6,6 @@ import java.util.List;
 import jif.ast.JifInstantiator;
 import jif.ast.JifNodeFactory;
 import jif.ast.JifNodeFactory_c;
-import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;

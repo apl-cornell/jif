@@ -24,7 +24,6 @@ public class JifNewExt extends JifExprExt
     }
 
     protected ConstructorChecker constructorChecker = new ConstructorChecker();
-    protected SubtypeChecker subtypeChecker = new SubtypeChecker();
 
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         New noe = (New) node();

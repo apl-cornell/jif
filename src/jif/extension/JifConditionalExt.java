@@ -22,8 +22,6 @@ public class JifConditionalExt extends JifExprExt
         super(toJava);
     }
 
-    SubtypeChecker subtypeChecker = new SubtypeChecker();
-
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         Conditional te = (Conditional) node();
@@ -37,10 +35,12 @@ public class JifConditionalExt extends JifExprExt
         if (t1.isReference() && t2.isReference()) {
             Type exprType = te.type();
             if (ts.isImplicitCastValid(t1, t2)) {
-                subtypeChecker.addSubtypeConstraints(lc, te.position(), exprType, t1);
+                SubtypeChecker subtypeChecker = new SubtypeChecker(exprType, t1);
+                subtypeChecker.addSubtypeConstraints(lc, te.position());
             }
             if (ts.isImplicitCastValid(t2, t1)) {
-                subtypeChecker.addSubtypeConstraints(lc, te.position(), exprType, t2);
+                SubtypeChecker subtypeChecker = new SubtypeChecker(exprType, t2);
+                subtypeChecker.addSubtypeConstraints(lc, te.position());
             }
         }
 

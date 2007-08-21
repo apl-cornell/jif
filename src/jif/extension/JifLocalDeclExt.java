@@ -21,8 +21,6 @@ public class JifLocalDeclExt extends JifStmtExt_c
         super(toJava);
     }
 
-    SubtypeChecker subtypeChecker = new SubtypeChecker();
-
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         LocalDecl decl = (LocalDecl) node();
 
@@ -33,7 +31,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
         PathMap X = ts.pathMap();
         X = X.N(A.pc());
 
-        final JifLocalInstance li = (JifLocalInstance) decl.localInstance();
+        JifLocalInstance li = (JifLocalInstance) decl.localInstance();
 
         if (polyglot.main.Report.should_report(jif.Topics.jif, 4))
             polyglot.main.Report.report(4, "Processing declaration for " + li);
@@ -65,7 +63,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
         if (L instanceof VarLabel) {            
             if (ts.isLabeled(t)) {
                 Label declaredLabel = ts.labelOfType(t);
-
+                final JifLocalInstance fli = li;
                 lc.constrain(new LabelConstraint(new NamedLabel("local_label", 
                                                                 "inferred label of local var " + li.name(), 
                                                                 L), 
@@ -78,7 +76,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
                                                                                decl.position(), 
                                                                                false) {
                     public String msg() {
-                        return "Declared label of local variable " + li.name() + 
+                        return "Declared label of local variable " + fli.name() + 
                         " is incompatible with label constraints.";
                     }
                 }
@@ -97,6 +95,10 @@ public class JifLocalDeclExt extends JifStmtExt_c
 
         if (decl.init() != null) {
             init = (Expr) lc.context(A).labelCheck(decl.init());
+            decl = decl.init(init);
+            decl = finishedInitLabelCheck(decl);
+            li = (JifLocalInstance)decl.localInstance();
+            t = li.type();
 
             if (init instanceof ArrayInit) {
                 ((JifArrayInitExt)(JifUtil.jifExt(init))).labelCheckElements(lc, decl.type().type()); 
@@ -106,12 +108,15 @@ public class JifLocalDeclExt extends JifStmtExt_c
                 // declared type.  Most of this is done in typeCheck, but if
                 // they are instantitation types, we must add constraints for
                 // the labels.
-                subtypeChecker.addSubtypeConstraints(lc, init.position(),
-                                                     t, init.type());
+//                System.err.println("Adding subtype constraints for " + decl.name());
+//                System.err.println("     " + init.type() + " <= " + t);
+                SubtypeChecker subtypeChecker = new SubtypeChecker(t, init.type());
+                subtypeChecker.addSubtypeConstraints(lc, init.position());
             }
 
             PathMap Xe = getPathMap(init);
 
+            final JifLocalInstance fli = li;
             lc.constrain(new LabelConstraint(new NamedLabel("init.nv", 
                                                             "label of successful evaluation of initializing expression", 
                                                             Xe.NV()), 
@@ -122,18 +127,18 @@ public class JifLocalDeclExt extends JifStmtExt_c
                 public String msg() {
                     return "Label of local variable initializer not less " + 
                     "restrictive than the label for local variable " + 
-                    li.name();
+                    fli.name();
                 }
                 public String detailMsg() { 
                     return "More information is revealed by the successful " +
                     "evaluation of the intializing expression " +
                     "than is allowed to flow to " +
-                    "the local variable " + li.name() + ".";
+                    "the local variable " + fli.name() + ".";
                 }
                 public String technicalMsg() {
                     return "Invalid assignment: NV of initializer is " +
                     "more restrictive than the declared label " +
-                    "of local variable " + li.name() + ".";
+                    "of local variable " + fli.name() + ".";
                 }                     
             }
             );
@@ -147,6 +152,12 @@ public class JifLocalDeclExt extends JifStmtExt_c
         X = X.N(ts.notTaken()).join(Xd);
 
         decl = (LocalDecl) updatePathMap(decl.init(init), X);
+        return decl;
+    }
+
+    protected LocalDecl finishedInitLabelCheck(LocalDecl decl) {
+//        JifLocalInstance li = (JifLocalInstance)decl.localInstance();
+//        li.setType(decl.init().type());
         return decl;
     }
 }

@@ -24,8 +24,6 @@ public class JifArrayInitExt extends JifExprExt
         super(toJava);
     }
 
-    SubtypeChecker subtypeChecker = new SubtypeChecker();
-
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         ArrayInit init = (ArrayInit) node();
@@ -77,7 +75,8 @@ public class JifArrayInitExt extends JifExprExt
                 ((JifArrayInitExt) JifUtil.jifExt(e)).labelCheckElements(lc, t);
             }
 
-            subtypeChecker.addSubtypeConstraints(lc, e.position(), t, s);
+            SubtypeChecker subtypeChecker = new SubtypeChecker(t, s);
+            subtypeChecker.addSubtypeConstraints(lc, e.position());
 
             if (L != null) {
                 // check that the element can be assigned to the base type.

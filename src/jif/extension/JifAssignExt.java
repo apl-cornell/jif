@@ -17,9 +17,7 @@ public abstract class JifAssignExt extends JifExprExt
     public JifAssignExt(ToJavaExt toJava) {
         super(toJava);
     }
-
-    SubtypeChecker subtypeChecker = new SubtypeChecker();
-
+    
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         Assign a = (Assign) node();
 
@@ -50,9 +48,9 @@ public abstract class JifAssignExt extends JifExprExt
             // Must check that the RHS is a subtype of the LHS.
             // Most of this is done in typeCheck, but if lhs and rhs are
             // instantitation types, we must add constraints for the labels.
-            subtypeChecker.addSubtypeConstraints(lc, a.position(),
-                                                 checked.left().type(),
-                                                 checked.right().type());
+            SubtypeChecker subtypeChecker = new SubtypeChecker(checked.left().type(),
+                                                               checked.right().type());
+            subtypeChecker.addSubtypeConstraints(lc, a.position());
         }
 
         return checked;

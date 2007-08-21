@@ -23,7 +23,6 @@ public class JifConstructorCallExt extends JifStmtExt_c
     }
 
     protected ConstructorChecker constructorChecker = new ConstructorChecker();
-    protected SubtypeChecker subtypeChecker = new SubtypeChecker();
 
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {

@@ -34,8 +34,6 @@ public class JifNewArrayExt extends JifExprExt
         super(toJava);
     }
 
-    SubtypeChecker subtypeChecker = new SubtypeChecker();
-
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         JifTypeSystem ts = lc.jifTypeSystem();

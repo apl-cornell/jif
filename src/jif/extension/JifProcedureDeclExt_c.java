@@ -24,8 +24,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         super(toJava);
     }
 
-    SubtypeChecker subtypeChecker = new SubtypeChecker();
-
     static String jif_verbose = "jif";
 
     /**
@@ -335,12 +333,13 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                 if (ts.isSubtype(pathType, tj) ||
                         ts.isSubtype(tj, pathType)) {
                     if (ts.isSubtype(pathType, tj)) {
-                        subtypeChecker.addSubtypeConstraints(lc, mn.position(),
-                                                             tj, pathType);
+                        SubtypeChecker subtypeChecker = new SubtypeChecker(tj, pathType);
+                        subtypeChecker.addSubtypeConstraints(lc, mn.position());
                     }
                     else {
-                        subtypeChecker.addSubtypeConstraints(lc, mn.position(),
-                                                             pathType, tj);                        
+
+                        SubtypeChecker subtypeChecker = new SubtypeChecker(pathType, tj);
+                        subtypeChecker.addSubtypeConstraints(lc, mn.position());                        
                     }
                     if (Report.should_report(jif_verbose, 4))
                         Report.report(4,
