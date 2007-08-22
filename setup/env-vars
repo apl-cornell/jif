@@ -1,3 +1,4 @@
+include $POLYGLOT/setup/env-vars
 JAVA_HOME
 LD_LIBRARY_PATH
 ANT_HOME
