@@ -240,6 +240,10 @@ sh ${jif} %CMD_LINE_ARGS%
             <param name="ext.basedir" value="${basedir}" />
             <param name="parser.type" value="ppg" />
         </antcall>
+    	
+    	<!-- Copy jif.ppg to the classes dir so that it's included in the jar
+    	     for others to use. -->
+    	<copy file="${src}/jif/parse/jif.ppg" todir="${classes}/jif/parse" />
     </target>
 
     <!-- The Jif signatures for standard java classes, e.g. java.lang.Object -->
@@ -310,7 +314,7 @@ sh ${jif} %CMD_LINE_ARGS%
 
     <target name="jif-runtime" depends="init,configure" description="compile the jif runtime">
         <mkdir dir="${rt-classes}" />
-        <javac srcdir="${rt-src}" destdir="${rt-classes}" debug="on" includes="**">
+        <javac source="1.5" target="1.5" srcdir="${rt-src}" destdir="${rt-classes}" debug="on" includes="**">
             <classpath>
                 <pathelement location="${sig-classes}" />
                 <pathelement location="${lib-classes}" />
@@ -570,7 +574,7 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
        @param ${ext.basedir} the base directory of the extension
     -->
     <target name="compile-ext">
-        <javac srcdir="${ext.basedir}/src" destdir="${classes}" debug="on" includes="${ext}/**">
+        <javac source="1.5" target="1.5" srcdir="${ext.basedir}/src" destdir="${classes}" debug="on" includes="${ext}/**">
             <classpath refid="standard.classpath" />
         </javac>
     </target>
