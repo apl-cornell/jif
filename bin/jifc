@@ -138,7 +138,6 @@ classpath="$classpath:$unixclasspath"
 
 runtime_lib_path=`fixpath "$runtime_lib_path"`
 sig_classpath=`fixpath "$sig_classpath"`
-lib_classpath=`fixpath "$lib_classpath"`
 classpath=`fixpath "$classpath"`
 
 
