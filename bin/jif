@@ -61,7 +61,6 @@ unixpath() {
 }
 
 runtime_lib_path=
-runtime_classpath=
 lib_classpath=
 extra_cp=
 args=
@@ -117,17 +116,16 @@ done
 
 unixclasspath=`unixpath $CLASSPATH`
 classpath="$extra_cp:$unixclasspath"
-classpath=`fixclasspath "$classpath"`
 
 
 path_unix=`unixpath $PATH`
 runtime_lib_path="$dir/lib:$path_unix"
-runtime_classpath="$dir/rt-classes:$dir/lib/jifrt.jar"
-lib_classpath="$dir/lib-classes:$dir/lib/jiflib.jar"
+lib_classpath="$dir/lib-classes:$dir/lib/jiflib.jar:$dir/rt-classes:$dir/lib/jifrt.jar"
+classpath="$classpath:$lib_classpath"
 
 runtime_lib_path=`fixclasspath "$runtime_lib_path"`
-runtime_classpath=`fixclasspath "$runtime_classpath"`
 lib_classpath=`fixclasspath "$lib_classpath"`
+classpath=`fixclasspath "$classpath"`
 
 
 if [ "$usage" = 1 ]; then
