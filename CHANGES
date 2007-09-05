@@ -33,7 +33,7 @@ This file documents changes between releases of Jif.
        * UTF-8 encoded source files accepted
        * A reader policy "p:q" can also be written "p->q" or
          "p&#8594;q" (the arrow is Unicode character 8594)
-       * A writer policy "p<-q" can also be written "p->q" or
+       * A writer policy "p!:q" can also be written "p-<q" or
          "p&#8592;q" (the arrow is Unicode character 8592)
        * Downgrades now explicitly mention the from and to labels
             e.g., declassify(h, {Alice:} to {Alice:Bob})
