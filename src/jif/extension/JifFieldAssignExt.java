@@ -186,7 +186,7 @@ public class JifFieldAssignExt extends JifAssignExt
             X = X.NV(lc.upperBound(X.NV(), Lf));
         }
 
-        Expr lhs = (Expr) updatePathMap(fe, X);
+        Expr lhs = (Expr) updatePathMap(fe.target(target), X);
 
         checkThrowTypes(throwTypes);
         return (Assign) updatePathMap(assign.right(rhs).left(lhs), X);
