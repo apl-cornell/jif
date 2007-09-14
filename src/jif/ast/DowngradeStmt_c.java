@@ -84,7 +84,7 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(body, this, false);
+        v.visitCFG(body, this, EXIT);
         return succs;
     }
 

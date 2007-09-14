@@ -96,11 +96,11 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
         JifTypeSystem ts = (JifTypeSystem)v.typeSystem();
         if (ts.Boolean().equals(ts.unlabel(expr.type()))) {
             // allow more precise dataflow when downgrading a boolean expression. 
-            v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this, false, 
-                       FlowGraph.EDGE_KEY_FALSE, this, false);
+            v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this, EXIT, 
+                       FlowGraph.EDGE_KEY_FALSE, this, EXIT);
         }
         else {
-            v.visitCFG(expr, this, false);
+            v.visitCFG(expr, this, EXIT);
         }
         return succs;
     }
