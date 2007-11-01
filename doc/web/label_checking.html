@@ -1104,13 +1104,21 @@ condition, and the motivation for the constraints.
 
 <p>
 The actual label constraints to enforce these requirements are given below,
-during the presentation of declassification expressions, endorsement expressions, 
-declassification statements, and endorsement statements.
+during the presentation of declassification and endorsement.
 </p>
 
 
-<h3><a name="declass-exprs">Declassification expressions</a></h3>
+<h3><a name="declassification">Declassification</a></h3>
 
+<p>Declassification is the downgrading of confidentiality. Jif has two
+syntactic forms of declassification: a <code>declassify</code> expression, and a 
+ <code>declassify</code> statement. Declassification expressions are used 
+ to downgrade the confidentiality of an expression, whereas declassification statements
+ downgrade the confidentiality of both the program counter label, and the side-effects
+ of the statement.
+</p>
+
+<h4><a name="declass-exprs">Declassification expressions</a></h4>
 <p>The expression <code>declassify(<i class="math">e</i>,<i
 class="math">L<sub>from</sub></i> to <i
 class="math">L<sub>to</sub></i>)</code> downgrades the confidentiality
@@ -1119,7 +1127,7 @@ class="math">L<sub>from</sub></i> to the label <i
 class="math">L<sub>to</sub></i>. A declassify expression is evaluated 
 just by evaluating the
 subexpression <i class="math">e</i>; that is, a declassification has 
-no runtime effect and the labels <i
+no run-time effect and the labels <i
 class="math">L<sub>from</sub></i> and <i
 class="math">L<sub>to</sub></i> are not evaluated at run-time. Thus, a declassification expression
 may throw any exception that <i class="math">e</i> may throw, and
@@ -1244,9 +1252,66 @@ wtr(<i class="math">p</i>&larr;<i class="math">q</i>) &#8796; <i class="math">p<
 </div>
 
 
+<h4><a name="declass-stmts">Declassification statements</a></h4>
 
+<p>The statement <code>declassify(<i class="math">L<sub>from</sub></i>
+to <i class="math">L<sub>to</sub></i>) <i class="math">S</i></code>
+downgrades the confidentiality of the program counter label from <i
+class="math">L<sub>from</sub></i> to <i
+class="math">L<sub>to</sub></i> for the label checking of the
+statement <i class="math">S</i>. Label checking of declassification statements is done
+completely static, so the labels <i
+class="math">L<sub>from</sub></i> and <i
+class="math">L<sub>to</sub></i> are not evaluated at run-time.
+</p>
 
-<h3><a name="endorse-exprs">Endorse expressions</a></h3>
+<p>The contained statement <i class="math">S</i> is label checked with
+the program counter label set to <i
+class="math">L<sub>to</sub></i>. In addition, label checking for <i
+class="math">S</i> assumes that <i class="math">L<sub>to</sub></i> is
+the lower bound for side-effects such as field update. (The lower
+bound for side-effects is normally equal to the start label of the
+current method.) The label environment for label checking <i
+class="math">S</i> has two new facts added to it:
+<code>{this}</code>&#8849;<i class="math">L<sub>to</sub></i> and
+<code>caller_pc</code>&#8849;<i class="math">L<sub>to</sub></i>. These
+facts state that both the label of the reference to the
+<code>this</code> object, and the program counter label at the call
+site of the current method, are no more restrictive than <i
+class="math">L<sub>to</sub></i>. Normally, both of these labels are
+bounded above by the start label of the current method.</p>
+
+<p>If <i class="math">S</i> can complete normally, then the normal
+termination label of the declassify statement is the normal termination
+label of <i class="math">S</i> joined with the program counter label for the
+declassify statement (that is, the program counter label just before it
+is declassified). Any exception that may be thrown by the statement
+<i class="math">S</i> may also be thrown by the declassify statement, with
+the same label associated with it.
+</p>
+
+<p>The restrictions on <i class="math">L<sub>from</sub></i> and <i
+class="math">L<sub>to</sub></i> that are applied to declassification
+expressions are also applied to declassification statements. In particular:
+(1) a <code>declassify</code> statement may only downgrade
+confidentiality; (2) a declassify statement must have sufficient
+authority to perform the declassification; and (3) the declassification
+must be robust. More details of these
+constraints are given <a href="#declass-exprs">above</a>.
+</p>
+
+<h3><a name="endorsement">Endorsement</a></h3>
+<p>Endorsement is the downgrading of integrity. Like declassification, Jif 
+supports different
+syntactic forms of endorsement: an <code>endorse</code> expression, an 
+ <code>endorse</code> statement, and also a checked endorse statement. 
+ Endorsement expressions are used 
+ to downgrade the integrity of expressions, whereas endorse statements
+ downgrade the integrity of both the program counter label, and the side-effects
+ of the statement.
+</p>
+
+<h4><a name="endorse-exprs">Endorse expressions</a></h4>
 <p>The expression <code>endorse(<i class="math">e</i>,<i
 class="math">L<sub>from</sub></i> to <i
 class="math">L<sub>to</sub></i>)</code> downgrades the integrity
@@ -1326,61 +1391,7 @@ equivalent to <i class="math">L</i> &#8852;
 {&#8868;&rarr;&#8868;;&#8868;&larr;&#8868;}.</p>
 
 
-
-
-
-<h3><a name="declass-stmts">Declassification statements</a></h3>
-
-<p>The statement <code>declassify(<i class="math">L<sub>from</sub></i>
-to <i class="math">L<sub>to</sub></i>) <i class="math">S</i></code>
-downgrades the confidentiality of the program counter label from <i
-class="math">L<sub>from</sub></i> to <i
-class="math">L<sub>to</sub></i> for the label checking of the
-statement <i class="math">S</i>. Label checking of declassification statements is done
-completely static, so the labels <i
-class="math">L<sub>from</sub></i> and <i
-class="math">L<sub>to</sub></i> are not evaluated at run-time.
-</p>
-
-<p>The contained statement <i class="math">S</i> is label checked with
-the program counter label set to <i
-class="math">L<sub>to</sub></i>. In addition, label checking for <i
-class="math">S</i> assumes that <i class="math">L<sub>to</sub></i> is
-the lower bound for side-effects such as field update. (The lower
-bound for side-effects is normally equal to the start label of the
-current method.) The label environment for label checking <i
-class="math">S</i> has two new facts added to it:
-<code>{this}</code>&#8849;<i class="math">L<sub>to</sub></i> and
-<code>caller_pc</code>&#8849;<i class="math">L<sub>to</sub></i>. These
-facts state that both the label of the reference to the
-<code>this</code> object, and the program counter label at the call
-site of the current method, are no more restrictive than <i
-class="math">L<sub>to</sub></i>. Normally, both of these labels are
-bounded above by the start label of the current method.</p>
-
-<p>If <i class="math">S</i> can complete normally, then the normal
-termination label of the declassify statement is the normal termination
-label of <i class="math">S</i> joined with the program counter label for the
-declassify statement (that is, the program counter label just before it
-is declassified). Any exception that may be thrown by the statement
-<i class="math">S</i> may also be thrown by the declassify statement, with
-the same label associated with it.
-</p>
-
-<p>The restrictions on <i class="math">L<sub>from</sub></i> and <i
-class="math">L<sub>to</sub></i> that are applied to declassification
-expressions are also applied to declassification statements. In particular:
-(1) a <code>declassify</code> statement may only downgrade
-confidentiality; (2) a declassify statement must have sufficient
-authority to perform the declassification; and (3) the declassification
-must be robust. More details of these
-constraints are given <a href="#declass-exprs">above</a>.
-</p>
-
-
-
-
-<h3><a name="endorse-stmts">Endorse statements</a></h3>
+<h4><a name="endorse-stmts">Endorse statements</a></h4>
 
 <p>The statement <code>endorse(<i class="math">L<sub>from</sub></i>
 to <i class="math">L<sub>to</sub></i>) <i class="math">S</i></code>
