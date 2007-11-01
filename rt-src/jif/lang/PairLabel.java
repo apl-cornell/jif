@@ -20,6 +20,7 @@ public final class PairLabel implements Label
         this.labelUtil = labelUtil;
         this.confPol = confPol;
         this.integPol = integPol;
+        if (confPol == null || integPol == null) throw new NullPointerException();
     }
 
     public boolean relabelsTo(Label l, Set s) {

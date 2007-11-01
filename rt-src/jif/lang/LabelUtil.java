@@ -306,6 +306,7 @@ public class LabelUtil
     public Label toLabel(ConfPolicy cPolicy, IntegPolicy iPolicy) {
         try {
             enterTiming();
+            if (cPolicy == null || iPolicy == null) throw new NullPointerException();
             return new PairLabel(this, cPolicy, iPolicy);        
         }
         finally {
