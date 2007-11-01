@@ -530,7 +530,9 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
                 <include name="rt-src/**" />
                 <include name="lib-src/**" />
                 <include name="sig-src/**" />
-                <include name="bin/*.in" />
+                <include name="bin/jif" />
+                <include name="bin/jifc" />
+                <include name="bin/jc" />
 
                 <!-- only include the battleship example at the moment -->
                 <include name="examples/battleship/**" />

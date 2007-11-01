@@ -3,7 +3,8 @@ Jif Change Log
 
 This file documents changes between releases of Jif.
 
-2007-07-XX    Jif 3.1.0
+2007-11-01    Jif 3.1.1
+    * Based on Polyglot 2.3.0
     * Checked endorse construct
        * A useful form of the endorse statement for the common
          case of validating an untrusted value. See the Jif 

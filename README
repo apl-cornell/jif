@@ -33,7 +33,7 @@ environment. Jif is compiled with the Ant build tool
 g++ are in your path.
 
 Softare Versions: We recommend that you use JDK 1.4.2 or later.  Ant
-   1.6.5 is known to work with Jif 3.0.0.
+   1.6.5 is known to work with Jif 3.1.1.
 
 Jif and Cygwin: Jif can be built and used on a Windows platform running 
    Cygwin. Several issues are worth pointing out however. 
@@ -63,7 +63,7 @@ also developed at Cornell. Polyglot can be obtained from the web site:
     http://www.cs.cornell.edu/Projects/polyglot
 
 This Jif distribution contains the files polyglot.jar, JFlex.jar and
-java_cup.jar from the Polyglot 2.0rc1 distribution. These files are
+java_cup.jar from the Polyglot 2.3.0 distribution. These files are
 required to build Jif.
 
 This Jif distribution contains some C++ code, used to produce
