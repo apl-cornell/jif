@@ -470,7 +470,28 @@ public final class Date[covariant label L] implements JifObject[L] {
     }
     public static Date[lb]{*lb; lb; date; delta} addMonth{*lb}(label lb, Date[lb]{*lb} date, int{*lb} delta) {
         if (date == null) return null;
-        return Date[lb].lenientDate(lb, date.getYear(), date.getMonth() +  + delta, date.getDay(), date.getHour(), date.getMinute());
+        return Date[lb].lenientDate(lb, date.getYear(), date.getMonth() + delta, date.getDay(), date.getHour(), date.getMinute());
+    }
+    /**
+     * Adds a positive or negative number of months to the date. If smartUpdate is true, then
+     * the returned date is guranteed to be at most one calendar month away; if smartUpdate is false, this is
+     * not guaranteed. An example where behavior is different adding one month to October 31. There is no November 31, so with
+     * smartUpdate false, the date returned would be Dec 1; with smartUpdate true, the date returned would be November 30.
+     * Another example, March 30 minus one month would be either March 1 or March 2 if smartUpdate false (depending on leap years), and
+     * either Feb 28 or Feb 29 if smartUpdate true (depending on leap years).
+     */
+    public static Date[lb]{*lb; lb; date; delta} addMonth{*lb}(label{*lb} lb, Date[lb]{*lb} date, int{*lb} delta, boolean{*lb} smartUpdate) {
+        if (date == null) return null;
+        Date[lb] d = Date[lb].lenientDate(lb, date.getYear(), date.getMonth() + delta, date.getDay(), date.getHour(), date.getMinute());
+        if (smartUpdate) {
+            int newMonth = date.getMonth() + delta;
+            newMonth = newMonth % 12; // make the new month in the correct range
+            if (newMonth <= 0) newMonth += 12;
+            while (d != null && newMonth != d.getMonth()) {
+                d = addDay(lb, d, delta<0?1:-1);
+            }
+        }
+        return d;
     }
     public static Date[lb]{*lb; lb; date; delta} addDay{*lb}(label lb, Date[lb]{*lb} date, int{*lb} delta) {
         if (date == null) return null;
