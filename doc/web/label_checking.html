@@ -1432,8 +1432,8 @@ constraints are given <a href="#endorse-exprs">above</a>.
 <p class="sssec"><strong>Checked endorse</strong>. 
 Many programs need to validate untrusted data and then treat it as
 trustworthy. This functionality is supported by the 
-<a href="language.html#checked-endorse">checked endorse</a> statement
-added in Jif 3.1.1. It takes the following form: 
+<a href="language.html#checked-endorse">checked endorse</a> statement.
+It takes the following form: 
 </p>
 <div class="code"><pre>
 endorse (<em>x</em>, <i class="math">L<sub>from</sub></i> to <i class="math">L<sub>to</sub></i>) 
@@ -1442,8 +1442,9 @@ endorse (<em>x</em>, <i class="math">L<sub>from</sub></i> to <i class="math">L<s
 <p class="cont">where <code><em>x</em></code> is a local variable, and 
 <code><i class="math">L<sub>from</sub></i></code> and <code><i class="math">L<sub>to</sub></i></code> are labels.</p>
 
-<p> The label checking of checked endorse statements proceeds as if the checked endorse statement
-were equivalent to the statement</p>
+<p>
+Label checking of checked endorse statements proceeds as if the checked endorse
+statement were equivalent to the statement</p>
 <div class="code"><pre>
 <em>x'</em> = endorse (<em>x</em>, <i class="math">L<sub>from</sub></i> to <i class="math">L<sub>to</sub></i>);
 if (<em>e</em>[<em>x'</em>/<em>x</em>]) <em>S</em>[<em>x'</em>/<em>x</em>] else <em>S'</em>

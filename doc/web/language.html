@@ -609,12 +609,16 @@ the program-counter label is relaxed until it is no more restrictive than
 
 <a name="checked-endorse">
 <p class="sssec"><strong>Checked endorse</strong>. 
-Jif provides a special form of the <code>endorse</code> 
-statement to cater for the common case of validating untrusted 
-data. When untrusted data is 
-validated, the data will typically be endorsed only if it passes the 
-validation checks. The <em>checked endorse</em> statement reduces the number of 
-annotations required in this case. A checked endorse is of the following form: 
+Many programs need to validate untrusted data and then treat it as more
+trustworthy. Jif provides a special form of the <code>endorse</code> 
+statement to support this pattern. The <em>checked endorse</em> statement
+(added in Jif 3.1)
+endorses data only if it passes a validation check. It considerably
+reduces the awkwardness of performing input validation.
+</p>
+
+<p>
+A checked endorse has the following form: 
 </p>
 <div class="code"><pre>
 endorse (<em>x</em>, <em>L</em> to <em>L'</em>) 
