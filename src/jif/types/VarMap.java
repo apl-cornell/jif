@@ -28,9 +28,9 @@ import polyglot.util.InternalCompilerError;
  * The defaultLabel defaults to ts.topLabel().
  */
 public class VarMap {
-    private Map bounds;
-    private JifTypeSystem ts;
-    private final Label defaultBound;
+    protected Map bounds;
+    protected JifTypeSystem ts;
+    protected final Label defaultBound;
 
     public VarMap(JifTypeSystem ts, Label defaultBound) {
 	this.ts = ts;

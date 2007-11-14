@@ -303,7 +303,7 @@ public class SolverGLB extends Solver {
     /**
      * Search recursively for solution to system of constraints.
      */
-    private boolean search(Equation eqn) {
+    protected boolean search(Equation eqn) {
         if (shouldReport(2)) {
             report(2, "===== Starting recursive search =====");
         }

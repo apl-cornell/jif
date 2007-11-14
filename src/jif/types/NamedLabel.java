@@ -103,4 +103,8 @@ public class NamedLabel
     public Label label(String name) {
 	return (Label) nameToLabels.get(name);
     }
+    
+    public String name() {
+    	return totalName;
+    }
 }
