@@ -35,23 +35,23 @@ public class LabelChecker implements Copy
      */
     private JifContext context;
     
-    final private JifTypeSystem ts;
-    final private Job job;    
-    final private NodeFactory nf;
+    final protected JifTypeSystem ts;
+    final protected Job job;    
+    final protected NodeFactory nf;
 
     /**
      * If true, then a new system of constraints will be used for each 
      * class body, and upon leaving the class body, the system of constraints
      * will be solved.
      */
-    final private boolean solvePerClassBody;
+    final protected boolean solvePerClassBody;
     
     /**
      * If true, then a new system of constraints will be used for each 
      * method body, and upon leaving the method body, the system of constraints
      * will be solved.
      */
-    final private boolean solvePerMethod;
+    final protected boolean solvePerMethod;
     
     /**
      * The <code>Solver</code> to add constraints to. Depending on 
@@ -59,7 +59,7 @@ public class LabelChecker implements Copy
      * for every class, or a single <code>Solver</code> used for the entire 
      * compilation. 
      */
-    private Solver solver;
+    protected Solver solver;
 
     public LabelChecker(Job job, TypeSystem ts, NodeFactory nf, boolean solvePerClassBody, boolean solvePerMethod, boolean doLabelSubst) {
         this.job = job;
