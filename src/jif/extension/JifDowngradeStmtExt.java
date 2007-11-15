@@ -107,14 +107,14 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
     }
 
     protected Stmt checkBody(LabelChecker lc, JifContext A, Label downgradeFrom, Label downgradeTo) throws SemanticException {
-        JifContext bA = bodyContext(A, downgradeFrom, downgradeTo);
+        JifContext bA = bodyContext(lc, A, downgradeFrom, downgradeTo);
         DowngradeStmt ds = (DowngradeStmt)this.node();
         return (Stmt) lc.context(bA).labelCheck(ds.body());
     }
 
-    protected JifContext bodyContext(JifContext A, Label downgradeFrom, Label downgradeTo) {
+    protected JifContext bodyContext(LabelChecker lc, JifContext A, Label downgradeFrom, Label downgradeTo) {
         A = (JifContext) A.pushBlock();
-        A.setPc(downgradeTo);
+        A.setPc(downgradeTo, lc);
         A.setCurrentCodePCBound(downgradeTo);
 
         // add a restriction on the "callerPC" label.

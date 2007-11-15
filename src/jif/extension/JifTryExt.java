@@ -46,7 +46,7 @@ public class JifTryExt extends JifStmtExt_c
 
             // use the label of the exception as the pc 
             A = (JifContext) A.pushBlock();
-            A.setPc(Li);
+            A.setPc(Li, lc);
 
 
             // label check the formal

@@ -32,7 +32,7 @@ public class JifDoExt extends JifStmtExt_c
         Label loopEntryPC = A.pc();         
 
         A = (JifContext) A.pushBlock();
-        A.setPc(L1);
+        A.setPc(L1, lc);
         A.gotoLabel(Branch.CONTINUE, null, L1);
         A.gotoLabel(Branch.BREAK, null, L2);
 
@@ -40,7 +40,7 @@ public class JifDoExt extends JifStmtExt_c
         PathMap Xs = getPathMap(s);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xs.N());
+        A.setPc(Xs.N(), lc);
 
         Expr e = (Expr) lc.context(A).labelCheck(ds.cond());
         PathMap Xe = getPathMap(e);

@@ -38,7 +38,7 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt
 
     protected Stmt checkBody(LabelChecker lc, JifContext A, Label downgradeFrom, Label downgradeTo) throws SemanticException {
         JifTypeSystem ts = lc.jifTypeSystem();
-        JifContext Abody = bodyContext(A, downgradeFrom, downgradeTo);
+        JifContext Abody = bodyContext(lc, A, downgradeFrom, downgradeTo);
 
         CheckedEndorseStmt ds = (CheckedEndorseStmt)this.node();
         If body = (If)ds.body();
@@ -51,7 +51,7 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt
         PathMap Xe = getPathMap(e);
 
         Abody = (JifContext) Abody.pushBlock();
-        Abody.setPc(Xe.NV());
+        Abody.setPc(Xe.NV(), lc);
 
         // extend the context with any label tests or actsfor tests
         JifIfExt.extendContext(lc, Abody, e, false);
@@ -65,7 +65,7 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt
         // check the alternative using the original context
         if (body.alternative() != null) {
             A = (JifContext) A.pushBlock();
-            A.setPc(Xe.NV());
+            A.setPc(Xe.NV(), lc);
 
             S2 = (Stmt) lc.context(A).labelCheck(body.alternative());
             X2 = getPathMap(S2);
@@ -81,7 +81,7 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt
         return (Stmt)updatePathMap(body.cond(e).consequent(S1).alternative(S2), X);
 
     }
-    protected JifContext bodyContext(JifContext A, Label downgradeFrom, Label downgradeTo) {
+    protected JifContext bodyContext(LabelChecker lc, JifContext A, Label downgradeFrom, Label downgradeTo) {
         // the pc of the block is not actually downgraded.
         A = (JifContext) A.pushBlock();
         final CheckedEndorseStmt_c d = (CheckedEndorseStmt_c)this.node();

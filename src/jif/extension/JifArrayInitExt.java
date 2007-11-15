@@ -49,7 +49,7 @@ public class JifArrayInitExt extends JifExprExt
             PathMap Xe = getPathMap(e);
             X = X.N(ts.notTaken()).join(Xe);
 
-            A.setPc(X.N());
+            A.setPc(X.N(), lc);
         }
 
         A = (JifContext) A.pop();

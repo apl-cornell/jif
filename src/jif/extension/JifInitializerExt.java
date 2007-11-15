@@ -32,7 +32,7 @@ public class JifInitializerExt extends Jif_c
         //!@!
         //Label Li = ts.freshCovariantLabel(ib.position(), "static");
         Label Li = ts.unknownLabel(ib.position()); // temporarily replace with this to get it compiling
-        A.setPc(Li);
+        A.setPc(Li, lc);
         A.setCurrentCodePCBound(Li);
 
         // reset "ph"

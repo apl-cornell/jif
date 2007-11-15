@@ -251,7 +251,7 @@ public abstract class JoinPolicy_c extends Policy_c {
         A = (JifContext)A.pushBlock();
         
         for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
-            A.setPc(X.N());
+            A.setPc(X.N(), lc);
             Policy c = (Policy) i.next();
             PathMap Xc = c.labelCheck(A, lc);
             X = X.join(Xc);            

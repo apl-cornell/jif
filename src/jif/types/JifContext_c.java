@@ -283,7 +283,7 @@ public class JifContext_c extends Context_c implements JifContext
     }
 
     public Label pc() { return pc; }
-    public void setPc(Label pc) { this.pc = pc; }
+    public void setPc(Label pc, LabelChecker lc) { this.pc = pc; }
 
     public Set authority() { return auth; }
     public void setAuthority(Set auth) { this.auth = auth; }

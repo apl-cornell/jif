@@ -110,7 +110,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         }
 
         // pc can be set to bottom during the init checking phase.
-        A.setPc(ts.bottomLabel()); 
+        A.setPc(ts.bottomLabel(), lc); 
 
         A.setConstructorReturnLabel(Lr);
 
@@ -172,7 +172,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
 
             // At this point, the environment A should have been extended
             // to include any declarations of s.  Reset the PC label.
-            A.setPc(Xs.N());
+            A.setPc(Xs.N(), lc);
 
             X = X.N(ts.notTaken()).join(Xs);
         }
@@ -282,7 +282,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         JifContext A = lc.context();
         A.setCheckingInits(false);
         A.setConstructorReturnLabel(null);    
-        A.setPc(lc.upperBound(A.pc(), lc.typeSystem().callSitePCLabel(ci)));        
+        A.setPc(lc.upperBound(A.pc(), lc.typeSystem().callSitePCLabel(ci)), lc);        
     }
 
     /**

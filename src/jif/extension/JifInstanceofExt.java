@@ -32,7 +32,7 @@ public class JifInstanceofExt extends JifExprExt
 
         // label check the type too, since the type may leak information
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.N());
+        A.setPc(Xe.N(), lc);
         PathMap Xct = ts.labelTypeCheckUtil().labelCheckType(ioe.compareType().type(), lc, throwTypes, ioe.compareType().position());
         A = (JifContext) A.pop();
         PathMap X = Xe.N(ts.notTaken()).join(Xct);

@@ -33,7 +33,7 @@ public class JifWhileExt extends JifStmtExt_c
 
         A = (JifContext) A.pushBlock();
 
-        A.setPc(L1);
+        A.setPc(L1, lc);
         A.gotoLabel(Branch.CONTINUE, null, L1);
         A.gotoLabel(Branch.BREAK, null, L2);
 
@@ -42,7 +42,7 @@ public class JifWhileExt extends JifStmtExt_c
 
         A = (JifContext) A.pushBlock();
 
-        A.setPc(Xe.NV());
+        A.setPc(Xe.NV(), lc);
         Stmt S = (Stmt) lc.context(A).labelCheck(ws.body());
         PathMap Xs = getPathMap(S);
 

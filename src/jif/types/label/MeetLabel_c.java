@@ -386,7 +386,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         A = (JifContext)A.pushBlock();
         
         for (Iterator i = components.iterator(); i.hasNext(); ) {
-            A.setPc(X.N());
+            A.setPc(X.N(), lc);
             Label c = (Label) i.next();
             PathMap Xc = c.labelCheck(A, lc);
             X = X.join(Xc);            

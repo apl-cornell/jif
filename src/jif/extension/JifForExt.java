@@ -49,7 +49,7 @@ public class JifForExt extends JifStmtExt_c
             // to include any declarations of s.  We push a new scope
             // on the stack so that we can set the PC.
 
-            A.setPc(Xs.N());
+            A.setPc(Xs.N(), lc);
 
             Xinit = Xinit.N(notTaken).join(Xs);
         }
@@ -63,7 +63,7 @@ public class JifForExt extends JifStmtExt_c
         A = (JifContext) A.pushBlock();
         Label loopEntryPC = A.pc();         
 
-        A.setPc(L1);
+        A.setPc(L1, lc);
         A.gotoLabel(Branch.CONTINUE, null, L1);
         A.gotoLabel(Branch.BREAK, null, L2);
 
@@ -78,12 +78,12 @@ public class JifForExt extends JifStmtExt_c
         }
 
         A = (JifContext) A.pushBlock();	
-        A.setPc(Xe.NV());
+        A.setPc(Xe.NV(), lc);
         Stmt body = (Stmt) lc.context(A).labelCheck(fs.body());
         PathMap Xbody = getPathMap(body);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xbody.N());
+        A.setPc(Xbody.N(), lc);
 
         List iters = new LinkedList();
 
@@ -97,7 +97,7 @@ public class JifForExt extends JifStmtExt_c
             // At this point, the environment A should have been extended
             // to include any declarations of s.  Reset the PC label.
 
-            A.setPc(Xs.N());
+            A.setPc(Xs.N(), lc);
 
             Xbody = Xbody.N(notTaken).join(Xs);
         }

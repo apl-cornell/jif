@@ -176,7 +176,7 @@ public class PairLabel_c extends Label_c implements PairLabel {
         PathMap Xc = confPolicy.labelCheck(A, lc);
         X = X.join(Xc);            
         
-        A.setPc(X.N());
+        A.setPc(X.N(), lc);
         PathMap Xi = integPolicy.labelCheck(A, lc);
         X = X.join(Xi);            
         return X;

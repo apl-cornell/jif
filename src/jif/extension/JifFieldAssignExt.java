@@ -44,7 +44,7 @@ public class JifFieldAssignExt extends JifAssignExt
 
         // check rhs
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.N()); 
+        A.setPc(Xe.N(), lc); 
 
         Expr rhs = (Expr) lc.context(A).labelCheck(assign.right());
         PathMap Xr = rhsPathMap(lc.context(A), rhs, throwTypes);

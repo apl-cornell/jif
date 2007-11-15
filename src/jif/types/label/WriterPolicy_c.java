@@ -120,7 +120,7 @@ public class WriterPolicy_c extends Policy_c implements WriterPolicy {
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         // check each principal in turn.
         PathMap X = owner.labelCheck(A, lc);
-        A.setPc(X.N());
+        A.setPc(X.N(), lc);
         PathMap Xr = writer.labelCheck(A, lc);
         X = X.join(Xr);            
         return X;

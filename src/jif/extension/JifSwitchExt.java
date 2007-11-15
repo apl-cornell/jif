@@ -43,7 +43,7 @@ public class JifSwitchExt extends JifStmtExt_c
                                         "label of PC at break target for switch statement at " + node().position());
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.NV());
+        A.setPc(Xe.NV(), lc);
         A.gotoLabel(Branch.BREAK, null, L);
 
         PathMap Xa = Xe.N(notTaken);
@@ -55,7 +55,7 @@ public class JifSwitchExt extends JifStmtExt_c
             l.add(s);
 
             PathMap Xs = getPathMap(s);
-            A.setPc(lc.upperBound(A.pc(), Xs.N()));
+            A.setPc(lc.upperBound(A.pc(), Xs.N()), lc);
             Xa = Xa.join(Xs);
         }
 

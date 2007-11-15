@@ -32,7 +32,7 @@ public class JifSynchronizedExt extends JifStmtExt_c
         Expr e = (Expr) lc.context(A).labelCheck(ss.expr());
         PathMap Xe = getPathMap(e);
 
-        A.setPc(Xe.N());
+        A.setPc(Xe.N(), lc);
 
         Block s = (Block) lc.context(A).labelCheck(ss.body());
         PathMap Xs = getPathMap(s);

@@ -46,7 +46,7 @@ public class JifArrayAccessExt extends JifExprExt
         PathMap Xa = getPathMap(array);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xa.N());
+        A.setPc(Xa.N(), lc);
 
         Expr index = (Expr) lc.context(A).labelCheck(aie.index());
         PathMap Xb = getPathMap(index);

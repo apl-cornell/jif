@@ -49,7 +49,7 @@ public class JifConditionalExt extends JifExprExt
         PathMap Xe = getPathMap(cond);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.NV());
+        A.setPc(Xe.NV(), lc);
 
         Expr cons = (Expr) lc.context(A).labelCheck(te.consequent());
         PathMap Xt = getPathMap(cons);
@@ -57,7 +57,7 @@ public class JifConditionalExt extends JifExprExt
         A = (JifContext) A.pop();
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.NV());
+        A.setPc(Xe.NV(), lc);
 
         Expr alt = (Expr) lc.context(A).labelCheck(te.alternative());
         PathMap Xf = getPathMap(alt);

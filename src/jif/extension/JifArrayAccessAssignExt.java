@@ -44,7 +44,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         PathMap Xarr = getPathMap(array);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xarr.N());
+        A.setPc(Xarr.N(), lc);
 
         Expr index = (Expr) lc.context(A).labelCheck(aie.index());
         PathMap Xind = getPathMap(index);
@@ -66,7 +66,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
                 Xlhs = Xlhs.exc(lc.upperBound(Xarr.NV(), Xind.NV()), oob);
             }
         }
-        A.setPc(Xlhs.N());
+        A.setPc(Xlhs.N(), lc);
 
         Expr rhs = (Expr) lc.context(A).labelCheck(assign.right());
         PathMap Xrhs = rhsPathMap(lc.context(A), rhs, throwTypes);

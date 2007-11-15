@@ -60,7 +60,7 @@ public class JifNewArrayExt extends JifExprExt
             PathMap Xe = getPathMap(e);
             Xs = Xs.N(ts.notTaken()).join(Xe);
 
-            A.setPc(Xs.N());
+            A.setPc(Xs.N(), lc);
             dimsNV = ts.join(dimsNV, Xe.NV());
         }
 

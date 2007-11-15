@@ -292,7 +292,7 @@ public class CallHelper {
 
             // A[pc := X_{j-1}[N]] |- Ej : Xj
             A = (JifContext)A.pushBlock();
-            A.setPc(Xj.N());
+            A.setPc(Xj.N(), lc);
             Ej = (Expr)lc.context(A).labelCheck(Ej);
             A = (JifContext)A.pop();
 
@@ -490,7 +490,7 @@ public class CallHelper {
         // check parameters
         PathMap Xjoin = labelCheckAndConstrainParams(lc, throwTypes);        
         lc = lc.context((JifContext)lc.context().pushBlock());        
-        lc.context().setPc(Xjoin.N());
+        lc.context().setPc(Xjoin.N(), lc);
 
         // check arguments
         Xjoin = labelCheckAndConstrainArgs(lc, Xjoin);
@@ -501,7 +501,7 @@ public class CallHelper {
         }        
         constrainFinalActualArgs(ts);
         lc = lc.context((JifContext)lc.context().pushBlock());        
-        lc.context().setPc(Xjoin.N());
+        lc.context().setPc(Xjoin.N(), lc);
 
         // A |- X_{maxj}[N] + entry_pc <= Li
         Label Li = resolvePCBound(lc);

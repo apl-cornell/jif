@@ -41,7 +41,7 @@ public class JifLabeledExt extends JifStmtExt_c
         A.gotoLabel(polyglot.ast.Branch.CONTINUE, label, L1);
         A.gotoLabel(polyglot.ast.Branch.BREAK, label, L2);
 
-        A.setPc(lc.upperBound(A.pc(), L1));
+        A.setPc(lc.upperBound(A.pc(), L1), lc);
 
         Stmt s = (Stmt) lc.context(A).labelCheck(ls.statement());
 

@@ -84,7 +84,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
             A.addAssertionLE(ct.thisLabel(), callerPcLabel);  
         }
 
-        A.setPc(callerPcLabel); 
+        A.setPc(callerPcLabel, lc); 
         Label initialPCBound = Li;
 
         if (!endorseTo.isTop()) {

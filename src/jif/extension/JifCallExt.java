@@ -86,13 +86,13 @@ public class JifCallExt extends JifExprExt
                 throw new InternalCompilerError("Type of " + e + " is null", e.position());
 
             PathMap Xs = getPathMap(target);
-            A.setPc(Xs.N());
+            A.setPc(Xs.N(), lc);
 
             if (! (target instanceof Special)) {
                 // a NPE may be thrown depending on the target.
                 npExc = (!((JifCallDel)node().del()).targetIsNeverNull());
                 objLabel = Xs.NV();
-                A.setPc(Xs.NV());
+                A.setPc(Xs.NV(), lc);
             }
             else {
                 objLabel = ((JifClassType) lc.context().currentClass()).thisLabel();

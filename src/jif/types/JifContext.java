@@ -117,7 +117,7 @@ public interface JifContext extends Context {
      * PC and Authority methods
      */
     Label pc();
-    void setPc(Label label);
+    void setPc(Label label, LabelChecker lc);
 
     /**
      * The currentCodePCBound is an upper bound on the 

@@ -225,7 +225,7 @@ public class LabelTypeCheckUtil {
                         }
                     }
                     
-                    A.setPc(X.N());    
+                    A.setPc(X.N(), lc);    
                     PathMap Xj = L.labelCheck(A, lc);
                     throwTypes.removeAll(L.throwTypes(ts));
                     Xparams.add(Xj);
@@ -248,7 +248,7 @@ public class LabelTypeCheckUtil {
                     }
                     
                     
-                    A.setPc(X.N());            
+                    A.setPc(X.N(), lc);            
                     PathMap Xj = p.labelCheck(A, lc);
                     throwTypes.removeAll(p.throwTypes(ts));
                     Xparams.add(Xj);

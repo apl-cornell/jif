@@ -36,7 +36,7 @@ public class JifIfExt extends JifStmtExt_c
         PathMap Xe = getPathMap(e);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.NV());
+        A.setPc(Xe.NV(), lc);
 
         // extend the context with any label tests or actsfor tests
         extendContext(lc, A, e, false);
@@ -51,7 +51,7 @@ public class JifIfExt extends JifStmtExt_c
 
         if (is.alternative() != null) {
             A = (JifContext) A.pushBlock();
-            A.setPc(Xe.NV());
+            A.setPc(Xe.NV(), lc);
 
             S2 = (Stmt) lc.context(A).labelCheck(is.alternative());
 
