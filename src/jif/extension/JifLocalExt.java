@@ -35,13 +35,14 @@ public class JifLocalExt extends JifExprExt
         // original constraint was X.NV() <= L
         // simplified to the equivalent constraint A.pc() <= L
         // (equivalent because X.NV == A.pc() join L)
-        lc.constrain(new LabelConstraint(new NamedLabel("pc", 
-                                                        "information revealed by reaching this program point", 
-                                                        A.pc()), 
-                                                        LabelConstraint.LEQ, 
-                                                        new NamedLabel("label of local variable " + li.name(), L),
-                                                        A.labelEnv(),
-                                                        lve.position()) {
+        lc.constrain(new NamedLabel("pc", 
+                                    "information revealed by reaching this program point", 
+                                    A.pc()), 
+                    LabelConstraint.LEQ, 
+                    new NamedLabel("label of local variable " + li.name(), L),
+                    A.labelEnv(),
+                    lve.position(),
+                    new LabelConstraintMessage() {
             public String msg() {
                 return "Program counter at increment " + 
                 "more restrictive than the label for " + 

@@ -118,17 +118,17 @@ public class SubtypeChecker
 
                 final Type lOrigSubtype = origSubtype;
                 final Type lOrigSupertype = origSupertype;
-                lc.constrain(new LabelConstraint(new NamedLabel(
-                                                                "sub_param_"+count,
-                                                                StringUtil.nth(count) + " param of subtype " + lOrigSubtype,
-                                                                label(subParam, pos)), 
-                                                                kind, 
-                                                                new NamedLabel(
-                                                                               "sup_param_"+count,
-                                                                               StringUtil.nth(count) + " param of supertype " + lOrigSupertype,
-                                                                               label(supParam, pos)), 
-                                                                               A.labelEnv(),
-                                                                               pos) {
+                lc.constrain(new NamedLabel("sub_param_"+count,
+                                            StringUtil.nth(count) + " param of subtype " + lOrigSubtype,
+                                            label(subParam, pos)), 
+                            kind, 
+                            new NamedLabel(
+                                           "sup_param_"+count,
+                                           StringUtil.nth(count) + " param of supertype " + lOrigSupertype,
+                                           label(supParam, pos)), 
+                           A.labelEnv(),
+                           pos,
+                           new LabelConstraintMessage() {
                     public String msg() {
                         return lOrigSubtype + " is not a subtype of " + 
                         lOrigSupertype + 
@@ -139,7 +139,7 @@ public class SubtypeChecker
                         String variance = pi.isInvariantLabel() 
                         ? "invariant"
                                 : "covariant";
-                        String reln = kind() == EQUAL 
+                        String reln = kind() == LabelConstraint.EQUAL 
                         ? "equal to"
                                 : "less restrictive than";
                         return lOrigSubtype + " is not a subtype of " + 
@@ -194,16 +194,15 @@ public class SubtypeChecker
             // of subtype, or if at least one of them is invariant, that they are equal
             final Type lOrigSubtype = origSubtype;
             final Type lOrigSupertype = origSupertype;
-            lc.constrain(new LabelConstraint(new NamedLabel(
-                                                            "label of type " + subtype,
-                                                            ts.labelOfType(subtype)), 
-                                                            LabelConstraint.LEQ, 
-                                                            new NamedLabel(
-                                                                           "label of type " + supertype,
-                                                                           ts.labelOfType(supertype)), 
-                                                                           A.labelEnv(),
-                                                                           pos,
-                                                                           !(ts.labelOfType(subtype) instanceof VarLabel || ts.labelOfType(supertype) instanceof VarLabel )) {
+            lc.constrain(new NamedLabel("label of type " + subtype,
+                                        ts.labelOfType(subtype)), 
+                        LabelConstraint.LEQ, 
+                        new NamedLabel("label of type " + supertype,
+                                       ts.labelOfType(supertype)), 
+                        A.labelEnv(),
+                        pos,
+                        !(ts.labelOfType(subtype) instanceof VarLabel || ts.labelOfType(supertype) instanceof VarLabel ),
+                        new LabelConstraintMessage() {
                 public String msg() {
                     String s = lOrigSubtype + " is not a subtype of " + 
                     lOrigSupertype + ".";

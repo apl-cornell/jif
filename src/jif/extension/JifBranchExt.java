@@ -34,15 +34,16 @@ public class JifBranchExt extends JifStmtExt_c
             throw new InternalCompilerError("Can't find target for " + bs.kind() + " " + bs.label());
         }
 
-        lc.constrain(new LabelConstraint(new NamedLabel("pc", 
-                                                        "the information that may be revealed by control reaching this program point",
-                                                        pc), 
-                                                        LabelConstraint.LEQ, 
-                                                        new NamedLabel("pc_target",
-                                                                       "upper bound on information that should be revealed by control reaching the target program point",
-                                                                       gotoLabel),
-                                                                       A.labelEnv(),
-                                                                       bs.position()) {
+        lc.constrain(new NamedLabel("pc", 
+                                    "the information that may be revealed by control reaching this program point",
+                                    pc), 
+                    LabelConstraint.LEQ, 
+                    new NamedLabel("pc_target",
+                                   "upper bound on information that should be revealed by control reaching the target program point",
+                                   gotoLabel),
+                   A.labelEnv(),
+                   bs.position(),
+                   new LabelConstraintMessage() {
             public String msg() {
                 return "More information may be revealed by " +
                 "branching to the target from this " +

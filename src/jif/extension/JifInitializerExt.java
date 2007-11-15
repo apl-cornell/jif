@@ -44,13 +44,14 @@ public class JifInitializerExt extends Jif_c
         PathMap X = getPathMap(body);
 
         // X[node()] join X[r] <= Lr (== Li) 
-        lc.constrain(new LabelConstraint(new NamedLabel("X(initializer).n", X.N()).
-                                         join(lc, "X(initializer).r", X.R()), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("init_pc", Li),
-                                         A.labelEnv(),
-                                         ib.position(), 
-                                         false) {
+        lc.constrain(new NamedLabel("X(initializer).n", X.N()).
+                     join(lc, "X(initializer).r", X.R()), 
+                     LabelConstraint.LEQ, 
+                     new NamedLabel("init_pc", Li),
+                     A.labelEnv(),
+                     ib.position(), 
+                     false,
+                     new LabelConstraintMessage() {
             public String msg() {
                 return "The information revealed by the normal " +
                 "termination of the initializer " +

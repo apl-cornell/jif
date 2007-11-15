@@ -235,13 +235,14 @@ public class CallHelper {
                 PathMap Xj = (PathMap)iter.next();
                 actualParamLabels.add(Xj.NV());
                 final int count = ++counter;
-                lc.constrain(new LabelConstraint(new NamedLabel("actual_param_"+count,
-                                                                "the label of the " + StringUtil.nth(count) + " actual parameter",
-                                                                Xj.NV()),
-                                                                LabelConstraint.LEQ,
-                                                                paramUB,
-                                                                A.labelEnv(),
-                                                                this.position) {
+                lc.constrain(new NamedLabel("actual_param_"+count,
+                                            "the label of the " + StringUtil.nth(count) + " actual parameter",
+                                            Xj.NV()),
+                             LabelConstraint.LEQ,
+                             paramUB,
+                             A.labelEnv(),
+                             this.position,
+                             new LabelConstraintMessage() {
                     public String msg() {
                         return "The actual parameter is more restrictive than " +
                         "permitted.";
@@ -335,15 +336,16 @@ public class CallHelper {
 
         // A |- Xj[nv] <= argLj
         PathMap Xj = Jif_c.getPathMap(Ej);
-        lc.constrain(new LabelConstraint(new NamedLabel("actual_arg_"+(index+1),
-                                                        "the label of the " + StringUtil.nth(index+1) + " actual argument",
-                                                        Xj.NV()),
-                                                        LabelConstraint.LEQ,
-                                                        new NamedLabel("formal_arg_" + (index+1),
-                                                                       "the upper bound of the formal argument " + aj.formalInstance().name(),
-                                                                       argBoundj),
-                                                                       A.labelEnv(),
-                                                                       Ej.position()) {
+        lc.constrain(new NamedLabel("actual_arg_"+(index+1),
+                                    "the label of the " + StringUtil.nth(index+1) + " actual argument",
+                     Xj.NV()),
+                     LabelConstraint.LEQ,
+                     new NamedLabel("formal_arg_" + (index+1),
+                                    "the upper bound of the formal argument " + aj.formalInstance().name(),
+                                    argBoundj),
+                     A.labelEnv(),
+                     Ej.position(),
+                     new LabelConstraintMessage() {
             public String msg() {
                 return "The actual argument is more restrictive than " +
                 "the formal argument.";
@@ -514,13 +516,14 @@ public class CallHelper {
                                                 "lower bound on the side effects of the method " + callee.signature(),
                                                 Li);
 
-            lc.constrain(new LabelConstraint(new NamedLabel("pc_call",
-                                                            "label of the program counter at this call site",
-                                                            Xjoin.N()),
-                                                            LabelConstraint.LEQ,
-                                                            namedLi,
-                                                            A.labelEnv(),
-                                                            position) {
+            lc.constrain(new NamedLabel("pc_call",
+                                        "label of the program counter at this call site",
+                                        Xjoin.N()),
+                        LabelConstraint.LEQ,
+                        namedLi,
+                        A.labelEnv(),
+                        position,
+                        new LabelConstraintMessage() {
                 public String msg() {
                     return "PC at call site more restrictive than " +
                     "begin label of " + callee.signature() + ".";
@@ -545,13 +548,14 @@ public class CallHelper {
                 }
             }
             );
-            lc.constrain(new LabelConstraint(new NamedLabel("caller_PC_bound",
-                                                            "lower bound on the side effects of caller",
-                                                            A.currentCodePCBound()),
-                                                            LabelConstraint.LEQ,
-                                                            namedLi,
-                                                            A.labelEnv(),
-                                                            position) {
+            lc.constrain(new NamedLabel("caller_PC_bound",
+                                        "lower bound on the side effects of caller",
+                                        A.currentCodePCBound()),
+                        LabelConstraint.LEQ,
+                        namedLi,
+                        A.labelEnv(),
+                        position,
+                        new LabelConstraintMessage() {
                 public String msg() {
                     return "The side effects of " + callee.signature() +
                     " are not bounded by the PC bound.";
@@ -740,39 +744,50 @@ public class CallHelper {
                 Position pos = position;
                 if (!overrideChecker) {
                     // being used as a normal call checker
-                    message = "The label " + lhs + " must be less restrictive " +
-                    "than " + rhs +" to invoke " + jpi.debugString();
-                    detailedMessage = "The " + jpi.debugString() + " requires that the " +
+                }
+                else {
+                    // being used as an override checker
+                    pos = lla.position();
+                }
+
+
+                lc.constrain(new NamedLabel(lla.lhs().toString(),
+                                            "LHS of label assertion",
+                                            lhs),
+                            LabelConstraint.LEQ,
+                            new NamedLabel(lla.rhs().toString(),
+                                           "RHS of label assertion",
+                                           rhs),
+                           A.labelEnv(),
+                           pos,
+                           new LabelConstraintMessage() {
+                    public String msg() {
+                        if (!overrideChecker) {
+                            // being used as a normal call checker
+                            return "The label " + lhs + " must be less restrictive " +
+                            "than " + rhs +" to invoke " + jpi.debugString();
+                        }
+                        else {
+                            // being used as an override checker
+                            return "The subclass cannot assume that " + lhs +
+                            " <= " + rhs;
+                        }
+                    }
+
+                    public String detailMsg() {
+                if (!overrideChecker) {
+                    // being used as a normal call checker
+                    return "The " + jpi.debugString() + " requires that the " +
                     "relationship " + lhs + " <= " + rhs + 
                     " holds at the call site.";                    
                 }
                 else {
                     // being used as an override checker
-                    message = "The subclass cannot assume that " + lhs +
-                    " <= " + rhs;
-                    detailedMessage = "The " + jpi.debugString() + " requires that " + lhs + 
+                    return "The " + jpi.debugString() + " requires that " + lhs + 
                     " <= " + rhs + ". However, this " +
-                    "method overrides the method in class " + this.pi.container() + 
+                    "method overrides the method in class " + CallHelper.this.pi.container() + 
                     " which does not make this requirement.";
-                    pos = lla.position();
                 }
-
-
-                lc.constrain(new LabelConstraint(new NamedLabel(lla.lhs().toString(),
-                                                                "LHS of label assertion",
-                                                                lhs),
-                                                                LabelConstraint.LEQ,
-                                                                new NamedLabel(lla.rhs().toString(),
-                                                                               "RHS of label assertion",
-                                                                               rhs),
-                                                                               A.labelEnv(),
-                                                                               pos) {
-                    public String msg() {
-                        return message;
-                    }
-
-                    public String detailMsg() {
-                        return detailedMessage;
                     }
                 });
             }
@@ -805,13 +820,12 @@ public class CallHelper {
 
         // bind the receiver var label
         if (receiverVarLabel != null && this.receiverLabel != null) {
-            lc.constrain(new LabelConstraint(new NamedLabel(receiverVarLabel.componentString(), receiverVarLabel), 
-                                             LabelConstraint.EQUAL,
-                                             new NamedLabel(receiverVarLabel.componentString(),
-                                                            this.receiverLabel), 
-                                                            A.labelEnv(), 
-                                                            this.position, 
-                                                            false));
+            lc.constrain(new NamedLabel(receiverVarLabel.componentString(), receiverVarLabel), 
+                         LabelConstraint.EQUAL,
+                         new NamedLabel(receiverVarLabel.componentString(),
+                                        this.receiverLabel), 
+                         A.labelEnv(), 
+                         this.position);
         }
         else if (receiverVarLabel != null || this.receiverLabel != null) {
             throw new InternalCompilerError("Inconsistent receiver labels", position);
@@ -821,11 +835,10 @@ public class CallHelper {
         for (int i = 0; i < actualArgLabels.size(); i++) {
             VarLabel argVarLbl = (VarLabel)actualArgVarLabels.get(i);
             Label argLbl = (Label)this.actualArgLabels.get(i);
-            lc.constrain(new LabelConstraint(new NamedLabel(argVarLbl.componentString(), argVarLbl), 
-                                             LabelConstraint.EQUAL,
-                                             new NamedLabel(argVarLbl.componentString(), argLbl), 
-                                             A.labelEnv(), this.position, 
-                                             false));
+            lc.constrain(new NamedLabel(argVarLbl.componentString(), argVarLbl), 
+                         LabelConstraint.EQUAL,
+                         new NamedLabel(argVarLbl.componentString(), argLbl), 
+                         A.labelEnv(), this.position);
         }
 
         // bind all the actual param var labels.
@@ -840,10 +853,9 @@ public class CallHelper {
             for (int i = 0; i < actualParamVarLabels.size(); i++) {
                 VarLabel paramVarLbl = (VarLabel)actualParamVarLabels.get(i);
                 Label paramLbl = (Label)this.actualParamLabels.get(i);
-                lc.constrain(new LabelConstraint(new NamedLabel(paramVarLbl.componentString(), paramVarLbl), 
-                                                 LabelConstraint.EQUAL, new NamedLabel(paramVarLbl.componentString(), paramLbl), 
-                                                 A.labelEnv(), this.position, 
-                                                 false));
+                lc.constrain(new NamedLabel(paramVarLbl.componentString(), paramVarLbl), 
+                             LabelConstraint.EQUAL, new NamedLabel(paramVarLbl.componentString(), paramLbl), 
+                             A.labelEnv(), this.position);
             }
         }
     }
@@ -944,15 +956,16 @@ public class CallHelper {
             ArgLabel ai = (ArgLabel)ts.labelOfType(i);
             ArgLabel aj = (ArgLabel)ts.labelOfType(j);
             final int argIndex = ++c;
-            newlc.constrain(new LabelConstraint(new NamedLabel("sup_arg_"+argIndex,
-                                                               "label of " + StringUtil.nth(argIndex) + " arg of overridden method",
-                                                               instantiate(A, aj.upperBound())),
-                                                               LabelConstraint.LEQ,
-                                                               new NamedLabel("sub_arg_"+argIndex,
-                                                                              "label of " + StringUtil.nth(argIndex) + " arg of overridding method",
-                                                                              ai.upperBound()),
-                                                                              A.labelEnv(),
-                                                                              overriding.position()) {
+            newlc.constrain(new NamedLabel("sup_arg_"+argIndex,
+                                           "label of " + StringUtil.nth(argIndex) + " arg of overridden method",
+                                           instantiate(A, aj.upperBound())),
+                           LabelConstraint.LEQ,
+                           new NamedLabel("sub_arg_"+argIndex,
+                                          "label of " + StringUtil.nth(argIndex) + " arg of overridding method",
+                                          ai.upperBound()),
+                          A.labelEnv(),
+                          overriding.position(),
+                          new LabelConstraintMessage() {
                 public String msg() {
                     return "Cannot override " + overridden.signature() + 
                     " in " + overridden.container() + " with " + 
@@ -983,11 +996,12 @@ public class CallHelper {
         NamedLabel startj = new NamedLabel("sup_pc_bound",
                                            "PC bound of method " + overridden.name() + " in " + overridden.container(), 
                                            instantiate(A, overridden.pcBound()));
-        newlc.constrain(new LabelConstraint(startj,
-                                            LabelConstraint.LEQ,
-                                            starti,
-                                            A.labelEnv(),
-                                            overriding.position()) {
+        newlc.constrain(startj,
+                        LabelConstraint.LEQ,
+                        starti,
+                        A.labelEnv(),
+                        overriding.position(),
+                        new LabelConstraintMessage() {
             public String msg() {
                 return "Cannot override " + overridden.signature() + 
                 " in " + overridden.container() + " with " + 
@@ -1018,11 +1032,12 @@ public class CallHelper {
         NamedLabel retj = new NamedLabel("sup_return_label", 
                                          "return label of method " + overridden.name() + " in " + overridden.container(), 
                                          instantiate(A, overridden.returnLabel()));                        
-        newlc.constrain(new LabelConstraint(reti,
-                                            LabelConstraint.LEQ,
-                                            retj,
-                                            A.labelEnv(),
-                                            overriding.position()) {
+        newlc.constrain(reti,
+                        LabelConstraint.LEQ,
+                        retj,
+                        A.labelEnv(),
+                        overriding.position(),
+                        new LabelConstraintMessage() {
             public String msg() {
                 return "Cannot override " + overridden.signature() + 
                 " in " + overridden.container() + " with " + 
@@ -1053,11 +1068,12 @@ public class CallHelper {
         NamedLabel retValj = new NamedLabel("sup_return_val_label", 
                                             "label of the return value of method " + overridden.name() + " in " + overridden.container(), 
                                             instantiate(A, overridden.returnValueLabel()));
-        newlc.constrain(new LabelConstraint(retVali,
-                                            LabelConstraint.LEQ,
-                                            retValj,
-                                            A.labelEnv(),
-                                            overriding.position()) {
+        newlc.constrain(retVali,
+                        LabelConstraint.LEQ,
+                        retValj,
+                        A.labelEnv(),
+                        overriding.position(),
+                        new LabelConstraintMessage() {
             public String msg() {
                 return "Cannot override " + overridden.signature() + 
                 " in " + overridden.container() + " with " + 
@@ -1090,15 +1106,16 @@ public class CallHelper {
             for (Iterator mjExcIt = mjExc.iterator(); mjExcIt.hasNext(); ) {
                 final LabeledType exj = (LabeledType)mjExcIt.next();
                 if (ts.isSubtype(exi.typePart(), exj.typePart())) {
-                    newlc.constrain(new LabelConstraint(new NamedLabel("exc_label_"+exi.typePart().toString(),
-                                                                       "",//"label on the exception " + exi.typePart().toString(),
-                                                                       exi.labelPart()),
-                                                                       LabelConstraint.LEQ,
-                                                                       new NamedLabel("exc_label_"+exj.typePart().toString(),
-                                                                                      "",
-                                                                                      instantiate(A, exj.labelPart())),
-                                                                                      A.labelEnv(),
-                                                                                      overriding.position()) {
+                    newlc.constrain(new NamedLabel("exc_label_"+exi.typePart().toString(),
+                                                   "",//"label on the exception " + exi.typePart().toString(),
+                                                   exi.labelPart()),
+                                    LabelConstraint.LEQ,
+                                    new NamedLabel("exc_label_"+exj.typePart().toString(),
+                                                   "",
+                                                   instantiate(A, exj.labelPart())),
+                                    A.labelEnv(),
+                                    overriding.position(),
+                                    new LabelConstraintMessage() {
                         public String msg() {
                             return "Cannot override " + overridden.signature() + 
                             " in " + overridden.container() + " with " + 

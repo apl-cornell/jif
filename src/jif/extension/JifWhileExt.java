@@ -49,20 +49,21 @@ public class JifWhileExt extends JifStmtExt_c
         A = (JifContext) A.pop();
         A = (JifContext) A.pop();
 
-        lc.constrain(new LabelConstraint(new NamedLabel("while_body.N",
-                                                        "label of normal termination of the loop body", 
-                                                        Xs.N()).
-                                                        join(lc,
-                                                             "loop_entry_pc",
-                                                             "label of the program counter just before the loop is executed",
-                                                             loopEntryPC), 
-                                                             LabelConstraint.LEQ, 
-                                                             new NamedLabel("loop_pc",
-                                                                            "label of the program counter at the top of the loop",
-                                                                            L1),
-                                                                            A.labelEnv(),
-                                                                            ws.position(), 
-                                                                            false) {
+        lc.constrain(new NamedLabel("while_body.N",
+                                    "label of normal termination of the loop body", 
+                                    Xs.N()).
+                                    join(lc,
+                                         "loop_entry_pc",
+                                         "label of the program counter just before the loop is executed",
+                                         loopEntryPC), 
+                     LabelConstraint.LEQ, 
+                     new NamedLabel("loop_pc",
+                                    "label of the program counter at the top of the loop",
+                                    L1),
+                    A.labelEnv(),
+                    ws.position(), 
+                    false,
+                    new LabelConstraintMessage() {
             public String msg() {
                 return "The information revealed by the normal " +
                 "termination of the body of the while loop " +

@@ -4,10 +4,7 @@ import jif.JifOptions;
 import jif.ast.DowngradeExpr;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.JifContext;
-import jif.types.LabelConstraint;
-import jif.types.NamedLabel;
-import jif.types.PathMap;
+import jif.types.*;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
@@ -55,12 +52,13 @@ public abstract class JifDowngradeExprExt extends JifExprExt
         }
 
 
-        lc.constrain(new LabelConstraint(new NamedLabel("expr.nv", Xe.NV()), 
+        lc.constrain(new NamedLabel("expr.nv", Xe.NV()), 
                                          boundSpecified?LabelConstraint.LEQ:LabelConstraint.EQUAL, 
                                                  new NamedLabel("downgrade_bound", downgradeFrom),
                                                  A.labelEnv(),
                                                  d.position(),
-                                                 boundSpecified) /* report this constraint if the bound was specified*/ {
+                                                 boundSpecified, /* report this constraint if the bound was specified*/ 
+                                        new LabelConstraintMessage() {                                                 
             public String msg() {
                 return "The label of the expression to " + 
                 d.downgradeKind()+" is " + 

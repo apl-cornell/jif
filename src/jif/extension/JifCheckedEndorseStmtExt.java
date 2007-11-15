@@ -135,12 +135,12 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt
         Expr e = (Expr) lc.context(A).labelCheck(d.expr());
         PathMap Xe = getPathMap(e);
 
-        lc.constrain(new LabelConstraint(new NamedLabel("expr.nv", Xe.NV()), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("downgrade_bound", labelFrom),
-                                         A.labelEnv(),
-                                         d.position(),
-                                         true) {
+        lc.constrain(new NamedLabel("expr.nv", Xe.NV()), 
+                     LabelConstraint.LEQ, 
+                     new NamedLabel("downgrade_bound", labelFrom),
+                     A.labelEnv(),
+                     d.position(),
+                     new LabelConstraintMessage() {
             public String msg() {
                 return "The label of the expression to " + 
                 d.downgradeKind()+" is " + 

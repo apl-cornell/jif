@@ -259,19 +259,20 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
             }
         }            
 
-        lc.constrain(new LabelConstraint(new NamedLabel("X.n",
-                                                        "information that may be gained by the body terminating normally",
-                                                        X.N()).
-                                                        join(lc,
-                                                             "X.r",
-                                                             "information that may be gained by exiting the body with a return statement",
-                                                             X.R()),
-                                                             LabelConstraint.LEQ,
-                                                             new NamedLabel("Lr", 
-                                                                            "return label of the method",
-                                                                            Lr),
-                                                                            A.labelEnv(),
-                                                                            mn.position())
+        lc.constrain(new NamedLabel("X.n",
+                                    "information that may be gained by the body terminating normally",
+                                    X.N()).
+                                    join(lc,
+                                         "X.r",
+                                         "information that may be gained by exiting the body with a return statement",
+                                         X.R()),
+                     LabelConstraint.LEQ,
+                     new NamedLabel("Lr", 
+                                    "return label of the method",
+                                    Lr),
+                    A.labelEnv(),
+                    mn.position(),
+                    new LabelConstraintMessage()
         {
             public String msg() { 
                 return "The non-exception termination of the " +
@@ -345,14 +346,15 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                         Report.report(4,
                                       ">>> X[C'] <= Lj (for exception " + tj + ")");
 
-                    lc.constrain(new LabelConstraint(pathNamedLabel,
-                                                     LabelConstraint.LEQ,
-                                                     new NamedLabel("decl_exc_"+tj.toClass().name(),
-                                                                    "declared upper bound on information that may be " +
-                                                                    "gained by observing the method throwing the exception " + tj.toClass().name(),
-                                                                    Lj),
-                                                                    A.labelEnv(),
-                                                                    mi.position())
+                    lc.constrain(pathNamedLabel,
+                                 LabelConstraint.LEQ,
+                                 new NamedLabel("decl_exc_"+tj.toClass().name(),
+                                                "declared upper bound on information that may be " +
+                                                "gained by observing the method throwing the exception " + tj.toClass().name(),
+                                                Lj),
+                                A.labelEnv(),
+                                mi.position(),
+                                new LabelConstraintMessage()
                     {
                         public String msg() { 
                             return "More information may be gained " + 

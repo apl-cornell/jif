@@ -1,15 +1,18 @@
 package jif.visit;
 
-import jif.ast.Jif;
 import jif.ast.JifClassDecl;
 import jif.ast.JifMethodDecl;
 import jif.ast.JifUtil;
 import jif.types.*;
+import jif.types.hierarchy.LabelEnv;
 import jif.types.label.Label;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.MethodInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
 import polyglot.util.*;
 
 /** 
@@ -159,7 +162,21 @@ public class LabelChecker implements Copy
         return n;
     }
 
-    public void constrain(LabelConstraint c) 
+    public void constrain(NamedLabel lhs, LabelConstraint.Kind kind, NamedLabel rhs, LabelEnv env,
+                   Position pos, LabelConstraintMessage msg) throws SemanticException {
+        constrain(lhs, kind, rhs, env, pos, true, msg);
+    }
+    public void constrain(NamedLabel lhs, LabelConstraint.Kind kind, NamedLabel rhs, LabelEnv env,
+                   Position pos, boolean report, LabelConstraintMessage msg) throws SemanticException {
+        LabelConstraint c = new LabelConstraint(lhs, kind, rhs, env, pos, msg, report);
+        if (msg != null) msg.setConstraint(c);
+        constrain(c);
+    }
+    public void constrain(NamedLabel lhs, LabelConstraint.Kind kind, NamedLabel rhs, LabelEnv env,
+                   Position pos) throws SemanticException {
+        constrain(lhs, kind, rhs, env, pos, false, null);
+    }
+    protected void constrain(LabelConstraint c) 
 	throws SemanticException 
     {        
 	this.solver.addConstraint(c);

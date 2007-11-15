@@ -57,14 +57,15 @@ public class JifTryExt extends JifStmtExt_c
             // be at least as high as the pc flow.
             if (ts.isLabeled(f.type().type())) {
                 Label declaredLabel = ts.labelOfType(f.type().type());
-                lc.constrain(new LabelConstraint(new NamedLabel("local_label", 
-                                                                "inferred label of " + f.name(), 
-                                                                Li), 
-                                                                LabelConstraint.EQUAL, 
-                                                                new NamedLabel("declared label of " + f.name(), declaredLabel), 
-                                                                A.labelEnv(),
-                                                                f.position(),
-                                                                false) {
+                lc.constrain(new NamedLabel("local_label", 
+                                            "inferred label of " + f.name(), 
+                                            Li), 
+                            LabelConstraint.EQUAL, 
+                            new NamedLabel("declared label of " + f.name(), declaredLabel), 
+                            A.labelEnv(),
+                            f.position(),
+                            false,
+                            new LabelConstraintMessage() {
                     public String msg() {
                         return "Declared label of catch block variable " + vi.name() + 
                         " is incompatible with label constraints.";
@@ -77,19 +78,19 @@ public class JifTryExt extends JifStmtExt_c
             Label pc_i = excLabel(Xs, cb.catchType(), lc, ts);
 
             final String catchTypeName = ts.unlabel(cb.catchType()).toClass().name();
-            lc.constrain(new LabelConstraint(
-                                             new NamedLabel("join(pc|where exc_i could be thrown)", 
-                                                            "the information that could be revealed " +
-                                                            "by the exception " + catchTypeName + " " +
-                                                            "being thrown", 
-                                                            pc_i), 
-                                                            LabelConstraint.LEQ,
-                                                            new NamedLabel("label_exc_i", 
-                                                                           "label of variable " + vi.name(), 
-                                                                           Li), 
-                                                                           A.labelEnv(),
-                                                                           f.position(),
-                                                                           false) {
+            lc.constrain(new NamedLabel("join(pc|where exc_i could be thrown)", 
+                                        "the information that could be revealed " +
+                                        "by the exception " + catchTypeName + " " +
+                                        "being thrown", 
+                                        pc_i), 
+                        LabelConstraint.LEQ,
+                        new NamedLabel("label_exc_i", 
+                                       "label of variable " + vi.name(), 
+                                       Li), 
+                       A.labelEnv(),
+                       f.position(),
+                       false,
+                       new LabelConstraintMessage() {
                 public String msg() {
                     return "Label of thrown exceptions of type " + catchTypeName + 
                     " not less restrictive than the label of " + vi.name();

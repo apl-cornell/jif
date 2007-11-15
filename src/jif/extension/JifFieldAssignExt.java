@@ -120,13 +120,14 @@ public class JifFieldAssignExt extends JifAssignExt
 
         }
 
-        lc.constrain(new LabelConstraint(new NamedLabel("rhs.nv", 
-                                                        "label of successful evaluation of right hand of assignment", 
-                                                        X.NV()), 
-                                                        LabelConstraint.LEQ, 
-                                                        new NamedLabel("label of field " + fi.name(), L),
-                                                        A.labelEnv(),
-                                                        fe.position()) {
+        lc.constrain(new NamedLabel("rhs.nv", 
+                                    "label of successful evaluation of right hand of assignment", 
+                                    X.NV()), 
+                    LabelConstraint.LEQ, 
+                    new NamedLabel("label of field " + fi.name(), L),
+                    A.labelEnv(),
+                    fe.position(),
+                    new LabelConstraintMessage() {
             public String msg() {
                 return "Label of right hand side not less " + 
                 "restrictive than the label for field " + 
@@ -152,13 +153,14 @@ public class JifFieldAssignExt extends JifAssignExt
             // considered as side-effects.
         }
         else {
-            lc.constrain(new LabelConstraint(new NamedLabel("Li", 
-                                                            "Lower bound for side-effects", 
-                                                            A.currentCodePCBound()), 
-                                                            LabelConstraint.LEQ, 
-                                                            new NamedLabel("label of field " + fi.name(), L),
-                                                            A.labelEnv(),
-                                                            fe.position()) {
+            lc.constrain(new NamedLabel("Li", 
+                                        "Lower bound for side-effects", 
+                                        A.currentCodePCBound()), 
+                        LabelConstraint.LEQ, 
+                        new NamedLabel("label of field " + fi.name(), L),
+                        A.labelEnv(),
+                        fe.position(),
+                        new LabelConstraintMessage() {
                 public String msg() {
                     return "Effect of assignment to field " + fi.name() + 
                     " is not bounded below by the PC bound.";

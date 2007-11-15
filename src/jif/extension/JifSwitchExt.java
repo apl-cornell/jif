@@ -60,12 +60,13 @@ public class JifSwitchExt extends JifStmtExt_c
         }
 
         A = (JifContext) A.pop();
-        lc.constrain(new LabelConstraint(new NamedLabel("label of normal termination of swtich statement", Xa.N()),
-                                         LabelConstraint.LEQ,
-                                         new NamedLabel("label of break target for the switch stmt", L),
-                                         A.labelEnv(),
-                                         ss.position(),
-                                         false) {
+        lc.constrain(new NamedLabel("label of normal termination of swtich statement", Xa.N()),
+                     LabelConstraint.LEQ,
+                     new NamedLabel("label of break target for the switch stmt", L),
+                     A.labelEnv(),
+                     ss.position(),
+                     false,
+                     new LabelConstraintMessage() {
             public String msg() { 
                 return "The information revealed by the normal " +
                 "termination of the switch statement " +

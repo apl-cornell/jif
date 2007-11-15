@@ -4,9 +4,7 @@ import java.util.*;
 
 import jif.extension.LabelTypeCheckUtil;
 import jif.types.hierarchy.LabelEnv;
-import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.*;
-
 import polyglot.util.Enum;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -42,40 +40,40 @@ public class LabelConstraint
      */
     public static final Kind LEQ = new Kind(" <= ");
 
-    private final Label lhs;
-    private final Kind kind;
-    private final Label rhs;
+    protected final Label lhs;
+    protected final Kind kind;
+    protected final Label rhs;
     
     /**
      * The environment under which this constraint needs to be satisfied.
      */
-    private final LabelEnv env;
+    protected final LabelEnv env;
 
     /**
      * Names for the LHS
      */
-    private  NamedLabel namedLHS;
+    protected final NamedLabel namedLHS;
     
     /**
      * Names for the RHS
      */
-    private  NamedLabel namedRHS;
+    protected final NamedLabel namedRHS;
 
-    private final Position pos;
+    protected final Position pos;
     
     /**
      * Do we want to report a violation of this constraint, or report the
      * error for a different constraint?
      */
-    private final boolean report;
+    protected final boolean report;
+    
+    /**
+     * Error messages
+     */
+    protected final LabelConstraintMessage messages;
 
     public LabelConstraint(NamedLabel lhs, Kind kind, NamedLabel rhs, LabelEnv env,
-               Position pos) {
-        this(lhs, kind, rhs, env, pos, true);
-    }
-
-   public LabelConstraint(NamedLabel lhs, Kind kind, NamedLabel rhs, LabelEnv env,
-              Position pos, boolean report) {
+              Position pos, LabelConstraintMessage msg, boolean report) {
         this.lhs = lhs.label;
         this.kind = kind;
         this.rhs = rhs.label;
@@ -83,6 +81,7 @@ public class LabelConstraint
         this.pos = pos;
         this.namedLHS = lhs;
         this.namedRHS = rhs;
+        this.messages = msg;
         this.report = report;
     }
     
@@ -129,7 +128,7 @@ public class LabelConstraint
      * for <code>NamedLabel</code>s.
      */
     public String msg() {
-        return null;
+        return messages.msg();
     }
     
     /**
@@ -138,7 +137,7 @@ public class LabelConstraint
      * names of the labels, if <code>NamedLabel</code>s are used.
      */
     public String detailMsg() {
-        return msg();
+        return messages.detailMsg();
     }
 
     /**
@@ -147,7 +146,7 @@ public class LabelConstraint
      * represents, and to names of labels, if <code>NamedLabel</code>s are used.
      */
     public String technicalMsg() {
-        return msg();
+        return messages.technicalMsg();
     }
         
     public String toString() {

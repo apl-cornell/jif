@@ -3,11 +3,15 @@ package jif.extension;
 import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.label.*;
+import jif.types.label.Label;
+import jif.types.label.VarLabel;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.ArrayInit;
+import polyglot.ast.Expr;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 
@@ -64,17 +68,18 @@ public class JifLocalDeclExt extends JifStmtExt_c
             if (ts.isLabeled(t)) {
                 Label declaredLabel = ts.labelOfType(t);
                 final JifLocalInstance fli = li;
-                lc.constrain(new LabelConstraint(new NamedLabel("local_label", 
-                                                                "inferred label of local var " + li.name(), 
-                                                                L), 
-                                                                LabelConstraint.EQUAL, 
-                                                                new NamedLabel("PC", 
-                                                                               "Information revealed by program counter being at this program point", 
-                                                                               A.pc()).
-                                                                               join(lc, "declared label of local var " + li.name(), declaredLabel), 
-                                                                               A.labelEnv(),
-                                                                               decl.position(), 
-                                                                               false) {
+                lc.constrain(new NamedLabel("local_label", 
+                                            "inferred label of local var " + li.name(), 
+                                            L), 
+                            LabelConstraint.EQUAL, 
+                            new NamedLabel("PC", 
+                                           "Information revealed by program counter being at this program point", 
+                                           A.pc()).
+                                           join(lc, "declared label of local var " + li.name(), declaredLabel), 
+                           A.labelEnv(),
+                           decl.position(), 
+                           false,
+                           new LabelConstraintMessage() {
                     public String msg() {
                         return "Declared label of local variable " + fli.name() + 
                         " is incompatible with label constraints.";
@@ -117,13 +122,14 @@ public class JifLocalDeclExt extends JifStmtExt_c
             PathMap Xe = getPathMap(init);
 
             final JifLocalInstance fli = li;
-            lc.constrain(new LabelConstraint(new NamedLabel("init.nv", 
-                                                            "label of successful evaluation of initializing expression", 
-                                                            Xe.NV()), 
-                                                            LabelConstraint.LEQ, 
-                                                            new NamedLabel("label of local variable " + li.name(), L),
-                                                            A.labelEnv(),
-                                                            init.position()) {
+            lc.constrain(new NamedLabel("init.nv", 
+                                        "label of successful evaluation of initializing expression", 
+                                        Xe.NV()), 
+                        LabelConstraint.LEQ, 
+                        new NamedLabel("label of local variable " + li.name(), L),
+                        A.labelEnv(),
+                        init.position(),
+                        new LabelConstraintMessage() {
                 public String msg() {
                     return "Label of local variable initializer not less " + 
                     "restrictive than the label for local variable " + 

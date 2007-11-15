@@ -110,17 +110,18 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         NamedLabel namedLa = new NamedLabel("La",
                                             "Label of the array base type",
                                             La);
-        lc.constrain(new LabelConstraint(new NamedLabel("rhs.nv", 
-                                                        "label of successful evaluation of right hand of assignment",
-                                                        Xrhs.NV()).
-                                                        join(lc, 
-                                                             "lhs.n", 
-                                                             "label of successful evaluation of array access " + aie,
-                                                             X.N()), 
-                                                             LabelConstraint.LEQ, 
-                                                             namedLa,
-                                                             A.labelEnv(),
-                                                             aie.position()) {
+        lc.constrain(new NamedLabel("rhs.nv", 
+                                    "label of successful evaluation of right hand of assignment",
+                                    Xrhs.NV()).
+                                    join(lc, 
+                                         "lhs.n", 
+                                         "label of successful evaluation of array access " + aie,
+                                         X.N()), 
+                     LabelConstraint.LEQ, 
+                     namedLa,
+                     A.labelEnv(),
+                     aie.position(),
+                     new LabelConstraintMessage() {
             public String msg() {
                 return "Label of succesful evaluation of array " +
                 "access and right hand side of the " +
@@ -144,13 +145,14 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         }
         );
 
-        lc.constrain(new LabelConstraint(new NamedLabel("Li", 
-                                                        "Lower bound for side-effects", 
-                                                        A.currentCodePCBound()), 
-                                                        LabelConstraint.LEQ, 
-                                                        namedLa,
-                                                        A.labelEnv(),
-                                                        aie.position()) {
+        lc.constrain(new NamedLabel("Li", 
+                                    "Lower bound for side-effects", 
+                                    A.currentCodePCBound()), 
+                    LabelConstraint.LEQ, 
+                    namedLa,
+                    A.labelEnv(),
+                    aie.position(),
+                    new LabelConstraintMessage() {
             public String msg() {
                 return "Effect of assignment to array " + array + 
                 " is not bounded below by the PC bound.";

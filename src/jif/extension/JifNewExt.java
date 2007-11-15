@@ -3,7 +3,6 @@ package jif.extension;
 import java.util.ArrayList;
 import java.util.List;
 
-import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.types.label.Label;
@@ -45,15 +44,15 @@ public class JifNewExt extends JifExprExt
         if (ts.isLabeled(noe.type()) ) {
             // error messages for equality constraints aren't displayed, so no
             // need to define error messages.  
-            lc.constrain(new LabelConstraint(new NamedLabel("new_label",
-                                                            "label of the reference to the newly created " + ct.name(), 
-                                                            newLabel), 
-                                                            LabelConstraint.EQUAL, 
-                                                            new NamedLabel("declared_label", 
-                                                                           "declared label of the newly created " + ct.name(), 
-                                                                           ts.labelOfType(noe.type())), 
-                                                                           A.labelEnv(),
-                                                                           noe.position()));
+            lc.constrain(new NamedLabel("new_label",
+                                        "label of the reference to the newly created " + ct.name(), 
+                                        newLabel), 
+                        LabelConstraint.EQUAL, 
+                        new NamedLabel("declared_label", 
+                                       "declared label of the newly created " + ct.name(), 
+                                       ts.labelOfType(noe.type())), 
+                       A.labelEnv(),
+                       noe.position());
         }
         CallHelper helper = new CallHelper(newLabel, ct, 
                                            (JifProcedureInstance)noe.constructorInstance(), 

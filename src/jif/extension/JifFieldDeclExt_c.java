@@ -47,14 +47,14 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 
         // error messages for equality constraints aren't displayed, so no
         // need top define error messages.	
-        lc.constrain(new LabelConstraint(new NamedLabel("field_label", 
-                                                        "inferred label of field " + fi.name(), 
-                                                        L), 
-                                                        LabelConstraint.EQUAL, 
-                                                        new NamedLabel("declared label of field " + fi.name(), 
-                                                                       declaredLabel),
-                                                                       A.labelEnv(),
-                                                                       decl.position()));
+        lc.constrain(new NamedLabel("field_label", 
+                                    "inferred label of field " + fi.name(), 
+                                    L), 
+                        LabelConstraint.EQUAL, 
+                        new NamedLabel("declared label of field " + fi.name(), 
+                                       declaredLabel),
+                       A.labelEnv(),
+                       decl.position());
 
 
     }
@@ -120,16 +120,16 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 
         // error messages for equality constraints aren't displayed, so no
         // need top define error messages.  
-        lc.constrain(new LabelConstraint(new NamedLabel("field_label", 
-                                                        "inferred label of field " + fi.name(), 
-                                                        L), 
-                                                        LabelConstraint.EQUAL, 
-                                                        new NamedLabel("PC", 
-                                                                       "Information revealed by program counter being at this program point", 
-                                                                       A.pc()).
-                                                                       join(lc, "declared label of field " + fi.name(), declaredLabel), 
-                                                                       A.labelEnv(),
-                                                                       decl.position()));
+        lc.constrain(new NamedLabel("field_label", 
+                                    "inferred label of field " + fi.name(), 
+                                    L), 
+                    LabelConstraint.EQUAL, 
+                    new NamedLabel("PC", 
+                                   "Information revealed by program counter being at this program point", 
+                                   A.pc()).
+                                   join(lc, "declared label of field " + fi.name(), declaredLabel), 
+                   A.labelEnv(),
+                   decl.position());
 
         PathMap Xd;
 
@@ -166,13 +166,14 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             }
 
             PathMap Xe = getPathMap(init);
-            lc.constrain(new LabelConstraint(new NamedLabel("init.nv", 
-                                                            "label of successful evaluation of initializing expression", 
-                                                            Xe.NV()), 
-                                                            LabelConstraint.LEQ, 
-                                                            new NamedLabel("label of field " + fi.name(), L),
-                                                            A.labelEnv(),
-                                                            init.position()) {
+            lc.constrain(new NamedLabel("init.nv", 
+                                        "label of successful evaluation of initializing expression", 
+                                        Xe.NV()), 
+                        LabelConstraint.LEQ, 
+                        new NamedLabel("label of field " + fi.name(), L),
+                        A.labelEnv(),
+                        init.position(),
+                        new LabelConstraintMessage() {
                 public String msg() {
                     return "Label of field initializer not less " + 
                     "restrictive than the label for field " + 

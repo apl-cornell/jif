@@ -45,20 +45,21 @@ public class JifDoExt extends JifStmtExt_c
         Expr e = (Expr) lc.context(A).labelCheck(ds.cond());
         PathMap Xe = getPathMap(e);
 
-        lc.constrain(new LabelConstraint(new NamedLabel("do_while_guard.NV",
-                                                        "label of evaluation of the loop guard", 
-                                                        Xe.NV()).
-                                                        join(lc,
-                                                             "loop_entry_pc",
-                                                             "label of the program counter just before the loop is executed",
-                                                             loopEntryPC), 
-                                                             LabelConstraint.LEQ, 
-                                                             new NamedLabel("loop_pc",
-                                                                            "label of the program counter at the top of the loop",
-                                                                            L1),
-                                                                            lc.context().labelEnv(),
-                                                                            ds.position(), 
-                                                                            false) {
+        lc.constrain(new NamedLabel("do_while_guard.NV",
+                                    "label of evaluation of the loop guard", 
+                                    Xe.NV()).
+                                    join(lc,
+                                         "loop_entry_pc",
+                                         "label of the program counter just before the loop is executed",
+                                         loopEntryPC), 
+                     LabelConstraint.LEQ, 
+                     new NamedLabel("loop_pc",
+                                    "label of the program counter at the top of the loop",
+                                    L1),
+                    lc.context().labelEnv(),
+                    ds.position(), 
+                    false,
+                    new LabelConstraintMessage() {
             public String msg() {
                 return "The information revealed by the normal " +
                 "termination of the body of the do-while loop " +

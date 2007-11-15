@@ -81,13 +81,14 @@ public class JifArrayInitExt extends JifExprExt
             if (L != null) {
                 // check that the element can be assigned to the base type.
                 PathMap Xe = getPathMap(e);
-                lc.constrain(new LabelConstraint(new NamedLabel("array_init_elem.nv", 
-                                                                "label of successful evaluation of array element " + e, 
-                                                                Xe.NV()), 
-                                                                LabelConstraint.LEQ, 
-                                                                new NamedLabel("label of array base type" , L),
-                                                                lc.context().labelEnv(),
-                                                                e.position()) {
+                lc.constrain(new NamedLabel("array_init_elem.nv", 
+                                            "label of successful evaluation of array element " + e, 
+                                            Xe.NV()), 
+                            LabelConstraint.LEQ, 
+                            new NamedLabel("label of array base type" , L),
+                            lc.context().labelEnv(),
+                            e.position(),
+                            new LabelConstraintMessage() {
                     public String msg() {
                         return "Label of the array element not less " + 
                         "restrictive than the label of the array base type.";

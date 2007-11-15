@@ -102,20 +102,21 @@ public class JifForExt extends JifStmtExt_c
             Xbody = Xbody.N(notTaken).join(Xs);
         }
 
-        lc.constrain(new LabelConstraint(new NamedLabel("for_body.N",
-                                                        "label of normal termination of the loop body", 
-                                                        Xbody.N()).
-                                                        join(lc,
-                                                             "loop_entry_pc",
-                                                             "label of the program counter just before the loop is executed",
-                                                             loopEntryPC), 
-                                                             LabelConstraint.LEQ, 
-                                                             new NamedLabel("loop_pc",
-                                                                            "label of the program counter at the top of the loop",
-                                                                            L1),
-                                                                            lc.context().labelEnv(),
-                                                                            fs.position(), 
-                                                                            false) {
+        lc.constrain(new NamedLabel("for_body.N",
+                                    "label of normal termination of the loop body", 
+                                    Xbody.N()).
+                                    join(lc,
+                                         "loop_entry_pc",
+                                         "label of the program counter just before the loop is executed",
+                                         loopEntryPC), 
+                     LabelConstraint.LEQ, 
+                     new NamedLabel("loop_pc",
+                                    "label of the program counter at the top of the loop",
+                                    L1),
+                    lc.context().labelEnv(),
+                    fs.position(), 
+                    false,
+                    new LabelConstraintMessage() {
             public String msg() {
                 return "The information revealed by the normal " +
                 "termination of the body of the for loop " +

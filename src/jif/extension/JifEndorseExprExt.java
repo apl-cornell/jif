@@ -4,10 +4,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import jif.translate.ToJavaExt;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.LabelConstraint;
-import jif.types.NamedLabel;
+import jif.types.*;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
@@ -44,12 +41,13 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                             jts.topConfPolicy(pos),
                                             jts.bottomIntegPolicy(pos));
 
-        lc.constrain(new LabelConstraint(new NamedLabel(isAutoEndorse?"pcBound":"endorse_from", labelFrom).
+        lc.constrain(new NamedLabel(isAutoEndorse?"pcBound":"endorse_from", labelFrom).
                                          meet(lc, "bottom_integ", botIntegLabel), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel(isAutoEndorse?"autoendorse_to":"endorse_to", labelTo),
-                                         A.labelEnv(),       
-                                         pos) {
+                     LabelConstraint.LEQ, 
+                     new NamedLabel(isAutoEndorse?"autoendorse_to":"endorse_to", labelTo),
+                     A.labelEnv(),       
+                     pos,
+                     new LabelConstraintMessage() {
             public String msg() {
                 if (isAutoEndorse) return "Auto-endorse cannot downgrade confidentiality.";
                 return "Endorse " + exprOrStmt + "s cannot downgrade confidentiality.";
@@ -81,12 +79,13 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
     throws SemanticException {
         Label authLabel = A.authLabelInteg();
         final String exprOrStmt = (isExpr?"expression":"statement");
-        lc.constrain(new LabelConstraint(new NamedLabel(isAutoEndorse?"pcBound":"endorse_from", labelFrom).
-                                         meet(lc, "auth_label", authLabel),
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel(isAutoEndorse?"autoendorse_to":"endorse_to", labelTo),
-                                         A.labelEnv(),
-                                         pos) {
+        lc.constrain(new NamedLabel(isAutoEndorse?"pcBound":"endorse_from", labelFrom).
+                                 meet(lc, "auth_label", authLabel),
+                     LabelConstraint.LEQ, 
+                     new NamedLabel(isAutoEndorse?"autoendorse_to":"endorse_to", labelTo),
+                     A.labelEnv(),
+                     pos,
+                     new LabelConstraintMessage() {
             public String msg() {
                 return "The method does not have sufficient " +
                 "authority to " + (isAutoEndorse?"auto-endorse this method":"endorse this " + exprOrStmt) + ".";
@@ -156,12 +155,13 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                                                     jts.topConfPolicy(pos),
                                                     jts.bottomIntegPolicy(pos)));        
 
-        lc.constrain(new LabelConstraint(new NamedLabel("endorse_from_label", labelFrom).
+        lc.constrain(new NamedLabel("endorse_from_label", labelFrom).
                                          meet(lc, "pc_integrity", pcInteg), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("endorse_to_label", labelTo),
-                                         A.labelEnv(),
-                                         pos) {
+                     LabelConstraint.LEQ, 
+                     new NamedLabel("endorse_to_label", labelTo),
+                     A.labelEnv(),
+                     pos,
+                     new LabelConstraintMessage() {
             public String msg() {
                 return "Endorsement not robust: a removed writer " +
                 "may influence the decision to " +

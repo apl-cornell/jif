@@ -4,10 +4,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import jif.translate.ToJavaExt;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.LabelConstraint;
-import jif.types.NamedLabel;
+import jif.types.*;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
@@ -44,12 +41,13 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                                           jts.topConfPolicy(pos),
                                           jts.bottomIntegPolicy(pos));
        
-       lc.constrain(new LabelConstraint(new NamedLabel("declass_from", labelFrom), 
+       lc.constrain(new NamedLabel("declass_from", labelFrom), 
                                         LabelConstraint.LEQ, 
                                         new NamedLabel("declass_to", labelTo).
                                            join(lc, "top_confidentiality", topConfLabel),
                                         A.labelEnv(),       
-                                        pos) {
+                                        pos,
+                                        new LabelConstraintMessage() {
                 public String msg() {
                     return "Declassify " + exprOrStmt + "s cannot downgrade integrity.";
                 }
@@ -77,12 +75,13 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
       final String exprOrStmt = (isExpr?"expression":"statement");
 
       Label authLabel = A.authLabel();    
-  lc.constrain(new LabelConstraint(new NamedLabel("declass_from", labelFrom), 
-                                   LabelConstraint.LEQ, 
-                                   new NamedLabel("declass_to", labelTo).
-                                             join(lc, "auth_label", authLabel),
-                                   A.labelEnv(),
-                                   pos) {
+  lc.constrain(new NamedLabel("declass_from", labelFrom), 
+               LabelConstraint.LEQ, 
+               new NamedLabel("declass_to", labelTo).
+                         join(lc, "auth_label", authLabel),
+               A.labelEnv(),
+               pos,
+                    new LabelConstraintMessage() {
                public String msg() {
                    return "The method does not have sufficient " +
                           "authority to declassify this " + exprOrStmt + ".";
@@ -140,12 +139,13 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
         JifTypeSystem jts = lc.typeSystem();
         Label pcInteg = jts.writersToReadersLabel(pos, A.pc());
 
-        lc.constrain(new LabelConstraint(new NamedLabel("declass_from", labelFrom), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("declass_to", labelTo).
-                                                   join(lc, "pc_integrity", pcInteg),
-                                         A.labelEnv(),
-                                         pos) {
+        lc.constrain(new NamedLabel("declass_from", labelFrom), 
+                     LabelConstraint.LEQ, 
+                     new NamedLabel("declass_to", labelTo).
+                               join(lc, "pc_integrity", pcInteg),
+                     A.labelEnv(),
+                     pos,
+                    new LabelConstraintMessage() {
                      public String msg() {
                          return "Declassification not robust: a new reader " +
                                         "may influence the decision to " +
@@ -162,12 +162,13 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
          );
 
         Label fromInteg = jts.writersToReadersLabel(pos, labelFrom);
-        lc.constrain(new LabelConstraint(new NamedLabel("declass_from_label", labelFrom), 
-                                         LabelConstraint.LEQ, 
-                                         new NamedLabel("declass_to_label", labelTo).
-                                                   join(lc, "from_label_integrity", fromInteg),
-                                         A.labelEnv(),
-                                         pos) {
+        lc.constrain(new NamedLabel("declass_from_label", labelFrom), 
+                     LabelConstraint.LEQ, 
+                     new NamedLabel("declass_to_label", labelTo).
+                               join(lc, "from_label_integrity", fromInteg),
+                     A.labelEnv(),
+                     pos,
+                     new LabelConstraintMessage() {
                      public String msg() {
                          return "Declassification not robust: a new reader " +
                                         "may influence the data to be " +

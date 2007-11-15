@@ -64,15 +64,16 @@ public class JifReturnExt extends JifStmtExt_c
                 throw new InternalCompilerError("Unexpected return type: " + retType);
             }
 
-            lc.constrain(new LabelConstraint(new NamedLabel("rv",
-                                                            "the label of the value returned",
-                                                            Xe.NV()),
-                                                            LabelConstraint.LEQ,
-                                                            new NamedLabel("Lrv", 
-                                                                           "return value label of the method",
-                                                                           Lrv),
-                                                                           A.labelEnv(),
-                                                                           rs.position())
+            lc.constrain(new NamedLabel("rv",
+                                        "the label of the value returned",
+                                        Xe.NV()),
+                                        LabelConstraint.LEQ,
+                                        new NamedLabel("Lrv", 
+                                                       "return value label of the method",
+                                                       Lrv),
+                       A.labelEnv(),
+                       rs.position(),
+                       new LabelConstraintMessage()
             {
                 public String msg() { 
                     return "This method may return a value with " +

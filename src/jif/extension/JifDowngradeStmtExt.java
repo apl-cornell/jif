@@ -78,12 +78,13 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
 
     protected void checkPCconstraint(LabelChecker lc, JifContext A, Label pc, Label downgradeFrom, boolean boundSpecified) throws SemanticException {
         final DowngradeStmt ds = (DowngradeStmt)this.node();
-        lc.constrain(new LabelConstraint(new NamedLabel("pc", pc), 
-                                         boundSpecified?LabelConstraint.LEQ:LabelConstraint.EQUAL, 
-                                                 new NamedLabel("downgrade_bound", downgradeFrom),
-                                                 A.labelEnv(),
-                                                 ds.position(),
-                                                 boundSpecified) /* report this constraint if the bound was specified*/ {
+        lc.constrain(new NamedLabel("pc", pc), 
+                     boundSpecified?LabelConstraint.LEQ:LabelConstraint.EQUAL, 
+                     new NamedLabel("downgrade_bound", downgradeFrom),
+                     A.labelEnv(),
+                     ds.position(),
+                     boundSpecified, /* report this constraint if the bound was specified*/ 
+                     new LabelConstraintMessage() {            
             public String msg() {
                 return "The label of the program counter at this " +
                 "program point is " + 
