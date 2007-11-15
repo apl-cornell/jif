@@ -15,9 +15,10 @@ public class LabelCheckGoal extends SourceFileGoal {
 
     public Pass createPass(polyglot.frontend.ExtensionInfo extInfo) {
         ExtensionInfo jifext = (ExtensionInfo)extInfo;
-        final JifTypeSystem ts = (JifTypeSystem) jifext.typeSystem();
-        final JifNodeFactory nf = (JifNodeFactory) jifext.nodeFactory();
-        return new LabelCheckPass(this, this.job(), 
-                                 new LabelChecker(this.job(), ts, nf, !jifext.getJifOptions().solveGlobally, !jifext.getJifOptions().solveGlobally));
+        LabelChecker lc = jifext.createLabelChecker(this.job(), 
+                                !jifext.getJifOptions().solveGlobally, 
+                                !jifext.getJifOptions().solveGlobally, 
+                                true);
+        return new LabelCheckPass(this, this.job(), lc);
     }
 }

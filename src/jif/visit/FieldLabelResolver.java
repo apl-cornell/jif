@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import jif.ExtensionInfo;
 import jif.ast.JifUtil;
 import jif.extension.JifFieldDeclExt;
 import jif.types.*;
@@ -56,7 +57,8 @@ public class FieldLabelResolver extends ContextVisitor
     private void labelCheckClassBody(ClassBody d) throws SemanticException {
         JifClassType ct = (JifClassType) context().currentClassScope();
 
-        LabelChecker lc = new LabelChecker(job, ts, nodeFactory(), false, false, false);
+        
+        LabelChecker lc = ((ExtensionInfo)ct.typeSystem().extensionInfo()).createLabelChecker(job, false, false, false); 
 
         if (lc == null) {
             throw new InternalCompilerError("Could not label check " +

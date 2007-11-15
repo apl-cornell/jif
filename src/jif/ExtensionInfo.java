@@ -9,12 +9,16 @@ import jif.ast.JifNodeFactory;
 import jif.ast.JifNodeFactory_c;
 import jif.types.JifTypeSystem;
 import jif.types.JifTypeSystem_c;
+import jif.visit.LabelChecker;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
 import polyglot.frontend.Compiler;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
-import polyglot.types.*;
+import polyglot.types.LoadedClassResolver;
+import polyglot.types.SemanticException;
+import polyglot.types.SourceClassResolver;
+import polyglot.types.TypeSystem;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 
@@ -120,6 +124,10 @@ public class ExtensionInfo extends JLExtensionInfo
         return new JifScheduler(this, jlext);
     }
 
+    public LabelChecker createLabelChecker(Job job, boolean solvePerClassBody, boolean solvePerMethod, boolean doLabelSubst) {
+        return new LabelChecker(job, typeSystem(), nodeFactory(), solvePerClassBody, solvePerMethod, doLabelSubst);
+    }
+    
     public Goal getCompileGoal(Job job) {
         JifScheduler jifScheduler = (JifScheduler)scheduler();
         return jifScheduler.JifToJavaRewritten(job);

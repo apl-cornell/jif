@@ -61,10 +61,6 @@ public class LabelChecker implements Copy
      */
     private Solver solver;
 
-    public LabelChecker(Job job, TypeSystem ts, NodeFactory nf, boolean solvePerClassBody, boolean solvePerMethod) {
-        this(job, ts, nf, solvePerClassBody, solvePerMethod, true);
-    }
-
     public LabelChecker(Job job, TypeSystem ts, NodeFactory nf, boolean solvePerClassBody, boolean solvePerMethod, boolean doLabelSubst) {
         this.job = job;
         this.ts = (JifTypeSystem) ts;
