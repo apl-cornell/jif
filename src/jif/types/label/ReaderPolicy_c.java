@@ -71,6 +71,12 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
         if (this.isBottomConfidentiality() || p.isTopConfidentiality())
             return true;
 
+        // if this policy is o:_, then o allows
+        // all principals to read info, and thus does
+        // not restrict who may read
+        if (reader.isBottomPrincipal()) {
+            return true;
+        }
         if (p instanceof ReaderPolicy) {
             ReaderPolicy that = (ReaderPolicy) p;            
             // this = { o  : .. ri .. }
