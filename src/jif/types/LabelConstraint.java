@@ -25,7 +25,7 @@ public class LabelConstraint
 {
     /** Kinds of constraint, either equality or inequality. */
     public static class Kind extends Enum {
-        private Kind(String name) { super(name); } 
+        protected Kind(String name) { super(name); } 
     }
 
     /**

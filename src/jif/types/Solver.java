@@ -19,15 +19,15 @@ import polyglot.util.*;
  * propagating upper bounds backwards.
  */
 public abstract class Solver {
-    private EquationQueue Q; // Queue of active equations to work on
+    protected EquationQueue Q; // Queue of active equations to work on
 
-    private LinkedList scc; // List of strongly connected components that
+    protected LinkedList scc; // List of strongly connected components that
                             // are left to work on
     
-    private Set currentSCC; // Equations in the strongly connected component that we are currently working on
+    protected Set currentSCC; // Equations in the strongly connected component that we are currently working on
 
     // connected component that is being worked on
-    private Collection equations; // Set of all equations
+    protected Collection equations; // Set of all equations
 
     /**
      * Map from variables to (Set of) equations that may be invalidated by
@@ -64,7 +64,7 @@ public abstract class Solver {
      * Set of VarLabels that had their initial value fixed when the constraint
      * was added.
      */
-    private Set fixedValueVars;
+    protected Set fixedValueVars;
 
     protected static final int STATUS_NOT_SOLVED = 0;
 
@@ -74,9 +74,9 @@ public abstract class Solver {
 
     protected static final int STATUS_NO_SOLUTION = 3;
 
-    private int status; // true if the current system has been solved
+    protected int status; // status of the current system has been solved
 
-    private VarMap bounds; // Current bounds on label variables
+    protected VarMap bounds; // Current bounds on label variables
 
     protected JifTypeSystem ts;
     
@@ -86,13 +86,13 @@ public abstract class Solver {
      * constraint will be thrown immediately, otherwise the constraint
      * will be added to this set, and thrown when solve() is called.
      */
-    private Set staticFailedConstraints;
-    private static final boolean THROW_STATIC_FAILED_CONSTRAINTS = false;
-    private final Compiler compiler;
+    protected Set staticFailedConstraints;
+    protected static final boolean THROW_STATIC_FAILED_CONSTRAINTS = false;
+    protected final Compiler compiler;
 
-    private Map traces; //Map from variables to their histories of refining
+    protected Map traces; //Map from variables to their histories of refining
 
-    private static Collection topics = CollectionUtil.list(Topics.jif, Topics.solver);
+    protected static Collection topics = CollectionUtil.list(Topics.jif, Topics.solver);
 
     /**
      * This boolean is used to turn on or off whether the strongly connected
@@ -102,13 +102,19 @@ public abstract class Solver {
      * components, which are then sorted in topological order. If false, then
      * constraints are solved in the order they are added to the solver
      */
-    private static final boolean useSCC = false;
+    protected static final boolean useSCC = false;
 
 
     /**
      * The name of the solver, for debugging purposes.
      */
     private final String solverName;
+
+    /**
+     * Number of solvers instantiated, for debugging purposes
+     */
+    protected static int solverCounter;
+        
     /**
      * Constructor
      */
@@ -130,7 +136,6 @@ public abstract class Solver {
         this.fixedValueVars = new HashSet();
     }
     
-    private static int solverCounter;
 
     /**
      * Constructor
@@ -454,12 +459,16 @@ public abstract class Solver {
             }
         }
     }
+    
+    public String solverName() {
+        return this.solverName;
+    }
 
     /**
      * Counter of the number of constraints added to the system. For debugging
      * purposes.
      */
-    static private int constraint_counter = 0;
+    static protected int constraint_counter = 0;
 
     /**
      * Constraint number at which to stop the compiler, for debugging purposes.
@@ -515,7 +524,14 @@ public abstract class Solver {
             // constraint can never be satisfied.
             throw new SemanticException(errorMsg(c), c.position());
         }
-
+        processConstraint(c);
+        addConstraintEquations(c);
+    }
+    
+    /**
+     * Perform any special processing for the label constraint
+     */
+    protected void processConstraint(LabelConstraint c) throws SemanticException {
         if (c.lhs() instanceof VarLabel && c.kind() == LabelConstraint.EQUAL) {
             // this is an equality constraint on a variable. Let's jump start the 
             // solving by setting it immediately
@@ -524,8 +540,16 @@ public abstract class Solver {
             addTrace(v, (Equation)c.getEquations().iterator().next(), initialBound);
             setBound(v, initialBound, c);
             fixedValueVars.add(v);
-        }
-
+        }        
+    }
+    
+    /**
+     * Go through each equation in the constraint, add the equation
+     * if needed, and register dependencies for the equation.
+     * @param c
+     * @throws SemanticException
+     */
+    protected void addConstraintEquations(LabelConstraint c) throws SemanticException {
         Collection eqns = c.getEquations();
         Equation eqn = null;
         for (Iterator i = eqns.iterator(); i.hasNext();) {
@@ -643,7 +667,7 @@ public abstract class Solver {
      * eqnVarDependencies), and then finds the equations that depend on those
      * variables (using the map varEqnDependencies)
      */
-    private Set eqnEqnDependencies(Equation eqn) {
+    protected Set eqnEqnDependencies(Equation eqn) {
         Set vars = (Set)eqnVarDependencies.get(eqn);
 
         if (vars == null || vars.isEmpty()) {
@@ -667,7 +691,7 @@ public abstract class Solver {
      * eqnVarReverseDependencies), and then finding the equations
      * that may alter those variables (using the map varEqnReverseDependencies)
      */
-    private Set eqnEqnReverseDependencies(Equation eqn) {
+    protected Set eqnEqnReverseDependencies(Equation eqn) {
         Set vars = (Set)eqnVarReverseDependencies.get(eqn);
 
         if (vars == null || vars.isEmpty()) {
@@ -1012,9 +1036,9 @@ public abstract class Solver {
         ret.addFirst(by_scc);
         return ret;
     }
-    private class Frame {
-        private Equation eqn;
-        private Iterator edges;
+    protected class Frame {
+        Equation eqn;
+        Iterator edges;
         Frame(Equation e, boolean forward) {
             eqn = e;
             if (forward) {
@@ -1030,9 +1054,9 @@ public abstract class Solver {
      * A queue for equations. This class ensures that an equation
      * is in the queue at most once.
      */
-    private static class EquationQueue {
-        private final LinkedList list;
-        private final Set elements;
+    protected static class EquationQueue {
+        final LinkedList list;
+        final Set elements;
         public EquationQueue() {
             list = new LinkedList();
             elements = new HashSet();
