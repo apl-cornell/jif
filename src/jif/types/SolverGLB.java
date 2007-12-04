@@ -12,7 +12,7 @@ import polyglot.util.InternalCompilerError;
  * propogating lower bounds forwards.
  *  
  */
-public class SolverGLB extends Solver {
+public class SolverGLB extends AbstractSolver {
     /**
      * Constructor
      */
@@ -307,7 +307,7 @@ public class SolverGLB extends Solver {
         if (shouldReport(2)) {
             report(2, "===== Starting recursive search =====");
         }
-        Solver js = new SolverGLB(this);
+        SolverGLB js = new SolverGLB(this);
 
         // make sure this equation is satisfied before continuing.
         js.addEquationToQueueHead(eqn);

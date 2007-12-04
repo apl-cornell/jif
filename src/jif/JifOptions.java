@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import jif.types.Solver;
 import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.main.UsageError;
@@ -70,14 +69,7 @@ public class JifOptions extends Options {
      *         processes two commands, then the return value should be index+2
      */
     protected int parseCommand(String args[], int index, Set source) throws UsageError {
-        if (args[index].equals("-stop_constraint")) {
-            index++;
-            Solver.stop_constraint = Integer.parseInt(args[index]);
-            System.err.println("Will trap on constraint "+
-                               Solver.stop_constraint);
-            index++;
-        }
-        else if (args[index].equals("-globalsolve")) {
+        if (args[index].equals("-globalsolve")) {
             index++;
             System.err.println("Will use a single solver to infer labels");
             solveGlobally = true;

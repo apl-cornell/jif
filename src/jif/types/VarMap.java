@@ -155,28 +155,31 @@ public class VarMap {
 	return t;
     }	
     
-    public void print() {
-        if (Solver.shouldReport(2)) {
-            Solver.report(2, "======== VAR MAP ========");
-            for (Iterator i = bounds.entrySet().iterator(); i.hasNext(); ){
-                Map.Entry e = (Map.Entry) i.next();
-                VarLabel var = (VarLabel) e.getKey();
-                Label bound = (Label) e.getValue();
-                String s = var.componentString() + " = " + bound.toString();
-                if (var.description() != null) {
-                    s += "    \t" + var.description();
-                }
-                Solver.report(2, s);
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("======== VAR MAP ========");
+        sb.append('\n');
+        for (Iterator i = bounds.entrySet().iterator(); i.hasNext(); ){
+            Map.Entry e = (Map.Entry) i.next();
+            VarLabel var = (VarLabel) e.getKey();
+            Label bound = (Label) e.getValue();
+            String s = var.componentString() + " = " + bound.toString();
+            if (var.description() != null) {
+                s += "    \t" + var.description();
             }
-            Solver.report(2, "Variables not in this map will receive " +
-                             "default label of " + defaultBound);
-            Solver.report(2, "=========================");
+            sb.append(s);
+            sb.append('\n');
         }
+        sb.append("Variables not in this map will receive " +
+                  "default label of " + defaultBound);
+        sb.append('\n');
+        sb.append("=========================\n");
+        return sb.toString();
     }
 
     public void dump(CodeWriter w) {
-	w.write("======== VAR MAP ========");
-	w.newline(0);
+        w.write("======== VAR MAP ========");
+        w.newline(0);
         for (Iterator i = bounds.entrySet().iterator(); i.hasNext(); ){
             Map.Entry e = (Map.Entry) i.next();
             VarLabel var = (VarLabel) e.getKey();
