@@ -1,18 +1,19 @@
 package jif.visit;
 
+import java.util.List;
+
 import jif.ast.JifClassDecl;
 import jif.ast.JifMethodDecl;
 import jif.ast.JifUtil;
+import jif.extension.CallHelper;
 import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.Label;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.ast.Receiver;
 import polyglot.frontend.Job;
-import polyglot.types.ClassType;
-import polyglot.types.MethodInstance;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
+import polyglot.types.*;
 import polyglot.util.*;
 
 /** 
@@ -261,5 +262,25 @@ public class LabelChecker implements Copy
     public void reportSemanticException(SemanticException e) {
         Position pos = e.position() != null ? e.position() : job().ast().position();
         errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), pos);
+    }
+    
+    public CallHelper createCallHelper(Label receiverLabel,
+            Receiver receiver,
+            ReferenceType calleeContainer,
+            JifProcedureInstance pi,
+            List actualArgs,
+            Position position) {
+        return new CallHelper(receiverLabel, receiver, calleeContainer, pi, actualArgs, position);
+    }
+    public CallHelper createCallHelper(Label receiverLabel,
+            ReferenceType calleeContainer,
+            JifProcedureInstance pi,
+            List actualArgs,
+            Position position) {
+        return createCallHelper(receiverLabel, null, calleeContainer, pi, actualArgs, position);
+    }
+    public CallHelper createOverrideHelper(JifMethodInstance overridden,
+                                           JifMethodInstance overriding) {
+        return CallHelper.OverrideHelper(overridden, overriding, this);
     }
 }

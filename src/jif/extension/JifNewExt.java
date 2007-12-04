@@ -54,7 +54,7 @@ public class JifNewExt extends JifExprExt
                        A.labelEnv(),
                        noe.position());
         }
-        CallHelper helper = new CallHelper(newLabel, ct, 
+        CallHelper helper = lc.createCallHelper(newLabel, ct, 
                                            (JifProcedureInstance)noe.constructorInstance(), 
                                            noe.arguments(),
                                            node().position());

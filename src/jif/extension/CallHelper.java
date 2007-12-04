@@ -24,11 +24,11 @@ import polyglot.util.StringUtil;
  * called.
  */
 public class CallHelper {
-    private static boolean shouldReport(int obscurity) {
+    protected static boolean shouldReport(int obscurity) {
         return Report.should_report(jif.Topics.labels, obscurity);
     }
 
-    private static void
+    protected static void
     report(int obscurity, String s) {
         Report.report(obscurity, "labels: " + s);
     }
@@ -37,11 +37,11 @@ public class CallHelper {
      * Label of the reference to the object on which the procedure is being
      * called.
      */
-    private final Label receiverLabel;
+    protected final Label receiverLabel;
 
-    private final Expr receiverExpr;
+    protected final Expr receiverExpr;
 
-    private final ReferenceType calleeContainer;
+    protected final ReferenceType calleeContainer;
 
     /**
      * Copy of the list of the <code>Expr</code> s that are the arguments to
@@ -49,44 +49,44 @@ public class CallHelper {
      * replace the elements of this list with the label checked versions of the
      * argument expressions.
      */
-    private final List actualArgs;
+    protected final List actualArgs;
 
     /**
      * The procedure being called. Also the MethodInstance of the overridden
      * method, when this class is used for overriding checking.
      */
-    private final JifProcedureInstance pi;
+    protected final JifProcedureInstance pi;
 
     /**
      * The position of the procedure call
      */
-    private final Position position;
+    protected final Position position;
 
     /**
      * Labels of the actual arguments.
      */
-    private List actualArgLabels;
+    protected List actualArgLabels;
 
     /**
      * Labels of the actual parameters.
      */
-    private List actualParamLabels;
+    protected List actualParamLabels;
 
     /**
      * The PathMap for the procedure call.
      */
-    private PathMap X;
+    protected PathMap X;
 
     /**
      * The return type of the procedure, if there is one.
      */
-    private Type returnType;
+    protected Type returnType;
 
     /*
      * Flags to ensure that this class is used correctly.
      */
-    private boolean callChecked = false;
-    private boolean overrideChecker = false; // false if call checker, true if override checker
+    protected boolean callChecked = false;
+    protected final boolean overrideChecker; // false if call checker, true if override checker
 
     /**
      * Method instance of the overriding (subclasses') method. Used
@@ -100,8 +100,18 @@ public class CallHelper {
             JifProcedureInstance pi,
             List actualArgs,
             Position position) {
+        this(receiverLabel, receiver, calleeContainer, pi, actualArgs, position, false);
+    }
+    protected CallHelper(Label receiverLabel,
+            Receiver receiver,
+            ReferenceType calleeContainer,
+            JifProcedureInstance pi,
+            List actualArgs,
+            Position position,
+            boolean overrideChecker) {
         this.receiverLabel = receiverLabel;
         this.calleeContainer = calleeContainer;
+        this.overrideChecker = overrideChecker;
         if (receiver instanceof Expr) {
             this.receiverExpr = (Expr)receiver;
         }
@@ -115,11 +125,6 @@ public class CallHelper {
 
         if (pi.formalTypes().size() != actualArgs.size())
             throw new InternalCompilerError("Wrong number of args.");
-    }
-
-    public CallHelper(Label receiverLabel, ReferenceType calleeContainer,
-            JifProcedureInstance pi, List actualArgs, Position position) {
-        this(receiverLabel, null, calleeContainer, pi, actualArgs, position);
     }
 
     public static CallHelper OverrideHelper(
@@ -156,8 +161,8 @@ public class CallHelper {
                                        calleeContainer,
                                        overridden, 
                                        actualArgs,
-                                       overriding.position());
-        ch.overrideChecker = true;
+                                       overriding.position(),
+                                       true);
         ch.overridingMethod = overriding;
         ch.actualParamLabels = Collections.EMPTY_LIST;
         ch.actualArgLabels = new ArrayList(overriding.formalTypes().size());
@@ -201,7 +206,7 @@ public class CallHelper {
         return X;
     }
 
-    private PathMap labelCheckAndConstrainParams(LabelChecker lc, List throwTypes) throws SemanticException {
+    protected PathMap labelCheckAndConstrainParams(LabelChecker lc, List throwTypes) throws SemanticException {
         PathMap Xjoin;
         JifTypeSystem ts = lc.typeSystem();
         LabelTypeCheckUtil ltcu = ts.labelTypeCheckUtil();
@@ -276,7 +281,7 @@ public class CallHelper {
      * @return The PathMap for the evaluation of all actual arguments, that is,
      *         join_j xj, for all actual arguments xj.
      */
-    private PathMap labelCheckAndConstrainArgs(LabelChecker lc, PathMap Xjoin)
+    protected PathMap labelCheckAndConstrainArgs(LabelChecker lc, PathMap Xjoin)
     throws SemanticException
     {
         JifContext A = lc.context();
@@ -321,7 +326,7 @@ public class CallHelper {
      * @param formalType the type of ith formal arg.
      * 
      */
-    private void constrainArg(LabelChecker lc, final int index, final Expr Ej, Type formalType) throws SemanticException {
+    protected void constrainArg(LabelChecker lc, final int index, final Expr Ej, Type formalType) throws SemanticException {
         // constrain the labels of the argument to be less
         // than the bound of the formal arg, substituting in the
         // fresh labels we just created.
@@ -379,7 +384,7 @@ public class CallHelper {
      * @throws SemanticException 
      *
      */
-    private void constrainFinalActualArgs(JifTypeSystem jts) throws SemanticException {
+    protected void constrainFinalActualArgs(JifTypeSystem jts) throws SemanticException {
         // find which formal arguments appear in the signature
         final Set argInstances = new LinkedHashSet();
         LabelSubstitution argLabelGather = new LabelSubstitution() {
@@ -423,7 +428,7 @@ public class CallHelper {
         }               
     }
 
-    private Label resolvePCBound(LabelChecker lc) throws SemanticException {
+    protected Label resolvePCBound(LabelChecker lc) throws SemanticException {
         return instantiate(lc.context(), pi.pcBound());
     }
 
@@ -431,7 +436,7 @@ public class CallHelper {
      * Returns the instantiated return label.
      * @throws SemanticException
      */
-    private Label resolveReturnLabel(LabelChecker lc) throws SemanticException {
+    protected Label resolveReturnLabel(LabelChecker lc) throws SemanticException {
         return instantiate(lc.context(), pi.returnLabel());
     }
 
@@ -439,7 +444,7 @@ public class CallHelper {
      * Returns the instantiated return value label joined with returnLabel.
      * @throws SemanticException
      */
-    private Label resolveReturnValueLabel(LabelChecker lc, Label returnLabel) throws SemanticException {
+    protected Label resolveReturnValueLabel(LabelChecker lc, Label returnLabel) throws SemanticException {
         JifTypeSystem ts = lc.typeSystem();
         Label L = null;
 
@@ -454,7 +459,7 @@ public class CallHelper {
         return lc.upperBound(L, returnLabel);
     }
 
-    private PathMap excPathMap(LabelChecker lc, Label returnLabel, Label pcPriorToInvoke, List throwTypes) throws SemanticException {
+    protected PathMap excPathMap(LabelChecker lc, Label returnLabel, Label pcPriorToInvoke, List throwTypes) throws SemanticException {
         JifTypeSystem ts = lc.typeSystem();
         PathMap Xexn = ts.pathMap();
 
@@ -618,7 +623,7 @@ public class CallHelper {
      * are satisfied
      *  Thesis, Figure 4.29
      */
-    private void satisfiesConstraints(final JifProcedureInstance jpi, LabelChecker lc)
+    protected void satisfiesConstraints(final JifProcedureInstance jpi, LabelChecker lc)
     throws SemanticException
     {
         JifContext A = lc.context();

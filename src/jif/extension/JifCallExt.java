@@ -99,7 +99,7 @@ public class JifCallExt extends JifExprExt
             }
         }
 
-        CallHelper helper = new CallHelper(objLabel, target, mi.container(), mi, me.arguments(), node().position());
+        CallHelper helper = lc.createCallHelper(objLabel, target, mi.container(), mi, me.arguments(), node().position());
         LabelChecker callLC = lc.context(A);
         helper.checkCall(callLC, throwTypes, npExc);
 

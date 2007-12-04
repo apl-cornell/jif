@@ -167,7 +167,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             if (! ts.isAccessible(mj, lc.context())) {
                 continue;
             }            
-            CallHelper.OverrideHelper(mj, mi, lc).checkOverride(lc);
+            lc.createOverrideHelper(mj, mi).checkOverride(lc);
         }
     }
 

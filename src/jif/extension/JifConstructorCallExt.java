@@ -48,7 +48,7 @@ public class JifConstructorCallExt extends JifStmtExt_c
 
         constructorChecker.checkConstructorAuthority(ct, A, ccs.position());
 
-        CallHelper helper = new CallHelper(jct.thisLabel(), ct, ci, 
+        CallHelper helper = lc.createCallHelper(jct.thisLabel(), ct, ci, 
                                            ccs.arguments(), node().position());
 
         helper.checkCall(lc.context(A), throwTypes, false);
