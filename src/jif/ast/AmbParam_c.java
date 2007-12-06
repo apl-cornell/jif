@@ -52,8 +52,13 @@ public class AmbParam_c extends Node_c implements AmbParam
         if (this.name == null) return this;
         
         Id name = (Id) visitChild(this.name, v);
+        return reconstruct(name);
+    }
+    protected AmbParam_c reconstruct(Id name) {
         if (this.name == name) { return this; }
-        return new AmbParam_c(this.position, name, pi); 
+        AmbParam_c n = (AmbParam_c)this.copy();
+        n.name = name;
+        return n;
     }
 
 

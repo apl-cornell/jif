@@ -1,10 +1,6 @@
 package jif.ast;
 
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.Param;
-import jif.types.ParamInstance;
-import jif.types.SemanticDetailedException;
+import jif.types.*;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
 import polyglot.ast.Node;
@@ -63,8 +59,14 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
     
     public Node visitChildren(NodeVisitor v) {
         Expr expr = (Expr) visitChild(this.expr, v);
-        if (this.expr == expr) { return this; }
-        return new AmbExprParam_c(this.position, expr, expectedPI); 
+        return reconstruct(expr, expectedPI);
+    }
+    protected AmbExprParam_c reconstruct(Expr expr, ParamInstance expectedPI) {
+        if (this.expr == expr && this.expectedPI == expectedPI) { return this; }
+        AmbExprParam_c n = (AmbExprParam_c)this.copy();
+        n.expr = expr;
+        n.expectedPI = expectedPI;
+        return n;         
     }
         
     /** 

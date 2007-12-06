@@ -196,11 +196,14 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
             name = (Id) visitChild(this.name, v);
         }
 
-        if (this.expr != expr) { 
-            return new AmbPrincipalNode_c(this.position, expr);             
-        }
-        if (this.name != name) { 
-            return new AmbPrincipalNode_c(this.position, name);             
+        return reconstruct(expr, name);
+    }
+    protected AmbPrincipalNode_c reconstruct(Expr expr, Id name) {
+        if (this.expr != expr || this.name != name) {
+            AmbPrincipalNode_c n = (AmbPrincipalNode_c)this.copy();
+            n.expr = expr;
+            n.name = name;
+            return n;             
         }
         return this;
     }

@@ -19,12 +19,12 @@ public class Wrapper extends Expr_c {
     public Amb amb;
 
     Wrapper(Amb amb) {
-	super(amb.pos);
-	this.amb = amb;
+        super(amb.pos);
+        this.amb = amb;
     }
 
     public Node visitChildren(NodeVisitor v) {
-	// throw new InternalCompilerError("Cannot visit illegal expression.");
+        // throw new InternalCompilerError("Cannot visit illegal expression.");
         return this;
     }
 

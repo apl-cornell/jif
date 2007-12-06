@@ -100,7 +100,7 @@ public class FieldLabelResolver extends ContextVisitor
             LabelSubstitutionVisitor lsv = 
                 new LabelSubstitutionVisitor(new FieldVarLabelSubst(this.fieldVarBounds), 
                                              false);
-            n =  n.visitChildren(lsv);
+            n =  n.del().visitChildren(lsv);
 
         }
         return n;

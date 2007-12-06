@@ -3,7 +3,9 @@ package jif.ast;
 import java.util.List;
 
 import jif.types.JifTypeSystem;
+import jif.types.ParamInstance;
 import jif.types.principal.Principal;
+import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.types.SemanticException;
@@ -68,8 +70,14 @@ public class AmbJunctivePrincipalNode_c extends PrincipalNode_c implements AmbJu
     public Node visitChildren(NodeVisitor v) {        
         PrincipalNode l = (PrincipalNode) visitChild(this.left, v);
         PrincipalNode r = (PrincipalNode) visitChild(this.right, v);
+        return reconstruct(l, r);
+    }
+    protected AmbJunctivePrincipalNode_c reconstruct(PrincipalNode l, PrincipalNode r) {
         if (this.left == l && this.right == r) { return this; }
-        return new AmbJunctivePrincipalNode_c(this.position, l, r, this.isConjunction); 
+        AmbJunctivePrincipalNode_c n = (AmbJunctivePrincipalNode_c)this.copy();
+        n.left = l;
+        n.right = r;
+        return n;         
     }
     
 }

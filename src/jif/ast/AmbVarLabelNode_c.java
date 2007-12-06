@@ -46,8 +46,14 @@ implements AmbVarLabelNode
         if (this.name == null) return this;
         
         Id name = (Id) visitChild(this.name, v);
+        return reconstruct(name);
+    }
+    
+    protected AmbVarLabelNode_c reconstruct(Id name) {
         if (this.name == name) { return this; }
-        return new AmbVarLabelNode_c(this.position, name); 
+        AmbVarLabelNode_c n = (AmbVarLabelNode_c)this.copy();
+        n.name = name;
+        return n;         
     }
 
 

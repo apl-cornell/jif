@@ -101,11 +101,11 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
             ParamInstance pi = (ParamInstance)pt.params().get(0);
             if (expr instanceof Expr) {
                 n = nf.AmbParam(position(), (Expr)expr, pi);
-                n = (ParamNode) n.disambiguate(ar);
+                n = (ParamNode) n.del().disambiguate(ar);
             }
             else {
                 n = nf.AmbParam(position(), (Id)expr, pi);	        
-                n = (ParamNode) n.disambiguate(ar);
+                n = (ParamNode) n.del().disambiguate(ar);
                 if (!n.isDisambiguated()) {
                     throw new SemanticException("\"" + expr + "\" is not " + 
                                                 "suitable as a parameter.", position());

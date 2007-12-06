@@ -160,7 +160,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
                     pn = nf.AmbParam(position(), (Id)expr, pi);                                        
                 }
 
-                pn = (ParamNode) pn.disambiguate(ar);
+                pn = (ParamNode) pn.del().disambiguate(ar);
 
                 List l = new LinkedList();
                 if (!pn.isDisambiguated()) {

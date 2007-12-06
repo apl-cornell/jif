@@ -27,20 +27,20 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
     protected Expr expr;
 
     public AmbDynamicLabelNode_c(Position pos, Expr expr) {
-	super(pos);
-	this.expr = expr;
+        super(pos);
+        this.expr = expr;
     }
 
     public String toString() {
-	return "*" + expr + "{amb}";
+        return "*" + expr + "{amb}";
     }
-    
+
     /** Disambiguate the type of this node. */
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-	Context c = sc.context();
-	JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
-	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
-    
+        Context c = sc.context();
+        JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
+        JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
+
         if (!sc.isASTDisambiguated(expr)) {
             sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
             return this;
@@ -50,7 +50,7 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         TypeChecker tc = new TypeChecker(sc.job(), ts, nf);
         tc = (TypeChecker) tc.context(sc.context());
         expr = (Expr)expr.visit(tc);
-	
+
         if (expr.type() == null || !expr.type().isCanonical()) {
             if (expr instanceof Field) {
                 Field f = (Field)expr;
@@ -62,17 +62,17 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
                     Goal g = sched.Disambiguated(pct.job());
                     throw new MissingDependencyException(g);                        
                 }
-//                System.err.println("***Failed with " + expr + " : " + expr.getClass() + " " + expr.type());
-//                System.err.println("   unlabeled target type: " + ts.unlabel(f.target().type()));
-//                System.err.println("   target : " + f.target() + "  " + f.target().getClass());
-//                if (f.target() instanceof Local) {
-//                    Local loc = (Local)f.target();
-//                    System.err.println("   local context lookup: " + sc.context().findLocal(loc.name()));
-//                }
+//              System.err.println("***Failed with " + expr + " : " + expr.getClass() + " " + expr.type());
+//              System.err.println("   unlabeled target type: " + ts.unlabel(f.target().type()));
+//              System.err.println("   target : " + f.target() + "  " + f.target().getClass());
+//              if (f.target() instanceof Local) {
+//              Local loc = (Local)f.target();
+//              System.err.println("   local context lookup: " + sc.context().findLocal(loc.name()));
+//              }
             }
-//            Scheduler sched = sc.job().extensionInfo().scheduler();
-//            Goal g = sched.Disambiguated(sc.job());
-//            throw new MissingDependencyException(g);                        
+//          Scheduler sched = sc.job().extensionInfo().scheduler();
+//          Goal g = sched.Disambiguated(sc.job());
+//          throw new MissingDependencyException(g);                        
             sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
             return this;
         }
@@ -87,14 +87,14 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
             // previous line should throw an exception, but throw this just to
             // be safe.
             throw new SemanticDetailedException(
-                "Illegal dynamic label.",
-                "Only final access paths or label expressions can be used as a dynamic label. " +
-                "A final access path is an expression starting with either \"this\" or a final " +
-                "local variable \"v\", followed by zero or more final field accesses. That is, " +
-                "a final access path is either this.f1.f2....fn, or v.f1.f2.....fn, where v is a " +
-                "final local variables, and each field f1 to fn is a final field. A label expression " +
-                "is either a label parameter, or a \"new label {...}\" expression.",
-                this.position());
+                                                "Illegal dynamic label.",
+                                                "Only final access paths or label expressions can be used as a dynamic label. " +
+                                                "A final access path is an expression starting with either \"this\" or a final " +
+                                                "local variable \"v\", followed by zero or more final field accesses. That is, " +
+                                                "a final access path is either this.f1.f2....fn, or v.f1.f2.....fn, where v is a " +
+                                                "final local variables, and each field f1 to fn is a final field. A label expression " +
+                                                "is either a label parameter, or a \"new label {...}\" expression.",
+                                                this.position());
         }
 
         // the expression type may not yet be fully determined, but
@@ -106,11 +106,20 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("*");
-        expr.prettyPrint(w, tr);
+        expr.del().prettyPrint(w, tr);
     }
     public Node visitChildren(NodeVisitor v) {
         Expr expr = (Expr) visitChild(this.expr, v);
-        if (this.expr == expr) { return this; }
-        return new AmbDynamicLabelNode_c(this.position, expr); 
+        return reconstruct(expr);
     }
+    protected AmbDynamicLabelNode_c reconstruct(Expr expr) {
+        if (this.expr != expr) {
+            AmbDynamicLabelNode_c n = (AmbDynamicLabelNode_c) copy();
+            n.expr = expr;
+            return n;
+        }
+
+        return this;
+    }
+
 }

@@ -15,20 +15,20 @@ public class UnwrapVisitor extends NodeVisitor
     boolean error;
 
     public Node override(Node n) {
-	if (! error && n instanceof Wrapper) {
-	    try {
-		return ((Wrapper) n).amb.toExpr();
-	    }
-	    catch (Exception e) {
-		error = true;
-	    }
-	}
+        if (! error && n instanceof Wrapper) {
+            try {
+                return ((Wrapper) n).amb.toExpr();
+            }
+            catch (Exception e) {
+                error = true;
+            }
+        }
 
-	if (error) {
-	    return n;
-	}
+        if (error) {
+            return n;
+        }
 
-	return null;
+        return null;
     }
 }
 
