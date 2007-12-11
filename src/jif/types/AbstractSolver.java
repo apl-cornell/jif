@@ -102,7 +102,7 @@ public abstract class AbstractSolver implements Solver {
      * components, which are then sorted in topological order. If false, then
      * constraints are solved in the order they are added to the solver
      */
-    protected static final boolean useSCC = false;
+    protected final boolean useSCC;
 
 
     /**
@@ -118,9 +118,17 @@ public abstract class AbstractSolver implements Solver {
     /**
      * Constructor
      */
-    public AbstractSolver(JifTypeSystem ts, Compiler compiler, String solverName) {
+    protected AbstractSolver(JifTypeSystem ts, Compiler compiler, String solverName) {
+        this(ts, compiler, solverName, false);
+    }
+    /**
+     * Constructor
+     */
+    protected AbstractSolver(JifTypeSystem ts, Compiler compiler, String solverName, boolean useSCC) {
         this.ts = ts;
         this.compiler = compiler;
+        this.useSCC = useSCC;
+        
         Q = new EquationQueue();
         equations = new LinkedHashSet();
         varEqnDependencies = new LinkedHashMap();
@@ -143,6 +151,7 @@ public abstract class AbstractSolver implements Solver {
     protected AbstractSolver(AbstractSolver js) {
         this.ts = js.ts;
         this.compiler = js.compiler;
+        this.useSCC = js.useSCC;
         Q = new EquationQueue(js.Q);
         equations = new LinkedHashSet(js.equations);
 
