@@ -103,7 +103,7 @@ public class Jif_c extends Ext_c implements Jif
     public static void checkThrowTypes(List throwTypes) {
         for (Iterator iter = throwTypes.iterator(); iter.hasNext();) {
             Type thrw = (Type)iter.next();
-            if (thrw.typeSystem().uncheckedExceptions().contains(thrw)) {
+            if (thrw.typeSystem().isUncheckedException(thrw)) {
                 iter.remove();
             }            
         }
