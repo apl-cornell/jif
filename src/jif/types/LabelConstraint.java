@@ -128,6 +128,7 @@ public class LabelConstraint
      * for <code>NamedLabel</code>s.
      */
     public String msg() {
+        if (messages == null) return null;
         return messages.msg();
     }
     
@@ -137,6 +138,7 @@ public class LabelConstraint
      * names of the labels, if <code>NamedLabel</code>s are used.
      */
     public String detailMsg() {
+        if (messages == null) return null;
         return messages.detailMsg();
     }
 
@@ -146,6 +148,7 @@ public class LabelConstraint
      * represents, and to names of labels, if <code>NamedLabel</code>s are used.
      */
     public String technicalMsg() {
+        if (messages == null) return null;
         return messages.technicalMsg();
     }
         
