@@ -74,7 +74,7 @@ public class AccessPathConstant extends AccessPathRoot {
 
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         throw new InternalCompilerError(
-                "Shouldn't be calling subst on an AccessPathConstant!");
+                "Shouldn't be calling subst on an AccessPathConstant! \"" + this + "\"");
     }
 
     public String toString() {

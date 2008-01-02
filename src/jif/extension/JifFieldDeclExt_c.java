@@ -138,7 +138,13 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         if (decl.init() != null) {
             A = (JifContext) A.pushBlock();
             A.setCurrentCodePCBound(ts.topLabel());
-            init = (Expr) lc.context(A).labelCheck(decl.init());
+            
+            // bound the this label.
+            JifClassType jct = (JifClassType)A.currentClass();
+            A.addAssertionLE(jct.thisLabel(), ts.bottomLabel());
+            
+            LabelChecker lcInit = lc.context(A); 
+            init = (Expr) lcInit.labelCheck(decl.init());
 
             if (fi.flags().isFinal() && JifUtil.isFinalAccessExprOrConst(ts, init)) { 
                 if (ts.isLabel(fi.type())) {
@@ -154,7 +160,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             }                            
 
             if (init instanceof ArrayInit) {
-                ((JifArrayInitExt)(JifUtil.jifExt(init))).labelCheckElements(lc, decl.type().type()); 
+                ((JifArrayInitExt)(JifUtil.jifExt(init))).labelCheckElements(lcInit, decl.type().type()); 
             }
             else {
                 // Must check that the expression type is a subtype of the
@@ -162,11 +168,11 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                 // they are instantitation types, we must add constraints for
                 // the labels.
                 SubtypeChecker subtypeChecker = new SubtypeChecker(t, init.type());
-                subtypeChecker.addSubtypeConstraints(lc, init.position());                
+                subtypeChecker.addSubtypeConstraints(lcInit, init.position());                
             }
 
             PathMap Xe = getPathMap(init);
-            lc.constrain(new NamedLabel("init.nv", 
+            lcInit.constrain(new NamedLabel("init.nv", 
                                         "label of successful evaluation of initializing expression", 
                                         Xe.NV()), 
                         LabelConstraint.LEQ, 

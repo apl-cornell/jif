@@ -66,6 +66,13 @@ public class JifUtil
     }    
 
     public static AccessPath exprToAccessPath(Expr e, JifContext context) throws SemanticException {
+        Type expectedType = null;
+        if (e != null && e.type() != null && !e.type().isNull()) {
+            expectedType = e.type();
+        }
+        return exprToAccessPath(e, expectedType, context);
+    }
+    public static AccessPath exprToAccessPath(Expr e, Type expectedType, JifContext context) throws SemanticException {
         if (e instanceof Local) {
            Local l = (Local)e;
            return new AccessPathLocal(l.localInstance(), l.name(), e.position());
@@ -78,7 +85,7 @@ public class JifUtil
 //                if (f.isTypeChecked()) {
 //                    container = f.fieldInstance().container();
                 //}
-                AccessPath prefix = exprToAccessPath((Expr)f.target(), context);
+                AccessPath prefix = exprToAccessPath((Expr)f.target(), null, context);
                 return new AccessPathField(prefix, f.fieldInstance(), f.name(), f.position());
             }
             else if (target instanceof TypeNode && ((TypeNode)target).type().isClass()){
@@ -109,15 +116,17 @@ public class JifUtil
             PrincipalNode pn = (PrincipalNode)e;
             return new AccessPathConstant(pn.principal(), pn.position());
         }
-        else if (e instanceof NullLit) {
+        else if (e instanceof NullLit && expectedType != null && 
+                context.typeSystem().isImplicitCastValid(expectedType, 
+                                                         ((JifTypeSystem)context.typeSystem()).Principal())) {
             Principal bot = ((JifTypeSystem)context.typeSystem()).bottomPrincipal(e.position());
             return new AccessPathConstant(bot, e.position());
         }
         else if (e instanceof Cast) {
-            return exprToAccessPath(((Cast)e).expr(), context);            
+            return exprToAccessPath(((Cast)e).expr(), expectedType, context);            
         }
         else if (e instanceof DowngradeExpr) {
-            return exprToAccessPath(((DowngradeExpr)e).expr(), context);            
+            return exprToAccessPath(((DowngradeExpr)e).expr(), expectedType, context);            
         }
         throw new SemanticDetailedException("Expression " + e + " not suitable for an access path.",
                                             "The expression " + e + " is not suitable for a final access " +
@@ -163,12 +172,22 @@ public class JifUtil
         return false;
     }
     public static boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e) {
+        Type expectedType = null;
+        if (e != null && e.type() != null && !e.type().isNull()) {
+            expectedType = e.type();
+        }
+        return isFinalAccessExprOrConst(ts, e, expectedType);
+        
+    }
+    public static boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e, Type expectedType) {
         return isFinalAccessExpr(ts, e) || 
             e instanceof LabelExpr || 
             e instanceof PrincipalNode ||
            (e instanceof Cast && isFinalAccessExprOrConst(ts, ((Cast)e).expr())) ||
            (e instanceof DowngradeExpr && isFinalAccessExprOrConst(ts, ((DowngradeExpr)e).expr())) ||
-           e instanceof NullLit;
+           (e instanceof NullLit &&
+                   expectedType != null && 
+                   ts.isImplicitCastValid(expectedType, ts.Principal()));
     }
     public static Label exprToLabel(JifTypeSystem ts, Expr e, JifContext context) throws SemanticException {
         if (e instanceof LabelExpr) {
@@ -178,7 +197,7 @@ public class JifUtil
             return exprToLabel(ts, ((DowngradeExpr)e).expr(), context);            
         }
         if (isFinalAccessExpr(ts, e)) {
-            return ts.dynamicLabel(e.position(), exprToAccessPath(e, context));
+            return ts.dynamicLabel(e.position(), exprToAccessPath(e, ts.Label(), context));
         }
         throw new InternalCompilerError("Expected a final access expression, or constant");
     }
@@ -199,7 +218,7 @@ public class JifUtil
             return ts.bottomPrincipal(e.position());
         }
         if (isFinalAccessExpr(ts, e)) {
-            return ts.dynamicPrincipal(e.position(), exprToAccessPath(e, context));
+            return ts.dynamicPrincipal(e.position(), exprToAccessPath(e, ts.Principal(), context));
         }
         throw new InternalCompilerError("Expected a final access expression, or constant");
     }

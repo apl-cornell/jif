@@ -53,10 +53,10 @@ public class JifLocalDeclExt extends JifStmtExt_c
                 Principal rhs_principal = JifUtil.exprToPrincipal(ts, decl.init(), lc.context());
                 lc.context().addDefinitionalEquiv(dp, rhs_principal);                    
             }
-            else {
+            else if (!decl.init().type().isNull()) {
                 // we can also add an access path equivalence
                 lc.context().addEquiv(JifUtil.varInstanceToAccessPath(li, li.position()),
-                                      JifUtil.exprToAccessPath(decl.init(), lc.context()));
+                                      JifUtil.exprToAccessPath(decl.init(), li.type(), lc.context()));
 
             }
         }

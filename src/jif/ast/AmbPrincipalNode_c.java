@@ -62,7 +62,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
-	// run the typechecker over expr.
+        // run the typechecker over expr.
         TypeChecker tc = new TypeChecker(ar.job(), ts, nf);
         tc = (TypeChecker) tc.context(ar.context());
         expr = (Expr)expr.visit(tc);
@@ -79,18 +79,16 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
                     throw new MissingDependencyException(g);                        
                 }
             }
-//            Scheduler sched = ar.job().extensionInfo().scheduler();
-//            Goal g = sched.Disambiguated(ar.job());
-//            throw new MissingDependencyException(g);                        
+
             ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
             return this;
         }
         
         if (expr.type() != null && expr.type().isCanonical() && 
-                !JifUtil.isFinalAccessExprOrConst(ts, expr)) {
+                !JifUtil.isFinalAccessExprOrConst(ts, expr, ts.Principal())) {
             // illegal dynamic principal. But try to convert it to an access path
             // to allow a more precise error message.
-            AccessPath ap = JifUtil.exprToAccessPath(expr, (JifContext)ar.context()); 
+            AccessPath ap = JifUtil.exprToAccessPath(expr, ts.Principal(), (JifContext)ar.context()); 
             ap.verify((JifContext)ar.context());
 
             // previous line should throw an exception, but throw this just to
@@ -110,7 +108,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         // that's ok, as type checking will ensure that it is
         // a suitable expression.
         return nf.CanonicalPrincipalNode(position(),
-                                         ts.dynamicPrincipal(position(), JifUtil.exprToAccessPath(expr, (JifContext)ar.context())));
+                                         ts.dynamicPrincipal(position(), JifUtil.exprToAccessPath(expr, ts.Principal(), (JifContext)ar.context())));
     }
     protected Node disambiguateName(AmbiguityRemover ar, Id name) throws SemanticException {
         if ("_".equals(name.id())) {
