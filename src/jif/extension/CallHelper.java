@@ -883,6 +883,7 @@ public class CallHelper {
     public Label instantiate(JifContext A, Label L) throws SemanticException {
         return JifInstantiator.instantiate(L, A, receiverExpr, calleeContainer, receiverLabel,
                                            getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem(), pi.position()),
+                                           pi.formalTypes(),
                                            this.actualArgLabels,
                                            this.actualArgs,
                                            this.actualParamLabels);
@@ -896,6 +897,7 @@ public class CallHelper {
     public Principal instantiate(JifContext A, Principal p) throws SemanticException {
         return JifInstantiator.instantiate(p, A, receiverExpr, calleeContainer, receiverLabel,
                                            getArgLabelsFromFormalTypes(this.pi.formalTypes(), (JifTypeSystem)this.pi.typeSystem(), this.pi.position()),
+                                           pi.formalTypes(),
                                            this.actualArgs,
                                            this.actualParamLabels);
     }
@@ -903,6 +905,7 @@ public class CallHelper {
     public Type instantiate(JifContext A, Type t) throws SemanticException {
         return JifInstantiator.instantiate(t, A, receiverExpr, calleeContainer, receiverLabel,
                                            getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem(), pi.position()),
+                                           pi.formalTypes(),
                                            this.actualArgLabels,
                                            this.actualArgs,
                                            this.actualParamLabels);

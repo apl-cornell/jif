@@ -31,6 +31,7 @@ public class JifInstantiator
     private final Label receiverLbl;
     private final AccessPath receiverPath;
     private final List formalArgLabels; 
+    private final List formalArgTypes; 
     private final List actualArgLabels; 
     private final List actualArgExprs;
     private final List actualParamLabels; 
@@ -46,6 +47,7 @@ public class JifInstantiator
                             Label receiverLbl,
                             AccessPath receiverPath,
                             List formalArgLabels,
+                            List formalArgTypes,
                             List actualArgLabels,
                             List actualArgExprs,
                             List actualParamLabels,
@@ -55,6 +57,7 @@ public class JifInstantiator
         this.receiverLbl = receiverLbl;
         this.receiverPath = receiverPath;
         this.formalArgLabels = formalArgLabels;
+        this.formalArgTypes = formalArgTypes;
         this.actualArgLabels = actualArgLabels;
         this.actualArgExprs = actualArgExprs;
         this.actualParamLabels = actualParamLabels;
@@ -186,9 +189,10 @@ public class JifInstantiator
             if (actualArgExprs != null) {
                 try {
                     Expr actualExpr = (Expr)actualArgExprs.get(i);
+                    Type formalArgType = (Type)formalArgTypes.get(i);
                     AccessPath target;
-                    if (JifUtil.isFinalAccessExprOrConst(ts, actualExpr)) {
-                        target = JifUtil.exprToAccessPath(actualExpr, callerContext);
+                    if (JifUtil.isFinalAccessExprOrConst(ts, actualExpr, formalArgType)) {
+                        target = JifUtil.exprToAccessPath(actualExpr, formalArgType, callerContext);
                     }
                     else {
                         target = new AccessPathUninterpreted(actualExpr, actualExpr.position());                            
@@ -465,13 +469,14 @@ public class JifInstantiator
                                     ReferenceType receiverType, 
                                     Label receiverLabel, 
                                     List formalArgLabels, 
+                                    List formalArgTypes,
                                     List actualArgLabels, 
                                     List actualArgExprs, 
                                     List actualParamLabels) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, callerContext);
+        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+            receiverPath = JifUtil.exprToAccessPath(receiverExpr, receiverType, callerContext);
         }
         else {
             receiverPath = new AccessPathUninterpreted(receiverExpr, L.position()); 
@@ -480,6 +485,7 @@ public class JifInstantiator
                                                    receiverLabel,
                                                    receiverPath,
                                                    formalArgLabels,
+                                                   formalArgTypes,
                                                    actualArgLabels,
                                                    actualArgExprs,
                                                    actualParamLabels,
@@ -494,8 +500,8 @@ public class JifInstantiator
                                     Label receiverLbl) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, callerContext);
+        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+            receiverPath = JifUtil.exprToAccessPath(receiverExpr, receiverType, callerContext);
         }
         else {
             receiverPath = new AccessPathUninterpreted(receiverExpr, L.position()); 
@@ -515,6 +521,7 @@ public class JifInstantiator
                                                    null,
                                                    null,
                                                    null,
+                                                   null,
                                                    callerContext);
         return inst.instantiate(L);
 
@@ -526,12 +533,13 @@ public class JifInstantiator
             ReferenceType receiverType, 
             Label receiverLabel, 
             List formalArgLabels, 
+            List formalArgTypes,
             List actualArgExprs, 
             List actualParamLabels) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, callerContext);
+        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+            receiverPath = JifUtil.exprToAccessPath(receiverExpr, receiverType, callerContext);
         }
         else {
             receiverPath = new AccessPathUninterpreted(receiverExpr, p.position()); 
@@ -540,6 +548,7 @@ public class JifInstantiator
                                                    receiverLabel,
                                                    receiverPath,
                                                    formalArgLabels,
+                                                   formalArgTypes,
                                                    null,
                                                    actualArgExprs,
                                                    actualParamLabels,
@@ -554,13 +563,14 @@ public class JifInstantiator
             ReferenceType receiverType, 
             Label receiverLabel, 
             List formalArgLabels, 
+            List formalArgTypes,
             List actualArgLabels, 
             List actualArgExprs, 
             List actualParamLabels) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, callerContext);
+        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+            receiverPath = JifUtil.exprToAccessPath(receiverExpr, receiverType, callerContext);
         }
         else {
             receiverPath = new AccessPathUninterpreted(receiverExpr, t.position()); 
@@ -569,6 +579,7 @@ public class JifInstantiator
                                                    receiverLabel,
                                                    receiverPath,
                                                    formalArgLabels,
+                                                   formalArgTypes,
                                                    actualArgLabels,
                                                    actualArgExprs,
                                                    actualParamLabels,
@@ -585,8 +596,8 @@ public class JifInstantiator
         
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, callerContext);
+        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+            receiverPath = JifUtil.exprToAccessPath(receiverExpr, receiverType, callerContext);
         }
         else {
             receiverPath = new AccessPathUninterpreted(receiverExpr, t.position()); 
@@ -594,6 +605,7 @@ public class JifInstantiator
         JifInstantiator inst = new JifInstantiator(receiverType,
                                                    receiverLbl,
                                                    receiverPath,
+                                                   null,
                                                    null,
                                                    null,
                                                    null,
