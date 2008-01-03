@@ -33,17 +33,17 @@ public class JifContext_c extends Context_c implements JifContext
      * Map of local variables that have been endorsed
      * using a checked endorse statement
      */
-    private Map<LocalInstance, Label> checkedEndorsements;
+    protected Map<LocalInstance, Label> checkedEndorsements;
 
 
     /**
      * Map from JifContext_c.Key (pairs of Branch.Kind and String) to Labels. 
      */
-    private Map gotos;
+    protected Map gotos;
 
-    private boolean checkingInits;
-    private boolean inConstructorCall;
-    private Label constructorReturnLabel;
+    protected boolean checkingInits;
+    protected boolean inConstructorCall;
+    protected Label constructorReturnLabel;
 
     protected JifContext_c(JifTypeSystem ts, TypeSystem jlts) {
         super(ts);
