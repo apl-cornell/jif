@@ -691,15 +691,28 @@ public class LabelEnv_c implements LabelEnv
      *
      */
     public Label findUpperBound(Label L) {
-        return findUpperBound(L, Collections.EMPTY_SET);
+        return findUpperBound(L, Collections.EMPTY_SET, false);
     }
-    private Label findUpperBound(Label L, Collection<Serializable> seen) {        
+    /**
+     * Finds an upper bound that does not contain arg labels. It does not use leq.
+     *
+     */
+    public Label findNonArgLabelUpperBound(Label L) {
+        return findUpperBound(L, Collections.EMPTY_SET, true);
+    }
+    private Label findUpperBound(Label L, Collection<Serializable> seen, boolean noArgLabels) {        
         // L is a pair label.
         if (L instanceof PairLabel) return L;
         if (L instanceof VarLabel_c) {
             // cant do anything.
             return L;
         }        
+        if (noArgLabels && (L instanceof DynamicLabel || 
+                L instanceof ParamLabel ||
+                L instanceof CovariantParamLabel)) {
+            // good enough
+            return L;
+        }
         
         if (seen.contains(L)) return ts.topLabel();
         
@@ -713,7 +726,7 @@ public class LabelEnv_c implements LabelEnv
             Label ret = ts.bottomLabel();
             for (Iterator<Label> iter = jl.joinComponents().iterator(); iter.hasNext();) {
                 Label comp = iter.next();
-                ret = ts.join(ret, this.findUpperBound(comp, newSeen));
+                ret = ts.join(ret, this.findUpperBound(comp, newSeen, noArgLabels));
             }
             allBounds.add(ret);
         }
@@ -722,7 +735,7 @@ public class LabelEnv_c implements LabelEnv
             Label ret = ts.topLabel();
             for (Iterator<Label> iter = ml.meetComponents().iterator(); iter.hasNext();) {
                 Label comp = iter.next();
-                ret = ts.meet(ret, this.findUpperBound(comp, newSeen));
+                ret = ts.meet(ret, this.findUpperBound(comp, newSeen, noArgLabels));
             }
             allBounds.add(ret);
         }
@@ -740,17 +753,16 @@ public class LabelEnv_c implements LabelEnv
                 cRHS = this.solver.applyBoundsTo(c.rhs());
             }
             if (L.equals(cLHS)) {
-                allBounds.add(findUpperBound(cRHS, newSeen));
+                allBounds.add(findUpperBound(cRHS, newSeen, noArgLabels));
             }
         }
 
-        // assertions didn't help
         if (L instanceof ArgLabel) {
             ArgLabel al = (ArgLabel)L;
             // we want to make sure that we don't end up recursing.
             // Check that al.upperbound() is not recursively defined.            
             if (!argLabelBoundRecursive(al)) {
-                allBounds.add(findUpperBound(al.upperBound(), newSeen));
+                allBounds.add(findUpperBound(al.upperBound(), newSeen, noArgLabels));
             }
         }
         

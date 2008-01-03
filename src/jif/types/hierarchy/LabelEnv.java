@@ -31,6 +31,13 @@ public interface LabelEnv
     Label findUpperBound(Label L);
     
     /**
+     * Finds an upper bound for L that does not have any arg labels in it.
+     * May return the top label if there is insufficient information to
+     * determine a more precise bound. 
+     */
+    Label findNonArgLabelUpperBound(Label L);
+
+    /**
      * Returns a Map of Strings to List[String]s which is the descriptions of any 
      * components that appear in the environment. This map is used for verbose 
      * output to the user, to help explain the meaning of constraints and 
