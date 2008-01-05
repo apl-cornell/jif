@@ -5,12 +5,15 @@ import java.util.*;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.label.*;
+import jif.types.label.Label;
+import jif.types.label.NotTaken;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
+import polyglot.ast.Formal;
 import polyglot.ast.ProcedureDecl;
 import polyglot.main.Report;
-import polyglot.types.*;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 
 /** The Jif extension of the <code>ProcedureDecl</code> node. 
@@ -25,6 +28,23 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
     }
 
     static String jif_verbose = "jif";
+    
+    /**
+     * Label check the formals.
+     * @throws SemanticException 
+     */
+    protected List checkFormals(List formals, JifProcedureInstance ci, LabelChecker lc) throws SemanticException {
+        List newFormals = new ArrayList(formals.size());
+        boolean changed = false;
+        for (Iterator iter = formals.iterator(); iter.hasNext();) {
+            Formal formal = (Formal)iter.next();
+            Formal newFormal = (Formal)lc.labelCheck(formal);
+            if (newFormal != formal) changed = true;
+            newFormals.add(newFormal);
+        }
+        if (changed) return newFormals;
+        return formals;
+    }
 
     /**
      * This methods corresponds to the check-arguments predicate in the
@@ -38,7 +58,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
             Report.report(2, "Adding constraints for header of " + mi);
 
         JifContext A = lc.jifContext();
-
+                
         // Set the "auth" variable.
         Set newAuth = constrainAuth(mi, A);
 
@@ -60,7 +80,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
         return Li;
     }
-
+    
     protected Label checkAutoEndorseConstrainPC(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
         final JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.jifTypeSystem();

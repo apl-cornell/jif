@@ -36,6 +36,9 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
 
         lc = lc.context(A);
 
+        // check formals
+        List formals = checkFormals(mn.formals(), ci, lc);
+
         // First, check the arguments, adjusting the context.
         Label Li = checkEnforceSignature(ci, lc);
 
@@ -53,7 +56,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
 
         addReturnConstraints(Li, X, ci, lc, ts.Void());
 
-        mn = (JifConstructorDecl) updatePathMap(mn.body(body), X);
+        mn = (JifConstructorDecl) updatePathMap(mn.formals(formals).body(body), X);
 
         return mn;
     }

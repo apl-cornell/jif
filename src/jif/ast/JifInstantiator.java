@@ -121,10 +121,12 @@ public class JifInstantiator
         for (int i = 0; formalArgLabels != null && i < formalArgLabels.size(); i++) {
             try {
                 ArgLabel formalArgLbl = (ArgLabel)formalArgLabels.get(i);            
-                AccessPathRoot formalRoot = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), formalArgLbl.name(), formalArgLbl.position());
-                AccessPathRoot tempRoot = (AccessPathRoot)formalTempAccessPathRoots.get(i);
+                if (formalArgLbl.formalInstance().flags().isFinal()) {
+                    AccessPathRoot formalRoot = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), formalArgLbl.name(), formalArgLbl.position());
+                    AccessPathRoot tempRoot = (AccessPathRoot)formalTempAccessPathRoots.get(i);
 
-                L = substImpl(L, new AccessPathInstantiator(formalRoot, tempRoot));
+                    L = substImpl(L, new AccessPathInstantiator(formalRoot, tempRoot));
+                }
             }
             catch (SemanticException e) {
                 throw new InternalCompilerError("Unexpected SemanticException " + e.getMessage(), pos);

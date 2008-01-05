@@ -673,9 +673,8 @@ method_header ::=
 
 override formal_parameter ::=
                     // Formal
-                    // All formals are final
         type:a variable_declarator_id:b
-            {: RESULT = parser.nf.Formal(parser.pos(a,b), Flags.FINAL,
+            {: RESULT = parser.nf.Formal(parser.pos(a,b), Flags.NONE,
                                          parser.array(a, b.dims), b.name); :}
     |   FINAL:x type:a variable_declarator_id:b
             {: RESULT = parser.nf.Formal(parser.pos(x, b), Flags.FINAL,

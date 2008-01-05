@@ -24,21 +24,30 @@ public class JifFormalDel extends JifJL_c
 {
     public JifFormalDel() { }
 
-
     private boolean isCatchFormal = false;
+    private boolean explicitFinalFlag = false;
     public void setIsCatchFormal(boolean isCatchFormal) {
         this.isCatchFormal = isCatchFormal;
     }
     public boolean isCatchFormal() {
         return this.isCatchFormal;
     }
-
+    public boolean hasExplicitFinalFlag() {
+        return explicitFinalFlag;
+    }
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        Formal n = (Formal) super.buildTypes(tb);
+        Formal n = (Formal) this.node();
+        this.explicitFinalFlag = n.flags().isFinal();
+        n = (Formal) super.buildTypes(tb);
+        
+        // all formals are final
+        n = n.flags(n.flags().Final());
+        JifLocalInstance li = (JifLocalInstance)n.localInstance();
+        li.setFlags(li.flags().Final());
+        
         JifTypeSystem jts = (JifTypeSystem)tb.typeSystem();
 
 
-        JifLocalInstance li = (JifLocalInstance)n.localInstance();
         if (isCatchFormal) {
             // formals occuring in a catch clause are treated more like local decls;
             // their label is a VarLabel
@@ -72,8 +81,12 @@ public class JifFormalDel extends JifJL_c
         JifLocalInstance li = (JifLocalInstance)n.localInstance();
         li.setFlags(n.flags());
         li.setName(n.name());
-        li.setType(n.declType());
-        //System.err.println("JifFormalDel.disamb: n.type: "  + n.type().getClass() );
+        
+        // set the type of the local instance, but only if we haven't
+        // set the upper bound of the arg label.
+        if  (isCatchFormal || ((ArgLabel)li.label()).upperBound() == null) {
+            li.setType(n.declType());
+        }
 
         if (!n.type().isDisambiguated()) {
             ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();

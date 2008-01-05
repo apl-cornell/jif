@@ -1,16 +1,20 @@
 package jif.extension;
 
 import java.util.Iterator;
+import java.util.List;
 
 import jif.ast.JifMethodDecl;
 import jif.ast.JifMethodDecl_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.label.*;
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
+import jif.types.label.ThisLabel;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.Block;
+import polyglot.ast.Formal;
+import polyglot.ast.Node;
+import polyglot.ast.ProcedureDecl;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -34,7 +38,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 
         // check covariance of labels
         checkCovariance(mi, lc);
-
+        
         // check that the labels in the method signature conform to the
         // restrictions of the superclass and/or interface method declaration.
         overrideMethodLabelCheck(lc, renamedMI);
@@ -49,6 +53,9 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 
         // First, check the arguments, and adjust the context.
         Label Li = checkEnforceSignature(mi, lc);
+
+        // check formals
+        List formals = checkFormals(mn.formals(), mi, lc);
 
         Block body = null;
         PathMap X;
@@ -73,7 +80,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             X = X.N(A.currentCodePCBound());
         }
 
-        mn = (JifMethodDecl) updatePathMap(mn.body(body), X);
+        mn = (JifMethodDecl) updatePathMap(mn.formals(formals).body(body), X);
 
         // let the label checker know that we have left the method
         mn = lc.leavingMethod(mn);
