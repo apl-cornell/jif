@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jif.types.JifTypeSystem;
+import polyglot.types.TypeObject;
 import polyglot.types.TypeObject_c;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /** An implementation of the <code>PolicyLabel</code> interface. 
@@ -19,6 +19,8 @@ public abstract class Policy_c extends TypeObject_c implements Policy {
         return toString(new HashSet());
     }
     
+    public abstract boolean equalsImpl(TypeObject t);
+
     public boolean hasWritersToReaders() {
         return false;
     }    

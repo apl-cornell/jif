@@ -43,6 +43,7 @@ public abstract class AccessPath implements Serializable {
         this.position = pos;
     }
 
+    public abstract boolean equals(Object o);
     public abstract boolean isCanonical();
     public abstract boolean isUninterpreted();
 
