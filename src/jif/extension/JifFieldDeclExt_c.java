@@ -319,13 +319,5 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             }
             return L;
         }
-
-        /**
-         * We do not want to check the labelOf components of fields.
-         */
-        public boolean recurseIntoLabelOf() {
-            return false;
-        }
-
     }
 }

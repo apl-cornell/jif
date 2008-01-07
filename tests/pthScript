@@ -187,6 +187,8 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	ConstructorPrologue05.jif (Semantic, "constructor prologue");
 	ConstructorPrologue06.jif (Semantic, "constructor prologue");
 	ConstructorPrologue07.jif (Semantic, "constructor prologue");
+	Covariant01.jif (Semantic, "can not be labeled with the covariant label");
+	Covariant02.jif (Semantic, "Covariant labels cannot occur on the right hand side");
 	DateTest.jif ;
 	Declassify.jif ;
 	Default1.jif ;

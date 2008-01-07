@@ -12,9 +12,11 @@ import jif.visit.LabelChecker;
 import polyglot.ast.Formal;
 import polyglot.ast.ProcedureDecl;
 import polyglot.main.Report;
+import polyglot.types.ConstructorInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** The Jif extension of the <code>ProcedureDecl</code> node. 
  * 
@@ -69,10 +71,13 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
             checkActsForAuthority(p, A);
         }
 
+        
         addCallers(mi, A, newAuth);
         A.setAuthority(newAuth);       
 
         constrainLabelEnv(mi, A, null);
+
+        checkConstraintVariance(mi, lc);
 
         // check that any autoendorse constraints are satisfied,
         // and set and constrain the inital PC
@@ -80,7 +85,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
         return Li;
     }
-    
+
     protected Label checkAutoEndorseConstrainPC(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
         final JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.jifTypeSystem();
@@ -392,5 +397,47 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                 }
             }
         }
-            }    
+            }
+    
+    /**
+     * Check that covariant labels do not appear in contravariant positions
+     * @param mi
+     * @param lc
+     * @throws SemanticException 
+     */
+    protected void checkConstraintVariance(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
+        if (!(lc.context().currentCode() instanceof ConstructorInstance)) {
+            for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
+                Assertion c = (Assertion) iter.next();
+
+                if (c instanceof LabelLeAssertion) {
+                    LabelLeAssertion lle = (LabelLeAssertion) c;
+                    lle.rhs().subst(new ConstraintVarianceLabelChecker(c.position()));
+                }
+            }
+        }
+    }
+
+    /**
+     * Checker to ensure that labels do not use
+     * covariant labels in the wrong places
+     */    
+    protected static class ConstraintVarianceLabelChecker extends LabelSubstitution {
+        private Position declPosition;
+
+        ConstraintVarianceLabelChecker(Position declPosition) {
+            this.declPosition = declPosition;
+        }
+        public Label substLabel(Label L) throws SemanticException {
+            if (L.isCovariant()) {
+                throw new SemanticDetailedException("Covariant labels cannot occur on the right hand side of label constraints.",
+                                                    "The right hand side of a label constraint cannot contain the covariant components such as " + 
+                                                    L + ". ",
+                                                    declPosition);
+            }
+            return L;
+        }
+    }    
+
+
 }
