@@ -4,6 +4,7 @@ import jif.types.JifTypeSystem;
 import jif.types.JifVarInstance;
 import jif.types.ParamInstance;
 import jif.types.PrincipalInstance;
+import jif.types.label.CovariantParamLabel;
 import jif.types.label.ParamLabel;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
@@ -73,8 +74,10 @@ implements AmbVarLabelNode
             ParamInstance pi = (ParamInstance) vi;
 
             if (pi.isCovariantLabel()) {
-                return nf.CanonicalLabelNode(position(),
-                                             ts.covariantLabel(position(), pi));
+                CovariantParamLabel pl = ts.covariantLabel(position(), pi);
+                pl.setDescription("label parameter " + pi.name() + 
+                                  " of class " + pi.container().fullName());
+                return nf.CanonicalLabelNode(position(), pl);
             }
             if (pi.isInvariantLabel()) {
                 ParamLabel pl = ts.paramLabel(position(), pi);
