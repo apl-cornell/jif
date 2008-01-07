@@ -17,7 +17,7 @@ import polyglot.visit.TypeChecker;
  */
 public class LabelTypeCheckUtil {
     protected final JifTypeSystem ts;
-    
+
     public LabelTypeCheckUtil(JifTypeSystem ts) {
         this.ts = ts;
     }
@@ -31,7 +31,7 @@ public class LabelTypeCheckUtil {
     public void typeCheckPrincipal(TypeChecker tc, Principal principal) throws SemanticException {
         if (principal instanceof DynamicPrincipal) {
             DynamicPrincipal dp = (DynamicPrincipal)principal;
-            
+
             // Make sure that the access path is set correctly
             // check also that all field accesses are final, and that
             // the type of the expression is principal
@@ -42,14 +42,14 @@ public class LabelTypeCheckUtil {
             catch (SemanticException e) {
                 throw new SemanticException(e.getMessage(), principal.position());
             }
-            
+
             if (!ts.isImplicitCastValid(dp.path().type(), ts.Principal())) {
                 throw new SemanticDetailedException("The type of a dynamic principal must be \"principal\".", 
-                                            "The type of a dynamic principal must be " +
-                                            "\"principal\". The type of the expression " + 
-                                            dp.path().exprString() + " is " + 
-                                            dp.path().type() + ".",
-                                            principal.position());
+                                                    "The type of a dynamic principal must be " +
+                                                    "\"principal\". The type of the expression " + 
+                                                    dp.path().exprString() + " is " + 
+                                                    dp.path().type() + ".",
+                                                    principal.position());
             }
         } 
         if (principal instanceof ConjunctivePrincipal) {
@@ -67,47 +67,49 @@ public class LabelTypeCheckUtil {
             }
         }
     }
-    
+
     /**
      * Check that all access paths occurring in label Lbl have the appropriate type.
      * @param tc
      * @param Lbl
      * @throws SemanticException
      */
-    public void typeCheckLabel(TypeChecker tc, Label Lbl) throws SemanticException {
-        Collection components = labelComponents(Lbl);
-        for (Iterator comps = components.iterator(); comps.hasNext(); ) {
-            Label l = (Label)comps.next();
-            if (l instanceof DynamicLabel) {
-                DynamicLabel dl = (DynamicLabel)l;
-                
-                // Make sure that the access path is set correctly
-                // check also that all field accesses are final, and that
-                // the type of the expression is label
-                AccessPath path = dl.path();
-                try {
-                    path.verify((JifContext)tc.context());                
+    public void typeCheckLabel(final TypeChecker tc, Label Lbl) throws SemanticException {
+        Lbl.subst(new LabelSubstitution() {
+            public Label substLabel(Label l) throws SemanticException {
+
+                if (l instanceof DynamicLabel) {
+                    DynamicLabel dl = (DynamicLabel)l;
+
+                    // Make sure that the access path is set correctly
+                    // check also that all field accesses are final, and that
+                    // the type of the expression is label
+                    AccessPath path = dl.path();
+                    try {
+                        path.verify((JifContext)tc.context());                
+                    }
+                    catch (SemanticException e) {
+                        throw new SemanticException(e.getMessage(), dl.position());
+                    }
+
+                    if (!ts.isLabel(dl.path().type())) {
+                        throw new SemanticDetailedException("The type of a dynamic label must be \"label\".",
+                                                            "The type of a dynamic label must be " +
+                                                            "\"label\". The type of the expression " + 
+                                                            dl.path().exprString() + " is " + 
+                                                            dl.path().type() + ".",
+                                                            dl.position());
+                    }
+                }        
+                else if (l instanceof PairLabel) {
+                    PairLabel pl = (PairLabel)l;
+                    typeCheckPolicy(tc, pl.confPolicy());
+                    typeCheckPolicy(tc, pl.integPolicy());
                 }
-                catch (SemanticException e) {
-                    throw new SemanticException(e.getMessage(), dl.position());
-                }
-                
-                if (!ts.isLabel(dl.path().type())) {
-                    throw new SemanticDetailedException("The type of a dynamic label must be \"label\".",
-                                     "The type of a dynamic label must be " +
-                                     "\"label\". The type of the expression " + 
-                                     dl.path().exprString() + " is " + 
-                                     dl.path().type() + ".",
-                                                        dl.position());
-                }
-            }        
-            else if (l instanceof PairLabel) {
-               PairLabel pl = (PairLabel)l;
-               typeCheckPolicy(tc, pl.confPolicy());
-               typeCheckPolicy(tc, pl.integPolicy());
+                return l;
             }
-        }
-        
+        });
+
     }
 
     public Collection labelComponents(Label L) {
@@ -121,7 +123,7 @@ public class LabelTypeCheckUtil {
             return Collections.singleton(L);
         }        
     }
-    
+
     public void typeCheckPolicy(TypeChecker tc, Policy p) throws SemanticException {
         if (p instanceof JoinPolicy_c) {
             JoinPolicy_c jp = (JoinPolicy_c)p;
@@ -151,13 +153,13 @@ public class LabelTypeCheckUtil {
             throw new InternalCompilerError("Unexpected policy " + p);
         }
     }
-    
+
     public void typeCheckType(TypeChecker tc, Type t) throws SemanticException {
         t = ts.unlabel(t);
-        
+
         if (t instanceof JifSubstType) {            
             JifSubstType jst = (JifSubstType)t;
-            
+
             for (Iterator i = jst.actuals().iterator(); i.hasNext();) {
                 Object arg = i.next();
                 if (arg instanceof Label) {
@@ -199,32 +201,32 @@ public class LabelTypeCheckUtil {
     public List labelCheckTypeParams(Type t, LabelChecker lc, List throwTypes, Position pos) throws SemanticException {
         t = ts.unlabel(t);
         List Xparams;
-        
+
         if (t instanceof JifSubstType) {            
             JifContext A = lc.context();
             PathMap X = ts.pathMap().N(A.pc());            
             JifSubstType jst = (JifSubstType)t;
             Xparams = new ArrayList(jst.subst().substitutions().size());
-            
+
             for (Iterator i = jst.actuals().iterator(); i.hasNext();) {
                 Object arg = i.next();
                 if (arg instanceof Label) {
                     Label L = (Label)arg;
                     A = (JifContext)A.pushBlock();
-                    
+
                     if (ts.isParamsRuntimeRep(t)) {
                         // make sure the label is runtime representable
                         if (!L.isRuntimeRepresentable()) {
                             throw new SemanticDetailedException(
-                                  "A label used in a type examined at runtime must be representable at runtime.",
-                                  "If a type is used in an instanceof, " +
-                                    "cast, constructor call, or static method call, " +
-                                    "all parameters of the type must be runtime " +
-                                    "representable. Arg labels are not represented at runtime.",
-                                   pos);
+                                                                "A label used in a type examined at runtime must be representable at runtime.",
+                                                                "If a type is used in an instanceof, " +
+                                                                "cast, constructor call, or static method call, " +
+                                                                "all parameters of the type must be runtime " +
+                                                                "representable. Arg labels are not represented at runtime.",
+                                                                pos);
                         }
                     }
-                    
+
                     A.setPc(X.N(), lc);    
                     PathMap Xj = L.labelCheck(A, lc);
                     throwTypes.removeAll(L.throwTypes(ts));
@@ -237,17 +239,17 @@ public class LabelTypeCheckUtil {
                     A = (JifContext)A.pushBlock();
                     if (ts.isParamsRuntimeRep(t) && !p.isRuntimeRepresentable()) {
                         throw new SemanticDetailedException("A principal used in a " +
-                            "type examined at runtime must be " +
-                            "representable at runtime.",
-                            "If a type is used in an instanceof, " +
-                            "cast, constructor call, or static method call, " +
-                            "all parameters of the type must be runtime " +
-                            "representable. The principal " + p + " is not " +
-                            "represented at runtime.",
-                                                    pos);
+                                                            "type examined at runtime must be " +
+                                                            "representable at runtime.",
+                                                            "If a type is used in an instanceof, " +
+                                                            "cast, constructor call, or static method call, " +
+                                                            "all parameters of the type must be runtime " +
+                                                            "representable. The principal " + p + " is not " +
+                                                            "represented at runtime.",
+                                                            pos);
                     }
-                    
-                    
+
+
                     A.setPc(X.N(), lc);            
                     PathMap Xj = p.labelCheck(A, lc);
                     throwTypes.removeAll(p.throwTypes(ts));
@@ -329,5 +331,5 @@ public class LabelTypeCheckUtil {
             return Collections.EMPTY_SET;
         }        
     }
-    
+
 }
