@@ -453,14 +453,14 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     public LabelExpr LabelExpr(Position pos, LabelNode node) {
         LabelExpr n = new LabelExpr_c(pos, node);
         n = (LabelExpr)n.ext(jifExtFactory().extLabelExpr());
-        n = (LabelExpr)n.del(delFactory().delExpr());
+        n = (LabelExpr)n.del(((JifDelFactory)delFactory()).delLabelExpr());
         return n;
     }
 
     public NewLabel NewLabel(Position pos, LabelNode label) {
         NewLabel n = new NewLabel_c(pos, label);
         n = (NewLabel)n.ext(jifExtFactory().extNewLabel());
-        n = (NewLabel)n.del(delFactory().delExpr());
+        n = (NewLabel)n.del(((JifDelFactory)delFactory()).delNewLabel());
         return n;
     }
     public PrincipalExpr PrincipalExpr(Position pos, PrincipalNode principal) {

@@ -130,20 +130,8 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
                 return this;
             }
             
-            if (pi.isLabel() && !(p.parameter() instanceof Label)) {
-                throw new SemanticException("Can not instantiate a "+
-                                            "label parameter with a non-label.",
-                                            p.position());
-            }
-            if (pi.isPrincipal() && !(p.parameter() instanceof Principal)) {
-                throw new SemanticException("Can not instantiate a "+
-                                            "principal parameter with a non-principal.",
-                                            p.position());
-            }
-            if (pi.isInvariantLabel() && !((Label)p.parameter()).isInvariant() )
-                throw new SemanticException("Can not instantiate an invariant "+
-                                            "label parameter with a non-invariant label.",
-                                            p.position());
+            checkParamSuitable(pi, p);
+            
             
             l.add(p.parameter());
         }
@@ -158,6 +146,23 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
                                                                  t.instantiatedFrom(), l) );
     }
     
+    protected void checkParamSuitable(ParamInstance pi, ParamNode p) throws SemanticException {
+        if (pi.isLabel() && !(p.parameter() instanceof Label)) {
+            throw new SemanticException("Can not instantiate a "+
+                                        "label parameter with a non-label.",
+                                        p.position());
+        }
+        if (pi.isPrincipal() && !(p.parameter() instanceof Principal)) {
+            throw new SemanticException("Can not instantiate a "+
+                                        "principal parameter with a non-principal.",
+                                        p.position());
+        }
+        if (pi.isInvariantLabel() && !((Label)p.parameter()).isInvariant() )
+            throw new SemanticException("Can not instantiate an invariant "+
+                                        "label parameter with a non-invariant label.",
+                                        p.position());        
+    }
+
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         throw new InternalCompilerError(position(),
                                         "Cannot type check ambiguous node " + this + ".");

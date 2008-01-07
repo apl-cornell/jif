@@ -914,7 +914,7 @@ public class JifTypeSystem_c
             return (Label)apc.constantValue();
         }
         
-        DynamicLabel t = new DynamicLabel_c(path, this, pos, dynamicLabelTranslator());
+        DynamicLabel t = dynamicLabel(pos, path);
         return t;
     }
     

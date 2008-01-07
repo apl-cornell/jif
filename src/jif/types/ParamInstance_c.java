@@ -62,7 +62,7 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
     }
 
     public boolean isPrincipal() {
-	return kind == PRINCIPAL;
+	return kind.isPrincipal();
     }
 
     public boolean isLabel() {
@@ -70,11 +70,11 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
     }
 
     public boolean isInvariantLabel() {
-	return kind == INVARIANT_LABEL;
+	return kind.isInvariantLabel();
     }
 
     public boolean isCovariantLabel() {
-	return kind == COVARIANT_LABEL;
+	return kind.isCovariantLabel();
     }
 
     public String toString() {
@@ -84,7 +84,7 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
         return kind + " " + name();
     }
 
-    private void writeObject(java.io.ObjectOutputStream out)
+    protected void writeObject(java.io.ObjectOutputStream out)
 	throws IOException
     {
 	out.writeObject(container);
@@ -94,7 +94,7 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
 	else throw new IOException("invalid kind");
     }
 
-    private void readObject(java.io.ObjectInputStream in)
+    protected void readObject(java.io.ObjectInputStream in)
 	throws IOException, ClassNotFoundException
     {
 	this.container = (JifClassType) in.readObject();
