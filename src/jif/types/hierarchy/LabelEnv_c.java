@@ -163,13 +163,13 @@ public class LabelEnv_c implements LabelEnv
             pathp = ((DynamicPrincipal)p).path();
         }
         else if (p.isRuntimeRepresentable()) {
-            pathp = new AccessPathConstant(p, p.position());
+            pathp = new AccessPathConstant(p, ts.Principal(), p.position());
         }
         if (q instanceof DynamicPrincipal) {
             pathq = ((DynamicPrincipal)q).path();
         }
         else if (q.isRuntimeRepresentable()) {
-            pathq = new AccessPathConstant(q, q.position());
+            pathq = new AccessPathConstant(q, ts.Principal(), q.position());
         }
 
         if (pathp != null && pathq != null && equivalentAccessPaths(pathp, pathq)) return true;

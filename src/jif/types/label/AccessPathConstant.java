@@ -41,18 +41,18 @@ public class AccessPathConstant extends AccessPathRoot {
      */
     private Object constantValue;
 
-    private boolean isLabel;
+    private Type type;
 
-    public AccessPathConstant(Label label, Position pos) {
+    public AccessPathConstant(Label label, Type type, Position pos) {
         super(pos);
         this.constantValue = label;
-        this.isLabel = true;
+        this.type = type;
     }
 
-    public AccessPathConstant(Principal principal, Position pos) {
+    public AccessPathConstant(Principal principal, Type type, Position pos) {
         super(pos);
         this.constantValue = principal;
-        this.isLabel = false;
+        this.type = type;
     }
 
     public Object constantValue() {
@@ -60,12 +60,12 @@ public class AccessPathConstant extends AccessPathRoot {
     }
 
     public boolean isLabelConstant() {
-        return this.isLabel;
+        return ((JifTypeSystem)type.typeSystem()).isLabel(type);
     }
     public boolean isNeverNull() { return false; }
 
     public boolean isPrincipalConstant() {
-        return !this.isLabel;
+        return ((JifTypeSystem)type.typeSystem()).isPrincipal(type);
     }
 
     public boolean isCanonical() {
@@ -94,11 +94,6 @@ public class AccessPathConstant extends AccessPathRoot {
     }
 
     public Type type() {
-        if (isLabel) {
-            Label l = (Label)constantValue;
-            return ((JifTypeSystem)l.typeSystem()).Label();
-        }
-        Principal p = (Principal)constantValue;
-        return ((JifTypeSystem)p.typeSystem()).Principal();
+        return type;
     }
 }

@@ -110,17 +110,18 @@ public class JifUtil
         }
         else if (e instanceof LabelExpr) {
             LabelExpr le = (LabelExpr)e;
-            return new AccessPathConstant(le.label().label(), le.position());
+            return new AccessPathConstant(le.label().label(), le.type(), le.position());
         }
         else if (e instanceof PrincipalNode) {
             PrincipalNode pn = (PrincipalNode)e;
-            return new AccessPathConstant(pn.principal(), pn.position());
+            return new AccessPathConstant(pn.principal(), pn.type(), pn.position());
         }
         else if (e instanceof NullLit && expectedType != null && 
                 context.typeSystem().isImplicitCastValid(expectedType, 
                                                          ((JifTypeSystem)context.typeSystem()).Principal())) {
-            Principal bot = ((JifTypeSystem)context.typeSystem()).bottomPrincipal(e.position());
-            return new AccessPathConstant(bot, e.position());
+            JifTypeSystem ts = (JifTypeSystem)context.typeSystem();
+            Principal bot = ts.bottomPrincipal(e.position());
+            return new AccessPathConstant(bot, ts.Principal(), e.position());
         }
         else if (e instanceof Cast) {
             return exprToAccessPath(((Cast)e).expr(), expectedType, context);            
