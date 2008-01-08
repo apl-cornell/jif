@@ -133,7 +133,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 
         PathMap Xd;
 
-        Expr init = null;
+        Expr init = decl.init();
 
         if (decl.init() != null) {
             A = (JifContext) A.pushBlock();
@@ -143,9 +143,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             JifClassType jct = (JifClassType)A.currentClass();
             A.addAssertionLE(jct.thisLabel(), ts.bottomLabel());
             
-            LabelChecker lcInit = lc.context(A); 
-            init = (Expr) lcInit.labelCheck(decl.init());
-
+            
             if (fi.flags().isFinal() && JifUtil.isFinalAccessExprOrConst(ts, init)) { 
                 if (ts.isLabel(fi.type())) {
                     Label dl = ts.dynamicLabel(fi.position(), JifUtil.varInstanceToAccessPath(fi, fi.position()));                
@@ -159,6 +157,10 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                 }
             }                            
 
+            LabelChecker lcInit = lc.context(A); 
+            init = (Expr) lcInit.labelCheck(decl.init());
+
+            
             if (init instanceof ArrayInit) {
                 ((JifArrayInitExt)(JifUtil.jifExt(init))).labelCheckElements(lcInit, decl.type().type()); 
             }
