@@ -142,7 +142,7 @@ public class JifToJavaRewriter extends ContextVisitor
         if (param instanceof Principal) {
             return principalToJava((Principal)param);
         }
-        throw new SemanticException("Unexpected param " + param);
+        throw new InternalCompilerError("Unexpected param " + param);
     }
 
     public Expr labelToJava(Label label) throws SemanticException {
