@@ -542,7 +542,12 @@ public abstract class AbstractSolver implements Solver {
             Label initialBound = bounds.applyTo(c.rhs());
             addTrace(v, (Equation)c.getEquations().iterator().next(), initialBound);
             setBound(v, initialBound, c);
-            fixedValueVars.add(v);
+            // only add the variable to the fixed value vars if the RHS does not contain
+            // any variables. Otherwise, the bound of v may need to change
+            // as the RHS changes.
+            if (!c.rhs().hasVariableComponents()) {
+                fixedValueVars.add(v);
+            }
         }        
     }
     
