@@ -108,17 +108,17 @@ public class LabelConstraint
     public LabelEnv env() {
 	return env;
     }
-    
-//    public PrincipalHierarchy ph() {
-//	return env.ph();
-//    }
-    
+        
     public Position position() {
         return pos;
     }
 
     public boolean report() {
         return report;
+    }
+    
+    public LabelConstraintMessage messages() {
+        return messages;
     }
 
     /**
