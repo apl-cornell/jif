@@ -18,7 +18,7 @@ import polyglot.visit.NodeVisitor;
 public class Wrapper extends Expr_c {
     public Amb amb;
 
-    Wrapper(Amb amb) {
+    public Wrapper(Amb amb) {
         super(amb.pos);
         this.amb = amb;
     }

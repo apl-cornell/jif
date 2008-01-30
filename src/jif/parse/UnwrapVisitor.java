@@ -14,6 +14,9 @@ public class UnwrapVisitor extends NodeVisitor
 {
     boolean error;
 
+    public boolean isError() {
+        return error;
+    }
     public Node override(Node n) {
         if (! error && n instanceof Wrapper) {
             try {

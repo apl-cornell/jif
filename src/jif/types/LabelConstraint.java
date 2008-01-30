@@ -40,37 +40,37 @@ public class LabelConstraint
      */
     public static final Kind LEQ = new Kind(" <= ");
 
-    protected final Label lhs;
-    protected final Kind kind;
-    protected final Label rhs;
+    protected Label lhs;
+    protected Kind kind;
+    protected Label rhs;
     
     /**
      * The environment under which this constraint needs to be satisfied.
      */
-    protected final LabelEnv env;
+    protected LabelEnv env;
 
     /**
      * Names for the LHS
      */
-    protected final NamedLabel namedLHS;
+    protected NamedLabel namedLHS;
     
     /**
      * Names for the RHS
      */
-    protected final NamedLabel namedRHS;
+    protected NamedLabel namedRHS;
 
-    protected final Position pos;
+    protected Position pos;
     
     /**
      * Do we want to report a violation of this constraint, or report the
      * error for a different constraint?
      */
-    protected final boolean report;
+    protected boolean report;
     
     /**
      * Error messages
      */
-    protected final LabelConstraintMessage messages;
+    protected LabelConstraintMessage messages;
 
     public LabelConstraint(NamedLabel lhs, Kind kind, NamedLabel rhs, LabelEnv env,
               Position pos, LabelConstraintMessage msg, boolean report) {

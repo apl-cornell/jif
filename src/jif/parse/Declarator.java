@@ -11,10 +11,26 @@ public class Declarator {
     int dims;
     Expr init;
 
-    Declarator(Position pos, String name) {
+    public Declarator(Position pos, String name) {
 	this.pos = pos;
 	this.name = name;
 	this.dims = 0;
 	this.init = null;
+    }
+
+    public int dims() {
+        return dims;
+    }
+
+    public Expr init() {
+        return init;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public Position position() {
+        return pos;
     }
 }

@@ -21,7 +21,7 @@ public class Access extends Amb {
     Amb prefix;
     Expr index;
 
-    Access(Grm parser, Position pos, Amb prefix, Expr index) throws Exception {
+    public Access(Grm parser, Position pos, Amb prefix, Expr index) throws Exception {
         super(parser, pos);
         this.prefix = prefix;
         this.index = index;
@@ -30,6 +30,8 @@ public class Access extends Amb {
         if (prefix instanceof Array) parser.die(pos);
     }
 
+    public Amb prefix() { return prefix; }
+    public Expr index() { return index; }
     public Prefix toPrefix() throws Exception { return toExpr(); }
     public Receiver toReceiver() throws Exception { return toExpr(); }
 

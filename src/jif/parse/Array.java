@@ -23,6 +23,13 @@ public class Array extends Amb {
         this.prefix = prefix;
         this.isConst = isConst;
     }
+    
+    public TypeNode prefix() {
+        return prefix;
+    }
+    public boolean isConst() {
+        return isConst;
+    }
 
     public TypeNode toType() {
         // if the (unlabeled) base type is an array, inherit the constness from that.

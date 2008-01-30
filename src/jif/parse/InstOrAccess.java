@@ -22,7 +22,7 @@ public class InstOrAccess extends Amb {
     Amb prefix;
     Object param;
 
-    InstOrAccess(Grm parser, Position pos, Amb prefix, Object param) throws Exception {
+    public InstOrAccess(Grm parser, Position pos, Amb prefix, Object param) throws Exception {
         super(parser, pos);
         this.prefix = prefix;
         this.param = param;
@@ -33,6 +33,14 @@ public class InstOrAccess extends Amb {
 
         if (prefix instanceof Labeled) parser.die(pos);
         if (prefix instanceof Array) parser.die(pos);
+    }
+
+    public Amb prefix() {
+        return prefix;
+    }
+    
+    public Object param() {
+        return param;
     }
 
     public TypeNode toType() throws Exception {

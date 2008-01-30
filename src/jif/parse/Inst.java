@@ -20,7 +20,7 @@ public class Inst extends Amb {
     TypeNode prefix;
     List params;
 
-    Inst(Grm parser, Position pos, TypeNode prefix, List params) throws Exception {
+    public Inst(Grm parser, Position pos, TypeNode prefix, List params) throws Exception {
 	super(parser, pos);
 	this.prefix = prefix;
 	this.params = new ArrayList(params);
@@ -31,6 +31,12 @@ public class Inst extends Amb {
 	if (prefix instanceof LabeledExpr) parser.die(pos);
     }
 
+    public TypeNode prefix() {
+        return prefix;
+    }
+    public List params() {
+        return params;
+    }
     public TypeNode toType() throws Exception {
 	return parser.nf.InstTypeNode(pos, prefix, params);
     }
