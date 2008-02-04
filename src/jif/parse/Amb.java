@@ -8,7 +8,7 @@ public abstract class Amb
     Position pos;
     Grm parser;
 
-    Amb(Grm parser, Position pos) {
+    public Amb(Grm parser, Position pos) {
         this.parser = parser;
         this.pos = pos;
     }

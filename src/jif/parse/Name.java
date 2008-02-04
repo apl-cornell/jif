@@ -17,6 +17,12 @@ public class Name extends Amb {
         this(parser, pos, null, name);
     }
     
+    public String name() {
+        return name;
+    }
+    public Amb prefix() {
+        return prefix;
+    }
     public Name(Grm parser, Position pos, Amb prefix, String name) throws Exception {
         super(parser, pos);
         this.prefix = prefix;
