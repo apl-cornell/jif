@@ -675,10 +675,10 @@ override formal_parameter ::=
                     // Formal
         type:a variable_declarator_id:b
             {: RESULT = parser.nf.Formal(parser.pos(a,b), Flags.NONE,
-                                         parser.array(a, b.dims()), b.name()); :}
+                                         parser.array(a, b.dims), b.name); :}
     |   FINAL:x type:a variable_declarator_id:b
             {: RESULT = parser.nf.Formal(parser.pos(x, b), Flags.FINAL,
-                     parser.array(a, b.dims()), b.name()); :}
+                     parser.array(a, b.dims), b.name); :}
     ;
 
 override throws ::=
