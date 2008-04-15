@@ -126,6 +126,7 @@ function compactChildren( base, oLev, oBsID, oCol, oT, oML) {
             //create a link for expanding/collapsing
             var newLink = document.createElement('A');
             newLink.setAttribute( 'href', '#' );
+            newLink.setAttribute( 'class', 'treeexpander' );
             newLink.onclick = new Function( 'clickSmack(this,' + oLev + ',\'' + oBsID + '\',' + oCol + ',\'' + escape(oT) + '\');return false;' );
 	    newLink.insertBefore(document.createTextNode(closedBullet), newLink.childNodes[0]);
             //wrap everything upto the child U/OL in the link

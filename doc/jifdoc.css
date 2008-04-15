@@ -80,6 +80,7 @@ span.bibbook {
 h1, h2, h3, h4, a.secref { font-family: sans-serif; font-weight: bold }
 
 a.secref { font-size: 90% }
+a.treeexpander { text-decoration: none }
 
 li.sec, li.ssec, li.sssec, li.ssssec { list-style-type: none; font-family: sans-serif }
 

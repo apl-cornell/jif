@@ -5,8 +5,9 @@
 
 3. Record version number of Polyglot and Jif in $JIF/README,
    $JIF/CHANGES, $JIF/doc/web/overview.html, and 
-   $JIF/doc/index.html
-
+   $JIF/doc/index.html. Change the date as appropriate in
+   $JIF/doc/title.html.
+   
 4. Check out clean copy of Jif
 
 5. Run  "ant dist"
