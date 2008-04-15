@@ -7,17 +7,18 @@
 #  - produce annotation statistics
 #  - allow more flexible command line, e.g., use stdin if no file specified
 
-if ($#ARGV != 0) {
-    print "usage: jc inputfile\n";
-    print "   inputfile should be a Jif program.";
-    print "   jc will report various statistics about the code.";
-    exit;
+
+$show_help = 0;
+for ($index = 0; $index <= $#ARGV; $index++) {
+print $ARGV[$index]."\n";
+    if ($ARGV[$index] =~ /^(-h|--help)$/i) {
+	    print "usage: jc [file1 file2 ...]\n";
+	    print "Report statistics about Jif code.\n";
+	    print "   Files should be Jif programs.\n";
+	    print "   If no input files specified, stdin is used.\n";
+	    exit;
+    }
 }
-
-$inputfile = $ARGV[0];
-
-# print "Opening " . $inputfile . "...\n";
-open (IN, $inputfile) or die "Can't find file $inputfile.";
 
 
 # the counters for stats
@@ -45,7 +46,7 @@ loadTokens();
 #$label = 
 
 # read in each line of the file
-while ($line = <IN>) {
+while ($line = <>) {
     $linesTotal++;
     $strippedComment = 0; # did we strip a comment off this line?
 
@@ -53,7 +54,7 @@ while ($line = <IN>) {
         # scan forward until the comment ends, i.e., until line contains "*/"
         while ($line && $line !~ /\*\//) { 
             $commentLines++;
-            $line = <IN>;
+            $line = <>;
             $linesTotal++;            
         }
         $inMultilineComment = 0;
@@ -134,7 +135,6 @@ while ($line = <IN>) {
 
 
 # print "Done!\n";
-close(IN);
 
 (($atLeastOneTokenLines + $commentLines + $blankLines) == $linesTotal) or die "invariant broken: comment lines + blank lines + lines with at least 1 token != total lines";
 # output stats
