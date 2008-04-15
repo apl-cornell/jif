@@ -19,7 +19,7 @@ import polyglot.util.StringUtil;
 /**
  * This is a tool to label check method calls. This class should be used by
  * creating an instance of it, and then calling the method
- * {@link #checkCall(LabelChecker, List) checkCall(LabelChecker)}. After the
+ * {@link #checkCall(LabelChecker, List, boolean) checkCall(LabelChecker)}. After the
  * call to that method, the remaining methods (which are getter methods) may be
  * called.
  */

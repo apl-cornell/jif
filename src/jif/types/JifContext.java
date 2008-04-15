@@ -70,8 +70,6 @@ public interface JifContext extends Context {
      * Adds the assertion that the access path p is equivalent to the
      * access path q to this context, and all outer contexts up to
      * the method/constructor/initializer level
-     * @param L1
-     * @param L2
      */
     void addDefinitionalAssertionEquiv(AccessPath p, AccessPath q);
 

@@ -24,7 +24,7 @@ public interface Solver {
      * Substitute variables in L with the solution for the variables. Should only
      * be called after solve() has been called successfully.
      * @param L
-     * @return
+     * @return L with variables replaced appropriately according to the solution.
      */
     Label applyBoundsTo(Label L);
 }

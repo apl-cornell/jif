@@ -70,7 +70,7 @@ public class JifFormalExt extends Jif_c
      * Ensure that covariant labels do not occur in the type of the formal for methods.
      * Constructors do not require this check.
      * @param lc 
-     * @param label
+     * @param f 
      * @throws SemanticException 
      */
     protected void checkVariance(LabelChecker lc, Formal f) throws SemanticException {
