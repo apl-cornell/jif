@@ -3,6 +3,14 @@ Jif Change Log
 
 This file documents changes between releases of Jif.
 
+2008-04-15    Jif 3.2.0
+    * Refactoring for cleaner support of extensions, including Jifclipse.
+    * Minor bug fixes and style changes.
+    * Allow reader policies o->_ and writer policies o<-_ to be
+      dropped from labels. (Principal _ is the bottom principal, and
+      thus o->_ and o<-_ do not restrict the the sets of readers and 
+      writers.)
+      
 2007-11-01    Jif 3.1.1
     * Based on Polyglot 2.3.0
     * Checked endorse construct

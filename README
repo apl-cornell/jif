@@ -1,4 +1,4 @@
-Jif 3.1.1
+Jif 3.2.0
 
 			     The Jif Compiler
 			     ----------------
@@ -222,12 +222,12 @@ The Jif project is supervised by Andrew Myers at the Cornell
 University Computer Science Department. Many people have contributed
 to this software.
 
-This release of the Jif compiler was prepared by Stephen Chong and Xin 
-Zheng. Thanks to Aslan Askarov, Doaa Hassan, Daniel Hedin, Boniface
-Hicks, Dave King, Karl Mazurak, Andrei Sabelfeld, and Steve Zdancewic, 
+This release of the Jif compiler was prepared by Stephen Chong. Thanks to 
+Aslan Askarov, Doaa Hassan, Daniel Hedin, Boniface Hicks, Dave King, 
+Karl Mazurak, Todd Millstein, Andrei Sabelfeld, and Steve Zdancewic, 
 who provided bug reports and feedback for previous versions of Jif. 
-Lantian Zheng, Steve Zdancewic, and Nate Nystrom helped implement
-earlier versions.
+Xin Zheng, Lantian Zheng, Steve Zdancewic, and Nate Nystrom helped 
+implement earlier versions.
 
 Restrictions on use
 -------------------
@@ -237,7 +237,7 @@ redistributed as governed by the license included in the attached file
 LICENSE.
 
 Jif: Java Information Flow
-Copyright (C) 1999-2006 Andrew C. Myers, Cornell University
+Copyright (C) 1999-2008 Andrew C. Myers, Cornell University
 
 This software is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
