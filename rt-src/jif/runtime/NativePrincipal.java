@@ -14,8 +14,9 @@ import jif.lang.*;
 public class NativePrincipal implements Principal {
     
     static private final ConcurrentMap allNatives = new ConcurrentHashMap();  
-
+    static private NativePrincipal UNKNOWN_NATIVE_PRINCIPAL = new NativePrincipal("unknown-principal") { };
     static NativePrincipal getInstance(String name) {
+        if (name == null) return UNKNOWN_NATIVE_PRINCIPAL;
         NativePrincipal p = (NativePrincipal)allNatives.get(name);
         if (p == null) {
             return (NativePrincipal)allNatives.putIfAbsent(name, new NativePrincipal(name));

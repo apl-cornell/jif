@@ -170,7 +170,11 @@ public class Runtime {
         return System.err;
     }
 
-    public static native String currentUser();
+    public static String currentUser() {
+        if (_nativeOK) return currentUserImpl();
+        return null;
+    }
+    private static native String currentUserImpl();
 
     public static int currentYear(Principal dummy) {
         return new GregorianCalendar().get(Calendar.YEAR);
@@ -225,7 +229,15 @@ public class Runtime {
         return c;
     }
        
+    private static boolean _nativeOK = true;
     static {
-        System.loadLibrary("jifrt");
+        try {
+            System.loadLibrary("jifrt");
+        }
+        catch (UnsatisfiedLinkError ule) {
+            // fail, but continue
+            _nativeOK = false;
+            System.err.println(ule.getLocalizedMessage());
+        }
     }   
 }

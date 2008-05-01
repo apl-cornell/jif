@@ -103,6 +103,12 @@ public class FileSystem
     private static native String owner(String file);
     
     static {
-        System.loadLibrary("jifrt");
+        try {
+            System.loadLibrary("jifrt");
+        }
+        catch (UnsatisfiedLinkError ule) {
+            // fail, but continue
+            System.err.println(ule.getLocalizedMessage());
+        }
     }
 }
