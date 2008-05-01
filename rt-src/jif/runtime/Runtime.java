@@ -237,7 +237,7 @@ public class Runtime {
         catch (UnsatisfiedLinkError ule) {
             // fail, but continue
             _nativeOK = false;
-            System.err.println(ule.getLocalizedMessage());
+            // System.err.println(ule.getLocalizedMessage());
         }
     }   
 }

@@ -108,7 +108,7 @@ public class FileSystem
         }
         catch (UnsatisfiedLinkError ule) {
             // fail, but continue
-            System.err.println(ule.getLocalizedMessage());
+            // System.err.println(ule.getLocalizedMessage());
         }
     }
 }
