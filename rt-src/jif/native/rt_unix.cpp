@@ -16,7 +16,7 @@
 #include "jif_runtime_FileSystem.h"
 #include "jif_runtime_Runtime.h"
 
-JNIEXPORT jstring JNICALL Java_jif_runtime_Runtime_currentUser(JNIEnv* env, 
+JNIEXPORT jstring JNICALL Java_jif_runtime_Runtime_currentUserImpl(JNIEnv* env, 
 	jclass clazz)
 {
     jstring juser;

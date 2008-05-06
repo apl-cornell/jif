@@ -14,7 +14,7 @@
 
 #include "winac.h"
 
-JNIEXPORT jstring JNICALL Java_jif_runtime_Runtime_currentUser(
+JNIEXPORT jstring JNICALL Java_jif_runtime_Runtime_currentUserImpl(
 	JNIEnv *env, jclass clazz) 
 {
     jstring user;
