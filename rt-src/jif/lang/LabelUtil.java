@@ -127,9 +127,9 @@ public class LabelUtil
     private final Label NO_COMPONENTS; 
     
     {
-        BOTTOM_CONF = new ReaderPolicy(this, null, null);
-        TOP_INTEG = new WriterPolicy(this, null, null);
-        NO_COMPONENTS = new PairLabel(this, BOTTOM_CONF, TOP_INTEG);
+        BOTTOM_CONF = this.readerPolicy(null, (Principal)null);
+        TOP_INTEG = this.writerPolicy(null, (Principal)null);
+        NO_COMPONENTS = this.toLabel(BOTTOM_CONF, TOP_INTEG);
     }
     
     public Label noComponents() {
@@ -155,7 +155,7 @@ public class LabelUtil
     public ConfPolicy readerPolicy(Principal owner, Collection<Principal> readers) {
         try {
             enterTiming();
-            return new ReaderPolicy(this, owner, PrincipalUtil.disjunction(readers));
+            return readerPolicy(owner, PrincipalUtil.disjunction(readers));
         }
         finally {
             exitTiming();
@@ -188,7 +188,7 @@ public class LabelUtil
     public Label readerPolicyLabel(Principal owner, Principal reader) {
         try {
             enterTiming();
-            return toLabel(new ReaderPolicy(this, owner, reader));
+            return toLabel(readerPolicy(owner, reader));
         }
         finally {
             exitTiming();
@@ -197,7 +197,7 @@ public class LabelUtil
     public Label readerPolicyLabel(Principal owner, Collection<Principal> readers) {        
         try {
             enterTiming();
-            Label l = toLabel(new ReaderPolicy(this, owner, PrincipalUtil.disjunction(readers)));
+            Label l = toLabel(readerPolicy(owner, PrincipalUtil.disjunction(readers)));
             return l;
         }
         finally {
@@ -241,7 +241,7 @@ public class LabelUtil
     public IntegPolicy writerPolicy(Principal owner, Collection<Principal> writers) {
         try {
             enterTiming();
-            return new WriterPolicy(this, owner, PrincipalUtil.disjunction(writers));
+            return writerPolicy(owner, PrincipalUtil.disjunction(writers));
         }
         finally {
             exitTiming();
@@ -250,7 +250,7 @@ public class LabelUtil
     public Label writerPolicyLabel(Principal owner, Principal writer) {
         try {
             enterTiming();
-            return toLabel(new WriterPolicy(this, owner, writer));
+            return toLabel(writerPolicy(owner, writer));
         }
         finally {
             exitTiming();
@@ -259,7 +259,7 @@ public class LabelUtil
     public Label writerPolicyLabel(Principal owner, Collection<Principal> writers) {
         try {
             enterTiming();
-            return toLabel(new WriterPolicy(this, owner, PrincipalUtil.disjunction(writers)));
+            return toLabel(writerPolicy(owner, PrincipalUtil.disjunction(writers)));
         }
         finally {
             exitTiming();
