@@ -51,7 +51,36 @@ public abstract class JifDowngradeExprExt extends JifExprExt
             "The label the downgrade expression is downgrading from");
         }
 
+        // The pc at the point of declassification is dependent on the expression to declassify
+        // terminating normally.
+        A = (JifContext) A.pushBlock();
+        A.setPc(Xe.N(), lc);
+        lc = lc.context(A);
 
+        checkDowngradeFromBound(lc, A, Xe, d, downgradeFrom, downgradeTo, boundSpecified);
+
+        JifContext dA = declassifyConstraintContext(lc, A, downgradeFrom, downgradeTo);
+        checkOneDimenOnly(lc, dA, downgradeFrom, downgradeTo, d.position());
+
+        checkAuthority(lc, dA, downgradeFrom, downgradeTo, d.position());
+
+        if (!((JifOptions)JifOptions.global).nonRobustness) {
+            checkRobustness(lc, dA, downgradeFrom, downgradeTo, d.position());
+        }
+
+        PathMap X = Xe.NV(lc.upperBound(dA.pc(), downgradeTo));           
+
+
+        return updatePathMap(d.expr(e), X);
+    }
+
+    /**
+     * @throws SemanticException 
+     * 
+     */
+    protected void checkDowngradeFromBound(LabelChecker lc, JifContext A,
+            PathMap Xe, final DowngradeExpr d, Label downgradeFrom,
+            Label downgradeTo, boolean boundSpecified) throws SemanticException {
         lc.constrain(new NamedLabel("expr.nv", Xe.NV()), 
                                          boundSpecified?LabelConstraint.LEQ:LabelConstraint.EQUAL, 
                                                  new NamedLabel("downgrade_bound", downgradeFrom),
@@ -79,20 +108,6 @@ public abstract class JifDowngradeExprExt extends JifExprExt
             }                     
         }
         );
-
-        JifContext dA = declassifyConstraintContext(lc, A, downgradeFrom, downgradeTo);
-        checkOneDimenOnly(lc, dA, downgradeFrom, downgradeTo, d.position());
-
-        checkAuthority(lc, dA, downgradeFrom, downgradeTo, d.position());
-
-        if (!((JifOptions)JifOptions.global).nonRobustness) {
-            checkRobustness(lc, dA, downgradeFrom, downgradeTo, d.position());
-        }
-
-        PathMap X = Xe.NV(lc.upperBound(dA.pc(), downgradeTo));           
-
-
-        return updatePathMap(d.expr(e), X);
     }
 
     protected PathMap downgradeExprPathMap(LabelChecker lc, PathMap Xe) throws SemanticException {
