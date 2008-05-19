@@ -112,7 +112,7 @@ public class JifContext_c extends Context_c implements JifContext
      * This makes sure that we are dealing with a copy of the environment,
      * and do not accidentally modify the parent's environment
      */
-    private void envModification() {
+    protected void envModification() {
         JifContext_c jifOuter = (JifContext_c)this.outer;
         if (jifOuter != null && jifOuter.env == this.env) {
             // the outer's label environment points to the same object as this
