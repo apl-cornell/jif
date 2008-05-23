@@ -700,7 +700,7 @@ public class LabelEnv_c implements LabelEnv
     public Label findNonArgLabelUpperBound(Label L) {
         return findUpperBound(L, Collections.EMPTY_SET, true);
     }
-    private Label findUpperBound(Label L, Collection<Serializable> seen, boolean noArgLabels) {        
+    protected Label findUpperBound(Label L, Collection<Serializable> seen, boolean noArgLabels) {        
         // L is a pair label.
         if (L instanceof PairLabel) return L;
         if (L instanceof VarLabel_c) {
