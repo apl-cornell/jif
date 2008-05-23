@@ -101,7 +101,7 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
         }        
         else if (label instanceof PairLabel) {
             PairLabel pl = (PairLabel)label;   
-            ConfPolicy newCP = transformIntegToCong(pl.integPolicy());
+            ConfPolicy newCP = transformIntegToConf(pl.integPolicy());
             return ts.pairLabel(pl.position(), newCP, ts.bottomIntegPolicy(pl.position()));
         }
         else if (label instanceof JoinLabel) {
@@ -128,7 +128,7 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
                                         "for " + label);
     }
         
-    protected static ConfPolicy transformIntegToCong(IntegPolicy pol) {
+    protected static ConfPolicy transformIntegToConf(IntegPolicy pol) {
         JifTypeSystem ts = (JifTypeSystem)pol.typeSystem();
         if (pol instanceof WriterPolicy) {
             WriterPolicy wp = (WriterPolicy)pol;
@@ -139,7 +139,7 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
             Set newPols = new HashSet(jp.joinComponents().size());
             for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
                 IntegPolicy ip = (IntegPolicy)iter.next();
-                ConfPolicy cp = transformIntegToCong(ip);
+                ConfPolicy cp = transformIntegToConf(ip);
                 newPols.add(cp);
             }
             return ts.meetConfPolicy(jp.position(), newPols);
@@ -149,7 +149,7 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
             Set newPols = new HashSet(mp.meetComponents().size());
             for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
                 IntegPolicy ip = (IntegPolicy)iter.next();
-                ConfPolicy cp = transformIntegToCong(ip);
+                ConfPolicy cp = transformIntegToConf(ip);
                 newPols.add(cp);
             }
             return ts.joinConfPolicy(mp.position(), newPols);

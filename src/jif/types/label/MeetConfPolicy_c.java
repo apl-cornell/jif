@@ -10,7 +10,7 @@ import polyglot.util.Position;
 import polyglot.util.TypedList;
 
 
-/** Represents the meet of a number of integrity policies. 
+/** Represents the meet of a number of confidentiality policies. 
  */
 public class MeetConfPolicy_c extends MeetPolicy_c implements ConfPolicy {
 
