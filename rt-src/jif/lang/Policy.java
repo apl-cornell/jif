@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  * A Policy is a component of a label, and is either an integrity policy or
- * a confidentiatlity policy. 
+ * a confidentiality policy. 
  *  
  */
 public interface Policy
