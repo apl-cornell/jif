@@ -156,7 +156,7 @@ public class ArrayList[label L]
 
 	    ensureCapacity(size+1);  // Increments modCount!!
 	    try {
-		for (int i = index; i < size /*&& i<ed.length && i < oldData.length */; i++) {
+		for (int i = size-1; i >= index /*&& i<ed.length && i < oldData.length */; i--) {
 		    elementData[i+1] = elementData[i];
 		}
 		elementData[index] = element;
