@@ -217,10 +217,10 @@ public class LabelTypeCheckUtil {
                     if (ts.isParamsRuntimeRep(t)) {
                         // make sure the label is runtime representable
                         if (!L.isRuntimeRepresentable()) {
-                            if (L instanceof VarLabel) {
-                                // mark the var label as needing to be runtime representable
-                                VarLabel vl = (VarLabel)L;
-                                vl.setMustRuntimeRepresentable();
+                            if (L instanceof VarLabel && ((VarLabel)L).mustRuntimeRepresentable()) {
+                                // the var label has already been marked as needing to be
+                                // runtime representable, and so the solver will
+                                // make sure it is indeed runtime representable.
                             }
                             else {                        
                                 throw new SemanticDetailedException(

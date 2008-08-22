@@ -196,15 +196,22 @@ public class SolverGLB extends AbstractSolver {
                 
         if (shouldReport(5)) report(4, "NEEDED = " + needed);
 
-        Label join =  ts.join(vBound, needed);
+        Label newBound =  ts.join(vBound, needed);
 
-        if (shouldReport(4)) report(4, "JOIN (" + v + ", NEEDED) := " + join);
+        if (shouldReport(4)) report(4, "JOIN (" + v + ", NEEDED) := " + newBound);
 
-        addTrace(v, eqn, join);
-        setBound(v, join, eqn.constraint());
+        if (v.mustRuntimeRepresentable() && !newBound.isRuntimeRepresentable()) {
+            Label rtRep = eqn.env().findNonArgLabelUpperBound(newBound);
+            if (shouldReport(4)) report(4, "RUNTIME_REPR (" + newBound + ") := " + rtRep);
+            newBound = rtRep;
+            
+        }
+
+        addTrace(v, eqn, newBound);
+        setBound(v, newBound, eqn.constraint());
         wakeUp(v);
     }
-    
+        
     /**
      * Return the most permissive label L such that lhs <= rhs join L
      */

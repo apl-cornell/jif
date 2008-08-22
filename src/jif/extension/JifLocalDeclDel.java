@@ -52,6 +52,8 @@ public class JifLocalDeclDel extends JifJL_c {
                 "an initializing expression.", ld.position());
         }
         
+        ld.localInstance().setType(ld.declType());
+        
         // if the declared type is an array type, make sure it is the same all the way through
         if (ld.localInstance().type().isArray()) {
             JifTypeSystem jts = (JifTypeSystem)tc.typeSystem(); 
