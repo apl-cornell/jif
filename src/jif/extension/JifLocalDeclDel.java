@@ -3,12 +3,11 @@ package jif.extension;
 import jif.types.ConstArrayType;
 import jif.types.JifLocalInstance;
 import jif.types.JifTypeSystem;
+import jif.visit.JifTypeChecker;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.types.*;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.TypeBuilder;
-import polyglot.visit.TypeChecker;
+import polyglot.visit.*;
 
 /** The delegate of the <code>JifMethodDecl</code> node. 
  * 
@@ -36,6 +35,11 @@ public class JifLocalDeclDel extends JifJL_c {
         li.setName(n.name());
         li.setType(n.declType());
         return n;
+    }
+
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+        JifTypeChecker jtc = (JifTypeChecker)super.typeCheckEnter(tc);
+        return jtc.inferClassParameters(true);
     }
 
     /**

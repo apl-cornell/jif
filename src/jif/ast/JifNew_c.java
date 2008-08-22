@@ -6,15 +6,13 @@ import java.util.List;
 import jif.extension.LabelTypeCheckUtil;
 import jif.types.JifClassType;
 import jif.types.JifTypeSystem;
-import polyglot.ast.ClassBody;
-import polyglot.ast.New;
-import polyglot.ast.New_c;
-import polyglot.ast.Node;
-import polyglot.ast.TypeNode;
+import jif.visit.JifTypeChecker;
+import polyglot.ast.*;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
 public class JifNew_c extends New_c implements New
@@ -24,6 +22,13 @@ public class JifNew_c extends New_c implements New
 	super(pos, null, tn, arguments, body);
     }
     
+    
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+        JifTypeChecker jtc = (JifTypeChecker)super.typeCheckEnter(tc);
+        return jtc.inferClassParameters(true);
+    }
+
+
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	JifNew_c n = (JifNew_c) super.typeCheck(tc);
 

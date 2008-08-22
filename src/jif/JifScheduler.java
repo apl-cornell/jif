@@ -1,28 +1,19 @@
 package jif;
 
-import java.util.Iterator;
+import java.util.*;
 
 import jif.ast.JifNodeFactory;
 import jif.translate.JifToJavaRewriter;
 import jif.types.JifSubstType;
 import jif.types.JifTypeSystem;
-import jif.visit.IntegerBoundsChecker;
-import jif.visit.JifInitChecker;
-import jif.visit.NotNullChecker;
-import jif.visit.PreciseClassChecker;
+import jif.visit.*;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.frontend.CyclicDependencyException;
-import polyglot.frontend.JLScheduler;
-import polyglot.frontend.Job;
-import polyglot.frontend.Source;
+import polyglot.frontend.*;
 import polyglot.frontend.goals.FieldConstantsChecked;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.VisitorGoal;
-import polyglot.types.FieldInstance;
-import polyglot.types.ParsedClassType;
-import polyglot.types.ParsedTypeObject;
-import polyglot.types.TypeSystem;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 
 public class JifScheduler extends JLScheduler {
@@ -77,6 +68,14 @@ public class JifScheduler extends JLScheduler {
         return g;
 
     }
+
+    public Goal TypeChecked(Job job) {
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = TypeChecked.create(this, job, ts, nf);
+        return g;
+    }
+
     public Goal PreciseClassChecker(Job job) {
         Goal g = internGoal(new VisitorGoal(job, new PreciseClassChecker(job)));
 
@@ -228,4 +227,28 @@ public class JifScheduler extends JLScheduler {
         return j;
     }
 
+}
+
+class TypeChecked extends VisitorGoal {
+    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
+        return scheduler.internGoal(new TypeChecked(job, ts, nf));
+    }
+
+    protected TypeChecked(Job job, TypeSystem ts, NodeFactory nf) {
+        super(job, new JifTypeChecker(job, ts, nf));
+    }
+
+    public Collection prerequisiteGoals(Scheduler scheduler) {
+        List l = new ArrayList();
+        l.add(scheduler.Disambiguated(job));
+        l.addAll(super.prerequisiteGoals(scheduler));
+        return l;
+    }
+
+    public Collection corequisiteGoals(Scheduler scheduler) {
+        List l = new ArrayList();
+        l.add(scheduler.ConstantsChecked(job));
+        l.addAll(super.corequisiteGoals(scheduler));
+        return l;
+    }
 }
