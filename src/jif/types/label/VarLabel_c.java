@@ -16,6 +16,10 @@ public class VarLabel_c extends Label_c implements VarLabel {
     private final transient int uid = ++counter;
     private static int counter = 0;
     private String name;
+    /**
+     * Does whatever this variable resolves to need to be runtime representable?
+     */
+    private boolean mustRuntimeRepresentable = false;
     
     protected VarLabel_c() {
     }
@@ -32,6 +36,13 @@ public class VarLabel_c extends Label_c implements VarLabel {
     public boolean isDisambiguatedImpl() { return true; }     
     public boolean isRuntimeRepresentable() { return false; }
     public boolean isCovariant() { return false; }
+    
+    public void setMustRuntimeRepresentable() {
+        this.mustRuntimeRepresentable = true;
+    }
+    public boolean mustRuntimeRepresentable() {
+        return this.mustRuntimeRepresentable;
+    }
     
     public String componentString(Set printedLabels) {
         if (Report.should_report(Report.debug, 2)) { 

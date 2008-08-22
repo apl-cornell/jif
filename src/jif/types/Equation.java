@@ -1,10 +1,11 @@
 package jif.types;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import jif.types.hierarchy.LabelEnv;
-import jif.types.label.*;
+import jif.types.label.JoinLabel;
+import jif.types.label.Label;
+import jif.types.label.MeetLabel;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -62,6 +63,17 @@ public class Equation
         List l = new LinkedList();
         l.addAll(lhs.variableComponents());
         l.addAll(rhs.variableComponents());
+        return l;
+    }
+
+    /**
+     * Return a <code>Set</code> of variables that occur in either the 
+     * left or right hand side.
+     */
+    public Set variables() {
+        Set l = new LinkedHashSet();
+        l.addAll(lhs.variables());
+        l.addAll(rhs.variables());
         return l;
     }
 

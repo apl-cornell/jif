@@ -169,6 +169,12 @@ public interface Label extends Param {
      * in upper bounds of arg labels.
      */
     Set variableComponents();
+    
+    /**
+     * The set of variables that this label contains including variables contained
+     * in upper bounds of arg labels.
+     */
+    Set variables();
 
     /**
      * Implementation of leq, should only be called by JifTypeSystem

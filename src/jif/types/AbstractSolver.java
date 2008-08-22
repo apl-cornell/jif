@@ -427,11 +427,21 @@ public abstract class AbstractSolver implements Solver {
             report(4, "===== Checking candidate solution =====");
         }
         // We are done refining the upper bounds of the variables.
+                
         // Make one final check that all equations are satisfied.
         // This will force a check on equations with unconstrained
         // variables.
         for (Iterator i = equations.iterator(); i.hasNext();) {
             Equation eqn = (Equation)i.next();
+
+            // Check that any variables that must be runtime representable are in fact so.
+            for (Iterator iter = eqn.variables().iterator(); iter.hasNext();) {
+                VarLabel v = (VarLabel)iter.next();
+                if (v.mustRuntimeRepresentable() && !bounds.boundOf(v).isRuntimeRepresentable()) {
+                    // a var label that must be runtime representable is not.
+                    reportError(eqn.constraint(), Collections.singleton(v));
+                }
+            }
 
             Label lhsBound = triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
             Label rhsBound = triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());

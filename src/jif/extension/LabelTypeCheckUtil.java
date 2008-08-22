@@ -217,13 +217,20 @@ public class LabelTypeCheckUtil {
                     if (ts.isParamsRuntimeRep(t)) {
                         // make sure the label is runtime representable
                         if (!L.isRuntimeRepresentable()) {
-                            throw new SemanticDetailedException(
-                                                                "A label used in a type examined at runtime must be representable at runtime.",
-                                                                "If a type is used in an instanceof, " +
-                                                                "cast, constructor call, or static method call, " +
-                                                                "all parameters of the type must be runtime " +
-                                                                "representable. Arg labels are not represented at runtime.",
-                                                                pos);
+                            if (L instanceof VarLabel) {
+                                // mark the var label as needing to be runtime representable
+                                VarLabel vl = (VarLabel)L;
+                                vl.setMustRuntimeRepresentable();
+                            }
+                            else {                        
+                                throw new SemanticDetailedException(
+                                                                    "A label used in a type examined at runtime must be representable at runtime.",
+                                                                    "If a type is used in an instanceof, " +
+                                                                    "cast, constructor call, or static method call, " +
+                                                                    "all parameters of the type must be runtime " +
+                                                                    "representable. Arg labels are not represented at runtime.",
+                                                                    pos);
+                            }     
                         }
                     }
 
