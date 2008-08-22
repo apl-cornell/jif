@@ -32,7 +32,8 @@ public class JifFieldExt extends JifExprExt
 
     public Node labelCheckIncrement(LabelChecker lc) throws SemanticException
     {
-        JifNodeFactory nf = new JifNodeFactory_c();
+        JifNodeFactory nf = (JifNodeFactory)lc.nodeFactory();
+        lc.nodeFactory();
         Field fe = (Field) node();
         Position pos = fe.position();
         FieldAssign fae = nf.FieldAssign(pos, fe, Assign.ADD_ASSIGN, 

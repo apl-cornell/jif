@@ -22,7 +22,7 @@ public class JifArrayAccessExt extends JifExprExt
 
     public Node labelCheckIncrement(LabelChecker lc) throws SemanticException
     {
-        JifNodeFactory nf = new JifNodeFactory_c();
+        JifNodeFactory nf = (JifNodeFactory)lc.nodeFactory();
         ArrayAccess ae = (ArrayAccess) node();
         Position pos = ae.position();
         ArrayAccessAssign aae = nf.ArrayAccessAssign(pos, ae, Assign.ADD_ASSIGN, 
