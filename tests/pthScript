@@ -264,6 +264,12 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Hello.jif ;
 	HiRefLowField.jif (Semantic, "Label .* not less restrictive");
 	If1.jif ;
+	Inf1.jif ;
+	Inf2.jif (Semantic, "uninstantiated") ;
+	Inf3.jif (Semantic, "uninstantiated") ;
+	Inf4.jif ;
+	Inf5.jif ;
+	Inf6.jif ;
 	Implicit.jif ;
 	Implicit2.jif ;
 	IntBounds1.jif ;
