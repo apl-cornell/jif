@@ -7,17 +7,10 @@ import java.util.List;
 import jif.types.JifContext;
 import jif.types.JifSubstType;
 import jif.types.JifTypeSystem;
-import polyglot.ast.CanonicalTypeNode;
-import polyglot.ast.Expr;
-import polyglot.ast.Field;
-import polyglot.ast.Node;
-import polyglot.ast.Receiver;
-import polyglot.ast.Special;
-import polyglot.types.FieldInstance;
-import polyglot.types.ReferenceType;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
+import jif.visit.JifTypeChecker;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>Field</code> node. 
@@ -56,6 +49,11 @@ public class JifFieldDel extends JifJL_c
         return (r instanceof Special 
                 || isTargetNeverNull 
                 || r instanceof CanonicalTypeNode);
+    }
+
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+        JifTypeChecker jtc = (JifTypeChecker)super.typeCheckEnter(tc);
+        return jtc.inferClassParameters(true);
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {

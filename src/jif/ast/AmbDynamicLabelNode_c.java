@@ -5,6 +5,7 @@ import jif.types.JifTypeSystem;
 import jif.types.SemanticDetailedException;
 import jif.types.label.AccessPath;
 import jif.types.label.Label;
+import jif.visit.JifTypeChecker;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
 import polyglot.ast.Node;
@@ -16,10 +17,7 @@ import polyglot.types.ParsedClassType;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeChecker;
+import polyglot.visit.*;
 
 /** An implementation of the <tt>AmbDynamicLabel</tt> interface. */
 public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicLabelNode
@@ -47,7 +45,7 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         }
 
         // run the typechecker over expr.
-        TypeChecker tc = new TypeChecker(sc.job(), ts, nf);
+        TypeChecker tc = new JifTypeChecker(sc.job(), ts, nf);
         tc = (TypeChecker) tc.context(sc.context());
         expr = (Expr)expr.visit(tc);
 

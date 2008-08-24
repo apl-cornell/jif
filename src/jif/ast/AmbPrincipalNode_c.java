@@ -6,19 +6,14 @@ import jif.types.*;
 import jif.types.label.AccessPath;
 import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
+import jif.visit.JifTypeChecker;
 import polyglot.ast.*;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
-import polyglot.types.Context;
-import polyglot.types.ParsedClassType;
-import polyglot.types.SemanticException;
-import polyglot.types.VarInstance;
+import polyglot.types.*;
 import polyglot.util.Position;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.CFGBuilder;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.TypeChecker;
+import polyglot.visit.*;
 
 /** An implementation of the <code>AmbPrincipalNode</code> interface. 
  */
@@ -63,7 +58,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
         // run the typechecker over expr.
-        TypeChecker tc = new TypeChecker(ar.job(), ts, nf);
+        TypeChecker tc = new JifTypeChecker(ar.job(), ts, nf);
         tc = (TypeChecker) tc.context(ar.context());
         expr = (Expr)expr.visit(tc);
 

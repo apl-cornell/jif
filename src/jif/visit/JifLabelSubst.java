@@ -47,7 +47,7 @@ public class JifLabelSubst extends ContextVisitor
         bounds = solver.solve();
     }
     
-    protected Node updateNode(Node n) {
+    protected Node updateNode(Node n) throws SemanticException {
         if (n instanceof ProcedureDecl) {
             JifProcedureInstance pi = (JifProcedureInstance)((ProcedureDecl)n).procedureInstance();
             pi.subst(bounds);
@@ -65,6 +65,17 @@ public class JifLabelSubst extends ContextVisitor
             li.subst(bounds);
         }
         
+        if (n instanceof Call) {
+            // update the method instance in case the type of the receiver changed
+            // during solving
+            Call c = (Call)n;
+            MethodInstance mi = ts.findMethod(c.target().type().toReference(), 
+                                              c.methodInstance().name(), 
+                                              c.methodInstance().formalTypes(), 
+                                              c.target().type().toClass());
+            n = c.methodInstance(mi);
+        }
+
         if (JifUtil.jifExt(n) != null) {
             PathMap X = Jif_c.getPathMap(n);
             

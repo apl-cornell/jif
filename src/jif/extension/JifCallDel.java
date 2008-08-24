@@ -5,9 +5,11 @@ import java.util.*;
 import jif.ast.JifInstantiator;
 import jif.types.*;
 import jif.types.label.VarLabel;
+import jif.visit.JifTypeChecker;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
+import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>Call</code> node. 
@@ -88,6 +90,11 @@ public class JifCallDel extends JifJL_c
     protected VarLabel receiverVarLabel;
     protected List argVarLabels; // list of var labels for the actual args
     protected List paramVarLabels; // list of var labels for the actual parameters of the return type.
+
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+        JifTypeChecker jtc = (JifTypeChecker)super.typeCheckEnter(tc);
+        return jtc.inferClassParameters(true);
+    }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Call c = (Call)super.typeCheck(tc);

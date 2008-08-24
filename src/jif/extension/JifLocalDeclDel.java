@@ -52,6 +52,7 @@ public class JifLocalDeclDel extends JifJL_c {
                 "an initializing expression.", ld.position());
         }
         
+        // set the type on the local instance, as it may have changed during type checking.
         ld.localInstance().setType(ld.declType());
         
         // if the declared type is an array type, make sure it is the same all the way through

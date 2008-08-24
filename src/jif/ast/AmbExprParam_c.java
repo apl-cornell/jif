@@ -1,10 +1,8 @@
 package jif.ast;
 
 import jif.types.*;
-import polyglot.ast.Expr;
-import polyglot.ast.Field;
-import polyglot.ast.Node;
-import polyglot.ast.Node_c;
+import jif.visit.JifTypeChecker;
+import polyglot.ast.*;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
@@ -83,7 +81,7 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
         JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
         // run the typechecker over expr.
-        TypeChecker tc = new TypeChecker(ar.job(), ts, nf);
+        TypeChecker tc = new JifTypeChecker(ar.job(), ts, nf);
         tc = (TypeChecker) tc.context(ar.context());
 	expr = (Expr)expr.visit(tc);
     
