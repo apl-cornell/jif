@@ -38,7 +38,10 @@ JNIEXPORT void JNICALL Java_jif_runtime_FileSystem_setPolicy
     struct stat buf;
     const char* file = env->GetStringUTFChars(jfile, 0);
 
-    stat(file, &buf);
+    if (stat(file, &buf) != 0) {
+    	// failed, the file does not exist
+        return;
+    }
 
     mode_t mode = buf.st_mode;
 	
@@ -82,7 +85,11 @@ JNIEXPORT jobjectArray JNICALL Java_jif_runtime_FileSystem_readers
 
     const char* file = env->GetStringUTFChars(jfile, 0);
 
-    stat(file, &buf);
+    if (stat(file, &buf) != 0) {
+    	// failed
+        // printf("Error in jif_runtime_FileSystem_readers");
+        return NULL;
+    }
 	
     mode_t mode = buf.st_mode;
 
@@ -129,7 +136,11 @@ JNIEXPORT jstring JNICALL Java_jif_runtime_FileSystem_owner
 
     const char* file = env->GetStringUTFChars(jfile, 0);
 
-    stat(file, &buf);
+    if (stat(file, &buf) != 0) {
+    	// failed
+        // printf("Error in jif_runtime_FileSystem_owner");
+        return NULL;
+    }
 
     uid_t uid = buf.st_uid;
 

@@ -1,5 +1,7 @@
 package jif.runtime;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +16,9 @@ import jif.lang.LabelUtil;
 public class FileSystem
 {
     /** Get the security label of <code>file</code>. */
-    public static Label labelOf(String file) {
+    public static Label labelOf(String file) throws FileNotFoundException {
+        File f = new File(file);
+        if (!f.exists()) throw new FileNotFoundException("File " + file + " not found");
         String[] readers = readers(file);
 //        String[] writers = writers(file);
         String owner = owner(file);
