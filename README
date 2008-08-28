@@ -223,10 +223,10 @@ University Computer Science Department. Many people have contributed
 to this software.
 
 This release of the Jif compiler was prepared by Stephen Chong. Thanks to 
-Aslan Askarov, Doaa Hassan, Daniel Hedin, Boniface Hicks, Dave King, 
-Karl Mazurak, Todd Millstein, Andrei Sabelfeld, and Steve Zdancewic, 
-who provided bug reports and feedback for previous versions of Jif. 
-Xin Zheng, Lantian Zheng, Steve Zdancewic, and Nate Nystrom helped 
+Aslan Askarov, Robert Grabowski, Doaa Hassan, Daniel Hedin, Boniface Hicks,
+Dave King, Karl Mazurak, Todd Millstein, Andrei Sabelfeld, and Steve
+Zdancewic, who provided bug reports and feedback for previous versions of 
+Jif. Xin Zheng, Lantian Zheng, Steve Zdancewic, and Nate Nystrom helped 
 implement earlier versions.
 
 Restrictions on use
