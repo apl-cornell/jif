@@ -1,13 +1,14 @@
 package jif.types;
 
-import jif.types.LabelConstraint.Kind;
+import jif.types.Constraint.Kind;
+import polyglot.util.InternalCompilerError;
 
 
 /** 
  * A <code>LabelConstraintMessage</code> provides error messages for 
  * label constraints.
  */
-public class LabelConstraintMessage
+public class ConstraintMessage
 {
     /**
      * A message to display if the constraint is violated. This message should
@@ -37,16 +38,22 @@ public class LabelConstraintMessage
         return msg();
     }        
     
-    private LabelConstraint constraint;
-    public void setConstraint(LabelConstraint c) {
+    private Constraint constraint;
+    public void setConstraint(Constraint c) {
         this.constraint = c;
     }
     
     public NamedLabel namedLhs() {
-        return constraint.namedLhs();
+        if (constraint instanceof LabelConstraint) {
+            return ((LabelConstraint)constraint).namedLhs();
+        }
+        throw new InternalCompilerError("Inappropriate call of namedLhs");
     }
     public NamedLabel namedRhs() {
-        return constraint.namedRhs();        
+        if (constraint instanceof LabelConstraint) {
+            return ((LabelConstraint)constraint).namedRhs();
+        }
+        throw new InternalCompilerError("Inappropriate call of namedRhs");
     }
     public Kind kind() {
         return constraint.kind();        

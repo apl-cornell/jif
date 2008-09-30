@@ -65,7 +65,7 @@ public class JifTryExt extends JifStmtExt_c
                             A.labelEnv(),
                             f.position(),
                             false,
-                            new LabelConstraintMessage() {
+                            new ConstraintMessage() {
                     public String msg() {
                         return "Declared label of catch block variable " + vi.name() + 
                         " is incompatible with label constraints.";
@@ -90,7 +90,7 @@ public class JifTryExt extends JifStmtExt_c
                        A.labelEnv(),
                        f.position(),
                        false,
-                       new LabelConstraintMessage() {
+                       new ConstraintMessage() {
                 public String msg() {
                     return "Label of thrown exceptions of type " + catchTypeName + 
                     " not less restrictive than the label of " + vi.name();

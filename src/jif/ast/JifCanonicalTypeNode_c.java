@@ -1,11 +1,14 @@
 package jif.ast;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import jif.extension.LabelTypeCheckUtil;
 import jif.types.*;
 import jif.types.label.Label;
 import jif.types.label.VarLabel;
+import jif.types.principal.VarPrincipal;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.CanonicalTypeNode_c;
 import polyglot.ast.Node;
@@ -62,16 +65,16 @@ public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements JifCa
                 for (Iterator iter = jpt.params().iterator(); iter.hasNext();) {
                     ParamInstance pi = (ParamInstance)iter.next();
                     if (pi.isLabel()) {
-                        VarLabel l = ts.freshLabelVariable(t.position(), pi.name()+"_inferred", "Inferred label parameter");
+                        VarLabel v = ts.freshLabelVariable(t.position(), pi.name()+"_inferred", "Inferred label parameter");
                         // mark the var label as needing to be runtime representable.
-                        l.setMustRuntimeRepresentable();
-                        varSubst.put(pi, l);
+                        v.setMustRuntimeRepresentable();
+                        varSubst.put(pi, v);
                     }
                     else {
-                        // XXX
-                        // cannot currently infer principal params
-                        inferred = false;
-                        break;
+                        VarPrincipal v = ts.freshPrincipalVariable(t.position(), pi.name()+"_inferred", "Inferred principal parameter");
+                        // mark the var label as needing to be runtime representable.
+                        v.setMustRuntimeRepresentable();
+                        varSubst.put(pi, v);                        
                     }
                 }                
                 t = (ClassType)ts.subst(jpt, varSubst);                

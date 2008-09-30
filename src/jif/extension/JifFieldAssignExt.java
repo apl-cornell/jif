@@ -127,7 +127,7 @@ public class JifFieldAssignExt extends JifAssignExt
                     new NamedLabel("label of field " + fi.name(), L),
                     A.labelEnv(),
                     fe.position(),
-                    new LabelConstraintMessage() {
+                    new ConstraintMessage() {
             public String msg() {
                 return "Label of right hand side not less " + 
                 "restrictive than the label for field " + 
@@ -160,7 +160,7 @@ public class JifFieldAssignExt extends JifAssignExt
                         new NamedLabel("label of field " + fi.name(), L),
                         A.labelEnv(),
                         fe.position(),
-                        new LabelConstraintMessage() {
+                        new ConstraintMessage() {
                 public String msg() {
                     return "Effect of assignment to field " + fi.name() + 
                     " is not bounded below by the PC bound.";

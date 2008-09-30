@@ -79,7 +79,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
                            A.labelEnv(),
                            decl.position(), 
                            false,
-                           new LabelConstraintMessage() {
+                           new ConstraintMessage() {
                     public String msg() {
                         return "Declared label of local variable " + fli.name() + 
                         " is incompatible with label constraints.";
@@ -129,7 +129,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
                         new NamedLabel("label of local variable " + li.name(), L),
                         A.labelEnv(),
                         init.position(),
-                        new LabelConstraintMessage() {
+                        new ConstraintMessage() {
                 public String msg() {
                     return "Label of local variable initializer not less " + 
                     "restrictive than the label for local variable " + 

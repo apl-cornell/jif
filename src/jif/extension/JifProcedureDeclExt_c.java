@@ -17,6 +17,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.StringUtil;
 
 /** The Jif extension of the <code>ProcedureDecl</code> node. 
  * 
@@ -68,7 +69,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
             Principal p = (Principal) iter.next();
             // Check that there is a p' in the old "auth" set such that
             // p' actsFor p.
-            checkActsForAuthority(p, A);
+            checkActsForAuthority(p, A, lc);
         }
 
         
@@ -175,26 +176,35 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
     /**
      * Check that there is a p' in the old "auth" set such that p' actsFor p.
      */
-    protected void checkActsForAuthority(Principal p, JifContext A)
+    protected void checkActsForAuthority(final Principal p, final JifContext A, LabelChecker lc)
     throws SemanticException
     {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
-        Principal authority = ts.conjunctivePrincipal(null, A.authority()); 
-        if (A.actsFor(authority, p)) {
-            return;
-        }
+        Principal authority = ts.conjunctivePrincipal(null, A.authority());
 
         String codeName = A.currentCode().toString();
         if (A.currentCode() instanceof JifProcedureInstance) {
             codeName = ((JifProcedureInstance)A.currentCode()).debugString();
         }
-        throw new SemanticDetailedException(
-                                            "The authority of the class " + A.currentClass().name() + 
-                                            " is insufficient to act for principal " + p + ".", 
-                                            "The " + codeName + " states that it has the authority of the " +
-                                            "principal " + p + ". However, the conjunction of the authority" +
-                                            " set of the class is insufficient to act for " + p + ".",
-                                            A.currentCode().position());
+        
+        final String msgCodeName = codeName;
+        
+        lc.constrain(authority, 
+                     PrincipalConstraint.ACTSFOR, 
+                    p, 
+                   A.labelEnv(),
+                   A.currentCode().position(),
+                   new ConstraintMessage() {
+            public String msg() {
+                return "The authority of the class " + A.currentClass().name() + 
+                " is insufficient to act for principal " + p + ".";
+            }
+            public String detailMsg() {
+                return "The " + msgCodeName + " states that it has the authority of the " +
+                "principal " + p + ". However, the conjunction of the authority" +
+                " set of the class is insufficient to act for " + p + ".";
+            }
+        });
     }
 
     /**
@@ -297,7 +307,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                                     Lr),
                     A.labelEnv(),
                     mn.position(),
-                    new LabelConstraintMessage()
+                    new ConstraintMessage()
         {
             public String msg() { 
                 return "The non-exception termination of the " +
@@ -379,7 +389,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                                                 Lj),
                                 A.labelEnv(),
                                 mi.position(),
-                                new LabelConstraintMessage()
+                                new ConstraintMessage()
                     {
                         public String msg() { 
                             return "More information may be gained " + 

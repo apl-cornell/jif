@@ -63,7 +63,7 @@ public class JifLocalAssignExt extends JifAssignExt
                     new NamedLabel("label of var " + li.name(), L),
                     A.labelEnv(),
                     lve.position(),
-                    new LabelConstraintMessage() {
+                    new ConstraintMessage() {
             public String msg() {
                 return "Label of right hand side not less " + 
                 "restrictive than the label for local variable " + 

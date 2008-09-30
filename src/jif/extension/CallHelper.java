@@ -247,7 +247,7 @@ public class CallHelper {
                              paramUB,
                              A.labelEnv(),
                              this.position,
-                             new LabelConstraintMessage() {
+                             new ConstraintMessage() {
                     public String msg() {
                         return "The actual parameter is more restrictive than " +
                         "permitted.";
@@ -350,7 +350,7 @@ public class CallHelper {
                                     argBoundj),
                      A.labelEnv(),
                      Ej.position(),
-                     new LabelConstraintMessage() {
+                     new ConstraintMessage() {
             public String msg() {
                 return "The actual argument is more restrictive than " +
                 "the formal argument.";
@@ -528,7 +528,7 @@ public class CallHelper {
                         namedLi,
                         A.labelEnv(),
                         position,
-                        new LabelConstraintMessage() {
+                        new ConstraintMessage() {
                 public String msg() {
                     return "PC at call site more restrictive than " +
                     "begin label of " + callee.signature() + ".";
@@ -560,7 +560,7 @@ public class CallHelper {
                         namedLi,
                         A.labelEnv(),
                         position,
-                        new LabelConstraintMessage() {
+                        new ConstraintMessage() {
                 public String msg() {
                     return "The side effects of " + callee.signature() +
                     " are not bounded by the PC bound.";
@@ -637,106 +637,126 @@ public class CallHelper {
             else if (jc instanceof CallerConstraint) {
                 CallerConstraint jcc = (CallerConstraint)jc;
 
+                
+                // construct a principal representing the authority of the context
+                Principal authPrincipal = lc.jifTypeSystem().conjunctivePrincipal(jpi.position(), A.authority());
+                
                 // Check the authority
                 for (Iterator i2 = jcc.principals().iterator(); i2.hasNext();) {
-                    Principal pi = (Principal)i2.next();
-                    pi = instantiate(A, pi);
+                    final Principal pi = instantiate(A, (Principal)i2.next());
 
-                    boolean sat = false;
-
-                    for (Iterator j = A.authority().iterator(); j.hasNext();) {
-                        Principal pj = (Principal)j.next();
-
-                        if (A.actsFor(pj, pi)) {
-                            sat = true;
-                            break;
+                    // authPrincipal must actfor pi, i.e., at least one
+                    // of the principals that have authorized the code must act for pi.
+                    lc.constrain(authPrincipal, 
+                                 PrincipalConstraint.ACTSFOR, 
+                                pi, 
+                               A.labelEnv(),
+                               overrideChecker?jcc.position():position,
+                               new ConstraintMessage() {
+                        public String msg() {
+                            if (!overrideChecker) {
+                                return "The caller must have the authority of the principal " + 
+                                pi + " to invoke " + jpi.debugString();
+                            }
+                            else {
+                                return "The subclass cannot assume the caller has the " +
+                                "authority of the principal " + 
+                                pi;
+                            }
                         }
-                    }
-
-                    if (!sat) {
-                        if (!overrideChecker) {
-                            // being used as a normal call checker
-                            throw new SemanticDetailedException(
-                                                                "The caller must have the authority of the principal " + 
-                                                                pi + " to invoke " + jpi.debugString(),
-                                                                "The " + jpi.debugString() + " requires that the " +
-                                                                "caller of the method have the authority of " +
-                                                                "the principal "  + pi +". The caller does " +
-                                                                "not have this principal's authority.", 
-                                                                position);
+                        public String detailMsg() {
+                            if (!overrideChecker) {
+                                return "The " + jpi.debugString() + " requires that the " +
+                                "caller of the method have the authority of " +
+                                "the principal "  + pi +". The caller does " +
+                                "not have this principal's authority.";
+                            }
+                            else {
+                                return "The " + jpi.debugString() + " requires that the " +
+                                "caller of the method have the authority of " +
+                                "the principal "  + pi +". However, this " +
+                                "method overrides the method in class " + CallHelper.this.pi.container() + 
+                                " which does not make this requirement.";
+                            }
                         }
-                        else {
-                            // being used as an override checker
-                            throw new SemanticDetailedException(
-                                                                "The subclass cannot assume the caller has the " +
-                                                                "authority of the principal " + 
-                                                                pi,
-                                                                "The " + jpi.debugString() + " requires that the " +
-                                                                "caller of the method have the authority of " +
-                                                                "the principal "  + pi +". However, this " +
-                                                                "method overrides the method in class " + this.pi.container() + 
-                                                                " which does not make this requirement.", 
-                                                                jcc.position());                            
-                        }
-                    }
+                    });
+                         
                 }
             }
             else if (jc instanceof ActsForConstraint) {
-                ActsForConstraint jac = (ActsForConstraint)jc;
+                final ActsForConstraint jac = (ActsForConstraint)jc;
 
-                Principal actor = jac.actor();
-                actor = instantiate(A, actor);
+                final Principal actor = instantiate(A, jac.actor());
 
-                Principal granter = jac.granter();
-                granter = instantiate(A, granter);
+                final Principal granter = instantiate(A, jac.granter());
 
+                
                 if (jac.isEquiv()) {
-                    if (!A.equiv(actor, granter)) {
-                        if (!overrideChecker) {
-                            // being used as a normal call checker
-                            throw new SemanticDetailedException(
-                                                                "The principal " + actor + " must be equivalent to " + 
-                                                                granter + " to invoke " + jpi.debugString(),
-                                                                "The " + jpi.debugString() + " requires that the " +
-                                                                " relationship " + jac + " holds at the call site.", 
-                                                                position);
+                    lc.constrain(actor, 
+                                 PrincipalConstraint.EQUIV, 
+                                 granter, 
+                               A.labelEnv(),
+                               position,
+                               new ConstraintMessage() {
+                        public String msg() {
+                            if (!overrideChecker) {
+                                return "The principal " + actor + " must be equivalent to " + 
+                                granter + " to invoke " + jpi.debugString();
+                            }
+                            else {
+                                return "The subclass cannot assume that " + actor + " is " +
+                                "equivalent to " + granter;
+
+                            }
                         }
-                        else { 
-                            // being used as an override checker
-                            throw new SemanticDetailedException(
-                                                                "The subclass cannot assume that " + actor + " is " +
-                                                                "equivalent to " + granter,
-                                                                "The " + jpi.debugString() + " requires that " + actor + " is " +
-                                                                "equivalent to " + granter + ". However, this " +
-                                                                "method overrides the method in class " + this.pi.container() + 
-                                                                " which does not make this requirement.", 
-                                                                jac.position());                            
-                        }                    
-                    }
+                        public String detailMsg() {
+                            if (!overrideChecker) {
+                                return "The " + jpi.debugString() + " requires that the " +
+                                " relationship " + jac + " holds at the call site.";
+                            }
+                            else {
+                                return "The " + jpi.debugString() + " requires that " + actor + " is " +
+                                "equivalent to " + granter + ". However, this " +
+                                "method overrides the method in class " + pi.container() + 
+                                " which does not make this requirement."; 
+
+                            }
+                        }
+                    });                    
                 }
-                else {
-                    if (!A.actsFor(actor, granter)) {
-                        if (!overrideChecker) {
-                            // being used as a normal call checker
-                            throw new SemanticDetailedException(
-                                                                "The principal " + actor + " must act for " + granter + 
-                                                                " to invoke " + jpi.debugString(),
-                                                                "The " + jpi.debugString() + " requires that the " +
-                                                                "relationship " + actor + " actsfor " + granter + 
-                                                                " holds at the call site.", 
-                                                                position);
-                        }   
-                        else { 
-                            throw new SemanticDetailedException(
-                                                                "The subclass cannot assume that " + actor + " can " +
-                                                                "actfor " + granter,
-                                                                "The " + jpi.debugString() + " requires that " + actor + " can " +
-                                                                "actfor " + granter + ". However, this " +
-                                                                "method overrides the method in class " + this.pi.container() + 
-                                                                " which does not make this requirement.", 
-                                                                jac.position());                            
+                else {                    
+                    lc.constrain(actor, 
+                                 PrincipalConstraint.ACTSFOR, 
+                                 granter, 
+                               A.labelEnv(),
+                               position,
+                               new ConstraintMessage() {
+                        public String msg() {
+                            if (!overrideChecker) {
+                                return "The principal " + actor + " must act for " + granter + 
+                                " to invoke " + jpi.debugString();
+                            }
+                            else {
+                                return "The subclass cannot assume that " + actor + " can " +
+                                "actfor " + granter;
+
+                            }
                         }
-                    }
+                        public String detailMsg() {
+                            if (!overrideChecker) {
+                                return "The " + jpi.debugString() + " requires that the " +
+                                "relationship " + actor + " actsfor " + granter + 
+                                " holds at the call site.";
+                            }
+                            else {
+                                return "The " + jpi.debugString() + " requires that " + actor + " can " +
+                                "actfor " + granter + ". However, this " +
+                                "method overrides the method in class " + pi.container() + 
+                                " which does not make this requirement."; 
+                            }
+                        }
+                    });
+     
                 }
             }
             else if (jc instanceof LabelLeAssertion) {
@@ -765,7 +785,7 @@ public class CallHelper {
                                            rhs),
                            A.labelEnv(),
                            pos,
-                           new LabelConstraintMessage() {
+                           new ConstraintMessage() {
                     public String msg() {
                         if (!overrideChecker) {
                             // being used as a normal call checker
@@ -973,7 +993,7 @@ public class CallHelper {
                                           ai.upperBound()),
                           A.labelEnv(),
                           overriding.position(),
-                          new LabelConstraintMessage() {
+                          new ConstraintMessage() {
                 public String msg() {
                     return "Cannot override " + overridden.signature() + 
                     " in " + overridden.container() + " with " + 
@@ -1009,7 +1029,7 @@ public class CallHelper {
                         starti,
                         A.labelEnv(),
                         overriding.position(),
-                        new LabelConstraintMessage() {
+                        new ConstraintMessage() {
             public String msg() {
                 return "Cannot override " + overridden.signature() + 
                 " in " + overridden.container() + " with " + 
@@ -1045,7 +1065,7 @@ public class CallHelper {
                         retj,
                         A.labelEnv(),
                         overriding.position(),
-                        new LabelConstraintMessage() {
+                        new ConstraintMessage() {
             public String msg() {
                 return "Cannot override " + overridden.signature() + 
                 " in " + overridden.container() + " with " + 
@@ -1081,7 +1101,7 @@ public class CallHelper {
                         retValj,
                         A.labelEnv(),
                         overriding.position(),
-                        new LabelConstraintMessage() {
+                        new ConstraintMessage() {
             public String msg() {
                 return "Cannot override " + overridden.signature() + 
                 " in " + overridden.container() + " with " + 
@@ -1123,7 +1143,7 @@ public class CallHelper {
                                                    instantiate(A, exj.labelPart())),
                                     A.labelEnv(),
                                     overriding.position(),
-                                    new LabelConstraintMessage() {
+                                    new ConstraintMessage() {
                         public String msg() {
                             return "Cannot override " + overridden.signature() + 
                             " in " + overridden.container() + " with " + 

@@ -4,6 +4,9 @@ import java.util.*;
 
 import jif.translate.ConjunctivePrincipalToJavaExpr_c;
 import jif.types.JifTypeSystem;
+import jif.types.JifTypeSystem_c;
+import jif.types.label.JoinLabel_c;
+import jif.types.label.Label;
 import polyglot.main.Report;
 import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
@@ -83,6 +86,56 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
     }
 
     public Set conjuncts() {
-        return conjuncts;
+        return Collections.unmodifiableSet(conjuncts);
     }
+    
+    public Principal simplify() {
+        if (!this.isCanonical()) {
+            return this;
+        }
+        
+        Set needed = new LinkedHashSet();
+        JifTypeSystem jts = (JifTypeSystem) ts;
+
+        for (Iterator i = conjuncts.iterator(); i.hasNext(); ) {
+            Principal ci = ((Principal) i.next()).simplify();
+            
+            if (ci.hasVariables()) {
+                needed.add(ci);
+            }
+            else {
+                boolean subsumed = false;
+                
+                for (Iterator j = needed.iterator(); j.hasNext(); ) {
+                    Principal cj = (Principal) j.next();
+                    
+                    if (cj.hasVariables()) {
+                        continue;
+                    }
+
+                    if (jts.actsFor(cj, ci)) {
+                        subsumed = true;
+                        break;
+                    }
+                    
+                    if (jts.actsFor(ci, cj)) { 
+                        j.remove();
+                    }
+                }
+                
+                if (! subsumed)
+                    needed.add(ci);
+            }
+        }
+        
+        if (needed.equals(conjuncts)) {
+            return this;
+        }
+        if (needed.size() == 1) {
+            return (Principal)needed.iterator().next();
+        }
+
+        return new ConjunctivePrincipal_c(needed, (JifTypeSystem)ts, position());
+    }
+    
 }

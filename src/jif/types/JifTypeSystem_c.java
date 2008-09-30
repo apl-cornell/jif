@@ -657,6 +657,11 @@ public class JifTypeSystem_c
         return t;
     }
 
+    public VarPrincipal freshPrincipalVariable(Position pos, String s, String description) {
+        VarPrincipal t = new VarPrincipal_c(s, description, this, pos);
+        return t;
+    }
+
 //    public CovariantParamLabel freshCovariantLabel(Position pos, ParamInstance) {
 //        CovariantParamLabel t = new CovariantParamLabel_c(this, pos, new UID(s));
 //        return t;
@@ -1219,6 +1224,10 @@ public class JifTypeSystem_c
         return meetLabel(pos, s).simplify();
     }
     
+
+    public boolean actsFor(Principal p, Principal q) {
+        return emptyLabelEnv.actsFor(p, q);
+    }
 
     public boolean leq(Label L1, Label L2) {
         return emptyLabelEnv.leq(L1, L2);

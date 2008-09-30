@@ -66,7 +66,7 @@ public class JifSwitchExt extends JifStmtExt_c
                      A.labelEnv(),
                      ss.position(),
                      false,
-                     new LabelConstraintMessage() {
+                     new ConstraintMessage() {
             public String msg() { 
                 return "The information revealed by the normal " +
                 "termination of the switch statement " +

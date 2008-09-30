@@ -2,7 +2,6 @@ package jif.types.label;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -74,7 +73,7 @@ public abstract class Label_c extends TypeObject_c implements Label {
 
     public Set variables() {
         if (variables == null) {
-            LabelVarGatherer lvg = new LabelVarGatherer();
+            VariableGatherer lvg = new VariableGatherer();
             try {
                 this.subst(lvg);
             }
@@ -188,23 +187,6 @@ public abstract class Label_c extends TypeObject_c implements Label {
 
     public Set variableComponents() {
         return Collections.EMPTY_SET;
-    }
-
-    /**
-     * This class is used to implement
-     * {@link Label#variables() Label.variables()}. It constructs a set of
-     * <code>VarLabel</code>s.
-     */
-    private static class LabelVarGatherer extends LabelSubstitution {
-        private final Set variables = new LinkedHashSet();
-
-        public Label substLabel(Label L) throws SemanticException {
-            if (L instanceof VarLabel) {
-                variables.add(L);
-    }
-            return L;
-        }
-    
     }
     
 }

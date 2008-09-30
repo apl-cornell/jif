@@ -226,16 +226,6 @@ public class JifContext_c extends Context_c implements JifContext
             }            
         }
     }
-    public boolean actsFor(Principal p1, Principal p2) {
-        return ph().actsFor(p1, p2);
-    }
-    public boolean equiv(Principal p1, Principal p2) {
-        return actsFor(p1, p2) && actsFor(p2, p1);
-    }
-    public boolean actsFor(Collection actorGrp, Collection grantorGrp) {
-        return ph().actsFor(actorGrp, grantorGrp);
-    }
-
 
     public void clearPH() {
         envModification();

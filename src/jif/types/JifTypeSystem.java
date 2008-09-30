@@ -96,6 +96,8 @@ public interface JifTypeSystem extends ParamTypeSystem
     Principal disjunctivePrincipal(Position pos, Collection principals);
     Principal pathToPrincipal(Position pos, AccessPath path);
 
+    VarPrincipal freshPrincipalVariable(Position pos, String s, String description);
+
     // Label constructors
     VarLabel freshLabelVariable(Position pos, String s, String description);
 
@@ -134,8 +136,11 @@ public interface JifTypeSystem extends ParamTypeSystem
     IntegPolicy topIntegPolicy(Position pos);
 
     
-    /** Returns true iff L1 <= L2 in <code>env</code>. */
+    /** Returns true iff L1 <= L2 in the empty environment. */
     boolean leq(Label L1, Label L2);
+
+    /** Returns true iff p actsfor q in the empty environment. */
+    boolean actsFor(Principal p, Principal q);
 
     /** Returns the join of L1 and L2. */
     Label join(Label L1, Label L2);

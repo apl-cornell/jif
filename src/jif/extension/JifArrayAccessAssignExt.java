@@ -121,7 +121,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
                      namedLa,
                      A.labelEnv(),
                      aie.position(),
-                     new LabelConstraintMessage() {
+                     new ConstraintMessage() {
             public String msg() {
                 return "Label of succesful evaluation of array " +
                 "access and right hand side of the " +
@@ -152,7 +152,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
                     namedLa,
                     A.labelEnv(),
                     aie.position(),
-                    new LabelConstraintMessage() {
+                    new ConstraintMessage() {
             public String msg() {
                 return "Effect of assignment to array " + array + 
                 " is not bounded below by the PC bound.";

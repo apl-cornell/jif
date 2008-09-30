@@ -245,15 +245,22 @@ public class LabelTypeCheckUtil {
                     Principal p = (Principal)arg;
                     A = (JifContext)A.pushBlock();
                     if (ts.isParamsRuntimeRep(t) && !p.isRuntimeRepresentable()) {
-                        throw new SemanticDetailedException("A principal used in a " +
-                                                            "type examined at runtime must be " +
-                                                            "representable at runtime.",
-                                                            "If a type is used in an instanceof, " +
-                                                            "cast, constructor call, or static method call, " +
-                                                            "all parameters of the type must be runtime " +
-                                                            "representable. The principal " + p + " is not " +
-                                                            "represented at runtime.",
-                                                            pos);
+                        if (p instanceof VarPrincipal && ((VarPrincipal)p).mustRuntimeRepresentable()) {
+                            // the var principal has already been marked as needing to be
+                            // runtime representable, and so the solver will
+                            // make sure it is indeed runtime representable.
+                        }
+                        else {                        
+                            throw new SemanticDetailedException("A principal used in a " +
+                                                                "type examined at runtime must be " +
+                                                                "representable at runtime.",
+                                                                "If a type is used in an instanceof, " +
+                                                                "cast, constructor call, or static method call, " +
+                                                                "all parameters of the type must be runtime " +
+                                                                "representable. The principal " + p + " is not " +
+                                                                "represented at runtime.",
+                                                                pos);
+                        }
                     }
 
 

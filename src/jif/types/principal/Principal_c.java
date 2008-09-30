@@ -2,26 +2,25 @@ package jif.types.principal;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import jif.translate.CannotPrincipalToJavaExpr_c;
 import jif.translate.JifToJavaRewriter;
 import jif.translate.PrincipalToJavaExpr;
-import jif.types.JifContext;
-import jif.types.JifTypeSystem;
-import jif.types.LabelSubstitution;
-import jif.types.PathMap;
+import jif.types.*;
+import jif.types.label.VariableGatherer;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeObject;
-import polyglot.types.TypeObject_c;
-import polyglot.types.TypeSystem;
+import polyglot.types.*;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /** An abstract implementation of the <code>Principal</code> interface. 
  */
 public abstract class Principal_c extends TypeObject_c implements Principal {
     PrincipalToJavaExpr toJava;
+
+    protected Set variables = null; // memoized
 
     public Principal_c(JifTypeSystem ts, Position pos) {
         this(ts, pos, new CannotPrincipalToJavaExpr_c());
@@ -34,6 +33,10 @@ public abstract class Principal_c extends TypeObject_c implements Principal {
 
     public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
         return toJava.toJava(this, rw);
+    }
+
+    public final boolean hasVariables() {
+        return !variables().isEmpty();
     }
 
     public boolean isTopPrincipal() { return false; }
@@ -56,4 +59,22 @@ public abstract class Principal_c extends TypeObject_c implements Principal {
         return ts.pathMap().N(A.pc()).NV(A.pc());
     }        
     
+    public Set variables() {
+        if (variables == null) {
+            VariableGatherer lvg = new VariableGatherer();
+            try {
+                this.subst(lvg);
+            }
+            catch (SemanticException e) {
+                throw new InternalCompilerError(e);
+            }
+            variables = lvg.variables;
+        }
+        return variables;
+    }    
+    
+    public Principal simplify() {
+        // XXX TODO implement in some of the subclasses.
+        return this;        
+    }
 }

@@ -140,7 +140,7 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt
                      new NamedLabel("downgrade_bound", labelFrom),
                      A.labelEnv(),
                      d.position(),
-                     new LabelConstraintMessage() {
+                     new ConstraintMessage() {
             public String msg() {
                 return "The label of the expression to " + 
                 d.downgradeKind()+" is " + 

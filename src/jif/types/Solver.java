@@ -10,7 +10,7 @@ public interface Solver {
     /**
      * Add the constraint c to the system
      */
-    void addConstraint(LabelConstraint c) throws SemanticException;
+    void addConstraint(Constraint c) throws SemanticException;
     
     /**
      * Solve the system of constraints.

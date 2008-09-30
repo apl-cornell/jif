@@ -3,6 +3,7 @@ package jif.types;
 import java.util.*;
 
 import jif.extension.LabelTypeCheckUtil;
+import jif.types.Constraint.Kind;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.*;
 import polyglot.util.Enum;
@@ -15,19 +16,10 @@ import polyglot.util.Position;
  * <code>LabelConstraint</code>s are generated during type checking.
  * <code>LabelConstraint</code>s in turn produce {@link Equation Equations}
  * which are what the {@link Solver Solver} will use to find a satisfying 
- * assignment for {@link VarLabel VarLabels}.
- * 
- * A <code>LabelConstraint</code> is not the same as a {@link jif.types.LabelConstraint
- * LabelConstraint}, which by contrast is assumed to be satisfied.
- * 
+ * assignment for {@link Variable Variables}.
  */
-public class LabelConstraint
+public class LabelConstraint extends Constraint
 {
-    /** Kinds of constraint, either equality or inequality. */
-    public static class Kind extends Enum {
-        protected Kind(String name) { super(name); } 
-    }
-
     /**
      * An equality kind of constraint. That is, the constraint requires that 
      * lhs &lt;= rhs and rhs &lt;= lhs. 
@@ -38,17 +30,8 @@ public class LabelConstraint
      * An inequality kind of constraint. That is, the constraint requires that
      * lhs &lt;= rhs.
      */
-    public static final Kind LEQ = new Kind(" <= ");
-
-    protected Label lhs;
-    protected Kind kind;
-    protected Label rhs;
-    
-    /**
-     * The environment under which this constraint needs to be satisfied.
-     */
-    protected LabelEnv env;
-
+    public static final Kind LEQ = new Kind(" <= ");    
+ 
     /**
      * Names for the LHS
      */
@@ -59,42 +42,21 @@ public class LabelConstraint
      */
     protected NamedLabel namedRHS;
 
-    protected Position pos;
     
-    /**
-     * Do we want to report a violation of this constraint, or report the
-     * error for a different constraint?
-     */
-    protected boolean report;
-    
-    /**
-     * Error messages
-     */
-    protected LabelConstraintMessage messages;
-
     public LabelConstraint(NamedLabel lhs, Kind kind, NamedLabel rhs, LabelEnv env,
-              Position pos, LabelConstraintMessage msg, boolean report) {
-        this.lhs = lhs.label;
-        this.kind = kind;
-        this.rhs = rhs.label;
-        this.env = env;
-        this.pos = pos;
+              Position pos, ConstraintMessage msg, boolean report) {
+        super(lhs.label(), kind, rhs.label(), env, pos, msg, report);
         this.namedLHS = lhs;
         this.namedRHS = rhs;
-        this.messages = msg;
-        this.report = report;
     }
     
-    public Label lhs() {
-	return lhs;
+    public Label lhsLabel() {
+	return (Label)lhs;
     }
     
-    public Kind kind() {
-        return kind;
-    }
     
-    public Label rhs() {
-	return rhs;
+    public Label rhsLabel() {
+	return (Label)rhs;
     }
     
     public NamedLabel namedLhs() {
@@ -104,65 +66,7 @@ public class LabelConstraint
     public NamedLabel namedRhs() {
         return namedRHS;
     }
-    
-    public LabelEnv env() {
-	return env;
-    }
-        
-    public Position position() {
-        return pos;
-    }
-
-    public boolean report() {
-        return report;
-    }
-    
-    public LabelConstraintMessage messages() {
-        return messages;
-    }
-
-    /**
-     * A message to display if this constraint is violated. This message should
-     * be short, and explain without using typing rules what this constraint
-     * represents. It should not refer to the names of labels (i.e., names
-     * for <code>NamedLabel</code>s.
-     */
-    public String msg() {
-        if (messages == null) return null;
-        return messages.msg();
-    }
-    
-    /**
-     * A detailed message to display if this constraint is violated.
-     * This message may consist of several sentences, and may refer to the
-     * names of the labels, if <code>NamedLabel</code>s are used.
-     */
-    public String detailMsg() {
-        if (messages == null) return null;
-        return messages.detailMsg();
-    }
-
-    /**
-     * A technical message to display if this constraint is violated. This
-     * message can refer to typing rules to explain what the constraint 
-     * represents, and to names of labels, if <code>NamedLabel</code>s are used.
-     */
-    public String technicalMsg() {
-        if (messages == null) return null;
-        return messages.technicalMsg();
-    }
-        
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append(lhs);
-        sb.append(kind);
-        sb.append(rhs);
-        sb.append(" in environment ");
-        sb.append(env);        
-	
-	return sb.toString();
-    }
-    
+                    
     /**
      * Return a map from Strings to Labels, which are the named elements of
      * the left and right hand sides.
@@ -228,14 +132,14 @@ public class LabelConstraint
         
         // in case there are no named labels, add all components of the lhs and
         // rhs bounds.
-        Label bound = bounds.applyTo(lhs);
+        Label bound = bounds.applyTo(lhsLabel());
         Collection components = ltcu.labelComponents(bound);
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label lb = (Label)i.next();
             labelComponents.add(lb);
         }
 
-        bound = bounds.applyTo(rhs);
+        bound = bounds.applyTo(rhsLabel());
         components = ltcu.labelComponents(bound);
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label l = (Label)i.next();
@@ -272,14 +176,14 @@ public class LabelConstraint
         Collection eqns = new LinkedList();
         
         if (kind == LEQ) {
-            addLEQEqns(eqns, lhs, rhs);
+            addLEQEqns(eqns, lhsLabel(), rhsLabel());
         }
         else if (kind == EQUAL) {
-            addLEQEqns(eqns, lhs, rhs);
-            addLEQEqns(eqns, rhs, lhs);
+            addLEQEqns(eqns, lhsLabel(), rhsLabel());
+            addLEQEqns(eqns, rhsLabel(), lhsLabel());
         }
         else {
-            throw new InternalCompilerError("Unknown kind of equation: " + kind);
+            throw new InternalCompilerError("Inappropriate kind of equation: " + kind);
         }
         
         return eqns;
@@ -306,8 +210,12 @@ public class LabelConstraint
             }                        
         }
         else {
-            Equation eqn = new Equation(left, right, this);
+            Equation eqn = new LabelEquation(left, right, this);
             eqns.add(eqn);            
         }
+    }
+
+    public boolean hasVariables() {
+        return lhsLabel().hasVariables() || rhsLabel().hasVariables();
     } 
 }

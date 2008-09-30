@@ -3,8 +3,10 @@ package jif.extension;
 import java.util.*;
 
 import jif.types.*;
+import jif.visit.JifTypeChecker;
 import polyglot.ast.*;
 import polyglot.types.*;
+import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>Cast</code> node.
@@ -19,6 +21,11 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
     private boolean isToSubstJifClass = false;
 
     public boolean isToSubstJifClass() { return this.isToSubstJifClass; }
+
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+        JifTypeChecker jtc = (JifTypeChecker)super.typeCheckEnter(tc);
+        return jtc.inferClassParameters(true);
+    }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         // prevent casting to arrays of parameterized types

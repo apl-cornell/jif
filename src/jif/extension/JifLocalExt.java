@@ -42,7 +42,7 @@ public class JifLocalExt extends JifExprExt
                     new NamedLabel("label of local variable " + li.name(), L),
                     A.labelEnv(),
                     lve.position(),
-                    new LabelConstraintMessage() {
+                    new ConstraintMessage() {
             public String msg() {
                 return "Program counter at increment " + 
                 "more restrictive than the label for " + 

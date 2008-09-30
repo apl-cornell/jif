@@ -87,7 +87,7 @@ public abstract class JifDowngradeExprExt extends JifExprExt
                                                  A.labelEnv(),
                                                  d.position(),
                                                  boundSpecified, /* report this constraint if the bound was specified*/ 
-                                        new LabelConstraintMessage() {                                                 
+                                        new ConstraintMessage() {                                                 
             public String msg() {
                 return "The label of the expression to " + 
                 d.downgradeKind()+" is " + 

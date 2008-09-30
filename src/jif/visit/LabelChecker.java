@@ -7,8 +7,10 @@ import jif.ast.JifMethodDecl;
 import jif.ast.JifUtil;
 import jif.extension.CallHelper;
 import jif.types.*;
+import jif.types.Constraint.Kind;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.Label;
+import jif.types.principal.Principal;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Receiver;
@@ -164,11 +166,11 @@ public class LabelChecker implements Copy
     }
 
     public void constrain(NamedLabel lhs, LabelConstraint.Kind kind, NamedLabel rhs, LabelEnv env,
-                   Position pos, LabelConstraintMessage msg) throws SemanticException {
+                   Position pos, ConstraintMessage msg) throws SemanticException {
         constrain(lhs, kind, rhs, env, pos, true, msg);
     }
     public void constrain(NamedLabel lhs, LabelConstraint.Kind kind, NamedLabel rhs, LabelEnv env,
-                   Position pos, boolean report, LabelConstraintMessage msg) throws SemanticException {
+                   Position pos, boolean report, ConstraintMessage msg) throws SemanticException {
         LabelConstraint c = new LabelConstraint(lhs, kind, rhs, env, pos, msg, report);
         if (msg != null) msg.setConstraint(c);
         constrain(c);
@@ -176,19 +178,32 @@ public class LabelChecker implements Copy
     public void constrain(NamedLabel lhs, LabelConstraint.Kind kind, NamedLabel rhs, LabelEnv env,
                    Position pos) throws SemanticException {
         constrain(lhs, kind, rhs, env, pos, false, null);
-    }
-    protected void constrain(LabelConstraint c) 
+    }    
+    protected void constrain(Constraint c) 
 	throws SemanticException 
     {        
 	this.solver.addConstraint(c);
     }
+    
+    public void constrain(Principal p, Constraint.Kind kind, Principal q,
+            LabelEnv env, Position pos,
+            ConstraintMessage msg) throws SemanticException {
+        constrain(p, kind, q, env, pos, msg, true);
+    }
+    public void constrain(Principal p, Constraint.Kind kind, Principal q,
+            LabelEnv env, Position pos, ConstraintMessage msg, boolean report) throws SemanticException {
+        PrincipalConstraint c = new PrincipalConstraint(p, kind, q, env, pos, msg, report);
+        if (msg != null) msg.setConstraint(c);
+        constrain(c);        
+    }
+    
 
     /**
      * Called by JifClassDeclExt just before this label checker is used to
      * check a class body. This allows us to use a different solver if
      * required.
      */
-    public void enteringClassBody(ClassType ct) {
+    public void enteringClassDecl(ClassType ct) {
         if (solvePerClassBody) {
             // solving by class. Set a new solver for the class body
             this.solver = ts.createSolver(ct.name());
@@ -212,7 +227,7 @@ public class LabelChecker implements Copy
      * check a class body. This allows us to use a different solver if
      * required.
      */
-    public JifClassDecl leavingClassBody(JifClassDecl n) {
+    public JifClassDecl leavingClassDecl(JifClassDecl n) {
         if (solvePerClassBody) {
             // solving by class. We need to solve the constraints
             return (JifClassDecl)solveConstraints(n);
@@ -283,4 +298,5 @@ public class LabelChecker implements Copy
                                            JifMethodInstance overriding) {
         return CallHelper.OverrideHelper(overridden, overriding, this);
     }
+
 }

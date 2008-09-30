@@ -70,7 +70,7 @@ public class JifCallExt extends JifExprExt
         me = me.methodInstance(mi);
         
         if (mi.flags().isStatic()) {
-            new ConstructorChecker().checkStaticMethodAuthority(mi, A, me.position());
+            new ConstructorChecker().checkStaticMethodAuthority(mi, A, lc, me.position());
         }
 
 

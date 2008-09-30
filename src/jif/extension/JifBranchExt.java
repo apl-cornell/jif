@@ -43,7 +43,7 @@ public class JifBranchExt extends JifStmtExt_c
                                    gotoLabel),
                    A.labelEnv(),
                    bs.position(),
-                   new LabelConstraintMessage() {
+                   new ConstraintMessage() {
             public String msg() {
                 return "More information may be revealed by " +
                 "branching to the target from this " +

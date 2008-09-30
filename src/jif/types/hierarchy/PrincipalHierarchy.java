@@ -254,25 +254,6 @@ public class PrincipalHierarchy {
         s.add(granter);   
     }
 
-    public boolean actsFor(Collection actorGrp, Collection grantorGrp) {
-        for (Iterator i = grantorGrp.iterator(); i.hasNext(); ) {
-            Principal gi = (Principal) i.next();
-            boolean sat = false;
-            for (Iterator j = actorGrp.iterator(); j.hasNext(); ) {
-                Principal aj = (Principal) j.next();
-
-                if (actsFor(aj, gi)) {
-                    sat = true;
-                    break;
-                }
-            }
-
-            if (! sat) 
-                return false;
-        }
-        return true;
-    }
-
     public PrincipalHierarchy copy() {
         PrincipalHierarchy dup = new PrincipalHierarchy();
 

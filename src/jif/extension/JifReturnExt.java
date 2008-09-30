@@ -73,7 +73,7 @@ public class JifReturnExt extends JifStmtExt_c
                                                        Lrv),
                        A.labelEnv(),
                        rs.position(),
-                       new LabelConstraintMessage()
+                       new ConstraintMessage()
             {
                 public String msg() { 
                     return "This method may return a value with " +

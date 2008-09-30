@@ -116,7 +116,7 @@ public class JifForExt extends JifStmtExt_c
                     lc.context().labelEnv(),
                     fs.position(), 
                     false,
-                    new LabelConstraintMessage() {
+                    new ConstraintMessage() {
             public String msg() {
                 return "The information revealed by the normal " +
                 "termination of the body of the for loop " +

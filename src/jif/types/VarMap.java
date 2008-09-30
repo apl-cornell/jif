@@ -4,10 +4,9 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import jif.types.label.Label;
-import jif.types.label.Policy;
-import jif.types.label.VarLabel;
+import jif.types.label.*;
 import jif.types.principal.Principal;
+import jif.types.principal.VarPrincipal;
 import polyglot.types.ArrayType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -30,47 +29,69 @@ import polyglot.util.InternalCompilerError;
 public class VarMap {
     protected Map bounds;
     protected JifTypeSystem ts;
-    protected final Label defaultBound;
+    protected final Label defaultLabelBound;
+    protected final Principal defaultPrincipalBound;
 
-    public VarMap(JifTypeSystem ts, Label defaultBound) {
+    public VarMap(JifTypeSystem ts, Label defaultLabelBound, Principal defaultPrincipalBound) {
 	this.ts = ts;
 	this.bounds = new LinkedHashMap();
-        this.defaultBound = defaultBound;
-        if (defaultBound == null) {
-            throw new InternalCompilerError("defaultBound cannot be null");
+        this.defaultLabelBound = defaultLabelBound;
+        this.defaultPrincipalBound = defaultPrincipalBound;
+        if (defaultLabelBound == null || defaultPrincipalBound == null) {
+            throw new InternalCompilerError("default bounds cannot be null");
         }
     }
 
-    private VarMap(JifTypeSystem ts, Map bounds, Label defaultBound) {
+    private VarMap(JifTypeSystem ts, Map bounds, Label defaultLabelBound, Principal defaultPrincipalBound) {
 	this.ts = ts;
 	this.bounds = new LinkedHashMap(bounds);
-        this.defaultBound = defaultBound;
-        if (defaultBound == null) {
-            throw new IllegalArgumentException("defaultBound cannot be null");
+        this.defaultLabelBound = defaultLabelBound;
+        this.defaultPrincipalBound = defaultPrincipalBound;
+        if (defaultLabelBound == null || defaultPrincipalBound == null) {
+            throw new InternalCompilerError("default bounds cannot be null");
         }
     }
 
     public VarMap copy() {
-	return new VarMap(ts, bounds, defaultBound);
+	return new VarMap(ts, bounds, defaultLabelBound, defaultPrincipalBound);
     }
 
+    public Principal boundOf(VarPrincipal v) {
+        Principal bound = (Principal) bounds.get(v);
+
+        if (bound == null) {
+            // The variable has no bound: assume the default bound.
+            // insert the default label into the map.
+            bound = defaultPrincipalBound;
+            this.setBound(v, bound);
+        }
+
+        return bound;        
+    }
+    
     public Label boundOf(VarLabel v) {
 	Label bound = (Label) bounds.get(v);
 
 	if (bound == null) {
 	    // The variable has no bound: assume the default label.
             // insert the default label into the map.
-            bound = defaultBound;
+            bound = defaultLabelBound;
             this.setBound(v, bound);
 	}
 
 	return bound;
     }
 
-    public void setBound(VarLabel v, Label bound) {
+    public void setBound(Variable v, Label bound) {
 	if (bound == null) {
 	    throw new InternalCompilerError("Null bound label.");
 	}
+        bounds.put(v, bound);
+    }
+    public void setBound(Variable v, Principal bound) {
+        if (bound == null) {
+            throw new InternalCompilerError("Null bound principal.");
+        }
         bounds.put(v, bound);
     }
     
@@ -81,6 +102,13 @@ public class VarMap {
                 return VarMap.this.boundOf(v);
             }
             return L;
+        }            
+        public Principal substPrincipal(Principal p) throws SemanticException {
+            if (p instanceof VarPrincipal) {
+                VarPrincipal v = (VarPrincipal)p;
+                return VarMap.this.boundOf(v);
+            }
+            return p;
         }            
     }
     
@@ -94,6 +122,11 @@ public class VarMap {
         }
         
     }
+    public Param applyTo(Param c) {
+        if (c instanceof Label) return applyTo((Label)c);
+        if (c instanceof Principal) return applyTo((Principal)c);
+        throw new InternalCompilerError("Unexpected Param" + c);
+    }
     public Label applyTo(Label c) {
         LabelSubstitution s = new VarMapLabelSubstitution() ;
         try {
@@ -105,7 +138,13 @@ public class VarMap {
     }
     
     public Principal applyTo(Principal p) {
-        return p;
+        LabelSubstitution s = new VarMapLabelSubstitution() ;
+        try {
+            return p.subst(s);
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected SemanticException", e);
+        }
     }
 
     public Type applyTo(Type t) {
@@ -161,17 +200,23 @@ public class VarMap {
         sb.append('\n');
         for (Iterator i = bounds.entrySet().iterator(); i.hasNext(); ){
             Map.Entry e = (Map.Entry) i.next();
-            VarLabel var = (VarLabel) e.getKey();
-            Label bound = (Label) e.getValue();
-            String s = var.componentString() + " = " + bound.toString();
-            if (var.description() != null) {
-                s += "    \t" + var.description();
+            Variable var = (Variable) e.getKey();
+            Param bound = (Param) e.getValue();
+            String s = "";
+            if (var instanceof VarLabel) {
+                s = ((VarLabel)var).componentString() + " = " + bound.toString();
+                if (((VarLabel)var).description() != null) {
+                    s += "    \t" + ((VarLabel)var).description();
+                }
+            }
+            else {
+                s = var + " = " + bound.toString();                
             }
             sb.append(s);
             sb.append('\n');
         }
         sb.append("Variables not in this map will receive " +
-                  "default label of " + defaultBound);
+                  "default bound of " + defaultLabelBound + " or " + defaultPrincipalBound + " as appropriate.");
         sb.append('\n');
         sb.append("=========================\n");
         return sb.toString();
@@ -182,17 +227,23 @@ public class VarMap {
         w.newline(0);
         for (Iterator i = bounds.entrySet().iterator(); i.hasNext(); ){
             Map.Entry e = (Map.Entry) i.next();
-            VarLabel var = (VarLabel) e.getKey();
-            Label bound = (Label) e.getValue();
-            String s = var.componentString() + " = " + bound.toString();
-            if (var.description() != null) {
-                s += "    \t" + var.description();
+            Variable var = (Variable) e.getKey();
+            Param bound = (Param) e.getValue();
+            String s = "";
+            if (var instanceof VarLabel) {
+                s = ((VarLabel)var).componentString() + " = " + bound.toString();
+                if (((VarLabel)var).description() != null) {
+                    s += "    \t" + ((VarLabel)var).description();
+                }
+            }
+            else {
+                s = var + " = " + bound.toString();                
             }
             w.write(s);
             w.newline(0);
         }
         w.write("Variables not in this map will receive " +
-                         "default label of " + defaultBound);
+                "default bound of " + defaultLabelBound + " or " + defaultPrincipalBound + " as appropriate.");
         w.newline(0);
         w.write("=========================");
         w.newline(0);

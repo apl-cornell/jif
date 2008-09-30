@@ -63,7 +63,7 @@ public class JifWhileExt extends JifStmtExt_c
                     A.labelEnv(),
                     ws.position(), 
                     false,
-                    new LabelConstraintMessage() {
+                    new ConstraintMessage() {
             public String msg() {
                 return "The information revealed by the normal " +
                 "termination of the body of the while loop " +

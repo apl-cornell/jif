@@ -5,9 +5,9 @@ import java.util.*;
 import jif.JifOptions;
 import jif.Topics;
 import jif.types.hierarchy.LabelEnv;
-import jif.types.label.Label;
-import jif.types.label.NotTaken;
-import jif.types.label.VarLabel;
+import jif.types.label.*;
+import jif.types.principal.Principal;
+import jif.types.principal.VarPrincipal;
 import polyglot.frontend.Compiler;
 import polyglot.main.Options;
 import polyglot.main.Report;
@@ -61,7 +61,7 @@ public abstract class AbstractSolver implements Solver {
     private Map eqnVarReverseDependencies;
     
     /**
-     * Set of VarLabels that had their initial value fixed when the constraint
+     * Set of Variables that had their initial value fixed when the constraint
      * was added.
      */
     protected Set fixedValueVars;
@@ -137,7 +137,7 @@ public abstract class AbstractSolver implements Solver {
         eqnVarReverseDependencies = new LinkedHashMap();
         traces = new LinkedHashMap();
         setStatus(STATUS_NOT_SOLVED);
-        bounds = new VarMap(ts, getDefaultBound());
+        bounds = new VarMap(ts, getDefaultLabelBound(), getDefaultPrincipalBound());
         scc = null;
         currentSCC = null;
         this.solverName = solverName + " (#" + (++solverCounter) + ")";
@@ -226,7 +226,11 @@ public abstract class AbstractSolver implements Solver {
      *             constraint.
      */
     public void setBound(VarLabel v, Label newBound, LabelConstraint responsible)
-            throws SemanticException {
+    throws SemanticException {
+        bounds.setBound(v, newBound);
+    }
+    public void setBound(VarPrincipal v, Principal newBound, PrincipalConstraint responsible)
+    throws SemanticException {
         bounds.setBound(v, newBound);
     }
 
@@ -264,7 +268,7 @@ public abstract class AbstractSolver implements Solver {
             }
             setStatus(STATUS_NO_SOLUTION);
             for (Iterator iter = staticFailedConstraints.iterator(); iter.hasNext();) {
-                LabelConstraint cons = (LabelConstraint)iter.next();
+                Constraint cons = (Constraint)iter.next();
                 SemanticException ex = new SemanticException(errorMsg(cons), 
                                                              cons.position()); 
                 if (!iter.hasNext()) {
@@ -339,9 +343,15 @@ public abstract class AbstractSolver implements Solver {
 
     /**
      * This method must return a constant label, which is the default bound of
-     * variables.
+     * label variables.
      */
-    protected abstract Label getDefaultBound();
+    protected abstract Label getDefaultLabelBound();
+
+    /**
+     * This method must return a constant principal, which is the default bound of
+     * principal variables.
+     */
+    protected abstract Principal getDefaultPrincipalBound();
 
     /**
      * Solve the system of constraints, by finding upper bounds for the label
@@ -350,7 +360,7 @@ public abstract class AbstractSolver implements Solver {
      * @return a solution to the system of constraints, in the form of a VarMap
      *         of the upper bounds of the label variables.
      * @throws SemanticException if the Solver cannot find a solution to the
-     *             system of contraints.
+     *             system of constraints.
      */
     protected VarMap solve_bounds() throws SemanticException {
         // Solve the system of constraints. bounds may already contain a
@@ -372,25 +382,7 @@ public abstract class AbstractSolver implements Solver {
             while (!Q.isEmpty()) {
                 counter++;
                 Equation eqn = Q.removeFirst();
-                Label lhsbound = triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
-                Label rhsbound = triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());                                
-
-                if (eqn.env().leq(lhsbound, rhsbound)) {
-                    if (shouldReport(5))
-                            report(5, "constraint: " + eqn
-                                    + " already satisfied: " + lhsbound + "<="
-                                    + rhsbound);
-                }
-                else {
-                    if (shouldReport(4)) {
-                        report(4, "Considering constraint: " + eqn + " ("
-                                + (eqn.position()==null?"null":("line "+eqn.position().line())) + ")");
-                    }
-                    // let the subclass deal with changing the bounds on
-                    // variables
-                    // to make this equation satisfied.
-                    solve_eqn(eqn);
-                }
+                considerEquation(eqn);
 
                 // if we finished the last strongly connected component
                 // move to the next one
@@ -412,12 +404,74 @@ public abstract class AbstractSolver implements Solver {
         return bounds;
     }
 
+    protected void considerEquation(Equation eqn) throws SemanticException {
+        if (eqn instanceof LabelEquation) {
+            considerEquation((LabelEquation)eqn);   
+        }
+        else if (eqn instanceof PrincipalEquation) {
+            considerEquation((PrincipalEquation)eqn);   
+        }
+        else {
+            throw new InternalCompilerError("Unexpected eqn " + eqn);
+        }
+    }
+    protected void considerEquation(LabelEquation eqn) throws SemanticException {
+        Label lhsbound = triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
+        Label rhsbound = triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());                                
+
+        if (eqn.env().leq(lhsbound, rhsbound)) {
+            if (shouldReport(5))
+                    report(5, "constraint: " + eqn
+                            + " already satisfied: " + lhsbound + "<="
+                            + rhsbound);
+        }
+        else {
+            if (shouldReport(4)) {
+                report(4, "Considering constraint: " + eqn + " ("
+                        + (eqn.position()==null?"null":("line "+eqn.position().line())) + ")");
+            }
+            // let the subclass deal with changing the bounds on
+            // variables
+            // to make this equation satisfied.
+            solve_eqn(eqn);
+        }        
+    }
+    
     /**
      * This method changes the bounds of variables in the Equation eqn, to make
      * the equation satisfied. The method may postpone solving the equation by
      * putting the equation back on the queue, using addEquationToQueue().
      */
-    protected abstract void solve_eqn(Equation eqn) throws SemanticException;
+    protected abstract void solve_eqn(LabelEquation eqn) throws SemanticException;
+
+    protected void considerEquation(PrincipalEquation eqn) throws SemanticException {
+        Principal lhsbound = bounds.applyTo(eqn.lhs());
+        Principal rhsbound = bounds.applyTo(eqn.rhs());                                
+
+        if (eqn.env().actsFor(lhsbound, rhsbound)) {
+            if (shouldReport(5))
+                    report(5, "constraint: " + eqn
+                            + " already satisfied: " + lhsbound + " actsfor "
+                            + rhsbound);
+        }
+        else {
+            if (shouldReport(4)) {
+                report(4, "Considering constraint: " + eqn + " ("
+                        + (eqn.position()==null?"null":("line "+eqn.position().line())) + ")");
+            }
+            // let the subclass deal with changing the bounds on
+            // variables
+            // to make this equation satisfied.
+            solve_eqn(eqn);
+        }        
+    }
+
+    /**
+     * This method changes the bounds of variables in the Equation eqn, to make
+     * the equation satisfied. The method may postpone solving the equation by
+     * putting the equation back on the queue, using addEquationToQueue().
+     */
+    protected abstract void solve_eqn(PrincipalEquation eqn) throws SemanticException;
 
     /**
      * Check the candidate solution
@@ -433,43 +487,46 @@ public abstract class AbstractSolver implements Solver {
         // variables.
         for (Iterator i = equations.iterator(); i.hasNext();) {
             Equation eqn = (Equation)i.next();
-
-            // Check that any variables that must be runtime representable are in fact so.
-            for (Iterator iter = eqn.variables().iterator(); iter.hasNext();) {
-                VarLabel v = (VarLabel)iter.next();
-                if (v.mustRuntimeRepresentable() && !bounds.boundOf(v).isRuntimeRepresentable()) {
-                    // a var label that must be runtime representable is not.
-                    reportError(eqn.constraint(), Collections.singleton(v));
-                }
-            }
-
-            Label lhsBound = triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
-            Label rhsBound = triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());
-
-            if (shouldReport(4)) {
-                report(4, "Checking equation: " + eqn);
-            }
-
-            if (shouldReport(6)) {
-                report(6, "LHS = " + eqn.lhs());
-                report(6, "LHS APP = " + lhsBound);
-                report(6, "RHS APP = " + rhsBound);
-            }
-
-            // Check to see if it is currently satisfiable.
-            if (!eqn.env().leq(lhsBound, rhsBound)) {
-                //if (!dynCheck(lhsBound, rhsBound, eqn.env())) {
-                reportError(eqn.constraint(), eqn.variableComponents());
-                //}
+            if (eqn instanceof LabelEquation) {
+                checkEquationSatisfied((LabelEquation)eqn);
             }
         }
+    }
+    
+    protected void checkEquationSatisfied(LabelEquation eqn) throws SemanticException {
+        // Check that any variables that must be runtime representable are in fact so.
+        for (Iterator iter = eqn.variables().iterator(); iter.hasNext();) {
+            VarLabel v = (VarLabel)iter.next();
+            if (v.mustRuntimeRepresentable() && !bounds.boundOf(v).isRuntimeRepresentable()) {
+                // a var label that must be runtime representable is not.
+                reportError(eqn.labelConstraint(), Collections.singleton(v));
+            }
+        }
+
+        Label lhsBound = triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
+        Label rhsBound = triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());
+
+        if (shouldReport(4)) {
+            report(4, "Checking equation: " + eqn);
+        }
+
+        if (shouldReport(6)) {
+            report(6, "LHS = " + eqn.lhs());
+            report(6, "LHS APP = " + lhsBound);
+            report(6, "RHS APP = " + rhsBound);
+        }
+
+        // Check to see if it is currently satisfiable.
+        if (!eqn.env().leq(lhsBound, rhsBound)) {
+            reportError(eqn.labelConstraint(), eqn.variableComponents());
+        }        
     }
 
     /**
      * Awakens all equations in the system that depend on the variable v,
      * ensuring that they are in the queue of active equations.
      */
-    protected final void wakeUp(VarLabel v) {
+    protected final void wakeUp(Variable v) {
         Set eqns = (Set)varEqnDependencies.get(v);
 
         if (eqns != null) {
@@ -505,14 +562,14 @@ public abstract class AbstractSolver implements Solver {
         constraint_counter++;
     }
 
-    protected boolean isFixedValueVar(VarLabel v) {
+    protected boolean isFixedValueVar(Variable v) {
         return fixedValueVars.contains(v);
     }
     
     /**
      * Add the constraint c to the system
      */
-    public void addConstraint(LabelConstraint c) throws SemanticException {
+    public void addConstraint(Constraint c) throws SemanticException {
         if (status != STATUS_NOT_SOLVED) {
             throw new InternalCompilerError("Computed solution already. "
                     + "Cannot add more constraints");
@@ -522,20 +579,23 @@ public abstract class AbstractSolver implements Solver {
         if (shouldReport(6)) report(6, ">>> " + c.msg());
         inc_counter();
 
-        if (!c.lhs().isCanonical() || !c.rhs().isCanonical()) {
+        if (!c.isCanonical()) {
             throw new SemanticException(errorMsg(c), c.position());
         }
 
-        if (c.lhs() instanceof NotTaken && c.kind() == LabelConstraint.LEQ) {
-            // if the LHS is NotTaken, then the constraint will always be
-            // satisfied.
-            return;
-        }
+        if (c instanceof LabelConstraint) {
+            LabelConstraint lc = (LabelConstraint)c;
+            if (lc.lhsLabel() instanceof NotTaken && lc.kind() == LabelConstraint.LEQ) {
+                // if the LHS is NotTaken, then the constraint will always be
+                // satisfied.
+                return;
+            }
 
-        if (c.rhs() instanceof NotTaken && c.kind() == LabelConstraint.LEQ) {
-            // if the RHS is NotTaken (and the LHS isn't), then the
-            // constraint can never be satisfied.
-            throw new SemanticException(errorMsg(c), c.position());
+            if (lc.rhsLabel() instanceof NotTaken && lc.kind() == LabelConstraint.LEQ) {
+                // if the RHS is NotTaken (and the LHS isn't), then the
+                // constraint can never be satisfied.
+                throw new SemanticException(errorMsg(c), c.position());
+            }
         }
         processConstraint(c);
         addConstraintEquations(c);
@@ -544,21 +604,52 @@ public abstract class AbstractSolver implements Solver {
     /**
      * Perform any special processing for the label constraint
      */
-    protected void processConstraint(LabelConstraint c) throws SemanticException {
-        if (c.lhs() instanceof VarLabel && c.kind() == LabelConstraint.EQUAL) {
-            // this is an equality constraint on a variable. Let's jump start the 
-            // solving by setting it immediately
-            VarLabel v = (VarLabel)c.lhs();
-            Label initialBound = bounds.applyTo(c.rhs());
-            addTrace(v, (Equation)c.getEquations().iterator().next(), initialBound);
-            setBound(v, initialBound, c);
-            // only add the variable to the fixed value vars if the RHS does not contain
-            // any variables. Otherwise, the bound of v may need to change
-            // as the RHS changes.
-            if (!c.rhs().hasVariableComponents()) {
-                fixedValueVars.add(v);
+    protected void processConstraint(Constraint c) throws SemanticException {
+        if (c instanceof LabelConstraint) {
+            LabelConstraint lc = (LabelConstraint)c;
+            if (lc.lhsLabel() instanceof VarLabel && lc.kind() == LabelConstraint.EQUAL) {
+                // this is an equality constraint on a variable. Let's jump start the 
+                // solving by setting it immediately
+                VarLabel v = (VarLabel)lc.lhsLabel();
+                Label initialBound = bounds.applyTo(lc.rhsLabel());
+                addTrace(v, (Equation)lc.getEquations().iterator().next(), initialBound);
+                setBound(v, initialBound, lc);
+                // only add the variable to the fixed value vars if the RHS does not contain
+                // any variables. Otherwise, the bound of v may need to change
+                // as the RHS changes.
+                if (!lc.rhsLabel().hasVariableComponents()) {
+                    fixedValueVars.add(v);
+                }
             }
-        }        
+        }       
+        else if (c instanceof PrincipalConstraint) {
+            PrincipalConstraint pc = (PrincipalConstraint)c;
+            if ((pc.lhsPrincipal() instanceof VarPrincipal || pc.rhsPrincipal() instanceof VarPrincipal)
+                    && pc.kind() == PrincipalConstraint.EQUIV) {
+                // this is an equality constraint on a variable. Let's jump start the 
+                // solving by setting it immediately
+                
+                VarPrincipal v = null;
+                Principal other = null;
+                if (pc.lhsPrincipal() instanceof VarPrincipal) {
+                    v = (VarPrincipal)pc.lhsPrincipal();
+                    other = pc.rhsPrincipal();
+                }
+                else {
+                    v = (VarPrincipal)pc.rhsPrincipal();
+                    other = pc.lhsPrincipal();
+                }
+                
+                Principal initialBound = bounds.applyTo(other);
+                setBound(v, initialBound, pc);
+                // only add the variable to the fixed value vars if other does not contain
+                // any variables. Otherwise, the bound of v may need to change
+                // as the other changes.
+                if (!other.hasVariables()) {
+                    fixedValueVars.add(v);
+                }
+            }
+        }
     }
     
     /**
@@ -567,30 +658,39 @@ public abstract class AbstractSolver implements Solver {
      * @param c
      * @throws SemanticException
      */
-    protected void addConstraintEquations(LabelConstraint c) throws SemanticException {
+    protected void addConstraintEquations(Constraint c) throws SemanticException {
         Collection eqns = c.getEquations();
         Equation eqn = null;
         for (Iterator i = eqns.iterator(); i.hasNext();) {
             eqn = (Equation)i.next();
             LabelEnv eqnEnv = eqn.env();
-            Label lhs = eqn.lhs();
-            Label rhs = eqn.rhs();
-            if (!eqnEnv.hasVariables() && !lhs.hasVariables()
-                    && !rhs.hasVariables()) {
+            if (!eqnEnv.hasVariables() && !eqn.constraint().hasVariables()) {
                 // The equation has no variables. We can check now if it is
                 // satisfied or not                    
-                
-                if (!eqnEnv.leq(triggerTransforms(lhs, eqnEnv), 
-                                triggerTransforms(rhs, eqnEnv))) {                    
+                boolean eqnSatisfied = false;
+                if (eqn instanceof LabelEquation) {     
+                    LabelEquation leqn = (LabelEquation)eqn;
+                    eqnSatisfied = eqnEnv.leq(triggerTransforms(leqn.lhs(), eqnEnv), 
+                                              triggerTransforms(leqn.rhs(), eqnEnv)); 
+                }
+                else if (eqn instanceof PrincipalEquation) {
+                    PrincipalEquation peqn = (PrincipalEquation)eqn;
+                    eqnSatisfied = eqnEnv.actsFor(peqn.lhs(), peqn.rhs());                     
+                }
+                else {
+                    throw new InternalCompilerError("Unexpected kind of equation: " + eqn);
+                }
+                if (!eqnSatisfied) {                    
                     if (shouldReport(2)) {
                         report(2, "Statically failed " + eqn);
                     }
-                    if (shouldReport(3)) {
-                        report(3, "Statically failed " + triggerTransforms(lhs, eqnEnv) + " <= " + triggerTransforms(rhs, eqnEnv));
+                    if (shouldReport(3) && eqn instanceof LabelEquation) {
+                        report(3, "Statically failed " + triggerTransforms(((LabelEquation)eqn).lhs(), eqnEnv) + " <= " + triggerTransforms(((LabelEquation)eqn).rhs(), eqnEnv));
                     }
+
                     // The equation is not satisfied.
                     if (THROW_STATIC_FAILED_CONSTRAINTS) {
-                        throw new SemanticException(errorMsg(eqn.constraint()), 
+                        throw new SemanticException(errorMsg(c), 
                                                     eqn.position());
                     }
                     else {
@@ -617,8 +717,8 @@ public abstract class AbstractSolver implements Solver {
 
     /**
      * This abstract method must add the correct dependencies from Equation eqn
-     * to varaiables occuring in eqn, and dependencies in the other direction
-     * (that is, from variables occuring in eqn to eqn).
+     * to variables occurring in eqn, and dependencies in the other direction
+     * (that is, from variables occurring in eqn to eqn).
      * 
      * There is a dependency from Equation eqn to variable var if the bound on
      * var may be modified as a result of solving eqn. This dependency should be
@@ -638,7 +738,7 @@ public abstract class AbstractSolver implements Solver {
      * There is a dependency from variable var to Equation eqn if modifying the
      * bound on var may cause eqn to no longer be satisfied.
      */
-    protected void addDependency(VarLabel var, Equation eqn) {
+    protected void addDependency(Variable var, Equation eqn) {
         Set eqns = (Set)varEqnDependencies.get(var);
         if (eqns == null) {
             eqns = new LinkedHashSet();
@@ -663,7 +763,7 @@ public abstract class AbstractSolver implements Solver {
      * There is a dependency from Equation eqn to variable var if the bound on
      * var may be modified as a result of solving eqn.
      */
-    protected void addDependency(Equation eqn, VarLabel var) {
+    protected void addDependency(Equation eqn, Variable var) {
         Set vars = (Set)eqnVarDependencies.get(eqn);
         if (vars == null) {
             vars = new LinkedHashSet();
@@ -771,38 +871,39 @@ public abstract class AbstractSolver implements Solver {
      * <code>Variables</code>
      */
     protected void reportTraces(Collection variables) {
-        if (shouldReport(3)) {
-            // We'll produce the traces...
-
-            StringBuffer trcs = new StringBuffer();
-            for (Iterator vs = variables.iterator(); vs.hasNext();) {
-                VarLabel v = (VarLabel)vs.next();
-
-                List trace = (List)traces.get(v);
-                if (trace != null) {
-                    StringBuffer trc = new StringBuffer("\nTrace for " + v
-                            + ":\n");
-
-                    trc.append("  initially : " + getDefaultBound() + "\n");
-                    for (int i = 0; i < trace.size(); ++i) {
-                        Pair p = (Pair)trace.get(i);
-                        Equation e = (Equation)p.part1();
-                        Label l = (Label)p.part2();
-                        trc.append("  " + i + ": " + l + " from eqn " + e.lhs()
-                                + " <= " + e.rhs() + "\n");
-                        trc.append("       from " + e.constraint());
-                        if (e.constraint().position() != null) {
-                            trc.append(" (line "
-                                    + e.constraint().position().line() + ")");
-                        }
-                        trc.append("\n");
-                    }
-                    trcs.append(trc.toString());
-                }
-            }
-
-            report(3, trcs.toString());
-        }
+        // NO TRACING FOR THE MOMENT.
+//        if (shouldReport(3)) {
+//            // We'll produce the traces...
+//
+//            StringBuffer trcs = new StringBuffer();
+//            for (Iterator vs = variables.iterator(); vs.hasNext();) {
+//                VarLabel v = (VarLabel)vs.next();
+//
+//                List trace = (List)traces.get(v);
+//                if (trace != null) {
+//                    StringBuffer trc = new StringBuffer("\nTrace for " + v
+//                            + ":\n");
+//
+//                    trc.append("  initially : " + getDefaultBound() + "\n");
+//                    for (int i = 0; i < trace.size(); ++i) {
+//                        Pair p = (Pair)trace.get(i);
+//                        Equation e = (Equation)p.part1();
+//                        Label l = (Label)p.part2();
+//                        trc.append("  " + i + ": " + l + " from eqn " + e.lhs()
+//                                + " <= " + e.rhs() + "\n");
+//                        trc.append("       from " + e.constraint());
+//                        if (e.constraint().position() != null) {
+//                            trc.append(" (line "
+//                                    + e.constraint().position().line() + ")");
+//                        }
+//                        trc.append("\n");
+//                    }
+//                    trcs.append(trc.toString());
+//                }
+//            }
+//
+//            report(3, trcs.toString());
+//        }
     }
 
     protected boolean errorShowConstraint() {
@@ -825,8 +926,7 @@ public abstract class AbstractSolver implements Solver {
     /**
      * Produce an error message for the constraint c, which cannot be satisfied.
      */
-    protected final String errorMsg(LabelConstraint c) {
-
+    protected final String errorMsg(Constraint c) {
         StringBuffer sb = new StringBuffer();
 
         if (errorShowConstraint()) {
@@ -836,10 +936,10 @@ public abstract class AbstractSolver implements Solver {
             sb.append(" \n \n");
         }
 
-        if (errorShowDefns()) {
+        if (errorShowDefns() && c instanceof LabelConstraint) {
             sb.append("Label Descriptions");
             sb.append(" \n------------------");
-            sb.append(errorStringDefns(c));
+            sb.append(errorStringDefns((LabelConstraint)c));
             sb.append(" \n \n");
         }
 
@@ -859,20 +959,23 @@ public abstract class AbstractSolver implements Solver {
      * Produce a string appropriate for an error message that displays the
      * unsatisfiable constraint <code>c</code>.
      */
-    protected String errorStringConstraint(LabelConstraint c) {
+    protected String errorStringConstraint(Constraint c) {
         StringBuffer sb = new StringBuffer();
-        if (c.namedLhs() != null || c.namedRhs() != null) {
-            sb.append("  ");
-            sb.append(c.namedLhs());
-            sb.append(c.kind());
-            sb.append(c.namedRhs());
-            sb.append(" \n");
+        if (c instanceof LabelConstraint) {
+            LabelConstraint lc = (LabelConstraint)c;
+            if (lc.namedLhs() != null || lc.namedRhs() != null) {
+                sb.append("  ");
+                sb.append(lc.namedLhs());
+                sb.append(c.kind());
+                sb.append(lc.namedRhs());
+                sb.append(" \n");
+            }
         }
 
         sb.append("\t");
-        sb.append(bounds.applyTo(c.lhs()));
+        sb.append(bounds.applyTo(c.lhs));
         sb.append(c.kind());
-        sb.append(bounds.applyTo(c.rhs()));
+        sb.append(bounds.applyTo(c.rhs));
         if (!c.env().isEmpty()) {
             sb.append(" \nin environment \n   ");
             sb.append(c.env());
@@ -913,7 +1016,7 @@ public abstract class AbstractSolver implements Solver {
      * @param c The constraint that cannot be satisfied.
      * @throws SemanticException always.
      */
-    protected void reportError(LabelConstraint c, Collection variables)
+    protected void reportError(Constraint c, Collection variables)
             throws SemanticException {
         int count = 0;
         while (!c.report() && (count++) < 1000) {
@@ -940,6 +1043,12 @@ public abstract class AbstractSolver implements Solver {
         throw new SemanticException(errorMsg(c), pos);
     }
 
+    protected Equation findContradictiveEqn(Constraint c) {
+        if (c instanceof LabelConstraint) {
+            return findContradictiveEqn((LabelConstraint)c);   
+        }
+        throw new InternalCompilerError("Unexpected constraint type: " + c.getClass());
+    }
     protected abstract Equation findContradictiveEqn(LabelConstraint c);
     
     /** Returns the linked list [by_scc, scc_head] where

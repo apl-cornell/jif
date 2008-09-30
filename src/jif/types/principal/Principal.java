@@ -1,14 +1,13 @@
 package jif.types.principal;
 
 import java.util.List;
+import java.util.Set;
 
 import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import jif.translate.JifToJavaRewriter;
 import jif.types.*;
-import jif.types.LabelSubstitution;
-import jif.types.Param;
 import jif.types.label.*;
 import jif.visit.LabelChecker;
 
@@ -56,6 +55,23 @@ public interface Principal extends Param {
      */
     List throwTypes(TypeSystem ts);
     
+    /**
+     * Does the label contain any variables at all? This includes variables
+     * that are in bounds of arg labels.
+     */
+    boolean hasVariables();
+    
+    /**
+     * The set of variables that this label contains including variables contained
+     * in upper bounds of arg labels.
+     */
+    Set variables();
+    
     boolean isTopPrincipal();
     boolean isBottomPrincipal();
+
+    /**
+     * Simplify the label, using the actsfor relation if needed
+     */
+    Principal simplify();
 }

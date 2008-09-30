@@ -18,93 +18,35 @@ import polyglot.util.Position;
  * 
  * @see jif.types.LabelConstraint 
  */
-public class Equation
+public abstract class Equation
 {
-    private Label lhs;
-    private Label rhs;
-
-    /**
-     * The <code>LabelConstraint</code> that generated this 
-     * <code>Equation</code>.
-     */
-    private final LabelConstraint constraint; //enclosing constraint
-
-    /**
-     * Constructor
-     */
-    Equation(Label lhs, Label rhs, LabelConstraint constraint) 
-    {
-        this.lhs = lhs;
-        this.rhs = rhs.simplify();
+    protected Equation(Constraint constraint) {
         this.constraint = constraint;
-
-        if (lhs instanceof JoinLabel) {
-            throw new InternalCompilerError(
-            "LHS of equation must not be a join label.");
-        }
-        if (rhs instanceof MeetLabel) {
-            throw new InternalCompilerError(
-            "LHS of equation must not be a meet label.");
-        }
     }
-
-
-    public Label lhs() {return lhs;}
-    public Label rhs() {return rhs;}
-    public LabelConstraint constraint() { return constraint; }
+    protected final Constraint constraint;
+    
     public LabelEnv env() {return constraint().env();}
     public Position position() {return constraint().position();}
 
-    /**
-     * Return a <code>List</code> of variable components that occur in either the 
-     * left or right hand side.
-     */
-    public List variableComponents() {
-        List l = new LinkedList();
-        l.addAll(lhs.variableComponents());
-        l.addAll(rhs.variableComponents());
-        return l;
+    public Constraint constraint() {
+        return constraint;
     }
 
     /**
      * Return a <code>Set</code> of variables that occur in either the 
      * left or right hand side.
      */
-    public Set variables() {
-        Set l = new LinkedHashSet();
-        l.addAll(lhs.variables());
-        l.addAll(rhs.variables());
-        return l;
-    }
+    public abstract Set variables();
 
-    public int hashCode() { return lhs.hashCode() ^ rhs.hashCode(); }
+    public abstract int hashCode();
 
-    public boolean equals(Object o) {
-        if (! (o instanceof Equation)) {
-            return false;
-        } 
-
-        Equation eqn = (Equation) o;
-        
-        if (this.constraint != eqn.constraint) return false;
-        
-        return lhs.equals(eqn.lhs) && rhs.equals(eqn.rhs);
-    }
-
-    public String toString() {
-        return lhs.toString() + " <= " + rhs.toString() + " in environment " +
-        env() + " (produced from " + 
-        constraint.lhs() + constraint.kind() + constraint.rhs() + ") " +
-        position();
-    }
+    public abstract boolean equals(Object o);
+    public abstract String toString();
 
     /**
      * Replace the <code>lhs</code> and <code>rhs</code> with the result of 
      * <code>lhs.subst(subst)</code> and <code>rhs.subst(subst)</code> 
      * respectively.
      */
-    public void subst(LabelSubstitution subst) throws SemanticException {
-        rhs = rhs.subst(subst);
-        lhs = lhs.subst(subst);
-    }
+    public abstract void subst(LabelSubstitution subst) throws SemanticException;
 }

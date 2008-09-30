@@ -128,7 +128,7 @@ public class SubtypeChecker
                                            label(supParam, pos)), 
                            A.labelEnv(),
                            pos,
-                           new LabelConstraintMessage() {
+                           new ConstraintMessage() {
                     public String msg() {
                         return lOrigSubtype + " is not a subtype of " + 
                         lOrigSupertype + 
@@ -155,18 +155,24 @@ public class SubtypeChecker
                 );
             }
             else if (pi.isPrincipal()) {
-                if (! A.actsFor(principal(supParam, pos), principal(subParam, pos)) ||
-                        ! A.actsFor(principal(subParam, pos), principal(supParam, pos))) {		    
-                    throw new SemanticDetailedException(
-                                                        origSubtype + " is not a subtype of " + 
-                                                        origSupertype + ", since the principals are not equivalent.", 
-                                                        origSubtype + " is not a subtype of " + 
-                                                        origSupertype + ". Subtyping requires " +
-                                                        "the " + StringUtil.nth(count) + 
-                                                        " parameter of the subtype to be equivalent to the " +
-                                                        StringUtil.nth(count) + " parameter of the supertype.",
-                                                        pos);
-                }
+                lc.constrain(principal(supParam, pos), 
+                             PrincipalConstraint.EQUIV, 
+                            principal(supParam, pos), 
+                           A.labelEnv(),
+                           pos,
+                           new ConstraintMessage() {
+                    public String msg() {
+                        return origSubtype + " is not a subtype of " + 
+                        origSupertype + ", since the principals are not equivalent.";
+                    }
+                    public String detailMsg() {
+                        return origSubtype + " is not a subtype of " + 
+                        origSupertype + ". Subtyping requires " +
+                        "the " + StringUtil.nth(count) + 
+                        " parameter of the subtype to be equivalent to the " +
+                        StringUtil.nth(count) + " parameter of the supertype.";
+                    }
+                });
             }
         }
 
@@ -202,7 +208,7 @@ public class SubtypeChecker
                         A.labelEnv(),
                         pos,
                         !(ts.labelOfType(subtype) instanceof VarLabel || ts.labelOfType(supertype) instanceof VarLabel ),
-                        new LabelConstraintMessage() {
+                        new ConstraintMessage() {
                 public String msg() {
                     String s = lOrigSubtype + " is not a subtype of " + 
                     lOrigSupertype + ".";

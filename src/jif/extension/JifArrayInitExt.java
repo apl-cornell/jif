@@ -88,7 +88,7 @@ public class JifArrayInitExt extends JifExprExt
                             new NamedLabel("label of array base type" , L),
                             lc.context().labelEnv(),
                             e.position(),
-                            new LabelConstraintMessage() {
+                            new ConstraintMessage() {
                     public String msg() {
                         return "Label of the array element not less " + 
                         "restrictive than the label of the array base type.";

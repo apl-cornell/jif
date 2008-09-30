@@ -51,7 +51,7 @@ public class JifInitializerExt extends Jif_c
                      A.labelEnv(),
                      ib.position(), 
                      false,
-                     new LabelConstraintMessage() {
+                     new ConstraintMessage() {
             public String msg() {
                 return "The information revealed by the normal " +
                 "termination of the initializer " +

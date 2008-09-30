@@ -47,7 +47,7 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                      new NamedLabel(isAutoEndorse?"autoendorse_to":"endorse_to", labelTo),
                      A.labelEnv(),       
                      pos,
-                     new LabelConstraintMessage() {
+                     new ConstraintMessage() {
             public String msg() {
                 if (isAutoEndorse) return "Auto-endorse cannot downgrade confidentiality.";
                 return "Endorse " + exprOrStmt + "s cannot downgrade confidentiality.";
@@ -85,7 +85,7 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                      new NamedLabel(isAutoEndorse?"autoendorse_to":"endorse_to", labelTo),
                      A.labelEnv(),
                      pos,
-                     new LabelConstraintMessage() {
+                     new ConstraintMessage() {
             public String msg() {
                 return "The method does not have sufficient " +
                 "authority to " + (isAutoEndorse?"auto-endorse this method":"endorse this " + exprOrStmt) + ".";
@@ -161,7 +161,7 @@ public class JifEndorseExprExt extends JifDowngradeExprExt
                      new NamedLabel("endorse_to_label", labelTo),
                      A.labelEnv(),
                      pos,
-                     new LabelConstraintMessage() {
+                     new ConstraintMessage() {
             public String msg() {
                 return "Endorsement not robust: a removed writer " +
                 "may influence the decision to " +

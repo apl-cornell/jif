@@ -181,7 +181,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                         new NamedLabel("label of field " + fi.name(), L),
                         A.labelEnv(),
                         init.position(),
-                        new LabelConstraintMessage() {
+                        new ConstraintMessage() {
                 public String msg() {
                     return "Label of field initializer not less " + 
                     "restrictive than the label for field " + 

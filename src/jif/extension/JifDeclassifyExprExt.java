@@ -47,7 +47,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                                            join(lc, "top_confidentiality", topConfLabel),
                                         A.labelEnv(),       
                                         pos,
-                                        new LabelConstraintMessage() {
+                                        new ConstraintMessage() {
                 public String msg() {
                     return "Declassify " + exprOrStmt + "s cannot downgrade integrity.";
                 }
@@ -81,7 +81,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                          join(lc, "auth_label", authLabel),
                A.labelEnv(),
                pos,
-                    new LabelConstraintMessage() {
+                    new ConstraintMessage() {
                public String msg() {
                    return "The method does not have sufficient " +
                           "authority to declassify this " + exprOrStmt + ".";
@@ -145,7 +145,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                                join(lc, "pc_integrity", pcInteg),
                      A.labelEnv(),
                      pos,
-                    new LabelConstraintMessage() {
+                    new ConstraintMessage() {
                      public String msg() {
                          return "Declassification not robust: a new reader " +
                                         "may influence the decision to " +
@@ -168,7 +168,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt
                                join(lc, "from_label_integrity", fromInteg),
                      A.labelEnv(),
                      pos,
-                     new LabelConstraintMessage() {
+                     new ConstraintMessage() {
                      public String msg() {
                          return "Declassification not robust: a new reader " +
                                         "may influence the data to be " +

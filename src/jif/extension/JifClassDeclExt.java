@@ -34,53 +34,56 @@ public class JifClassDeclExt extends Jif_c {
 
         A.setCurrentCodePCBound(jts.notTaken());
 
-	JifParsedPolyType ct = (JifParsedPolyType) n.type();
+	final JifParsedPolyType ct = (JifParsedPolyType) n.type();
+
+	// let the label checker know that we are about to enter a class body
+        lc.enteringClassDecl(ct);
 
 	// Check the authority of the class against the superclass.
 	if (ct.superType() instanceof JifClassType) {
-            JifClassType superType = (JifClassType) ct.superType();
+            final JifClassType superType = (JifClassType) ct.superType();
 
+            // construct a principal that represents the authority of ct
+            Principal authPrincipal = lc.jifTypeSystem().conjunctivePrincipal(ct.position(), ct.authority());
+            
+            
 	    for (Iterator i = superType.authority().iterator(); i.hasNext(); ) {
-		Principal pl = (Principal) i.next();
+		final Principal pl = (Principal) i.next();
 
-		boolean sat = false;
-
-		for (Iterator j = ct.authority().iterator(); j.hasNext(); ) {
-		    Principal pp = (Principal) j.next();
-
-		    if (A.actsFor(pp, pl)) {
-			sat = true;
-			break;
-		    }
-		}
-
-		if (! sat) {
-		    throw new SemanticDetailedException(
-                    "Superclass " + superType + " requires " + ct + " to " +
-                    "have the authority of principal " + pl, 
-                    "The class " + superType + " has the authority of the " +
-                    "principal " + pl + ". To extend this class, " + ct + 
-                    " must also have the authority of " + pl + ".", 
-                    n.position());
-		}
+		// authPrincipal must actfor pl i.e., at least one
+                // of the principals that have authorized ct must act for pl.
+                lc.constrain(authPrincipal, 
+                             PrincipalConstraint.ACTSFOR, 
+                            pl, 
+                           A.labelEnv(),
+                           n.position(),
+                           new ConstraintMessage() {
+                    public String msg() {
+                        return "Superclass " + superType + " requires " + ct + " to " +
+                        "have the authority of principal " + pl;
+                    }
+                    public String detailMsg() {
+                        return "The class " + superType + " has the authority of the " +
+                        "principal " + pl + ". To extend this class, " + ct + 
+                        " must also have the authority of " + pl + ".";
+                    }
+                });		
+		
 	    }
 	}
 
         A = (JifContext) n.del().enterScope(A);
 	
-        LabelChecker newLC = lc.context(A);
-	        
-        // let the label checker know that we are about to enter a class body
-        newLC.enteringClassBody(ct);
-        
+        lc = lc.context(A);
+	                
         // label check class conformance
-	labelCheckClassConformance(ct,newLC);
+	labelCheckClassConformance(ct,lc);
 
 	// label check the body
-        ClassBody body = (ClassBody) newLC.labelCheck(n.body());
+        ClassBody body = (ClassBody) lc.labelCheck(n.body());
 
         // let the label checker know that we have left the class body
-        n = newLC.leavingClassBody((JifClassDecl)n.body(body));
+        n = lc.leavingClassDecl((JifClassDecl)n.body(body));
         return n;
     }
     

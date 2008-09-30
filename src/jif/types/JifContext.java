@@ -94,18 +94,6 @@ public interface JifContext extends Context {
      */
     void addDefinitionalEquiv(Principal p1, Principal p2);
     /**
-     * Test an actsfor relation, using the principal hierarchy. 
-     */
-    boolean actsFor(Principal p1, Principal p2);
-    /**
-     * Test if p1 actsfor p2 and vice versa, using the principal hierarchy. 
-     */
-    boolean equiv(Principal p1, Principal p2);
-    /**
-     * Test an actsfor relation, using the principal hierarchy. 
-     */
-    boolean actsFor(Collection actorGrp, Collection grantorGrp);
-    /**
      * Clears the principal hierarchy of all actsfor relations. 
      */
     void clearPH();

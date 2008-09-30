@@ -4,8 +4,11 @@ import java.util.*;
 
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.*;
+import jif.types.principal.Principal;
+import jif.types.principal.VarPrincipal;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * A solver of Jif constraints. Finds solution to constraints essentially by
@@ -41,20 +44,28 @@ public class SolverGLB extends AbstractSolver {
      * to no longer be satisfied.
      */
     protected void addDependencies(Equation eqn) {
-        if (shouldReport(5)) {
-            report(5, "Equation " + eqn + " depends on variables: "
-                    + eqn.lhs().variableComponents());
-        }
-
         // Build dependency maps for this equation.
-        for (Iterator j = eqn.rhs().variableComponents().iterator(); j.hasNext();) {
-            VarLabel v = (VarLabel)j.next();
+        Set changeable, awakeable;
+        if (eqn instanceof LabelEquation) {
+            changeable = ((LabelEquation)eqn).rhs().variableComponents();
+            awakeable = ((LabelEquation)eqn).lhs().variableComponents(); 
+        }
+        else if (eqn instanceof PrincipalEquation) {
+            changeable = ((PrincipalEquation)eqn).lhs().variables();
+            awakeable = ((PrincipalEquation)eqn).rhs().variables();             
+        }
+        else {
+            throw new InternalCompilerError("Unexpected kind of equation " + eqn);
+        }
+        
+        for (Iterator j = changeable.iterator(); j.hasNext();) {
+            Variable v = (Variable)j.next();
 
             // If this equation is examined, then the bound for v may be changed
             addDependency(eqn, v);
         }
-        for (Iterator j = eqn.lhs().variableComponents().iterator(); j.hasNext();) {
-            VarLabel v = (VarLabel)j.next();
+        for (Iterator j = awakeable.iterator(); j.hasNext();) {
+            Variable v = (Variable)j.next();
 
             // If the bound for v is changed (upward), then we may need to
             // reexamine this equation.
@@ -63,10 +74,17 @@ public class SolverGLB extends AbstractSolver {
     }
 
     /**
-     * The default bound of variables in this solver is bottom
+     * The default bound of label variables in this solver is bottom
      */
-    protected Label getDefaultBound() {
+    protected Label getDefaultLabelBound() {
         return ts.bottomLabel();
+    }
+
+    /**
+     * The default bound of label variables in this solver is bottom
+     */
+    protected Principal getDefaultPrincipalBound() {
+        return ts.bottomPrincipal(Position.COMPILER_GENERATED);
     }
 
     /**
@@ -81,13 +99,13 @@ public class SolverGLB extends AbstractSolver {
      * performs a search, attempting to refine each variable in turn, and then
      * recursively attempting to solve the set of equations.
      */
-    protected void solve_eqn(Equation eqn) throws SemanticException {
-        // there are occurances of variables on the RHS of the equation
+    protected void solve_eqn(LabelEquation eqn) throws SemanticException {
+        // there are occurrences of variables on the RHS of the equation
         // there may be a join of components on the RHS of the equation.
         // we will need to try all possible ways of satisfying this equation,
         // trying the simple ones (i.e. var labels) first.
 
-        if (!eqn.rhs().hasVariableComponents()) {
+        if (!eqn.rhs().hasVariableComponents()) {            
             // the RHS has no variable components in it, it has nothing for us to
             // modify the bound of. It had better hold...
 
@@ -158,20 +176,85 @@ public class SolverGLB extends AbstractSolver {
             if (shouldReport(1)) {
                 report(1, "Search for refinement to constraint " + eqn + " failed.");
             }
-            reportError(eqn.constraint(), eqn.variableComponents());
+            reportError(eqn.labelConstraint(), eqn.variableComponents());
             
         }
 
     }
 
+    protected void solve_eqn(PrincipalEquation eqn) throws SemanticException {
+        if (!eqn.lhs().hasVariables()) {
+            // the LHS has no variable components in it, it has nothing for us to
+            // modify the bound of. It had better hold...
+
+            checkEquation(eqn);
+            return;
+        }
+
+        // at this point we know that there is at least one variable of the LHS
+
+        // get a count of them, to figure out if we need to do a search...
+        List lhsVariables = new ArrayList(eqn.lhs().variables());
+        boolean isSingleVar = (lhsVariables.size() == 1);
+        VarPrincipal singleVar = null;
+        if (isSingleVar) singleVar = (VarPrincipal)lhsVariables.get(0);
+        if (isSingleVar && (!isFixedValueVar(singleVar) || eqn.constraint().kind() == PrincipalConstraint.EQUIV)) {
+            // only a single component is a variable
+            refineVariableEquation(singleVar, eqn);
+        }
+        else {
+            // we will do a very simple search, not delaying the
+            // solution of any constraints...
+            // we only need one of the components to satisfy the constraints.
+            // we will just try each one in turn.
+            // copy the bounds before we start modifying anything, so we can
+            // restore it again later...
+            VarMap origBounds = bounds().copy();
+
+            for (Iterator i = lhsVariables.iterator(); i.hasNext();) {
+                VarPrincipal comp = (VarPrincipal)i.next();
+
+                if (isFixedValueVar(comp)) {
+                    // this var had it's value fixed when it's constraint
+                    // was added. Do not try to alter it's value.                   
+                    continue;
+                }
+                
+                refineVariableEquation(comp, eqn);
+                // check that the equation is now satisfied.
+                Principal lhsbound = bounds().applyTo(eqn.lhs());
+                Principal rhsbound = bounds().applyTo(eqn.rhs());
+                
+                if (eqn.env().actsFor(lhsbound, rhsbound) && search(eqn)) {
+                    // we were successfully able to find a solution to the
+                    // constraints!
+                    return;
+                }
+
+                // search failed!
+                // set the bounds back to their original settings, and
+                // try with another component
+                setBounds(origBounds);
+            }
+
+            // if we fall through to here, then the search failed.
+            if (shouldReport(1)) {
+                report(1, "Search for refinement to constraint " + eqn + " failed.");
+            }
+            reportError(eqn.constraint(), eqn.variables());            
+        }
+    }
+    
     /**
      * return true if every active constraint has multi vars on the RHS.
      */
     protected boolean allActivesAreMultiVarRHS() {
         for (Iterator i = getQueue().iterator(); i.hasNext();) {
             Equation eqn = (Equation)i.next();
-            if (eqn.rhs().variableComponents().size() <= 1){ 
-                return false;
+            if (eqn instanceof LabelEquation) {
+                if (((LabelEquation)eqn).rhs().variableComponents().size() <= 1){ 
+                    return false;
+                }
             }
         }
         return true;
@@ -181,7 +264,7 @@ public class SolverGLB extends AbstractSolver {
      * Raise the bound on the label variable v, which is a component of the RHS
      * of the equation eqn.
      */
-    protected void refineVariableEquation(VarLabel v, Equation eqn)
+    protected void refineVariableEquation(VarLabel v, LabelEquation eqn)
             throws SemanticException {
         Label vBound = bounds().boundOf(v);
         Label lhsBound = triggerTransforms(bounds().applyTo(eqn.lhs()), eqn.env());
@@ -208,10 +291,33 @@ public class SolverGLB extends AbstractSolver {
         }
 
         addTrace(v, eqn, newBound);
-        setBound(v, newBound, eqn.constraint());
+        setBound(v, newBound, eqn.labelConstraint());
         wakeUp(v);
     }
         
+    /**
+     * Raise the bound on the label variable v, which is a component of the equation eqn.
+     */
+    protected void refineVariableEquation(VarPrincipal v, PrincipalEquation eqn)
+            throws SemanticException {
+        Principal vBound = bounds().boundOf(v);
+        Principal lhsBound = bounds().applyTo(eqn.lhs());
+        Principal rhsBound = bounds().applyTo(eqn.rhs());
+
+        if (shouldReport(5)) report(5, "BOUND of " + v + " = " + vBound);
+        if (shouldReport(5)) report(5, "RHSBOUND = " + rhsBound);
+        if (shouldReport(5)) report(5, "LHSBOUND = " + lhsBound);
+
+        // Raise v's bound 
+        Principal newBound =  ts.conjunctivePrincipal(vBound.position(), vBound, rhsBound).simplify();
+
+        if (shouldReport(4)) report(4, "CONJUNCT (" + v + ", NEEDED) := " + newBound);
+
+        // addTrace(v, eqn, newBound);
+        setBound(v, newBound, eqn.principalConstraint());
+        wakeUp(v);
+    }
+
     /**
      * Return the most permissive label L such that lhs <= rhs join L
      */
@@ -337,7 +443,7 @@ public class SolverGLB extends AbstractSolver {
      * @throws SemanticException if eqn is not satisfied.
      * @throws InternalCompilerError if eqn contains variables
      */
-    protected void checkEquation(Equation eqn) throws SemanticException {
+    protected void checkEquation(LabelEquation eqn) throws SemanticException {
         if (eqn.rhs().hasVariableComponents()) {
             throw new InternalCompilerError("RHS of equation " + eqn
                     + " should not contain variables.");
@@ -358,19 +464,50 @@ public class SolverGLB extends AbstractSolver {
             //            if (dynCheck(lhsBound, rhsLabel, eqn.env())) return;
 
             // This equation isn't satisfiable.
-            reportError(eqn.constraint(), eqn.variableComponents());
+            reportError(eqn.labelConstraint(), eqn.variableComponents());
         }
     }
 
     /**
+     * Check that the equation eqn is satisfied. The LHS of eqn cannot have any
+     * variables.
+     * 
+     * @throws SemanticException if eqn is not satisfied.
+     * @throws InternalCompilerError if eqn contains variables
+     */
+    protected void checkEquation(PrincipalEquation eqn) throws SemanticException {
+        if (eqn.lhs().hasVariables()) {
+            throw new InternalCompilerError("LHS of equation " + eqn
+                    + " should not contain variables.");
+        }
+
+        // This equation must have been woken up. We need to
+        // check whether it is solvable given the current variables.
+
+        Principal rhsBound = bounds().applyTo(eqn.rhs());
+        if (shouldReport(4)) report(4, "RHS = " + rhsBound);
+
+        Principal lhsBound = bounds().applyTo(eqn.lhs());
+        if (shouldReport(4)) report(4, "LHS APP = " + lhsBound);
+
+        // Check to see if it is currently satisfiable.
+        if (!eqn.env().actsFor(lhsBound, rhsBound)) {
+
+            // This equation isn't satisfiable.
+            reportError(eqn.constraint(), eqn.variables());
+        }
+        
+    }
+
+        /**
      * Find a contradicting equation.
      */
     protected Equation findContradictiveEqn(LabelConstraint c) {
-        if (c.lhs().variableComponents().size() == 1) {
+        if (c.lhsLabel().variableComponents().size() == 1) {
             // The LHS is has a single VarLabel, so we may be able to find
             // an equation that contradicts this one.
-            VarLabel v = (VarLabel)c.lhs().variableComponents().iterator().next();
-            return findTrace(v, bounds().applyTo(c.rhs()), false);
+            VarLabel v = (VarLabel)c.lhsLabel().variableComponents().iterator().next();
+            return findTrace(v, bounds().applyTo(c.rhsLabel()), false);
         }
         // TODO: could try some other ways to find contradictive
         // equation, or could produce a different error message.
