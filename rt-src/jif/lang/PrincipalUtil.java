@@ -144,37 +144,26 @@ public class PrincipalUtil {
         try {
             LabelUtil.singleton().enterTiming();
             // try the dumb things first.
-            if (eq(p, q)) {
-                return new ReflexiveProof(p, q);
-            }
             if (q == null) {
                 return new DelegatesProof(p, q);            
             }
+            if (eq(p, q)) {
+                return new ReflexiveProof(p, q);
+            }
             
             // check the search state
-            Principal[] newss;
-            int ind = 0;
-            if (searchState instanceof Principal[]) {
-                Principal[] ss = (Principal[])searchState; 
-                newss = new Principal[ss.length + 2];
-                // ss is an array of principals, such that ss[2i],ss[2i+1] is goal on the goal stack.
-                for (;ind+1 < ss.length; ind += 2) {
-                    // check that p and q are not equal to ss[i] and ss[i+1]
-                    if (eq(p, ss[ind]) && eq(q, ss[ind+1])) {
-                        // p and q are already on the goal stack. Prevent an infinite recursion.
-                        return null;
-                    }
-                                        
-                    newss[ind] = ss[ind];
-                    newss[ind+1] = ss[ind+1];
-                }
+            ProofSearchState newss;
+            if (searchState instanceof ProofSearchState) {
+                ProofSearchState ss = (ProofSearchState)searchState;
+                if (ss.contains(p, q)) {
+                    // p and q are already on the goal stack. Prevent an infinite recursion.
+                    return null;
+                }                    
+                newss = new ProofSearchState(ss, p, q);                                        
             }
             else {
-                newss = new Principal[2];
+                newss = new ProofSearchState(p, q);
             }
-            // ind+1 is now less than newss.length
-            newss[ind] = p;
-            newss[ind+1] = q;
             
             // if we're going from a dis/conjunctive principal, try finding a downwards
             // proof first
@@ -190,7 +179,7 @@ public class PrincipalUtil {
             prf = q.findProofUpto(p, newss);
             if (prf != null) return prf;
             
-            // try searching downards from p.
+            // try searching downwards from p.
             if (!doneDownTo && p != null) {
                 prf = p.findProofDownto(q, newss);
                 if (prf != null) return prf;
@@ -201,6 +190,32 @@ public class PrincipalUtil {
         }
         finally {
             LabelUtil.singleton().exitTiming();            
+        }
+        
+    }
+    
+    private static class ProofSearchState {
+        private ActsForPair[] goalstack;
+
+        public ProofSearchState(Principal p, Principal q) {
+            goalstack = new ActsForPair[1];
+            goalstack[0] = new ActsForPair(p, q);
+        }
+        private ProofSearchState(ProofSearchState ss, Principal p, Principal q) {
+            int len = ss.goalstack.length + 1;
+            goalstack = new ActsForPair[len];
+            System.arraycopy(ss.goalstack, 0, goalstack, 0, len-1);
+            goalstack[len-1] = new ActsForPair(p, q);
+        }
+        public boolean contains(Principal p, Principal q) {
+            for (int i = 0; i < goalstack.length; i++) {
+                if (goalstack[i] != null) {
+                    if (eq(goalstack[i].p, p) && eq(goalstack[i].q, q)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         
     }
