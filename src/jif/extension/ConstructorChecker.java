@@ -1,4 +1,4 @@
-to package jif.extension;
+package jif.extension;
 
 import java.util.Iterator;
 import java.util.List;
