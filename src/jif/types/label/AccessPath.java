@@ -11,6 +11,8 @@ import jif.visit.LabelChecker;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.Copy;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /**
@@ -36,7 +38,7 @@ import polyglot.util.Position;
  * is used to represent non-final access paths, for example "this.m()".
  *  
  */
-public abstract class AccessPath implements Serializable {
+public abstract class AccessPath implements Serializable, Copy {
     private Position position;
 
     protected AccessPath(Position pos) {
@@ -94,6 +96,17 @@ public abstract class AccessPath implements Serializable {
      */
     public List throwTypes(TypeSystem ts) {
         return Collections.EMPTY_LIST;
+    }
+    
+    public Object copy() {
+        try {
+            AccessPath ap = (AccessPath) super.clone();
+
+            return ap;
+        }
+        catch (CloneNotSupportedException e) {
+            throw new InternalCompilerError("Java clone() weirdness.");
+        }
     }
 
     public abstract boolean equivalentTo(AccessPath p, LabelEnv env);

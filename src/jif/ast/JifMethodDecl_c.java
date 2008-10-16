@@ -284,16 +284,12 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
             if (r instanceof AccessPathLocal) {
                 AccessPathLocal apl = (AccessPathLocal)r;
                 if (!revertToOriginal && !apl.name().endsWith("'")) {
-                    apl = new AccessPathLocal(apl.localInstance(),
-                                              apl.name() + "'",
-                                              apl.position());
+                    apl = apl.name(apl.name() + "'");
                     AccessPath newPath = ap.subst(r, apl);
                     return newPath;
                 }
                 if (revertToOriginal && apl.name().endsWith("'")) {
-                    apl = new AccessPathLocal(apl.localInstance(),
-                                              apl.name().substring(0, apl.name().length()-1),
-                                              apl.position());
+                    apl = apl.name(apl.name().substring(0, apl.name().length()-1));
                     AccessPath newPath = ap.subst(r, apl);
                     return newPath;
                 }

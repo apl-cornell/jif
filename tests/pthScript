@@ -395,11 +395,13 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Override10.jif  ;
 	Override11.jif  (Semantic, "cannot assume");
 	Override12.jif;
-	Override13.jif  (Semantic, "cannot assume");
+	Override13.jif  (Semantic, "cannot assume"),
+	                (Semantic, "method may return a value with a more restrictive label");
 	Override14.jif;
 	Override15.jif;
 	Override16.jif;
-	Override17.jif  (Semantic, "cannot assume");
+	Override17.jif  (Semantic, "cannot assume"),
+	                (Semantic, "method may return a value with a more restrictive label");
 	Override18.jif;
 	Override19.jif;
 	PairList2.jif ;
@@ -490,8 +492,8 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	RuntimeParams19.jif (Semantic, "not less restrictive");
 	RuntimeParams20.jif (Semantic, "not less restrictive");
 	RuntimeParams21.jif (Semantic, "not less restrictive");
-	RuntimeParams22.jif (Semantic, "Calling context does not have enough authority");
-	RuntimeParams22a.jif (Semantic, "Calling context does not have enough authority");
+	RuntimeParams22.jif (Semantic, "Calling context does not have enough authority"), (), ();
+	RuntimeParams22a.jif (Semantic, "Calling context does not have enough authority"), ();
 	RuntimeParams23.jif (Semantic, "NullPointerException.*must either be caught"),
                             (Semantic, "NullPointerException.*must either be caught"),
                             (Semantic, "NullPointerException.*must either be caught"),
@@ -540,7 +542,8 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Super5.jif ;
 	Super6.jif (Semantic, "Final field.*must be initialized") ;
 	Super7.jif (Semantic, "requires .* authority .* principal");
-	Super8.jif (Semantic, "requires .* authority .* principal");
+	Super8.jif (Semantic, "requires .* authority .* principal"), 
+	           (Semantic, "Calling context does not have enough authority");
 	Super9.jif ;
 	SwitchLabel.jif (Semantic, "not representable at runtime");
 	SwitchLabel2.jif (Semantic, "not representable at runtime");

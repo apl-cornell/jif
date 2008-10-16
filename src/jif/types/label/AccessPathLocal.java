@@ -35,6 +35,15 @@ public class AccessPathLocal extends AccessPathRoot {
         return this;
     }
     
+    public AccessPathLocal name(String name) {
+        AccessPathLocal apl = (AccessPathLocal)this.copy();
+        apl.name = name;
+        if (apl.li != null && !name.startsWith(apl.li.name())) {
+            throw new InternalCompilerError("Inconsistent local names");
+        }
+        return apl;
+    }
+    
     public boolean isNeverNull() {
         return neverNull;
     }
