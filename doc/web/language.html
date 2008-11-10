@@ -1,6 +1,7 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
 <html>
-
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel=StyleSheet href="jifdoc.css" type="text/css">
 <title>Language features</title>
 </head>
@@ -86,7 +87,8 @@ the value can be used.
 Any type expression <i class="math">t</i>
 may be labeled with any label expression <i class="math">l</i>.
 This labeled type expression is written <code><i class="math">t</i>{<i class="math">l</i>}</code>; for example, the
-labeled type <code>int{p:}</code> represents an integer that principal <code>p</code> owns
+labeled type <code>int{p:}</code>
+represents an integer that principal <code>p</code> owns
 and that only <code>p</code> can read.
 For example, a variable may be declared with this labeled type: 
 <div class="code"><pre>
@@ -95,7 +97,9 @@ int{p:} x = 2;
 </p>
 
 <p>
-The syntax of labels is described earlier (see <a class="secref" href="dlm.html#dlm_syntax">Label syntax in Jif</a>).
+This labeled type may also be written as <code>{p→}</code> or
+<code>{p-&gt;}</code>. The syntax of labels is described earlier (see <a
+class="secref" href="dlm.html#dlm_syntax">Label syntax in Jif</a>).
 </p>
 
 <p>
@@ -145,13 +149,6 @@ Other kinds of label components are introduced later.
 </p>
 
 <p>
-A labeled type may occur in a Jif program almost anywhere a type
-may occur in a Java program. In fact, if the label is omitted from a type,
-the Jif compiler automatically generates a label for that type according
-to certain rules (see <a class="secref" href="#default-labels">Default labels</a>).
-</p>
-
-<p>
 The type and label parts of a labeled type act largely independently.
 The notation <i class="math">S &le; T</i> is used here to mean
 that the type <i class="math">S</i> is a subtype of the type
@@ -171,6 +168,30 @@ class="math">L</i><sub>2</sub>,
 </p>
 
 <h3><a name="inference"></a>Label inference</h3>
+
+<p>
+A labeled type may occur in a Jif program almost anywhere a type may occur in a
+Java program. If the label is omitted from a type, the Jif compiler
+automatically generates a label for that type according to certain rules.  In
+particular, labels on local variables are automatically inferred by the Jif
+compiler in a way that satisfies the constraints on information flow, if
+possible.  Not all omitted labels are inferred; other labels, such as on method
+arguments, are generated automatically using defaults (see <a class="secref"
+href="#default-labels">Default labels</a>).
+</p>
+<p>For example, in the following code the label on the variable <code>y</code>
+is inferred automatically as <code>{Bob→Alice}</code>:
+
+<div class=code><pre>
+  int{Bob→Alice} x;
+  int{Bob→Alice} z;
+  int y = x;
+  z = y;
+</pre></div>
+
+<p class=cont>Usually, it is not necessary to annotate local variables
+with labels. The labels appearing in method signatures are enough to infer
+their labels.</p>
 
 <h3><a name="principal-hierarchy"></a>Principals and <code>actsfor</code></h3>
 
@@ -369,14 +390,11 @@ may give information about the contents of these two variables.
 
 <h3><a name="default-labels"></a>Default labels</h3>
 
-<p>A powerful feature of Jif is automatic inference of the
-labels of local variables. The Jif compiler can figure out whether there
-is a way of labeling local variables to satisfy all the label
-constraints. However, most of the time you do need to write down
-labels of fields and method signatures, including the begin-label,
-end-label, return value label and arguments' labels. When these labels
-are missing, some conservatives rules are used to assign restrictive
-default labels:</p> 
+<p>The labels on local variables are inferred automatically by the compiler.
+However, most of the time you do need to write down labels for fields and
+method signatures. These labels include the begin-label, the end-label, the
+return value label, and the labels of the arguments.  When these labels are
+omitted, default labels are assigned using some simple rules:</p> 
 
 <ul class="ulpara">
 <li>Default field label: the empty label, <code>{}</code>
@@ -1151,10 +1169,10 @@ dynamic principal.</p>
 
 <div class="code"><pre>
 new label {Alice-&gt;Bob; Alice&lt;-Chuck}
-new label {*lbl; Alice-&gt;Bob}
+new label {*lbl; Alice→Bob}
 new label {L; pr-&gt;Alice}
 new label {*lbl meet L; Bob-&gt;Alice&amp;pr}
-new label {*:*; _!:_}
+new label {*:*; _!:_; *←*}
 </pre>
 </div>
 
