@@ -844,20 +844,22 @@ public class Vector[label L] extends AbstractList[L] {
 </pre></div>
 
 <p class="cont">
- The <code>Vector</code> class is parameterized on a label <code>L</code> that represents the
-label of the contained elements. Assuming that
-<code>secret</code> and <code>public</code> are appropriately defined dynamic labels,
-the types <code>Vector[secret]</code> and <code>Vector[public]</code> would represent
-vectors of elements of differing sensitivity. These types are referred
-to as <em>instantiations</em> of the parameterized type <code>Vector</code>. Without the 
-ability to instantiate
-classes on particular labels, it would be necessary
-to reimplement <code>Vector</code> for every distinct element label.
+The <code>Vector</code> class is parameterized on a
+label <code>L</code> that represents the label of the
+contained elements. Assuming that <code>secret</code> and
+<code>public</code> are appropriately defined dynamic labels, the
+types <code>Vector[secret]</code> and <code>Vector[public]</code>
+would represent vectors of elements of differing sensitivity. These
+types are referred to as <em>instantiations</em> of the parameterized
+type <code>Vector</code>. Without the ability to instantiate
+classes on particular labels, it would be necessary to reimplement
+<code>Vector</code> for every distinct element label.
 </p>
 
 <p>
 A class may also be parameterized with respect to principals, as in this
 example:
+</p>
 
 <div class="code"><pre>
 class paramCell[principal p, principal q] {
@@ -872,7 +874,32 @@ the instantiation <code>paramCell[Bob,Amy]</code> has
 a field <code>contents</code> with the label <code>{Bob:Amy; Bob&larr;Amy}</code>.
 </p>
 
-<h3><A NAME="param-interact-object-types">Interactions with object types</A></h3>
+<h3><a name="label-principal-params">Parameter inference</a></h3>
+
+<p>
+The Jif compiler automatically infers label and principal parameters for local
+variables. This makes programming in Jif more convenient, because it is not
+necessary to explicitly instantiate parameterized classes in most places where
+these types can be mentioned.   For example, code using the <code>Vector</code>
+or <code>paramCell</code> can declare variables without providing the
+parameters:
+</p>
+
+<div class="code"><pre>
+  paramCell cell;
+  Vector v;
+</pre></div>
+
+<p>
+Some parameters must still be supplied explicitly. For object fields with
+parameterized types, parameters must be supplied. Parameters must be provided
+explicitly for classes and interfaces appearing in an <code>extends</code>
+clause.  Formal parameters must always be declared, as in the class definition
+of <code>Vector</code> and <code>paramCell</code>. These restrictions exist
+because parameter inference in Jif is local to a single method.
+</p>
+
+<h3><a name="param-interact-object-types">Interactions with object types</a></h3>
 
 <p>
 When a parameterized or unparameterized type inherits from a superclass,
