@@ -496,10 +496,22 @@ public abstract class AbstractSolver implements Solver {
     protected void checkEquationSatisfied(LabelEquation eqn) throws SemanticException {
         // Check that any variables that must be runtime representable are in fact so.
         for (Iterator iter = eqn.variables().iterator(); iter.hasNext();) {
-            VarLabel v = (VarLabel)iter.next();
-            if (v.mustRuntimeRepresentable() && !bounds.boundOf(v).isRuntimeRepresentable()) {
-                // a var label that must be runtime representable is not.
-                reportError(eqn.labelConstraint(), Collections.singleton(v));
+            Variable v = (Variable)iter.next();
+            if (v.mustRuntimeRepresentable()) {
+                boolean isRuntimeRepresentable = false;
+                if (v instanceof VarLabel) {
+                    isRuntimeRepresentable = bounds.boundOf((VarLabel)v).isRuntimeRepresentable();
+                }
+                else if (v instanceof VarPrincipal) {
+                    isRuntimeRepresentable = bounds.boundOf((VarPrincipal)v).isRuntimeRepresentable();                    
+                }
+                else {
+                    throw new InternalCompilerError("Unexpected variable " + v);
+                }
+                if (!isRuntimeRepresentable) {
+                    // a variable that must be runtime representable is not.
+                    reportError(eqn.labelConstraint(), Collections.singleton(v));
+                }
             }
         }
 
