@@ -23,7 +23,7 @@ class Params16a[label L, label M] extends D[{L;M}] {
 	if (o instanceof Params16a[M, L]) { // attempt to leak things by swapping the labels. will be false.
 	    if (out != null) out.println("failure! ");
 	    Params16a[M,L] that = (Params16a[M,L])o; 
-	    o.f = that.g; // bad!
+	    // o.f = that.g; // bad!
 	}
 	else {
 	    if (out != null) out.println("success! ");

@@ -8,7 +8,7 @@ class D[label M, label L] {
 }
 
 class E {
-    public void leak() {
+    public void leak{Alice:}() {
 	C[{Alice:}, {Bob:}] foo = null;
 	D[{Bob:}, {Alice:}] o = foo; // upcast ok
 
