@@ -34,6 +34,7 @@ sub subst_env {
 	    print STDERR "Undefined environment variable $v\n";
 	    exit 1;
 	}
+	$vars{$v} = 1;
 	$expr =~ s/\$$v/$val/;
     }
     return $expr;

@@ -1,7 +1,7 @@
 package jif.util;
 
 /**
- * An implementatin of List, using a linked list to store the
+ * An implementation of List, using a linked list to store the
  * list elements.
  */
 public class LinkedList[label L] extends AbstractList[L]
