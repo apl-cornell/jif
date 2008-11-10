@@ -12,7 +12,7 @@ public class JifFieldInstance_c extends FieldInstance_c
 {
     protected Label label;
     protected boolean hasInitializer;
-
+    
     public JifFieldInstance_c(JifTypeSystem ts, Position pos,
 	ReferenceType container, Flags flags,
 	Type type, String name) {
@@ -94,6 +94,9 @@ public class JifFieldInstance_c extends FieldInstance_c
             throw new InternalCompilerError("Cant modify constant value on a copy");            
         }
         super.setConstantValue(constantValue);
+    }
+    public String toString() {
+        return super.toString() + " label = " + label;
     }
     
 }

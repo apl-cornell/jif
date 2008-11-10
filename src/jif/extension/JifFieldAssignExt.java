@@ -12,9 +12,7 @@ import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
-import polyglot.types.FieldInstance;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
+import polyglot.types.*;
 
 /** The Jif extension of the <code>LocalAssign</code> node. 
  */
@@ -29,6 +27,7 @@ public class JifFieldAssignExt extends JifAssignExt
     {
         Assign assign = (Assign) node();
         Field fe = (Field) assign.left();
+       
 
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
@@ -65,9 +64,17 @@ public class JifFieldAssignExt extends JifAssignExt
         }
 
 
-        // Must be done after visiting target to get PC right.
-        final FieldInstance fi = fe.fieldInstance();
+        // Must be done after visiting target to get PC right.        
+
+        // Find the field instance again. This ensures that
+        // we have the correctly instantiated type, as label checking
+        // of the target may have produced a new type for the target.
+        ReferenceType targetType = JifFieldExt.targetType(ts, A, target, fe);
+        final JifFieldInstance fi = (JifFieldInstance)ts.findField(targetType, fe.name());
+        fe = fe.fieldInstance(fi);
+
         Label Lf = ts.labelOfField(fi, A.pc());
+        
 
         if (target instanceof Expr) {
             if (!(target instanceof Special)) {

@@ -682,14 +682,14 @@ class HashMapEntry[label K, label V] implements MapEntry[K,V] {
      * overwritten by an invocation of put(k,v) for a key k that's already
      * in the HashMap.
      */
-    void recordAccess(HashMap[K,V]{this} m) {
+    void recordAccess{K}(HashMap[K,V]{this} m) {
     }
 
     /**
      * This method is invoked whenever the entry is
      * removed from the table.
      */
-    void recordRemoval(HashMap[K,V]{this} m) {
+    void recordRemoval{K}(HashMap[K,V]{this} m) {
         // update the doubly linked list.
         try {
             before.after = after;
