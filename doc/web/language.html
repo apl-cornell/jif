@@ -18,31 +18,32 @@ building interesting programs in a security-typed language:
 
 <ul class="ulpara">
 
-<li>A <strong>downgrading</strong> mechanism gives the programmer an
+<li>A <strong><a href="#downgrading">downgrading</a></strong> mechanism gives the programmer an
 explicit escape hatch for downgrading the security of information when
 that is necessary. Downgrading confidentiality is called
 <strong>declassification</strong>, whereas downgrading integrity is called
 <strong>endorsement</strong>.
 
-<li><strong>Principals</strong>, the entities that have security requirements,
+<li><strong><a href="dlm.html#dlm_principals">Principals</a></strong>, the entities that have security requirements,
 are explicitly represented in the Jif language, 
     both as type annotations and as values that can be manipulated at
     run time. Jif provides the ability to create
-    <strong>user-defined principals</strong>, so that programs can define
+    <strong><a href="#user-defined-principals">user-defined principals</a></strong>, so that programs can define
     their own authentication and authorization procedures.
-<li><strong>Statically checked access control</strong> makes it possible
+<li><strong><a href="#authority">Statically checked access control</a></strong> makes it possible
     to write complex authorization code without
     creating covert information leaks.
-<li>A <strong>principal hierarchy</strong> allows policies to be stated
+<li>A <strong><a href="#principal-hierarchy">principal hierarchy</a></strong> allows policies to be stated
     in a general way in terms of more abstract principals
     such as groups or roles.
-<li><strong>Label polymorphism</strong> allows the expression of code 
-that is generic with respect to the security class of the data it manipulates.
-<strong>Principal polymorphism</strong> supports genericity
-with respect to principals as well.
-<li><strong>Automatic label inference</strong>
-makes it unnecessary to write many type annotations.
-<li><strong>Run-time label checking and first-class label values</strong>
+<li><strong><a href="#label-polymorphism">Label polymorphism</a></strong> allows the expression of code 
+that is generic with respect to the security class of the data it manipulates. Classes can be
+<strong><a href="#parameterized-class">parameterized</a></strong>
+with respect to labels and principals, supporting genericity.
+<li><strong><a href="#inference">Automatic label inference</a></strong>
+and <strong><a href="#param-inference">automatic parameter inference</a></strong>
+make it unnecessary to write many type annotations.
+<li><strong><a href="#runtime-tests">Run-time label checking and first-class label values</a></strong>
 makes it possible to discover and to define new policies at run time. Run-time
 checks are statically checked to ensure that information is not leaked by
 the success or failure of the run-time check itself.  
@@ -168,6 +169,8 @@ class="math">L</i><sub>2</sub>,
 &le; <i class="math">T</i>{<i class="math">L</i><sub>2</sub>} (as in
 [<a href="bibliography.html#VSI96">VSI96</a>])
 </p>
+
+<h3><a name="inference"></a>Label inference</h3>
 
 <h3><a name="principal-hierarchy"></a>Principals and <code>actsfor</code></h3>
 
@@ -874,14 +877,14 @@ the instantiation <code>paramCell[Bob,Amy]</code> has
 a field <code>contents</code> with the label <code>{Bob:Amy; Bob&larr;Amy}</code>.
 </p>
 
-<h3><a name="label-principal-params">Parameter inference</a></h3>
+<h3><a name="param-inference">Parameter inference</a></h3>
 
 <p>
 The Jif compiler automatically infers label and principal parameters for local
 variables. This makes programming in Jif more convenient, because it is not
 necessary to explicitly instantiate parameterized classes in most places where
 these types can be mentioned.   For example, code using the <code>Vector</code>
-or <code>paramCell</code> can declare variables without providing the
+or <code>paramCell</code> classes may declare variables without providing the
 parameters:
 </p>
 
@@ -890,6 +893,9 @@ parameters:
   Vector v;
 </pre></div>
 
+<p class="cont">
+Parameters can always be supplied explicitly, which may make the code clearer
+or may help with debugging.</p>
 <p>
 Some parameters must still be supplied explicitly. For object fields with
 parameterized types, parameters must be supplied. Parameters must be provided
