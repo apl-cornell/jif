@@ -865,16 +865,19 @@ example:
 </p>
 
 <div class="code"><pre>
-class paramCell[principal p, principal q] {
-    int{p:q; p&larr;q} contents;
+class ParamCell[principal P, principal Q] {
+    int{P:Q; P&larr;Q} contents;
+    void m(principal x, principal y) where P actsfor x, Q actsfor y { ... }
 }
 </pre></div>
 
-<p>
-This class may be instantiated with any
-two principals <code>p</code> and <code>q</code>. For example,
-the instantiation <code>paramCell[Bob,Amy]</code> has
-a field <code>contents</code> with the label <code>{Bob:Amy; Bob&larr;Amy}</code>.
+<p> This class may be instantiated with any two principals
+<code>p</code> and <code>q</code>. For example, the instantiation
+<code>ParamCell[Bob,Amy]</code> has a field <code>contents</code> with
+the label <code>{Bob:Amy; Bob&larr;Amy}</code>, and method
+<code>m</code> that requires that parameter principal <code>P</code>
+can act for runtime principal <code>x</code>, and parameter principal
+<code>Q</code> can act for runtime principal <code>y</code>.
 </p>
 
 <h3><a name="param-inference">Parameter inference</a></h3>
@@ -884,25 +887,29 @@ The Jif compiler automatically infers label and principal parameters for local
 variables. This makes programming in Jif more convenient, because it is not
 necessary to explicitly instantiate parameterized classes in most places where
 these types can be mentioned.   For example, code using the <code>Vector</code>
-or <code>paramCell</code> classes may declare variables without providing the
+or <code>ParamCell</code> classes may declare variables without providing the
 parameters:
 </p>
 
 <div class="code"><pre>
-  paramCell cell;
+  ParamCell cell;
   Vector v;
+
+  cell.m(Alice, Bob); <span class="comment">// cell inferred to be of type ParamCell[Alice,Bob]</span>
+
+  v.setElementAt(null, cell.contents); <span class="comment">// v inferred to be of </span>
+                                       <span class="comment">//   type Vector[{Alice:Bob}]</span>
 </pre></div>
 
-<p class="cont">
-Parameters can always be supplied explicitly, which may make the code clearer
-or may help with debugging.</p>
-<p>
-Some parameters must still be supplied explicitly. For object fields with
-parameterized types, parameters must be supplied. Parameters must be provided
-explicitly for classes and interfaces appearing in an <code>extends</code>
-clause.  Formal parameters must always be declared, as in the class definition
-of <code>Vector</code> and <code>paramCell</code>. These restrictions exist
-because parameter inference in Jif is local to a single method.
+<p class="cont"> Parameters can always be supplied explicitly, which
+may make the code clearer or may help with debugging.</p> <p> Some
+parameters must still be supplied explicitly. For field declarations
+with parameterized types, parameters must be supplied. Parameters must
+be provided explicitly for classes and interfaces appearing in an
+<code>extends</code> clause, and in method and constructor signatures.
+Formal parameters must always be declared, as in the class definition
+of <code>Vector</code> and <code>ParamCell</code>. These restrictions
+exist because parameter inference in Jif is local to a single method.
 </p>
 
 <h3><a name="param-interact-object-types">Interactions with object types</a></h3>
