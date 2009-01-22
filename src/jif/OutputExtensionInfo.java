@@ -63,7 +63,7 @@ public class OutputExtensionInfo extends JLExtensionInfo {
          * In particular, ensure that it is submitted for re-writing before
          * any other job.
          */
-        private Job objectJob = null;
+        protected Job objectJob = null;
         
         OutputScheduler(OutputExtensionInfo extInfo) {
             super(extInfo);
