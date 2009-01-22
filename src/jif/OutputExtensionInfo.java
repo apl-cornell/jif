@@ -57,7 +57,7 @@ public class OutputExtensionInfo extends JLExtensionInfo {
         return output;
     }
         
-    static class OutputScheduler extends JLScheduler {    
+    static protected class OutputScheduler extends JLScheduler {    
         /**
          * Hack to ensure that we track the job for java.lang.Object specially.
          * In particular, ensure that it is submitted for re-writing before
@@ -65,7 +65,7 @@ public class OutputExtensionInfo extends JLExtensionInfo {
          */
         protected Job objectJob = null;
         
-        OutputScheduler(OutputExtensionInfo extInfo) {
+        public OutputScheduler(OutputExtensionInfo extInfo) {
             super(extInfo);
         }
 
