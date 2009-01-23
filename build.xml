@@ -115,6 +115,23 @@
         <delete dir="${sig-classes}" />
         <delete dir="${rt-classes}" />
         <delete dir="${lib-classes}" />
+        <delete includeemptydirs="true">
+            <fileset dir="${lib}">
+                <include name="jifrt.jar" />
+                <include name="jifsig.jar" />
+                <include name="jiflib.jar" />
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="clean-jars" description="Cleans up the jars">
+        <delete includeemptydirs="true">
+            <fileset dir="${lib}">
+                <include name="jifrt.jar" />
+                <include name="jifsig.jar" />
+                <include name="jiflib.jar" />
+            </fileset>
+        </delete>
     </target>
 
     <target name="clobber" depends="clean" description="removes all generated files">
