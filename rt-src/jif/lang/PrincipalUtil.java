@@ -415,7 +415,7 @@ public class PrincipalUtil {
             LabelUtil.singleton().exitTiming();            
         }
         
-    }/* writable writeable */
+    }
     
     public static IntegPolicy writableByPrinPolicy(Principal p) {
         try {
