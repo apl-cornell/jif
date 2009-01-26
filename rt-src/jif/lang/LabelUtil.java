@@ -600,6 +600,16 @@ public class LabelUtil
         }
     }
     
+    public boolean isWritableBy(Label lbl, Principal p) {
+        try {
+            enterTiming();
+            Label L = toLabel(PrincipalUtil.writableByPrinPolicy(p));
+            return relabelsTo(lbl, L);
+        } finally {
+            exitTiming();
+        }
+    }
+    
     public boolean relabelsTo(Label from, Label to) {
         try {
             enterTiming();

@@ -415,6 +415,15 @@ public class PrincipalUtil {
             LabelUtil.singleton().exitTiming();            
         }
         
+    }/* writable writeable */
+    
+    public static IntegPolicy writableByPrinPolicy(Principal p) {
+        try {
+            LabelUtil.singleton().enterTiming();
+            return new WriterPolicy(LabelUtil.singleton(), topPrincipal(), p);
+        } finally {
+            LabelUtil.singleton().exitTiming();
+        }
     }
     
     public static Principal disjunction(Principal left, Principal right) {
