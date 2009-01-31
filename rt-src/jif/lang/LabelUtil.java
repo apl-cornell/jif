@@ -123,11 +123,14 @@ public class LabelUtil
     }
     
     private final ConfPolicy BOTTOM_CONF;
+    private final ConfPolicy TOP_CONF;
     private final IntegPolicy TOP_INTEG;
     private final Label NO_COMPONENTS; 
     
     {
         BOTTOM_CONF = this.readerPolicy(null, (Principal)null);
+        TOP_CONF = this.readerPolicy(PrincipalUtil.topPrincipal(),
+            PrincipalUtil.topPrincipal());
         TOP_INTEG = this.writerPolicy(null, (Principal)null);
         NO_COMPONENTS = this.toLabel(BOTTOM_CONF, TOP_INTEG);
     }
@@ -138,6 +141,9 @@ public class LabelUtil
     
     public ConfPolicy bottomConf() {
         return BOTTOM_CONF;
+    }
+    public ConfPolicy topConf() {
+        return TOP_CONF;
     }
     public IntegPolicy topInteg() {
         return TOP_INTEG;
@@ -603,7 +609,7 @@ public class LabelUtil
     public boolean isWritableBy(Label lbl, Principal p) {
         try {
             enterTiming();
-            Label L = toLabel(PrincipalUtil.writableByPrinPolicy(p));
+            Label L = toLabel(TOP_CONF, writerPolicy(null, p));
             return relabelsTo(lbl, L);
         } finally {
             exitTiming();
