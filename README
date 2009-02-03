@@ -257,12 +257,10 @@ comments and bug reports to Andrew Myers at andru@cs.cornell.edu.  If
 you would like to receive notification of future Jif updates, please
 join the mailing list; details are on the Jif web site.
 
-Acknowledgements
+Acknowledgments
 ----------------
 
-The development and maintenance of the Jif software release has been
-supported by DARPA contracts F30602-98-1-0237 and F30602-99-1-0533,
-monitored by USAF Rome Laboratory, by ONR Grant N00014-01-1-0968, and
-by NSF CAREER Award 0133302. Any opinions expressed or implied in this
-release are those of the software developers alone, and not
-necessarily those of these sponsors.
+The development and maintenance of this Jif software release has been supported
+by NSF Grants 0430161 and 0627649, and by AFRL NICECAP Award FA8750-08-2-0079.
+Any opinions expressed or implied in this release are those of the software
+developers alone, and not necessarily those of these sponsors.
