@@ -19,5 +19,5 @@
 
 8. Publish files $JIF/doc/jifdoc.css and $JIF/doc/web/* on the web, at 
    http://www.cs.cornell.edu/jif/doc/jif-x.x.x/. (There is a link to the
-   reference manual from $JIF/doc/index.html that you updated in step 2.)
+   reference manual from $JIF/doc/index.html that you updated in step 3.)
 
