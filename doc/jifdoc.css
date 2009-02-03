@@ -49,7 +49,7 @@ ol {
       background-color: rgb(230,230,230);
       border: solid;
       border-color: rgb(200,200,200);
-      border-width: 1;
+      border-width: 1px;
       margin: 5;
       padding: 5;
       color: rgb(20,20,30);
@@ -61,7 +61,7 @@ ol {
       background-color: rgb(230,230,230);
       border: solid;
       border-color: rgb(200,200,200);
-      border-width: 1;
+      border-width: 1px;
       margin: 5;
       padding: 5;
       color: rgb(20,20,30);

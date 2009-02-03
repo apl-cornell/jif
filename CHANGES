@@ -3,6 +3,10 @@ Jif Change Log
 
 This file documents changes between releases of Jif.
 
+2009-02-02    Jif 3.3.0
+    * Jif now infers arguments to parameterized types, both for principal
+      and label parameters.
+
 2008-04-15    Jif 3.2.0
     * Refactoring for cleaner support of extensions, including Jifclipse.
     * Minor bug fixes and style changes.
