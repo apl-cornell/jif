@@ -33,6 +33,9 @@ public class JifDelFactory_c extends AbstractDelFactory_c implements JifDelFacto
     protected JL delCastImpl() {
         return new JifCastDel();
     }
+    protected JL delCatchImpl() {
+        return new JifCatchDel();
+    }
     protected JL delClassDeclImpl() {
         return new JifClassDeclDel();
     }
