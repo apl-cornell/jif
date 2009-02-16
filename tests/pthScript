@@ -334,6 +334,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	LabelLeConstraint11.jif (Semantic, "must be less restrictive");
 	LabelLeConstraint12.jif ;
 	LabelLeConstraint13.jif ;
+	LabelLeConstraint14.jif ;
 	LabelUtil01.jif ;
 	LabelUtil02.jif ;
 	List.jif ;

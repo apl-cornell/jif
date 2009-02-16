@@ -466,9 +466,84 @@ public class LabelEnv_c implements LabelEnv
             }
         }
         
+        // do a finer-grain search using pair labels
+        if (L1 instanceof PairLabel && !(L2 instanceof PairLabel)) {      
+            if (fineGrainPairLabelSearch((PairLabel)L1, L2)) {
+                return true;
+            }
+        }
+        
         // try to use assertions
         return leqApplyAssertions(L1, L2, (SearchState_c)state, true);
         
+    }
+    
+    /**
+     * Breaks PairLabel L1 into smaller components to see if L1 <= L2.
+     * Returns true if successfully discover that L1 <= L2, false otherwise.
+     * 
+     * More precisely, given L1 = {o_1->r_1 ; ... ; o_m->r_m ; p_1<-w_1 ; ... ; p_n<-w_n},
+     * this method will return true if
+     *    {o_i->r_i ; *<-*} <= L2 for all i in 1..m
+     *  and
+     *    {_<-_ ; p_j<-w_j} <= L2 for all j in 1..n.
+     * 
+     * @param L1 a PairLabel
+     * @param L2 any label (shouldn't be a PairLabel)
+     * @return
+     */
+    private boolean fineGrainPairLabelSearch(PairLabel L1, Label L2) {
+        ConfPolicy cp = L1.confPolicy();
+        IntegPolicy ip = L1.integPolicy();
+        
+        if ((!(cp instanceof JoinConfPolicy_c) && !(ip instanceof JoinIntegPolicy_c)) 
+                || (cp.isSingleton() && ip.isSingleton())) {
+            // either cp and ip are both not Join Policies, or they are 
+            // both singletons, i.e., cannot be decomposed.
+            // nothing we can do to help here 
+            return false;
+        }
+        
+        Position pos = L1.position();
+
+        if (cp instanceof JoinConfPolicy_c) {
+            // break cp down and try to satisfy each one individually
+            JoinConfPolicy_c jcp = (JoinConfPolicy_c)cp;
+            IntegPolicy bottomInteg = ts.bottomIntegPolicy(pos);
+
+            for (Iterator iter = jcp.joinComponents().iterator(); iter.hasNext();) {
+                ConfPolicy joinComponent = (ConfPolicy)iter.next();
+                if (!leq(ts.pairLabel(pos, joinComponent, bottomInteg), L2)) {
+                    return false;
+                }
+            }
+        }
+        else {
+            // cp isn't a join policy, make sure that it still is <= L2
+            if (!leq(ts.pairLabel(pos, cp, ts.bottomIntegPolicy(pos)), L2)) {
+                return false;
+            }            
+        }
+
+        if (ip instanceof JoinIntegPolicy_c) {
+            // break ip down and try to satisfy each one individually
+            JoinIntegPolicy_c jip = (JoinIntegPolicy_c)ip;
+            ConfPolicy bottomConf = ts.bottomConfPolicy(pos);
+            for (Iterator iter = jip.joinComponents().iterator(); iter.hasNext();) {
+                IntegPolicy joinComponent = (IntegPolicy)iter.next();
+                if (!leq(ts.pairLabel(pos, bottomConf, joinComponent), L2)) {
+                    return false;
+                }
+            }
+        }
+        else {
+            // ip isn't a join policy, make sure that it still is <= L2
+            if (!leq(ts.pairLabel(pos, ts.bottomConfPolicy(pos), ip), L2)) {
+                return false;
+            }
+        }
+
+        return true;
     }
         
     /**
@@ -522,8 +597,22 @@ public class LabelEnv_c implements LabelEnv
             if (Report.should_report(topics, 4))
                 Report.report(4, "Considering assertion " + c + " for " + L1 + " <= " + L2);
 
+//            if (beSmart) {
+//                boolean useConstraint = false;
+//                useConstraint = L1.equals(cLHS) || L2.equals(cRHS);
+//                if (!useConstraint) {
+//                    // check if L2 contains cRHS
+//                    if (L2 instanceof JoinLabel) {
+//                        JoinLabel jl = (JoinLabel)L2;
+//                        useConstraint = jl.joinComponents().contains(cRHS);
+//                    }
+//                }
+//                if (!useConstraint) {
+//                    continue;
+//                }
+//            }
             if (beSmart) {
-                // only use assertions that match one or the other of our labels
+                // only use assertions that match one or the other of our labels                
                 if (!L1.equals(cLHS) && !L2.equals(cRHS)) {
                     continue;
                 }
