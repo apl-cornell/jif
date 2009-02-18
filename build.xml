@@ -86,12 +86,9 @@
     <!-- ****************************************
        Clean up targets and other admin tasks
        ****************************************  -->
-    <target name="clean" description="clean up">
+    <target name="clean" depends="dust" description="clean up">
         <!-- Delete the ${classes} and ${dist} directory trees -->
         <delete dir="${classes}" />
-        <delete dir="${sig-classes}" />
-        <delete dir="${rt-classes}" />
-        <delete dir="${lib-classes}" />
         <delete dir="${dist}" />
         <delete includeemptydirs="true">
             <fileset dir="${basedir}/tests">

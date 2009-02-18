@@ -12,7 +12,7 @@ import polyglot.util.Position;
 
 /**
  * A solver of Jif constraints. Finds solution to constraints essentially by
- * propogating lower bounds forwards.
+ * propagating lower bounds forwards.
  *  
  */
 public class SolverGLB extends AbstractSolver {
@@ -31,9 +31,9 @@ public class SolverGLB extends AbstractSolver {
     }
 
     /**
-     * This method adds the correct dependencies from Equation eqn to varaiables
-     * occuring in eqn, and dependencies in the other direction (that is, from
-     * variables occuring in eqn to eqn).
+     * This method adds the correct dependencies from Equation eqn to variables
+     * occurring in eqn, and dependencies in the other direction (that is, from
+     * variables occurring in eqn to eqn).
      * 
      * There is a dependency from Equation eqn to all variables that occur on
      * the RHS of eqn, as the bounds on these variables may be modified
