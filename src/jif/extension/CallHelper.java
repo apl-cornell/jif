@@ -586,7 +586,7 @@ public class CallHelper {
             );
         }
 
-        satisfiesConstraints(pi, lc);
+        satisfiesConstraints(pi, lc, true);
 
         // A |- call-end(ct, pi, Aa, Li, LrvDef)
         if (shouldReport( 4))
@@ -610,7 +610,7 @@ public class CallHelper {
 
         if (pi instanceof MethodInstance) {
             returnType = instantiate(lc.context(), ((MethodInstance)pi).returnType());
-        }
+}
         else {
             returnType = null;
         }
@@ -620,10 +620,13 @@ public class CallHelper {
     }
 
     /** Check if the caller has sufficient authority, and label constraints
-     * are satisfied
-     *  Thesis, Figure 4.29
+     * are satisfied.
+     *  Thesis, Figure 4.29.
+     *  This method is called both when checking calls, and when checking overrides. When
+     *  checking overrides, since we are passed the overriding method (as opposed to the
+     *  overridden method) we do not perform instantations of principals and labels from jpi.
      */
-    protected void satisfiesConstraints(final JifProcedureInstance jpi, LabelChecker lc)
+    protected void satisfiesConstraints(final JifProcedureInstance jpi, LabelChecker lc, boolean performInstantiations)
     throws SemanticException
     {
         JifContext A = lc.context();
@@ -643,7 +646,8 @@ public class CallHelper {
                 
                 // Check the authority
                 for (Iterator i2 = jcc.principals().iterator(); i2.hasNext();) {
-                    final Principal pi = instantiate(A, (Principal)i2.next());
+                    Principal orig = (Principal)i2.next();
+                    final Principal pi = performInstantiations ? instantiate(A, orig) : orig;
 
                     // authPrincipal must actfor pi, i.e., at least one
                     // of the principals that have authorized the code must act for pi.
@@ -686,9 +690,9 @@ public class CallHelper {
             else if (jc instanceof ActsForConstraint) {
                 final ActsForConstraint jac = (ActsForConstraint)jc;
 
-                final Principal actor = instantiate(A, jac.actor());
+                final Principal actor = performInstantiations ? instantiate(A, jac.actor()) : jac.actor();
 
-                final Principal granter = instantiate(A, jac.granter());
+                final Principal granter = performInstantiations ? instantiate(A, jac.granter()) : jac.granter();
 
                 
                 if (jac.isEquiv()) {
@@ -762,8 +766,8 @@ public class CallHelper {
             else if (jc instanceof LabelLeAssertion) {
                 LabelLeAssertion lla = (LabelLeAssertion)jc;
 
-                final Label lhs = instantiate(A, lla.lhs());
-                final Label rhs = instantiate(A, lla.rhs());
+                final Label lhs = performInstantiations ? instantiate(A, lla.lhs()) : lla.lhs();
+                final Label rhs = performInstantiations ? instantiate(A, lla.rhs()) : lla.rhs();
                 final String message;
                 final String detailedMessage;
                 Position pos = position;
@@ -908,6 +912,16 @@ public class CallHelper {
                                            this.actualArgs,
                                            this.actualParamLabels);
     }
+    
+    public Set instantiate(JifContext A, Set s) throws SemanticException {
+        Set newS = new LinkedHashSet();
+        for (Iterator iter = s.iterator(); iter.hasNext();) {
+            Principal p = (Principal)iter.next();
+            newS.add(instantiate(A, p));
+        }
+        return newS;
+    }
+
 
     /**
      * replaces any signature ArgLabels in p with the appropriate label, and
@@ -963,14 +977,14 @@ public class CallHelper {
         // add the "where caller" authority of the superclass only
         Set newAuth = new LinkedHashSet();
         JifProcedureDeclExt_c.addCallers(overridden, newlc.context(), newAuth);
-        A.setAuthority(newAuth);       
+        A.setAuthority(instantiate(A, newAuth));       
 
         // add the where constraints of the superclass only.
         JifProcedureDeclExt_c.constrainLabelEnv(overridden, newlc.context(), this);        
-
+        
         // check that the where constraints of the subclass are implied by 
         // those of the superclass.
-        satisfiesConstraints(overriding, newlc);
+        satisfiesConstraints(overriding, newlc, false);
 
         // argument labels and types are contravariant:
         //      each argument label of mi may be more restrictive than the 
