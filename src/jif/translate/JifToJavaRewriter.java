@@ -291,7 +291,7 @@ public class JifToJavaRewriter extends ContextVisitor
      * The full class path of the runtime label utility.
      */
     public String runtimeLabelUtil() {
-        return "jif.lang.LabelUtil";
+        return "jif.lang.LabelUtil.singleton()";
     }
 
 
