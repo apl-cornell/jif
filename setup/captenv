@@ -24,6 +24,7 @@ print STDERR "Reading from $envvars\n";
 my $fhi = 0;
 my %vars;
 my %incfiles;
+my %defaults;
 
 sub subst_env {
     (my $expr) = @_;
@@ -32,7 +33,11 @@ sub subst_env {
 	my $val = $ENV{$v};
 	if ($val eq '') {
 	    print STDERR "Undefined environment variable $v\n";
-	    exit 1;
+	    if ($defaults{$v}) {
+		print STDERR "=> Using default ($defaults{$v}) instead\n";
+	    } else {
+		exit 1;
+	    }
 	}
 	$vars{$v} = 1;
 	$expr =~ s/\$$v/$val/;
@@ -55,10 +60,20 @@ sub expandvars {
 	(my $incfile) = m/^ *include (.*)/;
 	if ($incfile ne '') {
 	    my $f = subst_env($incfile);
-	    print STDERR "Reading from $incfile = $f\n";
+	    print STDERR "Reading include file $incfile = $f\n";
 	    &expandvars($f);
 	} else {
-	    $vars{$_} = 1;
+	    my @line = split /\s+/;
+	    my $v = $line[0];
+	    if ($#line == 0) {
+		$vars{$v} = 1;
+	    } elsif ($#line == 1) {
+		$vars{$v} = 1;
+		$defaults{$v} = $line[1];
+	    } else {
+		print STDERR "Syntax error: $_\n";
+		exit 1;
+	    }
 	}
     }
     close(FH);
@@ -67,10 +82,17 @@ sub expandvars {
 &expandvars($envvars);
 
 foreach my $var (keys %vars) {
-    if ($ENV{$var} eq '') { next; }
+    my $binding = $ENV{$var};
+    if ($binding eq '') {
+	if ($defaults{$var} ne '') {
+	    $binding = subst_env($defaults{$var});
+	} else {
+	    print STDERR "Warning: no definition for \$$var\n";
+	}
+    }
     if ($ENV{'SHELL'} =~ m@/ksh$|/sh$|/bash$@) {
-	print "export $var=$ENV{$var};\n";
+	print "export $var=$binding;\n";
     } else {
-        print "setenv $var $ENV{$var};\n";
+        print "setenv $var $binding;\n";
     }
 }
