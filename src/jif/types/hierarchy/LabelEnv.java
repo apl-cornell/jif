@@ -54,7 +54,7 @@ public interface LabelEnv
     Label triggerTransforms(Label label);
     
     /**
-     * Is this enviornment empty, or does is contain some constraints?
+     * Is this environment empty, or does is contain some constraints?
      */
     boolean isEmpty();
     
@@ -75,5 +75,13 @@ public interface LabelEnv
      */
     public interface SearchState { }
 
+    /**
+     * This method checks if two access paths are equivalent. Called in two cases:
+     * a. To check if a dynamic principal acts for another
+     * b. While checking a label constraint involving a DynamicLabel
+     * @param p
+     * @param q
+     * @return true if the two access paths are equivalent
+     */
     boolean equivalentAccessPaths(AccessPath p, AccessPath q);
 }
