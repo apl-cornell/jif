@@ -17,7 +17,7 @@ import polyglot.util.Position;
 import polyglot.util.StringUtil;
 
 /**
- * This is a tool to label check method calls. This class should be used by
+ * This is a tool to label-check method calls. This class should be used by
  * creating an instance of it, and then calling the method
  * {@link #checkCall(LabelChecker, List, boolean) checkCall(LabelChecker)}. After the
  * call to that method, the remaining methods (which are getter methods) may be

@@ -3,8 +3,9 @@ Jif Change Log
 
 This file documents changes between releases of Jif.
 
-2009-??-??    Jif ?????
-    * Subclasses of java.lang.Error can not be caught.
+2009-02-24    Jif 3.3.1
+    * Small bug fixes in Jif and upgrades to Polyglot.
+    * Subclasses of java.lang.Error now cannot be caught.
 
 2009-02-02    Jif 3.3.0
     * Jif now infers arguments to parameterized types, both for principal
