@@ -100,7 +100,7 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
     }
     
     public String toString() {
-        String str = PrincipalUtil.toString(owner) + ": ";
+        String str = PrincipalUtil.toString(owner) + "->";
         if (!PrincipalUtil.isTopPrincipal(reader))
             str += PrincipalUtil.toString(reader);
         return str;

@@ -86,7 +86,7 @@ public class ReaderPolicyNode_c extends PolicyNode_c
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         print(owner, w, tr);
 
-        w.write(": ");
+        w.write("->");
 
 	for (Iterator i = this.principals.iterator(); i.hasNext(); ) {
 	    PrincipalNode n = (PrincipalNode) i.next();

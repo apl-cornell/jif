@@ -74,8 +74,8 @@ public class WriterPolicy_c extends Policy_c implements WriterPolicy {
         
         if (p instanceof WriterPolicy) {
             WriterPolicy that = (WriterPolicy) p;            
-            // this = { o  !: .. wi .. }
-            // that = { o' !: .. wj' .. }
+            // this = { o  <- .. wi .. }
+            // that = { o' <- .. wj' .. }
             
             // o >= o'
             if (!env.actsFor(this.owner, that.owner())) {
@@ -91,7 +91,7 @@ public class WriterPolicy_c extends Policy_c implements WriterPolicy {
 
     public String toString(Set printedLabels) {
         StringBuffer sb = new StringBuffer(owner.toString());
-        sb.append("!: ");        
+        sb.append("<-");        
         if (!writer.isTopPrincipal()) sb.append(writer.toString());        
         return sb.toString();
     }

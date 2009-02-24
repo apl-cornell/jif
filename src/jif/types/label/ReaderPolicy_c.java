@@ -95,7 +95,7 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
 
     public String toString(Set printedLabels) {
         StringBuffer sb = new StringBuffer(owner.toString());
-        sb.append(": ");        
+        sb.append("->");        
         if (!reader.isTopPrincipal()) sb.append(reader.toString());        
         return sb.toString();
     }

@@ -733,7 +733,7 @@ public class LabelEnv_c implements LabelEnv
     public boolean leq(IntegPolicy p1, IntegPolicy p2, SearchState state) {
         if (p2 instanceof WriterPolicy) {
             WriterPolicy wp2 = (WriterPolicy)p2;
-            // if the writer policy is o!:_, then the policy
+            // if the writer policy is o<-_, then the policy
             // does not restrict the integrity at all
             if (wp2.writer().isBottomPrincipal()) return true;
         }
