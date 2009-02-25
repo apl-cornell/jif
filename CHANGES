@@ -6,6 +6,8 @@ This file documents changes between releases of Jif.
 2009-02-24    Jif 3.3.1
     * Small bug fixes in Jif and upgrades to Polyglot.
     * Subclasses of java.lang.Error now cannot be caught.
+    * Output format for labels uses more readable -> and <-
+    * Document -nonrobust
 
 2009-02-02    Jif 3.3.0
     * Jif now infers arguments to parameterized types, both for principal
