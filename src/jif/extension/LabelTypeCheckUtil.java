@@ -125,7 +125,15 @@ public class LabelTypeCheckUtil {
     }
 
     public void typeCheckPolicy(TypeChecker tc, Policy p) throws SemanticException {
-        if (p instanceof JoinPolicy_c) {
+        if (p instanceof ConfProjectionPolicy_c) {
+            ConfProjectionPolicy_c cpp = (ConfProjectionPolicy_c)p;
+            typeCheckLabel(tc, cpp.label());
+		} 
+        else if (p instanceof IntegProjectionPolicy_c) {
+			IntegProjectionPolicy_c ipp = (IntegProjectionPolicy_c) p;
+			typeCheckLabel(tc, ipp.label());
+		}
+        else if (p instanceof JoinPolicy_c) {
             JoinPolicy_c jp = (JoinPolicy_c)p;
             for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
                 Policy pol = (Policy)iter.next();
