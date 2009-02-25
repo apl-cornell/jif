@@ -264,7 +264,6 @@ parser Grm extends polyglot.parse.Grm {:
 :};
 
 terminal Token WHERE;
-terminal Token MEET;
 terminal Token PRINCIPAL;
 terminal Token LABEL;
 terminal Token COVARIANT;
@@ -279,8 +278,11 @@ terminal Token ENDORSE;
 terminal Token TO;
 
 terminal Token JOIN;
+terminal Token MEET;
 terminal Token RIGHTARROW;
 terminal Token LEFTARROW;
+terminal Token TOP;
+terminal Token BOTTOM;
 
 non terminal DeclassifyExpr declassify;
 non terminal DeclassifyStmt declassify_statement;
@@ -466,6 +468,10 @@ principal_base ::=
             {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a), a); :}
     |  MULT:a // top principal
             {: RESULT = parser.nf.CanonicalPrincipalNode(parser.pos(a), parser.ts.topPrincipal(parser.pos(a))); :}
+    |  TOP:a // top principal
+            {: RESULT = parser.nf.CanonicalPrincipalNode(parser.pos(a), parser.ts.topPrincipal(parser.pos(a))); :}
+    |  BOTTOM:a // bottom principal
+            {: RESULT = parser.nf.CanonicalPrincipalNode(parser.pos(a), parser.ts.bottomPrincipal(parser.pos(a))); :}
     |  IDENTIFIER:a
             {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a), parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
     |  LPAREN:a principal_disjunctive:b RPAREN:c
