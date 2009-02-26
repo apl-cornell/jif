@@ -129,9 +129,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
     /**
      * Create a method for initializations, and add it to cb.
-     * 
      */
-    private ClassBody addInitializer(ClassBody cb, JifToJavaRewriter rw) {
+    protected ClassBody addInitializer(ClassBody cb, JifToJavaRewriter rw) {
         List inits = new ArrayList(rw.getInitializations());
         rw.getInitializations().clear();
         return cb.addMember(rw.qq().parseMember(
