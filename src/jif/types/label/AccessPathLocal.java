@@ -70,8 +70,11 @@ public class AccessPathLocal extends AccessPathRoot {
     public boolean equals(Object o) {
         if (o instanceof AccessPathLocal) {
             AccessPathLocal that = (AccessPathLocal)o;
-            return this.name.equals(that.name) && 
-                         li.equals(that.li);
+            // use pointer equality for li instead of equals, so
+            // that we don't mistakenly equate two local instances
+            // with the same name but from different methods/defining
+            // scopes
+            return this.name.equals(that.name) && li == that.li; 
         }
         return false;        
     }

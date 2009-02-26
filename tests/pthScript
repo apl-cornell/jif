@@ -232,6 +232,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	DynLabel10.jif ;
 	DynLabel11.jif ;
 	DynLabel12.jif ;
+	DynLabel13.jif (Semantic, "not less restrictive");
 	EmptyList.jif List.jif;
 	EmptyList2.jif ;
 	Exc.jif ;

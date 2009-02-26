@@ -103,9 +103,14 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
             return false;
         }           
         ArgLabel_c that = (ArgLabel_c) o;
-        return (this.ci == that.ci || (this.ci != null && this.ci.equals(that.ci))) &&
-               (this.vi == that.vi || (this.vi != null && this.vi.equals(that.vi))) &&
+        
+        // use pointer equality for vi instead of equals
+        // to ensure that we don't confuse e.g., local instances
+        // with the same name.
+        return (this.ci == that.ci || (this.ci != null && this.ci.equals(that.ci)))  &&
+               this.vi == that.vi  &&
                this.name.equals(that.name);
+
     }
     
     public int hashCode() {
