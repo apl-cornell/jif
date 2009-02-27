@@ -9,7 +9,7 @@ import polyglot.types.*;
 import polyglot.visit.NodeVisitor;
 
 public class NewToJavaExt_c extends ExprToJavaExt_c {
-    private Type objectType;
+    protected Type objectType;
 
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
         New n = (New)this.node();
