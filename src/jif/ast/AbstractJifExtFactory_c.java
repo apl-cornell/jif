@@ -27,7 +27,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extInstTypeNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtInstTypeNode(e);
     }
@@ -38,7 +38,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extLabeledTypeNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtLabeledTypeNode(e);
     }
@@ -49,7 +49,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extAmbNewArray();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtAmbNewArray(e);
     }
@@ -60,7 +60,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extAmbParamTypeOrAccess();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtAmbParamTypeOrAccess(e);
     }
@@ -71,7 +71,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extJoinLabelNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtJoinLabelNode(e);
     }
@@ -82,7 +82,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extMeetLabelNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtMeetLabelNode(e);
     }
@@ -93,7 +93,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extPolicyNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtPolicyNode(e);
     }
@@ -104,7 +104,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extAmbDynamicLabelNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtAmbDynamicLabelNode(e);
     }
@@ -115,7 +115,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extAmbVarLabelNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtAmbVarLabelNode(e);
     }
@@ -126,7 +126,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extAmbThisLabelNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtAmbThisLabelNode(e);
     }
@@ -137,7 +137,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extCanonicalLabelNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtCanonicalLabelNode(e);
     }
@@ -148,7 +148,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extParamNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtParamNode(e);
     }
@@ -159,7 +159,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extLabelNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtLabelNode(e);
     }
@@ -170,7 +170,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extPrincipalNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtPrincipalNode(e);
     }
@@ -181,7 +181,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extAmbPrincipalNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtAmbPrincipalNode(e);
     }
@@ -193,7 +193,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extCanonicalPrincipalNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtCanonicalPrincipalNode(e);
     }
@@ -204,7 +204,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extAmbParam();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtAmbParam(e);
     }
@@ -215,7 +215,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extParamDecl();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtParamDecl(e);
     }
@@ -226,7 +226,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extConstraintNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtConstraintNode(e);
     }
@@ -237,7 +237,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extCanonicalConstraintNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtCanonicalConstraintNode(e);
     }
@@ -248,7 +248,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extAuthConstraintNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtAuthConstraintNode(e);
     }
@@ -259,7 +259,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extAutoEndorseConstraintNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtAutoEndorseConstraintNode(e);
     }
@@ -270,7 +270,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extCallerConstraintNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtCallerConstraintNode(e);
     }
@@ -281,7 +281,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extActsForConstraintNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtLabeledTypeNode(e);
     }
@@ -292,7 +292,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extLabelLeAssertionNode();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtLabelLeAssertionNode(e);
     }
@@ -303,7 +303,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
 		nextExtFactory() instanceof JifStmtExtFactory) {
             JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extDeclassifyStmt();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtDeclassifyStmt(e);
     }
@@ -314,7 +314,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extDeclassifyExpr();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtDeclassifyExpr(e);
     }
@@ -325,7 +325,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         nextExtFactory() instanceof JifStmtExtFactory) {
             JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extEndorseStmt();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
 
         return postExtEndorseStmt(e);
@@ -336,7 +336,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         nextExtFactory() instanceof JifStmtExtFactory) {
             JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extCheckedEndorseStmt();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
 
         return postExtEndorseStmt(e);
@@ -348,7 +348,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extEndorseExpr();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtEndorseExpr(e);
     }
@@ -359,7 +359,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extNewLabel();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtNewLabel(e);
     }
@@ -370,7 +370,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extLabelExpr();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtLabelExpr(e);
     }
@@ -381,7 +381,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
                 nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
             Ext e2 = nextFac.extPrincipalExpr();
-            e = composeExts(e2, e);
+            e = composeExts(e, e2);
         }
         return postExtPrincipalExpr(e);
     }
