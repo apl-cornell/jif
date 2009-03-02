@@ -22,6 +22,12 @@ public interface JifTypeSystem extends ParamTypeSystem
     /** Returns the "label" type. */
     PrimitiveType Label();
 
+  /**
+   * Returns the name of the "principal" type. In Jif, this is
+   * "jif.lang.Principal". In languages that extend Jif, this may be different.
+   */
+    String PrincipalClassName();
+
     /** Returns the "principal" type. */
     PrimitiveType Principal();
     

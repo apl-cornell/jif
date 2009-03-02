@@ -90,6 +90,8 @@ public class JifTypeSystem_c
     protected PrimitiveType PRINCIPAL_;
     protected PrimitiveType LABEL_;
     protected Type PRINCIPAL_CLASS_ = null;
+    
+    public String PrincipalClassName() { return "jif.lang.Principal"; }
 
     public PrimitiveType Principal() {
         return PRINCIPAL_;
@@ -98,7 +100,7 @@ public class JifTypeSystem_c
     public Type PrincipalClass() {
         if (PRINCIPAL_CLASS_ == null) {
             try {
-                PRINCIPAL_CLASS_ = typeForName("jif.lang.Principal");
+                PRINCIPAL_CLASS_ = typeForName(PrincipalClassName());
             }
             catch (SemanticException e) {
                 throw new InternalCompilerError("Cannot find Jif class jif.lang.Principal", e);

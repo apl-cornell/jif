@@ -6,6 +6,7 @@ import java.util.List;
 import jif.ast.JifMethodDecl;
 import jif.types.JifMethodInstance;
 import jif.types.JifPolyType;
+import jif.types.JifTypeSystem;
 import polyglot.ast.*;
 import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
@@ -68,7 +69,8 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
 
         Block origBody = n.body();
 
-        TypeNode type = rw.qq().parseType("jif.lang.Principal");
+        JifTypeSystem jifTs = rw.jif_ts();
+        TypeNode type = rw.qq().parseType(jifTs.PrincipalClassName());
         Expr init = rw.qq().parseExpr("jif.runtime.Runtime.user(null)");
 
         Stmt declPrincipal =
