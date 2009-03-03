@@ -23,7 +23,7 @@ import polyglot.visit.NodeVisitor;
 /** Visitor which performs rewriting on the AST. */
 public class JifToJavaRewriter extends ContextVisitor
 {
-    private ExtensionInfo java_ext;
+    protected ExtensionInfo java_ext;
     private JifTypeSystem jif_ts;
     private JifNodeFactory jif_nf;
     private Job job;
