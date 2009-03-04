@@ -322,7 +322,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
         if (addObjectFormal) {
             // add the object argument too.
-            TypeNode tn = rw.qq().parseType("Object");
+            TypeNode tn = rw.qq().parseType("java.lang.Object");
             formals.add(rw.java_nf().Formal(pos, Flags.FINAL, tn, "o"));
         }
         return formals;
