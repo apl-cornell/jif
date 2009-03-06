@@ -293,33 +293,46 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
      * the final field is a label, and it is being initialized from a final
      * label, share the uids of the fields.
      */
-    protected void checkFinalFieldAssignment(Stmt s, Set uninitFinalVars, JifContext A)
+    protected void checkFinalFieldAssignment(Stmt s_, Set uninitFinalVars, JifContext A)
     throws SemanticException
     {
-        if (!(s instanceof Eval) || !(((Eval)s).expr() instanceof FieldAssign)) {
-            // we are not interested in this statement, it's not an assignment
-            // to a field
-            return;
-        }
+    	// Added this so that we can initialize final fields within atomic blocks in Fabric programs
+    	List<Stmt> initializers = new ArrayList<Stmt>();
+    	
+    	if(s_ instanceof Block) {
+    		Block b  = (Block) s_;
+    		List<Stmt> stmts = b.statements();
+    		initializers.addAll(stmts);
+    	} else {
+    		initializers.add(s_);
+    	}
+    	
+    	for(Stmt s: initializers) {
+    		if (!(s instanceof Eval) || !(((Eval)s).expr() instanceof FieldAssign)) {
+    			// we are not interested in this statement, it's not an assignment
+    			// to a field
+    			return;
+    		}
 
-        FieldAssign ass = (FieldAssign)((Eval)s).expr();
-        Field f = (Field) ass.left();
-        JifFieldInstance assFi = (JifFieldInstance) f.fieldInstance();
+    		FieldAssign ass = (FieldAssign)((Eval)s).expr();
+    		Field f = (Field) ass.left();
+    		JifFieldInstance assFi = (JifFieldInstance) f.fieldInstance();
 
-        if (! (ass.operator() == Assign.ASSIGN &&
-                f.target() instanceof Special && 
-                ((Special)f.target()).kind() == Special.THIS && 
-                assFi.flags().isFinal())) {
-            // assignment to something other than a final field of this. 
-            return;
-        }    
+    		if (! (ass.operator() == Assign.ASSIGN &&
+    				f.target() instanceof Special && 
+    				((Special)f.target()).kind() == Special.THIS && 
+    				assFi.flags().isFinal())) {
+    			// assignment to something other than a final field of this. 
+    			return;
+    		}    
 
-        // Remove the field from the set of final vars, since it is
-        // initialized here.
-        uninitFinalVars.remove(assFi);
+    		// Remove the field from the set of final vars, since it is
+    		// initialized here.
+    		uninitFinalVars.remove(assFi);
 
-        // Note that the constraints specified in check-inits for the "v = E"
-        // case (Figure 4.44) are added when we visit the statement "s"
-        // normally, so we don't need to handle them specially here.
+    		// Note that the constraints specified in check-inits for the "v = E"
+    		// case (Figure 4.44) are added when we visit the statement "s"
+    		// normally, so we don't need to handle them specially here.
+    	}
     }
 }
