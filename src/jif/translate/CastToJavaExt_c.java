@@ -16,7 +16,7 @@ import polyglot.types.Type;
 import polyglot.visit.NodeVisitor;
 
 public class CastToJavaExt_c extends ToJavaExt_c {
-    private Type castType;
+    protected Type castType;
 
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
         Cast c = (Cast)this.node();
