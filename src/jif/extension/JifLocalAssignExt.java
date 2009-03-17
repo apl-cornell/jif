@@ -43,7 +43,7 @@ public class JifLocalAssignExt extends JifAssignExt
             Xv = Xv.N(A.pc());
             Xv = Xv.NV(lc.upperBound(L, A.pc()));
 
-            if (assign.throwsArithmeticException()) {
+            if (((JifAssignDel)assign.del()).throwsArithmeticException()) {
                 Type arithExc = ts.ArithmeticException();
                 checkAndRemoveThrowType(throwTypes, arithExc);
                 X = Xv.join(Xr).exc(Xr.NV(), arithExc);

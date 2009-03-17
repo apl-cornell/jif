@@ -13,7 +13,7 @@ import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>ArrayAccessAssign</code> node. 
  */
-public class JifArrayAccessAssignDel extends JifJL_c {
+public class JifArrayAccessAssignDel extends JifAssignDel {
     public JifArrayAccessAssignDel() {}
 
     /** 
@@ -25,7 +25,7 @@ public class JifArrayAccessAssignDel extends JifJL_c {
      */
     public List throwTypes(TypeSystem ts) {
         ArrayAccessAssign a = (ArrayAccessAssign)node();
-        List l = new ArrayList(5);
+        List l = super.throwTypes(ts);
         if (a.throwsArrayStoreException()) {
             l.add(ts.ArrayStoreException());
         }

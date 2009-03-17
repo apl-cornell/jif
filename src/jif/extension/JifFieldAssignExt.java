@@ -52,7 +52,7 @@ public class JifFieldAssignExt extends JifAssignExt
 
         PathMap X = Xe.join(Xr); 
 
-        if (assign.throwsArithmeticException()) {
+        if (((JifAssignDel)assign.del()).throwsArithmeticException()) {
             checkAndRemoveThrowType(throwTypes, are);
             X = X.exc(Xr.NV(), are);
         }

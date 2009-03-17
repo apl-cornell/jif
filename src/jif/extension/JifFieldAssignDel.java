@@ -8,7 +8,7 @@ import polyglot.types.TypeSystem;
 
 /** The Jif extension of the <code>FieldAssign</code> node. 
  */
-public class JifFieldAssignDel extends JifJL_c
+public class JifFieldAssignDel extends JifAssignDel
 {
     public JifFieldAssignDel() {
     }
@@ -19,7 +19,7 @@ public class JifFieldAssignDel extends JifJL_c
      * non-null
      */
     public List throwTypes(TypeSystem ts) {
-        List l = new ArrayList();
+        List l = super.throwTypes(ts);
 
         Assign a = (Assign)node();
         if (!((JifFieldDel)a.left().del()).targetIsNeverNull()) {

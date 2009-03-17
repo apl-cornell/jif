@@ -13,6 +13,9 @@ public class JifDelFactory_c extends AbstractDelFactory_c implements JifDelFacto
         super();
     }
 
+    protected JL delAssignImpl() {
+        return new JifAssignDel();
+    }
     protected JL delArrayAccessImpl() {
         return new JifArrayAccessDel();
     }

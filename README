@@ -224,10 +224,10 @@ to this software.
 
 This release of the Jif compiler was prepared by Stephen Chong. Thanks to 
 Aslan Askarov, Robert Grabowski, Doaa Hassan, Daniel Hedin, Boniface Hicks,
-Dave King, Karl Mazurak, Todd Millstein, Andrei Sabelfeld, and Steve
-Zdancewic, who provided bug reports and feedback for previous versions of 
-Jif. Xin Zheng, Lantian Zheng, Steve Zdancewic, and Nate Nystrom helped 
-implement earlier versions.
+Dave King, Karl Mazurak, Todd Millstein, Andrei Sabelfeld, Lilia Sfaxi, 
+and Steve Zdancewic, who provided bug reports and feedback for this and
+previous versions of Jif. Xin Zheng, Lantian Zheng, Steve Zdancewic, 
+and Nate Nystrom helped implement earlier versions.
 
 Restrictions on use
 -------------------

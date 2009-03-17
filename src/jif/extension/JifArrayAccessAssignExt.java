@@ -82,7 +82,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
             // the normal value include the value that was already in the array 
             X = X.NV(lc.upperBound(La, X.NV()));
 
-            if (assign.throwsArithmeticException()) {
+            if (((JifAssignDel)assign.del()).throwsArithmeticException()) {
                 checkAndRemoveThrowType(throwTypes, are);
                 X = X.exc(Xrhs.NV(), are);
             }
