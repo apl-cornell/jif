@@ -324,6 +324,9 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	LabelIf10.jif (Semantic, "NullPointerException.*declared");
 	LabelIf11.jif  (Semantic, "must .* final access path"), (Semantic, "must .* final access path");
 	LabelIf12.jif ;
+	LabelCheckDependency01A.jif LabelCheckDependency01B.jif (Semantic, "not less restrictive");
+	LabelCheckDependency01B.jif LabelCheckDependency01A.jif (Semantic, "not less restrictive");
+	LabelCheckDependency02A.jif LabelCheckDependency02B.jif (Semantic, "not less restrictive");
 	LabelLeConstraint01.jif ;
 	LabelLeConstraint02.jif ;
 	LabelLeConstraint03.jif ;

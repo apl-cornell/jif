@@ -5,15 +5,17 @@ import java.util.Iterator;
 import java.util.Map;
 
 import jif.ExtensionInfo;
+import jif.JifScheduler;
 import jif.ast.JifUtil;
 import jif.extension.JifFieldDeclExt;
 import jif.types.*;
 import jif.types.label.Label;
 import jif.types.label.VarLabel;
 import polyglot.ast.*;
+import polyglot.frontend.CyclicDependencyException;
 import polyglot.frontend.Job;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
+import polyglot.frontend.Scheduler;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
@@ -22,6 +24,10 @@ import polyglot.visit.NodeVisitor;
  *  field labels of all the classes before the label checking pass,
  *  because these field labels might be included in other labels, thus
  *  need to resolve first.
+ *  
+ *  This visitor also adds dependencies so that the label checking pass for
+ *  this job will not run until the FieldLabelResolver for all jobs it is 
+ *  dependent on has run.
  */
 public class FieldLabelResolver extends ContextVisitor
 {
@@ -37,10 +43,6 @@ public class FieldLabelResolver extends ContextVisitor
     }
 
     public NodeVisitor enterCall(Node n) throws SemanticException {
-        if (n instanceof ClassMember && ! (n instanceof ClassDecl)) {
-            return bypassChildren(n);
-        }
-
         if (n instanceof ClassDecl) {
             this.fieldVarBounds = new HashMap();
         }
@@ -50,7 +52,36 @@ public class FieldLabelResolver extends ContextVisitor
 	    ClassBody d = (ClassBody) n;
 	    labelCheckClassBody(d);
 	}
-
+	
+	if (n instanceof Field) {
+	    // this class uses field f. Make sure that the field label resolver
+	    // pass for the container of f is run before we run label checking.
+	    FieldInstance fi = ((Field)n).fieldInstance();
+            JifScheduler scheduler = (JifScheduler)typeSystem().extensionInfo().scheduler();
+            
+            Type ct = fi.container();
+            while (ct instanceof JifSubstType) {
+                ct = ((JifSubstType)ct).base();
+            }
+                      
+            if (ct instanceof ParsedClassType) {
+                // the container of fi is a class that is being compiled in
+                // this compiler execution
+                ParsedTypeObject pct = (ParsedClassType)ct;
+                if (pct.job() != null && pct.job() != this.job) {
+                    // add a dependency from the label checking of this.job to the
+                    // field label inference of pct
+                    try {
+                        scheduler.addPrerequisiteDependency(scheduler.LabelsChecked(this.job), 
+                                                            scheduler.FieldLabelInference(pct.job()));
+                    }
+                    catch (CyclicDependencyException e) {
+                        throw new InternalCompilerError(e);
+                    }
+                }
+            }
+	}
+	
         return this;
     }
 
