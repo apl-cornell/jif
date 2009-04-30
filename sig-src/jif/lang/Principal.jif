@@ -58,10 +58,12 @@ public interface Principal {
      * this is decided by inspecting the class of the closure).
      */
     boolean{authPrf; closure; lb; *lb; executeNow; this; this←}
-	isAuthorized{this←}(Object authPrf, 
-			    Closure[this, lb] closure,
-			    label lb,
-			    boolean executeNow) where authority (this);
+	isAuthorized(Object authPrf,
+		     Closure[this, lb] closure,
+		     label lb,
+		     boolean executeNow)
+	where authority (this),
+	      {authPrf;closure;lb;executeNow} <= lb;
     
     /**
      * Search for a proof that the principal p can act for this principal.
