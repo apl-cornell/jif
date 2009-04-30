@@ -64,6 +64,11 @@ public class JifLabelSubst extends ContextVisitor
             JifLocalInstance li = (JifLocalInstance)((Formal)n).localInstance();
             li.subst(bounds);
         }
+        if (n instanceof Local) {
+            // update the type of the local in case the local instance changed during solving.
+            JifLocalInstance li = (JifLocalInstance)((Local)n).localInstance();
+            n = ((Local)n).type(li.type());
+        }         
         
         if (n instanceof Call) {
             // update the method instance in case the type of the receiver changed
@@ -71,20 +76,10 @@ public class JifLabelSubst extends ContextVisitor
             Call c = (Call)n;
             MethodInstance mi;
             Receiver target = c.target();
-            if(target instanceof Local) {
-                // if the target is a local, the type might not be set yet
-                // use the local instance instead
-                mi = ts.findMethod(((Local)c.target()).localInstance().type().toReference(), 
-                        c.methodInstance().name(), 
-                        c.methodInstance().formalTypes(), 
-                        c.target().type().toClass());
-                
-            } else {
-                mi = ts.findMethod(c.target().type().toReference(), 
-                                              c.methodInstance().name(), 
-                                              c.methodInstance().formalTypes(), 
-                                              c.target().type().toClass());
-            }
+            mi = ts.findMethod(c.target().type().toReference(), 
+                    c.methodInstance().name(), 
+                    c.methodInstance().formalTypes(), 
+                    c.target().type().toClass());
                 
             n = c.methodInstance(mi);
         }
