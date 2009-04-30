@@ -36,10 +36,10 @@ public abstract class AbstractPrincipal implements Principal {
 	where authority (this);
     
     public boolean{authPrf; closure; lb; *lb; executeNow; this; this<-}
-    isAuthorized(Object authPrf,
-		 Closure[this, lb] closure,
-		 label lb,
-		 boolean executeNow)
+    isAuthorized{this<-}(Object authPrf,
+		         Closure[this, lb] closure,
+		         label lb,
+		         boolean executeNow)
 	where authority (this),
 	      {authPrf;closure;lb;executeNow} <= lb 
     {

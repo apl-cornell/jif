@@ -38,8 +38,7 @@ public interface Principal {
     /**
      * Does this principal delegate its authority to the principal p?
      */
-
-    boolean{this; p; this←} delegatesTo(principal p);
+    boolean{this; p; this<-} delegatesTo(principal p);
     
     /**
      * Is this principal equal to the Principal p?
@@ -49,7 +48,7 @@ public interface Principal {
     /**
      * Checks whether the <code>authPrf<code> provide sufficient proof of this
      * principal's authority to execute the closure <code>closure</code>, and
-     * if so, returns true. In addition, if <code>executeNow</code>,
+     * if so, returns true. In addition, if <code>executeNow</code> is true,
      * the closure will be executed immediately.
      *   For example, <code>authPrf<code> may be a password (or a password
      * digest, or a certificate, etc.); this method will return true
@@ -57,8 +56,8 @@ public interface Principal {
      * is one that the principal expects to be asked to authorize (typically
      * this is decided by inspecting the class of the closure).
      */
-    boolean{authPrf; closure; lb; *lb; executeNow; this; this←}
-	isAuthorized(Object authPrf,
+    boolean{authPrf; closure; lb; *lb; executeNow; this; this<-}
+	isAuthorized{this<-}(Object authPrf,
 		     Closure[this, lb] closure,
 		     label lb,
 		     boolean executeNow)
@@ -69,13 +68,13 @@ public interface Principal {
      * Search for a proof that the principal p can act for this principal.
      * Return null if no such proof can be found.
      */
-    ActsForProof{this; p; this←; p←}
-	findProofUpto{this←}(Principal p, Object searchState);
+    ActsForProof{this; p; this<-; p<-}
+	findProofUpto{this<-}(Principal p, Object searchState);
     
     /**
      * Search for a proof that this principal can act for the principal q.
      * Return null if no such proof can be found.
      */
-    ActsForProof{this; q; q←; this←}
-	findProofDownto{this←}(Principal q, Object searchState);    
+    ActsForProof{this; q; q<-; this<-}
+	findProofDownto{this<-}(Principal q, Object searchState);    
 }
