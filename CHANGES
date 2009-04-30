@@ -3,9 +3,9 @@ Jif Change Log
 
 This file documents changes between releases of Jif.
 
-2009-??-??    Jif 3.3.2
-    * Top/bottom Unicode principal syntax supported
-    * Small refactoring change to better support Jif extensions.
+2009-03-16    Jif 3.3.2
+    * Top/bottom Unicode syntax for principals supported.
+    * Small refactoring change to better support extensions to Jif.
     * Other bug fixes.
 
 2009-02-24    Jif 3.3.1

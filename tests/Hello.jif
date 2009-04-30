@@ -9,7 +9,7 @@ public class Hello
     {
         Runtime[pp] runtime = Runtime[pp].getRuntime();
         try {
-            PrintStream[{pp:;_!:_}] out = runtime.out();
+            PrintStream[{pp→}] out = runtime.out();
             out.println("Hello, world!");
         }
         catch (NullPointerException ignored) { }

@@ -91,7 +91,7 @@ public abstract class JifDowngradeExprExt extends JifExprExt
             public String msg() {
                 return "The label of the expression to " + 
                 d.downgradeKind()+" is " + 
-                "more restrictive than label of data that " +
+                "more restrictive than the label of data that " +
                 "the "+d.downgradeKind()+" expression is allowed to "+d.downgradeKind()+".";
             }
             public String detailMsg() {
@@ -99,7 +99,7 @@ public abstract class JifDowngradeExprExt extends JifExprExt
                 ""+d.downgradeKind()+" information labeled up to " +
                 namedRhs() + ". However, the label of the " +
                 "expression to "+d.downgradeKind()+" is " +
-                namedLhs() + ", which is more restrictive than " +
+                namedLhs() + ", which is more restrictive than is " +
                 "allowed.";
             }
             public String technicalMsg() {
