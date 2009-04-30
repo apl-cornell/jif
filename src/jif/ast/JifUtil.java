@@ -103,7 +103,16 @@ public class JifUtil
                     throw new SemanticException("Cannot use \"this\" in this scope.", e.position());
                 }
                 return new AccessPathThis(context.currentClass(), s.position());
+            } /* 
+            else if (Special.SUPER.equals(s.kind())) {
+                if(context.currentClass() == null || context.inStaticContext() || !context.inCode()) {
+                    throw new SemanticException("Cannot use \"super\" in this scope.", e.position());
+                } else {
+                    // We are not in a constructor now - using super is safe
+                    return new AccessPathThis((ClassType) context.currentClass().superType(), s.position());
+                }
             }
+              */
             else {
                 throw new InternalCompilerError("Not currently supporting access paths for special of kind " + s.kind());
             }            
@@ -162,7 +171,7 @@ public class JifUtil
             }
         }
         if (e instanceof Special) {
-            return ((Special)e).kind() == Special.THIS;          
+            return ((Special)e).kind() == Special.THIS;
         }
         if (e instanceof Cast) {
             return isFinalAccessExpr(ts, ((Cast)e).expr());        
@@ -188,7 +197,8 @@ public class JifUtil
            (e instanceof DowngradeExpr && isFinalAccessExprOrConst(ts, ((DowngradeExpr)e).expr())) ||
            (e instanceof NullLit &&
                    expectedType != null && 
-                   ts.isImplicitCastValid(expectedType, ts.Principal()));
+                   ts.isImplicitCastValid(expectedType, ts.Principal())) 
+                   /*|| (e instanceof Special && ((Special)e).kind() == Special.SUPER)*/ ;
     }
     public static Label exprToLabel(JifTypeSystem ts, Expr e, JifContext context) throws SemanticException {
         if (e instanceof LabelExpr) {
