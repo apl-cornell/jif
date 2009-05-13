@@ -675,7 +675,7 @@ override method_header ::=
              :}
     |   modifiers_opt:a VOID:b IDENTIFIER:c label_opt:i
         LPAREN formal_parameter_list_opt:d RPAREN
-        dims_opt:e return_label_opt:r throws_opt:f constraints_opt:w
+        return_label_opt:r throws_opt:f constraints_opt:w
             {: RESULT = parser.nf.JifMethodDecl(parser.pos(b,c), a,
                         parser.nf.CanonicalTypeNode(parser.pos(b),
                                    parser.ts.Void()),
