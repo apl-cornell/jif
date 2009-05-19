@@ -88,6 +88,17 @@ public class JifDelFactory_c extends AbstractDelFactory_c implements JifDelFacto
         return new JifProcedureDeclDel();
     }
 
+    public final JL delAmbNewArray() {
+    	JL e = delAmbNewArrayImpl();
+    	
+    	if (nextDelFactory() != null && nextDelFactory() instanceof JifDelFactory) {
+    		JL e2 = ((JifDelFactory) nextDelFactory()).delAmbNewArray();
+    		e = composeDels(e, e2);
+    	}
+    	
+    	return postDelAmbNewArray(e);
+    }
+    
     public final JL delLabelExpr() {
         JL e = delLabelExprImpl();
 
@@ -110,6 +121,14 @@ public class JifDelFactory_c extends AbstractDelFactory_c implements JifDelFacto
         return postDelNewLabel(e);
     }
 
+    protected JL delAmbNewArrayImpl() {
+    	return delAmbExprImpl();
+    }
+    
+    protected JL postDelAmbNewArray(JL e) {
+    	return postDelAmbExpr(e);
+    }
+    
     protected JL delLabelExprImpl() {
         return delExprImpl();
     }
