@@ -77,6 +77,16 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
         n.dims = TypedList.copyAndCheck(dims, Expr.class, true);
         return n;
     }
+    
+    public int additionalDims() {
+    	return this.addDims;
+    }
+    
+    public AmbNewArray additionalDims(int addDims) {
+    	AmbNewArray_c n = (AmbNewArray_c) copy();
+    	n.addDims = addDims;
+    	return n;
+    }
 
     /** Reconstructs the node. */
     protected AmbNewArray_c reconstruct(TypeNode baseType, Object expr, List dims) {
