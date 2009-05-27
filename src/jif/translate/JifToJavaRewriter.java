@@ -169,17 +169,11 @@ public class JifToJavaRewriter extends ContextVisitor
         if (t.isDouble()) return canonical(nf, ts.Double(), pos);
         
         if (this.jif_ts().isLabel(t)) {
-            return nf.AmbTypeNode(pos,
-                                  nf.PackageNode(pos,
-                                                 ts.packageForName("jif.lang")),
-            "Label");
+        	return nf.TypeNodeFromQualifiedName(pos, "jif.lang.Label");
         }
         
         if (this.jif_ts().isPrincipal(t)) {
-            return nf.AmbTypeNode(pos,
-                                  nf.PackageNode(pos,
-                                                 ts.packageForName("jif.lang")),
-            "Principal");
+        	return nf.TypeNodeFromQualifiedName(pos, "jif.lang.Principal");
         }
         
         if (t.isArray()) {
@@ -191,13 +185,10 @@ public class JifToJavaRewriter extends ContextVisitor
             Package p = t.toClass().package_();
             String name = t.toClass().name();
             if (p == null) {
-                return nf.AmbTypeNode(pos, name);
+            	return nf.TypeNodeFromQualifiedName(pos, name);
             }
             else {
-                return nf.AmbTypeNode(pos,
-                                      nf.PackageNode(pos,
-                                                     ts.packageForName(p.fullName())),
-                                                     name);
+            	return nf.TypeNodeFromQualifiedName(pos, t.toClass().fullName());
             }
         }
         
