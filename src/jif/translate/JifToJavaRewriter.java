@@ -182,14 +182,7 @@ public class JifToJavaRewriter extends ContextVisitor
         }
         
         if (t.isClass()) {
-            Package p = t.toClass().package_();
-            String name = t.toClass().name();
-            if (p == null) {
-            	return nf.TypeNodeFromQualifiedName(pos, name);
-            }
-            else {
-            	return nf.TypeNodeFromQualifiedName(pos, t.toClass().fullName());
-            }
+         	return nf.TypeNodeFromQualifiedName(pos, t.toClass().fullName());
         }
         
         throw new InternalCompilerError("Cannot translate type " + t + ".");
