@@ -12,8 +12,8 @@ import polyglot.util.Position;
  */  
 public class Array extends Amb {
     // prefix[]
-    final TypeNode prefix;
-    final boolean isConst;
+    final protected TypeNode prefix;
+    final protected boolean isConst;
 
     public Array(Grm parser, Position pos, TypeNode prefix) {
         this(parser, pos, prefix, false);
