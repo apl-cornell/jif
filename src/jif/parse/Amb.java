@@ -5,8 +5,8 @@ import polyglot.util.Position;
 
 public abstract class Amb 
 {
-    Position pos;
-    Grm parser;
+    public final Position pos;
+    public final Grm parser;
 
     public Amb(Grm parser, Position pos) {
         this.parser = parser;
