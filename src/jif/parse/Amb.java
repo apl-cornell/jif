@@ -5,8 +5,8 @@ import polyglot.util.Position;
 
 public abstract class Amb 
 {
-    public final Position pos;
-    public final Grm parser;
+    protected final Position pos;
+    protected final Grm parser;
 
     public Amb(Grm parser, Position pos) {
         this.parser = parser;
@@ -25,6 +25,7 @@ public abstract class Amb
     public Expr toNewArrayPrefix(Position p, Integer extraDims) throws Exception { parser.die(pos); return null; }
     public Id toIdentifier() throws Exception { parser.die(pos); return null; }
     public String toName() throws Exception { parser.die(pos); return null; }
+    
     public Position position() { return pos; } 
     public Grm parser() { return parser; } 
 }
