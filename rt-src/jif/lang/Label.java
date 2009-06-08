@@ -13,7 +13,7 @@ public interface Label
      * Returns true iff this <= l. If the method returns true, then
      * s has all of the delegations (i.e., DelegationPairs) added to it
      * that the result depends upon. If the method returns false,
-     * then s has no eleents added to it.
+     * then s has no elements added to it.
      */
     boolean relabelsTo(Label l, Set s);
     
