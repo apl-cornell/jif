@@ -1,0 +1,30 @@
+public class A {
+    final label{this} albl;
+    final E[this.albl]{this} e;
+    
+    public A(label{this} albl_, E[albl_]{this} e) {
+        this.albl = albl_;
+        this.e = e;
+    }
+}
+
+class B {
+    final A{this} a;
+    B(A{this} param) {
+        this.a = param;
+    }
+    public void foo{*lbl}(label{*lbl} lbl)
+        where a.albl <= lbl
+    {
+        try {
+            if(this.a.albl <= lbl && this.a.e.elbl <= new label {}) {
+                bar(lbl); // Label Error thrown here does not make sense
+            }
+        } catch (NullPointerException whocares) {}
+    }
+    
+    void bar{*lbl}(label{*lbl} lbl)
+    {       
+    }
+}
+
