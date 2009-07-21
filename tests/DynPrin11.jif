@@ -1,4 +1,4 @@
-class DynPrin10 {
+class DynPrin11 {
     void m3(principal{qq} pp, principal{pp} qq) {}
 
     void m() {
