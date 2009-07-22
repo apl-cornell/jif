@@ -17,13 +17,15 @@ class B {
         where a.albl <= lbl
     {
         try {
-            if(this.a.albl <= lbl && this.a.e.elbl <= new label {}) {
+//            final label x = this.a.e.elbl;
+            if(this.a.e.elbl <= new label {}) {
                 bar(lbl); // Label Error thrown here does not make sense
             }
         } catch (NullPointerException whocares) {}
     }
     
     void bar{*lbl}(label{*lbl} lbl)
+//        where this.a.e.elbl <= {}
     {       
     }
 }
