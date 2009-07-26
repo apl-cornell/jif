@@ -4,7 +4,9 @@ import java.util.*;
 
 import jif.translate.DisjunctivePrincipalToJavaExpr_c;
 import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
 import polyglot.main.Report;
+import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -75,5 +77,18 @@ public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePr
 
     public Set disjuncts() {
         return disjuncts;
+    }
+
+    @Override
+    public Principal subst(LabelSubstitution substitution)
+        throws SemanticException {
+      Set substDisjuncts = new HashSet();
+      for (Iterator it = disjuncts.iterator(); it.hasNext();) {
+        Principal disjunct = (Principal) it.next();
+        substDisjuncts.add(disjunct.subst(substitution));
+      }
+      
+      return new DisjunctivePrincipal_c(substDisjuncts, (JifTypeSystem) ts,
+          position());
     }
 }

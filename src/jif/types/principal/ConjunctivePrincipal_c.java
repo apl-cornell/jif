@@ -5,9 +5,11 @@ import java.util.*;
 import jif.translate.ConjunctivePrincipalToJavaExpr_c;
 import jif.types.JifTypeSystem;
 import jif.types.JifTypeSystem_c;
+import jif.types.LabelSubstitution;
 import jif.types.label.JoinLabel_c;
 import jif.types.label.Label;
 import polyglot.main.Report;
+import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -136,6 +138,19 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
         }
 
         return new ConjunctivePrincipal_c(needed, (JifTypeSystem)ts, position());
+    }
+
+    @Override
+    public Principal subst(LabelSubstitution substitution)
+        throws SemanticException {
+      Set substConjuncts = new HashSet();
+      for (Iterator it = conjuncts.iterator(); it.hasNext();) {
+        Principal conjunct = (Principal) it.next();
+        substConjuncts.add(conjunct.subst(substitution));
+      }
+      
+      return new ConjunctivePrincipal_c(substConjuncts, (JifTypeSystem) ts,
+          position());
     }
     
 }
