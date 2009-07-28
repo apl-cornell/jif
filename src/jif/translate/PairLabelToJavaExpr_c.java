@@ -7,6 +7,7 @@ import jif.types.label.*;
 import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
     public Expr toJava(Label label, JifToJavaRewriter rw) throws SemanticException {
@@ -36,7 +37,7 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
             ReaderPolicy policy = (ReaderPolicy)p;
             Expr owner = rw.principalToJava(policy.owner());
             Expr reader = rw.principalToJava(policy.reader());
-            return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".readerPolicy(%E, %E)", owner, reader);
+            return (Expr) rw.qq().parseExpr(rw.runtimeLabelUtil() + ".readerPolicy(%E, %E)", owner, reader).position(Position.compilerGenerated(p.toString() + ":" + p.position().toString()));
         }
         
         if (p instanceof JoinPolicy_c) {
@@ -50,7 +51,7 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
                 Expr f = policyToJava(head, rw);
                 e = rw.qq().parseExpr("%E.join(%E)", e, f);
             }
-            return e;            
+            return e;
         }
 
         if (p instanceof MeetPolicy_c) {
