@@ -55,6 +55,10 @@ public abstract class LabelNode_c extends Node_c implements LabelNode
         w.write(this.toString());
     }
     
+    public void dump(CodeWriter w) {
+        w.write(toString());
+    }    
+    
     public final void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("cannot translate " + this);
     }
