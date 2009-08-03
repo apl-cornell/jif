@@ -327,7 +327,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                 "\"void m(int i):{" + namedRhs() + "}\".";
             }
             public String technicalMsg() {
-                return "the return(end) label is less restrict than " +
+                return "the return (end) label is less restricted than " +
                 namedLhs() + " of the body.";
             }
         }
