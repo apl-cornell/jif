@@ -1,11 +1,15 @@
 package jif.ast;
 
 import jif.types.Param;
+import jif.types.label.ConfPolicy;
+import jif.types.label.IntegPolicy;
 import jif.types.label.Label;
+import jif.types.label.PairLabel;
 import polyglot.ast.Node_c;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 
@@ -56,7 +60,20 @@ public abstract class LabelNode_c extends Node_c implements LabelNode
     }
     
     public void dump(CodeWriter w) {
-        w.write(toString());
+        if (label != null) {
+            w.write("(" + StringUtil.getShortNameComponent(label.getClass().getName()) + " ");
+            if (label instanceof PairLabel) {
+                PairLabel pl = (PairLabel) label;
+                ConfPolicy cp = pl.confPolicy();
+                IntegPolicy ip = pl.integPolicy();
+                w.write("{" + StringUtil.getShortNameComponent(cp.getClass().getName()) + " " + cp.toString() + ";" +
+                        StringUtil.getShortNameComponent(ip.getClass().getName()) + " " + ip.toString() + "}" + ")");
+            } else {
+                w.write(label.toString());
+            }
+        } else {
+            w.write("<null-label>");
+        }
     }    
     
     public final void translate(CodeWriter w, Translator tr) {

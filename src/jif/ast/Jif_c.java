@@ -11,6 +11,7 @@ import polyglot.ast.Ext_c;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 
 /** An implementation of the <code>Jif</code> interface. 
@@ -116,6 +117,16 @@ public class Jif_c extends Ext_c implements Jif
 
     public void integerBoundsCalculated() {
         
+    }
+    
+    public void dump(CodeWriter w) {
+        if (toJava != null) {
+            w.write("(" + toString() + " toJava ");
+            toJava.dump(w);
+            w.write(")");
+        } else {
+            super.dump(w);
+        }
     }
 
     
