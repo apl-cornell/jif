@@ -1,6 +1,6 @@
 import jif.util.*;
 
-public class Inf1 { 
+public class Inf12 { 
 
     final principal Client = new TestPrincipal("Blah");
     final TestParamInf[Client] testParam;
