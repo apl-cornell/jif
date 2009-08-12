@@ -587,7 +587,11 @@ public abstract class AbstractSolver implements Solver {
                     + "Cannot add more constraints");
         }
 
-        if (shouldReport(5)) report(5, (constraint_counter + 1) + ": " + c);
+        if (shouldReport(5)) {
+            StackTraceElement[] stack = new Exception().getStackTrace();
+            String source = stack[4].getFileName() + ":" + stack[4].getLineNumber();
+            report(5, (constraint_counter + 1) + ": " + c + " << " + source);
+        }
         if (shouldReport(6)) report(6, ">>> " + c.msg());
         inc_counter();
 

@@ -113,7 +113,8 @@ public abstract class Constraint
         sb.append(kind);
         sb.append(rhs);
         sb.append(" in environment ");
-        sb.append(env);        
+        sb.append(env);
+        if (pos != null) sb.append("(" + pos.toString() + ")");
         
         return sb.toString();
     }
