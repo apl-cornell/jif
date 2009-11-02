@@ -382,13 +382,13 @@ must know this holds.</p-->
 
 <h4><a name="label_relations" id="label_relations">Label relations</a></h4>
 
-<p>Labels can also be passed around, and they're generally opaque.  However, a method can enforce some constraints on labels given to it, using a constraint of the form <code>where l1 &lt;= l2</code>.
+<p>Labels can also be passed around, and they're generally opaque.  However, a method can enforce some constraints on labels given to it, using a constraint of the form <code>where l1 &lt;= l2</code>.</p>
 
 <h4><a name="method_an_example" id="method_an_exampel">An Example</a></h4>
 
 Here is a fairly comprehensive example, taken from the Jif Reference Manual:
 
-<code>
+<pre>
 int{*lbl} m{*lbl}(label{*lbl} lbl, principal{*lbl} p, int{Alice->p} i)
    where {Alice->Bob} &lt;= lbl, Bob actsfor p
 {
@@ -397,7 +397,7 @@ int{*lbl} m{*lbl}(label{*lbl} lbl, principal{*lbl} p, int{Alice->p} i)
    // is &lt;= {*lbl}. Therefore, we can return i+1.
    return i+1;
 }
-</code>
+</pre>
 
 <p>Note that the label <code>lbl</code> is an argument to the method, and is labeled with its own value.  The return value of the method also has this label, while <code>i</code> has a policy owned by Alice, only allowing <code>p</code> (and Alice herself, and any principal acting for either of them) to read it.  So returning <code>i+1</code> would ordinarily be problematic, since lbl might contain any value, including an empty confidentiality policy that would leak the returned value <code>i+1</code> (and by extension, <code>i</code>) to the world</p>
 
@@ -420,8 +420,31 @@ asserts lb is "good enough".</p-->
 
 <h3><a name="exceptions" id="exceptions">Exceptions</a></h3>
 
-<p>Must be caught
-Affect PC bound.  </p>
+<p>Exceptions are devious; they can transfer program flow up many levels of the stack, and provide information that the programmer may not think about.  For example, an adversary may be able to find the number of users in a system by asking for various indices from an array containing the list of all users; if he gets an ArrayIndexOutOfBoundsException, he knows that he's off the end of the array.  For this reason, Jif requires all exceptions to be either caught or declared thrown.</p>
+
+<p>The only exception to this is when the Jif compiler can statically conclude that an exception is impossible.  Most commonly, if there is an explicit test of a variable being equal to <code>null</code>, code conditioned on this does not need to explicitly check for a NullPointerException.</p>
+
+<p>Exceptions also affect the PC label.  Consider the following snippet:</p>
+
+<code>
+   succeeded = 0;
+   try {
+      a[i] = 1;
+      succeeded = 1;
+   } catch (ArrayIndexOutOfBoundsException e) {}
+</code>
+
+<p>Here, the exception is properly handled, but succeeded depends on whether or not the exception occurred, which depends in turn on <code>a</code> and <code>i</code>.  So this is another form of implicit flow, so any time an exception may occur, the PC label is modified.</p>
+
+<h3><a name="arrays" id="arrays">Arrays</a></h3>
+
+<p>Arrays store labeled values, but also are themselves objects that store additional information (e.g., length).  As such, an array has two labels: the label on its elements (describing what values can be put into the array) and the label on the entire array.  For example,</p>
+
+<pre>
+   int{Alice<-}[]{Alice<-_} semitrusted;
+</pre>
+
+<p>declares an array where Alice believes that noone else has modified the objects in the array (the values stored in the array are of type <code>int{Alice<-}</code>), but the array itself has no such guarantee (since it has label <code>{Alice<-}</code>.</p>
 
 <h3><a name="lowering_security" id="lowering_security">Lowering Security</a></h3>
 
@@ -506,12 +529,779 @@ public class List[label lb] {
 
 <p>This functions nearly identically to principal parameters.  The two types may be freely mixed in the parameter list of a class</p>
 
-<h3><a name="a_large_example" id="a_large_example">A Large Example</a></h3>
+<h2><a name="a_large_example" id="a_large_example">A Large Example</a></h2>
 
-The above gives the key ideas of Jif, but actually writing a program of any size is still difficult, and learning to read Jif error messages is, as with most languages, an art in itself.  So this section will walk though the implementation of a small secret-keeper application, complete with mistakes, the resulting errors, and how to fix them.
+<p>The above gives the key ideas of Jif, but actually writing a program of any size is still difficult, and learning to read Jif error messages is, as with most languages, an art in itself.  So this section will walk though the implementation of a small secret-keeper application, complete with mistakes, the resulting errors, and how to fix them.</p>
 
+<h3>Overview</h3>
 
+<p>This simple secret-keeper stores secrets for a set of users, and allows a user to see her own secret after authenticating with username and password.  The implementation may be overkill in this case, but it makes it clear that users cannot somehow "trick" the program into seeing another user's secret without providing proper credentials.</p>
 
-<script type="text/javascript">colorize_all()</script>
-</body>
-</html>
+<p>As Jif does not provide any sort of secure storage, the users are created and secrets set by the principal running the program, called <code>root</code> by analogy with the standard Unix superuser.  Root provides a baseline of integrity throughout the program, though is primarily an artifact of the fact that some principal must be running the program.  In a real application, it would likely represent a principal for the server; the entity responsible for running the code that is trusted by virtue of the fact that a person is running the program.  In this case, most of the action happens in main_loop, which drops the authority of <code>root</code>, since it is unnecessary for most of the program.</p>
+
+<p>Once in main_loop, usernames and passwords are read from the console, and the array of users is searched for a user with that name (names are not confidential, so no special privileges are required).  If a match is found, a <code>SetSecretClosure</code> object is created.  This is a closure which, when invoked, will run as a specified user, with that user's full authority; thus, it is allowed to read the confidential secret stored by the user.  However, it is only run if the user's <code>isAuthorized</code> method returns <code>true</code> when given the closure and an authentication proof.  In this case, <code>isAuthorized</code> will check the password to ensure that the person attempting to log in is the person the user represents (or at least, knows the person's password).  In addition, <code>isAuthorized</code> will check that the closure is of the allowed type, to avoid running arbitrary code as the user by creating other types of closures and passing them in.</p>
+
+<h3>UnsafeIO</h3>
+
+<p>Jif's builtin console I/O assumes it is owned by the principal running the program, and all data going in or out must be trusted by this principal, and this principal must allow all principals to read the data (i.e., it's not confidential).  This is a poor match for this example, where we assume that different users are logging in and reading their secrets.  We instead use a short UnsafeIO module which allows data with any label to be printed, and reads input data at the bottom label, allowing it to be used anywhere.</p>
+
+<p>Compilation Instructions(?)</p>
+
+<h3>The User Class</h3>
+
+<p>Recall that programs can define their own principals.  For this example, we want a <code>User</code> to store a name and password for authentication, as well as the user's secret.  Here's a first attempt (presented in pieces for clarity):</p>
+
+<pre>
+class User extends AbstractPrincipal {
+   // Name is not confidential; the other fields are.
+   private String{this<-} name;
+   private String{this->; this<-} password;
+   private int{this->; this<-} secret;
+
+   // ...
+}
+</pre>
+
+<p>First, we declare the class extending AbstractPrincipal, and then declare the fields.  All fields are private according to standard practice, but vary in their Jif labels.  The field <code>name</code> is public information, so has no confidentiality label (hence the default of <code>_->_</code>, indicating readable by everyone).  The other two fields are truly private, and so the User object does not allow any other principals to read them.  All three are considered to have high integrity, so only the User is allowed to write to them.</p>
+
+<pre>
+   // Initialize all fields
+   public User(String name, String password, int secret) {
+      this.password = password;
+      this.secret = secret;
+      this.name = name;
+      super(name);
+   }
+</pre>
+
+<p>Here is the constructor: we create a new user with a given name, password, and secret.  At this point, we can compile the program, and get our first errors:</p>
+
+<pre>
+Tut.jif:9: Label of right hand side not less restrictive than the label for
+    field password
+      this.password = password;
+</pre>
+
+<p>There are similar errors for the other fields and call to <code>super</code>.  As usual, much more information can be obtained by passing <code>-explain</code> to the compiler (this will be done from now on in this example; in practice, this often leads to extremely long output in the case of multiple errors, but is extremely helpful in tracking down errors):</p>
+
+<pre>
+Tut.jif:9: Unsatisfiable constraint:    
+     rhs.nv <= label of field password    
+        {password; this} <= {this->; this<-}    
+     in environment    
+     [{this} <= {caller_pc}, {caller_pc} <= {*<-}]    
+        
+     Label Descriptions    
+     ------------------    
+     - rhs.nv = label of successful evaluation of right hand of assignment    
+     - rhs.nv = {password; this}    
+     - label of field password = {this->; this<-}    
+     - password = polymorphic label of formal argument password of constructor
+    (bounded above by {*->})    
+     - this = label of the special variable "this"    
+     - caller_pc = The pc at the call site of this constructor (bounded above
+    by {*->})    
+        
+     More information is revealed by the successful evaluation of the right
+    hand side of the assignment than is allowed to flow to the field password.
+      this.password = password;
+      ^-----------^
+</pre>
+
+<p>The problem here is that the parameters to the constructor are given the default label of <code>{*->*}</code>, so they are completely confidential, while the field labels are only confidential to the user object.  The solution here is to specify that the constructor parameters have the same label as the <code>User</code> object itself, using the special label <code>{this}</code>:
+
+<pre>
+   public User(String{this} name, String{this} password, int{this} secret) {
+      this.password = password;
+      this.secret = secret;
+      this.name = name;
+      super(name);
+   }
+
+   // ...
+</pre>
+
+<p>And now Jif accepts the constructor without complaint.</p>
+
+<p>Next up are getter methods for the name and secret:</p>
+
+<pre>
+   // Get the (non-confidential) name
+   public String getName() {
+      return this.name;
+   }
+
+   // Get the (confidential) secret
+   public int getSecret() {
+      return this.secret;
+   }
+
+   // ...
+</pre>
+
+<p>Once again, Jif has complaints:</p>
+
+<pre>
+Tut.jif:17: Unsatisfiable constraint:    
+     rv <= Lrv    
+        {_->_; this<-; this; caller_pc} <= {caller_pc}    
+     in environment    
+     [{this} <= {caller_pc}]    
+        
+     Label Descriptions    
+     ------------------    
+     - rv = the label of the value returned    
+     - rv = {_->_; this<-; this; caller_pc}    
+     - Lrv = return value label of the method    
+     - Lrv = {caller_pc}    
+     - this = label of the special variable "this"    
+     - caller_pc = The pc at the call site of this method (bounded above by
+    {*->})    
+        
+     This method may return a value with a more restrictive label than the
+    declared return value label. The declared return type of this method is
+    java.lang.String{*<-}. As such, values returned by this method can have a
+    label of at most Lrv.
+      return this.name;
+      ^---------------^
+</pre>
+
+<p>This is a problem in <code>getName</code>; there is a nearly identical error in <code>getSecret</code>.  The explanation is fairly self explanatory: the value returned has label <code>rv</code>, but the return value has to have label no more restrictive than <code>Lrv</code>.  The labels given are slightly strange: recall that <code>{_->_}</code> says that there is no confidentiality, so can be ignored.  Possibly the most useful line is the one giving <code>caller_pc</code>: it is <code>{*->}</code>.  This appeared nowhere in the code, but is the default return label.  In particular, it prevents a method with no return label from leaking any information at all.  The solution is to add an explicit return label, matching the level of information to be returned:
+
+<pre>
+   // Get the (non-confidential) name
+   public String{this<-} getName() {
+      return this.name;
+   }
+
+   // Get the (confidential) secret
+   public int{this->; this<-} getSecret() {
+      return this.secret;
+   }
+</pre>
+
+<p>Mollified, Jif allows us to move on to the heart of the User, <code>isAuthorized</code>.  This method has an intimidating declaration, but can be clearly parsed with some thought:
+
+<pre>
+   // Checks whether or not a closure is allowed to run.
+   public boolean{authPrf; closure; lb; this; this <-}
+   isAuthorized{this<-}(Object authPrf,
+                        Closure[this, lb] closure,
+                        label lb,
+                        boolean executeNow)
+         where authority (this),
+               {authPrf;closure;lb;executeNow} <= lb
+   {
+
+      if (this.password.equals(authPrf) /* && Closure is valid */)
+         return true;
+      else
+         return false;
+   }
+</pre>
+
+<p>It has a return value which is the join of <code>authPrf</code>, <code>closure</code>, <code>lb</code>, <code>this</code>, and <code>this<-</code>; it must, since it depends on all of them.  Its return value is considered high integrity by the user.  It then takes, as arguments, an authentication proof (e.g., password), a closure that will be executed if the check passes, the label of the closure, and a boolean which can be ignored for the moment.</p>
+
+<p>Finally, isAuthorized runs with the authority of the User, and can assume that the join of the labels on<code>authPrf</code>, <code>closure</code>, <code>lb</code>, and <code>executeNow</code> is less than <code>lb</code>; otherwise, <code>lb</code> would be a black box we know nothing about.</p>
+
+<p>The body of <code>isAuthorized</code> then simply checks if the user's password matches the proof passed in.  It should also make sure the closure is valid, but it's not clear how to do that yet.  But still, there is a problem here; a bit of thought should reveal it even before compiling.  The password is confidential, yet we're using it in a conditional, creating an implicit flow, so the return value depends on the confidential password, so must itself be confidential.</p>
+
+<p>However, this is a case where we clearly do want to release some information about the password.  So we can declassify it.  One simple way to do this is to declassify the password so that anyone can read it, and then compare it:</p>
+
+<pre>
+      String publicpw = declassify(this.password,
+                                   {this->; this<-} to {this<-});
+
+      if (publicpw.equals(authPrf) /* && Closure is valid */)
+         return true;
+      else
+         return false;
+</pre>
+
+<p>There is still a bug, though:</p>
+
+<pre>
+Tut.jif:36: The exception "java.lang.NullPointerException" must either be
+    caught or declared to be thrown.
+      if (publicpw.equals(authPrf) /* && Closure is valid */)
+          ^----------------------^
+</pre>
+
+<p>If publicpw is null, this will generate an exception.  Adding a try/catch block would solve the problem, but Jif can track nulls, so adding an extra condition is sufficient:</p>
+
+<pre>
+      if (publicpw != null && publicpw.equals(authPrf)
+            /* && Closure is valid */)
+         return true;
+      else
+         return false;
+</pre>
+
+<p>If the password is <code>null</code>, then it's reasonable to disallow all access.  And Jif knows that (thanks to short-circuit evaluation) <code>publicpw.equals</code> will only be called if <code>publicpw != null</code>, so no NullPointerExceptions will be generated by this code.</p>
+
+<p>And with that, the <code>User</code> class is done!  Actually, that's not quite true: while the class itself is correct, there are still some errors that will make it difficult to use.  However, those will come up and be fixed in due course.</p>
+
+<h3>Initialization</h3>
+
+<p>Before we can do anything with the users, we must create them.  We create a Main class with method main as follows:</p>
+
+<pre>
+class Main {
+   public static void main{}(principal root, String[] args)
+      where caller(root)
+   {
+      // Initialization of users
+      User users[] = new User[2];
+      String usernames[] = {"user1", "user2"};
+      String passwords[] = {"pass1", "pass2"};
+      int secrets[] = {42, 76};
+
+      for(int i = 0; i < users.length; i++) {
+         try {
+            users[i] = new User(usernames[i], passwords[i], secrets[i]);
+         } catch(ArrayIndexOutOfBoundsException e) {}
+      }
+   }
+}
+</pre>
+
+<p>There are very few Jif annotations so far; that is largely because this code is creating new information, but never using it.  As a result, there are no real restrictions on the data created, so default labels work well.  The one exception is the begin-label for the method main; the default of <code>{*->}</code> is too restrictive, as then any information created is completely confidential.</p>
+
+<h3>Beginning the Main Loop</h3>
+
+<p>The main loop of the program consists of reading in usernames and passwords, and printing out the user's secret if the credentials are correct.  First, we simply read in the username and password, and return if the username is blank or "q":</p>
+
+<pre>
+   public static void main_loop(User[] users) {
+
+      while(true) {
+         String username, password;
+         try {
+            UnsafeIO.print("username: ");
+            username = UnsafeIO.readLine();
+            if(username == null || username.equals("q")) {
+               UnsafeIO.print("\n");
+               return;
+            }
+            UnsafeIO.print("password: ");
+            password = UnsafeIO.readLine();
+         } catch(IOException e) {
+            UnsafeIO.print("Input error!\n");
+            return;
+         }
+
+         // ...
+      }
+   }
+</pre>
+
+<p>Note that IOException is caught.  Since this indicates some sort of input failure, returning from the main loop (and exiting the program) is a reasonable thing to do.  Aside from that, the code is pretty straightforward, with no interesting security properties.</p>
+
+<p>Next, we search the array of users for one which matches the given username.  Again, this seems straightforward:</p>
+
+<pre>
+         // Find the user matching the username
+         User user = null;
+
+         try {
+            for(int i = 0; i < users.length; i++) {
+               if(username.equals(users[i].getName()))
+                  user = users[i];
+            }
+         } catch(NullPointerException e) {}
+
+         // ...
+</pre>
+
+<p>In this case, there are multiple potential NullPointerExceptions, so it's easier to catch them rather than check each one explicitly.  Nothing here should be null, however, and if something were, the behavior would be the same as if no user matched, so an empty catch block is reasonable.</p>
+
+<p>Now we have a User object, and a password that we need to check against the User's password.  But the password is confidential, so we can't check directly.  Recall the <code>isAuthorized</code> method from the <code>User</code> class.  We want to use it to somehow gain permission to run code as a user; the key is creating an appropriate subclass of Closure to encapsulate this code and run it.</p>
+
+<h3>The Closure Class</h3>
+
+<p>A Jif closure is an object encapsulating some computation.  They provide the means for a principal to authorize another principal to run code on its behalf; for example, to read confidential data.  In this case, the closure will get the secret from the user, and declassify it so that the program can read it and print it to the screen.</p>
+
+<p>First, the closure needs to implement the <code>Closure</code> interface, which is paremeterized on a principal and a label.  The principal is the user that the code will be run as; the label is the label on the <code>invoke</code> method which determines, among other things, the label on the returned value.  In this case, the SetSecretClosure takes these same labels and passes them through unchanged.</p>
+
+<code>
+class SetSecretClosure[principal user, label lb_external]
+     implements Closure[user, lb_external]
+{
+   // ...
+}
+</code>
+
+<p>So far, the closure only knows about its user as a generic principal; in order to refer to the object representing the User, it has to be passed into the constructor and stored:</p>
+
+<pre>
+   private final User{*lb_external} user_obj;
+
+   public SetSecretClosure(User{this} user_obj) {
+      this.user_obj = user_obj;
+   }
+
+   // ...
+</pre>
+
+<p>The interesting part of the closure is the <code>invoke</code> method: this is what does the work.  The key feature is that it can assume <code>caller(user)</code>; this lets it endorse and declassify objects as the user.  As a first attempt:</p>
+
+<pre>
+   public final Object{*lb_external} invoke{*lb_external}()
+        where caller(user) {
+
+     int n = declassify(user_obj.getSecret(),
+                        {user_obj->; user_obj<-} to {user_obj<-});
+     return new Integer(n);
+   }
+</pre>
+
+<p>This code gets the secret, and declassifies it so that <code>user_obj</code> allows anyone to read it.  However, <code>user_obj</code> might be null.  A simple fix is to return -1 in this case:</p>
+
+<pre>
+     if(user_obj == null)
+        return new Integer(-1);
+
+     int n = declassify(user_obj.getSecret(),
+                        {user_obj->; user_obj<-} to {user_obj<-});
+     return new Integer(n);
+</pre>
+
+<p>Now there are three errors, the first of which is</p>
+
+<pre>
+Tut.jif:134: Unsatisfiable constraint:    
+     expr.nv <= downgrade_bound    
+        {this.user_obj->; this.user_obj<-; lb_external; this} <=
+    {this.user_obj->; this.user_obj<-}    
+     in environment    
+     [{this} <= {caller_pc}]    
+        
+     Label Descriptions    
+     ------------------    
+     - expr.nv = {this.user_obj->; this.user_obj<-; lb_external; this}    
+     - downgrade_bound = {this.user_obj->; this.user_obj<-}    
+     - lb_external = label parameter lb_external of class SetSecretClosure    
+     - this = label of the special variable "this"    
+     - caller_pc = The pc at the call site of this method (bounded above by
+    {lb_external})    
+        
+     This declassify expression is allowed to declassify information labeled
+    up to downgrade_bound. However, the label of the expression to declassify
+    is expr.nv, which is more restrictive than is allowed.
+     int n = declassify(user_obj.getSecret(), {user_obj->; user_obj<-} to {user_obj<-});
+             ^------------------------------------------------------------------------^
+</pre>
+
+<p>The problem here is that the declassification gets rid of the lb_external.  Looking at the inequality in the third line of the error, one way to resolve this is to ensure that <code>lb_external</code> is below <code>{this.user_obj->; this.user_obj<-}</code>.  While this is really a compile-time property, we can also check for it at run time:</p>
+
+<pre>
+     if(lb_external <= new label {user_obj<-; user_obj->}) {
+        int n = declassify(user_obj.getSecret(),
+                           {user_obj->; user_obj<-} to {user_obj<-});
+        return new Integer(n);
+     }
+     return new Integer(-1);
+</pre>
+
+<p>Now if the return label is too restrictive, we'll simply return -1 instead of the true secret.  And this way, we're not declassifying beyond what is allowed.</p>
+
+<p>This actually fixes two of the errors; the remaining one is</p>
+
+<pre>
+Tut.jif:135: Unsatisfiable constraint:    
+     declass_from <= declass_to join auth_label    
+        {this.user_obj->; this.user_obj<-} <= {user->}    
+     in environment    
+     [{this} <= {caller_pc}, {lb_external} <= {this.user_obj->;
+    this.user_obj<-}]    
+        
+     Label Descriptions    
+     ------------------    
+     - declass_from = {this.user_obj->; this.user_obj<-}    
+     - declass_to = {this.user_obj<-}    
+     - auth_label = {user->}    
+     - this = label of the special variable "this"    
+     - caller_pc = The pc at the call site of this method (bounded above by
+    {lb_external})    
+     - lb_external = label parameter lb_external of class SetSecretClosure    
+        
+     The expression to declassify has label declass_to join auth_label, and
+    the expression should be downgraded to label declass_to. However, the
+    method has the authority of the following principals: user. The authority
+    of other principals is required to perform the declassify.
+        int n = declassify(user_obj.getSecret(), {user_obj->; user_obj<-} to {user_obj<-});
+                ^------------------------------------------------------------------------^
+</pre>
+
+<p>The description here is key: this method only has the authority of the principal <code>user</code>, but the authority of other principals (namely, <code>user_obj</code>) is required to perform the declassify.  The intent, of course, is that the user parameter and user object are the same user, but Jif doesn't know that.  So we can use one more runtime check to enforce this:</p>
+
+<pre>
+     if(lb_external <= new label {user_obj<-; user_obj->} &&
+           user_obj equiv user) {
+        int n = declassify(user_obj.getSecret(),
+                           {user_obj->; user_obj<-} to {user_obj<-});
+        return new Integer(n);
+     }
+</pre>
+
+<p>This uses <code>equiv</code> to check that <code>user</code> and <code>user_obj</code> are "the same."  More precisely, <code>p equiv q</code> is identical to <code>p actsfor q && q actsfor p</code>; the two can act for each other, so are indistinguishable in what they are allowed to do.</p>
+
+<p>However, there is still one more problem:</p>
+
+<pre>
+Tut.jif:137: Unsatisfiable constraint:    
+     rv <= Lrv    
+        {this; lb_external; _->_; this.user_obj<-} <= {lb_external}    
+     in environment    
+     [{this} <= {caller_pc}, {lb_external} <= {this.user_obj->;
+    this.user_obj<-}, (user equiv this.user_obj)]    
+        
+     Label Descriptions    
+     ------------------    
+     - rv = the label of the value returned    
+     - rv = {this; lb_external; _->_; this.user_obj<-}    
+     - Lrv = return value label of the method    
+     - Lrv = {lb_external}    
+     - this = label of the special variable "this"    
+     - lb_external = label parameter lb_external of class SetSecretClosure    
+     - caller_pc = The pc at the call site of this method (bounded above by
+    {lb_external})    
+        
+     This method may return a value with a more restrictive label than the
+    declared return value label. The declared return type of this method is
+    java.lang.Object{lb_external}. As such, values returned by this method can
+    have a label of at most Lrv.
+        return new Integer(n);
+        ^--------------------^
+</pre>
+
+<p>Once again, the issue is with <code>lb_external</code>.  We can apply a similar solution of ensuring that <code>{user_obj<-} <= {lb_external}</code>:</p>
+
+<pre>
+     if(lb_external <= new label {user_obj<-; user_obj->} &&
+           new label {user_obj<-} <= lb_external &&
+           user_obj equiv user) {
+        int n = declassify(user_obj.getSecret(),
+                           {user_obj->; user_obj<-} to {user_obj<-});
+        return new Integer(n);
+     }
+</pre>
+
+<p>And at last, Jif accepts this closure.</p>
+
+<h3>Completing the Main Loop</h3>
+
+<p>Now that the closure class exists, it is time to use it.  The current body of <code>main_loop</code> is repeated here for convenience:</p>
+
+<pre>
+   public static void main_loop(User[] users) {
+
+      while(true) {
+         String username, password;
+         try {
+            UnsafeIO.print("username: ");
+            username = UnsafeIO.readLine();
+            if(username == null || username.equals("q")) {
+               UnsafeIO.print("\n");
+               return;
+            }
+            UnsafeIO.print("password: ");
+            password = UnsafeIO.readLine();
+         } catch(IOException e) {
+            UnsafeIO.print("Input error!\n");
+            return;
+         }
+
+         // Find the user matching the username
+         User user = null;
+
+         try {
+            for(int i = 0; i < users.length; i++) {
+               if(username.equals(users[i].getName()))
+                  user = users[i];
+            }
+         } catch(NullPointerException e) {}
+
+         // ...
+      }
+   }
+</pre>
+
+<p>Now we create a new SetSecretClosure for the user with a label which allows all readers:</p>
+
+<pre>
+         final label lb = new label {};
+         SetSecretClosure[user, lb] cl =
+               new SetSecretClosure[user, lb](42, user);
+</pre>
+
+<p>For convenience, a (high integrity, low confidentiality) label is put into lb, which is then used to create a SetSecretClosure.  Jif, however, objects:</p>
+
+<pre>
+Tut.jif:101: Only final variables of type "label" or "principal" may be used
+    as class parameters. The variable user is not final.
+         SetSecretClosure[user, lb] cl =
+               new SetSecretClosure[user, lb](user);
+</pre>
+
+<p>Parameters must always be final; this prevents them from changing later in the program and causing security problems.  While <code>user</code> is inherently changeable, as its value depends on runtime input, we have to put it in a final variable before using it as a parameter:</p>
+
+<pre>
+         final User userf = user;
+         final label lb = new label {};
+         SetSecretClosure[userf, lb] cl =
+               new SetSecretClosure[userf, lb](user);
+</pre>
+
+<p>Now to run the closure, we create a <code>Capability</code> using the special <code>jif.lang.PrincipalUtil.authorize</code> method, which takes the principal, authorization proof (password), closure, and label.  On authentication failure, it returns null; on success, it gives back a capability with an <code>invoke</code> method which will call the closure.</p>
+
+<pre>
+         Capability[userf, lb] cap =
+               jif.lang.PrincipalUtil.authorize(userf, password, cl, lb);
+
+         if(cap != null) {
+            int{*lb} revealed = -1;
+            try {
+               revealed = ((Integer)cap.invoke()).intValue();
+            } catch (NullPointerException e) {
+            } catch (ClassCastException e) {}
+
+            UnsafeIO.print("Got secret: " + revealed + "\n");
+         } else
+            UnsafeIO.print("Authentication failed\n"); 
+</pre>
+
+<p>The resulting error:</p>
+
+<pre>
+Tut.jif:101: Unsatisfiable constraint:    
+     caller_PC_bound <= callee_PC_bound    
+        {*->} <= {*lb}    
+     in environment    
+     [{*lb} equiv {}]    
+        
+     Label Descriptions    
+     ------------------    
+     - caller_PC_bound = lower bound on the side effects of caller    
+     - caller_PC_bound = {*->}    
+     - callee_PC_bound = lower bound on the side effects of the method public
+    Object invoke()    
+     - callee_PC_bound = {*lb}    
+     - *lb = dynamic label represented by the final access path lb    
+        
+     Calling the method here may have side effects that are not bounded below
+    by the PC bound of the caller. The side effects of the method to be
+    invoked are bounded below by the callee's begin label, callee_PC_bound.
+    However, the side effects of the calling context must be bounded below by
+    the caller's begin label caller_PC_bound.
+               revealed = ((Integer)cap.invoke()).intValue();
+                                    ^----------^
+</pre>
+
+<p>Once again, the PC bound of the method is the default of <code>{*->*}</code>, which is giving us problems upon trying to invoke the closure, which is less confidential.  So we need to lower the label on <code>main_loop</code> (reasonable, since the fact that the main loop is running does not leak any information)</p>
+
+<pre>
+   public static void main_loop{}(User[] users) {
+</pre>
+
+<p>However, the call to <code>invoke</code> still has a PC bound which is too high:
+
+<pre>
+Tut.jif:101: Unsatisfiable constraint:    
+     pc_call <= callee_PC_bound    
+        {_->_; _<-_; users; _->_; *<-} <= {*lb}    
+     in environment    
+     [{*lb} equiv {}]    
+        
+     Label Descriptions    
+     ------------------    
+     - pc_call = label of the program counter at this call site    
+     - pc_call = {_->_; _<-_; users; _->_; *<-}    
+     - callee_PC_bound = lower bound on the side effects of the method public
+    Object invoke()    
+     - callee_PC_bound = {*lb}    
+     - users = polymorphic label of formal argument users of method main_loop
+    (bounded above by {*->})    
+     - *lb = dynamic label represented by the final access path lb    
+        
+     Calling the method at this program point may reveal too much information
+    to the receiver of the method call. public Object invoke() can only be
+    invoked if the invocation will reveal no more information than the
+    callee's begin label, callee_PC_bound. However, execution reaching this
+    program point may depend on information up to the PC at this program
+    point: pc_call.
+               revealed = ((Integer)cap.invoke()).intValue();
+                                    ^----------^
+</pre>
+
+<p>Examing this, note that <code>_->_</code> and <code>*<-*</code> are the bottom labels for confidentiality and integrity, so aren't the problem, and that <code>{*lb}</code> is <code>{}</code>(from the code; the error doesn't provide this), which has top integrity, so the problem must be with confidentiality.  And sure enough, <code>users</code> has confidentiality potentially as high as <code>{*->}</code>, meaning that it is fully confidential.  However, the list of users isn't a secret, so we can change its label:</p>
+
+<pre>
+   public static void main_loop{}(User[]{} users) {
+</pre>
+
+<p>And now, the code compiles.  Running it and attemping to log in, however, produces the following:</p>
+
+<pre>
+username: user1
+password: pass1
+Got secret: -1
+</pre>
+
+<p>And now we pay the piper for taking the easy way out and doing run-time checks on <code>lb_external</code> in the closure.  One of the checks is failing.  It turns out the solution is to allow the <code>root</code> principal to act for all the users; this is reasonable since root created them.  It doesn't cause any security problems, since the main loop doesn't have any the authority of root, so can't do anything more as a result.</p>
+
+<p>So we modify the constructor of User to take one more argument, which is its creator, and add a delegatesTo method so that root actsfor the user, as well as a couple minor tweaks (for example, when root is a paremeter to <code>main</code>, it now must have label <code>{}</code>).  The final result is as follows:
+
+<pre>
+import java.io.*;
+
+class User extends AbstractPrincipal {
+   // Name is not confidential; the other fields are.
+   private String{this<-} name;
+   private String{this->; this<-} password;
+   private int{this->; this<-} secret;
+   private principal{*<-} root;
+
+   // Initialize all fields
+   public User(String{this} name, String{this} password, int{this} secret,
+               principal{this} root) {
+      this.password = password;
+      this.secret = secret;
+      this.name = name;
+      this.root = root;
+      super(name);
+   }
+   //
+   // Get the (non-confidential) name
+   public String{this<-} getName() {
+      return this.name;
+   }
+
+   // Get the (confidential) secret
+   public int{this->; this<-} getSecret() {
+      return this.secret;
+   }
+
+   public boolean delegatesTo(principal p) {
+      return p == root;
+   }
+
+   // Checks whether or not a closure is allowed to run.
+   public boolean{authPrf; closure; lb; this; this <-}
+   isAuthorized{this<-}(Object authPrf, 
+                        Closure[this, lb] closure,
+                        label lb,
+                        boolean executeNow)
+         where authority (this),
+               {authPrf;closure;lb;executeNow} <= lb
+   {
+      String publicpw = declassify(this.password,
+                                   {this->; this<-} to {this<-});
+
+      if (publicpw != null && publicpw.equals(authPrf)
+            /* && Closure is valid */)
+         return true;
+      else
+         return false;
+   }
+}
+
+class Main {
+   public static void main{}(principal{} root, String[] args)
+      where caller(root)
+   {
+      // Initialization of users
+      User users[] = new User[2];
+      String usernames[] = {"user1", "user2"};
+      String passwords[] = {"pass1", "pass2"};
+      int secrets[] = {42, 76};
+
+      for(int i = 0; i < users.length; i++) {
+         try {
+            users[i] = new User(usernames[i], passwords[i], secrets[i],
+                                root);
+         } catch(ArrayIndexOutOfBoundsException e) {}
+      }
+      main_loop(users);
+   }
+
+   public static void main_loop{}(User[]{} users) {
+
+      while(true) {
+         String username, password;
+         try {
+            UnsafeIO.print("username: ");
+            username = UnsafeIO.readLine();
+            if(username == null || username.equals("q")) {
+               UnsafeIO.print("\n");
+               return;
+            }
+            UnsafeIO.print("password: ");
+            password = UnsafeIO.readLine();
+         } catch(IOException e) {
+            UnsafeIO.print("Input error!\n");
+            return;
+         }
+
+         // Find the user matching the username
+         User user = null;
+
+         try {
+            for(int i = 0; i < users.length; i++) {
+               if(username.equals(users[i].getName()))
+                  user = users[i];
+            }
+         } catch(NullPointerException e) {}
+
+         // Create and invoke the closure to get the user's secret out, if
+         // the user allows it.
+         final User userf = user;
+         final label lb = new label {};
+         SetSecretClosure[userf, lb] cl =
+               new SetSecretClosure[userf, lb](user);
+         Capability[userf, lb] cap =
+               jif.lang.PrincipalUtil.authorize(userf, password, cl, lb);
+
+         if(cap != null) {
+            int{*lb} revealed = -1;
+            try {
+               revealed = ((Integer)cap.invoke()).intValue();
+            } catch (NullPointerException e) {
+            } catch (ClassCastException e) {}
+
+            UnsafeIO.print("Got secret: " + revealed + "\n");
+         } else
+            UnsafeIO.print("Authentication failed\n");
+      }
+   }
+}
+
+class SetSecretClosure[principal user, label lb_external]
+     implements Closure[user, lb_external]
+{
+
+   private final User{*lb_external} user_obj;
+
+   public SetSecretClosure(User{this} user_obj) {
+      this.user_obj = user_obj;
+   }
+
+   public final Object{*lb_external} invoke{*lb_external}()
+        where caller(user) {
+
+     if(user_obj == null)
+        return new Integer(-1);
+
+     if(lb_external <= new label {user_obj<-; user_obj->} &&
+           new label {user_obj<-} <= lb_external &&
+           user_obj equiv user) {
+        int n = declassify(user_obj.getSecret(),
+                           {user_obj->; user_obj<-} to {user_obj<-});
+        return new Integer(n);
+     }
+     return new Integer(-1);
+   }
+}
+</pre>
+
+</body></html>
