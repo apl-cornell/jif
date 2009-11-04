@@ -4,11 +4,18 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import jif.JifScheduler;
 import jif.types.JifContext;
+import jif.types.JifFieldInstance;
 import jif.types.JifSubstType;
 import jif.types.JifTypeSystem;
+import jif.types.label.VarLabel;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.*;
+import polyglot.ext.param.types.SubstType;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
@@ -70,14 +77,27 @@ public class JifFieldDel extends JifJL_c
         }
 
 	if (ft_type instanceof JifSubstType && fn.target() instanceof Expr) {
+	    JifContext jc = (JifContext) tc.context();
 	    ReferenceType rt = targetType((JifTypeSystem) tc.typeSystem(), 
-					  (JifContext) tc.context(), 
+					  jc, 
 					  (Expr) fn.target());	    
 
 	    if (rt instanceof JifSubstType) {		
                 Type ft1 = ((JifSubstType)rt).subst().substType(ft);
 		if (ft1 != ft) //update fieldInstance?
 		    f = (Field) f.type(ft1);
+	    }
+
+// Jif Dependency bugfix	    
+	    JifFieldInstance fi = (JifFieldInstance) ts.findField(rt.toReference(), fn.name(), jc.currentClass());
+	    if(fi.label() instanceof VarLabel) {
+            JifScheduler sched = (JifScheduler) tc.job().extensionInfo().scheduler();
+            Type tp = ts.unlabel(f.target().type());
+            if (tp instanceof ParsedClassType) {
+                ParsedClassType pct = (ParsedClassType)tp;            
+                Goal g = sched.FieldLabelInference(pct.job());
+                throw new MissingDependencyException(g);
+            }
 	    }
 	}
 	

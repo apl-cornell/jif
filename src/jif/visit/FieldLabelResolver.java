@@ -14,16 +14,18 @@ import jif.types.label.VarLabel;
 import polyglot.ast.*;
 import polyglot.frontend.CyclicDependencyException;
 import polyglot.frontend.Job;
+import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
 
-/** A visitor used to resolving field labels. We want to resolving
+/** A visitor used to resolving field labels. We want to resolve
  *  field labels of all the classes before the label checking pass,
- *  because these field labels might be included in other labels, thus
- *  need to resolve first.
+ *  because these field labels might be included in other labels, and 
+ *  thus need to be resolved first.
  *  
  *  This visitor also adds dependencies so that the label checking pass for
  *  this job will not run until the FieldLabelResolver for all jobs it is 
@@ -57,6 +59,23 @@ public class FieldLabelResolver extends ContextVisitor
 	    // this class uses field f. Make sure that the field label resolver
 	    // pass for the container of f is run before we run label checking.
 	    FieldInstance fi = ((Field)n).fieldInstance();
+
+// Jif Dependency bugfix
+	    if(fi == null) {
+	        Field f = (Field) n;
+            JifScheduler sched = (JifScheduler) this.job().extensionInfo().scheduler();
+            Type tp = ts.unlabel(f.target().type());
+            Job next;
+            if (tp instanceof ParsedClassType) {
+                ParsedClassType pct = (ParsedClassType)tp;
+                next = pct.job(); 
+            } else {
+                next = this.job();
+            }
+            Goal g = sched.TypeChecked(next);          
+            throw new MissingDependencyException(g);
+	    }
+	    
             JifScheduler scheduler = (JifScheduler)typeSystem().extensionInfo().scheduler();
             
             Type ct = fi.container();
