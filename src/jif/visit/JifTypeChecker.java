@@ -12,6 +12,8 @@ public class JifTypeChecker extends TypeChecker
      */
     private boolean inferClassParameters = false;
     
+    private boolean disambiguationInProgress = false;
+    
     public JifTypeChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
@@ -19,6 +21,16 @@ public class JifTypeChecker extends TypeChecker
     public boolean inferClassParameters() {
         return this.inferClassParameters;
     }
+
+    public JifTypeChecker(Job job, TypeSystem ts, NodeFactory nf, boolean dip) {
+        this(job, ts, nf);
+        disambiguationInProgress = dip;
+    }
+    
+    public boolean disambiguationInProgress() {
+        return disambiguationInProgress;
+    }
+    
     
     public JifTypeChecker inferClassParameters(boolean inferClassParameters) {
         if (this.inferClassParameters == inferClassParameters) return this;

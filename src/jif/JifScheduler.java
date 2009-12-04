@@ -36,7 +36,7 @@ public class JifScheduler extends JLScheduler {
         try {
             addPrerequisiteDependency(g, this.FieldLabelInference(job));
             addPrerequisiteDependency(g, this.IntegerBoundsChecker(job));
-// Jif Dependency bugfix:            
+// Jif Dependency bugfix:
             addPrerequisiteDependency(g, this.ExceptionsChecked(job));
         }
         catch (CyclicDependencyException e) {
@@ -48,13 +48,14 @@ public class JifScheduler extends JLScheduler {
     public FieldLabelInferenceGoal FieldLabelInference(Job job) {
         FieldLabelInferenceGoal g = (FieldLabelInferenceGoal)internGoal(new FieldLabelInferenceGoal(job));
 
-// Jif Dependency bugfix : comment the try block below and uncomment the line above
-//        try {
-//            addPrerequisiteDependency(g, this.ExceptionsChecked(job));
-//        }
-//        catch (CyclicDependencyException e) {
-//            throw new InternalCompilerError(e);
-//        }
+// Jif Dependency bugfix
+        try {
+//          addPrerequisiteDependency(g, this.ExceptionsChecked(job));
+            addPrerequisiteDependency(g, this.Disambiguated(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
         return g;
 
     }
@@ -250,8 +251,9 @@ class TypeChecked extends VisitorGoal {
 
     public Collection corequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList();
+        // Should this line be here, since FieldLabelResolver is added as a missing dependency during runtime?
+        l.add(((JifScheduler)scheduler).FieldLabelInference(job));
         l.add(scheduler.ConstantsChecked(job));
-//        l.add(((JifScheduler)scheduler).FieldLabelInference(job));
         l.addAll(super.corequisiteGoals(scheduler));
         return l;
     }

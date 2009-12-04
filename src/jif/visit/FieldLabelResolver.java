@@ -72,7 +72,7 @@ public class FieldLabelResolver extends ContextVisitor
             } else {
                 next = this.job();
             }
-            Goal g = sched.TypeChecked(next);          
+            Goal g = sched.TypeChecked(next);
             throw new MissingDependencyException(g);
 	    }
 	    

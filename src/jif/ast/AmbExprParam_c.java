@@ -81,7 +81,7 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
         JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
         // run the typechecker over expr.
-        TypeChecker tc = new JifTypeChecker(ar.job(), ts, nf);
+        TypeChecker tc = new JifTypeChecker(ar.job(), ts, nf, true);
         tc = (TypeChecker) tc.context(ar.context());
 	expr = (Expr)expr.visit(tc);
     

@@ -12,9 +12,7 @@ import jif.types.JifTypeSystem;
 import jif.types.label.VarLabel;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.*;
-import polyglot.ext.param.types.SubstType;
 import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.visit.NodeVisitor;
@@ -88,16 +86,17 @@ public class JifFieldDel extends JifJL_c
 		    f = (Field) f.type(ft1);
 	    }
 
-// Jif Dependency bugfix	    
+// Jif Dependency bugfix
 	    JifFieldInstance fi = (JifFieldInstance) ts.findField(rt.toReference(), fn.name(), jc.currentClass());
-	    if(fi.label() instanceof VarLabel) {
+	    if(fi.label() instanceof VarLabel && !((JifTypeChecker)tc).disambiguationInProgress()) {
             JifScheduler sched = (JifScheduler) tc.job().extensionInfo().scheduler();
-            Type tp = ts.unlabel(f.target().type());
+            Type tp = ts.unlabel(fi.container());
             if (tp instanceof ParsedClassType) {
-                ParsedClassType pct = (ParsedClassType)tp;            
+                ParsedClassType pct = (ParsedClassType)tp;        
                 Goal g = sched.FieldLabelInference(pct.job());
                 throw new MissingDependencyException(g);
             }
+//            else throw new InternalCompilerError("Help" + tp.getClass());
 	    }
 	}
 	

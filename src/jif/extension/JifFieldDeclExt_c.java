@@ -10,7 +10,6 @@ import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
-import polyglot.types.ArrayType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
@@ -36,7 +35,6 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         Label L = fi.label();
         Type t = decl.declType();
 
-
         if (!ts.isLabeled(t)) {
             // field should always be labeled.
             // See JifFieldDeclDel#disambiguate(AmbiguityRemover)
@@ -46,7 +44,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         Label declaredLabel = ts.labelOfType(t);
 
         // error messages for equality constraints aren't displayed, so no
-        // need top define error messages.	
+        // need to define error messages.	
         lc.constrain(new NamedLabel("field_label", 
                                     "inferred label of field " + fi.name(), 
                                     L), 
