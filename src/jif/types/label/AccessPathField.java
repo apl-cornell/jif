@@ -9,7 +9,11 @@ import jif.types.JifTypeSystem;
 import jif.types.PathMap;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
+import polyglot.ast.Field;
+import polyglot.ast.Receiver;
+import polyglot.ast.Special;
 import polyglot.types.FieldInstance;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
@@ -97,8 +101,20 @@ public class AccessPathField extends AccessPath {
     	    X = Xt.exc(Xt.NV(), ts.NullPointerException());
     	}
     	
+    	ReferenceType targetType = (ReferenceType) ts.unlabel(path.type());
+    	FieldInstance finst = null;
+        try {
+            finst = ts.findField(targetType, fieldName);
+        } catch (SemanticException e) {
+            throw new InternalCompilerError("Field " + fieldName + " not found in " + targetType);
+        }
+        if(finst != null) fi = finst;
+        
         Label L = ts.labelOfField(fi, A.pc());
         L = JifInstantiator.instantiate(L, A, path, path.type().toReference(), Xt.NV());
+        
+        Type ft = JifInstantiator.instantiate(fi.type(), A, path, path.type().toReference(), Xt.NV());
+        fi = fi.type(ft);
 
         X = X.NV(lc.upperBound(L, X.NV()));
         return X;
@@ -150,5 +166,4 @@ public class AccessPathField extends AccessPath {
         }
         return false;
     }
- 
 }

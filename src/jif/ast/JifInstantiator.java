@@ -529,6 +529,24 @@ public class JifInstantiator
 
     }
     
+    public static Type instantiate(Type t, 
+            JifContext callerContext, 
+            AccessPath receiverPath, 
+            ReferenceType receiverType, 
+            Label receiverLbl) {        
+        JifInstantiator inst = new JifInstantiator(receiverType,
+                receiverLbl,
+                receiverPath,
+                null,
+                null,
+                null,
+                null,
+                null,
+                callerContext);
+        return inst.instantiate(t);
+    }
+    
+    
     public static Principal instantiate(Principal p, 
             JifContext callerContext, 
             Expr receiverExpr, 

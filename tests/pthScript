@@ -31,6 +31,8 @@
 
 jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:../rt-classes:/../lib/jifrt.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar" {
 	A.jif ;
+    labelparam/AE.jif ;
+    labelparam/A.jif labelparam/E.jif ;
     OwnedObject.jif;
     LabeledObject.jif;
     TestPrincipal.jif;

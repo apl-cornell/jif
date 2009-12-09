@@ -19,6 +19,7 @@ class B {
         try {
 // Workaround: Use a local x instead            
 //            final label x = this.a.e.elbl;
+//            if(x <= new label {}) {
             if(this.a.e.elbl <= new label {}) {
                 bar(lbl); // Label Error thrown here does not make sense
             }
