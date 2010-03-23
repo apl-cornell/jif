@@ -5,3 +5,4 @@ classes
 .classpath
 dist
 pthScript.results
+config.properties

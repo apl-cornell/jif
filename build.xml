@@ -14,6 +14,9 @@
     <!--  <property name="jif-runtime-native.java-include-dir"
                 location="${env.JAVA_HOME}/include/linux"/> -->
 
+    <!-- Import properties file. -->
+    <property file="${basedir}/config.properties" />
+
     <!-- source directory -->
     <property name="src" location="${basedir}/src" />
 
@@ -54,6 +57,36 @@
     <!-- set the prefix for accessing environment variables -->
     <property environment="env" />
 
+    <!-- Polyglot classpath elements -->
+    <condition property="polyglot-classes"
+	       value="${polyglot.home}/classes"
+	       else="">
+	<isset property="polyglot.home" />
+    </condition>
+    <condition property="polyglot-jar"
+	       value="${polyglot.home}/lib/polyglot.jar"
+	       else="">
+	<isset property="polyglot.home" />
+    </condition>
+    <condition property="ppg-jar"
+	       value="${polyglot.home}/lib/ppg.jar"
+	       else="">
+	<isset property="polyglot.home" />
+    </condition>
+    <condition property="javacup-jar"
+	       value="${polyglot.home}/lib/java_cup.jar"
+	       else="">
+	<isset property="polyglot.home" />
+    </condition>
+    <condition property="jflex-jar"
+	       value="${polyglot.home}/lib/JFlex.jar"
+	       else="">
+	<isset property="polyglot.home" />
+    </condition>
+    <condition property="polyglot.home" value="">
+	<not><isset property="polyglot.home" /></not>
+    </condition>
+
     <!-- the standard classpath -->
     <path id="standard.classpath">
         <pathelement location="${classes}" />
@@ -62,6 +95,11 @@
             <include name="*.jar" />
             <exclude name="jif*.jar" />
         </fileset>
+	<pathelement path="${polyglot-classes}" />
+	<pathelement path="${polyglot-jar}" />
+	<pathelement path="${ppg-jar}" />
+	<pathelement path="${javacup-jar}" />
+	<pathelement path="${jflex-jar}" />
     </path>
 
 
@@ -151,6 +189,7 @@
                 <include name="jiflib.jar" />
             </fileset>
         </delete>
+        <delete file="${jifc}" />
         <delete file="${jifc}.bat" />
         <delete file="${bin}/splitc" />
     </target>
@@ -173,6 +212,7 @@
        ****************************************  -->
     <target name="configure" description="Configure jif">
         <antcall target="check-classpath" />
+	<antcall target="jifc-executable" />
         <antcall target="jif-executable-bat" />
     	<chmod file="${jif}" perm="a+x"/>
     	<chmod file="${jifc}" perm="a+x"/>
@@ -205,6 +245,15 @@
 	      message="The Polyglot param extension must be compiled."/>
         <fail unless="env.JAVA_HOME.defined"
 	      message="The environment variable JAVA_HOME must be defined."/>
+    </target>
+
+    <!-- Create jifc script if needed -->
+    <target name="jifc-executable">
+	<copy file="${jifc}.in" tofile="${jifc}">
+	    <filterset>
+		<filter token="POLYGLOT" value="${polyglot.home}" />
+	    </filterset>
+	</copy>
     </target>
 
     <!-- Create jif.bat and jifc.bat if needed -->
@@ -552,7 +601,7 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
                 <include name="lib-src/**" />
                 <include name="sig-src/**" />
                 <include name="bin/jif" />
-                <include name="bin/jifc" />
+                <include name="bin/jifc.in" />
                 <include name="bin/jc" />
 
                 <!-- only include the battleship example at the moment -->
@@ -567,6 +616,8 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
                 <include name="build.xml" />
             </fileset>
         </copy>
+
+	<copy file="config.properties.in" tofile="${dist}/config.properties" />
 
         <!-- Create the Javadoc, and copy the documentation -->
         <antcall target="javadoc" />

@@ -128,6 +128,10 @@ sig_classpath="$dir/sig-classes:$dir/lib/jifsig.jar"
 lib_classpath="$dir/lib-classes:$dir/lib/jiflib.jar:$dir/rt-classes:$dir/lib/jifrt.jar"
 classpath="$classpath:$lib_classpath"
 
+if [ -z "$POLYGLOT" ]; then
+    POLYGLOT="@POLYGLOT@"
+fi
+
 if [ -n "$POLYGLOT" ]; then 
     polyglot_unix=`unixpath "$POLYGLOT"` 
     classpath="$classpath:$polyglot_unix/classes:$polyglot_unix/lib/polyglot.jar"

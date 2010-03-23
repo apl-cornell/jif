@@ -1,0 +1,5 @@
+# Jif configuration properties.
+
+# Base directory of Polyglot installation.
+#   Must be an absolute path.
+polyglot.home=/${env.HOME}/polyglot
