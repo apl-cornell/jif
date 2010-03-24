@@ -16,6 +16,7 @@
 
     <!-- Import properties file. -->
     <property file="${basedir}/config.properties" />
+    <echo message="polyglot.home is ${polyglot.home}" level="verbose" />
 
     <!-- source directory -->
     <property name="src" location="${basedir}/src" />
@@ -63,26 +64,36 @@
 	       else="">
 	<isset property="polyglot.home" />
     </condition>
+    <echo message="polyglot-classes is ${polyglot-classes}" level="verbose" />
+
     <condition property="polyglot-jar"
 	       value="${polyglot.home}/lib/polyglot.jar"
 	       else="">
 	<isset property="polyglot.home" />
     </condition>
+    <echo message="polyglot-jar is ${polyglot-jar}" level="verbose" />
+
     <condition property="ppg-jar"
 	       value="${polyglot.home}/lib/ppg.jar"
 	       else="">
 	<isset property="polyglot.home" />
     </condition>
+    <echo message="ppg-jar is ${ppg-jar}" level="verbose" />
+
     <condition property="javacup-jar"
 	       value="${polyglot.home}/lib/java_cup.jar"
 	       else="">
 	<isset property="polyglot.home" />
     </condition>
+    <echo message="javacup-jar is ${javacup-jar}" level="verbose" />
+
     <condition property="jflex-jar"
 	       value="${polyglot.home}/lib/JFlex.jar"
 	       else="">
 	<isset property="polyglot.home" />
     </condition>
+    <echo message="jflex-jar is ${jflex-jar}" level="verbose" />
+
     <condition property="polyglot.home" value="">
 	<not><isset property="polyglot.home" /></not>
     </condition>
@@ -102,6 +113,8 @@
 	<pathelement path="${jflex-jar}" />
     </path>
 
+    <property name="standard.classpath" refid="standard.classpath" />
+    <echo message="standard.classpath is ${standard.classpath}" level="verbose" />
 
 	<!-- establish the os -->
     <condition property="os.isWindows">
