@@ -14,6 +14,10 @@
     <!--  <property name="jif-runtime-native.java-include-dir"
                 location="${env.JAVA_HOME}/include/linux"/> -->
 
+  <!-- set the prefix for accessing environment variables,
+       BEFORE reading the properties file. -->
+  <property environment="env" />
+
     <!-- Import properties file. -->
     <property file="${basedir}/config.properties" />
     <echo message="polyglot.home is ${polyglot.home}" level="verbose" />
@@ -55,8 +59,6 @@
     <property name="jifc" location="${bin}/jifc" />
     <property name="jif" location="${bin}/jif" />
 
-    <!-- set the prefix for accessing environment variables -->
-    <property environment="env" />
 
     <!-- Polyglot classpath elements -->
     <condition property="polyglot-classes"
