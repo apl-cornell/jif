@@ -92,6 +92,8 @@ public class JifTypeSystem_c
     protected Type PRINCIPAL_CLASS_ = null;
     
     public String PrincipalClassName() { return "jif.lang.Principal"; }
+    
+    public String RuntimePackageName() { return "jif.runtime"; }
 
     public PrimitiveType Principal() {
         return PRINCIPAL_;

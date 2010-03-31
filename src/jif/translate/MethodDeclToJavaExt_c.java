@@ -71,7 +71,8 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
 
         JifTypeSystem jifTs = rw.jif_ts();
         TypeNode type = rw.qq().parseType(jifTs.PrincipalClassName());
-        Expr init = rw.qq().parseExpr("jif.runtime.Runtime.user(null)");
+        Expr init = rw.qq().parseExpr(jifTs.RuntimePackageName()
+            + ".Runtime.user(null)");
 
         Stmt declPrincipal =
             rw.java_nf().LocalDecl(origBody.position(),

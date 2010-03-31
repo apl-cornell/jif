@@ -28,6 +28,12 @@ public interface JifTypeSystem extends ParamTypeSystem
    */
     String PrincipalClassName();
 
+    /**
+     * Returns the name of the Jif runtime package. In Jif, this is
+     * "jif.runtime". In languages that extend Jif, this may be different.
+     */
+    String RuntimePackageName();
+
     /** Returns the "principal" type. */
     PrimitiveType Principal();
     
