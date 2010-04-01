@@ -78,7 +78,7 @@ public class JifContext_c extends Context_c implements JifContext
             principal = (ClassType)jlts.typeForName(jifts.PrincipalClassName());
         }
         catch (SemanticException e) {
-            throw new InternalCompilerError("Cannot find jif.lang.Principal class.", e);
+            throw new InternalCompilerError("Cannot find " + jifts.PrincipalClassName() + " class.", e);
         }
 
         Named n;

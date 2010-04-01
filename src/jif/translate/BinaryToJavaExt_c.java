@@ -49,9 +49,10 @@ public class BinaryToJavaExt_c extends ExprToJavaExt_c {
     }
     
     public Expr actsforToJava(JifToJavaRewriter rw, boolean isEquiv) throws SemanticException {
+        JifTypeSystem ts = rw.jif_ts();
         Binary b = (Binary) node();
         String meth = isEquiv?"equivalentTo":"actsFor";
-        String comparison = "jif.lang.PrincipalUtil." + meth + "((%E), (%E))";
+        String comparison = ts.PrincipalUtilClassName() + "." + meth + "((%E), (%E))";
         List l = new ArrayList(2);
         l.add(b.left());
         l.add(b.right());

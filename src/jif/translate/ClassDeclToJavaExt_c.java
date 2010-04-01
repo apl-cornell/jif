@@ -225,11 +225,12 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
     protected ClassMember produceInstanceOfMethod(JifPolyType jpt, JifToJavaRewriter rw, boolean useGetters) throws SemanticException {
         Context A = rw.context();
         rw = (JifToJavaRewriter)rw.context(A.pushStatic());
+        JifTypeSystem jifts = rw.jif_ts();
         List formals = produceParamFormals(jpt, rw, true);
 
         String name = jpt.name();
         
-        if (!rw.jif_ts().isJifClass(jpt)) {
+        if (!jifts.isJifClass(jpt)) {
             // just produce a header
             return rw.qq().parseMember("static public native boolean %s(%LF);", INSTANCEOF_METHOD_NAME, formals);            
         }
@@ -263,7 +264,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 }
                 if (pi.isPrincipal()) {  
                     // e.g., PrincipalUtil.equivTo(c.expr, paramArgName)
-                    sb.append("jif.lang.PrincipalUtil."+comparison+
+                    sb.append(jifts.PrincipalUtilClassName() + "."+comparison+
                                          "(c."+paramExpr+","+paramArgName+");");
                 }
                 else {

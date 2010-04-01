@@ -156,6 +156,7 @@ public class JifToJavaRewriter extends ContextVisitor
     public TypeNode typeToJava(Type t, Position pos) throws SemanticException {
         NodeFactory nf = this.java_nf();
         TypeSystem ts = this.java_ts();
+        JifTypeSystem jifts = this.jif_ts();
         
         if (t.isNull()) return canonical(nf, ts.Null(), pos);
         if (t.isVoid()) return canonical(nf, ts.Void(), pos);
@@ -168,12 +169,12 @@ public class JifToJavaRewriter extends ContextVisitor
         if (t.isFloat()) return canonical(nf, ts.Float(), pos);
         if (t.isDouble()) return canonical(nf, ts.Double(), pos);
         
-        if (this.jif_ts().isLabel(t)) {
-        	return nf.TypeNodeFromQualifiedName(pos, "jif.lang.Label");
+        if (jifts.isLabel(t)) {
+        	return nf.TypeNodeFromQualifiedName(pos, jifts.LabelClassName());
         }
         
-        if (this.jif_ts().isPrincipal(t)) {
-        	return nf.TypeNodeFromQualifiedName(pos, "jif.lang.Principal");
+        if (jifts.isPrincipal(t)) {
+        	return nf.TypeNodeFromQualifiedName(pos, jifts.PrincipalClassName());
         }
         
         if (t.isArray()) {
@@ -279,7 +280,7 @@ public class JifToJavaRewriter extends ContextVisitor
      * The full class path of the runtime label utility.
      */
     public String runtimeLabelUtil() {
-        return "jif.lang.LabelUtil.singleton()";
+        return jif_ts().LabelUtilClassName() + ".singleton()";
     }
 
 

@@ -93,6 +93,12 @@ public class JifTypeSystem_c
     
     public String PrincipalClassName() { return "jif.lang.Principal"; }
     
+    public String PrincipalUtilClassName() { return "jif.lang.PrincipalUtil"; }
+    
+    public String LabelClassName() { return "jif.lang.Label"; }
+    
+    public String LabelUtilClassName() { return "jif.lang.LabelUtil"; }
+    
     public String RuntimePackageName() { return "jif.runtime"; }
 
     public PrimitiveType Principal() {
@@ -105,7 +111,7 @@ public class JifTypeSystem_c
                 PRINCIPAL_CLASS_ = typeForName(PrincipalClassName());
             }
             catch (SemanticException e) {
-                throw new InternalCompilerError("Cannot find Jif class jif.lang.Principal", e);
+                throw new InternalCompilerError("Cannot find Jif class " + PrincipalClassName(), e);
             } 
         }
         return PRINCIPAL_CLASS_;
@@ -1366,9 +1372,9 @@ public class JifTypeSystem_c
 
     public String translatePrimitive(Resolver c, PrimitiveType t) {
         if (isLabel(t)) {
-            return "jif.lang.Label";
+            return LabelClassName();
         } else if (isPrincipal(t)) {
-            return "jif.lang.Principal";
+            return PrincipalClassName();
         } else {
             return super.translatePrimitive(c, t);
         }
