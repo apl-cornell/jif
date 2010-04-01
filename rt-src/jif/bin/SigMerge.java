@@ -9,7 +9,7 @@ public class SigMerge
     private final static String WHITE = " \t\n";
     
     private static void usage() {
-	System.out.println("usage: java jif.lang.SigMerge f1 f2 [f3]");
+	System.out.println("usage: java jif.bin.SigMerge f1 f2 [f3]");
 	System.out.println("f1           file containing the signature");
 	System.out.println("f2           java source file");
 	System.out.println("f3           output file");
