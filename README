@@ -79,14 +79,13 @@ Jif is compiled with the Ant build tool
 compiler:
 
 1. Ensure javac is on your path and that you are using JDK 1.4.2 or
-   later.
-
+   later. Set the JAVA_HOME environment variable to the Java home
+   directory.  The file $JAVA_HOME/include/jni.h should exist.
 
 2. Go to the root directory of the Jif installation (the directory
    this README is in). We'll call this directory $JIF from now on.
 
     $ cd $JIF
-
 
 3. Edit config.properties to point "polyglot.home" to your Polyglot
    installation.

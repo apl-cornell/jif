@@ -12,7 +12,7 @@
     <!-- The OS-specific native include directory. If we can't figure it out
        automatically, it may need to be set explicitly -->
     <!--  <property name="jif-runtime-native.java-include-dir"
-                location="${env.JAVA_HOME}/include/linux"/> -->
+                location="${java.home}/include/linux"/> -->
 
   <!-- set the prefix for accessing environment variables,
        BEFORE reading the properties file. -->
@@ -247,8 +247,8 @@
 	           classpathref="standard.classpath"
 	           property="cp_existence.polyglot.param"/>
 
-        <condition property="env.JAVA_HOME.defined">
-            <isset property="env.JAVA_HOME" />
+        <condition property="java_home.defined">
+            <isset property="java.home" />
         </condition>
         <fail unless="cp_existence.polyglot"
 	      message="The polyglot classes must be on the classpath. Try adding polyglot.jar to the classpath."/>
@@ -258,8 +258,8 @@
 	      message="The JFlex classes must be on the classpath. Try adding JFlex.jar to the classpath."/>
         <fail unless="cp_existence.polyglot.param"
 	      message="The Polyglot param extension must be compiled."/>
-        <fail unless="env.JAVA_HOME.defined"
-	      message="The environment variable JAVA_HOME must be defined."/>
+        <fail unless="java_home.defined"
+	      message="The Java home (usually environment variable JAVA_HOME) must be defined."/>
     </target>
 
     <!-- Create jifc script if needed -->
@@ -424,50 +424,50 @@ sh ${jif} %CMD_LINE_ARGS%
         <fail if="os.unsupported-os" message="Cannot compile the native runtime code. This is not a supported OS." />
 
         <!-- Make sure we can find the appropriate OS specific native include directory -->
-        <condition property="jif-runtime-native.java-include-dir" value="${env.JAVA_HOME}/include/${env.OSTYPE}">
+        <condition property="jif-runtime-native.java-include-dir" value="${java.home}/include/${env.OSTYPE}">
             <and>
                 <not>
                     <isset property="jif-runtime-native.java-include-dir" />
                 </not>
                 <isset property="env.OSTYPE" />
-                <available file="${env.JAVA_HOME}/include/${env.OSTYPE}" />
+                <available file="${java.home}/include/${env.OSTYPE}" />
             </and>
         </condition>
-        <condition property="jif-runtime-native.java-include-dir" value="${env.JAVA_HOME}/include/linux">
+        <condition property="jif-runtime-native.java-include-dir" value="${java.home}/include/linux">
             <and>
                 <not>
                     <isset property="jif-runtime-native.java-include-dir" />
                 </not>
-                <available file="${env.JAVA_HOME}/include/linux" />
+                <available file="${java.home}/include/linux" />
             </and>
         </condition>
-        <condition property="jif-runtime-native.java-include-dir" value="${env.JAVA_HOME}/include/solaris">
+        <condition property="jif-runtime-native.java-include-dir" value="${java.home}/include/solaris">
             <and>
                 <not>
                     <isset property="jif-runtime-native.java-include-dir" />
                 </not>
-                <available file="${env.JAVA_HOME}/include/solaris" />
+                <available file="${java.home}/include/solaris" />
             </and>
         </condition>
-        <condition property="jif-runtime-native.java-include-dir" value="${env.JAVA_HOME}/include/win32">
+        <condition property="jif-runtime-native.java-include-dir" value="${java.home}/include/win32">
             <and>
                 <not>
                     <isset property="jif-runtime-native.java-include-dir" />
                 </not>
-                <available file="${env.JAVA_HOME}/include/win32" />
+                <available file="${java.home}/include/win32" />
             </and>
         </condition>
-        <condition property="jif-runtime-native.java-include-dir" value="${env.JAVA_HOME}/include">
+        <condition property="jif-runtime-native.java-include-dir" value="${java.home}/include">
             <and>
                 <not>
                     <isset property="jif-runtime-native.java-include-dir" />
                 </not>
-                <available file="${env.JAVA_HOME}/include/jni.h" />
+                <available file="${java.home}/include/jni.h" />
             </and>
         </condition>
         <available file="${jif-runtime-native.java-include-dir}" property="jif-runtime-native.java-include-dir.available" />
         <fail unless="jif-runtime-native.java-include-dir.available">
-Cannot find the OS-specific directory in ${env.JAVA_HOME}/include to include.
+Cannot find the OS-specific directory in ${java.home}/include to include.
 Please try setting the property "jif-runtime-native.java-include-dir" to be the absolute path of this directory.
     </fail>
         <property name="jif-runtime-native.java-include-dir.location" location="${jif-runtime-native.java-include-dir}" />
@@ -512,7 +512,7 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
             <arg value="-fPIC" />
             <arg value="-I." />
             <arg value="-I" />
-            <arg path="${env.JAVA_HOME}/include" />
+            <arg path="${java.home}/include" />
             <arg value="-I" />
             <arg path="${jif-runtime-native.java-include-dir.location}" />
             <srcfile />
@@ -535,7 +535,7 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
             <arg value="-mno-cygwin" />
             <arg value="-c" />
             <arg value="-I" />
-            <arg path="${env.JAVA_HOME}/include" />
+            <arg path="${java.home}/include" />
             <arg value="-I" />
             <arg path="${jif-runtime-native.java-include-dir.location}" />
             <srcfile />
