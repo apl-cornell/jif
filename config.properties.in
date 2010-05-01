@@ -3,4 +3,4 @@
 # Base directory of Polyglot installation.
 #   Must be an absolute path.
 polyglot.home=${env.HOME}/polyglot
-java.home=${env.JAVA_HOME}
+jdk.home=${env.JAVA_HOME}
