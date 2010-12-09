@@ -230,14 +230,25 @@ public class Runtime {
     }
        
     private static boolean _nativeOK = true;
-    static {
+
+    public static void loadRuntimeLibrary() {
+       if (_nativeOK) {
         try {
             System.loadLibrary("jifrt");
         }
         catch (UnsatisfiedLinkError ule) {
-            // fail, but continue
+            // fail, but continue with warning
             _nativeOK = false;
-            // System.err.println(ule.getLocalizedMessage());
+            System.err.println(ule.getLocalizedMessage());
         }
+	catch (SecurityException se) {
+            _nativeOK = false;
+            System.err.println(se.getLocalizedMessage());
+	}
+      }
+    }
+
+    static {
+	loadRuntimeLibrary();
     }   
 }
