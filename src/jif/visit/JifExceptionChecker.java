@@ -114,19 +114,19 @@ public class JifExceptionChecker extends ExceptionChecker {
 						"Uncaught exceptions in " + parent + " at " + parent.position()
 								+ " will be treated as fatal errors: "
 								+ fatalExcs);
-	        	String qqStr = "{ try { %S } ";
+	        	String qqStr = "try { %S } ";
 	        	List qqSubs = new LinkedList();
 	        	qqSubs.add(nNew);
 	        	Position pos = Position.compilerGenerated();
 	        	String s = UniqueID.newID("exc");
 	        	for(Iterator it = fatalExcs.iterator();it.hasNext();) {
-	        		qqStr += "catch (%T %s) { throw new %T(%s); } }";
+	        		qqStr += "catch (%T %s) { throw new %T(%s); }";
 		        	qqSubs.add(it.next());
 		        	qqSubs.add(s);
 		        	qqSubs.add(ts.Error());
 		        	qqSubs.add(s);
 	        	}
-	        	Stmt stmt = qq.parseStmt(qqStr, qqSubs);
+	        	Stmt stmt = qq.parseStmt("{"+qqStr+"}", qqSubs);
 	        	//Initialize types
 	        	TypeBuilder tb = new TypeBuilder(job, ts, nf);
 	        	stmt = (Stmt) stmt.visit(tb);
