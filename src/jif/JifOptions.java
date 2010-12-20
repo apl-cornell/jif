@@ -45,6 +45,11 @@ public class JifOptions extends Options {
       */
      public List addSigcp = new ArrayList();
 
+     /**
+      * Limit the authority of code to a certain principal's authority.
+      */
+     public String authority_limit = null;
+
     /**
      * Constructor
      */
@@ -105,6 +110,11 @@ public class JifOptions extends Options {
             Report.addTopic("debug", level);
             index++;
         }
+        else if (args[index].equals("-limit")) {
+            index++;
+            this.authority_limit = args[index++];
+        }
+
         else {
             int i = super.parseCommand(args, index, source);
             return i;
@@ -125,6 +135,8 @@ public class JifOptions extends Options {
         usageForFlag(out, "-globalsolve", "infer label variables globally (default: per class)");
         usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");
         usageForFlag(out, "-addsigcp <path>", "additional path for Jif signatures; prepended to sigcp");
+        usageForFlag(out, "-limit <top principal>", "limit the authority of compiled code");
+
     }
 
     public String constructSignatureClasspath() {        

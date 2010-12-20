@@ -196,5 +196,13 @@ public interface JifContext extends Context {
      * Add a checked endorse for the local instance li.
      */
     void addCheckedEndorse(LocalInstance li, Label downgradeTo);
+
+	boolean isAuthLimited();
+
+	Principal authLimit();
+
+	Principal limitPrincipal(Principal p);
+
+	Set limitPrincipals(Collection ps);
     
 }

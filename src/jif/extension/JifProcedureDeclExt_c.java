@@ -152,6 +152,10 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                 }
             }
         }
+        //If we are in a limited authority context,
+        //  attenuate principals with the auth limit.
+        if(A.isAuthLimited()) 
+        	newAuth = A.limitPrincipals(newAuth);
 
         return newAuth;
     }
@@ -164,11 +168,16 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
             if (c instanceof CallerConstraint) {
                 CallerConstraint cc = (CallerConstraint) c;
 
-                for (Iterator i = cc.principals().iterator(); i.hasNext(); ) {
-                    Principal pi = (Principal) i.next();
-                    // auth.add(A.instantiate(pi));
-                    auth.add(pi);
-                }
+                //Attenuate the caller's authority 
+                if(A.isAuthLimited())
+                	auth.addAll(A.limitPrincipals(cc.principals()));
+                else
+                	auth.addAll(cc.principals());
+//                for (Iterator i = cc.principals().iterator(); i.hasNext(); ) {
+//                    Principal pi = (Principal) i.next();
+//                    // auth.add(A.instantiate(pi));
+//                    auth.add(pi);
+//                }
             }
         }
     }

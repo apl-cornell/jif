@@ -290,4 +290,5 @@ public interface JifTypeSystem extends ParamTypeSystem
      * Is the string s a special marker field name?
      */
     boolean isMarkerFieldName(String s);
+
 }

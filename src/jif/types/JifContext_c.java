@@ -45,11 +45,17 @@ public class JifContext_c extends Context_c implements JifContext
     protected boolean inConstructorCall;
     protected Label constructorReturnLabel;
 
-    protected JifContext_c(JifTypeSystem ts, TypeSystem jlts) {
+    /**
+     * Limit authority of classes and code in this context.
+     */
+	protected Principal authLimit;
+
+    protected JifContext_c(JifTypeSystem ts, TypeSystem jlts, Principal authLimit) {
         super(ts);
         this.jlts = jlts;
         this.jifts = ts;
         this.env = (LabelEnv_c)ts.createLabelEnv();
+        this.authLimit = authLimit;
     }
 
     public Object copy() {
@@ -60,6 +66,7 @@ public class JifContext_c extends Context_c implements JifContext
         if (gotos != null) {
             ctxt.gotos = new HashMap(gotos);
         }
+        ctxt.authLimit = authLimit;
         return ctxt;        
     }
 
@@ -276,7 +283,19 @@ public class JifContext_c extends Context_c implements JifContext
     public void setPc(Label pc, LabelChecker lc) { this.pc = pc; }
 
     public Set authority() { return auth; }
-    public void setAuthority(Set auth) { this.auth = auth; }
+    public void setAuthority(Set auth) {
+    	if(authLimit != null) {
+			// Attenuate authority by creating a disjunctive
+			//   principal between the declared authority 
+			//   and the authority limit.
+			JifTypeSystem jifts = (JifTypeSystem) ts;
+			Principal p = jifts.conjunctivePrincipal(null, auth);
+			p = jifts.disjunctivePrincipal(null, authLimit, p);
+			this.auth = Collections.singleton(p);
+    	}
+    	else
+    		this.auth = auth; 
+    }
 
     public PrincipalHierarchy ph() { return env.ph(); }
 
@@ -402,4 +421,27 @@ public class JifContext_c extends Context_c implements JifContext
         }
         this.checkedEndorsements.put(li, downgradeTo);
     }
+    
+	@Override
+	public Principal authLimit() {
+		return authLimit;
+	}
+	
+	@Override
+	public boolean isAuthLimited() {
+		return authLimit != null;
+	}
+	
+	@Override
+	public Principal limitPrincipal(Principal p) {
+		return jifts.disjunctivePrincipal(null, authLimit, p);
+	}
+	
+	@Override
+	public Set limitPrincipals(Collection ps) {
+    	Principal p = jifts.conjunctivePrincipal(null, ps);
+		if(authLimit != null) 
+	    	p = jifts.disjunctivePrincipal(null, authLimit, p);
+    	return Collections.singleton(p);
+	}
 }

@@ -2,6 +2,7 @@ package jif.types;
 
 import java.util.*;
 
+import jif.JifOptions;
 import jif.extension.LabelTypeCheckUtil;
 import jif.translate.*;
 import jif.types.hierarchy.LabelEnv;
@@ -30,7 +31,7 @@ public class JifTypeSystem_c
     private final LabelEnv emptyLabelEnv = this.createEmptyLabelEnv();
 
     private final DefaultSignature ds;
-
+    
     public JifTypeSystem_c(TypeSystem jlts) {
         this.jlts = jlts;
         this.ds = new FixedSignature(this);
@@ -66,6 +67,9 @@ public class JifTypeSystem_c
 
         PRINCIPAL_ = new PrimitiveType_c(this, PRINCIPAL_KIND);
         LABEL_ = new PrimitiveType_c(this, LABEL_KIND);
+		JifOptions opt = (JifOptions) extInfo.getOptions();
+		if (opt.authority_limit != null)
+			AUTH_LIMIT = resolveLimitAuthorityPrincipal(opt.authority_limit);
     }
 
     public UnknownType unknownType(Position pos) {
@@ -90,7 +94,8 @@ public class JifTypeSystem_c
     protected PrimitiveType PRINCIPAL_;
     protected PrimitiveType LABEL_;
     protected Type PRINCIPAL_CLASS_ = null;
-    
+    protected Principal AUTH_LIMIT = null;
+
     public String PrincipalClassName() { return "jif.lang.Principal"; }
     
     public String PrincipalUtilClassName() { return "jif.lang.PrincipalUtil"; }
@@ -122,9 +127,8 @@ public class JifTypeSystem_c
     }
 
     public Context createContext() {
-        return new JifContext_c(this, jlts);
+    	return new JifContext_c(this, jlts, AUTH_LIMIT);
     }
-    
     
     public ConstArrayType constArrayOf(Type type) {
         return constArrayOf(type.position(), type);
@@ -1427,4 +1431,32 @@ public class JifTypeSystem_c
             ltcu = new LabelTypeCheckUtil(this);
         return ltcu;
     }
+	
+	public Principal resolveLimitAuthorityPrincipal(String name) throws SemanticException {
+        ClassType principal;
+
+        try {
+            principal = (ClassType)jlts.typeForName(PrincipalClassName());
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Cannot find " + PrincipalClassName() + " class.", e);
+        }
+
+        Named n;
+        // Look for the principal only in class files.
+        String className = "jif.principals." + name;
+        n = jlts.loadedResolver().find(className);
+        
+        if (n instanceof Type) {
+            Type t = (Type) n;
+            if (t.isClass()) {
+
+                if (jlts.isSubtype(t.toClass(), principal)) {
+                	return externalPrincipal(null, name);
+                }                
+            }
+        }
+         
+        throw new SemanticException(name + " is not a principal.");
+	}
 }
