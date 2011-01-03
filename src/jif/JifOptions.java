@@ -24,6 +24,11 @@ public class JifOptions extends Options {
     public boolean nonRobustness;
 
     
+    /**
+     * Should uncaught exceptions be made fatal?
+     */
+    public boolean fatalExceptions;
+    
      /**
       * Use a single Solver to infer labels globally, or solve on a class
       * by class basis.
@@ -82,6 +87,10 @@ public class JifOptions extends Options {
             index++;
             nonRobustness = true;
         }
+        else if (args[index].equals("-fail-on-exception")) {
+            index++;
+            fatalExceptions = true;
+        }
         else if (args[index].equals("-robust")) {
             index++;
             nonRobustness = false;
@@ -125,6 +134,7 @@ public class JifOptions extends Options {
         usageForFlag(out, "-globalsolve", "infer label variables globally (default: per class)");
         usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");
         usageForFlag(out, "-addsigcp <path>", "additional path for Jif signatures; prepended to sigcp");
+        usageForFlag(out, "-fail-on-exception", "fail on uncaught and undeclared runtime exceptions");
     }
 
     public String constructSignatureClasspath() {        

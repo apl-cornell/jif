@@ -2,6 +2,7 @@ package jif.types;
 
 import java.util.*;
 
+import jif.JifOptions;
 import jif.extension.LabelTypeCheckUtil;
 import jif.translate.*;
 import jif.types.hierarchy.LabelEnv;
@@ -1426,5 +1427,11 @@ public class JifTypeSystem_c
         if (ltcu == null)
             ltcu = new LabelTypeCheckUtil(this);
         return ltcu;
+    }
+    
+    @Override
+    public boolean promoteToFatal(Type t) {
+    	return ((JifOptions)extInfo.getOptions()).fatalExceptions
+    		&& descendsFrom(t, RuntimeException());
     }
 }
