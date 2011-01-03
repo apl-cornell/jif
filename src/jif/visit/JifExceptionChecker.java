@@ -4,10 +4,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import jif.types.JifTypeSystem;
+import jif.types.LabeledType;
+
 import polyglot.ast.CodeDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Stmt;
+import polyglot.ast.Try;
 import polyglot.frontend.Job;
 import polyglot.qq.QQ;
 import polyglot.types.ParsedClassType;
@@ -68,13 +72,19 @@ public class JifExceptionChecker extends ExceptionChecker {
 
 			//XXX: calling all of these visitors explicitly seems like a hack.
 			// Is there a better option?
-			
+        	//Initialize types
+        	TypeBuilder tb = new TypeBuilder(job, ts, nf);
+        	tb = (TypeBuilder) tb.begin();
+           	nNew = nNew.visit(tb);
+           	tb.finish(nNew);
+           	
         	//Disambiguate 
         	AmbiguityRemover ar = new AmbiguityRemover(job, ts, nf, true, true);
         	ar = (AmbiguityRemover) ar.begin();
         	ar = (AmbiguityRemover) ar.context(ar.context().pushClass(ct, ct));
         	nNew = nNew.visit(ar);
-
+        	ar.finish(nNew);
+        	
         	//TypeCheck 
         	JifTypeChecker tc = new JifTypeChecker(job, ts, nf);
 			tc = (JifTypeChecker) tc.begin();
@@ -121,15 +131,19 @@ public class JifExceptionChecker extends ExceptionChecker {
 	        	String s = UniqueID.newID("exc");
 	        	for(Iterator it = fatalExcs.iterator();it.hasNext();) {
 	        		qqStr += "catch (%T %s) { throw new %T(%s); }";
-		        	qqSubs.add(it.next());
+	        		JifTypeSystem jifts = ((JifTypeSystem) ts);
+	        		Type exType = (Type) it.next();
+	        		
+	        		if(exType instanceof LabeledType)
+	        			exType = ((LabeledType) exType).labelPart(jifts.topLabel());
+	        		else 
+	        			exType = jifts.labeledType(pos, exType, jifts.topLabel());
+		        	qqSubs.add(exType);
 		        	qqSubs.add(s);
 		        	qqSubs.add(ts.Error());
 		        	qqSubs.add(s);
 	        	}
 	        	Stmt stmt = qq.parseStmt("{"+qqStr+"}", qqSubs);
-	        	//Initialize types
-	        	TypeBuilder tb = new TypeBuilder(job, ts, nf);
-	        	stmt = (Stmt) stmt.visit(tb);
 	        	recheck = true;
 	        	return stmt;
         	}
@@ -174,6 +188,9 @@ public class JifExceptionChecker extends ExceptionChecker {
                     exceptionCaught = true;
                 }
                 ec = (JifExceptionChecker) ec.pop();
+           }
+            if (! exceptionCaught && !((JifTypeSystem) ts).promoteToFatal(t)) {
+                reportUncaughtException(t, pos);
             }
         }
     }
