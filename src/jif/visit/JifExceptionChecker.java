@@ -1,19 +1,31 @@
 package jif.visit;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import jif.types.JifContext;
+import jif.types.JifContext_c;
 import jif.types.JifTypeSystem;
 import jif.types.LabeledType;
 
+import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.CodeDecl;
+import polyglot.ast.Expr;
+import polyglot.ast.Formal;
+import polyglot.ast.Local;
+import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Stmt;
 import polyglot.ast.Try;
+import polyglot.ast.TypeNode;
 import polyglot.frontend.Job;
 import polyglot.qq.QQ;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.Flags;
 import polyglot.types.ParsedClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -24,6 +36,7 @@ import polyglot.util.Position;
 import polyglot.util.SubtypeSet;
 import polyglot.util.UniqueID;
 import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.ContextVisitor;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeBuilder;
@@ -65,41 +78,8 @@ public class JifExceptionChecker extends ExceptionChecker {
                 throw new InternalCompilerError("oops!");
             }
         }
-        Node nNew = n.del().exceptionCheck(inner);
-
-        if(nNew instanceof CodeDecl && inner.recheck) {
-			ParsedClassType ct = (ParsedClassType) ((CodeDecl)nNew).memberInstance().container();
-
-			//XXX: calling all of these visitors explicitly seems like a hack.
-			// Is there a better option?
-        	//Initialize types
-        	TypeBuilder tb = new TypeBuilder(job, ts, nf);
-        	tb = (TypeBuilder) tb.begin();
-           	nNew = nNew.visit(tb);
-           	tb.finish(nNew);
-           	
-        	//Disambiguate 
-        	AmbiguityRemover ar = new AmbiguityRemover(job, ts, nf, true, true);
-        	ar = (AmbiguityRemover) ar.begin();
-        	ar = (AmbiguityRemover) ar.context(ar.context().pushClass(ct, ct));
-        	nNew = nNew.visit(ar);
-        	ar.finish(nNew);
-        	
-        	//TypeCheck 
-        	JifTypeChecker tc = new JifTypeChecker(job, ts, nf);
-			tc = (JifTypeChecker) tc.begin();
-        	//set the scope correctly
-			tc = (JifTypeChecker) tc.context(tc.context().pushClass(ct,ct));
-			nNew = nNew.visit(tc);
-        	tc.finish(nNew);
-        	
-        	//NotNullChecker 
-        	NotNullChecker nnc = new NotNullChecker(job, ts, nf);
-        	nnc = (NotNullChecker) nnc.begin();
-        	nNew = nNew.visit(nnc);
-        	nnc.finish(nNew);
-        }
-        else if(parent instanceof CodeDecl && throwsSet.size() > 0) {
+        
+        if(parent instanceof CodeDecl && throwsSet.size() > 0) {
         	//XXX: this is probably redundant.  It seems like we should be 
         	// able to use throwsSet directly, but I must not 
         	// understand how things are added in relation to catchable
@@ -126,11 +106,11 @@ public class JifExceptionChecker extends ExceptionChecker {
 								+ fatalExcs);
 	        	String qqStr = "try { %S } ";
 	        	List qqSubs = new LinkedList();
-	        	qqSubs.add(nNew);
+	        	qqSubs.add(n);
 	        	Position pos = Position.compilerGenerated();
 	        	String s = UniqueID.newID("exc");
 	        	for(Iterator it = fatalExcs.iterator();it.hasNext();) {
-	        		qqStr += "catch (%T %s) { throw new %T(%s); }";
+	        		qqStr += "catch (%F) { throw %E; }";
 	        		JifTypeSystem jifts = ((JifTypeSystem) ts);
 	        		Type exType = (Type) it.next();
 	        		
@@ -138,18 +118,28 @@ public class JifExceptionChecker extends ExceptionChecker {
 	        			exType = ((LabeledType) exType).labelPart(jifts.topLabel());
 	        		else 
 	        			exType = jifts.labeledType(pos, exType, jifts.topLabel());
-		        	qqSubs.add(exType);
-		        	qqSubs.add(s);
-		        	qqSubs.add(ts.Error());
-		        	qqSubs.add(s);
+		        	
+	        		CanonicalTypeNode exTypeNode = nf.CanonicalTypeNode(pos, exType);
+		        	Formal exc = nf.Formal(pos, Flags.NONE, exTypeNode, nf.Id(pos, s));
+		        	exc = exc.localInstance(ts.localInstance(pos, Flags.NONE, exType, s));
+		        	qqSubs.add(exc);
+
+		        	Local loc = nf.Local(pos, nf.Id(pos, s));
+		        	loc = loc.localInstance(ts.localInstance(pos, Flags.NONE, exType, s));
+		        	List args = new LinkedList<Expr>();
+		        	args.add(loc);
+		        	
+		        	New newExc = nf.New(pos, nf.CanonicalTypeNode(pos, ts.Error()), args);
+		        	ConstructorInstance ci = ts.findConstructor(ts.Error(), 
+		        			Collections.EMPTY_LIST, ts.Error());
+		        	newExc = newExc.constructorInstance(ci);
+		        	qqSubs.add(newExc);
 	        	}
 	        	Stmt stmt = qq.parseStmt("{"+qqStr+"}", qqSubs);
-	        	recheck = true;
 	        	return stmt;
         	}
         }
-        // gather exceptions from this node.
-        return nNew;
+        return n;
     }
 
 	/**
