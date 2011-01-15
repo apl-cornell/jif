@@ -1,13 +1,19 @@
 package jif.parse;
 
 import java.io.*;
+
+import jif.types.CodeSource;
+import jif.types.principal.Principal;
 import polyglot.frontend.FileSource;
 
-public class UTF8FileSource extends FileSource {
-    public UTF8FileSource(File f, boolean userSpecified)
+public class UTF8FileSource extends FileSource implements CodeSource {
+    protected Principal provider;
+
+	public UTF8FileSource(File f, boolean userSpecified, Principal provider)
 	throws IOException 
     {
 	super(f, userSpecified);
+	this.provider = provider;
     }
 
     protected Reader createReader(InputStream str) {
@@ -19,4 +25,9 @@ public class UTF8FileSource extends FileSource {
 	return null;
       }
     }
+
+	@Override
+	public Principal provider() {
+		return provider;
+	}
 }

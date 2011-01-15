@@ -1,14 +1,17 @@
 package jif;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import jif.ast.JifNodeFactory;
 import jif.ast.JifNodeFactory_c;
 import jif.types.JifTypeSystem;
 import jif.types.JifTypeSystem_c;
+import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
@@ -21,6 +24,7 @@ import polyglot.types.SourceClassResolver;
 import polyglot.types.TypeSystem;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** The configuration information of the Jif extension.
  *
@@ -139,6 +143,23 @@ public class ExtensionInfo extends JLExtensionInfo
 
     public FileSource createFileSource(java.io.File f, boolean user) throws IOException
     {
-        return new jif.parse.UTF8FileSource(f, user);
+    	JifTypeSystem jifts = (JifTypeSystem) ts;
+    	if(jifts.isInitialized()) {
+    		Principal provider = jifts.providerForFile(f);
+    		return new jif.parse.UTF8FileSource(f, user, provider);
+    	}
+    	else {
+    		Map<File, String> pp = getJifOptions().providerPaths;
+    		File s = f;
+    		if(pp != null)
+        		while(s != null && !pp.containsKey(s)) {
+        			s = s.getParentFile();
+        		}
+        		if(s!=null)
+        			throw new InternalCompilerError(f + " is required to initialize the type system" +
+        					" and so must have provider TOP.");
+        	
+    		return new jif.parse.UTF8FileSource(f, user, jifts.topPrincipal(Position.compilerGenerated("init")));
+    	}
     }
 }

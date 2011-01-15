@@ -1,6 +1,8 @@
 package jif.types;
 
+import java.io.File;
 import java.util.*;
+import java.util.Map.Entry;
 
 import jif.JifOptions;
 import jif.extension.LabelTypeCheckUtil;
@@ -31,6 +33,11 @@ public class JifTypeSystem_c
     private final LabelEnv emptyLabelEnv = this.createEmptyLabelEnv();
 
     private final DefaultSignature ds;
+
+	protected boolean initialized;
+    protected Principal DEFAULT_PROVIDER = null;
+
+	protected Map<File,Principal> providerMap;
     
     public JifTypeSystem_c(TypeSystem jlts) {
         this.jlts = jlts;
@@ -68,10 +75,38 @@ public class JifTypeSystem_c
         PRINCIPAL_ = new PrimitiveType_c(this, PRINCIPAL_KIND);
         LABEL_ = new PrimitiveType_c(this, LABEL_KIND);
 		JifOptions opt = (JifOptions) extInfo.getOptions();
-		if (opt.authority_limit != null)
-			AUTH_LIMIT = resolveLimitAuthorityPrincipal(opt.authority_limit);
+		if (opt.defaultProvider != null)
+			DEFAULT_PROVIDER = resolveProviderPrincipal(opt.defaultProvider);
+		else
+			DEFAULT_PROVIDER = topPrincipal(Position.compilerGenerated("default provider"));
+		
+		if(opt.providerPaths != null) {
+			providerMap = new LinkedHashMap<File, Principal>();
+			for(Entry<File, String> entry : opt.providerPaths.entrySet()) {
+				Principal p = resolveProviderPrincipal(entry.getValue());
+				providerMap.put(entry.getKey(), p);
+			}
+		}
+		this.initialized = true;
+    }
+    public boolean isInitialized() {
+    	return initialized;
+    }
+    public Principal providerForFile(File s) {
+    	if(providerMap == null)
+    		return DEFAULT_PROVIDER;
+    	else {
+    		while(s != null && !providerMap.containsKey(s)) {
+    			s = s.getParentFile();
+    		}
+    		if(s==null)
+    			return DEFAULT_PROVIDER;
+    		else
+    			return providerMap.get(s);
+    	}
     }
 
+    
     public UnknownType unknownType(Position pos) {
         UnknownType t = super.unknownType(pos);
         return t;
@@ -94,7 +129,6 @@ public class JifTypeSystem_c
     protected PrimitiveType PRINCIPAL_;
     protected PrimitiveType LABEL_;
     protected Type PRINCIPAL_CLASS_ = null;
-    protected Principal AUTH_LIMIT = null;
 
     public String PrincipalClassName() { return "jif.lang.Principal"; }
     
@@ -127,7 +161,7 @@ public class JifTypeSystem_c
     }
 
     public Context createContext() {
-    	return new JifContext_c(this, jlts, AUTH_LIMIT);
+    	return new JifContext_c(this, jlts);
     }
     
     public ConstArrayType constArrayOf(Type type) {
@@ -721,6 +755,10 @@ public class JifTypeSystem_c
     public BottomPrincipal bottomPrincipal(Position pos) {
         return new BottomPrincipal_c(this, pos);
     }
+	public Principal providerPrincipal(Position position,
+			Principal p) {
+		return p.isProviderPrincipal(true);
+	}
     public Principal conjunctivePrincipal(Position pos, Principal l, Principal r) {
         return conjunctivePrincipal(pos, CollectionUtil.list(l, r));
     }
@@ -1432,7 +1470,7 @@ public class JifTypeSystem_c
         return ltcu;
     }
 	
-	public Principal resolveLimitAuthorityPrincipal(String name) throws SemanticException {
+	public Principal resolveProviderPrincipal(String name) throws SemanticException {
         ClassType principal;
 
         try {
@@ -1459,4 +1497,5 @@ public class JifTypeSystem_c
          
         throw new SemanticException(name + " is not a principal.");
 	}
+
 }

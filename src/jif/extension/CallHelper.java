@@ -509,7 +509,7 @@ public class CallHelper {
         constrainFinalActualArgs(ts);
         lc = lc.context((JifContext)lc.context().pushBlock());        
         lc.context().setPc(Xjoin.N(), lc);
-
+        
         // A |- X_{maxj}[N] + entry_pc <= Li
         Label Li = resolvePCBound(lc);
         if (Li != null) {
@@ -630,8 +630,12 @@ public class CallHelper {
     throws SemanticException
     {
         JifContext A = lc.context();
-
-        for (Iterator i = jpi.constraints().iterator(); i.hasNext();) {
+        //Check method-level and class-level constraints 
+        List constraints = new LinkedList(jpi.constraints());
+        if(jpi.container() instanceof JifClassType) 
+            constraints.addAll(((JifClassType) jpi.container()).constraints());        	
+        
+        for (Iterator i = constraints.iterator(); i.hasNext();) {
             Assertion jc = (Assertion)i.next();
 
             if (jc instanceof AuthConstraint || jc instanceof AutoEndorseConstraint) {
@@ -643,7 +647,7 @@ public class CallHelper {
                 
                 // construct a principal representing the authority of the context
                 Principal authPrincipal = lc.jifTypeSystem().conjunctivePrincipal(jpi.position(), A.authority());
-                
+
                 // Check the authority
                 for (Iterator i2 = jcc.principals().iterator(); i2.hasNext();) {
                     Principal orig = (Principal)i2.next();
@@ -976,7 +980,7 @@ public class CallHelper {
 
         // add the "where caller" authority of the superclass only
         Set newAuth = new LinkedHashSet();
-        JifProcedureDeclExt_c.addCallers(overridden, newlc.context(), newAuth);
+        JifProcedureDeclExt_c.addCallers(overridden, newlc, newAuth);
         A.setAuthority(instantiate(A, newAuth));       
 
         // add the where constraints of the superclass only.

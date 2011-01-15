@@ -7,6 +7,7 @@ import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.AccessPath;
 import jif.types.label.Label;
+import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Branch;
@@ -197,12 +198,6 @@ public interface JifContext extends Context {
      */
     void addCheckedEndorse(LocalInstance li, Label downgradeTo);
 
-	boolean isAuthLimited();
-
-	Principal authLimit();
-
-	Principal limitPrincipal(Principal p);
-
-	Set limitPrincipals(Collection ps);
-    
+	Principal provider();
+    void setProvider(Principal provider);
 }

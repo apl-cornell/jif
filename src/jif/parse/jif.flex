@@ -117,6 +117,8 @@ import java.math.BigInteger;
         keywords.put("principal",     new Integer(sym.PRINCIPAL));
         keywords.put("where",         new Integer(sym.WHERE));
         keywords.put("meet",          new Integer(sym.MEET));
+        
+        keywords.put("provider",     new Integer(sym.PROVIDER));        
     }
 
     public String file() {

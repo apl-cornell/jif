@@ -69,6 +69,8 @@ public interface Principal extends Param {
     
     boolean isTopPrincipal();
     boolean isBottomPrincipal();
+    boolean isProviderPrincipal();
+    Principal isProviderPrincipal(boolean isProvider); 
 
     /**
      * Simplify the label, using the actsfor relation if needed

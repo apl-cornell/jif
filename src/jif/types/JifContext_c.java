@@ -8,6 +8,7 @@ import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.AccessPath;
 import jif.types.label.Label;
 import jif.types.label.PairLabel;
+import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
@@ -48,14 +49,13 @@ public class JifContext_c extends Context_c implements JifContext
     /**
      * Limit authority of classes and code in this context.
      */
-	protected Principal authLimit;
+	protected Principal provider;
 
-    protected JifContext_c(JifTypeSystem ts, TypeSystem jlts, Principal authLimit) {
+    protected JifContext_c(JifTypeSystem ts, TypeSystem jlts) {
         super(ts);
         this.jlts = jlts;
         this.jifts = ts;
         this.env = (LabelEnv_c)ts.createLabelEnv();
-        this.authLimit = authLimit;
     }
 
     public Object copy() {
@@ -66,7 +66,7 @@ public class JifContext_c extends Context_c implements JifContext
         if (gotos != null) {
             ctxt.gotos = new HashMap(gotos);
         }
-        ctxt.authLimit = authLimit;
+        ctxt.provider = provider;
         return ctxt;        
     }
 
@@ -284,17 +284,7 @@ public class JifContext_c extends Context_c implements JifContext
 
     public Set authority() { return auth; }
     public void setAuthority(Set auth) {
-    	if(authLimit != null) {
-			// Attenuate authority by creating a disjunctive
-			//   principal between the declared authority 
-			//   and the authority limit.
-			JifTypeSystem jifts = (JifTypeSystem) ts;
-			Principal p = jifts.conjunctivePrincipal(null, auth);
-			p = jifts.disjunctivePrincipal(null, authLimit, p);
-			this.auth = Collections.singleton(p);
-    	}
-    	else
-    		this.auth = auth; 
+    	this.auth = auth; 
     }
 
     public PrincipalHierarchy ph() { return env.ph(); }
@@ -423,25 +413,12 @@ public class JifContext_c extends Context_c implements JifContext
     }
     
 	@Override
-	public Principal authLimit() {
-		return authLimit;
+	public Principal provider() {
+		return provider;
 	}
-	
+
 	@Override
-	public boolean isAuthLimited() {
-		return authLimit != null;
-	}
-	
-	@Override
-	public Principal limitPrincipal(Principal p) {
-		return jifts.disjunctivePrincipal(null, authLimit, p);
-	}
-	
-	@Override
-	public Set limitPrincipals(Collection ps) {
-    	Principal p = jifts.conjunctivePrincipal(null, ps);
-		if(authLimit != null) 
-	    	p = jifts.disjunctivePrincipal(null, authLimit, p);
-    	return Collections.singleton(p);
+	public void setProvider(Principal provider) {
+		this.provider = provider;
 	}
 }

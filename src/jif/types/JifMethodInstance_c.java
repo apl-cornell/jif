@@ -6,12 +6,14 @@ import java.util.List;
 
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
+import jif.types.principal.Principal;
 import polyglot.main.Report;
 import polyglot.types.Flags;
 import polyglot.types.MethodInstance_c;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.TypedList;
 
@@ -273,4 +275,10 @@ public class JifMethodInstance_c extends MethodInstance_c
        return sb.toString();
 
     }
+
+	@Override
+	public Principal provider() {
+		JifClassType jct = (JifClassType) container;
+		return jct.provider();
+	}
 }

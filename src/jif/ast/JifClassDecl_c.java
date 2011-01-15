@@ -2,6 +2,7 @@ package jif.ast;
 
 import java.util.*;
 
+import jif.types.ActsForConstraint;
 import jif.types.JifContext;
 import jif.types.JifParsedPolyType;
 import jif.types.JifTypeSystem;
@@ -19,13 +20,25 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 {
     protected List params;
     protected List authority;
+    protected List constraints;
 
     public JifClassDecl_c(Position pos, Flags flags, Id name,
             List params, TypeNode superClass, List interfaces,
-            List authority, ClassBody body) {
+            List authority, List constraints, ClassBody body) {
         super(pos, flags, name, superClass, interfaces, body);
         this.params = TypedList.copyAndCheck(params, ParamDecl.class, true);
         this.authority = TypedList.copyAndCheck(authority, PrincipalNode.class, true);
+        this.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
+    }
+    @Override
+    public List constraints() {
+        return this.constraints;
+    }
+    @Override
+    public JifClassDecl constraints(List constraints) {
+        JifClassDecl_c n = (JifClassDecl_c) copy();
+        n.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
+        return n;
     }
 
     public List params() {
@@ -48,11 +61,13 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         return n;
     }
 
-    protected JifClassDecl_c reconstruct(Id name, List params, TypeNode superClass, List interfaces, List authority, ClassBody body) {
-        if (! CollectionUtil.equals(params, this.params) || ! CollectionUtil.equals(authority, this.authority)) {
+    protected JifClassDecl_c reconstruct(Id name, List params, TypeNode superClass, List interfaces, List authority, List constraints, ClassBody body) {
+        if (! CollectionUtil.equals(params, this.params) || ! CollectionUtil.equals(authority, this.authority)
+        		|| ! CollectionUtil.equals(params, this.constraints)) {
             JifClassDecl_c n = (JifClassDecl_c) copy();
             n.params = TypedList.copyAndCheck(params, ParamDecl.class, true);
             n.authority = TypedList.copyAndCheck(authority, PrincipalNode.class, true);
+            n.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
             return (JifClassDecl_c) n.reconstruct(name, superClass, interfaces, body);
         }
 
@@ -65,13 +80,15 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
         List interfaces = visitList(this.interfaces, v);
         List authority = visitList(this.authority, v);
+        List constraints = visitList(this.constraints, v);
         ClassBody body = (ClassBody) visitChild(this.body, v);
-        return reconstruct(name, params, superClass, interfaces, authority, body);
+        return reconstruct(name, params, superClass, interfaces, authority, constraints, body);
     }
 
     public Context enterScope(Context c) {
         JifContext A = (JifContext) c;
-        return addParamsToContext(A);
+        A = addParamsToContext(A);
+        return addConstraintsToContext(A);
     }
     public Context enterChildScope(Node child, Context c) {
         if (child == this.body) {
@@ -82,6 +99,15 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             return addAuthorityToContext(A);
         }
         return super.enterChildScope(child, c);
+    }
+
+    public JifContext addConstraintsToContext(JifContext A) {
+        JifParsedPolyType ct = (JifParsedPolyType) this.type;
+        for (Iterator i = ct.constraints().iterator(); i.hasNext(); ) {
+        	ActsForConstraint pi = (ActsForConstraint) i.next();
+            A.addActsFor(pi.actor(), pi.granter());
+        }
+        return A;
     }
 
     public  JifContext addParamsToContext(JifContext A) {
@@ -155,6 +181,19 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             principals.add(p.principal());
         }
         ct.setAuthority(principals);
+        
+        List constraints = new ArrayList(n.constraints().size());
+        for (Iterator i = n.constraints().iterator(); i.hasNext(); ) {
+            ConstraintNode cn = (ConstraintNode) i.next();
+            if (!cn.isDisambiguated()) {
+                // constraint nodes haven't been disambiguated yet.
+                ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                return this;
+            }
+            constraints.addAll(cn.constraints());
+        }
+        ct.setConstraints(constraints);
+
         return n;
     }
 

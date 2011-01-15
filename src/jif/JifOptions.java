@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import polyglot.main.Options;
@@ -46,9 +48,13 @@ public class JifOptions extends Options {
      public List addSigcp = new ArrayList();
 
      /**
-      * Limit the authority of code to a certain principal's authority.
+      * The principal for paths not present in providerPaths.
       */
-     public String authority_limit = null;
+     public String defaultProvider = null;
+     /**
+      * Associate source paths with a principal that provided the code.
+      */
+     public Map<File,String> providerPaths = null;
 
     /**
      * Constructor
@@ -110,10 +116,20 @@ public class JifOptions extends Options {
             Report.addTopic("debug", level);
             index++;
         }
-        else if (args[index].equals("-limit")) {
+        else if (args[index].equals("-provider")) {
             index++;
-            this.authority_limit = args[index++];
+            this.defaultProvider = args[index++];
         }
+        else if (args[index].equals("-addProviderPath")) {
+            index++;
+            if(this.providerPaths == null) {
+            	this.providerPaths = new LinkedHashMap<File, String>();
+            }   
+            String[] s = args[index++].split(":");
+            File path = new File(s[0]);
+            this.providerPaths.put(path,s[1]);
+        }
+
 
         else {
             int i = super.parseCommand(args, index, source);
@@ -135,7 +151,8 @@ public class JifOptions extends Options {
         usageForFlag(out, "-globalsolve", "infer label variables globally (default: per class)");
         usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");
         usageForFlag(out, "-addsigcp <path>", "additional path for Jif signatures; prepended to sigcp");
-        usageForFlag(out, "-limit <top principal>", "limit the authority of compiled code");
+        usageForFlag(out, "-provider <principal>", "principal of the default code provider");
+        usageForFlag(out, "-addProviderPath <path:principal>", "associate a code provider with a path");
 
     }
 
