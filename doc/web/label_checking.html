@@ -1,7 +1,7 @@
 <html>
-
 <head>
 <link rel=StyleSheet href="jifdoc.css" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Label checking</title>
 </head>
 
@@ -122,10 +122,10 @@ contained in the label environment at that point, this constraint does
 indeed hold.
 </p>
 <div class="code"><pre>
-int{Alice: Bob} x;
-int{Alice: Chuck} y;
+int{Alice→Bob} x;
+int{Alice→Chuck} y;
 if (Bob actsfor Chuck) {
-    x = y; <span class="comment">// OK, since {Alice: Chuck} &#8849; {Alice: Bob} is</span>
+    x = y; <span class="comment">// OK, since {Alice→Chuck} &#8849; {Alice→Bob} is</span>
            <span class="comment">// deducible from the label environment at this point</span>
 }
 </pre></div>
@@ -380,7 +380,7 @@ class <Code>C</code>.</p>
 <div class="code"><pre>
 class C[principal P] {
     label{} lbl;
-    int{P: Alice; *this.lbl} foo;
+    int{P→Alice; *this.lbl} foo;
 }
 
 ...
@@ -392,9 +392,9 @@ int x = c.foo;
 <p class="cont">
 When the field <code>foo</code> is accessed in the field access
 <code>c.foo</code>, the label of the field <code>foo</code> is
-<code>{Bob: Alice; *c.lbl}</code>. Thus, the normal value label of the
+<code>{Bob→Alice; *c.lbl}</code>. Thus, the normal value label of the
 field access is join of the normal value label of <code>c</code> and
-<code>{Bob: Alice; *c.lbl}</code>.
+<code>{Bob→Alice; *c.lbl}</code>.
 </p>
 
 
@@ -655,23 +655,23 @@ class="math">L</i> &#8849; <i class="math">L'</i>.</p>
 <p>Consider the following example.</p>
 <div class="code"><pre>
 class C[covariant label L, label M] { } 
-class D[covariant label L] extends C[L, {Alice:}] { }
+class D[covariant label L] extends C[L, {Alice→}] { }
 </pre></div>
 <ul class="ulpara">
-<li> <code>C[{Bob:Chuck}, {Dave:}]</code> is a subtype of
-<code>C[{Bob:}, {Dave:}]</code>
+<li> <code>C[{Bob→Chuck}, {Dave→}]</code> is a subtype of
+<code>C[{Bob→}, {Dave→}]</code>
 
-<li> <code>C[{Bob:}, {Dave:Chuck}]</code> is <b>not</b> a subtype of
-<code>C[{Bob:}, {Dave:}]</code>
+<li> <code>C[{Bob→}, {Dave→Chuck}]</code> is <b>not</b> a subtype of
+<code>C[{Bob→}, {Dave→}]</code>
 
-<li> <code>C[{Bob:}, {Dave:}]</code> is <b>not</b> a subtype of
-<code>C[{Bob:Chuck}, {Dave:}]</code>
+<li> <code>C[{Bob→}, {Dave→}]</code> is <b>not</b> a subtype of
+<code>C[{Bob→Chuck}, {Dave→}]</code>
 
-<li> <code>D[{Bob:Chuck,Dave}]</code> is a subtype of
-<code>C[{Bob:Chuck}, {Alice:}]</code>
+<li> <code>D[{Bob→Chuck,Dave}]</code> is a subtype of
+<code>C[{Bob→Chuck}, {Alice→}]</code>
 
-<li> <code>D[lbl]</code> is a subtype of <code>C[{Bob:Chuck},
-{Alice:}]</code> if it can be shown that <code>lbl &#8849; {Bob:Chuck}</code>.
+<li> <code>D[lbl]</code> is a subtype of <code>C[{Bob→Chuck},
+{Alice→}]</code> if it can be shown that <code>lbl &#8849; {Bob→Chuck}</code>.
 </ul>
 
 <p>If the class <code>C</code> has a principal parameter as
@@ -972,7 +972,7 @@ the <code>instanceof</code> operator, and checked run-time type casts.</p>
 <p>Jif places some restrictions on the comparison type <code>T</code>
 that may occur in <code>e instanceof T</code> expressions , and casts
 <code>(T)e</code>. The comparison type <code>T</code> cannot be a
-labeled type, such as <code>Foo{Alice:}</code>, but may be a
+labeled type, such as <code>Foo{Alice→}</code>, but may be a
 parameterized class, for example, <code>Bar[Alice,
 this.lbl]</code>. The type <code>T</code> cannot be an array
 type. (This is because Jif cannot represent at runtime the label of
@@ -1047,7 +1047,7 @@ class="math">e</i><sub>2</sub>.
 <h2><a name="label-exprs">Label expressions</a></h2>
 
 <p>Label expressions are explicit run-time representations of labels,
-such as <code>new label {Alice:Bob; *!:*}</code>. In general, a label
+such as <code>new label {Alice→Bob; *←*}</code>. In general, a label
 expression may contain any run-time representable label, such as a
 dynamic label, a label parameter, or an integrity or confidentiality
 policy consisting of runtime representable principals. Label checking
@@ -1588,13 +1588,13 @@ clauses of <code>C.m</code>, but this is not true for the method
 <div class="code"><pre>
 abstract class C {
     abstract void m(label lbl, principal pr) 
-        where lbl &lt;= {Alice: pr}, 
+        where lbl &lt;= {Alice→pr}, 
               Bob actsfor pr, 
               pr actsfor Chuck;
 }
 class D extends C {
     void m(label lbl, principal pr) 
-        where lbl &lt;= {Alice: Bob}, Bob actsfor Chuck
+        where lbl &lt;= {Alice→Bob}, Bob actsfor Chuck
         <span class="comment">// These where clauses are implied by</span>
         <span class="comment">// the where clauses for C.m</span>
     {
@@ -1603,7 +1603,7 @@ class D extends C {
 }
 class E extends C {
     void m(label lbl, principal pr) 
-        where lbl &lt;= {pr: }, Alice actsfor Bob
+        where lbl &lt;= {pr-&gt;}, Alice actsfor Bob
         <span class="comment">// These where clauses are NOT implied by</span>
         <span class="comment">// the where clauses for C.m</span>
     {
@@ -1663,12 +1663,12 @@ the receiver of the method call. The example below demonstrates this.</p>
 <div class="code"><pre>
 int{*foo.lbl; x; p&lt;-*} m{*this.bound}(C foo, 
                                       principal p, 
-                                      int{p:} x) { ... }
+                                      int{p→} x) { ... }
 ...
 a.b.m(bar, Alice, y);
 <span class="comment">// after substitution, the begin-label is {*a.b.bound}, </span>
 <span class="comment">//    the return value label is {*bar.lbl; y; Alice&lt;-*}, </span>
-<span class="comment">//    and the label of the 3rd argument is {Alice:}</span>
+<span class="comment">//    and the label of the 3rd argument is {Alice→}</span>
 </pre></div>
 
 <p class="cont">For the remainder of this section, we

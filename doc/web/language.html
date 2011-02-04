@@ -87,18 +87,18 @@ the value can be used.
 Any type expression <i class="math">t</i>
 may be labeled with any label expression <i class="math">l</i>.
 This labeled type expression is written <code><i class="math">t</i>{<i class="math">l</i>}</code>; for example, the
-labeled type <code>int{p:}</code>
+labeled type <code>int{p→}</code>
 represents an integer that principal <code>p</code> owns
 and that only <code>p</code> can read.
-For example, a variable may be declared with this labeled type: 
+A variable may be declared with this labeled type: 
 <div class="code"><pre>
-int{p:} x = 2;
+int{p→} x = 2;
 </pre></div>
 </p>
 
 <p>
-This labeled type may also be written as <code>{p→}</code> or
-<code>{p-&gt;}</code>. The syntax of labels is described earlier (see <a
+This labeled type may also be written as <code>int{p-&gt;}</code> or
+<code>int{p:}</code>. The syntax of labels is described earlier (see <a
 class="secref" href="dlm.html#dlm_syntax">Label syntax in Jif</a>).
 </p>
 
@@ -126,10 +126,10 @@ the label of the result is the union of the policies
 in the labels of the inputs. This union is the
 <em>join</em> or <em>least upper bound</em>
 of the input labels. For example, if the label of
-<code>x</code> is <code>{p:q}</code> and the label of
-<code>y</code> is <code>{a:b; p:q,r}</code>, the
-label of the result is <code>{p:q; a:b; p:q,r}</code>,
-which is equivalent to <code>{p:q; a:b}</code>.
+<code>x</code> is <code>{p→q}</code> and the label of
+<code>y</code> is <code>{a→b; p→q,r}</code>, the
+label of the result is <code>{p→q; a→b; p→q,r}</code>,
+which is equivalent to <code>{p→q; a→b}</code>.
 </p>
 <p>
 In a program, a policy component of a label
@@ -140,7 +140,7 @@ that <code>a</code> is a variable and hence has a labeled type.
 The label expression <code>{a}</code> contains a single component expression;
 this label means that value it labels should be as restricted as the
 contents of <code>a</code> are. The more complex
-label expression <code>{a; o: r}</code> contains two policy components,
+label expression <code>{a; o→r}</code> contains two policy components,
 indicating
 that the labeled value should be as restricted as <code>a</code> is, and also that
 the principal <code>o</code> restricts the value to be read by at most
@@ -413,11 +413,11 @@ labels of actual arguments.
 </li>
 
 
-<li> Default method begin-label: the top label, <code>{*:}</code>
+<li> Default method begin-label: the top label, <code>{*→}</code>
 <br>
 The method begin-label is an upper bound on the <u>pc</u> of the caller, and
 a lower bound on the side effects of the method.  The default method begin
-label is <code>{*:}</code>, the most restrictive label, meaning
+label is <code>{*→}</code>, the most restrictive label, meaning
 that the method has no side effects.
 </li>
 
@@ -607,13 +607,13 @@ integrity. Again, it is possible to omit the label
 this form is deprecated. For example, the following is an example of
 a <code>declassify</code> statement.
 <div class="code"><pre>
-int{Alice:;Alice&larr;*} b;
-int{Alice:Bob;Alice&larr;*} y = 0;
+int{Alice→;Alice&larr;*} b;
+int{Alice→Bob;Alice&larr;*} y = 0;
 if (b) {
-    <span class="comment">// pc is at level {Alice:;Alice&larr;*} at this point.</span>
-    declassify ({Alice:;Alice&larr;*} to {y}) {
+    <span class="comment">// pc is at level {Alice→;Alice&larr;*} at this point.</span>
+    declassify ({Alice→;Alice&larr;*} to {y}) {
         <span class="comment">// at this point, pc has been declassified to the label of the local </span>
-        <span class="comment">// variable y (that is,  {Alice:Bob;Alice&larr;*} ) permitting the </span>
+        <span class="comment">// variable y (that is,  {Alice→Bob;Alice&larr;*} ) permitting the </span>
         <span class="comment">// assignment to y</span>
         y = 1;
     }
@@ -773,32 +773,31 @@ signature, the method <code>m</code> returns a <code>String</code> whose
 label is the same as the label of the argument <code>a</code>.
 
 <div class="code"><pre>
-String{a} m(int{Alice: ; Bob:} a);
+String{a} m(int{Alice→; Bob→} a);
 </pre></div>
 
 <p>The label on the declaration of the argument <code>a</code> is
-<code>{Alice: ; Bob:}</code>. This means that the label of any actual
+<code>{Alice→; Bob→}</code>. This means that the label of any actual
 argument given to <code>m</code> can be <i>at most</i> as restrictive
-as <code>{Alice: ; Bob:}</code>, that is, <code>{Alice: ; Bob:}</code> is an
+as <code>{Alice→; Bob→}</code>, that is, <code>{Alice→; Bob→}</code> is an
 upper bound on the label of any actual argument to <code>m</code>. The
 following code that calls the method <code>m</code> compiles
 successfully.
 <div class="code"><pre>
-int{Alice: Chuck} i = 42;
-String{Alice: Chuck} s = m(i);
+int{Alice→Chuck} i = 42;
+String{Alice→Chuck} s = m(i);
     <span class="comment">// OK: m returns a String with the same label as i</span>
 </pre></div>
  
 
 <p>In the body of the method <code>m</code>, all that is known about
-the label of the formal argument <code>a</code> is that <code>{Alice:
-; Bob:}</code> is an upper bound for it. Thus, the first line of the method body below is illegal, while the second is legal.
+the label of the formal argument <code>a</code> is that <code>{Alice→; Bob→}</code> is an upper bound for it. Thus, the first line of the method body below is illegal, while the second is legal.
 
 <div class="code"><pre>
-String{a} m(int{Alice: ; Bob:} a) {
-    int{Alice:} i = a; <span class="comment">// ILLEGAL!  Don't know </span>
-                       <span class="comment">//    that {a} &#8849; {Alice:}</span>
-    int{Alice: ; Bob: ; Chuck: } j = a; <span class="comment">// OK</span>
+String{a} m(int{Alice→; Bob→} a) {
+    int{Alice→} i = a; <span class="comment">// ILLEGAL!  Don't know </span>
+                       <span class="comment">//    that {a} &#8849; {Alice→}</span>
+    int{Alice→; Bob→; Chuck→} j = a; <span class="comment">// OK</span>
     ...
 }
 </pre></div>
@@ -810,11 +809,11 @@ representation of labels of the arguments. The following code
 that manipulates run-time labels is thus illegal.
 
 <div class="code"><pre>
-void foo(int{Bob:} a) {
-    label lb = new label {Alice: ; a};
+void foo(int{Bob→} a) {
+    label lb = new label {Alice→; a};
         <span class="comment">// ILLEGAL! Label of a is not runtime representable.</span>
 
-    if (new label {a} &lt;= new label {Bob: Chuck})
+    if (new label {a} &lt;= new label {Bob→Chuck})
         <span class="comment">// ILLEGAL! Label of a is not runtime representable.</span>
     { ... }
 }
@@ -884,7 +883,7 @@ example:
 
 <div class="code"><pre>
 class ParamCell[principal P, principal Q] {
-    int{P:Q; P&larr;Q} contents;
+    int{P→Q; P&larr;Q} contents;
     void m(principal x, principal y) where P actsfor x, Q actsfor y { ... }
 }
 </pre></div>
@@ -892,7 +891,7 @@ class ParamCell[principal P, principal Q] {
 <p> This class may be instantiated with any two principals
 <code>p</code> and <code>q</code>. For example, the instantiation
 <code>ParamCell[Bob,Amy]</code> has a field <code>contents</code> with
-the label <code>{Bob:Amy; Bob&larr;Amy}</code>, and method
+the label <code>{Bob→Amy; Bob&larr;Amy}</code>, and method
 <code>m</code> that requires that parameter principal <code>P</code>
 can act for runtime principal <code>x</code>, and parameter principal
 <code>Q</code> can act for runtime principal <code>y</code>.
@@ -916,7 +915,7 @@ parameters:
   cell.m(Alice, Bob); <span class="comment">// cell inferred to be of type ParamCell[Alice,Bob]</span>
 
   v.setElementAt(null, cell.contents); <span class="comment">// v inferred to be of </span>
-                                       <span class="comment">//   type Vector[{Alice:Bob}]</span>
+                                       <span class="comment">//   type Vector[{Alice→Bob}]</span>
 </pre></div>
 
 <p class="cont"> Parameters can always be supplied explicitly, which
@@ -1006,7 +1005,7 @@ class C[label L, principal P] {
     private final label{this} lb = L;      <span class="comment">// runtime use of L</span>
 
     private void m() {
-        label foo = new label {L; Alice:}; <span class="comment">// runtime use of L</span>
+        label foo = new label {L; Alice→}; <span class="comment">// runtime use of L</span>
         principal bar = P;                 <span class="comment">// runtime use of P</span>
     }
 }
@@ -1047,9 +1046,9 @@ class C[label L] { ... }
 ...
 
 void m() {
-    final label lb = new label {Alice: Bob; Alice&larr;*};
+    final label lb = new label {Alice→Bob; Alice&larr;*};
 
-    int{*lb; Bob:} x = 4;
+    int{*lb; Bob→} x = 4;
 
     C[lb] foo = null;
     C[{*lb}] bar = foo;
@@ -1059,9 +1058,9 @@ void m() {
 
 <p>Here we see a local variable <code>lb</code>, of type
 <code>label</code>. At runtime, this variable will contain a
-representation of the label <code>{Alice: Bob; Alice&larr;*}</code>. The type of the
-variable <code>x</code> is declared to be <code>int{*lb; Bob:}</code>,
-that is, an integer whose label the policy <code>{Bob:}</code> joined
+representation of the label <code>{Alice→Bob; Alice&larr;*}</code>. The type of the
+variable <code>x</code> is declared to be <code>int{*lb; Bob→}</code>,
+that is, an integer whose label the policy <code>{Bob→}</code> joined
 with the <i>value</i> stored in the variable <code>lb</code>. This is
 an example of a dynamic label being used in another label.
 
@@ -1093,9 +1092,9 @@ class C[label L, principal P] {
 
     void m(principal pp) throws NullPointerException {
         final C[next.lb, pp] foo = new C[this.next.lb, pp]();
-        C[{Alice: foo.q}, P] quux = null;
+        C[{Alice→foo.q}, P] quux = null;
 
-        int{foo.next.q: ; *this.lb} x = 8;        
+        int{foo.next.q→; *this.lb} x = 8;        
     }
 }
 </pre>
@@ -1125,30 +1124,30 @@ static method of a parameterized type.
 
 <p>In the following example, an <code>instanceof</code> check is
 performed against a parameterized type,
-<code>C[{this.f.p:}]</code>. The evaluation of this expression
+<code>C[{this.f.p→}]</code>. The evaluation of this expression
 requires the evaluation of the access path expression
 <code>this.f.p</code>, which may throw a
 <code>NullPointerException</code> if <code>this.f</code> is
 null. Thus, whether or not a <code>NullPointerException</code> is
 thrown may reveal information at level <code>{this;
-Alice:}</code> (which is the label of the expression <code>this.f</code>). 
+Alice→}</code> (which is the label of the expression <code>this.f</code>). 
 Thus, if the assignment to the local variable
 <code>x</code> occurs, information with the label <code>{this;
-Alice:}</code> is flowing, and thus the label of the variable
-<code>x</code> must be at least <code>{this; Alice:}</code>.
+Alice→}</code> is flowing, and thus the label of the variable
+<code>x</code> must be at least <code>{this; Alice→}</code>.
 
 <div class="code"><pre>
 class C[label L] { ... } 
 
 class D { 
-    final D{Alice:} f; 
+    final D{Alice→} f; 
     final principal{} p;
 
     ...
 
     void m(Object{} o) {
         try {
-            boolean{Alice:; this} x = (o instanceof C[{this.f.p:}]);
+            boolean{Alice→; this} x = (o instanceof C[{this.f.p→}]);
         }
         catch (NullPointerException e) {
             <span class="comment">// may be thrown by the evaluation of "this.f.p"</span>
@@ -1172,7 +1171,7 @@ new label {Alice-&gt;Bob; Alice&lt;-Chuck}
 new label {*lbl; Alice→Bob}
 new label {L; pr-&gt;Alice}
 new label {*lbl meet L; Bob-&gt;Alice&amp;pr}
-new label {*:*; _!:_; *←*}
+new label {*→*; _←_; *←*}
 </pre>
 </div>
 
@@ -1209,9 +1208,9 @@ the label <code>L1</code>. Thus, the following code compiles correctly.
 
 <div class="code"><pre>
 void m(int{*lbl} i, label{} lbl) {
-    int{Alice:} x;
-    if (lbl &lt;= new label {Alice:}) {
-        x = i; <span class="comment">// OK, since {*lbl} &#8849; {Alice:}</span>
+    int{Alice→} x;
+    if (lbl &lt;= new label {Alice→}) {
+        x = i; <span class="comment">// OK, since {*lbl} &#8849; {Alice→}</span>
     }
     else {
         x = 0;
@@ -1244,10 +1243,10 @@ principal <code>P1</code> can act for the principal
 <code>P2</code>. Thus, the following code compiles correctly.
 
 <div class="code"><pre>
-void m(int{Alice: pr} i, principal{} pr) {
-    int{Alice: Bob} x;
+void m(int{Alice→pr} i, principal{} pr) {
+    int{Alice→Bob} x;
     if (Bob actsfor pr) {
-        x = i; <span class="comment">// OK, since {Alice: pr} &#8849; {Alice: Bob}</span>
+        x = i; <span class="comment">// OK, since {Alice→pr} &#8849; {Alice→Bob}</span>
     }
     else {
         x = 0;
@@ -1272,19 +1271,19 @@ access paths.
 </p>
 
 <div class="code"><pre>
-void m(int{Alice: pr} i, principal{} pr, int{*lbl} i, label{} lbl) {
+void m(int{Alice→pr} i, principal{} pr, int{*lbl} i, label{} lbl) {
     <span class="comment">// dynamic label and actsfor tests can be used as boolean-valued</span>
     <span class="comment">// expressions</span>
-    boolean b = (lbl &lt;= new label {Alice: pr} || Alice actsfor pr);
+    boolean b = (lbl &lt;= new label {Alice→pr} || Alice actsfor pr);
 
-    int{Alice: Bob} x;
+    int{Alice→Bob} x;
     if (8 < 4 || Bob actsfor pr) {
         x = i; <span class="comment">// BAD: actsfor test is not a </span>
                <span class="comment">// conjunct of the condition of an if-statement</span>
     }
 
-    if (lbl &lt;= new label {Alice:pr} && Bob actsfor pr) {
-        x = i; <span class="comment">// OK, compiler can reason that lbl &#8849; {Alice:}</span>
+    if (lbl &lt;= new label {Alice→pr} && Bob actsfor pr) {
+        x = i; <span class="comment">// OK, compiler can reason that lbl &#8849; {Alice→}</span>
                <span class="comment">//  and Bob actsfor pr</span>
     }
 }
@@ -1489,11 +1488,11 @@ test</a>. The clause <code>where <i>L</i><sub>1</sub> equiv
 </p>
 
 <div class="code"><pre>
-int{*lbl} m{*lbl}(label{*lbl} lbl, principal{*lbl} p, int{Alice:p} i) 
-    where {Alice:Bob} &lt;= lbl, Bob actsfor p 
+int{*lbl} m{*lbl}(label{*lbl} lbl, principal{*lbl} p, int{Alice→p} i) 
+    where {Alice→Bob} &lt;= lbl, Bob actsfor p 
 {
-    <span class="comment">// since Bob actsfor p, {Alice:p} &lt;= {Alice:Bob},</span>
-    <span class="comment">// and since {Alice:Bob} &lt;= lbl, the label of the argument i</span> 
+    <span class="comment">// since Bob actsfor p, {Alice→p} &lt;= {Alice→Bob},</span>
+    <span class="comment">// and since {Alice→Bob} &lt;= lbl, the label of the argument i</span> 
     <span class="comment">// is &lt;= {*lbl}. Therefore, we can return i+1.</span>
    return i+1;
 }
@@ -1509,7 +1508,7 @@ brackets.
 </p>
 <div class="code"><pre>
     <span class="comment">// foo is a const array</span>
-    int{Alice:} const [] foo = {1, 2, 3}; 
+    int{Alice→} const [] foo = {1, 2, 3}; 
 
     foo[0] = 2; <span class="comment">// BAD: cannot assign to an element of</span>
                 <span class="comment">// a constant array</span>
@@ -1564,10 +1563,10 @@ the base type of a constant array can have the label <code>{this}</code>, which
 is not allowed with a non-constant array.
 </p>
 <div class="code"><pre>
-    int{Alice:Bob} const[] foo = {1,2,3}; 
-    int{Alice:} const[] bar = foo; <span class="comment">// OK, since const arrays</span>
+    int{Alice→Bob} const[] foo = {1,2,3}; 
+    int{Alice→} const[] bar = foo; <span class="comment">// OK, since const arrays</span>
                                    <span class="comment">// are covariant and </span>
-                                   <span class="comment">// {Alice:Bob} <= {Alice:}</span>
+                                   <span class="comment">// {Alice→Bob} <= {Alice→}</span>
 
     <span class="comment">// use of the {this} label for base types is ok</span>
     final int{this} const[]{this} bar = {1,2,3}; 
@@ -1676,8 +1675,8 @@ following:
 <div class="code"><pre>
 class B extends A {
     final principal p;
-    String {p:} name;
-    B(principal{} q, String{q:} n) {
+    String {p→} name;
+    B(principal{} q, String{q→} n) {
         p = q;
         super(n);
         name = n;
@@ -1692,8 +1691,8 @@ precede the call to <code>super</code>.
 
 <p>
 Note that this example has an assignment from <code>n</code> (with label 
-<code>{q:}</code>) to the field <code>name</code> (with label 
-<code>{this.p:}</code>). The assignment is permitted because
+<code>{q→}</code>) to the field <code>name</code> (with label 
+<code>{this.p→}</code>). The assignment is permitted because
 the Jif compiler knows from the assignment <code>p=q</code> that these
 principals are equal. It uses this fact to determine that
 the assignment from <code>n</code> to <code>name</code> is
