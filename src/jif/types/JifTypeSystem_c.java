@@ -19,6 +19,8 @@ import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Source;
 import polyglot.types.*;
 import polyglot.types.Package;
+import polyglot.types.reflect.ClassFile;
+import polyglot.types.reflect.ClassFileLazyClassInitializer;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -599,6 +601,12 @@ public class JifTypeSystem_c
         l.add("jif.lang");
         return l;
     }
+
+	public ClassFileLazyClassInitializer classFileLazyClassInitializer(
+			ClassFile clazz) {
+		throw new UnsupportedOperationException(
+				"Raw classfiles are not supported by Jif.");
+	}
 
     /****** Jif specific stuff ******/
 
@@ -1471,31 +1479,37 @@ public class JifTypeSystem_c
     }
 	
 	public Principal resolveProviderPrincipal(String name) throws SemanticException {
-        ClassType principal;
-
-        try {
-            principal = (ClassType)jlts.typeForName(PrincipalClassName());
-        }
-        catch (SemanticException e) {
-            throw new InternalCompilerError("Cannot find " + PrincipalClassName() + " class.", e);
-        }
-
-        Named n;
-        // Look for the principal only in class files.
-        String className = "jif.principals." + name;
-        n = jlts.loadedResolver().find(className);
         
-        if (n instanceof Type) {
-            Type t = (Type) n;
-            if (t.isClass()) {
-
-                if (jlts.isSubtype(t.toClass(), principal)) {
-                	return externalPrincipal(null, name);
-                }                
-            }
+        if("_".equals(name))
+        	return bottomPrincipal(null);
+        
+        else if("*".equals(name)) 
+        	return topPrincipal(null);
+        
+        else {
+        	ClassType pType;
+	        try {
+	            pType = (ClassType)jlts.typeForName(PrincipalClassName());
+	        }
+	        catch (SemanticException e) {
+	            throw new InternalCompilerError("Cannot find " + PrincipalClassName() + " class.", e);
+	        }
+	
+	        Named n;
+	        // Look for the principal only in class files.
+	        String className = "jif.principals." + name;
+	        n = jlts.loadedResolver().find(className);
+	        
+	        if (n instanceof Type) {
+	            Type t = (Type) n;
+	            if (t.isClass()) {
+	
+	                if (jlts.isSubtype(t.toClass(), pType)) {
+	                	return externalPrincipal(null, name);
+	                }                
+	            }
+	        }
+	        throw new SemanticException(name + " is not a principal.");
         }
-         
-        throw new SemanticException(name + " is not a principal.");
 	}
-
 }

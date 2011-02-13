@@ -120,6 +120,16 @@ public class JifOptions extends Options {
             index++;
             this.defaultProvider = args[index++];
         }
+        else if (args[index].equals("-providerPaths")) {
+            index++;
+            String[] paths = args[index++].split(",");
+            this.providerPaths = new LinkedHashMap<File, String>();
+            for(int i = 0; i<paths.length ;i++) {
+                String[] s = paths[i].split(":");
+                File path = new File(s[0]);
+                this.providerPaths.put(path,s[1]);            	
+            }
+        }
         else if (args[index].equals("-addProviderPath")) {
             index++;
             if(this.providerPaths == null) {
@@ -152,6 +162,7 @@ public class JifOptions extends Options {
         usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");
         usageForFlag(out, "-addsigcp <path>", "additional path for Jif signatures; prepended to sigcp");
         usageForFlag(out, "-provider <principal>", "principal of the default code provider");
+        usageForFlag(out, "-providerPaths <path0:principal0,path1:principal1,...>", "associate code providers with paths");
         usageForFlag(out, "-addProviderPath <path:principal>", "associate a code provider with a path");
 
     }

@@ -1,0 +1,15 @@
+//This class compiles with provider => Bob and fails otherwise
+public class Provider03 {
+	boolean{_->} m{p->}(principal p, boolean{p->} x) where caller(p), provider actsfor p 
+	{
+		return declassify(x, {p->} to {_->});	
+	}
+
+}
+
+class Provider03_5 authority(Bob) {
+	boolean{_->} p{Bob->}(Provider03{Bob->} p) throws (NullPointerException{p}) where authority(Bob) {
+		boolean{Bob->} foo = true;
+		return p.m(Bob, foo);	
+	}
+}

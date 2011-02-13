@@ -63,7 +63,7 @@ public class JifProcedureDeclDel extends JifJL_c
         }
     }
     protected void ensureNotTopPrincipal(Principal p, Position pos) throws SemanticException {
-        if (p.isTopPrincipal()) {
+        if (p.isTopPrincipal() && !p.isProviderPrincipal()) {
             throw new SemanticException("The top principal " + p + 
                                         " cannot appear in a constraint.", pos);
         }

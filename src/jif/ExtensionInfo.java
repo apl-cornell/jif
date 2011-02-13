@@ -22,6 +22,7 @@ import polyglot.types.LoadedClassResolver;
 import polyglot.types.SemanticException;
 import polyglot.types.SourceClassResolver;
 import polyglot.types.TypeSystem;
+import polyglot.types.reflect.ClassFile;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -75,7 +76,7 @@ public class ExtensionInfo extends JLExtensionInfo
         // it can look up jif.lang.Principal.
         return new JifTypeSystem_c(jlTypeSystem());
     }
-
+    
     public void initCompiler(Compiler compiler) {
         jlext.initCompiler(compiler);
         super.initCompiler(compiler);
@@ -155,6 +156,7 @@ public class ExtensionInfo extends JLExtensionInfo
         		while(s != null && !pp.containsKey(s)) {
         			s = s.getParentFile();
         		}
+    			//TODO: Allow top to be specified on the cmdline
         		if(s!=null)
         			throw new InternalCompilerError(f + " is required to initialize the type system" +
         					" and so must have provider TOP.");

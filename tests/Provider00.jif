@@ -1,0 +1,7 @@
+//This class compiles with provider => Bob and fails otherwise
+public class Provider00 authority(provider) {
+	boolean{_->} m{Bob->}(boolean{Bob->} x) where authority(provider)
+	{
+		return declassify(x, {Bob->} to {_->});	
+	}
+}
