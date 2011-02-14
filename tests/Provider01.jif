@@ -1,0 +1,7 @@
+//This class compiles with provider => Bob and fails otherwise
+public class Provider01 {
+	boolean{_->} m{Bob->}(boolean{Bob->} x) where caller(Bob) 
+	{
+		return declassify(x, {Bob->} to {_->});	
+	}
+}

@@ -284,6 +284,8 @@ terminal Token LEFTARROW;
 terminal Token TOP;
 terminal Token BOTTOM;
 
+terminal Token PROVIDER;
+
 non terminal DeclassifyExpr declassify;
 non terminal DeclassifyStmt declassify_statement;
 non terminal EndorseExpr endorse;
@@ -308,6 +310,9 @@ non terminal ParamDecl parameter;
 non terminal List constraints, constraints_opt;
 non terminal List authority, authority_opt;
 non terminal ConstraintNode constraint;
+non terminal List auth_constraints, auth_constraints_opt;
+non terminal ConstraintNode auth_constraint;
+
 non terminal Amb reftype_or_expr, objtype_or_expr;
 non terminal List param_or_expr_list;
 non terminal Expr primary_no_array;
@@ -476,6 +481,8 @@ principal_base ::=
             {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a), parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
     |  LPAREN:a principal_disjunctive:b RPAREN:c
             {: RESULT = b; :}
+    |  PROVIDER:a // provider principal
+            {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a),parser.nf.Id(parser.pos(a), "provider")); :}
     ;
 
 accesspath ::=
@@ -580,10 +587,10 @@ override class_declaration ::=
                     // ClassDecl
         modifiers_opt:a CLASS:n IDENTIFIER:b
                 parameters_opt:p super_opt:c
-                interfaces_opt:d authority_opt:u class_body:e
+                interfaces_opt:d authority_opt:u auth_constraints_opt:f class_body:e
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n, b),
                                                a, parser.nf.Id(parser.pos(b), b.getIdentifier()),
-                                               p, c, d, u, e); :}
+                                               p, c, d, u, f, e); :}
     ;
 
 override super ::=
@@ -876,15 +883,44 @@ constraint ::=
         :}
     ;
 
+auth_constraints_opt ::=
+        // List of ConstraintNode
+            {: RESULT = new TypedList(new LinkedList(), ConstraintNode.class, false); :}
+    |   WHERE auth_constraints:a
+            {: RESULT = a; :}
+    ;
+
+auth_constraints ::=
+        // List of ConstraintNode
+        auth_constraint:a
+            {: List l = new TypedList(new LinkedList(), ConstraintNode.class, false);
+               l.add(a); RESULT = l; :}
+    |   auth_constraints:a COMMA auth_constraint:b
+            {: RESULT = a;
+               a.add(b); :}
+    ;
+
+auth_constraint ::=
+        // ConstraintNode
+        principal:a actsfor principal:b
+        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b);
+           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
+        :}
+    |   principal:a EQUIV principal:b
+        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b, true);
+           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
+        :}
+    ;
+
 // 19.9.1) Interface Declarations
 override interface_declaration ::=
         // ClassDecl
         modifiers_opt:a INTERFACE:n IDENTIFIER:b
                 parameters_opt:p
-                extends_interfaces_opt:d authority_opt:u interface_body:e
+                extends_interfaces_opt:d authority_opt:u auth_constraints_opt:f interface_body:e
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n,b),
 		    a.set(Flags.INTERFACE), parser.nf.Id(parser.pos(b), b.getIdentifier()),
-		    p, null, d, u, e); :}
+		    p, null, d, u, f, e); :}
     ;
 
 override extends_interfaces ::=

@@ -21,7 +21,6 @@ public abstract class Principal_c extends TypeObject_c implements Principal {
     PrincipalToJavaExpr toJava;
 
     protected Set variables = null; // memoized
-
     public Principal_c(JifTypeSystem ts, Position pos) {
         this(ts, pos, new CannotPrincipalToJavaExpr_c());
     }
@@ -39,8 +38,18 @@ public abstract class Principal_c extends TypeObject_c implements Principal {
         return !variables().isEmpty();
     }
 
+    protected boolean isProvider = false;
     public boolean isTopPrincipal() { return false; }
     public boolean isBottomPrincipal() { return false; }
+    public boolean isProviderPrincipal() { return isProvider; }
+    
+    public Principal isProviderPrincipal(boolean isProvider) 
+    { 
+    	Principal_c p = (Principal_c) copy();
+    	p.isProvider = isProvider;
+    	return p;
+    }
+
     public abstract boolean isCanonical();
     public abstract boolean isRuntimeRepresentable();
     public abstract boolean equalsImpl(TypeObject o);

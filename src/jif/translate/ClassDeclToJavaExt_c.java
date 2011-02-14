@@ -52,7 +52,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             }
         }
 
-        return rw.bypass(n.params()).bypass(n.authority());
+        return rw.bypass(n.params()).bypass(n.authority()).bypass(n.constraints());
     }
 
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {

@@ -1,7 +1,10 @@
 package jif.types;
 
+import java.io.File;
 import java.util.*;
+import java.util.Map.Entry;
 
+import jif.JifOptions;
 import jif.extension.LabelTypeCheckUtil;
 import jif.translate.*;
 import jif.types.hierarchy.LabelEnv;
@@ -16,6 +19,8 @@ import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Source;
 import polyglot.types.*;
 import polyglot.types.Package;
+import polyglot.types.reflect.ClassFile;
+import polyglot.types.reflect.ClassFileLazyClassInitializer;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -31,6 +36,11 @@ public class JifTypeSystem_c
 
     private final DefaultSignature ds;
 
+	protected boolean initialized;
+    protected Principal DEFAULT_PROVIDER = null;
+
+	protected Map<File,Principal> providerMap;
+    
     public JifTypeSystem_c(TypeSystem jlts) {
         this.jlts = jlts;
         this.ds = new FixedSignature(this);
@@ -66,8 +76,39 @@ public class JifTypeSystem_c
 
         PRINCIPAL_ = new PrimitiveType_c(this, PRINCIPAL_KIND);
         LABEL_ = new PrimitiveType_c(this, LABEL_KIND);
+		JifOptions opt = (JifOptions) extInfo.getOptions();
+		if (opt.defaultProvider != null)
+			DEFAULT_PROVIDER = resolveProviderPrincipal(opt.defaultProvider);
+		else
+			DEFAULT_PROVIDER = topPrincipal(Position.compilerGenerated("default provider"));
+		
+		if(opt.providerPaths != null) {
+			providerMap = new LinkedHashMap<File, Principal>();
+			for(Entry<File, String> entry : opt.providerPaths.entrySet()) {
+				Principal p = resolveProviderPrincipal(entry.getValue());
+				providerMap.put(entry.getKey(), p);
+			}
+		}
+		this.initialized = true;
+    }
+    public boolean isInitialized() {
+    	return initialized;
+    }
+    public Principal providerForFile(File s) {
+    	if(providerMap == null)
+    		return DEFAULT_PROVIDER;
+    	else {
+    		while(s != null && !providerMap.containsKey(s)) {
+    			s = s.getParentFile();
+    		}
+    		if(s==null)
+    			return DEFAULT_PROVIDER;
+    		else
+    			return providerMap.get(s);
+    	}
     }
 
+    
     public UnknownType unknownType(Position pos) {
         UnknownType t = super.unknownType(pos);
         return t;
@@ -90,7 +131,7 @@ public class JifTypeSystem_c
     protected PrimitiveType PRINCIPAL_;
     protected PrimitiveType LABEL_;
     protected Type PRINCIPAL_CLASS_ = null;
-    
+
     public String PrincipalClassName() { return "jif.lang.Principal"; }
     
     public String PrincipalUtilClassName() { return "jif.lang.PrincipalUtil"; }
@@ -122,9 +163,8 @@ public class JifTypeSystem_c
     }
 
     public Context createContext() {
-        return new JifContext_c(this, jlts);
+    	return new JifContext_c(this, jlts);
     }
-    
     
     public ConstArrayType constArrayOf(Type type) {
         return constArrayOf(type.position(), type);
@@ -562,6 +602,12 @@ public class JifTypeSystem_c
         return l;
     }
 
+	public ClassFileLazyClassInitializer classFileLazyClassInitializer(
+			ClassFile clazz) {
+		throw new UnsupportedOperationException(
+				"Raw classfiles are not supported by Jif.");
+	}
+
     /****** Jif specific stuff ******/
 
     public LabeledType labeledType(Position pos, Type type, Label label) {
@@ -717,6 +763,10 @@ public class JifTypeSystem_c
     public BottomPrincipal bottomPrincipal(Position pos) {
         return new BottomPrincipal_c(this, pos);
     }
+	public Principal providerPrincipal(Position position,
+			Principal p) {
+		return p.isProviderPrincipal(true);
+	}
     public Principal conjunctivePrincipal(Position pos, Principal l, Principal r) {
         return conjunctivePrincipal(pos, CollectionUtil.list(l, r));
     }
@@ -1427,4 +1477,39 @@ public class JifTypeSystem_c
             ltcu = new LabelTypeCheckUtil(this);
         return ltcu;
     }
+	
+	public Principal resolveProviderPrincipal(String name) throws SemanticException {
+        
+        if("_".equals(name))
+        	return bottomPrincipal(null);
+        
+        else if("*".equals(name)) 
+        	return topPrincipal(null);
+        
+        else {
+        	ClassType pType;
+	        try {
+	            pType = (ClassType)jlts.typeForName(PrincipalClassName());
+	        }
+	        catch (SemanticException e) {
+	            throw new InternalCompilerError("Cannot find " + PrincipalClassName() + " class.", e);
+	        }
+	
+	        Named n;
+	        // Look for the principal only in class files.
+	        String className = "jif.principals." + name;
+	        n = jlts.loadedResolver().find(className);
+	        
+	        if (n instanceof Type) {
+	            Type t = (Type) n;
+	            if (t.isClass()) {
+	
+	                if (jlts.isSubtype(t.toClass(), pType)) {
+	                	return externalPrincipal(null, name);
+	                }                
+	            }
+	        }
+	        throw new SemanticException(name + " is not a principal.");
+        }
+	}
 }

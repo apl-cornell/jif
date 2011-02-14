@@ -3,6 +3,7 @@ package jif.types;
 import java.util.List;
 
 import jif.types.label.ThisLabel;
+import jif.types.principal.Principal;
 import polyglot.types.ClassType;
 
 /**
@@ -14,6 +15,10 @@ public interface JifClassType extends ClassType {
      * the principals listed in the authority clause.
      */
     List authority();
+    /**
+     * Constraints on the principal hierarchy.
+     */
+    List constraints();
 
     /**
      * The principals whose authority is required by the context that creates a
@@ -37,4 +42,9 @@ public interface JifClassType extends ClassType {
      * @return List of Param
      */
     List actuals();
+    
+    /**
+     * Returns the principal of the provider of the implementation of this class.
+     */
+    Principal provider();
 }

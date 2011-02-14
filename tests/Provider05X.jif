@@ -1,0 +1,6 @@
+//This class compiles with provider => Bob and fails otherwise
+public class Provider05X extends Provider05 authority (Bob) {
+	Provider05X() {
+		super(Bob);
+	}
+}

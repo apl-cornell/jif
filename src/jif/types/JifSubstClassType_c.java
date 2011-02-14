@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import jif.types.label.ThisLabel;
+import jif.types.principal.Principal;
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.SubstClassType_c;
 import polyglot.main.Report;
@@ -56,6 +57,12 @@ public class JifSubstClassType_c extends SubstClassType_c
         return subst.substPrincipalList(base.authority());
     }
 
+    public List constraints() {
+        JifClassType base = (JifClassType) this.base;
+        JifSubst subst = (JifSubst) this.subst;
+        return subst.substConstraintList(base.constraints());
+    }
+
     public List constructorCallAuthority() {
         JifClassType base = (JifClassType) this.base;        
         JifSubst subst = (JifSubst) this.subst;
@@ -92,4 +99,11 @@ public class JifSubstClassType_c extends SubstClassType_c
 
         return jpt.name() + s;
     }
+
+	@Override
+	public Principal provider() {
+		JifClassType jpt = (JifClassType) base;
+		return jpt.provider();
+	}
+
 }

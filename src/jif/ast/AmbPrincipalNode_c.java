@@ -113,6 +113,15 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
             return nf.CanonicalPrincipalNode(position(),
                                              ts.bottomPrincipal(position()));
         }
+        if ("provider".equals(name.id())) {
+            // "_" is the bottom principal
+            JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
+            JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
+            JifContext A = (JifContext) ar.context();            
+			return nf.CanonicalPrincipalNode(position(), ts.providerPrincipal(
+					position(), A.provider()));
+        }
+
         Context c = ar.context();
         VarInstance vi = c.findVariable(name.id());
         

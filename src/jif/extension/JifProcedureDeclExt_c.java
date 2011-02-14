@@ -73,11 +73,12 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         }
 
         
-        addCallers(mi, A, newAuth);
+        addCallers(mi, lc, newAuth);
         A.setAuthority(newAuth);       
 
         constrainLabelEnv(mi, A, null);
 
+        checkProviderAuthority(mi, lc);
         checkConstraintVariance(mi, lc);
 
         // check that any autoendorse constraints are satisfied,
@@ -87,7 +88,36 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         return Li;
     }
 
-    protected Label checkAutoEndorseConstrainPC(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
+    protected void checkProviderAuthority(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
+    	final JifContext A = lc.jifContext();
+        for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
+            Assertion c = (Assertion) iter.next();
+
+            if (c instanceof CallerConstraint) {
+                final CallerConstraint cc = (CallerConstraint) c;
+                for (Iterator it = cc.principals().iterator(); it.hasNext();) {
+                	final Principal pi = (Principal) it.next();
+                    final JifProcedureInstance _mi = mi;
+            		lc.constrain(A.provider(), 
+        					PrincipalConstraint.ACTSFOR, 
+        					pi, 
+        					A.labelEnv(), 
+        					cc.position(),
+                            new ConstraintMessage() {
+        	                    public String msg() {
+        	                        return A.provider() + " must act for " + pi;
+        	                    }
+        	                    public String detailMsg() {
+        	                        return  A.provider() + " is the provider of " + _mi.container() +
+        	                        " but does not have authority to act for " + pi;
+        	                    }
+                        	});
+                }
+            }
+        }
+	}
+
+	protected Label checkAutoEndorseConstrainPC(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
         final JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.jifTypeSystem();
         JifClassType ct = (JifClassType) A.currentClass();
@@ -152,23 +182,21 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                 }
             }
         }
-
+        
         return newAuth;
     }
 
     /** Adds the caller's authorities into <code>auth</code> */
-    protected static void addCallers(JifProcedureInstance mi, JifContext A, Set auth) {
+    protected static void addCallers(JifProcedureInstance mi, LabelChecker lc, Set auth) 
+    	throws SemanticException {
+    	
+    	final JifContext A = lc.jifContext();
         for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
             Assertion c = (Assertion) iter.next();
 
             if (c instanceof CallerConstraint) {
-                CallerConstraint cc = (CallerConstraint) c;
-
-                for (Iterator i = cc.principals().iterator(); i.hasNext(); ) {
-                    Principal pi = (Principal) i.next();
-                    // auth.add(A.instantiate(pi));
-                    auth.add(pi);
-                }
+                final CallerConstraint cc = (CallerConstraint) c;
+                auth.addAll(cc.principals());	
             }
         }
     }
@@ -448,6 +476,5 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
             return L;
         }
     }    
-
 
 }

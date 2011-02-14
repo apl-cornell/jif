@@ -39,13 +39,12 @@ public class JifClassDeclExt extends Jif_c {
 	// let the label checker know that we are about to enter a class body
         lc.enteringClassDecl(ct);
 
+    // construct a principal that represents the authority of ct
+    final Principal authPrincipal = lc.jifTypeSystem().conjunctivePrincipal(ct.position(), ct.authority());
+
 	// Check the authority of the class against the superclass.
 	if (ct.superType() instanceof JifClassType) {
-            final JifClassType superType = (JifClassType) ct.superType();
-
-            // construct a principal that represents the authority of ct
-            Principal authPrincipal = lc.jifTypeSystem().conjunctivePrincipal(ct.position(), ct.authority());
-            
+            final JifClassType superType = (JifClassType) ct.superType();         
             
 	    for (Iterator i = superType.authority().iterator(); i.hasNext(); ) {
 		final Principal pl = (Principal) i.next();
@@ -71,12 +70,28 @@ public class JifClassDeclExt extends Jif_c {
 		
 	    }
 	}
-
-        A = (JifContext) n.del().enterScope(A);
-	
-        lc = lc.context(A);
+    A = (JifContext) n.del().enterScope(A);
+    lc = lc.context(A);
+    
+	if(!A.provider().isTopPrincipal()) {
+		final JifContext _A = A; 
+		lc.constrain(A.provider(), 
+						PrincipalConstraint.ACTSFOR, 
+						authPrincipal, 
+						A.labelEnv(), 
+						n.position(),
+                        new ConstraintMessage() {
+		                    public String msg() {
+		                        return _A.provider() + " must act for " + authPrincipal;
+		                    }
+		                    public String detailMsg() {
+		                        return  _A.provider() + " is the provider of " + ct +
+		                        " but does not have authority to act for " + authPrincipal;
+		                    }
+	                	});
+	}
 	                
-        // label check class conformance
+    // label check class conformance
 	labelCheckClassConformance(ct,lc);
 
 	// label check the body
