@@ -10,6 +10,7 @@ import jif.visit.*;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
+import polyglot.frontend.goals.ExceptionsChecked;
 import polyglot.frontend.goals.FieldConstantsChecked;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.VisitorGoal;
@@ -108,7 +109,10 @@ public class JifScheduler extends JLScheduler {
 
 
     public Goal ExceptionsChecked(Job job) {
-        Goal g = super.ExceptionsChecked(job);
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = JifExceptionsChecked.create(this, job, ts, nf);
+
         try {
             addPrerequisiteDependency(g, this.NotNullChecker(job));
             addPrerequisiteDependency(g, this.PreciseClassChecker(job));
