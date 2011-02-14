@@ -294,6 +294,11 @@ public interface JifTypeSystem extends ParamTypeSystem
     boolean isMarkerFieldName(String s);
 
     /**
+     *  Should this exception be promoted to a fatal error? 
+     */
+	boolean promoteToFatal(Type t);
+
+    /**
      * Is the type system initialized?
      */
     boolean isInitialized();

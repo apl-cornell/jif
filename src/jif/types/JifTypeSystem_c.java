@@ -1477,6 +1477,12 @@ public class JifTypeSystem_c
             ltcu = new LabelTypeCheckUtil(this);
         return ltcu;
     }
+    
+    @Override
+    public boolean promoteToFatal(Type t) {
+    	return ((JifOptions)extInfo.getOptions()).fatalExceptions
+    		&& descendsFrom(t, RuntimeException());
+    }
 	
 	public Principal resolveProviderPrincipal(String name) throws SemanticException {
         
