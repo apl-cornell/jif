@@ -49,6 +49,7 @@ public class ConstructorChecker
                     }
                 });                     
             }
+            // Check the constraints on the principal hierarchy
         }
     }
     public void checkStaticMethodAuthority(final JifMethodInstance mi, JifContext A, LabelChecker lc, Position pos)

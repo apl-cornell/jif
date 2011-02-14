@@ -8,6 +8,7 @@ import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.AccessPath;
 import jif.types.label.Label;
 import jif.types.label.PairLabel;
+import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
@@ -45,6 +46,11 @@ public class JifContext_c extends Context_c implements JifContext
     protected boolean inConstructorCall;
     protected Label constructorReturnLabel;
 
+    /**
+     * Limit authority of classes and code in this context.
+     */
+	protected Principal provider;
+
     protected JifContext_c(JifTypeSystem ts, TypeSystem jlts) {
         super(ts);
         this.jlts = jlts;
@@ -60,6 +66,7 @@ public class JifContext_c extends Context_c implements JifContext
         if (gotos != null) {
             ctxt.gotos = new HashMap(gotos);
         }
+        ctxt.provider = provider;
         return ctxt;        
     }
 
@@ -276,7 +283,9 @@ public class JifContext_c extends Context_c implements JifContext
     public void setPc(Label pc, LabelChecker lc) { this.pc = pc; }
 
     public Set authority() { return auth; }
-    public void setAuthority(Set auth) { this.auth = auth; }
+    public void setAuthority(Set auth) {
+    	this.auth = auth; 
+    }
 
     public PrincipalHierarchy ph() { return env.ph(); }
 
@@ -402,4 +411,14 @@ public class JifContext_c extends Context_c implements JifContext
         }
         this.checkedEndorsements.put(li, downgradeTo);
     }
+    
+	@Override
+	public Principal provider() {
+		return provider;
+	}
+
+	@Override
+	public void setProvider(Principal provider) {
+		this.provider = provider;
+	}
 }

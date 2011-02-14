@@ -15,6 +15,9 @@ public interface JifClassDecl extends ClassDecl {
 
     List authority();
     JifClassDecl authority(List authority);
+    
+    List constraints();
+    JifClassDecl constraints(List constraints);
 
     JifClassDecl type(polyglot.types.Type type);
     

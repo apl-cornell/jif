@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import polyglot.main.Options;
@@ -49,6 +51,15 @@ public class JifOptions extends Options {
       * Additional classpath entries for Jif signatures.
       */
      public List addSigcp = new ArrayList();
+
+     /**
+      * The principal for paths not present in providerPaths.
+      */
+     public String defaultProvider = null;
+     /**
+      * Associate source paths with a principal that provided the code.
+      */
+     public Map<File,String> providerPaths = null;
 
     /**
      * Constructor
@@ -114,6 +125,31 @@ public class JifOptions extends Options {
             Report.addTopic("debug", level);
             index++;
         }
+        else if (args[index].equals("-provider")) {
+            index++;
+            this.defaultProvider = args[index++];
+        }
+        else if (args[index].equals("-providerPaths")) {
+            index++;
+            String[] paths = args[index++].split(",");
+            this.providerPaths = new LinkedHashMap<File, String>();
+            for(int i = 0; i<paths.length ;i++) {
+                String[] s = paths[i].split(":");
+                File path = new File(s[0]);
+                this.providerPaths.put(path,s[1]);            	
+            }
+        }
+        else if (args[index].equals("-addProviderPath")) {
+            index++;
+            if(this.providerPaths == null) {
+            	this.providerPaths = new LinkedHashMap<File, String>();
+            }   
+            String[] s = args[index++].split(":");
+            File path = new File(s[0]);
+            this.providerPaths.put(path,s[1]);
+        }
+
+
         else {
             int i = super.parseCommand(args, index, source);
             return i;
@@ -135,6 +171,9 @@ public class JifOptions extends Options {
         usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");
         usageForFlag(out, "-addsigcp <path>", "additional path for Jif signatures; prepended to sigcp");
         usageForFlag(out, "-fail-on-exception", "fail on uncaught and undeclared runtime exceptions");
+        usageForFlag(out, "-provider <principal>", "principal of the default code provider");
+        usageForFlag(out, "-providerPaths <path0:principal0,path1:principal1,...>", "associate code providers with paths");
+        usageForFlag(out, "-addProviderPath <path:principal>", "associate a code provider with a path");
     }
 
     public String constructSignatureClasspath() {        

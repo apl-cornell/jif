@@ -12,6 +12,7 @@ import polyglot.ast.*;
 import polyglot.ast.Binary.Operator;
 import polyglot.types.Flags;
 import polyglot.types.Type;
+import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -168,6 +169,13 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
+//    public AmbPrincipalNode AmbProviderPrincipalNode(Position pos) {
+//        AmbPrincipalNode n = new AmbProviderPrincipalNode_c(pos);
+//        n = (AmbPrincipalNode)n.ext(jifExtFactory().extAmbPrincipalNode());
+//        n = (AmbPrincipalNode)n.del(delFactory().delExpr());
+//        return n;
+//	}
+
     public CanonicalPrincipalNode CanonicalPrincipalNode(Position pos, Principal principal) {
         CanonicalPrincipalNode n = new CanonicalPrincipalNode_c(pos,
                                                                 principal);
@@ -186,7 +194,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     public ClassDecl ClassDecl(Position pos, Flags flags, Id name, TypeNode superClass, List interfaces, ClassBody body) {
         ClassDecl n = new JifClassDecl_c(pos, flags, name,
                                          Collections.EMPTY_LIST, superClass, interfaces, 
-                                         Collections.EMPTY_LIST, body);
+                                         Collections.EMPTY_LIST, Collections.EMPTY_LIST, body);
         n = (ClassDecl)n.ext(extFactory().extClassDecl());
         n = (ClassDecl)n.del(delFactory().delClassDecl());
         return n;
@@ -206,9 +214,9 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     public JifClassDecl JifClassDecl(Position pos, Flags flags, Id name,
             List params, 
             TypeNode superClass, List interfaces,
-            List authority, ClassBody body) {
+            List authority, List constraints, ClassBody body) {
         JifClassDecl n = new JifClassDecl_c(pos, flags, name,
-                                            params, superClass, interfaces, authority, body);
+                                            params, superClass, interfaces, authority, constraints, body);
         n = (JifClassDecl)n.ext(extFactory().extClassDecl());
         n = (JifClassDecl)n.del(delFactory().delClassDecl());
         return n;
@@ -292,6 +300,13 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         n = (New)n.del(delFactory().delNew());
         return n;
     }
+    
+    public SourceFile SourceFile(Position pos, PackageNode packageName, List imports, List decls) {
+        SourceFile n = new JifSourceFile_c(pos, packageName, CollectionUtil.nonNullList(imports), CollectionUtil.nonNullList(decls));
+        n = (SourceFile)n.ext(extFactory().extSourceFile());
+        n = (SourceFile)n.del(delFactory().delSourceFile());
+        return n;
+    }
 
     public Special Special(Position pos, Special.Kind kind, TypeNode outer) {
         if (outer != null) throw new InternalCompilerError("Jif does not support inner classes.");
@@ -358,7 +373,10 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     }
 
     public ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter) {
-        return ActsForConstraintNode(pos, actor, granter, false);
+    	ActsForConstraintNode n = ActsForConstraintNode(pos, actor, granter, false);
+        n = (ActsForConstraintNode)n.ext(jifExtFactory().extActsForConstraintNode());
+        n = (ActsForConstraintNode)n.del(delFactory().delNode());
+        return n;
     }
     public ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter, boolean isEquiv) {
         ActsForConstraintNode n = new ActsForConstraintNode_c(pos,

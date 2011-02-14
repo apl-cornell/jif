@@ -26,12 +26,17 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 {
     List params;
     List authority;
+    List constraints;
+    Principal provider;
+    
     PClass instantiatedFrom;
 
     protected JifParsedPolyType_c() {
 	super();
 	this.params = new TypedList(new LinkedList(), ParamInstance.class, false);
 	this.authority = new TypedList(new LinkedList(), Principal.class, false);
+	this.constraints = new TypedList(new LinkedList(), Constraint.class, false);
+	this.provider = ((JifTypeSystem)ts).bottomPrincipal(Position.compilerGenerated());
         this.instantiatedFrom = null;
     }
 
@@ -40,6 +45,11 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	super(ts, init, fromSource);
 	this.params = new TypedList(new LinkedList(), ParamInstance.class, false);
 	this.authority = new TypedList(new LinkedList(), Principal.class, false);
+	this.constraints = new TypedList(new LinkedList(), Constraint.class, false);
+	if(fromSource instanceof CodeSource)
+		this.provider = ((CodeSource)fromSource).provider();
+	else
+		throw new InternalCompilerError("Source file " + fromSource + " has no provider.");
         this.instantiatedFrom = null;
     }
 
@@ -139,6 +149,12 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
     public void setAuthority(List principals) {
         this.authority = new TypedList(principals, Principal.class, false);
     }
+    public List constraints() {
+    	return constraints;
+    }
+    public void setConstraints(List constraints) {
+        this.constraints = new TypedList(constraints, Constraint.class, false);
+    }
 
     public String toString() {
 	String s = "";
@@ -190,4 +206,9 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 
 	return false;
     }
+
+	@Override
+	public Principal provider() {
+		return provider;
+	}
 }

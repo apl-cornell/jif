@@ -15,5 +15,4 @@ public interface JifPolyType extends JifClassType, InstType {
      * @see ParamInstance
      */
     List params();
-
 }

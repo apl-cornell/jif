@@ -6,12 +6,14 @@ import java.util.List;
 
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
+import jif.types.principal.Principal;
 import polyglot.main.Report;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance_c;
 import polyglot.types.Flags;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.TypedList;
 
@@ -201,5 +203,13 @@ implements JifConstructorInstance
 
         return s;
     }
+	@Override
+	public Principal provider() {
+		if(container instanceof JifClassType) {
+			JifClassType jct = (JifClassType) container;
+			return jct.provider();
+		}
+		throw new InternalCompilerError("Expected JifClassType for container, but got " + container.getClass());
+	}
 
 }

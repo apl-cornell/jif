@@ -1,5 +1,6 @@
 package jif.types;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -121,6 +122,7 @@ public interface JifTypeSystem extends ParamTypeSystem
     UnknownPrincipal unknownPrincipal(Position pos);
     TopPrincipal topPrincipal(Position pos);
     BottomPrincipal bottomPrincipal(Position pos);
+	Principal providerPrincipal(Position position, Principal p);
     Principal conjunctivePrincipal(Position pos, Principal conjunctLeft, Principal conjunctRight);
     Principal conjunctivePrincipal(Position pos, Collection principals);
     Principal disjunctivePrincipal(Position pos, Principal disjunctLeft, Principal disjunctRight);
@@ -295,4 +297,14 @@ public interface JifTypeSystem extends ParamTypeSystem
      *  Should this exception be promoted to a fatal error? 
      */
 	boolean promoteToFatal(Type t);
+
+    /**
+     * Is the type system initialized?
+     */
+    boolean isInitialized();
+    /**
+     * Return the principal of the provider associated with s.
+     */
+    Principal providerForFile(File s);
+
 }
