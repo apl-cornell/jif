@@ -1,0 +1,5 @@
+class DirLookup[label L] {
+	static LookupResult{path} lookup(String{L}[] path, 
+
+}
+// vim: ts=4

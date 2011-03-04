@@ -1,0 +1,11 @@
+class exctest {
+    int{*->*} x;
+
+    static int{*->*} nofail(exctest y) {
+	int a;
+	//try {
+	    a = y.x;
+	//} catch (NullPointerException n) { a = 0; }
+	return a;
+    }
+}

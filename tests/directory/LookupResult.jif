@@ -1,0 +1,9 @@
+class LookupResult {
+    final label{this} label_; // XXX decl removed in Fabric version
+	Object{*label_} obj;
+
+    LookupResult{*label_}(label l, Object{*l} o) {
+        name = n;
+        obj = o;
+    }
+}

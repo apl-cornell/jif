@@ -1,0 +1,75 @@
+// Test case for the object label extension
+
+// A DirNode is a node in a directory tree. Its label is
+// self-defined ({*this.label}), because different nodes
+// in the tree may have different labels. Its children
+// may be arbitrary Fabric objects, including other
+// DirNodes.
+//
+// The information that is protected by the DirNode is both
+// the existence of mappings and the identity of what they map to.
+
+class DirEntry[label L] {
+    public String{L} name;
+    public Object{L} obj;
+
+    DirEntry(String{L} n, Object{L} o) {
+        name = n;
+        obj = o;
+    }
+}
+
+public class DirNode {
+
+    public final label{this} label_; // Fabric: should require no declaration, and we will name label_ simply as "label"!
+    DirEntry[{*label_}] {*label_} [] {*label_} kids; // elements are DirNodes or other objects. Fabric: can elide the last label:
+                                                     //     DirEntry[{*label}] {*label} [] kids;   
+
+    DirNode{*lbl}(label{this} lbl)
+    {
+        label_ = lbl;
+        kids = new DirEntry[{*label_}][0]; // for some reason the compiler refuses to let you leave this label to be inferred.
+    }
+
+    public boolean{*label_; name} contains(String name)
+    {
+		try { // XXX
+        for (int i = 0; i < kids.length; i++) {
+            DirEntry de =  kids[i];
+            if (de.name.equals(name)) return true;
+        }
+		} catch (RuntimeException ne) {} // XXX
+        return false;
+    }
+
+    public Object{*label_; name} get(String name) throws (Exception{*label_; name})
+    {
+        for (int i = 0; i < kids.length; i++) {
+            DirEntry de =  kids[i];
+            if (de.name.equals(name)) return de.obj;
+        }
+        throw new Exception();
+    }
+
+    public void add{*label_}(String{*label_} name, Object{*label_} o)
+    {
+		try { // XXX
+        for (int i = 0; i < kids.length; i++) {
+            DirEntry de =  kids[i];
+            if (de.name.equals(name)) {
+                kids[i] = new DirEntry(name, o);
+                return;
+            }
+        }
+        // new element!
+        DirEntry {*label_} [] {*label_} nkids = new DirEntry[kids.length + 1];
+        for (int i = 0; i < kids.length; i++) {
+            nkids[i] = kids[i];
+        }
+        nkids[kids.length] = new DirEntry(name, o);
+        kids = nkids;
+		} catch (RuntimeException ne) {} // XXX
+        return;
+    }
+}
+// vim: ts=4
