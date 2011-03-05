@@ -5,11 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import jif.ast.JifNew_c;
-import jif.extension.JifNewExt;
 import jif.extension.JifThrowDel;
-import jif.types.JifContext;
-import jif.types.JifContext_c;
 import jif.types.JifLocalInstance;
 import jif.types.JifTypeSystem;
 import jif.types.LabeledType;
@@ -18,22 +14,22 @@ import polyglot.ast.Block;
 import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.Catch;
 import polyglot.ast.CodeDecl;
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Expr;
 import polyglot.ast.Formal;
 import polyglot.ast.Local;
 import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.ast.Stmt;
+import polyglot.ast.ProcedureCall;
+import polyglot.ast.ProcedureDecl;
 import polyglot.ast.Throw;
 import polyglot.ast.Try;
-import polyglot.ast.TypeNode;
 import polyglot.frontend.Job;
-import polyglot.qq.QQ;
 import polyglot.types.ConstructorInstance;
-import polyglot.types.Context;
 import polyglot.types.Flags;
-import polyglot.types.ParsedClassType;
+import polyglot.types.ProcedureInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
@@ -42,11 +38,8 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SubtypeSet;
 import polyglot.util.UniqueID;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.ContextVisitor;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
-import polyglot.visit.TypeBuilder;
 
 public class JifExceptionChecker extends ExceptionChecker {
 
@@ -83,34 +76,40 @@ public class JifExceptionChecker extends ExceptionChecker {
             }
         }
 
-        if(parent instanceof CodeDecl && throwsSet.size() > 0) {
-        	//XXX: this is probably redundant.  It seems like we should be 
-        	// able to use throwsSet directly, but I must not 
-        	// understand how things are added in relation to catchable
-        	// types. --owen
+        if(parent instanceof ProcedureDecl && throwsSet.size() > 0) {
     		JifTypeSystem jifts = ((JifTypeSystem) ts);
         	SubtypeSet fatalExcs = new SubtypeSet(ts.Throwable());
-
+        	ProcedureDecl pd = (ProcedureDecl) parent;
+        	ProcedureInstance pi = pd.procedureInstance();
+        	
         	for(Iterator tsIter = throwsSet.iterator(); tsIter.hasNext();) {
         		Type uncaughtExc = (Type)tsIter.next();
         		boolean declared = false;
-        		for (Iterator cIter = catchable.iterator(); cIter.hasNext(); ) {
-                    Type declaredExc = (Type)cIter.next();
-                    if (ts.isSubtype(uncaughtExc, declaredExc)) {
-                    	declared=true;
-                        break;
-                    }
-                }
+                	for (Iterator cIter = catchable.iterator(); cIter.hasNext(); ) {
+                            Type declaredExc = (Type)cIter.next();
+                            if (ts.isSubtype(uncaughtExc, declaredExc)) {
+                            	declared=true;
+                                break;
+                            }
+                	}
         		if(!declared && jifts.promoteToFatal(uncaughtExc)) 
         			fatalExcs.add(uncaughtExc);
 	        }
-
+        	        	
         	if(fatalExcs.size() > 0) {
-				errorQueue().enqueue(
-						ErrorInfo.WARNING,
-						"Uncaught exceptions in " + parent + " at " + parent.position()
-								+ " will be treated as fatal errors: "
-								+ fatalExcs);
+    	               if(pi instanceof ConstructorInstance) {
+    	                    ConstructorInstance ci = (ConstructorInstance) pi;
+    	                    List stmts = ((Block) n).statements();
+    	                    throw new SemanticException(
+    	                            "Fail on exception not yet supported in constructors. " 
+    	                            + "The following exceptions must be declared or caught: "
+                                        + fatalExcs);
+    	                }
+
+        	        errorQueue().enqueue(ErrorInfo.WARNING, "Uncaught exceptions in " 
+        	                + parent + " at " + parent.position()
+				+ " will be treated as fatal errors: " + fatalExcs);
+        	        
 	        	Position pos = Position.compilerGenerated();
 	        	String s = UniqueID.newID("exc");
 	        	List catchBlocks = new LinkedList();
@@ -148,7 +147,10 @@ public class JifExceptionChecker extends ExceptionChecker {
 		        	Catch c = nf.Catch(pos, exc, body);
 		        	catchBlocks.add(c);
 	        	}
-	        	return nf.Block(pos, nf.Try(pos, (Block)n, catchBlocks));
+	        	List stmts = ((Block) n).statements();
+	        	Try t = nf.Try(pos, nf.Block(pos,stmts), catchBlocks);
+	        	List newStmts = Collections.singletonList(t);
+	        	return ((Block)n).statements(newStmts);
         	}
         }
         // gather exceptions from this node.
@@ -193,6 +195,7 @@ public class JifExceptionChecker extends ExceptionChecker {
                 }
                 ec = (JifExceptionChecker) ec.pop();
            }
+           
             if (! exceptionCaught && !((JifTypeSystem) ts).promoteToFatal(t)) {
                 reportUncaughtException(t, pos);
             }
