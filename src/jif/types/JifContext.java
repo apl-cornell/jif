@@ -1,13 +1,11 @@
 package jif.types;
 
-import java.util.Collection;
 import java.util.Set;
 
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.AccessPath;
 import jif.types.label.Label;
-import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Branch;
@@ -129,8 +127,8 @@ public interface JifContext extends Context {
      * The authority of a class or a procedure is the set of principals
      * who have authorized that code.
      */    
-    Set authority();
-    void setAuthority(Set authority);
+    Set<Principal> authority();
+    void setAuthority(Set<Principal> authority);
 
     /**
      * Get the authority of the current code, represented as a confidentiality label.
@@ -198,6 +196,6 @@ public interface JifContext extends Context {
      */
     void addCheckedEndorse(LocalInstance li, Label downgradeTo);
 
-	Principal provider();
-    void setProvider(Principal provider);
+    Label provider();
+    void setProvider(Label provider);
 }

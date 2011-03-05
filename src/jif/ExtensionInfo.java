@@ -11,7 +11,7 @@ import jif.ast.JifNodeFactory;
 import jif.ast.JifNodeFactory_c;
 import jif.types.JifTypeSystem;
 import jif.types.JifTypeSystem_c;
-import jif.types.principal.Principal;
+import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
@@ -22,7 +22,6 @@ import polyglot.types.LoadedClassResolver;
 import polyglot.types.SemanticException;
 import polyglot.types.SourceClassResolver;
 import polyglot.types.TypeSystem;
-import polyglot.types.reflect.ClassFile;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -47,14 +46,17 @@ public class ExtensionInfo extends JLExtensionInfo
 //  protected boolean doInfer = false;
     protected OutputExtensionInfo jlext = new OutputExtensionInfo(this);
 
+    @Override
     public String defaultFileExtension() {
         return "jif";
     }
 
+    @Override
     public String compilerName() {
         return "jifc";
     }
 
+    @Override
     protected Options createOptions() {
         return new JifOptions(this);
     }
@@ -63,7 +65,7 @@ public class ExtensionInfo extends JLExtensionInfo
         return (JifOptions)this.getOptions();
     }
 
-    static public Set topics = new LinkedHashSet();
+    static public Set<String> topics = new LinkedHashSet<String>();
     static { topics.add("jif"); }
 
     protected TypeSystem jlTypeSystem() {
@@ -71,17 +73,20 @@ public class ExtensionInfo extends JLExtensionInfo
         return jlext.typeSystem();
     }
 
+    @Override
     protected TypeSystem createTypeSystem() {
         // Need to pass it the jlTypeSystem() so that
         // it can look up jif.lang.Principal.
         return new JifTypeSystem_c(jlTypeSystem());
     }
     
+    @Override
     public void initCompiler(Compiler compiler) {
         jlext.initCompiler(compiler);
         super.initCompiler(compiler);
     }
 
+    @Override
     protected void initTypeSystem() {
         try {
             LoadedClassResolver lr;
@@ -98,14 +103,17 @@ public class ExtensionInfo extends JLExtensionInfo
         }
     }
 
+    @Override
     protected NodeFactory createNodeFactory() {
         return new JifNodeFactory_c();
     }
 
+    @Override
     public polyglot.main.Version version() {
         return new Version();
     }
 
+    @Override
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
 
         polyglot.lex.Lexer lexer =
@@ -121,10 +129,12 @@ public class ExtensionInfo extends JLExtensionInfo
         public JifJobExt(JifTypeSystem ts) {     }
     }
 
+    @Override
     public JobExt jobExt() {
         return new JifJobExt((JifTypeSystem) typeSystem());
     }
 
+    @Override
     protected Scheduler createScheduler() {
         return new JifScheduler(this, jlext);
     }
@@ -133,6 +143,7 @@ public class ExtensionInfo extends JLExtensionInfo
         return new LabelChecker(job, typeSystem(), nodeFactory(), solvePerClassBody, solvePerMethod, doLabelSubst);
     }
     
+    @Override
     public Goal getCompileGoal(Job job) {
         JifScheduler jifScheduler = (JifScheduler)scheduler();
         return jifScheduler.JifToJavaRewritten(job);
@@ -142,26 +153,28 @@ public class ExtensionInfo extends JLExtensionInfo
         Topics.jif.toLowerCase();
     }
 
-    public FileSource createFileSource(java.io.File f, boolean user) throws IOException
-    {
-    	JifTypeSystem jifts = (JifTypeSystem) ts;
-    	if(jifts.isInitialized()) {
-    		Principal provider = jifts.providerForFile(f);
-    		return new jif.parse.UTF8FileSource(f, user, provider);
-    	}
-    	else {
-    		Map<File, String> pp = getJifOptions().providerPaths;
-    		File s = f;
-    		if(pp != null)
-        		while(s != null && !pp.containsKey(s)) {
-        			s = s.getParentFile();
-        		}
-    			//TODO: Allow top to be specified on the cmdline
-        		if(s!=null)
-        			throw new InternalCompilerError(f + " is required to initialize the type system" +
-        					" and so must have provider TOP.");
-        	
-    		return new jif.parse.UTF8FileSource(f, user, jifts.topPrincipal(Position.compilerGenerated("init")));
-    	}
+    @Override
+    public FileSource createFileSource(java.io.File f, boolean user)
+            throws IOException {
+        JifTypeSystem jifts = (JifTypeSystem) ts;
+        if (jifts.isInitialized()) {
+            Label provider = jifts.providerForFile(f);
+            return new jif.parse.UTF8FileSource(f, user, provider);
+        } else {
+            Map<File, String> pp = getJifOptions().providerPaths;
+            File s = f;
+            if (pp != null) while (s != null && !pp.containsKey(s)) {
+                s = s.getParentFile();
+            }
+            // TODO: Allow top to be specified on the cmdline
+            if (s != null)
+                throw new InternalCompilerError(f
+                        + " is required to initialize the type system"
+                        + " and so must have provider TOP.");
+
+            return new jif.parse.UTF8FileSource(f, user,
+                    jifts.principalToTrustLabel(jifts.topPrincipal(Position
+                            .compilerGenerated("init"))));
+        }
     }
 }

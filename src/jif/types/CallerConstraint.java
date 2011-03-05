@@ -1,11 +1,12 @@
 package jif.types;
 
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
+
+import jif.types.principal.Principal;
 
 /** The caller constraint. 
  */
 public interface CallerConstraint extends Assertion {
-    List principals();
-    CallerConstraint principals(List principals);
+    List<Principal> principals();
+    CallerConstraint principals(List<Principal> principals);
 }

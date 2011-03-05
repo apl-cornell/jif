@@ -14,14 +14,14 @@ import polyglot.util.Position;
 /** The node factory of the Jif extension. 
  */
 public interface JifNodeFactory extends NodeFactory {
-    InstTypeNode InstTypeNode(Position pos, TypeNode type, List params);
+    InstTypeNode InstTypeNode(Position pos, TypeNode type, List<ParamNode> params);
     LabeledTypeNode LabeledTypeNode(Position pos, TypeNode type, LabelNode label);
-    AmbNewArray AmbNewArray(Position pos, TypeNode base, Object expr, List dims, int addDims);
+    AmbNewArray AmbNewArray(Position pos, TypeNode base, Object expr, List<Expr> dims, int addDims);
     AmbParamTypeOrAccess AmbParamTypeOrAccess(Position pos, Receiver base, Object expr);
-    JoinLabelNode JoinLabelNode(Position pos, List components);
-    MeetLabelNode MeetLabelNode(Position pos, List components);
-    PolicyNode ReaderPolicyNode(Position pos, PrincipalNode owner, List readers);
-    PolicyNode WriterPolicyNode(Position pos, PrincipalNode owner, List writers);
+    JoinLabelNode JoinLabelNode(Position pos, List<Node> components);
+    MeetLabelNode MeetLabelNode(Position pos, List<Node> components);
+    PolicyNode ReaderPolicyNode(Position pos, PrincipalNode owner, List<PrincipalNode> readers);
+    PolicyNode WriterPolicyNode(Position pos, PrincipalNode owner, List<PrincipalNode> writers);
     PolicyNode PolicyNode(Position pos, Policy pol);
     AmbDynamicLabelNode AmbDynamicLabelNode(Position pos, Expr expr);
     AmbVarLabelNode AmbVarLabelNode(Position pos, Id name);
@@ -33,16 +33,16 @@ public interface JifNodeFactory extends NodeFactory {
     AmbPrincipalNode AmbDisjunctivePrincipalNode(Position pos, PrincipalNode left, PrincipalNode right);
 //    AmbPrincipalNode AmbProviderPrincipalNode(Position pos);
     CanonicalPrincipalNode CanonicalPrincipalNode(Position pos, Principal principal);
-    JifClassDecl JifClassDecl(Position pos, Flags flags, Id name, List params, TypeNode superClass, List interfaces, List authority, List constraints, ClassBody body);
-    JifMethodDecl JifMethodDecl(Position pos, Flags flags, TypeNode returnType, Id name, LabelNode startLabel, List arguments, LabelNode endLabel, List exceptions, List constraints, Block body);
-    JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, Id name, LabelNode startLabel, LabelNode returnLabel, List arguments, List exceptions, List constraints, Block body);
+    JifClassDecl JifClassDecl(Position pos, Flags flags, Id name, List<ParamDecl> params, TypeNode superClass, List<TypeNode> interfaces, List<PrincipalNode> authority, List<ConstraintNode> constraints, ClassBody body);
+    JifMethodDecl JifMethodDecl(Position pos, Flags flags, TypeNode returnType, Id name, LabelNode startLabel, List<Formal> arguments, LabelNode endLabel, List<TypeNode> exceptions, List<ConstraintNode> constraints, Block body);
+    JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, Id name, LabelNode startLabel, LabelNode returnLabel, List<Formal> arguments, List<TypeNode> exceptions, List<ConstraintNode> constraints, Block body);
     AmbParam AmbParam(Position pos, Id name);
     AmbParam AmbParam(Position pos, Id name, ParamInstance pi);
     AmbExprParam AmbParam(Position pos, Expr expr, ParamInstance expectedPI);
     ParamDecl ParamDecl(Position pos, ParamInstance.Kind kind, Id name);
     CanonicalConstraintNode CanonicalConstraintNode(Position pos, Assertion constraint);
-    AuthConstraintNode AuthConstraintNode(Position pos, List principals);
-    CallerConstraintNode CallerConstraintNode(Position pos, List principals);
+    AuthConstraintNode AuthConstraintNode(Position pos, List<PrincipalNode> principals);
+    CallerConstraintNode CallerConstraintNode(Position pos, List<PrincipalNode> principals);
     AutoEndorseConstraintNode AutoEndorseConstraintNode(Position pos, LabelNode endorseTo);
     ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter);
     ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter, boolean isEquiv);

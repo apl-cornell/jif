@@ -21,7 +21,6 @@ import polyglot.types.*;
 import polyglot.types.Package;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLazyClassInitializer;
-import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -36,16 +35,17 @@ public class JifTypeSystem_c
 
     private final DefaultSignature ds;
 
-	protected boolean initialized;
-    protected Principal DEFAULT_PROVIDER = null;
+    protected boolean initialized;
+    protected Label DEFAULT_PROVIDER = null;
 
-	protected Map<File,Principal> providerMap;
+    protected Map<File,Label> providerMap;
     
     public JifTypeSystem_c(TypeSystem jlts) {
         this.jlts = jlts;
         this.ds = new FixedSignature(this);
     }
 
+    @Override
     public Solver createSolver(String solverName) {
         return new SolverGLB(this, extInfo.compiler(), solverName);
         //return new SolverLUB(this);
@@ -55,14 +55,17 @@ public class JifTypeSystem_c
         return new LabelEnv_c(this, false);
     }
 
+    @Override
     public LabelEnv createLabelEnv() {
         return new LabelEnv_c(this, true);
     }
 
+    @Override
     public MuPClass mutablePClass(Position pos) {
         return new JifMuPClass_c(this, pos);
     }
 
+    @Override
     public LazyClassInitializer defaultClassInitializer() {
         return new JifLazyClassInitializer_c(this);
     }
@@ -70,31 +73,40 @@ public class JifTypeSystem_c
     /**
      * Initializes the type system and its internal constants.
      */
+    @Override
     public void initialize(TopLevelResolver loadedResolver, ExtensionInfo extInfo)
         throws SemanticException {
         super.initialize(loadedResolver, extInfo);
 
         PRINCIPAL_ = new PrimitiveType_c(this, PRINCIPAL_KIND);
         LABEL_ = new PrimitiveType_c(this, LABEL_KIND);
-		JifOptions opt = (JifOptions) extInfo.getOptions();
-		if (opt.defaultProvider != null)
-			DEFAULT_PROVIDER = resolveProviderPrincipal(opt.defaultProvider);
-		else
-			DEFAULT_PROVIDER = topPrincipal(Position.compilerGenerated("default provider"));
-		
-		if(opt.providerPaths != null) {
-			providerMap = new LinkedHashMap<File, Principal>();
-			for(Entry<File, String> entry : opt.providerPaths.entrySet()) {
-				Principal p = resolveProviderPrincipal(entry.getValue());
-				providerMap.put(entry.getKey(), p);
-			}
-		}
-		this.initialized = true;
+        
+        JifOptions opt = (JifOptions) extInfo.getOptions();
+        
+        if (opt.defaultProvider != null)
+            DEFAULT_PROVIDER =
+                    principalToTrustLabel(resolveProviderPrincipal(opt.defaultProvider));
+        else DEFAULT_PROVIDER =
+                principalToTrustLabel(topPrincipal(Position
+                        .compilerGenerated("default provider")));
+
+        if (opt.providerPaths != null) {
+            providerMap = new LinkedHashMap<File, Label>();
+            for (Entry<File, String> entry : opt.providerPaths.entrySet()) {
+                Principal p = resolveProviderPrincipal(entry.getValue());
+                
+                providerMap.put(entry.getKey(), principalToTrustLabel(p));
+            }
+        }
+        
+        this.initialized = true;
     }
+    @Override
     public boolean isInitialized() {
     	return initialized;
     }
-    public Principal providerForFile(File s) {
+    @Override
+    public Label providerForFile(File s) {
     	if(providerMap == null)
     		return DEFAULT_PROVIDER;
     	else {
@@ -109,16 +121,19 @@ public class JifTypeSystem_c
     }
 
     
+    @Override
     public UnknownType unknownType(Position pos) {
         UnknownType t = super.unknownType(pos);
         return t;
     }
 
+    @Override
     public UnknownQualifier unknownQualifier(Position pos) {
         UnknownQualifier t = super.unknownQualifier(pos);
         return t;
     }
 
+    @Override
     public Package packageForName(Package prefix, String name)
 	throws SemanticException
     {
@@ -132,20 +147,27 @@ public class JifTypeSystem_c
     protected PrimitiveType LABEL_;
     protected Type PRINCIPAL_CLASS_ = null;
 
+    @Override
     public String PrincipalClassName() { return "jif.lang.Principal"; }
     
+    @Override
     public String PrincipalUtilClassName() { return "jif.lang.PrincipalUtil"; }
     
+    @Override
     public String LabelClassName() { return "jif.lang.Label"; }
     
+    @Override
     public String LabelUtilClassName() { return "jif.lang.LabelUtil"; }
     
+    @Override
     public String RuntimePackageName() { return "jif.runtime"; }
 
+    @Override
     public PrimitiveType Principal() {
         return PRINCIPAL_;
     }
 
+    @Override
     public Type PrincipalClass() {
         if (PRINCIPAL_CLASS_ == null) {
             try {
@@ -158,18 +180,22 @@ public class JifTypeSystem_c
         return PRINCIPAL_CLASS_;
     }
 
+    @Override
     public PrimitiveType Label() {
         return LABEL_;
     }
 
+    @Override
     public Context createContext() {
     	return new JifContext_c(this, jlts);
     }
     
+    @Override
     public ConstArrayType constArrayOf(Type type) {
         return constArrayOf(type.position(), type);
     }
 
+    @Override
     public ConstArrayType constArrayOf(Position pos, Type type) {
         return constArrayOf(pos, type, false);
     }
@@ -177,16 +203,20 @@ public class JifTypeSystem_c
         return new ConstArrayType_c(this, pos, type, true, castableToNonConst);
     }
 
+    @Override
     public ConstArrayType constArrayOf(Type type, int dims) {
         return constArrayOf(null, type, dims);
     }
 
+    @Override
     public ConstArrayType constArrayOf(Position pos, Type type, int dims) {
         return constArrayOf(pos, type, dims, false);        
     }
+    @Override
     public ConstArrayType constArrayOf(Position pos, Type type, int dims, boolean castableToNonConst) {
         return constArrayOf(pos, type, dims, castableToNonConst, false);        
     }
+    @Override
     public ConstArrayType constArrayOf(Position pos, Type type, int dims, boolean castableToNonConst, boolean recurseIntoBaseType) {
         if (recurseIntoBaseType && type.isArray()) {
             ArrayType baseArray = type.toArray();
@@ -205,6 +235,7 @@ public class JifTypeSystem_c
     }
     
 
+    @Override
     protected ArrayType arrayType(Position pos, Type type) {
         if (!isLabeled(type)) {
             type = labeledType(pos, type, defaultSignature().defaultArrayBaseLabel(type));
@@ -212,6 +243,7 @@ public class JifTypeSystem_c
         return new ConstArrayType_c(this, pos, type, false);
     }
 
+    @Override
     public InitializerInstance initializerInstance(
         Position pos,
         ClassType container,
@@ -221,6 +253,7 @@ public class JifTypeSystem_c
         return ii;
     }
 
+    @Override
     public FieldInstance fieldInstance(Position pos,
                                        ReferenceType container,
                                        Flags flags,
@@ -231,11 +264,14 @@ public class JifTypeSystem_c
         return fi;
     }
 
+    @Override
     public LocalInstance localInstance(Position pos, Flags flags, Type type, String name) {
         JifLocalInstance_c li = new JifLocalInstance_c(this, pos, flags, type, name);
         return li;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
     public ConstructorInstance constructorInstance(
         Position pos,
         ClassType container,
@@ -256,10 +292,10 @@ public class JifTypeSystem_c
         boolean isDefaultStartLabel,
         Label returnLabel,
         boolean isDefaultReturnLabel,
-        List formalTypes,
-        List formalArgLabels,
-        List excTypes,
-        List constraints) {
+        List<Type> formalTypes,
+        List<Label> formalArgLabels,
+        List<Type> excTypes,
+        List<Assertion> constraints) {
         JifConstructorInstance ci =
             new JifConstructorInstance_c(
                 this,
@@ -274,6 +310,8 @@ public class JifTypeSystem_c
         return ci;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
     public MethodInstance methodInstance(
         Position pos,
         ReferenceType container,
@@ -296,6 +334,7 @@ public class JifTypeSystem_c
             Collections.EMPTY_LIST);
     }
 
+    @Override
     public JifMethodInstance jifMethodInstance(
         Position pos,
         ReferenceType container,
@@ -304,11 +343,11 @@ public class JifTypeSystem_c
         String name,
         Label startLabel,
         boolean isDefaultStartLabel,
-        List formalTypes, List formalArgLabels,
+        List<Type> formalTypes, List<Label> formalArgLabels,
         Label endLabel,
         boolean isDefaultEndLabel,
-        List excTypes,
-        List constraints) {
+        List<Type> excTypes,
+        List<Assertion> constraints) {
 
         JifMethodInstance mi =
             new JifMethodInstance_c(
@@ -326,11 +365,13 @@ public class JifTypeSystem_c
         return mi;
     }
 
+    @Override
     public ParamInstance paramInstance(Position pos, JifClassType container, ParamInstance.Kind kind, String name) {
         ParamInstance pi = new ParamInstance_c(this, pos, container, kind, name);
         return pi;
     }
 
+    @Override
     public PrincipalInstance principalInstance(
         Position pos,
         ExternalPrincipal principal) {
@@ -338,14 +379,17 @@ public class JifTypeSystem_c
         return pi;
     }
 
+    @Override
     public boolean descendsFrom(Type child, Type ancestor) {
         return super.descendsFrom(strip(child), strip(ancestor));
     }
 
+    @Override
     public boolean isSubtype(Type child, Type ancestor) {
         return super.isSubtype(strip(child), strip(ancestor));
     }
 
+    @Override
     public boolean isCastValid(Type fromType, Type toType) {
         Type strpFromType = strip(fromType);
         Type strpToType = strip(toType);
@@ -363,6 +407,7 @@ public class JifTypeSystem_c
         return super.isCastValid(strpFromType, strpToType);
     }
 
+    @Override
     public boolean isImplicitCastValid(Type fromType, Type toType) {
         Type strpFromType = strip(fromType);
         Type strpToType = strip(toType);
@@ -380,6 +425,7 @@ public class JifTypeSystem_c
         return super.isImplicitCastValid(strpFromType, strpToType);
     }
 
+    @Override
     public Type staticTarget(Type t) {
         if (t instanceof JifParsedPolyType) {
                 JifParsedPolyType jppt = (JifParsedPolyType)t;
@@ -395,9 +441,11 @@ public class JifTypeSystem_c
 
     }
 
+    @Override
     public boolean equalsNoStrip(TypeObject t1, TypeObject t2) {
         return super.equals(t1, t2);        
     }
+    @Override
     public boolean equalsStrip(TypeObject t1, TypeObject t2) {
         if (t1 instanceof Type) {
             t1 = strip((Type)t1);
@@ -410,10 +458,12 @@ public class JifTypeSystem_c
         return super.equals(t1, t2);        
     }
     
+    @Override
     public boolean equals(TypeObject t1, TypeObject t2) {
         return equalsStrip(t1, t2);
     }
     
+    @Override
     public boolean typeEquals(Type t1, Type t2) {
         return equals(t1, t2);
     }
@@ -431,12 +481,12 @@ public class JifTypeSystem_c
         }
         // subtype is now the same type as supertype, when stripped of their
         // parameters. Now check their parameters.
-        Iterator iter1 = ((JifClassType)subtype).actuals().iterator();
-        Iterator iter2 = ((JifClassType)supertype).actuals().iterator();
+        Iterator<Param> iter1 = ((JifClassType)subtype).actuals().iterator();
+        Iterator<Param> iter2 = ((JifClassType)supertype).actuals().iterator();
 
         while (iter1.hasNext() && iter2.hasNext()) {
-            Param p1 = (Param)iter1.next();
-            Param p2 = (Param)iter2.next();
+            Param p1 = iter1.next();
+            Param p2 = iter2.next();
             if (p1 instanceof Principal && p2 instanceof Principal) {
                 if (!((Principal)p1).equals(p2)) {
                     return null;
@@ -466,6 +516,7 @@ public class JifTypeSystem_c
      * Override the superclass implementation, to handle label and principal
      * parameters, and array base types correctly.
      **/
+    @Override
     public Type leastCommonAncestor(Type type1, Type type2)
         throws SemanticException
     {
@@ -570,6 +621,7 @@ public class JifTypeSystem_c
            "\" and \"" + type2 + "\".");
     }
 
+    @Override
     public boolean numericConversionValid(Type t, Object value) {
         return super.numericConversionValid(strip(t), value);
     }
@@ -580,12 +632,14 @@ public class JifTypeSystem_c
         return outer;
     }
 
+    @Override
     public Resolver classContextResolver(ClassType type) {
         // Since Jif does not support inner classes, all class
         // contexts are empty.  Just return an empty resolver.
         return new TableResolver();
     }
 
+    @Override
     public ParsedClassType createClassType(LazyClassInitializer init,
                                            Source fromSource) {
         if (!init.fromClassFile()) {
@@ -595,14 +649,16 @@ public class JifTypeSystem_c
         }
     }
 
-    public List defaultPackageImports() {
-        List l = new ArrayList(2);
+    @Override
+    public List<String> defaultPackageImports() {
+        List<String> l = new ArrayList<String>(2);
         l.add("java.lang");
         l.add("jif.lang");
         return l;
     }
 
-	public ClassFileLazyClassInitializer classFileLazyClassInitializer(
+	@Override
+    public ClassFileLazyClassInitializer classFileLazyClassInitializer(
 			ClassFile clazz) {
 		throw new UnsupportedOperationException(
 				"Raw classfiles are not supported by Jif.");
@@ -610,6 +666,7 @@ public class JifTypeSystem_c
 
     /****** Jif specific stuff ******/
 
+    @Override
     public LabeledType labeledType(Position pos, Type type, Label label) {
         if (isLabeled(type)) {
             throw new InternalCompilerError("Trying to label a labeled type");
@@ -617,43 +674,50 @@ public class JifTypeSystem_c
         return new LabeledType_c(this, pos, type, label);
     }
 
+    @Override
     public PathMap pathMap() {
         return new PathMap(this);
     }
 
+    @Override
     public PathMap pathMap(Path path, Label L) {
         PathMap m = pathMap();
         return m.set(path, L);
     }
 
+    @Override
     public ExceptionPath exceptionPath(Type type) {
         return new ExceptionPath_c(unlabel(type));
     }
 
+    @Override
     public Path gotoPath(polyglot.ast.Branch.Kind kind, String target) {
         return new GotoPath_c(kind, target);
     }
 
+    @Override
     public Param unknownParam(Position pos) {
         return new UnknownParam_c(this, pos);
     }
 
+    @Override
     public ClassType nullInstantiate(Position pos, PClass pc) {
         if (pc.clazz() instanceof JifPolyType) {
             JifPolyType pt = (JifPolyType) pc.clazz();
 
-            Map subst = new LinkedHashMap();
+            Map<ParamInstance, Param> subst =
+                    new LinkedHashMap<ParamInstance, Param>();
 
-            Iterator i = pt.params().iterator();
+            Iterator<ParamInstance> i = pt.params().iterator();
             
             // pt.actuals() constructs a list of Params based on the
             // ParamInstances conatained in pt.params().
             // We construct a substitution map from the ParamInstances
             // to their corresponding Params.
-            Iterator j = pt.actuals().iterator();
+            Iterator<Param> j = pt.actuals().iterator();
             while (i.hasNext() && j.hasNext()) {
-                ParamInstance param = (ParamInstance) i.next();
-                Object actual = j.next();
+                ParamInstance param = i.next();
+                Param actual = j.next();
 
                 subst.put(param, actual);
             }
@@ -670,6 +734,8 @@ public class JifTypeSystem_c
                                         pc + "\".");
     }
 
+    @SuppressWarnings("rawtypes")
+    @Override
     public void checkInstantiation(Position pos, PClass t, List args)
         throws SemanticException {
         super.checkInstantiation(pos, t, args);
@@ -694,6 +760,8 @@ public class JifTypeSystem_c
         }
     }
 
+    @SuppressWarnings("rawtypes")
+    @Override
     public ClassType uncheckedInstantiate(
         Position pos,
         PClass t,
@@ -701,6 +769,8 @@ public class JifTypeSystem_c
         return super.uncheckedInstantiate(pos, t, actuals);
     }
 
+    @SuppressWarnings("rawtypes")
+    @Override
     public Subst subst(Map substMap, Map cache) {
         return new JifSubst_c(this, substMap, cache);
     }
@@ -708,11 +778,13 @@ public class JifTypeSystem_c
     ////////////////////////////////////////////////////////////////
     // Code for label manipulation
 
+    @Override
     public VarLabel freshLabelVariable(Position pos, String s, String description) {
         VarLabel t = new VarLabel_c(s, description, this, pos);
         return t;
     }
 
+    @Override
     public VarPrincipal freshPrincipalVariable(Position pos, String s, String description) {
         VarPrincipal t = new VarPrincipal_c(s, description, this, pos);
         return t;
@@ -723,11 +795,13 @@ public class JifTypeSystem_c
 //        return t;
 //    }
 
+    @Override
     public ParamPrincipal principalParam(Position pos, ParamInstance pi) {
         ParamPrincipal t = new ParamPrincipal_c(pi, this, pos);
         return t;
     }
 
+    @Override
     public DynamicPrincipal dynamicPrincipal(Position pos, AccessPath path) {
         DynamicPrincipal t = new DynamicPrincipal_c(path, this, pos, dynamicPrincipalTranslator());
         return t;
@@ -736,6 +810,7 @@ public class JifTypeSystem_c
         return new DynamicPrincipalToJavaExpr_c();
     }
 
+    @Override
     public Principal pathToPrincipal(Position pos, AccessPath path) {
         if (path instanceof AccessPathConstant) {
             AccessPathConstant apc = (AccessPathConstant)path;
@@ -748,48 +823,53 @@ public class JifTypeSystem_c
         return t;
     }
 
+    @Override
     public ExternalPrincipal externalPrincipal(Position pos, String name) {
         ExternalPrincipal t = new ExternalPrincipal_c(name, this, pos);
         return t;
     }
 
+    @Override
     public UnknownPrincipal unknownPrincipal(Position pos) {
         UnknownPrincipal t = new UnknownPrincipal_c(this, pos);
         return t;
     }
+    @Override
     public TopPrincipal topPrincipal(Position pos) {
         return new TopPrincipal_c(this, pos);
     }
+    @Override
     public BottomPrincipal bottomPrincipal(Position pos) {
         return new BottomPrincipal_c(this, pos);
     }
-	public Principal providerPrincipal(Position position,
-			Principal p) {
-		return p.isProviderPrincipal(true);
-	}
+    @Override
     public Principal conjunctivePrincipal(Position pos, Principal l, Principal r) {
-        return conjunctivePrincipal(pos, CollectionUtil.list(l, r));
+        return conjunctivePrincipal(pos,
+                Arrays.asList(new Principal[] { l, r }));
     }
-    public Principal conjunctivePrincipal(Position pos, Collection ps) {
+    @Override
+    public Principal conjunctivePrincipal(Position pos, Collection<Principal> ps) {
         if (ps.isEmpty()) return bottomPrincipal(pos);
         ps = flattenConjuncts(ps);
-        if (ps.size() == 1) return (Principal)ps.iterator().next();
+        if (ps.size() == 1) return ps.iterator().next();
         return new ConjunctivePrincipal_c(ps, this, pos);
     }
+    @Override
     public Principal disjunctivePrincipal(Position pos, Principal l, Principal r) {
-        return disjunctivePrincipal(pos, CollectionUtil.list(l, r));
+        return disjunctivePrincipal(pos,
+                Arrays.asList(new Principal[] { l, r }));
     }
-    public Principal disjunctivePrincipal(Position pos, Collection ps) {
+    @Override
+    public Principal disjunctivePrincipal(Position pos, Collection<Principal> ps) {
         if (ps.isEmpty()) return topPrincipal(pos);
         ps = flattenDisjuncts(ps);
-        if (ps.size() == 1) return (Principal)ps.iterator().next();
+        if (ps.size() == 1) return ps.iterator().next();
         return new DisjunctivePrincipal_c(ps, this, pos);
     }
 
-    private Collection flattenConjuncts(Collection ps) {
-        Set newps = new LinkedHashSet();
-        for (Iterator iter = ps.iterator(); iter.hasNext();) {
-            Principal p = (Principal)iter.next();
+    private Collection<Principal> flattenConjuncts(Collection<Principal> ps) {
+        Set<Principal> newps = new LinkedHashSet<Principal>();
+        for (Principal p : ps) {
             if (p instanceof ConjunctivePrincipal) {
                 ConjunctivePrincipal cp = (ConjunctivePrincipal)p;
                 newps.addAll(cp.conjuncts());
@@ -798,12 +878,10 @@ public class JifTypeSystem_c
                 newps.add(p);
             }
         }
-        Set needed = new LinkedHashSet();
-        for (Iterator iter = newps.iterator(); iter.hasNext();) {
-            Principal p = (Principal)iter.next();
+        Set<Principal> needed = new LinkedHashSet<Principal>();
+        for (Principal p : newps) {
             boolean essential = true;
-            for (Iterator iter2 = needed.iterator(); iter2.hasNext();) {
-                Principal q = (Principal)iter2.next();
+            for (Principal q : needed) {
                 if (this.emptyLabelEnv.actsFor(q, p)) {
                     essential = false;
                     break;
@@ -813,10 +891,9 @@ public class JifTypeSystem_c
         }
         return needed;
     }
-    private Collection flattenDisjuncts(Collection ps) {
-        Set newps = new LinkedHashSet();
-        for (Iterator iter = ps.iterator(); iter.hasNext();) {
-            Principal p = (Principal)iter.next();
+    private Collection<Principal> flattenDisjuncts(Collection<Principal> ps) {
+        Set<Principal> newps = new LinkedHashSet<Principal>();
+        for (Principal p : ps) {
             if (p instanceof DisjunctivePrincipal) {
                 DisjunctivePrincipal dp = (DisjunctivePrincipal)p;
                 newps.addAll(dp.disjuncts());
@@ -825,12 +902,10 @@ public class JifTypeSystem_c
                 newps.add(p);
             }
         }
-        Set needed = new LinkedHashSet();
-        for (Iterator iter = newps.iterator(); iter.hasNext();) {
-            Principal p = (Principal)iter.next();
+        Set<Principal> needed = new LinkedHashSet<Principal>();
+        for (Principal p : newps) {
             boolean essential = true;
-            for (Iterator iter2 = needed.iterator(); iter2.hasNext();) {
-                Principal q = (Principal)iter2.next();
+            for (Principal q : needed) {
                 if (this.emptyLabelEnv.actsFor(p, q)) {
                     essential = false;
                     break;
@@ -846,26 +921,36 @@ public class JifTypeSystem_c
     private Label noComponents = null;
     private Label notTaken = null;
     
+    @Override
     public Label topLabel(Position pos) {
         return pairLabel(pos, topConfPolicy(pos), topIntegPolicy(pos));
     }
 
+    @Override
     public Label topLabel() {
         if (top == null)
             top = topLabel(null);
         return top;
     }
 
+    @Override
     public Label bottomLabel(Position pos) {
         return pairLabel(pos, bottomConfPolicy(pos), bottomIntegPolicy(pos));
     }
     
+    @Override
     public Label bottomLabel() {
         if (bottom == null)
             bottom = bottomLabel(null);
         return bottom;
     }
 
+    @Override
+    public Label providerLabel(Position position, Label l) {
+        return l.isProviderLabel(true);
+    }
+
+    @Override
     public Label noComponentsLabel() {
         if (noComponents == null) {
             noComponents = noComponentsLabel(null);
@@ -873,71 +958,87 @@ public class JifTypeSystem_c
         return noComponents;
     }
     
+    @Override
     public Label noComponentsLabel(Position pos) {
         return pairLabel(pos, bottomConfPolicy(pos), topIntegPolicy(pos));
     }
 
+    @Override
     public Label notTaken(Position pos) {
         Label t = new NotTaken_c(this, pos);
         return t;
     }
 
+    @Override
     public Label notTaken() {
         if (notTaken == null)
             notTaken = notTaken(null);
         return notTaken;
     }
 
+    @Override
     public CovariantParamLabel covariantLabel(Position pos, ParamInstance pi) {
         CovariantParamLabel t = new CovariantParamLabel_c(pi, this, pos);
         return t;
     }
 
+    @Override
     public ParamLabel paramLabel(Position pos, ParamInstance pi) {
         ParamLabel t = new ParamLabel_c(pi, this, pos);
         return t;
     }
 
+    @Override
     public ReaderPolicy readerPolicy(Position pos, Principal owner, Principal reader) {
         ReaderPolicy t = new ReaderPolicy_c(owner, reader, this, pos);
         return t;
     }
-    public ReaderPolicy readerPolicy(Position pos, Principal owner, Collection readers) {
+    @Override
+    public ReaderPolicy readerPolicy(Position pos, Principal owner,
+            Collection<Principal> readers) {
         Principal r = disjunctivePrincipal(pos, readers);
         return readerPolicy(pos, owner, r);
     }
 
+    @Override
     public WriterPolicy writerPolicy(Position pos, Principal owner, Principal writer) {
         WriterPolicy t = new WriterPolicy_c(owner, writer, this, pos);
         return t;
     }
-    public WriterPolicy writerPolicy(Position pos, Principal owner, Collection writers) {
+    @Override
+    public WriterPolicy writerPolicy(Position pos, Principal owner,
+            Collection<Principal> writers) {
         Principal w = disjunctivePrincipal(pos, writers);
         return writerPolicy(pos, owner, w);
     }
+    @Override
     public ConfPolicy bottomConfPolicy(Position pos) {
         return readerPolicy(pos, bottomPrincipal(pos), bottomPrincipal(pos));
     }
+    @Override
     public IntegPolicy bottomIntegPolicy(Position pos) {
         return writerPolicy(pos, topPrincipal(pos), topPrincipal(pos));
     }
+    @Override
     public ConfPolicy topConfPolicy(Position pos) {
         return readerPolicy(pos, topPrincipal(pos), topPrincipal(pos));        
     }
+    @Override
     public IntegPolicy topIntegPolicy(Position pos) {
         return writerPolicy(pos, bottomPrincipal(pos), bottomPrincipal(pos));        
     }
     
         
-    public Label joinLabel(Position pos, Set components) {
+    @Override
+    public Label joinLabel(Position pos, Set<Label> components) {
         if (components == null) {
-            components = Collections.EMPTY_SET;
+            components = Collections.emptySet();
         }
         if (components.isEmpty()) {
             return bottomLabel(pos);
         }
         if (components.size() == 1) {
-            return (Label)components.iterator().next();
+            return components.iterator().next();
         }
         Label t = new JoinLabel_c(components, this, pos, joinLabelTranslator());
         return t;
@@ -947,15 +1048,16 @@ public class JifTypeSystem_c
         return new JoinLabelToJavaExpr_c();
     }
 
-    public Label meetLabel(Position pos, Set components) {
+    @Override
+    public Label meetLabel(Position pos, Set<Label> components) {
         if (components == null) {
-            components = Collections.EMPTY_SET;
+            components = Collections.emptySet();
         }
         if (components.isEmpty()) {
             return topLabel(pos);
         }
         if (components.size() == 1) {
-            return (Label)components.iterator().next();
+            return components.iterator().next();
         }
         Label t = new MeetLabel_c(components, this, pos, meetLabelTranslator());
         return t;
@@ -965,11 +1067,13 @@ public class JifTypeSystem_c
         return new MeetLabelToJavaExpr_c();
     }
 
+    @Override
     public DynamicLabel dynamicLabel(Position pos, AccessPath path) {
         DynamicLabel t = new DynamicLabel_c(path, this, pos, dynamicLabelTranslator());
         return t;
     }
 
+    @Override
     public Label pathToLabel(Position pos, AccessPath path) {
         if (path instanceof AccessPathConstant) {
             AccessPathConstant apc = (AccessPathConstant)path;
@@ -988,15 +1092,18 @@ public class JifTypeSystem_c
     }
 
 
+    @Override
     public ArgLabel argLabel(Position pos, LocalInstance vi, CodeInstance ci) {
         ArgLabel t = new ArgLabel_c(this, vi, ci, pos);
         return t;
     }
+    @Override
     public ArgLabel argLabel(Position pos, ParamInstance pi) {
         ArgLabel t = new ArgLabel_c(this, pi, null, pos);
         return t;
     }
     
+    @Override
     public Label callSitePCLabel(JifProcedureInstance pi) {
         ArgLabel pcLabel = new ArgLabel_c(this, pi, "caller_pc", pi.position());
         pcLabel.setUpperBound(pi.pcBound());
@@ -1006,13 +1113,16 @@ public class JifTypeSystem_c
         return pcLabel;
     }
 
+    @Override
     public ThisLabel thisLabel(JifClassType ct) {
         return thisLabel(ct.position(), ct);
     }
+    @Override
     public ThisLabel thisLabel(ArrayType at) {
         return thisLabel(at.position(), at);
     }
 
+    @Override
     public ThisLabel thisLabel(Position pos, JifClassType ct) {
         return thisLabel(pos, (ReferenceType)ct);
     }
@@ -1020,11 +1130,13 @@ public class JifTypeSystem_c
         return new ThisLabel_c(this, ct, pos);
     }
 
+    @Override
     public UnknownLabel unknownLabel(Position pos) {
         UnknownLabel t = new UnknownLabel_c(this, pos);
         return t;
     }
     
+    @Override
     public PairLabel pairLabel(Position pos, 
                                ConfPolicy confPol, 
                                IntegPolicy integPol) {
@@ -1035,11 +1147,13 @@ public class JifTypeSystem_c
         return new PairLabelToJavaExpr_c();
     }
 
+    @Override
     public WritersToReadersLabel writersToReadersLabel(Position pos, Label L) {
         WritersToReadersLabel t = new WritersToReadersLabel_c(L, this, pos);
         return t;
     }
 
+    @Override
     public ActsForConstraint actsForConstraint(
         Position pos,
         Principal actor,
@@ -1048,24 +1162,31 @@ public class JifTypeSystem_c
         return new ActsForConstraint_c(this, pos, actor, granter, isEquiv);
     }
 
+    @Override
     public LabelLeAssertion labelLeAssertion(Position pos,
                                              Label lhs,
                                              Label rhs) {
         return new LabelLeAssertion_c(this, lhs, rhs, pos);
     }
 
-    public AuthConstraint authConstraint(Position pos, List principals) {
+    @Override
+    public AuthConstraint authConstraint(Position pos,
+            List<Principal> principals) {
         return new AuthConstraint_c(this, pos, principals);
     }
 
+    @Override
     public AutoEndorseConstraint autoEndorseConstraint(Position pos, Label endorseTo) {
         return new AutoEndorseConstraint_c(this, pos, endorseTo);
     }
 
-    public CallerConstraint callerConstraint(Position pos, List principals) {
+    @Override
+    public CallerConstraint callerConstraint(Position pos,
+            List<Principal> principals) {
         return new CallerConstraint_c(this, pos, principals);
     }
 
+    @Override
     public Label labelOfField(FieldInstance vi, Label pc) {
         // pc is not used in Jif (it is used in Split) -- This is a
         // simplifying generalization so we don't have to override as much
@@ -1073,6 +1194,7 @@ public class JifTypeSystem_c
         return ((JifFieldInstance)vi).label();
     }
 
+    @Override
     public Label labelOfLocal(LocalInstance vi, Label pc) {
         // pc is not used in Jif (it is used in Split) -- This is a
         // simplifying generalization so we don't have to override as much
@@ -1080,10 +1202,12 @@ public class JifTypeSystem_c
         return ((JifLocalInstance)vi).label();
     }
 
+    @Override
     public Label labelOfType(Type type) {
         return labelOfType(type, bottomLabel(type.position()));
     }
 
+    @Override
     public Label labelOfType(Type type, Label defaultLabel) {
         if (type instanceof LabeledType) {
             return ((LabeledType)type).labelPart();
@@ -1107,6 +1231,7 @@ public class JifTypeSystem_c
         return type;
     }
     
+    @Override
     public Type unlabel(Type type) {
         if (type instanceof LabeledType) {
             return ((LabeledType)type).typePart();
@@ -1114,14 +1239,17 @@ public class JifTypeSystem_c
         return type;
     }
 
+    @Override
     public boolean isLabel(Type type) {
         return equals(unlabel(type), LABEL_);
     }
 
+    @Override
     public boolean isPrincipal(Type type) {
         return equals(unlabel(type), PRINCIPAL_);
     }
 
+    @Override
     public boolean isLabeled(Type type) {
         return type instanceof LabeledType;
     }
@@ -1136,6 +1264,7 @@ public class JifTypeSystem_c
      * have sufficient infrastructure in Polyglot to simply provide a signature
      * for a Java class, and be able to detect this.
      */
+    @Override
     public boolean isJifClass(Type type) {
         ClassType ct = type.toClass();
         if (ct != null) {
@@ -1150,6 +1279,7 @@ public class JifTypeSystem_c
         return true;
     }
     
+    @Override
     public boolean isMarkerFieldName(String s) {
         return JIF_SIG_OF_JAVA_MARKER.equals(s) ||
                JIF_PARAMS_RUNTIME_MARKER.equals(s) ||
@@ -1159,6 +1289,7 @@ public class JifTypeSystem_c
     static String JIF_PARAMS_RUNTIME_MARKER = "__JIF_PARAMS_RUNTIME_REPRESENTED$20051007";
     static String JIF_SAFE_CONSTRUCTOR_MARKER = "__JIF_SAFE_CONSTRUCTORS$20050907";
     
+    @Override
     public boolean isParamsRuntimeRep(Type t) {
         if (isJifClass(t)) {
             return true;
@@ -1192,6 +1323,7 @@ public class JifTypeSystem_c
      *         of an untrusted non-Jif ancestor otherwise.
      *  
      */
+    @Override
     public ClassType hasUntrustedAncestor(Type t) {
         if (t == null || t.toReference() == null) {
             return null;
@@ -1233,6 +1365,7 @@ public class JifTypeSystem_c
      * In general, type t can be coerced to a String if t is a String, a
      * primitive, or it has a toString() method.
      */
+    @Override
     public boolean canCoerceToString(Type t, Context c) {
         if (this.equalsStrip(t, this.String()) || (t.isPrimitive() && 
                                               !isPrincipal(t) && !isLabel(t))) {
@@ -1245,6 +1378,7 @@ public class JifTypeSystem_c
         return false;
     }
 
+    @Override
     public Label join(Label L1, Label L2) {
         if (L1 instanceof NotTaken) {
             return L2.simplify();
@@ -1259,7 +1393,7 @@ public class JifTypeSystem_c
             return L2.simplify();
         }
         
-        Set s = new LinkedHashSet();
+        Set<Label> s = new LinkedHashSet<Label>();
         s.add(L1);
         s.add(L2);
         Position pos = L1.position();
@@ -1268,6 +1402,7 @@ public class JifTypeSystem_c
         return joinLabel(pos, s).simplify();
     }
     
+    @Override
     public Label meet(Label L1, Label L2) {
         if (L1.isTop() || L2.isBottom()) {
             return L2.simplify();
@@ -1275,7 +1410,7 @@ public class JifTypeSystem_c
         if (L2.isTop() || L1.isBottom()) {
             return L1.simplify();
         }
-        Set s = new LinkedHashSet();
+        Set<Label> s = new LinkedHashSet<Label>();
         s.add(L1);
         s.add(L2);
         Position pos = L1.position();
@@ -1285,53 +1420,61 @@ public class JifTypeSystem_c
     }
     
 
+    @Override
     public boolean actsFor(Principal p, Principal q) {
         return emptyLabelEnv.actsFor(p, q);
     }
 
+    @Override
     public boolean leq(Label L1, Label L2) {
         return emptyLabelEnv.leq(L1, L2);
     }
 
+    @Override
     public boolean leq(Policy p1, Policy p2) {
         return emptyLabelEnv.leq(p1, p2);
     }
-    public ConfPolicy joinConfPolicy(Position pos, Set components) {
+    @Override
+    public ConfPolicy joinConfPolicy(Position pos, Set<ConfPolicy> components) {
         if (components.isEmpty()) {
             return bottomConfPolicy(pos);
         }
         else if (components.size() == 1) {
-            return (ConfPolicy)components.iterator().next();
+            return components.iterator().next();
         }
         return (ConfPolicy)new JoinConfPolicy_c(components, this, pos).simplify();
     }
-    public IntegPolicy joinIntegPolicy(Position pos, Set components) {
+    @Override
+    public IntegPolicy joinIntegPolicy(Position pos, Set<IntegPolicy> components) {
         if (components.isEmpty()) {
             return bottomIntegPolicy(pos);
         }
         else if (components.size() == 1) {
-            return (IntegPolicy)components.iterator().next();
+            return components.iterator().next();
         }
         return (IntegPolicy)new JoinIntegPolicy_c(components, this, pos).simplify();        
     }
-    public ConfPolicy meetConfPolicy(Position pos, Set components) {
+    @Override
+    public ConfPolicy meetConfPolicy(Position pos, Set<ConfPolicy> components) {
         if (components.isEmpty()) {
             return topConfPolicy(pos);
         }
         else if (components.size() == 1) {
-            return (ConfPolicy)components.iterator().next();
+            return components.iterator().next();
         }
         return (ConfPolicy)new MeetConfPolicy_c(components, this, pos).simplify();        
     }
-    public IntegPolicy meetIntegPolicy(Position pos, Set components) {
+    @Override
+    public IntegPolicy meetIntegPolicy(Position pos, Set<IntegPolicy> components) {
         if (components.isEmpty()) {
             return topIntegPolicy(pos);
         }
         else if (components.size() == 1) {
-            return (IntegPolicy)components.iterator().next();
+            return components.iterator().next();
         }
         return (IntegPolicy)new MeetIntegPolicy_c(components, this, pos).simplify();        
     }
+    @Override
     public ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {
         if (p1.isTop() || p2.isBottom()) {
             return (ConfPolicy)p1.simplify();
@@ -1339,7 +1482,7 @@ public class JifTypeSystem_c
         if (p2.isTop() || p1.isBottom()) {
             return (ConfPolicy)p2.simplify();
         }
-        Set s = new HashSet();
+        Set<ConfPolicy> s = new HashSet<ConfPolicy>();
         s.add(p1);
         s.add(p2);
         Position pos = p1.position();
@@ -1347,6 +1490,7 @@ public class JifTypeSystem_c
 
         return (ConfPolicy)joinConfPolicy(pos, s).simplify();
     }
+    @Override
     public IntegPolicy join(IntegPolicy p1, IntegPolicy p2) {
         if (p1.isTop() || p2.isBottom()) {
             return (IntegPolicy)p1.simplify();
@@ -1354,7 +1498,7 @@ public class JifTypeSystem_c
         if (p2.isTop() || p1.isBottom()) {
             return (IntegPolicy)p2.simplify();
         }
-        Set s = new HashSet();
+        Set<IntegPolicy> s = new HashSet<IntegPolicy>();
         s.add(p1);
         s.add(p2);
         Position pos = p1.position();
@@ -1362,6 +1506,7 @@ public class JifTypeSystem_c
 
         return (IntegPolicy)joinIntegPolicy(pos, s).simplify();
     }
+    @Override
     public ConfPolicy meet(ConfPolicy p1, ConfPolicy p2) {
         if (p1.isTop() || p2.isBottom()) {
             return (ConfPolicy)p2.simplify();
@@ -1369,7 +1514,7 @@ public class JifTypeSystem_c
         if (p2.isTop() || p1.isBottom()) {
             return (ConfPolicy)p1.simplify();
         }
-        Set s = new HashSet();
+        Set<ConfPolicy> s = new HashSet<ConfPolicy>();
         s.add(p1);
         s.add(p2);
         Position pos = p1.position();
@@ -1377,6 +1522,7 @@ public class JifTypeSystem_c
 
         return (ConfPolicy)meetConfPolicy(pos, s).simplify();
     }
+    @Override
     public IntegPolicy meet(IntegPolicy p1, IntegPolicy p2) {
         if (p1.isTop() || p2.isBottom()) {
             return (IntegPolicy)p2.simplify();
@@ -1384,7 +1530,7 @@ public class JifTypeSystem_c
         if (p2.isTop() || p1.isBottom()) {
             return (IntegPolicy)p1.simplify();
         }
-        Set s = new HashSet();
+        Set<IntegPolicy> s = new HashSet<IntegPolicy>();
         s.add(p1);
         s.add(p2);
         Position pos = p1.position();
@@ -1393,12 +1539,14 @@ public class JifTypeSystem_c
         return (IntegPolicy)meetIntegPolicy(pos, s).simplify();
     }
     
+    @Override
     public ConfPolicy confProjection(Label L) {
         if (L instanceof MeetLabel || L instanceof JoinLabel || L instanceof PairLabel)
             return L.confProjection();
         
         return new ConfProjectionPolicy_c(L, this, L.position());
     }
+    @Override
     public IntegPolicy integProjection(Label L) {
         if (L instanceof MeetLabel || L instanceof JoinLabel || L instanceof PairLabel)
             return L.integProjection();
@@ -1407,6 +1555,8 @@ public class JifTypeSystem_c
     }
     
 
+    @SuppressWarnings("deprecation")
+    @Override
     public String translateClass(Resolver c, ClassType t)
     {
         // Fully qualify classes in jif.lang and jif.principal.
@@ -1420,6 +1570,7 @@ public class JifTypeSystem_c
         return super.translateClass(c, t);
     }
 
+    @Override
     public String translatePrimitive(Resolver c, PrimitiveType t) {
         if (isLabel(t)) {
             return LabelClassName();
@@ -1430,14 +1581,18 @@ public class JifTypeSystem_c
         }
     }
 
-    public List abstractSuperInterfaces(ReferenceType rt) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<ReferenceType> abstractSuperInterfaces(ReferenceType rt) {
         return super.abstractSuperInterfaces(rt);
     }
 
+    @Override
     public boolean isAccessible(MemberInstance mi, ClassType contextClass) {
         return super.isAccessible(mi, contextClass);
     }
 
+    @Override
     public PrimitiveType primitiveForName(String name)
         throws SemanticException {
 
@@ -1448,14 +1603,18 @@ public class JifTypeSystem_c
         return super.primitiveForName(name);
     }
 
-    public Collection uncheckedExceptions() {
+    @Override
+    public Collection<ClassType> uncheckedExceptions() {
         return Collections.singletonList(Error());
     }
 
+    @Override
     public DefaultSignature defaultSignature() {
         return ds;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public ConstructorInstance defaultConstructor(
         Position pos,
         ClassType container) {
@@ -1472,6 +1631,7 @@ public class JifTypeSystem_c
     }
 
     protected LabelTypeCheckUtil ltcu = null;
+    @Override
     public LabelTypeCheckUtil labelTypeCheckUtil() {
         if (ltcu == null)
             ltcu = new LabelTypeCheckUtil(this);
@@ -1483,39 +1643,47 @@ public class JifTypeSystem_c
     	return ((JifOptions)extInfo.getOptions()).fatalExceptions
     		&& descendsFrom(t, RuntimeException());
     }
-	
-	public Principal resolveProviderPrincipal(String name) throws SemanticException {
-        
-        if("_".equals(name))
-        	return bottomPrincipal(null);
-        
-        else if("*".equals(name)) 
-        	return topPrincipal(null);
-        
+
+    public Principal resolveProviderPrincipal(String name)
+            throws SemanticException {
+        if ("_".equals(name))
+            return bottomPrincipal(null);
+
+        else if ("*".equals(name))
+            return topPrincipal(null);
+
         else {
-        	ClassType pType;
-	        try {
-	            pType = (ClassType)jlts.typeForName(PrincipalClassName());
-	        }
-	        catch (SemanticException e) {
-	            throw new InternalCompilerError("Cannot find " + PrincipalClassName() + " class.", e);
-	        }
-	
-	        Named n;
-	        // Look for the principal only in class files.
-	        String className = "jif.principals." + name;
-	        n = jlts.loadedResolver().find(className);
-	        
-	        if (n instanceof Type) {
-	            Type t = (Type) n;
-	            if (t.isClass()) {
-	
-	                if (jlts.isSubtype(t.toClass(), pType)) {
-	                	return externalPrincipal(null, name);
-	                }                
-	            }
-	        }
-	        throw new SemanticException(name + " is not a principal.");
+            ClassType pType;
+            try {
+                pType = (ClassType) jlts.typeForName(PrincipalClassName());
+            } catch (SemanticException e) {
+                throw new InternalCompilerError("Cannot find "
+                        + PrincipalClassName() + " class.", e);
+            }
+
+            Named n;
+            // Look for the principal only in class files.
+            String className = "jif.principals." + name;
+            n = jlts.loadedResolver().find(className);
+
+            if (n instanceof Type) {
+                Type t = (Type) n;
+                if (t.isClass()) {
+
+                    if (jlts.isSubtype(t.toClass(), pType)) {
+                        return externalPrincipal(null, name);
+                    }
+                }
+            }
+            throw new SemanticException(name + " is not a principal.");
         }
-	}
+    }
+    
+    @Override
+    public Label principalToTrustLabel(Principal p) {
+        Position pos = Position.compilerGenerated(2);
+        Principal topPrincipal = topPrincipal(pos);
+        return pairLabel(pos, readerPolicy(pos, topPrincipal, p),
+                writerPolicy(pos, topPrincipal, p));
+    }
 }

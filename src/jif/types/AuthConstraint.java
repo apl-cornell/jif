@@ -1,11 +1,12 @@
 package jif.types;
 
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
+
+import jif.types.principal.Principal;
 
 /** The authority constraint. 
  */
 public interface AuthConstraint extends Assertion {
-    List principals();
-    AuthConstraint principals(List principals);
+    List<Principal> principals();
+    AuthConstraint principals(List<Principal> principals);
 }

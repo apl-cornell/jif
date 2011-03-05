@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import polyglot.ast.Expr;
+import polyglot.types.ClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import jif.translate.JifToJavaRewriter;
@@ -53,7 +54,7 @@ public interface Principal extends Param {
      * the exceptions that the runtime evaluation of the principal may produce.
      * If the principal cannot be evaluated at runtime, an empty list should be returned.  
      */
-    List throwTypes(TypeSystem ts);
+    List<ClassType> throwTypes(TypeSystem ts);
     
     /**
      * Does the label contain any variables at all? This includes variables
@@ -65,12 +66,10 @@ public interface Principal extends Param {
      * The set of variables that this label contains including variables contained
      * in upper bounds of arg labels.
      */
-    Set variables();
+    Set<Param> variables();
     
     boolean isTopPrincipal();
     boolean isBottomPrincipal();
-    boolean isProviderPrincipal();
-    Principal isProviderPrincipal(boolean isProvider); 
 
     /**
      * Simplify the label, using the actsfor relation if needed

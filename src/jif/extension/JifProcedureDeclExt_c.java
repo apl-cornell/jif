@@ -88,36 +88,38 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         return Li;
     }
 
-    protected void checkProviderAuthority(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
-    	final JifContext A = lc.jifContext();
-        for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
+    protected void checkProviderAuthority(JifProcedureInstance mi,
+            LabelChecker lc) throws SemanticException {
+        final JifContext A = lc.jifContext();
+        for (Iterator iter = mi.constraints().iterator(); iter.hasNext();) {
             Assertion c = (Assertion) iter.next();
 
             if (c instanceof CallerConstraint) {
                 final CallerConstraint cc = (CallerConstraint) c;
                 for (Iterator it = cc.principals().iterator(); it.hasNext();) {
-                	final Principal pi = (Principal) it.next();
+                    final Principal pi = (Principal) it.next();
                     final JifProcedureInstance _mi = mi;
-            		lc.constrain(A.provider(), 
-        					PrincipalConstraint.ACTSFOR, 
-        					pi, 
-        					A.labelEnv(), 
-        					cc.position(),
+                    lc.constrain(A.provider(), PrincipalConstraint.ACTSFOR, pi,
+                            A.labelEnv(), cc.position(),
                             new ConstraintMessage() {
-        	                    public String msg() {
-        	                        return A.provider() + " must act for " + pi;
-        	                    }
-        	                    public String detailMsg() {
-        	                        return  A.provider() + " is the provider of " + _mi.container() +
-        	                        " but does not have authority to act for " + pi;
-        	                    }
-                        	});
+                                public String msg() {
+                                    return A.provider() + " must act for " + pi;
+                                }
+
+                                public String detailMsg() {
+                                    return A.provider()
+                                            + " is the provider of "
+                                            + _mi.container()
+                                            + " but does not have authority to act for "
+                                            + pi;
+                                }
+                            });
                 }
             }
         }
-	}
+    }
 
-	protected Label checkAutoEndorseConstrainPC(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
+    protected Label checkAutoEndorseConstrainPC(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
         final JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.jifTypeSystem();
         JifClassType ct = (JifClassType) A.currentClass();

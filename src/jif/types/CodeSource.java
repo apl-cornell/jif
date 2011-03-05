@@ -1,8 +1,7 @@
 package jif.types;
 
-import jif.types.principal.Principal;
-import polyglot.frontend.Source;
+import jif.types.label.Label;
 
 public interface CodeSource {
-	Principal provider();
+    Label provider();
 }

@@ -2,6 +2,7 @@ package jif.types;
 
 import java.util.List;
 
+import jif.types.label.Label;
 import jif.types.label.ThisLabel;
 import jif.types.principal.Principal;
 import polyglot.types.ClassType;
@@ -14,11 +15,11 @@ public interface JifClassType extends ClassType {
      * The principals that grant authority to objects of this class, that is,
      * the principals listed in the authority clause.
      */
-    List authority();
+    List<Principal> authority();
     /**
      * Constraints on the principal hierarchy.
      */
-    List constraints();
+    List<Assertion> constraints();
 
     /**
      * The principals whose authority is required by the context that creates a
@@ -26,7 +27,7 @@ public interface JifClassType extends ClassType {
      * instantiated) parameter principals that are in the authority list. See
      * Andrew's thesis, 4.6.2.
      */
-    List constructorCallAuthority();
+    List<Principal> constructorCallAuthority();
 
     /**
      * Returns this class's "this" label.
@@ -41,10 +42,10 @@ public interface JifClassType extends ClassType {
      * 
      * @return List of Param
      */
-    List actuals();
+    List<Param> actuals();
     
     /**
-     * Returns the principal of the provider of the implementation of this class.
+     * Returns the provider label of the implementation of this class.
      */
-    Principal provider();
+    Label provider();
 }

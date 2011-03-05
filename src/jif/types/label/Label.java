@@ -11,6 +11,7 @@ import jif.types.PathMap;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
+import polyglot.types.ClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 
@@ -43,6 +44,10 @@ public interface Label extends Param {
      * Is this label covariant?
      */
     boolean isCovariant();
+
+    public boolean isProviderLabel();
+    
+    public Label isProviderLabel(boolean isProvider);
 
 //    /**
 //     * Returns the join of this label and L.
@@ -168,13 +173,13 @@ public interface Label extends Param {
      * is a subset of variables(), since it does not count var labels contained
      * in upper bounds of arg labels.
      */
-    Set variableComponents();
+    Set<Param> variableComponents();
     
     /**
      * The set of variables that this label contains including variables contained
      * in upper bounds of arg labels.
      */
-    Set variables();
+    Set<Param> variables();
 
     /**
      * Implementation of leq, should only be called by JifTypeSystem
@@ -186,6 +191,7 @@ public interface Label extends Param {
      */
     boolean leq_(Label L, LabelEnv H, LabelEnv.SearchState state);
 
+    @Override
     boolean isRuntimeRepresentable();
 
     ConfPolicy confProjection();
@@ -197,13 +203,13 @@ public interface Label extends Param {
      * the runtime evaluation of the label may produce. If the label cannot be
      * evaluated at runtime, an empty list should be returned.
      */
-    List throwTypes(TypeSystem ts);
+    List<ClassType> throwTypes(TypeSystem ts);
 
     Expr toJava(JifToJavaRewriter rw) throws SemanticException;
 
     String componentString();
 
-    String componentString(Set printedLabels);
+    String componentString(Set<Label> printedLabels);
 
-    String toString(Set printedLabels);    
+    String toString(Set<Label> printedLabels);    
 }
