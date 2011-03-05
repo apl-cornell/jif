@@ -1,11 +1,15 @@
-class exctest {
+class exctest[label L] {
     int{*->*} x;
 
-    static int{*->*} nofail(exctest y) {
-	int a;
-	//try {
-	    a = y.x;
-	//} catch (NullPointerException n) { a = 0; }
-	return a;
+    static int{*->*} nofail(exctest[L] y) {
+		int a = y.x;
+		return a;
     }
+
+	exctest{L}(String{L} path) {
+		// Would be handy to have a signature for StringTokenizer...
+		while (0 < path.length()) {
+		}
+	}
 }
+// vim: ts=4 sw=4
