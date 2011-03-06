@@ -10,7 +10,7 @@ import polyglot.types.SemanticException;
 import polyglot.util.*;
 import polyglot.visit.*;
 
-/** An implementation of the <tt>ActsForConstraintNode</tt> interface. */
+/** An implementation of the <tt>LabelLeAssertionNode</tt> interface. */
 public class LabelLeAssertionNode_c extends ConstraintNode_c implements LabelLeAssertionNode
 {
     protected LabelNode lhs;
