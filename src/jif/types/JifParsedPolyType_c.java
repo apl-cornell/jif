@@ -46,10 +46,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	this.params = new TypedList(new LinkedList(), ParamInstance.class, false);
 	this.authority = new TypedList(new LinkedList(), Principal.class, false);
 	this.constraints = new TypedList(new LinkedList(), Constraint.class, false);
-	if(fromSource instanceof CodeSource)
-		this.provider = ((CodeSource)fromSource).provider();
-	else
-		throw new InternalCompilerError("Source file " + fromSource + " has no provider.");
+	this.provider = ts.topPrincipal(null);
         this.instantiatedFrom = null;
     }
 
