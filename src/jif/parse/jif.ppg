@@ -918,10 +918,6 @@ auth_constraint ::=
         {: RESULT = parser.nf.LabelActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}
-    |   label:a actsfor label:b
-        {: RESULT = parser.nf.LabelActsForLabelConstraintNode(parser.pos(a,b), a, b);
-           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
-        :}
     |   principal:a EQUIV principal:b
         {: RESULT = parser.nf.PrincipalActsForPrincipalConstraintNode(parser.pos(a,b), a, b, true);
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());

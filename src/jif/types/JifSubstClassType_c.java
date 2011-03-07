@@ -53,7 +53,6 @@ public class JifSubstClassType_c extends SubstClassType_c
     ////////////////////////////////////////////////////////////////
     // Implement methods of JifClassType
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Principal> authority() {
         JifClassType base = (JifClassType) this.base;
@@ -61,15 +60,13 @@ public class JifSubstClassType_c extends SubstClassType_c
         return subst.substPrincipalList(base.authority());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public List<ActsForConstraint<Principal, Principal>> constraints() {
+    public List<ActsForConstraint<ActsForParam, Principal>> constraints() {
         JifClassType base = (JifClassType) this.base;
         JifSubst subst = (JifSubst) this.subst;
         return subst.substConstraintList(base.constraints());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Principal> constructorCallAuthority() {
         JifClassType base = (JifClassType) this.base;        

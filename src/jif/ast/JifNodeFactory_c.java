@@ -3,6 +3,8 @@ package jif.ast;
 import java.util.Collections;
 import java.util.List;
 
+import jif.types.ActsForConstraint;
+import jif.types.ActsForParam;
 import jif.types.Assertion;
 import jif.types.ParamInstance;
 import jif.types.label.Label;
@@ -237,10 +239,16 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
     @Override
-    public JifClassDecl JifClassDecl(Position pos, Flags flags, Id name,
-            List<ParamDecl> params, 
-            TypeNode superClass, List<TypeNode> interfaces,
-            List<PrincipalNode> authority, List<ConstraintNode<Assertion>> constraints, ClassBody body) {
+    public JifClassDecl JifClassDecl(
+            Position pos,
+            Flags flags,
+            Id name,
+            List<ParamDecl> params,
+            TypeNode superClass,
+            List<TypeNode> interfaces,
+            List<PrincipalNode> authority,
+            List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints,
+            ClassBody body) {
         JifClassDecl n = new JifClassDecl_c(pos, flags, name,
                                             params, superClass, interfaces, authority, constraints, body);
         n = (JifClassDecl)n.ext(extFactory().extClassDecl());

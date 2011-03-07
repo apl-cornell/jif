@@ -4,6 +4,7 @@ import java.util.*;
 
 import jif.types.*;
 import jif.types.label.AccessPathThis;
+import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.ext.param.types.MuPClass;
@@ -17,26 +18,34 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 {
     protected List<ParamDecl> params;
     protected List<PrincipalNode> authority;
-    protected List<ConstraintNode<Assertion>> constraints;
+    protected List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints;
 
     public JifClassDecl_c(Position pos, Flags flags, Id name,
             List<ParamDecl> params, TypeNode superClass,
             List<TypeNode> interfaces, List<PrincipalNode> authority,
-            List<ConstraintNode<Assertion>> constraints, ClassBody body) {
+            List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints,
+            ClassBody body) {
         super(pos, flags, name, superClass, interfaces, body);
         this.params = Collections.unmodifiableList(new ArrayList<ParamDecl>(params));
         this.authority = Collections.unmodifiableList(new ArrayList<PrincipalNode>(authority));
-        this.constraints = Collections.unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(constraints));
+        this.constraints =
+                Collections
+                        .unmodifiableList(new ArrayList<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>>(
+                                constraints));
     }
 
     @Override
-    public List<ConstraintNode<Assertion>> constraints() {
+    public List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints() {
         return this.constraints;
     }
     @Override
-    public JifClassDecl constraints(List<ConstraintNode<Assertion>> constraints) {
+    public JifClassDecl constraints(
+            List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints) {
         JifClassDecl_c n = (JifClassDecl_c) copy();
-        n.constraints = Collections.unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(constraints));
+        n.constraints =
+                Collections
+                        .unmodifiableList(new ArrayList<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>>(
+                                constraints));
         return n;
     }
 
@@ -114,8 +123,16 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 
     public JifContext addConstraintsToContext(JifContext A) {
         JifParsedPolyType ct = (JifParsedPolyType) this.type;
-        for (ActsForConstraint<Principal, Principal> pi : ct.constraints()) {
-            A.addActsFor(pi.actor(), pi.granter());
+        for (ActsForConstraint<ActsForParam, Principal> pi : ct.constraints()) {
+            ActsForParam actor = pi.actor();
+            if (actor instanceof Principal) {
+                A.addActsFor((Principal) actor, pi.granter());
+            } else if (actor instanceof Label) {
+                A.addActsFor((Label) actor, pi.granter());
+            } else {
+                throw new InternalCompilerError(
+                        "Unexpected ActsForParam type: " + actor.getClass());
+            }
         }
         return A;
     }
@@ -124,8 +141,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
     public  JifContext addParamsToContext(JifContext A) {
         JifParsedPolyType ct = (JifParsedPolyType) this.type;
         A = (JifContext)A.pushBlock();
-        for (Iterator i = ct.params().iterator(); i.hasNext(); ) {
-            ParamInstance pi = (ParamInstance) i.next();
+        for (ParamInstance pi : ct.params()) {
             A.addVariable(pi);
         }
         return A;
@@ -135,7 +151,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
     public JifContext addAuthorityToContext(JifContext A) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         JifParsedPolyType ct = (JifParsedPolyType) this.type;
-        Set s = new LinkedHashSet(ct.authority());
+        Set<Principal> s = new LinkedHashSet<Principal>(ct.authority());
         if (ts.isSubtype(ct, ts.PrincipalClass())) {
             // This class implements jif.lang.Princpal, and as such
             // implicitly has the authority of the principal represented by
@@ -166,11 +182,10 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         ct.setInstantiatedFrom(pc);
         pc.clazz(ct);
 
-        Set names = new LinkedHashSet(params.size());
+        Set<String> names = new LinkedHashSet<String>(params.size());
 
-        List newParams = new ArrayList(params.size());
-        for (Iterator i = params.iterator(); i.hasNext();) {
-            ParamDecl p = (ParamDecl)i.next();
+        List<ParamInstance> newParams = new ArrayList<ParamInstance>(params.size());
+        for (ParamDecl p : params) {
             newParams.add(p.paramInstance());
             //check for renaming error
             if (names.contains(p.name()))
@@ -189,16 +204,16 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 
         JifParsedPolyType ct = (JifParsedPolyType) n.type;
 
-        List principals = new ArrayList(n.authority().size());
-        for (Iterator i = n.authority().iterator(); i.hasNext(); ) {
-            PrincipalNode p = (PrincipalNode) i.next();
+        List<Principal> principals = new ArrayList<Principal>(n.authority().size());
+        for (PrincipalNode p : n.authority()) {
             principals.add(p.principal());
         }
         ct.setAuthority(principals);
         
-        List<ConstraintNode<Assertion>> constraints = new ArrayList(n.constraints().size());
-        for (Iterator i = n.constraints().iterator(); i.hasNext(); ) {
-            ConstraintNode cn = (ConstraintNode) i.next();
+        List<ActsForConstraint<ActsForParam, Principal>> constraints =
+                new ArrayList<ActsForConstraint<ActsForParam, Principal>>(
+                        n.constraints().size());
+        for (ConstraintNode<ActsForConstraint<ActsForParam, Principal>> cn : n.constraints()) {
             if (!cn.isDisambiguated()) {
                 // constraint nodes haven't been disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
@@ -218,6 +233,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         return n;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
         if (flags.isInterface()) {
@@ -233,8 +249,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 
         if (! params.isEmpty()) {
             w.write("[");
-            for (Iterator i = params.iterator(); i.hasNext(); ) {
-                ParamDecl p = (ParamDecl) i.next();
+            for (Iterator<ParamDecl> i = params.iterator(); i.hasNext(); ) {
+                ParamDecl p = i.next();
                 print(p, w, tr);
                 if (i.hasNext()) {
                     w.write(",");
@@ -246,8 +262,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 
         if (! authority.isEmpty()) {
             w.write(" authority(");
-            for (Iterator i = authority.iterator(); i.hasNext(); ) {
-                PrincipalNode p = (PrincipalNode) i.next();
+            for (Iterator<PrincipalNode> i = authority.iterator(); i.hasNext(); ) {
+                PrincipalNode p = i.next();
                 print(p, w, tr);
                 if (i.hasNext()) {
                     w.write(",");
@@ -270,8 +286,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
                 w.write(" implements ");
             }
 
-            for (Iterator i = interfaces().iterator(); i.hasNext(); ) {
-                TypeNode tn = (TypeNode) i.next();
+            for (Iterator<TypeNode> i = interfaces().iterator(); i.hasNext(); ) {
+                TypeNode tn = i.next();
                 print(tn, w, tr);
 
                 if (i.hasNext()) {

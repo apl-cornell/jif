@@ -206,9 +206,9 @@ public class LabelTypeCheckUtil {
      * @return List of <code>PathMap</code>s, one for each parameter of the subst type.
      * @throws SemanticException
      */
-    public List labelCheckTypeParams(Type t, LabelChecker lc, List throwTypes, Position pos) throws SemanticException {
+    public List<PathMap> labelCheckTypeParams(Type t, LabelChecker lc, List throwTypes, Position pos) throws SemanticException {
         t = ts.unlabel(t);
-        List Xparams;
+        List<PathMap> Xparams;
 
         if (t instanceof JifSubstType) {            
             JifContext A = lc.context();

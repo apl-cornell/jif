@@ -27,7 +27,7 @@ import polyglot.types.SemanticException;
  */
 public interface JifContext extends Context {
     /* ************************************************
-     * Label envirnoment methods
+     * Label environment methods
      */
     LabelEnv labelEnv();
     
@@ -35,6 +35,11 @@ public interface JifContext extends Context {
      * Add a less than or equal assertion to the label environment.
      */
     void addAssertionLE(Label L1, Label L2);
+    
+    /**
+     * Adds a label-actsfor-principal assertion to the label environment.
+     */
+    void addActsFor(Label L, Principal p);
 
     /**
      * Add an equivalence to the label environment. 
