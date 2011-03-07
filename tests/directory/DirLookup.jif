@@ -1,8 +1,12 @@
 class DirLookup[label L] {
+
+ static int {} x;
+	/*
 	static LookupResult{*lb} lookup{*lb}(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path)
 	{
 		return lookup(d, path, 0, lb, lb);
 	}
+	*/
 
 // problem: the result should have a more restrictive label in general than *prev; *lb. The caller cannot in fact
 // predict what the label is. Two ideas for how to deal with this:
@@ -15,6 +19,7 @@ class DirLookup[label L] {
 //    but we need to be able to assign 'final' variables (e.g., the accumulated label) on each loop iteration.
 //   The Jif compiler needs to do some kind of SSA conversion to allow these assignments to be done soundly.
 
+/*
 	static LookupResult{*prev; *lb} lookup{*lb}(DirNode{*lb} d, DirPath[L]{*lb} path, int i, label{*lb} lb, label{*lb} prev)
 	{
 		final label retl = new label{*d.label_; L; *lb; *prev};
@@ -38,18 +43,23 @@ class DirLookup[label L] {
 			return new LookupResult(retl, null);
 		}
 	}
+*/
 
-	static LookupResult{*lb} lookup2(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path)
+	static LookupResult{*lb;L} lookup2{*lb}(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path)
 	{
-		final label retl = new label{*d.label_; L; *lb};
+		label retl = new label{L; *lb};
 		DirNode cur = d;
+		Object o = cur;
+		try {
 		int n = path.components.length;
 		int i = 0;
-		Object o = cur;
 		while (i < n) {
+			final label old_retl = retl;
+			final DirNode cur0 = cur;
+			retl = new label {*old_retl; *cur0.label_};
 			String nm = path.components[i];
 			o = null;
-			if (d.contains(nm)) {
+			if (cur.contains(nm)) {
 				try {
 					o = cur.get(nm);
 				} catch (Exception canthappen) {}
@@ -62,7 +72,9 @@ class DirLookup[label L] {
 			}
 			i++;
 		}
-		return new LookupResult(retl, o);
+		} catch (RuntimeException e) {}
+		final label ret_retl = retl;
+		return new LookupResult(ret_retl, o);
 	}
 
 }

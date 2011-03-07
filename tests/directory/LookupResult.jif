@@ -1,8 +1,8 @@
 class LookupResult {
     final label{this} label_; // XXX decl removed in Fabric version
-	final Object{*label_; this} obj;
+	final Object{*label_} obj;
 
-    LookupResult(label{this} l, Object{*l; this} o) {
+    LookupResult(label{this} l, Object{*l} o) {
 		label_ = l;
         obj = o;
     }
