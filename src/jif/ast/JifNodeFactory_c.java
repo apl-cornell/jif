@@ -212,7 +212,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public ClassDecl ClassDecl(Position pos, Flags flags, Id name, TypeNode superClass, List interfaces, ClassBody body) {
         ClassDecl n = new JifClassDecl_c(pos, flags, name,
@@ -240,7 +240,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     public JifClassDecl JifClassDecl(Position pos, Flags flags, Id name,
             List<ParamDecl> params, 
             TypeNode superClass, List<TypeNode> interfaces,
-            List<PrincipalNode> authority, List<ConstraintNode<?>> constraints, ClassBody body) {
+            List<PrincipalNode> authority, List<ConstraintNode<Assertion>> constraints, ClassBody body) {
         JifClassDecl n = new JifClassDecl_c(pos, flags, name,
                                             params, superClass, interfaces, authority, constraints, body);
         n = (JifClassDecl)n.ext(extFactory().extClassDecl());
