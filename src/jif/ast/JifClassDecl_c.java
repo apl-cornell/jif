@@ -114,7 +114,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 
     public JifContext addConstraintsToContext(JifContext A) {
         JifParsedPolyType ct = (JifParsedPolyType) this.type;
-        for (ActsForConstraint<?, ?> pi : ct.constraints()) {
+        for (ActsForConstraint<Principal, Principal> pi : ct.constraints()) {
             A.addActsFor(pi.actor(), pi.granter());
         }
         return A;

@@ -24,7 +24,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 {
     List<ParamInstance> params;
     List<Principal> authority;
-    List<Assertion> constraints;
+    List<ActsForConstraint<Principal, Principal>> constraints;
     Label provider;
     
     PClass instantiatedFrom;
@@ -164,7 +164,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
         this.authority = new TypedList(principals, Principal.class, false);
     }
     @Override
-    public List<Assertion> constraints() {
+    public List<ActsForConstraint<Principal, Principal>> constraints() {
     	return constraints;
     }
     @SuppressWarnings({ "rawtypes", "unchecked" })

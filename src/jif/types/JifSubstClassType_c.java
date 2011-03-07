@@ -63,7 +63,7 @@ public class JifSubstClassType_c extends SubstClassType_c
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Assertion> constraints() {
+    public List<ActsForConstraint<Principal, Principal>> constraints() {
         JifClassType base = (JifClassType) this.base;
         JifSubst subst = (JifSubst) this.subst;
         return subst.substConstraintList(base.constraints());

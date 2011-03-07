@@ -134,7 +134,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Assertion> substConstraintList(List<Assertion> constraints) {
+    public <C extends Assertion> List<C> substConstraintList(List<C> constraints) {
         return new CachingTransformingList(constraints, new ConstraintXform());
     }
 

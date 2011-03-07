@@ -15,7 +15,7 @@ public interface JifSubst extends Subst
     // public Label substLabel(Label label, Label thisL);
     public Principal substPrincipal(Principal principal);
 
-    public List<Assertion> substConstraintList(List<Assertion> constraints);
+    public <C extends Assertion> List<C> substConstraintList(List<C> constraints);
     public List<Label> substLabelList(List<Label> labels);
     public List<Principal> substPrincipalList(List<Principal> principals);
 
