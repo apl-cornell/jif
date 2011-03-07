@@ -691,8 +691,8 @@ public class CallHelper {
                          
                 }
             }
-            else if (jc instanceof ActsForConstraint) {
-                final ActsForConstraint jac = (ActsForConstraint)jc;
+            else if (jc instanceof ActsForConstraint<Principal, Principal>) {
+                final ActsForConstraint<Principal, Principal> jac = (ActsForConstraint<Principal, Principal>)jc;
 
                 final Principal actor = performInstantiations ? instantiate(A, jac.actor()) : jac.actor();
 

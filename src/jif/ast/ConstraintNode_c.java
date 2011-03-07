@@ -1,7 +1,6 @@
 package jif.ast;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Set;
 
 import jif.types.Assertion;
@@ -14,46 +13,51 @@ import polyglot.visit.NodeVisitor;
 
 /** An implementation of the <code>ConstraintNode</code> interface. 
  */
-public class ConstraintNode_c extends Node_c implements ConstraintNode
-{
-    protected Set constraints; // of Assertion 
+public class ConstraintNode_c<Constraint extends Assertion> extends Node_c
+        implements ConstraintNode<Constraint> {
+    
+    protected Set<Constraint> constraints; // of Assertion 
 
     public ConstraintNode_c(Position pos) {
 	super(pos);
     }
 
+    @Override
     public boolean isDisambiguated() {
         if (constraints == null) return false;
-        for (Iterator iter = constraints.iterator(); iter.hasNext(); ) {
-            Assertion a = (Assertion)iter.next();
+        for (Assertion a : constraints) {
             if (!a.isCanonical()) return false;
         }
         return super.isDisambiguated();
     }
 
-    public Set constraints() {
+    @Override
+    public Set<Constraint> constraints() {
 	return constraints;
     }
 
-    public ConstraintNode constraints(Set constraints) {
-	ConstraintNode_c n = (ConstraintNode_c) copy();
+    @SuppressWarnings("unchecked")
+    @Override
+    public ConstraintNode<Constraint> constraints(Set<Constraint> constraints) {
+	ConstraintNode_c<Constraint> n = (ConstraintNode_c<Constraint>) copy();
 	n.constraints = constraints;
 	return n;
     }
     
-    protected Assertion constraint() {
+    protected Constraint constraint() {
         if (constraints == null) return null;
         if (constraints.size() > 1)  throw new InternalCompilerError("Multiple constraints");
-        return (Assertion)constraints.iterator().next();
+        return constraints.iterator().next();
     }
 
-    protected ConstraintNode constraint(Assertion constraint) {
-        ConstraintNode_c n = (ConstraintNode_c) copy();
+    @SuppressWarnings("unchecked")
+    protected ConstraintNode<Constraint> constraint(Constraint constraint) {
+        ConstraintNode_c<Constraint> n = (ConstraintNode_c<Constraint>) copy();
         n.constraints = Collections.singleton(constraint);
         return n;
     }
     
-    protected void setConstraint(Assertion constraint) {
+    protected void setConstraint(Constraint constraint) {
         constraints = Collections.singleton(constraint);
     }
     
@@ -61,6 +65,7 @@ public class ConstraintNode_c extends Node_c implements ConstraintNode
      * Bypass all children when performing an exception check. Constraints
      * aren't examined at runtime.
      */
+    @Override
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
     throws SemanticException
     {
@@ -69,6 +74,7 @@ public class ConstraintNode_c extends Node_c implements ConstraintNode
     }
 
     
+    @Override
     public String toString() {
 	if (constraints != null) {
 	    return constraints.toString();

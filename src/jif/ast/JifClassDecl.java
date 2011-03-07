@@ -2,6 +2,7 @@ package jif.ast;
 
 import java.util.List;
 
+import jif.types.Assertion;
 import jif.types.JifContext;
 import polyglot.ast.ClassDecl;
 
@@ -10,14 +11,14 @@ import polyglot.ast.ClassDecl;
  *  and the authority constraint.
  */
 public interface JifClassDecl extends ClassDecl {
-    List params();
-    JifClassDecl params(List params);
+    List<ParamDecl> params();
+    JifClassDecl params(List<ParamDecl> params);
 
-    List authority();
-    JifClassDecl authority(List authority);
+    List<PrincipalNode> authority();
+    JifClassDecl authority(List<PrincipalNode> authority);
     
-    List constraints();
-    JifClassDecl constraints(List constraints);
+    List<ConstraintNode<Assertion>> constraints();
+    JifClassDecl constraints(List<ConstraintNode<Assertion>> constraints);
 
     JifClassDecl type(polyglot.types.Type type);
     

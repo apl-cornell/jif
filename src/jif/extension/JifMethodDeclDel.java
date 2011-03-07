@@ -99,7 +99,7 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
             // check that the method does not have any constraints that we do not check.
             for (Iterator iter = mi.constraints().iterator(); iter.hasNext();) {
                 Assertion constraint = (Assertion)iter.next();
-                if (constraint instanceof ActsForConstraint || 
+                if (constraint instanceof ActsForConstraint<Principal, Principal> || 
                         constraint instanceof LabelLeAssertion) {
                     // cannot have any actsfor or label le constraints
                     throw new SemanticDetailedException("The main method of a class can not have actsfor " +

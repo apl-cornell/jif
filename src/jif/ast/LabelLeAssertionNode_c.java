@@ -11,8 +11,8 @@ import polyglot.util.*;
 import polyglot.visit.*;
 
 /** An implementation of the <tt>LabelLeAssertionNode</tt> interface. */
-public class LabelLeAssertionNode_c extends ConstraintNode_c implements LabelLeAssertionNode
-{
+public class LabelLeAssertionNode_c extends ConstraintNode_c<LabelLeAssertion>
+        implements LabelLeAssertionNode {
     protected LabelNode lhs;
     protected LabelNode rhs;
     protected final boolean isEquiv;
@@ -25,32 +25,36 @@ public class LabelLeAssertionNode_c extends ConstraintNode_c implements LabelLeA
     }
 
     /** Gets the lhs label node. */
+    @Override
     public LabelNode lhs() {
 	return this.lhs;
     }
 
     /** Returns a copy of this node with the lhs updated. */
+    @Override
     public LabelLeAssertionNode lhs(LabelNode lhs) {
 	LabelLeAssertionNode_c n = (LabelLeAssertionNode_c) copy();
 	n.lhs = lhs;
 	if (constraints() != null) {
-            LabelLeAssertion c = (LabelLeAssertion)constraints().iterator().next();
+            LabelLeAssertion c = constraints().iterator().next();
             n = n.setConstraints((JifTypeSystem)c.typeSystem());
 	}
 	return n;
     }
 
     /** Gets the rhs principal. */
+    @Override
     public LabelNode rhs() {
 	return this.rhs;
     }
 
     /** Returns a copy of this node with the rhs updated. */
+    @Override
     public LabelLeAssertionNode rhs(LabelNode rhs) {
 	LabelLeAssertionNode_c n = (LabelLeAssertionNode_c) copy();
 	n.rhs = rhs;
 	if (constraints() != null) {
-            LabelLeAssertion c = (LabelLeAssertion)constraints().iterator().next();
+            LabelLeAssertion c = constraints().iterator().next();
             n = n.setConstraints((JifTypeSystem)c.typeSystem());
 	}
 	return n;
@@ -67,13 +71,19 @@ public class LabelLeAssertionNode_c extends ConstraintNode_c implements LabelLeA
     }
 
     /** Visits the children of this node. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	LabelNode lhs = (LabelNode) visitChild(this.lhs, v);
 	LabelNode rhs = (LabelNode) visitChild(this.rhs, v);
 	return reconstruct(lhs, rhs);
     }
 
-    /** Builds the type of this node. */
+    /**
+     * Builds the type of this node.
+     *  
+     * @throws SemanticException
+     */
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
 	if (constraints() == null) {
             JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
@@ -85,7 +95,7 @@ public class LabelLeAssertionNode_c extends ConstraintNode_c implements LabelLeA
     
     private LabelLeAssertionNode_c setConstraints(JifTypeSystem ts) {
         if (isEquiv) {
-            Set cs = new HashSet();
+            Set<LabelLeAssertion> cs = new HashSet<LabelLeAssertion>();
             cs.add(ts.labelLeAssertion(position(),
                                        lhs.label(),
                                        rhs.label()));
@@ -100,6 +110,7 @@ public class LabelLeAssertionNode_c extends ConstraintNode_c implements LabelLeA
         
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         print(lhs, w, tr);
         w.write(" ");
@@ -108,6 +119,7 @@ public class LabelLeAssertionNode_c extends ConstraintNode_c implements LabelLeA
         print(rhs, w, tr);
     }
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("Cannot translate " + this);
     }

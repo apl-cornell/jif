@@ -198,7 +198,8 @@ public interface JifTypeSystem extends ParamTypeSystem
     IntegPolicy integProjection(Label L);
     
     /** Construct an acts-for constraint. */
-    ActsForConstraint actsForConstraint(Position pos, Principal actor, Principal granter, boolean isEquiv);
+    <Actor extends ActsForParam, Granter extends ActsForParam> ActsForConstraint<Actor, Granter> actsForConstraint(
+            Position pos, Actor actor, Granter granter, boolean isEquiv);
 
     /** Construct an acts-for constraint. */
     LabelLeAssertion labelLeAssertion(Position pos, Label lhs, Label rhs);

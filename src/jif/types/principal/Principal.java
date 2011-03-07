@@ -14,7 +14,7 @@ import jif.visit.LabelChecker;
 
 /** The root interface of all kinds of Jif principals. 
  */
-public interface Principal extends Param {
+public interface Principal extends ActsForParam {
 
     /**
      * @param labelSubst The <code>LabelSubstitution</code> to apply to this
@@ -22,6 +22,7 @@ public interface Principal extends Param {
      * @return the result of applying labelSubst to this principal.
      * @throws SemanticException
      */
+    @Override
     Principal subst(LabelSubstitution labelSubst) throws SemanticException;
 
     /**

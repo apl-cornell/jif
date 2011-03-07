@@ -3,7 +3,6 @@ package jif.ast;
 import java.util.List;
 
 import jif.types.JifTypeSystem;
-import jif.types.Param;
 import jif.types.principal.Principal;
 import polyglot.ast.Expr_c;
 import polyglot.ast.Node;
@@ -22,20 +21,29 @@ public abstract class PrincipalNode_c extends Expr_c implements PrincipalNode
 	super(pos);
     }
 
+    @Override
     public Principal principal() {
 	return principal;
     }
 
+    @Override
     public PrincipalNode principal(Principal principal) {
 	PrincipalNode_c n = (PrincipalNode_c) copy();
 	n.principal = principal;
 	return n;
     }
 
-    public Param parameter() {
+    @Override
+    public Principal parameter() {
 	return principal();
     }
     
+    @Override
+    public PrincipalNode parameter(Principal principal) {
+        return principal(principal);
+    }
+    
+    @Override
     public String toString() {
 	if (principal != null) {
 	    return principal.toString();
@@ -48,15 +56,23 @@ public abstract class PrincipalNode_c extends Expr_c implements PrincipalNode
 //        return principal;
 //    }
 
+    @Override
     public boolean isDisambiguated() {
         return principal != null && principal.isCanonical() && super.isDisambiguated();
     }
     
+    @SuppressWarnings("rawtypes")
+    @Override
     public List throwTypes(TypeSystem ts) {
         return principal().throwTypes(ts);
     }
 
-    /** Type check the expression. */
+    /**
+     * Type check the expression.
+     *  
+     * @throws SemanticException
+     */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
         return type(ts.Principal());

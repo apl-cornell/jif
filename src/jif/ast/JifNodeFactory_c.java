@@ -240,7 +240,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     public JifClassDecl JifClassDecl(Position pos, Flags flags, Id name,
             List<ParamDecl> params, 
             TypeNode superClass, List<TypeNode> interfaces,
-            List<PrincipalNode> authority, List<ConstraintNode> constraints, ClassBody body) {
+            List<PrincipalNode> authority, List<ConstraintNode<?>> constraints, ClassBody body) {
         JifClassDecl n = new JifClassDecl_c(pos, flags, name,
                                             params, superClass, interfaces, authority, constraints, body);
         n = (JifClassDecl)n.ext(extFactory().extClassDecl());
@@ -264,7 +264,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     public JifMethodDecl JifMethodDecl(Position pos, Flags flags, 
             TypeNode returnType, Id name, LabelNode startLabel, 
             List<Formal> formals, LabelNode endLabel, List<TypeNode> throwTypes, 
-            List<ConstraintNode> constraints, Block body) {
+            List<ConstraintNode<?>> constraints, Block body) {
 //      //add default return value label node
 //if (! (returnType instanceof LabeledTypeNode) &&
 //      (! (returnType instanceof CanonicalTypeNode) ||
@@ -315,8 +315,11 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     }
 
     @Override
-    public JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, Id name, LabelNode startLabel, LabelNode returnLabel, List<Formal> formals, List<TypeNode> throwTypes, List<ConstraintNode> constraints, Block body) {
-        JifConstructorDecl n = new JifConstructorDecl_c(pos, flags,
+    public JifConstructorDecl JifConstructorDecl(Position pos, Flags flags,
+            Id name, LabelNode startLabel, LabelNode returnLabel,
+            List<Formal> formals, List<TypeNode> throwTypes,
+            List<ConstraintNode<?>> constraints, Block body) {
+    JifConstructorDecl n = new JifConstructorDecl_c(pos, flags,
                                                         name, startLabel, returnLabel, formals, throwTypes,
                                                         constraints, body);
         n = (JifConstructorDecl)n.ext(extFactory().extConstructorDecl());
@@ -420,20 +423,45 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     }
 
     @Override
-    public ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter) {
-    	ActsForConstraintNode n = ActsForConstraintNode(pos, actor, granter, false);
-        n = (ActsForConstraintNode)n.ext(jifExtFactory().extActsForConstraintNode());
-        n = (ActsForConstraintNode)n.del(delFactory().delNode());
+    public PrincipalActsForPrincipalConstraintNode PrincipalActsForPrincipalConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter) {
+    	PrincipalActsForPrincipalConstraintNode n = PrincipalActsForPrincipalConstraintNode(pos, actor, granter, false);
+        n = (PrincipalActsForPrincipalConstraintNode)n.ext(jifExtFactory().extPrincipalActsForPrincipalConstraintNode());
+        n = (PrincipalActsForPrincipalConstraintNode)n.del(delFactory().delNode());
         return n;
     }
     @Override
-    public ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter, boolean isEquiv) {
-        ActsForConstraintNode n = new ActsForConstraintNode_c(pos,
+    public PrincipalActsForPrincipalConstraintNode PrincipalActsForPrincipalConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter, boolean isEquiv) {
+        PrincipalActsForPrincipalConstraintNode n = new PrincipalActsForPrincipalConstraintNode_c(pos,
                                                               actor, granter, isEquiv);
-        n = (ActsForConstraintNode)n.ext(jifExtFactory().extActsForConstraintNode());
-        n = (ActsForConstraintNode)n.del(delFactory().delNode());
+        n = (PrincipalActsForPrincipalConstraintNode)n.ext(jifExtFactory().extPrincipalActsForPrincipalConstraintNode());
+        n = (PrincipalActsForPrincipalConstraintNode)n.del(delFactory().delNode());
         return n;
     }
+    
+    @Override
+    public LabelActsForPrincipalConstraintNode LabelActsForPrincipalConstraintNode(
+            Position pos, LabelNode actor, PrincipalNode granter) {
+        LabelActsForPrincipalConstraintNode n =
+                new LabelActsForPrincipalConstraintNode_c(pos, actor, granter);
+        n =
+                (LabelActsForPrincipalConstraintNode) n.ext(jifExtFactory()
+                        .extLabelActsForPrincipalConstraintNode());
+        n = (LabelActsForPrincipalConstraintNode) n.del(delFactory().delNode());
+        return n;
+    }
+    
+    @Override
+    public LabelActsForLabelConstraintNode LabelActsForLabelConstraintNode(
+            Position pos, LabelNode actor, LabelNode granter) {
+        LabelActsForLabelConstraintNode n =
+                new LabelActsForLabelConstraintNode_c(pos, actor, granter);
+        n =
+                (LabelActsForLabelConstraintNode) n.ext(jifExtFactory()
+                        .extLabelActsForPrincipalConstraintNode());
+        n = (LabelActsForLabelConstraintNode) n.del(delFactory().delNode());
+        return n;
+    }
+    
     @Override
     public LabelLeAssertionNode LabelLeAssertionNode(Position pos, LabelNode lhs, LabelNode rhs, boolean isEquiv) {
         LabelLeAssertionNode n = new LabelLeAssertionNode_c(pos,

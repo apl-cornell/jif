@@ -1,95 +1,126 @@
 package jif.ast;
 
 import jif.types.ActsForConstraint;
+import jif.types.ActsForParam;
 import jif.types.JifTypeSystem;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
 
-/** An implementation of the <tt>ActsForConstraintNode</tt> interface. */
-public class ActsForConstraintNode_c extends ConstraintNode_c implements ActsForConstraintNode
-{
-    protected PrincipalNode actor;
-    protected PrincipalNode granter;
+public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Granter extends ActsForParam>
+        extends ConstraintNode_c<ActsForConstraint<Actor, Granter>> implements
+        ActsForConstraintNode<Actor, Granter> {
+    
+    protected ActsForParamNode<Actor> actor;
+    protected ActsForParamNode<Granter> granter;
     protected final boolean isEquiv;
 
-    public ActsForConstraintNode_c(Position pos, PrincipalNode actor, PrincipalNode granter, boolean isEquiv) {
-	super(pos);
-	this.actor = actor;
-	this.granter = granter;
-	this.isEquiv = isEquiv;
+    public ActsForConstraintNode_c(Position pos, ActsForParamNode<Actor> actor,
+            ActsForParamNode<Granter> granter, boolean isEquiv) {
+        super(pos);
+        this.actor = actor;
+        this.granter = granter;
+        this.isEquiv = isEquiv;
     }
 
-    /** Gets the actor principal. */
-    public PrincipalNode actor() {
-	return this.actor;
+    public ActsForConstraintNode_c(Position pos, ActsForParamNode<Actor> actor,
+            ActsForParamNode<Granter> granter) {
+        this(pos, actor, granter, false);
     }
 
-    /** Returns a copy of this node with the actor updated. */
-    public ActsForConstraintNode actor(PrincipalNode actor) {
-	ActsForConstraintNode_c n = (ActsForConstraintNode_c) copy();
-	n.actor = actor;
-	if (constraint() != null) {
-	    n.setConstraint(((ActsForConstraint)constraint()).actor(actor.principal()));
-	}
-	return n;
+    @Override
+    public ActsForParamNode<Actor> actor() {
+        return this.actor;
+    }
+    
+    @Override
+    public ActsForConstraintNode<Actor, Granter> actor(
+            ActsForParamNode<Actor> actor) {
+        @SuppressWarnings("unchecked")
+        ActsForConstraintNode_c<Actor, Granter> n =
+                (ActsForConstraintNode_c<Actor, Granter>) copy();
+        n.actor = actor;
+        if (constraint() != null) {
+            n.setConstraint(constraint().actor(actor.parameter()));
+        }
+        return n;
     }
 
-    /** Gets the granter principal. */
-    public PrincipalNode granter() {
-	return this.granter;
+    @Override
+    public ActsForParamNode<Granter> granter() {
+        return this.granter;
     }
 
-    /** Returns a copy of this node with the granter updated. */
-    public ActsForConstraintNode granter(PrincipalNode granter) {
-	ActsForConstraintNode_c n = (ActsForConstraintNode_c) copy();
-	n.granter = granter;
-	if (constraint() != null) {
-	    n.setConstraint(((ActsForConstraint)constraint()).granter(granter.principal()));
-	}
-	return n;
+    @Override
+    public ActsForConstraintNode<Actor, Granter> granter(
+            ActsForParamNode<Granter> granter) {
+        @SuppressWarnings("unchecked")
+        ActsForConstraintNode_c<Actor, Granter> n =
+                (ActsForConstraintNode_c<Actor, Granter>) copy();
+        n.granter = granter;
+        if (constraint() != null) {
+            n.setConstraint(constraint().granter(granter.parameter()));
+        }
+        return n;
     }
 
-    /** Reconstructs this node. */
-    protected ActsForConstraintNode_c reconstruct(PrincipalNode actor, PrincipalNode granter) {
-	if (actor != this.actor || granter != this.granter) {
-	    ActsForConstraintNode_c n = (ActsForConstraintNode_c) copy();
-	    return (ActsForConstraintNode_c) n.actor(actor).granter(granter);
-	}
-
-	return this;
+    protected ActsForConstraintNode_c<Actor, Granter> reconstruct(
+            ActsForParamNode<Actor> actor, ActsForParamNode<Granter> granter) {
+        if (actor != this.actor || granter != this.granter) {
+            @SuppressWarnings("unchecked")
+            ActsForConstraintNode_c<Actor, Granter> n =
+                    (ActsForConstraintNode_c<Actor, Granter>) copy();
+            return (ActsForConstraintNode_c<Actor, Granter>) n.actor(actor)
+                    .granter(granter);
+        }
+        
+        return this;
     }
 
-    /** Visits the children of this node. */
+    @SuppressWarnings("unchecked")
+    @Override
     public Node visitChildren(NodeVisitor v) {
-	PrincipalNode actor = (PrincipalNode) visitChild(this.actor, v);
-	PrincipalNode granter = (PrincipalNode) visitChild(this.granter, v);
-	return reconstruct(actor, granter);
+        ActsForParamNode<Actor> actor = (ActsForParamNode<Actor>) visitChild(this.actor, v);
+        ActsForParamNode<Granter> granter = (ActsForParamNode<Granter>) visitChild(this.granter, v);
+        return reconstruct(actor, granter);
     }
 
-    /** Builds the type of this node. */
+    /**
+     * @throws SemanticException  
+     */
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-	if (constraint() == null) {
+        if (constraint() == null) {
             JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
-            return constraint(ts.actsForConstraint(position(),
-                                                  actor.principal(),
-                                                  granter.principal(),
-                                                  isEquiv));
+            return constraint(ts.actsForConstraint(position, actor.parameter(),
+                    granter.parameter(), isEquiv));
         }
 
         return this;
     }
 
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+    @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
+        print(actor, w, pp);
+        w.write(" ");
+        w.write(isEquiv ? "equiv" : "actsfor");
+        w.write(" ");
+        print(granter, w, pp);
+    }
+
+    @Override
+    public void translate(CodeWriter w, Translator tr) {
         print(actor, w, tr);
         w.write(" ");
-        w.write(isEquiv?"equiv":"actsfor");
+        w.write(isEquiv ? "equiv" : "actsfor");
         w.write(" ");
         print(granter, w, tr);
     }
-
-    public void translate(CodeWriter w, Translator tr) {
-        throw new InternalCompilerError("Cannot translate " + this);
-    }
+    
+    
 }

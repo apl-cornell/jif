@@ -33,9 +33,9 @@ public interface JifNodeFactory extends NodeFactory {
     AmbPrincipalNode AmbDisjunctivePrincipalNode(Position pos, PrincipalNode left, PrincipalNode right);
 //    AmbPrincipalNode AmbProviderPrincipalNode(Position pos);
     CanonicalPrincipalNode CanonicalPrincipalNode(Position pos, Principal principal);
-    JifClassDecl JifClassDecl(Position pos, Flags flags, Id name, List<ParamDecl> params, TypeNode superClass, List<TypeNode> interfaces, List<PrincipalNode> authority, List<ConstraintNode> constraints, ClassBody body);
-    JifMethodDecl JifMethodDecl(Position pos, Flags flags, TypeNode returnType, Id name, LabelNode startLabel, List<Formal> arguments, LabelNode endLabel, List<TypeNode> exceptions, List<ConstraintNode> constraints, Block body);
-    JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, Id name, LabelNode startLabel, LabelNode returnLabel, List<Formal> arguments, List<TypeNode> exceptions, List<ConstraintNode> constraints, Block body);
+    JifClassDecl JifClassDecl(Position pos, Flags flags, Id name, List<ParamDecl> params, TypeNode superClass, List<TypeNode> interfaces, List<PrincipalNode> authority, List<ConstraintNode<?>> constraints, ClassBody body);
+    JifMethodDecl JifMethodDecl(Position pos, Flags flags, TypeNode returnType, Id name, LabelNode startLabel, List<Formal> arguments, LabelNode endLabel, List<TypeNode> exceptions, List<ConstraintNode<?>> constraints, Block body);
+    JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, Id name, LabelNode startLabel, LabelNode returnLabel, List<Formal> arguments, List<TypeNode> exceptions, List<ConstraintNode<?>> constraints, Block body);
     AmbParam AmbParam(Position pos, Id name);
     AmbParam AmbParam(Position pos, Id name, ParamInstance pi);
     AmbExprParam AmbParam(Position pos, Expr expr, ParamInstance expectedPI);
@@ -44,8 +44,10 @@ public interface JifNodeFactory extends NodeFactory {
     AuthConstraintNode AuthConstraintNode(Position pos, List<PrincipalNode> principals);
     CallerConstraintNode CallerConstraintNode(Position pos, List<PrincipalNode> principals);
     AutoEndorseConstraintNode AutoEndorseConstraintNode(Position pos, LabelNode endorseTo);
-    ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter);
-    ActsForConstraintNode ActsForConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter, boolean isEquiv);
+    PrincipalActsForPrincipalConstraintNode PrincipalActsForPrincipalConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter);
+    PrincipalActsForPrincipalConstraintNode PrincipalActsForPrincipalConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter, boolean isEquiv);
+    LabelActsForPrincipalConstraintNode LabelActsForPrincipalConstraintNode(Position pos, LabelNode actor, PrincipalNode granter);
+    LabelActsForLabelConstraintNode LabelActsForLabelConstraintNode(Position pos, LabelNode actor, LabelNode granter);
     LabelLeAssertionNode LabelLeAssertionNode(Position pos, LabelNode actor, LabelNode granter, boolean isEquiv);
     LabelExpr LabelExpr(Position pos, Label l);
     DeclassifyStmt DeclassifyStmt(Position pos, LabelNode bound, LabelNode label, Stmt body);

@@ -28,10 +28,16 @@ public interface JifExtFactory extends ExtFactory, JifStmtExtFactory {
     Ext extAutoEndorseConstraintNode();
     Ext extCallerConstraintNode();
     Ext extActsForConstraintNode();
+    Ext extPrincipalActsForPrincipalConstraintNode();
+    Ext extLabelActsForPrincipalConstraintNode();
+    Ext extLabelActsForLabelConstraintNode();
     Ext extLabelLeAssertionNode();
+    @Override
     Ext extDeclassifyStmt();
     Ext extDeclassifyExpr();
+    @Override
     Ext extEndorseStmt();
+    @Override
     Ext extCheckedEndorseStmt();
     Ext extEndorseExpr();
     Ext extNewLabel();

@@ -350,6 +350,8 @@ label ::=
                RESULT = mn; :}
     |    LBRACE label:l RBRACE
             {: RESULT = l; :}
+    |  PROVIDER:a // provider label
+            {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),parser.nf.Id(parser.pos(a), "provider")); :}
     ;
 label_opt ::=
                     // LabelNode
@@ -481,8 +483,6 @@ principal_base ::=
             {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a), parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
     |  LPAREN:a principal_disjunctive:b RPAREN:c
             {: RESULT = b; :}
-    |  PROVIDER:a // provider principal
-            {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a),parser.nf.Id(parser.pos(a), "provider")); :}
     ;
 
 accesspath ::=
@@ -866,11 +866,19 @@ constraint ::=
            parser.countAnnotation(parser.METHOD_AUTO_ENDORSE_ANNOTATION, RESULT.position());
         :}
     |   principal:a actsfor principal:b
-        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b);
+        {: RESULT = parser.nf.PrincipalActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
+           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
+        :}
+    |   label:a actsfor principal:b
+        {: RESULT = parser.nf.LabelActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
+           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
+        :}
+    |   label:a actsfor label:b
+        {: RESULT = parser.nf.LabelActsForLabelConstraintNode(parser.pos(a,b), a, b);
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}
     |   principal:a EQUIV principal:b
-        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b, true);
+        {: RESULT = parser.nf.PrincipalActsForPrincipalConstraintNode(parser.pos(a,b), a, b, true);
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}
     |   label_flexible:a LTEQ label_flexible:b
@@ -903,11 +911,19 @@ auth_constraints ::=
 auth_constraint ::=
         // ConstraintNode
         principal:a actsfor principal:b
-        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b);
+        {: RESULT = parser.nf.PrincipalActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
+           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
+        :}
+    |   label:a actsfor principal:b
+        {: RESULT = parser.nf.LabelActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
+           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
+        :}
+    |   label:a actsfor label:b
+        {: RESULT = parser.nf.LabelActsForLabelConstraintNode(parser.pos(a,b), a, b);
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}
     |   principal:a EQUIV principal:b
-        {: RESULT = parser.nf.ActsForConstraintNode(parser.pos(a,b), a, b, true);
+        {: RESULT = parser.nf.PrincipalActsForPrincipalConstraintNode(parser.pos(a,b), a, b, true);
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}
     ;

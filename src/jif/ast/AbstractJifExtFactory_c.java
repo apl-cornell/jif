@@ -1,7 +1,5 @@
 package jif.ast;
 
-import jif.extension.*;
-import jif.translate.*;
 import polyglot.ast.AbstractExtFactory_c;
 import polyglot.ast.Ext;
 import polyglot.ast.ExtFactory;
@@ -21,6 +19,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         super(nextExtFactory);
     }
 
+    @Override
     public final Ext extInstTypeNode() {
         Ext e = extInstTypeNodeImpl();
         if (nextExtFactory() != null && 
@@ -32,6 +31,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtInstTypeNode(e);
     }
 
+    @Override
     public final Ext extLabeledTypeNode() {
         Ext e = extLabeledTypeNodeImpl();
         if (nextExtFactory() != null && 
@@ -43,6 +43,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtLabeledTypeNode(e);
     }
 
+    @Override
     public final Ext extAmbNewArray() {
         Ext e = extAmbNewArrayImpl();
         if (nextExtFactory() != null && 
@@ -54,6 +55,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtAmbNewArray(e);
     }
 
+    @Override
     public final Ext extAmbParamTypeOrAccess() {
         Ext e = extAmbParamTypeOrAccessImpl();
         if (nextExtFactory() != null && 
@@ -65,6 +67,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtAmbParamTypeOrAccess(e);
     }
 
+    @Override
     public final Ext extJoinLabelNode() {
         Ext e = extJoinLabelNodeImpl();
         if (nextExtFactory() != null && 
@@ -76,6 +79,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtJoinLabelNode(e);
     }
 
+    @Override
     public final Ext extMeetLabelNode() {
         Ext e = extMeetLabelNodeImpl();
         if (nextExtFactory() != null && 
@@ -87,6 +91,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtMeetLabelNode(e);
     }
 
+    @Override
     public final Ext extPolicyNode() {
         Ext e = extPolicyNodeImpl();
         if (nextExtFactory() != null && 
@@ -98,6 +103,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtPolicyNode(e);
     }
 
+    @Override
     public final Ext extAmbDynamicLabelNode() {
         Ext e = extAmbDynamicLabelNodeImpl();
         if (nextExtFactory() != null && 
@@ -109,6 +115,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtAmbDynamicLabelNode(e);
     }
 
+    @Override
     public final Ext extAmbVarLabelNode() {
         Ext e = extAmbVarLabelNodeImpl();
         if (nextExtFactory() != null && 
@@ -120,6 +127,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtAmbVarLabelNode(e);
     }
 
+    @Override
     public final Ext extAmbThisLabelNode() {
         Ext e = extAmbThisLabelNodeImpl();
         if (nextExtFactory() != null && 
@@ -131,6 +139,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtAmbThisLabelNode(e);
     }
 
+    @Override
     public final Ext extCanonicalLabelNode() {
         Ext e = extCanonicalLabelNodeImpl();
         if (nextExtFactory() != null && 
@@ -142,6 +151,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtCanonicalLabelNode(e);
     }
 
+    @Override
     public final Ext extParamNode() {
         Ext e = extParamNodeImpl();
         if (nextExtFactory() != null && 
@@ -153,6 +163,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtParamNode(e);
     }
 
+    @Override
     public final Ext extLabelNode() {
         Ext e = extLabelNodeImpl();
         if (nextExtFactory() != null && 
@@ -164,6 +175,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtLabelNode(e);
     }
 
+    @Override
     public final Ext extPrincipalNode() {
         Ext e = extPrincipalNodeImpl();
         if (nextExtFactory() != null && 
@@ -175,6 +187,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtPrincipalNode(e);
     }
 
+    @Override
     public final Ext extAmbPrincipalNode() {
         Ext e = extAmbPrincipalNodeImpl();
         if (nextExtFactory() != null && 
@@ -187,6 +200,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
     }
 
 
+    @Override
     public final Ext extCanonicalPrincipalNode() {
         Ext e = extCanonicalPrincipalNodeImpl();
         if (nextExtFactory() != null && 
@@ -198,6 +212,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtCanonicalPrincipalNode(e);
     }
 
+    @Override
     public final Ext extAmbParam() {
         Ext e = extAmbParamImpl();
         if (nextExtFactory() != null && 
@@ -209,6 +224,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtAmbParam(e);
     }
 
+    @Override
     public final Ext extParamDecl() {
         Ext e = extParamDeclImpl();
         if (nextExtFactory() != null && 
@@ -220,6 +236,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtParamDecl(e);
     }
 
+    @Override
     public final Ext extConstraintNode() {
         Ext e = extConstraintNodeImpl();
         if (nextExtFactory() != null && 
@@ -231,6 +248,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtConstraintNode(e);
     }
 
+    @Override
     public final Ext extCanonicalConstraintNode() {
         Ext e = extCanonicalConstraintNodeImpl();
         if (nextExtFactory() != null && 
@@ -242,6 +260,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtCanonicalConstraintNode(e);
     }
 
+    @Override
     public final Ext extAuthConstraintNode() {
         Ext e = extAuthConstraintNodeImpl();
         if (nextExtFactory() != null && 
@@ -253,6 +272,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtAuthConstraintNode(e);
     }
 
+    @Override
     public final Ext extAutoEndorseConstraintNode() {
         Ext e = extAutoEndorseConstraintNodeImpl();
         if (nextExtFactory() != null && 
@@ -264,6 +284,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtAutoEndorseConstraintNode(e);
     }
 
+    @Override
     public final Ext extCallerConstraintNode() {
         Ext e = extCallerConstraintNodeImpl();
         if (nextExtFactory() != null && 
@@ -275,6 +296,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtCallerConstraintNode(e);
     }
 
+    @Override
     public final Ext extActsForConstraintNode() {
         Ext e = extActsForConstraintNodeImpl();
         if (nextExtFactory() != null && 
@@ -283,9 +305,46 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
             Ext e2 = nextFac.extActsForConstraintNode();
             e = composeExts(e, e2);
         }
-        return postExtLabeledTypeNode(e);
+        return postExtActsForConstraintNode(e);
     }
 
+    @Override
+    public final Ext extLabelActsForPrincipalConstraintNode() {
+        Ext e = extLabelActsForPrincipalConstraintNodeImpl();
+        if (nextExtFactory() != null && 
+                nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
+            Ext e2 = nextFac.extLabelActsForPrincipalConstraintNode();
+            e = composeExts(e, e2);
+        }
+        return postExtLabelActsForPrincipalConstraintNode(e);
+    }
+
+    @Override
+    public final Ext extLabelActsForLabelConstraintNode() {
+        Ext e = extLabelActsForLabelConstraintNodeImpl();
+        if (nextExtFactory() != null && 
+                nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
+            Ext e2 = nextFac.extLabelActsForLabelConstraintNode();
+            e = composeExts(e, e2);
+        }
+        return postExtLabelActsForLabelConstraintNode(e);
+    }
+
+    @Override
+    public final Ext extPrincipalActsForPrincipalConstraintNode() {
+        Ext e = extPrincipalActsForPrincipalConstraintNodeImpl();
+        if (nextExtFactory() != null && 
+                nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory(); 
+            Ext e2 = nextFac.extPrincipalActsForPrincipalConstraintNode();
+            e = composeExts(e, e2);
+        }
+        return postExtPrincipalActsForPrincipalConstraintNode(e);
+    }
+
+    @Override
     public final Ext extLabelLeAssertionNode() {
         Ext e = extLabelLeAssertionNodeImpl();
         if (nextExtFactory() != null && 
@@ -297,6 +356,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtLabelLeAssertionNode(e);
     }
 
+    @Override
     public final Ext extDeclassifyStmt() {
         Ext e = extDeclassifyStmtImpl();
         if (nextExtFactory() != null && 
@@ -308,6 +368,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtDeclassifyStmt(e);
     }
 
+    @Override
     public final Ext extDeclassifyExpr() {
         Ext e = extDeclassifyExprImpl();
         if (nextExtFactory() != null && 
@@ -319,6 +380,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtDeclassifyExpr(e);
     }
 
+    @Override
     public final Ext extEndorseStmt() {
         Ext e = extEndorseStmtImpl();
         if (nextExtFactory() != null && 
@@ -330,6 +392,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
 
         return postExtEndorseStmt(e);
     }
+    @Override
     public final Ext extCheckedEndorseStmt() {
         Ext e = extCheckedEndorseStmtImpl();
         if (nextExtFactory() != null && 
@@ -342,6 +405,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtEndorseStmt(e);
     }
 
+    @Override
     public final Ext extEndorseExpr() {
         Ext e = extEndorseExprImpl();
         if (nextExtFactory() != null && 
@@ -353,6 +417,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtEndorseExpr(e);
     }
 
+    @Override
     public final Ext extNewLabel() {
         Ext e = extNewLabelImpl();
         if (nextExtFactory() != null && 
@@ -364,6 +429,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtNewLabel(e);
     }
 
+    @Override
     public final Ext extLabelExpr() {
         Ext e = extLabelExprImpl();
         if (nextExtFactory() != null && 
@@ -375,6 +441,7 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return postExtLabelExpr(e);
     }
 
+    @Override
     public final Ext extPrincipalExpr() {
         Ext e = extPrincipalExprImpl();
         if (nextExtFactory() != null && 
@@ -482,9 +549,21 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
     protected Ext extCallerConstraintNodeImpl() {
         return extConstraintNode();
     }
-
+    
     protected Ext extActsForConstraintNodeImpl() {
         return extConstraintNode();
+    }
+
+    protected Ext extLabelActsForPrincipalConstraintNodeImpl() {
+        return extActsForConstraintNode();
+    }
+
+    protected Ext extLabelActsForLabelConstraintNodeImpl() {
+        return extActsForConstraintNode();
+    }
+
+    protected Ext extPrincipalActsForPrincipalConstraintNodeImpl() {
+        return extActsForConstraintNode();
     }
 
     protected Ext extLabelLeAssertionNodeImpl() {
@@ -620,6 +699,18 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
 
     protected Ext postExtActsForConstraintNode(Ext e) {
         return postExtConstraintNode(e);
+    }
+
+    protected Ext postExtLabelActsForPrincipalConstraintNode(Ext e) {
+        return postExtActsForConstraintNode(e);
+    }
+
+    protected Ext postExtLabelActsForLabelConstraintNode(Ext e) {
+        return postExtActsForConstraintNode(e);
+    }
+
+    protected Ext postExtPrincipalActsForPrincipalConstraintNode(Ext e) {
+        return postExtActsForConstraintNode(e);
     }
 
     protected Ext postExtLabelLeAssertionNode(Ext e) {

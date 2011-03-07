@@ -1,9 +1,6 @@
 package jif.ast;
 
-import jif.types.JifTypeSystem;
-import jif.types.JifVarInstance;
-import jif.types.ParamInstance;
-import jif.types.PrincipalInstance;
+import jif.types.*;
 import jif.types.label.CovariantParamLabel;
 import jif.types.label.ParamLabel;
 import polyglot.ast.Id;
@@ -29,10 +26,12 @@ implements AmbVarLabelNode
         this.name = name;
     }
 
+    @Override
     public String toString() {
         return name + "{amb}";
     }
 
+    @Override
     public String name() {
         return this.name.id();
     }
@@ -43,6 +42,7 @@ implements AmbVarLabelNode
         return n;
     }
     
+    @Override
     public Node visitChildren(NodeVisitor v) {
         if (this.name == null) return this;
         
@@ -58,10 +58,18 @@ implements AmbVarLabelNode
     }
 
 
+    @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         Context c = sc.context();
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
+        
+        if ("provider".equals(name.id())) {
+            // "provider" is the provider label.
+            JifContext jc = (JifContext) c;
+            return nf.CanonicalLabelNode(position,
+                    ts.providerLabel(position, jc.provider()));
+        }
 
         VarInstance vi = c.findVariable(name.id());
 
@@ -102,6 +110,7 @@ implements AmbVarLabelNode
         throw new SemanticException(vi + " cannot be used as a label.", this.position());
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(name.id());
     }

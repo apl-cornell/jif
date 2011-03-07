@@ -4,10 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import jif.translate.JifToJavaRewriter;
-import jif.types.JifContext;
-import jif.types.LabelSubstitution;
-import jif.types.Param;
-import jif.types.PathMap;
+import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
@@ -18,7 +15,7 @@ import polyglot.types.TypeSystem;
 /**
  * This class represents the Jif security label.
  */
-public interface Label extends Param {
+public interface Label extends ActsForParam {
     /**
      * Is this label equivalent to bottom?
      * <p>
@@ -72,6 +69,7 @@ public interface Label extends Param {
      * @return the result of applying labelSubst to this label.
      * @throws SemanticException
      */
+    @Override
     Label subst(LabelSubstitution labelSubst) throws SemanticException;
 
     /**

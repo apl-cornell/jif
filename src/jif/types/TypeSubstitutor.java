@@ -87,20 +87,29 @@ public class TypeSubstitutor {
     protected boolean recurseIntoLabeledType(LabeledType type) {
         return true;
     }
+    
+    @SuppressWarnings("unchecked")
+    public <P extends ActsForParam> P rewriteActsForParam(P param)
+            throws SemanticException {
+        if (param == null) return null;
+        return (P) param.subst(substitution);
+    }
 
     public Label rewriteLabel(Label L) throws SemanticException {
-        if (L == null) return L;
-        return L.subst(substitution);
+        return rewriteActsForParam(L);
     }
     protected Principal rewritePrincipal(Principal p) throws SemanticException {
-        if (p == null) return p;
-        return p.subst(substitution);
+        return rewriteActsForParam(p);
     }
-    public Assertion rewriteAssertion(Assertion a) throws SemanticException {
+    
+    @SuppressWarnings("unchecked")
+    public <Actor extends ActsForParam, Granter extends ActsForParam> Assertion rewriteAssertion(
+            Assertion a) throws SemanticException {
         if (a instanceof ActsForConstraint) {
-            ActsForConstraint c = (ActsForConstraint)a.copy();
-            c = c.actor(rewritePrincipal(c.actor()));
-            c = c.granter(rewritePrincipal(c.granter()));
+            ActsForConstraint<Actor, Granter> c =
+                (ActsForConstraint<Actor, Granter>) a.copy();
+            c = c.actor(rewriteActsForParam(c.actor()));
+            c = c.granter(rewriteActsForParam(c.granter()));
             return c;
         }
         else if (a instanceof AuthConstraint) {
@@ -127,10 +136,10 @@ public class TypeSubstitutor {
         throw new InternalCompilerError("Unexpected assertion " + a);
     }
 
-    private List rewritePrincipalList(List list) throws SemanticException {
-        List newList = new ArrayList(list.size());
-        for (Iterator iter = list.iterator(); iter.hasNext();) {
-            Principal p = (Principal)iter.next();
+    private List<Principal> rewritePrincipalList(List<Principal> list)
+            throws SemanticException {
+        List<Principal> newList = new ArrayList<Principal>(list.size());
+        for (Principal p : list) {
             newList.add(rewritePrincipal(p));            
         }
         return newList;

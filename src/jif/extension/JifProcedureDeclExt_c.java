@@ -248,8 +248,8 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         for (Iterator i = mi.constraints().iterator(); i.hasNext(); ) {
             Assertion c = (Assertion) i.next();
 
-            if (c instanceof ActsForConstraint) {
-                ActsForConstraint ac = (ActsForConstraint) c;
+            if (c instanceof ActsForConstraint<Principal, Principal>) {
+                ActsForConstraint<Principal, Principal> ac = (ActsForConstraint<Principal, Principal>) c;
                 //A.addActsFor(A.instantiate(ac.actor()),
                 //	     A.instantiate(ac.granter()));
                 Principal actor = ac.actor();

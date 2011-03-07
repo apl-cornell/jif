@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import jif.types.label.*;
-import jif.types.label.CovariantParamLabel;
-import jif.types.label.Label;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
 
@@ -36,10 +34,12 @@ public class JifSubst_c extends Subst_c implements JifSubst
         }
     }
 
+    @Override
     public Param get(ParamInstance pi) {
         return (Param) subst.get(pi);
     }
 
+    @Override
     public void put(ParamInstance pi, Param param) {
         subst.put(pi, param);
     }
@@ -47,6 +47,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
     ////////////////////////////////////////////////////////////////
     // Override substitution methods to handle Jif constructs
 
+    @Override
     protected boolean cacheTypeEquality(Type t1, Type t2) {
         // don't strip away the instantiation info. At worst, we'll return
         // false more often than we need to, resulting in more instantiations.
@@ -56,6 +57,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
         return ((JifTypeSystem)ts).equalsNoStrip(t1, t2);
     }
     
+    @Override
     public Type uncachedSubstType(Type t) {
         JifTypeSystem ts = (JifTypeSystem) this.ts;
 
@@ -68,6 +70,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
         return super.uncachedSubstType(t);
     }
 
+    @Override
     public ClassType substClassType(ClassType t) {
         // Don't bother trying to substitute into a non-Jif class.
         if (! (t instanceof JifClassType)) {
@@ -78,6 +81,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
                                        (JifClassType) t, this);
     }
 
+    @Override
     public MethodInstance substMethod(MethodInstance mi) {
         mi = super.substMethod(mi);
         
@@ -95,6 +99,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
         return mi;
     }
 
+    @Override
     public ConstructorInstance substConstructor(ConstructorInstance ci) {
         ci = super.substConstructor(ci);
 
@@ -113,6 +118,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
     }
 
     /** Perform substititions on a field. */
+    @Override
     public FieldInstance substField(FieldInstance fi) {
         fi = super.substField(fi);
         if (fi instanceof JifFieldInstance) { 
@@ -126,27 +132,36 @@ public class JifSubst_c extends Subst_c implements JifSubst
     ////////////////////////////////////////////////////////////////
     // Substitution methods for Jif constructs
 
-    public List substConstraintList(List constraints) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Assertion> substConstraintList(List<Assertion> constraints) {
         return new CachingTransformingList(constraints, new ConstraintXform());
     }
 
-    public List substLabelList(List labels) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Label> substLabelList(List<Label> labels) {
         return new CachingTransformingList(labels, new LabelXform());
     }
 
-    public List substPrincipalList(List principals) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Principal> substPrincipalList(List<Principal> principals) {
         return new CachingTransformingList(principals, new PrincipalXform());
     }
 
-    public Assertion substConstraint(Assertion constraint) {
+    @Override
+    public <Actor extends ActsForParam, Granter extends ActsForParam> Assertion substConstraint(
+            Assertion constraint) {
 	if (constraint == null) {
 	    return null;
 	}
 
 	if (constraint instanceof ActsForConstraint) {
-	    ActsForConstraint c = (ActsForConstraint) constraint;
-	    c = c.actor(substPrincipal(c.actor()));
-	    c = c.granter(substPrincipal(c.granter()));
+	    @SuppressWarnings("unchecked")
+	    ActsForConstraint<Actor, Granter> c = (ActsForConstraint<Actor, Granter>) constraint;
+	    c = c.actor(substActsForParam(c.actor()));
+	    c = c.granter(substActsForParam(c.granter()));
 	    return c;
 	}
 	else if (constraint instanceof LabelLeAssertion) {
@@ -175,31 +190,26 @@ public class JifSubst_c extends Subst_c implements JifSubst
 
 	return constraint;
     }
-
-    public Label substLabel(Label label) {
-        if (label == null) {
-	    return null;
-	}
     
-        try {
-            return label.subst(substLabelSubst);
-        }
-        catch (SemanticException e) {
-            throw new InternalCompilerError("Unexpected semantic exception", e);
-        }  
-    }
-    
-    public Principal substPrincipal(Principal principal) {
-        if (principal == null) {
-            return null;
-        }
+    @SuppressWarnings("unchecked")
+    public <P extends ActsForParam> P substActsForParam(P param) {
+        if (param == null) return null;
         
         try {
-            return principal.subst(substLabelSubst);
-        }
-        catch (SemanticException e) {
+            return (P) param.subst(substLabelSubst);
+        } catch (SemanticException e) {
             throw new InternalCompilerError("Unexpected semantic exception", e);
-        }  
+        }
+    }
+
+    @Override
+    public Label substLabel(Label label) {
+        return substActsForParam(label);  
+    }
+    
+    @Override
+    public Principal substPrincipal(Principal principal) {
+        return substActsForParam(principal);
     }
 
     /**
@@ -215,6 +225,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
      *
      */
     protected class SubstLabelSubst extends LabelSubstitution implements Serializable {
+        @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ParamLabel) {
                 ParamLabel c = (ParamLabel) L;
@@ -227,6 +238,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
             return L;
         }
 
+        @Override
         public Principal substPrincipal(Principal p) throws SemanticException {
             if (p instanceof ParamPrincipal) {
                 ParamPrincipal pp = (ParamPrincipal) p;
@@ -281,6 +293,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
     ////////////////////////////////////////////////////////////////
     // Substitution machinery
 
+    @Override
     protected Object substSubstValue(Object value) {
         if (value instanceof Label) {
             return substLabel((Label)value);
@@ -292,19 +305,22 @@ public class JifSubst_c extends Subst_c implements JifSubst
     }
 
     public class ConstraintXform implements Transformation {
-	public Object transform(Object o) {
+	@Override
+    public Object transform(Object o) {
 	    return substConstraint((Assertion)o);
 	}
     }
 
     public class LabelXform implements Transformation {
-	public Object transform(Object o) {
+	@Override
+    public Object transform(Object o) {
 	    return substLabel((Label)o);
 	}
     }
 
     public class PrincipalXform implements Transformation {
-	public Object transform(Object o) {
+	@Override
+    public Object transform(Object o) {
 	    return substPrincipal((Principal)o);
 	}
     }

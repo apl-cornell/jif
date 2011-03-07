@@ -1,5 +1,6 @@
 package jif.ast;
 
+import jif.types.AutoEndorseConstraint;
 import jif.types.AutoEndorseConstraint_c;
 import jif.types.JifTypeSystem;
 import polyglot.ast.Node;
@@ -12,8 +13,10 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 
-public class AutoEndorseConstraintNode_c extends ConstraintNode_c implements AutoEndorseConstraintNode
-{
+public class AutoEndorseConstraintNode_c extends
+        ConstraintNode_c<AutoEndorseConstraint> implements
+        AutoEndorseConstraintNode {
+    
     protected LabelNode endorseTo;
 
     public AutoEndorseConstraintNode_c(Position pos, LabelNode endorseTo) {
@@ -21,10 +24,12 @@ public class AutoEndorseConstraintNode_c extends ConstraintNode_c implements Aut
 	this.endorseTo = endorseTo;
     }
 
+    @Override
     public LabelNode endorseTo() {
 	return this.endorseTo;
     }
 
+    @Override
     public AutoEndorseConstraintNode endorseTo(LabelNode endorseTo) {
 	AutoEndorseConstraintNode_c n = (AutoEndorseConstraintNode_c) copy();
 	n.endorseTo = endorseTo;
@@ -42,11 +47,16 @@ public class AutoEndorseConstraintNode_c extends ConstraintNode_c implements Aut
 	return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         LabelNode endorseTo = (LabelNode) visitChild(this.endorseTo, v);
         return reconstruct(endorseTo);
     }
 
+    /**
+     * @throws SemanticException  
+     */
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (constraint() == null) {
             JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
@@ -56,12 +66,14 @@ public class AutoEndorseConstraintNode_c extends ConstraintNode_c implements Aut
         return this;
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("autoendorse(");
         print(endorseTo, w, tr);
         w.write(")");
     }
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("Cannot translate " + this);
     }

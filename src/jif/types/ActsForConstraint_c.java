@@ -1,56 +1,70 @@
 package jif.types;
 
-import jif.types.principal.Principal;
 import polyglot.types.TypeObject_c;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
-/** An implementation of the <code>ActsForConstraint</code> interface.
- */
-public class ActsForConstraint_c extends TypeObject_c
-				implements ActsForConstraint
-{
-    protected Principal granter;
-    protected Principal actor;
+public class ActsForConstraint_c<Actor extends ActsForParam, Granter extends ActsForParam>
+        extends TypeObject_c implements ActsForConstraint<Actor, Granter> {
+
+    protected Actor actor;
+    protected Granter granter;
     protected final boolean isEquiv;
 
-    public ActsForConstraint_c(JifTypeSystem ts, Position pos,
-            Principal actor, Principal granter, boolean isEquiv) {
+    public ActsForConstraint_c(TypeSystem ts, Position pos, Actor actor,
+            Granter granter, boolean isEquiv) {
         super(ts, pos);
         this.actor = actor;
         this.granter = granter;
         this.isEquiv = isEquiv;
     }
 
-    public ActsForConstraint actor(Principal actor) {
-	ActsForConstraint_c n = (ActsForConstraint_c) copy();
-	n.actor = actor;
-	return n;
+    public ActsForConstraint_c(TypeSystem ts, Position pos, Actor actor,
+            Granter granter) {
+        this(ts, pos, actor, granter, false);
     }
 
-    public ActsForConstraint granter(Principal granter) {
-	ActsForConstraint_c n = (ActsForConstraint_c) copy();
-	n.granter = granter;
-	return n;
+    @Override
+    public Actor actor() {
+        return actor;
     }
 
-    public Principal actor() {
-	return actor;
+    @Override
+    public ActsForConstraint<Actor, Granter> actor(Actor actor) {
+        @SuppressWarnings("unchecked")
+        ActsForConstraint_c<Actor, Granter> n =
+                (ActsForConstraint_c<Actor, Granter>) copy();
+        n.actor = actor;
+        return n;
     }
 
-    public Principal granter() {
-	return granter;
+    @Override
+    public Granter granter() {
+        return granter;
     }
 
+    @Override
+    public ActsForConstraint<Actor, Granter> granter(Granter granter) {
+        @SuppressWarnings("unchecked")
+        ActsForConstraint_c<Actor, Granter> n =
+                (ActsForConstraint_c<Actor, Granter>) copy();
+        n.granter = granter;
+        return n;
+    }
+
+    @Override
     public boolean isEquiv() {
         return isEquiv;
     }
-    
-    public String toString() {
-        
-	return actor + " " + (isEquiv?"equiv":"actsfor") + " " + granter;
+
+    @Override
+    public boolean isCanonical() {
+        return true;
     }
 
-    public boolean isCanonical() {
-	return true;
+    @Override
+    public String toString() {
+        return actor + " " + (isEquiv ? "equiv" : "actsfor") + " " + granter;
     }
+
 }

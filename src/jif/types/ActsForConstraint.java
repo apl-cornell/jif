@@ -1,15 +1,16 @@
 package jif.types;
 
-import jif.types.principal.Principal;
-
-/** The acts-for constraint. 
+/**
+ * The acts-for constraint.
  */
-public interface ActsForConstraint extends Assertion {
-    public Principal actor();
-    public ActsForConstraint actor(Principal actor);
+public interface ActsForConstraint<Actor extends ActsForParam, Granter extends ActsForParam>
+        extends Assertion {
 
-    public Principal granter();
-    public ActsForConstraint granter(Principal granter);
+    public Actor actor();
+    public ActsForConstraint<Actor, Granter> actor(Actor actor);
+    
+    public Granter granter();
+    public ActsForConstraint<Actor, Granter> granter(Granter granter);
     
     public boolean isEquiv();
 }

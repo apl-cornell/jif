@@ -1154,12 +1154,10 @@ public class JifTypeSystem_c
     }
 
     @Override
-    public ActsForConstraint actsForConstraint(
-        Position pos,
-        Principal actor,
-        Principal granter,
-        boolean isEquiv) {
-        return new ActsForConstraint_c(this, pos, actor, granter, isEquiv);
+    public <Actor extends ActsForParam, Granter extends ActsForParam> ActsForConstraint<Actor, Granter> actsForConstraint(
+            Position pos, Actor actor, Granter granter, boolean isEquiv) {
+        return new ActsForConstraint_c<Actor, Granter>(this, pos, actor,
+                granter, isEquiv);
     }
 
     @Override

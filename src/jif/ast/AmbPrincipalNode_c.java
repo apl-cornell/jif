@@ -34,15 +34,18 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         this.name = name;
     }
 
+    @Override
     public boolean isDisambiguated() {
         return false;
     }
     
+    @Override
     public String toString() {
         if (expr != null) return expr + "{amb}";
         return name + "{amb}";
     }
     
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (name != null) {
             return disambiguateName(ar, name);
@@ -113,14 +116,6 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
             return nf.CanonicalPrincipalNode(position(),
                                              ts.bottomPrincipal(position()));
         }
-        if ("provider".equals(name.id())) {
-            // "_" is the bottom principal
-            JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
-            JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
-            JifContext A = (JifContext) ar.context();            
-			return nf.CanonicalPrincipalNode(position(), ts.providerPrincipal(
-					position(), A.provider()));
-        }
 
         Context c = ar.context();
         VarInstance vi = c.findVariable(name.id());
@@ -155,6 +150,9 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         "of type \"principal\".");
     }
     
+    /**
+     * @throws SemanticException  
+     */
     protected Node principalToPrincipal(PrincipalInstance vi,
             AmbiguityRemover sc)
     throws SemanticException {
@@ -182,12 +180,16 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
     /**
      * Visit this term in evaluation order.
      */
+    @SuppressWarnings("rawtypes")
+    @Override
     public List acceptCFG(CFGBuilder v, List succs) {
         return succs;
     }
+    @Override
     public Term firstChild() {
         return null;
     }
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = this.expr;
         Id name = this.name;
