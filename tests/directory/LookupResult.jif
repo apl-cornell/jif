@@ -1,9 +1,11 @@
 class LookupResult {
     final label{this} label_; // XXX decl removed in Fabric version
-	Object{*label_} obj;
+	final Object{*label_; this} obj;
 
-    LookupResult{*label_}(label l, Object{*l} o) {
-        name = n;
+    LookupResult(label{this} l, Object{*l; this} o) {
+		label_ = l;
         obj = o;
     }
 }
+
+// vim: ts=4 sw=4

@@ -33,29 +33,27 @@ public class DirNode {
 
     public boolean{*label_; name} contains(String name)
     {
-		try { // XXX
         for (int i = 0; i < kids.length; i++) {
-            DirEntry de =  kids[i];
+            DirEntry de = kids[i];
             if (de.name.equals(name)) return true;
         }
-		} catch (RuntimeException ne) {} // XXX
         return false;
     }
 
     public Object{*label_; name} get(String name) throws (Exception{*label_; name})
     {
         for (int i = 0; i < kids.length; i++) {
-            DirEntry de =  kids[i];
+            DirEntry de = kids[i];
             if (de.name.equals(name)) return de.obj;
         }
         throw new Exception();
     }
 
     public void add{*label_}(String{*label_} name, Object{*label_} o)
+		//throws (Exception{name})
     {
-		try { // XXX
         for (int i = 0; i < kids.length; i++) {
-            DirEntry de =  kids[i];
+            DirEntry de = kids[i];
             if (de.name.equals(name)) {
                 kids[i] = new DirEntry(name, o);
                 return;
@@ -68,8 +66,7 @@ public class DirNode {
         }
         nkids[kids.length] = new DirEntry(name, o);
         kids = nkids;
-		} catch (RuntimeException ne) {} // XXX
         return;
     }
 }
-// vim: ts=4
+// vim: ts=4 sw=4

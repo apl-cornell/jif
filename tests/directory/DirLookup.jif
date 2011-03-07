@@ -1,5 +1,69 @@
 class DirLookup[label L] {
-	static LookupResult{path} lookup(String{L}[] path, 
+	static LookupResult{*lb} lookup{*lb}(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path)
+	{
+		return lookup(d, path, 0, lb, lb);
+	}
+
+// problem: the result should have a more restrictive label in general than *prev; *lb. The caller cannot in fact
+// predict what the label is. Two ideas for how to deal with this:
+//
+// 1. Change the interface so the caller has to guess the label, and just doesn't get an answer if the guess is wrong.
+//    (Not clear this will actually work).
+// 2. The result is always a LookupResult, so knowing the pointer to the answer *doesn't* in fact communicate
+//    new information. Problem is that we have no way to capture that.  If we write the code using a while loop,
+//    a different problem bites us. We can pull the LookupResult creation out to the top so its pointer is untainted,
+//    but we need to be able to assign 'final' variables (e.g., the accumulated label) on each loop iteration.
+//   The Jif compiler needs to do some kind of SSA conversion to allow these assignments to be done soundly.
+
+	static LookupResult{*prev; *lb} lookup{*lb}(DirNode{*lb} d, DirPath[L]{*lb} path, int i, label{*lb} lb, label{*lb} prev)
+	{
+		final label retl = new label{*d.label_; L; *lb; *prev};
+		int n = path.components.length;
+		String nm = path.components[i];
+		if (d.contains(nm)) {
+			Object o = null;
+			try {
+				o = d.get(nm);
+			} catch (Exception canthappen) {}
+			if (i == n-1)
+				return new LookupResult(retl, o);
+
+			if (o instanceof DirNode) {
+				final DirNode d2 = (DirNode) o;
+				return lookup(d2, path, i+1, lb, retl);
+			} else {
+				return new LookupResult(retl, null);
+			}
+		} else {
+			return new LookupResult(retl, null);
+		}
+	}
+
+	static LookupResult{*lb} lookup2(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path)
+	{
+		final label retl = new label{*d.label_; L; *lb};
+		DirNode cur = d;
+		int n = path.components.length;
+		int i = 0;
+		Object o = cur;
+		while (i < n) {
+			String nm = path.components[i];
+			o = null;
+			if (d.contains(nm)) {
+				try {
+					o = cur.get(nm);
+				} catch (Exception canthappen) {}
+				if (i == n-1) break;
+				if (o instanceof DirNode) {
+					cur = (DirNode) o;
+				} else {
+					o = null;
+				}
+			}
+			i++;
+		}
+		return new LookupResult(retl, o);
+	}
 
 }
-// vim: ts=4
+// vim: ts=4 sw=4
