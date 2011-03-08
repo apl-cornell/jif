@@ -25,6 +25,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         JifConstructorDecl mn = (JifConstructorDecl) node();
@@ -37,7 +38,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         lc = lc.context(A);
 
         // check formals
-        List formals = checkFormals(mn.formals(), ci, lc);
+        @SuppressWarnings("unchecked")
+        List<Formal> formals = checkFormals(mn.formals(), ci, lc);
 
         // First, check the arguments, adjusting the context.
         Label Li = checkEnforceSignature(ci, lc);
@@ -65,11 +67,12 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
      * Utility method to get the set of field instances of final fields of
      * the given <code>ReferenceType</code> that do not have an initializer.
      */
-    protected static Set uninitFinalFields(ReferenceType type) {
-        Set s = new LinkedHashSet();
+    protected static Set<JifFieldInstance> uninitFinalFields(ReferenceType type) {
+        Set<JifFieldInstance> s = new LinkedHashSet<JifFieldInstance>();
 
-        for (Iterator iter = type.fields().iterator(); iter.hasNext(); ) {
-            JifFieldInstance fi = (JifFieldInstance) iter.next();
+        @SuppressWarnings("unchecked")
+        List<JifFieldInstance> fields = type.fields();
+        for (JifFieldInstance fi : fields) {
             if (fi.flags().isFinal() && !fi.hasInitializer()) {
                 s.add(fi);
             }
@@ -101,7 +104,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         // constructor, if the super constructor is an "untrusted class", i.e.
         // a Java class that isn't one of JifTypeSystem.trustedNonJifClassNames
         // or a Jif class.
-        Set uninitFinalVars = uninitFinalFields(ci.container());
+        Set<JifFieldInstance> uninitFinalVars = uninitFinalFields(ci.container());
 
         // let the context know that we are label checking a constructor
         // body, and what the return label of the constructor is.
@@ -118,7 +121,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         A.setConstructorReturnLabel(Lr);
 
         // stmts is the statements in the constructor body.
-        List stmts = new LinkedList();
+        List<Stmt> stmts = new LinkedList<Stmt>();
 
         // The flag preDangerousSuperCall indicates if we are before a call
         // to a "dangerous" super constructor call. A super call is dangerous
@@ -129,10 +132,9 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
 
         boolean seenSuperCall = false;
 
-        Iterator iter = body.statements().iterator();
-        while (iter.hasNext()) {
-            Stmt s = (Stmt) iter.next();
-
+        @SuppressWarnings("unchecked")
+        List<Stmt> statements = body.statements();
+        for (Stmt s : statements) {
             if (seenSuperCall && uninitFinalVars.isEmpty() && 
                     A.checkingInits() && isEscapingThis(s)) {
                 // there won't be a "dangerousSuperCall", 
@@ -194,14 +196,17 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
     private boolean isEscapingThis(Stmt s) {
         final boolean[] result = new boolean[] {false};
         s.visit(new NodeVisitor() {
+            @Override
             public Node leave( Node old, Node n, NodeVisitor v ) {
                 if (n instanceof Call) {
                     Call c = (Call)n;
                     if (c.target() instanceof Expr && JifUtil.effectiveExpr((Expr)c.target()) instanceof Special) {
                         result[0] = true;                        
                     }
-                    for (Iterator iter = c.arguments().iterator(); iter.hasNext();) {
-                        Expr arg = (Expr)iter.next();
+                    
+                    @SuppressWarnings("unchecked")
+                    List<Expr> args = c.arguments();
+                    for (Expr arg : args) {
                         if (JifUtil.effectiveExpr(arg) instanceof Special) {
                             result[0] = true;                        
                         }                        
@@ -217,8 +222,9 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         return result[0];
     }
 
-    private boolean processConstructorCall(ConstructorCall ccs, LabelChecker lc, JifConstructorInstance ci, Set uninitFinalVars) 
-    throws SemanticException {
+    private boolean processConstructorCall(ConstructorCall ccs,
+            LabelChecker lc, JifConstructorInstance ci,
+            Set<JifFieldInstance> uninitFinalVars) throws SemanticException {
         JifTypeSystem ts = lc.jifTypeSystem();
         boolean wasDangerousSuperCall = false;
 
@@ -260,8 +266,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
 
                 // We must make sure that all final variables of
                 // this class are initialized before the super call.                            
-                for (Iterator i = uninitFinalVars.iterator(); i.hasNext();) {
-                    JifFieldInstance fi = (JifFieldInstance)i.next();
+                for (JifFieldInstance fi : uninitFinalVars) {
                     throw new SemanticDetailedException(
                                                         "Final field \"" + fi.name()
                                                         + "\" must be initialized before "
@@ -292,47 +297,53 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
      * Check if the stmt is an assignment to a final field. Moreover, if
      * the final field is a label, and it is being initialized from a final
      * label, share the uids of the fields.
+     * 
+     * @throws SemanticException 
      */
-    protected void checkFinalFieldAssignment(Stmt s_, Set uninitFinalVars, JifContext A)
-    throws SemanticException
-    {
+    protected void checkFinalFieldAssignment(Stmt s_,
+            Set<JifFieldInstance> uninitFinalVars, JifContext A)
+            throws SemanticException {
     	// Added this so that we can initialize final fields within atomic blocks in Fabric programs
     	List<Stmt> initializers = new ArrayList<Stmt>();
     	
-    	if(s_ instanceof Block) {
-    		Block b  = (Block) s_;
-    		List<Stmt> stmts = b.statements();
-    		initializers.addAll(stmts);
-    	} else {
-    		initializers.add(s_);
-    	}
+        if (s_ instanceof Block) {
+            Block b = (Block) s_;
+            @SuppressWarnings("unchecked")
+            List<Stmt> stmts = b.statements();
+            initializers.addAll(stmts);
+        } else {
+            initializers.add(s_);
+        }
     	
-    	for(Stmt s: initializers) {
-    		if (!(s instanceof Eval) || !(((Eval)s).expr() instanceof FieldAssign)) {
-    			// we are not interested in this statement, it's not an assignment
-    			// to a field
-    			return;
-    		}
+        for (Stmt s : initializers) {
+            if (!(s instanceof Eval)
+                    || !(((Eval) s).expr() instanceof FieldAssign)) {
+                // we are not interested in this statement, it's not an
+                // assignment
+                // to a field
+                return;
+            }
 
-    		FieldAssign ass = (FieldAssign)((Eval)s).expr();
-    		Field f = (Field) ass.left();
-    		JifFieldInstance assFi = (JifFieldInstance) f.fieldInstance();
+            FieldAssign ass = (FieldAssign) ((Eval) s).expr();
+            Field f = (Field) ass.left();
+            JifFieldInstance assFi = (JifFieldInstance) f.fieldInstance();
 
-    		if (! (ass.operator() == Assign.ASSIGN &&
-    				f.target() instanceof Special && 
-    				((Special)f.target()).kind() == Special.THIS && 
-    				assFi.flags().isFinal())) {
-    			// assignment to something other than a final field of this. 
-    			return;
-    		}    
+            if (!(ass.operator() == Assign.ASSIGN
+                    && f.target() instanceof Special
+                    && ((Special) f.target()).kind() == Special.THIS && assFi
+                    .flags().isFinal())) {
+                // assignment to something other than a final field of this.
+                return;
+            }
 
-    		// Remove the field from the set of final vars, since it is
-    		// initialized here.
-    		uninitFinalVars.remove(assFi);
+            // Remove the field from the set of final vars, since it is
+            // initialized here.
+            uninitFinalVars.remove(assFi);
 
-    		// Note that the constraints specified in check-inits for the "v = E"
-    		// case (Figure 4.44) are added when we visit the statement "s"
-    		// normally, so we don't need to handle them specially here.
-    	}
+            // Note that the constraints specified in check-inits for the
+            // "v = E"
+            // case (Figure 4.44) are added when we visit the statement "s"
+            // normally, so we don't need to handle them specially here.
+        }
     }
 }
