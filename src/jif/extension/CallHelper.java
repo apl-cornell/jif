@@ -725,7 +725,7 @@ public class CallHelper {
                     throw new InternalCompilerError(
                             "acts-for constraints between labels not implemented yet");
                 } else {
-                    throw new InternalCompilerError(
+                    throw new InternalCompilerError(jac.position(),
                             "Unexpected ActsForConstraint (" + actor.getClass()
                                     + " actsfor " + granter.getClass() + ").");
                 }
@@ -1017,6 +1017,17 @@ public class CallHelper {
      * @throws SemanticException
      */
     @SuppressWarnings("unchecked")
+    public <P extends ActsForParam> P instantiate(JifContext A, P param)
+            throws SemanticException {
+        if (param instanceof Principal)
+            return (P) instantiate(A, (Principal) param);
+        
+        if (param instanceof Label) return (P) instantiate(A, (Label) param);
+        throw new InternalCompilerError(param.position(),
+                "Unexpected subclass of ActsForParam: " + param.getClass());
+    }
+    
+    @SuppressWarnings("unchecked")
     public Principal instantiate(JifContext A, Principal p) throws SemanticException {
         return JifInstantiator.instantiate(p, A, receiverExpr, calleeContainer, receiverLabel,
                                            getArgLabelsFromFormalTypes(this.pi.formalTypes(), (JifTypeSystem)this.pi.typeSystem(), this.pi.position()),
@@ -1066,7 +1077,7 @@ public class CallHelper {
 
         // add the "where caller" authority of the superclass only
         Set<Principal> newAuth = new LinkedHashSet<Principal>();
-        JifProcedureDeclExt_c.addCallers(overridden, newlc, newAuth);
+        JifProcedureDeclExt_c.addCallers(overridden, newAuth);
         A.setAuthority(instantiate(A, newAuth));       
 
         // add the where constraints of the superclass only.
