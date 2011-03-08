@@ -32,9 +32,9 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
     protected JifParsedPolyType_c() {
 	super();
 	JifTypeSystem jts = (JifTypeSystem) this.ts;
-	this.params = Collections.emptyList();
-	this.authority = Collections.emptyList();
-	this.constraints = Collections.emptyList();
+	this.params = new LinkedList<ParamInstance>();
+	this.authority = new LinkedList<Principal>();
+	this.constraints = new LinkedList<ActsForConstraint<ActsForParam, Principal>>();
         this.provider = jts.providerLabel(position, this);
         this.instantiatedFrom = null;
     }
@@ -42,9 +42,9 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
     public JifParsedPolyType_c(JifTypeSystem ts, LazyClassInitializer init, 
                                Source fromSource) {
 	super(ts, init, fromSource);
-	this.params = Collections.emptyList();
-	this.authority = Collections.emptyList();
-	this.constraints = Collections.emptyList();
+        this.params = new LinkedList<ParamInstance>();
+        this.authority = new LinkedList<Principal>();
+        this.constraints = new LinkedList<ActsForConstraint<ActsForParam, Principal>>();
         this.provider = ts.providerLabel(position, this);
         this.instantiatedFrom = null;
     }
