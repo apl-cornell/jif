@@ -900,7 +900,7 @@ public class JifTypeSystem_c
     }
 
     @Override
-    public Label providerLabel(Position position, JifClassType ct) {
+    public ProviderLabel providerLabel(Position position, JifClassType ct) {
         return new ProviderLabel_c(position, ct);
     }
 

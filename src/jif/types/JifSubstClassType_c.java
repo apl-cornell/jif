@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import jif.types.label.Label;
+import jif.types.label.ProviderLabel;
 import jif.types.label.ThisLabel;
 import jif.types.principal.Principal;
 import polyglot.ext.param.types.PClass;
@@ -52,6 +52,11 @@ public class JifSubstClassType_c extends SubstClassType_c
 
     ////////////////////////////////////////////////////////////////
     // Implement methods of JifClassType
+
+    @Override
+    public JifTypeSystem typeSystem() {
+        return (JifTypeSystem) super.typeSystem();
+    }
 
     @Override
     public List<Principal> authority() {
@@ -108,7 +113,7 @@ public class JifSubstClassType_c extends SubstClassType_c
     }
 
 	@Override
-	public Label provider() {
+	public ProviderLabel provider() {
 	    JifClassType jpt = (JifClassType) base;
 	    return jpt.provider();
 	}

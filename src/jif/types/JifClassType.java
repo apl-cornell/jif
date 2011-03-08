@@ -2,7 +2,7 @@ package jif.types;
 
 import java.util.List;
 
-import jif.types.label.Label;
+import jif.types.label.ProviderLabel;
 import jif.types.label.ThisLabel;
 import jif.types.principal.Principal;
 import polyglot.types.ClassType;
@@ -11,6 +11,10 @@ import polyglot.types.ClassType;
  * Jif class type.
  */
 public interface JifClassType extends ClassType {
+    
+    @Override
+    JifTypeSystem typeSystem();
+    
     /**
      * The principals that grant authority to objects of this class, that is,
      * the principals listed in the authority clause.
@@ -47,5 +51,5 @@ public interface JifClassType extends ClassType {
     /**
      * Returns the provider label of the implementation of this class.
      */
-    Label provider();
+    ProviderLabel provider();
 }

@@ -107,6 +107,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
     public Context enterScope(Context c) {
         JifContext A = (JifContext) c;
         A = addParamsToContext(A);
+        A.setProvider(((JifClassType) type).provider());
         return addConstraintsToContext(A);
     }
     @Override

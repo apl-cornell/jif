@@ -134,7 +134,7 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     Label topLabel(Position pos);
     Label bottomLabel(Position pos);
-    Label providerLabel(Position position, JifClassType ct);
+    ProviderLabel providerLabel(Position position, JifClassType ct);
     Label noComponentsLabel(Position pos);
     Label notTaken(Position pos);
 

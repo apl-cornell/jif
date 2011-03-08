@@ -1,19 +1,18 @@
 package jif.types;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import jif.types.label.Label;
 import jif.types.label.ParamLabel;
+import jif.types.label.ProviderLabel;
 import jif.types.label.ThisLabel;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ext.param.types.PClass;
 import polyglot.frontend.Source;
-import polyglot.types.ClassType;
-import polyglot.types.FieldInstance;
-import polyglot.types.LazyClassInitializer;
-import polyglot.types.ParsedClassType_c;
-import polyglot.types.TypeObject;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.TypedList;
@@ -25,7 +24,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
     List<ParamInstance> params;
     List<Principal> authority;
     List<ActsForConstraint<ActsForParam, Principal>> constraints;
-    Label provider;
+    ProviderLabel provider;
     
     PClass instantiatedFrom;
 
@@ -47,6 +46,11 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
         this.constraints = new LinkedList<ActsForConstraint<ActsForParam, Principal>>();
         this.provider = ts.providerLabel(position, this);
         this.instantiatedFrom = null;
+    }
+
+    @Override
+    public JifTypeSystem typeSystem() {
+        return (JifTypeSystem) super.typeSystem();
     }
 
     @Override
@@ -221,7 +225,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
     }
 
     @Override
-    public Label provider() {
+    public ProviderLabel provider() {
         return provider;
     }
 }

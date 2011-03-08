@@ -10,13 +10,14 @@ import polyglot.types.TypeObject;
 import polyglot.util.Position;
 
 public class ProviderLabel_c extends Label_c implements ProviderLabel {
-    
+
     /**
      * The class that this is labelling.
      */
     protected JifClassType classType;
     
     public ProviderLabel_c(Position pos, JifClassType classType) {
+        super(classType.typeSystem(), pos);
         this.classType = classType;
     }
 
