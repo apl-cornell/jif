@@ -23,6 +23,7 @@ public class JifClassDeclExt extends Jif_c {
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
 	JifClassDecl n = (JifClassDecl) node();
 
@@ -46,9 +47,7 @@ public class JifClassDeclExt extends Jif_c {
 	if (ct.superType() instanceof JifClassType) {
             final JifClassType superType = (JifClassType) ct.superType();         
             
-	    for (Iterator i = superType.authority().iterator(); i.hasNext(); ) {
-		final Principal pl = (Principal) i.next();
-
+	    for (final Principal pl : superType.authority()) {
 		// authPrincipal must actfor pl i.e., at least one
                 // of the principals that have authorized ct must act for pl.
                 lc.constrain(authPrincipal, 
@@ -57,10 +56,12 @@ public class JifClassDeclExt extends Jif_c {
                            A.labelEnv(),
                            n.position(),
                            new ConstraintMessage() {
+                    @Override
                     public String msg() {
                         return "Superclass " + superType + " requires " + ct + " to " +
                         "have the authority of principal " + pl;
                     }
+                    @Override
                     public String detailMsg() {
                         return "The class " + superType + " has the authority of the " +
                         "principal " + pl + ". To extend this class, " + ct + 
@@ -77,10 +78,12 @@ public class JifClassDeclExt extends Jif_c {
         final JifContext _A = A;
         lc.constrain(A.provider(), PrincipalConstraint.ACTSFOR, authPrincipal,
                 A.labelEnv(), n.position(), new ConstraintMessage() {
+                    @Override
                     public String msg() {
                         return _A.provider() + " must act for " + authPrincipal;
                     }
 
+                    @Override
                     public String detailMsg() {
                         return _A.provider() + " is the provider of " + ct
                                 + " but does not have authority to act for "
@@ -110,14 +113,14 @@ public class JifClassDeclExt extends Jif_c {
         // build up a list of superclasses and interfaces that ct 
         // extends/implements that may contain abstract methods that 
         // ct must define.
-        List superInterfaces = ts.abstractSuperInterfaces(ct);
+        List<ReferenceType> superInterfaces = ts.abstractSuperInterfaces(ct);
 
         // check each abstract method of the classes and interfaces in
         // superInterfaces
-        for (Iterator i = superInterfaces.iterator(); i.hasNext(); ) {
-            ReferenceType rt = (ReferenceType)i.next();
-            for (Iterator j = rt.methods().iterator(); j.hasNext(); ) {
-                JifMethodInstance mi = (JifMethodInstance)j.next();
+        for (ReferenceType rt : superInterfaces) {
+            @SuppressWarnings("unchecked")
+            List<JifMethodInstance> methods = rt.methods();
+            for (JifMethodInstance mi : methods) {
                 if (!mi.flags().isAbstract()) {
                     // the method isn't abstract, so ct doesn't have to
                     // implement it.
