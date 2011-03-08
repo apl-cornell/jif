@@ -1595,4 +1595,13 @@ public class JifTypeSystem_c
     	return ((JifOptions)extInfo.getOptions()).fatalExceptions
     		&& descendsFrom(t, RuntimeException());
     }
+
+    @Override
+    public Label toLabel(Principal p) {
+        ConfPolicy toConf =
+                topConfPolicy(Position.compilerGenerated(Position.CALLER));
+        IntegPolicy toInteg =
+                writerPolicy(Position.compilerGenerated(Position.CALLER), p, p);
+        return pairLabel(p.position(), toConf, toInteg);
+    }
 }

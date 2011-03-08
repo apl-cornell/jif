@@ -297,5 +297,12 @@ public interface JifTypeSystem extends ParamTypeSystem
     /**
      *  Should this exception be promoted to a fatal error? 
      */
-	boolean promoteToFatal(Type t);
+    boolean promoteToFatal(Type t);
+
+    /**
+     * @return the label {⊤→⊤;p←p}, representing the authority of the given
+     *         principal. This can then be used to check whether L actsfor p by
+     *         checking whether L <= p.
+     */
+    Label toLabel(Principal p);
 }

@@ -8,14 +8,15 @@ import java.util.Set;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv_c;
 import jif.types.hierarchy.PrincipalHierarchy;
-import jif.types.label.*;
+import jif.types.label.AccessPath;
+import jif.types.label.Label;
+import jif.types.label.PairLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
 import polyglot.ast.Local;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
 
 /** An implementation of the <code>JifContext</code> interface.
  */
@@ -139,11 +140,7 @@ public class JifContext_c extends Context_c implements JifContext
 
     @Override
     public void addActsFor(Label L, Principal p) {
-        // This is equivalent to saying that L can flow to {⊤→⊤;p←⊤}.
-        ConfPolicy toConf = jifts.topConfPolicy(Position.compilerGenerated());
-        IntegPolicy toInteg = jifts.writerPolicy(Position.compilerGenerated(), p, p);
-        Label toLabel = jifts.pairLabel(p.position(), toConf, toInteg);
-        addAssertionLE(L, toLabel);
+        addAssertionLE(L, jifts.toLabel(p));
     }
 
     @Override
