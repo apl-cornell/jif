@@ -75,6 +75,7 @@ public class JifClassDeclExt extends Jif_c {
 	A = (JifContext) n.del().enterScope(A);
         lc = lc.context(A);
 
+        // Check that the provider acts for the class's authority principal.
         final JifContext _A = A;
         lc.constrain(A.provider(), PrincipalConstraint.ACTSFOR, authPrincipal,
                 A.labelEnv(), n.position(), new ConstraintMessage() {
