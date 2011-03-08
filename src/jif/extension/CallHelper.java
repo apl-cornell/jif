@@ -841,12 +841,63 @@ public class CallHelper {
      * Helper for satisfiesConstraints().
      */
     private void satisfiesLabelActsForPrincipalConstraint(
-            JifProcedureInstance jpi, Position pos, Label label,
+            final JifProcedureInstance jpi, Position pos, Label label,
             Principal principal, LabelChecker lc, boolean performInstantiations)
             throws SemanticException {
-        Label principalLabel = lc.jifTypeSystem().toLabel(principal);
-        satisfiesLabelLeAssertion(jpi, pos, label, principalLabel, lc,
-                performInstantiations);
+        final JifContext A = lc.jifContext();
+        final Label lhs;
+        final Principal rhs;
+        if (performInstantiations) {
+            lhs = instantiate(A, label);
+            rhs = instantiate(A, principal);
+        } else {
+            lhs = label;
+            rhs = principal;
+        }
+
+        if (!overrideChecker) {
+            // being used as a normal call checker
+            pos = position;
+        } else {
+            // being used as an override checker
+        }
+
+        lc.constrain(new NamedLabel(label.toString(),
+                "LHS of actsfor assertion", lhs), rhs, A.labelEnv(), pos,
+                new ConstraintMessage() {
+                    @Override
+                    public String msg() {
+                        if (!overrideChecker) {
+                            // being used as a normal call checker
+                            return "The label " + lhs
+                                    + " must act for " + rhs
+                                    + " to invoke " + jpi.debugString();
+                        } else {
+                            // being used as an override checker
+                            return "The subclass cannot assume that " + lhs
+                                    + " <= " + rhs;
+                        }
+                    }
+
+                    @Override
+                    public String detailMsg() {
+                        if (!overrideChecker) {
+                            // being used as a normal call checker
+                            return "The " + jpi.debugString()
+                                    + " requires that the " + "relationship "
+                                    + lhs + " actsfor " + rhs
+                                    + " holds at the call site.";
+                        } else {
+                            // being used as an override checker
+                            return "The " + jpi.debugString()
+                                    + " requires that " + lhs + " actsfor " + rhs
+                                    + ". However, this "
+                                    + "method overrides the method in class "
+                                    + CallHelper.this.pi.container()
+                                    + " which does not make this requirement.";
+                        }
+                    }
+                });
     }
     
     /**
