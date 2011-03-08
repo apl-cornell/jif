@@ -1,14 +1,17 @@
 package jif.ast;
 
+import jif.JifOptions;
 import jif.types.*;
 import jif.types.label.CovariantParamLabel;
 import jif.types.label.ParamLabel;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
+import polyglot.main.Options;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
@@ -66,6 +69,11 @@ implements AmbVarLabelNode
         
         if ("provider".equals(name.id())) {
             // "provider" is the provider label.
+            if (!((JifOptions) Options.global).checkProviders) {
+                throw new InternalCompilerError(position, "Cannot compile code "
+                        + "that mentions providers with the -no-providers option.");
+            }
+            
             JifContext jc = (JifContext) c;
             return nf.CanonicalLabelNode(position, jc.provider());
         }

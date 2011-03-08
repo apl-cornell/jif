@@ -905,8 +905,7 @@ public class JifTypeSystem_c
         if (((JifOptions) Options.global).checkProviders) {
             return new ProviderLabel_c(position, ct);
         } else {
-            throw new InternalCompilerError(position, "Cannot compile code "
-                    + "that mentions providers with the -no-providers option.");
+            return null;
         }
     }
 
