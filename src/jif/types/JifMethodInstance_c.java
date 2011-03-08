@@ -7,6 +7,7 @@ import java.util.List;
 
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
+import jif.types.label.ProviderLabel;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.Position;
@@ -288,7 +289,7 @@ public class JifMethodInstance_c extends MethodInstance_c
     }
 
     @Override
-    public Label provider() {
+    public ProviderLabel provider() {
         JifClassType jct = (JifClassType) container;
         return jct.provider();
     }

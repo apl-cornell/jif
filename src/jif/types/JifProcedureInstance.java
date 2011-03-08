@@ -3,6 +3,7 @@ package jif.types;
 import java.util.List;
 
 import jif.types.label.Label;
+import jif.types.label.ProviderLabel;
 import polyglot.types.ProcedureInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
@@ -32,5 +33,5 @@ public interface JifProcedureInstance extends ProcedureInstance
     /**
      * @return the provider label of the enclosing class.
      */
-    Label provider();
+    ProviderLabel provider();
 }

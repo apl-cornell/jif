@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import jif.JifOptions;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
@@ -15,6 +16,7 @@ import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Formal;
 import polyglot.ast.ProcedureDecl;
+import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.SemanticException;
@@ -92,8 +94,10 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
     protected void checkProviderAuthority(JifProcedureInstance mi,
             LabelChecker lc) throws SemanticException {
+        if (!((JifOptions) Options.global).checkProviders) return;
+        
         final JifContext A = lc.jifContext();
-        ProviderLabel provider = A.provider();
+        final ProviderLabel provider = mi.provider();
         final NamedLabel namedProvider =
                 new NamedLabel(provider.toString(), "provider of "
                         + provider.classType().fullName(), provider);
@@ -109,12 +113,12 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                             new ConstraintMessage() {
                                 @Override
                                 public String msg() {
-                                    return A.provider() + " must act for " + pi;
+                                    return provider + " must act for " + pi;
                                 }
 
                                 @Override
                                 public String detailMsg() {
-                                    return A.provider()
+                                    return provider
                                             + " is the provider of "
                                             + _mi.container()
                                             + " but does not have authority to act for "
@@ -310,8 +314,10 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
         // fold the call site pc and the provider label into the return label
         Label Lr =
-                lc.upperBound(mi.returnLabel(), ts.callSitePCLabel(mi),
-                        provider);
+                lc.upperBound(mi.returnLabel(), ts.callSitePCLabel(mi));
+        if (((JifOptions) Options.global).checkProviders) {
+            Lr = lc.upperBound(Lr, provider);
+        }
 
         //Hack: If no other paths, the procedure must return. Therefore,
         //X.n is not taken, and X.r doesn't contain any information. 

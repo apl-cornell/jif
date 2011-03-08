@@ -39,6 +39,11 @@ public class JifOptions extends Options {
       * Provide more detailed explanation of solver error messages?
       */
      public boolean explainErrors;
+     
+     /**
+      * Whether providers should be checked.
+      */
+     public boolean checkProviders;
 
      /**
       * The classpath for the Jif signatures of java.lang objects.
@@ -67,6 +72,7 @@ public class JifOptions extends Options {
         solveGlobally = false;
         explainErrors = false;
         nonRobustness = false;
+        checkProviders = true;
     }
 
     /**
@@ -116,6 +122,10 @@ public class JifOptions extends Options {
             }
             Report.addTopic("debug", level);
             index++;
+        }
+        else if (args[index].equals("-no-providers")) {
+            index++;
+            checkProviders = false;
         }
         else {
             int i = super.parseCommand(args, index, source);

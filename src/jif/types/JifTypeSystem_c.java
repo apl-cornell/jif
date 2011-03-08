@@ -15,6 +15,7 @@ import polyglot.ext.param.types.ParamTypeSystem_c;
 import polyglot.ext.param.types.Subst;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Source;
+import polyglot.main.Options;
 import polyglot.types.*;
 import polyglot.types.Package;
 import polyglot.types.reflect.ClassFile;
@@ -901,7 +902,11 @@ public class JifTypeSystem_c
 
     @Override
     public ProviderLabel providerLabel(Position position, JifClassType ct) {
-        return new ProviderLabel_c(position, ct);
+        if (((JifOptions) Options.global).checkProviders) {
+            return new ProviderLabel_c(position, ct);
+        } else {
+            return null;
+        }
     }
 
     @Override

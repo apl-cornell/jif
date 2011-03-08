@@ -7,6 +7,7 @@ import java.util.List;
 
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
+import jif.types.label.ProviderLabel;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
@@ -222,7 +223,7 @@ implements JifConstructorInstance
     }
 
     @Override
-    public Label provider() {
+    public ProviderLabel provider() {
         if (container instanceof JifClassType) {
             JifClassType jct = (JifClassType) container;
             return jct.provider();
