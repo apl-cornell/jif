@@ -21,6 +21,11 @@ public class ProviderLabel_c extends Label_c implements ProviderLabel {
     }
 
     @Override
+    public JifClassType classType() {
+        return classType;
+    }
+
+    @Override
     public boolean isCovariant() {
         return false;
     }

@@ -7,10 +7,10 @@ import jif.ast.JifMethodDecl;
 import jif.ast.JifUtil;
 import jif.extension.CallHelper;
 import jif.types.*;
-import jif.types.Constraint.Kind;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
+import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Receiver;
@@ -83,6 +83,7 @@ public class LabelChecker implements Copy
         }
     }
 
+    @Override
     public Object copy() {
         try {
             return super.clone();
@@ -196,7 +197,29 @@ public class LabelChecker implements Copy
         if (msg != null) msg.setConstraint(c);
         constrain(c);        
     }
+
+    /**
+     * Adds a constraint to the solver, specifying that the given label must
+     * actfor the given principal.
+     */
+    public void constrain(NamedLabel label, Principal p, LabelEnv env,
+            Position pos, ConstraintMessage msg) throws SemanticException {
+        constrain(label, p, env, pos, msg, true);
+    }
     
+    /**
+     * Adds a constraint to the solver, specifying that the given label must
+     * actfor the given principal.
+     */
+    public void constrain(NamedLabel label, Principal p, LabelEnv env,
+            Position pos, ConstraintMessage msg, boolean report)
+            throws SemanticException {
+        NamedLabel principalLabel =
+                new NamedLabel(p.toString(), "RHS of actsfor constraint", p
+                        .typeSystem().toLabel(p));
+        constrain(label, LabelConstraint.LEQ, principalLabel, env, pos, report,
+                msg);
+    }
 
     /**
      * Called by JifClassDeclExt just before this label checker is used to
@@ -283,14 +306,14 @@ public class LabelChecker implements Copy
             Receiver receiver,
             ReferenceType calleeContainer,
             JifProcedureInstance pi,
-            List actualArgs,
+            List<Expr> actualArgs,
             Position position) {
         return new CallHelper(receiverLabel, receiver, calleeContainer, pi, actualArgs, position);
     }
     public CallHelper createCallHelper(Label receiverLabel,
             ReferenceType calleeContainer,
             JifProcedureInstance pi,
-            List actualArgs,
+            List<Expr> actualArgs,
             Position position) {
         return createCallHelper(receiverLabel, null, calleeContainer, pi, actualArgs, position);
     }

@@ -6,6 +6,11 @@ import polyglot.types.*;
  */
 public interface Param extends TypeObject
 {
+    @Override
+    JifTypeSystem typeSystem();
+    
     boolean isRuntimeRepresentable();
+    
+    @Override
     boolean isCanonical();
 }

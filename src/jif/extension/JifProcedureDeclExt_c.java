@@ -1,12 +1,16 @@
 package jif.extension;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.types.label.Label;
 import jif.types.label.NotTaken;
+import jif.types.label.ProviderLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Formal;
@@ -17,7 +21,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.util.StringUtil;
 
 /** The Jif extension of the <code>ProcedureDecl</code> node. 
  * 
@@ -63,7 +66,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         JifContext A = lc.jifContext();
                 
         // Set the "auth" variable.
-        @SuppressWarnings("unchecked")
         Set<Principal> newAuth = constrainAuth(mi, A);
 
         for (Principal p : newAuth) {
@@ -91,15 +93,18 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
     protected void checkProviderAuthority(JifProcedureInstance mi,
             LabelChecker lc) throws SemanticException {
         final JifContext A = lc.jifContext();
+        ProviderLabel provider = A.provider();
+        final NamedLabel namedProvider =
+                new NamedLabel(provider.toString(), "provider of "
+                        + provider.classType().fullName(), provider);
         for (Assertion c : mi.constraints()) {
             if (c instanceof CallerConstraint) {
                 final CallerConstraint cc = (CallerConstraint) c;
                 
-                // Check that the provider of the calling class acts for the
-                // principals whose authority is required by the constraint.
                 for (final Principal pi : cc.principals()) {
+                    // Check that the provider of the enclosing class acts for pi.
                     final JifProcedureInstance _mi = mi;
-                    lc.constrain(A.provider(), PrincipalConstraint.ACTSFOR, pi,
+                    lc.constrain(namedProvider, pi,
                             A.labelEnv(), cc.position(),
                             new ConstraintMessage() {
                                 @Override

@@ -17,7 +17,7 @@ import polyglot.util.Position;
 
 /** An abstract implementation of the <code>Principal</code> interface. 
  */
-public abstract class Principal_c extends TypeObject_c implements Principal {
+public abstract class Principal_c extends Param_c implements Principal {
     PrincipalToJavaExpr toJava;
 
     protected Set<Param> variables = null; // memoized

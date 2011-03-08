@@ -19,7 +19,7 @@ import polyglot.util.Position;
 /**
  * An abstract implementation of the <code>Label</code> interface.
  */
-public abstract class Label_c extends TypeObject_c implements Label {
+public abstract class Label_c extends Param_c implements Label {
     protected String description;
 
     protected LabelToJavaExpr toJava;

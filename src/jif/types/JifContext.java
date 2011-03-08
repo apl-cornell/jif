@@ -6,6 +6,7 @@ import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.AccessPath;
 import jif.types.label.Label;
+import jif.types.label.ProviderLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Branch;
@@ -201,6 +202,6 @@ public interface JifContext extends Context {
      */
     void addCheckedEndorse(LocalInstance li, Label downgradeTo);
 
-    Label provider();
-    void setProvider(Label provider);
+    ProviderLabel provider();
+    void setProvider(ProviderLabel provider);
 }

@@ -1,12 +1,12 @@
 package jif.extension;
 
-import java.util.Iterator;
 import java.util.List;
 
 import jif.ast.JifClassDecl;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
+import jif.types.label.ProviderLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.ClassBody;
@@ -77,7 +77,11 @@ public class JifClassDeclExt extends Jif_c {
 
         // Check that the provider acts for the class's authority principal.
         final JifContext _A = A;
-        lc.constrain(A.provider(), PrincipalConstraint.ACTSFOR, authPrincipal,
+        ProviderLabel provider = A.provider();
+        NamedLabel namedProvider =
+                new NamedLabel(provider.toString(), "provider of "
+                        + provider.classType().fullName(), provider);
+        lc.constrain(namedProvider, authPrincipal,
                 A.labelEnv(), n.position(), new ConstraintMessage() {
                     @Override
                     public String msg() {
@@ -92,7 +96,7 @@ public class JifClassDeclExt extends Jif_c {
                     }
                 });
 	                
-    // label check class conformance
+        // label check class conformance
 	labelCheckClassConformance(ct,lc);
 
 	// label check the body

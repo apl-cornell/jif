@@ -11,6 +11,7 @@ import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.AccessPath;
 import jif.types.label.Label;
 import jif.types.label.PairLabel;
+import jif.types.label.ProviderLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
@@ -50,7 +51,7 @@ public class JifContext_c extends Context_c implements JifContext
     /**
      * Limit authority of classes and code in this context.
      */
-    protected Label provider;
+    protected ProviderLabel provider;
 
     protected JifContext_c(JifTypeSystem ts, TypeSystem jlts) {
         super(ts);
@@ -455,12 +456,12 @@ public class JifContext_c extends Context_c implements JifContext
     }
 
     @Override
-    public Label provider() {
+    public ProviderLabel provider() {
         return provider;
     }
 
     @Override
-    public void setProvider(Label provider) {
+    public void setProvider(ProviderLabel provider) {
         this.provider = provider;
     }
 }
