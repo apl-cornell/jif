@@ -71,7 +71,10 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             if (Report.should_report(jif_verbose, 3))
                 Report.report(3, "Body path labels = " + X);
 
-            addReturnConstraints(Li, X, mi, lc, mi.returnType());
+            // Use the bottom label as the provider, since the actual provider
+            // won't be constraining the return label here.
+            addReturnConstraints(Li, X, mi, lc, mi.returnType(),
+                    ts.bottomLabel());
         }
         else {
             // for an abstract or native method, just set the 

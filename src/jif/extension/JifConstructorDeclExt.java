@@ -56,7 +56,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         if (Report.should_report(jif_verbose, 3))
             Report.report(3, "Body path labels = " + X);
 
-        addReturnConstraints(Li, X, ci, lc, ts.Void());
+        addReturnConstraints(Li, X, ci, lc, ts.Void(), A.provider());
 
         mn = (JifConstructorDecl) updatePathMap(mn.formals(formals).body(body), X);
 
