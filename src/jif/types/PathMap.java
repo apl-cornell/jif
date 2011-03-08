@@ -17,16 +17,16 @@ import polyglot.util.CodeWriter;
  */
 public class PathMap
 {
-    protected Map map;
+    protected Map<Path, Label> map;
     protected JifTypeSystem ts;
 
     public PathMap(JifTypeSystem ts) {
         this.ts = ts;
-        this.map = new HashMap(5);
+        this.map = new HashMap<Path, Label>(5);
     }
 
     public Label get(Path p) {
-        Label l = (Label) map.get(p);
+        Label l = map.get(p);
         if (l == null) return ts.notTaken();
         return l;
     }
@@ -72,15 +72,15 @@ public class PathMap
 
     /** Return all paths in the map except NV (which isn't really a
      * path). */
-    public Set paths() {
-        Set s = allPaths();
+    public Set<Path> paths() {
+        Set<Path> s = allPaths();
         s.remove(Path.NV);
         return s;
     }
 
     /** Return all paths in the map including NV. */
-    public Set allPaths() {
-        return new LinkedHashSet(map.keySet());
+    public Set<Path> allPaths() {
+        return new LinkedHashSet<Path>(map.keySet());
     }
 
     public PathMap join(PathMap m) {
@@ -89,10 +89,9 @@ public class PathMap
 
         // Iterate over the elements of X, joining those labels with the ones
         // in this and adding the ones that aren't there.
-        for (Iterator i = m.map.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
-            Path p = (Path) e.getKey();
-            Label l1 = (Label) e.getValue();
+        for (Map.Entry<Path, Label> e :m.map.entrySet()) {
+            Path p = e.getKey();
+            Label l1 = e.getValue();
             Label l2 = n.get(p);
             n.map.put(p, ts.join(l1, l2));
         }
@@ -103,10 +102,9 @@ public class PathMap
     public PathMap subst(LabelSubstitution subst) throws SemanticException {
         PathMap n = new PathMap(ts);
 
-        for (Iterator i = map.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
-            Path p = (Path) e.getKey();
-            Label L = (Label) e.getValue();
+        for (Map.Entry<Path, Label> e : map.entrySet()) {
+            Path p = e.getKey();
+            Label L = e.getValue();
             n.map.put(p, L.subst(subst));
         }
 
@@ -116,23 +114,23 @@ public class PathMap
     public PathMap subst(VarMap bounds) {
         PathMap n = new PathMap(ts);
 
-        for (Iterator i = map.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
-            Path p = (Path) e.getKey();
-            Label L = (Label) e.getValue();
+        for (Map.Entry<Path, Label> e : map.entrySet()) {
+            Path p = e.getKey();
+            Label L = e.getValue();
             n.map.put(p, bounds.applyTo(L));
         }
 
         return n;
     }
 
+    @Override
     public String toString() {
         String s = "";
 
-        for (Iterator i = map.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
-            Path p = (Path) e.getKey();
-            Label L = (Label) e.getValue();
+        for (Iterator<Map.Entry<Path, Label>> i = map.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry<Path, Label> e = i.next();
+            Path p = e.getKey();
+            Label L = e.getValue();
 
             s += p.toString() + ":" + L.toString();
 
@@ -149,10 +147,9 @@ public class PathMap
         w.begin(0);
         boolean first = true;
 
-        for (Iterator i = map.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
-            Path p = (Path) e.getKey();
-            Label L = (Label) e.getValue();
+        for (Map.Entry<Path, Label> e : map.entrySet()) {
+            Path p = e.getKey();
+            Label L = e.getValue();
 
             if (! first) {
                 w.allowBreak(0);
