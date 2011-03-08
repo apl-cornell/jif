@@ -293,10 +293,10 @@ public class JifInstantiator
         // t is unlabeled
         if (t instanceof JifSubstType) {
             JifSubstType jit = (JifSubstType)t;
-            Map<Param, Param> newMap = new HashMap<Param, Param>();
+            Map<ParamInstance, Param> newMap = new HashMap<ParamInstance, Param>();
             boolean diff = false;
-            for (Iterator<Map.Entry<Param, Param>> i = jit.entries(); i.hasNext();) {
-                Map.Entry<Param, Param> e = i.next();
+            for (Iterator<Map.Entry<ParamInstance, Param>> i = jit.entries(); i.hasNext();) {
+                Map.Entry<ParamInstance, Param> e = i.next();
                 Param arg = e.getValue();
                 Param p;
                 if (arg instanceof Label) {
