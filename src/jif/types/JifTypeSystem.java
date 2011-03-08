@@ -1,6 +1,5 @@
 package jif.types;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -135,7 +134,7 @@ public interface JifTypeSystem extends ParamTypeSystem
 
     Label topLabel(Position pos);
     Label bottomLabel(Position pos);
-    Label providerLabel(Position position, Label l);
+    Label providerLabel(Position position, JifClassType ct);
     Label noComponentsLabel(Position pos);
     Label notTaken(Position pos);
 
@@ -299,19 +298,4 @@ public interface JifTypeSystem extends ParamTypeSystem
      *  Should this exception be promoted to a fatal error? 
      */
 	boolean promoteToFatal(Type t);
-
-    /**
-     * Is the type system initialized?
-     */
-    boolean isInitialized();
-    
-    /**
-     * Return the provider label associated with s.
-     */
-    Label providerForFile(File s);
-
-    /**
-     * @return {⊤→p;⊤←p}.
-     */
-    public Label principalToTrustLabel(Principal p);
 }

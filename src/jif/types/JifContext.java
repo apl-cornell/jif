@@ -37,7 +37,7 @@ public interface JifContext extends Context {
     void addAssertionLE(Label L1, Label L2);
     
     /**
-     * Adds a label-actsfor-principal assertion to the label environment.
+     * Adds a label-actsfor-principal assumption to the label environment.
      */
     void addActsFor(Label L, Principal p);
 

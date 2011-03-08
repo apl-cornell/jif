@@ -25,8 +25,6 @@ public abstract class Label_c extends TypeObject_c implements Label {
     protected LabelToJavaExpr toJava;
     
     protected Set<Param> variables = null; // memoized
-    
-    protected boolean isProvider = false;
 
     protected Label_c() {
         super();
@@ -105,16 +103,6 @@ public abstract class Label_c extends TypeObject_c implements Label {
     @Override
     public boolean isTop() {
         return false;
-    }
-
-    @Override
-    public boolean isProviderLabel() { return isProvider; }
-    
-    @Override
-    public Label isProviderLabel(boolean isProvider) { 
-        Label_c l = (Label_c) copy();
-        l.isProvider = isProvider;
-        return l;
     }
 
     @Override

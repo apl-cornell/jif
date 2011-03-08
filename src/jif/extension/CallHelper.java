@@ -641,7 +641,7 @@ public class CallHelper {
     throws SemanticException
     {
         JifContext A = lc.context();
-        //Check method-level and class-level constraints 
+        // Check method-level and class-level constraints 
         List<Assertion> constraints = new LinkedList<Assertion>(jpi.constraints());
         if (jpi.container() instanceof JifClassType) 
             constraints.addAll(((JifClassType) jpi.container()).constraints());        	
@@ -702,13 +702,18 @@ public class CallHelper {
                          
                 }
             }
-            else if (jc instanceof ActsForConstraint<Principal, Principal>) {
-                final ActsForConstraint<Principal, Principal> jac = (ActsForConstraint<Principal, Principal>)jc;
+            else if (jc instanceof ActsForConstraint) {
+                @SuppressWarnings("unchecked")
+                final ActsForConstraint<ActsForParam, ActsForParam> jac =
+                        (ActsForConstraint<ActsForParam, ActsForParam>) jc;
 
-                final Principal actor = performInstantiations ? instantiate(A, jac.actor()) : jac.actor();
+                final Principal actor =
+                        performInstantiations ? instantiate(A, jac.actor())
+                                : jac.actor();
 
-                final Principal granter = performInstantiations ? instantiate(A, jac.granter()) : jac.granter();
-
+                final Principal granter =
+                        performInstantiations ? instantiate(A, jac.granter())
+                                : jac.granter();
                 
                 if (jac.isEquiv()) {
                     lc.constrain(actor, 

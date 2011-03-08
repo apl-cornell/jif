@@ -14,7 +14,6 @@ import polyglot.ast.*;
 import polyglot.ast.Binary.Operator;
 import polyglot.types.Flags;
 import polyglot.types.Type;
-import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -190,13 +189,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-//    public AmbPrincipalNode AmbProviderPrincipalNode(Position pos) {
-//        AmbPrincipalNode n = new AmbProviderPrincipalNode_c(pos);
-//        n = (AmbPrincipalNode)n.ext(jifExtFactory().extAmbPrincipalNode());
-//        n = (AmbPrincipalNode)n.del(delFactory().delExpr());
-//        return n;
-//	}
-
     @Override
     public CanonicalPrincipalNode CanonicalPrincipalNode(Position pos, Principal principal) {
         CanonicalPrincipalNode n = new CanonicalPrincipalNode_c(pos,
@@ -347,15 +339,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         n = (New)n.del(delFactory().delNew());
         return n;
     }
-    
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public SourceFile SourceFile(Position pos, PackageNode packageName, List imports, List decls) {
-        SourceFile n = new JifSourceFile_c(pos, packageName, CollectionUtil.nonNullList(imports), CollectionUtil.nonNullList(decls));
-        n = (SourceFile)n.ext(extFactory().extSourceFile());
-        n = (SourceFile)n.del(delFactory().delSourceFile());
-        return n;
-    }
 
     @Override
     public Special Special(Position pos, Special.Kind kind, TypeNode outer) {
@@ -432,11 +415,9 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
 
     @Override
     public PrincipalActsForPrincipalConstraintNode PrincipalActsForPrincipalConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter) {
-    	PrincipalActsForPrincipalConstraintNode n = PrincipalActsForPrincipalConstraintNode(pos, actor, granter, false);
-        n = (PrincipalActsForPrincipalConstraintNode)n.ext(jifExtFactory().extPrincipalActsForPrincipalConstraintNode());
-        n = (PrincipalActsForPrincipalConstraintNode)n.del(delFactory().delNode());
-        return n;
+    	return PrincipalActsForPrincipalConstraintNode(pos, actor, granter, false);
     }
+    
     @Override
     public PrincipalActsForPrincipalConstraintNode PrincipalActsForPrincipalConstraintNode(Position pos, PrincipalNode actor, PrincipalNode granter, boolean isEquiv) {
         PrincipalActsForPrincipalConstraintNode n = new PrincipalActsForPrincipalConstraintNode_c(pos,

@@ -42,10 +42,6 @@ public interface Label extends ActsForParam {
      */
     boolean isCovariant();
 
-    public boolean isProviderLabel();
-    
-    public Label isProviderLabel(boolean isProvider);
-
 //    /**
 //     * Returns the join of this label and L.
 //     */

@@ -35,9 +35,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	this.params = Collections.emptyList();
 	this.authority = Collections.emptyList();
 	this.constraints = Collections.emptyList();
-        this.provider =
-                jts.principalToTrustLabel(jts.bottomPrincipal(Position
-                        .compilerGenerated()));
+        this.provider = jts.providerLabel(position, this);
         this.instantiatedFrom = null;
     }
 
@@ -47,12 +45,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	this.params = Collections.emptyList();
 	this.authority = Collections.emptyList();
 	this.constraints = Collections.emptyList();
-        if (fromSource instanceof CodeSource) {
-            this.provider = ((CodeSource) fromSource).provider();
-        } else {
-            throw new InternalCompilerError("Source file " + fromSource
-                    + " has no provider label.");
-        }
+        this.provider = ts.providerLabel(position, this);
         this.instantiatedFrom = null;
     }
 
@@ -227,8 +220,8 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	return false;
     }
 
-	@Override
-	public Label provider() {
-		return provider;
-	}
+    @Override
+    public Label provider() {
+        return provider;
+    }
 }

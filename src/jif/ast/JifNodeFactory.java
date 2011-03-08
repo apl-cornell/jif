@@ -33,7 +33,6 @@ public interface JifNodeFactory extends NodeFactory {
     AmbPrincipalNode AmbPrincipalNode(Position pos, Id name);
     AmbPrincipalNode AmbConjunctivePrincipalNode(Position pos, PrincipalNode left, PrincipalNode right);
     AmbPrincipalNode AmbDisjunctivePrincipalNode(Position pos, PrincipalNode left, PrincipalNode right);
-//    AmbPrincipalNode AmbProviderPrincipalNode(Position pos);
     CanonicalPrincipalNode CanonicalPrincipalNode(Position pos, Principal principal);
     JifClassDecl JifClassDecl(Position pos, Flags flags, Id name, List<ParamDecl> params, TypeNode superClass, List<TypeNode> interfaces, List<PrincipalNode> authority, List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints, ClassBody body);
     JifMethodDecl JifMethodDecl(Position pos, Flags flags, TypeNode returnType, Id name, LabelNode startLabel, List<Formal> arguments, LabelNode endLabel, List<TypeNode> exceptions, List<ConstraintNode<?>> constraints, Block body);

@@ -50,10 +50,21 @@ public class JifProcedureDeclDel extends JifJL_c
                 CallerConstraint cc = (CallerConstraint)a;
                 ensureNotTopPrincipal(cc.principals(), a.position());
             }
-            else if (a instanceof ActsForConstraint<Principal, Principal>) {
-                ActsForConstraint<Principal, Principal> afc = (ActsForConstraint<Principal, Principal>)a;
-                ensureNotTopPrincipal(afc.actor(), a.position());
-                ensureNotTopPrincipal(afc.granter(), a.position());
+            else if (a instanceof ActsForConstraint) {
+                @SuppressWarnings("unchecked")
+                ActsForConstraint<ActsForParam, ActsForParam> afc =
+                        (ActsForConstraint<ActsForParam, ActsForParam>) a;
+                
+                ActsForParam actor = afc.actor();
+                ActsForParam granter = afc.granter();
+                
+                if (actor instanceof Principal) {
+                    ensureNotTopPrincipal((Principal) actor, a.position());
+                }
+                
+                if (granter instanceof Principal) {
+                    ensureNotTopPrincipal((Principal) granter, a.position());
+                }
             }
         }
         return pd;

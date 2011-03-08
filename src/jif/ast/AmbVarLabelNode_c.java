@@ -67,8 +67,7 @@ implements AmbVarLabelNode
         if ("provider".equals(name.id())) {
             // "provider" is the provider label.
             JifContext jc = (JifContext) c;
-            return nf.CanonicalLabelNode(position,
-                    ts.providerLabel(position, jc.provider()));
+            return nf.CanonicalLabelNode(position, jc.provider());
         }
 
         VarInstance vi = c.findVariable(name.id());

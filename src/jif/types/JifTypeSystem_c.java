@@ -1,8 +1,6 @@
 package jif.types;
 
-import java.io.File;
 import java.util.*;
-import java.util.Map.Entry;
 
 import jif.JifOptions;
 import jif.extension.LabelTypeCheckUtil;
@@ -35,11 +33,6 @@ public class JifTypeSystem_c
 
     private final DefaultSignature ds;
 
-    protected boolean initialized;
-    protected Label DEFAULT_PROVIDER = null;
-
-    protected Map<File,Label> providerMap;
-    
     public JifTypeSystem_c(TypeSystem jlts) {
         this.jlts = jlts;
         this.ds = new FixedSignature(this);
@@ -80,46 +73,7 @@ public class JifTypeSystem_c
 
         PRINCIPAL_ = new PrimitiveType_c(this, PRINCIPAL_KIND);
         LABEL_ = new PrimitiveType_c(this, LABEL_KIND);
-        
-        JifOptions opt = (JifOptions) extInfo.getOptions();
-        
-        if (opt.defaultProvider != null)
-            DEFAULT_PROVIDER =
-                    principalToTrustLabel(resolveProviderPrincipal(opt.defaultProvider));
-        else DEFAULT_PROVIDER =
-                principalToTrustLabel(topPrincipal(Position
-                        .compilerGenerated("default provider")));
-
-        if (opt.providerPaths != null) {
-            providerMap = new LinkedHashMap<File, Label>();
-            for (Entry<File, String> entry : opt.providerPaths.entrySet()) {
-                Principal p = resolveProviderPrincipal(entry.getValue());
-                
-                providerMap.put(entry.getKey(), principalToTrustLabel(p));
-            }
-        }
-        
-        this.initialized = true;
     }
-    @Override
-    public boolean isInitialized() {
-    	return initialized;
-    }
-    @Override
-    public Label providerForFile(File s) {
-    	if(providerMap == null)
-    		return DEFAULT_PROVIDER;
-    	else {
-    		while(s != null && !providerMap.containsKey(s)) {
-    			s = s.getParentFile();
-    		}
-    		if(s==null)
-    			return DEFAULT_PROVIDER;
-    		else
-    			return providerMap.get(s);
-    	}
-    }
-
     
     @Override
     public UnknownType unknownType(Position pos) {
@@ -946,8 +900,8 @@ public class JifTypeSystem_c
     }
 
     @Override
-    public Label providerLabel(Position position, Label l) {
-        return l.isProviderLabel(true);
+    public Label providerLabel(Position position, JifClassType ct) {
+        return new ProviderLabel_c(position, ct);
     }
 
     @Override
@@ -1640,48 +1594,5 @@ public class JifTypeSystem_c
     public boolean promoteToFatal(Type t) {
     	return ((JifOptions)extInfo.getOptions()).fatalExceptions
     		&& descendsFrom(t, RuntimeException());
-    }
-
-    public Principal resolveProviderPrincipal(String name)
-            throws SemanticException {
-        if ("_".equals(name))
-            return bottomPrincipal(null);
-
-        else if ("*".equals(name))
-            return topPrincipal(null);
-
-        else {
-            ClassType pType;
-            try {
-                pType = (ClassType) jlts.typeForName(PrincipalClassName());
-            } catch (SemanticException e) {
-                throw new InternalCompilerError("Cannot find "
-                        + PrincipalClassName() + " class.", e);
-            }
-
-            Named n;
-            // Look for the principal only in class files.
-            String className = "jif.principals." + name;
-            n = jlts.loadedResolver().find(className);
-
-            if (n instanceof Type) {
-                Type t = (Type) n;
-                if (t.isClass()) {
-
-                    if (jlts.isSubtype(t.toClass(), pType)) {
-                        return externalPrincipal(null, name);
-                    }
-                }
-            }
-            throw new SemanticException(name + " is not a principal.");
-        }
-    }
-    
-    @Override
-    public Label principalToTrustLabel(Principal p) {
-        Position pos = Position.compilerGenerated(2);
-        Principal topPrincipal = topPrincipal(pos);
-        return pairLabel(pos, readerPolicy(pos, topPrincipal, p),
-                writerPolicy(pos, topPrincipal, p));
     }
 }

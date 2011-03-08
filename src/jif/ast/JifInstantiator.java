@@ -96,15 +96,6 @@ public class JifInstantiator
     // access path root with appropriate temporary values.
     private Object substTempsForFormals(Object L, Position pos) {
         if (L == null) return null;
-        if (receiverType instanceof JifClassType) {
-            JifClassType jct = (JifClassType) receiverType;
-            try {
-                L = substImpl(L, new ProviderInstantiator(jct.provider()));
-            } catch (SemanticException e) {
-                throw new InternalCompilerError("Unexpected SemanticException "
-                        + "during label substitution: " + e.getMessage(), pos);
-            }
-        }
 
         // formal argLabels to formalTempLabels
         for (int i = 0; formalArgLabels != null && i < formalArgLabels.size(); i++) {
@@ -483,24 +474,6 @@ public class JifInstantiator
             if (ap.root().equals(srcRoot))
                 return ap.subst(srcRoot, trgPath);
             return ap;
-        }
-    }
-
-    /**
-     * Replaces all providers with trgPrincipal 
-     */
-    private static class ProviderInstantiator extends LabelSubstitution {
-        private Label trgLabel;
-        protected ProviderInstantiator(Label trgLabel) {
-            this.trgLabel = trgLabel;
-        }
-        
-        @Override
-        public Label substLabel(Label l) {
-            if (l.isProviderLabel()) {
-                return trgLabel;
-            }
-            return l;
         }
     }
 

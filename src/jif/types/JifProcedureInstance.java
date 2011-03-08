@@ -28,5 +28,9 @@ public interface JifProcedureInstance extends ProcedureInstance
     void subst(LabelSubstitution subst) throws SemanticException;
     
     ReferenceType container();
+    
+    /**
+     * @return the provider label of the enclosing class.
+     */
     Label provider();
 }
