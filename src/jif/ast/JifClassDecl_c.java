@@ -2,12 +2,15 @@ package jif.ast;
 
 import java.util.*;
 
+import jif.JifOptions;
 import jif.types.*;
 import jif.types.label.AccessPathThis;
 import jif.types.label.Label;
+import jif.types.label.ProviderLabel;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.ext.param.types.MuPClass;
+import polyglot.main.Options;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -123,7 +126,9 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
     }
 
     public JifContext addConstraintsToContext(JifContext A) {
-        JifParsedPolyType ct = (JifParsedPolyType) this.type;
+        final JifParsedPolyType ct = (JifParsedPolyType) this.type;
+        
+        // Add programer-specified constraints.
         for (ActsForConstraint<ActsForParam, Principal> pi : ct.constraints()) {
             ActsForParam actor = pi.actor();
             if (actor instanceof Principal) {
@@ -135,6 +140,27 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
                         "Unexpected ActsForParam type: " + actor.getClass());
             }
         }
+
+        // XXX Determine whether this can be relaxed.  -MJL
+        if (((JifOptions) Options.global).checkProviders) {
+            // Subclass providers must be at least as restrictive as superclass
+            // providers.
+            JifClassType curClass = ct;
+            ProviderLabel curProvider = ct.provider();
+            while (ct.supertypesResolved()
+                    && curClass.superType() instanceof JifClassType) {
+                JifClassType superClass = (JifClassType) curClass.superType();
+                ProviderLabel superProvider = superClass.provider();
+
+                if (superProvider != null && curProvider != null) {
+                    A.addAssertionLE(superProvider, curProvider);
+                }
+
+                curClass = superClass;
+                curProvider = superProvider;
+            }
+        }
+        
         return A;
     }
 
