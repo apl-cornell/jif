@@ -162,9 +162,26 @@ public interface JifTypeSystem extends ParamTypeSystem
     ReaderPolicy readerPolicy(Position pos, Principal owner, Collection<Principal> readers);
     WriterPolicy writerPolicy(Position pos, Principal owner, Principal writer);
     WriterPolicy writerPolicy(Position pos, Principal owner, Collection<Principal> writers);
+
+    /**
+     * @return the confidentiality policy representing public information (⊥→⊥).
+     */
     ConfPolicy bottomConfPolicy(Position pos);
+
+    /**
+     * @return the integrity policy representing trusted information (⊤←⊤).
+     */
     IntegPolicy bottomIntegPolicy(Position pos);
+
+    /**
+     * @return the confidentiality policy representing private information
+     *         (⊤→⊤).
+     */
     ConfPolicy topConfPolicy(Position pos);
+    
+    /**
+     * @return the integrity policy representing untrusted information (⊥←⊥).
+     */
     IntegPolicy topIntegPolicy(Position pos);
 
     
