@@ -7,7 +7,7 @@ public class Provider04[principal P] authority(P) where provider actsfor P {
 
 }
 
-class Provider04_5 authority(Bob) {
+class Provider04_5 authority(Bob) where provider actsfor Bob, {*Provider04.provider} actsfor Bob {
 	boolean{_->} p{Bob->}() throws (NullPointerException{Bob->}) where authority(Bob) {
 		boolean foo = true;
 		Provider04[Bob] p = new Provider04[Bob]();

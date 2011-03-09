@@ -1,10 +1,10 @@
-public class Provider05 authority(provider) {
-	final principal{this} p;
-	Provider05(principal{this} p) {
-		this.p = p;
+public class Provider05[principal p] authority(p) /*where provider actsfor p*/ {
+	final principal{this} q;
+	Provider05(principal{this} q) {
+		this.q = q;
 	} 	
 	
-	boolean m() where authority(p), provider actsfor p {
+	boolean m() where authority(q), p actsfor q {
 		return true;
 	}
 }

@@ -1,5 +1,5 @@
 //This class compiles with provider => Bob and fails otherwise
-public class Provider02 {
+public class Provider02 where provider actsfor Bob {
 	boolean{_->} m{p->}(principal p, boolean{p->} x) where caller(p), Bob actsfor p 
 	{
 		return declassify(x, {p->} to {_->});	
