@@ -28,6 +28,7 @@ public interface JifNodeFactory extends NodeFactory {
     AmbDynamicLabelNode AmbDynamicLabelNode(Position pos, Expr expr);
     AmbVarLabelNode AmbVarLabelNode(Position pos, Id name);
     AmbThisLabelNode AmbThisLabelNode(Position pos);
+    AmbProviderLabelNode AmbProviderLabelNode(Position pos, TypeNode typeNode);
     CanonicalLabelNode CanonicalLabelNode(Position pos, Label label);
     AmbPrincipalNode AmbPrincipalNode(Position pos, Expr expr);
     AmbPrincipalNode AmbPrincipalNode(Position pos, Id name);

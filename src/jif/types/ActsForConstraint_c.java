@@ -59,7 +59,7 @@ public class ActsForConstraint_c<Actor extends ActsForParam, Granter extends Act
 
     @Override
     public boolean isCanonical() {
-        return true;
+        return actor.isCanonical() && granter.isCanonical();
     }
 
     @Override

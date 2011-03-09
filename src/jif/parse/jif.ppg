@@ -292,7 +292,7 @@ non terminal EndorseExpr endorse;
 non terminal EndorseStmt endorse_statement;
 non terminal LabelNode downgrade_to_label_opt;
 non terminal TypeNode labeled_primitive_type;
-non terminal LabelNode label, label_opt, return_label_opt, label_flexible;
+non terminal LabelNode label, label_opt, return_label_opt, label_flexible, dynamic_label, provider;
 non terminal List join_component_list;
 non terminal Object join_label_component; // either a LabelNode or PolicyNode
 non terminal List meet_component_list;
@@ -350,8 +350,6 @@ label ::=
                RESULT = mn; :}
     |    LBRACE label:l RBRACE
             {: RESULT = l; :}
-    |  PROVIDER:a // provider label
-            {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),parser.nf.Id(parser.pos(a), "provider")); :}
     ;
 label_opt ::=
                     // LabelNode
@@ -364,8 +362,8 @@ label_flexible ::=
       // LabelNode
       label:a
             {: RESULT = a; :}
-    | accesspath:a
-            {: RESULT = parser.nf.AmbDynamicLabelNode(parser.pos(a), a); :}
+    | dynamic_label:a
+            {: RESULT = a; :}
     ;
 join_component_list ::=
                     // List of LabelNode or PolicyNode. Implicitly a join
@@ -403,14 +401,17 @@ label_component ::=
                     // LabelNode or PolicyNode
         label_component_policy:a
             {: RESULT = a; :}
-    |   MULT:x accesspath:a
-            {: RESULT = parser.nf.AmbDynamicLabelNode(parser.pos(x, a),
-						      a); :}
+    |   MULT:x dynamic_label:a
+            {: RESULT = a.position(parser.pos(x, a)); :}
     |   THIS:a
             {: RESULT = parser.nf.AmbThisLabelNode(parser.pos(a)); :}
     |   IDENTIFIER:a
             {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),
 						  parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
+    ;
+provider ::=
+        PROVIDER:a
+            {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),parser.nf.Id(parser.pos(a), "provider")); :}
     ;
 
 rightarrow ::= COLON:a 
@@ -485,14 +486,36 @@ principal_base ::=
             {: RESULT = b; :}
     ;
 
+dynamic_label ::=
+        accesspath:a
+            {: RESULT = parser.nf.AmbDynamicLabelNode(parser.pos(a), a); :}
+    |   provider:a
+            {: RESULT = a; :}
+    |   accesspath_receiver:a DOT PROVIDER:b
+            {: TypeNode clazz;
+               if (a instanceof Expr) {
+                   clazz = parser.exprToUninstType((Expr) a);
+               } else if (a instanceof AmbReceiver) {
+                   AmbReceiver ar = (AmbReceiver) a;
+                   Prefix prefix = ar.prefix();
+                   PackageNode pn = null;
+                   if (prefix != null) pn = parser.prefixToPackage(ar.prefix());
+                   clazz = parser.nf.AmbTypeNode(parser.pos(a), pn, ar.name());
+               } else {
+                   clazz = null;
+                   parser.die(parser.pos(a));
+               }
+               RESULT = parser.nf.AmbProviderLabelNode(parser.pos(a, b), clazz);
+            :}
+    ;
 accesspath ::=
         THIS:a {:  RESULT = parser.nf.This(parser.pos(a));  :}
     |   IDENTIFIER:a {: RESULT = new Name(parser, parser.pos(a), a.getIdentifier()).toExpr(); :}
-    | accesspath_receiver:a DOT IDENTIFIER:b
-             {: RESULT = parser.nf.Field(parser.pos(a, b),
-	                     a,
-			        b.getIdentifier()); :}
-     ;
+    |   accesspath_receiver:a DOT IDENTIFIER:b
+            {: RESULT = parser.nf.Field(parser.pos(a, b),
+	                                a,
+			                b.getIdentifier()); :}
+    ;
 
 accesspath_receiver ::=
         THIS:a {:  RESULT = parser.nf.This(parser.pos(a));  :}
@@ -873,6 +896,9 @@ constraint ::=
         {: RESULT = parser.nf.LabelActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}
+    |   provider:a actsfor principal:b
+        {: RESULT = parser.nf.LabelActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
+        :}
 // XXX Add this later.  This is intended to capture trust-ordering constraints between labels.
 //    |   label:a actsfor label:b
 //        {: RESULT = parser.nf.LabelActsForLabelConstraintNode(parser.pos(a,b), a, b);
@@ -916,6 +942,10 @@ auth_constraint ::=
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}
     |   label:a actsfor principal:b
+        {: RESULT = parser.nf.LabelActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
+           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
+        :}
+    |   provider:a actsfor principal:b
         {: RESULT = parser.nf.LabelActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}

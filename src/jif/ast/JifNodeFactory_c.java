@@ -148,6 +148,14 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     }
 
     @Override
+    public AmbProviderLabelNode AmbProviderLabelNode(Position pos,
+            TypeNode typeNode) {
+        AmbProviderLabelNode n = new AmbProviderLabelNode_c(pos, typeNode);
+        n = (AmbProviderLabelNode) n.ext(jifExtFactory().extAmbProviderLabelNode());
+        n = (AmbProviderLabelNode) n.del(delFactory().delNode());
+        return n;
+    }
+    @Override
     public CanonicalLabelNode CanonicalLabelNode(Position pos, Label label) {
         CanonicalLabelNode n = new CanonicalLabelNode_c(pos, label);
         n = (CanonicalLabelNode)n.ext(jifExtFactory().extCanonicalLabelNode());

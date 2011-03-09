@@ -14,6 +14,7 @@ public interface JifExtFactory extends ExtFactory, JifStmtExtFactory {
     Ext extAmbDynamicLabelNode();
     Ext extAmbVarLabelNode();
     Ext extAmbThisLabelNode();
+    Ext extAmbProviderLabelNode();
     Ext extCanonicalLabelNode();
     Ext extParamNode();
     Ext extLabelNode();
