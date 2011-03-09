@@ -20,23 +20,28 @@ public class JifFieldInstance_c extends FieldInstance_c
 	super(ts, pos, container, flags, type, name);
     }
 
+    @Override
     public void subst(VarMap bounds) {
         this.setLabel(bounds.applyTo(label));
         this.setType(bounds.applyTo(type));
     }
 
+    @Override
     public Label label() {
         return label;
     }
 
+    @Override
     public void setLabel(Label label) {
         this.label = label;
     }
 
+    @Override
     public boolean hasInitializer() {
         return hasInitializer;
     }
 
+    @Override
     public void setHasInitializer(boolean hasInitializer) {
         this.hasInitializer = hasInitializer;        
     }
@@ -53,6 +58,7 @@ public class JifFieldInstance_c extends FieldInstance_c
         }
         return this;        
     }
+    @Override
     public boolean isConstant() {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
@@ -60,6 +66,7 @@ public class JifFieldInstance_c extends FieldInstance_c
         }
         return super.isConstant();
     }
+    @Override
     public Object constantValue() {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
@@ -67,6 +74,7 @@ public class JifFieldInstance_c extends FieldInstance_c
         }
         return super.constantValue();
     }
+    @Override
     public boolean constantValueSet() {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
@@ -74,6 +82,7 @@ public class JifFieldInstance_c extends FieldInstance_c
         }
         return super.constantValueSet();
     }
+    @Override
     public FieldInstance constantValue(Object constantValue) {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
@@ -81,6 +90,7 @@ public class JifFieldInstance_c extends FieldInstance_c
         }
         return super.constantValue(constantValue);
     }
+    @Override
     public FieldInstance notConstant() {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
@@ -88,6 +98,7 @@ public class JifFieldInstance_c extends FieldInstance_c
         }
         return super.notConstant();
     }
+    @Override
     public void setConstantValue(Object constantValue) {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
@@ -95,6 +106,7 @@ public class JifFieldInstance_c extends FieldInstance_c
         }
         super.setConstantValue(constantValue);
     }
+    @Override
     public String toString() {
         return super.toString() + " label = " + label;
     }
