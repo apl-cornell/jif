@@ -132,14 +132,43 @@ public interface JifTypeSystem extends ParamTypeSystem
     // Label constructors
     VarLabel freshLabelVariable(Position pos, String s, String description);
 
+    /**
+     * @return the label representing private, untrusted information
+     *         ({⊤→⊤;⊥←⊥}).
+     */
     Label topLabel(Position pos);
+
+    /**
+     * @return the label representing public, trusted information
+     *         ({⊥→⊥;⊤←⊤}).
+     */
     Label bottomLabel(Position pos);
     ProviderLabel providerLabel(Position position, JifClassType ct);
+    
+    /**
+     * @return the label representing public, untrusted information
+     *         ({⊥→⊥;⊥←⊥}).
+     */
     Label noComponentsLabel(Position pos);
+    
     Label notTaken(Position pos);
 
+    /**
+     * @return the label representing private, untrusted information
+     *         ({⊤→⊤;⊥←⊥}).
+     */
     Label topLabel();
+
+    /**
+     * @return the label representing public, trusted information
+     *         ({⊥→⊥;⊤←⊤}).
+     */
     Label bottomLabel();
+    
+    /**
+     * @return the label representing public, untrusted information
+     *         ({⊥→⊥;⊥←⊥}).
+     */
     Label noComponentsLabel();
     Label notTaken();
 
