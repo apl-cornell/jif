@@ -1,7 +1,7 @@
 package jif.visit;
 
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import jif.ExtensionInfo;
@@ -15,7 +15,6 @@ import polyglot.ast.*;
 import polyglot.frontend.CyclicDependencyException;
 import polyglot.frontend.Job;
 import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
@@ -36,7 +35,7 @@ public class FieldLabelResolver extends ContextVisitor
     private final Job job;
     private final JifTypeSystem ts;
     private VarMap bounds;
-    private Map fieldVarBounds;
+    private Map<Label, Label> fieldVarBounds;
     
     public FieldLabelResolver(Job job, JifTypeSystem ts, NodeFactory nf) {
 	super(job, ts, nf);
@@ -44,9 +43,10 @@ public class FieldLabelResolver extends ContextVisitor
 	this.ts = ts;
     }
 
+    @Override
     public NodeVisitor enterCall(Node n) throws SemanticException {
         if (n instanceof ClassDecl) {
-            this.fieldVarBounds = new HashMap();
+            this.fieldVarBounds = new HashMap<Label, Label>();
         }
         
 	if (n instanceof ClassBody) {
@@ -115,9 +115,9 @@ public class FieldLabelResolver extends ContextVisitor
                                             ct + ".", d.position());
         }
 
-        for (Iterator i = d.members().iterator(); i.hasNext(); ) {
-            ClassMember m = (ClassMember) i.next();
-
+        @SuppressWarnings("unchecked")
+        List<ClassMember> members = d.members();
+        for (ClassMember m : members) {
             if (m instanceof FieldDecl) {
                 JifFieldDeclExt ext = (JifFieldDeclExt) JifUtil.jifExt(m);
                 ext.labelCheckField(lc, ct);
@@ -128,6 +128,10 @@ public class FieldLabelResolver extends ContextVisitor
         this.bounds = solver.solve();        
     }
 
+    /**
+     * @throws SemanticException  
+     */
+    @Override
     public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (n instanceof FieldDecl) {
             FieldDecl f = (FieldDecl) n;
@@ -157,12 +161,13 @@ public class FieldLabelResolver extends ContextVisitor
     }
     
     private static class FieldVarLabelSubst extends LabelSubstitution {
-        Map map;
-        public FieldVarLabelSubst(Map fieldVarBounds) {
+        Map<Label, Label> map;
+        public FieldVarLabelSubst(Map<Label, Label> fieldVarBounds) {
             map = fieldVarBounds;
         }
-        public Label substLabel(Label L) throws SemanticException {
-            Label b = (Label)map.get(L);            
+        @Override
+        public Label substLabel(Label L) {
+            Label b = map.get(L);            
             if (b != null) {
                 return b;
             }
