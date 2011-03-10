@@ -384,7 +384,8 @@ sh ${jif} %CMD_LINE_ARGS%
             <arg value="lib-classes" />
             <arg value="-sourcepath" />
             <arg value="lib-src" />
-      <arg value="-e" />
+	    <arg value="-e" />
+	    <arg value="-no-providers" />
 	    <arg value="-classpath" />
 	    <arg value="${java.class.path}" />
             <!--      

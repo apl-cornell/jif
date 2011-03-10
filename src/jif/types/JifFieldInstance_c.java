@@ -1,6 +1,7 @@
 package jif.types;
 
 import jif.types.label.Label;
+import jif.types.label.ProviderLabel;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -34,6 +35,11 @@ public class JifFieldInstance_c extends FieldInstance_c
     @Override
     public void setLabel(Label label) {
         this.label = label;
+    }
+
+    @Override
+    public ProviderLabel provider() {
+        return ((JifClassType) container).provider();
     }
 
     @Override

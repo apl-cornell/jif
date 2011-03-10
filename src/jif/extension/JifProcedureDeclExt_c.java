@@ -300,8 +300,8 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * the declared labels in the methods "throws" clause.
      */
     protected void addReturnConstraints(Label Li, PathMap X,
-            JifProcedureInstance mi, LabelChecker lc, final Type returnType,
-            Label provider) throws SemanticException            {
+            JifProcedureInstance mi, LabelChecker lc, final Type returnType)
+            throws SemanticException {
         if (Report.should_report(jif_verbose, 2))
             Report.report(2, "Adding constraints for result of " + mi);
 
@@ -312,12 +312,8 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         // Add the return termination constraints.
 
 
-        // fold the call site pc and the provider label into the return label
-        Label Lr =
-                lc.upperBound(mi.returnLabel(), ts.callSitePCLabel(mi));
-        if (((JifOptions) Options.global).checkProviders) {
-            Lr = lc.upperBound(Lr, provider);
-        }
+        // fold the call site pc into the return label
+        Label Lr = lc.upperBound(mi.returnLabel(), ts.callSitePCLabel(mi));
 
         //Hack: If no other paths, the procedure must return. Therefore,
         //X.n is not taken, and X.r doesn't contain any information. 
