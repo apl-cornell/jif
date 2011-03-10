@@ -5,12 +5,14 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import jif.JifOptions;
 import jif.types.Assertion;
 import jif.types.DefaultSignature;
 import jif.types.JifConstructorInstance;
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
 import polyglot.ast.*;
+import polyglot.main.Options;
 import polyglot.types.ClassType;
 import polyglot.types.Flags;
 import polyglot.types.SemanticException;
@@ -155,6 +157,11 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         } 
         else {
             Li = n.startLabel().label();
+            if (((JifOptions) Options.global).checkProviders) {
+                // Automagically ensure that the begin label is at least as high
+                // as the provider label.
+                Li = jts.join(Li, jci.provider());
+            }
         }
         jci.setPCBound(Li, isDefaultPCBound);
 
