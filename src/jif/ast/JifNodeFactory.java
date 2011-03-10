@@ -36,8 +36,8 @@ public interface JifNodeFactory extends NodeFactory {
     AmbPrincipalNode AmbDisjunctivePrincipalNode(Position pos, PrincipalNode left, PrincipalNode right);
     CanonicalPrincipalNode CanonicalPrincipalNode(Position pos, Principal principal);
     JifClassDecl JifClassDecl(Position pos, Flags flags, Id name, List<ParamDecl> params, TypeNode superClass, List<TypeNode> interfaces, List<PrincipalNode> authority, List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints, ClassBody body);
-    JifMethodDecl JifMethodDecl(Position pos, Flags flags, TypeNode returnType, Id name, LabelNode startLabel, List<Formal> arguments, LabelNode endLabel, List<TypeNode> exceptions, List<ConstraintNode<?>> constraints, Block body);
-    JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, Id name, LabelNode startLabel, LabelNode returnLabel, List<Formal> arguments, List<TypeNode> exceptions, List<ConstraintNode<?>> constraints, Block body);
+    JifMethodDecl JifMethodDecl(Position pos, Flags flags, TypeNode returnType, Id name, LabelNode startLabel, List<Formal> arguments, LabelNode endLabel, List<TypeNode> exceptions, List<ConstraintNode<Assertion>> constraints, Block body);
+    JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, Id name, LabelNode startLabel, LabelNode returnLabel, List<Formal> arguments, List<TypeNode> exceptions, List<ConstraintNode<Assertion>> constraints, Block body);
     AmbParam AmbParam(Position pos, Id name);
     AmbParam AmbParam(Position pos, Id name, ParamInstance pi);
     AmbExprParam AmbParam(Position pos, Expr expr, ParamInstance expectedPI);

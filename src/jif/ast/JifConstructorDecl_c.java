@@ -1,10 +1,11 @@
 package jif.ast;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import jif.types.Assertion;
 import jif.types.DefaultSignature;
 import jif.types.JifConstructorInstance;
 import jif.types.JifTypeSystem;
@@ -16,7 +17,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
-import polyglot.util.TypedList;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
@@ -28,72 +28,96 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
 {
     protected LabelNode startLabel;
     protected LabelNode returnLabel;
-    protected List constraints;
+    protected List<ConstraintNode<Assertion>> constraints;
 
-    public JifConstructorDecl_c(Position pos, Flags flags, Id name, LabelNode startLabel, LabelNode returnLabel, List formals, List throwTypes, List constraints, Block body) {
+    public JifConstructorDecl_c(Position pos, Flags flags, Id name,
+            LabelNode startLabel, LabelNode returnLabel, List<Formal> formals,
+            List<TypeNode> throwTypes,
+            List<ConstraintNode<Assertion>> constraints, Block body) {
         super(pos, flags, name, formals, throwTypes, body);
         this.startLabel = startLabel;
         this.returnLabel = returnLabel;
-        this.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
+        this.constraints =
+                Collections
+                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
+                                constraints));
     }
 
+    @Override
     public LabelNode startLabel() {
         return this.startLabel;
     }
 
+    @Override
     public JifConstructorDecl startLabel(LabelNode startLabel) {
         JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
         n.startLabel = startLabel;
         return n;
     }
 
+    @Override
     public LabelNode returnLabel() {
         return this.returnLabel;
     }
 
+    @Override
     public JifConstructorDecl returnLabel(LabelNode returnLabel) {
         JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
         n.returnLabel = returnLabel;
         return n;
     }
 
-    public List constraints() {
+    @Override
+    public List<ConstraintNode<Assertion>> constraints() {
         return this.constraints;
     }
 
-    public JifConstructorDecl constraints(List constraints) {
+    @Override
+    public JifConstructorDecl constraints(
+            List<ConstraintNode<Assertion>> constraints) {
         JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
-        n.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
+        n.constraints =
+                Collections
+                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
+                                constraints));
         return n;
     }
 
     protected JifConstructorDecl_c reconstruct(Id name, LabelNode startLabel, 
-	    LabelNode returnLabel, List formals, List throwTypes, 
-	    List constraints, Block body) {
-        if (startLabel != this.startLabel || returnLabel != this.returnLabel || !CollectionUtil.equals(constraints, this.constraints)) {
+	    LabelNode returnLabel, List<Formal> formals, List<TypeNode> throwTypes, 
+	    List<ConstraintNode<Assertion>> constraints, Block body) {
+        if (startLabel != this.startLabel || returnLabel != this.returnLabel
+                || !CollectionUtil.equals(constraints, this.constraints)) {
             JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
             n.startLabel = startLabel;
             n.returnLabel = returnLabel;
-            n.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
-            return (JifConstructorDecl_c) n.reconstruct(name, formals, throwTypes, body);
+            n.constraints =
+                    Collections
+                            .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
+                                    constraints));
+            return (JifConstructorDecl_c) n.reconstruct(name, formals,
+                    throwTypes, body);
         }
 
         return (JifConstructorDecl_c) super.reconstruct(name, formals, throwTypes, body);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = (Id)visitChild(this.name, v);
         LabelNode startLabel = (LabelNode) visitChild(this.startLabel, v);
         LabelNode returnLabel = (LabelNode) visitChild(this.returnLabel, v);
-        List formals = visitList(this.formals, v);
-        List throwTypes = visitList(this.throwTypes, v);
-        List constraints = visitList(this.constraints, v);
+        List<Formal> formals = visitList(this.formals, v);
+        List<TypeNode> throwTypes = visitList(this.throwTypes, v);
+        List<ConstraintNode<Assertion>> constraints = visitList(this.constraints, v);
         Block body = (Block) visitChild(this.body, v);
         return reconstruct(name, startLabel, returnLabel, formals, throwTypes, constraints, body);
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        JifConstructorDecl n = (JifConstructorDecl_c)super.disambiguate(ar);
+        JifConstructorDecl n = (JifConstructorDecl_c) super.disambiguate(ar);
 
         JifConstructorInstance jci = (JifConstructorInstance)n.constructorInstance();
         JifTypeSystem jts = (JifTypeSystem)ar.typeSystem();
@@ -109,9 +133,10 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         }
 
         // set the formal types
-        List formalTypes = new ArrayList(n.formals().size());
-        for (Iterator i = n.formals().iterator(); i.hasNext(); ) {
-            Formal f = (Formal)i.next();
+        List<Type> formalTypes = new ArrayList<Type>(n.formals().size());
+        @SuppressWarnings("unchecked")
+        List<Formal> formals = n.formals();
+        for (Formal f : formals) {
             if (!f.isDisambiguated()) {
                 // formals are not disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
@@ -145,9 +170,10 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         jci.setReturnLabel(Lr, isDefaultReturnLabel);
 
         // set the labels for the throwTypes.
-        List throwTypes = new LinkedList();        
-        for (Iterator i = n.throwTypes().iterator(); i.hasNext();) {
-            TypeNode tn = (TypeNode)i.next();
+        List<Type> newThrowTypes = new LinkedList<Type>();
+        @SuppressWarnings("unchecked")
+        List<TypeNode> throwTypes = n.throwTypes();
+        for (TypeNode tn : throwTypes) {
             if (!tn.isDisambiguated()) {
                 // throw types haven't been disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
@@ -159,13 +185,13 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
                 // default exception label is the return label
                 xt = jts.labeledType(xt.position(), xt, Lr);
             }
-            throwTypes.add(xt);
+            newThrowTypes.add(xt);
         }
-        jci.setThrowTypes(throwTypes);
+        jci.setThrowTypes(newThrowTypes);
 
-        List constraints = new ArrayList(n.constraints().size());
-        for (Iterator i = n.constraints().iterator(); i.hasNext(); ) {
-            ConstraintNode cn = (ConstraintNode) i.next();
+        List<Assertion> constraints =
+                new ArrayList<Assertion>(n.constraints().size());
+        for (ConstraintNode<Assertion> cn : n.constraints()) {
             if (!cn.isDisambiguated()) {
                 // constraint nodes haven't been disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
@@ -178,6 +204,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         return n.constructorInstance(jci);
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 
         Node n = super.typeCheck(tc);    

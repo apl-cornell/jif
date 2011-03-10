@@ -256,7 +256,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
             Id name, List formals, List throwTypes, Block body) {
@@ -272,7 +272,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     public JifMethodDecl JifMethodDecl(Position pos, Flags flags, 
             TypeNode returnType, Id name, LabelNode startLabel, 
             List<Formal> formals, LabelNode endLabel, List<TypeNode> throwTypes, 
-            List<ConstraintNode<?>> constraints, Block body) {
+            List<ConstraintNode<Assertion>> constraints, Block body) {
 //      //add default return value label node
 //if (! (returnType instanceof LabeledTypeNode) &&
 //      (! (returnType instanceof CanonicalTypeNode) ||
@@ -311,7 +311,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return super.ConstructorCall(pos, kind, outer, args);
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name, List formals, List throwTypes, Block body) {
         ConstructorDecl n = new JifConstructorDecl_c(pos, flags, name, null, null, formals,
@@ -326,7 +326,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     public JifConstructorDecl JifConstructorDecl(Position pos, Flags flags,
             Id name, LabelNode startLabel, LabelNode returnLabel,
             List<Formal> formals, List<TypeNode> throwTypes,
-            List<ConstraintNode<?>> constraints, Block body) {
+            List<ConstraintNode<Assertion>> constraints, Block body) {
     JifConstructorDecl n = new JifConstructorDecl_c(pos, flags,
                                                         name, startLabel, returnLabel, formals, throwTypes,
                                                         constraints, body);
