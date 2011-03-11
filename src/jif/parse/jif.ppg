@@ -1047,6 +1047,12 @@ primary_no_array ::=
             {: RESULT = a; :}
     |  endorse:a
             {: RESULT = a; :}
+    |  provider:a
+            {: RESULT = parser.nf.NewLabel(parser.pos(a), a); :}
+    |  reftype_or_expr:a DOT PROVIDER:b
+            {: RESULT = parser.nf.NewLabel(parser.pos(a, b),
+                   parser.nf.AmbProviderLabelNode(parser.pos(a, b), a.toType()));
+            :}
     ;
 transfer primary_no_new_array to primary_no_array {
 	literal | THIS | LPAREN expression RPAREN |
