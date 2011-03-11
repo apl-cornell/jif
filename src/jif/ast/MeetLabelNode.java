@@ -7,9 +7,9 @@ import java.util.*;
  */
 public interface MeetLabelNode extends LabelNode {
     /** Gets the list of join components, which are either label nodes or policy nodes. */
-    List components();
+    List<LabelComponentNode> components();
     
     /** Returns a copy of this object with <code>components</code> updated.
      */    
-    MeetLabelNode components(List components);
+    MeetLabelNode components(List<LabelComponentNode> components);
 }

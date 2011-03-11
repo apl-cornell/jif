@@ -20,8 +20,8 @@ public interface JifNodeFactory extends NodeFactory {
     LabeledTypeNode LabeledTypeNode(Position pos, TypeNode type, LabelNode label);
     AmbNewArray AmbNewArray(Position pos, TypeNode base, Object expr, List<Expr> dims, int addDims);
     AmbParamTypeOrAccess AmbParamTypeOrAccess(Position pos, Receiver base, Object expr);
-    JoinLabelNode JoinLabelNode(Position pos, List<Node> components);
-    MeetLabelNode MeetLabelNode(Position pos, List<Node> components);
+    JoinLabelNode JoinLabelNode(Position pos, List<LabelComponentNode> components);
+    MeetLabelNode MeetLabelNode(Position pos, List<LabelComponentNode> components);
     PolicyNode ReaderPolicyNode(Position pos, PrincipalNode owner, List<PrincipalNode> readers);
     PolicyNode WriterPolicyNode(Position pos, PrincipalNode owner, List<PrincipalNode> writers);
     PolicyNode PolicyNode(Position pos, Policy pol);

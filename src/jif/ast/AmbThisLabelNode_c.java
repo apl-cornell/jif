@@ -1,15 +1,16 @@
 package jif.ast;
 
+import java.util.List;
+
 import jif.types.JifClassType;
 import jif.types.JifContext;
 import polyglot.ast.Node;
-import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.Scheduler;
-import polyglot.frontend.goals.Goal;
+import polyglot.ast.Term;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
 import polyglot.visit.PrettyPrinter;
 
 /** An implementation of the <code>AmbThisLabelNode</code> interface. 
@@ -21,6 +22,7 @@ public class AmbThisLabelNode_c extends AmbLabelNode_c
 	super(pos);
     }
 
+    @Override
     public String toString() {
 	return "this{amb}";
     }
@@ -28,6 +30,7 @@ public class AmbThisLabelNode_c extends AmbLabelNode_c
     /** Disambiguates the type of this node by finding the correct label for
      * "this". 
      */
+    @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
 	JifContext c = (JifContext)sc.context();
 	JifClassType ct = (JifClassType) c.currentClass();
@@ -46,7 +49,19 @@ public class AmbThisLabelNode_c extends AmbLabelNode_c
 
         return nf.CanonicalLabelNode(position(), ct.thisLabel());
     }
+    
+    @Override
+    public Term firstChild() {
+        return null;
+    }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public List<Term> acceptCFG(CFGBuilder v, List succs) {
+        return succs;
+    }
+
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("this");
     }

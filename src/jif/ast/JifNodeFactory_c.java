@@ -82,7 +82,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     }
 
     @Override
-    public JoinLabelNode JoinLabelNode(Position pos, List<Node> components) {
+    public JoinLabelNode JoinLabelNode(Position pos,
+            List<LabelComponentNode> components) {
         JoinLabelNode n = new JoinLabelNode_c(pos, components);
         n = (JoinLabelNode)n.ext(jifExtFactory().extJoinLabelNode());
         n = (JoinLabelNode)n.del(delFactory().delNode());
@@ -90,7 +91,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
     }
 
     @Override
-    public MeetLabelNode MeetLabelNode(Position pos, List<Node> components) {
+    public MeetLabelNode MeetLabelNode(Position pos, List<LabelComponentNode> components) {
         MeetLabelNode n = new MeetLabelNode_c(pos, components);
         n = (MeetLabelNode)n.ext(jifExtFactory().extMeetLabelNode());
         n = (MeetLabelNode)n.del(delFactory().delNode());

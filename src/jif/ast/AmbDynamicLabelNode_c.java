@@ -1,5 +1,7 @@
 package jif.ast;
 
+import java.util.List;
+
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.SemanticDetailedException;
@@ -9,6 +11,7 @@ import jif.visit.JifTypeChecker;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
 import polyglot.ast.Node;
+import polyglot.ast.Term;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
@@ -29,11 +32,13 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         this.expr = expr;
     }
 
+    @Override
     public String toString() {
         return "*" + expr + "{amb}";
     }
 
     /** Disambiguate the type of this node. */
+    @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         Context c = sc.context();
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
@@ -102,11 +107,24 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         Label L = JifUtil.exprToLabel(ts, expr, (JifContext)c);
         return nf.CanonicalLabelNode(position(), L);
     }
+    
+    @Override
+    public Term firstChild() {
+        return null;
+    }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public List<Term> acceptCFG(CFGBuilder v, List succs) {
+        return succs;
+    }
+
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("*");
         expr.del().prettyPrint(w, tr);
     }
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = (Expr) visitChild(this.expr, v);
         return reconstruct(expr);
