@@ -55,4 +55,8 @@ public class CanonicalPrincipalNode_c extends PrincipalNode_c implements Canonic
     public List<Term> acceptCFG(CFGBuilder v, List succs) {
         return succs;
     }
+    @Override
+    public Term firstChild() {
+        return null;
+    }
 }

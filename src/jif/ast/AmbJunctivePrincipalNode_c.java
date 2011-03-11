@@ -71,6 +71,10 @@ public class AmbJunctivePrincipalNode_c extends PrincipalNode_c implements AmbJu
         return succs;
     }
     @Override
+    public Term firstChild() {
+        return null;
+    }
+    @Override
     public Node visitChildren(NodeVisitor v) {        
         PrincipalNode l = (PrincipalNode) visitChild(this.left, v);
         PrincipalNode r = (PrincipalNode) visitChild(this.right, v);
