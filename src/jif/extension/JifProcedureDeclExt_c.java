@@ -133,7 +133,9 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
     /**
      * Ensures that the procedure instance's begin label is at least as
-     * restrictive as the class provider.
+     * restrictive as the class provider. This ensures that code will be unable
+     * to affect data that the provider is not trusted to affect and that the
+     * behaviour of confidential code will not be leaked.
      */
     protected void checkBeginLabel(JifProcedureInstance jpi, LabelChecker lc)
             throws SemanticException {

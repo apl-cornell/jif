@@ -1,17 +1,21 @@
 package jif.extension;
 
-import jif.JifOptions;
 import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.label.*;
+import jif.types.label.CovariantParamLabel;
+import jif.types.label.Label;
+import jif.types.label.ParamLabel;
+import jif.types.label.ThisLabel;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
-import polyglot.main.Options;
+import polyglot.ast.ArrayInit;
+import polyglot.ast.Expr;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Node;
 import polyglot.types.ArrayType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -59,39 +63,6 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                         namedDeclaredLabel,
                        A.labelEnv(),
                        decl.position());
-
-
-        if (!fi.flags().isStatic()
-                && ((JifOptions) Options.global).checkProviders) {
-            // Ensure the field is tainted by the confidentiality of the
-            // provider so that only those who can read the declaring class will
-            // be able to use the field.
-            // XXX This doesn't prevent blind writes from happening, though.
-            Label privateTrusted =
-                    ts.pairLabel(Position.compilerGenerated(),
-                            ts.topConfPolicy(Position.compilerGenerated()),
-                            ts.bottomIntegPolicy(Position.compilerGenerated()));
-            Label providerConfLabel = ts.meet(fi.provider(), privateTrusted);
-            lc.constrain(new NamedLabel("provider_confid",
-                    "confidentiality of class " + fi.container(),
-                    providerConfLabel), LabelConstraint.LEQ,
-                    namedDeclaredLabel, A.labelEnv(), decl.position(),
-                    new ConstraintMessage() {
-
-                        @Override
-                        public String msg() {
-                            return "Users of this field may not be able to "
-                                    + "load this class.";
-                        }
-
-                        @Override
-                        public String detailMsg() {
-                            return "Declared label of field must be at least "
-                                    + "as restrictive as provider_confid.";
-                        }
-                    });
-        }
-
     }
 
     /** Label check field initializers. 

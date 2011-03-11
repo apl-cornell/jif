@@ -159,7 +159,10 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             Li = n.startLabel().label();
             if (((JifOptions) Options.global).checkProviders) {
                 // Automagically ensure that the begin label is at least as high
-                // as the provider label.
+                // as the provider label.  This ensures that code will be unable
+                // to affect data that the provider is not trusted to affect.
+                // It also ensures the behaviour of confidential code will not
+                // be leaked.
                 Li = jts.join(Li, jci.provider());
             }
         }
