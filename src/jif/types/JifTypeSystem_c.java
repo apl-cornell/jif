@@ -903,10 +903,14 @@ public class JifTypeSystem_c
     @Override
     public ProviderLabel providerLabel(Position position, JifClassType ct) {
         if (((JifOptions) Options.global).checkProviders) {
-            return new ProviderLabel_c(position, ct);
+            return new ProviderLabel_c(position, ct, providerLabelTranslator());
         } else {
             return null;
         }
+    }
+    
+    protected LabelToJavaExpr providerLabelTranslator() {
+        return new ProviderLabelToJavaExpr_c();
     }
 
     @Override

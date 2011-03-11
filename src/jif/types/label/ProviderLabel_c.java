@@ -2,6 +2,7 @@ package jif.types.label;
 
 import java.util.Set;
 
+import jif.translate.LabelToJavaExpr;
 import jif.types.JifClassType;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
@@ -16,8 +17,9 @@ public class ProviderLabel_c extends Label_c implements ProviderLabel {
      */
     protected JifClassType classType;
     
-    public ProviderLabel_c(Position pos, JifClassType classType) {
-        super(classType.typeSystem(), pos);
+    public ProviderLabel_c(Position pos, JifClassType classType,
+            LabelToJavaExpr toJava) {
+        super(classType.typeSystem(), pos, toJava);
         this.classType = classType;
     }
 
