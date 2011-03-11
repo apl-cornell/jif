@@ -149,6 +149,7 @@ public class JifOptions extends Options {
         usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");
         usageForFlag(out, "-addsigcp <path>", "additional path for Jif signatures; prepended to sigcp");
         usageForFlag(out, "-fail-on-exception", "fail on uncaught and undeclared runtime exceptions");
+        usageForFlag(out, "-no-providers", "disable provider checks");
     }
 
     public String constructSignatureClasspath() {        
