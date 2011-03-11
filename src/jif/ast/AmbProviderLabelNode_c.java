@@ -1,19 +1,15 @@
 package jif.ast;
 
-import java.util.List;
-
 import jif.types.JifClassType;
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
 import polyglot.ast.Node;
-import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
@@ -44,17 +40,6 @@ public class AmbProviderLabelNode_c extends AmbLabelNode_c implements
         Label providerLabel =
                 ts.providerLabel(typeNode.position(), (JifClassType) type);
         return nf.CanonicalLabelNode(position, providerLabel);
-    }
-    
-    @Override
-    public Term firstChild() {
-        return null;
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public List<Term> acceptCFG(CFGBuilder v, List succs) {
-        return succs;
     }
 
     @Override

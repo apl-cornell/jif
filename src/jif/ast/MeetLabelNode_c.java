@@ -8,14 +8,12 @@ import jif.types.label.IntegPolicy;
 import jif.types.label.Label;
 import jif.types.label.Policy;
 import polyglot.ast.Node;
-import polyglot.ast.Term;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
@@ -110,17 +108,6 @@ public class MeetLabelNode_c extends AmbLabelNode_c implements MeetLabelNode
                     ts.meetIntegPolicy(position, integPolicies));
         }
         return nf.CanonicalLabelNode(position(), ts.meetLabel(position(), labels));
-    }
-    
-    @Override
-    public Term firstChild() {
-        return null;
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public List<Term> acceptCFG(CFGBuilder v, List succs) {
-        return succs;
     }
 
     @Override

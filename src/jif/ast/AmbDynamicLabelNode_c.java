@@ -1,7 +1,5 @@
 package jif.ast;
 
-import java.util.List;
-
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.SemanticDetailedException;
@@ -11,7 +9,6 @@ import jif.visit.JifTypeChecker;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
 import polyglot.ast.Node;
-import polyglot.ast.Term;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
@@ -20,7 +17,10 @@ import polyglot.types.ParsedClassType;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
-import polyglot.visit.*;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /** An implementation of the <tt>AmbDynamicLabel</tt> interface. */
 public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicLabelNode
@@ -106,17 +106,6 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         // a suitable expression.
         Label L = JifUtil.exprToLabel(ts, expr, (JifContext)c);
         return nf.CanonicalLabelNode(position(), L);
-    }
-    
-    @Override
-    public Term firstChild() {
-        return null;
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public List<Term> acceptCFG(CFGBuilder v, List succs) {
-        return succs;
     }
 
     @Override

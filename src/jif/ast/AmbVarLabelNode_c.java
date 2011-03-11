@@ -1,14 +1,11 @@
 package jif.ast;
 
-import java.util.List;
-
 import jif.JifOptions;
 import jif.types.*;
 import jif.types.label.CovariantParamLabel;
 import jif.types.label.ParamLabel;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
-import polyglot.ast.Term;
 import polyglot.main.Options;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
@@ -17,7 +14,6 @@ import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
@@ -119,17 +115,6 @@ implements AmbVarLabelNode
         }
 
         throw new SemanticException(vi + " cannot be used as a label.", this.position());
-    }
-    
-    @Override
-    public Term firstChild() {
-        return null;
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public List<Term> acceptCFG(CFGBuilder v, List succs) {
-        return succs;
     }
 
     @Override

@@ -5,10 +5,14 @@ import java.util.*;
 import jif.types.JifTypeSystem;
 import jif.types.label.*;
 import polyglot.ast.Node;
-import polyglot.ast.Term;
 import polyglot.types.SemanticException;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 
 /** An implementation of the <code>JoinLabel</code> interface.
  */
@@ -105,17 +109,6 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
         }
 
         return nf.CanonicalLabelNode(position(), ts.joinLabel(position(), s));
-    }
-    
-    @Override
-    public Term firstChild() {
-        return null;
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public List<Term> acceptCFG(CFGBuilder v, List succs) {
-        return succs;
     }
 
     @Override
