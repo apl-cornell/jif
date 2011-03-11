@@ -1,6 +1,7 @@
 package jif.parse;
 
 import java.io.*;
+import java.util.Date;
 
 import polyglot.frontend.FileSource;
 
@@ -8,7 +9,11 @@ public class UTF8FileSource extends FileSource {
     public UTF8FileSource(File f, boolean userSpecified) throws IOException {
 	super(f, userSpecified);
     }
-
+    
+    public UTF8FileSource(String path, String name, Date lastModified, boolean userSpecified) throws IOException {
+        super(path, name, lastModified, userSpecified);
+    }
+    
     @Override
     protected Reader createReader(InputStream str) {
       try {
