@@ -2,64 +2,80 @@ package jif.ast;
 
 import java.util.*;
 
+import jif.types.CallerConstraint;
 import jif.types.CallerConstraint_c;
 import jif.types.JifTypeSystem;
+import jif.types.principal.Principal;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.*;
 import polyglot.visit.*;
 
-/** An implementation of the <code>CallerConstraint</code> interface.
+/**
+ * An implementation of the <code>CallerConstraint</code> interface.
  */
-public class CallerConstraintNode_c extends ConstraintNode_c implements CallerConstraintNode
-{
-    protected List principals;
+public class CallerConstraintNode_c extends ConstraintNode_c<CallerConstraint>
+        implements CallerConstraintNode {
 
-    public CallerConstraintNode_c(Position pos, List principals) {
-	super(pos);
-	this.principals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
+    protected List<PrincipalNode> principals;
+
+    public CallerConstraintNode_c(Position pos, List<PrincipalNode> principals) {
+        super(pos);
+        this.principals =
+                Collections.unmodifiableList(new ArrayList<PrincipalNode>(
+                        principals));
     }
 
-    public List principals() {
-	return this.principals;
+    @Override
+    public List<PrincipalNode> principals() {
+        return this.principals;
     }
 
-    public CallerConstraintNode principals(List principals) {
-	CallerConstraintNode_c n = (CallerConstraintNode_c) copy();
-	n.principals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
-        if (constraint()!=null) {
-            List l = new LinkedList();
-            for (Iterator i = principals.iterator(); i.hasNext(); ) {
-                PrincipalNode p = (PrincipalNode) i.next();
+    @Override
+    public CallerConstraintNode principals(List<PrincipalNode> principals) {
+        CallerConstraintNode_c n = (CallerConstraintNode_c) copy();
+        n.principals =
+                Collections.unmodifiableList(new ArrayList<PrincipalNode>(
+                        principals));
+        if (constraint() != null) {
+            List<Principal> l = new LinkedList<Principal>();
+            for (PrincipalNode p : principals) {
                 l.add(p.principal());
             }
-            n.setConstraint(((CallerConstraint_c)constraint()).principals(l));
+            n.setConstraint(((CallerConstraint_c) constraint()).principals(l));
         }
-	return n;
+        return n;
     }
 
-    protected CallerConstraintNode_c reconstruct(List principals) {
-	if (! CollectionUtil.equals(principals, this.principals)) {
-            List newPrincipals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
-            return (CallerConstraintNode_c)this.principals(newPrincipals);
-	}
+    protected CallerConstraintNode_c reconstruct(List<PrincipalNode> principals) {
+        if (!CollectionUtil.equals(principals, this.principals)) {
+            List<PrincipalNode> newPrincipals =
+                    Collections.unmodifiableList(new ArrayList<PrincipalNode>(
+                            principals));
+            return (CallerConstraintNode_c) this.principals(newPrincipals);
+        }
 
-	return this;
+        return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
-	List principals = visitList(this.principals, v);
-	return reconstruct(principals);
+        @SuppressWarnings("unchecked")
+        List<PrincipalNode> principals = visitList(this.principals, v);
+        return reconstruct(principals);
     }
 
+    /**
+     * @throws SemanticException  
+     */
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (constraint() == null) {
             JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
 
-            List l = new LinkedList();
+            List<Principal> l = new LinkedList<Principal>();
 
-            for (Iterator i = this.principals.iterator(); i.hasNext(); ) {
-                PrincipalNode p = (PrincipalNode) i.next();
+            for (PrincipalNode p : this.principals) {
                 l.add(p.principal());
             }
 
@@ -69,11 +85,11 @@ public class CallerConstraintNode_c extends ConstraintNode_c implements CallerCo
         return this;
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("caller(");
 
-        for (Iterator i = principals.iterator(); i.hasNext(); ) {
-            PrincipalNode p = (PrincipalNode) i.next();
+        for (PrincipalNode p : principals) {
             print(p, w, tr);
             w.write(",");
             w.allowBreak(0, " ");
@@ -82,6 +98,7 @@ public class CallerConstraintNode_c extends ConstraintNode_c implements CallerCo
         w.write(")");
     }
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("Cannot translate " + this);
     }

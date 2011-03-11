@@ -16,9 +16,13 @@ public class CanonicalLabelNode_c extends LabelNode_c implements CanonicalLabelN
     public CanonicalLabelNode_c(Position pos, Label label) {
 	super(pos, label);
     }
+    
+    @Override
     public boolean isDisambiguated() {
         return true;
     }    
+    
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         if (!this.label().isCanonical()) {
             // label should be canonical by the time we start typechecking.

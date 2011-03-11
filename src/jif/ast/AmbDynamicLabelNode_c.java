@@ -17,7 +17,10 @@ import polyglot.types.ParsedClassType;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
-import polyglot.visit.*;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /** An implementation of the <tt>AmbDynamicLabel</tt> interface. */
 public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicLabelNode
@@ -29,11 +32,13 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         this.expr = expr;
     }
 
+    @Override
     public String toString() {
         return "*" + expr + "{amb}";
     }
 
     /** Disambiguate the type of this node. */
+    @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         Context c = sc.context();
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
@@ -103,10 +108,12 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         return nf.CanonicalLabelNode(position(), L);
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("*");
         expr.del().prettyPrint(w, tr);
     }
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = (Expr) visitChild(this.expr, v);
         return reconstruct(expr);

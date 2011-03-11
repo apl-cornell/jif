@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import polyglot.main.Options;
@@ -41,6 +39,11 @@ public class JifOptions extends Options {
       * Provide more detailed explanation of solver error messages?
       */
      public boolean explainErrors;
+     
+     /**
+      * Whether providers should be checked.
+      */
+     public boolean checkProviders;
 
      /**
       * The classpath for the Jif signatures of java.lang objects.
@@ -50,16 +53,7 @@ public class JifOptions extends Options {
      /**
       * Additional classpath entries for Jif signatures.
       */
-     public List addSigcp = new ArrayList();
-
-     /**
-      * The principal for paths not present in providerPaths.
-      */
-     public String defaultProvider = null;
-     /**
-      * Associate source paths with a principal that provided the code.
-      */
-     public Map<File,String> providerPaths = null;
+     public List<String> addSigcp = new ArrayList<String>();
 
     /**
      * Constructor
@@ -72,11 +66,13 @@ public class JifOptions extends Options {
     /**
      * Set default values for options
      */
+    @Override
     public void setDefaultValues() {
         super.setDefaultValues();
         solveGlobally = false;
         explainErrors = false;
         nonRobustness = false;
+        checkProviders = true;
     }
 
     /**
@@ -84,6 +80,8 @@ public class JifOptions extends Options {
      * @return the next index to process. That is, if calling this method
      *         processes two commands, then the return value should be index+2
      */
+    @SuppressWarnings("rawtypes")
+    @Override
     protected int parseCommand(String args[], int index, Set source) throws UsageError {
         if (args[index].equals("-globalsolve")) {
             index++;
@@ -125,31 +123,10 @@ public class JifOptions extends Options {
             Report.addTopic("debug", level);
             index++;
         }
-        else if (args[index].equals("-provider")) {
+        else if (args[index].equals("-no-providers")) {
             index++;
-            this.defaultProvider = args[index++];
+            checkProviders = false;
         }
-        else if (args[index].equals("-providerPaths")) {
-            index++;
-            String[] paths = args[index++].split(",");
-            this.providerPaths = new LinkedHashMap<File, String>();
-            for(int i = 0; i<paths.length ;i++) {
-                String[] s = paths[i].split(":");
-                File path = new File(s[0]);
-                this.providerPaths.put(path,s[1]);            	
-            }
-        }
-        else if (args[index].equals("-addProviderPath")) {
-            index++;
-            if(this.providerPaths == null) {
-            	this.providerPaths = new LinkedHashMap<File, String>();
-            }   
-            String[] s = args[index++].split(":");
-            File path = new File(s[0]);
-            this.providerPaths.put(path,s[1]);
-        }
-
-
         else {
             int i = super.parseCommand(args, index, source);
             return i;
@@ -160,6 +137,7 @@ public class JifOptions extends Options {
     /**
      * Print usage information
      */
+    @Override
     public void usage(PrintStream out) {
         super.usage(out);
         usageForFlag(out, "-e -explain", "provide more detailed " +
@@ -171,16 +149,14 @@ public class JifOptions extends Options {
         usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");
         usageForFlag(out, "-addsigcp <path>", "additional path for Jif signatures; prepended to sigcp");
         usageForFlag(out, "-fail-on-exception", "fail on uncaught and undeclared runtime exceptions");
-        usageForFlag(out, "-provider <principal>", "principal of the default code provider");
-        usageForFlag(out, "-providerPaths <path0:principal0,path1:principal1,...>", "associate code providers with paths");
-        usageForFlag(out, "-addProviderPath <path:principal>", "associate a code provider with a path");
+        usageForFlag(out, "-no-providers", "disable provider checks");
     }
 
     public String constructSignatureClasspath() {        
         // use the signature classpath if it exists for compiling Jif classes
         String scp = "";
-        for (Iterator iter = addSigcp.iterator(); iter.hasNext(); ) {
-            scp += ((String)iter.next());
+        for (Iterator<String> iter = addSigcp.iterator(); iter.hasNext(); ) {
+            scp += iter.next();
             if (iter.hasNext()) {
                 scp += File.pathSeparator;            
             }
@@ -200,6 +176,7 @@ public class JifOptions extends Options {
         return constructFullClasspath();
     }
 
+    @Override
     public String constructPostCompilerClasspath() {
         String cp = super.constructPostCompilerClasspath() + File.pathSeparator
                 + constructFullClasspath();

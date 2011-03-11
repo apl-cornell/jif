@@ -1,13 +1,11 @@
 package jif.ast;
 
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import jif.types.JifTypeSystem;
 import jif.types.label.ConfPolicy;
+import jif.types.label.IntegPolicy;
+import jif.types.label.Label;
 import jif.types.label.Policy;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
@@ -15,7 +13,6 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.util.TypedList;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -24,90 +21,100 @@ import polyglot.visit.PrettyPrinter;
  */
 public class MeetLabelNode_c extends AmbLabelNode_c implements MeetLabelNode
 {
-    protected List components;
+    protected List<LabelComponentNode> components;
 
-    public MeetLabelNode_c(Position pos, List components) {
+    public MeetLabelNode_c(Position pos, List<LabelComponentNode> components) {
         super(pos);
-        this.components = TypedList.copyAndCheck(components, Node.class, true);
+        this.components =
+                Collections.unmodifiableList(new ArrayList<LabelComponentNode>(
+                        components));
     }
 
-    public List components() {
+    @Override
+    public List<LabelComponentNode> components() {
         return this.components;
     }
 
-    public MeetLabelNode components(List components) {
+    @Override
+    public MeetLabelNode components(List<LabelComponentNode> components) {
         MeetLabelNode_c n = (MeetLabelNode_c) copy();
-        n.components = TypedList.copyAndCheck(components, Node.class, true);
+        this.components =
+            Collections.unmodifiableList(new ArrayList<LabelComponentNode>(
+                    components));
         return n;
     }
 
-    protected MeetLabelNode_c reconstruct(List components) {
+    protected MeetLabelNode_c reconstruct(List<LabelComponentNode> components) {
         if (! CollectionUtil.equals(components, this.components)) {
             MeetLabelNode_c n = (MeetLabelNode_c) copy();
-            n.components = TypedList.copyAndCheck(components, Node.class, true);
+            this.components =
+                Collections.unmodifiableList(new ArrayList<LabelComponentNode>(
+                        components));
             return n;
         }
 
         return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
-        List components = visitList(this.components, v);
+        @SuppressWarnings("unchecked")
+        List<LabelComponentNode> components = visitList(this.components, v);
         return reconstruct(components);
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
-        Set labels = new LinkedHashSet();
-        Set policies = new LinkedHashSet();
+        Set<Label> labels = new LinkedHashSet<Label>();
+        Set<ConfPolicy> confPolicies = new LinkedHashSet<ConfPolicy>();
+        Set<IntegPolicy> integPolicies = new LinkedHashSet<IntegPolicy>();
 
-        boolean policyTypeIsConf = false;
-
-        for (Iterator i = this.components.iterator(); i.hasNext(); ) {
-            Node n = (Node) i.next();
+        for (LabelComponentNode n : this.components) {
             if (!n.isDisambiguated()) {
                 sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
                 return this;
             }
             if (n instanceof PolicyNode) {
                 Policy pol = ((PolicyNode)n).policy();
-                if (policies.isEmpty()) {
-                    policyTypeIsConf = (pol instanceof ConfPolicy);
+                if (pol instanceof ConfPolicy) {
+                    confPolicies.add((ConfPolicy) pol);
+                } else if (pol instanceof IntegPolicy) {
+                    integPolicies.add((IntegPolicy) pol);
+                } else {
+                    throw new InternalCompilerError("Unexpected policy " + pol);
                 }
-                else {
-                    if (policyTypeIsConf != (pol instanceof ConfPolicy)) {
-                        throw new SemanticException("Incompatible kinds of " +
-                                                    "policies for the meet expression.", position);
-                    }
-                }
-                policies.add(pol);
             }
             else if (n instanceof LabelNode) {
                 labels.add(((LabelNode)n).label());                
             }
             else throw new InternalCompilerError("Unexpected node " + n);
         }
-        if (!labels.isEmpty() && !policies.isEmpty()) {
+        if (!confPolicies.isEmpty() && !integPolicies.isEmpty()) {
+            throw new SemanticException("Incompatible kinds of "
+                    + "policies for the meet expression.", position);
+        }
+        if (!labels.isEmpty() && (!confPolicies.isEmpty() || !integPolicies.isEmpty())) {
             throw new SemanticException("Cannot take the meet of labels and policies.", position);            
         }
-        if (!policies.isEmpty()) {
-            Policy mp;
-            if (policyTypeIsConf) {
-                mp = ts.meetConfPolicy(position, policies);                
-            }
-            else {
-                mp = ts.meetIntegPolicy(position, policies);
-            }
-            return nf.PolicyNode(position, mp);
+        if (!confPolicies.isEmpty()) {
+            return nf.PolicyNode(position,
+                    ts.meetConfPolicy(position, confPolicies));
+        }
+        if (!integPolicies.isEmpty()) {
+            return nf.PolicyNode(position,
+                    ts.meetIntegPolicy(position, integPolicies));
         }
         return nf.CanonicalLabelNode(position(), ts.meetLabel(position(), labels));
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        for (Iterator i = this.components.iterator(); i.hasNext(); ) {
-            LabelNode n = (LabelNode) i.next();
+        for (Iterator<LabelComponentNode> i = this.components.iterator(); i
+                .hasNext();) {
+            LabelComponentNode n = i.next();
             print(n, w, tr);
             if (i.hasNext()) {
                 w.write(";");

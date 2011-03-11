@@ -2,20 +2,14 @@ package jif.parse;
 
 import java.io.*;
 
-import jif.types.CodeSource;
-import jif.types.principal.Principal;
 import polyglot.frontend.FileSource;
 
-public class UTF8FileSource extends FileSource implements CodeSource {
-    protected Principal provider;
-
-	public UTF8FileSource(File f, boolean userSpecified, Principal provider)
-	throws IOException 
-    {
+public class UTF8FileSource extends FileSource {
+    public UTF8FileSource(File f, boolean userSpecified) throws IOException {
 	super(f, userSpecified);
-	this.provider = provider;
     }
 
+    @Override
     protected Reader createReader(InputStream str) {
       try {
 	return new polyglot.lex.EscapedUnicodeReader(
@@ -25,9 +19,4 @@ public class UTF8FileSource extends FileSource implements CodeSource {
 	return null;
       }
     }
-
-	@Override
-	public Principal provider() {
-		return provider;
-	}
 }

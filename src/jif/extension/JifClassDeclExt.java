@@ -1,16 +1,18 @@
 package jif.extension;
 
-import java.util.Iterator;
 import java.util.List;
 
+import jif.JifOptions;
 import jif.ast.JifClassDecl;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
+import jif.types.label.ProviderLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.ClassBody;
 import polyglot.ast.Node;
+import polyglot.main.Options;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 
@@ -23,6 +25,7 @@ public class JifClassDeclExt extends Jif_c {
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
 	JifClassDecl n = (JifClassDecl) node();
 
@@ -39,16 +42,14 @@ public class JifClassDeclExt extends Jif_c {
 	// let the label checker know that we are about to enter a class body
         lc.enteringClassDecl(ct);
 
-    // construct a principal that represents the authority of ct
-    final Principal authPrincipal = lc.jifTypeSystem().conjunctivePrincipal(ct.position(), ct.authority());
+        // construct a principal that represents the authority of ct
+        final Principal authPrincipal = lc.jifTypeSystem().conjunctivePrincipal(ct.position(), ct.authority());
 
 	// Check the authority of the class against the superclass.
 	if (ct.superType() instanceof JifClassType) {
             final JifClassType superType = (JifClassType) ct.superType();         
             
-	    for (Iterator i = superType.authority().iterator(); i.hasNext(); ) {
-		final Principal pl = (Principal) i.next();
-
+	    for (final Principal pl : superType.authority()) {
 		// authPrincipal must actfor pl i.e., at least one
                 // of the principals that have authorized ct must act for pl.
                 lc.constrain(authPrincipal, 
@@ -57,10 +58,12 @@ public class JifClassDeclExt extends Jif_c {
                            A.labelEnv(),
                            n.position(),
                            new ConstraintMessage() {
+                    @Override
                     public String msg() {
                         return "Superclass " + superType + " requires " + ct + " to " +
                         "have the authority of principal " + pl;
                     }
+                    @Override
                     public String detailMsg() {
                         return "The class " + superType + " has the authority of the " +
                         "principal " + pl + ". To extend this class, " + ct + 
@@ -70,28 +73,34 @@ public class JifClassDeclExt extends Jif_c {
 		
 	    }
 	}
-    A = (JifContext) n.del().enterScope(A);
-    lc = lc.context(A);
-    
-	if(!A.provider().isTopPrincipal()) {
-		final JifContext _A = A; 
-		lc.constrain(A.provider(), 
-						PrincipalConstraint.ACTSFOR, 
-						authPrincipal, 
-						A.labelEnv(), 
-						n.position(),
-                        new ConstraintMessage() {
-		                    public String msg() {
-		                        return _A.provider() + " must act for " + authPrincipal;
-		                    }
-		                    public String detailMsg() {
-		                        return  _A.provider() + " is the provider of " + ct +
-		                        " but does not have authority to act for " + authPrincipal;
-		                    }
-	                	});
-	}
+	
+	A = (JifContext) n.del().enterScope(A);
+        lc = lc.context(A);
+
+        if (((JifOptions) Options.global).checkProviders) {
+            final ProviderLabel provider = ct.provider();
+            NamedLabel namedProvider =
+                    new NamedLabel(provider.toString(), "provider of "
+                            + provider.classType().fullName(), provider);
+            lc.constrain(namedProvider, authPrincipal, A.labelEnv(),
+                    n.position(), new ConstraintMessage() {
+                        @Override
+                        public String msg() {
+                            return provider + " must act for " + authPrincipal;
+                        }
+
+                        @Override
+                        public String detailMsg() {
+                            return provider
+                                    + " is the provider of "
+                                    + ct
+                                    + " but does not have authority to act for "
+                                    + authPrincipal;
+                        }
+                    });
+        }
 	                
-    // label check class conformance
+        // label check class conformance
 	labelCheckClassConformance(ct,lc);
 
 	// label check the body
@@ -113,14 +122,14 @@ public class JifClassDeclExt extends Jif_c {
         // build up a list of superclasses and interfaces that ct 
         // extends/implements that may contain abstract methods that 
         // ct must define.
-        List superInterfaces = ts.abstractSuperInterfaces(ct);
+        List<ReferenceType> superInterfaces = ts.abstractSuperInterfaces(ct);
 
         // check each abstract method of the classes and interfaces in
         // superInterfaces
-        for (Iterator i = superInterfaces.iterator(); i.hasNext(); ) {
-            ReferenceType rt = (ReferenceType)i.next();
-            for (Iterator j = rt.methods().iterator(); j.hasNext(); ) {
-                JifMethodInstance mi = (JifMethodInstance)j.next();
+        for (ReferenceType rt : superInterfaces) {
+            @SuppressWarnings("unchecked")
+            List<JifMethodInstance> methods = rt.methods();
+            for (JifMethodInstance mi : methods) {
                 if (!mi.flags().isAbstract()) {
                     // the method isn't abstract, so ct doesn't have to
                     // implement it.

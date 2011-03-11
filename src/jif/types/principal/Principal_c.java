@@ -17,10 +17,10 @@ import polyglot.util.Position;
 
 /** An abstract implementation of the <code>Principal</code> interface. 
  */
-public abstract class Principal_c extends TypeObject_c implements Principal {
+public abstract class Principal_c extends Param_c implements Principal {
     PrincipalToJavaExpr toJava;
 
-    protected Set variables = null; // memoized
+    protected Set<Param> variables = null; // memoized
     public Principal_c(JifTypeSystem ts, Position pos) {
         this(ts, pos, new CannotPrincipalToJavaExpr_c());
     }
@@ -30,45 +30,48 @@ public abstract class Principal_c extends TypeObject_c implements Principal {
         this.toJava = toJava;
     }
 
+    @Override
     public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
         return toJava.toJava(this, rw);
     }
 
+    @Override
     public final boolean hasVariables() {
         return !variables().isEmpty();
     }
 
-    protected boolean isProvider = false;
+    @Override
     public boolean isTopPrincipal() { return false; }
+    @Override
     public boolean isBottomPrincipal() { return false; }
-    public boolean isProviderPrincipal() { return isProvider; }
-    
-    public Principal isProviderPrincipal(boolean isProvider) 
-    { 
-    	Principal_c p = (Principal_c) copy();
-    	p.isProvider = isProvider;
-    	return p;
-    }
 
+    @Override
     public abstract boolean isCanonical();
+    @Override
     public abstract boolean isRuntimeRepresentable();
+    @Override
     public abstract boolean equalsImpl(TypeObject o);
+    @Override
     public abstract int hashCode();
     
-    public List throwTypes(TypeSystem ts) {
-        return Collections.EMPTY_LIST;
+    @Override
+    public List<ClassType> throwTypes(TypeSystem ts) {
+        return Collections.emptyList();
     }
 
+    @Override
     public Principal subst(LabelSubstitution substitution) throws SemanticException {
         return substitution.substPrincipal(this);
     }
 
+    @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         return ts.pathMap().N(A.pc()).NV(A.pc());
     }        
     
-    public Set variables() {
+    @Override
+    public Set<Param> variables() {
         if (variables == null) {
             VariableGatherer lvg = new VariableGatherer();
             try {
@@ -82,6 +85,7 @@ public abstract class Principal_c extends TypeObject_c implements Principal {
         return variables;
     }    
     
+    @Override
     public Principal simplify() {
         // XXX TODO implement in some of the subclasses.
         return this;        

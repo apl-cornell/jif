@@ -1,6 +1,5 @@
 package jif.extension;
 
-import java.util.Iterator;
 import java.util.List;
 
 import jif.types.*;
@@ -23,9 +22,7 @@ public class ConstructorChecker
             Principal authPrincipal = lc.jifTypeSystem().conjunctivePrincipal(pos, A.authority());
 
             // Check the authority
-            for (Iterator iter = jct.constructorCallAuthority().iterator(); iter.hasNext();) {
-                final Principal pi = (Principal)iter.next();
-
+            for (final Principal pi : jct.constructorCallAuthority()) {
                 // authPrincipal must actfor pi, i.e., at least one
                 // of the principals that have authorized the code must act for pi.
                 lc.constrain(authPrincipal, 
@@ -34,11 +31,13 @@ public class ConstructorChecker
                            A.labelEnv(),
                            pos,
                            new ConstraintMessage() {
+                    @Override
                     public String msg() {
                         return "Calling context does not "
                         + "have enough authority to construct \"" + jct
                         + "\".";
                     }
+                    @Override
                     public String detailMsg() {
                         return "In order to construct an instance of class "
                         + jct
@@ -49,7 +48,6 @@ public class ConstructorChecker
                     }
                 });                     
             }
-            // Check the constraints on the principal hierarchy
         }
     }
     public void checkStaticMethodAuthority(final JifMethodInstance mi, JifContext A, LabelChecker lc, Position pos)
@@ -62,9 +60,7 @@ public class ConstructorChecker
             Principal authPrincipal = lc.jifTypeSystem().conjunctivePrincipal(mi.position(), A.authority());
 
             // Check the authority
-            for (Iterator iter = jct.constructorCallAuthority().iterator(); iter.hasNext();) {
-                final Principal pi = (Principal)iter.next();
-
+            for (final Principal pi : jct.constructorCallAuthority()) {
                 // authPrincipal must actfor pi, i.e., at least one
                 // of the principals that have authorized the code must act for pi.
                 lc.constrain(authPrincipal, 
@@ -73,11 +69,13 @@ public class ConstructorChecker
                            A.labelEnv(),
                            pos,
                            new ConstraintMessage() {
+                    @Override
                     public String msg() {
                         return "Calling context does not "
                         + "have enough authority to invoke the static method " + 
                         mi.signature() + " of class " + jct + ".";
                     }
+                    @Override
                     public String detailMsg() {
                         return "In order to call a static method of class " + jct
                         + ", the calling context must have the authority of "
@@ -89,11 +87,11 @@ public class ConstructorChecker
         }
     }
     
-    private String principalListString(List principals) {
+    private String principalListString(List<Principal> principals) {
         int size = principals.size();
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < size; i++) {
-            Principal p = (Principal)principals.get(i);
+            Principal p = principals.get(i);
             sb.append(p);
             if (i == size-2) {
                 sb.append(" and ");

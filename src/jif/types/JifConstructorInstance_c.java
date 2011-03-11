@@ -1,18 +1,15 @@
 package jif.types;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
-import jif.types.principal.Principal;
+import jif.types.label.ProviderLabel;
 import polyglot.main.Report;
-import polyglot.types.ClassType;
-import polyglot.types.ConstructorInstance_c;
-import polyglot.types.Flags;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.TypedList;
@@ -24,20 +21,21 @@ implements JifConstructorInstance
 {
     protected Label pcBound;
     protected Label returnLabel;
-    protected List constraints;
+    protected List<Assertion> constraints;
     protected boolean isDefaultPCBound;
     protected boolean isDefaultReturnLabel;
 
     public JifConstructorInstance_c(JifTypeSystem ts, Position pos,
             ClassType container, Flags flags,
             Label pcBound, boolean isDefaultPCBound, Label returnLabel, 
-            boolean isDefaultReturnLabel, List formalTypes, List formalArgLabels,
-            List excTypes, List constraints) {
+            boolean isDefaultReturnLabel, List<Type> formalTypes,
+            List<Label> formalArgLabels, List<Type> excTypes,
+            List<Assertion> constraints) {
 
         super(ts, pos, container, flags, formalTypes, excTypes);
         this.pcBound = pcBound;
         this.returnLabel = returnLabel;
-        this.constraints = TypedList.copyAndCheck(constraints, Assertion.class, true);
+        this.constraints = new ArrayList<Assertion>(constraints);
 
         this.pcBound = pcBound;
         this.isDefaultPCBound = isDefaultPCBound;
@@ -52,6 +50,7 @@ implements JifConstructorInstance
     }
 
 
+    @Override
     public Label pcBound() {
         return pcBound;
     }
@@ -60,36 +59,45 @@ implements JifConstructorInstance
         return pcBound;
     }
 
+    @Override
     public Label returnLabel() {
         return returnLabel;
     }
 
+    @Override
     public void setReturnLabel(Label returnLabel, boolean isDefault) {
         this.returnLabel = returnLabel;
         this.isDefaultReturnLabel = isDefault;
     }
 
+    @Override
     public boolean isDefaultReturnLabel() {
         return isDefaultReturnLabel;
     }
 
+    @Override
     public void  setPCBound(Label pcBound, boolean isDefault) {
         this.pcBound = pcBound;
         this.isDefaultPCBound = isDefault;
     }
 
+    @Override
     public boolean isDefaultPCBound() {
         return isDefaultPCBound;
     }
 
-    public List constraints() {
+    @Override
+    public List<Assertion> constraints() {
         return constraints;
     }
 
-    public void setConstraints(List constraints) {
-        this.constraints = TypedList.copyAndCheck(constraints, Assertion.class, true);
+    @Override
+    public void setConstraints(List<Assertion> constraints) {
+        this.constraints = new ArrayList<Assertion>(constraints);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public boolean isCanonical() {
         if (!(super.isCanonical()
                 && pcBound.isCanonical()
@@ -101,13 +109,15 @@ implements JifConstructorInstance
 
         JifTypeSystem jts = (JifTypeSystem)typeSystem();
         // also need to make sure that every formal type is labeled with an arg label
-        for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
+        for (Iterator<Type> i = formalTypes().iterator(); i.hasNext(); ) {
+            Type t = i.next();
             if (!jts.isLabeled(t) || !(jts.labelOfType(t) instanceof ArgLabel)) return false;
         }    
         return true;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public void subst(VarMap bounds) {
         if (this.pcBound != null) 
             this.pcBound = bounds.applyTo(pcBound);
@@ -115,45 +125,50 @@ implements JifConstructorInstance
         if (this.returnLabel != null) 
             this.returnLabel = bounds.applyTo(returnLabel);
 
-        List formalTypes = new LinkedList();
-        for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
+        List<Type> formalTypes = new LinkedList<Type>();
+        for (Iterator<Type> i = formalTypes().iterator(); i.hasNext(); ) {
+            Type t = i.next();
             formalTypes.add(bounds.applyTo(t));
         }
         this.setFormalTypes(formalTypes);
 
-        List throwTypes = new LinkedList();
-        for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
+        List<Type> throwTypes = new LinkedList<Type>();
+        for (Iterator<Type> i = throwTypes().iterator(); i.hasNext(); ) {
+            Type t = i.next();
             throwTypes.add(bounds.applyTo(t));
         }
 
         this.setThrowTypes(throwTypes);
     }    
 
+    @SuppressWarnings("unchecked")
+    @Override
     public void subst(LabelSubstitution subst) throws SemanticException {
         TypeSubstitutor tsbs = new TypeSubstitutor(subst);
         setPCBound(pcBound().subst(subst), isDefaultPCBound());
         setReturnLabel(returnLabel().subst(subst), isDefaultReturnLabel());
 
-        List formalTypes = new LinkedList();
-        for (Iterator i = formalTypes().iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
+        List<Type> formalTypes = new LinkedList<Type>();
+        for (Iterator<Type> i = formalTypes().iterator(); i.hasNext(); ) {
+            Type t = i.next();
             formalTypes.add(tsbs.rewriteType(t));
         }
         this.setFormalTypes(formalTypes);
 
-        List throwTypes = new LinkedList();
-        for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
+        List<Type> throwTypes = new LinkedList<Type>();
+        for (Iterator<Type> i = throwTypes().iterator(); i.hasNext(); ) {
+            Type t = i.next();
             throwTypes.add(tsbs.rewriteType(t));
         }
         this.setThrowTypes(throwTypes);
 
     }
+    @Override
     public String debugString() {
         return debugString(true);
     }
+    
+    @SuppressWarnings("unchecked")
     private String debugString(boolean showInstanceKind) {
         String s = "";
         if (showInstanceKind) {
@@ -161,8 +176,8 @@ implements JifConstructorInstance
         }
         s += flags.translate() + container + "(";
 
-        for (Iterator i = formalTypes.iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
+        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext(); ) {
+            Type t = i.next();
             s += ((JifTypeSystem)ts).unlabel(t).toString();
 
             if (i.hasNext()) {
@@ -175,12 +190,15 @@ implements JifConstructorInstance
         return s;
     }
 
+    @Override
     public String signature() {
         if (Report.should_report(Report.debug, 1)) { 
             return fullSignature();
         }
         return debugString(false);
     }
+    
+    @SuppressWarnings("unchecked")
     public String fullSignature() {
         String s = container.toString();
         if (!isDefaultPCBound() || Report.should_report(Report.debug, 1)) {
@@ -188,8 +206,8 @@ implements JifConstructorInstance
         }
         s += "(";
 
-        for (Iterator i = formalTypes.iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
+        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext(); ) {
+            Type t = i.next();
             s += t.toString();
 
             if (i.hasNext()) {
@@ -203,13 +221,16 @@ implements JifConstructorInstance
 
         return s;
     }
-	@Override
-	public Principal provider() {
-		if(container instanceof JifClassType) {
-			JifClassType jct = (JifClassType) container;
-			return jct.provider();
-		}
-		throw new InternalCompilerError("Expected JifClassType for container, but got " + container.getClass());
-	}
+
+    @Override
+    public ProviderLabel provider() {
+        if (container instanceof JifClassType) {
+            JifClassType jct = (JifClassType) container;
+            return jct.provider();
+        }
+        throw new InternalCompilerError(
+                "Expected JifClassType for container, but got "
+                        + container.getClass());
+    }
 
 }

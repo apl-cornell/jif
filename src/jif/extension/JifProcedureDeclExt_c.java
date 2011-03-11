@@ -1,23 +1,28 @@
 package jif.extension;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
+import jif.JifOptions;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
 import jif.types.label.Label;
 import jif.types.label.NotTaken;
+import jif.types.label.ProviderLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Formal;
 import polyglot.ast.ProcedureDecl;
+import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.util.StringUtil;
 
 /** The Jif extension of the <code>ProcedureDecl</code> node. 
  * 
@@ -36,11 +41,11 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * Label check the formals.
      * @throws SemanticException 
      */
-    protected List checkFormals(List formals, JifProcedureInstance ci, LabelChecker lc) throws SemanticException {
-        List newFormals = new ArrayList(formals.size());
+    protected List<Formal> checkFormals(List<Formal> formals,
+            JifProcedureInstance ci, LabelChecker lc) throws SemanticException {
+        List<Formal> newFormals = new ArrayList<Formal>(formals.size());
         boolean changed = false;
-        for (Iterator iter = formals.iterator(); iter.hasNext();) {
-            Formal formal = (Formal)iter.next();
+        for (Formal formal : formals) {
             Formal newFormal = (Formal)lc.labelCheck(formal);
             if (newFormal != formal) changed = true;
             newFormals.add(newFormal);
@@ -63,22 +68,22 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         JifContext A = lc.jifContext();
                 
         // Set the "auth" variable.
-        Set newAuth = constrainAuth(mi, A);
+        Set<Principal> newAuth = constrainAuth(mi, A);
 
-        for (Iterator iter = newAuth.iterator(); iter.hasNext(); ) {
-            Principal p = (Principal) iter.next();
+        for (Principal p : newAuth) {
             // Check that there is a p' in the old "auth" set such that
             // p' actsFor p.
             checkActsForAuthority(p, A, lc);
         }
 
         
-        addCallers(mi, lc, newAuth);
+        addCallers(mi, newAuth);
         A.setAuthority(newAuth);       
 
         constrainLabelEnv(mi, A, null);
 
         checkProviderAuthority(mi, lc);
+        checkBeginLabel(mi, lc);
         checkConstraintVariance(mi, lc);
 
         // check that any autoendorse constraints are satisfied,
@@ -88,45 +93,89 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         return Li;
     }
 
-    protected void checkProviderAuthority(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
-    	final JifContext A = lc.jifContext();
-        for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
-            Assertion c = (Assertion) iter.next();
-
+    protected void checkProviderAuthority(JifProcedureInstance mi,
+            LabelChecker lc) throws SemanticException {
+        if (!((JifOptions) Options.global).checkProviders) return;
+        
+        final JifContext A = lc.jifContext();
+        final ProviderLabel provider = mi.provider();
+        final NamedLabel namedProvider =
+                new NamedLabel(provider.toString(), "provider of "
+                        + provider.classType().fullName(), provider);
+        for (Assertion c : mi.constraints()) {
             if (c instanceof CallerConstraint) {
                 final CallerConstraint cc = (CallerConstraint) c;
-                for (Iterator it = cc.principals().iterator(); it.hasNext();) {
-                	final Principal pi = (Principal) it.next();
+                
+                for (final Principal pi : cc.principals()) {
+                    // Check that the provider of the enclosing class acts for pi.
                     final JifProcedureInstance _mi = mi;
-            		lc.constrain(A.provider(), 
-        					PrincipalConstraint.ACTSFOR, 
-        					pi, 
-        					A.labelEnv(), 
-        					cc.position(),
+                    lc.constrain(namedProvider, pi,
+                            A.labelEnv(), cc.position(),
                             new ConstraintMessage() {
-        	                    public String msg() {
-        	                        return A.provider() + " must act for " + pi;
-        	                    }
-        	                    public String detailMsg() {
-        	                        return  A.provider() + " is the provider of " + _mi.container() +
-        	                        " but does not have authority to act for " + pi;
-        	                    }
-                        	});
+                                @Override
+                                public String msg() {
+                                    return provider + " must act for " + pi;
+                                }
+
+                                @Override
+                                public String detailMsg() {
+                                    return provider
+                                            + " is the provider of "
+                                            + _mi.container()
+                                            + " but does not have authority to act for "
+                                            + pi;
+                                }
+                            });
                 }
             }
         }
-	}
+    }
 
-	protected Label checkAutoEndorseConstrainPC(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
+    /**
+     * Ensures that the procedure instance's begin label is at least as
+     * restrictive as the class provider. This ensures that code will be unable
+     * to affect data that the provider is not trusted to affect and that the
+     * behaviour of confidential code will not be leaked.
+     */
+    protected void checkBeginLabel(JifProcedureInstance jpi, LabelChecker lc)
+            throws SemanticException {
+        if (!((JifOptions) Options.global).checkProviders) return;
+        
+        JifContext context = lc.jifContext();
+        final Label beginLabel = jpi.pcBound();
+        final NamedLabel namedBeginLabel =
+                new NamedLabel("pc_bound", "begin pc label", beginLabel);
+        final ProviderLabel provider = jpi.provider();
+        final NamedLabel namedProvider =
+                new NamedLabel("provider", "provider of "
+                        + provider.classType().fullName(), provider);
+        
+        lc.constrain(namedProvider, LabelConstraint.LEQ, namedBeginLabel,
+                context.labelEnv(), beginLabel.position(),
+                new ConstraintMessage() {
+                    @Override
+                    public String msg() {
+                        return "The method body might leak information about "
+                            + "the code, or might affect information that the "
+                            + "class provider is not allowed to affect.";
+                    }
+
+                    @Override
+                    public String detailMsg() {
+                        return "The begin label on the method must be at least "
+                            + "as restrictive as the class provider.";
+                    }
+                });
+    }
+
+    protected Label checkAutoEndorseConstrainPC(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
         final JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.jifTypeSystem();
         JifClassType ct = (JifClassType) A.currentClass();
         Label Li = mi.pcBound();
         Label endorseTo = ts.topLabel();
 
-        for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
-            Assertion c = (Assertion) iter.next();
-
+        for (Assertion c : mi.constraints()) {
             if (c instanceof AutoEndorseConstraint) {
                 AutoEndorseConstraint ac = (AutoEndorseConstraint) c;
                 endorseTo = ts.meet(endorseTo, ac.endorseTo());
@@ -167,19 +216,13 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * thesis (Figure 4.39).  It returns the set of principals for which the
      * method can act.
      */
-    protected Set constrainAuth(JifProcedureInstance mi, JifContext A) {
-        Set newAuth = new LinkedHashSet();
+    protected Set<Principal> constrainAuth(JifProcedureInstance mi, JifContext A) {
+        Set<Principal> newAuth = new LinkedHashSet<Principal>();
 
-        for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
-            Assertion c = (Assertion) iter.next();
-
+        for (Assertion c : mi.constraints()) {
             if (c instanceof AuthConstraint) {
                 AuthConstraint ac = (AuthConstraint) c;
-
-                for (Iterator i = ac.principals().iterator(); i.hasNext(); ) {
-                    Principal pi = (Principal) i.next();
-                    newAuth.add(pi);
-                }
+                newAuth.addAll(ac.principals());
             }
         }
         
@@ -187,13 +230,10 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
     }
 
     /** Adds the caller's authorities into <code>auth</code> */
-    protected static void addCallers(JifProcedureInstance mi, LabelChecker lc, Set auth) 
-    	throws SemanticException {
+    protected static void addCallers(JifProcedureInstance mi,
+            Set<Principal> auth) {
     	
-    	final JifContext A = lc.jifContext();
-        for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
-            Assertion c = (Assertion) iter.next();
-
+        for (Assertion c : mi.constraints()) {
             if (c instanceof CallerConstraint) {
                 final CallerConstraint cc = (CallerConstraint) c;
                 auth.addAll(cc.principals());	
@@ -223,10 +263,12 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                    A.labelEnv(),
                    A.currentCode().position(),
                    new ConstraintMessage() {
+            @Override
             public String msg() {
                 return "The authority of the class " + A.currentClass().name() + 
                 " is insufficient to act for principal " + p + ".";
             }
+            @Override
             public String detailMsg() {
                 return "The " + msgCodeName + " states that it has the authority of the " +
                 "principal " + p + ". However, the conjunction of the authority" +
@@ -243,25 +285,32 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
     protected static void constrainLabelEnv(JifProcedureInstance mi, JifContext A, CallHelper ch)
     throws SemanticException
     {
-        for (Iterator i = mi.constraints().iterator(); i.hasNext(); ) {
-            Assertion c = (Assertion) i.next();
-
+        for (Assertion c : mi.constraints()) {
             if (c instanceof ActsForConstraint) {
-                ActsForConstraint ac = (ActsForConstraint) c;
-                //A.addActsFor(A.instantiate(ac.actor()),
-                //	     A.instantiate(ac.granter()));
-                Principal actor = ac.actor();
-                Principal granter = ac.granter();
+                @SuppressWarnings("unchecked")
+                ActsForConstraint<ActsForParam, ActsForParam> afc =
+                        (ActsForConstraint<ActsForParam, ActsForParam>) c;
+                ActsForParam actor = afc.actor();
+                ActsForParam granter = afc.granter();
                 if (ch != null) {
                     actor = ch.instantiate(A, actor);
                     granter = ch.instantiate(A, granter);
                 }
-
-                if (ac.isEquiv()) {
-                    A.addEquiv(actor, granter);
-                }
-                else {
-                    A.addActsFor(actor, granter);
+                
+                if (actor instanceof Principal && granter instanceof Principal) {
+                    Principal pActor = (Principal) actor;
+                    Principal pGranter = (Principal) granter;
+                    if (afc.isEquiv()) {
+                        A.addEquiv(pActor, pGranter);
+                    } else {
+                        A.addActsFor(pActor, pGranter);
+                    }
+                } else if (actor instanceof Label && granter instanceof Principal) {
+                    A.addActsFor((Label) actor, (Principal) granter);
+                } else {
+                    throw new InternalCompilerError(afc.position(),
+                            "Unexpected ActsForConstraint (" + actor.getClass()
+                                    + " actsfor " + granter.getClass() + ").");
                 }
             }
             if (c instanceof LabelLeAssertion) {
@@ -289,8 +338,8 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * the declared labels in the methods "throws" clause.
      */
     protected void addReturnConstraints(Label Li, PathMap X,
-            JifProcedureInstance mi, LabelChecker lc, final Type returnType) throws SemanticException
-            {
+            JifProcedureInstance mi, LabelChecker lc, final Type returnType)
+            throws SemanticException {
         if (Report.should_report(jif_verbose, 2))
             Report.report(2, "Adding constraints for result of " + mi);
 
@@ -302,16 +351,14 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
 
         // fold the call site pc into the return label
-        Label Lr = lc.upperBound(mi.returnLabel(), ts.callSitePCLabel(mi)); 
-
+        Label Lr = lc.upperBound(mi.returnLabel(), ts.callSitePCLabel(mi));
 
         //Hack: If no other paths, the procedure must return. Therefore,
         //X.n is not taken, and X.r doesn't contain any information. 
         //TODO: implement a more precise single-path rule.
         if (! (X.N() instanceof NotTaken)) {
             boolean singlePath = true;
-            for (Iterator iter = X.paths().iterator(); iter.hasNext(); ) {
-                Path p = (Path) iter.next();
+            for (Path p : X.paths()) {
                 if (p.equals(Path.N) || p.equals(Path.R)) continue;
                 singlePath = false;
                 break;
@@ -337,11 +384,13 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                     mn.position(),
                     new ConstraintMessage()
         {
+            @Override
             public String msg() { 
                 return "The non-exception termination of the " +
                 "method body may reveal more information " +
                 "than is declared by the method return label.";
             }
+            @Override
             public String detailMsg() { 
                 return "The method return label, " + namedRhs() + 
                 ", is an upper bound on how much " +
@@ -354,6 +403,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                 "after the variables, e.g. " +
                 "\"void m(int i):{" + namedRhs() + "}\".";
             }
+            @Override
             public String technicalMsg() {
                 return "the return (end) label is less restricted than " +
                 namedLhs() + " of the body.";
@@ -366,9 +416,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
 
         // Add the exception path constraints.
-        for (Iterator iter = X.paths().iterator(); iter.hasNext(); ) {
-            Path path = (Path) iter.next();
-
+        for (Path path : X.paths()) {
             if (! (path instanceof ExceptionPath)) {
                 continue;
             }
@@ -387,8 +435,9 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                                                        "by observing the method throwing the exception " + pathType.toClass().name(),
                                                        pathLabel);
 
-            for (Iterator j = mi.throwTypes().iterator(); j.hasNext(); ) {
-                final Type tj = (Type) j.next();
+            @SuppressWarnings("unchecked")
+            List<Type> throwTypes = mi.throwTypes();
+            for (final Type tj : throwTypes) {
                 Label Lj = ts.labelOfType(tj, Lr);
 
                 // fold the call site pc into the return label
@@ -419,12 +468,14 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                                 mi.position(),
                                 new ConstraintMessage()
                     {
+                        @Override
                         public String msg() { 
                             return "More information may be gained " + 
                             "by observing a " + tj.toClass().fullName() +
                             " exception than is permitted by the " +
                             "method/constructor signature";
                         }
+                        @Override
                         public String technicalMsg() {
                             return "the path of <" + tj + "> may leak information " +
                             "more restrictive than the join of the declared " +
@@ -445,9 +496,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      */
     protected void checkConstraintVariance(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
         if (!(lc.context().currentCode() instanceof ConstructorInstance)) {
-            for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
-                Assertion c = (Assertion) iter.next();
-
+            for (Assertion c : mi.constraints()) {
                 if (c instanceof LabelLeAssertion) {
                     LabelLeAssertion lle = (LabelLeAssertion) c;
                     lle.rhs().subst(new ConstraintVarianceLabelChecker(c.position()));
@@ -466,6 +515,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         ConstraintVarianceLabelChecker(Position declPosition) {
             this.declPosition = declPosition;
         }
+        @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L.isCovariant()) {
                 throw new SemanticDetailedException("Covariant labels cannot occur on the right hand side of label constraints.",

@@ -1,7 +1,8 @@
 package jif.ast;
 
+import jif.types.LabelLeAssertion;
 
-public interface LabelLeAssertionNode extends ConstraintNode
+public interface LabelLeAssertionNode extends ConstraintNode<LabelLeAssertion>
 {
     /** Gets the lhs Label. */
     LabelNode lhs();

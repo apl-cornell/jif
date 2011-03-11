@@ -9,5 +9,5 @@ import java.util.Collection;
 public interface JoinLabel extends Label
 {
     //Label flatten();
-    Collection joinComponents();
+    Collection<Label> joinComponents();
 }

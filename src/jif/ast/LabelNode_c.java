@@ -1,6 +1,5 @@
 package jif.ast;
 
-import jif.types.Param;
 import jif.types.label.ConfPolicy;
 import jif.types.label.IntegPolicy;
 import jif.types.label.Label;
@@ -28,24 +27,34 @@ public abstract class LabelNode_c extends Node_c implements LabelNode
         this.label = label;
     }
 
+    @Override
     public boolean isDisambiguated() {
         return label != null && label.isCanonical() && super.isDisambiguated();
     }
 
+    @Override
     public Label label() {
 	return label;
     }
 
+    @Override
     public LabelNode label(Label label) {
 	LabelNode_c n = (LabelNode_c) copy();
 	n.label = label;
 	return n;
     }
 
-    public Param parameter() {
+    @Override
+    public Label parameter() {
 	return label();
     }
+    
+    @Override
+    public LabelNode parameter(Label label) {
+        return label(label);
+    }
 
+    @Override
     public String toString() {
 	if (label != null) {
 	    return label.toString();
@@ -55,10 +64,12 @@ public abstract class LabelNode_c extends Node_c implements LabelNode
 	}
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(this.toString());
     }
     
+    @Override
     public void dump(CodeWriter w) {
         if (label != null) {
             w.write("(" + StringUtil.getShortNameComponent(label.getClass().getName()) + " ");
@@ -76,6 +87,7 @@ public abstract class LabelNode_c extends Node_c implements LabelNode
         }
     }    
     
+    @Override
     public final void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("cannot translate " + this);
     }

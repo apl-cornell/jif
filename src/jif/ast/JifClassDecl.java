@@ -2,7 +2,10 @@ package jif.ast;
 
 import java.util.List;
 
+import jif.types.ActsForConstraint;
+import jif.types.ActsForParam;
 import jif.types.JifContext;
+import jif.types.principal.Principal;
 import polyglot.ast.ClassDecl;
 
 /** An immutable representation of the Jif class declaration.
@@ -10,14 +13,15 @@ import polyglot.ast.ClassDecl;
  *  and the authority constraint.
  */
 public interface JifClassDecl extends ClassDecl {
-    List params();
-    JifClassDecl params(List params);
+    List<ParamDecl> params();
+    JifClassDecl params(List<ParamDecl> params);
 
-    List authority();
-    JifClassDecl authority(List authority);
+    List<PrincipalNode> authority();
+    JifClassDecl authority(List<PrincipalNode> authority);
     
-    List constraints();
-    JifClassDecl constraints(List constraints);
+    List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints();
+    JifClassDecl constraints(
+            List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints);
 
     JifClassDecl type(polyglot.types.Type type);
     

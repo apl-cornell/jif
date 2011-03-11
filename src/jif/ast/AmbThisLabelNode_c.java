@@ -3,9 +3,6 @@ package jif.ast;
 import jif.types.JifClassType;
 import jif.types.JifContext;
 import polyglot.ast.Node;
-import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.Scheduler;
-import polyglot.frontend.goals.Goal;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
@@ -21,6 +18,7 @@ public class AmbThisLabelNode_c extends AmbLabelNode_c
 	super(pos);
     }
 
+    @Override
     public String toString() {
 	return "this{amb}";
     }
@@ -28,6 +26,7 @@ public class AmbThisLabelNode_c extends AmbLabelNode_c
     /** Disambiguates the type of this node by finding the correct label for
      * "this". 
      */
+    @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
 	JifContext c = (JifContext)sc.context();
 	JifClassType ct = (JifClassType) c.currentClass();
@@ -47,6 +46,7 @@ public class AmbThisLabelNode_c extends AmbLabelNode_c
         return nf.CanonicalLabelNode(position(), ct.thisLabel());
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("this");
     }

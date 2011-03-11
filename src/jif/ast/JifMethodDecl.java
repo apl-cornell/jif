@@ -3,6 +3,8 @@ package jif.ast;
 import polyglot.ast.*;
 import java.util.*;
 
+import jif.types.Assertion;
+
 /** An immutable representation of the Jif method declaration.
  *  It extends the Java method declaration with the start label,
  *  the return label, and various constraints, including the authority
@@ -13,5 +15,5 @@ public interface JifMethodDecl extends JifProcedureDecl, MethodDecl {
     
     JifMethodDecl returnLabel(LabelNode returnLabel);
 
-    JifMethodDecl constraints(List constraints);
+    JifMethodDecl constraints(List<ConstraintNode<Assertion>> constraints);
 }

@@ -1,13 +1,12 @@
 package jif.types;
 
-import java.util.Collection;
 import java.util.Set;
 
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.AccessPath;
 import jif.types.label.Label;
-import jif.types.principal.ExternalPrincipal;
+import jif.types.label.ProviderLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Branch;
@@ -29,7 +28,7 @@ import polyglot.types.SemanticException;
  */
 public interface JifContext extends Context {
     /* ************************************************
-     * Label envirnoment methods
+     * Label environment methods
      */
     LabelEnv labelEnv();
     
@@ -37,6 +36,11 @@ public interface JifContext extends Context {
      * Add a less than or equal assertion to the label environment.
      */
     void addAssertionLE(Label L1, Label L2);
+    
+    /**
+     * Adds a label-actsfor-principal assumption to the label environment.
+     */
+    void addActsFor(Label L, Principal p);
 
     /**
      * Add an equivalence to the label environment. 
@@ -129,8 +133,8 @@ public interface JifContext extends Context {
      * The authority of a class or a procedure is the set of principals
      * who have authorized that code.
      */    
-    Set authority();
-    void setAuthority(Set authority);
+    Set<Principal> authority();
+    void setAuthority(Set<Principal> authority);
 
     /**
      * Get the authority of the current code, represented as a confidentiality label.
@@ -198,6 +202,6 @@ public interface JifContext extends Context {
      */
     void addCheckedEndorse(LocalInstance li, Label downgradeTo);
 
-	Principal provider();
-    void setProvider(Principal provider);
+    ProviderLabel provider();
+    void setProvider(ProviderLabel provider);
 }

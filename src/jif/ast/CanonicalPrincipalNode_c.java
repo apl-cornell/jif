@@ -25,20 +25,24 @@ public class CanonicalPrincipalNode_c extends PrincipalNode_c implements Canonic
 	this.principal = principal;
     }
     
+    @Override
     public boolean isDisambiguated() {
         return true;
     }    
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         LabelTypeCheckUtil ltcu = ((JifTypeSystem)tc.typeSystem()).labelTypeCheckUtil(); 
         ltcu.typeCheckPrincipal(tc, principal);        
         return super.typeCheck(tc);
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(principal.toString());
     }
     
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("cannot translate " + this);
     }
@@ -46,9 +50,12 @@ public class CanonicalPrincipalNode_c extends PrincipalNode_c implements Canonic
     /**
      * Visit this term in evaluation order.
      */
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public List<Term> acceptCFG(CFGBuilder v, List succs) {
         return succs;
     }
+    @Override
     public Term firstChild() {
         return null;
     }

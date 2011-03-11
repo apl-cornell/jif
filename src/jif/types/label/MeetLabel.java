@@ -9,5 +9,5 @@ import java.util.Set;
 public interface MeetLabel extends Label
 {
     //Label flatten();
-    Set meetComponents();
+    Set<Label> meetComponents();
 }

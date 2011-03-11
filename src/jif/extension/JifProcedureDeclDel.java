@@ -1,12 +1,13 @@
 package jif.extension;
 
-import java.util.Iterator;
 import java.util.List;
 
 import jif.ast.JifProcedureDecl;
 import jif.types.*;
 import jif.types.principal.Principal;
-import polyglot.ast.*;
+import polyglot.ast.Formal;
+import polyglot.ast.Node;
+import polyglot.ast.ProcedureDecl;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.util.Position;
@@ -22,23 +23,25 @@ public class JifProcedureDeclDel extends JifJL_c
 
 
     // add the formals to the context before visiting the formals
+    @Override
     public Context enterScope(Context c) {
         c = super.enterScope(c);
         addFormalsToScope(c);
         return c;
     }
+    
+    @SuppressWarnings("unchecked")
     protected void addFormalsToScope(Context c) {
         ProcedureDecl pd = (ProcedureDecl) node();
-        for (Iterator i = pd.formals().iterator(); i.hasNext(); ) {
-            Formal f = (Formal) i.next();
+        for (Formal f : (List<Formal>) pd.formals()) {
             c.addVariable(f.localInstance());
         }        
     }
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JifProcedureDecl pd = (JifProcedureDecl)super.typeCheck(tc);
         JifProcedureInstance jpi = (JifProcedureInstance)pd.procedureInstance(); 
-        for (Iterator iter = jpi.constraints().iterator(); iter.hasNext(); ) {
-            Assertion a = (Assertion)iter.next();
+        for (Assertion a : jpi.constraints()) {
             if (a instanceof AuthConstraint) {
                 AuthConstraint ac = (AuthConstraint)a;
                 ensureNotTopPrincipal(ac.principals(), a.position());
@@ -48,22 +51,33 @@ public class JifProcedureDeclDel extends JifJL_c
                 ensureNotTopPrincipal(cc.principals(), a.position());
             }
             else if (a instanceof ActsForConstraint) {
-                ActsForConstraint afc = (ActsForConstraint)a;
-                ensureNotTopPrincipal(afc.actor(), a.position());
-                ensureNotTopPrincipal(afc.granter(), a.position());
+                @SuppressWarnings("unchecked")
+                ActsForConstraint<ActsForParam, ActsForParam> afc =
+                        (ActsForConstraint<ActsForParam, ActsForParam>) a;
+                
+                ActsForParam actor = afc.actor();
+                ActsForParam granter = afc.granter();
+                
+                if (actor instanceof Principal) {
+                    ensureNotTopPrincipal((Principal) actor, a.position());
+                }
+                
+                if (granter instanceof Principal) {
+                    ensureNotTopPrincipal((Principal) granter, a.position());
+                }
             }
         }
         return pd;
     }
     
-    protected void ensureNotTopPrincipal(List principals, Position pos) throws SemanticException {
-        for (Iterator iter = principals.iterator(); iter.hasNext(); ) {
-            Principal p = (Principal)iter.next();            
+    protected void ensureNotTopPrincipal(List<Principal> principals,
+            Position pos) throws SemanticException {
+        for (Principal p : principals) {
             ensureNotTopPrincipal(p, pos);
         }
     }
     protected void ensureNotTopPrincipal(Principal p, Position pos) throws SemanticException {
-        if (p.isTopPrincipal() && !p.isProviderPrincipal()) {
+        if (p.isTopPrincipal()) {
             throw new SemanticException("The top principal " + p + 
                                         " cannot appear in a constraint.", pos);
         }

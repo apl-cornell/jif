@@ -6,16 +6,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import jif.types.label.ParamLabel;
+import jif.types.label.ProviderLabel;
 import jif.types.label.ThisLabel;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ext.param.types.PClass;
 import polyglot.frontend.Source;
-import polyglot.types.ClassType;
-import polyglot.types.FieldInstance;
-import polyglot.types.LazyClassInitializer;
-import polyglot.types.ParsedClassType_c;
-import polyglot.types.TypeObject;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.TypedList;
@@ -24,40 +21,49 @@ import polyglot.util.TypedList;
  */
 public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedPolyType
 {
-    List params;
-    List authority;
-    List constraints;
-    Principal provider;
+    List<ParamInstance> params;
+    List<Principal> authority;
+    List<ActsForConstraint<ActsForParam, Principal>> constraints;
+    ProviderLabel provider;
     
     PClass instantiatedFrom;
 
     protected JifParsedPolyType_c() {
 	super();
-	this.params = new TypedList(new LinkedList(), ParamInstance.class, false);
-	this.authority = new TypedList(new LinkedList(), Principal.class, false);
-	this.constraints = new TypedList(new LinkedList(), Constraint.class, false);
-	this.provider = ((JifTypeSystem)ts).bottomPrincipal(Position.compilerGenerated());
+	JifTypeSystem jts = (JifTypeSystem) this.ts;
+	this.params = new LinkedList<ParamInstance>();
+	this.authority = new LinkedList<Principal>();
+	this.constraints = new LinkedList<ActsForConstraint<ActsForParam, Principal>>();
+        this.provider = jts.providerLabel(position, this);
         this.instantiatedFrom = null;
     }
 
     public JifParsedPolyType_c(JifTypeSystem ts, LazyClassInitializer init, 
                                Source fromSource) {
 	super(ts, init, fromSource);
-	this.params = new TypedList(new LinkedList(), ParamInstance.class, false);
-	this.authority = new TypedList(new LinkedList(), Principal.class, false);
-	this.constraints = new TypedList(new LinkedList(), Constraint.class, false);
-	this.provider = ts.topPrincipal(null);
+        this.params = new LinkedList<ParamInstance>();
+        this.authority = new LinkedList<Principal>();
+        this.constraints = new LinkedList<ActsForConstraint<ActsForParam, Principal>>();
+        this.provider = ts.providerLabel(position, this);
         this.instantiatedFrom = null;
     }
 
+    @Override
+    public JifTypeSystem typeSystem() {
+        return (JifTypeSystem) super.typeSystem();
+    }
+
+    @Override
     public PClass instantiatedFrom() {
         return instantiatedFrom;
     }
 
+    @Override
     public void setInstantiatedFrom(PClass pc) {
         this.instantiatedFrom = pc;
     }
 
+    @Override
     public void kind(Kind kind) {
         if (kind != TOP_LEVEL) {
             throw new InternalCompilerError("Jif does not support inner classes.");
@@ -65,14 +71,16 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
         super.kind(kind);
     }
 
-    public List fields() {
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<FieldInstance> fields() {
         if (fields == null) {
             // initialize the fields list.
             super.fields();
 
             // Remove the class field.
-            for (Iterator i = fields.iterator(); i.hasNext(); ) {
-                FieldInstance fi = (FieldInstance) i.next();
+            for (Iterator<FieldInstance> i = fields.iterator(); i.hasNext(); ) {
+                FieldInstance fi = i.next();
                 if (fi.name().equals("class")) {
                     i.remove();
                     break;
@@ -83,17 +91,16 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
         return fields;
     }
 
-    public List authority() {
-    return authority;
+    @Override
+    public List<Principal> authority() {
+        return authority;
     }
 
-    public List constructorCallAuthority() {
-        List l = new ArrayList(authority.size());
+    @Override
+    public List<Principal> constructorCallAuthority() {
+        List<Principal> l = new ArrayList<Principal>(authority.size());
         
-        Iterator iter = authority.iterator();
-        
-        while (iter.hasNext()) {
-            Principal p = (Principal)iter.next();
+        for (Principal p : authority) {
             if (p instanceof ParamPrincipal) {
                 // p is a parameter principal.
                 l.add(p);                            
@@ -102,17 +109,18 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
         return l;
     }
 
-    public List params() {
+    @Override
+    public List<ParamInstance> params() {
 	return params;
     }
 
-    public List actuals() {
+    @Override
+    public List<Param> actuals() {
         JifTypeSystem ts = (JifTypeSystem) this.ts;
 
-        List actuals = new ArrayList(params.size());
+        List<Param> actuals = new ArrayList<Param>(params.size());
 
-        for (Iterator i = params.iterator(); i.hasNext(); ) {
-            ParamInstance pi = (ParamInstance) i.next();
+        for (ParamInstance pi : params) {
             Position posi = pi.position();
 
             if (pi.isCovariantLabel()) {
@@ -131,34 +139,44 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
         return actuals;
     }
 
+    @Override
     public ThisLabel thisLabel() {
 	return ((JifTypeSystem)ts).thisLabel(this);
     }
 
+    @Override
     public void addMemberClass(ClassType t) {
 	throw new InternalCompilerError("Jif does not support inner classes.");
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
     public void setParams(List params) {
         this.params = new TypedList(params, ParamInstance.class, false);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
     public void setAuthority(List principals) {
         this.authority = new TypedList(principals, Principal.class, false);
     }
-    public List constraints() {
+    @Override
+    public List<ActsForConstraint<ActsForParam, Principal>> constraints() {
     	return constraints;
     }
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
     public void setConstraints(List constraints) {
         this.constraints = new TypedList(constraints, Constraint.class, false);
     }
 
+    @Override
     public String toString() {
 	String s = "";
 
         if (params != null) {
-            for (Iterator i = params.iterator(); i.hasNext(); ) {
-                ParamInstance pi = (ParamInstance) i.next();
+            for (Iterator<ParamInstance> i = params.iterator(); i.hasNext(); ) {
+                ParamInstance pi = i.next();
                 s += pi.toString();
 
                 if (i.hasNext()) {
@@ -178,10 +196,12 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	return name + s;
     }
 
+    @Override
     public int hashCode() {
         return flags.hashCode() + name.hashCode();
     }
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof JifPolyType) {
 	    JifPolyType t = (JifPolyType) o;
@@ -204,8 +224,8 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	return false;
     }
 
-	@Override
-	public Principal provider() {
-		return provider;
-	}
+    @Override
+    public ProviderLabel provider() {
+        return provider;
+    }
 }

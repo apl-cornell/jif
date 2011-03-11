@@ -4,20 +4,18 @@ import java.util.List;
 import java.util.Set;
 
 import jif.translate.JifToJavaRewriter;
-import jif.types.JifContext;
-import jif.types.LabelSubstitution;
-import jif.types.Param;
-import jif.types.PathMap;
+import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 
 /**
  * This class represents the Jif security label.
  */
-public interface Label extends Param {
+public interface Label extends ActsForParam {
     /**
      * Is this label equivalent to bottom?
      * <p>
@@ -67,6 +65,7 @@ public interface Label extends Param {
      * @return the result of applying labelSubst to this label.
      * @throws SemanticException
      */
+    @Override
     Label subst(LabelSubstitution labelSubst) throws SemanticException;
 
     /**
@@ -168,13 +167,13 @@ public interface Label extends Param {
      * is a subset of variables(), since it does not count var labels contained
      * in upper bounds of arg labels.
      */
-    Set variableComponents();
+    Set<Param> variableComponents();
     
     /**
      * The set of variables that this label contains including variables contained
      * in upper bounds of arg labels.
      */
-    Set variables();
+    Set<Param> variables();
 
     /**
      * Implementation of leq, should only be called by JifTypeSystem
@@ -186,6 +185,7 @@ public interface Label extends Param {
      */
     boolean leq_(Label L, LabelEnv H, LabelEnv.SearchState state);
 
+    @Override
     boolean isRuntimeRepresentable();
 
     ConfPolicy confProjection();
@@ -197,13 +197,13 @@ public interface Label extends Param {
      * the runtime evaluation of the label may produce. If the label cannot be
      * evaluated at runtime, an empty list should be returned.
      */
-    List throwTypes(TypeSystem ts);
+    List<Type> throwTypes(TypeSystem ts);
 
     Expr toJava(JifToJavaRewriter rw) throws SemanticException;
 
     String componentString();
 
-    String componentString(Set printedLabels);
+    String componentString(Set<Label> printedLabels);
 
-    String toString(Set printedLabels);    
+    String toString(Set<Label> printedLabels);    
 }

@@ -3,6 +3,8 @@ package jif.ast;
 import polyglot.ast.*;
 import java.util.*;
 
+import jif.types.Assertion;
+
 /** An immutable representation of the Jif constructor declaration.
  *  It extends the Java constructor declaration with the start label,
  *  the return label, and various constraints, including the authority
@@ -14,5 +16,5 @@ public interface JifConstructorDecl extends JifProcedureDecl, ConstructorDecl
     
     JifConstructorDecl returnLabel(LabelNode returnLabel);
 
-    JifConstructorDecl constraints(List constraints);
+    JifConstructorDecl constraints(List<ConstraintNode<Assertion>> constraints);
 }

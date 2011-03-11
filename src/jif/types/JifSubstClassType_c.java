@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import jif.types.label.ProviderLabel;
 import jif.types.label.ThisLabel;
 import jif.types.principal.Principal;
 import polyglot.ext.param.types.PClass;
@@ -29,18 +30,19 @@ public class JifSubstClassType_c extends SubstClassType_c
     ////////////////////////////////////////////////////////////////
     // Implement methods of JifSubstType
 
+    @Override
     public PClass instantiatedFrom() {
         return ((JifPolyType) base).instantiatedFrom();
     }
 
-    public List actuals() {
+    @Override
+    public List<Param> actuals() {
         JifPolyType pt = (JifPolyType) base;
         JifSubst subst = (JifSubst) this.subst;
 
-        List actuals = new ArrayList(pt.params().size());
+        List<Param> actuals = new ArrayList<Param>(pt.params().size());
 
-        for (Iterator i = pt.params().iterator(); i.hasNext(); ) {
-            ParamInstance pi = (ParamInstance) i.next();
+        for (ParamInstance pi : pt.params()) {
             Param p = subst.get(pi);
             actuals.add(p);
         }
@@ -51,28 +53,38 @@ public class JifSubstClassType_c extends SubstClassType_c
     ////////////////////////////////////////////////////////////////
     // Implement methods of JifClassType
 
-    public List authority() {
+    @Override
+    public JifTypeSystem typeSystem() {
+        return (JifTypeSystem) super.typeSystem();
+    }
+
+    @Override
+    public List<Principal> authority() {
         JifClassType base = (JifClassType) this.base;
         JifSubst subst = (JifSubst) this.subst;
         return subst.substPrincipalList(base.authority());
     }
 
-    public List constraints() {
+    @Override
+    public List<ActsForConstraint<ActsForParam, Principal>> constraints() {
         JifClassType base = (JifClassType) this.base;
         JifSubst subst = (JifSubst) this.subst;
         return subst.substConstraintList(base.constraints());
     }
 
-    public List constructorCallAuthority() {
+    @Override
+    public List<Principal> constructorCallAuthority() {
         JifClassType base = (JifClassType) this.base;        
         JifSubst subst = (JifSubst) this.subst;
         return subst.substPrincipalList(base.constructorCallAuthority());
     }
 
+    @Override
     public ThisLabel thisLabel() {
 	return ((JifTypeSystem)ts).thisLabel(this);
     }
 
+    @Override
     public String toString() {
         if (Report.should_report(Report.debug, 1)) {
             return super.toString();
@@ -83,8 +95,8 @@ public class JifSubstClassType_c extends SubstClassType_c
         String s = "";
 
         if (jpt.params() != null) {
-            for (Iterator i = jpt.params().iterator(); i.hasNext(); ) {
-                ParamInstance pi = (ParamInstance) i.next();
+            for (Iterator<ParamInstance> i = jpt.params().iterator(); i.hasNext(); ) {
+                ParamInstance pi = i.next();
                 s += subst.substitutions().get(pi);
 
                 if (i.hasNext()) {
@@ -101,9 +113,9 @@ public class JifSubstClassType_c extends SubstClassType_c
     }
 
 	@Override
-	public Principal provider() {
-		JifClassType jpt = (JifClassType) base;
-		return jpt.provider();
+	public ProviderLabel provider() {
+	    JifClassType jpt = (JifClassType) base;
+	    return jpt.provider();
 	}
 
 }

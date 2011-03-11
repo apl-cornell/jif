@@ -1,6 +1,5 @@
 package jif.extension;
 
-import java.util.Iterator;
 import java.util.List;
 
 import jif.ast.JifMethodDecl;
@@ -30,6 +29,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         JifMethodDecl mn = (JifMethodDecl) node();
@@ -55,7 +55,8 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         Label Li = checkEnforceSignature(mi, lc);
 
         // check formals
-        List formals = checkFormals(mn.formals(), mi, lc);
+        @SuppressWarnings("unchecked")
+        List<Formal> formals = checkFormals(mn.formals(), mi, lc);
 
         Block body = null;
         PathMap X;
@@ -117,12 +118,11 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 
         // check arguments
         JifTypeSystem ts = lc.jifTypeSystem();
-        Iterator types = mi.formalTypes().iterator();
 
         int index = 0;
-        while (types.hasNext()) {
-            Type tj = (Type) types.next();
-
+        @SuppressWarnings("unchecked")
+        List<Type> formalTypes = mi.formalTypes();
+        for (Type tj : formalTypes) {
             // This is the declared label of the parameter.
             Label argBj = ((ArgLabel)ts.labelOfType(tj)).upperBound();
             if (argBj.isCovariant()) {
@@ -143,10 +143,8 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         }
 
         // check label constraints
-        for (Iterator iter = mi.constraints().iterator(); iter.hasNext(); ) {
-            Assertion a = (Assertion)iter.next();
+        for (Assertion a : mi.constraints()) {
             if (a instanceof LabelLeAssertion) {
-                LabelLeAssertion lla = (LabelLeAssertion)a;
                 // no covariant labels can occur on the RHS of a constraint,
                 // as subtypes may violate this constraint.
                 // They may, however, occur on the LHS, since if a supertype
@@ -168,9 +166,9 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
      */
     protected void overrideMethodLabelCheck(LabelChecker lc, final JifMethodInstance mi) throws SemanticException {
         JifTypeSystem ts = lc.jifTypeSystem();
-        for (Iterator iter = mi.implemented().iterator(); iter.hasNext(); ) {
-            final JifMethodInstance mj = (JifMethodInstance) iter.next();
-
+        @SuppressWarnings("unchecked")
+        List<JifMethodInstance> implemented = mi.implemented();
+        for (final JifMethodInstance mj : implemented) {
             if (! ts.isAccessible(mj, lc.context())) {
                 continue;
             }            
@@ -187,6 +185,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         CovariantLabelChecker(Position errPosition) {
             this.errPosition = errPosition;
         }
+        @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ThisLabel) {
 //              throw new SemanticDetailedException("The \"this\" label " +

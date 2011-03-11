@@ -27,6 +27,7 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
     public JifMethodDeclDel() {
     }
     
+    @Override
     public Context enterScope(Context c) {
         JifMethodDecl jmd = (JifMethodDecl)this.node();
         JifMethodInstance mi = JifMethodDecl_c.unrenameArgs((JifMethodInstance)jmd.methodInstance()); 
@@ -39,6 +40,7 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
     /**
      * @see polyglot.ast.JL_c#typeCheck(polyglot.visit.TypeChecker)
      */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JifMethodDecl jmd = (JifMethodDecl)this.node();
         if (jmd.name().indexOf('$') >= 0) {
@@ -60,21 +62,22 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
             // ensure the signature of mi is either main(String[]) or
             // main(principal, String[])
             boolean wrongSig = true;
-            List formalTypes = mi.formalTypes();
+            @SuppressWarnings("unchecked")
+            List<Type> formalTypes = mi.formalTypes();
             
             String principalArgName = null;
             JifTypeSystem jts = (JifTypeSystem)tc.typeSystem();
             Type stringArrayType = jts.arrayOf(jts.String());
             if (formalTypes.size() == 1) {
-                Type formal0 = jts.unlabel((Type)formalTypes.get(0));
+                Type formal0 = jts.unlabel(formalTypes.get(0));
                 if (formal0.equals(stringArrayType)) {
                     // the main method signature is main(String[])
                     wrongSig = false;
                 }
             }
             else if (formalTypes.size() == 2) {
-                Type formal0 = jts.unlabel((Type)formalTypes.get(0));
-                Type formal1 = jts.unlabel((Type)formalTypes.get(1));
+                Type formal0 = jts.unlabel(formalTypes.get(0));
+                Type formal1 = jts.unlabel(formalTypes.get(1));
                 if (formal0.equals(jts.Principal()) && formal1.equals(stringArrayType)) {
                     // the main method signature is main(principal, String[])
                     wrongSig = false;
@@ -97,8 +100,8 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
             }
             
             // check that the method does not have any constraints that we do not check.
-            for (Iterator iter = mi.constraints().iterator(); iter.hasNext();) {
-                Assertion constraint = (Assertion)iter.next();
+            for (Iterator<Assertion> iter = mi.constraints().iterator(); iter.hasNext();) {
+                Assertion constraint = iter.next();
                 if (constraint instanceof ActsForConstraint || 
                         constraint instanceof LabelLeAssertion) {
                     // cannot have any actsfor or label le constraints
@@ -114,7 +117,7 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
                     CallerConstraint cc = (CallerConstraint)constraint;
                     boolean callerOK = false;                    
                     if (cc.principals().size() == 1) {
-                        Principal callerP = (Principal)cc.principals().get(0);
+                        Principal callerP = cc.principals().get(0);
                         // check that callerP is the same as the first arg.
                         if (callerP instanceof DynamicPrincipal) {
                             AccessPath ap = ((DynamicPrincipal)callerP).path();

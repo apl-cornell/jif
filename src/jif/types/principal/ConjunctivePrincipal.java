@@ -8,5 +8,5 @@ import java.util.Set;
  * The conjunctive principal A&B can act for A and it can act for B.
  */
 public interface ConjunctivePrincipal extends Principal {
-    Set conjuncts();
+    Set<Principal> conjuncts();
 }

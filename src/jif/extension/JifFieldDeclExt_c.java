@@ -4,12 +4,18 @@ import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.label.*;
+import jif.types.label.CovariantParamLabel;
+import jif.types.label.Label;
+import jif.types.label.ParamLabel;
+import jif.types.label.ThisLabel;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.ArrayInit;
+import polyglot.ast.Expr;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Node;
 import polyglot.types.ArrayType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -28,6 +34,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 
     /** Extracts the declared label of this field. 
      */
+    @Override
     public void labelCheckField(LabelChecker lc, JifClassType ct) throws SemanticException {
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
@@ -43,6 +50,9 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         }
 
         Label declaredLabel = ts.labelOfType(t);
+        NamedLabel namedDeclaredLabel =
+                new NamedLabel("declared label of field " + fi.name(),
+                        declaredLabel);
 
         // error messages for equality constraints aren't displayed, so no
         // need to define error messages.	
@@ -50,12 +60,9 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                                     "inferred label of field " + fi.name(), 
                                     L), 
                         LabelConstraint.EQUAL, 
-                        new NamedLabel("declared label of field " + fi.name(), 
-                                       declaredLabel),
+                        namedDeclaredLabel,
                        A.labelEnv(),
                        decl.position());
-
-
     }
 
     /** Label check field initializers. 
@@ -64,6 +71,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
      *  is always executed after invoking super constructor and before invoking
      *  the constructor of this class. (like the single path rule)
      */
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         FieldDecl decl = (FieldDecl) node();
 
@@ -181,17 +189,20 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                         A.labelEnv(),
                         init.position(),
                         new ConstraintMessage() {
+                @Override
                 public String msg() {
                     return "Label of field initializer not less " + 
                     "restrictive than the label for field " + 
                     fi.name();
                 }
+                @Override
                 public String detailMsg() { 
                     return "More information is revealed by the successful " +
                     "evaluation of the intializing expression " +
                     "than is allowed to flow to " +
                     "the field " + fi.name() + ".";
                 }
+                @Override
                 public String technicalMsg() {
                     return "Invalid assignment: NV of initializer is " +
                     "more restrictive than the declared label " +
@@ -224,6 +235,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         StaticFieldLabelChecker(Position declPosition) {
             this.declPosition = declPosition;
         }
+        @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ThisLabel) {
                 throw new SemanticException("The label of a static field " +
@@ -239,6 +251,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             return L;
         }
 
+        @Override
         public Principal substPrincipal(Principal p) throws SemanticException {
             if (p instanceof ParamPrincipal) {
                 throw new SemanticException("The label of a static field " +
@@ -258,12 +271,14 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         /* 
          * Don't check subst types, as the subtype checker will take care of those.
          */
+        @Override
         protected boolean recurseIntoSubstType(JifSubstType type) {
             return false;
         }
         /* 
          * Don't check const array types
          */
+        @Override
         protected boolean recurseIntoArrayType(ArrayType type) {
             if (type instanceof ConstArrayType) {
                 ConstArrayType cat = (ConstArrayType)type;
@@ -288,6 +303,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         InvarianceLabelChecker(Position declPosition) {
             this.declPosition = declPosition;
         }
+        @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ThisLabel) {
                 throw new SemanticDetailedException("The label of a non-final field, " +
