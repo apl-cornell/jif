@@ -3,9 +3,7 @@ package jif.ast;
 import java.util.List;
 
 import jif.types.JifTypeSystem;
-import jif.types.ParamInstance;
 import jif.types.principal.Principal;
-import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.types.SemanticException;
@@ -30,14 +28,20 @@ public class AmbJunctivePrincipalNode_c extends PrincipalNode_c implements AmbJu
         this.isConjunction = isConjunction;
     }
     
+    @Override
     public boolean isDisambiguated() {
         return false;
     }
     
+    @Override
     public String toString() {
         return left + (isConjunction?"&":",") + right;
     }
     
+    /**
+     * @throws SemanticException  
+     */
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (!left.isDisambiguated() || !right.isDisambiguated()) {
             ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
@@ -61,12 +65,12 @@ public class AmbJunctivePrincipalNode_c extends PrincipalNode_c implements AmbJu
     /**
      * Visit this term in evaluation order.
      */
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    public List<Term> acceptCFG(CFGBuilder v, List succs) {
         return succs;
     }
-    public Term firstChild() {
-        return null;
-    }
+    @Override
     public Node visitChildren(NodeVisitor v) {        
         PrincipalNode l = (PrincipalNode) visitChild(this.left, v);
         PrincipalNode r = (PrincipalNode) visitChild(this.right, v);

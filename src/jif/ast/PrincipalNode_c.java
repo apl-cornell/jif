@@ -6,6 +6,7 @@ import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
 import polyglot.ast.Expr_c;
 import polyglot.ast.Node;
+import polyglot.ast.Term;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
@@ -76,5 +77,10 @@ public abstract class PrincipalNode_c extends Expr_c implements PrincipalNode
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
         return type(ts.Principal());
+    }
+
+    @Override
+    public Term firstChild() {
+        return null;
     }
 }
