@@ -29,6 +29,7 @@ public class TypeSubstitutor {
         this.substitution = substitution;        
     }
 
+    @SuppressWarnings("unchecked")
     public Type rewriteType(Type t) throws SemanticException {
         if (t instanceof LabeledType && recurseIntoLabeledType((LabeledType)t)) {
             LabeledType lt = (LabeledType)t;
@@ -42,11 +43,14 @@ public class TypeSubstitutor {
         }
         else if (t instanceof JifSubstType && recurseIntoSubstType((JifSubstType)t)) {
             JifSubstType jst = (JifSubstType)t;
-            Map newMap = new LinkedHashMap();
+            Map<ParamInstance, Param> newMap =
+                    new LinkedHashMap<ParamInstance, Param>();
             boolean diff = false;
 
-            for (Iterator i = jst.entries(); i.hasNext();) {
-                Map.Entry e = (Map.Entry)i.next();
+            
+            for (Iterator<Map.Entry<ParamInstance, Param>> i = jst.entries(); i
+                    .hasNext();) {
+                Map.Entry<ParamInstance, Param> e = i.next();
                 Object arg = e.getValue();
                 Param p;
                 if (arg instanceof Label) {

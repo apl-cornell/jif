@@ -8,8 +8,8 @@ import jif.types.*;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
-import polyglot.types.ClassType;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 
 /**
@@ -197,7 +197,7 @@ public interface Label extends ActsForParam {
      * the runtime evaluation of the label may produce. If the label cannot be
      * evaluated at runtime, an empty list should be returned.
      */
-    List<ClassType> throwTypes(TypeSystem ts);
+    List<Type> throwTypes(TypeSystem ts);
 
     Expr toJava(JifToJavaRewriter rw) throws SemanticException;
 

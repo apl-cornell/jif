@@ -22,16 +22,15 @@ import polyglot.util.Transformation;
 
 public class JifSubst_c extends Subst_c implements JifSubst
 {
-    public JifSubst_c(JifTypeSystem ts, Map subst, Map cache) {
+    public JifSubst_c(JifTypeSystem ts, Map<ParamInstance, Param> subst,
+            Map<Type, Type> cache) {
         super(ts, subst, cache);
+    }
 
-        for (Iterator i = entries(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
-            if (e.getKey() instanceof ParamInstance && e.getValue() instanceof Param)
-                continue;
-            throw new InternalCompilerError("bad map: the keys must be UIDs, "+
-            "and the values must be Params: " + subst);
-        }
+    @SuppressWarnings("unchecked")
+    @Override
+    public Iterator<Map.Entry<ParamInstance, Param>> entries() {
+        return super.entries();
     }
 
     @Override
@@ -39,6 +38,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
         return (Param) subst.get(pi);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void put(ParamInstance pi, Param param) {
         subst.put(pi, param);
@@ -81,6 +81,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
                                        (JifClassType) t, this);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public MethodInstance substMethod(MethodInstance mi) {
         mi = super.substMethod(mi);
@@ -99,6 +100,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
         return mi;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ConstructorInstance substConstructor(ConstructorInstance ci) {
         ci = super.substConstructor(ci);
@@ -172,14 +174,18 @@ public class JifSubst_c extends Subst_c implements JifSubst
 	}
 	else if (constraint instanceof CallerConstraint) {
 	    CallerConstraint c = (CallerConstraint) constraint;
-	    List l = new CachingTransformingList(c.principals(),
-                                                 new PrincipalXform());
+            @SuppressWarnings("unchecked")
+            List<Principal> l =
+                    new CachingTransformingList(c.principals(),
+                            new PrincipalXform());
 	    return c.principals(l);
 	}
         else if (constraint instanceof AuthConstraint) {
             AuthConstraint c = (AuthConstraint) constraint;
-            List l = new CachingTransformingList(c.principals(),
-                                                 new PrincipalXform());
+            @SuppressWarnings("unchecked")
+            List<Principal> l =
+                    new CachingTransformingList(c.principals(),
+                            new PrincipalXform());
             return c.principals(l);
         }
         else if (constraint instanceof AutoEndorseConstraint) {
@@ -225,6 +231,9 @@ public class JifSubst_c extends Subst_c implements JifSubst
      *
      */
     protected class SubstLabelSubst extends LabelSubstitution implements Serializable {
+        /**
+         * @throws SemanticException  
+         */
         @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ParamLabel) {
@@ -238,6 +247,9 @@ public class JifSubst_c extends Subst_c implements JifSubst
             return L;
         }
 
+        /**
+         * @throws SemanticException  
+         */
         @Override
         public Principal substPrincipal(Principal p) throws SemanticException {
             if (p instanceof ParamPrincipal) {

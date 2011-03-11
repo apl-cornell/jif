@@ -724,7 +724,7 @@ public class JifTypeSystem_c
         return super.uncheckedInstantiate(pos, t, actuals);
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public Subst subst(Map substMap, Map cache) {
         return new JifSubst_c(this, substMap, cache);

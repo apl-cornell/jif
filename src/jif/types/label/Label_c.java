@@ -190,7 +190,7 @@ public abstract class Label_c extends Param_c implements Label {
     }
 
     @Override
-    public List<ClassType> throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts) {
         return Collections.emptyList();
     }
 
