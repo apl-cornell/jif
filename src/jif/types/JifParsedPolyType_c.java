@@ -28,13 +28,15 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
     
     PClass instantiatedFrom;
 
+    /**
+     * Used for deserializing types.
+     */
     protected JifParsedPolyType_c() {
 	super();
-	JifTypeSystem jts = (JifTypeSystem) this.ts;
 	this.params = new LinkedList<ParamInstance>();
 	this.authority = new LinkedList<Principal>();
 	this.constraints = new LinkedList<ActsForConstraint<ActsForParam, Principal>>();
-        this.provider = jts.providerLabel(position, this);
+        this.provider = null;
         this.instantiatedFrom = null;
     }
 
@@ -44,7 +46,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
         this.params = new LinkedList<ParamInstance>();
         this.authority = new LinkedList<Principal>();
         this.constraints = new LinkedList<ActsForConstraint<ActsForParam, Principal>>();
-        this.provider = ts.providerLabel(position, this);
+        this.provider = ts.providerLabel(this);
         this.instantiatedFrom = null;
     }
 

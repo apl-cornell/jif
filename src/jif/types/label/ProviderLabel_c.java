@@ -2,10 +2,12 @@ package jif.types.label;
 
 import java.util.Set;
 
+import jif.JifOptions;
 import jif.translate.LabelToJavaExpr;
 import jif.types.JifClassType;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
+import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.TypeObject;
 import polyglot.util.Position;
@@ -17,15 +19,30 @@ public class ProviderLabel_c extends Label_c implements ProviderLabel {
      */
     protected JifClassType classType;
     
-    public ProviderLabel_c(Position pos, JifClassType classType,
-            LabelToJavaExpr toJava) {
-        super(classType.typeSystem(), pos, toJava);
+    protected boolean isTrusted;
+    
+    public ProviderLabel_c(JifClassType classType, LabelToJavaExpr toJava) {
+        super(classType.typeSystem(), classType.position(), toJava);
         this.classType = classType;
+        this.isTrusted = ((JifOptions) Options.global).trustedProviders;
+    }
+    
+    @Override
+    public ProviderLabel position(Position pos) {
+        ProviderLabel_c copy = (ProviderLabel_c) copy();
+        copy.position = pos;
+        return copy;
     }
 
     @Override
     public JifClassType classType() {
         return classType;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        // TODO Auto-generated method stub
+        return super.clone();
     }
 
     @Override
@@ -45,9 +62,9 @@ public class ProviderLabel_c extends Label_c implements ProviderLabel {
 
     @Override
     public boolean leq_(Label L, LabelEnv H, SearchState state) {
-        // Only leq if equal to this parameter, which is checked before this
-        // method is called.
-        return false;
+        // If this provider is not trusted, then this <= L leq only if equal
+        // this == L, which is checked before this method is called.
+        return isTrusted;
     }
 
     @Override

@@ -41,9 +41,9 @@ public class JifOptions extends Options {
      public boolean explainErrors;
      
      /**
-      * Whether providers should be checked.
+      * Whether the providers of the sources being compiled are trusted.
       */
-     public boolean checkProviders;
+     public boolean trustedProviders;
 
      /**
       * The classpath for the Jif signatures of java.lang objects.
@@ -72,7 +72,7 @@ public class JifOptions extends Options {
         solveGlobally = false;
         explainErrors = false;
         nonRobustness = false;
-        checkProviders = true;
+        trustedProviders = false;
     }
 
     /**
@@ -123,9 +123,9 @@ public class JifOptions extends Options {
             Report.addTopic("debug", level);
             index++;
         }
-        else if (args[index].equals("-no-providers")) {
+        else if (args[index].equals("-trusted-providers")) {
             index++;
-            checkProviders = false;
+            trustedProviders = true;
         }
         else {
             int i = super.parseCommand(args, index, source);
@@ -149,7 +149,7 @@ public class JifOptions extends Options {
         usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");
         usageForFlag(out, "-addsigcp <path>", "additional path for Jif signatures; prepended to sigcp");
         usageForFlag(out, "-fail-on-exception", "fail on uncaught and undeclared runtime exceptions");
-        usageForFlag(out, "-no-providers", "disable provider checks");
+        usageForFlag(out, "-trusted-providers", "set the providers of the sources being compiled to be trusted");
     }
 
     public String constructSignatureClasspath() {        

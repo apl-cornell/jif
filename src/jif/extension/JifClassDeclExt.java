@@ -2,7 +2,6 @@ package jif.extension;
 
 import java.util.List;
 
-import jif.JifOptions;
 import jif.ast.JifClassDecl;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
@@ -12,7 +11,6 @@ import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.ClassBody;
 import polyglot.ast.Node;
-import polyglot.main.Options;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 
@@ -77,28 +75,24 @@ public class JifClassDeclExt extends Jif_c {
 	A = (JifContext) n.del().enterScope(A);
         lc = lc.context(A);
 
-        if (((JifOptions) Options.global).checkProviders) {
-            final ProviderLabel provider = ct.provider();
-            NamedLabel namedProvider =
-                    new NamedLabel(provider.toString(), "provider of "
-                            + provider.classType().fullName(), provider);
-            lc.constrain(namedProvider, authPrincipal, A.labelEnv(),
-                    n.position(), new ConstraintMessage() {
-                        @Override
-                        public String msg() {
-                            return provider + " must act for " + authPrincipal;
-                        }
+        final ProviderLabel provider = ct.provider();
+        NamedLabel namedProvider =
+                new NamedLabel(provider.toString(), "provider of "
+                        + provider.classType().fullName(), provider);
+        lc.constrain(namedProvider, authPrincipal, A.labelEnv(), n.position(),
+                new ConstraintMessage() {
+                    @Override
+                    public String msg() {
+                        return provider + " must act for " + authPrincipal;
+                    }
 
-                        @Override
-                        public String detailMsg() {
-                            return provider
-                                    + " is the provider of "
-                                    + ct
-                                    + " but does not have authority to act for "
-                                    + authPrincipal;
-                        }
-                    });
-        }
+                    @Override
+                    public String detailMsg() {
+                        return provider + " is the provider of " + ct
+                                + " but does not have authority to act for "
+                                + authPrincipal;
+                    }
+                });
 	                
         // label check class conformance
 	labelCheckClassConformance(ct,lc);

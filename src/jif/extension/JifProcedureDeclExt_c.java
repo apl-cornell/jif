@@ -5,7 +5,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import jif.JifOptions;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
@@ -16,7 +15,6 @@ import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Formal;
 import polyglot.ast.ProcedureDecl;
-import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.SemanticException;
@@ -95,8 +93,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
 
     protected void checkProviderAuthority(JifProcedureInstance mi,
             LabelChecker lc) throws SemanticException {
-        if (!((JifOptions) Options.global).checkProviders) return;
-        
         final JifContext A = lc.jifContext();
         final ProviderLabel provider = mi.provider();
         final NamedLabel namedProvider =
@@ -139,8 +135,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      */
     protected void checkBeginLabel(JifProcedureInstance jpi, LabelChecker lc)
             throws SemanticException {
-        if (!((JifOptions) Options.global).checkProviders) return;
-        
         JifContext context = lc.jifContext();
         final Label beginLabel = jpi.pcBound();
         final NamedLabel namedBeginLabel =

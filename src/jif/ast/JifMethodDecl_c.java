@@ -1,12 +1,13 @@
 package jif.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-import jif.JifOptions;
 import jif.types.*;
 import jif.types.label.*;
 import polyglot.ast.*;
-import polyglot.main.Options;
 import polyglot.types.Flags;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -166,14 +167,12 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         } 
         else {
             Li = n.startLabel().label();
-            if (((JifOptions) Options.global).checkProviders) {
-                // Automagically ensure that the begin label is at least as high
-                // as the provider label.  This ensures that code will be unable
-                // to affect data that the provider is not trusted to affect.
-                // It also ensures the behaviour of confidential code will not
-                // be leaked.
-                Li = jts.join(Li, jmi.provider());
-            }
+
+            // Automagically ensure that the begin label is at least as high as
+            // the provider label. This ensures that code will be unable to
+            // affect data that the provider is not trusted to affect. It also
+            // ensures the behaviour of confidential code will not be leaked.
+            Li = jts.join(Li, jmi.provider());
         }
         jmi.setPCBound(Li, isDefaultPCBound);
 

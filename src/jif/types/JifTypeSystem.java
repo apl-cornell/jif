@@ -143,6 +143,17 @@ public interface JifTypeSystem extends ParamTypeSystem
      *         ({⊥→⊥;⊤←⊤}).
      */
     Label bottomLabel(Position pos);
+
+    /**
+     * Constructs a label for the provider of the given class type. This is
+     * intended to be used only when initializing JifClassTypes. All other
+     * callers should use providerLabel(Position, JifClassType).
+     */
+    ProviderLabel providerLabel(JifClassType ct);
+    
+    /**
+     * @return a label representing the provider of the given class type.
+     */
     ProviderLabel providerLabel(Position position, JifClassType ct);
     
     /**
