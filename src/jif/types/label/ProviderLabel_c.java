@@ -40,6 +40,11 @@ public class ProviderLabel_c extends Label_c implements ProviderLabel {
     }
 
     @Override
+    public boolean isTrusted() {
+        return isTrusted;
+    }
+
+    @Override
     protected Object clone() throws CloneNotSupportedException {
         // TODO Auto-generated method stub
         return super.clone();
