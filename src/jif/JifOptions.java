@@ -72,7 +72,7 @@ public class JifOptions extends Options {
         solveGlobally = false;
         explainErrors = false;
         nonRobustness = false;
-        trustedProviders = false;
+        trustedProviders = true;
     }
 
     /**
@@ -127,6 +127,10 @@ public class JifOptions extends Options {
             index++;
             trustedProviders = true;
         }
+        else if (args[index].equals("-untrusted-providers")) {
+            index++;
+            trustedProviders = false;
+        }
         else {
             int i = super.parseCommand(args, index, source);
             return i;
@@ -149,7 +153,7 @@ public class JifOptions extends Options {
         usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");
         usageForFlag(out, "-addsigcp <path>", "additional path for Jif signatures; prepended to sigcp");
         usageForFlag(out, "-fail-on-exception", "fail on uncaught and undeclared runtime exceptions");
-        usageForFlag(out, "-trusted-providers", "set the providers of the sources being compiled to be trusted");
+        usageForFlag(out, "-trusted-providers", "set the providers of the sources being compiled to be trusted (use -untrusted-providers to disable)");
     }
 
     public String constructSignatureClasspath() {        

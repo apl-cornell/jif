@@ -341,7 +341,6 @@ sh ${jif} %CMD_LINE_ARGS%
             <arg value="sig-src" />
 	    <arg value="-classpath" />
 	    <arg value="${java.class.path}" />
-	    <arg value="-trusted-providers" />
             <srcfile />
             <fileset dir="${basedir}" includes="sig-src/**/Object.jif" />
             <mapper type="regexp" from="^sig-src(.*)\.jif" to="sig-classes\1\.class" />
@@ -361,7 +360,6 @@ sh ${jif} %CMD_LINE_ARGS%
             <arg value="sig-src" />
 	    <arg value="-classpath" />
 	    <arg value="${java.class.path}" />
-	    <arg value="-trusted-providers" />
             <srcfile />
             <fileset dir="${basedir}" includes="sig-src/**/*.jif" />
             <mapper type="regexp" from="^sig-src(.*)\.jif" to="sig-classes\1\.class" />
@@ -385,7 +383,6 @@ sh ${jif} %CMD_LINE_ARGS%
             <arg value="-sourcepath" />
             <arg value="lib-src" />
 	    <arg value="-e" />
-	    <arg value="-trusted-providers" />
 	    <arg value="-classpath" />
 	    <arg value="${java.class.path}" />
             <!--      
