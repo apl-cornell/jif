@@ -208,6 +208,17 @@ public class JifContext_c extends Context_c implements JifContext
         env.addActsFor(p1, p2);
     }
     @Override
+    public void addActsFor(ActsForParam actor, Principal granter) {
+        if (actor instanceof Label) {
+            addActsFor((Label) actor, granter);
+        } else if (actor instanceof Principal) {
+            addActsFor((Principal) actor, granter);
+        } else {
+            throw new InternalCompilerError("Unexpected ActsForParam type: "
+                    + actor.getClass());
+        }
+    }
+    @Override
     public void addEquiv(AccessPath p, AccessPath q) {
         //envModification(); XXX add the equivalence to the current environment.
 //        env.addEquiv(p, q);

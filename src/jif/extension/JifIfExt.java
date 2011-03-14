@@ -2,6 +2,7 @@ package jif.extension;
 
 import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
+import jif.types.ActsForParam;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.PathMap;
@@ -12,7 +13,6 @@ import polyglot.ast.*;
 import polyglot.types.SemanticException;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
-import polyglot.util.InternalCompilerError;
 
 /** The Jif extension of the <code>If</code> node. 
  * 
@@ -24,6 +24,7 @@ public class JifIfExt extends JifStmtExt_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         If is = (If) node();
 
@@ -116,8 +117,14 @@ public class JifIfExt extends JifStmtExt_c
         JifTypeSystem ts = lc.typeSystem();
         Binary.Operator op = b.operator();
 
-        if (op == JifBinaryDel.ACTSFOR) {            
-            Principal actor = JifUtil.exprToPrincipal(ts, b.left(), A);
+        if (op == JifBinaryDel.ACTSFOR) {
+            ActsForParam actor;
+            if (ts.isLabel(b.left().type())) {
+                actor = JifUtil.exprToLabel(ts, b.left(), A);
+            } else {
+                actor = JifUtil.exprToPrincipal(ts, b.left(), A);
+            }
+
             Principal granter = JifUtil.exprToPrincipal(ts, b.right(), A);
             if (warn) {
                 // give a warning.

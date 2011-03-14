@@ -32,8 +32,9 @@ public class LabelUtil
         private int callCount = 0;
         private int topCallCount = 0;
     }
-    private ThreadLocal statsPerThread = new ThreadLocal() {
-        protected Object initialValue() {
+    private ThreadLocal<Stats> statsPerThread = new ThreadLocal<Stats>() {
+        @Override
+        protected Stats initialValue() {
             return new Stats();
         }   
     };
@@ -59,7 +60,7 @@ public class LabelUtil
      */
     void enterTiming() {
         if (COUNT_TIME) {
-            Stats stats = (Stats)statsPerThread.get();
+            Stats stats = statsPerThread.get();
             stats.callCount++;
             if (stats.callStackCount++ == 0) {
                 stats.topCallCount++;
@@ -74,7 +75,7 @@ public class LabelUtil
      */
     void exitTiming() {
         if (COUNT_TIME) {
-            Stats stats = (Stats)statsPerThread.get();
+            Stats stats = statsPerThread.get();
             if ((--stats.callStackCount) == 0) {
                 stats.totalTime += (System.currentTimeMillis() - stats.enterStartTime);
             }
@@ -89,7 +90,7 @@ public class LabelUtil
     public long getAndClearTime() {
         long r = -1;
         if (COUNT_TIME) {
-            Stats stats = (Stats)statsPerThread.get();
+            Stats stats = statsPerThread.get();
             r = stats.totalTime;
             stats.totalTime = 0;
         }
@@ -105,7 +106,7 @@ public class LabelUtil
     public int getAndClearCount() {
         int r = -1;
         if (COUNT_TIME) {
-            Stats stats = (Stats)statsPerThread.get();
+            Stats stats = statsPerThread.get();
             r = stats.callCount;
             stats.callCount = 0;
         }
@@ -115,7 +116,7 @@ public class LabelUtil
     public int getAndClearTopCount() {
         int r = -1;
         if (COUNT_TIME) {
-            Stats stats = (Stats)statsPerThread.get();
+            Stats stats = statsPerThread.get();
             r = stats.topCallCount;
             stats.topCallCount = 0;
         }
@@ -170,6 +171,7 @@ public class LabelUtil
     /**
      * See the Jif signature for the explanation of lbl.
      */
+    @SuppressWarnings("unchecked")
     public ConfPolicy readerPolicy(Label lbl, Principal owner, Principal[] readers) {
         try {
             enterTiming();
@@ -181,6 +183,7 @@ public class LabelUtil
         }
     }
     
+    @SuppressWarnings("unchecked")
     public ConfPolicy readerPolicy(Principal owner, PrincipalSet writers) {
         try {
             enterTiming();
@@ -214,6 +217,7 @@ public class LabelUtil
     /**
      * See the Jif signature for the explanation of lbl.
      */
+    @SuppressWarnings("unchecked")
     public Label readerPolicyLabel(Label lbl, Principal owner, Principal[] readers) {
         try {
             enterTiming();
@@ -225,6 +229,7 @@ public class LabelUtil
         }
     }
     
+    @SuppressWarnings("unchecked")
     public Label readerPolicyLabel(Principal owner, PrincipalSet readers) {
         try {
             enterTiming();
@@ -274,6 +279,7 @@ public class LabelUtil
     /**
      * See the Jif signature for the explanation of lbl.
      */
+    @SuppressWarnings("unchecked")
     public Label writerPolicyLabel(Label lbl, Principal owner, Principal[] writers) {
         try {
             enterTiming();
@@ -288,6 +294,7 @@ public class LabelUtil
     /**
      * See the Jif signature for the explanation of lbl.
      */
+    @SuppressWarnings("unchecked")
     public IntegPolicy writerPolicy(Label lbl, Principal owner, Principal[] writers) {
         try {
             enterTiming();
@@ -299,6 +306,7 @@ public class LabelUtil
         }
     }
     
+    @SuppressWarnings("unchecked")
     public IntegPolicy writerPolicy(Principal owner, PrincipalSet writers) {
         try {
             enterTiming();
@@ -354,14 +362,14 @@ public class LabelUtil
                 if (result == null) {
                     PairLabel pl1 = (PairLabel)l1;
                     PairLabel pl2 = (PairLabel)l2;
-                    Set dependencies = new HashSet();
+                    Set<DelegationPair> dependencies =
+                            new HashSet<DelegationPair>();
                     result = new PairLabel(this, pl1.confPolicy().join(pl2.confPolicy(), dependencies),
                                            pl1.integPolicy().join(pl2.integPolicy(), dependencies));
                     if (USE_CACHING) {
                         // add dependencies from delegations to the cache result
                         // i.e., what dependencies does this result rely on?
-                        for (Iterator iter = dependencies.iterator(); iter.hasNext();) {
-                            DelegationPair del = (DelegationPair)iter.next();
+                        for (DelegationPair del : dependencies) {
                             Set<Pair> deps = cacheLabelJoinDependencies.get(del);
                             if (deps == null) {
                                 deps = new HashSet<Pair>();
@@ -406,14 +414,14 @@ public class LabelUtil
                 if (result == null) {
                     PairLabel pl1 = (PairLabel)l1;
                     PairLabel pl2 = (PairLabel)l2;
-                    Set dependencies = new HashSet();
+                    Set<DelegationPair> dependencies =
+                            new HashSet<DelegationPair>();
                     result = new PairLabel(this, pl1.confPolicy().meet(pl2.confPolicy(), dependencies),
                                            pl1.integPolicy().meet(pl2.integPolicy(), dependencies));
                     if (USE_CACHING) {
                         // add dependencies from delegations to the cache result
                         // i.e., what dependencies does this result rely on?
-                        for (Iterator iter = dependencies.iterator(); iter.hasNext();) {
-                            DelegationPair del = (DelegationPair)iter.next();
+                        for (DelegationPair del : dependencies) {
                             Set<Pair> deps = cacheLabelMeetDependencies.get(del);
                             if (deps == null) {
                                 deps = new HashSet<Pair>();
@@ -443,6 +451,7 @@ public class LabelUtil
             exitTiming();
         }
     }
+    @SuppressWarnings("unchecked")
     protected ConfPolicy join(ConfPolicy p1, ConfPolicy p2, Set<DelegationPair> s) {        
         try {
             enterTiming();
@@ -480,6 +489,7 @@ public class LabelUtil
             exitTiming();
         }        
     }
+    @SuppressWarnings("unchecked")
     IntegPolicy join(IntegPolicy p1, IntegPolicy p2, Set<DelegationPair> s) {        
         try {
             enterTiming();
@@ -517,6 +527,7 @@ public class LabelUtil
             exitTiming();
         }
     }
+    @SuppressWarnings("unchecked")
     protected ConfPolicy meet(ConfPolicy p1, ConfPolicy p2, Set<DelegationPair> s) {        
         try {
             enterTiming();
@@ -553,7 +564,8 @@ public class LabelUtil
             exitTiming();
         }
     }
-     IntegPolicy meet(IntegPolicy p1, IntegPolicy p2, Set<DelegationPair> s) {        
+     @SuppressWarnings("unchecked")
+    IntegPolicy meet(IntegPolicy p1, IntegPolicy p2, Set<DelegationPair> s) {        
         try {
             enterTiming();
             Set<Policy> comps = new LinkedHashSet<Policy>();
@@ -626,7 +638,7 @@ public class LabelUtil
                 if (cacheTrueLabelRelabels.containsKey(pair)) return true;
                 if (cacheFalseLabelRelabels.containsKey(pair)) return false;
             }
-            Set dependencies = new HashSet();
+            Set<DelegationPair> dependencies = new HashSet<DelegationPair>();
             boolean result = from != null && from.relabelsTo(to, dependencies);
             if (USE_CACHING) {
                 if (!result) {
@@ -636,8 +648,7 @@ public class LabelUtil
                     cacheTrueLabelRelabels.put(pair, pair);
                     // add dependencies from delegations to the cache result
                     // i.e., what dependencies does this result rely on?
-                    for (Iterator iter = dependencies.iterator(); iter.hasNext();) {
-                        DelegationPair del = (DelegationPair)iter.next();
+                    for (DelegationPair del : dependencies) {
                         Set<Pair> deps = cacheTrueLabelRelabelsDependencies.get(del);
                         if (deps == null) {
                             deps = new HashSet<Pair>();
@@ -650,6 +661,25 @@ public class LabelUtil
             return result;            
         }
         finally {
+            exitTiming();
+        }
+    }
+    
+    public boolean acts_for(Label actor, Principal granter) {
+        try {
+            enterTiming();
+            return actsFor(actor, granter);
+        } finally {
+            exitTiming();
+        }
+    }
+    
+    public boolean actsFor(Label actor, Principal granter) {
+        try {
+            enterTiming();
+            Label L = toLabel(TOP_CONF, writerPolicy(granter, granter));
+            return relabelsTo(actor, L);
+        } finally {
             exitTiming();
         }
     }
@@ -795,9 +825,11 @@ public class LabelUtil
             this.left = left;
             this.right = right;
         }
+        @Override
         public int hashCode() {
             return left.hashCode() ^ right.hashCode();
         }
+        @Override
         public boolean equals(Object o) {
             if (o instanceof Pair) {
                 Pair that = (Pair)o;
@@ -806,6 +838,7 @@ public class LabelUtil
             }
             return false;
         }
+        @Override
         public String toString() {
             return left + "-" + right;
         }

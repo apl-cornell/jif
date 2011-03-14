@@ -204,4 +204,6 @@ public interface JifContext extends Context {
 
     ProviderLabel provider();
     void setProvider(ProviderLabel provider);
+
+    void addActsFor(ActsForParam actor, Principal granter);
 }

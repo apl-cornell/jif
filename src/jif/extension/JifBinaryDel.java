@@ -1,6 +1,9 @@
 package jif.extension;
 
-import jif.ast.*;
+import jif.ast.JifNodeFactory;
+import jif.ast.JifUtil;
+import jif.ast.LabelExpr;
+import jif.ast.PrincipalExpr;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.SemanticDetailedException;
@@ -9,7 +12,6 @@ import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.ast.Binary.Operator;
 import polyglot.types.SemanticException;
-import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeChecker;
 
 public class JifBinaryDel extends JifJL_c
@@ -19,18 +21,21 @@ public class JifBinaryDel extends JifJL_c
 
     public JifBinaryDel() { }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Binary b = (Binary)node();
+        JifNodeFactory nf = (JifNodeFactory)tc.nodeFactory();
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-        if ((b.operator() == Binary.LE || b.operator() == EQUIV) && 
-                (ts.isLabel(b.left().type()) || ts.isLabel(b.right().type()))) {
-            if (!(ts.isLabel(b.left().type()) && ts.isLabel(b.right().type()))) {
+        boolean leftLabel = ts.isLabel(b.left().type());
+        boolean rightLabel = ts.isLabel(b.right().type());
+        if ((b.operator() == Binary.LE || b.operator() == EQUIV)
+                && (leftLabel || rightLabel)) {
+            if (!(leftLabel && rightLabel)) {
                 throw new SemanticException("The operator " + b.operator() + " requires both operands to be labels.", b.position());
             }
 
             // we have a label comparison
             // make sure that both left and right are LabelExprs.
-            JifNodeFactory nf = (JifNodeFactory)tc.nodeFactory();
             LabelExpr lhs;
             if (b.left() instanceof LabelExpr) {
                 lhs = (LabelExpr)b.left();
@@ -64,11 +69,51 @@ public class JifBinaryDel extends JifJL_c
         
         boolean leftPrinc = ts.isImplicitCastValid(b.left().type(), ts.Principal());
         boolean rightPrinc = ts.isImplicitCastValid(b.right().type(), ts.Principal());
-        if (b.operator() == ACTSFOR || (b.operator() == EQUIV && (leftPrinc || rightPrinc))) {
+        if (b.operator() == ACTSFOR) {
+            if (!leftPrinc && !leftLabel) {
+                throw new SemanticException("The left-hand side of the "
+                        + b.operator() + " must be a label or a principal.", b.left()
+                        .position());
+            }
+            
+            if (!rightPrinc) {
+                throw new SemanticException("The right-hand side of the "
+                        + b.operator() + " must be a principal.", b.right()
+                        .position());
+            }
+            
+            // We have an actsfor comparison.
+            Expr lhs = b.left();
+            if (leftPrinc) {
+                // Make sure the left side is a principal.
+                checkPrincipalExpr(tc, lhs);
+            } else {
+                // Make sure the left side is a LabelExpr.
+                if (!(lhs instanceof LabelExpr)) {
+                    if (!JifUtil.isFinalAccessExprOrConst(ts, lhs)) {
+                        throw new SemanticException(
+                                "An expression used in a label test must be "
+                                        + "either a final access path or a "
+                                        + "\"new label\"", lhs.position());
+                    }
+                    
+                    lhs =
+                            nf.LabelExpr(lhs.position(), JifUtil.exprToLabel(
+                                    ts, lhs, (JifContext) tc.context()));
+                }
+            }
+            
+            // Make sure the right side is a principal.
+            checkPrincipalExpr(tc, b.right());
+            return b.left(lhs).type(ts.Boolean());
+        }
+        
+        if (b.operator() == EQUIV && (leftPrinc || rightPrinc)) {
             if (!(leftPrinc && rightPrinc)) {
                 throw new SemanticException("The operator " + b.operator() + " requires both operands to be principals.", b.position());
             }
-            // we have an actsfor comparison
+            
+            // we have a principal equality test
             // make sure that both left and right are principals.
             checkPrincipalExpr(tc, b.left());
             checkPrincipalExpr(tc, b.right());
