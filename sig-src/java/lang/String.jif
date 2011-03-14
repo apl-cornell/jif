@@ -34,6 +34,7 @@ public final class String implements java.io.Serializable, CharSequence /*,  Com
 				         int toffset,
 			               String other, int ooffset, int len)
                     throws (NullPointerException{other});
+    public native boolean{this; regex}  matches(String regex); 
     public native boolean{this; prefix; toffset} startsWith(String prefix, int toffset);
     public native boolean{this; prefix} startsWith(String prefix);
     public native boolean{this; suffix} endsWith(String suffix);
