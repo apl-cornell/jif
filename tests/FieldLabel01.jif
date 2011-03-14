@@ -1,0 +1,12 @@
+class FieldLabel01 {
+	public final label{Alice←} lbl = new label {Alice→;Alice←};
+	
+	public static void main{Alice→;Alice←}(String[] args) {
+		final FieldLabel01 fl01 = new FieldLabel01();
+		fl01.foo();
+	}
+	
+	public void foo{*lbl}() {
+		// stuff
+	}
+}
