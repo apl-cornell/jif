@@ -40,14 +40,25 @@ public class ProviderLabel_c extends Label_c implements ProviderLabel {
     }
 
     @Override
-    public boolean isTrusted() {
+    public ConfPolicy confProjection() {
+        if (!isTrusted) return super.confProjection();
+        return typeSystem().bottomConfPolicy(position);
+    }
+
+    @Override
+    public IntegPolicy integProjection() {
+        if (!isTrusted) return super.integProjection();
+        return typeSystem().bottomIntegPolicy(position);
+    }
+
+    @Override
+    public boolean isBottom() {
         return isTrusted;
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        // TODO Auto-generated method stub
-        return super.clone();
+    public boolean isTrusted() {
+        return isTrusted;
     }
 
     @Override
