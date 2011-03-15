@@ -156,15 +156,20 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                     Label dl = ts.dynamicLabel(fi.position(), JifUtil.varInstanceToAccessPath(fi, fi.position()));                
                     Label rhs_label = JifUtil.exprToLabel(ts, init, A);
                     A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
+                    // store the initialization expression for use in static methods
+                    lc.inits.add(decl);
+                    
                 }
                 else if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
                     DynamicPrincipal dp = ts.dynamicPrincipal(fi.position(), JifUtil.varInstanceToAccessPath(fi, fi.position()));                
                     Principal rhs_principal = JifUtil.exprToPrincipal(ts, init, A);
                     A.addDefinitionalEquiv(dp, rhs_principal);                    
+                    // store the initialization expression for use in static methods
+                    lc.inits.add(decl);
                 }
             }                            
 
-            LabelChecker lcInit = lc.context(A); 
+            LabelChecker lcInit = lc.context(A);
             init = (Expr) lcInit.labelCheck(decl.init());
 
             

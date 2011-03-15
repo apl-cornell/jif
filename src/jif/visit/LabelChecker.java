@@ -1,5 +1,6 @@
 package jif.visit;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import jif.ast.JifClassDecl;
@@ -11,6 +12,7 @@ import jif.types.hierarchy.LabelEnv;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.Expr;
+import polyglot.ast.FieldDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Receiver;
@@ -44,6 +46,11 @@ public class LabelChecker implements Copy
     final protected JifTypeSystem ts;
     final protected Job job;    
     final protected NodeFactory nf;
+
+    // inits keeps track of any final label/principal field initializers
+    // will be used in static methods for local variables with the current class' type
+    public List<FieldDecl> inits;
+
 
     /**
      * If true, then a new system of constraints will be used for each 
@@ -81,6 +88,7 @@ public class LabelChecker implements Copy
         if (!solvePerClassBody && !solvePerMethod) {
             this.solver = this.ts.createSolver("Job solver: " + job.toString());
         }
+        this.inits = new LinkedList<FieldDecl>();
     }
 
     @Override

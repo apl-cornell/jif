@@ -1,8 +1,12 @@
 package jif.extension;
 
+import java.util.Iterator;
+
 import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.*;
+import jif.types.label.AccessPathField;
+import jif.types.label.AccessPathLocal;
 import jif.types.label.Label;
 import jif.types.label.VarLabel;
 import jif.types.principal.DynamicPrincipal;
@@ -10,10 +14,14 @@ import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.ArrayInit;
 import polyglot.ast.Expr;
+import polyglot.ast.FieldDecl;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
+import polyglot.types.FieldInstance;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.Position;
 
 /** The Jif extension of the <code>LocalDecl</code> node. 
  * 
@@ -58,6 +66,35 @@ public class JifLocalDeclExt extends JifStmtExt_c
                 lc.context().addEquiv(JifUtil.varInstanceToAccessPath(li, li.position()),
                                       JifUtil.exprToAccessPath(decl.init(), li.type(), lc.context()));
 
+            }
+        }
+        
+        // add another special case: "final C c = ..." where C is the current class
+        // TODO: in general, we could search for all available final access paths to labels/principals 
+        // but that might require more detailed type info or a whole program analysis
+        if (li.flags().isFinal()) {
+            ReferenceType rt = li.type().toReference();
+            if (rt != null && ts.equals(rt, A.currentClass())) {
+                // go through members of C and check for final fields
+                for (FieldDecl fd : lc.inits) {
+                    FieldInstance fi = fd.fieldInstance();
+                    if (fi.flags().isFinal() && JifUtil.isFinalAccessExprOrConst(ts, fd.init())) {
+                        if (ts.isLabel(fi.type())) {
+                            AccessPathLocal apl = (AccessPathLocal) JifUtil.varInstanceToAccessPath(li, li.position());
+                            AccessPathField apf = new AccessPathField(apl, fi, fi.name(), fi.position());
+                            Label dl = ts.dynamicLabel(fd.position(), apf);                
+                            Label rhs_label = JifUtil.exprToLabel(ts, fd.init(), lc.context());
+                            lc.context().addDefinitionalAssertionEquiv(dl, rhs_label);                            
+                        }
+                        if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
+                            AccessPathLocal apl = (AccessPathLocal) JifUtil.varInstanceToAccessPath(li, li.position());
+                            AccessPathField apf = new AccessPathField(apl, fi, fi.name(), fi.position());
+                            DynamicPrincipal dp = ts.dynamicPrincipal(fd.position(), apf);                
+                            Principal rhs_principal = JifUtil.exprToPrincipal(ts, fd.init(), lc.context());
+                            lc.context().addDefinitionalEquiv(dp, rhs_principal);                            
+                        }
+                    }
+                }
             }
         }
 
