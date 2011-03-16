@@ -47,7 +47,7 @@ public class MeetLabelNode_c extends AmbLabelNode_c implements MeetLabelNode
     protected MeetLabelNode_c reconstruct(List<LabelComponentNode> components) {
         if (! CollectionUtil.equals(components, this.components)) {
             MeetLabelNode_c n = (MeetLabelNode_c) copy();
-            this.components =
+            n.components =
                 Collections.unmodifiableList(new ArrayList<LabelComponentNode>(
                         components));
             return n;
