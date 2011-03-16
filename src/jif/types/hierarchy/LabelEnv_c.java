@@ -2,7 +2,6 @@ package jif.types.hierarchy;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.Map.Entry;
 
 import jif.Topics;
 import jif.types.*;
@@ -23,7 +22,7 @@ import polyglot.util.Position;
 public class LabelEnv_c implements LabelEnv
 {
     protected final PrincipalHierarchy ph;
-    protected final List<LabelLeAssertion_c> labelAssertions; // a list of LabelLeAssertions
+    protected final List<LabelLeAssertion> labelAssertions; // a list of LabelLeAssertions
     protected final StringBuffer displayLabelAssertions; 
     protected final JifTypeSystem ts;
 
@@ -45,12 +44,19 @@ public class LabelEnv_c implements LabelEnv
     /**
      * Topics to report
      */
-    protected static Collection topics = CollectionUtil.list(Topics.jif, Topics.labelEnv);
+    @SuppressWarnings("unchecked")
+    protected static Collection<String> topics = CollectionUtil.list(Topics.jif, Topics.labelEnv);
 
     public LabelEnv_c(JifTypeSystem ts, boolean useCache) {
-        this(ts, new PrincipalHierarchy(), new LinkedList(), "", false, useCache, new LinkedHashMap(), null);
+        this(ts, new PrincipalHierarchy(), new LinkedList<LabelLeAssertion>(),
+                "", false, useCache,
+                new LinkedHashMap<AccessPath, AccessPath>(), null);
     }
-    protected LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph, List<LabelLeAssertion_c> assertions, String displayLabelAssertions, boolean hasVariables, boolean useCache, Map<AccessPath, AccessPath> accessPathEquivReps, LabelEnv_c parent) {
+
+    protected LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph,
+            List<LabelLeAssertion> assertions, String displayLabelAssertions,
+            boolean hasVariables, boolean useCache,
+            Map<AccessPath, AccessPath> accessPathEquivReps, LabelEnv_c parent) {
         this.ph = ph;
         this.labelAssertions = assertions;
         this.accessPathEquivReps = accessPathEquivReps;
@@ -62,9 +68,10 @@ public class LabelEnv_c implements LabelEnv
         this.useCache = useCache;
         this.parent = parent;
         this.cacheTrue = new HashSet<LeqGoal>();
-        this.cacheFalse = new HashSet();        
+        this.cacheFalse = new HashSet<LeqGoal>();        
     }
     
+    @Override
     public void setSolver(Solver s) {
         if (this.solver == null) {
             this.solver = s;
@@ -78,6 +85,7 @@ public class LabelEnv_c implements LabelEnv
         return ph;
     }
     
+    @Override
     public boolean hasVariables() {
         return this.hasVariables;
     }
@@ -121,7 +129,7 @@ public class LabelEnv_c implements LabelEnv
             // need to add it regardless.
             if (L1.hasVariables() || L2.hasVariables() || 
                     !(this.leq(L1, L2, freshSearchState()))) {
-                labelAssertions.add(new LabelLeAssertion_c(ts, L1, L2, Position.compilerGenerated()));
+                labelAssertions.add(ts.labelLeAssertion(Position.compilerGenerated(), L1, L2));
                 added = true;
                 if (!this.hasVariables && (L1.hasVariables() || L2.hasVariables())) {
                     // at least one assertion in this label env has a variable.
@@ -149,12 +157,13 @@ public class LabelEnv_c implements LabelEnv
     }
     
     public LabelEnv_c copy() {
-        return new LabelEnv_c(ts, ph.copy(), new LinkedList<LabelLeAssertion_c>(labelAssertions), 
+        return new LabelEnv_c(ts, ph.copy(), new LinkedList<LabelLeAssertion>(labelAssertions), 
                               displayLabelAssertions.toString(), 
                               hasVariables, useCache, 
                               new LinkedHashMap<AccessPath, AccessPath>(this.accessPathEquivReps), this);
     }
     
+    @Override
     public boolean actsFor(Principal p, Principal q) {
         // try converting the principals to dynamic principals and trying again
         AccessPath pathp = null;
@@ -177,6 +186,7 @@ public class LabelEnv_c implements LabelEnv
         return (ph.actsFor(p, q));        
     }
     
+    @Override
     public boolean leq(Label L1, Label L2) { 
         if (Report.should_report(topics, 1))
             Report.report(1, "Testing " + L1 + " <= " + L2);
@@ -185,6 +195,7 @@ public class LabelEnv_c implements LabelEnv
                    new SearchState_c(new AssertionUseCount()));
     }
     
+    @Override
     public boolean equivalentAccessPaths(AccessPath p, AccessPath q) {
         if (p == q) return true;
         if (findAccessPathRepr(p).equals(findAccessPathRepr(q))) {
@@ -244,7 +255,7 @@ public class LabelEnv_c implements LabelEnv
      * the results. 
      */
     private final Set<LeqGoal> cacheTrue;
-    private final Set cacheFalse;
+    private final Set<LeqGoal> cacheFalse;
     
     protected final boolean useCache;
     
@@ -275,9 +286,11 @@ public class LabelEnv_c implements LabelEnv
             else
                 this.hash = lhash ^ rhash;
         }
+        @Override
         public int hashCode() {
             return hash;
         }
+        @Override
         public boolean equals(Object o) {
             if (o instanceof LeqGoal) {
                 LeqGoal that = (LeqGoal)o;
@@ -287,6 +300,7 @@ public class LabelEnv_c implements LabelEnv
             }
             return false;
         }
+        @Override
         public String toString() {
             return lhs + "<=" + rhs;
         }
@@ -295,6 +309,7 @@ public class LabelEnv_c implements LabelEnv
     /** 
      * Recursive implementation of L1 <= L2.
      */
+    @Override
     public boolean leq(Label L1, Label L2, SearchState state) {
         if (!useCache || 
                 !((SearchState_c)state).useAssertions || 
@@ -474,7 +489,7 @@ public class LabelEnv_c implements LabelEnv
         }
         
         // try to use assertions
-        return leqApplyAssertions(L1, L2, (SearchState_c)state, true);
+        return leqApplyAssertions(L1, L2, state, true);
         
     }
     
@@ -511,8 +526,9 @@ public class LabelEnv_c implements LabelEnv
             JoinConfPolicy_c jcp = (JoinConfPolicy_c)cp;
             IntegPolicy bottomInteg = ts.bottomIntegPolicy(pos);
 
-            for (Iterator iter = jcp.joinComponents().iterator(); iter.hasNext();) {
-                ConfPolicy joinComponent = (ConfPolicy)iter.next();
+            @SuppressWarnings("unchecked")
+            Collection<ConfPolicy> joinComponents = jcp.joinComponents();
+            for (ConfPolicy joinComponent : joinComponents) {
                 if (!leq(ts.pairLabel(pos, joinComponent, bottomInteg), L2)) {
                     return false;
                 }
@@ -529,8 +545,9 @@ public class LabelEnv_c implements LabelEnv
             // break ip down and try to satisfy each one individually
             JoinIntegPolicy_c jip = (JoinIntegPolicy_c)ip;
             ConfPolicy bottomConf = ts.bottomConfPolicy(pos);
-            for (Iterator iter = jip.joinComponents().iterator(); iter.hasNext();) {
-                IntegPolicy joinComponent = (IntegPolicy)iter.next();
+            @SuppressWarnings("unchecked")
+            Collection<IntegPolicy> joinComponents = jip.joinComponents();
+            for (IntegPolicy joinComponent : joinComponents) {
                 if (!leq(ts.pairLabel(pos, bottomConf, joinComponent), L2)) {
                     return false;
                 }
@@ -577,7 +594,7 @@ public class LabelEnv_c implements LabelEnv
         if (Report.should_report(topics, 2))
             Report.report(2, "Applying assertions for " + L1 + " <= " + L2);
 
-        for (Iterator<LabelLeAssertion_c> i = labelAssertions.iterator(); i.hasNext();) { 
+        for (Iterator<LabelLeAssertion> i = labelAssertions.iterator(); i.hasNext();) { 
             LabelLeAssertion c = i.next();
 
             if (auc.get(c) >= ASSERTION_USE_BOUND) {
@@ -675,9 +692,11 @@ public class LabelEnv_c implements LabelEnv
     }
     
     
+    @Override
     public boolean leq(Policy p1, Policy p2) {
         return leq(p1.simplify(), p2.simplify(), new SearchState_c(new AssertionUseCount()));
     }
+    @Override
     public boolean leq(Policy p1, Policy p2, SearchState state_) {
         // check the current goals
         SearchState_c state = (SearchState_c)state_;
@@ -706,9 +725,9 @@ public class LabelEnv_c implements LabelEnv
         if (p2 instanceof JoinPolicy_c) {
             // we need to find one element ci of p2 such that p1 <= ci
             JoinPolicy_c jp = (JoinPolicy_c)p2;
-            for (Iterator i = jp.joinComponents().iterator(); i.hasNext(); ) {
-                ConfPolicy ci = (ConfPolicy) i.next();
-                
+            @SuppressWarnings("unchecked")
+            Collection<ConfPolicy> joinComponents = jp.joinComponents();
+            for (ConfPolicy ci : joinComponents) {
                 if (leq(p1, ci, state)) {
                     return true;
                 }
@@ -718,8 +737,9 @@ public class LabelEnv_c implements LabelEnv
             // for all elements ci of p2 we require p1 <= ci             
             MeetPolicy_c mp = (MeetPolicy_c)p2;
             boolean allSat = true;
-            for (Iterator i = mp.meetComponents().iterator(); i.hasNext(); ) {
-                ConfPolicy ci = (ConfPolicy) i.next();                
+            @SuppressWarnings("unchecked")
+            Collection<ConfPolicy> meetComponents = mp.meetComponents();
+            for (ConfPolicy ci : meetComponents) {
                 if (!leq(p1, ci, state)) {
                     allSat = false;
                     break;
@@ -743,9 +763,9 @@ public class LabelEnv_c implements LabelEnv
         if (p2 instanceof JoinPolicy_c) {
             // we need to find one element ci of p2 such that p1 <= ci
             JoinPolicy_c jp = (JoinPolicy_c)p2;
-            for (Iterator i = jp.joinComponents().iterator(); i.hasNext(); ) {
-                IntegPolicy ci = (IntegPolicy) i.next();
-                
+            @SuppressWarnings("unchecked")
+            Collection<IntegPolicy> joinComponents = jp.joinComponents();
+            for (IntegPolicy ci : joinComponents) {
                 if (leq(p1, ci, state)) {
                     return true;
                 }
@@ -755,8 +775,9 @@ public class LabelEnv_c implements LabelEnv
             // for all elements ci of p2 we require p1 <= ci
             MeetPolicy_c mp = (MeetPolicy_c)p2;
             boolean allSat = true;
-            for (Iterator i = mp.meetComponents().iterator(); i.hasNext(); ) {
-                IntegPolicy ci = (IntegPolicy) i.next();                
+            @SuppressWarnings("unchecked")
+            Collection<IntegPolicy> meetComponents = mp.meetComponents();
+            for (IntegPolicy ci : meetComponents) {
                 if (!leq(p1, ci, state)) {
                     allSat = false;
                     break;
@@ -770,6 +791,7 @@ public class LabelEnv_c implements LabelEnv
     /**
      * Is this enviornment empty, or does is contain some constraints?
      */
+    @Override
     public boolean isEmpty() {
         return labelAssertions.isEmpty() && ph.isEmpty();
     }
@@ -779,6 +801,8 @@ public class LabelEnv_c implements LabelEnv
      * Finds a PairLabel upper bound. It does not use leq
      *
      */
+    @SuppressWarnings("unchecked")
+    @Override
     public Label findUpperBound(Label L) {
         return findUpperBound(L, Collections.EMPTY_SET, false);
     }
@@ -786,6 +810,8 @@ public class LabelEnv_c implements LabelEnv
      * Finds an upper bound that does not contain arg labels. It does not use leq.
      *
      */
+    @SuppressWarnings("unchecked")
+    @Override
     public Label findNonArgLabelUpperBound(Label L) {
         return findUpperBound(L, Collections.EMPTY_SET, true);
     }
@@ -830,7 +856,7 @@ public class LabelEnv_c implements LabelEnv
         }
                 
         // check the assertions
-        for (Iterator<LabelLeAssertion_c> i = labelAssertions.iterator(); i.hasNext();) { 
+        for (Iterator<LabelLeAssertion> i = labelAssertions.iterator(); i.hasNext();) { 
             LabelLeAssertion c = i.next();
 
             Label cLHS = c.lhs();
@@ -886,7 +912,8 @@ public class LabelEnv_c implements LabelEnv
     private static class ArgLabelGatherer extends LabelSubstitution {
         private final Set<Label> argLabels = new LinkedHashSet<Label>();
         
-        public Label substLabel(Label L) throws SemanticException {
+        @Override
+        public Label substLabel(Label L) {
             if (L instanceof ArgLabel) {
                 argLabels.add(L);
             }
@@ -894,6 +921,7 @@ public class LabelEnv_c implements LabelEnv
         }        
     }        
     
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("[");
@@ -913,13 +941,12 @@ public class LabelEnv_c implements LabelEnv
             sb.append(ph().actsForString());
         }
         if (/*Report.should_report(Report.debug, 1) && */!accessPathEquivReps.isEmpty()) {
-            for (Iterator iter = accessPathEquivReps.entrySet().iterator(); iter.hasNext(); ) {
-                Map.Entry e = (Entry)iter.next();
+            for (Map.Entry<AccessPath, AccessPath> e : accessPathEquivReps.entrySet()) {
                 if (e.getKey() == e.getValue()) continue;
                 if (sb.length() > 1) sb.append(", ");
-                sb.append(((AccessPath)e.getKey()).exprString());
+                sb.append((e.getKey()).exprString());
                 sb.append("==");
-                sb.append(((AccessPath)e.getValue()).exprString());
+                sb.append((e.getValue()).exprString());
             }
         }
         sb.append("]");
@@ -935,11 +962,13 @@ public class LabelEnv_c implements LabelEnv
      * Seen components is a Set of Labels whose definitions will not be 
      * displayed.
      */
-    public Map<String, List<String>> definitions(VarMap bounds, Set seenComponents) {
+    @Override
+    public Map<String, List<String>> definitions(VarMap bounds,
+            Set<Label> seenComponents) {
         Map<String, List<String>> defns = new LinkedHashMap<String, List<String>>();
         
         Set<Label> labelComponents = new LinkedHashSet<Label>();
-        for (Iterator<LabelLeAssertion_c> iter = labelAssertions.iterator(); iter.hasNext(); ) {
+        for (Iterator<LabelLeAssertion> iter = labelAssertions.iterator(); iter.hasNext(); ) {
             LabelLeAssertion c = iter.next();
             Label bound = bounds.applyTo(c.lhs());
             Collection<Label> components;
@@ -993,8 +1022,13 @@ public class LabelEnv_c implements LabelEnv
      * Trigger the transformation of WritersToReaders labels. Not guaranteed
      * to remove all writersToReaders labels. 
      */
+    @Override
     public Label triggerTransforms(Label label) {
         LabelSubstitution subst = new LabelSubstitution() {
+            /**
+             * @throws SemanticException  
+             */
+            @Override
             public Label substLabel(Label L) throws SemanticException {
                 if (L instanceof WritersToReadersLabel) {
                     return ((WritersToReadersLabel)L).transform(LabelEnv_c.this);

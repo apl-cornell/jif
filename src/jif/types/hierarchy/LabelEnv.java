@@ -1,5 +1,6 @@
 package jif.types.hierarchy;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,7 +47,8 @@ public interface LabelEnv
      * Seen components is a Set of Labels whose definitions will not be 
      * displayed.
      */
-    Map definitions(VarMap bounds, Set seenComponents);
+    Map<String, List<String>> definitions(VarMap bounds,
+            Set<Label> seenComponents);
 
     /**
      * Trigger any writersToReaders transforms in label, and return the result.
