@@ -5,9 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import jif.ast.JifMethodDecl;
-import jif.types.JifMethodInstance;
-import jif.types.JifPolyType;
-import jif.types.JifTypeSystem;
+import jif.types.*;
 import polyglot.ast.*;
 import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
@@ -62,13 +60,19 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
                                     formals, n.throwTypes(),
                                     n.body());
         n = n.methodInstance(null);
+        
+        if (isMainMethod) {
+            // Translate the constraints and use them to guard the body.
+            n = (MethodDecl) n.body(guardWithConstraints(rw, n.body()));
+        }
+        
         return n;
     }
 
     /** Rewrite static main(principal p, String[] args) {...} to
      * static main(String[] args) {Principal p = Runtime.getUser(); {...} };
      */
-    public Node staticMainToJava(JifToJavaRewriter rw, MethodDecl n) {
+    public Node staticMainToJava(JifToJavaRewriter rw, MethodDecl n) throws SemanticException {
         Formal formal0 = (Formal)n.formals().get(0); // the principal
         Formal formal1 = (Formal)n.formals().get(1); // the string array
         List<Formal> formalList = Collections.singletonList(formal1);
@@ -86,9 +90,13 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
                                type,
                                rw.java_nf().Id(Position.compilerGenerated(), formal0.name()),
                                init);
-        Block newBody = rw.java_nf().Block(origBody.position(),
+        
+        // Translate the constraints and use them to guard the body.
+        Block newBody = guardWithConstraints(rw, origBody);
+        
+        newBody = rw.java_nf().Block(origBody.position(),
                                            declPrincipal,
-                                           origBody);
+                                           newBody);
 
         n = rw.java_nf().MethodDecl(n.position(),
                                     n.flags(),
@@ -101,4 +109,31 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
         return n;
     }
 
+    protected Block guardWithConstraints(JifToJavaRewriter rw, Block b)
+            throws SemanticException {
+        NodeFactory nf = rw.java_nf();
+        List<Assertion> constraints = mi.constraints();
+        Position pos = b.position();
+        Expr guard = null;
+        for (Assertion constraint : constraints) {
+            Expr conjunct;
+            if (constraint instanceof ActsForConstraint) {
+                conjunct = ((ActsForConstraint<?, ?>) constraint).toJava(rw);
+            } else if (constraint instanceof LabelLeAssertion) {
+                conjunct = ((LabelLeAssertion) constraint).toJava(rw);
+            } else {
+                continue;
+            }
+
+            // Turn the constraint into a boolean expression.
+            if (guard == null) {
+                guard = conjunct;
+            } else {
+                guard = nf.Binary(pos, guard, Binary.COND_AND, conjunct);
+            }
+        }
+                
+        if (guard == null) return b;
+        return nf.Block(pos, nf.If(pos, guard, b));
+    }
 }

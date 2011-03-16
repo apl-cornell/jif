@@ -1,5 +1,7 @@
 package jif.types;
 
+import jif.translate.JifToJavaRewriter;
+import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 
 /**
@@ -7,4 +9,5 @@ import polyglot.types.SemanticException;
  */
 public interface ActsForParam extends Param {
     ActsForParam subst(LabelSubstitution labelSubst) throws SemanticException;
+    Expr toJava(JifToJavaRewriter rw) throws SemanticException;
 }

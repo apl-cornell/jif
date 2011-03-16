@@ -1,5 +1,9 @@
 package jif.types;
 
+import jif.translate.ActsForConstraintToJavaExpr;
+import jif.translate.JifToJavaRewriter;
+import polyglot.ast.Expr;
+import polyglot.types.SemanticException;
 import polyglot.types.TypeObject_c;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
@@ -7,21 +11,23 @@ import polyglot.util.Position;
 public class ActsForConstraint_c<Actor extends ActsForParam, Granter extends ActsForParam>
         extends TypeObject_c implements ActsForConstraint<Actor, Granter> {
 
+    protected ActsForConstraintToJavaExpr toJava;
     protected Actor actor;
     protected Granter granter;
     protected final boolean isEquiv;
 
     public ActsForConstraint_c(TypeSystem ts, Position pos, Actor actor,
-            Granter granter, boolean isEquiv) {
+            Granter granter, boolean isEquiv, ActsForConstraintToJavaExpr toJava) {
         super(ts, pos);
         this.actor = actor;
         this.granter = granter;
         this.isEquiv = isEquiv;
+        this.toJava = toJava;
     }
 
     public ActsForConstraint_c(TypeSystem ts, Position pos, Actor actor,
-            Granter granter) {
-        this(ts, pos, actor, granter, false);
+            Granter granter, ActsForConstraintToJavaExpr toJava) {
+        this(ts, pos, actor, granter, false, toJava);
     }
 
     @Override
@@ -65,6 +71,11 @@ public class ActsForConstraint_c<Actor extends ActsForParam, Granter extends Act
     @Override
     public String toString() {
         return actor + " " + (isEquiv ? "equiv" : "actsfor") + " " + granter;
+    }
+
+    @Override
+    public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
+        return toJava.toJava(this, rw);
     }
 
 }

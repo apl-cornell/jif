@@ -1120,14 +1120,23 @@ public class JifTypeSystem_c
     public <Actor extends ActsForParam, Granter extends ActsForParam> ActsForConstraint<Actor, Granter> actsForConstraint(
             Position pos, Actor actor, Granter granter, boolean isEquiv) {
         return new ActsForConstraint_c<Actor, Granter>(this, pos, actor,
-                granter, isEquiv);
+                granter, isEquiv, actsForConstraintTranslator());
+    }
+    
+    protected ActsForConstraintToJavaExpr actsForConstraintTranslator() {
+        return new ActsForConstraintToJavaExpr_c();
     }
 
     @Override
     public LabelLeAssertion labelLeAssertion(Position pos,
                                              Label lhs,
                                              Label rhs) {
-        return new LabelLeAssertion_c(this, lhs, rhs, pos);
+        return new LabelLeAssertion_c(this, lhs, rhs, pos,
+                labelLeAssertionTranslator());
+    }
+    
+    protected LabelLeAssertionToJavaExpr labelLeAssertionTranslator() {
+        return new LabelLeAssertionToJavaExpr_c();
     }
 
     @Override
