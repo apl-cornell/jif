@@ -27,6 +27,15 @@ public interface ParamInstance extends VarInstance
         public boolean isInvariantLabel() {
             return isInvariantLabel;
         }
+        @Override
+        public Object intern() {
+            // This forces the class loader to load ParamInstance when
+            // deserializing ParamInstance.Kinds so that the Enum constants
+            // defined below don't conflict with the deserialized objects.
+            @SuppressWarnings("unused")
+            Object o = PRINCIPAL;
+            return super.intern();
+        }
     }
 
     public final static Kind INVARIANT_LABEL = new Kind("label", false, true, false);
