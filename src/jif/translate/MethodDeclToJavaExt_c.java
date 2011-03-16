@@ -1,6 +1,7 @@
 package jif.translate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import jif.ast.JifMethodDecl;
@@ -11,29 +12,34 @@ import polyglot.ast.*;
 import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
-import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
 
 public class MethodDeclToJavaExt_c extends ToJavaExt_c {
     protected JifMethodInstance mi;
-    protected List formals;
+    protected List<Formal> formals;
+    /**
+     * @throws SemanticException  
+     */
+    @SuppressWarnings("unchecked")
+    @Override
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
         // Bypass labels and constraints
         JifMethodDecl n = (JifMethodDecl) node();
         
         mi = (JifMethodInstance)n.methodInstance();
-        formals = new ArrayList(n.formals());
+        formals = new ArrayList<Formal>(n.formals());
 
         // Bypass startLabel, returnLabel and constraints.
         return rw.bypass(n.startLabel()).bypass(n.returnLabel()).bypass(n.constraints());
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         MethodDecl n = (MethodDecl) node();
-        if ("main".equals(n.name()) &&
-            n.flags().isStatic() &&
-            n.formals().size() == 2) {
+        boolean isMainMethod = "main".equals(n.name()) && n.flags().isStatic();
+        if (isMainMethod && n.formals().size() == 2) {
             // the method is static main(principal p, String[] args). We
             // need to translate this specially.
             // (The typechecking for JifMethodDecl ensures that the formals
@@ -42,7 +48,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
         }
 
         MethodInstance mi = n.methodInstance();
-        List formals = new ArrayList(n.formals().size() + 2);
+        List<Formal> formals = new ArrayList<Formal>(n.formals().size() + 2);
 
         // for static methods, add args for the params of the class
         if (mi.flags().isStatic() && mi.container() instanceof JifPolyType) {
@@ -65,7 +71,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
     public Node staticMainToJava(JifToJavaRewriter rw, MethodDecl n) {
         Formal formal0 = (Formal)n.formals().get(0); // the principal
         Formal formal1 = (Formal)n.formals().get(1); // the string array
-        List formalList = CollectionUtil.list(formal1);
+        List<Formal> formalList = Collections.singletonList(formal1);
 
         Block origBody = n.body();
 
