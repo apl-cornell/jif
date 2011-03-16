@@ -1,0 +1,10 @@
+public class CheckedEndorse04 authority(*) {
+  void m{*L}(final label{*L} L, principal{*L}p)
+      where authority (p), {*L} <= {⊤->⊤; p←p} {
+    int x = 0;
+    final label confProject = new label {⊤→⊤; ⊤←⊤};
+    final label provConf = new label {*L ⊓ *confProject};
+    int y = endorse(x, {*L} to {*provConf ; p<-*});
+  }
+}
+
