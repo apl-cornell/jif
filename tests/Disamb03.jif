@@ -1,0 +1,5 @@
+public class Disamb03 {
+  final label l1 = new label {};
+  final label l2 = new label {*l1 ⊓ ⊤←⊤};
+}
+
