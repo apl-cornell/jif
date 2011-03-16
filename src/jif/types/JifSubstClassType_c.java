@@ -66,7 +66,7 @@ public class JifSubstClassType_c extends SubstClassType_c
     }
 
     @Override
-    public List<ActsForConstraint<ActsForParam, Principal>> constraints() {
+    public List<Assertion> constraints() {
         JifClassType base = (JifClassType) this.base;
         JifSubst subst = (JifSubst) this.subst;
         return subst.substConstraintList(base.constraints());

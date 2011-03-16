@@ -18,33 +18,31 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 {
     protected List<ParamDecl> params;
     protected List<PrincipalNode> authority;
-    protected List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints;
+    protected List<ConstraintNode<Assertion>> constraints;
 
     public JifClassDecl_c(Position pos, Flags flags, Id name,
             List<ParamDecl> params, TypeNode superClass,
             List<TypeNode> interfaces, List<PrincipalNode> authority,
-            List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints,
-            ClassBody body) {
+            List<ConstraintNode<Assertion>> constraints, ClassBody body) {
         super(pos, flags, name, superClass, interfaces, body);
         this.params = Collections.unmodifiableList(new ArrayList<ParamDecl>(params));
         this.authority = Collections.unmodifiableList(new ArrayList<PrincipalNode>(authority));
         this.constraints =
                 Collections
-                        .unmodifiableList(new ArrayList<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>>(
+                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
                                 constraints));
     }
 
     @Override
-    public List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints() {
+    public List<ConstraintNode<Assertion>> constraints() {
         return this.constraints;
     }
     @Override
-    public JifClassDecl constraints(
-            List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints) {
+    public JifClassDecl constraints(List<ConstraintNode<Assertion>> constraints) {
         JifClassDecl_c n = (JifClassDecl_c) copy();
         n.constraints =
                 Collections
-                        .unmodifiableList(new ArrayList<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>>(
+                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
                                 constraints));
         return n;
     }
@@ -126,15 +124,28 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         final JifParsedPolyType ct = (JifParsedPolyType) this.type;
         
         // Add programer-specified constraints.
-        for (ActsForConstraint<ActsForParam, Principal> pi : ct.constraints()) {
-            ActsForParam actor = pi.actor();
-            if (actor instanceof Principal) {
-                A.addActsFor((Principal) actor, pi.granter());
-            } else if (actor instanceof Label) {
-                A.addActsFor((Label) actor, pi.granter());
+        for (Assertion constraint : ct.constraints()) {
+            if (constraint instanceof ActsForConstraint) {
+                @SuppressWarnings("unchecked")
+                ActsForConstraint<ActsForParam, ActsForParam> pi =
+                        (ActsForConstraint<ActsForParam, ActsForParam>) constraint;
+                ActsForParam actor = pi.actor();
+                ActsForParam granter = pi.granter();
+                if (actor instanceof Principal && granter instanceof Principal) {
+                    A.addActsFor((Principal) actor, (Principal) granter);
+                } else if (actor instanceof Label) {
+                    A.addActsFor((Label) actor, (Principal) granter);
+                } else {
+                    throw new InternalCompilerError(
+                            "Unexpected ActsForParam type: " + actor.getClass()
+                                    + " actsfor " + granter.getClass());
+                }
+            } else if (constraint instanceof LabelLeAssertion) {
+                LabelLeAssertion lle = (LabelLeAssertion) constraint;
+                A.addAssertionLE(lle.lhs(), lle.rhs());
             } else {
-                throw new InternalCompilerError(
-                        "Unexpected ActsForParam type: " + actor.getClass());
+                throw new InternalCompilerError("Unexpected assertion type: "
+                        + constraint, constraint.position());
             }
         }
         
@@ -214,10 +225,9 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         }
         ct.setAuthority(principals);
         
-        List<ActsForConstraint<ActsForParam, Principal>> constraints =
-                new ArrayList<ActsForConstraint<ActsForParam, Principal>>(
-                        n.constraints().size());
-        for (ConstraintNode<ActsForConstraint<ActsForParam, Principal>> cn : n.constraints()) {
+        List<Assertion> constraints =
+                new ArrayList<Assertion>(n.constraints().size());
+        for (ConstraintNode<Assertion> cn : n.constraints()) {
             if (!cn.isDisambiguated()) {
                 // constraint nodes haven't been disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();

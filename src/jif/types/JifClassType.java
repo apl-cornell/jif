@@ -23,7 +23,7 @@ public interface JifClassType extends ClassType {
     /**
      * Constraints on the principal hierarchy.
      */
-    List<ActsForConstraint<ActsForParam, Principal>> constraints();
+    List<Assertion> constraints();
 
     /**
      * The principals whose authority is required by the context that creates a

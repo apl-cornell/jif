@@ -1,9 +1,6 @@
 package jif.types;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import jif.types.label.ParamLabel;
 import jif.types.label.ProviderLabel;
@@ -23,7 +20,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 {
     List<ParamInstance> params;
     List<Principal> authority;
-    List<ActsForConstraint<ActsForParam, Principal>> constraints;
+    List<Assertion> constraints;
     ProviderLabel provider;
     
     PClass instantiatedFrom;
@@ -35,7 +32,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	super();
 	this.params = new LinkedList<ParamInstance>();
 	this.authority = new LinkedList<Principal>();
-	this.constraints = new LinkedList<ActsForConstraint<ActsForParam, Principal>>();
+	this.constraints = new LinkedList<Assertion>();
         this.provider = null;
         this.instantiatedFrom = null;
     }
@@ -45,7 +42,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	super(ts, init, fromSource);
         this.params = new LinkedList<ParamInstance>();
         this.authority = new LinkedList<Principal>();
-        this.constraints = new LinkedList<ActsForConstraint<ActsForParam, Principal>>();
+        this.constraints = new LinkedList<Assertion>();
         this.provider = ts.providerLabel(this);
         this.instantiatedFrom = null;
     }
@@ -163,13 +160,15 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
         this.authority = new TypedList(principals, Principal.class, false);
     }
     @Override
-    public List<ActsForConstraint<ActsForParam, Principal>> constraints() {
+    public List<Assertion> constraints() {
     	return constraints;
     }
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+
     @Override
-    public void setConstraints(List constraints) {
-        this.constraints = new TypedList(constraints, Constraint.class, false);
+    public void setConstraints(List<Assertion> constraints) {
+        this.constraints =
+                Collections.unmodifiableList(new ArrayList<Assertion>(
+                        constraints));
     }
 
     @Override

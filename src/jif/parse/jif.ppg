@@ -307,11 +307,11 @@ non terminal List principal_list, principal_list_opt;
 
 non terminal List parameters_opt, parameters;
 non terminal ParamDecl parameter;
-non terminal List constraints, constraints_opt;
+non terminal List procedure_constraints, procedure_constraints_opt;
 non terminal List authority, authority_opt;
+non terminal ConstraintNode procedure_constraint;
+non terminal List constraints, constraints_opt;
 non terminal ConstraintNode constraint;
-non terminal List auth_constraints, auth_constraints_opt;
-non terminal ConstraintNode auth_constraint;
 
 non terminal Amb reftype_or_expr, objtype_or_expr;
 non terminal List param_or_expr_list;
@@ -610,7 +610,7 @@ override class_declaration ::=
                     // ClassDecl
         modifiers_opt:a CLASS:n IDENTIFIER:b
                 parameters_opt:p super_opt:c
-                interfaces_opt:d authority_opt:u auth_constraints_opt:f class_body:e
+                interfaces_opt:d authority_opt:u constraints_opt:f class_body:e
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n, b),
                                                a, parser.nf.Id(parser.pos(b), b.getIdentifier()),
                                                p, c, d, u, f, e); :}
@@ -696,7 +696,7 @@ override method_header ::=
                     // JifMethodNode
         modifiers_opt:a type:b IDENTIFIER:c label_opt:i
         LPAREN formal_parameter_list_opt:d RPAREN
-        dims_opt:e return_label_opt:r throws_opt:f constraints_opt:w
+        dims_opt:e return_label_opt:r throws_opt:f procedure_constraints_opt:w
             {: RESULT = parser.nf.JifMethodDecl(parser.pos(b,c,c), a,
                         parser.array(b, e.intValue()),
                         parser.nf.Id(parser.pos(c), c.getIdentifier()),
@@ -705,7 +705,7 @@ override method_header ::=
              :}
     |   modifiers_opt:a VOID:b IDENTIFIER:c label_opt:i
         LPAREN formal_parameter_list_opt:d RPAREN
-        return_label_opt:r throws_opt:f constraints_opt:w
+        return_label_opt:r throws_opt:f procedure_constraints_opt:w
             {: RESULT = parser.nf.JifMethodDecl(parser.pos(b,c), a,
                         parser.nf.CanonicalTypeNode(parser.pos(b),
                                    parser.ts.Void()),
@@ -754,7 +754,7 @@ override constructor_declaration ::=
         modifiers_opt:a reftype_or_expr:q
         LPAREN 
         formal_parameter_list_opt:c RPAREN:y return_label_opt:r
-        throws_opt:d constraints_opt:w 
+        throws_opt:d procedure_constraints_opt:w 
         constructor_body:e
         {: Id b; LabelNode i;
                // Pick apart the reftype_or_expr node.
@@ -857,6 +857,42 @@ parameter ::=
     ;
 
 
+procedure_constraints_opt ::=
+        // List of ConstraintNode
+            {: RESULT = new TypedList(new LinkedList(), ConstraintNode.class, false); :}
+    |   WHERE procedure_constraints:a
+            {: RESULT = a; :}
+    ;
+
+procedure_constraints ::=
+        // List of ConstraintNode
+        procedure_constraint:a
+            {: List l = new TypedList(new LinkedList(), ConstraintNode.class, false);
+               l.add(a); RESULT = l; :}
+    |   procedure_constraints:a COMMA procedure_constraint:b
+            {: RESULT = a;
+               a.add(b); :}
+    ;
+
+procedure_constraint ::=
+        // ConstraintNode
+        AUTHORITY:x LPAREN principal_list:a RPAREN:y
+        {: RESULT = parser.nf.AuthConstraintNode(parser.pos(x,y), a);
+           parser.countAnnotation(parser.METHOD_AUTH_ANNOTATION, RESULT.position());
+        :}
+    |   CALLER:x LPAREN principal_list:a RPAREN:y
+        {: RESULT = parser.nf.CallerConstraintNode(parser.pos(x,y), a);
+           parser.countAnnotation(parser.METHOD_CALLER_ANNOTATION, RESULT.position());
+        :}
+    |   ENDORSE:x LPAREN label_flexible:a RPAREN:y
+        {: RESULT = parser.nf.AutoEndorseConstraintNode(parser.pos(x,y), a);
+           parser.countAnnotation(parser.METHOD_AUTO_ENDORSE_ANNOTATION, RESULT.position());
+        :}
+    |   constraint:a
+        {: RESULT = a;
+        :}
+    ;
+
 constraints_opt ::=
         // List of ConstraintNode
             {: RESULT = new TypedList(new LinkedList(), ConstraintNode.class, false); :}
@@ -876,67 +912,6 @@ constraints ::=
 
 constraint ::=
         // ConstraintNode
-        AUTHORITY:x LPAREN principal_list:a RPAREN:y
-        {: RESULT = parser.nf.AuthConstraintNode(parser.pos(x,y), a);
-           parser.countAnnotation(parser.METHOD_AUTH_ANNOTATION, RESULT.position());
-        :}
-    |   CALLER:x LPAREN principal_list:a RPAREN:y
-        {: RESULT = parser.nf.CallerConstraintNode(parser.pos(x,y), a);
-           parser.countAnnotation(parser.METHOD_CALLER_ANNOTATION, RESULT.position());
-        :}
-    |   ENDORSE:x LPAREN label_flexible:a RPAREN:y
-        {: RESULT = parser.nf.AutoEndorseConstraintNode(parser.pos(x,y), a);
-           parser.countAnnotation(parser.METHOD_AUTO_ENDORSE_ANNOTATION, RESULT.position());
-        :}
-    |   principal:a actsfor principal:b
-        {: RESULT = parser.nf.PrincipalActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
-           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
-        :}
-    |   label:a actsfor principal:b
-        {: RESULT = parser.nf.LabelActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
-           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
-        :}
-    |   provider:a actsfor principal:b
-        {: RESULT = parser.nf.LabelActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
-        :}
-// XXX Add this later.  This is intended to capture trust-ordering constraints between labels.
-//    |   label:a actsfor label:b
-//        {: RESULT = parser.nf.LabelActsForLabelConstraintNode(parser.pos(a,b), a, b);
-//           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
-//        :}
-    |   principal:a EQUIV principal:b
-        {: RESULT = parser.nf.PrincipalActsForPrincipalConstraintNode(parser.pos(a,b), a, b, true);
-           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
-        :}
-    |   label_flexible:a LTEQ label_flexible:b
-        {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b, false);
-           parser.countAnnotation(parser.METHOD_LABEL_ASSERTION_ANNOTATION, RESULT.position());
-        :}
-    |   label:a EQUIV label:b
-        {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b, true);
-           parser.countAnnotation(parser.METHOD_LABEL_ASSERTION_ANNOTATION, RESULT.position());
-        :}
-    ;
-
-auth_constraints_opt ::=
-        // List of ConstraintNode
-            {: RESULT = new TypedList(new LinkedList(), ConstraintNode.class, false); :}
-    |   WHERE auth_constraints:a
-            {: RESULT = a; :}
-    ;
-
-auth_constraints ::=
-        // List of ConstraintNode
-        auth_constraint:a
-            {: List l = new TypedList(new LinkedList(), ConstraintNode.class, false);
-               l.add(a); RESULT = l; :}
-    |   auth_constraints:a COMMA auth_constraint:b
-            {: RESULT = a;
-               a.add(b); :}
-    ;
-
-auth_constraint ::=
-        // ConstraintNode
         principal:a actsfor principal:b
         {: RESULT = parser.nf.PrincipalActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
@@ -953,6 +928,19 @@ auth_constraint ::=
         {: RESULT = parser.nf.PrincipalActsForPrincipalConstraintNode(parser.pos(a,b), a, b, true);
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}
+// XXX Add this later.  This is intended to capture trust-ordering constraints between labels.
+//    |   label:a actsfor label:b
+//        {: RESULT = parser.nf.LabelActsForLabelConstraintNode(parser.pos(a,b), a, b);
+//           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
+//        :}
+    |   label_flexible:a LTEQ label_flexible:b
+        {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b, false);
+           parser.countAnnotation(parser.METHOD_LABEL_ASSERTION_ANNOTATION, RESULT.position());
+        :}
+    |   label:a EQUIV label:b
+        {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b, true);
+           parser.countAnnotation(parser.METHOD_LABEL_ASSERTION_ANNOTATION, RESULT.position());
+        :}
     ;
 
 // 19.9.1) Interface Declarations
@@ -960,7 +948,7 @@ override interface_declaration ::=
         // ClassDecl
         modifiers_opt:a INTERFACE:n IDENTIFIER:b
                 parameters_opt:p
-                extends_interfaces_opt:d authority_opt:u auth_constraints_opt:f interface_body:e
+                extends_interfaces_opt:d authority_opt:u constraints_opt:f interface_body:e
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n,b),
 		    a.set(Flags.INTERFACE), parser.nf.Id(parser.pos(b), b.getIdentifier()),
 		    p, null, d, u, f, e); :}

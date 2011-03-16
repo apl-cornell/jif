@@ -2,8 +2,6 @@ package jif.ast;
 
 import java.util.List;
 
-import jif.types.ActsForConstraint;
-import jif.types.ActsForParam;
 import jif.types.Assertion;
 import jif.types.ParamInstance;
 import jif.types.label.Label;
@@ -35,7 +33,7 @@ public interface JifNodeFactory extends NodeFactory {
     AmbPrincipalNode AmbConjunctivePrincipalNode(Position pos, PrincipalNode left, PrincipalNode right);
     AmbPrincipalNode AmbDisjunctivePrincipalNode(Position pos, PrincipalNode left, PrincipalNode right);
     CanonicalPrincipalNode CanonicalPrincipalNode(Position pos, Principal principal);
-    JifClassDecl JifClassDecl(Position pos, Flags flags, Id name, List<ParamDecl> params, TypeNode superClass, List<TypeNode> interfaces, List<PrincipalNode> authority, List<ConstraintNode<ActsForConstraint<ActsForParam, Principal>>> constraints, ClassBody body);
+    JifClassDecl JifClassDecl(Position pos, Flags flags, Id name, List<ParamDecl> params, TypeNode superClass, List<TypeNode> interfaces, List<PrincipalNode> authority, List<ConstraintNode<Assertion>> constraints, ClassBody body);
     JifMethodDecl JifMethodDecl(Position pos, Flags flags, TypeNode returnType, Id name, LabelNode startLabel, List<Formal> arguments, LabelNode endLabel, List<TypeNode> exceptions, List<ConstraintNode<Assertion>> constraints, Block body);
     JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, Id name, LabelNode startLabel, LabelNode returnLabel, List<Formal> arguments, List<TypeNode> exceptions, List<ConstraintNode<Assertion>> constraints, Block body);
     AmbParam AmbParam(Position pos, Id name);
