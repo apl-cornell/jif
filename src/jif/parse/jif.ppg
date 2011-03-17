@@ -77,9 +77,11 @@ parser Grm extends polyglot.parse.Grm {:
 
         if (p instanceof AmbPrefix) {
             AmbPrefix a = (AmbPrefix) p;
-            PackageNode pn = prefixToPackage(a.prefix());
+            Prefix ap = a.prefix();
+            polyglot.types.Package pkg = null;
+            if (ap != null) pkg = prefixToPackage(a.prefix()).package_();
             return nf.PackageNode(pos(p),
-                                ts.packageForName(pn.package_(), a.name()));
+                                ts.packageForName(pkg, a.name()));
         }
 
         die(pos(p));
