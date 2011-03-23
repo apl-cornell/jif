@@ -2,6 +2,7 @@ package jif.types;
 
 import jif.types.label.Label;
 import jif.types.label.ProviderLabel;
+import polyglot.ast.Expr;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -13,6 +14,7 @@ public class JifFieldInstance_c extends FieldInstance_c
 {
     protected Label label;
     protected boolean hasInitializer;
+    protected Param initializer;
     
     public JifFieldInstance_c(JifTypeSystem ts, Position pos,
 	ReferenceType container, Flags flags,
@@ -50,6 +52,14 @@ public class JifFieldInstance_c extends FieldInstance_c
     @Override
     public void setHasInitializer(boolean hasInitializer) {
         this.hasInitializer = hasInitializer;        
+    }
+    
+    public Param initializer() {
+        return initializer;
+    }
+    
+    public void setInitializer(Param init) {
+        this.initializer = init;
     }
 
     private FieldInstance findOrigFieldInstance() {

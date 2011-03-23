@@ -1,9 +1,13 @@
 package jif.extension;
 
+import java.util.Iterator;
+
 import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
+import jif.types.label.AccessPath;
+import jif.types.label.AccessPathField;
 import jif.types.label.CovariantParamLabel;
 import jif.types.label.Label;
 import jif.types.label.ParamLabel;
@@ -17,8 +21,11 @@ import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.Node;
 import polyglot.types.ArrayType;
+import polyglot.types.ClassType;
+import polyglot.types.FieldInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -71,6 +78,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
      *  is always executed after invoking super constructor and before invoking
      *  the constructor of this class. (like the single path rule)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         FieldDecl decl = (FieldDecl) node();
@@ -149,23 +157,19 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             // bound the this label.
             JifClassType jct = (JifClassType)A.currentClass();
             A.addAssertionLE(jct.thisLabel(), ts.bottomLabel());
-            
-            
+
             if (fi.flags().isFinal() && JifUtil.isFinalAccessExprOrConst(ts, init)) { 
                 if (ts.isLabel(fi.type())) {
                     Label dl = ts.dynamicLabel(fi.position(), JifUtil.varInstanceToAccessPath(fi, fi.position()));                
                     Label rhs_label = JifUtil.exprToLabel(ts, init, A);
                     A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
-                    // store the initialization expression for use in static methods
-                    lc.inits.add(decl);
-                    
+                    fi.setInitializer(rhs_label);
                 }
                 else if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
                     DynamicPrincipal dp = ts.dynamicPrincipal(fi.position(), JifUtil.varInstanceToAccessPath(fi, fi.position()));                
                     Principal rhs_principal = JifUtil.exprToPrincipal(ts, init, A);
-                    A.addDefinitionalEquiv(dp, rhs_principal);                    
-                    // store the initialization expression for use in static methods
-                    lc.inits.add(decl);
+                    A.addDefinitionalEquiv(dp, rhs_principal);
+                    fi.setInitializer(rhs_principal);
                 }
             }                            
 
@@ -224,12 +228,19 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             // There is no PC label at field nodes.
             Xd = ts.pathMap();
         }
-
+        
+        // Lookup all final access paths reachable and add them to the
+        // environment if they have constant initializers
+        if (fi.flags().isFinal()) {
+            AccessPathField path = (AccessPathField) JifUtil.varInstanceToAccessPath(fi, fi.position());
+            JifUtil.processFAP(fi, path, A, ts, lc);
+        }
+        
         decl = (FieldDecl) updatePathMap(decl.init(init), Xd);
 
         return decl;
     }
-
+    
     /**
      * Checker to ensure that labels of static fields do not use
      * the This label, or any parameters 

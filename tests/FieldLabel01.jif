@@ -1,5 +1,8 @@
 class FieldLabel01 {
-	public final label{Alice←} lbl = new label {Alice→;Alice←};
+	public static final label{Alice←} lbl = new label {Alice→;Alice←};
+
+    public FieldLabel01{*lbl}() {
+    }
 	
 	public static void main{Alice→;Alice←}(String[] args) {
 		final FieldLabel01 fl01 = new FieldLabel01();
@@ -9,4 +12,19 @@ class FieldLabel01 {
 	public void foo{*lbl}() {
 		// stuff
 	}
+}
+
+class Test {
+	public final label{Alice←} lbl = new label {Alice→;Alice←};
+    final FieldLabel01{Alice←} fl1;
+
+    public Test{*lbl}() {
+        fl1 = new FieldLabel01();
+    }
+    void foo{*lbl}() {
+        final FieldLabel01 fl = new FieldLabel01();
+
+        fl1.foo();
+        fl.foo();
+    }
 }

@@ -105,7 +105,7 @@ public class JifClassDeclExt extends Jif_c {
         return n;
     }
     
-    private void labelCheckClassConformance(JifParsedPolyType ct, LabelChecker lc) throws SemanticException {
+    protected void labelCheckClassConformance(JifParsedPolyType ct, LabelChecker lc) throws SemanticException {
         if (ct.flags().isInterface()) {
             // don't need to check interfaces            
             return;

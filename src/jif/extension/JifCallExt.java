@@ -4,14 +4,22 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import jif.JifScheduler;
 import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
+import jif.types.label.AccessPathField;
 import jif.types.label.Label;
+import jif.types.principal.DynamicPrincipal;
+import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.MethodInstance;
+import polyglot.types.ParsedClassType;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 
@@ -25,6 +33,7 @@ public class JifCallExt extends JifExprExt
         super(toJava);
     }
 
+    @SuppressWarnings("unchecked")
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         Call me = (Call) node();
 
@@ -58,11 +67,51 @@ public class JifCallExt extends JifExprExt
         List throwTypes = new ArrayList(me.del().throwTypes(ts));
 
         Receiver target = (Receiver) lc.context(A).labelCheck(me.target());
+        
+        ReferenceType rt = target.type().toReference();
+        
+        // TODO: Refactor and use JifUtil.processFAP instead.
+        // XXX: Ideally this is not needed here, since the reachable final access paths should include these
+        // If there are any final static labels/principals with initializers in rt,
+        // add them to the env.
+        if (rt != null && rt.fields() != null) {
+            for (Iterator it = rt.fields().iterator(); it.hasNext();) {
+                JifFieldInstance jfi = (JifFieldInstance) it.next();
+                if (jfi.flags().isFinal() && jfi.flags().isStatic() && jfi.hasInitializer()) {
+                    AccessPathField path = (AccessPathField) JifUtil.varInstanceToAccessPath(jfi, jfi.position());
+                    Param init = jfi.initializer();
+                    if (ts.isLabel(jfi.type())) {
+                        Label dl = ts.dynamicLabel(jfi.position(), path);
+                        Label rhs_label = (Label) init;
+                        if (rhs_label == null) {
+                            // label checking has not been done on ct yet
+                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
+                            ParsedClassType pct = (ParsedClassType) rt;
+                            Goal g = sched.LabelsChecked(pct.job());
+                            throw new MissingDependencyException(g);
+                        }
+                        A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
+                    } else if (ts.isImplicitCastValid(jfi.type(), ts.Principal())) {
+                        DynamicPrincipal dp = ts.dynamicPrincipal(jfi.position(), path);                
+                        Principal rhs_principal = (Principal) init;
+                        if (rhs_principal == null) {
+                            // label checking has not been done on ct yet
+                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
+                            ParsedClassType pct = (ParsedClassType) rt;
+                            Goal g = sched.LabelsChecked(pct.job());
+                            throw new MissingDependencyException(g);
+                        }
+                        A.addDefinitionalEquiv(dp, rhs_principal);
+                    }
+                }
+            }
+        }
+        
 
         // Find the method instance again. This ensures that
         // we have the correctly instantiated type, as label checking
         // of the target may have produced a new type for the target.
-        JifMethodInstance mi = (JifMethodInstance)ts.findMethod(target.type().toReference(), 
+        JifMethodInstance mi = (JifMethodInstance)ts.findMethod(rt, 
                                           me.name(), 
                                           me.methodInstance().formalTypes(), 
                                           A.currentClass());

@@ -69,34 +69,37 @@ public class JifLocalDeclExt extends JifStmtExt_c
             }
         }
         
-        // add another special case: "final C c = ..." where C is the current class
-        // TODO: in general, we could search for all available final access paths to labels/principals 
-        // but that might require more detailed type info or a whole program analysis
+        // add other special cases: "final C c = ..." 
         if (li.flags().isFinal()) {
-            ReferenceType rt = li.type().toReference();
-            if (rt != null && ts.equals(rt, A.currentClass())) {
-                // go through members of C and check for final fields
-                for (FieldDecl fd : lc.inits) {
-                    FieldInstance fi = fd.fieldInstance();
-                    if (fi.flags().isFinal() && JifUtil.isFinalAccessExprOrConst(ts, fd.init())) {
-                        if (ts.isLabel(fi.type())) {
-                            AccessPathLocal apl = (AccessPathLocal) JifUtil.varInstanceToAccessPath(li, li.position());
-                            AccessPathField apf = new AccessPathField(apl, fi, fi.name(), fi.position());
-                            Label dl = ts.dynamicLabel(fd.position(), apf);                
-                            Label rhs_label = JifUtil.exprToLabel(ts, fd.init(), lc.context());
-                            lc.context().addDefinitionalAssertionEquiv(dl, rhs_label);                            
-                        }
-                        if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
-                            AccessPathLocal apl = (AccessPathLocal) JifUtil.varInstanceToAccessPath(li, li.position());
-                            AccessPathField apf = new AccessPathField(apl, fi, fi.name(), fi.position());
-                            DynamicPrincipal dp = ts.dynamicPrincipal(fd.position(), apf);                
-                            Principal rhs_principal = JifUtil.exprToPrincipal(ts, fd.init(), lc.context());
-                            lc.context().addDefinitionalEquiv(dp, rhs_principal);                            
-                        }
-                    }
-                }
-            }
+            AccessPathLocal path = (AccessPathLocal) JifUtil.varInstanceToAccessPath(li, li.position());
+            JifUtil.processFAP(li, path, lc.context(), ts, lc);
         }
+        
+//        if (li.flags().isFinal()) {
+//            ReferenceType rt = li.type().toReference();
+//            if (rt != null && ts.equals(rt, A.currentClass())) {
+//                // go through members of C and check for final fields
+//                for (FieldDecl fd : lc.inits) {
+//                    FieldInstance fi = fd.fieldInstance();
+//                    if (fi.flags().isFinal() && JifUtil.isFinalAccessExprOrConst(ts, fd.init())) {
+//                        if (ts.isLabel(fi.type())) {
+//                            AccessPathLocal apl = (AccessPathLocal) JifUtil.varInstanceToAccessPath(li, li.position());
+//                            AccessPathField apf = new AccessPathField(apl, fi, fi.name(), fi.position());
+//                            Label dl = ts.dynamicLabel(fd.position(), apf);                
+//                            Label rhs_label = JifUtil.exprToLabel(ts, fd.init(), lc.context());
+//                            lc.context().addDefinitionalAssertionEquiv(dl, rhs_label);                            
+//                        }
+//                        if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
+//                            AccessPathLocal apl = (AccessPathLocal) JifUtil.varInstanceToAccessPath(li, li.position());
+//                            AccessPathField apf = new AccessPathField(apl, fi, fi.name(), fi.position());
+//                            DynamicPrincipal dp = ts.dynamicPrincipal(fd.position(), apf);                
+//                            Principal rhs_principal = JifUtil.exprToPrincipal(ts, fd.init(), lc.context());
+//                            lc.context().addDefinitionalEquiv(dp, rhs_principal);                            
+//                        }
+//                    }
+//                }
+//            }
+//        }
 
         // Equate the variable label with the declared label.
         Label L = li.label();

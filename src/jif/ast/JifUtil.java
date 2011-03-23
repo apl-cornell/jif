@@ -1,9 +1,18 @@
 package jif.ast;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import jif.JifScheduler;
 import jif.types.*;
 import jif.types.label.*;
+import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
+import jif.visit.LabelChecker;
 import polyglot.ast.*;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -147,6 +156,84 @@ public class JifUtil
                                             e.position());                                        
     }        
 
+    // Process Final Access Paths that are reachable from fi
+    @SuppressWarnings("unused")
+    public static void processFAP(VarInstance fi,
+            AccessPath path,
+            JifContext A,
+            JifTypeSystem ts,
+            LabelChecker lc,
+            Set<ClassType> visited)
+    throws SemanticException {
+
+        // final fields could be the root of a final access path. just check.
+        if (fi.flags().isFinal()) {
+            ReferenceType rt = fi.type().toReference();
+            if (!(rt instanceof ClassType)) return;
+            ClassType ct = (ClassType) rt;
+            if (visited.contains(ct)) return;
+            visited.add(ct);
+            if (ct == null || ct.fields() == null) return;
+            for (Iterator it = ct.fields().iterator(); it.hasNext();) {
+                JifFieldInstance jfi = (JifFieldInstance) it.next();
+                if (jfi.flags().isFinal()) {
+                    AccessPathField path2 = new AccessPathField(path, jfi, jfi.name(), jfi.position());
+                    // if it is static and is the end of a final access path and has an initializer
+                    // TODO Could use isFinalAccessExprOrConst instead of restricting to isStatic and hasInitializer
+                    Param init2 = jfi.initializer();
+                    if (
+//                            jfi.flags().isStatic() &&
+                            jfi.hasInitializer()) {
+                        if (ts.isLabel(jfi.type())) {
+                            Label dl = ts.dynamicLabel(jfi.position(), path2);                
+                            Label rhs_label = (Label) init2;
+                            if (rhs_label == null) {
+                                // label checking has not been done on ct yet
+                                JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
+                                ParsedClassType pct = (ParsedClassType) ct;
+                                Goal g = sched.LabelsChecked(pct.job());
+                                throw new MissingDependencyException(g);
+                            }
+                            A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
+                            continue;
+                        }
+                        else if (ts.isImplicitCastValid(jfi.type(), ts.Principal())) {
+                            DynamicPrincipal dp = ts.dynamicPrincipal(jfi.position(), path2);                
+                            Principal rhs_principal = (Principal) init2;
+                            if (rhs_principal == null) {
+                                // label checking has not been done on ct yet
+                                JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
+                                ParsedClassType pct = (ParsedClassType) ct;
+                                Goal g = sched.LabelsChecked(pct.job());
+                                throw new MissingDependencyException(g);
+                            }
+                            A.addDefinitionalEquiv(dp, rhs_principal);
+                            continue;
+                        } else {
+                            // If the field is not a label or a principal, no need to store the initializer
+                            jfi.setInitializer(null);
+                        }
+                       
+                    }
+                    // this field could be part of a final access path
+                    processFAP(jfi, path2, A, ts, lc, visited);
+
+                }
+            }
+        }
+
+    }
+    
+    public static void processFAP(VarInstance fi, 
+            AccessPath path,
+            JifContext A, 
+            JifTypeSystem ts,
+            LabelChecker lc) throws SemanticException {
+        Set<ClassType> visited = new HashSet<ClassType>();
+        processFAP(fi, path, A, ts, lc, visited);
+    }
+
+    
 
     private static boolean isFinalAccessExpr(JifTypeSystem ts, Expr e) {
         if (e instanceof Local) {

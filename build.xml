@@ -339,6 +339,7 @@ sh ${jif} %CMD_LINE_ARGS%
             <arg value="sig-classes" />
             <arg value="-sourcepath" />
             <arg value="sig-src" />
+            <!--arg value="-rdebug" /-->
 	    <arg value="-classpath" />
 	    <arg value="${java.class.path}" />
             <srcfile />

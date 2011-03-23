@@ -21,14 +21,15 @@ public class JifFieldDeclDel extends JifJL_c
         // Set the flag JifFieldInstance.hasInitializer correctly.
         FieldDecl fd = (FieldDecl)super.buildTypes(tb);
         JifFieldInstance jfi = (JifFieldInstance)fd.fieldInstance();
+        JifTypeSystem ts = (JifTypeSystem)tb.typeSystem();
         if (jfi == null) {
             // the only reason the jfi would be null is if 
             // something has gone horribly wrong. Just give up now...
             return fd;
         }
-        jfi.setHasInitializer(fd.init() != null);
-        
-        JifTypeSystem ts = (JifTypeSystem)tb.typeSystem();
+        Expr init = fd.init();
+        jfi.setHasInitializer(init != null);
+
         jfi.setLabel(ts.freshLabelVariable(fd.position(), fd.name(), 
                                            "label of the field " + tb.currentClass().name() + "." + fd.name()));
         return fd;

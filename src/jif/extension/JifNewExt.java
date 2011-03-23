@@ -1,15 +1,25 @@
 package jif.extension;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import jif.JifScheduler;
+import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.*;
+import jif.types.label.AccessPathField;
 import jif.types.label.Label;
+import jif.types.principal.DynamicPrincipal;
+import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.New;
 import polyglot.ast.Node;
+import polyglot.frontend.Job;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.ClassType;
+import polyglot.types.ParsedClassType;
 import polyglot.types.SemanticException;
 
 /** The Jif extension of the <code>New</code> node. 
@@ -34,6 +44,66 @@ public class JifNewExt extends JifExprExt
         List throwTypes = new ArrayList(noe.del().throwTypes(ts));
 
         ClassType ct = (ClassType) ts.unlabel(noe.type());
+        
+        // If there are any final static labels/principals with initializers in rt,
+        // add them to the env.
+        if (ct != null && ct.fields() != null) {
+            for (Iterator it = ct.fields().iterator(); it.hasNext();) {
+                JifFieldInstance jfi = (JifFieldInstance) it.next();
+                if (jfi.flags().isFinal() && jfi.flags().isStatic() && jfi.hasInitializer()) {
+                    AccessPathField path = (AccessPathField) JifUtil.varInstanceToAccessPath(jfi, jfi.position());
+                    Param init = jfi.initializer();
+                    if (ts.isLabel(jfi.type())) {
+                        Label dl = ts.dynamicLabel(jfi.position(), path);
+                        Label rhs_label = (Label) init;
+                        if (rhs_label == null) {
+                            // label checking has not been done on ct yet
+                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
+                            ParsedClassType pct = (ParsedClassType) ct;
+                            Job job = pct.job();
+                            
+                            // first check if ct is in the same source file
+                            // if yes, then no point throwing a MDE - just set unreachableThisRun
+                            // so that label checking continues into ct
+                            Job currentJob = sched.currentJob();
+                            if (job.equals(currentJob)) {
+                                Goal g = sched.currentGoal();
+                                g.setUnreachableThisRun();
+                                continue;
+                            } else {
+                                Goal g = sched.LabelsChecked(pct.job());
+                                throw new MissingDependencyException(g);
+                            }
+                        }
+                        A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
+                    } else if (ts.isImplicitCastValid(jfi.type(), ts.Principal())) {
+                        DynamicPrincipal dp = ts.dynamicPrincipal(jfi.position(), path);                
+                        Principal rhs_principal = (Principal) init;
+                        if (rhs_principal == null) {
+                            // label checking has not been done on ct yet
+                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
+                            ParsedClassType pct = (ParsedClassType) ct;
+                            Job job = pct.job();
+                            
+                            // first check if ct is in the same source file
+                            // if yes, then no point throwing a MDE - just set unreachableThisRun
+                            // so that label checking continues into ct
+                            Job currentJob = sched.currentJob();
+                            if (job.equals(currentJob)) {
+                                Goal g = sched.currentGoal();
+                                g.setUnreachableThisRun();
+                                continue;
+                            } else {
+                                Goal g = sched.LabelsChecked(pct.job());
+                                throw new MissingDependencyException(g);
+                            }
+                        }
+                        A.addDefinitionalEquiv(dp, rhs_principal);
+                    }
+                }
+            }
+        }
+        
 
         constructorChecker.checkConstructorAuthority(ct, A, lc, noe.position());
 
