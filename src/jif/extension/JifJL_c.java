@@ -1,6 +1,8 @@
 package jif.extension;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -10,6 +12,7 @@ import jif.types.JifTypeSystem;
 import polyglot.ast.JL_c;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
@@ -54,11 +57,19 @@ public class JifJL_c extends JL_c implements JifJL
     // do not. 
     public List throwTypes(TypeSystem ts) {
         List l = super.throwTypes(ts);
+        if(l.isEmpty())
+            return l;
+        l = new ArrayList(l);
+        
+        Set rem = new HashSet();
         if(fatalExceptions.isEmpty())
             return l;
-        for (Iterator it = l.iterator(); it.hasNext();)
-            if (fatalExceptions.contains(it.next()))
-                it.remove();
+        for (Iterator it = l.iterator(); it.hasNext();) {
+            Type t = (Type) it.next();
+            if (fatalExceptions.contains(t))
+                rem.add(t);
+        }
+        l.removeAll(rem);
         return l;
     }
 }
