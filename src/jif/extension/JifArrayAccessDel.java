@@ -3,14 +3,9 @@ package jif.extension;
 import java.util.ArrayList;
 import java.util.List;
 
-import jif.types.ConstArrayType;
-
-import polyglot.ast.ArrayAccess;
-import polyglot.ast.Expr;
 import polyglot.ast.Node;
-import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
-import polyglot.visit.TypeChecker;
+import polyglot.util.SubtypeSet;
 
 /** The Jif extension of the <code>ArrayAccess</code> node. 
  */
@@ -56,17 +51,30 @@ public class JifArrayAccessDel extends JifJL_c
      * throw a null pointer exception if the array is guaranteed to be 
      * non-null
      */
+    @Override
+    @SuppressWarnings("unchecked")
     public List throwTypes(TypeSystem ts) {
         List l = new ArrayList(2);
         if (outOfBoundsExcThrown()) {
             l.add(ts.OutOfBoundsException());
         }
         
-        if (!arrayIsNeverNull()) {
+        if (!arrayIsNeverNull()
+                && !fatalExceptions.contains(ts.NullPointerException())) {
             l.add(ts.NullPointerException());
         }
 
         return l;
     }
+
+    @Override
+    public void fatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
+        super.fatalExceptions(ts, fatalExceptions);
+        if(fatalExceptions.contains(ts.OutOfBoundsException()))
+            setNoOutOfBoundsExcThrown();
+        if(fatalExceptions.contains(ts.NullPointerException()))
+            setArrayIsNeverNull();
+    }
+    
     
 }

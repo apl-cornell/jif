@@ -15,6 +15,7 @@ import polyglot.ast.*;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
+import polyglot.util.SubtypeSet;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
@@ -38,6 +39,12 @@ public class JifFieldDel extends JifJL_c
      * OR of all values set.
      */
     private boolean targetNeverNullAlreadySet = false; 
+
+    /**
+     * This flag records if an NPE is fatal due to fail-on-exception.
+     */
+    private boolean isNPEfatal = false;
+
     
     public void setTargetIsNeverNull(boolean neverNull) {
         if (!targetNeverNullAlreadySet) {
@@ -52,6 +59,7 @@ public class JifFieldDel extends JifJL_c
     public boolean targetIsNeverNull() {
         Receiver r = ((Field)node()).target();
         return (r instanceof Special 
+                || isNPEfatal
                 || isTargetNeverNull 
                 || r instanceof CanonicalTypeNode);
     }
@@ -144,10 +152,22 @@ public class JifFieldDel extends JifJL_c
      * throw a null pointer exception if the receiver is guaranteed to be 
      * non-null
      */
+    @SuppressWarnings("unchecked")
+    @Override
     public List throwTypes(TypeSystem ts) {
-        if (!targetIsNeverNull()) {
+        if (!targetIsNeverNull()
+                && !fatalExceptions.contains(ts.NullPointerException())) {
             return Collections.singletonList(ts.NullPointerException());
         }
         return Collections.EMPTY_LIST;
-    }    
+    } 
+    
+    @Override
+    public void fatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
+        super.fatalExceptions(ts, fatalExceptions);
+        if(fatalExceptions.contains(ts.NullPointerException())) 
+            isNPEfatal = true;
+    }
+
+
 }

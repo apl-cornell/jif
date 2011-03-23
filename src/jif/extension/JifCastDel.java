@@ -6,6 +6,7 @@ import jif.types.*;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.*;
 import polyglot.types.*;
+import polyglot.util.SubtypeSet;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
@@ -19,6 +20,7 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
 
     private Set exprPreciseClasses = null;
     private boolean isToSubstJifClass = false;
+    private boolean isClassCastExceptionFatal = false;
 
     public boolean isToSubstJifClass() { return this.isToSubstJifClass; }
 
@@ -62,6 +64,8 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
         return super.typeCheck(tc);
     }
     
+    @Override
+    @SuppressWarnings("unchecked")
     public List throwTypes(TypeSystem ts) {
         Cast c = (Cast)this.node();
 
@@ -73,11 +77,24 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
             LabelTypeCheckUtil ltcu = ((JifTypeSystem)ts).labelTypeCheckUtil();
             ex.addAll(ltcu.throwTypes((JifClassType)c.castType().type()));
         }
+        for(Iterator it = ex.iterator();it.hasNext();)
+            if(fatalExceptions.contains(it.next()))
+                it.remove();
+        
         return ex;
     }
     
-    
+    @Override
+    public void fatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
+        super.fatalExceptions(ts, fatalExceptions);
+        if(fatalExceptions.contains(ts.NullPointerException())) 
+            isClassCastExceptionFatal = true;
+    }
+
     public boolean throwsClassCastException() {
+        if(isClassCastExceptionFatal)
+            return false;
+        
         Cast c = (Cast)this.node();
         Type castType = c.castType().type();
         JifTypeSystem ts = (JifTypeSystem)castType.typeSystem();

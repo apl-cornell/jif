@@ -7,13 +7,18 @@ import jif.ast.JifUtil;
 import jif.visit.IntegerBoundsChecker.Interval;
 import polyglot.ast.Assign;
 import polyglot.types.TypeSystem;
+import polyglot.util.SubtypeSet;
 
 public class JifAssignDel extends JifJL_c
 {
+    protected boolean arithmeticExcIsFatal = false;
+    @Override
+    @SuppressWarnings("unchecked")
     public List throwTypes(TypeSystem ts) {
         List l = new LinkedList();
 
-        if (throwsArithmeticException()) {
+        if (throwsArithmeticException()
+                && !fatalExceptions.contains(ts.ArithmeticException())) {
           l.add(ts.ArithmeticException());
         }
 
@@ -21,6 +26,9 @@ public class JifAssignDel extends JifJL_c
     }
     
     public boolean throwsArithmeticException() {
+        if(arithmeticExcIsFatal)
+            return false;
+        
         Assign a = (Assign)this.node();
         if (a.operator() == Assign.DIV_ASSIGN || a.operator() == Assign.MOD_ASSIGN) {
             // it's a divide or mod operation.
@@ -47,5 +55,12 @@ public class JifAssignDel extends JifJL_c
         }
         return false;
     }    
+    
+    @Override
+    public void fatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
+        super.fatalExceptions(ts, fatalExceptions);
+        if(fatalExceptions.contains(ts.ArithmeticException()))
+            arithmeticExcIsFatal = true;
+    }
 
 }

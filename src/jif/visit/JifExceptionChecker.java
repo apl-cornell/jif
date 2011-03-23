@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import jif.extension.JifJL;
 import jif.extension.JifThrowDel;
 import jif.types.JifLocalInstance;
 import jif.types.JifTypeSystem;
@@ -38,6 +39,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SubtypeSet;
 import polyglot.util.UniqueID;
+import polyglot.visit.ErrorHandlingVisitor;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 
@@ -55,6 +57,8 @@ public class JifExceptionChecker extends ExceptionChecker {
      * @return The final result of the traversal of the tree rooted at 
      *  <code>n</code>.
      */
+    @SuppressWarnings("unchecked")
+    @Override
     protected Node leaveCall(Node parent, Node old, Node n, NodeVisitor v)
 	throws SemanticException {
         //when parent is a CodeDecl, v should be the correct EC???
@@ -98,8 +102,6 @@ public class JifExceptionChecker extends ExceptionChecker {
         	        	
         	if(fatalExcs.size() > 0) {
     	               if(pi instanceof ConstructorInstance) {
-    	                    ConstructorInstance ci = (ConstructorInstance) pi;
-    	                    List stmts = ((Block) n).statements();
     	                    throw new SemanticException(
     	                            "Fail on exception not yet supported in constructors. " 
     	                            + "The following exceptions must be declared or caught: "
@@ -147,17 +149,46 @@ public class JifExceptionChecker extends ExceptionChecker {
 		        	Catch c = nf.Catch(pos, exc, body);
 		        	catchBlocks.add(c);
 	        	}
-	        	List stmts = ((Block) n).statements();
+	        	//remove fatal exceptions from throw types of children
+	                Block newBlock = (Block) n.visit(new FatalExceptionSetter(job,ts,nf,fatalExcs));
+
+	        	List stmts = newBlock.statements();
 	        	Try t = nf.Try(pos, nf.Block(pos,stmts), catchBlocks);
 	        	List newStmts = Collections.singletonList(t);
-	        	return ((Block)n).statements(newStmts);
+	        	return newBlock.statements(newStmts);
         	}
         }
         // gather exceptions from this node.
         return n.del().exceptionCheck(inner);        
     }
+    public static class FatalExceptionSetter extends ErrorHandlingVisitor {
 
-	/**
+        public FatalExceptionSetter(Job job, TypeSystem ts, NodeFactory nf, SubtypeSet toRemove) {
+            super(job, ts, nf);
+            this.toRemove = toRemove;
+        }
+
+        protected SubtypeSet toRemove;
+        
+        @Override
+        public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
+            if(n instanceof Throw) {
+                Throw th = (Throw) n;
+                if(toRemove.contains(th.expr().type()))
+                    throw new SemanticException(
+                            "Explicitly thrown exception "
+                                    + th.expr().type()
+                                    + " must either be caught or declared to be thrown.",
+                            th.position());
+            }
+            //sigh... Not all nodes have JifJL delegates.
+            if(n.del() instanceof JifJL)
+                ((JifJL)n.del()).fatalExceptions(ts, toRemove);
+            
+            return n;
+        }
+    }
+    /**
      * The ast nodes will use this callback to notify us that they throw an
      * exception of type t. This method will throw a SemanticException if the
      * type t is not allowed to be thrown at this point; the exception t will be
@@ -167,7 +198,8 @@ public class JifExceptionChecker extends ExceptionChecker {
      * @param t The type of exception that the node throws.
      * @throws SemanticException
      */
-	@Override
+    @SuppressWarnings("unchecked")
+    @Override
     public void throwsException(Type t, Position pos) throws SemanticException {
 		
         if (! t.isUncheckedException()) {            

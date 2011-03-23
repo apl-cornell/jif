@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import jif.lang.PrincipalUtil.DelegationPair;
 
 /**
- * A Label is the runtime representation of a Jif label. A Label consists of a
+ * A Label is the run  time representation of a Jif label. A Label consists of a
  * set of components, each of which is a {@link jif.lang.IntegPolicy Policy}.
  *  
  */

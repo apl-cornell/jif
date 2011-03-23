@@ -9,6 +9,7 @@ import jif.visit.JifTypeChecker;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SubtypeSet;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
@@ -33,6 +34,11 @@ public class JifCallDel extends JifJL_c
      */
     private boolean targetNeverNullAlreadySet = false; 
     
+    /**
+     * This flag records if an NPE is fatal due to fail-on-exception.
+     */
+    private boolean isNPEfatal = false;
+
     public void setTargetIsNeverNull(boolean neverNull) {
         if (!targetNeverNullAlreadySet) {
             isTargetNeverNull = neverNull;
@@ -46,6 +52,7 @@ public class JifCallDel extends JifJL_c
     public boolean targetIsNeverNull() {
         Receiver r = ((Call)node()).target();
         return (r instanceof Special 
+                || isNPEfatal
                 || isTargetNeverNull 
                 || r instanceof CanonicalTypeNode);
     }
@@ -57,6 +64,8 @@ public class JifCallDel extends JifJL_c
      * throw a null pointer exception if the receiver is guaranteed to be 
      * non-null
      */
+    @SuppressWarnings("unchecked")
+    @Override
     public List throwTypes(TypeSystem ts) {
         MethodInstance mi = ((Call)node()).methodInstance();
         if (mi == null) {
@@ -71,7 +80,8 @@ public class JifCallDel extends JifJL_c
 
         // We may throw a null pointer exception except when the target
         // is "this" or "super", or the receiver is guaranteed to be non-null
-        if (!targetIsNeverNull()) {
+        if (!targetIsNeverNull()
+                && !fatalExceptions.contains(ts.NullPointerException())) {
             l.add(ts.NullPointerException());
         }
 
@@ -86,6 +96,14 @@ public class JifCallDel extends JifJL_c
         }
         return l;
     }
+    
+    @Override
+    public void fatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
+        super.fatalExceptions(ts, fatalExceptions);
+        if(fatalExceptions.contains(ts.NullPointerException())) 
+            isNPEfatal = true;
+    }
+
     
     protected VarLabel receiverVarLabel;
     protected List argVarLabels; // list of var labels for the actual args

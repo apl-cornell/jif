@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import polyglot.ast.Throw;
+import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CollectionUtil;
 
@@ -37,12 +38,15 @@ public class JifThrowDel extends JifJL_c
      * throw a null pointer exception if the thrown object is guaranteed to be 
      * non-null
      */
+    @SuppressWarnings("unchecked")
+    @Override
     public List throwTypes(TypeSystem ts) {
         Throw t = (Throw)node();
 
         // if the exception that a throw statement is given to throw is null,
         // then a NullPointerException will be thrown.
-        if (!isThrownNeverNull && !ts.NullPointerException().equals(t.expr().type())) {
+        if (!isThrownNeverNull && !ts.NullPointerException().equals(t.expr().type())
+                && !fatalExceptions.contains(ts.NullPointerException())) {
             return CollectionUtil.list(t.expr().type(), ts.NullPointerException());
         }
         return Collections.singletonList(t.expr().type());

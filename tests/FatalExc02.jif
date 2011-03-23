@@ -1,0 +1,9 @@
+public class FatalExc02 {
+	static int{} go{}(java.lang.Object{*->} o) {
+		Class c	= o.getClass();	
+		throw new NullPointerException();
+	}
+	public static void main{}(String[] args) {
+		go(new java.lang.Object());	
+	}
+}

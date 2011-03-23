@@ -11,8 +11,10 @@ import polyglot.ast.Expr;
 import polyglot.ast.NewArray;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SubtypeSet;
 import polyglot.visit.TypeChecker;
 
 
@@ -36,15 +38,19 @@ public class JifNewArrayDel extends JifJL_c
      * throw a negative array size exception if the indices is guaranteed to be 
      * non-null
      */
+    @Override
+    @SuppressWarnings("unchecked")
     public List throwTypes(TypeSystem ts) {
         List l = new ArrayList(1);
-        if (!noNegArraySizeExcThrown()) {
-            try {
-                l.add(ts.typeForName("java.lang.NegativeArraySizeException"));
+        try {
+            Type nase = ts.typeForName("java.lang.NegativeArraySizeException");
+            if (!noNegArraySizeExcThrown()
+                    && !fatalExceptions.contains(nase)) {
+                l.add(nase);
             }
-            catch (SemanticException e) {
-                throw new InternalCompilerError("Cannot find class java.lang.NegativeArraySizeException", e);
-            }
+        } catch (SemanticException e) {
+            throw new InternalCompilerError(
+                    "Cannot find class java.lang.NegativeArraySizeException", e);
         }
         return l;
     }
@@ -55,5 +61,19 @@ public class JifNewArrayDel extends JifJL_c
     }
     public boolean noNegArraySizeExcThrown() {
         return noNegArraySizeExcThrown;
+    }
+    
+    @Override
+    public void fatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
+        super.fatalExceptions(ts, fatalExceptions);
+        Type nase;
+        try {
+            nase = ts.typeForName("java.lang.NegativeArraySizeException");
+            if(fatalExceptions.contains(nase)) 
+                setNoNegArraySizeExcThrown();
+        } catch (SemanticException e) {
+            throw new InternalCompilerError(
+                    "Cannot find class java.lang.NegativeArraySizeException", e);
+        }
     }
 }

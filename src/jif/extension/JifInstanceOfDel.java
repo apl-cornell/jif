@@ -1,6 +1,7 @@
 package jif.extension;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import jif.types.*;
@@ -53,6 +54,8 @@ public class JifInstanceOfDel extends JifJL_c
         ts.labelTypeCheckUtil().typeCheckType(tc, compareType);
         return super.typeCheck(tc);
     }
+    @SuppressWarnings("unchecked")
+    @Override
     public List throwTypes(TypeSystem ts) {
         List ex = new ArrayList(super.throwTypes(ts));
         Instanceof io = (Instanceof)this.node();
@@ -60,6 +63,9 @@ public class JifInstanceOfDel extends JifJL_c
             LabelTypeCheckUtil ltcu = ((JifTypeSystem)ts).labelTypeCheckUtil();
             ex.addAll(ltcu.throwTypes((JifClassType)io.compareType().type()));
         }
+        for(Iterator it = ex.iterator();it.hasNext();)
+            if(fatalExceptions.contains(it.next()))
+                it.remove();
         return ex;
     }
 }
