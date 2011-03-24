@@ -1,0 +1,18 @@
+public class FatalExc03 {
+    int{}[]{} items;
+    public void foo() {
+    }
+}
+
+class SearchListener {
+    FatalExc03{⊤→} shop;
+    
+    public int{} onClick{}() {
+        int y = 0;
+        for (int i = 0; i < shop.items.length; i++) {
+            int x = shop.items[i];
+            y = 1;
+        }
+        return y;
+    }
+}
