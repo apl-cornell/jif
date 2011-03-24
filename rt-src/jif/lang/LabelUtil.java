@@ -327,6 +327,11 @@ public class LabelUtil
             exitTiming();
         }
     }
+
+    /**
+     * @return a label representing untrusted information at the given
+     *         confidentiality policy level.
+     */
     public Label toLabel(ConfPolicy policy) {
         try {
             enterTiming();
@@ -336,6 +341,11 @@ public class LabelUtil
             exitTiming();
         }
     }
+
+    /**
+     * @return a label representing public information at the given integrity
+     *         policy level.
+     */
     public Label toLabel(IntegPolicy policy) {
         try {
             enterTiming();
@@ -621,8 +631,8 @@ public class LabelUtil
     public boolean isWritableBy(Label lbl, Principal p) {
         try {
             enterTiming();
-            Label L = toLabel(TOP_CONF, writerPolicy(null, p));
-            return relabelsTo(lbl, L);
+            Label L = toLabel(PrincipalUtil.writableByPrinPolicy(p));
+            return relabelsTo(L, lbl);
         } finally {
             exitTiming();
         }
