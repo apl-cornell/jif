@@ -95,7 +95,8 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
      */
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (constraint() == null) {
+        if (constraint() == null && actor.isDisambiguated()
+                && granter.isDisambiguated()) {
             JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
             return constraint(ts.actsForConstraint(position, actor.parameter(),
                     granter.parameter(), isEquiv));
