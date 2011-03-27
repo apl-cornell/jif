@@ -11,6 +11,7 @@ public class Topics {
     public static String error = "error";
     public static String labels = "labels";
     public static String labelEnv = "labelEnv";
+    public static String pc = "pc";
 
     static {
         Report.topics.add(solver);
@@ -18,5 +19,6 @@ public class Topics {
         Report.topics.add(error);
         Report.topics.add(labels);
         Report.topics.add(labelEnv);
+        Report.topics.add(pc);
     }
 }

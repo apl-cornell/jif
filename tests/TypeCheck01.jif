@@ -1,0 +1,12 @@
+public class TypeCheck01 {
+    public void foo() {
+        B b = new B();
+        b.bar(5);
+    }
+}
+
+class B {
+    public void bar(int x) {
+        TypeCheck01 t = new TypeCheck01();
+    }
+}

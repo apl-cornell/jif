@@ -21,6 +21,7 @@ import polyglot.frontend.goals.Goal;
 import polyglot.types.ClassType;
 import polyglot.types.ParsedClassType;
 import polyglot.types.SemanticException;
+import polyglot.util.InternalCompilerError;
 
 /** The Jif extension of the <code>New</code> node. 
  * 
@@ -34,6 +35,7 @@ public class JifNewExt extends JifExprExt
 
     protected ConstructorChecker constructorChecker = new ConstructorChecker();
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         New noe = (New) node();
 
@@ -57,46 +59,50 @@ public class JifNewExt extends JifExprExt
                         Label dl = ts.dynamicLabel(jfi.position(), path);
                         Label rhs_label = (Label) init;
                         if (rhs_label == null) {
+                            throw new InternalCompilerError("FinalParams has not run yet");
                             // label checking has not been done on ct yet
-                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
-                            ParsedClassType pct = (ParsedClassType) ct;
-                            Job job = pct.job();
-                            
-                            // first check if ct is in the same source file
-                            // if yes, then no point throwing a MDE - just set unreachableThisRun
-                            // so that label checking continues into ct
-                            Job currentJob = sched.currentJob();
-                            if (job.equals(currentJob)) {
-                                Goal g = sched.currentGoal();
-                                g.setUnreachableThisRun();
-                                continue;
-                            } else {
-                                Goal g = sched.LabelsChecked(pct.job());
-                                throw new MissingDependencyException(g);
-                            }
+//                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
+//                            ParsedClassType pct = (ParsedClassType) ct;
+//                            Job job = pct.job();
+//                            
+//                            // first check if ct is in the same source file
+//                            // if yes, then no point throwing a MDE - just set unreachableThisRun
+//                            // so that label checking continues into ct
+//                            Job currentJob = sched.currentJob();
+//                            Goal subgoal = sched.LabelsChecked(pct.job());
+//                            if (job.equals(currentJob)) {
+//                                Goal g = sched.currentGoal();
+//                                g.setUnreachableThisRun();
+//                                sched.addDependencyAndEnqueue(g, subgoal, false);
+//                                continue;
+//                            } else {
+//                                throw new MissingDependencyException(subgoal);
+//                            }
                         }
                         A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
                     } else if (ts.isImplicitCastValid(jfi.type(), ts.Principal())) {
                         DynamicPrincipal dp = ts.dynamicPrincipal(jfi.position(), path);                
                         Principal rhs_principal = (Principal) init;
                         if (rhs_principal == null) {
+                            throw new InternalCompilerError("FinalParams has not run yet");
                             // label checking has not been done on ct yet
-                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
-                            ParsedClassType pct = (ParsedClassType) ct;
-                            Job job = pct.job();
-                            
-                            // first check if ct is in the same source file
-                            // if yes, then no point throwing a MDE - just set unreachableThisRun
-                            // so that label checking continues into ct
-                            Job currentJob = sched.currentJob();
-                            if (job.equals(currentJob)) {
-                                Goal g = sched.currentGoal();
-                                g.setUnreachableThisRun();
-                                continue;
-                            } else {
-                                Goal g = sched.LabelsChecked(pct.job());
-                                throw new MissingDependencyException(g);
-                            }
+//                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
+//                            ParsedClassType pct = (ParsedClassType) ct;
+//                            Job job = pct.job();
+//                            
+//                            // first check if ct is in the same source file
+//                            // if yes, then no point throwing a MDE - just set unreachableThisRun
+//                            // so that label checking continues into ct
+//                            Job currentJob = sched.currentJob();
+//                            Goal subgoal = sched.LabelsChecked(pct.job());
+//                            if (job.equals(currentJob)) {
+//                                Goal g = sched.currentGoal();
+//                                g.setUnreachableThisRun();
+//                                sched.addDependencyAndEnqueue(g, subgoal, false);
+//                                continue;
+//                            } else {
+//                                throw new MissingDependencyException(subgoal);
+//                            }
                         }
                         A.addDefinitionalEquiv(dp, rhs_principal);
                     }

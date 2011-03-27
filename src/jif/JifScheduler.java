@@ -35,10 +35,24 @@ public class JifScheduler extends JLScheduler {
         LabelCheckGoal g = (LabelCheckGoal)internGoal(new LabelCheckGoal(job));
 
         try {
+            addPrerequisiteDependency(g, this.FinalParams(job));            
             addPrerequisiteDependency(g, this.FieldLabelInference(job));
             addPrerequisiteDependency(g, this.IntegerBoundsChecker(job));
 // Jif Dependency bugfix:
             addPrerequisiteDependency(g, this.ExceptionsChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
+    }
+    
+    public Goal FinalParams(Job job) {
+        JifTypeSystem ts = (JifTypeSystem) extInfo.typeSystem();
+        Goal g = internGoal(new VisitorGoal(job, new FinalParams(ts)));
+
+        try {
+            addPrerequisiteDependency(g, this.TypeChecked(job));
         }
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);

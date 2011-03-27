@@ -12,6 +12,7 @@ import jif.visit.LabelChecker;
 import polyglot.ast.Block;
 import polyglot.ast.Node;
 import polyglot.ast.Stmt;
+import polyglot.main.Report;
 import polyglot.types.SemanticException;
 
 /** The Jif extension of the <code>Block</code> node. 
@@ -50,6 +51,10 @@ public class JifBlockExt extends JifStmtExt_c
             // At this point, the environment A should have been extended
             // to include any declarations of s.  Reset the PC label.
             A.setPc(Xs.N(), lc);
+            
+            if (Report.should_report(jif.Topics.pc, 1)) {
+                Report.report(1, "pc after statement at " + s.position() + " : " + A.pc().toString());
+            }
 
             Xblock = Xblock.N(ts.notTaken()).join(Xs);
         }

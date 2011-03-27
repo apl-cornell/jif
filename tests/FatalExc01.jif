@@ -1,6 +1,8 @@
 public class FatalExc01 {
+    static java.lang.Object{⊤→} p;
 	static int{} go{}(java.lang.Object{*->} o) {
-		Class c	= o.getClass();	
+		Class c	= o.getClass();
+		Class d = p.getClass();
 		return 0;
 	}
 	public static void main{}(String[] args) {

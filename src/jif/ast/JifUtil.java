@@ -188,11 +188,12 @@ public class JifUtil
                             Label dl = ts.dynamicLabel(jfi.position(), path2);                
                             Label rhs_label = (Label) init2;
                             if (rhs_label == null) {
+                                throw new InternalCompilerError("FinalParams has not run yet");
                                 // label checking has not been done on ct yet
-                                JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
-                                ParsedClassType pct = (ParsedClassType) ct;
-                                Goal g = sched.LabelsChecked(pct.job());
-                                throw new MissingDependencyException(g);
+//                                JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
+//                                ParsedClassType pct = (ParsedClassType) ct;
+//                                Goal g = sched.LabelsChecked(pct.job());
+//                                throw new MissingDependencyException(g);
                             }
                             A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
                             continue;
@@ -201,11 +202,12 @@ public class JifUtil
                             DynamicPrincipal dp = ts.dynamicPrincipal(jfi.position(), path2);                
                             Principal rhs_principal = (Principal) init2;
                             if (rhs_principal == null) {
+                                throw new InternalCompilerError("FinalParams has not run yet");
                                 // label checking has not been done on ct yet
-                                JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
-                                ParsedClassType pct = (ParsedClassType) ct;
-                                Goal g = sched.LabelsChecked(pct.job());
-                                throw new MissingDependencyException(g);
+//                                JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
+//                                ParsedClassType pct = (ParsedClassType) ct;
+//                                Goal g = sched.LabelsChecked(pct.job());
+//                                throw new MissingDependencyException(g);
                             }
                             A.addDefinitionalEquiv(dp, rhs_principal);
                             continue;

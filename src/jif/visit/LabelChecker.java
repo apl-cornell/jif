@@ -47,11 +47,8 @@ public class LabelChecker implements Copy
     final protected Job job;    
     final protected NodeFactory nf;
 
-    // inits keeps track of any final label/principal field initializers
-    // will be used in static methods for local variables with the current class' type
-    public List<FieldDecl> inits;
 
-
+    public boolean shouldRerun = false;
     /**
      * If true, then a new system of constraints will be used for each 
      * class body, and upon leaving the class body, the system of constraints
@@ -88,7 +85,6 @@ public class LabelChecker implements Copy
         if (!solvePerClassBody && !solvePerMethod) {
             this.solver = this.ts.createSolver("Job solver: " + job.toString());
         }
-        this.inits = new LinkedList<FieldDecl>();
     }
 
     @Override
