@@ -134,6 +134,13 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
         }
                 
         if (guard == null) return b;
-        return nf.Block(pos, nf.If(pos, guard, b));
+        StringLit errorMessage =
+                nf.StringLit(pos, "The method " + mi.debugString()
+                        + " has constraints that are unsatisfied.");
+        Stmt error =
+                nf.Throw(pos, nf.New(pos, nf.CanonicalTypeNode(pos, rw
+                        .java_ts().Error()), Collections
+                        .singletonList(errorMessage)));
+        return nf.Block(pos, nf.If(pos, guard, b, error));
     }
 }

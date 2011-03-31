@@ -1,0 +1,13 @@
+import jif.runtime.Runtime;
+import jif.lang.PrincipalUtil;
+import java.io.PrintStream;
+
+public class MainWhere {
+
+   public static void main{}(principal{} p, String[]{} args)
+      throws (SecurityException)
+      where caller(p), p actsfor Alice
+   {
+   }
+
+}
