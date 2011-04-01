@@ -72,14 +72,12 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
         List ex = new ArrayList(super.throwTypes(ts));
         if (!throwsClassCastException()) {
             ex.remove(ts.ClassCastException());            
-        }
+            return ex;
+        }        
         if (c.castType().type() instanceof JifClassType) {
             LabelTypeCheckUtil ltcu = ((JifTypeSystem)ts).labelTypeCheckUtil();
             ex.addAll(ltcu.throwTypes((JifClassType)c.castType().type()));
         }
-        for(Iterator it = ex.iterator();it.hasNext();)
-            if(fatalExceptions.contains(it.next()))
-                it.remove();
         
         return ex;
     }
@@ -87,7 +85,7 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
     @Override
     public void fatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
         super.fatalExceptions(ts, fatalExceptions);
-        if(fatalExceptions.contains(ts.NullPointerException())) 
+        if(fatalExceptions.contains(ts.ClassCastException())) 
             isClassCastExceptionFatal = true;
     }
 
