@@ -2,10 +2,17 @@ package jif.extension;
 
 import jif.JifOptions;
 import jif.ast.DowngradeExpr;
-import jif.ast.Jif_c;
+import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.ConstraintMessage;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.LabelSubstitution;
+import jif.types.NamedLabel;
+import jif.types.PathMap;
 import jif.types.label.Label;
+import jif.types.label.MeetLabel;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
@@ -25,20 +32,22 @@ public abstract class JifDowngradeExprExt extends JifExprExt
     protected JifContext declassifyConstraintContext(LabelChecker lc, JifContext A, Label downgradeFrom, Label downgradeTo) throws SemanticException {
         return A;
     }
-
+    
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         final DowngradeExpr d = (DowngradeExpr) node();
 
         JifContext A = lc.jifContext();
         A = (JifContext) d.del().enterScope(A);
 
+        // get the label on e without pc environment
         Expr e = (Expr) lc.context(A).labelCheck(d.expr());
         PathMap Xe = getPathMap(e);
 
         Xe = downgradeExprPathMap(lc.context(A), Xe);
-
+        
         Label downgradeTo = d.label().label();
         Label downgradeFrom = null;
+
         boolean boundSpecified;
         if (d.bound() != null) {
             boundSpecified = true;
@@ -49,31 +58,40 @@ public abstract class JifDowngradeExprExt extends JifExprExt
             downgradeFrom = lc.typeSystem().freshLabelVariable(d.position(), 
                                                                "downgrade_from", 
             "The label the downgrade expression is downgrading from");
-        }
-
+        }		
+        
+        Label inferedFrom = lc.typeSystem().freshLabelVariable(d.position(), 
+                "infered_downgrade_from",
+                "The label of the target label of downgraded expression");
+        inferLabelFrom(lc, d.position(), A, d, inferedFrom, Xe.NV(), downgradeFrom);
+       
         // The pc at the point of declassification is dependent on the expression to declassify
         // terminating normally.
         A = (JifContext) A.pushBlock();
         A.setPc(Xe.N(), lc);
         lc = lc.context(A);
 
-        checkDowngradeFromBound(lc, A, Xe, d, downgradeFrom, downgradeTo, boundSpecified);
+        Label inferedTo = lc.typeSystem().freshLabelVariable(d.position(), 
+                "infered_downgrade_to",
+                "The label of the target label of downgraded expression");
+        inferLabelTo(lc, d.position(), A, inferedTo, Xe.NV(), downgradeTo);
+        checkDowngradeFromBound(lc, A, Xe, d, inferedFrom, inferedTo, boundSpecified);
 
-        JifContext dA = declassifyConstraintContext(lc, A, downgradeFrom, downgradeTo);
-        checkOneDimenOnly(lc, dA, downgradeFrom, downgradeTo, d.position());
+        JifContext dA = declassifyConstraintContext(lc, A, inferedFrom, inferedTo);
+        checkOneDimenOnly(lc, dA, inferedFrom, inferedTo, d.position());
 
-        checkAuthority(lc, dA, downgradeFrom, downgradeTo, d.position());
+        checkAuthority(lc, dA, inferedFrom, inferedTo, d.position());
 
         if (!((JifOptions)JifOptions.global).nonRobustness) {
-            checkRobustness(lc, dA, downgradeFrom, downgradeTo, d.position());
+            checkRobustness(lc, dA, inferedFrom, inferedTo, d.position());
         }
-
-        PathMap X = Xe.NV(lc.upperBound(dA.pc(), downgradeTo));           
-
+        PathMap X = Xe.NV(lc.upperBound(dA.pc(), inferedTo));
 
         return updatePathMap(d.expr(e), X);
     }
 
+    abstract void inferLabelFrom(LabelChecker lc, Position pos, JifContext A, DowngradeExpr d, Label inferredFrom, Label exp, Label from) throws SemanticException;
+    abstract void inferLabelTo(LabelChecker lc, Position pos, JifContext A, Label l, Label exp, Label to) throws SemanticException;
     /**
      * @throws SemanticException 
      * 
@@ -81,9 +99,10 @@ public abstract class JifDowngradeExprExt extends JifExprExt
     protected void checkDowngradeFromBound(LabelChecker lc, JifContext A,
             PathMap Xe, final DowngradeExpr d, Label downgradeFrom,
             Label downgradeTo, boolean boundSpecified) throws SemanticException {
+    	Label from = downgradeFrom;
         lc.constrain(new NamedLabel("expr.nv", Xe.NV()), 
                                          boundSpecified?LabelConstraint.LEQ:LabelConstraint.EQUAL, 
-                                                 new NamedLabel("downgrade_bound", downgradeFrom),
+                                                 new NamedLabel("downgrade_bound", from),
                                                  A.labelEnv(),
                                                  d.position(),
                                                  boundSpecified, /* report this constraint if the bound was specified*/ 
