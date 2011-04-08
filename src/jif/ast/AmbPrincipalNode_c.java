@@ -8,6 +8,7 @@ import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.*;
+import polyglot.ext.param.types.SubstClassType_c;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
@@ -68,13 +69,25 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         if (! expr.isTypeChecked()) {
             if (expr instanceof Field) {
                 Field f = (Field)expr;
-                if (ts.unlabel(f.target().type()) instanceof ParsedClassType) {
+                if (ts.unlabel(f.target().type()) instanceof JifClassType) {
                     // disambiguate the class of the receiver of the field,
                     // so that type checking will eventually go through.
-                    ParsedClassType pct = (ParsedClassType)ts.unlabel(f.target().type());
-                    Scheduler sched = ar.job().extensionInfo().scheduler();
-                    Goal g = sched.Disambiguated(pct.job());
-                    throw new MissingDependencyException(g);                        
+                    JifClassType jct = (JifClassType) ts.unlabel(f.target().type());
+                    ParsedClassType pct = null;
+                    if (jct instanceof ParsedClassType)
+                        pct = (ParsedClassType) jct;
+                    //XXX: SubstTypes are not subclasses of ParsedClassTypes!
+                    else if (jct instanceof JifSubstType) {
+                        JifSubstType jst = (JifSubstType) jct;
+                        if (jst.base() instanceof ParsedClassType)
+                            pct = (ParsedClassType) jst.base();
+                    }
+                    if(pct != null) {
+                        Scheduler sched = ar.job().extensionInfo().scheduler();
+                        Goal g = sched.Disambiguated(pct.job());
+                        throw new MissingDependencyException(g);                    
+                    }
+                    //XXX: otherwise... hope for the best?
                 }
             }
 
