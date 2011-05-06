@@ -81,6 +81,12 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
     }
     
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
+        if (L instanceof PairLabel) {
+            PairLabel that = (PairLabel)L;
+            return env.leq(this.confProjection(), that.confPolicy(), state) &&
+                   env.leq(this.integProjection(), that.integPolicy(), state);
+        }
+        
         // only leq if equal to this parameter, which is checked before 
         // this method is called.
         return false;
