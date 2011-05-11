@@ -1,9 +1,12 @@
 package jif;
 
+import javax.tools.StandardJavaFileManager;
+
 import jif.visit.JifTranslator;
 import polyglot.ast.Node;
 import polyglot.frontend.*;
 import polyglot.frontend.goals.CodeGenerated;
+import polyglot.frontend.goals.EmptyGoal;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.SourceFileGoal;
 import polyglot.main.Options;
@@ -30,7 +33,11 @@ public class OutputExtensionInfo extends JLExtensionInfo {
     public Options getOptions() {
         return jifExtInfo.getOptions();
     }
-    
+    @Override
+    public StandardJavaFileManager fileManager() {
+        return jifExtInfo.fileManager();
+    }
+
     public Scheduler createScheduler() {
         return new OutputScheduler(this);
     }
@@ -116,11 +123,9 @@ public class OutputExtensionInfo extends JLExtensionInfo {
     protected void initTypeSystem() {
         try {
             LoadedClassResolver lr;
-            lr = new SourceClassResolver(compiler, this, 
-                                         jifExtInfo.getJifOptions().constructOutputExtClasspath(),
-                                         compiler.loader(), true,
-                                         getOptions().compile_command_line_only,
-                                         getOptions().ignore_mod_times);
+            lr = new SourceClassResolver(compiler, this, true,
+                            getOptions().compile_command_line_only,
+                            getOptions().ignore_mod_times);
             ts.initialize(lr, this);
         }
         catch (SemanticException e) {

@@ -1,15 +1,21 @@
 package jif;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
+
+import javax.tools.JavaFileManager;
+import javax.tools.JavaFileManager.Location;
 
 import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.main.UsageError;
+import polyglot.util.InternalCompilerError;
 
 /**
  * This object encapsulates various polyglot options.
@@ -54,6 +60,19 @@ public class JifOptions extends Options {
       * Additional classpath entries for Jif signatures.
       */
      public List<String> addSigcp = new ArrayList<String>();
+
+
+    public Location signature_path = new Location() {
+        @Override
+        public String getName() {
+            return "SIGNATURE_PATH";
+        }
+
+        @Override
+        public boolean isOutputLocation() {
+            return false;
+        }        
+    };
 
     /**
      * Constructor
@@ -156,30 +175,27 @@ public class JifOptions extends Options {
         usageForFlag(out, "-trusted-providers", "set the providers of the sources being compiled to be trusted (use -untrusted-providers to disable)");
     }
 
-    public String constructSignatureClasspath() {        
+    public void addSignaturesToClassPath() {        
         // use the signature classpath if it exists for compiling Jif classes
-        String scp = "";
+        List<File> path = new ArrayList<File>();
         for (Iterator<String> iter = addSigcp.iterator(); iter.hasNext(); ) {
-            scp += iter.next();
-            if (iter.hasNext()) {
-                scp += File.pathSeparator;            
-            }
+            path.add(new File(iter.next()));
         }
         if (sigcp != null) {
-            scp += File.pathSeparator + sigcp;
+            StringTokenizer st = new StringTokenizer(sigcp, File.pathSeparator);
+            while(st.hasMoreTokens())
+            {
+                path.add(new File(st.nextToken()));
+            }
         }
-        return scp;
-    }
-
-    public String constructJifClasspath() {
-        return constructSignatureClasspath() +  
-                File.pathSeparator + constructFullClasspath();
+        try {
+            path.addAll(classpath_directories);
+            extension.fileManager().setLocation(signature_path, path);
+        } catch (IOException e) {
+            throw new InternalCompilerError(e);
+        }        
     }
     
-    public String constructOutputExtClasspath() {
-        return constructFullClasspath();
-    }
-
     @Override
     public String constructPostCompilerClasspath() {
         String cp = super.constructPostCompilerClasspath() + File.pathSeparator

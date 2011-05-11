@@ -2,8 +2,14 @@ package jif;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+
+import javax.tools.FileObject;
+import javax.tools.JavaFileObject;
+import javax.tools.JavaFileManager.Location;
 
 import jif.ast.JifNodeFactory;
 import jif.ast.JifNodeFactory_c;
@@ -19,6 +25,8 @@ import polyglot.types.LoadedClassResolver;
 import polyglot.types.SemanticException;
 import polyglot.types.SourceClassResolver;
 import polyglot.types.TypeSystem;
+import polyglot.types.reflect.ClassFileLoader;
+import polyglot.types.reflect.ClassFileLoader_c;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 
@@ -86,11 +94,9 @@ public class ExtensionInfo extends JLExtensionInfo
     protected void initTypeSystem() {
         try {
             LoadedClassResolver lr;
-            lr = new SourceClassResolver(compiler, this, 
-                                         getJifOptions().constructJifClasspath(),
-                                         compiler.loader(), false,
-                                         getOptions().compile_command_line_only,
-                                         getOptions().ignore_mod_times);
+            lr = new SourceClassResolver(compiler, this, false,
+                    getOptions().compile_command_line_only,
+                    getOptions().ignore_mod_times);
             ts.initialize(lr, this);
         }
         catch (SemanticException e) {
@@ -150,8 +156,16 @@ public class ExtensionInfo extends JLExtensionInfo
     }
 
     @Override
-    public FileSource createFileSource(java.io.File f, boolean user)
+    public FileSource createFileSource(FileObject f, boolean user)
             throws IOException {
-        return new jif.parse.UTF8FileSource(f, user);
+        return new jif.parse.UTF8FileSource((JavaFileObject) f, user);
     }
+    
+    public ClassFileLoader classFileLoader() {
+        ClassFileLoader cfl = super.classFileLoader();
+        getJifOptions().addSignaturesToClassPath();
+        cfl.addLocation(getJifOptions().signature_path);
+        return cfl;
+    }
+
 }
