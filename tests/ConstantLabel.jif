@@ -1,0 +1,8 @@
+public class ConstantLabel {
+	private final principal p;
+	public final label{*lbl} lbl = new label {p->};	
+	public ConstantLabel () {
+		super();
+		p = new principal(_);
+	}
+}
