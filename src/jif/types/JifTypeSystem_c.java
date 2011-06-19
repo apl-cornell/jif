@@ -806,8 +806,14 @@ public class JifTypeSystem_c
         if (ps.isEmpty()) return bottomPrincipal(pos);
         ps = flattenConjuncts(ps);
         if (ps.size() == 1) return ps.iterator().next();
-        return new ConjunctivePrincipal_c(ps, this, pos);
+        return new ConjunctivePrincipal_c(ps, this, pos, conjunctivePrincipalTranslator());
     }
+    
+    @Override
+    public PrincipalToJavaExpr conjunctivePrincipalTranslator() {
+        return new ConjunctivePrincipalToJavaExpr_c();
+    }
+
     @Override
     public Principal disjunctivePrincipal(Position pos, Principal l, Principal r) {
         return disjunctivePrincipal(pos,
@@ -818,9 +824,14 @@ public class JifTypeSystem_c
         if (ps.isEmpty()) return topPrincipal(pos);
         ps = flattenDisjuncts(ps);
         if (ps.size() == 1) return ps.iterator().next();
-        return new DisjunctivePrincipal_c(ps, this, pos);
+        return new DisjunctivePrincipal_c(ps, this, pos, disjunctivePrincipalTranslator());
     }
 
+    @Override
+    public PrincipalToJavaExpr disjunctivePrincipalTranslator() {
+        return new DisjunctivePrincipalToJavaExpr_c();
+    }
+    
     private Collection<Principal> flattenConjuncts(Collection<Principal> ps) {
         Set<Principal> newps = new LinkedHashSet<Principal>();
         for (Principal p : ps) {

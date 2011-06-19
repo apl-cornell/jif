@@ -24,10 +24,10 @@ import polyglot.visit.NodeVisitor;
 public class JifToJavaRewriter extends ContextVisitor
 {
     protected ExtensionInfo java_ext;
-    private JifTypeSystem jif_ts;
-    private JifNodeFactory jif_nf;
-    private Job job;
-    private QQ qq;
+    protected JifTypeSystem jif_ts;
+    protected JifNodeFactory jif_nf;
+    protected Job job;
+    protected QQ qq;
     
     protected Collection additionalClassDecls;
     protected Collection newSourceFiles;

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import jif.extension.LabelTypeCheckUtil;
+import jif.translate.PrincipalToJavaExpr;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.*;
 import jif.types.principal.*;
@@ -362,4 +363,13 @@ public interface JifTypeSystem extends ParamTypeSystem
      *         checking whether L <= p.
      */
     Label toLabel(Principal p);
+
+    /**
+     * @return class for translating conjunctive principals to java expressions
+     */
+    PrincipalToJavaExpr conjunctivePrincipalTranslator();
+    /**
+     * @return class for translating disjunctive principals to java expressions
+     */
+    PrincipalToJavaExpr disjunctivePrincipalTranslator();
 }
