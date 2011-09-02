@@ -66,7 +66,7 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
     }
 
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
-        // can be leq than L is L is also a dynamic label with an access path
+        // can be leq than L if L is also a dynamic label with an access path
         // equivalent to this one.
         if (L instanceof DynamicLabel) {
             DynamicLabel that = (DynamicLabel)L;
