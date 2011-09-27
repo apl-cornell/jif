@@ -168,9 +168,9 @@ public class LabelTypeCheckUtil {
         t = ts.unlabel(t);
 
         if (t instanceof JifSubstType) {            
-            JifSubstType jst = (JifSubstType)t;
+            JifClassType jct = (JifSubstType)t;
 
-            for (Param arg : jst.actuals()) {
+            for (Param arg : jct.actuals()) {
                 if (arg instanceof Label) {
                     Label L = (Label)arg;
                     typeCheckLabel(tc, L);
@@ -217,8 +217,9 @@ public class LabelTypeCheckUtil {
             PathMap X = ts.pathMap().N(A.pc());            
             JifSubstType jst = (JifSubstType)t;
             Xparams = new ArrayList<PathMap>(jst.subst().substitutions().size());
-
-            for (Param arg : jst.actuals()) {
+            
+            JifClassType jct = jst;
+            for (Param arg : jct.actuals()) {
                 if (arg instanceof Label) {
                     Label L = (Label)arg;
                     A = (JifContext)A.pushBlock();
@@ -303,9 +304,9 @@ public class LabelTypeCheckUtil {
     public List<Type> throwTypes(JifClassType type) {
         Type t = ts.unlabel(type);
         if (t instanceof JifSubstType && ts.isParamsRuntimeRep(t)) {            
-            JifSubstType jst = (JifSubstType)t;
+            JifClassType jct = (JifSubstType)t;
             List<Type> exc = new ArrayList<Type>();
-            for (Param arg : jst.actuals()) {
+            for (Param arg : jct.actuals()) {
                 if (arg instanceof Label) {
                     exc.addAll(((Label)arg).throwTypes(ts));
                 }
@@ -329,9 +330,8 @@ public class LabelTypeCheckUtil {
     public Set<LocalInstance> localInstancesUsed(JifClassType type) {
         Type t = ts.unlabel(type);
         if (t instanceof JifSubstType) {            
-            JifSubstType jst = (JifSubstType)t;
             Set<LocalInstance> lis = new LinkedHashSet<LocalInstance>();
-            for (Param arg : jst.actuals()) {
+            for (Param arg : type.actuals()) {
                 AccessPath p = null;
                 if (arg instanceof DynamicLabel) {
                     p = ((DynamicLabel)arg).path();
