@@ -82,7 +82,7 @@ public class IntegProjectionPolicy_c extends Policy_c implements IntegPolicy {
         }
 
         JifTypeSystem ts = (JifTypeSystem)typeSystem();
-        Policy newPolicy = ts.integProjection(this.label());
+        Policy newPolicy = ts.integProjection(newLabel);
         return substitution.substPolicy(newPolicy).simplify();
     }
     
