@@ -85,7 +85,13 @@ public class WriterPolicy_c extends Policy_c implements WriterPolicy {
             // for all i . wi >= o || exists j . wi >= wj'
             return env.actsFor(this.writer(), that.owner()) ||
                 env.actsFor(this.writer(), that.writer());
-        }        
+        }
+        
+        if (p instanceof IntegProjectionPolicy_c) {
+            Label lowb = env.findLowerBound(((IntegProjectionPolicy_c)p).label());
+            return env.leq(this, lowb.integProjection());
+        }
+        
         return false;
     }
 

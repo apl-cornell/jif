@@ -30,6 +30,13 @@ public interface LabelEnv
      * determine a more precise bound. 
      */
     Label findUpperBound(Label L);
+
+    /**
+     * Finds an lower bound for L using the assertions in this environment.
+     * May return the bottom label if there is insufficient information to
+     * determine a more precise bound. 
+     */
+    Label findLowerBound(Label L);
     
     /**
      * Finds an upper bound for L that does not have any arg labels in it.

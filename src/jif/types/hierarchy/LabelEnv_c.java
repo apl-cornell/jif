@@ -14,6 +14,7 @@ import polyglot.types.TypeObject;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * The wrapper of a set of assumptions that can be used to decide
@@ -796,6 +797,96 @@ public class LabelEnv_c implements LabelEnv
         return labelAssertions.isEmpty() && ph.isEmpty();
     }
     
+    /**
+     * Finds a PairLabel lower bound. It does not use leq
+     *
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public Label findLowerBound(Label L) {
+        return findLowerBound(L, Collections.EMPTY_SET, false);
+    }
+    
+    protected Label findLowerBound(Label L, Collection<Serializable> seen, boolean noArgLabels) {        
+        // L is a pair label.
+        if (L instanceof PairLabel) return L;
+        if (L instanceof VarLabel_c) {
+            // cant do anything.
+            return L;
+        }        
+        if (noArgLabels && (L instanceof DynamicLabel || 
+                L instanceof ParamLabel ||
+                L instanceof CovariantParamLabel)) {
+            // good enough
+            return L;
+        }
+        
+        if (seen.contains(L)) return ts.bottomLabel();
+        
+        Collection<Serializable> newSeen = new ArrayList<Serializable>(seen.size() + 1);
+        newSeen.addAll(seen);
+        newSeen.add(L);
+                
+        Set<Label> allBounds = new LinkedHashSet<Label>();
+        if (L instanceof JoinLabel) {
+            JoinLabel jl = (JoinLabel)L;
+            Label ret = ts.bottomLabel();
+            for (Iterator<Label> iter = jl.joinComponents().iterator(); iter.hasNext();) {
+                Label comp = iter.next();
+                ret = ts.join(ret, this.findLowerBound(comp, newSeen, noArgLabels));
+            }
+            allBounds.add(ret);
+        }
+        if (L instanceof MeetLabel) {
+            MeetLabel ml = (MeetLabel)L;
+            Label ret = ts.topLabel();
+            for (Iterator<Label> iter = ml.meetComponents().iterator(); iter.hasNext();) {
+                Label comp = iter.next();
+                ret = ts.meet(ret, this.findLowerBound(comp, newSeen, noArgLabels));
+            }
+            allBounds.add(ret);
+        }
+                
+        // check the assertions
+        for (Iterator<LabelLeAssertion> i = labelAssertions.iterator(); i.hasNext();) { 
+            LabelLeAssertion c = i.next();
+
+            Label cLHS = c.lhs();
+            if (cLHS.hasVariables()) { 
+                cLHS = this.solver.applyBoundsTo(c.lhs());
+            }
+            Label cRHS = c.rhs();
+            if (cRHS.hasVariables()) { 
+                cRHS = this.solver.applyBoundsTo(c.rhs());
+            }
+            if (L.equals(cRHS)) {
+                allBounds.add(findLowerBound(cLHS, newSeen, noArgLabels));
+            }
+        }
+
+        if (L instanceof ArgLabel) {
+            if (Report.should_report(topics, 4))
+                Report.report(4, "ArgLabel " + L + " does not have a non-trivial lower bound");
+            return ts.bottomLabel();
+        }
+        
+        if (!allBounds.isEmpty()) {
+            Label lowerBound;
+            if (allBounds.size() == 1) {
+                lowerBound = allBounds.iterator().next();
+            }
+            else {
+                lowerBound = ts.joinLabel(L.position(), allBounds);
+            }
+            if (Report.should_report(topics, 4))
+                Report.report(4, "Using " + lowerBound + " as lower bound for " + L);
+            return lowerBound;
+        }
+
+        if (Report.should_report(topics, 4))
+            Report.report(4, "Using bottom as lower bound for " + L);
+        return ts.bottomLabel();
+    }
     
     /**
      * Finds a PairLabel upper bound. It does not use leq
