@@ -14,7 +14,6 @@ import polyglot.types.TypeObject;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * The wrapper of a set of assumptions that can be used to decide
