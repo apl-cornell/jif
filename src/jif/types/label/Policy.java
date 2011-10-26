@@ -8,6 +8,7 @@ import jif.types.LabelSubstitution;
 import jif.types.PathMap;
 import jif.visit.LabelChecker;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 
@@ -17,6 +18,7 @@ import polyglot.types.TypeSystem;
  * confidentiality policies.
  */
 public interface Policy extends TypeObject { 
+    @Override
     boolean isCanonical();
     boolean isSingleton();
     boolean isRuntimeRepresentable();
@@ -26,9 +28,9 @@ public interface Policy extends TypeObject {
     boolean hasWritersToReaders();
     
     
-    List throwTypes(TypeSystem ts);
+    List<Type> throwTypes(TypeSystem ts);
     Policy subst(LabelSubstitution substitution) throws SemanticException;
     Policy simplify();
-    String toString(Set printedLabels);
+    String toString(Set<Label> printedLabels);
     PathMap labelCheck(JifContext A, LabelChecker lc);
 }

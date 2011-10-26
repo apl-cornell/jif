@@ -10,6 +10,7 @@ import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.visit.LabelChecker;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
@@ -17,11 +18,11 @@ import polyglot.util.Position;
 
 /** Represents the meet of a number of policies. 
  */
-public abstract class MeetPolicy_c extends Policy_c {
-    private final Set meetComponents;
+public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
+    private final Set<P> meetComponents;
     private Integer hashCode = null;
     
-    public MeetPolicy_c(Set components, JifTypeSystem ts, Position pos) {
+    public MeetPolicy_c(Set<P> components, JifTypeSystem ts, Position pos) {
         super(ts, pos);
         this.meetComponents = Collections.unmodifiableSet(flatten(components));
         if (this.meetComponents.isEmpty()) {
@@ -29,21 +30,22 @@ public abstract class MeetPolicy_c extends Policy_c {
         }
     }
     
+    @Override
     public boolean isSingleton() {
         return meetComponents.size() == 1;
     }
+    @Override
     public boolean isCanonical() {
-        for (Iterator i = meetComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();            
+        for (P c : meetComponents) {
             if (! c.isCanonical()) {
                 return false;
             }
         }        
         return true;
     }
+    @Override
     public boolean isRuntimeRepresentable() {
-        for (Iterator i = meetComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();            
+        for (P c : meetComponents) {
             if (! c.isRuntimeRepresentable()) {
                 return false;
             }
@@ -51,10 +53,12 @@ public abstract class MeetPolicy_c extends Policy_c {
         return true;
     }
             
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof MeetPolicy_c) {
-            MeetPolicy_c that = (MeetPolicy_c)o;
+            @SuppressWarnings("rawtypes")
+            MeetPolicy_c that = (MeetPolicy_c) o;
             return this.hashCode() == that.hashCode() && this.meetComponents.equals(that.meetComponents);
         }
         if (o instanceof Policy) {
@@ -63,6 +67,7 @@ public abstract class MeetPolicy_c extends Policy_c {
         }
         return false;
     }
+    @Override
     public int hashCode() {
         if (hashCode == null) {
             hashCode = new Integer(meetComponents.hashCode());
@@ -70,10 +75,11 @@ public abstract class MeetPolicy_c extends Policy_c {
         return hashCode.intValue();
     }
     
-    public String toString(Set printedLabels) {
+    @Override
+    public String toString(Set<Label> printedLabels) {
         String s = "";
-        for (Iterator i = meetComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();
+        for (Iterator<P> i = meetComponents.iterator(); i.hasNext(); ) {
+            P c = i.next();
             s += c.toString(printedLabels);
             
             if (i.hasNext()) {
@@ -87,9 +93,7 @@ public abstract class MeetPolicy_c extends Policy_c {
     protected boolean leq_(Policy p, LabelEnv env, SearchState state) {
         // If this = { .. Pi .. , check there exists an i
         // such that Pi <= p
-        for (Iterator i = meetComponents.iterator(); i.hasNext(); ) {
-            Policy pi = (Policy) i.next();
-            
+        for (P pi : meetComponents) {
             if (env.leq(pi, p, state)) {
                 return true;
             }
@@ -98,7 +102,7 @@ public abstract class MeetPolicy_c extends Policy_c {
         return false;
     }
     
-    public Collection meetComponents() {
+    public Collection<P> meetComponents() {
         return Collections.unmodifiableCollection(meetComponents);
     }
 
@@ -106,6 +110,7 @@ public abstract class MeetPolicy_c extends Policy_c {
      * @return An equivalent label with fewer components by pulling out
      * less restrictive policies.
      */
+    @Override
     protected Policy simplifyImpl() {
         if (meetComponents.isEmpty()) {
             return this;
@@ -114,12 +119,13 @@ public abstract class MeetPolicy_c extends Policy_c {
             return ((Policy)meetComponents.iterator().next()).simplify();
         }
 
-        Collection comps = flatten(meetComponents);
-        Set needed = new LinkedHashSet();
+        Collection<P> comps = flatten(meetComponents);
+        Set<P> needed = new LinkedHashSet<P>();
         JifTypeSystem jts = (JifTypeSystem) ts;
 
-        for (Iterator i = comps.iterator(); i.hasNext(); ) {
-            Policy ci = ((Policy) i.next()).simplify();
+        for (P comp : comps) {
+            @SuppressWarnings("unchecked")
+            P ci = (P) comp.simplify();
             
             if (ci.hasVariables() || ci.hasWritersToReaders()) {
                 needed.add(ci);
@@ -127,8 +133,8 @@ public abstract class MeetPolicy_c extends Policy_c {
             else {
                 boolean subsumed = false;
                 
-                for (Iterator j = needed.iterator(); j.hasNext(); ) {
-                    Policy cj = (Policy) j.next();
+                for (Iterator<P> j = needed.iterator(); j.hasNext(); ) {
+                    P cj = j.next();
                     
                     if (cj.hasVariables() || cj.hasWritersToReaders()) {
                         continue;
@@ -153,20 +159,18 @@ public abstract class MeetPolicy_c extends Policy_c {
             return this;
         }
         if (needed.size() == 1) {
-            return (Policy)needed.iterator().next();
+            return needed.iterator().next();
         }
 
         return constructMeetPolicy(needed, position);
     }
     
-    protected abstract Policy constructMeetPolicy(Set components, Position pos);
+    protected abstract Policy constructMeetPolicy(Set<P> components, Position pos);
     
-    private static Set flatten(Set comps) {
+    private static <P extends Policy> Set<P> flatten(Set<P> comps) {
         // check if there are any meet policies in there.
         boolean needFlattening = false;
-        for (Iterator i = comps.iterator(); i.hasNext(); ) {
-            Policy p = (Policy) i.next();
-            
+        for (P p : comps) {
             if (p instanceof MeetPolicy_c) {
                 needFlattening = true;
                 break;
@@ -175,16 +179,16 @@ public abstract class MeetPolicy_c extends Policy_c {
         
         if (!needFlattening) return comps;
         
-        Set c = new LinkedHashSet();
-        for (Iterator i = comps.iterator(); i.hasNext(); ) {
-            Policy p = (Policy) i.next();
-            
+        Set<P> c = new LinkedHashSet<P>();
+        for (P p : comps) {
             if (p.isBottom()) {
                 return Collections.singleton(p);
             }
             
             if (p instanceof MeetPolicy_c) {
-                Collection lComps = ((MeetPolicy_c)p).meetComponents();
+                @SuppressWarnings("unchecked")
+                MeetPolicy_c<P> mp = (MeetPolicy_c<P>) p;
+                Collection<P> lComps = mp.meetComponents();
                 c.addAll(lComps);                
             }
             else {
@@ -195,25 +199,26 @@ public abstract class MeetPolicy_c extends Policy_c {
         return c;
     }
 
-    public List throwTypes(TypeSystem ts) {
-        List throwTypes = new ArrayList();
-        for (Iterator i = meetComponents.iterator(); i.hasNext(); ) {
-            Policy L = (Policy) i.next();
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
+        List<Type> throwTypes = new ArrayList<Type>();
+        for (P L : meetComponents) {
             throwTypes.addAll(L.throwTypes(ts));
         }
         return throwTypes; 
     }
 
+    @Override
     public Policy subst(LabelSubstitution substitution) throws SemanticException {        
         if (meetComponents.isEmpty()) {
             return substitution.substPolicy(this).simplify();
         }
         boolean changed = false;
-        Set s = new LinkedHashSet();
+        Set<P> s = new LinkedHashSet<P>();
         
-        for (Iterator i = meetComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();
-            Policy newc = c.subst(substitution);
+        for (P c : meetComponents) {
+            @SuppressWarnings("unchecked")
+            P newc = (P) c.subst(substitution);
             if (newc != c) changed = true;
             s.add(newc);
         }
@@ -223,22 +228,23 @@ public abstract class MeetPolicy_c extends Policy_c {
         Policy newMeetPolicy = constructMeetPolicy(flatten(s), position);
         return substitution.substPolicy(newMeetPolicy).simplify();
     }
+    @Override
     public boolean hasWritersToReaders() {
-        for (Iterator i = meetComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();
+        for (P c : meetComponents) {
             if (c.hasWritersToReaders()) return true;
         }
         return false;
     }    
+    @Override
     public boolean hasVariables() {
-        for (Iterator i = meetComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();
+        for (P c : meetComponents) {
             if (c.hasVariables()) return true;
         }
         return false;
     }    
 
     
+    @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         PathMap X = ts.pathMap().N(A.pc()).NV(A.pc());
@@ -249,29 +255,28 @@ public abstract class MeetPolicy_c extends Policy_c {
 
         A = (JifContext)A.pushBlock();
         
-        for (Iterator i = meetComponents.iterator(); i.hasNext(); ) {
+        for (P c : meetComponents) {
             A.setPc(X.N(), lc);
-            Policy c = (Policy) i.next();
             PathMap Xc = c.labelCheck(A, lc);
             X = X.join(Xc);            
         }
         return X;
     }
 
+    @Override
     public boolean isTop() {
         // top if all policies is top
-        for (Iterator i = meetComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();            
+        for (P c : meetComponents) {
             if (!c.isTop()) {
                 return false;
             }
         }        
         return true;
     }
+    @Override
     public boolean isBottom() {
         // bottom if any policy is bottom
-        for (Iterator i = meetComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();            
+        for (P c : meetComponents) {
             if (c.isBottom()) {
                 return true;
             }

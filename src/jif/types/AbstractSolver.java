@@ -86,7 +86,7 @@ public abstract class AbstractSolver implements Solver {
      * constraint will be thrown immediately, otherwise the constraint
      * will be added to this set, and thrown when solve() is called.
      */
-    protected Set staticFailedConstraints;
+    protected Set<Constraint> staticFailedConstraints;
     protected static final boolean THROW_STATIC_FAILED_CONSTRAINTS = false;
     protected final Compiler compiler;
 
@@ -1032,7 +1032,7 @@ public abstract class AbstractSolver implements Solver {
      * @param c The constraint that cannot be satisfied.
      * @throws SemanticException always.
      */
-    protected void reportError(Constraint c, Collection variables)
+    protected void reportError(Constraint c, Collection<Variable> variables)
             throws SemanticException {
         int count = 0;
         while (!c.report() && (count++) < 1000) {

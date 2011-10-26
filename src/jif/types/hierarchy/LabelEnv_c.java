@@ -526,7 +526,6 @@ public class LabelEnv_c implements LabelEnv
             JoinConfPolicy_c jcp = (JoinConfPolicy_c)cp;
             IntegPolicy bottomInteg = ts.bottomIntegPolicy(pos);
 
-            @SuppressWarnings("unchecked")
             Collection<ConfPolicy> joinComponents = jcp.joinComponents();
             for (ConfPolicy joinComponent : joinComponents) {
                 if (!leq(ts.pairLabel(pos, joinComponent, bottomInteg), L2)) {
@@ -545,7 +544,6 @@ public class LabelEnv_c implements LabelEnv
             // break ip down and try to satisfy each one individually
             JoinIntegPolicy_c jip = (JoinIntegPolicy_c)ip;
             ConfPolicy bottomConf = ts.bottomConfPolicy(pos);
-            @SuppressWarnings("unchecked")
             Collection<IntegPolicy> joinComponents = jip.joinComponents();
             for (IntegPolicy joinComponent : joinComponents) {
                 if (!leq(ts.pairLabel(pos, bottomConf, joinComponent), L2)) {
@@ -724,8 +722,8 @@ public class LabelEnv_c implements LabelEnv
         }
         if (p2 instanceof JoinPolicy_c) {
             // we need to find one element ci of p2 such that p1 <= ci
-            JoinPolicy_c jp = (JoinPolicy_c)p2;
             @SuppressWarnings("unchecked")
+            JoinPolicy_c<ConfPolicy> jp = (JoinPolicy_c<ConfPolicy>)p2;
             Collection<ConfPolicy> joinComponents = jp.joinComponents();
             for (ConfPolicy ci : joinComponents) {
                 if (leq(p1, ci, state)) {
@@ -735,9 +733,9 @@ public class LabelEnv_c implements LabelEnv
         }
         else if (p2 instanceof MeetPolicy_c) {
             // for all elements ci of p2 we require p1 <= ci             
-            MeetPolicy_c mp = (MeetPolicy_c)p2;
-            boolean allSat = true;
             @SuppressWarnings("unchecked")
+            MeetPolicy_c<ConfPolicy> mp = (MeetPolicy_c<ConfPolicy>) p2;
+            boolean allSat = true;
             Collection<ConfPolicy> meetComponents = mp.meetComponents();
             for (ConfPolicy ci : meetComponents) {
                 if (!leq(p1, ci, state)) {
@@ -762,8 +760,8 @@ public class LabelEnv_c implements LabelEnv
         }
         if (p2 instanceof JoinPolicy_c) {
             // we need to find one element ci of p2 such that p1 <= ci
-            JoinPolicy_c jp = (JoinPolicy_c)p2;
             @SuppressWarnings("unchecked")
+            JoinPolicy_c<IntegPolicy> jp = (JoinPolicy_c<IntegPolicy>) p2;
             Collection<IntegPolicy> joinComponents = jp.joinComponents();
             for (IntegPolicy ci : joinComponents) {
                 if (leq(p1, ci, state)) {
@@ -773,9 +771,9 @@ public class LabelEnv_c implements LabelEnv
         }
         else if (p2 instanceof MeetPolicy_c) {
             // for all elements ci of p2 we require p1 <= ci
-            MeetPolicy_c mp = (MeetPolicy_c)p2;
-            boolean allSat = true;
             @SuppressWarnings("unchecked")
+            MeetPolicy_c<IntegPolicy> mp = (MeetPolicy_c<IntegPolicy>) p2;
+            boolean allSat = true;
             Collection<IntegPolicy> meetComponents = mp.meetComponents();
             for (IntegPolicy ci : meetComponents) {
                 if (!leq(p1, ci, state)) {
@@ -1239,6 +1237,8 @@ public class LabelEnv_c implements LabelEnv
             this.p = p;
             this.q = q;
         }
+        
+        @SuppressWarnings("unused")
         public boolean equalsImpl(TypeObject t) {
             if (t instanceof AccessPathEquivalence) {
                 AccessPathEquivalence that = (AccessPathEquivalence)t;

@@ -15,21 +15,27 @@ public abstract class Policy_c extends TypeObject_c implements Policy {
         super(ts, pos); 
     }    
     
+    @Override
     public final String toString() {
-        return toString(new HashSet());
+        return toString(new HashSet<Label>());
     }
     
+    @Override
     public abstract boolean equalsImpl(TypeObject t);
 
+    @Override
     public boolean hasWritersToReaders() {
         return false;
     }    
+    @Override
     public boolean hasVariables() {
         return false;
     }    
     
-    abstract public String toString(Set printedLabels);
+    @Override
+    abstract public String toString(Set<Label> printedLabels);
 
+    @Override
     public Object copy() {
         Policy_c p = (Policy_c)super.copy();
         p.simplified = null;
@@ -37,6 +43,7 @@ public abstract class Policy_c extends TypeObject_c implements Policy {
     }
     
     private Policy simplified = null;
+    @Override
     public final Policy simplify() {
         // memoize the result
         if (simplified == null) {

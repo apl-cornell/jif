@@ -1,6 +1,10 @@
 package jif.translate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import jif.ast.Jif;
 import jif.ast.JifNodeFactory;
@@ -9,14 +13,28 @@ import jif.types.JifTypeSystem;
 import jif.types.Param;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
-import polyglot.ast.*;
+import polyglot.ast.Block;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.SourceCollection;
+import polyglot.ast.SourceFile;
+import polyglot.ast.Stmt;
+import polyglot.ast.TypeNode;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Job;
 import polyglot.frontend.Source;
 import polyglot.qq.QQ;
-import polyglot.types.*;
-import polyglot.types.Package;
-import polyglot.util.*;
+import polyglot.types.ClassType;
+import polyglot.types.FieldInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
 
@@ -26,14 +44,13 @@ public class JifToJavaRewriter extends ContextVisitor
     protected ExtensionInfo java_ext;
     protected JifTypeSystem jif_ts;
     protected JifNodeFactory jif_nf;
-    protected Job job;
     protected QQ qq;
     
-    protected Collection additionalClassDecls;
-    protected Collection newSourceFiles;
+    protected Collection<ClassDecl> additionalClassDecls;
+    protected Collection<SourceFile> newSourceFiles;
     
-    protected List initializations;
-    protected List staticInitializations;
+    protected List<Stmt> initializations;
+    protected List<Block> staticInitializations;
 
     public JifToJavaRewriter(Job job,
                              JifTypeSystem jif_ts,
@@ -46,17 +63,19 @@ public class JifToJavaRewriter extends ContextVisitor
         this.jif_nf = jif_nf;
         this.java_ext = java_ext;
         this.qq = new QQ(java_ext);
-        this.additionalClassDecls = new LinkedList();
-        this.newSourceFiles = new LinkedList();
-        this.initializations = new ArrayList();
-        this.staticInitializations = new ArrayList();
+        this.additionalClassDecls = new LinkedList<ClassDecl>();
+        this.newSourceFiles = new LinkedList<SourceFile>();
+        this.initializations = new ArrayList<Stmt>();
+        this.staticInitializations = new ArrayList<Block>();
     }
 
+    @Override
     public void finish(Node ast) {
         if (ast instanceof SourceCollection) {
             SourceCollection c = (SourceCollection) ast;
-            for (Iterator iter = c.sources().iterator(); iter.hasNext(); ) {
-                SourceFile sf = (SourceFile)iter.next();
+            @SuppressWarnings("unchecked")
+            List<SourceFile> sources = c.sources();
+            for (SourceFile sf : sources) {
                 java_ext.scheduler().addJob(sf.source(), sf);
                 
             }
@@ -67,8 +86,7 @@ public class JifToJavaRewriter extends ContextVisitor
 
         
         // now add any additional source files, which should all be public.
-        for (Iterator iter = newSourceFiles.iterator(); iter.hasNext(); ) {
-            SourceFile sf = (SourceFile)iter.next();
+        for (SourceFile sf : newSourceFiles) {
             java_ext.scheduler().addJob(sf.source(), sf);
         }
         newSourceFiles.clear();
@@ -90,10 +108,12 @@ public class JifToJavaRewriter extends ContextVisitor
         return java_ext.nodeFactory();
     }
 
+    @Override
     public ErrorQueue errorQueue() {
         return job.compiler().errorQueue();
     }
 
+    @Override
     public NodeVisitor enterCall(Node n) {
         try {
             Jif ext = JifUtil.jifExt(n);
@@ -113,6 +133,7 @@ public class JifToJavaRewriter extends ContextVisitor
         }
     }
 
+    @Override
     public Node leaveCall(Node old, Node n, NodeVisitor v) {
         try {
             Jif ext = JifUtil.jifExt(n);
@@ -213,19 +234,23 @@ public class JifToJavaRewriter extends ContextVisitor
     public void addInitializer(Block s) {
         this.initializations.add(s);        
     }
+    
+    /**
+     * @throws SemanticException  
+     */
     public void addInitializer(FieldInstance fi, Expr init) throws SemanticException {
         Stmt s = qq().parseStmt(fi.name() + " = %E;", init);
         this.initializations.add(s);
     }
 
-    public List getInitializations() {
+    public List<Stmt> getInitializations() {
         return this.initializations;
     }
 
     public void addStaticInitializer(Block s) {
         this.staticInitializations.add(s);                
     }
-    public List getStaticInitializations() {
+    public List<Block> getStaticInitializations() {
         return this.staticInitializations;
     }
 
@@ -237,11 +262,13 @@ public class JifToJavaRewriter extends ContextVisitor
      * Take any additional class declarations that can fit into the source file,
      * i.e., non-public class decls.
      */
+    @SuppressWarnings("unchecked")
     public Node leavingSourceFile(SourceFile n) {
-        List l = new ArrayList(n.decls().size() + additionalClassDecls.size());
+        List<ClassDecl> l =
+                new ArrayList<ClassDecl>(n.decls().size()
+                        + additionalClassDecls.size());
         l.addAll(n.decls());
-        for (Iterator iter = this.additionalClassDecls.iterator(); iter.hasNext(); ) {
-            ClassDecl cd = (ClassDecl)iter.next();
+        for (ClassDecl cd : this.additionalClassDecls) {
             if (cd.flags().isPublic()) {
                 // cd is public, we will put it in it's own source file.
                 SourceFile sf = java_nf().SourceFile(Position.compilerGenerated(), 

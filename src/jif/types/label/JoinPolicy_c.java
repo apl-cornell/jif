@@ -1,6 +1,12 @@
 package jif.types.label;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
@@ -10,6 +16,7 @@ import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.visit.LabelChecker;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
@@ -17,11 +24,11 @@ import polyglot.util.Position;
 
 /** Represents a join of a number of policies. 
  */
-public abstract class JoinPolicy_c extends Policy_c {
-    private final Set joinComponents;
+public abstract class JoinPolicy_c<P extends Policy> extends Policy_c {
+    private final Set<P> joinComponents;
     private Integer hashCode = null;
     
-    public JoinPolicy_c(Set components, JifTypeSystem ts, Position pos) {
+    public JoinPolicy_c(Set<P> components, JifTypeSystem ts, Position pos) {
         super(ts, pos);
         this.joinComponents = Collections.unmodifiableSet(flatten(components));
         if (this.joinComponents.isEmpty()) {
@@ -29,21 +36,24 @@ public abstract class JoinPolicy_c extends Policy_c {
         }
     }
     
+    @Override
     public boolean isSingleton() {
         return joinComponents.size() == 1;
     }
+    
+    @Override
     public boolean isCanonical() {
-        for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();            
+        for (P c : joinComponents) {
             if (! c.isCanonical()) {
                 return false;
             }
         }        
         return true;
     }
+    
+    @Override
     public boolean isRuntimeRepresentable() {
-        for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();            
+        for (P c : joinComponents) {
             if (! c.isRuntimeRepresentable()) {
                 return false;
             }
@@ -51,10 +61,12 @@ public abstract class JoinPolicy_c extends Policy_c {
         return true;
     }
             
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof JoinPolicy_c) {
-            JoinPolicy_c that = (JoinPolicy_c)o;
+            @SuppressWarnings("rawtypes")
+            JoinPolicy_c that = (JoinPolicy_c) o;
             return this.hashCode() == that.hashCode() && this.joinComponents.equals(that.joinComponents);
         }
         if (o instanceof Policy) {
@@ -63,6 +75,7 @@ public abstract class JoinPolicy_c extends Policy_c {
         }
         return false;
     }
+    @Override
     public int hashCode() {
         if (hashCode == null) {
             hashCode = new Integer(joinComponents.hashCode());
@@ -70,10 +83,11 @@ public abstract class JoinPolicy_c extends Policy_c {
         return hashCode.intValue();
     }
     
-    public String toString(Set printedLabels) {
+    @Override
+    public String toString(Set<Label> printedLabels) {
         String s = "";
-        for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();
+        for (Iterator<P> i = joinComponents.iterator(); i.hasNext(); ) {
+            P c = i.next();
             s += c.toString(printedLabels);
             
             if (i.hasNext()) {
@@ -87,9 +101,7 @@ public abstract class JoinPolicy_c extends Policy_c {
     protected boolean leq_(Policy p, LabelEnv env, SearchState state) {
         // If this = { .. Pi .. } and L = { .. Pj' .. }, check if for all i,
         // there exists a j, such that Pi <= Pj'
-        for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
-            Policy pi = (Policy) i.next();
-            
+        for (P pi : joinComponents) {
             if (! env.leq(pi, p, state)) {
                 return false;
             }
@@ -98,7 +110,7 @@ public abstract class JoinPolicy_c extends Policy_c {
         return true;
     }
     
-    public Collection joinComponents() {
+    public Collection<P> joinComponents() {
         return Collections.unmodifiableCollection(joinComponents);
     }
 
@@ -106,20 +118,22 @@ public abstract class JoinPolicy_c extends Policy_c {
      * @return An equivalent label with fewer components by pulling out
      * less restrictive policies.
      */
+    @Override
     protected Policy simplifyImpl() {
         if (joinComponents.isEmpty()) {
             return this;
         }
         if (joinComponents.size() == 1) {
-            return ((Policy)joinComponents.iterator().next()).simplify();
+            return joinComponents.iterator().next().simplify();
         }
 
-        Collection comps = flatten(joinComponents);
-        Set needed = new LinkedHashSet();
+        Collection<P> comps = flatten(joinComponents);
+        Set<P> needed = new LinkedHashSet<P>();
         JifTypeSystem jts = (JifTypeSystem) ts;
 
-        for (Iterator i = comps.iterator(); i.hasNext(); ) {
-            Policy ci = ((Policy) i.next()).simplify();
+        for (final P comp : comps) {
+            @SuppressWarnings("unchecked")
+            P ci = (P) comp.simplify();
             
             boolean subsumed = false;
             
@@ -127,8 +141,8 @@ public abstract class JoinPolicy_c extends Policy_c {
                 needed.add(ci);
             }
             else {
-                for (Iterator j = needed.iterator(); j.hasNext(); ) {
-                    Policy cj = (Policy) j.next();
+                for (Iterator<P> j = needed.iterator(); j.hasNext(); ) {
+                    P cj = j.next();
                     
                     if (cj.hasVariables() || cj.hasWritersToReaders()) {
                         continue;
@@ -153,20 +167,19 @@ public abstract class JoinPolicy_c extends Policy_c {
             return this;
         }
         if (needed.size() == 1) {
-            return (Policy)needed.iterator().next();
+            return needed.iterator().next();
         }
 
         return constructJoinPolicy(needed, position);
     }
     
-    protected abstract Policy constructJoinPolicy(Set components, Position pos);
-    
-    private static Set flatten(Set comps) {
+    protected abstract Policy constructJoinPolicy(Set<P> components,
+            Position pos);
+
+    private static <P extends Policy> Set<P> flatten(Set<P> comps) {
         // check if there are any join policies in there.
         boolean needFlattening = false;
-        for (Iterator i = comps.iterator(); i.hasNext(); ) {
-            Policy p = (Policy) i.next();
-            
+        for (P p : comps) {
             if (p instanceof JoinPolicy_c) {
                 needFlattening = true;
                 break;
@@ -175,16 +188,16 @@ public abstract class JoinPolicy_c extends Policy_c {
         
         if (!needFlattening) return comps;
         
-        Set c = new LinkedHashSet();
-        for (Iterator i = comps.iterator(); i.hasNext(); ) {
-            Policy p = (Policy) i.next();
-            
+        Set<P> c = new LinkedHashSet<P>();
+        for (P p : comps) {
             if (p.isTop()) {
                 return Collections.singleton(p);
             }
             
             if (p instanceof JoinPolicy_c) {
-                Collection lComps = ((JoinPolicy_c)p).joinComponents();
+                @SuppressWarnings("unchecked")
+                JoinPolicy_c<P> jp = (JoinPolicy_c<P>) p;
+                Collection<P> lComps = jp.joinComponents();
                 c.addAll(lComps);                
             }
             else {
@@ -195,25 +208,26 @@ public abstract class JoinPolicy_c extends Policy_c {
         return c;
     }
 
-    public List throwTypes(TypeSystem ts) {
-        List throwTypes = new ArrayList();
-        for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
-            Policy L = (Policy)i.next();
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
+        List<Type> throwTypes = new ArrayList<Type>();
+        for (P L : joinComponents) {
             throwTypes.addAll(L.throwTypes(ts));
         }
         return throwTypes; 
     }
 
+    @Override
     public Policy subst(LabelSubstitution substitution) throws SemanticException {        
         if (joinComponents.isEmpty()) {
             return substitution.substPolicy(this).simplify();
         }
         boolean changed = false;
-        Set s = new LinkedHashSet();
+        Set<P> s = new LinkedHashSet<P>();
         
-        for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();
-            Policy newc = c.subst(substitution);
+        for (P c : joinComponents) {
+            @SuppressWarnings("unchecked")
+            P newc = (P) c.subst(substitution);
             if (newc != c) changed = true;
             s.add(newc);
         }
@@ -224,22 +238,23 @@ public abstract class JoinPolicy_c extends Policy_c {
         return substitution.substPolicy(newJoinPolicy).simplify();
     }
     
+    @Override
     public boolean hasWritersToReaders() {
-        for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();
+        for (P c : joinComponents) {
             if (c.hasWritersToReaders()) return true;
         }
         return false;
     }    
 
+    @Override
     public boolean hasVariables() {
-        for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();
+        for (P c : joinComponents) {
             if (c.hasVariables()) return true;
         }
         return false;
     }    
 
+    @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         PathMap X = ts.pathMap().N(A.pc()).NV(A.pc());
@@ -250,29 +265,28 @@ public abstract class JoinPolicy_c extends Policy_c {
 
         A = (JifContext)A.pushBlock();
         
-        for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
+        for (P c : joinComponents) {
             A.setPc(X.N(), lc);
-            Policy c = (Policy) i.next();
             PathMap Xc = c.labelCheck(A, lc);
             X = X.join(Xc);            
         }
         return X;
     }
     
+    @Override
     public boolean isTop() {
         // top if any policy is top
-        for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();            
+        for (P c : joinComponents) {
             if (c.isTop()) {
                 return true;
             }
         }        
         return false;
     }
+    @Override
     public boolean isBottom() {
         // bottom if all policies are bottom
-        for (Iterator i = joinComponents.iterator(); i.hasNext(); ) {
-            Policy c = (Policy) i.next();            
+        for (P c : joinComponents) {
             if (! c.isBottom()) {
                 return false;
             }
