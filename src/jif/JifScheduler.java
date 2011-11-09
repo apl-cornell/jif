@@ -10,6 +10,7 @@ import jif.visit.*;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
+import polyglot.frontend.goals.Barrier;
 import polyglot.frontend.goals.ExceptionsChecked;
 import polyglot.frontend.goals.FieldConstantsChecked;
 import polyglot.frontend.goals.Goal;
@@ -35,7 +36,7 @@ public class JifScheduler extends JLScheduler {
         LabelCheckGoal g = (LabelCheckGoal)internGoal(new LabelCheckGoal(job));
 
         try {
-            addPrerequisiteDependency(g, this.FinalParams(job));            
+            addPrerequisiteDependency(g, this.FinalParamsBarrier());            
             addPrerequisiteDependency(g, this.FieldLabelInference(job));
             addPrerequisiteDependency(g, this.IntegerBoundsChecker(job));
 // Jif Dependency bugfix:
@@ -44,6 +45,16 @@ public class JifScheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
+        return g;
+    }
+    
+    public Goal FinalParamsBarrier() {
+        Goal g = internGoal(new Barrier("FinalParamsBarrier", this){
+            @Override
+            public Goal goalForJob(Job job) {
+                return FinalParams(job);
+            }
+        });
         return g;
     }
     
@@ -269,6 +280,7 @@ class TypeChecked extends VisitorGoal {
 
     public Collection corequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList();
+//        l.add(((JifScheduler)scheduler).FinalParams(job));
         // Should this line be here, since FieldLabelResolver is added as a missing dependency during runtime?
         l.add(((JifScheduler)scheduler).FieldLabelInference(job));
         l.add(scheduler.ConstantsChecked(job));
