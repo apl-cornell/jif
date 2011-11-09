@@ -6,8 +6,23 @@ public class Runtime[principal P]
 {
     private Runtime(principal{this} pp) { }
 
+    /**
+     * Return a runtime instance.
+     *
+     * @throws SecurityException
+     *         if user() does not act for P.
+     */
     public static native Runtime[P]{P!:} getRuntime() throws SecurityException;
+
+    /**
+     * Return a principal representing the system user who invoked the
+     * jif runtime.
+     */
     public static native principal{*!:*} user();
+
+    /**
+     * Return a principal representing a system user with the given name.
+     */
     public static native principal getUser(String username);
 
     public native FileOutputStream[{*L}]{P:;P!:} openFileWrite(String{*L} name, boolean{*L} append, label L)
@@ -15,11 +30,17 @@ public class Runtime[principal P]
     public native FileInputStream[{*L}]{P:;P!:} openFileRead(String{*L} name, label L)
 	throws (FileNotFoundException{*L;L}, SecurityException{*L;L});
 
+    /**
+     * Return a reference to stdout that is writeable only at label L
+     *
+     * @throws SecurityException
+     *         unless L ⊑  {P→ ;_←_}
+     */
     public native PrintStream[{*L}]{P:;P!:} stdout(label L) throws (SecurityException{*L;L});
     public native InputStream[{*L}]{P:;P!:} stdin(label L) throws (SecurityException{*L;L});
     public native PrintStream[{*L}]{P:;P!:} stderr(label L) throws (SecurityException{*L;L});
 
-    //the default label is {P:;_!:_} for output, {P:;P!:} for input 
+    //the default label is {P→ ;_←_} for output, {P→ ;P←} for input 
     public native PrintStream[{P:;_!:_}]{P:;P!:} err();
     public native PrintStream[{P:;_!:_}]{P:;P!:} out();
     public native InputStream[{P:;P!:}]{P:;P!:} in();
