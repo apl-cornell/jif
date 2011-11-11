@@ -4,11 +4,10 @@ import java.util.Collections;
 import java.util.Set;
 
 import jif.types.JifTypeSystem;
-import jif.types.LabelSubstitution;
+import jif.types.Param;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.main.Report;
 import polyglot.types.ReferenceType;
-import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -31,7 +30,9 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
     }
     
 
+    @Override
     public boolean isRuntimeRepresentable() { return false; }
+    @Override
     public boolean isCovariant() {
         // the this label is not actually covariant, it's really an arg-label
         // in disguise (think about the receiver of the method or field-access
@@ -39,15 +40,21 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
         return false; 
     }
     
+    @Override
     public boolean isComparable() { return true; }
+    @Override
     public boolean isCanonical() { return true; }
+    @Override
     public boolean isDisambiguatedImpl() { return true; }
+    @Override
     public boolean isEnumerable() { return true; }
     
+    @Override
     public ReferenceType classType() {
         return ct;
     }
     
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (! (o instanceof ThisLabel)) {
@@ -56,11 +63,13 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
         ThisLabel that = (ThisLabel) o;
         return this.ct.equals(that.classType());
     }
+    @Override
     public int hashCode() {
         return fullName.hashCode();
     }
     
-    public String componentString(Set printedLabels) {
+    @Override
+    public String componentString(Set<Label> printedLabels) {
         if (Report.should_report(Report.debug, 2)) { 
             return "<this (of " + fullName + ")>";
         }
@@ -70,14 +79,16 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
         return "this";            
     }
 
+    @Override
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         // We know nothing about the this label, save that it is equal to itself,
         // and whatever is in the environment.
         return false;
     }
  
-    public Set variables() {
-        return Collections.EMPTY_SET;        
+    @Override
+    public Set<Param> variables() {
+        return Collections.emptySet();        
     }
     
     
