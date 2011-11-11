@@ -20,7 +20,7 @@ class Main {
     public Main{}(principal{} p):{p:} throws (SecurityException, IllegalArgumentException, IOException) where caller(p) {
 	this.user = p;
 	// get hold of sec input and output channels.
-        Runtime[user] runtime = Runtime[user].getRuntime(user);
+        Runtime[user] runtime = Runtime[user].getRuntime();
 
         if (runtime == null) {
 	    out = null;
