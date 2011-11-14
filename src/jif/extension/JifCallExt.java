@@ -15,6 +15,8 @@ import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
+import polyglot.frontend.FileSource;
+import polyglot.frontend.Job;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.MethodInstance;
@@ -87,8 +89,13 @@ public class JifCallExt extends JifExprExt
                             // label checking has not been done on ct yet
                             JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
                             ParsedClassType pct = (ParsedClassType) rt;
-                            Goal g = sched.LabelsChecked(pct.job());
-                            throw new MissingDependencyException(g);
+                            if(sched.sourceHasJob(pct.fromSource())) {
+                                Job job = sched.loadSource((FileSource) pct.fromSource(),true);
+                                Goal g = sched.LabelsChecked(job);
+                                throw new MissingDependencyException(g);
+                            }
+                            else
+                                throw new InternalCompilerError("No job for " + pct);
                         }
                         A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
                     } else if (ts.isImplicitCastValid(jfi.type(), ts.Principal())) {
@@ -98,8 +105,14 @@ public class JifCallExt extends JifExprExt
                             // label checking has not been done on ct yet
                             JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
                             ParsedClassType pct = (ParsedClassType) rt;
-                            Goal g = sched.LabelsChecked(pct.job());
-                            throw new MissingDependencyException(g);
+                            
+                            if(sched.sourceHasJob(pct.fromSource())) {
+                                Job job = sched.loadSource((FileSource) pct.fromSource(),true);
+                                Goal g = sched.LabelsChecked(job);
+                                throw new MissingDependencyException(g);
+                            }
+                            else
+                                throw new InternalCompilerError("No job for " + pct);
                         }
                         A.addDefinitionalEquiv(dp, rhs_principal);
                     }
