@@ -1,5 +1,3 @@
-package util.tests;
-
 public class ProviderTest01 {
   public String {*←} name;
 
