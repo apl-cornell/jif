@@ -1,0 +1,5 @@
+public class Provider06 {
+	// this should not compile with -untrusted-providers, as the
+	// provider-tainted value 0 affects the top-integrity value x.
+	int {*←} x = 0;
+}
