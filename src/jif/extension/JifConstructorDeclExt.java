@@ -115,8 +115,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
             Lr = ts.bottomLabel(ci.position());
         }
 
-        // pc can be set to bottom during the init checking phase.
-        A.setPc(ts.bottomLabel(), lc); 
+        // pc can be set to the provider during the init checking phase.
+        A.setPc(ts.providerLabel((JifClassType) lc.context().currentClass()), lc); 
 
         A.setConstructorReturnLabel(Lr);
 
