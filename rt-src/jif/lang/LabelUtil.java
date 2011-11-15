@@ -638,6 +638,9 @@ public class LabelUtil
         }
     }
     
+    /**
+     * @return true iff from <= to in the information-flow ordering.
+     */
     public boolean relabelsTo(Label from, Label to) {
         try {
             enterTiming();
