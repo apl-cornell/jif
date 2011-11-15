@@ -91,8 +91,11 @@ public class JifCallExt extends JifExprExt
                             ParsedClassType pct = (ParsedClassType) rt;
                             if(sched.sourceHasJob(pct.fromSource())) {
                                 Job job = sched.loadSource((FileSource) pct.fromSource(),true);
-                                Goal g = sched.LabelsChecked(job);
-                                throw new MissingDependencyException(g);
+                                if(job != null) {
+                                    Goal g = sched.LabelsChecked(job);
+                                    throw new MissingDependencyException(g);
+                                }
+                                throw new InternalCompilerError("No job for " + pct);
                             }
                             else
                                 throw new InternalCompilerError("No job for " + pct);
@@ -108,8 +111,11 @@ public class JifCallExt extends JifExprExt
                             
                             if(sched.sourceHasJob(pct.fromSource())) {
                                 Job job = sched.loadSource((FileSource) pct.fromSource(),true);
-                                Goal g = sched.LabelsChecked(job);
-                                throw new MissingDependencyException(g);
+                                if(job != null) {
+                                    Goal g = sched.LabelsChecked(job);
+                                    throw new MissingDependencyException(g);
+                                }
+                                throw new InternalCompilerError("No job for " + pct);
                             }
                             else
                                 throw new InternalCompilerError("No job for " + pct);
