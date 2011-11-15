@@ -24,6 +24,7 @@ import polyglot.types.ParsedClassType;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** The Jif extension of the <code>Call</code> node. 
  * 
@@ -95,10 +96,10 @@ public class JifCallExt extends JifExprExt
                                     Goal g = sched.LabelsChecked(job);
                                     throw new MissingDependencyException(g);
                                 }
-                                throw new InternalCompilerError("No job for " + pct);
                             }
-                            else
-                                throw new InternalCompilerError("No job for " + pct);
+                            // Turns out label checking has occurred, but the init was null.
+                            // Just skip it.
+                            continue;
                         }
                         A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
                     } else if (ts.isImplicitCastValid(jfi.type(), ts.Principal())) {
@@ -115,10 +116,9 @@ public class JifCallExt extends JifExprExt
                                     Goal g = sched.LabelsChecked(job);
                                     throw new MissingDependencyException(g);
                                 }
-                                throw new InternalCompilerError("No job for " + pct);
                             }
-                            else
-                                throw new InternalCompilerError("No job for " + pct);
+                            // turns out label checking has occurred, but the init was null.
+                            rhs_principal = ts.bottomPrincipal(Position.compilerGenerated());
                         }
                         A.addDefinitionalEquiv(dp, rhs_principal);
                     }
