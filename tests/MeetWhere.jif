@@ -1,0 +1,20 @@
+public class MeetWhere[principal A, principal B] {
+  public
+  void
+  m{{A→} meet {*→B}}
+  (
+    final Object arg
+  )
+  throws
+  (
+    NullPointerException {arg}
+  )
+  where
+    {arg} <= {{A→} meet {*→B}} // This assertion fails
+    //{arg} <= {A→},              // These equivalent
+    //{arg} <= {*→B}              // assertions do not.
+  {
+    if (arg == null)
+      throw new NullPointerException();
+  }
+}
