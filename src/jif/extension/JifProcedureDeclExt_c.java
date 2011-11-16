@@ -276,7 +276,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
      * (Figure 4.39).  It returns the principal hierarchy used to check the
      * body of the method.
      */
-    protected static void constrainLabelEnv(JifProcedureInstance mi, JifContext A, CallHelper ch)
+    public static void constrainLabelEnv(JifProcedureInstance mi, JifContext A, CallHelper ch)
     throws SemanticException
     {
         for (Assertion c : mi.constraints()) {
