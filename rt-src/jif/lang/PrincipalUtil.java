@@ -138,7 +138,7 @@ public class PrincipalUtil {
      * @param p
      * @param q
      * @param searchState records the goals that we are in the middle of attempting
-     * @return An ActsForPoorf between p and q, or null if none can be found.
+     * @return An ActsForProof between p and q, or null if none can be found.
      */
     public static ActsForProof findActsForProof(Principal p, Principal q, Object searchState) {
         try {
