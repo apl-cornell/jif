@@ -48,6 +48,7 @@ public class PathMap
     public Label N() { return get(Path.N); }
     public PathMap N(Label label) { return set(Path.N, label); }
 
+    /** Normal value label */
     public Label NV() { return get(Path.NV); }
     public PathMap NV(Label label) { return set(Path.NV, label); }
 

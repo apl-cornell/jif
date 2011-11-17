@@ -6,13 +6,13 @@ import polyglot.util.Enum;
  */
 public interface Path
 {
-    // Normal termination
+    /** Normal termination */
     public static final Path N = new FixedPath("N");
 
-    // Return termination
+    /** Return termination */
     public static final Path R = new FixedPath("R");
 
-    // Normal value label
+    /** Normal value label */
     public static final Path NV = new FixedPath("NV");
 
     public static class FixedPath extends Enum implements Path {
