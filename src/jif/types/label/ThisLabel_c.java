@@ -26,7 +26,7 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
             this.fullName = ct.toArray().base().toString() + "[]";
         }
         else throw new InternalCompilerError("Only class types and arrays allowed");
-        setDescription("label of the special variable \"this\"");
+        setDescription("label of the special variable \"this\" in " + ct);
     }
     
 
