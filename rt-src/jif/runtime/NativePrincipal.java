@@ -19,7 +19,11 @@ public class NativePrincipal implements Principal {
         if (name == null) return UNKNOWN_NATIVE_PRINCIPAL;
         NativePrincipal p = (NativePrincipal)allNatives.get(name);
         if (p == null) {
-            return (NativePrincipal)allNatives.putIfAbsent(name, new NativePrincipal(name));
+            NativePrincipal newp = new NativePrincipal(name);
+            p = (NativePrincipal)allNatives.putIfAbsent(name, newp);
+            if (p == null) {
+                p = newp;
+            }
         }
         return p;
     }
