@@ -408,8 +408,8 @@ OctalEscape = \\ [0-7]
     "⊔" { return op(sym.JOIN); }
     "←" { return op(sym.LEFTARROW); }
     "→" { return op(sym.RIGHTARROW); }
-    "\u22a4" { return op(sym.TOP);      }
-    "\u22a5" { return op(sym.BOTTOM);   }
+    "⊤" { return op(sym.TOP);      }
+    "⊥" { return op(sym.BOTTOM);   }
     "≽" { return op(sym.TRUST_GTEQ);  }
     "⊑" { return op(sym.INFO_LTEQ);   }
 }
