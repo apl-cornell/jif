@@ -19,10 +19,10 @@ parser Grm extends polyglot.parse.Grm {:
     public final JifTypeSystem ts; /* shadows BaseParser.ts */
 
     public Grm(polyglot.lex.Lexer l, JifTypeSystem t,
-	       JifNodeFactory n, ErrorQueue q) {
-	super(l,t,n,q);
-	ts = t;
-	nf = n;
+               JifNodeFactory n, ErrorQueue q) {
+        super(l,t,n,q);
+        ts = t;
+        nf = n;
     }
 
     /**
@@ -69,7 +69,7 @@ parser Grm extends polyglot.parse.Grm {:
         die(pos(e));
         return null;
     }
-	
+
     public PackageNode prefixToPackage(Prefix p) throws Exception {
         if (p instanceof Expr) {
             return exprToPackage((Expr) p);
@@ -273,7 +273,8 @@ terminal Token INVARIANT;
 terminal Token AUTHORITY;
 terminal Token CALLER;
 terminal Token ACTSFOR;
-terminal Token ACTSFOR_LOWER;
+terminal Token FLOWSTO;
+terminal Token ENFORCES;
 terminal Token EQUIV;
 terminal Token DECLASSIFY;
 terminal Token ENDORSE;
@@ -285,6 +286,8 @@ terminal Token RIGHTARROW;
 terminal Token LEFTARROW;
 terminal Token TOP;
 terminal Token BOTTOM;
+terminal Token TRUST_GTEQ;
+terminal Token INFO_LTEQ;
 
 terminal Token PROVIDER;
 
@@ -301,7 +304,6 @@ non terminal List meet_component_list;
 non terminal Object label_component; // either a LabelNode or PolicyNode
 non terminal PolicyNode label_component_policy;
 non terminal PrincipalNode principal, principal_conjunctive, principal_disjunctive, principal_base;
-non terminal Token actsfor;
 non terminal Expr accesspath;
 non terminal Receiver accesspath_receiver;
 non terminal Expr accesspath_no_id;
@@ -313,6 +315,7 @@ non terminal List procedure_constraints, procedure_constraints_opt;
 non terminal List authority, authority_opt;
 non terminal ConstraintNode procedure_constraint;
 non terminal List constraints, constraints_opt;
+non terminal Token flowsto;
 non terminal ConstraintNode constraint;
 
 non terminal Amb reftype_or_expr, objtype_or_expr;
@@ -914,28 +917,23 @@ constraints ::=
 
 constraint ::=
         // ConstraintNode
-        principal:a actsfor principal:b
+
+        // principal-principal comparisons
+        principal:a ACTSFOR principal:b
         {: RESULT = parser.nf.PrincipalActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}
-    |   label:a actsfor principal:b
-        {: RESULT = parser.nf.LabelActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
-           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
-        :}
-    |   provider:a actsfor principal:b
-        {: RESULT = parser.nf.LabelActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
+    |   principal:a TRUST_GTEQ principal:b
+        {: RESULT = parser.nf.PrincipalActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}
     |   principal:a EQUIV principal:b
         {: RESULT = parser.nf.PrincipalActsForPrincipalConstraintNode(parser.pos(a,b), a, b, true);
            parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
         :}
-// XXX Add this later.  This is intended to capture trust-ordering constraints between labels.
-//    |   label:a actsfor label:b
-//        {: RESULT = parser.nf.LabelActsForLabelConstraintNode(parser.pos(a,b), a, b);
-//           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
-//        :}
-    |   label_flexible:a LTEQ label_flexible:b
+
+        // label-label comparisons
+    |   label_flexible:a flowsto label_flexible:b
         {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b, false);
            parser.countAnnotation(parser.METHOD_LABEL_ASSERTION_ANNOTATION, RESULT.position());
         :}
@@ -943,7 +941,37 @@ constraint ::=
         {: RESULT = parser.nf.LabelLeAssertionNode(parser.pos(a,b), a, b, true);
            parser.countAnnotation(parser.METHOD_LABEL_ASSERTION_ANNOTATION, RESULT.position());
         :}
+
+        // principal-label comparisons
+// TODO
+//    |   principal:a ENFORCES label_flexible:b
+//        {: RESULT = parser.nf.PrincipalEnforcesLabelConstraintNode(parser.pos(a,b), a, b);
+//           parser.countAnnotation(parser.METHOD_ENFORCES_ASSERTION_ANNOTATION, RESULT.position());
+//        :}
+// TODO
+//    |   principal:a TRUST_GTEQ label_flexible:b
+//        {: RESULT = parser.nf.PrincipalEnforcesLabelConstraintNode(parser.pos(a,b), a, b);
+//           parser.countAnnotation(parser.METHOD_ENFORCES_ASSERTION_ANNOTATION, RESULT.position());
+//        :}
+// Other possible comparisons:
+//    Seems unnecessary [mdgeorge]: should be implicit for authority
+    |   provider:a ACTSFOR principal:b
+        {: RESULT = parser.nf.LabelActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
+           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
+        :}
+//    Seems unnecessary [mdgeorge]
+//    |   label_flexible:a actsfor principal:b
+//        {: RESULT = parser.nf.LabelActsForPrincipalConstraintNode(parser.pos(a,b), a, b);
+//           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
+//        :}
+//    Seems unnecessary [mdgeorge]
+//    |   label:a actsfor label:b
+//        {: RESULT = parser.nf.LabelActsForLabelConstraintNode(parser.pos(a,b), a, b);
+//           parser.countAnnotation(parser.METHOD_ACTSFOR_ANNOTATION, RESULT.position());
+//        :}
     ;
+
+flowsto ::= FLOWSTO | INFO_LTEQ | LTEQ;
 
 // 19.9.1) Interface Declarations
 override interface_declaration ::=
@@ -1051,15 +1079,16 @@ transfer primary_no_new_array to primary_no_array {
 }
 
 extend relational_expression ::=
-     relational_expression:a actsfor shift_expression:b {:
+     relational_expression:a ACTSFOR shift_expression:b {:
+                RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.ACTSFOR, b);
+                :}
+  |  relational_expression:a TRUST_GTEQ shift_expression:b {:
                 RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.ACTSFOR, b);
                 :}
   |  relational_expression:a EQUIV shift_expression:b {:
                 RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.EQUIV, b);
                 :}
     ;
-
-actsfor ::= ACTSFOR | ACTSFOR_LOWER ;
 
 drop { /* no reflection */
 primary_no_new_array ::=
