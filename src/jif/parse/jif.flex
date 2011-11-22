@@ -177,20 +177,20 @@ import java.math.BigInteger;
     private Token float_lit(String s) {
         try {
             Float x = Float.valueOf(s);
-	    boolean zero = true;
-	    for (int i = 0; i < s.length(); i++) {
-		if ('1' <= s.charAt(i) && s.charAt(i) <= '9') {
-		    zero = false;
-		    break;
+            boolean zero = true;
+            for (int i = 0; i < s.length(); i++) {
+                if ('1' <= s.charAt(i) && s.charAt(i) <= '9') {
+                    zero = false;
+                    break;
         }
                 if (s.charAt(i) == 'e' || s.charAt(i) == 'E') {
                     break; // 0e19 is still 0
                 }
-	    }
-	    if (x.isInfinite() || x.isNaN() || (x.floatValue() == 0 && ! zero)) {
-		eq.enqueue(ErrorInfo.LEXICAL_ERROR,
-			   "Illegal float literal \"" + yytext() + "\"", pos());
-	    }
+            }
+            if (x.isInfinite() || x.isNaN() || (x.floatValue() == 0 && ! zero)) {
+                eq.enqueue(ErrorInfo.LEXICAL_ERROR,
+                           "Illegal float literal \"" + yytext() + "\"", pos());
+            }
             return new FloatLiteral(pos(), x.floatValue(), sym.FLOAT_LITERAL);
         }
         catch (NumberFormatException e) {
@@ -203,20 +203,20 @@ import java.math.BigInteger;
     private Token double_lit(String s) {
         try {
             Double x = Double.valueOf(s);
-	    boolean zero = true;
-	    for (int i = 0; i < s.length(); i++) {
-		if ('1' <= s.charAt(i) && s.charAt(i) <= '9') {
-		    zero = false;
-		    break;
+            boolean zero = true;
+            for (int i = 0; i < s.length(); i++) {
+                if ('1' <= s.charAt(i) && s.charAt(i) <= '9') {
+                    zero = false;
+                    break;
         }
                 if (s.charAt(i) == 'e' || s.charAt(i) == 'E') {
                     break; // 0e19 is still 0
                 }
-	    }
-	    if (x.isInfinite() || x.isNaN() || (x.doubleValue() == 0 && ! zero)) {
-		eq.enqueue(ErrorInfo.LEXICAL_ERROR,
-			   "Illegal double literal \"" + yytext() + "\"", pos());
-	    }
+            }
+            if (x.isInfinite() || x.isNaN() || (x.doubleValue() == 0 && ! zero)) {
+                eq.enqueue(ErrorInfo.LEXICAL_ERROR,
+                           "Illegal double literal \"" + yytext() + "\"", pos());
+            }
             return new DoubleLiteral(pos(), x.doubleValue(), sym.DOUBLE_LITERAL);
         }
         catch (NumberFormatException e) {
