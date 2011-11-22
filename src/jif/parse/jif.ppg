@@ -171,36 +171,36 @@ parser Grm extends polyglot.parse.Grm {:
     }
 
     public List makeParamOrExprList(Expr a) {
-	List l = new TypedList(new LinkedList(), Object.class, false);
+        List l = new TypedList(new LinkedList(), Object.class, false);
 
-	if (a instanceof Wrapper) {
-	    Wrapper w = (Wrapper) a;
+        if (a instanceof Wrapper) {
+            Wrapper w = (Wrapper) a;
 
-	    if (w.amb instanceof Name &&
-		((Name) w.amb).prefix == null) {
+            if (w.amb instanceof Name &&
+                ((Name) w.amb).prefix == null) {
 
-		// Could be a field, local, principal, or param of the
-		// current class. The last three can be used to
-		// instantiate a class.
-		l.add(w.amb);
-	    }
-	    else {
-		l.add(a);
-	    }
-	} else {
-	    l.add(a);
-	}
-	return l;
+                // Could be a field, local, principal, or param of the
+                // current class. The last three can be used to
+                // instantiate a class.
+                l.add(w.amb);
+            }
+            else {
+                l.add(a);
+            }
+        } else {
+            l.add(a);
+        }
+        return l;
     }
 
     /**
      * Return the source position of the Parse.
      */
     public static Position pos(Amb n) {
-	if (n == null) {
-	    return null;
-	}
-	return n.pos;
+        if (n == null) {
+            return null;
+        }
+        return n.pos;
     }
 
     protected Position posForObject(Object o) {
@@ -222,20 +222,20 @@ parser Grm extends polyglot.parse.Grm {:
     }
 
     public Amb makeAccessOrInst(Amb a, List b) throws Exception {
-		if (a instanceof Access) {
-		    return new Access(this, pos(a), a, (Expr) b.get(0));
-		} else {
-		    if (b.size() == 1) {
-				if (b.get(0) instanceof ParamNode) {
-				    return new Inst(this, pos(a), a.toClassType(), b);
-				}
-				else {
-				    return new InstOrAccess(this, pos(a), a, b.get(0));
-				}
-		    } else {
-				return new Inst(this,pos(a), a.toClassType(), toParamList(b));
-		    }
-		}
+        if (a instanceof Access) {
+            return new Access(this, pos(a), a, (Expr) b.get(0));
+        } else {
+            if (b.size() == 1) {
+                if (b.get(0) instanceof ParamNode) {
+                    return new Inst(this, pos(a), a.toClassType(), b);
+                }
+                else {
+                    return new InstOrAccess(this, pos(a), a, b.get(0));
+                }
+            } else {
+                return new Inst(this,pos(a), a.toClassType(), toParamList(b));
+            }
+        }
     }
 
     public static final String TYPE_ANNOTATION = "labeled types";
@@ -247,7 +247,7 @@ parser Grm extends polyglot.parse.Grm {:
     public static final String METHOD_ACTSFOR_ANNOTATION = "actsfor where-constraints";
     public static final String METHOD_LABEL_ASSERTION_ANNOTATION = "label leq where-constraints";
 
-	private static final Set linesSeen = new HashSet();
+    private static final Set linesSeen = new HashSet();
     public void countAnnotation(String key, Position pos) {
         Job job = ts.extensionInfo().scheduler().currentJob();
         String countKey = "Jif annotations: " + job + " : " + key;
@@ -256,10 +256,10 @@ parser Grm extends polyglot.parse.Grm {:
         ts.extensionInfo().getStats().accumPassTimes(countAllKey, 1, 1);
         String posString = new Position(pos.path(), pos.file(), pos.line()).toString();
         // check if the position is already recorded.
-        
+
         if (!linesSeen.contains(posString)) {
-        	linesSeen.add(posString);
-	        ts.extensionInfo().getStats().accumPassTimes("Jif annotations: TOTAL LINES WITH ANNOTATION", 1, 1);        	
+            linesSeen.add(posString);
+            ts.extensionInfo().getStats().accumPassTimes("Jif annotations: TOTAL LINES WITH ANNOTATION", 1, 1);         
         }
     }
 
@@ -412,7 +412,7 @@ label_component ::=
             {: RESULT = parser.nf.AmbThisLabelNode(parser.pos(a)); :}
     |   IDENTIFIER:a
             {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),
-						  parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
+                                                  parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
     ;
 provider ::=
         PROVIDER:a
@@ -445,7 +445,7 @@ label_component_policy ::=
 principal_list_opt ::=
                     // List of PrincipalNode
             {: RESULT = new TypedList(new LinkedList(), PrincipalNode.class,
-				      false); :}
+                                      false); :}
     |   principal_list:a
             {: RESULT = a; :}
     ;
@@ -513,27 +513,33 @@ dynamic_label ::=
                RESULT = parser.nf.AmbProviderLabelNode(parser.pos(a, b), clazz);
             :}
     ;
+
 accesspath ::=
-        THIS:a {:  RESULT = parser.nf.This(parser.pos(a));  :}
-    |   IDENTIFIER:a {: RESULT = new Name(parser, parser.pos(a), a.getIdentifier()).toExpr(); :}
+        THIS:a
+            {:  RESULT = parser.nf.This(parser.pos(a));  :}
+    |   IDENTIFIER:a
+            {: RESULT = new Name(parser, parser.pos(a), a.getIdentifier()).toExpr(); :}
     |   accesspath_receiver:a DOT IDENTIFIER:b
             {: RESULT = parser.nf.Field(parser.pos(a, b),
-	                                a,
-			                b.getIdentifier()); :}
+                                        a,
+                                        b.getIdentifier());
+            :}
     ;
 
 accesspath_receiver ::=
         THIS:a {:  RESULT = parser.nf.This(parser.pos(a));  :}
     |   IDENTIFIER:a {: RESULT = new Name(parser, parser.pos(a), a.getIdentifier()).toReceiver(); :}
-    | accesspath_receiver:a DOT IDENTIFIER:b
-             {: RESULT = parser.nf.Field(parser.pos(a, b),
-	                     a,
-			        b.getIdentifier()); :}
-     ;
+    |   accesspath_receiver:a DOT IDENTIFIER:b
+            {: RESULT = parser.nf.Field(parser.pos(a, b),
+                                        a,
+                                        b.getIdentifier());
+            :}
+    ;
 
 accesspath_no_id ::=
-        THIS:a {:  RESULT = parser.nf.This(parser.pos(a));  :}
-    | accesspath_receiver:a DOT IDENTIFIER:b
+        THIS:a
+             {:  RESULT = parser.nf.This(parser.pos(a));  :}
+    |   accesspath_receiver:a DOT IDENTIFIER:b
              {: RESULT = parser.nf.Field(parser.pos(a, b), a, b.getIdentifier()); :};
 
 // 19.4) Types, Values, and Variables
@@ -639,17 +645,16 @@ override interface_type_list ::=
     ;
 
 authority_opt ::=
-            {: RESULT = new TypedList(new LinkedList(), PrincipalNode.class,
-	       false); :}
+            {: RESULT = new TypedList(new LinkedList(), PrincipalNode.class, false); :}
     |   authority:a
             {: RESULT = a; :}
     ;
+
 authority ::=
         AUTHORITY:n LPAREN principal_list:a RPAREN
         {: RESULT = a; :}
     ;
-    
-    
+
 override class_body_declaration ::=
                     // List of ClassMember
         class_member_declaration:a
@@ -668,16 +673,17 @@ override class_body_declaration ::=
             {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
                RESULT = l; :}
     |   block:a 
-          {: 
-              parser.report_error ("Jif does not currently support initializer blocks.", parser.pos(a));
-              if (true) throw new Exception();
-           :}
+            {:
+                parser.report_error ("Jif does not currently support initializer blocks.", parser.pos(a));
+                if (true) throw new Exception();
+            :}
     | static_initializer:a
-          {: 
-              parser.report_error ("Jif does not currently support initializer blocks.", parser.pos(a));
-              if (true) throw new Exception();
-           :}    
+            {:
+                parser.report_error ("Jif does not currently support initializer blocks.", parser.pos(a));
+                if (true) throw new Exception();
+            :}
     ;
+
 override class_member_declaration ::=
                     // List of ClassMember
         field_declaration:a
@@ -980,8 +986,10 @@ override interface_declaration ::=
                 parameters_opt:p
                 extends_interfaces_opt:d authority_opt:u constraints_opt:f interface_body:e
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n,b),
-		    a.set(Flags.INTERFACE), parser.nf.Id(parser.pos(b), b.getIdentifier()),
-		    p, null, d, u, f, e); :}
+                                               a.set(Flags.INTERFACE),
+                                               parser.nf.Id(parser.pos(b),
+                                               b.getIdentifier()),
+                                               p, null, d, u, f, e); :}
     ;
 
 override extends_interfaces ::=
@@ -997,11 +1005,7 @@ override extends_interfaces ::=
 
 drop { interface_type }
 
-drop { interface_member_declaration ::=
-	      class_declaration
-	    | interface_declaration
-	    ;
-}
+drop { interface_member_declaration ::= class_declaration | interface_declaration; }
 
 // 19.10) Arrays
 
@@ -1056,10 +1060,12 @@ extend primary ::=
     |   NEW:n objtype_or_expr:a dims_opt:b
             {: RESULT = a.toNewArray(parser.pos(n, a), b); :}
     ;
+
 extend primary_no_new_array ::=
         primary_no_array:a
             {: RESULT = a; :}
     ;
+
 primary_no_array ::=
        declassify:a
             {: RESULT = a; :}
@@ -1072,10 +1078,14 @@ primary_no_array ::=
                    parser.nf.AmbProviderLabelNode(parser.pos(a, b), a.toType()));
             :}
     ;
+
 transfer primary_no_new_array to primary_no_array {
-	literal | THIS | LPAREN expression RPAREN |
-	class_instance_creation_expression | field_access |
-        method_invocation
+        literal
+    |   THIS
+    |   LPAREN expression RPAREN
+    |   class_instance_creation_expression
+    |   field_access
+    |   method_invocation
 }
 
 extend relational_expression ::=
@@ -1092,7 +1102,7 @@ extend relational_expression ::=
 
 drop { /* no reflection */
 primary_no_new_array ::=
-	primitive_type DOT CLASS
+        primitive_type DOT CLASS
     |   VOID DOT CLASS
     |   array_type DOT CLASS
     |   name DOT CLASS
@@ -1114,9 +1124,9 @@ class_instance_creation_expression ::=
                     // NewObjectExpr
         NEW:x objtype_or_expr:a label_opt:l LPAREN argument_list_opt:b RPAREN:y
             {:  TypeNode tn = a.toUnlabeledType();
-		if (l != null)
-		    tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
-		RESULT = parser.nf.New(parser.pos(x,y), tn, b); :}
+                if (l != null)
+                    tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
+                RESULT = parser.nf.New(parser.pos(x,y), tn, b); :}
     ;
 
 override array_creation_expression ::=
@@ -1153,7 +1163,7 @@ override method_invocation ::=
            Name n = (Name) a;
                RESULT = parser.nf.Call(parser.pos(a,y),
                        n.prefix == null ? null
-					: n.prefix.toReceiver(),
+                                        : n.prefix.toReceiver(),
                        n.name, b); :}
     |   primary_no_new_array:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:y
             {: RESULT = parser.nf.Call(parser.pos(a,y), a,
@@ -1177,16 +1187,16 @@ param_or_expr_list ::=
         expression:a
         {: RESULT = parser.makeParamOrExprList(a); :}
     |   label:a
-	    {: List l = new LinkedList();
-	       l.add(a);
-	       RESULT = l;
-	    :}
+            {: List l = new LinkedList();
+               l.add(a);
+               RESULT = l;
+            :}
     |   param_or_expr_list:a COMMA simple_name:b
-	    {: a.add(b); RESULT = a; :}
+            {: a.add(b); RESULT = a; :}
     |   param_or_expr_list:a COMMA label:b
-	    {: a.add(b); RESULT = a; :}
-    |  param_or_expr_list:a COMMA accesspath_no_id:b
-        {:  a.add(b); RESULT = a;  :}
+            {: a.add(b); RESULT = a; :}
+    |   param_or_expr_list:a COMMA accesspath_no_id:b
+            {:  a.add(b); RESULT = a;  :}
     ;
 
 /* objtype_or_expr: something that looks like the name of a class or interface
@@ -1200,7 +1210,7 @@ objtype_or_expr ::=
             {: RESULT = new Name(parser, parser.pos(a,b), a,
                                  b.getIdentifier()); :}
     |   objtype_or_expr:a LBRACK param_or_expr_list:b RBRACK
-	    {: RESULT = parser.makeAccessOrInst(a,b); :}
+            {: RESULT = parser.makeAccessOrInst(a,b); :}
     ;
 
 /* reftype_or_expr: something that looks like a reference type (but not
@@ -1237,11 +1247,11 @@ override array_access ::=
                     x = parser.nf.ArrayAccess(parser.pos(a,b), x, e);
                }
                RESULT = (ArrayAccess) x;
-	    :}
+            :}
     ;
 drop { postfix_expression ::= name; }
 extend postfix_expression ::=
-	reftype_or_expr:a
+        reftype_or_expr:a
             {: RESULT = a.wrap(); :}
     ;
 
