@@ -54,6 +54,10 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
         return (this.paramInstance == that.paramInstance());
     }
     
+    public String toString(Set printedLabels) {
+        return componentString(printedLabels);
+    }
+    
     public String componentString(Set printedLabels) {
         if (Report.should_report(Report.debug, 1)) { 
             return "<param-" + this.paramInstance + ">";

@@ -98,6 +98,10 @@ public class ProviderLabel_c extends Label_c implements ProviderLabel {
         return isCanonical();
     }
 
+    public String toString(Set printedLabels) {
+        return componentString(printedLabels);
+    }
+    
     @Override
     public String componentString(Set<Label> printedLabels) {
         if (Report.should_report(Report.debug, 1)) {

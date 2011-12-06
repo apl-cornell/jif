@@ -142,7 +142,7 @@ public abstract class Label_c extends Param_c implements Label {
 
     @Override
     public String toString() {
-        return "{" + componentString(new HashSet<Label>()) + "}";
+        return toString(new HashSet<Label>());
     }
 
     @Override

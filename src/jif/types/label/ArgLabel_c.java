@@ -116,7 +116,7 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     public int hashCode() {
         return (vi==null?234:vi.hashCode()) ^ 2346882;
     }
-        
+
     public String componentString(Set printedLabels) {
         if (printedLabels.contains(this)) {
             if (Report.should_report(Report.debug, 2)) { 

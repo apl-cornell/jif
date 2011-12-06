@@ -58,11 +58,15 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
         return path.hashCode();
     }
     
-    public String componentString(Set printedLabels) {
+    public String toString(Set printedLabels) {
         if (Report.should_report(Report.debug, 1)) { 
             return "<dynamic " + path + ">";
         }
-        return "*"+path();
+        return path().toString();
+    }
+    
+    public String componentString(Set printedLabels) {
+        return "*"+toString(printedLabels);
     }
 
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {

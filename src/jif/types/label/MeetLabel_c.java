@@ -113,19 +113,11 @@ public class MeetLabel_c extends Label_c implements MeetLabel
     }
     
     public String componentString(Set printedLabels) {
-        return componentString(printedLabels, false);
-    }
-    private String componentString(Set printedLabels, boolean topLevel) {
         String s = "";
         for (Iterator i = components.iterator(); i.hasNext(); ) {
             Label c = (Label) i.next();
-            if (topLevel) {
-                s += c.toString(printedLabels);
-            }
-            else {
-                s += c.componentString(printedLabels);                
-            }
-            
+            s += c.toString(printedLabels);
+
             if (i.hasNext()) {
                 s += " meet ";
             }
@@ -134,15 +126,6 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         return s;
     }
 
-    public String toString() {
-        return "{" + componentString(new HashSet(), true) + "}";
-    }
-
-    public String toString(Set printedLabels) {
-        return "{" + componentString(printedLabels, true) + "}";
-    }
-    
-    
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         if (! L.isComparable() || ! L.isEnumerable())
             throw new InternalCompilerError("Cannot compare " + L);

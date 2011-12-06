@@ -140,9 +140,9 @@ public class LabelEnv_c implements LabelEnv
         
         if (updateDisplayString && added) {
             if (displayLabelAssertions.length() > 0) {
-                displayLabelAssertions.append(", ");
+                displayLabelAssertions.append("\n");
             }
-            displayLabelAssertions.append(L1 + " <= " + L2);
+            displayLabelAssertions.append("   " + L1 + " <= " + L2);
         }
         return added;
     }
@@ -151,9 +151,9 @@ public class LabelEnv_c implements LabelEnv
         addAssertionLE(L1, L2, false);
         addAssertionLE(L2, L1, false);
         if (displayLabelAssertions.length() > 0) {
-            displayLabelAssertions.append(", ");
+            displayLabelAssertions.append("\n");
         }
-        displayLabelAssertions.append(L1 + " equiv " + L2);        
+        displayLabelAssertions.append("   " + L1 + " equiv " + L2);        
     }
     
     public LabelEnv_c copy() {
@@ -1012,7 +1012,6 @@ public class LabelEnv_c implements LabelEnv
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append("[");
         sb.append(this.displayLabelAssertions);
 //        for (Iterator i = labelAssertions.iterator(); i.hasNext(); ) {
 //            LabelLeAssertion c = (LabelLeAssertion) i.next();
@@ -1037,7 +1036,6 @@ public class LabelEnv_c implements LabelEnv
                 sb.append((e.getValue()).exprString());
             }
         }
-        sb.append("]");
         return sb.toString();
     }
     

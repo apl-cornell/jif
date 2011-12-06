@@ -57,6 +57,10 @@ public class WritersToReadersLabel_c extends Label_c implements WritersToReaders
         return label.hashCode() ^ 597829;
     }
     
+    public String toString(Set printedLabels) {
+        return componentString(printedLabels);
+    }
+    
     public String componentString(Set printedLabels) {
         if (Report.should_report(Report.debug, 1)) { 
             return "<writersToReaders " + label + ">";

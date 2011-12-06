@@ -201,9 +201,36 @@ public interface Label extends ActsForParam {
 
     Expr toJava(JifToJavaRewriter rw) throws SemanticException;
 
+    ////////////////////////////////////////////////////////////////////////////
+    // String representation methods                                          //
+    ////////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * Equivalent to toString(emptySet).
+     */
+    String toString();
+    
+    /**
+     * return a string representation of the label.
+     *
+     * @param printedLabels
+     *        the set of labels for which auxiliary information should be
+     *        omitted. 
+     */
+    String toString(Set<Label> printedLabels);
+    
+    /**
+     * Equivalent to componentString(emptySet)
+     */
     String componentString();
 
+    /**
+     * return a string s such that {s} is a label
+     *
+     * @param printedLabels
+     *        the set of labels for which auxiliary information should be
+     *        omitted. 
+     */
     String componentString(Set<Label> printedLabels);
 
-    String toString(Set<Label> printedLabels);    
 }

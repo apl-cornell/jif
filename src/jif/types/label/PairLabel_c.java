@@ -83,9 +83,6 @@ public class PairLabel_c extends Label_c implements PairLabel {
         return confPolicy.hashCode() ^ integPolicy.hashCode();
     }
         
-    public String toString() {
-        return toString(new HashSet());
-    }
     public String toString(Set printedLabels) {
         return toString(printedLabels, true);        
     }

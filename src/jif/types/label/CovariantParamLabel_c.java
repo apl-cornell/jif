@@ -53,6 +53,10 @@ public class CovariantParamLabel_c extends Label_c implements CovariantParamLabe
         return (this.paramInstance == that.paramInstance());
     }
     
+    public String toString(Set printedLabels) {
+        return componentString(printedLabels);
+    }
+    
     public String componentString(Set printedLabels) {
         if (Report.should_report(Report.debug, 1)) { 
             return "<covariant-param-label " + this.paramInstance + ">";
