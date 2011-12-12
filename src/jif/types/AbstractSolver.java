@@ -607,7 +607,8 @@ public abstract class AbstractSolver implements Solver {
             if (lc.rhsLabel() instanceof NotTaken && lc.kind() == LabelConstraint.LEQ) {
                 // if the RHS is NotTaken (and the LHS isn't), then the
                 // constraint can never be satisfied.
-                throw new UnsatisfiableConstraintException(this, lc);
+                LabelEquation eqn = new LabelEquation(lc.lhsLabel(), lc.rhsLabel(), lc);
+                reportError(eqn);
             }
         }
         processConstraint(c);
@@ -1077,6 +1078,8 @@ public abstract class AbstractSolver implements Solver {
     protected UnsatisfiableConstraintException reportError(Equation eqn) {
         for (Variable v : eqn.variables())
             reportTrace(v);
+        bounds.applyTo(eqn);        
+        
         return new UnsatisfiableConstraintException(this, eqn);
     }
     

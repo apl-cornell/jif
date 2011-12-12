@@ -122,17 +122,29 @@ public class VarMap {
         }
         
     }
+    
     public Param applyTo(Param c) {
         if (c instanceof Label) return applyTo((Label)c);
         if (c instanceof Principal) return applyTo((Principal)c);
         throw new InternalCompilerError("Unexpected Param" + c);
     }
+    
     public Label applyTo(Label c) {
         LabelSubstitution s = new VarMapLabelSubstitution() ;
         try {
             return c.subst(s);
         }
         catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected SemanticException", e);
+        }
+    }
+    
+    public void applyTo(Equation eqn) {
+        // TODO: this imperatively updates eqn.
+        LabelSubstitution s = new VarMapLabelSubstitution();
+        try {
+            eqn.subst(s);
+        } catch (SemanticException e) {
             throw new InternalCompilerError("Unexpected SemanticException", e);
         }
     }

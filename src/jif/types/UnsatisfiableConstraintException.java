@@ -20,20 +20,19 @@ class UnsatisfiableConstraintException extends SemanticException {
     protected final AbstractSolver solver;
     protected final Equation       failure;
 
+    /**
+     * Construct a new UnsatisfiableConstraintException.
+     * @param solver
+     *          The solver that was used to determine that eqn is unsatisfiable
+     * @param eqn
+     *          The unsatisfiable equation
+     */
     public UnsatisfiableConstraintException(AbstractSolver solver, Equation eqn) {
         super(eqn.position());
         this.solver  = solver;
         this.failure = eqn;
     }
 
-    /**
-     * Report an unsatisfiable constraint without providing an
-     * unsatisfiable equation.
-     */ 
-    public UnsatisfiableConstraintException(AbstractSolver solver, LabelConstraint c) {
-        this(solver, new LabelEquation(c.lhsLabel(), c.rhsLabel(), c));
-    }
-    
     /**
      * Report the traces for each variables in the collection
      * <code>Variables</code>
