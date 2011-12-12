@@ -16,7 +16,7 @@ import polyglot.util.InternalCompilerError;
 /**
  * Exception indicating that a program constraint is not satisfiable.
  */
-class UnsatisfiableConstraintException extends SemanticException {
+public class UnsatisfiableConstraintException extends SemanticException {
     protected final AbstractSolver solver;
     protected final Equation       failure;
 
