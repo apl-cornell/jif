@@ -176,7 +176,7 @@ public class SolverGLB extends AbstractSolver {
             if (shouldReport(1)) {
                 report(1, "Search for refinement to constraint " + eqn + " failed.");
             }
-            reportError(eqn.labelConstraint(), eqn.variableComponents());
+            throw reportError(eqn);
             
         }
 
@@ -241,7 +241,7 @@ public class SolverGLB extends AbstractSolver {
             if (shouldReport(1)) {
                 report(1, "Search for refinement to constraint " + eqn + " failed.");
             }
-            reportError(eqn.constraint(), eqn.variables());            
+            throw reportError(eqn);            
         }
     }
     
@@ -464,7 +464,7 @@ public class SolverGLB extends AbstractSolver {
             //            if (dynCheck(lhsBound, rhsLabel, eqn.env())) return;
 
             // This equation isn't satisfiable.
-            reportError(eqn.labelConstraint(), eqn.variableComponents());
+            throw reportError(eqn);
         }
     }
 
@@ -494,7 +494,7 @@ public class SolverGLB extends AbstractSolver {
         if (!eqn.env().actsFor(lhsBound, rhsBound)) {
 
             // This equation isn't satisfiable.
-            reportError(eqn.constraint(), eqn.variables());
+            throw reportError(eqn);
         }
         
     }

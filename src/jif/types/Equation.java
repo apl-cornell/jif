@@ -6,6 +6,7 @@ import jif.types.hierarchy.LabelEnv;
 import jif.types.label.JoinLabel;
 import jif.types.label.Label;
 import jif.types.label.MeetLabel;
+import jif.types.label.Variable;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -20,14 +21,21 @@ import polyglot.util.Position;
  */
 public abstract class Equation
 {
+    /**
+     * @param constraint
+     *        the constraint from which this equation was derived.
+     */
     protected Equation(Constraint constraint) {
         this.constraint = constraint;
     }
+    
+    /** The constraint from which this equation was derived. */
     protected final Constraint constraint;
     
     public LabelEnv env() {return constraint().env();}
     public Position position() {return constraint().position();}
 
+    /** The constraint from which this equation was derived. */
     public Constraint constraint() {
         return constraint;
     }
@@ -36,7 +44,7 @@ public abstract class Equation
      * Return a <code>Set</code> of variables that occur in either the 
      * left or right hand side.
      */
-    public abstract Set variables();
+    public abstract Set<Variable> variables();
 
     public abstract int hashCode();
 

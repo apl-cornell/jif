@@ -81,6 +81,16 @@ public class LabelEnv_c implements LabelEnv
         }
     }
     
+    @Override
+    public PrincipalHierarchy principalHierarchy() {
+        return ph;
+    }
+    
+    @Override
+    public Collection<LabelLeAssertion> labelAssertions() {
+        return Collections.unmodifiableCollection(labelAssertions);
+    }
+    
     public PrincipalHierarchy ph() {
         return ph;
     }

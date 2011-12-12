@@ -1,9 +1,11 @@
 package jif.types.hierarchy;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jif.types.LabelLeAssertion;
 import jif.types.Solver;
 import jif.types.VarMap;
 import jif.types.label.AccessPath;
@@ -57,6 +59,16 @@ public interface LabelEnv
     Map<String, List<String>> definitions(VarMap bounds,
             Set<Label> seenComponents);
 
+    /**
+     * The collection of label assertions
+     */
+    Collection<LabelLeAssertion> labelAssertions();
+    
+    /**
+     * The static principal hierarchy
+     */
+    PrincipalHierarchy principalHierarchy();
+    
     /**
      * Trigger any writersToReaders transforms in label, and return the result.
      */

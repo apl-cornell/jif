@@ -2,14 +2,12 @@ package jif.types;
 
 import java.util.*;
 
-import jif.JifOptions;
 import jif.Topics;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.*;
 import jif.types.principal.Principal;
 import jif.types.principal.VarPrincipal;
 import polyglot.frontend.Compiler;
-import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.util.*;
@@ -86,7 +84,7 @@ public abstract class AbstractSolver implements Solver {
      * constraint will be thrown immediately, otherwise the constraint
      * will be added to this set, and thrown when solve() is called.
      */
-    protected Set<Constraint> staticFailedConstraints;
+    protected Set<Equation> staticFailedConstraints;
     protected static final boolean THROW_STATIC_FAILED_CONSTRAINTS = false;
     protected final Compiler compiler;
 
@@ -267,10 +265,8 @@ public abstract class AbstractSolver implements Solver {
                 report(1, "   " + staticFailedConstraints.size() + " statically failed constraint");
             }
             setStatus(STATUS_NO_SOLUTION);
-            for (Iterator iter = staticFailedConstraints.iterator(); iter.hasNext();) {
-                Constraint cons = (Constraint)iter.next();
-                SemanticException ex = new SemanticException(errorMsg(cons), 
-                                                             cons.position()); 
+            for (Iterator<Equation> iter = staticFailedConstraints.iterator(); iter.hasNext();) {
+                SemanticException ex = reportError(iter.next());
                 if (!iter.hasNext()) {
                     // throw the last one
                     throw ex;
@@ -510,7 +506,8 @@ public abstract class AbstractSolver implements Solver {
                 }
                 if (!isRuntimeRepresentable) {
                     // a variable that must be runtime representable is not.
-                    reportError(eqn.labelConstraint(), Collections.singleton(v));
+                    reportTrace(v);
+                    throw new SemanticException(v + " must be runtime representable in equation " + eqn, eqn.position());
                 }
             }
         }
@@ -530,7 +527,7 @@ public abstract class AbstractSolver implements Solver {
 
         // Check to see if it is currently satisfiable.
         if (!eqn.env().leq(lhsBound, rhsBound)) {
-            reportError(eqn.labelConstraint(), eqn.variableComponents());
+            throw reportError(eqn);
         }        
     }
 
@@ -596,7 +593,7 @@ public abstract class AbstractSolver implements Solver {
         inc_counter();
 
         if (!c.isCanonical()) {
-            throw new SemanticException(errorMsg(c), c.position());
+            throw new InternalCompilerError(c.position(), "Constraint is not canonical.");
         }
 
         if (c instanceof LabelConstraint) {
@@ -610,7 +607,7 @@ public abstract class AbstractSolver implements Solver {
             if (lc.rhsLabel() instanceof NotTaken && lc.kind() == LabelConstraint.LEQ) {
                 // if the RHS is NotTaken (and the LHS isn't), then the
                 // constraint can never be satisfied.
-                throw new SemanticException(errorMsg(c), c.position());
+                throw new UnsatisfiableConstraintException(this, lc);
             }
         }
         processConstraint(c);
@@ -706,14 +703,13 @@ public abstract class AbstractSolver implements Solver {
 
                     // The equation is not satisfied.
                     if (THROW_STATIC_FAILED_CONSTRAINTS) {
-                        throw new SemanticException(errorMsg(c), 
-                                                    eqn.position());
+                        throw reportError(eqn);
                     }
                     else {
                         if (staticFailedConstraints == null) {
                             staticFailedConstraints = new LinkedHashSet();
                         }
-                        staticFailedConstraints.add(eqn.constraint());
+                        staticFailedConstraints.add(eqn);
                     }
                 }
                 else {
@@ -880,183 +876,6 @@ public abstract class AbstractSolver implements Solver {
             }
         }
         return null;
-    }
-
-    /**
-     * Report the traces for each variables in the collection
-     * <code>Variables</code>
-     */
-    protected void reportTraces(Collection variables) {
-        // NO TRACING FOR THE MOMENT.
-//        if (shouldReport(3)) {
-//            // We'll produce the traces...
-//
-//            StringBuffer trcs = new StringBuffer();
-//            for (Iterator vs = variables.iterator(); vs.hasNext();) {
-//                VarLabel v = (VarLabel)vs.next();
-//
-//                List trace = (List)traces.get(v);
-//                if (trace != null) {
-//                    StringBuffer trc = new StringBuffer("\nTrace for " + v
-//                            + ":\n");
-//
-//                    trc.append("  initially : " + getDefaultBound() + "\n");
-//                    for (int i = 0; i < trace.size(); ++i) {
-//                        Pair p = (Pair)trace.get(i);
-//                        Equation e = (Equation)p.part1();
-//                        Label l = (Label)p.part2();
-//                        trc.append("  " + i + ": " + l + " from eqn " + e.lhs()
-//                                + " <= " + e.rhs() + "\n");
-//                        trc.append("       from " + e.constraint());
-//                        if (e.constraint().position() != null) {
-//                            trc.append(" (line "
-//                                    + e.constraint().position().line() + ")");
-//                        }
-//                        trc.append("\n");
-//                    }
-//                    trcs.append(trc.toString());
-//                }
-//            }
-//
-//            report(3, trcs.toString());
-//        }
-    }
-
-    protected boolean errorShowConstraint() {
-        return (errorShowTechnicalMsg() || errorShowDetailMsg());
-    }
-
-    protected boolean errorShowTechnicalMsg() {
-        return false;
-    }
-
-    protected boolean errorShowDetailMsg() {
-        return ((JifOptions)Options.global).explainErrors;
-    }
-
-    protected boolean errorShowDefns() {
-        return (errorShowTechnicalMsg() || errorShowDetailMsg())
-                && errorShowConstraint();
-    }
-
-    /**
-     * Produce an error message for the constraint c, which cannot be satisfied.
-     */
-    protected final String errorMsg(Constraint c) {
-        StringBuffer sb = new StringBuffer();
-
-        if (errorShowConstraint()) {
-            sb.append("Unsatisfiable constraint: \n");
-            //sb.append(" \n------------------------ \n");
-            sb.append(errorStringConstraint(c));
-            sb.append(" \n \n");
-        }
-
-        if (errorShowDefns() && c instanceof LabelConstraint) {
-            sb.append("Label Descriptions");
-            sb.append(" \n------------------");
-            sb.append(errorStringDefns((LabelConstraint)c));
-            sb.append(" \n \n");
-        }
-
-        if (errorShowTechnicalMsg()) {
-            sb.append(c.technicalMsg());
-        }
-        else if (errorShowDetailMsg()) {
-            sb.append(c.detailMsg());
-        }
-        else {
-            sb.append(c.msg());
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Produce a string appropriate for an error message that displays the
-     * unsatisfiable constraint <code>c</code>.
-     */
-    protected String errorStringConstraint(Constraint c) {
-        StringBuffer sb = new StringBuffer();
-        if (c instanceof LabelConstraint) {
-            LabelConstraint lc = (LabelConstraint)c;
-            if (lc.namedLhs() != null || lc.namedRhs() != null) {
-                sb.append("  ");
-                sb.append(lc.namedLhs());
-                sb.append(c.kind());
-                sb.append(lc.namedRhs());
-                sb.append(" \n");
-            }
-        }
-
-        sb.append("\t");
-        sb.append(bounds.applyTo(c.lhs));
-        sb.append(c.kind());
-        sb.append(bounds.applyTo(c.rhs));
-        if (!c.env().isEmpty()) {
-            sb.append(" \nin environment \n   ");
-            sb.append(c.env());
-        }
-
-        return sb.toString();
-    }
-
-    /**
-     * Produce a string appropriate for an error message that displays the
-     * definitions needed by the unsatisfiable constraint <code>c</code>.
-     */
-    protected String errorStringDefns(LabelConstraint c) {
-        StringBuffer sb = new StringBuffer();
-
-        Map defns = c.definitions(bounds);
-        for (Iterator iter = defns.entrySet().iterator(); iter.hasNext();) {
-            Map.Entry e = (Map.Entry)iter.next();
-            sb.append(" \n - ");
-            sb.append((String)e.getKey());
-            List l = (List)e.getValue();
-            for (Iterator j = l.iterator(); j.hasNext();) {
-                sb.append(" = ");
-                sb.append((String)j.next());
-                if (j.hasNext()) {
-                    sb.append(" \n - ");
-                    sb.append((String)e.getKey());
-                }
-            }
-        }
-
-        return sb.toString();
-    }
-
-    /**
-     * Throws a SemanticException with the appropriate error message.
-     * 
-     * @param c The constraint that cannot be satisfied.
-     * @throws SemanticException always.
-     */
-    protected void reportError(Constraint c, Collection<Variable> variables)
-            throws SemanticException {
-        int count = 0;
-        while (!c.report() && (count++) < 1000) {
-            // we don't want to blame this constraint for the error, if
-            // possible. Try to find the constraint that made this one
-            // unsatisfiable.
-            Equation eqn = findContradictiveEqn(c);
-            if (eqn == null) {
-                // we can't find a contradictive eqn. Just use this one.
-                if (shouldReport(3))
-                        report(3, "Could not find contradictive eqn for " + c);
-                break;
-            }
-            if (shouldReport(3))
-                    report(3, "Found contradictive eqn for " + c + "; it is "
-                            + eqn);
-            c = eqn.constraint();
-        }
-
-        Position pos = c.position();
-
-        if (variables != null) reportTraces(variables);
-
-        throw new SemanticException(errorMsg(c), pos);
     }
 
     protected Equation findContradictiveEqn(Constraint c) {
@@ -1245,5 +1064,56 @@ public abstract class AbstractSolver implements Solver {
             list.addFirst(eqn);
             elements.add(eqn);                        
         }
+    }
+    
+    /**
+     * Report an unsatisfiable constraint 
+     * 
+     * @param  eqn
+     *          The equation that is unsatisfiable
+     * @return
+     *          a suitable exception to indicate the failure
+     */
+    protected UnsatisfiableConstraintException reportError(Equation eqn) {
+        for (Variable v : eqn.variables())
+            reportTrace(v);
+        return new UnsatisfiableConstraintException(this, eqn);
+    }
+    
+    /** Report a trace for a given variable. */
+    protected void reportTrace(Variable v) {
+        /* This code was commented out in r1.5 before it was moved here.
+        if (shouldReport(3)) {
+            // We'll produce the traces...
+
+            StringBuffer trcs = new StringBuffer();
+            for (Iterator vs = variables.iterator(); vs.hasNext();) {
+                VarLabel v = (VarLabel)vs.next();
+
+                List trace = (List)traces.get(v);
+                if (trace != null) {
+                    StringBuffer trc = new StringBuffer("\nTrace for " + v
+                            + ":\n");
+
+                    trc.append("  initially : " + getDefaultBound() + "\n");
+                    for (int i = 0; i < trace.size(); ++i) {
+                        Pair p = (Pair)trace.get(i);
+                        Equation e = (Equation)p.part1();
+                        Label l = (Label)p.part2();
+                        trc.append("  " + i + ": " + l + " from eqn " + e.lhs()
+                                + " <= " + e.rhs() + "\n");
+                        trc.append("       from " + e.constraint());
+                        if (e.constraint().position() != null) {
+                            trc.append(" (line "
+                                    + e.constraint().position().line() + ")");
+                        }
+                        trc.append("\n");
+                    }
+                    trcs.append(trc.toString());
+                }
+            }
+            report(3, trcs.toString());
+        }
+        */
     }
 }
