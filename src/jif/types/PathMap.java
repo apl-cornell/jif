@@ -9,11 +9,15 @@ import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 
 /**
- * Implements the mapping from paths to labels.  All updates are functional, so
+ * Implements the mapping from control flow paths to labels.
+ * 
+ * <p>All updates are functional, so
  * that old path maps are still accessible.  This means that all updates, etc.
  * create clones of the pathmap.  There may be a more efficient way to do this
  * sharing, with "lazy" copying of the necessary entries, but this is easy to
- * implement.
+ * implement.</p>
+ * 
+ * @see Path
  */
 public class PathMap
 {
@@ -25,12 +29,14 @@ public class PathMap
         this.map = new HashMap<Path, Label>(5);
     }
 
+    /** Look up the label corresponding to p. */
     public Label get(Path p) {
         Label l = map.get(p);
         if (l == null) return ts.notTaken();
         return l;
     }
 
+    /** Return a copy of this with "p" set to "L". */
     public PathMap set(Path p, Label L) {
         PathMap n = new PathMap(ts);
         n.map.putAll(map);
@@ -45,20 +51,31 @@ public class PathMap
         return n;
     }
 
+    /** Convenience method to return the normal termination path label ({@link Path#N}). */
     public Label N() { return get(Path.N); }
+    /** Convenience method to set the normal termination path label    ({@link Path#N})  */ 
     public PathMap N(Label label) { return set(Path.N, label); }
 
-    /** Normal value label */
+    /** Convenience method to return the normal value label            ({@link Path#NV}) */
     public Label NV() { return get(Path.NV); }
+    /** Convenience method to set the normal value label               ({@link Path#NV}) */
     public PathMap NV(Label label) { return set(Path.NV, label); }
 
+    /** Convenience method to return the the normal return path label  ({@link Path#R})  */
     public Label R() { return get(Path.R); }
+    /** Convenience method to set the normal return path label         ({@link Path#R})  */
     public PathMap R(Label label) { return set(Path.R, label); }
 
+    /** Convenience method to set the exception path label for the given exception type */ 
     public PathMap exception(Type type, Label label) {
         return set(ts.exceptionPath(type), label);
     }
 
+    /**
+     * If "type" is an unchecked exception, return this.  Otherwise, return an
+     * updated copy with "label" joined to N, NV, and the exception path for
+     * "type".S
+     */ 
     public PathMap exc(Label label, Type type) {
         if (ts.isUncheckedException(type)) {
             return this;
@@ -71,8 +88,7 @@ public class PathMap
         return this.N(n).NV(nv).set(C, c);
     }
 
-    /** Return all paths in the map except NV (which isn't really a
-     * path). */
+    /** Return all paths in the map except NV */
     public Set<Path> paths() {
         Set<Path> s = allPaths();
         s.remove(Path.NV);
@@ -84,6 +100,7 @@ public class PathMap
         return new LinkedHashSet<Path>(map.keySet());
     }
 
+    /** Return a new PathMap mapping a path p to this.get(p) join m.get(p). */ 
     public PathMap join(PathMap m) {
         PathMap n = new PathMap(ts);
         n.map.putAll(map);
