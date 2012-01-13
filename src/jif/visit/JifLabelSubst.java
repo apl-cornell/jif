@@ -1,13 +1,34 @@
 package jif.visit;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-
-import polyglot.visit.*;
-import jif.ast.*;
-import jif.types.*;
+import jif.JifOptions;
+import jif.ast.CanonicalLabelNode;
+import jif.ast.JifUtil;
+import jif.ast.Jif_c;
+import jif.types.JifFieldInstance;
+import jif.types.JifLocalInstance;
+import jif.types.JifProcedureInstance;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
+import jif.types.Solver;
+import jif.types.VarMap;
+import polyglot.ast.Call;
+import polyglot.ast.CanonicalTypeNode;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Formal;
+import polyglot.ast.Local;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.ProcedureDecl;
+import polyglot.ast.Receiver;
 import polyglot.frontend.Job;
+import polyglot.main.Options;
+import polyglot.types.MethodInstance;
+import polyglot.types.SemanticException;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
+import polyglot.visit.ContextVisitor;
+import polyglot.visit.NodeVisitor;
 
 /**
  * This visitor substitutes labels for each variable in the path maps of
@@ -39,7 +60,6 @@ public class JifLabelSubst extends ContextVisitor
             return n;
         }
         n = updateNode(n);
-        
         return n;
     }
     

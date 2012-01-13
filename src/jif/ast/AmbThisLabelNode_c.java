@@ -38,12 +38,12 @@ public class AmbThisLabelNode_c extends AmbLabelNode_c
         
 	JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
-	if (!ct.thisLabel().isCanonical()) {
+	if (!ct.thisLabel(null).isCanonical()) {
             sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
             return this;
 	}
 
-        return nf.CanonicalLabelNode(position(), ct.thisLabel());
+        return nf.CanonicalLabelNode(position(), ct.thisLabel(null));
     }
 
     @Override

@@ -1,22 +1,36 @@
 package jif.types;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import jif.translate.JoinLabelToJavaExpr_c;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv_c;
 import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.AccessPath;
+import jif.types.label.JoinLabel_c;
 import jif.types.label.Label;
+import jif.types.label.NotTaken;
 import jif.types.label.PairLabel;
 import jif.types.label.ProviderLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
 import polyglot.ast.Local;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.CodeInstance;
+import polyglot.types.Context;
+import polyglot.types.Context_c;
+import polyglot.types.LocalInstance;
+import polyglot.types.Named;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 
 /** An implementation of the <code>JifContext</code> interface.
@@ -319,8 +333,23 @@ public class JifContext_c extends Context_c implements JifContext
 
     @Override
     public Label pc() { return pc; }
+    
     @Override
-    public void setPc(Label pc, LabelChecker lc) { this.pc = pc; }
+    // pc label is special for better error report
+    public void setPc(Label pc, LabelChecker lc) { // this.pc = pc;
+        if (pc instanceof NotTaken)
+            this.pc=pc;
+        if (this.pc == pc)
+            return;
+        if (pc != null) {
+            Set<Label> set = new HashSet<Label>();
+            set.add(pc);
+            this.pc = new JoinLabel_c(set, pc.typeSystem(), pc.position(), new JoinLabelToJavaExpr_c());
+            this.pc.setDescription("pc label");
+        }
+        else
+            this.pc = pc;
+    }
 
     @Override
     public Set<Principal> authority() { return auth; }

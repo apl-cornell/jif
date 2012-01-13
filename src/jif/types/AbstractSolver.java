@@ -1,16 +1,38 @@
 package jif.types;
 
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import jif.JifOptions;
 import jif.Topics;
+import jif.types.InformationFlowTrace.Direction;
 import jif.types.hierarchy.LabelEnv;
-import jif.types.label.*;
+import jif.types.label.Label;
+import jif.types.label.NotTaken;
+import jif.types.label.VarLabel;
+import jif.types.label.Variable;
 import jif.types.principal.Principal;
 import jif.types.principal.VarPrincipal;
 import polyglot.frontend.Compiler;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
-import polyglot.util.*;
+import polyglot.util.CollectionUtil;
+import polyglot.util.ErrorInfo;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Pair;
 
 /**
  * A solver of Jif constraints. Finds solution to constraints essentially by
@@ -26,6 +48,9 @@ public abstract class AbstractSolver implements Solver {
 
     // connected component that is being worked on
     protected Collection equations; // Set of all equations
+    
+    // failed constrians in the type checking
+    protected List<FailedConstraintSnapshot> failedEquations; // Set of all equations
 
     /**
      * Map from variables to (Set of) equations that may be invalidated by
@@ -89,6 +114,7 @@ public abstract class AbstractSolver implements Solver {
     protected final Compiler compiler;
 
     protected Map traces; //Map from variables to their histories of refining
+    public List<InformationFlowTrace> fullTrace;
 
     protected static Collection topics = CollectionUtil.list(Topics.jif, Topics.solver);
 
@@ -140,6 +166,8 @@ public abstract class AbstractSolver implements Solver {
         currentSCC = null;
         this.solverName = solverName + " (#" + (++solverCounter) + ")";
         this.fixedValueVars = new HashSet();
+        failedEquations = new ArrayList<FailedConstraintSnapshot>();
+        fullTrace = new ArrayList();
     }
     
 
@@ -162,6 +190,8 @@ public abstract class AbstractSolver implements Solver {
         scc = new LinkedList(js.scc);
         solverName = js.solverName;
         fixedValueVars = js.fixedValueVars;
+        failedEquations = new ArrayList<FailedConstraintSnapshot>();
+        fullTrace = new ArrayList();
     }
 
     /**
@@ -240,6 +270,7 @@ public abstract class AbstractSolver implements Solver {
      *             system of contraints.
      */
     public VarMap solve() throws SemanticException {
+        
         // Cache the solution.
         if (status == STATUS_SOLVED || status == STATUS_NO_SOLUTION) {
             return bounds;
@@ -266,9 +297,10 @@ public abstract class AbstractSolver implements Solver {
             }
             setStatus(STATUS_NO_SOLUTION);
             for (Iterator<Equation> iter = staticFailedConstraints.iterator(); iter.hasNext();) {
-                SemanticException ex = reportError(iter.next());
+                UnsatisfiableConstraintException ex = reportError(iter.next());
                 if (!iter.hasNext()) {
-                    // throw the last one
+                    // handle and throw the last one
+                    genFlowMessage(ex);
                     throw ex;
                 }
                 // add all but the last to the queue.
@@ -322,6 +354,7 @@ public abstract class AbstractSolver implements Solver {
         try {
             VarMap soln = solve_bounds();
             setStatus(STATUS_SOLVED);
+            
             if (shouldReport(1)) {
                 report(1, "   finished " + solverName);
             }
@@ -329,9 +362,246 @@ public abstract class AbstractSolver implements Solver {
         }
         catch (SemanticException e) {
             setStatus(STATUS_NO_SOLUTION);
+            genFlowMessage((UnsatisfiableConstraintException)e);
             throw e;
         }
     }
+    
+    public void genFlowMessage (UnsatisfiableConstraintException ex) {
+        if (LabelFlowGraph.shouldReport(LabelFlowGraph.messageOnly)) {
+            LabelFlowGraph g = new LabelFlowGraph(fullTrace, ex.getSnapshot());
+            g.showErrorPath();
+            if (LabelFlowGraph.shouldReport(LabelFlowGraph.showSlicedGraph))
+                g.writeToDotFile();
+        }    
+    }
+    
+    // this function outputs the dependency recorded in the map eqnVarDependency and varEqnDependency into a graph
+//    public void dependencyToGraph ( ) {
+//        String filename = solverName + ".dot";
+//        
+//        try {
+//            FileWriter fstream = new FileWriter(filename);
+//            BufferedWriter out = new BufferedWriter(fstream);
+//            
+//            out.write("digraph G1 {\n");
+//            // set the fill color of nodes
+//            out.write("\tnode [color = grey, style = filled];\n");
+//
+//            // first, generate all nodes in the graph
+//            int refCounter = 0;
+//            Map<Constraint, String> nameMap = new HashMap<Constraint, String>();
+//                        
+//            String nodes = ""; // keep track of all nodes appeared in the graph
+//            Set vars = new HashSet();
+//            Set links = new HashSet();
+//            
+//            // now output all the links
+//            for (Object o: eqnVarDependencies.keySet()) {
+//                LabelEquation equ = (LabelEquation) o;
+//                if (!nameMap.keySet().contains(equ.constraint)) {
+//                    // create a new node and assign it a fresh name
+//                    String name = "Equ"+refCounter;
+//                    nameMap.put(equ.constraint, name);
+//                    nodes += "\t" + name + " [label=\""
+//                          + equ.constraint.lhs.toString()
+//                          + equ.constraint.kind().toString()
+//                          + equ.constraint.rhs.toString()
+//                          + equ.constraint.pos.toString() 
+//                          + "\"" 
+//                          + (failedEquations.contains(equ.constraint)? ", color = red " : "")
+//                          + "];\n";
+//                    refCounter ++;
+//                }
+//                for (Object o1 : (Set) eqnVarDependencies.get(equ)) {
+//                    Variable var = (Variable) o1;
+//                    if (!vars.contains(var))
+//                        vars.add(var);
+//                    links.add(nameMap.get(equ.constraint) + "->" + var.name());
+//                }
+//            }
+//            
+//            for (Object o: varEqnDependencies.keySet()) {
+//                Variable var = (Variable) o;
+//                if (!vars.contains(var))
+//                    vars.add(var);
+//                for (Object o1: (Set) varEqnDependencies.get(var)) {
+//                    LabelEquation equ = (LabelEquation) o1;
+//                    if (!nameMap.keySet().contains(equ.constraint)) {
+//                        // create a new node and assign it a fresh name
+//                        String name = "Equ"+refCounter;
+//                        nameMap.put(equ.constraint, name);
+//                        nodes += "\t" + name + " [label=\""
+//                              + equ.constraint.lhs.toString()
+//                              + equ.constraint.kind().toString()
+//                              + equ.constraint.rhs.toString()
+//                              + equ.constraint.pos.toString() + "\"];\n";
+//                        refCounter ++;
+//                    }
+//                    links.add(var.name() + "->" + nameMap.get(equ.constraint) );
+//                }
+//            }
+//            
+//            // output all nodes to the graph
+//            out.write (nodes);
+//            for (Object o : vars) {
+//                Variable v = (Variable) o;
+//                out.write( "\t" + v.name() + "\n");
+//            }
+//            // output all links
+//            for (Object o : links) {
+//                String s = (String) o;
+//                out.write( "\t" + s + ";\n");
+//            }
+//            out.write("}");
+//            //Close the output stream
+//            out.flush();
+//            out.close();
+//        } catch (IOException e) {
+//            System.out.println("Unable to write to file: "+filename);
+//        }
+//    }
+    
+    // this function accepts a trace of refinements for variable's labels, and visualize it
+//    public void traceToGraph ( ) {
+     // add the failed constraint to the graph
+//        DependencyGraph g = new DependencyGraph(fullTrace, failedConstraints, bounds);
+//        g.writeToDotFile(solverName + ".dot");
+        
+//        String fileName = solverName + ".dot";
+//        System.out.println( "Failed constraints #: "+failedConstraints.size());
+//        for (Object o : failedConstraints)
+//            System.out.println(((Constraint)o).toString());
+//        Map varNameMap = new HashMap();
+//        Map unchangedVarNameMap = new HashMap();
+//        
+//        try {
+//            FileWriter fstream = new FileWriter(fileName);
+//            BufferedWriter out = new BufferedWriter(fstream);
+//            out.write("digraph G1 {\n");
+//            out.write("\tnode [color = grey, style = filled];\n");
+//
+//            // this is used to store the string for each variable
+//            Map<VarLabel, String> strings = new HashMap<VarLabel, String>();
+//            String gString = ""; // this is a global string
+//
+//            int varCounter = 0;
+//            int refCounter = 0;
+//            
+//            // first, get all var labels in the trace
+//            for (Object o : fullTrace) {
+//                Trace tr = (Trace) o;
+//                if ( !strings.keySet().contains(tr.label)) {
+//                    varNameMap.put(tr.label, "v"+varCounter+"_");
+//                    strings.put(tr.label, "");
+//                    System.out.println(tr.label.toString());
+//                    strings.put(tr.label, "\tsubgraph cluster_" + varCounter
+//                            + " {\n" + "\t\tlabel = \"" + tr.label.name()
+//                            + "\";\n" + "\t\t" + varNameMap.get(tr.label) + refCounter
+//                            + " [label=\"bot\"];\n");
+//                    varCounter++;
+//                }
+//            }
+//            
+//            for (Object o : fullTrace) {
+//                Trace tr = (Trace) o;
+//                refCounter ++;
+//                
+//                for (Object o1 : strings.keySet()) {
+//                    VarLabel var1 = (VarLabel) o1;
+//
+//                    // this is the var whose label is raised
+//                    if (tr.label == var1) {
+//                        // generated the refined label
+//                        strings.put(var1, strings.get(var1) + "\t\t"
+//                                    + varNameMap.get(var1) + refCounter + " [label=\""
+//                                    + tr.to.toString() + "\"];\n");
+//
+//                        String label = tr.equ.lhs().toString()
+//                                        + tr.equ.constraint.kind().toString()
+//                                        + tr.equ.rhs().toString()
+//                                        + tr.equ.position().toString();
+//
+//                        // first, label the refinement using the constraint
+//                        strings.put(var1, strings.get(var1) + "\t\t"
+//                                + varNameMap.get(var1) + (refCounter - 1)
+//                                + "->" + varNameMap.get(var1) + refCounter
+//                                + " [ " + "label=\"" + label + "\" ];\n");
+//
+//                        // add links from variables appeared in the lhs of the equation
+//                        for (Object o3 : tr.equ.variables()) {
+//                            if (o3 != tr.label) {
+//                                VarLabel var2 = (VarLabel) o3;
+//                                if (!varNameMap.containsKey(var2)) {
+//                                    if (!unchangedVarNameMap.containsKey(var2)) {
+//                                        unchangedVarNameMap.put(var2, "v"+ varCounter);
+//                                        varCounter++;
+//                                        gString = gString + "\t\t"
+//                                                        + unchangedVarNameMap
+//                                                                .get(var2)
+//                                                        + " [label=\""
+//                                                        + var2.toString()
+//                                                        + "\"];\n";
+//                                    }
+//                                    gString = gString + "\t\t"
+//                                                    + unchangedVarNameMap.get(var2)
+//                                                    + "->"
+//                                                    + varNameMap.get(var1) + refCounter + " [ "
+//                                                    + "label=\"" + label
+//                                                    + "\" ];\n";
+//                                } else gString = gString + "\t\t" + varNameMap.get(var2)
+//                                                + (refCounter - 1) + "->"
+//                                                + varNameMap.get(var1)
+//                                                + refCounter + " [ "
+//                                                + "label=\"" + label
+//                                                + "\" ];\n";
+//                            }
+//                        }
+//                    } else {
+//                        strings.put(var1, strings.get(var1) + "\t\t"
+//                                        + varNameMap.get(var1) + refCounter
+//                                        + " [label=\"\"];\n");
+//                        strings.put(var1, strings.get(var1) + "\t\t"
+//                                + varNameMap.get(var1) + (refCounter - 1) + "->"
+//                                + varNameMap.get(var1) + refCounter + ";\n");
+//                    }
+//                }
+//            }
+//            
+//            // add failed constrain to the graph
+//            gString = gString + "\t\t" + "FAIL [color = red];\n";
+//            for (Object o : failedConstraints) {
+//                LabelConstraint c = (LabelConstraint) o;
+//                String label = c.lhs.toString()
+//                                + c.kind().toString()
+//                                + c.rhs.toString()
+//                                + c.position().toString();
+//
+//                for (Object o1 : (c.lhsLabel().variables())) {
+//                    Variable v = (Variable) o1;
+//                    gString = gString + "\t\t" + varNameMap.get(v)
+//                                    + refCounter + "->"
+//                                    + "FAIL" + " [ "
+//                                    + "label=\"" + label + "\" ];\n";
+//                }
+//            }
+//
+//            // write the subgraphs
+//            for (Object o : strings.keySet()) {
+//                VarLabel var1 = (VarLabel) o;
+//                out.write(strings.get(var1));
+//                out.write("\t}\n");
+//            }
+//            // write the global part
+//            out.write(gString);
+//
+//            out.write("}");
+//            // Close the output stream
+//            out.close();
+//        } catch (IOException e) {
+//            System.out.println("Unable to write to file: " + fileName);
+//        }
+//    }
     
     protected void setStatus(int status) {
         this.status = status;
@@ -414,7 +684,7 @@ public abstract class AbstractSolver implements Solver {
     protected void considerEquation(LabelEquation eqn) throws SemanticException {
         Label lhsbound = triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
         Label rhsbound = triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());                                
-
+        
         if (eqn.env().leq(lhsbound, rhsbound)) {
             if (shouldReport(5))
                     report(5, "constraint: " + eqn
@@ -626,7 +896,7 @@ public abstract class AbstractSolver implements Solver {
                 // solving by setting it immediately
                 VarLabel v = (VarLabel)lc.lhsLabel();
                 Label initialBound = bounds.applyTo(lc.rhsLabel());
-                addTrace(v, (Equation)lc.getEquations().iterator().next(), initialBound);
+                addTrace(v, lc.rhsLabel(), (Equation)lc.getEquations().iterator().next(), initialBound, InformationFlowTrace.Direction.BOTH);
                 setBound(v, initialBound, lc);
                 // only add the variable to the fixed value vars if the RHS does not contain
                 // any variables. Otherwise, the bound of v may need to change
@@ -680,12 +950,11 @@ public abstract class AbstractSolver implements Solver {
             LabelEnv eqnEnv = eqn.env();
             if (!eqnEnv.hasVariables() && !eqn.constraint().hasVariables()) {
                 // The equation has no variables. We can check now if it is
-                // satisfied or not                    
+                // satisfied or not   
                 boolean eqnSatisfied = false;
                 if (eqn instanceof LabelEquation) {     
                     LabelEquation leqn = (LabelEquation)eqn;
-                    eqnSatisfied = eqnEnv.leq(triggerTransforms(leqn.lhs(), eqnEnv), 
-                                              triggerTransforms(leqn.rhs(), eqnEnv)); 
+                    eqnSatisfied = eqnEnv.leq(triggerTransforms(leqn.lhs(), eqnEnv), triggerTransforms(leqn.rhs(), eqnEnv));
                 }
                 else if (eqn instanceof PrincipalEquation) {
                     PrincipalEquation peqn = (PrincipalEquation)eqn;
@@ -694,7 +963,7 @@ public abstract class AbstractSolver implements Solver {
                 else {
                     throw new InternalCompilerError("Unexpected kind of equation: " + eqn);
                 }
-                if (!eqnSatisfied) {                    
+                if (!eqnSatisfied) {         
                     if (shouldReport(2)) {
                         report(2, "Statically failed " + eqn);
                     }
@@ -844,12 +1113,14 @@ public abstract class AbstractSolver implements Solver {
      * Record the fact that label variable v, in the constraint eqn had its
      * bound set to the label lb.
      */
-    protected final void addTrace(VarLabel v, Equation eqn, Label lb) {
+    protected final void addTrace(VarLabel v, Label sourcelabel, Equation eqn, Label lb, Direction dir) {
+        fullTrace.add(new InformationFlowTrace(v, sourcelabel, dir, (LabelEquation)eqn));
+        
         List trace = (List)traces.get(v);
         if (trace == null) {
             trace = new LinkedList();
             traces.put(v, trace);
-        }
+        }           
         trace.add(new Pair(eqn, lb.copy()));
     }
 
@@ -1078,9 +1349,9 @@ public abstract class AbstractSolver implements Solver {
     protected UnsatisfiableConstraintException reportError(Equation eqn) {
         for (Variable v : eqn.variables())
             reportTrace(v);
-        bounds.applyTo(eqn);        
-        
-        return new UnsatisfiableConstraintException(this, eqn);
+        Equation reporteqn = (Equation) eqn.copy();
+        bounds.applyTo(reporteqn);
+        return new UnsatisfiableConstraintException(this, reporteqn, new FailedConstraintSnapshot(eqn, bounds.copy()));
     }
     
     /** Report a trace for a given variable. */

@@ -49,6 +49,10 @@ public class PrincipalEquation extends Equation
     public Principal rhs() {return rhs;}
     public LabelEnv env() {return constraint().env();}
     public Position position() {return constraint().position();}
+    
+    public Object copy() {
+        return new PrincipalEquation(lhs, rhs, (PrincipalConstraint)constraint);
+    }
 
     public PrincipalConstraint principalConstraint() {
         return (PrincipalConstraint)constraint;

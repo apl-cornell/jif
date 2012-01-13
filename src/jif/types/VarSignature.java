@@ -71,6 +71,8 @@ public class VarSignature implements DefaultSignature
                 return ts.labelOfType(baseType.toArray().ultimateBase());
             }
         }
-        return ts.noComponentsLabel();
+        Label l = ts.noComponentsLabel(baseType.position());
+        l.setDescription("default array base label");
+        return l;
     }    
 }

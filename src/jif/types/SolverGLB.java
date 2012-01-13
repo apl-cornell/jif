@@ -1,9 +1,23 @@
 package jif.types;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
+import jif.types.InformationFlowTrace.Direction;
 import jif.types.hierarchy.LabelEnv;
-import jif.types.label.*;
+import jif.types.label.ConfPolicy;
+import jif.types.label.IntegPolicy;
+import jif.types.label.JoinLabel;
+import jif.types.label.JoinPolicy_c;
+import jif.types.label.Label;
+import jif.types.label.MeetLabel;
+import jif.types.label.MeetPolicy_c;
+import jif.types.label.PairLabel;
+import jif.types.label.VarLabel;
+import jif.types.label.Variable;
 import jif.types.principal.Principal;
 import jif.types.principal.VarPrincipal;
 import polyglot.types.SemanticException;
@@ -104,7 +118,7 @@ public class SolverGLB extends AbstractSolver {
         // there may be a join of components on the RHS of the equation.
         // we will need to try all possible ways of satisfying this equation,
         // trying the simple ones (i.e. var labels) first.
-
+        
         if (!eqn.rhs().hasVariableComponents()) {            
             // the RHS has no variable components in it, it has nothing for us to
             // modify the bound of. It had better hold...
@@ -125,7 +139,7 @@ public class SolverGLB extends AbstractSolver {
         if (isSingleVar) singleVar = (VarLabel)rhsVariables.get(0);
         if (isSingleVar && (!isFixedValueVar(singleVar) || eqn.constraint().kind() == LabelConstraint.EQUAL)) {
             // only a single component is a variable
-            refineVariableEquation(singleVar, eqn);
+            refineVariableEquation(singleVar, eqn, true);
         }
         else {
             if (!isSingleVar && !allActivesAreMultiVarRHS()) {
@@ -145,25 +159,38 @@ public class SolverGLB extends AbstractSolver {
             // copy the bounds before we start modifying anything, so we can
             // restore it again later...
             VarMap origBounds = bounds().copy();
-
+            // record the last failed try for error report
+            SemanticException lastexception=null;
+            VarLabel comp=null;
+            Label lastlabel=null;
+            
             for (Iterator i = rhsVariables.iterator(); i.hasNext();) {
-                VarLabel comp = (VarLabel)i.next();
-
+                comp = (VarLabel)i.next();
+                
                 if (isFixedValueVar(comp) && eqn.constraint().kind() != LabelConstraint.EQUAL) {
                     // this var label had it's value fixed when it's constraint
-                    // was added. Do not try to alter it's value.                   
+                    // was added. Do not try to alter it's value.        
                     continue;
                 }
                 
-                refineVariableEquation(comp, eqn);
+                refineVariableEquation(comp, eqn, false);
+                
                 // check that the equation is now satisfied.
                 Label lhsbound = triggerTransforms(bounds().applyTo(eqn.lhs()), eqn.env());
                 Label rhsbound = triggerTransforms(bounds().applyTo(eqn.rhs()), eqn.env());
                 
-                if (eqn.env().leq(lhsbound, rhsbound) && search(eqn)) {
-                    // we were successfully able to find a solution to the
-                    // constraints!
-                    return;
+                try {
+                    if (eqn.env().leq(lhsbound, rhsbound) && search(eqn)) {
+                        // we were successfully able to find a solution to the
+                        // constraints!
+                        addTrace(comp, eqn.lhs(), eqn, bounds.boundOf(comp), Direction.IN);
+                        return;
+                    }
+                }
+                catch (SemanticException search) {
+                    if (shouldReport(2)) report(2, "Solution failed, backtracking");
+                    lastexception = search;
+                    lastlabel = bounds.boundOf(comp);
                 }
 
                 // search failed!
@@ -176,8 +203,14 @@ public class SolverGLB extends AbstractSolver {
             if (shouldReport(1)) {
                 report(1, "Search for refinement to constraint " + eqn + " failed.");
             }
-            throw reportError(eqn);
-            
+            // when the search failed, report the last bound snapshot and the try
+            if (lastexception!=null) {
+                addTrace(comp, eqn.lhs(), eqn, lastlabel, Direction.IN);
+                throw lastexception;
+            }
+            else {
+                throw reportError(eqn);
+            }
         }
 
     }
@@ -264,12 +297,12 @@ public class SolverGLB extends AbstractSolver {
      * Raise the bound on the label variable v, which is a component of the RHS
      * of the equation eqn.
      */
-    protected void refineVariableEquation(VarLabel v, LabelEquation eqn)
+    protected void refineVariableEquation(VarLabel v, LabelEquation eqn, boolean trace)
             throws SemanticException {
         Label vBound = bounds().boundOf(v);
         Label lhsBound = triggerTransforms(bounds().applyTo(eqn.lhs()), eqn.env());
         Label rhsBound = triggerTransforms(bounds().applyTo(eqn.rhs()), eqn.env());
-
+        
         if (shouldReport(5)) report(5, "BOUND of " + v + " = " + vBound);
         if (shouldReport(5)) report(5, "RHSBOUND = " + rhsBound);
         if (shouldReport(5)) report(5, "LHSBOUND = " + lhsBound);
@@ -289,9 +322,13 @@ public class SolverGLB extends AbstractSolver {
             newBound = rtRep;
             
         }
-
-        addTrace(v, eqn, newBound);
+        
+        // since this method can be called while trying out the rhs components, only add
+        // the refinement when it succeeds
+        if (trace)
+            addTrace(v, eqn.lhs(), eqn, newBound, Direction.IN);
         setBound(v, newBound, eqn.labelConstraint());
+        
         wakeUp(v);
     }
         
@@ -416,7 +453,7 @@ public class SolverGLB extends AbstractSolver {
     /**
      * Search recursively for solution to system of constraints.
      */
-    protected boolean search(Equation eqn) {
+    protected boolean search(Equation eqn) throws SemanticException {
         if (shouldReport(2)) {
             report(2, "===== Starting recursive search =====");
         }
@@ -425,15 +462,9 @@ public class SolverGLB extends AbstractSolver {
         // make sure this equation is satisfied before continuing.
         js.addEquationToQueueHead(eqn);
 
-        try {
-            setBounds(js.solve_bounds());
-            if (shouldReport(2)) report(2, "Solution succeeded, finishing up");
+        setBounds(js.solve_bounds());
+        if (shouldReport(2)) report(2, "Solution succeeded, finishing up");
             return true;
-        }
-        catch (SemanticException dummy) {
-            if (shouldReport(2)) report(2, "Solution failed, backtracking");
-            return false;
-        }
     }
 
     /**
@@ -462,7 +493,6 @@ public class SolverGLB extends AbstractSolver {
         if (!eqn.env().leq(lhsBound, rhsLabel)) {
             //            //try bounding the dynamic labels
             //            if (dynCheck(lhsBound, rhsLabel, eqn.env())) return;
-
             // This equation isn't satisfiable.
             throw reportError(eqn);
         }

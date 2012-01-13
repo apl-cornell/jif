@@ -6,6 +6,7 @@ import jif.types.label.ProviderLabel;
 import jif.types.label.ThisLabel;
 import jif.types.principal.Principal;
 import polyglot.types.ClassType;
+import polyglot.util.Position;
 
 /**
  * Jif class type.
@@ -39,6 +40,7 @@ public interface JifClassType extends ClassType {
      * @see ThisLabel
      */
     ThisLabel thisLabel();
+    ThisLabel thisLabel(Position p);
 
     /**
      * Returns a list of <code>Param</code>s, being the parameters with which

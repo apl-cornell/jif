@@ -62,6 +62,10 @@ public class LabelEquation extends Equation
         return l;
     }
 
+    public Object copy() {
+        return new LabelEquation(lhs, rhs, (LabelConstraint)constraint);
+    }
+
     /**
      * Return a <code>Set</code> of variables that occur in either the 
      * left or right hand side.

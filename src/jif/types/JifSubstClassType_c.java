@@ -78,10 +78,15 @@ public class JifSubstClassType_c extends SubstClassType_c
         JifSubst subst = (JifSubst) this.subst;
         return subst.substPrincipalList(base.constructorCallAuthority());
     }
-
+   
     @Override
     public ThisLabel thisLabel() {
-	return ((JifTypeSystem)ts).thisLabel(this);
+        return ((JifTypeSystem)ts).thisLabel(this);
+    }
+    
+    @Override
+    public ThisLabel thisLabel(Position p) {
+        return ((JifTypeSystem)ts).thisLabel(p, this);
     }
 
     @Override

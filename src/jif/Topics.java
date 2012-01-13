@@ -12,6 +12,7 @@ public class Topics {
     public static String labels = "labels";
     public static String labelEnv = "labelEnv";
     public static String pc = "pc";
+    public static String labelFlow = "labelFlow";
 
     static {
         Report.topics.add(solver);
@@ -20,5 +21,6 @@ public class Topics {
         Report.topics.add(labels);
         Report.topics.add(labelEnv);
         Report.topics.add(pc);
+        Report.topics.add(labelFlow);
     }
 }

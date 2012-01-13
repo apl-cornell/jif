@@ -1,9 +1,7 @@
 package jif.types;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +17,8 @@ import polyglot.util.InternalCompilerError;
 public class UnsatisfiableConstraintException extends SemanticException {
     protected final AbstractSolver solver;
     protected final Equation       failure;
-
+    protected final FailedConstraintSnapshot snapshot;
+    
     /**
      * Construct a new UnsatisfiableConstraintException.
      * @param solver
@@ -27,10 +26,11 @@ public class UnsatisfiableConstraintException extends SemanticException {
      * @param eqn
      *          The unsatisfiable equation
      */
-    public UnsatisfiableConstraintException(AbstractSolver solver, Equation eqn) {
+    public UnsatisfiableConstraintException(AbstractSolver solver, Equation eqn, FailedConstraintSnapshot snapshot) {
         super(eqn.position());
         this.solver  = solver;
         this.failure = eqn;
+        this.snapshot = snapshot;
     }
 
     /**
@@ -45,6 +45,10 @@ public class UnsatisfiableConstraintException extends SemanticException {
     /**
      * Produce an error message for the constraint c, which cannot be satisfied.
      */
+    public final FailedConstraintSnapshot getSnapshot () {
+        return snapshot;    
+    }
+    
     @Override
     public final String getMessage() {
         StringBuffer sb = new StringBuffer();

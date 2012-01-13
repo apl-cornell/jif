@@ -1,14 +1,10 @@
 package jif.types;
 
-import java.util.*;
+import java.util.Set;
 
 import jif.types.hierarchy.LabelEnv;
-import jif.types.label.JoinLabel;
-import jif.types.label.Label;
-import jif.types.label.MeetLabel;
 import jif.types.label.Variable;
 import polyglot.types.SemanticException;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /** 
@@ -57,4 +53,6 @@ public abstract class Equation
      * respectively.
      */
     public abstract void subst(LabelSubstitution subst) throws SemanticException;
+    
+    public abstract Object copy();
 }

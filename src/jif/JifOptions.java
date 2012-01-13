@@ -54,6 +54,11 @@ public class JifOptions extends Options {
       * Additional classpath entries for Jif signatures.
       */
      public List<String> addSigcp = new ArrayList<String>();
+     
+     /**
+      * Output a dependency graph to help the diagnosing of type error?
+      */
+     public boolean dependencyGraph;
 
     /**
      * Constructor
@@ -73,6 +78,7 @@ public class JifOptions extends Options {
         explainErrors = false;
         nonRobustness = false;
         trustedProviders = true;
+        dependencyGraph = false;
     }
 
     /**

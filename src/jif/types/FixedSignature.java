@@ -18,11 +18,15 @@ public class FixedSignature implements DefaultSignature
     }
     
     public Label defaultPCBound(Position pos, String methodName) {
-	return ts.topLabel(pos);
+        Label ret = ts.topLabel(pos);
+        ret.setDescription("default pc label");
+	return ret;
     }
 
-    public Label defaultArgBound(Formal f) {	
-        return ts.topLabel(f.position());
+    public Label defaultArgBound(Formal f) {
+        Label ret = ts.topLabel(f.position());
+        ret.setDescription("default arg bound");
+        return ret;
     }
 
     public Label defaultReturnLabel(ProcedureDecl pd) {
@@ -58,7 +62,9 @@ public class FixedSignature implements DefaultSignature
     }
 
     public Label defaultFieldLabel(FieldDecl fd) {
-        return ts.noComponentsLabel();
+        Label ret = ts.noComponentsLabel(fd.position());
+        ret.setDescription("default field label");
+        return ts.noComponentsLabel(fd.position());
     }
 
     public Label defaultArrayBaseLabel(Type baseType) {
@@ -68,7 +74,9 @@ public class FixedSignature implements DefaultSignature
                 return ts.labelOfType(baseType.toArray().ultimateBase());
             }
         }
-        return ts.noComponentsLabel();
+        Label l = ts.noComponentsLabel(baseType.position());
+        l.setDescription("default array base label");
+        return l;
     }
     
 }
