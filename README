@@ -87,9 +87,9 @@ compiler:
 
     $ cd $JIF
 
-3. Edit config.properties to point "polyglot.home" to your Polyglot
-   installation.
-
+3. Copy config.properties.in to config.properties, and then edit
+   config.properties to make "polyglot.home" the absolute
+   path of your Polyglot installation.
   
 4. Run ant to configure the system.
 
