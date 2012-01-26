@@ -11,19 +11,31 @@ import jif.types.label.AccessPath;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.ast.Binary.Operator;
+import static polyglot.ast.Binary.GE;
+import static polyglot.ast.Binary.LE;
 import polyglot.types.SemanticException;
 import polyglot.visit.TypeChecker;
 
 public class JifBinaryDel extends JifJL_c
 {
-    public static final Binary.Operator ACTSFOR  = new Operator("actsfor", Precedence.RELATIONAL);
-    public static final Binary.Operator EQUIV  = new Operator("equiv", Precedence.RELATIONAL);
+    // ambiguous operators
+    public static final Binary.Operator EQUIV    = new Operator("equiv", Precedence.RELATIONAL);
+    public static final Binary.Operator TRUST_GE = new Operator("≽",     Precedence.RELATIONAL);
+    // also LE, GE
+    
+    // disambiguous operators
+    public static final Operator RELABELS_TO     = new Operator("flowsto",    Precedence.RELATIONAL);
+    public static final Operator ACTSFOR         = new Operator("actsfor",    Precedence.RELATIONAL);
+    public static final Operator AUTHORIZES      = new Operator("authorizes", Precedence.RELATIONAL);
+    public static final Operator ENFORCES        = new Operator("enforces",   Precedence.RELATIONAL);
+    public static final Operator PRINCIPAL_EQUIV = new Operator("(principal) equiv", Precedence.RELATIONAL);
+    public static final Operator LABEL_EQUIV     = new Operator("(label)     equiv", Precedence.RELATIONAL);
 
     public JifBinaryDel() { }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Binary b = (Binary)node();
+        Binary b = node();
         JifNodeFactory nf = (JifNodeFactory)tc.nodeFactory();
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
         boolean leftLabel = ts.isLabel(b.left().type());
@@ -67,8 +79,8 @@ public class JifBinaryDel extends JifJL_c
             return b.left(lhs).right(rhs).type(ts.Boolean());
         }
         
-        boolean leftPrinc = ts.isImplicitCastValid(b.left().type(), ts.Principal());
-        boolean rightPrinc = ts.isImplicitCastValid(b.right().type(), ts.Principal());
+        boolean leftPrinc = ts.isImplicitCastValid(b.left().type(), ts.PrincipalType());
+        boolean rightPrinc = ts.isImplicitCastValid(b.right().type(), ts.PrincipalType());
         if (b.operator() == ACTSFOR) {
             if (!leftPrinc && !leftLabel) {
                 throw new SemanticException("The left-hand side of the "
@@ -127,6 +139,58 @@ public class JifBinaryDel extends JifJL_c
         return super.typeCheck(tc);
     }
 
+    /**
+     * This uses type information to specify which version of an overloaded
+     * operator is intended, and returns an updated node.
+     * 
+     * @throws SemanticException if the expression is invalid
+     */
+    private Node disambiguateRelations(JifTypeSystem ts) throws SemanticException {
+        
+        // the left (l) and right (r) types are either
+        // a principal (p), a label (l), or neither (n).
+        // thus for example, if l(eft) is a p(rincipal), then lp is true.
+        
+        boolean lp = ts.isPrincipal(node().left().type());
+        boolean ll = ts.isLabel(node().left().type());
+        boolean ln = !lp && !ll;
+        
+        boolean rp = ts.isPrincipal(node().right().type());
+        boolean rl = ts.isLabel(node().right().type());
+        boolean rn = !rp && !rl;
+        
+        Operator result = node().operator();
+        
+        if (node().operator() == GE) {
+                 if (lp && rl) result = ENFORCES;        // p >= l
+            else if (ll && rp) result = AUTHORIZES;      // l >= p
+            else if (lp && rp) result = ACTSFOR;         // p >= p
+            else if (ln && rn) result = GE;              // n >= n
+            else throw new SemanticException();
+        }
+        
+        else if (node().operator() == LE) {
+                 if (ll && rl) result = RELABELS_TO;     // l <= l
+            else if (ln && rn) result = LE;              // n <= n
+            else throw new SemanticException();
+        }
+        
+        else if (node().operator() == EQUIV) {
+                 if (lp && rp) result = PRINCIPAL_EQUIV; // p equiv p
+            else if (ll && rl) result = LABEL_EQUIV;     // l equiv l
+            else throw new SemanticException();
+        }
+        
+        else if (node().operator() == TRUST_GE) {
+                 if (lp && rp) result = ACTSFOR;         // p ≽ p
+            else if (ll && rp) result = AUTHORIZES;      // l ≽ p
+            else if (lp && rl) result = ENFORCES;        // p ≽ l
+            else throw new SemanticException();
+        }
+        
+        return node().operator(result);
+    }
+    
     private void checkPrincipalExpr(TypeChecker tc, Expr expr) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
         if (expr instanceof PrincipalExpr) return;
@@ -164,5 +228,9 @@ public class JifBinaryDel extends JifJL_c
         }
         
     }
-    
+
+    @Override
+    public Binary node() {
+        return (Binary) super.node();
+    }
 }

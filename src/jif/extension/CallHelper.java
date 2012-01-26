@@ -482,7 +482,10 @@ public class CallHelper {
     /**
      * Check method calls. (Thesis, Figure 4.29)
      * 
-     *  
+     * @param targetMayBeNull
+     *          indicates whether the receiver of the call might be null (and
+     *          thus whether this method considers the NPE that the call may
+     *          cause). 
      */
     public void checkCall(LabelChecker lc, List<Type> throwTypes, boolean targetMayBeNull)
     throws SemanticException

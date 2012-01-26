@@ -140,7 +140,7 @@ public class JifIfExt extends JifStmtExt_c
                 A.addActsFor(actor, granter);
             }
         }
-        else if (op == JifBinaryDel.EQUIV && ts.isImplicitCastValid(b.left().type(), ts.Principal())) {
+        else if (op == JifBinaryDel.EQUIV && ts.isImplicitCastValid(b.left().type(), ts.PrincipalType())) {
             Principal left = JifUtil.exprToPrincipal(ts, b.left(), A);
             Principal right = JifUtil.exprToPrincipal(ts, b.right(), A);
             if (warn) {

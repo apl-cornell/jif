@@ -167,7 +167,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         JifParsedPolyType ct = (JifParsedPolyType) this.type;
         Set<Principal> s = new LinkedHashSet<Principal>(ct.authority());
-        if (ts.isSubtype(ct, ts.PrincipalClass())) {
+        if (ts.isSubtype(ct, ts.PrincipalClassType())) {
             // This class implements jif.lang.Princpal, and as such
             // implicitly has the authority of the principal represented by
             // "this"

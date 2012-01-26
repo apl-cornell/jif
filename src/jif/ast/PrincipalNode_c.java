@@ -75,6 +75,6 @@ public abstract class PrincipalNode_c extends Expr_c implements PrincipalNode
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-        return type(ts.Principal());
+        return type(ts.PrincipalType());
     }
 }

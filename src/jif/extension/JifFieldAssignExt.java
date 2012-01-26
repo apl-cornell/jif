@@ -113,7 +113,7 @@ public class JifFieldAssignExt extends JifAssignExt
                     Label rhs_label = JifUtil.exprToLabel(ts, assign.right(), A);
                     A.addDefinitionalAssertionEquiv(dl, rhs_label);
                 }
-                else if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
+                else if (ts.isImplicitCastValid(fi.type(), ts.PrincipalType())) {
                     DynamicPrincipal dp = ts.dynamicPrincipal(fi.position(), JifUtil.varInstanceToAccessPath(fi, fi.position()));                
                     Principal rhs_principal = JifUtil.exprToPrincipal(ts, assign.right(), A);
                     A.addDefinitionalEquiv(dp, rhs_principal);                    

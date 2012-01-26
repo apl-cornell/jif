@@ -55,7 +55,7 @@ public class LabelExpr_c extends Expr_c implements LabelExpr
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();	
-	return type(ts.Label());
+	return type(ts.LabelType());
     }
 
     public List throwTypes(TypeSystem ts) {

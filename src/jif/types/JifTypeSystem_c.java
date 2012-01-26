@@ -117,12 +117,12 @@ public class JifTypeSystem_c
     public String RuntimePackageName() { return "jif.runtime"; }
 
     @Override
-    public PrimitiveType Principal() {
+    public PrimitiveType PrincipalType() {
         return PRINCIPAL_;
     }
 
     @Override
-    public Type PrincipalClass() {
+    public Type PrincipalClassType() {
         if (PRINCIPAL_CLASS_ == null) {
             try {
                 PRINCIPAL_CLASS_ = typeForName(PrincipalClassName());
@@ -135,7 +135,7 @@ public class JifTypeSystem_c
     }
 
     @Override
-    public PrimitiveType Label() {
+    public PrimitiveType LabelType() {
         return LABEL_;
     }
 
@@ -349,12 +349,12 @@ public class JifTypeSystem_c
         Type strpToType = strip(toType);
                 
         // can cast from "principal" to any subclass of "jif.lang.Principal"
-        if (Principal().equals(strpFromType) && isCastValid(PrincipalClass(), toType)) {
+        if (PrincipalType().equals(strpFromType) && isCastValid(PrincipalClassType(), toType)) {
             return true;
         }
         
         // can cast from any subtype of "jif.lang.Principal" to "principal"
-        if (Principal().equals(strpToType) && isSubtype(strpFromType, PrincipalClass())) {
+        if (PrincipalType().equals(strpToType) && isSubtype(strpFromType, PrincipalClassType())) {
             return true;
         }
 
@@ -367,12 +367,12 @@ public class JifTypeSystem_c
         Type strpToType = strip(toType);
         
         // can cast from "principal" to "jif.lang.Principal"
-        if (Principal().equals(strpFromType) && PrincipalClass().equals(strpToType)) {
+        if (PrincipalType().equals(strpFromType) && PrincipalClassType().equals(strpToType)) {
             return true;
         }
 
         // can cast from any subtype of "jif.lang.Principal" to "principal"
-        if (Principal().equals(strpToType) && isSubtype(strpFromType, PrincipalClass())) {
+        if (PrincipalType().equals(strpToType) && isSubtype(strpFromType, PrincipalClassType())) {
             return true;
         }
 
@@ -1578,9 +1578,9 @@ public class JifTypeSystem_c
         throws SemanticException {
 
         if (name.equals("label"))
-            return Label();
+            return LabelType();
         if (name.equals("principal"))
-            return Principal();
+            return PrincipalType();
         return super.primitiveForName(name);
     }
 

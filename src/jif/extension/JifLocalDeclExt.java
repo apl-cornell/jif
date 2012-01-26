@@ -56,7 +56,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
                 Label rhs_label = JifUtil.exprToLabel(ts, decl.init(), lc.context());
                 lc.context().addDefinitionalAssertionEquiv(dl, rhs_label);
             }
-            else if (ts.isImplicitCastValid(li.type(), ts.Principal())) {
+            else if (ts.isImplicitCastValid(li.type(), ts.PrincipalType())) {
                 DynamicPrincipal dp = ts.dynamicPrincipal(decl.position(), JifUtil.varInstanceToAccessPath(li, li.position()));                
                 Principal rhs_principal = JifUtil.exprToPrincipal(ts, decl.init(), lc.context());
                 lc.context().addDefinitionalEquiv(dp, rhs_principal);                    

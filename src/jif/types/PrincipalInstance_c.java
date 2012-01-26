@@ -12,7 +12,7 @@ public class PrincipalInstance_c extends VarInstance_c implements PrincipalInsta
     ExternalPrincipal principal;
 
     public PrincipalInstance_c(JifTypeSystem ts, Position pos, ExternalPrincipal p) {
-	super(ts, pos, ts.Public().Static().Final(), ts.Principal(), p.name());
+	super(ts, pos, ts.Public().Static().Final(), ts.PrincipalType(), p.name());
 	this.principal = p;
     }
 

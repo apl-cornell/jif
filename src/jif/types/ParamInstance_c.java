@@ -19,7 +19,7 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
 	JifClassType container, Kind kind, String name) {
 
 	super(ts, pos, ts.Public().Static().Final(),
-	      kind == PRINCIPAL ? ts.Principal() : ts.Label(), name);
+	      kind == PRINCIPAL ? ts.PrincipalType() : ts.LabelType(), name);
 	this.kind = kind;
 	this.container = container;
     }

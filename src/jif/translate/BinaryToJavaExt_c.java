@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jif.extension.JifBinaryDel;
+import jif.extension.JifBinaryExt;
 import jif.types.JifTypeSystem;
 import polyglot.ast.Binary;
 import polyglot.ast.Expr;
@@ -24,15 +25,16 @@ public class BinaryToJavaExt_c extends ExprToJavaExt_c {
 
     @Override
     public Expr exprToJava(JifToJavaRewriter rw) throws SemanticException {
-        Binary b = (Binary) node();
+        Binary       b   = (Binary) node();
+        JifBinaryExt ext = (JifBinaryExt) b.ext(); 
         JifTypeSystem ts = (JifTypeSystem)rw.typeSystem(); 
 
-        if (b.operator() == JifBinaryDel.ACTSFOR) {
+        if (ext.isActsFor()) {
             return actsforToJava(rw, false);
         }
 
         if (b.operator() == JifBinaryDel.EQUIV) {
-            if (ts.isImplicitCastValid(this.lhsType, ts.Principal())) {
+            if (ts.isImplicitCastValid(this.lhsType, ts.PrincipalType())) {
                 return actsforToJava(rw, true);
             }
             else if (ts.isLabel(this.lhsType)) {
@@ -40,7 +42,7 @@ public class BinaryToJavaExt_c extends ExprToJavaExt_c {
             }
         }
         
-        if (b.operator() == Binary.LE && ts.isLabel(this.lhsType)) {
+        if (ext.isRelabelsTo()) {
             return labelTestToJava(rw, false);
         }
         

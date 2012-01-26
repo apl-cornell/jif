@@ -284,7 +284,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
     }
 
     private static TypeNode typeNodeForParam(ParamInstance pi, JifToJavaRewriter rw) throws SemanticException {
-        Type paramType = pi.isPrincipal() ? rw.jif_ts().Principal() : rw.jif_ts().Label();
+        Type paramType = pi.isPrincipal() ? rw.jif_ts().PrincipalType() : rw.jif_ts().LabelType();
         return rw.typeToJava(paramType, Position.compilerGenerated());
     }
     protected ClassMember produceCastMethod(JifPolyType jpt, JifToJavaRewriter rw) throws SemanticException {

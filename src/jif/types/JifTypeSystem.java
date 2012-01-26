@@ -18,48 +18,76 @@ import polyglot.util.Position;
  */
 public interface JifTypeSystem extends ParamTypeSystem
 {
-    // Type constructors
+    ////////////////////////////////////////////////////////////////////////////
+    // Constants related to Jif runtime                                       //
+    ////////////////////////////////////////////////////////////////////////////
 
-    /** Returns the "label" type. */
-    PrimitiveType Label();
+    // Principal
+    
+    /** Returns the "principal" type. */
+    PrimitiveType PrincipalType();
 
-    /**
-     * Returns the name of the "principal" type. In Jif, this is
-     * "jif.lang.Principal". In languages that extend Jif, this may be different.
-     */
+    /** Returns the Principal class's name ("jif.lang.Principal" in Jif). */
     String PrincipalClassName();
-    
-    /**
-     * Returns the name of the PrincipalUtil class. In Jif, this is
-     * "jif.lang.PrincipalUtil". In languages that extend Jif, this may be
-     * different.
-     */
-    String PrincipalUtilClassName();
-    
-    /**
-     * Returns the name of the "label" type. In Jif, this is
-     * "jif.lang.Label". In languages that extend Jif, this may be different.
-     */
-    String LabelClassName();
 
-    /**
-     * Returns the name of the LabelUtil class. In Jif, this is
-     * "jif.lang.LabelUtil". In languages that extend Jif, this may be different.
-     */
+    /** Returns the Principal class's type */
+    Type   PrincipalClassType();
+
+    // Label
+    
+    /** Returns the "label" type. */
+    PrimitiveType LabelType();
+    
+    /** Returns the Label class's name ("jif.lang.Label" in Jif). */
+    String LabelClassName();
+    
+    /** Returns the Label class's type */
+    Type   LabelClassType();
+
+    // PrincipalUtil
+    
+    /** Returns the PrincipalUtil class's name ("jif.lang.PrincipalUtil" in Jif). */
+    String PrincipalUtilClassName();
+
+    /** Returns the PrincipalUtil class's type */
+    Type   PrincipalUtilClassType();
+    
+    /** Returns the type of the static method used to perform principal ≽ principal comparisons. */
+    JifMethodInstance actsForMethod();
+    
+    /** Returns the type of the static method used to perform principal equiv principal tests. */
+    JifMethodInstance principalEquivMethod();
+    
+    // LabelUtil
+    
+    /** Returns the LabelUtil class's name ("jif.lang.LabelUtil" in Jif) */
     String LabelUtilClassName();
 
-    /**
-     * Returns the name of the Jif runtime package. In Jif, this is
-     * "jif.runtime". In languages that extend Jif, this may be different.
-     */
+    /** Returns the LabelUtil class's type */
+    Type   LabelUtilClassType();
+    
+    /** Returns the type of the static method used to perform label ⊑ label comparisons. */
+    JifMethodInstance relabelsToMethod();
+    
+    /** Returns the type of the static method used to perform principal ≽ label comparisons. */
+    JifMethodInstance enforcesMethod();
+    
+    /** Returns the type of the static method used to perform label ≽ principal comparisons. */
+    JifMethodInstance authorizesMethod();
+    
+    /** Returns the type of the static method used to perform label equiv label tests. */
+    JifMethodInstance labelEquivMethod();
+    
+    // Runtime
+    
+    /** Returns the Runtime package's name ("jif.runtime" in Jif). */
     String RuntimePackageName();
 
-    /** Returns the "principal" type. */
-    PrimitiveType Principal();
+    ////////////////////////////////////////////////////////////////////////////
+    // Type constructors                                                      //
+    ////////////////////////////////////////////////////////////////////////////
     
-    /** Returns the class jif.lang.Principal. */
-    Type PrincipalClass();
-
+    
     /** Returns a labeled type, type{label}. */
     LabeledType labeledType(Position pos, Type type, Label label);
 
