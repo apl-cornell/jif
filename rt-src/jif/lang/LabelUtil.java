@@ -697,6 +697,10 @@ public class LabelUtil
         }
     }
 
+    public boolean enforces(Principal actor, Label policy) {
+        return isReadableBy(policy, actor) && isWritableBy(policy, actor);
+    }
+    
     public boolean relabelsTo(Policy from, Policy to) {
         try {
             enterTiming();
