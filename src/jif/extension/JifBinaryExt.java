@@ -4,22 +4,14 @@ import java.util.ArrayList;
 
 import java.util.List;
 
-import jif.ast.JifUtil;
-import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.*;
-import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import jif.types.label.VarLabel;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
-import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
-import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.qq.QQ;
 
 /** The Jif extension of the <code>Binary</code> node. 
  *  
@@ -36,59 +28,6 @@ public class JifBinaryExt extends JifExprExt
     }
 
     /**
-     * return true if this expression is a label ⊑ label comparison.
-     * @throws InternalCompilerError
-     *         if the left and right sides have not been type-checked  
-     */
-    public boolean isRelabelsTo() throws InternalCompilerError {
-        JifTypeSystem ts = checkTypeChecked();
-        
-        return node().operator().equals(Binary.LE)
-            && ts.isLabel(node().left().type())
-            && ts.isLabel(node().right().type());
-    }
-    
-    /**
-     * return true if this expression is a principal ≽ principal comparison.
-     * @throws InternalCompilerError
-     *         if the left and right sides have not been type-checked
-     */
-    public boolean isActsFor() throws InternalCompilerError
-    {
-        JifTypeSystem ts = checkTypeChecked();
-        
-        return node().operator().equals(JifBinaryDel.ACTSFOR)
-            && ts.isPrincipal(node().left().type())
-            && ts.isPrincipal(node().right().type());
-    }
-    
-    /**
-     * return true if this expression is a label ≽ principal comparison. 
-     * @return
-     * @throws InternalCompilerError
-     */
-    public boolean isAuthorizes() throws InternalCompilerError {
-        JifTypeSystem ts = checkTypeChecked();
-        return node().operator().equals(Binary.LE)
-            && ts.isPrincipal(node().left().type())
-            && ts.isLabel(node().right().type());
-    }
-    
-    /**
-     * return true if this expression is a principal ≽ label comparison
-     * @throws InternalCompilerError
-     *         if the left and right sides have not been type-checked
-     */
-    public boolean isEnforces() throws InternalCompilerError
-    {
-        JifTypeSystem ts = checkTypeChecked();
-        
-        return node().operator().equals(Binary.GE)
-            && ts.isPrincipal(node().left().type())
-            && ts.isPrincipal(node().right().type());
-    }
-    
-    /**
      * return true if this expression is a short-circuiting operator.
      */
     public boolean isShortCircuit() {
@@ -100,19 +39,15 @@ public class JifBinaryExt extends JifExprExt
     // label checking                                                         //
     ////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
 
-        if (isRelabelsTo())
-            return labelCheckAsMethod(lc, ts.relabelsToMethod());
-        if (isActsFor())
-            return labelCheckAsMethod(lc, ts.actsForMethod());
-        if (isAuthorizes())
-            return labelCheckAsMethod(lc, ts.authorizesMethod());
-        if (isEnforces())
-            return labelCheckAsMethod(lc, ts.enforcesMethod());
+        JifMethodInstance method = JifBinaryDel.equivalentMethod(ts, node().operator());
+        if (method != null)
+            return labelCheckAsMethod(lc, method);
         
         List throwTypes = new ArrayList(node().del().throwTypes(ts));
 
@@ -195,19 +130,6 @@ public class JifBinaryExt extends JifExprExt
     ////////////////////////////////////////////////////////////////////////////
     // helper methods                                                         //
     ////////////////////////////////////////////////////////////////////////////
-    
-    /**
-     * throws a compiler error if this expression is not type checked, otherwise
-     * return the type system.
-     */
-    private JifTypeSystem checkTypeChecked() throws InternalCompilerError {
-        Type lhs = node().left().type();
-        Type rhs = node().right().type();
-        if (lhs == null || rhs == null)
-            throw new InternalCompilerError("Expression not typechecked");
-
-        return (JifTypeSystem) lhs.typeSystem();
-    }
     
     /** map (var -> new VarLabel) [left, right] */
     @SuppressWarnings("unchecked")

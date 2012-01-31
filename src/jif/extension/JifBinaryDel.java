@@ -5,15 +5,20 @@ import jif.ast.JifUtil;
 import jif.ast.LabelExpr;
 import jif.ast.PrincipalExpr;
 import jif.types.JifContext;
+import jif.types.JifMethodInstance;
 import jif.types.JifTypeSystem;
 import jif.types.SemanticDetailedException;
 import jif.types.label.AccessPath;
+import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.ast.Binary.Operator;
+import polyglot.frontend.goals.Disambiguated;
 import static polyglot.ast.Binary.GE;
 import static polyglot.ast.Binary.LE;
 import polyglot.types.SemanticException;
+import polyglot.util.InternalCompilerError;
+import polyglot.visit.SupertypeDisambiguator;
 import polyglot.visit.TypeChecker;
 
 public class JifBinaryDel extends JifJL_c
@@ -29,123 +34,107 @@ public class JifBinaryDel extends JifJL_c
     public static final Operator AUTHORIZES      = new Operator("authorizes", Precedence.RELATIONAL);
     public static final Operator ENFORCES        = new Operator("enforces",   Precedence.RELATIONAL);
     public static final Operator PRINCIPAL_EQUIV = new Operator("(principal) equiv", Precedence.RELATIONAL);
-    public static final Operator LABEL_EQUIV     = new Operator("(label)     equiv", Precedence.RELATIONAL);
+    public static final Operator LABEL_EQUIV     = new Operator("(label) equiv",     Precedence.RELATIONAL);
 
     public JifBinaryDel() { }
 
+    /**
+     * As a side-effect of typechecking, the various label and principal
+     * comparisons are disambiguated (for example x ≽ y is translated to
+     * x actsfor y or x enforces y.
+     * 
+     * @see #disambiguateRelations(JifTypeSystem)
+     */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Binary b = node();
         JifNodeFactory nf = (JifNodeFactory)tc.nodeFactory();
-        JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-        boolean leftLabel = ts.isLabel(b.left().type());
-        boolean rightLabel = ts.isLabel(b.right().type());
-        if ((b.operator() == Binary.LE || b.operator() == EQUIV)
-                && (leftLabel || rightLabel)) {
-            if (!(leftLabel && rightLabel)) {
-                throw new SemanticException("The operator " + b.operator() + " requires both operands to be labels.", b.position());
-            }
+        JifTypeSystem  ts = (JifTypeSystem)tc.typeSystem();
 
-            // we have a label comparison
-            // make sure that both left and right are LabelExprs.
-            LabelExpr lhs;
-            if (b.left() instanceof LabelExpr) {
-                lhs = (LabelExpr)b.left();
-            }
-            else {
-                if (!JifUtil.isFinalAccessExprOrConst(ts, b.left())) {
-                    throw new SemanticException(
-                            "An expression used in a label test must be either a final access path, principal parameter or a constant principal",
-                            b.left().position());
-                }
-                lhs = nf.LabelExpr(b.left().position(), 
-                                   JifUtil.exprToLabel(ts, b.left(), (JifContext)tc.context()));
-                lhs = (LabelExpr)lhs.visit(tc);
-            }
-            LabelExpr rhs;
-            if (b.right() instanceof LabelExpr) {
-                rhs = (LabelExpr)b.right();
-            }
-            else {
-                if (!JifUtil.isFinalAccessExprOrConst(ts, b.right())) {
-                    throw new SemanticException(
-                            "An expression used in a label test must either be a final access path or a \"new label\"",
-                            b.right().position());
-                }
-                rhs = nf.LabelExpr(b.right().position(),
-                                   JifUtil.exprToLabel(ts, b.right(), (JifContext)tc.context()));
-                rhs = (LabelExpr)rhs.visit(tc);
-            }
+        b = disambiguateRelations(ts);
+        
+        if (b.operator() == RELABELS_TO || b.operator() == LABEL_EQUIV) {
+            LabelExpr lhs = checkLabelExpr(ts, nf, tc, b.left());
+            LabelExpr rhs = checkLabelExpr(ts, nf, tc, b.right());
+
             return b.left(lhs).right(rhs).type(ts.Boolean());
         }
-        
-        boolean leftPrinc = ts.isImplicitCastValid(b.left().type(), ts.PrincipalType());
-        boolean rightPrinc = ts.isImplicitCastValid(b.right().type(), ts.PrincipalType());
-        if (b.operator() == ACTSFOR) {
-            if (!leftPrinc && !leftLabel) {
-                throw new SemanticException("The left-hand side of the "
-                        + b.operator() + " must be a label or a principal.", b.left()
-                        .position());
-            }
+
+        if (b.operator() == ACTSFOR || b.operator() == PRINCIPAL_EQUIV) {
+            checkPrincipalExpr(ts, nf, tc, b.left());
+            checkPrincipalExpr(ts, nf, tc, b.right());
             
-            if (!rightPrinc) {
-                throw new SemanticException("The right-hand side of the "
-                        + b.operator() + " must be a principal.", b.right()
-                        .position());
-            }
-            
-            // We have an actsfor comparison.
-            Expr lhs = b.left();
-            if (leftPrinc) {
-                // Make sure the left side is a principal.
-                checkPrincipalExpr(tc, lhs);
-            } else {
-                // Make sure the left side is a LabelExpr.
-                if (!(lhs instanceof LabelExpr)) {
-                    if (!JifUtil.isFinalAccessExprOrConst(ts, lhs)) {
-                        throw new SemanticException(
-                                "An expression used in a label test must be "
-                                        + "either a final access path or a "
-                                        + "\"new label\"", lhs.position());
-                    }
-                    
-                    lhs =
-                            nf.LabelExpr(lhs.position(), JifUtil.exprToLabel(
-                                    ts, lhs, (JifContext) tc.context()));
-                }
-            }
-            
-            // Make sure the right side is a principal.
-            checkPrincipalExpr(tc, b.right());
-            return b.left(lhs).type(ts.Boolean());
+            return node().type(ts.Boolean());
         }
         
-        if (b.operator() == EQUIV && (leftPrinc || rightPrinc)) {
-            if (!(leftPrinc && rightPrinc)) {
-                throw new SemanticException("The operator " + b.operator() + " requires both operands to be principals.", b.position());
-            }
+        if (b.operator() == AUTHORIZES) {
+            LabelExpr lhs = checkLabelExpr(ts, nf, tc, node().left());
+            checkPrincipalExpr(ts, nf, tc, node().right());
             
-            // we have a principal equality test
-            // make sure that both left and right are principals.
-            checkPrincipalExpr(tc, b.left());
-            checkPrincipalExpr(tc, b.right());
-            return b.type(ts.Boolean());            
+            return node().left(lhs).type(ts.Boolean());
         }
         
-        if (b.operator() == EQUIV) {
-            throw new SemanticException("The equiv operator requires either both operands to be principals, or both operands to be labels.", b.position());
+        if (b.operator() == ENFORCES) {
+            checkPrincipalExpr(ts, nf, tc, node().left());
+            LabelExpr rhs = checkLabelExpr(ts, nf, tc, node().right());
+
+            return node().right(rhs).type(ts.Boolean());
         }
+        
+        // Note: at this point, b.node() must be equal to node() even though
+        // b has been disambiguated, because disambiguation only modifies the
+        // operator in one of the new cases handled by this method; normal java
+        // operators are unchanged.
         
         return super.typeCheck(tc);
     }
 
     /**
-     * This uses type information to specify which version of an overloaded
-     * operator is intended, and returns an updated node.
-     * 
-     * @throws SemanticException if the expression is invalid
+     * Label and principal comparisons are translated to static method calls.
+     * This  function returns the appropriate type information for the generated
+     * calls.  Assumes that the operator is unambiguous.
+     *
+     * @param o
+     *          an unambiguous operator.
+     * @return
+     *          type information for a static two-argument method, or null if
+     *          the operator is not a label comparison.  
      */
-    private Node disambiguateRelations(JifTypeSystem ts) throws SemanticException {
+    public static JifMethodInstance equivalentMethod(JifTypeSystem ts, Operator o) {
+        // new unambiguous operators
+        if (o == RELABELS_TO)
+            return ts.relabelsToMethod();
+        if (o == ACTSFOR)
+            return ts.actsForMethod();
+        if (o == AUTHORIZES)
+            return ts.authorizesMethod();
+        if (o == ENFORCES)
+            return ts.enforcesMethod();
+        if (o == PRINCIPAL_EQUIV)
+            return ts.principalEquivMethod();
+        if (o == LABEL_EQUIV)
+            return ts.labelEquivMethod();
+        
+        // ambiguous operators
+        if (o == EQUIV || o == TRUST_GE)
+            throw new InternalCompilerError("Expected unambiguous operator");
+        
+        // java operators 
+        return null;
+    }
+    
+    /**
+     * This uses type information to specify which version of an overloaded
+     * operator (>=, <=, equiv, or ≽) is intended, and returns an updated node.
+     * Assumes that <code>left()</code> and <code>right()</code> have types.  
+     * 
+     * @return
+     *         a copy of node() having an unambiguous operator()
+     * 
+     * @throws SemanticException
+     *         if the expression is invalid
+     */
+    protected Binary disambiguateRelations(JifTypeSystem ts) throws SemanticException {
         
         // the left (l) and right (r) types are either
         // a principal (p), a label (l), or neither (n).
@@ -154,10 +143,16 @@ public class JifBinaryDel extends JifJL_c
         boolean lp = ts.isPrincipal(node().left().type());
         boolean ll = ts.isLabel(node().left().type());
         boolean ln = !lp && !ll;
+        String left = lp ? "principal" :
+                      ll ? "label"     :
+                           "numeric expression";
         
         boolean rp = ts.isPrincipal(node().right().type());
         boolean rl = ts.isLabel(node().right().type());
         boolean rn = !rp && !rl;
+        String right = rp ? "principal" :
+                       rl ? "label"     :
+                            "numeric expression";
         
         Operator result = node().operator();
         
@@ -166,40 +161,91 @@ public class JifBinaryDel extends JifJL_c
             else if (ll && rp) result = AUTHORIZES;      // l >= p
             else if (lp && rp) result = ACTSFOR;         // p >= p
             else if (ln && rn) result = GE;              // n >= n
-            else throw new SemanticException();
+            else throw new SemanticException(">= cannot be used to compare a " + left + " with a " + right);
         }
         
         else if (node().operator() == LE) {
                  if (ll && rl) result = RELABELS_TO;     // l <= l
             else if (ln && rn) result = LE;              // n <= n
-            else throw new SemanticException();
+            else throw new SemanticException("<= cannot be used to compare a " + left + " with a " + right);
         }
         
         else if (node().operator() == EQUIV) {
                  if (lp && rp) result = PRINCIPAL_EQUIV; // p equiv p
             else if (ll && rl) result = LABEL_EQUIV;     // l equiv l
-            else throw new SemanticException();
+            else throw new SemanticException("\"equiv\" can only be used to compare principals or labels");
         }
         
         else if (node().operator() == TRUST_GE) {
                  if (lp && rp) result = ACTSFOR;         // p ≽ p
             else if (ll && rp) result = AUTHORIZES;      // l ≽ p
             else if (lp && rl) result = ENFORCES;        // p ≽ l
-            else throw new SemanticException();
+            else throw new SemanticException("≽ can only be used to compare principals and labels");
         }
         
         return node().operator(result);
     }
     
-    private void checkPrincipalExpr(TypeChecker tc, Expr expr) throws SemanticException {
-        JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-        if (expr instanceof PrincipalExpr) return;
+    /**
+     * Convert the given expression to a LabelExpr by wrapping it if necessary.
+     *  
+     * @throws SemanticException
+     *          if the expression is not a valid label expression (i.e. a final
+     *          access path or constant) 
+     */
+    protected LabelExpr checkLabelExpr(JifTypeSystem ts, JifNodeFactory nf, TypeChecker tc, Expr e) throws SemanticException {
+        if (e instanceof LabelExpr) {
+            return (LabelExpr) e;
+        }
+        else if (JifUtil.isFinalAccessExprOrConst(ts, e)) {
+            Label l = JifUtil.exprToLabel(ts, e, (JifContext)tc.context());
+            e = nf.LabelExpr(e.position(), l);
+            return (LabelExpr) e.visit(tc);
+        }
+        else {
+            throw new SemanticException(
+                    "An expression used in a label test must be either a final access path, principal parameter or a constant principal",
+                    e.position());
+        }
+    }
+    
+    /**
+     * Convert the given expression to a PrincipalExpr by wrapping it if
+     * necessary.  Assumes e has a non-null canonical type.
+     *
+     * @throws SemanticException
+     *          if the expression is not a valid runtime-representable principal
+     *          expression (i.e. a final access path or constant)
+     */
+    protected void checkPrincipalExpr(JifTypeSystem ts, JifNodeFactory nf, TypeChecker tc, Expr e) throws SemanticException {
 
-        if (expr.type() != null && expr.type().isCanonical() && 
-                !JifUtil.isFinalAccessExprOrConst(ts, expr)) {
+        if (e.type() == null || !e.type().isCanonical())
+            throw new InternalCompilerError("Expected canonical type.");
+        
+        
+        if (e instanceof PrincipalExpr) {
+            return;
+        }
+        else if (JifUtil.isFinalAccessExprOrConst(ts, e)) {
+            Principal p = JifUtil.exprToPrincipal(ts, e, (JifContext)tc.context());
+            
+            if (!p.isRuntimeRepresentable()) {
+                throw new SemanticDetailedException(
+                        "A principal used in an actsfor must be runtime-representable.",                    
+                        "Both principals used in an actsfor test must be " +
+                        "represented at runtime, since the actsfor test is a dynamic " +
+                        "test. The principal " + p + 
+                        " is not represented at runtime, and thus cannot be used " +
+                        "in an actsfor test.",
+                        e.position());
+            }
+            
+            return;
+        }
+        else {
             // illegal dynamic principal. But try to convert it to an access path
             // to allow a more precise error message.
-            AccessPath ap = JifUtil.exprToAccessPath(expr, (JifContext)tc.context()); 
+            AccessPath ap = JifUtil.exprToAccessPath(e, (JifContext)tc.context()); 
             ap.verify((JifContext)tc.context());
 
             // previous line should throw an exception, but throw this just to
@@ -212,21 +258,8 @@ public class JifBinaryDel extends JifJL_c
                 "a final access path is either this.f1.f2....fn, or v.f1.f2.....fn, where v is a " +
                 "final local variables, and each field f1 to fn is a final field. A principal expression " +
                 "is either a principal parameter, or an external principal.",
-                expr.position());                                        
+                e.position());                                        
         }
-
-        Principal p = JifUtil.exprToPrincipal(ts, expr, (JifContext)tc.context());
-        if (!p.isRuntimeRepresentable()) {
-            throw new SemanticDetailedException(
-                    "A principal used in an actsfor must be runtime-representable.",                    
-                    "Both principals used in an actsfor test must be " +
-                    "represented at runtime, since the actsfor test is a dynamic " +
-                    "test. The principal " + p + 
-                    " is not represented at runtime, and thus cannot be used " +
-                    "in an actsfor test.",
-                    expr.position());
-        }
-        
     }
 
     @Override
