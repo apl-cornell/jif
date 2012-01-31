@@ -161,7 +161,7 @@ public class JifTypeSystem_c
     @Override
     public JifMethodInstance actsForMethod() {
         return ACTS_FOR_ = getConstMethod(PrincipalUtilClassType(),
-                                          "",
+                                          "acts_for",
                                           CollectionUtil.list(PrincipalType(), PrincipalType()),
                                           ACTS_FOR_);
     }
@@ -169,7 +169,7 @@ public class JifTypeSystem_c
     @Override
     public JifMethodInstance principalEquivMethod() {
         return PRINCIPAL_EQUIV_ = getConstMethod(PrincipalUtilClassType(),
-                                                 "",
+                                                 "equivalentTo",
                                                  CollectionUtil.list(PrincipalType(), PrincipalType()),
                                                  PRINCIPAL_EQUIV_);
     }
@@ -184,7 +184,7 @@ public class JifTypeSystem_c
     @Override
     public JifMethodInstance relabelsToMethod() {
         return RELABELS_TO_ = getConstMethod(LabelUtilClassType(),
-                                             "",
+                                             "relabelsTo",
                                              CollectionUtil.list(LabelType(),LabelType()),
                                              RELABELS_TO_);
     }
@@ -192,7 +192,7 @@ public class JifTypeSystem_c
     @Override
     public JifMethodInstance enforcesMethod() {
         return ENFORCES_ = getConstMethod(LabelUtilClassType(),
-                                          "",
+                                          "enforces",
                                           CollectionUtil.list(PrincipalType(), LabelType()),
                                           ENFORCES_);
     }
@@ -200,7 +200,7 @@ public class JifTypeSystem_c
     @Override
     public JifMethodInstance authorizesMethod() {
         return AUTHORIZES_ = getConstMethod(LabelUtilClassType(),
-                                            "",
+                                            "acts_for",
                                             CollectionUtil.list(LabelType(), PrincipalType()),
                                             AUTHORIZES_);
     }
@@ -208,7 +208,7 @@ public class JifTypeSystem_c
     @Override
     public JifMethodInstance labelEquivMethod() {
         return LABEL_EQUIV_ = getConstMethod(LabelUtilClassType(),
-                                             "",
+                                             "equivalentTo",
                                              CollectionUtil.list(LabelType(), LabelType()),
                                              LABEL_EQUIV_);
     }
@@ -217,26 +217,38 @@ public class JifTypeSystem_c
     
     /**
      * Helper function to look up methods.  Intended for cached results: returns
-     * the <code>instance</code> parameter if it is non-null.
+     * the <code>instance</code> parameter if it is non-null.  Example usage:
+     * 
+     * <pre>
+     * return instance_ = getConstMethod(class, method, args, instance_);
+     * </pre>
      */
     protected JifMethodInstance getConstMethod(ClassType container, String methodName, List args, JifMethodInstance instance) {
         if (instance == null) try {
-            instance = (JifMethodInstance) findMethod(container, methodName, args, (ClassType) null);
+            // Note: the last argument of findMethod is supposed to be the
+            // calling context, used to rule out private and protected methods.
+            // however, since these methods are expected to be public, we simply
+            // use the container itself as the context.
+            instance = (JifMethodInstance) findMethod(container, methodName, args, container);
         } catch (Exception e) {
-            throw new InternalCompilerError("invalid type information for " + container.name() + "." + methodName);
+            throw new InternalCompilerError("invalid type information for " + container.name() + "." + methodName, e);
         }
         return instance;
     }
     
     /**
      * Helper function to look up classes.  Intended for cached results: returns
-     * the <code>instance</code> parameter if it is non-null;
+     * the <code>instance</code> parameter if it is non-null.  Example usage:
+     * 
+     * <pre>
+     * return instance_ = getConstMethod(className, instance_);
+     * </pre>
      */
     protected JifClassType getConstClass(String name, JifClassType instance) {
         if (instance == null) try {
             instance = (JifClassType) typeForName(name);
-        } catch (Exception e) {
-            throw new InternalCompilerError("invalid type information for " + name);
+        } catch (SemanticException e) {
+            throw new InternalCompilerError("invalid type information for " + name, e);
         }
         return instance;
     }

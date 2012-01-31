@@ -559,9 +559,9 @@ override type ::=
 extend primitive_type ::=
                     // TypeNode
         LABEL:a
-            {: RESULT = parser.nf.CanonicalTypeNode(parser.pos(a), parser.ts.Label()); :}
+            {: RESULT = parser.nf.CanonicalTypeNode(parser.pos(a), parser.ts.LabelType()); :}
     |   PRINCIPAL:a
-            {: RESULT = parser.nf.CanonicalTypeNode(parser.pos(a), parser.ts.Principal()); :}
+            {: RESULT = parser.nf.CanonicalTypeNode(parser.pos(a), parser.ts.PrincipalType()); :}
     ;
 
 labeled_primitive_type  ::=
