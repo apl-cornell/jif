@@ -53,7 +53,7 @@ public class PrincipalExpr_c extends Expr_c implements PrincipalExpr
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();	
-	return type(ts.PrincipalType());
+	return type(ts.Principal());
     }
 
     public List throwTypes(TypeSystem ts) {

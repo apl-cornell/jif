@@ -124,7 +124,7 @@ public class AmbParam_c extends Node_c implements AmbParam
                 return nf.CanonicalLabelNode(position(), l);
             }
 
-            if (ts.isImplicitCastValid(vi.type(), ts.PrincipalType()) || (pi != null && pi.isPrincipal())) {
+            if (ts.isImplicitCastValid(vi.type(), ts.Principal()) || (pi != null && pi.isPrincipal())) {
                 Principal p = ts.dynamicPrincipal(position(), JifUtil.varInstanceToAccessPath(vi, this.position()));
                 return nf.CanonicalPrincipalNode(position(), p);
             }

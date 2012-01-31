@@ -80,7 +80,7 @@ public class JifNewExt extends JifExprExt
 //                            }
                         }
                         A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
-                    } else if (ts.isImplicitCastValid(jfi.type(), ts.PrincipalType())) {
+                    } else if (ts.isImplicitCastValid(jfi.type(), ts.Principal())) {
                         DynamicPrincipal dp = ts.dynamicPrincipal(jfi.position(), path);                
                         Principal rhs_principal = (Principal) init;
                         if (rhs_principal == null) {

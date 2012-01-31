@@ -130,7 +130,7 @@ public class JifTypeSystem_c
     // principal
     
     @Override
-    public PrimitiveType PrincipalType() {
+    public PrimitiveType Principal() {
         return PRINCIPAL_;
     }
     
@@ -142,7 +142,7 @@ public class JifTypeSystem_c
     // label
     
     @Override
-    public PrimitiveType LabelType() {
+    public PrimitiveType Label() {
         return LABEL_;
     }
     
@@ -162,7 +162,7 @@ public class JifTypeSystem_c
     public JifMethodInstance actsForMethod() {
         return ACTS_FOR_ = getConstMethod(PrincipalUtilClassType(),
                                           "acts_for",
-                                          CollectionUtil.list(PrincipalType(), PrincipalType()),
+                                          CollectionUtil.list(Principal(), Principal()),
                                           ACTS_FOR_);
     }
 
@@ -170,7 +170,7 @@ public class JifTypeSystem_c
     public JifMethodInstance principalEquivMethod() {
         return PRINCIPAL_EQUIV_ = getConstMethod(PrincipalUtilClassType(),
                                                  "equivalentTo",
-                                                 CollectionUtil.list(PrincipalType(), PrincipalType()),
+                                                 CollectionUtil.list(Principal(), Principal()),
                                                  PRINCIPAL_EQUIV_);
     }
 
@@ -185,7 +185,7 @@ public class JifTypeSystem_c
     public JifMethodInstance relabelsToMethod() {
         return RELABELS_TO_ = getConstMethod(LabelUtilClassType(),
                                              "relabelsTo",
-                                             CollectionUtil.list(LabelType(),LabelType()),
+                                             CollectionUtil.list(Label(),Label()),
                                              RELABELS_TO_);
     }
 
@@ -193,7 +193,7 @@ public class JifTypeSystem_c
     public JifMethodInstance enforcesMethod() {
         return ENFORCES_ = getConstMethod(LabelUtilClassType(),
                                           "enforces",
-                                          CollectionUtil.list(PrincipalType(), LabelType()),
+                                          CollectionUtil.list(Principal(), Label()),
                                           ENFORCES_);
     }
 
@@ -201,7 +201,7 @@ public class JifTypeSystem_c
     public JifMethodInstance authorizesMethod() {
         return AUTHORIZES_ = getConstMethod(LabelUtilClassType(),
                                             "acts_for",
-                                            CollectionUtil.list(LabelType(), PrincipalType()),
+                                            CollectionUtil.list(Label(), Principal()),
                                             AUTHORIZES_);
     }
 
@@ -209,7 +209,7 @@ public class JifTypeSystem_c
     public JifMethodInstance labelEquivMethod() {
         return LABEL_EQUIV_ = getConstMethod(LabelUtilClassType(),
                                              "equivalentTo",
-                                             CollectionUtil.list(LabelType(), LabelType()),
+                                             CollectionUtil.list(Label(), Label()),
                                              LABEL_EQUIV_);
     }
     
@@ -468,12 +468,12 @@ public class JifTypeSystem_c
         Type strpToType = strip(toType);
                 
         // can cast from "principal" to any subclass of "jif.lang.Principal"
-        if (PrincipalType().equals(strpFromType) && isCastValid(PrincipalClassType(), toType)) {
+        if (Principal().equals(strpFromType) && isCastValid(PrincipalClassType(), toType)) {
             return true;
         }
         
         // can cast from any subtype of "jif.lang.Principal" to "principal"
-        if (PrincipalType().equals(strpToType) && isSubtype(strpFromType, PrincipalClassType())) {
+        if (Principal().equals(strpToType) && isSubtype(strpFromType, PrincipalClassType())) {
             return true;
         }
 
@@ -486,12 +486,12 @@ public class JifTypeSystem_c
         Type strpToType = strip(toType);
         
         // can cast from "principal" to "jif.lang.Principal"
-        if (PrincipalType().equals(strpFromType) && PrincipalClassType().equals(strpToType)) {
+        if (Principal().equals(strpFromType) && PrincipalClassType().equals(strpToType)) {
             return true;
         }
 
         // can cast from any subtype of "jif.lang.Principal" to "principal"
-        if (PrincipalType().equals(strpToType) && isSubtype(strpFromType, PrincipalClassType())) {
+        if (Principal().equals(strpToType) && isSubtype(strpFromType, PrincipalClassType())) {
             return true;
         }
 
@@ -1697,9 +1697,9 @@ public class JifTypeSystem_c
         throws SemanticException {
 
         if (name.equals("label"))
-            return LabelType();
+            return Label();
         if (name.equals("principal"))
-            return PrincipalType();
+            return Principal();
         return super.primitiveForName(name);
     }
 

@@ -78,7 +78,7 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
             else if (formalTypes.size() == 2) {
                 Type formal0 = jts.unlabel(formalTypes.get(0));
                 Type formal1 = jts.unlabel(formalTypes.get(1));
-                if (formal0.equals(jts.PrincipalType()) && formal1.equals(stringArrayType)) {
+                if (formal0.equals(jts.Principal()) && formal1.equals(stringArrayType)) {
                     // the main method signature is main(principal, String[])
                     wrongSig = false;
                     principalArgName = ((Formal)jmd.formals().get(0)).name();

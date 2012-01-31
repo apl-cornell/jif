@@ -82,10 +82,10 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         }
 
         if (expr.type() != null && expr.type().isCanonical() && 
-                !JifUtil.isFinalAccessExprOrConst(ts, expr, ts.LabelType())) {
+                !JifUtil.isFinalAccessExprOrConst(ts, expr, ts.Label())) {
             // illegal dynamic label. But try to convert it to an access path
             // to allow a more precise error message.
-            AccessPath ap = JifUtil.exprToAccessPath(expr, ts.LabelType(), (JifContext)c); 
+            AccessPath ap = JifUtil.exprToAccessPath(expr, ts.Label(), (JifContext)c); 
             ap.verify((JifContext)c);
 
             // previous line should throw an exception, but throw this just to

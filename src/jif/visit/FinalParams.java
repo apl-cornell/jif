@@ -40,7 +40,7 @@ public class FinalParams extends NodeVisitor {
                         Label rhs_label = exprToLabel(init);
                         fi.setInitializer(rhs_label);
                     }
-                    else if (ts.isImplicitCastValid(fi.type(), ts.PrincipalType())) {
+                    else if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
                         Principal rhs_principal = exprToPrincipal(init);
                         fi.setInitializer(rhs_principal);
                     }

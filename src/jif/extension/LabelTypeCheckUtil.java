@@ -44,7 +44,7 @@ public class LabelTypeCheckUtil {
                 throw new SemanticException(e.getMessage(), principal.position());
             }
 
-            if (!ts.isImplicitCastValid(dp.path().type(), ts.PrincipalType())) {
+            if (!ts.isImplicitCastValid(dp.path().type(), ts.Principal())) {
                 throw new SemanticDetailedException("The type of a dynamic principal must be \"principal\".", 
                                                     "The type of a dynamic principal must be " +
                                                     "\"principal\". The type of the expression " + 
