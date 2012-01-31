@@ -19,6 +19,7 @@ import polyglot.types.*;
 import polyglot.types.Package;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLazyClassInitializer;
+import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -95,50 +96,156 @@ public class JifTypeSystem_c
         return p;
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    // constants                                                              //
+    ////////////////////////////////////////////////////////////////////////////
+    
+    
     private static final PrimitiveType.Kind PRINCIPAL_KIND = new PrimitiveType.Kind("principal");
-    private static final PrimitiveType.Kind LABEL_KIND = new PrimitiveType.Kind("label");
-    protected PrimitiveType PRINCIPAL_;
-    protected PrimitiveType LABEL_;
-    protected Type PRINCIPAL_CLASS_ = null;
+    private static final PrimitiveType.Kind LABEL_KIND     = new PrimitiveType.Kind("label");
+    
+    protected PrimitiveType     PRINCIPAL_       = null;
+    protected PrimitiveType     LABEL_           = null;
+    
+    protected JifClassType      PRINCIPAL_CLASS_ = null;
+    protected JifClassType      LABEL_CLASS_     = null;
+    
+    protected JifClassType      PRINCIPAL_UTIL_  = null;
+    protected JifMethodInstance ACTS_FOR_        = null;
+    protected JifMethodInstance PRINCIPAL_EQUIV_ = null;
 
-    @Override
-    public String PrincipalClassName() { return "jif.lang.Principal"; }
-    
-    @Override
-    public String PrincipalUtilClassName() { return "jif.lang.PrincipalUtil"; }
-    
-    @Override
-    public String LabelClassName() { return "jif.lang.Label"; }
-    
-    @Override
-    public String LabelUtilClassName() { return "jif.lang.LabelUtil"; }
-    
-    @Override
-    public String RuntimePackageName() { return "jif.runtime"; }
+    protected JifClassType      LABEL_UTIL_      = null;
+    protected JifMethodInstance RELABELS_TO_     = null;
+    protected JifMethodInstance ENFORCES_        = null;
+    protected JifMethodInstance AUTHORIZES_      = null;
+    protected JifMethodInstance LABEL_EQUIV_     = null;
 
+    // TODO: remove these
+    @Override public String PrincipalClassName()     { return "jif.lang.Principal"; }
+    @Override public String PrincipalUtilClassName() { return "jif.lang.PrincipalUtil"; }
+    @Override public String LabelClassName()         { return "jif.lang.Label"; }
+    @Override public String LabelUtilClassName()     { return "jif.lang.LabelUtil"; }
+    @Override public String RuntimePackageName()     { return "jif.runtime"; }
+
+    // principal
+    
     @Override
     public PrimitiveType PrincipalType() {
         return PRINCIPAL_;
     }
-
+    
     @Override
     public Type PrincipalClassType() {
-        if (PRINCIPAL_CLASS_ == null) {
-            try {
-                PRINCIPAL_CLASS_ = typeForName(PrincipalClassName());
-            }
-            catch (SemanticException e) {
-                throw new InternalCompilerError("Cannot find Jif class " + PrincipalClassName(), e);
-            } 
-        }
-        return PRINCIPAL_CLASS_;
+        return PRINCIPAL_CLASS_ = getConstClass(PrincipalClassName(), PRINCIPAL_CLASS_);
     }
 
+    // label
+    
     @Override
     public PrimitiveType LabelType() {
         return LABEL_;
     }
+    
+    @Override
+    public JifClassType LabelClassType() {
+        return LABEL_CLASS_    = getConstClass(LabelClassName(), LABEL_CLASS_); 
+    }
 
+    // principal util
+    
+    @Override
+    public JifClassType PrincipalUtilClassType() {
+        return PRINCIPAL_UTIL_ = getConstClass(PrincipalUtilClassName(), PRINCIPAL_UTIL_);
+    }
+
+    @Override
+    public JifMethodInstance actsForMethod() {
+        return ACTS_FOR_ = getConstMethod(PrincipalUtilClassType(),
+                                          "",
+                                          CollectionUtil.list(PrincipalType(), PrincipalType()),
+                                          ACTS_FOR_);
+    }
+
+    @Override
+    public JifMethodInstance principalEquivMethod() {
+        return PRINCIPAL_EQUIV_ = getConstMethod(PrincipalUtilClassType(),
+                                                 "",
+                                                 CollectionUtil.list(PrincipalType(), PrincipalType()),
+                                                 PRINCIPAL_EQUIV_);
+    }
+
+    // label util
+    
+    @Override
+    public JifClassType LabelUtilClassType() {
+        return LABEL_UTIL_ = getConstClass(LabelUtilClassName(), LABEL_UTIL_);
+    }
+
+    @Override
+    public JifMethodInstance relabelsToMethod() {
+        return RELABELS_TO_ = getConstMethod(LabelUtilClassType(),
+                                             "",
+                                             CollectionUtil.list(LabelType(),LabelType()),
+                                             RELABELS_TO_);
+    }
+
+    @Override
+    public JifMethodInstance enforcesMethod() {
+        return ENFORCES_ = getConstMethod(LabelUtilClassType(),
+                                          "",
+                                          CollectionUtil.list(PrincipalType(), LabelType()),
+                                          ENFORCES_);
+    }
+
+    @Override
+    public JifMethodInstance authorizesMethod() {
+        return AUTHORIZES_ = getConstMethod(LabelUtilClassType(),
+                                            "",
+                                            CollectionUtil.list(LabelType(), PrincipalType()),
+                                            AUTHORIZES_);
+    }
+
+    @Override
+    public JifMethodInstance labelEquivMethod() {
+        return LABEL_EQUIV_ = getConstMethod(LabelUtilClassType(),
+                                             "",
+                                             CollectionUtil.list(LabelType(), LabelType()),
+                                             LABEL_EQUIV_);
+    }
+    
+    // helper methods
+    
+    /**
+     * Helper function to look up methods.  Intended for cached results: returns
+     * the <code>instance</code> parameter if it is non-null.
+     */
+    protected JifMethodInstance getConstMethod(ClassType container, String methodName, List args, JifMethodInstance instance) {
+        if (instance == null) try {
+            instance = (JifMethodInstance) findMethod(container, methodName, args, (ClassType) null);
+        } catch (Exception e) {
+            throw new InternalCompilerError("invalid type information for " + container.name() + "." + methodName);
+        }
+        return instance;
+    }
+    
+    /**
+     * Helper function to look up classes.  Intended for cached results: returns
+     * the <code>instance</code> parameter if it is non-null;
+     */
+    protected JifClassType getConstClass(String name, JifClassType instance) {
+        if (instance == null) try {
+            instance = (JifClassType) typeForName(name);
+        } catch (Exception e) {
+            throw new InternalCompilerError("invalid type information for " + name);
+        }
+        return instance;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    //                                                                        //
+    ////////////////////////////////////////////////////////////////////////////
+    
+    
     @Override
     public Context createContext() {
     	return new JifContext_c(this, jlts);
@@ -1633,4 +1740,5 @@ public class JifTypeSystem_c
                 writerPolicy(Position.compilerGenerated(Position.CALLER), p, p);
         return pairLabel(p.position(), toConf, toInteg);
     }
+
 }
