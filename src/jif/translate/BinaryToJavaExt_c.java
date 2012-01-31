@@ -24,7 +24,13 @@ public class BinaryToJavaExt_c extends ExprToJavaExt_c {
         }
         else {
             // operator translates to a method call.
-            return rw.qq().parseExpr("%T.%S(%E,%E)", method.container(), method.name(), b.left(), b.right());
+            StringBuilder call = new StringBuilder();
+            call.append(method.container().toString());
+            call.append(".");
+            call.append(method.name());
+            call.append("(%E,%E)");
+            
+            return rw.qq().parseExpr(call.toString(), b.left(), b.right());
         }
     }
 }

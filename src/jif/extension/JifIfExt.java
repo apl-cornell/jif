@@ -10,6 +10,7 @@ import jif.types.label.Label;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.*;
+import polyglot.ast.Binary.Operator;
 import polyglot.types.SemanticException;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
@@ -112,85 +113,59 @@ public class JifIfExt extends JifStmtExt_c
         }
     }
 
-
     protected static void extendFact(LabelChecker lc, JifContext A, Binary b, boolean warn) throws SemanticException {
         JifTypeSystem ts = lc.typeSystem();
         Binary.Operator op = b.operator();
 
+        if (warn && (op == JifBinaryDel.RELABELS_TO     ||
+                     op == JifBinaryDel.ACTSFOR         ||
+                     op == JifBinaryDel.AUTHORIZES      ||
+                     op == JifBinaryDel.ENFORCES        ||
+                     op == JifBinaryDel.PRINCIPAL_EQUIV ||
+                     op == JifBinaryDel.LABEL_EQUIV)) {
+            lc.errorQueue().enqueue(ErrorInfo.WARNING,
+                    "The Jif compiler can only reason about " +
+                    "actsfor tests if they occur as conjuncts in the " +
+                    "conditional of an if statement.",
+                    b.position());
+            return;
+        }
+
+        if (op == JifBinaryDel.RELABELS_TO) {
+            Label lhs = JifUtil.exprToLabel(ts, b.left(),  A);
+            Label rhs = JifUtil.exprToLabel(ts, b.right(), A);
+            
+            A.addAssertionLE(lhs, rhs);
+        }
         if (op == JifBinaryDel.ACTSFOR) {
-            ActsForParam actor;
-            if (ts.isLabel(b.left().type())) {
-                actor = JifUtil.exprToLabel(ts, b.left(), A);
-            } else {
-                actor = JifUtil.exprToPrincipal(ts, b.left(), A);
-            }
-
-            Principal granter = JifUtil.exprToPrincipal(ts, b.right(), A);
-            if (warn) {
-                // give a warning.
-                ErrorQueue eq = lc.errorQueue();
-                eq.enqueue(ErrorInfo.WARNING,
-                           "The Jif compiler can only reason about " +
-                           "actsfor tests if they occur as conjuncts in the " +
-                           "conditional of an if statement.",
-                           b.position());
-
-            }
-            else {
-                A.addActsFor(actor, granter);
-            }
+            Principal lhs = JifUtil.exprToPrincipal(ts, b.left(),  A);
+            Principal rhs = JifUtil.exprToPrincipal(ts, b.right(), A);
+            
+            A.addActsFor(lhs, rhs);
         }
-        else if (op == JifBinaryDel.EQUIV && ts.isImplicitCastValid(b.left().type(), ts.Principal())) {
-            Principal left = JifUtil.exprToPrincipal(ts, b.left(), A);
-            Principal right = JifUtil.exprToPrincipal(ts, b.right(), A);
-            if (warn) {
-                // give a warning.
-                ErrorQueue eq = lc.errorQueue();
-                eq.enqueue(ErrorInfo.WARNING,
-                           "The Jif compiler can only reason about " +
-                           "actsfor tests if they occur as conjuncts in the " +
-                           "conditional of an if statement.",
-                           b.position());
-
-            }
-            else {
-                A.addEquiv(left, right);                            
-            }
+        if (op == JifBinaryDel.AUTHORIZES) {
+            Label     lhs = JifUtil.exprToLabel(ts, b.left(),  A);
+            Principal rhs = JifUtil.exprToPrincipal(ts, b.right(), A);
+            
+            A.addActsFor(lhs, rhs);
         }
-        else if (op == JifBinaryDel.EQUIV && ts.isLabel(b.left().type())) {
-            Label lhs = JifUtil.exprToLabel(ts, b.left(), A);
+        if (op == JifBinaryDel.ENFORCES) {
+            Principal lhs = JifUtil.exprToPrincipal(ts, b.left(),  A);
+            Label     rhs = JifUtil.exprToLabel(ts, b.right(), A);
+
+            A.addEnforces(lhs, rhs);
+        }
+        if (op == JifBinaryDel.PRINCIPAL_EQUIV) {
+            Principal lhs = JifUtil.exprToPrincipal(ts, b.left(), A);
+            Principal rhs = JifUtil.exprToPrincipal(ts, b.right(), A);
+
+            A.addEquiv(lhs, rhs);
+        }
+        if (op == JifBinaryDel.LABEL_EQUIV) {
+            Label lhs = JifUtil.exprToLabel(ts, b.left(),  A);
             Label rhs = JifUtil.exprToLabel(ts, b.right(), A);
-
-            if (warn) {
-                // give a warning.
-                ErrorQueue eq = lc.errorQueue();
-                eq.enqueue(ErrorInfo.WARNING,
-                           "The Jif compiler can only reason about label tests " +
-                           "if they occur as conjuncts in the " +
-                           "conditional of an if statement.",
-                           b.position());
-
-            }
-            else {
-                A.addEquiv(lhs, rhs);
-            }
-        }
-        else if (op == Binary.LE && ts.isLabel(b.left().type())) {
-            Label lhs = JifUtil.exprToLabel(ts, b.left(), A);
-            Label rhs = JifUtil.exprToLabel(ts, b.right(), A);
-            if (warn) {
-                // give a warning.
-                ErrorQueue eq = lc.errorQueue();
-                eq.enqueue(ErrorInfo.WARNING,
-                           "The Jif compiler can only reason about label tests " +
-                           "if they occur as conjuncts in the " +
-                           "conditional of an if statement.",
-                           b.position());
-
-            }
-            else {
-                A.addAssertionLE(lhs, rhs);
-            }
+            
+            A.addEquiv(lhs, rhs);
         }
     }
 }

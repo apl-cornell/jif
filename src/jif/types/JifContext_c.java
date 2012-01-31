@@ -218,6 +218,12 @@ public class JifContext_c extends Context_c implements JifContext
                     + actor.getClass());
         }
     }
+    
+    @Override
+    public void addEnforces(Principal p, Label l) {
+        
+    }
+    
     @Override
     public void addEquiv(AccessPath p, AccessPath q) {
         //envModification(); XXX add the equivalence to the current environment.
@@ -241,6 +247,7 @@ public class JifContext_c extends Context_c implements JifContext
         }
         
     }
+    
     /**
      * Adds the assertion to this context, and all outer contexts up to
      * the method/constructor/initializer level

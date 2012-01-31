@@ -205,5 +205,13 @@ public interface JifContext extends Context {
     ProviderLabel provider();
     void setProvider(ProviderLabel provider);
 
+    /**
+     * Add the assumption actor ≽ granter 
+     */
     void addActsFor(ActsForParam actor, Principal granter);
+
+    /**
+     * Add the assumption p ≽ l
+     */
+    void addEnforces(Principal p, Label l);
 }
