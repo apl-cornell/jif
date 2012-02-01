@@ -606,14 +606,14 @@ public class LabelUtil
     
     
     
-    public boolean equivalentTo(Label l1, Label l2) {
+    public static boolean equivalentTo(Label l1, Label l2) {
         try {
-            enterTiming();
+            singleton().enterTiming();
             if (l1 == l2 || (l1 != null && l1.equals(l2))) return true;
             return relabelsTo(l1, l2) && relabelsTo(l2, l1);
         }
         finally {
-            exitTiming();
+            singleton().exitTiming();
         }
     }
     
