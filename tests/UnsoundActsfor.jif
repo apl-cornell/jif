@@ -1,0 +1,45 @@
+public class UnsoundActsFor {
+
+	public static boolean{*L} do_endorse{*L} (principal {*L} p, label L, boolean{p←} bit)
+		where L <= {p←}
+	{
+
+		final principal e   = new Endorser[p](bit);
+		final principal bot = null;
+
+		if (bot actsfor p)
+			return true;
+		else
+			return false;
+	}
+}
+
+class Endorser[principal o] implements Principal {
+	private boolean {o←} bit;
+
+	public Endorser(boolean{o←} bit) {
+		this.bit = bit;
+	}
+
+	public boolean {this←; this; other} delegatesTo(principal other) {
+		if (other == o)
+			return true;
+		if (o actsfor this)
+			return bit;
+		return false;
+	}
+
+	/** cruft ****************************************/
+
+	public String name() { return ""; }
+	public boolean equals(Principal other) { return false; }
+	public boolean isAuthorized(Object authPrf, Closure[this, lb] closure, label lb, boolean ex) { return false; }
+
+	public ActsForProof{this; p; this<-; p<-}
+	    findProofUpto{this<-}(Principal p, Object searchState) { return null; }
+
+	public ActsForProof{this; q; q<-; this<-}
+	    findProofDownto{this<-}(Principal q, Object searchState) { return null; }
+
+}
+
