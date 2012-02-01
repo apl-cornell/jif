@@ -64,21 +64,21 @@ public class JifBinaryDel extends JifJL_c
             checkPrincipalExpr(ts, nf, tc, b.left());
             checkPrincipalExpr(ts, nf, tc, b.right());
             
-            return node().type(ts.Boolean());
+            return b.type(ts.Boolean());
         }
         
         if (b.operator() == AUTHORIZES) {
             LabelExpr lhs = checkLabelExpr(ts, nf, tc, node().left());
             checkPrincipalExpr(ts, nf, tc, node().right());
             
-            return node().left(lhs).type(ts.Boolean());
+            return b.left(lhs).type(ts.Boolean());
         }
         
         if (b.operator() == ENFORCES) {
             checkPrincipalExpr(ts, nf, tc, node().left());
             LabelExpr rhs = checkLabelExpr(ts, nf, tc, node().right());
 
-            return node().right(rhs).type(ts.Boolean());
+            return b.right(rhs).type(ts.Boolean());
         }
         
         // Note: at this point, b.node() must be equal to node() even though
