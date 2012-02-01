@@ -222,11 +222,13 @@ public class JifBinaryDel extends JifJL_c
         if (e.type() == null || !e.type().isCanonical())
             throw new InternalCompilerError("Expected canonical type.");
         
-        
+        if (!ts.isPrincipal(e.type())) {
+            throw new SemanticException("Only principal expressions may be used in an actsfor check");
+        }
         if (e instanceof PrincipalExpr) {
             return;
         }
-        else if (JifUtil.isFinalAccessExprOrConst(ts, e)) {
+        else if (ts.isPrincipal(e.type()) && JifUtil.isFinalAccessExprOrConst(ts, e)) {
             Principal p = JifUtil.exprToPrincipal(ts, e, (JifContext)tc.context());
             
             if (!p.isRuntimeRepresentable()) {

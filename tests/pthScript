@@ -56,7 +56,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 #	ActsFor16.jif (Semantic, "access path");
 #	ActsFor16b.jif (Semantic, "requires both operands to be principals");
 	ActsFor16c.jif ;
-	ActsFor16d.jif (Semantic, "access path");
+	ActsFor16d.jif (Semantic, "principal.*actsfor");
 	ActsFor17.jif (Semantic, "Non-final local variable"),
 		      (Semantic, "Non-final local variable");
 	ArgLabel1.jif ;
