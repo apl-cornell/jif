@@ -140,15 +140,15 @@ public class JifBinaryDel extends JifJL_c
         // a principal (p), a label (l), or neither (n).
         // thus for example, if l(eft) is a p(rincipal), then lp is true.
         
-        boolean lp = ts.isPrincipal(node().left().type());
-        boolean ll = ts.isLabel(node().left().type());
+        boolean lp = ts.isImplicitCastValid(node().left().type(), ts.Principal());
+        boolean ll = ts.isImplicitCastValid(node().left().type(), ts.Label());
         boolean ln = !lp && !ll;
         String left = lp ? "principal" :
                       ll ? "label"     :
                            "numeric expression";
         
-        boolean rp = ts.isPrincipal(node().right().type());
-        boolean rl = ts.isLabel(node().right().type());
+        boolean rp = ts.isImplicitCastValid(node().right().type(), ts.Principal());
+        boolean rl = ts.isImplicitCastValid(node().right().type(), ts.Label());
         boolean rn = !rp && !rl;
         String right = rp ? "principal" :
                        rl ? "label"     :
@@ -210,8 +210,8 @@ public class JifBinaryDel extends JifJL_c
     }
     
     /**
-     * Convert the given expression to a PrincipalExpr by wrapping it if
-     * necessary.  Assumes e has a non-null canonical type.
+     * Checks that the given expression is a valid runtime-represented principal
+     * expression.  Assumes e has a non-null canonical type.
      *
      * @throws SemanticException
      *          if the expression is not a valid runtime-representable principal
@@ -219,32 +219,25 @@ public class JifBinaryDel extends JifJL_c
      */
     protected void checkPrincipalExpr(JifTypeSystem ts, JifNodeFactory nf, TypeChecker tc, Expr e) throws SemanticException {
 
-        if (e.type() == null || !e.type().isCanonical())
-            throw new InternalCompilerError("Expected canonical type.");
+        if (e instanceof PrincipalExpr)
+            return;
         
-        if (!ts.isPrincipal(e.type())) {
-            throw new SemanticException("Only principal expressions may be used in an actsfor check");
-        }
-        if (e instanceof PrincipalExpr) {
-            return;
-        }
-        else if (ts.isPrincipal(e.type()) && JifUtil.isFinalAccessExprOrConst(ts, e)) {
-            Principal p = JifUtil.exprToPrincipal(ts, e, (JifContext)tc.context());
+        if (e.type() == null)
+            throw new InternalCompilerError(
+                "Expected type-checked node.",
+                e.position());
             
-            if (!p.isRuntimeRepresentable()) {
-                throw new SemanticDetailedException(
-                        "A principal used in an actsfor must be runtime-representable.",                    
-                        "Both principals used in an actsfor test must be " +
-                        "represented at runtime, since the actsfor test is a dynamic " +
-                        "test. The principal " + p + 
-                        " is not represented at runtime, and thus cannot be used " +
-                        "in an actsfor test.",
-                        e.position());
-            }
-            
-            return;
-        }
-        else {
+        if (!e.type().isCanonical())
+            throw new InternalCompilerError(
+                "Expected canonical type.",
+                e.position());
+        
+        if (!ts.isImplicitCastValid(e.type(), ts.Principal()))
+            throw new SemanticException(
+                "Only principal expressions may be used in an actsfor check",
+                e.position());
+
+        if (!JifUtil.isFinalAccessExprOrConst(ts, e)) {
             // illegal dynamic principal. But try to convert it to an access path
             // to allow a more precise error message.
             AccessPath ap = JifUtil.exprToAccessPath(e, (JifContext)tc.context()); 
@@ -262,6 +255,21 @@ public class JifBinaryDel extends JifJL_c
                 "is either a principal parameter, or an external principal.",
                 e.position());                                        
         }
+
+        Principal p = JifUtil.exprToPrincipal(ts, e, (JifContext)tc.context());
+        if (!p.isRuntimeRepresentable()) {
+            throw new SemanticDetailedException(
+                "A principal used in an actsfor must be runtime-representable.",                    
+                "Both principals used in an actsfor test must be " +
+                "represented at runtime, since the actsfor test is a dynamic " +
+                "test. The principal " + p + 
+                " is not represented at runtime, and thus cannot be used " +
+                "in an actsfor test.",
+                e.position());
+        }
+        
+        // success
+        return;
     }
 
     @Override
