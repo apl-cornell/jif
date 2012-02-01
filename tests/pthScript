@@ -318,7 +318,13 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	JunctivePrincipals03.jif (Semantic, "not less restrictive");
 	JunctivePrincipals04.jif;
 	JunctivePrincipals05.jif;
-	JunctivePrincipals06.jif;
+	JunctivePrincipals06.jif (Semantic, "may return a value"),
+	                         (Semantic, "may return a value"),
+	                         (Semantic, "may return a value"),
+	                         (Semantic, "may return a value"),
+	                         (Semantic, "may return a value"),
+	                         (Semantic, "may return a value");
+	JunctivePrincipals07.jif ;
 	LabelIf1.jif ;
 	LabelIf2.jif ;
 	LabelIf3.jif (Warning);
