@@ -641,31 +641,32 @@ public class LabelUtil
     /**
      * @return true iff from <= to in the information-flow ordering.
      */
-    public boolean relabelsTo(Label from, Label to) {
+    public static boolean relabelsTo(Label from, Label to) {
+        LabelUtil s = singleton();
         try {
-            enterTiming();
+            s.enterTiming();
             if (from == null || to == null) return false;
             if (from == to || from.equals(to)) return true;
             Pair pair = new Pair(from, to);
             if (USE_CACHING) {
-                if (cacheTrueLabelRelabels.containsKey(pair)) return true;
-                if (cacheFalseLabelRelabels.containsKey(pair)) return false;
+                if (s.cacheTrueLabelRelabels.containsKey(pair)) return true;
+                if (s.cacheFalseLabelRelabels.containsKey(pair)) return false;
             }
             Set<DelegationPair> dependencies = new HashSet<DelegationPair>();
             boolean result = from != null && from.relabelsTo(to, dependencies);
             if (USE_CACHING) {
                 if (!result) {
-                    cacheFalseLabelRelabels.put(pair, pair);
+                    s.cacheFalseLabelRelabels.put(pair, pair);
                 }
                 else {
-                    cacheTrueLabelRelabels.put(pair, pair);
+                    s.cacheTrueLabelRelabels.put(pair, pair);
                     // add dependencies from delegations to the cache result
                     // i.e., what dependencies does this result rely on?
                     for (DelegationPair del : dependencies) {
-                        Set<Pair> deps = cacheTrueLabelRelabelsDependencies.get(del);
+                        Set<Pair> deps = s.cacheTrueLabelRelabelsDependencies.get(del);
                         if (deps == null) {
                             deps = new HashSet<Pair>();
-                            cacheTrueLabelRelabelsDependencies.put(del, deps);
+                            s.cacheTrueLabelRelabelsDependencies.put(del, deps);
                         }
                         deps.add(pair);
                     }
@@ -674,31 +675,32 @@ public class LabelUtil
             return result;            
         }
         finally {
-            exitTiming();
+            s.exitTiming();
         }
     }
     
-    public boolean acts_for(Label actor, Principal granter) {
+    public static boolean acts_for(Label actor, Principal granter) {
         try {
-            enterTiming();
+            singleton().enterTiming();
             return actsFor(actor, granter);
         } finally {
-            exitTiming();
+            singleton().exitTiming();
         }
     }
     
-    public boolean actsFor(Label actor, Principal granter) {
+    public static boolean actsFor(Label actor, Principal granter) {
         try {
-            enterTiming();
-            Label L = toLabel(TOP_CONF, writerPolicy(granter, granter));
+            singleton().enterTiming();
+            Label L = singleton().toLabel(singleton().TOP_CONF, singleton().writerPolicy(granter, granter));
             return relabelsTo(actor, L);
         } finally {
-            exitTiming();
+            singleton().exitTiming();
         }
     }
 
-    public boolean enforces(Principal actor, Label policy) {
-        return isReadableBy(policy, actor) && isWritableBy(policy, actor);
+    public static boolean enforces(Principal actor, Label policy) {
+        LabelUtil s = singleton();
+        return s.isReadableBy(policy, actor) && s.isWritableBy(policy, actor);
     }
     
     public boolean relabelsTo(Policy from, Policy to) {
@@ -835,7 +837,7 @@ public class LabelUtil
     /**
      * Internal representation of a pair of objects, used for the caches
      */
-    private class Pair {
+    private static class Pair {
         final Object left; // must be non null
         final Object right; // must be non null
         public Pair(Object left, Object right) {
