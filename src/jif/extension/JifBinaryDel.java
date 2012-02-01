@@ -204,8 +204,9 @@ public class JifBinaryDel extends JifJL_c
         }
         else {
             throw new SemanticException(
-                    "An expression used in a label test must be either a final access path, principal parameter or a constant principal",
-                    e.position());
+                "An expression used in a label test must be either a final " +
+                "access path, principal parameter or a constant principal",
+                e.position());
         }
     }
     
@@ -219,9 +220,6 @@ public class JifBinaryDel extends JifJL_c
      */
     protected void checkPrincipalExpr(JifTypeSystem ts, JifNodeFactory nf, TypeChecker tc, Expr e) throws SemanticException {
 
-        if (e instanceof PrincipalExpr)
-            return;
-        
         if (e.type() == null)
             throw new InternalCompilerError(
                 "Expected type-checked node.",

@@ -226,6 +226,9 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	DynPrin13.jif ;
 #	DynPrin14.jif ;
 	DynPrin15.jif ;
+	DynPrin17a.jif ;
+	DynPrin17b.jif (Semantic, "final variable of type \"principal\"");
+	DynPrin17c.jif (Semantic, "final variable of type \"principal\"");
 	DynLabel1.jif ;
 	DynLabel2.jif (Semantic, "Non-final.*access path"), (Semantic, "Non-final.*access path");
 	DynLabel3.jif (Semantic, "Field.*is not final"), (Semantic, "Field.*is not final");

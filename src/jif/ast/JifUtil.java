@@ -134,6 +134,10 @@ public class JifUtil
             PrincipalNode pn = (PrincipalNode)e;
             return new AccessPathConstant(pn.principal(), pn.type(), pn.position());
         }
+        else if (e instanceof PrincipalExpr) {
+            PrincipalExpr pe = (PrincipalExpr) e;
+            return new AccessPathConstant(pe.principal().principal(), pe.type(), pe.position());
+        }
         else if (e instanceof NullLit && expectedType != null && 
                 context.typeSystem().isImplicitCastValid(expectedType, 
                                                          ((JifTypeSystem)context.typeSystem()).Principal())) {
@@ -263,13 +267,14 @@ public class JifUtil
             return ((Special)e).kind() == Special.THIS;
         }
         if (e instanceof Cast) {
-            return isFinalAccessExpr(ts, ((Cast)e).expr());        
+            return isFinalAccessExprOrConst(ts, ((Cast)e).expr());        
         }
         if (e instanceof DowngradeExpr) {
-            return isFinalAccessExpr(ts, ((DowngradeExpr)e).expr());        
+            return isFinalAccessExprOrConst(ts, ((DowngradeExpr)e).expr());        
         }
         return false;
     }
+    
     public static boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e) {
         Type expectedType = null;
         if (e != null && e.type() != null && !e.type().isNull()) {
@@ -278,12 +283,12 @@ public class JifUtil
         return isFinalAccessExprOrConst(ts, e, expectedType);
         
     }
+    
     public static boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e, Type expectedType) {
-        return isFinalAccessExpr(ts, e) || 
-            e instanceof LabelExpr || 
-            e instanceof PrincipalNode ||
-           (e instanceof Cast && isFinalAccessExprOrConst(ts, ((Cast)e).expr())) ||
-           (e instanceof DowngradeExpr && isFinalAccessExprOrConst(ts, ((DowngradeExpr)e).expr())) ||
+        return isFinalAccessExpr(ts, e) ||
+            e instanceof LabelExpr      ||
+            e instanceof PrincipalNode  ||
+            e instanceof PrincipalExpr  ||
            (e instanceof NullLit &&
                    expectedType != null && 
                    ts.isImplicitCastValid(expectedType, ts.Principal())) 

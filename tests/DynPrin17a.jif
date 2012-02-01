@@ -1,0 +1,8 @@
+class DynPrin17a {
+	public void f {p→} (principal p) {
+	}
+
+	public void g {Alice&Bob→} () {
+		f(new principal (Alice&Bob)); // ok
+	}
+}

@@ -1,0 +1,9 @@
+class DynPrin17b {
+	public void f {p→} (principal p) {
+	}
+
+	public void g {Alice&Bob→} () {
+		principal a = Alice;
+		f(new principal (a&Bob)); // not ok - a is not a FAP
+	}
+}
