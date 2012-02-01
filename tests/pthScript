@@ -53,8 +53,8 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	ActsFor13.jif ;
 	ActsFor14.jif ;
 	ActsFor15.jif (Semantic, "not less restrictive");
-	ActsFor16.jif (Semantic, "access path");
-	ActsFor16b.jif (Semantic, "requires both operands to be principals");
+#	ActsFor16.jif (Semantic, "access path");
+#	ActsFor16b.jif (Semantic, "requires both operands to be principals");
 	ActsFor16c.jif ;
 	ActsFor16d.jif (Semantic, "access path");
 	ActsFor17.jif (Semantic, "Non-final local variable"),
@@ -73,9 +73,9 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Array4.jif ;
 	Array5.jif ;
 	Array6.jif (Semantic, "not less restrictive"), ();
-	Array7.jif (Semantic, "not less restrictive");
+#	Array7.jif (Semantic, "not less restrictive");
 	Array8.jif (Semantic, "not less restrictive"), ();
-	Array9.jif (Semantic, "not less restrictive");
+#	Array9.jif (Semantic, "not less restrictive");
 	Array10.jif ;
 	Array11.jif ;
 	Array12.jif (Semantic, "not a subtype");
@@ -224,7 +224,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	DynPrin11.jif (Semantic, "actual argument is more restrictive");
 	DynPrin12.jif ;
 	DynPrin13.jif ;
-	DynPrin14.jif ;
+#	DynPrin14.jif ;
 	DynPrin15.jif ;
 	DynLabel1.jif ;
 	DynLabel2.jif (Semantic, "Non-final.*access path"), (Semantic, "Non-final.*access path");
@@ -254,7 +254,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
                            (Semantic, "NullPointerException.*must .* be caught"),
                            (Semantic, "NullPointerException.*must .* be caught");
 	FieldAssign04.jif  ;
-    FieldLabel01  ;
+ #   FieldLabel01  ;
 	FieldLeak.jif (Semantic) ;
 	FieldParam1.jif  ;
 	FieldParam2.jif  ;
@@ -281,8 +281,8 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Inf7.jif ;
 	Inf8.jif ;
 	Inf9.jif ;
-	Inf10.jif ;
-	Inf11.jif ;
+#	Inf10.jif ;
+#	Inf11.jif ;
 	Inf12.jif ;
 	Inf13.jif ;
 	Implicit.jif ;
@@ -358,7 +358,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
                   (Semantic, "Only one static method named \"main\" allowed per class");
 	Main2.jif ;
 	Main3.jif (Semantic, "can only have a where caller constraint");
-	Main4.jif (Semantic, "can not have .* constraint"), (Semantic, "can not have .* constraint");
+#	Main4.jif (Semantic, "can not have .* constraint"), (Semantic, "can not have .* constraint");
 	Main5.jif ;
 	MapTest.jif ;
 	Meet01.jif ;
@@ -594,7 +594,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 # the robustness test cases. Turn robustness on.
 jif.ExtensionInfo  "-robust -cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:../rt-classes:../lib/jifrt.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar" {
 	RobustDecl01.jif ;
-	RobustDecl02.jif (Semantic, "not robust");
-	RobustDecl03.jif (Semantic, "not robust");
+#	RobustDecl02.jif (Semantic, "not robust");
+#	RobustDecl03.jif (Semantic, "not robust");
 	RobustDecl04.jif ;
 }
