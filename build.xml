@@ -207,6 +207,7 @@
         <delete file="${jifc}" />
         <delete file="${jifc}.bat" />
         <delete file="${bin}/splitc" />
+        <delete file="${tests}/pthScript.results" />
     </target>
 
     <!-- initialize the build -->
