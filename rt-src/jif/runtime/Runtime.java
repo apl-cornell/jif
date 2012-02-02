@@ -78,7 +78,7 @@ public class Runtime {
 
         if (existed) {
             Label acLabel = FileSystem.labelOf(name);
-            if (!LabelUtil.singleton().relabelsTo(L, acLabel)) {
+            if (!LabelUtil.singleton()._relabelsTo(L, acLabel)) {
                 throw new SecurityException("The file " + name
                         + "doesn't have sufficient access restrictions.");
             }
@@ -107,7 +107,7 @@ public class Runtime {
             throws FileNotFoundException, SecurityException {
         Label acLabel = FileSystem.labelOf(name);
         
-        if (LabelUtil.singleton().relabelsTo(acLabel, L)) return new FileInputStream(name);
+        if (LabelUtil.singleton()._relabelsTo(acLabel, L)) return new FileInputStream(name);
         
         throw new SecurityException("The file has label " + LabelUtil.singleton().stringValue(acLabel) + 
                                     ", which is more restrictive than " +
@@ -119,7 +119,7 @@ public class Runtime {
      * The output channel is parameterized by <code>l</code>.
      */
     public PrintStream stderr(Label l) {
-        if (LabelUtil.singleton().relabelsTo(l, defaultOutputLabel())) return System.err;
+        if (LabelUtil.singleton()._relabelsTo(l, defaultOutputLabel())) return System.err;
 
         throw new SecurityException("The standard error output is not "
                 + "sufficiently secure.");
@@ -130,7 +130,7 @@ public class Runtime {
      * This output channel is parameterized by <code>l</code>.
      */
     public PrintStream stdout(Label l) {
-        if (LabelUtil.singleton().relabelsTo(l, defaultOutputLabel())) return System.out;
+        if (LabelUtil.singleton()._relabelsTo(l, defaultOutputLabel())) return System.out;
         throw new SecurityException("The standard output is not "
                 + "sufficiently secure.");
     }
@@ -140,7 +140,7 @@ public class Runtime {
      * This input channel is parameterized by <code>l</code>.
      */
     public InputStream stdin(Label l) {
-        if (LabelUtil.singleton().relabelsTo(defaultInputLabel(), l)) return System.in;
+        if (LabelUtil.singleton()._relabelsTo(defaultInputLabel(), l)) return System.in;
         
         throw new SecurityException("The standard output is not "
                 + "sufficiently secure.");

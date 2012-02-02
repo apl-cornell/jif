@@ -336,6 +336,7 @@ sh ${jif} %CMD_LINE_ARGS%
 		       skipemptyfilesets="true" 
 		       vmlauncher="false">
             <arg value="-e" />
+            <arg value="-debugpositions" />
             <arg value="-d" />
             <arg value="sig-classes" />
             <arg value="-sourcepath" />

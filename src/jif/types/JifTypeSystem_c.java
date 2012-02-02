@@ -161,7 +161,7 @@ public class JifTypeSystem_c
     @Override
     public JifMethodInstance actsForMethod() {
         return ACTS_FOR_ = getConstMethod(PrincipalUtilClassType(),
-                                          "acts_for",
+                                          "_actsFor",
                                           CollectionUtil.list(Principal(), Principal()),
                                           ACTS_FOR_);
     }
@@ -169,7 +169,7 @@ public class JifTypeSystem_c
     @Override
     public JifMethodInstance principalEquivMethod() {
         return PRINCIPAL_EQUIV_ = getConstMethod(PrincipalUtilClassType(),
-                                                 "equivalentTo",
+                                                 "_equivalentTo",
                                                  CollectionUtil.list(Principal(), Principal()),
                                                  PRINCIPAL_EQUIV_);
     }
@@ -184,7 +184,7 @@ public class JifTypeSystem_c
     @Override
     public JifMethodInstance relabelsToMethod() {
         return RELABELS_TO_ = getConstMethod(LabelUtilClassType(),
-                                             "relabelsTo",
+                                             "_relabelsTo",
                                              CollectionUtil.list(Label(),Label()),
                                              RELABELS_TO_);
     }
@@ -192,7 +192,7 @@ public class JifTypeSystem_c
     @Override
     public JifMethodInstance enforcesMethod() {
         return ENFORCES_ = getConstMethod(LabelUtilClassType(),
-                                          "enforces",
+                                          "_enforces",
                                           CollectionUtil.list(Principal(), Label()),
                                           ENFORCES_);
     }
@@ -200,7 +200,7 @@ public class JifTypeSystem_c
     @Override
     public JifMethodInstance authorizesMethod() {
         return AUTHORIZES_ = getConstMethod(LabelUtilClassType(),
-                                            "acts_for",
+                                            "_actsFor",
                                             CollectionUtil.list(Label(), Principal()),
                                             AUTHORIZES_);
     }
@@ -208,7 +208,7 @@ public class JifTypeSystem_c
     @Override
     public JifMethodInstance labelEquivMethod() {
         return LABEL_EQUIV_ = getConstMethod(LabelUtilClassType(),
-                                             "equivalentTo",
+                                             "_equivalentTo",
                                              CollectionUtil.list(Label(), Label()),
                                              LABEL_EQUIV_);
     }

@@ -24,7 +24,7 @@ public class PrincipalUtil {
      * Returns true if and only if the principal p acts for the principal q. A
      * synonym for the <code>actsFor</code> method.
      */
-    public static boolean acts_for(Principal p, Principal q) {
+    public static boolean _actsFor(Principal p, Principal q) {
         try {
             LabelUtil.singleton().enterTiming();
             return actsFor(p, q);
@@ -314,7 +314,7 @@ public class PrincipalUtil {
         
     }
     
-    public static boolean equivalentTo(Principal p, Principal q) {
+    public static boolean _equivalentTo(Principal p, Principal q) {
         try {
             LabelUtil.singleton().enterTiming();
             return actsFor(p, q) && actsFor(q, p);
@@ -364,7 +364,7 @@ public class PrincipalUtil {
                     || (p != null && closureP != null && p.equals(closureP) && closureP
                             .equals(p))) {
                 // The principals agree.
-                if (LabelUtil.singleton().equivalentTo(closureL, lb)) {
+                if (LabelUtil.singleton()._equivalentTo(closureL, lb)) {
                     // the labels agree
                     if (p == null || p.isAuthorized(authPrf, c, lb, executeNow)) {
                         // either p is null (and the "null" principal always

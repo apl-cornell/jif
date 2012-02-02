@@ -275,6 +275,7 @@ terminal Token CALLER;
 terminal Token ACTSFOR;
 terminal Token FLOWSTO;
 terminal Token ENFORCES;
+terminal Token AUTHORIZES;
 terminal Token EQUIV;
 terminal Token DECLASSIFY;
 terminal Token ENDORSE;
@@ -1089,16 +1090,30 @@ transfer primary_no_new_array to primary_no_array {
 }
 
 extend relational_expression ::=
-     relational_expression:a ACTSFOR shift_expression:b {:
+     relational_expression:a TRUST_GTEQ shift_expression:b {:
+                RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.TRUST_GE, b);
+                :}
+  |  relational_expression:a INFO_LTEQ shift_expression:b {:
+                RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.RELABELS_TO, b);
+                :}
+  
+  |  relational_expression:a FLOWSTO shift_expression:b {:
+                RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.RELABELS_TO, b);
+                :}
+  |  relational_expression:a ENFORCES shift_expression:b {:
+                RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.ENFORCES, b);
+                :}
+  |  relational_expression:a AUTHORIZES shift_expression:b {:
+                RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.AUTHORIZES, b);
+                :}
+  |  relational_expression:a ACTSFOR shift_expression:b {:
                 RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.ACTSFOR, b);
                 :}
-  |  relational_expression:a TRUST_GTEQ shift_expression:b {:
-                RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.ACTSFOR, b);
-                :}
+  
   |  relational_expression:a EQUIV shift_expression:b {:
                 RESULT = parser.nf.Binary(parser.pos(a, b), a, JifBinaryDel.EQUIV, b);
                 :}
-    ;
+  ;
 
 drop { /* no reflection */
 primary_no_new_array ::=

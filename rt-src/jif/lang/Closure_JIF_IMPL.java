@@ -5,8 +5,8 @@ public abstract class Closure_JIF_IMPL {
         if (o instanceof Closure) {
             Closure c = (Closure) o;
             boolean ok = true;
-            ok = ok && PrincipalUtil.equivalentTo(c.jif$getjif_lang_Closure_P(), jif$P);
-            ok = ok && LabelUtil.singleton().equivalentTo(c.jif$getjif_lang_Closure_L(), jif$L);
+            ok = ok && PrincipalUtil._equivalentTo(c.jif$getjif_lang_Closure_P(), jif$P);
+            ok = ok && LabelUtil.singleton()._equivalentTo(c.jif$getjif_lang_Closure_L(), jif$L);
             return ok;
         }
         return false;

@@ -606,11 +606,11 @@ public class LabelUtil
     
     
     
-    public static boolean equivalentTo(Label l1, Label l2) {
+    public static boolean _equivalentTo(Label l1, Label l2) {
         try {
             singleton().enterTiming();
             if (l1 == l2 || (l1 != null && l1.equals(l2))) return true;
-            return relabelsTo(l1, l2) && relabelsTo(l2, l1);
+            return _relabelsTo(l1, l2) && _relabelsTo(l2, l1);
         }
         finally {
             singleton().exitTiming();
@@ -621,7 +621,7 @@ public class LabelUtil
         try {
             enterTiming();
             Label L = toLabel(PrincipalUtil.readableByPrinPolicy(p));
-            return relabelsTo(lbl, L);
+            return _relabelsTo(lbl, L);
         }
         finally {
             exitTiming();
@@ -632,7 +632,7 @@ public class LabelUtil
         try {
             enterTiming();
             Label L = toLabel(PrincipalUtil.writableByPrinPolicy(p));
-            return relabelsTo(L, lbl);
+            return _relabelsTo(L, lbl);
         } finally {
             exitTiming();
         }
@@ -641,7 +641,7 @@ public class LabelUtil
     /**
      * @return true iff from <= to in the information-flow ordering.
      */
-    public static boolean relabelsTo(Label from, Label to) {
+    public static boolean _relabelsTo(Label from, Label to) {
         LabelUtil s = singleton();
         try {
             s.enterTiming();
@@ -679,7 +679,7 @@ public class LabelUtil
         }
     }
     
-    public static boolean acts_for(Label actor, Principal granter) {
+    public static boolean _actsFor(Label actor, Principal granter) {
         try {
             singleton().enterTiming();
             return actsFor(actor, granter);
@@ -692,13 +692,13 @@ public class LabelUtil
         try {
             singleton().enterTiming();
             Label L = singleton().toLabel(singleton().TOP_CONF, singleton().writerPolicy(granter, granter));
-            return relabelsTo(actor, L);
+            return _relabelsTo(actor, L);
         } finally {
             singleton().exitTiming();
         }
     }
 
-    public static boolean enforces(Principal actor, Label policy) {
+    public static boolean _enforces(Principal actor, Label policy) {
         LabelUtil s = singleton();
         return s.isReadableBy(policy, actor) && s.isWritableBy(policy, actor);
     }

@@ -251,9 +251,9 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 ParamInstance pi = (ParamInstance)iter.next();
                 String paramFieldName = ParamToJavaExpr_c.paramFieldName(pi);
                 String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
-                String comparison = "equivalentTo";
+                String comparison = "_equivalentTo";
                 if (pi.isCovariantLabel()) {
-                    comparison = "relabelsTo";
+                    comparison = "_relabelsTo";
                 }
     
                 sb.append(moreThanOneParam?"ok = ok && ":"return ");

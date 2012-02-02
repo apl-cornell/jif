@@ -12,15 +12,15 @@ public class PrincipalUtil {
     /**
      * Does the principal p act for the principal q? 
      */
-    public static native boolean{p;q;q←} acts_for(Principal p, Principal q);
+    public static native boolean{p;q;q←} _actsFor(Principal p, Principal q);
 
     /**
      * Are the principals p and q equivalent to each other? That is,
      * does p act for q, and q act for p?
      * 
      */
-    public static boolean{p;q;p←;q←} equivalentTo(Principal p, Principal q) {
-        return acts_for(p, q) && acts_for(q, p);
+    public static boolean{p;q;p←;q←} _equivalentTo(Principal p, Principal q) {
+        return _actsFor(p, q) && _actsFor(q, p);
     }
 
     /**

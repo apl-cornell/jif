@@ -24,8 +24,8 @@ public final class Capability {
         if (o instanceof Capability) {
             Capability c = (Capability) o;
             boolean ok = true;
-            ok = ok && PrincipalUtil.equivalentTo(c.jif$jif_lang_Capability_P, jif$P);
-            ok = ok && LabelUtil.singleton().equivalentTo(c.jif$jif_lang_Capability_L, jif$L);
+            ok = ok && PrincipalUtil._equivalentTo(c.jif$jif_lang_Capability_P, jif$P);
+            ok = ok && LabelUtil.singleton()._equivalentTo(c.jif$jif_lang_Capability_L, jif$L);
             return ok;
         }
         return false;
