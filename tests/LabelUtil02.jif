@@ -24,13 +24,13 @@ public class LabelUtil02
 
             final label lb4 = new label {Alice!:Alice; Alice!:Bob}; 
             out.println("Label4 is " + LabelUtil.singleton().stringValue(lb4));
-            out.println("Label1 is equivalent to Label4? " + LabelUtil.singleton().equivalentTo(lb, lb4));
-            out.println("Label1 relabels to Label4? " + LabelUtil.singleton().relabelsTo(lb, lb4));
+            out.println("Label1 is equivalent to Label4? " + LabelUtil.singleton()._equivalentTo(lb, lb4));
+            out.println("Label1 relabels to Label4? " + LabelUtil.singleton()._relabelsTo(lb, lb4));
             
             final label lb5 = new label{Alice!:};
             out.println("Label5 is " + LabelUtil.singleton().stringValue(lb5));
-            out.println("Label5 relabels to Label1? " + LabelUtil.singleton().relabelsTo(lb5, lb));
-            out.println("Label1 relabels to Label5? " + LabelUtil.singleton().relabelsTo(lb, lb5));
+            out.println("Label5 relabels to Label1? " + LabelUtil.singleton()._relabelsTo(lb5, lb));
+            out.println("Label1 relabels to Label5? " + LabelUtil.singleton()._relabelsTo(lb, lb5));
         }
         catch (NullPointerException ignored) { }
     }

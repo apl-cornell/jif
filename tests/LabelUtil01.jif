@@ -24,8 +24,8 @@ public class LabelUtil01
 
             final label lb4 = new label {Alice:Alice; Alice:Bob}; 
             out.println("Label4 is " + LabelUtil.singleton().stringValue(lb4));
-            out.println("Label1 is equivalent to Label4? " + LabelUtil.singleton().equivalentTo(lb, lb4));
-            out.println("Label1 relabels to Label4? " + LabelUtil.singleton().relabelsTo(lb, lb4));
+            out.println("Label1 is equivalent to Label4? " + LabelUtil.singleton()._equivalentTo(lb, lb4));
+            out.println("Label1 relabels to Label4? " + LabelUtil.singleton()._relabelsTo(lb, lb4));
             
         }
         catch (NullPointerException ignored) { }

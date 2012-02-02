@@ -17,10 +17,10 @@ public class PrincipalUtil01
             PrintStream[{pp:;_!:_}] out = runtime.out();
             out.println("nullP is " + PrincipalUtil.toString(nullP));
             out.println("stupid1 is " + PrincipalUtil.stringValue(stupid1));
-            out.println("stupid1 actsfor stupid2? " + PrincipalUtil.acts_for(stupid1, stupid2));
-            out.println("stupid2 actsfor stupid1? " + PrincipalUtil.acts_for(stupid2, stupid1));
-            out.println("stupid1 actsfor nullP " + PrincipalUtil.acts_for(stupid1, nullP));
-            out.println("stupid1 actsfor stupid3? " + PrincipalUtil.acts_for(stupid1, stupid3));
+            out.println("stupid1 actsfor stupid2? " + PrincipalUtil._actsFor(stupid1, stupid2));
+            out.println("stupid2 actsfor stupid1? " + PrincipalUtil._actsFor(stupid2, stupid1));
+            out.println("stupid1 actsfor nullP " + PrincipalUtil._actsFor(stupid1, nullP));
+            out.println("stupid1 actsfor stupid3? " + PrincipalUtil._actsFor(stupid1, stupid3));
 
             ActsForProof prf = PrincipalUtil.findActsForProof(stupid1, stupid2, null);
             out.println("proof between stupid1 and stupid2 verified? " + PrincipalUtil.verifyProof(prf, stupid1, stupid2));
@@ -54,7 +54,7 @@ class StupidPrincipal extends AbstractPrincipal {
 }
 
 
-//public static boolean{p;q} equivalentTo(Principal p, Principal q) {//public static native ActsForProof findActsForProof(Principal p, Principal q);
+//public static boolean{p;q} _equivalentTo(Principal p, Principal q) {//public static native ActsForProof findActsForProof(Principal p, Principal q);
 //public static native Capability[p, lb]{p; authPrf; c; lb} 
 //            authorize(principal p, Object authPrf, Closure[p, lb] c, label lb);
 //            
