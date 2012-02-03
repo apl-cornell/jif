@@ -17,7 +17,9 @@ import polyglot.frontend.goals.Disambiguated;
 import static polyglot.ast.Binary.GE;
 import static polyglot.ast.Binary.LE;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
+import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.SupertypeDisambiguator;
 import polyglot.visit.TypeChecker;
 
@@ -89,6 +91,25 @@ public class JifBinaryDel extends JifJL_c
         return super.typeCheck(tc);
     }
 
+    
+    /**
+     * Returns the appropriate type for the new Jif binary operators.  Assumes
+     * that the expression has been typechecked. 
+     */
+    public Type expectedChildType(Expr child, AscriptionVisitor av) {
+        
+        JifMethodInstance method = equivalentMethod((JifTypeSystem) av.typeSystem(), node().operator());
+        
+        if (method == null)
+            return node().childExpectedType(child, av);
+        else if (child == node().left())
+            return (Type) method.formalTypes().get(0);
+        else if (child == node().right())
+            return (Type) method.formalTypes().get(1);
+        else
+            throw new InternalCompilerError("child must be left() or right()");
+    }
+    
     /**
      * Label and principal comparisons are translated to static method calls.
      * This  function returns the appropriate type information for the generated
