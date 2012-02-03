@@ -38,21 +38,21 @@ public class SubtypeChecker
     }
     /** Check that subtype <= supertype */
     protected void addSubtypeConstraints(LabelChecker lc, Position pos,
-            Type supertype, Type subtype) throws SemanticException
-            {
+            Type supertype, Type subtype) throws SemanticException {
         // make sure that we take the top level labels off the types
         JifTypeSystem ts = lc.jifTypeSystem();
         supertype = ts.unlabel(supertype);
-        subtype = ts.unlabel(subtype);                
+        subtype = ts.unlabel(subtype);
 
         if (Report.should_report(Report.types, 1))
-            Report.report(1, "Adding subtype constraints: " + supertype + " >= " + subtype);
+            Report.report(1, "Adding subtype constraints: " + supertype
+                    + " >= " + subtype);
 
-        if (! recursiveAddSubtypeConstraints(lc, pos, supertype, subtype, false)) {
-            throw new SemanticException(subtype + " is not a subtype of " +
-                                        supertype + ".", pos);
+        if (!recursiveAddSubtypeConstraints(lc, pos, supertype, subtype, false)) {
+            throw new SemanticException(subtype + " is not a subtype of "
+                    + supertype + ".", pos);
         }
-            }
+    }
 
     private Label label(Param param, Position pos) throws SemanticException {
         if (param instanceof Label) {
