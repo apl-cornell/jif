@@ -404,14 +404,14 @@ OctalEscape = \\ [0-7]
     {WhiteSpace}                 { /* ignore */ }
     
     /* Jif extensions */
-    "⊓" { return op(sym.MEET); }
-    "⊔" { return op(sym.JOIN); }
-    "←" { return op(sym.LEFTARROW); }
-    "→" { return op(sym.RIGHTARROW); }
-    "⊤" { return op(sym.TOP);      }
-    "⊥" { return op(sym.BOTTOM);   }
-    "≽" { return op(sym.TRUST_GTEQ);  }
-    "⊑" { return op(sym.INFO_LTEQ);   }
+    "\u2293" { return op(sym.MEET); }
+    "\u2294" { return op(sym.JOIN); }
+    "\u2190" { return op(sym.LEFTARROW); }
+    "\u2192" { return op(sym.RIGHTARROW); }
+    "\u22a4" { return op(sym.TOP);      }
+    "\u22a5" { return op(sym.BOTTOM);   }
+    "\u227d" { return op(sym.TRUST_GTEQ);  }
+    "\u2291" { return op(sym.INFO_LTEQ);   }
 }
 
 <TRADITIONAL_COMMENT> {
