@@ -3,6 +3,8 @@ package jif.visit;
 import java.util.ArrayList;
 import java.util.List;
 
+import jif.ast.JifConstructorDecl;
+
 import polyglot.ast.Block;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorDecl;
@@ -12,6 +14,7 @@ import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
+import polyglot.types.Flags;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -34,14 +37,16 @@ public class NativeConstructorAdder extends NodeVisitor {
     
     @Override
     public Node override(Node n) {
-        if (n instanceof ConstructorDecl) {
-            ConstructorDecl decl = (ConstructorDecl) n;
+        if (n instanceof JifConstructorDecl) {
+            JifConstructorDecl decl = (JifConstructorDecl) n;
             ClassType       ct   = decl.constructorInstance().container().toClass();
             
             if (decl.body() == null) {
                 ConstructorCall dummy = dummyCall(ct);
-                Block superCall = nf.Block(Position.COMPILER_GENERATED, dummy); 
-                return decl.body(superCall);
+                Block superCall = nf.Block(Position.COMPILER_GENERATED, dummy);
+                Flags flags = decl.constructorInstance().flags().clearNative();
+                decl.constructorInstance().setFlags(flags);
+                return ((JifConstructorDecl) decl.body(superCall)).flags(flags);
             }
             else
                 return decl;
