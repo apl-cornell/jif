@@ -812,6 +812,9 @@ override constructor_body ::=
             {: RESULT = parser.nf.Block(parser.pos(x,y),
                 parser.nf.SuperCall(parser.pos(x),
                 Collections.EMPTY_LIST)); :}
+    |   SEMICOLON
+            {: RESULT = null; :}
+    
     ;
 
 explicit_super_constructor_invocation ::=

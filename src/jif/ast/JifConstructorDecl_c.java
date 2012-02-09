@@ -289,6 +289,10 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             boolean allowThisCalls,
             boolean superCallMustBeDefault) 
     throws SemanticException {
+        if (body == null) {
+            // this must be a native constructor.
+            return;
+        }
         if (body().statements().size() < 1) {
             throw new SemanticException("Empty constructor body.", position());
         }

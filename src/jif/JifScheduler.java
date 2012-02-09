@@ -173,6 +173,20 @@ public class JifScheduler extends JLScheduler {
         Goal g = super.Serialized(job);
         try {
             addPrerequisiteDependency(g, this.LabelsChecked(job));
+            addPrerequisiteDependency(g, this.NativeConstructorsAdded(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
+    }
+    
+    public Goal NativeConstructorsAdded(Job job) {
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = internGoal(new VisitorGoal(job, new NativeConstructorAdder(nf)));
+        
+        try {
+            addPrerequisiteDependency(g, this.TypeChecked(job));
         }
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
