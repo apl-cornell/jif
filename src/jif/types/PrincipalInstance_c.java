@@ -25,13 +25,6 @@ public class PrincipalInstance_c extends VarInstance_c implements PrincipalInsta
 	n.principal = principal;
 	return n;
     }
-    
-    //  XXX: What benefit does this hashCode implementation give?
-    //  This causes collisions with varinstances from different scopes
-    public int hashCode() {
-      return flags.hashCode() + name.hashCode();
-    }
-
 
     public String toString() {
 	return "principal " + name();

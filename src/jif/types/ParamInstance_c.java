@@ -39,12 +39,6 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
 	return false;
     }
 
-    // XXX: What benefit does this hashCode implementation give?
-    // This causes collisions with varinstances from different scopes
-    public int hashCode() {
-        return flags.hashCode() + name.hashCode();
-    }
-
     public ParamInstance container(JifClassType container) {
 	ParamInstance_c n = (ParamInstance_c) copy();
 	n.container = container;
