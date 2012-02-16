@@ -264,22 +264,17 @@ public class JifContext_c extends Context_c implements JifContext
         // don't bother copying the environment, as we'll be
         // propogating it upwards anyway.
         // envModification();
-        
         this.addEquiv(p1, p2);
         JifContext_c jc = this;
         LabelEnv_c lastEnvAddedTo = env;
-        
-        // TODO: I added this != null check without understanding the code - it
-        // fixed the problem I was working on, but I don't know why it's right.
-        //  - mdg
-        while (jc != null && !jc.isCode()) {
+        while (!jc.isCode()) {
             jc = (JifContext_c)jc.pop();
             if (jc != null && jc.scope == this.scope && jc.env != lastEnvAddedTo) {
                 // only add to env we haven't seen yet, and
                 // envs in the scope of the same class as us.
                 jc.env.addEquiv(p1, p2);
                 lastEnvAddedTo = jc.env;
-            }
+            }            
         }
     }
 

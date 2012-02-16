@@ -157,6 +157,13 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             // bound the this label.
             JifClassType jct = (JifClassType)A.currentClass();
             A.addAssertionLE(jct.thisLabel(), ts.bottomLabel());
+            
+            // Lookup all final access paths reachable and add them to the
+            // environment if they have constant initializers
+            if (fi.flags().isFinal()) {
+                AccessPathField path = (AccessPathField) JifUtil.varInstanceToAccessPath(fi, fi.position());
+                JifUtil.processFAP(fi, path, A, ts, lc);
+            }
 
             if (fi.flags().isFinal() && JifUtil.isFinalAccessExprOrConst(ts, init)) { 
                 if (ts.isLabel(fi.type())) {
@@ -225,13 +232,6 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         else {
             // There is no PC label at field nodes.
             Xd = ts.pathMap();
-        }
-        
-        // Lookup all final access paths reachable and add them to the
-        // environment if they have constant initializers
-        if (fi.flags().isFinal()) {
-            AccessPathField path = (AccessPathField) JifUtil.varInstanceToAccessPath(fi, fi.position());
-            JifUtil.processFAP(fi, path, A, ts, lc);
         }
         
         decl = (FieldDecl) updatePathMap(decl.init(init), Xd);
