@@ -298,9 +298,9 @@ public abstract class AbstractSolver implements Solver {
             setStatus(STATUS_NO_SOLUTION);
             for (Iterator<Equation> iter = staticFailedConstraints.iterator(); iter.hasNext();) {
                 UnsatisfiableConstraintException ex = reportError(iter.next());
+                // generate error report for all exceptions
+                genFlowMessage(ex);
                 if (!iter.hasNext()) {
-                    // handle and throw the last one
-                    genFlowMessage(ex);
                     throw ex;
                 }
                 // add all but the last to the queue.

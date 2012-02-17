@@ -145,10 +145,14 @@ public class LabelFlowGraph extends Graph {
 //        }
                 
         public String getName () {
+            if (label==null)
+                System.out.println("NULL!!");
             if (label instanceof VarLabel)
-                return ((VarLabel)label).name()+"@"+label.position().toString();
+                return ((VarLabel)label).name()+
+                    (label.position()==null?"":"@"+label.position().toString());
             else {
-                return (label.description()==null?"":label.description())+label.toString()+"@"+label.position().toString();
+                return (label.description()==null?"":label.description())+label.toString()+
+                (label.position()==null?"":"@"+label.position().toString());
             }
         }
         
@@ -319,13 +323,13 @@ public class LabelFlowGraph extends Graph {
             }
 
             // next, handle the provable flows
-            for (Label component : sourceset) {
-                if (jiferror.failedConstraint.env().leq(
-                        jiferror.bounds.applyTo(lbl),
-                        jiferror.bounds.applyTo(component))) {
-                    addEdge(getNode(lbl), getNode(component), staticEdge);
-                }
-            }
+//            for (Label component : sourceset) {
+//                if (jiferror.failedConstraint.env().leq(
+//                        jiferror.bounds.applyTo(lbl),
+//                        jiferror.bounds.applyTo(component))) {
+//                    addEdge(getNode(lbl), getNode(component), staticEdge);
+//                }
+//            }
        }
         
         generated = true;
@@ -356,9 +360,9 @@ public class LabelFlowGraph extends Graph {
                 int linenum = 1;
                 ret += "source [shape=box, label=\"";
                 while (line != null) {
-                    if (v.getSourcePosition().contains(linenum)) {
+//                    if (v.getSourcePosition().contains(linenum)) {
                         ret += linenum + ":\t" + sanitaze(line) + "\\l";
-                    }
+//                    }
                     line = reader.readLine();
                     linenum++;
                 }
@@ -385,7 +389,7 @@ public class LabelFlowGraph extends Graph {
     public void showErrorPath () {
         FailedConstraintSnapshot snapshot = jiferror;
         boolean detail = shouldReport(detailedMessage);
-        
+                
         if (!generated) generateGraph();
         
         if (snapshot.failedConstraint instanceof LabelEquation) {
