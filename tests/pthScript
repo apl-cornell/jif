@@ -53,8 +53,8 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	ActsFor13.jif ;
 	ActsFor14.jif ;
 	ActsFor15.jif (Semantic, "not less restrictive");
-	ActsFor16.jif (Semantic, "requires both operands to be principals");
-	ActsFor16b.jif (Semantic, "requires both operands to be principals");
+	ActsFor16.jif (Semantic, "left-hand side of the actsfor must be a");
+	ActsFor16b.jif (Semantic, "right-hand side of the actsfor must be a principal");
 	ActsFor16c.jif ;
 	ActsFor17.jif (Semantic, "Non-final local variable"),
 		      (Semantic, "Non-final local variable");
@@ -72,9 +72,9 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Array4.jif ;
 	Array5.jif ;
 	Array6.jif (Semantic, "not less restrictive"), ();
-	Array7.jif (Semantic, "not less restrictive");
+	Array7.jif (Semantic, "is not a subtype of");
 	Array8.jif (Semantic, "not less restrictive"), ();
-	Array9.jif (Semantic, "not less restrictive");
+	Array9.jif (Semantic, "is not a subtype of");
 	Array10.jif ;
 	Array11.jif ;
 	Array12.jif (Semantic, "not a subtype");
