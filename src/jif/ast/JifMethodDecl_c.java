@@ -167,12 +167,6 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         } 
         else {
             Li = n.startLabel().label();
-
-            // Automagically ensure that the begin label is at least as high as
-            // the provider label. This ensures that code will be unable to
-            // affect data that the provider is not trusted to affect. It also
-            // ensures the behaviour of confidential code will not be leaked.
-            Li = jts.join(Li, jmi.provider());
         }
         jmi.setPCBound(Li, isDefaultPCBound);
 

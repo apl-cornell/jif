@@ -46,6 +46,8 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
         A = (JifContext) mn.del().enterScope(A);
+        Label providerAndPc = ts.join(A.pc(), A.provider());
+        A.setPc(providerAndPc, lc);
         lc = lc.context(A);
 
         // let the label checker know that we are about to enter a method decl
