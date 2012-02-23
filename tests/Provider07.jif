@@ -1,0 +1,10 @@
+/**
+ * This should compile with trusted providers, but not with untrusted providers.
+ */
+public class Provider07[label L] {
+  int{*L} x;
+  void m{*L}() {
+    x = 0;
+  }
+}
+
