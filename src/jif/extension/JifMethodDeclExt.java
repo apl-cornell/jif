@@ -32,6 +32,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
     @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
+
         JifMethodDecl mn = (JifMethodDecl) node();
         JifMethodInstance renamedMI = (JifMethodInstance) mn.methodInstance();
         JifMethodInstance mi = JifMethodDecl_c.unrenameArgs(renamedMI);
@@ -46,13 +47,11 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
         A = (JifContext) mn.del().enterScope(A);
-        Label providerAndPc = ts.join(A.pc(), A.provider());
-        A.setPc(providerAndPc, lc);
         lc = lc.context(A);
 
         // let the label checker know that we are about to enter a method decl
         lc.enteringMethod(mi);
-
+        
         // First, check the arguments, and adjust the context.
         Label Li = checkEnforceSignature(mi, lc);
 
@@ -66,6 +65,11 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         if (! mi.flags().isAbstract() && ! mi.flags().isNative()) {
             // Now, check the body of the method in the new context.
 
+            // join the provider label into the pc
+            A = lc.context();
+            Label providerAndPc = ts.join(A.pc(), A.provider());
+            A.setPc(providerAndPc, lc);
+            
             // Visit only the body, not the formal parameters.
             body = (Block) lc.context(A).labelCheck(mn.body());
             X = getPathMap(body);
