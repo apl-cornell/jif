@@ -81,7 +81,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         constrainLabelEnv(mi, A, null);
 
         checkProviderAuthority(mi, lc);
-        checkBeginLabel(mi, lc);
         checkConstraintVariance(mi, lc);
 
         // check that any autoendorse constraints are satisfied,
@@ -125,41 +124,6 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                 }
             }
         }
-    }
-
-    /**
-     * Ensures that the procedure instance's begin label is at least as
-     * restrictive as the class provider. This ensures that code will be unable
-     * to affect data that the provider is not trusted to affect and that the
-     * behaviour of confidential code will not be leaked.
-     */
-    protected void checkBeginLabel(JifProcedureInstance jpi, LabelChecker lc)
-            throws SemanticException {
-        JifContext context = lc.jifContext();
-        final Label beginLabel = jpi.pcBound();
-        final NamedLabel namedBeginLabel =
-                new NamedLabel("pc_bound", "begin pc label", beginLabel);
-        final ProviderLabel provider = jpi.provider();
-        final NamedLabel namedProvider =
-                new NamedLabel("provider", "provider of "
-                        + provider.classType().fullName(), provider);
-        
-        lc.constrain(namedProvider, LabelConstraint.LEQ, namedBeginLabel,
-                context.labelEnv(), beginLabel.position(),
-                new ConstraintMessage() {
-                    @Override
-                    public String msg() {
-                        return "The method body might leak information about "
-                            + "the code, or might affect information that the "
-                            + "class provider is not allowed to affect.";
-                    }
-
-                    @Override
-                    public String detailMsg() {
-                        return "The begin label on the method must be at least "
-                            + "as restrictive as the class provider.";
-                    }
-                });
     }
 
     protected Label checkAutoEndorseConstrainPC(JifProcedureInstance mi, LabelChecker lc) throws SemanticException {
