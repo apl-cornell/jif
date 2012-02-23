@@ -123,7 +123,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
             s += c.componentString(printedLabels);
             
             if (i.hasNext()) {
-                s += "; ";
+                s += " ⊔ ";
             }
         }
         

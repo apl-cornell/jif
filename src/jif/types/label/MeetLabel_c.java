@@ -119,7 +119,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
             s += c.toString(printedLabels);
 
             if (i.hasNext()) {
-                s += " meet ";
+                s += " ⊓ ";
             }
         }
         
