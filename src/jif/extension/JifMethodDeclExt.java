@@ -67,8 +67,8 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 
             // join the provider label into the pc
             A = lc.context();
-            Label providerAndPc = ts.join(A.pc(), A.provider());
-            A.setPc(providerAndPc, lc);
+            Label providerAndPc = ts.join(A.currentCodePCBound(), A.provider());
+            A.setCurrentCodePCBound(providerAndPc);
             
             // Visit only the body, not the formal parameters.
             body = (Block) lc.context(A).labelCheck(mn.body());
