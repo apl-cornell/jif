@@ -14,11 +14,13 @@ class DirLookup[label L] {
 // fact communicate new information. Problem is that we have no way to capture
 // that. The language seems to need tuples or some way to say that
 // LookupResults are special and can *only* be distinguished via their fields.
-// If we write the code using a while loop, a different problem bites us. We
-// can pull the LookupResult creation out to the top so its pointer is
-// untainted, but we need to be able to assign 'final' variables (e.g., the
-// accumulated label) on each loop iteration.  The Jif compiler needs to do
-// some kind of SSA conversion to allow these assignments to be done soundly.
+//
+// If we write the code using a while loop (see lookup2), a different problem
+// bites us. We can pull the LookupResult creation out to the top so its
+// pointer is untainted, but we need to be able to assign 'final' variables
+// (e.g., the accumulated label) on each loop iteration.  The Jif compiler
+// needs to do some kind of SSA conversion to allow these assignments to be
+// done soundly.
 
 /*
 	static LookupResult{*prev; *lb} lookup{*lb}(DirNode{*lb} d, DirPath[L]{*lb} path, int i, label{*lb} lb, label{*lb} prev)
@@ -44,7 +46,6 @@ class DirLookup[label L] {
 			return new LookupResult(retl, null);
 		}
 	}
-*/
 
 	static LookupResult{*lb; L} lookup2{*lb}(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path)
 	{
@@ -83,6 +84,12 @@ class DirLookup[label L] {
 
 		return new LookupResult(retl, o); // ok if invariant holds
 	}
+*/
+    // Idea (suggested by Steve Chong): compute the label first, then extract the value while testing
+    //  at every level whether the label is high enough.
+	static LookupResult{*lb; L} lookup3{*lb}(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path) {
+
+    }
 
 }
 // vim: ts=4 sw=4
