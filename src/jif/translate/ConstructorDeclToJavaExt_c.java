@@ -49,7 +49,7 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
                 List formals = new ArrayList(n.formals().size() + 2);
                 if (ci.container() instanceof JifPolyType) {
                     JifPolyType jpt = (JifPolyType)ci.container();
-                    formals.addAll(ClassDeclToJavaExt_c.produceParamFormals(jpt, rw, false));
+                    formals.addAll(ClassDeclToJavaExt_c.produceParamFormals(jpt, rw));
                 }
                 formals.addAll(n.formals());
                 n = rw.java_nf().ConstructorDecl(n.position(), 

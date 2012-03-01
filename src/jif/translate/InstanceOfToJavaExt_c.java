@@ -16,7 +16,7 @@ import polyglot.types.Type;
 import polyglot.visit.NodeVisitor;
 
 public class InstanceOfToJavaExt_c extends ToJavaExt_c {
-    private Type compareType;
+    protected Type compareType;
 
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
         Instanceof io = (Instanceof)this.node();

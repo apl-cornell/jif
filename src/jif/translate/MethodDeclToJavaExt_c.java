@@ -51,7 +51,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
         // for static methods, add args for the params of the class
         if (mi.flags().isStatic() && mi.container() instanceof JifPolyType) {
             JifPolyType jpt = (JifPolyType)mi.container();
-            formals.addAll(ClassDeclToJavaExt_c.produceParamFormals(jpt, rw, false));
+            formals.addAll(ClassDeclToJavaExt_c.produceParamFormals(jpt, rw));
         }
 
         formals.addAll(n.formals());
