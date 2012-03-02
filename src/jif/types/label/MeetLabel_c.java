@@ -165,32 +165,34 @@ public class MeetLabel_c extends Label_c implements MeetLabel
             return (Label)components.iterator().next();
         }
         // if there is more than one PairLabel, combine them.
-        JifTypeSystem ts = (JifTypeSystem)typeSystem();
-        PairLabel pl = null;
-        boolean combinedPL = false;
-        Set nonPairLabels = new LinkedHashSet();
-        for (Iterator iter = meetComponents().iterator(); iter.hasNext();) {
-            Label lbl = (Label)iter.next();
-            if (lbl instanceof PairLabel) {
-                PairLabel p = (PairLabel)lbl;
-                if (pl == null) {
-                    pl = p;
-                }
-                else {
-                    combinedPL = true;
-                    pl = ts.pairLabel(position(),
-                                      pl.confPolicy().meet(p.confPolicy()),
-                                      pl.integPolicy().meet(p.integPolicy()));                    
-                }
-            }
-            else {
-                nonPairLabels.add(lbl);
-            }
-        }
-        if (combinedPL) {
-            nonPairLabels.add(pl);
-            return ts.meetLabel(position(), nonPairLabels);
-        }
+        // Don't simplify these labels since the solver isn't smart enough
+        // to reason about 'simplified' labels.
+//        JifTypeSystem ts = (JifTypeSystem)typeSystem();
+//        PairLabel pl = null;
+//        boolean combinedPL = false;
+//        Set nonPairLabels = new LinkedHashSet();
+//        for (Iterator iter = meetComponents().iterator(); iter.hasNext();) {
+//            Label lbl = (Label)iter.next();
+//            if (lbl instanceof PairLabel) {
+//                PairLabel p = (PairLabel)lbl;
+//                if (pl == null) {
+//                    pl = p;
+//                }
+//                else {
+//                    combinedPL = true;
+//                    pl = ts.pairLabel(position(),
+//                                      pl.confPolicy().meet(p.confPolicy()),
+//                                      pl.integPolicy().meet(p.integPolicy()));                    
+//                }
+//            }
+//            else {
+//                nonPairLabels.add(lbl);
+//            }
+//        }
+//        if (combinedPL) {
+//            nonPairLabels.add(pl);
+//            return ts.meetLabel(position(), nonPairLabels);
+//        }
         return this;
     }
     /**
