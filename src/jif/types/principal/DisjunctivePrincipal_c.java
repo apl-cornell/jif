@@ -19,7 +19,7 @@ public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePr
         super(ts, pos, toJava);
         this.disjuncts = new LinkedHashSet(disjuncts);
         if (disjuncts.size() < 2) {
-            throw new InternalCompilerError("ConjunctivePrincipal should " +
+            throw new InternalCompilerError("DisjunctivePrincipal should " +
                         "have at least 2 members");
         }
     }
