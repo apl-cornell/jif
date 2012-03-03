@@ -1,0 +1,29 @@
+
+class DynPrin17 {
+	public
+	void
+	f
+	{
+		{*→o.p}
+	}
+	(
+		C o,
+		int y
+	)
+	where
+		{o;y} <= {*→o.p}
+	{
+		if (o != null)
+			o.x = y;
+	}
+}
+
+class C {
+	public final principal p;
+	public int {*→this.p} x;
+
+	public C () {
+		p = null;
+		x = 0;
+	}
+}
