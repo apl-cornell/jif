@@ -526,14 +526,16 @@ public class CallHelper {
                                                 "lower bound on the side effects of the method " + callee.signature(),
                                                 Li);
 
-            lc.constrain(new NamedLabel("pc_call",
-                                        "label of the program counter at this call site",
-                                        Xjoin.N()),
-                        LabelConstraint.LEQ,
-                        namedLi,
-                        A.labelEnv(),
-                        position,
-                        new ConstraintMessage() {
+            NamedLabel namedPc = new NamedLabel("pc",
+                                                "label of the program counter at this call site",
+                                                ts.join(Xjoin.N(), A.currentCodePCBound()));
+            
+            lc.constrain(namedPc,
+                         LabelConstraint.LEQ,
+                         namedLi,
+                         A.labelEnv(),
+                         position,
+                         new ConstraintMessage() {
                 @Override
                 public String msg() {
                     return "PC at call site more restrictive than " +
@@ -550,40 +552,6 @@ public class CallHelper {
                     namedRhs() + ". However, execution reaching " +
                     "this program point may depend on information " +
                     "up to the PC at this program point: " +
-                    namedLhs() + ".";
-                }
-
-                @Override
-                public String technicalMsg() {
-                    return "Invalid method call: " + namedLhs() +
-                    " is more restrictive than " +
-                    "the callee's begin label.";
-                }
-            }
-            );
-            lc.constrain(new NamedLabel("caller_PC_bound",
-                                        "lower bound on the side effects of caller",
-                                        A.currentCodePCBound()),
-                        LabelConstraint.LEQ,
-                        namedLi,
-                        A.labelEnv(),
-                        position,
-                        new ConstraintMessage() {
-                @Override
-                public String msg() {
-                    return "The side effects of " + callee.signature() +
-                    " are not bounded by the PC bound.";
-                }
-
-                @Override
-                public String detailMsg() {
-                    return "Calling the method here may have side effects " +
-                    "that are not bounded below by the PC bound of the " +
-                    "caller. The side effects of the method to be " +
-                    "invoked are bounded below by the callee's " +
-                    "begin label, " + namedRhs() +
-                    ". However, the side effects of the calling context must " +
-                    "be bounded below by the caller's begin label " +
                     namedLhs() + ".";
                 }
 
