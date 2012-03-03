@@ -88,8 +88,15 @@ public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePr
         Principal disjunct = (Principal) it.next();
         substDisjuncts.add(disjunct.subst(substitution));
       }
-      
-      return new DisjunctivePrincipal_c(substDisjuncts, (JifTypeSystem) ts,
-          position(), toJava);
+      if (substDisjuncts.size() > 1) {
+          return new DisjunctivePrincipal_c(substDisjuncts, (JifTypeSystem) ts,
+                  position(), toJava);
+      } 
+      else if (substDisjuncts.size() == 1) {
+          return (Principal) substDisjuncts.iterator().next();          
+      }
+      else {
+          throw new InternalCompilerError("No principals left after substitution.");
+      }
     }
 }

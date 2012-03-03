@@ -149,9 +149,18 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
         Principal conjunct = (Principal) it.next();
         substConjuncts.add(conjunct.subst(substitution));
       }
-      
-      return new ConjunctivePrincipal_c(substConjuncts, (JifTypeSystem) ts,
-          position(), toJava);
+            
+      if (substConjuncts.size() > 1) {
+          return new ConjunctivePrincipal_c(substConjuncts, (JifTypeSystem) ts,
+                  position(), toJava);
+      } 
+      else if (substConjuncts.size() == 1) {
+          return (Principal) substConjuncts.iterator().next();          
+      }
+      else {
+          throw new InternalCompilerError("No principals left after substitution.");
+      }
+
     }
     
 }
