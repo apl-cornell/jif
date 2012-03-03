@@ -314,61 +314,67 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         //Hack: If no other paths, the procedure must return. Therefore,
         //X.n is not taken, and X.r doesn't contain any information. 
         //TODO: implement a more precise single-path rule.
-        if (! (X.N() instanceof NotTaken)) {
-            boolean singlePath = true;
-            for (Path p : X.paths()) {
-                if (p.equals(Path.N) || p.equals(Path.R)) continue;
-                singlePath = false;
-                break;
-            }
-            if (singlePath) {
-                X = X.N(ts.notTaken());
-                X = X.R(ts.bottomLabel());
-            }
-        }            
-
-        lc.constrain(new NamedLabel("X.n",
-                                    "information that may be gained by the body terminating normally",
-                                    X.N()).
-                                    join(lc,
-                                         "X.r",
-                                         "information that may be gained by exiting the body with a return statement",
-                                         X.R()),
-                     LabelConstraint.LEQ,
-                     new NamedLabel("Lr", 
-                                    "return label of the method",
-                                    Lr),
-                    A.labelEnv(),
-                    mn.position(),
-                    new ConstraintMessage()
-        {
-            @Override
-            public String msg() { 
-                return "The non-exception termination of the " +
-                "method body may reveal more information " +
-                "than is declared by the method return label.";
-            }
-            @Override
-            public String detailMsg() { 
-                return "The method return label, " + namedRhs() + 
-                ", is an upper bound on how much " +
-                "information can be gained by observing " +
-                "that this method terminates normally " +
-                "(i.e., terminates without throwing " +
-                "an exception). The method body may " +
-                "reveal more information than this. The " +
-                "return label of a method is declared " +
-                "after the variables, e.g. " +
-                "\"void m(int i):{" + namedRhs() + "}\".";
-            }
-            @Override
-            public String technicalMsg() {
-                return "the return (end) label is less restricted than " +
-                namedLhs() + " of the body.";
-            }
+        //XXX: Somewhat experimental commenting of this check.
+        // Why was is only considering methods that exited normally without
+        // return statements?
+        // if (! (X.N() instanceof NotTaken)) {
+        boolean singlePath = true;
+        for (Path p : X.paths()) {
+            if (p.equals(Path.N) || p.equals(Path.R)) continue;
+            singlePath = false;
+            break;
         }
-        );
-
+//      }        
+        if (singlePath) {
+            X = X.N(ts.notTaken());
+            X = X.R(ts.bottomLabel());
+        } 
+        else {
+            lc.constrain(new NamedLabel("X.n",
+                                        "information that may be gained by the body terminating normally",
+                                        X.N()).
+                                        join(lc,
+                                             "X.r",
+                                             "information that may be gained by exiting the body with a return statement",
+                                             X.R()).join(lc, 
+                                                         "Li", 
+                                                         "Lower bound for method output", 
+                                                         A.currentCodePCBound()),
+                         LabelConstraint.LEQ,
+                         new NamedLabel("Lr", 
+                                        "return label of the method",
+                                        Lr),
+                        A.labelEnv(),
+                        mn.position(),
+                        new ConstraintMessage()
+            {
+                @Override
+                public String msg() { 
+                    return "The non-exception termination of the " +
+                    "method body may reveal more information " +
+                    "than is declared by the method return label.";
+                }
+                @Override
+                public String detailMsg() { 
+                    return "The method return label, " + namedRhs() + 
+                    ", is an upper bound on how much " +
+                    "information can be gained by observing " +
+                    "that this method terminates normally " +
+                    "(i.e., terminates without throwing " +
+                    "an exception). The method body may " +
+                    "reveal more information than this. The " +
+                    "return label of a method is declared " +
+                    "after the variables, e.g. " +
+                    "\"void m(int i):{" + namedRhs() + "}\".";
+                }
+                @Override
+                public String technicalMsg() {
+                    return "the return (end) label is less restricted than " +
+                    namedLhs() + " of the body.";
+                }
+            }
+            );
+        }
         // return value constraints are implemented at the "return" statement, in order
         // to make use of the (more precise) label environment there.
 
