@@ -1,0 +1,9 @@
+class CallerPC02 {
+	public void f {_→} (boolean {*→} x) {
+		if (x)
+			g();
+	}
+
+	public void g {_→} () {
+	}
+}

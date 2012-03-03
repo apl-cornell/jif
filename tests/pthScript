@@ -139,6 +139,8 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Call12.jif ;
 	Call13.jif ;
 	Call14.jif ;
+	CallerPC01.jif (Semantic, "PC") ;
+	CallerPC02.jif (Semantic, "PC") ;
 	cat.jif ;
 	Catch01.jif (Semantic, "Label of .* exceptions .* not less restrictive");
 	Catch02.jif (Semantic, "Label .* not less restrictive");

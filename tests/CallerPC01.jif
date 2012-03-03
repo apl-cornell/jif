@@ -1,0 +1,8 @@
+class CallerPC01 {
+	public void f {*→} () {
+		g();
+	}
+
+	public void g {_→} () {
+	}
+}
