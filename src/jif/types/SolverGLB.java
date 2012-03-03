@@ -98,7 +98,7 @@ public class SolverGLB extends AbstractSolver {
      * The default bound of label variables in this solver is bottom
      */
     protected Principal getDefaultPrincipalBound() {
-        return ts.bottomPrincipal(Position.COMPILER_GENERATED);
+        return ts.bottomPrincipal(Position.compilerGenerated());
     }
 
     /**

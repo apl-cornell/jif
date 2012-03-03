@@ -43,7 +43,7 @@ public class NativeConstructorAdder extends NodeVisitor {
             
             if (decl.body() == null) {
                 ConstructorCall dummy = dummyCall(ct);
-                Block superCall = nf.Block(Position.COMPILER_GENERATED, dummy);
+                Block superCall = nf.Block(Position.compilerGenerated(), dummy);
                 Flags flags = decl.constructorInstance().flags().clearNative();
                 decl.constructorInstance().setFlags(flags);
                 return ((JifConstructorDecl) decl.body(superCall)).flags(flags);
@@ -61,7 +61,7 @@ public class NativeConstructorAdder extends NodeVisitor {
     private ConstructorCall dummyCall(ClassType ct) {
         ClassType sup = ct.superType().toClass();
         List<ConstructorInstance> cxs = sup.constructors();
-        ConstructorInstance ci = cxs.isEmpty() ? ct.typeSystem().defaultConstructor(Position.COMPILER_GENERATED, sup)
+        ConstructorInstance ci = cxs.isEmpty() ? ct.typeSystem().defaultConstructor(Position.compilerGenerated(), sup)
                                                : cxs.get(0);
         
         List<Expr> args = new ArrayList<Expr>();
@@ -77,11 +77,11 @@ public class NativeConstructorAdder extends NodeVisitor {
     private Expr dummyValue(Type t) {
         Expr e = null;
         if (t.isNumeric())
-            e = nf.IntLit(Position.COMPILER_GENERATED, IntLit.INT, 0);
+            e = nf.IntLit(Position.compilerGenerated(), IntLit.INT, 0);
         else if (t.isBoolean())
-            e = nf.BooleanLit(Position.COMPILER_GENERATED, false);
+            e = nf.BooleanLit(Position.compilerGenerated(), false);
         else
-            e = nf.NullLit(Position.COMPILER_GENERATED);
+            e = nf.NullLit(Position.compilerGenerated());
         
         return e.type(t);
     }
