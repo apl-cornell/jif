@@ -148,7 +148,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
         }
 
         A.setPc(callerPcLabel, lc); 
-        Label initialPCBound = Li;
+        Label initialPCBound = A.currentCodePCBound();
 
         if (!endorseTo.isTop()) {
             // check that there is sufficient authority to endorse to 
