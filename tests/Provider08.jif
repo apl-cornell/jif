@@ -1,0 +1,10 @@
+class C {
+  /**
+   * This should fail to compile with -untrusted-providers. Provider influences
+   * decision to throw the exception (e.g., can replace if(x) with if(!x)), but
+   * the exception label doesn't reflect this.
+   */
+  void m(boolean x) throws (RuntimeException{x}) {
+    if (x) throw new RuntimeException();
+  }
+}
