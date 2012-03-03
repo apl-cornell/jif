@@ -290,7 +290,11 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         JifContext A = lc.context();
         A.setCheckingInits(false);
         A.setConstructorReturnLabel(null);    
-        A.setPc(lc.upperBound(A.pc(), lc.typeSystem().callSitePCLabel(ci)), lc);        
+        A.setPc(lc.upperBound(A.pc(), lc.typeSystem().callSitePCLabel(ci)), lc);
+        
+        // Taint current code PC bound with provider.
+        Label providerAndPc = lc.typeSystem().join(A.currentCodePCBound(), A.provider());
+        A.setCurrentCodePCBound(providerAndPc);
     }
 
     /**
