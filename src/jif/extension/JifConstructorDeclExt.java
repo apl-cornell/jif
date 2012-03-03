@@ -116,7 +116,10 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         }
 
         // pc can be set to the provider during the init checking phase.
-        A.setPc(ts.providerLabel((JifClassType) lc.context().currentClass()), lc); 
+        A = lc.context();
+        Label providerAndPc = ts.join(A.currentCodePCBound(), A.provider());
+        A.setCurrentCodePCBound(providerAndPc);
+
 
         A.setConstructorReturnLabel(Lr);
 
