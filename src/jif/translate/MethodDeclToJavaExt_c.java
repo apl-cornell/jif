@@ -112,7 +112,9 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
     protected Block guardWithConstraints(JifToJavaRewriter rw, Block b)
             throws SemanticException {
         NodeFactory nf = rw.java_nf();
-        List<Assertion> constraints = mi.constraints();
+        List<Assertion> constraints = new ArrayList<Assertion>(mi.constraints());
+        JifParsedPolyType pct = (JifParsedPolyType) rw.currentClass();
+        constraints.addAll(pct.constraints());
         Position pos = b.position();
         Expr guard = null;
         for (Assertion constraint : constraints) {
