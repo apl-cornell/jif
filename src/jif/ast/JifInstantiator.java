@@ -508,8 +508,10 @@ public class JifInstantiator
     }
 
     /**
-     * Labels are defined in a context, but postentially used in another.  For
-     * example, in the following code:
+     * Instantiate a label into a new context where some of the names it
+     * mentions may have a different meaning. Instantiation is needed because
+     * labels may be used in a context different from the one in which they are
+     * defined.  For example, in the following code:
      * 
      * <pre>
      * class C [label A] {
