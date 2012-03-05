@@ -507,6 +507,53 @@ public class JifInstantiator
         return inst.instantiate(L);
     }
 
+    /**
+     * Labels are defined in a context, but postentially used in another.  For
+     * example, in the following code:
+     * 
+     * <pre>
+     * class C [label A] {
+     *   final label x;
+     *   
+     *   f {this; x} () {
+     *   }
+     * }
+     * 
+     * class D[principal A] {
+     *   void g() { o.f(); }
+     * }
+     * </pre>
+     * 
+     * The begin label of f is defined in a context containing:
+     * <ul>
+     *  <li>x:    label</li>
+     *  <li>A:    label</li>
+     *  <li>this: C    </li> </ul>
+     *
+     * In the context of g(), the begin label of f ({this; x}) should be
+     * interpreted as {o; o.x}.
+     * 
+     * @param L
+     *          the label to be instantiated ({this;x} in the example)
+     *          
+     * @param callerContext
+     *          the context in which result label will be used (g in the example)
+     *          
+     * @param receiverExpr
+     *          the expression to be used for interpreting dynamic labels (o in the example)
+     *          
+     * @param receiverType
+     *          the type in which L is defined (C in this example)
+     * 
+     * @param receiverLbl
+     *          the label to be substituted for {this} ({o} in the example)
+     * 
+     * @return
+     *          the instantiated label ({o; o.x} in the example)
+     *
+     * @throws SemanticException
+     *          TODO
+     */
     public static Label instantiate(Label L, 
                                     JifContext callerContext, 
                                     Expr receiverExpr, 
