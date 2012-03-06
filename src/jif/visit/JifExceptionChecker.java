@@ -138,11 +138,11 @@ public class JifExceptionChecker extends ExceptionChecker {
 		        	List args = new LinkedList<Expr>();
 		        	args.add(loc);
 		        	
-		        	New newExc = nf.New(pos, nf.CanonicalTypeNode(pos, ts.Error()), args);
-		        	ConstructorInstance ci = ts.findConstructor(ts.Error(), 
-		        			Collections.singletonList(ts.Throwable()), ts.Error());
+		        	New newExc = nf.New(pos, nf.CanonicalTypeNode(pos, jifts.fatalException()), args);
+		        	ConstructorInstance ci = ts.findConstructor(jifts.fatalException(), 
+		        			Collections.singletonList(ts.Throwable()), jifts.fatalException());
 		        	newExc = newExc.constructorInstance(ci);
-		        	Throw thrw = nf.Throw(pos, newExc.type(ts.Error()));		        	
+		        	Throw thrw = nf.Throw(pos, newExc.type(jifts.fatalException()));		        	
 		        	((JifThrowDel)thrw.del()).setThrownIsNeverNull();
 		        	Block body = nf.Block(pos, thrw);
 		        	

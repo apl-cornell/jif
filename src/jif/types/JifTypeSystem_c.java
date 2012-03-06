@@ -728,7 +728,10 @@ public class JifTypeSystem_c
     public Subst subst(Map substMap, Map cache) {
         return new JifSubst_c(this, substMap, cache);
     }
-
+    @Override
+    public ClassType fatalException() {
+        return Error();
+    }
     ////////////////////////////////////////////////////////////////
     // Code for label manipulation
 

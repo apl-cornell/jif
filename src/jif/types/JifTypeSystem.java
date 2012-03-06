@@ -372,4 +372,6 @@ public interface JifTypeSystem extends ParamTypeSystem
      * @return class for translating disjunctive principals to java expressions
      */
     PrincipalToJavaExpr disjunctivePrincipalTranslator();
+
+    ClassType fatalException();
 }
