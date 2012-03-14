@@ -1,23 +1,16 @@
 package jif.visit;
 
-import jif.ast.DowngradeExpr;
-import jif.ast.JifUtil;
 import jif.ast.LabelExpr;
 import jif.ast.PrincipalExpr;
 import jif.ast.PrincipalNode;
-import jif.types.JifContext;
 import jif.types.JifFieldInstance;
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
-import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.Cast;
 import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.Node;
-import polyglot.ast.NullLit;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.visit.NodeVisitor;
 
