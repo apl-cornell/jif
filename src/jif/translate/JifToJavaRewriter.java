@@ -1,10 +1,15 @@
 package jif.translate;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.tools.JavaFileObject;
+import javax.tools.JavaFileManager.Location;
+import javax.tools.JavaFileObject.Kind;
 
 import jif.ast.Jif;
 import jif.ast.JifNodeFactory;
@@ -270,20 +275,27 @@ public class JifToJavaRewriter extends ContextVisitor
         l.addAll(n.decls());
         for (ClassDecl cd : this.additionalClassDecls) {
             if (cd.flags().isPublic()) {
-                // cd is public, we will put it in it's own source file.
-                SourceFile sf = java_nf().SourceFile(Position.compilerGenerated(), 
-                                                     n.package_(), 
-                                                     Collections.EMPTY_LIST,
-                                                     Collections.singletonList(cd));
+                try {
+                    // cd is public, we will put it in it's own source file.
+                    SourceFile sf = java_nf().SourceFile(Position.compilerGenerated(), 
+                                                         n.package_(), 
+                                                         Collections.EMPTY_LIST,
+                                                         Collections.singletonList(cd));
                 
-                String newName = cd.name() + "." + job.extensionInfo().defaultFileExtension();
-                String newPath = n.source().path().substring(0, n.source().path().length() - n.source().name().length()) + newName;
+                    String newName = cd.name() + "." + job.extensionInfo().defaultFileExtension();
+                    String newPath = n.source().path().substring(0, n.source().path().length() - n.source().name().length()) + newName;
                 
-                Source s = new Source(newName,
-                                      newPath,
-                                      n.source().lastModified());
-                sf = sf.source(s);
-                this.newSourceFiles.add(sf);
+                    Location location = java_ext.getOptions().source_output;
+                    String pkgName = ""; 
+                    if(sf.package_()!=null)
+                        pkgName = sf.package_().package_().fullName() + ".";
+                    JavaFileObject jfo = java_ext.extFileManager().getJavaFileForOutput(location, pkgName + cd.name(), Kind.SOURCE, null);
+                    Source s = java_ext.createFileSource(jfo, false);
+                    sf = sf.source(s);
+                    this.newSourceFiles.add(sf);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             else {
                 // cd is not public; it's ok to put the class decl in the source file.

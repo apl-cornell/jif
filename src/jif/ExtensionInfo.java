@@ -5,6 +5,9 @@ import java.io.Reader;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.tools.FileObject;
+import javax.tools.StandardJavaFileManager;
+
 import jif.ast.JifNodeFactory;
 import jif.ast.JifNodeFactory_c;
 import jif.types.JifTypeSystem;
@@ -19,6 +22,8 @@ import polyglot.types.LoadedClassResolver;
 import polyglot.types.SemanticException;
 import polyglot.types.SourceClassResolver;
 import polyglot.types.TypeSystem;
+import polyglot.types.reflect.ClassFileLoader;
+import polyglot.util.CustomExtFileManager;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 
@@ -40,7 +45,9 @@ import polyglot.util.InternalCompilerError;
 public class ExtensionInfo extends JLExtensionInfo
 {
 //  protected boolean doInfer = false;
+    protected ClassFileLoader cfl;
     protected OutputExtensionInfo jlext = new OutputExtensionInfo(this);
+    protected StandardJavaFileManager fm = CustomExtFileManager.getNewInstance();
 
     @Override
     public String defaultFileExtension() {
@@ -50,6 +57,11 @@ public class ExtensionInfo extends JLExtensionInfo
     @Override
     public String compilerName() {
         return "jifc";
+    }
+    
+    @Override
+    public StandardJavaFileManager extFileManager() {
+        return fm;
     }
 
     @Override
@@ -86,11 +98,9 @@ public class ExtensionInfo extends JLExtensionInfo
     protected void initTypeSystem() {
         try {
             LoadedClassResolver lr;
-            lr = new SourceClassResolver(compiler, this, 
-                                         getJifOptions().constructJifClasspath(),
-                                         compiler.loader(), false,
-                                         getOptions().compile_command_line_only,
-                                         getOptions().ignore_mod_times);
+            lr = new SourceClassResolver(compiler, this, false,
+                    getOptions().compile_command_line_only,
+                    getOptions().ignore_mod_times);
             ts.initialize(lr, this);
         }
         catch (SemanticException e) {
@@ -150,8 +160,19 @@ public class ExtensionInfo extends JLExtensionInfo
     }
 
     @Override
-    public FileSource createFileSource(java.io.File f, boolean user)
+    public FileSource createFileSource(FileObject f, boolean user)
             throws IOException {
         return new jif.parse.UTF8FileSource(f, user);
     }
+    
+    @Override
+    public ClassFileLoader classFileLoader() {
+        if (cfl == null) {
+            cfl = super.classFileLoader();
+            getJifOptions().addSignaturesToClassPath();
+            cfl.addLocation(getJifOptions().signature_path);
+        }
+        return cfl;
+    }
+    
 }
