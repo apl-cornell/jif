@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.tools.JavaFileManager.Location;
-import javax.tools.StandardLocation;
 
 import polyglot.main.Options;
 import polyglot.main.Report;
@@ -105,9 +104,8 @@ public class JifOptions extends Options {
      * @return the next index to process. That is, if calling this method
      *         processes two commands, then the return value should be index+2
      */
-    @SuppressWarnings("rawtypes")
     @Override
-    protected int parseCommand(String args[], int index, Set source) throws UsageError {
+    protected int parseCommand(String args[], int index, Set<String> source) throws UsageError {
         if (args[index].equals("-globalsolve")) {
             index++;
             System.err.println("Will use a single solver to infer labels");
@@ -209,7 +207,7 @@ public class JifOptions extends Options {
 
     @Override
     public String constructPostCompilerClasspath() {
-        String cp = super.constructPostCompilerClasspath() + File.pathSeparator
+        String cp = super.constructPostCompilerClasspath() + pathSeparator
                 + constructFullClasspath();
         return cp;
     }

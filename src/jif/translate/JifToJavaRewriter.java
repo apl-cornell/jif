@@ -282,9 +282,6 @@ public class JifToJavaRewriter extends ContextVisitor
                                                          Collections.EMPTY_LIST,
                                                          Collections.singletonList(cd));
                 
-                    String newName = cd.name() + "." + job.extensionInfo().defaultFileExtension();
-                    String newPath = n.source().path().substring(0, n.source().path().length() - n.source().name().length()) + newName;
-                
                     Location location = java_ext.getOptions().source_output;
                     String pkgName = ""; 
                     if(sf.package_()!=null)
