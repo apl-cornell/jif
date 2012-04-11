@@ -1,7 +1,5 @@
 package jif;
 
-import javax.tools.StandardJavaFileManager;
-
 import jif.visit.JifTranslator;
 import polyglot.ast.Node;
 import polyglot.frontend.*;
@@ -32,11 +30,6 @@ public class OutputExtensionInfo extends JLExtensionInfo {
     @Override
     public Options getOptions() {
         return jifExtInfo.getOptions();
-    }
-    
-    @Override
-    public StandardJavaFileManager extFileManager() {
-        return getOptions().jl_fm;
     }
     
     @Override
@@ -85,7 +78,7 @@ public class OutputExtensionInfo extends JLExtensionInfo {
         @Override
         public Job addJob(Source source, Node ast) {
             Job j = super.addJob(source, ast);
-            if ("Object.jif".equals(source.name())) {
+            if ("Object.jif".equals(source.getName())) {
                 this.objectJob = j;
             }
             return j;
@@ -96,7 +89,7 @@ public class OutputExtensionInfo extends JLExtensionInfo {
         @Override
         public Job addJob(Source source) {
             Job j = super.addJob(source);
-            if ("Object.jif".equals(source.name())) {
+            if ("Object.jif".equals(source.getName())) {
                 this.objectJob = j;
             }
             return j;
@@ -120,6 +113,7 @@ public class OutputExtensionInfo extends JLExtensionInfo {
         @Override
         public Goal Parsed(Job job) {
             return internGoal(new SourceFileGoal(job) {
+                @Override
                 public Pass createPass(polyglot.frontend.ExtensionInfo extInfo) {
                     return new EmptyPass(this);              
                 }

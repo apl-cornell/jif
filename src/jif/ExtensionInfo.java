@@ -1,9 +1,16 @@
 package jif;
 
+import static java.io.File.pathSeparator;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.tools.FileObject;
 import javax.tools.StandardJavaFileManager;
@@ -47,7 +54,7 @@ public class ExtensionInfo extends JLExtensionInfo
 //  protected boolean doInfer = false;
     protected ClassFileLoader cfl;
     protected OutputExtensionInfo jlext = new OutputExtensionInfo(this);
-    protected StandardJavaFileManager fm = CustomExtFileManager.getNewInstance();
+    protected StandardJavaFileManager fm;
 
     @Override
     public String defaultFileExtension() {
@@ -61,6 +68,8 @@ public class ExtensionInfo extends JLExtensionInfo
     
     @Override
     public StandardJavaFileManager extFileManager() {
+        if (fm == null)
+            fm = new CustomExtFileManager();
         return fm;
     }
 
@@ -107,6 +116,32 @@ public class ExtensionInfo extends JLExtensionInfo
             throw new InternalCompilerError(
                                             "Unable to initialize type system: ", e);
         }
+    }
+    
+    @Override
+    public void addLocationsToFileManager() {
+        JifOptions options = getJifOptions();
+        // use the signature classpath if it exists for compiling Jif classes
+        List<File> path = new ArrayList<File>();
+        for (Iterator<String> iter = options.addSigcp.iterator(); iter.hasNext(); ) {
+            path.add(new File(iter.next()));
+        }
+        if (options.sigcp != null) {
+            StringTokenizer st = new StringTokenizer(options.sigcp, pathSeparator);
+            while(st.hasMoreTokens()) {
+                File f = new File(st.nextToken());
+                if (f.exists())
+                    path.add(f);
+            }
+        }
+        try {
+            path.addAll(options.classpath_directories);
+            fm.setLocation(options.signature_path, path);
+        } catch (IOException e) {
+            throw new InternalCompilerError(e);
+        }
+        super.addLocationsToFileManager();
+        jlext.addLocationsToFileManager();
     }
 
     @Override
@@ -169,7 +204,6 @@ public class ExtensionInfo extends JLExtensionInfo
     public ClassFileLoader classFileLoader() {
         if (cfl == null) {
             cfl = super.classFileLoader();
-            getJifOptions().addSignaturesToClassPath();
             cfl.addLocation(getJifOptions().signature_path);
         }
         return cfl;
