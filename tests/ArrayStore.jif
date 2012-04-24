@@ -1,0 +1,15 @@
+public class ArrayStore[label A] {
+	// This should either be prevented by the type system or 
+	// generated a checked ArrayStoreException.  
+	// Jif currently permits array subtyping like this, but doesn't 
+	// generated ArrayStoreExceptions for array access assignments.  
+	//
+	// A comment in JifArrayAccessAssign_c suggests that 
+	// String[] should not be a subtype of Object[], but the there is 
+	// no code enforcing that. 
+	public int{A} m5{A}() throws (ArrayIndexOutOfBoundsException{A}) {
+		Object{A}[] a = new String[3];
+		a[0] = new Integer(0);	
+		return 0;
+	}
+}
