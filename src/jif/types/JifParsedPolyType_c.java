@@ -178,6 +178,10 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 
     @Override
     public String toString() {
+        if (kind() == null) {
+            return "<unknown class " + name + ">";
+        }
+
 	String s = "";
 
         if (params != null) {

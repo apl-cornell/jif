@@ -137,6 +137,7 @@ public class JifToJavaRewriter extends ContextVisitor
     public Node leaveCall(Node old, Node n, NodeVisitor v) {
         try {
             Jif ext = JifUtil.jifExt(n);
+
             Node m = ext.toJava().toJava(this);
             if (m.del() instanceof Jif)
                 throw new InternalCompilerError(m + " is still a Jif node.");

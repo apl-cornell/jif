@@ -64,8 +64,8 @@ public class JifNewArrayDel extends JifJL_c
     }
     
     @Override
-    public void fatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
-        super.fatalExceptions(ts, fatalExceptions);
+    public void setFatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
+        super.setFatalExceptions(ts, fatalExceptions);
         Type nase;
         try {
             nase = ts.typeForName("java.lang.NegativeArraySizeException");

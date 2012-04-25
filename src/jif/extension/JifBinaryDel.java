@@ -1,5 +1,8 @@
 package jif.extension;
 
+import java.util.Collections;
+import java.util.List;
+
 import jif.ast.JifNodeFactory;
 import jif.ast.JifUtil;
 import jif.ast.LabelExpr;
@@ -12,12 +15,15 @@ import jif.types.principal.Principal;
 import polyglot.ast.*;
 import polyglot.ast.Binary.Operator;
 import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.util.SubtypeSet;
 import polyglot.visit.TypeChecker;
 
-public class JifBinaryDel extends JifJL_c
+public class JifBinaryDel extends JifJL_c 
 {
     public static final Binary.Operator ACTSFOR  = new Operator("actsfor", Precedence.RELATIONAL);
     public static final Binary.Operator EQUIV  = new Operator("equiv", Precedence.RELATIONAL);
+    private boolean isAEFatal;
 
     public JifBinaryDel() { }
 
@@ -161,8 +167,39 @@ public class JifBinaryDel extends JifJL_c
                     " is not represented at runtime, and thus cannot be used " +
                     "in an actsfor test.",
                     expr.position());
-        }
-        
+        }        
     }
     
+    /** 
+     *  List of Types of exceptions that might get thrown.
+     * 
+     *  This differs from the method defined in Field_c in that it does not
+     * throw a null pointer exception if the receiver is guaranteed to be 
+     * non-null
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public List throwTypes(TypeSystem ts) {
+        Binary be = (Binary) node();
+        if (be.throwsArithmeticException()
+                && !fatalExceptions.contains(ts.ArithmeticException())) {
+            return Collections.singletonList(ts.ArithmeticException());
+        }
+        return Collections.EMPTY_LIST;
+    }         
+    
+    @Override
+    public void setFatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
+        super.setFatalExceptions(ts, fatalExceptions);
+        if(fatalExceptions.contains(ts.ArithmeticException())) 
+            isAEFatal = true;
+    }
+
+    public boolean throwsArithmeticException() {
+        if (isAEFatal) return false;
+        Binary be = (Binary) node();
+        return be.throwsArithmeticException();
+    }
+
+
 }

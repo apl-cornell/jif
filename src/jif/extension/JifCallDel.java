@@ -98,8 +98,8 @@ public class JifCallDel extends JifJL_c
     }
     
     @Override
-    public void fatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
-        super.fatalExceptions(ts, fatalExceptions);
+    public void setFatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
+        super.setFatalExceptions(ts, fatalExceptions);
         if(fatalExceptions.contains(ts.NullPointerException())) 
             isNPEfatal = true;
     }

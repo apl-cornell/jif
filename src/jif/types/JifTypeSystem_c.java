@@ -1636,4 +1636,11 @@ public class JifTypeSystem_c
                 writerPolicy(Position.compilerGenerated(Position.CALLER), p, p);
         return pairLabel(p.position(), toConf, toInteg);
     }
+
+//    @Override
+//    protected ArrayType createArrayType(Position pos, Type type) {
+//        return new JifArrayType_c(this, pos, type);
+//    }
+    
+    
 }

@@ -83,8 +83,8 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
     }
     
     @Override
-    public void fatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
-        super.fatalExceptions(ts, fatalExceptions);
+    public void setFatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
+        super.setFatalExceptions(ts, fatalExceptions);
         if(fatalExceptions.contains(ts.ClassCastException())) 
             isClassCastExceptionFatal = true;
     }

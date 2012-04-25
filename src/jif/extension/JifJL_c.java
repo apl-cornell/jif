@@ -11,6 +11,7 @@ import jif.ast.JifUtil;
 import jif.types.JifTypeSystem;
 import polyglot.ast.JL_c;
 import polyglot.ast.Node;
+import polyglot.types.ClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
@@ -25,14 +26,22 @@ import polyglot.visit.TypeBuilder;
 public class JifJL_c extends JL_c implements JifJL
 {
     @SuppressWarnings("unchecked")
-    protected Set fatalExceptions = Collections.EMPTY_SET;
+    protected Set<ClassType> fatalExceptions = Collections.EMPTY_SET;
     
-    public void fatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
+    /**
+     * Set the exceptions thrown by this node that are treated as fatal.
+     */
+    @Override
+    public void setFatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
         this.fatalExceptions = fatalExceptions;
     }
     
+    /**
+     * Get the exceptions thrown by this node that are treated as fatal.
+     */
+    @Override
     @SuppressWarnings("unchecked")
-    public Set fatalExceptions() {
+    public Set<ClassType> fatalExceptions() {
         return fatalExceptions;
     }
 

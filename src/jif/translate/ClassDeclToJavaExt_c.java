@@ -177,8 +177,10 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         }
         for (Iterator iter = jpt.interfaces().iterator(); iter.hasNext(); ) {
             Type interf = (Type)iter.next();
+
             if (rw.jif_ts().isParamsRuntimeRep(interf) &&
-                    !rw.jif_ts().isSubtype(baseClass.superType(), interf)) {                
+                    !rw.jif_ts().isSubtype(baseClass.superType(), interf)) {
+
                 // the interface is not implemented in a super class,
                 // so add fields and params for runtime representation of params
                 JifPolyType interfPT = null;

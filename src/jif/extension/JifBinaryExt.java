@@ -56,7 +56,7 @@ public class JifBinaryExt extends JifExprExt
 
         PathMap X = Xl.N(ts.notTaken()).join(Xr);
 
-        if (be.throwsArithmeticException()) {
+        if (((JifBinaryDel) be.del()).throwsArithmeticException()) {
             checkAndRemoveThrowType(throwTypes, ts.ArithmeticException());
             X = X.exc(Xr.NV(), ts.ArithmeticException());
         }

@@ -178,12 +178,12 @@ public class JifExceptionChecker extends ExceptionChecker {
                     throw new SemanticException(
                             "Explicitly thrown exception "
                                     + th.expr().type()
-                                    + " must either be caught or declared to be thrown.",
+                                    + " must either be caught or declared to be thrown." +" : " + toRemove + ":: " + th.expr().type(),
                             th.position());
             }
             //sigh... Not all nodes have JifJL delegates.
             if(n.del() instanceof JifJL)
-                ((JifJL)n.del()).fatalExceptions(ts, toRemove);
+                ((JifJL)n.del()).setFatalExceptions(ts, toRemove);
             
             return n;
         }
