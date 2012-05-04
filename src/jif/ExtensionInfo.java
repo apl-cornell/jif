@@ -30,8 +30,9 @@ import polyglot.types.SemanticException;
 import polyglot.types.SourceClassResolver;
 import polyglot.types.TypeSystem;
 import polyglot.types.reflect.ClassFileLoader;
-import polyglot.util.CustomExtFileManager;
+import polyglot.util.ExtFileManager;
 import polyglot.util.ErrorQueue;
+import polyglot.util.FileManager;
 import polyglot.util.InternalCompilerError;
 
 /** The configuration information of the Jif extension.
@@ -54,7 +55,7 @@ public class ExtensionInfo extends JLExtensionInfo
 //  protected boolean doInfer = false;
     protected ClassFileLoader cfl;
     protected OutputExtensionInfo jlext = new OutputExtensionInfo(this);
-    protected StandardJavaFileManager fm;
+    protected FileManager fm;
 
     @Override
     public String defaultFileExtension() {
@@ -67,9 +68,9 @@ public class ExtensionInfo extends JLExtensionInfo
     }
     
     @Override
-    public StandardJavaFileManager extFileManager() {
+    public FileManager extFileManager() {
         if (fm == null)
-            fm = new CustomExtFileManager();
+            fm = new ExtFileManager(this);
         return fm;
     }
 
@@ -121,6 +122,7 @@ public class ExtensionInfo extends JLExtensionInfo
     @Override
     public void addLocationsToFileManager() {
         JifOptions options = getJifOptions();
+        StandardJavaFileManager fm = extFileManager();
         // use the signature classpath if it exists for compiling Jif classes
         List<File> path = new ArrayList<File>();
         for (Iterator<String> iter = options.addSigcp.iterator(); iter.hasNext(); ) {

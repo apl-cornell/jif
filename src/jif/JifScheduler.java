@@ -258,7 +258,7 @@ public class JifScheduler extends JLScheduler {
      */
     public Job addJob(Source source, Node ast) {
         Job j = super.addJob(source, ast);
-        if ("Object.jif".equals(source.name())) {
+        if ("Object.jif".equals(source.getName())) {
             this.objectJob = j;
         }
         return j;
@@ -268,7 +268,7 @@ public class JifScheduler extends JLScheduler {
      */
     public Job addJob(Source source) {
         Job j = super.addJob(source);
-        if ("Object.jif".equals(source.name())) {
+        if ("Object.jif".equals(source.getName())) {
             this.objectJob = j;
         }
         return j;

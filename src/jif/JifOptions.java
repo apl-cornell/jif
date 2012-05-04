@@ -2,21 +2,16 @@ package jif;
 
 import static java.io.File.pathSeparator;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.tools.JavaFileManager.Location;
 
 import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.main.UsageError;
-import polyglot.util.InternalCompilerError;
 
 /**
  * This object encapsulates various polyglot options.
