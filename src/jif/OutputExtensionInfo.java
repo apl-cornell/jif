@@ -27,14 +27,17 @@ public class OutputExtensionInfo extends JLExtensionInfo {
         this.jifExtInfo = jifExtInfo;        
     }
     
+    @Override
     public Options getOptions() {
         return jifExtInfo.getOptions();
     }
     
+    @Override
     public Scheduler createScheduler() {
         return new OutputScheduler(this);
     }
 
+    @Override
     public Goal getCompileGoal(final Job job) {
         CodeGenerated output = new CodeGenerated(job) {
             public Pass createPass(ExtensionInfo extInfo) {
@@ -72,9 +75,10 @@ public class OutputExtensionInfo extends JLExtensionInfo {
         /**
          * 
          */
+        @Override
         public Job addJob(Source source, Node ast) {
             Job j = super.addJob(source, ast);
-            if ("Object.jif".equals(source.name())) {
+            if ("Object.jif".equals(source.getName())) {
                 this.objectJob = j;
             }
             return j;
@@ -82,14 +86,16 @@ public class OutputExtensionInfo extends JLExtensionInfo {
         /**
          * 
          */
+        @Override
         public Job addJob(Source source) {
             Job j = super.addJob(source);
-            if ("Object.jif".equals(source.name())) {
+            if ("Object.jif".equals(source.getName())) {
                 this.objectJob = j;
             }
             return j;
         }
 
+        @Override
         public Goal TypesInitialized(Job job) {
             Goal g = super.TypesInitialized(job);
             try {
@@ -104,8 +110,10 @@ public class OutputExtensionInfo extends JLExtensionInfo {
             return g;
         }
     
+        @Override
         public Goal Parsed(Job job) {
             return internGoal(new SourceFileGoal(job) {
+                @Override
                 public Pass createPass(polyglot.frontend.ExtensionInfo extInfo) {
                     return new EmptyPass(this);              
                 }
@@ -113,14 +121,13 @@ public class OutputExtensionInfo extends JLExtensionInfo {
         }
     }
     
+    @Override
     protected void initTypeSystem() {
         try {
             LoadedClassResolver lr;
-            lr = new SourceClassResolver(compiler, this, 
-                                         jifExtInfo.getJifOptions().constructOutputExtClasspath(),
-                                         compiler.loader(), true,
-                                         getOptions().compile_command_line_only,
-                                         getOptions().ignore_mod_times);
+            lr = new SourceClassResolver(compiler, this, true,
+                            getOptions().compile_command_line_only,
+                            getOptions().ignore_mod_times);
             ts.initialize(lr, this);
         }
         catch (SemanticException e) {
