@@ -74,12 +74,14 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 // add any static initializers             
                 cb = addStaticInitializers(cb, rw);
             }
+            if (needsDynamicTypeMethods(rw, jpt)) {
+                // add instanceof and cast static methods to the class
+                cb = cb.addMember(produceInstanceOfMethod(jpt, rw, false));
+                cb = cb.addMember(produceCastMethod(jpt, rw));
+            }
+            
             if (rw.jif_ts().isParamsRuntimeRep(jpt)) {
                 if (!jpt.params().isEmpty()) {
-                    // add instanceof and cast static methods to the class
-                    cb = cb.addMember(produceInstanceOfMethod(jpt, rw, false));
-                    cb = cb.addMember(produceCastMethod(jpt, rw));
-                    
                     // add fields for params
                     if (rw.jif_ts().isJifClass(jpt)) {
                         for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
@@ -97,7 +99,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         }
         else {
             // it's an interface
-            if (rw.jif_ts().isParamsRuntimeRep(jpt)) {
+            if (needsImplClass(rw, jpt)) {
                 ClassBody implBody = rw.java_nf().ClassBody(Position.compilerGenerated(), new ArrayList(2));
                 implBody = implBody.addMember(produceInstanceOfMethod(jpt, rw, true));
                 implBody = implBody.addMember(produceCastMethod(jpt, rw));
@@ -127,6 +129,13 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                                       n.superClass(), n.interfaces(), cb);
     }
 
+    protected boolean needsDynamicTypeMethods(JifToJavaRewriter rw, JifPolyType jpt) {
+        return rw.jif_ts().isParamsRuntimeRep(jpt) && !jpt.params().isEmpty();
+    }
+
+    protected boolean needsImplClass(JifToJavaRewriter rw, JifPolyType jpt) {
+        return rw.jif_ts().isParamsRuntimeRep(jpt);
+    }
     /**
      * Create a method for initializations, and add it to cb.
      */
