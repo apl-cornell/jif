@@ -1,0 +1,6 @@
+Changes in Jif
+==============
+
+1. JifOptions - constructSignatureClasspath, constructJifClasspath, constructOutputClassExtClasspath and
+                constructPostCompilerClasspath have been deleted. All of theses classpaths are now 
+                handled by jif's instance of file manager (ExtFileManager).

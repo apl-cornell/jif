@@ -171,36 +171,4 @@ public class JifOptions extends Options {
         usageForFlag(out, "-fail-on-exception", "fail on uncaught and undeclared runtime exceptions");
         usageForFlag(out, "-trusted-providers", "set the providers of the sources being compiled to be trusted (use -untrusted-providers to disable)");
     }
-
-    /*public String constructSignatureClasspath() {        
-        // use the signature classpath if it exists for compiling Jif classes
-        String scp = "";
-        for (Iterator<String> iter = addSigcp.iterator(); iter.hasNext(); ) {
-            scp += iter.next();
-            if (iter.hasNext()) {
-                scp += File.pathSeparator;            
-            }
-        }
-        if (sigcp != null) {
-            scp += File.pathSeparator + sigcp;
-        }
-        return scp;
-    }*/
-
-    /*public String constructJifClasspath() {
-        return constructSignatureClasspath() +  
-                File.pathSeparator + constructFullClasspath();
-    }*/
-    
-    /*public String constructOutputExtClasspath() {
-        return constructFullClasspath();
-    }*/
-
-    /*@Override
-    public String constructPostCompilerClasspath() {
-        String cp = super.constructPostCompilerClasspath() + File.pathSeparator
-                + constructFullClasspath();
-        return cp;
-    }*/
-
 }
