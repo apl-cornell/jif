@@ -98,7 +98,7 @@ public class JifOptions extends Options {
      *         processes two commands, then the return value should be index+2
      */
     @Override
-    protected int parseCommand(String args[], int index, Set<String> source) throws UsageError {
+    protected int parseCommand(String args[], int index, Set source) throws UsageError {
         if (args[index].equals("-globalsolve")) {
             index++;
             System.err.println("Will use a single solver to infer labels");
