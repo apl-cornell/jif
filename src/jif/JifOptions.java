@@ -1,11 +1,11 @@
 package jif;
 
-import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import javax.tools.JavaFileManager.Location;
 
 import polyglot.main.Options;
 import polyglot.main.Report;
@@ -55,6 +55,18 @@ public class JifOptions extends Options {
       */
      public List<String> addSigcp = new ArrayList<String>();
      
+     public Location signature_path = new Location() {
+         @Override
+         public String getName() {
+             return "SIGNATURE_PATH";
+         }
+
+         @Override
+         public boolean isOutputLocation() {
+             return false;
+         }        
+     };
+     
      /**
       * Output a dependency graph to help the diagnosing of type error?
       */
@@ -65,7 +77,6 @@ public class JifOptions extends Options {
      */
     public JifOptions(ExtensionInfo extension) {
         super(extension);
-        setDefaultValues();
     }
 
     /**
@@ -86,7 +97,6 @@ public class JifOptions extends Options {
      * @return the next index to process. That is, if calling this method
      *         processes two commands, then the return value should be index+2
      */
-    @SuppressWarnings("rawtypes")
     @Override
     protected int parseCommand(String args[], int index, Set source) throws UsageError {
         if (args[index].equals("-globalsolve")) {
@@ -161,36 +171,4 @@ public class JifOptions extends Options {
         usageForFlag(out, "-fail-on-exception", "fail on uncaught and undeclared runtime exceptions");
         usageForFlag(out, "-trusted-providers", "set the providers of the sources being compiled to be trusted (use -untrusted-providers to disable)");
     }
-
-    public String constructSignatureClasspath() {        
-        // use the signature classpath if it exists for compiling Jif classes
-        String scp = "";
-        for (Iterator<String> iter = addSigcp.iterator(); iter.hasNext(); ) {
-            scp += iter.next();
-            if (iter.hasNext()) {
-                scp += File.pathSeparator;            
-            }
-        }
-        if (sigcp != null) {
-            scp += File.pathSeparator + sigcp;
-        }
-        return scp;
-    }
-
-    public String constructJifClasspath() {
-        return constructSignatureClasspath() +  
-                File.pathSeparator + constructFullClasspath();
-    }
-    
-    public String constructOutputExtClasspath() {
-        return constructFullClasspath();
-    }
-
-    @Override
-    public String constructPostCompilerClasspath() {
-        String cp = super.constructPostCompilerClasspath() + File.pathSeparator
-                + constructFullClasspath();
-        return cp;
-    }
-
 }

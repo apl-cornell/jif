@@ -1,9 +1,19 @@
 package jif;
 
+import static java.io.File.pathSeparator;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
+
+import javax.tools.FileObject;
+import javax.tools.StandardJavaFileManager;
 
 import jif.ast.JifNodeFactory;
 import jif.ast.JifNodeFactory_c;
@@ -19,6 +29,7 @@ import polyglot.types.LoadedClassResolver;
 import polyglot.types.SemanticException;
 import polyglot.types.SourceClassResolver;
 import polyglot.types.TypeSystem;
+import polyglot.types.reflect.ClassFileLoader;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 
@@ -51,7 +62,7 @@ public class ExtensionInfo extends JLExtensionInfo
     public String compilerName() {
         return "jifc";
     }
-
+    
     @Override
     protected Options createOptions() {
         return new JifOptions(this);
@@ -86,17 +97,42 @@ public class ExtensionInfo extends JLExtensionInfo
     protected void initTypeSystem() {
         try {
             LoadedClassResolver lr;
-            lr = new SourceClassResolver(compiler, this, 
-                                         getJifOptions().constructJifClasspath(),
-                                         compiler.loader(), false,
-                                         getOptions().compile_command_line_only,
-                                         getOptions().ignore_mod_times);
+            lr = new SourceClassResolver(compiler, this, false,
+                    getOptions().compile_command_line_only,
+                    getOptions().ignore_mod_times);
             ts.initialize(lr, this);
         }
         catch (SemanticException e) {
             throw new InternalCompilerError(
                                             "Unable to initialize type system: ", e);
         }
+    }
+    
+    @Override
+    public void addLocationsToFileManager() {
+        JifOptions options = getJifOptions();
+        StandardJavaFileManager fm = extFileManager();
+        // use the signature classpath if it exists for compiling Jif classes
+        List<File> path = new ArrayList<File>();
+        for (Iterator<String> iter = options.addSigcp.iterator(); iter.hasNext(); ) {
+            path.add(new File(iter.next()));
+        }
+        if (options.sigcp != null) {
+            StringTokenizer st = new StringTokenizer(options.sigcp, pathSeparator);
+            while(st.hasMoreTokens()) {
+                File f = new File(st.nextToken());
+                if (f.exists())
+                    path.add(f);
+            }
+        }
+        try {
+            path.addAll(options.classpath_directories);
+            fm.setLocation(options.signature_path, path);
+        } catch (IOException e) {
+            throw new InternalCompilerError(e);
+        }
+        super.addLocationsToFileManager();
+        jlext.addLocationsToFileManager();
     }
 
     @Override
@@ -150,8 +186,17 @@ public class ExtensionInfo extends JLExtensionInfo
     }
 
     @Override
-    public FileSource createFileSource(java.io.File f, boolean user)
+    public FileSource createFileSource(FileObject f, boolean user)
             throws IOException {
         return new jif.parse.UTF8FileSource(f, user);
+    }
+    
+    @Override
+    public ClassFileLoader classFileLoader() {
+        if (classFileLoader == null) {
+            super.classFileLoader();
+            classFileLoader.addLocation(getJifOptions().signature_path);
+        }
+        return classFileLoader;
     }
 }
