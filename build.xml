@@ -262,6 +262,27 @@
 	      message="The JDK home (usually environment variable JAVA_HOME) must be defined."/>
     </target>
 
+    <!-- Configures Eclipse's .classpath file. -->
+    <target name="eclipse" depends="eclipse-check"
+	    unless="eclipse.up-to-date"
+	    description="Configures Eclipse's .classpath file">
+	<condition property="tools.jar-entry"
+	    value="&lt;classpathentry kind=&quot;lib&quot; path=&quot;${jdk.home}/lib/tools.jar&quot;/&gt;"
+	    else="">
+	    <available file="${jdk.home}/lib/tools.jar" />
+	</condition>
+	<copy file="eclipse-classpath.in" tofile=".classpath">
+	    <filterset>
+		<filter token="TOOLS.JAR" value="${tools.jar-entry}" />
+	    </filterset>
+	</copy>
+    </target>
+
+    <target name="eclipse-check">
+	<uptodate property="eclipse.up-to-date" targetfile=".classpath"
+		    srcfile="eclipse-classpath.in" />
+    </target>
+
     <!-- Create jifc script if needed -->
     <target name="jifc-executable">
 	<copy file="${jifc}.in" tofile="${jifc}">
@@ -312,7 +333,7 @@ sh ${jif} %CMD_LINE_ARGS%
 
     <target name="jif" depends="jif-base,jif-runtime,jif-sig,jif-lib" description="Build the Jif compiler and libraries"/>
 
-    <target name="jif-base" depends="init,configure">
+    <target name="jif-base" depends="init,configure,eclipse">
         <antcall target="standard-ext">
             <param name="ext" value="jif" />
             <param name="ext.basedir" value="${basedir}" />

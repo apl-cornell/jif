@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="rt-classes" path="rt-src"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/polyglot"/>
+	<classpathentry kind="lib" path="/polyglot/lib/java_cup.jar"/>
+	<classpathentry kind="lib" path="/polyglot/lib/JFlex.jar"/>
+	<classpathentry kind="output" path="classes"/>
+</classpath>
