@@ -50,9 +50,8 @@ public class CanonicalPrincipalNode_c extends PrincipalNode_c implements Canonic
     /**
      * Visit this term in evaluation order.
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public List<Term> acceptCFG(CFGBuilder v, List succs) {
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         return succs;
     }
     @Override

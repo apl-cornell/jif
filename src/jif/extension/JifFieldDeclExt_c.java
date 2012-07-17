@@ -78,7 +78,6 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
      *  is always executed after invoking super constructor and before invoking
      *  the constructor of this class. (like the single path rule)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         FieldDecl decl = (FieldDecl) node();

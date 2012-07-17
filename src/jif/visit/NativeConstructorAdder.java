@@ -60,7 +60,7 @@ public class NativeConstructorAdder extends NodeVisitor {
      */
     private ConstructorCall dummyCall(ClassType ct) {
         ClassType sup = ct.superType().toClass();
-        List<ConstructorInstance> cxs = sup.constructors();
+        List<? extends ConstructorInstance> cxs = sup.constructors();
         ConstructorInstance ci = cxs.isEmpty() ? ct.typeSystem().defaultConstructor(Position.compilerGenerated(), sup)
                                                : cxs.get(0);
         

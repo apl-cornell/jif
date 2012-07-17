@@ -44,7 +44,6 @@ public class LabelEnv_c implements LabelEnv
     /**
      * Topics to report
      */
-    @SuppressWarnings("unchecked")
     protected static Collection<String> topics = CollectionUtil.list(Topics.jif, Topics.labelEnv);
 
     public LabelEnv_c(JifTypeSystem ts, boolean useCache) {
@@ -808,10 +807,9 @@ public class LabelEnv_c implements LabelEnv
      * Finds a PairLabel lower bound. It does not use leq
      *
      */
-    @SuppressWarnings("unchecked")
     @Override
     public Label findLowerBound(Label L) {
-        return findLowerBound(L, Collections.EMPTY_SET, false);
+        return findLowerBound(L, Collections.<Serializable> emptySet(), false);
     }
     
     protected Label findLowerBound(Label L, Collection<Serializable> seen, boolean noArgLabels) {        
@@ -899,21 +897,19 @@ public class LabelEnv_c implements LabelEnv
      * Finds a PairLabel upper bound. It does not use leq
      *
      */
-    @SuppressWarnings("unchecked")
     @Override
     public Label findUpperBound(Label L) {
-        return findUpperBound(L, Collections.EMPTY_SET, false);
+        return findUpperBound(L, Collections.<Label> emptySet(), false);
     }
     /**
      * Finds an upper bound that does not contain arg labels. It does not use leq.
      *
      */
-    @SuppressWarnings("unchecked")
     @Override
     public Label findNonArgLabelUpperBound(Label L) {
-        return findUpperBound(L, Collections.EMPTY_SET, true);
+        return findUpperBound(L, Collections.<Label> emptySet(), true);
     }
-    protected Label findUpperBound(Label L, Collection<Serializable> seen, boolean noArgLabels) {        
+    protected Label findUpperBound(Label L, Collection<Label> seen, boolean noArgLabels) {        
         // L is a pair label.
         if (L instanceof PairLabel) return L;
         if (L instanceof VarLabel_c) {
@@ -929,7 +925,7 @@ public class LabelEnv_c implements LabelEnv
         
         if (seen.contains(L)) return ts.topLabel();
         
-        Collection<Serializable> newSeen = new ArrayList<Serializable>(seen.size() + 1);
+        Collection<Label> newSeen = new ArrayList<Label>(seen.size() + 1);
         newSeen.addAll(seen);
         newSeen.add(L);
                 

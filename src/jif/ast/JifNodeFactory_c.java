@@ -213,7 +213,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public ClassDecl ClassDecl(Position pos, Flags flags, Id name, TypeNode superClass, List interfaces, ClassBody body) {
         ClassDecl n = new JifClassDecl_c(pos, flags, name,
@@ -255,7 +254,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
             Id name, List formals, List throwTypes, Block body) {
@@ -302,14 +300,12 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind, Expr outer, List args) {
         if (outer != null) throw new InternalCompilerError("Jif does not support inner classes.");
         return super.ConstructorCall(pos, kind, outer, args);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name, List formals, List throwTypes, Block body) {
         ConstructorDecl n = new JifConstructorDecl_c(pos, flags, name, null, null, formals,
@@ -333,7 +329,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public New New(Position pos, Expr outer, TypeNode objectType, List args, ClassBody body) {
         if (body != null) 
@@ -573,7 +568,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
         return n;
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public Call Call(Position pos, Receiver target, Id name, List args) {
         Call n = new JifCall_c(pos, target, name, args);

@@ -77,7 +77,6 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         return n;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = (Id)visitChild(this.name, v);
@@ -118,7 +117,6 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
 
         // set the formal types
         List<Type> formalTypes = new ArrayList<Type>(n.formals().size());
-        @SuppressWarnings("unchecked")
         List<Formal> formals = n.formals();
         for (Formal f : formals) {
             if (!f.isDisambiguated()) {
@@ -184,7 +182,6 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
 
         // set the labels for the throwTypes.
         List<Type> newThrowTypes = new LinkedList<Type>();
-        @SuppressWarnings("unchecked")
         List<TypeNode> throwTypes = n.throwTypes();
         for (TypeNode tn : throwTypes) {
             if (!tn.isDisambiguated()) {
@@ -242,7 +239,6 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
     private static void renameArgs(JifMethodInstance jmi, TypeSubstitutor tsub) throws SemanticException {
         // formal types
         List<Type> newFormalTypes = new ArrayList<Type>(jmi.formalTypes().size());
-        @SuppressWarnings("unchecked")
         List<Type> formalTypes = jmi.formalTypes();
         for (Type t : formalTypes) {
             newFormalTypes.add(tsub.rewriteType(t));
@@ -260,8 +256,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
 
         // throw types
         List<Type> newThrowTypes = new ArrayList<Type>(jmi.throwTypes().size());
-        @SuppressWarnings("unchecked")
-        List<Type> throwTypes = jmi.throwTypes();
+        List<? extends Type> throwTypes = jmi.throwTypes();
         for (Type t : throwTypes) {
             newThrowTypes.add(tsub.rewriteType(t));
         }

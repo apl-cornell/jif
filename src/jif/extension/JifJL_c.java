@@ -1,17 +1,11 @@
 package jif.extension;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import jif.ast.JifUtil;
 import jif.types.JifTypeSystem;
 import polyglot.ast.JL_c;
 import polyglot.ast.Node;
-import polyglot.types.ClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
@@ -25,8 +19,7 @@ import polyglot.visit.TypeBuilder;
  */
 public class JifJL_c extends JL_c implements JifJL
 {
-    @SuppressWarnings("unchecked")
-    protected Set<ClassType> fatalExceptions = Collections.EMPTY_SET;
+    protected Set<Type> fatalExceptions = Collections.emptySet();
     
     /**
      * Set the exceptions thrown by this node that are treated as fatal.
@@ -40,8 +33,7 @@ public class JifJL_c extends JL_c implements JifJL
      * Get the exceptions thrown by this node that are treated as fatal.
      */
     @Override
-    @SuppressWarnings("unchecked")
-    public Set<ClassType> fatalExceptions() {
+    public Set<Type> fatalExceptions() {
         return fatalExceptions;
     }
 
@@ -58,23 +50,21 @@ public class JifJL_c extends JL_c implements JifJL
         "; still has a Jif extension");
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     // This will be redundant for some classes, 
     // but some subtypes invoke this method and
     // add exceptions afterward, while others 
     // do not. 
-    public List throwTypes(TypeSystem ts) {
-        List l = super.throwTypes(ts);
+    public List<Type> throwTypes(TypeSystem ts) {
+        List<Type> l = super.throwTypes(ts);
         if(l.isEmpty())
             return l;
-        l = new ArrayList(l);
+        l = new ArrayList<Type>(l);
         
-        Set rem = new HashSet();
+        Set<Type> rem = new HashSet<Type>();
         if(fatalExceptions.isEmpty())
             return l;
-        for (Iterator it = l.iterator(); it.hasNext();) {
-            Type t = (Type) it.next();
+        for (Type t : l) {
             if (fatalExceptions.contains(t))
                 rem.add(t);
         }

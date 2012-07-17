@@ -32,7 +32,7 @@ import polyglot.visit.NodeVisitor;
  */
 public class FieldLabelResolver extends ContextVisitor
 {
-    private final Job job;
+    @SuppressWarnings("hiding")
     private final JifTypeSystem ts;
     private VarMap bounds;
     private Map<Label, Label> fieldVarBounds;
@@ -115,7 +115,6 @@ public class FieldLabelResolver extends ContextVisitor
                                             ct + ".", d.position());
         }
 
-        @SuppressWarnings("unchecked")
         List<ClassMember> members = d.members();
         for (ClassMember m : members) {
             if (m instanceof FieldDecl) {

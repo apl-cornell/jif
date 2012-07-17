@@ -38,7 +38,6 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         lc = lc.context(A);
 
         // check formals
-        @SuppressWarnings("unchecked")
         List<Formal> formals = checkFormals(mn.formals(), ci, lc);
 
         // First, check the arguments, adjusting the context.
@@ -71,7 +70,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         Set<JifFieldInstance> s = new LinkedHashSet<JifFieldInstance>();
 
         @SuppressWarnings("unchecked")
-        List<JifFieldInstance> fields = type.fields();
+        List<JifFieldInstance> fields = (List<JifFieldInstance>) type.fields();
         for (JifFieldInstance fi : fields) {
             if (fi.flags().isFinal() && !fi.hasInitializer()) {
                 s.add(fi);
@@ -132,7 +131,6 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
 
         boolean seenSuperCall = false;
 
-        @SuppressWarnings("unchecked")
         List<Stmt> statements = body.statements();
         for (Stmt s : statements) {
             if (seenSuperCall && uninitFinalVars.isEmpty() && 
@@ -204,7 +202,6 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                         result[0] = true;                        
                     }
                     
-                    @SuppressWarnings("unchecked")
                     List<Expr> args = c.arguments();
                     for (Expr arg : args) {
                         if (JifUtil.effectiveExpr(arg) instanceof Special) {
@@ -312,7 +309,6 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
     	
         if (s_ instanceof Block) {
             Block b = (Block) s_;
-            @SuppressWarnings("unchecked")
             List<Stmt> stmts = b.statements();
             initializers.addAll(stmts);
         } else {

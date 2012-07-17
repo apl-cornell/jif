@@ -65,9 +65,8 @@ public class AmbJunctivePrincipalNode_c extends PrincipalNode_c implements AmbJu
     /**
      * Visit this term in evaluation order.
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public List<Term> acceptCFG(CFGBuilder v, List succs) {
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         return succs;
     }
     @Override

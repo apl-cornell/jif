@@ -29,7 +29,6 @@ public class TypeSubstitutor {
         this.substitution = substitution;        
     }
 
-    @SuppressWarnings("unchecked")
     public Type rewriteType(Type t) throws SemanticException {
         if (t instanceof LabeledType && recurseIntoLabeledType((LabeledType)t)) {
             LabeledType lt = (LabeledType)t;
@@ -92,7 +91,6 @@ public class TypeSubstitutor {
         return true;
     }
     
-    @SuppressWarnings("unchecked")
     public <P extends ActsForParam> P rewriteActsForParam(P param)
             throws SemanticException {
         if (param == null) return null;
@@ -106,10 +104,10 @@ public class TypeSubstitutor {
         return rewriteActsForParam(p);
     }
     
-    @SuppressWarnings("unchecked")
     public <Actor extends ActsForParam, Granter extends ActsForParam> Assertion rewriteAssertion(
             Assertion a) throws SemanticException {
         if (a instanceof ActsForConstraint) {
+            @SuppressWarnings("unchecked")
             ActsForConstraint<Actor, Granter> c =
                 (ActsForConstraint<Actor, Granter>) a.copy();
             c = c.actor(rewriteActsForParam(c.actor()));

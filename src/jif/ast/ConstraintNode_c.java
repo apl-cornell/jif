@@ -36,7 +36,6 @@ public class ConstraintNode_c<Constraint extends Assertion> extends Node_c
 	return constraints;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ConstraintNode<Constraint> constraints(Set<Constraint> constraints) {
 	ConstraintNode_c<Constraint> n = (ConstraintNode_c<Constraint>) copy();
@@ -50,7 +49,6 @@ public class ConstraintNode_c<Constraint extends Assertion> extends Node_c
         return constraints.iterator().next();
     }
 
-    @SuppressWarnings("unchecked")
     protected ConstraintNode<Constraint> constraint(Constraint constraint) {
         ConstraintNode_c<Constraint> n = (ConstraintNode_c<Constraint>) copy();
         n.constraints = Collections.singleton(constraint);

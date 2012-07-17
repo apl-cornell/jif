@@ -399,8 +399,7 @@ public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt
                                                        "by observing the method throwing the exception " + pathType.toClass().name(),
                                                        pathLabel);
 
-            @SuppressWarnings("unchecked")
-            List<Type> throwTypes = mi.throwTypes();
+            List<? extends Type> throwTypes = mi.throwTypes();
             for (final Type tj : throwTypes) {
                 Label Lj = ts.labelOfType(tj, Lr);
 

@@ -122,7 +122,7 @@ public class JifClassDeclExt extends Jif_c {
         // superInterfaces
         for (ReferenceType rt : superInterfaces) {
             @SuppressWarnings("unchecked")
-            List<JifMethodInstance> methods = rt.methods();
+            List<JifMethodInstance> methods = (List<JifMethodInstance>) rt.methods();
             for (JifMethodInstance mi : methods) {
                 if (!mi.flags().isAbstract()) {
                     // the method isn't abstract, so ct doesn't have to

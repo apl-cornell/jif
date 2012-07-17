@@ -58,7 +58,6 @@ public class MeetLabelNode_c extends AmbLabelNode_c implements MeetLabelNode
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        @SuppressWarnings("unchecked")
         List<LabelComponentNode> components = visitList(this.components, v);
         return reconstruct(components);
     }

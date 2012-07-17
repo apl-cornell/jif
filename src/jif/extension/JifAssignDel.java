@@ -13,7 +13,6 @@ public class JifAssignDel extends JifJL_c
 {
     protected boolean arithmeticExcIsFatal = false;
     @Override
-    @SuppressWarnings("unchecked")
     public List throwTypes(TypeSystem ts) {
         List l = new LinkedList();
 

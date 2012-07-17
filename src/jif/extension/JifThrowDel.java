@@ -38,7 +38,6 @@ public class JifThrowDel extends JifJL_c
      * throw a null pointer exception if the thrown object is guaranteed to be 
      * non-null
      */
-    @SuppressWarnings("unchecked")
     @Override
     public List throwTypes(TypeSystem ts) {
         Throw t = (Throw)node();

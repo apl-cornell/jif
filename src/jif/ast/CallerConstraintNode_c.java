@@ -60,7 +60,6 @@ public class CallerConstraintNode_c extends ConstraintNode_c<CallerConstraint>
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        @SuppressWarnings("unchecked")
         List<PrincipalNode> principals = visitList(this.principals, v);
         return reconstruct(principals);
     }

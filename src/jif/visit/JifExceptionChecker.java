@@ -1,7 +1,6 @@
 package jif.visit;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,35 +9,10 @@ import jif.extension.JifThrowDel;
 import jif.types.JifLocalInstance;
 import jif.types.JifTypeSystem;
 import jif.types.LabeledType;
-
-import polyglot.ast.Block;
-import polyglot.ast.CanonicalTypeNode;
-import polyglot.ast.Catch;
-import polyglot.ast.CodeDecl;
-import polyglot.ast.ConstructorCall;
-import polyglot.ast.ConstructorDecl;
-import polyglot.ast.Expr;
-import polyglot.ast.Formal;
-import polyglot.ast.Local;
-import polyglot.ast.New;
-import polyglot.ast.Node;
-import polyglot.ast.NodeFactory;
-import polyglot.ast.ProcedureCall;
-import polyglot.ast.ProcedureDecl;
-import polyglot.ast.Throw;
-import polyglot.ast.Try;
+import polyglot.ast.*;
 import polyglot.frontend.Job;
-import polyglot.types.ConstructorInstance;
-import polyglot.types.Flags;
-import polyglot.types.ProcedureInstance;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
-import polyglot.util.ErrorInfo;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.util.SubtypeSet;
-import polyglot.util.UniqueID;
+import polyglot.types.*;
+import polyglot.util.*;
 import polyglot.visit.ErrorHandlingVisitor;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
@@ -57,7 +31,6 @@ public class JifExceptionChecker extends ExceptionChecker {
      * @return The final result of the traversal of the tree rooted at 
      *  <code>n</code>.
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected Node leaveCall(Node parent, Node old, Node n, NodeVisitor v)
 	throws SemanticException {
@@ -86,11 +59,9 @@ public class JifExceptionChecker extends ExceptionChecker {
         	ProcedureDecl pd = (ProcedureDecl) parent;
         	ProcedureInstance pi = pd.procedureInstance();
         	
-        	for(Iterator tsIter = throwsSet.iterator(); tsIter.hasNext();) {
-        		Type uncaughtExc = (Type)tsIter.next();
+        	for(Type uncaughtExc : throwsSet) {
         		boolean declared = false;
-                	for (Iterator cIter = catchable.iterator(); cIter.hasNext(); ) {
-                            Type declaredExc = (Type)cIter.next();
+                	for (Type declaredExc : catchable) {
                             if (ts.isSubtype(uncaughtExc, declaredExc)) {
                             	declared=true;
                                 break;
@@ -114,10 +85,8 @@ public class JifExceptionChecker extends ExceptionChecker {
         	        
 	        	Position pos = Position.compilerGenerated();
 	        	String s = UniqueID.newID("exc");
-	        	List catchBlocks = new LinkedList();
-	        	for(Iterator it = fatalExcs.iterator();it.hasNext();) {
-	        		Type exType = (Type) it.next();
-	        		
+	        	List<Catch> catchBlocks = new LinkedList<Catch>();
+	        	for(Type exType : fatalExcs) {
 	        		if(exType instanceof LabeledType)
 	        			exType = ((LabeledType) exType).labelPart(jifts.topLabel());
 	        		else 
@@ -135,12 +104,12 @@ public class JifExceptionChecker extends ExceptionChecker {
 		        	loc = loc.localInstance(lli);
 		        	loc = (Local) loc.type(exType);
 
-		        	List args = new LinkedList<Expr>();
+		        	List<Expr> args = new LinkedList<Expr>();
 		        	args.add(loc);
 		        	
 		        	New newExc = nf.New(pos, nf.CanonicalTypeNode(pos, jifts.fatalException()), args);
 		        	ConstructorInstance ci = ts.findConstructor(jifts.fatalException(), 
-		        			Collections.singletonList(ts.Throwable()), jifts.fatalException());
+		        			Collections.singletonList((Type) ts.Throwable()), jifts.fatalException());
 		        	newExc = newExc.constructorInstance(ci);
 		        	Throw thrw = nf.Throw(pos, newExc.type(jifts.fatalException()));		        	
 		        	((JifThrowDel)thrw.del()).setThrownIsNeverNull();
@@ -152,9 +121,9 @@ public class JifExceptionChecker extends ExceptionChecker {
 	        	//remove fatal exceptions from throw types of children
 	                Block newBlock = (Block) n.visit(new FatalExceptionSetter(job,ts,nf,fatalExcs));
 
-	        	List stmts = newBlock.statements();
+	        	List<Stmt> stmts = newBlock.statements();
 	        	Try t = nf.Try(pos, nf.Block(pos,stmts), catchBlocks);
-	        	List newStmts = Collections.singletonList(t);
+	        	List<Stmt> newStmts = Collections.singletonList((Stmt) t);
 	        	return newBlock.statements(newStmts);
         	}
         }
@@ -198,7 +167,6 @@ public class JifExceptionChecker extends ExceptionChecker {
      * @param t The type of exception that the node throws.
      * @throws SemanticException
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void throwsException(Type t, Position pos) throws SemanticException {
 		
@@ -209,8 +177,7 @@ public class JifExceptionChecker extends ExceptionChecker {
             JifExceptionChecker ec = this;
             while (!exceptionCaught && ec != null) {
                 if (ec.catchable != null) {
-                    for (Iterator iter = ec.catchable.iterator(); iter.hasNext(); ) {
-                        Type catchType = (Type)iter.next();
+                    for (Type catchType : ec.catchable) {
                         if (ts.isSubtype(t, catchType)) {
                             exceptionCaught = true;
                             break;

@@ -30,7 +30,6 @@ public class JifProcedureDeclDel extends JifJL_c
         return c;
     }
     
-    @SuppressWarnings("unchecked")
     protected void addFormalsToScope(Context c) {
         ProcedureDecl pd = (ProcedureDecl) node();
         for (Formal f : (List<Formal>) pd.formals()) {

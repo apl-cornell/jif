@@ -39,7 +39,6 @@ public class JifNewArrayDel extends JifJL_c
      * non-null
      */
     @Override
-    @SuppressWarnings("unchecked")
     public List throwTypes(TypeSystem ts) {
         List l = new ArrayList(1);
         try {

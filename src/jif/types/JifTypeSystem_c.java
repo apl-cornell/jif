@@ -224,18 +224,17 @@ public class JifTypeSystem_c
         return li;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public ConstructorInstance constructorInstance(
         Position pos,
         ClassType container,
         Flags flags,
-        List formalTypes,
-        List excTypes) {
+        List<Type> formalTypes,
+        List<Type> excTypes) {
         return jifConstructorInstance(pos,container,flags,unknownLabel(pos), false,unknownLabel(pos),false,
-            formalTypes, Collections.EMPTY_LIST,
+            formalTypes, Collections.<Label> emptyList(),
             excTypes,
-            Collections.EMPTY_LIST);
+            Collections.<Assertion> emptyList());
     }
 
     public JifConstructorInstance jifConstructorInstance(
@@ -264,7 +263,6 @@ public class JifTypeSystem_c
         return ci;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public MethodInstance methodInstance(
         Position pos,
@@ -272,8 +270,8 @@ public class JifTypeSystem_c
         Flags flags,
         Type returnType,
         String name,
-        List formalTypes,
-        List excTypes) {
+        List<Type> formalTypes,
+        List<Type> excTypes) {
 
         return jifMethodInstance(
             pos,
@@ -282,10 +280,10 @@ public class JifTypeSystem_c
             returnType,
             name,
             unknownLabel(pos), false,
-            formalTypes, Collections.EMPTY_LIST,
+            formalTypes, Collections.<Label> emptyList(),
             unknownLabel(pos), false,
             excTypes,
-            Collections.EMPTY_LIST);
+            Collections.<Assertion> emptyList());
     }
 
     @Override
@@ -688,7 +686,6 @@ public class JifTypeSystem_c
                                         pc + "\".");
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public void checkInstantiation(Position pos, PClass t, List args)
         throws SemanticException {
@@ -714,7 +711,6 @@ public class JifTypeSystem_c
         }
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public ClassType uncheckedInstantiate(
         Position pos,
@@ -723,7 +719,6 @@ public class JifTypeSystem_c
         return super.uncheckedInstantiate(pos, t, actuals);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public Subst subst(Map substMap, Map cache) {
         return new JifSubst_c(this, substMap, cache);
@@ -1565,7 +1560,6 @@ public class JifTypeSystem_c
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<ReferenceType> abstractSuperInterfaces(ReferenceType rt) {
         return super.abstractSuperInterfaces(rt);
@@ -1588,8 +1582,8 @@ public class JifTypeSystem_c
     }
 
     @Override
-    public Collection<ClassType> uncheckedExceptions() {
-        return Collections.singletonList(Error());
+    public Collection<Type> uncheckedExceptions() {
+        return Collections.singletonList((Type) Error());
     }
 
     @Override
@@ -1597,7 +1591,6 @@ public class JifTypeSystem_c
         return ds;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ConstructorInstance defaultConstructor(
         Position pos,
@@ -1608,10 +1601,10 @@ public class JifTypeSystem_c
                                       Public(),
                                       topLabel(), true,
                                       bottomLabel(), true,
-                                      Collections.EMPTY_LIST,
-                                      Collections.EMPTY_LIST,
-                                      Collections.EMPTY_LIST,
-                                      Collections.EMPTY_LIST);
+                                      Collections.<Type> emptyList(),
+                                      Collections.<Label> emptyList(),
+                                      Collections.<Type> emptyList(),
+                                      Collections.<Assertion> emptyList());
     }
 
     protected LabelTypeCheckUtil ltcu = null;

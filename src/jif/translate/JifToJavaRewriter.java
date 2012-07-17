@@ -18,15 +18,7 @@ import jif.types.JifTypeSystem;
 import jif.types.Param;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
-import polyglot.ast.Block;
-import polyglot.ast.ClassDecl;
-import polyglot.ast.Expr;
-import polyglot.ast.Node;
-import polyglot.ast.NodeFactory;
-import polyglot.ast.SourceCollection;
-import polyglot.ast.SourceFile;
-import polyglot.ast.Stmt;
-import polyglot.ast.TypeNode;
+import polyglot.ast.*;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Job;
 import polyglot.frontend.Source;
@@ -81,7 +73,6 @@ public class JifToJavaRewriter extends ContextVisitor
     public void finish(Node ast) {
         if (ast instanceof SourceCollection) {
             SourceCollection c = (SourceCollection) ast;
-            @SuppressWarnings("unchecked")
             List<SourceFile> sources = c.sources();
             for (SourceFile sf : sources) {
                 java_ext.scheduler().addJob(sf.source(), sf);
@@ -271,10 +262,9 @@ public class JifToJavaRewriter extends ContextVisitor
      * Take any additional class declarations that can fit into the source file,
      * i.e., non-public class decls.
      */
-    @SuppressWarnings("unchecked")
     public Node leavingSourceFile(SourceFile n) {
-        List<ClassDecl> l =
-                new ArrayList<ClassDecl>(n.decls().size()
+        List<TopLevelDecl> l =
+                new ArrayList<TopLevelDecl>(n.decls().size()
                         + additionalClassDecls.size());
         l.addAll(n.decls());
         for (ClassDecl cd : this.additionalClassDecls) {
@@ -283,8 +273,9 @@ public class JifToJavaRewriter extends ContextVisitor
                     // cd is public, we will put it in it's own source file.
                     SourceFile sf = java_nf().SourceFile(Position.compilerGenerated(), 
                                                          n.package_(), 
-                                                         Collections.EMPTY_LIST,
-                                                         Collections.singletonList(cd));
+                                                         Collections
+                                                                .<Import> emptyList(),
+                                                         Collections.singletonList((TopLevelDecl) cd));
                 
                     Location location = java_ext.getOptions().source_output;
                     String pkgName = ""; 

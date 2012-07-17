@@ -64,7 +64,6 @@ public class JifCallDel extends JifJL_c
      * throw a null pointer exception if the receiver is guaranteed to be 
      * non-null
      */
-    @SuppressWarnings("unchecked")
     @Override
     public List throwTypes(TypeSystem ts) {
         MethodInstance mi = ((Call)node()).methodInstance();

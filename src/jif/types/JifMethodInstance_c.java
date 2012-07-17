@@ -91,7 +91,6 @@ public class JifMethodInstance_c extends MethodInstance_c
 	this.constraints = new ArrayList<Assertion>(constraints);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public String toString() {
 	String s = "method " + flags.translate() + returnType +
@@ -149,7 +148,6 @@ public class JifMethodInstance_c extends MethodInstance_c
 	return s;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public boolean isCanonical() {
         if (!(super.isCanonical()
@@ -170,7 +168,6 @@ public class JifMethodInstance_c extends MethodInstance_c
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void subst(VarMap bounds) {
 	this.pcBound = bounds.applyTo(pcBound);
@@ -190,7 +187,6 @@ public class JifMethodInstance_c extends MethodInstance_c
         this.setThrowTypes(throwTypes);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void subst(LabelSubstitution subst) throws SemanticException {
         TypeSubstitutor tsbs = new TypeSubstitutor(subst);
@@ -216,7 +212,6 @@ public class JifMethodInstance_c extends MethodInstance_c
     public String debugString() {
         return debugString(true);
     }
-    @SuppressWarnings("unchecked")
     private String debugString(boolean showInstanceKind) {
         JifTypeSystem jts = (JifTypeSystem) ts;
         String s = "";
@@ -247,7 +242,6 @@ public class JifMethodInstance_c extends MethodInstance_c
         }
         return debugString(false);
     }
-    @SuppressWarnings("unchecked")
     public String fullSignature() { 
 	StringBuffer sb = new StringBuffer();
         sb.append(name);

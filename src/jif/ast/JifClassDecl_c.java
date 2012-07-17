@@ -71,7 +71,6 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         return n;
     }
 
-    @SuppressWarnings("unchecked")
     protected JifClassDecl_c reconstruct(Id name, List<ParamDecl> params,
             TypeNode superClass, List<TypeNode> interfaces,
             List<PrincipalNode> authority,
@@ -88,7 +87,6 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         return (JifClassDecl_c) super.reconstruct(name, superClass, interfaces, body);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = (Id)visitChild(this.name, v);
@@ -247,7 +245,6 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         return n;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
         if (flags.isInterface()) {

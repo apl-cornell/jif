@@ -92,7 +92,6 @@ implements JifConstructorInstance
         this.constraints = new ArrayList<Assertion>(constraints);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public boolean isCanonical() {
         if (!(super.isCanonical()
@@ -112,7 +111,6 @@ implements JifConstructorInstance
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void subst(VarMap bounds) {
         if (this.pcBound != null) 
@@ -137,7 +135,6 @@ implements JifConstructorInstance
         this.setThrowTypes(throwTypes);
     }    
 
-    @SuppressWarnings("unchecked")
     @Override
     public void subst(LabelSubstitution subst) throws SemanticException {
         TypeSubstitutor tsbs = new TypeSubstitutor(subst);
@@ -164,7 +161,6 @@ implements JifConstructorInstance
         return debugString(true);
     }
     
-    @SuppressWarnings("unchecked")
     private String debugString(boolean showInstanceKind) {
         String s = "";
         if (showInstanceKind) {
@@ -194,7 +190,6 @@ implements JifConstructorInstance
         return debugString(false);
     }
     
-    @SuppressWarnings("unchecked")
     public String fullSignature() {
         String s = container.toString();
         if (!isDefaultPCBound() || Report.should_report(Report.debug, 1)) {

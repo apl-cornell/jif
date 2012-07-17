@@ -58,7 +58,6 @@ public class AuthConstraintNode_c extends ConstraintNode_c<AuthConstraint>
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-	@SuppressWarnings("unchecked")
 	List<PrincipalNode> principals = visitList(this.principals, v);
 	return reconstruct(principals);
     }

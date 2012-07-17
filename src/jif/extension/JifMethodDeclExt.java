@@ -56,7 +56,6 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         Label Li = checkEnforceSignature(mi, lc);
 
         // check formals
-        @SuppressWarnings("unchecked")
         List<Formal> formals = checkFormals(mn.formals(), mi, lc);
 
         Block body = null;
@@ -126,7 +125,6 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         JifTypeSystem ts = lc.jifTypeSystem();
 
         int index = 0;
-        @SuppressWarnings("unchecked")
         List<Type> formalTypes = mi.formalTypes();
         for (Type tj : formalTypes) {
             // This is the declared label of the parameter.
@@ -173,7 +171,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
     protected void overrideMethodLabelCheck(LabelChecker lc, final JifMethodInstance mi) throws SemanticException {
         JifTypeSystem ts = lc.jifTypeSystem();
         @SuppressWarnings("unchecked")
-        List<JifMethodInstance> implemented = mi.implemented();
+        List<JifMethodInstance> implemented = (List<JifMethodInstance>) mi.implemented();
         for (final JifMethodInstance mj : implemented) {
             if (! ts.isAccessible(mj, lc.context())) {
                 continue;

@@ -4,10 +4,10 @@ import java.util.*;
 
 public class PrincipalSet
 {
-    private Set set;
+    private Set<Principal> set;
 
     public PrincipalSet() {
-	set = new LinkedHashSet();
+	set = new LinkedHashSet<Principal>();
     }
 
     public PrincipalSet add(Principal p) {
@@ -17,7 +17,7 @@ public class PrincipalSet
 	return ps;
     }
 
-    Set getSet() {
+    Set<Principal> getSet() {
 	return set;
     }
 }

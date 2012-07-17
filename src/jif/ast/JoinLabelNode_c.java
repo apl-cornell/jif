@@ -55,7 +55,6 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        @SuppressWarnings("unchecked")
         List<LabelComponentNode> components = visitList(this.components, v);
         return reconstruct(components);
     }

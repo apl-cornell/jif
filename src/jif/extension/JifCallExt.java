@@ -36,7 +36,6 @@ public class JifCallExt extends JifExprExt
         super(toJava);
     }
 
-    @SuppressWarnings("unchecked")
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         Call me = (Call) node();
 

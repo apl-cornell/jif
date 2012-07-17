@@ -7,6 +7,7 @@ import jif.types.principal.Principal;
 import polyglot.ast.Expr_c;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.visit.TypeChecker;
@@ -61,9 +62,8 @@ public abstract class PrincipalNode_c extends Expr_c implements PrincipalNode
         return principal != null && principal.isCanonical() && super.isDisambiguated();
     }
     
-    @SuppressWarnings("rawtypes")
     @Override
-    public List throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts) {
         return principal().throwTypes(ts);
     }
 

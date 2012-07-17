@@ -193,7 +193,6 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
     /**
      * Visit this term in evaluation order.
      */
-    @SuppressWarnings("rawtypes")
     @Override
     public List acceptCFG(CFGBuilder v, List succs) {
         return succs;

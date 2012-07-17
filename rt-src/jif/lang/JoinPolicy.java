@@ -2,31 +2,33 @@ package jif.lang;
 
 import java.util.*;
 
+import jif.lang.PrincipalUtil.DelegationPair;
+
 /**
  * Abstract class representing the join of policies. All the policies should be
  * of the same kind, either all IntegPolicies or all ConfPolicies.
  */
 public abstract class JoinPolicy extends AbstractPolicy implements Policy
 {
-    private Set components; // Set of Policies
-    JoinPolicy(LabelUtil labelUtil, Set policies) {
+    private Set<Policy> components; // Set of Policies
+    JoinPolicy(LabelUtil labelUtil, Set<Policy> policies) {
         super(labelUtil);
         components = Collections.unmodifiableSet(policies);
     }
     
-    public Set joinComponents() {
+    public Set<Policy> joinComponents() {
         return components;
     }
     
-    public boolean relabelsTo(Policy pol, Set s) {
+    @Override
+    public boolean relabelsTo(Policy pol, Set<DelegationPair> s) {
         if (this == pol || this.equals(pol)) return true;
         
-        Set temp = new HashSet();
+        Set<DelegationPair> temp = new HashSet<DelegationPair>();
         // this == c1 join ... join cn
         // this <= pol if for all Ci, Ci <= pol
         boolean sat = true;
-        for (Iterator i = components.iterator(); i.hasNext(); ) {
-            Policy Ci = (Policy) i.next();
+        for (Policy Ci : components) {
             if (!labelUtil.relabelsTo(Ci, pol, temp)) {
                 sat = false;
                 break;
@@ -45,8 +47,7 @@ public abstract class JoinPolicy extends AbstractPolicy implements Policy
             // we have this <= di
             MeetPolicy mp = (MeetPolicy)pol;
             sat = true;
-            for (Iterator i = mp.meetComponents().iterator(); i.hasNext(); ) {
-                Policy Di = (Policy) i.next();
+            for (Policy Di : mp.meetComponents()) {
                 if (!labelUtil.relabelsTo(this, Di, temp)) {
                     sat = false;
                     break;
@@ -61,9 +62,8 @@ public abstract class JoinPolicy extends AbstractPolicy implements Policy
             // this <= d1 join ... join dn if there is some di
             // such that this <= di
             JoinPolicy jp = (JoinPolicy)pol;
-            for (Iterator i = jp.joinComponents().iterator(); i.hasNext(); ) {
+            for (Policy Di : jp.joinComponents()) {
                 temp.clear();
-                Policy Di = (Policy) i.next();
                 if (labelUtil.relabelsTo(this, Di, temp)) {
                     s.addAll(temp);
                     return true;
@@ -73,6 +73,7 @@ public abstract class JoinPolicy extends AbstractPolicy implements Policy
         return false;
     }
     
+    @Override
     public boolean equals(Object o) {
         if (o instanceof JoinPolicy) {
             JoinPolicy that = (JoinPolicy)o;            
@@ -81,14 +82,16 @@ public abstract class JoinPolicy extends AbstractPolicy implements Policy
         return false;
     }
 
+    @Override
     public final int hashCode() {
         return components.hashCode();
     }
     
+    @Override
     public final String toString() {
         String str = "";
-        for (Iterator iter = components.iterator(); iter.hasNext(); ) {
-            str += ((Policy)iter.next()).toString();
+        for (Iterator<Policy> iter = components.iterator(); iter.hasNext(); ) {
+            str += iter.next().toString();
             if (iter.hasNext()) str += "; ";
         }
         return str;

@@ -171,11 +171,10 @@ public class LabelUtil
     /**
      * See the Jif signature for the explanation of lbl.
      */
-    @SuppressWarnings("unchecked")
     public ConfPolicy readerPolicy(Label lbl, Principal owner, Principal[] readers) {
         try {
             enterTiming();
-            if (readers == null) return readerPolicy(owner, Collections.EMPTY_SET);
+            if (readers == null) return readerPolicy(owner, Collections.<Principal> emptySet());
             return readerPolicy(owner, Arrays.asList(readers));
         }
         finally {
@@ -183,7 +182,6 @@ public class LabelUtil
         }
     }
     
-    @SuppressWarnings("unchecked")
     public ConfPolicy readerPolicy(Principal owner, PrincipalSet writers) {
         try {
             enterTiming();
@@ -217,11 +215,10 @@ public class LabelUtil
     /**
      * See the Jif signature for the explanation of lbl.
      */
-    @SuppressWarnings("unchecked")
     public Label readerPolicyLabel(Label lbl, Principal owner, Principal[] readers) {
         try {
             enterTiming();
-            if (readers == null) return readerPolicyLabel(owner, Collections.EMPTY_SET);
+            if (readers == null) return readerPolicyLabel(owner, Collections.<Principal> emptySet());
             return readerPolicyLabel(owner, Arrays.asList(readers));
         }
         finally {
@@ -229,7 +226,6 @@ public class LabelUtil
         }
     }
     
-    @SuppressWarnings("unchecked")
     public Label readerPolicyLabel(Principal owner, PrincipalSet readers) {
         try {
             enterTiming();
@@ -279,11 +275,10 @@ public class LabelUtil
     /**
      * See the Jif signature for the explanation of lbl.
      */
-    @SuppressWarnings("unchecked")
     public Label writerPolicyLabel(Label lbl, Principal owner, Principal[] writers) {
         try {
             enterTiming();
-            if (writers == null) return writerPolicyLabel(owner, Collections.EMPTY_SET);
+            if (writers == null) return writerPolicyLabel(owner, Collections.<Principal> emptySet());
             return writerPolicyLabel(owner, Arrays.asList(writers));
         }
         finally {
@@ -294,11 +289,10 @@ public class LabelUtil
     /**
      * See the Jif signature for the explanation of lbl.
      */
-    @SuppressWarnings("unchecked")
     public IntegPolicy writerPolicy(Label lbl, Principal owner, Principal[] writers) {
         try {
             enterTiming();
-            if (writers == null) return writerPolicy(owner, Collections.EMPTY_SET);
+            if (writers == null) return writerPolicy(owner, Collections.<Principal> emptySet());
             return writerPolicy(owner, Arrays.asList(writers));
         }
         finally {
@@ -306,7 +300,6 @@ public class LabelUtil
         }
     }
     
-    @SuppressWarnings("unchecked")
     public IntegPolicy writerPolicy(Principal owner, PrincipalSet writers) {
         try {
             enterTiming();
@@ -461,7 +454,6 @@ public class LabelUtil
             exitTiming();
         }
     }
-    @SuppressWarnings("unchecked")
     protected ConfPolicy join(ConfPolicy p1, ConfPolicy p2, Set<DelegationPair> s) {        
         try {
             enterTiming();
@@ -499,7 +491,6 @@ public class LabelUtil
             exitTiming();
         }        
     }
-    @SuppressWarnings("unchecked")
     IntegPolicy join(IntegPolicy p1, IntegPolicy p2, Set<DelegationPair> s) {        
         try {
             enterTiming();
@@ -537,7 +528,6 @@ public class LabelUtil
             exitTiming();
         }
     }
-    @SuppressWarnings("unchecked")
     protected ConfPolicy meet(ConfPolicy p1, ConfPolicy p2, Set<DelegationPair> s) {        
         try {
             enterTiming();
@@ -574,7 +564,6 @@ public class LabelUtil
             exitTiming();
         }
     }
-     @SuppressWarnings("unchecked")
     IntegPolicy meet(IntegPolicy p1, IntegPolicy p2, Set<DelegationPair> s) {        
         try {
             enterTiming();

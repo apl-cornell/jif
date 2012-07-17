@@ -52,7 +52,6 @@ public class JifArrayAccessDel extends JifJL_c
      * non-null
      */
     @Override
-    @SuppressWarnings("unchecked")
     public List throwTypes(TypeSystem ts) {
         List l = new ArrayList(2);
         if (outOfBoundsExcThrown()) {

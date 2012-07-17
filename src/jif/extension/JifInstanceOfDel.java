@@ -54,7 +54,6 @@ public class JifInstanceOfDel extends JifJL_c
         ts.labelTypeCheckUtil().typeCheckType(tc, compareType);
         return super.typeCheck(tc);
     }
-    @SuppressWarnings("unchecked")
     @Override
     public List throwTypes(TypeSystem ts) {
         List ex = new ArrayList(super.throwTypes(ts));

@@ -41,14 +41,18 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
     @Override
     public ActsForConstraintNode<Actor, Granter> actor(
             ActsForParamNode<Actor> actor) {
-        @SuppressWarnings("unchecked")
-        ActsForConstraintNode_c<Actor, Granter> n =
-                (ActsForConstraintNode_c<Actor, Granter>) copy();
+        ActsForConstraintNode_c<Actor, Granter> n = copy();
         n.actor = actor;
         if (constraint() != null) {
             n.setConstraint(constraint().actor(actor.parameter()));
         }
         return n;
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public ActsForConstraintNode_c<Actor, Granter> copy() {
+        return (ActsForConstraintNode_c<Actor, Granter>) super.copy();
     }
 
     @Override
@@ -59,9 +63,7 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
     @Override
     public ActsForConstraintNode<Actor, Granter> granter(
             ActsForParamNode<Granter> granter) {
-        @SuppressWarnings("unchecked")
-        ActsForConstraintNode_c<Actor, Granter> n =
-                (ActsForConstraintNode_c<Actor, Granter>) copy();
+        ActsForConstraintNode_c<Actor, Granter> n = copy();
         n.granter = granter;
         if (constraint() != null) {
             n.setConstraint(constraint().granter(granter.parameter()));
@@ -72,9 +74,8 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
     protected ActsForConstraintNode_c<Actor, Granter> reconstruct(
             ActsForParamNode<Actor> actor, ActsForParamNode<Granter> granter) {
         if (actor != this.actor || granter != this.granter) {
-            @SuppressWarnings("unchecked")
             ActsForConstraintNode_c<Actor, Granter> n =
-                    (ActsForConstraintNode_c<Actor, Granter>) copy();
+                    copy();
             return (ActsForConstraintNode_c<Actor, Granter>) n.actor(actor)
                     .granter(granter);
         }
@@ -82,7 +83,6 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Node visitChildren(NodeVisitor v) {
         ActsForParamNode<Actor> actor = (ActsForParamNode<Actor>) visitChild(this.actor, v);

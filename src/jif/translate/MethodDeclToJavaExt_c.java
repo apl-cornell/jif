@@ -19,7 +19,6 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
     /**
      * @throws SemanticException  
      */
-    @SuppressWarnings("unchecked")
     @Override
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
         // Bypass labels and constraints
@@ -32,7 +31,6 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
         return rw.bypass(n.startLabel()).bypass(n.returnLabel()).bypass(n.constraints());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         MethodDecl n = (MethodDecl) node();
@@ -136,7 +134,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
         }
                 
         if (guard == null) return b;
-        StringLit errorMessage =
+        Expr errorMessage =
                 nf.StringLit(pos, "The method " + mi.debugString()
                         + " has constraints that are unsatisfied.");
         Stmt error =

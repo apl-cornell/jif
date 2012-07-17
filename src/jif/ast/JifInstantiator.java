@@ -276,7 +276,6 @@ public class JifInstantiator
         return (Label)instantiateImpl(L, L.position());
     }
 
-    @SuppressWarnings("unchecked")
     public Type instantiate(Type t) {
         if (t instanceof ArrayType) {
             ArrayType at = (ArrayType)t;

@@ -135,7 +135,6 @@ public class LabelTypeCheckUtil {
 		}
         else if (p instanceof JoinPolicy_c) {
             JoinPolicy_c jp = (JoinPolicy_c)p;
-            @SuppressWarnings("unchecked")
             Collection<Policy> joinComponents = jp.joinComponents();
             for (Policy pol : joinComponents) {
                 typeCheckPolicy(tc, pol);
@@ -143,7 +142,6 @@ public class LabelTypeCheckUtil {
         }
         else if (p instanceof MeetPolicy_c) {
             MeetPolicy_c mp = (MeetPolicy_c)p;
-            @SuppressWarnings("unchecked")
             Collection<Policy> meetComponents = mp.meetComponents();
             for (Policy pol : meetComponents) {
                 typeCheckPolicy(tc, pol);

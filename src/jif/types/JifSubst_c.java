@@ -27,7 +27,6 @@ public class JifSubst_c extends Subst_c implements JifSubst
         super(ts, subst, cache);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Iterator<Map.Entry<ParamInstance, Param>> entries() {
         return super.entries();
@@ -38,7 +37,6 @@ public class JifSubst_c extends Subst_c implements JifSubst
         return (Param) subst.get(pi);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void put(ParamInstance pi, Param param) {
         subst.put(pi, param);
@@ -81,7 +79,6 @@ public class JifSubst_c extends Subst_c implements JifSubst
                                        (JifClassType) t, this);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public MethodInstance substMethod(MethodInstance mi) {
         mi = super.substMethod(mi);
@@ -100,7 +97,6 @@ public class JifSubst_c extends Subst_c implements JifSubst
         return mi;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ConstructorInstance substConstructor(ConstructorInstance ci) {
         ci = super.substConstructor(ci);
@@ -134,19 +130,16 @@ public class JifSubst_c extends Subst_c implements JifSubst
     ////////////////////////////////////////////////////////////////
     // Substitution methods for Jif constructs
 
-    @SuppressWarnings("unchecked")
     @Override
     public <C extends Assertion> List<C> substConstraintList(List<C> constraints) {
         return new CachingTransformingList(constraints, new ConstraintXform());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Label> substLabelList(List<Label> labels) {
         return new CachingTransformingList(labels, new LabelXform());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Principal> substPrincipalList(List<Principal> principals) {
         return new CachingTransformingList(principals, new PrincipalXform());
@@ -174,7 +167,6 @@ public class JifSubst_c extends Subst_c implements JifSubst
 	}
 	else if (constraint instanceof CallerConstraint) {
 	    CallerConstraint c = (CallerConstraint) constraint;
-            @SuppressWarnings("unchecked")
             List<Principal> l =
                     new CachingTransformingList(c.principals(),
                             new PrincipalXform());
@@ -182,7 +174,6 @@ public class JifSubst_c extends Subst_c implements JifSubst
 	}
         else if (constraint instanceof AuthConstraint) {
             AuthConstraint c = (AuthConstraint) constraint;
-            @SuppressWarnings("unchecked")
             List<Principal> l =
                     new CachingTransformingList(c.principals(),
                             new PrincipalXform());
@@ -197,7 +188,6 @@ public class JifSubst_c extends Subst_c implements JifSubst
 	return constraint;
     }
     
-    @SuppressWarnings("unchecked")
     public <P extends ActsForParam> P substActsForParam(P param) {
         if (param == null) return null;
         

@@ -37,7 +37,6 @@ public class ActsForConstraint_c<Actor extends ActsForParam, Granter extends Act
 
     @Override
     public ActsForConstraint<Actor, Granter> actor(Actor actor) {
-        @SuppressWarnings("unchecked")
         ActsForConstraint_c<Actor, Granter> n =
                 (ActsForConstraint_c<Actor, Granter>) copy();
         n.actor = actor;
@@ -51,7 +50,6 @@ public class ActsForConstraint_c<Actor extends ActsForParam, Granter extends Act
 
     @Override
     public ActsForConstraint<Actor, Granter> granter(Granter granter) {
-        @SuppressWarnings("unchecked")
         ActsForConstraint_c<Actor, Granter> n =
                 (ActsForConstraint_c<Actor, Granter>) copy();
         n.granter = granter;

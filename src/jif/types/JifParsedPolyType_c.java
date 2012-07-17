@@ -69,9 +69,8 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
         super.kind(kind);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public List<FieldInstance> fields() {
+    public List<? extends FieldInstance> fields() {
         if (fields == null) {
             // initialize the fields list.
             super.fields();
@@ -152,13 +151,11 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 	throw new InternalCompilerError("Jif does not support inner classes.");
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void setParams(List params) {
         this.params = new LinkedList<ParamInstance>(params);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void setAuthority(List principals) {
         this.authority = new LinkedList<Principal>(principals);

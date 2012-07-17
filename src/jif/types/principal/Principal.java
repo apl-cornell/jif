@@ -3,14 +3,14 @@ package jif.types.principal;
 import java.util.List;
 import java.util.Set;
 
-import polyglot.ast.Expr;
-import polyglot.types.ClassType;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
 import jif.translate.JifToJavaRewriter;
 import jif.types.*;
-import jif.types.label.*;
+import jif.types.label.Label;
 import jif.visit.LabelChecker;
+import polyglot.ast.Expr;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 
 /** The root interface of all kinds of Jif principals. 
  */
@@ -47,6 +47,7 @@ public interface Principal extends ActsForParam {
      */
     PathMap labelCheck(JifContext A, LabelChecker lc);
 
+    @Override
     Expr toJava(JifToJavaRewriter rw) throws SemanticException;
 
     /**
@@ -55,7 +56,7 @@ public interface Principal extends ActsForParam {
      * the exceptions that the runtime evaluation of the principal may produce.
      * If the principal cannot be evaluated at runtime, an empty list should be returned.  
      */
-    List<ClassType> throwTypes(TypeSystem ts);
+    List<Type> throwTypes(TypeSystem ts);
     
     /**
      * Does the label contain any variables at all? This includes variables

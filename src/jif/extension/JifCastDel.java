@@ -65,7 +65,6 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
     }
     
     @Override
-    @SuppressWarnings("unchecked")
     public List throwTypes(TypeSystem ts) {
         Cast c = (Cast)this.node();
 

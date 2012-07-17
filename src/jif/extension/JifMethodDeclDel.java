@@ -62,7 +62,6 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
             // ensure the signature of mi is either main(String[]) or
             // main(principal, String[])
             boolean wrongSig = true;
-            @SuppressWarnings("unchecked")
             List<Type> formalTypes = mi.formalTypes();
             
             String principalArgName = null;

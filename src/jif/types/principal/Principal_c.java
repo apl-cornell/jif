@@ -55,7 +55,7 @@ public abstract class Principal_c extends Param_c implements Principal {
     public abstract int hashCode();
     
     @Override
-    public List<ClassType> throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts) {
         return Collections.emptyList();
     }
 

@@ -127,7 +127,6 @@ public class CallHelper {
             throw new InternalCompilerError("Wrong number of args.");
     }
 
-    @SuppressWarnings("unchecked")
     public static CallHelper OverrideHelper(
             JifMethodInstance overridden,
             JifMethodInstance overriding,
@@ -405,7 +404,6 @@ public class CallHelper {
 
         // now go through each of the actual and formal arguments, and
         // check if the actual arg needs to be final. 
-        @SuppressWarnings("unchecked")
         Iterator<Type> formalTypes = pi.formalTypes().iterator();
         for (int j = 0; j < actualArgs.size(); j++) {
             Type tj = formalTypes.next();
@@ -462,7 +460,6 @@ public class CallHelper {
         return lc.upperBound(L, returnLabel);
     }
 
-    @SuppressWarnings("unchecked")
     protected PathMap excPathMap(LabelChecker lc, Label returnLabel,
             Label pcPriorToInvoke, List<Type> throwTypes)
             throws SemanticException {
@@ -1011,7 +1008,6 @@ public class CallHelper {
         return formalArgLabels;
     }
 
-    @SuppressWarnings("unchecked")
     public Label instantiate(JifContext A, Label L) throws SemanticException {
         return JifInstantiator.instantiate(L, A, receiverExpr, calleeContainer, receiverLabel,
                                            getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem(), pi.position()),
@@ -1035,7 +1031,6 @@ public class CallHelper {
      * replaces any signature ArgPrincipal with the appropriate prinicipal.
      * @throws SemanticException
      */
-    @SuppressWarnings("unchecked")
     public <P extends ActsForParam> P instantiate(JifContext A, P param)
             throws SemanticException {
         if (param instanceof Principal)
@@ -1046,7 +1041,6 @@ public class CallHelper {
                 "Unexpected subclass of ActsForParam: " + param.getClass());
     }
     
-    @SuppressWarnings("unchecked")
     public Principal instantiate(JifContext A, Principal p) throws SemanticException {
         return JifInstantiator.instantiate(p, A, receiverExpr, calleeContainer, receiverLabel,
                                            getArgLabelsFromFormalTypes(this.pi.formalTypes(), (JifTypeSystem)this.pi.typeSystem(), this.pi.position()),
@@ -1055,7 +1049,6 @@ public class CallHelper {
                                            this.actualParamLabels);
     }
 
-    @SuppressWarnings("unchecked")
     public Type instantiate(JifContext A, Type t) throws SemanticException {
         return JifInstantiator.instantiate(t, A, receiverExpr, calleeContainer, receiverLabel,
                                            getArgLabelsFromFormalTypes(pi.formalTypes(), (JifTypeSystem)pi.typeSystem(), pi.position()),
@@ -1109,9 +1102,7 @@ public class CallHelper {
         // argument labels and types are contravariant:
         //      each argument label of mi may be more restrictive than the 
         //      correponding argument label in mj        
-        @SuppressWarnings("unchecked")
         Iterator<Type> miargs = overriding.formalTypes().iterator();
-        @SuppressWarnings("unchecked")
         Iterator<Type> mjargs = overridden.formalTypes().iterator();
         int c=0;
         while (miargs.hasNext() && mjargs.hasNext()) {
@@ -1268,9 +1259,9 @@ public class CallHelper {
         //          the label of an exception E on mi may be less restrictive
         //          than the label of any exception E' on mj, where E<=E'
         @SuppressWarnings("unchecked")
-        List<LabeledType> miExc = overriding.throwTypes();
+        List<LabeledType> miExc = (List<LabeledType>) overriding.throwTypes();
         @SuppressWarnings("unchecked")
-        List<LabeledType> mjExc = overridden.throwTypes();
+        List<LabeledType> mjExc = (List<LabeledType>) overridden.throwTypes();
 
         for (final LabeledType exi : miExc) {
 

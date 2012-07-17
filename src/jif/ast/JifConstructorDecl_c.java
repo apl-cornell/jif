@@ -102,7 +102,6 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         return (JifConstructorDecl_c) super.reconstruct(name, formals, throwTypes, body);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = (Id)visitChild(this.name, v);
@@ -134,7 +133,6 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
 
         // set the formal types
         List<Type> formalTypes = new ArrayList<Type>(n.formals().size());
-        @SuppressWarnings("unchecked")
         List<Formal> formals = n.formals();
         for (Formal f : formals) {
             if (!f.isDisambiguated()) {
@@ -177,7 +175,6 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
 
         // set the labels for the throwTypes.
         List<Type> newThrowTypes = new LinkedList<Type>();
-        @SuppressWarnings("unchecked")
         List<TypeNode> throwTypes = n.throwTypes();
         for (TypeNode tn : throwTypes) {
             if (!tn.isDisambiguated()) {
