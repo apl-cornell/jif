@@ -16,11 +16,7 @@ import polyglot.ast.TypeNode;
 import polyglot.ast.TypeNode_c;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.CodeWriter;
-import polyglot.util.CollectionUtil;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.util.TypedList;
+import polyglot.util.*;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
@@ -38,7 +34,7 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
     public InstTypeNode_c(Position pos, TypeNode base, List params) {
         super(pos);
         this.base = base;
-        this.params = TypedList.copyAndCheck(params, ParamNode.class, true);
+        this.params = ListUtil.copy(params, true);
     }
     
     public TypeNode base() {
@@ -57,7 +53,7 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
     
     public InstTypeNode params(List params) {
         InstTypeNode_c n = (InstTypeNode_c) copy();
-        n.params = TypedList.copyAndCheck(params, ParamNode.class, true);
+        n.params = ListUtil.copy(params, true);
         return n;
     }
     
@@ -65,7 +61,7 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
         if (base != this.base || ! CollectionUtil.equals(params, this.params)) {
             InstTypeNode_c n = (InstTypeNode_c) copy();
             n.base = base;
-            n.params = TypedList.copyAndCheck(params, ParamNode.class, true);
+            n.params = ListUtil.copy(params, true);
             return n;
         }
         

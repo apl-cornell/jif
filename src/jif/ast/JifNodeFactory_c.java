@@ -279,9 +279,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory
 //      List comps = new LinkedList();
 //      if (endLabel != null)
 //      if (endLabel instanceof JoinLabelNode) 
-//      comps = TypedList.copyAndCheck(
-//      ((JoinLabelNode)endLabel).components(), 
-//      LabelNode.class, false);
+//      comps = ListUtil.copy(
+//      ((JoinLabelNode)endLabel).components(), false);
 //      else	    
 //      comps.add(endLabel.copy());
 

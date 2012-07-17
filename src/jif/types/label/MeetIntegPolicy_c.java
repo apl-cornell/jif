@@ -7,17 +7,14 @@ import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
 import polyglot.util.Position;
-import polyglot.util.TypedList;
 
 
 /** Represents the meet of a number of integrity policies. 
  */
 public class MeetIntegPolicy_c extends MeetPolicy_c implements IntegPolicy {
 
-    public MeetIntegPolicy_c(Set components, JifTypeSystem ts, Position pos) {
+    public MeetIntegPolicy_c(Set<IntegPolicy> components, JifTypeSystem ts, Position pos) {
         super(components, ts, pos);
-        // check that all the components are integrity policies
-        TypedList.check(new ArrayList(components), IntegPolicy.class);
     }
 
     protected Policy constructMeetPolicy(Set components, Position pos) {

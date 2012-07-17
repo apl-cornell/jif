@@ -79,9 +79,9 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         if (! CollectionUtil.equals(params, this.params) || ! CollectionUtil.equals(authority, this.authority)
         		|| ! CollectionUtil.equals(params, this.constraints)) {
             JifClassDecl_c n = (JifClassDecl_c) copy();
-            n.params = TypedList.copyAndCheck(params, ParamDecl.class, true);
-            n.authority = TypedList.copyAndCheck(authority, PrincipalNode.class, true);
-            n.constraints = TypedList.copyAndCheck(constraints, ConstraintNode.class, true);
+            n.params = ListUtil.copy(params, true);
+            n.authority = ListUtil.copy(authority, true);
+            n.constraints = ListUtil.copy(constraints, true);
             return (JifClassDecl_c) n.reconstruct(name, superClass, interfaces, body);
         }
 

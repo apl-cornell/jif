@@ -34,7 +34,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
         if (!(expr instanceof Expr) && !(expr instanceof Id)) {
             throw new InternalCompilerError("wrong type for expr: " + expr.getClass().getName());
         }
-        this.dims = TypedList.copyAndCheck(dims, Expr.class, true);
+        this.dims = ListUtil.copy(dims, true);
         this.addDims = addDims;
     }
 
@@ -74,7 +74,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
     /** Returns a copy of this node with <code>dims</code> updated. */
     public AmbNewArray dims(List dims) {
         AmbNewArray_c n = (AmbNewArray_c) copy();
-        n.dims = TypedList.copyAndCheck(dims, Expr.class, true);
+        n.dims = ListUtil.copy(dims, true);
         return n;
     }
     
@@ -94,7 +94,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
             AmbNewArray_c n = (AmbNewArray_c) copy();
             n.baseType = baseType;
             n.expr = expr;
-            n.dims = TypedList.copyAndCheck(dims, Expr.class, true);
+            n.dims = ListUtil.copy(dims, true);
             return n;
         }
 

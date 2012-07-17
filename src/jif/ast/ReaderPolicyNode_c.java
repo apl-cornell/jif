@@ -24,7 +24,7 @@ public class ReaderPolicyNode_c extends PolicyNode_c
 
     public ReaderPolicyNode_c(Position pos, PrincipalNode owner, List principals) {
 	super(pos, owner);
-        this.principals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
+        this.principals = ListUtil.copy(principals, true);
     }
 
     public List principals() {
@@ -33,7 +33,7 @@ public class ReaderPolicyNode_c extends PolicyNode_c
 
     public PolicyNode principals(List principals) {
         ReaderPolicyNode_c n = (ReaderPolicyNode_c) copy();
-        n.principals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
+        n.principals = ListUtil.copy(principals, true);
         return n;
     }
 
@@ -70,7 +70,7 @@ public class ReaderPolicyNode_c extends PolicyNode_c
         if (owner != this.owner || ! CollectionUtil.equals(principals, this.principals)) {
             ReaderPolicyNode_c n = (ReaderPolicyNode_c) copy();
             n.owner = owner;
-            n.principals = TypedList.copyAndCheck(principals, PrincipalNode.class, true);
+            n.principals = ListUtil.copy(principals, true);
             return n;
         }
 

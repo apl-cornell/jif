@@ -141,7 +141,7 @@ parser Grm extends polyglot.parse.Grm {:
     }
 
     public List toParamList(java.util.List l) throws Exception {
-        List params = new TypedList(new LinkedList(), ParamNode.class, false);
+        List params = new LinkedList<ParamNode>();
 
         for (Iterator i = l.iterator(); i.hasNext(); ) {
             Object n = i.next();
@@ -171,7 +171,7 @@ parser Grm extends polyglot.parse.Grm {:
     }
 
     public List makeParamOrExprList(Expr a) {
-        List l = new TypedList(new LinkedList(), Object.class, false);
+        List l = new LinkedList<Object>();
 
         if (a instanceof Wrapper) {
             Wrapper w = (Wrapper) a;
@@ -374,7 +374,7 @@ join_component_list ::=
                     // List of LabelNode or PolicyNode. Implicitly a join
                     // between them
         join_label_component:a
-            {: List l = new TypedList(new LinkedList(), Node.class, false);
+            {: List l = new LinkedList<Node>();
                l.add(a);
                RESULT = l; :}
     |   join_component_list:a SEMICOLON join_label_component:b
@@ -444,15 +444,14 @@ label_component_policy ::=
 
 principal_list_opt ::=
                     // List of PrincipalNode
-            {: RESULT = new TypedList(new LinkedList(), PrincipalNode.class,
-                                      false); :}
+            {: RESULT = new LinkedList<PrincipalNode>(); :}
     |   principal_list:a
             {: RESULT = a; :}
     ;
 principal_list ::=
                     // List of PrincipalNode
         principal_conjunctive:a
-            {: List l = new TypedList(new LinkedList(), PrincipalNode.class, false);
+            {: List l = new LinkedList<PrincipalNode>();
            l.add(a);
                RESULT = l; :}
     |   principal_list:a COMMA principal_conjunctive:b
@@ -636,7 +635,7 @@ override super ::=
 override interface_type_list ::=
                     // List of TypeNode
         objtype_or_expr:a
-            {: List l = new TypedList(new LinkedList(), TypeNode.class, false);
+            {: List l = new LinkedList<TypeNode>();
                l.add(a.toUnlabeledType());
                RESULT = l; :}
     |   interface_type_list:a COMMA objtype_or_expr:b
@@ -645,7 +644,7 @@ override interface_type_list ::=
     ;
 
 authority_opt ::=
-            {: RESULT = new TypedList(new LinkedList(), PrincipalNode.class, false); :}
+            {: RESULT = new LinkedList<PrincipalNode>(); :}
     |   authority:a
             {: RESULT = a; :}
     ;
@@ -660,17 +659,17 @@ override class_body_declaration ::=
         class_member_declaration:a
             {: RESULT = a; :}
     |   constructor_declaration:a
-            {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+            {: List l = new LinkedList<ClassMember>();
                l.add(a);
                RESULT = l; :}
     |   SEMICOLON
-            {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+            {: List l = new LinkedList<ClassMember>();
                RESULT = l; :}
     |   error SEMICOLON:a
-            {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+            {: List l = new LinkedList<ClassMember>();
                RESULT = l; :}
     |   error LBRACE:a
-            {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+            {: List l = new LinkedList<ClassMember>();
                RESULT = l; :}
     |   block:a 
             {:
@@ -689,7 +688,7 @@ override class_member_declaration ::=
         field_declaration:a
             {: RESULT = a; :}
     |   method_declaration:a
-            {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+            {: List l = new LinkedList<ClassMember>();
                l.add(a);
                RESULT = l; :}
     ;
@@ -787,19 +786,19 @@ override constructor_declaration ::=
 override constructor_body ::=
                     // Block
         LBRACE:n explicit_constructor_invocation:a block_statements:b RBRACE:d
-            {: List l = new TypedList(new LinkedList(), Stmt.class, false);
+            {: List l = new LinkedList<Stmt>();
                l.add(a);
                l.addAll(b);
                RESULT = parser.nf.Block(parser.pos(n, d), l); :}
     |   LBRACE:n explicit_constructor_invocation:a RBRACE:d
             {: RESULT = parser.nf.Block(parser.pos(n, d), a); :}
     |   LBRACE:x block_statements:a explicit_super_constructor_invocation:b RBRACE:y
-            {: List l = new TypedList(new LinkedList(), Stmt.class, false);
+            {: List l = new LinkedList<Stmt>();
                l.addAll(a);
                l.add(b);
                RESULT = parser.nf.Block(parser.pos(x,y), l); :}
     |   LBRACE:x block_statements:a explicit_super_constructor_invocation:b block_statements:c RBRACE:y
-            {: List l = new TypedList(new LinkedList(), Stmt.class, false);
+            {: List l = new LinkedList<Stmt>();
                l.addAll(a);
                l.add(b);
                l.addAll(c);
@@ -835,7 +834,7 @@ override explicit_constructor_invocation ::=
 
 parameters_opt ::=
             // List of ParamDecl
-            {: RESULT = new TypedList(new LinkedList(), ParamDecl.class, false); :}
+            {: RESULT = new LinkedList<ParamDecl>(); :}
     |
         LBRACK parameters:p RBRACK
             {: RESULT = p; :}
@@ -844,7 +843,7 @@ parameters_opt ::=
 parameters ::=
             // List of ParamDecl
         parameter:a
-            {: List l = new TypedList(new LinkedList(), ParamDecl.class, false);
+            {: List l = new LinkedList<ParamDecl>();
                l.add(a);
                RESULT = l; :}
     |   parameters:a COMMA parameter:b
@@ -873,7 +872,7 @@ parameter ::=
 
 procedure_constraints_opt ::=
         // List of ConstraintNode
-            {: RESULT = new TypedList(new LinkedList(), ConstraintNode.class, false); :}
+            {: RESULT = new LinkedList<ConstraintNode>(); :}
     |   WHERE procedure_constraints:a
             {: RESULT = a; :}
     ;
@@ -881,7 +880,7 @@ procedure_constraints_opt ::=
 procedure_constraints ::=
         // List of ConstraintNode
         procedure_constraint:a
-            {: List l = new TypedList(new LinkedList(), ConstraintNode.class, false);
+            {: List l = new LinkedList<ConstraintNode>();
                l.add(a); RESULT = l; :}
     |   procedure_constraints:a COMMA procedure_constraint:b
             {: RESULT = a;
@@ -909,7 +908,7 @@ procedure_constraint ::=
 
 constraints_opt ::=
         // List of ConstraintNode
-            {: RESULT = new TypedList(new LinkedList(), ConstraintNode.class, false); :}
+            {: RESULT = new LinkedList<ConstraintNode>(); :}
     |   WHERE constraints:a
             {: RESULT = a; :}
     ;
@@ -917,7 +916,7 @@ constraints_opt ::=
 constraints ::=
         // List of ConstraintNode
         constraint:a
-            {: List l = new TypedList(new LinkedList(), ConstraintNode.class, false);
+            {: List l = new LinkedList<ConstraintNode>();
                l.add(a); RESULT = l; :}
     |   constraints:a COMMA constraint:b
             {: RESULT = a;
@@ -998,7 +997,7 @@ override interface_declaration ::=
 override extends_interfaces ::=
                     // List of TypeNode
         EXTENDS objtype_or_expr:a
-            {: List l = new TypedList(new LinkedList(), TypeNode.class, false);
+            {: List l = new LinkedList<TypeNode>();
                l.add(a.toUnlabeledType());
                RESULT = l; :}
     |   extends_interfaces:a COMMA objtype_or_expr:b

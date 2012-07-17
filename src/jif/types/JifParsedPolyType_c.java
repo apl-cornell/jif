@@ -12,7 +12,6 @@ import polyglot.frontend.Source;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.util.TypedList;
 
 /** An implementation of the <code>JifParsedPolyType</code> interface. 
  */
@@ -156,13 +155,13 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void setParams(List params) {
-        this.params = new TypedList(params, ParamInstance.class, false);
+        this.params = new LinkedList<ParamInstance>(params);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void setAuthority(List principals) {
-        this.authority = new TypedList(principals, Principal.class, false);
+        this.authority = new LinkedList<Principal>(principals);
     }
     @Override
     public List<Assertion> constraints() {

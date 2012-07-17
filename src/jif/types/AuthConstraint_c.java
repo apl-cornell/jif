@@ -5,8 +5,8 @@ import java.util.List;
 
 import jif.types.principal.Principal;
 import polyglot.types.TypeObject_c;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
-import polyglot.util.TypedList;
 
 /** An implementation of the <code>AuthConstraint</code> interface. 
  */
@@ -16,12 +16,12 @@ public class AuthConstraint_c extends TypeObject_c implements AuthConstraint {
     public AuthConstraint_c(JifTypeSystem ts, Position pos,
 	                        List principals) {
 	super(ts, pos);
-	this.principals = TypedList.copyAndCheck(principals, Principal.class, true);
+	this.principals = ListUtil.copy(principals, true);
     }
 
     public AuthConstraint principals(List principals) {
 	AuthConstraint_c n = (AuthConstraint_c) copy();
-	n.principals = TypedList.copyAndCheck(principals, Principal.class, true);
+	n.principals = ListUtil.copy(principals, true);
 	return n;
     }
 

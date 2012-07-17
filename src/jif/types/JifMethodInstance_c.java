@@ -10,8 +10,8 @@ import jif.types.label.Label;
 import jif.types.label.ProviderLabel;
 import polyglot.main.Report;
 import polyglot.types.*;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
-import polyglot.util.TypedList;
 
 /** An implementation of the <code>JifMethodInstance</code> interface.
  */
@@ -38,12 +38,8 @@ public class JifMethodInstance_c extends MethodInstance_c
         this.isDefaultPCBound = isDefaultPCBound;
 	this.returnLabel = returnLabel;
         this.isDefaultReturnLabel = isDefaultReturnLabel;
-	this.throwTypes = TypedList.copyAndCheck(throwTypes,
-					       Type.class,
-					       true);
-	this.formalTypes = TypedList.copyAndCheck(formalTypes,
-	                                          Type.class,
-	                                          true);
+	this.throwTypes = ListUtil.copy(throwTypes, true);
+	this.formalTypes = ListUtil.copy(formalTypes, true);
     }
 
     @Override
