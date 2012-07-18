@@ -36,7 +36,7 @@ public abstract class Policy_c extends TypeObject_c implements Policy {
     abstract public String toString(Set<Label> printedLabels);
 
     @Override
-    public Object copy() {
+    public Policy_c copy() {
         Policy_c p = (Policy_c)super.copy();
         p.simplified = null;
         return p;

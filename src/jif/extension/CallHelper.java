@@ -404,7 +404,7 @@ public class CallHelper {
 
         // now go through each of the actual and formal arguments, and
         // check if the actual arg needs to be final. 
-        Iterator<Type> formalTypes = pi.formalTypes().iterator();
+        Iterator<? extends Type> formalTypes = pi.formalTypes().iterator();
         for (int j = 0; j < actualArgs.size(); j++) {
             Type tj = formalTypes.next();
             ArgLabel aj = (ArgLabel)jts.labelOfType(tj);
@@ -994,7 +994,7 @@ public class CallHelper {
     }
 
     protected static List<ArgLabel> getArgLabelsFromFormalTypes(
-            List<Type> formalTypes, JifTypeSystem jts, Position pos)
+            List<? extends Type> formalTypes, JifTypeSystem jts, Position pos)
             throws SemanticException {
         List<ArgLabel> formalArgLabels = new ArrayList<ArgLabel>(formalTypes.size());
         for (Type t : formalTypes) {
@@ -1102,8 +1102,8 @@ public class CallHelper {
         // argument labels and types are contravariant:
         //      each argument label of mi may be more restrictive than the 
         //      correponding argument label in mj        
-        Iterator<Type> miargs = overriding.formalTypes().iterator();
-        Iterator<Type> mjargs = overridden.formalTypes().iterator();
+        Iterator<? extends Type> miargs = overriding.formalTypes().iterator();
+        Iterator<? extends Type> mjargs = overridden.formalTypes().iterator();
         int c=0;
         while (miargs.hasNext() && mjargs.hasNext()) {
             Type i = miargs.next();

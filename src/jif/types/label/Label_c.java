@@ -39,7 +39,7 @@ public abstract class Label_c extends Param_c implements Label {
         this(ts, pos, new CannotLabelToJavaExpr_c());
     }
     @Override
-    public Object copy() {
+    public Label_c copy() {
         Label_c l = (Label_c)super.copy();
         l.variables = null;
         l.simplified = null;

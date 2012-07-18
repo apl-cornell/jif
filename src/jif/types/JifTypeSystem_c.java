@@ -229,8 +229,8 @@ public class JifTypeSystem_c
         Position pos,
         ClassType container,
         Flags flags,
-        List<Type> formalTypes,
-        List<Type> excTypes) {
+        List<? extends Type> formalTypes,
+        List<? extends Type> excTypes) {
         return jifConstructorInstance(pos,container,flags,unknownLabel(pos), false,unknownLabel(pos),false,
             formalTypes, Collections.<Label> emptyList(),
             excTypes,
@@ -245,9 +245,9 @@ public class JifTypeSystem_c
         boolean isDefaultStartLabel,
         Label returnLabel,
         boolean isDefaultReturnLabel,
-        List<Type> formalTypes,
+        List<? extends Type> formalTypes,
         List<Label> formalArgLabels,
-        List<Type> excTypes,
+        List<? extends Type> excTypes,
         List<Assertion> constraints) {
         JifConstructorInstance ci =
             new JifConstructorInstance_c(

@@ -28,8 +28,8 @@ implements JifConstructorInstance
     public JifConstructorInstance_c(JifTypeSystem ts, Position pos,
             ClassType container, Flags flags,
             Label pcBound, boolean isDefaultPCBound, Label returnLabel, 
-            boolean isDefaultReturnLabel, List<Type> formalTypes,
-            List<Label> formalArgLabels, List<Type> excTypes,
+            boolean isDefaultReturnLabel, List<? extends Type> formalTypes,
+            List<Label> formalArgLabels, List<? extends Type> excTypes,
             List<Assertion> constraints) {
 
         super(ts, pos, container, flags, formalTypes, excTypes);

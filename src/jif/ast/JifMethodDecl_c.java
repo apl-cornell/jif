@@ -239,7 +239,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
     private static void renameArgs(JifMethodInstance jmi, TypeSubstitutor tsub) throws SemanticException {
         // formal types
         List<Type> newFormalTypes = new ArrayList<Type>(jmi.formalTypes().size());
-        List<Type> formalTypes = jmi.formalTypes();
+        List<? extends Type> formalTypes = jmi.formalTypes();
         for (Type t : formalTypes) {
             newFormalTypes.add(tsub.rewriteType(t));
         }

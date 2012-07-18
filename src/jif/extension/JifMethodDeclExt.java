@@ -125,7 +125,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         JifTypeSystem ts = lc.jifTypeSystem();
 
         int index = 0;
-        List<Type> formalTypes = mi.formalTypes();
+        List<? extends Type> formalTypes = mi.formalTypes();
         for (Type tj : formalTypes) {
             // This is the declared label of the parameter.
             Label argBj = ((ArgLabel)ts.labelOfType(tj)).upperBound();

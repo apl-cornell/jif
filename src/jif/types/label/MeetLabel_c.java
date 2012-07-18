@@ -147,7 +147,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         return Collections.unmodifiableSet(components);
     }
 
-    public Object copy() {
+    public MeetLabel_c copy() {
         MeetLabel_c l = (MeetLabel_c)super.copy();
         l.normalized = null;
         return l;

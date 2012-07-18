@@ -62,7 +62,7 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
             // ensure the signature of mi is either main(String[]) or
             // main(principal, String[])
             boolean wrongSig = true;
-            List<Type> formalTypes = mi.formalTypes();
+            List<? extends Type> formalTypes = mi.formalTypes();
             
             String principalArgName = null;
             JifTypeSystem jts = (JifTypeSystem)tc.typeSystem();

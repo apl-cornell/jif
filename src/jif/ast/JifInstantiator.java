@@ -31,7 +31,7 @@ public class JifInstantiator
     private final Label receiverLbl;
     private final AccessPath receiverPath;
     private final List<ArgLabel> formalArgLabels; 
-    private final List<Type> formalArgTypes; 
+    private final List<? extends Type> formalArgTypes; 
     private final List<Label> actualArgLabels; 
     private final List<Expr> actualArgExprs;
     private final List<Label> actualParamLabels; 
@@ -47,7 +47,7 @@ public class JifInstantiator
                             Label receiverLbl,
                             AccessPath receiverPath,
                             List<ArgLabel> formalArgLabels,
-                            List<Type> formalArgTypes,
+                            List<? extends Type> formalArgTypes,
                             List<Label> actualArgLabels,
                             List<Expr> actualArgExprs,
                             List<Label> actualParamLabels,
@@ -482,7 +482,7 @@ public class JifInstantiator
                                     ReferenceType receiverType, 
                                     Label receiverLabel, 
                                     List<ArgLabel> formalArgLabels, 
-                                    List<Type> formalArgTypes,
+                                    List<? extends Type> formalArgTypes,
                                     List<Label> actualArgLabels, 
                                     List<Expr> actualArgExprs, 
                                     List<Label> actualParamLabels) throws SemanticException {
@@ -613,7 +613,7 @@ public class JifInstantiator
             ReferenceType receiverType, 
             Label receiverLabel, 
             List<ArgLabel> formalArgLabels, 
-            List<Type> formalArgTypes,
+            List<? extends Type> formalArgTypes,
             List<Expr> actualArgExprs, 
             List<Label> actualParamLabels) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
@@ -643,7 +643,7 @@ public class JifInstantiator
             ReferenceType receiverType, 
             Label receiverLabel, 
             List<ArgLabel> formalArgLabels, 
-            List<Type> formalArgTypes,
+            List<? extends Type> formalArgTypes,
             List<Label> actualArgLabels, 
             List<Expr> actualArgExprs, 
             List<Label> actualParamLabels) throws SemanticException {

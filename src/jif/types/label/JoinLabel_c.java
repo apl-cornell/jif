@@ -151,7 +151,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         return Collections.unmodifiableCollection(components);
     }
 
-    public Object copy() {
+    public JoinLabel_c copy() {
         JoinLabel_c l = (JoinLabel_c)super.copy();
         l.normalized = null;
         return l;
