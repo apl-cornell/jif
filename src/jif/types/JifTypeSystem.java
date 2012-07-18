@@ -91,10 +91,10 @@ public interface JifTypeSystem extends ParamTypeSystem
             String name,
             Label startLabel,
             boolean isDefaultStartLabel,
-            List<Type> formalTypes, List<Label> formalArgLabels,
+            List<? extends Type> formalTypes, List<Label> formalArgLabels,
             Label endLabel,
             boolean isDefaultEndLabel,
-            List<Type> excTypes,
+            List<? extends Type> excTypes,
             List<Assertion> constraints);
     
     /** Tests if the type is "principal". */

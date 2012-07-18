@@ -27,9 +27,9 @@ public class JifMethodInstance_c extends MethodInstance_c
     public JifMethodInstance_c(JifTypeSystem ts, Position pos,
 	    ReferenceType container, Flags flags, Type returnType,
 	    String name, Label pcBound, boolean isDefaultPCBound,
-            List<Type> formalTypes, List<Label> formalArgLabels,
+            List<? extends Type> formalTypes, List<Label> formalArgLabels,
 	    Label returnLabel, boolean isDefaultReturnLabel,
-            List<Type> excTypes, List<Assertion> constraints) {
+            List<? extends Type> excTypes, List<Assertion> constraints) {
 
 	super(ts, pos, container, flags, returnType, name, formalTypes, excTypes);
 	this.constraints = new ArrayList<Assertion>(constraints);
@@ -160,7 +160,7 @@ public class JifMethodInstance_c extends MethodInstance_c
 
         JifTypeSystem jts = (JifTypeSystem)typeSystem();
         // also need to make sure that every formal type is labeled with an arg label
-        for (Type t : (List<Type>) formalTypes()) {
+        for (Type t : formalTypes()) {
             if (!jts.isLabeled(t) || !(jts.labelOfType(t) instanceof ArgLabel)) {
                 return false;
             }
@@ -175,13 +175,13 @@ public class JifMethodInstance_c extends MethodInstance_c
 	this.returnType = bounds.applyTo(returnType);
 
 	List<Type> formalTypes = new LinkedList<Type>();
-	for (Type t : (List<Type>) formalTypes()) {
+	for (Type t : formalTypes()) {
 	    formalTypes.add(bounds.applyTo(t));
 	}
 	this.setFormalTypes(formalTypes);
 
         List<Type> throwTypes = new LinkedList<Type>();
-        for (Type t : (List<Type>) throwTypes()) {
+        for (Type t : throwTypes()) {
             throwTypes.add(bounds.applyTo(t));
         }
         this.setThrowTypes(throwTypes);
@@ -195,13 +195,13 @@ public class JifMethodInstance_c extends MethodInstance_c
         setReturnType(tsbs.rewriteType(returnType()));
 
         List<Type> formalTypes = new LinkedList<Type>();
-        for (Type t : (List<Type>) formalTypes()) {
+        for (Type t : formalTypes()) {
             formalTypes.add(tsbs.rewriteType(t));
         }
         this.setFormalTypes(formalTypes);
 
         List<Type> throwTypes = new LinkedList<Type>();
-        for (Type t : (List<Type>) throwTypes()) {
+        for (Type t : throwTypes()) {
             throwTypes.add(tsbs.rewriteType(t));
         }
         this.setThrowTypes(throwTypes);
