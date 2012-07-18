@@ -25,7 +25,7 @@ import polyglot.util.Position;
 /** An implementation of the <code>JifTypeSystem</code> interface.
  */
 public class JifTypeSystem_c
-    extends ParamTypeSystem_c
+    extends ParamTypeSystem_c<ParamInstance, Param>
     implements JifTypeSystem {
     protected final TypeSystem jlts;
 
@@ -720,8 +720,8 @@ public class JifTypeSystem_c
     }
 
     @Override
-    public Subst subst(Map substMap, Map cache) {
-        return new JifSubst_c(this, substMap, cache);
+    public Subst subst(Map substMap) {
+        return new JifSubst_c(this, substMap);
     }
     @Override
     public ClassType fatalException() {

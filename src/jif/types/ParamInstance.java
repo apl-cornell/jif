@@ -6,7 +6,7 @@ import polyglot.util.Enum;
 /** A parameter instance. A wrapper of all the type information 
  *  related to a label/principal parameter. 
  */
-public interface ParamInstance extends VarInstance
+public interface ParamInstance extends polyglot.ext.param.types.Param, VarInstance
 {
     public static class Kind extends Enum {
         final boolean isPrincipal;

@@ -6,7 +6,7 @@ import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ext.param.types.Subst;
 
-public interface JifSubst extends Subst
+public interface JifSubst extends Subst<ParamInstance, Param>
 {
     public <Actor extends ActsForParam, Granter extends ActsForParam> Assertion substConstraint(
             Assertion constraint);

@@ -20,11 +20,10 @@ import polyglot.util.CachingTransformingList;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Transformation;
 
-public class JifSubst_c extends Subst_c implements JifSubst
+public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubst
 {
-    public JifSubst_c(JifTypeSystem ts, Map<ParamInstance, Param> subst,
-            Map<Type, Type> cache) {
-        super(ts, subst, cache);
+    public JifSubst_c(JifTypeSystem ts, Map<ParamInstance, Param> subst) {
+        super(ts, subst);
     }
 
     @Override
@@ -296,7 +295,7 @@ public class JifSubst_c extends Subst_c implements JifSubst
     // Substitution machinery
 
     @Override
-    protected Object substSubstValue(Object value) {
+    protected Param substSubstValue(Param value) {
         if (value instanceof Label) {
             return substLabel((Label)value);
         }

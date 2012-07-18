@@ -16,7 +16,7 @@ import polyglot.util.Position;
 
 /** Jif type system.
  */
-public interface JifTypeSystem extends ParamTypeSystem
+public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
 {
     // Type constructors
 
