@@ -1,14 +1,34 @@
 package jif.visit;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import jif.ast.DowngradeExpr;
 import jif.ast.Jif;
 import jif.ast.JifUtil;
 import jif.extension.JifArrayAccessDel;
 import jif.extension.JifExprExt;
-import polyglot.ast.*;
+import polyglot.ast.ArrayAccess;
+import polyglot.ast.ArrayAccessAssign;
+import polyglot.ast.Assign;
+import polyglot.ast.Binary;
 import polyglot.ast.Binary.Operator;
+import polyglot.ast.Conditional;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Local;
+import polyglot.ast.LocalAssign;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Term;
+import polyglot.ast.Unary;
 import polyglot.frontend.Job;
 import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
@@ -16,14 +36,15 @@ import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.visit.DataFlow;
 import polyglot.visit.FlowGraph;
+import polyglot.visit.FlowGraph.EdgeKey;
 import polyglot.visit.NodeVisitor;
 
 /**
  * This class finds integral bounds on expressions. It uses that information to
  * determine whether it is impossible for certain exceptions to be thrown.
  */
-public class IntegerBoundsChecker extends DataFlow
-{
+public class IntegerBoundsChecker extends
+        DataFlow<IntegerBoundsChecker.DataFlowItem> {
     public IntegerBoundsChecker(Job job) {
         this(job, job.extensionInfo().typeSystem(), job.extensionInfo().nodeFactory());
     }
@@ -36,7 +57,8 @@ public class IntegerBoundsChecker extends DataFlow
      * Create an initial Item for the dataflow analysis. By default, the 
      * map of integer bounds is empty.
      */
-    protected Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
+    @Override
+    protected DataFlowItem createInitialItem(FlowGraph<DataFlowItem> graph, Term node, boolean entry) {
         return new DataFlowItem();
     }
     
@@ -44,8 +66,10 @@ public class IntegerBoundsChecker extends DataFlow
      * We use boolean flows for this dataflow analysis, i.e., we want to track
      * different information on the true and false branches.
      */
-    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, Term n,
-            boolean entry, Set edgeKeys) {
+    @Override
+    protected Map<EdgeKey, DataFlowItem> flow(List<DataFlowItem> inItems,
+            List<EdgeKey> inItemKeys, FlowGraph<DataFlowItem> graph, Term n,
+            boolean entry, Set<EdgeKey> edgeKeys) {
         return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, entry, 
                 edgeKeys);
     }
@@ -54,19 +78,22 @@ public class IntegerBoundsChecker extends DataFlow
         new HashSet<Operator>(Arrays.asList(new Binary.Operator[] { 
                 Binary.EQ, Binary.LE, Binary.LT, Binary.GE, Binary.GT, }));
     
-    public Map flow(Item trueItem, Item falseItem, Item otherItem, 
-            FlowGraph graph, Term n, boolean entry, Set succEdgeKeys) {
-        Item inItem = safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, 
+    @Override
+    public Map<EdgeKey, DataFlowItem> flow(DataFlowItem trueItem,
+            DataFlowItem falseItem, DataFlowItem otherItem,
+            FlowGraph<DataFlowItem> graph, Term n, boolean entry,
+            Set<EdgeKey> succEdgeKeys) {
+        DataFlowItem inItem = safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, 
                                      falseItem, FlowGraph.EDGE_KEY_FALSE,
                                      otherItem, FlowGraph.EDGE_KEY_OTHER,
                                      n, entry, graph);
         //System.err.println("flow for " + n + " : in " + inItem);
         
         if (entry) {
-            return itemToMap(inItem, succEdgeKeys);
+            return DataFlow.<DataFlowItem> itemToMap(inItem, succEdgeKeys);
         }
 
-        DataFlowItem inDFItem = ((DataFlowItem)inItem);
+        DataFlowItem inDFItem = (inItem);
         
         // create a map of updates, that is, the information that we know to
         // be true as a result of flowing over the term n
@@ -172,8 +199,9 @@ public class IntegerBoundsChecker extends DataFlow
             DataFlowItem otherDFItem = outDFItem;
             trueItem = trueItem == null ? outDFItem : trueItem;
             falseItem = falseItem == null ? outDFItem : falseItem;
-            Map m = flowBooleanConditions(trueItem, falseItem, otherDFItem,
-                    graph, (Expr) n, succEdgeKeys);
+            Map<EdgeKey, DataFlowItem> m =
+                    flowBooleanConditions(trueItem, falseItem, otherDFItem,
+                            graph, (Expr) n, succEdgeKeys);
             
             if (m != null) {
                 return m;
@@ -183,7 +211,8 @@ public class IntegerBoundsChecker extends DataFlow
         return itemToMap(outDFItem, succEdgeKeys);
     }
 
-    protected void post(FlowGraph graph, Term root) throws SemanticException {
+    @Override
+    protected void post(FlowGraph<DataFlowItem> graph, Term root) throws SemanticException {
         super.post(graph, root);
         notifyAllNodes(root);
     }
@@ -191,9 +220,10 @@ public class IntegerBoundsChecker extends DataFlow
      * Record the bounds information. We could be extensible here, and allow
      * other uses of the info.
      */
-    public void check(FlowGraph graph, Term n, boolean entry, Item inItem, 
-            Map outItems) throws SemanticException {
-        DataFlowItem dfIn = (DataFlowItem) inItem;
+    @Override
+    public void check(FlowGraph<DataFlowItem> graph, Term n, boolean entry,
+            DataFlowItem inItem, Map<EdgeKey, DataFlowItem> outItems) {
+        DataFlowItem dfIn = inItem;
         
         if (n instanceof Expr && ((Expr)n).type().isNumeric()) {
             Interval bounds = findNumericRange((Expr) n, dfIn);
@@ -217,7 +247,8 @@ public class IntegerBoundsChecker extends DataFlow
             if (indBounds.getLower() != null && indBounds.getLower().longValue() >= 0L) {
                 // lower bound is ok, now check the upper bound.
                 Local arr = (Local)aa.array();            
-                Set arrays = findArrayLengthBounds(aa.index(), true, dfIn);
+                Set<LocalInstance> arrays =
+                        findArrayLengthBounds(aa.index(), true, dfIn);
                 if (arrays.contains(arr.localInstance())) {
                     JifArrayAccessDel jaad = (JifArrayAccessDel)aa.del();
                     jaad.setNoOutOfBoundsExcThrown();
@@ -228,6 +259,7 @@ public class IntegerBoundsChecker extends DataFlow
     
     protected void notifyAllNodes(Node n) {
         n.visit(new NodeVisitor() {
+            @Override
             public Node leave(Node old, Node n, NodeVisitor v) {
                 // let the node know that the numeric bounds have been set.
                 Jif ext = JifUtil.jifExt(n);
@@ -242,11 +274,11 @@ public class IntegerBoundsChecker extends DataFlow
      * The confluence of a list of items. Only facts that are true of all
      * items should be retained.
      */
-    protected Item confluence(List items, Term node, boolean entry, 
-            FlowGraph graph) {
+    @Override
+    protected DataFlowItem confluence(List<DataFlowItem> items, Term node,
+            boolean entry, FlowGraph<DataFlowItem> graph) {
         Map<LocalInstance, Bounds> newMap = null;
-        for (Iterator iter = items.iterator(); iter.hasNext();) {
-            DataFlowItem df = (DataFlowItem)iter.next();
+        for (DataFlowItem df : items) {
             if (newMap == null) {
                 newMap = new HashMap<LocalInstance, Bounds>(df.bounds);
                 continue;
@@ -266,7 +298,7 @@ public class IntegerBoundsChecker extends DataFlow
                 }
             }
         }
-        Item result = new DataFlowItem(newMap);
+        DataFlowItem result = new DataFlowItem(newMap);
         return result;
     }
     
@@ -635,24 +667,28 @@ public class IntegerBoundsChecker extends DataFlow
                 }
             }
         }
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
 
-    protected Set<LocalInstance> findArrayLengthBounds(LocalInstance li, boolean strict, DataFlowItem df) {
-        return findArrayLengthBounds(li, strict, df, new HashSet());
+    protected Set<LocalInstance> findArrayLengthBounds(LocalInstance li,
+            boolean strict, DataFlowItem df) {
+        return findArrayLengthBounds(li, strict, df,
+                new HashSet<LocalInstance>());
     }
+
     /**
      * Finds the local instances that are arrays, and whose length
      * is a strict upper bound on the value of the local variable li.
      */
-    protected Set<LocalInstance> findArrayLengthBounds(LocalInstance li, boolean strict, DataFlowItem df, Set<LocalInstance> seen) {
-        if (seen.contains(li)) return Collections.EMPTY_SET;
+    protected Set<LocalInstance> findArrayLengthBounds(LocalInstance li,
+            boolean strict, DataFlowItem df, Set<LocalInstance> seen) {
+        if (seen.contains(li)) return Collections.emptySet();
         seen.add(li);
         Bounds bnds = df.bounds.get(li);
         
         if (bnds == null) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
         Set<LocalInstance> s = new HashSet<LocalInstance>();
         for (Bound b : bnds.bounds) {
@@ -836,7 +872,11 @@ public class IntegerBoundsChecker extends DataFlow
         
         protected static enum Type {
             
-            LT("<"), LE("<="), GT(">"), GE(">=");
+            @SuppressWarnings("hiding")
+            LT("<"), @SuppressWarnings("hiding")
+            LE("<="), @SuppressWarnings("hiding")
+            GT(">"), @SuppressWarnings("hiding")
+            GE(">=");
             
             private final String name;
             
@@ -876,6 +916,7 @@ public class IntegerBoundsChecker extends DataFlow
                 return strict ? strict() : nonStrict();
             }
             
+            @Override
             public String toString() {
                 return name;
             }
@@ -912,6 +953,7 @@ public class IntegerBoundsChecker extends DataFlow
             return type.isStrict();
         }
         
+        @Override
         public boolean equals(Object o) {
             if (o instanceof Bound) {
                 Bound other = (Bound) o;
@@ -921,10 +963,12 @@ public class IntegerBoundsChecker extends DataFlow
             }
         }
 
+        @Override
         public int hashCode() {
             return type.hashCode();
         }
         
+        @Override
         public String toString() {
             return type.toString();
         }
@@ -942,11 +986,13 @@ public class IntegerBoundsChecker extends DataFlow
             this.li = bound;
         }
         
+        @Override
         public Bound strict(boolean strict) {
             if (type.isStrict() == strict) return this;
             return new LocalBound(type.strict(strict), li);
         }
         
+        @Override
         public boolean equals(Object o) {
             if (o instanceof LocalBound) {
                 LocalBound other = (LocalBound) o;
@@ -956,10 +1002,12 @@ public class IntegerBoundsChecker extends DataFlow
             }
         }
         
+        @Override
         public int hashCode() {
             return super.hashCode() ^ li.hashCode();
         }
 
+        @Override
         public String toString() {
             return type + li.name();
         }
@@ -978,11 +1026,13 @@ public class IntegerBoundsChecker extends DataFlow
             assert(array.type().isArray());
         }
         
+        @Override
         public Bound strict(boolean strict) {
             if (type.isStrict() == strict) return this;
             return new ArrayLengthBound(type.strict(strict), array);
         }
         
+        @Override
         public boolean equals(Object o) {
             if (o instanceof ArrayLengthBound) {
                 ArrayLengthBound other = (ArrayLengthBound) o;
@@ -992,10 +1042,12 @@ public class IntegerBoundsChecker extends DataFlow
             }
         }
         
+        @Override
         public int hashCode() {
             return super.hashCode() ^ array.hashCode() ^ -98798387;
         }
 
+        @Override
         public String toString() {
             return type + array.name() + ".length";
         }
@@ -1173,6 +1225,7 @@ public class IntegerBoundsChecker extends DataFlow
             return new Interval(low, high);
         }
         
+        @Override
         public boolean equals(Object o) {
             if (o instanceof Interval) {
                 Interval other = (Interval) o;
@@ -1183,6 +1236,7 @@ public class IntegerBoundsChecker extends DataFlow
             }
         }
         
+        @Override
         public int hashCode() {
             return nullableHashCode(lower) ^ nullableHashCode(upper);
         }
@@ -1195,6 +1249,7 @@ public class IntegerBoundsChecker extends DataFlow
             }
         }
         
+        @Override
         public String toString() {
             return "[" + longString(lower) + "," + longString(upper) + "]";
         }
@@ -1307,6 +1362,7 @@ public class IntegerBoundsChecker extends DataFlow
             return new Bounds(rng, bnds);
         }
 
+        @Override
         public boolean equals(Object o) {
             if (o instanceof Bounds) {
                 Bounds that = (Bounds) o;
@@ -1316,10 +1372,12 @@ public class IntegerBoundsChecker extends DataFlow
             }
         }
         
+        @Override
         public int hashCode() {
             return range.hashCode() ^ bounds.hashCode();
         }
 
+        @Override
         public String toString() {
             return "(" + range + ", " + bounds + ")";
         }
@@ -1332,7 +1390,7 @@ public class IntegerBoundsChecker extends DataFlow
      * 
      * There is a Map from LocalInstances (of type int) to a set of lower bounds.
      */
-    protected static class DataFlowItem extends Item {
+    protected static class DataFlowItem extends DataFlow.Item {
         
         /**
          * map from LocalInstances (of type int) a set of lower bounds. Elements in
@@ -1352,6 +1410,7 @@ public class IntegerBoundsChecker extends DataFlow
             bounds = new HashMap<LocalInstance, Bounds>(d.bounds);
         }
 
+        @Override
         public boolean equals(Object o) {
             if (o instanceof DataFlowItem) {
                 DataFlowItem other = (DataFlowItem) o;
@@ -1361,10 +1420,12 @@ public class IntegerBoundsChecker extends DataFlow
             }
         }
 
+        @Override
         public int hashCode() {
             return bounds.hashCode();
         }
 
+        @Override
         public String toString() {
             return bounds.toString();
         }

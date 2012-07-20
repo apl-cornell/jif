@@ -8,17 +8,19 @@ import polyglot.visit.AmbiguityRemover;
 
 /** An ambiguous label node. */
 public abstract class AmbLabelNode_c extends LabelNode_c
-                                  implements LabelNode, Ambiguous
+implements LabelNode, Ambiguous
 {
     public AmbLabelNode_c(Position pos) {
-	super(pos);
+        super(pos);
     }
 
+    @Override
     public final boolean isDisambiguated() {
         return false;
     }
 
     /** Disambiguate the type of this node. */
+    @Override
     public abstract Node disambiguate(AmbiguityRemover ar)
-	throws SemanticException;
+            throws SemanticException;
 }

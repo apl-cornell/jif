@@ -2,7 +2,15 @@ package jif;
 
 import jif.visit.JifTranslator;
 import polyglot.ast.Node;
-import polyglot.frontend.*;
+import polyglot.frontend.CyclicDependencyException;
+import polyglot.frontend.EmptyPass;
+import polyglot.frontend.JLExtensionInfo;
+import polyglot.frontend.JLScheduler;
+import polyglot.frontend.Job;
+import polyglot.frontend.OutputPass;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.Source;
 import polyglot.frontend.goals.CodeGenerated;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.SourceFileGoal;
@@ -40,7 +48,8 @@ public class OutputExtensionInfo extends JLExtensionInfo {
     @Override
     public Goal getCompileGoal(final Job job) {
         CodeGenerated output = new CodeGenerated(job) {
-            public Pass createPass(ExtensionInfo extInfo) {
+            @Override
+            public Pass createPass(polyglot.frontend.ExtensionInfo extInfo) {
                 return new OutputPass(this, new JifTranslator(job, typeSystem(),
                                                               nodeFactory(), targetFactory()));
             }            

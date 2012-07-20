@@ -1,10 +1,11 @@
 package jif.ast;
 
 import jif.types.JifTypeSystem;
-import polyglot.ast.*;
-import polyglot.types.SemanticException;
+import polyglot.ast.ArrayTypeNode_c;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.TypeNode;
 import polyglot.types.Type;
-import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeBuilder;
@@ -19,15 +20,17 @@ public class ConstArrayTypeNode_c extends ArrayTypeNode_c implements ConstArrayT
         super(pos, base);
     }
 
-    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+    @Override
+    public Node buildTypes(TypeBuilder tb) {
         JifTypeSystem ts = (JifTypeSystem)tb.typeSystem();
         return type(ts.constArrayOf(position(), base.type()));
     }
 
-    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+    @Override
+    public Node disambiguate(AmbiguityRemover ar) {
         JifTypeSystem ts = (JifTypeSystem)ar.typeSystem();
         NodeFactory nf = ar.nodeFactory();
-        if (! base.isDisambiguated()) {
+        if (!base.isDisambiguated()) {
             return this;
         }
 
@@ -38,10 +41,11 @@ public class ConstArrayTypeNode_c extends ArrayTypeNode_c implements ConstArrayT
         }
 
         return nf.CanonicalTypeNode(position(),
-                                    ts.constArrayOf(position(), baseType));
+                ts.constArrayOf(position(), baseType));
     }
 
 
+    @Override
     public String toString() {
         return base.toString() + "const []";
     }

@@ -30,30 +30,36 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt
         this.body = body;
     }
 
+    @Override
     public LabelNode label() {
         return label;
     }
 
+    @Override
     public DowngradeStmt label(LabelNode label) {
         DowngradeStmt_c n = (DowngradeStmt_c) copy();
         n.label = label;
         return n;
     }
 
+    @Override
     public LabelNode bound() {
         return bound;
     }
 
+    @Override
     public DowngradeStmt bound(LabelNode b) {
         DowngradeStmt_c n = (DowngradeStmt_c) copy();
         n.bound = b;
         return n;
-    }    
+    }
 
+    @Override
     public Stmt body() {
         return body;
     }
 
+    @Override
     public DowngradeStmt body(Stmt body) {
         DowngradeStmt_c n = (DowngradeStmt_c) copy();
         n.body = body;
@@ -72,6 +78,7 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt
         return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         LabelNode bound = this.bound==null?null:((LabelNode) visitChild(this.bound, v));
         LabelNode label = (LabelNode) visitChild(this.label, v);
@@ -79,24 +86,28 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt
         return reconstruct(bound, label, body);
     }
 
+    @Override
     public Term firstChild() {
         return body;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(body, this, EXIT);
         return succs;
     }
 
+    @Override
     public String toString() {
         if (bound == null) {
             return downgradeKind() + "(" + label + ") " + body;
         }
         else {
-            return downgradeKind() + "(" + bound + " to " + label + ") " + body;            
+            return downgradeKind() + "(" + bound + " to " + label + ") " + body;
         }
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(downgradeKind());
         w.write("(");
@@ -112,8 +123,10 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt
      * 
      * @return Name of the kind of downgrade, e.g. "declassify" or "endorse"
      */
+    @Override
     public abstract String downgradeKind();
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("cannot translate " + this);
     }

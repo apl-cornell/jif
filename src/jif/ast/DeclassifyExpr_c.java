@@ -7,12 +7,13 @@ import polyglot.util.Position;
  */
 public class DeclassifyExpr_c extends DowngradeExpr_c implements DeclassifyExpr
 {
-    public DeclassifyExpr_c(Position pos, Expr expr, 
-                            LabelNode bound, LabelNode label) {
+    public DeclassifyExpr_c(Position pos, Expr expr,
+            LabelNode bound, LabelNode label) {
         super(pos, expr, bound, label);
 
     }
 
+    @Override
     public String downgradeKind() {
         return "declassify";
     }

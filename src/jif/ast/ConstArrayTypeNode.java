@@ -9,6 +9,8 @@ import polyglot.ast.TypeNode;
  */
 public interface ConstArrayTypeNode extends ArrayTypeNode
 {
+    @Override
     TypeNode base();
+    @Override
     ArrayTypeNode base(TypeNode base);
 }

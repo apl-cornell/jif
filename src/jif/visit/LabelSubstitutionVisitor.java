@@ -1,34 +1,51 @@
 package jif.visit;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import jif.ast.JifConstructorDecl;
 import jif.ast.JifMethodDecl;
 import jif.ast.LabelNode;
-import jif.types.*;
+import jif.types.JifConstructorInstance;
+import jif.types.JifFieldInstance;
+import jif.types.JifLocalInstance;
+import jif.types.JifMethodInstance;
+import jif.types.JifProcedureInstance;
+import jif.types.LabelSubstitution;
+import jif.types.TypeSubstitutor;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
-import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.ast.Block;
+import polyglot.ast.Expr;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Formal;
+import polyglot.ast.Local;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Node;
+import polyglot.ast.ProcedureDecl;
+import polyglot.ast.TypeNode;
+import polyglot.types.LocalInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.visit.NodeVisitor;
 
-/** 
+/**
  * Visits an AST, and applies a <code>LabelSubsitution</code> to all labels
  * that occur in the AST. The <code>LabelSubsitution</code> is not allowed
  * to throw any <code>SemanticException</code>s.
  */
 public class LabelSubstitutionVisitor extends NodeVisitor {
     /**
-     * Should the Rewriter skip over the 
+     * Should the Rewriter skip over the
      */
     private boolean skipBody;
-    
+
     /**
      * The substitution to use.
      */
     private LabelSubstitution substitution;
-    
+
     /**
      * Utility class to rewrite labels in types.
      */
@@ -39,19 +56,20 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
      * @param substitution the LabelSubstitution to use.
      * @param skipBody skip over the body of method/constructor decls?
      */
-    public LabelSubstitutionVisitor(LabelSubstitution substitution, 
-                                    boolean skipBody) {
+    public LabelSubstitutionVisitor(LabelSubstitution substitution,
+            boolean skipBody) {
         this(substitution, new TypeSubstitutor(substitution), skipBody);
     }
-        public LabelSubstitutionVisitor(LabelSubstitution substitution, 
-                TypeSubstitutor typeSubst,
-                boolean skipBody) {
+    public LabelSubstitutionVisitor(LabelSubstitution substitution,
+            TypeSubstitutor typeSubst,
+            boolean skipBody) {
         this.skipBody = skipBody;
         this.substitution = substitution;
         this.typeSubstitutor = typeSubst;
     }
 
     // Don't recurse into the body.
+    @Override
     public Node override(Node n) {
         if (skipBody && n instanceof Block) {
             return n;
@@ -60,6 +78,7 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
         return null;
     }
 
+    @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
         try {
             if (n instanceof TypeNode) {
@@ -119,7 +138,7 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
                 // Imperatively update the field instance.
                 fi.setType(t);
                 fi.setLabel(rewriteLabel(fi.label()));
-                
+
                 return fd;
             }
             else if (n instanceof ProcedureDecl) {
@@ -128,27 +147,28 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
                 JifProcedureInstance mi = (JifProcedureInstance)md.procedureInstance();
                 mi.setReturnLabel(rewriteLabel(mi.returnLabel()), mi.isDefaultReturnLabel());
                 mi.setPCBound(rewriteLabel(mi.pcBound()), mi.isDefaultPCBound());
-                
-                List throwTypes = new ArrayList(mi.throwTypes());
+
+                ArrayList<Type> throwTypes =
+                        new ArrayList<Type>(mi.throwTypes());
                 for (int i = 0; i < throwTypes.size(); i++) {
-                    throwTypes.set(i, rewriteType((Type)throwTypes.get(i)));
+                    throwTypes.set(i, rewriteType(throwTypes.get(i)));
                 }
-                List formalTypes = new ArrayList(mi.formalTypes());
+                List<Type> formalTypes = new ArrayList<Type>(mi.formalTypes());
                 for (int i = 0; i < formalTypes.size(); i++) {
-                    formalTypes.set(i, rewriteType((Type)formalTypes.get(i)));
+                    formalTypes.set(i, rewriteType(formalTypes.get(i)));
                 }
 
                 if (mi instanceof JifMethodInstance) {
                     JifMethodInstance jmi = (JifMethodInstance)mi;
                     jmi.setReturnType(rewriteType(jmi.returnType()));
-                    
+
                     jmi.setThrowTypes(throwTypes);
                     jmi.setFormalTypes(formalTypes);
                     md = ((JifMethodDecl)md).methodInstance(jmi);
                 }
                 else if (mi instanceof JifConstructorInstance) {
                     JifConstructorInstance jci = (JifConstructorInstance)mi;
-                    
+
                     jci.setThrowTypes(throwTypes);
                     jci.setFormalTypes(formalTypes);
                     md = ((JifConstructorDecl)md).constructorInstance(jci);
@@ -161,7 +181,7 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
         }
         catch (SemanticException e) {
             throw new InternalCompilerError("Unexpected SemanticException "+
-                "thrown", e);
+                    "thrown", e);
         }
     }
 
@@ -175,7 +195,7 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
 
     public Expr rewriteExpr(Expr e) throws SemanticException {
         Type t = e.type();
-        return e.type(rewriteType(t));        
+        return e.type(rewriteType(t));
     }
 
     private Type rewriteType(Type t) throws SemanticException {

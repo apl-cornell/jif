@@ -20,16 +20,18 @@ public class CheckedEndorseStmt_c extends EndorseStmt_c implements CheckedEndors
         this.expr = e;
     }
 
+    @Override
     public Expr expr() {
         return expr;
     }
 
+    @Override
     public CheckedEndorseStmt expr(Expr expr) {
         CheckedEndorseStmt_c n = (CheckedEndorseStmt_c) copy();
         n.expr = expr;
         return n;
     }
-    
+
     protected DowngradeStmt_c reconstruct(Expr expr, LabelNode bound, LabelNode label, Stmt body) {
         CheckedEndorseStmt_c n = (CheckedEndorseStmt_c)super.reconstruct(bound, label, body);
         if (this.expr != expr) {
@@ -39,6 +41,7 @@ public class CheckedEndorseStmt_c extends EndorseStmt_c implements CheckedEndors
         return n;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = (Expr) visitChild(this.expr(), v);
         LabelNode bound = this.bound()==null?null:((LabelNode) visitChild(this.bound(), v));
@@ -47,10 +50,12 @@ public class CheckedEndorseStmt_c extends EndorseStmt_c implements CheckedEndors
         return reconstruct(expr, bound, label, body);
     }
 
+    @Override
     public String toString() {
         return downgradeKind() + "(" + expr() + ", " + (bound()==null?"":(bound() + " to ")) + label() + ") " + body();
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(downgradeKind());
         w.write("(");
@@ -64,5 +69,5 @@ public class CheckedEndorseStmt_c extends EndorseStmt_c implements CheckedEndors
         w.write(") ");
         printSubStmt(body(), w, tr);
     }
-    
+
 }

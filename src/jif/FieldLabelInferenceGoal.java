@@ -13,6 +13,7 @@ public class FieldLabelInferenceGoal extends SourceFileGoal {
         super(job);
     }
 
+    @Override
     public Pass createPass(polyglot.frontend.ExtensionInfo extInfo) {
         ExtensionInfo jifext = (ExtensionInfo)extInfo;
         final JifTypeSystem ts = (JifTypeSystem) jifext.typeSystem();

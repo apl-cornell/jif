@@ -1,6 +1,11 @@
 package jif.ast;
 
-import jif.types.*;
+import jif.types.JifTypeSystem;
+import jif.types.JifVarInstance;
+import jif.types.Param;
+import jif.types.ParamInstance;
+import jif.types.PrincipalInstance;
+import jif.types.SemanticDetailedException;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.Id;
@@ -14,7 +19,7 @@ import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 
-/** An implementation of the <code>AmbParam</code> interface. 
+/** An implementation of the <code>AmbParam</code> interface.
  */
 public class AmbParam_c extends Node_c implements AmbParam
 {
@@ -27,6 +32,7 @@ public class AmbParam_c extends Node_c implements AmbParam
         this.pi = pi;
     }
 
+    @Override
     public boolean isDisambiguated() {
         return false;
     }
@@ -41,16 +47,19 @@ public class AmbParam_c extends Node_c implements AmbParam
         return n;
     }
 
+    @Override
     public Param parameter() {
         throw new InternalCompilerError("No parameter yet");
     }
 
+    @Override
     public String toString() {
         return name + "{amb}";
     }
+    @Override
     public Node visitChildren(NodeVisitor v) {
         if (this.name == null) return this;
-        
+
         Id name = (Id) visitChild(this.name, v);
         return reconstruct(name);
     }
@@ -67,7 +76,7 @@ public class AmbParam_c extends Node_c implements AmbParam
      * of meaningful error messages.
      */
     private int disambCount = 0;
-    
+
     /**
      * The maximum number of times that disambiguate can be called before
      * we allow an error message to be reported. Should be less than
@@ -77,13 +86,14 @@ public class AmbParam_c extends Node_c implements AmbParam
      * need to be bigger than k.
      */
     protected static final int MAX_DISAMB_CALLS = 100;
-    
+
     /** Disambiguates <code>name</code>.
      *  If <code>name</code> is a <tt>VarInstance</tt>, we get a dynamic label/principal
-     *  node. If <code>name</code> is a <tt>PrincipalInstance</tt>, we get the same 
+     *  node. If <code>name</code> is a <tt>PrincipalInstance</tt>, we get the same
      *  principal. If <code>name</code> is a <tt>ParamInstance</tt>, we get a <tt>ParamLabel</tt>
      *  or a <tt>ParamPrincipal</tt>.
      */
+    @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         Context c = sc.context();
         VarInstance vi = c.findVariable(name.id());
@@ -93,7 +103,7 @@ public class AmbParam_c extends Node_c implements AmbParam
             sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
             return this;
         }
-        
+
         if (vi instanceof JifVarInstance) {
             return varToParam((JifVarInstance) vi, sc);
         }
@@ -106,15 +116,15 @@ public class AmbParam_c extends Node_c implements AmbParam
             return paramToParam((ParamInstance) vi, sc);
         }
 
-        throw new SemanticDetailedException(vi + " cannot be used as parameter.", 
-                                            "The variable " + name + " is not suitable for use as a parameter.",
-                                            this.position());
+        throw new SemanticDetailedException(vi + " cannot be used as parameter.",
+                "The variable " + name + " is not suitable for use as a parameter.",
+                this.position());
     }
 
     /** Turns a <code>JifVarInstance</code> object into a label node or
      *  a principal node */
     protected Node varToParam(JifVarInstance vi, AmbiguityRemover sc)
-    throws SemanticException {
+            throws SemanticException {
 
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
@@ -129,31 +139,29 @@ public class AmbParam_c extends Node_c implements AmbParam
                 return nf.CanonicalPrincipalNode(position(), p);
             }
             throw new SemanticDetailedException(
-                                                "Only final variables of type \"label\" or \"principal\" may be used as class parameters.",
-                                                "Only final variables of type \"label\" or \"principal\" may be used as class parameters. " +
-                                                "The variable " + vi.name() + " is not of type \"label\", nor of type \"principal\".",
-                                                position());
+                    "Only final variables of type \"label\" or \"principal\" may be used as class parameters.",
+                    "Only final variables of type \"label\" or \"principal\" may be used as class parameters. " +
+                            "The variable " + vi.name() + " is not of type \"label\", nor of type \"principal\".",
+                            position());
         }
 
         throw new SemanticDetailedException(
-                                            "Only final variables of type \"label\" or \"principal\" may be used as class parameters.",
-                                            "Only final variables of type \"label\" or \"principal\" may be used as class parameters. " +
-                                            "The variable " + vi.name() + " is not final.",
-                                            position());
+                "Only final variables of type \"label\" or \"principal\" may be used as class parameters.",
+                "Only final variables of type \"label\" or \"principal\" may be used as class parameters. " +
+                        "The variable " + vi.name() + " is not final.",
+                        position());
     }
 
     /** Turns a <code>PrincipalInstance</code> object into a principal node. */
-    protected Node principalToParam(PrincipalInstance vi, AmbiguityRemover sc)
-    throws SemanticException {
+    protected Node principalToParam(PrincipalInstance vi, AmbiguityRemover sc) {
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
         return nf.CanonicalPrincipalNode(position(), vi.principal());
     }
 
-    /** Turns a <code>PramaInstance</code> object into a label node or a 
-     *  principal node. 
+    /** Turns a <code>PramaInstance</code> object into a label node or a
+     *  principal node.
      */
-    protected Node paramToParam(ParamInstance pi, AmbiguityRemover sc)
-    throws SemanticException {
+    protected Node paramToParam(ParamInstance pi, AmbiguityRemover sc) {
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
@@ -166,8 +174,8 @@ public class AmbParam_c extends Node_c implements AmbParam
         if (pi.isInvariantLabel()) {
             // <param label uid> => <label-param uid>
             Label L = ts.paramLabel(position(), pi);
-            L.setDescription("label parameter " + pi.name() + 
-                             " of class " + pi.container().fullName());
+            L.setDescription("label parameter " + pi.name() +
+                    " of class " + pi.container().fullName());
             return nf.CanonicalLabelNode(position(), L);
         }
 
@@ -178,6 +186,6 @@ public class AmbParam_c extends Node_c implements AmbParam
         }
 
         throw new InternalCompilerError("Unrecognized parameter type for " + pi,
-                                        position());
+                position());
     }
 }

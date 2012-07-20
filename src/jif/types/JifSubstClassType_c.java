@@ -14,16 +14,16 @@ import polyglot.types.ClassType;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
-public class JifSubstClassType_c extends SubstClassType_c
-    implements JifSubstType
+public class JifSubstClassType_c extends SubstClassType_c<ParamInstance, Param>
+implements JifSubstType
 {
     public JifSubstClassType_c(JifTypeSystem ts, Position pos,
-                               ClassType base, JifSubst subst) {
+            ClassType base, JifSubst subst) {
         super(ts, pos, base, subst);
 
         if (! (base instanceof JifPolyType)) {
             throw new InternalCompilerError("Cannot perform subst on \"" +
-                                            base + "\".");
+                    base + "\".");
         }
     }
 
@@ -31,7 +31,7 @@ public class JifSubstClassType_c extends SubstClassType_c
     // Implement methods of JifSubstType
 
     @Override
-    public PClass instantiatedFrom() {
+    public PClass<ParamInstance, Param> instantiatedFrom() {
         return ((JifPolyType) base).instantiatedFrom();
     }
 
@@ -74,16 +74,16 @@ public class JifSubstClassType_c extends SubstClassType_c
 
     @Override
     public List<Principal> constructorCallAuthority() {
-        JifClassType base = (JifClassType) this.base;        
+        JifClassType base = (JifClassType) this.base;
         JifSubst subst = (JifSubst) this.subst;
         return subst.substPrincipalList(base.constructorCallAuthority());
     }
-   
+
     @Override
     public ThisLabel thisLabel() {
         return ((JifTypeSystem)ts).thisLabel(this);
     }
-    
+
     @Override
     public ThisLabel thisLabel(Position p) {
         return ((JifTypeSystem)ts).thisLabel(p, this);
@@ -117,10 +117,10 @@ public class JifSubstClassType_c extends SubstClassType_c
         return jpt.name() + s;
     }
 
-	@Override
-	public ProviderLabel provider() {
-	    JifClassType jpt = (JifClassType) base;
-	    return jpt.provider();
-	}
+    @Override
+    public ProviderLabel provider() {
+        JifClassType jpt = (JifClassType) base;
+        return jpt.provider();
+    }
 
 }

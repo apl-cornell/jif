@@ -1,6 +1,5 @@
 package jif.visit;
 
-import java.util.Iterator;
 import java.util.Set;
 
 import jif.types.JifClassType;
@@ -25,7 +24,8 @@ public class JifInitChecker extends InitChecker {
     }
 
     
-    protected void checkOther(FlowGraph graph, 
+    @Override
+    protected void checkOther(FlowGraph<FlowItem> graph, 
                               Node n, 
                               DataFlowItem dfIn,
                               DataFlowItem dfOut) 
@@ -36,9 +36,8 @@ public class JifInitChecker extends InitChecker {
             Type t = tn.type();
             if (t instanceof JifClassType) {
                 JifTypeSystem ts = (JifTypeSystem)t.typeSystem();
-                Set lis = ts.labelTypeCheckUtil().localInstancesUsed((JifClassType)t);
-                for (Iterator iter = lis.iterator(); iter.hasNext(); ) {
-                    LocalInstance li = (LocalInstance)iter.next();
+                Set<LocalInstance> lis = ts.labelTypeCheckUtil().localInstancesUsed((JifClassType)t);
+                for (LocalInstance li : lis) {
                     checkLocalInstanceInit(li, dfIn, tn.position());
                 }
             }

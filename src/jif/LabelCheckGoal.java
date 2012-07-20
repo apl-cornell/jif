@@ -1,7 +1,5 @@
 package jif;
 
-import jif.ast.JifNodeFactory;
-import jif.types.JifTypeSystem;
 import jif.visit.LabelCheckPass;
 import jif.visit.LabelChecker;
 import polyglot.frontend.Job;
@@ -13,6 +11,7 @@ public class LabelCheckGoal extends SourceFileGoal {
         super(job);
     }
 
+    @Override
     public Pass createPass(polyglot.frontend.ExtensionInfo extInfo) {
         ExtensionInfo jifext = (ExtensionInfo)extInfo;
         LabelChecker lc = jifext.createLabelChecker(this.job(), 

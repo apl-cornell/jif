@@ -16,6 +16,7 @@ public class JifTranslator extends TypedTranslator
 	super(job, ts, nf, tf);
     }
 
+    @Override
     protected boolean translateSource(SourceFile sfn) {
 	// Don't translate classes in jif.lang.
 	if (sfn.package_() != null &&

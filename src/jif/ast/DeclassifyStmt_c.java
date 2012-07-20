@@ -8,10 +8,11 @@ import polyglot.util.Position;
 public class DeclassifyStmt_c extends DowngradeStmt_c implements DeclassifyStmt
 {
     public DeclassifyStmt_c(Position pos, LabelNode bound,
-                            LabelNode label, Stmt body) {
-	super(pos, bound, label, body);
+            LabelNode label, Stmt body) {
+        super(pos, bound, label, body);
     }
 
+    @Override
     public String downgradeKind() {
         return "declassify";
     }

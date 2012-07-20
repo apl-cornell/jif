@@ -85,7 +85,9 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
 
     @Override
     public Node visitChildren(NodeVisitor v) {
+        @SuppressWarnings("unchecked")
         ActsForParamNode<Actor> actor = (ActsForParamNode<Actor>) visitChild(this.actor, v);
+        @SuppressWarnings("unchecked")
         ActsForParamNode<Granter> granter = (ActsForParamNode<Granter>) visitChild(this.granter, v);
         return reconstruct(actor, granter);
     }

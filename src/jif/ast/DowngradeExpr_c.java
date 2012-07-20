@@ -8,7 +8,6 @@ import polyglot.ast.Expr_c;
 import polyglot.ast.Node;
 import polyglot.ast.Precedence;
 import polyglot.ast.Term;
-import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -27,7 +26,7 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
     private LabelNode bound;
     private Expr expr;
 
-    public DowngradeExpr_c(Position pos, Expr expr, 
+    public DowngradeExpr_c(Position pos, Expr expr,
             LabelNode bound, LabelNode label) {
         super(pos);
         this.expr = expr;
@@ -35,30 +34,36 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
         this.label = label;
     }
 
+    @Override
     public Expr expr() {
         return expr;
     }
 
+    @Override
     public DowngradeExpr expr(Expr expr) {
         DowngradeExpr_c n = (DowngradeExpr_c) copy();
         n.expr = expr;
         return n;
     }
 
+    @Override
     public LabelNode label() {
         return label;
     }
 
+    @Override
     public DowngradeExpr label(LabelNode label) {
         DowngradeExpr_c n = (DowngradeExpr_c) copy();
         n.label = label;
         return n;
     }
 
+    @Override
     public LabelNode bound() {
         return bound;
     }
 
+    @Override
     public DowngradeExpr bound(LabelNode b) {
         DowngradeExpr_c n = (DowngradeExpr_c) copy();
         n.bound = b;
@@ -77,6 +82,7 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
         return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = (Expr) visitChild(this.expr, v);
         LabelNode bound = this.bound==null?null:((LabelNode) visitChild(this.bound, v));
@@ -84,20 +90,23 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
         return reconstruct(expr, bound, label);
     }
 
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
+    @Override
+    public Node typeCheck(TypeChecker tc) {
         return type(expr.type());
     }
 
+    @Override
     public Term firstChild() {
         return expr;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         JifTypeSystem ts = (JifTypeSystem)v.typeSystem();
         if (ts.Boolean().equals(ts.unlabel(expr.type()))) {
-            // allow more precise dataflow when downgrading a boolean expression. 
-            v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this, EXIT, 
-                       FlowGraph.EDGE_KEY_FALSE, this, EXIT);
+            // allow more precise dataflow when downgrading a boolean expression.
+            v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this, EXIT,
+                    FlowGraph.EDGE_KEY_FALSE, this, EXIT);
         }
         else {
             v.visitCFG(expr, this, EXIT);
@@ -105,6 +114,7 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
         return succs;
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(downgradeKind());
         w.write("(");
@@ -115,14 +125,17 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
         w.write(")");
     }
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("cannot translate " + this);
     }
 
+    @Override
     public String toString() {
         return downgradeKind() + "(" + expr + ", " + label + ")";
     }
 
+    @Override
     public Precedence precedence() {
         return expr.precedence();
     }

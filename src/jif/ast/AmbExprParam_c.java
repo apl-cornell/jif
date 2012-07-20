@@ -1,8 +1,15 @@
 package jif.ast;
 
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.Param;
+import jif.types.ParamInstance;
+import jif.types.SemanticDetailedException;
 import jif.visit.JifTypeChecker;
-import polyglot.ast.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Node;
+import polyglot.ast.Node_c;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
@@ -14,47 +21,52 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
-/** An implementation of the <code>AmbParam</code> interface. 
+/** An implementation of the <code>AmbParam</code> interface.
  */
 public class AmbExprParam_c extends Node_c implements AmbExprParam
 {
     protected Expr expr;
     protected ParamInstance expectedPI;
-    
+
     public AmbExprParam_c(Position pos, Expr expr, ParamInstance expectedPI) {
         super(pos);
         this.expr = expr;
         this.expectedPI = expectedPI;
     }
-    
+
+    @Override
     public boolean isDisambiguated() {
         return false;
     }
-    
+
     public Expr expr() {
         return this.expr;
     }
-    
+
     public AmbParam expr(Expr expr) {
         AmbExprParam_c n = (AmbExprParam_c) copy();
         n.expr = expr;
         return n;
     }
 
+    @Override
     public AmbParam expectedPI(ParamInstance expectedPI) {
         AmbExprParam_c n = (AmbExprParam_c) copy();
         n.expectedPI = expectedPI;
         return n;
     }
-    
+
+    @Override
     public Param parameter() {
         throw new InternalCompilerError("No parameter yet");
     }
-    
+
+    @Override
     public String toString() {
         return expr + "{amb}";
     }
-    
+
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = (Expr) visitChild(this.expr, v);
         return reconstruct(expr, expectedPI);
@@ -64,13 +76,14 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
         AmbExprParam_c n = (AmbExprParam_c)this.copy();
         n.expr = expr;
         n.expectedPI = expectedPI;
-        return n;         
+        return n;
     }
-        
-    /** 
-     * Always return a CanoncialLabelNode, and let the dynamic label be possibly 
+
+    /**
+     * Always return a CanoncialLabelNode, and let the dynamic label be possibly
      * changed to a dynamic principal later.
      */
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (!ar.isASTDisambiguated(expr)) {
             ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
@@ -83,8 +96,8 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
         // run the typechecker over expr.
         TypeChecker tc = new JifTypeChecker(ar.job(), ts, nf, true);
         tc = (TypeChecker) tc.context(ar.context());
-	expr = (Expr)expr.visit(tc);
-    
+        expr = (Expr)expr.visit(tc);
+
         if (! expr.isTypeChecked()) {
             if (expr instanceof Field) {
                 Field f = (Field)expr;
@@ -94,40 +107,40 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
                     ParsedClassType pct = (ParsedClassType)ts.unlabel(f.target().type());
                     Scheduler sched = ar.job().extensionInfo().scheduler();
                     Goal g = sched.Disambiguated(pct.job());
-                    throw new MissingDependencyException(g);                        
+                    throw new MissingDependencyException(g);
                 }
             }
-//            Scheduler sched = ar.job().extensionInfo().scheduler();
-//            Goal g = sched.Disambiguated(ar.job());
-//            throw new MissingDependencyException(g);                        
+            //            Scheduler sched = ar.job().extensionInfo().scheduler();
+            //            Goal g = sched.Disambiguated(ar.job());
+            //            throw new MissingDependencyException(g);
             ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
             return this;
         }
 
-	if (expr instanceof PrincipalNode || 
-            ts.isImplicitCastValid(expr.type(), ts.Principal()) ||
-            (expectedPI != null && expectedPI.isPrincipal())) {
+        if (expr instanceof PrincipalNode ||
+                ts.isImplicitCastValid(expr.type(), ts.Principal()) ||
+                (expectedPI != null && expectedPI.isPrincipal())) {
             if (!JifUtil.isFinalAccessExprOrConst(ts, expr, ts.Principal())) {
                 throw new SemanticDetailedException(
-                    "Illegal principal parameter.",
-                    "The expression " + expr + " is not suitable as a " +
-                    "principal parameter. Principal parameters can be either " +
-                    "dynamic principals, or principal expressions, such as a " +
-                    "principal parameter, or an external principal.",
-                    this.position());                                        
+                        "Illegal principal parameter.",
+                        "The expression " + expr + " is not suitable as a " +
+                                "principal parameter. Principal parameters can be either " +
+                                "dynamic principals, or principal expressions, such as a " +
+                                "principal parameter, or an external principal.",
+                                this.position());
             }
-            return nf.CanonicalPrincipalNode(position(), 
-                                             JifUtil.exprToPrincipal(ts, expr, c));
+            return nf.CanonicalPrincipalNode(position(),
+                    JifUtil.exprToPrincipal(ts, expr, c));
         }
         if (!JifUtil.isFinalAccessExprOrConst(ts, expr, ts.Label())) {
             throw new SemanticDetailedException(
-                "Illegal label parameter.",
-                "The expression " + expr + " is not suitable as a " +
-                "label parameter. Label parameters can be either " +
-                "dynamic labels, or label expressions.",
-                this.position());
+                    "Illegal label parameter.",
+                    "The expression " + expr + " is not suitable as a " +
+                            "label parameter. Label parameters can be either " +
+                            "dynamic labels, or label expressions.",
+                            this.position());
         }
-        return nf.CanonicalLabelNode(position(), 
-                                     JifUtil.exprToLabel(ts, expr, c));            
+        return nf.CanonicalLabelNode(position(),
+                JifUtil.exprToLabel(ts, expr, c));
     }
 }

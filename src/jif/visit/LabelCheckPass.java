@@ -15,17 +15,18 @@ public class LabelCheckPass extends AbstractPass
     private final LabelChecker lc;
 
     public LabelCheckPass(Goal goal, Job job, LabelChecker lc) {
-	super(goal);
+        super(goal);
         this.job = job;
         this.lc = lc;
     }
 
+    @Override
     public boolean run() {
-	Node ast = job.ast();
+        Node ast = job.ast();
 
-	if (ast == null) {
-	    throw new InternalCompilerError("Null AST for job " + job + ": did the parser run?");
-	}
+        if (ast == null) {
+            throw new InternalCompilerError("Null AST for job " + job + ": did the parser run?");
+        }
 
         ErrorQueue q = job.compiler().errorQueue();
         int nErrsBefore = q.errorCount();
@@ -41,7 +42,7 @@ public class LabelCheckPass extends AbstractPass
         int nErrsAfter = q.errorCount();
 
         job.ast(ast);
-        
+
         return (nErrsBefore == nErrsAfter);
     }
 }

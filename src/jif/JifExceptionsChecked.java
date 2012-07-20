@@ -22,8 +22,9 @@ public class JifExceptionsChecked extends VisitorGoal {
         super(job, new JifExceptionChecker(job, ts, nf));
     }
 
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         l.add(scheduler.TypeChecked(job));
         l.add(scheduler.ReachabilityChecked(job));
         l.addAll(super.prerequisiteGoals(scheduler));

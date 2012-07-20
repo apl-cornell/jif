@@ -5,8 +5,14 @@ import java.util.List;
 
 import jif.types.JifPolyType;
 import jif.types.JifTypeSystem;
+import jif.types.Param;
 import jif.types.ParamInstance;
-import polyglot.ast.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Id;
+import polyglot.ast.Node;
+import polyglot.ast.Node_c;
+import polyglot.ast.Receiver;
+import polyglot.ast.TypeNode;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
@@ -27,10 +33,12 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
         this.expr = expr;
     }
 
+    @Override
     public boolean isDisambiguated() {
         return false;
     }
 
+    @Override
     public Receiver prefix() {
         return this.prefix;
     }
@@ -41,11 +49,13 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
         return n;
     }
 
+    @Override
     public Object expr() {
         return this.expr;
     }
 
 
+    @Override
     public Type type() {
         return this.type;
     }
@@ -61,6 +71,7 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
         return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Receiver prefix = (Receiver) visitChild(this.prefix, v);
         Object expr = this.expr;
@@ -70,15 +81,17 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
         return reconstruct(prefix, expr);
     }
 
+    @Override
     public String toString() {
         return prefix + "[" + expr + "]{amb}";
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
-        if (!ar.isASTDisambiguated(prefix) || 
+        if (!ar.isASTDisambiguated(prefix) ||
                 (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr))) {
             ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
             return this;
@@ -94,26 +107,26 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
             JifPolyType pt = (JifPolyType)tn.type();
 
             if (pt.params().isEmpty()) {
-                throw new SemanticException(tn.type() + " is not a parameterized type.", position());            
+                throw new SemanticException(tn.type() + " is not a parameterized type.", position());
             }
 
             ParamNode n;
-            ParamInstance pi = (ParamInstance)pt.params().get(0);
+            ParamInstance pi = pt.params().get(0);
             if (expr instanceof Expr) {
                 n = nf.AmbParam(position(), (Expr)expr, pi);
                 n = (ParamNode) n.del().disambiguate(ar);
             }
             else {
-                n = nf.AmbParam(position(), (Id)expr, pi);	        
+                n = nf.AmbParam(position(), (Id)expr, pi);
                 n = (ParamNode) n.del().disambiguate(ar);
                 if (!n.isDisambiguated()) {
-                    throw new SemanticException("\"" + expr + "\" is not " + 
-                                                "suitable as a parameter.", position());
+                    throw new SemanticException("\"" + expr + "\" is not " +
+                            "suitable as a parameter.", position());
 
                 }
             }
 
-            List l = new LinkedList();
+            List<Param> l = new LinkedList<Param>();
             l.add(n.parameter());
 
             Type t = ts.instantiate(position(), pt.instantiatedFrom(), l);

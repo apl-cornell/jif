@@ -1,6 +1,5 @@
 package jif.visit;
 
-import jif.JifOptions;
 import jif.ast.CanonicalLabelNode;
 import jif.ast.JifUtil;
 import jif.ast.Jif_c;
@@ -20,9 +19,7 @@ import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.ProcedureDecl;
-import polyglot.ast.Receiver;
 import polyglot.frontend.Job;
-import polyglot.main.Options;
 import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
 import polyglot.util.ErrorInfo;
@@ -38,20 +35,22 @@ import polyglot.visit.NodeVisitor;
  */
 public class JifLabelSubst extends ContextVisitor
 {
+    @SuppressWarnings("hiding")
     protected JifTypeSystem ts;
     protected final Solver solver;
     protected ErrorQueue eq;
     protected VarMap bounds;
-    
+
     public JifLabelSubst(Job job, JifTypeSystem ts, NodeFactory nf, Solver solver) {
         super(job, ts, nf);
         this.solver = solver;
         this.ts = ts;
         this.eq = job.compiler().errorQueue();
     }
-    
+
+    @Override
     public Node leaveCall(Node old, Node n, NodeVisitor v)
-    throws SemanticException {
+            throws SemanticException {
         try {
             solve();
         }
@@ -62,11 +61,11 @@ public class JifLabelSubst extends ContextVisitor
         n = updateNode(n);
         return n;
     }
-    
+
     protected void solve() throws SemanticException {
         bounds = solver.solve();
     }
-    
+
     protected Node updateNode(Node n) throws SemanticException {
         if (n instanceof ProcedureDecl) {
             JifProcedureInstance pi = (JifProcedureInstance)((ProcedureDecl)n).procedureInstance();
@@ -88,25 +87,24 @@ public class JifLabelSubst extends ContextVisitor
             // update the type of the local in case the local instance changed during solving.
             JifLocalInstance li = (JifLocalInstance)((Local)n).localInstance();
             n = ((Local)n).type(li.type());
-        }         
-        
+        }
+
         if (n instanceof Call) {
             // update the method instance in case the type of the receiver changed
             // during solving
             Call c = (Call)n;
             MethodInstance mi;
-            Receiver target = c.target();
-            mi = ts.findMethod(c.target().type().toReference(), 
-                    c.methodInstance().name(), 
-                    c.methodInstance().formalTypes(), 
+            mi = ts.findMethod(c.target().type().toReference(),
+                    c.methodInstance().name(),
+                    c.methodInstance().formalTypes(),
                     c.target().type().toClass());
-                
+
             n = c.methodInstance(mi);
         }
 
         if (JifUtil.jifExt(n) != null) {
             PathMap X = Jif_c.getPathMap(n);
-            
+
             if (X != null) {
                 n = Jif_c.updatePathMap(n, X.subst(bounds));
             }
@@ -115,11 +113,11 @@ public class JifLabelSubst extends ContextVisitor
             CanonicalTypeNode tn = (CanonicalTypeNode) n;
             n = tn.type(bounds.applyTo(tn.type()));
         }
-        
+
         if (n instanceof CanonicalLabelNode) {
             CanonicalLabelNode ln = (CanonicalLabelNode) n;
             n = ln.label(bounds.applyTo(ln.label()));
         }
         return n;
-    }    
+    }
 }

@@ -1,7 +1,14 @@
 package jif.visit;
 
 import jif.types.JifTypeSystem;
-import polyglot.ast.*;
+import polyglot.ast.ArrayInit;
+import polyglot.ast.Call;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Lit;
+import polyglot.ast.New;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
 import polyglot.types.ClassType;
 import polyglot.types.FieldInstance;
 import polyglot.types.Type;
@@ -37,6 +44,7 @@ public class ConstChecker extends NodeVisitor
         return isConst;
     }
 
+    @Override
     public Node override(Node n) {
         // If we've already determined the expression is non-constant,
         // then don't bother continuing
@@ -46,6 +54,7 @@ public class ConstChecker extends NodeVisitor
         return null;
     }
 
+    @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
         if (n instanceof Field) {
             FieldInstance fi = ((Field)n).fieldInstance();

@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jif.ast.JifConstructorDecl;
-
 import polyglot.ast.Block;
 import polyglot.ast.ConstructorCall;
-import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Expr;
 import polyglot.ast.IntLit;
 import polyglot.ast.Node;
@@ -16,7 +14,6 @@ import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Flags;
 import polyglot.types.Type;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
 
@@ -28,19 +25,19 @@ import polyglot.visit.NodeVisitor;
  * @author mdgeorge
  */
 public class NativeConstructorAdder extends NodeVisitor {
- 
+
     private final NodeFactory nf;
-    
+
     public NativeConstructorAdder(final NodeFactory nf) {
         this.nf = nf;
     }
-    
+
     @Override
     public Node override(Node n) {
         if (n instanceof JifConstructorDecl) {
             JifConstructorDecl decl = (JifConstructorDecl) n;
             ClassType       ct   = decl.constructorInstance().container().toClass();
-            
+
             if (decl.body() == null) {
                 ConstructorCall dummy = dummyCall(ct);
                 Block superCall = nf.Block(Position.compilerGenerated(), dummy);
@@ -54,7 +51,7 @@ public class NativeConstructorAdder extends NodeVisitor {
         else
             return null;
     }
-    
+
     /**
      * Construct a dummy super call.
      */
@@ -62,17 +59,17 @@ public class NativeConstructorAdder extends NodeVisitor {
         ClassType sup = ct.superType().toClass();
         List<? extends ConstructorInstance> cxs = sup.constructors();
         ConstructorInstance ci = cxs.isEmpty() ? ct.typeSystem().defaultConstructor(Position.compilerGenerated(), sup)
-                                               : cxs.get(0);
-        
+                : cxs.get(0);
+
         List<Expr> args = new ArrayList<Expr>();
-        for (Type t : (List<Type>) ci.formalTypes())
+        for (Type t : ci.formalTypes())
             args.add(dummyValue(t));
-        
+
         return nf.ConstructorCall(ct.position(), ConstructorCall.SUPER, args).constructorInstance(ci);
     }
-    
+
     /**
-     * Create a dummy expr with having the given type 
+     * Create a dummy expr with having the given type
      */
     private Expr dummyValue(Type t) {
         Expr e = null;
@@ -82,7 +79,7 @@ public class NativeConstructorAdder extends NodeVisitor {
             e = nf.BooleanLit(Position.compilerGenerated(), false);
         else
             e = nf.NullLit(Position.compilerGenerated());
-        
+
         return e.type(t);
     }
 

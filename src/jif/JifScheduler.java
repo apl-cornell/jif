@@ -1,21 +1,36 @@
 package jif;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import jif.ast.JifNodeFactory;
 import jif.translate.JifToJavaRewriter;
 import jif.types.JifSubstType;
 import jif.types.JifTypeSystem;
-import jif.visit.*;
+import jif.visit.FinalParams;
+import jif.visit.IntegerBoundsChecker;
+import jif.visit.JifInitChecker;
+import jif.visit.JifTypeChecker;
+import jif.visit.NativeConstructorAdder;
+import jif.visit.NotNullChecker;
+import jif.visit.PreciseClassChecker;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.frontend.*;
+import polyglot.frontend.CyclicDependencyException;
+import polyglot.frontend.JLExtensionInfo;
+import polyglot.frontend.JLScheduler;
+import polyglot.frontend.Job;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.Source;
 import polyglot.frontend.goals.Barrier;
-import polyglot.frontend.goals.ExceptionsChecked;
 import polyglot.frontend.goals.FieldConstantsChecked;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.VisitorGoal;
-import polyglot.types.*;
+import polyglot.types.FieldInstance;
+import polyglot.types.ParsedClassType;
+import polyglot.types.ParsedTypeObject;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 
 public class JifScheduler extends JLScheduler {
@@ -99,6 +114,7 @@ public class JifScheduler extends JLScheduler {
 
     }
 
+    @Override
     public Goal TypeChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
@@ -133,6 +149,7 @@ public class JifScheduler extends JLScheduler {
     }
 
 
+    @Override
     public Goal ExceptionsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
@@ -169,6 +186,7 @@ public class JifScheduler extends JLScheduler {
         return g;
     }
 
+    @Override
     public Goal Serialized(Job job) {
         Goal g = super.Serialized(job);
         try {
@@ -194,6 +212,7 @@ public class JifScheduler extends JLScheduler {
         return g;
     }
 
+    @Override
     public Goal FieldConstantsChecked(FieldInstance fi) {
         Goal g = internGoal(new JifFieldConstantsChecked(fi));
         try {
@@ -213,6 +232,7 @@ public class JifScheduler extends JLScheduler {
         }
         return g;
     }
+    @Override
     public Goal InitializationsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
@@ -226,11 +246,11 @@ public class JifScheduler extends JLScheduler {
         return g;
     }
 
+    @Override
     public boolean runToCompletion() {
         if (super.runToCompletion()) {
             // Create a goal to compile every source file.
-            for (Iterator i = jlext.scheduler().jobs().iterator(); i.hasNext(); ) {
-                Job job = (Job) i.next();
+            for (Job job : jlext.scheduler().jobs()) {
                 jlext.scheduler().addGoal(jlext.getCompileGoal(job));
             }
             return jlext.scheduler().runToCompletion();
@@ -242,6 +262,7 @@ public class JifScheduler extends JLScheduler {
         public JifFieldConstantsChecked(FieldInstance fi) {
             super(fi);
         }
+        @Override
         protected ParsedClassType findContainer() {
             if (var().container() instanceof JifSubstType) {
                 JifSubstType jst = (JifSubstType)var().container();
@@ -256,6 +277,7 @@ public class JifScheduler extends JLScheduler {
     /**
      * 
      */
+    @Override
     public Job addJob(Source source, Node ast) {
         Job j = super.addJob(source, ast);
         if ("Object.jif".equals(source.name())) {
@@ -266,6 +288,7 @@ public class JifScheduler extends JLScheduler {
     /**
      * 
      */
+    @Override
     public Job addJob(Source source) {
         Job j = super.addJob(source);
         if ("Object.jif".equals(source.name())) {
@@ -285,15 +308,17 @@ class TypeChecked extends VisitorGoal {
         super(job, new JifTypeChecker(job, ts, nf));
     }
 
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         l.add(scheduler.Disambiguated(job));
         l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }
 
-    public Collection corequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
 //        l.add(((JifScheduler)scheduler).FinalParams(job));
         // Should this line be here, since FieldLabelResolver is added as a missing dependency during runtime?
         l.add(((JifScheduler)scheduler).FieldLabelInference(job));
