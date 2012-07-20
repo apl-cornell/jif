@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.tools.FileObject;
-import javax.tools.StandardJavaFileManager;
 
 import jif.ast.JifNodeFactory;
 import jif.ast.JifNodeFactory_c;
@@ -21,6 +20,7 @@ import jif.types.JifTypeSystem;
 import jif.types.JifTypeSystem_c;
 import jif.visit.LabelChecker;
 import polyglot.ast.NodeFactory;
+import polyglot.filemanager.FileManager;
 import polyglot.frontend.*;
 import polyglot.frontend.Compiler;
 import polyglot.frontend.goals.Goal;
@@ -109,9 +109,9 @@ public class ExtensionInfo extends JLExtensionInfo
     }
     
     @Override
-    public void addLocationsToFileManager() {
+    protected FileManager createFileManager() {
         JifOptions options = getJifOptions();
-        StandardJavaFileManager fm = extFileManager();
+        FileManager fm = super.createFileManager();
         // use the signature classpath if it exists for compiling Jif classes
         List<File> path = new ArrayList<File>();
         for (Iterator<String> iter = options.addSigcp.iterator(); iter.hasNext(); ) {
@@ -131,8 +131,7 @@ public class ExtensionInfo extends JLExtensionInfo
         } catch (IOException e) {
             throw new InternalCompilerError(e);
         }
-        super.addLocationsToFileManager();
-        jlext.addLocationsToFileManager();
+        return fm;
     }
 
     @Override
