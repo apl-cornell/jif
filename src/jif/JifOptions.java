@@ -1,15 +1,19 @@
 package jif;
 
-import java.io.PrintStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import javax.tools.JavaFileManager.Location;
 
+import polyglot.main.OptFlag;
+import polyglot.main.OptFlag.Arg;
+import polyglot.main.OptFlag.IntFlag;
+import polyglot.main.OptFlag.PathFlag;
+import polyglot.main.OptFlag.Switch;
 import polyglot.main.Options;
 import polyglot.main.Report;
-import polyglot.main.UsageError;
 
 /**
  * This object encapsulates various polyglot options.
@@ -48,12 +52,8 @@ public class JifOptions extends Options {
      /**
       * The classpath for the Jif signatures of java.lang objects.
       */
-     public String sigcp = null;
+     public List<File> sigcp = new ArrayList<File>();
 
-     /**
-      * Additional classpath entries for Jif signatures.
-      */
-     public List<String> addSigcp = new ArrayList<String>();
      
      public Location signature_path = new Location() {
          @Override
@@ -79,96 +79,74 @@ public class JifOptions extends Options {
         super(extension);
     }
 
-    /**
-     * Set default values for options
-     */
     @Override
-    public void setDefaultValues() {
-        super.setDefaultValues();
-        solveGlobally = false;
-        explainErrors = false;
-        nonRobustness = false;
-        trustedProviders = true;
-        dependencyGraph = false;
-    }
-
-    /**
-     * Parse a command
-     * @return the next index to process. That is, if calling this method
-     *         processes two commands, then the return value should be index+2
-     */
-    @Override
-    protected int parseCommand(String args[], int index, Set<String> source) throws UsageError {
-        if (args[index].equals("-globalsolve")) {
-            index++;
-            System.err.println("Will use a single solver to infer labels");
-            solveGlobally = true;
-        }
-        else if (args[index].equals("-explain") || args[index].equals("-e")) {
-            index++;
-            explainErrors = true;
-        }
-        else if (args[index].equals("-nonrobust")) {
-            index++;
-            nonRobustness = true;
-        }
-        else if (args[index].equals("-fail-on-exception")) {
-            index++;
-            fatalExceptions = true;
-        }
-        else if (args[index].equals("-robust")) {
-            index++;
-            nonRobustness = false;
-        }
-        else if (args[index].equals("-sigcp")) {
-            index++;
-            this.sigcp = args[index++];
-        }
-        else if (args[index].equals("-addsigcp")) {
-            index++;
-            this.addSigcp.add(args[index++]);
-        }
-        else if (args[index].equals("-debug")) {
-            index++;
-            int level=0;
-            try {
-                level = Integer.parseInt(args[index]);
-            } 
-            catch (NumberFormatException e) {
+    protected void populateFlags(Set<OptFlag<?>> flags) {
+        super.populateFlags(flags);
+        flags.add(new Switch("-globalsolve", "infer label variables globally (default: per class)"));
+        flags.add(new Switch(new String[]{"-explain", "-e"}, "provide more detailed " +
+                                         "explanations of failed label checking"));
+        flags.add(new Switch("-nonrobust", "infer label variables globally (default: per class)"));
+        flags.add(new Switch("-fail-on-exception", "infer label variables globally (default: per class)"));
+        flags.add(new Switch("-robust", "infer label variables globally (default: per class)"));
+        flags.add(new PathFlag<File>("-sigcp", "<path>", "path for Jif signatures (e.g. for java.lang.Object)") {
+            @Override
+            public File handlePathEntry(String entry) {
+                File f = new File(entry);
+                if (f.exists())
+                    return f;
+                else return null;
             }
-            Report.addTopic("debug", level);
-            index++;
-        }
-        else if (args[index].equals("-trusted-providers")) {
-            index++;
-            trustedProviders = true;
-        }
-        else if (args[index].equals("-untrusted-providers")) {
-            index++;
-            trustedProviders = false;
-        }
-        else {
-            int i = super.parseCommand(args, index, source);
-            return i;
-        }
-        return index;
+        });
+        flags.add(new PathFlag<File>("-addsigcp", "<path>", "append <path> to Jif signature path") {
+            @Override
+            public File handlePathEntry(String entry) {
+                File f = new File(entry);
+                if (f.exists())
+                    return f;
+                else return null;
+            }
+        });
+        flags.add(new IntFlag("-debug", "<num>", "set debug level to n. Prints more information about labels"));
+        //flags.add(new Switch("-trusted-providers", "set the providers of the sources being compiled to be trusted"));
+        flags.add(new Switch("-untrusted-providers", "set the providers of the sources being compiled to be untrusted"));
     }
-
-    /**
-     * Print usage information
-     */
+    
+    @SuppressWarnings("unchecked")
     @Override
-    public void usage(PrintStream out) {
-        super.usage(out);
-        usageForFlag(out, "-e -explain", "provide more detailed " +
-                                         "explanations of failed label checking.");
-        usageForFlag(out, "-robust", "enable checking of robustness conditions for downgrading (use -nonrobust to disable).");
-        usageForFlag(out, "-debug <n>", "set debug level to n. Prints more information about labels.");
-        usageForFlag(out, "-stop_constraint <n>", "halt when the nth constraint is added");
-        usageForFlag(out, "-globalsolve", "infer label variables globally (default: per class)");
-        usageForFlag(out, "-sigcp <path>", "path for Jif signatures (e.g. for java.lang.Object)");
-        usageForFlag(out, "-addsigcp <path>", "additional path for Jif signatures; prepended to sigcp");
-        usageForFlag(out, "-fail-on-exception", "fail on uncaught and undeclared runtime exceptions");
-        usageForFlag(out, "-trusted-providers", "set the providers of the sources being compiled to be trusted (use -untrusted-providers to disable)");
+    protected void handleArg(Arg<?> arg) {
+        if (arg.flag().ids().contains("-globalsolve")) {
+            if ((Boolean) arg.value())
+                System.err.println("Will use a single solver to infer labels");
+            solveGlobally = (Boolean) arg.value();
+        }
+        else if (arg.flag().ids().contains("-explain") || arg.flag().ids().contains("-e")) {
+            explainErrors = (Boolean) arg.value();
+        }
+        else if (arg.flag().ids().contains("-nonrobust")) {
+            nonRobustness = (Boolean) arg.value();
+        }
+        else if (arg.flag().ids().contains("-fail-on-exception")) {
+            fatalExceptions = (Boolean) arg.value();
+        }
+        else if (arg.flag().ids().contains("-robust")) {
+            nonRobustness = !(Boolean) arg.value();
+        }
+        else if (arg.flag().ids().contains("-sigcp")) {
+            this.sigcp.clear();
+            this.sigcp.addAll((List<File>) arg.value());
+        }
+        else if (arg.flag().ids().contains("-addsigcp")) {
+            this.sigcp.addAll((List<File>) arg.value());
+        }
+        else if (arg.flag().ids().contains("-debug")) {
+            Report.addTopic("debug", (Integer) arg.value());
+        }
+        else if (arg.flag().ids().contains("-trusted-providers")) {
+            trustedProviders = (Boolean) arg.value();
+        }
+        else if (arg.flag().ids().contains("-untrusted-providers")) {
+            trustedProviders = !(Boolean) arg.value();
+        }
+        else super.handleArg(arg);
     }
 }

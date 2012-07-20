@@ -114,19 +114,9 @@ public class ExtensionInfo extends JLExtensionInfo
         FileManager fm = super.createFileManager();
         // use the signature classpath if it exists for compiling Jif classes
         List<File> path = new ArrayList<File>();
-        for (Iterator<String> iter = options.addSigcp.iterator(); iter.hasNext(); ) {
-            path.add(new File(iter.next()));
-        }
-        if (options.sigcp != null) {
-            StringTokenizer st = new StringTokenizer(options.sigcp, pathSeparator);
-            while(st.hasMoreTokens()) {
-                File f = new File(st.nextToken());
-                if (f.exists())
-                    path.add(f);
-            }
-        }
+        path.addAll(options.sigcp);
+        path.addAll(options.classpath_directories);
         try {
-            path.addAll(options.classpath_directories);
             fm.setLocation(options.signature_path, path);
         } catch (IOException e) {
             throw new InternalCompilerError(e);
