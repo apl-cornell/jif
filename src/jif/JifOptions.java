@@ -81,7 +81,6 @@ public class JifOptions extends Options {
 
     @Override
     protected void populateFlags(Set<OptFlag<?>> flags) {
-        super.populateFlags(flags);
         flags.add(new Switch("-globalsolve", "infer label variables globally (default: per class)"));
         flags.add(new Switch(new String[]{"-explain", "-e"}, "provide more detailed " +
                                          "explanations of failed label checking"));
@@ -109,6 +108,7 @@ public class JifOptions extends Options {
         flags.add(new IntFlag("-debug", "<num>", "set debug level to n. Prints more information about labels"));
         //flags.add(new Switch("-trusted-providers", "set the providers of the sources being compiled to be trusted"));
         flags.add(new Switch("-untrusted-providers", "set the providers of the sources being compiled to be untrusted"));
+        super.populateFlags(flags);
     }
     
     @SuppressWarnings("unchecked")
