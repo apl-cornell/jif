@@ -15,7 +15,7 @@ public class SocketUtil {
     private static boolean DEBUG = false;
 
     /**
-     * Listen to the ServerSocket, and pass any new connections to the 
+     * Listen to the ServerSocket, and pass any new connections to the
      * SocketAcceptor, in a new thread.
      * @param ss
      * @param a
@@ -25,16 +25,16 @@ public class SocketUtil {
         while (true) {
             try {
                 if (DEBUG) System.out.println("Listening on port " + ss.getLocalPort());
-                Socket s = ss.accept();  
+                Socket s = ss.accept();
                 if (DEBUG) System.out.println("Got socket: " + s.getPort());
-                new Thread(new SocketAcceptorRunner(a,s)).start();   
+                new Thread(new SocketAcceptorRunner(a,s)).start();
             }
             catch (Exception e) {
                 // recover silently
                 if (DEBUG) e.printStackTrace();
             }
         }
-        
+
     }
     private static class SocketAcceptorRunner implements Runnable {
         private final SocketAcceptor a;
@@ -43,6 +43,7 @@ public class SocketUtil {
             this.a = a;
             this.s = s;
         }
+        @Override
         public void run() {
             try {
                 if (DEBUG) System.out.println("Calling accept for socket #" + s.getPort());
@@ -59,9 +60,9 @@ public class SocketUtil {
                 }
                 catch (IOException e) {
                     if (DEBUG) e.printStackTrace();
-                }                
+                }
             }
         }
-        
+
     }
 }

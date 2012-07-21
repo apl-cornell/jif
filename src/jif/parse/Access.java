@@ -4,11 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import jif.ast.AmbNewArray;
-import polyglot.ast.Expr;
-import polyglot.ast.Labeled;
-import polyglot.ast.NewArray;
-import polyglot.ast.Prefix;
-import polyglot.ast.Receiver;
+import polyglot.ast.*;
 import polyglot.util.Position;
 
 /**
@@ -31,23 +27,32 @@ public class Access extends Amb {
     }
 
     public Amb prefix() { return prefix; }
-    public Expr index() { return index; }
+
+    public Expr index() {
+        return index;
+    }
+
+    @Override
     public Prefix toPrefix() throws Exception { return toExpr(); }
+    @Override
     public Receiver toReceiver() throws Exception { return toExpr(); }
 
+    @Override
     public Expr toExpr() throws Exception {
         index = (Expr) index.visit(new UnwrapVisitor());
         return parser.nf.ArrayAccess(pos, prefix.toExpr(), index);
     }
 
+    @Override
     public Expr toNewArrayPrefix(Position p, Integer extraDims) throws Exception {
         return toNewArray(p, extraDims);
     }
 
+    @Override
     public Expr toNewArray(Position p, Integer extraDims) throws Exception {
         if (prefix instanceof Name || prefix instanceof Inst) {
             // "new T.a[n]" or "new T[L,M][n]"
-            List dims = new LinkedList();
+            List<Expr> dims = new LinkedList<Expr>();
             dims.add(index);
             return parser.nf.NewArray(p, prefix.toType(), dims, extraDims.intValue());
         }
@@ -58,13 +63,13 @@ public class Access extends Amb {
             // Take the expression we built and add a new dimension.
             if (e instanceof NewArray) {
                 NewArray a = (NewArray) e;
-                List dims = new LinkedList(a.dims());
+                List<Expr> dims = new LinkedList<Expr>(a.dims());
                 dims.add(index);
                 return a.dims(dims);
             }
             else if (e instanceof AmbNewArray) {
                 AmbNewArray a = (AmbNewArray) e;
-                List dims = new LinkedList(a.dims());
+                List<Expr> dims = new LinkedList<Expr>(a.dims());
                 dims.add(index);
                 return a.dims(dims);
             }

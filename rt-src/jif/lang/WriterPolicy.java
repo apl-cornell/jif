@@ -1,66 +1,68 @@
 package jif.lang;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+
+import jif.lang.PrincipalUtil.DelegationPair;
 
 public class WriterPolicy extends AbstractPolicy implements IntegPolicy
 {
     private final Principal owner;
     private final Principal writer;
-    
+
     public WriterPolicy(LabelUtil labelUtil, Principal owner, Principal writer) {
         super(labelUtil);
         this.owner = owner;
         this.writer = writer;
     }
-    
+
     public Principal owner() {
         return owner;
     }
-    
+
     public Principal writer() {
         return writer;
     }
-    
-    
-    public boolean relabelsTo(Policy p, Set s) {
+
+
+    @Override
+    public boolean relabelsTo(Policy p, Set<DelegationPair> s) {
         if (this == p || this.equals(p)) return true;
         if (p instanceof JoinIntegPolicy) {
             JoinPolicy jp = (JoinPolicy)p;
             // this <= p1 join ... join p2 if there exists a pi such that
             // this <= pi
-            for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
-                Policy pi = (Policy)iter.next();
-                if (labelUtil.relabelsTo(this, pi, s)) return true;                
+            for (Policy pi : jp.joinComponents()) {
+                if (labelUtil.relabelsTo(this, pi, s)) return true;
             }
             return false;
         }
         else if (p instanceof MeetIntegPolicy) {
             MeetPolicy mp = (MeetPolicy)p;
-            // this <= p1 meet ... meet p2 if for all pi 
+            // this <= p1 meet ... meet p2 if for all pi
             // this <= pi
-            Set temp = new HashSet();
-            for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
-                Policy pi = (Policy)iter.next();
-                if (!labelUtil.relabelsTo(this, pi, temp)) return false;                
+            Set<DelegationPair> temp = new HashSet<DelegationPair>();
+            for (Policy pi : mp.meetComponents()) {
+                if (!labelUtil.relabelsTo(this, pi, temp)) return false;
             }
             s.addAll(temp);
-            return true;            
+            return true;
         }
         else if (!(p instanceof WriterPolicy))
             return false;
-        
+
         WriterPolicy pp = (WriterPolicy) p;
-        
+
         // this = { o  : .. ri  .. }
         // p    = { o' : .. rj' .. }
-        
+
         // o' >= o?
-        
+
         ActsForProof ownersProof = PrincipalUtil.actsForProof(owner, pp.owner);
         if (ownersProof == null) {
             return false;
         }
-        
+
         // for all j . rj' >= o || exists i . rj' >= ri
         ActsForProof writerWriterProof = PrincipalUtil.actsForProof(this.writer, pp.writer);
         if (writerWriterProof != null) {
@@ -71,33 +73,36 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy
         ActsForProof writerOwnerProof = PrincipalUtil.actsForProof(this.writer, pp.owner);
         if (writerOwnerProof != null) {
             ownersProof.gatherDelegationDependencies(s);
-            writerOwnerProof.gatherDelegationDependencies(s);      
+            writerOwnerProof.gatherDelegationDependencies(s);
             return true;
         }
         return false;
     }
-    
+
+    @Override
     public int hashCode() {
         return (owner==null?0:owner.hashCode()) ^ (writer==null?0:writer.hashCode()) ^ -124978;
     }
-    
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (! (o instanceof WriterPolicy)) {
             return false;
         }
-        
+
         WriterPolicy policy = (WriterPolicy) o;
-        
+
         if (owner == policy.owner || (owner != null && owner.equals(policy.owner)
                 && policy.owner != null && policy.owner.equals(owner))) {
             return (writer == policy.writer || (writer != null && writer.equals(policy.writer)
                     && policy.writer != null && policy.writer.equals(writer)));
         }
-        
+
         return false;
     }
-    
+
+    @Override
     public String toString() {
         String str = PrincipalUtil.toString(owner) + "<-";
         if (!PrincipalUtil.isTopPrincipal(writer))
@@ -105,18 +110,22 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy
         return str;
     }
 
-    public IntegPolicy join(IntegPolicy p, Set s) {
+    @Override
+    public IntegPolicy join(IntegPolicy p, Set<DelegationPair> s) {
         return labelUtil.join(this, p, s);
     }
 
-    public IntegPolicy meet(IntegPolicy p, Set s) {
+    @Override
+    public IntegPolicy meet(IntegPolicy p, Set<DelegationPair> s) {
         return labelUtil.meet(this, p, s);
-    }    
+    }
+    @Override
     public IntegPolicy join(IntegPolicy p) {
         return labelUtil.join(this, p);
     }
 
+    @Override
     public IntegPolicy meet(IntegPolicy p) {
         return labelUtil.meetPol(this, p);
-    }    
+    }
 }

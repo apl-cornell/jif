@@ -7,6 +7,7 @@ import java.util.List;
 
 import jif.types.JifPolyType;
 import jif.types.JifTypeSystem;
+import jif.types.Param;
 import jif.types.ParamInstance;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
@@ -17,90 +18,92 @@ import polyglot.ast.TypeNode_c;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.*;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.ExceptionChecker;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.Translator;
-import polyglot.visit.TypeChecker;
+import polyglot.visit.*;
 
 /** An implementation of the <code>InstTypeNode</code> interface.
  */
 public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguous
 {
     protected TypeNode base;
-    protected List params;
-    
-    public InstTypeNode_c(Position pos, TypeNode base, List params) {
+    protected List<ParamNode> params;
+
+    public InstTypeNode_c(Position pos, TypeNode base, List<ParamNode> params) {
         super(pos);
         this.base = base;
         this.params = ListUtil.copy(params, true);
     }
-    
+
+    @Override
     public TypeNode base() {
         return this.base;
     }
-    
+
+    @Override
     public InstTypeNode base(TypeNode base) {
         InstTypeNode_c n = (InstTypeNode_c) copy();
         n.base = base;
         return n;
     }
-    
-    public List params() {
+
+    @Override
+    public List<ParamNode> params() {
         return this.params;
     }
-    
-    public InstTypeNode params(List params) {
+
+    @Override
+    public InstTypeNode params(List<ParamNode> params) {
         InstTypeNode_c n = (InstTypeNode_c) copy();
         n.params = ListUtil.copy(params, true);
         return n;
     }
-    
-    protected InstTypeNode_c reconstruct(TypeNode base, List params) {
+
+    protected InstTypeNode_c reconstruct(TypeNode base, List<ParamNode> params) {
         if (base != this.base || ! CollectionUtil.equals(params, this.params)) {
             InstTypeNode_c n = (InstTypeNode_c) copy();
             n.base = base;
             n.params = ListUtil.copy(params, true);
             return n;
         }
-        
+
         return this;
     }
-    
+
+    @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode base = (TypeNode) visitChild(this.base, v);
         Type b = base.type();
-        
-        List newParams = this.params;
+
+        List<ParamNode> newParams = this.params;
         if (b != null && b.isCanonical() && b instanceof JifPolyType) {
             JifPolyType t = (JifPolyType) b;
-            newParams = new ArrayList(this.params.size());
-            
-            Iterator i = t.params().iterator();
-            Iterator j = this.params.iterator();
+            newParams = new ArrayList<ParamNode>(this.params.size());
+
+            Iterator<ParamInstance> i = t.params().iterator();
+            Iterator<ParamNode> j = this.params.iterator();
             ParamInstance pi = null;
             while (j.hasNext()) {
-                if (i.hasNext()) pi = (ParamInstance)i.next();
-                ParamNode p = (ParamNode)j.next();
+                if (i.hasNext()) pi = i.next();
+                ParamNode p = j.next();
                 if (p instanceof AmbExprParam) {
                     p = ((AmbExprParam)p).expectedPI(pi);
                 }
                 newParams.add(p);
             }
         }
-        
-        List params = visitList(newParams, v);
+
+        List<ParamNode> params = visitList(newParams, v);
         return reconstruct(base, params);
     }
-    
+
+    @Override
     public boolean isDisambiguated() {
         return false;
     }
+    @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
         Type b = base.type();
-        
+
         if (!base.isDisambiguated() || !b.isCanonical()) {
             //  not yet ready to disambiguate
             sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
@@ -111,85 +114,90 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
             throw new SemanticException("Cannot instantiate from a non-polymorphic type " + b);
         }
         JifPolyType t = (JifPolyType) b;
-        
-        List l = new LinkedList();
-        
-        Iterator i = this.params.iterator();
-        Iterator j = t.params().iterator();
+
+        List<Param> l = new LinkedList<Param>();
+
+        Iterator<ParamNode> i = this.params.iterator();
+        Iterator<ParamInstance> j = t.params().iterator();
         while (i.hasNext() && j.hasNext()) {
-            ParamNode p = (ParamNode) i.next();
-            ParamInstance pi = (ParamInstance) j.next();
-            
+            ParamNode p = i.next();
+            ParamInstance pi = j.next();
+
             if (!p.isDisambiguated()) {
                 // the param is not yet ready
                 sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
                 return this;
             }
-            
+
             checkParamSuitable(pi, p);
-            
-            
+
+
             l.add(p.parameter());
         }
         if (i.hasNext()) {
             throw new SemanticException("Too many parameters supplied for the "
-                                        + "class " + t,
-                                        this.position());            
+                    + "class " + t,
+                    this.position());
         }
-        
+
         return sc.nodeFactory().CanonicalTypeNode(position(),
-                                                  ts.instantiate(position(), 
-                                                                 t.instantiatedFrom(), l) );
+                ts.instantiate(position(),
+                        t.instantiatedFrom(), l) );
     }
-    
+
     protected void checkParamSuitable(ParamInstance pi, ParamNode p) throws SemanticException {
         if (pi.isLabel() && !(p.parameter() instanceof Label)) {
             throw new SemanticException("Can not instantiate a "+
-                                        "label parameter with a non-label.",
-                                        p.position());
+                    "label parameter with a non-label.",
+                    p.position());
         }
         if (pi.isPrincipal() && !(p.parameter() instanceof Principal)) {
             throw new SemanticException("Can not instantiate a "+
-                                        "principal parameter with a non-principal.",
-                                        p.position());
+                    "principal parameter with a non-principal.",
+                    p.position());
         }
         if (pi.isInvariantLabel() && !((Label)p.parameter()).isInvariant() )
             throw new SemanticException("Can not instantiate an invariant "+
-                                        "label parameter with a non-invariant label.",
-                                        p.position());        
+                    "label parameter with a non-invariant label.",
+                    p.position());
     }
 
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
+    @Override
+    public Node typeCheck(TypeChecker tc) {
         throw new InternalCompilerError(position(),
-                                        "Cannot type check ambiguous node " + this + ".");
+                "Cannot type check ambiguous node " + this + ".");
     }
-    
-    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
+
+    @Override
+    public Node exceptionCheck(ExceptionChecker ec) {
         throw new InternalCompilerError(position(),
-                                        "Cannot exception check ambiguous node " + this + ".");
+                "Cannot exception check ambiguous node " + this + ".");
     }
-    
+
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         print(base, w, tr);
         w.write("[");
-        
-        for (Iterator i = params.iterator(); i.hasNext(); ) {
-            ParamNode p = (ParamNode) i.next();
+
+        for (Iterator<ParamNode> i = params.iterator(); i.hasNext();) {
+            ParamNode p = i.next();
             print(p, w, tr);
             if (i.hasNext()) {
                 w.write(",");
                 w.allowBreak(0, " ");
             }
         }
-        
+
         w.write("]");
     }
-    
+
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError(position(),
-                                        "Cannot translate ambiguous node " + this + ".");
+                "Cannot translate ambiguous node " + this + ".");
     }
-    
+
+    @Override
     public String toString() {
         return base + "[...]";
     }

@@ -46,11 +46,15 @@ public class Runtime {
     }
 
     private Label defaultOutputLabel() {
-        ConfPolicy cp = LabelUtil.singleton().readerPolicy(dynp, new LinkedList());
+        ConfPolicy cp =
+                LabelUtil.singleton().readerPolicy(dynp,
+                        new LinkedList<Principal>());
         return LabelUtil.singleton().toLabel(cp);
     }
     private Label defaultInputLabel() {
-        IntegPolicy ip = LabelUtil.singleton().writerPolicy(dynp, new LinkedList());
+        IntegPolicy ip =
+                LabelUtil.singleton().writerPolicy(dynp,
+                        new LinkedList<Principal>());
         return LabelUtil.singleton().toLabel(ip);
     }
 
@@ -88,7 +92,7 @@ public class Runtime {
 
         if (!existed) {
             fos.flush();
-//            FileSystem.setPolicy(name, (PrivacyPolicy)L.policy());
+            //            FileSystem.setPolicy(name, (PrivacyPolicy)L.policy());
         }
         return fos;
     }
@@ -106,12 +110,12 @@ public class Runtime {
     public FileInputStream openFileRead(String name, Label L)
             throws FileNotFoundException, SecurityException {
         Label acLabel = FileSystem.labelOf(name);
-        
+
         if (LabelUtil.singleton().relabelsTo(acLabel, L)) return new FileInputStream(name);
-        
-        throw new SecurityException("The file has label " + LabelUtil.singleton().stringValue(acLabel) + 
-                                    ", which is more restrictive than " +
-                                    L.toString());
+
+        throw new SecurityException("The file has label " + LabelUtil.singleton().stringValue(acLabel) +
+                ", which is more restrictive than " +
+                L.toString());
     }
 
     /**
@@ -141,7 +145,7 @@ public class Runtime {
      */
     public InputStream stdin(Label l) {
         if (LabelUtil.singleton().relabelsTo(defaultInputLabel(), l)) return System.in;
-        
+
         throw new SecurityException("The standard output is not "
                 + "sufficiently secure.");
     }
@@ -194,7 +198,7 @@ public class Runtime {
     public static void sleep(Principal dummy, int s) {
         try {
             // add some noise...
-            double noise = 0.15; 
+            double noise = 0.15;
             double multiplier = 1 + ((2 * Math.random() - 1) * noise); // = 1 plus or minus noise
             long ms = (long)((long)s * 1000 * multiplier);
             if (!Thread.interrupted()) {
@@ -205,11 +209,11 @@ public class Runtime {
             // ignore the interrupted exception
         }
     }
-    
-    
+
+
     public static Object[] arrayDeepClone(Object[] a) {
         if (a == null) return null;
-        Object[] c = (Object[])a.clone();
+        Object[] c = a.clone();
         for (int i = 0; i < a.length; i++) {
             Object o = a[i];
             if (o != null && o.getClass().isArray()) {
@@ -228,27 +232,27 @@ public class Runtime {
         }
         return c;
     }
-       
+
     private static boolean _nativeOK = true;
 
     public static void loadRuntimeLibrary() {
-       if (_nativeOK) {
-        try {
-            System.loadLibrary("jifrt");
+        if (_nativeOK) {
+            try {
+                System.loadLibrary("jifrt");
+            }
+            catch (UnsatisfiedLinkError ule) {
+                // fail, but continue with warning
+                _nativeOK = false;
+                System.err.println(ule.getLocalizedMessage());
+            }
+            catch (SecurityException se) {
+                _nativeOK = false;
+                System.err.println(se.getLocalizedMessage());
+            }
         }
-        catch (UnsatisfiedLinkError ule) {
-            // fail, but continue with warning
-            _nativeOK = false;
-            System.err.println(ule.getLocalizedMessage());
-        }
-	catch (SecurityException se) {
-            _nativeOK = false;
-            System.err.println(se.getLocalizedMessage());
-	}
-      }
     }
 
     static {
-	loadRuntimeLibrary();
-    }   
+        loadRuntimeLibrary();
+    }
 }

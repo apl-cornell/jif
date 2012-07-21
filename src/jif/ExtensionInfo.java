@@ -1,16 +1,12 @@
 package jif;
 
-import static java.io.File.pathSeparator;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.tools.FileObject;
 
@@ -50,7 +46,7 @@ import polyglot.util.InternalCompilerError;
  */
 public class ExtensionInfo extends JLExtensionInfo
 {
-//  protected boolean doInfer = false;
+    //  protected boolean doInfer = false;
     protected OutputExtensionInfo jlext = new OutputExtensionInfo(this);
 
     @Override
@@ -62,7 +58,7 @@ public class ExtensionInfo extends JLExtensionInfo
     public String compilerName() {
         return "jifc";
     }
-    
+
     @Override
     protected Options createOptions() {
         return new JifOptions(this);
@@ -86,7 +82,7 @@ public class ExtensionInfo extends JLExtensionInfo
         // it can look up jif.lang.Principal.
         return new JifTypeSystem_c(jlTypeSystem());
     }
-    
+
     @Override
     public void initCompiler(Compiler compiler) {
         jlext.initCompiler(compiler);
@@ -104,10 +100,10 @@ public class ExtensionInfo extends JLExtensionInfo
         }
         catch (SemanticException e) {
             throw new InternalCompilerError(
-                                            "Unable to initialize type system: ", e);
+                    "Unable to initialize type system: ", e);
         }
     }
-    
+
     @Override
     protected FileManager createFileManager() {
         JifOptions options = getJifOptions();
@@ -138,10 +134,10 @@ public class ExtensionInfo extends JLExtensionInfo
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
 
         polyglot.lex.Lexer lexer =
-            new jif.parse.Lexer_c(reader, source, eq);
+                new jif.parse.Lexer_c(reader, source, eq);
         polyglot.parse.BaseParser grm =
-            new jif.parse.Grm(lexer, (JifTypeSystem)ts,
-                              (JifNodeFactory)nf, eq);
+                new jif.parse.Grm(lexer, (JifTypeSystem)ts,
+                        (JifNodeFactory)nf, eq);
 
         return new CupParser(grm, source, eq);
     }
@@ -163,7 +159,7 @@ public class ExtensionInfo extends JLExtensionInfo
     public LabelChecker createLabelChecker(Job job, boolean solvePerClassBody, boolean solvePerMethod, boolean doLabelSubst) {
         return new LabelChecker(job, typeSystem(), nodeFactory(), solvePerClassBody, solvePerMethod, doLabelSubst);
     }
-    
+
     @Override
     public Goal getCompileGoal(Job job) {
         JifScheduler jifScheduler = (JifScheduler)scheduler();
@@ -179,7 +175,7 @@ public class ExtensionInfo extends JLExtensionInfo
             throws IOException {
         return new jif.parse.UTF8FileSource(f, user);
     }
-    
+
     @Override
     public ClassFileLoader classFileLoader() {
         if (classFileLoader == null) {

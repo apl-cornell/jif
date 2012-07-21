@@ -9,6 +9,7 @@ import java.util.Set;
 
 import jif.lang.Label;
 import jif.lang.LabelUtil;
+import jif.lang.Principal;
 
 /** This class represents the file system, through which you can query
  *  and set the security labels of files.
@@ -22,22 +23,22 @@ public class FileSystem
         String[] readers = readers(file);
 //        String[] writers = writers(file);
         String owner = owner(file);
-        
-        List readerList = new LinkedList();
+
+        List<Principal> readerList = new LinkedList<Principal>();
         for (int i = 0; readers != null && i < readers.length; i++) {
             readerList.add(NativePrincipal.getInstance(readers[i]));
         }
-//        List writerList = new LinkedList();            
+//        List writerList = new LinkedList();
 //        for (int i = 0; i < writers.length; i++) {
 //            writerList.add(new NativePrincipal(writers[i]));
 //        }
         jif.lang.Principal op = NativePrincipal.getInstance(owner);
         return LabelUtil.singleton().readerPolicyLabel(op, readerList);
     }
-    
+
     /** Set the access(read) policy of <code>file</code>.  */
     /*
-     public static void setPolicy(String file, ReaderPolicy p) 
+     public static void setPolicy(String file, ReaderPolicy p)
     throws IOException
     {
         if (!(p.owner() instanceof NativePrincipal)) {
@@ -48,10 +49,10 @@ public class FileSystem
         int i = 0;
         for (Iterator iter = p.readers().iterator(); iter.hasNext(); )
             readers[i++] = ((jif.lang.Principal) iter.next()).name();
-        
+
         String os = System.getProperty("os.name");
         //in unix systems, files can belong to only one group. so reader
-        //set has to be adjusted. 
+        //set has to be adjusted.
         if (os.equals("Linux") || os.equals("SunOS") || os.equals("Mac OS X")) {
             Set groups = groups(owner);
             ReaderPolicy p1 = null;
@@ -73,40 +74,40 @@ public class FileSystem
                 if (i < readers.length - 1 ) msg += ", ";
                 else msg += "}.";
             }
-            
+
             throw new IOException(msg);
         }
-        
+
         setPolicy(file, owner.name(), readers);
     }
-    
+
     /** Returns the set of groups in which <code>p</code> belongs.
      */
-    public static Set groups(NativePrincipal p) {
-        Set grps = new LinkedHashSet();
-        Set supers = new LinkedHashSet(p.superiors());
-        
+    public static Set<Principal> groups(NativePrincipal p) {
+        Set<Principal> grps = new LinkedHashSet<Principal>();
+        Set<Principal> supers = new LinkedHashSet<Principal>(p.superiors());
+
         while (!supers.isEmpty()) {
-            jif.lang.Principal one = (jif.lang.Principal) supers.iterator().next();
+            jif.lang.Principal one = supers.iterator().next();
             if (one instanceof NativePrincipal) {
                 supers.addAll(((NativePrincipal)one).superiors());
                 grps.add(one);
             }
             supers.remove(one);
         }
-        
+
         return grps;
     }
-    
+
     private static native void setPolicy(String file, String owner,
-            String[] readers);							      
-    
+            String[] readers);
+
     private static native String[] readers(String file);
 //    private static native String[] writers(String file);
-    
+
     private static native String owner(String file);
-    
+
     static {
-	Runtime.loadRuntimeLibrary();
+        Runtime.loadRuntimeLibrary();
     }
 }

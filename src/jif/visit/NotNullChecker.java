@@ -1,55 +1,22 @@
 package jif.visit;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import jif.ast.DowngradeExpr;
 import jif.ast.LabelExpr;
 import jif.ast.PrincipalNode;
-import jif.extension.JifArrayAccessDel;
-import jif.extension.JifCallDel;
-import jif.extension.JifFieldDel;
-import jif.extension.JifFormalDel;
-import jif.extension.JifThrowDel;
+import jif.extension.*;
 import jif.types.JifSubstType;
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
+import jif.types.Param;
 import jif.types.label.AccessPathClass;
 import jif.types.label.AccessPathField;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import jif.visit.PreciseClassChecker.AccessPath;
 import jif.visit.PreciseClassChecker.AccessPathLocal;
-import polyglot.ast.ArrayAccess;
-import polyglot.ast.ArrayAccessAssign;
-import polyglot.ast.ArrayInit;
-import polyglot.ast.Assign;
-import polyglot.ast.Binary;
-import polyglot.ast.Call;
-import polyglot.ast.Cast;
-import polyglot.ast.Conditional;
-import polyglot.ast.Expr;
-import polyglot.ast.Field;
-import polyglot.ast.FieldAssign;
-import polyglot.ast.Formal;
-import polyglot.ast.Instanceof;
-import polyglot.ast.Lit;
-import polyglot.ast.LocalDecl;
-import polyglot.ast.New;
-import polyglot.ast.NewArray;
-import polyglot.ast.NodeFactory;
-import polyglot.ast.NullLit;
-import polyglot.ast.Receiver;
-import polyglot.ast.Special;
-import polyglot.ast.Term;
-import polyglot.ast.Throw;
-import polyglot.ast.TypeNode;
-import polyglot.ast.Unary;
+import polyglot.ast.*;
 import polyglot.frontend.Job;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -57,6 +24,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.visit.DataFlow;
 import polyglot.visit.FlowGraph;
+import polyglot.visit.FlowGraph.EdgeKey;
 import polyglot.visit.NodeVisitor;
 
 /**
@@ -66,7 +34,7 @@ import polyglot.visit.NodeVisitor;
  * NullPointerExceptions. This information is then stored in the appropriate
  * delegates.
  */
-public class NotNullChecker extends DataFlow
+public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem>
 {
     public NotNullChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf, true /* forward analysis */);
@@ -86,27 +54,29 @@ public class NotNullChecker extends DataFlow
 
     }
 
-    public Item createItem(FlowGraph graph, Term n) {
+    public DataFlowItem createItem(FlowGraph<DataFlowItem> graph, Term n) {
         return new DataFlowItem();
     }
 
-    static class DataFlowItem extends Item {
+    static class DataFlowItem extends DataFlow.Item {
         // contains objects of type VarInstance that are not null
-        Set notNullAccessPaths;
+        Set<AccessPath> notNullAccessPaths;
 
         // if the result of the expression is not null.
         boolean resultIsNotNull;
 
         DataFlowItem() {
-            notNullAccessPaths = new LinkedHashSet();
+            notNullAccessPaths = new LinkedHashSet<AccessPath>();
             resultIsNotNull = false;
         }
-        DataFlowItem(Set notNullAccessPaths, boolean resultIsNotNull) {
+
+        DataFlowItem(Set<AccessPath> notNullAccessPaths, boolean resultIsNotNull) {
             this.notNullAccessPaths = notNullAccessPaths;
             this.resultIsNotNull = resultIsNotNull;
         }
         DataFlowItem(DataFlowItem d) {
-            notNullAccessPaths = new LinkedHashSet(d.notNullAccessPaths);
+            notNullAccessPaths =
+                    new LinkedHashSet<AccessPath>(d.notNullAccessPaths);
         }
         static boolean exprIsNotNullStatic(Expr e) {
             // expression is not null if it is a "new" expression, "this"
@@ -159,13 +129,14 @@ public class NotNullChecker extends DataFlow
      * set of not null variables is empty.
      */
     @Override
-    protected Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
+    protected DataFlowItem createInitialItem(FlowGraph<DataFlowItem> graph, Term node, boolean entry) {
         return new DataFlowItem();
     }
 
     @Override
-    protected Map flow(List inItems, List inItemKeys, FlowGraph graph,
-            Term n, boolean entry, Set edgeKeys) {
+    protected Map<EdgeKey, DataFlowItem> flow(List<DataFlowItem> inItems,
+            List<EdgeKey> inItemKeys, FlowGraph<DataFlowItem> graph,
+            Term n, boolean entry, Set<EdgeKey> edgeKeys) {
         return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, entry, edgeKeys);
     }
 
@@ -176,9 +147,10 @@ public class NotNullChecker extends DataFlow
      * a possibly null expression, then the local variable is possibly null.
      */
     @Override
-    public Map flow(Item trueItem, Item falseItem, Item otherItem,
-            FlowGraph graph, Term n, boolean entry, Set succEdgeKeys) {
-        DataFlowItem dfIn = (DataFlowItem)safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE,
+    public Map<EdgeKey, DataFlowItem> flow(DataFlowItem trueItem,
+            DataFlowItem falseItem, DataFlowItem otherItem,
+            FlowGraph<DataFlowItem> graph, Term n, boolean entry, Set<EdgeKey> succEdgeKeys) {
+        DataFlowItem dfIn = safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE,
                 falseItem, FlowGraph.EDGE_KEY_FALSE,
                 otherItem, FlowGraph.EDGE_KEY_OTHER,
                 n, entry, graph);
@@ -190,7 +162,9 @@ public class NotNullChecker extends DataFlow
         if (n instanceof LocalDecl) {
             LocalDecl x = (LocalDecl)n;
             if (dfIn.exprIsNotNull(x.init()) || dfIn.resultIsNotNull) {
-                Set s = addNotNull(dfIn.notNullAccessPaths, new AccessPathLocal(x.localInstance()));
+                Set<AccessPath> s =
+                        addNotNull(dfIn.notNullAccessPaths,
+                                new AccessPathLocal(x.localInstance()));
                 DataFlowItem newItem = new DataFlowItem(s, false);
                 return checkNPE(itemToMap(newItem, succEdgeKeys), n);
             }
@@ -200,9 +174,11 @@ public class NotNullChecker extends DataFlow
             JifFormalDel d = (JifFormalDel)n.del();
             if (d.isCatchFormal()) {
                 // f is a formal in a catch block (e.g.,
-                        // try {...} catch(Exception e) {...} )
+                // try {...} catch(Exception e) {...} )
                 // and as such is never null
-                Set s = addNotNull(dfIn.notNullAccessPaths, new AccessPathLocal(f.localInstance()));
+                Set<AccessPath> s =
+                        addNotNull(dfIn.notNullAccessPaths,
+                                new AccessPathLocal(f.localInstance()));
                 DataFlowItem newItem = new DataFlowItem(s, false);
                 return checkNPE(itemToMap(newItem, succEdgeKeys), n);
             }
@@ -214,7 +190,8 @@ public class NotNullChecker extends DataFlow
                 // on the true branch of an instanceof, we know that
                 // the local (or final field of this) is not null
                 // e.g., if (o instanceof String) { /* o is not null */ }
-                Set trueBranch = addNotNull(dfIn.notNullAccessPaths, ap);
+                Set<AccessPath> trueBranch =
+                        addNotNull(dfIn.notNullAccessPaths, ap);
                 return itemsToMap(new DataFlowItem(trueBranch, false),
                         dfIn, dfIn, succEdgeKeys);
             }
@@ -223,7 +200,7 @@ public class NotNullChecker extends DataFlow
             Assign x = (Assign)n;
             AccessPath ap = PreciseClassChecker.findAccessPathForExpr(x.left());
             if (ap != null && x.operator() == Assign.ASSIGN) {
-                Set s = killAccessPath(dfIn.notNullAccessPaths, ap);
+                Set<AccessPath> s = killAccessPath(dfIn.notNullAccessPaths, ap);
                 boolean resultIsNotNull = false;
                 if (dfIn.exprIsNotNull(x.right()) || dfIn.resultIsNotNull) {
                     s = addNotNull(s, ap);
@@ -243,7 +220,9 @@ public class NotNullChecker extends DataFlow
                 // e is the expression being compared with null.
                 Expr e = (b.left() instanceof NullLit) ? b.right() : b.left();
 
-                Map m = comparisonToNull(e, Binary.EQ.equals(b.operator()), dfIn, succEdgeKeys);
+                Map<EdgeKey, DataFlowItem> m =
+                        comparisonToNull(e, Binary.EQ.equals(b.operator()),
+                                dfIn, succEdgeKeys);
                 return checkNPE(m, n);
             }
         }
@@ -252,7 +231,9 @@ public class NotNullChecker extends DataFlow
             if (trueItem == null) trueItem = dfIn;
             if (falseItem == null) falseItem = dfIn;
 
-            Map ret = flowBooleanConditions(trueItem, falseItem, dfIn, graph, (Expr)n, succEdgeKeys);
+            Map<EdgeKey, DataFlowItem> ret =
+                    flowBooleanConditions(trueItem, falseItem, dfIn, graph,
+                            (Expr) n, succEdgeKeys);
             if (ret == null) {
                 ret = itemToMap(false, dfIn, succEdgeKeys);
             }
@@ -262,7 +243,8 @@ public class NotNullChecker extends DataFlow
             dfIn = new DataFlowItem(dfIn.notNullAccessPaths, false);
             if (trueItem == null) trueItem = dfIn;
             if (falseItem == null) falseItem = dfIn;
-            Map ret =  itemsToMap(trueItem, falseItem, dfIn, succEdgeKeys);
+            Map<EdgeKey, DataFlowItem> ret =
+                    itemsToMap(trueItem, falseItem, dfIn, succEdgeKeys);
             return checkNPE(ret, n);
         }
 
@@ -276,7 +258,8 @@ public class NotNullChecker extends DataFlow
     }
 
 
-    private Map itemToMap(boolean resultIsNotNull, DataFlowItem dfIn, Set succEdgeKeys) {
+    private Map<EdgeKey, DataFlowItem> itemToMap(boolean resultIsNotNull,
+            DataFlowItem dfIn, Set<EdgeKey> succEdgeKeys) {
         if (dfIn.resultIsNotNull != resultIsNotNull) {
             dfIn = new DataFlowItem(dfIn.notNullAccessPaths, resultIsNotNull);
         }
@@ -306,7 +289,8 @@ public class NotNullChecker extends DataFlow
      *          by node are added to the notNullVars set of all other edges
      *          out of the node.
      */
-    private Map checkNPE(Map m, Term node) {
+    private Map<EdgeKey, DataFlowItem> checkNPE(Map<EdgeKey, DataFlowItem> m,
+            Term node) {
         if (node instanceof Field || node instanceof Call) {
             Receiver r;
             if (node instanceof Field) {
@@ -323,19 +307,20 @@ public class NotNullChecker extends DataFlow
                 // pointer exception! This means that if the local is null,
                 // the NPE edge will be taken, meaning all other flows can have
                 // the access path ap added to their notNullVars set.
-                Map newMap = new HashMap();
-                for (Iterator i = m.entrySet().iterator(); i.hasNext(); ) {
-                    Map.Entry e = (Map.Entry)i.next();
+                Map<EdgeKey, DataFlowItem> newMap =
+                        new HashMap<EdgeKey, DataFlowItem>();
+                for (Map.Entry<EdgeKey, DataFlowItem> e : m.entrySet()) {
                     if (e.getKey().equals(EDGE_KEY_NPE)) {
                         newMap.put(e.getKey(), e.getValue());
                     }
                     else {
-                        DataFlowItem dfi = (DataFlowItem)e.getValue();
+                        DataFlowItem dfi = e.getValue();
                         if (dfi.notNullAccessPaths.contains(ap)) {
                             newMap.put(e.getKey(), dfi);
                         }
                         else {
-                            Set s = addNotNull(dfi.notNullAccessPaths, ap);
+                            Set<AccessPath> s =
+                                    addNotNull(dfi.notNullAccessPaths, ap);
                             newMap.put(e.getKey(), new DataFlowItem(s, false));
                         }
                     }
@@ -352,11 +337,12 @@ public class NotNullChecker extends DataFlow
      * DataFlowItems when expressions that compare local variables to null
      * are evaluated to true and false.
      */
-    private static Map comparisonToNull(Expr expr, boolean equalsEquals, DataFlowItem in, Set edgeKeys) {
+    private static Map<EdgeKey, DataFlowItem> comparisonToNull(Expr expr,
+            boolean equalsEquals, DataFlowItem in, Set<EdgeKey> edgeKeys) {
         AccessPath ap = PreciseClassChecker.findAccessPathForExpr(expr);
         if (ap != null) {
-            Set sEq = killAccessPath(in.notNullAccessPaths, ap);
-            Set sNeq = addNotNull(in.notNullAccessPaths, ap);
+            Set<AccessPath> sEq = killAccessPath(in.notNullAccessPaths, ap);
+            Set<AccessPath> sNeq = addNotNull(in.notNullAccessPaths, ap);
 
             if (equalsEquals) {
                 return itemsToMap(new DataFlowItem(sEq, false), new DataFlowItem(sNeq, false), in, edgeKeys);
@@ -368,13 +354,14 @@ public class NotNullChecker extends DataFlow
         return itemToMap(in, edgeKeys);
     }
 
-    private static Set killAccessPath(Set paths, AccessPath ap) {
-        Set p = new LinkedHashSet(paths);
+    private static Set<AccessPath> killAccessPath(Set<AccessPath> paths,
+            AccessPath ap) {
+        Set<AccessPath> p = new LinkedHashSet<AccessPath>(paths);
         boolean changed = p.remove(ap);
         if (ap instanceof AccessPathLocal) {
             // go through the set and remove any access paths rooted at this local
-            for (Iterator iter = p.iterator(); iter.hasNext(); ) {
-                AccessPath v = (AccessPath)iter.next();
+            for (Iterator<AccessPath> iter = p.iterator(); iter.hasNext();) {
+                AccessPath v = iter.next();
                 if (ap.equals(v.findRoot())) {
                     iter.remove();
                     changed = true;
@@ -385,8 +372,10 @@ public class NotNullChecker extends DataFlow
         return changed?p:paths;
     }
 
-    private static Set addNotNull(Set notNullAccessPaths, AccessPath ap) {
-        Set s = new LinkedHashSet(notNullAccessPaths);
+    private static Set<AccessPath> addNotNull(
+            Set<AccessPath> notNullAccessPaths,
+            AccessPath ap) {
+        Set<AccessPath> s = new LinkedHashSet<AccessPath>(notNullAccessPaths);
         s.add(ap);
         return s;
     }
@@ -397,7 +386,7 @@ public class NotNullChecker extends DataFlow
      * if it is not null on all paths flowing in.
      */
     @Override
-    protected Item confluence(List items, Term node, boolean entry, FlowGraph graph) {
+    protected DataFlowItem confluence(List<DataFlowItem> items, Term node, boolean entry, FlowGraph<DataFlowItem> graph) {
         return intersect(items);
     }
 
@@ -405,16 +394,16 @@ public class NotNullChecker extends DataFlow
      * Utility method takes the intersection of a List of DataFlowItems,
      * by intersecting all of their notNullVars sets.
      */
-    private static DataFlowItem intersect(List items) {
+    private static DataFlowItem intersect(List<DataFlowItem> items) {
         // take the intersection of all the not null variable sets of the
         // DataFlowItems
-        Set intersectSet = null;
+        Set<AccessPath> intersectSet = null;
         boolean resultIsNotNull = true;
         for (int i = 0; i < items.size(); i++) {
-            DataFlowItem dfi = (DataFlowItem)items.get(i);
-            Set m = dfi.notNullAccessPaths;
+            DataFlowItem dfi = items.get(i);
+            Set<AccessPath> m = dfi.notNullAccessPaths;
             if (intersectSet == null ) {
-                intersectSet = new LinkedHashSet(m);
+                intersectSet = new LinkedHashSet<AccessPath>(m);
             }
             else {
                 intersectSet.retainAll(m);
@@ -422,7 +411,7 @@ public class NotNullChecker extends DataFlow
             resultIsNotNull = resultIsNotNull && dfi.resultIsNotNull;
         }
 
-        if (intersectSet == null) intersectSet = Collections.EMPTY_SET;
+        if (intersectSet == null) intersectSet = Collections.emptySet();
         return new DataFlowItem(intersectSet, resultIsNotNull);
 
     }
@@ -436,33 +425,33 @@ public class NotNullChecker extends DataFlow
      * would be thrown.
      */
     @Override
-    protected void check(FlowGraph graph, Term n, boolean entry,
-            Item inItem, Map outItems) throws SemanticException {
+    protected void check(FlowGraph<DataFlowItem> graph, Term n, boolean entry,
+            DataFlowItem inItem, Map<EdgeKey, DataFlowItem> outItems) {
         if (entry) {
             return;
         }
 
         if (n instanceof Assign) {
             if (n instanceof FieldAssign) {
-                checkField((Field)((Assign)n).left(), (DataFlowItem)inItem);
+                checkField((Field)((Assign)n).left(), inItem);
             }
             else if (n instanceof ArrayAccessAssign) {
-                checkArrayAccess((ArrayAccess)((Assign)n).left(), (DataFlowItem)inItem);
+                checkArrayAccess((ArrayAccess)((Assign)n).left(), inItem);
             }
         }
         else if (n instanceof Field) {
-            checkField((Field)n, (DataFlowItem)inItem);
+            checkField((Field)n, inItem);
         }
         else if (n instanceof Call) {
             Call c = (Call)n;
             Receiver r = c.target();
-            checkReceiver(r, n, (DataFlowItem)inItem);
+            checkReceiver(r, n, inItem);
             // also check the type of the method instance container
-            checkType(c.methodInstance().container(), (DataFlowItem)inItem);
+            checkType(c.methodInstance().container(), inItem);
         }
         else if (n instanceof Throw) {
             Throw t = (Throw)n;
-            if ((inItem != null && ((DataFlowItem)inItem).exprIsNotNull(t.expr()))
+            if ((inItem != null && inItem.exprIsNotNull(t.expr()))
                     || (inItem == null && DataFlowItem.exprIsNotNullStatic(t.expr()))) {
                 // The object thrown by this throw statement can never be
                 // null, e.g. it is a new expression, or it is a variable
@@ -471,22 +460,22 @@ public class NotNullChecker extends DataFlow
             }
         }
         else if (n instanceof ArrayAccess) {
-            checkArrayAccess((ArrayAccess)n, (DataFlowItem)inItem);
+            checkArrayAccess((ArrayAccess)n, inItem);
         }
         else if (n instanceof LabelExpr) {
-            checkLabelExpr((LabelExpr)n, (DataFlowItem)inItem);
+            checkLabelExpr((LabelExpr)n, inItem);
         }
         else if (n instanceof PrincipalNode) {
-            checkPrincipalNode((PrincipalNode)n, (DataFlowItem)inItem);
+            checkPrincipalNode((PrincipalNode)n, inItem);
         }
         else if (n instanceof Cast) {
-            checkTypeNode(((Cast)n).castType(), (DataFlowItem)inItem);
+            checkTypeNode(((Cast)n).castType(), inItem);
         }
         else if (n instanceof Instanceof) {
-            checkTypeNode(((Instanceof)n).compareType(), (DataFlowItem)inItem);
+            checkTypeNode(((Instanceof)n).compareType(), inItem);
         }
         else if (n instanceof New) {
-            checkTypeNode(((New)n).objectType(), (DataFlowItem)inItem);
+            checkTypeNode(((New)n).objectType(), inItem);
         }
     }
 
@@ -546,7 +535,7 @@ public class NotNullChecker extends DataFlow
         if (t instanceof JifSubstType && ((JifTypeSystem)ts).isParamsRuntimeRep(t)) {
             LabelNotNullSubst lnns = new LabelNotNullSubst(inItem);
             JifSubstType jst = (JifSubstType)t;
-            for (Object arg : jst.actuals()) {
+            for (Param arg : jst.actuals()) {
                 if (arg instanceof Label) {
                     Label L = (Label)arg;
                     try {

@@ -3,7 +3,6 @@ package jif.ast;
 import polyglot.ast.ArrayAccess;
 import polyglot.ast.ArrayAccessAssign_c;
 import polyglot.ast.Expr;
-import polyglot.ast.Assign.Operator;
 import polyglot.util.Position;
 
 /**
@@ -14,17 +13,18 @@ import polyglot.util.Position;
  * <code>ArrayAccessAssign_c.left()</code>is guaranteed to be an
  * <code>ArrayAccess</code>.
  */
-public class JifArrayAccessAssign_c extends ArrayAccessAssign_c 
+public class JifArrayAccessAssign_c extends ArrayAccessAssign_c
 {
-  public JifArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op, Expr right) {
+    public JifArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op, Expr right) {
         super(pos, left, op, right);
     }
 
-/** Since Jif's type system makes arrays invariant 
-   * on the base type, no array store exceptions can 
-   * be thrown. */
-  public boolean throwsArrayStoreException() {
-    return false;
-  }
+    /** Since Jif's type system makes arrays invariant
+     * on the base type, no array store exceptions can
+     * be thrown. */
+    @Override
+    public boolean throwsArrayStoreException() {
+        return false;
+    }
 
 }

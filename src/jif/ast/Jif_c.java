@@ -14,7 +14,7 @@ import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 
-/** An implementation of the <code>Jif</code> interface. 
+/** An implementation of the <code>Jif</code> interface.
  */
 public class Jif_c extends Ext_c implements Jif
 {
@@ -25,15 +25,18 @@ public class Jif_c extends Ext_c implements Jif
         this.toJava = toJava;
     }
 
+    @Override
     public ToJavaExt toJava() {
         return toJava;
     }
 
+    @Override
     public void init(Node node) {
         super.init(node);
         toJava.init(node);
     }
 
+    @Override
     public Jif toJava(ToJavaExt toJava) {
         // Set toJava to null to prevent it from being copied unnecessarily.
         ToJavaExt old = this.toJava;
@@ -48,6 +51,7 @@ public class Jif_c extends Ext_c implements Jif
         return copy;
     }
 
+    @Override
     public Object copy() {
         Jif_c copy = (Jif_c) super.copy();
         if (toJava != null) {
@@ -57,18 +61,24 @@ public class Jif_c extends Ext_c implements Jif
     }
 
 
+    @Override
     public PathMap X() {
-	return X;
+        return X;
     }
 
+    @Override
     public Jif X(PathMap X) {
-	Jif_c n = (Jif_c) copy();
-	n.X = X;
-	return n;
+        Jif_c n = (Jif_c) copy();
+        n.X = X;
+        return n;
     }
 
+    /**
+     * @throws SemanticException
+     */
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
-        JifContext A = lc.jifContext(); 
+        JifContext A = lc.jifContext();
         A = (JifContext) node().del().enterScope(A);
         return node();
     }
@@ -80,45 +90,48 @@ public class Jif_c extends Ext_c implements Jif
 
     public static Node updatePathMap(Node n, PathMap X) {
         return JifUtil.updatePathMap(n, X);
-    }   
+    }
 
     /**
-     * Check that the type excType is indeed in the list of types thrown, 
+     * Check that the type excType is indeed in the list of types thrown,
      * throwTypes, and remove excType from that list.
      * @param throwTypes
      * @param excType
      */
-    public static void checkAndRemoveThrowType(List throwTypes, Type excType) {
+    public static void checkAndRemoveThrowType(List<Type> throwTypes,
+            Type excType) {
         if (!throwTypes.remove(excType)) {
             throw new InternalCompilerError("The type " + excType + " is not "
-                                            + "declared to be thrown!");
+                    + "declared to be thrown!");
         }
     }
 
     /**
-     * Check that the list of types thrown, 
-     * throwTypes, does not contain any checked exceptions, i.e., all throw 
+     * Check that the list of types thrown,
+     * throwTypes, does not contain any checked exceptions, i.e., all throw
      * types have been correctly label checked.
      * @param throwTypes
      */
-    public static void checkThrowTypes(List throwTypes) {
-        for (Iterator iter = throwTypes.iterator(); iter.hasNext();) {
-            Type thrw = (Type)iter.next();
+    public static void checkThrowTypes(List<Type> throwTypes) {
+        for (Iterator<Type> iter = throwTypes.iterator(); iter.hasNext();) {
+            Type thrw = iter.next();
             if (thrw.typeSystem().isUncheckedException(thrw)) {
                 iter.remove();
-            }            
+            }
         }
         if (!throwTypes.isEmpty()) {
             throw new InternalCompilerError("The types " + throwTypes + " are " +
-                                            "declared to be thrown, but " +
-                                            "are not label checked!");
+                    "declared to be thrown, but " +
+                    "are not label checked!");
         }
     }
 
+    @Override
     public void integerBoundsCalculated() {
-        
+
     }
-    
+
+    @Override
     public void dump(CodeWriter w) {
         if (toJava != null) {
             w.write("(" + toString() + " toJava ");
@@ -129,5 +142,5 @@ public class Jif_c extends Ext_c implements Jif
         }
     }
 
-    
+
 }

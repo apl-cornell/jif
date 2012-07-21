@@ -3,24 +3,11 @@ package jif.ast;
 import java.util.LinkedList;
 import java.util.List;
 
-import jif.types.JifPolyType;
-import jif.types.JifTypeSystem;
-import jif.types.Param;
-import jif.types.ParamInstance;
-import jif.types.SemanticDetailedException;
-import polyglot.ast.Expr;
-import polyglot.ast.Expr_c;
-import polyglot.ast.Id;
-import polyglot.ast.Node;
-import polyglot.ast.Term;
-import polyglot.ast.TypeNode;
+import jif.types.*;
+import polyglot.ast.*;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.CodeWriter;
-import polyglot.util.CollectionUtil;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.ListUtil;
-import polyglot.util.Position;
+import polyglot.util.*;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -247,8 +234,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
         }
         w.write("]");
 
-        for (Object element : dims) {
-            Expr e = (Expr) element;
+        for (Expr e : dims) {
             w.write("[");
             printBlock(e, w, tr);
             w.write("]");

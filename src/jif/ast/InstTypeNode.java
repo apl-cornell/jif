@@ -1,15 +1,17 @@
 package jif.ast;
 
-import polyglot.ast.*;
-import java.util.*;
+import java.util.List;
 
-/** Instantiated type node. 
+import polyglot.ast.TypeNode;
+
+/** Instantiated type node.
  */
 public interface InstTypeNode extends TypeNode
 {
     TypeNode base();
     InstTypeNode base(TypeNode base);
 
-    List params();
-    InstTypeNode params(List params);
+    List<ParamNode> params();
+
+    InstTypeNode params(List<ParamNode> params);
 }

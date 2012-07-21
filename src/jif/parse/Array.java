@@ -7,9 +7,9 @@ import polyglot.ast.TypeNode;
 import polyglot.util.Position;
 
 /**
- * An <code>Array</code> represents a <code>Amb</code> of the form "P[]".  
+ * An <code>Array</code> represents a <code>Amb</code> of the form "P[]".
  * This must be an array type, although the base of that type is still ambiguous.
- */  
+ */
 public class Array extends Amb {
     // prefix[]
     final protected TypeNode prefix;
@@ -23,7 +23,7 @@ public class Array extends Amb {
         this.prefix = prefix;
         this.isConst = isConst;
     }
-    
+
     public TypeNode prefix() {
         return prefix;
     }
@@ -31,6 +31,7 @@ public class Array extends Amb {
         return isConst;
     }
 
+    @Override
     public TypeNode toType() {
         // if the (unlabeled) base type is an array, inherit the constness from that.
         TypeNode base = prefix;
@@ -43,7 +44,9 @@ public class Array extends Amb {
         return parser.nf.ArrayTypeNode(pos, prefix);
     }
 
+    @Override
     public TypeNode toUnlabeledType() { return toType(); }
+    @Override
     public Receiver toReceiver() { return toType(); }
 }
 

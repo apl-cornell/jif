@@ -1,7 +1,7 @@
 package jif.parse;
 
-import polyglot.ast.*;
-import polyglot.visit.*;
+import polyglot.ast.Node;
+import polyglot.visit.NodeVisitor;
 
 /**
  * An <code>UnwrapVisitor</code> rewrites the AST to remove any Wrapped
@@ -10,13 +10,15 @@ import polyglot.visit.*;
  * A visitor which tries to unwrap every <code>Wrapper</code> object in
  *  the node it visits.
  */
-public class UnwrapVisitor extends NodeVisitor 
+public class UnwrapVisitor extends NodeVisitor
 {
     boolean error;
 
     public boolean isError() {
         return error;
     }
+
+    @Override
     public Node override(Node n) {
         if (! error && n instanceof Wrapper) {
             try {

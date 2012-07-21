@@ -2,6 +2,8 @@ package jif.lang;
 
 import java.util.Set;
 
+import jif.lang.PrincipalUtil.DelegationPair;
+
 public final class ReflexiveProof extends ActsForProof {
 
     /**
@@ -13,7 +15,8 @@ public final class ReflexiveProof extends ActsForProof {
         super(p, q);
     }
 
-    public void gatherDelegationDependencies(Set s) {
+    @Override
+    public void gatherDelegationDependencies(Set<DelegationPair> s) {
         // no dependencies
     }
 

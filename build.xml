@@ -706,6 +706,14 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
             <arg line="${ppg.file}" />
         </java>
         <antcall target="cup-parser" />
+	<!-- Hack to suppress warnings in parser. -->
+	<replaceregexp
+	    file="${parser.dir}/${parser.class}.java"
+	    match="^(public )?class"
+	    replace="@SuppressWarnings(&quot;all&quot;) \1class"
+	    flags="g"
+	    byline="yes"
+	/>
     </target>
 
     <!-- Set the property ppg.parser.up-to-date if the parser is in fact

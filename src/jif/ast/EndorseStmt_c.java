@@ -8,10 +8,11 @@ import polyglot.util.Position;
 public class EndorseStmt_c extends DowngradeStmt_c implements EndorseStmt
 {
     public EndorseStmt_c(Position pos, LabelNode bound,
-                            LabelNode label, Stmt body) {
-	super(pos, bound, label, body);
+            LabelNode label, Stmt body) {
+        super(pos, bound, label, body);
     }
 
+    @Override
     public String downgradeKind() {
         return "endorse";
     }

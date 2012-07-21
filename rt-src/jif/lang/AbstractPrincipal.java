@@ -12,16 +12,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class AbstractPrincipal implements Principal {
     private String name;
-    private static Principal NULL_PRINCIPAL = new AbstractPrincipal("NULL PRINCIPAL") { 
+    private static Principal NULL_PRINCIPAL = new AbstractPrincipal("NULL PRINCIPAL") {
+        @Override
         public boolean equals(Object o) { return this == o; }
     };
 
     private Map<Principal, Principal> superiors = new ConcurrentHashMap<Principal, Principal>(); // treat this like a set
 
     public AbstractPrincipal() { super(); }
-    
+
     private void jif$init() {  }
-    
+
     protected AbstractPrincipal jif$lang$AbstractPrincipal$(final String name) {
         this.jif$init();
         { this.name = name; }
@@ -32,12 +33,14 @@ public abstract class AbstractPrincipal implements Principal {
         this.name = name;
     }
 
+    @Override
     public String name() {
         return name;
     }
 
+    @Override
     public boolean delegatesTo(Principal p) {
-        return superiorsContains((Principal)p);
+        return superiorsContains(p);
     }
 
     public void addDelegatesTo(Principal p) {
@@ -49,7 +52,7 @@ public abstract class AbstractPrincipal implements Principal {
     public void removeDelegatesTo(Principal p) {
         if (p == null) p = NULL_PRINCIPAL;
         if (this.superiors.remove(p) != null) {
-            PrincipalUtil.notifyRevokeDelegation(this, p);            
+            PrincipalUtil.notifyRevokeDelegation(this, p);
         }
     }
 
@@ -58,7 +61,8 @@ public abstract class AbstractPrincipal implements Principal {
         return this.superiors.containsKey(p);
     }
 
-    public boolean isAuthorized(Object authPrf, 
+    @Override
+    public boolean isAuthorized(Object authPrf,
             Closure closure,
             Label lb,
             boolean executeNow) {
@@ -67,42 +71,47 @@ public abstract class AbstractPrincipal implements Principal {
     }
 
 
-    public ActsForProof findProofDownto(Principal q, Object searchState) {    
+    @Override
+    public ActsForProof findProofDownto(Principal q, Object searchState) {
         // don't even try! We don't have any information
         // about who we can act for.
         return null;
     }
 
+    @Override
     public ActsForProof findProofUpto(Principal p, Object searchState) {
         for (Principal s : this.superiors.keySet()) {
-            ActsForProof prf = PrincipalUtil.findActsForProof(p, s, searchState);            
+            ActsForProof prf = PrincipalUtil.findActsForProof(p, s, searchState);
             if (prf != null) {
                 if (PrincipalUtil.actsFor(s, this)) {
                     return new TransitiveProof(prf, s, new DelegatesProof(s, this));
                 }
             }
         }
-        return null;        
+        return null;
     }
 
+    @Override
     public int hashCode() {
         return this.name == null ? 0 : this.name.hashCode();
     }
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Principal) {
             Principal p = (Principal)o;
-            return (this.name == p.name() || (this.name != null && 
+            return (this.name == p.name() || (this.name != null &&
                     this.name.equals(p.name()))) &&
-                    this.getClass() == p.getClass();        
+                    this.getClass() == p.getClass();
         }
         return false;
     }
 
+    @Override
     public boolean equals(Principal p) {
         if (p == null) return false;
-        return (this.name == p.name() || (this.name != null && 
+        return (this.name == p.name() || (this.name != null &&
                 this.name.equals(p.name()))) &&
-                this.getClass() == p.getClass();        
+                this.getClass() == p.getClass();
     }
 
 }

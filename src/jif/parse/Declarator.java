@@ -1,9 +1,7 @@
 package jif.parse;
 
-import polyglot.ast.*;
-import polyglot.visit.*;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.ast.Expr;
+import polyglot.util.Position;
 
 public class Declarator {
     Position pos;
@@ -12,10 +10,10 @@ public class Declarator {
     Expr init;
 
     public Declarator(Position pos, String name) {
-	this.pos = pos;
-	this.name = name;
-	this.dims = 0;
-	this.init = null;
+        this.pos = pos;
+        this.name = name;
+        this.dims = 0;
+        this.init = null;
     }
 
     public int dims() {

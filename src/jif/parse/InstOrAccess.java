@@ -5,12 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import jif.ast.AmbNewArray;
-import polyglot.ast.Expr;
-import polyglot.ast.Labeled;
-import polyglot.ast.NewArray;
-import polyglot.ast.Prefix;
-import polyglot.ast.Receiver;
-import polyglot.ast.TypeNode;
+import jif.ast.ParamNode;
+import polyglot.ast.*;
 import polyglot.util.Position;
 
 /**
@@ -38,45 +34,51 @@ public class InstOrAccess extends Amb {
     public Amb prefix() {
         return prefix;
     }
-    
+
     public Object param() {
         return param;
     }
 
+    @Override
     public TypeNode toType() throws Exception {
-        LinkedList l = new LinkedList();
+        LinkedList<ParamNode> l = new LinkedList<ParamNode>();
         if (param instanceof Name) {
             l.add(parser.nf.AmbParam(((Name)param).pos, ((Name)param).toIdentifier()));
         }
         else {
-            l.add(parser.nf.AmbParam(((Expr)param).position(), (Expr)param, null));	    
+            l.add(parser.nf.AmbParam(((Expr)param).position(), (Expr)param, null));
         }
         return parser.nf.InstTypeNode(pos, prefix.toUnlabeledType(), l);
     }
 
+    @Override
     public TypeNode toUnlabeledType() throws Exception { return toType(); }
 
+    @Override
     public Prefix toPrefix() throws Exception { return toReceiver(); }
 
+    @Override
     public Receiver toReceiver() throws Exception {
         // The prefix must be either a type or an expression
         // (i.e., a receiver).
         return parser.nf.AmbParamTypeOrAccess(pos, prefix.toReceiver(),
-                                              paramToExprOrString());
+                paramToExprOrString());
     }
 
     private Expr paramToExpr() throws Exception {
         if (param instanceof Expr) {
-            param = (Expr) ((Expr)param).visit(new UnwrapVisitor());
+            param = ((Expr)param).visit(new UnwrapVisitor());
             return (Expr)param;
         }
-        return parser.nf.AmbExpr(((Name)param).pos, 
-                                 ((Name)param).toIdentifier());
+        return parser.nf.AmbExpr(((Name)param).pos,
+                ((Name)param).toIdentifier());
     }
+    @Override
     public Expr toExpr() throws Exception {
         return parser.nf.ArrayAccess(pos, prefix.toExpr(), paramToExpr());
     }
 
+    @Override
     public Expr toNewArray(Position p, Integer extraDims) throws Exception {
         Access a = new Access(parser, pos, prefix, paramToExpr());
         return a.toNewArray(p, extraDims);
@@ -86,24 +88,24 @@ public class InstOrAccess extends Amb {
         if (param instanceof Name) {
             return ((Name)param).toIdentifier();
         }
-        param = (Expr) ((Expr)param).visit(new UnwrapVisitor());
+        param = ((Expr)param).visit(new UnwrapVisitor());
         return param;
     }
+    @Override
     public Expr toNewArrayPrefix(Position p, Integer extraDims) throws Exception {
         // Only the first dimension of "new T[p][q][r]" is ambiguous;
         // the rest must be expressions.
 
         if (prefix instanceof Name) {
             // "new T.a[n]".  "name" may be either an expr or a param.
-            List params = new LinkedList();
             return parser.nf.AmbNewArray(p, prefix.toType(),
-                                         paramToExprOrString(),
-                                         Collections.EMPTY_LIST,
-                                         extraDims.intValue());
+                    paramToExprOrString(),
+                    Collections.<Expr> emptyList(),
+                    extraDims.intValue());
         }
         else if (prefix instanceof Inst) {
             // "new T[L,M][n]".  "name" must be an expr.
-            List dims = new LinkedList();
+            List<Expr> dims = new LinkedList<Expr>();
             dims.add(paramToExpr());
             return parser.nf.NewArray(p, prefix.toType(), dims);
         }
@@ -116,13 +118,13 @@ public class InstOrAccess extends Amb {
             // Take the expression we built and add a new dimension.
             if (e instanceof NewArray) {
                 NewArray a = (NewArray) e;
-                List dims = new LinkedList(a.dims());
+                List<Expr> dims = new LinkedList<Expr>(a.dims());
                 dims.add(paramToExpr());
                 return a.dims(dims);
             }
             else if (e instanceof AmbNewArray) {
                 AmbNewArray a = (AmbNewArray) e;
-                List dims = new LinkedList(a.dims());
+                List<Expr> dims = new LinkedList<Expr>(a.dims());
                 dims.add(paramToExpr());
                 return a.dims(dims);
             }

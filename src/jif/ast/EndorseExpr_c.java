@@ -7,12 +7,13 @@ import polyglot.util.Position;
  */
 public class EndorseExpr_c extends DowngradeExpr_c implements EndorseExpr
 {
-    
-    public EndorseExpr_c(Position pos, Expr expr, 
-                            LabelNode bound, LabelNode label) {
+
+    public EndorseExpr_c(Position pos, Expr expr,
+            LabelNode bound, LabelNode label) {
         super(pos, expr, bound, label);
     }
 
+    @Override
     public String downgradeKind() {
         return "endorse";
     }
