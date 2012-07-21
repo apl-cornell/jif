@@ -7,6 +7,7 @@ import polyglot.ast.Expr_c;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
@@ -17,70 +18,83 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
-/** An implementation of the <code>NewLabel</code> interface. 
+/** An implementation of the <code>NewLabel</code> interface.
  */
 public class LabelExpr_c extends Expr_c implements LabelExpr
 {
     protected LabelNode label;
 
     public LabelExpr_c(Position pos, LabelNode label) {
-	super(pos);
-	this.label = label;
+        super(pos);
+        this.label = label;
     }
 
+    @Override
     public LabelNode label() {
-	return this.label;
+        return this.label;
     }
 
+    @Override
     public LabelExpr label(LabelNode label) {
-	LabelExpr_c n = (LabelExpr_c) copy();
-	n.label = label;
-	return n;
+        LabelExpr_c n = (LabelExpr_c) copy();
+        n.label = label;
+        return n;
     }
-    
+
     protected LabelExpr_c reconstruct(LabelNode label) {
-	if (label != this.label) {
-	    LabelExpr_c n = (LabelExpr_c) copy();
-	    n.label = label;
-	    return n;
-	}
+        if (label != this.label) {
+            LabelExpr_c n = (LabelExpr_c) copy();
+            n.label = label;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
-	LabelNode label = (LabelNode) visitChild(this.label, v);
-	return reconstruct(label);
+        LabelNode label = (LabelNode) visitChild(this.label, v);
+        return reconstruct(label);
     }
 
+    /**
+     * @throws SemanticException
+     */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();	
-	return type(ts.Label());
+        JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();
+        return type(ts.Label());
     }
 
-    public List throwTypes(TypeSystem ts) {
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
         return label().label().throwTypes(ts);
     }
-    
+
+    @Override
     public Term firstChild() {
         return null;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         return succs;
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("{");
         print(label, w, tr);
         w.write("}");
     }
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("cannot translate " + this);
     }
 
+    @Override
     public String toString() {
-	return label.toString();
+        return label.toString();
     }
 }

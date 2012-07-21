@@ -1,6 +1,10 @@
 package jif.ast;
 
-import polyglot.ast.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Id;
+import polyglot.ast.LocalDecl_c;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
 import polyglot.util.Position;
@@ -13,6 +17,7 @@ public class JifLocalDecl_c extends LocalDecl_c
         super(pos, flags, type, name, init);
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = (TypeNode) visitChild(type(), v);
         Id name = (Id)visitChild(id(), v);
@@ -23,7 +28,7 @@ public class JifLocalDecl_c extends LocalDecl_c
             LocalInstance li = localInstance();
             li.setFlags(flags());
             li.setName(name());
-            li.setType(declType());            
+            li.setType(declType());
         }
         Expr init = (Expr) visitChild(init(), v);
 

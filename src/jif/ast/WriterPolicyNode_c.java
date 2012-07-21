@@ -1,18 +1,20 @@
 package jif.ast;
 
-import java.util.*;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import jif.types.JifTypeSystem;
 import jif.types.label.Policy;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
-import polyglot.types.SemanticException;
-import polyglot.util.*;
 import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
-import polyglot.visit.*;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /** An implementation of the <code>PolicyLabel</code> interface.
@@ -20,29 +22,32 @@ import polyglot.visit.PrettyPrinter;
 public class WriterPolicyNode_c extends PolicyNode_c
 {
 
-    protected List principals;
+    protected List<PrincipalNode> principals;
 
-    public WriterPolicyNode_c(Position pos, PrincipalNode owner, List principals) {
+    public WriterPolicyNode_c(Position pos, PrincipalNode owner,
+            List<PrincipalNode> principals) {
         super(pos, owner);
         this.principals = ListUtil.copy(principals, true);
     }
 
-    public List principals() {
+    public List<PrincipalNode> principals() {
         return this.principals;
     }
 
-    public PolicyNode principals(List principals) {
+    public PolicyNode principals(List<PrincipalNode> principals) {
         WriterPolicyNode_c n = (WriterPolicyNode_c) copy();
         n.principals = ListUtil.copy(principals, true);
         return n;
     }
 
-    
-    protected Policy producePolicy(JifTypeSystem ts, Principal owner, List principals) {
+
+    protected Policy producePolicy(JifTypeSystem ts, Principal owner,
+            List<Principal> principals) {
         return ts.writerPolicy(position(), owner, principals);
     }
 
-    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+    @Override
+    public Node disambiguate(AmbiguityRemover ar) {
         JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
         if (!owner.isDisambiguated()) {
             ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
@@ -52,10 +57,10 @@ public class WriterPolicyNode_c extends PolicyNode_c
         Principal o = owner.principal();
         if (o == null) throw new InternalCompilerError("null owner " + owner.getClass().getName() + " " + owner.position());
 
-        List l = new LinkedList();
+        List<Principal> l = new LinkedList<Principal>();
 
-        for (Iterator i = this.principals.iterator(); i.hasNext(); ) {
-            PrincipalNode r = (PrincipalNode) i.next();
+        for (Object element : this.principals) {
+            PrincipalNode r = (PrincipalNode) element;
             if (!r.isDisambiguated()) {
                 ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
                 return this;
@@ -66,7 +71,8 @@ public class WriterPolicyNode_c extends PolicyNode_c
         return this;
     }
 
-    protected WriterPolicyNode_c reconstruct(PrincipalNode owner, List principals) {
+    protected WriterPolicyNode_c reconstruct(PrincipalNode owner,
+            List<PrincipalNode> principals) {
         if (owner != this.owner || ! CollectionUtil.equals(principals, this.principals)) {
             WriterPolicyNode_c n = (WriterPolicyNode_c) copy();
             n.owner = owner;
@@ -77,19 +83,22 @@ public class WriterPolicyNode_c extends PolicyNode_c
         return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         PrincipalNode owner = (PrincipalNode) visitChild(this.owner, v);
-        List readers = visitList(this.principals, v);
+        List<PrincipalNode> readers = visitList(this.principals, v);
         return reconstruct(owner, readers);
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         print(owner, w, tr);
 
         w.write("<-");
 
-        for (Iterator i = this.principals.iterator(); i.hasNext(); ) {
-            PrincipalNode n = (PrincipalNode) i.next();
+        for (Iterator<PrincipalNode> i = this.principals.iterator(); i
+                .hasNext();) {
+            PrincipalNode n = i.next();
             print(n, w, tr);
             if (i.hasNext()) {
                 w.write(";");

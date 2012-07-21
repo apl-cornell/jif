@@ -1,31 +1,33 @@
 package jif.extension;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jif.types.ConstArrayType;
-
-import polyglot.ast.*;
+import polyglot.ast.ArrayAccess;
 import polyglot.ast.ArrayAccessAssign;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.visit.TypeChecker;
 
-/** The Jif extension of the <code>ArrayAccessAssign</code> node. 
+/** The Jif extension of the <code>ArrayAccessAssign</code> node.
  */
 public class JifArrayAccessAssignDel extends JifAssignDel {
     public JifArrayAccessAssignDel() {}
 
-    /** 
+    /**
      *  List of Types of exceptions that might get thrown.
      * 
      * This differs from the method defined in ArrayAccess_c in that it does not
-     * throw a null pointer exception if the array is guaranteed to be 
+     * throw a null pointer exception if the array is guaranteed to be
      * non-null
      */
-    public List throwTypes(TypeSystem ts) {
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
         ArrayAccessAssign a = (ArrayAccessAssign)node();
-        List l = super.throwTypes(ts);
+        List<Type> l = super.throwTypes(ts);
         if (a.throwsArrayStoreException()) {
             l.add(ts.ArrayStoreException());
         }
@@ -40,6 +42,7 @@ public class JifArrayAccessAssignDel extends JifAssignDel {
 
         return l;
     }
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         ArrayAccessAssign aa = (ArrayAccessAssign)super.typeCheck(tc);
         Expr array = ((ArrayAccess)aa.left()).array();
@@ -49,7 +52,7 @@ public class JifArrayAccessAssignDel extends JifAssignDel {
                 throw new SemanticException("Cannot assign to elements of const arrays.", aa.position());
             }
         }
-        return aa;        
+        return aa;
     }
-    
+
 }

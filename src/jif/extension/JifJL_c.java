@@ -1,6 +1,10 @@
 package jif.extension;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import jif.ast.JifUtil;
 import jif.types.JifTypeSystem;
@@ -15,12 +19,12 @@ import polyglot.util.SubtypeSet;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeBuilder;
 
-/** An implementation of the <code>Jif</code> interface. 
+/** An implementation of the <code>Jif</code> interface.
  */
 public class JifJL_c extends JL_c implements JifJL
 {
     protected Set<Type> fatalExceptions = Collections.emptySet();
-    
+
     /**
      * Set the exceptions thrown by this node that are treated as fatal.
      */
@@ -28,7 +32,7 @@ public class JifJL_c extends JL_c implements JifJL
     public void setFatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
         this.fatalExceptions = fatalExceptions;
     }
-    
+
     /**
      * Get the exceptions thrown by this node that are treated as fatal.
      */
@@ -47,20 +51,20 @@ public class JifJL_c extends JL_c implements JifJL
     @Override
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("cannot translate " + node() +
-        "; still has a Jif extension");
+                "; still has a Jif extension");
     }
 
     @Override
-    // This will be redundant for some classes, 
+    // This will be redundant for some classes,
     // but some subtypes invoke this method and
-    // add exceptions afterward, while others 
-    // do not. 
+    // add exceptions afterward, while others
+    // do not.
     public List<Type> throwTypes(TypeSystem ts) {
         List<Type> l = super.throwTypes(ts);
         if(l.isEmpty())
             return l;
         l = new ArrayList<Type>(l);
-        
+
         Set<Type> rem = new HashSet<Type>();
         if(fatalExceptions.isEmpty())
             return l;

@@ -17,17 +17,18 @@ public class JifFormal_c extends Formal_c {
         super(pos, flags, type, name);
     }
 
-    
+
     /**
      * 
      */
+    @Override
     public boolean isDisambiguated() {
         boolean typeNotNull = type() != null && type().type() != null;
         JifTypeSystem jts = (JifTypeSystem)(typeNotNull ? type().type().typeSystem() : null);
-        return super.isDisambiguated() && 
+        return super.isDisambiguated() &&
                 (((JifFormalDel)del()).isCatchFormal() ||
-                (type() != null && 
-                type().type() != null &&
-                jts.isLabeled(type().type())));
+                        (type() != null &&
+                        type().type() != null &&
+                        jts.isLabeled(type().type())));
     }
 }

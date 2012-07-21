@@ -1,19 +1,43 @@
 package jif.ast;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
-import jif.JifScheduler;
-import jif.types.*;
-import jif.types.label.*;
+import jif.types.JifContext;
+import jif.types.JifFieldInstance;
+import jif.types.JifTypeSystem;
+import jif.types.Param;
+import jif.types.PathMap;
+import jif.types.SemanticDetailedException;
+import jif.types.label.AccessPath;
+import jif.types.label.AccessPathClass;
+import jif.types.label.AccessPathConstant;
+import jif.types.label.AccessPathField;
+import jif.types.label.AccessPathLocal;
+import jif.types.label.AccessPathRoot;
+import jif.types.label.AccessPathThis;
+import jif.types.label.Label;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
-import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.goals.Goal;
-import polyglot.types.*;
+import polyglot.ast.Cast;
+import polyglot.ast.Expr;
+import polyglot.ast.Ext;
+import polyglot.ast.Field;
+import polyglot.ast.Local;
+import polyglot.ast.Node;
+import polyglot.ast.NullLit;
+import polyglot.ast.Receiver;
+import polyglot.ast.Special;
+import polyglot.ast.TypeNode;
+import polyglot.types.ClassType;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.LocalInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -157,7 +181,6 @@ public class JifUtil
     }        
 
     // Process Final Access Paths that are reachable from fi
-    @SuppressWarnings("unused")
     public static void processFAP(VarInstance fi,
             AccessPath path,
             JifContext A,
@@ -174,8 +197,8 @@ public class JifUtil
             if (visited.contains(ct)) return;
             visited.add(ct);
             if (ct == null || ct.fields() == null) return;
-            for (Iterator it = ct.fields().iterator(); it.hasNext();) {
-                JifFieldInstance jfi = (JifFieldInstance) it.next();
+            for (Object element : ct.fields()) {
+                JifFieldInstance jfi = (JifFieldInstance) element;
                 if (jfi.flags().isFinal()) {
                     AccessPathField path2 = new AccessPathField(path, jfi, jfi.name(), jfi.position());
                     // if it is static and is the end of a final access path and has an initializer

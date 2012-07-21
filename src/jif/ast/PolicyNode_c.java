@@ -15,30 +15,34 @@ public class PolicyNode_c extends Node_c implements PolicyNode
     public PolicyNode_c(Position pos, Policy policy) {
         super(pos);
         this.policy = policy;
-        this.owner = null; 
+        this.owner = null;
     }
     public PolicyNode_c(Position pos, PrincipalNode owner) {
-	super(pos);
+        super(pos);
         if (owner == null) throw new InternalCompilerError("null owner");
-	this.owner = owner;
+        this.owner = owner;
     }
 
+    @Override
     public Policy policy() {
         return this.policy;
     }
 
+    @Override
     public PrincipalNode owner() {
-	return this.owner;
-    }
-   
-    public PolicyNode owner(PrincipalNode owner) {
-	PolicyNode_c n = (PolicyNode_c) copy();
-	n.owner = owner;
-	return n;
+        return this.owner;
     }
 
+    @Override
+    public PolicyNode owner(PrincipalNode owner) {
+        PolicyNode_c n = (PolicyNode_c) copy();
+        n.owner = owner;
+        return n;
+    }
+
+    @Override
     public boolean isDisambiguated() {
         return policy != null;
     }
-    
+
 }

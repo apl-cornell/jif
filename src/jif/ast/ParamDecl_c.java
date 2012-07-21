@@ -7,14 +7,13 @@ import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
 import polyglot.types.Context;
-import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeBuilder;
 
-/** An implementation of the <code>ParamDecl</code> interface. 
+/** An implementation of the <code>ParamDecl</code> interface.
  */
 public class ParamDecl_c extends Node_c implements ParamDecl
 {
@@ -29,53 +28,64 @@ public class ParamDecl_c extends Node_c implements ParamDecl
         this.name = name;
     }
 
+    @Override
     public boolean isDisambiguated() {
         return pi != null && pi.isCanonical() && super.isDisambiguated();
     }
 
+    @Override
     public ParamInstance.Kind kind() {
         return this.kind;
     }
 
+    @Override
     public ParamDecl kind(ParamInstance.Kind kind) {
         ParamDecl_c n = (ParamDecl_c) copy();
         n.kind = kind;
         return n;
     }
 
+    @Override
     public String name() {
         return this.name.id();
     }
 
+    @Override
     public ParamDecl name(String name) {
         ParamDecl_c n = (ParamDecl_c) copy();
         n.name = n.name.id(name);
         return n;
     }
 
+    @Override
     public ParamInstance paramInstance() {
         return pi;
     }
 
+    @Override
     public ParamDecl paramInstance(ParamInstance pi) {
         ParamDecl_c n = (ParamDecl_c) copy();
         n.pi = pi;
         return n;
     }
 
+    @Override
     public boolean isPrincipal() {
         return kind == ParamInstance.PRINCIPAL;
     }
 
+    @Override
     public boolean isLabel() {
         return kind == ParamInstance.INVARIANT_LABEL ||
-        kind == ParamInstance.COVARIANT_LABEL;
+                kind == ParamInstance.COVARIANT_LABEL;
     }
 
+    @Override
     public boolean isInvariantLabel() {
         return kind == ParamInstance.INVARIANT_LABEL;
     }
 
+    @Override
     public boolean isCovariantLabel() {
         return kind == ParamInstance.COVARIANT_LABEL;
     }
@@ -84,7 +94,8 @@ public class ParamDecl_c extends Node_c implements ParamDecl
         c.addVariable(pi);
     }
 
-    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+    @Override
+    public Node buildTypes(TypeBuilder tb) {
         JifTypeSystem ts = (JifTypeSystem) tb.typeSystem();
 
         JifPolyType ct = (JifPolyType) tb.currentClass();
@@ -94,10 +105,12 @@ public class ParamDecl_c extends Node_c implements ParamDecl
         return paramInstance(pi);
     }
 
+    @Override
     public String toString() {
         return kind.toString();
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (kind == ParamInstance.COVARIANT_LABEL) {
             w.write("covariant label ");
@@ -112,5 +125,6 @@ public class ParamDecl_c extends Node_c implements ParamDecl
         w.write(name.id());
     }
 
-    public void translate(CodeWriter w, Translator tr) { } 
+    @Override
+    public void translate(CodeWriter w, Translator tr) { }
 }

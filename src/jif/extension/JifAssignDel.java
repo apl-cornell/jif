@@ -6,6 +6,7 @@ import java.util.List;
 import jif.ast.JifUtil;
 import jif.visit.IntegerBoundsChecker.Interval;
 import polyglot.ast.Assign;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.SubtypeSet;
 
@@ -13,26 +14,26 @@ public class JifAssignDel extends JifJL_c
 {
     protected boolean arithmeticExcIsFatal = false;
     @Override
-    public List throwTypes(TypeSystem ts) {
-        List l = new LinkedList();
+    public List<Type> throwTypes(TypeSystem ts) {
+        List<Type> l = new LinkedList<Type>();
 
         if (throwsArithmeticException()
                 && !fatalExceptions.contains(ts.ArithmeticException())) {
-          l.add(ts.ArithmeticException());
+            l.add(ts.ArithmeticException());
         }
 
         return l;
     }
-    
+
     public boolean throwsArithmeticException() {
         if(arithmeticExcIsFatal)
             return false;
-        
+
         Assign a = (Assign)this.node();
         if (a.operator() == Assign.DIV_ASSIGN || a.operator() == Assign.MOD_ASSIGN) {
             // it's a divide or mod operation.
             if (a.right().type().isFloat() || a.right().type().isDouble()) {
-                // floats and doubles don't throw 
+                // floats and doubles don't throw
                 return false;
             }
             if (a.right().isConstant()) {
@@ -47,14 +48,14 @@ public class JifAssignDel extends JifJL_c
                 if ((i.getLower() != null && i.getLower().longValue() > 0) ||
                         (i.getUpper() != null && i.getUpper().longValue() < 0)) {
                     // the right operand is non zero
-                    return false;                    
+                    return false;
                 }
             }
             return true;
         }
         return false;
-    }    
-    
+    }
+
     @Override
     public void setFatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
         super.setFatalExceptions(ts, fatalExceptions);

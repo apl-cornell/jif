@@ -19,7 +19,7 @@ import polyglot.visit.Translator;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
-/** An implementation of the <code>LabeledTypeNode</code> interface. 
+/** An implementation of the <code>LabeledTypeNode</code> interface.
  */
 public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Ambiguous
 {
@@ -27,60 +27,68 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Am
     protected LabelNode labelPart;
 
     public LabeledTypeNode_c(Position pos, TypeNode typePart, LabelNode labelPart) {
-	super(pos);
-	this.typePart = typePart;
-	this.labelPart = labelPart;
+        super(pos);
+        this.typePart = typePart;
+        this.labelPart = labelPart;
     }
 
+    @Override
     public TypeNode typePart() {
-	return this.typePart;
+        return this.typePart;
     }
 
+    @Override
     public LabeledTypeNode typePart(TypeNode typePart) {
-	LabeledTypeNode_c n = (LabeledTypeNode_c) copy();
-	n.typePart = typePart;
-	return n;
+        LabeledTypeNode_c n = (LabeledTypeNode_c) copy();
+        n.typePart = typePart;
+        return n;
     }
 
+    @Override
     public LabelNode labelPart() {
-	return this.labelPart;
+        return this.labelPart;
     }
 
+    @Override
     public LabeledTypeNode labelPart(LabelNode labelPart) {
-	LabeledTypeNode_c n = (LabeledTypeNode_c) copy();
-	n.labelPart = labelPart;
-	return n;
+        LabeledTypeNode_c n = (LabeledTypeNode_c) copy();
+        n.labelPart = labelPart;
+        return n;
     }
 
     protected LabeledTypeNode_c reconstruct(TypeNode typePart, LabelNode labelPart) {
-	if (typePart != this.typePart || labelPart != this.labelPart) {
-	    LabeledTypeNode_c n = (LabeledTypeNode_c) copy();
-	    n.typePart = typePart;
-	    n.labelPart = labelPart;
-	    return n;
-	}
+        if (typePart != this.typePart || labelPart != this.labelPart) {
+            LabeledTypeNode_c n = (LabeledTypeNode_c) copy();
+            n.typePart = typePart;
+            n.labelPart = labelPart;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
-	TypeNode typePart = (TypeNode) visitChild(this.typePart, v);
-	LabelNode labelPart = (LabelNode) visitChild(this.labelPart, v);
-	return reconstruct(typePart, labelPart);
+        TypeNode typePart = (TypeNode) visitChild(this.typePart, v);
+        LabelNode labelPart = (LabelNode) visitChild(this.labelPart, v);
+        return reconstruct(typePart, labelPart);
     }
 
-    public Node buildTypes(TypeBuilder tb) throws SemanticException {
-          if (type == null) {
-              return type(typePart.type());
-          }
+    @Override
+    public Node buildTypes(TypeBuilder tb) {
+        if (type == null) {
+            return type(typePart.type());
+        }
 
-          return this;
+        return this;
     }
 
+    @Override
     public boolean isDisambiguated() {
         return false;
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
 //        System.err.println("LabeledTypeNode.disamb: typepart: " + this.typePart + "   :::  labelPart: " + this.labelPart);
         LabeledTypeNode_c n = this;
@@ -97,32 +105,36 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Am
 
         JifTypeSystem jts = (JifTypeSystem) ar.typeSystem();
 
-	Type t = n.typePart.type();
-	Label L = n.labelPart.label();
-    
-	if (t.isVoid()) {
-	    throw new SemanticException("The void type cannot be labeled.",
-		position());
-	}
+        Type t = n.typePart.type();
+        Label L = n.labelPart.label();
 
-	return ar.nodeFactory().CanonicalTypeNode(position(), 
-	    jts.labeledType(n.position(), t, L));
+        if (t.isVoid()) {
+            throw new SemanticException("The void type cannot be labeled.",
+                    position());
+        }
+
+        return ar.nodeFactory().CanonicalTypeNode(position(),
+                jts.labeledType(n.position(), t, L));
     }
 
+    @Override
     public String toString() {
-	return typePart.toString() + labelPart.toString();
+        return typePart.toString() + labelPart.toString();
     }
 
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-	throw new InternalCompilerError(position(),
-	    "Cannot type check ambiguous node " + this + ".");
-    } 
+    @Override
+    public Node typeCheck(TypeChecker tc) {
+        throw new InternalCompilerError(position(),
+                "Cannot type check ambiguous node " + this + ".");
+    }
 
-    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-	throw new InternalCompilerError(position(),
-	    "Cannot exception check ambiguous node " + this + ".");
-    } 
+    @Override
+    public Node exceptionCheck(ExceptionChecker ec) {
+        throw new InternalCompilerError(position(),
+                "Cannot exception check ambiguous node " + this + ".");
+    }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         print(typePart, w, tr);
         w.write("{");
@@ -130,8 +142,9 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Am
         w.write("}");
     }
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
-	throw new InternalCompilerError(position(),
-	    "Cannot translate ambiguous node " + this + ".");
+        throw new InternalCompilerError(position(),
+                "Cannot translate ambiguous node " + this + ".");
     }
 }

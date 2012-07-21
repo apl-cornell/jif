@@ -19,7 +19,8 @@ public class JifCatch_c extends Catch_c
             jfdel.setIsCatchFormal(true);
         }
     }
-    
+
+    @Override
     public Catch formal(Formal formal) {
         // set the delegate to know that it is in a catch clause
         JL del = formal.del();
@@ -31,6 +32,7 @@ public class JifCatch_c extends Catch_c
         return super.formal(formal);
     }
 
+    @Override
     protected Catch_c reconstruct(Formal formal, Block body) {
         // set the delegate to know that it is in a catch clause
         JL del = formal.del();

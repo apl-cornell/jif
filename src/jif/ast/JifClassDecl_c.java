@@ -1,16 +1,47 @@
 package jif.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
-import jif.types.*;
+import jif.types.ActsForConstraint;
+import jif.types.ActsForParam;
+import jif.types.Assertion;
+import jif.types.JifClassType;
+import jif.types.JifContext;
+import jif.types.JifParsedPolyType;
+import jif.types.JifTypeSystem;
+import jif.types.LabelLeAssertion;
+import jif.types.Param;
+import jif.types.ParamInstance;
 import jif.types.label.AccessPathThis;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
-import polyglot.ast.*;
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl_c;
+import polyglot.ast.Id;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
 import polyglot.ext.param.types.MuPClass;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.types.ClassType;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeBuilder;
 
 /** An implementation of the <code>JifClassDecl</code> interface.
  */
@@ -29,8 +60,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         this.authority = Collections.unmodifiableList(new ArrayList<PrincipalNode>(authority));
         this.constraints =
                 Collections
-                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
-                                constraints));
+                .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
+                        constraints));
     }
 
     @Override
@@ -42,8 +73,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         JifClassDecl_c n = (JifClassDecl_c) copy();
         n.constraints =
                 Collections
-                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
-                                constraints));
+                .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
+                        constraints));
         return n;
     }
 
@@ -76,7 +107,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             List<PrincipalNode> authority,
             List<ConstraintNode<Assertion>> constraints, ClassBody body) {
         if (! CollectionUtil.equals(params, this.params) || ! CollectionUtil.equals(authority, this.authority)
-        		|| ! CollectionUtil.equals(params, this.constraints)) {
+                || ! CollectionUtil.equals(params, this.constraints)) {
             JifClassDecl_c n = (JifClassDecl_c) copy();
             n.params = ListUtil.copy(params, true);
             n.authority = ListUtil.copy(authority, true);
@@ -120,13 +151,13 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 
     public JifContext addConstraintsToContext(JifContext A) {
         final JifParsedPolyType ct = (JifParsedPolyType) this.type;
-        
+
         // Add programer-specified constraints.
         for (Assertion constraint : ct.constraints()) {
             if (constraint instanceof ActsForConstraint) {
                 @SuppressWarnings("unchecked")
                 ActsForConstraint<ActsForParam, ActsForParam> pi =
-                        (ActsForConstraint<ActsForParam, ActsForParam>) constraint;
+                (ActsForConstraint<ActsForParam, ActsForParam>) constraint;
                 ActsForParam actor = pi.actor();
                 ActsForParam granter = pi.granter();
                 if (actor instanceof Principal && granter instanceof Principal) {
@@ -136,7 +167,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
                 } else {
                     throw new InternalCompilerError(
                             "Unexpected ActsForParam type: " + actor.getClass()
-                                    + " actsfor " + granter.getClass());
+                            + " actsfor " + granter.getClass());
                 }
             } else if (constraint instanceof LabelLeAssertion) {
                 LabelLeAssertion lle = (LabelLeAssertion) constraint;
@@ -146,7 +177,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
                         + constraint, constraint.position());
             }
         }
-        
+
         return A;
     }
 
@@ -169,8 +200,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             // This class implements jif.lang.Princpal, and as such
             // implicitly has the authority of the principal represented by
             // "this"
-            s.add(ts.dynamicPrincipal(ct.position(), 
-                                      new AccessPathThis(ct, ct.position())));
+            s.add(ts.dynamicPrincipal(ct.position(),
+                    new AccessPathThis(ct, ct.position())));
         }
         A.setAuthority(s);
         return A;
@@ -190,7 +221,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             // super.buildTypes failed. Give up now.
             return;
         }
-        MuPClass pc = ts.mutablePClass(ct.position());
+        MuPClass<ParamInstance, Param> pc = ts.mutablePClass(ct.position());
 
         ct.setInstantiatedFrom(pc);
         pc.clazz(ct);
@@ -203,7 +234,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             //check for renaming error
             if (names.contains(p.name()))
                 throw new SemanticException("Redefined Parameter Error.", p
-                                            .position());
+                        .position());
             else
                 names.add(p.name());
         }
@@ -222,7 +253,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             principals.add(p.principal());
         }
         ct.setAuthority(principals);
-        
+
         List<Assertion> constraints =
                 new ArrayList<Assertion>(n.constraints().size());
         for (ConstraintNode<Assertion> cn : n.constraints()) {

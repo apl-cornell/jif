@@ -6,7 +6,7 @@ import jif.types.JifTypeSystem;
 import polyglot.ast.Expr_c;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
-import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
@@ -22,63 +22,73 @@ public class PrincipalExpr_c extends Expr_c implements PrincipalExpr
     protected PrincipalNode principal;
 
     public PrincipalExpr_c(Position pos, PrincipalNode principal) {
-	super(pos);
-	this.principal = principal;
+        super(pos);
+        this.principal = principal;
     }
 
+    @Override
     public PrincipalNode principal() {
-	return this.principal;
+        return this.principal;
     }
 
+    @Override
     public PrincipalExpr principal(PrincipalNode principal) {
-	PrincipalExpr_c n = (PrincipalExpr_c) copy();
-	n.principal = principal;
-	return n;
+        PrincipalExpr_c n = (PrincipalExpr_c) copy();
+        n.principal = principal;
+        return n;
     }
-    
+
     protected PrincipalExpr_c reconstruct(PrincipalNode principal) {
-	if (principal != this.principal) {
-	    PrincipalExpr_c n = (PrincipalExpr_c) copy();
-	    n.principal = principal;
-	    return n;
-	}
+        if (principal != this.principal) {
+            PrincipalExpr_c n = (PrincipalExpr_c) copy();
+            n.principal = principal;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
-	PrincipalNode principal = (PrincipalNode) visitChild(this.principal, v);
-	return reconstruct(principal);
+        PrincipalNode principal = (PrincipalNode) visitChild(this.principal, v);
+        return reconstruct(principal);
     }
 
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-	JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();	
-	return type(ts.Principal());
+    @Override
+    public Node typeCheck(TypeChecker tc) {
+        JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();
+        return type(ts.Principal());
     }
 
-    public List throwTypes(TypeSystem ts) {
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
         return principal().principal().throwTypes(ts);
     }
-    
+
+    @Override
     public Term firstChild() {
         return null;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         return succs;
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("new principal (");
         print(principal, w, tr);
         w.write(")");
     }
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("cannot translate " + this);
     }
 
+    @Override
     public String toString() {
-	return principal.toString();
+        return principal.toString();
     }
 }

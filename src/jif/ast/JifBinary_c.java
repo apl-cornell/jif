@@ -13,11 +13,12 @@ public class JifBinary_c extends Binary_c implements Binary
         super(pos, left, op, right);
     }
 
+    @Override
     public boolean throwsArithmeticException() {
         if (op == DIV || op == MOD) {
             // it's a divide or mod operation.
             if (right.type().isFloat() || right.type().isDouble()) {
-                // floats and doubles don't throw 
+                // floats and doubles don't throw
                 return false;
             }
             if (right.isConstant()) {
@@ -32,11 +33,11 @@ public class JifBinary_c extends Binary_c implements Binary
                 if ((i.getLower() != null && i.getLower().longValue() > 0) ||
                         (i.getUpper() != null && i.getUpper().longValue() < 0)) {
                     // the right operand is non zero
-                    return false;                    
+                    return false;
                 }
             }
             return true;
         }
         return false;
-    }    
+    }
 }

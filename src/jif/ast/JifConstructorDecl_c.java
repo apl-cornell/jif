@@ -10,7 +10,14 @@ import jif.types.DefaultSignature;
 import jif.types.JifConstructorInstance;
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
-import polyglot.ast.*;
+import polyglot.ast.Block;
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.ConstructorDecl_c;
+import polyglot.ast.Formal;
+import polyglot.ast.Id;
+import polyglot.ast.Node;
+import polyglot.ast.Stmt;
+import polyglot.ast.TypeNode;
 import polyglot.types.ClassType;
 import polyglot.types.Flags;
 import polyglot.types.SemanticException;
@@ -21,7 +28,7 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
-/** 
+/**
  * An implementation of the <code>JifConstructor</code> interface.
  */
 public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstructorDecl
@@ -39,8 +46,8 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         this.returnLabel = returnLabel;
         this.constraints =
                 Collections
-                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
-                                constraints));
+                .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
+                        constraints));
     }
 
     @Override
@@ -78,14 +85,14 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
         n.constraints =
                 Collections
-                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
-                                constraints));
+                .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
+                        constraints));
         return n;
     }
 
-    protected JifConstructorDecl_c reconstruct(Id name, LabelNode startLabel, 
-	    LabelNode returnLabel, List<Formal> formals, List<TypeNode> throwTypes, 
-	    List<ConstraintNode<Assertion>> constraints, Block body) {
+    protected JifConstructorDecl_c reconstruct(Id name, LabelNode startLabel,
+            LabelNode returnLabel, List<Formal> formals, List<TypeNode> throwTypes,
+            List<ConstraintNode<Assertion>> constraints, Block body) {
         if (startLabel != this.startLabel || returnLabel != this.returnLabel
                 || !CollectionUtil.equals(constraints, this.constraints)) {
             JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
@@ -93,8 +100,8 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             n.returnLabel = returnLabel;
             n.constraints =
                     Collections
-                            .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
-                                    constraints));
+                    .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
+                            constraints));
             return (JifConstructorDecl_c) n.reconstruct(name, formals,
                     throwTypes, body);
         }
@@ -150,10 +157,10 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         if (n.startLabel() == null) {
             Li = ds.defaultPCBound(n.position(), n.name());
             isDefaultPCBound = true;
-        } 
+        }
         else {
             Li = n.startLabel().label();
-            
+
             // Automagically ensure that the begin label is at least as high as
             // the provider label. This ensures that code will be unable to
             // affect data that the provider is not trusted to affect. It also
@@ -170,7 +177,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         }
         else {
             Lr = n.returnLabel().label();
-        }        
+        }
         jci.setReturnLabel(Lr, isDefaultReturnLabel);
 
         // set the labels for the throwTypes.
@@ -210,7 +217,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 
-        Node n = super.typeCheck(tc);    
+        Node n = super.typeCheck(tc);
         JifConstructorDecl_c jcd = (JifConstructorDecl_c)n;
         jcd.checkConstructorCall(tc);
 
@@ -221,8 +228,8 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
      * Checks that if there is an explicit constructor call in the constructor
      * body that the call is all right.
      * 
-     * In particular, if this is a java class or one of the ancestors of this 
-     * class is "untrusted" then the explicit constructor call must be 
+     * In particular, if this is a java class or one of the ancestors of this
+     * class is "untrusted" then the explicit constructor call must be
      * the first statement in the constructor body.
      * 
      * Moreover, if this is a Jif class, but the superclass is not a Jif class,
@@ -236,7 +243,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         ClassType ct = tc.context().currentClass();
 
         // ignore java.lang.Object
-        if (ts.equals(ct, ts.Object())) 
+        if (ts.equals(ct, ts.Object()))
             return;
 
         ClassType untrusted = ts.hasUntrustedAncestor(ct);
@@ -245,34 +252,34 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             // had better be a constructor call (which is the normal Java
             // rule).
             checkFirstStmtConstructorCall("The first statement of a constructor " +
-                                          "of a Java class must be a constructor call.", true, false);
+                    "of a Java class must be a constructor call.", true, false);
         }
         else if (ts.isJifClass(ct) && untrusted != null) {
             // If ct is a Jif class, but the super class is an
             // untrusted Java class, then the first statement of the body
             // must be an explicit call to the default super constructor:
-            // "super()". If it wasn't, then due to the translation of 
+            // "super()". If it wasn't, then due to the translation of
             // Jif constructors, a malicious (non-Jif) superclass access
             // final fields before they have been initialized.
             checkFirstStmtConstructorCall("The first statement of a constructor " +
-                                          "of a Jif class with an untrusted Java superclass " +
-                                          "must be an explicit call to the default super constructor," +
-                                          "\"super()\".", false, true);
-        }        
+                    "of a Jif class with an untrusted Java superclass " +
+                    "must be an explicit call to the default super constructor," +
+                    "\"super()\".", false, true);
+        }
         else if (ts.isJifClass(ct) && !ts.isJifClass(ct.superType())) {
             // this is a Jif class, but it's superclass is a trusted Java class.
-            // The first statement must either be a "this(...)" constructor 
+            // The first statement must either be a "this(...)" constructor
             // call, or a "super()" call. That is, the constructor cannot
             // call any super constructor other than the default constuctor,
             // since in translation, the Jif class has no opportunity to
-            // marshal the arguments before the super constructor call 
+            // marshal the arguments before the super constructor call
             // happens.
             checkFirstStmtConstructorCall("The first statement of a " +
-                                          "constructor of a Jif class with a Java superclass " +
-                                          "must be either a \"this(...)\" constructor call, or " +
-                                          "a call to the default super constructor, " +
-                                          "\"super()\".", 
-                                          true, true);
+                    "constructor of a Jif class with a Java superclass " +
+                    "must be either a \"this(...)\" constructor call, or " +
+                    "a call to the default super constructor, " +
+                    "\"super()\".",
+                    true, true);
         }
     }
 
@@ -282,10 +289,10 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
      * @param allowThisCalls if false then first statement must be super(); if true then it may be a call to this(...) or super().
      * @throws SemanticException
      */
-    private void checkFirstStmtConstructorCall(String message, 
+    private void checkFirstStmtConstructorCall(String message,
             boolean allowThisCalls,
-            boolean superCallMustBeDefault) 
-    throws SemanticException {
+            boolean superCallMustBeDefault)
+                    throws SemanticException {
         if (body == null) {
             // this must be a native constructor.
             return;
@@ -293,19 +300,19 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
         if (body().statements().size() < 1) {
             throw new SemanticException("Empty constructor body.", position());
         }
-        Stmt s = (Stmt)body().statements().get(0);
+        Stmt s = body().statements().get(0);
         if (!(s instanceof ConstructorCall)) {
             throw new SemanticException(message, position());
         }
 
         ConstructorCall cc = (ConstructorCall)s;
         if (!allowThisCalls && cc.kind() == ConstructorCall.THIS) {
-            throw new SemanticException(message, position());                
+            throw new SemanticException(message, position());
         }
 
         if (superCallMustBeDefault && cc.kind() == ConstructorCall.SUPER &&
                 cc.arguments().size() > 0) {
-            throw new SemanticException(message, position());                
+            throw new SemanticException(message, position());
         }
 
     }

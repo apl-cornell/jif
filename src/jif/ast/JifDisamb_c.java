@@ -22,8 +22,8 @@ import polyglot.util.InternalCompilerError;
  * We need to override the default functionality of <code>Disamb_c</code>
  * to deal with using the correct instantiations of polymorphic classes.
  */
-public class JifDisamb_c extends Disamb_c
-{
+public class JifDisamb_c extends Disamb_c {
+    @Override
     protected Node disambiguateVarInstance(VarInstance vi) throws SemanticException {
         Node n = super.disambiguateVarInstance(vi);
         if (n != null) {
@@ -54,7 +54,7 @@ public class JifDisamb_c extends Disamb_c
             }
 
             throw new InternalCompilerError("Unexpected param " + pi,
-                                            pos);
+                    pos);
         }
         return null;
     }
@@ -63,6 +63,7 @@ public class JifDisamb_c extends Disamb_c
      * Override superclass functionality to avoid returning an
      * uninstantiated polymorphic class.
      */
+    @Override
     protected Receiver makeMissingFieldTarget(FieldInstance fi) throws SemanticException {
         if (fi.flags().isStatic()) {
             JifTypeSystem jts = (JifTypeSystem)fi.typeSystem();
