@@ -1,24 +1,26 @@
 package jif.lang;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import jif.lang.PrincipalUtil.DelegationPair;
+
 public final class ToConjunctProof extends ActsForProof {
-    private final Map conjunctProofs;
+    private final Map<Principal, ActsForProof> conjunctProofs;
     ToConjunctProof(Principal actor, ConjunctivePrincipal granter,
-                    Map conjunctProofs) {
+            Map<Principal, ActsForProof> conjunctProofs) {
         super(actor, granter);
         this.conjunctProofs = conjunctProofs;
     }
-    Map getConjunctProofs() {
+
+    Map<Principal, ActsForProof> getConjunctProofs() {
         return conjunctProofs;
     }
-    public void gatherDelegationDependencies(Set s) {
+    @Override
+    public void gatherDelegationDependencies(Set<DelegationPair> s) {
         ConjunctivePrincipal cp = (ConjunctivePrincipal)getGranter();
-        for (Iterator iter = cp.conjuncts.iterator(); iter.hasNext(); ) {
-            Principal conjunct = (Principal)iter.next();
-            ActsForProof pr = (ActsForProof)this.getConjunctProofs().get(conjunct);
+        for (Principal conjunct : cp.conjuncts) {
+            ActsForProof pr = this.getConjunctProofs().get(conjunct);
             pr.gatherDelegationDependencies(s);
         }
     }

@@ -1,6 +1,11 @@
 package jif.lang;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -272,7 +277,8 @@ public class PrincipalUtil {
                     // go though each conjunct, and make sure there is a proof
                     // from actor to the conjunct
                     for (Principal conjunct : cp.conjuncts) {
-                        ActsForProof pr = (ActsForProof)proof.getConjunctProofs().get(conjunct);
+                        ActsForProof pr =
+                                proof.getConjunctProofs().get(conjunct);
                         if (!verifyProof(pr, actor, conjunct)) return false;
                     }
                     // we have verified a proof from actor to each conjunct.

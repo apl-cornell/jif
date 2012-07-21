@@ -2,10 +2,11 @@ package jif.lang;
 
 import java.util.Set;
 
+import jif.lang.PrincipalUtil.DelegationPair;
 
 /**
- * A Label is the runtime representation of a Jif label. 
- *  
+ * A Label is the runtime representation of a Jif label.
+ * 
  */
 public interface Label
 {
@@ -15,12 +16,12 @@ public interface Label
      * that the result depends upon. If the method returns false,
      * then s has no elements added to it.
      */
-    boolean relabelsTo(Label l, Set s);
-    
+    boolean relabelsTo(Label l, Set<DelegationPair> s);
+
     Label join(Label l);
     Label meet(Label l);
-    
+
     ConfPolicy confPolicy();
     IntegPolicy integPolicy();
-    
+
 }

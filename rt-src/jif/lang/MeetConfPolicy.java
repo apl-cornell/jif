@@ -1,26 +1,32 @@
 package jif.lang;
 
-import java.util.*;
+import java.util.Set;
+
+import jif.lang.PrincipalUtil.DelegationPair;
 
 /**
  * Represents the meet of confidentiality policies
- *  
+ * 
  */
 public final class MeetConfPolicy extends MeetPolicy implements ConfPolicy
 {
-    MeetConfPolicy(LabelUtil labelUtil, Set policies) {
+    MeetConfPolicy(LabelUtil labelUtil, Set<Policy> policies) {
         super(labelUtil, policies);
     }
 
-    public ConfPolicy join(ConfPolicy p, Set s) {
+    @Override
+    public ConfPolicy join(ConfPolicy p, Set<DelegationPair> s) {
         return labelUtil.join(this, p, s);
     }
-    public ConfPolicy meet(ConfPolicy p, Set s) {
+    @Override
+    public ConfPolicy meet(ConfPolicy p, Set<DelegationPair> s) {
         return labelUtil.meet(this, p, s);
     }
+    @Override
     public ConfPolicy join(ConfPolicy p) {
         return labelUtil.join(this, p);
     }
+    @Override
     public ConfPolicy meet(ConfPolicy p) {
         return labelUtil.meetPol(this, p);
     }
