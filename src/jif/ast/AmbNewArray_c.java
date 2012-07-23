@@ -69,7 +69,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray
 
     /** Gets the additional dimensions. */
     @Override
-    public List<Expr> dims() {
+    public List<? extends Expr> dims() {
         return this.dims;
     }
 

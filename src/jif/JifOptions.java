@@ -14,6 +14,7 @@ import polyglot.main.OptFlag.PathFlag;
 import polyglot.main.OptFlag.Switch;
 import polyglot.main.Options;
 import polyglot.main.Report;
+import polyglot.main.UsageError;
 
 /**
  * This object encapsulates various polyglot options.
@@ -27,50 +28,50 @@ public class JifOptions extends Options {
      */
     public boolean nonRobustness;
 
-    
+
     /**
      * Should uncaught exceptions be made fatal?
      */
     public boolean fatalExceptions;
-    
-     /**
-      * Use a single Solver to infer labels globally, or solve on a class
-      * by class basis.
-      */
-     public boolean solveGlobally;
 
-     /**
-      * Provide more detailed explanation of solver error messages?
-      */
-     public boolean explainErrors;
-     
-     /**
-      * Whether the providers of the sources being compiled are trusted.
-      */
-     public boolean trustedProviders;
+    /**
+     * Use a single Solver to infer labels globally, or solve on a class
+     * by class basis.
+     */
+    public boolean solveGlobally;
 
-     /**
-      * The classpath for the Jif signatures of java.lang objects.
-      */
-     public List<File> sigcp = new ArrayList<File>();
+    /**
+     * Provide more detailed explanation of solver error messages?
+     */
+    public boolean explainErrors;
 
-     
-     public Location signature_path = new Location() {
-         @Override
-         public String getName() {
-             return "SIGNATURE_PATH";
-         }
+    /**
+     * Whether the providers of the sources being compiled are trusted.
+     */
+    public boolean trustedProviders;
 
-         @Override
-         public boolean isOutputLocation() {
-             return false;
-         }        
-     };
-     
-     /**
-      * Output a dependency graph to help the diagnosing of type error?
-      */
-     public boolean dependencyGraph;
+    /**
+     * The classpath for the Jif signatures of java.lang objects.
+     */
+    public List<File> sigcp = new ArrayList<File>();
+
+
+    public Location signature_path = new Location() {
+        @Override
+        public String getName() {
+            return "SIGNATURE_PATH";
+        }
+
+        @Override
+        public boolean isOutputLocation() {
+            return false;
+        }
+    };
+
+    /**
+     * Output a dependency graph to help the diagnosing of type error?
+     */
+    public boolean dependencyGraph;
 
     /**
      * Constructor
@@ -83,7 +84,7 @@ public class JifOptions extends Options {
     protected void populateFlags(Set<OptFlag<?>> flags) {
         flags.add(new Switch("-globalsolve", "infer label variables globally (default: per class)"));
         flags.add(new Switch(new String[]{"-explain", "-e"}, "provide more detailed " +
-                                         "explanations of failed label checking"));
+                "explanations of failed label checking"));
         flags.add(new Switch("-nonrobust", "infer label variables globally (default: per class)"));
         flags.add(new Switch("-fail-on-exception", "infer label variables globally (default: per class)"));
         flags.add(new Switch("-robust", "infer label variables globally (default: per class)"));
@@ -110,10 +111,10 @@ public class JifOptions extends Options {
         flags.add(new Switch("-untrusted-providers", "set the providers of the sources being compiled to be untrusted"));
         super.populateFlags(flags);
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
-    protected void handleArg(Arg<?> arg) {
+    protected void handleArg(Arg<?> arg) throws UsageError {
         if (arg.flag().ids().contains("-globalsolve")) {
             if ((Boolean) arg.value())
                 System.err.println("Will use a single solver to infer labels");
