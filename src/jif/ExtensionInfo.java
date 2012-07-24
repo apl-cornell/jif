@@ -111,6 +111,8 @@ public class ExtensionInfo extends JLExtensionInfo
 
     @Override
     protected void configureFileManager() {
+        super.configureFileManager();
+
         JifOptions options = getJifOptions();
         // use the signature classpath if it exists for compiling Jif classes
         List<File> path = new ArrayList<File>();
