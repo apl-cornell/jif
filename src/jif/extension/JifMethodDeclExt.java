@@ -5,7 +5,14 @@ import java.util.List;
 import jif.ast.JifMethodDecl;
 import jif.ast.JifMethodDecl_c;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.Assertion;
+import jif.types.JifContext;
+import jif.types.JifMethodInstance;
+import jif.types.JifTypeSystem;
+import jif.types.LabelLeAssertion;
+import jif.types.LabelSubstitution;
+import jif.types.PathMap;
+import jif.types.SemanticDetailedException;
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import jif.types.label.ThisLabel;
@@ -130,7 +137,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             // This is the declared label of the parameter.
             Label argBj = ((ArgLabel)ts.labelOfType(tj)).upperBound();
             if (argBj.isCovariant()) {
-                String name = ((Formal)mn.formals().get(index)).name();
+                String name = mn.formals().get(index).name();
                 throw new SemanticDetailedException("The method " +
                                                     "argument " + name + 
                                                     " can not be labeled with the covariant label " + argBj + ".",

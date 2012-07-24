@@ -5,6 +5,7 @@ import polyglot.ast.Try;
 import polyglot.types.SemanticException;
 
 public class TryToJavaExt_c extends ToJavaExt_c {
+    @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         Try n = (Try)node();
         return rw.java_nf().Try(n.position(), n.tryBlock(), n.catchBlocks(), n.finallyBlock());

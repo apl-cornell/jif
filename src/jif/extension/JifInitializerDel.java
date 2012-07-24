@@ -14,6 +14,7 @@ public class JifInitializerDel extends JifJL_c
     public JifInitializerDel() {
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	Initializer ib = (Initializer) node();
 

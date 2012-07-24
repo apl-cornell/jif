@@ -1,11 +1,10 @@
-    /**
-     * Check the dim expressions to see if any of them can cause 
-     * a NegativeArraySizeException to be thrown
-     */
+/**
+ * Check the dim expressions to see if any of them can cause
+ * a NegativeArraySizeException to be thrown
+ */
 package jif.extension;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,22 +23,23 @@ import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 
-/** The Jif extension of the <code>NewArray</code> node. 
+/** The Jif extension of the <code>NewArray</code> node.
  * 
  *  @see polyglot.ast.NewArray
  */
-public class JifNewArrayExt extends JifExprExt 
+public class JifNewArrayExt extends JifExprExt
 {
     public JifNewArrayExt(ToJavaExt toJava) {
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         JifTypeSystem ts = lc.jifTypeSystem();
 
         NewArray nae = (NewArray) node();
-        List throwTypes = new ArrayList(nae.del().throwTypes(ts));
+        List<Type> throwTypes = new ArrayList<Type>(nae.del().throwTypes(ts));
 
         JifContext A = lc.jifContext();
         A = (JifContext) nae.del().enterScope(A);
@@ -49,11 +49,10 @@ public class JifNewArrayExt extends JifExprExt
         PathMap Xs = ts.pathMap();
         Xs = Xs.N(A.pc());
 
-        List dims = new LinkedList();
+        List<Expr> dims = new LinkedList<Expr>();
 
         Label dimsNV = ts.bottomLabel();
-        for (Iterator iter = nae.dims().iterator(); iter.hasNext(); ) {
-            Expr e = (Expr) iter.next(); 
+        for (Expr e : nae.dims()) {
             e = (Expr) lc.context(A).labelCheck(e);
             dims.add(e);
 
@@ -68,7 +67,7 @@ public class JifNewArrayExt extends JifExprExt
 
         if (nae.init() != null) {
             init = (ArrayInit) lc.context(A).labelCheck(nae.init());
-            ((JifArrayInitExt)(JifUtil.jifExt(init))).labelCheckElements(lc, nae.type()); 
+            ((JifArrayInitExt)(JifUtil.jifExt(init))).labelCheckElements(lc, nae.type());
             PathMap Xinit = getPathMap(init);
             Xs = Xs.N(ts.notTaken()).join(Xinit);
         }
@@ -88,6 +87,7 @@ public class JifNewArrayExt extends JifExprExt
         return updatePathMap(nae.dims(dims).init(init), Xs);
     }
 
+    @Override
     public void integerBoundsCalculated() {
         super.integerBoundsCalculated();
         boolean noNegArraySizeExcThrown = noNegArraySizeExcThrown();
@@ -96,13 +96,12 @@ public class JifNewArrayExt extends JifExprExt
             del.setNoNegArraySizeExcThrown();
         }
     }
-    
+
     private boolean noNegArraySizeExcThrown() {
         NewArray na = (NewArray)node();
-        List dims = na.dims();
+        List<Expr> dims = na.dims();
         if (dims == null) return true;
-        for (Iterator iter = dims.iterator(); iter.hasNext();) {
-            Expr d = (Expr)iter.next();
+        for (Expr d : dims) {
             JifExprExt ext = (JifExprExt)JifUtil.jifExt(d);
 
             IntegerBoundsChecker.Interval bounds = ext.getNumericBounds();
@@ -110,13 +109,13 @@ public class JifNewArrayExt extends JifExprExt
             if (bounds == null || bounds.getLower() < 0) {
                 // the value of d may be less than 0, and so
                 // a NegativeArraySizeException may be thrown
-                
+
 //                System.err.println("Bound for " +  d + " is " + bound);
                 return false;
             }
         }
-        return true;        
+        return true;
     }
-    
-    
+
+
 }

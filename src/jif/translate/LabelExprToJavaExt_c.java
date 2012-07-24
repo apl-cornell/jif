@@ -6,11 +6,14 @@ import polyglot.types.SemanticException;
 import polyglot.visit.NodeVisitor;
 
 public class LabelExprToJavaExt_c extends ToJavaExt_c {
-    public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
+    @Override
+    public NodeVisitor toJavaEnter(JifToJavaRewriter rw)
+            throws SemanticException {
         LabelExpr n = (LabelExpr) node();
         return rw.bypass(n.label());
     }
 
+    @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         LabelExpr n = (LabelExpr) node();
         return n.visitChild(n.label(), rw);

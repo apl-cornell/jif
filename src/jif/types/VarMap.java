@@ -4,7 +4,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import jif.types.label.*;
+import jif.types.label.Label;
+import jif.types.label.Policy;
+import jif.types.label.VarLabel;
+import jif.types.label.Variable;
 import jif.types.principal.Principal;
 import jif.types.principal.VarPrincipal;
 import polyglot.types.ArrayType;
@@ -96,6 +99,7 @@ public class VarMap {
     }
     
     private class VarMapLabelSubstitution extends LabelSubstitution {
+        @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof VarLabel) {
                 VarLabel v = (VarLabel)L;
@@ -103,6 +107,7 @@ public class VarMap {
             }
             return L;
         }            
+        @Override
         public Principal substPrincipal(Principal p) throws SemanticException {
             if (p instanceof VarPrincipal) {
                 VarPrincipal v = (VarPrincipal)p;
@@ -206,6 +211,7 @@ public class VarMap {
 	return t;
     }	
     
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("======== VAR MAP ========");

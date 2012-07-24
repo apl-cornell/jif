@@ -16,6 +16,7 @@ public class JifConstructorCallDel extends JifJL_c
     /* (non-Javadoc)
      * @see polyglot.ast.NodeOps#enterScope(polyglot.types.Context)
      */
+    @Override
     public Context enterScope(Context c) {
         return ((JifContext)c).pushConstructorCall();
     }

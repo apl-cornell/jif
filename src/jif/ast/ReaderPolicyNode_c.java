@@ -58,8 +58,7 @@ public class ReaderPolicyNode_c extends PolicyNode_c
 
         List<Principal> l = new LinkedList<Principal>();
 
-        for (Object element : this.principals) {
-            PrincipalNode r = (PrincipalNode) element;
+        for (PrincipalNode r : this.principals) {
             if (!r.isDisambiguated()) {
                 ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
                 return this;

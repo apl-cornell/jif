@@ -3,16 +3,26 @@ package jif.extension;
 import java.util.ArrayList;
 import java.util.List;
 
-import jif.ast.*;
+import jif.ast.JifNodeFactory;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.ast.ArrayAccess;
+import polyglot.ast.ArrayAccessAssign;
+import polyglot.ast.Assign;
+import polyglot.ast.Expr;
+import polyglot.ast.IntLit;
+import polyglot.ast.Local;
+import polyglot.ast.Node;
+import polyglot.types.ArrayType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.Position;
 
-/** The Jif extension of the <code>ArrayAccess</code> node. 
+/** The Jif extension of the <code>ArrayAccess</code> node.
  */
 public class JifArrayAccessExt extends JifExprExt
 {
@@ -25,22 +35,21 @@ public class JifArrayAccessExt extends JifExprExt
         JifNodeFactory nf = (JifNodeFactory)lc.nodeFactory();
         ArrayAccess ae = (ArrayAccess) node();
         Position pos = ae.position();
-        ArrayAccessAssign aae = nf.ArrayAccessAssign(pos, ae, Assign.ADD_ASSIGN, 
-                                                     nf.IntLit(pos, IntLit.INT, 1));
+        ArrayAccessAssign aae = nf.ArrayAccessAssign(pos, ae, Assign.ADD_ASSIGN,
+                nf.IntLit(pos, IntLit.INT, 1));
 
         aae = (ArrayAccessAssign)lc.labelCheck(aae);
 
         return aae.left();
     }
 
-    public Node labelCheck(LabelChecker lc)
-    throws SemanticException
-    {
+    @Override
+    public Node labelCheck(LabelChecker lc) throws SemanticException {
         JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.jifTypeSystem();
         ArrayAccess aie = (ArrayAccess) node();
 
-        List throwTypes = new ArrayList(aie.del().throwTypes(ts));
+        List<Type> throwTypes = new ArrayList<Type>(aie.del().throwTypes(ts));
 
         Expr array = (Expr) lc.context(A).labelCheck(aie.array());
         PathMap Xa = getPathMap(array);
@@ -62,7 +71,7 @@ public class JifArrayAccessExt extends JifExprExt
         if (!((JifArrayAccessDel)node().del()).arrayIsNeverNull()) {
             // a null pointer exception may be thrown
             checkAndRemoveThrowType(throwTypes, npe);
-            X2 = X2.exc(Xa.NV(), npe);             
+            X2 = X2.exc(Xa.NV(), npe);
         }
         if (((JifArrayAccessDel)node().del()).outOfBoundsExcThrown()) {
             // an out of bounds exception may be thrown
@@ -79,15 +88,15 @@ public class JifArrayAccessExt extends JifExprExt
     private Type arrayType(Expr array, JifTypeSystem ts) {
         Type arrayType = array.type();
         if (array instanceof Local) {
-            arrayType = ((Local)array).localInstance().type();	
+            arrayType = ((Local)array).localInstance().type();
         }
 
-        return ts.unlabel(arrayType); 
+        return ts.unlabel(arrayType);
     }
 
     private Label arrayBaseLabel(Expr array, JifTypeSystem ts) {
-        Type arrayType = arrayType(array, ts);	
-        return ts.labelOfType(((ArrayType)arrayType).base());	
+        Type arrayType = arrayType(array, ts);
+        return ts.labelOfType(((ArrayType)arrayType).base());
     }
 
 }

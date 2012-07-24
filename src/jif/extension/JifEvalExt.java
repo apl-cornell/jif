@@ -20,6 +20,7 @@ public class JifEvalExt extends JifStmtExt_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         Eval eval = (Eval) node();
 

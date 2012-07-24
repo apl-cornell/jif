@@ -1,12 +1,8 @@
 package jif.types;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -16,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jif.JifOptions;
 import jif.Topics;
 import jif.types.InformationFlowTrace.Direction;
 import jif.types.hierarchy.LabelEnv;
@@ -209,6 +204,7 @@ public abstract class AbstractSolver implements Solver {
         return Report.should_report(topics, obscurity);
     }
 
+    @Override
     public Label applyBoundsTo(Label L) {
         return bounds.applyTo(L);
     }
@@ -269,6 +265,7 @@ public abstract class AbstractSolver implements Solver {
      * @throws SemanticException if the Solver cannot find a solution to the
      *             system of contraints.
      */
+    @Override
     public VarMap solve() throws SemanticException {
         
         // Cache the solution.
@@ -848,6 +845,7 @@ public abstract class AbstractSolver implements Solver {
     /**
      * Add the constraint c to the system
      */
+    @Override
     public void addConstraint(Constraint c) throws SemanticException {
         if (status != STATUS_NOT_SOLVED) {
             throw new InternalCompilerError("Computed solution already. "

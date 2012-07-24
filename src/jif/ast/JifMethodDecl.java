@@ -1,9 +1,9 @@
 package jif.ast;
 
-import polyglot.ast.*;
-import java.util.*;
+import java.util.List;
 
 import jif.types.Assertion;
+import polyglot.ast.MethodDecl;
 
 /** An immutable representation of the Jif method declaration.
  *  It extends the Java method declaration with the start label,

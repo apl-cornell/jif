@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import jif.types.ActsForConstraint;
 import jif.types.ActsForParam;
-
 import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 

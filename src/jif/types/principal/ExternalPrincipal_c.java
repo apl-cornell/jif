@@ -20,11 +20,15 @@ public class ExternalPrincipal_c extends Principal_c implements ExternalPrincipa
         this.name = name;
     }
 
+    @Override
     public String name() {
         return name;
     }
+    @Override
     public boolean isRuntimeRepresentable() { return true; }
+    @Override
     public boolean isCanonical() { return true; }
+    @Override
     public String toString() {
         if (Report.should_report(Report.debug, 1)) { 
             return "<pr-external " + name + ">";
@@ -37,6 +41,7 @@ public class ExternalPrincipal_c extends Principal_c implements ExternalPrincipa
      *  Return true if and only the specific object is an <code>ExternalPrincipal</code>
      *  and both principals have the same name. 
      */
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (! (o instanceof ExternalPrincipal)) {
@@ -47,6 +52,7 @@ public class ExternalPrincipal_c extends Principal_c implements ExternalPrincipa
         return this.name.equals(that.name());
     }
 
+    @Override
     public int hashCode() {
         return name.hashCode();
     }

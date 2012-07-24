@@ -17,6 +17,7 @@ public class JifEmptyExt extends JifStmtExt_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheckStmt(LabelChecker lc) {
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();

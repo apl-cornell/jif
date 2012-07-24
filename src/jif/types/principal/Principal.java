@@ -4,7 +4,11 @@ import java.util.List;
 import java.util.Set;
 
 import jif.translate.JifToJavaRewriter;
-import jif.types.*;
+import jif.types.ActsForParam;
+import jif.types.JifContext;
+import jif.types.LabelSubstitution;
+import jif.types.Param;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;

@@ -15,16 +15,19 @@ public class AutoEndorseConstraint_c extends TypeObject_c implements AutoEndorse
 	this.endorseTo = endorseTo;
     }
 
+    @Override
     public AutoEndorseConstraint endorseTo(Label endorseTo) {
 	AutoEndorseConstraint_c n = (AutoEndorseConstraint_c) copy();
 	n.endorseTo = endorseTo;
 	return n;
     }
 
+    @Override
     public Label endorseTo() {
 	return endorseTo;
     }
 
+    @Override
     public String toString() {
 	String s = "autoendorse(";
 	s += endorseTo.toString();
@@ -32,6 +35,7 @@ public class AutoEndorseConstraint_c extends TypeObject_c implements AutoEndorse
 	return s;
     }
 
+    @Override
     public boolean isCanonical() {
 	return true;
     }

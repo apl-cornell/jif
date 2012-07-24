@@ -3,7 +3,6 @@ package jif.ast;
 import java.util.Set;
 
 import jif.types.Assertion;
-
 import polyglot.ast.Node;
 
 /**

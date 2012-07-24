@@ -1,7 +1,6 @@
 package jif.types;
 
 import jif.types.label.ProviderLabel;
-import polyglot.ast.Expr;
 import polyglot.types.FieldInstance;
 
 /** Jif field instance. A wrapper of all the type information related

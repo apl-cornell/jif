@@ -1,11 +1,14 @@
 package jif.extension;
 
-import java.util.Iterator;
-
 import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
-import jif.types.*;
-import jif.types.label.AccessPathField;
+import jif.types.ConstraintMessage;
+import jif.types.JifContext;
+import jif.types.JifLocalInstance;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.NamedLabel;
+import jif.types.PathMap;
 import jif.types.label.AccessPathLocal;
 import jif.types.label.Label;
 import jif.types.label.VarLabel;
@@ -14,14 +17,10 @@ import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.ArrayInit;
 import polyglot.ast.Expr;
-import polyglot.ast.FieldDecl;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
-import polyglot.types.FieldInstance;
-import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.Position;
 
 /** The Jif extension of the <code>LocalDecl</code> node. 
  * 
@@ -33,6 +32,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         LocalDecl decl = (LocalDecl) node();
 
@@ -120,6 +120,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
                            decl.position(), 
                            false,
                            new ConstraintMessage() {
+                    @Override
                     public String msg() {
                         return "Declared label of local variable " + fli.name() + 
                         " is incompatible with label constraints.";
@@ -170,17 +171,20 @@ public class JifLocalDeclExt extends JifStmtExt_c
                         A.labelEnv(),
                         init.position(),
                         new ConstraintMessage() {
+                @Override
                 public String msg() {
                     return "Label of local variable initializer not less " + 
                     "restrictive than the label for local variable " + 
                     fli.name();
                 }
+                @Override
                 public String detailMsg() { 
                     return "More information is revealed by the successful " +
                     "evaluation of the intializing expression " +
                     "than is allowed to flow to " +
                     "the local variable " + fli.name() + ".";
                 }
+                @Override
                 public String technicalMsg() {
                     return "Invalid assignment: NV of initializer is " +
                     "more restrictive than the declared label " +

@@ -1,6 +1,6 @@
 package jif.ast;
 
-import java.util.*;
+import java.util.List;
 
 /** This class represents a join of several label nodes. It's also a
  *  label node by itself. 

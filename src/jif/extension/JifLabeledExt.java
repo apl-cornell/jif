@@ -1,7 +1,9 @@
 package jif.extension;
 
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.Labeled;
@@ -19,6 +21,7 @@ public class JifLabeledExt extends JifStmtExt_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
         Labeled ls = (Labeled) node();

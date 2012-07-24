@@ -1,12 +1,9 @@
 package jif.types;
 
-import java.util.*;
+import java.util.Collection;
 
-import jif.extension.LabelTypeCheckUtil;
 import jif.types.hierarchy.LabelEnv;
-import jif.types.label.*;
 import polyglot.util.Enum;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /** 
@@ -107,6 +104,7 @@ public abstract class Constraint
         return messages.technicalMsg();
     }
     
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append(lhs);

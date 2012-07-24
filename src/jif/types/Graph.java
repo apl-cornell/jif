@@ -75,6 +75,7 @@ public abstract class Graph {
             this.isbackward = isBackward;
         }
         
+        @Override
         public void discoverVertex(Node n) {
             if (isbackward)
                 currentpath.add(0, n);
@@ -82,6 +83,7 @@ public abstract class Graph {
                 currentpath.add(n);
         }
         
+        @Override
         public void leaveVertex(Node n) {
             if (isbackward)
                 currentpath.remove(0);
@@ -89,6 +91,7 @@ public abstract class Graph {
                 currentpath.remove(currentpath.size()-1);
         }
         
+        @Override
         public void visit(Node n) {
             if (n.isend(isbackward))
                 results.add((List)currentpath.clone());
@@ -111,14 +114,17 @@ public abstract class Graph {
     
     // this visitor just labels all node visited as "shouldprint"
     protected class LabellingVisitor implements NodeVisitor {
+        @Override
         public void discoverVertex(Node n) {
             return;
         }
         
+        @Override
         public void leaveVertex(Node n) {
             return;
         }
         
+        @Override
         public void visit(Node n) {
             n.shouldprint = true;
         }

@@ -9,22 +9,23 @@ import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 
 public class MeetLabelToJavaExpr_c extends LabelToJavaExpr_c {
+    @Override
     public Expr toJava(Label label, JifToJavaRewriter rw) throws SemanticException {
         MeetLabel L = (MeetLabel) label;
 
         if (L.meetComponents().size() == 1) {
-            return rw.labelToJava((Label)L.meetComponents().iterator().next());
+            return rw.labelToJava(L.meetComponents().iterator().next());
         }
 
-        LinkedList l = new LinkedList(L.meetComponents());
-        Iterator iter = l.iterator();            
-        Label head = (Label)iter.next();
+        LinkedList<Label> l = new LinkedList<Label>(L.meetComponents());
+        Iterator<Label> iter = l.iterator();
+        Label head = iter.next();
         Expr e = rw.labelToJava(head);
         while (iter.hasNext()) {
-            head = (Label)iter.next();
+            head = iter.next();
             Expr f = rw.labelToJava(head);
             e = rw.qq().parseExpr("%E.meet(%E)", e, f);
         }
-        return e;            
+        return e;
     }
 }

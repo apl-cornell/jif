@@ -16,20 +16,24 @@ public class PrincipalInstance_c extends VarInstance_c implements PrincipalInsta
 	this.principal = p;
     }
 
+    @Override
     public ExternalPrincipal principal() {
 	return principal;
     }
 
+    @Override
     public PrincipalInstance principal(ExternalPrincipal principal) {
 	PrincipalInstance_c n = (PrincipalInstance_c) copy();
 	n.principal = principal;
 	return n;
     }
 
+    @Override
     public String toString() {
 	return "principal " + name();
     }
 
+    @Override
     public void setType(Type t) {
     	//do nothing
     }

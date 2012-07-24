@@ -1,7 +1,6 @@
 package jif.types;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import jif.types.label.AccessPath;
 import jif.types.label.Label;

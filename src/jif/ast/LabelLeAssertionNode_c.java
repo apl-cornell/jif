@@ -7,8 +7,13 @@ import jif.types.JifTypeSystem;
 import jif.types.LabelLeAssertion;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
 
 /** An implementation of the <tt>LabelLeAssertionNode</tt> interface. */
 public class LabelLeAssertionNode_c extends ConstraintNode_c<LabelLeAssertion>

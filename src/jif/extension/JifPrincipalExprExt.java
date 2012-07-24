@@ -3,14 +3,17 @@ package jif.extension;
 import java.util.ArrayList;
 import java.util.List;
 
-import jif.ast.Jif_c;
 import jif.ast.PrincipalExpr;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
+import jif.types.SemanticDetailedException;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 
 public class JifPrincipalExprExt extends JifExprExt
 {
@@ -18,6 +21,7 @@ public class JifPrincipalExprExt extends JifExprExt
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         PrincipalExpr pe = (PrincipalExpr) node();
@@ -25,13 +29,13 @@ public class JifPrincipalExprExt extends JifExprExt
         JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.jifTypeSystem();
 
-        List throwTypes = new ArrayList(pe.del().throwTypes(ts));
+        List<Type> throwTypes = new ArrayList<Type>(pe.del().throwTypes(ts));
         // make sure the principal is runtime representable
         if (!p.isRuntimeRepresentable()) {
             throw new SemanticDetailedException(
-                                                "Principal expression not representable at runtime.",
-                                                "A principal expression must be representable at runtime.",
-                                                pe.position());
+                    "Principal expression not representable at runtime.",
+                    "A principal expression must be representable at runtime.",
+                    pe.position());
         }
 
         A = (JifContext) pe.del().enterScope(A);

@@ -1,6 +1,6 @@
 package jif.types;
 
-import polyglot.types.*;
+import polyglot.types.TypeObject;
 
 /** The root of the Jif class parameter types.
  */

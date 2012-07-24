@@ -2,7 +2,11 @@ package jif.extension;
 
 import java.util.List;
 
-import jif.types.*;
+import jif.types.ConstraintMessage;
+import jif.types.JifClassType;
+import jif.types.JifContext;
+import jif.types.JifMethodInstance;
+import jif.types.PrincipalConstraint;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.types.ClassType;

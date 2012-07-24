@@ -3,7 +3,12 @@ package jif.extension;
 import java.util.List;
 
 import jif.ast.JifProcedureDecl;
-import jif.types.*;
+import jif.types.ActsForConstraint;
+import jif.types.ActsForParam;
+import jif.types.Assertion;
+import jif.types.AuthConstraint;
+import jif.types.CallerConstraint;
+import jif.types.JifProcedureInstance;
 import jif.types.principal.Principal;
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
@@ -32,7 +37,7 @@ public class JifProcedureDeclDel extends JifJL_c
     
     protected void addFormalsToScope(Context c) {
         ProcedureDecl pd = (ProcedureDecl) node();
-        for (Formal f : (List<Formal>) pd.formals()) {
+        for (Formal f : pd.formals()) {
             c.addVariable(f.localInstance());
         }        
     }

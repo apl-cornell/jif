@@ -10,14 +10,15 @@ import polyglot.ast.Node;
 import polyglot.ast.Special;
 import polyglot.types.SemanticException;
 
-/** The Jif extension of the <code>Assign</code> node. 
+/** The Jif extension of the <code>Assign</code> node.
  */
 public abstract class JifAssignExt extends JifExprExt
 {
     public JifAssignExt(ToJavaExt toJava) {
         super(toJava);
     }
-    
+
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         Assign a = (Assign) node();
 
@@ -27,12 +28,12 @@ public abstract class JifAssignExt extends JifExprExt
         if (A.checkingInits()) {
             // in the constructor prologue, the this object cannot value on the RHS
             if (JifUtil.effectiveExpr(a.right()) instanceof Special) {
-                throw new SemanticDetailedException("The \"this\" object cannot be the value assigned in a constructor prologue.", 
-                                                    "In a constructor body before the call to the super class, no " +
-                                                    "reference to the \"this\" object is allowed to escape. This means " +
-                                                    "that the right hand side of an assignment is not allowed to refer " +
-                                                    "to the \"this\" object.", 
-                                                    a.right().position());
+                throw new SemanticDetailedException("The \"this\" object cannot be the value assigned in a constructor prologue.",
+                        "In a constructor body before the call to the super class, no " +
+                                "reference to the \"this\" object is allowed to escape. This means " +
+                                "that the right hand side of an assignment is not allowed to refer " +
+                                "to the \"this\" object.",
+                                a.right().position());
             }
         }
 
@@ -49,7 +50,7 @@ public abstract class JifAssignExt extends JifExprExt
             // Most of this is done in typeCheck, but if lhs and rhs are
             // instantitation types, we must add constraints for the labels.
             SubtypeChecker subtypeChecker = new SubtypeChecker(checked.left().type(),
-                                                               checked.right().type());
+                    checked.right().type());
             subtypeChecker.addSubtypeConstraints(lc, a.position());
         }
 

@@ -1,6 +1,10 @@
 package jif.ast;
 
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.JifVarInstance;
+import jif.types.ParamInstance;
+import jif.types.PrincipalInstance;
 import jif.types.label.CovariantParamLabel;
 import jif.types.label.ParamLabel;
 import polyglot.ast.Id;

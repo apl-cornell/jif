@@ -2,12 +2,16 @@ package jif.extension;
 
 import java.util.List;
 
-import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.Cast;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.Position;
 
 /** The Jif extension of the <code>Cast</code> node.
@@ -20,6 +24,7 @@ public class JifCastExt extends JifExprExt
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         Cast c = (Cast) node();
 
@@ -27,7 +32,7 @@ public class JifCastExt extends JifExprExt
         JifContext A = lc.context();
         A = (JifContext) c.del().enterScope(A);
 
-        List throwTypes = c.del().throwTypes(ts);
+        List<Type> throwTypes = c.del().throwTypes(ts);
         Position pos = c.position();
 
         Expr e = (Expr) lc.context(A).labelCheck(c.expr());

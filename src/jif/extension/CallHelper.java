@@ -980,7 +980,8 @@ public class CallHelper {
      * @throws SemanticException
      */
     public void bindVarLabels(LabelChecker lc, VarLabel receiverVarLabel,
-            List<Label> actualArgVarLabels, List<Label> actualParamVarLabels)
+            List<? extends Label> actualArgVarLabels,
+            List<? extends Label> actualParamVarLabels)
                     throws SemanticException {
         if (overrideChecker) {
             throw new InternalCompilerError("Not available for call checking");

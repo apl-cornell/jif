@@ -7,7 +7,16 @@ import jif.types.ParamInstance;
 import jif.types.label.Label;
 import jif.types.label.Policy;
 import jif.types.principal.Principal;
-import polyglot.ast.*;
+import polyglot.ast.Block;
+import polyglot.ast.ClassBody;
+import polyglot.ast.Expr;
+import polyglot.ast.Formal;
+import polyglot.ast.Id;
+import polyglot.ast.If;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Receiver;
+import polyglot.ast.Stmt;
+import polyglot.ast.TypeNode;
 import polyglot.types.Flags;
 import polyglot.util.Position;
 

@@ -21,6 +21,7 @@ public class InformationFlowTrace {
         this.lblflows = from;
     }
     
+    @Override
     public String toString () {
         String dirstr="";
         if (dir==Direction.IN) dirstr="in";

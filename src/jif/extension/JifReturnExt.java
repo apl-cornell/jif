@@ -1,13 +1,22 @@
 package jif.extension;
 
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.ConstraintMessage;
+import jif.types.JifContext;
+import jif.types.JifMethodInstance;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.NamedLabel;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.Return;
-import polyglot.types.*;
+import polyglot.types.CodeInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 
 /** The Jif extension of the <code>Return</code> node. 
@@ -20,6 +29,7 @@ public class JifReturnExt extends JifStmtExt_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
         Return rs = (Return) node();
@@ -75,11 +85,13 @@ public class JifReturnExt extends JifStmtExt_c
                        rs.position(),
                        new ConstraintMessage()
             {
+                @Override
                 public String msg() { 
                     return "This method may return a value with " +
                     "a more restrictive label than the " +
                     "declared return value label.";
                 }
+                @Override
                 public String detailMsg() { 
                     return msg() + " The declared return type " +
                     "of this method is " + retType + 
@@ -87,6 +99,7 @@ public class JifReturnExt extends JifStmtExt_c
                     "method can have a label of at most " +
                     namedRhs() +".";
                 }
+                @Override
                 public String technicalMsg() {
                     return "this method may return a value " +
                     "with a more restrictive label " + 

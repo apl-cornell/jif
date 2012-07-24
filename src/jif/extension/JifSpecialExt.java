@@ -1,6 +1,5 @@
 package jif.extension;
 
-import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifClassType;
 import jif.types.JifContext;
@@ -11,7 +10,7 @@ import polyglot.ast.Node;
 import polyglot.ast.Special;
 import polyglot.types.SemanticException;
 
-/** The Jif extension of the <code>Special</code> node. 
+/** The Jif extension of the <code>Special</code> node.
  * 
  *  @see polyglot.ast.Special
  */
@@ -55,6 +54,7 @@ public class JifSpecialExt extends JifExprExt
      * 
      *  X.nv = X.n = A.pc ( the expression itself does not contain any information.)
      */
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         Special se = (Special) node();
 
@@ -70,8 +70,8 @@ public class JifSpecialExt extends JifExprExt
         X = X.N(A.pc());
 
         // X(this).NV = this_label, which is upper-bounded
-        // by the begin label. 
-        X = X.NV(lc.upperBound(ct.thisLabel(), A.pc()));	
+        // by the begin label.
+        X = X.NV(lc.upperBound(ct.thisLabel(), A.pc()));
 
         return updatePathMap(se, X);
     }

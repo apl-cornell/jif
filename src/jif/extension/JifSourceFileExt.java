@@ -1,21 +1,24 @@
 package jif.extension;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
+import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
-import polyglot.ast.ClassDecl;
 import polyglot.ast.Node;
 import polyglot.ast.SourceFile;
+import polyglot.ast.TopLevelDecl;
 import polyglot.types.SemanticException;
 
-/** The root of all kinds of Jif extensions for statements. 
+/** The root of all kinds of Jif extensions for statements.
  *  It provides a generic <node>labelCheck</code> method, which
  *  will invoke the <code>labelCheckStmt</code> methods provided
- *  by the subclasses of this class. 
+ *  by the subclasses of this class.
  */
 public class JifSourceFileExt extends Jif_c
 {
@@ -23,29 +26,28 @@ public class JifSourceFileExt extends Jif_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         SourceFile n = (SourceFile) node();
-        
-        JifTypeSystem ts = lc.typeSystem();
-	JifContext A = lc.context();
-	A = (JifContext) n.del().enterScope(A);
 
-        A.setAuthority(new LinkedHashSet());
+        JifTypeSystem ts = lc.typeSystem();
+        JifContext A = lc.context();
+        A = (JifContext) n.del().enterScope(A);
+
+        A.setAuthority(new LinkedHashSet<Principal>());
         A.setPc(ts.notTaken(), lc);
 
         lc = lc.context(A);
-        
+
         LabelChecker orig_lc = lc;
 
-        List decls = new LinkedList();
-        for (Iterator i = n.decls().iterator(); i.hasNext(); ) {
-            ClassDecl d = (ClassDecl) i.next();
-            
+        List<TopLevelDecl> decls = new LinkedList<TopLevelDecl>();
+        for (TopLevelDecl d : n.decls()) {
             // push a block to ensure separation of contexts for different
             // declaration within the same source file.
             lc = orig_lc.context((JifContext)orig_lc.context().pushBlock());
-            
-            decls.add(lc.labelCheck(d));
+
+            decls.add((TopLevelDecl) lc.labelCheck(d));
         }
 
         return n.decls(decls);

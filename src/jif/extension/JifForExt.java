@@ -1,17 +1,27 @@
 package jif.extension;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.ConstraintMessage;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.NamedLabel;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.Branch;
+import polyglot.ast.Expr;
+import polyglot.ast.For;
+import polyglot.ast.ForInit;
+import polyglot.ast.ForUpdate;
+import polyglot.ast.Node;
+import polyglot.ast.Stmt;
 import polyglot.types.SemanticException;
 
-/** The Jif extension of the <code>For</code> node. 
+/** The Jif extension of the <code>For</code> node.
  * 
  *  @see polyglot.ast.For
  */
@@ -21,6 +31,7 @@ public class JifForExt extends JifStmtExt_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         For fs = (For) node();
 
@@ -36,14 +47,13 @@ public class JifForExt extends JifStmtExt_c
 
         PathMap Xinit = ts.pathMap().N(A.pc());
 
-        List inits = new LinkedList();
+        List<ForInit> inits = new LinkedList<ForInit>();
 
-        for (Iterator i = fs.inits().iterator(); i.hasNext(); ) {
-            Stmt s = (Stmt) i.next();
-            s = (Stmt) lc.context(A).labelCheck(s);
-            inits.add(s);
+        for (ForInit init : fs.inits()) {
+            init = (ForInit) lc.context(A).labelCheck(init);
+            inits.add(init);
 
-            PathMap Xs = getPathMap(s);
+            PathMap Xs = getPathMap(init);
 
             // At this point, the environment A should have been extended
             // to include any declarations of s.  We push a new scope
@@ -56,12 +66,12 @@ public class JifForExt extends JifStmtExt_c
 
         // Now handle the loop body, condition, and iterators.
         Label L1 = ts.freshLabelVariable(fs.position(), "for",
-                                         "label of PC for the for statement at " + node().position());
+                "label of PC for the for statement at " + node().position());
         Label L2 = ts.freshLabelVariable(fs.position(), "for",
-                                         "label of PC for end of the for statement at " + node().position());
+                "label of PC for end of the for statement at " + node().position());
 
         A = (JifContext) A.pushBlock();
-        Label loopEntryPC = A.pc();         
+        Label loopEntryPC = A.pc();
 
         A.setPc(L1, lc);
         A.gotoLabel(Branch.CONTINUE, null, L1);
@@ -77,7 +87,7 @@ public class JifForExt extends JifStmtExt_c
             Xe = ts.pathMap().NV(A.pc()).N(A.pc());
         }
 
-        A = (JifContext) A.pushBlock();	
+        A = (JifContext) A.pushBlock();
         A.setPc(Xe.NV(), lc);
         Stmt body = (Stmt) lc.context(A).labelCheck(fs.body());
         PathMap Xbody = getPathMap(body);
@@ -85,14 +95,13 @@ public class JifForExt extends JifStmtExt_c
         A = (JifContext) A.pushBlock();
         A.setPc(Xbody.N(), lc);
 
-        List iters = new LinkedList();
+        List<ForUpdate> iters = new LinkedList<ForUpdate>();
 
-        for (Iterator i = fs.iters().iterator(); i.hasNext(); ) {
-            Stmt s = (Stmt) i.next();
-            s = (Stmt) lc.context(A).labelCheck(s);
-            iters.add(s);
+        for (ForUpdate update : fs.iters()) {
+            update = (ForUpdate) lc.context(A).labelCheck(update);
+            iters.add(update);
 
-            PathMap Xs = getPathMap(s);
+            PathMap Xs = getPathMap(update);
 
             // At this point, the environment A should have been extended
             // to include any declarations of s.  Reset the PC label.
@@ -103,39 +112,42 @@ public class JifForExt extends JifStmtExt_c
         }
 
         lc.constrain(new NamedLabel("for_body.N",
-                                    "label of normal termination of the loop body", 
-                                    Xbody.N()).
-                                    join(lc,
-                                         "loop_entry_pc",
-                                         "label of the program counter just before the loop is executed",
-                                         loopEntryPC), 
-                     LabelConstraint.LEQ, 
-                     new NamedLabel("loop_pc",
-                                    "label of the program counter at the top of the loop",
-                                    L1),
-                    lc.context().labelEnv(),
-                    fs.position(), 
-                    false,
-                    new ConstraintMessage() {
+                "label of normal termination of the loop body",
+                Xbody.N()).
+                join(lc,
+                        "loop_entry_pc",
+                        "label of the program counter just before the loop is executed",
+                        loopEntryPC),
+                        LabelConstraint.LEQ,
+                        new NamedLabel("loop_pc",
+                                "label of the program counter at the top of the loop",
+                                L1),
+                                lc.context().labelEnv(),
+                                fs.position(),
+                                false,
+                                new ConstraintMessage() {
+            @Override
             public String msg() {
                 return "The information revealed by the normal " +
-                "termination of the body of the for loop " +
-                "may be more restrictive than the " +
-                "information that should be revealed by " +
-                "reaching the top of the loop.";
+                        "termination of the body of the for loop " +
+                        "may be more restrictive than the " +
+                        "information that should be revealed by " +
+                        "reaching the top of the loop.";
             }
+            @Override
             public String detailMsg() {
                 return "The program counter label at the start of the loop is at least as restrictive " +
-                "as the normal termination label of the loop body, and the entry " +
-                "program counter label (that is, the program counter label just " +
-                "before the loop is executed for the first time).";
+                        "as the normal termination label of the loop body, and the entry " +
+                        "program counter label (that is, the program counter label just " +
+                        "before the loop is executed for the first time).";
 
             }
+            @Override
             public String technicalMsg() {
                 return "X(loopbody).n <= _pc_ of the for statement";
-            }                     
+            }
         }
-        );
+                );
 
         // Compute the path map for "loop" == "while (cond) body".
         PathMap Xloop = Xe.join(Xbody);

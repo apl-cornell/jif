@@ -17,8 +17,17 @@ import polyglot.ast.TypeNode;
 import polyglot.ast.TypeNode_c;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>InstTypeNode</code> interface.
  */

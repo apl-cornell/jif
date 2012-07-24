@@ -24,10 +24,12 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
 	this.container = container;
     }
 
+    @Override
     public JifClassType container() {
 	return container;
     }
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof ParamInstance) {
             ParamInstance that = (ParamInstance) o;
@@ -39,44 +41,53 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
 	return false;
     }
 
+    @Override
     public ParamInstance container(JifClassType container) {
 	ParamInstance_c n = (ParamInstance_c) copy();
 	n.container = container;
 	return n;
     }
 
+    @Override
     public Kind kind() {
 	return kind;
     }
 
+    @Override
     public ParamInstance kind(Kind kind) {
 	ParamInstance_c n = (ParamInstance_c) copy();
 	n.kind = kind;
 	return n;
     }
 
+    @Override
     public ParamInstance name(String name) {
 	ParamInstance_c n = (ParamInstance_c) copy();
 	n.name = name;
 	return n;
     }
 
+    @Override
     public boolean isPrincipal() {
 	return kind.isPrincipal();
     }
 
+    @Override
     public boolean isLabel() {
 	return isInvariantLabel() || isCovariantLabel();
     }
 
+    @Override
     public boolean isInvariantLabel() {
 	return kind.isInvariantLabel();
     }
 
+    @Override
     public boolean isCovariantLabel() {
 	return kind.isCovariantLabel();
     }
 
+    @Override
     public String toString() {
         if (Report.should_report(Report.debug, 1)) {
             return kind + " " + container().name() + "." + name();
@@ -107,6 +118,7 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance
 	}
     }
 
+    @Override
     public void setType(Type t) {
     	//Do nothing
     }

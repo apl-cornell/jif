@@ -5,10 +5,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import jif.types.label.*;
+import jif.types.label.CovariantParamLabel;
+import jif.types.label.Label;
+import jif.types.label.ParamLabel;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
-
 import polyglot.ext.param.types.Subst_c;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
@@ -33,7 +34,7 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
 
     @Override
     public Param get(ParamInstance pi) {
-        return (Param) subst.get(pi);
+        return subst.get(pi);
     }
 
     @Override
@@ -253,7 +254,7 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
 
     /** Return the substitution of uid, or label if not found. */
     protected Label subLabel(Label label, ParamInstance pi) {
-	Param sub = (Param) subst.get(pi);
+	Param sub = subst.get(pi);
         JifTypeSystem ts = (JifTypeSystem) typeSystem();
 
 	if (sub instanceof UnknownParam) {
@@ -273,7 +274,7 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
 
     /** Return the substitution of uid, or principal if not found. */
     protected Principal subPrincipal(Principal principal, ParamInstance pi) {
-	Param sub = (Param) subst.get(pi);
+	Param sub = subst.get(pi);
         JifTypeSystem ts = (JifTypeSystem) typeSystem();
 
 	if (sub instanceof UnknownParam) {

@@ -1,25 +1,33 @@
 package jif.translate;
 
-import jif.types.*;
-import jif.types.label.*;
+import jif.types.JifClassType;
+import jif.types.JifContext;
+import jif.types.ParamInstance;
+import jif.types.label.CovariantParamLabel;
+import jif.types.label.Label;
+import jif.types.label.ParamLabel;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 
 public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
-    public Expr toJava(Label label, JifToJavaRewriter rw) throws SemanticException {
+    @Override
+    public Expr toJava(Label label, JifToJavaRewriter rw)
+            throws SemanticException {
         if (label instanceof ParamLabel) {
             return toJava(((ParamLabel)label).paramInstance(), rw);
         }
         return toJava(((CovariantParamLabel)label).paramInstance(), rw);
     }
 
-    public Expr toJava(Principal principal, JifToJavaRewriter rw) throws SemanticException {
+    @Override
+    public Expr toJava(Principal principal, JifToJavaRewriter rw)
+            throws SemanticException {
         return toJava(((ParamPrincipal)principal).paramInstance(), rw);
     }
 
-    public Expr toJava(ParamInstance pi, JifToJavaRewriter rw) throws SemanticException {
+    public Expr toJava(ParamInstance pi, JifToJavaRewriter rw) {
         if (!rw.jif_ts().isJifClass(pi.container())) {
             // the parameter to be translated is in the code
             // of a non-Jif class (which does have runtime representation
@@ -39,14 +47,14 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
             // and are in a static context, then we must
             // be in a constructor call (i.e., this(...) or
             // super(...)), and we do in fact have the
-            // fields available to us. Hence the "!rw.inConstructor()") 
-            return rw.qq().parseExpr(paramArgName(pi));            
+            // fields available to us. Hence the "!rw.inConstructor()")
+            return rw.qq().parseExpr(paramArgName(pi));
         }
         else {
-            return rw.qq().parseExpr("this." + paramFieldName(pi));            
-        }        
+            return rw.qq().parseExpr("this." + paramFieldName(pi));
+        }
     }
-    
+
     public static String paramFieldName(ParamInstance pi) {
         JifClassType jct = pi.container();
         String fullName = jct.fullName().replace('.', '_');

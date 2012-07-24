@@ -1,6 +1,5 @@
 package jif.extension;
 
-import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
@@ -9,7 +8,7 @@ import jif.visit.LabelChecker;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 
-/** The Jif extension of the <code>Lit</code> or <code>NewLabel</code> node. 
+/** The Jif extension of the <code>Lit</code> or <code>NewLabel</code> node.
  * 
  *  @see polyglot.ast.Lit
  */
@@ -19,6 +18,7 @@ public class JifLiteralExt extends JifExprExt
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();

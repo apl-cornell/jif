@@ -20,6 +20,7 @@ public class JifCaseExt extends JifStmtExt_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
         Case cs = (Case) node();

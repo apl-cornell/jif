@@ -1,8 +1,8 @@
 package jif.types;
 
+import jif.translate.JifToJavaRewriter;
 import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
-import jif.translate.JifToJavaRewriter;
 
 /**
  * The acts-for constraint.

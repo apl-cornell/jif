@@ -6,9 +6,10 @@ import polyglot.frontend.Source;
 import polyglot.types.SemanticException;
 
 public class SourceFileToJavaExt_c extends ToJavaExt_c {
+    @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         SourceFile n = (SourceFile) node();
-        Source source = n.source();        
+        Source source = n.source();
         n = rw.java_nf().SourceFile(n.position(), n.package_(), n.imports(), n.decls());
         //n = (SourceFile)n.del(null);
         n = n.source(source);

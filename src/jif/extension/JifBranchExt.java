@@ -1,7 +1,12 @@
 package jif.extension;
 
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.ConstraintMessage;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.NamedLabel;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.Branch;
@@ -20,6 +25,7 @@ public class JifBranchExt extends JifStmtExt_c
     }
 
     /** Label check the branch statement. See Figure 4.21. */
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         Branch bs = (Branch) node();
 
@@ -44,11 +50,13 @@ public class JifBranchExt extends JifStmtExt_c
                    A.labelEnv(),
                    bs.position(),
                    new ConstraintMessage() {
+            @Override
             public String msg() {
                 return "More information may be revealed by " +
                 "branching to the target from this " +
                 "program point than is allowed.";
             }
+            @Override
             public String detailMsg() { 
                 return "Knowing that control flow reached this " +
                 "program point may reveal information upto " + 
@@ -60,6 +68,7 @@ public class JifBranchExt extends JifStmtExt_c
                 "target from this program point than is " +
                 "allowed.";
             }
+            @Override
             public String technicalMsg() {
                 return "Invalid break/continue: PC is more " +
                 "restrictive than the label of the destination.";

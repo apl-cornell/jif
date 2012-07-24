@@ -1,8 +1,7 @@
 package jif.types;
 
 import jif.types.principal.ExternalPrincipal;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.types.VarInstance;
 
 /**
  * A <code>PrincipalInstance</code> represents a global principal.

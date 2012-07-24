@@ -5,6 +5,7 @@ import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 
 public abstract class ExprToJavaExt_c extends ToJavaExt_c {
+    @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         Expr e = (Expr) node();
         e = e.type(null);

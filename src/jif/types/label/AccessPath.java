@@ -36,7 +36,7 @@ import polyglot.util.Position;
  * represent label or principal expressions, such as "new label {Alice:}" or
  * "Alice". (@link jif.types.label.AccessPathUninterpreted AccessPathUninterpreted}
  * is used to represent non-final access paths, for example "this.m()".
- *  
+ * 
  */
 public abstract class AccessPath implements Serializable, Copy {
     private Position position;
@@ -45,6 +45,7 @@ public abstract class AccessPath implements Serializable, Copy {
         this.position = pos;
     }
 
+    @Override
     public abstract boolean equals(Object o);
     public abstract boolean isCanonical();
     public abstract boolean isUninterpreted();
@@ -54,7 +55,7 @@ public abstract class AccessPath implements Serializable, Copy {
      * e. For example, given a field access path "this.f", substituting
      * the access path root "this" for the access path "o.g" will result
      * in the access path "o.g.f". This method is used to instantiate
-     * procedures for calls, and labels of fields. 
+     * procedures for calls, and labels of fields.
      */
     public abstract AccessPath subst(AccessPathRoot r, AccessPath e);
 
@@ -64,6 +65,7 @@ public abstract class AccessPath implements Serializable, Copy {
      */
     public abstract Type type();
 
+    @Override
     public abstract int hashCode();
 
     public abstract boolean isNeverNull();
@@ -71,7 +73,7 @@ public abstract class AccessPath implements Serializable, Copy {
     public abstract PathMap labelcheck(JifContext A, LabelChecker lc);
 
     public abstract AccessPathRoot root();
-    
+
     public final Position position() {
         return position;
     }
@@ -79,9 +81,10 @@ public abstract class AccessPath implements Serializable, Copy {
     /**
      * Go through the path, check that all the type information is set
      * correctly, and check that every field access is to a final field,
-     * and any local used is final 
+     * and any local used is final
      * 
      * @param A
+     * @throws SemanticException
      */
     public void verify(JifContext A) throws SemanticException {
     }
@@ -94,10 +97,11 @@ public abstract class AccessPath implements Serializable, Copy {
      * Return a list of types that may be thrown as a result of the runtime
      * evaluation of this path.
      */
-    public List throwTypes(TypeSystem ts) {
-        return Collections.EMPTY_LIST;
+    public List<Type> throwTypes(TypeSystem ts) {
+        return Collections.emptyList();
     }
-    
+
+    @Override
     public Object copy() {
         try {
             AccessPath ap = (AccessPath) super.clone();

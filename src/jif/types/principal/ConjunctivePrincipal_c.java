@@ -1,14 +1,15 @@
 package jif.types.principal;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-import jif.translate.ConjunctivePrincipalToJavaExpr_c;
 import jif.translate.PrincipalToJavaExpr;
 import jif.types.JifTypeSystem;
-import jif.types.JifTypeSystem_c;
 import jif.types.LabelSubstitution;
-import jif.types.label.JoinLabel_c;
-import jif.types.label.Label;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
@@ -16,32 +17,34 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePrincipal {
-    private final Set conjuncts;
-    public ConjunctivePrincipal_c(Collection conjuncts, 
-                                  JifTypeSystem ts, Position pos, PrincipalToJavaExpr toJava) {
+    private final Set<Principal> conjuncts;
+
+    public ConjunctivePrincipal_c(Collection<Principal> conjuncts,
+            JifTypeSystem ts, Position pos, PrincipalToJavaExpr toJava) {
         super(ts, pos, toJava);
-        this.conjuncts = new LinkedHashSet(conjuncts);
+        this.conjuncts = new LinkedHashSet<Principal>(conjuncts);
         if (conjuncts.size() < 2) {
             throw new InternalCompilerError("ConjunctivePrincipal should " +
-                        "have at least 2 members");
+                    "have at least 2 members");
         }
     }
-    
+
+    @Override
     public boolean isRuntimeRepresentable() {
-        for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
-            Principal p = (Principal)iter.next();
+        for (Principal p : conjuncts) {
             if (!p.isRuntimeRepresentable()) return false;
         }
         return true;
     }
-    public boolean isCanonical() { 
-        for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
-            Principal p = (Principal)iter.next();
+    @Override
+    public boolean isCanonical() {
+        for (Principal p : conjuncts) {
             if (!p.isCanonical()) return false;
         }
         return true;
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         String sep = "&";
@@ -53,19 +56,19 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
             sb.append("<conjunction: ");
             sep = " and ";
         }
-        for (Iterator iter = conjuncts.iterator(); iter.hasNext(); ) {
-            Principal p = (Principal)iter.next(); 
+        for (Iterator<Principal> iter = conjuncts.iterator(); iter.hasNext();) {
+            Principal p = iter.next();
             if (p instanceof DisjunctivePrincipal) {
                 sb.append('(');
                 sb.append(p);
                 sb.append(')');
             }
             else {
-                sb.append(p);            
+                sb.append(p);
             }
             if (iter.hasNext()) sb.append(sep);
         }
-        
+
         if (Report.should_report(Report.debug, 1)) {
             sb.append(">");
         }
@@ -74,7 +77,8 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
         }
         return sb.toString();
     }
-    
+
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof ConjunctivePrincipal) {
@@ -83,35 +87,38 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
         }
         return false;
     }
-    
+
+    @Override
     public int hashCode() {
         return conjuncts.hashCode();
     }
 
-    public Set conjuncts() {
+    @Override
+    public Set<Principal> conjuncts() {
         return Collections.unmodifiableSet(conjuncts);
     }
-    
+
+    @Override
     public Principal simplify() {
         if (!this.isCanonical()) {
             return this;
         }
-        
-        Set needed = new LinkedHashSet();
+
+        Set<Principal> needed = new LinkedHashSet<Principal>();
         JifTypeSystem jts = (JifTypeSystem) ts;
 
-        for (Iterator i = conjuncts.iterator(); i.hasNext(); ) {
-            Principal ci = ((Principal) i.next()).simplify();
-            
+        for (Principal p : conjuncts) {
+            Principal ci = p.simplify();
+
             if (ci.hasVariables()) {
                 needed.add(ci);
             }
             else {
                 boolean subsumed = false;
-                
-                for (Iterator j = needed.iterator(); j.hasNext(); ) {
-                    Principal cj = (Principal) j.next();
-                    
+
+                for (Iterator<Principal> j = needed.iterator(); j.hasNext();) {
+                    Principal cj = j.next();
+
                     if (cj.hasVariables()) {
                         continue;
                     }
@@ -120,22 +127,22 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
                         subsumed = true;
                         break;
                     }
-                    
-                    if (jts.actsFor(ci, cj)) { 
+
+                    if (jts.actsFor(ci, cj)) {
                         j.remove();
                     }
                 }
-                
+
                 if (! subsumed)
                     needed.add(ci);
             }
         }
-        
+
         if (needed.equals(conjuncts)) {
             return this;
         }
         if (needed.size() == 1) {
-            return (Principal)needed.iterator().next();
+            return needed.iterator().next();
         }
 
         return new ConjunctivePrincipal_c(needed, (JifTypeSystem)ts, position(), toJava);
@@ -143,24 +150,23 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
 
     @Override
     public Principal subst(LabelSubstitution substitution)
-        throws SemanticException {
-      Set substConjuncts = new HashSet();
-      for (Iterator it = conjuncts.iterator(); it.hasNext();) {
-        Principal conjunct = (Principal) it.next();
-        substConjuncts.add(conjunct.subst(substitution));
-      }
-            
-      if (substConjuncts.size() > 1) {
-          return new ConjunctivePrincipal_c(substConjuncts, (JifTypeSystem) ts,
-                  position(), toJava);
-      } 
-      else if (substConjuncts.size() == 1) {
-          return (Principal) substConjuncts.iterator().next();          
-      }
-      else {
-          throw new InternalCompilerError("No principals left after substitution.");
-      }
+            throws SemanticException {
+        Set<Principal> substConjuncts = new HashSet<Principal>();
+        for (Principal conjunct : conjuncts) {
+            substConjuncts.add(conjunct.subst(substitution));
+        }
+
+        if (substConjuncts.size() > 1) {
+            return new ConjunctivePrincipal_c(substConjuncts, (JifTypeSystem) ts,
+                    position(), toJava);
+        }
+        else if (substConjuncts.size() == 1) {
+            return substConjuncts.iterator().next();
+        }
+        else {
+            throw new InternalCompilerError("No principals left after substitution.");
+        }
 
     }
-    
+
 }

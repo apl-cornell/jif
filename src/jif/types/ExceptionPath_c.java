@@ -1,6 +1,7 @@
 package jif.types;
 
-import polyglot.types.*;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
 
 /** An implementation of the <code>ExceptionPath</code> interface. 
  */
@@ -12,10 +13,12 @@ public class ExceptionPath_c implements ExceptionPath
 	this.type = type;
     }
 
+    @Override
     public Type exception() {
 	return type;
     }
 
+    @Override
     public String toString() {
 	return type.toString();
     }
@@ -29,6 +32,7 @@ public class ExceptionPath_c implements ExceptionPath
 	}
     }
 
+    @Override
     public int hashCode() {
 	return type.hashCode();
     }

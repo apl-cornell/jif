@@ -1,11 +1,11 @@
 package jif.translate;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import jif.types.JifPolyType;
 import jif.types.JifSubstType;
+import jif.types.ParamInstance;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
@@ -16,6 +16,7 @@ import polyglot.util.Position;
 
 public class ConstructorCallToJavaExt_c extends ToJavaExt_c {
     /** Rewrite this(a) to this.C$(a); Rewrite super(a) to super.C$(a) */
+    @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         ConstructorCall n = (ConstructorCall) node();
         ConstructorInstance ci = n.constructorInstance();
@@ -23,23 +24,24 @@ public class ConstructorCallToJavaExt_c extends ToJavaExt_c {
 
         ConstructorCall.Kind kind = n.kind();
 
-        // only translate calls to jif constructors        
+        // only translate calls to jif constructors
         if (! rw.jif_ts().isJifClass(ct)) {
-            List arguments = new ArrayList(n.arguments().size() + 2);
+            List<Expr> arguments =
+                    new ArrayList<Expr>(n.arguments().size() + 2);
             JifPolyType jpt = null;
-            if (n.kind() == ConstructorCall.THIS && 
-                    ci.container() instanceof JifPolyType && 
+            if (n.kind() == ConstructorCall.THIS &&
+                    ci.container() instanceof JifPolyType &&
                     rw.jif_ts().isParamsRuntimeRep(ct)) {
                 jpt = (JifPolyType)ci.container();
             }
-            else if (n.kind() == ConstructorCall.SUPER && 
+            else if (n.kind() == ConstructorCall.SUPER &&
                     ci.container() instanceof JifSubstType && rw.jif_ts().isParamsRuntimeRep(((JifSubstType)ci.container()).base())) {
                 jpt = (JifPolyType)((JifSubstType)ci.container()).base();
             }
             if (jpt != null) {
                 Expr placeholder = rw.java_nf().NullLit(Position.compilerGenerated());
-                for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
-                    iter.next();
+                for (@SuppressWarnings("unused")
+                ParamInstance pi : jpt.params()) {
                     arguments.add(placeholder);
                 }
             }
@@ -56,6 +58,6 @@ public class ConstructorCallToJavaExt_c extends ToJavaExt_c {
         }
         else {
             return rw.qq().parseStmt("this.%s(%LE);", name, n.arguments());
-        }        
+        }
     }
 }

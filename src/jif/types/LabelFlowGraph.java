@@ -85,6 +85,7 @@ public class LabelFlowGraph extends Graph {
             else return 0;
         }       
         
+        @Override
         public String toString() {
             if (equ != null) {
                 return "because of constraint: " + equ.constraint.toString(); 
@@ -161,6 +162,7 @@ public class LabelFlowGraph extends Graph {
         }
         
         /* treat join labels in backtracking specially for better error message */
+        @Override
         public boolean isend (boolean isbackward) {
             if (isbackward) {
                 return !label.hasVariableComponents() && !(label instanceof JoinLabel);
@@ -169,6 +171,7 @@ public class LabelFlowGraph extends Graph {
                 return !label.hasVariableComponents();
         }
         
+        @Override
         public String toString() {
             return "Current node: "+getName()+"\n";
         }
@@ -210,14 +213,17 @@ public class LabelFlowGraph extends Graph {
         String nodes = "";
         String links = "";
         
+        @Override
         public void discoverVertex(Node n) {
             return;
         }
         
+        @Override
         public void leaveVertex(Node n) {
             return;
         }
         
+        @Override
         public void visit(Node node) {
             if (node instanceof LabelNode) {
                 LabelNode n = (LabelNode) node;
@@ -421,7 +427,7 @@ public class LabelFlowGraph extends Graph {
                                     snapshot.bounds.applyTo(rightmost.label))) {
                         System.out.println("\n----Start of one path----");
                         System.out.println(leftmost.getName());
-                        LabelNode prev = (LabelNode) leftmost;
+                        LabelNode prev = leftmost;
                         FlowEdge edge;
                         for (int i = 1; i < leftpath.size(); i++) {
                             LabelNode next = (LabelNode) leftpath.get(i);

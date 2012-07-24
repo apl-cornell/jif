@@ -1,6 +1,8 @@
 package jif.types;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import polyglot.ext.param.types.MuPClass_c;
 import polyglot.util.Position;
@@ -17,6 +19,7 @@ public class JifMuPClass_c extends MuPClass_c
 	super(ts, pos);
     }
 
+    @Override
     public List formals() {
         JifPolyType pt = (JifPolyType) clazz;
 
@@ -30,6 +33,7 @@ public class JifMuPClass_c extends MuPClass_c
         return l;
     }
 
+    @Override
     public String toString() {
 	String s = "";
 

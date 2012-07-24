@@ -3,12 +3,16 @@ package jif.extension;
 import java.util.ArrayList;
 import java.util.List;
 
-import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Instanceof;
+import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 
 /** The Jif extension of the <code>Instanceof</code> node.
  *
@@ -20,12 +24,13 @@ public class JifInstanceofExt extends JifExprExt
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         Instanceof ioe = (Instanceof) node();
         JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.typeSystem();
 
-        List throwTypes = new ArrayList(ioe.del().throwTypes(ts));
+        List<Type> throwTypes = new ArrayList<Type>(ioe.del().throwTypes(ts));
         A = (JifContext) ioe.del().enterScope(A);
         Expr e = (Expr) lc.context(A).labelCheck(ioe.expr());
         PathMap Xe = getPathMap(e);

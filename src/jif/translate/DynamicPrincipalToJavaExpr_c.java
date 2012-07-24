@@ -13,7 +13,6 @@ import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 
 public class DynamicPrincipalToJavaExpr_c extends PrincipalToJavaExpr_c {
-    @SuppressWarnings("unused")
     @Override
     public Expr toJava(Principal principal, JifToJavaRewriter rw) throws SemanticException {
         DynamicPrincipal p = (DynamicPrincipal) principal;

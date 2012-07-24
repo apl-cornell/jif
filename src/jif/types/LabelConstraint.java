@@ -1,12 +1,22 @@
 package jif.types;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import jif.extension.LabelTypeCheckUtil;
-import jif.types.Constraint.Kind;
 import jif.types.hierarchy.LabelEnv;
-import jif.types.label.*;
-import polyglot.util.Enum;
+import jif.types.label.JoinLabel;
+import jif.types.label.Label;
+import jif.types.label.MeetLabel;
+import jif.types.label.Variable;
+import jif.types.label.WritersToReadersLabel;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -109,7 +119,7 @@ public class LabelConstraint extends Constraint
         Set labelComponents = new LinkedHashSet();
         Map namedLabels = this.namedLabels();
         Map namedDescrips = this.namedDescrips();
-        LabelTypeCheckUtil ltcu = ((JifTypeSystem)lhs.typeSystem()).labelTypeCheckUtil();
+        LabelTypeCheckUtil ltcu = lhs.typeSystem().labelTypeCheckUtil();
         
         for (Iterator iter = namedLabels.keySet().iterator(); 
              iter.hasNext(); ) {
@@ -172,6 +182,7 @@ public class LabelConstraint extends Constraint
      * Produce a <code>Collection</code> of {@link Equation Equations} for this
      * constraint.
      */
+    @Override
     public Collection getEquations() {
         Collection eqns = new LinkedList();
         
@@ -215,6 +226,7 @@ public class LabelConstraint extends Constraint
         }
     }
 
+    @Override
     public boolean hasVariables() {
         return lhsLabel().hasVariables() || rhsLabel().hasVariables();
     } 

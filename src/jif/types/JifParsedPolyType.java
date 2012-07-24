@@ -3,7 +3,6 @@ package jif.types;
 import java.util.List;
 
 import jif.types.principal.Principal;
-
 import polyglot.ext.param.types.PClass;
 import polyglot.types.ParsedClassType;
 

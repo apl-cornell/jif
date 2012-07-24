@@ -2,7 +2,12 @@ package jif.extension;
 
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.ConstraintMessage;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.NamedLabel;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.Block;
@@ -20,6 +25,7 @@ public class JifInitializerExt extends Jif_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         Initializer ib = (Initializer) node();
@@ -52,6 +58,7 @@ public class JifInitializerExt extends Jif_c
                      ib.position(), 
                      false,
                      new ConstraintMessage() {
+            @Override
             public String msg() {
                 return "The information revealed by the normal " +
                 "termination of the initializer " +
@@ -59,6 +66,7 @@ public class JifInitializerExt extends Jif_c
                 "information that should be revealed by " +
                 "the execution of this initializer";
             }
+            @Override
             public String technicalMsg() {
                 return "Invalid initializer: " + namedLhs() + 
                 " contains secret information.";

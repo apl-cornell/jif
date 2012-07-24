@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import jif.visit.JifExceptionChecker;
-
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
 import polyglot.frontend.Scheduler;

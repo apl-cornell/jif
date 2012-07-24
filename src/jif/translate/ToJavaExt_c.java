@@ -6,9 +6,12 @@ import polyglot.types.SemanticException;
 import polyglot.visit.NodeVisitor;
 
 public abstract class ToJavaExt_c extends Ext_c implements ToJavaExt {
-    public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
+    @Override
+    public NodeVisitor toJavaEnter(JifToJavaRewriter rw)
+            throws SemanticException {
         return rw;
     }
 
+    @Override
     public abstract Node toJava(JifToJavaRewriter rw) throws SemanticException;
 }

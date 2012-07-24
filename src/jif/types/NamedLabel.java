@@ -96,6 +96,7 @@ public class NamedLabel
 	return label;
     }
     
+    @Override
     public String toString() {
         return totalName;
     }

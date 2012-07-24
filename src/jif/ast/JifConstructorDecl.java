@@ -1,9 +1,9 @@
 package jif.ast;
 
-import polyglot.ast.*;
-import java.util.*;
+import java.util.List;
 
 import jif.types.Assertion;
+import polyglot.ast.ConstructorDecl;
 
 /** An immutable representation of the Jif constructor declaration.
  *  It extends the Java constructor declaration with the start label,

@@ -3,23 +3,28 @@ package jif.extension;
 import java.util.ArrayList;
 import java.util.List;
 
-import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.PathMap;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.Binary;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 
-/** The Jif extension of the <code>Binary</code> node. 
- *  
+/** The Jif extension of the <code>Binary</code> node.
+ * 
  *  @see polyglot.ast.Binary_c
  */
-public class JifBinaryExt extends JifExprExt 
+public class JifBinaryExt extends JifExprExt
 {
     public JifBinaryExt(ToJavaExt toJava) {
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         Binary be = (Binary) node();
@@ -27,7 +32,7 @@ public class JifBinaryExt extends JifExprExt
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
 
-        List throwTypes = new ArrayList(be.del().throwTypes(ts));
+        List<Type> throwTypes = new ArrayList<Type>(be.del().throwTypes(ts));
 
         A = (JifContext) be.del().enterScope(A);
 
@@ -40,13 +45,13 @@ public class JifBinaryExt extends JifExprExt
             // if it's a short circuit evaluation, then
             // whether the right is executed or not depends on the _value_
             // of the left sub-expression.
-            A.setPc(Xl.NV(), lc);            
+            A.setPc(Xl.NV(), lc);
         }
         else {
             // non-short circuit operator, the right sub-expression
             // will always be evaluated, provided the left sub-expression
             // terminated normally.
-            A.setPc(Xl.N(), lc);            
+            A.setPc(Xl.N(), lc);
         }
 
         Expr right = (Expr) lc.context(A).labelCheck(be.right());

@@ -1,6 +1,6 @@
 package jif.ast;
 
-import polyglot.ast.*;
+import polyglot.ast.TypeNode;
 
 /** This class represents a labeled type node. 
  */

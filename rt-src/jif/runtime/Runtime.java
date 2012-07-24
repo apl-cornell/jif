@@ -1,12 +1,23 @@
 package jif.runtime;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Array;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
-import jif.lang.*;
+import jif.lang.ConfPolicy;
+import jif.lang.IntegPolicy;
+import jif.lang.Label;
+import jif.lang.LabelUtil;
+import jif.lang.Principal;
+import jif.lang.PrincipalUtil;
 
 /**
  * The runtime interface between Jif programs and the underlying system.

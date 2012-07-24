@@ -1,7 +1,9 @@
 package jif.ast;
 
 import jif.types.Assertion;
-import polyglot.util.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 

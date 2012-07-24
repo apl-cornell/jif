@@ -16,23 +16,28 @@ public class JifLocalInstance_c extends LocalInstance_c implements JifLocalInsta
         super(ts, pos, flags, type, name);
     }
     
+    @Override
     public void subst(VarMap bounds) {
         this.setLabel(bounds.applyTo(label));
         this.setType(bounds.applyTo(type));
     }
 
+    @Override
     public boolean isCanonical() {
         return label != null && label.isCanonical() && super.isCanonical();
     }
     
+    @Override
     public Label label() {
         return label;
     }
     
+    @Override
     public void setLabel(Label L) {        
         this.label = L;
     }
     
+    @Override
     public String toString() {
         return super.toString() + " " + label;
     }

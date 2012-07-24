@@ -5,7 +5,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import jif.lang.*;
+import jif.lang.ActsForProof;
+import jif.lang.Closure;
+import jif.lang.DelegatesProof;
+import jif.lang.Label;
+import jif.lang.Principal;
+import jif.lang.PrincipalUtil;
+import jif.lang.TransitiveProof;
 
 /**
  * A NativePrincipal represents the file system users and groups.

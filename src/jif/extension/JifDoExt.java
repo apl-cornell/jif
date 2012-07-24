@@ -1,10 +1,19 @@
 package jif.extension;
 
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.ConstraintMessage;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.NamedLabel;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.Branch;
+import polyglot.ast.Do;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.Stmt;
 import polyglot.types.SemanticException;
 
 /** The Jif extension of the <code>Do</code> node. 
@@ -17,6 +26,7 @@ public class JifDoExt extends JifStmtExt_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         Do ds = (Do) node();
 
@@ -60,6 +70,7 @@ public class JifDoExt extends JifStmtExt_c
                     ds.position(), 
                     false,
                     new ConstraintMessage() {
+            @Override
             public String msg() {
                 return "The information revealed by the normal " +
                 "termination of the body of the do-while loop " +
@@ -67,6 +78,7 @@ public class JifDoExt extends JifStmtExt_c
                 "information that should be revealed by " +
                 "reaching the top of the loop.";
             }
+            @Override
             public String detailMsg() {
                 return "The program counter label at the start of the loop is at least as restrictive " +
                 "as the normal termination label of the loop body, and the entry " +
@@ -74,6 +86,7 @@ public class JifDoExt extends JifStmtExt_c
                 "before the loop is executed for the first time).";
 
             }
+            @Override
             public String technicalMsg() {
                 return "X(loopbody).n <= _pc_ of the do-while statement";
             }                     

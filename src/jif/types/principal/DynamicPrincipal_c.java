@@ -2,7 +2,6 @@ package jif.types.principal;
 
 import java.util.List;
 
-import jif.translate.DynamicPrincipalToJavaExpr_c;
 import jif.translate.PrincipalToJavaExpr;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
@@ -13,12 +12,13 @@ import jif.types.label.AccessPathConstant;
 import jif.visit.LabelChecker;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
-/** An implementation of the <code>DynamicPrincipal</code> interface. 
+/** An implementation of the <code>DynamicPrincipal</code> interface.
  */
 public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal {
     private final AccessPath path;
@@ -31,21 +31,26 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
         }
     }
 
+    @Override
     public AccessPath path() {
         return path;
     }
 
+    @Override
     public boolean isRuntimeRepresentable() { return true; }
+    @Override
     public boolean isCanonical() { return path.isCanonical(); }
 
+    @Override
     public String toString() {
-        if (Report.should_report(Report.debug, 1)) { 
+        if (Report.should_report(Report.debug, 1)) {
             return "<pr-dynamic " + path + ">";
         }
         return path().toString();
     }
 
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (! (o instanceof DynamicPrincipal)) {
@@ -56,23 +61,27 @@ public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal 
         return (this.path.equals(that.path()));
     }
 
+    @Override
     public int hashCode() {
         return path.hashCode();
     }
 
-    public List throwTypes(TypeSystem ts) {
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
         return path.throwTypes(ts);
     }
 
+    @Override
     public Principal subst(LabelSubstitution substitution) throws SemanticException {
         AccessPath newPath = substitution.substAccessPath(path);
         if (newPath != path) {
-            JifTypeSystem ts = (JifTypeSystem)typeSystem();
+            JifTypeSystem ts = typeSystem();
             Principal newDP = ts.pathToPrincipal(this.position(), newPath);
             return substitution.substPrincipal(newDP);
         }
         return substitution.substPrincipal(this);
     }
+    @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         return path.labelcheck(A, lc);
     }

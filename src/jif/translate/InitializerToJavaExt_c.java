@@ -1,12 +1,15 @@
 package jif.translate;
 
-import polyglot.ast.*;
+import polyglot.ast.Block;
+import polyglot.ast.Initializer;
+import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 
 public class InitializerToJavaExt_c extends ToJavaExt_c {
+    @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         Initializer n = (Initializer) node();
-        
+
         // if it is an instance initializer, we need to move the code to
         // the initializer method.
         if (!n.flags().isStatic()) {

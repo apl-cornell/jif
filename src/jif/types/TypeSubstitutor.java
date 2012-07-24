@@ -1,6 +1,10 @@
 package jif.types;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import jif.types.label.Label;
 import jif.types.principal.Principal;

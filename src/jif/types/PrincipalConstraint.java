@@ -54,6 +54,7 @@ public class PrincipalConstraint extends Constraint
      * Produce a <code>Collection</code> of {@link Equation Equations} for this
      * constraint.
      */
+    @Override
     public Collection getEquations() {
         Collection eqns = new LinkedList();
         
@@ -96,6 +97,7 @@ public class PrincipalConstraint extends Constraint
             eqns.add(eqn);            
         }
     }
+    @Override
     public boolean hasVariables() {
         return lhsPrincipal().hasVariables() || rhsPrincipal().hasVariables();
     } 

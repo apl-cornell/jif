@@ -1,6 +1,7 @@
 package jif.lang;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class PrincipalSet
 {

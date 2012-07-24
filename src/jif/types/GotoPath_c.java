@@ -1,6 +1,6 @@
 package jif.types;
 
-import polyglot.ast.*;
+import polyglot.ast.Branch;
 
 /** The control flow path derived from GOTO like statements.
  *  Jif only has two GOTO like statements: <code>break</code>
@@ -15,11 +15,13 @@ public class GotoPath_c implements Path {
 	this.label = label;
     }
 
+    @Override
     public String toString() {
 	return (kind == Branch.BREAK ? "break " : "continue ")
 	    + label;
     }
 
+    @Override
     public boolean equals(Object o) {
 	if (! (o instanceof GotoPath_c)) {
 	    return false;
@@ -39,6 +41,7 @@ public class GotoPath_c implements Path {
 	}
     }
 
+    @Override
     public int hashCode() {
 	if (label == null) {
 	    return kind.hashCode();

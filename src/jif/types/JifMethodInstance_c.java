@@ -9,7 +9,11 @@ import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import jif.types.label.ProviderLabel;
 import polyglot.main.Report;
-import polyglot.types.*;
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance_c;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 

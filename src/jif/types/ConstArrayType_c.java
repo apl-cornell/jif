@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import jif.types.label.Label;
-import polyglot.types.*;
+import polyglot.types.ArrayType;
+import polyglot.types.ArrayType_c;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
 import polyglot.util.Position;
 
 
@@ -25,6 +28,7 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
         this.isNonConst = isNonConst;
     }
 
+    @Override
     public String toString() {
         Type base = base();
         Type ultBase = ultimateBase();
@@ -47,6 +51,7 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
         return s + "[]";
     }
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof ConstArrayType) {
             ConstArrayType t = (ConstArrayType) o;
@@ -63,14 +68,17 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
         return false;
     }
 
+    @Override
     public boolean isConst() {
         return isConst;
     }
 
+    @Override
     public boolean isNonConst() {
         return isNonConst;
     }
 
+    @Override
     public boolean isImplicitCastValidImpl(Type toType) {
         if (isNonConst && !isConst) {
             if (toType.isArray()) {
@@ -106,6 +114,7 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
         return false;
     }
     
+    @Override
     protected void init() {
         JifTypeSystem ts = (JifTypeSystem)this.ts;
         if (methods == null) {

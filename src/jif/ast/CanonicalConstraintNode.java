@@ -1,6 +1,6 @@
 package jif.ast;
 
-import jif.types.*;
+import jif.types.Assertion;
 
 /** A canonical(non-ambiguous) constraint node.
  */

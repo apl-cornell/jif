@@ -3,16 +3,24 @@ package jif.extension;
 import jif.JifOptions;
 import jif.ast.DowngradeStmt;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.ConstraintMessage;
+import jif.types.JifClassType;
+import jif.types.JifContext;
+import jif.types.JifProcedureInstance;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.NamedLabel;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.types.label.NotTaken;
 import jif.visit.LabelChecker;
 import polyglot.ast.Node;
 import polyglot.ast.Stmt;
+import polyglot.main.Options;
 import polyglot.types.SemanticException;
 import polyglot.util.Position;
 
-/** The Jif extension of the <code>DeclassifyStmt</code> node. 
+/** The Jif extension of the <code>DeclassifyStmt</code> node.
  * 
  *  @see jif.ast.DeclassifyStmt
  */
@@ -22,10 +30,11 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
         super(toJava);
     }
 
-    protected JifContext declassifyConstraintContext(JifContext A) throws SemanticException {
+    protected JifContext declassifyConstraintContext(JifContext A) {
         return A;
-    }    
+    }
 
+    @Override
     public final Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
         final DowngradeStmt ds = (DowngradeStmt) node();
@@ -42,9 +51,9 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
         }
         else {
             boundSpecified = false;
-            downgradeFrom = lc.typeSystem().freshLabelVariable(ds.position(), 
-                                                               "downgrade_from", 
-            "The label the downgrade statement is downgrading from");
+            downgradeFrom = lc.typeSystem().freshLabelVariable(ds.position(),
+                    "downgrade_from",
+                    "The label the downgrade statement is downgrading from");
         }
 
         PathMap initMap = initPathMap(lc);
@@ -57,7 +66,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
         checkAuthority(lc, dA, downgradeFrom, downgradeTo, ds.position());
         checkAdditionalConstraints(lc, dA, downgradeFrom, downgradeTo, ds.position());
 
-        if (!((JifOptions)JifOptions.global).nonRobustness) {
+        if (!((JifOptions)Options.global).nonRobustness) {
             checkRobustness(lc, dA, downgradeFrom, downgradeTo, ds.position());
         }
 
@@ -69,7 +78,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
         if (Xs.N() instanceof NotTaken) {
             X = Xs;
         }
-        else {          
+        else {
             X = Xs.N(lc.upperBound(Xs.N(), A.pc()));
         }
 
@@ -78,33 +87,36 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
 
     protected void checkPCconstraint(LabelChecker lc, JifContext A, Label pc, Label downgradeFrom, boolean boundSpecified) throws SemanticException {
         final DowngradeStmt ds = (DowngradeStmt)this.node();
-        lc.constrain(new NamedLabel("pc", pc), 
-                     boundSpecified?LabelConstraint.LEQ:LabelConstraint.EQUAL, 
-                     new NamedLabel("downgrade_bound", downgradeFrom),
-                     A.labelEnv(),
-                     ds.position(),
-                     boundSpecified, /* report this constraint if the bound was specified*/ 
-                     new ConstraintMessage() {            
+        lc.constrain(new NamedLabel("pc", pc),
+                boundSpecified?LabelConstraint.LEQ:LabelConstraint.EQUAL,
+                        new NamedLabel("downgrade_bound", downgradeFrom),
+                        A.labelEnv(),
+                        ds.position(),
+                        boundSpecified, /* report this constraint if the bound was specified*/
+                        new ConstraintMessage() {
+            @Override
             public String msg() {
                 return "The label of the program counter at this " +
-                "program point is " + 
-                "more restrictive than the upper bound " +
-                "that this " + ds.downgradeKind() + " statement is allowed " +
-                "to " + ds.downgradeKind() + ".";
+                        "program point is " +
+                        "more restrictive than the upper bound " +
+                        "that this " + ds.downgradeKind() + " statement is allowed " +
+                        "to " + ds.downgradeKind() + ".";
             }
+            @Override
             public String detailMsg() {
                 return "This " + ds.downgradeKind() + " statement is allowed to " +
-                ds.downgradeKind() + " a program counter labeled up to " +
-                namedRhs() + ". However, the label of the " +
-                "program counter at this point is " +
-                namedLhs() + ", which is more restrictive than " +
-                "allowed.";
+                        ds.downgradeKind() + " a program counter labeled up to " +
+                        namedRhs() + ". However, the label of the " +
+                        "program counter at this point is " +
+                        namedLhs() + ", which is more restrictive than " +
+                        "allowed.";
             }
+            @Override
             public String technicalMsg() {
                 return "Invalid " + ds.downgradeKind() + ": PC is out of bound.";
-            }                     
+            }
         }
-        );
+                );
     }
 
     protected Stmt checkBody(LabelChecker lc, JifContext A, Label downgradeFrom, Label downgradeTo) throws SemanticException {
@@ -133,7 +145,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
         return A;
     }
 
-    protected PathMap initPathMap(LabelChecker lc) throws SemanticException {
+    protected PathMap initPathMap(LabelChecker lc) {
         return lc.typeSystem().pathMap();
     }
 
@@ -143,50 +155,50 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
      * @param lc
      * @param labelFrom
      * @param labelTo
-     * @throws SemanticException 
+     * @throws SemanticException
      */
-    protected abstract void checkOneDimenOnly(LabelChecker lc, 
+    protected abstract void checkOneDimenOnly(LabelChecker lc,
             JifContext A,
-            Label labelFrom, 
-            Label labelTo, Position pos) 
-    throws SemanticException;
+            Label labelFrom,
+            Label labelTo, Position pos)
+                    throws SemanticException;
 
     /**
      * Check the authority condition
      * @param lc
      * @param labelFrom
      * @param labelTo
-     * @throws SemanticException 
+     * @throws SemanticException
      */
-    protected abstract void checkAuthority(LabelChecker lc, 
+    protected abstract void checkAuthority(LabelChecker lc,
             JifContext A,
-            Label labelFrom, 
-            Label labelTo, Position pos) 
-    throws SemanticException;
+            Label labelFrom,
+            Label labelTo, Position pos)
+                    throws SemanticException;
 
     /**
      * Check the robustness condition
      * @param lc
      * @param labelFrom
      * @param labelTo
-     * @throws SemanticException 
+     * @throws SemanticException
      */
-    protected abstract void checkRobustness(LabelChecker lc, 
+    protected abstract void checkRobustness(LabelChecker lc,
             JifContext A,
-            Label labelFrom, 
-            Label labelTo, Position pos) 
-    throws SemanticException;
+            Label labelFrom,
+            Label labelTo, Position pos)
+                    throws SemanticException;
 
     /**
      * Check any additional constraints
      * @param lc
      * @param labelFrom
      * @param labelTo
-     * @throws SemanticException 
+     * @throws SemanticException
      */
-    protected void checkAdditionalConstraints(LabelChecker lc, 
+    protected void checkAdditionalConstraints(LabelChecker lc,
             JifContext A,
-            Label labelFrom, 
-            Label labelTo, Position pos) 
-    throws SemanticException { }
+            Label labelFrom,
+            Label labelTo, Position pos)
+                    throws SemanticException { }
 }

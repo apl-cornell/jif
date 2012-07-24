@@ -4,7 +4,12 @@ import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.ArrayAccess;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Local;
+import polyglot.ast.Node;
+import polyglot.ast.Unary;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 
@@ -18,6 +23,7 @@ public class JifUnaryExt extends JifExprExt
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         Unary ue = (Unary) node();

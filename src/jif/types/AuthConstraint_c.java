@@ -19,16 +19,19 @@ public class AuthConstraint_c extends TypeObject_c implements AuthConstraint {
 	this.principals = ListUtil.copy(principals, true);
     }
 
+    @Override
     public AuthConstraint principals(List principals) {
 	AuthConstraint_c n = (AuthConstraint_c) copy();
 	n.principals = ListUtil.copy(principals, true);
 	return n;
     }
 
+    @Override
     public List principals() {
 	return principals;
     }
 
+    @Override
     public String toString() {
 	String s = "authority(";
 	for (Iterator i = principals.iterator(); i.hasNext(); ) {
@@ -42,6 +45,7 @@ public class AuthConstraint_c extends TypeObject_c implements AuthConstraint {
 	return s;
     }
 
+    @Override
     public boolean isCanonical() {
 	return true;
     }

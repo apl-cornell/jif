@@ -1,12 +1,21 @@
 package jif.extension;
 
-import java.util.Iterator;
-
 import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.*;
-import jif.types.label.AccessPath;
+import jif.types.ConstArrayType;
+import jif.types.ConstraintMessage;
+import jif.types.JifClassType;
+import jif.types.JifContext;
+import jif.types.JifFieldInstance;
+import jif.types.JifSubstType;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.LabelSubstitution;
+import jif.types.NamedLabel;
+import jif.types.PathMap;
+import jif.types.SemanticDetailedException;
+import jif.types.TypeSubstitutor;
 import jif.types.label.AccessPathField;
 import jif.types.label.CovariantParamLabel;
 import jif.types.label.Label;
@@ -21,11 +30,8 @@ import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.Node;
 import polyglot.types.ArrayType;
-import polyglot.types.ClassType;
-import polyglot.types.FieldInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 

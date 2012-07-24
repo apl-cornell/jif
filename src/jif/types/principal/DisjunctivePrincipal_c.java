@@ -1,8 +1,11 @@
 package jif.types.principal;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-import jif.translate.DisjunctivePrincipalToJavaExpr_c;
 import jif.translate.PrincipalToJavaExpr;
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
@@ -13,32 +16,34 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePrincipal {
-    private final Set disjuncts;
-    public DisjunctivePrincipal_c(Collection disjuncts, 
-                                  JifTypeSystem ts, Position pos, PrincipalToJavaExpr toJava) {
+    private final Set<Principal> disjuncts;
+
+    public DisjunctivePrincipal_c(Collection<Principal> disjuncts,
+            JifTypeSystem ts, Position pos, PrincipalToJavaExpr toJava) {
         super(ts, pos, toJava);
-        this.disjuncts = new LinkedHashSet(disjuncts);
+        this.disjuncts = new LinkedHashSet<Principal>(disjuncts);
         if (disjuncts.size() < 2) {
             throw new InternalCompilerError("DisjunctivePrincipal should " +
-                        "have at least 2 members");
+                    "have at least 2 members");
         }
     }
-    
+
+    @Override
     public boolean isRuntimeRepresentable() {
-        for (Iterator iter = disjuncts.iterator(); iter.hasNext(); ) {
-            Principal p = (Principal)iter.next();
+        for (Principal p : disjuncts) {
             if (!p.isRuntimeRepresentable()) return false;
         }
         return true;
     }
-    public boolean isCanonical() { 
-        for (Iterator iter = disjuncts.iterator(); iter.hasNext(); ) {
-            Principal p = (Principal)iter.next();
+    @Override
+    public boolean isCanonical() {
+        for (Principal p : disjuncts) {
             if (!p.isCanonical()) return false;
         }
         return true;
     }
-    
+
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         String sep = ",";
@@ -50,7 +55,7 @@ public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePr
             sb.append("<disjunction: ");
             sep = " or ";
         }
-        for (Iterator iter = disjuncts.iterator(); iter.hasNext(); ) {
+        for (Iterator<Principal> iter = disjuncts.iterator(); iter.hasNext();) {
             sb.append(iter.next());
             if (iter.hasNext()) sb.append(sep);
         }
@@ -62,7 +67,8 @@ public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePr
         }
         return sb.toString();
     }
-    
+
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof DisjunctivePrincipal) {
@@ -71,32 +77,33 @@ public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePr
         }
         return false;
     }
-    
+
+    @Override
     public int hashCode() {
         return disjuncts.hashCode();
     }
 
-    public Set disjuncts() {
+    @Override
+    public Set<Principal> disjuncts() {
         return disjuncts;
     }
 
     @Override
     public Principal subst(LabelSubstitution substitution)
-        throws SemanticException {
-      Set substDisjuncts = new HashSet();
-      for (Iterator it = disjuncts.iterator(); it.hasNext();) {
-        Principal disjunct = (Principal) it.next();
-        substDisjuncts.add(disjunct.subst(substitution));
-      }
-      if (substDisjuncts.size() > 1) {
-          return new DisjunctivePrincipal_c(substDisjuncts, (JifTypeSystem) ts,
-                  position(), toJava);
-      } 
-      else if (substDisjuncts.size() == 1) {
-          return (Principal) substDisjuncts.iterator().next();          
-      }
-      else {
-          throw new InternalCompilerError("No principals left after substitution.");
-      }
+            throws SemanticException {
+        Set<Principal> substDisjuncts = new HashSet<Principal>();
+        for (Principal disjunct : disjuncts) {
+            substDisjuncts.add(disjunct.subst(substitution));
+        }
+        if (substDisjuncts.size() > 1) {
+            return new DisjunctivePrincipal_c(substDisjuncts, (JifTypeSystem) ts,
+                    position(), toJava);
+        }
+        else if (substDisjuncts.size() == 1) {
+            return substDisjuncts.iterator().next();
+        }
+        else {
+            throw new InternalCompilerError("No principals left after substitution.");
+        }
     }
 }

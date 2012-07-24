@@ -5,7 +5,18 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
-import jif.types.*;
+import jif.types.ConstArrayType;
+import jif.types.ConstraintMessage;
+import jif.types.JifClassType;
+import jif.types.JifContext;
+import jif.types.JifPolyType;
+import jif.types.JifSubstType;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.NamedLabel;
+import jif.types.Param;
+import jif.types.ParamInstance;
+import jif.types.PrincipalConstraint;
 import jif.types.label.Label;
 import jif.types.label.VarLabel;
 import jif.types.principal.Principal;
@@ -18,7 +29,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.StringUtil;
 
-/** A checker of subtype relationships. 
+/** A checker of subtype relationships.
  */
 public class SubtypeChecker
 {
@@ -28,7 +39,7 @@ public class SubtypeChecker
     public SubtypeChecker(Type supertype, Type subtype) {
         JifTypeSystem ts = (JifTypeSystem)supertype.typeSystem();
         origSupertype = ts.unlabel(supertype);
-        origSubtype = ts.unlabel(subtype);                        
+        origSubtype = ts.unlabel(subtype);
     }
 
     /** Check that subtype <= supertype */
@@ -43,14 +54,14 @@ public class SubtypeChecker
         // make sure that we take the top level labels off the types
         JifTypeSystem ts = lc.jifTypeSystem();
         supertype = ts.unlabel(supertype);
-        subtype = ts.unlabel(subtype);                
+        subtype = ts.unlabel(subtype);
 
         if (Report.should_report(Report.types, 1))
             Report.report(1, "Adding subtype constraints: " + supertype + " >= " + subtype);
 
         if (! recursiveAddSubtypeConstraints(lc, pos, supertype, subtype, false)) {
             throw new SemanticException(subtype + " is not a subtype of " +
-                                        supertype + ".", pos);
+                    supertype + ".", pos);
         }
             }
 
@@ -60,12 +71,12 @@ public class SubtypeChecker
         }
         if (param == null) {
             throw new SemanticException("No parameter given; expected a " +
-                                        "label parameter.",
-                                        pos);            
+                    "label parameter.",
+                    pos);
         }
 
         throw new SemanticException("Parameter " + param + " is not a label.",
-                                    param.position());
+                param.position());
     }
 
     private Principal principal(Param param, Position pos) throws SemanticException {
@@ -75,13 +86,13 @@ public class SubtypeChecker
         }
 
         if (param == null) {
-            throw new SemanticException("No parameter given; expected a " + 
-                                        "principal parameter.",
-                                        pos);            
+            throw new SemanticException("No parameter given; expected a " +
+                    "principal parameter.",
+                    pos);
         }
 
         throw new SemanticException("Parameter " + param +
-                                    " is not a principal.", param.position());
+                " is not a principal.", param.position());
     }
 
     /**
@@ -98,79 +109,84 @@ public class SubtypeChecker
 
         JifContext A = lc.jifContext();
 
-        Iterator iter = polyTypeForClass(supertype).params().iterator();
-        Iterator supIter = supertype.actuals().iterator();
-        Iterator subIter = subtype.actuals().iterator();
+        Iterator<ParamInstance> iter =
+                polyTypeForClass(supertype).params().iterator();
+        Iterator<Param> supIter = supertype.actuals().iterator();
+        Iterator<Param> subIter = subtype.actuals().iterator();
 
         int counter = 0;
         while (iter.hasNext() && supIter.hasNext() && subIter.hasNext()) {
             counter++;
             final int count = counter;
-            final ParamInstance pi = (ParamInstance) iter.next();
-            Param supParam = (Param) supIter.next();
-            Param subParam = (Param) subIter.next();
+            final ParamInstance pi = iter.next();
+            Param supParam = supIter.next();
+            Param subParam = subIter.next();
 
             if (pi.isInvariantLabel() || pi.isCovariantLabel()) {
-                LabelConstraint.Kind kind = 
-                    pi.isInvariantLabel() ? LabelConstraint.EQUAL // subParam == supParam
-                            : pi.isCovariantLabel() ? LabelConstraint.LEQ   // subParam <= supParam
-                                    : null;
+                LabelConstraint.Kind kind =
+                        pi.isInvariantLabel() ? LabelConstraint.EQUAL // subParam == supParam
+                                : pi.isCovariantLabel() ? LabelConstraint.LEQ   // subParam <= supParam
+                                        : null;
 
                 final Type lOrigSubtype = origSubtype;
                 final Type lOrigSupertype = origSupertype;
                 lc.constrain(new NamedLabel("sub_param_"+count,
-                                            StringUtil.nth(count) + " param of subtype " + lOrigSubtype,
-                                            label(subParam, pos)), 
-                            kind, 
-                            new NamedLabel(
-                                           "sup_param_"+count,
-                                           StringUtil.nth(count) + " param of supertype " + lOrigSupertype,
-                                           label(supParam, pos)), 
-                           A.labelEnv(),
-                           pos,
-                           new ConstraintMessage() {
+                        StringUtil.nth(count) + " param of subtype " + lOrigSubtype,
+                        label(subParam, pos)),
+                        kind,
+                        new NamedLabel(
+                                "sup_param_"+count,
+                                StringUtil.nth(count) + " param of supertype " + lOrigSupertype,
+                                label(supParam, pos)),
+                                A.labelEnv(),
+                                pos,
+                                new ConstraintMessage() {
+                    @Override
                     public String msg() {
-                        return lOrigSubtype + " is not a subtype of " + 
-                        lOrigSupertype + 
-                        ", since the subtype relation between label " + 
-                        "parameters is not satisfied.";
+                        return lOrigSubtype + " is not a subtype of " +
+                                lOrigSupertype +
+                                ", since the subtype relation between label " +
+                                "parameters is not satisfied.";
                     }
+                    @Override
                     public String detailMsg() {
-                        String variance = pi.isInvariantLabel() 
-                        ? "invariant"
-                                : "covariant";
-                        String reln = kind() == LabelConstraint.EQUAL 
-                        ? "equal to"
-                                : "less restrictive than";
-                        return lOrigSubtype + " is not a subtype of " + 
+                        String variance = pi.isInvariantLabel()
+                                ? "invariant"
+                                        : "covariant";
+                        String reln = kind() == LabelConstraint.EQUAL
+                                ? "equal to"
+                                        : "less restrictive than";
+                        return lOrigSubtype + " is not a subtype of " +
                         lOrigSupertype + ". Subtyping requires " +
-                        "the " + StringUtil.nth(count) + 
+                        "the " + StringUtil.nth(count) +
                         " parameter of the subtype to be " +
-                        reln + 
-                        " the " + StringUtil.nth(count) + 
+                        reln +
+                        " the " + StringUtil.nth(count) +
                         " parameter of the supertype, since that " +
                         "parameter is " + variance + ".";
                     }
                 }
-                );
+                        );
             }
             else if (pi.isPrincipal()) {
-                lc.constrain(principal(supParam, pos), 
-                             PrincipalConstraint.EQUIV, 
-                            principal(supParam, pos), 
-                           A.labelEnv(),
-                           pos,
-                           new ConstraintMessage() {
+                lc.constrain(principal(supParam, pos),
+                        PrincipalConstraint.EQUIV,
+                        principal(supParam, pos),
+                        A.labelEnv(),
+                        pos,
+                        new ConstraintMessage() {
+                    @Override
                     public String msg() {
-                        return origSubtype + " is not a subtype of " + 
-                        origSupertype + ", since the principals are not equivalent.";
+                        return origSubtype + " is not a subtype of " +
+                                origSupertype + ", since the principals are not equivalent.";
                     }
+                    @Override
                     public String detailMsg() {
-                        return origSubtype + " is not a subtype of " + 
-                        origSupertype + ". Subtyping requires " +
-                        "the " + StringUtil.nth(count) + 
-                        " parameter of the subtype to be equivalent to the " +
-                        StringUtil.nth(count) + " parameter of the supertype.";
+                        return origSubtype + " is not a subtype of " +
+                                origSupertype + ". Subtyping requires " +
+                                "the " + StringUtil.nth(count) +
+                                " parameter of the subtype to be equivalent to the " +
+                                StringUtil.nth(count) + " parameter of the supertype.";
                     }
                 });
             }
@@ -178,7 +194,7 @@ public class SubtypeChecker
 
         if (iter.hasNext() || supIter.hasNext() || subIter.hasNext())
             throw new InternalCompilerError(pos,
-            "Instantiation type parameter count mismatch.");
+                    "Instantiation type parameter count mismatch.");
             }
 
     /** Check that subtype <= supertype */
@@ -195,42 +211,44 @@ public class SubtypeChecker
         Type unlblSubtype = ts.unlabel(subtype);
 
         if (ts.isLabeled(supertype) && ts.isLabeled(subtype)) {
-            // the two types are labeled. make sure that 
+            // the two types are labeled. make sure that
             // the label of supertype is at least as restrictve as that
             // of subtype, or if at least one of them is invariant, that they are equal
             final Type lOrigSubtype = origSubtype;
             final Type lOrigSupertype = origSupertype;
             lc.constrain(new NamedLabel("label of type " + subtype,
-                                        ts.labelOfType(subtype)), 
-                        LabelConstraint.LEQ, 
-                        new NamedLabel("label of type " + supertype,
-                                       ts.labelOfType(supertype)), 
-                        A.labelEnv(),
-                        pos,
-                        !(ts.labelOfType(subtype) instanceof VarLabel || ts.labelOfType(supertype) instanceof VarLabel ),
-                        new ConstraintMessage() {
+                    ts.labelOfType(subtype)),
+                    LabelConstraint.LEQ,
+                    new NamedLabel("label of type " + supertype,
+                            ts.labelOfType(supertype)),
+                            A.labelEnv(),
+                            pos,
+                            !(ts.labelOfType(subtype) instanceof VarLabel || ts.labelOfType(supertype) instanceof VarLabel ),
+                            new ConstraintMessage() {
+                @Override
                 public String msg() {
-                    String s = lOrigSubtype + " is not a subtype of " + 
-                    lOrigSupertype + ".";
+                    String s = lOrigSubtype + " is not a subtype of " +
+                            lOrigSupertype + ".";
                     if (inNonConstArrayType) {
                         s += " The base type of arrays must be equivalent.";
                     }
                     return s;
                 }
+                @Override
                 public String detailMsg() {
                     if (inNonConstArrayType) {
-                        return lOrigSubtype + " is not a subtype of " + 
-                        lOrigSupertype + ". Subtyping requires " +
-                        "the base types of arrays to be equivalent.";                                                
+                        return lOrigSubtype + " is not a subtype of " +
+                                lOrigSupertype + ". Subtyping requires " +
+                                "the base types of arrays to be equivalent.";
                     }
-                    return lOrigSubtype + " is not a subtype of " + 
+                    return lOrigSubtype + " is not a subtype of " +
                     lOrigSupertype + ". Subtyping requires " +
                     "the label of the subtype to be less " +
                     "restrictive than the label of the " +
                     "supertype.";
                 }
             }
-            );                
+                    );
         }
 
 
@@ -242,9 +260,9 @@ public class SubtypeChecker
             JifClassType sup = (JifClassType) unlblSupertype;
 
 
-            LinkedList subPossibles = new LinkedList();
+            LinkedList<Type> subPossibles = new LinkedList<Type>();
             subPossibles.add(sub);
-            Set checkedPossibles = new HashSet();
+            Set<JifClassType> checkedPossibles = new HashSet<JifClassType>();
             while (!subPossibles.isEmpty()) {
                 JifClassType poss = (JifClassType)subPossibles.removeFirst();
                 if (ts.equalsStrip(polyTypeForClass(poss), polyTypeForClass(sup))) {
@@ -257,16 +275,15 @@ public class SubtypeChecker
 
                 // add the superclass and all interfaces of poss to the set of candidates.
                 Type possParent = poss.superType();
-                if (possParent instanceof JifClassType && 
-                        !checkedPossibles.contains(possParent) && 
+                if (possParent instanceof JifClassType &&
+                        !checkedPossibles.contains(possParent) &&
                         !subPossibles.contains(possParent)) {
                     subPossibles.add(possParent);
                 }
 
-                for (Iterator iter = poss.interfaces().iterator(); iter.hasNext(); ) {
-                    Type possInterface = (Type) iter.next();
-                    if (possInterface instanceof JifClassType && 
-                            !checkedPossibles.contains(possInterface) && 
+                for (Type possInterface : poss.interfaces()) {
+                    if (possInterface instanceof JifClassType &&
+                            !checkedPossibles.contains(possInterface) &&
                             !subPossibles.contains(possInterface)) {
                         subPossibles.add(possInterface);
                     }
@@ -279,7 +296,7 @@ public class SubtypeChecker
             // both subtype and supertype are arrays, say of D and C respectively
             // i.e. subtype == D[], supertype = C[]
             // we insist that C[] >= D[] iff C >= D and D >= C.
-            Type subBase = ((ArrayType)unlblSubtype).base();  
+            Type subBase = ((ArrayType)unlblSubtype).base();
             Type supBase = ((ArrayType)unlblSupertype).base();
 
             // check that the const-ness of the arrays is suitable.
@@ -287,17 +304,17 @@ public class SubtypeChecker
             boolean superIsNonConst = false;
             boolean subIsBoth = false;
             if (unlblSupertype instanceof ConstArrayType) {
-                ConstArrayType unlblSuperCat = (ConstArrayType)unlblSupertype; 
+                ConstArrayType unlblSuperCat = (ConstArrayType)unlblSupertype;
                 superIsConst = unlblSuperCat.isConst();
                 superIsNonConst = unlblSuperCat.isNonConst();
             }
             if (unlblSubtype instanceof ConstArrayType) {
-                ConstArrayType unlblSubCat = (ConstArrayType)unlblSubtype; 
+                ConstArrayType unlblSubCat = (ConstArrayType)unlblSubtype;
                 subIsBoth = unlblSubCat.isConst() && unlblSubCat.isNonConst();
             }
             if (superIsConst) {
                 // sub must be const
-                if (!subIsBoth && (!(unlblSubtype instanceof ConstArrayType) || 
+                if (!subIsBoth && (!(unlblSubtype instanceof ConstArrayType) ||
                         !((ConstArrayType)unlblSubtype).isConst())) {
                     throw new SemanticException("A normal array is not a subtype of a const array", pos);
                 }
@@ -313,14 +330,14 @@ public class SubtypeChecker
                 // the super and sub types are both const arrays, and so are covariant
                 // or the sub type is for a cloned array, or an array initializer.
                 if (!recursiveAddSubtypeConstraints(lc, pos, supBase, subBase, false)) {
-                    return false; 
+                    return false;
                 }
             }
             else  {
                 // the super and sub types are both non-const arrays, and so are invariant.
                 if (!recursiveAddSubtypeConstraints(lc, pos, subBase, supBase, true) ||
                         !recursiveAddSubtypeConstraints(lc, pos, supBase, subBase, true)) {
-                    return false; 
+                    return false;
                 }
             }
         }
@@ -329,13 +346,13 @@ public class SubtypeChecker
             }
 
     /**
-     * Return the <code>JifPolyType</code> for the given 
-     * <code>JifClassType jct</code>. If <code>jct</code> is an 
-     * instance of <code>JifPolyType</code>, then <code>jct</code> is returned; 
-     * otherwise, if <code>jct</code> is an instance of 
-     * <code>JifSubstType</code> then <code>jct.base()</code> 
+     * Return the <code>JifPolyType</code> for the given
+     * <code>JifClassType jct</code>. If <code>jct</code> is an
+     * instance of <code>JifPolyType</code>, then <code>jct</code> is returned;
+     * otherwise, if <code>jct</code> is an instance of
+     * <code>JifSubstType</code> then <code>jct.base()</code>
      * is returned.
-     *  
+     * 
      */
     public static JifPolyType polyTypeForClass(JifClassType jct) {
         if (jct instanceof JifPolyType) {
@@ -345,7 +362,7 @@ public class SubtypeChecker
             return (JifPolyType)((JifSubstType)jct).base();
         }
         throw new InternalCompilerError("Unexpected JifClassType instance." +
-                                        "Expected a JifPolyType or JifSubstType, but got " + 
-                                        jct.getClass().getName(), jct.position());
+                "Expected a JifPolyType or JifSubstType, but got " +
+                jct.getClass().getName(), jct.position());
     }
 }

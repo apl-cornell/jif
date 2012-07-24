@@ -6,6 +6,7 @@ import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 
 public class LocalAssignToJavaExt_c extends ToJavaExt_c {
+    @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         LocalAssign n = (LocalAssign)node();
         return rw.java_nf().LocalAssign(n.position(), (Local)n.left(), n.operator(), n.right());

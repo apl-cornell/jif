@@ -1,9 +1,18 @@
 package jif.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import jif.types.JifTypeSystem;
-import jif.types.label.*;
+import jif.types.label.ConfPolicy;
+import jif.types.label.IntegPolicy;
+import jif.types.label.Label;
+import jif.types.label.PairLabel;
+import jif.types.label.Policy;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;

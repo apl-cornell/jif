@@ -23,6 +23,7 @@ public class JifSynchronizedExt extends JifStmtExt_c
     /** Label check the <tt>synchronized</tt> statement.
      *  Just lets the label checker visit its children. 
      */
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         Synchronized ss = (Synchronized) node();
 

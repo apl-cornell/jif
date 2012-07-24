@@ -14,6 +14,7 @@ import polyglot.visit.TypeChecker;
  */
 public class JifCatchDel extends JifJL_c 
 {
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Catch c = (Catch)this.node();
 

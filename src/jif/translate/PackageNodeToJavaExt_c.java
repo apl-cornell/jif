@@ -6,6 +6,7 @@ import polyglot.types.Package;
 import polyglot.types.SemanticException;
 
 public class PackageNodeToJavaExt_c extends ToJavaExt_c {
+    @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         PackageNode n = (PackageNode) node();
         Package p = n.package_();

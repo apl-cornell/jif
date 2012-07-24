@@ -17,6 +17,7 @@ public class JifDeclassifyStmtExt extends JifDowngradeStmtExt
         super(toJava);
     }
 
+    @Override
     protected void checkOneDimenOnly(LabelChecker lc, 
             final JifContext A,
             Label labelFrom, 
@@ -25,6 +26,7 @@ public class JifDeclassifyStmtExt extends JifDowngradeStmtExt
         JifDeclassifyExprExt.checkOneDimen(lc, A, labelFrom, labelTo, pos, false);
     }
 
+    @Override
     protected void checkAuthority(LabelChecker lc, 
                                   final JifContext A,
                                   Label labelFrom, 
@@ -33,6 +35,7 @@ public class JifDeclassifyStmtExt extends JifDowngradeStmtExt
         JifDeclassifyExprExt.checkAuth(lc, A, labelFrom, labelTo, pos, false);
     }
 
+    @Override
     protected void checkRobustness(LabelChecker lc, 
                                    JifContext A,
                                    Label labelFrom, 

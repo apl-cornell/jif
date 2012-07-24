@@ -24,6 +24,7 @@ public class JifTypeNodeDel extends JifJL_c
      * Prevent an uninstantiated polymorphic class from being used anywhere, 
      * and check that the "this" label is not used in a static context.
      */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeNode tn = (TypeNode) super.typeCheck(tc);
         
@@ -70,6 +71,7 @@ public class JifTypeNodeDel extends JifJL_c
         StaticLabelChecker(Position position) {
             this.position = position;
         }
+        @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ThisLabel) { 
                 throw new SemanticException("The label \"this\" cannot be used " +

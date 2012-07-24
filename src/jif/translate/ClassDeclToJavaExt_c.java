@@ -1,13 +1,35 @@
 package jif.translate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import jif.ast.JifClassDecl;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifPolyType;
+import jif.types.JifSubst;
+import jif.types.JifSubstType;
+import jif.types.JifTypeSystem;
+import jif.types.Param;
+import jif.types.ParamInstance;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
-import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.ast.Block;
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassMember;
+import polyglot.ast.Expr;
+import polyglot.ast.Formal;
+import polyglot.ast.Id;
+import polyglot.ast.Node;
+import polyglot.ast.Stmt;
+import polyglot.ast.TypeNode;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
 
@@ -27,24 +49,25 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
     protected static final String constructorTranslatedName(ClassType ct) {
         return (ct.fullName() + ".").replace('.', '$');
     }
-    
+
     protected static final String DEFAULT_CONSTRUCTOR_INVOKER_METHOD_NAME = "jif$invokeDefConstructor";
-    
+
     /*
-     * Code for translating ClassDecls 
+     * Code for translating ClassDecls
      */
     private boolean hasDefaultConstructor = false;
-    private List defaultConstructorExceptions = null;
-    
-    public NodeVisitor toJavaEnter(JifToJavaRewriter rw) throws SemanticException {
+    private List<? extends Type> defaultConstructorExceptions = null;
+
+    @Override
+    public NodeVisitor toJavaEnter(JifToJavaRewriter rw)
+            throws SemanticException {
         // Bypass params and authority.
         JifClassDecl n = (JifClassDecl) node();
 
         rw.enteringClass(n.type());
-        
+
         ClassType ct = n.type();
-        for (Iterator iter = ct.constructors().iterator(); iter.hasNext(); ) {
-            ConstructorInstance ci = (ConstructorInstance)iter.next();
+        for (ConstructorInstance ci : ct.constructors()) {
             if (ci.formalTypes().isEmpty()) {
                 hasDefaultConstructor = true;
                 defaultConstructorExceptions = ci.throwTypes();
@@ -55,6 +78,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         return rw.bypass(n.params()).bypass(n.authority()).bypass(n.constraints());
     }
 
+    @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         JifClassDecl n = (JifClassDecl) node();
         JifPolyType jpt = (JifPolyType)n.type();
@@ -67,11 +91,11 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 if (hasDefaultConstructor) {
                     cb = cb.addMember(produceDefaultConstructorInvoker(jpt, rw, defaultConstructorExceptions));
                 }
-                // add initializer method (which is called from every 
-                // translated constructer.                
+                // add initializer method (which is called from every
+                // translated constructer.
                 cb = addInitializer(cb, rw);
-                
-                // add any static initializers             
+
+                // add any static initializers
                 cb = addStaticInitializers(cb, rw);
             }
             if (needsDynamicTypeMethods(rw, jpt)) {
@@ -79,54 +103,56 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 cb = cb.addMember(produceInstanceOfMethod(jpt, rw, false));
                 cb = cb.addMember(produceCastMethod(jpt, rw));
             }
-            
+
             if (rw.jif_ts().isParamsRuntimeRep(jpt)) {
                 if (!jpt.params().isEmpty()) {
                     // add fields for params
                     if (rw.jif_ts().isJifClass(jpt)) {
-                        for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
-                            ParamInstance pi = (ParamInstance)iter.next();
+                        for (ParamInstance pi : jpt.params()) {
                             String paramFieldName = ParamToJavaExpr_c.paramFieldName(pi);
                             TypeNode tn = typeNodeForParam(pi, rw);
                             cb = cb.addMember(rw.qq().parseMember("private final %T %s;", tn, paramFieldName));
                         }
                     }
                 }
-                
+
                 // add getter methods for any params declared in interfaces
                 cb = addInterfaceParamGetters(cb, jpt, jpt, rw);
-            }            
+            }
         }
         else {
             // it's an interface
             if (needsImplClass(rw, jpt)) {
-                ClassBody implBody = rw.java_nf().ClassBody(Position.compilerGenerated(), new ArrayList(2));
+                ClassBody implBody =
+                        rw.java_nf().ClassBody(Position.compilerGenerated(),
+                                new ArrayList<ClassMember>(2));
                 implBody = implBody.addMember(produceInstanceOfMethod(jpt, rw, true));
                 implBody = implBody.addMember(produceCastMethod(jpt, rw));
-                
-                ClassDecl implDecl = rw.java_nf().ClassDecl(Position.compilerGenerated(),
-                                                            n.flags().clearInterface().Abstract(),
-                                                            interfaceClassImplName(n.name()),
-                                                            null,
-                                                            Collections.EMPTY_LIST,
-                                                            implBody);
+
+                Id name =
+                        rw.java_nf().Id(Position.compilerGenerated(),
+                                interfaceClassImplName(n.name()));
+                ClassDecl implDecl =
+                        rw.java_nf().ClassDecl(Position.compilerGenerated(),
+                                n.flags().clearInterface().Abstract(), name,
+                                null, Collections.<TypeNode> emptyList(),
+                                implBody);
                 rw.addAdditionalClassDecl(implDecl);
-                
+
                 // add getters for params to the interface
-                for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
-                    ParamInstance pi = (ParamInstance)iter.next();
+                for (ParamInstance pi : jpt.params()) {
                     String paramFieldNameGetter = ParamToJavaExpr_c.paramFieldNameGetter(pi);
                     TypeNode tn = typeNodeForParam(pi, rw);
                     cb = cb.addMember(rw.qq().parseMember("%T %s();", tn,paramFieldNameGetter));
                 }
-                
+
             }
         }
-        
+
 
         rw.leavingClass();
-        return rw.java_nf().ClassDecl(n.position(), n.flags(), n.name(),
-                                      n.superClass(), n.interfaces(), cb);
+        return rw.java_nf().ClassDecl(n.position(), n.flags(), n.id(),
+                n.superClass(), n.interfaces(), cb);
     }
 
     protected boolean needsDynamicTypeMethods(JifToJavaRewriter rw, JifPolyType jpt) {
@@ -140,12 +166,12 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
      * Create a method for initializations, and add it to cb.
      */
     protected ClassBody addInitializer(ClassBody cb, JifToJavaRewriter rw) {
-        List inits = new ArrayList(rw.getInitializations());
+        List<Stmt> inits = new ArrayList<Stmt>(rw.getInitializations());
         rw.getInitializations().clear();
         return cb.addMember(rw.qq().parseMember(
-                                              "private void %s() { %LS }", 
-                                              INITIALIZATIONS_METHOD_NAME,
-                                              inits));
+                "private void %s() { %LS }",
+                INITIALIZATIONS_METHOD_NAME,
+                inits));
     }
 
     /**
@@ -156,8 +182,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         if (rw.getStaticInitializations().isEmpty()) {
             return cb;
         }
-        List inits = new ArrayList(rw.getStaticInitializations());
-        rw.getStaticInitializations().clear();   
+        List<Stmt> inits = new ArrayList<Stmt>(rw.getStaticInitializations());
+        rw.getStaticInitializations().clear();
 
         Block b;
         if (inits.size() == 1) {
@@ -167,8 +193,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             b = rw.java_nf().Block(Position.compilerGenerated(), inits);
         }
         return cb.addMember(rw.java_nf().Initializer(Position.compilerGenerated(),
-                                                     Flags.STATIC,
-                                                     b));
+                Flags.STATIC,
+                b));
     }
 
     /**
@@ -184,9 +210,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             // don't bother adding interface methods for classes that don't represent the runtime params (i.e., Jif sig classes)
             return cb;
         }
-        for (Iterator iter = jpt.interfaces().iterator(); iter.hasNext(); ) {
-            Type interf = (Type)iter.next();
-
+        for (Type interf : jpt.interfaces()) {
             if (rw.jif_ts().isParamsRuntimeRep(interf) &&
                     !rw.jif_ts().isSubtype(baseClass.superType(), interf)) {
 
@@ -197,8 +221,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                     JifSubstType interfST = (JifSubstType)interf;
                     JifSubst subst = (JifSubst)interfST.subst();
                     interfPT = (JifPolyType)interfST.base();
-                    for (Iterator iter2 = interfPT.params().iterator(); iter2.hasNext(); ) {
-                        ParamInstance pi = (ParamInstance)iter2.next();
+                    for (ParamInstance pi : interfPT.params()) {
                         String paramFieldName = ParamToJavaExpr_c.paramFieldName(pi);
                         String paramFieldNameGetter = ParamToJavaExpr_c.paramFieldNameGetter(pi);
                         TypeNode tn = typeNodeForParam(pi, rw);
@@ -207,11 +230,11 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                             // it's a real Jif class, so add a real implementation
                             cb = cb.addMember(rw.qq().parseMember("private %T %s;", tn, paramFieldName));
                             cb = cb.addMember(rw.qq().parseMember(
-                                                                  "public final %T %s() { "
-                                                                  + " if (this.%s==null) this.%s = %E; "
-                                                                  + "return this.%s; }",
-                                                                  tn, paramFieldNameGetter, paramFieldName,
-                                                                  paramFieldName, lblExpr, paramFieldName));
+                                    "public final %T %s() { "
+                                            + " if (this.%s==null) this.%s = %E; "
+                                            + "return this.%s; }",
+                                            tn, paramFieldNameGetter, paramFieldName,
+                                            paramFieldName, lblExpr, paramFieldName));
                         }
                         else {
                             // it's just a signature file, add the method sig but nothing else.
@@ -237,51 +260,50 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         Context A = rw.context();
         rw = (JifToJavaRewriter)rw.context(A.pushStatic());
         JifTypeSystem jifts = rw.jif_ts();
-        List formals = produceFormals(jpt, rw, true);
+        List<Formal> formals = produceFormals(jpt, rw, true);
 
         String name = jpt.name();
-        
+
         if (!jifts.isJifClass(jpt)) {
             // just produce a header
-            return rw.qq().parseMember("static public native boolean %s(%LF);", INSTANCEOF_METHOD_NAME, formals);            
+            return rw.qq().parseMember("static public native boolean %s(%LF);", INSTANCEOF_METHOD_NAME, formals);
         }
-        
+
         StringBuffer sb = new StringBuffer();
         sb.append("static public boolean %s(%LF) {");
         if (jpt.params().isEmpty()) {
-            sb.append("return (o instanceof %s);");            
+            sb.append("return (o instanceof %s);");
         }
         else {
             sb.append("if (o instanceof %s) { ");
             sb.append("%s c = (%s)o; ");
-    
+
             // now test each of the params
             boolean moreThanOneParam = (jpt.params().size() > 1);
             sb.append(moreThanOneParam?"boolean ok = true;":"");
-            for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
-                ParamInstance pi = (ParamInstance)iter.next();
+            for (ParamInstance pi : jpt.params()) {
                 String paramFieldName = ParamToJavaExpr_c.paramFieldName(pi);
                 String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
                 String comparison = "equivalentTo";
                 if (pi.isCovariantLabel()) {
                     comparison = "relabelsTo";
                 }
-    
+
                 sb.append(moreThanOneParam?"ok = ok && ":"return ");
-    
+
                 String paramExpr = paramFieldName;
                 if (useGetters) {
                     paramExpr = ParamToJavaExpr_c.paramFieldNameGetter(pi) + "()";
                 }
-                if (pi.isPrincipal()) {  
+                if (pi.isPrincipal()) {
                     // e.g., PrincipalUtil.equivTo(c.expr, paramArgName)
                     sb.append(jifts.PrincipalUtilClassName() + "."+comparison+
-                                         "(c."+paramExpr+","+paramArgName+");");
+                            "(c."+paramExpr+","+paramArgName+");");
                 }
                 else {
                     // e.g., LabelUtil.equivTo(paramArgName)
-                    sb.append(rw.runtimeLabelUtil() + "."+comparison+ 
-                              "(c."+paramExpr+","+paramArgName+");");
+                    sb.append(rw.runtimeLabelUtil() + "."+comparison+
+                            "(c."+paramExpr+","+paramArgName+");");
                 }
             }
             if (moreThanOneParam) sb.append("return ok;");
@@ -303,11 +325,11 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         rw = (JifToJavaRewriter)rw.context(A.pushStatic());
 
         TypeNode tn = rw.typeToJava(jpt, Position.compilerGenerated());;
-        List formals = produceFormals(jpt, rw, true);
+        List<Formal> formals = produceFormals(jpt, rw, true);
         if (!rw.jif_ts().isJifClass(jpt)) {
             // just produce a header
             return rw.qq().parseMember("static public native %T %s(%LF);", tn, castMethodName(jpt), formals);
-            
+
         }
 
         StringBuffer sb = new StringBuffer();
@@ -317,16 +339,18 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         sb.append("throw new ClassCastException();");
         sb.append("}");
 
-        List args = produceParamArgs(jpt, rw);
+        List<Expr> args = produceParamArgs(jpt, rw);
         return rw.qq().parseMember(sb.toString(), tn, castMethodName(jpt), formals, INSTANCEOF_METHOD_NAME, args, tn);
     }
 
-    protected List produceFormals(JifPolyType jpt, JifToJavaRewriter rw, boolean addObjectFormal) throws SemanticException {
-        List formals = new ArrayList(jpt.params().size() + 1);
+    protected List<Formal> produceFormals(JifPolyType jpt,
+            JifToJavaRewriter rw, boolean addObjectFormal)
+                    throws SemanticException {
+        List<Formal> formals = new ArrayList<Formal>(jpt.params().size() + 1);
         Position pos = Position.compilerGenerated();
-        for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
-            ParamInstance pi = (ParamInstance)iter.next();
-            String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
+        for (ParamInstance pi : jpt.params()) {
+            Id paramArgName =
+                    rw.java_nf().Id(pos, ParamToJavaExpr_c.paramArgName(pi));
             TypeNode tn = typeNodeForParam(pi, rw);
             Formal f = rw.java_nf().Formal(pos, Flags.FINAL, tn, paramArgName);
             formals.add(f);
@@ -335,17 +359,19 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         if (addObjectFormal) {
             // add the object argument too.
             TypeNode tn = rw.qq().parseType("java.lang.Object");
-            formals.add(rw.java_nf().Formal(pos, Flags.FINAL, tn, "o"));
+            Id id = rw.java_nf().Id(pos, "o");
+            formals.add(rw.java_nf().Formal(pos, Flags.FINAL, tn, id));
         }
         return formals;
     }
 
-    static protected List produceParamFormals(JifPolyType jpt, JifToJavaRewriter rw) throws SemanticException {
-        List formals = new ArrayList(jpt.params().size() + 1);
+    static protected List<Formal> produceParamFormals(JifPolyType jpt,
+            JifToJavaRewriter rw) throws SemanticException {
+        List<Formal> formals = new ArrayList<Formal>(jpt.params().size() + 1);
         Position pos = Position.compilerGenerated();
-        for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
-            ParamInstance pi = (ParamInstance)iter.next();
-            String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
+        for (ParamInstance pi : jpt.params()) {
+            Id paramArgName =
+                    rw.java_nf().Id(pos, ParamToJavaExpr_c.paramArgName(pi));
             TypeNode tn = typeNodeForParam(pi, rw);
             Formal f = rw.java_nf().Formal(pos, Flags.FINAL, tn, paramArgName);
             formals.add(f);
@@ -353,10 +379,9 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         return formals;
     }
 
-    protected List produceParamArgs(JifPolyType jpt, JifToJavaRewriter rw) {
-        List args = new ArrayList(jpt.params().size() + 1);
-        for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
-            ParamInstance pi = (ParamInstance)iter.next();
+    protected List<Expr> produceParamArgs(JifPolyType jpt, JifToJavaRewriter rw) {
+        List<Expr> args = new ArrayList<Expr>(jpt.params().size() + 1);
+        for (ParamInstance pi : jpt.params()) {
             String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
             args.add(rw.qq().parseExpr(paramArgName));
         }
@@ -368,12 +393,12 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
     protected ClassMember produceConstructor(JifPolyType jpt, JifToJavaRewriter rw) throws SemanticException {
         // add arguments for params.
-        List formals = produceParamFormals(jpt, rw);
+        List<Formal> formals = produceParamFormals(jpt, rw);
 
-        List inits = new ArrayList();
+        List<Stmt> inits = new ArrayList<Stmt>();
 
         // add super call.
-        List superArgs = new ArrayList();
+        List<Expr> superArgs = new ArrayList<Expr>();
         Type superType = jpt.superType();
         if (superType instanceof JifSubstType && rw.jif_ts().isParamsRuntimeRep(((JifSubstType)superType).base())) {
             JifSubstType superjst = (JifSubstType)jpt.superType();
@@ -381,8 +406,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
             JifContext A = (JifContext)rw.context();
             JifToJavaRewriter rwCons = (JifToJavaRewriter)rw.context(A.pushConstructorCall());
-            for (Iterator iter = superjpt.params().iterator(); iter.hasNext(); ) {
-                ParamInstance pi = (ParamInstance)iter.next();
+            for (ParamInstance pi : superjpt.params()) {
                 Param param = ((JifSubst)superjst.subst()).get(pi);
                 if (pi.isLabel()) {
                     superArgs.add(((Label)param).toJava(rwCons));
@@ -395,8 +419,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         inits.add(rw.qq().parseStmt("super(%LE);", (Object)superArgs));
 
         // create initializers for the fields from the arguments
-        for (Iterator iter = jpt.params().iterator(); iter.hasNext(); ) {
-            ParamInstance pi = (ParamInstance)iter.next();
+        for (ParamInstance pi : jpt.params()) {
             String paramFieldName = ParamToJavaExpr_c.paramFieldName(pi);
             String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
             inits.add(rw.qq().parseStmt("this." + paramFieldName + " = " + paramArgName + ";"));
@@ -404,43 +427,45 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
         inits.addAll(additionalConstructorCode(rw));
 
+        Id name = rw.java_nf().Id(Position.compilerGenerated(), jpt.name());
         return rw.java_nf().ConstructorDecl(Position.compilerGenerated(),
-                                            Flags.PUBLIC,
-                                            jpt.name(),
-                                            formals,
-                                            Collections.EMPTY_LIST,
-                                            rw.java_nf().Block(Position.compilerGenerated(),
-                                                               inits));
+                Flags.PUBLIC, name, formals,
+                Collections.<TypeNode> emptyList(),
+                rw.java_nf().Block(Position.compilerGenerated(), inits));
     }
 
-    protected List additionalConstructorCode(JifToJavaRewriter rw) {
-        return Collections.EMPTY_LIST;
+    protected List<Stmt> additionalConstructorCode(JifToJavaRewriter rw) {
+        return Collections.emptyList();
     }
     /**
      * Produce a method (with a standard name) that will invoke the default
-     * constructor of the class. This method assumes that such a default 
+     * constructor of the class. This method assumes that such a default
      * constructor exists.
      */
-    protected ClassMember produceDefaultConstructorInvoker(ClassType ct, 
-                    JifToJavaRewriter rw, List throwTypes) throws SemanticException {
+    protected ClassMember produceDefaultConstructorInvoker(ClassType ct,
+            JifToJavaRewriter rw, List<? extends Type> throwTypes) {
         // add arguments for params.
         if (throwTypes == null || throwTypes.isEmpty()) {
-            return rw.qq().parseMember("public void " + 
-                                       DEFAULT_CONSTRUCTOR_INVOKER_METHOD_NAME + "() {" +
-                                       "this." + constructorTranslatedName(ct)+ "();" + 
-                                            "}");
+            return rw.qq().parseMember("public void " +
+                    DEFAULT_CONSTRUCTOR_INVOKER_METHOD_NAME + "() {" +
+                    "this." + constructorTranslatedName(ct)+ "();" +
+                    "}");
         }
-        List typeNodes = new ArrayList(throwTypes.size());
-        for (Iterator iter = throwTypes.iterator(); iter.hasNext(); ) {
-            Type t = (Type)iter.next();
-            TypeNode tn = rw.java_nf().AmbTypeNode(Position.compilerGenerated(), t.toClass().name());
+        List<TypeNode> typeNodes = new ArrayList<TypeNode>(throwTypes.size());
+        for (Type t : throwTypes) {
+            Id name =
+                    rw.java_nf().Id(Position.compilerGenerated(),
+                            t.toClass().name());
+            TypeNode tn =
+                    rw.java_nf()
+                    .AmbTypeNode(Position.compilerGenerated(), name);
             typeNodes.add(tn);
         }
-        return rw.qq().parseMember("public void " + 
-                                   DEFAULT_CONSTRUCTOR_INVOKER_METHOD_NAME + 
-                                   "() throws %LT {" +
-                                   "this." + constructorTranslatedName(ct)+ "();" + 
-                                        "}", (Object)typeNodes);
-        
-    }    
+        return rw.qq().parseMember("public void " +
+                DEFAULT_CONSTRUCTOR_INVOKER_METHOD_NAME +
+                "() throws %LT {" +
+                "this." + constructorTranslatedName(ct)+ "();" +
+                "}", (Object)typeNodes);
+
+    }
 }

@@ -5,6 +5,7 @@ import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 
 public class CanonicalTypeNodeToJavaExt_c extends ToJavaExt_c {
+    @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         CanonicalTypeNode n = (CanonicalTypeNode) node();
         return rw.typeToJava(n.type(), n.position());

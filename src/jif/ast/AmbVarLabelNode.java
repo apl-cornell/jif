@@ -1,6 +1,6 @@
 package jif.ast;
 
-import polyglot.ast.*;
+import polyglot.ast.Ambiguous;
 
 /** An ambiguous variable label node. 
  */

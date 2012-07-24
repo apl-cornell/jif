@@ -5,8 +5,22 @@ import java.util.Collections;
 import java.util.List;
 
 import jif.ast.JifMethodDecl;
-import jif.types.*;
-import polyglot.ast.*;
+import jif.types.ActsForConstraint;
+import jif.types.Assertion;
+import jif.types.JifMethodInstance;
+import jif.types.JifParsedPolyType;
+import jif.types.JifPolyType;
+import jif.types.JifTypeSystem;
+import jif.types.LabelLeAssertion;
+import polyglot.ast.Binary;
+import polyglot.ast.Block;
+import polyglot.ast.Expr;
+import polyglot.ast.Formal;
+import polyglot.ast.MethodDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Stmt;
+import polyglot.ast.TypeNode;
 import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
@@ -54,7 +68,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
 
         formals.addAll(n.formals());
         n = rw.java_nf().MethodDecl(n.position(), n.flags(), n.returnType(),
-                                    rw.java_nf().Id(Position.compilerGenerated(), n.name()), 
+                                    n.id(), 
                                     formals, n.throwTypes(),
                                     n.body());
         n = n.methodInstance(null);
@@ -71,8 +85,8 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
      * static main(String[] args) {Principal p = Runtime.getUser(); {...} };
      */
     public Node staticMainToJava(JifToJavaRewriter rw, MethodDecl n) throws SemanticException {
-        Formal formal0 = (Formal)n.formals().get(0); // the principal
-        Formal formal1 = (Formal)n.formals().get(1); // the string array
+        Formal formal0 = n.formals().get(0); // the principal
+        Formal formal1 = n.formals().get(1); // the string array
         List<Formal> formalList = Collections.singletonList(formal1);
 
         Block origBody = n.body();
@@ -86,7 +100,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
             rw.java_nf().LocalDecl(origBody.position(),
                                Flags.FINAL,
                                type,
-                               rw.java_nf().Id(Position.compilerGenerated(), formal0.name()),
+                               formal0.id(),
                                init);
         
         // Translate the constraints and use them to guard the body.
@@ -99,7 +113,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
         n = rw.java_nf().MethodDecl(n.position(),
                                     n.flags(),
                                     n.returnType(),
-                                    rw.java_nf().Id(Position.compilerGenerated(), n.name()),
+                                    n.id(),
                                     formalList,
                                     n.throwTypes(),
                                     newBody);

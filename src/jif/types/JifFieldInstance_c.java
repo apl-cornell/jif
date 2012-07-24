@@ -2,8 +2,12 @@ package jif.types;
 
 import jif.types.label.Label;
 import jif.types.label.ProviderLabel;
-import polyglot.ast.Expr;
-import polyglot.types.*;
+import polyglot.types.FieldInstance;
+import polyglot.types.FieldInstance_c;
+import polyglot.types.Flags;
+import polyglot.types.ParsedClassType;
+import polyglot.types.ReferenceType;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -54,10 +58,12 @@ public class JifFieldInstance_c extends FieldInstance_c
         this.hasInitializer = hasInitializer;        
     }
     
+    @Override
     public Param initializer() {
         return initializer;
     }
     
+    @Override
     public void setInitializer(Param init) {
         this.initializer = init;
     }

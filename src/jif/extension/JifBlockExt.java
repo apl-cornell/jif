@@ -1,7 +1,6 @@
 package jif.extension;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import jif.translate.ToJavaExt;
@@ -15,7 +14,7 @@ import polyglot.ast.Stmt;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
 
-/** The Jif extension of the <code>Block</code> node. 
+/** The Jif extension of the <code>Block</code> node.
  * 
  *  @see polyglot.ast.Block_c
  */
@@ -25,6 +24,7 @@ public class JifBlockExt extends JifStmtExt_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
         Block bs = (Block) node();
@@ -39,10 +39,9 @@ public class JifBlockExt extends JifStmtExt_c
 
         A = (JifContext) A.pushBlock();
 
-        List l = new ArrayList(bs.statements().size());
+        List<Stmt> l = new ArrayList<Stmt>(bs.statements().size());
 
-        for (Iterator i = bs.statements().iterator(); i.hasNext(); ) {
-            Stmt s = (Stmt) i.next();
+        for (Stmt s : bs.statements()) {
             s = (Stmt) lc.context(A).labelCheck(s);
             l.add(s);
 
@@ -51,7 +50,7 @@ public class JifBlockExt extends JifStmtExt_c
             // At this point, the environment A should have been extended
             // to include any declarations of s.  Reset the PC label.
             A.setPc(Xs.N(), lc);
-            
+
             if (Report.should_report(jif.Topics.pc, 1)) {
                 Report.report(1, "pc after statement at " + s.position() + " : " + A.pc().toString());
             }

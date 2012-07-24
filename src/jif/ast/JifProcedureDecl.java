@@ -1,9 +1,9 @@
 package jif.ast;
 
-import polyglot.ast.*;
-import java.util.*;
+import java.util.List;
 
 import jif.types.Assertion;
+import polyglot.ast.ProcedureDecl;
 
 /** An immutable representation of the Jif procedure declaration.
  *  It extends the Java procedure declaration with the start label,

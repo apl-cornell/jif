@@ -1,7 +1,9 @@
 package jif.types;
 
 import jif.types.label.Label;
-import polyglot.ast.*;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Formal;
+import polyglot.ast.ProcedureDecl;
 import polyglot.types.Type;
 import polyglot.util.Position;
 

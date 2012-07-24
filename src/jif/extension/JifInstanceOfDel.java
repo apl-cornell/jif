@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import jif.types.*;
+import jif.types.JifClassType;
+import jif.types.JifPolyType;
+import jif.types.JifSubstType;
+import jif.types.JifTypeSystem;
 import polyglot.ast.Instanceof;
 import polyglot.ast.Node;
-import polyglot.types.*;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>Cast</code> node.
@@ -23,6 +28,7 @@ public class JifInstanceOfDel extends JifJL_c
     public boolean isToSubstJifClass() { return this.isToSubstJifClass; }
 
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         // prevent instanceof to arrays of parameterized types
         Instanceof io = (Instanceof)this.node();
@@ -34,11 +40,11 @@ public class JifInstanceOfDel extends JifJL_c
 
         if (!ts.isParamsRuntimeRep(compareType)) {
             if ((compareType instanceof JifSubstType && !((JifSubstType)compareType).actuals().isEmpty()) ||
-                (compareType instanceof JifPolyType && !((JifPolyType)compareType).params().isEmpty()))                    
-            throw new SemanticException("Cannot perform instanceof on " + compareType +
-                                        ", since it does " +
-                                        "not represent the parameters at runtime.", 
-                                        io.position());
+                    (compareType instanceof JifPolyType && !((JifPolyType)compareType).params().isEmpty()))
+                throw new SemanticException("Cannot perform instanceof on " + compareType +
+                        ", since it does " +
+                        "not represent the parameters at runtime.",
+                        io.position());
         }
         if (compareType.isArray()) {
             throw new SemanticException("Jif does not currently support instanceof to arrays.", io.position());
@@ -55,14 +61,14 @@ public class JifInstanceOfDel extends JifJL_c
         return super.typeCheck(tc);
     }
     @Override
-    public List throwTypes(TypeSystem ts) {
-        List ex = new ArrayList(super.throwTypes(ts));
+    public List<Type> throwTypes(TypeSystem ts) {
+        List<Type> ex = new ArrayList<Type>(super.throwTypes(ts));
         Instanceof io = (Instanceof)this.node();
         if (io.compareType().type() instanceof JifClassType) {
             LabelTypeCheckUtil ltcu = ((JifTypeSystem)ts).labelTypeCheckUtil();
             ex.addAll(ltcu.throwTypes((JifClassType)io.compareType().type()));
         }
-        for(Iterator it = ex.iterator();it.hasNext();)
+        for (Iterator<Type> it = ex.iterator(); it.hasNext();)
             if(fatalExceptions.contains(it.next()))
                 it.remove();
         return ex;

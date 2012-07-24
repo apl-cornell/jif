@@ -11,10 +11,14 @@ public class TopPrincipal_c extends Principal_c implements TopPrincipal {
         super(ts, pos, new TopPrincipalToJavaExpr_c());
     }
     
+    @Override
     public boolean isTopPrincipal() { return true; }
+    @Override
     public boolean isRuntimeRepresentable() { return true; }
+    @Override
     public boolean isCanonical() { return true; }
     
+    @Override
     public String toString() {
         if (Report.should_report(Report.debug, 2)) {
             return "<top principal>";
@@ -22,11 +26,13 @@ public class TopPrincipal_c extends Principal_c implements TopPrincipal {
         return "*";
     }
     
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         return o instanceof TopPrincipal_c;
     }
     
+    @Override
     public int hashCode() {
         return 451212;
     }

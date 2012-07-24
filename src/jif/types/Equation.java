@@ -42,9 +42,12 @@ public abstract class Equation
      */
     public abstract Set<Variable> variables();
 
+    @Override
     public abstract int hashCode();
 
+    @Override
     public abstract boolean equals(Object o);
+    @Override
     public abstract String toString();
 
     /**

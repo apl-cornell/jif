@@ -1,6 +1,9 @@
 package jif.types;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.JoinLabel;
@@ -45,7 +48,9 @@ public class LabelEquation extends Equation
 
     public Label lhs() {return lhs;}
     public Label rhs() {return rhs;}
+    @Override
     public LabelEnv env() {return constraint().env();}
+    @Override
     public Position position() {return constraint().position();}
 
     public LabelConstraint labelConstraint() {
@@ -62,6 +67,7 @@ public class LabelEquation extends Equation
         return l;
     }
 
+    @Override
     public Object copy() {
         return new LabelEquation(lhs, rhs, (LabelConstraint)constraint);
     }
@@ -70,6 +76,7 @@ public class LabelEquation extends Equation
      * Return a <code>Set</code> of variables that occur in either the 
      * left or right hand side.
      */
+    @Override
     public Set variables() {
         Set l = new LinkedHashSet();
         l.addAll(lhs.variables());
@@ -77,8 +84,10 @@ public class LabelEquation extends Equation
         return l;
     }
 
+    @Override
     public int hashCode() { return lhs.hashCode() ^ rhs.hashCode(); }
 
+    @Override
     public boolean equals(Object o) {
         if (! (o instanceof LabelEquation)) {
             return false;
@@ -91,6 +100,7 @@ public class LabelEquation extends Equation
         return lhs.equals(eqn.lhs) && rhs.equals(eqn.rhs);
     }
 
+    @Override
     public String toString() {
         return lhs.toString() + " <= " + rhs.toString() + " in environment " +
         env() + " (produced from " + 
@@ -103,6 +113,7 @@ public class LabelEquation extends Equation
      * <code>lhs.subst(subst)</code> and <code>rhs.subst(subst)</code> 
      * respectively.
      */
+    @Override
     public void subst(LabelSubstitution subst) throws SemanticException {
         rhs = rhs.subst(subst);
         lhs = lhs.subst(subst);

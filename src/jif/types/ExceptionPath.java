@@ -1,6 +1,6 @@
 package jif.types;
 
-import polyglot.types.*;
+import polyglot.types.Type;
 
 /** The control flow path introduced by throwing a exception. 
  */

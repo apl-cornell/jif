@@ -4,13 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.ConstraintMessage;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.NamedLabel;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.ast.Assign;
+import polyglot.ast.Expr;
+import polyglot.ast.Local;
+import polyglot.ast.Node;
+import polyglot.types.LocalInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 
-/** The Jif extension of the <code>LocalAssign</code> node. 
+/** The Jif extension of the <code>LocalAssign</code> node.
  */
 public class JifLocalAssignExt extends JifAssignExt
 {
@@ -18,9 +28,10 @@ public class JifLocalAssignExt extends JifAssignExt
         super(toJava);
     }
 
+    @Override
     public Node labelCheckLHS(LabelChecker lc)
-    throws SemanticException
-    {
+            throws SemanticException
+            {
         final Assign assign = (Assign) node();
         Local lve = (Local) assign.left();
 
@@ -28,7 +39,8 @@ public class JifLocalAssignExt extends JifAssignExt
         JifContext A = lc.jifContext();
         A = (JifContext) lve.del().enterScope(A);
 
-        List throwTypes = new ArrayList(assign.del().throwTypes(ts));
+        List<Type> throwTypes =
+                new ArrayList<Type>(assign.del().throwTypes(ts));
 
         final LocalInstance li = lve.localInstance();
 
@@ -56,40 +68,44 @@ public class JifLocalAssignExt extends JifAssignExt
             X = Xr;
         }
 
-        lc.constrain(new NamedLabel("rhs.nv", 
-                                    "label of successful evaluation of right hand of assignment", 
-                                    X.NV()), 
-                    LabelConstraint.LEQ, 
-                    new NamedLabel("label of var " + li.name(), L),
-                    A.labelEnv(),
-                    lve.position(),
-                    new ConstraintMessage() {
+        lc.constrain(new NamedLabel("rhs.nv",
+                "label of successful evaluation of right hand of assignment",
+                X.NV()),
+                LabelConstraint.LEQ,
+                new NamedLabel("label of var " + li.name(), L),
+                A.labelEnv(),
+                lve.position(),
+                new ConstraintMessage() {
+            @Override
             public String msg() {
-                return "Label of right hand side not less " + 
-                "restrictive than the label for local variable " + 
-                li.name();
+                return "Label of right hand side not less " +
+                        "restrictive than the label for local variable " +
+                        li.name();
             }
-            public String detailMsg() { 
+            @Override
+            public String detailMsg() {
                 return "More information is revealed by the successful " +
-                "evaluation of the right hand side of the " +
-                "assignment than is allowed to flow to " +
-                "the local variable " + li.name() + ".";
+                        "evaluation of the right hand side of the " +
+                        "assignment than is allowed to flow to " +
+                        "the local variable " + li.name() + ".";
             }
+            @Override
             public String technicalMsg() {
                 return "Invalid assignment: path NV of rhs is " +
-                "not less restrictive than the declared label " +
-                "of the local variable <" + li.name() + ">.";
+                        "not less restrictive than the declared label " +
+                        "of the local variable <" + li.name() + ">.";
             }
 
         }
-        );
+                );
 
         Expr lhs = (Expr) updatePathMap(lve, X);
         checkThrowTypes(throwTypes);
-        return (Assign) updatePathMap(assign.right(rhs).left(lhs), X);
-    }
+        return updatePathMap(assign.right(rhs).left(lhs), X);
+            }
 
-    protected PathMap rhsPathMap(LabelChecker lc, Expr rhs, List throwTypes) {
+    protected PathMap rhsPathMap(LabelChecker lc, Expr rhs,
+            List<Type> throwTypes) {
         return getPathMap(rhs);
     }
 }

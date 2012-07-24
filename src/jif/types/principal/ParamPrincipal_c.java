@@ -22,14 +22,18 @@ public class ParamPrincipal_c extends Principal_c implements ParamPrincipal {
 	this.paramInstance = paramInstance;
     }
 
+    @Override
     public ParamInstance paramInstance() {
         return paramInstance;
     }
+    @Override
     public boolean isRuntimeRepresentable() { 
         return ((JifTypeSystem)ts).isParamsRuntimeRep(paramInstance.container()); 
     }
+    @Override
     public boolean isCanonical() { return true; }
 
+    @Override
     public String toString() {
         if (Report.should_report(Report.debug, 1)) {
             return "<param-" + paramInstance + ">";
@@ -37,6 +41,7 @@ public class ParamPrincipal_c extends Principal_c implements ParamPrincipal {
         return paramInstance.name();
     }
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
 	if (! (o instanceof ParamPrincipal)) {
@@ -47,10 +52,12 @@ public class ParamPrincipal_c extends Principal_c implements ParamPrincipal {
 	return this.paramInstance.equals(that.paramInstance());
     }
 
+    @Override
     public int hashCode() {
 	return paramInstance.hashCode();
     }
 
+    @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
         Label l;

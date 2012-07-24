@@ -2,13 +2,18 @@ package jif.extension;
 
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifLocalInstance;
+import jif.types.JifSubstType;
+import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
+import jif.types.SemanticDetailedException;
+import jif.types.TypeSubstitutor;
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
-import polyglot.types.ArrayType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
@@ -24,6 +29,7 @@ public class JifFormalExt extends Jif_c
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
         JifContext A = lc.jifContext();
 	A = (JifContext) node().del().enterScope(A);
@@ -88,6 +94,7 @@ public class JifFormalExt extends Jif_c
         /* 
          * Don't check subst types, as the subtype checker will take care of those.
          */
+        @Override
         protected boolean recurseIntoSubstType(JifSubstType type) {
             return false;
         }
@@ -108,6 +115,7 @@ public class JifFormalExt extends Jif_c
         FormalVarianceLabelChecker(Position declPosition) {
             this.declPosition = declPosition;
         }
+        @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L.isCovariant()) {
                 throw new SemanticDetailedException("Covariant labels cannot occur in the type of formal arguments.",

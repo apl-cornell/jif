@@ -4,12 +4,12 @@ import java.util.Collections;
 import java.util.List;
 
 import polyglot.ast.Throw;
-import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CollectionUtil;
 
 /** Jif extension of the <code>Throw</code> node.
- *  
+ * 
  *  @see polyglot.ast.Throw
  */
 public class JifThrowDel extends JifJL_c
@@ -30,16 +30,16 @@ public class JifThrowDel extends JifJL_c
     public boolean thrownIsNeverNull() {
         return isThrownNeverNull;
     }
-    
-    /** 
+
+    /**
      *  List of Types of exceptions that might get thrown.
      * 
      * This differs from the method defined in Throw_c in that it does not
-     * throw a null pointer exception if the thrown object is guaranteed to be 
+     * throw a null pointer exception if the thrown object is guaranteed to be
      * non-null
      */
     @Override
-    public List throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts) {
         Throw t = (Throw)node();
 
         // if the exception that a throw statement is given to throw is null,

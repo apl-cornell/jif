@@ -4,7 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import jif.ast.AmbNewArray;
-import polyglot.ast.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Labeled;
+import polyglot.ast.NewArray;
+import polyglot.ast.Prefix;
+import polyglot.ast.Receiver;
 import polyglot.util.Position;
 
 /**

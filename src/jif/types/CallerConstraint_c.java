@@ -19,16 +19,19 @@ public class CallerConstraint_c extends TypeObject_c implements CallerConstraint
 	this.principals = ListUtil.copy(principals, true);
     }
 
+    @Override
     public CallerConstraint principals(List principals) {
 	CallerConstraint_c n = (CallerConstraint_c) copy();
 	n.principals = ListUtil.copy(principals, true);
 	return n;
     }
 
+    @Override
     public List principals() {
 	return principals;
     }
 
+    @Override
     public String toString() {
 	String s = "caller(";
 	for (Iterator i = principals.iterator(); i.hasNext(); ) {
@@ -42,6 +45,7 @@ public class CallerConstraint_c extends TypeObject_c implements CallerConstraint
 	return s;
     }
 
+    @Override
     public boolean isCanonical() {
 	return true;
     }

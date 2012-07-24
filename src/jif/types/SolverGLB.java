@@ -57,6 +57,7 @@ public class SolverGLB extends AbstractSolver {
      * because modifying (upwards) the bounds on these variables may cause eqn
      * to no longer be satisfied.
      */
+    @Override
     protected void addDependencies(Equation eqn) {
         // Build dependency maps for this equation.
         Set changeable, awakeable;
@@ -90,6 +91,7 @@ public class SolverGLB extends AbstractSolver {
     /**
      * The default bound of label variables in this solver is bottom
      */
+    @Override
     protected Label getDefaultLabelBound() {
         return ts.bottomLabel();
     }
@@ -97,6 +99,7 @@ public class SolverGLB extends AbstractSolver {
     /**
      * The default bound of label variables in this solver is bottom
      */
+    @Override
     protected Principal getDefaultPrincipalBound() {
         return ts.bottomPrincipal(Position.compilerGenerated());
     }
@@ -113,6 +116,7 @@ public class SolverGLB extends AbstractSolver {
      * performs a search, attempting to refine each variable in turn, and then
      * recursively attempting to solve the set of equations.
      */
+    @Override
     protected void solve_eqn(LabelEquation eqn) throws SemanticException {
         // there are occurrences of variables on the RHS of the equation
         // there may be a join of components on the RHS of the equation.
@@ -215,6 +219,7 @@ public class SolverGLB extends AbstractSolver {
 
     }
 
+    @Override
     protected void solve_eqn(PrincipalEquation eqn) throws SemanticException {
         if (!eqn.lhs().hasVariables()) {
             // the LHS has no variable components in it, it has nothing for us to
@@ -532,6 +537,7 @@ public class SolverGLB extends AbstractSolver {
         /**
      * Find a contradicting equation.
      */
+    @Override
     protected Equation findContradictiveEqn(LabelConstraint c) {
         if (c.lhsLabel().variableComponents().size() == 1) {
             // The LHS is has a single VarLabel, so we may be able to find

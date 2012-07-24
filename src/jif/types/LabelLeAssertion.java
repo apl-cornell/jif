@@ -1,9 +1,9 @@
 package jif.types;
 
-import polyglot.ast.Expr;
-import polyglot.types.SemanticException;
 import jif.translate.JifToJavaRewriter;
 import jif.types.label.Label;
+import polyglot.ast.Expr;
+import polyglot.types.SemanticException;
 
 public interface LabelLeAssertion extends Assertion
 {

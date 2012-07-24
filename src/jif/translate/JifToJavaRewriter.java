@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.tools.JavaFileObject;
 import javax.tools.JavaFileManager.Location;
+import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 
 import jif.ast.Jif;
@@ -18,7 +18,17 @@ import jif.types.JifTypeSystem;
 import jif.types.Param;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
-import polyglot.ast.*;
+import polyglot.ast.Block;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.Expr;
+import polyglot.ast.Import;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.SourceCollection;
+import polyglot.ast.SourceFile;
+import polyglot.ast.Stmt;
+import polyglot.ast.TopLevelDecl;
+import polyglot.ast.TypeNode;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Job;
 import polyglot.frontend.Source;

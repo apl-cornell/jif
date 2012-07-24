@@ -4,15 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.JifClassType;
+import jif.types.JifConstructorInstance;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
 import jif.visit.LabelChecker;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.Node;
 import polyglot.types.ClassType;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 
-/** The Jif extension of the <code>ConstructorCall</code> node. 
+/** The Jif extension of the <code>ConstructorCall</code> node.
  * 
  *  @see polyglot.ast.ConstructorCall
  */
@@ -24,6 +28,7 @@ public class JifConstructorCallExt extends JifStmtExt_c
 
     protected ConstructorChecker constructorChecker = new ConstructorChecker();
 
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException
     {
         ConstructorCall ccs = (ConstructorCall) node();
@@ -31,7 +36,7 @@ public class JifConstructorCallExt extends JifStmtExt_c
         JifContext A = lc.jifContext();
         JifTypeSystem ts = lc.typeSystem();
 
-        List throwTypes = new ArrayList(ccs.del().throwTypes(ts)); 
+        List<Type> throwTypes = new ArrayList<Type>(ccs.del().throwTypes(ts));
         A = (JifContext) ccs.del().enterScope(A);
 
         JifConstructorInstance ci = (JifConstructorInstance)ccs.constructorInstance();
@@ -43,13 +48,13 @@ public class JifConstructorCallExt extends JifStmtExt_c
         }
         if (ccs.qualifier() != null) {
             throw new InternalCompilerError(
-            "Qualified constructor calls are not supported in Jif.");
+                    "Qualified constructor calls are not supported in Jif.");
         }
 
         constructorChecker.checkConstructorAuthority(ct, A, lc, ccs.position());
 
-        CallHelper helper = lc.createCallHelper(jct.thisLabel(), ct, ci, 
-                                           ccs.arguments(), node().position());
+        CallHelper helper = lc.createCallHelper(jct.thisLabel(), ct, ci,
+                ccs.arguments(), node().position());
 
         helper.checkCall(lc.context(A), throwTypes, false);
 

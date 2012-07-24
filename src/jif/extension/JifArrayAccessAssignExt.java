@@ -4,14 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jif.translate.ToJavaExt;
-import jif.types.*;
+import jif.types.ConstraintMessage;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.LabelConstraint;
+import jif.types.NamedLabel;
+import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.ast.ArrayAccess;
+import polyglot.ast.ArrayAccessAssign;
+import polyglot.ast.Assign;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.types.ArrayType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 
-/** The Jif extension of the <code>ArrayAccessAssign</code> node. 
+/** The Jif extension of the <code>ArrayAccessAssign</code> node.
  */
 public class JifArrayAccessAssignExt extends JifAssignExt
 {
@@ -19,20 +30,20 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         super(toJava);
     }
 
-    public Node labelCheckLHS(LabelChecker lc)
-    throws SemanticException
-    {
+    @Override
+    public Node labelCheckLHS(LabelChecker lc) throws SemanticException {
         ArrayAccessAssign assign = (ArrayAccessAssign)node();
         final ArrayAccess aie = (ArrayAccess) assign.left();
         JifContext A = lc.jifContext();
         A = (JifContext) aie.del().enterScope(A);
         JifTypeSystem ts = lc.jifTypeSystem();
 
-        List throwTypes = new ArrayList(assign.del().throwTypes(ts));
+        List<Type> throwTypes =
+                new ArrayList<Type>(assign.del().throwTypes(ts));
 
         if (assign.left() != aie) {
             throw new InternalCompilerError(aie +
-                                            " is not the left hand side of " + assign);
+                    " is not the left hand side of " + assign);
         }
 
         Type npe = ts.NullPointerException();
@@ -58,7 +69,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt
             if (!((JifArrayAccessDel)assign.left().del()).arrayIsNeverNull()) {
                 // a null pointer exception may be thrown
                 checkAndRemoveThrowType(throwTypes, npe);
-                Xlhs = Xlhs.exc(lc.upperBound(Xarr.NV(), Xind.N()), npe);             
+                Xlhs = Xlhs.exc(lc.upperBound(Xarr.NV(), Xind.N()), npe);
             }
             if (((JifArrayAccessDel)assign.left().del()).outOfBoundsExcThrown()) {
                 // an out of bounds exception may be thrown
@@ -79,21 +90,21 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         PathMap X = Xlhs.join(Xrhs);
 
         if (assign.operator() != Assign.ASSIGN) {
-            // the normal value include the value that was already in the array 
+            // the normal value include the value that was already in the array
             X = X.NV(lc.upperBound(La, X.NV()));
 
             if (((JifAssignDel)assign.del()).throwsArithmeticException()) {
                 checkAndRemoveThrowType(throwTypes, are);
                 X = X.exc(Xrhs.NV(), are);
             }
-            Xrhs = X; // the value computed to store in the array actually depends on everything computed so far 
+            Xrhs = X; // the value computed to store in the array actually depends on everything computed so far
         }
         else {
             // at this point here, for an = assignment, evaluation may decide to throw a NPE or OOB
             if (!((JifArrayAccessDel)assign.left().del()).arrayIsNeverNull()) {
                 // a null pointer exception may be thrown
                 checkAndRemoveThrowType(throwTypes, npe);
-                X = X.exc(lc.upperBound(Xarr.NV(), X.N()), npe);             
+                X = X.exc(lc.upperBound(Xarr.NV(), X.N()), npe);
             }
             if (((JifArrayAccessDel)assign.left().del()).outOfBoundsExcThrown()) {
                 // an out of bounds exception may be thrown
@@ -108,84 +119,91 @@ public class JifArrayAccessAssignExt extends JifAssignExt
         }
 
         NamedLabel namedLa = new NamedLabel("La",
-                                            "Label of the array base type",
-                                            La);
-        lc.constrain(new NamedLabel("rhs.nv", 
-                                    "label of successful evaluation of right hand of assignment",
-                                    Xrhs.NV()).
-                                    join(lc, 
-                                         "lhs.n", 
-                                         "label of successful evaluation of array access " + aie,
-                                         X.N()), 
-                     LabelConstraint.LEQ, 
-                     namedLa,
-                     A.labelEnv(),
-                     aie.position(),
-                     new ConstraintMessage() {
+                "Label of the array base type",
+                La);
+        lc.constrain(new NamedLabel("rhs.nv",
+                "label of successful evaluation of right hand of assignment",
+                Xrhs.NV()).
+                join(lc,
+                        "lhs.n",
+                        "label of successful evaluation of array access " + aie,
+                        X.N()),
+                        LabelConstraint.LEQ,
+                        namedLa,
+                        A.labelEnv(),
+                        aie.position(),
+                        new ConstraintMessage() {
+            @Override
             public String msg() {
                 return "Label of succesful evaluation of array " +
-                "access and right hand side of the " +
-                "assignment is not less restrictive than " +
-                "the label for the array base type.";
+                        "access and right hand side of the " +
+                        "assignment is not less restrictive than " +
+                        "the label for the array base type.";
             }
-            public String detailMsg() { 
+            @Override
+            public String detailMsg() {
                 return "More information may be revealed by the successul " +
-                "evaluation of the array access " + aie + 
-                " and the right hand side of the assignment " +
-                "than is allowed to flow to elements of the " + 
-                "array. Elements of the array can only " +
-                "contain information up to the label of the " +
-                "array base type, La.";
+                        "evaluation of the array access " + aie +
+                        " and the right hand side of the assignment " +
+                        "than is allowed to flow to elements of the " +
+                        "array. Elements of the array can only " +
+                        "contain information up to the label of the " +
+                        "array base type, La.";
             }
+            @Override
             public String technicalMsg() {
-                return "Invalid assignment: " + namedLhs().toString() + 
-                " is not less restrictive than the label of " +
-                "array element.";
-            }                     
+                return "Invalid assignment: " + namedLhs().toString() +
+                        " is not less restrictive than the label of " +
+                        "array element.";
+            }
         }
-        );
+                );
 
-        lc.constrain(new NamedLabel("Li", 
-                                    "Lower bound for side-effects", 
-                                    A.currentCodePCBound()), 
-                    LabelConstraint.LEQ, 
-                    namedLa,
-                    A.labelEnv(),
-                    aie.position(),
-                    new ConstraintMessage() {
+        lc.constrain(new NamedLabel("Li",
+                "Lower bound for side-effects",
+                A.currentCodePCBound()),
+                LabelConstraint.LEQ,
+                namedLa,
+                A.labelEnv(),
+                aie.position(),
+                new ConstraintMessage() {
+            @Override
             public String msg() {
-                return "Effect of assignment to array " + array + 
-                " is not bounded below by the PC bound.";
+                return "Effect of assignment to array " + array +
+                        " is not bounded below by the PC bound.";
             }
-            public String detailMsg() { 
-                return "Assignment to the array " + array + 
-                " is a side effect which reveals more" +
-                " information than this method is allowed" +
-                " to; the side effects of this method must" +
-                " be bounded below by the method's PC" +
-                " bound, Li.";
+            @Override
+            public String detailMsg() {
+                return "Assignment to the array " + array +
+                        " is a side effect which reveals more" +
+                        " information than this method is allowed" +
+                        " to; the side effects of this method must" +
+                        " be bounded below by the method's PC" +
+                        " bound, Li.";
             }
+            @Override
             public String technicalMsg() {
                 return "Invalid assignment: Li is more " +
-                "restrictive than array base label.";
+                        "restrictive than array base label.";
             }
 
         }
-        );
+                );
 
         Expr lhs = (Expr) updatePathMap(aie.index(index).array(array), X);
 
         checkThrowTypes(throwTypes);
-        return (Assign) updatePathMap(assign.right(rhs).left(lhs), X);
+        return updatePathMap(assign.right(rhs).left(lhs), X);
     }
 
-    protected PathMap rhsPathMap(LabelChecker checker, Expr rhs, List throwTypes) {
+    protected PathMap rhsPathMap(LabelChecker checker, Expr rhs,
+            List<Type> throwTypes) {
         return getPathMap(rhs);
     }
 
-    private Label arrayBaseLabel(Expr array, JifTypeSystem ts) {        
+    private Label arrayBaseLabel(Expr array, JifTypeSystem ts) {
         ArrayType arrayType = (ArrayType)ts.unlabel(array.type());
-        return ts.labelOfType(arrayType.base());	
+        return ts.labelOfType(arrayType.base());
     }
 
 }

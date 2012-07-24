@@ -5,14 +5,20 @@ import java.util.List;
 
 import jif.ast.JifInstantiator;
 import jif.ast.JifNodeFactory;
-import jif.ast.JifNodeFactory_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
-import polyglot.ast.*;
+import polyglot.ast.Assign;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.FieldAssign;
+import polyglot.ast.IntLit;
+import polyglot.ast.Node;
+import polyglot.ast.Receiver;
+import polyglot.ast.Special;
 import polyglot.types.FieldInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
@@ -20,7 +26,7 @@ import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
-/** The Jif extension of the <code>Field</code> node. 
+/** The Jif extension of the <code>Field</code> node.
  * 
  *  @see polyglot.ast.Field
  */
@@ -36,8 +42,8 @@ public class JifFieldExt extends JifExprExt
         lc.nodeFactory();
         Field fe = (Field) node();
         Position pos = fe.position();
-        FieldAssign fae = nf.FieldAssign(pos, fe, Assign.ADD_ASSIGN, 
-                                         nf.IntLit(pos, IntLit.INT, 1));
+        FieldAssign fae = nf.FieldAssign(pos, fe, Assign.ADD_ASSIGN,
+                nf.IntLit(pos, IntLit.INT, 1));
 
 
         fae = (FieldAssign)lc.labelCheck(fae);
@@ -78,7 +84,7 @@ public class JifFieldExt extends JifExprExt
 
 	PathMap X = Xe.join(Xr);
 
-	if (target instanceof Special) 
+	if (target instanceof Special)
 	    X = Xr;
 
 	// Must be done after visiting target to get PC right.
@@ -93,15 +99,15 @@ public class JifFieldExt extends JifExprExt
 	if (target instanceof Special && lc.checkingInits()) {
 	    Label Lr = lc.constructorReturnLabel();
 	    Label Li = A.entryPC();
-            if (Lr != null) 
+            if (Lr != null)
 		L = L.join(Lr);
 	    if (Li != null)
 		L = L.join(Li);
-	}	
+	}
 
-	lc.constrainLE(X.NV(), L, fe.position(), 
+	lc.constrainLE(X.NV(), L, fe.position(),
 		       "Invalid increment: NV of the field container or PC is "
-		       + "more restrictive than the label of field " 
+		       + "more restrictive than the label of field "
 		       + fi.name() + ".");
 
 	return X(fe, X);
@@ -110,6 +116,7 @@ public class JifFieldExt extends JifExprExt
     /** label check the field access.
      *  Refer to Andrew's thesis, Figure 4.18
      */
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         JifContext A = lc.jifContext();
@@ -119,10 +126,10 @@ public class JifFieldExt extends JifExprExt
         Receiver target = checkTarget(lc, fe);
         PathMap Xe = getPathMap(target);
 
-        List throwTypes = new ArrayList(fe.del().throwTypes(ts));
+        List<Type> throwTypes = new ArrayList<Type>(fe.del().throwTypes(ts));
 
         if (! ((JifFieldDel)node().del()).targetIsNeverNull()) {
-            // null pointer exception may be thrown. 
+            // null pointer exception may be thrown.
             Type npe = ts.NullPointerException();
             checkAndRemoveThrowType(throwTypes, npe);
             Xe = Xe.exc(Xe.NV(), npe);
@@ -136,7 +143,7 @@ public class JifFieldExt extends JifExprExt
         ReferenceType targetType = targetType(ts, A, target, fe);
         FieldInstance fi = ts.findField(targetType, fe.name());
         fe = fe.fieldInstance(fi);
-        
+
         Label L = ts.labelOfField(fi, A.pc());
 
         if (target instanceof Expr) {
@@ -144,7 +151,7 @@ public class JifFieldExt extends JifExprExt
 
             L = JifInstantiator.instantiate(L, A, (Expr)target, targetType, objLabel);
 
-            Type ft = JifInstantiator.instantiate(fi.type(), A, (Expr)target, targetType, objLabel); 
+            Type ft = JifInstantiator.instantiate(fi.type(), A, (Expr)target, targetType, objLabel);
 
             fe = (Field)fe.type(ft);
         }
@@ -155,28 +162,28 @@ public class JifFieldExt extends JifExprExt
         return updatePathMap(fe.target(target), X);
     }
 
-    static protected Receiver checkTarget(LabelChecker lc, Field fe) 
-    throws SemanticException
-    {
+    static protected Receiver checkTarget(LabelChecker lc, Field fe)
+            throws SemanticException
+            {
         JifTypeSystem ts = lc.jifTypeSystem();
 
         if (! (fe.target() instanceof Expr)) {
             JifContext A = lc.context();
             return (Receiver) updatePathMap(fe.target(), ts.pathMap().N(A.pc()).NV(A.pc()));
-        }		
+        }
 
         Expr target = (Expr) lc.labelCheck(fe.target());
         return target;
-    }
+            }
 
-    static protected ReferenceType targetType(JifTypeSystem ts, JifContext A, 
-            Receiver target, Field fe) 
+    static protected ReferenceType targetType(JifTypeSystem ts, JifContext A,
+            Receiver target, Field fe)
     {
         String name = fe.name();
         ReferenceType rt = A.currentClass();
         if (target instanceof Special) {
             Special st = (Special) target;
-            if (st.kind() == Special.SUPER) 
+            if (st.kind() == Special.SUPER)
                 rt = (ReferenceType) A.currentClass().superType();
             else {
                 /*boolean found = false;
@@ -188,7 +195,7 @@ public class JifFieldExt extends JifExprExt
                             break;
                         }
                     }
-                    if (found) 
+                    if (found)
                         break;
 
                     rt = (ReferenceType) rt.superType();
@@ -199,7 +206,7 @@ public class JifFieldExt extends JifExprExt
                 }
                 catch (SemanticException x) {
                     throw new InternalCompilerError("Cannot find the field "
-                                                    + name + " in " + rt, x);
+                            + name + " in " + rt, x);
                 }
             }
         }

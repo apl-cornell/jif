@@ -1,6 +1,11 @@
 package jif.parse;
 
-import polyglot.ast.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Id;
+import polyglot.ast.PackageNode;
+import polyglot.ast.Prefix;
+import polyglot.ast.Receiver;
+import polyglot.ast.TypeNode;
 import polyglot.util.Position;
 
 /**

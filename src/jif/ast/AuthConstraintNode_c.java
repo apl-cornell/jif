@@ -1,6 +1,9 @@
 package jif.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import jif.types.AuthConstraint;
 import jif.types.AuthConstraint_c;
@@ -8,8 +11,14 @@ import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
 
 /** An implementation of the <code>AuthConstraintNode</code> interface.
  */

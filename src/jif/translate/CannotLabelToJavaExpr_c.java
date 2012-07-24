@@ -6,8 +6,9 @@ import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 
 public class CannotLabelToJavaExpr_c extends LabelToJavaExpr_c {
+    @Override
     public Expr toJava(Label L, JifToJavaRewriter rw) throws SemanticException {
         throw new InternalCompilerError(L.position(),
-                                        "Cannot translate " + L + " to Java.");
+                "Cannot translate " + L + " to Java.");
     }
 }

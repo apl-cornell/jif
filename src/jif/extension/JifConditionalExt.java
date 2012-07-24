@@ -1,6 +1,5 @@
 package jif.extension;
 
-import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
@@ -22,6 +21,7 @@ public class JifConditionalExt extends JifExprExt
         super(toJava);
     }
 
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException
     {
         Conditional te = (Conditional) node();

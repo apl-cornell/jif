@@ -1,6 +1,10 @@
 package jif.types;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 import jif.types.label.Label;
 import jif.types.label.NotTaken;
