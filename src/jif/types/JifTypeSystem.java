@@ -61,14 +61,14 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
      * "jif.lang.Principal". In languages that extend Jif, this may be different.
      */
     String PrincipalClassName();
-    
+
     /**
      * Returns the name of the PrincipalUtil class. In Jif, this is
      * "jif.lang.PrincipalUtil". In languages that extend Jif, this may be
      * different.
      */
     String PrincipalUtilClassName();
-    
+
     /**
      * Returns the name of the "label" type. In Jif, this is
      * "jif.lang.Label". In languages that extend Jif, this may be different.
@@ -89,22 +89,22 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
 
     /** Returns the "principal" type. */
     PrimitiveType Principal();
-    
+
     /** Returns the class jif.lang.Principal. */
     Type PrincipalClass();
 
     /** Returns a labeled type, type{label}. */
     LabeledType labeledType(Position pos, Type type, Label label);
 
-    ClassType nullInstantiate(Position pos, PClass pc);
-    
+    ClassType nullInstantiate(Position pos, PClass<ParamInstance, Param> pc);
+
     /** Constructs a parameter instance for a class parameter declaration */
     ParamInstance paramInstance(Position pos, JifClassType container,
-				ParamInstance.Kind kind, String name);
+            ParamInstance.Kind kind, String name);
 
     /** Constructs a principal instance for an external principal. */
     PrincipalInstance principalInstance(Position pos,
-	                                ExternalPrincipal principal);
+            ExternalPrincipal principal);
 
     /* constant array constructors */
     ConstArrayType constArrayOf(Type type);
@@ -116,7 +116,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
     ConstArrayType constArrayOf(Position pos, Type type, int dims);
     ConstArrayType constArrayOf(Position position, Type type, int dims, boolean castableToNonConst);
     ConstArrayType constArrayOf(Position position, Type type, int dims, boolean castableToNonConst, boolean recurseIntoBaseType);
-    
+
     JifMethodInstance jifMethodInstance(Position pos,
             ReferenceType container,
             Flags flags,
@@ -129,7 +129,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
             boolean isDefaultEndLabel,
             List<? extends Type> excTypes,
             List<Assertion> constraints);
-    
+
     /** Tests if the type is "principal". */
     boolean isPrincipal(Type t);
 
@@ -184,18 +184,18 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
      * callers should use providerLabel(Position, JifClassType).
      */
     ProviderLabel providerLabel(JifClassType ct);
-    
+
     /**
      * @return a label representing the provider of the given class type.
      */
     ProviderLabel providerLabel(Position position, JifClassType ct);
-    
+
     /**
      * @return the label representing public, untrusted information
      *         ({⊥→⊥;⊥←⊥}).
      */
     Label noComponentsLabel(Position pos);
-    
+
     Label notTaken(Position pos);
 
     /**
@@ -209,7 +209,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
      *         ({⊥→⊥;⊤←⊤}).
      */
     Label bottomLabel();
-    
+
     /**
      * @return the label representing public, untrusted information
      *         ({⊥→⊥;⊥←⊥}).
@@ -252,13 +252,13 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
      *         (⊤→⊤).
      */
     ConfPolicy topConfPolicy(Position pos);
-    
+
     /**
      * @return the integrity policy representing untrusted information (⊥←⊥).
      */
     IntegPolicy topIntegPolicy(Position pos);
 
-    
+
     /** Returns true iff L1 <= L2 in the empty environment. */
     boolean leq(Label L1, Label L2);
 
@@ -283,10 +283,10 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
     ConfPolicy meet(ConfPolicy p1, ConfPolicy p2);
     IntegPolicy join(IntegPolicy p1, IntegPolicy p2);
     IntegPolicy meet(IntegPolicy p1, IntegPolicy p2);
-    
+
     ConfPolicy confProjection(Label L);
     IntegPolicy integProjection(Label L);
-    
+
     /** Construct an acts-for constraint. */
     <Actor extends ActsForParam, Granter extends ActsForParam> ActsForConstraint<Actor, Granter> actsForConstraint(
             Position pos, Actor actor, Granter granter, boolean isEquiv);
@@ -326,12 +326,12 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
      * is just a jif signature for a java class).
      */
     boolean isJifClass(Type t);
-    
+
     /**
      * Returns true if the type is a Jif class, or if it is a non-Jif class
      * that represents parameters at runtime.
      */
-    boolean isParamsRuntimeRep(Type t);    
+    boolean isParamsRuntimeRep(Type t);
 
 
     /**
@@ -364,7 +364,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
 
     /** Returns a new label constraint system solver. */
     Solver createSolver(String solverName);
-    
+
     LabelEnv createLabelEnv();
 
     DefaultSignature defaultSignature();
@@ -386,7 +386,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
     boolean isMarkerFieldName(String s);
 
     /**
-     *  Should this exception be promoted to a fatal error? 
+     *  Should this exception be promoted to a fatal error?
      */
     boolean promoteToFatal(Type t);
 

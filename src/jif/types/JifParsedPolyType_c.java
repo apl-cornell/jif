@@ -21,7 +21,7 @@ import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
-/** An implementation of the <code>JifParsedPolyType</code> interface. 
+/** An implementation of the <code>JifParsedPolyType</code> interface.
  */
 public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedPolyType
 {
@@ -29,24 +29,24 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
     List<Principal> authority;
     List<Assertion> constraints;
     ProviderLabel provider;
-    
-    PClass instantiatedFrom;
+
+    PClass<ParamInstance, Param> instantiatedFrom;
 
     /**
      * Used for deserializing types.
      */
     protected JifParsedPolyType_c() {
-	super();
-	this.params = new LinkedList<ParamInstance>();
-	this.authority = new LinkedList<Principal>();
-	this.constraints = new LinkedList<Assertion>();
+        super();
+        this.params = new LinkedList<ParamInstance>();
+        this.authority = new LinkedList<Principal>();
+        this.constraints = new LinkedList<Assertion>();
         this.provider = null;
         this.instantiatedFrom = null;
     }
 
-    public JifParsedPolyType_c(JifTypeSystem ts, LazyClassInitializer init, 
-                               Source fromSource) {
-	super(ts, init, fromSource);
+    public JifParsedPolyType_c(JifTypeSystem ts, LazyClassInitializer init,
+            Source fromSource) {
+        super(ts, init, fromSource);
         this.params = new LinkedList<ParamInstance>();
         this.authority = new LinkedList<Principal>();
         this.constraints = new LinkedList<Assertion>();
@@ -60,12 +60,12 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
     }
 
     @Override
-    public PClass instantiatedFrom() {
+    public PClass<ParamInstance, Param> instantiatedFrom() {
         return instantiatedFrom;
     }
 
     @Override
-    public void setInstantiatedFrom(PClass pc) {
+    public void setInstantiatedFrom(PClass<ParamInstance, Param> pc) {
         this.instantiatedFrom = pc;
     }
 
@@ -104,11 +104,11 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
     @Override
     public List<Principal> constructorCallAuthority() {
         List<Principal> l = new ArrayList<Principal>(authority.size());
-        
+
         for (Principal p : authority) {
             if (p instanceof ParamPrincipal) {
                 // p is a parameter principal.
-                l.add(p);                            
+                l.add(p);
             }
         }
         return l;
@@ -116,7 +116,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 
     @Override
     public List<ParamInstance> params() {
-	return params;
+        return params;
     }
 
     @Override
@@ -133,7 +133,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
             }
             else if (pi.isLabel()) {
                 ParamLabel pl = ts.paramLabel(posi, pi);
-                pl.setDescription("label parameter " + pi.name() + " of class " + pi.container().fullName());                
+                pl.setDescription("label parameter " + pi.name() + " of class " + pi.container().fullName());
                 actuals.add(pl);
             }
             else {
@@ -143,34 +143,34 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
 
         return actuals;
     }
-    
+
     @Override
     public ThisLabel thisLabel() {
         return ((JifTypeSystem)ts).thisLabel(this);
     }
-    
+
     @Override
     public ThisLabel thisLabel(Position p) {
-	return ((JifTypeSystem)ts).thisLabel(p, this);
+        return ((JifTypeSystem)ts).thisLabel(p, this);
     }
 
     @Override
     public void addMemberClass(ClassType t) {
-	throw new InternalCompilerError("Jif does not support inner classes.");
+        throw new InternalCompilerError("Jif does not support inner classes.");
     }
 
     @Override
-    public void setParams(List params) {
+    public void setParams(List<ParamInstance> params) {
         this.params = new LinkedList<ParamInstance>(params);
     }
 
     @Override
-    public void setAuthority(List principals) {
+    public void setAuthority(List<Principal> principals) {
         this.authority = new LinkedList<Principal>(principals);
     }
     @Override
     public List<Assertion> constraints() {
-    	return constraints;
+        return constraints;
     }
 
     @Override
@@ -186,7 +186,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
             return "<unknown class " + name + ">";
         }
 
-	String s = "";
+        String s = "";
 
         if (params != null) {
             for (Iterator<ParamInstance> i = params.iterator(); i.hasNext(); ) {
@@ -199,15 +199,15 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
             }
         }
 
-	if (! s.equals("")) {
-	    s = "[" + s + "]";
-	}
+        if (! s.equals("")) {
+            s = "[" + s + "]";
+        }
 
         if (package_() != null) {
-	    return package_().toString() + "." + name + s;
-	}
+            return package_().toString() + "." + name + s;
+        }
 
-	return name + s;
+        return name + s;
     }
 
     @Override
@@ -218,24 +218,24 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedP
     @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof JifPolyType) {
-	    JifPolyType t = (JifPolyType) o;
+            JifPolyType t = (JifPolyType) o;
 
-	    if (package_() != null && t.package_() != null) {
-		return package_().equals(t.package_())
-		    && name.equals(t.name())
-		    && flags.equals(t.flags())
-		    && params.equals(t.params())
-		    && authority.equals(t.authority());
-	    }
-	    else if (package_() == t.package_()) {
-		return name.equals(t.name())
-		    && flags.equals(t.flags())
-		    && params.equals(t.params())
-		    && authority.equals(t.authority());
-	    }
-	}
+            if (package_() != null && t.package_() != null) {
+                return package_().equals(t.package_())
+                        && name.equals(t.name())
+                        && flags.equals(t.flags())
+                        && params.equals(t.params())
+                        && authority.equals(t.authority());
+            }
+            else if (package_() == t.package_()) {
+                return name.equals(t.name())
+                        && flags.equals(t.flags())
+                        && params.equals(t.params())
+                        && authority.equals(t.authority());
+            }
+        }
 
-	return false;
+        return false;
     }
 
     @Override

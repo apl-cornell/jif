@@ -18,15 +18,15 @@ public class ProviderLabel_c extends Label_c implements ProviderLabel {
      * The class that this is labelling.
      */
     protected JifClassType classType;
-    
+
     protected boolean isTrusted;
-    
+
     public ProviderLabel_c(JifClassType classType, LabelToJavaExpr toJava) {
         super(classType.typeSystem(), classType.position(), toJava);
         this.classType = classType;
         this.isTrusted = ((JifOptions) Options.global).trustedProviders;
     }
-    
+
     @Override
     public ProviderLabel position(Position pos) {
         ProviderLabel_c copy = (ProviderLabel_c) copy();
@@ -98,16 +98,17 @@ public class ProviderLabel_c extends Label_c implements ProviderLabel {
         return isCanonical();
     }
 
-    public String toString(Set printedLabels) {
+    @Override
+    public String toString(Set<Label> printedLabels) {
         return componentString(printedLabels);
     }
-    
+
     @Override
     public String componentString(Set<Label> printedLabels) {
         if (Report.should_report(Report.debug, 1)) {
             return "<provider " + classType.fullName() + ">";
         }
-        
+
         return classType.fullName() + ".provider";
     }
 
@@ -115,7 +116,7 @@ public class ProviderLabel_c extends Label_c implements ProviderLabel {
     public boolean equalsImpl(TypeObject t) {
         if (this == t) return true;
         if (!(t instanceof ProviderLabel_c)) return false;
-        
+
         ProviderLabel_c that = (ProviderLabel_c) t;
         return classType.equals(that.classType);
     }

@@ -12,43 +12,55 @@ import polyglot.util.InternalCompilerError;
 /**
  * The class is a simple Label visitor. It can be used to substitute and check
  * labels and principals. All labels and principals implement a method
- * <code>subst(LabelSubstitution)</code>. 
+ * <code>subst(LabelSubstitution)</code>.
  * 
  * <p>In addition, the LabelSubstitution keeps a stack of labels, to record which
  * labels it is in the middle of processing. Labels that recurse on nested
  * labels must push themselves onto the stack before the recursive call,
  * and pop themselves off the stack after the recursive call. Prior to pushing
- * themselves on the stack, labels should examine the stack to see if they 
+ * themselves on the stack, labels should examine the stack to see if they
  * already exist in the stack; if so, then the label should not make a recursive
- * call, in order to avoid an infinite loop. 
+ * call, in order to avoid an infinite loop.
  * 
  * @see jif.types.label.Label#subst(LabelSubstitution)
  */
 public abstract class LabelSubstitution {
+    /**
+     * @throws SemanticException
+     */
     public Label substLabel(Label L) throws SemanticException {
         return L;
     }
+
+    /**
+     * @throws SemanticException
+     */
     public Policy substPolicy(Policy p) throws SemanticException {
         return p;
     }
+
+    /**
+     * @throws SemanticException
+     */
     public Principal substPrincipal(Principal p) throws SemanticException {
         return p;
-    }    
+    }
+
+    /**
+     * @throws SemanticException
+     */
     public AccessPath substAccessPath(AccessPath ap) throws SemanticException {
         return ap;
-    }    
-    
+    }
+
     public boolean recurseIntoChildren(Label L) {
         return true;
     }
-    
-    private ArrayList stack = null;
+
+    private ArrayList<Label> stack = null;
     public void pushLabel(Label l) {
-        pushLabel((Object)l);
-    }
-    private void pushLabel(Object l) {
         if (stack == null) {
-            stack = new ArrayList(5);
+            stack = new ArrayList<Label>(5);
         }
         stack.add(l);
     }

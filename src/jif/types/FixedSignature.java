@@ -1,6 +1,5 @@
 package jif.types;
 
-import java.util.Iterator;
 
 import jif.ast.JifProcedureDecl;
 import jif.types.label.ArgLabel;
@@ -17,14 +16,14 @@ public class FixedSignature implements DefaultSignature
     JifTypeSystem ts;
 
     public FixedSignature(JifTypeSystem ts) {
-	this.ts = ts;
+        this.ts = ts;
     }
-    
+
     @Override
     public Label defaultPCBound(Position pos, String methodName) {
         Label ret = ts.topLabel(pos);
         ret.setDescription("default pc label");
-	return ret;
+        return ret;
     }
 
     @Override
@@ -36,36 +35,34 @@ public class FixedSignature implements DefaultSignature
 
     @Override
     public Label defaultReturnLabel(ProcedureDecl pd) {
-	Label Lr = ts.bottomLabel();
-	
-	for (Iterator i = pd.throwTypes().iterator(); i.hasNext(); ) {
-	    TypeNode tn = (TypeNode) i.next();
-	    Label excLabel = ts.labelOfType(tn.type(), ts.bottomLabel());
-	    Lr = ts.join(Lr, excLabel);	
-	}	
+        Label Lr = ts.bottomLabel();
 
-	return Lr;
+        for (TypeNode tn : pd.throwTypes()) {
+            Label excLabel = ts.labelOfType(tn.type(), ts.bottomLabel());
+            Lr = ts.join(Lr, excLabel);
+        }
+
+        return Lr;
     }
 
     @Override
     public Label defaultReturnValueLabel(ProcedureDecl pd) {
         JifProcedureDecl jpd = (JifProcedureDecl) pd;
-        
+
         Label Lrv;
-        if (jpd.returnLabel() != null) 
+        if (jpd.returnLabel() != null)
             Lrv = jpd.returnLabel().label();
         else
             Lrv = defaultReturnLabel(pd);
-	
+
         JifProcedureInstance pi = (JifProcedureInstance)pd.procedureInstance();
         JifTypeSystem jts = (JifTypeSystem)pi.typeSystem();
 
-        for (Iterator i = pi.formalTypes().iterator(); i.hasNext(); ) {
-            Type t = (Type)i.next();
+        for (Type t : pi.formalTypes()) {
             ArgLabel a = (ArgLabel)jts.labelOfType(t);
             Lrv = ts.join(Lrv, a);
         }
-	return Lrv;	
+        return Lrv;
     }
 
     @Override
@@ -87,5 +84,5 @@ public class FixedSignature implements DefaultSignature
         l.setDescription("default array base label");
         return l;
     }
-    
+
 }

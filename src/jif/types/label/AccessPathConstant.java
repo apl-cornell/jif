@@ -17,7 +17,7 @@ import polyglot.util.Position;
  * <pre>
  * 
  *    int{*lb} m(label{} lb);
- *  
+ * 
  * </pre>
  * 
  * and a call site
@@ -25,7 +25,7 @@ import polyglot.util.Position;
  * <pre>
  * 
  *    m(new label{Alice:});
- *  
+ * 
  * </pre>
  * 
  * the type system needs to be precise enough to realize that the method call
@@ -62,25 +62,30 @@ public class AccessPathConstant extends AccessPathRoot {
     public boolean isLabelConstant() {
         return ((JifTypeSystem)type.typeSystem()).isLabel(type);
     }
+    @Override
     public boolean isNeverNull() { return false; }
 
     public boolean isPrincipalConstant() {
         return ((JifTypeSystem)type.typeSystem()).isPrincipal(type);
     }
 
+    @Override
     public boolean isCanonical() {
         return true;
     }
 
+    @Override
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         throw new InternalCompilerError(
                 "Shouldn't be calling subst on an AccessPathConstant! \"" + this + "\"");
     }
 
+    @Override
     public String toString() {
         return constantValue.toString();
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof AccessPathConstant) {
             AccessPathConstant that = (AccessPathConstant)o;
@@ -89,10 +94,12 @@ public class AccessPathConstant extends AccessPathRoot {
         return false;
     }
 
+    @Override
     public int hashCode() {
         return constantValue.hashCode();
     }
 
+    @Override
     public Type type() {
         return type;
     }

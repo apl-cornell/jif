@@ -13,26 +13,26 @@ import polyglot.util.Position;
  * 
  * <pre>
  * 
- *  
+ * 
  *      class C {
  *         final label{} lb;
  *         int{*this.lb} f;
  *         ...
- *      }  
- *   
- *  
+ *      }
+ * 
+ * 
  * </pre>
  * 
  * and the field access
  * 
  * <pre>
  * 
- *  
- *   
+ * 
+ * 
  *      bar().f;
- *    
- *   
- *  
+ * 
+ * 
+ * 
  * </pre>
  * 
  * where bar is a method that returns an object of class C, the type system
@@ -59,15 +59,19 @@ public class AccessPathUninterpreted extends AccessPathRoot {
         this.allowSubst = allowSubst;
     }
 
+    @Override
     public boolean isCanonical() {
         return true;
     }
+    @Override
     public boolean isNeverNull() { return false; }
-    
+
+    @Override
     public boolean isUninterpreted() {
         return true;
     }
 
+    @Override
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         if (allowSubst) {
             if (r == this) return e;
@@ -75,6 +79,7 @@ public class AccessPathUninterpreted extends AccessPathRoot {
         return this;
     }
 
+    @Override
     public String toString() {
         if (Report.should_report(Report.debug, 1)) {
             return "<uninterpreted path: " + expr + ">";
@@ -82,14 +87,17 @@ public class AccessPathUninterpreted extends AccessPathRoot {
         return "<uninterp: " + expr + ">";
     }
 
+    @Override
     public boolean equals(Object o) {
         return this == o;
     }
 
+    @Override
     public int hashCode() {
         return System.identityHashCode(this);
     }
 
+    @Override
     public Type type() {
         return null;
     }

@@ -4,6 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jif.types.hierarchy.LabelEnv;
+import jif.types.label.Variable;
 import jif.types.principal.ConjunctivePrincipal;
 import jif.types.principal.DisjunctivePrincipal;
 import jif.types.principal.Principal;
@@ -11,13 +12,13 @@ import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
-/** 
+/**
  * Principal equation derived from a principal constraint. A principal equation represents
  * an actsfor relation that must be satisfied, namely <code>lhs actsfor rhs</code>
  * in the environment <code>env</code>.
  * 
  * 
- * @see jif.types.PrincipalConstraint 
+ * @see jif.types.PrincipalConstraint
  */
 public class PrincipalEquation extends Equation
 {
@@ -28,7 +29,7 @@ public class PrincipalEquation extends Equation
     /**
      * Constructor
      */
-    PrincipalEquation(Principal lhs, Principal rhs, PrincipalConstraint constraint) 
+    PrincipalEquation(Principal lhs, Principal rhs, PrincipalConstraint constraint)
     {
         super(constraint);
         this.lhs = lhs;
@@ -36,11 +37,11 @@ public class PrincipalEquation extends Equation
 
         if (lhs instanceof DisjunctivePrincipal) {
             throw new InternalCompilerError(
-            "LHS of equation must not be a disjunctive principal.");
+                    "LHS of equation must not be a disjunctive principal.");
         }
         if (rhs instanceof ConjunctivePrincipal) {
             throw new InternalCompilerError(
-            "LHS of equation must not be a conjunctive principal.");
+                    "LHS of equation must not be a conjunctive principal.");
         }
     }
 
@@ -51,7 +52,7 @@ public class PrincipalEquation extends Equation
     public LabelEnv env() {return constraint().env();}
     @Override
     public Position position() {return constraint().position();}
-    
+
     @Override
     public Object copy() {
         return new PrincipalEquation(lhs, rhs, (PrincipalConstraint)constraint);
@@ -62,12 +63,12 @@ public class PrincipalEquation extends Equation
     }
 
     /**
-     * Return a <code>Set</code> of variables that occur in either the 
+     * Return a <code>Set</code> of variables that occur in either the
      * left or right hand side.
      */
     @Override
-    public Set variables() {
-        Set l = new LinkedHashSet();
+    public Set<Variable> variables() {
+        Set<Variable> l = new LinkedHashSet<Variable>();
         l.addAll(lhs.variables());
         l.addAll(rhs.variables());
         return l;
@@ -80,26 +81,26 @@ public class PrincipalEquation extends Equation
     public boolean equals(Object o) {
         if (! (o instanceof PrincipalEquation)) {
             return false;
-        } 
+        }
 
         PrincipalEquation eqn = (PrincipalEquation) o;
-        
+
         if (this.constraint != eqn.constraint) return false;
-        
+
         return lhs.equals(eqn.lhs) && rhs.equals(eqn.rhs);
     }
 
     @Override
     public String toString() {
         return lhs.toString() + " actsfor " + rhs.toString() + " in environment " +
-        env() + " (produced from " + 
-        principalConstraint().lhsPrincipal() + principalConstraint().kind() + principalConstraint().rhsPrincipal() + ") " +
-        position();
+                env() + " (produced from " +
+                principalConstraint().lhsPrincipal() + principalConstraint().kind() + principalConstraint().rhsPrincipal() + ") " +
+                position();
     }
 
     /**
-     * Replace the <code>lhs</code> and <code>rhs</code> with the result of 
-     * <code>lhs.subst(subst)</code> and <code>rhs.subst(subst)</code> 
+     * Replace the <code>lhs</code> and <code>rhs</code> with the result of
+     * <code>lhs.subst(subst)</code> and <code>rhs.subst(subst)</code>
      * respectively.
      */
     @Override

@@ -7,16 +7,16 @@ import jif.translate.JifToJavaRewriter;
 import jif.types.ActsForParam;
 import jif.types.JifContext;
 import jif.types.LabelSubstitution;
-import jif.types.Param;
 import jif.types.PathMap;
 import jif.types.label.Label;
+import jif.types.label.Variable;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 
-/** The root interface of all kinds of Jif principals. 
+/** The root interface of all kinds of Jif principals.
  */
 public interface Principal extends ActsForParam {
 
@@ -43,7 +43,7 @@ public interface Principal extends ActsForParam {
      * if (p actsfor Bob) { // evaluation of p reveals
      *                      // information at level {Alice:}
      *     leak = true;
-     * 	} 
+     * 	}
      * </pre>
      * 
      * @see jif.ast.Jif#labelCheck(LabelChecker)
@@ -58,22 +58,22 @@ public interface Principal extends ActsForParam {
      * If the principal is runtime representable, when it is evaluated at
      * runtime it may throw exceptions. This method returns a list of
      * the exceptions that the runtime evaluation of the principal may produce.
-     * If the principal cannot be evaluated at runtime, an empty list should be returned.  
+     * If the principal cannot be evaluated at runtime, an empty list should be returned.
      */
     List<Type> throwTypes(TypeSystem ts);
-    
+
     /**
      * Does the label contain any variables at all? This includes variables
      * that are in bounds of arg labels.
      */
     boolean hasVariables();
-    
+
     /**
      * The set of variables that this label contains including variables contained
      * in upper bounds of arg labels.
      */
-    Set<Param> variables();
-    
+    Set<Variable> variables();
+
     boolean isTopPrincipal();
     boolean isBottomPrincipal();
 

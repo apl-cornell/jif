@@ -13,45 +13,53 @@ import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
-/** An implementation of the <code>PolicyLabel</code> interface. 
+/** An implementation of the <code>PolicyLabel</code> interface.
  */
 public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
     private final Principal owner;
     private final Principal reader;
-    
+
     public ReaderPolicy_c(Principal owner, Principal reader, JifTypeSystem ts, Position pos) {
-        super(ts, pos); 
+        super(ts, pos);
         if (owner == null) throw new InternalCompilerError("null owner");
         this.owner = owner;
         this.reader = reader;
-    }    
-    
+    }
+
+    @Override
     public Principal owner() {
         return this.owner;
     }
+    @Override
     public Principal reader() {
         return reader;
     }
-        
+
+    @Override
     public boolean isSingleton() {
         return true;
     }
+    @Override
     public boolean isCanonical() {
         return owner.isCanonical() && reader.isCanonical();
     }
+    @Override
     public boolean isRuntimeRepresentable() {
         return owner.isRuntimeRepresentable() && reader.isRuntimeRepresentable();
     }
-    
+
+    @Override
     protected Policy simplifyImpl() {
         return this;
     }
-        
+
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof ReaderPolicy_c) {
@@ -62,11 +70,13 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
         }
         return false;
     }
-    
+
+    @Override
     public int hashCode() {
         return (owner==null?0:owner.hashCode()) ^ reader.hashCode() ^ 948234;
     }
-    
+
+    @Override
     public boolean leq_(ConfPolicy p, LabelEnv env, SearchState state) {
         if (this.isBottomConfidentiality() || p.isTopConfidentiality())
             return true;
@@ -78,35 +88,38 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
             return true;
         }
         if (p instanceof ReaderPolicy) {
-            ReaderPolicy that = (ReaderPolicy) p;            
+            ReaderPolicy that = (ReaderPolicy) p;
             // this = { o  : .. ri .. }
             // that = { o' : .. rj' .. }
-            
+
             // o' >= o
             if (!env.actsFor(that.owner(), this.owner)) {
                 return false;
             }
-            
+
             return env.actsFor(that.reader(), this.owner()) ||
                     env.actsFor(that.reader(), this.reader());
-        }            
+        }
         return false;
     }
 
-    public String toString(Set printedLabels) {
+    @Override
+    public String toString(Set<Label> printedLabels) {
         StringBuffer sb = new StringBuffer(owner.toString());
-        sb.append("->");        
-        if (!reader.isTopPrincipal()) sb.append(reader.toString());        
+        sb.append("->");
+        if (!reader.isTopPrincipal()) sb.append(reader.toString());
         return sb.toString();
     }
-    
-    public List throwTypes(TypeSystem ts) {
-        List throwTypes = new ArrayList();
+
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
+        List<Type> throwTypes = new ArrayList<Type>();
         throwTypes.addAll(owner.throwTypes(ts));
         throwTypes.addAll(reader.throwTypes(ts));
-        return throwTypes; 
+        return throwTypes;
     }
 
+    @Override
     public Policy subst(LabelSubstitution substitution) throws SemanticException {
         boolean changed = false;
 
@@ -114,40 +127,47 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
         if (newOwner != owner) changed = true;
         Principal newReader = reader.subst(substitution);
         if (newReader != reader) changed = true;
-                
+
         if (!changed) return substitution.substPolicy(this);
 
         JifTypeSystem ts = (JifTypeSystem)typeSystem();
         ReaderPolicy newPolicy = ts.readerPolicy(this.position(), newOwner, newReader);
         return substitution.substPolicy(newPolicy);
     }
+    @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         // check each principal in turn.
         PathMap X = owner.labelCheck(A, lc);
         A.setPc(X.N(), lc);
         PathMap Xr = reader.labelCheck(A, lc);
-        X = X.join(Xr);            
+        X = X.join(Xr);
         return X;
     }
 
+    @Override
     public boolean isBottomConfidentiality() {
         return owner.isBottomPrincipal() && reader.isBottomPrincipal();
     }
+    @Override
     public boolean isTopConfidentiality() {
         return owner.isTopPrincipal() && reader.isTopPrincipal();
     }
+    @Override
     public boolean isTop() {
         return isTopConfidentiality();
     }
+    @Override
     public boolean isBottom() {
         return isBottomConfidentiality();
     }
+    @Override
     public ConfPolicy meet(ConfPolicy p) {
         JifTypeSystem ts = (JifTypeSystem)this.ts;
         return ts.meet(this, p);
     }
+    @Override
     public ConfPolicy join(ConfPolicy p) {
         JifTypeSystem ts = (JifTypeSystem)this.ts;
         return ts.join(this, p);
-    }    
+    }
 }

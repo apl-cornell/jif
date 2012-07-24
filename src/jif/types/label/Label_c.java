@@ -8,11 +8,18 @@ import java.util.Set;
 import jif.translate.CannotLabelToJavaExpr_c;
 import jif.translate.JifToJavaRewriter;
 import jif.translate.LabelToJavaExpr;
-import jif.types.*;
+import jif.types.JifContext;
+import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
+import jif.types.Param_c;
+import jif.types.PathMap;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
-import polyglot.types.*;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -23,8 +30,8 @@ public abstract class Label_c extends Param_c implements Label {
     protected String description;
 
     protected LabelToJavaExpr toJava;
-    
-    protected Set<Param> variables = null; // memoized
+
+    protected Set<Variable> variables = null; // memoized
 
     protected Label_c() {
         super();
@@ -72,7 +79,7 @@ public abstract class Label_c extends Param_c implements Label {
     }
 
     @Override
-    public Set<Param> variables() {
+    public Set<Variable> variables() {
         if (variables == null) {
             VariableGatherer lvg = new VariableGatherer();
             try {
@@ -109,12 +116,12 @@ public abstract class Label_c extends Param_c implements Label {
     public boolean isInvariant() {
         return !isCovariant();
     }
-    
+
     /**
      * Check if the label is disambiguated, without recursing into child labels.
      */
     protected abstract boolean isDisambiguatedImpl();
-    
+
     @Override
     public final boolean isDisambiguated() {
         final boolean[] result = new boolean[1];
@@ -131,8 +138,8 @@ public abstract class Label_c extends Param_c implements Label {
                 @Override
                 public Principal substPrincipal(Principal p) {
                     return p;
-                }    
-      });
+                }
+            });
         }
         catch (SemanticException e) {
             throw new InternalCompilerError("Unexpected semantic exception", e);
@@ -173,7 +180,7 @@ public abstract class Label_c extends Param_c implements Label {
     protected Label simplifyImpl() {
         return this;
     }
-    
+
     @Override
     public Label normalize() {
         return this;
@@ -206,8 +213,8 @@ public abstract class Label_c extends Param_c implements Label {
     }
 
     @Override
-    public Set<Param> variableComponents() {
+    public Set<Variable> variableComponents() {
         return Collections.emptySet();
     }
-    
+
 }

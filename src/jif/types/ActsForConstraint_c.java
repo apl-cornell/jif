@@ -9,7 +9,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
 public class ActsForConstraint_c<Actor extends ActsForParam, Granter extends ActsForParam>
-        extends TypeObject_c implements ActsForConstraint<Actor, Granter> {
+extends TypeObject_c implements ActsForConstraint<Actor, Granter> {
 
     protected ActsForConstraintToJavaExpr toJava;
     protected Actor actor;
@@ -37,8 +37,7 @@ public class ActsForConstraint_c<Actor extends ActsForParam, Granter extends Act
 
     @Override
     public ActsForConstraint<Actor, Granter> actor(Actor actor) {
-        ActsForConstraint_c<Actor, Granter> n =
-                (ActsForConstraint_c<Actor, Granter>) copy();
+        ActsForConstraint_c<Actor, Granter> n = copy();
         n.actor = actor;
         return n;
     }
@@ -50,8 +49,7 @@ public class ActsForConstraint_c<Actor extends ActsForParam, Granter extends Act
 
     @Override
     public ActsForConstraint<Actor, Granter> granter(Granter granter) {
-        ActsForConstraint_c<Actor, Granter> n =
-                (ActsForConstraint_c<Actor, Granter>) copy();
+        ActsForConstraint_c<Actor, Granter> n = copy();
         n.granter = granter;
         return n;
     }
@@ -64,6 +62,14 @@ public class ActsForConstraint_c<Actor extends ActsForParam, Granter extends Act
     @Override
     public boolean isCanonical() {
         return actor.isCanonical() && granter.isCanonical();
+    }
+
+    @Override
+    public ActsForConstraint_c<Actor, Granter> copy() {
+        @SuppressWarnings("unchecked")
+        ActsForConstraint_c<Actor, Granter> copy =
+        (ActsForConstraint_c<Actor, Granter>) super.copy();
+        return copy;
     }
 
     @Override

@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import jif.types.JifTypeSystem;
-import jif.types.Param;
+import jif.types.label.Variable;
 import polyglot.types.TypeObject;
 import polyglot.util.Position;
 
@@ -52,8 +52,8 @@ public class VarPrincipal_c extends Principal_c implements VarPrincipal {
     public int hashCode() { return -88393 + uid; }
 
     @Override
-    public Set<Param> variables() {
-        return Collections.<Param> singleton(this);
+    public Set<Variable> variables() {
+        return Collections.<Variable> singleton(this);
     }
 
     @Override

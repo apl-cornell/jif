@@ -7,38 +7,31 @@ import java.util.List;
 import polyglot.ext.param.types.MuPClass_c;
 import polyglot.util.Position;
 
-/** An implementation of the <code>JifParsedPolyType</code> interface. 
+/** An implementation of the <code>JifParsedPolyType</code> interface.
  */
-public class JifMuPClass_c extends MuPClass_c
+public class JifMuPClass_c extends MuPClass_c<ParamInstance, Param>
 {
     protected JifMuPClass_c() {
-	super();
+        super();
     }
 
     public JifMuPClass_c(JifTypeSystem ts, Position pos) {
-	super(ts, pos);
+        super(ts, pos);
     }
 
     @Override
-    public List formals() {
+    public List<ParamInstance> formals() {
         JifPolyType pt = (JifPolyType) clazz;
 
-        List l = new ArrayList(pt.params().size());
-
-        for (Iterator i = pt.params().iterator(); i.hasNext(); ) {
-            ParamInstance pi = (ParamInstance) i.next();
-            l.add(pi);
-        }
-
-        return l;
+        return new ArrayList<ParamInstance>(pt.params());
     }
 
     @Override
     public String toString() {
-	String s = "";
+        String s = "";
 
-        for (Iterator i = formals().iterator(); i.hasNext(); ) {
-	    ParamInstance pi =  (ParamInstance)i.next();
+        for (Iterator<ParamInstance> i = formals().iterator(); i.hasNext();) {
+            ParamInstance pi =  i.next();
             s += pi.name();
 
             if (i.hasNext()) {
@@ -46,9 +39,9 @@ public class JifMuPClass_c extends MuPClass_c
             }
         }
 
-	if (! s.equals("")) {
-	    s = "[" + s + "]";
-	}
+        if (! s.equals("")) {
+            s = "[" + s + "]";
+        }
 
         return clazz.toString() + s;
     }

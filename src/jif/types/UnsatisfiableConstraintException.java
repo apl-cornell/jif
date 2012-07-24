@@ -18,7 +18,7 @@ public class UnsatisfiableConstraintException extends SemanticException {
     protected final AbstractSolver solver;
     protected final Equation       failure;
     protected final FailedConstraintSnapshot snapshot;
-    
+
     /**
      * Construct a new UnsatisfiableConstraintException.
      * @param solver
@@ -41,14 +41,14 @@ public class UnsatisfiableConstraintException extends SemanticException {
         for (Variable v : variables)
             solver.reportTrace(v);
     }
-    
+
     /**
      * Produce an error message for the constraint c, which cannot be satisfied.
      */
     public final FailedConstraintSnapshot getSnapshot () {
-        return snapshot;    
+        return snapshot;
     }
-    
+
     @Override
     public final String getMessage() {
         StringBuffer sb = new StringBuffer();
@@ -64,12 +64,12 @@ public class UnsatisfiableConstraintException extends SemanticException {
             sb.append('\t'); sb.append("in environment:");                sb.append('\n');
             for (LabelLeAssertion assertion : failure.env().labelAssertions()) {
                 sb.append('\t'); sb.append('\t'); sb.append(assertion.lhs());
-                                                  sb.append(" ⊑ ");
-                                                  sb.append(assertion.rhs());
-                                                                          sb.append('\n');
+                sb.append(" ⊑ ");
+                sb.append(assertion.rhs());
+                sb.append('\n');
             }
             sb.append('\t'); sb.append('\t'); sb.append(failure.env().principalHierarchy());
-                                                                          sb.append('\n');
+            sb.append('\n');
             sb.append('\n');
         }
 
@@ -91,42 +91,42 @@ public class UnsatisfiableConstraintException extends SemanticException {
         else {
             sb.append(failure.constraint().msg());
         }
-        
+
         return sb.toString();
     }
 
     /**
      * Append the failed named constraint, for example
      *    "caller_pc <= callee_pc"
-     *    
+     * 
      * If the constraint does not have a named component, sb is unmodified.
      */
     protected void appendNamedConstraint(StringBuffer sb) {
         if (!(failure instanceof LabelEquation)) return;
-        
+
         LabelConstraint lc = ((LabelEquation) failure).labelConstraint();
         if (null == lc.namedLhs()) return;
         if (null == lc.namedRhs()) return;
-        
+
         sb.append(lc.namedLhs());
         sb.append(lc.kind());
         sb.append(lc.namedRhs());
-        
+
     }
-    
+
     /**
      * append the fully instantiated failed constraint, for example
      *    "a;b;c <= b;c"
-     *    
+     * 
      * If the constraint does not have a named component, sb is unmodified.
-     */ 
+     */
     protected void appendActualConstraint(StringBuffer sb) {
         sb.append(solver.bounds.applyTo(failure.constraint().lhs));
         sb.append(failure.constraint.kind());
         sb.append(solver.bounds.applyTo(failure.constraint().rhs));
     }
-    
-    /** 
+
+    /**
      * append the failed equation, for example
      *     "a <= b;c"
      * or
@@ -140,7 +140,7 @@ public class UnsatisfiableConstraintException extends SemanticException {
             sb.append(" ⊑ ");
             sb.append(le.rhs());
         }
-        
+
         // principal equation: lhs ≽ rhs
         else if (failure instanceof PrincipalEquation) {
             PrincipalEquation pe = (PrincipalEquation) failure;
@@ -148,22 +148,22 @@ public class UnsatisfiableConstraintException extends SemanticException {
             sb.append(" ≽ ");
             sb.append(pe.rhs());
         }
-        
+
         else
             throw new InternalCompilerError(failure.position(), "unexpected equation type");
     }
-    
+
     protected Iterable<Map.Entry<String, List<String>>> definitions() {
         if (failure instanceof LabelEquation)
             return ((LabelEquation) failure).labelConstraint().definitions(solver.bounds).entrySet();
         else
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////
     // determine what type of messages to show                                //
     ////////////////////////////////////////////////////////////////////////////
-    
+
     protected boolean errorShowConstraint() {
         return (errorShowTechnicalMsg() || errorShowDetailMsg());
     }

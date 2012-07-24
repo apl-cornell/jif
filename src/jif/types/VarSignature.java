@@ -1,6 +1,5 @@
 package jif.types;
 
-import java.util.Iterator;
 
 import jif.ast.JifProcedureDecl;
 import jif.types.label.ArgLabel;
@@ -17,61 +16,59 @@ public class VarSignature implements DefaultSignature
     JifTypeSystem ts;
 
     public VarSignature(JifTypeSystem ts) {
-	this.ts = ts;
+        this.ts = ts;
     }
-    
+
     @Override
     public Label defaultPCBound(Position pos, String methodName) {
-	return ts.freshLabelVariable(pos, methodName, 
-                 "start label for the method " + methodName);
+        return ts.freshLabelVariable(pos, methodName,
+                "start label for the method " + methodName);
     }
 
     @Override
     public Label defaultArgBound(Formal f) {
         String argName = f.name();
-	return ts.freshLabelVariable(f.position(), argName,
-                    "upper bound for the formal argument " + argName);
+        return ts.freshLabelVariable(f.position(), argName,
+                "upper bound for the formal argument " + argName);
     }
 
     @Override
     public Label defaultReturnLabel(ProcedureDecl pd) {
-	Label Lr = ts.noComponentsLabel();
-	
-	for (Iterator i = pd.throwTypes().iterator(); i.hasNext(); ) {
-	    TypeNode tn = (TypeNode) i.next();
-	    Label excLabel = ts.labelOfType(tn.type(), ts.bottomLabel());
-	    Lr = ts.join(Lr, excLabel);	
-	}	
+        Label Lr = ts.noComponentsLabel();
 
-	return Lr;
+        for (TypeNode tn : pd.throwTypes()) {
+            Label excLabel = ts.labelOfType(tn.type(), ts.bottomLabel());
+            Lr = ts.join(Lr, excLabel);
+        }
+
+        return Lr;
     }
 
     @Override
     public Label defaultReturnValueLabel(ProcedureDecl pd) {
-	JifProcedureDecl jpd = (JifProcedureDecl) pd;
+        JifProcedureDecl jpd = (JifProcedureDecl) pd;
 
-	Label Lrv;
-        if (jpd.returnLabel() != null) 
+        Label Lrv;
+        if (jpd.returnLabel() != null)
             Lrv = jpd.returnLabel().label();
         else
             Lrv = defaultReturnLabel(pd);
-        
-        
+
+
         JifProcedureInstance pi = (JifProcedureInstance)pd.procedureInstance();
-        for (Iterator i = pi.formalTypes().iterator(); i.hasNext(); ) {
-            Type t = (Type)i.next();
+        for (Type t : pi.formalTypes()) {
             ArgLabel a = (ArgLabel)ts.labelOfType(t);
             Lrv = ts.join(Lrv, a);
         }
-        
-	return Lrv;	
+
+        return Lrv;
     }
 
     @Override
     public Label defaultFieldLabel(FieldDecl fd) {
         return ts.bottomLabel();
     }
-    
+
     @Override
     public Label defaultArrayBaseLabel(Type baseType) {
         if (baseType.isArray()) {
@@ -83,5 +80,5 @@ public class VarSignature implements DefaultSignature
         Label l = ts.noComponentsLabel(baseType.position());
         l.setDescription("default array base label");
         return l;
-    }    
+    }
 }

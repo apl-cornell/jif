@@ -6,7 +6,7 @@ import jif.types.principal.Principal;
 import polyglot.ext.param.types.PClass;
 import polyglot.types.ParsedClassType;
 
-/** Jif parsed polymorphic class type. 
+/** Jif parsed polymorphic class type.
  */
 public interface JifParsedPolyType extends ParsedClassType, JifPolyType {
     void setParams(List<ParamInstance> params);
@@ -14,5 +14,5 @@ public interface JifParsedPolyType extends ParsedClassType, JifPolyType {
 
     void setConstraints(List<Assertion> constraints);
 
-    void setInstantiatedFrom(PClass pc);
+    void setInstantiatedFrom(PClass<ParamInstance, Param> pc);
 }

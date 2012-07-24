@@ -131,8 +131,8 @@ import polyglot.util.Position;
 /** An implementation of the <code>JifTypeSystem</code> interface.
  */
 public class JifTypeSystem_c
-    extends ParamTypeSystem_c<ParamInstance, Param>
-    implements JifTypeSystem {
+extends ParamTypeSystem_c<ParamInstance, Param>
+implements JifTypeSystem {
     protected final TypeSystem jlts;
 
     private final LabelEnv emptyLabelEnv = this.createEmptyLabelEnv();
@@ -160,7 +160,7 @@ public class JifTypeSystem_c
     }
 
     @Override
-    public MuPClass mutablePClass(Position pos) {
+    public MuPClass<ParamInstance, Param> mutablePClass(Position pos) {
         return new JifMuPClass_c(this, pos);
     }
 
@@ -174,13 +174,13 @@ public class JifTypeSystem_c
      */
     @Override
     public void initialize(TopLevelResolver loadedResolver, ExtensionInfo extInfo)
-        throws SemanticException {
+            throws SemanticException {
         super.initialize(loadedResolver, extInfo);
 
         PRINCIPAL_ = new PrimitiveType_c(this, PRINCIPAL_KIND);
         LABEL_ = new PrimitiveType_c(this, LABEL_KIND);
     }
-    
+
     @Override
     public UnknownType unknownType(Position pos) {
         UnknownType t = super.unknownType(pos);
@@ -195,11 +195,11 @@ public class JifTypeSystem_c
 
     @Override
     public Package packageForName(Package prefix, String name)
-	throws SemanticException
-    {
+            throws SemanticException
+            {
         Package p = super.packageForName(prefix, name);
         return p;
-    }
+            }
 
     private static final PrimitiveType.Kind PRINCIPAL_KIND = new PrimitiveType.Kind("principal");
     private static final PrimitiveType.Kind LABEL_KIND = new PrimitiveType.Kind("label");
@@ -209,16 +209,16 @@ public class JifTypeSystem_c
 
     @Override
     public String PrincipalClassName() { return "jif.lang.Principal"; }
-    
+
     @Override
     public String PrincipalUtilClassName() { return "jif.lang.PrincipalUtil"; }
-    
+
     @Override
     public String LabelClassName() { return "jif.lang.Label"; }
-    
+
     @Override
     public String LabelUtilClassName() { return "jif.lang.LabelUtil"; }
-    
+
     @Override
     public String RuntimePackageName() { return "jif.runtime"; }
 
@@ -235,7 +235,7 @@ public class JifTypeSystem_c
             }
             catch (SemanticException e) {
                 throw new InternalCompilerError("Cannot find Jif class " + PrincipalClassName(), e);
-            } 
+            }
         }
         return PRINCIPAL_CLASS_;
     }
@@ -247,9 +247,9 @@ public class JifTypeSystem_c
 
     @Override
     public Context createContext() {
-    	return new JifContext_c(this, jlts);
+        return new JifContext_c(this, jlts);
     }
-    
+
     @Override
     public ConstArrayType constArrayOf(Type type) {
         return constArrayOf(type.position(), type);
@@ -270,11 +270,11 @@ public class JifTypeSystem_c
 
     @Override
     public ConstArrayType constArrayOf(Position pos, Type type, int dims) {
-        return constArrayOf(pos, type, dims, false);        
+        return constArrayOf(pos, type, dims, false);
     }
     @Override
     public ConstArrayType constArrayOf(Position pos, Type type, int dims, boolean castableToNonConst) {
-        return constArrayOf(pos, type, dims, castableToNonConst, false);        
+        return constArrayOf(pos, type, dims, castableToNonConst, false);
     }
     @Override
     public ConstArrayType constArrayOf(Position pos, Type type, int dims, boolean castableToNonConst, boolean recurseIntoBaseType) {
@@ -290,10 +290,10 @@ public class JifTypeSystem_c
         }
         else {
             throw new InternalCompilerError(
-            "Must call constArrayOf(type, dims) with dims > 0");
+                    "Must call constArrayOf(type, dims) with dims > 0");
         }
     }
-    
+
 
     @Override
     protected ArrayType arrayType(Position pos, Type type) {
@@ -305,22 +305,22 @@ public class JifTypeSystem_c
 
     @Override
     public InitializerInstance initializerInstance(
-        Position pos,
-        ClassType container,
-        Flags flags) {
+            Position pos,
+            ClassType container,
+            Flags flags) {
         InitializerInstance ii =
-            super.initializerInstance(pos, container, flags);
+                super.initializerInstance(pos, container, flags);
         return ii;
     }
 
     @Override
     public FieldInstance fieldInstance(Position pos,
-                                       ReferenceType container,
-                                       Flags flags,
-                                       Type type,
-                                       String name) {
+            ReferenceType container,
+            Flags flags,
+            Type type,
+            String name) {
         JifFieldInstance_c fi =
-            new JifFieldInstance_c(this, pos, container, flags, type, name);
+                new JifFieldInstance_c(this, pos, container, flags, type, name);
         return fi;
     }
 
@@ -332,94 +332,94 @@ public class JifTypeSystem_c
 
     @Override
     public ConstructorInstance constructorInstance(
-        Position pos,
-        ClassType container,
-        Flags flags,
-        List<? extends Type> formalTypes,
-        List<? extends Type> excTypes) {
+            Position pos,
+            ClassType container,
+            Flags flags,
+            List<? extends Type> formalTypes,
+            List<? extends Type> excTypes) {
         return jifConstructorInstance(pos,container,flags,unknownLabel(pos), false,unknownLabel(pos),false,
-            formalTypes, Collections.<Label> emptyList(),
-            excTypes,
-            Collections.<Assertion> emptyList());
+                formalTypes, Collections.<Label> emptyList(),
+                excTypes,
+                Collections.<Assertion> emptyList());
     }
 
     public JifConstructorInstance jifConstructorInstance(
-        Position pos,
-        ClassType container,
-        Flags flags,
-        Label startLabel,
-        boolean isDefaultStartLabel,
-        Label returnLabel,
-        boolean isDefaultReturnLabel,
-        List<? extends Type> formalTypes,
-        List<Label> formalArgLabels,
-        List<? extends Type> excTypes,
-        List<Assertion> constraints) {
+            Position pos,
+            ClassType container,
+            Flags flags,
+            Label startLabel,
+            boolean isDefaultStartLabel,
+            Label returnLabel,
+            boolean isDefaultReturnLabel,
+            List<? extends Type> formalTypes,
+            List<Label> formalArgLabels,
+            List<? extends Type> excTypes,
+            List<Assertion> constraints) {
         JifConstructorInstance ci =
-            new JifConstructorInstance_c(
-                this,
-                pos,
-                container,
-                flags,
-                startLabel, isDefaultStartLabel,
-                returnLabel, isDefaultReturnLabel,
-                formalTypes, formalArgLabels,
-                excTypes,
-                constraints);
+                new JifConstructorInstance_c(
+                        this,
+                        pos,
+                        container,
+                        flags,
+                        startLabel, isDefaultStartLabel,
+                        returnLabel, isDefaultReturnLabel,
+                        formalTypes, formalArgLabels,
+                        excTypes,
+                        constraints);
         return ci;
     }
 
     @Override
     public MethodInstance methodInstance(
-        Position pos,
-        ReferenceType container,
-        Flags flags,
-        Type returnType,
-        String name,
-        List<? extends Type> formalTypes,
-        List<? extends Type> excTypes) {
+            Position pos,
+            ReferenceType container,
+            Flags flags,
+            Type returnType,
+            String name,
+            List<? extends Type> formalTypes,
+            List<? extends Type> excTypes) {
 
         return jifMethodInstance(
-            pos,
-            container,
-            flags,
-            returnType,
-            name,
-            unknownLabel(pos), false,
-            formalTypes, Collections.<Label> emptyList(),
-            unknownLabel(pos), false,
-            excTypes,
-            Collections.<Assertion> emptyList());
-    }
-
-    @Override
-    public JifMethodInstance jifMethodInstance(
-        Position pos,
-        ReferenceType container,
-        Flags flags,
-        Type returnType,
-        String name,
-        Label startLabel,
-        boolean isDefaultStartLabel,
-        List<? extends Type> formalTypes, List<Label> formalArgLabels,
-        Label endLabel,
-        boolean isDefaultEndLabel,
-        List<? extends Type> excTypes,
-        List<Assertion> constraints) {
-
-        JifMethodInstance mi =
-            new JifMethodInstance_c(
-                this,
                 pos,
                 container,
                 flags,
                 returnType,
                 name,
-                startLabel, isDefaultStartLabel,
-                formalTypes, formalArgLabels,
-                endLabel, isDefaultEndLabel,
+                unknownLabel(pos), false,
+                formalTypes, Collections.<Label> emptyList(),
+                unknownLabel(pos), false,
                 excTypes,
-                constraints);
+                Collections.<Assertion> emptyList());
+    }
+
+    @Override
+    public JifMethodInstance jifMethodInstance(
+            Position pos,
+            ReferenceType container,
+            Flags flags,
+            Type returnType,
+            String name,
+            Label startLabel,
+            boolean isDefaultStartLabel,
+            List<? extends Type> formalTypes, List<Label> formalArgLabels,
+            Label endLabel,
+            boolean isDefaultEndLabel,
+            List<? extends Type> excTypes,
+            List<Assertion> constraints) {
+
+        JifMethodInstance mi =
+                new JifMethodInstance_c(
+                        this,
+                        pos,
+                        container,
+                        flags,
+                        returnType,
+                        name,
+                        startLabel, isDefaultStartLabel,
+                        formalTypes, formalArgLabels,
+                        endLabel, isDefaultEndLabel,
+                        excTypes,
+                        constraints);
         return mi;
     }
 
@@ -431,8 +431,8 @@ public class JifTypeSystem_c
 
     @Override
     public PrincipalInstance principalInstance(
-        Position pos,
-        ExternalPrincipal principal) {
+            Position pos,
+            ExternalPrincipal principal) {
         PrincipalInstance pi = new PrincipalInstance_c(this, pos, principal);
         return pi;
     }
@@ -451,12 +451,12 @@ public class JifTypeSystem_c
     public boolean isCastValid(Type fromType, Type toType) {
         Type strpFromType = strip(fromType);
         Type strpToType = strip(toType);
-                
+
         // can cast from "principal" to any subclass of "jif.lang.Principal"
         if (Principal().equals(strpFromType) && isCastValid(PrincipalClass(), toType)) {
             return true;
         }
-        
+
         // can cast from any subtype of "jif.lang.Principal" to "principal"
         if (Principal().equals(strpToType) && isSubtype(strpFromType, PrincipalClass())) {
             return true;
@@ -469,7 +469,7 @@ public class JifTypeSystem_c
     public boolean isImplicitCastValid(Type fromType, Type toType) {
         Type strpFromType = strip(fromType);
         Type strpToType = strip(toType);
-        
+
         // can cast from "principal" to "jif.lang.Principal"
         if (Principal().equals(strpFromType) && PrincipalClass().equals(strpToType)) {
             return true;
@@ -486,22 +486,22 @@ public class JifTypeSystem_c
     @Override
     public Type staticTarget(Type t) {
         if (t instanceof JifParsedPolyType) {
-                JifParsedPolyType jppt = (JifParsedPolyType)t;
-                if (jppt.params().size() > 0) {
-                    // return the "null instantiation" of the base type,
-                    // to ensure that all TypeNodes contain either
-                    // a JifParsedPolyType with zero params, or a
-                    // JifSubstClassType
-                    return jppt.instantiatedFrom().clazz();
-                }
-         }
+            JifParsedPolyType jppt = (JifParsedPolyType)t;
+            if (jppt.params().size() > 0) {
+                // return the "null instantiation" of the base type,
+                // to ensure that all TypeNodes contain either
+                // a JifParsedPolyType with zero params, or a
+                // JifSubstClassType
+                return jppt.instantiatedFrom().clazz();
+            }
+        }
         return super.staticTarget(t);
 
     }
 
     @Override
     public boolean equalsNoStrip(TypeObject t1, TypeObject t2) {
-        return super.equals(t1, t2);        
+        return super.equals(t1, t2);
     }
     @Override
     public boolean equalsStrip(TypeObject t1, TypeObject t2) {
@@ -513,14 +513,14 @@ public class JifTypeSystem_c
             t2 = strip((Type)t2);
         }
 
-        return super.equals(t1, t2);        
+        return super.equals(t1, t2);
     }
-    
+
     @Override
     public boolean equals(TypeObject t1, TypeObject t2) {
         return equalsStrip(t1, t2);
     }
-    
+
     @Override
     public boolean typeEquals(Type t1, Type t2) {
         return equals(t1, t2);
@@ -576,8 +576,8 @@ public class JifTypeSystem_c
      **/
     @Override
     public Type leastCommonAncestor(Type type1, Type type2)
-        throws SemanticException
-    {
+            throws SemanticException
+            {
         assert_(type1);
         assert_(type2);
 
@@ -587,7 +587,7 @@ public class JifTypeSystem_c
         // if one of them is a numeric type, or is a null type, just hand it
         // off to the superclass
         if (type1.isNumeric() || type2.isNumeric() ||
-            type1.isNull() || type2.isNull()) {
+                type1.isNull() || type2.isNull()) {
             return super.leastCommonAncestor(strip(type1), strip(type2));
         }
 
@@ -602,21 +602,21 @@ public class JifTypeSystem_c
                 arrL = L2;
             }
             else if (L2 instanceof VarLabel) {
-                arrL = L1;                
-            }
-            else if (leq(L1, L2) && leq(L2, L1)) { 
                 arrL = L1;
             }
-            
+            else if (leq(L1, L2) && leq(L2, L1)) {
+                arrL = L1;
+            }
+
             if (arrL != null) {
                 // Both base types are labelled with the same label.
                 // (Either or both types may be unlabelled, in which case
                 // we are using the default label).
 
                 return arrayOf(labeledType(base1.position(),
-                                          leastCommonAncestor(unlabel(base1),
-                                                              unlabel(base2)),
-                                          arrL));
+                        leastCommonAncestor(unlabel(base1),
+                                unlabel(base2)),
+                                arrL));
             }
             else {
                 // the labels of the base types are different.
@@ -665,9 +665,9 @@ public class JifTypeSystem_c
 
             // Walk up the hierarchy
             Type t1 = leastCommonAncestor(type1.toReference().superType(),
-                                      type2);
+                    type2);
             Type t2 = leastCommonAncestor(type2.toReference().superType(),
-                          type1);
+                    type1);
 
             if (equals(t1, t2)) return t1;
 
@@ -675,9 +675,9 @@ public class JifTypeSystem_c
         }
 
         throw new SemanticException(
-           "No least common ancestor found for types \"" + type1 +
-           "\" and \"" + type2 + "\".");
-    }
+                "No least common ancestor found for types \"" + type1 +
+                "\" and \"" + type2 + "\".");
+            }
 
     @Override
     public boolean numericConversionValid(Type t, Object value) {
@@ -699,7 +699,7 @@ public class JifTypeSystem_c
 
     @Override
     public ParsedClassType createClassType(LazyClassInitializer init,
-                                           Source fromSource) {
+            Source fromSource) {
         if (!init.fromClassFile()) {
             return new JifParsedPolyType_c(this, init, fromSource);
         } else {
@@ -715,12 +715,12 @@ public class JifTypeSystem_c
         return l;
     }
 
-	@Override
+    @Override
     public ClassFileLazyClassInitializer classFileLazyClassInitializer(
-			ClassFile clazz) {
-		throw new UnsupportedOperationException(
-				"Raw classfiles are not supported by Jif.");
-	}
+            ClassFile clazz) {
+        throw new UnsupportedOperationException(
+                "Raw classfiles are not supported by Jif.");
+    }
 
     /****** Jif specific stuff ******/
 
@@ -759,7 +759,8 @@ public class JifTypeSystem_c
     }
 
     @Override
-    public ClassType nullInstantiate(Position pos, PClass pc) {
+    public ClassType nullInstantiate(Position pos,
+            PClass<ParamInstance, Param> pc) {
         if (pc.clazz() instanceof JifPolyType) {
             JifPolyType pt = (JifPolyType) pc.clazz();
 
@@ -767,7 +768,7 @@ public class JifTypeSystem_c
                     new LinkedHashMap<ParamInstance, Param>();
 
             Iterator<ParamInstance> i = pt.params().iterator();
-            
+
             // pt.actuals() constructs a list of Params based on the
             // ParamInstances conatained in pt.params().
             // We construct a substitution map from the ParamInstances
@@ -789,44 +790,46 @@ public class JifTypeSystem_c
         }
 
         throw new InternalCompilerError("Cannot null instantiate \"" +
-                                        pc + "\".");
+                pc + "\".");
     }
 
     @Override
-    public void checkInstantiation(Position pos, PClass t, List args)
-        throws SemanticException {
+    public void checkInstantiation(Position pos,
+            PClass<ParamInstance, Param> t, List<? extends Param> args)
+                    throws SemanticException {
         super.checkInstantiation(pos, t, args);
 
         // Check that labels are instantiated with labels and principals
         // with principals.
-        Iterator i = args.iterator();
-        Iterator j = ((JifPolyType)t.clazz()).params().iterator();
+        Iterator<? extends Param> i = args.iterator();
+        Iterator<ParamInstance> j =
+                ((JifPolyType) t.clazz()).params().iterator();
 
         while (i.hasNext() && j.hasNext()) {
-            Param p = (Param)i.next();
-            ParamInstance pi = (ParamInstance)j.next();
+            Param p = i.next();
+            ParamInstance pi = j.next();
             if (pi.isLabel() && !(p instanceof Label)) {
                 throw new SemanticException(
-                    "Cannot use " + p + " as a label.",
-                    p.position());
+                        "Cannot use " + p + " as a label.",
+                        p.position());
             } else if (pi.isPrincipal() && !(p instanceof Principal)) {
                 throw new SemanticException(
-                    "Cannot use " + p + " as a principal.",
-                    p.position());
+                        "Cannot use " + p + " as a principal.",
+                        p.position());
             }
         }
     }
 
     @Override
     public ClassType uncheckedInstantiate(
-        Position pos,
-        PClass t,
-        List actuals) {
+            Position pos,
+            PClass<ParamInstance, Param> t, List<? extends Param> actuals) {
         return super.uncheckedInstantiate(pos, t, actuals);
     }
 
     @Override
-    public Subst subst(Map substMap) {
+    public Subst<ParamInstance, Param> subst(
+            Map<ParamInstance, ? extends Param> substMap) {
         return new JifSubst_c(this, substMap);
     }
     @Override
@@ -912,7 +915,7 @@ public class JifTypeSystem_c
         if (ps.size() == 1) return ps.iterator().next();
         return new ConjunctivePrincipal_c(ps, this, pos, conjunctivePrincipalTranslator());
     }
-    
+
     @Override
     public PrincipalToJavaExpr conjunctivePrincipalTranslator() {
         return new ConjunctivePrincipalToJavaExpr_c();
@@ -935,7 +938,7 @@ public class JifTypeSystem_c
     public PrincipalToJavaExpr disjunctivePrincipalTranslator() {
         return new DisjunctivePrincipalToJavaExpr_c();
     }
-    
+
     private Collection<Principal> flattenConjuncts(Collection<Principal> ps) {
         Set<Principal> newps = new LinkedHashSet<Principal>();
         for (Principal p : ps) {
@@ -954,9 +957,9 @@ public class JifTypeSystem_c
                 if (this.emptyLabelEnv.actsFor(q, p)) {
                     essential = false;
                     break;
-    }
+                }
             }
-            if (essential) needed.add(p);            
+            if (essential) needed.add(p);
         }
         return needed;
     }
@@ -978,9 +981,9 @@ public class JifTypeSystem_c
                 if (this.emptyLabelEnv.actsFor(p, q)) {
                     essential = false;
                     break;
-    }
+                }
             }
-            if (essential) needed.add(p);            
+            if (essential) needed.add(p);
         }
         return needed;
     }
@@ -989,7 +992,7 @@ public class JifTypeSystem_c
     private Label bottom = null;
     private Label noComponents = null;
     private Label notTaken = null;
-    
+
     @Override
     public Label topLabel(Position pos) {
         return pairLabel(pos, topConfPolicy(pos), topIntegPolicy(pos));
@@ -1006,7 +1009,7 @@ public class JifTypeSystem_c
     public Label bottomLabel(Position pos) {
         return pairLabel(pos, bottomConfPolicy(pos), bottomIntegPolicy(pos));
     }
-    
+
     @Override
     public Label bottomLabel() {
         if (bottom == null)
@@ -1023,7 +1026,7 @@ public class JifTypeSystem_c
     public ProviderLabel providerLabel(Position position, JifClassType ct) {
         return ct.provider().position(position);
     }
-    
+
     protected LabelToJavaExpr providerLabelTranslator() {
         return new ProviderLabelToJavaExpr_c();
     }
@@ -1035,7 +1038,7 @@ public class JifTypeSystem_c
         }
         return noComponents;
     }
-    
+
     @Override
     public Label noComponentsLabel(Position pos) {
         return pairLabel(pos, bottomConfPolicy(pos), topIntegPolicy(pos));
@@ -1099,14 +1102,14 @@ public class JifTypeSystem_c
     }
     @Override
     public ConfPolicy topConfPolicy(Position pos) {
-        return readerPolicy(pos, topPrincipal(pos), topPrincipal(pos));        
+        return readerPolicy(pos, topPrincipal(pos), topPrincipal(pos));
     }
     @Override
     public IntegPolicy topIntegPolicy(Position pos) {
-        return writerPolicy(pos, bottomPrincipal(pos), bottomPrincipal(pos));        
+        return writerPolicy(pos, bottomPrincipal(pos), bottomPrincipal(pos));
     }
-    
-        
+
+
     @Override
     public Label joinLabel(Position pos, Set<Label> components) {
         if (components == null) {
@@ -1160,11 +1163,11 @@ public class JifTypeSystem_c
             }
             return (Label)apc.constantValue();
         }
-        
+
         DynamicLabel t = dynamicLabel(pos, path);
         return t;
     }
-    
+
     protected LabelToJavaExpr dynamicLabelTranslator() {
         return new DynamicLabelToJavaExpr_c();
     }
@@ -1180,14 +1183,14 @@ public class JifTypeSystem_c
         ArgLabel t = new ArgLabel_c(this, pi, null, pos);
         return t;
     }
-    
+
     @Override
     public Label callSitePCLabel(JifProcedureInstance pi) {
         ArgLabel pcLabel = new ArgLabel_c(this, pi, "caller_pc", pi.position());
         pcLabel.setUpperBound(pi.pcBound());
-        pcLabel.setDescription("The pc at the call site of this " + 
-                               pi.designator() + " (bounded above by " +
-                               pi.pcBound() + ")");
+        pcLabel.setDescription("The pc at the call site of this " +
+                pi.designator() + " (bounded above by " +
+                pi.pcBound() + ")");
         return pcLabel;
     }
 
@@ -1213,14 +1216,14 @@ public class JifTypeSystem_c
         UnknownLabel t = new UnknownLabel_c(this, pos);
         return t;
     }
-    
+
     @Override
-    public PairLabel pairLabel(Position pos, 
-                               ConfPolicy confPol, 
-                               IntegPolicy integPol) {
+    public PairLabel pairLabel(Position pos,
+            ConfPolicy confPol,
+            IntegPolicy integPol) {
         return new PairLabel_c(this, confPol, integPol, pos, pairLabelTranslator());
     }
-    
+
     protected LabelToJavaExpr pairLabelTranslator() {
         return new PairLabelToJavaExpr_c();
     }
@@ -1237,19 +1240,19 @@ public class JifTypeSystem_c
         return new ActsForConstraint_c<Actor, Granter>(this, pos, actor,
                 granter, isEquiv, actsForConstraintTranslator());
     }
-    
+
     protected ActsForConstraintToJavaExpr actsForConstraintTranslator() {
         return new ActsForConstraintToJavaExpr_c();
     }
 
     @Override
     public LabelLeAssertion labelLeAssertion(Position pos,
-                                             Label lhs,
-                                             Label rhs) {
+            Label lhs,
+            Label rhs) {
         return new LabelLeAssertion_c(this, lhs, rhs, pos,
                 labelLeAssertionTranslator());
     }
-    
+
     protected LabelLeAssertionToJavaExpr labelLeAssertionTranslator() {
         return new LabelLeAssertionToJavaExpr_c();
     }
@@ -1315,7 +1318,7 @@ public class JifTypeSystem_c
         }
         return type;
     }
-    
+
     @Override
     public Type unlabel(Type type) {
         if (type instanceof LabeledType) {
@@ -1355,25 +1358,25 @@ public class JifTypeSystem_c
         if (ct != null) {
             FieldInstance fi = ct.fieldNamed(JIF_SIG_OF_JAVA_MARKER);
             if (fi != null
-                && (fi.flags().isPrivate() || ct.flags().isInterface())
-                && fi.flags().isStatic()) {
+                    && (fi.flags().isPrivate() || ct.flags().isInterface())
+                    && fi.flags().isStatic()) {
                 return false;
             }
         }
 
         return true;
     }
-    
+
     @Override
     public boolean isMarkerFieldName(String s) {
         return JIF_SIG_OF_JAVA_MARKER.equals(s) ||
-               JIF_PARAMS_RUNTIME_MARKER.equals(s) ||
-               JIF_SAFE_CONSTRUCTOR_MARKER.equals(s);
+                JIF_PARAMS_RUNTIME_MARKER.equals(s) ||
+                JIF_SAFE_CONSTRUCTOR_MARKER.equals(s);
     }
     static String JIF_SIG_OF_JAVA_MARKER = "__JIF_SIG_OF_JAVA_CLASS$20030619";
     static String JIF_PARAMS_RUNTIME_MARKER = "__JIF_PARAMS_RUNTIME_REPRESENTED$20051007";
     static String JIF_SAFE_CONSTRUCTOR_MARKER = "__JIF_SAFE_CONSTRUCTORS$20050907";
-    
+
     @Override
     public boolean isParamsRuntimeRep(Type t) {
         if (isJifClass(t)) {
@@ -1384,13 +1387,13 @@ public class JifTypeSystem_c
         if (ct != null) {
             FieldInstance fi = ct.fieldNamed(JIF_PARAMS_RUNTIME_MARKER);
             if (fi != null
-                && fi.flags().isPrivate()
-                && fi.flags().isStatic()) {
+                    && fi.flags().isPrivate()
+                    && fi.flags().isStatic()) {
                 return true;
             }
         }
 
-        return false;        
+        return false;
     }
 
     /**
@@ -1406,13 +1409,13 @@ public class JifTypeSystem_c
      * @param t Type to check
      * @return null if ct has no untrusted non-Jif ancestor, and the ClassType
      *         of an untrusted non-Jif ancestor otherwise.
-     *  
+     * 
      */
     @Override
     public ClassType hasUntrustedAncestor(Type t) {
         if (t == null || t.toReference() == null) {
             return null;
-	}
+        }
 
         Type st = t.toReference().superType();
         if (st == null || st.toClass() == null) {
@@ -1452,8 +1455,8 @@ public class JifTypeSystem_c
      */
     @Override
     public boolean canCoerceToString(Type t, Context c) {
-        if (this.equalsStrip(t, this.String()) || (t.isPrimitive() && 
-                                              !isPrincipal(t) && !isLabel(t))) {
+        if (this.equalsStrip(t, this.String()) || (t.isPrimitive() &&
+                !isPrincipal(t) && !isLabel(t))) {
             return true;
         }
 
@@ -1477,7 +1480,7 @@ public class JifTypeSystem_c
         if (L2.isTop() || L1.isBottom()) {
             return L2.simplify();
         }
-        
+
         Set<Label> s = new LinkedHashSet<Label>();
         s.add(L1);
         s.add(L2);
@@ -1486,7 +1489,7 @@ public class JifTypeSystem_c
 
         return joinLabel(pos, s).simplify();
     }
-    
+
     @Override
     public Label meet(Label L1, Label L2) {
         if (L1.isTop() || L2.isBottom()) {
@@ -1503,7 +1506,7 @@ public class JifTypeSystem_c
 
         return meetLabel(pos, s).simplify();
     }
-    
+
 
     @Override
     public boolean actsFor(Principal p, Principal q) {
@@ -1537,7 +1540,7 @@ public class JifTypeSystem_c
         else if (components.size() == 1) {
             return components.iterator().next();
         }
-        return (IntegPolicy)new JoinIntegPolicy_c(components, this, pos).simplify();        
+        return (IntegPolicy)new JoinIntegPolicy_c(components, this, pos).simplify();
     }
     @Override
     public ConfPolicy meetConfPolicy(Position pos, Set<ConfPolicy> components) {
@@ -1547,7 +1550,7 @@ public class JifTypeSystem_c
         else if (components.size() == 1) {
             return components.iterator().next();
         }
-        return (ConfPolicy)new MeetConfPolicy_c(components, this, pos).simplify();        
+        return (ConfPolicy)new MeetConfPolicy_c(components, this, pos).simplify();
     }
     @Override
     public IntegPolicy meetIntegPolicy(Position pos, Set<IntegPolicy> components) {
@@ -1557,7 +1560,7 @@ public class JifTypeSystem_c
         else if (components.size() == 1) {
             return components.iterator().next();
         }
-        return (IntegPolicy)new MeetIntegPolicy_c(components, this, pos).simplify();        
+        return (IntegPolicy)new MeetIntegPolicy_c(components, this, pos).simplify();
     }
     @Override
     public ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {
@@ -1623,12 +1626,12 @@ public class JifTypeSystem_c
 
         return (IntegPolicy)meetIntegPolicy(pos, s).simplify();
     }
-    
+
     @Override
     public ConfPolicy confProjection(Label L) {
         if (L instanceof MeetLabel || L instanceof JoinLabel || L instanceof PairLabel)
             return L.confProjection();
-        
+
         return new ConfProjectionPolicy_c(L, this, L.position());
     }
     @Override
@@ -1638,7 +1641,7 @@ public class JifTypeSystem_c
 
         return new IntegProjectionPolicy_c(L, this, L.position());
     }
-    
+
 
     @SuppressWarnings("deprecation")
     @Override
@@ -1647,7 +1650,7 @@ public class JifTypeSystem_c
         // Fully qualify classes in jif.lang and jif.principal.
         if (t.package_() != null) {
             if (t.package_().equals(createPackage("jif.lang"))
-                || t.package_().equals(createPackage("jif.principals"))) {
+                    || t.package_().equals(createPackage("jif.principals"))) {
                 return super.translateClass(null, t);
             }
         }
@@ -1678,7 +1681,7 @@ public class JifTypeSystem_c
 
     @Override
     public PrimitiveType primitiveForName(String name)
-        throws SemanticException {
+            throws SemanticException {
 
         if (name.equals("label"))
             return Label();
@@ -1699,18 +1702,18 @@ public class JifTypeSystem_c
 
     @Override
     public ConstructorInstance defaultConstructor(
-        Position pos,
-        ClassType container) {
+            Position pos,
+            ClassType container) {
         assert_(container);
         return jifConstructorInstance(pos,
-                                      container,
-                                      Public(),
-                                      topLabel(), true,
-                                      bottomLabel(), true,
-                                      Collections.<Type> emptyList(),
-                                      Collections.<Label> emptyList(),
-                                      Collections.<Type> emptyList(),
-                                      Collections.<Assertion> emptyList());
+                container,
+                Public(),
+                topLabel(), true,
+                bottomLabel(), true,
+                Collections.<Type> emptyList(),
+                Collections.<Label> emptyList(),
+                Collections.<Type> emptyList(),
+                Collections.<Assertion> emptyList());
     }
 
     protected LabelTypeCheckUtil ltcu = null;
@@ -1720,11 +1723,11 @@ public class JifTypeSystem_c
             ltcu = new LabelTypeCheckUtil(this);
         return ltcu;
     }
-    
+
     @Override
     public boolean promoteToFatal(Type t) {
-    	return ((JifOptions)extInfo.getOptions()).fatalExceptions
-    		&& descendsFrom(t, RuntimeException());
+        return ((JifOptions)extInfo.getOptions()).fatalExceptions
+                && descendsFrom(t, RuntimeException());
     }
 
     @Override
@@ -1740,6 +1743,6 @@ public class JifTypeSystem_c
 //    protected ArrayType createArrayType(Position pos, Type type) {
 //        return new JifArrayType_c(this, pos, type);
 //    }
-    
-    
+
+
 }

@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.Set;
 
 import jif.translate.JifToJavaRewriter;
-import jif.types.*;
+import jif.types.ActsForParam;
+import jif.types.JifContext;
+import jif.types.LabelSubstitution;
+import jif.types.PathMap;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
@@ -81,11 +84,11 @@ public interface Label extends ActsForParam {
      *  boolean{Alice:} secret = ...;
      *  final label{Alice:} lb = secret?new label{}:new label{Bob:};
      *  boolean{} leak = false;
-     *  if ((*lb} &lt;= new label{}) { // evaluation of lb reveals 
-     *                           // information at level {Alice:} 
+     *  if ((*lb} &lt;= new label{}) { // evaluation of lb reveals
+     *                           // information at level {Alice:}
      *     leak = true;
-     *  } 
-     *  
+     *  }
+     * 
      * </pre>
      * 
      * @see jif.ast.Jif#labelCheck(LabelChecker)
@@ -138,7 +141,7 @@ public interface Label extends ActsForParam {
      * Simplify the label, using leq if needed
      */
     Label simplify();
-    
+
     /**
      * Normalize the label. Essentially, simplify as much as possible without
      * using the leq ordering
@@ -149,7 +152,7 @@ public interface Label extends ActsForParam {
      * Does the label contain any writersToReaders constructs?
      */
     boolean hasWritersToReaders();
-    
+
     /**
      * Does the label contain any variables as components? This does not include variables
      * that are in bounds of arg labels.
@@ -167,13 +170,13 @@ public interface Label extends ActsForParam {
      * is a subset of variables(), since it does not count var labels contained
      * in upper bounds of arg labels.
      */
-    Set<Param> variableComponents();
-    
+    Set<Variable> variableComponents();
+
     /**
      * The set of variables that this label contains including variables contained
      * in upper bounds of arg labels.
      */
-    Set<Param> variables();
+    Set<Variable> variables();
 
     /**
      * Implementation of leq, should only be called by JifTypeSystem
@@ -190,7 +193,7 @@ public interface Label extends ActsForParam {
 
     ConfPolicy confProjection();
     IntegPolicy integProjection();
-    
+
     /**
      * If the label is runtime representable, when it is evaluated at runtime it
      * may throw exceptions. This method returns a list of the exceptions that
@@ -199,26 +202,31 @@ public interface Label extends ActsForParam {
      */
     List<Type> throwTypes(TypeSystem ts);
 
+    @Override
     Expr toJava(JifToJavaRewriter rw) throws SemanticException;
+
+    @Override
+    Label copy();
 
     ////////////////////////////////////////////////////////////////////////////
     // String representation methods                                          //
     ////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * Equivalent to toString(emptySet).
      */
+    @Override
     String toString();
-    
+
     /**
      * return a string representation of the label.
      *
      * @param printedLabels
      *        the set of labels for which auxiliary information should be
-     *        omitted. 
+     *        omitted.
      */
     String toString(Set<Label> printedLabels);
-    
+
     /**
      * Equivalent to componentString(emptySet)
      */
@@ -229,7 +237,7 @@ public interface Label extends ActsForParam {
      *
      * @param printedLabels
      *        the set of labels for which auxiliary information should be
-     *        omitted. 
+     *        omitted.
      */
     String componentString(Set<Label> printedLabels);
 

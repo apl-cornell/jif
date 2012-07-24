@@ -1,7 +1,7 @@
 package jif.types.label;
 
-import polyglot.util.Position;
 import jif.types.JifClassType;
+import polyglot.util.Position;
 
 /**
  * The label on a class, representing the trustworthiness of the class itself.

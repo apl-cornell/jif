@@ -14,7 +14,7 @@ import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 
 
-/** 
+/**
  * Visits an AST, and applies a <code>LabelSubsitution</code> to all labels
  * that occur in the AST. The <code>LabelSubsitution</code> is not allowed
  * to throw any <code>SemanticException</code>s.
@@ -30,7 +30,7 @@ public class TypeSubstitutor {
      * @param substitution the LabelSubstitution to use.
      */
     public TypeSubstitutor(LabelSubstitution substitution) {
-        this.substitution = substitution;        
+        this.substitution = substitution;
     }
 
     public Type rewriteType(Type t) throws SemanticException {
@@ -50,7 +50,7 @@ public class TypeSubstitutor {
                     new LinkedHashMap<ParamInstance, Param>();
             boolean diff = false;
 
-            
+
             for (Iterator<Map.Entry<ParamInstance, Param>> i = jst.entries(); i
                     .hasNext();) {
                 Map.Entry<ParamInstance, Param> e = i.next();
@@ -64,8 +64,8 @@ public class TypeSubstitutor {
                 }
                 else {
                     throw new InternalCompilerError(
-                        "Unexpected type for entry: "
-                            + arg.getClass().getName());
+                            "Unexpected type for entry: "
+                                    + arg.getClass().getName());
                 }
                 newMap.put(e.getKey(), p);
 
@@ -94,11 +94,14 @@ public class TypeSubstitutor {
     protected boolean recurseIntoLabeledType(LabeledType type) {
         return true;
     }
-    
+
     public <P extends ActsForParam> P rewriteActsForParam(P param)
             throws SemanticException {
         if (param == null) return null;
-        return (P) param.subst(substitution);
+
+        @SuppressWarnings("unchecked")
+        P result = (P) param.subst(substitution);
+        return result;
     }
 
     public Label rewriteLabel(Label L) throws SemanticException {
@@ -107,13 +110,13 @@ public class TypeSubstitutor {
     protected Principal rewritePrincipal(Principal p) throws SemanticException {
         return rewriteActsForParam(p);
     }
-    
+
     public <Actor extends ActsForParam, Granter extends ActsForParam> Assertion rewriteAssertion(
             Assertion a) throws SemanticException {
         if (a instanceof ActsForConstraint) {
             @SuppressWarnings("unchecked")
             ActsForConstraint<Actor, Granter> c =
-                (ActsForConstraint<Actor, Granter>) a.copy();
+            (ActsForConstraint<Actor, Granter>) a.copy();
             c = c.actor(rewriteActsForParam(c.actor()));
             c = c.granter(rewriteActsForParam(c.granter()));
             return c;
@@ -146,7 +149,7 @@ public class TypeSubstitutor {
             throws SemanticException {
         List<Principal> newList = new ArrayList<Principal>(list.size());
         for (Principal p : list) {
-            newList.add(rewritePrincipal(p));            
+            newList.add(rewritePrincipal(p));
         }
         return newList;
     }

@@ -1,7 +1,6 @@
 package jif.types;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +26,7 @@ import polyglot.util.Position;
 /**
  * A solver of Jif constraints. Finds solution to constraints essentially by
  * propagating lower bounds forwards.
- *  
+ * 
  */
 public class SolverGLB extends AbstractSolver {
     /**
@@ -60,28 +59,24 @@ public class SolverGLB extends AbstractSolver {
     @Override
     protected void addDependencies(Equation eqn) {
         // Build dependency maps for this equation.
-        Set changeable, awakeable;
+        Set<Variable> changeable, awakeable;
         if (eqn instanceof LabelEquation) {
             changeable = ((LabelEquation)eqn).rhs().variableComponents();
-            awakeable = ((LabelEquation)eqn).lhs().variableComponents(); 
+            awakeable = ((LabelEquation)eqn).lhs().variableComponents();
         }
         else if (eqn instanceof PrincipalEquation) {
             changeable = ((PrincipalEquation)eqn).lhs().variables();
-            awakeable = ((PrincipalEquation)eqn).rhs().variables();             
+            awakeable = ((PrincipalEquation)eqn).rhs().variables();
         }
         else {
             throw new InternalCompilerError("Unexpected kind of equation " + eqn);
         }
-        
-        for (Iterator j = changeable.iterator(); j.hasNext();) {
-            Variable v = (Variable)j.next();
 
+        for (Variable v : changeable) {
             // If this equation is examined, then the bound for v may be changed
             addDependency(eqn, v);
         }
-        for (Iterator j = awakeable.iterator(); j.hasNext();) {
-            Variable v = (Variable)j.next();
-
+        for (Variable v : awakeable) {
             // If the bound for v is changed (upward), then we may need to
             // reexamine this equation.
             addDependency(v, eqn);
@@ -122,8 +117,8 @@ public class SolverGLB extends AbstractSolver {
         // there may be a join of components on the RHS of the equation.
         // we will need to try all possible ways of satisfying this equation,
         // trying the simple ones (i.e. var labels) first.
-        
-        if (!eqn.rhs().hasVariableComponents()) {            
+
+        if (!eqn.rhs().hasVariableComponents()) {
             // the RHS has no variable components in it, it has nothing for us to
             // modify the bound of. It had better hold...
 
@@ -137,10 +132,11 @@ public class SolverGLB extends AbstractSolver {
         // has a variable...
 
         // get a count of them, to figure out if we need to do a search...
-        List rhsVariables = new ArrayList(eqn.rhs().variableComponents());
+        List<Variable> rhsVariables =
+                new ArrayList<Variable>(eqn.rhs().variableComponents());
         boolean isSingleVar = (rhsVariables.size() == 1);
         VarLabel singleVar = null;
-        if (isSingleVar) singleVar = (VarLabel)rhsVariables.get(0);
+        if (isSingleVar) singleVar = (VarLabel) rhsVariables.get(0);
         if (isSingleVar && (!isFixedValueVar(singleVar) || eqn.constraint().kind() == LabelConstraint.EQUAL)) {
             // only a single component is a variable
             refineVariableEquation(singleVar, eqn, true);
@@ -148,10 +144,10 @@ public class SolverGLB extends AbstractSolver {
         else {
             if (!isSingleVar && !allActivesAreMultiVarRHS()) {
                 // some of the active equations have single variables
-                // on the RHS. Satisfy those first, to reduce the search 
+                // on the RHS. Satisfy those first, to reduce the search
                 // effort.
                 if (shouldReport(3))
-                        report(3, "Deferring multi var RHS constraint");
+                    report(3, "Deferring multi var RHS constraint");
                 addEquationToQueue(eqn);
                 return;
             }
@@ -165,24 +161,24 @@ public class SolverGLB extends AbstractSolver {
             VarMap origBounds = bounds().copy();
             // record the last failed try for error report
             SemanticException lastexception=null;
-            VarLabel comp=null;
+            VarLabel comp = null;
             Label lastlabel=null;
-            
-            for (Iterator i = rhsVariables.iterator(); i.hasNext();) {
-                comp = (VarLabel)i.next();
-                
+
+            for (Variable var : rhsVariables) {
+                comp = (VarLabel) var;
+
                 if (isFixedValueVar(comp) && eqn.constraint().kind() != LabelConstraint.EQUAL) {
                     // this var label had it's value fixed when it's constraint
-                    // was added. Do not try to alter it's value.        
+                    // was added. Do not try to alter it's value.
                     continue;
                 }
-                
+
                 refineVariableEquation(comp, eqn, false);
-                
+
                 // check that the equation is now satisfied.
                 Label lhsbound = triggerTransforms(bounds().applyTo(eqn.lhs()), eqn.env());
                 Label rhsbound = triggerTransforms(bounds().applyTo(eqn.rhs()), eqn.env());
-                
+
                 try {
                     if (eqn.env().leq(lhsbound, rhsbound) && search(eqn)) {
                         // we were successfully able to find a solution to the
@@ -232,7 +228,8 @@ public class SolverGLB extends AbstractSolver {
         // at this point we know that there is at least one variable of the LHS
 
         // get a count of them, to figure out if we need to do a search...
-        List lhsVariables = new ArrayList(eqn.lhs().variables());
+        List<Variable> lhsVariables =
+                new ArrayList<Variable>(eqn.lhs().variables());
         boolean isSingleVar = (lhsVariables.size() == 1);
         VarPrincipal singleVar = null;
         if (isSingleVar) singleVar = (VarPrincipal)lhsVariables.get(0);
@@ -249,20 +246,20 @@ public class SolverGLB extends AbstractSolver {
             // restore it again later...
             VarMap origBounds = bounds().copy();
 
-            for (Iterator i = lhsVariables.iterator(); i.hasNext();) {
-                VarPrincipal comp = (VarPrincipal)i.next();
+            for (Variable var : lhsVariables) {
+                VarPrincipal comp = (VarPrincipal) var;
 
                 if (isFixedValueVar(comp)) {
                     // this var had it's value fixed when it's constraint
-                    // was added. Do not try to alter it's value.                   
+                    // was added. Do not try to alter it's value.
                     continue;
                 }
-                
+
                 refineVariableEquation(comp, eqn);
                 // check that the equation is now satisfied.
                 Principal lhsbound = bounds().applyTo(eqn.lhs());
                 Principal rhsbound = bounds().applyTo(eqn.rhs());
-                
+
                 if (eqn.env().actsFor(lhsbound, rhsbound) && search(eqn)) {
                     // we were successfully able to find a solution to the
                     // constraints!
@@ -279,18 +276,17 @@ public class SolverGLB extends AbstractSolver {
             if (shouldReport(1)) {
                 report(1, "Search for refinement to constraint " + eqn + " failed.");
             }
-            throw reportError(eqn);            
+            throw reportError(eqn);
         }
     }
-    
+
     /**
      * return true if every active constraint has multi vars on the RHS.
      */
     protected boolean allActivesAreMultiVarRHS() {
-        for (Iterator i = getQueue().iterator(); i.hasNext();) {
-            Equation eqn = (Equation)i.next();
+        for (Equation eqn : getQueue()) {
             if (eqn instanceof LabelEquation) {
-                if (((LabelEquation)eqn).rhs().variableComponents().size() <= 1){ 
+                if (((LabelEquation)eqn).rhs().variableComponents().size() <= 1){
                     return false;
                 }
             }
@@ -307,14 +303,14 @@ public class SolverGLB extends AbstractSolver {
         Label vBound = bounds().boundOf(v);
         Label lhsBound = triggerTransforms(bounds().applyTo(eqn.lhs()), eqn.env());
         Label rhsBound = triggerTransforms(bounds().applyTo(eqn.rhs()), eqn.env());
-        
+
         if (shouldReport(5)) report(5, "BOUND of " + v + " = " + vBound);
         if (shouldReport(5)) report(5, "RHSBOUND = " + rhsBound);
         if (shouldReport(5)) report(5, "LHSBOUND = " + lhsBound);
 
         // Try and raise v's bound just enough to satisfy the equation
         Label needed = findNeeded(lhsBound, rhsBound, eqn.env());
-                
+
         if (shouldReport(5)) report(4, "NEEDED = " + needed);
 
         Label newBound =  ts.join(vBound, needed);
@@ -325,23 +321,22 @@ public class SolverGLB extends AbstractSolver {
             Label rtRep = eqn.env().findNonArgLabelUpperBound(newBound);
             if (shouldReport(4)) report(4, "RUNTIME_REPR (" + newBound + ") := " + rtRep);
             newBound = rtRep;
-            
+
         }
-        
+
         // since this method can be called while trying out the rhs components, only add
         // the refinement when it succeeds
         if (trace)
             addTrace(v, eqn.lhs(), eqn, newBound, Direction.IN);
         setBound(v, newBound, eqn.labelConstraint());
-        
+
         wakeUp(v);
     }
-        
+
     /**
      * Raise the bound on the label variable v, which is a component of the equation eqn.
      */
-    protected void refineVariableEquation(VarPrincipal v, PrincipalEquation eqn)
-            throws SemanticException {
+    protected void refineVariableEquation(VarPrincipal v, PrincipalEquation eqn) {
         Principal vBound = bounds().boundOf(v);
         Principal lhsBound = bounds().applyTo(eqn.lhs());
         Principal rhsBound = bounds().applyTo(eqn.rhs());
@@ -350,7 +345,7 @@ public class SolverGLB extends AbstractSolver {
         if (shouldReport(5)) report(5, "RHSBOUND = " + rhsBound);
         if (shouldReport(5)) report(5, "LHSBOUND = " + lhsBound);
 
-        // Raise v's bound 
+        // Raise v's bound
         Principal newBound =  ts.conjunctivePrincipal(vBound.position(), vBound, rhsBound).simplify();
 
         if (shouldReport(4)) report(4, "CONJUNCT (" + v + ", NEEDED) := " + newBound);
@@ -366,11 +361,10 @@ public class SolverGLB extends AbstractSolver {
     protected Label findNeeded(Label lhs, Label rhs, LabelEnv env) {
         if (lhs instanceof JoinLabel) {
             JoinLabel jl = (JoinLabel)lhs;
-            Set needed = new LinkedHashSet();
+            Set<Label> needed = new LinkedHashSet<Label>();
             // jl = c1 join ... join cn
             // Want L to be the join of all ci such that ci is not <= rhs
-            for (Iterator iter = jl.joinComponents().iterator(); iter.hasNext();) {
-                Label ci = (Label)iter.next();
+            for (Label ci : jl.joinComponents()) {
                 if (!env.leq(ci, rhs)) {
                     needed.add(findNeeded(ci, rhs, env));
                 }
@@ -381,9 +375,8 @@ public class SolverGLB extends AbstractSolver {
             MeetLabel ml = (MeetLabel)lhs;
             // ml = c1 meet ... meet cn
             // find the needed components of each of the ci.
-            Set needed = new LinkedHashSet();
-            for (Iterator iter = ml.meetComponents().iterator(); iter.hasNext();) {
-                Label ci = (Label)iter.next();
+            Set<Label> needed = new LinkedHashSet<Label>();
+            for (Label ci : ml.meetComponents()) {
                 needed.add(findNeeded(ci, rhs, env));
             }
             return ts.meetLabel(lhs.position(), needed);
@@ -401,12 +394,12 @@ public class SolverGLB extends AbstractSolver {
 
     protected ConfPolicy findNeeded(ConfPolicy lhs, ConfPolicy rhs, LabelEnv env) {
         if (lhs instanceof JoinPolicy_c) {
-            JoinPolicy_c jp = (JoinPolicy_c)lhs;
-            Set needed = new LinkedHashSet();
+            @SuppressWarnings("unchecked")
+            JoinPolicy_c<ConfPolicy> jp = (JoinPolicy_c<ConfPolicy>) lhs;
+            Set<ConfPolicy> needed = new LinkedHashSet<ConfPolicy>();
             // jl = c1 join ... join cn
             // Want L to be the join of all ci such that ci is not <= rhs
-            for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
-                ConfPolicy ci = (ConfPolicy)iter.next();
+            for (ConfPolicy ci : jp.joinComponents()) {
                 if (!env.leq(ci, rhs)) {
                     needed.add(findNeeded(ci, rhs, env));
                 }
@@ -414,27 +407,27 @@ public class SolverGLB extends AbstractSolver {
             return ts.joinConfPolicy(lhs.position(), needed);
         }
         else if (lhs instanceof MeetPolicy_c) {
-            MeetPolicy_c mp = (MeetPolicy_c)lhs;
+            @SuppressWarnings("unchecked")
+            MeetPolicy_c<ConfPolicy> mp = (MeetPolicy_c<ConfPolicy>) lhs;
             // find the needed components of each of the ci.
-            Set needed = new LinkedHashSet();
-            for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
-                ConfPolicy ci = (ConfPolicy)iter.next();
+            Set<ConfPolicy> needed = new LinkedHashSet<ConfPolicy>();
+            for (ConfPolicy ci : mp.meetComponents()) {
                 needed.add(findNeeded(ci, rhs, env));
             }
             return ts.meetConfPolicy(lhs.position(), needed);
         }
         else {
             return lhs;
-        }        
+        }
     }
     protected IntegPolicy findNeeded(IntegPolicy lhs, IntegPolicy rhs, LabelEnv env) {
         if (lhs instanceof JoinPolicy_c) {
-            JoinPolicy_c jp = (JoinPolicy_c)lhs;
-            Set needed = new LinkedHashSet();
+            @SuppressWarnings("unchecked")
+            JoinPolicy_c<IntegPolicy> jp = (JoinPolicy_c<IntegPolicy>) lhs;
+            Set<IntegPolicy> needed = new LinkedHashSet<IntegPolicy>();
             // jl = c1 join ... join cn
             // Want L to be the join of all ci such that ci is not <= rhs
-            for (Iterator iter = jp.joinComponents().iterator(); iter.hasNext();) {
-                IntegPolicy ci = (IntegPolicy)iter.next();
+            for (IntegPolicy ci : jp.joinComponents()) {
                 if (!env.leq(ci, rhs)) {
                     needed.add(findNeeded(ci, rhs, env));
                 }
@@ -442,18 +435,18 @@ public class SolverGLB extends AbstractSolver {
             return ts.joinIntegPolicy(lhs.position(), needed);
         }
         else if (lhs instanceof MeetPolicy_c) {
-            MeetPolicy_c mp = (MeetPolicy_c)lhs;
+            @SuppressWarnings("unchecked")
+            MeetPolicy_c<IntegPolicy> mp = (MeetPolicy_c<IntegPolicy>) lhs;
             // find the needed components of each of the ci.
-            Set needed = new LinkedHashSet();
-            for (Iterator iter = mp.meetComponents().iterator(); iter.hasNext();) {
-                IntegPolicy ci = (IntegPolicy)iter.next();
+            Set<IntegPolicy> needed = new LinkedHashSet<IntegPolicy>();
+            for (IntegPolicy ci : mp.meetComponents()) {
                 needed.add(findNeeded(ci, rhs, env));
             }
             return ts.meetIntegPolicy(lhs.position(), needed);
         }
         else {
             return lhs;
-        }        
+        }
     }
     /**
      * Search recursively for solution to system of constraints.
@@ -469,7 +462,7 @@ public class SolverGLB extends AbstractSolver {
 
         setBounds(js.solve_bounds());
         if (shouldReport(2)) report(2, "Solution succeeded, finishing up");
-            return true;
+        return true;
     }
 
     /**
@@ -531,10 +524,10 @@ public class SolverGLB extends AbstractSolver {
             // This equation isn't satisfiable.
             throw reportError(eqn);
         }
-        
+
     }
 
-        /**
+    /**
      * Find a contradicting equation.
      */
     @Override

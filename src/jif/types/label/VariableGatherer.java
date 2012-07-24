@@ -4,7 +4,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jif.types.LabelSubstitution;
-import jif.types.Param;
 import jif.types.principal.Principal;
 import jif.types.principal.VarPrincipal;
 import polyglot.types.SemanticException;
@@ -15,26 +14,26 @@ import polyglot.types.SemanticException;
  * <code>Variable</code>s.
  */
 public class VariableGatherer extends LabelSubstitution {
-    public final Set<Param> variables = new LinkedHashSet<Param>();
+    public final Set<Variable> variables = new LinkedHashSet<Variable>();
 
     /**
-     * @throws SemanticException  
+     * @throws SemanticException
      */
     @Override
     public Label substLabel(Label L) throws SemanticException {
         if (L instanceof VarLabel) {
-            variables.add(L);
+            variables.add((VarLabel) L);
         }
         return L;
     }
-    
+
     /**
-     * @throws SemanticException  
+     * @throws SemanticException
      */
     @Override
     public Principal substPrincipal(Principal p) throws SemanticException {
         if (p instanceof VarPrincipal) {
-            variables.add(p);
+            variables.add((VarPrincipal) p);
         }
         return p;
     }

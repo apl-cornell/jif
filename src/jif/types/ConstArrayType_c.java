@@ -6,6 +6,8 @@ import java.util.Collections;
 import jif.types.label.Label;
 import polyglot.types.ArrayType;
 import polyglot.types.ArrayType_c;
+import polyglot.types.FieldInstance;
+import polyglot.types.MethodInstance;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.util.Position;
@@ -20,7 +22,7 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
     protected ConstArrayType_c() { }
 
     public ConstArrayType_c(JifTypeSystem ts, Position pos, Type base, boolean isConst) {
-        this(ts, pos, base, isConst, !isConst); 
+        this(ts, pos, base, isConst, !isConst);
     }
     public ConstArrayType_c(JifTypeSystem ts, Position pos, Type base, boolean isConst, boolean isNonConst) {
         super(ts, pos, base);
@@ -45,7 +47,7 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
         }
 
         String s = base.toString();
-        
+
         if (!isBaseArray && isConst && !isNonConst) return s + " const[]";
         if (!isBaseArray && isConst && isNonConst) return s + " const?[]";
         return s + "[]";
@@ -55,9 +57,9 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof ConstArrayType) {
             ConstArrayType t = (ConstArrayType) o;
-            return t.isConst() == isConst && 
-               t.isNonConst() == isNonConst && 
-               ts.equals(base, t.base());
+            return t.isConst() == isConst &&
+                    t.isNonConst() == isNonConst &&
+                    ts.equals(base, t.base());
         }
 
         if (o instanceof ArrayType) {
@@ -90,7 +92,7 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
                 return ts.equals(this.base(), toType.toArray().base());
             }
             else {
-                // Object = int[] 
+                // Object = int[]
                 return super.isImplicitCastValidImpl(toType);
             }
         }
@@ -106,56 +108,56 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
                 return ts.isImplicitCastValid(this.base(), toType.toArray().base());
             }
             else {
-                // Object = int[] 
+                // Object = int[]
                 return super.isImplicitCastValidImpl(toType);
             }
         }
 
         return false;
     }
-    
+
     @Override
     protected void init() {
         JifTypeSystem ts = (JifTypeSystem)this.ts;
         if (methods == null) {
-            methods = new ArrayList(1);
-            
+            methods = new ArrayList<MethodInstance>(1);
+
             // Add method public T const?[] clone()
             Type retType = ts.constArrayOf(position(), this.base(), 1, true, true);
-            
+
             methods.add(ts.jifMethodInstance(position(),
-                                          this,
-                                          ts.Public(),
-                                          retType,
-                                          "clone",
-                                          ts.topLabel(),
-                                          false,
-                                          Collections.EMPTY_LIST,
-                                          Collections.EMPTY_LIST,
-                                          ts.bottomLabel(),
-                                          false,
-                                          Collections.EMPTY_LIST,
-                                          Collections.EMPTY_LIST));
+                    this,
+                    ts.Public(),
+                    retType,
+                    "clone",
+                    ts.topLabel(),
+                    false,
+                    Collections.<Type> emptyList(),
+                    Collections.<Label> emptyList(),
+                    ts.bottomLabel(),
+                    false,
+                    Collections.<Type> emptyList(),
+                    Collections.<Assertion> emptyList()));
         }
-        
+
         if (fields == null) {
-            fields = new ArrayList(2);
-            
+            fields = new ArrayList<FieldInstance>(2);
+
             // Add field public final int length
             Label fieldLabel = ts.thisLabel(this);
             JifFieldInstance fi = (JifFieldInstance)ts.fieldInstance(position(),
-                                                this,
-                                                ts.Public().Final(),
-                                                ts.labeledType(position(), ts.Int(), fieldLabel),
-                                                "length");
+                    this,
+                    ts.Public().Final(),
+                    ts.labeledType(position(), ts.Int(), fieldLabel),
+                    "length");
             fi.setLabel(fieldLabel);
             fi.setNotConstant();
             fields.add(fi);
         }
-        
+
         if (interfaces == null) {
-            interfaces = Collections.EMPTY_LIST;
+            interfaces = Collections.emptyList();
         }
     }
-    
+
 }

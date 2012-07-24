@@ -5,11 +5,9 @@ import java.util.List;
 import jif.ast.JifMethodDecl;
 import jif.ast.JifMethodDecl_c;
 import jif.translate.ToJavaExt;
-import jif.types.Assertion;
 import jif.types.JifContext;
 import jif.types.JifMethodInstance;
 import jif.types.JifTypeSystem;
-import jif.types.LabelLeAssertion;
 import jif.types.LabelSubstitution;
 import jif.types.PathMap;
 import jif.types.SemanticDetailedException;
@@ -26,7 +24,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
 
-/** The Jif extension of the <code>JifMethodDecl</code> node. 
+/** The Jif extension of the <code>JifMethodDecl</code> node.
  * 
  *  @see jif.ast.JifMethodDecl
  */
@@ -46,7 +44,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 
         // check covariance of labels
         checkCovariance(mi, lc);
-        
+
         // check that the labels in the method signature conform to the
         // restrictions of the superclass and/or interface method declaration.
         overrideMethodLabelCheck(lc, renamedMI);
@@ -58,7 +56,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 
         // let the label checker know that we are about to enter a method decl
         lc.enteringMethod(mi);
-        
+
         // First, check the arguments, and adjust the context.
         Label Li = checkEnforceSignature(mi, lc);
 
@@ -75,7 +73,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             A = lc.context();
             Label providerAndPc = ts.join(A.currentCodePCBound(), A.provider());
             A.setCurrentCodePCBound(providerAndPc);
-            
+
             // Visit only the body, not the formal parameters.
             body = (Block) lc.context(A).labelCheck(mn.body());
             X = getPathMap(body);
@@ -86,7 +84,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             addReturnConstraints(Li, X, mi, lc, mi.returnType());
         }
         else {
-            // for an abstract or native method, just set the 
+            // for an abstract or native method, just set the
             // normal termination path to the entry PC of the
             // method.
             X = ts.pathMap();
@@ -119,13 +117,13 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         Label Li = mi.pcBound();
         if (Li.isCovariant()) {
             throw new SemanticDetailedException("The pc bound of a method " +
-                                                "can not be the covariant label " + Li + ".",
-                                                "The pc bound of a method " +
-                                                "can not be the covariant label " + Li + ". " +
-                                                "Otherwise, information may be leaked by casting the " +
-                                                "low-parameter class to a high-parameter class, and masking " +
-                                                "the low side-effects that invoking the method may cause.",
-                                                declPosition);
+                    "can not be the covariant label " + Li + ".",
+                    "The pc bound of a method " +
+                            "can not be the covariant label " + Li + ". " +
+                            "Otherwise, information may be leaked by casting the " +
+                            "low-parameter class to a high-parameter class, and masking " +
+                            "the low side-effects that invoking the method may cause.",
+                            declPosition);
         }
 
         // check arguments
@@ -139,31 +137,35 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             if (argBj.isCovariant()) {
                 String name = mn.formals().get(index).name();
                 throw new SemanticDetailedException("The method " +
-                                                    "argument " + name + 
-                                                    " can not be labeled with the covariant label " + argBj + ".",
-                                                    "The method argument " + name + 
-                                                    " can not be labeled with the covariant label " + argBj + ". " +
-                                                    "Otherwise, information may be leaked by casting the " +
-                                                    "low-parameter class to a high-parameter class, and calling " +
-                                                    "the method with a high security parameter, which the " +
-                                                    "method regards as low security information.",
-                                                    argBj.position());
+                        "argument " + name +
+                        " can not be labeled with the covariant label " + argBj + ".",
+                        "The method argument " + name +
+                        " can not be labeled with the covariant label " + argBj + ". " +
+                        "Otherwise, information may be leaked by casting the " +
+                        "low-parameter class to a high-parameter class, and calling " +
+                        "the method with a high security parameter, which the " +
+                        "method regards as low security information.",
+                        argBj.position());
             }
 
             index++;
         }
 
+        // XXX Commented out code below. Essentially a no-op since 14 Feb 2007.
+        // Original commit message by schong says it's intended to fix a
+        // "covariant label in label constraint" unsoundness. -Jed, Jul 2012
+
         // check label constraints
-        for (Assertion a : mi.constraints()) {
-            if (a instanceof LabelLeAssertion) {
-                // no covariant labels can occur on the RHS of a constraint,
-                // as subtypes may violate this constraint.
-                // They may, however, occur on the LHS, since if a supertype
-                // satisfies the constraint, then the subtype will too.
-                CovariantLabelChecker clc = new CovariantLabelChecker(a.position());
-//              !@!                lla.rhs().subst(clc);
-            }
-        }
+//        for (Assertion a : mi.constraints()) {
+//            if (a instanceof LabelLeAssertion) {
+//                // no covariant labels can occur on the RHS of a constraint,
+//                // as subtypes may violate this constraint.
+//                // They may, however, occur on the LHS, since if a supertype
+//                // satisfies the constraint, then the subtype will too.
+//                CovariantLabelChecker clc = new CovariantLabelChecker(a.position());
+////              !@!                lla.rhs().subst(clc);
+//            }
+//        }
 
     }
 
@@ -172,7 +174,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
      * methods in the superclasses or interfaces that it is overriding.
      * 
      * In particular, argument labels and pc bounds are contravariant,
-     * return labels, return value labels and labels on exception types are 
+     * return labels, return value labels and labels on exception types are
      * covariant.
      */
     protected void overrideMethodLabelCheck(LabelChecker lc, final JifMethodInstance mi) throws SemanticException {
@@ -182,14 +184,14 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         for (final JifMethodInstance mj : implemented) {
             if (! ts.isAccessible(mj, lc.context())) {
                 continue;
-            }            
+            }
             lc.createOverrideHelper(mj, mi).checkOverride(lc);
         }
     }
 
     /**
      * Checker to ensure that no covariant label occurs in the label
-     */    
+     */
     protected static class CovariantLabelChecker extends LabelSubstitution {
         private final Position errPosition;
 
@@ -201,7 +203,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             if (L instanceof ThisLabel) {
 //              throw new SemanticDetailedException("The \"this\" label " +
 //              "can not occur on the right hand side of " +
-//              "a label constraint.", 
+//              "a label constraint.",
 //              "The \"this\" label " +
 //              "can not occur on the right hand side of " +
 //              "a label constraint, since it is covariant, and " +
@@ -211,13 +213,13 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
             }
             else if (L.isCovariant()) {
                 throw new SemanticDetailedException("Covariant labels " +
-                                                    "can not occur on the right hand side of " +
-                                                    "a label constraint.", 
-                                                    "Covariant labels " +
-                                                    "can not occur on the right hand side of " +
-                                                    "a label constraint, since subclasses may " +
-                                                    "not satisfy the constraint.",
-                                                    errPosition);
+                        "can not occur on the right hand side of " +
+                        "a label constraint.",
+                        "Covariant labels " +
+                                "can not occur on the right hand side of " +
+                                "a label constraint, since subclasses may " +
+                                "not satisfy the constraint.",
+                                errPosition);
             }
             return L;
         }

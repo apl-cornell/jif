@@ -4,7 +4,10 @@ import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.PathMap;
 import jif.visit.LabelChecker;
-import polyglot.types.*;
+import polyglot.types.LocalInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.UnknownType;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -24,17 +27,19 @@ public class AccessPathLocal extends AccessPathRoot {
             throw new InternalCompilerError("Inconsistent local names");
         }
     }
-    
+
+    @Override
     public boolean isCanonical() { return !(li.type() instanceof UnknownType); }
+    @Override
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
-        if (r instanceof AccessPathLocal) {            
+        if (r instanceof AccessPathLocal) {
             if (li.equals(((AccessPathLocal)r).li)) {
                 return e;
             }
         }
         return this;
     }
-    
+
     public AccessPathLocal name(String name) {
         AccessPathLocal apl = (AccessPathLocal)this.copy();
         apl.name = name;
@@ -43,16 +48,19 @@ public class AccessPathLocal extends AccessPathRoot {
         }
         return apl;
     }
-    
+
+    @Override
     public boolean isNeverNull() {
         return neverNull;
     }
     public void setIsNeverNull() {
         this.neverNull = true;
     }
-    public String toString() {        
+    @Override
+    public String toString() {
         return niceName();
     }
+    @Override
     public String exprString() {
         return niceName();
     }
@@ -63,10 +71,11 @@ public class AccessPathLocal extends AccessPathRoot {
     public String name() {
         return name;
     }
-    
+
     public LocalInstance localInstance() {
         return this.li;
     }
+    @Override
     public boolean equals(Object o) {
         if (o instanceof AccessPathLocal) {
             AccessPathLocal that = (AccessPathLocal)o;
@@ -74,29 +83,33 @@ public class AccessPathLocal extends AccessPathRoot {
             // that we don't mistakenly equate two local instances
             // with the same name but from different methods/defining
             // scopes
-            return this.name.equals(that.name) && li == that.li; 
+            return this.name.equals(that.name) && li == that.li;
         }
-        return false;        
+        return false;
     }
 
+    @Override
     public int hashCode() {
         return name.hashCode();
     }
+    @Override
     public Type type() {
         if (li == null) return null;
         return li.type();
     }
 
+    @Override
     public PathMap labelcheck(JifContext A, LabelChecker lc) {
-    	JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
-    	Label L = ts.labelOfLocal(li, A.pc());
+        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        Label L = ts.labelOfLocal(li, A.pc());
 
-    	PathMap X = ts.pathMap();
-    	X = X.N(A.pc());
-    	X = X.NV(lc.upperBound(L, A.pc()));
-        
+        PathMap X = ts.pathMap();
+        X = X.N(A.pc());
+        X = X.NV(lc.upperBound(L, A.pc()));
+
         return X;
     }
+    @Override
     public void verify(JifContext A) throws SemanticException {
         if (li == null) {
             li = A.findLocal(name);
