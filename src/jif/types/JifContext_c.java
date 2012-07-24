@@ -45,7 +45,7 @@ public class JifContext_c extends Context_c implements JifContext
     private Set<Principal> auth;
     private Label pc; //internal pc
     private Label currentCodePCBound; //external pc
-    
+
     /**
      * Map of local variables that have been endorsed
      * using a checked endorse statement
@@ -54,7 +54,7 @@ public class JifContext_c extends Context_c implements JifContext
 
 
     /**
-     * Map from JifContext_c.Key (pairs of Branch.Kind and String) to Labels. 
+     * Map from JifContext_c.Key (pairs of Branch.Kind and String) to Labels.
      */
     protected Map<Key, Label> gotos;
 
@@ -84,7 +84,7 @@ public class JifContext_c extends Context_c implements JifContext
             ctxt.gotos = new HashMap<Key, Label>(gotos);
         }
         ctxt.provider = provider;
-        return ctxt;        
+        return ctxt;
     }
 
     @Override
@@ -95,6 +95,10 @@ public class JifContext_c extends Context_c implements JifContext
             return vi;
         }
 
+        return findStaticPrincipal(name);
+    }
+
+    protected VarInstance findStaticPrincipal(String name) {
         // Principals are masquerading as classes.   Find the class
         // and pull the principal out of the class.  Ick.
         ClassType principal;
@@ -121,8 +125,8 @@ public class JifContext_c extends Context_c implements JifContext
 
                 if (jlts.isSubtype(t.toClass(), principal)) {
                     return jifts.principalInstance(null,
-                                                   jifts.externalPrincipal(null, name));
-                }                
+                            jifts.externalPrincipal(null, name));
+                }
             }
         }
         return null;
@@ -183,7 +187,7 @@ public class JifContext_c extends Context_c implements JifContext
                 // envs in the scope of the same class as us.
                 jc.env.addEquiv(L1, L2);
                 lastEnvAddedTo = jc.env;
-            }            
+            }
         }
     }
 
@@ -202,7 +206,7 @@ public class JifContext_c extends Context_c implements JifContext
                 // envs in the scope of the same class as us.
                 jc.env.addEquiv(p, q);
                 lastEnvAddedTo = jc.env;
-            }            
+            }
         }
     }
 
@@ -250,10 +254,10 @@ public class JifContext_c extends Context_c implements JifContext
                 // envs in the scope of the same class as us.
                 jc.env.addEquiv(p, q);
                 lastEnvAddedTo = jc.env;
-            }            
+            }
             lastJCBlock = (jc.kind == Context_c.BLOCK);
         }
-        
+
     }
     /**
      * Adds the assertion to this context, and all outer contexts up to
@@ -274,7 +278,7 @@ public class JifContext_c extends Context_c implements JifContext
                 // envs in the scope of the same class as us.
                 jc.env.addEquiv(p1, p2);
                 lastEnvAddedTo = jc.env;
-            }            
+            }
         }
     }
 
@@ -306,7 +310,7 @@ public class JifContext_c extends Context_c implements JifContext
         public boolean equals(Object o) {
             if (o instanceof Key) {
                 Key that = (Key)o;
-                return this.kind.equals(that.kind) && (this.label == that.label || (this.label != null && this.label.equals(that.label))); 
+                return this.kind.equals(that.kind) && (this.label == that.label || (this.label != null && this.label.equals(that.label)));
             }
             return false;
         }
@@ -327,13 +331,13 @@ public class JifContext_c extends Context_c implements JifContext
     @Override
     public Label currentCodePCBound() { return currentCodePCBound; }
     @Override
-    public void setCurrentCodePCBound(Label currentCodePCBound) { 
-        this.currentCodePCBound = currentCodePCBound; 
+    public void setCurrentCodePCBound(Label currentCodePCBound) {
+        this.currentCodePCBound = currentCodePCBound;
     }
 
     @Override
     public Label pc() { return pc; }
-    
+
     @Override
     // pc label is special for better error report
     public void setPc(Label pc, LabelChecker lc) { // this.pc = pc;
@@ -355,7 +359,7 @@ public class JifContext_c extends Context_c implements JifContext
     public Set<Principal> authority() { return auth; }
     @Override
     public void setAuthority(Set<Principal> auth) {
-    	this.auth = auth; 
+        this.auth = auth;
     }
 
     @Override
@@ -368,18 +372,18 @@ public class JifContext_c extends Context_c implements JifContext
         Set<Label> labels = new LinkedHashSet<Label>();
         for (Principal p : auth) {
             PairLabel pl = jifts.pairLabel(p.position(),
-                                           jifts.readerPolicy(p.position(),
-                                                              p,
-                                                              jifts.topPrincipal(p.position())),
-                                                              jifts.topIntegPolicy(p.position()));
+                    jifts.readerPolicy(p.position(),
+                            p,
+                            jifts.topPrincipal(p.position())),
+                            jifts.topIntegPolicy(p.position()));
             labels.add(pl);
         }
 
         if (labels.isEmpty()) {
             return jifts.bottomLabel(currentCode().position());
         }
-        Label L = jifts.joinLabel(currentCode().position(), 
-                                  labels);
+        Label L = jifts.joinLabel(currentCode().position(),
+                labels);
         return L;
     }
 
@@ -388,18 +392,18 @@ public class JifContext_c extends Context_c implements JifContext
         Set<Label> labels = new LinkedHashSet<Label>();
         for (Principal p : authority()) {
             PairLabel pl = jifts.pairLabel(p.position(),
-                                           jifts.bottomConfPolicy(p.position()),
-                                           jifts.writerPolicy(p.position(),
-                                                              p,
-                                                              jifts.topPrincipal(p.position())));
+                    jifts.bottomConfPolicy(p.position()),
+                    jifts.writerPolicy(p.position(),
+                            p,
+                            jifts.topPrincipal(p.position())));
             labels.add(pl);
         }
 
         if (labels.isEmpty()) {
             return jifts.topLabel(currentCode().position());
         }
-        Label L = jifts.meetLabel(currentCode().position(), 
-                                  labels);
+        Label L = jifts.meetLabel(currentCode().position(),
+                labels);
         return L;
     }
 
@@ -490,7 +494,7 @@ public class JifContext_c extends Context_c implements JifContext
             this.checkedEndorsements = new HashMap<LocalInstance, Label>();
         }
         else {
-            this.checkedEndorsements = new HashMap<LocalInstance, Label>(this.checkedEndorsements);            
+            this.checkedEndorsements = new HashMap<LocalInstance, Label>(this.checkedEndorsements);
         }
         this.checkedEndorsements.put(li, downgradeTo);
     }
