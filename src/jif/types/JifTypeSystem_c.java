@@ -109,7 +109,6 @@ import polyglot.types.LazyClassInitializer;
 import polyglot.types.LocalInstance;
 import polyglot.types.MemberInstance;
 import polyglot.types.MethodInstance;
-import polyglot.types.Package;
 import polyglot.types.ParsedClassType;
 import polyglot.types.PrimitiveType;
 import polyglot.types.PrimitiveType_c;
@@ -192,14 +191,6 @@ implements JifTypeSystem {
         UnknownQualifier t = super.unknownQualifier(pos);
         return t;
     }
-
-    @Override
-    public Package packageForName(Package prefix, String name)
-            throws SemanticException
-            {
-        Package p = super.packageForName(prefix, name);
-        return p;
-            }
 
     private static final PrimitiveType.Kind PRINCIPAL_KIND = new PrimitiveType.Kind("principal");
     private static final PrimitiveType.Kind LABEL_KIND = new PrimitiveType.Kind("label");
