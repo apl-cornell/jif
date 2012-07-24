@@ -16,9 +16,14 @@ import jif.types.JifTypeSystem;
 import jif.types.JifTypeSystem_c;
 import jif.visit.LabelChecker;
 import polyglot.ast.NodeFactory;
-import polyglot.filemanager.FileManager;
-import polyglot.frontend.*;
 import polyglot.frontend.Compiler;
+import polyglot.frontend.CupParser;
+import polyglot.frontend.FileSource;
+import polyglot.frontend.JLExtensionInfo;
+import polyglot.frontend.Job;
+import polyglot.frontend.JobExt;
+import polyglot.frontend.Parser;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
 import polyglot.types.LoadedClassResolver;
@@ -105,19 +110,17 @@ public class ExtensionInfo extends JLExtensionInfo
     }
 
     @Override
-    protected FileManager createFileManager() {
+    protected void configureFileManager() {
         JifOptions options = getJifOptions();
-        FileManager fm = super.createFileManager();
         // use the signature classpath if it exists for compiling Jif classes
         List<File> path = new ArrayList<File>();
         path.addAll(options.sigcp);
         path.addAll(options.classpath_directories);
         try {
-            fm.setLocation(options.signature_path, path);
+            extFM.setLocation(options.signature_path, path);
         } catch (IOException e) {
             throw new InternalCompilerError(e);
         }
-        return fm;
     }
 
     @Override

@@ -107,7 +107,6 @@ public class JifOptions extends Options {
             }
         });
         flags.add(new IntFlag("-debug", "<num>", "set debug level to n. Prints more information about labels"));
-        //flags.add(new Switch("-trusted-providers", "set the providers of the sources being compiled to be trusted"));
         flags.add(new Switch("-untrusted-providers", "set the providers of the sources being compiled to be untrusted"));
         super.populateFlags(flags);
     }
@@ -142,10 +141,7 @@ public class JifOptions extends Options {
         else if (arg.flag().ids().contains("-debug")) {
             Report.addTopic("debug", (Integer) arg.value());
         }
-        else if (arg.flag().ids().contains("-trusted-providers")) {
-            trustedProviders = (Boolean) arg.value();
-        }
-        else if (arg.flag().ids().contains("-untrusted-providers")) {
+ else if (arg.flag().ids().contains("-untrusted-providers")) {
             trustedProviders = !(Boolean) arg.value();
         }
         else super.handleArg(arg);
