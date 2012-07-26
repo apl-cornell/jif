@@ -1815,11 +1815,9 @@ implements JifTypeSystem {
             return new AccessPathConstant(pn.principal(), pn.type(), pn.position());
         }
         else if (e instanceof NullLit && expectedType != null &&
-                context.typeSystem().isImplicitCastValid(expectedType,
-                        ((JifTypeSystem)context.typeSystem()).Principal())) {
-            JifTypeSystem ts = (JifTypeSystem)context.typeSystem();
-            Principal bot = ts.bottomPrincipal(e.position());
-            return new AccessPathConstant(bot, ts.Principal(), e.position());
+                isImplicitCastValid(expectedType, Principal())) {
+            Principal bot = bottomPrincipal(e.position());
+            return new AccessPathConstant(bot, Principal(), e.position());
         }
         else if (e instanceof Cast) {
             return exprToAccessPath(((Cast)e).expr(), expectedType, context);
