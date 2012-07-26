@@ -130,12 +130,16 @@ public class AmbParam_c extends Node_c implements AmbParam
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
         if (vi.flags().isFinal()) {
             if (ts.isLabel(vi.type()) || (pi != null && pi.isLabel())) {
-                Label l = ts.dynamicLabel(position(), JifUtil.varInstanceToAccessPath(vi, this.position()));
+                Label l =
+                        ts.dynamicLabel(position(),
+                                ts.varInstanceToAccessPath(vi, this.position()));
                 return nf.CanonicalLabelNode(position(), l);
             }
 
             if (ts.isImplicitCastValid(vi.type(), ts.Principal()) || (pi != null && pi.isPrincipal())) {
-                Principal p = ts.dynamicPrincipal(position(), JifUtil.varInstanceToAccessPath(vi, this.position()));
+                Principal p =
+                        ts.dynamicPrincipal(position(),
+                                ts.varInstanceToAccessPath(vi, this.position()));
                 return nf.CanonicalPrincipalNode(position(), p);
             }
             throw new SemanticDetailedException(

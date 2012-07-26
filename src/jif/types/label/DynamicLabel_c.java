@@ -3,7 +3,6 @@ package jif.types.label;
 import java.util.List;
 import java.util.Set;
 
-import jif.ast.JifUtil;
 import jif.translate.LabelToJavaExpr;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
@@ -30,7 +29,7 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
         if (path instanceof AccessPathConstant) {
             throw new InternalCompilerError("Don't expect to get AccessPathConstants for dynamic labels");
         }
-        setDescription(JifUtil.accessPathDescrip(path, "label"));
+        setDescription(ts.accessPathDescrip(path, "label"));
     }
     @Override
     public AccessPath path() {

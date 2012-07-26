@@ -1,6 +1,5 @@
 package jif.extension;
 
-import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.ActsForParam;
 import jif.types.JifContext;
@@ -19,7 +18,7 @@ import polyglot.types.SemanticException;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
 
-/** The Jif extension of the <code>If</code> node. 
+/** The Jif extension of the <code>If</code> node.
  * 
  *  @see polyglot.ast.If
  */
@@ -96,23 +95,23 @@ public class JifIfExt extends JifStmtExt_c
         if (e instanceof Unary) {
             Unary u = (Unary)e;
             if (u.operator() == Unary.NOT && u.expr() instanceof Binary) {
-                extendContext(lc, A, u.expr(), true);                
+                extendContext(lc, A, u.expr(), true);
             }
         }
         extendFact(lc, A, e, warn);
     }
 
-    protected static void extendFact(LabelChecker lc, 
-            JifContext A, 
-            Expr e, 
+    protected static void extendFact(LabelChecker lc,
+            JifContext A,
+            Expr e,
             boolean warn) throws SemanticException {
         if (e instanceof Binary) {
             extendFact(lc, A, (Binary)e, warn);
-        }       
+        }
         if (e instanceof Unary) {
             Unary u = (Unary)e;
             if (u.expr() instanceof Binary) {
-                extendFact(lc, A, (Binary)u.expr(), true);                
+                extendFact(lc, A, (Binary)u.expr(), true);
             }
         }
     }
@@ -125,20 +124,20 @@ public class JifIfExt extends JifStmtExt_c
         if (op == JifBinaryDel.ACTSFOR) {
             ActsForParam actor;
             if (ts.isLabel(b.left().type())) {
-                actor = JifUtil.exprToLabel(ts, b.left(), A);
+                actor = ts.exprToLabel(ts, b.left(), A);
             } else {
-                actor = JifUtil.exprToPrincipal(ts, b.left(), A);
+                actor = ts.exprToPrincipal(ts, b.left(), A);
             }
 
-            Principal granter = JifUtil.exprToPrincipal(ts, b.right(), A);
+            Principal granter = ts.exprToPrincipal(ts, b.right(), A);
             if (warn) {
                 // give a warning.
                 ErrorQueue eq = lc.errorQueue();
                 eq.enqueue(ErrorInfo.WARNING,
-                           "The Jif compiler can only reason about " +
-                           "actsfor tests if they occur as conjuncts in the " +
-                           "conditional of an if statement.",
-                           b.position());
+                        "The Jif compiler can only reason about " +
+                                "actsfor tests if they occur as conjuncts in the " +
+                                "conditional of an if statement.",
+                                b.position());
 
             }
             else {
@@ -146,34 +145,34 @@ public class JifIfExt extends JifStmtExt_c
             }
         }
         else if (op == JifBinaryDel.EQUIV && ts.isImplicitCastValid(b.left().type(), ts.Principal())) {
-            Principal left = JifUtil.exprToPrincipal(ts, b.left(), A);
-            Principal right = JifUtil.exprToPrincipal(ts, b.right(), A);
+            Principal left = ts.exprToPrincipal(ts, b.left(), A);
+            Principal right = ts.exprToPrincipal(ts, b.right(), A);
             if (warn) {
                 // give a warning.
                 ErrorQueue eq = lc.errorQueue();
                 eq.enqueue(ErrorInfo.WARNING,
-                           "The Jif compiler can only reason about " +
-                           "actsfor tests if they occur as conjuncts in the " +
-                           "conditional of an if statement.",
-                           b.position());
+                        "The Jif compiler can only reason about " +
+                                "actsfor tests if they occur as conjuncts in the " +
+                                "conditional of an if statement.",
+                                b.position());
 
             }
             else {
-                A.addEquiv(left, right);                            
+                A.addEquiv(left, right);
             }
         }
         else if (op == JifBinaryDel.EQUIV && ts.isLabel(b.left().type())) {
-            Label lhs = JifUtil.exprToLabel(ts, b.left(), A);
-            Label rhs = JifUtil.exprToLabel(ts, b.right(), A);
+            Label lhs = ts.exprToLabel(ts, b.left(), A);
+            Label rhs = ts.exprToLabel(ts, b.right(), A);
 
             if (warn) {
                 // give a warning.
                 ErrorQueue eq = lc.errorQueue();
                 eq.enqueue(ErrorInfo.WARNING,
-                           "The Jif compiler can only reason about label tests " +
-                           "if they occur as conjuncts in the " +
-                           "conditional of an if statement.",
-                           b.position());
+                        "The Jif compiler can only reason about label tests " +
+                                "if they occur as conjuncts in the " +
+                                "conditional of an if statement.",
+                                b.position());
 
             }
             else {
@@ -181,16 +180,16 @@ public class JifIfExt extends JifStmtExt_c
             }
         }
         else if (op == Binary.LE && ts.isLabel(b.left().type())) {
-            Label lhs = JifUtil.exprToLabel(ts, b.left(), A);
-            Label rhs = JifUtil.exprToLabel(ts, b.right(), A);
+            Label lhs = ts.exprToLabel(ts, b.left(), A);
+            Label rhs = ts.exprToLabel(ts, b.right(), A);
             if (warn) {
                 // give a warning.
                 ErrorQueue eq = lc.errorQueue();
                 eq.enqueue(ErrorInfo.WARNING,
-                           "The Jif compiler can only reason about label tests " +
-                           "if they occur as conjuncts in the " +
-                           "conditional of an if statement.",
-                           b.position());
+                        "The Jif compiler can only reason about label tests " +
+                                "if they occur as conjuncts in the " +
+                                "conditional of an if statement.",
+                                b.position());
 
             }
             else {

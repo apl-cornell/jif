@@ -32,6 +32,8 @@ import jif.types.principal.Principal;
 import jif.types.principal.TopPrincipal;
 import jif.types.principal.UnknownPrincipal;
 import jif.types.principal.VarPrincipal;
+import jif.visit.LabelChecker;
+import polyglot.ast.Expr;
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.types.ArrayType;
@@ -43,8 +45,10 @@ import polyglot.types.LocalInstance;
 import polyglot.types.MemberInstance;
 import polyglot.types.PrimitiveType;
 import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
+import polyglot.types.VarInstance;
 import polyglot.util.Position;
 
 /** Jif type system.
@@ -407,4 +411,50 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
     PrincipalToJavaExpr disjunctivePrincipalTranslator();
 
     ClassType fatalException();
+
+    /**
+     * Create an AccessPath for the expression <code>e</code> in context <code>context</code>.
+     */
+    AccessPath exprToAccessPath(Expr e, JifContext context)
+            throws SemanticException;
+
+    /**
+     * Create an AccessPath for the expression <code>e</code> with expected type
+     *  <code>expectedType</code> in context <code>context</code>.
+     */
+    AccessPath exprToAccessPath(Expr e, Type expectedType, JifContext context)
+            throws SemanticException;
+
+//    /**
+//     * Returns the "effective expression" for expr. That is, it strips
+//     * away casts and downgrade expressions.
+//     */
+//    Expr effectiveExpr(Expr expr);
+
+    String accessPathDescrip(AccessPath path, String kind);
+
+    Principal exprToPrincipal(JifTypeSystem ts, Expr e, JifContext context)
+            throws SemanticException;
+
+    Label exprToLabel(JifTypeSystem ts, Expr e, JifContext context)
+            throws SemanticException;
+
+    boolean isFinalAccessExpr(JifTypeSystem ts, Expr e);
+
+    boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e, Type expectedType);
+
+    boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e);
+
+    void processFAP(VarInstance fi, AccessPath path, JifContext A,
+            JifTypeSystem ts, LabelChecker lc) throws SemanticException;
+
+    void processFAP(VarInstance fi, AccessPath path, JifContext A,
+            JifTypeSystem ts, LabelChecker lc, Set<ClassType> visited)
+                    throws SemanticException;
+
+    AccessPath varInstanceToAccessPath(VarInstance vi, String name, Position pos)
+            throws SemanticException;
+
+    AccessPath varInstanceToAccessPath(VarInstance vi, Position pos)
+            throws SemanticException;
 }

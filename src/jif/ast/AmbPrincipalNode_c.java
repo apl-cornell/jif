@@ -112,10 +112,12 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         }
 
         if (expr.type() != null && expr.type().isCanonical() &&
-                !JifUtil.isFinalAccessExprOrConst(ts, expr, ts.Principal())) {
+ !ts.isFinalAccessExprOrConst(ts, expr, ts.Principal())) {
             // illegal dynamic principal. But try to convert it to an access path
             // to allow a more precise error message.
-            AccessPath ap = JifUtil.exprToAccessPath(expr, ts.Principal(), (JifContext)ar.context());
+            AccessPath ap =
+                    ts.exprToAccessPath(expr, ts.Principal(),
+                            (JifContext) ar.context());
             ap.verify((JifContext)ar.context());
 
             // previous line should throw an exception, but throw this just to
@@ -135,7 +137,8 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         // that's ok, as type checking will ensure that it is
         // a suitable expression.
         return nf.CanonicalPrincipalNode(position(),
-                ts.dynamicPrincipal(position(), JifUtil.exprToAccessPath(expr, ts.Principal(), (JifContext)ar.context())));
+                ts.dynamicPrincipal(position(), ts.exprToAccessPath(expr,
+                        ts.Principal(), (JifContext) ar.context())));
     }
     protected Node disambiguateName(AmbiguityRemover ar, Id name) throws SemanticException {
         if ("_".equals(name.id())) {
@@ -172,7 +175,8 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
 
         if (vi.flags().isFinal()) {
             return nf.CanonicalPrincipalNode(position(),
-                    ts.dynamicPrincipal(position(), JifUtil.varInstanceToAccessPath(vi, this.position())));
+                    ts.dynamicPrincipal(position(),
+                            ts.varInstanceToAccessPath(vi, this.position())));
         }
 
         throw new SemanticException(vi + " is not a final variable " +

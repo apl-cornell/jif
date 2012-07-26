@@ -33,7 +33,7 @@ import polyglot.util.Position;
  * AccessPathConstants.
  * 
  * @see jif.types.label.AccessPath
- * @see jif.ast.JifUtil#exprToAccessPath(Expr, JifContext)
+ * @see jif.types.JifTypeSystem_c#exprToAccessPath(Expr, JifContext)
  */
 public class AccessPathConstant extends AccessPathRoot {
     /**

@@ -3,7 +3,6 @@ package jif.extension;
 import java.util.ArrayList;
 import java.util.List;
 
-import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.JifFieldInstance;
@@ -56,7 +55,9 @@ public class JifNewExt extends JifExprExt
             for (FieldInstance fi : ct.fields()) {
                 JifFieldInstance jfi = (JifFieldInstance) fi;
                 if (jfi.flags().isFinal() && jfi.flags().isStatic() && jfi.hasInitializer()) {
-                    AccessPathField path = (AccessPathField) JifUtil.varInstanceToAccessPath(jfi, jfi.position());
+                    AccessPathField path =
+                            (AccessPathField) ts.varInstanceToAccessPath(jfi,
+                                    jfi.position());
                     Param init = jfi.initializer();
                     if (ts.isLabel(jfi.type())) {
                         Label dl = ts.dynamicLabel(jfi.position(), path);

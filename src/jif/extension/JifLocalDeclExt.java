@@ -22,7 +22,7 @@ import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 
-/** The Jif extension of the <code>LocalDecl</code> node. 
+/** The Jif extension of the <code>LocalDecl</code> node.
  * 
  *  @see polyglot.ast.LocalDecl
  */
@@ -50,31 +50,41 @@ public class JifLocalDeclExt extends JifStmtExt_c
 
         //deal with the special cases "final label l = new label(...)"
         // and "final principal p = ..."
-        if (li.flags().isFinal() && JifUtil.isFinalAccessExprOrConst(ts, decl.init())) { 
+        if (li.flags().isFinal()
+                && ts.isFinalAccessExprOrConst(ts, decl.init())) {
             if (ts.isLabel(li.type())) {
-                Label dl = ts.dynamicLabel(decl.position(), JifUtil.varInstanceToAccessPath(li, li.position()));                
-                Label rhs_label = JifUtil.exprToLabel(ts, decl.init(), lc.context());
+                Label dl =
+                        ts.dynamicLabel(decl.position(),
+                                ts.varInstanceToAccessPath(li, li.position()));
+                Label rhs_label = ts.exprToLabel(ts, decl.init(), lc.context());
                 lc.context().addDefinitionalAssertionEquiv(dl, rhs_label);
             }
             else if (ts.isImplicitCastValid(li.type(), ts.Principal())) {
-                DynamicPrincipal dp = ts.dynamicPrincipal(decl.position(), JifUtil.varInstanceToAccessPath(li, li.position()));                
-                Principal rhs_principal = JifUtil.exprToPrincipal(ts, decl.init(), lc.context());
-                lc.context().addDefinitionalEquiv(dp, rhs_principal);                    
+                DynamicPrincipal dp =
+                        ts.dynamicPrincipal(decl.position(),
+                                ts.varInstanceToAccessPath(li, li.position()));
+                Principal rhs_principal =
+                        ts.exprToPrincipal(ts, decl.init(), lc.context());
+                lc.context().addDefinitionalEquiv(dp, rhs_principal);
             }
             else if (!decl.init().type().isNull()) {
                 // we can also add an access path equivalence
-                lc.context().addEquiv(JifUtil.varInstanceToAccessPath(li, li.position()),
-                                      JifUtil.exprToAccessPath(decl.init(), li.type(), lc.context()));
+                lc.context().addEquiv(
+                        ts.varInstanceToAccessPath(li, li.position()),
+                        ts.exprToAccessPath(decl.init(), li.type(),
+                                lc.context()));
 
             }
         }
-        
-        // add other special cases: "final C c = ..." 
+
+        // add other special cases: "final C c = ..."
         if (li.flags().isFinal()) {
-            AccessPathLocal path = (AccessPathLocal) JifUtil.varInstanceToAccessPath(li, li.position());
-            JifUtil.processFAP(li, path, lc.context(), ts, lc);
+            AccessPathLocal path =
+                    (AccessPathLocal) ts.varInstanceToAccessPath(li,
+                            li.position());
+            ts.processFAP(li, path, lc.context(), ts, lc);
         }
-        
+
 //        if (li.flags().isFinal()) {
 //            ReferenceType rt = li.type().toReference();
 //            if (rt != null && ts.equals(rt, A.currentClass())) {
@@ -85,16 +95,16 @@ public class JifLocalDeclExt extends JifStmtExt_c
 //                        if (ts.isLabel(fi.type())) {
 //                            AccessPathLocal apl = (AccessPathLocal) JifUtil.varInstanceToAccessPath(li, li.position());
 //                            AccessPathField apf = new AccessPathField(apl, fi, fi.name(), fi.position());
-//                            Label dl = ts.dynamicLabel(fd.position(), apf);                
+//                            Label dl = ts.dynamicLabel(fd.position(), apf);
 //                            Label rhs_label = JifUtil.exprToLabel(ts, fd.init(), lc.context());
-//                            lc.context().addDefinitionalAssertionEquiv(dl, rhs_label);                            
+//                            lc.context().addDefinitionalAssertionEquiv(dl, rhs_label);
 //                        }
 //                        if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
 //                            AccessPathLocal apl = (AccessPathLocal) JifUtil.varInstanceToAccessPath(li, li.position());
 //                            AccessPathField apf = new AccessPathField(apl, fi, fi.name(), fi.position());
-//                            DynamicPrincipal dp = ts.dynamicPrincipal(fd.position(), apf);                
+//                            DynamicPrincipal dp = ts.dynamicPrincipal(fd.position(), apf);
 //                            Principal rhs_principal = JifUtil.exprToPrincipal(ts, fd.init(), lc.context());
-//                            lc.context().addDefinitionalEquiv(dp, rhs_principal);                            
+//                            lc.context().addDefinitionalEquiv(dp, rhs_principal);
 //                        }
 //                    }
 //                }
@@ -104,29 +114,29 @@ public class JifLocalDeclExt extends JifStmtExt_c
         // Equate the variable label with the declared label.
         Label L = li.label();
         Type t = decl.declType();
-        if (L instanceof VarLabel) {            
+        if (L instanceof VarLabel) {
             if (ts.isLabeled(t)) {
                 Label declaredLabel = ts.labelOfType(t);
                 final JifLocalInstance fli = li;
-                lc.constrain(new NamedLabel("local_label", 
-                                            "inferred label of local var " + li.name(), 
-                                            L), 
-                            LabelConstraint.EQUAL, 
-                            new NamedLabel("PC", 
-                                           "Information revealed by program counter being at this program point", 
-                                           A.pc()).
-                                           join(lc, "declared label of local var " + li.name(), declaredLabel), 
-                           A.labelEnv(),
-                           decl.position(), 
-                           false,
-                           new ConstraintMessage() {
+                lc.constrain(new NamedLabel("local_label",
+                        "inferred label of local var " + li.name(),
+                        L),
+                        LabelConstraint.EQUAL,
+                        new NamedLabel("PC",
+                                "Information revealed by program counter being at this program point",
+                                A.pc()).
+                                join(lc, "declared label of local var " + li.name(), declaredLabel),
+                                A.labelEnv(),
+                                decl.position(),
+                                false,
+                                new ConstraintMessage() {
                     @Override
                     public String msg() {
-                        return "Declared label of local variable " + fli.name() + 
-                        " is incompatible with label constraints.";
+                        return "Declared label of local variable " + fli.name() +
+                                " is incompatible with label constraints.";
                     }
                 }
-                );
+                        );
             }
             else {
                 // Label the type, and update the node and local instance to reflect it.
@@ -147,7 +157,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
             t = li.type();
 
             if (init instanceof ArrayInit) {
-                ((JifArrayInitExt)(JifUtil.jifExt(init))).labelCheckElements(lc, decl.type().type()); 
+                ((JifArrayInitExt)(JifUtil.jifExt(init))).labelCheckElements(lc, decl.type().type());
             }
             else {
                 // Must check that the expression type is a subtype of the
@@ -163,36 +173,36 @@ public class JifLocalDeclExt extends JifStmtExt_c
             PathMap Xe = getPathMap(init);
 
             final JifLocalInstance fli = li;
-            lc.constrain(new NamedLabel("init.nv", 
-                                        "label of successful evaluation of initializing expression", 
-                                        Xe.NV()), 
-                        LabelConstraint.LEQ, 
-                        new NamedLabel("label of local variable " + li.name(), L),
-                        A.labelEnv(),
-                        init.position(),
-                        new ConstraintMessage() {
+            lc.constrain(new NamedLabel("init.nv",
+                    "label of successful evaluation of initializing expression",
+                    Xe.NV()),
+                    LabelConstraint.LEQ,
+                    new NamedLabel("label of local variable " + li.name(), L),
+                    A.labelEnv(),
+                    init.position(),
+                    new ConstraintMessage() {
                 @Override
                 public String msg() {
-                    return "Label of local variable initializer not less " + 
-                    "restrictive than the label for local variable " + 
-                    fli.name();
+                    return "Label of local variable initializer not less " +
+                            "restrictive than the label for local variable " +
+                            fli.name();
                 }
                 @Override
-                public String detailMsg() { 
+                public String detailMsg() {
                     return "More information is revealed by the successful " +
-                    "evaluation of the intializing expression " +
-                    "than is allowed to flow to " +
-                    "the local variable " + fli.name() + ".";
+                            "evaluation of the intializing expression " +
+                            "than is allowed to flow to " +
+                            "the local variable " + fli.name() + ".";
                 }
                 @Override
                 public String technicalMsg() {
                     return "Invalid assignment: NV of initializer is " +
-                    "more restrictive than the declared label " +
-                    "of local variable " + fli.name() + ".";
-                }                     
+                            "more restrictive than the declared label " +
+                            "of local variable " + fli.name() + ".";
+                }
             }
-            );
-            Xd = Xe;            
+                    );
+            Xd = Xe;
         }
         else {
             Xd = ts.pathMap();

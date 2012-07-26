@@ -120,7 +120,7 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
         if (expr instanceof PrincipalNode ||
                 ts.isImplicitCastValid(expr.type(), ts.Principal()) ||
                 (expectedPI != null && expectedPI.isPrincipal())) {
-            if (!JifUtil.isFinalAccessExprOrConst(ts, expr, ts.Principal())) {
+            if (!ts.isFinalAccessExprOrConst(ts, expr, ts.Principal())) {
                 throw new SemanticDetailedException(
                         "Illegal principal parameter.",
                         "The expression " + expr + " is not suitable as a " +
@@ -130,9 +130,9 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
                                 this.position());
             }
             return nf.CanonicalPrincipalNode(position(),
-                    JifUtil.exprToPrincipal(ts, expr, c));
+                    ts.exprToPrincipal(ts, expr, c));
         }
-        if (!JifUtil.isFinalAccessExprOrConst(ts, expr, ts.Label())) {
+        if (!ts.isFinalAccessExprOrConst(ts, expr, ts.Label())) {
             throw new SemanticDetailedException(
                     "Illegal label parameter.",
                     "The expression " + expr + " is not suitable as a " +
@@ -141,6 +141,6 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
                             this.position());
         }
         return nf.CanonicalLabelNode(position(),
-                JifUtil.exprToLabel(ts, expr, c));
+ ts.exprToLabel(ts, expr, c));
     }
 }

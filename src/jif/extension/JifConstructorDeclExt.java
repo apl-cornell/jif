@@ -35,7 +35,7 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.visit.NodeVisitor;
 
-/** The Jif extension of the <code>JifConstructorDecl</code> node. 
+/** The Jif extension of the <code>JifConstructorDecl</code> node.
  * 
  *  @see polyglot.ast.ConstructorDecl
  *  @see jif.ast.JifConstructorDecl
@@ -83,7 +83,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         return mn;
     }
 
-    /** 
+    /**
      * Utility method to get the set of field instances of final fields of
      * the given <code>ReferenceType</code> that do not have an initializer.
      */
@@ -105,9 +105,9 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
      * This method implements the check-inits predicate of the thesis
      * (Figures 4.41-45).
      */
-    protected Block checkInitsAndBody(Label Li, 
+    protected Block checkInitsAndBody(Label Li,
             JifConstructorInstance ci,
-            Block body, 
+            Block body,
             LabelChecker lc) throws SemanticException
             {
         JifContext A = lc.jifContext();
@@ -120,7 +120,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         X = X.N(A.pc());
 
         // This set is all the uninitialized final variables.
-        // These fields need to be initialized before calling the super 
+        // These fields need to be initialized before calling the super
         // constructor, if the super constructor is an "untrusted class", i.e.
         // a Java class that isn't one of JifTypeSystem.trustedNonJifClassNames
         // or a Jif class.
@@ -136,7 +136,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         }
 
         // pc can be set to the provider during the init checking phase.
-        A.setPc(ts.providerLabel((JifClassType) lc.context().currentClass()), lc); 
+        A.setPc(ts.providerLabel((JifClassType) lc.context().currentClass()), lc);
 
         A.setConstructorReturnLabel(Lr);
 
@@ -146,7 +146,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         // The flag preDangerousSuperCall indicates if we are before a call
         // to a "dangerous" super constructor call. A super call is dangerous
         // if the immediate superclass is a Jif class, or if this class has an
-        // "untrusted" Java ancestor, 
+        // "untrusted" Java ancestor,
         //          i.e. ts.hasUntrustedAncestor(ci.container()) != null.
         boolean preDangerousSuperCall = true;
 
@@ -154,9 +154,9 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
 
         List<Stmt> statements = body.statements();
         for (Stmt s : statements) {
-            if (seenSuperCall && uninitFinalVars.isEmpty() && 
+            if (seenSuperCall && uninitFinalVars.isEmpty() &&
                     A.checkingInits() && isEscapingThis(s)) {
-                // there won't be a "dangerousSuperCall", 
+                // there won't be a "dangerousSuperCall",
                 // and the next statement wants to let a reference to "this"
                 // escape, so mark this as the end of the init checking.
                 setEndOfInitChecking(lc, ci);
@@ -164,10 +164,10 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
 
             A = (JifContext)A.pushBlock();
             if (A.checkingInits()) {
-                // when we are checking inits, the pc is lower than 
+                // when we are checking inits, the pc is lower than
                 // the start-label of the method, so we explicitly add
                 // as an assertion that the caller_pc is less than the pc.
-                A.addAssertionLE(ts.callSitePCLabel(ci), A.pc());                
+                A.addAssertionLE(ts.callSitePCLabel(ci), A.pc());
             }
 
             s = (Stmt) lc.context(A).labelCheck(s);
@@ -191,7 +191,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                     if (ccs.kind() == ConstructorCall.SUPER) {
                         seenSuperCall = true;
                     }
-                }                
+                }
             }
 
             // At this point, the environment A should have been extended
@@ -219,18 +219,20 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
             public Node leave( Node old, Node n, NodeVisitor v ) {
                 if (n instanceof Call) {
                     Call c = (Call)n;
-                    if (c.target() instanceof Expr && JifUtil.effectiveExpr((Expr)c.target()) instanceof Special) {
-                        result[0] = true;                        
+                    if (c.target() instanceof Expr
+                            && JifUtil.effectiveExpr((Expr) c.target()) instanceof Special) {
+                        result[0] = true;
                     }
-                    
+
                     List<Expr> args = c.arguments();
                     for (Expr arg : args) {
                         if (JifUtil.effectiveExpr(arg) instanceof Special) {
-                            result[0] = true;                        
-                        }                        
+                            result[0] = true;
+                        }
                     }
                 }
-                else if (n instanceof Assign && JifUtil.effectiveExpr(((Assign)n).right()) instanceof Special) {
+ else if (n instanceof Assign
+                        && JifUtil.effectiveExpr(((Assign) n).right()) instanceof Special) {
                     result[0] = true;
                 }
                 return n;
@@ -267,15 +269,15 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                 // The immediate super class is a trusted Java
                 // class.
                 // Although there are uninitialized final vars before
-                // the call to super, it's OK, as this is a Jif class, 
+                // the call to super, it's OK, as this is a Jif class,
                 // the immediate ancestor (and all ancestors) are
                 // "trusted" java classes, which do not access
                 // these fields before they are initialized.
-            } 
+            }
             else {
                 // This is a potentially dangerous super call,
                 // as code in one of the ancestor classes may
-                // access a final field of this class. 
+                // access a final field of this class.
                 wasDangerousSuperCall = true;
 
                 // Let the context know that we are no longer checking field
@@ -283,23 +285,23 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                 setEndOfInitChecking(lc, ci);
 
                 // We must make sure that all final variables of
-                // this class are initialized before the super call.                            
+                // this class are initialized before the super call.
                 for (JifFieldInstance fi : uninitFinalVars) {
                     throw new SemanticDetailedException(
-                                                        "Final field \"" + fi.name()
-                                                        + "\" must be initialized before "
-                                                        + "calling the superclass constructor.",
-                                                        "All final fields of a class must " +
-                                                        "be initialized before the superclass " +
-                                                        "constructor is called, to prevent " +
-                                                        "ancestor classes from reading " +
-                                                        "uninitialized final fields. The " +
-                                                        "final field \"" + fi.name() + "\" needs to " +
-                                                        "be initialized before the superclass " +
-                                                        "constructor call.",
-                                                        ccs.position());
+                            "Final field \"" + fi.name()
+                            + "\" must be initialized before "
+                            + "calling the superclass constructor.",
+                            "All final fields of a class must " +
+                                    "be initialized before the superclass " +
+                                    "constructor is called, to prevent " +
+                                    "ancestor classes from reading " +
+                                    "uninitialized final fields. The " +
+                                    "final field \"" + fi.name() + "\" needs to " +
+                                    "be initialized before the superclass " +
+                                    "constructor call.",
+                                    ccs.position());
                 }
-            }                                
+            }
         }
         return wasDangerousSuperCall;
     }
@@ -307,9 +309,9 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
     private void setEndOfInitChecking(LabelChecker lc, JifConstructorInstance ci) {
         JifContext A = lc.context();
         A.setCheckingInits(false);
-        A.setConstructorReturnLabel(null);    
+        A.setConstructorReturnLabel(null);
         A.setPc(lc.upperBound(A.pc(), lc.typeSystem().callSitePCLabel(ci)), lc);
-        
+
         // Taint current code PC bound with provider.
         Label providerAndPc = lc.typeSystem().join(A.currentCodePCBound(), A.provider());
         A.setCurrentCodePCBound(providerAndPc);
@@ -320,14 +322,14 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
      * the final field is a label, and it is being initialized from a final
      * label, share the uids of the fields.
      * 
-     * @throws SemanticException 
+     * @throws SemanticException
      */
     protected void checkFinalFieldAssignment(Stmt s_,
             Set<JifFieldInstance> uninitFinalVars, JifContext A)
-            throws SemanticException {
-    	// Added this so that we can initialize final fields within atomic blocks in Fabric programs
-    	List<Stmt> initializers = new ArrayList<Stmt>();
-    	
+                    throws SemanticException {
+        // Added this so that we can initialize final fields within atomic blocks in Fabric programs
+        List<Stmt> initializers = new ArrayList<Stmt>();
+
         if (s_ instanceof Block) {
             Block b = (Block) s_;
             List<Stmt> stmts = b.statements();
@@ -335,7 +337,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
         } else {
             initializers.add(s_);
         }
-    	
+
         for (Stmt s : initializers) {
             if (!(s instanceof Eval)
                     || !(((Eval) s).expr() instanceof FieldAssign)) {

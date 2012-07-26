@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import jif.ast.JifNodeFactory;
-import jif.ast.JifUtil;
 import jif.ast.LabelExpr;
 import jif.ast.PrincipalExpr;
 import jif.types.JifContext;
@@ -51,13 +50,14 @@ public class JifBinaryDel extends JifJL_c
                 lhs = (LabelExpr)b.left();
             }
             else {
-                if (!JifUtil.isFinalAccessExprOrConst(ts, b.left())) {
+                if (!ts.isFinalAccessExprOrConst(ts, b.left())) {
                     throw new SemanticException(
                             "An expression used in a label test must be either a final access path, principal parameter or a constant principal",
                             b.left().position());
                 }
                 lhs = nf.LabelExpr(b.left().position(),
-                        JifUtil.exprToLabel(ts, b.left(), (JifContext)tc.context()));
+                                ts.exprToLabel(ts, b.left(),
+                                        (JifContext) tc.context()));
                 lhs = (LabelExpr)lhs.visit(tc);
             }
             LabelExpr rhs;
@@ -65,13 +65,14 @@ public class JifBinaryDel extends JifJL_c
                 rhs = (LabelExpr)b.right();
             }
             else {
-                if (!JifUtil.isFinalAccessExprOrConst(ts, b.right())) {
+                if (!ts.isFinalAccessExprOrConst(ts, b.right())) {
                     throw new SemanticException(
                             "An expression used in a label test must either be a final access path or a \"new label\"",
                             b.right().position());
                 }
                 rhs = nf.LabelExpr(b.right().position(),
-                        JifUtil.exprToLabel(ts, b.right(), (JifContext)tc.context()));
+                                ts.exprToLabel(ts, b.right(),
+                                        (JifContext) tc.context()));
                 rhs = (LabelExpr)rhs.visit(tc);
             }
             return b.left(lhs).right(rhs).type(ts.Boolean());
@@ -100,7 +101,7 @@ public class JifBinaryDel extends JifJL_c
             } else {
                 // Make sure the left side is a LabelExpr.
                 if (!(lhs instanceof LabelExpr)) {
-                    if (!JifUtil.isFinalAccessExprOrConst(ts, lhs)) {
+                    if (!ts.isFinalAccessExprOrConst(ts, lhs)) {
                         throw new SemanticException(
                                 "An expression used in a label test must be "
                                         + "either a final access path or a "
@@ -108,7 +109,9 @@ public class JifBinaryDel extends JifJL_c
                     }
 
                     lhs =
-                            nf.LabelExpr(lhs.position(), JifUtil.exprToLabel(
+                            nf.LabelExpr(
+                                    lhs.position(),
+                                    ts.exprToLabel(
                                     ts, lhs, (JifContext) tc.context()));
                 }
             }
@@ -142,10 +145,11 @@ public class JifBinaryDel extends JifJL_c
         if (expr instanceof PrincipalExpr) return;
 
         if (expr.type() != null && expr.type().isCanonical() &&
-                !JifUtil.isFinalAccessExprOrConst(ts, expr)) {
+ !ts.isFinalAccessExprOrConst(ts, expr)) {
             // illegal dynamic principal. But try to convert it to an access path
             // to allow a more precise error message.
-            AccessPath ap = JifUtil.exprToAccessPath(expr, (JifContext)tc.context());
+            AccessPath ap =
+                    ts.exprToAccessPath(expr, (JifContext) tc.context());
             ap.verify((JifContext)tc.context());
 
             // previous line should throw an exception, but throw this just to
@@ -161,7 +165,7 @@ public class JifBinaryDel extends JifJL_c
                             expr.position());
         }
 
-        Principal p = JifUtil.exprToPrincipal(ts, expr, (JifContext)tc.context());
+        Principal p = ts.exprToPrincipal(ts, expr, (JifContext) tc.context());
         if (!p.isRuntimeRepresentable()) {
             throw new SemanticDetailedException(
                     "A principal used in an actsfor must be runtime-representable.",

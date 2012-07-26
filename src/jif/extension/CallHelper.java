@@ -10,7 +10,6 @@ import java.util.Set;
 
 import jif.ast.JifInstantiator;
 import jif.ast.JifNodeFactory;
-import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.types.ActsForConstraint;
 import jif.types.ActsForParam;
@@ -450,7 +449,7 @@ public class CallHelper {
             if (argInstances.contains(aj.formalInstance())) {
                 // this actual arg needs to be final!
                 Expr Ej = actualArgs.get(j);
-                if (!JifUtil.isFinalAccessExprOrConst(jts, Ej)) {
+                if (!jts.isFinalAccessExprOrConst(jts, Ej)) {
                     throw new SemanticDetailedException("The " +
                             StringUtil.nth(j+1) +
                             " argument must be a final access path or a " +

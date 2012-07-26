@@ -56,7 +56,8 @@ public class JifCallExt extends JifExprExt
 
         if (A.checkingInits()) {
             // in the constructor prologue, the this object cannot be the receiver or an argument
-            if (me.target() instanceof Expr && JifUtil.effectiveExpr((Expr)me.target()) instanceof Special) {
+            if (me.target() instanceof Expr
+                    && JifUtil.effectiveExpr((Expr) me.target()) instanceof Special) {
                 throw new SemanticDetailedException("No methods may be called on \"this\" object in a constructor prologue.",
                         "In a constructor body before the call to the super class, no " +
                                 "reference to the \"this\" object is allowed to escape. This means " +
@@ -90,7 +91,10 @@ public class JifCallExt extends JifExprExt
             for (FieldInstance fi : rt.fields()) {
                 JifFieldInstance jfi = (JifFieldInstance) fi;
                 if (jfi.flags().isFinal() && jfi.flags().isStatic() && jfi.hasInitializer()) {
-                    AccessPathField path = (AccessPathField) JifUtil.varInstanceToAccessPath(jfi, jfi.position());
+                    AccessPathField path =
+                            (AccessPathField) ts
+                            .varInstanceToAccessPath(jfi,
+                                    jfi.position());
                     Param init = jfi.initializer();
                     if (ts.isLabel(jfi.type())) {
                         Label dl = ts.dynamicLabel(jfi.position(), path);

@@ -146,7 +146,11 @@ public class JifInstantiator
             try {
                 ArgLabel formalArgLbl = formalArgLabels.get(i);
                 if (formalArgLbl.formalInstance().flags().isFinal()) {
-                    AccessPathRoot formalRoot = (AccessPathRoot)JifUtil.varInstanceToAccessPath(formalArgLbl.formalInstance(), formalArgLbl.name(), formalArgLbl.position());
+                    AccessPathRoot formalRoot =
+                            (AccessPathRoot) ts.varInstanceToAccessPath(
+                                    formalArgLbl.formalInstance(),
+                                    formalArgLbl.name(),
+                                    formalArgLbl.position());
                     AccessPathRoot tempRoot = formalTempAccessPathRoots.get(i);
 
                     L = substImpl(L, new AccessPathInstantiator(formalRoot, tempRoot));
@@ -217,8 +221,11 @@ public class JifInstantiator
                     Expr actualExpr = actualArgExprs.get(i);
                     Type formalArgType = formalArgTypes.get(i);
                     AccessPath target;
-                    if (JifUtil.isFinalAccessExprOrConst(ts, actualExpr, formalArgType)) {
-                        target = JifUtil.exprToAccessPath(actualExpr, formalArgType, callerContext);
+                    if (ts.isFinalAccessExprOrConst(ts, actualExpr,
+                            formalArgType)) {
+                        target =
+                                ts.exprToAccessPath(actualExpr, formalArgType,
+                                        callerContext);
                     }
                     else {
                         target = new AccessPathUninterpreted(actualExpr, actualExpr.position());
@@ -511,8 +518,10 @@ public class JifInstantiator
             List<Label> actualParamLabels) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, receiverType, callerContext);
+        if (ts.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+            receiverPath =
+                    ts.exprToAccessPath(receiverExpr, receiverType,
+                            callerContext);
         }
         else {
             receiverPath = new AccessPathUninterpreted(receiverExpr, L.position());
@@ -585,8 +594,10 @@ public class JifInstantiator
             Label receiverLbl) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, receiverType, callerContext);
+        if (ts.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+            receiverPath =
+                    ts.exprToAccessPath(receiverExpr, receiverType,
+                            callerContext);
         }
         else {
             receiverPath = new AccessPathUninterpreted(receiverExpr, L.position());
@@ -641,8 +652,10 @@ public class JifInstantiator
             List<Label> actualParamLabels) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, receiverType, callerContext);
+        if (ts.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+            receiverPath =
+                    ts.exprToAccessPath(receiverExpr, receiverType,
+                            callerContext);
         }
         else {
             receiverPath = new AccessPathUninterpreted(receiverExpr, p.position());
@@ -672,8 +685,10 @@ public class JifInstantiator
             List<? extends Label> actualParamLabels) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, receiverType, callerContext);
+        if (ts.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+            receiverPath =
+                    ts.exprToAccessPath(receiverExpr, receiverType,
+                            callerContext);
         }
         else {
             receiverPath = new AccessPathUninterpreted(receiverExpr, t.position());
@@ -699,8 +714,10 @@ public class JifInstantiator
 
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (JifUtil.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
-            receiverPath = JifUtil.exprToAccessPath(receiverExpr, receiverType, callerContext);
+        if (ts.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+            receiverPath =
+                    ts.exprToAccessPath(receiverExpr, receiverType,
+                            callerContext);
         }
         else {
             receiverPath = new AccessPathUninterpreted(receiverExpr, t.position());
