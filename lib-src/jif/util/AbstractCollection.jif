@@ -84,6 +84,7 @@ public abstract class AbstractCollection[label L] implements Collection[L] {
                 }
             }
             catch (IndexOutOfBoundsException impossible) { }
+            i++;
         }
         return containsAll;
     }

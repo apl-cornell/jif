@@ -150,7 +150,9 @@ public class LinkedList2[label S, label C] extends AbstractList2[S,C]
         while (e != null) {
             JifObject[C] mobj = e.data;
             hashCode = 31*hashCode + (mobj==null ? 0 : mobj.hashCode());
+            e = e.next;            
         }
+        
         return hashCode;
     }
 

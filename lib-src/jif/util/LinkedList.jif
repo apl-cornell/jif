@@ -112,6 +112,7 @@ public class LinkedList[label L] extends AbstractList[L]
         while (e != null) {
             JifObject[L] mobj = e.data;
             hashCode = 31*hashCode + (mobj==null ? 0 : mobj.hashCode());
+            e = e.next;
         }
         return hashCode;
     }
