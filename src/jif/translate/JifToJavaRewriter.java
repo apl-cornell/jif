@@ -59,9 +59,6 @@ public class JifToJavaRewriter extends ContextVisitor
     protected List<Stmt> initializations;
     protected List<Block> staticInitializations;
 
-    /** An expression used to instantiate the 'this' principal in static contexts */
-    protected Expr staticThisPrincipal;
-    
     public JifToJavaRewriter(Job job,
                              JifTypeSystem jif_ts,
                              JifNodeFactory jif_nf,
@@ -322,23 +319,6 @@ public class JifToJavaRewriter extends ContextVisitor
      */
     public String runtimeLabelUtil() {
         return jif_ts().LabelUtilClassName() + ".singleton()";
-    }
-
-    /**
-     * Provide an expression to instantiate "this" principals with in static contexts.
-     */
-    public void setStaticThisPrincipal(Expr principal) {
-        staticThisPrincipal = principal;
-    }
-    /**
-     * Clear "this" principal expression.
-     */
-    public void clearStaticThisPrincipal() {
-        staticThisPrincipal = null;
-    }
-
-    public Expr staticThisPrincipal() {
-        return staticThisPrincipal;
     }
 
 }
