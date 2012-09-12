@@ -74,6 +74,11 @@ public class JifOptions extends Options {
     public boolean dependencyGraph;
 
     /**
+     * Suppress compile-time warnings, such as those for fail-on-exception.
+     */
+    protected boolean noWarnings;
+
+    /**
      * Constructor
      */
     public JifOptions(ExtensionInfo extension) {
@@ -85,9 +90,10 @@ public class JifOptions extends Options {
         flags.add(new Switch("-globalsolve", "infer label variables globally (default: per class)"));
         flags.add(new Switch(new String[]{"-explain", "-e"}, "provide more detailed " +
                 "explanations of failed label checking"));
-        flags.add(new Switch("-nonrobust", "infer label variables globally (default: per class)"));
-        flags.add(new Switch("-fail-on-exception", "infer label variables globally (default: per class)"));
-        flags.add(new Switch("-robust", "infer label variables globally (default: per class)"));
+        flags.add(new Switch("-nonrobust", "skip robustness checks."));
+        flags.add(new Switch("-fail-on-exception",
+                "re-throw uncaught and undeclared runtime exceptions as fatal errors."));
+        flags.add(new Switch("-robust", "force robustness checks"));
         flags.add(new PathFlag<File>("-sigcp", "<path>", "path for Jif signatures (e.g. for java.lang.Object)") {
             @Override
             public File handlePathEntry(String entry) {
@@ -106,8 +112,12 @@ public class JifOptions extends Options {
                 else return null;
             }
         });
-        flags.add(new IntFlag("-debug", "<num>", "set debug level to n. Prints more information about labels"));
-        flags.add(new Switch("-untrusted-providers", "set the providers of the sources being compiled to be untrusted"));
+        flags.add(new IntFlag("-debug", "<num>",
+                "set debug level to n. Prints more information about labels"));
+        flags.add(new Switch("-untrusted-providers",
+                "set the providers of the sources being compiled to be untrusted"));
+        flags.add(new Switch("-no-warnings",
+                "suppress compile-time warnings"));
         super.populateFlags(flags);
     }
 
@@ -141,9 +151,16 @@ public class JifOptions extends Options {
         else if (arg.flag().ids().contains("-debug")) {
             Report.addTopic("debug", (Integer) arg.value());
         }
- else if (arg.flag().ids().contains("-untrusted-providers")) {
+        else if (arg.flag().ids().contains("-untrusted-providers")) {
             trustedProviders = !(Boolean) arg.value();
         }
+        else if (arg.flag().ids().contains("-no-warnings")) {
+            noWarnings = (Boolean) arg.value();
+        }
         else super.handleArg(arg);
+    }
+
+    public boolean noWarnings() {
+        return noWarnings;
     }
 }
