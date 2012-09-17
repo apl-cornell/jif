@@ -5,16 +5,16 @@ set sw=4
 
 syn match op        "->"
 syn match op        "<-"
-syn keyword javaMethodDecl where class principal public equiv void if return while actsfor private final new
+syn keyword javaMethodDecl where class public void actsfor private final new implements
+syn keyword Statement  if return while try catch
 syn region commentRegion matchgroup=comment start="//" end ="$"
 syn region commentRegion matchgroup=comment start="/\*" end="\*/"
-syn keyword StorageClass principal label actsfor
+syn keyword StorageClass principal label actsfor equiv provider
 
 if !exists("main_syntax")
   let main_syntax='jif'
 endif
 
-syn clear javaLabelRegion
 hi link op StorageClass
 hi link javaMethodDecl Statement
 hi link commentRegion Comment

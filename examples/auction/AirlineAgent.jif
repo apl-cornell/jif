@@ -3,9 +3,9 @@
 public class AirlineAgent [principal TheAirline, principal Airlines, label L]
     where Airlines actsfor TheAirline, provider actsfor TheAirline 
 {
-    private final AirlineServer [TheAirline, Airlines, L]{TheAirline->; TheAirline<-} server;
+    private final AirlineServer[TheAirline, Airlines, L]{TheAirline->; TheAirline<-} server;
 
-    public AirlineAgent (AirlineServer [TheAirline, Airlines, L] {TheAirline->; TheAirline<-} server)
+    public AirlineAgent(AirlineServer[TheAirline, Airlines, L]{TheAirline->; TheAirline<-} server)
     { this.server = server; }
 
     int {TheAirline<-; TheAirline->} lowestprice; 
@@ -17,22 +17,24 @@ public class AirlineAgent [principal TheAirline, principal Airlines, label L]
 
     public Offer[L] {L} makeFirstOffer {TheAirline<-; TheAirline->} () 
         where {TheAirline<-; TheAirline-> } <= L, provider <= {TheAirline<-},
-        {*AirlineServer.provider} equiv {*provider}
+              {*AirlineServer.provider} equiv {*provider}
     {
         prepareForAuction(); 
         int price = 2* lowestprice;
         return new Offer[L] (price, 0);
     }
 
-    public Offer[L ] {L} makeOffer {L} (UserChoice[L] {L} userChoice,  Offer[L] {L} bestOffer)
-            where {TheAirline<-; TheAirline->} <= L, provider <= {TheAirline<-}   {
+    public Offer[L]{L} makeOffer{L} (UserChoice[L]{L} userChoice,  Offer[L]{L} bestOffer)
+        where {TheAirline<-; TheAirline->} <= L, provider <= {TheAirline<-}
+    {
         if (userChoice == null) return null;
         int price = 2* lowestprice;
         Offer[L] newOffer = new Offer[L] (price, 0);
-        while (userChoice.choice (newOffer, bestOffer)  >= 0 && price >= lowestprice) {
-            newOffer = new Offer [L] ( price -- , 0) ;
+        while (userChoice.choice (newOffer, bestOffer) >= 0 &&
+               price >= lowestprice) {
+            newOffer = new Offer[L](price--, 0) ;
         }
-        if (price < lowestprice) 
+        if (price < lowestprice)
             return null;
         return newOffer;
     }
