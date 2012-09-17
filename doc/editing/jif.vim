@@ -4,8 +4,8 @@ set ts=4
 set sw=4
 
 syn match op        "->"
-syn match op        "<-"
-syn keyword javaMethodDecl where class public void actsfor private final new implements
+syn match op        "<-" "←"
+syn keyword javaMethodDecl where class public void private final new implements authority
 syn keyword Statement  if return while try catch
 syn region commentRegion matchgroup=comment start="//" end ="$"
 syn region commentRegion matchgroup=comment start="/\*" end="\*/"
