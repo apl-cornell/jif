@@ -37,8 +37,8 @@ import polyglot.util.InternalCompilerError;
  */
 public class JifContext_c extends Context_c implements JifContext
 {
-    private final TypeSystem jlts;
-    private final JifTypeSystem jifts;
+    protected final TypeSystem jlts;
+    protected final JifTypeSystem jifts;
 
     private LabelEnv_c env; // label environment (ph, constraints known to be true)
 
