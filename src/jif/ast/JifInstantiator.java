@@ -48,24 +48,24 @@ import polyglot.util.Position;
  */
 public class JifInstantiator
 {
-    private final JifTypeSystem ts;
-    private final ReferenceType receiverType;
-    private final Label receiverLbl;
-    private final AccessPath receiverPath;
-    private final List<ArgLabel> formalArgLabels;
-    private final List<? extends Type> formalArgTypes;
-    private final List<? extends Label> actualArgLabels;
-    private final List<Expr> actualArgExprs;
-    private final List<? extends Label> actualParamLabels;
-    private final JifContext callerContext;
+    protected final JifTypeSystem ts;
+    protected final ReferenceType receiverType;
+    protected final Label receiverLbl;
+    protected final AccessPath receiverPath;
+    protected final List<ArgLabel> formalArgLabels;
+    protected final List<? extends Type> formalArgTypes;
+    protected final List<? extends Label> actualArgLabels;
+    protected final List<Expr> actualArgExprs;
+    protected final List<? extends Label> actualParamLabels;
+    protected final JifContext callerContext;
 
     // temp labels and paths
-    private final List<Label> formalTempLabels;
-    private final List<AccessPathRoot> formalTempAccessPathRoots;
-    private final AccessPathRoot tempThisRoot;
-    private final Label tempThisLbl;
+    protected final List<Label> formalTempLabels;
+    protected final List<AccessPathRoot> formalTempAccessPathRoots;
+    protected final AccessPathRoot tempThisRoot;
+    protected final Label tempThisLbl;
 
-    private JifInstantiator(ReferenceType receiverType,
+    protected JifInstantiator(ReferenceType receiverType,
             Label receiverLbl,
             AccessPath receiverPath,
             List<ArgLabel> formalArgLabels,
@@ -177,7 +177,7 @@ public class JifInstantiator
 
     }
 
-    private Object instantiateImpl(Object L, Position pos) {
+    protected Object instantiateImpl(Object L, Position pos) {
         if (L == null) return L;
 
         // now go through and substitute things...
@@ -291,7 +291,8 @@ public class JifInstantiator
         return L;
     }
 
-    private Object substImpl(Object o, LabelSubstitution lblsubst) throws SemanticException {
+    protected Object substImpl(Object o, LabelSubstitution lblsubst)
+            throws SemanticException {
         if (o instanceof Principal) {
             return ((Principal)o).subst(lblsubst);
         }
