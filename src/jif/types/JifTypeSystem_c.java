@@ -1860,7 +1860,7 @@ implements JifTypeSystem {
         if (e instanceof NullLit) {
             return ts.bottomPrincipal(e.position());
         }
-        if (isFinalAccessExpr(ts, e)) {
+        if (isFinalAccessExpr(e)) {
             return ts.dynamicPrincipal(e.position(),
                     ts.exprToAccessPath(e, ts.Principal(), context));
         }
@@ -1876,7 +1876,7 @@ implements JifTypeSystem {
         if (e instanceof DowngradeExpr) {
             return exprToLabel(ts, ((DowngradeExpr)e).expr(), context);
         }
-        if (isFinalAccessExpr(ts, e)) {
+        if (isFinalAccessExpr(e)) {
             return ts.dynamicLabel(e.position(),
                     ts.exprToAccessPath(e, ts.Label(), context));
         }
@@ -1884,7 +1884,7 @@ implements JifTypeSystem {
     }
 
     @Override
-    public boolean isFinalAccessExpr(JifTypeSystem ts, Expr e) {
+    public boolean isFinalAccessExpr(Expr e) {
         if (e instanceof Local) {
             Local l = (Local)e;
             if (l.type() != null && l.type().isCanonical()) {
@@ -1900,7 +1900,7 @@ implements JifTypeSystem {
                 Flags flgs = f.flags();
                 return flgs.isFinal() &&
                         (flgs.isStatic() ||
-                                (f.target() instanceof Expr && isFinalAccessExpr(ts, (Expr)f.target())));
+                                (f.target() instanceof Expr && isFinalAccessExpr((Expr)f.target())));
             }
             else {
                 return true;
@@ -1910,36 +1910,36 @@ implements JifTypeSystem {
             return ((Special)e).kind() == Special.THIS;
         }
         if (e instanceof Cast) {
-            return isFinalAccessExpr(ts, ((Cast)e).expr());
+            return isFinalAccessExpr(((Cast)e).expr());
         }
         if (e instanceof DowngradeExpr) {
-            return isFinalAccessExpr(ts, ((DowngradeExpr)e).expr());
+            return isFinalAccessExpr(((DowngradeExpr)e).expr());
         }
         return false;
     }
 
     @Override
-    public boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e,
-            Type expectedType) {
-        return isFinalAccessExpr(ts, e)
+    public boolean isFinalAccessExprOrConst(Expr e, Type expectedType) {
+        return isFinalAccessExpr(e)
                 ||
                 e instanceof LabelExpr ||
                 e instanceof PrincipalNode ||
-                (e instanceof Cast && isFinalAccessExprOrConst(ts, ((Cast)e).expr())) ||
-                (e instanceof DowngradeExpr && isFinalAccessExprOrConst(ts, ((DowngradeExpr)e).expr())) ||
+                (e instanceof Cast && isFinalAccessExprOrConst(((Cast)e).expr())) ||
+                (e instanceof DowngradeExpr && isFinalAccessExprOrConst(((DowngradeExpr)e).expr())) ||
                 (e instanceof NullLit &&
                         expectedType != null &&
-                        ts.isImplicitCastValid(expectedType, ts.Principal()))
-                        /*|| (e instanceof Special && ((Special)e).kind() == Special.SUPER)*/ ;
+                        isImplicitCastValid(
+                                expectedType, Principal()))
+                                /*|| (e instanceof Special && ((Special)e).kind() == Special.SUPER)*/ ;
     }
 
     @Override
-    public boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e) {
+    public boolean isFinalAccessExprOrConst(Expr e) {
         Type expectedType = null;
         if (e != null && e.type() != null && !e.type().isNull()) {
             expectedType = e.type();
         }
-        return isFinalAccessExprOrConst(ts, e, expectedType);
+        return isFinalAccessExprOrConst(e, expectedType);
 
     }
 

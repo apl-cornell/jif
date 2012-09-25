@@ -123,7 +123,7 @@ public class JifFieldAssignExt extends JifAssignExt
             // add a definitional assertion that the field is equivalent
             // to the expression being assigned to it.
             if (fi.flags().isFinal()
-                    && ts.isFinalAccessExprOrConst(ts, assign.right())) {
+                    && ts.isFinalAccessExprOrConst(assign.right())) {
                 if (ts.isLabel(fi.type())) {
                     Label dl =
                             ts.dynamicLabel(

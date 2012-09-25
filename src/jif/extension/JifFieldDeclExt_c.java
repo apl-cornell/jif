@@ -172,7 +172,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                 ts.processFAP(fi, path, A, ts, lc);
             }
 
-            if (fi.flags().isFinal() && ts.isFinalAccessExprOrConst(ts, init)) {
+            if (fi.flags().isFinal() && ts.isFinalAccessExprOrConst(init)) {
                 if (ts.isLabel(fi.type())) {
                     Label dl =
                             ts.dynamicLabel(

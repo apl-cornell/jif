@@ -449,7 +449,7 @@ public class CallHelper {
             if (argInstances.contains(aj.formalInstance())) {
                 // this actual arg needs to be final!
                 Expr Ej = actualArgs.get(j);
-                if (!jts.isFinalAccessExprOrConst(jts, Ej)) {
+                if (!jts.isFinalAccessExprOrConst(Ej)) {
                     throw new SemanticDetailedException("The " +
                             StringUtil.nth(j+1) +
                             " argument must be a final access path or a " +

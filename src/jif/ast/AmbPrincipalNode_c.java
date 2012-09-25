@@ -112,7 +112,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements AmbPrincipalN
         }
 
         if (expr.type() != null && expr.type().isCanonical() &&
- !ts.isFinalAccessExprOrConst(ts, expr, ts.Principal())) {
+ !ts.isFinalAccessExprOrConst(expr, ts.Principal())) {
             // illegal dynamic principal. But try to convert it to an access path
             // to allow a more precise error message.
             AccessPath ap =

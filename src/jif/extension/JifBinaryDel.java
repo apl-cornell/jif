@@ -50,7 +50,7 @@ public class JifBinaryDel extends JifJL_c
                 lhs = (LabelExpr)b.left();
             }
             else {
-                if (!ts.isFinalAccessExprOrConst(ts, b.left())) {
+                if (!ts.isFinalAccessExprOrConst(b.left())) {
                     throw new SemanticException(
                             "An expression used in a label test must be either a final access path, principal parameter or a constant principal",
                             b.left().position());
@@ -65,7 +65,7 @@ public class JifBinaryDel extends JifJL_c
                 rhs = (LabelExpr)b.right();
             }
             else {
-                if (!ts.isFinalAccessExprOrConst(ts, b.right())) {
+                if (!ts.isFinalAccessExprOrConst(b.right())) {
                     throw new SemanticException(
                             "An expression used in a label test must either be a final access path or a \"new label\"",
                             b.right().position());
@@ -101,7 +101,7 @@ public class JifBinaryDel extends JifJL_c
             } else {
                 // Make sure the left side is a LabelExpr.
                 if (!(lhs instanceof LabelExpr)) {
-                    if (!ts.isFinalAccessExprOrConst(ts, lhs)) {
+                    if (!ts.isFinalAccessExprOrConst(lhs)) {
                         throw new SemanticException(
                                 "An expression used in a label test must be "
                                         + "either a final access path or a "
@@ -145,7 +145,7 @@ public class JifBinaryDel extends JifJL_c
         if (expr instanceof PrincipalExpr) return;
 
         if (expr.type() != null && expr.type().isCanonical() &&
- !ts.isFinalAccessExprOrConst(ts, expr)) {
+ !ts.isFinalAccessExprOrConst(expr)) {
             // illegal dynamic principal. But try to convert it to an access path
             // to allow a more precise error message.
             AccessPath ap =

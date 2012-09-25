@@ -51,7 +51,7 @@ public class JifLocalDeclExt extends JifStmtExt_c
         //deal with the special cases "final label l = new label(...)"
         // and "final principal p = ..."
         if (li.flags().isFinal()
-                && ts.isFinalAccessExprOrConst(ts, decl.init())) {
+                && ts.isFinalAccessExprOrConst(decl.init())) {
             if (ts.isLabel(li.type())) {
                 Label dl =
                         ts.dynamicLabel(decl.position(),

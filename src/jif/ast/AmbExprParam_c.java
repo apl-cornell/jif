@@ -120,7 +120,7 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
         if (expr instanceof PrincipalNode ||
                 ts.isImplicitCastValid(expr.type(), ts.Principal()) ||
                 (expectedPI != null && expectedPI.isPrincipal())) {
-            if (!ts.isFinalAccessExprOrConst(ts, expr, ts.Principal())) {
+            if (!ts.isFinalAccessExprOrConst(expr, ts.Principal())) {
                 throw new SemanticDetailedException(
                         "Illegal principal parameter.",
                         "The expression " + expr + " is not suitable as a " +
@@ -132,7 +132,7 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam
             return nf.CanonicalPrincipalNode(position(),
                     ts.exprToPrincipal(ts, expr, c));
         }
-        if (!ts.isFinalAccessExprOrConst(ts, expr, ts.Label())) {
+        if (!ts.isFinalAccessExprOrConst(expr, ts.Label())) {
             throw new SemanticDetailedException(
                     "Illegal label parameter.",
                     "The expression " + expr + " is not suitable as a " +

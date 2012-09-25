@@ -82,7 +82,7 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements AmbDynamicL
         }
 
         if (expr.type() != null && expr.type().isCanonical() &&
-                !ts.isFinalAccessExprOrConst(ts, expr, ts.Label())) {
+                !ts.isFinalAccessExprOrConst(expr, ts.Label())) {
             // illegal dynamic label. But try to convert it to an access path
             // to allow a more precise error message.
             AccessPath ap =

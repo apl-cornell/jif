@@ -439,11 +439,11 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
     Label exprToLabel(JifTypeSystem ts, Expr e, JifContext context)
             throws SemanticException;
 
-    boolean isFinalAccessExpr(JifTypeSystem ts, Expr e);
+    boolean isFinalAccessExpr(Expr e);
 
-    boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e, Type expectedType);
+    boolean isFinalAccessExprOrConst(Expr e, Type expectedType);
 
-    boolean isFinalAccessExprOrConst(JifTypeSystem ts, Expr e);
+    boolean isFinalAccessExprOrConst(Expr e);
 
     void processFAP(VarInstance fi, AccessPath path, JifContext A,
             JifTypeSystem ts, LabelChecker lc) throws SemanticException;

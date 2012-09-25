@@ -221,8 +221,7 @@ public class JifInstantiator
                     Expr actualExpr = actualArgExprs.get(i);
                     Type formalArgType = formalArgTypes.get(i);
                     AccessPath target;
-                    if (ts.isFinalAccessExprOrConst(ts, actualExpr,
-                            formalArgType)) {
+                    if (ts.isFinalAccessExprOrConst(actualExpr, formalArgType)) {
                         target =
                                 ts.exprToAccessPath(actualExpr, formalArgType,
                                         callerContext);
@@ -519,7 +518,7 @@ public class JifInstantiator
             List<Label> actualParamLabels) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (ts.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+        if (ts.isFinalAccessExprOrConst(receiverExpr, receiverType)) {
             receiverPath =
                     ts.exprToAccessPath(receiverExpr, receiverType,
                             callerContext);
@@ -595,7 +594,7 @@ public class JifInstantiator
             Label receiverLbl) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (ts.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+        if (ts.isFinalAccessExprOrConst(receiverExpr, receiverType)) {
             receiverPath =
                     ts.exprToAccessPath(receiverExpr, receiverType,
                             callerContext);
@@ -653,7 +652,7 @@ public class JifInstantiator
             List<Label> actualParamLabels) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (ts.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+        if (ts.isFinalAccessExprOrConst(receiverExpr, receiverType)) {
             receiverPath =
                     ts.exprToAccessPath(receiverExpr, receiverType,
                             callerContext);
@@ -686,7 +685,7 @@ public class JifInstantiator
             List<? extends Label> actualParamLabels) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (ts.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+        if (ts.isFinalAccessExprOrConst(receiverExpr, receiverType)) {
             receiverPath =
                     ts.exprToAccessPath(receiverExpr, receiverType,
                             callerContext);
@@ -715,7 +714,7 @@ public class JifInstantiator
 
         JifTypeSystem ts = (JifTypeSystem)callerContext.typeSystem();
         AccessPath receiverPath;
-        if (ts.isFinalAccessExprOrConst(ts, receiverExpr, receiverType)) {
+        if (ts.isFinalAccessExprOrConst(receiverExpr, receiverType)) {
             receiverPath =
                     ts.exprToAccessPath(receiverExpr, receiverType,
                             callerContext);
