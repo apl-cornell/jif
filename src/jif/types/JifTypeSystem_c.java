@@ -1354,7 +1354,8 @@ implements JifTypeSystem {
 
     /**
      * Returns true if the type is a Jif class (will return false if the type
-     * is just a jif signature for a java class).
+     * is just a jif signature for a java class). All class types are JifClasses
+     * unless they are signatures for java classes.
      *
      * Currently we determine this by assuming that Jif "source code" for Java
      * classes have been given a private static field, named
@@ -1363,18 +1364,18 @@ implements JifTypeSystem {
      * for a Java class, and be able to detect this.
      */
     @Override
-    public boolean isJifClass(Type type) {
+    public boolean isSignature(Type type) {
         ClassType ct = type.toClass();
         if (ct != null) {
             FieldInstance fi = ct.fieldNamed(JIF_SIG_OF_JAVA_MARKER);
             if (fi != null
                     && (fi.flags().isPrivate() || ct.flags().isInterface())
                     && fi.flags().isStatic()) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     @Override
@@ -1389,7 +1390,7 @@ implements JifTypeSystem {
 
     @Override
     public boolean isParamsRuntimeRep(Type t) {
-        if (isJifClass(t)) {
+        if (!isSignature(t)) {
             return true;
         }
 
@@ -1442,11 +1443,11 @@ implements JifTypeSystem {
     /**
      * Check if the class has safe constructors, that is, if the constructors of
      * the class definitely do not access a final field (possibly on a subclass)
-     * before that field has been initalized. All Jif classes are not untrusted;
-     * Java classes can be explicitly marked as not by a specially marker field.
+     * before that field has been initalized. All Jif classes are safe;
+     * Java classes can be explicitly marked as safe by a special marker field.
      */
     public boolean hasSafeConstructors(ClassType ct) {
-        if (isJifClass(ct)) {
+        if (!isSignature(ct)) {
             return true;
         }
         if (ct != null) {
@@ -2052,5 +2053,14 @@ implements JifTypeSystem {
         return varInstanceToAccessPath(vi, vi.name(), pos);
     }
 
+    @Override
+    public boolean needsDynamicTypeMethods(Type ct) {
+        return isParamsRuntimeRep(ct) && !((JifPolyType) ct).params().isEmpty();
+    }
+
+    @Override
+    public boolean needsImplClass(Type jpt) {
+        return isParamsRuntimeRep(jpt);
+    }
 
 }

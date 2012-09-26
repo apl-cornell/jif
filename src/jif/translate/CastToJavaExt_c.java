@@ -3,10 +3,10 @@ package jif.translate;
 import java.util.ArrayList;
 import java.util.List;
 
-import jif.extension.JifCastDel;
 import jif.types.JifPolyType;
 import jif.types.JifSubst;
 import jif.types.JifSubstType;
+import jif.types.JifTypeSystem;
 import jif.types.ParamInstance;
 import polyglot.ast.Cast;
 import polyglot.ast.Expr;
@@ -28,8 +28,9 @@ public class CastToJavaExt_c extends ToJavaExt_c {
     @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         Cast c = (Cast)this.node();
+        JifTypeSystem ts = (JifTypeSystem) rw.typeSystem();
 
-        if (!((JifCastDel)c.del()).isToSubstJifClass()) {
+        if (!ts.needsDynamicTypeMethods(castType)) {
             return rw.java_nf().Cast(c.position(), c.castType(), c.expr());
 
         }

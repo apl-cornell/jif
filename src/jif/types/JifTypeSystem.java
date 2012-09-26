@@ -326,10 +326,9 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
     boolean isLabeled(Type type);
 
     /**
-     * Returns true if the type is a Jif class (will return false if the type
-     * is just a jif signature for a java class).
+     * Returns true if the type is signature for a Java class.
      */
-    boolean isJifClass(Type t);
+    boolean isSignature(Type t);
 
     /**
      * Returns true if the type is a Jif class, or if it is a non-Jif class
@@ -457,4 +456,15 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
 
     AccessPath varInstanceToAccessPath(VarInstance vi, Position pos)
             throws SemanticException;
+
+    /**
+     * Returns true if the class has runtime methods for cast and instanceof
+     */
+    boolean needsDynamicTypeMethods(Type ct);
+
+    /**
+     * Returns true if the class has runtime methods for cast and instanceof
+     */
+    boolean needsImplClass(Type ct);
+
 }
