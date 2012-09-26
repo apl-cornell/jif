@@ -231,7 +231,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
                         }
                     }
                 }
- else if (n instanceof Assign
+                else if (n instanceof Assign
                         && JifUtil.effectiveExpr(((Assign) n).right()) instanceof Special) {
                     result[0] = true;
                 }
@@ -258,12 +258,14 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c
             // we are making a super constructor call. Is it
             // a potentially dangerous one?
 
-            if (!ts.isJifClass(ci.container())) {
+            if (ts.isSignature(ci.container())) {
                 // the class is not a Jif class, but just a signature
                 // for a java class. Don't bother throwing any errors.
             }
-            else if (ts.isJifClass(ci.container()) &&
-                    !ts.isJifClass(ci.container().superType()) &&
+            else if (!ts.isSignature(ci.container())
+                    &&
+ ts.isSignature(ci.container().superType())
+                    &&
                     ts.hasUntrustedAncestor(ci.container()) == null) {
                 // Not a potentially dangerous super call.
                 // The immediate super class is a trusted Java

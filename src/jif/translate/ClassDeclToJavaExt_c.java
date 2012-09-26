@@ -85,7 +85,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
         ClassBody cb = n.body();
         if (!jpt.flags().isInterface()) {
-            if (rw.jif_ts().isJifClass(jpt)) {
+            if (!rw.jif_ts().isSignature(jpt)) {
                 // add constructor
                 cb = cb.addMember(produceConstructor(jpt, rw));
                 if (hasDefaultConstructor) {
@@ -98,7 +98,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 // add any static initializers
                 cb = addStaticInitializers(cb, rw);
             }
-            if (needsDynamicTypeMethods(rw, jpt)) {
+            if (rw.jif_ts().needsDynamicTypeMethods(jpt)) {
                 // add instanceof and cast static methods to the class
                 cb = cb.addMember(produceInstanceOfMethod(jpt, rw, false));
                 cb = cb.addMember(produceCastMethod(jpt, rw));
@@ -107,7 +107,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             if (rw.jif_ts().isParamsRuntimeRep(jpt)) {
                 if (!jpt.params().isEmpty()) {
                     // add fields for params
-                    if (rw.jif_ts().isJifClass(jpt)) {
+                    if (!rw.jif_ts().isSignature(jpt)) {
                         for (ParamInstance pi : jpt.params()) {
                             String paramFieldName = ParamToJavaExpr_c.paramFieldName(pi);
                             TypeNode tn = typeNodeForParam(pi, rw);
@@ -122,7 +122,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         }
         else {
             // it's an interface
-            if (needsImplClass(rw, jpt)) {
+            if (rw.jif_ts().needsImplClass(jpt)) {
                 ClassBody implBody =
                         rw.java_nf().ClassBody(Position.compilerGenerated(),
                                 new ArrayList<ClassMember>(2));
@@ -155,13 +155,6 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 n.superClass(), n.interfaces(), cb);
     }
 
-    protected boolean needsDynamicTypeMethods(JifToJavaRewriter rw, JifPolyType jpt) {
-        return rw.jif_ts().isParamsRuntimeRep(jpt) && !jpt.params().isEmpty();
-    }
-
-    protected boolean needsImplClass(JifToJavaRewriter rw, JifPolyType jpt) {
-        return rw.jif_ts().isParamsRuntimeRep(jpt);
-    }
     /**
      * Create a method for initializations, and add it to cb.
      */
@@ -226,7 +219,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                         String paramFieldNameGetter = ParamToJavaExpr_c.paramFieldNameGetter(pi);
                         TypeNode tn = typeNodeForParam(pi, rw);
                         Expr lblExpr = rw.paramToJava(subst.get(pi));
-                        if (rw.jif_ts().isJifClass(jpt)) {
+                        if (!rw.jif_ts().isSignature(jpt)) {
                             // it's a real Jif class, so add a real implementation
                             cb = cb.addMember(rw.qq().parseMember("private %T %s;", tn, paramFieldName));
                             cb = cb.addMember(rw.qq().parseMember(
@@ -260,11 +253,11 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         Context A = rw.context();
         rw = (JifToJavaRewriter)rw.context(A.pushStatic());
         JifTypeSystem jifts = rw.jif_ts();
-        List<Formal> formals = produceFormals(jpt, rw, true);
+        List<Formal> formals = produceFormals(jpt, rw);
 
         String name = jpt.name();
 
-        if (!jifts.isJifClass(jpt)) {
+        if (jifts.isSignature(jpt)) {
             // just produce a header
             return rw.qq().parseMember("static public native boolean %s(%LF);", INSTANCEOF_METHOD_NAME, formals);
         }
@@ -325,8 +318,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         rw = (JifToJavaRewriter)rw.context(A.pushStatic());
 
         TypeNode tn = rw.typeToJava(jpt, Position.compilerGenerated());;
-        List<Formal> formals = produceFormals(jpt, rw, true);
-        if (!rw.jif_ts().isJifClass(jpt)) {
+        List<Formal> formals = produceFormals(jpt, rw);
+        if (rw.jif_ts().isSignature(jpt)) {
             // just produce a header
             return rw.qq().parseMember("static public native %T %s(%LF);", tn, castMethodName(jpt), formals);
 
@@ -344,7 +337,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
     }
 
     protected List<Formal> produceFormals(JifPolyType jpt,
-            JifToJavaRewriter rw, boolean addObjectFormal)
+            JifToJavaRewriter rw)
                     throws SemanticException {
         List<Formal> formals = new ArrayList<Formal>(jpt.params().size() + 1);
         Position pos = Position.compilerGenerated();
@@ -355,14 +348,18 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             Formal f = rw.java_nf().Formal(pos, Flags.FINAL, tn, paramArgName);
             formals.add(f);
         }
-
-        if (addObjectFormal) {
-            // add the object argument too.
-            TypeNode tn = rw.qq().parseType("java.lang.Object");
-            Id id = rw.java_nf().Id(pos, "o");
-            formals.add(rw.java_nf().Formal(pos, Flags.FINAL, tn, id));
-        }
+        formals.add(produceObjectFormal(jpt, rw));
         return formals;
+    }
+
+    /**
+     * Returns the formal with id "o" for the object passed to the cast and instanceof methods
+     */
+    protected Formal produceObjectFormal(JifPolyType jpt, JifToJavaRewriter rw) {
+        Position pos = Position.compilerGenerated();
+        TypeNode tn = rw.qq().parseType("java.lang.Object");
+        Id id = rw.java_nf().Id(pos, "o");
+        return rw.java_nf().Formal(pos, Flags.FINAL, tn, id);
     }
 
     static protected List<Formal> produceParamFormals(JifPolyType jpt,

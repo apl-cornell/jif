@@ -54,7 +54,7 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
 
         Node retVal;
         // only translate jif constructors
-        if (! rw.jif_ts().isJifClass(ct)) {
+        if (rw.jif_ts().isSignature(ct)) {
             if (rw.jif_ts().isParamsRuntimeRep(ct)) {
                 // It's a java class that represents parameters at runtime.
                 // Produce the correct signature for constructors in the
@@ -120,7 +120,8 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
             // Previous checks should have ensured that the first statement
             // is either a this(...) call (permitted if the java superclass is
             // trusted) or the default super call, super().
-            if (rw.jif_ts().isJifClass(ct) && !rw.jif_ts().isJifClass(ct.superType())) {
+            if (!rw.jif_ts().isSignature(ct)
+                    && rw.jif_ts().isSignature(ct.superType())) {
                 // first calculate the number of parameters that are being
                 // passed to super.
                 int numSuperParams = 0;

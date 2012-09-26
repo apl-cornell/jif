@@ -28,7 +28,7 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
     }
 
     public Expr toJava(ParamInstance pi, JifToJavaRewriter rw) {
-        if (!rw.jif_ts().isJifClass(pi.container())) {
+        if (rw.jif_ts().isSignature(pi.container())) {
             // the parameter to be translated is in the code
             // of a non-Jif class (which does have runtime representation
             // of params).

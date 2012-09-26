@@ -3,10 +3,10 @@ package jif.translate;
 import java.util.ArrayList;
 import java.util.List;
 
-import jif.extension.JifInstanceOfDel;
 import jif.types.JifPolyType;
 import jif.types.JifSubst;
 import jif.types.JifSubstType;
+import jif.types.JifTypeSystem;
 import jif.types.ParamInstance;
 import polyglot.ast.Expr;
 import polyglot.ast.Instanceof;
@@ -28,7 +28,9 @@ public class InstanceOfToJavaExt_c extends ToJavaExt_c {
     @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         Instanceof io = (Instanceof)this.node();
-        if (!((JifInstanceOfDel)io.del()).isToSubstJifClass()) {
+        JifTypeSystem ts = (JifTypeSystem) rw.typeSystem();
+
+        if (!ts.needsDynamicTypeMethods(compareType)) {
             return rw.java_nf().Instanceof(io.position(), io.expr(), io.compareType());
         }
 

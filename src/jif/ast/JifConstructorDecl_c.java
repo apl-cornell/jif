@@ -247,14 +247,14 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
             return;
 
         ClassType untrusted = ts.hasUntrustedAncestor(ct);
-        if (!ts.isJifClass(ct)) {
+        if (ts.isSignature(ct)) {
             // If ct is not a jif class, then the first statement of the body
             // had better be a constructor call (which is the normal Java
             // rule).
             checkFirstStmtConstructorCall("The first statement of a constructor " +
                     "of a Java class must be a constructor call.", true, false);
         }
-        else if (ts.isJifClass(ct) && untrusted != null) {
+        else if (!ts.isSignature(ct) && untrusted != null) {
             // If ct is a Jif class, but the super class is an
             // untrusted Java class, then the first statement of the body
             // must be an explicit call to the default super constructor:
@@ -266,7 +266,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements JifConstr
                     "must be an explicit call to the default super constructor," +
                     "\"super()\".", false, true);
         }
-        else if (ts.isJifClass(ct) && !ts.isJifClass(ct.superType())) {
+ else if (!ts.isSignature(ct) && ts.isSignature(ct.superType())) {
             // this is a Jif class, but it's superclass is a trusted Java class.
             // The first statement must either be a "this(...)" constructor
             // call, or a "super()" call. That is, the constructor cannot

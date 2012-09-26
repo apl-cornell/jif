@@ -25,7 +25,7 @@ public class ConstructorCallToJavaExt_c extends ToJavaExt_c {
         ConstructorCall.Kind kind = n.kind();
 
         // only translate calls to jif constructors
-        if (! rw.jif_ts().isJifClass(ct)) {
+        if (rw.jif_ts().isSignature(ct)) {
             List<Expr> arguments =
                     new ArrayList<Expr>(n.arguments().size() + 2);
             JifPolyType jpt = null;

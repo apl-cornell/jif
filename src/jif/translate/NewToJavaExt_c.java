@@ -49,7 +49,7 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
         }
 
         // use the appropriate string for the constructor invocation.
-        if (rw.jif_ts().isJifClass(ct)) {
+        if (!rw.jif_ts().isSignature(ct)) {
             String name = ClassDeclToJavaExt_c.constructorTranslatedName(ct);
             return rw.qq().parseExpr("new %T(%LE).%s(%LE)",
                     n.objectType(), paramargs, name, n.arguments());
