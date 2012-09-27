@@ -2055,7 +2055,10 @@ implements JifTypeSystem {
 
     @Override
     public boolean needsDynamicTypeMethods(Type ct) {
-        return isParamsRuntimeRep(ct) && !((JifPolyType) ct).params().isEmpty();
+        boolean hasParams = (ct instanceof JifSubstType
+                && !((JifSubstType) ct).actuals().isEmpty())
+                || (ct instanceof JifPolyType && !((JifPolyType) ct).params().isEmpty());
+        return isParamsRuntimeRep(ct) && hasParams;
     }
 
     @Override
