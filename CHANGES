@@ -2,6 +2,12 @@ Jif Change Log
 ==============
 
 This file documents changes between releases of Jif.
+2012-10-04    Jif 3.4.0
+    * Latent support for provider labels for limited compilation of 
+        untrusted code
+    * -fail-on-exception option to promoting uncaught exceptions to 
+        fatal errors.
+    * Updated to Polyglot 2.5.1 release.
 
 2009-03-16    Jif 3.3.2
     * Top/bottom Unicode syntax for principals supported.
