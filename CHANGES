@@ -4,12 +4,13 @@ Jif Change Log
 This file documents changes between releases of Jif.
 2012-10-04    Jif 3.4.0
     * Latent support for provider labels for limited compilation of 
-        untrusted code
-    * -fail-on-exception option to promoting uncaught exceptions to 
+        untrusted code (to support Fabric).
+    * -fail-on-exception option to promote uncaught exceptions to 
         fatal errors.
-	* In "declassify" commands, only the confidential component needs to be
-	  specified. For instance, when the label of expression e is
-	  {Alice->;Alice<-}, "declassify(e, {Alice->} to {})" is the same as
+    * In "declassify" commands, only the confidential component now
+      needs to be specified. This makes declassify() easier to use.
+      For instance, when the label of expression e is {Alice->;Alice<-},
+      "declassify(e, {Alice->} to {})" is the same as
       "declassify(e, {Alice->;Alice<-} to {Alice<-})".
     * Updated to Polyglot 2.5.1 release.
 
