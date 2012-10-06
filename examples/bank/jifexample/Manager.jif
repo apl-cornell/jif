@@ -52,7 +52,7 @@ class Manager {
 	    Password[customer] psswd = new Password[customer](name);
 
 	    //** need to dynamically add the customer's authority here...
-	    actsfor(manager, customer) {
+	    if (manager actsfor customer) {
 		RSAPrivateKey[customer] privKey = new RSAPrivateKey[customer]();
 		RSAPublicKey pubKey = privKey.createPublicKey();
 		EncryptedObject ePrivKey = psswd.encrypt(privKey);
