@@ -6,11 +6,11 @@
 
 class UnsoundConstructor {
 	public static boolean {_→} _declassify (boolean {*→} y) {
-		C o;
+		UnsoundConstructor o;
 		if (y)
-			o = new C(0);
+			o = new UnsoundConstructor(0);
 		else
-			o = new C();
+			o = new UnsoundConstructor();
 		return o.x;
 	}
 
@@ -18,8 +18,8 @@ class UnsoundConstructor {
 
 	final boolean {_→} x;
 
-	C {*→} ()      { x = false; }
-	C {*→} (int a) { x = true;  }
+	UnsoundConstructor {*→} ()      { x = false; }
+	UnsoundConstructor {*→} (int a) { x = true;  }
 
 }
 		

@@ -24,7 +24,7 @@ class Test {
     void foo{*lbl}() {
         final FieldLabel01 fl = new FieldLabel01();
 
-        fl1.foo();
+        try { fl1.foo(); } catch(NullPointerException e) {}
         fl.foo();
     }
 }

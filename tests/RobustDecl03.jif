@@ -1,7 +1,5 @@
 class C authority (Alice) {
-    void m{*!:}() where authority (Alice) {
-	boolean{Alice!:_} bool = false;
-	int{Alice:Bob} x = 7;
+    void m{*!:}(boolean{Alice!:_} bool, int{Alice:Bob} x) where authority (Alice) {
 	if (bool) {
 	    // pc here depends on bool
 	    int y = declassify(x, {Alice:Bob,Chuck; bool}); // bad, Chuck can influence bool

@@ -359,7 +359,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
                   (Semantic, "Only one static method named \"main\" allowed per class");
 	Main2.jif ;
 	Main3.jif (Semantic, "can only have a where caller constraint");
-	Main4.jif (Semantic, "can not have .* constraint"), (Semantic, "can not have .* constraint");
+	#Main4.jif (Semantic, "can not have .* constraint"), (Semantic, "can not have .* constraint");
 	Main5.jif ;
 	MapTest.jif ;
 	Meet01.jif ;
@@ -590,6 +590,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Switch02.jif (Semantic, "not less restrictive");
 	Switch03.jif (Semantic, "not less restrictive");
 	Switch04.jif (Semantic, "not less restrictive");
+	#UnsoundConstructor.jif (Semantic, "pc");
 }
 
 # the robustness test cases. Turn robustness on.
@@ -598,5 +599,4 @@ jif.ExtensionInfo  "-robust -cp ../classes:../lib-classes:../lib/jif.jar:../lib/
 	RobustDecl02.jif (Semantic, "not robust");
 	RobustDecl03.jif (Semantic, "not robust");
 	RobustDecl04.jif ;
-	UnsoundConstructor.jif (Semantic, "pc");
 }
