@@ -1,7 +1,7 @@
-Jif 3.3.1
+Jif 3.4
 
-			     The Jif Compiler
-			     ----------------
+                         The Jif Language and Compiler
+			 -----------------------------
 
 Jif is an implementation of the JFlow language (with several
 extensions) described in the 1999 paper, Practical Mostly-Static
@@ -27,13 +27,12 @@ sub-directories:
 Requirements
 ------------
 
-This Jif distribution builds on Unix and on Windows using the Cygwin
-environment. Jif is compiled with the Ant build tool
-(http://jakarta.apache.org/ant). You must ensure that java, javac, and
-g++ are in your path.
+This Jif distribution builds on Unix (Linux, MacOS) and on Windows under the
+Cygwin environment. Jif is compiled with the Ant build tool
+(http://jakarta.apache.org/ant). You must ensure that java, javac, and g++ are
+in your path.
 
-Softare Versions: We recommend that you use JDK 1.4.2 or later.  Ant
-   1.6.5 is known to work with Jif 3.1.1.
+Software Versions: We recommend that you use JDK 1.4.2 or later.
 
 Jif and Cygwin: Jif can be built and used on a Windows platform running 
    Cygwin. Several issues are worth pointing out however. 
@@ -63,7 +62,7 @@ also developed at Cornell. Polyglot can be obtained from the web site:
     http://www.cs.cornell.edu/Projects/polyglot
 
 This Jif distribution contains the files polyglot.jar, JFlex.jar and
-java_cup.jar from the Polyglot 2.3.0 distribution. These files are
+java_cup.jar from the Polyglot 2.5.1 distribution. These files are
 required to build Jif.
 
 This Jif distribution contains some C++ code, used to produce
@@ -226,12 +225,12 @@ The Jif project is supervised by Andrew Myers at the Cornell
 University Computer Science Department. Many people have contributed
 to this software.
 
-This release of the Jif compiler was prepared by Stephen Chong. Thanks to 
-Aslan Askarov, Robert Grabowski, Doaa Hassan, Daniel Hedin, Boniface Hicks,
-Dave King, Karl Mazurak, Todd Millstein, Andrei Sabelfeld, Lilia Sfaxi, 
-and Steve Zdancewic, who provided bug reports and feedback for this and
-previous versions of Jif. Xin Zheng, Lantian Zheng, Steve Zdancewic, 
-and Nate Nystrom helped implement earlier versions.
+This release of the Jif compiler was prepared by Owen Arden. Thanks to Aslan
+Askarov, Robert Grabowski, Doaa Hassan, Daniel Hedin, Boniface Hicks, Dave
+King, Karl Mazurak, Todd Millstein, Andrei Sabelfeld, Lilia Sfaxi, and Steve
+Zdancewic, who provided bug reports and feedback for this and previous versions
+of Jif. Steve Chong, Xin Zheng, Lantian Zheng, Steve Zdancewic, and Nate
+Nystrom helped implement earlier versions.
 
 Restrictions on use
 -------------------
@@ -241,7 +240,7 @@ redistributed as governed by the license included in the attached file
 LICENSE.
 
 Jif: Java Information Flow
-Copyright (C) 1999-2008 Andrew C. Myers, Cornell University
+Copyright (C) 1999-2012 Andrew C. Myers, Cornell University
 
 This software is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -257,14 +256,15 @@ at the Jif web site at
     http://www.cs.cornell.edu/jif
 
 If you use Jif, we'd appreciate your letting us know.  Send your
-comments and bug reports to Andrew Myers at andru@cs.cornell.edu.  If
-you would like to receive notification of future Jif updates, please
-join the mailing list; details are on the Jif web site.
+comments and bug reports to Andrew Myers at andru@cs.cornell.edu. There
+is also a Jif users mailing list and a Jif announcement mailing list.
+If you would like to receive notification of future Jif updates, please
+join these mailing lists; details are on the Jif web site.
 
-Acknowledgments
-----------------
+Other Acknowledgments
+---------------------
 
-The development and maintenance of this Jif software release has been supported
-by NSF Grants 0430161 and 0627649, and by AFRL NICECAP Award FA8750-08-2-0079.
-Any opinions expressed or implied in this release are those of the software
-developers alone, and not necessarily those of these sponsors.
+This Jif software release was supported by NSF Grant 0964409, by ONR grant
+N000140910652, and by the USAF Research Laboratory.  Any opinions expressed or
+implied in this release are those of the software developers alone, and not
+necessarily those of these sponsors.
