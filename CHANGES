@@ -7,6 +7,10 @@ This file documents changes between releases of Jif.
         untrusted code
     * -fail-on-exception option to promoting uncaught exceptions to 
         fatal errors.
+	* In "declassify" commands, only the confidential component needs to be
+	  specified. For instance, when the label of expression e is
+	  {Alice->;Alice<-}, "declassify(e, {Alice->} to {})" is the same as
+      "declassify(e, {Alice->;Alice<-} to {Alice<-})".
     * Updated to Polyglot 2.5.1 release.
 
 2009-03-16    Jif 3.3.2
