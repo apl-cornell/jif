@@ -9,7 +9,8 @@
 
 <body class="notes">
 
-<h2>Jif: Adding Information Flow to Java</h2>
+<h2>Tutorial on Jif: Adding Information Flow to Java</h2>
+<h3>Evan Danaher</h3>
 
 <a name="toc" id="toc"></a>
 <!-- TOC START - ->
@@ -49,7 +50,12 @@
 
 <h3><a name="introduction" id="introduction">Introduction</a></h3>
 
-<p>Jif is a security-typed programming language that extends Java with support for information flow control and access control, enforced at both compile time and run time.  The use of security types makes it easy to avoid many types of security bugs.  It also adds a whole new set of constraints to programs, which makes writing valid programs that much more difficult.</p>
+<p>Jif is a security-typed programming language that extends Java with support
+for information flow control and access control, enforced at both compile time
+and run time.  The use of security types makes it easy to avoid many types
+of security bugs.  This also means that the Jif compiler rejects programs that
+you write, because of insecurities. Understanding how it works helps a great deal.
+</p>
 
 <p> This tutorial provides an overview of the major features of Jif, and then walks through the implementation of a small example, demonstrating common pitfalls and solutions.</p>
 

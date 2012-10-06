@@ -16,14 +16,14 @@ class SetSecretClosure[principal user, label lb_external]
         where caller(user) {
 
      // This should never happen, but it makes the compiler happy
-     if(user_obj == null)
+     if (user_obj == null)
         return new Integer(-1);
 
      // This should always be true
-     if(user_obj equiv user) {
+     if (user_obj equiv user) {
         // This should be statically enforcable.
-        if(lb_external <= new label {user_obj<-; user_obj->}) {
-           if(new label {user_obj<-} <= lb_external) {
+        if (lb_external <= new label {user_obj<-; user_obj->}) {
+           if (new label {user_obj<-} <= lb_external) {
               int n = declassify(user_obj.getSecret(), {user_obj->; user_obj<-} to {user_obj<-});
               return new Integer(n);
            }
@@ -43,15 +43,15 @@ public class Main {
       // read "login" or "register" command
 
       // avoid NullPointerExceptions
-      if(users == null)
+      if (users == null)
          return;
 
-      while(true) {
+      while (true) {
          String username, password;
          try {
             UnsafeIO.print("username: ");
             username = UnsafeIO.readLine();
-            if(username == null || username.equals("q")) {
+            if (username == null || username.equals("q")) {
                UnsafeIO.print("\n");
                return;
             }
@@ -67,14 +67,14 @@ public class Main {
 
          try {
             for(int i = 0; i < users.length; i++) {
-               if(username.equals(users[i].getName()))
+               if (username.equals(users[i].getName()))
                   activeuser = users[i];
             }
          } catch(NullPointerException e) {}
 
          // And put the active user into a final variable.
          final User user = activeuser;
-         if(user == null) {
+         if (user == null) {
             UnsafeIO.print("Unknown user: " + username + "\n");
             continue;
          }
@@ -85,7 +85,7 @@ public class Main {
          SetSecretClosure[user, lb] cl = new SetSecretClosure[user, lb](42, user);
          Capability[user, lb] cap = jif.lang.PrincipalUtil.authorize(user, password, cl, lb);
 
-         if(cap != null) {
+         if (cap != null) {
             int{*lb} revealed = -1;
             try {
                revealed = ((Integer)cap.invoke()).intValue();
@@ -161,7 +161,7 @@ class User extends AbstractPrincipal {
          label lb,
          boolean executeNow)
       where authority (this),
-   {authPrf;closure;lb;executeNow} <= lb
+	    {authPrf;closure;lb;executeNow} <= lb
    {
 
 
@@ -177,3 +177,4 @@ class User extends AbstractPrincipal {
    }
 }
 
+// vim: sw=4 ts=4
