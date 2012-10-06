@@ -225,12 +225,13 @@ The Jif project is supervised by Andrew Myers at the Cornell
 University Computer Science Department. Many people have contributed
 to this software.
 
-This release of the Jif compiler was prepared by Owen Arden. Thanks to Aslan
-Askarov, Robert Grabowski, Doaa Hassan, Daniel Hedin, Boniface Hicks, Dave
-King, Karl Mazurak, Todd Millstein, Andrei Sabelfeld, Lilia Sfaxi, and Steve
-Zdancewic, who provided bug reports and feedback for this and previous versions
-of Jif. Steve Chong, Xin Zheng, Lantian Zheng, Steve Zdancewic, and Nate
-Nystrom helped implement earlier versions.
+This release of the Jif compiler was prepared largely through the efforts of
+Owen Arden and Danfeng Zhang. Thanks to Aslan Askarov, Robert Grabowski, Doaa
+Hassan, Daniel Hedin, Boniface Hicks, Dave King, Karl Mazurak, Todd Millstein,
+Andrei Sabelfeld, Lilia Sfaxi, and Steve Zdancewic, who provided bug reports
+and feedback for this and previous versions of Jif. Steve Chong, Xin Zheng,
+Lantian Zheng, Steve Zdancewic, and Nate Nystrom helped implement earlier
+versions.
 
 Restrictions on use
 -------------------
