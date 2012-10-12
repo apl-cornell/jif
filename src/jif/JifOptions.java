@@ -53,20 +53,27 @@ public class JifOptions extends Options {
     /**
      * The classpath for the Jif signatures of java.lang objects.
      */
-    public List<File> sigcp = new ArrayList<File>();
+    public final List<File> sigcp;
 
 
-    public Location signature_path = new Location() {
-        @Override
-        public String getName() {
-            return "SIGNATURE_PATH";
+    public enum JifLocations implements Location {
+        SIGNATURE_PATH(false);
+        private final boolean isOutput;
+
+        private JifLocations(boolean isOutput) {
+            this.isOutput = isOutput;
         }
 
         @Override
         public boolean isOutputLocation() {
-            return false;
+            return isOutput;
         }
-    };
+
+        @Override
+        public String getName() {
+            return name();
+        }
+    }
 
     /**
      * Output a dependency graph to help the diagnosing of type error?
@@ -83,6 +90,7 @@ public class JifOptions extends Options {
      */
     public JifOptions(ExtensionInfo extension) {
         super(extension);
+        sigcp = new ArrayList<File>();
     }
 
     @Override

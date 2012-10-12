@@ -30,7 +30,6 @@ import polyglot.types.LoadedClassResolver;
 import polyglot.types.SemanticException;
 import polyglot.types.SourceClassResolver;
 import polyglot.types.TypeSystem;
-import polyglot.types.reflect.ClassFileLoader;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 
@@ -110,7 +109,7 @@ public class ExtensionInfo extends JLExtensionInfo
     }
 
     @Override
-    protected void configureFileManager() {
+    protected void configureFileManager() throws IOException {
         super.configureFileManager();
 
         JifOptions options = getJifOptions();
@@ -118,11 +117,7 @@ public class ExtensionInfo extends JLExtensionInfo
         List<File> path = new ArrayList<File>();
         path.addAll(options.sigcp);
         path.addAll(options.classpath_directories);
-        try {
-            extFM.setLocation(options.signature_path, path);
-        } catch (IOException e) {
-            throw new InternalCompilerError(e);
-        }
+        extFM.setLocation(options.classpath, path);
     }
 
     @Override
@@ -181,12 +176,4 @@ public class ExtensionInfo extends JLExtensionInfo
         return new jif.parse.UTF8FileSource(f, user);
     }
 
-    @Override
-    public ClassFileLoader classFileLoader() {
-        if (classFileLoader == null) {
-            super.classFileLoader();
-            classFileLoader.addLocation(getJifOptions().signature_path);
-        }
-        return classFileLoader;
-    }
 }
