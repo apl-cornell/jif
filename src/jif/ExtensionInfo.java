@@ -116,7 +116,7 @@ public class ExtensionInfo extends JLExtensionInfo
         // use the signature classpath if it exists for compiling Jif classes
         List<File> path = new ArrayList<File>();
         path.addAll(options.sigcp);
-        path.addAll(options.classpath_directories);
+        path.addAll(options.classpathDirectories());
         extFM.setLocation(options.classpath, path);
     }
 
