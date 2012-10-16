@@ -113,8 +113,8 @@ compiler:
 
    The Jif distribution comes with the Jif compiler almost completely
    pre-built (in the lib directory), and is nearly usable "out of the
-   box." If you want, you can now skip step 5, which builds the Jif
-   compiler and proceed directly to step 6.
+   box." If you want, you can now skip step 6, which builds the Jif
+   compiler, and proceed directly to step 7.
 
 
 6. (OPTIONAL) 
