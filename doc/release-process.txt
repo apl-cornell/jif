@@ -15,11 +15,13 @@
 6. Copy polyglot.jar, JFlex.jar, ppg.jar, pth.jar and java_cup.jar into the
    distribution's lib directory
 
-7. Tar it all up
+7. Move 'dist' to jif-<major>.<minor>.<patch>
 
-8. Publish files $JIF/doc/jifdoc.css and $JIF/doc/web/* on the web, at 
+8. Zip it: zip -r jif-<major>.<minor>.<patch>.zip jif-<major>.<minor>.<patch>
+
+9. Publish files $JIF/doc/jifdoc.css and $JIF/doc/web/* on the web, at 
    http://www.cs.cornell.edu/jif/doc/jif-x.x.x/. (There is a link to the
    reference manual from $JIF/doc/index.html that you updated in step 3.)
 
-9. Email jif-announce-l@lists.cs.cornell.edu with an announcement of the release,
-   if appropriate.
+10. Email jif-announce-l@lists.cs.cornell.edu with an announcement of the release,
+    if appropriate.
