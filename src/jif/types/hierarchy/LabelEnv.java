@@ -13,6 +13,9 @@ import jif.types.label.Label;
 import jif.types.label.Policy;
 import jif.types.principal.Principal;
 
+/** An environment of assertions about label relationships. The relationships
+ *  between different labels can be queried in this environment using {@code leq}".
+ */
 public interface LabelEnv
 {
     // returns true if "L1 <= L2"
