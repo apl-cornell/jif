@@ -13,8 +13,8 @@ The new version of Jif includes several nice improvements:
 This new version of the Jif compiler brought to you primarily
 through the work of:
 
-    Jed Liu
     Owen Arden
+    Jed Liu
     Michael George
     K. Vikram
     Danfeng Zhang
