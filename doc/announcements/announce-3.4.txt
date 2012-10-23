@@ -1,0 +1,21 @@
+We are pleased to announce release 3.4 of the Jif compiler at:
+
+    http://www.cs.cornell.edu/jif
+
+The new version of Jif includes several nice improvements:
+
+    - More convenient handling of fatal errors
+    - Automatic inference of the integrity of declassification 
+    - Upgrade to Polyglot 2.5.1. This yields faster performance.
+    - Hooks for supporting the Fabric distributed programming
+      language, notably a label that represents the code provider.
+
+This new version of the Jif compiler brought to you primarily
+through the work of:
+
+    Jed Liu
+    Owen Arden
+    Michael George
+    K. Vikram
+    Danfeng Zhang
+    Samarth Lad
