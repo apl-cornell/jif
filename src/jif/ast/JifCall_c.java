@@ -12,9 +12,11 @@ import polyglot.types.MethodInstance;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
-public class JifCall_c extends Call_c
-{
+public class JifCall_c extends Call_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifCall_c(Position pos, Receiver target, Id name, List<Expr> args) {
         super(pos, target, name, args);
     }
@@ -23,13 +25,14 @@ public class JifCall_c extends Call_c
     protected Type findContainer(TypeSystem ts, MethodInstance mi) {
         Type container = mi.container();
         if (container instanceof JifParsedPolyType) {
-            JifParsedPolyType jppt = (JifParsedPolyType)container;
+            JifParsedPolyType jppt = (JifParsedPolyType) container;
             if (jppt.params().size() > 0) {
                 // return the "null instantiation" of the base type,
                 // to ensure that all TypeNodes contain either
                 // a JifParsedPolyType with zero params, or a
                 // JifSubstClassType
-                return ((JifTypeSystem)ts).nullInstantiate(position(), jppt.instantiatedFrom());
+                return ((JifTypeSystem) ts).nullInstantiate(position(),
+                        jppt.instantiatedFrom());
             }
         }
         return super.findContainer(ts, mi);

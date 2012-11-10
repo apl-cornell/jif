@@ -7,10 +7,13 @@ import jif.types.principal.Principal;
 import polyglot.types.TypeObject_c;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>AuthConstraint</code> interface.
  */
 public class AuthConstraint_c extends TypeObject_c implements AuthConstraint {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<Principal> principals;
 
     public AuthConstraint_c(JifTypeSystem ts, Position pos,

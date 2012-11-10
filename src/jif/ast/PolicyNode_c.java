@@ -4,11 +4,13 @@ import jif.types.label.Policy;
 import polyglot.ast.Node_c;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>PolicyLabel</code> interface.
  */
-public class PolicyNode_c extends Node_c implements PolicyNode
-{
+public class PolicyNode_c extends Node_c implements PolicyNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected PrincipalNode owner;
     protected Policy policy = null;
 
@@ -17,6 +19,7 @@ public class PolicyNode_c extends Node_c implements PolicyNode
         this.policy = policy;
         this.owner = null;
     }
+
     public PolicyNode_c(Position pos, PrincipalNode owner) {
         super(pos);
         if (owner == null) throw new InternalCompilerError("null owner");

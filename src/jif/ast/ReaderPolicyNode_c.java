@@ -13,14 +13,16 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /** An implementation of the <code>PolicyLabel</code> interface.
  */
-public class ReaderPolicyNode_c extends PolicyNode_c
-{
+public class ReaderPolicyNode_c extends PolicyNode_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<PrincipalNode> principals;
 
     public ReaderPolicyNode_c(Position pos, PrincipalNode owner,
@@ -39,7 +41,6 @@ public class ReaderPolicyNode_c extends PolicyNode_c
         return n;
     }
 
-
     protected Policy producePolicy(JifTypeSystem ts, Principal owner,
             List<Principal> principals) {
         return ts.readerPolicy(position(), owner, principals);
@@ -49,18 +50,22 @@ public class ReaderPolicyNode_c extends PolicyNode_c
     public Node disambiguate(AmbiguityRemover ar) {
         JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
         if (!owner.isDisambiguated()) {
-            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            ar.job().extensionInfo().scheduler().currentGoal()
+                    .setUnreachableThisRun();
             return this;
         }
 
         Principal o = owner.principal();
-        if (o == null) throw new InternalCompilerError("null owner " + owner.getClass().getName() + " " + owner.position());
+        if (o == null)
+            throw new InternalCompilerError("null owner "
+                    + owner.getClass().getName() + " " + owner.position());
 
         List<Principal> l = new LinkedList<Principal>();
 
         for (PrincipalNode r : this.principals) {
             if (!r.isDisambiguated()) {
-                ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                ar.job().extensionInfo().scheduler().currentGoal()
+                        .setUnreachableThisRun();
                 return this;
             }
             l.add(r.principal());
@@ -71,7 +76,8 @@ public class ReaderPolicyNode_c extends PolicyNode_c
 
     protected ReaderPolicyNode_c reconstruct(PrincipalNode owner,
             List<PrincipalNode> principals) {
-        if (owner != this.owner || ! CollectionUtil.equals(principals, this.principals)) {
+        if (owner != this.owner
+                || !CollectionUtil.equals(principals, this.principals)) {
             ReaderPolicyNode_c n = (ReaderPolicyNode_c) copy();
             n.owner = owner;
             n.principals = ListUtil.copy(principals, true);

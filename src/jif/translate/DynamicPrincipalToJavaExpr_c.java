@@ -11,34 +11,35 @@ import polyglot.ast.NodeFactory;
 import polyglot.types.FieldInstance;
 import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 public class DynamicPrincipalToJavaExpr_c extends PrincipalToJavaExpr_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
-    public Expr toJava(Principal principal, JifToJavaRewriter rw) throws SemanticException {
+    public Expr toJava(Principal principal, JifToJavaRewriter rw)
+            throws SemanticException {
         DynamicPrincipal p = (DynamicPrincipal) principal;
         return accessPathToExpr(rw, p.path());
     }
-    
-    protected Expr accessPathToExpr(JifToJavaRewriter rw, AccessPath ap) {
-      NodeFactory nf = rw.java_nf();
 
-      if (ap instanceof AccessPathThis) {
-        return nf.This(ap.position());
-      }
-      else if (ap instanceof AccessPathLocal) {
-        LocalInstance li = ((AccessPathLocal) ap).localInstance();
-        return nf.Local(li.position(), nf.Id(li.position(), li.name()));
-      }
-      else if (ap instanceof AccessPathField) {
-        AccessPathField apf = (AccessPathField) ap;
-        FieldInstance fi = apf.fieldInstance();
-        
-        return nf.Field(ap.position(), accessPathToExpr(rw, apf.path()),
-            nf.Id(fi.position(), fi.name()));
-      }
-      else {
-          throw new Error("Don't know how to translate " + ap);
-      }
-   }
+    protected Expr accessPathToExpr(JifToJavaRewriter rw, AccessPath ap) {
+        NodeFactory nf = rw.java_nf();
+
+        if (ap instanceof AccessPathThis) {
+            return nf.This(ap.position());
+        } else if (ap instanceof AccessPathLocal) {
+            LocalInstance li = ((AccessPathLocal) ap).localInstance();
+            return nf.Local(li.position(), nf.Id(li.position(), li.name()));
+        } else if (ap instanceof AccessPathField) {
+            AccessPathField apf = (AccessPathField) ap;
+            FieldInstance fi = apf.fieldInstance();
+
+            return nf.Field(ap.position(), accessPathToExpr(rw, apf.path()),
+                    nf.Id(fi.position(), fi.name()));
+        } else {
+            throw new Error("Don't know how to translate " + ap);
+        }
+    }
 
 }

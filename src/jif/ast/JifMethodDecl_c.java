@@ -28,13 +28,15 @@ import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 
 /** An implementation of the <code>JifMethod</code> interface.
  */
-public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
-{
+public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected LabelNode startLabel;
     protected LabelNode returnLabel;
     protected List<ConstraintNode<Assertion>> constraints;
@@ -93,22 +95,25 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id)visitChild(this.name, v);
+        Id name = (Id) visitChild(this.name, v);
         TypeNode returnType = (TypeNode) visitChild(this.returnType, v);
         LabelNode startLabel = (LabelNode) visitChild(this.startLabel, v);
         List<Formal> formals = visitList(this.formals, v);
         LabelNode returnLabel = (LabelNode) visitChild(this.returnLabel, v);
         List<TypeNode> throwTypes = visitList(this.throwTypes, v);
-        List<ConstraintNode<Assertion>> constraints = visitList(this.constraints, v);
+        List<ConstraintNode<Assertion>> constraints =
+                visitList(this.constraints, v);
         Block body = (Block) visitChild(this.body, v);
-        return reconstruct(name, returnType, startLabel, formals, returnLabel, throwTypes, constraints, body);
+        return reconstruct(name, returnType, startLabel, formals, returnLabel,
+                throwTypes, constraints, body);
     }
 
     protected JifMethodDecl_c reconstruct(Id name, TypeNode returnType,
             LabelNode startLabel, List<Formal> formals, LabelNode returnLabel,
             List<TypeNode> throwTypes,
             List<ConstraintNode<Assertion>> constraints, Block body) {
-    if (startLabel != this.startLabel || returnLabel != this.returnLabel || ! CollectionUtil.equals(constraints, this.constraints)) {
+        if (startLabel != this.startLabel || returnLabel != this.returnLabel
+                || !CollectionUtil.equals(constraints, this.constraints)) {
             JifMethodDecl_c n = (JifMethodDecl_c) copy();
             n.startLabel = startLabel;
             n.returnLabel = returnLabel;
@@ -116,18 +121,20 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
                     Collections
                             .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
                                     constraints));
-            return (JifMethodDecl_c) n.reconstruct(returnType, name, formals, throwTypes, body);
+            return (JifMethodDecl_c) n.reconstruct(returnType, name, formals,
+                    throwTypes, body);
         }
 
-        return (JifMethodDecl_c) super.reconstruct(returnType, name, formals, throwTypes, body);
+        return (JifMethodDecl_c) super.reconstruct(returnType, name, formals,
+                throwTypes, body);
     }
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        JifMethodDecl n = (JifMethodDecl)super.disambiguate(ar);
+        JifMethodDecl n = (JifMethodDecl) super.disambiguate(ar);
 
-        JifMethodInstance jmi = (JifMethodInstance)n.methodInstance();
-        JifTypeSystem jts = (JifTypeSystem)ar.typeSystem();        
+        JifMethodInstance jmi = (JifMethodInstance) n.methodInstance();
+        JifTypeSystem jts = (JifTypeSystem) ar.typeSystem();
 
         // set the formal types
         List<Type> formalTypes = new ArrayList<Type>(n.formals().size());
@@ -135,7 +142,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         for (Formal f : formals) {
             if (!f.isDisambiguated()) {
                 // formals are not disambiguated yet.
-                ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                ar.job().extensionInfo().scheduler().currentGoal()
+                        .setUnreachableThisRun();
                 return this;
             }
             formalTypes.add(f.declType());
@@ -145,7 +153,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         // return type
         if (!n.returnType().isDisambiguated()) {
             // return type node not disambiguated yet
-            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            ar.job().extensionInfo().scheduler().currentGoal()
+                    .setUnreachableThisRun();
             return this;
         }
 
@@ -153,21 +162,25 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
 
         if (n.startLabel() != null && !n.startLabel().isDisambiguated()) {
             // the startlabel node hasn't been disambiguated yet
-            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            ar.job().extensionInfo().scheduler().currentGoal()
+                    .setUnreachableThisRun();
             return this;
         }
 
         Type declrt = n.returnType().type();
-        if (! declrt.isVoid() && !jts.isLabeled(declrt)) {
+        if (!declrt.isVoid() && !jts.isLabeled(declrt)) {
             // return type isn't labeled. Add the default label.
-            declrt = jts.labeledType(declrt.position(), declrt, ds.defaultReturnValueLabel(n));
-            n = (JifMethodDecl)n.returnType(n.returnType().type(declrt));
+            declrt =
+                    jts.labeledType(declrt.position(), declrt,
+                            ds.defaultReturnValueLabel(n));
+            n = (JifMethodDecl) n.returnType(n.returnType().type(declrt));
         }
         jmi.setReturnType(declrt);
 
         if (n.returnLabel() != null && !n.returnLabel().isDisambiguated()) {
             // the return label node hasn't been disambiguated yet
-            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            ar.job().extensionInfo().scheduler().currentGoal()
+                    .setUnreachableThisRun();
             return this;
         }
 
@@ -176,8 +189,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         if (n.startLabel() == null) {
             Li = ds.defaultPCBound(n.position(), n.name());
             isDefaultPCBound = true;
-        } 
-        else {
+        } else {
             Li = n.startLabel().label();
         }
         jmi.setPCBound(Li, isDefaultPCBound);
@@ -187,12 +199,10 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         if (n.returnLabel() == null) {
             Lr = ds.defaultReturnLabel(n);
             isDefaultReturnLabel = true;
-        }
-        else {
+        } else {
             Lr = n.returnLabel().label();
-        }        
+        }
         jmi.setReturnLabel(Lr, isDefaultReturnLabel);
-
 
         // set the labels for the throwTypes.
         List<Type> newThrowTypes = new LinkedList<Type>();
@@ -200,7 +210,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         for (TypeNode tn : throwTypes) {
             if (!tn.isDisambiguated()) {
                 // throw types haven't been disambiguated yet.
-                ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                ar.job().extensionInfo().scheduler().currentGoal()
+                        .setUnreachableThisRun();
                 return this;
             }
 
@@ -218,7 +229,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         for (ConstraintNode<Assertion> cn : n.constraints()) {
             if (!cn.isDisambiguated()) {
                 // constraint nodes haven't been disambiguated yet.
-                ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                ar.job().extensionInfo().scheduler().currentGoal()
+                        .setUnreachableThisRun();
                 return this;
             }
             constraints.addAll(cn.constraints());
@@ -236,23 +248,25 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
      * we don't confuse the 
      */
     public static JifMethodInstance unrenameArgs(JifMethodInstance jmi) {
-        jmi = (JifMethodInstance)jmi.copy();
+        jmi = (JifMethodInstance) jmi.copy();
         try {
             renameArgs(jmi, new TypeSubstitutor(new ArgRenamer(true)));
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new InternalCompilerError("Unexpected semantic", e);
         }
         return jmi;
     }
+
     /**
      * Rename the arg labels and arg roots. This is needed to make sure
      * that during substitution of args in a recursive method call,
      * we don't confuse the 
      */
-    private static void renameArgs(JifMethodInstance jmi, TypeSubstitutor tsub) throws SemanticException {
+    private static void renameArgs(JifMethodInstance jmi, TypeSubstitutor tsub)
+            throws SemanticException {
         // formal types
-        List<Type> newFormalTypes = new ArrayList<Type>(jmi.formalTypes().size());
+        List<Type> newFormalTypes =
+                new ArrayList<Type>(jmi.formalTypes().size());
         List<? extends Type> formalTypes = jmi.formalTypes();
         for (Type t : formalTypes) {
             newFormalTypes.add(tsub.rewriteType(t));
@@ -266,7 +280,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         jmi.setPCBound(tsub.rewriteLabel(jmi.pcBound()), jmi.isDefaultPCBound());
 
         // return label
-        jmi.setReturnLabel(tsub.rewriteLabel(jmi.returnLabel()), jmi.isDefaultReturnLabel());
+        jmi.setReturnLabel(tsub.rewriteLabel(jmi.returnLabel()),
+                jmi.isDefaultReturnLabel());
 
         // throw types
         List<Type> newThrowTypes = new ArrayList<Type>(jmi.throwTypes().size());
@@ -276,35 +291,36 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         }
         jmi.setThrowTypes(newThrowTypes);
 
-
         // constraints
-        List<Assertion> constraints = new ArrayList<Assertion>(jmi.constraints().size());
+        List<Assertion> constraints =
+                new ArrayList<Assertion>(jmi.constraints().size());
         for (Assertion c : jmi.constraints()) {
             constraints.add(tsub.rewriteAssertion(c));
         }
         jmi.setConstraints(constraints);
     }
 
-
     private static class ArgRenamer extends LabelSubstitution {
         boolean revertToOriginal;
+
         ArgRenamer(boolean revertToOriginal) {
             this.revertToOriginal = revertToOriginal;
         }
+
         @Override
         public Label substLabel(Label L) {
             if (L instanceof ArgLabel) {
-                ArgLabel al = (ArgLabel)L;
+                ArgLabel al = (ArgLabel) L;
                 if (!revertToOriginal && !al.name().endsWith("'")) {
                     // change the name to end with a prime
-                    al = (ArgLabel)al.copy();
+                    al = (ArgLabel) al.copy();
                     al.setName(al.name() + "'");
                     return al;
                 }
                 if (revertToOriginal && al.name().endsWith("'")) {
                     // change the name to remove the prime
-                    al = (ArgLabel)al.copy();
-                    al.setName(al.name().substring(0, al.name().length()-1));
+                    al = (ArgLabel) al.copy();
+                    al.setName(al.name().substring(0, al.name().length() - 1));
                     return al;
                 }
             }
@@ -313,23 +329,25 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl
         }
 
         @Override
-        public AccessPath substAccessPath(AccessPath ap) {            
+        public AccessPath substAccessPath(AccessPath ap) {
             AccessPathRoot r = ap.root();
             if (r instanceof AccessPathLocal) {
-                AccessPathLocal apl = (AccessPathLocal)r;
+                AccessPathLocal apl = (AccessPathLocal) r;
                 if (!revertToOriginal && !apl.name().endsWith("'")) {
                     apl = apl.name(apl.name() + "'");
                     AccessPath newPath = ap.subst(r, apl);
                     return newPath;
                 }
                 if (revertToOriginal && apl.name().endsWith("'")) {
-                    apl = apl.name(apl.name().substring(0, apl.name().length()-1));
+                    apl =
+                            apl.name(apl.name().substring(0,
+                                    apl.name().length() - 1));
                     AccessPath newPath = ap.subst(r, apl);
                     return newPath;
                 }
             }
             return ap;
-        }        
+        }
     }
 }
 

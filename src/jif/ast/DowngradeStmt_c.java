@@ -9,6 +9,7 @@ import polyglot.ast.Term;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -16,14 +17,15 @@ import polyglot.visit.Translator;
 
 /** An implementation of the <code>DowngradeStmt</code> interface.
  */
-public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt
-{
+public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private LabelNode bound;
     private LabelNode label;
     private Stmt body;
 
-    public DowngradeStmt_c(Position pos, LabelNode bound,
-            LabelNode label, Stmt body) {
+    public DowngradeStmt_c(Position pos, LabelNode bound, LabelNode label,
+            Stmt body) {
         super(pos);
         this.bound = bound;
         this.label = label;
@@ -66,7 +68,8 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt
         return n;
     }
 
-    protected DowngradeStmt_c reconstruct(LabelNode bound, LabelNode label, Stmt body) {
+    protected DowngradeStmt_c reconstruct(LabelNode bound, LabelNode label,
+            Stmt body) {
         if (this.bound != bound || this.label != label || this.body != body) {
             DowngradeStmt_c n = (DowngradeStmt_c) copy();
             n.bound = bound;
@@ -80,7 +83,9 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        LabelNode bound = this.bound==null?null:((LabelNode) visitChild(this.bound, v));
+        LabelNode bound =
+                this.bound == null ? null : ((LabelNode) visitChild(this.bound,
+                        v));
         LabelNode label = (LabelNode) visitChild(this.label, v);
         Stmt body = (Stmt) visitChild(this.body, v);
         return reconstruct(bound, label, body);
@@ -101,8 +106,7 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt
     public String toString() {
         if (bound == null) {
             return downgradeKind() + "(" + label + ") " + body;
-        }
-        else {
+        } else {
             return downgradeKind() + "(" + bound + " to " + label + ") " + body;
         }
     }
@@ -119,6 +123,7 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt
         w.write(") ");
         printSubStmt(body, w, tr);
     }
+
     /**
      * 
      * @return Name of the kind of downgrade, e.g. "declassify" or "endorse"

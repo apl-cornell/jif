@@ -34,13 +34,15 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>FieldDecl</code> node.
  * 
  *  @see polyglot.ast.FieldDecl
  */
-public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
-{
+public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifFieldDeclExt_c(ToJavaExt toJava) {
         super(toJava);
     }
@@ -48,7 +50,8 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
     /** Extracts the declared label of this field.
      */
     @Override
-    public void labelCheckField(LabelChecker lc, JifClassType ct) throws SemanticException {
+    public void labelCheckField(LabelChecker lc, JifClassType ct)
+            throws SemanticException {
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
         FieldDecl decl = (FieldDecl) node();
@@ -59,7 +62,8 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         if (!ts.isLabeled(t)) {
             // field should always be labeled.
             // See JifFieldDeclDel#disambiguate(AmbiguityRemover)
-            throw new InternalCompilerError("Unexpectedly unlabeled field", node().position());
+            throw new InternalCompilerError("Unexpectedly unlabeled field",
+                    node().position());
         }
 
         Label declaredLabel = ts.labelOfType(t);
@@ -69,13 +73,9 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 
         // error messages for equality constraints aren't displayed, so no
         // need to define error messages.
-        lc.constrain(new NamedLabel("field_label",
-                "inferred label of field " + fi.name(),
-                L),
-                LabelConstraint.EQUAL,
-                namedDeclaredLabel,
-                A.labelEnv(),
-                decl.position());
+        lc.constrain(new NamedLabel("field_label", "inferred label of field "
+                + fi.name(), L), LabelConstraint.EQUAL, namedDeclaredLabel,
+                A.labelEnv(), decl.position());
     }
 
     /** Label check field initializers.
@@ -106,8 +106,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
 
             if (decl.flags().isFinal()) {
                 tsb.rewriteType(ts.unlabel(fieldType));
-            }
-            else {
+            } else {
                 tsb.rewriteType(fieldType);
             }
         }
@@ -120,7 +119,9 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             // We use the TypeSubstitutor to ensure that the entire type is traversed,
             // including e.g. actual parameters to polymorphic types, labels
             // of array elements, etc.
-            TypeSubstitutor tsb = new TypeSubstitutor(new StaticFieldLabelChecker(decl.position()));
+            TypeSubstitutor tsb =
+                    new TypeSubstitutor(new StaticFieldLabelChecker(
+                            decl.position()));
 
             tsb.rewriteType(fi.type());
 
@@ -133,23 +134,24 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         if (!ts.isLabeled(t)) {
             // field should always be labeled.
             // See JifFieldDeclDel#disambiguate(AmbiguityRemover)
-            throw new InternalCompilerError("Unexpectedly unlabeled field", node().position());
+            throw new InternalCompilerError("Unexpectedly unlabeled field",
+                    node().position());
         }
 
         Label declaredLabel = ts.labelOfType(t);
 
         // error messages for equality constraints aren't displayed, so no
         // need top define error messages.
-        lc.constrain(new NamedLabel("field_label",
-                "inferred label of field " + fi.name(),
-                L),
+        lc.constrain(
+                new NamedLabel("field_label", "inferred label of field "
+                        + fi.name(), L),
                 LabelConstraint.EQUAL,
-                new NamedLabel("PC",
+                new NamedLabel(
+                        "PC",
                         "Information revealed by program counter being at this program point",
-                        A.pc()).
-                        join(lc, "declared label of field " + fi.name(), declaredLabel),
-                        A.labelEnv(),
-                        decl.position());
+                        A.pc()).join(lc,
+                        "declared label of field " + fi.name(), declaredLabel),
+                A.labelEnv(), decl.position());
 
         PathMap Xd;
 
@@ -160,7 +162,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             A.setCurrentCodePCBound(ts.topLabel());
 
             // bound the this label.
-            JifClassType jct = (JifClassType)A.currentClass();
+            JifClassType jct = (JifClassType) A.currentClass();
             A.addAssertionLE(jct.thisLabel(), ts.bottomLabel());
 
             // Lookup all final access paths reachable and add them to the
@@ -181,8 +183,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
                                             fi.position()));
                     Label rhs_label = ts.exprToLabel(ts, init, A);
                     A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
-                }
-                else if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
+                } else if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
                     DynamicPrincipal dp =
                             ts.dynamicPrincipal(
                                     fi.position(),
@@ -196,55 +197,54 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
             LabelChecker lcInit = lc.context(A);
             init = (Expr) lcInit.labelCheck(decl.init());
 
-
             if (init instanceof ArrayInit) {
-                ((JifArrayInitExt)(JifUtil.jifExt(init))).labelCheckElements(lcInit, decl.type().type());
-            }
-            else {
+                ((JifArrayInitExt) (JifUtil.jifExt(init))).labelCheckElements(
+                        lcInit, decl.type().type());
+            } else {
                 // Must check that the expression type is a subtype of the
                 // declared type.  Most of this is done in typeCheck, but if
                 // they are instantitation types, we must add constraints for
                 // the labels.
-                SubtypeChecker subtypeChecker = new SubtypeChecker(t, init.type());
+                SubtypeChecker subtypeChecker =
+                        new SubtypeChecker(t, init.type());
                 subtypeChecker.addSubtypeConstraints(lcInit, init.position());
             }
 
             PathMap Xe = getPathMap(init);
-            lcInit.constrain(new NamedLabel("init.nv",
-                    "label of successful evaluation of initializing expression",
-                    Xe.NV()),
-                    LabelConstraint.LEQ,
-                    new NamedLabel("label of field " + fi.name(), L),
-                    A.labelEnv(),
-                    init.position(),
-                    new ConstraintMessage() {
-                @Override
-                public String msg() {
-                    return "Label of field initializer not less " +
-                            "restrictive than the label for field " +
-                            fi.name();
-                }
-                @Override
-                public String detailMsg() {
-                    return "More information is revealed by the successful " +
-                            "evaluation of the intializing expression " +
-                            "than is allowed to flow to " +
-                            "the field " + fi.name() + ".";
-                }
-                @Override
-                public String technicalMsg() {
-                    return "Invalid assignment: NV of initializer is " +
-                            "more restrictive than the declared label " +
-                            "of field " + fi.name() + ".";
-                }
-            }
-                    );
+            lcInit.constrain(
+                    new NamedLabel(
+                            "init.nv",
+                            "label of successful evaluation of initializing expression",
+                            Xe.NV()), LabelConstraint.LEQ, new NamedLabel(
+                            "label of field " + fi.name(), L), A.labelEnv(),
+                    init.position(), new ConstraintMessage() {
+                        @Override
+                        public String msg() {
+                            return "Label of field initializer not less "
+                                    + "restrictive than the label for field "
+                                    + fi.name();
+                        }
+
+                        @Override
+                        public String detailMsg() {
+                            return "More information is revealed by the successful "
+                                    + "evaluation of the intializing expression "
+                                    + "than is allowed to flow to "
+                                    + "the field " + fi.name() + ".";
+                        }
+
+                        @Override
+                        public String technicalMsg() {
+                            return "Invalid assignment: NV of initializer is "
+                                    + "more restrictive than the declared label "
+                                    + "of field " + fi.name() + ".";
+                        }
+                    });
 
             Xd = Xe;
 
             A = (JifContext) A.pop();
-        }
-        else {
+        } else {
             // There is no PC label at field nodes.
             Xd = ts.pathMap();
         }
@@ -264,18 +264,17 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         StaticFieldLabelChecker(Position declPosition) {
             this.declPosition = declPosition;
         }
+
         @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ThisLabel) {
-                throw new SemanticException("The label of a static field " +
-                        "cannot use the \"this\" label.",
-                        declPosition);
+                throw new SemanticException("The label of a static field "
+                        + "cannot use the \"this\" label.", declPosition);
             }
             if (L instanceof ParamLabel || L instanceof CovariantParamLabel) {
-                throw new SemanticException("The label of a static field " +
-                        "cannot use the label parameter " +
-                        L.componentString(),
-                        declPosition);
+                throw new SemanticException("The label of a static field "
+                        + "cannot use the label parameter "
+                        + L.componentString(), declPosition);
             }
             return L;
         }
@@ -283,8 +282,8 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         @Override
         public Principal substPrincipal(Principal p) throws SemanticException {
             if (p instanceof ParamPrincipal) {
-                throw new SemanticException("The label of a static field " +
-                        "cannot use the principal parameter " + p.toString(),
+                throw new SemanticException("The label of a static field "
+                        + "cannot use the principal parameter " + p.toString(),
                         declPosition);
             }
             return p;
@@ -304,23 +303,24 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         protected boolean recurseIntoSubstType(JifSubstType type) {
             return false;
         }
+
         /*
          * Don't check const array types
          */
         @Override
         protected boolean recurseIntoArrayType(ArrayType type) {
             if (type instanceof ConstArrayType) {
-                ConstArrayType cat = (ConstArrayType)type;
+                ConstArrayType cat = (ConstArrayType) type;
                 if (cat.isConst()) return false;
             }
             return true;
         }
+
         public InvarianceLabelSubstr(Position pos) {
             super(new InvarianceLabelChecker(pos));
         }
 
     }
-
 
     /**
      * Checker to ensure that labels do not use
@@ -332,36 +332,41 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt
         InvarianceLabelChecker(Position declPosition) {
             this.declPosition = declPosition;
         }
+
         @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ThisLabel) {
-                throw new SemanticDetailedException("The label of a non-final field, " +
-                        "or a mutable location within a final field can not " +
-                        "contain the label \"this\".",
-                        "The label of a non-final field, " +
-                                "or a mutable location within a final field (such as " +
-                                "the label of elements of an array) can not " +
-                                "contain the label \"this\". Otherwise, sensitive " +
-                                "information could be written into the location " +
-                                "through a sensitive reference to the object, and " +
-                                "converted to non-sensitive information by reading " +
-                                "the value through a non-sensitive reference.",
-                                declPosition);
+                throw new SemanticDetailedException(
+                        "The label of a non-final field, "
+                                + "or a mutable location within a final field can not "
+                                + "contain the label \"this\".",
+                        "The label of a non-final field, "
+                                + "or a mutable location within a final field (such as "
+                                + "the label of elements of an array) can not "
+                                + "contain the label \"this\". Otherwise, sensitive "
+                                + "information could be written into the location "
+                                + "through a sensitive reference to the object, and "
+                                + "converted to non-sensitive information by reading "
+                                + "the value through a non-sensitive reference.",
+                        declPosition);
             }
             if (L.isCovariant()) {
-                throw new SemanticDetailedException("The label of a non-final field, " +
-                        "or a mutable location within a final field can not " +
-                        "contain the covariant component " + L,
-                        "The label of a non-final field, " +
-                                "or a mutable location within a final field (such as " +
-                                "the label of elements of an array) can not " +
-                                "contain the covariant component " + L + ". " +
-                                "Otherwise, sensitive " +
-                                "information could be written into the location " +
-                                "through a reference to the object with a sensitive type, " +
-                                "and converted to non-sensitive information by reading " +
-                                "the value through a reference with a less sensitive type.",
-                                declPosition);
+                throw new SemanticDetailedException(
+                        "The label of a non-final field, "
+                                + "or a mutable location within a final field can not "
+                                + "contain the covariant component " + L,
+                        "The label of a non-final field, "
+                                + "or a mutable location within a final field (such as "
+                                + "the label of elements of an array) can not "
+                                + "contain the covariant component "
+                                + L
+                                + ". "
+                                + "Otherwise, sensitive "
+                                + "information could be written into the location "
+                                + "through a reference to the object with a sensitive type, "
+                                + "and converted to non-sensitive information by reading "
+                                + "the value through a reference with a less sensitive type.",
+                        declPosition);
             }
             return L;
         }

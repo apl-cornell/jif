@@ -13,8 +13,11 @@ import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.SemanticException;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class ConstructorCallToJavaExt_c extends ToJavaExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /** Rewrite this(a) to this.C$(a); Rewrite super(a) to super.C$(a) */
     @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
@@ -29,34 +32,34 @@ public class ConstructorCallToJavaExt_c extends ToJavaExt_c {
             List<Expr> arguments =
                     new ArrayList<Expr>(n.arguments().size() + 2);
             JifPolyType jpt = null;
-            if (n.kind() == ConstructorCall.THIS &&
-                    ci.container() instanceof JifPolyType &&
-                    rw.jif_ts().isParamsRuntimeRep(ct)) {
-                jpt = (JifPolyType)ci.container();
-            }
-            else if (n.kind() == ConstructorCall.SUPER &&
-                    ci.container() instanceof JifSubstType && rw.jif_ts().isParamsRuntimeRep(((JifSubstType)ci.container()).base())) {
-                jpt = (JifPolyType)((JifSubstType)ci.container()).base();
+            if (n.kind() == ConstructorCall.THIS
+                    && ci.container() instanceof JifPolyType
+                    && rw.jif_ts().isParamsRuntimeRep(ct)) {
+                jpt = (JifPolyType) ci.container();
+            } else if (n.kind() == ConstructorCall.SUPER
+                    && ci.container() instanceof JifSubstType
+                    && rw.jif_ts().isParamsRuntimeRep(
+                            ((JifSubstType) ci.container()).base())) {
+                jpt = (JifPolyType) ((JifSubstType) ci.container()).base();
             }
             if (jpt != null) {
-                Expr placeholder = rw.java_nf().NullLit(Position.compilerGenerated());
+                Expr placeholder =
+                        rw.java_nf().NullLit(Position.compilerGenerated());
                 for (@SuppressWarnings("unused")
                 ParamInstance pi : jpt.params()) {
                     arguments.add(placeholder);
                 }
             }
             arguments.addAll(n.arguments());
-            return rw.java_nf().ConstructorCall(n.position(),
-                    n.kind(), n.qualifier(),
-                    arguments);
+            return rw.java_nf().ConstructorCall(n.position(), n.kind(),
+                    n.qualifier(), arguments);
         }
 
         String name = ClassDeclToJavaExt_c.constructorTranslatedName(ct);
 
         if (kind == ConstructorCall.THIS) {
             return rw.qq().parseStmt("this.%s(%LE);", name, n.arguments());
-        }
-        else {
+        } else {
             return rw.qq().parseStmt("this.%s(%LE);", name, n.arguments());
         }
     }

@@ -5,6 +5,7 @@ import java.util.List;
 import polyglot.ast.Expr_c;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 
@@ -16,6 +17,8 @@ import polyglot.visit.NodeVisitor;
  * the tree!
  */
 public class Wrapper extends Expr_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public Amb amb;
 
     public Wrapper(Amb amb) {
@@ -42,5 +45,3 @@ public class Wrapper extends Expr_c {
         return null;
     }
 }
-
-

@@ -23,34 +23,38 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>JoinLabel</code> interface.
  */
-public class JoinLabel_c extends Label_c implements JoinLabel
-{
+public class JoinLabel_c extends Label_c implements JoinLabel {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private final Set<Label> components;
 
     public JoinLabel_c(Set<Label> components, JifTypeSystem ts, Position pos,
             LabelToJavaExpr trans) {
         super(ts, pos, trans);
         this.components = Collections.unmodifiableSet(flatten(components));
-        if (this.components.isEmpty()) throw new InternalCompilerError("No empty joins");
+        if (this.components.isEmpty())
+            throw new InternalCompilerError("No empty joins");
     }
 
     @Override
     public boolean isRuntimeRepresentable() {
         for (Label c : components) {
-            if (! c.isRuntimeRepresentable()) {
+            if (!c.isRuntimeRepresentable()) {
                 return false;
             }
         }
 
         return true;
     }
+
     @Override
     public boolean isCanonical() {
         for (Label c : components) {
-            if (! c.isCanonical()) {
+            if (!c.isCanonical()) {
                 return false;
             }
         }
@@ -62,6 +66,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     protected boolean isDisambiguatedImpl() {
         return true;
     }
+
     /**
      * @return true iff this label is covariant.
      *
@@ -77,16 +82,18 @@ public class JoinLabel_c extends Label_c implements JoinLabel
 
         return false;
     }
+
     @Override
     public boolean isComparable() {
         for (Label c : components) {
-            if (! c.isComparable()) {
+            if (!c.isComparable()) {
                 return false;
             }
         }
 
         return true;
     }
+
     @Override
     public boolean isEnumerable() {
         return true;
@@ -112,7 +119,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof JoinLabel_c) {
-            JoinLabel_c that = (JoinLabel_c)o;
+            JoinLabel_c that = (JoinLabel_c) o;
             return this.components.equals(that.components);
         }
         if (o instanceof Label) {
@@ -121,6 +128,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         }
         return false;
     }
+
     @Override
     public int hashCode() {
         return components.hashCode();
@@ -131,6 +139,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         if (isTop()) return "<top>";
         return super.toString();
     }
+
     @Override
     public String componentString(Set<Label> printedLabels) {
         String s = "";
@@ -148,13 +157,13 @@ public class JoinLabel_c extends Label_c implements JoinLabel
 
     @Override
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
-        if (! L.isComparable() || ! L.isEnumerable())
+        if (!L.isComparable() || !L.isEnumerable())
             throw new InternalCompilerError("Cannot compare " + L);
 
         // If this = {c1 join ... join cn } , check if for all i,
         // we have Pi <= L
         for (Label ci : components) {
-            if (! env.leq(ci, L, state)) {
+            if (!env.leq(ci, L, state)) {
                 return false;
             }
         }
@@ -169,12 +178,13 @@ public class JoinLabel_c extends Label_c implements JoinLabel
 
     @Override
     public JoinLabel_c copy() {
-        JoinLabel_c l = (JoinLabel_c)super.copy();
+        JoinLabel_c l = (JoinLabel_c) super.copy();
         l.normalized = null;
         return l;
     }
 
     private Label normalized = null;
+
     @Override
     public Label normalize() {
         if (normalized == null) {
@@ -183,6 +193,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         }
         return normalized;
     }
+
     private Label normalizeImpl() {
 
         if (components.size() == 1) {
@@ -194,15 +205,16 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         boolean combinedPL = false;
         for (Label lbl : joinComponents()) {
             if (lbl instanceof PairLabel) {
-                PairLabel p = (PairLabel)lbl;
+                PairLabel p = (PairLabel) lbl;
                 if (pl == null) {
                     pl = p;
-                }
-                else {
+                } else {
                     combinedPL = true;
-                    pl = ts.pairLabel(position(),
-                            pl.confPolicy().join(p.confPolicy()),
-                            pl.integPolicy().join(p.integPolicy()));
+                    pl =
+                            ts.pairLabel(position(),
+                                    pl.confPolicy().join(p.confPolicy()), pl
+                                            .integPolicy()
+                                            .join(p.integPolicy()));
                 }
             }
         }
@@ -219,6 +231,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         }
         return this;
     }
+
     /**
      * @return An equivalent label with fewer components by pulling out
      * less restrictive policies.
@@ -237,8 +250,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
 
             if (ci.hasVariables() || ci.hasWritersToReaders()) {
                 needed.add(ci);
-            }
-            else {
+            } else {
                 boolean subsumed = false;
 
                 for (Iterator<Label> j = needed.iterator(); j.hasNext();) {
@@ -258,8 +270,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
                     }
                 }
 
-                if (! subsumed)
-                    needed.add(ci);
+                if (!subsumed) needed.add(ci);
             }
         }
 
@@ -270,7 +281,8 @@ public class JoinLabel_c extends Label_c implements JoinLabel
             return needed.iterator().next();
         }
 
-        return new JoinLabel_c(needed, (JifTypeSystem)ts, position(), ((JifTypeSystem_c)ts).joinLabelTranslator());
+        return new JoinLabel_c(needed, (JifTypeSystem) ts, position(),
+                ((JifTypeSystem_c) ts).joinLabelTranslator());
     }
 
     private static Set<Label> flatten(Set<Label> comps) {
@@ -295,8 +307,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
             if (L instanceof JoinLabel) {
                 Collection<Label> lComps = ((JoinLabel) L).joinComponents();
                 c.addAll(lComps);
-            }
-            else {
+            } else {
                 c.add(L);
             }
         }
@@ -310,7 +321,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         for (Label c : components) {
             confPols.add(c.confProjection());
         }
-        return ((JifTypeSystem)ts).joinConfPolicy(position, confPols);
+        return ((JifTypeSystem) ts).joinConfPolicy(position, confPols);
     }
 
     @Override
@@ -319,7 +330,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel
         for (Label c : components) {
             integPols.add(c.integProjection());
         }
-        return ((JifTypeSystem)ts).joinIntegPolicy(position, integPols);
+        return ((JifTypeSystem) ts).joinIntegPolicy(position, integPols);
     }
 
     @Override
@@ -333,7 +344,8 @@ public class JoinLabel_c extends Label_c implements JoinLabel
 
     @Override
     public Label subst(LabelSubstitution substitution) throws SemanticException {
-        if (components.isEmpty() || substitution.stackContains(this) || !substitution.recurseIntoChildren(this)) {
+        if (components.isEmpty() || substitution.stackContains(this)
+                || !substitution.recurseIntoChildren(this)) {
             return substitution.substLabel(this);
         }
         substitution.pushLabel(this);
@@ -382,14 +394,14 @@ public class JoinLabel_c extends Label_c implements JoinLabel
 
     @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) A.typeSystem();
         PathMap X = ts.pathMap().N(A.pc()).NV(A.pc());
 
         if (components.isEmpty()) {
             return X;
         }
 
-        A = (JifContext)A.pushBlock();
+        A = (JifContext) A.pushBlock();
 
         for (Label c : components) {
             A.setPc(X.N(), lc);

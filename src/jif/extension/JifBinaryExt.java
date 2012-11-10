@@ -13,20 +13,21 @@ import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>Binary</code> node.
  * 
  *  @see polyglot.ast.Binary_c
  */
-public class JifBinaryExt extends JifExprExt
-{
+public class JifBinaryExt extends JifExprExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifBinaryExt(ToJavaExt toJava) {
         super(toJava);
     }
 
     @Override
-    public Node labelCheck(LabelChecker lc) throws SemanticException
-    {
+    public Node labelCheck(LabelChecker lc) throws SemanticException {
         Binary be = (Binary) node();
 
         JifTypeSystem ts = lc.jifTypeSystem();
@@ -46,8 +47,7 @@ public class JifBinaryExt extends JifExprExt
             // whether the right is executed or not depends on the _value_
             // of the left sub-expression.
             A.setPc(Xl.NV(), lc);
-        }
-        else {
+        } else {
             // non-short circuit operator, the right sub-expression
             // will always be evaluated, provided the left sub-expression
             // terminated normally.

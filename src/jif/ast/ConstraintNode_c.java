@@ -8,13 +8,15 @@ import polyglot.ast.Node_c;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 
 /** An implementation of the <code>ConstraintNode</code> interface.
  */
 public class ConstraintNode_c<Constraint extends Assertion> extends Node_c
-implements ConstraintNode<Constraint> {
+        implements ConstraintNode<Constraint> {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Set<Constraint> constraints; // of Assertion
 
@@ -45,7 +47,8 @@ implements ConstraintNode<Constraint> {
 
     protected Constraint constraint() {
         if (constraints == null) return null;
-        if (constraints.size() > 1)  throw new InternalCompilerError("Multiple constraints");
+        if (constraints.size() > 1)
+            throw new InternalCompilerError("Multiple constraints");
         return constraints.iterator().next();
     }
 
@@ -65,12 +68,10 @@ implements ConstraintNode<Constraint> {
      */
     @Override
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
-            throws SemanticException
-            {
+            throws SemanticException {
         ec = (ExceptionChecker) super.exceptionCheckEnter(ec);
         return ec.bypassChildren(this);
-            }
-
+    }
 
     @Override
     public ConstraintNode_c<Constraint> copy() {
@@ -84,8 +85,7 @@ implements ConstraintNode<Constraint> {
     public String toString() {
         if (constraints != null) {
             return constraints.toString();
-        }
-        else {
+        } else {
             return "<unknown-constraint>";
         }
     }

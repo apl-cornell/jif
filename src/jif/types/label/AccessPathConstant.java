@@ -7,6 +7,7 @@ import polyglot.ast.Expr;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Represents a final access path consisting of a constant label or principal,
@@ -36,6 +37,8 @@ import polyglot.util.Position;
  * @see jif.types.JifTypeSystem_c#exprToAccessPath(Expr, JifContext)
  */
 public class AccessPathConstant extends AccessPathRoot {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /**
      * Either a jif.types.label.Label or a jif.types.principal.Principal
      */
@@ -60,13 +63,16 @@ public class AccessPathConstant extends AccessPathRoot {
     }
 
     public boolean isLabelConstant() {
-        return ((JifTypeSystem)type.typeSystem()).isLabel(type);
+        return ((JifTypeSystem) type.typeSystem()).isLabel(type);
     }
+
     @Override
-    public boolean isNeverNull() { return false; }
+    public boolean isNeverNull() {
+        return false;
+    }
 
     public boolean isPrincipalConstant() {
-        return ((JifTypeSystem)type.typeSystem()).isPrincipal(type);
+        return ((JifTypeSystem) type.typeSystem()).isPrincipal(type);
     }
 
     @Override
@@ -77,7 +83,8 @@ public class AccessPathConstant extends AccessPathRoot {
     @Override
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         throw new InternalCompilerError(
-                "Shouldn't be calling subst on an AccessPathConstant! \"" + this + "\"");
+                "Shouldn't be calling subst on an AccessPathConstant! \""
+                        + this + "\"");
     }
 
     @Override
@@ -88,7 +95,7 @@ public class AccessPathConstant extends AccessPathRoot {
     @Override
     public boolean equals(Object o) {
         if (o instanceof AccessPathConstant) {
-            AccessPathConstant that = (AccessPathConstant)o;
+            AccessPathConstant that = (AccessPathConstant) o;
             return constantValue.equals(that.constantValue);
         }
         return false;

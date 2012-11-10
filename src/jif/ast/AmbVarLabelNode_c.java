@@ -14,15 +14,17 @@ import polyglot.types.SemanticException;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /** An implementation of the <code>AmbVarLabelNode</code> interface. 
  */
-public class AmbVarLabelNode_c extends AmbLabelNode_c
-implements AmbVarLabelNode
-{
+public class AmbVarLabelNode_c extends AmbLabelNode_c implements
+        AmbVarLabelNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Id name;
 
     public AmbVarLabelNode_c(Position pos, Id name) {
@@ -45,29 +47,30 @@ implements AmbVarLabelNode
         n.name = n.name.id(name);
         return n;
     }
-    
+
     @Override
     public Node visitChildren(NodeVisitor v) {
         if (this.name == null) return this;
-        
+
         Id name = (Id) visitChild(this.name, v);
         return reconstruct(name);
     }
-    
-    protected AmbVarLabelNode_c reconstruct(Id name) {
-        if (this.name == name) { return this; }
-        AmbVarLabelNode_c n = (AmbVarLabelNode_c)this.copy();
-        n.name = name;
-        return n;         
-    }
 
+    protected AmbVarLabelNode_c reconstruct(Id name) {
+        if (this.name == name) {
+            return this;
+        }
+        AmbVarLabelNode_c n = (AmbVarLabelNode_c) this.copy();
+        n.name = name;
+        return n;
+    }
 
     @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         Context c = sc.context();
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
-        
+
         if ("provider".equals(name.id())) {
             JifContext jc = (JifContext) c;
             return nf.CanonicalLabelNode(position, jc.provider());
@@ -85,31 +88,34 @@ implements AmbVarLabelNode
 
             if (pi.isCovariantLabel()) {
                 CovariantParamLabel pl = ts.covariantLabel(position(), pi);
-                pl.setDescription("label parameter " + pi.name() + 
-                                  " of class " + pi.container().fullName());
+                pl.setDescription("label parameter " + pi.name() + " of class "
+                        + pi.container().fullName());
                 return nf.CanonicalLabelNode(position(), pl);
             }
             if (pi.isInvariantLabel()) {
                 ParamLabel pl = ts.paramLabel(position(), pi);
-                pl.setDescription("label parameter " + pi.name() + 
-                                  " of class " + pi.container().fullName());
+                pl.setDescription("label parameter " + pi.name() + " of class "
+                        + pi.container().fullName());
 
-                return nf.CanonicalLabelNode(position(), pl);        
+                return nf.CanonicalLabelNode(position(), pl);
             }
             if (pi.isPrincipal()) {
-                throw new SemanticException("Cannot use the external principal " + 
-                                            name + " as a label. (The label \"{" + name + ": }\" may have " +
-                                            "been intended.)", this.position());
+                throw new SemanticException(
+                        "Cannot use the external principal " + name
+                                + " as a label. (The label \"{" + name
+                                + ": }\" may have " + "been intended.)",
+                        this.position());
             }
         }
 
         if (vi instanceof PrincipalInstance) {
-            throw new SemanticException("Cannot use the external principal " + 
-                                        name + " as a label. (The label \"{" + name + ": }\" may have " +
-                                        "been intended.)", this.position());
+            throw new SemanticException("Cannot use the external principal "
+                    + name + " as a label. (The label \"{" + name
+                    + ": }\" may have " + "been intended.)", this.position());
         }
 
-        throw new SemanticException(vi + " cannot be used as a label.", this.position());
+        throw new SemanticException(vi + " cannot be used as a label.",
+                this.position());
     }
 
     @Override

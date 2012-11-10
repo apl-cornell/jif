@@ -9,20 +9,21 @@ import polyglot.ast.Case;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>Case</code> node. 
  * 
  *  @see polyglot.ast.Case
  */
-public class JifCaseExt extends JifStmtExt_c
-{
+public class JifCaseExt extends JifStmtExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifCaseExt(ToJavaExt toJava) {
         super(toJava);
     }
 
     @Override
-    public Node labelCheckStmt(LabelChecker lc) throws SemanticException
-    {
+    public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         Case cs = (Case) node();
 
         JifTypeSystem ts = lc.jifTypeSystem();
@@ -34,8 +35,7 @@ public class JifCaseExt extends JifStmtExt_c
         if (!cs.isDefault()) {
             e = (Expr) lc.context(A).labelCheck(cs.expr());
             X = getPathMap(e).NV(ts.notTaken());
-        }
-        else {
+        } else {
             X = ts.pathMap().N(A.pc());
         }
 

@@ -3,13 +3,15 @@ package jif.ast;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 
 /** An implementation of the <code>NewLabel</code> interface.
  */
-public class NewLabel_c extends LabelExpr_c implements NewLabel
-{
+public class NewLabel_c extends LabelExpr_c implements NewLabel {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public NewLabel_c(Position pos, LabelNode label) {
         super(pos, label);
     }

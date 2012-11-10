@@ -15,8 +15,12 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
-public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePrincipal {
+public class ConjunctivePrincipal_c extends Principal_c implements
+        ConjunctivePrincipal {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private final Set<Principal> conjuncts;
 
     public ConjunctivePrincipal_c(Collection<Principal> conjuncts,
@@ -24,8 +28,8 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
         super(ts, pos, toJava);
         this.conjuncts = new LinkedHashSet<Principal>(conjuncts);
         if (conjuncts.size() < 2) {
-            throw new InternalCompilerError("ConjunctivePrincipal should " +
-                    "have at least 2 members");
+            throw new InternalCompilerError("ConjunctivePrincipal should "
+                    + "have at least 2 members");
         }
     }
 
@@ -36,6 +40,7 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
         }
         return true;
     }
+
     @Override
     public boolean isCanonical() {
         for (Principal p : conjuncts) {
@@ -51,8 +56,7 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
         if (Report.should_report(Report.debug, 1)) {
             sb.append("<");
             sep = " and ";
-        }
-        else if (Report.should_report(Report.debug, 2)) {
+        } else if (Report.should_report(Report.debug, 2)) {
             sb.append("<conjunction: ");
             sep = " and ";
         }
@@ -62,8 +66,7 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
                 sb.append('(');
                 sb.append(p);
                 sb.append(')');
-            }
-            else {
+            } else {
                 sb.append(p);
             }
             if (iter.hasNext()) sb.append(sep);
@@ -71,8 +74,7 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
 
         if (Report.should_report(Report.debug, 1)) {
             sb.append(">");
-        }
-        else if (Report.should_report(Report.debug, 2)) {
+        } else if (Report.should_report(Report.debug, 2)) {
             sb.append(">");
         }
         return sb.toString();
@@ -82,7 +84,7 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof ConjunctivePrincipal) {
-            ConjunctivePrincipal that = (ConjunctivePrincipal)o;
+            ConjunctivePrincipal that = (ConjunctivePrincipal) o;
             return this.conjuncts.equals(that.conjuncts());
         }
         return false;
@@ -112,8 +114,7 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
 
             if (ci.hasVariables()) {
                 needed.add(ci);
-            }
-            else {
+            } else {
                 boolean subsumed = false;
 
                 for (Iterator<Principal> j = needed.iterator(); j.hasNext();) {
@@ -133,8 +134,7 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
                     }
                 }
 
-                if (! subsumed)
-                    needed.add(ci);
+                if (!subsumed) needed.add(ci);
             }
         }
 
@@ -145,7 +145,8 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
             return needed.iterator().next();
         }
 
-        return new ConjunctivePrincipal_c(needed, (JifTypeSystem)ts, position(), toJava);
+        return new ConjunctivePrincipal_c(needed, (JifTypeSystem) ts,
+                position(), toJava);
     }
 
     @Override
@@ -157,14 +158,13 @@ public class ConjunctivePrincipal_c extends Principal_c implements ConjunctivePr
         }
 
         if (substConjuncts.size() > 1) {
-            return new ConjunctivePrincipal_c(substConjuncts, (JifTypeSystem) ts,
-                    position(), toJava);
-        }
-        else if (substConjuncts.size() == 1) {
+            return new ConjunctivePrincipal_c(substConjuncts,
+                    (JifTypeSystem) ts, position(), toJava);
+        } else if (substConjuncts.size() == 1) {
             return substConjuncts.iterator().next();
-        }
-        else {
-            throw new InternalCompilerError("No principals left after substitution.");
+        } else {
+            throw new InternalCompilerError(
+                    "No principals left after substitution.");
         }
 
     }

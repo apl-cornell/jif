@@ -15,14 +15,16 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeBuilder;
 
 /** An implementation of the <code>Jif</code> interface.
  */
-public class JifJL_c extends JL_c implements JifJL
-{
+public class JifJL_c extends JL_c implements JifJL {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Set<Type> fatalExceptions = Collections.emptySet();
 
     /**
@@ -50,8 +52,8 @@ public class JifJL_c extends JL_c implements JifJL
 
     @Override
     public void translate(CodeWriter w, Translator tr) {
-        throw new InternalCompilerError("cannot translate " + node() +
-                "; still has a Jif extension");
+        throw new InternalCompilerError("cannot translate " + node()
+                + "; still has a Jif extension");
     }
 
     @Override
@@ -61,16 +63,13 @@ public class JifJL_c extends JL_c implements JifJL
     // do not.
     public List<Type> throwTypes(TypeSystem ts) {
         List<Type> l = super.throwTypes(ts);
-        if(l.isEmpty())
-            return l;
+        if (l.isEmpty()) return l;
         l = new ArrayList<Type>(l);
 
         Set<Type> rem = new HashSet<Type>();
-        if(fatalExceptions.isEmpty())
-            return l;
+        if (fatalExceptions.isEmpty()) return l;
         for (Type t : l) {
-            if (fatalExceptions.contains(t))
-                rem.add(t);
+            if (fatalExceptions.contains(t)) rem.add(t);
         }
         l.removeAll(rem);
         return l;

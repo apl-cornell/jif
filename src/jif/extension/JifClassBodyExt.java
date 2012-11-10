@@ -12,12 +12,15 @@ import polyglot.ast.ClassBody;
 import polyglot.ast.ClassMember;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 /** The extension of the <code>ClassBody</code> node.
  * 
  *  @see polyglot.ast.ClassBody
  */
 public class JifClassBodyExt extends Jif_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifClassBodyExt(ToJavaExt toJava) {
         super(toJava);
     }
@@ -39,8 +42,7 @@ public class JifClassBodyExt extends Jif_c {
         for (ClassMember cm : n.members()) {
             try {
                 members.add((ClassMember) lc.context(A).labelCheck(cm));
-            }
-            catch (SemanticException e) {
+            } catch (SemanticException e) {
                 // report it and keep going.
                 lc.reportSemanticException(e);
             }

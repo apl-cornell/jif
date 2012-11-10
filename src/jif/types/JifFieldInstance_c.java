@@ -10,21 +10,24 @@ import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>JifFieldInstance</code> interface.
  */
 public class JifFieldInstance_c extends FieldInstance_c
-                               implements JifFieldInstance
+implements JifFieldInstance
 {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Label label;
     protected boolean hasInitializer;
     protected Param initializer;
-    
-    public JifFieldInstance_c(JifTypeSystem ts, Position pos,
-	ReferenceType container, Flags flags,
-	Type type, String name) {
 
-	super(ts, pos, container, flags, type, name);
+    public JifFieldInstance_c(JifTypeSystem ts, Position pos,
+            ReferenceType container, Flags flags,
+            Type type, String name) {
+
+        super(ts, pos, container, flags, type, name);
     }
 
     @Override
@@ -55,14 +58,14 @@ public class JifFieldInstance_c extends FieldInstance_c
 
     @Override
     public void setHasInitializer(boolean hasInitializer) {
-        this.hasInitializer = hasInitializer;        
+        this.hasInitializer = hasInitializer;
     }
-    
+
     @Override
     public Param initializer() {
         return initializer;
     }
-    
+
     @Override
     public void setInitializer(Param init) {
         this.initializer = init;
@@ -78,13 +81,13 @@ public class JifFieldInstance_c extends FieldInstance_c
                 throw new InternalCompilerError("Unexpected base type");
             }
         }
-        return this;        
+        return this;
     }
     @Override
     public boolean isConstant() {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
-            return orig.isConstant();        
+            return orig.isConstant();
         }
         return super.isConstant();
     }
@@ -92,7 +95,7 @@ public class JifFieldInstance_c extends FieldInstance_c
     public Object constantValue() {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
-            return orig.constantValue();        
+            return orig.constantValue();
         }
         return super.constantValue();
     }
@@ -100,7 +103,7 @@ public class JifFieldInstance_c extends FieldInstance_c
     public boolean constantValueSet() {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
-            return orig.constantValueSet();        
+            return orig.constantValueSet();
         }
         return super.constantValueSet();
     }
@@ -108,7 +111,7 @@ public class JifFieldInstance_c extends FieldInstance_c
     public FieldInstance constantValue(Object constantValue) {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
-            throw new InternalCompilerError("Cant modify constant value on a copy");            
+            throw new InternalCompilerError("Cant modify constant value on a copy");
         }
         return super.constantValue(constantValue);
     }
@@ -116,7 +119,7 @@ public class JifFieldInstance_c extends FieldInstance_c
     public FieldInstance notConstant() {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
-            throw new InternalCompilerError("Cant modify constant value on a copy");            
+            throw new InternalCompilerError("Cant modify constant value on a copy");
         }
         return super.notConstant();
     }
@@ -124,7 +127,7 @@ public class JifFieldInstance_c extends FieldInstance_c
     public void setConstantValue(Object constantValue) {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
-            throw new InternalCompilerError("Cant modify constant value on a copy");            
+            throw new InternalCompilerError("Cant modify constant value on a copy");
         }
         super.setConstantValue(constantValue);
     }
@@ -132,5 +135,5 @@ public class JifFieldInstance_c extends FieldInstance_c
     public String toString() {
         return super.toString() + " label = " + label;
     }
-    
+
 }

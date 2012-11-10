@@ -10,15 +10,19 @@ import polyglot.types.Type;
 import polyglot.types.UnknownType;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Represents a final access path rooted at a local variable.
  * @see jif.types.label.AccessPath
  */
 public class AccessPathLocal extends AccessPathRoot {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected LocalInstance li;
     protected String name;
     private boolean neverNull = false;
+
     public AccessPathLocal(LocalInstance li, String name, Position pos) {
         super(pos);
         this.li = li;
@@ -29,11 +33,14 @@ public class AccessPathLocal extends AccessPathRoot {
     }
 
     @Override
-    public boolean isCanonical() { return !(li.type() instanceof UnknownType); }
+    public boolean isCanonical() {
+        return !(li.type() instanceof UnknownType);
+    }
+
     @Override
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         if (r instanceof AccessPathLocal) {
-            if (li.equals(((AccessPathLocal)r).li)) {
+            if (li.equals(((AccessPathLocal) r).li)) {
                 return e;
             }
         }
@@ -41,7 +48,7 @@ public class AccessPathLocal extends AccessPathRoot {
     }
 
     public AccessPathLocal name(String name) {
-        AccessPathLocal apl = (AccessPathLocal)this.copy();
+        AccessPathLocal apl = (AccessPathLocal) this.copy();
         apl.name = name;
         if (apl.li != null && !name.startsWith(apl.li.name())) {
             throw new InternalCompilerError("Inconsistent local names");
@@ -53,21 +60,27 @@ public class AccessPathLocal extends AccessPathRoot {
     public boolean isNeverNull() {
         return neverNull;
     }
+
     public void setIsNeverNull() {
         this.neverNull = true;
     }
+
     @Override
     public String toString() {
         return niceName();
     }
+
     @Override
     public String exprString() {
         return niceName();
     }
+
     private String niceName() {
-        if (li != null && li.name() != null && name.startsWith(li.name())) return li.name();
+        if (li != null && li.name() != null && name.startsWith(li.name()))
+            return li.name();
         return name;
     }
+
     public String name() {
         return name;
     }
@@ -75,10 +88,11 @@ public class AccessPathLocal extends AccessPathRoot {
     public LocalInstance localInstance() {
         return this.li;
     }
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof AccessPathLocal) {
-            AccessPathLocal that = (AccessPathLocal)o;
+            AccessPathLocal that = (AccessPathLocal) o;
             // use pointer equality for li instead of equals, so
             // that we don't mistakenly equate two local instances
             // with the same name but from different methods/defining
@@ -92,6 +106,7 @@ public class AccessPathLocal extends AccessPathRoot {
     public int hashCode() {
         return name.hashCode();
     }
+
     @Override
     public Type type() {
         if (li == null) return null;
@@ -100,7 +115,7 @@ public class AccessPathLocal extends AccessPathRoot {
 
     @Override
     public PathMap labelcheck(JifContext A, LabelChecker lc) {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) A.typeSystem();
         Label L = ts.labelOfLocal(li, A.pc());
 
         PathMap X = ts.pathMap();
@@ -109,18 +124,20 @@ public class AccessPathLocal extends AccessPathRoot {
 
         return X;
     }
+
     @Override
     public void verify(JifContext A) throws SemanticException {
         if (li == null) {
             li = A.findLocal(name);
-        }
-        else {
+        } else {
             if (!li.equals(A.findLocal(name))) {
-                throw new InternalCompilerError("Unexpected local instance for name " + name);
+                throw new InternalCompilerError(
+                        "Unexpected local instance for name " + name);
             }
         }
         if (!li.flags().isFinal()) {
-            throw new SemanticException("Non-final local variable used in access path", position());
+            throw new SemanticException(
+                    "Non-final local variable used in access path", position());
         }
     }
 }

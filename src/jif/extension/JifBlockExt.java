@@ -13,20 +13,21 @@ import polyglot.ast.Node;
 import polyglot.ast.Stmt;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>Block</code> node.
  * 
  *  @see polyglot.ast.Block_c
  */
-public class JifBlockExt extends JifStmtExt_c
-{
+public class JifBlockExt extends JifStmtExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifBlockExt(ToJavaExt toJava) {
         super(toJava);
     }
 
     @Override
-    public Node labelCheckStmt(LabelChecker lc) throws SemanticException
-    {
+    public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         Block bs = (Block) node();
 
         JifTypeSystem ts = lc.jifTypeSystem();
@@ -52,7 +53,8 @@ public class JifBlockExt extends JifStmtExt_c
             A.setPc(Xs.N(), lc);
 
             if (Report.should_report(jif.Topics.pc, 1)) {
-                Report.report(1, "pc after statement at " + s.position() + " : " + A.pc().toString());
+                Report.report(1, "pc after statement at " + s.position()
+                        + " : " + A.pc().toString());
             }
 
             Xblock = Xblock.N(ts.notTaken()).join(Xs);

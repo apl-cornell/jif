@@ -22,18 +22,23 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An abstract implementation of the <code>Principal</code> interface.
  */
 public abstract class Principal_c extends Param_c implements Principal {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     PrincipalToJavaExpr toJava;
 
     protected Set<Variable> variables = null; // memoized
+
     public Principal_c(JifTypeSystem ts, Position pos) {
         this(ts, pos, new CannotPrincipalToJavaExpr_c());
     }
 
-    public Principal_c(JifTypeSystem ts, Position pos, PrincipalToJavaExpr toJava) {
+    public Principal_c(JifTypeSystem ts, Position pos,
+            PrincipalToJavaExpr toJava) {
         super(ts, pos);
         this.toJava = toJava;
     }
@@ -49,16 +54,24 @@ public abstract class Principal_c extends Param_c implements Principal {
     }
 
     @Override
-    public boolean isTopPrincipal() { return false; }
+    public boolean isTopPrincipal() {
+        return false;
+    }
+
     @Override
-    public boolean isBottomPrincipal() { return false; }
+    public boolean isBottomPrincipal() {
+        return false;
+    }
 
     @Override
     public abstract boolean isCanonical();
+
     @Override
     public abstract boolean isRuntimeRepresentable();
+
     @Override
     public abstract boolean equalsImpl(TypeObject o);
+
     @Override
     public abstract int hashCode();
 
@@ -68,13 +81,14 @@ public abstract class Principal_c extends Param_c implements Principal {
     }
 
     @Override
-    public Principal subst(LabelSubstitution substitution) throws SemanticException {
+    public Principal subst(LabelSubstitution substitution)
+            throws SemanticException {
         return substitution.substPrincipal(this);
     }
 
     @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) A.typeSystem();
         return ts.pathMap().N(A.pc()).NV(A.pc());
     }
 
@@ -84,8 +98,7 @@ public abstract class Principal_c extends Param_c implements Principal {
             VariableGatherer lvg = new VariableGatherer();
             try {
                 this.subst(lvg);
-            }
-            catch (SemanticException e) {
+            } catch (SemanticException e) {
                 throw new InternalCompilerError(e);
             }
             variables = lvg.variables;

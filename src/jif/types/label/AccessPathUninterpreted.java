@@ -4,6 +4,7 @@ import polyglot.ast.Expr;
 import polyglot.main.Report;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Represents an access path that is not final, and thus not interpreted: the
@@ -45,14 +46,19 @@ import polyglot.util.Position;
  * @see jif.ast.JifInstantiator
  */
 public class AccessPathUninterpreted extends AccessPathRoot {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     String expr;
     private final boolean allowSubst;
+
     public AccessPathUninterpreted(Expr expr, Position pos) {
         this(String.valueOf(expr), pos);
     }
+
     public AccessPathUninterpreted(String expr, Position pos) {
         this(expr, pos, false);
     }
+
     public AccessPathUninterpreted(String expr, Position pos, boolean allowSubst) {
         super(pos);
         this.expr = expr;
@@ -63,8 +69,11 @@ public class AccessPathUninterpreted extends AccessPathRoot {
     public boolean isCanonical() {
         return true;
     }
+
     @Override
-    public boolean isNeverNull() { return false; }
+    public boolean isNeverNull() {
+        return false;
+    }
 
     @Override
     public boolean isUninterpreted() {

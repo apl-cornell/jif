@@ -19,13 +19,15 @@ import polyglot.ast.Stmt;
 import polyglot.main.Options;
 import polyglot.types.SemanticException;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>DeclassifyStmt</code> node.
  * 
  *  @see jif.ast.DeclassifyStmt
  */
-public abstract class JifDowngradeStmtExt extends JifStmtExt_c
-{
+public abstract class JifDowngradeStmtExt extends JifStmtExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifDowngradeStmtExt(ToJavaExt toJava) {
         super(toJava);
     }
@@ -35,8 +37,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
     }
 
     @Override
-    public final Node labelCheckStmt(LabelChecker lc) throws SemanticException
-    {
+    public final Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         final DowngradeStmt ds = (DowngradeStmt) node();
 
         JifContext A = lc.jifContext();
@@ -48,12 +49,13 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
         if (ds.bound() != null) {
             boundSpecified = true;
             downgradeFrom = ds.bound().label();
-        }
-        else {
+        } else {
             boundSpecified = false;
-            downgradeFrom = lc.typeSystem().freshLabelVariable(ds.position(),
-                    "downgrade_from",
-                    "The label the downgrade statement is downgrading from");
+            downgradeFrom =
+                    lc.typeSystem()
+                            .freshLabelVariable(ds.position(),
+                                    "downgrade_from",
+                                    "The label the downgrade statement is downgrading from");
         }
 
         PathMap initMap = initPathMap(lc);
@@ -64,9 +66,10 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
         JifContext dA = declassifyConstraintContext(A);
         checkOneDimenOnly(lc, dA, downgradeFrom, downgradeTo, ds.position());
         checkAuthority(lc, dA, downgradeFrom, downgradeTo, ds.position());
-        checkAdditionalConstraints(lc, dA, downgradeFrom, downgradeTo, ds.position());
+        checkAdditionalConstraints(lc, dA, downgradeFrom, downgradeTo,
+                ds.position());
 
-        if (!((JifOptions)Options.global).nonRobustness) {
+        if (!((JifOptions) Options.global).nonRobustness) {
             checkRobustness(lc, dA, downgradeFrom, downgradeTo, ds.position());
         }
 
@@ -77,55 +80,62 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
 
         if (Xs.N() instanceof NotTaken) {
             X = Xs;
-        }
-        else {
+        } else {
             X = Xs.N(lc.upperBound(Xs.N(), A.pc()));
         }
 
         return updatePathMap(ds.body(body), X);
     }
 
-    protected void checkPCconstraint(LabelChecker lc, JifContext A, Label pc, Label downgradeFrom, boolean boundSpecified) throws SemanticException {
-        final DowngradeStmt ds = (DowngradeStmt)this.node();
+    protected void checkPCconstraint(LabelChecker lc, JifContext A, Label pc,
+            Label downgradeFrom, boolean boundSpecified)
+            throws SemanticException {
+        final DowngradeStmt ds = (DowngradeStmt) this.node();
         lc.constrain(new NamedLabel("pc", pc),
-                boundSpecified?LabelConstraint.LEQ:LabelConstraint.EQUAL,
-                        new NamedLabel("downgrade_bound", downgradeFrom),
-                        A.labelEnv(),
-                        ds.position(),
-                        boundSpecified, /* report this constraint if the bound was specified*/
-                        new ConstraintMessage() {
-            @Override
-            public String msg() {
-                return "The label of the program counter at this " +
-                        "program point is " +
-                        "more restrictive than the upper bound " +
-                        "that this " + ds.downgradeKind() + " statement is allowed " +
-                        "to " + ds.downgradeKind() + ".";
-            }
-            @Override
-            public String detailMsg() {
-                return "This " + ds.downgradeKind() + " statement is allowed to " +
-                        ds.downgradeKind() + " a program counter labeled up to " +
-                        namedRhs() + ". However, the label of the " +
-                        "program counter at this point is " +
-                        namedLhs() + ", which is more restrictive than " +
-                        "allowed.";
-            }
-            @Override
-            public String technicalMsg() {
-                return "Invalid " + ds.downgradeKind() + ": PC is out of bound.";
-            }
-        }
-                );
+                boundSpecified ? LabelConstraint.LEQ : LabelConstraint.EQUAL,
+                new NamedLabel("downgrade_bound", downgradeFrom), A.labelEnv(),
+                ds.position(), boundSpecified, /* report this constraint if the bound was specified*/
+                new ConstraintMessage() {
+                    @Override
+                    public String msg() {
+                        return "The label of the program counter at this "
+                                + "program point is "
+                                + "more restrictive than the upper bound "
+                                + "that this " + ds.downgradeKind()
+                                + " statement is allowed " + "to "
+                                + ds.downgradeKind() + ".";
+                    }
+
+                    @Override
+                    public String detailMsg() {
+                        return "This " + ds.downgradeKind()
+                                + " statement is allowed to "
+                                + ds.downgradeKind()
+                                + " a program counter labeled up to "
+                                + namedRhs() + ". However, the label of the "
+                                + "program counter at this point is "
+                                + namedLhs()
+                                + ", which is more restrictive than "
+                                + "allowed.";
+                    }
+
+                    @Override
+                    public String technicalMsg() {
+                        return "Invalid " + ds.downgradeKind()
+                                + ": PC is out of bound.";
+                    }
+                });
     }
 
-    protected Stmt checkBody(LabelChecker lc, JifContext A, Label downgradeFrom, Label downgradeTo) throws SemanticException {
+    protected Stmt checkBody(LabelChecker lc, JifContext A,
+            Label downgradeFrom, Label downgradeTo) throws SemanticException {
         JifContext bA = bodyContext(lc, A, downgradeFrom, downgradeTo);
-        DowngradeStmt ds = (DowngradeStmt)this.node();
+        DowngradeStmt ds = (DowngradeStmt) this.node();
         return (Stmt) lc.context(bA).labelCheck(ds.body());
     }
 
-    protected JifContext bodyContext(LabelChecker lc, JifContext A, Label downgradeFrom, Label downgradeTo) {
+    protected JifContext bodyContext(LabelChecker lc, JifContext A,
+            Label downgradeFrom, Label downgradeTo) {
         A = (JifContext) A.pushBlock();
         A.setPc(downgradeTo, lc);
         A.setCurrentCodePCBound(downgradeTo);
@@ -134,12 +144,12 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
         // for non-static methods, we know the this label
         // must be bounded above by the start label
         if (A.currentCode() instanceof JifProcedureInstance) {
-            JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
-            Label callPC = ts.callSitePCLabel((JifProcedureInstance)A.currentCode());
+            JifTypeSystem ts = (JifTypeSystem) A.typeSystem();
+            Label callPC =
+                    ts.callSitePCLabel((JifProcedureInstance) A.currentCode());
             A.addAssertionLE(callPC, downgradeTo);
-        }
-        else if (!A.currentCode().flags().isStatic())  {
-            JifClassType jct = (JifClassType)A.currentClass();
+        } else if (!A.currentCode().flags().isStatic()) {
+            JifClassType jct = (JifClassType) A.currentClass();
             A.addAssertionLE(jct.thisLabel(), downgradeTo);
         }
         return A;
@@ -157,11 +167,9 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
      * @param labelTo
      * @throws SemanticException
      */
-    protected abstract void checkOneDimenOnly(LabelChecker lc,
-            JifContext A,
-            Label labelFrom,
-            Label labelTo, Position pos)
-                    throws SemanticException;
+    protected abstract void checkOneDimenOnly(LabelChecker lc, JifContext A,
+            Label labelFrom, Label labelTo, Position pos)
+            throws SemanticException;
 
     /**
      * Check the authority condition
@@ -170,11 +178,9 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
      * @param labelTo
      * @throws SemanticException
      */
-    protected abstract void checkAuthority(LabelChecker lc,
-            JifContext A,
-            Label labelFrom,
-            Label labelTo, Position pos)
-                    throws SemanticException;
+    protected abstract void checkAuthority(LabelChecker lc, JifContext A,
+            Label labelFrom, Label labelTo, Position pos)
+            throws SemanticException;
 
     /**
      * Check the robustness condition
@@ -183,11 +189,9 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
      * @param labelTo
      * @throws SemanticException
      */
-    protected abstract void checkRobustness(LabelChecker lc,
-            JifContext A,
-            Label labelFrom,
-            Label labelTo, Position pos)
-                    throws SemanticException;
+    protected abstract void checkRobustness(LabelChecker lc, JifContext A,
+            Label labelFrom, Label labelTo, Position pos)
+            throws SemanticException;
 
     /**
      * Check any additional constraints
@@ -196,9 +200,8 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c
      * @param labelTo
      * @throws SemanticException
      */
-    protected void checkAdditionalConstraints(LabelChecker lc,
-            JifContext A,
-            Label labelFrom,
-            Label labelTo, Position pos)
-                    throws SemanticException { }
+    protected void checkAdditionalConstraints(LabelChecker lc, JifContext A,
+            Label labelFrom, Label labelTo, Position pos)
+            throws SemanticException {
+    }
 }

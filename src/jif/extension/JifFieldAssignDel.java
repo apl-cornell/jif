@@ -5,11 +5,13 @@ import java.util.List;
 import polyglot.ast.Assign;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>FieldAssign</code> node.
  */
-public class JifFieldAssignDel extends JifAssignDel
-{
+public class JifFieldAssignDel extends JifAssignDel {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifFieldAssignDel() {
     }
 
@@ -22,8 +24,8 @@ public class JifFieldAssignDel extends JifAssignDel
     public List<Type> throwTypes(TypeSystem ts) {
         List<Type> l = super.throwTypes(ts);
 
-        Assign a = (Assign)node();
-        if (!((JifFieldDel)a.left().del()).targetIsNeverNull()) {
+        Assign a = (Assign) node();
+        if (!((JifFieldDel) a.left().del()).targetIsNeverNull()) {
             l.add(ts.NullPointerException());
         }
 

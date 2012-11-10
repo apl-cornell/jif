@@ -12,6 +12,7 @@ import polyglot.types.ArrayType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
@@ -20,44 +21,49 @@ import polyglot.visit.TypeChecker;
  * 
  *  @see polyglot.ast.Formal
  */
-public class JifFormalDel extends JifJL_c
-{
-    public JifFormalDel() { }
+public class JifFormalDel extends JifJL_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
+    public JifFormalDel() {
+    }
 
     private boolean isCatchFormal = false;
     private boolean explicitFinalFlag = false;
+
     public void setIsCatchFormal(boolean isCatchFormal) {
         this.isCatchFormal = isCatchFormal;
     }
+
     public boolean isCatchFormal() {
         return this.isCatchFormal;
     }
+
     public boolean hasExplicitFinalFlag() {
         return explicitFinalFlag;
     }
+
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         Formal n = (Formal) this.node();
         this.explicitFinalFlag = n.flags().isFinal();
         n = (Formal) super.buildTypes(tb);
-        
+
         // all formals are final
         n = n.flags(n.flags().Final());
-        JifLocalInstance li = (JifLocalInstance)n.localInstance();
+        JifLocalInstance li = (JifLocalInstance) n.localInstance();
         li.setFlags(li.flags().Final());
-        
-        JifTypeSystem jts = (JifTypeSystem)tb.typeSystem();
 
+        JifTypeSystem jts = (JifTypeSystem) tb.typeSystem();
 
         if (isCatchFormal) {
             // formals occuring in a catch clause are treated more like local decls;
             // their label is a VarLabel
-            li.setLabel(jts.freshLabelVariable(li.position(), li.name(), "label of the formal " + li.name()));
-        }
-        else {
+            li.setLabel(jts.freshLabelVariable(li.position(), li.name(),
+                    "label of the formal " + li.name()));
+        } else {
             Position pos = n.type().position();
             if (n.type() instanceof LabeledTypeNode) {
-                LabelNode ln = ((LabeledTypeNode)n.type()).labelPart();
+                LabelNode ln = ((LabeledTypeNode) n.type()).labelPart();
                 if (ln != null) {
                     pos = ln.position();
                 }
@@ -72,32 +78,31 @@ public class JifFormalDel extends JifJL_c
         return n;
     }
 
-
     /* Perform an imperative update to the local instance.
      */
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        Formal n = (Formal)super.disambiguate(ar);
-        JifTypeSystem jts = (JifTypeSystem)ar.typeSystem();
+        Formal n = (Formal) super.disambiguate(ar);
+        JifTypeSystem jts = (JifTypeSystem) ar.typeSystem();
 
-        JifLocalInstance li = (JifLocalInstance)n.localInstance();
+        JifLocalInstance li = (JifLocalInstance) n.localInstance();
         li.setFlags(n.flags());
         li.setName(n.name());
-        
+
         // set the type of the local instance, but only if we haven't
         // set the upper bound of the arg label.
-        if  (isCatchFormal || ((ArgLabel)li.label()).upperBound() == null) {
+        if (isCatchFormal || ((ArgLabel) li.label()).upperBound() == null) {
             li.setType(n.declType());
         }
 
         if (!n.type().isDisambiguated()) {
-            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            ar.job().extensionInfo().scheduler().currentGoal()
+                    .setUnreachableThisRun();
             return n;
         }
 
-
         if (!isCatchFormal) {
-            ArgLabel al = (ArgLabel)li.label();
+            ArgLabel al = (ArgLabel) li.label();
 
             al.setCodeInstance(ar.context().currentCode());
 
@@ -108,9 +113,12 @@ public class JifFormalDel extends JifJL_c
                 if (!jts.isLabeled(n.declType())) {
                     // declared type isn't labeled, use the default arg bound
                     Type lblType = n.declType();
-                    Label defaultBound = jts.defaultSignature().defaultArgBound(n);
-                    lblType = jts.labeledType(lblType.position(), lblType, defaultBound);
-                    n = n.type(n.type().type(lblType));                    
+                    Label defaultBound =
+                            jts.defaultSignature().defaultArgBound(n);
+                    lblType =
+                            jts.labeledType(lblType.position(), lblType,
+                                    defaultBound);
+                    n = n.type(n.type().type(lblType));
                 }
 
                 // now take the label of the declared type, and set it to 
@@ -121,7 +129,7 @@ public class JifFormalDel extends JifJL_c
                 Type lblType = n.declType();
                 Position pos = n.type().position();
                 lblType = jts.labeledType(pos, jts.unlabel(lblType), al);
-                n = n.type(n.type().type(lblType));     
+                n = n.type(n.type().type(lblType));
             }
         }
 
@@ -134,7 +142,7 @@ public class JifFormalDel extends JifJL_c
 
         // if the declared type is an array type, make sure it is the same all the way through
         if (f.localInstance().type().isArray()) {
-            JifTypeSystem jts = (JifTypeSystem)tc.typeSystem(); 
+            JifTypeSystem jts = (JifTypeSystem) tc.typeSystem();
             ArrayType at = jts.unlabel(f.localInstance().type()).toArray();
             JifLocalDeclDel.checkArrayTypeConsistency(at);
         }

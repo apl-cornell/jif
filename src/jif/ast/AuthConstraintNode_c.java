@@ -15,6 +15,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -24,11 +25,12 @@ import polyglot.visit.Translator;
  */
 public class AuthConstraintNode_c extends ConstraintNode_c<AuthConstraint>
         implements AuthConstraintNode {
-    
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<PrincipalNode> principals;
 
     public AuthConstraintNode_c(Position pos, List<PrincipalNode> principals) {
-	super(pos);
+        super(pos);
         this.principals =
                 Collections.unmodifiableList(new ArrayList<PrincipalNode>(
                         principals));
@@ -36,39 +38,39 @@ public class AuthConstraintNode_c extends ConstraintNode_c<AuthConstraint>
 
     @Override
     public List<PrincipalNode> principals() {
-	return this.principals;
+        return this.principals;
     }
 
     @Override
     public AuthConstraintNode principals(List<PrincipalNode> principals) {
-	AuthConstraintNode_c n = (AuthConstraintNode_c) copy();
+        AuthConstraintNode_c n = (AuthConstraintNode_c) copy();
         n.principals =
                 Collections.unmodifiableList(new ArrayList<PrincipalNode>(
                         principals));
-        if (constraint()!=null) {
+        if (constraint() != null) {
             List<Principal> l = new LinkedList<Principal>();
             for (PrincipalNode p : principals) {
                 l.add(p.principal());
             }
-            n.setConstraint(((AuthConstraint_c)constraint()).principals(l));
+            n.setConstraint(((AuthConstraint_c) constraint()).principals(l));
         }
-	return n;
+        return n;
     }
 
     protected AuthConstraintNode_c reconstruct(List<PrincipalNode> principals) {
-	if (! CollectionUtil.equals(principals, this.principals)) {
+        if (!CollectionUtil.equals(principals, this.principals)) {
             List<PrincipalNode> newPrincipals =
                     Collections.unmodifiableList(new ArrayList<PrincipalNode>(
                             principals));
-            return (AuthConstraintNode_c)this.principals(newPrincipals);
-	}
-	return this;
+            return (AuthConstraintNode_c) this.principals(newPrincipals);
+        }
+        return this;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-	List<PrincipalNode> principals = visitList(this.principals, v);
-	return reconstruct(principals);
+        List<PrincipalNode> principals = visitList(this.principals, v);
+        return reconstruct(principals);
     }
 
     /**

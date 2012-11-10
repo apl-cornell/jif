@@ -15,6 +15,7 @@ import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
@@ -23,44 +24,53 @@ import polyglot.visit.TypeChecker;
  *
  *  @see polyglot.ast.Cast_c
  */
-public class JifCastDel extends JifJL_c implements JifPreciseClassDel
-{
-    public JifCastDel() { }
+public class JifCastDel extends JifJL_c implements JifPreciseClassDel {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
+    public JifCastDel() {
+    }
 
     private Set<Type> exprPreciseClasses = null;
     private boolean isToSubstJifClass = false;
     private boolean isClassCastExceptionFatal = false;
 
-    public boolean isToSubstJifClass() { return this.isToSubstJifClass; }
+    public boolean isToSubstJifClass() {
+        return this.isToSubstJifClass;
+    }
 
     @Override
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
-        JifTypeChecker jtc = (JifTypeChecker)super.typeCheckEnter(tc);
+        JifTypeChecker jtc = (JifTypeChecker) super.typeCheckEnter(tc);
         return jtc.inferClassParameters(true);
     }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         // prevent casting to arrays of parameterized types
-        Cast c = (Cast)this.node();
-        JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
+        Cast c = (Cast) this.node();
+        JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();
         Type castType = c.castType().type();
 
         if (ts.isLabeled(castType)) {
-            throw new SemanticException("Cannot cast to a labeled type.", c.position());
+            throw new SemanticException("Cannot cast to a labeled type.",
+                    c.position());
         }
 
         if (!ts.isParamsRuntimeRep(castType)) {
-            if ((castType instanceof JifSubstType && !((JifSubstType)castType).actuals().isEmpty()) ||
-                    (castType instanceof JifPolyType && !((JifPolyType)castType).params().isEmpty()))
-                throw new SemanticException("Cannot cast to " + castType +
-                        ", since it does " +
-                        "not represent the parameters at runtime.",
+            if ((castType instanceof JifSubstType && !((JifSubstType) castType)
+                    .actuals().isEmpty())
+                    || (castType instanceof JifPolyType && !((JifPolyType) castType)
+                            .params().isEmpty()))
+                throw new SemanticException("Cannot cast to " + castType
+                        + ", since it does "
+                        + "not represent the parameters at runtime.",
                         c.position());
         }
 
         if (castType.isArray()) {
-            throw new SemanticException("Jif does not currently support casts to arrays.", c.position());
+            throw new SemanticException(
+                    "Jif does not currently support casts to arrays.",
+                    c.position());
 //            while (castType.isArray()) {
 //                castType = ts.unlabel(castType.toArray().base());
 //            }
@@ -69,7 +79,9 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
 //            }
         }
 
-        this.isToSubstJifClass = (castType instanceof JifSubstType && !((JifSubstType)castType).actuals().isEmpty());
+        this.isToSubstJifClass =
+                (castType instanceof JifSubstType && !((JifSubstType) castType)
+                        .actuals().isEmpty());
 
         ts.labelTypeCheckUtil().typeCheckType(tc, castType);
         return super.typeCheck(tc);
@@ -77,7 +89,7 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        Cast c = (Cast)this.node();
+        Cast c = (Cast) this.node();
 
         List<Type> ex = new ArrayList<Type>(super.throwTypes(ts));
         if (!throwsClassCastException()) {
@@ -85,8 +97,8 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
             return ex;
         }
         if (c.castType().type() instanceof JifClassType) {
-            LabelTypeCheckUtil ltcu = ((JifTypeSystem)ts).labelTypeCheckUtil();
-            ex.addAll(ltcu.throwTypes((JifClassType)c.castType().type()));
+            LabelTypeCheckUtil ltcu = ((JifTypeSystem) ts).labelTypeCheckUtil();
+            ex.addAll(ltcu.throwTypes((JifClassType) c.castType().type()));
         }
 
         return ex;
@@ -95,17 +107,16 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
     @Override
     public void setFatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
         super.setFatalExceptions(ts, fatalExceptions);
-        if(fatalExceptions.contains(ts.ClassCastException()))
+        if (fatalExceptions.contains(ts.ClassCastException()))
             isClassCastExceptionFatal = true;
     }
 
     public boolean throwsClassCastException() {
-        if(isClassCastExceptionFatal)
-            return false;
+        if (isClassCastExceptionFatal) return false;
 
-        Cast c = (Cast)this.node();
+        Cast c = (Cast) this.node();
         Type castType = c.castType().type();
-        JifTypeSystem ts = (JifTypeSystem)castType.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) castType.typeSystem();
         if (exprPreciseClasses != null) {
             for (Type t : exprPreciseClasses) {
                 if (typeCastGuaranteed(ts, castType, t)) {
@@ -123,14 +134,18 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
     /**
      * Will casting from exprType to castType always succeed?
      */
-    private static boolean typeCastGuaranteed(JifTypeSystem ts, Type castType, Type exprType) {
+    private static boolean typeCastGuaranteed(JifTypeSystem ts, Type castType,
+            Type exprType) {
         if (ts.equalsNoStrip(castType, exprType)) {
             return true;
         }
-        if (castType instanceof JifClassType &&
-                SubtypeChecker.polyTypeForClass((JifClassType)castType).params().isEmpty()) {
+        if (castType instanceof JifClassType
+                && SubtypeChecker.polyTypeForClass((JifClassType) castType)
+                        .params().isEmpty()) {
             // cast type is not parameterized.
-            if (!(exprType instanceof JifClassType) || SubtypeChecker.polyTypeForClass((JifClassType)exprType).params().isEmpty()) {
+            if (!(exprType instanceof JifClassType)
+                    || SubtypeChecker.polyTypeForClass((JifClassType) exprType)
+                            .params().isEmpty()) {
                 // if the expr is definitely a subtype of the
                 // cast type, no class cast exception will be throw.
                 if (castType.typeSystem().isSubtype(exprType, castType)) {
@@ -140,13 +155,15 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel
         }
         return false;
     }
+
     /**
      * 
      */
     @Override
     public Expr getPreciseClassExpr() {
-        return ((Cast)node()).expr();
+        return ((Cast) node()).expr();
     }
+
     /**
      * 
      */

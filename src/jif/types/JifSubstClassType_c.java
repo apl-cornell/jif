@@ -13,17 +13,19 @@ import polyglot.main.Report;
 import polyglot.types.ClassType;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class JifSubstClassType_c extends SubstClassType_c<ParamInstance, Param>
-implements JifSubstType
-{
-    public JifSubstClassType_c(JifTypeSystem ts, Position pos,
-            ClassType base, JifSubst subst) {
+        implements JifSubstType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
+    public JifSubstClassType_c(JifTypeSystem ts, Position pos, ClassType base,
+            JifSubst subst) {
         super(ts, pos, base, subst);
 
-        if (! (base instanceof JifPolyType)) {
-            throw new InternalCompilerError("Cannot perform subst on \"" +
-                    base + "\".");
+        if (!(base instanceof JifPolyType)) {
+            throw new InternalCompilerError("Cannot perform subst on \"" + base
+                    + "\".");
         }
     }
 
@@ -81,12 +83,12 @@ implements JifSubstType
 
     @Override
     public ThisLabel thisLabel() {
-        return ((JifTypeSystem)ts).thisLabel(this);
+        return ((JifTypeSystem) ts).thisLabel(this);
     }
 
     @Override
     public ThisLabel thisLabel(Position p) {
-        return ((JifTypeSystem)ts).thisLabel(p, this);
+        return ((JifTypeSystem) ts).thisLabel(p, this);
     }
 
     @Override
@@ -96,11 +98,12 @@ implements JifSubstType
         }
 
         // do something a little more readable
-        JifPolyType jpt = (JifPolyType)base;
+        JifPolyType jpt = (JifPolyType) base;
         String s = "";
 
         if (jpt.params() != null) {
-            for (Iterator<ParamInstance> i = jpt.params().iterator(); i.hasNext(); ) {
+            for (Iterator<ParamInstance> i = jpt.params().iterator(); i
+                    .hasNext();) {
                 ParamInstance pi = i.next();
                 s += subst.substitutions().get(pi);
 

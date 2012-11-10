@@ -22,6 +22,7 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
@@ -31,8 +32,10 @@ import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>InstTypeNode</code> interface.
  */
-public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguous
-{
+public class InstTypeNode_c extends TypeNode_c implements InstTypeNode,
+        Ambiguous {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected TypeNode base;
     protected List<ParamNode> params;
 
@@ -67,7 +70,7 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
     }
 
     protected InstTypeNode_c reconstruct(TypeNode base, List<ParamNode> params) {
-        if (base != this.base || ! CollectionUtil.equals(params, this.params)) {
+        if (base != this.base || !CollectionUtil.equals(params, this.params)) {
             InstTypeNode_c n = (InstTypeNode_c) copy();
             n.base = base;
             n.params = ListUtil.copy(params, true);
@@ -94,7 +97,7 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
                 if (i.hasNext()) pi = i.next();
                 ParamNode p = j.next();
                 if (p instanceof AmbExprParam) {
-                    p = ((AmbExprParam)p).expectedPI(pi);
+                    p = ((AmbExprParam) p).expectedPI(pi);
                 }
                 newParams.add(p);
             }
@@ -108,6 +111,7 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
     public boolean isDisambiguated() {
         return false;
     }
+
     @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
@@ -115,12 +119,14 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
 
         if (!base.isDisambiguated() || !b.isCanonical()) {
             //  not yet ready to disambiguate
-            sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            sc.job().extensionInfo().scheduler().currentGoal()
+                    .setUnreachableThisRun();
             return this;
         }
 
-        if (! (b instanceof JifPolyType) || ((JifPolyType)b).params().isEmpty()) {
-            throw new SemanticException("Cannot instantiate from a non-polymorphic type " + b);
+        if (!(b instanceof JifPolyType) || ((JifPolyType) b).params().isEmpty()) {
+            throw new SemanticException(
+                    "Cannot instantiate from a non-polymorphic type " + b);
         }
         JifPolyType t = (JifPolyType) b;
 
@@ -134,40 +140,37 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode, Ambiguou
 
             if (!p.isDisambiguated()) {
                 // the param is not yet ready
-                sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                sc.job().extensionInfo().scheduler().currentGoal()
+                        .setUnreachableThisRun();
                 return this;
             }
 
             checkParamSuitable(pi, p);
 
-
             l.add(p.parameter());
         }
         if (i.hasNext()) {
             throw new SemanticException("Too many parameters supplied for the "
-                    + "class " + t,
-                    this.position());
+                    + "class " + t, this.position());
         }
 
         return sc.nodeFactory().CanonicalTypeNode(position(),
-                ts.instantiate(position(),
-                        t.instantiatedFrom(), l) );
+                ts.instantiate(position(), t.instantiatedFrom(), l));
     }
 
-    protected void checkParamSuitable(ParamInstance pi, ParamNode p) throws SemanticException {
+    protected void checkParamSuitable(ParamInstance pi, ParamNode p)
+            throws SemanticException {
         if (pi.isLabel() && !(p.parameter() instanceof Label)) {
-            throw new SemanticException("Can not instantiate a "+
-                    "label parameter with a non-label.",
-                    p.position());
+            throw new SemanticException("Can not instantiate a "
+                    + "label parameter with a non-label.", p.position());
         }
         if (pi.isPrincipal() && !(p.parameter() instanceof Principal)) {
-            throw new SemanticException("Can not instantiate a "+
-                    "principal parameter with a non-principal.",
-                    p.position());
+            throw new SemanticException("Can not instantiate a "
+                    + "principal parameter with a non-principal.", p.position());
         }
-        if (pi.isInvariantLabel() && !((Label)p.parameter()).isInvariant() )
-            throw new SemanticException("Can not instantiate an invariant "+
-                    "label parameter with a non-invariant label.",
+        if (pi.isInvariantLabel() && !((Label) p.parameter()).isInvariant())
+            throw new SemanticException("Can not instantiate an invariant "
+                    + "label parameter with a non-invariant label.",
                     p.position());
     }
 

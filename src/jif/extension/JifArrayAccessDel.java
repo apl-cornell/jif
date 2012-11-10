@@ -5,12 +5,14 @@ import java.util.List;
 
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 
 /** The Jif extension of the <code>ArrayAccess</code> node.
  */
-public class JifArrayAccessDel extends JifJL_c
-{
+public class JifArrayAccessDel extends JifJL_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifArrayAccessDel() {
     }
 
@@ -40,6 +42,7 @@ public class JifArrayAccessDel extends JifJL_c
     public void setNoOutOfBoundsExcThrown() {
         isOutOfBoundsExcThrown = false;
     }
+
     public boolean outOfBoundsExcThrown() {
         return isOutOfBoundsExcThrown;
     }
@@ -69,11 +72,10 @@ public class JifArrayAccessDel extends JifJL_c
     @Override
     public void setFatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
         super.setFatalExceptions(ts, fatalExceptions);
-        if(fatalExceptions.contains(ts.OutOfBoundsException()))
+        if (fatalExceptions.contains(ts.OutOfBoundsException()))
             setNoOutOfBoundsExcThrown();
-        if(fatalExceptions.contains(ts.NullPointerException()))
+        if (fatalExceptions.contains(ts.NullPointerException()))
             setArrayIsNeverNull();
     }
-
 
 }

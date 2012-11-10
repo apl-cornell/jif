@@ -16,13 +16,15 @@ import polyglot.types.SemanticException;
 import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 
 /** An implementation of the <code>AmbParam</code> interface.
  */
-public class AmbParam_c extends Node_c implements AmbParam
-{
+public class AmbParam_c extends Node_c implements AmbParam {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Id name;
     protected ParamInstance pi;
 
@@ -56,6 +58,7 @@ public class AmbParam_c extends Node_c implements AmbParam
     public String toString() {
         return name + "{amb}";
     }
+
     @Override
     public Node visitChildren(NodeVisitor v) {
         if (this.name == null) return this;
@@ -63,13 +66,15 @@ public class AmbParam_c extends Node_c implements AmbParam
         Id name = (Id) visitChild(this.name, v);
         return reconstruct(name);
     }
+
     protected AmbParam_c reconstruct(Id name) {
-        if (this.name == name) { return this; }
-        AmbParam_c n = (AmbParam_c)this.copy();
+        if (this.name == name) {
+            return this;
+        }
+        AmbParam_c n = (AmbParam_c) this.copy();
         n.name = name;
         return n;
     }
-
 
     /**
      * Count the number of times disambiguate has been called, to allow reporting
@@ -100,7 +105,8 @@ public class AmbParam_c extends Node_c implements AmbParam
 
         if (!vi.isCanonical() && pi == null && disambCount++ < MAX_DISAMB_CALLS) {
             // not yet ready to disambiguate
-            sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            sc.job().extensionInfo().scheduler().currentGoal()
+                    .setUnreachableThisRun();
             return this;
         }
 
@@ -116,9 +122,9 @@ public class AmbParam_c extends Node_c implements AmbParam
             return paramToParam((ParamInstance) vi, sc);
         }
 
-        throw new SemanticDetailedException(vi + " cannot be used as parameter.",
-                "The variable " + name + " is not suitable for use as a parameter.",
-                this.position());
+        throw new SemanticDetailedException(vi
+                + " cannot be used as parameter.", "The variable " + name
+                + " is not suitable for use as a parameter.", this.position());
     }
 
     /** Turns a <code>JifVarInstance</code> object into a label node or
@@ -136,7 +142,8 @@ public class AmbParam_c extends Node_c implements AmbParam
                 return nf.CanonicalLabelNode(position(), l);
             }
 
-            if (ts.isImplicitCastValid(vi.type(), ts.Principal()) || (pi != null && pi.isPrincipal())) {
+            if (ts.isImplicitCastValid(vi.type(), ts.Principal())
+                    || (pi != null && pi.isPrincipal())) {
                 Principal p =
                         ts.dynamicPrincipal(position(),
                                 ts.varInstanceToAccessPath(vi, this.position()));
@@ -144,16 +151,18 @@ public class AmbParam_c extends Node_c implements AmbParam
             }
             throw new SemanticDetailedException(
                     "Only final variables of type \"label\" or \"principal\" may be used as class parameters.",
-                    "Only final variables of type \"label\" or \"principal\" may be used as class parameters. " +
-                            "The variable " + vi.name() + " is not of type \"label\", nor of type \"principal\".",
-                            position());
+                    "Only final variables of type \"label\" or \"principal\" may be used as class parameters. "
+                            + "The variable "
+                            + vi.name()
+                            + " is not of type \"label\", nor of type \"principal\".",
+                    position());
         }
 
         throw new SemanticDetailedException(
                 "Only final variables of type \"label\" or \"principal\" may be used as class parameters.",
-                "Only final variables of type \"label\" or \"principal\" may be used as class parameters. " +
-                        "The variable " + vi.name() + " is not final.",
-                        position());
+                "Only final variables of type \"label\" or \"principal\" may be used as class parameters. "
+                        + "The variable " + vi.name() + " is not final.",
+                position());
     }
 
     /** Turns a <code>PrincipalInstance</code> object into a principal node. */
@@ -178,8 +187,8 @@ public class AmbParam_c extends Node_c implements AmbParam
         if (pi.isInvariantLabel()) {
             // <param label uid> => <label-param uid>
             Label L = ts.paramLabel(position(), pi);
-            L.setDescription("label parameter " + pi.name() +
-                    " of class " + pi.container().fullName());
+            L.setDescription("label parameter " + pi.name() + " of class "
+                    + pi.container().fullName());
             return nf.CanonicalLabelNode(position(), L);
         }
 
@@ -189,7 +198,7 @@ public class AmbParam_c extends Node_c implements AmbParam
             return nf.CanonicalPrincipalNode(position(), p);
         }
 
-        throw new InternalCompilerError("Unrecognized parameter type for " + pi,
-                position());
+        throw new InternalCompilerError(
+                "Unrecognized parameter type for " + pi, position());
     }
 }

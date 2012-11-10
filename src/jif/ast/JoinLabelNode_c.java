@@ -19,14 +19,16 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /** An implementation of the <code>JoinLabel</code> interface.
  */
-public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
-{
+public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<LabelComponentNode> components;
 
     public JoinLabelNode_c(Position pos, List<LabelComponentNode> components) {
@@ -51,11 +53,12 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
     }
 
     protected JoinLabelNode_c reconstruct(List<LabelComponentNode> components) {
-        if (! CollectionUtil.equals(components, this.components)) {
+        if (!CollectionUtil.equals(components, this.components)) {
             JoinLabelNode_c n = (JoinLabelNode_c) copy();
             n.components =
-                Collections.unmodifiableList(new ArrayList<LabelComponentNode>(
-                        components));
+                    Collections
+                            .unmodifiableList(new ArrayList<LabelComponentNode>(
+                                    components));
             return n;
         }
 
@@ -82,28 +85,26 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
         Set<IntegPolicy> integPolicies = new LinkedHashSet<IntegPolicy>();
         for (LabelComponentNode n : this.components) {
             if (!n.isDisambiguated()) {
-                sc.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                sc.job().extensionInfo().scheduler().currentGoal()
+                        .setUnreachableThisRun();
                 return this;
             }
             if (n instanceof PolicyNode) {
-                Policy pol = ((PolicyNode)n).policy();
+                Policy pol = ((PolicyNode) n).policy();
                 if (pol instanceof ConfPolicy) {
                     confPolicies.add((ConfPolicy) pol);
-                }
-                else {
+                } else {
                     integPolicies.add((IntegPolicy) pol);
                 }
-            }
-            else if (n instanceof LabelNode) {
-                s.add(((LabelNode)n).label());
+            } else if (n instanceof LabelNode) {
+                s.add(((LabelNode) n).label());
 
-            }
-            else {
+            } else {
                 throw new InternalCompilerError("Unexpected node: " + n);
             }
         }
 
-        if (!confPolicies.isEmpty() || !integPolicies.isEmpty()) {                
+        if (!confPolicies.isEmpty() || !integPolicies.isEmpty()) {
             ConfPolicy cp = ts.bottomConfPolicy(position());
             IntegPolicy ip = ts.topIntegPolicy(position());
             if (!confPolicies.isEmpty()) {
@@ -113,7 +114,7 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode
                 ip = ts.joinIntegPolicy(position(), integPolicies);
             }
             PairLabel pl = ts.pairLabel(position(), cp, ip);
-            s.add(pl);           
+            s.add(pl);
         }
 
         return nf.CanonicalLabelNode(position(), ts.joinLabel(position(), s));

@@ -21,13 +21,16 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
-
 
 /**
  * A <code>JifCanonicalTypeNode</code> is a type node for a canonical type in Polyj.
  */
-public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements JifCanonicalTypeNode {
+public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements
+        JifCanonicalTypeNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifCanonicalTypeNode_c(Position pos, Type type) {
         super(pos, type);
     }
@@ -54,12 +57,12 @@ public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements JifCa
             return at.base(newBaseType);
         }
 
-        if (t instanceof JifPolyType && !((JifPolyType)t).params().isEmpty()) {
+        if (t instanceof JifPolyType && !((JifPolyType) t).params().isEmpty()) {
             // the type is missing parameters
 
-            JifPolyType jpt = (JifPolyType)t;
+            JifPolyType jpt = (JifPolyType) t;
 
-            JifTypeChecker jtc = (JifTypeChecker)tc;
+            JifTypeChecker jtc = (JifTypeChecker) tc;
             boolean inferred = false;
             if (jtc.inferClassParameters()) {
                 inferred = true;
@@ -71,13 +74,18 @@ public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements JifCa
 
                 for (ParamInstance pi : jpt.params()) {
                     if (pi.isLabel()) {
-                        VarLabel v = ts.freshLabelVariable(t.position(), pi.name()+"_inferred", "Inferred label parameter");
+                        VarLabel v =
+                                ts.freshLabelVariable(t.position(), pi.name()
+                                        + "_inferred",
+                                        "Inferred label parameter");
                         // mark the var label as needing to be runtime representable.
                         v.setMustRuntimeRepresentable();
                         varSubst.put(pi, v);
-                    }
-                    else {
-                        VarPrincipal v = ts.freshPrincipalVariable(t.position(), pi.name()+"_inferred", "Inferred principal parameter");
+                    } else {
+                        VarPrincipal v =
+                                ts.freshPrincipalVariable(t.position(),
+                                        pi.name() + "_inferred",
+                                        "Inferred principal parameter");
                         // mark the var label as needing to be runtime representable.
                         v.setMustRuntimeRepresentable();
                         varSubst.put(pi, v);
@@ -87,13 +95,12 @@ public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements JifCa
             }
 
             if (!inferred) {
-                throw new SemanticDetailedException(
-                        "Parameterized type " + t + " is uninstantiated",
-                        "The type " + t + " is a parameterized type, " +
-                                "and must be provided with parameters " +
-                                "to instantiate it. Jif prevents the use of " +
-                                "uninstantiated parameterized types.",
-                                position());
+                throw new SemanticDetailedException("Parameterized type " + t
+                        + " is uninstantiated", "The type " + t
+                        + " is a parameterized type, "
+                        + "and must be provided with parameters "
+                        + "to instantiate it. Jif prevents the use of "
+                        + "uninstantiated parameterized types.", position());
             }
             return t;
         }
@@ -101,12 +108,12 @@ public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements JifCa
 
     }
 
-
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         if (!this.type().isCanonical()) {
             // type should be canonical by the time we start typechecking.
-            throw new InternalCompilerError(this.type() + " is not canonical.", this.position);
+            throw new InternalCompilerError(this.type() + " is not canonical.",
+                    this.position);
         }
 
         TypeNode tn = (TypeNode) super.typeCheck(tc);
@@ -120,7 +127,8 @@ public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements JifCa
 
         // typecheck the type, make sure principal parameters are instantiated
         // with principals, label parameters with labels.
-        LabelTypeCheckUtil ltcu = ((JifTypeSystem)tc.typeSystem()).labelTypeCheckUtil();
+        LabelTypeCheckUtil ltcu =
+                ((JifTypeSystem) tc.typeSystem()).labelTypeCheckUtil();
         ltcu.typeCheckType(tc, t);
 
         return tn;

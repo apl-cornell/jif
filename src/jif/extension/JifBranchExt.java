@@ -13,13 +13,15 @@ import polyglot.ast.Branch;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>Branch</code> node. 
  *  
  *  @see polyglot.ast.Branch_c
  */
-public class JifBranchExt extends JifStmtExt_c
-{
+public class JifBranchExt extends JifStmtExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifBranchExt(ToJavaExt toJava) {
         super(toJava);
     }
@@ -37,44 +39,47 @@ public class JifBranchExt extends JifStmtExt_c
         Label gotoLabel = A.gotoLabel(bs.kind(), bs.label());
 
         if (gotoLabel == null) {
-            throw new InternalCompilerError("Can't find target for " + bs.kind() + " " + bs.label());
+            throw new InternalCompilerError("Can't find target for "
+                    + bs.kind() + " " + bs.label());
         }
 
-        lc.constrain(new NamedLabel("pc", 
-                                    "the information that may be revealed by control reaching this program point",
-                                    pc), 
-                    LabelConstraint.LEQ, 
-                    new NamedLabel("pc_target",
-                                   "upper bound on information that should be revealed by control reaching the target program point",
-                                   gotoLabel),
-                   A.labelEnv(),
-                   bs.position(),
-                   new ConstraintMessage() {
-            @Override
-            public String msg() {
-                return "More information may be revealed by " +
-                "branching to the target from this " +
-                "program point than is allowed.";
-            }
-            @Override
-            public String detailMsg() { 
-                return "Knowing that control flow reached this " +
-                "program point may reveal information upto " + 
-                namedRhs() + ". However, the target of " +
-                "this break/continue should only be " +
-                "revealed information less than or equal to " + 
-                namedRhs() + ". Thus, more information " +
-                "may be revealed by branching to the " +
-                "target from this program point than is " +
-                "allowed.";
-            }
-            @Override
-            public String technicalMsg() {
-                return "Invalid break/continue: PC is more " +
-                "restrictive than the label of the destination.";
-            }                     
-        }
-        );
+        lc.constrain(
+                new NamedLabel(
+                        "pc",
+                        "the information that may be revealed by control reaching this program point",
+                        pc),
+                LabelConstraint.LEQ,
+                new NamedLabel(
+                        "pc_target",
+                        "upper bound on information that should be revealed by control reaching the target program point",
+                        gotoLabel), A.labelEnv(), bs.position(),
+                new ConstraintMessage() {
+                    @Override
+                    public String msg() {
+                        return "More information may be revealed by "
+                                + "branching to the target from this "
+                                + "program point than is allowed.";
+                    }
+
+                    @Override
+                    public String detailMsg() {
+                        return "Knowing that control flow reached this "
+                                + "program point may reveal information upto "
+                                + namedRhs() + ". However, the target of "
+                                + "this break/continue should only be "
+                                + "revealed information less than or equal to "
+                                + namedRhs() + ". Thus, more information "
+                                + "may be revealed by branching to the "
+                                + "target from this program point than is "
+                                + "allowed.";
+                    }
+
+                    @Override
+                    public String technicalMsg() {
+                        return "Invalid break/continue: PC is more "
+                                + "restrictive than the label of the destination.";
+                    }
+                });
 
         PathMap X = ts.pathMap();
         // prevent the single path rule from being used.

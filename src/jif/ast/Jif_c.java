@@ -13,11 +13,13 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>Jif</code> interface.
  */
-public class Jif_c extends Ext_c implements Jif
-{
+public class Jif_c extends Ext_c implements Jif {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected PathMap X;
     protected ToJavaExt toJava;
 
@@ -59,7 +61,6 @@ public class Jif_c extends Ext_c implements Jif
         }
         return copy;
     }
-
 
     @Override
     public PathMap X() {
@@ -120,9 +121,8 @@ public class Jif_c extends Ext_c implements Jif
             }
         }
         if (!throwTypes.isEmpty()) {
-            throw new InternalCompilerError("The types " + throwTypes + " are " +
-                    "declared to be thrown, but " +
-                    "are not label checked!");
+            throw new InternalCompilerError("The types " + throwTypes + " are "
+                    + "declared to be thrown, but " + "are not label checked!");
         }
     }
 
@@ -141,6 +141,5 @@ public class Jif_c extends Ext_c implements Jif
             super.dump(w);
         }
     }
-
 
 }

@@ -12,6 +12,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -20,8 +21,9 @@ import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>NewLabel</code> interface.
  */
-public class LabelExpr_c extends Expr_c implements LabelExpr
-{
+public class LabelExpr_c extends Expr_c implements LabelExpr {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected LabelNode label;
 
     public LabelExpr_c(Position pos, LabelNode label) {

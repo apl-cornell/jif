@@ -9,32 +9,52 @@ import polyglot.main.Report;
 import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>UnknownLabel</code> interface.
  */
-public class UnknownLabel_c extends Label_c implements UnknownLabel
-{
+public class UnknownLabel_c extends Label_c implements UnknownLabel {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public UnknownLabel_c(JifTypeSystem ts, Position pos) {
         super(ts, pos);
     }
 
     @Override
-    public boolean isComparable() { return false; }
+    public boolean isComparable() {
+        return false;
+    }
+
     @Override
-    public boolean isEnumerable() { return false; }
+    public boolean isEnumerable() {
+        return false;
+    }
+
     @Override
-    public boolean isCanonical() { return false; }
+    public boolean isCanonical() {
+        return false;
+    }
+
     @Override
-    public boolean isDisambiguatedImpl() { return false; }
+    public boolean isDisambiguatedImpl() {
+        return false;
+    }
+
     @Override
-    public boolean isCovariant() { return false; }
+    public boolean isCovariant() {
+        return false;
+    }
+
     @Override
-    public boolean isRuntimeRepresentable() { return false; }
+    public boolean isRuntimeRepresentable() {
+        return false;
+    }
 
     @Override
     public String componentString(Set<Label> printedLabels) {
         return "<unknown label>";
     }
+
     @Override
     public String toString() {
         if (Report.should_report(Report.debug, 1) && this.description() != null) {
@@ -47,12 +67,17 @@ public class UnknownLabel_c extends Label_c implements UnknownLabel
     public boolean equalsImpl(TypeObject o) {
         return o == this;
     }
+
     @Override
-    public int hashCode() { return 234334; }
+    public int hashCode() {
+        return 234334;
+    }
+
     @Override
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         throw new InternalCompilerError("Cannot compare unknown label.");
     }
+
     @Override
     public Set<Variable> variables() {
         return Collections.emptySet();

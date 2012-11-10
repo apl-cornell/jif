@@ -16,13 +16,16 @@ import polyglot.ast.TypeNode;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 
 /** An implementation of the <code>AmbParamTypeOrAccess</code> interface.
  */
-public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAccess
-{
+public class AmbParamTypeOrAccess_c extends Node_c implements
+        AmbParamTypeOrAccess {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Receiver prefix;
     protected Object expr;
     protected Type type;
@@ -54,7 +57,6 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
         return this.expr;
     }
 
-
     @Override
     public Type type() {
         return this.type;
@@ -76,7 +78,7 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
         Receiver prefix = (Receiver) visitChild(this.prefix, v);
         Object expr = this.expr;
         if (expr instanceof Expr) {
-            expr = visitChild((Expr)expr, v);
+            expr = visitChild((Expr) expr, v);
         }
         return reconstruct(prefix, expr);
     }
@@ -91,9 +93,10 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
         JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
-        if (!ar.isASTDisambiguated(prefix) ||
-                (expr instanceof Expr && !ar.isASTDisambiguated((Expr)expr))) {
-            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+        if (!ar.isASTDisambiguated(prefix)
+                || (expr instanceof Expr && !ar.isASTDisambiguated((Expr) expr))) {
+            ar.job().extensionInfo().scheduler().currentGoal()
+                    .setUnreachableThisRun();
             return this;
         }
 
@@ -101,27 +104,28 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
             // "expr" must be a parameter.
             TypeNode tn = (TypeNode) prefix;
 
-            if (! (tn.type() instanceof JifPolyType)) {
-                throw new SemanticException(tn.type() + " is not a parameterized type.", position());
+            if (!(tn.type() instanceof JifPolyType)) {
+                throw new SemanticException(tn.type()
+                        + " is not a parameterized type.", position());
             }
-            JifPolyType pt = (JifPolyType)tn.type();
+            JifPolyType pt = (JifPolyType) tn.type();
 
             if (pt.params().isEmpty()) {
-                throw new SemanticException(tn.type() + " is not a parameterized type.", position());
+                throw new SemanticException(tn.type()
+                        + " is not a parameterized type.", position());
             }
 
             ParamNode n;
             ParamInstance pi = pt.params().get(0);
             if (expr instanceof Expr) {
-                n = nf.AmbParam(position(), (Expr)expr, pi);
+                n = nf.AmbParam(position(), (Expr) expr, pi);
                 n = (ParamNode) n.del().disambiguate(ar);
-            }
-            else {
-                n = nf.AmbParam(position(), (Id)expr, pi);
+            } else {
+                n = nf.AmbParam(position(), (Id) expr, pi);
                 n = (ParamNode) n.del().disambiguate(ar);
                 if (!n.isDisambiguated()) {
-                    throw new SemanticException("\"" + expr + "\" is not " +
-                            "suitable as a parameter.", position());
+                    throw new SemanticException("\"" + expr + "\" is not "
+                            + "suitable as a parameter.", position());
 
                 }
             }
@@ -132,20 +136,20 @@ public class AmbParamTypeOrAccess_c extends Node_c implements AmbParamTypeOrAcce
             Type t = ts.instantiate(position(), pt.instantiatedFrom(), l);
 
             return nf.CanonicalTypeNode(position(), t);
-        }
-        else if (prefix instanceof Expr) {
+        } else if (prefix instanceof Expr) {
             // "expr" must be an access index.
             Expr n;
             if (expr instanceof Expr) {
-                n = (Expr)expr;
-            }
-            else {
-                n = nf.AmbExpr(position(), (Id)expr);;
-                n = (Expr)n.visit(ar);
+                n = (Expr) expr;
+            } else {
+                n = nf.AmbExpr(position(), (Id) expr);
+                ;
+                n = (Expr) n.visit(ar);
             }
             return nf.ArrayAccess(position(), (Expr) prefix, n);
         }
 
-        throw new SemanticException("Could not disambiguate type or expression.", position());
+        throw new SemanticException(
+                "Could not disambiguate type or expression.", position());
     }
 }

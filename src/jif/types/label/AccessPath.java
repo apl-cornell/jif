@@ -14,6 +14,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * An AccessPath represents a final access path. A final access path is of the
@@ -39,6 +40,8 @@ import polyglot.util.Position;
  * 
  */
 public abstract class AccessPath implements Serializable, Copy {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private Position position;
 
     protected AccessPath(Position pos) {
@@ -47,7 +50,9 @@ public abstract class AccessPath implements Serializable, Copy {
 
     @Override
     public abstract boolean equals(Object o);
+
     public abstract boolean isCanonical();
+
     public abstract boolean isUninterpreted();
 
     /**
@@ -107,8 +112,7 @@ public abstract class AccessPath implements Serializable, Copy {
             AccessPath ap = (AccessPath) super.clone();
 
             return ap;
-        }
-        catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Java clone() weirdness.");
         }
     }

@@ -10,6 +10,7 @@ import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -18,69 +19,72 @@ import polyglot.visit.Translator;
 /** An implementation of the <tt>LabelLeAssertionNode</tt> interface. */
 public class LabelLeAssertionNode_c extends ConstraintNode_c<LabelLeAssertion>
         implements LabelLeAssertionNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected LabelNode lhs;
     protected LabelNode rhs;
     protected final boolean isEquiv;
 
-    public LabelLeAssertionNode_c(Position pos, LabelNode lhs, LabelNode rhs, boolean isEquiv) {
-	super(pos);
-	this.lhs = lhs;
-	this.rhs = rhs;
-	this.isEquiv = isEquiv;
+    public LabelLeAssertionNode_c(Position pos, LabelNode lhs, LabelNode rhs,
+            boolean isEquiv) {
+        super(pos);
+        this.lhs = lhs;
+        this.rhs = rhs;
+        this.isEquiv = isEquiv;
     }
 
     /** Gets the lhs label node. */
     @Override
     public LabelNode lhs() {
-	return this.lhs;
+        return this.lhs;
     }
 
     /** Returns a copy of this node with the lhs updated. */
     @Override
     public LabelLeAssertionNode lhs(LabelNode lhs) {
-	LabelLeAssertionNode_c n = (LabelLeAssertionNode_c) copy();
-	n.lhs = lhs;
-	if (constraints() != null) {
+        LabelLeAssertionNode_c n = (LabelLeAssertionNode_c) copy();
+        n.lhs = lhs;
+        if (constraints() != null) {
             LabelLeAssertion c = constraints().iterator().next();
-            n = n.setConstraints((JifTypeSystem)c.typeSystem());
-	}
-	return n;
+            n = n.setConstraints((JifTypeSystem) c.typeSystem());
+        }
+        return n;
     }
 
     /** Gets the rhs principal. */
     @Override
     public LabelNode rhs() {
-	return this.rhs;
+        return this.rhs;
     }
 
     /** Returns a copy of this node with the rhs updated. */
     @Override
     public LabelLeAssertionNode rhs(LabelNode rhs) {
-	LabelLeAssertionNode_c n = (LabelLeAssertionNode_c) copy();
-	n.rhs = rhs;
-	if (constraints() != null) {
+        LabelLeAssertionNode_c n = (LabelLeAssertionNode_c) copy();
+        n.rhs = rhs;
+        if (constraints() != null) {
             LabelLeAssertion c = constraints().iterator().next();
-            n = n.setConstraints((JifTypeSystem)c.typeSystem());
-	}
-	return n;
+            n = n.setConstraints((JifTypeSystem) c.typeSystem());
+        }
+        return n;
     }
 
     /** Reconstructs this node. */
     protected LabelLeAssertionNode_c reconstruct(LabelNode lhs, LabelNode rhs) {
-	if (lhs != this.lhs || rhs != this.rhs) {
-	    LabelLeAssertionNode_c n = (LabelLeAssertionNode_c) copy();
-	    return (LabelLeAssertionNode_c) n.lhs(lhs).rhs(rhs);
-	}
+        if (lhs != this.lhs || rhs != this.rhs) {
+            LabelLeAssertionNode_c n = (LabelLeAssertionNode_c) copy();
+            return (LabelLeAssertionNode_c) n.lhs(lhs).rhs(rhs);
+        }
 
-	return this;
+        return this;
     }
 
     /** Visits the children of this node. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	LabelNode lhs = (LabelNode) visitChild(this.lhs, v);
-	LabelNode rhs = (LabelNode) visitChild(this.rhs, v);
-	return reconstruct(lhs, rhs);
+        LabelNode lhs = (LabelNode) visitChild(this.lhs, v);
+        LabelNode rhs = (LabelNode) visitChild(this.rhs, v);
+        return reconstruct(lhs, rhs);
     }
 
     /**
@@ -90,36 +94,31 @@ public class LabelLeAssertionNode_c extends ConstraintNode_c<LabelLeAssertion>
      */
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-	if (constraints() == null) {
+        if (constraints() == null) {
             JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
             return setConstraints(ts);
         }
 
         return this;
     }
-    
+
     private LabelLeAssertionNode_c setConstraints(JifTypeSystem ts) {
         if (isEquiv) {
             Set<LabelLeAssertion> cs = new HashSet<LabelLeAssertion>();
-            cs.add(ts.labelLeAssertion(position(),
-                                       lhs.label(),
-                                       rhs.label()));
-            cs.add(ts.labelLeAssertion(position(),
-                                       rhs.label(),
-                                       lhs.label()));
-            return (LabelLeAssertionNode_c)constraints(cs);
+            cs.add(ts.labelLeAssertion(position(), lhs.label(), rhs.label()));
+            cs.add(ts.labelLeAssertion(position(), rhs.label(), lhs.label()));
+            return (LabelLeAssertionNode_c) constraints(cs);
         }
-        return (LabelLeAssertionNode_c)constraint(ts.labelLeAssertion(position(),
-                                              lhs.label(),
-                                              rhs.label()));
-        
+        return (LabelLeAssertionNode_c) constraint(ts.labelLeAssertion(
+                position(), lhs.label(), rhs.label()));
+
     }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         print(lhs, w, tr);
         w.write(" ");
-        w.write(isEquiv?"equiv":"<=");
+        w.write(isEquiv ? "equiv" : "<=");
         w.write(" ");
         print(rhs, w, tr);
     }

@@ -6,9 +6,11 @@ import polyglot.ast.Binary;
 import polyglot.ast.Binary_c;
 import polyglot.ast.Expr;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
-public class JifBinary_c extends Binary_c implements Binary
-{
+public class JifBinary_c extends Binary_c implements Binary {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifBinary_c(Position pos, Expr left, Operator op, Expr right) {
         super(pos, left, op, right);
     }
@@ -24,14 +26,16 @@ public class JifBinary_c extends Binary_c implements Binary
             if (right.isConstant()) {
                 // is it a non-zero constant?
                 Object o = right.constantValue();
-                if (o instanceof Number && ((Number)o).longValue() != 0) {
+                if (o instanceof Number && ((Number) o).longValue() != 0) {
                     return false;
                 }
             }
             if (((JifExprExt) JifUtil.jifExt(right())).getNumericBounds() != null) {
-                Interval i = ((JifExprExt) JifUtil.jifExt(right())).getNumericBounds();
-                if ((i.getLower() != null && i.getLower().longValue() > 0) ||
-                        (i.getUpper() != null && i.getUpper().longValue() < 0)) {
+                Interval i =
+                        ((JifExprExt) JifUtil.jifExt(right()))
+                                .getNumericBounds();
+                if ((i.getLower() != null && i.getLower().longValue() > 0)
+                        || (i.getUpper() != null && i.getUpper().longValue() < 0)) {
                     // the right operand is non zero
                     return false;
                 }

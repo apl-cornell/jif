@@ -16,37 +16,54 @@ import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
-    public Expr toJava(Label label, JifToJavaRewriter rw) throws SemanticException {
-        PairLabel pl = (PairLabel)label;
-        if (pl.confPolicy().isBottomConfidentiality() && pl.integPolicy().isTopIntegrity()) {
+    public Expr toJava(Label label, JifToJavaRewriter rw)
+            throws SemanticException {
+        PairLabel pl = (PairLabel) label;
+        if (pl.confPolicy().isBottomConfidentiality()
+                && pl.integPolicy().isTopIntegrity()) {
             return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".noComponents()");
         }
         Expr cexp = policyToJava(pl.confPolicy(), rw);
         Expr iexp = policyToJava(pl.integPolicy(), rw);
-        return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".toLabel(%E, %E)", cexp, iexp);
+        return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".toLabel(%E, %E)",
+                cexp, iexp);
     }
-    public Expr policyToJava(Policy p, JifToJavaRewriter rw) throws SemanticException {
-        if (p instanceof ConfPolicy && ((ConfPolicy)p).isBottomConfidentiality()) {
+
+    public Expr policyToJava(Policy p, JifToJavaRewriter rw)
+            throws SemanticException {
+        if (p instanceof ConfPolicy
+                && ((ConfPolicy) p).isBottomConfidentiality()) {
             return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".bottomConf()");
         }
-        if (p instanceof IntegPolicy && ((IntegPolicy)p).isTopIntegrity()) {
+        if (p instanceof IntegPolicy && ((IntegPolicy) p).isTopIntegrity()) {
             return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".topInteg()");
         }
         if (p instanceof WriterPolicy) {
-            WriterPolicy policy = (WriterPolicy)p;
+            WriterPolicy policy = (WriterPolicy) p;
             Expr owner = rw.principalToJava(policy.owner());
             Expr writer = rw.principalToJava(policy.writer());
-            return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".writerPolicy(%E, %E)", owner, writer);
+            return rw.qq().parseExpr(
+                    rw.runtimeLabelUtil() + ".writerPolicy(%E, %E)", owner,
+                    writer);
         }
 
         if (p instanceof ReaderPolicy) {
-            ReaderPolicy policy = (ReaderPolicy)p;
+            ReaderPolicy policy = (ReaderPolicy) p;
             Expr owner = rw.principalToJava(policy.owner());
             Expr reader = rw.principalToJava(policy.reader());
-            return (Expr) rw.qq().parseExpr(rw.runtimeLabelUtil() + ".readerPolicy(%E, %E)", owner, reader).position(Position.compilerGenerated(p.toString() + ":" + p.position().toString()));
+            return (Expr) rw
+                    .qq()
+                    .parseExpr(rw.runtimeLabelUtil() + ".readerPolicy(%E, %E)",
+                            owner, reader)
+                    .position(
+                            Position.compilerGenerated(p.toString() + ":"
+                                    + p.position().toString()));
         }
 
         if (p instanceof JoinPolicy_c) {

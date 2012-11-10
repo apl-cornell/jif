@@ -9,13 +9,15 @@ import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.Synchronized;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 /** Jif extension of the <code>Synchronized</code> node.
  *  
  *  @see polyglot.ast.Synchronized
  */
-public class JifSynchronizedExt extends JifStmtExt_c
-{
+public class JifSynchronizedExt extends JifStmtExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifSynchronizedExt(ToJavaExt toJava) {
         super(toJava);
     }

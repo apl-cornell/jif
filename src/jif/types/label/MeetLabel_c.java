@@ -23,34 +23,38 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>MeetLabel</code> interface.
  */
-public class MeetLabel_c extends Label_c implements MeetLabel
-{
+public class MeetLabel_c extends Label_c implements MeetLabel {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private final Set<Label> components;
 
     public MeetLabel_c(Set<Label> components, JifTypeSystem ts, Position pos,
             LabelToJavaExpr trans) {
         super(ts, pos, trans);
         this.components = Collections.unmodifiableSet(flatten(components));
-        if (this.components.isEmpty()) throw new InternalCompilerError("No empty meets");
+        if (this.components.isEmpty())
+            throw new InternalCompilerError("No empty meets");
     }
 
     @Override
     public boolean isRuntimeRepresentable() {
         for (Label c : components) {
-            if (! c.isRuntimeRepresentable()) {
+            if (!c.isRuntimeRepresentable()) {
                 return false;
             }
         }
 
         return true;
     }
+
     @Override
     public boolean isCanonical() {
         for (Label c : components) {
-            if (! c.isCanonical()) {
+            if (!c.isCanonical()) {
                 return false;
             }
         }
@@ -62,6 +66,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
     protected boolean isDisambiguatedImpl() {
         return true;
     }
+
     /**
      * @return true iff this label is covariant.
      *
@@ -77,16 +82,18 @@ public class MeetLabel_c extends Label_c implements MeetLabel
 
         return false;
     }
+
     @Override
     public boolean isComparable() {
         for (Label c : components) {
-            if (! c.isComparable()) {
+            if (!c.isComparable()) {
                 return false;
             }
         }
 
         return true;
     }
+
     @Override
     public boolean isEnumerable() {
         return true;
@@ -112,7 +119,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof MeetLabel_c) {
-            MeetLabel_c that = (MeetLabel_c)o;
+            MeetLabel_c that = (MeetLabel_c) o;
             return this.components.equals(that.components);
         }
         if (o instanceof Label) {
@@ -121,6 +128,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         }
         return false;
     }
+
     @Override
     public int hashCode() {
         return components.hashCode();
@@ -143,7 +151,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
 
     @Override
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
-        if (! L.isComparable() || ! L.isEnumerable())
+        if (!L.isComparable() || !L.isEnumerable())
             throw new InternalCompilerError("Cannot compare " + L);
 
         // If this = { p1 meet .. meet pn } check that there exists an i,
@@ -164,11 +172,13 @@ public class MeetLabel_c extends Label_c implements MeetLabel
 
     @Override
     public MeetLabel_c copy() {
-        MeetLabel_c l = (MeetLabel_c)super.copy();
+        MeetLabel_c l = (MeetLabel_c) super.copy();
         l.normalized = null;
         return l;
     }
+
     private Label normalized = null;
+
     @Override
     public Label normalize() {
         if (normalized == null) {
@@ -177,6 +187,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         }
         return normalized;
     }
+
     private Label normalizeImpl() {
         if (components.size() == 1) {
             return components.iterator().next();
@@ -212,6 +223,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
 //        }
         return this;
     }
+
     /**
      * @return An equivalent label with fewer components by pulling out
      * less restrictive policies.
@@ -231,8 +243,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
 
             if (ci.hasVariables() || ci.hasWritersToReaders()) {
                 needed.add(ci);
-            }
-            else {
+            } else {
                 boolean subsumed = false;
 
                 for (Iterator<Label> j = needed.iterator(); j.hasNext();) {
@@ -252,8 +263,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
                     }
                 }
 
-                if (! subsumed)
-                    needed.add(ci);
+                if (!subsumed) needed.add(ci);
             }
         }
 
@@ -264,7 +274,8 @@ public class MeetLabel_c extends Label_c implements MeetLabel
             return needed.iterator().next();
         }
 
-        return new MeetLabel_c(needed, (JifTypeSystem)ts, position(), ((JifTypeSystem_c)ts).meetLabelTranslator());
+        return new MeetLabel_c(needed, (JifTypeSystem) ts, position(),
+                ((JifTypeSystem_c) ts).meetLabelTranslator());
     }
 
     private static Set<Label> flatten(Set<Label> comps) {
@@ -288,8 +299,7 @@ public class MeetLabel_c extends Label_c implements MeetLabel
             if (L instanceof MeetLabel) {
                 Collection<Label> lComps = ((MeetLabel) L).meetComponents();
                 c.addAll(lComps);
-            }
-            else {
+            } else {
                 c.add(L);
             }
         }
@@ -303,15 +313,16 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         for (Label c : components) {
             confPols.add(c.confProjection());
         }
-        return ((JifTypeSystem)ts).meetConfPolicy(position, confPols);
+        return ((JifTypeSystem) ts).meetConfPolicy(position, confPols);
     }
+
     @Override
     public IntegPolicy integProjection() {
         Set<IntegPolicy> integPols = new HashSet<IntegPolicy>();
         for (Label c : components) {
             integPols.add(c.integProjection());
         }
-        return ((JifTypeSystem)ts).meetIntegPolicy(position, integPols);
+        return ((JifTypeSystem) ts).meetIntegPolicy(position, integPols);
     }
 
     @Override
@@ -325,7 +336,8 @@ public class MeetLabel_c extends Label_c implements MeetLabel
 
     @Override
     public Label subst(LabelSubstitution substitution) throws SemanticException {
-        if (components.isEmpty() || substitution.stackContains(this) || !substitution.recurseIntoChildren(this)) {
+        if (components.isEmpty() || substitution.stackContains(this)
+                || !substitution.recurseIntoChildren(this)) {
             return substitution.substLabel(this);
         }
         substitution.pushLabel(this);
@@ -363,7 +375,6 @@ public class MeetLabel_c extends Label_c implements MeetLabel
         return false;
     }
 
-
     @Override
     public Set<Variable> variableComponents() {
         Set<Variable> s = new LinkedHashSet<Variable>();
@@ -375,14 +386,14 @@ public class MeetLabel_c extends Label_c implements MeetLabel
 
     @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) A.typeSystem();
         PathMap X = ts.pathMap().N(A.pc()).NV(A.pc());
 
         if (components.isEmpty()) {
             return X;
         }
 
-        A = (JifContext)A.pushBlock();
+        A = (JifContext) A.pushBlock();
 
         for (Label c : components) {
             A.setPc(X.N(), lc);

@@ -16,12 +16,15 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>JifMethodInstance</code> interface.
  */
 public class JifMethodInstance_c extends MethodInstance_c
-                                implements JifMethodInstance
+implements JifMethodInstance
 {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Label pcBound;
     protected Label returnLabel;
     protected List<Assertion> constraints;
@@ -29,26 +32,26 @@ public class JifMethodInstance_c extends MethodInstance_c
     protected boolean isDefaultReturnLabel;
 
     public JifMethodInstance_c(JifTypeSystem ts, Position pos,
-	    ReferenceType container, Flags flags, Type returnType,
-	    String name, Label pcBound, boolean isDefaultPCBound,
+            ReferenceType container, Flags flags, Type returnType,
+            String name, Label pcBound, boolean isDefaultPCBound,
             List<? extends Type> formalTypes, List<Label> formalArgLabels,
-	    Label returnLabel, boolean isDefaultReturnLabel,
+            Label returnLabel, boolean isDefaultReturnLabel,
             List<? extends Type> excTypes, List<Assertion> constraints) {
 
-	super(ts, pos, container, flags, returnType, name, formalTypes, excTypes);
-	this.constraints = new ArrayList<Assertion>(constraints);
+        super(ts, pos, container, flags, returnType, name, formalTypes, excTypes);
+        this.constraints = new ArrayList<Assertion>(constraints);
 
-	this.pcBound = pcBound;
+        this.pcBound = pcBound;
         this.isDefaultPCBound = isDefaultPCBound;
-	this.returnLabel = returnLabel;
+        this.returnLabel = returnLabel;
         this.isDefaultReturnLabel = isDefaultReturnLabel;
-	this.throwTypes = ListUtil.copy(throwTypes, true);
-	this.formalTypes = ListUtil.copy(formalTypes, true);
+        this.throwTypes = ListUtil.copy(throwTypes, true);
+        this.formalTypes = ListUtil.copy(formalTypes, true);
     }
 
     @Override
     public Label pcBound() {
-	return pcBound;
+        return pcBound;
     }
 
     @Override
@@ -63,13 +66,13 @@ public class JifMethodInstance_c extends MethodInstance_c
 
     @Override
     public Label returnLabel() {
-	return returnLabel;
+        return returnLabel;
     }
 
     @Override
     public void setReturnLabel(Label returnLabel, boolean isDefault) {
         this.returnLabel = returnLabel;
-	this.isDefaultReturnLabel = isDefault;
+        this.isDefaultReturnLabel = isDefault;
     }
     @Override
     public boolean isDefaultReturnLabel() {
@@ -78,78 +81,78 @@ public class JifMethodInstance_c extends MethodInstance_c
 
     @Override
     public Label returnValueLabel() {
-	JifTypeSystem jts = (JifTypeSystem) ts;
-	if (returnType.isVoid())
-	    return jts.notTaken();
+        JifTypeSystem jts = (JifTypeSystem) ts;
+        if (returnType.isVoid())
+            return jts.notTaken();
 
-	return jts.labelOfType(returnType);
+        return jts.labelOfType(returnType);
     }
 
     @Override
     public List<Assertion> constraints() {
-	return constraints;
+        return constraints;
     }
 
     @Override
     public void setConstraints(List<Assertion> constraints) {
-	this.constraints = new ArrayList<Assertion>(constraints);
+        this.constraints = new ArrayList<Assertion>(constraints);
     }
 
     @Override
     public String toString() {
-	String s = "method " + flags.translate() + returnType +
-	    " " + name;
+        String s = "method " + flags.translate() + returnType +
+                " " + name;
 
-	if (pcBound != null) {
-	    s += pcBound.toString();
-	}
+        if (pcBound != null) {
+            s += pcBound.toString();
+        }
 
-	s += "(";
+        s += "(";
 
-	for (Iterator<Type> i = formalTypes.iterator(); i.hasNext(); ) {
-	    Type t = i.next();
-	    s += t.toString();
+        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext(); ) {
+            Type t = i.next();
+            s += t.toString();
 
-	    if (i.hasNext()) {
-		s += ", ";
-	    }
-	}
+            if (i.hasNext()) {
+                s += ", ";
+            }
+        }
 
-	s += ")";
+        s += ")";
 
-	if (returnLabel != null) {
-	    s += " : " + returnLabel.toString();
-	}
+        if (returnLabel != null) {
+            s += " : " + returnLabel.toString();
+        }
 
-	if (! this.throwTypes.isEmpty()) {
-	    s += " throws (";
+        if (! this.throwTypes.isEmpty()) {
+            s += " throws (";
 
-	    for (Iterator<Type> i = throwTypes.iterator(); i.hasNext(); ) {
-		Type t = i.next();
-		s += t.toString();
+            for (Iterator<Type> i = throwTypes.iterator(); i.hasNext(); ) {
+                Type t = i.next();
+                s += t.toString();
 
-		if (i.hasNext()) {
-		    s += ", ";
-		}
-	    }
+                if (i.hasNext()) {
+                    s += ", ";
+                }
+            }
 
-	    s += ")";
-	}
+            s += ")";
+        }
 
-	if (! constraints.isEmpty()) {
-	    s += " where ";
+        if (! constraints.isEmpty()) {
+            s += " where ";
 
-	    for (Iterator<Assertion> i = constraints.iterator(); i.hasNext(); ) {
-		Assertion c = i.next();
-		s += c.toString();
+            for (Iterator<Assertion> i = constraints.iterator(); i.hasNext(); ) {
+                Assertion c = i.next();
+                s += c.toString();
 
-		if (i.hasNext()) {
-		    s += ", ";
-		}
-	    }
-	}
+                if (i.hasNext()) {
+                    s += ", ";
+                }
+            }
+        }
 
-	return s;
+        return s;
     }
 
     @Override
@@ -174,15 +177,15 @@ public class JifMethodInstance_c extends MethodInstance_c
 
     @Override
     public void subst(VarMap bounds) {
-	this.pcBound = bounds.applyTo(pcBound);
-	this.returnLabel = bounds.applyTo(returnLabel);
-	this.returnType = bounds.applyTo(returnType);
+        this.pcBound = bounds.applyTo(pcBound);
+        this.returnLabel = bounds.applyTo(returnLabel);
+        this.returnType = bounds.applyTo(returnType);
 
-	List<Type> formalTypes = new LinkedList<Type>();
-	for (Type t : formalTypes()) {
-	    formalTypes.add(bounds.applyTo(t));
-	}
-	this.setFormalTypes(formalTypes);
+        List<Type> formalTypes = new LinkedList<Type>();
+        for (Type t : formalTypes()) {
+            formalTypes.add(bounds.applyTo(t));
+        }
+        this.setFormalTypes(formalTypes);
 
         List<Type> throwTypes = new LinkedList<Type>();
         for (Type t : throwTypes()) {
@@ -209,7 +212,7 @@ public class JifMethodInstance_c extends MethodInstance_c
             throwTypes.add(tsbs.rewriteType(t));
         }
         this.setThrowTypes(throwTypes);
-        
+
     }
 
     @Override
@@ -222,32 +225,32 @@ public class JifMethodInstance_c extends MethodInstance_c
         if (showInstanceKind) {
             s = "method ";
         }
-	s += flags.translate() + jts.unlabel(returnType) +
-	    " " + name + "(";
+        s += flags.translate() + jts.unlabel(returnType) +
+                " " + name + "(";
 
-	for (Iterator<Type> i = formalTypes.iterator(); i.hasNext(); ) {
-	    Type t = i.next();
-	    s += jts.unlabel(t).toString();
+        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext(); ) {
+            Type t = i.next();
+            s += jts.unlabel(t).toString();
 
-	    if (i.hasNext()) {
-	        s += ", ";
-	    }
-	}
+            if (i.hasNext()) {
+                s += ", ";
+            }
+        }
 
-	s += ")";
+        s += ")";
 
-	return s;
+        return s;
     }
 
     @Override
     public String signature() {
-        if (Report.should_report(Report.debug, 1)) { 
+        if (Report.should_report(Report.debug, 1)) {
             return fullSignature();
         }
         return debugString(false);
     }
-    public String fullSignature() { 
-	StringBuffer sb = new StringBuffer();
+    public String fullSignature() {
+        StringBuffer sb = new StringBuffer();
         sb.append(name);
         if (!isDefaultPCBound() || Report.should_report(Report.debug, 1)) {
             sb.append(pcBound);
@@ -278,7 +281,7 @@ public class JifMethodInstance_c extends MethodInstance_c
             sb.append(":");
             sb.append(returnLabel);
         }
-       return sb.toString();
+        return sb.toString();
 
     }
 

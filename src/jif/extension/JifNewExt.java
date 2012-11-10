@@ -24,13 +24,15 @@ import polyglot.types.FieldInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>New</code> node.
  * 
  *  @see polyglot.ast.New
  */
-public class JifNewExt extends JifExprExt
-{
+public class JifNewExt extends JifExprExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifNewExt(ToJavaExt toJava) {
         super(toJava);
     }
@@ -54,7 +56,8 @@ public class JifNewExt extends JifExprExt
         if (ct != null && ct.fields() != null) {
             for (FieldInstance fi : ct.fields()) {
                 JifFieldInstance jfi = (JifFieldInstance) fi;
-                if (jfi.flags().isFinal() && jfi.flags().isStatic() && jfi.hasInitializer()) {
+                if (jfi.flags().isFinal() && jfi.flags().isStatic()
+                        && jfi.hasInitializer()) {
                     AccessPathField path =
                             (AccessPathField) ts.varInstanceToAccessPath(jfi,
                                     jfi.position());
@@ -63,7 +66,8 @@ public class JifNewExt extends JifExprExt
                         Label dl = ts.dynamicLabel(jfi.position(), path);
                         Label rhs_label = (Label) init;
                         if (rhs_label == null) {
-                            throw new InternalCompilerError("FinalParams has not run yet");
+                            throw new InternalCompilerError(
+                                    "FinalParams has not run yet");
                             // label checking has not been done on ct yet
 //                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
 //                            ParsedClassType pct = (ParsedClassType) ct;
@@ -84,11 +88,14 @@ public class JifNewExt extends JifExprExt
 //                            }
                         }
                         A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
-                    } else if (ts.isImplicitCastValid(jfi.type(), ts.Principal())) {
-                        DynamicPrincipal dp = ts.dynamicPrincipal(jfi.position(), path);
+                    } else if (ts.isImplicitCastValid(jfi.type(),
+                            ts.Principal())) {
+                        DynamicPrincipal dp =
+                                ts.dynamicPrincipal(jfi.position(), path);
                         Principal rhs_principal = (Principal) init;
                         if (rhs_principal == null) {
-                            throw new InternalCompilerError("FinalParams has not run yet");
+                            throw new InternalCompilerError(
+                                    "FinalParams has not run yet");
                             // label checking has not been done on ct yet
 //                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
 //                            ParsedClassType pct = (ParsedClassType) ct;
@@ -114,30 +121,29 @@ public class JifNewExt extends JifExprExt
             }
         }
 
-
         constructorChecker.checkConstructorAuthority(ct, A, lc, noe.position());
 
-        Label newLabel = ts.freshLabelVariable(noe.position(), "new" + ct.name(),
-                "label of the reference to the newly created " +
-                        ct.name() + " object, at " + noe.position());
+        Label newLabel =
+                ts.freshLabelVariable(
+                        noe.position(),
+                        "new" + ct.name(),
+                        "label of the reference to the newly created "
+                                + ct.name() + " object, at " + noe.position());
 
-        if (ts.isLabeled(noe.type()) ) {
+        if (ts.isLabeled(noe.type())) {
             // error messages for equality constraints aren't displayed, so no
             // need to define error messages.
             lc.constrain(new NamedLabel("new_label",
                     "label of the reference to the newly created " + ct.name(),
-                    newLabel),
-                    LabelConstraint.EQUAL,
-                    new NamedLabel("declared_label",
-                            "declared label of the newly created " + ct.name(),
-                            ts.labelOfType(noe.type())),
-                            A.labelEnv(),
-                            noe.position());
+                    newLabel), LabelConstraint.EQUAL, new NamedLabel(
+                    "declared_label", "declared label of the newly created "
+                            + ct.name(), ts.labelOfType(noe.type())), A
+                    .labelEnv(), noe.position());
         }
-        CallHelper helper = lc.createCallHelper(newLabel, ct,
-                (JifProcedureInstance)noe.constructorInstance(),
-                noe.arguments(),
-                node().position());
+        CallHelper helper =
+                lc.createCallHelper(newLabel, ct,
+                        (JifProcedureInstance) noe.constructorInstance(),
+                        noe.arguments(), node().position());
 
         helper.checkCall(lc, throwTypes, false);
 

@@ -15,10 +15,13 @@ import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** The integrity projection of a (non meet, join or pair) label.
  */
 public class IntegProjectionPolicy_c extends Policy_c implements IntegPolicy {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private final Label label;
 
     public IntegProjectionPolicy_c(Label label, JifTypeSystem ts, Position pos) {
@@ -34,10 +37,12 @@ public class IntegProjectionPolicy_c extends Policy_c implements IntegPolicy {
     public boolean isSingleton() {
         return true;
     }
+
     @Override
     public boolean isCanonical() {
         return label.isCanonical();
     }
+
     @Override
     public boolean isRuntimeRepresentable() {
         return label.isRuntimeRepresentable();
@@ -52,9 +57,9 @@ public class IntegProjectionPolicy_c extends Policy_c implements IntegPolicy {
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof IntegProjectionPolicy_c) {
-            IntegProjectionPolicy_c that = (IntegProjectionPolicy_c)o;
-            return (this.label == that.label ||
-                    (this.label != null && this.label.equals(that.label)));
+            IntegProjectionPolicy_c that = (IntegProjectionPolicy_c) o;
+            return (this.label == that.label || (this.label != null && this.label
+                    .equals(that.label)));
         }
         return false;
     }
@@ -67,7 +72,8 @@ public class IntegProjectionPolicy_c extends Policy_c implements IntegPolicy {
     @Override
     public boolean leq_(IntegPolicy p, LabelEnv env, SearchState state) {
         if (p instanceof IntegProjectionPolicy_c) {
-            return env.leq(this.label(), ((IntegProjectionPolicy_c)p).label(), state);
+            return env.leq(this.label(), ((IntegProjectionPolicy_c) p).label(),
+                    state);
         }
         if (p.isTopIntegrity()) return true;
         Label ub = env.findUpperBound(this.label);
@@ -85,14 +91,15 @@ public class IntegProjectionPolicy_c extends Policy_c implements IntegPolicy {
     }
 
     @Override
-    public Policy subst(LabelSubstitution substitution) throws SemanticException {
+    public Policy subst(LabelSubstitution substitution)
+            throws SemanticException {
 
         Label newLabel = label.subst(substitution);
         if (newLabel == label) {
             return substitution.substPolicy(this).simplify();
         }
 
-        JifTypeSystem ts = (JifTypeSystem)typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) typeSystem();
         Policy newPolicy = ts.integProjection(newLabel);
         return substitution.substPolicy(newPolicy).simplify();
     }
@@ -106,34 +113,41 @@ public class IntegProjectionPolicy_c extends Policy_c implements IntegPolicy {
     public boolean isBottomIntegrity() {
         return label.isBottom();
     }
+
     @Override
     public boolean isTopIntegrity() {
         return label.isTop();
     }
+
     @Override
     public boolean isTop() {
         return isTopIntegrity();
     }
+
     @Override
     public boolean isBottom() {
         return isBottomIntegrity();
     }
+
     @Override
     public boolean hasWritersToReaders() {
         return label.hasWritersToReaders();
     }
+
     @Override
     public boolean hasVariables() {
         return label.hasVariables();
     }
+
     @Override
     public IntegPolicy meet(IntegPolicy p) {
-        JifTypeSystem ts = (JifTypeSystem)this.ts;
+        JifTypeSystem ts = (JifTypeSystem) this.ts;
         return ts.meet(this, p);
     }
+
     @Override
     public IntegPolicy join(IntegPolicy p) {
-        JifTypeSystem ts = (JifTypeSystem)this.ts;
+        JifTypeSystem ts = (JifTypeSystem) this.ts;
         return ts.join(this, p);
     }
 }

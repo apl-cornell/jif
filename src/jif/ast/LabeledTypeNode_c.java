@@ -11,6 +11,7 @@ import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
@@ -21,12 +22,15 @@ import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>LabeledTypeNode</code> interface.
  */
-public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Ambiguous
-{
+public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode,
+        Ambiguous {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected TypeNode typePart;
     protected LabelNode labelPart;
 
-    public LabeledTypeNode_c(Position pos, TypeNode typePart, LabelNode labelPart) {
+    public LabeledTypeNode_c(Position pos, TypeNode typePart,
+            LabelNode labelPart) {
         super(pos);
         this.typePart = typePart;
         this.labelPart = labelPart;
@@ -56,7 +60,8 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Am
         return n;
     }
 
-    protected LabeledTypeNode_c reconstruct(TypeNode typePart, LabelNode labelPart) {
+    protected LabeledTypeNode_c reconstruct(TypeNode typePart,
+            LabelNode labelPart) {
         if (typePart != this.typePart || labelPart != this.labelPart) {
             LabeledTypeNode_c n = (LabeledTypeNode_c) copy();
             n.typePart = typePart;
@@ -95,11 +100,12 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode, Am
         if (n.typePart.isDisambiguated()) {
             // give n's type a partial disambiguation, even if we can't give
             // the full one yet.
-            n = (LabeledTypeNode_c)n.type(n.typePart.type());
+            n = (LabeledTypeNode_c) n.type(n.typePart.type());
         }
         if (!n.typePart.isDisambiguated() || !n.labelPart.isDisambiguated()) {
             // the children haven't been disambiguated yet
-            ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+            ar.job().extensionInfo().scheduler().currentGoal()
+                    .setUnreachableThisRun();
             return n;
         }
 

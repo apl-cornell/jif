@@ -11,8 +11,10 @@ import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.TypeObject;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class ProviderLabel_c extends Label_c implements ProviderLabel {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     /**
      * The class that this is labelling.

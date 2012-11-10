@@ -9,6 +9,7 @@ import jif.types.SemanticDetailedException;
 import polyglot.ast.Node;
 import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
 /** The delegate of the <code>JifClassDecl</code> node.
@@ -16,6 +17,8 @@ import polyglot.visit.TypeChecker;
  *  @see jif.ast.JifClassDecl
  */
 public class JifClassDeclDel extends JifJL_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifClassDeclDel() {
     }
 
@@ -24,9 +27,8 @@ public class JifClassDeclDel extends JifJL_c {
      */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JifClassDecl cd = (JifClassDecl)this.node();
-        JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-
+        JifClassDecl cd = (JifClassDecl) this.node();
+        JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();
 
         // check that there are not two static methods called "main"
         MethodInstance staticMain = null;
@@ -37,13 +39,14 @@ public class JifClassDeclDel extends JifJL_c {
                 if (staticMain != null) {
                     // this is the second static method named main.
                     // we don't like this.
-                    throw new SemanticDetailedException("Only one static " +
-                            "method named \"main\" allowed per class.",
-                            "Two main methods can be used to invoke a Jif " +
-                                    "program: public static main(String[]), or public " +
-                                    "static main(principal, String[]). Any class may " +
-                                    "have at most one static method named \"main\".",
-                                    mi.position());
+                    throw new SemanticDetailedException(
+                            "Only one static "
+                                    + "method named \"main\" allowed per class.",
+                            "Two main methods can be used to invoke a Jif "
+                                    + "program: public static main(String[]), or public "
+                                    + "static main(principal, String[]). Any class may "
+                                    + "have at most one static method named \"main\".",
+                            mi.position());
                 }
 
                 staticMain = mi;
@@ -53,14 +56,15 @@ public class JifClassDeclDel extends JifJL_c {
         // check that if this class extends Throwable, then it does not have
         // any parameters.
         if (cd.type().isSubtype(ts.Throwable())) {
-            JifParsedPolyType jppt = (JifParsedPolyType)cd.type();
+            JifParsedPolyType jppt = (JifParsedPolyType) cd.type();
             if (jppt.params().size() > 0) {
-                throw new SemanticDetailedException("Subclasses of " +
-                        "java.lang.Throwable can not have parameters.",
-                        "Subclasses of java.lang.Throwable can not have any parameters, " +
-                                "since Jif does not currently support catch blocks for " +
-                                "parameterized subclasses of Throwable.",
-                                jppt.position());
+                throw new SemanticDetailedException(
+                        "Subclasses of "
+                                + "java.lang.Throwable can not have parameters.",
+                        "Subclasses of java.lang.Throwable can not have any parameters, "
+                                + "since Jif does not currently support catch blocks for "
+                                + "parameterized subclasses of Throwable.",
+                        jppt.position());
             }
         }
 

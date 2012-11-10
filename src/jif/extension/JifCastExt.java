@@ -13,13 +13,15 @@ import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>Cast</code> node.
  *
  *  @see polyglot.ast.Cast
  */
-public class JifCastExt extends JifExprExt
-{
+public class JifCastExt extends JifExprExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifCastExt(ToJavaExt toJava) {
         super(toJava);
     }
@@ -41,12 +43,15 @@ public class JifCastExt extends JifExprExt
         // label check the type too, since the type may leak information
         A = (JifContext) A.pushBlock();
         A.setPc(Xe.N(), lc);
-        PathMap Xct = ts.labelTypeCheckUtil().labelCheckType(c.castType().type(), lc, throwTypes, pos);
+        PathMap Xct =
+                ts.labelTypeCheckUtil().labelCheckType(c.castType().type(), lc,
+                        throwTypes, pos);
         A = (JifContext) A.pop();
         PathMap X = Xe.N(ts.notTaken()).join(Xct);
 
         // the cast may throw a class cast exception.
-        if (c.expr().type().isReference() && ((JifCastDel)c.del()).throwsClassCastException()) {
+        if (c.expr().type().isReference()
+                && ((JifCastDel) c.del()).throwsClassCastException()) {
             checkAndRemoveThrowType(throwTypes, ts.ClassCastException());
             X = X.exc(X.NV(), ts.ClassCastException());
         }

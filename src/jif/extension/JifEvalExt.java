@@ -9,13 +9,15 @@ import polyglot.ast.Eval;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>Eval</code> node. 
  * 
  *  @see polyglot.ast.Eval
  */
-public class JifEvalExt extends JifStmtExt_c
-{
+public class JifEvalExt extends JifStmtExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifEvalExt(ToJavaExt toJava) {
         super(toJava);
     }

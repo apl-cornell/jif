@@ -7,9 +7,11 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeObject_c;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class ActsForConstraint_c<Actor extends ActsForParam, Granter extends ActsForParam>
 extends TypeObject_c implements ActsForConstraint<Actor, Granter> {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected ActsForConstraintToJavaExpr toJava;
     protected Actor actor;

@@ -21,13 +21,16 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** Represents the meet of a number of policies. 
  */
 public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private final Set<P> meetComponents;
     private Integer hashCode = null;
-    
+
     public MeetPolicy_c(Set<P> components, JifTypeSystem ts, Position pos) {
         super(ts, pos);
         this.meetComponents = Collections.unmodifiableSet(flatten(components));
@@ -35,37 +38,40 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
             throw new InternalCompilerError("Empty collection!");
         }
     }
-    
+
     @Override
     public boolean isSingleton() {
         return meetComponents.size() == 1;
     }
+
     @Override
     public boolean isCanonical() {
         for (P c : meetComponents) {
-            if (! c.isCanonical()) {
+            if (!c.isCanonical()) {
                 return false;
             }
-        }        
+        }
         return true;
     }
+
     @Override
     public boolean isRuntimeRepresentable() {
         for (P c : meetComponents) {
-            if (! c.isRuntimeRepresentable()) {
+            if (!c.isRuntimeRepresentable()) {
                 return false;
             }
-        }        
+        }
         return true;
     }
-            
+
     @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof MeetPolicy_c) {
             @SuppressWarnings("rawtypes")
             MeetPolicy_c that = (MeetPolicy_c) o;
-            return this.hashCode() == that.hashCode() && this.meetComponents.equals(that.meetComponents);
+            return this.hashCode() == that.hashCode()
+                    && this.meetComponents.equals(that.meetComponents);
         }
         if (o instanceof Policy) {
             // see if it matches a singleton
@@ -73,6 +79,7 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
         }
         return false;
     }
+
     @Override
     public int hashCode() {
         if (hashCode == null) {
@@ -80,22 +87,22 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
         }
         return hashCode.intValue();
     }
-    
+
     @Override
     public String toString(Set<Label> printedLabels) {
         String s = "";
-        for (Iterator<P> i = meetComponents.iterator(); i.hasNext(); ) {
+        for (Iterator<P> i = meetComponents.iterator(); i.hasNext();) {
             P c = i.next();
             s += c.toString(printedLabels);
-            
+
             if (i.hasNext()) {
                 s += " meet ";
             }
         }
-        
+
         return s;
     }
-    
+
     protected boolean leq_(Policy p, LabelEnv env, SearchState state) {
         // If this = { .. Pi .. , check there exists an i
         // such that Pi <= p
@@ -104,10 +111,10 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     public Collection<P> meetComponents() {
         return Collections.unmodifiableCollection(meetComponents);
     }
@@ -122,7 +129,7 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
             return this;
         }
         if (meetComponents.size() == 1) {
-            return ((Policy)meetComponents.iterator().next()).simplify();
+            return ((Policy) meetComponents.iterator().next()).simplify();
         }
 
         Collection<P> comps = flatten(meetComponents);
@@ -132,16 +139,15 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
         for (P comp : comps) {
             @SuppressWarnings("unchecked")
             P ci = (P) comp.simplify();
-            
+
             if (ci.hasVariables() || ci.hasWritersToReaders()) {
                 needed.add(ci);
-            }
-            else {
+            } else {
                 boolean subsumed = false;
-                
-                for (Iterator<P> j = needed.iterator(); j.hasNext(); ) {
+
+                for (Iterator<P> j = needed.iterator(); j.hasNext();) {
                     P cj = j.next();
-                    
+
                     if (cj.hasVariables() || cj.hasWritersToReaders()) {
                         continue;
                     }
@@ -150,17 +156,16 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
                         subsumed = true;
                         break;
                     }
-                    
-                    if (jts.leq(ci, cj)) { 
+
+                    if (jts.leq(ci, cj)) {
                         j.remove();
                     }
                 }
-                
-                if (! subsumed)
-                    needed.add(ci);
+
+                if (!subsumed) needed.add(ci);
             }
         }
-        
+
         if (needed.equals(meetComponents)) {
             return this;
         }
@@ -170,9 +175,10 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
 
         return constructMeetPolicy(needed, position);
     }
-    
-    protected abstract Policy constructMeetPolicy(Set<P> components, Position pos);
-    
+
+    protected abstract Policy constructMeetPolicy(Set<P> components,
+            Position pos);
+
     private static <P extends Policy> Set<P> flatten(Set<P> comps) {
         // check if there are any meet policies in there.
         boolean needFlattening = false;
@@ -182,26 +188,25 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
                 break;
             }
         }
-        
+
         if (!needFlattening) return comps;
-        
+
         Set<P> c = new LinkedHashSet<P>();
         for (P p : comps) {
             if (p.isBottom()) {
                 return Collections.singleton(p);
             }
-            
+
             if (p instanceof MeetPolicy_c) {
                 @SuppressWarnings("unchecked")
                 MeetPolicy_c<P> mp = (MeetPolicy_c<P>) p;
                 Collection<P> lComps = mp.meetComponents();
-                c.addAll(lComps);                
-            }
-            else {
+                c.addAll(lComps);
+            } else {
                 c.add(p);
             }
         }
-        
+
         return c;
     }
 
@@ -211,60 +216,62 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
         for (P L : meetComponents) {
             throwTypes.addAll(L.throwTypes(ts));
         }
-        return throwTypes; 
+        return throwTypes;
     }
 
     @Override
-    public Policy subst(LabelSubstitution substitution) throws SemanticException {        
+    public Policy subst(LabelSubstitution substitution)
+            throws SemanticException {
         if (meetComponents.isEmpty()) {
             return substitution.substPolicy(this).simplify();
         }
         boolean changed = false;
         Set<P> s = new LinkedHashSet<P>();
-        
+
         for (P c : meetComponents) {
             @SuppressWarnings("unchecked")
             P newc = (P) c.subst(substitution);
             if (newc != c) changed = true;
             s.add(newc);
         }
-        
+
         if (!changed) return substitution.substPolicy(this).simplify();
-        
+
         Policy newMeetPolicy = constructMeetPolicy(flatten(s), position);
         return substitution.substPolicy(newMeetPolicy).simplify();
     }
+
     @Override
     public boolean hasWritersToReaders() {
         for (P c : meetComponents) {
             if (c.hasWritersToReaders()) return true;
         }
         return false;
-    }    
+    }
+
     @Override
     public boolean hasVariables() {
         for (P c : meetComponents) {
             if (c.hasVariables()) return true;
         }
         return false;
-    }    
+    }
 
-    
     @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) A.typeSystem();
         PathMap X = ts.pathMap().N(A.pc()).NV(A.pc());
-        
+
         if (meetComponents.isEmpty()) {
             return X;
         }
 
-        A = (JifContext)A.pushBlock();
-        
+        A = (JifContext) A.pushBlock();
+
         for (P c : meetComponents) {
             A.setPc(X.N(), lc);
             PathMap Xc = c.labelCheck(A, lc);
-            X = X.join(Xc);            
+            X = X.join(Xc);
         }
         return X;
     }
@@ -276,9 +283,10 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
             if (!c.isTop()) {
                 return false;
             }
-        }        
+        }
         return true;
     }
+
     @Override
     public boolean isBottom() {
         // bottom if any policy is bottom
@@ -286,7 +294,7 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c {
             if (c.isBottom()) {
                 return true;
             }
-        }        
+        }
         return false;
     }
 }

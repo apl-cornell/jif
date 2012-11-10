@@ -22,20 +22,21 @@ import polyglot.ast.NewArray;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>NewArray</code> node.
  * 
  *  @see polyglot.ast.NewArray
  */
-public class JifNewArrayExt extends JifExprExt
-{
+public class JifNewArrayExt extends JifExprExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifNewArrayExt(ToJavaExt toJava) {
         super(toJava);
     }
 
     @Override
-    public Node labelCheck(LabelChecker lc) throws SemanticException
-    {
+    public Node labelCheck(LabelChecker lc) throws SemanticException {
         JifTypeSystem ts = lc.jifTypeSystem();
 
         NewArray nae = (NewArray) node();
@@ -67,12 +68,13 @@ public class JifNewArrayExt extends JifExprExt
 
         if (nae.init() != null) {
             init = (ArrayInit) lc.context(A).labelCheck(nae.init());
-            ((JifArrayInitExt)(JifUtil.jifExt(init))).labelCheckElements(lc, nae.type());
+            ((JifArrayInitExt) (JifUtil.jifExt(init))).labelCheckElements(lc,
+                    nae.type());
             PathMap Xinit = getPathMap(init);
             Xs = Xs.N(ts.notTaken()).join(Xinit);
         }
 
-        if (!((JifNewArrayDel)node().del()).noNegArraySizeExcThrown()) {
+        if (!((JifNewArrayDel) node().del()).noNegArraySizeExcThrown()) {
             // a NegativeArraySizeExcepiton may be thrown, depending
             // on the value of the dimensions.
             Type nase = ts.typeForName("java.lang.NegativeArraySizeException");
@@ -92,17 +94,17 @@ public class JifNewArrayExt extends JifExprExt
         super.integerBoundsCalculated();
         boolean noNegArraySizeExcThrown = noNegArraySizeExcThrown();
         if (noNegArraySizeExcThrown) {
-            JifNewArrayDel del = (JifNewArrayDel)this.node().del();
+            JifNewArrayDel del = (JifNewArrayDel) this.node().del();
             del.setNoNegArraySizeExcThrown();
         }
     }
 
     private boolean noNegArraySizeExcThrown() {
-        NewArray na = (NewArray)node();
+        NewArray na = (NewArray) node();
         List<Expr> dims = na.dims();
         if (dims == null) return true;
         for (Expr d : dims) {
-            JifExprExt ext = (JifExprExt)JifUtil.jifExt(d);
+            JifExprExt ext = (JifExprExt) JifUtil.jifExt(d);
 
             IntegerBoundsChecker.Interval bounds = ext.getNumericBounds();
             // if bound is not null, then bound < d
@@ -116,6 +118,5 @@ public class JifNewArrayExt extends JifExprExt
         }
         return true;
     }
-
 
 }

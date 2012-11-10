@@ -17,16 +17,16 @@ import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class PairLabel_c extends Label_c implements PairLabel {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private final ConfPolicy confPolicy;
     private final IntegPolicy integPolicy;
 
-    public PairLabel_c(JifTypeSystem ts,
-            ConfPolicy confPolicy,
-            IntegPolicy integPolicy,
-            Position pos,
-            LabelToJavaExpr trans) {
+    public PairLabel_c(JifTypeSystem ts, ConfPolicy confPolicy,
+            IntegPolicy integPolicy, Position pos, LabelToJavaExpr trans) {
         super(ts, pos, trans);
         this.confPolicy = confPolicy;
         this.integPolicy = integPolicy;
@@ -36,6 +36,7 @@ public class PairLabel_c extends Label_c implements PairLabel {
     public ConfPolicy confPolicy() {
         return this.confPolicy;
     }
+
     @Override
     public IntegPolicy integPolicy() {
         return this.integPolicy;
@@ -43,22 +44,34 @@ public class PairLabel_c extends Label_c implements PairLabel {
 
     @Override
     public boolean isRuntimeRepresentable() {
-        return confPolicy.isRuntimeRepresentable() &&
-                integPolicy.isRuntimeRepresentable();
+        return confPolicy.isRuntimeRepresentable()
+                && integPolicy.isRuntimeRepresentable();
     }
+
     @Override
-    public boolean isCovariant() { return false; }
+    public boolean isCovariant() {
+        return false;
+    }
+
     @Override
-    public boolean isComparable() { return true; }
+    public boolean isComparable() {
+        return true;
+    }
+
     @Override
     public boolean isCanonical() {
-        return confPolicy.isCanonical() &&
-                integPolicy.isCanonical();
+        return confPolicy.isCanonical() && integPolicy.isCanonical();
     }
+
     @Override
-    public boolean isEnumerable() { return true; }
+    public boolean isEnumerable() {
+        return true;
+    }
+
     @Override
-    protected boolean isDisambiguatedImpl() { return isCanonical(); }
+    protected boolean isDisambiguatedImpl() {
+        return isCanonical();
+    }
 
     @Override
     public boolean isBottom() {
@@ -73,20 +86,20 @@ public class PairLabel_c extends Label_c implements PairLabel {
     @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
-        if (! (o instanceof PairLabel_c)) {
+        if (!(o instanceof PairLabel_c)) {
             return false;
         }
         PairLabel_c that = (PairLabel_c) o;
-        return (this.confPolicy.equals(that.confPolicy)) &&
-                (this.integPolicy.equals(that.integPolicy));
+        return (this.confPolicy.equals(that.confPolicy))
+                && (this.integPolicy.equals(that.integPolicy));
     }
 
     @Override
     protected Label simplifyImpl() {
-        ConfPolicy cp = (ConfPolicy)confPolicy.simplify();
-        IntegPolicy ip = (IntegPolicy)integPolicy.simplify();
+        ConfPolicy cp = (ConfPolicy) confPolicy.simplify();
+        IntegPolicy ip = (IntegPolicy) integPolicy.simplify();
         if (cp != confPolicy || ip != integPolicy) {
-            return ((JifTypeSystem)ts).pairLabel(position, cp, ip);
+            return ((JifTypeSystem) ts).pairLabel(position, cp, ip);
         }
         return this;
     }
@@ -95,6 +108,7 @@ public class PairLabel_c extends Label_c implements PairLabel {
     public ConfPolicy confProjection() {
         return confPolicy();
     }
+
     @Override
     public IntegPolicy integProjection() {
         return integPolicy();
@@ -119,14 +133,12 @@ public class PairLabel_c extends Label_c implements PairLabel {
         StringBuffer sb = new StringBuffer();
         if (topLevel) sb.append("{");
         if (Report.should_report(Report.debug, 2)) {
-            sb.append("<pair " + confPolicy.toString(printedLabels) +
-                    " ; " + integPolicy.toString(printedLabels) + ">");
-        }
-        else if (Report.should_report(Report.debug, 1)) {
-            sb.append(confPolicy.toString(printedLabels) +
-                    "; " + integPolicy.toString(printedLabels));
-        }
-        else {
+            sb.append("<pair " + confPolicy.toString(printedLabels) + " ; "
+                    + integPolicy.toString(printedLabels) + ">");
+        } else if (Report.should_report(Report.debug, 1)) {
+            sb.append(confPolicy.toString(printedLabels) + "; "
+                    + integPolicy.toString(printedLabels));
+        } else {
             String cs = "";
             if (!topLevel || !confPolicy.isBottomConfidentiality()) {
                 cs = confPolicy.toString(printedLabels);
@@ -137,8 +149,7 @@ public class PairLabel_c extends Label_c implements PairLabel {
             }
             if (cs.length() > 0 && is.length() > 0) {
                 sb.append(cs + "; " + is);
-            }
-            else {
+            } else {
                 sb.append(cs + is);
             }
         }
@@ -149,14 +160,14 @@ public class PairLabel_c extends Label_c implements PairLabel {
     @Override
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
         if (L instanceof PairLabel) {
-            PairLabel that = (PairLabel)L;
+            PairLabel that = (PairLabel) L;
 //            System.out.println("***Comparing " + this + " to " + that);
 //            System.out.println("   to wit " + this.confPolicy() + " to " + that.confPolicy());
 //            System.out.println("   and " + this.integPolicy() + " to " + that.integPolicy());
 //            System.out.println("   " + env.leq(this.confPolicy(), that.confPolicy()));
 //            System.out.println("   " + env.leq(this.integPolicy(), that.integPolicy()));
-            return env.leq(this.confPolicy(), that.confPolicy(), state) &&
-                    env.leq(this.integPolicy(), that.integPolicy(), state);
+            return env.leq(this.confPolicy(), that.confPolicy(), state)
+                    && env.leq(this.integPolicy(), that.integPolicy(), state);
         }
         return false;
     }
@@ -164,12 +175,14 @@ public class PairLabel_c extends Label_c implements PairLabel {
     @Override
     public Label subst(LabelSubstitution substitution) throws SemanticException {
         PairLabel lbl = this;
-        if  (substitution.recurseIntoChildren(lbl)) {
-            ConfPolicy newCP = (ConfPolicy)lbl.confPolicy().subst(substitution);
-            IntegPolicy newIP = (IntegPolicy)lbl.integPolicy().subst(substitution);
+        if (substitution.recurseIntoChildren(lbl)) {
+            ConfPolicy newCP =
+                    (ConfPolicy) lbl.confPolicy().subst(substitution);
+            IntegPolicy newIP =
+                    (IntegPolicy) lbl.integPolicy().subst(substitution);
 
             if (newCP != this.confPolicy || newIP != this.integPolicy) {
-                lbl = ((JifTypeSystem)ts).pairLabel(position, newCP, newIP);
+                lbl = ((JifTypeSystem) ts).pairLabel(position, newCP, newIP);
             }
         }
         return substitution.substLabel(lbl);
@@ -185,17 +198,16 @@ public class PairLabel_c extends Label_c implements PairLabel {
 
     @Override
     public boolean hasWritersToReaders() {
-        return confPolicy.hasWritersToReaders() ||
-                integPolicy.hasWritersToReaders();
+        return confPolicy.hasWritersToReaders()
+                || integPolicy.hasWritersToReaders();
     }
 
     @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) A.typeSystem();
         PathMap X = ts.pathMap().N(A.pc()).NV(A.pc());
 
-
-        A = (JifContext)A.pushBlock();
+        A = (JifContext) A.pushBlock();
 
         PathMap Xc = confPolicy.labelCheck(A, lc);
         X = X.join(Xc);

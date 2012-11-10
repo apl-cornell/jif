@@ -37,6 +37,7 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -45,8 +46,9 @@ import polyglot.visit.TypeBuilder;
 
 /** An implementation of the <code>JifClassDecl</code> interface.
  */
-public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
-{
+public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<ParamDecl> params;
     protected List<PrincipalNode> authority;
     protected List<ConstraintNode<Assertion>> constraints;
@@ -56,25 +58,29 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             List<TypeNode> interfaces, List<PrincipalNode> authority,
             List<ConstraintNode<Assertion>> constraints, ClassBody body) {
         super(pos, flags, name, superClass, interfaces, body);
-        this.params = Collections.unmodifiableList(new ArrayList<ParamDecl>(params));
-        this.authority = Collections.unmodifiableList(new ArrayList<PrincipalNode>(authority));
+        this.params =
+                Collections.unmodifiableList(new ArrayList<ParamDecl>(params));
+        this.authority =
+                Collections.unmodifiableList(new ArrayList<PrincipalNode>(
+                        authority));
         this.constraints =
                 Collections
-                .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
-                        constraints));
+                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
+                                constraints));
     }
 
     @Override
     public List<ConstraintNode<Assertion>> constraints() {
         return this.constraints;
     }
+
     @Override
     public JifClassDecl constraints(List<ConstraintNode<Assertion>> constraints) {
         JifClassDecl_c n = (JifClassDecl_c) copy();
         n.constraints =
                 Collections
-                .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
-                        constraints));
+                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
+                                constraints));
         return n;
     }
 
@@ -86,7 +92,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
     @Override
     public JifClassDecl params(List<ParamDecl> params) {
         JifClassDecl_c n = (JifClassDecl_c) copy();
-        n.params = Collections.unmodifiableList(new ArrayList<ParamDecl>(params));
+        n.params =
+                Collections.unmodifiableList(new ArrayList<ParamDecl>(params));
         return n;
     }
 
@@ -98,7 +105,9 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
     @Override
     public JifClassDecl authority(List<PrincipalNode> authority) {
         JifClassDecl_c n = (JifClassDecl_c) copy();
-        n.authority = Collections.unmodifiableList(new ArrayList<PrincipalNode>(authority));
+        n.authority =
+                Collections.unmodifiableList(new ArrayList<PrincipalNode>(
+                        authority));
         return n;
     }
 
@@ -106,28 +115,33 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             TypeNode superClass, List<TypeNode> interfaces,
             List<PrincipalNode> authority,
             List<ConstraintNode<Assertion>> constraints, ClassBody body) {
-        if (! CollectionUtil.equals(params, this.params) || ! CollectionUtil.equals(authority, this.authority)
-                || ! CollectionUtil.equals(params, this.constraints)) {
+        if (!CollectionUtil.equals(params, this.params)
+                || !CollectionUtil.equals(authority, this.authority)
+                || !CollectionUtil.equals(params, this.constraints)) {
             JifClassDecl_c n = (JifClassDecl_c) copy();
             n.params = ListUtil.copy(params, true);
             n.authority = ListUtil.copy(authority, true);
             n.constraints = ListUtil.copy(constraints, true);
-            return (JifClassDecl_c) n.reconstruct(name, superClass, interfaces, body);
+            return (JifClassDecl_c) n.reconstruct(name, superClass, interfaces,
+                    body);
         }
 
-        return (JifClassDecl_c) super.reconstruct(name, superClass, interfaces, body);
+        return (JifClassDecl_c) super.reconstruct(name, superClass, interfaces,
+                body);
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id)visitChild(this.name, v);
+        Id name = (Id) visitChild(this.name, v);
         List<ParamDecl> params = visitList(this.params, v);
         TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
         List<TypeNode> interfaces = visitList(this.interfaces, v);
         List<PrincipalNode> authority = visitList(this.authority, v);
-        List<ConstraintNode<Assertion>> constraints = visitList(this.constraints, v);
+        List<ConstraintNode<Assertion>> constraints =
+                visitList(this.constraints, v);
         ClassBody body = (ClassBody) visitChild(this.body, v);
-        return reconstruct(name, params, superClass, interfaces, authority, constraints, body);
+        return reconstruct(name, params, superClass, interfaces, authority,
+                constraints, body);
     }
 
     @Override
@@ -137,13 +151,14 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         A.setProvider(((JifClassType) type).provider());
         return addConstraintsToContext(A);
     }
+
     @Override
     public Context enterChildScope(Node child, Context c) {
         if (child == this.body) {
             JifContext A = (JifContext) c;
             JifParsedPolyType ct = (JifParsedPolyType) this.type;
             ClassType inst = ct;
-            A = (JifContext)A.pushClass(ct, inst);
+            A = (JifContext) A.pushClass(ct, inst);
             return addAuthorityToContext(A);
         }
         return super.enterChildScope(child, c);
@@ -157,7 +172,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             if (constraint instanceof ActsForConstraint) {
                 @SuppressWarnings("unchecked")
                 ActsForConstraint<ActsForParam, ActsForParam> pi =
-                (ActsForConstraint<ActsForParam, ActsForParam>) constraint;
+                        (ActsForConstraint<ActsForParam, ActsForParam>) constraint;
                 ActsForParam actor = pi.actor();
                 ActsForParam granter = pi.granter();
                 if (actor instanceof Principal && granter instanceof Principal) {
@@ -167,7 +182,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
                 } else {
                     throw new InternalCompilerError(
                             "Unexpected ActsForParam type: " + actor.getClass()
-                            + " actsfor " + granter.getClass());
+                                    + " actsfor " + granter.getClass());
                 }
             } else if (constraint instanceof LabelLeAssertion) {
                 LabelLeAssertion lle = (LabelLeAssertion) constraint;
@@ -182,9 +197,9 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
     }
 
     @Override
-    public  JifContext addParamsToContext(JifContext A) {
+    public JifContext addParamsToContext(JifContext A) {
         JifParsedPolyType ct = (JifParsedPolyType) this.type;
-        A = (JifContext)A.pushBlock();
+        A = (JifContext) A.pushBlock();
         for (ParamInstance pi : ct.params()) {
             A.addVariable(pi);
         }
@@ -193,7 +208,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 
     @Override
     public JifContext addAuthorityToContext(JifContext A) {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) A.typeSystem();
         JifParsedPolyType ct = (JifParsedPolyType) this.type;
         Set<Principal> s = new LinkedHashSet<Principal>(ct.authority());
         if (ts.isSubtype(ct, ts.PrincipalClass())) {
@@ -215,7 +230,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
     }
 
     private void buildParams(JifTypeSystem ts) throws SemanticException {
-        JifParsedPolyType ct = (JifParsedPolyType)this.type;
+        JifParsedPolyType ct = (JifParsedPolyType) this.type;
         if (ct == null) {
             // The only way the class type could be null is if
             // super.buildTypes failed. Give up now.
@@ -228,27 +243,27 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
 
         Set<String> names = new LinkedHashSet<String>(params.size());
 
-        List<ParamInstance> newParams = new ArrayList<ParamInstance>(params.size());
+        List<ParamInstance> newParams =
+                new ArrayList<ParamInstance>(params.size());
         for (ParamDecl p : params) {
             newParams.add(p.paramInstance());
             //check for renaming error
             if (names.contains(p.name()))
-                throw new SemanticException("Redefined Parameter Error.", p
-                        .position());
-            else
-                names.add(p.name());
+                throw new SemanticException("Redefined Parameter Error.",
+                        p.position());
+            else names.add(p.name());
         }
         ct.setParams(newParams);
     }
 
-
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        JifClassDecl_c n = (JifClassDecl_c)super.disambiguate(ar);
+        JifClassDecl_c n = (JifClassDecl_c) super.disambiguate(ar);
 
         JifParsedPolyType ct = (JifParsedPolyType) n.type;
 
-        List<Principal> principals = new ArrayList<Principal>(n.authority().size());
+        List<Principal> principals =
+                new ArrayList<Principal>(n.authority().size());
         for (PrincipalNode p : n.authority()) {
             principals.add(p.principal());
         }
@@ -259,7 +274,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         for (ConstraintNode<Assertion> cn : n.constraints()) {
             if (!cn.isDisambiguated()) {
                 // constraint nodes haven't been disambiguated yet.
-                ar.job().extensionInfo().scheduler().currentGoal().setUnreachableThisRun();
+                ar.job().extensionInfo().scheduler().currentGoal()
+                        .setUnreachableThisRun();
                 return this;
             }
             constraints.addAll(cn.constraints());
@@ -281,17 +297,16 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
         if (flags.isInterface()) {
             w.write(flags.clearInterface().clearAbstract().translate());
             w.write("interface ");
-        }
-        else {
+        } else {
             w.write(flags.translate());
             w.write("class ");
         }
 
         w.write(name.id());
 
-        if (! params.isEmpty()) {
+        if (!params.isEmpty()) {
             w.write("[");
-            for (Iterator<ParamDecl> i = params.iterator(); i.hasNext(); ) {
+            for (Iterator<ParamDecl> i = params.iterator(); i.hasNext();) {
                 ParamDecl p = i.next();
                 print(p, w, tr);
                 if (i.hasNext()) {
@@ -302,9 +317,9 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             w.write("]");
         }
 
-        if (! authority.isEmpty()) {
+        if (!authority.isEmpty()) {
             w.write(" authority(");
-            for (Iterator<PrincipalNode> i = authority.iterator(); i.hasNext(); ) {
+            for (Iterator<PrincipalNode> i = authority.iterator(); i.hasNext();) {
                 PrincipalNode p = i.next();
                 print(p, w, tr);
                 if (i.hasNext()) {
@@ -320,20 +335,19 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl
             print(superClass(), w, tr);
         }
 
-        if (! interfaces.isEmpty()) {
+        if (!interfaces.isEmpty()) {
             if (flags.isInterface()) {
                 w.write(" extends ");
-            }
-            else {
+            } else {
                 w.write(" implements ");
             }
 
-            for (Iterator<TypeNode> i = interfaces().iterator(); i.hasNext(); ) {
+            for (Iterator<TypeNode> i = interfaces().iterator(); i.hasNext();) {
                 TypeNode tn = i.next();
                 print(tn, w, tr);
 
                 if (i.hasNext()) {
-                    w.write (", ");
+                    w.write(", ");
                 }
             }
         }

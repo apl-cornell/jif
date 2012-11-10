@@ -7,10 +7,14 @@ import jif.types.label.JoinLabel;
 import jif.types.label.Label;
 import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 public class JoinLabelToJavaExpr_c extends LabelToJavaExpr_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
-    public Expr toJava(Label label, JifToJavaRewriter rw) throws SemanticException {
+    public Expr toJava(Label label, JifToJavaRewriter rw)
+            throws SemanticException {
         JoinLabel L = (JoinLabel) label;
 
         if (L.joinComponents().size() == 1) {

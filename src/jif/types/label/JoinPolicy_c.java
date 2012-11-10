@@ -21,13 +21,16 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** Represents a join of a number of policies. 
  */
 public abstract class JoinPolicy_c<P extends Policy> extends Policy_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private final Set<P> joinComponents;
     private Integer hashCode = null;
-    
+
     public JoinPolicy_c(Set<P> components, JifTypeSystem ts, Position pos) {
         super(ts, pos);
         this.joinComponents = Collections.unmodifiableSet(flatten(components));
@@ -35,39 +38,40 @@ public abstract class JoinPolicy_c<P extends Policy> extends Policy_c {
             throw new InternalCompilerError("Empty collection!");
         }
     }
-    
+
     @Override
     public boolean isSingleton() {
         return joinComponents.size() == 1;
     }
-    
+
     @Override
     public boolean isCanonical() {
         for (P c : joinComponents) {
-            if (! c.isCanonical()) {
+            if (!c.isCanonical()) {
                 return false;
             }
-        }        
+        }
         return true;
     }
-    
+
     @Override
     public boolean isRuntimeRepresentable() {
         for (P c : joinComponents) {
-            if (! c.isRuntimeRepresentable()) {
+            if (!c.isRuntimeRepresentable()) {
                 return false;
             }
-        }        
+        }
         return true;
     }
-            
+
     @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof JoinPolicy_c) {
             @SuppressWarnings("rawtypes")
             JoinPolicy_c that = (JoinPolicy_c) o;
-            return this.hashCode() == that.hashCode() && this.joinComponents.equals(that.joinComponents);
+            return this.hashCode() == that.hashCode()
+                    && this.joinComponents.equals(that.joinComponents);
         }
         if (o instanceof Policy) {
             // see if it matches a singleton
@@ -75,6 +79,7 @@ public abstract class JoinPolicy_c<P extends Policy> extends Policy_c {
         }
         return false;
     }
+
     @Override
     public int hashCode() {
         if (hashCode == null) {
@@ -82,34 +87,34 @@ public abstract class JoinPolicy_c<P extends Policy> extends Policy_c {
         }
         return hashCode.intValue();
     }
-    
+
     @Override
     public String toString(Set<Label> printedLabels) {
         String s = "";
-        for (Iterator<P> i = joinComponents.iterator(); i.hasNext(); ) {
+        for (Iterator<P> i = joinComponents.iterator(); i.hasNext();) {
             P c = i.next();
             s += c.toString(printedLabels);
-            
+
             if (i.hasNext()) {
                 s += "; ";
             }
         }
-        
+
         return s;
     }
-    
+
     protected boolean leq_(Policy p, LabelEnv env, SearchState state) {
         // If this = { .. Pi .. } and L = { .. Pj' .. }, check if for all i,
         // there exists a j, such that Pi <= Pj'
         for (P pi : joinComponents) {
-            if (! env.leq(pi, p, state)) {
+            if (!env.leq(pi, p, state)) {
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     public Collection<P> joinComponents() {
         return Collections.unmodifiableCollection(joinComponents);
     }
@@ -134,35 +139,33 @@ public abstract class JoinPolicy_c<P extends Policy> extends Policy_c {
         for (final P comp : comps) {
             @SuppressWarnings("unchecked")
             P ci = (P) comp.simplify();
-            
+
             boolean subsumed = false;
-            
+
             if (ci.hasVariables() || ci.hasWritersToReaders()) {
                 needed.add(ci);
-            }
-            else {
-                for (Iterator<P> j = needed.iterator(); j.hasNext(); ) {
+            } else {
+                for (Iterator<P> j = needed.iterator(); j.hasNext();) {
                     P cj = j.next();
-                    
+
                     if (cj.hasVariables() || cj.hasWritersToReaders()) {
                         continue;
                     }
-                    
+
                     if (jts.leq(ci, cj)) {
                         subsumed = true;
                         break;
                     }
-                    
-                    if (jts.leq(cj, ci)) { 
+
+                    if (jts.leq(cj, ci)) {
                         j.remove();
                     }
                 }
-                
-                if (! subsumed)
-                    needed.add(ci);
+
+                if (!subsumed) needed.add(ci);
             }
         }
-        
+
         if (needed.equals(joinComponents)) {
             return this;
         }
@@ -172,7 +175,7 @@ public abstract class JoinPolicy_c<P extends Policy> extends Policy_c {
 
         return constructJoinPolicy(needed, position);
     }
-    
+
     protected abstract Policy constructJoinPolicy(Set<P> components,
             Position pos);
 
@@ -185,26 +188,25 @@ public abstract class JoinPolicy_c<P extends Policy> extends Policy_c {
                 break;
             }
         }
-        
+
         if (!needFlattening) return comps;
-        
+
         Set<P> c = new LinkedHashSet<P>();
         for (P p : comps) {
             if (p.isTop()) {
                 return Collections.singleton(p);
             }
-            
+
             if (p instanceof JoinPolicy_c) {
                 @SuppressWarnings("unchecked")
                 JoinPolicy_c<P> jp = (JoinPolicy_c<P>) p;
                 Collection<P> lComps = jp.joinComponents();
-                c.addAll(lComps);                
-            }
-            else {
+                c.addAll(lComps);
+            } else {
                 c.add(p);
             }
         }
-        
+
         return c;
     }
 
@@ -214,37 +216,38 @@ public abstract class JoinPolicy_c<P extends Policy> extends Policy_c {
         for (P L : joinComponents) {
             throwTypes.addAll(L.throwTypes(ts));
         }
-        return throwTypes; 
+        return throwTypes;
     }
 
     @Override
-    public Policy subst(LabelSubstitution substitution) throws SemanticException {        
+    public Policy subst(LabelSubstitution substitution)
+            throws SemanticException {
         if (joinComponents.isEmpty()) {
             return substitution.substPolicy(this).simplify();
         }
         boolean changed = false;
         Set<P> s = new LinkedHashSet<P>();
-        
+
         for (P c : joinComponents) {
             @SuppressWarnings("unchecked")
             P newc = (P) c.subst(substitution);
             if (newc != c) changed = true;
             s.add(newc);
         }
-        
+
         if (!changed) return substitution.substPolicy(this).simplify();
-        
+
         Policy newJoinPolicy = constructJoinPolicy(flatten(s), position);
         return substitution.substPolicy(newJoinPolicy).simplify();
     }
-    
+
     @Override
     public boolean hasWritersToReaders() {
         for (P c : joinComponents) {
             if (c.hasWritersToReaders()) return true;
         }
         return false;
-    }    
+    }
 
     @Override
     public boolean hasVariables() {
@@ -252,27 +255,27 @@ public abstract class JoinPolicy_c<P extends Policy> extends Policy_c {
             if (c.hasVariables()) return true;
         }
         return false;
-    }    
+    }
 
     @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) A.typeSystem();
         PathMap X = ts.pathMap().N(A.pc()).NV(A.pc());
-        
+
         if (joinComponents.isEmpty()) {
             return X;
         }
 
-        A = (JifContext)A.pushBlock();
-        
+        A = (JifContext) A.pushBlock();
+
         for (P c : joinComponents) {
             A.setPc(X.N(), lc);
             PathMap Xc = c.labelCheck(A, lc);
-            X = X.join(Xc);            
+            X = X.join(Xc);
         }
         return X;
     }
-    
+
     @Override
     public boolean isTop() {
         // top if any policy is top
@@ -280,17 +283,18 @@ public abstract class JoinPolicy_c<P extends Policy> extends Policy_c {
             if (c.isTop()) {
                 return true;
             }
-        }        
+        }
         return false;
     }
+
     @Override
     public boolean isBottom() {
         // bottom if all policies are bottom
         for (P c : joinComponents) {
-            if (! c.isBottom()) {
+            if (!c.isBottom()) {
                 return false;
             }
-        }        
+        }
         return true;
     }
 }

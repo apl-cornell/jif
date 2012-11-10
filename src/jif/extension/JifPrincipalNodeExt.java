@@ -13,18 +13,21 @@ import jif.visit.LabelChecker;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
 
 public class JifPrincipalNodeExt extends JifExprExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifPrincipalNodeExt(ToJavaExt toJava) {
         super(toJava);
     }
 
     @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
-        PrincipalNode pn = (PrincipalNode)node();
+        PrincipalNode pn = (PrincipalNode) node();
 
         JifContext A = lc.jifContext();
-        A = (JifContext)pn.del().enterScope(A);
+        A = (JifContext) pn.del().enterScope(A);
         JifTypeSystem ts = lc.jifTypeSystem();
 
         List<Type> throwTypes = new ArrayList<Type>(pn.del().throwTypes(ts));
@@ -39,7 +42,7 @@ public class JifPrincipalNodeExt extends JifExprExt {
 
         PathMap X1 = p.labelCheck(A, lc);
         throwTypes.removeAll(p.throwTypes(ts));
-        A = (JifContext)A.pop();
+        A = (JifContext) A.pop();
 
         checkThrowTypes(throwTypes);
         return updatePathMap(pn, X1);

@@ -10,13 +10,16 @@ import jif.types.label.Variable;
 import polyglot.main.Options;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Exception indicating that a program constraint is not satisfiable.
  */
 public class UnsatisfiableConstraintException extends SemanticException {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected final AbstractSolver solver;
-    protected final Equation       failure;
+    protected final Equation failure;
     protected final FailedConstraintSnapshot snapshot;
 
     /**
@@ -26,9 +29,10 @@ public class UnsatisfiableConstraintException extends SemanticException {
      * @param eqn
      *          The unsatisfiable equation
      */
-    public UnsatisfiableConstraintException(AbstractSolver solver, Equation eqn, FailedConstraintSnapshot snapshot) {
+    public UnsatisfiableConstraintException(AbstractSolver solver,
+            Equation eqn, FailedConstraintSnapshot snapshot) {
         super(eqn.position());
-        this.solver  = solver;
+        this.solver = solver;
         this.failure = eqn;
         this.snapshot = snapshot;
     }
@@ -45,7 +49,7 @@ public class UnsatisfiableConstraintException extends SemanticException {
     /**
      * Produce an error message for the constraint c, which cannot be satisfied.
      */
-    public final FailedConstraintSnapshot getSnapshot () {
+    public final FailedConstraintSnapshot getSnapshot() {
         return snapshot;
     }
 
@@ -54,41 +58,63 @@ public class UnsatisfiableConstraintException extends SemanticException {
         StringBuffer sb = new StringBuffer();
 
         if (errorShowConstraint()) {
-            sb.append("Unsatisfiable constraint");                        sb.append('\n');
-            sb.append('\t'); sb.append("general constraint:");            sb.append('\n');
-            sb.append('\t'); sb.append('\t'); appendNamedConstraint(sb);  sb.append('\n');
-            sb.append('\t'); sb.append("in this context:");               sb.append('\n');
-            sb.append('\t'); sb.append('\t'); appendActualConstraint(sb); sb.append('\n');
-            sb.append('\t'); sb.append("cannot satisfy equation:");       sb.append('\n');
-            sb.append('\t'); sb.append('\t'); appendEquation(sb);         sb.append('\n');
-            sb.append('\t'); sb.append("in environment:");                sb.append('\n');
+            sb.append("Unsatisfiable constraint");
+            sb.append('\n');
+            sb.append('\t');
+            sb.append("general constraint:");
+            sb.append('\n');
+            sb.append('\t');
+            sb.append('\t');
+            appendNamedConstraint(sb);
+            sb.append('\n');
+            sb.append('\t');
+            sb.append("in this context:");
+            sb.append('\n');
+            sb.append('\t');
+            sb.append('\t');
+            appendActualConstraint(sb);
+            sb.append('\n');
+            sb.append('\t');
+            sb.append("cannot satisfy equation:");
+            sb.append('\n');
+            sb.append('\t');
+            sb.append('\t');
+            appendEquation(sb);
+            sb.append('\n');
+            sb.append('\t');
+            sb.append("in environment:");
+            sb.append('\n');
             for (LabelLeAssertion assertion : failure.env().labelAssertions()) {
-                sb.append('\t'); sb.append('\t'); sb.append(assertion.lhs());
+                sb.append('\t');
+                sb.append('\t');
+                sb.append(assertion.lhs());
                 sb.append(" ⊑ ");
                 sb.append(assertion.rhs());
                 sb.append('\n');
             }
-            sb.append('\t'); sb.append('\t'); sb.append(failure.env().principalHierarchy());
+            sb.append('\t');
+            sb.append('\t');
+            sb.append(failure.env().principalHierarchy());
             sb.append('\n');
             sb.append('\n');
         }
 
         if (errorShowDefns() && failure instanceof LabelEquation) {
-            sb.append("Label Descriptions"); sb.append('\n');
-            sb.append("------------------"); sb.append('\n');
-            for(Map.Entry<String, List<String>> entry : definitions())
-                for(String desc : entry.getValue())
+            sb.append("Label Descriptions");
+            sb.append('\n');
+            sb.append("------------------");
+            sb.append('\n');
+            for (Map.Entry<String, List<String>> entry : definitions())
+                for (String desc : entry.getValue())
                     sb.append(" - " + entry.getKey() + " = " + desc + "\n");
             sb.append('\n');
         }
 
         if (errorShowTechnicalMsg()) {
             sb.append(failure.constraint().technicalMsg());
-        }
-        else if (errorShowDetailMsg()) {
+        } else if (errorShowDetailMsg()) {
             sb.append(failure.constraint().detailMsg());
-        }
-        else {
+        } else {
             sb.append(failure.constraint().msg());
         }
 
@@ -149,15 +175,15 @@ public class UnsatisfiableConstraintException extends SemanticException {
             sb.append(pe.rhs());
         }
 
-        else
-            throw new InternalCompilerError(failure.position(), "unexpected equation type");
+        else throw new InternalCompilerError(failure.position(),
+                "unexpected equation type");
     }
 
     protected Iterable<Map.Entry<String, List<String>>> definitions() {
         if (failure instanceof LabelEquation)
-            return ((LabelEquation) failure).labelConstraint().definitions(solver.bounds).entrySet();
-        else
-            return Collections.emptyList();
+            return ((LabelEquation) failure).labelConstraint()
+                    .definitions(solver.bounds).entrySet();
+        else return Collections.emptyList();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -173,7 +199,7 @@ public class UnsatisfiableConstraintException extends SemanticException {
     }
 
     protected boolean errorShowDetailMsg() {
-        return ((JifOptions)Options.global).explainErrors;
+        return ((JifOptions) Options.global).explainErrors;
     }
 
     protected boolean errorShowDefns() {

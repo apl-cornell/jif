@@ -7,13 +7,15 @@ import polyglot.ast.Throw;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CollectionUtil;
+import polyglot.util.SerialVersionUID;
 
 /** Jif extension of the <code>Throw</code> node.
  * 
  *  @see polyglot.ast.Throw
  */
-public class JifThrowDel extends JifJL_c
-{
+public class JifThrowDel extends JifJL_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifThrowDel() {
     }
 
@@ -27,6 +29,7 @@ public class JifThrowDel extends JifJL_c
     public void setThrownIsNeverNull() {
         isThrownNeverNull = true;
     }
+
     public boolean thrownIsNeverNull() {
         return isThrownNeverNull;
     }
@@ -40,13 +43,15 @@ public class JifThrowDel extends JifJL_c
      */
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        Throw t = (Throw)node();
+        Throw t = (Throw) node();
 
         // if the exception that a throw statement is given to throw is null,
         // then a NullPointerException will be thrown.
-        if (!isThrownNeverNull && !ts.NullPointerException().equals(t.expr().type())
+        if (!isThrownNeverNull
+                && !ts.NullPointerException().equals(t.expr().type())
                 && !fatalExceptions.contains(ts.NullPointerException())) {
-            return CollectionUtil.list(t.expr().type(), ts.NullPointerException());
+            return CollectionUtil.list(t.expr().type(),
+                    ts.NullPointerException());
         }
         return Collections.singletonList(t.expr().type());
     }

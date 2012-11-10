@@ -17,12 +17,15 @@ import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
-/** An implementation of the <code>JifConstructorInstance</code> interface. 
+/** An implementation of the <code>JifConstructorInstance</code> interface.
  */
 public class JifConstructorInstance_c extends ConstructorInstance_c
 implements JifConstructorInstance
 {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Label pcBound;
     protected Label returnLabel;
     protected List<Assertion> constraints;
@@ -31,7 +34,7 @@ implements JifConstructorInstance
 
     public JifConstructorInstance_c(JifTypeSystem ts, Position pos,
             ClassType container, Flags flags,
-            Label pcBound, boolean isDefaultPCBound, Label returnLabel, 
+            Label pcBound, boolean isDefaultPCBound, Label returnLabel,
             boolean isDefaultReturnLabel, List<? extends Type> formalTypes,
             List<Label> formalArgLabels, List<? extends Type> excTypes,
             List<Assertion> constraints) {
@@ -108,36 +111,33 @@ implements JifConstructorInstance
 
         JifTypeSystem jts = (JifTypeSystem)typeSystem();
         // also need to make sure that every formal type is labeled with an arg label
-        for (Iterator<Type> i = formalTypes().iterator(); i.hasNext(); ) {
-            Type t = i.next();
+        for (Type t : formalTypes()) {
             if (!jts.isLabeled(t) || !(jts.labelOfType(t) instanceof ArgLabel)) return false;
-        }    
+        }
         return true;
     }
 
     @Override
     public void subst(VarMap bounds) {
-        if (this.pcBound != null) 
+        if (this.pcBound != null)
             this.pcBound = bounds.applyTo(pcBound);
 
-        if (this.returnLabel != null) 
+        if (this.returnLabel != null)
             this.returnLabel = bounds.applyTo(returnLabel);
 
         List<Type> formalTypes = new LinkedList<Type>();
-        for (Iterator<Type> i = formalTypes().iterator(); i.hasNext(); ) {
-            Type t = i.next();
+        for (Type t : formalTypes()) {
             formalTypes.add(bounds.applyTo(t));
         }
         this.setFormalTypes(formalTypes);
 
         List<Type> throwTypes = new LinkedList<Type>();
-        for (Iterator<Type> i = throwTypes().iterator(); i.hasNext(); ) {
-            Type t = i.next();
+        for (Type t : throwTypes()) {
             throwTypes.add(bounds.applyTo(t));
         }
 
         this.setThrowTypes(throwTypes);
-    }    
+    }
 
     @Override
     public void subst(LabelSubstitution subst) throws SemanticException {
@@ -146,15 +146,13 @@ implements JifConstructorInstance
         setReturnLabel(returnLabel().subst(subst), isDefaultReturnLabel());
 
         List<Type> formalTypes = new LinkedList<Type>();
-        for (Iterator<Type> i = formalTypes().iterator(); i.hasNext(); ) {
-            Type t = i.next();
+        for (Type t : formalTypes()) {
             formalTypes.add(tsbs.rewriteType(t));
         }
         this.setFormalTypes(formalTypes);
 
         List<Type> throwTypes = new LinkedList<Type>();
-        for (Iterator<Type> i = throwTypes().iterator(); i.hasNext(); ) {
-            Type t = i.next();
+        for (Type t : throwTypes()) {
             throwTypes.add(tsbs.rewriteType(t));
         }
         this.setThrowTypes(throwTypes);
@@ -164,7 +162,7 @@ implements JifConstructorInstance
     public String debugString() {
         return debugString(true);
     }
-    
+
     private String debugString(boolean showInstanceKind) {
         String s = "";
         if (showInstanceKind) {
@@ -188,12 +186,12 @@ implements JifConstructorInstance
 
     @Override
     public String signature() {
-        if (Report.should_report(Report.debug, 1)) { 
+        if (Report.should_report(Report.debug, 1)) {
             return fullSignature();
         }
         return debugString(false);
     }
-    
+
     public String fullSignature() {
         String s = container.toString();
         if (!isDefaultPCBound() || Report.should_report(Report.debug, 1)) {

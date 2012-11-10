@@ -24,6 +24,7 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
@@ -32,9 +33,11 @@ import polyglot.visit.TypeChecker;
  * 
  *  @see polyglot.ast.Field
  */
-public class JifFieldDel extends JifJL_c
-{
-    public JifFieldDel() { }
+public class JifFieldDel extends JifJL_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
+    public JifFieldDel() {
+    }
 
     /**
      * This flag records whether the target of a field access is never
@@ -54,28 +57,23 @@ public class JifFieldDel extends JifJL_c
      */
     private boolean isNPEfatal = false;
 
-
     public void setTargetIsNeverNull(boolean neverNull) {
         if (!targetNeverNullAlreadySet) {
             isTargetNeverNull = neverNull;
-        }
-        else {
+        } else {
             isTargetNeverNull = isTargetNeverNull && neverNull;
         }
         targetNeverNullAlreadySet = true;
     }
 
     public boolean targetIsNeverNull() {
-        Receiver r = ((Field)node()).target();
-        return (r instanceof Special
-                || isNPEfatal
-                || isTargetNeverNull
-                || r instanceof CanonicalTypeNode);
+        Receiver r = ((Field) node()).target();
+        return (r instanceof Special || isNPEfatal || isTargetNeverNull || r instanceof CanonicalTypeNode);
     }
 
     @Override
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
-        JifTypeChecker jtc = (JifTypeChecker)super.typeCheckEnter(tc);
+        JifTypeChecker jtc = (JifTypeChecker) super.typeCheckEnter(tc);
         return jtc.inferClassParameters(true);
     }
 
@@ -95,23 +93,27 @@ public class JifFieldDel extends JifJL_c
 
         if (ft_type instanceof JifSubstType && fn.target() instanceof Expr) {
             JifContext jc = (JifContext) tc.context();
-            ReferenceType rt = targetType((JifTypeSystem) tc.typeSystem(),
-                    jc,
-                    (Expr) fn.target());
+            ReferenceType rt =
+                    targetType((JifTypeSystem) tc.typeSystem(), jc,
+                            (Expr) fn.target());
 
             if (rt instanceof JifSubstType) {
-                Type ft1 = ((JifSubstType)rt).subst().substType(ft);
+                Type ft1 = ((JifSubstType) rt).subst().substType(ft);
                 if (ft1 != ft) //update fieldInstance?
                     f = (Field) f.type(ft1);
             }
 
 // Jif Dependency bugfix
-            JifFieldInstance fi = (JifFieldInstance) ts.findField(rt.toReference(), fn.name(), jc.currentClass());
-            if(fi.label() instanceof VarLabel && !((JifTypeChecker)tc).disambiguationInProgress()) {
-                JifScheduler sched = (JifScheduler) tc.job().extensionInfo().scheduler();
+            JifFieldInstance fi =
+                    (JifFieldInstance) ts.findField(rt.toReference(),
+                            fn.name(), jc.currentClass());
+            if (fi.label() instanceof VarLabel
+                    && !((JifTypeChecker) tc).disambiguationInProgress()) {
+                JifScheduler sched =
+                        (JifScheduler) tc.job().extensionInfo().scheduler();
                 Type tp = ts.unlabel(fi.container());
                 if (tp instanceof ParsedClassType) {
-                    ParsedClassType pct = (ParsedClassType)tp;
+                    ParsedClassType pct = (ParsedClassType) tp;
                     Goal g = sched.FieldLabelInference(pct.job());
                     throw new MissingDependencyException(g);
                 }
@@ -123,8 +125,7 @@ public class JifFieldDel extends JifJL_c
     }
 
     protected ReferenceType targetType(JifTypeSystem ts, JifContext A,
-            Expr target)
-    {
+            Expr target) {
         Field fe = (Field) node();
         String name = fe.name();
         ReferenceType rt = A.currentClass();
@@ -141,14 +142,12 @@ public class JifFieldDel extends JifJL_c
                             break;
                         }
                     }
-                    if (found)
-                        break;
+                    if (found) break;
 
                     rt = (ReferenceType) rt.superType();
                 } while (rt != null);
             }
-        }
-        else {
+        } else {
             rt = (ReferenceType) ts.unlabel(target.type());
         }
 
@@ -174,9 +173,8 @@ public class JifFieldDel extends JifJL_c
     @Override
     public void setFatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
         super.setFatalExceptions(ts, fatalExceptions);
-        if(fatalExceptions.contains(ts.NullPointerException()))
+        if (fatalExceptions.contains(ts.NullPointerException()))
             isNPEfatal = true;
     }
-
 
 }

@@ -10,21 +10,24 @@ import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public Expr toJava(Label label, JifToJavaRewriter rw)
             throws SemanticException {
         if (label instanceof ParamLabel) {
-            return toJava(((ParamLabel)label).paramInstance(), rw);
+            return toJava(((ParamLabel) label).paramInstance(), rw);
         }
-        return toJava(((CovariantParamLabel)label).paramInstance(), rw);
+        return toJava(((CovariantParamLabel) label).paramInstance(), rw);
     }
 
     @Override
     public Expr toJava(Principal principal, JifToJavaRewriter rw)
             throws SemanticException {
-        return toJava(((ParamPrincipal)principal).paramInstance(), rw);
+        return toJava(((ParamPrincipal) principal).paramInstance(), rw);
     }
 
     public Expr toJava(ParamInstance pi, JifToJavaRewriter rw) {
@@ -37,7 +40,7 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
             // a standard name for parameters, so just return a placeholder.
             return rw.qq().parseExpr("null");
         }
-        JifContext A = (JifContext)rw.context();
+        JifContext A = (JifContext) rw.context();
         if (A.inStaticContext() && !rw.inConstructor()) {
             // We are in a static context, so we do not have
             // the field instances available. Instead, the
@@ -49,8 +52,7 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
             // super(...)), and we do in fact have the
             // fields available to us. Hence the "!rw.inConstructor()")
             return rw.qq().parseExpr(paramArgName(pi));
-        }
-        else {
+        } else {
             return rw.qq().parseExpr("this." + paramFieldName(pi));
         }
     }
@@ -60,11 +62,13 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
         String fullName = jct.fullName().replace('.', '_');
         return "jif$" + fullName + "_" + pi.name();
     }
+
     public static String paramFieldNameGetter(ParamInstance pi) {
         JifClassType jct = pi.container();
         String fullName = jct.fullName().replace('.', '_');
         return "jif$get" + fullName + "_" + pi.name();
     }
+
     public static String paramArgName(ParamInstance pi) {
         return "jif$" + pi.name();
     }

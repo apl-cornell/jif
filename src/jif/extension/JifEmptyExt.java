@@ -6,13 +6,15 @@ import jif.types.JifTypeSystem;
 import jif.types.PathMap;
 import jif.visit.LabelChecker;
 import polyglot.ast.Node;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>Empty</code> node. 
  * 
  *  @see polyglot.ast.Empty
  */
-public class JifEmptyExt extends JifStmtExt_c
-{
+public class JifEmptyExt extends JifStmtExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifEmptyExt(ToJavaExt toJava) {
         super(toJava);
     }

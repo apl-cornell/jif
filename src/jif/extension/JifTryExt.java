@@ -22,13 +22,15 @@ import polyglot.ast.Node;
 import polyglot.ast.Try;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
 
 /** Jif extension of the <code>Try</code> node.
  * 
  *  @see polyglot.ast.Try
  */
-public class JifTryExt extends JifStmtExt_c
-{
+public class JifTryExt extends JifStmtExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifTryExt(ToJavaExt toJava) {
         super(toJava);
     }
@@ -58,7 +60,6 @@ public class JifTryExt extends JifStmtExt_c
             A = (JifContext) A.pushBlock();
             A.setPc(Li, lc);
 
-
             // label check the formal
             f = (Formal) lc.context(A).labelCheck(cb.formal());
 
@@ -67,54 +68,51 @@ public class JifTryExt extends JifStmtExt_c
             // be at least as high as the pc flow.
             if (ts.isLabeled(f.type().type())) {
                 Label declaredLabel = ts.labelOfType(f.type().type());
-                lc.constrain(new NamedLabel("local_label",
-                        "inferred label of " + f.name(),
-                        Li),
-                        LabelConstraint.EQUAL,
-                        new NamedLabel("declared label of " + f.name(), declaredLabel),
-                        A.labelEnv(),
-                        f.position(),
-                        false,
+                lc.constrain(new NamedLabel("local_label", "inferred label of "
+                        + f.name(), Li), LabelConstraint.EQUAL, new NamedLabel(
+                        "declared label of " + f.name(), declaredLabel), A
+                        .labelEnv(), f.position(), false,
                         new ConstraintMessage() {
-                    @Override
-                    public String msg() {
-                        return "Declared label of catch block variable " + vi.name() +
-                                " is incompatible with label constraints.";
-                    }
-                }
-                        );
+                            @Override
+                            public String msg() {
+                                return "Declared label of catch block variable "
+                                        + vi.name()
+                                        + " is incompatible with label constraints.";
+                            }
+                        });
             }
 
             // Constrain the variable label to be at least as much as the exc-label.
             Label pc_i = excLabel(Xs, cb.catchType(), lc, ts);
 
-            final String catchTypeName = ts.unlabel(cb.catchType()).toClass().name();
-            lc.constrain(new NamedLabel("join(pc|where exc_i could be thrown)",
-                    "the information that could be revealed " +
-                            "by the exception " + catchTypeName + " " +
-                            "being thrown",
-                            pc_i),
-                            LabelConstraint.LEQ,
-                            new NamedLabel("label_exc_i",
-                                    "label of variable " + vi.name(),
-                                    Li),
-                                    A.labelEnv(),
-                                    f.position(),
-                                    false,
-                                    new ConstraintMessage() {
-                @Override
-                public String msg() {
-                    return "Label of thrown exceptions of type " + catchTypeName +
-                            " not less restrictive than the label of " + vi.name();
-                }
-                @Override
-                public String detailMsg() {
-                    return "More information may be revealed by an exception of " +
-                            "type " + catchTypeName + " being thrown than is " +
-                            "allowed to flow to " + vi.name() + ".";
-                }
-            });
+            final String catchTypeName =
+                    ts.unlabel(cb.catchType()).toClass().name();
+            lc.constrain(
+                    new NamedLabel("join(pc|where exc_i could be thrown)",
+                            "the information that could be revealed "
+                                    + "by the exception " + catchTypeName + " "
+                                    + "being thrown", pc_i),
+                    LabelConstraint.LEQ,
+                    new NamedLabel("label_exc_i", "label of variable "
+                            + vi.name(), Li), A.labelEnv(), f.position(),
+                    false, new ConstraintMessage() {
+                        @Override
+                        public String msg() {
+                            return "Label of thrown exceptions of type "
+                                    + catchTypeName
+                                    + " not less restrictive than the label of "
+                                    + vi.name();
+                        }
 
+                        @Override
+                        public String detailMsg() {
+                            return "More information may be revealed by an exception of "
+                                    + "type "
+                                    + catchTypeName
+                                    + " being thrown than is "
+                                    + "allowed to flow to " + vi.name() + ".";
+                        }
+                    });
 
             Block si = (Block) lc.context(A).labelCheck(cb.body());
             PathMap Xi = getPathMap(si);
@@ -153,8 +151,7 @@ public class JifTryExt extends JifStmtExt_c
             }
 
             X = Xall.join(X2);
-        }
-        else {
+        } else {
             X = Xall;
         }
 
@@ -173,8 +170,8 @@ public class JifTryExt extends JifStmtExt_c
                 boolean sat = false;
 
                 for (Catch cb : trs.catchBlocks()) {
-                    if (ts.isImplicitCastValid(jep.exception(), cb.catchType()) ||
-                            ts.equals(jep.exception(), cb.catchType())) {
+                    if (ts.isImplicitCastValid(jep.exception(), cb.catchType())
+                            || ts.equals(jep.exception(), cb.catchType())) {
 
                         sat = true;
                         break;
@@ -198,8 +195,8 @@ public class JifTryExt extends JifStmtExt_c
             if (p instanceof ExceptionPath) {
                 ExceptionPath ep = (ExceptionPath) p;
 
-                if (ts.isSubtype(ct, ep.exception()) ||
-                        ts.isSubtype(ep.exception(), ct)) {
+                if (ts.isSubtype(ct, ep.exception())
+                        || ts.isSubtype(ep.exception(), ct)) {
                     L = lc.upperBound(L, X.get(ep));
                 }
             }

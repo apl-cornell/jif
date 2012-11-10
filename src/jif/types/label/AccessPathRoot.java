@@ -5,7 +5,7 @@ import jif.types.PathMap;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
 import polyglot.util.Position;
-
+import polyglot.util.SerialVersionUID;
 
 /**
  * Represents a final access path root.
@@ -13,6 +13,8 @@ import polyglot.util.Position;
  * @see jif.types.label.AccessPath
  */
 public abstract class AccessPathRoot extends AccessPath {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected AccessPathRoot(Position pos) {
         super(pos);
     }
@@ -29,8 +31,10 @@ public abstract class AccessPathRoot extends AccessPath {
 
     @Override
     public PathMap labelcheck(JifContext A, LabelChecker lc) {
-        throw new UnsupportedOperationException("Cannot labelcheck an " + this.getClass());
+        throw new UnsupportedOperationException("Cannot labelcheck an "
+                + this.getClass());
     }
+
     @Override
     public boolean equivalentTo(AccessPath p, LabelEnv env) {
         return (this.equals(p));

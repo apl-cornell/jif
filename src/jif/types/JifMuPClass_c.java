@@ -6,11 +6,13 @@ import java.util.List;
 
 import polyglot.ext.param.types.MuPClass_c;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>JifParsedPolyType</code> interface.
  */
-public class JifMuPClass_c extends MuPClass_c<ParamInstance, Param>
-{
+public class JifMuPClass_c extends MuPClass_c<ParamInstance, Param> {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected JifMuPClass_c() {
         super();
     }

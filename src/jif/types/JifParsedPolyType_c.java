@@ -20,11 +20,14 @@ import polyglot.types.ParsedClassType_c;
 import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>JifParsedPolyType</code> interface.
  */
-public class JifParsedPolyType_c extends ParsedClassType_c implements JifParsedPolyType
-{
+public class JifParsedPolyType_c extends ParsedClassType_c implements
+        JifParsedPolyType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     List<ParamInstance> params;
     List<Principal> authority;
     List<Assertion> constraints;

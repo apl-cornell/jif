@@ -11,6 +11,7 @@ import polyglot.ast.Term;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.NodeVisitor;
@@ -20,14 +21,15 @@ import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>DowngradeExpr</code> interface.
  */
-public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
-{
+public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private LabelNode label;
     private LabelNode bound;
     private Expr expr;
 
-    public DowngradeExpr_c(Position pos, Expr expr,
-            LabelNode bound, LabelNode label) {
+    public DowngradeExpr_c(Position pos, Expr expr, LabelNode bound,
+            LabelNode label) {
         super(pos);
         this.expr = expr;
         this.bound = bound;
@@ -70,7 +72,8 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
         return n;
     }
 
-    protected DowngradeExpr_c reconstruct(Expr expr, LabelNode bound, LabelNode label) {
+    protected DowngradeExpr_c reconstruct(Expr expr, LabelNode bound,
+            LabelNode label) {
         if (this.expr != expr || this.bound != bound || this.label != label) {
             DowngradeExpr_c n = (DowngradeExpr_c) copy();
             n.expr = expr;
@@ -85,7 +88,9 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = (Expr) visitChild(this.expr, v);
-        LabelNode bound = this.bound==null?null:((LabelNode) visitChild(this.bound, v));
+        LabelNode bound =
+                this.bound == null ? null : ((LabelNode) visitChild(this.bound,
+                        v));
         LabelNode label = (LabelNode) visitChild(this.label, v);
         return reconstruct(expr, bound, label);
     }
@@ -102,13 +107,12 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        JifTypeSystem ts = (JifTypeSystem)v.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) v.typeSystem();
         if (ts.Boolean().equals(ts.unlabel(expr.type()))) {
             // allow more precise dataflow when downgrading a boolean expression.
             v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this, EXIT,
                     FlowGraph.EDGE_KEY_FALSE, this, EXIT);
-        }
-        else {
+        } else {
             v.visitCFG(expr, this, EXIT);
         }
         return succs;

@@ -25,6 +25,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
@@ -33,9 +34,11 @@ import polyglot.visit.TypeChecker;
  * 
  *  @see polyglot.ast.Call_c
  */
-public class JifCallDel extends JifJL_c
-{
-    public JifCallDel() { }
+public class JifCallDel extends JifJL_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
+    public JifCallDel() {
+    }
 
     /**
      * This flag records whether the target of a method call is never
@@ -58,19 +61,15 @@ public class JifCallDel extends JifJL_c
     public void setTargetIsNeverNull(boolean neverNull) {
         if (!targetNeverNullAlreadySet) {
             isTargetNeverNull = neverNull;
-        }
-        else {
+        } else {
             isTargetNeverNull = isTargetNeverNull && neverNull;
         }
         targetNeverNullAlreadySet = true;
     }
 
     public boolean targetIsNeverNull() {
-        Receiver r = ((Call)node()).target();
-        return (r instanceof Special
-                || isNPEfatal
-                || isTargetNeverNull
-                || r instanceof CanonicalTypeNode);
+        Receiver r = ((Call) node()).target();
+        return (r instanceof Special || isNPEfatal || isTargetNeverNull || r instanceof CanonicalTypeNode);
     }
 
     /**
@@ -82,10 +81,9 @@ public class JifCallDel extends JifJL_c
      */
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        MethodInstance mi = ((Call)node()).methodInstance();
+        MethodInstance mi = ((Call) node()).methodInstance();
         if (mi == null) {
-            throw new InternalCompilerError(
-                    node().position(),
+            throw new InternalCompilerError(node().position(),
                     "Null method instance after type " + "check.");
         }
 
@@ -103,10 +101,10 @@ public class JifCallDel extends JifJL_c
         // if the method instance is static, and the target type is a
         // parameterized class, we may need to evaluate some parameters
         // at runtime, and need to account for them here.
-        LabelTypeCheckUtil ltcu = ((JifTypeSystem)ts).labelTypeCheckUtil();
+        LabelTypeCheckUtil ltcu = ((JifTypeSystem) ts).labelTypeCheckUtil();
         if (mi.flags().isStatic()) {
             if (mi.container() instanceof JifClassType) {
-                l.addAll(ltcu.throwTypes((JifClassType)mi.container()));
+                l.addAll(ltcu.throwTypes((JifClassType) mi.container()));
             }
         }
         return l;
@@ -115,10 +113,9 @@ public class JifCallDel extends JifJL_c
     @Override
     public void setFatalExceptions(TypeSystem ts, SubtypeSet fatalExceptions) {
         super.setFatalExceptions(ts, fatalExceptions);
-        if(fatalExceptions.contains(ts.NullPointerException()))
+        if (fatalExceptions.contains(ts.NullPointerException()))
             isNPEfatal = true;
     }
-
 
     protected VarLabel receiverVarLabel;
     protected List<VarLabel> argVarLabels; // list of var labels for the actual args
@@ -126,13 +123,13 @@ public class JifCallDel extends JifJL_c
 
     @Override
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
-        JifTypeChecker jtc = (JifTypeChecker)super.typeCheckEnter(tc);
+        JifTypeChecker jtc = (JifTypeChecker) super.typeCheckEnter(tc);
         return jtc.inferClassParameters(true);
     }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Call c = (Call)super.typeCheck(tc);
+        Call c = (Call) super.typeCheck(tc);
 
         // we need to instantiate the return type correctly during type checking,
         // to allow, for example, the following code to correctly type checked
@@ -146,57 +143,55 @@ public class JifCallDel extends JifJL_c
         //
         // We use var labels, which are later bound to the correct labels
         // during label checking.
-        JifMethodInstance mi = (JifMethodInstance)c.methodInstance();
-        JifContext A = (JifContext)tc.context();
-        JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
+        JifMethodInstance mi = (JifMethodInstance) c.methodInstance();
+        JifContext A = (JifContext) tc.context();
+        JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();
 
-        JifCallDel del = (JifCallDel)c.del();
+        JifCallDel del = (JifCallDel) c.del();
         del.receiverVarLabel = null;
         Expr receiverExpr = null;
         if (c.target() instanceof Expr) {
-            receiverExpr = (Expr)c.target();
-            del.receiverVarLabel = ts.freshLabelVariable(c.position(),
-                    "receiver",
-                    "label of receiver of call " + c.toString());
+            receiverExpr = (Expr) c.target();
+            del.receiverVarLabel =
+                    ts.freshLabelVariable(c.position(), "receiver",
+                            "label of receiver of call " + c.toString());
         }
         del.argVarLabels = new ArrayList<VarLabel>(c.arguments().size());
         for (int i = 0; i < c.arguments().size(); i++) {
             Expr arg = c.arguments().get(i);
-            VarLabel argLbl =  ts.freshLabelVariable(arg.position(),
-                    "arg"+(i+1)+"label",
-                    "label of arg " + (i+1) + " of call " + c.toString());
+            VarLabel argLbl =
+                    ts.freshLabelVariable(arg.position(), "arg" + (i + 1)
+                            + "label", "label of arg " + (i + 1) + " of call "
+                            + c.toString());
             del.argVarLabels.add(argLbl);
         }
 
         if (ts.unlabel(mi.container()) instanceof JifSubstType) {
-            JifSubstType jst = (JifSubstType)ts.unlabel(mi.container());
+            JifSubstType jst = (JifSubstType) ts.unlabel(mi.container());
             del.paramVarLabels =
                     new ArrayList<VarLabel>(jst.instantiatedFrom().formals()
                             .size());
 
             for (Param param : jst.actuals()) {
-                VarLabel paramLbl =  ts.freshLabelVariable(param.position(),
-                        "param_"+param+"_label",
-                        "label of param " + param + " of call " + c.toString());
+                VarLabel paramLbl =
+                        ts.freshLabelVariable(param.position(), "param_"
+                                + param + "_label", "label of param " + param
+                                + " of call " + c.toString());
                 del.paramVarLabels.add(paramLbl);
             }
-        }
-        else {
+        } else {
             del.paramVarLabels = Collections.emptyList();
         }
         Type t = mi.returnType();
 
-        Type retType =  JifInstantiator.instantiate(t, A,
-                receiverExpr,
-                mi.container(),
-                del.receiverVarLabel,
-                CallHelper.getArgLabelsFromFormalTypes(mi.formalTypes(), ts, mi.position()),
-                mi.formalTypes(),
-                del.argVarLabels,
-                c.arguments(),
-                del.paramVarLabels);
+        Type retType =
+                JifInstantiator.instantiate(t, A, receiverExpr, mi.container(),
+                        del.receiverVarLabel, CallHelper
+                                .getArgLabelsFromFormalTypes(mi.formalTypes(),
+                                        ts, mi.position()), mi.formalTypes(),
+                        del.argVarLabels, c.arguments(), del.paramVarLabels);
 
-        c = (Call)c.type(retType);
+        c = (Call) c.type(retType);
         return c;
     }
 

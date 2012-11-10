@@ -5,6 +5,7 @@ import java.util.Collection;
 import jif.types.hierarchy.LabelEnv;
 import polyglot.util.Enum;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>Constraint</code> is the superclass of label
@@ -16,6 +17,8 @@ public abstract class Constraint
 {
     /** Kinds of constraint, either equality or inequality. */
     public static class Kind extends Enum {
+        private static final long serialVersionUID = SerialVersionUID.generate();
+
         protected Kind(String name) { super(name); }
     }
 

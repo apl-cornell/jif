@@ -14,8 +14,12 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
-public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePrincipal {
+public class DisjunctivePrincipal_c extends Principal_c implements
+        DisjunctivePrincipal {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private final Set<Principal> disjuncts;
 
     public DisjunctivePrincipal_c(Collection<Principal> disjuncts,
@@ -23,8 +27,8 @@ public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePr
         super(ts, pos, toJava);
         this.disjuncts = new LinkedHashSet<Principal>(disjuncts);
         if (disjuncts.size() < 2) {
-            throw new InternalCompilerError("DisjunctivePrincipal should " +
-                    "have at least 2 members");
+            throw new InternalCompilerError("DisjunctivePrincipal should "
+                    + "have at least 2 members");
         }
     }
 
@@ -35,6 +39,7 @@ public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePr
         }
         return true;
     }
+
     @Override
     public boolean isCanonical() {
         for (Principal p : disjuncts) {
@@ -50,8 +55,7 @@ public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePr
         if (Report.should_report(Report.debug, 1)) {
             sb.append("<");
             sep = " or ";
-        }
-        else if (Report.should_report(Report.debug, 2)) {
+        } else if (Report.should_report(Report.debug, 2)) {
             sb.append("<disjunction: ");
             sep = " or ";
         }
@@ -61,8 +65,7 @@ public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePr
         }
         if (Report.should_report(Report.debug, 1)) {
             sb.append(">");
-        }
-        else if (Report.should_report(Report.debug, 2)) {
+        } else if (Report.should_report(Report.debug, 2)) {
             sb.append(">");
         }
         return sb.toString();
@@ -72,7 +75,7 @@ public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePr
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof DisjunctivePrincipal) {
-            DisjunctivePrincipal that = (DisjunctivePrincipal)o;
+            DisjunctivePrincipal that = (DisjunctivePrincipal) o;
             return this.disjuncts.equals(that.disjuncts());
         }
         return false;
@@ -96,14 +99,13 @@ public class DisjunctivePrincipal_c extends Principal_c implements DisjunctivePr
             substDisjuncts.add(disjunct.subst(substitution));
         }
         if (substDisjuncts.size() > 1) {
-            return new DisjunctivePrincipal_c(substDisjuncts, (JifTypeSystem) ts,
-                    position(), toJava);
-        }
-        else if (substDisjuncts.size() == 1) {
+            return new DisjunctivePrincipal_c(substDisjuncts,
+                    (JifTypeSystem) ts, position(), toJava);
+        } else if (substDisjuncts.size() == 1) {
             return substDisjuncts.iterator().next();
-        }
-        else {
-            throw new InternalCompilerError("No principals left after substitution.");
+        } else {
+            throw new InternalCompilerError(
+                    "No principals left after substitution.");
         }
     }
 }

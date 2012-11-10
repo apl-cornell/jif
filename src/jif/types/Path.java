@@ -1,11 +1,11 @@
 package jif.types;
 
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /** A control flow path. 
  */
-public interface Path
-{
+public interface Path {
     /** Normal termination */
     public static final Path N = new FixedPath("N");
 
@@ -16,6 +16,11 @@ public interface Path
     public static final Path NV = new FixedPath("NV");
 
     public static class FixedPath extends Enum implements Path {
-	FixedPath(String name) { super(name); }
+        private static final long serialVersionUID = SerialVersionUID
+                .generate();
+
+        FixedPath(String name) {
+            super(name);
+        }
     }
 }

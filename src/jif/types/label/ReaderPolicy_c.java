@@ -18,14 +18,18 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>PolicyLabel</code> interface.
  */
 public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private final Principal owner;
     private final Principal reader;
 
-    public ReaderPolicy_c(Principal owner, Principal reader, JifTypeSystem ts, Position pos) {
+    public ReaderPolicy_c(Principal owner, Principal reader, JifTypeSystem ts,
+            Position pos) {
         super(ts, pos);
         if (owner == null) throw new InternalCompilerError("null owner");
         this.owner = owner;
@@ -36,6 +40,7 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
     public Principal owner() {
         return this.owner;
     }
+
     @Override
     public Principal reader() {
         return reader;
@@ -45,13 +50,16 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
     public boolean isSingleton() {
         return true;
     }
+
     @Override
     public boolean isCanonical() {
         return owner.isCanonical() && reader.isCanonical();
     }
+
     @Override
     public boolean isRuntimeRepresentable() {
-        return owner.isRuntimeRepresentable() && reader.isRuntimeRepresentable();
+        return owner.isRuntimeRepresentable()
+                && reader.isRuntimeRepresentable();
     }
 
     @Override
@@ -63,8 +71,9 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof ReaderPolicy_c) {
-            ReaderPolicy_c that = (ReaderPolicy_c)o;
-            if (this.owner == that.owner || (this.owner != null && this.owner.equals(that.owner))) {
+            ReaderPolicy_c that = (ReaderPolicy_c) o;
+            if (this.owner == that.owner
+                    || (this.owner != null && this.owner.equals(that.owner))) {
                 return this.reader.equals(that.reader);
             }
         }
@@ -73,7 +82,8 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
 
     @Override
     public int hashCode() {
-        return (owner==null?0:owner.hashCode()) ^ reader.hashCode() ^ 948234;
+        return (owner == null ? 0 : owner.hashCode()) ^ reader.hashCode()
+                ^ 948234;
     }
 
     @Override
@@ -97,8 +107,8 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
                 return false;
             }
 
-            return env.actsFor(that.reader(), this.owner()) ||
-                    env.actsFor(that.reader(), this.reader());
+            return env.actsFor(that.reader(), this.owner())
+                    || env.actsFor(that.reader(), this.reader());
         }
         return false;
     }
@@ -120,7 +130,8 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
     }
 
     @Override
-    public Policy subst(LabelSubstitution substitution) throws SemanticException {
+    public Policy subst(LabelSubstitution substitution)
+            throws SemanticException {
         boolean changed = false;
 
         Principal newOwner = owner.subst(substitution);
@@ -130,10 +141,12 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
 
         if (!changed) return substitution.substPolicy(this);
 
-        JifTypeSystem ts = (JifTypeSystem)typeSystem();
-        ReaderPolicy newPolicy = ts.readerPolicy(this.position(), newOwner, newReader);
+        JifTypeSystem ts = (JifTypeSystem) typeSystem();
+        ReaderPolicy newPolicy =
+                ts.readerPolicy(this.position(), newOwner, newReader);
         return substitution.substPolicy(newPolicy);
     }
+
     @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         // check each principal in turn.
@@ -148,26 +161,31 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
     public boolean isBottomConfidentiality() {
         return owner.isBottomPrincipal() && reader.isBottomPrincipal();
     }
+
     @Override
     public boolean isTopConfidentiality() {
         return owner.isTopPrincipal() && reader.isTopPrincipal();
     }
+
     @Override
     public boolean isTop() {
         return isTopConfidentiality();
     }
+
     @Override
     public boolean isBottom() {
         return isBottomConfidentiality();
     }
+
     @Override
     public ConfPolicy meet(ConfPolicy p) {
-        JifTypeSystem ts = (JifTypeSystem)this.ts;
+        JifTypeSystem ts = (JifTypeSystem) this.ts;
         return ts.meet(this, p);
     }
+
     @Override
     public ConfPolicy join(ConfPolicy p) {
-        JifTypeSystem ts = (JifTypeSystem)this.ts;
+        JifTypeSystem ts = (JifTypeSystem) this.ts;
         return ts.join(this, p);
     }
 }

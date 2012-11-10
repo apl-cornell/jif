@@ -7,10 +7,14 @@ import jif.types.principal.Principal;
 import polyglot.types.TypeObject_c;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>CallerConstraint</code> interface.
  */
-public class CallerConstraint_c extends TypeObject_c implements CallerConstraint {
+public class CallerConstraint_c extends TypeObject_c implements
+CallerConstraint {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<Principal> principals;
 
     public CallerConstraint_c(JifTypeSystem ts, Position pos,

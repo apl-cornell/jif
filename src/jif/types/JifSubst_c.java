@@ -19,10 +19,13 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CachingTransformingList;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.Transformation;
 
-public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubst
-{
+public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
+        JifSubst {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifSubst_c(JifTypeSystem ts,
             Map<ParamInstance, ? extends Param> subst) {
         super(ts, subst);
@@ -53,7 +56,7 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
         // But at least it'll be correct, otherwise we end up with, say,
         // C[L1] and C[L2] being regarded as equal, and thus having the same
         // substitution.
-        return ((JifTypeSystem)ts).equalsNoStrip(t1, t2);
+        return ((JifTypeSystem) ts).equalsNoStrip(t1, t2);
     }
 
     @Override
@@ -61,8 +64,7 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
         JifTypeSystem ts = (JifTypeSystem) this.ts;
 
         if (ts.isLabeled(t)) {
-            return ts.labeledType(t.position(),
-                    substType(ts.unlabel(t)),
+            return ts.labeledType(t.position(), substType(ts.unlabel(t)),
                     substLabel(ts.labelOfType(t)));
         }
 
@@ -72,7 +74,7 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
     @Override
     public ClassType substClassType(ClassType t) {
         // Don't bother trying to substitute into a non-Jif class.
-        if (! (t instanceof JifClassType)) {
+        if (!(t instanceof JifClassType)) {
             return t;
         }
 
@@ -85,10 +87,11 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
         mi = super.substMethod(mi);
 
         if (mi instanceof JifProcedureInstance) {
-            JifProcedureInstance jmi = (JifProcedureInstance)mi;
+            JifProcedureInstance jmi = (JifProcedureInstance) mi;
 
             jmi.setPCBound(substLabel(jmi.pcBound()), jmi.isDefaultPCBound());
-            jmi.setReturnLabel(substLabel(jmi.returnLabel()), jmi.isDefaultReturnLabel());
+            jmi.setReturnLabel(substLabel(jmi.returnLabel()),
+                    jmi.isDefaultReturnLabel());
             jmi.setConstraints(new CachingTransformingList<Assertion, Assertion>(
                     jmi.constraints(), new ConstraintXform()));
 
@@ -108,7 +111,8 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
             JifProcedureInstance jci = (JifProcedureInstance) ci;
 
             jci.setPCBound(substLabel(jci.pcBound()), jci.isDefaultPCBound());
-            jci.setReturnLabel(substLabel(jci.returnLabel()), jci.isDefaultReturnLabel());
+            jci.setReturnLabel(substLabel(jci.returnLabel()),
+                    jci.isDefaultReturnLabel());
             jci.setConstraints(new CachingTransformingList<Assertion, Assertion>(
                     jci.constraints(), new ConstraintXform()));
 
@@ -125,7 +129,7 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
     public <FI extends FieldInstance> FI substField(FI fi) {
         fi = super.substField(fi);
         if (fi instanceof JifFieldInstance) {
-            JifFieldInstance jfi = (JifFieldInstance)fi;
+            JifFieldInstance jfi = (JifFieldInstance) fi;
             jfi.setLabel(substLabel(jfi.label()));
 
             @SuppressWarnings("unchecked")
@@ -165,32 +169,29 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
 
         if (constraint instanceof ActsForConstraint) {
             @SuppressWarnings("unchecked")
-            ActsForConstraint<Actor, Granter> c = (ActsForConstraint<Actor, Granter>) constraint;
+            ActsForConstraint<Actor, Granter> c =
+                    (ActsForConstraint<Actor, Granter>) constraint;
             c = c.actor(substActsForParam(c.actor()));
             c = c.granter(substActsForParam(c.granter()));
             return c;
-        }
-        else if (constraint instanceof LabelLeAssertion) {
+        } else if (constraint instanceof LabelLeAssertion) {
             LabelLeAssertion c = (LabelLeAssertion) constraint;
             c = c.lhs(substLabel(c.lhs()));
             c = c.rhs(substLabel(c.rhs()));
             return c;
-        }
-        else if (constraint instanceof CallerConstraint) {
+        } else if (constraint instanceof CallerConstraint) {
             CallerConstraint c = (CallerConstraint) constraint;
             List<Principal> l =
                     new CachingTransformingList<Principal, Principal>(
                             c.principals(), new PrincipalXform());
             return c.principals(l);
-        }
-        else if (constraint instanceof AuthConstraint) {
+        } else if (constraint instanceof AuthConstraint) {
             AuthConstraint c = (AuthConstraint) constraint;
             List<Principal> l =
                     new CachingTransformingList<Principal, Principal>(
                             c.principals(), new PrincipalXform());
             return c.principals(l);
-        }
-        else if (constraint instanceof AutoEndorseConstraint) {
+        } else if (constraint instanceof AutoEndorseConstraint) {
             AutoEndorseConstraint c = (AutoEndorseConstraint) constraint;
             c = c.endorseTo(substLabel(c.endorseTo()));
             return c;
@@ -233,7 +234,9 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
      * substitutions on <code>Label</code>s and <code>Principal</code>s.
      *
      */
-    protected class SubstLabelSubst extends LabelSubstitution implements Serializable {
+    @SuppressWarnings("serial")
+    protected class SubstLabelSubst extends LabelSubstitution implements
+            Serializable {
         /**
          * @throws SemanticException
          */
@@ -242,8 +245,7 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
             if (L instanceof ParamLabel) {
                 ParamLabel c = (ParamLabel) L;
                 return subLabel(c, c.paramInstance());
-            }
-            else if (L instanceof CovariantParamLabel) {
+            } else if (L instanceof CovariantParamLabel) {
                 CovariantParamLabel c = (CovariantParamLabel) L;
                 return subLabel(c, c.paramInstance());
             }
@@ -264,7 +266,6 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
         }
     }
 
-
     /** Return the substitution of uid, or label if not found. */
     protected Label subLabel(Label label, ParamInstance pi) {
         Param sub = subst.get(pi);
@@ -272,16 +273,14 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
 
         if (sub instanceof UnknownParam) {
             return ts.unknownLabel(sub.position());
-        }
-        else if (sub instanceof Label) {
+        } else if (sub instanceof Label) {
             return (Label) sub;
-        }
-        else if (sub == null) {
+        } else if (sub == null) {
             return label;
-        }
-        else {
-            throw new InternalCompilerError("Cannot substitute " + label +
-                    " for " + sub + " with param instance " + pi, label.position());
+        } else {
+            throw new InternalCompilerError("Cannot substitute " + label
+                    + " for " + sub + " with param instance " + pi,
+                    label.position());
         }
     }
 
@@ -292,16 +291,14 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
 
         if (sub instanceof UnknownParam) {
             return ts.unknownPrincipal(sub.position());
-        }
-        else if (sub instanceof Principal) {
+        } else if (sub instanceof Principal) {
             return (Principal) sub;
-        }
-        else if (sub == null) {
+        } else if (sub == null) {
             return principal;
-        }
-        else {
-            throw new InternalCompilerError("Cannot substitute " + principal +
-                    " for " + sub + " with param instance " + pi, principal.position());
+        } else {
+            throw new InternalCompilerError("Cannot substitute " + principal
+                    + " for " + sub + " with param instance " + pi,
+                    principal.position());
         }
     }
 
@@ -311,16 +308,15 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements JifSubs
     @Override
     protected Param substSubstValue(Param value) {
         if (value instanceof Label) {
-            return substLabel((Label)value);
-        }
-        else if (value instanceof Principal) {
-            return substPrincipal((Principal)value);
+            return substLabel((Label) value);
+        } else if (value instanceof Principal) {
+            return substPrincipal((Principal) value);
         }
         return super.substSubstValue(value);
     }
 
     public class ConstraintXform implements
-    Transformation<Assertion, Assertion> {
+            Transformation<Assertion, Assertion> {
         @Override
         public Assertion transform(Assertion a) {
             return substConstraint(a);

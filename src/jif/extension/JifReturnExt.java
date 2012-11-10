@@ -18,20 +18,21 @@ import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>Return</code> node. 
  * 
  *  @see polyglot.ast.Return 
  */
-public class JifReturnExt extends JifStmtExt_c
-{
+public class JifReturnExt extends JifStmtExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifReturnExt(ToJavaExt toJava) {
         super(toJava);
     }
 
     @Override
-    public Node labelCheckStmt(LabelChecker lc) throws SemanticException
-    {
+    public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         Return rs = (Return) node();
 
         JifTypeSystem ts = lc.jifTypeSystem();
@@ -46,8 +47,7 @@ public class JifReturnExt extends JifStmtExt_c
             X = ts.pathMap();
             X = X.R(A.pc());
             X = X.NV(ts.notTaken());
-        }
-        else {
+        } else {
             e = (Expr) lc.context(A).labelCheck(rs.expr());
 
             PathMap Xe = getPathMap(e);
@@ -56,9 +56,9 @@ public class JifReturnExt extends JifStmtExt_c
             X = X.R(Xe.N());
 
             CodeInstance ci = A.currentCode();
-            if (! (ci instanceof MethodInstance)) {
-                throw new SemanticException(
-                                            "Cannot return a value from " + ci + ".");
+            if (!(ci instanceof MethodInstance)) {
+                throw new SemanticException("Cannot return a value from " + ci
+                        + ".");
             }
             JifMethodInstance mi = (JifMethodInstance) ci;
             // Type retType = A.instantiate(mi.returnType()); 
@@ -69,49 +69,46 @@ public class JifReturnExt extends JifStmtExt_c
 
             if (ts.isLabeled(retType)) {
                 Lrv = lc.upperBound(ts.labelOfType(retType), Lr);
-            }
-            else {
-                throw new InternalCompilerError("Unexpected return type: " + retType);
+            } else {
+                throw new InternalCompilerError("Unexpected return type: "
+                        + retType);
             }
 
             lc.constrain(new NamedLabel("rv",
-                                        "the label of the value returned",
-                                        Xe.NV()),
-                                        LabelConstraint.LEQ,
-                                        new NamedLabel("Lrv", 
-                                                       "return value label of the method",
-                                                       Lrv),
-                       A.labelEnv(),
-                       rs.position(),
-                       new ConstraintMessage()
-            {
-                @Override
-                public String msg() { 
-                    return "This method may return a value with " +
-                    "a more restrictive label than the " +
-                    "declared return value label.";
-                }
-                @Override
-                public String detailMsg() { 
-                    return msg() + " The declared return type " +
-                    "of this method is " + retType + 
-                    ". As such, values returned by this " +  
-                    "method can have a label of at most " +
-                    namedRhs() +".";
-                }
-                @Override
-                public String technicalMsg() {
-                    return "this method may return a value " +
-                    "with a more restrictive label " + 
-                    "than the declared return value label.";
-                }
-            }
-            );
+                    "the label of the value returned", Xe.NV()),
+                    LabelConstraint.LEQ, new NamedLabel("Lrv",
+                            "return value label of the method", Lrv), A
+                            .labelEnv(), rs.position(),
+                    new ConstraintMessage() {
+                        @Override
+                        public String msg() {
+                            return "This method may return a value with "
+                                    + "a more restrictive label than the "
+                                    + "declared return value label.";
+                        }
+
+                        @Override
+                        public String detailMsg() {
+                            return msg() + " The declared return type "
+                                    + "of this method is " + retType
+                                    + ". As such, values returned by this "
+                                    + "method can have a label of at most "
+                                    + namedRhs() + ".";
+                        }
+
+                        @Override
+                        public String technicalMsg() {
+                            return "this method may return a value "
+                                    + "with a more restrictive label "
+                                    + "than the declared return value label.";
+                        }
+                    });
 
             // Must check that the expression type is a subtype of the declared
             // return type.  Most of this is done in typeCheck, but if they are
             // instantitation types, we must add constraints for the labels.
-            SubtypeChecker subtypeChecker = new SubtypeChecker(retType, e.type());
+            SubtypeChecker subtypeChecker =
+                    new SubtypeChecker(retType, e.type());
             subtypeChecker.addSubtypeConstraints(lc.context(A), e.position());
         }
 

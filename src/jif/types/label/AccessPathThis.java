@@ -11,13 +11,17 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Represents a final access path rooted at "this".
  * @see jif.types.label.AccessPath
  */
 public class AccessPathThis extends AccessPathRoot {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private ClassType ct;
+
     /**
      * 
      * @param ct may be null.
@@ -28,9 +32,15 @@ public class AccessPathThis extends AccessPathRoot {
     }
 
     @Override
-    public boolean isCanonical() { return true; }
+    public boolean isCanonical() {
+        return true;
+    }
+
     @Override
-    public boolean isNeverNull() { return true; }
+    public boolean isNeverNull() {
+        return true;
+    }
+
     @Override
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         if (r instanceof AccessPathThis) {
@@ -59,10 +69,11 @@ public class AccessPathThis extends AccessPathRoot {
     public String exprString() {
         return "this";
     }
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof AccessPathThis) {
-            AccessPathThis that = (AccessPathThis)o;
+            AccessPathThis that = (AccessPathThis) o;
             if (this.ct == that.ct || this.ct == null || that.ct == null)
                 return true;
             // return true if this.ct <= that.ct or that.ct <= this.ct
@@ -75,6 +86,7 @@ public class AccessPathThis extends AccessPathRoot {
     public int hashCode() {
         return -572309;
     }
+
     @Override
     public Type type() {
         return ct;
@@ -82,9 +94,8 @@ public class AccessPathThis extends AccessPathRoot {
 
     @Override
     public PathMap labelcheck(JifContext A, LabelChecker lc) {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
-        JifClassType ct = (JifClassType)A.currentClass();
-
+        JifTypeSystem ts = (JifTypeSystem) A.typeSystem();
+        JifClassType ct = (JifClassType) A.currentClass();
 
         PathMap X = ts.pathMap();
         X = X.N(A.pc());
@@ -93,16 +104,16 @@ public class AccessPathThis extends AccessPathRoot {
         X = X.NV(lc.upperBound(ct.thisLabel(), A.pc()));
         return X;
     }
+
     @Override
     public void verify(JifContext A) throws SemanticException {
         if (ct == null) {
             ct = A.currentClass();
-        }
-        else {
+        } else {
             if (!A.currentClass().isSubtype(ct)) {
-                throw new InternalCompilerError("Unexpected class type for " +
-                        "access path this: wanted a supertype of " +
-                        A.currentClass());
+                throw new InternalCompilerError("Unexpected class type for "
+                        + "access path this: wanted a supertype of "
+                        + A.currentClass());
             }
         }
     }

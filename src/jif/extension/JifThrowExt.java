@@ -13,20 +13,21 @@ import polyglot.ast.Node;
 import polyglot.ast.Throw;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
 
 /** Jif extension of the <code>Throw</code> node.
  * 
  *  @see polyglot.ast.Throw
  */
-public class JifThrowExt extends JifStmtExt_c
-{
+public class JifThrowExt extends JifStmtExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifThrowExt(ToJavaExt toJava) {
         super(toJava);
     }
 
     @Override
-    public Node labelCheckStmt(LabelChecker lc) throws SemanticException
-    {
+    public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         Throw ths = (Throw) node();
 
         JifTypeSystem ts = lc.jifTypeSystem();
@@ -39,7 +40,8 @@ public class JifThrowExt extends JifStmtExt_c
         PathMap Xe = getPathMap(e);
         PathMap X = Xe;
 
-        if (!((JifThrowDel)ths.del()).thrownIsNeverNull() && !ts.NullPointerException().equals(e.type())) {
+        if (!((JifThrowDel) ths.del()).thrownIsNeverNull()
+                && !ts.NullPointerException().equals(e.type())) {
             checkAndRemoveThrowType(throwTypes, ts.NullPointerException());
             X = X.exc(Xe.NV(), ts.NullPointerException());
         }

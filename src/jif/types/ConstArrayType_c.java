@@ -11,10 +11,12 @@ import polyglot.types.MethodInstance;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 
-public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
-{
+public class ConstArrayType_c extends ArrayType_c implements ConstArrayType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected boolean isConst;
     protected boolean isNonConst;
 

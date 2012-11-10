@@ -10,8 +10,11 @@ import polyglot.types.ReferenceType;
 import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class ThisLabel_c extends Label_c implements ThisLabel {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private final ReferenceType ct;
     private final String fullName;
 
@@ -20,17 +23,18 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
         this.ct = ct;
         if (ct.isClass()) {
             this.fullName = ct.toClass().fullName();
-        }
-        else if (ct.isArray()) {
+        } else if (ct.isArray()) {
             this.fullName = ct.toArray().base().toString() + "[]";
-        }
-        else throw new InternalCompilerError("Only class types and arrays allowed");
+        } else throw new InternalCompilerError(
+                "Only class types and arrays allowed");
         setDescription("label of the special variable \"this\" in " + ct);
     }
 
-
     @Override
-    public boolean isRuntimeRepresentable() { return false; }
+    public boolean isRuntimeRepresentable() {
+        return false;
+    }
+
     @Override
     public boolean isCovariant() {
         // the this label is not actually covariant, it's really an arg-label
@@ -40,13 +44,24 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
     }
 
     @Override
-    public boolean isComparable() { return true; }
+    public boolean isComparable() {
+        return true;
+    }
+
     @Override
-    public boolean isCanonical() { return true; }
+    public boolean isCanonical() {
+        return true;
+    }
+
     @Override
-    public boolean isDisambiguatedImpl() { return true; }
+    public boolean isDisambiguatedImpl() {
+        return true;
+    }
+
     @Override
-    public boolean isEnumerable() { return true; }
+    public boolean isEnumerable() {
+        return true;
+    }
 
     @Override
     public ReferenceType classType() {
@@ -56,12 +71,13 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
     @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
-        if (! (o instanceof ThisLabel)) {
+        if (!(o instanceof ThisLabel)) {
             return false;
         }
         ThisLabel that = (ThisLabel) o;
         return this.ct.equals(that.classType());
     }
+
     @Override
     public int hashCode() {
         return fullName.hashCode();
@@ -71,8 +87,7 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
     public String componentString(Set<Label> printedLabels) {
         if (Report.should_report(Report.debug, 2)) {
             return "<this (of " + fullName + ")>";
-        }
-        else if (Report.should_report(Report.debug, 1)) {
+        } else if (Report.should_report(Report.debug, 1)) {
             return "<this (of " + fullName + ")>";
         }
         return "this";
@@ -89,6 +104,5 @@ public class ThisLabel_c extends Label_c implements ThisLabel {
     public Set<Variable> variables() {
         return Collections.emptySet();
     }
-
 
 }

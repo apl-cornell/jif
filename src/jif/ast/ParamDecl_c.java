@@ -9,20 +9,21 @@ import polyglot.ast.Node_c;
 import polyglot.types.Context;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeBuilder;
 
 /** An implementation of the <code>ParamDecl</code> interface.
  */
-public class ParamDecl_c extends Node_c implements ParamDecl
-{
+public class ParamDecl_c extends Node_c implements ParamDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     ParamInstance pi;
     Id name;
     ParamInstance.Kind kind;
 
-    public ParamDecl_c(Position pos, ParamInstance.Kind kind,
-            Id name) {
+    public ParamDecl_c(Position pos, ParamInstance.Kind kind, Id name) {
         super(pos);
         this.kind = kind;
         this.name = name;
@@ -76,8 +77,8 @@ public class ParamDecl_c extends Node_c implements ParamDecl
 
     @Override
     public boolean isLabel() {
-        return kind == ParamInstance.INVARIANT_LABEL ||
-                kind == ParamInstance.COVARIANT_LABEL;
+        return kind == ParamInstance.INVARIANT_LABEL
+                || kind == ParamInstance.COVARIANT_LABEL;
     }
 
     @Override
@@ -114,11 +115,9 @@ public class ParamDecl_c extends Node_c implements ParamDecl
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (kind == ParamInstance.COVARIANT_LABEL) {
             w.write("covariant label ");
-        }
-        else if (kind == ParamInstance.INVARIANT_LABEL) {
+        } else if (kind == ParamInstance.INVARIANT_LABEL) {
             w.write("label ");
-        }
-        else if (kind == ParamInstance.PRINCIPAL) {
+        } else if (kind == ParamInstance.PRINCIPAL) {
             w.write("principal ");
         }
 
@@ -126,5 +125,6 @@ public class ParamDecl_c extends Node_c implements ParamDecl
     }
 
     @Override
-    public void translate(CodeWriter w, Translator tr) { }
+    public void translate(CodeWriter w, Translator tr) {
+    }
 }

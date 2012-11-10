@@ -3,8 +3,10 @@ package jif.types;
 import polyglot.types.TypeObject_c;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public abstract class Param_c extends TypeObject_c implements Param {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public Param_c() {
         super();

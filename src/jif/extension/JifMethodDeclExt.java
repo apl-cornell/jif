@@ -23,20 +23,21 @@ import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>JifMethodDecl</code> node.
  * 
  *  @see jif.ast.JifMethodDecl
  */
-public class JifMethodDeclExt extends JifProcedureDeclExt_c
-{
+public class JifMethodDeclExt extends JifProcedureDeclExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifMethodDeclExt(ToJavaExt toJava) {
         super(toJava);
     }
 
     @Override
-    public Node labelCheck(LabelChecker lc) throws SemanticException
-    {
+    public Node labelCheck(LabelChecker lc) throws SemanticException {
 
         JifMethodDecl mn = (JifMethodDecl) node();
         JifMethodInstance renamedMI = (JifMethodInstance) mn.methodInstance();
@@ -66,7 +67,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         Block body = null;
         PathMap X;
 
-        if (! mi.flags().isAbstract() && ! mi.flags().isNative()) {
+        if (!mi.flags().isAbstract() && !mi.flags().isNative()) {
             // Now, check the body of the method in the new context.
 
             // join the provider label into the pc
@@ -82,8 +83,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
                 Report.report(3, "Body path labels = " + X);
 
             addReturnConstraints(Li, X, mi, lc, mi.returnType());
-        }
-        else {
+        } else {
             // for an abstract or native method, just set the
             // normal termination path to the entry PC of the
             // method.
@@ -105,7 +105,8 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
      * @throws SemanticDetailedException
      *
      */
-    protected void checkCovariance(JifMethodInstance mi, LabelChecker lc) throws SemanticDetailedException {
+    protected void checkCovariance(JifMethodInstance mi, LabelChecker lc)
+            throws SemanticDetailedException {
         if (mi.flags().isStatic()) {
             // static methods are ok, since they do not override other methods.
             return;
@@ -116,14 +117,17 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         // check pc bound
         Label Li = mi.pcBound();
         if (Li.isCovariant()) {
-            throw new SemanticDetailedException("The pc bound of a method " +
-                    "can not be the covariant label " + Li + ".",
-                    "The pc bound of a method " +
-                            "can not be the covariant label " + Li + ". " +
-                            "Otherwise, information may be leaked by casting the " +
-                            "low-parameter class to a high-parameter class, and masking " +
-                            "the low side-effects that invoking the method may cause.",
-                            declPosition);
+            throw new SemanticDetailedException(
+                    "The pc bound of a method "
+                            + "can not be the covariant label " + Li + ".",
+                    "The pc bound of a method "
+                            + "can not be the covariant label "
+                            + Li
+                            + ". "
+                            + "Otherwise, information may be leaked by casting the "
+                            + "low-parameter class to a high-parameter class, and masking "
+                            + "the low side-effects that invoking the method may cause.",
+                    declPosition);
         }
 
         // check arguments
@@ -133,18 +137,24 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         List<? extends Type> formalTypes = mi.formalTypes();
         for (Type tj : formalTypes) {
             // This is the declared label of the parameter.
-            Label argBj = ((ArgLabel)ts.labelOfType(tj)).upperBound();
+            Label argBj = ((ArgLabel) ts.labelOfType(tj)).upperBound();
             if (argBj.isCovariant()) {
                 String name = mn.formals().get(index).name();
-                throw new SemanticDetailedException("The method " +
-                        "argument " + name +
-                        " can not be labeled with the covariant label " + argBj + ".",
-                        "The method argument " + name +
-                        " can not be labeled with the covariant label " + argBj + ". " +
-                        "Otherwise, information may be leaked by casting the " +
-                        "low-parameter class to a high-parameter class, and calling " +
-                        "the method with a high security parameter, which the " +
-                        "method regards as low security information.",
+                throw new SemanticDetailedException(
+                        "The method "
+                                + "argument "
+                                + name
+                                + " can not be labeled with the covariant label "
+                                + argBj + ".",
+                        "The method argument "
+                                + name
+                                + " can not be labeled with the covariant label "
+                                + argBj
+                                + ". "
+                                + "Otherwise, information may be leaked by casting the "
+                                + "low-parameter class to a high-parameter class, and calling "
+                                + "the method with a high security parameter, which the "
+                                + "method regards as low security information.",
                         argBj.position());
             }
 
@@ -177,12 +187,14 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
      * return labels, return value labels and labels on exception types are
      * covariant.
      */
-    protected void overrideMethodLabelCheck(LabelChecker lc, final JifMethodInstance mi) throws SemanticException {
+    protected void overrideMethodLabelCheck(LabelChecker lc,
+            final JifMethodInstance mi) throws SemanticException {
         JifTypeSystem ts = lc.jifTypeSystem();
         @SuppressWarnings("unchecked")
-        List<JifMethodInstance> implemented = (List<JifMethodInstance>) mi.implemented();
+        List<JifMethodInstance> implemented =
+                (List<JifMethodInstance>) mi.implemented();
         for (final JifMethodInstance mj : implemented) {
-            if (! ts.isAccessible(mj, lc.context())) {
+            if (!ts.isAccessible(mj, lc.context())) {
                 continue;
             }
             lc.createOverrideHelper(mj, mi).checkOverride(lc);
@@ -198,6 +210,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         CovariantLabelChecker(Position errPosition) {
             this.errPosition = errPosition;
         }
+
         @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ThisLabel) {
@@ -210,16 +223,13 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
 //              "subclasses may " +
 //              "not satisfy the constraint.",
 //              errPosition);
-            }
-            else if (L.isCovariant()) {
-                throw new SemanticDetailedException("Covariant labels " +
-                        "can not occur on the right hand side of " +
-                        "a label constraint.",
-                        "Covariant labels " +
-                                "can not occur on the right hand side of " +
-                                "a label constraint, since subclasses may " +
-                                "not satisfy the constraint.",
-                                errPosition);
+            } else if (L.isCovariant()) {
+                throw new SemanticDetailedException("Covariant labels "
+                        + "can not occur on the right hand side of "
+                        + "a label constraint.", "Covariant labels "
+                        + "can not occur on the right hand side of "
+                        + "a label constraint, since subclasses may "
+                        + "not satisfy the constraint.", errPosition);
             }
             return L;
         }
@@ -232,6 +242,5 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c
         }
 
     }
-
 
 }

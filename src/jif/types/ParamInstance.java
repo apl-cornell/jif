@@ -2,13 +2,16 @@ package jif.types;
 
 import polyglot.types.VarInstance;
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /** A parameter instance. A wrapper of all the type information 
  *  related to a label/principal parameter. 
  */
 public interface ParamInstance extends polyglot.ext.param.types.Param, VarInstance
 {
-    public static class Kind extends Enum {
+    public static class Kind extends Enum { 
+        private static final long serialVersionUID = SerialVersionUID.generate();
+
         final boolean isPrincipal;
         final boolean isInvariantLabel;
         final boolean isCovariantLabel; 

@@ -35,13 +35,15 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>Call</code> node.
  * 
  *  @see polyglot.ast.Call_c
  */
-public class JifCallExt extends JifExprExt
-{
+public class JifCallExt extends JifExprExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifCallExt(ToJavaExt toJava) {
         super(toJava);
     }
@@ -58,19 +60,21 @@ public class JifCallExt extends JifExprExt
             // in the constructor prologue, the this object cannot be the receiver or an argument
             if (me.target() instanceof Expr
                     && JifUtil.effectiveExpr((Expr) me.target()) instanceof Special) {
-                throw new SemanticDetailedException("No methods may be called on \"this\" object in a constructor prologue.",
-                        "In a constructor body before the call to the super class, no " +
-                                "reference to the \"this\" object is allowed to escape. This means " +
-                                "that no methods of the current object may be called.",
-                                me.position());
+                throw new SemanticDetailedException(
+                        "No methods may be called on \"this\" object in a constructor prologue.",
+                        "In a constructor body before the call to the super class, no "
+                                + "reference to the \"this\" object is allowed to escape. This means "
+                                + "that no methods of the current object may be called.",
+                        me.position());
             }
             for (Expr arg : me.arguments()) {
                 if (JifUtil.effectiveExpr(arg) instanceof Special) {
-                    throw new SemanticDetailedException("The \"this\" object cannot be used as a method argument in a constructor prologue.",
-                            "In a constructor body before the call to the super class, no " +
-                                    "reference to the \"this\" object is allowed to escape. This means " +
-                                    "that the \"this\" object cannot be used as a method argument.",
-                                    arg.position());
+                    throw new SemanticDetailedException(
+                            "The \"this\" object cannot be used as a method argument in a constructor prologue.",
+                            "In a constructor body before the call to the super class, no "
+                                    + "reference to the \"this\" object is allowed to escape. This means "
+                                    + "that the \"this\" object cannot be used as a method argument.",
+                            arg.position());
                 }
 
             }
@@ -90,10 +94,10 @@ public class JifCallExt extends JifExprExt
         if (rt != null && rt.fields() != null) {
             for (FieldInstance fi : rt.fields()) {
                 JifFieldInstance jfi = (JifFieldInstance) fi;
-                if (jfi.flags().isFinal() && jfi.flags().isStatic() && jfi.hasInitializer()) {
+                if (jfi.flags().isFinal() && jfi.flags().isStatic()
+                        && jfi.hasInitializer()) {
                     AccessPathField path =
-                            (AccessPathField) ts
-                            .varInstanceToAccessPath(jfi,
+                            (AccessPathField) ts.varInstanceToAccessPath(jfi,
                                     jfi.position());
                     Param init = jfi.initializer();
                     if (ts.isLabel(jfi.type())) {
@@ -101,11 +105,16 @@ public class JifCallExt extends JifExprExt
                         Label rhs_label = (Label) init;
                         if (rhs_label == null) {
                             // label checking has not been done on ct yet
-                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
+                            JifScheduler sched =
+                                    (JifScheduler) lc.job().extensionInfo()
+                                            .scheduler();
                             ParsedClassType pct = (ParsedClassType) rt;
-                            if(sched.sourceHasJob(pct.fromSource())) {
-                                Job job = sched.loadSource((FileSource) pct.fromSource(),true);
-                                if(job != null) {
+                            if (sched.sourceHasJob(pct.fromSource())) {
+                                Job job =
+                                        sched.loadSource(
+                                                (FileSource) pct.fromSource(),
+                                                true);
+                                if (job != null) {
                                     Goal g = sched.LabelsChecked(job);
                                     throw new MissingDependencyException(g);
                                 }
@@ -115,23 +124,32 @@ public class JifCallExt extends JifExprExt
                             continue;
                         }
                         A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
-                    } else if (ts.isImplicitCastValid(jfi.type(), ts.Principal())) {
-                        DynamicPrincipal dp = ts.dynamicPrincipal(jfi.position(), path);
+                    } else if (ts.isImplicitCastValid(jfi.type(),
+                            ts.Principal())) {
+                        DynamicPrincipal dp =
+                                ts.dynamicPrincipal(jfi.position(), path);
                         Principal rhs_principal = (Principal) init;
                         if (rhs_principal == null) {
                             // label checking has not been done on ct yet
-                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
+                            JifScheduler sched =
+                                    (JifScheduler) lc.job().extensionInfo()
+                                            .scheduler();
                             ParsedClassType pct = (ParsedClassType) rt;
 
-                            if(sched.sourceHasJob(pct.fromSource())) {
-                                Job job = sched.loadSource((FileSource) pct.fromSource(),true);
-                                if(job != null) {
+                            if (sched.sourceHasJob(pct.fromSource())) {
+                                Job job =
+                                        sched.loadSource(
+                                                (FileSource) pct.fromSource(),
+                                                true);
+                                if (job != null) {
                                     Goal g = sched.LabelsChecked(job);
                                     throw new MissingDependencyException(g);
                                 }
                             }
                             // turns out label checking has occurred, but the init was null.
-                            rhs_principal = ts.bottomPrincipal(Position.compilerGenerated());
+                            rhs_principal =
+                                    ts.bottomPrincipal(Position
+                                            .compilerGenerated());
                         }
                         A.addDefinitionalEquiv(dp, rhs_principal);
                     }
@@ -139,21 +157,19 @@ public class JifCallExt extends JifExprExt
             }
         }
 
-
         // Find the method instance again. This ensures that
         // we have the correctly instantiated type, as label checking
         // of the target may have produced a new type for the target.
-        JifMethodInstance mi = (JifMethodInstance)ts.findMethod(rt,
-                me.name(),
-                me.methodInstance().formalTypes(),
-                A.currentClass());
+        JifMethodInstance mi =
+                (JifMethodInstance) ts.findMethod(rt, me.name(), me
+                        .methodInstance().formalTypes(), A.currentClass());
 
         me = me.methodInstance(mi);
 
         if (mi.flags().isStatic()) {
-            new ConstructorChecker().checkStaticMethodAuthority(mi, A, lc, me.position());
+            new ConstructorChecker().checkStaticMethodAuthority(mi, A, lc,
+                    me.position());
         }
-
 
         A = (JifContext) A.pushBlock();
 
@@ -164,32 +180,34 @@ public class JifCallExt extends JifExprExt
             Expr e = (Expr) target;
 
             if (e.type() == null)
-                throw new InternalCompilerError("Type of " + e + " is null", e.position());
+                throw new InternalCompilerError("Type of " + e + " is null",
+                        e.position());
 
             PathMap Xs = getPathMap(target);
             A.setPc(Xs.N(), lc);
 
-            if (! (target instanceof Special)) {
+            if (!(target instanceof Special)) {
                 // a NPE may be thrown depending on the target.
-                npExc = (!((JifCallDel)node().del()).targetIsNeverNull());
+                npExc = (!((JifCallDel) node().del()).targetIsNeverNull());
                 objLabel = Xs.NV();
                 A.setPc(Xs.NV(), lc);
-            }
-            else {
-                objLabel = ((JifClassType) lc.context().currentClass()).thisLabel();
+            } else {
+                objLabel =
+                        ((JifClassType) lc.context().currentClass())
+                                .thisLabel();
             }
         }
 
-        CallHelper helper = lc.createCallHelper(objLabel, target, mi.container(), mi, me.arguments(), node().position());
+        CallHelper helper =
+                lc.createCallHelper(objLabel, target, mi.container(), mi,
+                        me.arguments(), node().position());
         LabelChecker callLC = lc.context(A);
         helper.checkCall(callLC, throwTypes, npExc);
 
         // now use the call helper to bind the var labels that were created
         // during type checking of the call (see JifCallDel#typeCheck)
-        JifCallDel del = (JifCallDel)me.del();
-        helper.bindVarLabels(callLC,
-                del.receiverVarLabel,
-                del.argVarLabels,
+        JifCallDel del = (JifCallDel) me.del();
+        helper.bindVarLabels(callLC, del.receiverVarLabel, del.argVarLabels,
                 del.paramVarLabels);
 
         A = (JifContext) A.pop();
@@ -200,6 +218,8 @@ public class JifCallExt extends JifExprExt
         }
 
         checkThrowTypes(throwTypes);
-        return updatePathMap(me.target(target).arguments(helper.labelCheckedArgs()), helper.X());
+        return updatePathMap(
+                me.target(target).arguments(helper.labelCheckedArgs()),
+                helper.X());
     }
 }

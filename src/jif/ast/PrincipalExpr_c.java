@@ -11,14 +11,16 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
-public class PrincipalExpr_c extends Expr_c implements PrincipalExpr
-{
+public class PrincipalExpr_c extends Expr_c implements PrincipalExpr {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected PrincipalNode principal;
 
     public PrincipalExpr_c(Position pos, PrincipalNode principal) {

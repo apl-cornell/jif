@@ -22,11 +22,14 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * An abstract implementation of the <code>Label</code> interface.
  */
 public abstract class Label_c extends Param_c implements Label {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected String description;
 
     protected LabelToJavaExpr toJava;
@@ -45,9 +48,10 @@ public abstract class Label_c extends Param_c implements Label {
     public Label_c(JifTypeSystem ts, Position pos) {
         this(ts, pos, new CannotLabelToJavaExpr_c());
     }
+
     @Override
     public Label_c copy() {
-        Label_c l = (Label_c)super.copy();
+        Label_c l = (Label_c) super.copy();
         l.variables = null;
         l.simplified = null;
         return l;
@@ -84,8 +88,7 @@ public abstract class Label_c extends Param_c implements Label {
             VariableGatherer lvg = new VariableGatherer();
             try {
                 this.subst(lvg);
-            }
-            catch (SemanticException e) {
+            } catch (SemanticException e) {
                 throw new InternalCompilerError(e);
             }
             variables = lvg.variables;
@@ -131,17 +134,17 @@ public abstract class Label_c extends Param_c implements Label {
                 @Override
                 public Label substLabel(Label L) {
                     if (result[0] && L instanceof Label_c) {
-                        result[0] = ((Label_c)L).isDisambiguatedImpl();
+                        result[0] = ((Label_c) L).isDisambiguatedImpl();
                     }
                     return L;
                 }
+
                 @Override
                 public Principal substPrincipal(Principal p) {
                     return p;
                 }
             });
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new InternalCompilerError("Unexpected semantic exception", e);
         }
         return result[0];
@@ -169,14 +172,16 @@ public abstract class Label_c extends Param_c implements Label {
     public abstract boolean equalsImpl(TypeObject t);
 
     private Label simplified = null;
+
     @Override
     public final Label simplify() {
         // memoize the result
         if (simplified == null) {
-            simplified = ((Label_c)this.normalize()).simplifyImpl();
+            simplified = ((Label_c) this.normalize()).simplifyImpl();
         }
         return simplified;
     }
+
     protected Label simplifyImpl() {
         return this;
     }
@@ -188,12 +193,12 @@ public abstract class Label_c extends Param_c implements Label {
 
     @Override
     public ConfPolicy confProjection() {
-        return ((JifTypeSystem)ts).confProjection(this);
+        return ((JifTypeSystem) ts).confProjection(this);
     }
 
     @Override
     public IntegPolicy integProjection() {
-        return ((JifTypeSystem)ts).integProjection(this);
+        return ((JifTypeSystem) ts).integProjection(this);
     }
 
     @Override
@@ -208,7 +213,7 @@ public abstract class Label_c extends Param_c implements Label {
 
     @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) A.typeSystem();
         return ts.pathMap().N(A.pc()).NV(A.pc());
     }
 

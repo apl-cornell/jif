@@ -8,6 +8,7 @@ import polyglot.main.Report;
 import polyglot.types.ClassType;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Represents a final access path rooted at a class, e.g. "Foo[Alice]".
@@ -15,16 +16,24 @@ import polyglot.util.Position;
  * @see jif.types.label.AccessPath
  */
 public class AccessPathClass extends AccessPathRoot {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private ClassType ct;
+
     public AccessPathClass(ClassType ct, Position pos) {
         super(pos);
         this.ct = ct;
     }
 
     @Override
-    public boolean isCanonical() { return true; }
+    public boolean isCanonical() {
+        return true;
+    }
+
     @Override
-    public boolean isNeverNull() { return true; }
+    public boolean isNeverNull() {
+        return true;
+    }
 
     @Override
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
@@ -47,7 +56,7 @@ public class AccessPathClass extends AccessPathRoot {
     @Override
     public boolean equals(Object o) {
         if (o instanceof AccessPathClass) {
-            return ct.equals(((AccessPathClass)o).ct);
+            return ct.equals(((AccessPathClass) o).ct);
         }
         return false;
     }
@@ -64,7 +73,7 @@ public class AccessPathClass extends AccessPathRoot {
 
     @Override
     public PathMap labelcheck(JifContext A, LabelChecker lc) {
-        JifTypeSystem ts = (JifTypeSystem)A.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) A.typeSystem();
 
         // there is no information gained by accessing a class statically.
         return ts.pathMap().N(A.pc()).NV(A.pc());

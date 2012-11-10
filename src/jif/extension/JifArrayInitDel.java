@@ -6,19 +6,20 @@ import polyglot.ast.Node;
 import polyglot.types.ArrayType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
+public class JifArrayInitDel extends JifJL_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
-public class JifArrayInitDel extends JifJL_c
-{
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        ArrayInit ai = (ArrayInit)super.typeCheck(tc);
+        ArrayInit ai = (ArrayInit) super.typeCheck(tc);
         if (ai.type().isArray()) {
             ArrayType at = ai.type().toArray();
             // strip off the label of the base type, and replace them with variables
-            JifTypeSystem ts = (JifTypeSystem)tc.typeSystem();
-            ai = (ArrayInit)ai.type(relabelBaseType(at, ts));
+            JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();
+            ai = (ArrayInit) ai.type(relabelBaseType(at, ts));
 
         }
         return ai;
@@ -32,7 +33,10 @@ public class JifArrayInitDel extends JifJL_c
         if (base.isArray()) {
             base = relabelBaseType(base.toArray(), ts);
         }
-        base = ts.labeledType(base.position(), base, ts.freshLabelVariable(base.position(), "array_base", "label of base type of array"));
+        base =
+                ts.labeledType(base.position(), base, ts.freshLabelVariable(
+                        base.position(), "array_base",
+                        "label of base type of array"));
         return type.base(base);
     }
 }

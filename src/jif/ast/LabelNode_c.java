@@ -8,14 +8,16 @@ import polyglot.ast.Node_c;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 
 /** An implementation of the <code>LabelNode</code> interface. 
  */
-public abstract class LabelNode_c extends Node_c implements LabelNode
-{
+public abstract class LabelNode_c extends Node_c implements LabelNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private Label label;
 
     public LabelNode_c(Position pos) {
@@ -34,21 +36,21 @@ public abstract class LabelNode_c extends Node_c implements LabelNode
 
     @Override
     public Label label() {
-	return label;
+        return label;
     }
 
     @Override
     public LabelNode label(Label label) {
-	LabelNode_c n = (LabelNode_c) copy();
-	n.label = label;
-	return n;
+        LabelNode_c n = (LabelNode_c) copy();
+        n.label = label;
+        return n;
     }
 
     @Override
     public Label parameter() {
-	return label();
+        return label();
     }
-    
+
     @Override
     public LabelNode parameter(Label label) {
         return label(label);
@@ -56,40 +58,47 @@ public abstract class LabelNode_c extends Node_c implements LabelNode
 
     @Override
     public String toString() {
-	if (label != null) {
-	    return label.toString();
-	}
-	else {
-	    return "<unknown-label>";
-	}
+        if (label != null) {
+            return label.toString();
+        } else {
+            return "<unknown-label>";
+        }
     }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(this.toString());
     }
-    
+
     @Override
     public void dump(CodeWriter w) {
         if (label != null) {
-            w.write("(" + StringUtil.getShortNameComponent(label.getClass().getName()) + " ");
+            w.write("("
+                    + StringUtil.getShortNameComponent(label.getClass()
+                            .getName()) + " ");
             if (label instanceof PairLabel) {
                 PairLabel pl = (PairLabel) label;
                 ConfPolicy cp = pl.confPolicy();
                 IntegPolicy ip = pl.integPolicy();
-                w.write("{" + StringUtil.getShortNameComponent(cp.getClass().getName()) + " " + cp.toString() + ";" +
-                        StringUtil.getShortNameComponent(ip.getClass().getName()) + " " + ip.toString() + "}" + ")");
+                w.write("{"
+                        + StringUtil.getShortNameComponent(cp.getClass()
+                                .getName())
+                        + " "
+                        + cp.toString()
+                        + ";"
+                        + StringUtil.getShortNameComponent(ip.getClass()
+                                .getName()) + " " + ip.toString() + "}" + ")");
             } else {
                 w.write(label.toString());
             }
         } else {
             w.write("<null-label>");
         }
-    }    
-    
+    }
+
     @Override
     public final void translate(CodeWriter w, Translator tr) {
         throw new InternalCompilerError("cannot translate " + this);
     }
-    
+
 }

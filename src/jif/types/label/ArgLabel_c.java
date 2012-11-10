@@ -15,24 +15,28 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
 import polyglot.types.VarInstance;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * This label is used as the label of the real argument.
  * The purpose is to avoid having to re-interpret labels at each call.
  */
 public class ArgLabel_c extends Label_c implements ArgLabel {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private final VarInstance vi;
     private CodeInstance ci; // code instance containing vi, if relevant
     private String name;
     private Label upperBound;
 
-
     protected ArgLabel_c() {
         vi = null;
         ci = null;
-        name =  null;
+        name = null;
     }
-    public ArgLabel_c(JifTypeSystem ts, VarInstance vi, CodeInstance ci, Position pos) {
+
+    public ArgLabel_c(JifTypeSystem ts, VarInstance vi, CodeInstance ci,
+            Position pos) {
         super(ts, pos);
         this.vi = vi;
         this.ci = ci;
@@ -40,7 +44,8 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         setDescription();
     }
 
-    public ArgLabel_c(JifTypeSystem ts, ProcedureInstance pi, String name, Position pos) {
+    public ArgLabel_c(JifTypeSystem ts, ProcedureInstance pi, String name,
+            Position pos) {
         super(ts, pos);
         this.vi = null;
         this.ci = pi;
@@ -56,14 +61,12 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
                 sb.append(" of ");
                 if (ci instanceof JifMethodInstance) {
                     sb.append("method ");
-                    sb.append(((JifMethodInstance)ci).name());
+                    sb.append(((JifMethodInstance) ci).name());
 
-                }
-                else if (ci instanceof JifConstructorInstance) {
+                } else if (ci instanceof JifConstructorInstance) {
                     sb.append("constructor");
-                }
-                else {
-                    sb.append(((JifProcedureInstance)ci).debugString());
+                } else {
+                    sb.append(((JifProcedureInstance) ci).debugString());
                 }
             }
             sb.append(" (bounded above by ");
@@ -73,6 +76,7 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
             this.setDescription(sb.toString());
         }
     }
+
     @Override
     public VarInstance formalInstance() {
         return vi;
@@ -105,22 +109,39 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     }
 
     @Override
-    public boolean isRuntimeRepresentable() { return false; }
+    public boolean isRuntimeRepresentable() {
+        return false;
+    }
+
     @Override
-    public boolean isCovariant() { return false; }
+    public boolean isCovariant() {
+        return false;
+    }
+
     @Override
-    public boolean isComparable() { return true; }
+    public boolean isComparable() {
+        return true;
+    }
+
     @Override
-    public boolean isCanonical() { return true; }
+    public boolean isCanonical() {
+        return true;
+    }
+
     @Override
-    public boolean isEnumerable() { return true; }
+    public boolean isEnumerable() {
+        return true;
+    }
+
     @Override
-    protected boolean isDisambiguatedImpl() { return upperBound != null; }
+    protected boolean isDisambiguatedImpl() {
+        return upperBound != null;
+    }
 
     @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
-        if (! (o instanceof ArgLabel_c)) {
+        if (!(o instanceof ArgLabel_c)) {
             return false;
         }
         ArgLabel_c that = (ArgLabel_c) o;
@@ -128,15 +149,16 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         // use pointer equality for vi instead of equals
         // to ensure that we don't confuse e.g., local instances
         // with the same name.
-        return (this.ci == that.ci || (this.ci != null && this.ci.equals(that.ci)))  &&
-                this.vi == that.vi  &&
-                this.name.equals(that.name);
+        return (this.ci == that.ci || (this.ci != null && this.ci
+                .equals(that.ci)))
+                && this.vi == that.vi
+                && this.name.equals(that.name);
 
     }
 
     @Override
     public int hashCode() {
-        return (vi==null?234:vi.hashCode()) ^ 2346882;
+        return (vi == null ? 234 : vi.hashCode()) ^ 2346882;
     }
 
     @Override
@@ -144,8 +166,7 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         if (printedLabels.contains(this)) {
             if (Report.should_report(Report.debug, 2)) {
                 return "<arg " + nicename() + ">";
-            }
-            else if (Report.should_report(Report.debug, 1)) {
+            } else if (Report.should_report(Report.debug, 1)) {
                 return "<arg " + name + ">";
             }
             return nicename();
@@ -153,18 +174,21 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         printedLabels.add(this);
 
         if (Report.should_report(Report.debug, 2)) {
-            String ub = upperBound==null?"-":upperBound.toString(printedLabels);
+            String ub =
+                    upperBound == null ? "-" : upperBound
+                            .toString(printedLabels);
             return "<arg " + name + " " + ub + ">";
-        }
-        else if (Report.should_report(Report.debug, 1)) {
-            String ub = upperBound==null?"-":upperBound.toString(printedLabels);
+        } else if (Report.should_report(Report.debug, 1)) {
+            String ub =
+                    upperBound == null ? "-" : upperBound
+                            .toString(printedLabels);
             return "<arg " + nicename() + " " + ub + ">";
         }
         return nicename();
     }
 
     private String nicename() {
-        return vi==null?name:vi.name();
+        return vi == null ? name : vi.name();
     }
 
     @Override
@@ -184,13 +208,12 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
                     Label newBound = lbl.upperBound().subst(substitution);
 
                     if (newBound != lbl.upperBound()) {
-                        lbl = (ArgLabel)lbl.copy();
+                        lbl = (ArgLabel) lbl.copy();
                         lbl.setUpperBound(newBound);
                     }
                     substitution.popLabel(this);
                 }
-            }
-            else {
+            } else {
                 // the stack already contains this label, so don't call the
                 // substitution recursively
             }
@@ -198,11 +221,11 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         return substitution.substLabel(lbl);
 
     }
+
     @Override
     public String description() {
         setDescription();
         return super.description();
     }
-
 
 }

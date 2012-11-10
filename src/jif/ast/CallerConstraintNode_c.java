@@ -15,6 +15,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -25,6 +26,7 @@ import polyglot.visit.Translator;
  */
 public class CallerConstraintNode_c extends ConstraintNode_c<CallerConstraint>
         implements CallerConstraintNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<PrincipalNode> principals;
 

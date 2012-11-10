@@ -14,16 +14,17 @@ import jif.visit.LabelChecker;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
 
-public class JifLabelExprExt extends JifExprExt
-{
+public class JifLabelExprExt extends JifExprExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifLabelExprExt(ToJavaExt toJava) {
         super(toJava);
     }
 
     @Override
-    public Node labelCheck(LabelChecker lc) throws SemanticException
-    {
+    public Node labelCheck(LabelChecker lc) throws SemanticException {
         LabelExpr le = (LabelExpr) node();
         Label l = le.label().label();
         JifContext A = lc.jifContext();

@@ -7,10 +7,13 @@ import jif.types.JifTypeSystem;
 import jif.types.label.Variable;
 import polyglot.types.TypeObject;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>VarPrincipal</code> interface.
  */
 public class VarPrincipal_c extends Principal_c implements VarPrincipal {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private final transient int uid = ++counter;
     private static int counter = 0;
     private String name;
@@ -22,7 +25,8 @@ public class VarPrincipal_c extends Principal_c implements VarPrincipal {
 
     protected String description;
 
-    public VarPrincipal_c(String name, String description, JifTypeSystem ts, Position pos) {
+    public VarPrincipal_c(String name, String description, JifTypeSystem ts,
+            Position pos) {
         super(ts, pos);
         this.name = name;
         setDescription(description);
@@ -33,12 +37,15 @@ public class VarPrincipal_c extends Principal_c implements VarPrincipal {
     }
 
     @Override
-    public boolean isCanonical() { return true; }
+    public boolean isCanonical() {
+        return true;
+    }
 
     @Override
     public void setMustRuntimeRepresentable() {
         this.mustRuntimeRepresentable = true;
     }
+
     @Override
     public boolean mustRuntimeRepresentable() {
         return this.mustRuntimeRepresentable;
@@ -48,8 +55,11 @@ public class VarPrincipal_c extends Principal_c implements VarPrincipal {
     public boolean equalsImpl(TypeObject o) {
         return this == o;
     }
+
     @Override
-    public int hashCode() { return -88393 + uid; }
+    public int hashCode() {
+        return -88393 + uid;
+    }
 
     @Override
     public Set<Variable> variables() {

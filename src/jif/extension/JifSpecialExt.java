@@ -9,44 +9,46 @@ import jif.visit.LabelChecker;
 import polyglot.ast.Node;
 import polyglot.ast.Special;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>Special</code> node.
  * 
  *  @see polyglot.ast.Special
  */
-public class JifSpecialExt extends JifExprExt
-{
+public class JifSpecialExt extends JifExprExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifSpecialExt(ToJavaExt toJava) {
         super(toJava);
     }
 
     /*
     protected Param paramToParam(ParamInstance vi, TypeChecker visitor)
-	throws SemanticException {
-	JifTypeSystem ts = (JifTypeSystem) visitor.typeSystem();
-	JifNodeFactory nf = (JifNodeFactory) visitor.nodeFactory();
-	Position pos = node().position();
+    throws SemanticException {
+    JifTypeSystem ts = (JifTypeSystem) visitor.typeSystem();
+    JifNodeFactory nf = (JifNodeFactory) visitor.nodeFactory();
+    Position pos = node().position();
 
-	if (vi.isCovariantLabel()) {
-	    // <covariant label uid> => <covariant-label uid>
-	    Label L = ts.covariantLabel(pos, vi.uid());
-	    return L;
-	}
+    if (vi.isCovariantLabel()) {
+        // <covariant label uid> => <covariant-label uid>
+        Label L = ts.covariantLabel(pos, vi.uid());
+        return L;
+    }
 
-	if (vi.isInvariantLabel()) {
-	    // <param label uid> => <label-param uid>
-	    Label L = ts.paramLabel(pos, vi.uid());
-	    return L;
-	}
+    if (vi.isInvariantLabel()) {
+        // <param label uid> => <label-param uid>
+        Label L = ts.paramLabel(pos, vi.uid());
+        return L;
+    }
 
-	if (vi.isPrincipal()) {
-	    // <param principal uid> => <principal-param uid>
-	    Principal p = ts.principalParam(pos, vi.uid());
-	    return p;
-	}
+    if (vi.isPrincipal()) {
+        // <param principal uid> => <principal-param uid>
+        Principal p = ts.principalParam(pos, vi.uid());
+        return p;
+    }
 
-	throw new SemanticException("Unrecognized parameter type for " + vi,
-		                    pos);
+    throw new SemanticException("Unrecognized parameter type for " + vi,
+    	                    pos);
     }
      */
 
@@ -64,7 +66,9 @@ public class JifSpecialExt extends JifExprExt
 
         JifClassType ct = (JifClassType) A.currentClass();
 
-        se = (Special)se.type(ts.labeledType(se.position(), ct, ct.thisLabel()));
+        se =
+                (Special) se.type(ts.labeledType(se.position(), ct,
+                        ct.thisLabel()));
 
         PathMap X = ts.pathMap();
         X = X.N(A.pc());

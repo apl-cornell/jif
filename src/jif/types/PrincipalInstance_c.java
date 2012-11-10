@@ -4,11 +4,14 @@ import jif.types.principal.ExternalPrincipal;
 import polyglot.types.Type;
 import polyglot.types.VarInstance_c;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>PrincipalInstance</code> interface. 
  */
 public class PrincipalInstance_c extends VarInstance_c implements PrincipalInstance
 {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     ExternalPrincipal principal;
 
     public PrincipalInstance_c(JifTypeSystem ts, Position pos, ExternalPrincipal p) {

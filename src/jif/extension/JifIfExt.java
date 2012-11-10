@@ -17,13 +17,15 @@ import polyglot.ast.Unary;
 import polyglot.types.SemanticException;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
+import polyglot.util.SerialVersionUID;
 
 /** The Jif extension of the <code>If</code> node.
  * 
  *  @see polyglot.ast.If
  */
-public class JifIfExt extends JifStmtExt_c
-{
+public class JifIfExt extends JifStmtExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifIfExt(ToJavaExt toJava) {
         super(toJava);
     }
@@ -62,17 +64,16 @@ public class JifIfExt extends JifStmtExt_c
 
             A = (JifContext) A.pop();
             X2 = getPathMap(S2);
-        }
-        else {
+        } else {
             // Simulate the effect of an empty statement.
             // X0[node() := A[pc := Xe[nv][pc]]] == Xe[nv]
             X2 = ts.pathMap().N(Xe.NV());
         }
 
         /*
-	trace("Xe == " + Xe);
-	trace("X1 == " + X1);
-	trace("X2 == " + X2);
+        trace("Xe == " + Xe);
+        trace("X1 == " + X1);
+        trace("X2 == " + X2);
          */
 
         PathMap X = Xe.N(ts.notTaken()).join(X1).join(X2);
@@ -80,10 +81,12 @@ public class JifIfExt extends JifStmtExt_c
         return updatePathMap(is.cond(e).consequent(S1).alternative(S2), X);
     }
 
-    protected static void extendContext(LabelChecker lc, JifContext A, Expr e, boolean warn) throws SemanticException {
+    protected static void extendContext(LabelChecker lc, JifContext A, Expr e,
+            boolean warn) throws SemanticException {
         if (e instanceof Binary) {
-            Binary b = (Binary)e;
-            if (b.operator() == Binary.BIT_AND || b.operator() == Binary.COND_AND) {
+            Binary b = (Binary) e;
+            if (b.operator() == Binary.BIT_AND
+                    || b.operator() == Binary.COND_AND) {
                 extendContext(lc, A, b.left(), warn);
                 extendContext(lc, A, b.right(), warn);
             }
@@ -93,7 +96,7 @@ public class JifIfExt extends JifStmtExt_c
             }
         }
         if (e instanceof Unary) {
-            Unary u = (Unary)e;
+            Unary u = (Unary) e;
             if (u.operator() == Unary.NOT && u.expr() instanceof Binary) {
                 extendContext(lc, A, u.expr(), true);
             }
@@ -101,23 +104,21 @@ public class JifIfExt extends JifStmtExt_c
         extendFact(lc, A, e, warn);
     }
 
-    protected static void extendFact(LabelChecker lc,
-            JifContext A,
-            Expr e,
+    protected static void extendFact(LabelChecker lc, JifContext A, Expr e,
             boolean warn) throws SemanticException {
         if (e instanceof Binary) {
-            extendFact(lc, A, (Binary)e, warn);
+            extendFact(lc, A, (Binary) e, warn);
         }
         if (e instanceof Unary) {
-            Unary u = (Unary)e;
+            Unary u = (Unary) e;
             if (u.expr() instanceof Binary) {
-                extendFact(lc, A, (Binary)u.expr(), true);
+                extendFact(lc, A, (Binary) u.expr(), true);
             }
         }
     }
 
-
-    protected static void extendFact(LabelChecker lc, JifContext A, Binary b, boolean warn) throws SemanticException {
+    protected static void extendFact(LabelChecker lc, JifContext A, Binary b,
+            boolean warn) throws SemanticException {
         JifTypeSystem ts = lc.typeSystem();
         Binary.Operator op = b.operator();
 
@@ -133,35 +134,34 @@ public class JifIfExt extends JifStmtExt_c
             if (warn) {
                 // give a warning.
                 ErrorQueue eq = lc.errorQueue();
-                eq.enqueue(ErrorInfo.WARNING,
-                        "The Jif compiler can only reason about " +
-                                "actsfor tests if they occur as conjuncts in the " +
-                                "conditional of an if statement.",
-                                b.position());
+                eq.enqueue(
+                        ErrorInfo.WARNING,
+                        "The Jif compiler can only reason about "
+                                + "actsfor tests if they occur as conjuncts in the "
+                                + "conditional of an if statement.",
+                        b.position());
 
-            }
-            else {
+            } else {
                 A.addActsFor(actor, granter);
             }
-        }
-        else if (op == JifBinaryDel.EQUIV && ts.isImplicitCastValid(b.left().type(), ts.Principal())) {
+        } else if (op == JifBinaryDel.EQUIV
+                && ts.isImplicitCastValid(b.left().type(), ts.Principal())) {
             Principal left = ts.exprToPrincipal(ts, b.left(), A);
             Principal right = ts.exprToPrincipal(ts, b.right(), A);
             if (warn) {
                 // give a warning.
                 ErrorQueue eq = lc.errorQueue();
-                eq.enqueue(ErrorInfo.WARNING,
-                        "The Jif compiler can only reason about " +
-                                "actsfor tests if they occur as conjuncts in the " +
-                                "conditional of an if statement.",
-                                b.position());
+                eq.enqueue(
+                        ErrorInfo.WARNING,
+                        "The Jif compiler can only reason about "
+                                + "actsfor tests if they occur as conjuncts in the "
+                                + "conditional of an if statement.",
+                        b.position());
 
-            }
-            else {
+            } else {
                 A.addEquiv(left, right);
             }
-        }
-        else if (op == JifBinaryDel.EQUIV && ts.isLabel(b.left().type())) {
+        } else if (op == JifBinaryDel.EQUIV && ts.isLabel(b.left().type())) {
             Label lhs = ts.exprToLabel(ts, b.left(), A);
             Label rhs = ts.exprToLabel(ts, b.right(), A);
 
@@ -169,30 +169,27 @@ public class JifIfExt extends JifStmtExt_c
                 // give a warning.
                 ErrorQueue eq = lc.errorQueue();
                 eq.enqueue(ErrorInfo.WARNING,
-                        "The Jif compiler can only reason about label tests " +
-                                "if they occur as conjuncts in the " +
-                                "conditional of an if statement.",
-                                b.position());
+                        "The Jif compiler can only reason about label tests "
+                                + "if they occur as conjuncts in the "
+                                + "conditional of an if statement.",
+                        b.position());
 
-            }
-            else {
+            } else {
                 A.addEquiv(lhs, rhs);
             }
-        }
-        else if (op == Binary.LE && ts.isLabel(b.left().type())) {
+        } else if (op == Binary.LE && ts.isLabel(b.left().type())) {
             Label lhs = ts.exprToLabel(ts, b.left(), A);
             Label rhs = ts.exprToLabel(ts, b.right(), A);
             if (warn) {
                 // give a warning.
                 ErrorQueue eq = lc.errorQueue();
                 eq.enqueue(ErrorInfo.WARNING,
-                        "The Jif compiler can only reason about label tests " +
-                                "if they occur as conjuncts in the " +
-                                "conditional of an if statement.",
-                                b.position());
+                        "The Jif compiler can only reason about label tests "
+                                + "if they occur as conjuncts in the "
+                                + "conditional of an if statement.",
+                        b.position());
 
-            }
-            else {
+            } else {
                 A.addAssertionLE(lhs, rhs);
             }
         }

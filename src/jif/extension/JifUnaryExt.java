@@ -12,20 +12,21 @@ import polyglot.ast.Node;
 import polyglot.ast.Unary;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 
 /** Jif extension of the <code>Unary</code> node.
  *  
  *  @see polyglot.ast.Unary
  */
-public class JifUnaryExt extends JifExprExt
-{
+public class JifUnaryExt extends JifExprExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifUnaryExt(ToJavaExt toJava) {
         super(toJava);
     }
 
     @Override
-    public Node labelCheck(LabelChecker lc) throws SemanticException
-    {
+    public Node labelCheck(LabelChecker lc) throws SemanticException {
         Unary ue = (Unary) node();
 
         JifContext A = lc.jifContext();
@@ -33,29 +34,32 @@ public class JifUnaryExt extends JifExprExt
 
         Expr e = ue.expr();
 
-        if (ue.operator() == Unary.POST_INC ||
-                ue.operator() == Unary.POST_DEC ||
-                ue.operator() == Unary.PRE_INC ||
-                ue.operator() == Unary.PRE_DEC) {
+        if (ue.operator() == Unary.POST_INC || ue.operator() == Unary.POST_DEC
+                || ue.operator() == Unary.PRE_INC
+                || ue.operator() == Unary.PRE_DEC) {
 
             if (!A.updateAllowed(e)) {
-                throw new SemanticException("Cannot assign to \"" + e + "\" in this context.", e.position());
+                throw new SemanticException("Cannot assign to \"" + e
+                        + "\" in this context.", e.position());
             }
 
             if (e instanceof Local) {
-                e = (Expr)((JifLocalExt)JifUtil.jifExt(e)).labelCheckIncrement(lc.context(A));
+                e =
+                        (Expr) ((JifLocalExt) JifUtil.jifExt(e))
+                                .labelCheckIncrement(lc.context(A));
+            } else if (e instanceof Field) {
+                e =
+                        (Expr) ((JifFieldExt) JifUtil.jifExt(e))
+                                .labelCheckIncrement(lc.context(A));
+            } else if (e instanceof ArrayAccess) {
+                e =
+                        (Expr) ((JifArrayAccessExt) JifUtil.jifExt(e))
+                                .labelCheckIncrement(lc.context(A));
+            } else {
+                throw new InternalCompilerError(
+                        "Cannot perform unary operation on a " + e.type());
             }
-            else if (e instanceof Field) {
-                e = (Expr)((JifFieldExt)JifUtil.jifExt(e)).labelCheckIncrement(lc.context(A));
-            }
-            else if (e instanceof ArrayAccess) {
-                e = (Expr)((JifArrayAccessExt)JifUtil.jifExt(e)).labelCheckIncrement(lc.context(A));
-            }
-            else {
-                throw new InternalCompilerError("Cannot perform unary operation on a " + e.type());
-            }
-        }
-        else {
+        } else {
             e = (Expr) lc.context(A).labelCheck(e);
         }
 

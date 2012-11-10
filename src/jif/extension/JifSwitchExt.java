@@ -18,13 +18,15 @@ import polyglot.ast.Node;
 import polyglot.ast.Switch;
 import polyglot.ast.SwitchElement;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 /** Jif extension of the <code>Switch</code> node.
  * 
  *  @see polyglot.ast.Switch
  */
-public class JifSwitchExt extends JifStmtExt_c
-{
+public class JifSwitchExt extends JifStmtExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JifSwitchExt(ToJavaExt toJava) {
         super(toJava);
     }
@@ -34,8 +36,7 @@ public class JifSwitchExt extends JifStmtExt_c
      *  PC(branch i) = X(branch 0).N + ... + X(branch i-1).N
      */
     @Override
-    public Node labelCheckStmt(LabelChecker lc) throws SemanticException
-    {
+    public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         Switch ss = (Switch) node();
 
         JifTypeSystem ts = lc.jifTypeSystem();
@@ -47,9 +48,10 @@ public class JifSwitchExt extends JifStmtExt_c
         Expr e = (Expr) lc.context(A).labelCheck(ss.expr());
         PathMap Xe = getPathMap(e);
 
-
-        Label L = ts.freshLabelVariable(ss.position(), "switch",
-                "label of PC at break target for switch statement at " + node().position());
+        Label L =
+                ts.freshLabelVariable(ss.position(), "switch",
+                        "label of PC at break target for switch statement at "
+                                + node().position());
 
         A = (JifContext) A.pushBlock();
         A.setPc(Xe.NV(), lc);
@@ -68,29 +70,28 @@ public class JifSwitchExt extends JifStmtExt_c
         }
 
         A = (JifContext) A.pop();
-        lc.constrain(new NamedLabel("label of normal termination of swtich statement", Xa.N()),
-                LabelConstraint.LEQ,
-                new NamedLabel("label of break target for the switch stmt", L),
-                A.labelEnv(),
-                ss.position(),
-                false,
+        lc.constrain(new NamedLabel(
+                "label of normal termination of swtich statement", Xa.N()),
+                LabelConstraint.LEQ, new NamedLabel(
+                        "label of break target for the switch stmt", L), A
+                        .labelEnv(), ss.position(), false,
                 new ConstraintMessage() {
-            @Override
-            public String msg() {
-                return "The information revealed by the normal " +
-                        "termination of the switch statement " +
-                        "may be more restrictive than the " +
-                        "information that can be revealed by " +
-                        "a break statement being executed in the " +
-                        "switch statement.";
-            }
-            @Override
-            public String technicalMsg() {
-                return "[join(X(branch_i).n) <= L(break)] is not satisfied.";
-            }
+                    @Override
+                    public String msg() {
+                        return "The information revealed by the normal "
+                                + "termination of the switch statement "
+                                + "may be more restrictive than the "
+                                + "information that can be revealed by "
+                                + "a break statement being executed in the "
+                                + "switch statement.";
+                    }
 
-        }
-                );
+                    @Override
+                    public String technicalMsg() {
+                        return "[join(X(branch_i).n) <= L(break)] is not satisfied.";
+                    }
+
+                });
 
         PathMap X = Xa.set(ts.gotoPath(Branch.BREAK, null), notTaken);
         X = X.NV(ts.notTaken());

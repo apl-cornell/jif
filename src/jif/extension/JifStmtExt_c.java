@@ -1,6 +1,5 @@
 package jif.extension;
 
-
 import jif.ast.JifUtil;
 import jif.ast.Jif_c;
 import jif.translate.ToJavaExt;
@@ -12,14 +11,16 @@ import jif.types.label.NotTaken;
 import jif.visit.LabelChecker;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 /** The root of all kinds of Jif extensions for statements.
  *  It provides a generic <node>labelCheck</code> method, which
  *  will invoke the <ndoe>labelCheckStmt</code> methods provided
  *  by the subclasses of this class.
  */
-public abstract class JifStmtExt_c extends Jif_c implements JifStmtExt
-{
+public abstract class JifStmtExt_c extends Jif_c implements JifStmtExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected JifStmtExt stmtDel;
 
     public JifStmtExt_c(JifStmtExt stmtDel, ToJavaExt toJava) {
@@ -83,14 +84,15 @@ public abstract class JifStmtExt_c extends Jif_c implements JifStmtExt
      *  so just set the path map to use the PC label.
      */
     @Override
-    public Node labelCheck(LabelChecker lc) throws SemanticException
-    {
+    public Node labelCheck(LabelChecker lc) throws SemanticException {
         JifTypeSystem ts = lc.typeSystem();
         JifContext A = lc.jifContext();
         A = (JifContext) node().del().enterScope(A);
 
         // Redispatch in case we're not the first delegate.
-        Node n = ((JifStmtExt) JifUtil.jifExt(node())).stmtDel().labelCheckStmt(lc.context(A));
+        Node n =
+                ((JifStmtExt) JifUtil.jifExt(node())).stmtDel().labelCheckStmt(
+                        lc.context(A));
 
         // Apply the "single path rule"
         PathMap X = getPathMap(n).NV(ts.notTaken());
@@ -113,7 +115,6 @@ public abstract class JifStmtExt_c extends Jif_c implements JifStmtExt
 
             singlePath = p;
         }
-
 
         if (singlePath != null) {
             if (singlePath.equals(Path.N) || singlePath.equals(Path.R)) {
