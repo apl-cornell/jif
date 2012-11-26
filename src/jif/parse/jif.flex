@@ -158,10 +158,10 @@ import java.math.BigInteger;
         if (x.bitLength() > bits && ! boundary) {
             eq.enqueue(ErrorInfo.LEXICAL_ERROR, "Integer literal \"" +
                         yytext() + "\" out of range.", pos());
-            }
+        }
         return new IntegerLiteral(pos(), x.intValue(),
                 boundary ? sym.INTEGER_LITERAL_BD : sym.INTEGER_LITERAL);
-            }
+    }
 
     private Token long_lit(String s, int radix) {
         BigInteger x = new BigInteger(s, radix);
@@ -183,7 +183,7 @@ import java.math.BigInteger;
                 if ('1' <= s.charAt(i) && s.charAt(i) <= '9') {
                     zero = false;
                     break;
-        }
+                }
                 if (s.charAt(i) == 'e' || s.charAt(i) == 'E') {
                     break; // 0e19 is still 0
                 }
@@ -209,7 +209,7 @@ import java.math.BigInteger;
                 if ('1' <= s.charAt(i) && s.charAt(i) <= '9') {
                     zero = false;
                     break;
-        }
+                }
                 if (s.charAt(i) == 'e' || s.charAt(i) == 'E') {
                     break; // 0e19 is still 0
                 }
@@ -403,7 +403,7 @@ OctalEscape = \\ [0-7]
 
     /* 3.6 White Space */
     {WhiteSpace}                 { /* ignore */ }
-    
+
     /* Jif extensions */
     "\u2293" { return op(sym.MEET); }        /* ⊓ */
     "\u2294" { return op(sym.JOIN); }        /* ⊔ */
