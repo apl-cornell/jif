@@ -1076,7 +1076,8 @@ primary_no_array ::=
     |  provider:a
             {: RESULT = parser.nf.NewLabel(parser.pos(a), a); :}
     |  reftype_or_expr:a DOT PROVIDER:b
-            {: RESULT = parser.nf.NewLabel(parser.pos(a, b),
+	    {: if (! (a instanceof Name)) parser.die(parser.pos(a));
+               RESULT = parser.nf.NewLabel(parser.pos(a, b),
                    parser.nf.AmbProviderLabelNode(parser.pos(a, b), a.toType()));
             :}
     ;
