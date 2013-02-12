@@ -52,7 +52,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         return jifInterfaceName + "_JIF_IMPL";
     }
 
-    protected static final String constructorTranslatedName(ClassType ct) {
+    public static final String constructorTranslatedName(ClassType ct) {
         return (ct.fullName() + ".").replace('.', '$');
     }
 
