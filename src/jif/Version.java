@@ -24,7 +24,7 @@ public class Version extends polyglot.main.Version {
 
   @Override
   public int minor() {
-    return 4;
+    return 5;
   }
 
   @Override
@@ -34,6 +34,6 @@ public class Version extends polyglot.main.Version {
 
   @Override
   public String toString() {
-    return "3.4.0 (2012-10-12 16:48:06 EDT)";
+    return "3.5.0 (2013-04-17 13:29:51 EDT)";
   }
 }

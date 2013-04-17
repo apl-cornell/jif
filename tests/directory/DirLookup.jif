@@ -1,5 +1,10 @@
 class DirLookup[label L] {
 
+   
+
+  
+
+
  static int {} x;
 	/*
 	static LookupResult{*lb} lookup{*lb}(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path)
@@ -46,50 +51,60 @@ class DirLookup[label L] {
 			return new LookupResult(retl, null);
 		}
 	}
+*/
 
-	static LookupResult{*lb; L} lookup2{*lb}(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path)
-	{
-		final label retl = new label{L; *lb};
+
+    class Invariant[label retll] {
+        label{retll} retl;
+        DirNode{*retl} cur;
+
+        //invariant {*retl} <= {retll};
+        invariant retll <= retl;
+
+        Invariant(label{retll} l, DirNode{*l} cur_) 
+            where {retll} <= {*l} {
+                retl=l;
+                cur=cur_;
+        }
+    }
+
+	static LookupResult{*lb; L} lookup2{*lb}(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path) {
+		final label{*lb} retl = new label{L; *lb};
 		final DirNode{*retl} cur = d;
+        label dummy = new label {};
 		Object{*retl} o = cur;
+
 		try {
 			int n = path.components.length;
 			int i = 0;
+            Invariant[*lb; L] inv_mutable = new Invariant(retl, cur);
 			while (i < n) {
+                final Invariant inv = inv_mutable;
 				// invariant:  cur       :   DirNode{*retl}
-				//             o         :   Object {*retl}
-				//             {L; *lb} <=   {*retl}
 
-				String{L} nm = path.components[i];
-				o = null;
+				String{L; *lb; *inv.retl} nm = path.components[i];
 
-				if (cur.contains(nm)) {
-					try {
-						o = cur.get(nm);                      // now      o : {*retl ; *cur.label_; L}
-						retl = new label {*retl; *cur.label_} // restores o : {*retl}
-					} catch (Exception canthappen) {}
+                if (!inv.cur.contains(nm)) return null;
 
-					if (i == n-1) break;
+                try {
+                    final Object{L; *lb; *inv.retl} o2 = inv.cur.get(nm);
+                    final label retl2 = new label {L; *lb; *inv.retl; *inv.cur.label_} // restores o : {*retl}
 
-					if (o instanceof DirNode) {
-						cur = (DirNode) o;                    // still have cur : {*retl}
-					} else {
-						o = null;
-						break;
-					}
-				}
-				i++;
+                    if (i == n-1) return new LookupResult(inv.retl, o2);
+
+                    if (!o instanceof DirNode) throw new Error();
+
+                    final DirNode{*retl2} cur2 = (DirNode)o2;
+
+                    inv_mutable = new Invariant(retl2, cur2);
+
+                    i++;
+                } catch (Exception canthappen) {}
 			}
 		} catch (RuntimeException e) { throw new Error(); }
 
 		return new LookupResult(retl, o); // ok if invariant holds
 	}
-*/
-    // Idea (suggested by Steve Chong): compute the label first, then extract the value while testing
-    //  at every level whether the label is high enough.
-	static LookupResult{*lb; L} lookup3{*lb}(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path) {
-
-    }
 
 }
 // vim: ts=4 sw=4
