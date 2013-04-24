@@ -783,6 +783,7 @@ public class Version extends polyglot.main.Version {
         </copy>
 
 	<copy file="config.properties.in" tofile="${dist}/config.properties" />
+	<copy file="eclipse-classpath.in" tofile="${dist}/eclipse-classpath.in" />
 
         <!-- Create the Javadoc, and copy the documentation -->
         <antcall target="javadoc" />

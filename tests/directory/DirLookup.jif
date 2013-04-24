@@ -14,7 +14,7 @@ class DirLookup[label L] {
 	*/
 
 // problem: the result should have a more restrictive label in general than
-// {*lb}. The caller cannot in fact predict what the label is. The result is
+// {*lb}. The caller cannot predict what the label is. The result is
 // always a LookupResult, so knowing the pointer to the answer *doesn't* in
 // fact communicate new information. Problem is that we have no way to capture
 // that. The language seems to need tuples or some way to say that
@@ -26,6 +26,15 @@ class DirLookup[label L] {
 // (e.g., the accumulated label) on each loop iteration.  The Jif compiler
 // needs to do some kind of SSA conversion to allow these assignments to be
 // done soundly.
+//
+// Probably it would be nice to support both of these kinds of flexibility.
+// While loops should support where clauses that express invariants.
+// 
+// What would it take to reason statically that the value of a pointer conveys no
+// information? In general, it can. A pointer freshly returned by a constructor -- or a creator --
+// does not convey information beyond the PC where it is created, however. So it can, in a sense,
+// be automatically downgraded as it passes outward through contexts. This assumes it is not
+// recorded anywhere along the way.
 
 /*
 	static LookupResult{*prev; *lb} lookup{*lb}(DirNode{*lb} d, DirPath[L]{*lb} path, int i, label{*lb} lb, label{*lb} prev)
