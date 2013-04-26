@@ -62,7 +62,6 @@ class DirLookup[label L] {
 	}
 */
 
-
     class Invariant[label retll] {
         label{retll} retl;
         DirNode{*retl} cur;
