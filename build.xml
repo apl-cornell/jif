@@ -774,6 +774,7 @@ public class Version extends polyglot.main.Version {
                 <include name="examples/*" />
 
                 <include name="tests/*" />
+                <exclude name="tests/directory/**" />
                 <include name="tests/jif/principals/**" />
                 <include name="README" />
                 <include name="LICENSE" />
@@ -811,14 +812,15 @@ public class Version extends polyglot.main.Version {
     </target>
 
     <target name="make.tar" depends="configure-version" description="make the tar file">
-		<property name="tardir" location="${basedir}/jif-${jif.version}-src" />
-		<property name="tarfile" location="${tardir}.tar.gz" />
+		<property name="tardir" location="${basedir}/jif-${jif.version}" />
+		<property name="tarfile" location="${tardir}.zip" />
 		<antcall target="rmdir">
 			<param name="dir" value="${tardir}" />
 		</antcall>
 		<move file="${dist}" tofile="${tardir}" />
-		<tar destfile="${tarfile}" basedir="${basedir}" includes="jif-${jif.version}-src/**"
-			 excludes="*/classes/**" compression="gzip" />
+		<zip destfile="${tarfile}" basedir="${basedir}" includes="jif-${jif.version}/**"
+			 excludes="*/classes/**" />
+		<move file="${tardir}" tofile="${dist}" />
     </target>
 
     <!-- ****************************************
