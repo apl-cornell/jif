@@ -1,12 +1,6 @@
 class DirLookup[label L] {
 
-   
-
-  
-
-
- static int {} x;
-	/*
+  	/*
 	static LookupResult{*lb} lookup{*lb}(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path)
 	{
 		return lookup(d, path, 0, lb, lb);
@@ -62,56 +56,50 @@ class DirLookup[label L] {
 	}
 */
 
-    class Invariant[label retll] {
-        label{retll} retl;
-        DirNode{*retl} cur;
-
-        //invariant {*retl} <= {retll};
-        invariant retll <= retl;
-
-        Invariant(label{retll} l, DirNode{*l} cur_) 
-            where {retll} <= {*l} {
-                retl=l;
-                cur=cur_;
-        }
-    }
-
-	static LookupResult{*lb; L} lookup2{*lb}(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path) {
+// L is an upper bound on the label of the components of the path name itself
+// lb is the program counter label
+	LookupResult lookup2{*lb}(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path) {
 		final label{*lb} retl = new label{L; *lb};
 		final DirNode{*retl} cur = d;
         label dummy = new label {};
 		Object{*retl} o = cur;
+        Invariant[{*lb ; L}] inv_mutable = new Invariant(retl, cur);
 
 		try {
 			int n = path.components.length;
 			int i = 0;
-            Invariant[*lb; L] inv_mutable = new Invariant(retl, cur);
 			while (i < n) {
                 final Invariant inv = inv_mutable;
 				// invariant:  cur       :   DirNode{*retl}
 
 				String{L; *lb; *inv.retl} nm = path.components[i];
 
-                if (!inv.cur.contains(nm)) return null;
+                final label retl2 = new label {L; *lb; *inv.retl; *inv.cur.label_};
+
+                if (!inv.cur.contains(nm)) {
+                    if (new label{*inv.retl ; L ; *lb} <= new label{*lb ; L}) { // enforce the invariant dynamically
+                        inv_mutable = new Invariant(retl2);
+                    } else {
+                        throw new Error();
+                    }
+                }
 
                 try {
                     final Object{L; *lb; *inv.retl} o2 = inv.cur.get(nm);
-                    final label retl2 = new label {L; *lb; *inv.retl; *inv.cur.label_} // restores o : {*retl}
 
-                    if (i == n-1) return new LookupResult(inv.retl, o2);
-
-                    if (!o instanceof DirNode) throw new Error();
-
-                    final DirNode{*retl2} cur2 = (DirNode)o2;
-
-                    inv_mutable = new Invariant(retl2, cur2);
-
-                    i++;
+                    if (i != n-1) {
+                        if (!(o instanceof DirNode)) throw new Error();
+                        final DirNode{*retl2} cur2 = (DirNode)o2;
+                        inv_mutable = new Invariant(retl2, cur2);
+                        i++;
+                    }
                 } catch (Exception canthappen) {}
 			}
 		} catch (RuntimeException e) { throw new Error(); }
 
-		return new LookupResult(retl, o); // ok if invariant holds
+        // pc = {*lb}
+        final Invariant inv2 = inv_mutable;
+		return new LookupResult(inv2.retl, inv2.cur); // ok if invariant holds
 	}
 
 }
