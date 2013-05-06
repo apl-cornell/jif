@@ -61,9 +61,7 @@ class DirLookup[label L] {
 	LookupResult lookup2{*lb}(label{*lb} lb, DirNode{*lb} d, DirPath[L]{*lb} path) {
 		final label{*lb} retl = new label{L; *lb};
 		final DirNode{*retl} cur = d;
-        label dummy = new label {};
-		Object{*retl} o = cur;
-        Invariant[{*lb ; L}] inv_mutable = new Invariant(retl, cur);
+        Invariant inv_mutable = new Invariant(retl, cur);
 
 		try {
 			int n = path.components.length;
@@ -74,7 +72,7 @@ class DirLookup[label L] {
 
 				String{L; *lb; *inv.retl} nm = path.components[i];
 
-                final label retl2 = new label {L; *lb; *inv.retl; *inv.cur.label_};
+                final label {L; *lb; *inv.retl} retl2 = new label {L; *lb; *inv.retl; *inv.cur.label_};
 
                 if (!inv.cur.contains(nm)) {
                     if (new label{*inv.retl ; L ; *lb} <= new label{*lb ; L}) { // enforce the invariant dynamically
@@ -85,11 +83,11 @@ class DirLookup[label L] {
                 }
 
                 try {
-                    final Object{L; *lb; *inv.retl} o2 = inv.cur.get(nm);
+                    final Object{L; *lb; *inv.retl} o = inv.cur.get(nm);
 
                     if (i != n-1) {
                         if (!(o instanceof DirNode)) throw new Error();
-                        final DirNode{*retl2} cur2 = (DirNode)o2;
+                        final DirNode{*retl2} cur2 = (DirNode)o;
                         inv_mutable = new Invariant(retl2, cur2);
                         i++;
                     }
