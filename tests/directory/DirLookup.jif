@@ -97,7 +97,13 @@ class DirLookup[label L] {
 
         // pc = {*lb}
         final Invariant inv2 = inv_mutable;
-		return new LookupResult(inv2.retl, inv2.cur); // ok if invariant holds
+        try {
+            if (new label{*inv.cur.label_ ; L ; *lb ; *inv2.retl} <= new label{*inv2.retl}) {
+    		    return new LookupResult(inv2.retl, inv2.cur); // ok if invariant holds
+            } else {
+                throw new Error();
+            }
+        } catch (RuntimeException e) {throw new Error(); }
 	}
 
 }
