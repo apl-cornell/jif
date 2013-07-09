@@ -19,7 +19,8 @@ import polyglot.util.SerialVersionUID;
 
 /** The confidentiality projection of a (non meet, join or pair) label.
  */
-public class ConfProjectionPolicy_c extends Policy_c implements ConfPolicy {
+public class ConfProjectionPolicy_c extends Policy_c implements
+        ConfProjectionPolicy {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private final Label label;
