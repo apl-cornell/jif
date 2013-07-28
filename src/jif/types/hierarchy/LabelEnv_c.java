@@ -239,6 +239,9 @@ public class LabelEnv_c implements LabelEnv
     @Override
     public boolean equivalentAccessPaths(AccessPath p, AccessPath q) {
         if (p == q) return true;
+        //XXX: What is the purpose of this check? should it always
+        //     return true if equivAccessPaths(p) & equivAccessPaths(q) 
+        //     have a non-empty intersection (it doesn't)? -oa
         if (findAccessPathRepr(p).equals(findAccessPathRepr(q))) {
             return true;
         }

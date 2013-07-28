@@ -591,6 +591,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Switch03.jif (Semantic, "not less restrictive");
 	Switch04.jif (Semantic, "not less restrictive");
 	#UnsoundConstructor.jif (Semantic, "pc");
+    FinalParamBug.jif ;
 }
 
 # the robustness test cases. Turn robustness on.

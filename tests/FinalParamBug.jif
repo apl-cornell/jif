@@ -1,0 +1,19 @@
+/** Test case for a bug that causes a stack trace with "FinalParam has not run
+ * yet" in JifTypeSystem_c.processFAP */
+public class FinalParamBug[label L] {
+    public final label{this} a = L;
+    public final label{this} b = a;
+    public final label{this} c = a;
+    public String{*b} s = "FOO";
+
+   public static String{*lbl} t{*lbl}(label{*lbl} lbl) {
+       final FinalParamBug[{*lbl}] t = new FinalParamBug[{*lbl}]();
+       final label lbl2 = lbl;
+       final FinalParamBug[{*lbl2}] u = t;
+       return u.s();
+   }
+
+   public String{*c} s() {
+      return s;
+   }
+}
