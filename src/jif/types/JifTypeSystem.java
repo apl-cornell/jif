@@ -32,7 +32,6 @@ import jif.types.principal.Principal;
 import jif.types.principal.TopPrincipal;
 import jif.types.principal.UnknownPrincipal;
 import jif.types.principal.VarPrincipal;
-import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.ParamTypeSystem;
@@ -53,8 +52,7 @@ import polyglot.util.Position;
 
 /** Jif type system.
  */
-public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
-{
+public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
     // Type constructors
 
     /** Returns the "label" type. */
@@ -118,20 +116,18 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
     ConstArrayType constArrayOf(Type type, int dims);
 
     ConstArrayType constArrayOf(Position pos, Type type, int dims);
-    ConstArrayType constArrayOf(Position position, Type type, int dims, boolean castableToNonConst);
-    ConstArrayType constArrayOf(Position position, Type type, int dims, boolean castableToNonConst, boolean recurseIntoBaseType);
 
-    JifMethodInstance jifMethodInstance(Position pos,
-            ReferenceType container,
-            Flags flags,
-            Type returnType,
-            String name,
-            Label startLabel,
-            boolean isDefaultStartLabel,
-            List<? extends Type> formalTypes, List<Label> formalArgLabels,
-            Label endLabel,
-            boolean isDefaultEndLabel,
-            List<? extends Type> excTypes,
+    ConstArrayType constArrayOf(Position position, Type type, int dims,
+            boolean castableToNonConst);
+
+    ConstArrayType constArrayOf(Position position, Type type, int dims,
+            boolean castableToNonConst, boolean recurseIntoBaseType);
+
+    JifMethodInstance jifMethodInstance(Position pos, ReferenceType container,
+            Flags flags, Type returnType, String name, Label startLabel,
+            boolean isDefaultStartLabel, List<? extends Type> formalTypes,
+            List<Label> formalArgLabels, Label endLabel,
+            boolean isDefaultEndLabel, List<? extends Type> excTypes,
             List<Assertion> constraints);
 
     /** Tests if the type is "principal". */
@@ -143,8 +139,11 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
     // Path and path map constructors
 
     PathMap pathMap();
+
     PathMap pathMap(Path path, Label L);
+
     ExceptionPath exceptionPath(Type type);
+
     Path gotoPath(polyglot.ast.Branch.Kind kind, String target);
 
     // Param constructors
@@ -154,18 +153,33 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
     // Principal constructors
 
     ParamPrincipal principalParam(Position pos, ParamInstance pi);
+
     DynamicPrincipal dynamicPrincipal(Position pos, AccessPath path);
+
     ExternalPrincipal externalPrincipal(Position pos, String name);
+
     UnknownPrincipal unknownPrincipal(Position pos);
+
     TopPrincipal topPrincipal(Position pos);
+
     BottomPrincipal bottomPrincipal(Position pos);
-    Principal conjunctivePrincipal(Position pos, Principal conjunctLeft, Principal conjunctRight);
-    Principal conjunctivePrincipal(Position pos, Collection<Principal> principals);
-    Principal disjunctivePrincipal(Position pos, Principal disjunctLeft, Principal disjunctRight);
-    Principal disjunctivePrincipal(Position pos, Collection<Principal> principals);
+
+    Principal conjunctivePrincipal(Position pos, Principal conjunctLeft,
+            Principal conjunctRight);
+
+    Principal conjunctivePrincipal(Position pos,
+            Collection<Principal> principals);
+
+    Principal disjunctivePrincipal(Position pos, Principal disjunctLeft,
+            Principal disjunctRight);
+
+    Principal disjunctivePrincipal(Position pos,
+            Collection<Principal> principals);
+
     Principal pathToPrincipal(Position pos, AccessPath path);
 
-    VarPrincipal freshPrincipalVariable(Position pos, String s, String description);
+    VarPrincipal freshPrincipalVariable(Position pos, String s,
+            String description);
 
     // Label constructors
     VarLabel freshLabelVariable(Position pos, String s, String description);
@@ -219,27 +233,45 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
      *         ({⊥→⊥;⊥←⊥}).
      */
     Label noComponentsLabel();
+
     Label notTaken();
 
     /* Label methods */
     CovariantParamLabel covariantLabel(Position pos, ParamInstance pi);
+
     ParamLabel paramLabel(Position pos, ParamInstance pi);
+
     DynamicLabel dynamicLabel(Position pos, AccessPath path);
+
     ArgLabel argLabel(Position pos, LocalInstance li, CodeInstance ci);
+
     ArgLabel argLabel(Position pos, ParamInstance li);
+
     Label callSitePCLabel(JifProcedureInstance pi);
+
     ThisLabel thisLabel(Position pos, JifClassType ct);
+
     ThisLabel thisLabel(JifClassType ct);
+
     ThisLabel thisLabel(ArrayType ct);
+
     UnknownLabel unknownLabel(Position pos);
+
     PairLabel pairLabel(Position pos, ConfPolicy confPol, IntegPolicy integPol);
+
     WritersToReadersLabel writersToReadersLabel(Position pos, Label L);
+
     Label pathToLabel(Position pos, AccessPath path);
 
     ReaderPolicy readerPolicy(Position pos, Principal owner, Principal reader);
-    ReaderPolicy readerPolicy(Position pos, Principal owner, Collection<Principal> readers);
+
+    ReaderPolicy readerPolicy(Position pos, Principal owner,
+            Collection<Principal> readers);
+
     WriterPolicy writerPolicy(Position pos, Principal owner, Principal writer);
-    WriterPolicy writerPolicy(Position pos, Principal owner, Collection<Principal> writers);
+
+    WriterPolicy writerPolicy(Position pos, Principal owner,
+            Collection<Principal> writers);
 
     /**
      * @return the confidentiality policy representing public information (⊥→⊥).
@@ -262,7 +294,6 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
      */
     IntegPolicy topIntegPolicy(Position pos);
 
-
     /** Returns true iff L1 <= L2 in the empty environment. */
     boolean leq(Label L1, Label L2);
 
@@ -271,24 +302,35 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
 
     /** Returns the join of L1 and L2. */
     Label join(Label L1, Label L2);
+
     Label joinLabel(Position pos, Set<Label> components);
 
     /** Returns the meet of L1 and L2. */
     Label meet(Label L1, Label L2);
+
     Label meetLabel(Position pos, Set<Label> components);
 
     /* methods for policies */
     boolean leq(Policy p1, Policy p2);
+
     ConfPolicy joinConfPolicy(Position pos, Set<ConfPolicy> components);
+
     IntegPolicy joinIntegPolicy(Position pos, Set<IntegPolicy> components);
+
     ConfPolicy meetConfPolicy(Position pos, Set<ConfPolicy> components);
+
     IntegPolicy meetIntegPolicy(Position pos, Set<IntegPolicy> components);
+
     ConfPolicy join(ConfPolicy p1, ConfPolicy p2);
+
     ConfPolicy meet(ConfPolicy p1, ConfPolicy p2);
+
     IntegPolicy join(IntegPolicy p1, IntegPolicy p2);
+
     IntegPolicy meet(IntegPolicy p1, IntegPolicy p2);
 
     ConfPolicy confProjection(Label L);
+
     IntegPolicy integProjection(Label L);
 
     /** Construct an acts-for constraint. */
@@ -336,7 +378,6 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
      */
     boolean isParamsRuntimeRep(Type t);
 
-
     /**
      * Check if the class has an untrusted non-jif ancestor.
      *
@@ -376,6 +417,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
      * Compares t1 to t2 without stripping off all the parameters and labels
      */
     boolean equalsNoStrip(TypeObject t1, TypeObject t2);
+
     /**
      * Compares t1 to t2, stripping off all the parameters and labels
      */
@@ -404,6 +446,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
      * @return class for translating conjunctive principals to java expressions
      */
     PrincipalToJavaExpr conjunctivePrincipalTranslator();
+
     /**
      * @return class for translating disjunctive principals to java expressions
      */
@@ -444,12 +487,11 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param>
 
     boolean isFinalAccessExprOrConst(Expr e);
 
-    void processFAP(VarInstance fi, AccessPath path, JifContext A,
-            JifTypeSystem ts, LabelChecker lc) throws SemanticException;
+    void processFAP(VarInstance fi, AccessPath path, JifContext A)
+            throws SemanticException;
 
-    void processFAP(VarInstance fi, AccessPath path, JifContext A,
-            JifTypeSystem ts, LabelChecker lc, Set<ClassType> visited)
-                    throws SemanticException;
+    void processFAP(ReferenceType rt, AccessPath path, JifContext A)
+            throws SemanticException;
 
     AccessPath varInstanceToAccessPath(VarInstance vi, String name, Position pos)
             throws SemanticException;

@@ -171,7 +171,7 @@ public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt {
                 AccessPathField path =
                         (AccessPathField) ts.varInstanceToAccessPath(fi,
                                 fi.position());
-                ts.processFAP(fi, path, A, ts, lc);
+                ts.processFAP(fi, path, A);
             }
 
             if (fi.flags().isFinal() && ts.isFinalAccessExprOrConst(init)) {

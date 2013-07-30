@@ -72,7 +72,6 @@ public class JifLocalDeclExt extends JifStmtExt_c {
                         ts.varInstanceToAccessPath(li, li.position()),
                         ts.exprToAccessPath(decl.init(), li.type(),
                                 lc.context()));
-
             }
         }
 
@@ -81,7 +80,7 @@ public class JifLocalDeclExt extends JifStmtExt_c {
             AccessPathLocal path =
                     (AccessPathLocal) ts.varInstanceToAccessPath(li,
                             li.position());
-            ts.processFAP(li, path, lc.context(), ts, lc);
+            ts.processFAP(li, path, lc.context());
         }
 
 //        if (li.flags().isFinal()) {
