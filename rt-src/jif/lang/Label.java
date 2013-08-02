@@ -8,8 +8,7 @@ import jif.lang.PrincipalUtil.DelegationPair;
  * A Label is the runtime representation of a Jif label.
  * 
  */
-public interface Label
-{
+public interface Label {
     /**
      * Returns true iff this <= l. If the method returns true, then
      * s has all of the delegations (i.e., DelegationPairs) added to it
@@ -19,9 +18,15 @@ public interface Label
     boolean relabelsTo(Label l, Set<DelegationPair> s);
 
     Label join(Label l);
+
+    Label join(Label l, boolean simplify);
+
     Label meet(Label l);
 
+    Label meet(Label l, boolean simplify);
+
     ConfPolicy confPolicy();
+
     IntegPolicy integPolicy();
 
 }

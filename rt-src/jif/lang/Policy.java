@@ -4,14 +4,12 @@ import java.util.Set;
 
 import jif.lang.PrincipalUtil.DelegationPair;
 
-
 /**
  * A Policy is a component of a label, and is either an integrity policy or
  * a confidentiality policy. 
  *  
  */
-public interface Policy
-{
+public interface Policy {
     /**
      * Does this policy relabel to policy p? If this method returns true,
      * then all delegations that this result depend upon (i.e., DelegationPairs)
@@ -21,5 +19,5 @@ public interface Policy
      * @param dependencies
      * @return
      */
-    boolean relabelsTo(Policy p, Set<DelegationPair> s);    
+    boolean relabelsTo(Policy p, Set<DelegationPair> s);
 }

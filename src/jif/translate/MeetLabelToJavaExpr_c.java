@@ -6,7 +6,9 @@ import java.util.LinkedList;
 import jif.types.label.Label;
 import jif.types.label.MeetLabel;
 import polyglot.ast.Expr;
+import polyglot.types.ConstructorInstance;
 import polyglot.types.SemanticException;
+import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 public class MeetLabelToJavaExpr_c extends LabelToJavaExpr_c {
@@ -21,6 +23,11 @@ public class MeetLabelToJavaExpr_c extends LabelToJavaExpr_c {
             return rw.labelToJava(L.meetComponents().iterator().next());
         }
 
+        boolean simplify = true;
+        if (rw.context().currentCode() instanceof ConstructorInstance
+                && rw.currentClass().isSubtype(rw.jif_ts().PrincipalClass()))
+            simplify = false;
+
         LinkedList<Label> l = new LinkedList<Label>(L.meetComponents());
         Iterator<Label> iter = l.iterator();
         Label head = iter.next();
@@ -28,7 +35,13 @@ public class MeetLabelToJavaExpr_c extends LabelToJavaExpr_c {
         while (iter.hasNext()) {
             head = iter.next();
             Expr f = rw.labelToJava(head);
-            e = rw.qq().parseExpr("%E.meet(%E)", e, f);
+            e =
+                    rw.qq().parseExpr(
+                            "%E.meet(%E, %E)",
+                            e,
+                            f,
+                            rw.java_nf().BooleanLit(
+                                    Position.compilerGenerated(), simplify));
         }
         return e;
     }

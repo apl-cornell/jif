@@ -5,8 +5,7 @@ import java.util.Set;
 
 import jif.lang.PrincipalUtil.DelegationPair;
 
-public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
-{
+public class ReaderPolicy extends AbstractPolicy implements ConfPolicy {
     private final Principal owner;
     private final Principal reader;
 
@@ -24,22 +23,20 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
         return reader;
     }
 
-
     @Override
     public boolean relabelsTo(Policy p, Set<DelegationPair> s) {
         if (this == p || this.equals(p)) return true;
 
         if (p instanceof JoinConfPolicy) {
-            JoinPolicy jp = (JoinPolicy)p;
+            JoinPolicy jp = (JoinPolicy) p;
             // this <= p1 join ... join p2 if there exists a pi such that
             // this <= pi
             for (Policy pi : jp.joinComponents()) {
                 if (labelUtil.relabelsTo(this, pi, s)) return true;
             }
             return false;
-        }
-        else if (p instanceof MeetConfPolicy) {
-            MeetPolicy mp = (MeetPolicy)p;
+        } else if (p instanceof MeetConfPolicy) {
+            MeetPolicy mp = (MeetPolicy) p;
             // this <= p1 meet ... meet p2 if for all pi
             // this <= pi
             Set<DelegationPair> temp = new HashSet<DelegationPair>();
@@ -48,9 +45,7 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
             }
             s.addAll(temp);
             return true;
-        }
-        else if (!(p instanceof ReaderPolicy))
-            return false;
+        } else if (!(p instanceof ReaderPolicy)) return false;
 
         ReaderPolicy pp = (ReaderPolicy) p;
 
@@ -63,13 +58,15 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
         if (ownersProof == null) {
             return false;
         }
-        ActsForProof readerReaderProof = PrincipalUtil.actsForProof(pp.reader, this.reader);
+        ActsForProof readerReaderProof =
+                PrincipalUtil.actsForProof(pp.reader, this.reader);
         if (readerReaderProof != null) {
             ownersProof.gatherDelegationDependencies(s);
             readerReaderProof.gatherDelegationDependencies(s);
             return true;
         }
-        ActsForProof readerOwnerProof = PrincipalUtil.actsForProof(pp.reader, this.owner);
+        ActsForProof readerOwnerProof =
+                PrincipalUtil.actsForProof(pp.reader, this.owner);
         if (readerOwnerProof != null) {
             ownersProof.gatherDelegationDependencies(s);
             readerOwnerProof.gatherDelegationDependencies(s);
@@ -80,22 +77,25 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
 
     @Override
     public int hashCode() {
-        return (owner==null?0:owner.hashCode()) ^ (reader==null?0:reader.hashCode()) ^ 4238;
+        return (owner == null ? 0 : owner.hashCode())
+                ^ (reader == null ? 0 : reader.hashCode()) ^ 4238;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (! (o instanceof ReaderPolicy)) {
+        if (!(o instanceof ReaderPolicy)) {
             return false;
         }
 
         ReaderPolicy policy = (ReaderPolicy) o;
 
-        if (owner == policy.owner || (owner != null && owner.equals(policy.owner)
-                && policy.owner != null && policy.owner.equals(owner))) {
-            return (reader == policy.reader || (reader != null && reader.equals(policy.reader)
-                    && policy.reader != null && policy.reader.equals(reader)));
+        if (owner == policy.owner
+                || (owner != null && owner.equals(policy.owner)
+                        && policy.owner != null && policy.owner.equals(owner))) {
+            return (reader == policy.reader || (reader != null
+                    && reader.equals(policy.reader) && policy.reader != null && policy.reader
+                        .equals(reader)));
         }
 
         return false;
@@ -111,21 +111,41 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy
 
     @Override
     public ConfPolicy join(ConfPolicy p, Set<DelegationPair> s) {
-        return labelUtil.join(this, p, s);
-    }
-
-    @Override
-    public ConfPolicy join(ConfPolicy p) {
-        return labelUtil.join(this, p);
+        return join(p, s, true);
     }
 
     @Override
     public ConfPolicy meet(ConfPolicy p, Set<DelegationPair> s) {
-        return labelUtil.meet(this, p, s);
-    }
-    @Override
-    public ConfPolicy meet(ConfPolicy p) {
-        return labelUtil.meetPol(this, p);
+        return meet(p, s, true);
     }
 
+    @Override
+    public ConfPolicy join(ConfPolicy p) {
+        return join(p, true);
+    }
+
+    @Override
+    public ConfPolicy meet(ConfPolicy p) {
+        return meet(p, true);
+    }
+
+    @Override
+    public ConfPolicy join(ConfPolicy p, boolean simplify) {
+        return labelUtil.join(this, p, simplify);
+    }
+
+    @Override
+    public ConfPolicy meet(ConfPolicy p, boolean simplify) {
+        return labelUtil.meet(this, p, simplify);
+    }
+
+    @Override
+    public ConfPolicy join(ConfPolicy p, Set<DelegationPair> s, boolean simplify) {
+        return labelUtil.join(this, p, s, simplify);
+    }
+
+    @Override
+    public ConfPolicy meet(ConfPolicy p, Set<DelegationPair> s, boolean simplify) {
+        return labelUtil.meet(this, p, s, simplify);
+    }
 }
