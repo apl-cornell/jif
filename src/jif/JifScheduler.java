@@ -48,23 +48,22 @@ public class JifScheduler extends JLScheduler {
     }
 
     public Goal LabelsChecked(Job job) {
-        LabelCheckGoal g = (LabelCheckGoal)internGoal(new LabelCheckGoal(job));
+        LabelCheckGoal g = (LabelCheckGoal) internGoal(new LabelCheckGoal(job));
 
         try {
-            addPrerequisiteDependency(g, this.FinalParamsBarrier());            
+            addPrerequisiteDependency(g, this.FinalParamsBarrier());
             addPrerequisiteDependency(g, this.FieldLabelInference(job));
             addPrerequisiteDependency(g, this.IntegerBoundsChecker(job));
 // Jif Dependency bugfix:
             addPrerequisiteDependency(g, this.ExceptionsChecked(job));
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return g;
     }
-    
+
     public Goal FinalParamsBarrier() {
-        Goal g = internGoal(new Barrier("FinalParamsBarrier", this){
+        Goal g = internGoal(new Barrier("FinalParamsBarrier", this) {
             @Override
             public Goal goalForJob(Job job) {
                 return FinalParams(job);
@@ -72,29 +71,30 @@ public class JifScheduler extends JLScheduler {
         });
         return g;
     }
-    
+
     public Goal FinalParams(Job job) {
         JifTypeSystem ts = (JifTypeSystem) extInfo.typeSystem();
-        Goal g = internGoal(new VisitorGoal(job, new FinalParams(ts)));
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = internGoal(new VisitorGoal(job, new FinalParams(job, ts, nf)));
 
         try {
             addPrerequisiteDependency(g, this.TypeChecked(job));
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return g;
     }
 
     public FieldLabelInferenceGoal FieldLabelInference(Job job) {
-        FieldLabelInferenceGoal g = (FieldLabelInferenceGoal)internGoal(new FieldLabelInferenceGoal(job));
+        FieldLabelInferenceGoal g =
+                (FieldLabelInferenceGoal) internGoal(new FieldLabelInferenceGoal(
+                        job));
 
 // Jif Dependency bugfix
         try {
 //          addPrerequisiteDependency(g, this.ExceptionsChecked(job));
             addPrerequisiteDependency(g, this.Disambiguated(job));
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return g;
@@ -102,12 +102,12 @@ public class JifScheduler extends JLScheduler {
     }
 
     public Goal IntegerBoundsChecker(Job job) {
-        Goal g = internGoal(new VisitorGoal(job, new IntegerBoundsChecker(job)));
+        Goal g =
+                internGoal(new VisitorGoal(job, new IntegerBoundsChecker(job)));
 
         try {
             addPrerequisiteDependency(g, this.ReachabilityChecked(job));
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return g;
@@ -127,8 +127,7 @@ public class JifScheduler extends JLScheduler {
 
         try {
             addPrerequisiteDependency(g, this.ReachabilityChecked(job));
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return g;
@@ -140,14 +139,12 @@ public class JifScheduler extends JLScheduler {
 
         try {
             addPrerequisiteDependency(g, this.ReachabilityChecked(job));
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return g;
 
     }
-
 
     @Override
     public Goal ExceptionsChecked(Job job) {
@@ -159,8 +156,7 @@ public class JifScheduler extends JLScheduler {
             addPrerequisiteDependency(g, this.NotNullChecker(job));
             addPrerequisiteDependency(g, this.PreciseClassChecker(job));
             addPrerequisiteDependency(g, this.IntegerBoundsChecker(job));
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return g;
@@ -169,17 +165,18 @@ public class JifScheduler extends JLScheduler {
     public Goal JifToJavaRewritten(Job job) {
         JifTypeSystem ts = (JifTypeSystem) extInfo.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new JifToJavaRewriter(job, ts, nf, jlext)));     
+        Goal g =
+                internGoal(new VisitorGoal(job, new JifToJavaRewriter(job, ts,
+                        nf, jlext)));
 
         try {
             addPrerequisiteDependency(g, this.Serialized(job));
-            
+
             // make sure that if Object.jif is being compiled, it is always
             // written to Java before any other job.
             if (objectJob != null && job != objectJob)
                 addPrerequisiteDependency(g, JifToJavaRewritten(objectJob));
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             // Cannot happen
             throw new InternalCompilerError(e);
         }
@@ -192,21 +189,20 @@ public class JifScheduler extends JLScheduler {
         try {
             addPrerequisiteDependency(g, this.LabelsChecked(job));
             addPrerequisiteDependency(g, this.NativeConstructorsAdded(job));
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return g;
     }
-    
+
     public Goal NativeConstructorsAdded(Job job) {
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new NativeConstructorAdder(nf)));
-        
+        Goal g =
+                internGoal(new VisitorGoal(job, new NativeConstructorAdder(nf)));
+
         try {
             addPrerequisiteDependency(g, this.TypeChecked(job));
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return g;
@@ -226,21 +222,21 @@ public class JifScheduler extends JLScheduler {
                     addPrerequisiteDependency(g, SignaturesResolved(ct));
                 }
             }
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return g;
     }
+
     @Override
     public Goal InitializationsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new JifInitChecker(job, ts, nf)));
+        Goal g =
+                internGoal(new VisitorGoal(job, new JifInitChecker(job, ts, nf)));
         try {
             addPrerequisiteDependency(g, ReachabilityChecked(job));
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return g;
@@ -262,16 +258,17 @@ public class JifScheduler extends JLScheduler {
         public JifFieldConstantsChecked(FieldInstance fi) {
             super(fi);
         }
+
         @Override
         protected ParsedClassType findContainer() {
             if (var().container() instanceof JifSubstType) {
-                JifSubstType jst = (JifSubstType)var().container();
+                JifSubstType jst = (JifSubstType) var().container();
                 if (jst.base() instanceof ParsedClassType) {
                     return (ParsedClassType) jst.base();
                 }
             }
             return super.findContainer();
-        }        
+        }
     }
 
     /**
@@ -285,6 +282,7 @@ public class JifScheduler extends JLScheduler {
         }
         return j;
     }
+
     /**
      * 
      */
@@ -300,7 +298,8 @@ public class JifScheduler extends JLScheduler {
 }
 
 class TypeChecked extends VisitorGoal {
-    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
+    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
+            NodeFactory nf) {
         return scheduler.internGoal(new TypeChecked(job, ts, nf));
     }
 
@@ -321,7 +320,7 @@ class TypeChecked extends VisitorGoal {
         List<Goal> l = new ArrayList<Goal>();
 //        l.add(((JifScheduler)scheduler).FinalParams(job));
         // Should this line be here, since FieldLabelResolver is added as a missing dependency during runtime?
-        l.add(((JifScheduler)scheduler).FieldLabelInference(job));
+        l.add(((JifScheduler) scheduler).FieldLabelInference(job));
         l.add(scheduler.ConstantsChecked(job));
         l.addAll(super.corequisiteGoals(scheduler));
         return l;
