@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import jif.JifOptions;
 import jif.translate.JoinLabelToJavaExpr_c;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv_c;
@@ -32,11 +33,11 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** An implementation of the <code>JifContext</code> interface.
  */
-public class JifContext_c extends Context_c implements JifContext
-{
+public class JifContext_c extends Context_c implements JifContext {
     protected final TypeSystem jlts;
     protected final JifTypeSystem jifts;
 
@@ -51,7 +52,6 @@ public class JifContext_c extends Context_c implements JifContext
      * using a checked endorse statement
      */
     protected Map<LocalInstance, Label> checkedEndorsements;
-
 
     /**
      * Map from JifContext_c.Key (pairs of Branch.Kind and String) to Labels.
@@ -71,12 +71,12 @@ public class JifContext_c extends Context_c implements JifContext
         super(ts);
         this.jlts = jlts;
         this.jifts = ts;
-        this.env = (LabelEnv_c)ts.createLabelEnv();
+        this.env = (LabelEnv_c) ts.createLabelEnv();
     }
 
     @Override
     public Object copy() {
-        JifContext_c ctxt = (JifContext_c)super.copy();
+        JifContext_c ctxt = (JifContext_c) super.copy();
         if (auth != null) {
             ctxt.auth = new LinkedHashSet<Principal>(auth);
         }
@@ -104,10 +104,11 @@ public class JifContext_c extends Context_c implements JifContext
         ClassType principal;
 
         try {
-            principal = (ClassType)jlts.typeForName(jifts.PrincipalClassName());
-        }
-        catch (SemanticException e) {
-            throw new InternalCompilerError("Cannot find " + jifts.PrincipalClassName() + " class.", e);
+            principal =
+                    (ClassType) jlts.typeForName(jifts.PrincipalClassName());
+        } catch (SemanticException e) {
+            throw new InternalCompilerError("Cannot find "
+                    + jifts.PrincipalClassName() + " class.", e);
         }
 
         Named n;
@@ -143,7 +144,7 @@ public class JifContext_c extends Context_c implements JifContext
      * and do not accidentally modify the parent's environment
      */
     protected void envModification() {
-        JifContext_c jifOuter = (JifContext_c)this.outer;
+        JifContext_c jifOuter = (JifContext_c) this.outer;
         if (jifOuter != null && jifOuter.env == this.env) {
             // the outer's label environment points to the same object as this
             // one. Create a new label env.
@@ -166,6 +167,7 @@ public class JifContext_c extends Context_c implements JifContext
     public void addDefinitionalAssertionEquiv(Label L1, Label L2) {
         addDefinitionalAssertionEquiv(L1, L2, false);
     }
+
     /**
      * Adds the assertion to this context, and all outer contexts up to
      * the method/constructor/initializer level
@@ -173,7 +175,8 @@ public class JifContext_c extends Context_c implements JifContext
      * @param L2
      */
     @Override
-    public void addDefinitionalAssertionEquiv(Label L1, Label L2, boolean addToClass) {
+    public void addDefinitionalAssertionEquiv(Label L1, Label L2,
+            boolean addToClass) {
         // don't bother copying the environment, as we'll be
         // propogating it upwards anyway.
         // envModification();
@@ -181,8 +184,9 @@ public class JifContext_c extends Context_c implements JifContext
         JifContext_c jc = this;
         LabelEnv_c lastEnvAddedTo = env;
         while (jc != null && (!jc.isCode() || addToClass)) {
-            jc = (JifContext_c)jc.pop();
-            if (jc != null && jc.scope == this.scope && jc.env != lastEnvAddedTo) {
+            jc = (JifContext_c) jc.pop();
+            if (jc != null && jc.scope == this.scope
+                    && jc.env != lastEnvAddedTo) {
                 // only add to env we haven't seen yet, and
                 // envs in the scope of the same class as us.
                 jc.env.addEquiv(L1, L2);
@@ -200,8 +204,9 @@ public class JifContext_c extends Context_c implements JifContext
         JifContext_c jc = this;
         LabelEnv_c lastEnvAddedTo = env;
         while (!jc.isCode()) {
-            jc = (JifContext_c)jc.pop();
-            if (jc != null && jc.scope == this.scope && jc.env != lastEnvAddedTo) {
+            jc = (JifContext_c) jc.pop();
+            if (jc != null && jc.scope == this.scope
+                    && jc.env != lastEnvAddedTo) {
                 // only add to env we haven't seen yet, and
                 // envs in the scope of the same class as us.
                 jc.env.addEquiv(p, q);
@@ -215,16 +220,19 @@ public class JifContext_c extends Context_c implements JifContext
         envModification();
         env.addEquiv(L1, L2);
     }
+
     @Override
     public void addEquiv(Principal p1, Principal p2) {
         envModification();
         env.addEquiv(p1, p2);
     }
+
     @Override
     public void addActsFor(Principal p1, Principal p2) {
         envModification();
         env.addActsFor(p1, p2);
     }
+
     @Override
     public void addActsFor(ActsForParam actor, Principal granter) {
         if (actor instanceof Label) {
@@ -236,6 +244,7 @@ public class JifContext_c extends Context_c implements JifContext
                     + actor.getClass());
         }
     }
+
     @Override
     public void addEquiv(AccessPath p, AccessPath q) {
         //envModification(); XXX add the equivalence to the current environment.
@@ -248,8 +257,9 @@ public class JifContext_c extends Context_c implements JifContext
         LabelEnv_c lastEnvAddedTo = env;
         boolean lastJCBlock = (jc.kind == Context_c.BLOCK);
         while (!jc.isCode() && !lastJCBlock) {
-            jc = (JifContext_c)jc.pop();
-            if (jc != null && jc.scope == this.scope && jc.env != lastEnvAddedTo) {
+            jc = (JifContext_c) jc.pop();
+            if (jc != null && jc.scope == this.scope
+                    && jc.env != lastEnvAddedTo) {
                 // only add to env we haven't seen yet, and
                 // envs in the scope of the same class as us.
                 jc.env.addEquiv(p, q);
@@ -259,6 +269,7 @@ public class JifContext_c extends Context_c implements JifContext
         }
 
     }
+
     /**
      * Adds the assertion to this context, and all outer contexts up to
      * the method/constructor/initializer level
@@ -272,8 +283,9 @@ public class JifContext_c extends Context_c implements JifContext
         JifContext_c jc = this;
         LabelEnv_c lastEnvAddedTo = env;
         while (!jc.isCode()) {
-            jc = (JifContext_c)jc.pop();
-            if (jc != null && jc.scope == this.scope && jc.env != lastEnvAddedTo) {
+            jc = (JifContext_c) jc.pop();
+            if (jc != null && jc.scope == this.scope
+                    && jc.env != lastEnvAddedTo) {
                 // only add to env we haven't seen yet, and
                 // envs in the scope of the same class as us.
                 jc.env.addEquiv(p1, p2);
@@ -301,6 +313,7 @@ public class JifContext_c extends Context_c implements JifContext
         public int hashCode() {
             return kind.hashCode() + (label == null ? 0 : label.hashCode());
         }
+
         @Override
         public String toString() {
             return kind.toString() + label;
@@ -309,8 +322,10 @@ public class JifContext_c extends Context_c implements JifContext
         @Override
         public boolean equals(Object o) {
             if (o instanceof Key) {
-                Key that = (Key)o;
-                return this.kind.equals(that.kind) && (this.label == that.label || (this.label != null && this.label.equals(that.label)));
+                Key that = (Key) o;
+                return this.kind.equals(that.kind)
+                        && (this.label == that.label || (this.label != null && this.label
+                                .equals(that.label)));
             }
             return false;
         }
@@ -329,82 +344,108 @@ public class JifContext_c extends Context_c implements JifContext
     }
 
     @Override
-    public Label currentCodePCBound() { return currentCodePCBound; }
+    public Label currentCodePCBound() {
+        return currentCodePCBound;
+    }
+
     @Override
     public void setCurrentCodePCBound(Label currentCodePCBound) {
         this.currentCodePCBound = currentCodePCBound;
     }
 
     @Override
-    public Label pc() { return pc; }
+    public Label pc() {
+        return pc;
+    }
 
     @Override
     // pc label is special for better error report
     public void setPc(Label pc, LabelChecker lc) { // this.pc = pc;
-        if (pc instanceof NotTaken)
-            this.pc=pc;
-        if (this.pc == pc)
-            return;
+        if (pc instanceof NotTaken) this.pc = pc;
+        if (this.pc == pc) return;
         if (pc != null) {
             Set<Label> set = new HashSet<Label>();
             set.add(pc);
-            this.pc = new JoinLabel_c(set, pc.typeSystem(), pc.position(), new JoinLabelToJavaExpr_c());
+            this.pc =
+                    new JoinLabel_c(set, pc.typeSystem(), pc.position(),
+                            new JoinLabelToJavaExpr_c());
             this.pc.setDescription("pc label");
-        }
-        else
-            this.pc = pc;
+        } else this.pc = pc;
     }
 
     @Override
-    public Set<Principal> authority() { return auth; }
+    public Set<Principal> authority() {
+        return auth;
+    }
+
     @Override
     public void setAuthority(Set<Principal> auth) {
         this.auth = auth;
     }
 
     @Override
-    public PrincipalHierarchy ph() { return env.ph(); }
+    public PrincipalHierarchy ph() {
+        return env.ph();
+    }
 
     @Override
     public Label authLabel() {
-        Set<Principal> auth = authority();
+        JifOptions opt = (JifOptions) jifts.extensionInfo().getOptions();
+        if (opt.authFromProvider()) {
+            Position pos = Position.compilerGenerated();
+            PairLabel public_untrusted =
+                    jifts.pairLabel(pos, jifts.bottomConfPolicy(pos),
+                            jifts.topIntegPolicy(pos));
+            Label provider_integ = jifts.meet(public_untrusted, provider());
+            Label L = jifts.writersToReadersLabel(pos, provider_integ);
+            return env.triggerTransforms(L).normalize();
+        } else {
+            Set<Principal> auth = authority();
 
-        Set<Label> labels = new LinkedHashSet<Label>();
-        for (Principal p : auth) {
-            PairLabel pl = jifts.pairLabel(p.position(),
-                    jifts.readerPolicy(p.position(),
-                            p,
-                            jifts.topPrincipal(p.position())),
-                            jifts.topIntegPolicy(p.position()));
-            labels.add(pl);
-        }
+            Set<Label> labels = new LinkedHashSet<Label>();
+            for (Principal p : auth) {
+                PairLabel pl =
+                        jifts.pairLabel(
+                                p.position(),
+                                jifts.readerPolicy(p.position(), p,
+                                        jifts.topPrincipal(p.position())),
+                                jifts.topIntegPolicy(p.position()));
+                labels.add(pl);
+            }
 
-        if (labels.isEmpty()) {
-            return jifts.bottomLabel(currentCode().position());
+            if (labels.isEmpty()) {
+                return jifts.bottomLabel(currentCode().position());
+            }
+            Label L = jifts.joinLabel(currentCode().position(), labels);
+            return L;
         }
-        Label L = jifts.joinLabel(currentCode().position(),
-                labels);
-        return L;
     }
 
     @Override
     public Label authLabelInteg() {
-        Set<Label> labels = new LinkedHashSet<Label>();
-        for (Principal p : authority()) {
-            PairLabel pl = jifts.pairLabel(p.position(),
-                    jifts.bottomConfPolicy(p.position()),
-                    jifts.writerPolicy(p.position(),
-                            p,
-                            jifts.topPrincipal(p.position())));
-            labels.add(pl);
-        }
+        JifOptions opt = (JifOptions) jifts.extensionInfo().getOptions();
+        if (opt.authFromProvider()) {
+            Position pos = Position.compilerGenerated();
+            return jifts.pairLabel(pos, jifts.bottomConfPolicy(pos), provider()
+                    .integProjection());
+        } else {
+            Set<Label> labels = new LinkedHashSet<Label>();
+            for (Principal p : authority()) {
+                PairLabel pl =
+                        jifts.pairLabel(
+                                p.position(),
+                                jifts.bottomConfPolicy(p.position()),
+                                jifts.writerPolicy(p.position(), p,
+                                        jifts.topPrincipal(p.position())));
+                labels.add(pl);
+            }
 
-        if (labels.isEmpty()) {
-            return jifts.topLabel(currentCode().position());
+            if (labels.isEmpty()) {
+                return jifts.topLabel(currentCode().position());
+            }
+            Label L = jifts.meetLabel(currentCode().position(), labels);
+            return L;
         }
-        Label L = jifts.meetLabel(currentCode().position(),
-                labels);
-        return L;
     }
 
     @Override
@@ -429,15 +470,14 @@ public class JifContext_c extends Context_c implements JifContext
 
     @Override
     public Context pushConstructorCall() {
-        JifContext_c A = (JifContext_c)pushStatic();
+        JifContext_c A = (JifContext_c) pushStatic();
         A.inConstructorCall = true;
         return A;
     }
 
-
     @Override
     public Context pushClass(ParsedClassType classScope, ClassType type) {
-        JifContext_c jc = (JifContext_c)super.pushClass(classScope, type);
+        JifContext_c jc = (JifContext_c) super.pushClass(classScope, type);
         // force a new label environment
         jc.envModification();
         return jc;
@@ -445,11 +485,12 @@ public class JifContext_c extends Context_c implements JifContext
 
     @Override
     public Context pushCode(CodeInstance ci) {
-        JifContext_c jc = (JifContext_c)super.pushCode(ci);
+        JifContext_c jc = (JifContext_c) super.pushCode(ci);
         // force a new label environment
         jc.envModification();
         return jc;
     }
+
 //    public Context pushBlock() {
 //        JifContext_c jc = (JifContext_c)super.pushBlock();
 //        // force a new label environment
@@ -468,8 +509,7 @@ public class JifContext_c extends Context_c implements JifContext
         Label L = null;
         if (checkedEndorsements != null && checkedEndorsements.containsKey(li)) {
             L = checkedEndorsements.get(li);
-        }
-        else {
+        } else {
             L = ts.labelOfLocal(li, this.pc());
         }
 
@@ -483,7 +523,8 @@ public class JifContext_c extends Context_c implements JifContext
     public boolean updateAllowed(Expr e) {
         if (e instanceof Local && checkedEndorsements != null) {
             // cannot update locals that are involved in a checked endorse
-            return !checkedEndorsements.containsKey(((Local)e).localInstance());
+            return !checkedEndorsements
+                    .containsKey(((Local) e).localInstance());
         }
         return true;
     }
@@ -492,9 +533,9 @@ public class JifContext_c extends Context_c implements JifContext
     public void addCheckedEndorse(LocalInstance li, Label downgradeTo) {
         if (this.checkedEndorsements == null) {
             this.checkedEndorsements = new HashMap<LocalInstance, Label>();
-        }
-        else {
-            this.checkedEndorsements = new HashMap<LocalInstance, Label>(this.checkedEndorsements);
+        } else {
+            this.checkedEndorsements =
+                    new HashMap<LocalInstance, Label>(this.checkedEndorsements);
         }
         this.checkedEndorsements.put(li, downgradeTo);
     }

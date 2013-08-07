@@ -28,7 +28,6 @@ public class JifOptions extends Options {
      */
     public boolean nonRobustness;
 
-
     /**
      * Should uncaught exceptions be made fatal?
      */
@@ -54,7 +53,6 @@ public class JifOptions extends Options {
      * The classpath for the Jif signatures of java.lang objects.
      */
     public final List<File> sigcp;
-
 
     public enum JifLocations implements Location {
         SIGNATURE_PATH(false);
@@ -86,6 +84,11 @@ public class JifOptions extends Options {
     protected boolean noWarnings;
 
     /**
+     * Whether to use the provider label for authorization checks when downgrading policies.
+     */
+    protected boolean authFromProvider;
+
+    /**
      * Constructor
      */
     public JifOptions(ExtensionInfo extension) {
@@ -95,14 +98,17 @@ public class JifOptions extends Options {
 
     @Override
     protected void populateFlags(Set<OptFlag<?>> flags) {
-        flags.add(new Switch("-globalsolve", "infer label variables globally (default: per class)"));
-        flags.add(new Switch(new String[]{"-explain", "-e"}, "provide more detailed " +
-                "explanations of failed label checking"));
+        flags.add(new Switch("-globalsolve",
+                "infer label variables globally (default: per class)"));
+        flags.add(new Switch(new String[] { "-explain", "-e" },
+                "provide more detailed "
+                        + "explanations of failed label checking"));
         flags.add(new Switch("-nonrobust", "skip robustness checks."));
         flags.add(new Switch("-fail-on-exception",
                 "re-throw uncaught and undeclared runtime exceptions as fatal errors."));
         flags.add(new Switch("-robust", "force robustness checks"));
-        flags.add(new PathFlag<File>("-sigcp", "<path>", "path for Jif signatures (e.g. for java.lang.Object)") {
+        flags.add(new PathFlag<File>("-sigcp", "<path>",
+                "path for Jif signatures (e.g. for java.lang.Object)") {
             @Override
             public File handlePathEntry(String entry) {
                 File f = new File(entry);
@@ -111,7 +117,8 @@ public class JifOptions extends Options {
                 else return null;
             }
         });
-        flags.add(new PathFlag<File>("-addsigcp", "<path>", "append <path> to Jif signature path") {
+        flags.add(new PathFlag<File>("-addsigcp", "<path>",
+                "append <path> to Jif signature path") {
             @Override
             public File handlePathEntry(String entry) {
                 File f = new File(entry);
@@ -124,8 +131,9 @@ public class JifOptions extends Options {
                 "set debug level to n. Prints more information about labels"));
         flags.add(new Switch("-untrusted-providers",
                 "set the providers of the sources being compiled to be untrusted"));
-        flags.add(new Switch("-no-warnings",
-                "suppress compile-time warnings"));
+        flags.add(new Switch("-auth-from-provider",
+                "Use the provider label to determine authority."));
+        flags.add(new Switch("-no-warnings", "suppress compile-time warnings"));
         super.populateFlags(flags);
     }
 
@@ -136,39 +144,37 @@ public class JifOptions extends Options {
             if ((Boolean) arg.value())
                 System.err.println("Will use a single solver to infer labels");
             solveGlobally = (Boolean) arg.value();
-        }
-        else if (arg.flag().ids().contains("-explain") || arg.flag().ids().contains("-e")) {
+        } else if (arg.flag().ids().contains("-explain")
+                || arg.flag().ids().contains("-e")) {
             explainErrors = (Boolean) arg.value();
-        }
-        else if (arg.flag().ids().contains("-nonrobust")) {
+        } else if (arg.flag().ids().contains("-nonrobust")) {
             nonRobustness = (Boolean) arg.value();
-        }
-        else if (arg.flag().ids().contains("-fail-on-exception")) {
+        } else if (arg.flag().ids().contains("-fail-on-exception")) {
             fatalExceptions = (Boolean) arg.value();
-        }
-        else if (arg.flag().ids().contains("-robust")) {
+        } else if (arg.flag().ids().contains("-robust")) {
             nonRobustness = !(Boolean) arg.value();
-        }
-        else if (arg.flag().ids().contains("-sigcp")) {
+        } else if (arg.flag().ids().contains("-sigcp")) {
             this.sigcp.clear();
             this.sigcp.addAll((List<File>) arg.value());
-        }
-        else if (arg.flag().ids().contains("-addsigcp")) {
+        } else if (arg.flag().ids().contains("-addsigcp")) {
             this.sigcp.addAll((List<File>) arg.value());
-        }
-        else if (arg.flag().ids().contains("-debug")) {
+        } else if (arg.flag().ids().contains("-debug")) {
             Report.addTopic("debug", (Integer) arg.value());
-        }
-        else if (arg.flag().ids().contains("-untrusted-providers")) {
+        } else if (arg.flag().ids().contains("-untrusted-providers")) {
             trustedProviders = !(Boolean) arg.value();
-        }
-        else if (arg.flag().ids().contains("-no-warnings")) {
+        } else if (arg.flag().ids().contains("-auth-from-provider")) {
+            authFromProvider = (Boolean) arg.value();
+        } else if (arg.flag().ids().contains("-no-warnings")) {
             noWarnings = (Boolean) arg.value();
-        }
-        else super.handleArg(arg);
+        } else super.handleArg(arg);
     }
 
     public boolean noWarnings() {
         return noWarnings;
     }
+
+    public boolean authFromProvider() {
+        return authFromProvider;
+    }
+
 }

@@ -139,7 +139,7 @@ public class WritersToReadersLabel_c extends Label_c implements
 
     protected static Label transformImpl(Label label) {
         JifTypeSystem ts = label.typeSystem();
-        if (label instanceof VarLabel_c) {
+        if (label instanceof VarLabel_c || label instanceof ProviderLabel) {
             // cant do anything.
             return ts.writersToReadersLabel(label.position(), label);
         } else if (label instanceof PairLabel) {
@@ -164,6 +164,7 @@ public class WritersToReadersLabel_c extends Label_c implements
             }
             return ts.joinLabel(label.position(), comps);
         }
+
         throw new InternalCompilerError("WritersToReaders undefined " + "for "
                 + label);
     }
@@ -196,6 +197,7 @@ public class WritersToReadersLabel_c extends Label_c implements
             }
             return ts.joinConfPolicy(mp.position(), newPols);
         }
+        //XXX: can we do anything about projections?
         throw new InternalCompilerError("Unexpected integ policy: " + pol);
     }
 
