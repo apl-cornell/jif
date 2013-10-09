@@ -126,4 +126,10 @@ public class JifSubstClassType_c extends SubstClassType_c<ParamInstance, Param>
         return jpt.provider();
     }
 
+    @Override
+    public boolean isUnsafe() {
+        JifClassType jpt = (JifClassType) base;
+        return jpt.isUnsafe();
+    }
+
 }

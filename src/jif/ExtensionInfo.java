@@ -48,8 +48,7 @@ import polyglot.util.InternalCompilerError;
  *	<li> translation, <code>JifTranslator</code> </li>
  *  </ul>
  */
-public class ExtensionInfo extends JLExtensionInfo
-{
+public class ExtensionInfo extends JLExtensionInfo {
     //  protected boolean doInfer = false;
     protected OutputExtensionInfo jlext = new OutputExtensionInfo(this);
 
@@ -69,11 +68,13 @@ public class ExtensionInfo extends JLExtensionInfo
     }
 
     public JifOptions getJifOptions() {
-        return (JifOptions)this.getOptions();
+        return (JifOptions) this.getOptions();
     }
 
     static public Set<String> topics = new LinkedHashSet<String>();
-    static { topics.add("jif"); }
+    static {
+        topics.add("jif");
+    }
 
     protected TypeSystem jlTypeSystem() {
         // Use a JL type system for looking up principals.
@@ -97,12 +98,13 @@ public class ExtensionInfo extends JLExtensionInfo
     protected void initTypeSystem() {
         try {
             LoadedClassResolver lr;
-            lr = new SourceClassResolver(compiler, this, false,
-                    getOptions().compile_command_line_only,
-                    getOptions().ignore_mod_times);
+            boolean allowRaw = getJifOptions().skipLabelChecking;
+            lr =
+                    new SourceClassResolver(compiler, this, allowRaw,
+                            getOptions().compile_command_line_only,
+                            getOptions().ignore_mod_times);
             ts.initialize(lr, this);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new InternalCompilerError(
                     "Unable to initialize type system: ", e);
         }
@@ -133,17 +135,17 @@ public class ExtensionInfo extends JLExtensionInfo
     @Override
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
 
-        polyglot.lex.Lexer lexer =
-                new jif.parse.Lexer_c(reader, source, eq);
+        polyglot.lex.Lexer lexer = new jif.parse.Lexer_c(reader, source, eq);
         polyglot.parse.BaseParser grm =
-                new jif.parse.Grm(lexer, (JifTypeSystem)ts,
-                        (JifNodeFactory)nf, eq);
+                new jif.parse.Grm(lexer, (JifTypeSystem) ts,
+                        (JifNodeFactory) nf, eq);
 
         return new CupParser(grm, source, eq);
     }
 
     public static class JifJobExt implements JobExt {
-        public JifJobExt(JifTypeSystem ts) {     }
+        public JifJobExt(JifTypeSystem ts) {
+        }
     }
 
     @Override
@@ -156,15 +158,18 @@ public class ExtensionInfo extends JLExtensionInfo
         return new JifScheduler(this, jlext);
     }
 
-    public LabelChecker createLabelChecker(Job job, boolean solvePerClassBody, boolean solvePerMethod, boolean doLabelSubst) {
-        return new LabelChecker(job, typeSystem(), nodeFactory(), solvePerClassBody, solvePerMethod, doLabelSubst);
+    public LabelChecker createLabelChecker(Job job, boolean solvePerClassBody,
+            boolean solvePerMethod, boolean doLabelSubst) {
+        return new LabelChecker(job, typeSystem(), nodeFactory(),
+                solvePerClassBody, solvePerMethod, doLabelSubst);
     }
 
     @Override
     public Goal getCompileGoal(Job job) {
-        JifScheduler jifScheduler = (JifScheduler)scheduler();
+        JifScheduler jifScheduler = (JifScheduler) scheduler();
         return jifScheduler.JifToJavaRewritten(job);
     }
+
     static {
         // touch Topics to force the static initializer to be loaded.
         Topics.jif.toLowerCase();

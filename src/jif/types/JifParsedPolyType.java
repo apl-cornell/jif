@@ -10,6 +10,7 @@ import polyglot.types.ParsedClassType;
  */
 public interface JifParsedPolyType extends ParsedClassType, JifPolyType {
     void setParams(List<ParamInstance> params);
+
     void setAuthority(List<Principal> principals);
 
     void setConstraints(List<Assertion> constraints);

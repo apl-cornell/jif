@@ -24,6 +24,7 @@ import polyglot.frontend.Job;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.Source;
 import polyglot.frontend.goals.Barrier;
+import polyglot.frontend.goals.EmptyGoal;
 import polyglot.frontend.goals.FieldConstantsChecked;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.VisitorGoal;
@@ -48,13 +49,18 @@ public class JifScheduler extends JLScheduler {
     }
 
     public Goal LabelsChecked(Job job) {
-        LabelCheckGoal g = (LabelCheckGoal) internGoal(new LabelCheckGoal(job));
-
+        JifOptions opts = (JifOptions) job.extensionInfo().getOptions();
+        Goal ig;
+        if (opts.skipLabelChecking) {
+            ig = new EmptyGoal(job);
+        } else {
+            ig = new LabelCheckGoal(job);
+        }
+        Goal g = internGoal(ig);
         try {
             addPrerequisiteDependency(g, this.FinalParamsBarrier());
             addPrerequisiteDependency(g, this.FieldLabelInference(job));
             addPrerequisiteDependency(g, this.IntegerBoundsChecker(job));
-// Jif Dependency bugfix:
             addPrerequisiteDependency(g, this.ExceptionsChecked(job));
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);

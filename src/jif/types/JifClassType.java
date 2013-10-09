@@ -12,15 +12,16 @@ import polyglot.util.Position;
  * Jif class type.
  */
 public interface JifClassType extends ClassType {
-    
+
     @Override
     JifTypeSystem typeSystem();
-    
+
     /**
      * The principals that grant authority to objects of this class, that is,
      * the principals listed in the authority clause.
      */
     List<Principal> authority();
+
     /**
      * Constraints on the principal hierarchy.
      */
@@ -40,6 +41,7 @@ public interface JifClassType extends ClassType {
      * @see ThisLabel
      */
     ThisLabel thisLabel();
+
     ThisLabel thisLabel(Position p);
 
     /**
@@ -49,9 +51,14 @@ public interface JifClassType extends ClassType {
      * @return List of Param
      */
     List<Param> actuals();
-    
+
     /**
      * Returns the provider label of the implementation of this class.
      */
     ProviderLabel provider();
+
+    /**
+     * Returns whether this class has been label-checked.
+     */
+    boolean isUnsafe();
 }

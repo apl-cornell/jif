@@ -34,6 +34,11 @@ public class JifOptions extends Options {
     public boolean fatalExceptions;
 
     /**
+     * Should we skip label checks entirely?
+     */
+    public boolean skipLabelChecking;
+
+    /**
      * Use a single Solver to infer labels globally, or solve on a class
      * by class basis.
      */
@@ -134,6 +139,7 @@ public class JifOptions extends Options {
         flags.add(new Switch("-auth-from-provider",
                 "Use the provider label to determine authority."));
         flags.add(new Switch("-no-warnings", "suppress compile-time warnings"));
+        flags.add(new Switch("-skip-label-checks", "Skip label checking."));
         super.populateFlags(flags);
     }
 
@@ -147,6 +153,8 @@ public class JifOptions extends Options {
         } else if (arg.flag().ids().contains("-explain")
                 || arg.flag().ids().contains("-e")) {
             explainErrors = (Boolean) arg.value();
+        } else if (arg.flag().ids().contains("-skip-label-checks")) {
+            skipLabelChecking = (Boolean) arg.value();
         } else if (arg.flag().ids().contains("-nonrobust")) {
             nonRobustness = (Boolean) arg.value();
         } else if (arg.flag().ids().contains("-fail-on-exception")) {

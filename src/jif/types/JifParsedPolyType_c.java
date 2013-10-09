@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import jif.JifOptions;
 import jif.types.label.ParamLabel;
 import jif.types.label.ProviderLabel;
 import jif.types.label.ThisLabel;
@@ -13,6 +14,7 @@ import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ext.param.types.PClass;
 import polyglot.frontend.Source;
+import polyglot.main.Options;
 import polyglot.types.ClassType;
 import polyglot.types.FieldInstance;
 import polyglot.types.LazyClassInitializer;
@@ -32,6 +34,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
     List<Principal> authority;
     List<Assertion> constraints;
     ProviderLabel provider;
+    boolean isUnsafe;
 
     PClass<ParamInstance, Param> instantiatedFrom;
 
@@ -54,6 +57,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
         this.authority = new LinkedList<Principal>();
         this.constraints = new LinkedList<Assertion>();
         this.provider = ts.providerLabel(this);
+        this.isUnsafe = ((JifOptions) Options.global).skipLabelChecking;
         this.instantiatedFrom = null;
     }
 
@@ -75,7 +79,8 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
     @Override
     public void kind(Kind kind) {
         if (kind != TOP_LEVEL) {
-            throw new InternalCompilerError("Jif does not support inner classes.");
+            throw new InternalCompilerError(
+                    "Jif does not support inner classes.");
         }
         super.kind(kind);
     }
@@ -87,7 +92,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
             super.fields();
 
             // Remove the class field.
-            for (Iterator<FieldInstance> i = fields.iterator(); i.hasNext(); ) {
+            for (Iterator<FieldInstance> i = fields.iterator(); i.hasNext();) {
                 FieldInstance fi = i.next();
                 if (fi.name().equals("class")) {
                     i.remove();
@@ -133,13 +138,12 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
 
             if (pi.isCovariantLabel()) {
                 actuals.add(ts.covariantLabel(posi, pi));
-            }
-            else if (pi.isLabel()) {
+            } else if (pi.isLabel()) {
                 ParamLabel pl = ts.paramLabel(posi, pi);
-                pl.setDescription("label parameter " + pi.name() + " of class " + pi.container().fullName());
+                pl.setDescription("label parameter " + pi.name() + " of class "
+                        + pi.container().fullName());
                 actuals.add(pl);
-            }
-            else {
+            } else {
                 actuals.add(ts.principalParam(posi, pi));
             }
         }
@@ -149,12 +153,12 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
 
     @Override
     public ThisLabel thisLabel() {
-        return ((JifTypeSystem)ts).thisLabel(this);
+        return ((JifTypeSystem) ts).thisLabel(this);
     }
 
     @Override
     public ThisLabel thisLabel(Position p) {
-        return ((JifTypeSystem)ts).thisLabel(p, this);
+        return ((JifTypeSystem) ts).thisLabel(p, this);
     }
 
     @Override
@@ -171,6 +175,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
     public void setAuthority(List<Principal> principals) {
         this.authority = new LinkedList<Principal>(principals);
     }
+
     @Override
     public List<Assertion> constraints() {
         return constraints;
@@ -192,7 +197,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
         String s = "";
 
         if (params != null) {
-            for (Iterator<ParamInstance> i = params.iterator(); i.hasNext(); ) {
+            for (Iterator<ParamInstance> i = params.iterator(); i.hasNext();) {
                 ParamInstance pi = i.next();
                 s += pi.toString();
 
@@ -202,7 +207,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
             }
         }
 
-        if (! s.equals("")) {
+        if (!s.equals("")) {
             s = "[" + s + "]";
         }
 
@@ -224,15 +229,11 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
             JifPolyType t = (JifPolyType) o;
 
             if (package_() != null && t.package_() != null) {
-                return package_().equals(t.package_())
-                        && name.equals(t.name())
-                        && flags.equals(t.flags())
-                        && params.equals(t.params())
+                return package_().equals(t.package_()) && name.equals(t.name())
+                        && flags.equals(t.flags()) && params.equals(t.params())
                         && authority.equals(t.authority());
-            }
-            else if (package_() == t.package_()) {
-                return name.equals(t.name())
-                        && flags.equals(t.flags())
+            } else if (package_() == t.package_()) {
+                return name.equals(t.name()) && flags.equals(t.flags())
                         && params.equals(t.params())
                         && authority.equals(t.authority());
             }
@@ -245,4 +246,10 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
     public ProviderLabel provider() {
         return provider;
     }
+
+    @Override
+    public boolean isUnsafe() {
+        return isUnsafe;
+    }
+
 }

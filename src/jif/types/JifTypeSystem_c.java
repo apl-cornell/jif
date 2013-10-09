@@ -161,6 +161,11 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
+    public LazyClassInitializer deserializedClassInitializer() {
+        return new JifDeserializedClassInitializer(this);
+    }
+
+    @Override
     public Solver createSolver(String solverName) {
         return new SolverGLB(this, extInfo.compiler(), solverName);
         //return new SolverLUB(this);
