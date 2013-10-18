@@ -37,6 +37,7 @@ import polyglot.util.Position;
 import polyglot.visit.DataFlow;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.FlowGraph.EdgeKey;
+import polyglot.visit.FlowGraph.Peer;
 import polyglot.visit.NodeVisitor;
 
 /**
@@ -70,10 +71,9 @@ public class IntegerBoundsChecker extends
      */
     @Override
     protected Map<EdgeKey, DataFlowItem> flow(List<DataFlowItem> inItems,
-            List<EdgeKey> inItemKeys, FlowGraph<DataFlowItem> graph, Term n,
-            boolean entry, Set<EdgeKey> edgeKeys) {
-        return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, entry,
-                edgeKeys);
+            List<EdgeKey> inItemKeys, FlowGraph<DataFlowItem> graph,
+            Peer<DataFlowItem> peer) {
+        return this.flowToBooleanFlow(inItems, inItemKeys, graph, peer);
     }
 
     protected static final Set<Operator> INTERESTING_BINARY_OPERATORS =
@@ -83,16 +83,16 @@ public class IntegerBoundsChecker extends
     @Override
     public Map<EdgeKey, DataFlowItem> flow(DataFlowItem trueItem,
             DataFlowItem falseItem, DataFlowItem otherItem,
-            FlowGraph<DataFlowItem> graph, Term n, boolean entry,
-            Set<EdgeKey> succEdgeKeys) {
+            FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
         DataFlowItem inItem =
                 safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, falseItem,
                         FlowGraph.EDGE_KEY_FALSE, otherItem,
-                        FlowGraph.EDGE_KEY_OTHER, n, entry, graph);
+                        FlowGraph.EDGE_KEY_OTHER, peer, graph);
         //System.err.println("flow for " + n + " : in " + inItem);
 
-        if (entry) {
-            return DataFlow.<DataFlowItem> itemToMap(inItem, succEdgeKeys);
+        if (peer.isEntry()) {
+            return DataFlow.<DataFlowItem> itemToMap(inItem,
+                    peer.succEdgeKeys());
         }
 
         DataFlowItem inDFItem = (inItem);
@@ -103,6 +103,8 @@ public class IntegerBoundsChecker extends
                 new HashMap<LocalInstance, Bounds>();
         // if the value of a local changes, it goes in one of these two, or both
         LocalInstance increased = null, decreased = null;
+
+        final Term n = peer.node();
 
         if (n instanceof LocalDecl) {
             LocalDecl ld = (LocalDecl) n;
@@ -199,7 +201,7 @@ public class IntegerBoundsChecker extends
                 DataFlowItem falseOutDFItem =
                         inDFItem.update(falseupdates, increased, decreased);
                 return itemsToMap(trueOutDFItem, falseOutDFItem, null,
-                        succEdgeKeys);
+                        peer.succEdgeKeys());
             }
         }
 
@@ -218,14 +220,14 @@ public class IntegerBoundsChecker extends
             falseItem = falseItem == null ? outDFItem : falseItem;
             Map<EdgeKey, DataFlowItem> m =
                     flowBooleanConditions(trueItem, falseItem, otherDFItem,
-                            graph, (Expr) n, succEdgeKeys);
+                            graph, peer);
 
             if (m != null) {
                 return m;
             }
         }
 
-        return itemToMap(outDFItem, succEdgeKeys);
+        return itemToMap(outDFItem, peer.succEdgeKeys());
     }
 
     @Override
@@ -294,8 +296,8 @@ public class IntegerBoundsChecker extends
      * items should be retained.
      */
     @Override
-    protected DataFlowItem confluence(List<DataFlowItem> items, Term node,
-            boolean entry, FlowGraph<DataFlowItem> graph) {
+    protected DataFlowItem confluence(List<DataFlowItem> items,
+            Peer<DataFlowItem> peer, FlowGraph<DataFlowItem> graph) {
         Map<LocalInstance, Bounds> newMap = null;
         for (DataFlowItem df : items) {
             if (newMap == null) {

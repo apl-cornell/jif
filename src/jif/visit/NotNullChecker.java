@@ -59,6 +59,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.visit.DataFlow;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.FlowGraph.EdgeKey;
+import polyglot.visit.FlowGraph.Peer;
 import polyglot.visit.NodeVisitor;
 
 /**
@@ -185,10 +186,9 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
 
     @Override
     protected Map<EdgeKey, DataFlowItem> flow(List<DataFlowItem> inItems,
-            List<EdgeKey> inItemKeys, FlowGraph<DataFlowItem> graph, Term n,
-            boolean entry, Set<EdgeKey> edgeKeys) {
-        return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, entry,
-                edgeKeys);
+            List<EdgeKey> inItemKeys, FlowGraph<DataFlowItem> graph,
+            Peer<DataFlowItem> peer) {
+        return this.flowToBooleanFlow(inItems, inItemKeys, graph, peer);
     }
 
     /**
@@ -200,16 +200,17 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
     @Override
     public Map<EdgeKey, DataFlowItem> flow(DataFlowItem trueItem,
             DataFlowItem falseItem, DataFlowItem otherItem,
-            FlowGraph<DataFlowItem> graph, Term n, boolean entry,
-            Set<EdgeKey> succEdgeKeys) {
+            FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
         DataFlowItem dfIn =
                 safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, falseItem,
                         FlowGraph.EDGE_KEY_FALSE, otherItem,
-                        FlowGraph.EDGE_KEY_OTHER, n, entry, graph);
+                        FlowGraph.EDGE_KEY_OTHER, peer, graph);
 
-        if (entry) {
-            return itemToMap(dfIn, succEdgeKeys);
+        if (peer.isEntry()) {
+            return itemToMap(dfIn, peer.succEdgeKeys());
         }
+
+        final Term n = peer.node();
 
         if (n instanceof LocalDecl) {
             LocalDecl x = (LocalDecl) n;
@@ -218,7 +219,7 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
                         addNotNull(dfIn.notNullAccessPaths,
                                 new AccessPathLocal(x.localInstance()));
                 DataFlowItem newItem = new DataFlowItem(s, false);
-                return checkNPE(itemToMap(newItem, succEdgeKeys), n);
+                return checkNPE(itemToMap(newItem, peer.succEdgeKeys()), n);
             }
         } else if (n instanceof Formal) {
             Formal f = (Formal) n;
@@ -231,7 +232,7 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
                         addNotNull(dfIn.notNullAccessPaths,
                                 new AccessPathLocal(f.localInstance()));
                 DataFlowItem newItem = new DataFlowItem(s, false);
-                return checkNPE(itemToMap(newItem, succEdgeKeys), n);
+                return checkNPE(itemToMap(newItem, peer.succEdgeKeys()), n);
             }
         } else if (n instanceof Instanceof) {
             Instanceof io = (Instanceof) n;
@@ -244,7 +245,7 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
                 Set<AccessPath> trueBranch =
                         addNotNull(dfIn.notNullAccessPaths, ap);
                 return itemsToMap(new DataFlowItem(trueBranch, false), dfIn,
-                        dfIn, succEdgeKeys);
+                        dfIn, peer.succEdgeKeys());
             }
         } else if (n instanceof Assign) {
             Assign x = (Assign) n;
@@ -257,7 +258,7 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
                     resultIsNotNull = true;
                 }
                 DataFlowItem newItem = new DataFlowItem(s, resultIsNotNull);
-                return checkNPE(itemToMap(newItem, succEdgeKeys), n);
+                return checkNPE(itemToMap(newItem, peer.succEdgeKeys()), n);
             }
         } else if (n instanceof Binary
                 && (Binary.EQ.equals(((Binary) n).operator()) || Binary.NE
@@ -271,7 +272,7 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
 
                 Map<EdgeKey, DataFlowItem> m =
                         comparisonToNull(e, Binary.EQ.equals(b.operator()),
-                                dfIn, succEdgeKeys);
+                                dfIn, peer.succEdgeKeys());
                 return checkNPE(m, n);
             }
         } else if (n instanceof Expr && ((Expr) n).type().isBoolean()
@@ -281,9 +282,9 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
 
             Map<EdgeKey, DataFlowItem> ret =
                     flowBooleanConditions(trueItem, falseItem, dfIn, graph,
-                            (Expr) n, succEdgeKeys);
+                            peer);
             if (ret == null) {
-                ret = itemToMap(false, dfIn, succEdgeKeys);
+                ret = itemToMap(false, dfIn, peer.succEdgeKeys());
             }
             return checkNPE(ret, n);
         } else if (n instanceof DowngradeExpr && ((Expr) n).type().isBoolean()) {
@@ -291,7 +292,7 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
             if (trueItem == null) trueItem = dfIn;
             if (falseItem == null) falseItem = dfIn;
             Map<EdgeKey, DataFlowItem> ret =
-                    itemsToMap(trueItem, falseItem, dfIn, succEdgeKeys);
+                    itemsToMap(trueItem, falseItem, dfIn, peer.succEdgeKeys());
             return checkNPE(ret, n);
         }
 
@@ -302,7 +303,8 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
             // the result of this expression is not null.
             resultIsNotNull = true;
         }
-        return checkNPE(itemToMap(resultIsNotNull, dfIn, succEdgeKeys), n);
+        return checkNPE(itemToMap(resultIsNotNull, dfIn, peer.succEdgeKeys()),
+                n);
     }
 
     private Map<EdgeKey, DataFlowItem> itemToMap(boolean resultIsNotNull,
@@ -429,8 +431,8 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
      * if it is not null on all paths flowing in.
      */
     @Override
-    protected DataFlowItem confluence(List<DataFlowItem> items, Term node,
-            boolean entry, FlowGraph<DataFlowItem> graph) {
+    protected DataFlowItem confluence(List<DataFlowItem> items,
+            Peer<DataFlowItem> peer, FlowGraph<DataFlowItem> graph) {
         return intersect(items);
     }
 

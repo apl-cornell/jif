@@ -32,6 +32,7 @@ import polyglot.types.TypeSystem;
 import polyglot.visit.DataFlow;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.FlowGraph.EdgeKey;
+import polyglot.visit.FlowGraph.Peer;
 import polyglot.visit.NodeVisitor;
 
 /**
@@ -116,10 +117,9 @@ public class PreciseClassChecker extends
 
     @Override
     protected Map<EdgeKey, DataFlowItem> flow(List<DataFlowItem> inItems,
-            List<EdgeKey> inItemKeys, FlowGraph<DataFlowItem> graph, Term n,
-            boolean entry, Set<EdgeKey> edgeKeys) {
-        return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, entry,
-                edgeKeys);
+            List<EdgeKey> inItemKeys, FlowGraph<DataFlowItem> graph,
+            Peer<DataFlowItem> peer) {
+        return this.flowToBooleanFlow(inItems, inItemKeys, graph, peer);
     }
 
     /**
@@ -131,16 +131,17 @@ public class PreciseClassChecker extends
     @Override
     public Map<EdgeKey, DataFlowItem> flow(DataFlowItem trueItem,
             DataFlowItem falseItem, DataFlowItem otherItem,
-            FlowGraph<DataFlowItem> graph, Term n, boolean entry,
-            Set<EdgeKey> succEdgeKeys) {
+            FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
         DataFlowItem dfIn =
                 safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, falseItem,
                         FlowGraph.EDGE_KEY_FALSE, otherItem,
-                        FlowGraph.EDGE_KEY_OTHER, n, entry, graph);
+                        FlowGraph.EDGE_KEY_OTHER, peer, graph);
 
-        if (entry) {
-            return itemToMap(dfIn, succEdgeKeys);
+        if (peer.isEntry()) {
+            return itemToMap(dfIn, peer.succEdgeKeys());
         }
+
+        final Term n = peer.node();
 
         if (n instanceof Instanceof) {
             Instanceof io = (Instanceof) n;
@@ -152,7 +153,7 @@ public class PreciseClassChecker extends
                 Map<AccessPath, Set<Type>> trueBranch =
                         addClass(dfIn.classTypes, ap, io.compareType().type());
                 return itemsToMap(new DataFlowItem(trueBranch), dfIn, dfIn,
-                        succEdgeKeys);
+                        peer.succEdgeKeys());
             }
         } else if (n instanceof Cast) {
             Cast cst = (Cast) n;
@@ -162,7 +163,8 @@ public class PreciseClassChecker extends
                 // on the non-ClassCastException edges, we know that
                 // the cast succeeded, and var instance is in fact an
                 // instance of the cast type.
-                Map<EdgeKey, DataFlowItem> m = itemToMap(dfIn, succEdgeKeys);
+                Map<EdgeKey, DataFlowItem> m =
+                        itemToMap(dfIn, peer.succEdgeKeys());
                 for (Map.Entry<EdgeKey, DataFlowItem> element : m.entrySet()) {
                     Entry<EdgeKey, DataFlowItem> e = element;
                     if (!e.getKey().equals(EDGE_KEY_CLASS_CAST_EXC)) {
@@ -179,14 +181,14 @@ public class PreciseClassChecker extends
             Map<AccessPath, Set<Type>> m =
                     killClasses(dfIn.classTypes,
                             new AccessPathLocal(x.localInstance()));
-            return itemToMap(new DataFlowItem(m), succEdgeKeys);
+            return itemToMap(new DataFlowItem(m), peer.succEdgeKeys());
         } else if (n instanceof Assign) {
             Assign x = (Assign) n;
             // remove the precise class information...
             AccessPath ap = findAccessPathForExpr(x.left());
             if (ap != null) {
                 Map<AccessPath, Set<Type>> m = killClasses(dfIn.classTypes, ap);
-                return itemToMap(new DataFlowItem(m), succEdgeKeys);
+                return itemToMap(new DataFlowItem(m), peer.succEdgeKeys());
             }
         } else if (n instanceof Expr && ((Expr) n).type().isBoolean()
                 && (n instanceof Binary || n instanceof Unary)) {
@@ -195,18 +197,18 @@ public class PreciseClassChecker extends
 
             Map<EdgeKey, DataFlowItem> ret =
                     flowBooleanConditions(trueItem, falseItem, dfIn, graph,
-                            (Expr) n, succEdgeKeys);
+                            peer);
             if (ret == null) {
-                ret = itemToMap(dfIn, succEdgeKeys);
+                ret = itemToMap(dfIn, peer.succEdgeKeys());
             }
             return ret;
         } else if (n instanceof DowngradeExpr && ((Expr) n).type().isBoolean()) {
             if (trueItem == null) trueItem = dfIn;
             if (falseItem == null) falseItem = dfIn;
-            return itemsToMap(trueItem, falseItem, dfIn, succEdgeKeys);
+            return itemsToMap(trueItem, falseItem, dfIn, peer.succEdgeKeys());
         }
 
-        return itemToMap(dfIn, succEdgeKeys);
+        return itemToMap(dfIn, peer.succEdgeKeys());
     }
 
     private Map<AccessPath, Set<Type>> killClasses(
@@ -252,8 +254,8 @@ public class PreciseClassChecker extends
      * if it is not null on all paths flowing in.
      */
     @Override
-    protected DataFlowItem confluence(List<DataFlowItem> items, Term node,
-            boolean entry, FlowGraph<DataFlowItem> graph) {
+    protected DataFlowItem confluence(List<DataFlowItem> items,
+            Peer<DataFlowItem> peer, FlowGraph<DataFlowItem> graph) {
         return intersect(items);
     }
 
