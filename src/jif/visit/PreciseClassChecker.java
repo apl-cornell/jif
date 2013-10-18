@@ -41,22 +41,24 @@ import polyglot.visit.NodeVisitor;
  * delegates.
  */
 public class PreciseClassChecker extends
-DataFlow<PreciseClassChecker.DataFlowItem>
-{
+        DataFlow<PreciseClassChecker.DataFlowItem> {
     public PreciseClassChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf, true /* forward analysis */);
         EDGE_KEY_CLASS_CAST_EXC = null;
     }
 
     public PreciseClassChecker(Job job) {
-        this(job, job.extensionInfo().typeSystem(), job.extensionInfo().nodeFactory());
+        this(job, job.extensionInfo().typeSystem(), job.extensionInfo()
+                .nodeFactory());
     }
 
     private FlowGraph.ExceptionEdgeKey EDGE_KEY_CLASS_CAST_EXC;
 
     @Override
     public NodeVisitor begin() {
-        EDGE_KEY_CLASS_CAST_EXC = new FlowGraph.ExceptionEdgeKey(typeSystem().ClassCastException());
+        EDGE_KEY_CLASS_CAST_EXC =
+                new FlowGraph.ExceptionEdgeKey(typeSystem()
+                        .ClassCastException());
         return super.begin();
 
     }
@@ -76,35 +78,39 @@ DataFlow<PreciseClassChecker.DataFlowItem>
         DataFlowItem(Map<AccessPath, Set<Type>> classTypes) {
             this.classTypes = classTypes;
         }
+
         DataFlowItem(DataFlowItem d) {
             classTypes = new HashMap<AccessPath, Set<Type>>(d.classTypes);
         }
+
         @Override
         public boolean equals(Object o) {
             if (o instanceof DataFlowItem) {
-                return this.classTypes == ((DataFlowItem)o).classTypes ||
-                        this.classTypes.equals(((DataFlowItem)o).classTypes);
+                return this.classTypes == ((DataFlowItem) o).classTypes
+                        || this.classTypes
+                                .equals(((DataFlowItem) o).classTypes);
             }
             return false;
         }
+
         @Override
         public int hashCode() {
             return classTypes.hashCode();
         }
+
         @Override
         public String toString() {
             return "[" + classTypes + "]";
         }
     }
 
-
     /**
      * Create an initial Item for the dataflow analysis. By default, the
      * set of not null variables is empty.
      */
     @Override
-    protected DataFlowItem createInitialItem(FlowGraph<DataFlowItem> graph, Term node,
-            boolean entry) {
+    protected DataFlowItem createInitialItem(FlowGraph<DataFlowItem> graph,
+            Term node, boolean entry) {
         return new DataFlowItem();
     }
 
@@ -112,7 +118,8 @@ DataFlow<PreciseClassChecker.DataFlowItem>
     protected Map<EdgeKey, DataFlowItem> flow(List<DataFlowItem> inItems,
             List<EdgeKey> inItemKeys, FlowGraph<DataFlowItem> graph, Term n,
             boolean entry, Set<EdgeKey> edgeKeys) {
-        return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, entry, edgeKeys);
+        return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, entry,
+                edgeKeys);
     }
 
     /**
@@ -126,17 +133,17 @@ DataFlow<PreciseClassChecker.DataFlowItem>
             DataFlowItem falseItem, DataFlowItem otherItem,
             FlowGraph<DataFlowItem> graph, Term n, boolean entry,
             Set<EdgeKey> succEdgeKeys) {
-        DataFlowItem dfIn = safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE,
-                falseItem, FlowGraph.EDGE_KEY_FALSE,
-                otherItem, FlowGraph.EDGE_KEY_OTHER,
-                n, entry, graph);
+        DataFlowItem dfIn =
+                safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, falseItem,
+                        FlowGraph.EDGE_KEY_FALSE, otherItem,
+                        FlowGraph.EDGE_KEY_OTHER, n, entry, graph);
 
         if (entry) {
             return itemToMap(dfIn, succEdgeKeys);
         }
 
         if (n instanceof Instanceof) {
-            Instanceof io = (Instanceof)n;
+            Instanceof io = (Instanceof) n;
             Expr e = io.expr();
             AccessPath ap = findAccessPathForExpr(e);
             if (ap != null) {
@@ -144,12 +151,11 @@ DataFlow<PreciseClassChecker.DataFlowItem>
                 // the path is in fact an instance of the compare type.
                 Map<AccessPath, Set<Type>> trueBranch =
                         addClass(dfIn.classTypes, ap, io.compareType().type());
-                return itemsToMap(new DataFlowItem(trueBranch),
-                        dfIn, dfIn, succEdgeKeys);
+                return itemsToMap(new DataFlowItem(trueBranch), dfIn, dfIn,
+                        succEdgeKeys);
             }
-        }
-        else if (n instanceof Cast) {
-            Cast cst = (Cast)n;
+        } else if (n instanceof Cast) {
+            Cast cst = (Cast) n;
             Expr ex = cst.expr();
             AccessPath ap = findAccessPathForExpr(ex);
             if (ap != null) {
@@ -161,31 +167,29 @@ DataFlow<PreciseClassChecker.DataFlowItem>
                     Entry<EdgeKey, DataFlowItem> e = element;
                     if (!e.getKey().equals(EDGE_KEY_CLASS_CAST_EXC)) {
                         DataFlowItem df = e.getValue();
-                        e.setValue(new DataFlowItem(addClass(df.classTypes, ap, cst.castType().type())));
+                        e.setValue(new DataFlowItem(addClass(df.classTypes, ap,
+                                cst.castType().type())));
                     }
                 }
                 return m;
             }
-        }
-        else if (n instanceof LocalDecl) {
-            LocalDecl x = (LocalDecl)n;
+        } else if (n instanceof LocalDecl) {
+            LocalDecl x = (LocalDecl) n;
             // remove the precise class information...
             Map<AccessPath, Set<Type>> m =
                     killClasses(dfIn.classTypes,
                             new AccessPathLocal(x.localInstance()));
             return itemToMap(new DataFlowItem(m), succEdgeKeys);
-        }
-        else if (n instanceof Assign) {
-            Assign x = (Assign)n;
+        } else if (n instanceof Assign) {
+            Assign x = (Assign) n;
             // remove the precise class information...
             AccessPath ap = findAccessPathForExpr(x.left());
             if (ap != null) {
                 Map<AccessPath, Set<Type>> m = killClasses(dfIn.classTypes, ap);
                 return itemToMap(new DataFlowItem(m), succEdgeKeys);
             }
-        }
-        else if (n instanceof Expr && ((Expr)n).type().isBoolean() &&
-                (n instanceof Binary || n instanceof Unary)) {
+        } else if (n instanceof Expr && ((Expr) n).type().isBoolean()
+                && (n instanceof Binary || n instanceof Unary)) {
             if (trueItem == null) trueItem = dfIn;
             if (falseItem == null) falseItem = dfIn;
 
@@ -196,8 +200,7 @@ DataFlow<PreciseClassChecker.DataFlowItem>
                 ret = itemToMap(dfIn, succEdgeKeys);
             }
             return ret;
-        }
-        else if (n instanceof DowngradeExpr && ((Expr)n).type().isBoolean()) {
+        } else if (n instanceof DowngradeExpr && ((Expr) n).type().isBoolean()) {
             if (trueItem == null) trueItem = dfIn;
             if (falseItem == null) falseItem = dfIn;
             return itemsToMap(trueItem, falseItem, dfIn, succEdgeKeys);
@@ -205,7 +208,6 @@ DataFlow<PreciseClassChecker.DataFlowItem>
 
         return itemToMap(dfIn, succEdgeKeys);
     }
-
 
     private Map<AccessPath, Set<Type>> killClasses(
             Map<AccessPath, Set<Type>> map, AccessPath ap) {
@@ -224,7 +226,7 @@ DataFlow<PreciseClassChecker.DataFlowItem>
             }
 
         }
-        return changed?m:map;
+        return changed ? m : map;
     }
 
     private Map<AccessPath, Set<Type>> addClass(Map<AccessPath, Set<Type>> map,
@@ -237,8 +239,7 @@ DataFlow<PreciseClassChecker.DataFlowItem>
         Set<Type> s = m.get(ap);
         if (s == null) {
             s = new LinkedHashSet<Type>();
-        }
-        else {
+        } else {
             s = new LinkedHashSet<Type>(s);
         }
         m.put(ap, s);
@@ -251,7 +252,8 @@ DataFlow<PreciseClassChecker.DataFlowItem>
      * if it is not null on all paths flowing in.
      */
     @Override
-    protected DataFlowItem confluence(List<DataFlowItem> items, Term node, boolean entry, FlowGraph<DataFlowItem> graph) {
+    protected DataFlowItem confluence(List<DataFlowItem> items, Term node,
+            boolean entry, FlowGraph<DataFlowItem> graph) {
         return intersect(items);
     }
 
@@ -284,15 +286,13 @@ DataFlow<PreciseClassChecker.DataFlowItem>
             Map<AccessPath, Set<Type>> m = items.get(i).classTypes;
             // go through the entries of intersectMap
             for (Iterator<Map.Entry<AccessPath, Set<Type>>> iter =
-                    intersectMap.entrySet().iterator(); iter
-                    .hasNext();) {
+                    intersectMap.entrySet().iterator(); iter.hasNext();) {
                 Entry<AccessPath, Set<Type>> e = iter.next();
                 if (m.containsKey(e.getKey())) {
                     Set<Type> s = new LinkedHashSet<Type>(e.getValue());
                     Set<Type> t = m.get(e.getKey());
                     s.retainAll(t); // could be more precise here, a la SubtypeSet
-                }
-                else {
+                } else {
                     // no entry for the set, the intersection is empty, so remove
                     // the key.
                     iter.remove();
@@ -302,7 +302,6 @@ DataFlow<PreciseClassChecker.DataFlowItem>
 
         return new DataFlowItem(intersectMap);
     }
-
 
     /**
      * "Check" the nodes of the graph for the precise class analysis. This actually
@@ -316,7 +315,7 @@ DataFlow<PreciseClassChecker.DataFlowItem>
             DataFlowItem inItem, Map<EdgeKey, DataFlowItem> outItems) {
         if (n.del() instanceof JifPreciseClassDel) {
             DataFlowItem dfi = inItem;
-            JifPreciseClassDel jpcd = (JifPreciseClassDel)n.del();
+            JifPreciseClassDel jpcd = (JifPreciseClassDel) n.del();
             AccessPath ap = findAccessPathForExpr(jpcd.getPreciseClassExpr());
             if (ap != null) {
                 jpcd.setPreciseClass(dfi.classTypes.get(ap));
@@ -329,28 +328,28 @@ DataFlow<PreciseClassChecker.DataFlowItem>
             return new AccessPathThis();
         }
         if (expr instanceof Local) {
-            return new AccessPathLocal(((Local)expr).localInstance());
+            return new AccessPathLocal(((Local) expr).localInstance());
         }
         if (expr instanceof Field) {
-            Field f = (Field)expr;
+            Field f = (Field) expr;
             if (f.flags().isFinal()) {
                 AccessPath target = null;
                 if (f.target() instanceof Expr) {
-                    target = findAccessPathForExpr((Expr)f.target());
-                }
-                else if (f.target() instanceof TypeNode) {
-                    target = new AccessPathClass(((TypeNode)f.target()).type());
+                    target = findAccessPathForExpr((Expr) f.target());
+                } else if (f.target() instanceof TypeNode) {
+                    target =
+                            new AccessPathClass(((TypeNode) f.target()).type());
                 }
                 if (target == null) return null;
                 return new AccessPathFinalField(target, f.fieldInstance());
             }
         }
         if (expr instanceof DowngradeExpr) {
-            DowngradeExpr de = (DowngradeExpr)expr;
+            DowngradeExpr de = (DowngradeExpr) expr;
             return findAccessPathForExpr(de.expr());
         }
         if (expr instanceof Cast) {
-            Cast ce = (Cast)expr;
+            Cast ce = (Cast) expr;
             return findAccessPathForExpr(ce.expr());
         }
         return null;
@@ -359,72 +358,119 @@ DataFlow<PreciseClassChecker.DataFlowItem>
     static abstract class AccessPath {
         public abstract AccessPath findRoot();
     }
+
     static class AccessPathLocal extends AccessPath {
         final LocalInstance li;
+
         public AccessPathLocal(LocalInstance li) {
             this.li = li;
         }
+
         @Override
-        public AccessPath findRoot() { return this; }
+        public AccessPath findRoot() {
+            return this;
+        }
+
         @Override
-        public int hashCode() { return li.hashCode(); }
+        public int hashCode() {
+            return li.hashCode();
+        }
+
         @Override
         public boolean equals(Object o) {
-            return (o instanceof AccessPathLocal &&
-                    ((AccessPathLocal)o).li.equals(this.li));
+            return (o instanceof AccessPathLocal && ((AccessPathLocal) o).li
+                    .equals(this.li));
         }
+
         @Override
-        public String toString() { return li.name(); }
+        public String toString() {
+            return li.name();
+        }
     }
+
     static class AccessPathFinalField extends AccessPath {
         final AccessPath target;
         final FieldInstance fi;
+
         public AccessPathFinalField(AccessPath target, FieldInstance fi) {
             this.target = target;
             this.fi = fi;
         }
+
         @Override
-        public AccessPath findRoot() { return target.findRoot(); }
+        public AccessPath findRoot() {
+            return target.findRoot();
+        }
+
         @Override
-        public int hashCode() { return fi.hashCode() + target.hashCode(); }
+        public int hashCode() {
+            return fi.hashCode() + target.hashCode();
+        }
+
         @Override
         public boolean equals(Object o) {
             if (o instanceof AccessPathFinalField) {
-                AccessPathFinalField that = (AccessPathFinalField)o;
-                return that.fi.equals(this.fi) && that.target.equals(this.target);
+                AccessPathFinalField that = (AccessPathFinalField) o;
+                return that.fi.equals(this.fi)
+                        && that.target.equals(this.target);
             }
             return false;
         }
+
         @Override
-        public String toString() { return target + "." + fi.name(); }
+        public String toString() {
+            return target + "." + fi.name();
+        }
     }
-    static class AccessPathThis  extends AccessPath {
+
+    static class AccessPathThis extends AccessPath {
         @Override
-        public AccessPath findRoot() { return this; }
+        public AccessPath findRoot() {
+            return this;
+        }
+
         @Override
-        public int hashCode() { return -45; }
+        public int hashCode() {
+            return -45;
+        }
+
         @Override
         public boolean equals(Object o) {
             return (o instanceof AccessPathThis);
         }
+
         @Override
-        public String toString() { return "this"; }
+        public String toString() {
+            return "this";
+        }
     }
+
     static class AccessPathClass extends AccessPath {
         final Type type;
+
         public AccessPathClass(Type type) {
             this.type = type;
         }
+
         @Override
-        public AccessPath findRoot() { return this; }
+        public AccessPath findRoot() {
+            return this;
+        }
+
         @Override
-        public int hashCode() { return type.hashCode(); }
+        public int hashCode() {
+            return type.hashCode();
+        }
+
         @Override
         public boolean equals(Object o) {
-            return (o instanceof AccessPathClass &&
-                    ((AccessPathClass)o).type.equals(this.type));
+            return (o instanceof AccessPathClass && ((AccessPathClass) o).type
+                    .equals(this.type));
         }
+
         @Override
-        public String toString() { return type.toString(); }
+        public String toString() {
+            return type.toString();
+        }
     }
 }
