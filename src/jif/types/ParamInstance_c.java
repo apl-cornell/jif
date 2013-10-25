@@ -91,6 +91,11 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance {
     }
 
     @Override
+    public boolean isType() {
+        return kind.isType();
+    }
+
+    @Override
     public String toString() {
         if (Report.should_report(Report.debug, 1)) {
             return kind + " " + container().name() + "." + name();
@@ -113,6 +118,8 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance {
             out.writeInt(1);
         else if (kind == PRINCIPAL)
             out.writeInt(2);
+        else if (kind == TYPE)
+            out.writeInt(3);
         else throw new IOException("invalid kind");
     }
 
@@ -135,6 +142,9 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance {
             break;
         case 2:
             kind = PRINCIPAL;
+            break;
+        case 3:
+            kind = TYPE;
             break;
         default:
             throw new IOException("invalid kind");

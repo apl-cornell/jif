@@ -37,6 +37,7 @@ public class JifNew_c extends New_c implements New {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
+        // verify no singletons (SemanticException)
         JifNew_c n = (JifNew_c) super.typeCheck(tc);
 
         Type t = n.tn.type();

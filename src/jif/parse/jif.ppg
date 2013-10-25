@@ -268,6 +268,9 @@ parser Grm extends polyglot.parse.Grm {:
 terminal Token WHERE;
 terminal Token PRINCIPAL;
 terminal Token LABEL;
+terminal Token TYPE;
+terminal Token OBJECT;
+terminal Token SINGLETON;
 terminal Token COVARIANT;
 terminal Token INVARIANT;
 terminal Token AUTHORITY;
@@ -624,6 +627,13 @@ override class_declaration ::=
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n, b),
                                                a, parser.nf.Id(parser.pos(b), b.getIdentifier()),
                                                p, c, d, u, f, e); :}
+    |   modifiers_opt:a OBJECT:n IDENTIFIER:b parameters_opt:p super_opt:c
+                interfaces_opt:d authority_opt:u constraints_opt:f class_body:e
+            {: TypeNode tn = (new Name(parser, parser.pos(e), null,
+                                               b.getIdentifier())).toUnlabeledType();
+                RESULT = parser.nf.JifSingletonDecl(parser.pos(n, b),
+                                               a, parser.nf.Id(parser.pos(b), b.getIdentifier()), p,
+                                               c, d, u, f, e); :}
     ;
 
 override super ::=
@@ -880,8 +890,17 @@ parameter ::=
                                         ParamInstance.PRINCIPAL,
                                         parser.nf.Id(parser.pos(a), a.getIdentifier()));
                                         :}
+    |   TYPE:x IDENTIFIER:a
+        {: RESULT = parser.nf.ParamDecl(parser.pos(x, a),
+                                        ParamInstance.TYPE,
+                                        parser.nf.Id(parser.pos(a), a.getIdentifier()));
+                                        :}
+    |   TYPE:x IDENTIFIER:a EXTENDS objtype_or_expr:b
+        {: RESULT = parser.nf.ParamDecl(parser.pos(x, a),
+                                        ParamInstance.TYPE,
+                                        parser.nf.Id(parser.pos(a), a.getIdentifier()));
+                                        :}
     ;
-
 
 procedure_constraints_opt ::=
         // List of ConstraintNode
@@ -1141,6 +1160,9 @@ class_instance_creation_expression ::=
                 if (l != null)
                     tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
                 RESULT = parser.nf.New(parser.pos(x,y), tn, b); :}
+    |   SINGLETON:x IDENTIFIER:a
+            {:  RESULT = parser.nf.JifSingletonAccess(parser.pos(x, a), 
+                parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
     ;
 
 override array_creation_expression ::=
@@ -1205,6 +1227,13 @@ param_or_expr_list ::=
                l.add(a);
                RESULT = l;
             :}
+    |   primitive_type:a
+            {: List l = new LinkedList();
+               l.add(a);
+               RESULT = l;
+            :} 
+    |   param_or_expr_list:a COMMA primitive_type:b 
+            {: a.add(b); RESULT = a; :}
     |   param_or_expr_list:a COMMA simple_name:b
             {: a.add(b); RESULT = a; :}
     |   param_or_expr_list:a COMMA label:b
