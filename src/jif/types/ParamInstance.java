@@ -15,11 +15,11 @@ public interface ParamInstance extends polyglot.ext.param.types.Param,
 
         final boolean isPrincipal;
         final boolean isInvariantLabel;
-        final boolean isCovariantLabel; 
+        final boolean isCovariantLabel;
         final boolean isType;
 
-        public Kind(String name, boolean isPrincipal, boolean isInvariantLabel, 
-                boolean isCovariantLabel, boolean isType) { 
+        public Kind(String name, boolean isPrincipal, boolean isInvariantLabel,
+                boolean isCovariantLabel, boolean isType) {
             super(name); 
             this.isPrincipal = isPrincipal;
             this.isCovariantLabel = isCovariantLabel;
