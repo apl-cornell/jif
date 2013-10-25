@@ -71,4 +71,6 @@ public interface JifNodeFactory extends NodeFactory {
     NewLabel NewLabel(Position pos, LabelNode label);
     PrincipalExpr PrincipalExpr(Position pos, PrincipalNode principal);
     TypeNode ConstArrayTypeNode(Position position, TypeNode node);
+    JifSingletonDecl JifSingletonDecl(Position pos, Flags flags, Id name, List<ParamDecl> params, TypeNode superClass, List<TypeNode> interfaces, List<PrincipalNode> authority, List<ConstraintNode<Assertion>> constraints, ClassBody body);
+    JifSingletonAccess JifSingletonAccess(Position pos, Id name);
 }

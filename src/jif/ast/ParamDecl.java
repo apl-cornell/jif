@@ -20,4 +20,5 @@ public interface ParamDecl extends Node
     boolean isLabel();
     boolean isInvariantLabel();
     boolean isCovariantLabel();
+    boolean isTypeParam();
 }
