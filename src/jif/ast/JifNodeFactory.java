@@ -161,5 +161,4 @@ public interface JifNodeFactory extends NodeFactory {
             List<ConstraintNode<Assertion>> constraints, ClassBody body);
 
     JifSingletonAccess JifSingletonAccess(Position pos, Id name);
-
 }
