@@ -154,4 +154,12 @@ public interface JifNodeFactory extends NodeFactory {
     TypeNode ConstArrayTypeNode(Position position, TypeNode node);
 
     Prologue Prologue(Position pos, List<Stmt> stmts);
+
+    JifSingletonDecl JifSingletonDecl(Position pos, Flags flags, Id name, 
+            List<ParamDecl> params, TypeNode superClass, 
+            List<TypeNode> interfaces, List<PrincipalNode> authority, 
+            List<ConstraintNode<Assertion>> constraints, ClassBody body);
+
+    JifSingletonAccess JifSingletonAccess(Position pos, Id name);
+
 }

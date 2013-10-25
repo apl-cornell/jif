@@ -90,6 +90,11 @@ public class ParamDecl_c extends Node_c implements ParamDecl {
     public boolean isCovariantLabel() {
         return kind == ParamInstance.COVARIANT_LABEL;
     }
+    
+    @Override
+    public boolean isTypeParam() {
+    	return kind == ParamInstance.TYPE;
+    }
 
     public void leaveScope(Context c) {
         c.addVariable(pi);

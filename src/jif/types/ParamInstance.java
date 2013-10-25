@@ -15,14 +15,15 @@ public interface ParamInstance extends polyglot.ext.param.types.Param,
 
         final boolean isPrincipal;
         final boolean isInvariantLabel;
-        final boolean isCovariantLabel;
-
-        public Kind(String name, boolean isPrincipal, boolean isInvariantLabel,
-                boolean isCovariantLabel) {
-            super(name);
+        final boolean isCovariantLabel; 
+        final boolean isType;
+        public Kind(String name, boolean isPrincipal, boolean isInvariantLabel, 
+                boolean isCovariantLabel, boolean isType) { 
+            super(name); 
             this.isPrincipal = isPrincipal;
             this.isCovariantLabel = isCovariantLabel;
             this.isInvariantLabel = isInvariantLabel;
+            this.isType = isType;
         }
 
         public boolean isPrincipal() {
@@ -35,6 +36,10 @@ public interface ParamInstance extends polyglot.ext.param.types.Param,
 
         public boolean isInvariantLabel() {
             return isInvariantLabel;
+        }
+
+        public boolean isType() {
+            return isType;
         }
 
         @Override
@@ -54,6 +59,8 @@ public interface ParamInstance extends polyglot.ext.param.types.Param,
             false, false, true);
     public final static Kind PRINCIPAL = new Kind("principal", true, false,
             false);
+    public final static Kind TYPE = new Kind("type", false, false, false,
+            false);
 
     JifClassType container();
 
@@ -72,4 +79,6 @@ public interface ParamInstance extends polyglot.ext.param.types.Param,
     boolean isInvariantLabel();
 
     boolean isCovariantLabel();
+
+    boolean isType();
 }
