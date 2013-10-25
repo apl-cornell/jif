@@ -80,5 +80,6 @@ public interface ParamInstance extends polyglot.ext.param.types.Param,
     boolean isInvariantLabel();
 
     boolean isCovariantLabel();
+
     boolean isType();
 }
