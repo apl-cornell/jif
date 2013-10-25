@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import jif.JifOptions;
 import jif.types.JifClassType;
 import jif.types.JifPolyType;
 import jif.types.JifSubstType;
@@ -68,15 +69,13 @@ public class JifCastDel extends JifJL_c implements JifPreciseClassDel {
         }
 
         if (castType.isArray()) {
-            throw new SemanticException(
-                    "Jif does not currently support casts to arrays.",
-                    c.position());
-//            while (castType.isArray()) {
-//                castType = ts.unlabel(castType.toArray().base());
-//            }
-//            if (castType instanceof JifSubstType && ((JifSubstType)castType).entries().hasNext()) {
-//                throw new SemanticException("Jif does not currently support casts to an array of a parameterized type.", c.position());
-//            }
+            JifOptions opt = (JifOptions) ts.extensionInfo().getOptions();
+            if (!opt.skipLabelChecking) {
+                throw new SemanticException(
+                        "Jif does not currently support casts to arrays.",
+                        c.position());
+            }
+            //XXX: Allow cast to array. Print warning?
         }
 
         this.isToSubstJifClass =
