@@ -691,6 +691,19 @@ override class_member_declaration ::=
             {: List l = new LinkedList<ClassMember>();
                l.add(a);
                RESULT = l; :}
+        /* repeat the prod for 'class_declaration' here: */
+    |   modifiers_opt:a CLASS:n IDENTIFIER:b
+                parameters_opt:p super_opt:c
+                interfaces_opt:d authority_opt:u constraints_opt:f class_body:e
+	    {: List l = new LinkedList<ClassMember>();
+               l.add(parser.nf.JifClassDecl(parser.pos(n, b),
+                                            a, parser.nf.Id(parser.pos(b), b.getIdentifier()),
+                                            p, c, d, u, f, e));
+	       RESULT = l; :}
+    |   interface_declaration:a
+	    {: List l = new LinkedList<ClassMember>();
+	       l.add(a);
+	       RESULT = l; :}
     ;
 
 
@@ -1006,8 +1019,6 @@ override extends_interfaces ::=
     ;
 
 drop { interface_type }
-
-drop { interface_member_declaration ::= class_declaration | interface_declaration; }
 
 // 19.10) Arrays
 
