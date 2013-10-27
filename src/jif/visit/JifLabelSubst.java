@@ -2,7 +2,7 @@ package jif.visit;
 
 import jif.ast.CanonicalLabelNode;
 import jif.ast.JifUtil;
-import jif.ast.Jif_c;
+import jif.ast.JifExt_c;
 import jif.types.JifFieldInstance;
 import jif.types.JifLocalInstance;
 import jif.types.JifProcedureInstance;
@@ -103,10 +103,10 @@ public class JifLabelSubst extends ContextVisitor
         }
 
         if (JifUtil.jifExt(n) != null) {
-            PathMap X = Jif_c.getPathMap(n);
+            PathMap X = JifExt_c.getPathMap(n);
 
             if (X != null) {
-                n = Jif_c.updatePathMap(n, X.subst(bounds));
+                n = JifExt_c.updatePathMap(n, X.subst(bounds));
             }
         }
         if (n instanceof CanonicalTypeNode) {

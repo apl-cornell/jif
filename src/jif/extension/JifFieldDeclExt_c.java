@@ -1,7 +1,7 @@
 package jif.extension;
 
 import jif.ast.JifUtil;
-import jif.ast.Jif_c;
+import jif.ast.JifExt_c;
 import jif.translate.ToJavaExt;
 import jif.types.ConstArrayType;
 import jif.types.ConstraintMessage;
@@ -40,7 +40,7 @@ import polyglot.util.SerialVersionUID;
  * 
  *  @see polyglot.ast.FieldDecl
  */
-public class JifFieldDeclExt_c extends Jif_c implements JifFieldDeclExt {
+public class JifFieldDeclExt_c extends JifExt_c implements JifFieldDeclExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifFieldDeclExt_c(ToJavaExt toJava) {

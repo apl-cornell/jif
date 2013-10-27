@@ -1,13 +1,13 @@
 package jif.extension;
 
-import jif.ast.Jif_c;
+import jif.ast.JifExt_c;
 import jif.translate.ToJavaExt;
 import jif.visit.IntegerBoundsChecker;
 import polyglot.util.SerialVersionUID;
 
 /** The Jif extension for all <code>Expr</code> nodes. 
  */
-public class JifExprExt extends Jif_c {
+public class JifExprExt extends JifExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifExprExt(ToJavaExt toJava) {

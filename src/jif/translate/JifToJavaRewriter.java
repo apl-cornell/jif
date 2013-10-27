@@ -11,7 +11,7 @@ import javax.tools.JavaFileManager.Location;
 import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 
-import jif.ast.Jif;
+import jif.ast.JifExt;
 import jif.ast.JifNodeFactory;
 import jif.ast.JifUtil;
 import jif.types.JifTypeSystem;
@@ -122,7 +122,7 @@ public class JifToJavaRewriter extends ContextVisitor
     @Override
     public NodeVisitor enterCall(Node n) {
         try {
-            Jif ext = JifUtil.jifExt(n);
+            JifExt ext = JifUtil.jifExt(n);
             return ext.toJava().toJavaEnter(this);
         }
         catch (SemanticException e) {
@@ -142,10 +142,10 @@ public class JifToJavaRewriter extends ContextVisitor
     @Override
     public Node leaveCall(Node old, Node n, NodeVisitor v) {
         try {
-            Jif ext = JifUtil.jifExt(n);
+            JifExt ext = JifUtil.jifExt(n);
 
             Node m = ext.toJava().toJava(this);
-            if (m.del() instanceof Jif)
+            if (m.del() instanceof JifExt)
                 throw new InternalCompilerError(m + " is still a Jif node.");
             return m;
         }

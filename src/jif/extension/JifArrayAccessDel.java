@@ -10,7 +10,7 @@ import polyglot.util.SubtypeSet;
 
 /** The Jif extension of the <code>ArrayAccess</code> node.
  */
-public class JifArrayAccessDel extends JifJL_c {
+public class JifArrayAccessDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifArrayAccessDel() {

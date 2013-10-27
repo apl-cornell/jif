@@ -11,7 +11,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 
-public class JifAssignDel extends JifJL_c {
+public class JifAssignDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected boolean arithmeticExcIsFatal = false;

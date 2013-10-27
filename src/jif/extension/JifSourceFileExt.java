@@ -4,7 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import jif.ast.Jif_c;
+import jif.ast.JifExt_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
@@ -21,7 +21,7 @@ import polyglot.util.SerialVersionUID;
  *  will invoke the <code>labelCheckStmt</code> methods provided
  *  by the subclasses of this class.
  */
-public class JifSourceFileExt extends Jif_c {
+public class JifSourceFileExt extends JifExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifSourceFileExt(ToJavaExt toJava) {

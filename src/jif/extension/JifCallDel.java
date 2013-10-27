@@ -34,7 +34,7 @@ import polyglot.visit.TypeChecker;
  * 
  *  @see polyglot.ast.Call_c
  */
-public class JifCallDel extends JifJL_c {
+public class JifCallDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifCallDel() {

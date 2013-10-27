@@ -21,7 +21,7 @@ import polyglot.visit.TypeChecker;
  * 
  *  @see polyglot.ast.Formal
  */
-public class JifFormalDel extends JifJL_c {
+public class JifFormalDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifFormalDel() {

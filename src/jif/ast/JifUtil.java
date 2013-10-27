@@ -14,28 +14,28 @@ public class JifUtil
 {
     // Some utility functions used to avoid casts.
     public static PathMap getPathMap(Node n) {
-        Jif ext = jifExt(n);
+        JifExt ext = jifExt(n);
         return ext.X();
     }
 
-    public static Jif jifExt(Node n) {
+    public static JifExt jifExt(Node n) {
         Ext ext = n.ext();
-        while (ext != null && !(ext instanceof Jif)) {
+        while (ext != null && !(ext instanceof JifExt)) {
             ext = ext.ext();
         }
-        return (Jif)ext;
+        return (JifExt)ext;
     }
 
     public static Node updatePathMap(Node n, PathMap X) {
-        Jif ext = jifExt(n);
+        JifExt ext = jifExt(n);
         return updateJifExt(n, ext.X(X));
     }
 
-    private static Node updateJifExt(Node n, Jif jif) {
+    private static Node updateJifExt(Node n, JifExt jif) {
         return n.ext(updateJifExt(n.ext(), jif));
     }
-    private static Ext updateJifExt(Ext e, Jif jif) {
-        if (e instanceof Jif) return jif;
+    private static Ext updateJifExt(Ext e, JifExt jif) {
+        if (e instanceof JifExt) return jif;
         if (e == null) return e;
         return e.ext(updateJifExt(e.ext(), jif));
     }

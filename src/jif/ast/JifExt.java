@@ -10,16 +10,16 @@ import polyglot.types.SemanticException;
 /** This class represents a Jif extension node. It is the root of all
  *  the Jif extension node classes. 
  */
-public interface Jif extends Ext
+public interface JifExt extends Ext
 {
     ToJavaExt toJava();
-    Jif toJava(ToJavaExt toJava);
+    JifExt toJava(ToJavaExt toJava);
 
     /** Gets the path map of this extension. */
     PathMap X();
     
     /** Returns a copy of this object with the path map updated. */
-    Jif X(PathMap X);
+    JifExt X(PathMap X);
 
     /** Label check the node to which this extension is attached. */
     Node labelCheck(LabelChecker lc) throws SemanticException;

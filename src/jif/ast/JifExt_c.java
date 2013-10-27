@@ -17,13 +17,13 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>Jif</code> interface.
  */
-public class Jif_c extends Ext_c implements Jif {
+public class JifExt_c extends Ext_c implements JifExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected PathMap X;
     protected ToJavaExt toJava;
 
-    public Jif_c(ToJavaExt toJava) {
+    public JifExt_c(ToJavaExt toJava) {
         this.toJava = toJava;
     }
 
@@ -39,12 +39,12 @@ public class Jif_c extends Ext_c implements Jif {
     }
 
     @Override
-    public Jif toJava(ToJavaExt toJava) {
+    public JifExt toJava(ToJavaExt toJava) {
         // Set toJava to null to prevent it from being copied unnecessarily.
         ToJavaExt old = this.toJava;
         this.toJava = null;
 
-        Jif_c copy = (Jif_c) copy();
+        JifExt_c copy = (JifExt_c) copy();
         copy.toJava = toJava;
 
         // Restore the old pointer.
@@ -55,7 +55,7 @@ public class Jif_c extends Ext_c implements Jif {
 
     @Override
     public Object copy() {
-        Jif_c copy = (Jif_c) super.copy();
+        JifExt_c copy = (JifExt_c) super.copy();
         if (toJava != null) {
             copy.toJava = (ToJavaExt) toJava.copy();
         }
@@ -68,8 +68,8 @@ public class Jif_c extends Ext_c implements Jif {
     }
 
     @Override
-    public Jif X(PathMap X) {
-        Jif_c n = (Jif_c) copy();
+    public JifExt X(PathMap X) {
+        JifExt_c n = (JifExt_c) copy();
         n.X = X;
         return n;
     }

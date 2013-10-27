@@ -25,7 +25,7 @@ import polyglot.visit.TypeChecker;
  *
  *  @see polyglot.ast.Cast_c
  */
-public class JifCastDel extends JifJL_c implements JifPreciseClassDel {
+public class JifCastDel extends JifDel_c implements JifPreciseClassDel {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifCastDel() {

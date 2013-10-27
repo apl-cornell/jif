@@ -16,7 +16,7 @@ import polyglot.visit.TypeChecker;
  *
  *  @see jif.ast.JifClassDecl
  */
-public class JifClassDeclDel extends JifJL_c {
+public class JifClassDeclDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifClassDeclDel() {

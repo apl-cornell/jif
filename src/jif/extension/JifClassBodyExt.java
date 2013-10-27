@@ -3,7 +3,7 @@ package jif.extension;
 import java.util.LinkedList;
 import java.util.List;
 
-import jif.ast.Jif_c;
+import jif.ast.JifExt_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
@@ -18,7 +18,7 @@ import polyglot.util.SerialVersionUID;
  * 
  *  @see polyglot.ast.ClassBody
  */
-public class JifClassBodyExt extends Jif_c {
+public class JifClassBodyExt extends JifExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifClassBodyExt(ToJavaExt toJava) {

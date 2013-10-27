@@ -1,6 +1,6 @@
 package jif.extension;
 
-import jif.ast.Jif_c;
+import jif.ast.JifExt_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.JifLocalInstance;
@@ -24,7 +24,7 @@ import polyglot.util.SerialVersionUID;
  * 
  *  @see polyglot.ast.Formal
  */
-public class JifFormalExt extends Jif_c {
+public class JifFormalExt extends JifExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifFormalExt(ToJavaExt toJava) {

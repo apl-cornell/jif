@@ -1,6 +1,6 @@
 package jif.extension;
 
-import jif.ast.Jif;
+import jif.ast.JifExt;
 import jif.types.JifClassType;
 import jif.visit.LabelChecker;
 import polyglot.types.SemanticException;
@@ -9,7 +9,7 @@ import polyglot.types.SemanticException;
  * 
  *  @see polyglot.ast.FieldDecl
  */
-public interface JifFieldDeclExt extends Jif
+public interface JifFieldDeclExt extends JifExt
 {
     void labelCheckField(LabelChecker lc, JifClassType ct) throws SemanticException;
 }

@@ -3,7 +3,7 @@ package jif.extension;
 import java.util.List;
 
 import jif.ast.JifClassDecl;
-import jif.ast.Jif_c;
+import jif.ast.JifExt_c;
 import jif.translate.ToJavaExt;
 import jif.types.ConstraintMessage;
 import jif.types.JifClassType;
@@ -26,7 +26,7 @@ import polyglot.util.SerialVersionUID;
  * 
  *  @see jif.ast.JifClassDecl
  */
-public class JifClassDeclExt extends Jif_c {
+public class JifClassDeclExt extends JifExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifClassDeclExt(ToJavaExt toJava) {

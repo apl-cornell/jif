@@ -1,6 +1,6 @@
 package jif.extension;
 
-import jif.ast.Jif_c;
+import jif.ast.JifExt_c;
 import jif.translate.ToJavaExt;
 import jif.types.ConstraintMessage;
 import jif.types.JifContext;
@@ -20,7 +20,7 @@ import polyglot.util.SerialVersionUID;
  * 
  *  @see polyglot.ast.Initializer
  */
-public class JifInitializerExt extends Jif_c {
+public class JifInitializerExt extends JifExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifInitializerExt(ToJavaExt toJava) {

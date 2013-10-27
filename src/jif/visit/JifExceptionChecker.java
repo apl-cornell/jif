@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import jif.ExtensionInfo;
-import jif.extension.JifJL;
+import jif.extension.JifDel;
 import jif.extension.JifThrowDel;
 import jif.types.JifLocalInstance;
 import jif.types.JifTypeSystem;
@@ -174,8 +174,8 @@ public class JifExceptionChecker extends ExceptionChecker {
                                     th.position());
             }
             //sigh... Not all nodes have JifJL delegates.
-            if(n.del() instanceof JifJL)
-                ((JifJL)n.del()).setFatalExceptions(ts, toRemove);
+            if(n.del() instanceof JifDel)
+                ((JifDel)n.del()).setFatalExceptions(ts, toRemove);
 
             return n;
         }

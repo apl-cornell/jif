@@ -1,7 +1,7 @@
 package jif.extension;
 
 import jif.ast.JifUtil;
-import jif.ast.Jif_c;
+import jif.ast.JifExt_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
@@ -18,7 +18,7 @@ import polyglot.util.SerialVersionUID;
  *  will invoke the <ndoe>labelCheckStmt</code> methods provided
  *  by the subclasses of this class.
  */
-public abstract class JifStmtExt_c extends Jif_c implements JifStmtExt {
+public abstract class JifStmtExt_c extends JifExt_c implements JifStmtExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected JifStmtExt stmtDel;
