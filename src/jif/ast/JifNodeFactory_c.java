@@ -661,6 +661,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
         n = (Prologue) n.ext(extFactory().extBlock());
         n = (Prologue) n.del(delFactory().delBlock());
         return n;
+    }
 
     @Override
     public JifSingletonDecl JifSingletonDecl(
