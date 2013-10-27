@@ -677,7 +677,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
                 superClass, interfaces, authority, constraints, body);
     }
     @Override
-    public JifSingletonAccess JifSingletonAccess(Position pos, Id name) {
-        return new JifSingletonAccess_c(pos, name);
+    public JifSingletonAccess JifSingletonAccess(Position pos, TypeNode objectType, List<Expr> args) {
+        return new JifSingletonAccess_c(pos, objectType, args);
     }
 }
