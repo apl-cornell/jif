@@ -5,7 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import jif.ast.Jif_c;
+import jif.ast.JifExt_c;
 import jif.translate.ToJavaExt;
 import jif.types.ActsForConstraint;
 import jif.types.ActsForParam;
@@ -47,7 +47,7 @@ import polyglot.util.SerialVersionUID;
  *  @see polyglot.ast.ProcedureDecl
  *  @see jif.types.JifProcedureInstance
  */
-public class JifProcedureDeclExt_c extends Jif_c implements JifProcedureDeclExt {
+public class JifProcedureDeclExt_c extends JifExt_c implements JifProcedureDeclExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifProcedureDeclExt_c(ToJavaExt toJava) {

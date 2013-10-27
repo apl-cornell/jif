@@ -126,7 +126,7 @@ public class JifExtFactory_c extends AbstractJifExtFactory_c
 
     @Override
     protected Ext extNodeImpl() {
-        return new Jif_c(new CannotToJavaExt_c());
+        return new JifExt_c(new CannotToJavaExt_c());
     }
 
     @Override
@@ -136,7 +136,7 @@ public class JifExtFactory_c extends AbstractJifExtFactory_c
 
     @Override
     protected Ext extIdImpl() {
-        return new Jif_c(new IdToJavaExt_c());
+        return new JifExt_c(new IdToJavaExt_c());
     }
 
     /**
@@ -144,7 +144,7 @@ public class JifExtFactory_c extends AbstractJifExtFactory_c
      * CannotToJavaExt_c for the ToJavaExt.
      */
     protected Ext extCannotToJavaImpl() {
-        return new Jif_c(new CannotToJavaExt_c());
+        return new JifExt_c(new CannotToJavaExt_c());
     }
 
     @Override
@@ -231,7 +231,7 @@ public class JifExtFactory_c extends AbstractJifExtFactory_c
     }
     @Override
     protected Ext extCatchImpl() {
-        return new Jif_c(new CatchToJavaExt_c());
+        return new JifExt_c(new CatchToJavaExt_c());
     }
 
     @Override
@@ -301,7 +301,7 @@ public class JifExtFactory_c extends AbstractJifExtFactory_c
 
     @Override
     protected Ext extImportImpl() {
-        return new Jif_c(new ImportToJavaExt_c());
+        return new JifExt_c(new ImportToJavaExt_c());
     }
 
     @Override
@@ -392,12 +392,12 @@ public class JifExtFactory_c extends AbstractJifExtFactory_c
 
     @Override
     protected Ext extCanonicalTypeNodeImpl() {
-        return new Jif_c(new CanonicalTypeNodeToJavaExt_c());
+        return new JifExt_c(new CanonicalTypeNodeToJavaExt_c());
     }
 
     @Override
     protected Ext extPackageNodeImpl() {
-        return new Jif_c(new PackageNodeToJavaExt_c());
+        return new JifExt_c(new PackageNodeToJavaExt_c());
     }
 
     @Override
@@ -432,7 +432,7 @@ public class JifExtFactory_c extends AbstractJifExtFactory_c
 
     @Override
     protected Ext extCanonicalLabelNodeImpl() {
-        return new Jif_c(new CanonicalLabelNodeToJavaExt_c());
+        return new JifExt_c(new CanonicalLabelNodeToJavaExt_c());
     }
 
     @Override

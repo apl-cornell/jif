@@ -22,7 +22,7 @@ import polyglot.visit.TypeBuilder;
 
 /** An implementation of the <code>Jif</code> interface.
  */
-public class JifJL_c extends JL_c implements JifJL {
+public class JifDel_c extends JL_c implements JifDel {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Set<Type> fatalExceptions = Collections.emptySet();

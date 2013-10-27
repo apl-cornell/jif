@@ -40,7 +40,7 @@ public class JifNew_c extends New_c implements New {
         // verify no singletons (SemanticException)
         JifNew_c n = (JifNew_c) super.typeCheck(tc);
 
-        Type t = n.tn.type();
+        Type t = n.objectType.type();
         LabelTypeCheckUtil ltcu =
                 ((JifTypeSystem) tc.typeSystem()).labelTypeCheckUtil();
         ltcu.typeCheckType(tc, t);

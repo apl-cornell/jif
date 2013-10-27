@@ -13,7 +13,7 @@ import polyglot.visit.TypeChecker;
  *
  *  @see polyglot.ast.Catch_c
  */
-public class JifCatchDel extends JifJL_c {
+public class JifCatchDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

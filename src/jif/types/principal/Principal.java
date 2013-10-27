@@ -46,7 +46,7 @@ public interface Principal extends ActsForParam {
      * 	}
      * </pre>
      * 
-     * @see jif.ast.Jif#labelCheck(LabelChecker)
+     * @see jif.ast.JifExt#labelCheck(LabelChecker)
      * @see Label#labelCheck(JifContext, LabelChecker)
      */
     PathMap labelCheck(JifContext A, LabelChecker lc);

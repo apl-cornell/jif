@@ -9,7 +9,7 @@ import polyglot.types.Type;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JifArrayInitDel extends JifJL_c {
+public class JifArrayInitDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

@@ -22,7 +22,7 @@ import polyglot.visit.TypeChecker;
  * 
  *  @see polyglot.ast.FieldDecl
  */
-public class JifFieldDeclDel extends JifJL_c {
+public class JifFieldDeclDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifFieldDeclDel() {

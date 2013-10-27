@@ -23,7 +23,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.TypeChecker;
 
-public class JifBinaryDel extends JifJL_c {
+public class JifBinaryDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public static final Binary.Operator ACTSFOR = new Operator("actsfor",

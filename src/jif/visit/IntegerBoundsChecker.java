@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jif.ast.DowngradeExpr;
-import jif.ast.Jif;
+import jif.ast.JifExt;
 import jif.ast.JifUtil;
 import jif.extension.JifArrayAccessDel;
 import jif.extension.JifExprExt;
@@ -283,7 +283,7 @@ public class IntegerBoundsChecker extends
             @Override
             public Node leave(Node old, Node n, NodeVisitor v) {
                 // let the node know that the numeric bounds have been set.
-                Jif ext = JifUtil.jifExt(n);
+                JifExt ext = JifUtil.jifExt(n);
                 ext.integerBoundsCalculated();
                 return n;
             }

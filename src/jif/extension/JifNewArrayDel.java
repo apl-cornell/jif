@@ -14,7 +14,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.TypeChecker;
 
-public class JifNewArrayDel extends JifJL_c {
+public class JifNewArrayDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

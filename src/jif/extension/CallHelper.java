@@ -11,7 +11,7 @@ import java.util.Set;
 import jif.JifOptions;
 import jif.ast.JifInstantiator;
 import jif.ast.JifNodeFactory;
-import jif.ast.Jif_c;
+import jif.ast.JifExt_c;
 import jif.types.ActsForConstraint;
 import jif.types.ActsForParam;
 import jif.types.Assertion;
@@ -334,7 +334,7 @@ public class CallHelper {
 
             actualArgs.set(i, Ej);
 
-            Xj = Jif_c.getPathMap(Ej);
+            Xj = JifExt_c.getPathMap(Ej);
             actualArgLabels.add(Xj.NV());
             Xjoin = Xjoin.join(Xj);
         }
@@ -370,7 +370,7 @@ public class CallHelper {
         Label argBoundj = instantiate(A, aj.upperBound());
 
         // A |- Xj[nv] <= argLj
-        PathMap Xj = Jif_c.getPathMap(Ej);
+        PathMap Xj = JifExt_c.getPathMap(Ej);
         lc.constrain(new NamedLabel("actual_arg_" + (index + 1),
                 "the label of the " + StringUtil.nth(index + 1)
                         + " actual argument", Xj.NV()), LabelConstraint.LEQ,
@@ -509,7 +509,7 @@ public class CallHelper {
         for (Type te : pi.throwTypes()) {
             Label Le = ts.labelOfType(te, returnLabel);
             Le = instantiate(lc.context(), Le);
-            Jif_c.checkAndRemoveThrowType(throwTypes, te);
+            JifExt_c.checkAndRemoveThrowType(throwTypes, te);
             Xexn = Xexn.exception(te, lc.upperBound(Le, pcPriorToInvoke));
         }
 
@@ -544,7 +544,7 @@ public class CallHelper {
         Xjoin = labelCheckAndConstrainArgs(lc, Xjoin);
         if (targetMayBeNull) {
             // a null pointer exception may be thrown
-            Jif_c.checkAndRemoveThrowType(throwTypes, ts.NullPointerException());
+            JifExt_c.checkAndRemoveThrowType(throwTypes, ts.NullPointerException());
             Xjoin = Xjoin.exc(receiverLabel, ts.NullPointerException());
         }
         constrainFinalActualArgs(ts);

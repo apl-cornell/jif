@@ -20,7 +20,7 @@ import polyglot.visit.TypeChecker;
  * 
  *  @see jif.ast.JifMethodDecl
  */
-public class JifLocalDeclDel extends JifJL_c {
+public class JifLocalDeclDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifLocalDeclDel() {

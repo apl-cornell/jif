@@ -16,7 +16,7 @@ import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>TypeNode</code> node. 
  */
-public class JifTypeNodeDel extends JifJL_c {
+public class JifTypeNodeDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifTypeNodeDel() {

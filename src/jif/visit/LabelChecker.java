@@ -38,7 +38,7 @@ import polyglot.util.Position;
 /**
  * The <code>LabelChecker</code> class is used in the label checking of
  * Jif. Primarily it provides the method {@link #labelCheck(Node)
- * labelCheck(Node)} which invokes the {@link jif.ast.Jif#labelCheck labelCheck}
+ * labelCheck(Node)} which invokes the {@link jif.ast.JifExt#labelCheck labelCheck}
  * method on nodes, utility functions to help in the implementation of the
  * <code>labelCheck</code> methods, as well as references to the appropriate
  *  {@link jif.types.Solver Solver} and {@link jif.types.JifContext JifContext}.

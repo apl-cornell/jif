@@ -22,7 +22,7 @@ public class JifCall_c extends Call_c {
     }
 
     @Override
-    protected Type findContainer(TypeSystem ts, MethodInstance mi) {
+    public Type findContainer(TypeSystem ts, MethodInstance mi) {
         Type container = mi.container();
         if (container instanceof JifParsedPolyType) {
             JifParsedPolyType jppt = (JifParsedPolyType) container;

@@ -6,7 +6,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.SubtypeSet;
 
-public interface JifJL {
+public interface JifDel {
     /**
      * The exceptions that will be treated as fatal at this node.
      */

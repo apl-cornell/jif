@@ -8,7 +8,7 @@ import polyglot.util.SerialVersionUID;
  * 
  *  @see polyglot.ast.ConstructorCall
  */
-public class JifConstructorCallDel extends JifJL_c {
+public class JifConstructorCallDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifConstructorCallDel() {

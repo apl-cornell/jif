@@ -91,7 +91,7 @@ public interface Label extends ActsForParam {
      * 
      * </pre>
      * 
-     * @see jif.ast.Jif#labelCheck(LabelChecker)
+     * @see jif.ast.JifExt#labelCheck(LabelChecker)
      * @see jif.types.principal.Principal#labelCheck(JifContext, LabelChecker)
      */
     PathMap labelCheck(JifContext A, LabelChecker lc);
