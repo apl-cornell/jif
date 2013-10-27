@@ -160,6 +160,7 @@ public interface JifNodeFactory extends NodeFactory {
             List<TypeNode> interfaces, List<PrincipalNode> authority, 
             List<ConstraintNode<Assertion>> constraints, ClassBody body);
 
-    JifSingletonAccess JifSingletonAccess(Position pos, Id name);
+    JifSingletonAccess JifSingletonAccess(Position pos, TypeNode objectType, 
+            List<Expr> args);
 
 }
