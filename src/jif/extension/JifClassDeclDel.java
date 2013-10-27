@@ -3,24 +3,28 @@ package jif.extension;
 import java.util.List;
 
 import jif.ast.JifClassDecl;
+import jif.ast.JifClassDecl_c;
 import jif.types.JifParsedPolyType;
 import jif.types.JifTypeSystem;
 import jif.types.SemanticDetailedException;
+import polyglot.ast.ClassDeclOps;
 import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.types.ConstructorInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /** The delegate of the <code>JifClassDecl</code> node.
  *
  *  @see jif.ast.JifClassDecl
  */
-public class JifClassDeclDel extends JifDel_c {
+public class JifClassDeclDel extends JifDel_c implements ClassDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    public JifClassDeclDel() {
-    }
 
     /**
      * @see polyglot.ast.JL_c#typeCheck(polyglot.visit.TypeChecker)
@@ -69,6 +73,27 @@ public class JifClassDeclDel extends JifDel_c {
         }
 
         return super.typeCheck(tc);
+    }
+
+    @Override
+    public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
+        // XXX Should refactor to separate Del functionality out of JifClassDecl.
+        ((JifClassDecl_c) node()).prettyPrintHeader(w, tr);
+    }
+
+    @Override
+    public void prettyPrintFooter(CodeWriter w, PrettyPrinter tr) {
+        // XXX Should refactor to separate Del functionality out of JifClassDecl.
+        ((JifClassDecl_c) node()).prettyPrintFooter(w, tr);
+    }
+
+    @Override
+    public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
+            ConstructorInstance defaultConstructorInstance)
+            throws SemanticException {
+        // XXX Should refactor to separate Del functionality out of JifClassDecl.
+        return ((JifClassDecl_c) node()).addDefaultConstructor(ts, nf,
+                defaultConstructorInstance);
     }
 
 }

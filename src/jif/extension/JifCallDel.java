@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import jif.ast.JifCall_c;
 import jif.ast.JifInstantiator;
 import jif.types.JifClassType;
 import jif.types.JifContext;
@@ -15,12 +16,14 @@ import jif.types.Param;
 import jif.types.label.VarLabel;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.Call;
+import polyglot.ast.CallOps;
 import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.Receiver;
 import polyglot.ast.Special;
 import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
@@ -34,7 +37,7 @@ import polyglot.visit.TypeChecker;
  * 
  *  @see polyglot.ast.Call_c
  */
-public class JifCallDel extends JifDel_c {
+public class JifCallDel extends JifDel_c implements CallOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifCallDel() {
@@ -193,6 +196,25 @@ public class JifCallDel extends JifDel_c {
 
         c = (Call) c.type(retType);
         return c;
+    }
+
+    @Override
+    public Type findContainer(TypeSystem ts, MethodInstance mi) {
+        // XXX Should refactor to separate Del functionality out of JifCall.
+        return ((JifCall_c) node()).findContainer(ts, mi);
+    }
+
+    @Override
+    public ReferenceType findTargetType() throws SemanticException {
+        // XXX Should refactor to separate Del functionality out of JifCall.
+        return ((JifCall_c) node()).findTargetType();
+    }
+
+    @Override
+    public Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes)
+            throws SemanticException {
+        // XXX Should refactor to separate Del functionality out of JifCall.
+        return ((JifCall_c) node()).typeCheckNullTarget(tc, argTypes);
     }
 
 }
