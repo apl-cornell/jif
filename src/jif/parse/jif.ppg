@@ -1149,9 +1149,9 @@ class_instance_creation_expression ::=
                 if (l != null)
                     tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
                 RESULT = parser.nf.New(parser.pos(x,y), tn, b); :}
-    |   SINGLETON:x IDENTIFIER:a
-            {:  RESULT = parser.nf.JifSingletonAccess(parser.pos(x, a), 
-                parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
+    |   SINGLETON:x objtype_or_expr:a LPAREN RPAREN
+            {:  TypeNode tn = a.toUnlabeledType();  
+                RESULT = parser.nf.JifSingletonAccess(parser.pos(x,a), tn, new ArrayList<Expr>()); :}
     ;
 
 override array_creation_expression ::=
