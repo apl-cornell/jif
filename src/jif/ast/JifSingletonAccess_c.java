@@ -15,6 +15,6 @@ public class JifSingletonAccess_c extends JifNew_c implements JifSingletonAccess
 
     public JifSingletonAccess_c(Position pos, TypeNode objectType,
             List<Expr> args) {
-        super(pos, objectType, args, null);
+        super(pos, null, objectType, args, null);
     }
 }
