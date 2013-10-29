@@ -1,0 +1,25 @@
+public class Nested01 {
+  static class X {
+    X(int x) {}
+  }
+
+  static class D extends X {
+    int{*->*;_<-_} x;
+    final int y;
+    D() {
+      y = 0;
+      super(0);
+      x = 0;
+    }
+  }
+
+  class E extends X {
+    int{*->*;_<-_} x;
+    final int y;
+    E() {
+      y = 0;
+      super(0);
+      x = 0;
+    }
+  }
+}
