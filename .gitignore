@@ -6,3 +6,4 @@
 /dist
 /pthScript.results
 /config.properties
+.*.sw?
