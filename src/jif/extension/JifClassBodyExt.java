@@ -41,7 +41,8 @@ public class JifClassBodyExt extends JifExt_c {
 
         for (ClassMember cm : n.members()) {
             try {
-                members.add((ClassMember) lc.context(A).labelCheck(cm));
+                members.add((ClassMember) ((LabelChecker) lc.copy()).context(A)
+                        .labelCheck(cm));
             } catch (SemanticException e) {
                 // report it and keep going.
                 lc.reportSemanticException(e);

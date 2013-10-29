@@ -15,12 +15,10 @@ import jif.types.principal.Principal;
 import polyglot.ext.param.types.PClass;
 import polyglot.frontend.Source;
 import polyglot.main.Options;
-import polyglot.types.ClassType;
 import polyglot.types.FieldInstance;
 import polyglot.types.LazyClassInitializer;
 import polyglot.types.ParsedClassType_c;
 import polyglot.types.TypeObject;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -78,10 +76,6 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
 
     @Override
     public void kind(Kind kind) {
-        if (kind != TOP_LEVEL) {
-            throw new InternalCompilerError(
-                    "Jif does not support inner classes.");
-        }
         super.kind(kind);
     }
 
@@ -162,11 +156,6 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
     }
 
     @Override
-    public void addMemberClass(ClassType t) {
-        throw new InternalCompilerError("Jif does not support inner classes.");
-    }
-
-    @Override
     public void setParams(List<ParamInstance> params) {
         this.params = new LinkedList<ParamInstance>(params);
     }
@@ -220,7 +209,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
 
     @Override
     public int hashCode() {
-        return flags.hashCode() + name.hashCode();
+        return flags().hashCode() + name.hashCode();
     }
 
     @Override

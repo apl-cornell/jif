@@ -384,13 +384,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     @Override
     public New New(Position pos, Expr outer, TypeNode objectType,
             List<Expr> args, ClassBody body) {
-        if (body != null)
-            throw new InternalCompilerError(
-                    "Jif does not support inner classes.");
-        if (outer != null)
-            throw new InternalCompilerError(
-                    "Jif does not support inner classes.");
-        New n = new JifNew_c(pos, objectType, args, body);
+        New n = new JifNew_c(pos, outer, objectType, args, body);
         n = (New) n.ext(extFactory().extNew());
         n = (New) n.del(delFactory().delNew());
         return n;

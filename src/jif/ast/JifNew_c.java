@@ -24,9 +24,9 @@ import polyglot.visit.TypeChecker;
 public class JifNew_c extends New_c implements New {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public JifNew_c(Position pos, TypeNode tn, List<Expr> arguments,
-            ClassBody body) {
-        super(pos, null, tn, arguments, body);
+    public JifNew_c(Position pos, Expr outer, TypeNode tn,
+            List<Expr> arguments, ClassBody body) {
+        super(pos, outer, tn, arguments, body);
     }
 
     @Override
