@@ -1096,8 +1096,10 @@ primary_no_array ::=
                RESULT = parser.nf.NewLabel(parser.pos(a, b),
                    parser.nf.AmbProviderLabelNode(parser.pos(a, b), a.toType()));
             :}
-    // TODO Fill in action.
     |  reftype_or_expr:a DOT THIS:n
+	    {: if (!(a instanceof Name)) parser.die(parser.pos(a));
+	       RESULT = parser.nf.This(parser.pos(a, n, n), a.toType());
+	    :}
     ;
 
 transfer primary_no_new_array to primary_no_array {
@@ -1148,17 +1150,41 @@ class_instance_creation_expression ::=
                 if (l != null)
                     tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
                 RESULT = parser.nf.New(parser.pos(x,y), tn, b); :}
-    // TODO Fill in actions.
-    |   NEW:x objtype_or_expr:a label_opt:l LPAREN argument_list_opt:b RPAREN:y
+    |   NEW:x objtype_or_expr:a label_opt:l LPAREN argument_list_opt:b RPAREN
 	class_body:c
-    |   primary_no_new_array:a DOT NEW simple_name:b LPAREN argument_list_opt:c
-	RPAREN:d
-    |   primary_no_new_array:a DOT NEW simple_name:b LPAREN argument_list_opt:c
-        RPAREN:d class_body:e
-    |   reftype_or_expr:a DOT NEW simple_name:b LPAREN argument_list_opt:c
-	RPAREN:d
-    |   reftype_or_expr:a DOT NEW simple_name:b LPAREN argument_list_opt:c
-	RPAREN:d class_body:e
+	    {:  TypeNode tn = a.toUnlabeledType();
+	        if (l != null)
+		    tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
+		RESULT = parser.nf.New(parser.pos(x,c), tn, b, c);
+	    :}
+    |   primary_no_new_array:a DOT NEW:n simple_name:b label_opt:l LPAREN
+	argument_list_opt:c RPAREN:d
+	    {:  TypeNode tn = b.toUnlabeledType();
+		if (l != null)
+		    tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
+		RESULT = parser.nf.New(parser.pos(a,d), a, tn, c);
+	    :}
+    |   primary_no_new_array:a DOT NEW simple_name:b label_opt:l LPAREN
+	argument_list_opt:c RPAREN class_body:d
+	    {:  TypeNode tn = b.toUnlabeledType();
+		if (l != null)
+		    tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
+		RESULT = parser.nf.New(parser.pos(a,d), a, tn, c, d);
+	    :}
+    |   reftype_or_expr:a DOT NEW simple_name:b label_opt:l LPAREN
+	argument_list_opt:c RPAREN:d
+	    {:  TypeNode tn = b.toUnlabeledType();
+	        if (l != null)
+	            tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
+	        RESULT = parser.nf.New(parser.pos(a,d), a.toExpr(), tn, c);
+	    :}
+    |   reftype_or_expr:a DOT NEW simple_name:b label_opt:l LPAREN
+	argument_list_opt:c RPAREN class_body:d
+	    {:  TypeNode tn = b.toUnlabeledType();
+	        if (l != null)
+	            tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
+	        RESULT = parser.nf.New(parser.pos(a,d), a.toExpr(), tn, c, d);
+	    :}
     ;
 
 override array_creation_expression ::=
