@@ -49,8 +49,7 @@ import polyglot.util.Position;
  * <code>LabelChecker</code> is given a new <code>JifContext</code>, a new
  *  <code>LabelChecker</code> is created.
  */
-public class LabelChecker implements Copy
-{
+public class LabelChecker implements Copy {
     /**
      * The <code>JifContext</code> appropriate for this label checker. The
      * Jif context records a substantial amount of information required for
@@ -61,7 +60,6 @@ public class LabelChecker implements Copy
     final protected JifTypeSystem ts;
     final protected Job job;
     final protected NodeFactory nf;
-
 
     public boolean shouldRerun = false;
     /**
@@ -86,7 +84,9 @@ public class LabelChecker implements Copy
      */
     protected Solver solver;
 
-    public LabelChecker(Job job, TypeSystem ts, NodeFactory nf, boolean solvePerClassBody, boolean solvePerMethod, boolean doLabelSubst) {
+    public LabelChecker(Job job, TypeSystem ts, NodeFactory nf,
+            boolean solvePerClassBody, boolean solvePerMethod,
+            boolean doLabelSubst) {
         this.job = job;
         this.ts = (JifTypeSystem) ts;
         this.context = (JifContext) ts.createContext();
@@ -106,8 +106,7 @@ public class LabelChecker implements Copy
     public Object copy() {
         try {
             return super.clone();
-        }
-        catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Java clone() weirdness.", e);
         }
     }
@@ -115,6 +114,7 @@ public class LabelChecker implements Copy
     public JifContext context() {
         return context;
     }
+
     public JifContext jifContext() {
         return context;
     }
@@ -129,6 +129,7 @@ public class LabelChecker implements Copy
     public JifTypeSystem typeSystem() {
         return ts;
     }
+
     public JifTypeSystem jifTypeSystem() {
         return ts;
     }
@@ -148,7 +149,6 @@ public class LabelChecker implements Copy
     public ErrorQueue errorQueue() {
         return job.compiler().errorQueue();
     }
-
 
     /**
      * Returns an upper bound for L1 and L2
@@ -171,9 +171,11 @@ public class LabelChecker implements Copy
     protected Node preLabelCheck(Node n) {
         return n;
     }
+
     protected Node postLabelCheck(Node old, Node n) {
         return n;
     }
+
     public Node labelCheck(Node n) throws SemanticException {
         if (JifUtil.jifExt(n) != null) {
             this.context().labelEnv().setSolver(this.solver());
@@ -185,34 +187,42 @@ public class LabelChecker implements Copy
         return n;
     }
 
-    public void constrain(NamedLabel lhs, LabelConstraint.Kind kind, NamedLabel rhs, LabelEnv env,
-            Position pos, ConstraintMessage msg) throws SemanticException {
+    public void constrain(NamedLabel lhs, LabelConstraint.Kind kind,
+            NamedLabel rhs, LabelEnv env, Position pos, ConstraintMessage msg)
+            throws SemanticException {
         constrain(lhs, kind, rhs, env, pos, true, msg);
     }
-    public void constrain(NamedLabel lhs, LabelConstraint.Kind kind, NamedLabel rhs, LabelEnv env,
-            Position pos, boolean report, ConstraintMessage msg) throws SemanticException {
-        LabelConstraint c = new LabelConstraint(lhs, kind, rhs, env, pos, msg, report);
+
+    public void constrain(NamedLabel lhs, LabelConstraint.Kind kind,
+            NamedLabel rhs, LabelEnv env, Position pos, boolean report,
+            ConstraintMessage msg) throws SemanticException {
+        LabelConstraint c =
+                new LabelConstraint(lhs, kind, rhs, env, pos, msg, report);
         if (msg != null) msg.setConstraint(c);
         constrain(c);
     }
-    public void constrain(NamedLabel lhs, LabelConstraint.Kind kind, NamedLabel rhs, LabelEnv env,
-            Position pos) throws SemanticException {
+
+    public void constrain(NamedLabel lhs, LabelConstraint.Kind kind,
+            NamedLabel rhs, LabelEnv env, Position pos)
+            throws SemanticException {
         constrain(lhs, kind, rhs, env, pos, false, null);
     }
-    protected void constrain(Constraint c)
-            throws SemanticException
-            {
+
+    protected void constrain(Constraint c) throws SemanticException {
         this.solver.addConstraint(c);
-            }
+    }
 
     public void constrain(Principal p, Constraint.Kind kind, Principal q,
-            LabelEnv env, Position pos,
-            ConstraintMessage msg) throws SemanticException {
+            LabelEnv env, Position pos, ConstraintMessage msg)
+            throws SemanticException {
         constrain(p, kind, q, env, pos, msg, true);
     }
+
     public void constrain(Principal p, Constraint.Kind kind, Principal q,
-            LabelEnv env, Position pos, ConstraintMessage msg, boolean report) throws SemanticException {
-        PrincipalConstraint c = new PrincipalConstraint(p, kind, q, env, pos, msg, report);
+            LabelEnv env, Position pos, ConstraintMessage msg, boolean report)
+            throws SemanticException {
+        PrincipalConstraint c =
+                new PrincipalConstraint(p, kind, q, env, pos, msg, report);
         if (msg != null) msg.setConstraint(c);
         constrain(c);
     }
@@ -232,7 +242,7 @@ public class LabelChecker implements Copy
      */
     public void constrain(NamedLabel label, Principal p, LabelEnv env,
             Position pos, ConstraintMessage msg, boolean report)
-                    throws SemanticException {
+            throws SemanticException {
         NamedLabel principalLabel =
                 new NamedLabel(p.toString(), "RHS of actsfor constraint", p
                         .typeSystem().toLabel(p));
@@ -260,7 +270,8 @@ public class LabelChecker implements Copy
     public void enteringMethod(MethodInstance mi) {
         if (solvePerMethod) {
             // solving by method. Set a new solver for the method body
-            this.solver = ts.createSolver(mi.container().toString() + "." + mi.name());
+            this.solver =
+                    ts.createSolver(mi.container().toString() + "." + mi.name());
         }
     }
 
@@ -272,7 +283,7 @@ public class LabelChecker implements Copy
     public JifClassDecl leavingClassDecl(JifClassDecl n) {
         if (solvePerClassBody) {
             // solving by class. We need to solve the constraints
-            return (JifClassDecl)solveConstraints(n);
+            return (JifClassDecl) solveConstraints(n);
         }
         return n;
     }
@@ -285,7 +296,7 @@ public class LabelChecker implements Copy
     public JifMethodDecl leavingMethod(JifMethodDecl n) {
         if (solvePerMethod) {
             // solving by class. We need to solve the constraints
-            return (JifMethodDecl)solveConstraints(n);
+            return (JifMethodDecl) solveConstraints(n);
         }
         return n;
     }
@@ -305,9 +316,10 @@ public class LabelChecker implements Copy
 
     protected Node solveConstraints(Node n) {
         Node newN = n;
-        JifLabelSubst jls = new JifLabelSubst(this.job, this.ts, this.nf, this.solver);
+        JifLabelSubst jls =
+                new JifLabelSubst(this.job, this.ts, this.nf, this.solver);
 
-        jls = (JifLabelSubst)jls.begin();
+        jls = (JifLabelSubst) jls.begin();
 
         if (jls != null) {
             newN = n.visit(jls);
@@ -317,25 +329,25 @@ public class LabelChecker implements Copy
     }
 
     public void reportSemanticException(SemanticException e) {
-        Position pos = e.position() != null ? e.position() : job().ast().position();
+        Position pos =
+                e.position() != null ? e.position() : job().ast().position();
         errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), pos);
     }
 
-    public CallHelper createCallHelper(Label receiverLabel,
-            Receiver receiver,
-            ReferenceType calleeContainer,
-            JifProcedureInstance pi,
-            List<Expr> actualArgs,
-            Position position) {
-        return new CallHelper(receiverLabel, receiver, calleeContainer, pi, actualArgs, position);
+    public CallHelper createCallHelper(Label receiverLabel, Receiver receiver,
+            ReferenceType calleeContainer, JifProcedureInstance pi,
+            List<Expr> actualArgs, Position position) {
+        return new CallHelper(receiverLabel, receiver, calleeContainer, pi,
+                actualArgs, position);
     }
+
     public CallHelper createCallHelper(Label receiverLabel,
-            ReferenceType calleeContainer,
-            JifProcedureInstance pi,
-            List<Expr> actualArgs,
-            Position position) {
-        return createCallHelper(receiverLabel, null, calleeContainer, pi, actualArgs, position);
+            ReferenceType calleeContainer, JifProcedureInstance pi,
+            List<Expr> actualArgs, Position position) {
+        return createCallHelper(receiverLabel, null, calleeContainer, pi,
+                actualArgs, position);
     }
+
     public CallHelper createOverrideHelper(JifMethodInstance overridden,
             JifMethodInstance overriding) {
         return CallHelper.OverrideHelper(overridden, overriding, this);
