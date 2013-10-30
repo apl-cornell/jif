@@ -271,7 +271,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public Context createContext() {
+    public JifContext createContext() {
         return new JifContext_c(this, jlts);
     }
 
