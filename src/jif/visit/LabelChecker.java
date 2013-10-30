@@ -61,7 +61,6 @@ public class LabelChecker implements Copy {
     final protected Job job;
     final protected NodeFactory nf;
 
-    public boolean shouldRerun = false;
     /**
      * If true, then a new system of constraints will be used for each
      * class body, and upon leaving the class body, the system of constraints
