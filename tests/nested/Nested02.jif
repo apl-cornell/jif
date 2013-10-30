@@ -1,0 +1,5 @@
+public class Nested01 {
+  void m() {
+    Object o = new Object() {};
+  }
+}
