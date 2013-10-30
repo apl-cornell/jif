@@ -41,7 +41,13 @@ public class JifContext_c extends Context_c implements JifContext {
     protected final TypeSystem jlts;
     protected final JifTypeSystem jifts;
 
-    private LabelEnv_c env; // label environment (ph, constraints known to be true)
+    /**
+     * The label environment contains the principal hierarchy and the
+     * constraints that are known to be true. In principle, this should be
+     * copied when a new context is pushed, but for performance, this is copied
+     * on write.
+     */
+    private LabelEnv_c env;
 
     private Set<Principal> auth;
     private Label pc; //internal pc
