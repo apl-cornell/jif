@@ -35,6 +35,7 @@ import jif.extension.JifLabelExprExt;
 import jif.extension.JifLabeledExt;
 import jif.extension.JifLiteralExt;
 import jif.extension.JifLocalAssignExt;
+import jif.extension.JifLocalClassDeclExt;
 import jif.extension.JifLocalDeclExt;
 import jif.extension.JifLocalExt;
 import jif.extension.JifMethodDeclExt;
@@ -89,6 +90,7 @@ import jif.translate.LabelExprToJavaExt_c;
 import jif.translate.LabeledToJavaExt_c;
 import jif.translate.LitToJavaExt_c;
 import jif.translate.LocalAssignToJavaExt_c;
+import jif.translate.LocalClassDeclToJavaExt_c;
 import jif.translate.LocalDeclToJavaExt_c;
 import jif.translate.LocalToJavaExt_c;
 import jif.translate.MethodDeclToJavaExt_c;
@@ -114,8 +116,7 @@ import polyglot.ast.ExtFactory;
  * This class provides is Jif's Extension factory, creating the appropriate
  * Ext objects as required.
  */
-public class JifExtFactory_c extends AbstractJifExtFactory_c
-{
+public class JifExtFactory_c extends AbstractJifExtFactory_c {
     public JifExtFactory_c() {
         super();
     }
@@ -186,10 +187,12 @@ public class JifExtFactory_c extends AbstractJifExtFactory_c
     protected Ext extLocalAssignImpl() {
         return new JifLocalAssignExt(new LocalAssignToJavaExt_c());
     }
+
     @Override
     protected Ext extFieldAssignImpl() {
         return new JifFieldAssignExt(new FieldAssignToJavaExt_c());
     }
+
     @Override
     protected Ext extArrayAccessAssignImpl() {
         return new JifArrayAccessAssignExt(new ArrayAccessAssignToJavaExt_c());
@@ -229,6 +232,7 @@ public class JifExtFactory_c extends AbstractJifExtFactory_c
     protected Ext extCastImpl() {
         return new JifCastExt(new CastToJavaExt_c());
     }
+
     @Override
     protected Ext extCatchImpl() {
         return new JifExt_c(new CatchToJavaExt_c());
@@ -328,7 +332,6 @@ public class JifExtFactory_c extends AbstractJifExtFactory_c
     protected Ext extLocalImpl() {
         return new JifLocalExt(new LocalToJavaExt_c());
     }
-
 
     @Override
     protected Ext extLocalDeclImpl() {
@@ -440,13 +443,10 @@ public class JifExtFactory_c extends AbstractJifExtFactory_c
         return extCannotToJavaImpl();
     }
 
-
-
     @Override
     protected Ext extCanonicalPrincipalNodeImpl() {
         return new JifPrincipalNodeExt(new CanonicalPrincipalNodeToJavaExt_c());
     }
-
 
     @Override
     protected Ext extParamDeclImpl() {
@@ -487,12 +487,19 @@ public class JifExtFactory_c extends AbstractJifExtFactory_c
     protected Ext extNewLabelImpl() {
         return new JifLabelExprExt(new NewLabelToJavaExt_c());
     }
+
     @Override
     protected Ext extLabelExprImpl() {
         return new JifLabelExprExt(new LabelExprToJavaExt_c());
     }
+
     @Override
     protected Ext extPrincipalExprImpl() {
         return new JifPrincipalExprExt(new PrincipalExprToJavaExt_c());
+    }
+
+    @Override
+    protected Ext extLocalClassDeclImpl() {
+        return new JifLocalClassDeclExt(new LocalClassDeclToJavaExt_c());
     }
 }

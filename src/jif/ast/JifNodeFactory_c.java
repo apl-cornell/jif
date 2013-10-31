@@ -26,7 +26,6 @@ import polyglot.ast.Expr;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.If;
-import polyglot.ast.LocalClassDecl;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
@@ -266,11 +265,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
         n = (ClassDecl) n.ext(extFactory().extClassDecl());
         n = (ClassDecl) n.del(delFactory().delClassDecl());
         return n;
-    }
-
-    @Override
-    public LocalClassDecl LocalClassDecl(Position pos, ClassDecl decl) {
-        throw new InternalCompilerError("Jif does not support inner classes.");
     }
 
     @Override

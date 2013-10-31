@@ -9,6 +9,7 @@ import jif.types.JifTypeSystem;
 import jif.types.PathMap;
 import jif.visit.LabelChecker;
 import polyglot.ast.Block;
+import polyglot.ast.LocalClassDecl;
 import polyglot.ast.Node;
 import polyglot.ast.Stmt;
 import polyglot.main.Report;
@@ -45,6 +46,10 @@ public class JifBlockExt extends JifStmtExt_c {
         for (Stmt s : bs.statements()) {
             s = (Stmt) lc.context(A).labelCheck(s);
             l.add(s);
+
+            if (s instanceof LocalClassDecl)
+            // nothing else required
+                continue;
 
             PathMap Xs = getPathMap(s);
 
