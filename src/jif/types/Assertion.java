@@ -15,6 +15,5 @@ import polyglot.types.TypeObject;
  * @see jif.types.hierarchy.LabelEnv 
  * @see jif.types.LabelConstraint 
  */
-public interface Assertion extends TypeObject
-{
+public interface Assertion extends TypeObject {
 }

@@ -8,8 +8,8 @@ import java.util.List;
 public interface JoinLabelNode extends LabelNode {
     /** Gets the list of join components, which are either label nodes or policy nodes. */
     List<LabelComponentNode> components();
-    
+
     /** Returns a copy of this object with <code>components</code> updated.
-     */    
+     */
     JoinLabelNode components(List<LabelComponentNode> components);
 }

@@ -15,12 +15,10 @@ import jif.types.principal.Principal;
 import polyglot.ext.param.types.PClass;
 import polyglot.frontend.Source;
 import polyglot.main.Options;
-import polyglot.types.ClassType;
 import polyglot.types.FieldInstance;
 import polyglot.types.LazyClassInitializer;
 import polyglot.types.ParsedClassType_c;
 import polyglot.types.TypeObject;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -78,10 +76,6 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
 
     @Override
     public void kind(Kind kind) {
-        if (kind != TOP_LEVEL) {
-            throw new InternalCompilerError(
-                    "Jif does not support inner classes.");
-        }
         super.kind(kind);
     }
 
@@ -162,11 +156,6 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
     }
 
     @Override
-    public void addMemberClass(ClassType t) {
-        throw new InternalCompilerError("Jif does not support inner classes.");
-    }
-
-    @Override
     public void setParams(List<ParamInstance> params) {
         this.params = new LinkedList<ParamInstance>(params);
     }
@@ -216,30 +205,6 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
         }
 
         return name + s;
-    }
-
-    @Override
-    public int hashCode() {
-        return flags.hashCode() + name.hashCode();
-    }
-
-    @Override
-    public boolean equalsImpl(TypeObject o) {
-        if (o instanceof JifPolyType) {
-            JifPolyType t = (JifPolyType) o;
-
-            if (package_() != null && t.package_() != null) {
-                return package_().equals(t.package_()) && name.equals(t.name())
-                        && flags.equals(t.flags()) && params.equals(t.params())
-                        && authority.equals(t.authority());
-            } else if (package_() == t.package_()) {
-                return name.equals(t.name()) && flags.equals(t.flags())
-                        && params.equals(t.params())
-                        && authority.equals(t.authority());
-            }
-        }
-
-        return false;
     }
 
     @Override

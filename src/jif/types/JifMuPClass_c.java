@@ -33,7 +33,7 @@ public class JifMuPClass_c extends MuPClass_c<ParamInstance, Param> {
         String s = "";
 
         for (Iterator<ParamInstance> i = formals().iterator(); i.hasNext();) {
-            ParamInstance pi =  i.next();
+            ParamInstance pi = i.next();
             s += pi.name();
 
             if (i.hasNext()) {
@@ -41,7 +41,7 @@ public class JifMuPClass_c extends MuPClass_c<ParamInstance, Param> {
             }
         }
 
-        if (! s.equals("")) {
+        if (!s.equals("")) {
             s = "[" + s + "]";
         }
 

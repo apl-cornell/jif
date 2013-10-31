@@ -5,14 +5,15 @@ package jif.lang;
  */
 public interface Principal {
     String name();
-    
+
     boolean delegatesTo(final Principal p);
-    
+
     boolean equals(final Principal p);
-    
-    boolean isAuthorized(final Object authPrf, final Closure closure, final Label lb, final boolean executeNow);
-    
+
+    boolean isAuthorized(final Object authPrf, final Closure closure,
+            final Label lb, final boolean executeNow);
+
     ActsForProof findProofUpto(final Principal p, final Object searchState);
-    
+
     ActsForProof findProofDownto(final Principal q, final Object searchState);
 }

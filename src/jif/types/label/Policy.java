@@ -12,25 +12,33 @@ import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 
-
 /**
  * This class is the common super class for integrity polices and 
  * confidentiality policies.
  */
-public interface Policy extends TypeObject { 
+public interface Policy extends TypeObject {
     @Override
     boolean isCanonical();
+
     boolean isSingleton();
+
     boolean isRuntimeRepresentable();
+
     boolean isTop();
+
     boolean isBottom();
+
     boolean hasVariables();
+
     boolean hasWritersToReaders();
-    
-    
+
     List<Type> throwTypes(TypeSystem ts);
+
     Policy subst(LabelSubstitution substitution) throws SemanticException;
+
     Policy simplify();
+
     String toString(Set<Label> printedLabels);
+
     PathMap labelCheck(JifContext A, LabelChecker lc);
 }

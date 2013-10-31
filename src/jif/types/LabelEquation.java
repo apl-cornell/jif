@@ -22,16 +22,14 @@ import polyglot.util.Position;
  * 
  * @see jif.types.LabelConstraint
  */
-public class LabelEquation extends Equation
-{
+public class LabelEquation extends Equation {
     private Label lhs;
     private Label rhs;
 
     /**
      * Constructor
      */
-    LabelEquation(Label lhs, Label rhs, LabelConstraint constraint)
-    {
+    LabelEquation(Label lhs, Label rhs, LabelConstraint constraint) {
         super(constraint);
         this.lhs = lhs;
         this.rhs = rhs.simplify();
@@ -46,17 +44,28 @@ public class LabelEquation extends Equation
         }
     }
 
+    public Label lhs() {
+        return lhs;
+    }
 
-    public Label lhs() {return lhs;}
-    public Label rhs() {return rhs;}
+    public Label rhs() {
+        return rhs;
+    }
+
     @Override
-    public LabelEnv env() {return constraint().env();}
+    public LabelEnv env() {
+        return constraint().env();
+    }
+
     @Override
-    public Position position() {return constraint().position();}
+    public Position position() {
+        return constraint().position();
+    }
 
     public LabelConstraint labelConstraint() {
-        return (LabelConstraint)constraint;
+        return (LabelConstraint) constraint;
     }
+
     /**
      * Return a <code>List</code> of variable components that occur in either the
      * left or right hand side.
@@ -70,7 +79,7 @@ public class LabelEquation extends Equation
 
     @Override
     public Object copy() {
-        return new LabelEquation(lhs, rhs, (LabelConstraint)constraint);
+        return new LabelEquation(lhs, rhs, (LabelConstraint) constraint);
     }
 
     /**
@@ -86,11 +95,13 @@ public class LabelEquation extends Equation
     }
 
     @Override
-    public int hashCode() { return lhs.hashCode() ^ rhs.hashCode(); }
+    public int hashCode() {
+        return lhs.hashCode() ^ rhs.hashCode();
+    }
 
     @Override
     public boolean equals(Object o) {
-        if (! (o instanceof LabelEquation)) {
+        if (!(o instanceof LabelEquation)) {
             return false;
         }
 
@@ -103,10 +114,10 @@ public class LabelEquation extends Equation
 
     @Override
     public String toString() {
-        return lhs.toString() + " <= " + rhs.toString() + " in environment " +
-                env() + " (produced from " +
-                labelConstraint().lhsLabel() + labelConstraint().kind() + labelConstraint().rhsLabel() + ") " +
-                position();
+        return lhs.toString() + " <= " + rhs.toString() + " in environment "
+                + env() + " (produced from " + labelConstraint().lhsLabel()
+                + labelConstraint().kind() + labelConstraint().rhsLabel()
+                + ") " + position();
     }
 
     /**

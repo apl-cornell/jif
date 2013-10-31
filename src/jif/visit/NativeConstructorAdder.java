@@ -36,7 +36,7 @@ public class NativeConstructorAdder extends NodeVisitor {
     public Node override(Node n) {
         if (n instanceof JifConstructorDecl) {
             JifConstructorDecl decl = (JifConstructorDecl) n;
-            ClassType       ct   = decl.constructorInstance().container().toClass();
+            ClassType ct = decl.constructorInstance().container().toClass();
 
             if (decl.body() == null) {
                 ConstructorCall dummy = dummyCall(ct);
@@ -44,12 +44,8 @@ public class NativeConstructorAdder extends NodeVisitor {
                 Flags flags = decl.constructorInstance().flags().clearNative();
                 decl.constructorInstance().setFlags(flags);
                 return ((JifConstructorDecl) decl.body(superCall)).flags(flags);
-            }
-            else
-                return decl;
-        }
-        else
-            return null;
+            } else return decl;
+        } else return null;
     }
 
     /**
@@ -58,14 +54,16 @@ public class NativeConstructorAdder extends NodeVisitor {
     private ConstructorCall dummyCall(ClassType ct) {
         ClassType sup = ct.superType().toClass();
         List<? extends ConstructorInstance> cxs = sup.constructors();
-        ConstructorInstance ci = cxs.isEmpty() ? ct.typeSystem().defaultConstructor(Position.compilerGenerated(), sup)
-                : cxs.get(0);
+        ConstructorInstance ci =
+                cxs.isEmpty() ? ct.typeSystem().defaultConstructor(
+                        Position.compilerGenerated(), sup) : cxs.get(0);
 
         List<Expr> args = new ArrayList<Expr>();
         for (Type t : ci.formalTypes())
             args.add(dummyValue(t));
 
-        return nf.ConstructorCall(ct.position(), ConstructorCall.SUPER, args).constructorInstance(ci);
+        return nf.ConstructorCall(ct.position(), ConstructorCall.SUPER, args)
+                .constructorInstance(ci);
     }
 
     /**
@@ -77,8 +75,7 @@ public class NativeConstructorAdder extends NodeVisitor {
             e = nf.IntLit(Position.compilerGenerated(), IntLit.INT, 0);
         else if (t.isBoolean())
             e = nf.BooleanLit(Position.compilerGenerated(), false);
-        else
-            e = nf.NullLit(Position.compilerGenerated());
+        else e = nf.NullLit(Position.compilerGenerated());
 
         return e.type(t);
     }

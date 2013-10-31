@@ -13,7 +13,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 
-
 /**
  * Visits an AST, and applies a <code>LabelSubsitution</code> to all labels
  * that occur in the AST. The <code>LabelSubsitution</code> is not allowed
@@ -34,22 +33,21 @@ public class TypeSubstitutor {
     }
 
     public Type rewriteType(Type t) throws SemanticException {
-        if (t instanceof LabeledType && recurseIntoLabeledType((LabeledType)t)) {
-            LabeledType lt = (LabeledType)t;
+        if (t instanceof LabeledType && recurseIntoLabeledType((LabeledType) t)) {
+            LabeledType lt = (LabeledType) t;
             Label L = lt.labelPart();
             Type bt = lt.typePart();
             return lt.labelPart(rewriteLabel(L)).typePart(rewriteType(bt));
-        }
-        else if (t instanceof ArrayType && recurseIntoArrayType((ArrayType)t)) {
-            ArrayType at = (ArrayType)t;
+        } else if (t instanceof ArrayType
+                && recurseIntoArrayType((ArrayType) t)) {
+            ArrayType at = (ArrayType) t;
             return at.base(rewriteType(at.base()));
-        }
-        else if (t instanceof JifSubstType && recurseIntoSubstType((JifSubstType)t)) {
-            JifSubstType jst = (JifSubstType)t;
+        } else if (t instanceof JifSubstType
+                && recurseIntoSubstType((JifSubstType) t)) {
+            JifSubstType jst = (JifSubstType) t;
             Map<ParamInstance, Param> newMap =
                     new LinkedHashMap<ParamInstance, Param>();
             boolean diff = false;
-
 
             for (Iterator<Map.Entry<ParamInstance, Param>> i = jst.entries(); i
                     .hasNext();) {
@@ -57,12 +55,10 @@ public class TypeSubstitutor {
                 Object arg = e.getValue();
                 Param p;
                 if (arg instanceof Label) {
-                    p = rewriteLabel((Label)arg);
-                }
-                else if (arg instanceof Principal) {
-                    p = rewritePrincipal((Principal)arg);
-                }
-                else {
+                    p = rewriteLabel((Label) arg);
+                } else if (arg instanceof Principal) {
+                    p = rewritePrincipal((Principal) arg);
+                } else {
                     throw new InternalCompilerError(
                             "Unexpected type for entry: "
                                     + arg.getClass().getName());
@@ -74,7 +70,7 @@ public class TypeSubstitutor {
                 }
             }
             if (diff) {
-                JifTypeSystem ts = (JifTypeSystem)t.typeSystem();
+                JifTypeSystem ts = (JifTypeSystem) t.typeSystem();
                 t = ts.subst(jst.base(), newMap);
                 return t;
             }
@@ -107,6 +103,7 @@ public class TypeSubstitutor {
     public Label rewriteLabel(Label L) throws SemanticException {
         return rewriteActsForParam(L);
     }
+
     protected Principal rewritePrincipal(Principal p) throws SemanticException {
         return rewriteActsForParam(p);
     }
@@ -116,28 +113,24 @@ public class TypeSubstitutor {
         if (a instanceof ActsForConstraint) {
             @SuppressWarnings("unchecked")
             ActsForConstraint<Actor, Granter> c =
-            (ActsForConstraint<Actor, Granter>) a.copy();
+                    (ActsForConstraint<Actor, Granter>) a.copy();
             c = c.actor(rewriteActsForParam(c.actor()));
             c = c.granter(rewriteActsForParam(c.granter()));
             return c;
-        }
-        else if (a instanceof AuthConstraint) {
-            AuthConstraint c = (AuthConstraint)a.copy();
+        } else if (a instanceof AuthConstraint) {
+            AuthConstraint c = (AuthConstraint) a.copy();
             c = c.principals(rewritePrincipalList(c.principals()));
             return c;
-        }
-        else if (a instanceof AutoEndorseConstraint) {
-            AutoEndorseConstraint c = (AutoEndorseConstraint)a.copy();
+        } else if (a instanceof AutoEndorseConstraint) {
+            AutoEndorseConstraint c = (AutoEndorseConstraint) a.copy();
             c = c.endorseTo(rewriteLabel(c.endorseTo()));
             return c;
-        }
-        else if (a instanceof CallerConstraint) {
-            CallerConstraint c = (CallerConstraint)a.copy();
+        } else if (a instanceof CallerConstraint) {
+            CallerConstraint c = (CallerConstraint) a.copy();
             c = c.principals(rewritePrincipalList(c.principals()));
             return c;
-        }
-        else if (a instanceof LabelLeAssertion) {
-            LabelLeAssertion c = (LabelLeAssertion)a.copy();
+        } else if (a instanceof LabelLeAssertion) {
+            LabelLeAssertion c = (LabelLeAssertion) a.copy();
             c = c.lhs(rewriteLabel(c.lhs()));
             c = c.rhs(rewriteLabel(c.rhs()));
             return c;

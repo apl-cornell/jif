@@ -60,9 +60,9 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
             boolean skipBody) {
         this(substitution, new TypeSubstitutor(substitution), skipBody);
     }
+
     public LabelSubstitutionVisitor(LabelSubstitution substitution,
-            TypeSubstitutor typeSubst,
-            boolean skipBody) {
+            TypeSubstitutor typeSubst, boolean skipBody) {
         this.skipBody = skipBody;
         this.substitution = substitution;
         this.typeSubstitutor = typeSubst;
@@ -82,16 +82,15 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
     public Node leave(Node old, Node n, NodeVisitor v) {
         try {
             if (n instanceof TypeNode) {
-                TypeNode c = (TypeNode)n;
+                TypeNode c = (TypeNode) n;
                 c = rewriteTypeNode(c);
                 return c;
-            }
-            else if (n instanceof Expr) {
-                Expr e = (Expr)n;
+            } else if (n instanceof Expr) {
+                Expr e = (Expr) n;
                 e = rewriteExpr(e);
 
                 if (e instanceof Local) {
-                    Local lc = (Local)e;
+                    Local lc = (Local) e;
                     LocalInstance li = lc.localInstance();
                     Type t = rewriteType(li.type());
 
@@ -100,39 +99,35 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
                     return lc;
                 }
                 return e;
-            }
-            else if (n instanceof LabelNode) {
-                LabelNode ln = (LabelNode)n;
+            } else if (n instanceof LabelNode) {
+                LabelNode ln = (LabelNode) n;
                 Label l = rewriteLabel(ln.label());
                 ln = ln.label(l);
                 return ln;
-            }
-            else if (n instanceof Formal) {
-                Formal fn = (Formal)n;
+            } else if (n instanceof Formal) {
+                Formal fn = (Formal) n;
 
-                JifLocalInstance li = (JifLocalInstance)fn.localInstance();
+                JifLocalInstance li = (JifLocalInstance) fn.localInstance();
                 Type t = rewriteType(li.type());
 
                 // Imperatively update the local instance.
                 li.setType(t);
                 li.setLabel(rewriteLabel(li.label()));
                 return fn;
-            }
-            else if (n instanceof LocalDecl) {
-                LocalDecl ld = (LocalDecl)n;
+            } else if (n instanceof LocalDecl) {
+                LocalDecl ld = (LocalDecl) n;
 
-                JifLocalInstance li = (JifLocalInstance)ld.localInstance();
+                JifLocalInstance li = (JifLocalInstance) ld.localInstance();
                 Type t = rewriteType(li.type());
 
                 // Imperatively update the local instance.
                 li.setType(t);
                 li.setLabel(rewriteLabel(li.label()));
                 return ld;
-            }
-            else if (n instanceof FieldDecl) {
-                FieldDecl fd = (FieldDecl)n;
+            } else if (n instanceof FieldDecl) {
+                FieldDecl fd = (FieldDecl) n;
 
-                JifFieldInstance fi = (JifFieldInstance)fd.fieldInstance();
+                JifFieldInstance fi = (JifFieldInstance) fd.fieldInstance();
                 Type t = rewriteType(fi.type());
 
                 // Imperatively update the field instance.
@@ -140,12 +135,13 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
                 fi.setLabel(rewriteLabel(fi.label()));
 
                 return fd;
-            }
-            else if (n instanceof ProcedureDecl) {
-                ProcedureDecl md = (ProcedureDecl)n;
+            } else if (n instanceof ProcedureDecl) {
+                ProcedureDecl md = (ProcedureDecl) n;
 
-                JifProcedureInstance mi = (JifProcedureInstance)md.procedureInstance();
-                mi.setReturnLabel(rewriteLabel(mi.returnLabel()), mi.isDefaultReturnLabel());
+                JifProcedureInstance mi =
+                        (JifProcedureInstance) md.procedureInstance();
+                mi.setReturnLabel(rewriteLabel(mi.returnLabel()),
+                        mi.isDefaultReturnLabel());
                 mi.setPCBound(rewriteLabel(mi.pcBound()), mi.isDefaultPCBound());
 
                 ArrayList<Type> throwTypes =
@@ -159,29 +155,27 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
                 }
 
                 if (mi instanceof JifMethodInstance) {
-                    JifMethodInstance jmi = (JifMethodInstance)mi;
+                    JifMethodInstance jmi = (JifMethodInstance) mi;
                     jmi.setReturnType(rewriteType(jmi.returnType()));
 
                     jmi.setThrowTypes(throwTypes);
                     jmi.setFormalTypes(formalTypes);
-                    md = ((JifMethodDecl)md).methodInstance(jmi);
-                }
-                else if (mi instanceof JifConstructorInstance) {
-                    JifConstructorInstance jci = (JifConstructorInstance)mi;
+                    md = ((JifMethodDecl) md).methodInstance(jmi);
+                } else if (mi instanceof JifConstructorInstance) {
+                    JifConstructorInstance jci = (JifConstructorInstance) mi;
 
                     jci.setThrowTypes(throwTypes);
                     jci.setFormalTypes(formalTypes);
-                    md = ((JifConstructorDecl)md).constructorInstance(jci);
+                    md = ((JifConstructorDecl) md).constructorInstance(jci);
                 }
 
                 return md;
             }
 
             return n;
-        }
-        catch (SemanticException e) {
-            throw new InternalCompilerError("Unexpected SemanticException "+
-                    "thrown", e);
+        } catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected SemanticException "
+                    + "thrown", e);
         }
     }
 
@@ -206,6 +200,7 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
         if (L == null) return L;
         return L.subst(substitution).simplify();
     }
+
     protected Principal rewritePrincipal(Principal p) throws SemanticException {
         if (p == null) return p;
         return p.subst(substitution);

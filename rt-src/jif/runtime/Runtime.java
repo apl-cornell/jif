@@ -51,6 +51,7 @@ public class Runtime {
         String username = currentUser();
         return NativePrincipal.getInstance(username);
     }
+
     /** Get a native user  */
     public static Principal getUser(Principal parameter, String username) {
         return NativePrincipal.getInstance(username);
@@ -62,6 +63,7 @@ public class Runtime {
                         new LinkedList<Principal>());
         return LabelUtil.singleton().toLabel(cp);
     }
+
     private Label defaultInputLabel() {
         IntegPolicy ip =
                 LabelUtil.singleton().writerPolicy(dynp,
@@ -122,11 +124,12 @@ public class Runtime {
             throws FileNotFoundException, SecurityException {
         Label acLabel = FileSystem.labelOf(name);
 
-        if (LabelUtil.singleton().relabelsTo(acLabel, L)) return new FileInputStream(name);
+        if (LabelUtil.singleton().relabelsTo(acLabel, L))
+            return new FileInputStream(name);
 
-        throw new SecurityException("The file has label " + LabelUtil.singleton().stringValue(acLabel) +
-                ", which is more restrictive than " +
-                L.toString());
+        throw new SecurityException("The file has label "
+                + LabelUtil.singleton().stringValue(acLabel)
+                + ", which is more restrictive than " + L.toString());
     }
 
     /**
@@ -134,7 +137,8 @@ public class Runtime {
      * The output channel is parameterized by <code>l</code>.
      */
     public PrintStream stderr(Label l) {
-        if (LabelUtil.singleton().relabelsTo(l, defaultOutputLabel())) return System.err;
+        if (LabelUtil.singleton().relabelsTo(l, defaultOutputLabel()))
+            return System.err;
 
         throw new SecurityException("The standard error output is not "
                 + "sufficiently secure.");
@@ -145,7 +149,8 @@ public class Runtime {
      * This output channel is parameterized by <code>l</code>.
      */
     public PrintStream stdout(Label l) {
-        if (LabelUtil.singleton().relabelsTo(l, defaultOutputLabel())) return System.out;
+        if (LabelUtil.singleton().relabelsTo(l, defaultOutputLabel()))
+            return System.out;
         throw new SecurityException("The standard output is not "
                 + "sufficiently secure.");
     }
@@ -155,7 +160,8 @@ public class Runtime {
      * This input channel is parameterized by <code>l</code>.
      */
     public InputStream stdin(Label l) {
-        if (LabelUtil.singleton().relabelsTo(defaultInputLabel(), l)) return System.in;
+        if (LabelUtil.singleton().relabelsTo(defaultInputLabel(), l))
+            return System.in;
 
         throw new SecurityException("The standard output is not "
                 + "sufficiently secure.");
@@ -189,38 +195,43 @@ public class Runtime {
         if (_nativeOK) return currentUserImpl();
         return null;
     }
+
     private static native String currentUserImpl();
 
     public static int currentYear(Principal dummy) {
         return new GregorianCalendar().get(Calendar.YEAR);
     }
+
     public static int currentMonth(Principal dummy) {
-        return new GregorianCalendar().get(Calendar.MONTH) - Calendar.JANUARY + 1;
+        return new GregorianCalendar().get(Calendar.MONTH) - Calendar.JANUARY
+                + 1;
     }
+
     public static int currentDayOfMonth(Principal dummy) {
         return new GregorianCalendar().get(Calendar.DAY_OF_MONTH);
     }
+
     public static int currentHour(Principal dummy) {
         return new GregorianCalendar().get(Calendar.HOUR_OF_DAY);
     }
+
     public static int currentMinute(Principal dummy) {
         return new GregorianCalendar().get(Calendar.MINUTE);
     }
+
     public static void sleep(Principal dummy, int s) {
         try {
             // add some noise...
             double noise = 0.15;
             double multiplier = 1 + ((2 * Math.random() - 1) * noise); // = 1 plus or minus noise
-            long ms = (long)((long)s * 1000 * multiplier);
+            long ms = (long) ((long) s * 1000 * multiplier);
             if (!Thread.interrupted()) {
                 Thread.sleep(ms);
             }
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             // ignore the interrupted exception
         }
     }
-
 
     public static Object[] arrayDeepClone(Object[] a) {
         if (a == null) return null;
@@ -231,12 +242,13 @@ public class Runtime {
                 if (o.getClass().getComponentType().isPrimitive()) {
                     // o is of type e.g., int[]. Need to clone it.
                     int length = Array.getLength(o);
-                    o = Array.newInstance(o.getClass().getComponentType(), length);
+                    o =
+                            Array.newInstance(o.getClass().getComponentType(),
+                                    length);
                     System.arraycopy(a[i], 0, o, 0, length);
-                }
-                else {
+                } else {
                     // o i of type C[]
-                    o = arrayDeepClone((Object[])o);
+                    o = arrayDeepClone((Object[]) o);
                 }
             }
             c[i] = o;
@@ -250,13 +262,11 @@ public class Runtime {
         if (_nativeOK) {
             try {
                 System.loadLibrary("jifrt");
-            }
-            catch (UnsatisfiedLinkError ule) {
+            } catch (UnsatisfiedLinkError ule) {
                 // fail, but continue with warning
                 _nativeOK = false;
                 System.err.println(ule.getLocalizedMessage());
-            }
-            catch (SecurityException se) {
+            } catch (SecurityException se) {
                 _nativeOK = false;
                 System.err.println(se.getLocalizedMessage());
             }

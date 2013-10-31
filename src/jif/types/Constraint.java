@@ -13,13 +13,15 @@ import polyglot.util.SerialVersionUID;
  * are generated during type checking and label checking.
  * 
  */
-public abstract class Constraint
-{
+public abstract class Constraint {
     /** Kinds of constraint, either equality or inequality. */
     public static class Kind extends Enum {
-        private static final long serialVersionUID = SerialVersionUID.generate();
+        private static final long serialVersionUID = SerialVersionUID
+                .generate();
 
-        protected Kind(String name) { super(name); }
+        protected Kind(String name) {
+            super(name);
+        }
     }
 
     protected final Param lhs;
@@ -54,7 +56,6 @@ public abstract class Constraint
         this.messages = msg;
         this.report = report;
     }
-
 
     public Kind kind() {
         return kind;
@@ -120,16 +121,15 @@ public abstract class Constraint
         return sb.toString();
     }
 
-
     /**
      * Produce a <code>Collection</code> of {@link Equation Equations} for this
      * constraint.
      */
     public abstract Collection<Equation> getEquations();
 
-
     public boolean isCanonical() {
         return lhs.isCanonical() && rhs.isCanonical();
     }
+
     public abstract boolean hasVariables();
 }

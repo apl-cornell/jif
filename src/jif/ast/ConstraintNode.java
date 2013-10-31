@@ -11,5 +11,6 @@ import polyglot.ast.Node;
  */
 public interface ConstraintNode<Constraint extends Assertion> extends Node {
     Set<Constraint> constraints();
+
     ConstraintNode<Constraint> constraints(Set<Constraint> constraint);
 }

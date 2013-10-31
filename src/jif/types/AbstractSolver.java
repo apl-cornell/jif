@@ -124,7 +124,6 @@ public abstract class AbstractSolver implements Solver {
      */
     protected final boolean useSCC;
 
-
     /**
      * The name of the solver, for debugging purposes.
      */
@@ -138,13 +137,16 @@ public abstract class AbstractSolver implements Solver {
     /**
      * Constructor
      */
-    protected AbstractSolver(JifTypeSystem ts, Compiler compiler, String solverName) {
+    protected AbstractSolver(JifTypeSystem ts, Compiler compiler,
+            String solverName) {
         this(ts, compiler, solverName, false);
     }
+
     /**
      * Constructor
      */
-    protected AbstractSolver(JifTypeSystem ts, Compiler compiler, String solverName, boolean useSCC) {
+    protected AbstractSolver(JifTypeSystem ts, Compiler compiler,
+            String solverName, boolean useSCC) {
         this.ts = ts;
         this.compiler = compiler;
         this.useSCC = useSCC;
@@ -159,7 +161,9 @@ public abstract class AbstractSolver implements Solver {
                 new LinkedHashMap<Equation, Set<Variable>>();
         traces = new LinkedHashMap<VarLabel, List<Pair<Equation, Label>>>();
         setStatus(STATUS_NOT_SOLVED);
-        bounds = new VarMap(ts, getDefaultLabelBound(), getDefaultPrincipalBound());
+        bounds =
+                new VarMap(ts, getDefaultLabelBound(),
+                        getDefaultPrincipalBound());
         scc = null;
         currentSCC = null;
         this.solverName = solverName + " (#" + (++solverCounter) + ")";
@@ -167,7 +171,6 @@ public abstract class AbstractSolver implements Solver {
         failedEquations = new ArrayList<FailedConstraintSnapshot>();
         fullTrace = new ArrayList<InformationFlowTrace>();
     }
-
 
     /**
      * Constructor
@@ -229,7 +232,6 @@ public abstract class AbstractSolver implements Solver {
     protected void addEquationToQueueHead(Equation eqn) {
         Q.addFirst(eqn);
     }
-
 
     /**
      * Get the bounds for this Solver.
@@ -294,12 +296,15 @@ public abstract class AbstractSolver implements Solver {
         }
 
         // check for static failures.
-        if (staticFailedConstraints != null && !staticFailedConstraints.isEmpty()) {
+        if (staticFailedConstraints != null
+                && !staticFailedConstraints.isEmpty()) {
             if (shouldReport(1)) {
-                report(1, "   " + staticFailedConstraints.size() + " statically failed constraint");
+                report(1, "   " + staticFailedConstraints.size()
+                        + " statically failed constraint");
             }
             setStatus(STATUS_NO_SOLUTION);
-            for (Iterator<Equation> iter = staticFailedConstraints.iterator(); iter.hasNext();) {
+            for (Iterator<Equation> iter = staticFailedConstraints.iterator(); iter
+                    .hasNext();) {
                 UnsatisfiableConstraintException ex = reportError(iter.next());
                 // generate error report for all exceptions
                 genFlowMessage(ex);
@@ -307,7 +312,8 @@ public abstract class AbstractSolver implements Solver {
                     throw ex;
                 }
                 // add all but the last to the queue.
-                compiler.errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR, ex.getMessage(), ex.position());
+                compiler.errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
+                        ex.getMessage(), ex.position());
             }
         }
 
@@ -336,8 +342,7 @@ public abstract class AbstractSolver implements Solver {
                 scc.add(currentScc);
                 currentScc = null;
             }
-        }
-        else {
+        } else {
             // not using SCC, so pretend that
             // we have a single SCC consisting of all equations
             scc = new LinkedList<Set<Equation>>();
@@ -349,8 +354,7 @@ public abstract class AbstractSolver implements Solver {
         if (scc.isEmpty()) {
             currentSCC = Collections.emptySet();
             Q = new EquationQueue();
-        }
-        else {
+        } else {
             currentSCC = scc.removeFirst();
             Q = new EquationQueue(currentSCC);
         }
@@ -363,15 +367,14 @@ public abstract class AbstractSolver implements Solver {
                 report(1, "   finished " + solverName);
             }
             return soln;
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             setStatus(STATUS_NO_SOLUTION);
-            genFlowMessage((UnsatisfiableConstraintException)e);
+            genFlowMessage((UnsatisfiableConstraintException) e);
             throw e;
         }
     }
 
-    public void genFlowMessage (UnsatisfiableConstraintException ex) {
+    public void genFlowMessage(UnsatisfiableConstraintException ex) {
         if (LabelFlowGraph.shouldReport(LabelFlowGraph.messageOnly)) {
             LabelFlowGraph g = new LabelFlowGraph(fullTrace, ex.getSnapshot());
             g.showErrorPath();
@@ -666,7 +669,8 @@ public abstract class AbstractSolver implements Solver {
 
             checkCandidateSolution();
         }
-        if (shouldReport(2)) report(2, "Number of relaxation steps: " + counter);
+        if (shouldReport(2))
+            report(2, "Number of relaxation steps: " + counter);
         if (shouldReport(2)) {
             report(2, bounds.toString());
         }
@@ -675,29 +679,33 @@ public abstract class AbstractSolver implements Solver {
 
     protected void considerEquation(Equation eqn) throws SemanticException {
         if (eqn instanceof LabelEquation) {
-            considerEquation((LabelEquation)eqn);
-        }
-        else if (eqn instanceof PrincipalEquation) {
-            considerEquation((PrincipalEquation)eqn);
-        }
-        else {
+            considerEquation((LabelEquation) eqn);
+        } else if (eqn instanceof PrincipalEquation) {
+            considerEquation((PrincipalEquation) eqn);
+        } else {
             throw new InternalCompilerError("Unexpected eqn " + eqn);
         }
     }
+
     protected void considerEquation(LabelEquation eqn) throws SemanticException {
-        Label lhsbound = triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
-        Label rhsbound = triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());
+        Label lhsbound =
+                triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
+        Label rhsbound =
+                triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());
 
         if (eqn.env().leq(lhsbound, rhsbound)) {
             if (shouldReport(5))
-                report(5, "constraint: " + eqn
-                        + " already satisfied: " + lhsbound + "<="
-                        + rhsbound);
-        }
-        else {
+                report(5, "constraint: " + eqn + " already satisfied: "
+                        + lhsbound + "<=" + rhsbound);
+        } else {
             if (shouldReport(4)) {
-                report(4, "Considering constraint: " + eqn + " ("
-                        + (eqn.position()==null?"null":("line "+eqn.position().line())) + ")");
+                report(4,
+                        "Considering constraint: "
+                                + eqn
+                                + " ("
+                                + (eqn.position() == null ? "null"
+                                        : ("line " + eqn.position().line()))
+                                + ")");
             }
             // let the subclass deal with changing the bounds on
             // variables
@@ -711,22 +719,27 @@ public abstract class AbstractSolver implements Solver {
      * the equation satisfied. The method may postpone solving the equation by
      * putting the equation back on the queue, using addEquationToQueue().
      */
-    protected abstract void solve_eqn(LabelEquation eqn) throws SemanticException;
+    protected abstract void solve_eqn(LabelEquation eqn)
+            throws SemanticException;
 
-    protected void considerEquation(PrincipalEquation eqn) throws SemanticException {
+    protected void considerEquation(PrincipalEquation eqn)
+            throws SemanticException {
         Principal lhsbound = bounds.applyTo(eqn.lhs());
         Principal rhsbound = bounds.applyTo(eqn.rhs());
 
         if (eqn.env().actsFor(lhsbound, rhsbound)) {
             if (shouldReport(5))
-                report(5, "constraint: " + eqn
-                        + " already satisfied: " + lhsbound + " actsfor "
-                        + rhsbound);
-        }
-        else {
+                report(5, "constraint: " + eqn + " already satisfied: "
+                        + lhsbound + " actsfor " + rhsbound);
+        } else {
             if (shouldReport(4)) {
-                report(4, "Considering constraint: " + eqn + " ("
-                        + (eqn.position()==null?"null":("line "+eqn.position().line())) + ")");
+                report(4,
+                        "Considering constraint: "
+                                + eqn
+                                + " ("
+                                + (eqn.position() == null ? "null"
+                                        : ("line " + eqn.position().line()))
+                                + ")");
             }
             // let the subclass deal with changing the bounds on
             // variables
@@ -740,7 +753,8 @@ public abstract class AbstractSolver implements Solver {
      * the equation satisfied. The method may postpone solving the equation by
      * putting the equation back on the queue, using addEquationToQueue().
      */
-    protected abstract void solve_eqn(PrincipalEquation eqn) throws SemanticException;
+    protected abstract void solve_eqn(PrincipalEquation eqn)
+            throws SemanticException;
 
     /**
      * Check the candidate solution
@@ -756,35 +770,42 @@ public abstract class AbstractSolver implements Solver {
         // variables.
         for (Equation eqn : equations) {
             if (eqn instanceof LabelEquation) {
-                checkEquationSatisfied((LabelEquation)eqn);
+                checkEquationSatisfied((LabelEquation) eqn);
             }
         }
     }
 
-    protected void checkEquationSatisfied(LabelEquation eqn) throws SemanticException {
+    protected void checkEquationSatisfied(LabelEquation eqn)
+            throws SemanticException {
         // Check that any variables that must be runtime representable are in fact so.
         for (Variable v : eqn.variables()) {
             if (v.mustRuntimeRepresentable()) {
                 boolean isRuntimeRepresentable = false;
                 if (v instanceof VarLabel) {
-                    isRuntimeRepresentable = bounds.boundOf((VarLabel)v).isRuntimeRepresentable();
-                }
-                else if (v instanceof VarPrincipal) {
-                    isRuntimeRepresentable = bounds.boundOf((VarPrincipal)v).isRuntimeRepresentable();
-                }
-                else {
+                    isRuntimeRepresentable =
+                            bounds.boundOf((VarLabel) v)
+                                    .isRuntimeRepresentable();
+                } else if (v instanceof VarPrincipal) {
+                    isRuntimeRepresentable =
+                            bounds.boundOf((VarPrincipal) v)
+                                    .isRuntimeRepresentable();
+                } else {
                     throw new InternalCompilerError("Unexpected variable " + v);
                 }
                 if (!isRuntimeRepresentable) {
                     // a variable that must be runtime representable is not.
                     reportTrace(v);
-                    throw new SemanticException(v + " must be runtime representable in equation " + eqn, eqn.position());
+                    throw new SemanticException(v
+                            + " must be runtime representable in equation "
+                            + eqn, eqn.position());
                 }
             }
         }
 
-        Label lhsBound = triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
-        Label rhsBound = triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());
+        Label lhsBound =
+                triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
+        Label rhsBound =
+                triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());
 
         if (shouldReport(4)) {
             report(4, "Checking equation: " + eqn);
@@ -813,8 +834,7 @@ public abstract class AbstractSolver implements Solver {
             for (Equation eqn : eqns) {
                 // if its in the current strongly connected set
                 // and its not in the Queue, add it
-                if (!Q.contains(eqn)
-                        && (!useSCC || currentSCC.contains(eqn))) // offensive but simple
+                if (!Q.contains(eqn) && (!useSCC || currentSCC.contains(eqn))) // offensive but simple
                     Q.add(eqn);
             }
         }
@@ -857,28 +877,33 @@ public abstract class AbstractSolver implements Solver {
 
         if (shouldReport(5)) {
             StackTraceElement[] stack = new Exception().getStackTrace();
-            String source = stack[4].getFileName() + ":" + stack[4].getLineNumber();
+            String source =
+                    stack[4].getFileName() + ":" + stack[4].getLineNumber();
             report(5, (constraint_counter + 1) + ": " + c + " << " + source);
         }
         if (shouldReport(6)) report(6, ">>> " + c.msg());
         inc_counter();
 
         if (!c.isCanonical()) {
-            throw new InternalCompilerError(c.position(), "Constraint is not canonical.");
+            throw new InternalCompilerError(c.position(),
+                    "Constraint is not canonical.");
         }
 
         if (c instanceof LabelConstraint) {
-            LabelConstraint lc = (LabelConstraint)c;
-            if (lc.lhsLabel() instanceof NotTaken && lc.kind() == LabelConstraint.LEQ) {
+            LabelConstraint lc = (LabelConstraint) c;
+            if (lc.lhsLabel() instanceof NotTaken
+                    && lc.kind() == LabelConstraint.LEQ) {
                 // if the LHS is NotTaken, then the constraint will always be
                 // satisfied.
                 return;
             }
 
-            if (lc.rhsLabel() instanceof NotTaken && lc.kind() == LabelConstraint.LEQ) {
+            if (lc.rhsLabel() instanceof NotTaken
+                    && lc.kind() == LabelConstraint.LEQ) {
                 // if the RHS is NotTaken (and the LHS isn't), then the
                 // constraint can never be satisfied.
-                LabelEquation eqn = new LabelEquation(lc.lhsLabel(), lc.rhsLabel(), lc);
+                LabelEquation eqn =
+                        new LabelEquation(lc.lhsLabel(), lc.rhsLabel(), lc);
                 reportError(eqn);
             }
         }
@@ -891,13 +916,15 @@ public abstract class AbstractSolver implements Solver {
      */
     protected void processConstraint(Constraint c) throws SemanticException {
         if (c instanceof LabelConstraint) {
-            LabelConstraint lc = (LabelConstraint)c;
-            if (lc.lhsLabel() instanceof VarLabel && lc.kind() == LabelConstraint.EQUAL) {
+            LabelConstraint lc = (LabelConstraint) c;
+            if (lc.lhsLabel() instanceof VarLabel
+                    && lc.kind() == LabelConstraint.EQUAL) {
                 // this is an equality constraint on a variable. Let's jump start the
                 // solving by setting it immediately
-                VarLabel v = (VarLabel)lc.lhsLabel();
+                VarLabel v = (VarLabel) lc.lhsLabel();
                 Label initialBound = bounds.applyTo(lc.rhsLabel());
-                addTrace(v, lc.rhsLabel(), lc.getEquations().iterator().next(), initialBound, InformationFlowTrace.Direction.BOTH);
+                addTrace(v, lc.rhsLabel(), lc.getEquations().iterator().next(),
+                        initialBound, InformationFlowTrace.Direction.BOTH);
                 setBound(v, initialBound, lc);
                 // only add the variable to the fixed value vars if the RHS does not contain
                 // any variables. Otherwise, the bound of v may need to change
@@ -906,9 +933,8 @@ public abstract class AbstractSolver implements Solver {
                     fixedValueVars.add(v);
                 }
             }
-        }
-        else if (c instanceof PrincipalConstraint) {
-            PrincipalConstraint pc = (PrincipalConstraint)c;
+        } else if (c instanceof PrincipalConstraint) {
+            PrincipalConstraint pc = (PrincipalConstraint) c;
             if ((pc.lhsPrincipal() instanceof VarPrincipal || pc.rhsPrincipal() instanceof VarPrincipal)
                     && pc.kind() == PrincipalConstraint.EQUIV) {
                 // this is an equality constraint on a variable. Let's jump start the
@@ -917,11 +943,10 @@ public abstract class AbstractSolver implements Solver {
                 VarPrincipal v = null;
                 Principal other = null;
                 if (pc.lhsPrincipal() instanceof VarPrincipal) {
-                    v = (VarPrincipal)pc.lhsPrincipal();
+                    v = (VarPrincipal) pc.lhsPrincipal();
                     other = pc.rhsPrincipal();
-                }
-                else {
-                    v = (VarPrincipal)pc.rhsPrincipal();
+                } else {
+                    v = (VarPrincipal) pc.rhsPrincipal();
                     other = pc.lhsPrincipal();
                 }
 
@@ -943,7 +968,8 @@ public abstract class AbstractSolver implements Solver {
      * @param c
      * @throws SemanticException
      */
-    protected void addConstraintEquations(Constraint c) throws SemanticException {
+    protected void addConstraintEquations(Constraint c)
+            throws SemanticException {
         Collection<Equation> eqns = c.getEquations();
         for (Equation eqn : eqns) {
             LabelEnv eqnEnv = eqn.env();
@@ -952,42 +978,48 @@ public abstract class AbstractSolver implements Solver {
                 // satisfied or not
                 boolean eqnSatisfied = false;
                 if (eqn instanceof LabelEquation) {
-                    LabelEquation leqn = (LabelEquation)eqn;
-                    eqnSatisfied = eqnEnv.leq(triggerTransforms(leqn.lhs(), eqnEnv), triggerTransforms(leqn.rhs(), eqnEnv));
-                }
-                else if (eqn instanceof PrincipalEquation) {
-                    PrincipalEquation peqn = (PrincipalEquation)eqn;
+                    LabelEquation leqn = (LabelEquation) eqn;
+                    eqnSatisfied =
+                            eqnEnv.leq(triggerTransforms(leqn.lhs(), eqnEnv),
+                                    triggerTransforms(leqn.rhs(), eqnEnv));
+                } else if (eqn instanceof PrincipalEquation) {
+                    PrincipalEquation peqn = (PrincipalEquation) eqn;
                     eqnSatisfied = eqnEnv.actsFor(peqn.lhs(), peqn.rhs());
-                }
-                else {
-                    throw new InternalCompilerError("Unexpected kind of equation: " + eqn);
+                } else {
+                    throw new InternalCompilerError(
+                            "Unexpected kind of equation: " + eqn);
                 }
                 if (!eqnSatisfied) {
                     if (shouldReport(2)) {
                         report(2, "Statically failed " + eqn);
                     }
                     if (shouldReport(3) && eqn instanceof LabelEquation) {
-                        report(3, "Statically failed " + triggerTransforms(((LabelEquation)eqn).lhs(), eqnEnv) + " <= " + triggerTransforms(((LabelEquation)eqn).rhs(), eqnEnv));
+                        report(3,
+                                "Statically failed "
+                                        + triggerTransforms(
+                                                ((LabelEquation) eqn).lhs(),
+                                                eqnEnv)
+                                        + " <= "
+                                        + triggerTransforms(
+                                                ((LabelEquation) eqn).rhs(),
+                                                eqnEnv));
                     }
 
                     // The equation is not satisfied.
                     if (THROW_STATIC_FAILED_CONSTRAINTS) {
                         throw reportError(eqn);
-                    }
-                    else {
+                    } else {
                         if (staticFailedConstraints == null) {
                             staticFailedConstraints =
                                     new LinkedHashSet<Equation>();
                         }
                         staticFailedConstraints.add(eqn);
                     }
-                }
-                else {
+                } else {
                     // The equation is satisfied, no need to add it to
                     // the queue.
                 }
-            }
-            else {
+            } else {
                 if (shouldReport(5)) report(5, "Adding equation: " + eqn);
                 eqnEnv.setSolver(this);
                 equations.add(eqn);
@@ -1111,8 +1143,10 @@ public abstract class AbstractSolver implements Solver {
      * Record the fact that label variable v, in the constraint eqn had its
      * bound set to the label lb.
      */
-    protected final void addTrace(VarLabel v, Label sourcelabel, Equation eqn, Label lb, Direction dir) {
-        fullTrace.add(new InformationFlowTrace(v, sourcelabel, dir, (LabelEquation)eqn));
+    protected final void addTrace(VarLabel v, Label sourcelabel, Equation eqn,
+            Label lb, Direction dir) {
+        fullTrace.add(new InformationFlowTrace(v, sourcelabel, dir,
+                (LabelEquation) eqn));
 
         List<Pair<Equation, Label>> trace = traces.get(v);
         if (trace == null) {
@@ -1137,8 +1171,9 @@ public abstract class AbstractSolver implements Solver {
             for (Pair<Equation, Label> eqn_label : history) {
                 Label label = eqn_label.part2();
                 Equation eqn = eqn_label.part1();
-                boolean test = lowerThreshold ? eqn.env().leq(threshold, label)
-                        : eqn.env().leq(label, threshold);
+                boolean test =
+                        lowerThreshold ? eqn.env().leq(threshold, label) : eqn
+                                .env().leq(label, threshold);
                 if (!test) {
                     return eqn;
                 }
@@ -1149,10 +1184,12 @@ public abstract class AbstractSolver implements Solver {
 
     protected Equation findContradictiveEqn(Constraint c) {
         if (c instanceof LabelConstraint) {
-            return findContradictiveEqn((LabelConstraint)c);
+            return findContradictiveEqn((LabelConstraint) c);
         }
-        throw new InternalCompilerError("Unexpected constraint type: " + c.getClass());
+        throw new InternalCompilerError("Unexpected constraint type: "
+                + c.getClass());
     }
+
     protected abstract Equation findContradictiveEqn(LabelConstraint c);
 
     /** Returns the pair [by_scc, scc_head] where
@@ -1202,7 +1239,7 @@ public abstract class AbstractSolver implements Solver {
         int[] scc_head = new int[n];
         Set<Equation> visited = new HashSet<Equation>();
         int head = 0;
-        for (int i=n-1; i>=0; i--) {
+        for (int i = n - 1; i >= 0; i--) {
             if (!visited.contains(sorted[i])) {
                 // First, find all the nodes in the SCC
                 Set<Equation> SCC = new HashSet<Equation>();
@@ -1246,7 +1283,7 @@ public abstract class AbstractSolver implements Solver {
                         nsorted++;
                     }
                 }
-                scc_head[head+scc_size-1] = head;
+                scc_head[head + scc_size - 1] = head;
                 scc_head[head] = -1;
                 head = head + scc_size;
             }
@@ -1263,15 +1300,16 @@ public abstract class AbstractSolver implements Solver {
 //        }
         return new Pair<Equation[], int[]>(by_scc, scc_head);
     }
+
     protected class Frame {
         Equation eqn;
         Iterator<Equation> edges;
+
         Frame(Equation e, boolean forward) {
             eqn = e;
             if (forward) {
                 edges = eqnEqnDependencies(e).iterator();
-            }
-            else {
+            } else {
                 edges = eqnEqnReverseDependencies(e).iterator();
             }
         }
@@ -1284,6 +1322,7 @@ public abstract class AbstractSolver implements Solver {
     protected static class EquationQueue {
         final LinkedList<Equation> list;
         final Set<Equation> elements;
+
         public EquationQueue() {
             list = new LinkedList<Equation>();
             elements = new HashSet<Equation>();
@@ -1293,10 +1332,12 @@ public abstract class AbstractSolver implements Solver {
             list = new LinkedList<Equation>(c);
             elements = new HashSet<Equation>(c);
         }
+
         public EquationQueue(EquationQueue q) {
             list = new LinkedList<Equation>(q.list);
             elements = new HashSet<Equation>(q.elements);
         }
+
         public boolean contains(Equation eqn) {
             return elements.contains(eqn);
         }
@@ -1308,20 +1349,24 @@ public abstract class AbstractSolver implements Solver {
                 }
             }
         }
+
         public Equation removeFirst() {
             Equation e = list.removeFirst();
             elements.remove(e);
             return e;
         }
+
         public boolean isEmpty() {
             return list.isEmpty();
         }
+
         public void add(Equation eqn) {
             if (!elements.contains(eqn)) {
                 list.add(eqn);
                 elements.add(eqn);
             }
         }
+
         public void addFirst(Equation eqn) {
             if (elements.contains(eqn)) {
                 // already in the queue. remove it.
@@ -1345,7 +1390,8 @@ public abstract class AbstractSolver implements Solver {
             reportTrace(v);
         Equation reporteqn = (Equation) eqn.copy();
         bounds.applyTo(reporteqn);
-        return new UnsatisfiableConstraintException(this, reporteqn, new FailedConstraintSnapshot(eqn, bounds.copy()));
+        return new UnsatisfiableConstraintException(this, reporteqn,
+                new FailedConstraintSnapshot(eqn, bounds.copy()));
     }
 
     /** Report a trace for a given variable. */

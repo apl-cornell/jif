@@ -13,8 +13,10 @@ import jif.ast.LabelExpr;
 import jif.ast.PrincipalNode;
 import jif.extension.JifArrayAccessDel;
 import jif.extension.JifCallDel;
+import jif.extension.JifConstructorCallDel;
 import jif.extension.JifFieldDel;
 import jif.extension.JifFormalDel;
+import jif.extension.JifNewDel;
 import jif.extension.JifThrowDel;
 import jif.types.JifSubstType;
 import jif.types.JifTypeSystem;
@@ -34,6 +36,7 @@ import polyglot.ast.Binary;
 import polyglot.ast.Call;
 import polyglot.ast.Cast;
 import polyglot.ast.Conditional;
+import polyglot.ast.ConstructorCall;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
 import polyglot.ast.FieldAssign;
@@ -510,8 +513,34 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
         } else if (n instanceof Instanceof) {
             checkTypeNode(((Instanceof) n).compareType(), inItem);
         } else if (n instanceof New) {
+            checkQualifier((New) n, inItem);
             checkTypeNode(((New) n).objectType(), inItem);
+        } else if (n instanceof ConstructorCall) {
+            checkQualifier((ConstructorCall) n, inItem);
         }
+
+    }
+
+    private void checkQualifier(ConstructorCall n, DataFlowItem inItem) {
+        boolean neverNull = false;
+        if ((inItem != null && inItem.exprIsNotNull(n.qualifier()))
+                || (inItem == null && DataFlowItem.exprIsNotNullStatic(n
+                        .qualifier()))) {
+            // the receiver is not null
+            neverNull = true;
+        }
+        ((JifConstructorCallDel) n.del()).setQualifierIsNeverNull(neverNull);
+    }
+
+    private void checkQualifier(New n, DataFlowItem inItem) {
+        boolean neverNull = false;
+        if ((inItem != null && inItem.exprIsNotNull(n.qualifier()))
+                || (inItem == null && DataFlowItem.exprIsNotNullStatic(n
+                        .qualifier()))) {
+            // the receiver is not null
+            neverNull = true;
+        }
+        ((JifNewDel) n.del()).setQualifierIsNeverNull(neverNull);
     }
 
     private void checkField(Field f, DataFlowItem inItem) {

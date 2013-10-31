@@ -12,7 +12,7 @@ public interface CallerConstraintNode extends ConstraintNode<CallerConstraint> {
     /**Gets the list of principals who need to grant their
      * authorities to the caller. */
     List<PrincipalNode> principals();
-    
+
     /**Returns a copy of this node with the principal list updated. */
     CallerConstraintNode principals(List<PrincipalNode> principals);
 }

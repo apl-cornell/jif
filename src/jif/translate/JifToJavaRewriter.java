@@ -46,23 +46,20 @@ import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
 
 /** Visitor which performs rewriting on the AST. */
-public class JifToJavaRewriter extends ContextVisitor
-{
+public class JifToJavaRewriter extends ContextVisitor {
     protected ExtensionInfo java_ext;
     protected JifTypeSystem jif_ts;
     protected JifNodeFactory jif_nf;
     protected QQ qq;
-    
+
     protected Collection<ClassDecl> additionalClassDecls;
     protected Collection<SourceFile> newSourceFiles;
-    
+
     protected List<Stmt> initializations;
     protected List<Block> staticInitializations;
 
-    public JifToJavaRewriter(Job job,
-                             JifTypeSystem jif_ts,
-                             JifNodeFactory jif_nf,
-                             ExtensionInfo java_ext) {
+    public JifToJavaRewriter(Job job, JifTypeSystem jif_ts,
+            JifNodeFactory jif_nf, ExtensionInfo java_ext) {
         //super(jif_ts);
         super(job, jif_ts, java_ext.nodeFactory());
         this.job = job;
@@ -83,14 +80,12 @@ public class JifToJavaRewriter extends ContextVisitor
             List<SourceFile> sources = c.sources();
             for (SourceFile sf : sources) {
                 java_ext.scheduler().addJob(sf.source(), sf);
-                
+
             }
-        }
-        else {
+        } else {
             java_ext.scheduler().addJob(job.source(), ast);
         }
 
-        
         // now add any additional source files, which should all be public.
         for (SourceFile sf : newSourceFiles) {
             java_ext.scheduler().addJob(sf.source(), sf);
@@ -124,16 +119,15 @@ public class JifToJavaRewriter extends ContextVisitor
         try {
             JifExt ext = JifUtil.jifExt(n);
             return ext.toJava().toJavaEnter(this);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             Position position = e.position();
 
             if (position == null) {
                 position = n.position();
             }
 
-            errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                 e.getMessage(), position);
+            errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
+                    position);
 
             return this;
         }
@@ -148,16 +142,15 @@ public class JifToJavaRewriter extends ContextVisitor
             if (m.del() instanceof JifExt)
                 throw new InternalCompilerError(m + " is still a Jif node.");
             return m;
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             Position position = e.position();
 
             if (position == null) {
                 position = n.position();
             }
 
-            errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                 e.getMessage(), position);
+            errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
+                    position);
 
             return n;
         }
@@ -165,10 +158,10 @@ public class JifToJavaRewriter extends ContextVisitor
 
     public Expr paramToJava(Param param) throws SemanticException {
         if (param instanceof Label) {
-            return labelToJava((Label)param);
+            return labelToJava((Label) param);
         }
         if (param instanceof Principal) {
-            return principalToJava((Principal)param);
+            return principalToJava((Principal) param);
         }
         throw new InternalCompilerError("Unexpected param " + param);
     }
@@ -185,7 +178,7 @@ public class JifToJavaRewriter extends ContextVisitor
         NodeFactory nf = this.java_nf();
         TypeSystem ts = this.java_ts();
         JifTypeSystem jifts = this.jif_ts();
-        
+
         if (t.isNull()) return canonical(nf, ts.Null(), pos);
         if (t.isVoid()) return canonical(nf, ts.Void(), pos);
         if (t.isBoolean()) return canonical(nf, ts.Boolean(), pos);
@@ -196,27 +189,27 @@ public class JifToJavaRewriter extends ContextVisitor
         if (t.isLong()) return canonical(nf, ts.Long(), pos);
         if (t.isFloat()) return canonical(nf, ts.Float(), pos);
         if (t.isDouble()) return canonical(nf, ts.Double(), pos);
-        
+
         if (jifts.isLabel(t)) {
-        	return nf.TypeNodeFromQualifiedName(pos, jifts.LabelClassName());
+            return nf.TypeNodeFromQualifiedName(pos, jifts.LabelClassName());
         }
-        
+
         if (jifts.isPrincipal(t)) {
-        	return nf.TypeNodeFromQualifiedName(pos, jifts.PrincipalClassName());
+            return nf
+                    .TypeNodeFromQualifiedName(pos, jifts.PrincipalClassName());
         }
-        
+
         if (t.isArray()) {
-            return nf.ArrayTypeNode(pos,
-                                    typeToJava(t.toArray().base(), pos));
+            return nf.ArrayTypeNode(pos, typeToJava(t.toArray().base(), pos));
         }
-        
+
         if (t.isClass()) {
-         	return nf.TypeNodeFromQualifiedName(pos, t.toClass().fullName());
+            return nf.TypeNodeFromQualifiedName(pos, t.toClass().fullName());
         }
-        
+
         throw new InternalCompilerError("Cannot translate type " + t + ".");
     }
-    
+
     protected TypeNode canonical(NodeFactory nf, Type t, Position pos) {
         return nf.CanonicalTypeNode(pos, t);
     }
@@ -235,17 +228,20 @@ public class JifToJavaRewriter extends ContextVisitor
     public void enteringClass(ClassType t) {
         this.currentClass = t;
     }
+
     public void leavingClass() {
         this.currentClass = null;
     }
+
     public void addInitializer(Block s) {
-        this.initializations.add(s);        
+        this.initializations.add(s);
     }
-    
+
     /**
      * @throws SemanticException  
      */
-    public void addInitializer(FieldInstance fi, Expr init) throws SemanticException {
+    public void addInitializer(FieldInstance fi, Expr init)
+            throws SemanticException {
         Stmt s = qq().parseStmt(fi.name() + " = %E;", init);
         this.initializations.add(s);
     }
@@ -255,8 +251,9 @@ public class JifToJavaRewriter extends ContextVisitor
     }
 
     public void addStaticInitializer(Block s) {
-        this.staticInitializations.add(s);                
+        this.staticInitializations.add(s);
     }
+
     public List<Block> getStaticInitializations() {
         return this.staticInitializations;
     }
@@ -278,30 +275,34 @@ public class JifToJavaRewriter extends ContextVisitor
             if (cd.flags().isPublic()) {
                 try {
                     // cd is public, we will put it in it's own source file.
-                    SourceFile sf = java_nf().SourceFile(Position.compilerGenerated(), 
-                                                         n.package_(), 
-                                                         Collections
-                                                                .<Import> emptyList(),
-                                                         Collections.singletonList((TopLevelDecl) cd));
-                
+                    SourceFile sf =
+                            java_nf().SourceFile(
+                                    Position.compilerGenerated(),
+                                    n.package_(),
+                                    Collections.<Import> emptyList(),
+                                    Collections
+                                            .singletonList((TopLevelDecl) cd));
+
                     Location location = java_ext.getOptions().source_output;
-                    String pkgName = ""; 
-                    if(sf.package_()!=null)
+                    String pkgName = "";
+                    if (sf.package_() != null)
                         pkgName = sf.package_().package_().fullName() + ".";
-                    JavaFileObject jfo = java_ext.extFileManager().getJavaFileForOutput(location, pkgName + cd.name(), Kind.SOURCE, null);
+                    JavaFileObject jfo =
+                            java_ext.extFileManager().getJavaFileForOutput(
+                                    location, pkgName + cd.name(), Kind.SOURCE,
+                                    null);
                     Source s = java_ext.createFileSource(jfo, false);
                     sf = sf.source(s);
                     this.newSourceFiles.add(sf);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
-            else {
+            } else {
                 // cd is not public; it's ok to put the class decl in the source file.
                 l.add(cd);
             }
-        }    
-        
+        }
+
         this.additionalClassDecls.clear();
         return n.decls(l);
     }

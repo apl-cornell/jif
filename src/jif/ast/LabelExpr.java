@@ -7,5 +7,6 @@ import polyglot.ast.Expr;
  */
 public interface LabelExpr extends Expr {
     LabelNode label();
+
     LabelExpr label(LabelNode label);
 }

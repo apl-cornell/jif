@@ -53,6 +53,9 @@ import polyglot.util.Position;
 /** Jif type system.
  */
 public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
+    @Override
+    JifContext createContext();
+
     // Type constructors
 
     /** Returns the "label" type. */

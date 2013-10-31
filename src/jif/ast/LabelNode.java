@@ -6,5 +6,6 @@ import jif.types.label.Label;
  */
 public interface LabelNode extends ActsForParamNode<Label>, LabelComponentNode {
     Label label();
+
     LabelNode label(Label L);
 }

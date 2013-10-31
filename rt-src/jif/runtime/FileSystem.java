@@ -14,12 +14,12 @@ import jif.lang.Principal;
 /** This class represents the file system, through which you can query
  *  and set the security labels of files.
  */
-public class FileSystem
-{
+public class FileSystem {
     /** Get the security label of <code>file</code>. */
     public static Label labelOf(String file) throws FileNotFoundException {
         File f = new File(file);
-        if (!f.exists()) throw new FileNotFoundException("File " + file + " not found");
+        if (!f.exists())
+            throw new FileNotFoundException("File " + file + " not found");
         String[] readers = readers(file);
 //        String[] writers = writers(file);
         String owner = owner(file);
@@ -90,7 +90,7 @@ public class FileSystem
         while (!supers.isEmpty()) {
             jif.lang.Principal one = supers.iterator().next();
             if (one instanceof NativePrincipal) {
-                supers.addAll(((NativePrincipal)one).superiors());
+                supers.addAll(((NativePrincipal) one).superiors());
                 grps.add(one);
             }
             supers.remove(one);
@@ -103,6 +103,7 @@ public class FileSystem
             String[] readers);
 
     private static native String[] readers(String file);
+
 //    private static native String[] writers(String file);
 
     private static native String owner(String file);

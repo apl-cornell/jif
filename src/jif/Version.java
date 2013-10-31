@@ -12,28 +12,28 @@ package jif;
  *   ant bump-patch    (Bumps the patch level.)
  */
 public class Version extends polyglot.main.Version {
-  @Override
-  public String name() {
-    return "jif";
-  }
+    @Override
+    public String name() {
+        return "jif";
+    }
 
-  @Override
-  public int major() {
-    return 3;
-  }
+    @Override
+    public int major() {
+        return 3;
+    }
 
-  @Override
-  public int minor() {
-    return 5;
-  }
+    @Override
+    public int minor() {
+        return 5;
+    }
 
-  @Override
-  public int patch_level() {
-    return 0;
-  }
+    @Override
+    public int patch_level() {
+        return 0;
+    }
 
-  @Override
-  public String toString() {
-    return "3.5.0 (2013-04-17 13:29:51 EDT)";
-  }
+    @Override
+    public String toString() {
+        return "3.5.0 (2013-04-17 13:29:51 EDT)";
+    }
 }

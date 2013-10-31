@@ -19,8 +19,7 @@ import polyglot.util.CodeWriter;
  * sharing, with "lazy" copying of the necessary entries, but this is easy to
  * implement.
  */
-public class PathMap
-{
+public class PathMap {
     protected Map<Path, Label> map;
     protected JifTypeSystem ts;
 
@@ -41,23 +40,37 @@ public class PathMap
 
         if (L instanceof NotTaken) {
             n.map.remove(p);
-        }
-        else {
+        } else {
             n.map.put(p, L);
         }
 
         return n;
     }
 
-    public Label N() { return get(Path.N); }
-    public PathMap N(Label label) { return set(Path.N, label); }
+    public Label N() {
+        return get(Path.N);
+    }
+
+    public PathMap N(Label label) {
+        return set(Path.N, label);
+    }
 
     /** Normal value label */
-    public Label NV() { return get(Path.NV); }
-    public PathMap NV(Label label) { return set(Path.NV, label); }
+    public Label NV() {
+        return get(Path.NV);
+    }
 
-    public Label R() { return get(Path.R); }
-    public PathMap R(Label label) { return set(Path.R, label); }
+    public PathMap NV(Label label) {
+        return set(Path.NV, label);
+    }
+
+    public Label R() {
+        return get(Path.R);
+    }
+
+    public PathMap R(Label label) {
+        return set(Path.R, label);
+    }
 
     public PathMap exception(Type type, Label label) {
         return set(ts.exceptionPath(type), label);
@@ -94,7 +107,7 @@ public class PathMap
 
         // Iterate over the elements of X, joining those labels with the ones
         // in this and adding the ones that aren't there.
-        for (Map.Entry<Path, Label> e :m.map.entrySet()) {
+        for (Map.Entry<Path, Label> e : m.map.entrySet()) {
             Path p = e.getKey();
             Label l1 = e.getValue();
             Label l2 = n.get(p);
@@ -115,7 +128,7 @@ public class PathMap
 
         return n;
     }
-    
+
     public PathMap subst(VarMap bounds) {
         PathMap n = new PathMap(ts);
 
@@ -132,7 +145,8 @@ public class PathMap
     public String toString() {
         String s = "";
 
-        for (Iterator<Map.Entry<Path, Label>> i = map.entrySet().iterator(); i.hasNext(); ) {
+        for (Iterator<Map.Entry<Path, Label>> i = map.entrySet().iterator(); i
+                .hasNext();) {
             Map.Entry<Path, Label> e = i.next();
             Path p = e.getKey();
             Label L = e.getValue();
@@ -156,12 +170,12 @@ public class PathMap
             Path p = e.getKey();
             Label L = e.getValue();
 
-            if (! first) {
+            if (!first) {
                 w.allowBreak(0);
                 first = false;
             }
 
-            w.write(p.toString()+ ":" + L.toString());
+            w.write(p.toString() + ":" + L.toString());
         }
 
         w.end();

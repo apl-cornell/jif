@@ -10,10 +10,9 @@ import polyglot.ast.ConstructorDecl;
  *  the return label, and various constraints, including the authority
  *  constraint, the caller constraint, and the acts-for constraint. 
  */
-public interface JifConstructorDecl extends JifProcedureDecl, ConstructorDecl 
-{
+public interface JifConstructorDecl extends JifProcedureDecl, ConstructorDecl {
     JifConstructorDecl startLabel(LabelNode startLabel);
-    
+
     JifConstructorDecl returnLabel(LabelNode returnLabel);
 
     JifConstructorDecl constraints(List<ConstraintNode<Assertion>> constraints);

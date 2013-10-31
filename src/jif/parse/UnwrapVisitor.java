@@ -10,8 +10,7 @@ import polyglot.visit.NodeVisitor;
  * A visitor which tries to unwrap every <code>Wrapper</code> object in
  *  the node it visits.
  */
-public class UnwrapVisitor extends NodeVisitor
-{
+public class UnwrapVisitor extends NodeVisitor {
     boolean error;
 
     public boolean isError() {
@@ -20,11 +19,10 @@ public class UnwrapVisitor extends NodeVisitor
 
     @Override
     public Node override(Node n) {
-        if (! error && n instanceof Wrapper) {
+        if (!error && n instanceof Wrapper) {
             try {
                 return ((Wrapper) n).amb.toExpr();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 error = true;
             }
         }
@@ -36,5 +34,3 @@ public class UnwrapVisitor extends NodeVisitor
         return null;
     }
 }
-
-

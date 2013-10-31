@@ -7,5 +7,6 @@ import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 
 public interface LabelToJavaExpr extends Serializable {
-    public Expr toJava(Label label, JifToJavaRewriter rw) throws SemanticException;
+    public Expr toJava(Label label, JifToJavaRewriter rw)
+            throws SemanticException;
 }

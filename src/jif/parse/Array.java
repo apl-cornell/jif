@@ -18,6 +18,7 @@ public class Array extends Amb {
     public Array(Grm parser, Position pos, TypeNode prefix) {
         this(parser, pos, prefix, false);
     }
+
     public Array(Grm parser, Position pos, TypeNode prefix, boolean isConst) {
         super(parser, pos);
         this.prefix = prefix;
@@ -27,6 +28,7 @@ public class Array extends Amb {
     public TypeNode prefix() {
         return prefix;
     }
+
     public boolean isConst() {
         return isConst;
     }
@@ -36,7 +38,7 @@ public class Array extends Amb {
         // if the (unlabeled) base type is an array, inherit the constness from that.
         TypeNode base = prefix;
         if (base instanceof LabeledTypeNode) {
-            base = ((LabeledTypeNode)base).typePart();
+            base = ((LabeledTypeNode) base).typePart();
         }
         if (isConst || (base instanceof ConstArrayTypeNode)) {
             return parser.nf.ConstArrayTypeNode(pos, prefix);
@@ -45,8 +47,12 @@ public class Array extends Amb {
     }
 
     @Override
-    public TypeNode toUnlabeledType() { return toType(); }
-    @Override
-    public Receiver toReceiver() { return toType(); }
-}
+    public TypeNode toUnlabeledType() {
+        return toType();
+    }
 
+    @Override
+    public Receiver toReceiver() {
+        return toType();
+    }
+}

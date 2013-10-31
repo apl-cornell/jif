@@ -9,8 +9,7 @@ import polyglot.util.Position;
 
 /** A Jif label with names for the debuging use.
  */
-public class NamedLabel
-{
+public class NamedLabel {
     protected Map<String, Label> nameToLabels;
     protected Map<String, String> nameToDescrip;
     protected String totalName;
@@ -53,39 +52,40 @@ public class NamedLabel
         return join(lc, name, null, l);
 
     }
+
     public NamedLabel join(LabelChecker lc, String name, String descrip, Label l) {
         nameToLabels.put(name, l);
         if (descrip != null) {
             nameToDescrip.put(name, descrip);
         }
 
-        if (label==null) {
+        if (label == null) {
             label = l;
             if (pos == null) pos = l.position();
             this.totalName = name;
-        }
-        else {
+        } else {
             label = lc.upperBound(label, l);
             this.totalName += " join " + name;
         }
         return this;
     }
+
     public NamedLabel meet(LabelChecker lc, String name, Label l) {
         return meet(lc, name, null, l);
 
     }
+
     public NamedLabel meet(LabelChecker lc, String name, String descrip, Label l) {
         nameToLabels.put(name, l);
         if (descrip != null) {
             nameToDescrip.put(name, descrip);
         }
 
-        if (label==null) {
+        if (label == null) {
             label = l;
             if (pos == null) pos = l.position();
             this.totalName = name;
-        }
-        else {
+        } else {
             label = lc.lowerBound(label, l);
             this.totalName += " meet " + name;
         }

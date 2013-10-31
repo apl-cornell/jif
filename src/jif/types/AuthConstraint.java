@@ -8,5 +8,6 @@ import jif.types.principal.Principal;
  */
 public interface AuthConstraint extends Assertion {
     List<Principal> principals();
+
     AuthConstraint principals(List<Principal> principals);
 }

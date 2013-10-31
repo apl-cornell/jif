@@ -22,7 +22,6 @@ public class PrincipalHierarchy {
      */
     private final Map<Principal, Set<Principal>> actsfor;
 
-
     /**
      * Map from Principal to Set[Principal], where if p' actsfor p, then
      * p' is in the set actsfor.get(p)
@@ -42,7 +41,7 @@ public class PrincipalHierarchy {
 
     @Override
     public String toString() {
-        return "[" + actsForString()+ "]";
+        return "[" + actsForString() + "]";
     }
 
     private static void addAlreadyReported(
@@ -66,6 +65,7 @@ public class PrincipalHierarchy {
         }
         return false;
     }
+
     public String actsForString() {
         StringBuffer sb = new StringBuffer();
         Map<Principal, Set<Principal>> alreadyReported =
@@ -89,8 +89,7 @@ public class PrincipalHierarchy {
                     // q also acts for p
                     sb.append(" equiv ");
                     addAlreadyReported(alreadyReported, p, q);
-                }
-                else {
+                } else {
                     sb.append(" actsFor ");
                 }
                 sb.append(q.toString());
@@ -104,6 +103,7 @@ public class PrincipalHierarchy {
     public boolean isEmpty() {
         return actsfor.isEmpty();
     }
+
     public void add(Principal actor, Principal granter) {
         Set<Principal> s = actsfor.get(actor);
         if (s == null) {
@@ -131,15 +131,21 @@ public class PrincipalHierarchy {
             this.actor = actor;
             this.granter = granter;
         }
+
         final Principal actor;
         final Principal granter;
+
         @Override
-        public int hashCode() { return actor.hashCode() ^ granter.hashCode(); }
+        public int hashCode() {
+            return actor.hashCode() ^ granter.hashCode();
+        }
+
         @Override
         public boolean equals(Object o) {
             if (o instanceof PrincipalPair) {
-                PrincipalPair that = (PrincipalPair)o;
-                return this.actor.equals(that.actor) && this.granter.equals(that.granter);
+                PrincipalPair that = (PrincipalPair) o;
+                return this.actor.equals(that.actor)
+                        && this.granter.equals(that.granter);
             }
             return false;
         }
@@ -151,8 +157,7 @@ public class PrincipalHierarchy {
         if (granter.isBottomPrincipal()) return true;
 
         Set<Principal> actorCached = actorCache.get(actor);
-        if (actorCached != null && actorCached.contains(granter))
-            return true;
+        if (actorCached != null && actorCached.contains(granter)) return true;
 
         PrincipalPair currentGoal = new PrincipalPair(actor, granter);
         if (goalStack.contains(currentGoal)) {
@@ -177,7 +182,7 @@ public class PrincipalHierarchy {
 
         // special cases for conjunctive and disjunctive principals.
         if (actor instanceof ConjunctivePrincipal) {
-            ConjunctivePrincipal cp = (ConjunctivePrincipal)actor;
+            ConjunctivePrincipal cp = (ConjunctivePrincipal) actor;
             // cp actsfor granter if at least one of the conjucts act for granter
             for (Principal p : cp.conjuncts()) {
                 if (actsFor(p, granter, goalStack)) {
@@ -187,7 +192,7 @@ public class PrincipalHierarchy {
             }
         }
         if (actor instanceof DisjunctivePrincipal) {
-            DisjunctivePrincipal dp = (DisjunctivePrincipal)actor;
+            DisjunctivePrincipal dp = (DisjunctivePrincipal) actor;
             // dp actsfor granter if all of the disjucts act for granter
             boolean all = true;
             for (Principal p : dp.disjuncts()) {
@@ -203,7 +208,7 @@ public class PrincipalHierarchy {
         }
 
         if (granter instanceof DisjunctivePrincipal) {
-            DisjunctivePrincipal dp = (DisjunctivePrincipal)granter;
+            DisjunctivePrincipal dp = (DisjunctivePrincipal) granter;
             // actor actsfor dp if there is one disjunct that actor can act for
             for (Principal p : dp.disjuncts()) {
                 if (actsFor(actor, p, goalStack)) {
@@ -214,7 +219,7 @@ public class PrincipalHierarchy {
         }
 
         if (granter instanceof ConjunctivePrincipal) {
-            ConjunctivePrincipal cp = (ConjunctivePrincipal)granter;
+            ConjunctivePrincipal cp = (ConjunctivePrincipal) granter;
             // actor actsfor cp if actor actsfor all conjuncts
             boolean all = true;
             for (Principal p : cp.conjuncts()) {
@@ -227,7 +232,6 @@ public class PrincipalHierarchy {
                 cacheResult(actor, granter);
                 return true;
             }
-
 
         }
 
@@ -256,6 +260,7 @@ public class PrincipalHierarchy {
         goalStack.removeLast();
         return false;
     }
+
     private void cacheResult(Principal actor, Principal granter) {
         Set<Principal> s = actorCache.get(actor);
         if (s == null) {

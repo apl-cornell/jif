@@ -1,6 +1,5 @@
 package jif.types;
 
-
 import jif.ast.JifProcedureDecl;
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
@@ -11,8 +10,7 @@ import polyglot.ast.TypeNode;
 import polyglot.types.Type;
 import polyglot.util.Position;
 
-public class VarSignature implements DefaultSignature
-{
+public class VarSignature implements DefaultSignature {
     JifTypeSystem ts;
 
     public VarSignature(JifTypeSystem ts) {
@@ -51,13 +49,11 @@ public class VarSignature implements DefaultSignature
         Label Lrv;
         if (jpd.returnLabel() != null)
             Lrv = jpd.returnLabel().label();
-        else
-            Lrv = defaultReturnLabel(pd);
+        else Lrv = defaultReturnLabel(pd);
 
-
-        JifProcedureInstance pi = (JifProcedureInstance)pd.procedureInstance();
+        JifProcedureInstance pi = (JifProcedureInstance) pd.procedureInstance();
         for (Type t : pi.formalTypes()) {
-            ArgLabel a = (ArgLabel)ts.labelOfType(t);
+            ArgLabel a = (ArgLabel) ts.labelOfType(t);
             Lrv = ts.join(Lrv, a);
         }
 

@@ -12,17 +12,20 @@ import polyglot.ast.ClassDecl;
  */
 public interface JifClassDecl extends ClassDecl {
     List<ParamDecl> params();
+
     JifClassDecl params(List<ParamDecl> params);
 
     List<PrincipalNode> authority();
+
     JifClassDecl authority(List<PrincipalNode> authority);
-    
+
     List<ConstraintNode<Assertion>> constraints();
 
     JifClassDecl constraints(List<ConstraintNode<Assertion>> constraints);
 
     JifClassDecl type(polyglot.types.Type type);
-    
+
     JifContext addParamsToContext(JifContext A);
-    JifContext  addAuthorityToContext(JifContext A);    
+
+    JifContext addAuthorityToContext(JifContext A);
 }

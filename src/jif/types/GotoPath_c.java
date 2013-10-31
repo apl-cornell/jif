@@ -11,44 +11,40 @@ public class GotoPath_c implements Path {
     final Branch.Kind kind;
 
     public GotoPath_c(Branch.Kind kind, String label) {
-	this.kind = kind;
-	this.label = label;
+        this.kind = kind;
+        this.label = label;
     }
 
     @Override
     public String toString() {
-	return (kind == Branch.BREAK ? "break " : "continue ")
-	    + label;
+        return (kind == Branch.BREAK ? "break " : "continue ") + label;
     }
 
     @Override
     public boolean equals(Object o) {
-	if (! (o instanceof GotoPath_c)) {
-	    return false;
-	}
+        if (!(o instanceof GotoPath_c)) {
+            return false;
+        }
 
-	GotoPath_c that = (GotoPath_c) o;
+        GotoPath_c that = (GotoPath_c) o;
 
-	if (this.kind != that.kind) {
-	    return false;
-	}
+        if (this.kind != that.kind) {
+            return false;
+        }
 
-	if (this.label == null) {
-	    return that.label == null;
-	}
-	else {
-	    return this.label.equals(that.label);
-	}
+        if (this.label == null) {
+            return that.label == null;
+        } else {
+            return this.label.equals(that.label);
+        }
     }
 
     @Override
     public int hashCode() {
-	if (label == null) {
-	    return kind.hashCode();
-	}
-	else {
-	    return kind.hashCode() + label.hashCode();
-	}
+        if (label == null) {
+            return kind.hashCode();
+        } else {
+            return kind.hashCode() + label.hashCode();
+        }
     }
 }
-

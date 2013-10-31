@@ -41,7 +41,11 @@ public class JifClassBodyExt extends JifExt_c {
 
         for (ClassMember cm : n.members()) {
             try {
-                members.add((ClassMember) lc.context(A).labelCheck(cm));
+                // labelCheck() imperatively updates LabelChecker.solver.
+                // The solver should only be used for checking this particular
+                // member.
+                LabelChecker lc_ = (LabelChecker) lc.copy();
+                members.add((ClassMember) lc_.context(A).labelCheck(cm));
             } catch (SemanticException e) {
                 // report it and keep going.
                 lc.reportSemanticException(e);

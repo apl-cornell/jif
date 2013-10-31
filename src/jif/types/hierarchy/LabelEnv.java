@@ -16,8 +16,7 @@ import jif.types.principal.Principal;
 /** An environment of assertions about label relationships. The relationships
  *  between different labels can be queried in this environment using {@code leq}".
  */
-public interface LabelEnv
-{
+public interface LabelEnv {
     // returns true if "L1 <= L2"
     boolean leq(Label L1, Label L2);
 
@@ -25,6 +24,7 @@ public interface LabelEnv
     boolean leq(Label L1, Label L2, SearchState state);
 
     boolean leq(Policy p1, Policy p2);
+
     boolean leq(Policy p1, Policy p2, SearchState state);
 
     boolean actsFor(Principal p, Principal q);
@@ -42,7 +42,7 @@ public interface LabelEnv
      * determine a more precise bound. 
      */
     Label findLowerBound(Label L);
-    
+
     /**
      * Finds an upper bound for L that does not have any arg labels in it.
      * May return the top label if there is insufficient information to
@@ -66,38 +66,39 @@ public interface LabelEnv
      * The collection of label assertions
      */
     Collection<LabelLeAssertion> labelAssertions();
-    
+
     /**
      * The static principal hierarchy
      */
     PrincipalHierarchy principalHierarchy();
-    
+
     /**
      * Trigger any writersToReaders transforms in label, and return the result.
      */
     Label triggerTransforms(Label label);
-    
+
     /**
      * Is this environment empty, or does is contain some constraints?
      */
     boolean isEmpty();
-    
+
     /**
      * Do any of the assertions in this label environment contain variables? 
      */
     boolean hasVariables();
-    
+
     /**
      * Set the solver used for this Label Environment. When necessary, the
      * label environment will use the variable bounds of label variables
      * when determining if constraints are satisfied.
      */
     void setSolver(Solver solver);
-    
+
     /**
      * Encapsulates the solvers search state. 
      */
-    public interface SearchState { }
+    public interface SearchState {
+    }
 
     /**
      * This method checks if two access paths are equivalent. Called in two cases:

@@ -20,6 +20,7 @@ import jif.extension.JifInstanceOfDel;
 import jif.extension.JifLocalDeclDel;
 import jif.extension.JifMethodDeclDel;
 import jif.extension.JifNewArrayDel;
+import jif.extension.JifNewDel;
 import jif.extension.JifProcedureDeclDel;
 import jif.extension.JifThrowDel;
 import jif.extension.JifTypeNodeDel;
@@ -29,7 +30,8 @@ import polyglot.ast.JL;
 /**
  * Constructs Jif delegates
  **/
-public class JifDelFactory_c extends AbstractDelFactory_c implements JifDelFactory {
+public class JifDelFactory_c extends AbstractDelFactory_c implements
+        JifDelFactory {
 
     protected JifDelFactory_c() {
         super();
@@ -39,10 +41,12 @@ public class JifDelFactory_c extends AbstractDelFactory_c implements JifDelFacto
     protected JL delAssignImpl() {
         return new JifAssignDel();
     }
+
     @Override
     protected JL delArrayAccessImpl() {
         return new JifArrayAccessDel();
     }
+
     @Override
     protected JL delArrayAccessAssignImpl() {
         return new JifArrayAccessAssignDel();
@@ -57,53 +61,70 @@ public class JifDelFactory_c extends AbstractDelFactory_c implements JifDelFacto
     protected JL delBinaryImpl() {
         return new JifBinaryDel();
     }
+
     @Override
     protected JL delCallImpl() {
         return new JifCallDel();
     }
+
     @Override
     protected JL delCastImpl() {
         return new JifCastDel();
     }
+
     @Override
     protected JL delCatchImpl() {
         return new JifCatchDel();
     }
+
     @Override
     protected JL delClassDeclImpl() {
         return new JifClassDeclDel();
     }
+
     @Override
     protected JL delFieldDeclImpl() {
         return new JifFieldDeclDel();
     }
+
     @Override
     protected JL delFieldImpl() {
         return new JifFieldDel();
     }
+
     @Override
     protected JL delFieldAssignImpl() {
         return new JifFieldAssignDel();
     }
+
     @Override
     protected JL delFormalImpl() {
         return new JifFormalDel();
     }
+
     @Override
     protected JL delIfImpl() {
         return new JifIfDel();
     }
+
     @Override
     protected JL delInitializerImpl() {
         return new JifInitializerDel();
     }
+
     @Override
     protected JL delInstanceofImpl() {
         return new JifInstanceOfDel();
     }
+
     @Override
     protected JL delLocalDeclImpl() {
         return new JifLocalDeclDel();
+    }
+
+    @Override
+    protected JL delNewImpl() {
+        return new JifNewDel();
     }
 
     @Override
@@ -115,6 +136,7 @@ public class JifDelFactory_c extends AbstractDelFactory_c implements JifDelFacto
     protected JL delThrowImpl() {
         return new JifThrowDel();
     }
+
     @Override
     protected JL delTypeNodeImpl() {
         return new JifTypeNodeDel();
@@ -124,10 +146,12 @@ public class JifDelFactory_c extends AbstractDelFactory_c implements JifDelFacto
     protected JL delConstructorCallImpl() {
         return new JifConstructorCallDel();
     }
+
     @Override
     protected JL delMethodDeclImpl() {
         return new JifMethodDeclDel();
     }
+
     @Override
     protected JL delConstructorDeclImpl() {
         return new JifProcedureDeclDel();
@@ -137,7 +161,8 @@ public class JifDelFactory_c extends AbstractDelFactory_c implements JifDelFacto
     public final JL delAmbNewArray() {
         JL e = delAmbNewArrayImpl();
 
-        if (nextDelFactory() != null && nextDelFactory() instanceof JifDelFactory) {
+        if (nextDelFactory() != null
+                && nextDelFactory() instanceof JifDelFactory) {
             JL e2 = ((JifDelFactory) nextDelFactory()).delAmbNewArray();
             e = composeDels(e, e2);
         }
@@ -149,21 +174,21 @@ public class JifDelFactory_c extends AbstractDelFactory_c implements JifDelFacto
     public final JL delLabelExpr() {
         JL e = delLabelExprImpl();
 
-        if (nextDelFactory() != null && nextDelFactory() instanceof JifDelFactory) {
-            JL e2 = ((JifDelFactory)nextDelFactory()).delLabelExpr();
+        if (nextDelFactory() != null
+                && nextDelFactory() instanceof JifDelFactory) {
+            JL e2 = ((JifDelFactory) nextDelFactory()).delLabelExpr();
             e = composeDels(e, e2);
         }
         return postDelLabelExpr(e);
     }
 
-
-
     @Override
     public final JL delNewLabel() {
         JL e = delNewLabelImpl();
 
-        if (nextDelFactory() != null && nextDelFactory() instanceof JifDelFactory) {
-            JL e2 = ((JifDelFactory)nextDelFactory()).delLabelExpr();
+        if (nextDelFactory() != null
+                && nextDelFactory() instanceof JifDelFactory) {
+            JL e2 = ((JifDelFactory) nextDelFactory()).delLabelExpr();
             e = composeDels(e, e2);
         }
         return postDelNewLabel(e);
@@ -180,12 +205,15 @@ public class JifDelFactory_c extends AbstractDelFactory_c implements JifDelFacto
     protected JL delLabelExprImpl() {
         return delExprImpl();
     }
+
     protected JL postDelLabelExpr(JL e) {
         return postDelExpr(e);
     }
+
     protected JL delNewLabelImpl() {
         return delLabelExprImpl();
     }
+
     protected JL postDelNewLabel(JL e) {
         return postDelLabelExpr(e);
     }

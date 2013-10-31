@@ -12,6 +12,7 @@ import polyglot.ast.New;
 import polyglot.types.ClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 
@@ -59,8 +60,10 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
         // use the appropriate string for the constructor invocation.
         if (!rw.jif_ts().isSignature(ct)) {
             String name = ClassDeclToJavaExt_c.constructorTranslatedName(ct);
-            return rw.qq().parseExpr("new %T(%LE).%s(%LE)", n.objectType(),
-                    paramargs, name, n.arguments());
+            New newexp =
+                    rw.java_nf().New(n.position(), n.qualifier(),
+                            n.objectType(), paramargs, n.body());
+            return rw.qq().parseExpr("%E.%s(%LE)", newexp, name, n.arguments());
         } else {
             // ct represents params at runtime, but is a Java class with a
             // Jif signature.
@@ -68,7 +71,8 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
                     new ArrayList<Expr>(paramargs.size() + n.arguments().size());
             allArgs.addAll(paramargs);
             allArgs.addAll(n.arguments());
-            return rw.qq().parseExpr("new %T(%LE)", n.objectType(), allArgs);
+            return rw.java_nf().New(Position.compilerGenerated(),
+                    n.qualifier(), n.objectType(), allArgs, n.body());
         }
     }
 }

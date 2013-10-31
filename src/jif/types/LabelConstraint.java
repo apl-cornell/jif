@@ -27,8 +27,7 @@ import polyglot.util.Position;
  * which are what the {@link Solver Solver} will use to find a satisfying
  * assignment for {@link Variable Variables}.
  */
-public class LabelConstraint extends Constraint
-{
+public class LabelConstraint extends Constraint {
     /**
      * An equality kind of constraint. That is, the constraint requires that
      * lhs &lt;= rhs and rhs &lt;= lhs.
@@ -51,21 +50,19 @@ public class LabelConstraint extends Constraint
      */
     protected NamedLabel namedRHS;
 
-
-    public LabelConstraint(NamedLabel lhs, Kind kind, NamedLabel rhs, LabelEnv env,
-            Position pos, ConstraintMessage msg, boolean report) {
+    public LabelConstraint(NamedLabel lhs, Kind kind, NamedLabel rhs,
+            LabelEnv env, Position pos, ConstraintMessage msg, boolean report) {
         super(lhs.label(), kind, rhs.label(), env, pos, msg, report);
         this.namedLHS = lhs;
         this.namedRHS = rhs;
     }
 
     public Label lhsLabel() {
-        return (Label)lhs;
+        return (Label) lhs;
     }
 
-
     public Label rhsLabel() {
-        return (Label)rhs;
+        return (Label) rhs;
     }
 
     public NamedLabel namedLhs() {
@@ -146,8 +143,7 @@ public class LabelConstraint extends Constraint
         for (Label l : labelComponents) {
             if (l.description() != null) {
                 String s = l.componentString();
-                if (s.length() == 0)
-                    s = l.toString();
+                if (s.length() == 0) s = l.toString();
                 List<String> list = new ArrayList<String>(2);
                 list.add(l.description());
                 defns.put(s, list);
@@ -173,13 +169,12 @@ public class LabelConstraint extends Constraint
 
         if (kind == LEQ) {
             addLEQEqns(eqns, lhsLabel(), rhsLabel());
-        }
-        else if (kind == EQUAL) {
+        } else if (kind == EQUAL) {
             addLEQEqns(eqns, lhsLabel(), rhsLabel());
             addLEQEqns(eqns, rhsLabel(), lhsLabel());
-        }
-        else {
-            throw new InternalCompilerError("Inappropriate kind of equation: " + kind);
+        } else {
+            throw new InternalCompilerError("Inappropriate kind of equation: "
+                    + kind);
         }
 
         return eqns;
@@ -197,13 +192,11 @@ public class LabelConstraint extends Constraint
             for (Label jc : ((JoinLabel) left).joinComponents()) {
                 addLEQEqns(eqns, jc, right);
             }
-        }
-        else if (right instanceof MeetLabel) {
+        } else if (right instanceof MeetLabel) {
             for (Label mc : ((MeetLabel) right).meetComponents()) {
                 addLEQEqns(eqns, left, mc);
             }
-        }
-        else {
+        } else {
             Equation eqn = new LabelEquation(left, right, this);
             eqns.add(eqn);
         }

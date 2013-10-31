@@ -33,15 +33,15 @@ import polyglot.visit.NodeVisitor;
  *
  * By subclassing ContextVisitor, type objects are rebuilt automatically.
  */
-public class JifLabelSubst extends ContextVisitor
-{
+public class JifLabelSubst extends ContextVisitor {
     @SuppressWarnings("hiding")
     protected JifTypeSystem ts;
     protected final Solver solver;
     protected ErrorQueue eq;
     protected VarMap bounds;
 
-    public JifLabelSubst(Job job, JifTypeSystem ts, NodeFactory nf, Solver solver) {
+    public JifLabelSubst(Job job, JifTypeSystem ts, NodeFactory nf,
+            Solver solver) {
         super(job, ts, nf);
         this.solver = solver;
         this.ts = ts;
@@ -53,8 +53,7 @@ public class JifLabelSubst extends ContextVisitor
             throws SemanticException {
         try {
             solve();
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), e.position());
             return n;
         }
@@ -68,36 +67,42 @@ public class JifLabelSubst extends ContextVisitor
 
     protected Node updateNode(Node n) throws SemanticException {
         if (n instanceof ProcedureDecl) {
-            JifProcedureInstance pi = (JifProcedureInstance)((ProcedureDecl)n).procedureInstance();
+            JifProcedureInstance pi =
+                    (JifProcedureInstance) ((ProcedureDecl) n)
+                            .procedureInstance();
             pi.subst(bounds);
         }
         if (n instanceof FieldDecl) {
-            JifFieldInstance fi = (JifFieldInstance)((FieldDecl)n).fieldInstance();
+            JifFieldInstance fi =
+                    (JifFieldInstance) ((FieldDecl) n).fieldInstance();
             fi.subst(bounds);
         }
         if (n instanceof LocalDecl) {
-            JifLocalInstance li = (JifLocalInstance)((LocalDecl)n).localInstance();
+            JifLocalInstance li =
+                    (JifLocalInstance) ((LocalDecl) n).localInstance();
             li.subst(bounds);
         }
         if (n instanceof Formal) {
-            JifLocalInstance li = (JifLocalInstance)((Formal)n).localInstance();
+            JifLocalInstance li =
+                    (JifLocalInstance) ((Formal) n).localInstance();
             li.subst(bounds);
         }
         if (n instanceof Local) {
             // update the type of the local in case the local instance changed during solving.
-            JifLocalInstance li = (JifLocalInstance)((Local)n).localInstance();
-            n = ((Local)n).type(li.type());
+            JifLocalInstance li =
+                    (JifLocalInstance) ((Local) n).localInstance();
+            n = ((Local) n).type(li.type());
         }
 
         if (n instanceof Call) {
             // update the method instance in case the type of the receiver changed
             // during solving
-            Call c = (Call)n;
+            Call c = (Call) n;
             MethodInstance mi;
-            mi = ts.findMethod(c.target().type().toReference(),
-                    c.methodInstance().name(),
-                    c.methodInstance().formalTypes(),
-                    c.target().type().toClass());
+            mi =
+                    ts.findMethod(c.target().type().toReference(), c
+                            .methodInstance().name(), c.methodInstance()
+                            .formalTypes(), c.target().type().toClass());
 
             n = c.methodInstance(mi);
         }

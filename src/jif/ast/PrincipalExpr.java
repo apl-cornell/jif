@@ -7,5 +7,6 @@ import polyglot.ast.Expr;
  */
 public interface PrincipalExpr extends Expr {
     PrincipalNode principal();
+
     PrincipalExpr principal(PrincipalNode principal);
 }

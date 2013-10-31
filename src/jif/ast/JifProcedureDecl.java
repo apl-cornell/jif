@@ -12,6 +12,8 @@ import polyglot.ast.ProcedureDecl;
  */
 public interface JifProcedureDecl extends ProcedureDecl {
     LabelNode startLabel();
+
     LabelNode returnLabel();
+
     List<ConstraintNode<Assertion>> constraints();
 }

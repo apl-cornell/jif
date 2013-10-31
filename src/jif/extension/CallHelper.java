@@ -544,7 +544,8 @@ public class CallHelper {
         Xjoin = labelCheckAndConstrainArgs(lc, Xjoin);
         if (targetMayBeNull) {
             // a null pointer exception may be thrown
-            JifExt_c.checkAndRemoveThrowType(throwTypes, ts.NullPointerException());
+            JifExt_c.checkAndRemoveThrowType(throwTypes,
+                    ts.NullPointerException());
             Xjoin = Xjoin.exc(receiverLabel, ts.NullPointerException());
         }
         constrainFinalActualArgs(ts);

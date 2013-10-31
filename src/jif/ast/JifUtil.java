@@ -1,6 +1,5 @@
 package jif.ast;
 
-
 import jif.types.PathMap;
 import polyglot.ast.Cast;
 import polyglot.ast.Expr;
@@ -10,8 +9,7 @@ import polyglot.ast.Node;
 /**
  * An implementation of the <code>Jif</code> interface.
  */
-public class JifUtil
-{
+public class JifUtil {
     // Some utility functions used to avoid casts.
     public static PathMap getPathMap(Node n) {
         JifExt ext = jifExt(n);
@@ -23,7 +21,7 @@ public class JifUtil
         while (ext != null && !(ext instanceof JifExt)) {
             ext = ext.ext();
         }
-        return (JifExt)ext;
+        return (JifExt) ext;
     }
 
     public static Node updatePathMap(Node n, PathMap X) {
@@ -34,6 +32,7 @@ public class JifUtil
     private static Node updateJifExt(Node n, JifExt jif) {
         return n.ext(updateJifExt(n.ext(), jif));
     }
+
     private static Ext updateJifExt(Ext e, JifExt jif) {
         if (e instanceof JifExt) return jif;
         if (e == null) return e;
@@ -46,10 +45,10 @@ public class JifUtil
      */
     public static Expr effectiveExpr(Expr expr) {
         if (expr instanceof Cast) {
-            return effectiveExpr(((Cast)expr).expr());
+            return effectiveExpr(((Cast) expr).expr());
         }
         if (expr instanceof DowngradeExpr) {
-            return effectiveExpr(((DowngradeExpr)expr).expr());
+            return effectiveExpr(((DowngradeExpr) expr).expr());
         }
         return expr;
     }

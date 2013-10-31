@@ -5,15 +5,17 @@ import polyglot.ast.Expr;
 /** 
  * Superinterface for downgrade expressions.
  */
-public interface DowngradeExpr extends Expr
-{
+public interface DowngradeExpr extends Expr {
     LabelNode label();
+
     DowngradeExpr label(LabelNode label);
 
     Expr expr();
+
     DowngradeExpr expr(Expr expr);
-    
+
     LabelNode bound();
+
     DowngradeExpr bound(LabelNode label);
 
     /**

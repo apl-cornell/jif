@@ -12,7 +12,7 @@ import polyglot.util.SerialVersionUID;
 /** An implementation of the <code>CallerConstraint</code> interface.
  */
 public class CallerConstraint_c extends TypeObject_c implements
-CallerConstraint {
+        CallerConstraint {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<Principal> principals;

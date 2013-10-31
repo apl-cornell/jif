@@ -11,7 +11,7 @@ public interface Solver {
      * Add the constraint c to the system
      */
     void addConstraint(Constraint c) throws SemanticException;
-    
+
     /**
      * Solve the system of constraints.
      * 
@@ -19,7 +19,7 @@ public interface Solver {
      *             system of contraints.
      */
     VarMap solve() throws SemanticException;
-    
+
     /**
      * Substitute variables in L with the solution for the variables. Should only
      * be called after solve() has been called successfully.
