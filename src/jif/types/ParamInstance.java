@@ -55,13 +55,12 @@ public interface ParamInstance extends polyglot.ext.param.types.Param,
     }
 
     public final static Kind INVARIANT_LABEL = new Kind("label", false, true,
-            false);
+            false, false);
     public final static Kind COVARIANT_LABEL = new Kind("covariant label",
-            false, false, true);
+            false, false, true, false);
     public final static Kind PRINCIPAL = new Kind("principal", true, false,
-            false);
-    public final static Kind TYPE = new Kind("type", false, false, false,
-	    false);
+            false, false);
+    public final static Kind TYPE = new Kind("type", false, false, false, true);
 
     JifClassType container();
 
