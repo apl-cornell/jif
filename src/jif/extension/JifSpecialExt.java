@@ -64,7 +64,7 @@ public class JifSpecialExt extends JifExprExt {
         JifContext A = lc.jifContext();
         A = (JifContext) se.del().enterScope(A);
 
-        JifClassType ct = (JifClassType) A.currentClass();
+        JifClassType ct = (JifClassType) se.type();
 
         se =
                 (Special) se.type(ts.labeledType(se.position(), ct,
