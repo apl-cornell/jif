@@ -1,11 +1,11 @@
 package jif.ast;
 
+import java.util.List;
+
 import polyglot.ast.Expr;
 import polyglot.ast.TypeNode;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
-
-import java.util.List;
 
 /** An implementation of the <code>JifSingletonAccess</code> interface.
  */
