@@ -18,7 +18,6 @@ import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.Catch;
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
-import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.DelFactory;
 import polyglot.ast.Disamb;
@@ -337,15 +336,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
         n = (JifMethodDecl) n.ext(extFactory().extMethodDecl());
         n = (JifMethodDecl) n.del(delFactory().delMethodDecl());
         return n;
-    }
-
-    @Override
-    public ConstructorCall ConstructorCall(Position pos,
-            ConstructorCall.Kind kind, Expr outer, List<Expr> args) {
-        if (outer != null)
-            throw new InternalCompilerError(
-                    "Jif does not support inner classes.");
-        return super.ConstructorCall(pos, kind, outer, args);
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jif.translate.ToJavaExt;
+import jif.types.JifClassType;
 import jif.types.JifContext;
 import jif.types.JifFieldInstance;
 import jif.types.JifProcedureInstance;
@@ -17,8 +18,10 @@ import jif.types.label.Label;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
+import polyglot.ast.Expr;
 import polyglot.ast.New;
 import polyglot.ast.Node;
+import polyglot.ast.Special;
 import polyglot.types.ClassType;
 import polyglot.types.FieldInstance;
 import polyglot.types.SemanticException;
@@ -123,13 +126,41 @@ public class JifNewExt extends JifExprExt {
 
         constructorChecker.checkConstructorAuthority(ct, A, lc, noe.position());
 
-        Label newLabel =
-                ts.freshLabelVariable(
-                        noe.position(),
-                        "new" + ct.name(),
-                        "label of the reference to the newly created "
-                                + ct.name() + " object, at " + noe.position());
+        Label newLabel = null;
+        boolean npExc = false;
+        if (noe.qualifier() == null) {
+            newLabel =
+                    ts.freshLabelVariable(
+                            noe.position(),
+                            "new" + ct.name(),
+                            "label of the reference to the newly created "
+                                    + ct.name() + " object, at "
+                                    + noe.position());
+        } else {
+            // labelcheck qualifier like the target of a method call.
+            Expr e = (Expr) lc.labelCheck(noe.qualifier());
 
+            if (e.type() == null)
+                throw new InternalCompilerError("Type of " + e + " is null",
+                        e.position());
+
+            PathMap Xs = getPathMap(e);
+            if (Xs == null)
+                throw new InternalCompilerError("No entry for " + e);
+            A.setPc(Xs.N(), lc);
+
+            if (!(e instanceof Special)) {
+                // TODO: a NPE may be thrown depending on the qualifier.
+                //       for now, assume the qualifier may be null.
+                npExc = (!((JifNewDel) node().del()).qualIsNeverNull());
+                newLabel = Xs.NV();
+                A.setPc(Xs.NV(), lc);
+            } else {
+                newLabel =
+                        ((JifClassType) lc.context().currentClass())
+                                .thisLabel();
+            }
+        }
         if (ts.isLabeled(noe.type())) {
             // error messages for equality constraints aren't displayed, so no
             // need to define error messages.
@@ -140,12 +171,13 @@ public class JifNewExt extends JifExprExt {
                             + ct.name(), ts.labelOfType(noe.type())), A
                     .labelEnv(), noe.position());
         }
+
         CallHelper helper =
                 lc.createCallHelper(newLabel, noe, ct,
                         (JifProcedureInstance) noe.constructorInstance(),
                         noe.arguments(), node().position());
-
-        helper.checkCall(lc, throwTypes, false);
+        LabelChecker callLC = lc.context(A);
+        helper.checkCall(callLC, throwTypes, npExc);
 
         PathMap retX = helper.X();
         PathMap X = retX.NV(lc.upperBound(retX.NV(), newLabel));
