@@ -32,7 +32,6 @@ import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
 import polyglot.ast.NodeFactory_c;
 import polyglot.ast.Receiver;
-import polyglot.ast.Special;
 import polyglot.ast.Stmt;
 import polyglot.ast.TypeNode;
 import polyglot.types.Flags;
@@ -388,14 +387,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
         n = (New) n.ext(extFactory().extNew());
         n = (New) n.del(delFactory().delNew());
         return n;
-    }
-
-    @Override
-    public Special Special(Position pos, Special.Kind kind, TypeNode outer) {
-        if (outer != null)
-            throw new InternalCompilerError(
-                    "Jif does not support inner classes.");
-        return super.Special(pos, kind, outer);
     }
 
     @Override
