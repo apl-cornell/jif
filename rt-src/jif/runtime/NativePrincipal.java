@@ -20,7 +20,10 @@ public class NativePrincipal implements Principal {
 
     static private final ConcurrentMap<String, NativePrincipal> allNatives =
             new ConcurrentHashMap<String, NativePrincipal>();
-    static private NativePrincipal UNKNOWN_NATIVE_PRINCIPAL = new NativePrincipal("unknown-principal") { };
+    static private NativePrincipal UNKNOWN_NATIVE_PRINCIPAL =
+            new NativePrincipal("unknown-principal") {
+            };
+
     static NativePrincipal getInstance(String name) {
         if (name == null) return UNKNOWN_NATIVE_PRINCIPAL;
         NativePrincipal p = allNatives.get(name);
@@ -62,7 +65,8 @@ public class NativePrincipal implements Principal {
     }
 
     @Override
-    public boolean isAuthorized(Object authorizationProof, Closure closure, Label lb, boolean executeNow) {
+    public boolean isAuthorized(Object authorizationProof, Closure closure,
+            Label lb, boolean executeNow) {
         // The default is that this principal authorizes no closures.
         return false;
     }
@@ -94,16 +98,16 @@ public class NativePrincipal implements Principal {
     public boolean equals(Object o) {
         if (o == null) return false;
         if (o instanceof Principal) {
-            return equals((Principal)o);
+            return equals((Principal) o);
         }
         return false;
     }
 
     @Override
     public boolean equals(Principal p) {
-        return p != null && (this.name == p.name() || (this.name != null &&
-                this.name.equals(p.name()))) &&
-                this.getClass() == p.getClass();
+        return p != null
+                && (this.name == p.name() || (this.name != null && this.name
+                        .equals(p.name()))) && this.getClass() == p.getClass();
     }
 
     @Override
@@ -116,7 +120,8 @@ public class NativePrincipal implements Principal {
      * the last element of the new chain is <code>principal</code>, and
      * all other elements are copied over from <code>chain</code>.
      */
-    static protected Principal[] addToChainBottom(Principal[] chain, Principal principal) {
+    static protected Principal[] addToChainBottom(Principal[] chain,
+            Principal principal) {
         if (chain == null) {
             Principal[] newChain = new Principal[1];
             newChain[0] = principal;
@@ -136,7 +141,8 @@ public class NativePrincipal implements Principal {
      * the first element of the new chain is <code>principal</code>, and
      * all other elements are copied over from <code>chain</code>, offset by one.
      */
-    static protected Principal[] addToChainTop(Principal principal, Principal[] chain) {
+    static protected Principal[] addToChainTop(Principal principal,
+            Principal[] chain) {
         if (chain == null) {
             Principal[] newChain = new Principal[1];
             newChain[0] = principal;
@@ -146,7 +152,7 @@ public class NativePrincipal implements Principal {
         Principal[] newChain = new Principal[chain.length + 1];
         newChain[0] = principal;
         for (int i = 0; i < chain.length; i++) {
-            newChain[i+1] = chain[i];
+            newChain[i + 1] = chain[i];
         }
         return newChain;
     }

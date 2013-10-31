@@ -23,7 +23,8 @@ public class InstOrAccess extends Amb {
     Amb prefix;
     Object param;
 
-    public InstOrAccess(Grm parser, Position pos, Amb prefix, Object param) throws Exception {
+    public InstOrAccess(Grm parser, Position pos, Amb prefix, Object param)
+            throws Exception {
         super(parser, pos);
         this.prefix = prefix;
         this.param = param;
@@ -48,19 +49,24 @@ public class InstOrAccess extends Amb {
     public TypeNode toType() throws Exception {
         LinkedList<ParamNode> l = new LinkedList<ParamNode>();
         if (param instanceof Name) {
-            l.add(parser.nf.AmbParam(((Name)param).pos, ((Name)param).toIdentifier()));
-        }
-        else {
-            l.add(parser.nf.AmbParam(((Expr)param).position(), (Expr)param, null));
+            l.add(parser.nf.AmbParam(((Name) param).pos,
+                    ((Name) param).toIdentifier()));
+        } else {
+            l.add(parser.nf.AmbParam(((Expr) param).position(), (Expr) param,
+                    null));
         }
         return parser.nf.InstTypeNode(pos, prefix.toUnlabeledType(), l);
     }
 
     @Override
-    public TypeNode toUnlabeledType() throws Exception { return toType(); }
+    public TypeNode toUnlabeledType() throws Exception {
+        return toType();
+    }
 
     @Override
-    public Prefix toPrefix() throws Exception { return toReceiver(); }
+    public Prefix toPrefix() throws Exception {
+        return toReceiver();
+    }
 
     @Override
     public Receiver toReceiver() throws Exception {
@@ -72,12 +78,13 @@ public class InstOrAccess extends Amb {
 
     private Expr paramToExpr() throws Exception {
         if (param instanceof Expr) {
-            param = ((Expr)param).visit(new UnwrapVisitor());
-            return (Expr)param;
+            param = ((Expr) param).visit(new UnwrapVisitor());
+            return (Expr) param;
         }
-        return parser.nf.AmbExpr(((Name)param).pos,
-                ((Name)param).toIdentifier());
+        return parser.nf.AmbExpr(((Name) param).pos,
+                ((Name) param).toIdentifier());
     }
+
     @Override
     public Expr toExpr() throws Exception {
         return parser.nf.ArrayAccess(pos, prefix.toExpr(), paramToExpr());
@@ -91,31 +98,29 @@ public class InstOrAccess extends Amb {
 
     private Object paramToExprOrString() throws Exception {
         if (param instanceof Name) {
-            return ((Name)param).toIdentifier();
+            return ((Name) param).toIdentifier();
         }
-        param = ((Expr)param).visit(new UnwrapVisitor());
+        param = ((Expr) param).visit(new UnwrapVisitor());
         return param;
     }
+
     @Override
-    public Expr toNewArrayPrefix(Position p, Integer extraDims) throws Exception {
+    public Expr toNewArrayPrefix(Position p, Integer extraDims)
+            throws Exception {
         // Only the first dimension of "new T[p][q][r]" is ambiguous;
         // the rest must be expressions.
 
         if (prefix instanceof Name) {
             // "new T.a[n]".  "name" may be either an expr or a param.
             return parser.nf.AmbNewArray(p, prefix.toType(),
-                    paramToExprOrString(),
-                    Collections.<Expr> emptyList(),
+                    paramToExprOrString(), Collections.<Expr> emptyList(),
                     extraDims.intValue());
-        }
-        else if (prefix instanceof Inst) {
+        } else if (prefix instanceof Inst) {
             // "new T[L,M][n]".  "name" must be an expr.
             List<Expr> dims = new LinkedList<Expr>();
             dims.add(paramToExpr());
             return parser.nf.NewArray(p, prefix.toType(), dims);
-        }
-        else if (prefix instanceof Access ||
-                prefix instanceof InstOrAccess) {
+        } else if (prefix instanceof Access || prefix instanceof InstOrAccess) {
             // The prefix is "S[n]".  Recurse as if we were doing
             // "new S[n]".  "name" must be an expression.
             Expr e = prefix.toNewArrayPrefix(p, extraDims);
@@ -126,8 +131,7 @@ public class InstOrAccess extends Amb {
                 List<Expr> dims = new LinkedList<Expr>(a.dims());
                 dims.add(paramToExpr());
                 return a.dims(dims);
-            }
-            else if (e instanceof AmbNewArray) {
+            } else if (e instanceof AmbNewArray) {
                 AmbNewArray a = (AmbNewArray) e;
                 List<Expr> dims = new LinkedList<Expr>(a.dims());
                 dims.add(paramToExpr());
@@ -139,5 +143,3 @@ public class InstOrAccess extends Amb {
         return null;
     }
 }
-
-

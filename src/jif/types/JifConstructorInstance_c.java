@@ -21,9 +21,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>JifConstructorInstance</code> interface.
  */
-public class JifConstructorInstance_c extends ConstructorInstance_c
-implements JifConstructorInstance
-{
+public class JifConstructorInstance_c extends ConstructorInstance_c implements
+        JifConstructorInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Label pcBound;
@@ -33,8 +32,8 @@ implements JifConstructorInstance
     protected boolean isDefaultReturnLabel;
 
     public JifConstructorInstance_c(JifTypeSystem ts, Position pos,
-            ClassType container, Flags flags,
-            Label pcBound, boolean isDefaultPCBound, Label returnLabel,
+            ClassType container, Flags flags, Label pcBound,
+            boolean isDefaultPCBound, Label returnLabel,
             boolean isDefaultReturnLabel, List<? extends Type> formalTypes,
             List<Label> formalArgLabels, List<? extends Type> excTypes,
             List<Assertion> constraints) {
@@ -51,7 +50,6 @@ implements JifConstructorInstance
         this.throwTypes = ListUtil.copy(throwTypes, true);
         this.formalTypes = ListUtil.copy(formalTypes, true);
     }
-
 
     @Override
     public Label pcBound() {
@@ -79,7 +77,7 @@ implements JifConstructorInstance
     }
 
     @Override
-    public void  setPCBound(Label pcBound, boolean isDefault) {
+    public void setPCBound(Label pcBound, boolean isDefault) {
         this.pcBound = pcBound;
         this.isDefaultPCBound = isDefault;
     }
@@ -101,26 +99,23 @@ implements JifConstructorInstance
 
     @Override
     public boolean isCanonical() {
-        if (!(super.isCanonical()
-                && pcBound.isCanonical()
-                && returnLabel.isCanonical()
-                && listIsCanonical(constraints)
-                && formalTypes != null)) {
+        if (!(super.isCanonical() && pcBound.isCanonical()
+                && returnLabel.isCanonical() && listIsCanonical(constraints) && formalTypes != null)) {
             return false;
         }
 
-        JifTypeSystem jts = (JifTypeSystem)typeSystem();
+        JifTypeSystem jts = (JifTypeSystem) typeSystem();
         // also need to make sure that every formal type is labeled with an arg label
         for (Type t : formalTypes()) {
-            if (!jts.isLabeled(t) || !(jts.labelOfType(t) instanceof ArgLabel)) return false;
+            if (!jts.isLabeled(t) || !(jts.labelOfType(t) instanceof ArgLabel))
+                return false;
         }
         return true;
     }
 
     @Override
     public void subst(VarMap bounds) {
-        if (this.pcBound != null)
-            this.pcBound = bounds.applyTo(pcBound);
+        if (this.pcBound != null) this.pcBound = bounds.applyTo(pcBound);
 
         if (this.returnLabel != null)
             this.returnLabel = bounds.applyTo(returnLabel);
@@ -158,6 +153,7 @@ implements JifConstructorInstance
         this.setThrowTypes(throwTypes);
 
     }
+
     @Override
     public String debugString() {
         return debugString(true);
@@ -170,9 +166,9 @@ implements JifConstructorInstance
         }
         s += flags.translate() + container + "(";
 
-        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext(); ) {
+        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext();) {
             Type t = i.next();
-            s += ((JifTypeSystem)ts).unlabel(t).toString();
+            s += ((JifTypeSystem) ts).unlabel(t).toString();
 
             if (i.hasNext()) {
                 s += ", ";
@@ -199,7 +195,7 @@ implements JifConstructorInstance
         }
         s += "(";
 
-        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext(); ) {
+        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext();) {
             Type t = i.next();
             s += t.toString();
 

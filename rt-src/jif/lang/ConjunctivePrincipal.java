@@ -15,6 +15,7 @@ public final class ConjunctivePrincipal implements Principal {
     ConjunctivePrincipal(Set<Principal> conjuncts) {
         this.conjuncts = conjuncts;
     }
+
     @Override
     public String name() {
         StringBuffer sb = new StringBuffer();
@@ -29,7 +30,7 @@ public final class ConjunctivePrincipal implements Principal {
     @Override
     public boolean delegatesTo(Principal p) {
         if (p instanceof ConjunctivePrincipal) {
-            ConjunctivePrincipal cp = (ConjunctivePrincipal)p;
+            ConjunctivePrincipal cp = (ConjunctivePrincipal) p;
             return cp.conjuncts.containsAll(this.conjuncts);
         }
         for (Principal q : conjuncts) {
@@ -50,29 +51,32 @@ public final class ConjunctivePrincipal implements Principal {
     @Override
     public boolean equals(Principal p) {
         if (p instanceof ConjunctivePrincipal) {
-            ConjunctivePrincipal that = (ConjunctivePrincipal)p;
-            return this.hashCode() == that.hashCode() && this.conjuncts.equals(that.conjuncts) &&
-                    that.conjuncts.equals(this.conjuncts);
+            ConjunctivePrincipal that = (ConjunctivePrincipal) p;
+            return this.hashCode() == that.hashCode()
+                    && this.conjuncts.equals(that.conjuncts)
+                    && that.conjuncts.equals(this.conjuncts);
         }
         return false;
     }
 
     @Override
-    public boolean isAuthorized(Object authPrf, Closure closure, Label lb, boolean executeNow) {
+    public boolean isAuthorized(Object authPrf, Closure closure, Label lb,
+            boolean executeNow) {
         for (Principal p : conjuncts) {
-            if (!p.isAuthorized(authPrf, closure, lb, executeNow)) return false;
+            if (!p.isAuthorized(authPrf, closure, lb, executeNow))
+                return false;
         }
         // all conjuncts authorize the closure.
         return true;
     }
-
 
     @Override
     public ActsForProof findProofUpto(Principal p, Object searchState) {
         Map<Principal, ActsForProof> proofs =
                 new HashMap<Principal, ActsForProof>();
         for (Principal q : conjuncts) {
-            ActsForProof prf = PrincipalUtil.findActsForProof(p, q, searchState);
+            ActsForProof prf =
+                    PrincipalUtil.findActsForProof(p, q, searchState);
             if (prf == null) return null;
             proofs.put(q, prf);
         }
@@ -86,7 +90,8 @@ public final class ConjunctivePrincipal implements Principal {
     @Override
     public ActsForProof findProofDownto(Principal q, Object searchState) {
         for (Principal witness : conjuncts) {
-            ActsForProof prf = PrincipalUtil.findActsForProof(witness, q, searchState);
+            ActsForProof prf =
+                    PrincipalUtil.findActsForProof(witness, q, searchState);
             if (prf != null) {
                 // have found a proof from witness to q
                 DelegatesProof step = new DelegatesProof(this, witness);

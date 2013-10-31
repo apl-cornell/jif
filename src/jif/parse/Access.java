@@ -21,7 +21,8 @@ public class Access extends Amb {
     Amb prefix;
     Expr index;
 
-    public Access(Grm parser, Position pos, Amb prefix, Expr index) throws Exception {
+    public Access(Grm parser, Position pos, Amb prefix, Expr index)
+            throws Exception {
         super(parser, pos);
         this.prefix = prefix;
         this.index = index;
@@ -30,16 +31,23 @@ public class Access extends Amb {
         if (prefix instanceof Array) parser.die(pos);
     }
 
-    public Amb prefix() { return prefix; }
+    public Amb prefix() {
+        return prefix;
+    }
 
     public Expr index() {
         return index;
     }
 
     @Override
-    public Prefix toPrefix() throws Exception { return toExpr(); }
+    public Prefix toPrefix() throws Exception {
+        return toExpr();
+    }
+
     @Override
-    public Receiver toReceiver() throws Exception { return toExpr(); }
+    public Receiver toReceiver() throws Exception {
+        return toExpr();
+    }
 
     @Override
     public Expr toExpr() throws Exception {
@@ -48,7 +56,8 @@ public class Access extends Amb {
     }
 
     @Override
-    public Expr toNewArrayPrefix(Position p, Integer extraDims) throws Exception {
+    public Expr toNewArrayPrefix(Position p, Integer extraDims)
+            throws Exception {
         return toNewArray(p, extraDims);
     }
 
@@ -58,9 +67,9 @@ public class Access extends Amb {
             // "new T.a[n]" or "new T[L,M][n]"
             List<Expr> dims = new LinkedList<Expr>();
             dims.add(index);
-            return parser.nf.NewArray(p, prefix.toType(), dims, extraDims.intValue());
-        }
-        else if (prefix instanceof Access || prefix instanceof InstOrAccess) {
+            return parser.nf.NewArray(p, prefix.toType(), dims,
+                    extraDims.intValue());
+        } else if (prefix instanceof Access || prefix instanceof InstOrAccess) {
             // The prefix is "S[n]".  Recurse as if we were doing "new S[n]"
             Expr e = prefix.toNewArrayPrefix(p, extraDims);
 
@@ -70,8 +79,7 @@ public class Access extends Amb {
                 List<Expr> dims = new LinkedList<Expr>(a.dims());
                 dims.add(index);
                 return a.dims(dims);
-            }
-            else if (e instanceof AmbNewArray) {
+            } else if (e instanceof AmbNewArray) {
                 AmbNewArray a = (AmbNewArray) e;
                 List<Expr> dims = new LinkedList<Expr>(a.dims());
                 dims.add(index);
@@ -83,5 +91,3 @@ public class Access extends Amb {
         return null;
     }
 }
-
-

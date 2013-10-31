@@ -30,16 +30,16 @@ import polyglot.util.InternalCompilerError;
  */
 public class OutputExtensionInfo extends JLExtensionInfo {
     ExtensionInfo jifExtInfo;
-    
+
     public OutputExtensionInfo(ExtensionInfo jifExtInfo) {
-        this.jifExtInfo = jifExtInfo;        
+        this.jifExtInfo = jifExtInfo;
     }
-    
+
     @Override
     public Options getOptions() {
         return jifExtInfo.getOptions();
     }
-    
+
     @Override
     public Scheduler createScheduler() {
         return new OutputScheduler(this);
@@ -50,33 +50,32 @@ public class OutputExtensionInfo extends JLExtensionInfo {
         CodeGenerated output = new CodeGenerated(job) {
             @Override
             public Pass createPass(polyglot.frontend.ExtensionInfo extInfo) {
-                return new OutputPass(this, new JifTranslator(job, typeSystem(),
-                                                              nodeFactory(), targetFactory()));
-            }            
+                return new OutputPass(this, new JifTranslator(job,
+                        typeSystem(), nodeFactory(), targetFactory()));
+            }
         };
 
         output = (CodeGenerated) scheduler.internGoal(output);
 
         try {
             scheduler().addPrerequisiteDependency(output,
-                                                  scheduler().Serialized(job));
-        }
-        catch (CyclicDependencyException e) {
+                    scheduler().Serialized(job));
+        } catch (CyclicDependencyException e) {
             // Cannot happen
             throw new InternalCompilerError(e);
         }
 
         return output;
     }
-        
-    static protected class OutputScheduler extends JLScheduler {    
+
+    static protected class OutputScheduler extends JLScheduler {
         /**
          * Hack to ensure that we track the job for java.lang.Object specially.
          * In particular, ensure that it is submitted for re-writing before
          * any other job.
          */
         protected Job objectJob = null;
-        
+
         public OutputScheduler(OutputExtensionInfo extInfo) {
             super(extInfo);
         }
@@ -92,6 +91,7 @@ public class OutputExtensionInfo extends JLExtensionInfo {
             }
             return j;
         }
+
         /**
          * 
          */
@@ -111,37 +111,36 @@ public class OutputExtensionInfo extends JLExtensionInfo {
                 if (objectJob != null && job != objectJob) {
                     addPrerequisiteDependency(g, TypesInitialized(objectJob));
                 }
-            }
-            catch (CyclicDependencyException e) {
+            } catch (CyclicDependencyException e) {
                 // Cannot happen
                 throw new InternalCompilerError(e);
             }
             return g;
         }
-    
+
         @Override
         public Goal Parsed(Job job) {
             return internGoal(new SourceFileGoal(job) {
                 @Override
                 public Pass createPass(polyglot.frontend.ExtensionInfo extInfo) {
-                    return new EmptyPass(this);              
+                    return new EmptyPass(this);
                 }
             });
         }
     }
-    
+
     @Override
     protected void initTypeSystem() {
         try {
             LoadedClassResolver lr;
-            lr = new SourceClassResolver(compiler, this, true,
+            lr =
+                    new SourceClassResolver(compiler, this, true,
                             getOptions().compile_command_line_only,
                             getOptions().ignore_mod_times);
             ts.initialize(lr, this);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new InternalCompilerError(
-                "Unable to initialize type system.", e);
+                    "Unable to initialize type system.", e);
         }
     }
 }

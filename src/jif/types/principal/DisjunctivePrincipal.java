@@ -2,7 +2,6 @@ package jif.types.principal;
 
 import java.util.Set;
 
-
 /** 
  * A disjunctive principal represents the disjunction of two principals "A or B".
  * The conjunctive principal "A or B" delegates its authority to A and B, that is,

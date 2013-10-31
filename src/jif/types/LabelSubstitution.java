@@ -58,17 +58,20 @@ public abstract class LabelSubstitution {
     }
 
     private ArrayList<Label> stack = null;
+
     public void pushLabel(Label l) {
         if (stack == null) {
             stack = new ArrayList<Label>(5);
         }
         stack.add(l);
     }
+
     public void popLabel(Label l) {
-        if (l != stack.remove(stack.size()-1)) {
+        if (l != stack.remove(stack.size() - 1)) {
             throw new InternalCompilerError("Stack discipline not obeyed");
         }
     }
+
     public boolean stackContains(Label l) {
         return stack != null && stack.contains(l);
     }

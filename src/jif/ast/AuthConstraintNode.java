@@ -11,7 +11,7 @@ import jif.types.AuthConstraint;
 public interface AuthConstraintNode extends ConstraintNode<AuthConstraint> {
     /** Gets the list of principal who grants their authorities. */
     List<PrincipalNode> principals();
-    
+
     /** Returns a copy of this node with the principal list updated. */
     AuthConstraintNode principals(List<PrincipalNode> principals);
 }

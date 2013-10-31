@@ -47,7 +47,8 @@ import polyglot.util.SerialVersionUID;
  *  @see polyglot.ast.ProcedureDecl
  *  @see jif.types.JifProcedureInstance
  */
-public class JifProcedureDeclExt_c extends JifExt_c implements JifProcedureDeclExt {
+public class JifProcedureDeclExt_c extends JifExt_c implements
+        JifProcedureDeclExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifProcedureDeclExt_c(ToJavaExt toJava) {

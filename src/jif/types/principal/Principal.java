@@ -75,6 +75,7 @@ public interface Principal extends ActsForParam {
     Set<Variable> variables();
 
     boolean isTopPrincipal();
+
     boolean isBottomPrincipal();
 
     /**

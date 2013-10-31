@@ -30,11 +30,11 @@ import polyglot.util.Position;
 
 public class LabelFlowGraph extends Graph {
     List<InformationFlowTrace> tr;
-    Set<String> files;                                  // source codes involved
-    FailedConstraintSnapshot jiferror;          // used to highlight the error in graph
-    boolean generated;                                  // if the graph has been generated already, just reuse it
-    LabelNode root;                                     // starting node
-    static int count=1;                                 // counter for jif errors. Report information flow paths for each error
+    Set<String> files; // source codes involved
+    FailedConstraintSnapshot jiferror; // used to highlight the error in graph
+    boolean generated; // if the graph has been generated already, just reuse it
+    LabelNode root; // starting node
+    static int count = 1; // counter for jif errors. Report information flow paths for each error
 
     /* there are two kinds of edges in the flow graph:
      * 1) dynamics: corresponds to the constraints
@@ -46,21 +46,25 @@ public class LabelFlowGraph extends Graph {
     /*
      * fields for Jif option -report
      */
-    public static final Collection<String> flowgraphtopic = CollectionUtil.list(Topics.labelFlow);
+    public static final Collection<String> flowgraphtopic = CollectionUtil
+            .list(Topics.labelFlow);
     // different levels of details
-    public static final int messageOnly         = 1;    // concise path info
-    public static final int detailedMessage     = 2;    // detailed path info, including explanation of each constraint
-    public static final int showSlicedGraph     = 3;    // output the relevant graph (nodes related to the error) into a dot file
-    public static final int showWholeGraph      = 4;    // output the whole graph into a dot file
+    public static final int messageOnly = 1; // concise path info
+    public static final int detailedMessage = 2; // detailed path info, including explanation of each constraint
+    public static final int showSlicedGraph = 3; // output the relevant graph (nodes related to the error) into a dot file
+    public static final int showWholeGraph = 4; // output the whole graph into a dot file
 
-    public static boolean shouldReport (int obscurity) {
+    public static boolean shouldReport(int obscurity) {
         return Report.should_report(flowgraphtopic, obscurity);
     }
 
-    public LabelFlowGraph(List<InformationFlowTrace> t, FailedConstraintSnapshot snapshot) {
+    public LabelFlowGraph(List<InformationFlowTrace> t,
+            FailedConstraintSnapshot snapshot) {
         tr = t;
         generated = false;
-        root = new LabelNode("ROOT", new VarLabel_c("ROOT", "fake label", null, null)); // root is just serves as the start point
+        root =
+                new LabelNode("ROOT", new VarLabel_c("ROOT", "fake label",
+                        null, null)); // root is just serves as the start point
 
         files = new HashSet<String>();
         this.jiferror = snapshot;
@@ -89,22 +93,22 @@ public class LabelFlowGraph extends Graph {
         public String toString() {
             if (equ != null) {
                 return "because of constraint: " + equ.constraint.toString();
-            }
-            else return "join";
+            } else return "join";
         }
 
         public String toStringDetail() {
             if (equ != null) {
-                return toString() + "\n(Why this constraint?) " + equ.constraint.detailMsg();
-            }
-            else return toString();
+                return toString() + "\n(Why this constraint?) "
+                        + equ.constraint.detailMsg();
+            } else return toString();
         }
 
         public String toDotString() {
             if (equ != null) {
-                return  equ.constraint().lhs.toString()+equ.constraint.kind.toString()+equ.constraint.rhs.toString();
-            }
-            else return "join";
+                return equ.constraint().lhs.toString()
+                        + equ.constraint.kind.toString()
+                        + equ.constraint.rhs.toString();
+            } else return "join";
         }
     }
 
@@ -118,9 +122,9 @@ public class LabelFlowGraph extends Graph {
 
         @Override
         public boolean equals(Object obj) {
-            if (! (obj instanceof LabelWrapper)) return false;
+            if (!(obj instanceof LabelWrapper)) return false;
             LabelWrapper labelwrap = (LabelWrapper) obj;
-            return this.label==labelwrap.label;
+            return this.label == labelwrap.label;
         }
 
         @Override
@@ -134,7 +138,7 @@ public class LabelFlowGraph extends Graph {
         String uid;
         Label label;
 
-        public LabelNode (String id, Label label) {
+        public LabelNode(String id, Label label) {
             super();
             this.uid = id;
             this.label = label;
@@ -145,61 +149,64 @@ public class LabelFlowGraph extends Graph {
 //            return ( (label instanceof JoinLabel) && label.description()!=null && label.description().equals("pc label"));
 //        }
 
-        public String getName () {
-            if (label==null)
-                System.out.println("NULL!!");
+        public String getName() {
+            if (label == null) System.out.println("NULL!!");
             if (label instanceof VarLabel)
-                return ((VarLabel)label).name()+
-                        (label.position()==null?"":"@"+label.position().toString());
+                return ((VarLabel) label).name()
+                        + (label.position() == null ? "" : "@"
+                                + label.position().toString());
             else {
-                return (label.description()==null?"":label.description())+label.toString()+
-                        (label.position()==null?"":"@"+label.position().toString());
+                return (label.description() == null ? "" : label.description())
+                        + label.toString()
+                        + (label.position() == null ? "" : "@"
+                                + label.position().toString());
             }
         }
 
-        public Position position () {
+        public Position position() {
             return label.position();
         }
 
         /* treat join labels in backtracking specially for better error message */
         @Override
-        public boolean isend (boolean isbackward) {
+        public boolean isend(boolean isbackward) {
             if (isbackward) {
-                return !label.hasVariableComponents() && !(label instanceof JoinLabel);
-            }
-            else
-                return !label.hasVariableComponents();
+                return !label.hasVariableComponents()
+                        && !(label instanceof JoinLabel);
+            } else return !label.hasVariableComponents();
         }
 
         @Override
         public String toString() {
-            return "Current node: "+getName()+"\n";
+            return "Current node: " + getName() + "\n";
         }
 
-        public String printNodeToDotString () {
-            return  uid + " [label=\"" + getName()+"\\n"+label.position() + "\"];\n";
+        public String printNodeToDotString() {
+            return uid + " [label=\"" + getName() + "\\n" + label.position()
+                    + "\"];\n";
         }
 
-        public String printLinkToDotString () {
+        public String printLinkToDotString() {
             String ret = "";
             for (Node node : outs.keySet()) {
                 LabelNode n = (LabelNode) node;
-                String linkinfo = ((FlowEdge)outs.get(n)).toDotString();
+                String linkinfo = ((FlowEdge) outs.get(n)).toDotString();
                 if (n.shouldprint) {
-                    ret += this.uid + "->" + n.uid + " [label=\"" + linkinfo + "\"];\n";
+                    ret +=
+                            this.uid + "->" + n.uid + " [label=\"" + linkinfo
+                                    + "\"];\n";
                 }
             }
             return ret;
         }
 
         // get the position of current node and out links that links to printable nodes
-        public Set<Integer> getPositions () {
+        public Set<Integer> getPositions() {
             Set<Integer> ret = new HashSet<Integer>();
-            if (this.position()!=null)
-                ret.add(this.position().line());
-            for (Node n: outs.keySet()) {
+            if (this.position() != null) ret.add(this.position().line());
+            for (Node n : outs.keySet()) {
                 if (n.shouldprint)
-                    ret.add(((FlowEdge)outs.get(n)).getLineno());
+                    ret.add(((FlowEdge) outs.get(n)).getLineno());
             }
             return ret;
         }
@@ -227,33 +234,38 @@ public class LabelFlowGraph extends Graph {
         public void visit(Node node) {
             if (node instanceof LabelNode) {
                 LabelNode n = (LabelNode) node;
-                if (!n.shouldprint)
-                    return;
+                if (!n.shouldprint) return;
                 sourcePosition.addAll(n.getPositions());
                 nodes += n.printNodeToDotString();
                 links += n.printLinkToDotString();
             }
         }
 
-        String getNodeString () { return nodes;}
-        String getLinkString () { return links;}
+        String getNodeString() {
+            return nodes;
+        }
+
+        String getLinkString() {
+            return links;
+        }
     }
 
     /*
      *  map Jif labels to graph nodes
      */
-    Map<LabelWrapper, LabelNode> lblToNode = new HashMap<LabelWrapper, LabelNode>(); // map from uid to a the id corresponding var
+    Map<LabelWrapper, LabelNode> lblToNode =
+            new HashMap<LabelWrapper, LabelNode>(); // map from uid to a the id corresponding var
     int varCounter = 0;
 
     /* get the corresponding node in graph. Create one if none exists */
-    public LabelNode getNode (Label label) {
+    public LabelNode getNode(Label label) {
         LabelWrapper lbl = new LabelWrapper(label);
-        if (! lblToNode.containsKey(lbl)) {
-            String vid = "v"+varCounter;
+        if (!lblToNode.containsKey(lbl)) {
+            String vid = "v" + varCounter;
             LabelNode n = new LabelNode(vid, label);
             varCounter++;
             // record the source files involved
-            if (label.position()!=null) {
+            if (label.position() != null) {
                 files.add(label.position().path());
             }
             /* make the node reachable from root */
@@ -263,9 +275,8 @@ public class LabelFlowGraph extends Graph {
         return lblToNode.get(lbl);
     }
 
-    public void generateGraph ( ) {
-        if (generated || tr == null)
-            return;
+    public void generateGraph() {
+        if (generated || tr == null) return;
 
         // generate the dynamic links
         for (InformationFlowTrace t : tr) {
@@ -306,7 +317,7 @@ public class LabelFlowGraph extends Graph {
         Set<LabelNode> processed = new HashSet<LabelNode>();
 
         // first, handle the join labels
-        while (workingList.size()!=0) {
+        while (workingList.size() != 0) {
             LabelNode currentnode = workingList.get(0);
             workingList.remove(0);
             processed.add(currentnode);
@@ -323,7 +334,8 @@ public class LabelFlowGraph extends Graph {
 
             for (Label srclbl : sourceset) {
                 LabelNode srcnode = getNode(srclbl);
-                if (!processed.contains(srclbl) && !workingList.contains(srclbl))
+                if (!processed.contains(srclbl)
+                        && !workingList.contains(srclbl))
                     workingList.add(getNode(srclbl));
                 addEdge(srcnode, currentnode, staticEdge);
             }
@@ -343,15 +355,13 @@ public class LabelFlowGraph extends Graph {
 
     // this function is used to filter out letters that can not pretty print in the dot format
     // such as " and \n
-    private String sanitaze (String s) {
-        if (s!=null)
+    private String sanitaze(String s) {
+        if (s != null)
             return s.replace('"', '\'').replace("\\", "\\\\");
-        else
-            return s;
+        else return s;
     }
 
-
-    public String toDotString ( ) {
+    public String toDotString() {
         String ret = "";
         ToDotVisitor v = new ToDotVisitor();
         List<Node> visited = new ArrayList<Node>();
@@ -393,14 +403,14 @@ public class LabelFlowGraph extends Graph {
         return ret;
     }
 
-    public void slicing (Node backward, Node forward) {
+    public void slicing(Node backward, Node forward) {
         List<Node> visited = new ArrayList<Node>();
         backward.acceptBackward(new LabellingVisitor(), visited);
         visited = new ArrayList<Node>();
         forward.acceptForward(new LabellingVisitor(), visited);
     }
 
-    public void showErrorPath () {
+    public void showErrorPath() {
         FailedConstraintSnapshot snapshot = jiferror;
         boolean detail = shouldReport(detailedMessage);
 
@@ -430,9 +440,10 @@ public class LabelFlowGraph extends Graph {
                         }
                     }
 
-                    if (!skip && !snapshot.failedConstraint.env().leq(
-                            snapshot.bounds.applyTo(leftmost.label),
-                            snapshot.bounds.applyTo(rightmost.label))) {
+                    if (!skip
+                            && !snapshot.failedConstraint.env().leq(
+                                    snapshot.bounds.applyTo(leftmost.label),
+                                    snapshot.bounds.applyTo(rightmost.label))) {
                         System.out.println("\n----Start of one path----");
                         System.out.println(leftmost.getName());
                         LabelNode prev = leftmost;
@@ -441,20 +452,23 @@ public class LabelFlowGraph extends Graph {
                             LabelNode next = (LabelNode) leftpath.get(i);
                             edge = (FlowEdge) prev.outs.get(next);
                             System.out.println("--> ("
-                                    + (detail?edge.toStringDetail():edge.toString()) + ")");
+                                    + (detail ? edge.toStringDetail() : edge
+                                            .toString()) + ")");
                             System.out.println(next.getName());
                             prev = next;
                         }
                         edge = new FlowEdge(snapshot.failedConstraint);
                         System.out.println("-> ("
-                                + (detail?edge.toStringDetail():edge.toString()) + ")");
+                                + (detail ? edge.toStringDetail() : edge
+                                        .toString()) + ")");
                         prev = (LabelNode) rightpath.get(0);
                         System.out.println(prev.getName());
                         for (int i = 1; i < rightpath.size(); i++) {
                             LabelNode next = (LabelNode) rightpath.get(i);
                             edge = (FlowEdge) prev.outs.get(next);
                             System.out.println("--> ("
-                                    + (detail?edge.toStringDetail():edge.toString()) + ")");
+                                    + (detail ? edge.toStringDetail() : edge
+                                            .toString()) + ")");
                             System.out.println(next.getName());
                             prev = next;
                         }
@@ -465,7 +479,7 @@ public class LabelFlowGraph extends Graph {
         }
     }
 
-    public void writeToDotFile () {
+    public void writeToDotFile() {
         String filename;
 
         FailedConstraintSnapshot snapshot = jiferror;
@@ -476,12 +490,10 @@ public class LabelFlowGraph extends Graph {
         try {
             FileWriter fstream = new FileWriter(filename);
             BufferedWriter out = new BufferedWriter(fstream);
-            if (!shouldReport (showWholeGraph)) {
+            if (!shouldReport(showWholeGraph)) {
                 LabelEquation equ = (LabelEquation) snapshot.failedConstraint;
                 slicing(getNode(equ.lhs()), getNode(equ.rhs()));
-            }
-            else
-                labelAll(root);
+            } else labelAll(root);
             root.shouldprint = false;
             out.write(toDotString());
             out.close();

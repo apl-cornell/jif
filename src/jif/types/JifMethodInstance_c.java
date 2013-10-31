@@ -20,9 +20,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>JifMethodInstance</code> interface.
  */
-public class JifMethodInstance_c extends MethodInstance_c
-implements JifMethodInstance
-{
+public class JifMethodInstance_c extends MethodInstance_c implements
+        JifMethodInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Label pcBound;
@@ -32,13 +31,14 @@ implements JifMethodInstance
     protected boolean isDefaultReturnLabel;
 
     public JifMethodInstance_c(JifTypeSystem ts, Position pos,
-            ReferenceType container, Flags flags, Type returnType,
-            String name, Label pcBound, boolean isDefaultPCBound,
+            ReferenceType container, Flags flags, Type returnType, String name,
+            Label pcBound, boolean isDefaultPCBound,
             List<? extends Type> formalTypes, List<Label> formalArgLabels,
             Label returnLabel, boolean isDefaultReturnLabel,
             List<? extends Type> excTypes, List<Assertion> constraints) {
 
-        super(ts, pos, container, flags, returnType, name, formalTypes, excTypes);
+        super(ts, pos, container, flags, returnType, name, formalTypes,
+                excTypes);
         this.constraints = new ArrayList<Assertion>(constraints);
 
         this.pcBound = pcBound;
@@ -59,6 +59,7 @@ implements JifMethodInstance
         this.pcBound = pcBound;
         this.isDefaultPCBound = isDefault;
     }
+
     @Override
     public boolean isDefaultPCBound() {
         return isDefaultPCBound;
@@ -74,6 +75,7 @@ implements JifMethodInstance
         this.returnLabel = returnLabel;
         this.isDefaultReturnLabel = isDefault;
     }
+
     @Override
     public boolean isDefaultReturnLabel() {
         return isDefaultReturnLabel;
@@ -82,8 +84,7 @@ implements JifMethodInstance
     @Override
     public Label returnValueLabel() {
         JifTypeSystem jts = (JifTypeSystem) ts;
-        if (returnType.isVoid())
-            return jts.notTaken();
+        if (returnType.isVoid()) return jts.notTaken();
 
         return jts.labelOfType(returnType);
     }
@@ -100,8 +101,7 @@ implements JifMethodInstance
 
     @Override
     public String toString() {
-        String s = "method " + flags.translate() + returnType +
-                " " + name;
+        String s = "method " + flags.translate() + returnType + " " + name;
 
         if (pcBound != null) {
             s += pcBound.toString();
@@ -109,7 +109,7 @@ implements JifMethodInstance
 
         s += "(";
 
-        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext(); ) {
+        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext();) {
             Type t = i.next();
             s += t.toString();
 
@@ -124,10 +124,10 @@ implements JifMethodInstance
             s += " : " + returnLabel.toString();
         }
 
-        if (! this.throwTypes.isEmpty()) {
+        if (!this.throwTypes.isEmpty()) {
             s += " throws (";
 
-            for (Iterator<Type> i = throwTypes.iterator(); i.hasNext(); ) {
+            for (Iterator<Type> i = throwTypes.iterator(); i.hasNext();) {
                 Type t = i.next();
                 s += t.toString();
 
@@ -139,10 +139,10 @@ implements JifMethodInstance
             s += ")";
         }
 
-        if (! constraints.isEmpty()) {
+        if (!constraints.isEmpty()) {
             s += " where ";
 
-            for (Iterator<Assertion> i = constraints.iterator(); i.hasNext(); ) {
+            for (Iterator<Assertion> i = constraints.iterator(); i.hasNext();) {
                 Assertion c = i.next();
                 s += c.toString();
 
@@ -157,15 +157,12 @@ implements JifMethodInstance
 
     @Override
     public boolean isCanonical() {
-        if (!(super.isCanonical()
-                && pcBound.isCanonical()
-                && returnLabel.isCanonical()
-                && listIsCanonical(constraints)
-                && formalTypes != null)) {
+        if (!(super.isCanonical() && pcBound.isCanonical()
+                && returnLabel.isCanonical() && listIsCanonical(constraints) && formalTypes != null)) {
             return false;
         }
 
-        JifTypeSystem jts = (JifTypeSystem)typeSystem();
+        JifTypeSystem jts = (JifTypeSystem) typeSystem();
         // also need to make sure that every formal type is labeled with an arg label
         for (Type t : formalTypes()) {
             if (!jts.isLabeled(t) || !(jts.labelOfType(t) instanceof ArgLabel)) {
@@ -219,16 +216,16 @@ implements JifMethodInstance
     public String debugString() {
         return debugString(true);
     }
+
     private String debugString(boolean showInstanceKind) {
         JifTypeSystem jts = (JifTypeSystem) ts;
         String s = "";
         if (showInstanceKind) {
             s = "method ";
         }
-        s += flags.translate() + jts.unlabel(returnType) +
-                " " + name + "(";
+        s += flags.translate() + jts.unlabel(returnType) + " " + name + "(";
 
-        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext(); ) {
+        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext();) {
             Type t = i.next();
             s += jts.unlabel(t).toString();
 
@@ -249,6 +246,7 @@ implements JifMethodInstance
         }
         return debugString(false);
     }
+
     public String fullSignature() {
         StringBuffer sb = new StringBuffer();
         sb.append(name);
@@ -257,16 +255,14 @@ implements JifMethodInstance
         }
         sb.append("(");
 
-        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext(); ) {
+        for (Iterator<Type> i = formalTypes.iterator(); i.hasNext();) {
             Type t = i.next();
             if (Report.should_report(Report.debug, 1)) {
                 sb.append(t.toString());
-            }
-            else {
+            } else {
                 if (t.isClass()) {
                     sb.append(t.toClass().name());
-                }
-                else {
+                } else {
                     sb.append(t.toString());
                 }
             }

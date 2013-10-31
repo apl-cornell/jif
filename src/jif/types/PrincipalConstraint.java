@@ -20,8 +20,7 @@ import polyglot.util.Position;
  * assignment for {@link Variable Variables}.
  * 
  */
-public class PrincipalConstraint extends Constraint
-{
+public class PrincipalConstraint extends Constraint {
     /**
      * An equivalence kind of constraint. That is, the constraint requires that
      * lhs actsfor rhs and rhs actsfor lhs.
@@ -34,20 +33,18 @@ public class PrincipalConstraint extends Constraint
      */
     public static final Kind ACTSFOR = new Kind(" actsfor ");
 
-    public PrincipalConstraint(Principal lhs, Kind kind, Principal rhs, LabelEnv env,
-            Position pos, ConstraintMessage msg, boolean report) {
+    public PrincipalConstraint(Principal lhs, Kind kind, Principal rhs,
+            LabelEnv env, Position pos, ConstraintMessage msg, boolean report) {
         super(lhs, kind, rhs, env, pos, msg, report);
     }
 
     public Principal lhsPrincipal() {
-        return (Principal)lhs;
+        return (Principal) lhs;
     }
-
 
     public Principal rhsPrincipal() {
-        return (Principal)rhs;
+        return (Principal) rhs;
     }
-
 
     /**
      * Produce a <code>Collection</code> of {@link Equation Equations} for this
@@ -59,13 +56,12 @@ public class PrincipalConstraint extends Constraint
 
         if (kind == ACTSFOR) {
             addActsforEqns(eqns, lhsPrincipal(), rhsPrincipal());
-        }
-        else if (kind == EQUIV) {
+        } else if (kind == EQUIV) {
             addActsforEqns(eqns, lhsPrincipal(), rhsPrincipal());
             addActsforEqns(eqns, rhsPrincipal(), lhsPrincipal());
-        }
-        else {
-            throw new InternalCompilerError("Inappropriate kind of equation: " + kind);
+        } else {
+            throw new InternalCompilerError("Inappropriate kind of equation: "
+                    + kind);
         }
 
         return eqns;
@@ -84,17 +80,16 @@ public class PrincipalConstraint extends Constraint
             for (Principal jc : ((DisjunctivePrincipal) left).disjuncts()) {
                 addActsforEqns(eqns, jc, right);
             }
-        }
-        else if (right instanceof ConjunctivePrincipal) {
+        } else if (right instanceof ConjunctivePrincipal) {
             for (Principal mc : ((ConjunctivePrincipal) right).conjuncts()) {
                 addActsforEqns(eqns, left, mc);
             }
-        }
-        else {
+        } else {
             Equation eqn = new PrincipalEquation(left, right, this);
             eqns.add(eqn);
         }
     }
+
     @Override
     public boolean hasVariables() {
         return lhsPrincipal().hasVariables() || rhsPrincipal().hasVariables();

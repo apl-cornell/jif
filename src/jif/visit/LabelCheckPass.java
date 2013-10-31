@@ -9,8 +9,7 @@ import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 
 /** A pass which runs a visitor. */
-public class LabelCheckPass extends AbstractPass
-{
+public class LabelCheckPass extends AbstractPass {
     private final Job job;
     private final LabelChecker lc;
 
@@ -25,7 +24,8 @@ public class LabelCheckPass extends AbstractPass
         Node ast = job.ast();
 
         if (ast == null) {
-            throw new InternalCompilerError("Null AST for job " + job + ": did the parser run?");
+            throw new InternalCompilerError("Null AST for job " + job
+                    + ": did the parser run?");
         }
 
         ErrorQueue q = job.compiler().errorQueue();
@@ -34,8 +34,7 @@ public class LabelCheckPass extends AbstractPass
         try {
             ast = lc.labelCheck(ast);
             ast = lc.finishedLabelCheckPass(ast);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             lc.reportSemanticException(e);
         }
 

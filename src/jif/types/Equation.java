@@ -15,8 +15,7 @@ import polyglot.util.Position;
  * 
  * @see jif.types.LabelConstraint 
  */
-public abstract class Equation
-{
+public abstract class Equation {
     /**
      * @param constraint
      *        the constraint from which this equation was derived.
@@ -24,12 +23,17 @@ public abstract class Equation
     protected Equation(Constraint constraint) {
         this.constraint = constraint;
     }
-    
+
     /** The constraint from which this equation was derived. */
     protected final Constraint constraint;
-    
-    public LabelEnv env() {return constraint().env();}
-    public Position position() {return constraint().position();}
+
+    public LabelEnv env() {
+        return constraint().env();
+    }
+
+    public Position position() {
+        return constraint().position();
+    }
 
     /** The constraint from which this equation was derived. */
     public Constraint constraint() {
@@ -47,6 +51,7 @@ public abstract class Equation
 
     @Override
     public abstract boolean equals(Object o);
+
     @Override
     public abstract String toString();
 
@@ -55,7 +60,8 @@ public abstract class Equation
      * <code>lhs.subst(subst)</code> and <code>rhs.subst(subst)</code> 
      * respectively.
      */
-    public abstract void subst(LabelSubstitution subst) throws SemanticException;
-    
+    public abstract void subst(LabelSubstitution subst)
+            throws SemanticException;
+
     public abstract Object copy();
 }

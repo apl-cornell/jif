@@ -6,6 +6,6 @@ import jif.types.principal.Principal;
  */
 public interface WriterPolicy extends IntegPolicy {
     Principal owner();
+
     Principal writer();
 }
-

@@ -7,6 +7,5 @@ import jif.ast.JifExt;
  *  @see polyglot.ast.ProcedureDecl
  *  @see jif.types.JifProcedureInstance
  */
-public interface JifProcedureDeclExt extends JifExt
-{
+public interface JifProcedureDeclExt extends JifExt {
 }

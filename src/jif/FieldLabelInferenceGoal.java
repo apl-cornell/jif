@@ -15,7 +15,7 @@ public class FieldLabelInferenceGoal extends SourceFileGoal {
 
     @Override
     public Pass createPass(polyglot.frontend.ExtensionInfo extInfo) {
-        ExtensionInfo jifext = (ExtensionInfo)extInfo;
+        ExtensionInfo jifext = (ExtensionInfo) extInfo;
         final JifTypeSystem ts = (JifTypeSystem) jifext.typeSystem();
         final JifNodeFactory nf = (JifNodeFactory) jifext.nodeFactory();
         return new VisitorPass(this, new FieldLabelResolver(this.job(), ts, nf));

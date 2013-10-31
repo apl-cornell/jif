@@ -9,7 +9,7 @@ import polyglot.types.SemanticException;
  * 
  *  @see polyglot.ast.FieldDecl
  */
-public interface JifFieldDeclExt extends JifExt
-{
-    void labelCheckField(LabelChecker lc, JifClassType ct) throws SemanticException;
+public interface JifFieldDeclExt extends JifExt {
+    void labelCheckField(LabelChecker lc, JifClassType ct)
+            throws SemanticException;
 }

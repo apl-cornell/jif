@@ -40,17 +40,29 @@ public class Inst extends Amb {
     public List<ParamNode> params() {
         return params;
     }
+
     @Override
     public TypeNode toType() throws Exception {
         return parser.nf.InstTypeNode(pos, prefix, params);
     }
 
     @Override
-    public Prefix toPrefix() throws Exception { return toType(); }
+    public Prefix toPrefix() throws Exception {
+        return toType();
+    }
+
     @Override
-    public Receiver toReceiver() throws Exception { return toType(); }
+    public Receiver toReceiver() throws Exception {
+        return toType();
+    }
+
     @Override
-    public TypeNode toUnlabeledType() throws Exception { return toType(); }
+    public TypeNode toUnlabeledType() throws Exception {
+        return toType();
+    }
+
     @Override
-    public TypeNode toClassType() throws Exception { return toType(); }
+    public TypeNode toClassType() throws Exception {
+        return toType();
+    }
 }

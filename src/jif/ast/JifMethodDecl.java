@@ -12,7 +12,7 @@ import polyglot.ast.MethodDecl;
  */
 public interface JifMethodDecl extends JifProcedureDecl, MethodDecl {
     JifMethodDecl startLabel(LabelNode startLabel);
-    
+
     JifMethodDecl returnLabel(LabelNode returnLabel);
 
     JifMethodDecl constraints(List<ConstraintNode<Assertion>> constraints);

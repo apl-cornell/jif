@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SigMerge
-{
-    private final static String MARK = "public static final String jlc$CompilerVersion";
+public class SigMerge {
+    private final static String MARK =
+            "public static final String jlc$CompilerVersion";
     private final static String WHITE = " \t\n";
 
     private static void usage() {
@@ -26,7 +26,7 @@ public class SigMerge
         String line;
         boolean sigStart = false;
 
-        while ((line = reader.readLine())!=null) {
+        while ((line = reader.readLine()) != null) {
             if (!sigStart && line.indexOf(MARK) != -1) sigStart = true;
             if (sigStart) {
                 sig.add(line);
@@ -48,15 +48,14 @@ public class SigMerge
     }
 
     public static boolean isEmpty(String line) {
-        for (int i=0; i<line.length(); i++) {
-            if (WHITE.indexOf(line.charAt(i))==-1) return false;
+        for (int i = 0; i < line.length(); i++) {
+            if (WHITE.indexOf(line.charAt(i)) == -1) return false;
         }
         return true;
     }
 
-    public static void main(String[] args) throws IOException
-    {
-        if (args.length >3 || args.length < 2) {
+    public static void main(String[] args) throws IOException {
+        if (args.length > 3 || args.length < 2) {
             usage();
             return;
         }
@@ -64,7 +63,8 @@ public class SigMerge
         String sigFile = args[0];
         String javaFile = args[1];
         String outputFile;
-        if (args.length == 2) outputFile = javaFile;
+        if (args.length == 2)
+            outputFile = javaFile;
         else outputFile = args[2];
 
         List<String> sig = readSig(sigFile);
@@ -96,7 +96,8 @@ public class SigMerge
                 buffering = true;
             }
 
-            if (buffering) buf.add(line);
+            if (buffering)
+                buf.add(line);
             else out.add(line);
         }
 

@@ -31,12 +31,12 @@ public interface JifContext extends Context {
      * Label environment methods
      */
     LabelEnv labelEnv();
-    
+
     /**
      * Add a less than or equal assertion to the label environment.
      */
     void addAssertionLE(Label L1, Label L2);
-    
+
     /**
      * Adds a label-actsfor-principal assumption to the label environment.
      */
@@ -46,7 +46,7 @@ public interface JifContext extends Context {
      * Add an equivalence to the label environment. 
      */
     void addEquiv(Label L1, Label L2);
-    
+
     /**
      * Adds the assertion to this context, and all outer contexts up to
      * the method/constructor/initializer level
@@ -78,12 +78,11 @@ public interface JifContext extends Context {
      */
     void addDefinitionalAssertionEquiv(AccessPath p, AccessPath q);
 
-
     /* ************************************************
      * Prinicpal Hierarchy methods
      */
     PrincipalHierarchy ph();
-    
+
     /**
      * Add an actsfor relation to the principal hierarchy. 
      */
@@ -93,21 +92,23 @@ public interface JifContext extends Context {
      * Add an actsfor relation both ways to the principal hierarchy. 
      */
     void addEquiv(Principal p1, Principal p2);
+
     /**
      * Adds the assertion to this context, and all outer contexts up to
      * the method/constructor/initializer level
      */
     void addDefinitionalEquiv(Principal p1, Principal p2);
+
     /**
      * Clears the principal hierarchy of all actsfor relations. 
      */
     void clearPH();
-     
-     
+
     /* ************************************************
      * PC and Authority methods
      */
     Label pc();
+
     void setPc(Label label, LabelChecker lc);
 
     /**
@@ -116,6 +117,7 @@ public interface JifContext extends Context {
      * on the observable effects of the current code.
      */
     Label currentCodePCBound();
+
     void setCurrentCodePCBound(Label label);
 
     /**
@@ -123,6 +125,7 @@ public interface JifContext extends Context {
      * location <code>label</code>, with the branch kind <code>kind</code>.
      */
     Label gotoLabel(Branch.Kind kind, String label) throws SemanticException;
+
     /**
      * Record the <code>Label</code> associated with branching to the 
      * location <code>label</code>, with the branch kind <code>kind</code>.
@@ -132,32 +135,32 @@ public interface JifContext extends Context {
     /**
      * The authority of a class or a procedure is the set of principals
      * who have authorized that code.
-     */    
+     */
     Set<Principal> authority();
+
     void setAuthority(Set<Principal> authority);
 
     /**
      * Get the authority of the current code, represented as a confidentiality label.
-     */    
+     */
     Label authLabel();
 
     /**
      * Get the authority of the current code, represented as an integrity label.
-     */    
+     */
     Label authLabelInteg();
-
 
     /* ************************************************
      * Miscellaneous contextual information for label checking
      */
-     
+
     /**
      * Indicates if we are currently checking the initializers within a 
      * constructor. If we are, then more permissive label checking can 
      * be used for field assignments.
      */
     boolean checkingInits();
-    
+
     /**
      * Set whether we are currently checking the initializers within a 
      * constructor.
@@ -171,6 +174,7 @@ public interface JifContext extends Context {
      * assignments.
      */
     Label constructorReturnLabel();
+
     void setConstructorReturnLabel(Label Lr);
 
     /**
@@ -180,7 +184,7 @@ public interface JifContext extends Context {
      * constructor call contexts, but not other static contexts.
      */
     Context pushConstructorCall();
-    
+
     /**
      * Is the Context in a constructor call, e.g. "super(...)"
      * or "this(...)"? 
@@ -196,13 +200,14 @@ public interface JifContext extends Context {
      * Can this expression be updated, e.g. is "e++" or "e = e'" allowed?
      */
     boolean updateAllowed(Expr e);
-    
+
     /**
      * Add a checked endorse for the local instance li.
      */
     void addCheckedEndorse(LocalInstance li, Label downgradeTo);
 
     ProviderLabel provider();
+
     void setProvider(ProviderLabel provider);
 
     void addActsFor(ActsForParam actor, Principal granter);

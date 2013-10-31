@@ -8,8 +8,7 @@ import polyglot.types.TypeSystem;
  * a class after it has been created.  Members are initialized lazily
  * to correctly handle cyclic dependencies between classes.
  */
-public class JifLazyClassInitializer_c extends SchedulerClassInitializer
-{
+public class JifLazyClassInitializer_c extends SchedulerClassInitializer {
     public JifLazyClassInitializer_c(TypeSystem ts) {
         super(ts);
     }

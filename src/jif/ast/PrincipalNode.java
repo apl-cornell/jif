@@ -7,5 +7,6 @@ import polyglot.ast.Expr;
  */
 public interface PrincipalNode extends ActsForParamNode<Principal>, Expr {
     Principal principal();
+
     PrincipalNode principal(Principal principal);
 }

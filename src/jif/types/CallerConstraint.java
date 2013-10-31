@@ -8,5 +8,6 @@ import jif.types.principal.Principal;
  */
 public interface CallerConstraint extends Assertion {
     List<Principal> principals();
+
     CallerConstraint principals(List<Principal> principals);
 }

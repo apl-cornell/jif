@@ -6,6 +6,6 @@ import jif.types.principal.Principal;
  */
 public interface ReaderPolicy extends ConfPolicy {
     Principal owner();
+
     Principal reader();
 }
-

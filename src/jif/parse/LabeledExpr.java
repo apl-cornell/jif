@@ -9,12 +9,12 @@ public class LabeledExpr extends Amb {
     public Amb prefix;
     public LabelNode label;
 
-    public LabeledExpr(Grm parser, Position pos, Amb prefix, LabelNode label) throws Exception {
+    public LabeledExpr(Grm parser, Position pos, Amb prefix, LabelNode label)
+            throws Exception {
         super(parser, pos);
         this.prefix = prefix;
         this.label = label;
-        if (prefix instanceof LabeledExpr)
-            parser.die(pos);
+        if (prefix instanceof LabeledExpr) parser.die(pos);
     }
 
     @Override
@@ -22,5 +22,3 @@ public class LabeledExpr extends Amb {
         return parser.nf.LabeledTypeNode(pos, prefix.toType(), label);
     }
 }
-
-

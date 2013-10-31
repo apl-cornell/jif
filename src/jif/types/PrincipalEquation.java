@@ -20,17 +20,15 @@ import polyglot.util.Position;
  * 
  * @see jif.types.PrincipalConstraint
  */
-public class PrincipalEquation extends Equation
-{
+public class PrincipalEquation extends Equation {
     private Principal lhs;
     private Principal rhs;
-
 
     /**
      * Constructor
      */
-    PrincipalEquation(Principal lhs, Principal rhs, PrincipalConstraint constraint)
-    {
+    PrincipalEquation(Principal lhs, Principal rhs,
+            PrincipalConstraint constraint) {
         super(constraint);
         this.lhs = lhs;
         this.rhs = rhs.simplify();
@@ -45,21 +43,31 @@ public class PrincipalEquation extends Equation
         }
     }
 
+    public Principal lhs() {
+        return lhs;
+    }
 
-    public Principal lhs() {return lhs;}
-    public Principal rhs() {return rhs;}
+    public Principal rhs() {
+        return rhs;
+    }
+
     @Override
-    public LabelEnv env() {return constraint().env();}
+    public LabelEnv env() {
+        return constraint().env();
+    }
+
     @Override
-    public Position position() {return constraint().position();}
+    public Position position() {
+        return constraint().position();
+    }
 
     @Override
     public Object copy() {
-        return new PrincipalEquation(lhs, rhs, (PrincipalConstraint)constraint);
+        return new PrincipalEquation(lhs, rhs, (PrincipalConstraint) constraint);
     }
 
     public PrincipalConstraint principalConstraint() {
-        return (PrincipalConstraint)constraint;
+        return (PrincipalConstraint) constraint;
     }
 
     /**
@@ -75,11 +83,13 @@ public class PrincipalEquation extends Equation
     }
 
     @Override
-    public int hashCode() { return lhs.hashCode() ^ rhs.hashCode(); }
+    public int hashCode() {
+        return lhs.hashCode() ^ rhs.hashCode();
+    }
 
     @Override
     public boolean equals(Object o) {
-        if (! (o instanceof PrincipalEquation)) {
+        if (!(o instanceof PrincipalEquation)) {
             return false;
         }
 
@@ -92,10 +102,11 @@ public class PrincipalEquation extends Equation
 
     @Override
     public String toString() {
-        return lhs.toString() + " actsfor " + rhs.toString() + " in environment " +
-                env() + " (produced from " +
-                principalConstraint().lhsPrincipal() + principalConstraint().kind() + principalConstraint().rhsPrincipal() + ") " +
-                position();
+        return lhs.toString() + " actsfor " + rhs.toString()
+                + " in environment " + env() + " (produced from "
+                + principalConstraint().lhsPrincipal()
+                + principalConstraint().kind()
+                + principalConstraint().rhsPrincipal() + ") " + position();
     }
 
     /**

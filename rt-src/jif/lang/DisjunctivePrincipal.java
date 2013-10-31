@@ -15,6 +15,7 @@ public final class DisjunctivePrincipal implements Principal {
     DisjunctivePrincipal(Set<Principal> disjuncts) {
         this.disjuncts = disjuncts;
     }
+
     @Override
     public String name() {
         StringBuffer sb = new StringBuffer();
@@ -29,7 +30,7 @@ public final class DisjunctivePrincipal implements Principal {
     @Override
     public boolean delegatesTo(Principal p) {
         if (p instanceof DisjunctivePrincipal) {
-            DisjunctivePrincipal dp = (DisjunctivePrincipal)p;
+            DisjunctivePrincipal dp = (DisjunctivePrincipal) p;
             return this.disjuncts.containsAll(dp.disjuncts);
         }
         for (Principal q : disjuncts) {
@@ -49,15 +50,17 @@ public final class DisjunctivePrincipal implements Principal {
     @Override
     public boolean equals(Principal p) {
         if (p instanceof DisjunctivePrincipal) {
-            DisjunctivePrincipal that = (DisjunctivePrincipal)p;
-            return this.hashCode() == that.hashCode() && this.disjuncts.equals(that.disjuncts) &&
-                    that.disjuncts.equals(this.disjuncts);
+            DisjunctivePrincipal that = (DisjunctivePrincipal) p;
+            return this.hashCode() == that.hashCode()
+                    && this.disjuncts.equals(that.disjuncts)
+                    && that.disjuncts.equals(this.disjuncts);
         }
         return false;
     }
 
     @Override
-    public boolean isAuthorized(Object authPrf, Closure closure, Label lb, boolean executeNow) {
+    public boolean isAuthorized(Object authPrf, Closure closure, Label lb,
+            boolean executeNow) {
         for (Principal p : disjuncts) {
             if (p.isAuthorized(authPrf, closure, lb, executeNow)) return true;
         }
@@ -70,7 +73,8 @@ public final class DisjunctivePrincipal implements Principal {
             return new DelegatesProof(p, this);
         }
         for (Principal witness : disjuncts) {
-            ActsForProof prf = PrincipalUtil.findActsForProof(p, witness, searchState);
+            ActsForProof prf =
+                    PrincipalUtil.findActsForProof(p, witness, searchState);
             if (prf != null) {
                 // have found a proof from p to witness.
                 DelegatesProof step = new DelegatesProof(witness, this);
@@ -85,7 +89,8 @@ public final class DisjunctivePrincipal implements Principal {
         Map<Principal, ActsForProof> proofs =
                 new HashMap<Principal, ActsForProof>();
         for (Principal p : disjuncts) {
-            ActsForProof prf = PrincipalUtil.findActsForProof(p, q, searchState);
+            ActsForProof prf =
+                    PrincipalUtil.findActsForProof(p, q, searchState);
             if (prf == null) return null;
             proofs.put(p, prf);
         }

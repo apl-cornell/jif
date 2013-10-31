@@ -17,15 +17,14 @@ public abstract class Graph {
         Map<Node, Edge> outs;
         boolean shouldprint;
 
-        public Node( ) {
+        public Node() {
             ins = new HashMap<Node, Edge>();
             outs = new HashMap<Node, Edge>();
             shouldprint = false;
         }
 
-        public void acceptForward (NodeVisitor v, List<Node> visited) {
-            if (visited.contains(this))
-                return;
+        public void acceptForward(NodeVisitor v, List<Node> visited) {
+            if (visited.contains(this)) return;
             v.discoverVertex(this);
             v.visit(this);
             visited.add(this);
@@ -35,9 +34,8 @@ public abstract class Graph {
             v.leaveVertex(this);
         }
 
-        public void acceptBackward (NodeVisitor v, List<Node> visited) {
-            if (visited.contains(this))
-                return;
+        public void acceptBackward(NodeVisitor v, List<Node> visited) {
+            if (visited.contains(this)) return;
             v.discoverVertex(this);
             v.visit(this);
             visited.add(this);
@@ -52,11 +50,13 @@ public abstract class Graph {
 
     public interface NodeVisitor {
         public void discoverVertex(Node n);
+
         public void visit(Node n);
+
         public void leaveVertex(Node n);
     }
 
-    protected void addEdge (Node from, Node to, Edge edge) {
+    protected void addEdge(Node from, Node to, Edge edge) {
         from.outs.put(to, edge);
         to.ins.put(from, edge);
     }
@@ -79,16 +79,14 @@ public abstract class Graph {
         public void discoverVertex(Node n) {
             if (isbackward)
                 currentpath.add(0, n);
-            else
-                currentpath.add(n);
+            else currentpath.add(n);
         }
 
         @Override
         public void leaveVertex(Node n) {
             if (isbackward)
                 currentpath.remove(0);
-            else
-                currentpath.remove(currentpath.size()-1);
+            else currentpath.remove(currentpath.size() - 1);
         }
 
         @Override
@@ -101,14 +99,14 @@ public abstract class Graph {
         }
     }
 
-    public Set<List<Node>> getBackwardPaths (Node start) {
+    public Set<List<Node>> getBackwardPaths(Node start) {
         Set<List<Node>> ret = new HashSet<List<Node>>();
         List<Node> visited = new ArrayList<Node>();
         start.acceptBackward(new PathFinder(ret, true), visited);
         return ret;
     }
 
-    public Set<List<Node>> getForwardPaths (Node start) {
+    public Set<List<Node>> getForwardPaths(Node start) {
         Set<List<Node>> ret = new HashSet<List<Node>>();
         List<Node> visited = new ArrayList<Node>();
         start.acceptForward(new PathFinder(ret, false), visited);
@@ -133,7 +131,7 @@ public abstract class Graph {
         }
     }
 
-    public void labelAll (Node root) {
+    public void labelAll(Node root) {
         List<Node> visited = new ArrayList<Node>();
         root.acceptForward(new LabellingVisitor(), visited);
         root.shouldprint = false;

@@ -10,8 +10,7 @@ import polyglot.ast.TypeNode;
  *  The ambiguity arises because in <code>new T.a[e][m]</code>, <code>e</code>
  *  may be either a dimension expression or a label/principal parameter.
  */
-public interface AmbNewArray extends Expr, Ambiguous
-{
+public interface AmbNewArray extends Expr, Ambiguous {
     /** Gets the base type T.a from an AmbNewArray representing T.a[e][m]. */
     TypeNode baseType();
 

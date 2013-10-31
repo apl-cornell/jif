@@ -24,37 +24,35 @@ import polyglot.util.InternalCompilerError;
  */
 public class JifDisamb_c extends Disamb_c {
     @Override
-    protected Node disambiguateVarInstance(VarInstance vi) throws SemanticException {
+    protected Node disambiguateVarInstance(VarInstance vi)
+            throws SemanticException {
         Node n = super.disambiguateVarInstance(vi);
         if (n != null) {
             return n;
         }
         if (vi instanceof PrincipalInstance) {
-            PrincipalInstance pi = (PrincipalInstance)vi;
-            JifNodeFactory jnf = (JifNodeFactory)nf;
+            PrincipalInstance pi = (PrincipalInstance) vi;
+            JifNodeFactory jnf = (JifNodeFactory) nf;
             return jnf.CanonicalPrincipalNode(pos, pi.principal());
         }
         if (vi instanceof ParamInstance) {
-            ParamInstance pi = (ParamInstance)vi;
-            JifNodeFactory jnf = (JifNodeFactory)nf;
-            JifTypeSystem ts = (JifTypeSystem)vi.typeSystem();
+            ParamInstance pi = (ParamInstance) vi;
+            JifNodeFactory jnf = (JifNodeFactory) nf;
+            JifTypeSystem ts = (JifTypeSystem) vi.typeSystem();
 
             if (pi.isPrincipal()) {
                 // <param principal uid> => <principal-param uid>
                 Principal p = ts.principalParam(pos, pi);
                 return jnf.CanonicalPrincipalNode(pos, p);
-            }
-            else if (pi.isInvariantLabel()) {
+            } else if (pi.isInvariantLabel()) {
                 Label l = ts.paramLabel(pos, pi);
                 return jnf.LabelExpr(pos, l);
-            }
-            else if (pi.isCovariantLabel()) {
+            } else if (pi.isCovariantLabel()) {
                 Label l = ts.covariantLabel(pos, pi);
                 return jnf.LabelExpr(pos, l);
             }
 
-            throw new InternalCompilerError("Unexpected param " + pi,
-                    pos);
+            throw new InternalCompilerError("Unexpected param " + pi, pos);
         }
         return null;
     }
@@ -64,18 +62,20 @@ public class JifDisamb_c extends Disamb_c {
      * uninstantiated polymorphic class.
      */
     @Override
-    protected Receiver makeMissingFieldTarget(FieldInstance fi) throws SemanticException {
+    protected Receiver makeMissingFieldTarget(FieldInstance fi)
+            throws SemanticException {
         if (fi.flags().isStatic()) {
-            JifTypeSystem jts = (JifTypeSystem)fi.typeSystem();
+            JifTypeSystem jts = (JifTypeSystem) fi.typeSystem();
             Type container = fi.container();
             if (container instanceof JifParsedPolyType) {
-                JifParsedPolyType jppt = (JifParsedPolyType)container;
+                JifParsedPolyType jppt = (JifParsedPolyType) container;
                 if (jppt.params().size() > 0) {
                     // return the "null instantiation" of the base type,
                     // to ensure that all TypeNodes contain either
                     // a JifParsedPolyType with zero params, or a
                     // JifSubstClassType
-                    return nf.CanonicalTypeNode(pos, jts.nullInstantiate(pos, jppt.instantiatedFrom()));
+                    return nf.CanonicalTypeNode(pos,
+                            jts.nullInstantiate(pos, jppt.instantiatedFrom()));
                 }
             }
         }
@@ -84,5 +84,3 @@ public class JifDisamb_c extends Disamb_c {
     }
 
 }
-
-

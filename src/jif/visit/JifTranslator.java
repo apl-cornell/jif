@@ -10,20 +10,21 @@ import polyglot.visit.TypedTranslator;
 /** The Jif translator is used to generate Java files from
  *  the current ASTs.
  */
-public class JifTranslator extends TypedTranslator
-{
-    public JifTranslator(Job job, TypeSystem ts, NodeFactory nf, TargetFactory tf) {
-	super(job, ts, nf, tf);
+public class JifTranslator extends TypedTranslator {
+    public JifTranslator(Job job, TypeSystem ts, NodeFactory nf,
+            TargetFactory tf) {
+        super(job, ts, nf, tf);
     }
 
     @Override
     protected boolean translateSource(SourceFile sfn) {
-	// Don't translate classes in jif.lang.
-	if (sfn.package_() != null &&
-	    sfn.package_().equals(typeSystem().createPackage("jif.lang"))) {
-	    return true;
-	}
+        // Don't translate classes in jif.lang.
+        if (sfn.package_() != null
+                && sfn.package_()
+                        .equals(typeSystem().createPackage("jif.lang"))) {
+            return true;
+        }
 
-	return super.translateSource(sfn);
+        return super.translateSource(sfn);
     }
 }

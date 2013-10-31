@@ -23,20 +23,18 @@ public class JifInitChecker extends InitChecker {
         super(job, ts, nf);
     }
 
-    
     @Override
-    protected void checkOther(FlowGraph<FlowItem> graph, 
-                              Node n, 
-                              DataFlowItem dfIn,
-                              DataFlowItem dfOut) 
-    throws SemanticException {
+    protected void checkOther(FlowGraph<FlowItem> graph, Node n,
+            DataFlowItem dfIn, DataFlowItem dfOut) throws SemanticException {
         if (n instanceof TypeNode) {
             // need to check type nodes for uses of locals.
-            TypeNode tn = (TypeNode)n;
+            TypeNode tn = (TypeNode) n;
             Type t = tn.type();
             if (t instanceof JifClassType) {
-                JifTypeSystem ts = (JifTypeSystem)t.typeSystem();
-                Set<LocalInstance> lis = ts.labelTypeCheckUtil().localInstancesUsed((JifClassType)t);
+                JifTypeSystem ts = (JifTypeSystem) t.typeSystem();
+                Set<LocalInstance> lis =
+                        ts.labelTypeCheckUtil().localInstancesUsed(
+                                (JifClassType) t);
                 for (LocalInstance li : lis) {
                     checkLocalInstanceInit(li, dfIn, tn.position());
                 }

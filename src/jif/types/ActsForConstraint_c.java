@@ -10,7 +10,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 public class ActsForConstraint_c<Actor extends ActsForParam, Granter extends ActsForParam>
-extends TypeObject_c implements ActsForConstraint<Actor, Granter> {
+        extends TypeObject_c implements ActsForConstraint<Actor, Granter> {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected ActsForConstraintToJavaExpr toJava;
@@ -70,7 +70,7 @@ extends TypeObject_c implements ActsForConstraint<Actor, Granter> {
     public ActsForConstraint_c<Actor, Granter> copy() {
         @SuppressWarnings("unchecked")
         ActsForConstraint_c<Actor, Granter> copy =
-        (ActsForConstraint_c<Actor, Granter>) super.copy();
+                (ActsForConstraint_c<Actor, Granter>) super.copy();
         return copy;
     }
 

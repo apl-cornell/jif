@@ -13,7 +13,8 @@ import polyglot.frontend.goals.VisitorGoal;
 import polyglot.types.TypeSystem;
 
 public class JifExceptionsChecked extends VisitorGoal {
-    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
+    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
+            NodeFactory nf) {
         return scheduler.internGoal(new JifExceptionsChecked(job, ts, nf));
     }
 

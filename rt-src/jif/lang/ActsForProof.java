@@ -16,6 +16,7 @@ public abstract class ActsForProof {
     public Principal getActor() {
         return actor;
     }
+
     public Principal getGranter() {
         return granter;
     }

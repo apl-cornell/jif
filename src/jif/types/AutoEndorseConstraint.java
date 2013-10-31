@@ -6,5 +6,6 @@ import jif.types.label.Label;
  */
 public interface AutoEndorseConstraint extends Assertion {
     Label endorseTo();
+
     AutoEndorseConstraint endorseTo(Label endorseTo);
 }

@@ -13,7 +13,6 @@ import polyglot.types.TypeObject;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-
 public class ConstArrayType_c extends ArrayType_c implements ConstArrayType {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
@@ -21,12 +20,16 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType {
     protected boolean isNonConst;
 
     /** Used for deserializing types. */
-    protected ConstArrayType_c() { }
+    protected ConstArrayType_c() {
+    }
 
-    public ConstArrayType_c(JifTypeSystem ts, Position pos, Type base, boolean isConst) {
+    public ConstArrayType_c(JifTypeSystem ts, Position pos, Type base,
+            boolean isConst) {
         this(ts, pos, base, isConst, !isConst);
     }
-    public ConstArrayType_c(JifTypeSystem ts, Position pos, Type base, boolean isConst, boolean isNonConst) {
+
+    public ConstArrayType_c(JifTypeSystem ts, Position pos, Type base,
+            boolean isConst, boolean isNonConst) {
         super(ts, pos, base);
         this.isConst = isConst;
         this.isNonConst = isNonConst;
@@ -36,7 +39,7 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType {
     public String toString() {
         Type base = base();
         Type ultBase = ultimateBase();
-        JifTypeSystem ts = (JifTypeSystem)this.typeSystem();
+        JifTypeSystem ts = (JifTypeSystem) this.typeSystem();
         boolean isBaseArray = base.isArray();
         if (isBaseArray && ts.isLabeled(base) && ts.isLabeled(ultBase)) {
             // both the base of this array is labeled, and the
@@ -59,9 +62,8 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType {
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof ConstArrayType) {
             ConstArrayType t = (ConstArrayType) o;
-            return t.isConst() == isConst &&
-                    t.isNonConst() == isNonConst &&
-                    ts.equals(base, t.base());
+            return t.isConst() == isConst && t.isNonConst() == isNonConst
+                    && ts.equals(base, t.base());
         }
 
         if (o instanceof ArrayType) {
@@ -87,13 +89,13 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType {
         if (isNonConst && !isConst) {
             if (toType.isArray()) {
                 // toType must be a non-const
-                if (toType instanceof ConstArrayType && ((ConstArrayType)toType).isConst()) {
+                if (toType instanceof ConstArrayType
+                        && ((ConstArrayType) toType).isConst()) {
                     return false;
                 }
                 // non-const arrays are invariant.
                 return ts.equals(this.base(), toType.toArray().base());
-            }
-            else {
+            } else {
                 // Object = int[]
                 return super.isImplicitCastValidImpl(toType);
             }
@@ -101,15 +103,17 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType {
         if (isConst) {
             if (toType.isArray()) {
                 // if we are strictly const then, toType must be a const
-                if (!isNonConst && (!(toType instanceof ConstArrayType) || !((ConstArrayType)toType).isConst())) {
+                if (!isNonConst
+                        && (!(toType instanceof ConstArrayType) || !((ConstArrayType) toType)
+                                .isConst())) {
                     // we are strictly const, and to type is not const
                     return false;
                 }
 
                 // const arrays are covariant
-                return ts.isImplicitCastValid(this.base(), toType.toArray().base());
-            }
-            else {
+                return ts.isImplicitCastValid(this.base(), toType.toArray()
+                        .base());
+            } else {
                 // Object = int[]
                 return super.isImplicitCastValidImpl(toType);
             }
@@ -120,24 +124,18 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType {
 
     @Override
     protected void init() {
-        JifTypeSystem ts = (JifTypeSystem)this.ts;
+        JifTypeSystem ts = (JifTypeSystem) this.ts;
         if (methods == null) {
             methods = new ArrayList<MethodInstance>(1);
 
             // Add method public T const?[] clone()
-            Type retType = ts.constArrayOf(position(), this.base(), 1, true, true);
+            Type retType =
+                    ts.constArrayOf(position(), this.base(), 1, true, true);
 
-            methods.add(ts.jifMethodInstance(position(),
-                    this,
-                    ts.Public(),
-                    retType,
-                    "clone",
-                    ts.topLabel(),
-                    false,
+            methods.add(ts.jifMethodInstance(position(), this, ts.Public(),
+                    retType, "clone", ts.topLabel(), false,
                     Collections.<Type> emptyList(),
-                    Collections.<Label> emptyList(),
-                    ts.bottomLabel(),
-                    false,
+                    Collections.<Label> emptyList(), ts.bottomLabel(), false,
                     Collections.<Type> emptyList(),
                     Collections.<Assertion> emptyList()));
         }
@@ -147,11 +145,10 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType {
 
             // Add field public final int length
             Label fieldLabel = ts.thisLabel(this);
-            JifFieldInstance fi = (JifFieldInstance)ts.fieldInstance(position(),
-                    this,
-                    ts.Public().Final(),
-                    ts.labeledType(position(), ts.Int(), fieldLabel),
-                    "length");
+            JifFieldInstance fi =
+                    (JifFieldInstance) ts.fieldInstance(position(), this, ts
+                            .Public().Final(), ts.labeledType(position(),
+                            ts.Int(), fieldLabel), "length");
             fi.setLabel(fieldLabel);
             fi.setNotConstant();
             fields.add(fi);

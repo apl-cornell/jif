@@ -36,7 +36,8 @@ public class VarMap {
     protected final Label defaultLabelBound;
     protected final Principal defaultPrincipalBound;
 
-    public VarMap(JifTypeSystem ts, Label defaultLabelBound, Principal defaultPrincipalBound) {
+    public VarMap(JifTypeSystem ts, Label defaultLabelBound,
+            Principal defaultPrincipalBound) {
         this.ts = ts;
         this.bounds = new LinkedHashMap<Variable, ActsForParam>();
         this.defaultLabelBound = defaultLabelBound;
@@ -93,6 +94,7 @@ public class VarMap {
         }
         bounds.put(v, bound);
     }
+
     public void setBound(Variable v, Principal bound) {
         if (bound == null) {
             throw new InternalCompilerError("Null bound principal.");
@@ -104,15 +106,16 @@ public class VarMap {
         @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof VarLabel) {
-                VarLabel v = (VarLabel)L;
+                VarLabel v = (VarLabel) L;
                 return VarMap.this.boundOf(v);
             }
             return L;
         }
+
         @Override
         public Principal substPrincipal(Principal p) throws SemanticException {
             if (p instanceof VarPrincipal) {
-                VarPrincipal v = (VarPrincipal)p;
+                VarPrincipal v = (VarPrincipal) p;
                 return VarMap.this.boundOf(v);
             }
             return p;
@@ -120,28 +123,26 @@ public class VarMap {
     }
 
     public Policy applyTo(Policy p) {
-        LabelSubstitution s = new VarMapLabelSubstitution() ;
+        LabelSubstitution s = new VarMapLabelSubstitution();
         try {
             return p.subst(s);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new InternalCompilerError("Unexpected SemanticException", e);
         }
 
     }
 
     public Param applyTo(Param c) {
-        if (c instanceof Label) return applyTo((Label)c);
-        if (c instanceof Principal) return applyTo((Principal)c);
+        if (c instanceof Label) return applyTo((Label) c);
+        if (c instanceof Principal) return applyTo((Principal) c);
         throw new InternalCompilerError("Unexpected Param" + c);
     }
 
     public Label applyTo(Label c) {
-        LabelSubstitution s = new VarMapLabelSubstitution() ;
+        LabelSubstitution s = new VarMapLabelSubstitution();
         try {
             return c.subst(s);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new InternalCompilerError("Unexpected SemanticException", e);
         }
     }
@@ -157,11 +158,10 @@ public class VarMap {
     }
 
     public Principal applyTo(Principal p) {
-        LabelSubstitution s = new VarMapLabelSubstitution() ;
+        LabelSubstitution s = new VarMapLabelSubstitution();
         try {
             return p.subst(s);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new InternalCompilerError("Unexpected SemanticException", e);
         }
     }
@@ -172,13 +172,11 @@ public class VarMap {
             Label L = ts.labelOfType(t);
 
             return ts.labeledType(t.position(), applyTo(baseType), applyTo(L));
-        }
-        else if (t instanceof ArrayType) {
-            ArrayType at = (ArrayType)t;
+        } else if (t instanceof ArrayType) {
+            ArrayType at = (ArrayType) t;
             return at.base(applyTo(at.base()));
-        }
-        else if (t instanceof JifSubstType) {
-            JifSubstType jst = (JifSubstType)t;
+        } else if (t instanceof JifSubstType) {
+            JifSubstType jst = (JifSubstType) t;
             Map<ParamInstance, Param> newMap =
                     new LinkedHashMap<ParamInstance, Param>();
             boolean diff = false;
@@ -189,12 +187,10 @@ public class VarMap {
                 Param arg = e.getValue();
                 Param p;
                 if (arg instanceof Label) {
-                    p = applyTo((Label)arg);
-                }
-                else if (arg instanceof Principal) {
-                    p = applyTo((Principal)arg);
-                }
-                else {
+                    p = applyTo((Label) arg);
+                } else if (arg instanceof Principal) {
+                    p = applyTo((Principal) arg);
+                } else {
                     throw new InternalCompilerError(
                             "Unexpected type for entry: "
                                     + arg.getClass().getName());
@@ -206,7 +202,7 @@ public class VarMap {
                 }
             }
             if (diff) {
-                JifTypeSystem ts = (JifTypeSystem)t.typeSystem();
+                JifTypeSystem ts = (JifTypeSystem) t.typeSystem();
                 t = ts.subst(jst.base(), newMap);
                 return t;
             }
@@ -225,19 +221,21 @@ public class VarMap {
             ActsForParam bound = e.getValue();
             String s = "";
             if (var instanceof VarLabel) {
-                s = ((VarLabel)var).componentString() + " = " + bound.toString();
-                if (((VarLabel)var).description() != null) {
-                    s += "    \t" + ((VarLabel)var).description();
+                s =
+                        ((VarLabel) var).componentString() + " = "
+                                + bound.toString();
+                if (((VarLabel) var).description() != null) {
+                    s += "    \t" + ((VarLabel) var).description();
                 }
-            }
-            else {
+            } else {
                 s = var + " = " + bound.toString();
             }
             sb.append(s);
             sb.append('\n');
         }
-        sb.append("Variables not in this map will receive " +
-                "default bound of " + defaultLabelBound + " or " + defaultPrincipalBound + " as appropriate.");
+        sb.append("Variables not in this map will receive "
+                + "default bound of " + defaultLabelBound + " or "
+                + defaultPrincipalBound + " as appropriate.");
         sb.append('\n');
         sb.append("=========================\n");
         return sb.toString();
@@ -251,19 +249,21 @@ public class VarMap {
             ActsForParam bound = e.getValue();
             String s = "";
             if (var instanceof VarLabel) {
-                s = ((VarLabel)var).componentString() + " = " + bound.toString();
-                if (((VarLabel)var).description() != null) {
-                    s += "    \t" + ((VarLabel)var).description();
+                s =
+                        ((VarLabel) var).componentString() + " = "
+                                + bound.toString();
+                if (((VarLabel) var).description() != null) {
+                    s += "    \t" + ((VarLabel) var).description();
                 }
-            }
-            else {
+            } else {
                 s = var + " = " + bound.toString();
             }
             w.write(s);
             w.newline(0);
         }
-        w.write("Variables not in this map will receive " +
-                "default bound of " + defaultLabelBound + " or " + defaultPrincipalBound + " as appropriate.");
+        w.write("Variables not in this map will receive " + "default bound of "
+                + defaultLabelBound + " or " + defaultPrincipalBound
+                + " as appropriate.");
         w.newline(0);
         w.write("=========================");
         w.newline(0);

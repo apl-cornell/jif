@@ -7,10 +7,10 @@ import polyglot.ast.TypeNode;
  * A <code>ConstArrayTypeNode</code> is a type node for a non-canonical
  * const array type.
  */
-public interface ConstArrayTypeNode extends ArrayTypeNode
-{
+public interface ConstArrayTypeNode extends ArrayTypeNode {
     @Override
     TypeNode base();
+
     @Override
     ArrayTypeNode base(TypeNode base);
 }

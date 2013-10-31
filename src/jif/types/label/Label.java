@@ -192,6 +192,7 @@ public interface Label extends ActsForParam {
     boolean isRuntimeRepresentable();
 
     ConfPolicy confProjection();
+
     IntegPolicy integProjection();
 
     /**

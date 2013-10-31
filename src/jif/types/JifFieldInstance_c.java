@@ -14,9 +14,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>JifFieldInstance</code> interface.
  */
-public class JifFieldInstance_c extends FieldInstance_c
-implements JifFieldInstance
-{
+public class JifFieldInstance_c extends FieldInstance_c implements
+        JifFieldInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Label label;
@@ -24,8 +23,7 @@ implements JifFieldInstance
     protected Param initializer;
 
     public JifFieldInstance_c(JifTypeSystem ts, Position pos,
-            ReferenceType container, Flags flags,
-            Type type, String name) {
+            ReferenceType container, Flags flags, Type type, String name) {
 
         super(ts, pos, container, flags, type, name);
     }
@@ -73,16 +71,16 @@ implements JifFieldInstance
 
     private FieldInstance findOrigFieldInstance() {
         if (this.container() instanceof JifSubstType) {
-            JifSubstType jst = (JifSubstType)this.container();
+            JifSubstType jst = (JifSubstType) this.container();
             if (jst.base() instanceof ParsedClassType) {
                 return ((ParsedClassType) jst.base()).fieldNamed(this.name());
-            }
-            else {
+            } else {
                 throw new InternalCompilerError("Unexpected base type");
             }
         }
         return this;
     }
+
     @Override
     public boolean isConstant() {
         FieldInstance orig = findOrigFieldInstance();
@@ -91,6 +89,7 @@ implements JifFieldInstance
         }
         return super.isConstant();
     }
+
     @Override
     public Object constantValue() {
         FieldInstance orig = findOrigFieldInstance();
@@ -99,6 +98,7 @@ implements JifFieldInstance
         }
         return super.constantValue();
     }
+
     @Override
     public boolean constantValueSet() {
         FieldInstance orig = findOrigFieldInstance();
@@ -107,30 +107,37 @@ implements JifFieldInstance
         }
         return super.constantValueSet();
     }
+
     @Override
     public FieldInstance constantValue(Object constantValue) {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
-            throw new InternalCompilerError("Cant modify constant value on a copy");
+            throw new InternalCompilerError(
+                    "Cant modify constant value on a copy");
         }
         return super.constantValue(constantValue);
     }
+
     @Override
     public FieldInstance notConstant() {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
-            throw new InternalCompilerError("Cant modify constant value on a copy");
+            throw new InternalCompilerError(
+                    "Cant modify constant value on a copy");
         }
         return super.notConstant();
     }
+
     @Override
     public void setConstantValue(Object constantValue) {
         FieldInstance orig = findOrigFieldInstance();
         if (this != orig) {
-            throw new InternalCompilerError("Cant modify constant value on a copy");
+            throw new InternalCompilerError(
+                    "Cant modify constant value on a copy");
         }
         super.setConstantValue(constantValue);
     }
+
     @Override
     public String toString() {
         return super.toString() + " label = " + label;
