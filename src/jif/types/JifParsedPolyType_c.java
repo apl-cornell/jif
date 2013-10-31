@@ -208,30 +208,6 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
     }
 
     @Override
-    public int hashCode() {
-        return flags().hashCode() + name.hashCode();
-    }
-
-    @Override
-    public boolean equalsImpl(TypeObject o) {
-        if (o instanceof JifPolyType) {
-            JifPolyType t = (JifPolyType) o;
-
-            if (package_() != null && t.package_() != null) {
-                return package_().equals(t.package_()) && name.equals(t.name())
-                        && flags.equals(t.flags()) && params.equals(t.params())
-                        && authority.equals(t.authority());
-            } else if (package_() == t.package_()) {
-                return name.equals(t.name()) && flags.equals(t.flags())
-                        && params.equals(t.params())
-                        && authority.equals(t.authority());
-            }
-        }
-
-        return false;
-    }
-
-    @Override
     public ProviderLabel provider() {
         return provider;
     }
