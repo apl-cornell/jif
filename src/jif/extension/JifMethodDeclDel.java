@@ -15,19 +15,24 @@ import jif.types.label.AccessPathLocal;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import polyglot.ast.Node;
+import polyglot.ast.ProcedureDeclOps;
 import polyglot.types.Context;
+import polyglot.types.Flags;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.CodeWriter;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /** The delegate of the <code>JifMethodDecl</code> node.
  * 
  *  @see jif.ast.JifMethodDecl
  */
-public class JifMethodDeclDel extends JifProcedureDeclDel {
+public class JifMethodDeclDel extends JifProcedureDeclDel implements
+        ProcedureDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifMethodDeclDel() {
@@ -147,5 +152,11 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
             }
         }
         return super.typeCheck(tc);
+    }
+
+    @Override
+    public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
+        // XXX Should refactor to separate Del functionality out of JifClassDecl.
+        ((JifMethodDecl_c) node()).prettyPrintHeader(flags, w, tr);
     }
 }
