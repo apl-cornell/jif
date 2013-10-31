@@ -288,6 +288,9 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Inf13.jif ;
 	Implicit.jif ;
 	Implicit2.jif ;
+    Inner0.jif;
+    Inner1.jif;
+    Inner2.jif;
 	IntBounds1.jif ;
 	IntBounds2.jif ;
 	IntBounds3.jif ;

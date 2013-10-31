@@ -4,6 +4,7 @@ import polyglot.ast.Expr;
 import polyglot.ast.Id;
 import polyglot.ast.PackageNode;
 import polyglot.ast.Prefix;
+import polyglot.ast.QualifierNode;
 import polyglot.ast.Receiver;
 import polyglot.ast.TypeNode;
 import polyglot.util.Position;
@@ -32,7 +33,10 @@ public abstract class Amb
     public String toName() throws Exception { parser.die(pos); return null; }
     
     public Position position() { return pos; } 
-    public Grm parser() { return parser; } 
+    public Grm parser() { return parser; }
+
+    public QualifierNode toQualifier()  throws Exception { parser.die(pos); return null; }
+
 }
 
 

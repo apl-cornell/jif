@@ -4,6 +4,7 @@ import polyglot.ast.Expr;
 import polyglot.ast.Id;
 import polyglot.ast.PackageNode;
 import polyglot.ast.Prefix;
+import polyglot.ast.QualifierNode;
 import polyglot.ast.Receiver;
 import polyglot.ast.TypeNode;
 import polyglot.util.Position;
@@ -25,10 +26,13 @@ public class Name extends Amb {
     public String name() {
         return name;
     }
+
     public Amb prefix() {
         return prefix;
     }
-    public Name(Grm parser, Position pos, Amb prefix, String name) throws Exception {
+
+    public Name(Grm parser, Position pos, Amb prefix, String name)
+            throws Exception {
         super(parser, pos);
         this.prefix = prefix;
         this.name = name;
@@ -81,8 +85,7 @@ public class Name extends Amb {
 
     @Override
     public PackageNode toPackage() throws Exception {
-        return parser.nf.PackageNode(pos,
-                parser.ts.packageForName(toName()));
+        return parser.nf.PackageNode(pos, parser.ts.packageForName(toName()));
     }
 
     @Override
@@ -93,13 +96,29 @@ public class Name extends Amb {
             return parser.nf.AmbTypeNode(pos, id);
         }
 
-        return parser.nf.AmbTypeNode(pos, prefix.toPackage(), id);
+        return parser.nf.AmbTypeNode(pos, prefix.toQualifier(), id);
     }
 
     @Override
-    public TypeNode toClassType() throws Exception { return toType(); }
+    public QualifierNode toQualifier() throws Exception {
+        Id id = parser.nf.Id(pos, name);
+
+        if (prefix == null) {
+            return parser.nf.AmbQualifierNode(pos, id);
+        }
+
+        return parser.nf.AmbQualifierNode(pos, prefix.toQualifier(), id);
+    }
+
     @Override
-    public TypeNode toUnlabeledType() throws Exception { return toType(); }
+    public TypeNode toClassType() throws Exception {
+        return toType();
+    }
+
+    @Override
+    public TypeNode toUnlabeledType() throws Exception {
+        return toType();
+    }
 
     @Override
     public Id toIdentifier() throws Exception {
@@ -123,11 +142,8 @@ public class Name extends Amb {
     public String toString() {
         try {
             return toName();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return super.toString();
         }
     }
 }
-
-

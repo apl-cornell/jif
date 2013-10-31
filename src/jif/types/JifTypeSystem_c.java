@@ -132,7 +132,6 @@ import polyglot.types.PrimitiveType_c;
 import polyglot.types.ReferenceType;
 import polyglot.types.Resolver;
 import polyglot.types.SemanticException;
-import polyglot.types.TableResolver;
 import polyglot.types.TopLevelResolver;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
@@ -671,19 +670,6 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     @Override
     public boolean numericConversionValid(Type t, Object value) {
         return super.numericConversionValid(strip(t), value);
-    }
-
-    public Resolver bodyContextResolver(ClassType type, Resolver outer) {
-        // Since Jif does not support inner classes, all class
-        // contexts are empty.  Just return the outer resolver.
-        return outer;
-    }
-
-    @Override
-    public Resolver classContextResolver(ClassType type) {
-        // Since Jif does not support inner classes, all class
-        // contexts are empty.  Just return an empty resolver.
-        return new TableResolver();
     }
 
     @Override
