@@ -383,6 +383,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	            (Semantic, "can not contain .* character");
 	NativePrincipal01.jif ;
 	Nested01.jif ;
+	Nested02.jif ;
 	NewLabel.jif ;
 	NewLabel2.jif ;
 	NewLabel3.jif (Semantic, "not representable at runtime");
