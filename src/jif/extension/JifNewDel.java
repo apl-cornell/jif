@@ -1,6 +1,5 @@
 package jif.extension;
 
-import java.util.Collections;
 import java.util.List;
 
 import jif.ast.JifNew_c;
@@ -65,11 +64,14 @@ public class JifNewDel extends JifDel_c implements NewOps {
      */
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
+        List<Type> result = super.throwTypes(ts);
+
         if (!qualIsNeverNull()
                 && !fatalExceptions.contains(ts.NullPointerException())) {
-            return Collections.<Type> singletonList(ts.NullPointerException());
+            result.add(ts.NullPointerException());
         }
-        return Collections.emptyList();
+
+        return result;
     }
 
     @Override
@@ -109,7 +111,6 @@ public class JifNewDel extends JifDel_c implements NewOps {
     @Override
     public void printArgs(CodeWriter w, PrettyPrinter tr) {
         ((JifNew_c) node()).printArgs(w, tr);
-
     }
 
     @Override
