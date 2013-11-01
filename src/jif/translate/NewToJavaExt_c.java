@@ -9,6 +9,7 @@ import jif.types.JifSubstType;
 import jif.types.ParamInstance;
 import polyglot.ast.Expr;
 import polyglot.ast.New;
+import polyglot.ast.Special;
 import polyglot.types.ClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -32,6 +33,16 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
     @Override
     public Expr exprToJava(JifToJavaRewriter rw) throws SemanticException {
         New n = (New) node();
+
+        // If the qualifier is "null{amb}.this", replace it with null. Gross.
+        if (n.qualifier() instanceof Special) {
+            Special qualifier = (Special) n.qualifier();
+            if (qualifier.kind() == Special.THIS
+                    && qualifier.qualifier().name().equals("null")) {
+                n = n.qualifier(null);
+            }
+        }
+
         ClassType ct = objectType.toClass();
 
         if (!rw.jif_ts().isParamsRuntimeRep(ct)
