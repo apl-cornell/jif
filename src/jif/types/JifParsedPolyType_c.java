@@ -18,7 +18,6 @@ import polyglot.main.Options;
 import polyglot.types.FieldInstance;
 import polyglot.types.LazyClassInitializer;
 import polyglot.types.ParsedClassType_c;
-import polyglot.types.TypeObject;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
