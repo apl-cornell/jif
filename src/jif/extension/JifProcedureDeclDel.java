@@ -13,17 +13,21 @@ import jif.types.principal.Principal;
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
 import polyglot.ast.ProcedureDecl;
+import polyglot.ast.ProcedureDeclOps;
 import polyglot.types.Context;
+import polyglot.types.Flags;
 import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /** The Jif delegate the <code>ProcedureDecl</code> node. 
  * 
  *  @see  polyglot.ast.ProcedureDecl
  */
-public class JifProcedureDeclDel extends JifDel_c {
+public class JifProcedureDeclDel extends JifDel_c implements ProcedureDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifProcedureDeclDel() {
@@ -89,6 +93,12 @@ public class JifProcedureDeclDel extends JifDel_c {
             throw new SemanticException("The top principal " + p
                     + " cannot appear in a constraint.", pos);
         }
+    }
+
+    @Override
+    public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
+        // XXX Should refactor to separate Del functionality out of JifClassDecl.
+        ((ProcedureDeclOps) node()).prettyPrintHeader(flags, w, tr);
     }
 
 }
