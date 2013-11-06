@@ -29,7 +29,7 @@ public class InstOrAccess extends Amb {
         this.prefix = prefix;
         this.param = param;
 
-        if (!(param instanceof Name || param instanceof Expr)) {
+        if (!(param instanceof Name || param instanceof Expr || param instanceof TypeNode)) {
             parser.die(pos);
         }
 
@@ -51,6 +51,9 @@ public class InstOrAccess extends Amb {
         if (param instanceof Name) {
             l.add(parser.nf.AmbParam(((Name) param).pos,
                     ((Name) param).toIdentifier()));
+        } else if (param instanceof TypeNode) {
+            TypeNode tn = (TypeNode) param;
+            l.add(parser.nf.TypeParamNode(tn.position(), tn));
         } else {
             l.add(parser.nf.AmbParam(((Expr) param).position(), (Expr) param,
                     null));

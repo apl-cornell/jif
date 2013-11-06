@@ -679,7 +679,13 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     }
 
     @Override
-    public JifSingletonAccess JifSingletonAccess(Position pos, TypeNode objectType, List<Expr> args) {
+    public JifSingletonAccess JifSingletonAccess(Position pos, 
+            TypeNode objectType, List<Expr> args) {
         return new JifSingletonAccess_c(pos, objectType, args);
+    }
+
+    @Override
+    public TypeParamNode TypeParamNode(Position pos, TypeNode tn) {
+        return new TypeParamNode_c(pos, tn);
     }
 }
