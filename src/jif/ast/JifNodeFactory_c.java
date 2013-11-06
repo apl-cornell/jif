@@ -654,22 +654,24 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public TypeNode ConstArrayTypeNode(Position pos, TypeNode base) {
         return new ConstArrayTypeNode_c(pos, base);
     }
+
     @Override
-    public JifSingletonDecl JifSingletonDecl(
-            Position pos,
-            Flags flags,
-            Id name,
-            List<ParamDecl> params,
-            TypeNode superClass,
-            List<TypeNode> interfaces,
-            List<PrincipalNode> authority,
-            List<ConstraintNode<Assertion>> constraints,
-            ClassBody body) {
-        return new JifSingletonDecl_c(pos, flags, name, params,
-                superClass, interfaces, authority, constraints, body);
+    public JifSingletonDecl JifSingletonDecl(Position pos, Flags flags,
+            Id name, List<ParamDecl> params, TypeNode superClass,
+            List<TypeNode> interfaces, List<PrincipalNode> authority,
+            List<ConstraintNode<Assertion>> constraints, ClassBody body) {
+        return new JifSingletonDecl_c(pos, flags, name, params, superClass,
+                interfaces, authority, constraints, body);
     }
+
     @Override
-    public JifSingletonAccess JifSingletonAccess(Position pos, TypeNode objectType, List<Expr> args) {
+    public JifSingletonAccess JifSingletonAccess(Position pos,
+            TypeNode objectType, List<Expr> args) {
         return new JifSingletonAccess_c(pos, objectType, args);
+    }
+
+    @Override
+    public TypeParamNode TypeParamNode(Position pos, TypeNode tn) {
+        return new TypeParamNode_c(pos, tn);
     }
 }

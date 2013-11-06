@@ -160,4 +160,6 @@ public interface JifNodeFactory extends NodeFactory {
 
     JifSingletonAccess JifSingletonAccess(Position pos, TypeNode objectType,
             List<Expr> args);
+
+    TypeParamNode TypeParamNode(Position pos, TypeNode tn);
 }
