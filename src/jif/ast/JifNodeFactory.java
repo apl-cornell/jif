@@ -152,6 +152,14 @@ public interface JifNodeFactory extends NodeFactory {
     PrincipalExpr PrincipalExpr(Position pos, PrincipalNode principal);
 
     TypeNode ConstArrayTypeNode(Position position, TypeNode node);
-    JifSingletonDecl JifSingletonDecl(Position pos, Flags flags, Id name, List<ParamDecl> params, TypeNode superClass, List<TypeNode> interfaces, List<PrincipalNode> authority, List<ConstraintNode<Assertion>> constraints, ClassBody body);
-    JifSingletonAccess JifSingletonAccess(Position pos, TypeNode objectType, List<Expr> args);
+
+    JifSingletonDecl JifSingletonDecl(Position pos, Flags flags, Id name,
+            List<ParamDecl> params, TypeNode superClass,
+            List<TypeNode> interfaces, List<PrincipalNode> authority,
+            List<ConstraintNode<Assertion>> constraints, ClassBody body);
+
+    JifSingletonAccess JifSingletonAccess(Position pos, TypeNode objectType,
+            List<Expr> args);
+
+    TypeParamNode TypeParamNode(Position pos, TypeNode tn);
 }
