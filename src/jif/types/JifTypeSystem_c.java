@@ -2069,4 +2069,9 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         return isParamsRuntimeRep(jpt);
     }
 
+    @Override
+    public TypeParam typeParam(Type t) {
+        return new TypeParam_c(t);
+    }
+
 }
