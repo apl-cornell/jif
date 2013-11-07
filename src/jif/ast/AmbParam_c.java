@@ -11,6 +11,7 @@ import jif.types.principal.Principal;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
+import polyglot.ast.TypeNode;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.VarInstance;
@@ -196,6 +197,11 @@ public class AmbParam_c extends Node_c implements AmbParam {
             // <param principal uid> => <principal-param uid>
             Principal p = ts.principalParam(position(), pi);
             return nf.CanonicalPrincipalNode(position(), p);
+        }
+
+        if (pi.isType()) {
+            TypeNode tn = nf.CanonicalTypeNode(position(), pi.type());
+            return nf.TypeParamNode(position(), tn);
         }
 
         throw new InternalCompilerError(
