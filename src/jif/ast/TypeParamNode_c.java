@@ -33,11 +33,11 @@ import polyglot.visit.TypeChecker;
 public class TypeParamNode_c extends TypeNode_c implements TypeParamNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    TypeNode tn;
+    TypeNode typeNode;
 
     public TypeParamNode_c(Position pos, TypeNode tn) {
         super(pos);
-        this.tn = tn;
+        this.typeNode = tn;
     }
 
     @Override

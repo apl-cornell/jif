@@ -1270,11 +1270,11 @@ param_or_expr_list ::=
             :}
     |   primitive_type:a
             {: List l = new LinkedList();
-               l.add(a);
+               l.add(parser.nf.TypeParamNode(parser.pos(a), a));
                RESULT = l;
             :}
     |   param_or_expr_list:a COMMA primitive_type:b
-            {: a.add(b); RESULT = a; :}
+            {: a.add(parser.nf.TypeParamNode(parser.pos(b), b));; RESULT = a; :}
     |   param_or_expr_list:a COMMA simple_name:b
             {: a.add(b); RESULT = a; :}
     |   param_or_expr_list:a COMMA label:b

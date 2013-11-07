@@ -6,6 +6,7 @@ import java.util.List;
 
 import jif.ast.AmbNewArray;
 import jif.ast.ParamNode;
+import jif.ast.TypeParamNode;
 import polyglot.ast.Expr;
 import polyglot.ast.Labeled;
 import polyglot.ast.NewArray;
@@ -51,9 +52,9 @@ public class InstOrAccess extends Amb {
         if (param instanceof Name) {
             l.add(parser.nf.AmbParam(((Name) param).pos,
                     ((Name) param).toIdentifier()));
-        } else if (param instanceof TypeNode) {
-            TypeNode tn = (TypeNode) param;
-            l.add(parser.nf.TypeParamNode(tn.position(), tn));
+        } else if (param instanceof TypeParamNode) {
+            TypeParamNode tn = (TypeParamNode) param;
+            l.add(tn);
         } else {
             l.add(parser.nf.AmbParam(((Expr) param).position(), (Expr) param,
                     null));
