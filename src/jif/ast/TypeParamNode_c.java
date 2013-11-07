@@ -9,12 +9,16 @@ import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 public class TypeParamNode_c extends Term_c implements TypeParamNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -77,13 +81,29 @@ public class TypeParamNode_c extends Term_c implements TypeParamNode {
     }
 
     @Override
-    public Node visitChildren(NodeVisitor v) {
-        TypeNode tn = (TypeNode) visitChild(typeNode, v);
-        return typeNode(tn);
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        TypeParamNode_c n = (TypeParamNode_c) super.typeCheck(tc);
+        Type t = n.typeNode.type();
+        JifTypeSystem jts = (JifTypeSystem) tc.typeSystem();
+        TypeParam tp = jts.typeParam(t);
+        return n.parameter(tp);
     }
 
     @Override
-    public String toString() {
-        return typeNode.toString();
+    public Node visitChildren(NodeVisitor v) {
+        TypeNode tn = (TypeNode) visitChild(typeNode, v);
+        return reconstruct(tn);
+    }
+
+    protected TypeParamNode_c reconstruct(TypeNode tn) {
+        if (typeNode == tn) {
+            return this;
+        }
+        if (typeParam != null) {
+            throw new InternalCompilerError("Type parameter already set.");
+        }
+        TypeParamNode_c tpn = (TypeParamNode_c) copy();
+        tpn.typeNode = tn;
+        return tpn;
     }
 }
