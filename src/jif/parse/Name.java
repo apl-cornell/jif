@@ -10,7 +10,7 @@ import polyglot.ast.TypeNode;
 import polyglot.util.Position;
 
 /**
- * A <code>Name</code> represents a <code>Amp</code> of the form "n | P.n".
+ * A <code>Name</code> represents a <code>Amb</code> of the form "n | P.n".
  * This could either be a field access or a type.  Both could be preceded by
  * ambiguous qualifiers.
  */

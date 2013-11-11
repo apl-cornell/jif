@@ -1,5 +1,7 @@
 package jif.types;
 
-public interface TypeParam extends Param {
+import polyglot.types.Type;
 
+public interface TypeParam extends Param {
+    Type type();
 }

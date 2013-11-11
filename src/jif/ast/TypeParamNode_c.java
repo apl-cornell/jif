@@ -9,16 +9,12 @@ import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
 import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeChecker;
 
 public class TypeParamNode_c extends Term_c implements TypeParamNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -29,6 +25,10 @@ public class TypeParamNode_c extends Term_c implements TypeParamNode {
     public TypeParamNode_c(Position pos, TypeNode tn) {
         super(pos);
         typeNode = tn;
+        if (typeNode.isDisambiguated()) {
+            JifTypeSystem jts = (JifTypeSystem) typeNode.type().typeSystem();
+            typeParam = jts.typeParam(typeNode.type());
+        }
     }
 
     @Override
@@ -60,8 +60,14 @@ public class TypeParamNode_c extends Term_c implements TypeParamNode {
 
     @Override
     public TypeParamNode typeNode(TypeNode type) {
+        if (type == typeNode) return this;
+
         TypeParamNode_c newNode = (TypeParamNode_c) copy();
         newNode.typeNode = type;
+        if (type.isDisambiguated()) {
+            JifTypeSystem jts = (JifTypeSystem) type.type().typeSystem();
+            newNode.typeParam = jts.typeParam(type.type());
+        }
         return newNode;
     }
 
@@ -71,29 +77,13 @@ public class TypeParamNode_c extends Term_c implements TypeParamNode {
     }
 
     @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        TypeParamNode_c n = (TypeParamNode_c) super.typeCheck(tc);
-        Type t = n.typeNode.type();
-        JifTypeSystem jts = (JifTypeSystem) tc.typeSystem();
-        TypeParam tp = jts.typeParam(t);
-        return n.parameter(tp);
+    public Node visitChildren(NodeVisitor v) {
+        TypeNode tn = (TypeNode) visitChild(typeNode, v);
+        return typeNode(tn);
     }
 
     @Override
-    public Node visitChildren(NodeVisitor v) {
-        TypeNode tn = (TypeNode) visitChild(typeNode, v);
-        return reconstruct(tn);
-    }
-
-    protected TypeParamNode_c reconstruct(TypeNode tn) {
-        if (typeNode == tn) {
-            return this;
-        }
-        if (typeParam != null) {
-            throw new InternalCompilerError("Type parameter already set.");
-        }
-        TypeParamNode_c tpn = (TypeParamNode_c) copy();
-        tpn.typeNode = tn;
-        return tpn;
+    public String toString() {
+        return typeNode.toString();
     }
 }

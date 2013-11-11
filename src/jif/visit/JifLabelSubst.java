@@ -1,8 +1,8 @@
 package jif.visit;
 
 import jif.ast.CanonicalLabelNode;
-import jif.ast.JifUtil;
 import jif.ast.JifExt_c;
+import jif.ast.JifUtil;
 import jif.types.JifFieldInstance;
 import jif.types.JifLocalInstance;
 import jif.types.JifProcedureInstance;
@@ -116,7 +116,9 @@ public class JifLabelSubst extends ContextVisitor {
         }
         if (n instanceof CanonicalTypeNode) {
             CanonicalTypeNode tn = (CanonicalTypeNode) n;
-            n = tn.type(bounds.applyTo(tn.type()));
+            if (ts.isLabeled(tn.type())) {
+                n = tn.type(bounds.applyTo(tn.type()));
+            }
         }
 
         if (n instanceof CanonicalLabelNode) {
