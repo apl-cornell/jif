@@ -19,7 +19,16 @@ public class TypeParam_c extends Param_c implements TypeParam {
 
     @Override
     public boolean isCanonical() {
-        return true;
+        return type.isCanonical();
     }
 
+    @Override
+    public String toString() {
+        return type.toString();
+    }
+
+    @Override
+    public Type type() {
+        return type;
+    }
 }
