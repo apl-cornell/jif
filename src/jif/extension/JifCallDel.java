@@ -80,7 +80,7 @@ public class JifCallDel extends JifDel_c implements CallOps {
      * 
      * This differs from the method defined in Call_c in that it does not
      * throw a null pointer exception if the receiver is guaranteed to be
-     * non-null
+     * non-null.  Always returns all declared exceptions (expected by call checker).
      */
     @Override
     public List<Type> throwTypes(TypeSystem ts) {

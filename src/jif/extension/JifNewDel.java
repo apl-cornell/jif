@@ -1,5 +1,6 @@
 package jif.extension;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import jif.ast.JifNew_c;
@@ -9,11 +10,13 @@ import polyglot.ast.NewOps;
 import polyglot.ast.Special;
 import polyglot.ast.TypeNode;
 import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.AmbiguityRemover;
@@ -58,20 +61,29 @@ public class JifNewDel extends JifDel_c implements NewOps {
     /**
      *  List of Types of exceptions that might get thrown.
      * 
-     *  This differs from the method defined in New_c in that it does not
+     * This differs from the method defined in New_c in that it does not
      * throw a null pointer exception if the qualifier is guaranteed to be
-     * non-null
+     * non-null.  Always returns all declared exceptions (expected by call checker).
      */
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        List<Type> result = super.throwTypes(ts);
-
-        if (!qualIsNeverNull()
-                && !fatalExceptions.contains(ts.NullPointerException())) {
-            result.add(ts.NullPointerException());
+        ConstructorInstance ci = ((New) node()).constructorInstance();
+        if (ci == null) {
+            throw new InternalCompilerError(node().position(),
+                    "Null method instance after type " + "check.");
         }
 
-        return result;
+        List<Type> l = new LinkedList<Type>();
+
+        l.addAll(ci.throwTypes());
+
+        // We may throw a null pointer exception except when the target
+        // is "this" or "super", or the receiver is guaranteed to be non-null
+        if (!qualIsNeverNull()
+                && !fatalExceptions.contains(ts.NullPointerException())) {
+            l.add(ts.NullPointerException());
+        }
+        return l;
     }
 
     @Override

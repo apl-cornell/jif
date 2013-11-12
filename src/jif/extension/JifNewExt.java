@@ -71,24 +71,6 @@ public class JifNewExt extends JifExprExt {
                         if (rhs_label == null) {
                             throw new InternalCompilerError(
                                     "FinalParams has not run yet");
-                            // label checking has not been done on ct yet
-//                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
-//                            ParsedClassType pct = (ParsedClassType) ct;
-//                            Job job = pct.job();
-//
-//                            // first check if ct is in the same source file
-//                            // if yes, then no point throwing a MDE - just set unreachableThisRun
-//                            // so that label checking continues into ct
-//                            Job currentJob = sched.currentJob();
-//                            Goal subgoal = sched.LabelsChecked(pct.job());
-//                            if (job.equals(currentJob)) {
-//                                Goal g = sched.currentGoal();
-//                                g.setUnreachableThisRun();
-//                                sched.addDependencyAndEnqueue(g, subgoal, false);
-//                                continue;
-//                            } else {
-//                                throw new MissingDependencyException(subgoal);
-//                            }
                         }
                         A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
                     } else if (ts.isImplicitCastValid(jfi.type(),
@@ -99,24 +81,6 @@ public class JifNewExt extends JifExprExt {
                         if (rhs_principal == null) {
                             throw new InternalCompilerError(
                                     "FinalParams has not run yet");
-                            // label checking has not been done on ct yet
-//                            JifScheduler sched = (JifScheduler) lc.job().extensionInfo().scheduler();
-//                            ParsedClassType pct = (ParsedClassType) ct;
-//                            Job job = pct.job();
-//
-//                            // first check if ct is in the same source file
-//                            // if yes, then no point throwing a MDE - just set unreachableThisRun
-//                            // so that label checking continues into ct
-//                            Job currentJob = sched.currentJob();
-//                            Goal subgoal = sched.LabelsChecked(pct.job());
-//                            if (job.equals(currentJob)) {
-//                                Goal g = sched.currentGoal();
-//                                g.setUnreachableThisRun();
-//                                sched.addDependencyAndEnqueue(g, subgoal, false);
-//                                continue;
-//                            } else {
-//                                throw new MissingDependencyException(subgoal);
-//                            }
                         }
                         A.addDefinitionalEquiv(dp, rhs_principal);
                     }
@@ -185,4 +149,5 @@ public class JifNewExt extends JifExprExt {
         checkThrowTypes(throwTypes);
         return updatePathMap(noe.arguments(helper.labelCheckedArgs()), X);
     }
+
 }
