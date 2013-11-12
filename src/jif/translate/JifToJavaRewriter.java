@@ -16,6 +16,7 @@ import jif.ast.JifNodeFactory;
 import jif.ast.JifUtil;
 import jif.types.JifTypeSystem;
 import jif.types.Param;
+import jif.types.TypeParam;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.Block;
@@ -163,6 +164,9 @@ public class JifToJavaRewriter extends ContextVisitor {
         if (param instanceof Principal) {
             return principalToJava((Principal) param);
         }
+        if (param instanceof TypeParam) {
+            return typeParamToJava((TypeParam) param);
+        }
         throw new InternalCompilerError("Unexpected param " + param);
     }
 
@@ -172,6 +176,10 @@ public class JifToJavaRewriter extends ContextVisitor {
 
     public Expr principalToJava(Principal principal) throws SemanticException {
         return principal.toJava(this);
+    }
+
+    public Expr typeParamToJava(TypeParam typeParam) throws SemanticException {
+        return typeParam.toJava(this);
     }
 
     public TypeNode typeToJava(Type t, Position pos) throws SemanticException {
