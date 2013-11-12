@@ -512,6 +512,6 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
      */
     boolean needsImplClass(Type ct);
 
-    TypeParam typeParam(Type t);
+    TypeParam typeParam(Position p, Type t);
 
 }

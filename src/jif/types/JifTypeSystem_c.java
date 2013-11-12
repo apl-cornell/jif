@@ -2070,8 +2070,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public TypeParam typeParam(Type t) {
-        return new TypeParam_c(t);
+    public TypeParam typeParam(Position p, Type t) {
+        return new TypeParam_c(p, t);
     }
 
 }

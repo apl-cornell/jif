@@ -27,7 +27,7 @@ public class TypeParamNode_c extends Term_c implements TypeParamNode {
         typeNode = tn;
         if (typeNode.isDisambiguated()) {
             JifTypeSystem jts = (JifTypeSystem) typeNode.type().typeSystem();
-            typeParam = jts.typeParam(typeNode.type());
+            typeParam = jts.typeParam(pos, typeNode.type());
         }
     }
 
@@ -66,7 +66,7 @@ public class TypeParamNode_c extends Term_c implements TypeParamNode {
         newNode.typeNode = type;
         if (type.isDisambiguated()) {
             JifTypeSystem jts = (JifTypeSystem) type.type().typeSystem();
-            newNode.typeParam = jts.typeParam(type.type());
+            newNode.typeParam = jts.typeParam(position(), type.type());
         }
         return newNode;
     }
