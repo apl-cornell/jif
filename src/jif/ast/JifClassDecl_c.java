@@ -201,7 +201,9 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
         JifParsedPolyType ct = (JifParsedPolyType) this.type;
         A = (JifContext) A.pushBlock();
         for (ParamInstance pi : ct.params()) {
-            A.addVariable(pi);
+            if (pi.isType())
+                A.addTypeParam(pi);
+            else A.addVariable(pi);
         }
         return A;
     }

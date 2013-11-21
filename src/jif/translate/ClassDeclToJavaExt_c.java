@@ -156,6 +156,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
                 // add getters for params to the interface
                 for (ParamInstance pi : jpt.params()) {
+                    if (pi.isType()) continue;
                     String paramFieldNameGetter =
                             ParamToJavaExpr_c.paramFieldNameGetter(pi);
                     TypeNode tn = typeNodeForParam(pi, rw);
@@ -230,6 +231,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                     JifSubst subst = (JifSubst) interfST.subst();
                     interfPT = (JifPolyType) interfST.base();
                     for (ParamInstance pi : interfPT.params()) {
+                        if (pi.isType()) continue;
                         String paramFieldName =
                                 ParamToJavaExpr_c.paramFieldName(pi);
                         String paramFieldNameGetter =
@@ -303,6 +305,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             boolean moreThanOneParam = (jpt.params().size() > 1);
             sb.append(moreThanOneParam ? "boolean ok = true;" : "");
             for (ParamInstance pi : jpt.params()) {
+                if (pi.isType()) continue;
                 String paramFieldName = ParamToJavaExpr_c.paramFieldName(pi);
                 String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
                 String comparison = "equivalentTo";
