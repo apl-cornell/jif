@@ -15,6 +15,7 @@ import jif.types.LabelSubstitution;
 import jif.types.Param;
 import jif.types.PathMap;
 import jif.types.SemanticDetailedException;
+import jif.types.TypeParam;
 import jif.types.label.AccessPath;
 import jif.types.label.AccessPathField;
 import jif.types.label.AccessPathLocal;
@@ -203,6 +204,8 @@ public class LabelTypeCheckUtil {
                 } else if (arg instanceof Principal) {
                     Principal p = (Principal) arg;
                     typeCheckPrincipal(tc, p);
+                } else if (arg instanceof TypeParam) {
+                    // Do we need to do anything?
                 } else {
                     throw new InternalCompilerError(
                             "Unexpected type for entry: "

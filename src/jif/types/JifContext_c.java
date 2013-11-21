@@ -74,6 +74,7 @@ public class JifContext_c extends Context_c implements JifContext {
      * Limit authority of classes and code in this context.
      */
     protected ProviderLabel provider;
+    private Map<String, ParamInstance> typeParams;
 
     protected JifContext_c(JifTypeSystem ts, TypeSystem jlts) {
         super(ts);
@@ -484,6 +485,18 @@ public class JifContext_c extends Context_c implements JifContext {
     }
 
     @Override
+    public Named find(String name) throws SemanticException {
+        if (typeParams == null || !typeParams.containsKey(name))
+            return super.find(name);
+
+        ParamInstance param = typeParams.get(name);
+        if (param.isType()) return (Named) param.type();
+
+        throw new SemanticException("Parameter " + param.name()
+                + " is not a type parameter.");
+    }
+
+    @Override
     public Context pushClass(ParsedClassType classScope, ClassType type) {
         JifContext_c jc = (JifContext_c) super.pushClass(classScope, type);
         // force a new label environment
@@ -570,5 +583,18 @@ public class JifContext_c extends Context_c implements JifContext {
 
     public boolean inPrologue() {
         return inPrologue;
+    }
+
+    public void addTypeParam(ParamInstance pi) {
+        if (typeParams == null)
+            typeParams = new HashMap<String, ParamInstance>();
+        typeParams.put(pi.name(), pi);
+    }
+
+    @Override
+    protected Context_c push() {
+        JifContext_c c = (JifContext_c) super.push();
+        c.typeParams = null;
+        return c;
     }
 }

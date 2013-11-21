@@ -213,4 +213,6 @@ public interface JifContext extends Context {
     void addActsFor(ActsForParam actor, Principal granter);
 
     Context pushPrologue();
+
+    void addTypeParam(ParamInstance pi);
 }
