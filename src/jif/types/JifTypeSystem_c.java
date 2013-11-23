@@ -2074,4 +2074,14 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         return new TypeParam_c(p, t);
     }
 
+    @Override
+    public UninstTypeParam uninstTypeParam(ParamInstance pi) {
+        return new UninstTypeParam_c(this, pi);
+    }
+
+    @Override
+    public boolean isTypeParam(Type t) {
+        return unlabel(t) instanceof UninstTypeParam;
+    }
+
 }

@@ -199,6 +199,10 @@ public class JifToJavaRewriter extends ContextVisitor {
                     .TypeNodeFromQualifiedName(pos, jifts.PrincipalClassName());
         }
 
+        if (jifts.isTypeParam(t)) {
+            return canonical(nf, ts.Object(), pos);
+        }
+
         if (t.isArray()) {
             return nf.ArrayTypeNode(pos, typeToJava(t.toArray().base(), pos));
         }

@@ -20,8 +20,14 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance {
     public ParamInstance_c(JifTypeSystem ts, Position pos,
             JifClassType container, Kind kind, String name) {
 
-        super(ts, pos, ts.Public().Static().Final(), kind == PRINCIPAL ? ts
-                .Principal() : ts.Label(), name);
+        super(ts, pos, ts.Public().Static().Final(), null, name);
+        if (kind.isPrincipal()) {
+            super.type = ts.Principal();
+        } else if (kind.isCovariantLabel() || kind.isInvariantLabel) {
+            super.type = ts.Label();
+        } else {
+            super.type = ts.uninstTypeParam(this);
+        }
         this.kind = kind;
         this.container = container;
     }
