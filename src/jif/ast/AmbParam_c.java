@@ -102,7 +102,17 @@ public class AmbParam_c extends Node_c implements AmbParam {
     @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         Context c = sc.context();
-        VarInstance vi = c.findVariable(name.id());
+        VarInstance vi = c.findVariableSilent(name.id());
+        if (vi == null) {
+            TypeParamNode tpn =
+                    ((JifNodeFactory) sc.nodeFactory()).TypeParamNode(
+                            position(),
+                            sc.nodeFactory().TypeNodeFromQualifiedName(
+                                    position(), name.id()));
+            return tpn.parameter(((JifTypeSystem) (sc.typeSystem())).typeParam(
+                    position(),
+                    ((JifTypeSystem) sc.typeSystem()).typeForName(name.id())));
+        }
 
         if (!vi.isCanonical() && pi == null && disambCount++ < MAX_DISAMB_CALLS) {
             // not yet ready to disambiguate
