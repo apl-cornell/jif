@@ -514,4 +514,8 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
 
     TypeParam typeParam(Position p, Type t);
 
+    UninstTypeParam uninstTypeParam(ParamInstance name);
+
+    boolean isTypeParam(Type t);
+
 }
