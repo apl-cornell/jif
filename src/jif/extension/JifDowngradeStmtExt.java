@@ -32,7 +32,8 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c {
         super(toJava);
     }
 
-    protected JifContext declassifyConstraintContext(JifContext A) {
+    protected JifContext declassifyConstraintContext(JifContext A)
+            throws SemanticException {
         return A;
     }
 
@@ -155,7 +156,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c {
         return A;
     }
 
-    protected PathMap initPathMap(LabelChecker lc) {
+    protected PathMap initPathMap(LabelChecker lc) throws SemanticException {
         return lc.typeSystem().pathMap();
     }
 

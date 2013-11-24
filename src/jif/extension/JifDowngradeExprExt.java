@@ -29,7 +29,8 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
     }
 
     protected JifContext declassifyConstraintContext(LabelChecker lc,
-            JifContext A, Label downgradeFrom, Label downgradeTo) {
+            JifContext A, Label downgradeFrom, Label downgradeTo)
+            throws SemanticException {
         return A;
     }
 
@@ -150,7 +151,8 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
                 });
     }
 
-    protected PathMap downgradeExprPathMap(LabelChecker lc, PathMap Xe) {
+    protected PathMap downgradeExprPathMap(LabelChecker lc, PathMap Xe)
+            throws SemanticException {
         return Xe;
     }
 
