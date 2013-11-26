@@ -343,7 +343,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
                 // we are not interested in this statement, it's not an
                 // assignment
                 // to a field
-                return;
+                continue;
             }
 
             FieldAssign ass = (FieldAssign) ((Eval) s).expr();
@@ -355,7 +355,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
                     && ((Special) f.target()).kind() == Special.THIS && assFi
                     .flags().isFinal())) {
                 // assignment to something other than a final field of this.
-                return;
+                continue;
             }
 
             // Remove the field from the set of final vars, since it is
