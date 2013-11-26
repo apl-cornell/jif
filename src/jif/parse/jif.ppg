@@ -807,12 +807,12 @@ override constructor_body ::=
             {: RESULT = parser.nf.Block(parser.pos(n, d), a); :}
     |   LBRACE:x block_statements:a explicit_super_constructor_invocation:b RBRACE:y
             {: List l = new LinkedList<Stmt>();
-               l.addAll(a);
+               l.add(parser.nf.Prologue(parser.pos(a), a));
                l.add(b);
                RESULT = parser.nf.Block(parser.pos(x,y), l); :}
     |   LBRACE:x block_statements:a explicit_super_constructor_invocation:b block_statements:c RBRACE:y
             {: List l = new LinkedList<Stmt>();
-               l.addAll(a);
+               l.add(parser.nf.Prologue(parser.pos(a), a));
                l.add(b);
                l.addAll(c);
                RESULT = parser.nf.Block(parser.pos(x,y), l); :}

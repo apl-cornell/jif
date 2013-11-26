@@ -655,4 +655,11 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
         return new ConstArrayTypeNode_c(pos, base);
     }
 
+    @Override
+    public Prologue Prologue(Position pos, List<Stmt> stmts) {
+        Prologue n = new Prologue_c(pos, stmts);
+        n = (Prologue) n.ext(extFactory().extBlock());
+        n = (Prologue) n.del(delFactory().delBlock());
+        return n;
+    }
 }

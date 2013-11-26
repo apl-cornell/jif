@@ -152,4 +152,6 @@ public interface JifNodeFactory extends NodeFactory {
     PrincipalExpr PrincipalExpr(Position pos, PrincipalNode principal);
 
     TypeNode ConstArrayTypeNode(Position position, TypeNode node);
+
+    Prologue Prologue(Position pos, List<Stmt> stmts);
 }

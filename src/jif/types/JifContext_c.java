@@ -66,6 +66,8 @@ public class JifContext_c extends Context_c implements JifContext {
 
     protected boolean checkingInits;
     protected boolean inConstructorCall;
+    protected boolean inPrologue = false;
+
     protected Label constructorReturnLabel;
 
     /**
@@ -554,5 +556,19 @@ public class JifContext_c extends Context_c implements JifContext {
     @Override
     public void setProvider(ProviderLabel provider) {
         this.provider = provider;
+    }
+
+    @Override
+    public Context pushPrologue() {
+        JifContext_c v = (JifContext_c) this.copy();
+        v.outer = this;
+        /** Prologue does not have separate lexical scope: inherit types and vars:  */
+        v.kind = BLOCK;
+        v.inPrologue = true;
+        return v;
+    }
+
+    public boolean inPrologue() {
+        return inPrologue;
     }
 }
