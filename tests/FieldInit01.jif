@@ -1,0 +1,5 @@
+public class FieldInit01 {
+  final int{⊤→} x = m();
+
+  int m() { return 42; }
+}

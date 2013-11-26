@@ -255,7 +255,8 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
                            (Semantic, "NullPointerException.*must .* be caught"),
                            (Semantic, "NullPointerException.*must .* be caught");
 	FieldAssign04.jif  ;
-    FieldLabel01.jif  ;
+	FieldInit01.jif (Semantic) ;
+	FieldLabel01.jif  ;
 	FieldLeak.jif (Semantic) ;
 	FieldParam1.jif  ;
 	FieldParam2.jif  ;
