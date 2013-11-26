@@ -34,10 +34,11 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
     public Expr exprToJava(JifToJavaRewriter rw) throws SemanticException {
         New n = (New) node();
 
-        // If the qualifier is "null{amb}.this", replace it with null. Gross.
+        // If the qualifier is "null{amb}.this", replace it with null. Gross.        
         if (n.qualifier() instanceof Special) {
             Special qualifier = (Special) n.qualifier();
             if (qualifier.kind() == Special.THIS
+                    && qualifier.qualifier() != null
                     && qualifier.qualifier().name().equals("null")) {
                 n = n.qualifier(null);
             }
