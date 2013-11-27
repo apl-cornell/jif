@@ -270,6 +270,12 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
         FinalArgs07.jif (Semantic, "argument must be a final access path");
         FinalArgs08.jif (Semantic, "argument must be a final access path");
     FinalField01.jif ;
+    FinalField02.jif (Semantic, "must be initialized before calling the superclass constructor");
+    FinalField03.jif ;
+    FinalField04.jif ;
+    FinalField05.jif (Semantic, "right hand side not less restrictive"); //why doesn't this work?
+    FinalField06.jif ;
+    FinalField07.jif ;
 	Hierarchy1.jif ;
 	Heapsort.jif ;
 	Hello.jif ;

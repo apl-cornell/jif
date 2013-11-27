@@ -60,7 +60,7 @@ public class JifInitChecker extends DefiniteAssignmentChecker {
                         AssignmentStatus initCount = e.getValue();
                         if (!initCount.definitelyAssigned) {
                             throw new SemanticDetailedException(
-                                    "XXX: Final field \""
+                                    "Final field \""
                                             + fi.name()
                                             + "\" must be initialized before "
                                             + "calling the superclass constructor.",
