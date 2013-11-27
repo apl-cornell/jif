@@ -28,6 +28,11 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
         super(toJava);
     }
 
+    /**
+     * TODO: document me!
+     * 
+     * @throws SemanticException
+     */
     protected JifContext declassifyConstraintContext(LabelChecker lc,
             JifContext A, Label downgradeFrom, Label downgradeTo)
             throws SemanticException {
@@ -151,6 +156,11 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
                 });
     }
 
+    /**
+     * TODO: document me!
+     * 
+     * @throws SemanticException
+     */
     protected PathMap downgradeExprPathMap(LabelChecker lc, PathMap Xe)
             throws SemanticException {
         return Xe;
