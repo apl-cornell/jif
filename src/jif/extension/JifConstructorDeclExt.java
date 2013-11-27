@@ -1,6 +1,7 @@
 package jif.extension;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -125,8 +126,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
         // constructor, if the super constructor is an "untrusted class", i.e.
         // a Java class that isn't one of JifTypeSystem.trustedNonJifClassNames
         // or a Jif class.
-        Set<JifFieldInstance> uninitFinalVars =
-                uninitFinalFields(ci.container());
+        Set<JifFieldInstance> uninitFinalVars = Collections.emptySet();
+//                uninitFinalFields(ci.container());
 
         // let the context know that we are label checking a constructor
         // body, and what the return label of the constructor is.
@@ -183,7 +184,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
                 // we're before a potentially dangerous super call, so we
                 // can do check to see if we are assigning to a final label
                 // field.
-                checkFinalFieldAssignment(s, uninitFinalVars, A);
+                // XXX: skip -- now handled in JifInitChecker.
+                //checkFinalFieldAssignment(s, uninitFinalVars, A);
 
                 if (s instanceof ConstructorCall) {
                     ConstructorCall ccs = (ConstructorCall) s;

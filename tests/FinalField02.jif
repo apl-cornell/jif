@@ -1,0 +1,11 @@
+class A { A() { super(); } }
+public class FinalField02 extends A {
+   int x;
+   final int y;
+
+   FinalField02() {
+     x = 0;
+     super();
+     y = 0; //error: should be init'ed before super
+   }
+}

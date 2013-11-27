@@ -1,0 +1,14 @@
+class A { int{*<-} f; A() { super(); } }
+public class FinalField07[label hi, label lo] extends A {
+   int{lo} x = 0;
+   final int{hi} y;
+
+   FinalField07(A{lo} o) where lo <= hi {
+     try {
+       y = o.f;
+     } catch (NullPointerException e) { 
+       y = 0;
+     }
+     super(); // ok! This is more powerful than Java's init checking. Is that ok?
+   }
+}

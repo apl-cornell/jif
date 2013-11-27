@@ -1,4 +1,4 @@
-class A { }
+class A { A() { super(); } }
 public class FinalField01 extends A {
    int x;
    final int y;

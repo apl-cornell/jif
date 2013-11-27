@@ -1,0 +1,10 @@
+class A { A() { super(); } }
+public class FinalField04 extends A {
+   int x;
+   final int y = 0;
+
+   FinalField04() {
+     x = 0;
+     super();
+   }
+}

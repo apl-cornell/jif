@@ -1,0 +1,13 @@
+class A { A() { super(); } }
+public class FinalField06[label hi, label lo] extends A {
+   int{lo} x = 0;
+   final int{hi} y;
+
+   FinalField06() where lo <= hi {
+     if (x > 0)
+       y = 0;
+     else 
+       y = 1;
+     super();
+   }
+}

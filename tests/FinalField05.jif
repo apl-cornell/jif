@@ -1,0 +1,13 @@
+class A { A() { super(); } }
+public class FinalField05[label hi, label lo] extends A {
+   int{hi} x = 0;
+   final int{lo} y;
+
+   FinalField05() {
+     if (x > 0)
+       y = 0; //error implicit flow to y
+     else 
+       y = 1; //error implicit flow to y
+     super();
+   }
+}
