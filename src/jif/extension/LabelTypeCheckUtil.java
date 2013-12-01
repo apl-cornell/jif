@@ -310,6 +310,8 @@ public class LabelTypeCheckUtil {
                     Xparams.add(Xj);
                     X = X.join(Xj);
                     A = (JifContext) A.pop();
+                } else if (arg instanceof TypeParam) {
+                    // Do we need to do anything?
                 } else {
                     throw new InternalCompilerError(
                             "Unexpected type for entry: "

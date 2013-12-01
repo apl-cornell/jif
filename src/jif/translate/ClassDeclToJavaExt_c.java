@@ -449,6 +449,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 Param param = ((JifSubst) superjst.subst()).get(pi);
                 if (pi.isLabel()) {
                     superArgs.add(((Label) param).toJava(rwCons));
+                } else if (pi.isType()) {
+                    // Do we need to do anything?
                 } else {
                     superArgs.add(((Principal) param).toJava(rwCons));
                 }
