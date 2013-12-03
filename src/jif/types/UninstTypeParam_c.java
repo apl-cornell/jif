@@ -2,6 +2,7 @@ package jif.types;
 
 import polyglot.types.Named;
 import polyglot.types.Resolver;
+import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.types.Type_c;
 import polyglot.util.SerialVersionUID;
@@ -29,6 +30,12 @@ public class UninstTypeParam_c extends Type_c implements UninstTypeParam, Named 
     @Override
     public String toString() {
         return "type " + pi.name();
+    }
+
+    @Override
+    public boolean equalsImpl(TypeObject o) {
+        return o instanceof UninstTypeParam
+                && pi.equals(((UninstTypeParam) o).paramInstance());
     }
 
     @Override
