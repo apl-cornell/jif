@@ -119,6 +119,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                     // add fields for params
                     if (!rw.jif_ts().isSignature(jpt)) {
                         for (ParamInstance pi : jpt.params()) {
+                            if (pi.isType()) continue;
                             String paramFieldName =
                                     ParamToJavaExpr_c.paramFieldName(pi);
                             TypeNode tn = typeNodeForParam(pi, rw);
@@ -405,6 +406,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         List<Formal> formals = new ArrayList<Formal>(jpt.params().size() + 1);
         Position pos = Position.compilerGenerated();
         for (ParamInstance pi : jpt.params()) {
+            if (pi.isType()) continue;
             Id paramArgName =
                     rw.java_nf().Id(pos, ParamToJavaExpr_c.paramArgName(pi));
             TypeNode tn = typeNodeForParam(pi, rw);
@@ -460,6 +462,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
         // create initializers for the fields from the arguments
         for (ParamInstance pi : jpt.params()) {
+            if (pi.isType()) continue;
             String paramFieldName = ParamToJavaExpr_c.paramFieldName(pi);
             String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
             inits.add(rw.qq().parseStmt(
