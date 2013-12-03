@@ -472,6 +472,12 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             return true;
         }
 
+        if (strpFromType instanceof UninstTypeParam
+                && strpToType instanceof UninstTypeParam
+                && strpFromType.equals(strpToType)) {
+            return true;
+        }
+
         return super.isImplicitCastValid(strpFromType, strpToType);
     }
 
