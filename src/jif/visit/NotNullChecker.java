@@ -22,6 +22,7 @@ import jif.types.JifSubstType;
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.Param;
+import jif.types.TypeParam;
 import jif.types.label.AccessPathClass;
 import jif.types.label.AccessPathField;
 import jif.types.label.Label;
@@ -620,6 +621,8 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
                         throw new InternalCompilerError(
                                 "Unexpected SemanticException", se);
                     }
+                } else if (arg instanceof TypeParam) {
+                    // Do we need to do anything?
                 } else {
                     throw new InternalCompilerError(
                             "Unexpected type for entry: "
