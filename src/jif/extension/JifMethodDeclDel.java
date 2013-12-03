@@ -45,7 +45,7 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
     }
 
     /**
-     * @see polyglot.ast.JL_c#typeCheck(polyglot.visit.TypeChecker)
+     * @see polyglot.ast.JLDel_c#typeCheck(polyglot.visit.TypeChecker)
      */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {

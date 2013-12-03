@@ -25,7 +25,7 @@ import jif.extension.JifProcedureDeclDel;
 import jif.extension.JifThrowDel;
 import jif.extension.JifTypeNodeDel;
 import polyglot.ast.AbstractDelFactory_c;
-import polyglot.ast.JL;
+import polyglot.ast.JLDel;
 
 /**
  * Constructs Jif delegates
@@ -38,132 +38,132 @@ public class JifDelFactory_c extends AbstractDelFactory_c implements
     }
 
     @Override
-    protected JL delAssignImpl() {
+    protected JLDel delAssignImpl() {
         return new JifAssignDel();
     }
 
     @Override
-    protected JL delArrayAccessImpl() {
+    protected JLDel delArrayAccessImpl() {
         return new JifArrayAccessDel();
     }
 
     @Override
-    protected JL delArrayAccessAssignImpl() {
+    protected JLDel delArrayAccessAssignImpl() {
         return new JifArrayAccessAssignDel();
     }
 
     @Override
-    protected JL delArrayInitImpl() {
+    protected JLDel delArrayInitImpl() {
         return new JifArrayInitDel();
     }
 
     @Override
-    protected JL delBinaryImpl() {
+    protected JLDel delBinaryImpl() {
         return new JifBinaryDel();
     }
 
     @Override
-    protected JL delCallImpl() {
+    protected JLDel delCallImpl() {
         return new JifCallDel();
     }
 
     @Override
-    protected JL delCastImpl() {
+    protected JLDel delCastImpl() {
         return new JifCastDel();
     }
 
     @Override
-    protected JL delCatchImpl() {
+    protected JLDel delCatchImpl() {
         return new JifCatchDel();
     }
 
     @Override
-    protected JL delClassDeclImpl() {
+    protected JLDel delClassDeclImpl() {
         return new JifClassDeclDel();
     }
 
     @Override
-    protected JL delFieldDeclImpl() {
+    protected JLDel delFieldDeclImpl() {
         return new JifFieldDeclDel();
     }
 
     @Override
-    protected JL delFieldImpl() {
+    protected JLDel delFieldImpl() {
         return new JifFieldDel();
     }
 
     @Override
-    protected JL delFieldAssignImpl() {
+    protected JLDel delFieldAssignImpl() {
         return new JifFieldAssignDel();
     }
 
     @Override
-    protected JL delFormalImpl() {
+    protected JLDel delFormalImpl() {
         return new JifFormalDel();
     }
 
     @Override
-    protected JL delIfImpl() {
+    protected JLDel delIfImpl() {
         return new JifIfDel();
     }
 
     @Override
-    protected JL delInitializerImpl() {
+    protected JLDel delInitializerImpl() {
         return new JifInitializerDel();
     }
 
     @Override
-    protected JL delInstanceofImpl() {
+    protected JLDel delInstanceofImpl() {
         return new JifInstanceOfDel();
     }
 
     @Override
-    protected JL delLocalDeclImpl() {
+    protected JLDel delLocalDeclImpl() {
         return new JifLocalDeclDel();
     }
 
     @Override
-    protected JL delNewImpl() {
+    protected JLDel delNewImpl() {
         return new JifNewDel();
     }
 
     @Override
-    protected JL delNewArrayImpl() {
+    protected JLDel delNewArrayImpl() {
         return new JifNewArrayDel();
     }
 
     @Override
-    protected JL delThrowImpl() {
+    protected JLDel delThrowImpl() {
         return new JifThrowDel();
     }
 
     @Override
-    protected JL delTypeNodeImpl() {
+    protected JLDel delTypeNodeImpl() {
         return new JifTypeNodeDel();
     }
 
     @Override
-    protected JL delConstructorCallImpl() {
+    protected JLDel delConstructorCallImpl() {
         return new JifConstructorCallDel();
     }
 
     @Override
-    protected JL delMethodDeclImpl() {
+    protected JLDel delMethodDeclImpl() {
         return new JifMethodDeclDel();
     }
 
     @Override
-    protected JL delConstructorDeclImpl() {
+    protected JLDel delConstructorDeclImpl() {
         return new JifProcedureDeclDel();
     }
 
     @Override
-    public final JL delAmbNewArray() {
-        JL e = delAmbNewArrayImpl();
+    public final JLDel delAmbNewArray() {
+        JLDel e = delAmbNewArrayImpl();
 
         if (nextDelFactory() != null
                 && nextDelFactory() instanceof JifDelFactory) {
-            JL e2 = ((JifDelFactory) nextDelFactory()).delAmbNewArray();
+            JLDel e2 = ((JifDelFactory) nextDelFactory()).delAmbNewArray();
             e = composeDels(e, e2);
         }
 
@@ -171,50 +171,50 @@ public class JifDelFactory_c extends AbstractDelFactory_c implements
     }
 
     @Override
-    public final JL delLabelExpr() {
-        JL e = delLabelExprImpl();
+    public final JLDel delLabelExpr() {
+        JLDel e = delLabelExprImpl();
 
         if (nextDelFactory() != null
                 && nextDelFactory() instanceof JifDelFactory) {
-            JL e2 = ((JifDelFactory) nextDelFactory()).delLabelExpr();
+            JLDel e2 = ((JifDelFactory) nextDelFactory()).delLabelExpr();
             e = composeDels(e, e2);
         }
         return postDelLabelExpr(e);
     }
 
     @Override
-    public final JL delNewLabel() {
-        JL e = delNewLabelImpl();
+    public final JLDel delNewLabel() {
+        JLDel e = delNewLabelImpl();
 
         if (nextDelFactory() != null
                 && nextDelFactory() instanceof JifDelFactory) {
-            JL e2 = ((JifDelFactory) nextDelFactory()).delLabelExpr();
+            JLDel e2 = ((JifDelFactory) nextDelFactory()).delLabelExpr();
             e = composeDels(e, e2);
         }
         return postDelNewLabel(e);
     }
 
-    protected JL delAmbNewArrayImpl() {
+    protected JLDel delAmbNewArrayImpl() {
         return delAmbExprImpl();
     }
 
-    protected JL postDelAmbNewArray(JL e) {
+    protected JLDel postDelAmbNewArray(JLDel e) {
         return postDelAmbExpr(e);
     }
 
-    protected JL delLabelExprImpl() {
+    protected JLDel delLabelExprImpl() {
         return delExprImpl();
     }
 
-    protected JL postDelLabelExpr(JL e) {
+    protected JLDel postDelLabelExpr(JLDel e) {
         return postDelExpr(e);
     }
 
-    protected JL delNewLabelImpl() {
+    protected JLDel delNewLabelImpl() {
         return delLabelExprImpl();
     }
 
-    protected JL postDelNewLabel(JL e) {
+    protected JLDel postDelNewLabel(JLDel e) {
         return postDelLabelExpr(e);
     }
 

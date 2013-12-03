@@ -8,7 +8,7 @@ import java.util.Set;
 
 import jif.ast.JifUtil;
 import jif.types.JifTypeSystem;
-import polyglot.ast.JL_c;
+import polyglot.ast.JLDel_c;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -22,7 +22,7 @@ import polyglot.visit.TypeBuilder;
 
 /** An implementation of the <code>Jif</code> interface.
  */
-public class JifDel_c extends JL_c implements JifDel {
+public class JifDel_c extends JLDel_c implements JifDel {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Set<Type> fatalExceptions = Collections.emptySet();

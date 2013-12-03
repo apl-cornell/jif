@@ -1,14 +1,14 @@
 package jif.ast;
 
 import polyglot.ast.DelFactory;
-import polyglot.ast.JL;
+import polyglot.ast.JLDel;
 
 public interface JifDelFactory extends DelFactory {
 
-    JL delAmbNewArray();
+    JLDel delAmbNewArray();
 
-    JL delNewLabel();
+    JLDel delNewLabel();
 
-    JL delLabelExpr();
+    JLDel delLabelExpr();
 
 }
