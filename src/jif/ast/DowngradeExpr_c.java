@@ -26,7 +26,7 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr {
 
     private LabelNode label;
     private LabelNode bound;
-    private Expr expr;
+    protected Expr expr;
 
     public DowngradeExpr_c(Position pos, Expr expr, LabelNode bound,
             LabelNode label) {

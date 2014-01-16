@@ -11,6 +11,7 @@ import java.util.Set;
 import jif.ast.DowngradeExpr;
 import jif.ast.LabelExpr;
 import jif.ast.PrincipalNode;
+import jif.ast.ReclassifyExpr;
 import jif.extension.JifArrayAccessDel;
 import jif.extension.JifCallDel;
 import jif.extension.JifConstructorCallDel;
@@ -134,6 +135,10 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
                             .expr()))
                     || (e instanceof DowngradeExpr && exprIsNotNullStatic(((DowngradeExpr) e)
                             .expr()))
+                    /* begin-new */
+                    || (e instanceof ReclassifyExpr && exprIsNotNullStatic(((ReclassifyExpr) e)
+                            .expr()))
+                    /* end-new */
                     || (e instanceof Conditional
                             && exprIsNotNullStatic(((Conditional) e)
                                     .consequent()) && exprIsNotNullStatic(((Conditional) e)
@@ -151,6 +156,10 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
                     || (e instanceof Cast && exprIsNotNull(((Cast) e).expr()))
                     || (e instanceof DowngradeExpr && exprIsNotNull(((DowngradeExpr) e)
                             .expr()))
+                    /* begin-new */
+                    || (e instanceof ReclassifyExpr && exprIsNotNull(((ReclassifyExpr) e)
+                            .expr()))
+                    /* end-new */
                     || (e instanceof Conditional && (exprIsNotNullStatic(((Conditional) e)
                             .consequent()) && exprIsNotNullStatic(((Conditional) e)
                             .alternative())));
@@ -298,6 +307,9 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
                     itemsToMap(trueItem, falseItem, dfIn, peer.succEdgeKeys());
             return checkNPE(ret, n);
         }
+        /* begin-new */
+        //we should add something here for reclassification
+        /* end-new */
 
         boolean resultIsNotNull = false;
         if ((n instanceof Conditional && dfIn.resultIsNotNull && ((Conditional) n)

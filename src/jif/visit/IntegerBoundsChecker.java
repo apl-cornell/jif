@@ -12,6 +12,7 @@ import java.util.Set;
 import jif.ast.DowngradeExpr;
 import jif.ast.JifExt;
 import jif.ast.JifUtil;
+import jif.ast.ReclassifyExpr;
 import jif.extension.JifArrayAccessDel;
 import jif.extension.JifExprExt;
 import polyglot.ast.ArrayAccess;
@@ -854,7 +855,14 @@ public class IntegerBoundsChecker extends
         } else if (expr instanceof DowngradeExpr) {
             DowngradeExpr e = (DowngradeExpr) expr;
             best = best.intersect(getExprBounds(e.expr()));
-        } else if (expr instanceof Binary) {
+        }
+        /* begin-new */
+        else if (expr instanceof ReclassifyExpr) {
+            ReclassifyExpr e = (ReclassifyExpr) expr;
+            best = best.intersect(getExprBounds(e.expr()));
+        }
+        /* end-new */
+        else if (expr instanceof Binary) {
             Binary b = (Binary) expr;
             Interval left = getExprBounds(b.left());
             Interval right = getExprBounds(b.right());

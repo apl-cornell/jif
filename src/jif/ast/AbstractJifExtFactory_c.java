@@ -390,6 +390,21 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
         return postExtDeclassifyExpr(e);
     }
 
+    /* new-begin */
+    @Override
+    public Ext extReclassifyExpr() {
+        Ext e = extReclassifyExprImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extReclassifyExpr();
+            e = composeExts(e, e2);
+        }
+        return postExtDeclassifyExpr(e);
+    }
+
+    /* new-end */
+
     @Override
     public final Ext extEndorseStmt() {
         Ext e = extEndorseStmtImpl();
@@ -591,6 +606,14 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
         return extExprImpl();
     }
 
+    /* new-begin */
+    /* this is not actualy used! */
+    protected Ext extReclassifyExprImpl() {
+        return extExprImpl();
+    }
+
+    /* new-end */
+
     protected Ext extEndorseStmtImpl() {
         return extStmtImpl();
     }
@@ -770,4 +793,5 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     protected Ext postExtPrincipalExpr(Ext e) {
         return postExtExpr(e);
     }
+
 }

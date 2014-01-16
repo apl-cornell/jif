@@ -17,6 +17,7 @@ import jif.ast.DowngradeExpr;
 import jif.ast.LabelExpr;
 import jif.ast.PrincipalExpr;
 import jif.ast.PrincipalNode;
+import jif.ast.ReclassifyExpr;
 import jif.extension.LabelTypeCheckUtil;
 import jif.translate.ActsForConstraintToJavaExpr;
 import jif.translate.ActsForConstraintToJavaExpr_c;
@@ -1814,6 +1815,12 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             return exprToAccessPath(((DowngradeExpr) e).expr(), expectedType,
                     context);
         }
+        /* begin-new */
+        else if (e instanceof ReclassifyExpr) {
+            return exprToAccessPath(((ReclassifyExpr) e).expr(), expectedType,
+                    context);
+        }
+        /* end-new */
         throw new SemanticDetailedException(
                 "Expression " + e + " not suitable for an access path.",
                 "The expression "
@@ -1850,6 +1857,11 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         if (e instanceof DowngradeExpr) {
             return exprToPrincipal(ts, ((DowngradeExpr) e).expr(), context);
         }
+        /* begin-new */
+        if (e instanceof ReclassifyExpr) {
+            return exprToPrincipal(ts, ((ReclassifyExpr) e).expr(), context);
+        }
+        /* end-new */
         if (e instanceof NullLit) {
             return ts.bottomPrincipal(e.position());
         }
@@ -1870,6 +1882,11 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         if (e instanceof DowngradeExpr) {
             return exprToLabel(ts, ((DowngradeExpr) e).expr(), context);
         }
+        /* begin-new */
+        if (e instanceof ReclassifyExpr) {
+            return exprToLabel(ts, ((ReclassifyExpr) e).expr(), context);
+        }
+        /* end-new */
         if (isFinalAccessExpr(e)) {
             return ts.dynamicLabel(e.position(),
                     ts.exprToAccessPath(e, ts.Label(), context));
@@ -1908,6 +1925,11 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         if (e instanceof DowngradeExpr) {
             return isFinalAccessExpr(((DowngradeExpr) e).expr());
         }
+        /* begin-new */
+        if (e instanceof ReclassifyExpr) {
+            return isFinalAccessExpr(((ReclassifyExpr) e).expr());
+        }
+        /* end-new */
         return false;
     }
 
@@ -1920,6 +1942,10 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                         .expr()))
                 || (e instanceof DowngradeExpr && isFinalAccessExprOrConst(((DowngradeExpr) e)
                         .expr()))
+                /* begin-new */
+                || (e instanceof ReclassifyExpr && isFinalAccessExprOrConst(((ReclassifyExpr) e)
+                        .expr()))
+                /* end-new */
                 || (e instanceof NullLit && expectedType != null && isImplicitCastValid(
                         expectedType, Principal()))
         /*|| (e instanceof Special && ((Special)e).kind() == Special.SUPER)*/;

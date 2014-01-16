@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import jif.ast.DowngradeExpr;
+import jif.ast.ReclassifyExpr;
 import jif.extension.JifPreciseClassDel;
 import polyglot.ast.Assign;
 import polyglot.ast.Binary;
@@ -207,7 +208,13 @@ public class PreciseClassChecker extends
             if (falseItem == null) falseItem = dfIn;
             return itemsToMap(trueItem, falseItem, dfIn, peer.succEdgeKeys());
         }
-
+        /* begin-new */
+        else if (n instanceof ReclassifyExpr && ((Expr) n).type().isBoolean()) {
+            if (trueItem == null) trueItem = dfIn;
+            if (falseItem == null) falseItem = dfIn;
+            return itemsToMap(trueItem, falseItem, dfIn, peer.succEdgeKeys());
+        }
+        /* end-new */
         return itemToMap(dfIn, peer.succEdgeKeys());
     }
 
@@ -350,6 +357,12 @@ public class PreciseClassChecker extends
             DowngradeExpr de = (DowngradeExpr) expr;
             return findAccessPathForExpr(de.expr());
         }
+        /* begin-new */
+        if (expr instanceof ReclassifyExpr) {
+            ReclassifyExpr re = (ReclassifyExpr) expr;
+            return findAccessPathForExpr(re.expr());
+        }
+        /* bend-new */
         if (expr instanceof Cast) {
             Cast ce = (Cast) expr;
             return findAccessPathForExpr(ce.expr());

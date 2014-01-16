@@ -545,6 +545,17 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
         return n;
     }
 
+    /* new-begin */
+    @Override
+    public ReclassifyExpr ReclassifyExpr(Position pos, Expr expr, Id name) {
+        ReclassifyExpr n = new ReclassifyExpr_c(pos, expr, name);
+        n = (ReclassifyExpr) n.ext(jifExtFactory().extReclassifyExpr());
+        n = (ReclassifyExpr) n.del(delFactory().delExpr());
+        return n;
+    }
+
+    /* new-end */
+
     @Override
     public EndorseStmt EndorseStmt(Position pos, LabelNode bound,
             LabelNode label, Stmt body) {

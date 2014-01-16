@@ -43,6 +43,7 @@ import jif.extension.JifNewArrayExt;
 import jif.extension.JifNewExt;
 import jif.extension.JifPrincipalExprExt;
 import jif.extension.JifPrincipalNodeExt;
+import jif.extension.JifReclassifyExprExt;
 import jif.extension.JifReturnExt;
 import jif.extension.JifSourceFileExt;
 import jif.extension.JifSpecialExt;
@@ -99,6 +100,7 @@ import jif.translate.NewLabelToJavaExt_c;
 import jif.translate.NewToJavaExt_c;
 import jif.translate.PackageNodeToJavaExt_c;
 import jif.translate.PrincipalExprToJavaExt_c;
+import jif.translate.ReclassifyExprToJavaExt_c;
 import jif.translate.ReturnToJavaExt_c;
 import jif.translate.SourceFileToJavaExt_c;
 import jif.translate.SpecialToJavaExt_c;
@@ -467,6 +469,14 @@ public class JifExtFactory_c extends AbstractJifExtFactory_c {
     protected Ext extDeclassifyExprImpl() {
         return new JifDeclassifyExprExt(new DowngradeExprToJavaExt_c());
     }
+
+    /* new-begin */
+    @Override
+    protected Ext extReclassifyExprImpl() {
+        return new JifReclassifyExprExt(new ReclassifyExprToJavaExt_c());
+    }
+
+    /* new-end */
 
     @Override
     protected Ext extEndorseStmtImpl() {

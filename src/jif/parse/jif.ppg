@@ -277,6 +277,9 @@ terminal Token FLOWSTO;
 terminal Token ENFORCES;
 terminal Token EQUIV;
 terminal Token DECLASSIFY;
+/* begin-new */
+terminal Token RECLASSIFY;
+/* end-new */
 terminal Token ENDORSE;
 terminal Token TO;
 
@@ -293,6 +296,9 @@ terminal Token PROVIDER;
 
 non terminal DeclassifyExpr declassify;
 non terminal DeclassifyStmt declassify_statement;
+/* begin-new */
+non terminal ReclassifyExpr reclassify;
+/* end-new */
 non terminal EndorseExpr endorse;
 non terminal EndorseStmt endorse_statement;
 non terminal LabelNode downgrade_to_label_opt;
@@ -355,7 +361,50 @@ label ::=
                RESULT = mn; :}
     |    LBRACE label:l RBRACE
             {: RESULT = l; :}
+            
+            /* begin-new */
+    |    LBRACK:x rif_component_list:a RBRACK:y
+            {: /* to-do */   :} 
+            /* end-new */
     ;
+    
+    /* begin-new */
+rif_component_list ::=
+        rif_component:a
+            {: /* to-do */ :}
+    |   rif_component_list:a COMMA rif_component:b
+            {: /* to-do */ :}
+    ;        
+     
+rif_component ::=
+        state_component:a
+            {: /* to-do */ :}
+    |   transition_component:a
+            {: /* to-do */ :}
+    ;
+    
+state_component ::=
+        IDENTIFIER:a COLON principal_set:b
+            {: /* to-do */ :}
+    ;
+    
+principal_set ::=
+        LBRACE:x principal_list:a RBRACE:y
+            {: /* to-do */ :}
+    ;
+    
+transition_component ::=
+        IDENTIFIER:a COLON IDENTIFIER:b rif_rightarrow IDENTIFIER:c
+            {: /* to-do */ :}
+    ;
+          
+ rif_rightarrow ::=        
+        MINUS GT:a 
+            {: RESULT = a; :}
+    ;
+    
+    /* end-new */
+        
 label_opt ::=
                     // LabelNode
             {: RESULT = null; :}
@@ -1087,6 +1136,10 @@ extend primary_no_new_array ::=
 primary_no_array ::=
        declassify:a
             {: RESULT = a; :}
+/* begin-new */
+    |  reclassify:a
+            {: RESULT = a; :}
+/* end-new */
     |  endorse:a
             {: RESULT = a; :}
     |  provider:a
@@ -1233,6 +1286,16 @@ declassify ::=
         DECLASSIFY:x LPAREN expression:a COMMA label:c downgrade_to_label_opt:b RPAREN:y
             {: RESULT = parser.nf.DeclassifyExpr(parser.pos(x,y), a, b==null?null:c, b==null?c:b); :}
     ;
+
+/* begin-new */ /*unresolved*/
+
+reclassify ::=
+                    // ReclassifyExpr
+        RECLASSIFY:x LPAREN expression:a COMMA IDENTIFIER:b RPAREN:y
+            {: RESULT = parser.nf.ReclassifyExpr(parser.pos(x,y), a, parser.nf.Id(parser.pos(b), b.getIdentifier())); :}
+    ;
+
+/* end-new */
 
 endorse ::=
                     // DeclassifyExpr

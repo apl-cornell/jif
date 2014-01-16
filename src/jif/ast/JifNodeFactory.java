@@ -134,6 +134,12 @@ public interface JifNodeFactory extends NodeFactory {
 
     DeclassifyExpr DeclassifyExpr(Position pos, Expr expr, LabelNode label);
 
+    /* new-begin */
+
+    ReclassifyExpr ReclassifyExpr(Position pos, Expr expr, Id name);
+
+    /* new-end */
+
     EndorseStmt EndorseStmt(Position pos, LabelNode bound, LabelNode label,
             Stmt body);
 

@@ -112,6 +112,9 @@ import java.math.BigInteger;
         keywords.put("covariant",     new Integer(sym.COVARIANT));
         keywords.put("invariant",     new Integer(sym.INVARIANT));
         keywords.put("declassify",    new Integer(sym.DECLASSIFY));
+	/* new-begin */
+	keywords.put("reclassify",    new Integer(sym.RECLASSIFY));
+	/* new-end */
         keywords.put("endorse",       new Integer(sym.ENDORSE));
         keywords.put("to",            new Integer(sym.TO));
         keywords.put("label",         new Integer(sym.LABEL));

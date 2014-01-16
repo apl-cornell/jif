@@ -80,4 +80,6 @@ public interface JifExtFactory extends ExtFactory, JifStmtExtFactory {
     Ext extLabelExpr();
 
     Ext extPrincipalExpr();
+
+    Ext extReclassifyExpr();
 }
