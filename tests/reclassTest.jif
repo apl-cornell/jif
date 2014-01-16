@@ -1,0 +1,24 @@
+package jif.principals;
+
+public class Alice extends ExternalPrincipal {
+    public Alice() {
+	super("Alice");
+    }
+   // public transition f5;
+    private static Alice{*!:*} P;
+    public static Principal getInstance{*!:*}() {
+    // label lbl = new label {Alice->};
+    // int {Bob->;Bob<-;*lbl}]
+    // label L = new label {q1:{Alice},q2:{Alice,Bob},f1:q1->q2};
+    // int {q1:{Alice},q2:{Alice,Bob},q3:{Bob},f1:q1->q2,f2:q1->q3 ; q3:{Charlie}, f3:q3->q4}  x
+    // if (jif.principals.Alice.f5(L) <= {x})
+    int x;
+    
+    x = reclassify(234 / 7,f);
+    
+	if (P == null) {
+	    P = new Alice();
+	}
+	return P;
+    }
+}
