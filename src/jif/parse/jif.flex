@@ -114,6 +114,7 @@ import java.math.BigInteger;
         keywords.put("declassify",    new Integer(sym.DECLASSIFY));
 	/* new-begin */
 	keywords.put("reclassify",    new Integer(sym.RECLASSIFY));
+	keywords.put("rif",    new Integer(sym.RIF));
 	/* new-end */
         keywords.put("endorse",       new Integer(sym.ENDORSE));
         keywords.put("to",            new Integer(sym.TO));
@@ -123,7 +124,7 @@ import java.math.BigInteger;
         keywords.put("meet",          new Integer(sym.MEET));
         
         keywords.put("provider",     new Integer(sym.PROVIDER));        
-    }
+    }    
 
     public String file() {
         return file;

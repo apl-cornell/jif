@@ -279,6 +279,7 @@ terminal Token EQUIV;
 terminal Token DECLASSIFY;
 /* begin-new */
 terminal Token RECLASSIFY;
+terminal Token RIF;
 /* end-new */
 terminal Token ENDORSE;
 terminal Token TO;
@@ -298,6 +299,12 @@ non terminal DeclassifyExpr declassify;
 non terminal DeclassifyStmt declassify_statement;
 /* begin-new */
 non terminal ReclassifyExpr reclassify;
+non terminal List rif_component_list;
+non terminal Object rif_component;
+non terminal Object state_component;   //change-me!!!!
+non terminal List principal_set;
+non terminal Object transition_component;  //change-me!!!
+non terminal Token rif_rightarrow;
 /* end-new */
 non terminal EndorseExpr endorse;
 non terminal EndorseStmt endorse_statement;
@@ -361,49 +368,54 @@ label ::=
                RESULT = mn; :}
     |    LBRACE label:l RBRACE
             {: RESULT = l; :}
-            
+          
             /* begin-new */
-    |    LBRACK:x rif_component_list:a RBRACK:y
-            {: /* to-do */   :} 
+    |    RIF:x LBRACK rif_component_list:a RBRACK:y
+            {:/* LabelNode ln;
+               ln = parser.nf.RifLabelNode(parser.pos(x, y), a);
+               RESULT = ln; */:}
             /* end-new */
     ;
-    
+     
     /* begin-new */
 rif_component_list ::=
         rif_component:a
-            {: /* to-do */ :}
-    |   rif_component_list:a COMMA rif_component:b
-            {: /* to-do */ :}
+           {:/* List l = new LinkedList<Node>();
+               l.add(a);
+               RESULT = l; */ :}
+   |   rif_component_list:a COMMA rif_component:b
+            {: /*RESULT = a;
+               a.add(b); */:}
     ;        
-     
+
 rif_component ::=
         state_component:a
-            {: /* to-do */ :}
+            {: /*RESULT = a; */:}
     |   transition_component:a
-            {: /* to-do */ :}
+            {: /*RESULT = a; */:}
     ;
     
 state_component ::=
-        IDENTIFIER:a COLON principal_set:b
-            {: /* to-do */ :}
-    ;
+        IDENTIFIER:a COLON principal_set:b     
+            {: /*RESULT = parser.nf.RifStateNode(parser.pos(a, parser.pos(b)==null?arr:b), a, b); */:}
+    ;   
     
 principal_set ::=
-        LBRACE:x principal_list:a RBRACE:y
-            {: /* to-do */ :}
+        LBRACK:x principal_list:a RBRACK:y
+            {: /*RESULT = a; */:}
     ;
     
 transition_component ::=
         IDENTIFIER:a COLON IDENTIFIER:b rif_rightarrow IDENTIFIER:c
-            {: /* to-do */ :}
+           {: /* RESULT = parser.nf.RifTransitionNode(parser.pos(a, parser.pos(c)==null?arr:c), a, b, c); */:}
     ;
-          
- rif_rightarrow ::=        
+             
+rif_rightarrow ::=        
         MINUS GT:a 
-            {: RESULT = a; :}
+            {: /* RESULT = a; */:}
     ;
     
-    /* end-new */
+    /* end-new */     
         
 label_opt ::=
                     // LabelNode
