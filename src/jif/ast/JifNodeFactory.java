@@ -138,6 +138,14 @@ public interface JifNodeFactory extends NodeFactory {
 
     ReclassifyExpr ReclassifyExpr(Position pos, Expr expr, Id name);
 
+    RifTransitionNode RifTransitionNode(Position pos, Id name, Id lstate,
+            Id rstate);
+
+    RifStateNode RifStateNode(Position pos, Id name,
+            List<PrincipalNode> principals);
+
+    RifLabelNode RifLabelNode(Position pos, List<List<RifComponentNode>> params);
+
     /* new-end */
 
     EndorseStmt EndorseStmt(Position pos, LabelNode bound, LabelNode label,

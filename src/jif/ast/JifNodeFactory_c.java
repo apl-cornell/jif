@@ -554,6 +554,31 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
         return n;
     }
 
+    @Override
+    public RifTransitionNode RifTransitionNode(Position pos, Id name,
+            Id lstate, Id rstate) {
+        RifTransitionNode n =
+                new RifTransitionNode_c(pos, name, lstate, rstate);
+        //to-do
+        return n;
+    }
+
+    @Override
+    public RifStateNode RifStateNode(Position pos, Id name,
+            List<PrincipalNode> principals) {
+        RifStateNode n = new RifStateNode_c(pos, name, principals);
+        //to-do
+        return n;
+    }
+
+    @Override
+    public RifLabelNode RifLabelNode(Position pos,
+            List<List<RifComponentNode>> components) {
+        RifLabelNode n = new RifLabelNode_c(pos, components);
+        //to-do
+        return n;
+    }
+
     /* new-end */
 
     @Override
