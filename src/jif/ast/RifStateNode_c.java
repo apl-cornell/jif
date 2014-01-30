@@ -2,8 +2,10 @@
 package jif.ast;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
+import jif.types.principal.Principal;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
@@ -21,6 +23,7 @@ public class RifStateNode_c extends RifComponentNode_c implements RifStateNode {
 
     protected Id name;
     protected List<PrincipalNode> principals;
+    protected List<Principal> state; //put it in type
 
     public RifStateNode_c(Position pos, Id name, List<PrincipalNode> principals) {
         super(pos);
@@ -52,22 +55,29 @@ public class RifStateNode_c extends RifComponentNode_c implements RifStateNode {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
+        Id name = (Id) visitChild(this.name, v);
         List<PrincipalNode> readers = visitList(this.principals, v);
-        return reconstruct(this.name, readers);
+        return reconstruct(name, readers);
+    }
+
+    @Override
+    public boolean isDisambiguated() {
+        return this.state != null;
     }
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        /*  List<Principal> l = new LinkedList<Principal>();
+        List<Principal> l = new LinkedList<Principal>();
 
-          for (PrincipalNode r : this.principals) {
-              if (!r.isDisambiguated()) {
-                  ar.job().extensionInfo().scheduler().currentGoal()
-                          .setUnreachableThisRun();
-                  return this;
-              }
-              l.add(r.principal());
-          } */
+        for (PrincipalNode r : this.principals) {
+            if (!r.isDisambiguated()) {
+                ar.job().extensionInfo().scheduler().currentGoal()
+                        .setUnreachableThisRun();
+                return this;
+            }
+            l.add(r.principal());
+        }
+        this.state = l;
         return this;
     }
 

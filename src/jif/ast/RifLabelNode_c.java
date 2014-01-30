@@ -20,6 +20,7 @@ public class RifLabelNode_c extends LabelNode_c implements RifLabelNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<List<RifComponentNode>> components;
+    protected boolean disambiguated = false;
 
     public RifLabelNode_c(Position pos, List<List<RifComponentNode>> components) {
         super(pos);
@@ -59,7 +60,23 @@ public class RifLabelNode_c extends LabelNode_c implements RifLabelNode {
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+
+        for (List<RifComponentNode> l : this.components) {
+            for (RifComponentNode c : l) {
+                if (!c.isDisambiguated()) {
+                    ar.job().extensionInfo().scheduler().currentGoal()
+                            .setUnreachableThisRun();
+                    return this;
+                }
+            }
+        }
+        this.disambiguated = true;
         return this;
+    }
+
+    @Override
+    public boolean isDisambiguated() {
+        return this.disambiguated;
     }
 
     @Override

@@ -18,6 +18,7 @@ public class RifTransitionNode_c extends RifComponentNode_c implements
     protected Id name;
     protected Id lstate;
     protected Id rstate;
+    protected boolean disambiguated = true; //attention!!!!
 
     public RifTransitionNode_c(Position pos, Id name, Id lstate, Id rstate) {
         super(pos);
@@ -41,26 +42,34 @@ public class RifTransitionNode_c extends RifComponentNode_c implements
         return this.rstate;
     }
 
-    /* protected RifTransitionNode_c reconstruct(Id name, Id lstate, Id rstate) {
-         if (name != this.name || lstate != this.lstate || rstate != this.rstate){
-             RifTransitionNode_c n = (RifTransitionNode_c) copy();
-             n.name = name;
-             n.lstate = lstate;
-             n.rstate = rstate;
-             return n;
-         }
+    protected RifTransitionNode_c reconstruct(Id name, Id lstate, Id rstate) {
+        if (name != this.name || lstate != this.lstate || rstate != this.rstate) {
+            RifTransitionNode_c n = (RifTransitionNode_c) copy();
+            n.name = name;
+            n.lstate = lstate;
+            n.rstate = rstate;
+            return n;
+        }
 
-         return this;
-     }*/
+        return this;
+    }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        return this;
+        Id name = (Id) visitChild(this.name, v);
+        Id lstate = (Id) visitChild(this.lstate, v);
+        Id rstate = (Id) visitChild(this.rstate, v);
+        return reconstruct(name, lstate, rstate);
     }
 
     @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         return this;
+    }
+
+    @Override
+    public boolean isDisambiguated() {
+        return this.disambiguated;
     }
 
     @Override
