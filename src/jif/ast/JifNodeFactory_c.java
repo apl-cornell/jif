@@ -559,7 +559,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
             Id lstate, Id rstate) {
         RifTransitionNode n =
                 new RifTransitionNode_c(pos, name, lstate, rstate);
-        //to-do
+        n = (RifTransitionNode) n.ext(jifExtFactory().extPolicyNode());
+        n = (RifTransitionNode) n.del(delFactory().delNode());
         return n;
     }
 
@@ -567,7 +568,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public RifStateNode RifStateNode(Position pos, Id name,
             List<PrincipalNode> principals) {
         RifStateNode n = new RifStateNode_c(pos, name, principals);
-        //to-do
+        n = (RifStateNode) n.ext(jifExtFactory().extPolicyNode());
+        n = (RifStateNode) n.del(delFactory().delNode());
         return n;
     }
 
@@ -575,7 +577,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public RifLabelNode RifLabelNode(Position pos,
             List<List<RifComponentNode>> components) {
         RifLabelNode n = new RifLabelNode_c(pos, components);
-        //to-do
+        n = (RifLabelNode) n.ext(jifExtFactory().extPolicyNode());
+        n = (RifLabelNode) n.del(delFactory().delNode());
         return n;
     }
 
