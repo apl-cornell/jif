@@ -15,6 +15,12 @@ public abstract class AbstractPrincipal implements Principal {
         this.name = name;
     }
 
+    protected AbstractPrincipal(String{this} name, principal{this} superior) {
+        this.name = name;
+        // Implemented in Java
+        // addDelegatesTo(superior);
+    }
+
     public String{this} name() {
         return name;
     }

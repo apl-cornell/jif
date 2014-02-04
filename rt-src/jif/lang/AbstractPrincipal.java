@@ -37,6 +37,16 @@ public abstract class AbstractPrincipal implements Principal {
         return this;
     }
 
+    protected AbstractPrincipal jif$lang$AbstractPrincpal$(final String name,
+            final Principal superior) {
+        this.jif$init();
+        {
+            this.name = name;
+            addDelegatesTo(superior);
+        }
+        return this;
+    }
+
     protected AbstractPrincipal(String name) {
         this.name = name;
     }
