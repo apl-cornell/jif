@@ -37,7 +37,7 @@ public abstract class AbstractPrincipal implements Principal {
         return this;
     }
 
-    protected AbstractPrincipal jif$lang$AbstractPrincpal$(final String name,
+    protected AbstractPrincipal jif$lang$AbstractPrincipal$(final String name,
             final Principal superior) {
         this.jif$init();
         {
