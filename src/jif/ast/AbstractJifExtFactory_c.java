@@ -102,6 +102,57 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
         return postExtPolicyNode(e);
     }
 
+    /* begin-new */
+    @Override
+    public final Ext extRifTransitionNode() {
+        Ext e = extRifTransitionNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extRifTransitionNode();
+            e = composeExts(e, e2);
+        }
+        return postExtPolicyNode(e);
+    }
+
+    @Override
+    public final Ext extRifStateNode() {
+        Ext e = extRifStateNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extRifStateNode();
+            e = composeExts(e, e2);
+        }
+        return postExtPolicyNode(e);
+    }
+
+    @Override
+    public final Ext extRifPolicyNode() {
+        Ext e = extRifPolicyNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extRifPolicyNode();
+            e = composeExts(e, e2);
+        }
+        return postExtPolicyNode(e);
+    }
+
+    @Override
+    public final Ext extRifLabelNode() {
+        Ext e = extRifLabelNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extRifLabelNode();
+            e = composeExts(e, e2);
+        }
+        return postExtPolicyNode(e);
+    }
+
+    /* end-new */
+
     @Override
     public final Ext extAmbDynamicLabelNode() {
         Ext e = extAmbDynamicLabelNodeImpl();
@@ -509,6 +560,25 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     protected Ext extPolicyNodeImpl() {
         return extNode();
     }
+
+    /* begin-new */
+    protected Ext extRifTransitionNodeImpl() {
+        return extNode();
+    }
+
+    protected Ext extRifStateNodeImpl() {
+        return extNode();
+    }
+
+    protected Ext extRifPolicyNodeImpl() {
+        return extNode();
+    }
+
+    protected Ext extRifLabelNodeImpl() {
+        return extNode();
+    }
+
+    /* end-new */
 
     protected Ext extAmbDynamicLabelNodeImpl() {
         return extLabelNode();

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import polyglot.ast.Node;
+import polyglot.ast.Node_c;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
@@ -15,26 +16,28 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
-public class RifLabelNode_c extends LabelNode_c implements RifLabelNode {
+public class RifPolicyNode_c extends Node_c implements RifPolicyNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected List<RifPolicyNode> policies;
+    protected List<RifComponentNode> components;
     protected boolean disambiguated = false;
 
-    public RifLabelNode_c(Position pos, List<RifPolicyNode> policies) {
+    //put sth for a type
+
+    public RifPolicyNode_c(Position pos, List<RifComponentNode> components) {
         super(pos);
-        this.policies = policies;
+        this.components = components;
     }
 
     @Override
-    public List<RifPolicyNode> policies() {
-        return this.policies;
+    public List<RifComponentNode> components() {
+        return this.components;
     }
 
-    protected RifLabelNode_c reconstruct(List<RifPolicyNode> policies) {
-        if (!CollectionUtil.equals(policies, this.policies)) {
-            RifLabelNode_c n = (RifLabelNode_c) copy();
-            n.policies = ListUtil.copy(policies, true);
+    protected RifPolicyNode_c reconstruct(List<RifComponentNode> components) {
+        if (!CollectionUtil.equals(components, this.components)) {
+            RifPolicyNode_c n = (RifPolicyNode_c) copy();
+            n.components = ListUtil.copy(components, true);
             return n;
         }
 
@@ -43,7 +46,7 @@ public class RifLabelNode_c extends LabelNode_c implements RifLabelNode {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        List<RifPolicyNode> lnew = visitList(this.policies, v);
+        List<RifComponentNode> lnew = visitList(this.components, v);
         return reconstruct(lnew);
     }
 
@@ -55,7 +58,7 @@ public class RifLabelNode_c extends LabelNode_c implements RifLabelNode {
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
 
-        for (RifPolicyNode c : this.policies) {
+        for (RifComponentNode c : this.components) {
             if (!c.isDisambiguated()) {
                 ar.job().extensionInfo().scheduler().currentGoal()
                         .setUnreachableThisRun();
@@ -74,17 +77,18 @@ public class RifLabelNode_c extends LabelNode_c implements RifLabelNode {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        w.write("rif[");
-        Iterator<RifPolicyNode> ic = this.policies.iterator();
+
+        Iterator<RifComponentNode> ic = this.components.iterator();
         while (ic.hasNext()) {
-            RifPolicyNode c = ic.next();
+            RifComponentNode c = ic.next();
             print(c, w, tr);
             if (ic.hasNext()) {
-                w.write(";");
+                w.write(",");
             }
         }
-        w.write("]");
+
     }
+
 }
 
 /* new-end */

@@ -299,6 +299,7 @@ non terminal DeclassifyExpr declassify;
 non terminal DeclassifyStmt declassify_statement;
 /* begin-new */
 non terminal ReclassifyExpr reclassify;
+non terminal RifPolicyNode rif_policy;
 non terminal List rif_component_list;
 non terminal Object rif_component;
 non terminal RifStateNode state_component;
@@ -381,15 +382,23 @@ label ::=
           
     /* begin-new */
 rif_join_list ::=
-        rif_component_list:a
-           {: List l = new LinkedList<LinkedList<Node>>();
+        rif_policy:a
+           {: List l = new LinkedList<RifPolicyNode>();
               l.add(a);
               RESULT = l; :}
-   |    rif_join_list:a SEMICOLON rif_component_list:b
+   |    rif_join_list:a SEMICOLON rif_policy:b
             {: RESULT = a;
                a.add(b); :}
     ;       
         
+rif_policy ::=
+        rif_component_list:a
+           {: RifPolicyNode n;
+              n = parser.nf.RifPolicyNode(parser.pos(a), a);
+              RESULT = n;
+           :}
+    ;
+    
 rif_component_list ::=
         rif_component:a
            {: List l = new LinkedList<Node>();
