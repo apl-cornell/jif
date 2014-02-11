@@ -7,19 +7,19 @@ import java.util.Set;
 
 import javax.tools.JavaFileManager.Location;
 
+import polyglot.ext.jl5.JL5Options;
 import polyglot.main.OptFlag;
 import polyglot.main.OptFlag.Arg;
 import polyglot.main.OptFlag.IntFlag;
 import polyglot.main.OptFlag.PathFlag;
 import polyglot.main.OptFlag.Switch;
-import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.main.UsageError;
 
 /**
  * This object encapsulates various polyglot options.
  */
-public class JifOptions extends Options {
+public class JifOptions extends JL5Options {
     /*
      * Fields for storing values for options.
      */
