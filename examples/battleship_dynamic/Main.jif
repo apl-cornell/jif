@@ -1,0 +1,66 @@
+import java.io.PrintStream;
+import jif.runtime.Runtime;
+
+/**
+ * This is the Main class for the BattleShip example. 
+ *
+ * It plays a game of BattleShip for dynamically created principals.
+ */
+class Main {
+    
+    /*
+     * The main method has integrity {p<-*}.
+     * (By assumption, the invocation of the program has the permission of the
+     * current user p).
+     */
+    public static final void main{p<-*}
+                     (principal{p<-p} p, String{p<-p}[]{p<-p} args) : {p<-*} 
+         throws SecurityException
+      where caller(p)
+    {
+          PrintStream[{}] out = null;
+          try {
+              Runtime[p] runtime = Runtime[p].getRuntime();
+              out = runtime==null?null:runtime.stdout(new label {});
+          }
+          catch (SecurityException e) {
+              // just let out be null.
+          }
+
+          // the PrintStream needs to be labeled {player1<-* meet player2<-*}, which
+          // requires a declassification and an endorsement.
+          PrintStream[{}] out1 = endorse(out, {p->*} to {p->*;p<-*});
+          PrintStream[{}] out2 = declassify(out1, {p<-*});
+              
+          // instantiate an instance of the BattleShip game for player1 
+          // and player2, and play it.
+          try {
+            final MyPrincipal[p] player1 = new MyPrincipal[p](args[0]);
+            final MyPrincipal[p] player2 = new MyPrincipal[p](args[1]);
+            if (p actsfor player1 && p actsfor player2) {
+              new BattleShip[player1, player2]().play(out2);
+            }
+          } catch (Exception e) {
+            throw new Error(e);
+          }
+    }
+}
+
+class MyPrincipal[principal P] extends AbstractPrincipal {
+    
+    MyPrincipal(String{this} name) { 
+      super(name);
+    }
+
+    public boolean{this;p;this<-} delegatesTo(principal p) {
+      try {
+        if (((Principal) P).equals(p) && ((Principal) p).equals(P)) {
+           return true;
+        } else {
+          return superiorsContains((Principal)p);
+        }
+      } catch (NullPointerException e) {
+        throw new Error(e);
+      }
+    }
+}
