@@ -2,6 +2,7 @@ package jif;
 
 import jif.visit.JifTranslator;
 import polyglot.ast.Node;
+import polyglot.ext.jl5.JL5ExtensionInfo;
 import polyglot.frontend.CyclicDependencyException;
 import polyglot.frontend.EmptyPass;
 import polyglot.frontend.JLExtensionInfo;
@@ -28,7 +29,7 @@ import polyglot.util.InternalCompilerError;
  * the passes after EXC_CHECK_ALL: that is those which deal with
  * translation.
  */
-public class OutputExtensionInfo extends JLExtensionInfo {
+public class OutputExtensionInfo extends JL5ExtensionInfo {
     ExtensionInfo jifExtInfo;
 
     public OutputExtensionInfo(ExtensionInfo jifExtInfo) {
