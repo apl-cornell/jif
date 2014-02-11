@@ -63,6 +63,23 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
     public Type uncachedSubstType(Type t) {
         JifTypeSystem ts = (JifTypeSystem) this.ts;
 
+        if (t instanceof UninstTypeParam) {
+            UninstTypeParam utp = (UninstTypeParam) t;
+            Param p = subst.get(utp.paramInstance());
+            if (p instanceof TypeParam) {
+                Type substType = ((TypeParam) p).type();
+                if (substType.isPrimitive()) {
+                    throw new UnsupportedOperationException(
+                            "fix primitive types.");
+                } else {
+                    return substType;
+                }
+            } else {
+                throw new InternalCompilerError(
+                        "Type parameter bound to non-type value.");
+            }
+        }
+
         if (ts.isLabeled(t)) {
             return ts.labeledType(t.position(), substType(ts.unlabel(t)),
                     substLabel(ts.labelOfType(t)));

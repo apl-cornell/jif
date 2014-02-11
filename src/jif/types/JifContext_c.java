@@ -585,6 +585,7 @@ public class JifContext_c extends Context_c implements JifContext {
         return inPrologue;
     }
 
+    @Override
     public void addTypeParam(ParamInstance pi) {
         if (typeParams == null)
             typeParams = new HashMap<String, ParamInstance>();
