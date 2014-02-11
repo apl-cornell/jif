@@ -15,7 +15,9 @@ import jif.ast.JifExt;
 import jif.ast.JifNodeFactory;
 import jif.ast.JifUtil;
 import jif.types.JifTypeSystem;
+import jif.types.LabeledType;
 import jif.types.Param;
+import jif.types.UninstTypeParam;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.Block;
@@ -29,6 +31,7 @@ import polyglot.ast.SourceFile;
 import polyglot.ast.Stmt;
 import polyglot.ast.TopLevelDecl;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Job;
 import polyglot.frontend.Source;
@@ -175,7 +178,7 @@ public class JifToJavaRewriter extends ContextVisitor {
     }
 
     public TypeNode typeToJava(Type t, Position pos) throws SemanticException {
-        NodeFactory nf = this.java_nf();
+        JL5NodeFactory nf = (JL5NodeFactory) this.java_nf();
         TypeSystem ts = this.java_ts();
         JifTypeSystem jifts = this.jif_ts();
 
@@ -200,7 +203,14 @@ public class JifToJavaRewriter extends ContextVisitor {
         }
 
         if (jifts.isTypeParam(t)) {
-            return canonical(nf, ts.Object(), pos);
+            UninstTypeParam tp;
+            if (t instanceof LabeledType) {
+                tp = (UninstTypeParam) jifts.unlabel(t);
+            } else {
+                tp = (UninstTypeParam) t;
+            }
+            return nf.ParamTypeNode(pos, Collections.<TypeNode> emptyList(),
+                    nf.Id(pos, tp.paramInstance().name()));
         }
 
         if (t.isArray()) {
