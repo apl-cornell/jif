@@ -209,8 +209,7 @@ public class JifToJavaRewriter extends ContextVisitor {
             } else {
                 tp = (UninstTypeParam) t;
             }
-            return nf.ParamTypeNode(pos, Collections.<TypeNode> emptyList(),
-                    nf.Id(pos, tp.paramInstance().name()));
+            return nf.AmbTypeNode(pos, nf.Id(pos, tp.paramInstance().name()));
         }
 
         if (t.isArray()) {
