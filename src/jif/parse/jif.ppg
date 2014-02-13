@@ -303,6 +303,7 @@ non terminal RifPolicyNode rif_policy;
 non terminal List rif_component_list;
 non terminal Object rif_component;
 non terminal RifStateNode state_component;
+non terminal RifStateNode current_state_component;
 non terminal List principal_set;
 non terminal RifTransitionNode transition_component;
 non terminal Token rif_rightarrow;
@@ -410,16 +411,24 @@ rif_component_list ::=
     ;        
 
 rif_component ::=
-        state_component:a
+        current_state_component:a
+            {: RESULT = a; :}
+    |   state_component:a
             {: RESULT = a; :}
     |   transition_component:a
             {: RESULT = a; :}
+    ;
+
+current_state_component ::=
+     IDENTIFIER:a MULT COLON principal_set:b     
+            {: RESULT = parser.nf.RifStateNode(parser.pos(a, b), 
+            parser.nf.Id(parser.pos(a), a.getIdentifier()), b,"current"); :}
     ;
     
 state_component ::=
         IDENTIFIER:a COLON principal_set:b     
             {: RESULT = parser.nf.RifStateNode(parser.pos(a, b), 
-            parser.nf.Id(parser.pos(a), a.getIdentifier()), b); :}
+            parser.nf.Id(parser.pos(a), a.getIdentifier()), b,"nocurrent"); :}
     ;   
     
 principal_set ::=

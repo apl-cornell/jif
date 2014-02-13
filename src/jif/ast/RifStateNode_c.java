@@ -26,12 +26,19 @@ public class RifStateNode_c extends RifComponentNode_c implements RifStateNode {
     protected Id name;
     protected List<PrincipalNode> principals;
     protected RifState state;
+    protected boolean current;
 
-    public RifStateNode_c(Position pos, Id name, List<PrincipalNode> principals) {
+    public RifStateNode_c(Position pos, Id name,
+            List<PrincipalNode> principals, String check) {
         super(pos);
         this.name = name;
         this.principals = principals;
         this.state = null;
+        if (check == "current") {
+            this.current = true;
+        } else {
+            this.current = false;
+        }
     }
 
     @Override
@@ -47,6 +54,11 @@ public class RifStateNode_c extends RifComponentNode_c implements RifStateNode {
     @Override
     public RifState state() {
         return this.state;
+    }
+
+    @Override
+    public boolean isCurrent() {
+        return this.current;
     }
 
     protected RifStateNode_c reconstruct(Id name, List<PrincipalNode> principals) {
@@ -85,7 +97,7 @@ public class RifStateNode_c extends RifComponentNode_c implements RifStateNode {
             }
             l.add(r.principal());
         }
-        RifState state = new RifState_c(this.name, l);
+        RifState state = new RifState_c(this.name, l, this.current);
         this.state = state;
         return this;
     }

@@ -14,4 +14,6 @@ public interface RifState extends RifComponent {
 
     boolean isTopConfidentiality();
 
+    boolean isCurrent();
+
 }

@@ -142,7 +142,7 @@ public interface JifNodeFactory extends NodeFactory {
             Id rstate);
 
     RifStateNode RifStateNode(Position pos, Id name,
-            List<PrincipalNode> principals);
+            List<PrincipalNode> principals, String current);
 
     RifPolicyNode RifPolicyNode(Position pos, List<RifComponentNode> params);
 

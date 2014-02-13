@@ -566,8 +566,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
 
     @Override
     public RifStateNode RifStateNode(Position pos, Id name,
-            List<PrincipalNode> principals) {
-        RifStateNode n = new RifStateNode_c(pos, name, principals);
+            List<PrincipalNode> principals, String current) {
+        RifStateNode n = new RifStateNode_c(pos, name, principals, current);
         n = (RifStateNode) n.ext(jifExtFactory().extRifStateNode());
         n = (RifStateNode) n.del(delFactory().delNode());
         return n;

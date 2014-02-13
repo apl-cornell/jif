@@ -13,4 +13,6 @@ public interface RifStateNode extends RifComponentNode {
 
     public RifState state();
 
+    public boolean isCurrent();
+
 }

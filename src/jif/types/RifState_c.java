@@ -17,10 +17,12 @@ public class RifState_c implements RifState {
 
     private Id name;
     private List<Principal> principals;
+    private boolean current;
 
-    public RifState_c(Id name, List<Principal> principals) {
+    public RifState_c(Id name, List<Principal> principals, boolean current) {
         this.name = name;
         this.principals = principals;
+        this.current = current;
     }
 
     @Override
@@ -31,6 +33,11 @@ public class RifState_c implements RifState {
     @Override
     public List<Principal> principals() {
         return this.principals;
+    }
+
+    @Override
+    public boolean isCurrent() {
+        return this.current;
     }
 
     @Override
@@ -87,7 +94,7 @@ public class RifState_c implements RifState {
             Principal newprincipal = p.subst(substitution);
             l.add(newprincipal);
         }
-        RifState newstate = new RifState_c(this.name, l);
+        RifState newstate = new RifState_c(this.name, l, this.current);
         return newstate;
     }
 

@@ -11,6 +11,8 @@ import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.PathMap;
 import jif.types.RifComponent;
+import jif.types.RifFSM;
+import jif.types.RifFSM_c;
 import jif.types.RifState;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
@@ -28,11 +30,15 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private final List<RifComponent> components;
+    private RifFSM fsm;
+
+    //maybe components and fsm contain duplicate information
 
     public RifReaderPolicy_c(List<RifComponent> components, JifTypeSystem ts,
             Position pos) {
         super(ts, pos);
         this.components = components;
+        this.fsm = new RifFSM_c(components);
     }
 
     @Override
@@ -43,6 +49,11 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
     @Override
     public boolean isSingleton() {
         return true;
+    }
+
+    @Override
+    public RifFSM getFSM() {
+        return this.fsm;
     }
 
     @Override
@@ -70,19 +81,16 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
         return this;
     }
 
+    public boolean equalsFSM(RifFSM other) {
+        if (this.fsm.currentState().equalsFSM(other.currentState())) {
+
+        }
+    }
+
     @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
-
-        /*  if (this == o) return true;
-          if (o instanceof ReaderPolicy_c) {
-              ReaderPolicy_c that = (ReaderPolicy_c) o;
-              if (this.owner == that.owner
-                      || (this.owner != null && this.owner.equals(that.owner))) {
-                  return this.reader.equals(that.reader);
-              }
-          }*/
-        return false;
+        return this.equalsFSM(((RifReaderPolicy) o).getFSM());
     }
 
     @Override
