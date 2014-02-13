@@ -2,10 +2,13 @@
 package jif.ast;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
+import jif.types.JifTypeSystem;
+import jif.types.RifComponent;
+import jif.types.label.Policy;
 import polyglot.ast.Node;
-import polyglot.ast.Node_c;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
@@ -16,16 +19,13 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
-public class RifPolicyNode_c extends Node_c implements RifPolicyNode {
+public class RifPolicyNode_c extends PolicyNode_c implements RifPolicyNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<RifComponentNode> components;
-    protected boolean disambiguated = false;
-
-    //put sth for a type
 
     public RifPolicyNode_c(Position pos, List<RifComponentNode> components) {
-        super(pos);
+        super(pos, (Policy) null); //this is not very principled!
         this.components = components;
     }
 
@@ -50,13 +50,15 @@ public class RifPolicyNode_c extends Node_c implements RifPolicyNode {
         return reconstruct(lnew);
     }
 
-    /*
-    protected Policy producePolicy(JifTypeSystem ts, List<List<RifComponentNode>> components) {
-        return ts.something();
-    }*/
+    protected Policy producePolicy(JifTypeSystem ts,
+            List<RifComponent> components) {
+        return ts.rifreaderPolicy(position(), components);
+    }
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
+        List<RifComponent> l = new LinkedList<RifComponent>();
 
         for (RifComponentNode c : this.components) {
             if (!c.isDisambiguated()) {
@@ -64,15 +66,14 @@ public class RifPolicyNode_c extends Node_c implements RifPolicyNode {
                         .setUnreachableThisRun();
                 return this;
             }
+            if (c instanceof RifStateNode) {
+                l.add(((RifStateNode) c).state());
+            } else if (c instanceof RifTransitionNode) {
+                l.add(((RifTransitionNode) c).transition());
+            }
         }
-
-        this.disambiguated = true;
+        this.policy = producePolicy(ts, l);
         return this;
-    }
-
-    @Override
-    public boolean isDisambiguated() {
-        return this.disambiguated;
     }
 
     @Override

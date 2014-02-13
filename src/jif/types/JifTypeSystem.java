@@ -19,6 +19,7 @@ import jif.types.label.ParamLabel;
 import jif.types.label.Policy;
 import jif.types.label.ProviderLabel;
 import jif.types.label.ReaderPolicy;
+import jif.types.label.RifReaderPolicy;
 import jif.types.label.ThisLabel;
 import jif.types.label.UnknownLabel;
 import jif.types.label.VarLabel;
@@ -270,6 +271,8 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
 
     ReaderPolicy readerPolicy(Position pos, Principal owner,
             Collection<Principal> readers);
+
+    RifReaderPolicy rifreaderPolicy(Position pos, List<RifComponent> components);
 
     WriterPolicy writerPolicy(Position pos, Principal owner, Principal writer);
 

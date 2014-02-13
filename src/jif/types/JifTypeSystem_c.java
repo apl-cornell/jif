@@ -72,6 +72,8 @@ import jif.types.label.ProviderLabel;
 import jif.types.label.ProviderLabel_c;
 import jif.types.label.ReaderPolicy;
 import jif.types.label.ReaderPolicy_c;
+import jif.types.label.RifReaderPolicy;
+import jif.types.label.RifReaderPolicy_c;
 import jif.types.label.ThisLabel;
 import jif.types.label.ThisLabel_c;
 import jif.types.label.UnknownLabel;
@@ -1067,6 +1069,13 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             Collection<Principal> readers) {
         Principal r = disjunctivePrincipal(pos, readers);
         return readerPolicy(pos, owner, r);
+    }
+
+    @Override
+    public RifReaderPolicy rifreaderPolicy(Position pos,
+            List<RifComponent> components) {
+        RifReaderPolicy t = new RifReaderPolicy_c(components, this, pos);
+        return t;
     }
 
     @Override

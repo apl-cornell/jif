@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import jif.types.RifState;
+import jif.types.RifState_c;
 import jif.types.principal.Principal;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
@@ -23,12 +25,13 @@ public class RifStateNode_c extends RifComponentNode_c implements RifStateNode {
 
     protected Id name;
     protected List<PrincipalNode> principals;
-    protected List<Principal> state; //put it in type
+    protected RifState state;
 
     public RifStateNode_c(Position pos, Id name, List<PrincipalNode> principals) {
         super(pos);
         this.name = name;
         this.principals = principals;
+        this.state = null;
     }
 
     @Override
@@ -39,6 +42,11 @@ public class RifStateNode_c extends RifComponentNode_c implements RifStateNode {
     @Override
     public List<PrincipalNode> principals() {
         return this.principals;
+    }
+
+    @Override
+    public RifState state() {
+        return this.state;
     }
 
     protected RifStateNode_c reconstruct(Id name, List<PrincipalNode> principals) {
@@ -77,7 +85,8 @@ public class RifStateNode_c extends RifComponentNode_c implements RifStateNode {
             }
             l.add(r.principal());
         }
-        this.state = l;
+        RifState state = new RifState_c(this.name, l);
+        this.state = state;
         return this;
     }
 

@@ -1,17 +1,19 @@
 package jif.types.label;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import jif.ast.RifComponentNode;
-import jif.ast.RifStateNode;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.PathMap;
+import jif.types.RifComponent;
+import jif.types.RifState;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
-import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -25,17 +27,16 @@ import polyglot.util.SerialVersionUID;
 public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    private final List<RifComponentNode> components; //this should not be the correct type! 
-                                                     //be sure to extract the disambprincipals and not principals!
+    private final List<RifComponent> components;
 
-    public RifReaderPolicy_c(List<RifComponentNode> components,
-            JifTypeSystem ts, Position pos) {
+    public RifReaderPolicy_c(List<RifComponent> components, JifTypeSystem ts,
+            Position pos) {
         super(ts, pos);
         this.components = components;
     }
 
     @Override
-    public List<RifComponentNode> components() {
+    public List<RifComponent> components() {
         return this.components;
     }
 
@@ -46,30 +47,20 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
 
     @Override
     public boolean isCanonical() {
-        for (RifComponentNode c : this.components) {
-            if (c instanceof RifStateNode) {
-                for (Principal p : ((RifStateNode) c).disambprincipals()) {
-                    if (!p.isCanonical()) {
-                        return false;
-                    }
-                }
+        for (RifComponent c : this.components) {
+            if (!c.isCanonical()) {
+                return false;
             }
-
         }
         return true;
     }
 
     @Override
     public boolean isRuntimeRepresentable() {
-        for (RifComponentNode c : this.components) {
-            if (c instanceof RifStateNode) {
-                for (Principal p : ((RifStateNode) c).disambprincipals()) {
-                    if (!p.isRuntimeRepresentable()) {
-                        return false;
-                    }
-                }
+        for (RifComponent c : this.components) {
+            if (!c.isRuntimeRepresentable()) {
+                return false;
             }
-
         }
         return true;
     }
@@ -81,6 +72,8 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
 
     @Override
     public boolean equalsImpl(TypeObject o) {
+        if (this == o) return true;
+
         /*  if (this == o) return true;
           if (o instanceof ReaderPolicy_c) {
               ReaderPolicy_c that = (ReaderPolicy_c) o;
@@ -128,39 +121,43 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
 
     @Override
     public String toString(Set<Label> printedLabels) {
-        /*  StringBuffer sb = new StringBuffer(owner.toString());
-          sb.append("->");
-          if (!reader.isTopPrincipal()) sb.append(reader.toString());
-          return sb.toString(); */
-        return "";
+        StringBuffer sb = new StringBuffer();
+        Iterator<RifComponent> ic = this.components.iterator();
+        while (ic.hasNext()) {
+            RifComponent c = ic.next();
+            sb.append(c.toString());
+            if (ic.hasNext()) {
+                sb.append(",");
+            }
+        }
+        return sb.toString();
     }
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        /* List<Type> throwTypes = new ArrayList<Type>();
-         throwTypes.addAll(owner.throwTypes(ts));
-         throwTypes.addAll(reader.throwTypes(ts));
-         return throwTypes;*/
-        return null;
+        List<Type> throwTypes = new ArrayList<Type>();
+        for (RifComponent c : this.components) {
+            throwTypes.addAll(c.throwTypes(ts));
+        }
+        return throwTypes;
     }
 
     @Override
     public Policy subst(LabelSubstitution substitution)
             throws SemanticException {
-        /*   boolean changed = false;
+        boolean changed = false;
+        List<RifComponent> l = new LinkedList<RifComponent>();
 
-           Principal newOwner = owner.subst(substitution);
-           if (newOwner != owner) changed = true;
-           Principal newReader = reader.subst(substitution);
-           if (newReader != reader) changed = true;
+        for (RifComponent c : this.components) {
+            RifComponent newcomponent = c.subst(substitution);
+            l.add(newcomponent);
+            if (newcomponent != c) changed = true;
+        }
+        if (!changed) return substitution.substPolicy(this);
 
-           if (!changed) return substitution.substPolicy(this);
-
-           JifTypeSystem ts = (JifTypeSystem) typeSystem();
-           ReaderPolicy newPolicy =
-                   ts.readerPolicy(this.position(), newOwner, newReader);
-           return substitution.substPolicy(newPolicy); */
-        return null;
+        JifTypeSystem ts = (JifTypeSystem) typeSystem();
+        RifReaderPolicy newPolicy = ts.rifreaderPolicy(this.position(), l);
+        return substitution.substPolicy(newPolicy);
     }
 
     @Override
@@ -175,15 +172,27 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
     }
 
     @Override
-    public boolean isBottomConfidentiality() {
-        // return owner.isBottomPrincipal() && reader.isBottomPrincipal();
-        return false;
+    public boolean isBottomConfidentiality() { //not entirely correct
+        for (RifComponent c : this.components) {
+            if (c instanceof RifState) {
+                if (!((RifState) c).isBottomConfidentiality()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
-    public boolean isTopConfidentiality() {
-        //return owner.isTopPrincipal() && reader.isTopPrincipal();
-        return false;
+    public boolean isTopConfidentiality() { //not entirely correct
+        for (RifComponent c : this.components) {
+            if (c instanceof RifState) {
+                if (!((RifState) c).isTopConfidentiality()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override

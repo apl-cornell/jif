@@ -2,9 +2,7 @@ package jif.ast;
 
 import java.util.List;
 
-import polyglot.ast.Node;
-
-public interface RifPolicyNode extends Node {
+public interface RifPolicyNode extends PolicyNode {
 
     public List<RifComponentNode> components();
 
