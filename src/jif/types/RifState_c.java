@@ -8,6 +8,7 @@ import java.util.Set;
 
 import jif.types.label.Label;
 import jif.types.principal.Principal;
+import jif.visit.LabelChecker;
 import polyglot.ast.Id;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -116,5 +117,18 @@ public class RifState_c implements RifState {
             }
         }
         return true;
+    }
+
+    @Override
+    public PathMap labelCheck(JifContext A, LabelChecker lc) {
+        // check each principal in turn.
+        PathMap X;
+        PathMap Xtot = null; //or bottom
+        for (Principal p : this.principals) {
+            X = p.labelCheck(A, lc);
+            A.setPc(X.N(), lc);
+            Xtot = Xtot.join(X);
+        }
+        return Xtot;
     }
 }

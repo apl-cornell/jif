@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import jif.types.label.Label;
+import jif.visit.LabelChecker;
 import polyglot.ast.Id;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -65,6 +66,11 @@ public class RifTransition_c implements RifTransition {
     public RifComponent subst(LabelSubstitution substitution)
             throws SemanticException {
         return this;
+    }
+
+    @Override
+    public PathMap labelCheck(JifContext A, LabelChecker lc) {
+        return null;
     }
 
 }

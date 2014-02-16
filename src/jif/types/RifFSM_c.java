@@ -5,11 +5,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import polyglot.ast.Id;
+import polyglot.ast.Id_c;
 
 public class RifFSM_c implements RifFSM {
 
     protected HashMap<Id, RifFSMstate> states;
     protected RifFSMstate current;
+    // allPossibleActions contains all the actions that appear in the program.
+    // Somehow this list should be initialized when the whole program is parsed.
+    private LinkedList<Id> allPossibleActions;
 
     public RifFSM_c(List<RifComponent> components) {
         Id currName = null;
@@ -40,6 +44,12 @@ public class RifFSM_c implements RifFSM {
         }
 
         this.current = states.get(currName);
+
+        allPossibleActions = new LinkedList<Id>();
+        int i;
+        for (i = 0; i < 100; i++) {
+            allPossibleActions.add(new Id_c(null, "f" + Integer.toString(i)));
+        }
     }
 
     public RifFSM_c(HashMap<Id, RifFSMstate> states, RifFSMstate current) {
@@ -59,4 +69,53 @@ public class RifFSM_c implements RifFSM {
         newfsm = new RifFSM_c(this.states, nextState);
         return newfsm;
     }
+
+    @Override
+    public boolean equalsFSM(RifFSM other, List<String> visited) {
+        String pair = this.current.name() + "&" + other.currentState().name();
+        List<String> newvisited = new LinkedList<String>();
+
+        if (visited.contains(pair)) {
+            return true;
+        }
+        for (String s : visited) {
+            newvisited.add(s);
+        }
+        newvisited.add(pair);
+        if (this.currentState().equalsFSM(other.currentState())) {
+            for (Id action : allPossibleActions) {
+                if (!this.takeTransition(action).equalsFSM(
+                        other.takeTransition(action), newvisited)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean leqFSM(RifFSM other, List<String> visited) {
+        String pair = this.current.name() + "&" + other.currentState().name();
+        List<String> newvisited = new LinkedList<String>();
+
+        if (visited.contains(pair)) {
+            return true;
+        }
+        for (String s : visited) {
+            newvisited.add(s);
+        }
+        newvisited.add(pair);
+        if (this.currentState().leqFSM(other.currentState())) {
+            for (Id action : allPossibleActions) {
+                if (!this.takeTransition(action).leqFSM(
+                        other.takeTransition(action), newvisited)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
 }

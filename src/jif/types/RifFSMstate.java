@@ -15,4 +15,8 @@ public interface RifFSMstate {
 
     List<Principal> principals();
 
+    Id name();
+
+    boolean leqFSM(RifFSMstate other);
+
 }

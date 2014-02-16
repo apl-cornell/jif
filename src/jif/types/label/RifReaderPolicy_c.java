@@ -81,16 +81,11 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
         return this;
     }
 
-    public boolean equalsFSM(RifFSM other) {
-        if (this.fsm.currentState().equalsFSM(other.currentState())) {
-
-        }
-    }
-
     @Override
     public boolean equalsImpl(TypeObject o) {
+        List<String> visited = new LinkedList<String>();
         if (this == o) return true;
-        return this.equalsFSM(((RifReaderPolicy) o).getFSM());
+        return this.fsm.equalsFSM(((RifReaderPolicy) o).getFSM(), visited);
     }
 
     @Override
@@ -102,28 +97,12 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
 
     @Override
     public boolean leq_(ConfPolicy p, LabelEnv env, SearchState state) {
-        /*   if (this.isBottomConfidentiality() || p.isTopConfidentiality())
-              return true;
-
-          // if this policy is o:_, then o allows
-          // all principals to read info, and thus does
-          // not restrict who may read
-          if (reader.isBottomPrincipal()) {
-              return true;
-          }
-          if (p instanceof ReaderPolicy) {
-              ReaderPolicy that = (ReaderPolicy) p;
-              // this = { o  : .. ri .. }
-              // that = { o' : .. rj' .. }
-
-              // o' >= o
-              if (!env.actsFor(that.owner(), this.owner)) {
-                  return false;
-              }
-
-              return env.actsFor(that.reader(), this.owner())
-                      || env.actsFor(that.reader(), this.reader());
-          } */
+        List<String> visited = new LinkedList<String>();
+        if (this.isBottomConfidentiality() || p.isTopConfidentiality())
+            return true;
+        if (p instanceof RifReaderPolicy) {
+            return this.fsm.leqFSM(((RifReaderPolicy) p).getFSM(), visited);
+        }
         return false;
     }
 
@@ -171,12 +150,14 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
     @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         // check each principal in turn.
-        /*   PathMap X = owner.labelCheck(A, lc);
-           A.setPc(X.N(), lc);
-           PathMap Xr = reader.labelCheck(A, lc);
-           X = X.join(Xr);
-           return X; */
-        return null;
+        PathMap X;
+        PathMap Xtot = null; //or bottom
+        for (RifComponent c : this.components) {
+            X = c.labelCheck(A, lc);
+            A.setPc(X.N(), lc);
+            Xtot = Xtot.join(X);
+        }
+        return Xtot;
     }
 
     @Override

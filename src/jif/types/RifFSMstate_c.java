@@ -39,9 +39,21 @@ public class RifFSMstate_c implements RifFSMstate {
     }
 
     @Override
+    public Id name() {
+        return this.name;
+    }
+
+    @Override
     public boolean equalsFSM(RifFSMstate other) {
         List<Principal> set1 = this.principals;
         List<Principal> set2 = other.principals();
         return set1.containsAll(set2) && set2.containsAll(set1);
+    }
+
+    @Override
+    public boolean leqFSM(RifFSMstate other) {
+        List<Principal> set1 = this.principals;
+        List<Principal> set2 = other.principals();
+        return set1.containsAll(set2);
     }
 }
