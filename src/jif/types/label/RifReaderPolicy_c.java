@@ -1,7 +1,5 @@
 package jif.types.label;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -13,7 +11,6 @@ import jif.types.PathMap;
 import jif.types.RifComponent;
 import jif.types.RifFSM;
 import jif.types.RifFSM_c;
-import jif.types.RifState;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.visit.LabelChecker;
@@ -58,22 +55,14 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
 
     @Override
     public boolean isCanonical() {
-        for (RifComponent c : this.components) {
-            if (!c.isCanonical()) {
-                return false;
-            }
-        }
-        return true;
+        List<String> visited = new LinkedList<String>();
+        return this.fsm.isCanonical(visited);
     }
 
     @Override
     public boolean isRuntimeRepresentable() {
-        for (RifComponent c : this.components) {
-            if (!c.isRuntimeRepresentable()) {
-                return false;
-            }
-        }
-        return true;
+        List<String> visited = new LinkedList<String>();
+        return this.fsm.isRuntimeRepresentable(visited);
     }
 
     @Override
@@ -108,27 +97,17 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
 
     @Override
     public String toString(Set<Label> printedLabels) {
-        StringBuffer sb = new StringBuffer();
-        Iterator<RifComponent> ic = this.components.iterator();
-        while (ic.hasNext()) {
-            RifComponent c = ic.next();
-            sb.append(c.toString());
-            if (ic.hasNext()) {
-                sb.append(",");
-            }
-        }
-        return sb.toString();
+        List<String> visited = new LinkedList<String>();
+        return this.fsm.toString(visited);
     }
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        List<Type> throwTypes = new ArrayList<Type>();
-        for (RifComponent c : this.components) {
-            throwTypes.addAll(c.throwTypes(ts));
-        }
-        return throwTypes;
+        List<String> visited = new LinkedList<String>();
+        return this.fsm.throwTypes(ts, visited);
     }
 
+    //fix it
     @Override
     public Policy subst(LabelSubstitution substitution)
             throws SemanticException {
@@ -161,27 +140,15 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
     }
 
     @Override
-    public boolean isBottomConfidentiality() { //not entirely correct
-        for (RifComponent c : this.components) {
-            if (c instanceof RifState) {
-                if (!((RifState) c).isBottomConfidentiality()) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    public boolean isBottomConfidentiality() {
+        List<String> visited = new LinkedList<String>();
+        return this.fsm.isBottomConfidentiality(visited);
     }
 
     @Override
-    public boolean isTopConfidentiality() { //not entirely correct
-        for (RifComponent c : this.components) {
-            if (c instanceof RifState) {
-                if (!((RifState) c).isTopConfidentiality()) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    public boolean isTopConfidentiality() {
+        List<String> visited = new LinkedList<String>();
+        return this.fsm.isTopConfidentiality(visited);
     }
 
     @Override

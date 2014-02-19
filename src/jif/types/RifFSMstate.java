@@ -4,6 +4,8 @@ import java.util.List;
 
 import jif.types.principal.Principal;
 import polyglot.ast.Id;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 
 public interface RifFSMstate {
 
@@ -18,5 +20,17 @@ public interface RifFSMstate {
     Id name();
 
     boolean leqFSM(RifFSMstate other);
+
+    boolean isCanonical();
+
+    boolean isRuntimeRepresentable();
+
+    List<Type> throwTypes(TypeSystem ts);
+
+    boolean isBottomConfidentiality();
+
+    boolean isTopConfidentiality();
+
+    String toString(boolean current);
 
 }
