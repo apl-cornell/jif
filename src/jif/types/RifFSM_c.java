@@ -3,12 +3,17 @@ package jif.types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import jif.types.principal.Principal;
+import jif.visit.LabelChecker;
 import polyglot.ast.Id;
 import polyglot.ast.Id_c;
+import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 
@@ -50,7 +55,7 @@ public class RifFSM_c implements RifFSM {
 
             RifFSMstate lstate = states.get(t.lstate().id());
             RifFSMstate rstate = states.get(t.rstate().id());
-            lstate.setTransition(t.name(), rstate);
+            lstate.setTransition(t.name().id(), rstate);
         }
 
         this.current = states.get(currName);
@@ -70,6 +75,11 @@ public class RifFSM_c implements RifFSM {
     @Override
     public RifFSMstate currentState() {
         return this.current;
+    }
+
+    @Override
+    public Map<String, RifFSMstate> states() {
+        return this.states;
     }
 
     @Override
@@ -133,143 +143,158 @@ public class RifFSM_c implements RifFSM {
     }
 
     @Override
-    public boolean isCanonical(List<String> visited) {
-        String name = this.current.name().id();
-        List<String> newvisited = new LinkedList<String>();
-
-        if (visited.contains(name)) {
-            return true;
-        }
-        for (String s : visited) {
-            newvisited.add(s);
-        }
-        newvisited.add(name);
-        if (this.currentState().isCanonical()) {
-            for (Id action : allPossibleActions) {
-                if (!this.takeTransition(action).isCanonical(newvisited)) {
-                    return false;
-                }
+    public boolean isCanonical() {
+        Iterator<Entry<String, RifFSMstate>> it =
+                this.states.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<String, RifFSMstate> pairs = it.next();
+            if (!pairs.getValue().isCanonical()) {
+                return false;
             }
-            return true;
+            it.remove(); // avoids a ConcurrentModificationException
         }
-        return false;
+        return true;
     }
 
     @Override
-    public boolean isRuntimeRepresentable(List<String> visited) {
-        String name = this.current.name().id();
-        List<String> newvisited = new LinkedList<String>();
-
-        if (visited.contains(name)) {
-            return true;
-        }
-        for (String s : visited) {
-            newvisited.add(s);
-        }
-        newvisited.add(name);
-        if (this.currentState().isRuntimeRepresentable()) {
-            for (Id action : allPossibleActions) {
-                if (!this.takeTransition(action).isRuntimeRepresentable(
-                        newvisited)) {
-                    return false;
-                }
+    public boolean isRuntimeRepresentable() {
+        Iterator<Entry<String, RifFSMstate>> it =
+                this.states.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<String, RifFSMstate> pairs = it.next();
+            if (!pairs.getValue().isRuntimeRepresentable()) {
+                return false;
             }
-            return true;
+            it.remove(); // avoids a ConcurrentModificationException
         }
-        return false;
+        return true;
     }
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts, List<String> visited) {
+    public List<Type> throwTypes(TypeSystem ts) {
         List<Type> throwTypes = new ArrayList<Type>();
-        String name = this.current.name().id();
-        List<String> newvisited = new LinkedList<String>();
-
-        if (visited.contains(name)) {
-            return null;
-        }
-        for (String s : visited) {
-            newvisited.add(s);
-        }
-        newvisited.add(name);
-        throwTypes.addAll(this.currentState().throwTypes(ts));
-        for (Id action : allPossibleActions) {
-            throwTypes.addAll(this.takeTransition(action).throwTypes(ts,
-                    newvisited));
+        Iterator<Entry<String, RifFSMstate>> it =
+                this.states.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<String, RifFSMstate> pairs = it.next();
+            throwTypes.addAll(pairs.getValue().throwTypes(ts));
+            it.remove(); // avoids a ConcurrentModificationException
         }
         return throwTypes;
     }
 
     @Override
-    public boolean isBottomConfidentiality(List<String> visited) {
-        String name = this.current.name().id();
-        List<String> newvisited = new LinkedList<String>();
-
-        if (visited.contains(name)) {
-            return true;
-        }
-        for (String s : visited) {
-            newvisited.add(s);
-        }
-        newvisited.add(name);
-        if (this.currentState().isBottomConfidentiality()) {
-            for (Id action : allPossibleActions) {
-                if (!this.takeTransition(action).isBottomConfidentiality(
-                        newvisited)) {
-                    return false;
-                }
+    public boolean isBottomConfidentiality() {
+        Iterator<Entry<String, RifFSMstate>> it =
+                this.states.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<String, RifFSMstate> pairs = it.next();
+            if (!pairs.getValue().isBottomConfidentiality()) {
+                return false;
             }
-            return true;
+            it.remove(); // avoids a ConcurrentModificationException
         }
-        return false;
+        return true;
     }
 
     @Override
-    public boolean isTopConfidentiality(List<String> visited) {
-        String name = this.current.name().id();
-        List<String> newvisited = new LinkedList<String>();
-
-        if (visited.contains(name)) {
-            return true;
-        }
-        for (String s : visited) {
-            newvisited.add(s);
-        }
-        newvisited.add(name);
-        if (this.currentState().isTopConfidentiality()) {
-            for (Id action : allPossibleActions) {
-                if (!this.takeTransition(action).isTopConfidentiality(
-                        newvisited)) {
-                    return false;
-                }
+    public boolean isTopConfidentiality() {
+        Iterator<Entry<String, RifFSMstate>> it =
+                this.states.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<String, RifFSMstate> pairs = it.next();
+            if (!pairs.getValue().isTopConfidentiality()) {
+                return false;
             }
-            return true;
+            it.remove(); // avoids a ConcurrentModificationException
         }
-        return false;
+        return true;
     }
 
     @Override
-    public String toString(List<String> visited) {
+    public String toString() {
         StringBuffer sb = new StringBuffer();
-        String name = this.current.name().id();
-        List<String> newvisited = new LinkedList<String>();
 
-        if (visited.contains(name)) {
-            return null;
-        }
-        for (String s : visited) {
-            newvisited.add(s);
-        }
-
-        sb.append(this.currentState().toString(visited == null));
-
-        for (Id action : allPossibleActions) {
-            String temp = this.takeTransition(action).toString(newvisited);
-            if (temp != null) {
+        Iterator<Entry<String, RifFSMstate>> it =
+                this.states.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<String, RifFSMstate> pairs = it.next();
+            sb.append(pairs.getValue().toString(
+                    pairs.getKey() == this.current.name().id()));
+            if (it.hasNext()) {
                 sb.append(",");
-                sb.append(temp);
             }
+            it.remove(); // avoids a ConcurrentModificationException
         }
         return sb.toString();
     }
+
+    @Override
+    public RifFSM subst(LabelSubstitution substitution)
+            throws SemanticException {
+        RifFSMstate state;
+        boolean changed = false;
+        RifFSMstate current = null;
+        HashMap<String, RifFSMstate> l = new HashMap<String, RifFSMstate>();
+        Iterator<Entry<String, RifFSMstate>> it =
+                this.states.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<String, RifFSMstate> pairs = it.next();
+            List<Principal> principals = pairs.getValue().subst(substitution);
+            if (principals != null) {
+                changed = true;
+                state =
+                        new RifFSMstate_c(pairs.getValue().name(), principals,
+                                null);
+            } else {
+                state =
+                        new RifFSMstate_c(pairs.getValue().name(), pairs
+                                .getValue().principals(), null);
+            }
+            l.put(pairs.getValue().name().id(), state);
+            it.remove(); // avoids a ConcurrentModificationException
+        }
+        if (changed) {
+            Iterator<Entry<String, RifFSMstate>> it2 =
+                    this.states.entrySet().iterator();
+            while (it2.hasNext()) {
+                Entry<String, RifFSMstate> pairs = it2.next();
+                HashMap<String, RifFSMstate> transitions =
+                        pairs.getValue().getTransitions();
+                Iterator<Entry<String, RifFSMstate>> transIt =
+                        transitions.entrySet().iterator();
+                while (transIt.hasNext()) {
+                    Entry<String, RifFSMstate> trans = transIt.next();
+                    RifFSMstate reachedstate =
+                            l.get(trans.getValue().name().id());
+                    l.get(pairs.getKey()).setTransition(trans.getKey(),
+                            reachedstate);
+                    transIt.remove();
+                }
+                if (pairs.getKey() == this.current.name().id()) {
+                    current = l.get(pairs.getKey());
+                }
+                it2.remove(); // avoids a ConcurrentModificationException
+            }
+            return new RifFSM_c(l, current);
+        }
+        return null;
+    }
+
+    @Override
+    public PathMap labelCheck(JifContext A, LabelChecker lc) {
+        Iterator<Entry<String, RifFSMstate>> it =
+                this.states.entrySet().iterator();
+        PathMap X;
+        PathMap Xtot = null; //or bottom
+        while (it.hasNext()) {
+            Entry<String, RifFSMstate> pairs = it.next();
+            X = pairs.getValue().labelCheck(A, lc);
+            A.setPc(X.N(), lc);
+            Xtot = Xtot.join(X);
+            it.remove(); // avoids a ConcurrentModificationException
+        }
+        return Xtot;
+    }
+
 }

@@ -1,8 +1,11 @@
 package jif.types;
 
 import java.util.List;
+import java.util.Map;
 
+import jif.visit.LabelChecker;
 import polyglot.ast.Id;
+import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 
@@ -16,16 +19,23 @@ public interface RifFSM {
 
     boolean leqFSM(RifFSM other, List<String> visited);
 
-    boolean isCanonical(List<String> visited);
+    boolean isCanonical();
 
-    boolean isRuntimeRepresentable(List<String> visited);
+    boolean isRuntimeRepresentable();
 
-    List<Type> throwTypes(TypeSystem ts, List<String> visited);
+    List<Type> throwTypes(TypeSystem ts);
 
-    boolean isBottomConfidentiality(List<String> visited);
+    boolean isBottomConfidentiality();
 
-    boolean isTopConfidentiality(List<String> visited);
+    boolean isTopConfidentiality();
 
-    String toString(List<String> visited);
+    @Override
+    String toString();
+
+    RifFSM subst(LabelSubstitution substitution) throws SemanticException;
+
+    PathMap labelCheck(JifContext A, LabelChecker lc);
+
+    Map<String, RifFSMstate> states();
 
 }

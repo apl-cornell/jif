@@ -3,11 +3,14 @@ package jif.types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
 import jif.types.principal.Principal;
+import jif.visit.LabelChecker;
 import polyglot.ast.Id;
+import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 
@@ -23,9 +26,21 @@ public class RifFSMstate_c implements RifFSMstate {
         this.transitions = new HashMap<String, RifFSMstate>();
     }
 
+    public RifFSMstate_c(Id name, List<Principal> principals,
+            HashMap<String, RifFSMstate> transitions) {
+        this.name = name;
+        this.principals = principals;
+        this.transitions = transitions;
+    }
+
     @Override
-    public void setTransition(Id transName, RifFSMstate rstate) {
-        this.transitions.put(transName.id(), rstate);
+    public void setTransition(String transName, RifFSMstate rstate) {
+        this.transitions.put(transName, rstate);
+    }
+
+    @Override
+    public HashMap<String, RifFSMstate> getTransitions() {
+        return this.transitions;
     }
 
     @Override
@@ -139,5 +154,35 @@ public class RifFSMstate_c implements RifFSMstate {
             it.remove(); // avoids a ConcurrentModificationException
         }
         return sb.toString();
+    }
+
+    @Override
+    public List<Principal> subst(LabelSubstitution substitution)
+            throws SemanticException {
+        List<Principal> l = new LinkedList<Principal>();
+        boolean changed = false;
+
+        for (Principal p : this.principals) {
+            Principal newprincipal = p.subst(substitution);
+            if (newprincipal != p) changed = true;
+            l.add(newprincipal);
+        }
+
+        if (!changed) return null;
+        return l;
+
+    }
+
+    @Override
+    public PathMap labelCheck(JifContext A, LabelChecker lc) {
+        // check each principal in turn.
+        PathMap X;
+        PathMap Xtot = null; //or bottom
+        for (Principal p : this.principals) {
+            X = p.labelCheck(A, lc);
+            A.setPc(X.N(), lc);
+            Xtot = Xtot.join(X);
+        }
+        return Xtot;
     }
 }

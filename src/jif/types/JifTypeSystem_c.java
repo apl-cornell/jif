@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import jif.JifOptions;
@@ -106,6 +109,7 @@ import jif.types.principal.VarPrincipal_c;
 import polyglot.ast.Cast;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
+import polyglot.ast.Id_c;
 import polyglot.ast.Local;
 import polyglot.ast.NullLit;
 import polyglot.ast.Receiver;
@@ -1072,9 +1076,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public RifReaderPolicy rifreaderPolicy(Position pos,
-            List<RifComponent> components) {
-        RifReaderPolicy t = new RifReaderPolicy_c(components, this, pos);
+    public RifReaderPolicy rifreaderPolicy(Position pos, RifFSM fsm) {
+        RifReaderPolicy t = new RifReaderPolicy_c(fsm, this, pos);
         return t;
     }
 
@@ -1586,6 +1589,52 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         if (pos == null) pos = p2.position();
 
         return (ConfPolicy) joinConfPolicy(pos, s).simplify();
+    }
+
+    @Override
+    public ConfPolicy join(RifReaderPolicy p1, RifReaderPolicy p2) {
+        int i = 0;
+        HashMap<String, RifFSMstate> states;
+        RifFSM fsm1 = p1.getFSM();
+        RifFSM fsm2 = p2.getFSM();
+
+        states = new HashMap<String, RifFSMstate>();
+
+        Iterator<Entry<String, RifFSMstate>> it1 =
+                fsm1.states().entrySet().iterator();
+        Iterator<Entry<String, RifFSMstate>> it2 =
+                fsm2.states().entrySet().iterator();
+        while (it1.hasNext()) {
+            Entry<String, RifFSMstate> pairs1 = it1.next();
+            while (it2.hasNext()) {
+                Entry<String, RifFSMstate> pairs2 = it2.next();
+                String newname = pairs1.getKey() + "&" + pairs2.getKey();
+                List<Principal> newprincipals = new LinkedList<Principal>();
+                for (Principal p : pairs1.getValue().principals()) {
+                    if (pairs2.getValue().principals().contains(p)) {
+                        newprincipals.add(p);
+                    }
+                }
+                states.put(newname, new RifFSMstate_c(new Id_c(null, newname),
+                        newprincipals, null));
+                it2.remove(); // avoids a ConcurrentModificationException
+            }
+            it1.remove(); // avoids a ConcurrentModificationException
+        }
+
+        Iterator<Entry<String, RifFSMstate>> it1 =
+                fsm1.states().entrySet().iterator();
+        Iterator<Entry<String, RifFSMstate>> it2 =
+                fsm2.states().entrySet().iterator();
+        while (it1.hasNext()) {
+            Entry<String, RifFSMstate> pairs1 = it1.next();
+            while (it2.hasNext()) {
+                Entry<String, RifFSMstate> pairs2 = it2.next();
+
+                it2.remove(); // avoids a ConcurrentModificationException
+            }
+            it1.remove(); // avoids a ConcurrentModificationException
+        }
     }
 
     @Override

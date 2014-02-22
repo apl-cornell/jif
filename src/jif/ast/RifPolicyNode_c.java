@@ -7,6 +7,7 @@ import java.util.List;
 
 import jif.types.JifTypeSystem;
 import jif.types.RifComponent;
+import jif.types.RifFSM_c;
 import jif.types.label.Policy;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
@@ -52,7 +53,7 @@ public class RifPolicyNode_c extends PolicyNode_c implements RifPolicyNode {
 
     protected Policy producePolicy(JifTypeSystem ts,
             List<RifComponent> components) {
-        return ts.rifreaderPolicy(position(), components);
+        return ts.rifreaderPolicy(position(), new RifFSM_c(components));
     }
 
     @Override

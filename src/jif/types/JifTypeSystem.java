@@ -272,7 +272,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
     ReaderPolicy readerPolicy(Position pos, Principal owner,
             Collection<Principal> readers);
 
-    RifReaderPolicy rifreaderPolicy(Position pos, List<RifComponent> components);
+    RifReaderPolicy rifreaderPolicy(Position pos, RifFSM fsm);
 
     WriterPolicy writerPolicy(Position pos, Principal owner, Principal writer);
 

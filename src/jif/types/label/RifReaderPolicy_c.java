@@ -8,9 +8,7 @@ import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.PathMap;
-import jif.types.RifComponent;
 import jif.types.RifFSM;
-import jif.types.RifFSM_c;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.visit.LabelChecker;
@@ -26,21 +24,11 @@ import polyglot.util.SerialVersionUID;
 public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    private final List<RifComponent> components;
     private RifFSM fsm;
 
-    //maybe components and fsm contain duplicate information
-
-    public RifReaderPolicy_c(List<RifComponent> components, JifTypeSystem ts,
-            Position pos) {
+    public RifReaderPolicy_c(RifFSM fsm, JifTypeSystem ts, Position pos) {
         super(ts, pos);
-        this.components = components;
-        this.fsm = new RifFSM_c(components);
-    }
-
-    @Override
-    public List<RifComponent> components() {
-        return this.components;
+        this.fsm = fsm;
     }
 
     @Override
@@ -55,14 +43,12 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
 
     @Override
     public boolean isCanonical() {
-        List<String> visited = new LinkedList<String>();
-        return this.fsm.isCanonical(visited);
+        return this.fsm.isCanonical();
     }
 
     @Override
     public boolean isRuntimeRepresentable() {
-        List<String> visited = new LinkedList<String>();
-        return this.fsm.isRuntimeRepresentable(visited);
+        return this.fsm.isRuntimeRepresentable();
     }
 
     @Override
@@ -97,58 +83,41 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
 
     @Override
     public String toString(Set<Label> printedLabels) {
-        List<String> visited = new LinkedList<String>();
-        return this.fsm.toString(visited);
+        return this.fsm.toString();
     }
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        List<String> visited = new LinkedList<String>();
-        return this.fsm.throwTypes(ts, visited);
+        return this.fsm.throwTypes(ts);
     }
 
-    //fix it
     @Override
     public Policy subst(LabelSubstitution substitution)
             throws SemanticException {
-        boolean changed = false;
-        List<RifComponent> l = new LinkedList<RifComponent>();
-
-        for (RifComponent c : this.components) {
-            RifComponent newcomponent = c.subst(substitution);
-            l.add(newcomponent);
-            if (newcomponent != c) changed = true;
+        RifFSM newfsm;
+        newfsm = this.fsm.subst(substitution);
+        if (newfsm == null) {
+            return substitution.substPolicy(this);
         }
-        if (!changed) return substitution.substPolicy(this);
 
         JifTypeSystem ts = (JifTypeSystem) typeSystem();
-        RifReaderPolicy newPolicy = ts.rifreaderPolicy(this.position(), l);
+        RifReaderPolicy newPolicy = ts.rifreaderPolicy(this.position(), newfsm);
         return substitution.substPolicy(newPolicy);
     }
 
     @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
-        // check each principal in turn.
-        PathMap X;
-        PathMap Xtot = null; //or bottom
-        for (RifComponent c : this.components) {
-            X = c.labelCheck(A, lc);
-            A.setPc(X.N(), lc);
-            Xtot = Xtot.join(X);
-        }
-        return Xtot;
+        return this.fsm.labelCheck(A, lc);
     }
 
     @Override
     public boolean isBottomConfidentiality() {
-        List<String> visited = new LinkedList<String>();
-        return this.fsm.isBottomConfidentiality(visited);
+        return this.fsm.isBottomConfidentiality();
     }
 
     @Override
     public boolean isTopConfidentiality() {
-        List<String> visited = new LinkedList<String>();
-        return this.fsm.isTopConfidentiality(visited);
+        return this.fsm.isTopConfidentiality();
     }
 
     @Override
