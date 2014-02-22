@@ -58,6 +58,8 @@ public class TypeSubstitutor {
                     p = rewriteLabel((Label) arg);
                 } else if (arg instanceof Principal) {
                     p = rewritePrincipal((Principal) arg);
+                } else if (arg instanceof TypeParam) {
+                    p = (TypeParam) arg;
                 } else {
                     throw new InternalCompilerError(
                             "Unexpected type for entry: "

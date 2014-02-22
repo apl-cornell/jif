@@ -190,6 +190,8 @@ public class VarMap {
                     p = applyTo((Label) arg);
                 } else if (arg instanceof Principal) {
                     p = applyTo((Principal) arg);
+                } else if (arg instanceof TypeParam) {
+                    p = arg;
                 } else {
                     throw new InternalCompilerError(
                             "Unexpected type for entry: "
