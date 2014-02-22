@@ -16,10 +16,10 @@ import jif.types.JifTypeSystem;
 import jif.types.JifTypeSystem_c;
 import jif.visit.LabelChecker;
 import polyglot.ast.NodeFactory;
+import polyglot.ext.jl5.JL5ExtensionInfo;
 import polyglot.frontend.Compiler;
 import polyglot.frontend.CupParser;
 import polyglot.frontend.FileSource;
-import polyglot.frontend.JLExtensionInfo;
 import polyglot.frontend.Job;
 import polyglot.frontend.JobExt;
 import polyglot.frontend.Parser;
@@ -48,7 +48,7 @@ import polyglot.util.InternalCompilerError;
  *	<li> translation, <code>JifTranslator</code> </li>
  *  </ul>
  */
-public class ExtensionInfo extends JLExtensionInfo {
+public class ExtensionInfo extends JL5ExtensionInfo {
     //  protected boolean doInfer = false;
     protected OutputExtensionInfo jlext = new OutputExtensionInfo(this);
 
@@ -154,7 +154,7 @@ public class ExtensionInfo extends JLExtensionInfo {
     }
 
     @Override
-    protected Scheduler createScheduler() {
+    public Scheduler createScheduler() {
         return new JifScheduler(this, jlext);
     }
 
