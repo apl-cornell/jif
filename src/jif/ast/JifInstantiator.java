@@ -16,6 +16,7 @@ import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.Param;
 import jif.types.ParamInstance;
+import jif.types.TypeParam;
 import jif.types.label.AccessPath;
 import jif.types.label.AccessPathRoot;
 import jif.types.label.AccessPathThis;
@@ -342,6 +343,8 @@ public class JifInstantiator {
                     p = instantiate((Label) arg);
                 } else if (arg instanceof Principal) {
                     p = instantiate((Principal) arg);
+                } else if (arg instanceof TypeParam) {
+                    p = arg;
                 } else {
                     throw new InternalCompilerError(
                             "Unexpected type for entry: "
