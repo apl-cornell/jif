@@ -43,4 +43,6 @@ public interface RifFSMstate {
 
     PathMap labelCheck(JifContext A, LabelChecker lc);
 
+    RifFSMstate reachedState(String transition);
+
 }

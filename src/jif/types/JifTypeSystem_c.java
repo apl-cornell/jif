@@ -109,6 +109,7 @@ import jif.types.principal.VarPrincipal_c;
 import polyglot.ast.Cast;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
+import polyglot.ast.Id;
 import polyglot.ast.Id_c;
 import polyglot.ast.Local;
 import polyglot.ast.NullLit;
@@ -1593,10 +1594,16 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public ConfPolicy join(RifReaderPolicy p1, RifReaderPolicy p2) {
-        int i = 0;
         HashMap<String, RifFSMstate> states;
         RifFSM fsm1 = p1.getFSM();
         RifFSM fsm2 = p2.getFSM();
+        RifFSMstate newcurrentstate = null;
+
+        LinkedList<Id> allPossibleActions = new LinkedList<Id>();
+        int j;
+        for (j = 0; j < 100; j++) {
+            allPossibleActions.add(new Id_c(null, "f" + Integer.toString(j)));
+        }
 
         states = new HashMap<String, RifFSMstate>();
 
@@ -1617,10 +1624,56 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                 }
                 states.put(newname, new RifFSMstate_c(new Id_c(null, newname),
                         newprincipals, null));
+                if (fsm1.currentState().name().id() == pairs1.getKey()
+                        && fsm2.currentState().name().id() == pairs2.getKey())
+                    newcurrentstate = states.get(newname);
                 it2.remove(); // avoids a ConcurrentModificationException
             }
             it1.remove(); // avoids a ConcurrentModificationException
         }
+
+        it1 = fsm1.states().entrySet().iterator();
+        it2 = fsm2.states().entrySet().iterator();
+        while (it1.hasNext()) {
+            Entry<String, RifFSMstate> pairs1 = it1.next();
+            while (it2.hasNext()) {
+                Entry<String, RifFSMstate> pairs2 = it2.next();
+                RifFSMstate currentstate =
+                        states.get(pairs1.getValue() + "&" + pairs2.getValue());
+                for (Id action : allPossibleActions) {
+                    RifFSMstate reachedstate1 =
+                            pairs1.getValue().reachedState(action.id());
+                    RifFSMstate reachedstate2 =
+                            pairs2.getValue().reachedState(action.id());
+                    String reachedname =
+                            reachedstate1.name().id() + "&"
+                                    + reachedstate2.name().id();
+                    currentstate.setTransition(action.id(),
+                            states.get(reachedname));
+                }
+                it2.remove(); // avoids a ConcurrentModificationException
+            }
+            it1.remove(); // avoids a ConcurrentModificationException
+        }
+
+        return new RifReaderPolicy_c(new RifFSM_c(states, newcurrentstate),
+                this, p1.position());
+    }
+
+    @Override
+    public ConfPolicy meet(RifReaderPolicy p1, RifReaderPolicy p2) {
+        HashMap<String, RifFSMstate> states;
+        RifFSM fsm1 = p1.getFSM();
+        RifFSM fsm2 = p2.getFSM();
+        RifFSMstate newcurrentstate = null;
+
+        LinkedList<Id> allPossibleActions = new LinkedList<Id>();
+        int j;
+        for (j = 0; j < 100; j++) {
+            allPossibleActions.add(new Id_c(null, "f" + Integer.toString(j)));
+        }
+
+        states = new HashMap<String, RifFSMstate>();
 
         Iterator<Entry<String, RifFSMstate>> it1 =
                 fsm1.states().entrySet().iterator();
@@ -1630,11 +1683,46 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             Entry<String, RifFSMstate> pairs1 = it1.next();
             while (it2.hasNext()) {
                 Entry<String, RifFSMstate> pairs2 = it2.next();
-
+                String newname = pairs1.getKey() + "&" + pairs2.getKey();
+                List<Principal> newprincipals = new LinkedList<Principal>();
+                newprincipals.addAll(pairs1.getValue().principals());
+                newprincipals.addAll(pairs2.getValue().principals());
+                states.put(newname, new RifFSMstate_c(new Id_c(null, newname),
+                        newprincipals, null));
+                if (fsm1.currentState().name().id() == pairs1.getKey()
+                        && fsm2.currentState().name().id() == pairs2.getKey())
+                    newcurrentstate = states.get(newname);
                 it2.remove(); // avoids a ConcurrentModificationException
             }
             it1.remove(); // avoids a ConcurrentModificationException
         }
+
+        it1 = fsm1.states().entrySet().iterator();
+        it2 = fsm2.states().entrySet().iterator();
+        while (it1.hasNext()) {
+            Entry<String, RifFSMstate> pairs1 = it1.next();
+            while (it2.hasNext()) {
+                Entry<String, RifFSMstate> pairs2 = it2.next();
+                RifFSMstate currentstate =
+                        states.get(pairs1.getValue() + "&" + pairs2.getValue());
+                for (Id action : allPossibleActions) {
+                    RifFSMstate reachedstate1 =
+                            pairs1.getValue().reachedState(action.id());
+                    RifFSMstate reachedstate2 =
+                            pairs2.getValue().reachedState(action.id());
+                    String reachedname =
+                            reachedstate1.name().id() + "&"
+                                    + reachedstate2.name().id();
+                    currentstate.setTransition(action.id(),
+                            states.get(reachedname));
+                }
+                it2.remove(); // avoids a ConcurrentModificationException
+            }
+            it1.remove(); // avoids a ConcurrentModificationException
+        }
+
+        return new RifReaderPolicy_c(new RifFSM_c(states, newcurrentstate),
+                this, p1.position());
     }
 
     @Override

@@ -515,4 +515,8 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
      */
     boolean needsImplClass(Type ct);
 
+    ConfPolicy join(RifReaderPolicy p1, RifReaderPolicy p2);
+
+    ConfPolicy meet(RifReaderPolicy p1, RifReaderPolicy p2);
+
 }
