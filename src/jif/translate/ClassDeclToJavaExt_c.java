@@ -2,16 +2,20 @@ package jif.translate;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import jif.ast.JifClassDecl;
 import jif.types.JifContext;
 import jif.types.JifPolyType;
 import jif.types.JifSubst;
+import jif.types.JifSubstClassType_c;
 import jif.types.JifSubstType;
 import jif.types.JifTypeSystem;
 import jif.types.Param;
 import jif.types.ParamInstance;
+import jif.types.TypeParam;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.Block;
@@ -24,10 +28,14 @@ import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Stmt;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.ast.AnnotationElem;
+import polyglot.ext.jl5.ast.JL5NodeFactory;
+import polyglot.ext.jl5.ast.ParamTypeNode;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
 import polyglot.types.Flags;
+import polyglot.types.Named;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
@@ -90,8 +98,10 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         JifClassDecl n = (JifClassDecl) node();
         JifPolyType jpt = (JifPolyType) n.type();
+        JL5NodeFactory nf = (JL5NodeFactory) rw.java_nf();
 
         ClassBody cb = n.body();
+        List<ParamTypeNode> params = new ArrayList<ParamTypeNode>();
         if (!jpt.flags().isInterface()) {
             if (!rw.jif_ts().isSignature(jpt)) {
                 // add constructor
@@ -119,7 +129,12 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                     // add fields for params
                     if (!rw.jif_ts().isSignature(jpt)) {
                         for (ParamInstance pi : jpt.params()) {
-                            if (pi.isType()) continue;
+                            if (pi.isType()) {
+                                params.add(nf.ParamTypeNode(pi.position(),
+                                        Collections.<TypeNode> emptyList(),
+                                        nf.Id(pi.position(), pi.name())));
+                                continue;
+                            }
                             String paramFieldName =
                                     ParamToJavaExpr_c.paramFieldName(pi);
                             TypeNode tn = typeNodeForParam(pi, rw);
@@ -157,7 +172,11 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
                 // add getters for params to the interface
                 for (ParamInstance pi : jpt.params()) {
-                    if (pi.isType()) continue;
+                    if (pi.isType()) {
+                        params.add(nf.ParamTypeNode(pi.position(),
+                                Collections.<TypeNode> emptyList(),
+                                nf.Id(pi.position(), pi.name())));
+                    }
                     String paramFieldNameGetter =
                             ParamToJavaExpr_c.paramFieldNameGetter(pi);
                     TypeNode tn = typeNodeForParam(pi, rw);
@@ -170,8 +189,57 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         }
 
         rw.leavingClass();
-        return rw.java_nf().ClassDecl(n.position(), n.flags(), n.id(),
-                n.superClass(), n.interfaces(), cb);
+        TypeNode superClass = n.superClass();
+        if (n.type().superType() instanceof JifSubstClassType_c) {
+            JifSubstClassType_c superType =
+                    (JifSubstClassType_c) n.type().superType();
+            List<TypeNode> args = new ArrayList<TypeNode>();
+            Iterator<Entry<ParamInstance, Param>> entries =
+                    superType.subst().entries();
+            while (entries.hasNext()) {
+                Entry<ParamInstance, Param> e = entries.next();
+                if (e.getKey().isType()) {
+                    TypeParam tp = (TypeParam) e.getValue();
+                    Named namedType = (Named) tp.type();
+                    args.add(nf.AmbTypeNode(e.getValue().position(),
+                            nf.Id(tp.position(), namedType.name())));
+                }
+            }
+            if (args.size() > 0) {
+                superClass =
+                        nf.AmbTypeInstantiation(n.superClass().position(),
+                                n.superClass(), args);
+            }
+        }
+        List<TypeNode> newInters = new ArrayList<TypeNode>();
+        for (int i = 0; i < n.interfaces().size(); i++) {
+            TypeNode inter = n.interfaces().get(i);
+            if (n.type().interfaces().get(i) instanceof JifSubstClassType_c) {
+                JifSubstClassType_c interType =
+                        (JifSubstClassType_c) n.type().interfaces().get(i);
+                List<TypeNode> args = new ArrayList<TypeNode>();
+                Iterator<Entry<ParamInstance, Param>> entries =
+                        interType.subst().entries();
+                while (entries.hasNext()) {
+                    Entry<ParamInstance, Param> e = entries.next();
+                    if (e.getKey().isType()) {
+                        TypeParam tp = (TypeParam) e.getValue();
+                        Named namedType = (Named) tp.type();
+                        args.add(nf.AmbTypeNode(e.getValue().position(),
+                                nf.Id(tp.position(), namedType.name())));
+                    }
+                }
+                if (args.size() > 0) {
+                    inter =
+                            nf.AmbTypeInstantiation(n.interfaces().get(i)
+                                    .position(), n.interfaces().get(i), args);
+                }
+                newInters.add(inter);
+            }
+        }
+        return nf.ClassDecl(n.position(), n.flags(),
+                Collections.<AnnotationElem> emptyList(), n.id(), superClass,
+                newInters, cb, params);
     }
 
     /**

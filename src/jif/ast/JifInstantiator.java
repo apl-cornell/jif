@@ -261,7 +261,16 @@ public class JifInstantiator {
                     actualParamLabels.iterator();
 
             // go through each formal and actual param, and make substitutions.
-            if (jpt.params().size() != actualParamLabels.size()) {
+            ArrayList<ParamInstance> labelParams =
+                    new ArrayList<ParamInstance>();
+            for (ParamInstance pi : jpt.params()) {
+                if (!(pi.isType())) {
+                    labelParams.add(pi);
+                }
+            }
+            iFormalParams = labelParams.iterator();
+
+            if (labelParams.size() != actualParamLabels.size()) {
                 throw new InternalCompilerError(
                         "Inconsistent sizes for params. Error, please contact a Jif developer");
             }
