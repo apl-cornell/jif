@@ -1,8 +1,10 @@
 package jif.extension;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import jif.types.ConstArrayType;
@@ -109,8 +111,15 @@ public class SubtypeChecker {
 
         JifContext A = lc.jifContext();
 
-        Iterator<ParamInstance> iter =
-                polyTypeForClass(supertype).params().iterator();
+        List<ParamInstance> params = new ArrayList<ParamInstance>();
+
+        for (ParamInstance pi : polyTypeForClass(supertype).params()) {
+            if (!pi.isType()) {
+                params.add(pi);
+            }
+        }
+
+        Iterator<ParamInstance> iter = params.iterator();
         Iterator<Param> supIter = supertype.actuals().iterator();
         Iterator<Param> subIter = subtype.actuals().iterator();
 

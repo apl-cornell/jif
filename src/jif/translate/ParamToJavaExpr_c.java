@@ -3,6 +3,7 @@ package jif.translate;
 import jif.types.JifClassType;
 import jif.types.JifContext;
 import jif.types.ParamInstance;
+import jif.types.TypeParam;
 import jif.types.label.CovariantParamLabel;
 import jif.types.label.Label;
 import jif.types.label.ParamLabel;
@@ -31,6 +32,9 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
     }
 
     public Expr toJava(ParamInstance pi, JifToJavaRewriter rw) {
+        if (pi instanceof TypeParam) {
+            return rw.qq().parseExpr(pi.name());
+        }
         if (rw.jif_ts().isSignature(pi.container())) {
             // the parameter to be translated is in the code
             // of a non-Jif class (which does have runtime representation
