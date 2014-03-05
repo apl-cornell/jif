@@ -519,4 +519,6 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
 
     ConfPolicy meet(RifReaderPolicy p1, RifReaderPolicy p2);
 
+    ConfPolicy rifjoinConfPolicy(Position pos, Set<RifReaderPolicy> components);
+
 }

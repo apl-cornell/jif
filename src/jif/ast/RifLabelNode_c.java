@@ -2,8 +2,12 @@
 package jif.ast;
 
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
+import jif.types.JifTypeSystem;
+import jif.types.label.RifReaderPolicy;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -47,29 +51,24 @@ public class RifLabelNode_c extends LabelNode_c implements RifLabelNode {
         return reconstruct(lnew);
     }
 
-    /*
-    protected Policy producePolicy(JifTypeSystem ts, List<List<RifComponentNode>> components) {
-        return ts.something();
-    }*/
-
     @Override
-    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
+        JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
+        JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
+        Set<RifReaderPolicy> confPolicies =
+                new LinkedHashSet<RifReaderPolicy>();
 
         for (RifPolicyNode c : this.policies) {
             if (!c.isDisambiguated()) {
-                ar.job().extensionInfo().scheduler().currentGoal()
+                sc.job().extensionInfo().scheduler().currentGoal()
                         .setUnreachableThisRun();
                 return this;
             }
+            confPolicies.add((RifReaderPolicy) c.policy());
         }
-
-        this.disambiguated = true;
-        return this;
-    }
-
-    @Override
-    public boolean isDisambiguated() {
-        return this.disambiguated;
+//we have to implement RifMeetPolicy_c analogous to MeetPolicy_c
+        return nf.PolicyNode(position,
+                ts.rifjoinConfPolicy(position, confPolicies));
     }
 
     @Override

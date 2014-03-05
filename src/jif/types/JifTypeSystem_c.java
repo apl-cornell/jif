@@ -75,6 +75,8 @@ import jif.types.label.ProviderLabel;
 import jif.types.label.ProviderLabel_c;
 import jif.types.label.ReaderPolicy;
 import jif.types.label.ReaderPolicy_c;
+import jif.types.label.RifJoinConfPolicy;
+import jif.types.label.RifJoinConfPolicy_c;
 import jif.types.label.RifReaderPolicy;
 import jif.types.label.RifReaderPolicy_c;
 import jif.types.label.ThisLabel;
@@ -1529,6 +1531,16 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     @Override
     public boolean leq(Policy p1, Policy p2) {
         return emptyLabelEnv.leq(p1, p2);
+    }
+
+    @Override
+    public ConfPolicy rifjoinConfPolicy(Position pos,
+            Set<RifReaderPolicy> components) {
+        if (components.isEmpty()) {
+            return bottomConfPolicy(pos);
+        }
+        return (RifJoinConfPolicy) new RifJoinConfPolicy_c(components, this,
+                pos).simplify();
     }
 
     @Override
