@@ -16,8 +16,10 @@ import polyglot.ast.Id_c;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 
 public class RifFSM_c implements RifFSM {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Map<String, RifFSMstate> states;
     protected RifFSMstate current;
@@ -28,7 +30,7 @@ public class RifFSM_c implements RifFSM {
     public RifFSM_c(List<RifComponent> components) {
         Map<String, RifFSMstate> states;
 
-        Id currName = null;
+        String currName = null;
         states = new HashMap<String, RifFSMstate>();
         List<RifState> ls = new LinkedList<RifState>();
         List<RifTransition> lt = new LinkedList<RifTransition>();
@@ -37,7 +39,7 @@ public class RifFSM_c implements RifFSM {
             if (c instanceof RifState) {
                 ls.add((RifState) c);
                 if (((RifState) c).isCurrent()) {
-                    currName = ((RifState) c).name();
+                    currName = ((RifState) c).name().id();
                 }
             } else if (c instanceof RifTransition) {
                 lt.add((RifTransition) c);
@@ -144,14 +146,10 @@ public class RifFSM_c implements RifFSM {
 
     @Override
     public boolean isCanonical() {
-        Iterator<Entry<String, RifFSMstate>> it =
-                this.states.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<String, RifFSMstate> pairs = it.next();
-            if (!pairs.getValue().isCanonical()) {
+        for (Entry<String, RifFSMstate> pair : states.entrySet()) {
+            if (!pair.getValue().isCanonical()) {
                 return false;
             }
-            it.remove(); // avoids a ConcurrentModificationException
         }
         return true;
     }
@@ -165,7 +163,6 @@ public class RifFSM_c implements RifFSM {
             if (!pairs.getValue().isRuntimeRepresentable()) {
                 return false;
             }
-            it.remove(); // avoids a ConcurrentModificationException
         }
         return true;
     }
@@ -178,7 +175,6 @@ public class RifFSM_c implements RifFSM {
         while (it.hasNext()) {
             Entry<String, RifFSMstate> pairs = it.next();
             throwTypes.addAll(pairs.getValue().throwTypes(ts));
-            it.remove(); // avoids a ConcurrentModificationException
         }
         return throwTypes;
     }
@@ -192,7 +188,6 @@ public class RifFSM_c implements RifFSM {
             if (!pairs.getValue().isBottomConfidentiality()) {
                 return false;
             }
-            it.remove(); // avoids a ConcurrentModificationException
         }
         return true;
     }
@@ -206,13 +201,13 @@ public class RifFSM_c implements RifFSM {
             if (!pairs.getValue().isTopConfidentiality()) {
                 return false;
             }
-            it.remove(); // avoids a ConcurrentModificationException
         }
         return true;
     }
 
     @Override
     public String toString() {
+
         StringBuffer sb = new StringBuffer();
 
         Iterator<Entry<String, RifFSMstate>> it =
@@ -224,7 +219,6 @@ public class RifFSM_c implements RifFSM {
             if (it.hasNext()) {
                 sb.append(",");
             }
-            it.remove(); // avoids a ConcurrentModificationException
         }
         return sb.toString();
     }
@@ -252,7 +246,6 @@ public class RifFSM_c implements RifFSM {
                                 .getValue().principals(), null);
             }
             l.put(pairs.getValue().name().id(), state);
-            it.remove(); // avoids a ConcurrentModificationException
         }
         if (changed) {
             Iterator<Entry<String, RifFSMstate>> it2 =
@@ -269,12 +262,10 @@ public class RifFSM_c implements RifFSM {
                             l.get(trans.getValue().name().id());
                     l.get(pairs.getKey()).setTransition(trans.getKey(),
                             reachedstate);
-                    transIt.remove();
                 }
                 if (pairs.getKey() == this.current.name().id()) {
                     current = l.get(pairs.getKey());
                 }
-                it2.remove(); // avoids a ConcurrentModificationException
             }
             return new RifFSM_c(l, current);
         }
@@ -292,7 +283,6 @@ public class RifFSM_c implements RifFSM {
             X = pairs.getValue().labelCheck(A, lc);
             A.setPc(X.N(), lc);
             Xtot = Xtot.join(X);
-            it.remove(); // avoids a ConcurrentModificationException
         }
         return Xtot;
     }

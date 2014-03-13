@@ -3,10 +3,13 @@
 package jif.extension;
 
 import jif.ast.ReclassifyExpr;
+import jif.translate.PairLabelToJavaExpr_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.PathMap;
-import jif.types.label.Label;
+import jif.types.label.PairLabel;
+import jif.types.label.PairLabel_c;
+import jif.types.label.RifConfPolicy;
 import jif.visit.LabelChecker;
 import polyglot.ast.Expr;
 import polyglot.ast.Ext;
@@ -38,9 +41,14 @@ public class JifReclassifyExprExt extends JifExprExt implements Ext {
         A.setPc(Xe.N(), lc);
         lc = lc.context(A);
 
-        Label CHANGEME = lc.typeSystem().labelOfType(e.type());
+        PairLabel l = (PairLabel) lc.typeSystem().labelOfType(e.type());
+        RifConfPolicy cp = (RifConfPolicy) l.confPolicy();
+        RifConfPolicy newcp = cp.takeTransition(d.actionId(), null, null);
+        PairLabel newl =
+                new PairLabel_c(l.typeSystem(), newcp, l.integPolicy(),
+                        l.position(), new PairLabelToJavaExpr_c());
 
-        PathMap X = Xe.NV(lc.upperBound(A.pc(), CHANGEME));
+        PathMap X = Xe.NV(lc.upperBound(A.pc(), newl));
 
         return updatePathMap(d.expr(e), X);
     }

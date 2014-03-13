@@ -8,7 +8,7 @@ import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.label.ConfPolicy;
-import jif.types.label.RifReaderPolicy;
+import jif.types.label.RifConfPolicy;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -57,8 +57,8 @@ public class AmbRifLabelNode_c extends LabelNode_c implements RifLabelNode {
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
-        Set<RifReaderPolicy> confPolicies =
-                new LinkedHashSet<RifReaderPolicy>();
+        Set<RifConfPolicy> confPolicies =
+                new LinkedHashSet<RifConfPolicy>();
 
         for (RifPolicyNode c : this.policies) {
             if (!c.isDisambiguated()) {
@@ -66,7 +66,7 @@ public class AmbRifLabelNode_c extends LabelNode_c implements RifLabelNode {
                         .setUnreachableThisRun();
                 return this;
             }
-            confPolicies.add((RifReaderPolicy) c.policy());
+            confPolicies.add((RifConfPolicy) c.policy());
         }
         ConfPolicy cp = ts.rifjoinConfPolicy(position, confPolicies);
         return nf.CanonicalLabelNode(position,

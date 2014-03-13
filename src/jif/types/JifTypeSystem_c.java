@@ -55,7 +55,6 @@ import jif.types.label.DynamicLabel;
 import jif.types.label.DynamicLabel_c;
 import jif.types.label.IntegPolicy;
 import jif.types.label.IntegProjectionPolicy_c;
-import jif.types.label.JoinConfPolicy_c;
 import jif.types.label.JoinIntegPolicy_c;
 import jif.types.label.JoinLabel;
 import jif.types.label.JoinLabel_c;
@@ -74,10 +73,9 @@ import jif.types.label.Policy;
 import jif.types.label.ProviderLabel;
 import jif.types.label.ProviderLabel_c;
 import jif.types.label.ReaderPolicy;
-import jif.types.label.ReaderPolicy_c;
+import jif.types.label.RifConfPolicy;
 import jif.types.label.RifJoinConfPolicy;
 import jif.types.label.RifJoinConfPolicy_c;
-import jif.types.label.RifReaderPolicy;
 import jif.types.label.RifReaderPolicy_c;
 import jif.types.label.ThisLabel;
 import jif.types.label.ThisLabel_c;
@@ -899,6 +897,26 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
+    public RifFSM topfsm(Position pos) {
+        Map<String, RifFSMstate> states = new HashMap<String, RifFSMstate>();
+        List<Principal> l = new LinkedList<Principal>();
+        l.add(topPrincipal(pos));
+        RifFSMstate state = new RifFSMstate_c(new Id_c(pos, "q_0"), l, null);
+        states.put("q_0", state);
+        return new RifFSM_c(states, state);
+    }
+
+    @Override
+    public RifFSM bottomfsm(Position pos) {
+        Map<String, RifFSMstate> states = new HashMap<String, RifFSMstate>();
+        List<Principal> l = new LinkedList<Principal>();
+        l.add(bottomPrincipal(pos));
+        RifFSMstate state = new RifFSMstate_c(new Id_c(pos, "q_0"), l, null);
+        states.put("q_0", state);
+        return new RifFSM_c(states, state);
+    }
+
+    @Override
     public Principal conjunctivePrincipal(Position pos, Principal l, Principal r) {
         return conjunctivePrincipal(pos,
                 Arrays.asList(new Principal[] { l, r }));
@@ -1065,13 +1083,16 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
+    @Deprecated
     public ReaderPolicy readerPolicy(Position pos, Principal owner,
             Principal reader) {
-        ReaderPolicy t = new ReaderPolicy_c(owner, reader, this, pos);
-        return t;
+        /* ReaderPolicy t = new ReaderPolicy_c(owner, reader, this, pos);
+         return t;*/
+        throw new UnsupportedOperationException("Try to create jif policy");
     }
 
     @Override
+    @Deprecated
     public ReaderPolicy readerPolicy(Position pos, Principal owner,
             Collection<Principal> readers) {
         Principal r = disjunctivePrincipal(pos, readers);
@@ -1079,8 +1100,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public RifReaderPolicy rifreaderPolicy(Position pos, RifFSM fsm) {
-        RifReaderPolicy t = new RifReaderPolicy_c(fsm, this, pos);
+    public RifConfPolicy rifreaderPolicy(Position pos, RifFSM fsm) {
+        RifConfPolicy t = new RifReaderPolicy_c(fsm, this, pos);
         return t;
     }
 
@@ -1100,7 +1121,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public ConfPolicy bottomConfPolicy(Position pos) {
-        return readerPolicy(pos, bottomPrincipal(pos), bottomPrincipal(pos));
+        //return readerPolicy(pos, bottomPrincipal(pos), bottomPrincipal(pos));
+        return rifreaderPolicy(pos, bottomfsm(pos));
     }
 
     @Override
@@ -1110,7 +1132,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public ConfPolicy topConfPolicy(Position pos) {
-        return readerPolicy(pos, topPrincipal(pos), topPrincipal(pos));
+        /*return readerPolicy(pos, topPrincipal(pos), topPrincipal(pos));*/
+        return rifreaderPolicy(pos, topfsm(pos));
     }
 
     @Override
@@ -1535,7 +1558,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public ConfPolicy rifjoinConfPolicy(Position pos,
-            Set<RifReaderPolicy> components) {
+            Set<RifConfPolicy> components) {
         if (components.isEmpty()) {
             return bottomConfPolicy(pos);
         }
@@ -1545,13 +1568,15 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public ConfPolicy joinConfPolicy(Position pos, Set<ConfPolicy> components) {
-        if (components.isEmpty()) {
-            return bottomConfPolicy(pos);
-        } else if (components.size() == 1) {
-            return components.iterator().next();
-        }
-        return (ConfPolicy) new JoinConfPolicy_c(components, this, pos)
-                .simplify();
+//        if (components.isEmpty()) {
+//            return bottomConfPolicy(pos);
+//        } else if (components.size() == 1) {
+//            return components.iterator().next();
+//        }
+//        return (ConfPolicy) new JoinConfPolicy_c(components, this, pos)
+//                .simplify();
+        throw new UnsupportedOperationException(
+                "Try to create jif joinconfpolicy");
     }
 
     @Override
@@ -1605,7 +1630,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public ConfPolicy join(RifReaderPolicy p1, RifReaderPolicy p2) {
+    public ConfPolicy join(RifConfPolicy p1, RifConfPolicy p2) {
         HashMap<String, RifFSMstate> states;
         RifFSM fsm1 = p1.getFSM();
         RifFSM fsm2 = p2.getFSM();
@@ -1673,7 +1698,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public ConfPolicy meet(RifReaderPolicy p1, RifReaderPolicy p2) {
+    public ConfPolicy meet(RifConfPolicy p1, RifConfPolicy p2) {
         HashMap<String, RifFSMstate> states;
         RifFSM fsm1 = p1.getFSM();
         RifFSM fsm2 = p2.getFSM();

@@ -13,8 +13,10 @@ import polyglot.ast.Id;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 
 public class RifState_c implements RifState {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     private Id name;
     private List<Principal> principals;

@@ -9,7 +9,7 @@ public class reclassTest{
 	   // int rif[q1:{Alice},q2:{Alice,Bob},f1:q1->q2; q3:{Bob}, f3:q3->q3] z;
 	   // int rif[q4:{Ethel,Alice,Bob},q5:{Ethel,Bob},q6:{Bob},f4:q4->q5,f5:q5->q6; 
 	   //         q1:{Alice},q2:{Alice,Bob},f1:q1->q2; q3:{Bob}, f3:q3->q3] w;
-	    	        
+	    x = 96;	        
         res = reclassify(x % 100,f1);
     }
 

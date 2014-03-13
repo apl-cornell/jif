@@ -65,6 +65,11 @@ public class ReclassifyExpr_c extends Expr_c implements ReclassifyExpr {
     }
 
     @Override
+    public Id actionId() {
+        return name;
+    }
+
+    @Override
     public ReclassifyExpr expr(Expr expr) {
         ReclassifyExpr_c n = (ReclassifyExpr_c) copy();
         n.expr = expr;

@@ -75,6 +75,9 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode,
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode typePart = (TypeNode) visitChild(this.typePart, v);
+        if (visitChild(this.labelPart, v) instanceof PolicyNode) {
+            System.out.println("HELLO:" + this.labelPart.getClass().getName());
+        }
         LabelNode labelPart = (LabelNode) visitChild(this.labelPart, v);
         return reconstruct(typePart, labelPart);
     }

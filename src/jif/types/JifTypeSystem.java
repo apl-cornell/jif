@@ -19,7 +19,7 @@ import jif.types.label.ParamLabel;
 import jif.types.label.Policy;
 import jif.types.label.ProviderLabel;
 import jif.types.label.ReaderPolicy;
-import jif.types.label.RifReaderPolicy;
+import jif.types.label.RifConfPolicy;
 import jif.types.label.ThisLabel;
 import jif.types.label.UnknownLabel;
 import jif.types.label.VarLabel;
@@ -272,7 +272,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
     ReaderPolicy readerPolicy(Position pos, Principal owner,
             Collection<Principal> readers);
 
-    RifReaderPolicy rifreaderPolicy(Position pos, RifFSM fsm);
+    RifConfPolicy rifreaderPolicy(Position pos, RifFSM fsm);
 
     WriterPolicy writerPolicy(Position pos, Principal owner, Principal writer);
 
@@ -515,10 +515,14 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
      */
     boolean needsImplClass(Type ct);
 
-    ConfPolicy join(RifReaderPolicy p1, RifReaderPolicy p2);
+    ConfPolicy join(RifConfPolicy p1, RifConfPolicy p2);
 
-    ConfPolicy meet(RifReaderPolicy p1, RifReaderPolicy p2);
+    ConfPolicy meet(RifConfPolicy p1, RifConfPolicy p2);
 
-    ConfPolicy rifjoinConfPolicy(Position pos, Set<RifReaderPolicy> components);
+    ConfPolicy rifjoinConfPolicy(Position pos, Set<RifConfPolicy> components);
+
+    RifFSM topfsm(Position pos);
+
+    RifFSM bottomfsm(Position pos);
 
 }

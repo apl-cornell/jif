@@ -9,8 +9,10 @@ import polyglot.ast.Id;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 
 public class RifTransition_c implements RifTransition {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Id name;
     protected Id lstate;

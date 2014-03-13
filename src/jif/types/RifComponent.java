@@ -1,5 +1,6 @@
 package jif.types;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -9,7 +10,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 
-public interface RifComponent {
+public interface RifComponent extends Serializable {
 
     boolean isCanonical();
 

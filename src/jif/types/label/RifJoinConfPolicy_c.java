@@ -12,9 +12,11 @@ import jif.types.JifContext;
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.PathMap;
+import jif.types.RifFSM;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.visit.LabelChecker;
+import polyglot.ast.Id;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
@@ -28,11 +30,11 @@ import polyglot.util.SerialVersionUID;
 public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    private final Set<RifReaderPolicy> joinComponents;
+    private final Set<RifConfPolicy> joinComponents;
     private Integer hashCode = null;
 
-    public RifJoinConfPolicy_c(Set<RifReaderPolicy> components,
-            JifTypeSystem ts, Position pos) {
+    public RifJoinConfPolicy_c(Set<RifConfPolicy> components, JifTypeSystem ts,
+            Position pos) {
         super(ts, pos);
         this.joinComponents = Collections.unmodifiableSet(flatten(components));
         if (this.joinComponents.isEmpty()) {
@@ -47,7 +49,7 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
 
     @Override
     public boolean isCanonical() {
-        for (RifReaderPolicy c : joinComponents) {
+        for (ConfPolicy c : joinComponents) {
             if (!c.isCanonical()) {
                 return false;
             }
@@ -57,12 +59,18 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
 
     @Override
     public boolean isRuntimeRepresentable() {
-        for (RifReaderPolicy c : joinComponents) {
+        for (RifConfPolicy c : joinComponents) {
             if (!c.isRuntimeRepresentable()) {
                 return false;
             }
         }
         return true;
+    }
+
+    @Override
+    public RifFSM getFSM() {
+        //fix it!!!!
+        return null;
     }
 
     @Override
@@ -91,9 +99,8 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     @Override
     public String toString(Set<Label> printedLabels) {
         String s = "";
-        for (Iterator<RifReaderPolicy> i = joinComponents.iterator(); i
-                .hasNext();) {
-            RifReaderPolicy c = i.next();
+        for (Iterator<RifConfPolicy> i = joinComponents.iterator(); i.hasNext();) {
+            RifConfPolicy c = i.next();
             s += c.toString(printedLabels);
 
             if (i.hasNext()) {
@@ -106,7 +113,7 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
 
     @Override
     public boolean leq_(Policy p, LabelEnv env, SearchState state) {
-        for (RifReaderPolicy pi : joinComponents) {
+        for (RifConfPolicy pi : joinComponents) {
             if (env.leq(pi, p, state)) {
                 return true;
             }
@@ -116,7 +123,7 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     }
 
     @Override
-    public Collection<RifReaderPolicy> joinComponents() {
+    public Collection<RifConfPolicy> joinComponents() {
         return Collections.unmodifiableCollection(joinComponents);
     }
 
@@ -133,19 +140,29 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
         List<Type> throwTypes = new ArrayList<Type>();
-        for (RifReaderPolicy L : joinComponents) {
+        for (RifConfPolicy L : joinComponents) {
             throwTypes.addAll(L.throwTypes(ts));
         }
         return throwTypes;
     }
 
-    private static Set<RifReaderPolicy> flatten(Set<RifReaderPolicy> comps) {
+    private static Set<RifConfPolicy> flatten(Set<RifConfPolicy> comps) {
         // to be implemented
         return comps;
     }
 
+    @Override
+    public RifJoinConfPolicy takeTransition(Id action, JifTypeSystem ts,
+            Position pos) {
+        Set<RifConfPolicy> s = new LinkedHashSet<RifConfPolicy>();
+        for (RifConfPolicy c : joinComponents) {
+            s.add(c.takeTransition(action, ts, position));
+        }
+        return constructRifJoinConfPolicy(s, position);
+    }
+
     protected RifJoinConfPolicy constructRifJoinConfPolicy(
-            Set<RifReaderPolicy> components, Position pos) {
+            Set<RifConfPolicy> components, Position pos) {
         return new RifJoinConfPolicy_c(components, (JifTypeSystem) ts, pos);
     }
 
@@ -156,10 +173,10 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
             return substitution.substPolicy(this).simplify();
         }
         boolean changed = false;
-        Set<RifReaderPolicy> s = new LinkedHashSet<RifReaderPolicy>();
+        Set<RifConfPolicy> s = new LinkedHashSet<RifConfPolicy>();
 
-        for (RifReaderPolicy c : joinComponents) {
-            RifReaderPolicy newc = (RifReaderPolicy) c.subst(substitution);
+        for (RifConfPolicy c : joinComponents) {
+            RifConfPolicy newc = (RifConfPolicy) c.subst(substitution);
             if (newc != c) changed = true;
             s.add(newc);
         }
@@ -173,7 +190,7 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
 
     @Override
     public boolean hasWritersToReaders() {
-        for (RifReaderPolicy c : joinComponents) {
+        for (RifConfPolicy c : joinComponents) {
             if (c.hasWritersToReaders()) return true;
         }
         return false;
@@ -181,7 +198,7 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
 
     @Override
     public boolean hasVariables() {
-        for (RifReaderPolicy c : joinComponents) {
+        for (RifConfPolicy c : joinComponents) {
             if (c.hasVariables()) return true;
         }
         return false;
@@ -198,7 +215,7 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
 
         A = (JifContext) A.pushBlock();
 
-        for (RifReaderPolicy c : joinComponents) {
+        for (RifConfPolicy c : joinComponents) {
             A.setPc(X.N(), lc);
             PathMap Xc = c.labelCheck(A, lc);
             X = X.join(Xc);
@@ -209,7 +226,7 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     @Override
     public boolean isTop() {
         // top if all policies is top
-        for (RifReaderPolicy c : joinComponents) {
+        for (RifConfPolicy c : joinComponents) {
             if (!c.isTop()) {
                 return false;
             }
@@ -220,7 +237,7 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     @Override
     public boolean isBottom() {
         // bottom if any policy is bottom
-        for (RifReaderPolicy c : joinComponents) {
+        for (RifConfPolicy c : joinComponents) {
             if (c.isBottom()) {
                 return true;
             }
@@ -257,12 +274,12 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     }
 
     @Override
-    public ConfPolicy meet(RifReaderPolicy p) {
+    public ConfPolicy meet(RifConfPolicy p) {
         return meet((ConfPolicy) p);
     }
 
     @Override
-    public ConfPolicy join(RifReaderPolicy p) {
+    public ConfPolicy join(RifConfPolicy p) {
         return join((ConfPolicy) p);
     }
 }

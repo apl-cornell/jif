@@ -3,6 +3,7 @@
 package jif.ast;
 
 import polyglot.ast.Expr;
+import polyglot.ast.Id;
 
 /** An immutable representation of the Jif <code>reclassify</code> expression. 
  *  <p>Grammar: <code>reclassify(expression, idintifier)</code> </p>
@@ -16,6 +17,8 @@ public interface ReclassifyExpr extends Expr {
     ReclassifyExpr expr(Expr expr);
 
     String downgradeKind();
+
+    Id actionId();
 
 }
 

@@ -1,5 +1,6 @@
 package jif.types;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +10,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 
-public interface RifFSM {
+public interface RifFSM extends Serializable {
 
     RifFSMstate currentState();
 

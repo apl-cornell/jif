@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import jif.types.JifClassType;
@@ -14,6 +16,8 @@ import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.Param;
 import jif.types.PathMap;
+import jif.types.RifFSM;
+import jif.types.RifFSMstate;
 import jif.types.SemanticDetailedException;
 import jif.types.label.AccessPath;
 import jif.types.label.AccessPathField;
@@ -29,6 +33,8 @@ import jif.types.label.MeetPolicy_c;
 import jif.types.label.PairLabel;
 import jif.types.label.Policy;
 import jif.types.label.ReaderPolicy;
+import jif.types.label.RifJoinConfPolicy_c;
+import jif.types.label.RifConfPolicy;
 import jif.types.label.VarLabel;
 import jif.types.label.WriterPolicy;
 import jif.types.principal.ConjunctivePrincipal;
@@ -52,6 +58,18 @@ public class LabelTypeCheckUtil {
 
     public LabelTypeCheckUtil(JifTypeSystem ts) {
         this.ts = ts;
+    }
+
+    public void typeCheckFSM(TypeChecker tc, RifFSM fsm)
+            throws SemanticException {
+        Map<String, RifFSMstate> states = fsm.states();
+        List<Principal> principals;
+        for (Entry<String, RifFSMstate> pair : states.entrySet()) {
+            principals = pair.getValue().principals();
+            for (Principal p : principals) {
+                typeCheckPrincipal(tc, p);
+            }
+        }
     }
 
     /**
@@ -170,6 +188,12 @@ public class LabelTypeCheckUtil {
             for (Policy pol : joinComponents) {
                 typeCheckPolicy(tc, pol);
             }
+        } else if (p instanceof RifJoinConfPolicy_c) {
+            RifJoinConfPolicy_c rjcp = (RifJoinConfPolicy_c) p;
+            Collection<RifConfPolicy> joinComponents = rjcp.joinComponents();
+            for (Policy pol : joinComponents) {
+                typeCheckPolicy(tc, pol);
+            }
         } else if (p instanceof MeetPolicy_c) {
             @SuppressWarnings("unchecked")
             MeetPolicy_c<Policy> mp = (MeetPolicy_c<Policy>) p;
@@ -185,7 +209,11 @@ public class LabelTypeCheckUtil {
             WriterPolicy pol = (WriterPolicy) p;
             typeCheckPrincipal(tc, pol.owner());
             typeCheckPrincipal(tc, pol.writer());
+        } else if (p instanceof RifConfPolicy) {
+            RifConfPolicy pol = (RifConfPolicy) p;
+            typeCheckFSM(tc, pol.getFSM());
         } else {
+            System.out.println("HELLO " + p.getClass().getName());
             throw new InternalCompilerError("Unexpected policy " + p);
         }
     }

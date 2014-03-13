@@ -12,6 +12,7 @@ import jif.types.RifFSM;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
 import jif.visit.LabelChecker;
+import polyglot.ast.Id;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
@@ -21,7 +22,7 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>PolicyLabel</code> interface.
  */
-public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
+public class RifReaderPolicy_c extends Policy_c implements RifConfPolicy {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private RifFSM fsm;
@@ -52,6 +53,13 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
     }
 
     @Override
+    public RifConfPolicy takeTransition(Id action, JifTypeSystem ts,
+            Position pos) {
+        RifFSM newfsm = this.fsm.takeTransition(action);
+        return new RifReaderPolicy_c(newfsm, ts, pos);
+    }
+
+    @Override
     protected Policy simplifyImpl() {
         return this;
     }
@@ -60,14 +68,17 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
     public boolean equalsImpl(TypeObject o) {
         List<String> visited = new LinkedList<String>();
         if (this == o) return true;
-        return this.fsm.equalsFSM(((RifReaderPolicy) o).getFSM(), visited);
+        if (o instanceof RifConfPolicy) {
+            return this.fsm.equalsFSM(((RifConfPolicy) o).getFSM(), visited);
+        }
+        return false;
     }
 
     @Override
     public int hashCode() {
         // return (owner == null ? 0 : owner.hashCode()) ^ reader.hashCode()
         //         ^ 948234;
-        return 0;
+        return 948234;
     }
 
     @Override
@@ -75,8 +86,8 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
         List<String> visited = new LinkedList<String>();
         if (this.isBottomConfidentiality() || p.isTopConfidentiality())
             return true;
-        if (p instanceof RifReaderPolicy) {
-            return this.fsm.leqFSM(((RifReaderPolicy) p).getFSM(), visited);
+        if (p instanceof RifConfPolicy) {
+            return this.fsm.leqFSM(((RifConfPolicy) p).getFSM(), visited);
         }
         return false;
     }
@@ -101,7 +112,7 @@ public class RifReaderPolicy_c extends Policy_c implements RifReaderPolicy {
         }
 
         JifTypeSystem ts = (JifTypeSystem) typeSystem();
-        RifReaderPolicy newPolicy = ts.rifreaderPolicy(this.position(), newfsm);
+        RifConfPolicy newPolicy = ts.rifreaderPolicy(this.position(), newfsm);
         return substitution.substPolicy(newPolicy);
     }
 

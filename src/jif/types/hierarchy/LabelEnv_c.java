@@ -39,7 +39,7 @@ import jif.types.label.PairLabel;
 import jif.types.label.ParamLabel;
 import jif.types.label.Policy;
 import jif.types.label.RifJoinConfPolicy;
-import jif.types.label.RifReaderPolicy;
+import jif.types.label.RifConfPolicy;
 import jif.types.label.VarLabel_c;
 import jif.types.label.WriterPolicy;
 import jif.types.label.WritersToReadersLabel;
@@ -813,23 +813,23 @@ public class LabelEnv_c implements LabelEnv {
         return p1.leq_(p2, this, state);
     }
 
-    public boolean leq(RifReaderPolicy p1, ConfPolicy p2, SearchState state) {
+    public boolean leq(RifConfPolicy p1, ConfPolicy p2, SearchState state) {
         if (p2.isSingleton() || !p1.isSingleton()) {
             if (p1.leq_(p2, this, state)) return true;
         }
         if (p2 instanceof RifJoinConfPolicy) {
             RifJoinConfPolicy jp = (RifJoinConfPolicy) p2;
-            Collection<RifReaderPolicy> joinComponents = jp.joinComponents();
+            Collection<RifConfPolicy> joinComponents = jp.joinComponents();
             if (joinComponents.size() == 1) {
                 if (p1.leq_(joinComponents.iterator().next(), this, state))
                     return true;
             } else {
-                Iterator<RifReaderPolicy> ic = joinComponents.iterator();
-                RifReaderPolicy c1 = ic.next();
-                RifReaderPolicy c2 = ic.next();
-                RifReaderPolicy ctotal = (RifReaderPolicy) c1.join(c2);
+                Iterator<RifConfPolicy> ic = joinComponents.iterator();
+                RifConfPolicy c1 = ic.next();
+                RifConfPolicy c2 = ic.next();
+                RifConfPolicy ctotal = (RifConfPolicy) c1.join(c2);
                 while (ic.hasNext()) {
-                    ctotal = (RifReaderPolicy) ctotal.join(ic.next());
+                    ctotal = (RifConfPolicy) ctotal.join(ic.next());
                 }
                 if (p1.leq_(ctotal, this, state)) return true;
             }

@@ -1,5 +1,6 @@
 package jif.types;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 
-public interface RifFSMstate {
+public interface RifFSMstate extends Serializable {
 
     void setTransition(String transName, RifFSMstate rstate);
 

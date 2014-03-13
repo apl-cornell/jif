@@ -13,8 +13,10 @@ import polyglot.ast.Id;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 
 public class RifFSMstate_c implements RifFSMstate {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     private Id name;
     private List<Principal> principals;
@@ -50,6 +52,7 @@ public class RifFSMstate_c implements RifFSMstate {
 
     @Override
     public RifFSMstate getNextState(Id action) {
+        if (this.transitions == null) return this;
         RifFSMstate nextState = this.transitions.get(action.id());
         if (nextState == null) {
             return this;
@@ -79,6 +82,7 @@ public class RifFSMstate_c implements RifFSMstate {
     public boolean leqFSM(RifFSMstate other) {
         List<Principal> set1 = this.principals;
         List<Principal> set2 = other.principals();
+        if (set1.size() == 1 && set1.get(0).isBottomPrincipal()) return true;
         return set1.containsAll(set2);
     }
 
@@ -146,17 +150,18 @@ public class RifFSMstate_c implements RifFSMstate {
         }
         sb.append("}");
 
-        Iterator<Entry<String, RifFSMstate>> it =
-                this.transitions.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<String, RifFSMstate> pairs = it.next();
-            sb.append(",");
-            sb.append(pairs.getKey());
-            sb.append(":");
-            sb.append(this.name.toString());
-            sb.append("->");
-            sb.append(pairs.getValue().name().toString());
-            it.remove(); // avoids a ConcurrentModificationException
+        if (this.transitions != null) {
+            Iterator<Entry<String, RifFSMstate>> it =
+                    this.transitions.entrySet().iterator();
+            while (it.hasNext()) {
+                Entry<String, RifFSMstate> pairs = it.next();
+                sb.append(",");
+                sb.append(pairs.getKey());
+                sb.append(":");
+                sb.append(this.name.toString());
+                sb.append("->");
+                sb.append(pairs.getValue().name().toString());
+            }
         }
         return sb.toString();
     }
