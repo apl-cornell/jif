@@ -1615,10 +1615,10 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     @Override
     public ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {
         if (p1.isTop() || p2.isBottom()) {
-            return (ConfPolicy) p1.simplify();
+            return p1;
         }
         if (p2.isTop() || p1.isBottom()) {
-            return (ConfPolicy) p2.simplify();
+            return p2;
         }
         Set<ConfPolicy> s = new HashSet<ConfPolicy>();
         s.add(p1);
@@ -1626,11 +1626,28 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         Position pos = p1.position();
         if (pos == null) pos = p2.position();
 
-        return (ConfPolicy) joinConfPolicy(pos, s).simplify();
+        return joinConfPolicy(pos, s);
     }
 
     @Override
-    public ConfPolicy join(RifConfPolicy p1, RifConfPolicy p2) {
+    public RifConfPolicy join(RifConfPolicy p1, RifConfPolicy p2) {
+        if (p1.isTop() || p2.isBottom()) {
+            return p1;
+        }
+        if (p2.isTop() || p1.isBottom()) {
+            return p2;
+        }
+        Set<RifConfPolicy> s = new HashSet<RifConfPolicy>();
+        s.add(p1);
+        s.add(p2);
+        Position pos = p1.position();
+        if (pos == null) pos = p2.position();
+
+        return (RifConfPolicy) rifjoinConfPolicy(pos, s);
+    }
+
+    @Override
+    public RifReaderPolicy_c join(RifReaderPolicy_c p1, RifReaderPolicy_c p2) {
         HashMap<String, RifFSMstate> states;
         RifFSM fsm1 = p1.getFSM();
         RifFSM fsm2 = p2.getFSM();

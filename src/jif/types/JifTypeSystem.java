@@ -20,6 +20,7 @@ import jif.types.label.Policy;
 import jif.types.label.ProviderLabel;
 import jif.types.label.ReaderPolicy;
 import jif.types.label.RifConfPolicy;
+import jif.types.label.RifReaderPolicy_c;
 import jif.types.label.ThisLabel;
 import jif.types.label.UnknownLabel;
 import jif.types.label.VarLabel;
@@ -516,6 +517,8 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
     boolean needsImplClass(Type ct);
 
     ConfPolicy join(RifConfPolicy p1, RifConfPolicy p2);
+
+    RifReaderPolicy_c join(RifReaderPolicy_c p1, RifReaderPolicy_c p2);
 
     ConfPolicy meet(RifConfPolicy p1, RifConfPolicy p2);
 

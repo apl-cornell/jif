@@ -53,10 +53,11 @@ public class RifReaderPolicy_c extends Policy_c implements RifConfPolicy {
     }
 
     @Override
-    public RifConfPolicy takeTransition(Id action, JifTypeSystem ts,
-            Position pos) {
+    public RifConfPolicy takeTransition(Id action) {
+        System.out.println("Hello form rifreader");
         RifFSM newfsm = this.fsm.takeTransition(action);
-        return new RifReaderPolicy_c(newfsm, ts, pos);
+        return new RifReaderPolicy_c(newfsm, (JifTypeSystem) this.ts,
+                this.position);
     }
 
     @Override

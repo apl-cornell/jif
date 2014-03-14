@@ -152,11 +152,11 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     }
 
     @Override
-    public RifJoinConfPolicy takeTransition(Id action, JifTypeSystem ts,
-            Position pos) {
+    public RifJoinConfPolicy takeTransition(Id action) {
+        System.out.println("Hello form rifjoin");
         Set<RifConfPolicy> s = new LinkedHashSet<RifConfPolicy>();
         for (RifConfPolicy c : joinComponents) {
-            s.add(c.takeTransition(action, ts, position));
+            s.add(c.takeTransition(action));
         }
         return constructRifJoinConfPolicy(s, position);
     }

@@ -43,7 +43,8 @@ public class JifReclassifyExprExt extends JifExprExt implements Ext {
 
         PairLabel l = (PairLabel) lc.typeSystem().labelOfType(e.type());
         RifConfPolicy cp = (RifConfPolicy) l.confPolicy();
-        RifConfPolicy newcp = cp.takeTransition(d.actionId(), null, null);
+        d.prettyPrint(System.out);
+        RifConfPolicy newcp = cp.takeTransition(d.actionId());
         PairLabel newl =
                 new PairLabel_c(l.typeSystem(), newcp, l.integPolicy(),
                         l.position(), new PairLabelToJavaExpr_c());
