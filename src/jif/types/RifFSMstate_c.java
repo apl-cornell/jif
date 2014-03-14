@@ -72,16 +72,33 @@ public class RifFSMstate_c implements RifFSMstate {
     }
 
     @Override
+    public List<Principal> confEquivPrincipals() {
+        List<Principal> l = new LinkedList<Principal>();
+
+        for (Principal p : this.principals) {
+            if (p.isBottomPrincipal()) {
+                List<Principal> t = new LinkedList<Principal>();
+                t.add(p);
+                return t;
+            }
+            if (!p.isTopPrincipal()) l.add(p);
+        }
+        return l;
+    }
+
+    @Override
     public boolean equalsFSM(RifFSMstate other) {
-        List<Principal> set1 = this.principals;
-        List<Principal> set2 = other.principals();
+        List<Principal> set1 = this.confEquivPrincipals();
+        List<Principal> set2 = other.confEquivPrincipals();
+
         return set1.containsAll(set2) && set2.containsAll(set1);
     }
 
     @Override
     public boolean leqFSM(RifFSMstate other) {
-        List<Principal> set1 = this.principals;
-        List<Principal> set2 = other.principals();
+        List<Principal> set1 = this.confEquivPrincipals();
+        List<Principal> set2 = other.confEquivPrincipals();
+        if (set2 == null) return true;
         if (set1.size() == 1 && set1.get(0).isBottomPrincipal()) return true;
         return set1.containsAll(set2);
     }
@@ -117,22 +134,13 @@ public class RifFSMstate_c implements RifFSMstate {
 
     @Override
     public boolean isBottomConfidentiality() {
-        for (Principal p : this.principals) {
-            if (!p.isBottomPrincipal()) {
-                return false;
-            }
-        }
-        return true;
+        List<Principal> l = this.confEquivPrincipals();
+        return l.size() == 1 && l.get(0).isBottomPrincipal();
     }
 
     @Override
     public boolean isTopConfidentiality() {
-        for (Principal p : this.principals) {
-            if (!p.isTopPrincipal()) {
-                return false;
-            }
-        }
-        return true;
+        return this.confEquivPrincipals() == null;
     }
 
     @Override

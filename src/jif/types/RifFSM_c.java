@@ -72,6 +72,12 @@ public class RifFSM_c implements RifFSM {
     public RifFSM_c(Map<String, RifFSMstate> states, RifFSMstate current) {
         this.states = states;
         this.current = current;
+
+        allPossibleActions = new LinkedList<Id>();
+        int i;
+        for (i = 0; i < 100; i++) {
+            allPossibleActions.add(new Id_c(null, "f" + Integer.toString(i)));
+        }
     }
 
     @Override

@@ -2,8 +2,9 @@
 public class reclassTest{
     
     public reclassTest() {
-        int res;
-	    int rif[q1*:{Alice},q2:{Alice,Bob},f1:q1->q2] x;
+       // int res;
+       int rif[q1*:{Alice},q2:{Alice,Bob},f1:q1->q2]res; 
+	   int rif[q1*:{Alice},q2:{Alice},f1:q1->q2] x; //we expect error with this
 	    
 	   // int rif[f2:q2->q1, q1:{Alice}, q2:{Alice,Bob}, f1:q1->q2] y;
 	   // int rif[q1:{Alice},q2:{Alice,Bob},f1:q1->q2; q3:{Bob}, f3:q3->q3] z;

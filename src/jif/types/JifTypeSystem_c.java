@@ -1664,9 +1664,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                 if (fsm1.currentState().name().id() == pairs1.getKey()
                         && fsm2.currentState().name().id() == pairs2.getKey())
                     newcurrentstate = states.get(newname);
-                it2.remove(); // avoids a ConcurrentModificationException
             }
-            it1.remove(); // avoids a ConcurrentModificationException
         }
 
         it1 = fsm1.states().entrySet().iterator();
@@ -1688,9 +1686,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                     currentstate.setTransition(action.id(),
                             states.get(reachedname));
                 }
-                it2.remove(); // avoids a ConcurrentModificationException
             }
-            it1.remove(); // avoids a ConcurrentModificationException
         }
 
         return new RifReaderPolicy_c(new RifFSM_c(states, newcurrentstate),
@@ -1729,9 +1725,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                 if (fsm1.currentState().name().id() == pairs1.getKey()
                         && fsm2.currentState().name().id() == pairs2.getKey())
                     newcurrentstate = states.get(newname);
-                it2.remove(); // avoids a ConcurrentModificationException
             }
-            it1.remove(); // avoids a ConcurrentModificationException
         }
 
         it1 = fsm1.states().entrySet().iterator();
@@ -1753,9 +1747,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                     currentstate.setTransition(action.id(),
                             states.get(reachedname));
                 }
-                it2.remove(); // avoids a ConcurrentModificationException
             }
-            it1.remove(); // avoids a ConcurrentModificationException
         }
 
         return new RifReaderPolicy_c(new RifFSM_c(states, newcurrentstate),
