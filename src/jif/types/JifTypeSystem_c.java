@@ -77,6 +77,8 @@ import jif.types.label.RifConfPolicy;
 import jif.types.label.RifJoinConfPolicy;
 import jif.types.label.RifJoinConfPolicy_c;
 import jif.types.label.RifReaderPolicy_c;
+import jif.types.label.RifVarLabel;
+import jif.types.label.RifVarLabel_c;
 import jif.types.label.ThisLabel;
 import jif.types.label.ThisLabel_c;
 import jif.types.label.UnknownLabel;
@@ -829,6 +831,13 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
+    public RifVarLabel freshRifLabelVariable(Position pos, String s,
+            String description) {
+        RifVarLabel t = new RifVarLabel_c(s, description, this, pos);
+        return t;
+    }
+
+    @Override
     public VarPrincipal freshPrincipalVariable(Position pos, String s,
             String description) {
         VarPrincipal t = new VarPrincipal_c(s, description, this, pos);
@@ -1121,8 +1130,9 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public ConfPolicy bottomConfPolicy(Position pos) {
-        //return readerPolicy(pos, bottomPrincipal(pos), bottomPrincipal(pos));
-        return rifreaderPolicy(pos, bottomfsm(pos));
+        Set<RifConfPolicy> s = new LinkedHashSet<RifConfPolicy>();
+        s.add(rifreaderPolicy(pos, bottomfsm(pos)));
+        return rifjoinConfPolicy(pos, s);
     }
 
     @Override
@@ -1132,8 +1142,9 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public ConfPolicy topConfPolicy(Position pos) {
-        /*return readerPolicy(pos, topPrincipal(pos), topPrincipal(pos));*/
-        return rifreaderPolicy(pos, topfsm(pos));
+        Set<RifConfPolicy> s = new LinkedHashSet<RifConfPolicy>();
+        s.add(rifreaderPolicy(pos, topfsm(pos)));
+        return rifjoinConfPolicy(pos, s);
     }
 
     @Override

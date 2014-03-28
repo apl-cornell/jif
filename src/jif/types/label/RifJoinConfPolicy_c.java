@@ -246,19 +246,6 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     }
 
     @Override
-    // this might not do exactly what we want!
-    public ConfPolicy meet(ConfPolicy p) {
-        JifTypeSystem ts = (JifTypeSystem) this.ts;
-        return ts.meet(this, p);
-    }
-
-    @Override
-    public ConfPolicy join(ConfPolicy p) {
-        JifTypeSystem ts = (JifTypeSystem) this.ts;
-        return ts.join(this, p);
-    }
-
-    @Override
     public boolean isBottomConfidentiality() {
         return isBottom();
     }
@@ -270,16 +257,21 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
 
     @Override
     public boolean leq_(ConfPolicy p, LabelEnv env, SearchState state) {
+        System.out.println("Hello form leq at RifJoin...");
         return leq_((Policy) p, env, state);
     }
 
     @Override
-    public ConfPolicy meet(RifConfPolicy p) {
-        return meet((ConfPolicy) p);
+    // this might not do exactly what we want!
+    public ConfPolicy meet(ConfPolicy p) {
+        JifTypeSystem ts = (JifTypeSystem) this.ts;
+        return ts.meet(this, (RifConfPolicy) p);
     }
 
     @Override
-    public ConfPolicy join(RifConfPolicy p) {
-        return join((ConfPolicy) p);
+    public ConfPolicy join(ConfPolicy p) {
+        JifTypeSystem ts = (JifTypeSystem) this.ts;
+        return ts.join(this, (RifConfPolicy) p);
     }
+
 }

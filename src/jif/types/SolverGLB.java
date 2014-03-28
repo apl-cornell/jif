@@ -338,6 +338,7 @@ public class SolverGLB extends AbstractSolver {
         // since this method can be called while trying out the rhs components, only add
         // the refinement when it succeeds
         if (trace) addTrace(v, eqn.lhs(), eqn, newBound, Direction.IN);
+
         setBound(v, newBound, eqn.labelConstraint());
 
         wakeUp(v);

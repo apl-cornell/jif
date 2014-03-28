@@ -150,6 +150,7 @@ public class RifReaderPolicy_c extends Policy_c implements RifConfPolicy {
 
     @Override
     public ConfPolicy join(ConfPolicy p) {
+        System.out.println("Hello form join at RifReader...");
         JifTypeSystem ts = (JifTypeSystem) this.ts;
         return ts.join(this, p);
     }

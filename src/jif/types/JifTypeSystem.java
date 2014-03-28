@@ -21,6 +21,7 @@ import jif.types.label.ProviderLabel;
 import jif.types.label.ReaderPolicy;
 import jif.types.label.RifConfPolicy;
 import jif.types.label.RifReaderPolicy_c;
+import jif.types.label.RifVarLabel;
 import jif.types.label.ThisLabel;
 import jif.types.label.UnknownLabel;
 import jif.types.label.VarLabel;
@@ -527,5 +528,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
     RifFSM topfsm(Position pos);
 
     RifFSM bottomfsm(Position pos);
+
+    RifVarLabel freshRifLabelVariable(Position pos, String s, String description);
 
 }
