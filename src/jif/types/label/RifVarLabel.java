@@ -4,8 +4,6 @@ import polyglot.ast.Id;
 
 public interface RifVarLabel extends VarLabel {
 
-    void takeTransition(Id transition);
-
-    Id transition();
+    RifVarLabel takeTransition(Id transition);
 
 }

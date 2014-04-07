@@ -38,8 +38,9 @@ import jif.types.label.MeetPolicy_c;
 import jif.types.label.PairLabel;
 import jif.types.label.ParamLabel;
 import jif.types.label.Policy;
-import jif.types.label.RifJoinConfPolicy;
 import jif.types.label.RifConfPolicy;
+import jif.types.label.RifJoinConfPolicy;
+import jif.types.label.RifReaderPolicy_c;
 import jif.types.label.VarLabel_c;
 import jif.types.label.WriterPolicy;
 import jif.types.label.WritersToReadersLabel;
@@ -772,6 +773,9 @@ public class LabelEnv_c implements LabelEnv {
         }
         state = new SearchState_c(auc, state, newGoal);
 
+        if (p1 instanceof RifConfPolicy && p2 instanceof ConfPolicy) {
+            return leq((RifConfPolicy) p1, (ConfPolicy) p2, state);
+        }
         if (p1 instanceof ConfPolicy && p2 instanceof ConfPolicy) {
             return leq((ConfPolicy) p1, (ConfPolicy) p2, state);
         }
@@ -814,14 +818,31 @@ public class LabelEnv_c implements LabelEnv {
     }
 
     public boolean leq(RifConfPolicy p1, ConfPolicy p2, SearchState state) {
-        if (p2.isSingleton() || !p1.isSingleton()) {
+        RifReaderPolicy_c p1new;
+
+        if (!p1.isSingleton()) {
             if (p1.leq_(p2, this, state)) return true;
-        }
-        if (p2 instanceof RifJoinConfPolicy) {
+        } else if (p2 instanceof RifReaderPolicy_c) {
+            if (p1 instanceof RifJoinConfPolicy) {
+                Iterator<RifConfPolicy> i =
+                        ((RifJoinConfPolicy) p1).joinComponents().iterator();
+                p1new = (RifReaderPolicy_c) i.next();
+            } else {
+                p1new = (RifReaderPolicy_c) p1;
+            }
+            if (p1new.leq_(p2, this, state)) return true;
+        } else if (p2 instanceof RifJoinConfPolicy) {
+            if (p1 instanceof RifJoinConfPolicy) {
+                Iterator<RifConfPolicy> i =
+                        ((RifJoinConfPolicy) p1).joinComponents().iterator();
+                p1new = (RifReaderPolicy_c) i.next();
+            } else {
+                p1new = (RifReaderPolicy_c) p1;
+            }
             RifJoinConfPolicy jp = (RifJoinConfPolicy) p2;
             Collection<RifConfPolicy> joinComponents = jp.joinComponents();
             if (joinComponents.size() == 1) {
-                if (p1.leq_(joinComponents.iterator().next(), this, state))
+                if (p1new.leq_(joinComponents.iterator().next(), this, state))
                     return true;
             } else {
                 Iterator<RifConfPolicy> ic = joinComponents.iterator();
@@ -831,7 +852,7 @@ public class LabelEnv_c implements LabelEnv {
                 while (ic.hasNext()) {
                     ctotal = (RifConfPolicy) ctotal.join(ic.next());
                 }
-                if (p1.leq_(ctotal, this, state)) return true;
+                if (p1new.leq_(ctotal, this, state)) return true;
             }
         }
         return false;

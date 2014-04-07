@@ -90,8 +90,13 @@ public class JifReclassifyExprExt extends JifExprExt implements Ext {
                                 "infered_reclassify_from",
                                 "The label of the target label of reclassified expression");
         inferLabelFrom(lc, d.position(), A, d, inferedFrom, Xe.NV());
-        inferedFrom.takeTransition(d.actionId());
-        PathMap X = Xe.NV(lc.upperBound(A.pc(), inferedFrom));
+        RifVarLabel newlbl = inferedFrom.takeTransition(d.actionId());
+
+        //create one more new varlabel newvar
+        //add constraint "(d.action) (inferedFrom) <= newvar "
+        //update the Xe.NV with the newvar (instead the inferedFrom)
+
+        PathMap X = Xe.NV(lc.upperBound(A.pc(), newlbl));
 
         return updatePathMap(d.expr(e), X);
     }

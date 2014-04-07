@@ -7,18 +7,11 @@ public class reclassTest{
 	   int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2] x;
 	   int rif[q1*:{Alice},q2:{Alice,Bob},f1:q1->q2] y; 
 	    
-	   // int rif[f2:q2->q1, q1:{Alice}, q2:{Alice,Bob}, f1:q1->q2] y;
-	   // int rif[q1:{Alice},q2:{Alice,Bob},f1:q1->q2; q3:{Bob}, f3:q3->q3] z;
-	   // int rif[q4:{Ethel,Alice,Bob},q5:{Ethel,Bob},q6:{Bob},f4:q4->q5,f5:q5->q6; 
-	   //         q1:{Alice},q2:{Alice,Bob},f1:q1->q2; q3:{Bob}, f3:q3->q3] w;
 	    x = 96;
 	    y = 45;
 	    
-	    res = reclassify(11+y,f1);  
-	   // res = reclassify(x+11,f1); //problem!  
-	   // res = x+11; // it generated the correct error
-       // res = reclassify(x,f1); // it generated the correct error
-       // res = x+y; // it generated the correct error
+	    res = reclassify(x+y,f1);  
+	    
     }
 
 }

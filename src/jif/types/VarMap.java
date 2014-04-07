@@ -6,11 +6,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import jif.types.label.Label;
+import jif.types.label.PairLabel;
 import jif.types.label.Policy;
+import jif.types.label.RifConfPolicy;
+import jif.types.label.TransitionVarLabel;
 import jif.types.label.VarLabel;
 import jif.types.label.Variable;
 import jif.types.principal.Principal;
 import jif.types.principal.VarPrincipal;
+import polyglot.ast.Id;
 import polyglot.types.ArrayType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -77,8 +81,20 @@ public class VarMap {
 
     public Label boundOf(VarLabel v) {
         Label bound = (Label) bounds.get(v);
-
-        if (bound == null) {
+        if (v instanceof TransitionVarLabel) {
+            TransitionVarLabel reclassbound = (TransitionVarLabel) v;
+            Label innerlabel = reclassbound.innerRifLabel();
+            PairLabel innerbound = (PairLabel) bounds.get(innerlabel);
+            JifTypeSystem ts = innerbound.typeSystem();
+            RifConfPolicy innerconf =
+                    (RifConfPolicy) innerbound.confProjection();
+            Id action = reclassbound.transition();
+            bound =
+                    ts.pairLabel(innerbound.position(),
+                            innerconf.takeTransition(action),
+                            innerbound.integProjection());
+            this.setBound(v, bound);
+        } else if (bound == null) {
             // The variable has no bound: assume the default label.
             // insert the default label into the map.
             bound = defaultLabelBound;

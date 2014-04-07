@@ -114,12 +114,12 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     @Override
     public boolean leq_(Policy p, LabelEnv env, SearchState state) {
         for (RifConfPolicy pi : joinComponents) {
-            if (env.leq(pi, p, state)) {
-                return true;
+            if (!env.leq(pi, p, state)) {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     @Override
@@ -153,7 +153,6 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
 
     @Override
     public RifJoinConfPolicy takeTransition(Id action) {
-        System.out.println("Hello form rifjoin");
         Set<RifConfPolicy> s = new LinkedHashSet<RifConfPolicy>();
         for (RifConfPolicy c : joinComponents) {
             s.add(c.takeTransition(action));
@@ -257,7 +256,6 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
 
     @Override
     public boolean leq_(ConfPolicy p, LabelEnv env, SearchState state) {
-        System.out.println("Hello form leq at RifJoin...");
         return leq_((Policy) p, env, state);
     }
 

@@ -8,22 +8,17 @@ import polyglot.util.SerialVersionUID;
 public class RifVarLabel_c extends VarLabel_c implements RifVarLabel {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    private Id transition;
-
     public RifVarLabel_c(String name, String description, JifTypeSystem ts,
             Position pos) {
         super(name, description, ts, pos);
-        this.transition = null;
     }
 
     @Override
-    public void takeTransition(Id transition) {
-        this.transition = transition;
-    }
-
-    @Override
-    public Id transition() {
-        return this.transition;
+    public RifVarLabel takeTransition(Id transition) {
+        return new TransitionVarLabel_c(transition.id() + "(" + this.name()
+                + ")", "Apply transition " + transition.id() + " to "
+                + this.name(), (JifTypeSystem) ts, this.position(), this,
+                transition);
     }
 
 }
