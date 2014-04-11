@@ -449,6 +449,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         List<Formal> formals = new ArrayList<Formal>(jpt.params().size() + 1);
         Position pos = Position.compilerGenerated();
         for (ParamInstance pi : jpt.params()) {
+            if (pi.isType()) continue;
             Id paramArgName =
                     rw.java_nf().Id(pos, ParamToJavaExpr_c.paramArgName(pi));
             TypeNode tn = typeNodeForParam(pi, rw);
@@ -487,6 +488,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
     protected List<Expr> produceParamArgs(JifPolyType jpt, JifToJavaRewriter rw) {
         List<Expr> args = new ArrayList<Expr>(jpt.params().size() + 1);
         for (ParamInstance pi : jpt.params()) {
+            if (pi.isType()) continue;
             String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
             args.add(rw.qq().parseExpr(paramArgName));
         }
