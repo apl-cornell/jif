@@ -370,4 +370,16 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
             // normally, so we don't need to handle them specially here.
         }
     }
+
+    @Override
+    public void checkSingletons() throws SemanticException {
+        JifConstructorDecl jcd = (JifConstructorDecl) node();
+        JifClassType jct = (JifClassType) jcd.constructorInstance().container();
+        if (jct.isSingleton()
+                && !((JifConstructorInstance) jcd.constructorInstance())
+                        .isSingletonConstructor()) {
+            throw new SemanticException(
+                    "Singletons cannot contain constructors.");
+        }
+    }
 }

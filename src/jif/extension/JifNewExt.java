@@ -3,6 +3,7 @@ package jif.extension;
 import java.util.ArrayList;
 import java.util.List;
 
+import jif.ast.JifSingletonAccess;
 import jif.translate.ToJavaExt;
 import jif.types.JifClassType;
 import jif.types.JifContext;
@@ -148,6 +149,16 @@ public class JifNewExt extends JifExprExt {
 
         checkThrowTypes(throwTypes);
         return updatePathMap(noe.arguments(helper.labelCheckedArgs()), X);
+    }
+
+    @Override
+    public void checkSingletons() throws SemanticException {
+        if (node() instanceof JifSingletonAccess) return;
+        New jcd = (New) node();
+        JifClassType jct = (JifClassType) jcd.type();
+        if (jct.isSingleton()) {
+            throw new SemanticException("Singletons cannot be instantiated.");
+        }
     }
 
 }

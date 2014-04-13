@@ -379,7 +379,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                 new JifConstructorInstance_c(this, pos, container, flags,
                         startLabel, isDefaultStartLabel, returnLabel,
                         isDefaultReturnLabel, formalTypes, formalArgLabels,
-                        excTypes, constraints);
+                        excTypes, constraints,
+                        ((JifClassType) container).isSingleton());
         return ci;
     }
 

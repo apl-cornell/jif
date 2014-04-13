@@ -142,4 +142,10 @@ public class JifExt_c extends Ext_c implements JifExt {
         }
     }
 
+    @Override
+    public void checkSingletons() throws SemanticException {
+        // Overridden in affected exts (fielddecl, constructordecl, new)
+        return;
+    }
+
 }

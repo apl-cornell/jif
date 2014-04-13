@@ -29,4 +29,7 @@ public interface JifExt extends Ext {
      * the numeric bounds have been calculated.
      */
     void integerBoundsCalculated();
+
+    /** Validate singletons */
+    void checkSingletons() throws SemanticException;
 }

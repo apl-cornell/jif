@@ -15,6 +15,7 @@ import jif.visit.JifTypeChecker;
 import jif.visit.NativeConstructorAdder;
 import jif.visit.NotNullChecker;
 import jif.visit.PreciseClassChecker;
+import jif.visit.SingletonChecker;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.CyclicDependencyException;
@@ -195,6 +196,7 @@ public class JifScheduler extends JLScheduler {
         try {
             addPrerequisiteDependency(g, this.LabelsChecked(job));
             addPrerequisiteDependency(g, this.NativeConstructorsAdded(job));
+            addPrerequisiteDependency(g, this.SingletonsChecked(job));
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
@@ -212,6 +214,22 @@ public class JifScheduler extends JLScheduler {
             throw new InternalCompilerError(e);
         }
         return g;
+    }
+
+    public Goal SingletonsChecked(Job job) {
+        Goal g =
+                internGoal(new VisitorGoal(job, new SingletonChecker(job,
+                        extInfo.typeSystem(), extInfo.nodeFactory())));
+
+        try {
+            addPrerequisiteDependency(g, this.LabelsChecked(job));
+            addPrerequisiteDependency(g, this.NativeConstructorsAdded(job));
+            addPrerequisiteDependency(g, this.TypeChecked(job));
+        } catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
+
     }
 
     @Override

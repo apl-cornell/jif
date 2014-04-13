@@ -1,7 +1,7 @@
 package jif.extension;
 
-import jif.ast.JifUtil;
 import jif.ast.JifExt_c;
+import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.ConstArrayType;
 import jif.types.ConstraintMessage;
@@ -369,6 +369,15 @@ public class JifFieldDeclExt_c extends JifExt_c implements JifFieldDeclExt {
                         declPosition);
             }
             return L;
+        }
+    }
+
+    @Override
+    public void checkSingletons() throws SemanticException {
+        FieldDecl fd = (FieldDecl) node();
+        JifClassType jct = (JifClassType) fd.fieldInstance().container();
+        if (jct.isSingleton()) {
+            throw new SemanticException("Singletons cannot contain fields.");
         }
     }
 }

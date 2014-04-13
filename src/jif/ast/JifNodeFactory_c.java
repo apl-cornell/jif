@@ -664,24 +664,25 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     }
 
     @Override
-    public JifSingletonDecl JifSingletonDecl(
-            Position pos,
-            Flags flags,
-            Id name,
-            List<ParamDecl> params,
-            TypeNode superClass,
-            List<TypeNode> interfaces,
-            List<PrincipalNode> authority,
-            List<ConstraintNode<Assertion>> constraints,
-            ClassBody body) {
-        return new JifSingletonDecl_c(pos, flags, name, params,
-                superClass, interfaces, authority, constraints, body);
+    public JifSingletonDecl JifSingletonDecl(Position pos, Flags flags,
+            Id name, List<ParamDecl> params, TypeNode superClass,
+            List<TypeNode> interfaces, List<PrincipalNode> authority,
+            List<ConstraintNode<Assertion>> constraints, ClassBody body) {
+        JifSingletonDecl n =
+                new JifSingletonDecl_c(pos, flags, name, params, superClass,
+                        interfaces, authority, constraints, body);
+        n = (JifSingletonDecl) n.ext(extFactory().extClassDecl());
+        n = (JifSingletonDecl) n.del(delFactory().delClassDecl());
+        return n;
     }
 
     @Override
     public JifSingletonAccess JifSingletonAccess(Position pos,
             TypeNode objectType, List<Expr> args) {
-        return new JifSingletonAccess_c(pos, objectType, args);
+        JifSingletonAccess n = new JifSingletonAccess_c(pos, objectType, args);
+        n = (JifSingletonAccess) n.ext(extFactory().extNew());
+        n = (JifSingletonAccess) n.del(delFactory().delNew());
+        return n;
     }
 
     @Override

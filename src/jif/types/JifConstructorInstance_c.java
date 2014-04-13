@@ -30,13 +30,14 @@ public class JifConstructorInstance_c extends ConstructorInstance_c implements
     protected List<Assertion> constraints;
     protected boolean isDefaultPCBound;
     protected boolean isDefaultReturnLabel;
+    protected boolean isSingleton;
 
     public JifConstructorInstance_c(JifTypeSystem ts, Position pos,
             ClassType container, Flags flags, Label pcBound,
             boolean isDefaultPCBound, Label returnLabel,
             boolean isDefaultReturnLabel, List<? extends Type> formalTypes,
             List<Label> formalArgLabels, List<? extends Type> excTypes,
-            List<Assertion> constraints) {
+            List<Assertion> constraints, boolean isSingleton) {
 
         super(ts, pos, container, flags, formalTypes, excTypes);
         this.pcBound = pcBound;
@@ -49,6 +50,7 @@ public class JifConstructorInstance_c extends ConstructorInstance_c implements
         this.isDefaultReturnLabel = isDefaultReturnLabel;
         this.throwTypes = ListUtil.copy(throwTypes, true);
         this.formalTypes = ListUtil.copy(formalTypes, true);
+        this.isSingleton = isSingleton;
     }
 
     @Override
@@ -220,6 +222,11 @@ public class JifConstructorInstance_c extends ConstructorInstance_c implements
         throw new InternalCompilerError(
                 "Expected JifClassType for container, but got "
                         + container.getClass());
+    }
+
+    @Override
+    public boolean isSingletonConstructor() {
+        return isSingleton;
     }
 
 }

@@ -32,6 +32,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
     List<Assertion> constraints;
     ProviderLabel provider;
     boolean isUnsafe;
+    boolean isSingleton;
 
     PClass<ParamInstance, Param> instantiatedFrom;
 
@@ -214,6 +215,16 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
     @Override
     public boolean isUnsafe() {
         return isUnsafe;
+    }
+
+    @Override
+    public boolean isSingleton() {
+        return isSingleton;
+    }
+
+    @Override
+    public void setSingleton(boolean singleton) {
+        isSingleton = singleton;
     }
 
 }
