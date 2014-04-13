@@ -45,8 +45,10 @@ public class JifSubstClassType_c extends SubstClassType_c<ParamInstance, Param>
         List<Param> actuals = new ArrayList<Param>(pt.params().size());
 
         for (ParamInstance pi : pt.params()) {
-            Param p = subst.get(pi);
-            actuals.add(p);
+            if (!pi.isType()) {
+                Param p = subst.get(pi);
+                actuals.add(p);
+            }
         }
 
         return actuals;
@@ -130,6 +132,18 @@ public class JifSubstClassType_c extends SubstClassType_c<ParamInstance, Param>
     public boolean isUnsafe() {
         JifClassType jpt = (JifClassType) base;
         return jpt.isUnsafe();
+    }
+
+    @Override
+    public boolean isSingleton() {
+        JifClassType jpt = (JifClassType) base;
+        return jpt.isSingleton();
+    }
+
+    @Override
+    public void setSingleton(boolean single) {
+        JifClassType jpt = (JifClassType) base;
+        jpt.setSingleton(single);
     }
 
 }

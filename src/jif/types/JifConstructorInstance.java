@@ -6,4 +6,6 @@ import polyglot.types.ConstructorInstance;
  */
 public interface JifConstructorInstance extends ConstructorInstance,
         JifProcedureInstance {
+
+    boolean isSingletonConstructor();
 }

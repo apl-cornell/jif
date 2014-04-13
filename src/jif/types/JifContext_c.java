@@ -3,6 +3,7 @@ package jif.types;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -102,6 +103,22 @@ public class JifContext_c extends Context_c implements JifContext {
 
         if (vi != null) {
             return vi;
+        }
+
+        // Search for param declaration
+        if (types != null) {
+            for (String key : types.keySet()) {
+                Named named = types.get(key);
+                if (named instanceof JifParsedPolyType) {
+                    List<ParamInstance> params =
+                            ((JifParsedPolyType) named).params();
+                    for (ParamInstance p : params) {
+                        if (p.isType() && p.name().equals(name)) {
+                            return p;
+                        }
+                    }
+                }
+            }
         }
 
         return findStaticPrincipal(name);

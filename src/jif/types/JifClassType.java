@@ -61,4 +61,14 @@ public interface JifClassType extends ClassType {
      * Returns whether this class has been label-checked.
      */
     boolean isUnsafe();
+
+    /**
+     * Returns whether this class is a singleton.
+     */
+    boolean isSingleton();
+
+    /**
+     * Sets the status of this class as a singleton.
+     */
+    void setSingleton(boolean single);
 }
