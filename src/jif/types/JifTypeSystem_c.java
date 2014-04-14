@@ -910,7 +910,9 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         Map<String, RifFSMstate> states = new HashMap<String, RifFSMstate>();
         List<Principal> l = new LinkedList<Principal>();
         l.add(topPrincipal(pos));
-        RifFSMstate state = new RifFSMstate_c(new Id_c(pos, "q_0"), l, null);
+        RifFSMstate state =
+                new RifFSMstate_c(new Id_c(pos, "q_0"), l,
+                        new HashMap<String, RifFSMstate>());
         states.put("q_0", state);
         return new RifFSM_c(states, state);
     }
@@ -920,7 +922,9 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         Map<String, RifFSMstate> states = new HashMap<String, RifFSMstate>();
         List<Principal> l = new LinkedList<Principal>();
         l.add(bottomPrincipal(pos));
-        RifFSMstate state = new RifFSMstate_c(new Id_c(pos, "q_0"), l, null);
+        RifFSMstate state =
+                new RifFSMstate_c(new Id_c(pos, "q_0"), l,
+                        new HashMap<String, RifFSMstate>());
         states.put("q_0", state);
         return new RifFSM_c(states, state);
     }
@@ -1624,20 +1628,68 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {
-        if (p1.isTop() || p2.isBottom()) {
-            return p1;
-        }
-        if (p2.isTop() || p1.isBottom()) {
-            return p2;
-        }
-        Set<ConfPolicy> s = new HashSet<ConfPolicy>();
-        s.add(p1);
-        s.add(p2);
-        Position pos = p1.position();
-        if (pos == null) pos = p2.position();
+    public RifReaderPolicy_c join(RifReaderPolicy_c p1, RifReaderPolicy_c p2) {
+        HashMap<String, RifFSMstate> states;
+        RifFSM fsm1 = p1.getFSM();
+        RifFSM fsm2 = p2.getFSM();
+        RifFSMstate newcurrentstate = null;
 
-        return joinConfPolicy(pos, s);
+        LinkedList<Id> allPossibleActions = new LinkedList<Id>();
+        int j;
+        for (j = 0; j < 100; j++) {
+            allPossibleActions.add(new Id_c(null, "f" + Integer.toString(j)));
+        }
+
+        states = new HashMap<String, RifFSMstate>();
+
+        Iterator<Entry<String, RifFSMstate>> it1 =
+                fsm1.states().entrySet().iterator();
+        while (it1.hasNext()) {
+            Entry<String, RifFSMstate> pairs1 = it1.next();
+            Iterator<Entry<String, RifFSMstate>> it2 =
+                    fsm2.states().entrySet().iterator();
+            while (it2.hasNext()) {
+                Entry<String, RifFSMstate> pairs2 = it2.next();
+                String newname = pairs1.getKey() + "&" + pairs2.getKey();
+                List<Principal> newprincipals = new LinkedList<Principal>();
+                for (Principal p : pairs1.getValue().principals()) {
+                    if (pairs2.getValue().principals().contains(p)) {
+                        newprincipals.add(p);
+                    }
+                }
+                states.put(newname, new RifFSMstate_c(new Id_c(null, newname),
+                        newprincipals, new HashMap<String, RifFSMstate>()));
+                if (fsm1.currentState().name().id() == pairs1.getKey()
+                        && fsm2.currentState().name().id() == pairs2.getKey())
+                    newcurrentstate = states.get(newname);
+            }
+        }
+
+        it1 = fsm1.states().entrySet().iterator();
+        while (it1.hasNext()) {
+            Entry<String, RifFSMstate> pairs1 = it1.next();
+            Iterator<Entry<String, RifFSMstate>> it2 =
+                    fsm2.states().entrySet().iterator();
+            while (it2.hasNext()) {
+                Entry<String, RifFSMstate> pairs2 = it2.next();
+                RifFSMstate currentstate =
+                        states.get(pairs1.getKey() + "&" + pairs2.getKey());
+                for (Id action : allPossibleActions) {
+                    RifFSMstate reachedstate1 =
+                            pairs1.getValue().reachedState(action.id());
+                    RifFSMstate reachedstate2 =
+                            pairs2.getValue().reachedState(action.id());
+                    String reachedname =
+                            reachedstate1.name().id() + "&"
+                                    + reachedstate2.name().id();
+                    currentstate.setTransition(action.id(),
+                            states.get(reachedname));
+                }
+            }
+        }
+
+        return new RifReaderPolicy_c(new RifFSM_c(states, newcurrentstate),
+                this, p1.position());
     }
 
     @Override
@@ -1658,67 +1710,20 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public RifReaderPolicy_c join(RifReaderPolicy_c p1, RifReaderPolicy_c p2) {
-        HashMap<String, RifFSMstate> states;
-        RifFSM fsm1 = p1.getFSM();
-        RifFSM fsm2 = p2.getFSM();
-        RifFSMstate newcurrentstate = null;
-
-        LinkedList<Id> allPossibleActions = new LinkedList<Id>();
-        int j;
-        for (j = 0; j < 100; j++) {
-            allPossibleActions.add(new Id_c(null, "f" + Integer.toString(j)));
+    public ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {
+        if (p1.isTop() || p2.isBottom()) {
+            return p1;
         }
-
-        states = new HashMap<String, RifFSMstate>();
-
-        Iterator<Entry<String, RifFSMstate>> it1 =
-                fsm1.states().entrySet().iterator();
-        Iterator<Entry<String, RifFSMstate>> it2 =
-                fsm2.states().entrySet().iterator();
-        while (it1.hasNext()) {
-            Entry<String, RifFSMstate> pairs1 = it1.next();
-            while (it2.hasNext()) {
-                Entry<String, RifFSMstate> pairs2 = it2.next();
-                String newname = pairs1.getKey() + "&" + pairs2.getKey();
-                List<Principal> newprincipals = new LinkedList<Principal>();
-                for (Principal p : pairs1.getValue().principals()) {
-                    if (pairs2.getValue().principals().contains(p)) {
-                        newprincipals.add(p);
-                    }
-                }
-                states.put(newname, new RifFSMstate_c(new Id_c(null, newname),
-                        newprincipals, null));
-                if (fsm1.currentState().name().id() == pairs1.getKey()
-                        && fsm2.currentState().name().id() == pairs2.getKey())
-                    newcurrentstate = states.get(newname);
-            }
+        if (p2.isTop() || p1.isBottom()) {
+            return p2;
         }
+        Set<ConfPolicy> s = new HashSet<ConfPolicy>();
+        s.add(p1);
+        s.add(p2);
+        Position pos = p1.position();
+        if (pos == null) pos = p2.position();
 
-        it1 = fsm1.states().entrySet().iterator();
-        it2 = fsm2.states().entrySet().iterator();
-        while (it1.hasNext()) {
-            Entry<String, RifFSMstate> pairs1 = it1.next();
-            while (it2.hasNext()) {
-                Entry<String, RifFSMstate> pairs2 = it2.next();
-                RifFSMstate currentstate =
-                        states.get(pairs1.getValue() + "&" + pairs2.getValue());
-                for (Id action : allPossibleActions) {
-                    RifFSMstate reachedstate1 =
-                            pairs1.getValue().reachedState(action.id());
-                    RifFSMstate reachedstate2 =
-                            pairs2.getValue().reachedState(action.id());
-                    String reachedname =
-                            reachedstate1.name().id() + "&"
-                                    + reachedstate2.name().id();
-                    currentstate.setTransition(action.id(),
-                            states.get(reachedname));
-                }
-            }
-        }
-
-        return new RifReaderPolicy_c(new RifFSM_c(states, newcurrentstate),
-                this, p1.position());
+        return joinConfPolicy(pos, s);
     }
 
     @Override
@@ -1749,7 +1754,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                 newprincipals.addAll(pairs1.getValue().principals());
                 newprincipals.addAll(pairs2.getValue().principals());
                 states.put(newname, new RifFSMstate_c(new Id_c(null, newname),
-                        newprincipals, null));
+                        newprincipals, new HashMap<String, RifFSMstate>()));
                 if (fsm1.currentState().name().id() == pairs1.getKey()
                         && fsm2.currentState().name().id() == pairs2.getKey())
                     newcurrentstate = states.get(newname);

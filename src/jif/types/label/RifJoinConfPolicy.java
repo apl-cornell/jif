@@ -9,4 +9,6 @@ public interface RifJoinConfPolicy extends RifConfPolicy {
     Collection<RifConfPolicy> joinComponents();
 
     boolean leq_(Policy p, LabelEnv env, SearchState state);
+
+    RifReaderPolicy_c flatten();
 }

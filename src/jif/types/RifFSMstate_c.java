@@ -47,7 +47,13 @@ public class RifFSMstate_c implements RifFSMstate {
 
     @Override
     public RifFSMstate reachedState(String transition) {
-        return this.transitions.get(transition);
+        if (this.transitions == null) return this;
+        RifFSMstate nextState = this.transitions.get(transition);
+        if (nextState == null) {
+            return this;
+        } else {
+            return nextState;
+        }
     }
 
     @Override

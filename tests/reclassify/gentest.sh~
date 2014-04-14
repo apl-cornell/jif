@@ -1,0 +1,50 @@
+#!/bin/sh
+####################################
+#
+# Test Rjif.
+#
+####################################
+
+# Run it as  ./gentest.sh 
+
+echo "test1: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test1.jif
+
+echo "test2: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test2.jif
+
+echo "test3: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test3.jif
+
+echo "test4: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test4.jif
+
+echo "test5: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test5.jif
+
+echo "test6: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test6.jif
+
+echo "test7: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test7.jif
+
+echo "test8: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test8.jif
+
+echo "test9: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test9.jif
+
+echo "test10: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test10.jif
+
+echo "test11: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test11.jif
+
+echo "test12: Υ "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test12.jif
+
+echo "test13: Υ "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test13.jif
+
+echo "test14: Υ "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test14.jif

@@ -839,21 +839,8 @@ public class LabelEnv_c implements LabelEnv {
             } else {
                 p1new = (RifReaderPolicy_c) p1;
             }
-            RifJoinConfPolicy jp = (RifJoinConfPolicy) p2;
-            Collection<RifConfPolicy> joinComponents = jp.joinComponents();
-            if (joinComponents.size() == 1) {
-                if (p1new.leq_(joinComponents.iterator().next(), this, state))
-                    return true;
-            } else {
-                Iterator<RifConfPolicy> ic = joinComponents.iterator();
-                RifConfPolicy c1 = ic.next();
-                RifConfPolicy c2 = ic.next();
-                RifConfPolicy ctotal = (RifConfPolicy) c1.join(c2);
-                while (ic.hasNext()) {
-                    ctotal = (RifConfPolicy) ctotal.join(ic.next());
-                }
-                if (p1new.leq_(ctotal, this, state)) return true;
-            }
+            RifReaderPolicy_c p2new = ((RifJoinConfPolicy) p2).flatten();
+            if (p1new.leq_(p2new, this, state)) return true;
         }
         return false;
     }
