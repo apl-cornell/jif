@@ -19,6 +19,7 @@ import jif.types.label.Label;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
+import jif.visit.SingletonChecker;
 import polyglot.ast.Expr;
 import polyglot.ast.New;
 import polyglot.ast.Node;
@@ -152,10 +153,16 @@ public class JifNewExt extends JifExprExt {
     }
 
     @Override
-    public void checkSingletons() throws SemanticException {
-        if (node() instanceof JifSingletonAccess) return;
+    public void checkSingletons(SingletonChecker sc) throws SemanticException {
         New jcd = (New) node();
         JifClassType jct = (JifClassType) jcd.type();
+        if (jcd instanceof JifSingletonAccess) {
+            if (!jct.isSingleton()) {
+                throw new SemanticException(
+                        "Classes cannot be instantiated with the keyword single.");
+            }
+            return;
+        }
         if (jct.isSingleton()) {
             throw new SemanticException("Singletons cannot be instantiated.");
         }

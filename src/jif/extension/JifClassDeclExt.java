@@ -4,6 +4,7 @@ import java.util.List;
 
 import jif.ast.JifClassDecl;
 import jif.ast.JifExt_c;
+import jif.ast.JifSingletonDecl;
 import jif.translate.ToJavaExt;
 import jif.types.ConstraintMessage;
 import jif.types.JifClassType;
@@ -16,6 +17,7 @@ import jif.types.PrincipalConstraint;
 import jif.types.label.ProviderLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
+import jif.visit.SingletonChecker;
 import polyglot.ast.ClassBody;
 import polyglot.ast.Node;
 import polyglot.types.ReferenceType;
@@ -173,4 +175,20 @@ public class JifClassDeclExt extends JifExt_c {
         }
     }
 
+    @Override
+    public void checkSingletons(SingletonChecker sc) throws SemanticException {
+        JifClassDecl n = (JifClassDecl) node();
+        if (((JifClassType) n.type()).isSingleton()) {
+            JifSingletonDecl jcd = (JifSingletonDecl) node();
+            JifClassType sup = (JifClassType) jcd.type().superType();
+            // Cannot inherit from classes other than java.lang.object
+            if (!(sup.isSingleton() || sup.equals(sc.typeSystem().Object())))
+                throw new SemanticException(
+                        "Singletons may not inherit from classes.");
+            // Singletons cannot have parameters
+            if (!jcd.params().isEmpty())
+                throw new SemanticException(
+                        "Singletons may not have label, type, or principal parameters.");
+        }
+    }
 }

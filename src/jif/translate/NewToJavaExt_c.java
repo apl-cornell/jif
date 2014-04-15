@@ -3,6 +3,7 @@ package jif.translate;
 import java.util.ArrayList;
 import java.util.List;
 
+import jif.types.JifClassType;
 import jif.types.JifPolyType;
 import jif.types.JifSubst;
 import jif.types.JifSubstType;
@@ -38,6 +39,13 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
     public Expr exprToJava(JifToJavaRewriter rw) throws SemanticException {
         New n = (New) node();
         JL5NodeFactory nf = (JL5NodeFactory) rw.java_nf();
+
+        if (((JifClassType) n.type()).isSingleton()) {
+            return nf.Field(Position.compilerGenerated(), nf
+                    .ReceiverFromQualifiedName(Position.compilerGenerated(), n
+                            .objectType().name()), nf.Id(
+                    Position.compilerGenerated(), "jif$single"));
+        }
 
         // If the qualifier is "null{amb}.this", replace it with null. Gross.        
         if (n.qualifier() instanceof Special) {
