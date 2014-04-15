@@ -19,6 +19,7 @@ import jif.types.PathMap;
 import jif.types.SemanticDetailedException;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
+import jif.visit.SingletonChecker;
 import polyglot.ast.Assign;
 import polyglot.ast.Block;
 import polyglot.ast.Call;
@@ -372,7 +373,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
     }
 
     @Override
-    public void checkSingletons() throws SemanticException {
+    public void checkSingletons(SingletonChecker sc) throws SemanticException {
         JifConstructorDecl jcd = (JifConstructorDecl) node();
         JifClassType jct = (JifClassType) jcd.constructorInstance().container();
         if (jct.isSingleton()

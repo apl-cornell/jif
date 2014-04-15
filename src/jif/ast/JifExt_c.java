@@ -7,6 +7,7 @@ import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.PathMap;
 import jif.visit.LabelChecker;
+import jif.visit.SingletonChecker;
 import polyglot.ast.Ext_c;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
@@ -143,7 +144,7 @@ public class JifExt_c extends Ext_c implements JifExt {
     }
 
     @Override
-    public void checkSingletons() throws SemanticException {
+    public void checkSingletons(SingletonChecker sc) throws SemanticException {
         // Overridden in affected exts (fielddecl, constructordecl, new)
         return;
     }

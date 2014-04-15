@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import jif.ast.JifClassDecl;
 import jif.types.JifContext;
+import jif.types.JifParsedPolyType;
 import jif.types.JifPolyType;
 import jif.types.JifSubst;
 import jif.types.JifSubstClassType_c;
@@ -100,6 +101,27 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         JifPolyType jpt = (JifPolyType) n.type();
         JL5NodeFactory nf = (JL5NodeFactory) rw.java_nf();
 
+        if (n.type() instanceof JifParsedPolyType
+                && ((JifParsedPolyType) n.type()).isSingleton()) {
+            // Add singleton field
+            Id name =
+                    rw.java_nf().Id(Position.compilerGenerated(), "jif$single");
+            TypeNode tn =
+                    rw.java_nf().TypeNodeFromQualifiedName(
+                            Position.compilerGenerated(), n.name());
+            n =
+                    (JifClassDecl) n.body(n.body().addMember(
+                            rw.java_nf().FieldDecl(
+                                    Position.compilerGenerated(),
+                                    Flags.FINAL.set(Flags.PUBLIC).set(
+                                            Flags.STATIC),
+                                    tn,
+                                    name,
+                                    rw.java_nf().New(
+                                            Position.compilerGenerated(), tn,
+                                            new ArrayList<Expr>()))));
+        }
+
         ClassBody cb = n.body();
         List<ParamTypeNode> params = new ArrayList<ParamTypeNode>();
         if (!jpt.flags().isInterface()) {
@@ -176,6 +198,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                         params.add(nf.ParamTypeNode(pi.position(),
                                 Collections.<TypeNode> emptyList(),
                                 nf.Id(pi.position(), pi.name())));
+                        continue;
                     }
                     String paramFieldNameGetter =
                             ParamToJavaExpr_c.paramFieldNameGetter(pi);

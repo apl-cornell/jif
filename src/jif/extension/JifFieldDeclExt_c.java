@@ -25,6 +25,7 @@ import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
+import jif.visit.SingletonChecker;
 import polyglot.ast.ArrayInit;
 import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
@@ -373,7 +374,7 @@ public class JifFieldDeclExt_c extends JifExt_c implements JifFieldDeclExt {
     }
 
     @Override
-    public void checkSingletons() throws SemanticException {
+    public void checkSingletons(SingletonChecker sc) throws SemanticException {
         FieldDecl fd = (FieldDecl) node();
         JifClassType jct = (JifClassType) fd.fieldInstance().container();
         if (jct.isSingleton()) {

@@ -3,6 +3,7 @@ package jif.ast;
 import jif.translate.ToJavaExt;
 import jif.types.PathMap;
 import jif.visit.LabelChecker;
+import jif.visit.SingletonChecker;
 import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
@@ -31,5 +32,5 @@ public interface JifExt extends Ext {
     void integerBoundsCalculated();
 
     /** Validate singletons */
-    void checkSingletons() throws SemanticException;
+    void checkSingletons(SingletonChecker sc) throws SemanticException;
 }
