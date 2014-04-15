@@ -13,7 +13,9 @@ import polyglot.ast.Node;
 import polyglot.ast.Node_c;
 import polyglot.ast.TypeNode;
 import polyglot.types.Context;
+import polyglot.types.Named;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -104,14 +106,19 @@ public class AmbParam_c extends Node_c implements AmbParam {
         Context c = sc.context();
         VarInstance vi = c.findVariableSilent(name.id());
         if (vi == null) {
-            TypeParamNode tpn =
-                    ((JifNodeFactory) sc.nodeFactory()).TypeParamNode(
-                            position(),
-                            sc.nodeFactory().TypeNodeFromQualifiedName(
-                                    position(), name.id()));
-            return tpn.parameter(((JifTypeSystem) (sc.typeSystem())).typeParam(
-                    position(),
-                    ((JifTypeSystem) sc.typeSystem()).typeForName(name.id())));
+            Named n = c.find(name.id());
+            if (n instanceof Type) {
+                TypeParamNode tpn =
+                        ((JifNodeFactory) sc.nodeFactory()).TypeParamNode(
+                                position(),
+                                sc.nodeFactory().TypeNodeFromQualifiedName(
+                                        position(), name.id()));
+                return tpn.parameter(((JifTypeSystem) (sc.typeSystem()))
+                        .typeParam(position(), (Type) n));
+            } else {
+                throw new SemanticException("No class or variable found for "
+                        + name.id());
+            }
         }
 
         if (!vi.isCanonical() && pi == null && disambCount++ < MAX_DISAMB_CALLS) {
