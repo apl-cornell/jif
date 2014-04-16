@@ -1,5 +1,7 @@
 package jif.types.label;
 
+import java.util.Set;
+
 import jif.types.RifFSM;
 import polyglot.ast.Id;
 
@@ -7,7 +9,7 @@ import polyglot.ast.Id;
  */
 public interface RifConfPolicy extends ConfPolicy {
 
-    RifFSM getFSM();
-
     RifConfPolicy takeTransition(Id action);
+
+    Set<RifFSM> getFSMs();
 }

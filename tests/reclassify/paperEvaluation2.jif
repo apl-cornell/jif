@@ -1,0 +1,28 @@
+
+// Paper evaluation
+// Non-type-correct
+
+public class paperEvaluation2{
+    
+    public paperEvaluation2() {
+
+	int rif[q1*:{Alice},q2:{},q3:{Alice,Bob},f1:q1->q2,f2:q1->q3] part_sum;
+	int num;
+	int id;
+	int rif[q1*:{Alice},q2:{},q3:{Alice,Bob},f1:q1->q2,f2:q1->q3] eval;
+	int rif[q2*:{},q3:{Bob},f4:q2->q3] record;
+	int rif[q3*:{Alice,Bob}] result;
+	    
+	part_sum = 0;
+	num = 0;
+	while (num<3){
+		num = num +1;
+		id = 100100100;
+		eval = 10;
+		record = reclassify(id+eval,f1);
+		part_sum = part_sum + eval;
+	}
+	if (reclassify((part_sum/num)>5,f2)) then result = 1; else result = 0;
+    }
+}
+

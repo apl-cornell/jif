@@ -1727,7 +1727,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public ConfPolicy meet(RifConfPolicy p1, RifConfPolicy p2) {
+    public ConfPolicy meet(RifReaderPolicy_c p1, RifReaderPolicy_c p2) {
         HashMap<String, RifFSMstate> states;
         RifFSM fsm1 = p1.getFSM();
         RifFSM fsm2 = p2.getFSM();
@@ -1743,10 +1743,11 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
         Iterator<Entry<String, RifFSMstate>> it1 =
                 fsm1.states().entrySet().iterator();
-        Iterator<Entry<String, RifFSMstate>> it2 =
-                fsm2.states().entrySet().iterator();
+
         while (it1.hasNext()) {
             Entry<String, RifFSMstate> pairs1 = it1.next();
+            Iterator<Entry<String, RifFSMstate>> it2 =
+                    fsm2.states().entrySet().iterator();
             while (it2.hasNext()) {
                 Entry<String, RifFSMstate> pairs2 = it2.next();
                 String newname = pairs1.getKey() + "&" + pairs2.getKey();
@@ -1762,13 +1763,14 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         }
 
         it1 = fsm1.states().entrySet().iterator();
-        it2 = fsm2.states().entrySet().iterator();
         while (it1.hasNext()) {
             Entry<String, RifFSMstate> pairs1 = it1.next();
+            Iterator<Entry<String, RifFSMstate>> it2 =
+                    fsm2.states().entrySet().iterator();
             while (it2.hasNext()) {
                 Entry<String, RifFSMstate> pairs2 = it2.next();
                 RifFSMstate currentstate =
-                        states.get(pairs1.getValue() + "&" + pairs2.getValue());
+                        states.get(pairs1.getKey() + "&" + pairs2.getKey());
                 for (Id action : allPossibleActions) {
                     RifFSMstate reachedstate1 =
                             pairs1.getValue().reachedState(action.id());

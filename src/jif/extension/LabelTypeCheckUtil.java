@@ -33,8 +33,8 @@ import jif.types.label.MeetPolicy_c;
 import jif.types.label.PairLabel;
 import jif.types.label.Policy;
 import jif.types.label.ReaderPolicy;
-import jif.types.label.RifJoinConfPolicy_c;
 import jif.types.label.RifConfPolicy;
+import jif.types.label.RifJoinConfPolicy_c;
 import jif.types.label.VarLabel;
 import jif.types.label.WriterPolicy;
 import jif.types.principal.ConjunctivePrincipal;
@@ -60,14 +60,17 @@ public class LabelTypeCheckUtil {
         this.ts = ts;
     }
 
-    public void typeCheckFSM(TypeChecker tc, RifFSM fsm)
+    public void typeCheckFSM(TypeChecker tc, Set<RifFSM> fsms)
             throws SemanticException {
-        Map<String, RifFSMstate> states = fsm.states();
-        List<Principal> principals;
-        for (Entry<String, RifFSMstate> pair : states.entrySet()) {
-            principals = pair.getValue().principals();
-            for (Principal p : principals) {
-                typeCheckPrincipal(tc, p);
+
+        for (RifFSM fsm : fsms) {
+            Map<String, RifFSMstate> states = fsm.states();
+            List<Principal> principals;
+            for (Entry<String, RifFSMstate> pair : states.entrySet()) {
+                principals = pair.getValue().principals();
+                for (Principal p : principals) {
+                    typeCheckPrincipal(tc, p);
+                }
             }
         }
     }
@@ -211,7 +214,7 @@ public class LabelTypeCheckUtil {
             typeCheckPrincipal(tc, pol.writer());
         } else if (p instanceof RifConfPolicy) {
             RifConfPolicy pol = (RifConfPolicy) p;
-            typeCheckFSM(tc, pol.getFSM());
+            typeCheckFSM(tc, pol.getFSMs());
         } else {
             System.out.println("HELLO " + p.getClass().getName());
             throw new InternalCompilerError("Unexpected policy " + p);

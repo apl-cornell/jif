@@ -68,12 +68,6 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     }
 
     @Override
-    public RifFSM getFSM() {
-        //fix it!!!!
-        return null;
-    }
-
-    @Override
     public boolean equalsImpl(TypeObject o) {
         if (this == o) return true;
         if (o instanceof RifJoinConfPolicy_c) {
@@ -263,7 +257,7 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     // this might not do exactly what we want!
     public ConfPolicy meet(ConfPolicy p) {
         JifTypeSystem ts = (JifTypeSystem) this.ts;
-        return ts.meet(this, (RifConfPolicy) p);
+        return ts.meet(this, p);
     }
 
     @Override
@@ -290,5 +284,19 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
             }
         }
         return temp;
+    }
+
+    @Override
+    public Set<RifFSM> getFSMs() {
+        Set<RifFSM> l = new LinkedHashSet<RifFSM>();
+
+        for (RifConfPolicy c : joinComponents) {
+            if (c instanceof RifReaderPolicy_c) {
+                l.add(((RifReaderPolicy_c) c).getFSM());
+            } else {
+                l.addAll(((RifJoinConfPolicy) c).getFSMs());
+            }
+        }
+        return l;
     }
 }

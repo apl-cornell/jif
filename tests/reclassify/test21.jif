@@ -1,0 +1,23 @@
+
+// Call - reclassify
+// Type-correct
+
+public class test21{
+    
+    public test21() {
+
+       	int rif[q1*:{Alice},q2:{Alice},f1:q1->q2] res; 
+	
+	res = reclassify(help(),f1);
+    }
+
+
+    int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2] help(){
+
+	int rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2] y;
+
+ 	return y;
+
+    }
+	
+}

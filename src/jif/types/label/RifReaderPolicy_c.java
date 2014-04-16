@@ -1,5 +1,6 @@
 package jif.types.label;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -37,9 +38,15 @@ public class RifReaderPolicy_c extends Policy_c implements RifConfPolicy {
         return true;
     }
 
-    @Override
     public RifFSM getFSM() {
         return this.fsm;
+    }
+
+    @Override
+    public Set<RifFSM> getFSMs() {
+        Set<RifFSM> l = new LinkedHashSet<RifFSM>();
+        l.add(this.fsm);
+        return l;
     }
 
     @Override
@@ -68,8 +75,13 @@ public class RifReaderPolicy_c extends Policy_c implements RifConfPolicy {
     public boolean equalsImpl(TypeObject o) {
         List<String> visited = new LinkedList<String>();
         if (this == o) return true;
-        if (o instanceof RifConfPolicy) {
-            return this.fsm.equalsFSM(((RifConfPolicy) o).getFSM(), visited);
+        if (o instanceof RifReaderPolicy_c) {
+            return this.fsm
+                    .equalsFSM(((RifReaderPolicy_c) o).getFSM(), visited);
+        }
+        if (o instanceof RifJoinConfPolicy_c) {
+            throw new UnsupportedOperationException(
+                    "Try to compare RifReaderPolicy with RifJoinConfPolicy.");
         }
         return false;
     }
@@ -86,8 +98,12 @@ public class RifReaderPolicy_c extends Policy_c implements RifConfPolicy {
         List<String> visited = new LinkedList<String>();
         if (this.isBottomConfidentiality() || p.isTopConfidentiality())
             return true;
-        if (p instanceof RifConfPolicy) {
-            return this.fsm.leqFSM(((RifConfPolicy) p).getFSM(), visited);
+        if (p instanceof RifReaderPolicy_c) {
+            return this.fsm.leqFSM(((RifReaderPolicy_c) p).getFSM(), visited);
+        }
+        if (p instanceof RifJoinConfPolicy_c) {
+            throw new UnsupportedOperationException(
+                    "Try to compare RifReaderPolicy with RifJoinConfPolicy.");
         }
         return false;
     }
@@ -144,7 +160,7 @@ public class RifReaderPolicy_c extends Policy_c implements RifConfPolicy {
     @Override
     public ConfPolicy meet(ConfPolicy p) {
         JifTypeSystem ts = (JifTypeSystem) this.ts;
-        return ts.meet((RifConfPolicy) this, (RifConfPolicy) p);
+        return ts.meet(this, p);
     }
 
     @Override
