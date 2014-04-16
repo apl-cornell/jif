@@ -72,7 +72,7 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
     }
 
     @Override
-    public ClassType substClassType(ClassType t) {
+    protected ClassType substClassTypeImpl(ClassType t) {
         // Don't bother trying to substitute into a non-Jif class.
         if (!(t instanceof JifClassType)) {
             return t;

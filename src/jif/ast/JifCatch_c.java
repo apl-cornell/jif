@@ -5,7 +5,7 @@ import polyglot.ast.Block;
 import polyglot.ast.Catch;
 import polyglot.ast.Catch_c;
 import polyglot.ast.Formal;
-import polyglot.ast.JLDel;
+import polyglot.ast.NodeOps;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -14,35 +14,29 @@ public class JifCatch_c extends Catch_c {
 
     public JifCatch_c(Position pos, Formal formal, Block body) {
         super(pos, formal, body);
-        // set the delegate to know that it is in a catch clause
-        JLDel del = formal.del();
-        if (del instanceof JifFormalDel) {
-            JifFormalDel jfdel = (JifFormalDel) del;
-            jfdel.setIsCatchFormal(true);
-        }
+        setIsCatchFormal(formal);
     }
 
     @Override
     public Catch formal(Formal formal) {
-        // set the delegate to know that it is in a catch clause
-        JLDel del = formal.del();
-        if (del instanceof JifFormalDel) {
-            JifFormalDel jfdel = (JifFormalDel) del;
-            jfdel.setIsCatchFormal(true);
-        }
-
+        setIsCatchFormal(formal);
         return super.formal(formal);
     }
 
     @Override
-    protected Catch_c reconstruct(Formal formal, Block body) {
-        // set the delegate to know that it is in a catch clause
-        JLDel del = formal.del();
+    protected <N extends Catch_c> N reconstruct(N n, Formal formal, Block body) {
+        setIsCatchFormal(formal);
+        return super.reconstruct(n, formal, body);
+    }
+
+    /**
+     * Sets the delegate to know that it is in a catch clause.
+     */
+    protected static void setIsCatchFormal(Formal formal) {
+        NodeOps del = formal.del();
         if (del instanceof JifFormalDel) {
             JifFormalDel jfdel = (JifFormalDel) del;
             jfdel.setIsCatchFormal(true);
         }
-
-        return super.reconstruct(formal, body);
     }
 }

@@ -61,7 +61,7 @@ also developed at Cornell. Polyglot can be obtained from the web site:
 
     http://www.cs.cornell.edu/Projects/polyglot
 
-This Jif distribution contains the files polyglot.jar, JFlex.jar and
+This Jif distribution contains the files polyglot.jar, jflex.jar and
 java_cup.jar from the Polyglot 2.5.2 distribution. These files are
 required to build Jif.
 

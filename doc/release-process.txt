@@ -12,7 +12,7 @@
 
 5. Run  "ant dist"
 
-6. Copy polyglot.jar, JFlex.jar, ppg.jar, pth.jar and java_cup.jar into the
+6. Copy polyglot.jar, jflex.jar, ppg.jar, pth.jar and java_cup.jar into the
    distribution's lib directory
 
 7. Move 'dist' to jif-<major>.<minor>.<patch>

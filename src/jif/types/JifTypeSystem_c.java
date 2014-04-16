@@ -800,7 +800,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public Subst<ParamInstance, Param> subst(
+    protected Subst<ParamInstance, Param> substImpl(
             Map<ParamInstance, ? extends Param> substMap) {
         return new JifSubst_c(this, substMap);
     }

@@ -90,7 +90,7 @@
     <echo message="javacup-jar is ${javacup-jar}" level="verbose" />
 
     <condition property="jflex-jar"
-	       value="${polyglot.home}/lib/JFlex.jar"
+	       value="${polyglot.home}/lib/jflex.jar"
 	       else="">
 	<isset property="polyglot.home" />
     </condition>
@@ -240,7 +240,7 @@
         <available classname="java_cup.Main"
 	           classpathref="standard.classpath"
 	           property="cp_existence.java_cup"/>
-        <available classname="JFlex.Main"
+        <available classname="jflex.Main"
 	           classpathref="standard.classpath"
 	           property="cp_existence.jflex"/>
         <available classname="polyglot.ext.param.ExtensionInfo"
@@ -255,7 +255,7 @@
         <fail unless="cp_existence.java_cup"
 	      message="The java_cup classes must be on the classpath. Try adding java_cup.jar to the classpath."/>
         <fail unless="cp_existence.jflex"
-	      message="The JFlex classes must be on the classpath. Try adding JFlex.jar to the classpath."/>
+	      message="The JFlex classes must be on the classpath. Try adding jflex.jar to the classpath."/>
         <fail unless="cp_existence.polyglot.param"
 	      message="The Polyglot param extension must be compiled."/>
         <fail unless="jdk_home.defined"
@@ -929,7 +929,7 @@ public class Version extends polyglot.main.Version {
        @param jflex.file    The name of the JFlex file.
    -->
     <target name="jflex-lexer" depends="jflex-lexer-deps" unless="jflex.lexer.up-to-date">
-        <java classname="JFlex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
+        <java classname="jflex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
             <classpath refid="standard.classpath" />
             <arg line="${jflex.file}" />
         </java>
