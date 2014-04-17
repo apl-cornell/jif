@@ -68,8 +68,10 @@ public class LabelTypeCheckUtil {
             List<Principal> principals;
             for (Entry<String, RifFSMstate> pair : states.entrySet()) {
                 principals = pair.getValue().principals();
-                for (Principal p : principals) {
-                    typeCheckPrincipal(tc, p);
+                if (principals != null) {
+                    for (Principal p : principals) {
+                        typeCheckPrincipal(tc, p);
+                    }
                 }
             }
         }

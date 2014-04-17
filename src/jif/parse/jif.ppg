@@ -432,7 +432,9 @@ state_component ::=
     ;   
     
 principal_set ::=
-        LBRACE:x principal_list:a RBRACE:y
+         LBRACE:x RBRACE:y
+            {: RESULT = null; :}
+    |    LBRACE:x principal_list:a RBRACE:y
             {: RESULT = a; :}
     ;
     

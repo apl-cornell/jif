@@ -80,6 +80,7 @@ public class RifFSMstate_c implements RifFSMstate {
     @Override
     public List<Principal> confEquivPrincipals() {
         List<Principal> l = new LinkedList<Principal>();
+        if (this.principals == null) return null;
 
         for (Principal p : this.principals) {
             if (p.isBottomPrincipal()) {
@@ -97,6 +98,8 @@ public class RifFSMstate_c implements RifFSMstate {
         List<Principal> set1 = this.confEquivPrincipals();
         List<Principal> set2 = other.confEquivPrincipals();
 
+        if (set1 == null && set2 == null) return true;
+        if (set1 == null || set2 == null) return false;
         return set1.containsAll(set2) && set2.containsAll(set1);
     }
 
@@ -105,12 +108,14 @@ public class RifFSMstate_c implements RifFSMstate {
         List<Principal> set1 = this.confEquivPrincipals();
         List<Principal> set2 = other.confEquivPrincipals();
         if (set2 == null) return true;
+        if (set1 == null) return false;
         if (set1.size() == 1 && set1.get(0).isBottomPrincipal()) return true;
         return set1.containsAll(set2);
     }
 
     @Override
     public boolean isCanonical() {
+        if (this.principals == null) return true;
         for (Principal p : this.principals) {
             if (!p.isCanonical()) {
                 return false;
@@ -121,6 +126,7 @@ public class RifFSMstate_c implements RifFSMstate {
 
     @Override
     public boolean isRuntimeRepresentable() {
+        if (this.principals == null) return true;
         for (Principal p : this.principals) {
             if (!p.isRuntimeRepresentable()) {
                 return false;
@@ -132,8 +138,12 @@ public class RifFSMstate_c implements RifFSMstate {
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
         List<Type> throwTypes = new ArrayList<Type>();
-        for (Principal p : this.principals) {
-            throwTypes.addAll(p.throwTypes(ts));
+        if (this.principals == null)
+            throwTypes = null;
+        else {
+            for (Principal p : this.principals) {
+                throwTypes.addAll(p.throwTypes(ts));
+            }
         }
         return throwTypes;
     }
@@ -141,6 +151,7 @@ public class RifFSMstate_c implements RifFSMstate {
     @Override
     public boolean isBottomConfidentiality() {
         List<Principal> l = this.confEquivPrincipals();
+        if (l == null) return false;
         return l.size() == 1 && l.get(0).isBottomPrincipal();
     }
 
@@ -154,12 +165,14 @@ public class RifFSMstate_c implements RifFSMstate {
         StringBuffer sb = new StringBuffer(this.name.toString());
         if (current) sb.append("*");
         sb.append(":{");
-        Iterator<Principal> ip = this.principals.iterator();
-        while (ip.hasNext()) {
-            Principal p = ip.next();
-            if (!p.isTopPrincipal()) sb.append(p.toString());
-            if (ip.hasNext()) {
-                sb.append(",");
+        if (this.principals != null) {
+            Iterator<Principal> ip = this.principals.iterator();
+            while (ip.hasNext()) {
+                Principal p = ip.next();
+                if (!p.isTopPrincipal()) sb.append(p.toString());
+                if (ip.hasNext()) {
+                    sb.append(",");
+                }
             }
         }
         sb.append("}");
@@ -186,6 +199,7 @@ public class RifFSMstate_c implements RifFSMstate {
         List<Principal> l = new LinkedList<Principal>();
         boolean changed = false;
 
+        if (this.principals == null) return null;
         for (Principal p : this.principals) {
             Principal newprincipal = p.subst(substitution);
             if (newprincipal != p) changed = true;
@@ -202,6 +216,7 @@ public class RifFSMstate_c implements RifFSMstate {
         // check each principal in turn.
         PathMap X;
         PathMap Xtot = null; //or bottom
+        if (this.principals == null) return null;
         for (Principal p : this.principals) {
             X = p.labelCheck(A, lc);
             A.setPc(X.N(), lc);

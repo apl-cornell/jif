@@ -87,15 +87,20 @@ public class RifStateNode_c extends RifComponentNode_c implements RifStateNode {
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+
         List<Principal> l = new LinkedList<Principal>();
 
-        for (PrincipalNode r : this.principals) {
-            if (!r.isDisambiguated()) {
-                ar.job().extensionInfo().scheduler().currentGoal()
-                        .setUnreachableThisRun();
-                return this;
+        if (this.principals == null)
+            l = null;
+        else {
+            for (PrincipalNode r : this.principals) {
+                if (!r.isDisambiguated()) {
+                    ar.job().extensionInfo().scheduler().currentGoal()
+                            .setUnreachableThisRun();
+                    return this;
+                }
+                l.add(r.principal());
             }
-            l.add(r.principal());
         }
         RifState state = new RifState_c(this.name, l, this.current);
         this.state = state;
@@ -108,13 +113,15 @@ public class RifStateNode_c extends RifComponentNode_c implements RifStateNode {
         w.write(":");
         w.allowBreak(0, " ");
         w.write("{");
-        for (Iterator<PrincipalNode> i = this.principals.iterator(); i
-                .hasNext();) {
-            PrincipalNode n = i.next();
-            print(n, w, tr);
-            if (i.hasNext()) {
-                w.write(",");
-                w.allowBreak(0, " ");
+        if (this.principals != null) {
+            for (Iterator<PrincipalNode> i = this.principals.iterator(); i
+                    .hasNext();) {
+                PrincipalNode n = i.next();
+                print(n, w, tr);
+                if (i.hasNext()) {
+                    w.write(",");
+                    w.allowBreak(0, " ");
+                }
             }
         }
         w.write("}");

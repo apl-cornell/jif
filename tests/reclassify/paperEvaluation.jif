@@ -22,7 +22,7 @@ public class paperEvaluation{
 		record = reclassify(id+eval,f1);
 		part_sum = part_sum + eval;
 	}
-	if (reclassify((part_sum/num)>5,f2)) then result = 1; else result = 0;
+	if (reclassify((part_sum/num)>5,f2)) result = 1; else result = 0;
     }
 }
 

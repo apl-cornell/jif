@@ -85,15 +85,20 @@ public class VarMap {
             TransitionVarLabel reclassbound = (TransitionVarLabel) v;
             Label innerlabel = reclassbound.innerRifLabel();
             PairLabel innerbound = (PairLabel) bounds.get(innerlabel);
-            JifTypeSystem ts = innerbound.typeSystem();
-            RifConfPolicy innerconf =
-                    (RifConfPolicy) innerbound.confProjection();
-            Id action = reclassbound.transition();
-            bound =
-                    ts.pairLabel(innerbound.position(),
-                            innerconf.takeTransition(action),
-                            innerbound.integProjection());
-            this.setBound(v, bound);
+            if (innerbound != null) {
+                JifTypeSystem ts = innerbound.typeSystem();
+                RifConfPolicy innerconf =
+                        (RifConfPolicy) innerbound.confProjection();
+                Id action = reclassbound.transition();
+                bound =
+                        ts.pairLabel(innerbound.position(),
+                                innerconf.takeTransition(action),
+                                innerbound.integProjection());
+                this.setBound(v, bound);
+            } else {
+                bound = defaultLabelBound;
+                this.setBound(v, bound);
+            }
         } else if (bound == null) {
             // The variable has no bound: assume the default label.
             // insert the default label into the map.
