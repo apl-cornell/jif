@@ -21,6 +21,7 @@ public class TypeParamNode_c extends Term_c implements TypeParamNode {
 
     TypeNode typeNode;
     TypeParam typeParam;
+    TypeNode upperBound;
 
     public TypeParamNode_c(Position pos, TypeNode tn) {
         super(pos);
@@ -32,8 +33,26 @@ public class TypeParamNode_c extends Term_c implements TypeParamNode {
     }
 
     @Override
+    public boolean isDisambiguated() {
+        return typeNode.isDisambiguated()
+                && (upperBound == null || upperBound.isDisambiguated());
+    }
+
+    @Override
     public Param parameter() {
         return typeParam;
+    }
+
+    @Override
+    public TypeNode upperBound() {
+        return upperBound;
+    }
+
+    @Override
+    public TypeParamNode upperBound(TypeNode upperBound) {
+        TypeParamNode_c newNode = (TypeParamNode_c) copy();
+        newNode.upperBound = upperBound;
+        return newNode;
     }
 
     @Override
@@ -78,8 +97,9 @@ public class TypeParamNode_c extends Term_c implements TypeParamNode {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
+        TypeNode ub = (TypeNode) visitChild(upperBound, v);
         TypeNode tn = (TypeNode) visitChild(typeNode, v);
-        return typeNode(tn);
+        return typeNode(tn).upperBound(ub);
     }
 
     @Override

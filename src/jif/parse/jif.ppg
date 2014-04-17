@@ -904,7 +904,8 @@ parameter ::=
     |   TYPE:x IDENTIFIER:a EXTENDS objtype_or_expr:b
         {: RESULT = parser.nf.ParamDecl(parser.pos(x, a),
                                         ParamInstance.TYPE,
-                                        parser.nf.Id(parser.pos(a), a.getIdentifier()));
+                                        parser.nf.Id(parser.pos(a), a.getIdentifier()),
+                                        b.toUnlabeledType());
                                         :}
     ;
 
@@ -1274,7 +1275,7 @@ param_or_expr_list ::=
                RESULT = l;
             :}
     |   param_or_expr_list:a COMMA primitive_type:b
-            {: a.add(parser.nf.TypeParamNode(parser.pos(b), b));; RESULT = a; :}
+            {: a.add(parser.nf.TypeParamNode(parser.pos(b), b)); RESULT = a; :}
     |   param_or_expr_list:a COMMA simple_name:b
             {: a.add(b); RESULT = a; :}
     |   param_or_expr_list:a COMMA label:b

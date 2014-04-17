@@ -94,6 +94,9 @@ public interface JifNodeFactory extends NodeFactory {
 
     ParamDecl ParamDecl(Position pos, ParamInstance.Kind kind, Id name);
 
+    ParamDecl ParamDecl(Position pos, ParamInstance.Kind kind, Id name,
+            TypeNode upperBound);
+
     CanonicalConstraintNode CanonicalConstraintNode(Position pos,
             Assertion constraint);
 
