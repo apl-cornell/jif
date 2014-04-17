@@ -46,6 +46,7 @@ public class InstanceOfToJavaExt_c extends ToJavaExt_c {
         JifSubst subst = (JifSubst) t.subst();
         JifPolyType base = (JifPolyType) t.base();
         for (ParamInstance pi : base.params()) {
+            if (pi.isType()) continue;
             args.add(rw.paramToJava(subst.get(pi)));
         }
 
