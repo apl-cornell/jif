@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import jif.ast.JifClassDecl;
+import jif.ast.ParamDecl;
 import jif.types.JifContext;
 import jif.types.JifParsedPolyType;
 import jif.types.JifPolyType;
@@ -123,7 +124,6 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         }
 
         ClassBody cb = n.body();
-        List<ParamTypeNode> params = new ArrayList<ParamTypeNode>();
         if (!jpt.flags().isInterface()) {
             if (!rw.jif_ts().isSignature(jpt)) {
                 // add constructor
@@ -152,9 +152,6 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                     if (!rw.jif_ts().isSignature(jpt)) {
                         for (ParamInstance pi : jpt.params()) {
                             if (pi.isType()) {
-                                params.add(nf.ParamTypeNode(pi.position(),
-                                        Collections.<TypeNode> emptyList(),
-                                        nf.Id(pi.position(), pi.name())));
                                 continue;
                             }
                             String paramFieldName =
@@ -195,9 +192,6 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 // add getters for params to the interface
                 for (ParamInstance pi : jpt.params()) {
                     if (pi.isType()) {
-                        params.add(nf.ParamTypeNode(pi.position(),
-                                Collections.<TypeNode> emptyList(),
-                                nf.Id(pi.position(), pi.name())));
                         continue;
                     }
                     String paramFieldNameGetter =
@@ -259,6 +253,19 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 }
                 newInters.add(inter);
             }
+        }
+        List<ParamTypeNode> params = new ArrayList<ParamTypeNode>();
+        for (ParamDecl pd : n.params()) {
+            if (!pd.isTypeParam()) {
+                continue;
+            }
+            List<TypeNode> bounds = new ArrayList<TypeNode>();
+            if (pd.upperBound() != null) {
+                bounds.add(nf.AmbTypeNode(pd.position(),
+                        nf.Id(pd.position(), pd.upperBound().name())));
+            }
+            params.add(nf.ParamTypeNode(pd.position(), bounds,
+                    nf.Id(pd.position(), pd.name())));
         }
         return nf.ClassDecl(n.position(), n.flags(),
                 Collections.<AnnotationElem> emptyList(), n.id(), superClass,

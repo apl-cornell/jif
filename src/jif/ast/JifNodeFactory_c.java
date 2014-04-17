@@ -404,6 +404,15 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     }
 
     @Override
+    public ParamDecl ParamDecl(Position pos, ParamInstance.Kind kind, Id name,
+            TypeNode upperBound) {
+        ParamDecl n = new ParamDecl_c(pos, kind, name, upperBound);
+        n = (ParamDecl) n.ext(jifExtFactory().extParamDecl());
+        n = (ParamDecl) n.del(delFactory().delNode());
+        return n;
+    }
+
+    @Override
     public CanonicalConstraintNode CanonicalConstraintNode(Position pos,
             Assertion constraint) {
         if (!constraint.isCanonical()) {

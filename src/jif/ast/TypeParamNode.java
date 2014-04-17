@@ -11,4 +11,8 @@ public interface TypeParamNode extends ParamNode {
 
     TypeParamNode typeNode(TypeNode type);
 
+    TypeParamNode upperBound(TypeNode upperBound);
+
+    TypeNode upperBound();
+
 }
