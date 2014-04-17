@@ -1,8 +1,9 @@
 package jif.types;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
+import polyglot.types.ClassType;
 import polyglot.types.FieldInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.Named;
@@ -19,6 +20,7 @@ public class UninstTypeParam_c extends ReferenceType_c implements
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private ParamInstance pi;
+    private ReferenceType upperBound;
 
     public UninstTypeParam_c(TypeSystem ts, ParamInstance pi) {
         super(ts);
@@ -32,17 +34,31 @@ public class UninstTypeParam_c extends ReferenceType_c implements
 
     @Override
     public boolean isCanonical() {
-        return true;
+        return upperBound == null || upperBound.isCanonical();
+    }
+
+    @Override
+    public ReferenceType upperBound() {
+        return upperBound;
+    }
+
+    @Override
+    public UninstTypeParam upperBound(ReferenceType upperBound) {
+        UninstTypeParam_c n = (UninstTypeParam_c) copy();
+        n.upperBound = upperBound;
+        return n;
     }
 
     @Override
     public List<? extends MethodInstance> methods() {
-        return Collections.emptyList();
+        return upperBound == null ? new ArrayList<MethodInstance>()
+                : upperBound.methods();
     }
 
     @Override
     public List<? extends FieldInstance> fields() {
-        return Collections.emptyList();
+        return upperBound == null ? new ArrayList<FieldInstance>() : upperBound
+                .fields();
     }
 
     @Override
@@ -57,12 +73,18 @@ public class UninstTypeParam_c extends ReferenceType_c implements
 
     @Override
     public List<? extends ReferenceType> interfaces() {
-        return Collections.emptyList();
+        return upperBound == null ? new ArrayList<ReferenceType>() : upperBound
+                .interfaces();
     }
 
     @Override
     public Type superType() {
-        return ts.Object();
+        return upperBound == null ? ts.Object() : upperBound;
+    }
+
+    @Override
+    public ClassType toClass() {
+        return upperBound == null ? ts.Object() : upperBound.toClass();
     }
 
     @Override
@@ -81,7 +103,8 @@ public class UninstTypeParam_c extends ReferenceType_c implements
             return true;
         }
 
-        return ts.isCastValid(ts.Object(), toType);
+        return ts.isCastValid(upperBound == null ? ts.Object() : upperBound,
+                toType);
     }
 
     @Override
@@ -90,7 +113,8 @@ public class UninstTypeParam_c extends ReferenceType_c implements
             return true;
         }
 
-        return ts.isSubtype(ts.Object(), ancestor);
+        return ts.isSubtype(upperBound == null ? ts.Object() : upperBound,
+                ancestor);
     }
 
     @Override
@@ -99,13 +123,16 @@ public class UninstTypeParam_c extends ReferenceType_c implements
             return true;
         }
 
-        return ts.isImplicitCastValid(ts.Object(), toType);
+        return ts.isImplicitCastValid(upperBound == null ? ts.Object()
+                : upperBound, toType);
     }
 
     @Override
     public boolean equalsImpl(TypeObject o) {
+        // TODO: name equality of type parameters may not be sound.
         return o instanceof UninstTypeParam
-                && pi.equals(((UninstTypeParam) o).paramInstance());
+                && pi.name().equals(
+                        ((UninstTypeParam) o).paramInstance().name());
     }
 
     @Override

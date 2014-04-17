@@ -2,6 +2,7 @@ package jif.ast;
 
 import jif.types.ParamInstance;
 import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
 
 /** The AST node representing a label/principal parameter declaration.
  */
@@ -25,5 +26,8 @@ public interface ParamDecl extends Node {
     boolean isInvariantLabel();
 
     boolean isCovariantLabel();
+
     boolean isTypeParam();
+
+    TypeNode upperBound();
 }

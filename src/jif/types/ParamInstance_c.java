@@ -3,7 +3,6 @@ package jif.types;
 import java.io.IOException;
 
 import polyglot.main.Report;
-import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.VarInstance_c;
 import polyglot.util.Position;
@@ -155,10 +154,5 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance {
         default:
             throw new IOException("invalid kind");
         }
-    }
-
-    @Override
-    public void setType(Type t) {
-        //Do nothing
     }
 }
