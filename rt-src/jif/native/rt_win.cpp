@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <winnt.h>
 #include <aclapi.h>
-//#include <cwchar>
 #include <string.h>
 #include <lmaccess.h>
 #include <lmapibuf.h>

@@ -1,7 +1,6 @@
 #include "winac.h"
 
 #include <windows.h>
-//#include <tchar.h>
 #include <lmaccess.h>
 #include <lmapibuf.h>
 #include <lm.h>
