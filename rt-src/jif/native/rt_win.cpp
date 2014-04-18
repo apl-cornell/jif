@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <winnt.h>
 #include <aclapi.h>
-#include <tchar.h>
+//#include <cwchar>
 #include <string.h>
 #include <lmaccess.h>
 #include <lmapibuf.h>
@@ -199,7 +199,7 @@ JNIEXPORT jobjectArray JNICALL Java_jif_policy_Passwd_users
 JNIEXPORT jobjectArray JNICALL Java_jif_policy_Passwd_groups
   (JNIEnv *env, jclass clazz)
 {
-    DWORD resume = 0;
+    DWORD_PTR resume = 0;
     DWORD num_entries = 0;
     DWORD total = 0;
     LOCALGROUP_INFO_0* buf = NULL;

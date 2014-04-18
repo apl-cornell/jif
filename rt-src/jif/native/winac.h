@@ -2,16 +2,18 @@
 #include <windows.h>
 #include <winnt.h>
 #include "aclapi.h"
-#include <tchar.h>
+#include <cwchar>
 
 #define PSIDFromPACE(pACE)  ((PSID)(&((pACE)->SidStart)))
 #define SUCCESS		1
 #define FAIL		0
 #define DEBUG		0
-#define ACCESS_ALLOWED_OBJECT_ACE_TYPE	0x05
-#define ACCESS_DENIED_OBJECT_ACE_TYPE   0x06
-#define SYSTEM_AUDIT_OBJECT_ACE_TYPE	0x07
-#define INHERITED_ACE			0x08
+//#define ACCESS_ALLOWED_OBJECT_ACE_TYPE	0x05
+//#define ACCESS_DENIED_OBJECT_ACE_TYPE   0x06
+//#define SYSTEM_AUDIT_OBJECT_ACE_TYPE	0x07
+//#define INHERITED_ACE			0x08
+
+#define _tprintf printf
 
 typedef union _ACE_UNION {
     ACE_HEADER		aceHeader;

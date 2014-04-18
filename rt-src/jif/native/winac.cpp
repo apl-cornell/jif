@@ -1,7 +1,7 @@
 #include "winac.h"
 
 #include <windows.h>
-#include <tchar.h>
+//#include <tchar.h>
 #include <lmaccess.h>
 #include <lmapibuf.h>
 #include <lm.h>
@@ -572,7 +572,8 @@ int main(int argc, char* argv[]) {
     GROUP_INFO_0* grpBuf;
     DWORD num;
     DWORD totalNum;
-    DWORD resumeHandle = 0;
+    DWORD resumeHandleUser = 0;
+    DWORD_PTR resumeHandleGroup = 0;
     
     //get DC name
     status = NetGetDCName(NULL, L"SWORD", &buf);
@@ -580,7 +581,7 @@ int main(int argc, char* argv[]) {
     if (status == NERR_Success) {
 	wprintf(L"Domain Controller: %s\n", (LPWSTR) buf);
 	status = NetUserEnum((LPWSTR) buf, 0, 0, (LPBYTE*) &userBuf, 
-		MAX_PREFERRED_LENGTH, &num, &totalNum, &resumeHandle);
+		MAX_PREFERRED_LENGTH, &num, &totalNum, &resumeHandleUser);
 	if (status == NERR_Success) {
 	    printf("Total user number: %d\n", totalNum);
 	    //for (i = 0; i < num; i++) {
@@ -595,7 +596,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	status = NetGroupEnum((LPWSTR) buf, 0, (LPBYTE*) &grpBuf, 
-		MAX_PREFERRED_LENGTH, &num, &totalNum, &resumeHandle);
+		MAX_PREFERRED_LENGTH, &num, &totalNum, &resumeHandleGroup);
 	if (status == NERR_Success) {
 	    printf("Total group number: %d\n", totalNum);
 	    for (DWORD i = 0; i < num; i++) {

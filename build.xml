@@ -364,7 +364,7 @@ sh ${jif} %CMD_LINE_ARGS%
             <arg value="-rdebug" />
             -->
 	    <arg value="-classpath" />
-	    <arg value="${java.class.path}" />
+    	    <arg path="${java.class.path}" prefix="&quot;" suffix="&quot;" />
             <srcfile />
             <fileset dir="${basedir}" includes="sig-src/**/Object.jif" />
             <mapper type="regexp" from="^sig-src(.*)\.jif" to="sig-classes\1\.class" />
@@ -383,7 +383,7 @@ sh ${jif} %CMD_LINE_ARGS%
             <arg value="-sourcepath" />
             <arg value="sig-src" />
 	    <arg value="-classpath" />
-	    <arg value="${java.class.path}" />
+    	    <arg path="${java.class.path}" prefix="&quot;" suffix="&quot;" />
             <srcfile />
             <fileset dir="${basedir}" includes="sig-src/**/*.jif" />
             <mapper type="regexp" from="^sig-src(.*)\.jif" to="sig-classes\1\.class" />
@@ -408,7 +408,7 @@ sh ${jif} %CMD_LINE_ARGS%
             <arg value="lib-src" />
 	    <arg value="-e" />
 	    <arg value="-classpath" />
-	    <arg value="${java.class.path}" />
+    	    <arg path="${java.class.path}" prefix="&quot;" suffix="&quot;" />
             <!--      
       <arg value="-report" />
       <arg value="debug=1" />
@@ -579,7 +579,6 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
 		       vmlauncher="false">
             <arg value="-o" />
             <targetfile />
-            <arg value="-mno-cygwin" />
             <arg value="-shared" />
             <arg value="-Wl,--export-all-symbols" />
             <arg value="-Wl,--add-stdcall-alias" />
@@ -850,14 +849,6 @@ public class Version extends polyglot.main.Version {
             <arg line="${ppg.file}" />
         </java>
         <antcall target="cup-parser" />
-	<!-- Hack to suppress warnings in parser. -->
-	<replaceregexp
-	    file="${parser.dir}/${parser.class}.java"
-	    match="^(public )?class"
-	    replace="@SuppressWarnings(&quot;all&quot;) \1class"
-	    flags="g"
-	    byline="yes"
-	/>
     </target>
 
     <!-- Set the property ppg.parser.up-to-date if the parser is in fact
