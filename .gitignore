@@ -7,3 +7,4 @@
 /pthScript.results
 /config.properties
 .*.sw?
+/bin_

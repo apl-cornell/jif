@@ -145,4 +145,9 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance {
     public void setType(Type t) {
         //Do nothing
     }
+
+    @Override
+    public String fullName() {
+        return name();
+    }
 }

@@ -556,7 +556,6 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
 		       skipemptyfilesets="true" 
 		       parallel="false" 
 		       vmlauncher="false">
-            <arg value="-mno-cygwin" />
             <arg value="-c" />
             <arg value="-I" />
             <arg path="${jdk.home}/include" />
@@ -832,7 +831,7 @@ public class Version extends polyglot.main.Version {
        @param ${ext.basedir} the base directory of the extension
     -->
     <target name="compile-ext">
-        <javac source="1.5" target="1.5" srcdir="${ext.basedir}/src" destdir="${classes}" debug="on" includes="${ext}/**">
+        <javac source="1.7" target="1.7" srcdir="${ext.basedir}/src" destdir="${classes}" debug="on" includes="${ext}/**">
             <classpath refid="standard.classpath" />
         </javac>
     </target>

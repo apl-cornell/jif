@@ -5,6 +5,8 @@ import java.util.List;
 
 import jif.ast.JifNew_c;
 import polyglot.ast.Expr;
+import polyglot.ast.ExprOps;
+import polyglot.ast.Lang;
 import polyglot.ast.New;
 import polyglot.ast.NewOps;
 import polyglot.ast.Special;
@@ -100,7 +102,7 @@ public class JifNewDel extends JifDel_c implements NewOps {
     }
 
     @Override
-    public New findQualifier(AmbiguityRemover ar, ClassType ct)
+    public Expr findQualifier(AmbiguityRemover ar, ClassType ct)
             throws SemanticException {
         return ((JifNew_c) node()).findQualifier(ar, ct);
     }
@@ -133,5 +135,29 @@ public class JifNewDel extends JifDel_c implements NewOps {
     @Override
     public ClassType findEnclosingClass(Context c, ClassType ct) {
         return ((JifNew_c) node()).findEnclosingClass(c, ct);
+    }
+
+    @Override
+    public boolean constantValueSet(Lang lang) {
+        // TODO Auto-generated method stub
+        return ((ExprOps) jl()).constantValueSet(lang);
+    }
+
+    @Override
+    public boolean isConstant(Lang lang) {
+        // TODO Auto-generated method stub
+        return ((ExprOps) jl()).isConstant(lang);
+    }
+
+    @Override
+    public Object constantValue(Lang lang) {
+        // TODO Auto-generated method stub
+        return ((ExprOps) jl()).constantValue(lang);
+    }
+
+    @Override
+    public void printShortObjectType(CodeWriter w, PrettyPrinter tr) {
+        // TODO Auto-generated method stub
+        ((NewOps) jl()).printShortObjectType(w, tr);
     }
 }
