@@ -222,25 +222,21 @@ public class JifCallDel extends JifDel_c implements CallOps {
 
     @Override
     public void printArgs(CodeWriter w, PrettyPrinter tr) {
-        // TODO Auto-generated method stub
         ((CallOps) jl()).printArgs(w, tr);
     }
 
     @Override
     public boolean constantValueSet(Lang lang) {
-        // TODO Auto-generated method stub
         return ((ExprOps) jl()).constantValueSet(lang);
     }
 
     @Override
     public boolean isConstant(Lang lang) {
-        // TODO Auto-generated method stub
         return ((ExprOps) jl()).isConstant(lang);
     }
 
     @Override
     public Object constantValue(Lang lang) {
-        // TODO Auto-generated method stub
         return ((ExprOps) jl()).constantValue(lang);
     }
 }
