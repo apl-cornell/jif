@@ -52,11 +52,10 @@ public class JifNew_c extends New_c implements New {
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
         List<Type> ex = new ArrayList<Type>(super.throwTypes(ts));
-        New n = (New) this.node();
         LabelTypeCheckUtil ltcu = ((JifTypeSystem) ts).labelTypeCheckUtil();
 
-        if (n.objectType().type() instanceof JifClassType) {
-            ex.addAll(ltcu.throwTypes((JifClassType) n.objectType().type()));
+        if (objectType().type() instanceof JifClassType) {
+            ex.addAll(ltcu.throwTypes((JifClassType) objectType().type()));
         }
         return ex;
     }

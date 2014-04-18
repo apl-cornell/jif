@@ -22,8 +22,8 @@ public class JifLocalDecl_c extends LocalDecl_c {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode type = (TypeNode) visitChild(type(), v);
-        Id name = (Id) visitChild(id(), v);
+        TypeNode type = visitChild(type(), v);
+        Id name = visitChild(id(), v);
         if (v instanceof AmbiguityRemover) {
             // ugly hack to make sure that the local instance
             // has the correct information in it by the time
@@ -33,8 +33,8 @@ public class JifLocalDecl_c extends LocalDecl_c {
             li.setName(name());
             li.setType(declType());
         }
-        Expr init = (Expr) visitChild(init(), v);
+        Expr init = visitChild(init(), v);
 
-        return reconstruct(type, name, init);
+        return reconstruct(this, type, name, init);
     }
 }

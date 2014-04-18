@@ -1,7 +1,7 @@
 package jif.extension;
 
-import jif.ast.JifUtil;
 import jif.ast.JifExt_c;
+import jif.ast.JifUtil;
 import jif.translate.ToJavaExt;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
@@ -46,7 +46,7 @@ public abstract class JifStmtExt_c extends JifExt_c implements JifStmtExt {
     }
 
     @Override
-    public Object copy() {
+    public JifStmtExt copy() {
         JifStmtExt_c copy = (JifStmtExt_c) super.copy();
         if (stmtDel != null) {
             copy.stmtDel = (JifStmtExt) stmtDel.copy();

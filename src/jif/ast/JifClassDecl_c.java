@@ -1,7 +1,6 @@
 package jif.ast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -34,6 +33,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -58,15 +58,9 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
             List<TypeNode> interfaces, List<PrincipalNode> authority,
             List<ConstraintNode<Assertion>> constraints, ClassBody body) {
         super(pos, flags, name, superClass, interfaces, body);
-        this.params =
-                Collections.unmodifiableList(new ArrayList<ParamDecl>(params));
-        this.authority =
-                Collections.unmodifiableList(new ArrayList<PrincipalNode>(
-                        authority));
-        this.constraints =
-                Collections
-                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
-                                constraints));
+        this.params = ListUtil.copy(params, true);
+        this.authority = ListUtil.copy(authority, true);
+        this.constraints = ListUtil.copy(constraints, true);
     }
 
     @Override
@@ -76,11 +70,14 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
 
     @Override
     public JifClassDecl constraints(List<ConstraintNode<Assertion>> constraints) {
-        JifClassDecl_c n = (JifClassDecl_c) copy();
-        n.constraints =
-                Collections
-                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
-                                constraints));
+        return constraints(this, constraints);
+    }
+
+    protected <N extends JifClassDecl_c> N constraints(N n,
+            List<ConstraintNode<Assertion>> constraints) {
+        if (CollectionUtil.equals(n.constraints, constraints)) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.constraints = ListUtil.copy(constraints, true);
         return n;
     }
 
@@ -91,9 +88,13 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
 
     @Override
     public JifClassDecl params(List<ParamDecl> params) {
-        JifClassDecl_c n = (JifClassDecl_c) copy();
-        n.params =
-                Collections.unmodifiableList(new ArrayList<ParamDecl>(params));
+        return params(this, params);
+    }
+
+    protected <N extends JifClassDecl_c> N params(N n, List<ParamDecl> params) {
+        if (CollectionUtil.equals(n.params, params)) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.params = ListUtil.copy(params, true);
         return n;
     }
 
@@ -104,44 +105,40 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
 
     @Override
     public JifClassDecl authority(List<PrincipalNode> authority) {
-        JifClassDecl_c n = (JifClassDecl_c) copy();
-        n.authority =
-                Collections.unmodifiableList(new ArrayList<PrincipalNode>(
-                        authority));
+        return authority(this, authority);
+    }
+
+    protected <N extends JifClassDecl_c> N authority(N n,
+            List<PrincipalNode> authority) {
+        if (CollectionUtil.equals(n.authority, authority)) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.authority = ListUtil.copy(authority, true);
         return n;
     }
 
-    protected JifClassDecl_c reconstruct(Id name, List<ParamDecl> params,
-            TypeNode superClass, List<TypeNode> interfaces,
-            List<PrincipalNode> authority,
+    protected <N extends JifClassDecl_c> N reconstruct(N n, Id name,
+            List<ParamDecl> params, TypeNode superClass,
+            List<TypeNode> interfaces, List<PrincipalNode> authority,
             List<ConstraintNode<Assertion>> constraints, ClassBody body) {
-        if (!CollectionUtil.equals(params, this.params)
-                || !CollectionUtil.equals(authority, this.authority)
-                || !CollectionUtil.equals(params, this.constraints)) {
-            JifClassDecl_c n = (JifClassDecl_c) copy();
-            n.params = ListUtil.copy(params, true);
-            n.authority = ListUtil.copy(authority, true);
-            n.constraints = ListUtil.copy(constraints, true);
-            return (JifClassDecl_c) n.reconstruct(name, superClass, interfaces,
-                    body);
-        }
-
-        return (JifClassDecl_c) super.reconstruct(name, superClass, interfaces,
-                body);
+        n = super.reconstruct(n, name, superClass, interfaces, body);
+        n = params(n, params);
+        n = authority(n, authority);
+        n = constraints(n, constraints);
+        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id) visitChild(this.name, v);
+        Id name = visitChild(this.name, v);
         List<ParamDecl> params = visitList(this.params, v);
-        TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
+        TypeNode superClass = visitChild(this.superClass, v);
         List<TypeNode> interfaces = visitList(this.interfaces, v);
         List<PrincipalNode> authority = visitList(this.authority, v);
         List<ConstraintNode<Assertion>> constraints =
                 visitList(this.constraints, v);
-        ClassBody body = (ClassBody) visitChild(this.body, v);
-        return reconstruct(name, params, superClass, interfaces, authority,
-                constraints, body);
+        ClassBody body = visitChild(this.body, v);
+        return reconstruct(this, name, params, superClass, interfaces,
+                authority, constraints, body);
     }
 
     @Override
