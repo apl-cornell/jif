@@ -422,7 +422,7 @@ sh ${jif} %CMD_LINE_ARGS%
 
     <target name="jif-runtime" depends="init,configure" description="compile the jif runtime">
         <mkdir dir="${rt-classes}" />
-        <javac source="1.5" target="1.5" srcdir="${rt-src}" destdir="${rt-classes}" debug="on" includes="**">
+        <javac source="1.5" target="1.5" srcdir="${rt-src}" destdir="${rt-classes}" encoding="UTF-8" debug="on" includes="**">
             <classpath>
                 <pathelement location="${sig-classes}" />
                 <pathelement location="${lib-classes}" />
@@ -830,7 +830,7 @@ public class Version extends polyglot.main.Version {
        @param ${ext.basedir} the base directory of the extension
     -->
     <target name="compile-ext">
-        <javac source="1.7" target="1.7" srcdir="${ext.basedir}/src" destdir="${classes}" debug="on" includes="${ext}/**">
+        <javac source="1.7" target="1.7" srcdir="${ext.basedir}/src" destdir="${classes}" encoding="UTF-8" debug="on" includes="${ext}/**">
             <classpath refid="standard.classpath" />
         </javac>
     </target>
