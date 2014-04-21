@@ -17,11 +17,16 @@ import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.ArrayInit;
 import polyglot.ast.Expr;
+import polyglot.ast.Id;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
+import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
 
 /** The Jif extension of the <code>LocalDecl</code> node.
  * 
@@ -35,8 +40,36 @@ public class JifLocalDeclExt extends JifStmtExt_c {
     }
 
     @Override
+    public LocalDecl node() {
+        return (LocalDecl) super.node();
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        LocalDecl node = node();
+        TypeNode type = visitChild(node.type(), v);
+        Id name = visitChild(node.id(), v);
+        if (v instanceof AmbiguityRemover) {
+            // ugly hack to make sure that the local instance
+            // has the correct information in it by the time
+            // the init expression is disambiguated.
+            LocalInstance li = node.localInstance();
+            li.setFlags(node.flags());
+            li.setName(node.name());
+            li.setType(node.declType());
+        }
+        Expr init = visitChild(node.init(), v);
+
+        // XXX Wish we had access to reconstruct here...
+        node = node.type(type);
+        node = node.id(name);
+        node = node.init(init);
+        return node;
+    }
+
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
-        LocalDecl decl = (LocalDecl) node();
+        LocalDecl decl = node();
 
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
