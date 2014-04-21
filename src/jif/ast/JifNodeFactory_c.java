@@ -315,27 +315,6 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
             List<Formal> formals, LabelNode endLabel,
             List<TypeNode> throwTypes,
             List<ConstraintNode<Assertion>> constraints, Block body) {
-//      //add default return value label node
-//if (! (returnType instanceof LabeledTypeNode) &&
-//      (! (returnType instanceof CanonicalTypeNode) ||
-//      !returnType.type().isVoid()) ) {
-//      List comps = new LinkedList();
-//      if (endLabel != null)
-//      if (endLabel instanceof JoinLabelNode)
-//      comps = ListUtil.copy(
-//      ((JoinLabelNode)endLabel).components(), false);
-//      else
-//      comps.add(endLabel.copy());
-
-//      for (Iterator iter = formals.iterator(); iter.hasNext(); ) {
-//      Formal arg = (Formal) iter.next();
-//      comps.add(AmbVarLabelNode(arg.position(), arg.name()));
-//      }
-//      LabelNode LrvNode = JoinLabelNode(returnType.position(), comps);
-//      returnType = LabeledTypeNode(returnType.position(), returnType,
-//      LrvNode);
-//      }
-
         JifMethodDecl n =
                 new JifMethodDecl_c(pos, flags, returnType, name, startLabel,
                         formals, endLabel, throwTypes, constraints, body);
