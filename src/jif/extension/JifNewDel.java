@@ -139,25 +139,21 @@ public class JifNewDel extends JifDel_c implements NewOps {
 
     @Override
     public boolean constantValueSet(Lang lang) {
-        // TODO Auto-generated method stub
         return ((ExprOps) jl()).constantValueSet(lang);
     }
 
     @Override
     public boolean isConstant(Lang lang) {
-        // TODO Auto-generated method stub
         return ((ExprOps) jl()).isConstant(lang);
     }
 
     @Override
     public Object constantValue(Lang lang) {
-        // TODO Auto-generated method stub
         return ((ExprOps) jl()).constantValue(lang);
     }
 
     @Override
     public void printShortObjectType(CodeWriter w, PrettyPrinter tr) {
-        // TODO Auto-generated method stub
         ((NewOps) jl()).printShortObjectType(w, tr);
     }
 }
