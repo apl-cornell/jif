@@ -25,6 +25,14 @@ public class AmbProviderLabelNode_c extends AmbLabelNode_c implements
         this.typeNode = typeNode;
     }
 
+    protected <N extends AmbProviderLabelNode_c> N typeNode(N n,
+            TypeNode typeNode) {
+        if (n.typeNode == typeNode) return n;
+        n = copyIfNeeded(n);
+        n.typeNode = typeNode;
+        return n;
+    }
+
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (!typeNode.isDisambiguated()) {
@@ -58,17 +66,13 @@ public class AmbProviderLabelNode_c extends AmbLabelNode_c implements
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode typeNode = (TypeNode) visitChild(this.typeNode, v);
-        return reconstruct(typeNode);
+        TypeNode typeNode = visitChild(this.typeNode, v);
+        return reconstruct(this, typeNode);
     }
 
-    protected AmbProviderLabelNode_c reconstruct(TypeNode typeNode) {
-        if (this.typeNode != typeNode) {
-            AmbProviderLabelNode_c n = (AmbProviderLabelNode_c) copy();
-            n.typeNode = typeNode;
-            return n;
-        }
-
-        return this;
+    protected <N extends AmbProviderLabelNode_c> N reconstruct(N n,
+            TypeNode typeNode) {
+        n = typeNode(n, typeNode);
+        return n;
     }
 }

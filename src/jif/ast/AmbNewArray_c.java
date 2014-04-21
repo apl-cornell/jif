@@ -65,7 +65,12 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray {
     /** Returns a copy of this node with <code>baseType</code> updated. */
     @Override
     public AmbNewArray baseType(TypeNode baseType) {
-        AmbNewArray_c n = (AmbNewArray_c) copy();
+        return baseType(this, baseType);
+    }
+
+    protected <N extends AmbNewArray_c> N baseType(N n, TypeNode baseType) {
+        if (n.baseType == baseType) return n;
+        n = copyIfNeeded(n);
         n.baseType = baseType;
         return n;
     }
@@ -76,12 +81,12 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray {
         return this.expr;
     }
 
-    /** Returns a copy of this node with <code>name</code> updated. */
-    //  public AmbNewArray expr(Expr expr) {
-    //  AmbNewArray_c n = (AmbNewArray_c) copy();
-    //  n.expr = expr;
-    //  return n;
-    //  }
+    protected <N extends AmbNewArray_c> N expr(N n, Object expr) {
+        if (n.expr == expr) return n;
+        n = copyIfNeeded(n);
+        n.expr = expr;
+        return n;
+    }
 
     /** Gets the additional dimensions. */
     @Override
@@ -92,7 +97,12 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray {
     /** Returns a copy of this node with <code>dims</code> updated. */
     @Override
     public AmbNewArray dims(List<? extends Expr> dims) {
-        AmbNewArray_c n = (AmbNewArray_c) copy();
+        return dims(this, dims);
+    }
+
+    protected <N extends AmbNewArray_c> N dims(N n, List<? extends Expr> dims) {
+        if (CollectionUtil.equals(n.dims, dims)) return n;
+        n = copyIfNeeded(n);
         n.dims = ListUtil.copy(dims, true);
         return n;
     }
@@ -110,18 +120,12 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray {
     }
 
     /** Reconstructs the node. */
-    protected AmbNewArray_c reconstruct(TypeNode baseType, Object expr,
-            List<? extends Expr> dims) {
-        if (baseType != this.baseType || expr != this.expr
-                || !CollectionUtil.equals(dims, this.dims)) {
-            AmbNewArray_c n = (AmbNewArray_c) copy();
-            n.baseType = baseType;
-            n.expr = expr;
-            n.dims = ListUtil.copy(dims, true);
-            return n;
-        }
-
-        return this;
+    protected <N extends AmbNewArray_c> N reconstruct(N n, TypeNode baseType,
+            Object expr, List<? extends Expr> dims) {
+        n = baseType(n, baseType);
+        n = expr(n, expr);
+        n = dims(n, dims);
+        return n;
     }
 
     /**
@@ -140,13 +144,13 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray {
     /** Visits the children of this node. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode baseType = (TypeNode) visitChild(this.baseType, v);
+        TypeNode baseType = visitChild(this.baseType, v);
         List<? extends Expr> dims = visitList(this.dims, v);
         Object expr = this.expr;
         if (expr instanceof Expr) {
             expr = visitChild((Expr) expr, v);
         }
-        return reconstruct(baseType, expr, dims);
+        return reconstruct(this, baseType, expr, dims);
     }
 
     @Override

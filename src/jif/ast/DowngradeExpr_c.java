@@ -24,9 +24,9 @@ import polyglot.visit.TypeChecker;
 public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    private LabelNode label;
-    private LabelNode bound;
-    private Expr expr;
+    protected LabelNode label;
+    protected LabelNode bound;
+    protected Expr expr;
 
     public DowngradeExpr_c(Position pos, Expr expr, LabelNode bound,
             LabelNode label) {
@@ -43,7 +43,12 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr {
 
     @Override
     public DowngradeExpr expr(Expr expr) {
-        DowngradeExpr_c n = (DowngradeExpr_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends DowngradeExpr_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        n = copyIfNeeded(n);
         n.expr = expr;
         return n;
     }
@@ -55,7 +60,12 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr {
 
     @Override
     public DowngradeExpr label(LabelNode label) {
-        DowngradeExpr_c n = (DowngradeExpr_c) copy();
+        return label(this, label);
+    }
+
+    protected <N extends DowngradeExpr_c> N label(N n, LabelNode label) {
+        if (n.label == label) return n;
+        n = copyIfNeeded(n);
         n.label = label;
         return n;
     }
@@ -67,32 +77,32 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr {
 
     @Override
     public DowngradeExpr bound(LabelNode b) {
-        DowngradeExpr_c n = (DowngradeExpr_c) copy();
+        return bound(this, b);
+    }
+
+    protected <N extends DowngradeExpr_c> N bound(N n, LabelNode b) {
+        if (n.bound == b) return n;
+        n = copyIfNeeded(n);
         n.bound = b;
         return n;
     }
 
-    protected DowngradeExpr_c reconstruct(Expr expr, LabelNode bound,
-            LabelNode label) {
-        if (this.expr != expr || this.bound != bound || this.label != label) {
-            DowngradeExpr_c n = (DowngradeExpr_c) copy();
-            n.expr = expr;
-            n.bound = bound;
-            n.label = label;
-            return n;
-        }
-
-        return this;
+    protected <N extends DowngradeExpr_c> N reconstruct(N n, Expr expr,
+            LabelNode bound, LabelNode label) {
+        n = expr(n, expr);
+        n = bound(n, bound);
+        n = label(n, label);
+        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
+        Expr expr = visitChild(this.expr, v);
         LabelNode bound =
                 this.bound == null ? null : ((LabelNode) visitChild(this.bound,
                         v));
-        LabelNode label = (LabelNode) visitChild(this.label, v);
-        return reconstruct(expr, bound, label);
+        LabelNode label = visitChild(this.label, v);
+        return reconstruct(this, expr, bound, label);
     }
 
     @Override

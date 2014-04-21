@@ -12,6 +12,7 @@ import jif.types.label.Label;
 import polyglot.ast.Block;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorDecl_c;
+import polyglot.ast.Ext;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
@@ -22,7 +23,6 @@ import polyglot.types.Flags;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -41,11 +41,20 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements
     protected LabelNode returnLabel;
     protected List<ConstraintNode<Assertion>> constraints;
 
+    @Deprecated
     public JifConstructorDecl_c(Position pos, Flags flags, Id name,
             LabelNode startLabel, LabelNode returnLabel, List<Formal> formals,
             List<TypeNode> throwTypes,
             List<ConstraintNode<Assertion>> constraints, Block body) {
-        super(pos, flags, name, formals, throwTypes, body);
+        this(pos, flags, name, startLabel, returnLabel, formals, throwTypes,
+                constraints, body, null);
+    }
+
+    public JifConstructorDecl_c(Position pos, Flags flags, Id name,
+            LabelNode startLabel, LabelNode returnLabel, List<Formal> formals,
+            List<TypeNode> throwTypes,
+            List<ConstraintNode<Assertion>> constraints, Block body, Ext ext) {
+        super(pos, flags, name, formals, throwTypes, body, ext);
         this.startLabel = startLabel;
         this.returnLabel = returnLabel;
         this.constraints = ListUtil.copy(constraints, true);
@@ -64,7 +73,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements
     protected <N extends JifConstructorDecl_c> N startLabel(N n,
             LabelNode startLabel) {
         if (n.startLabel == startLabel) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.startLabel = startLabel;
         return n;
     }
@@ -82,7 +91,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements
     protected <N extends JifConstructorDecl_c> N returnLabel(N n,
             LabelNode returnLabel) {
         if (n.returnLabel == returnLabel) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.returnLabel = returnLabel;
         return n;
     }
@@ -101,7 +110,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements
     protected <N extends JifConstructorDecl_c> N constraints(N n,
             List<ConstraintNode<Assertion>> constraints) {
         if (CollectionUtil.equals(n.constraints, constraints)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.constraints = ListUtil.copy(constraints, true);
         return n;
     }

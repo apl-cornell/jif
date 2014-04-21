@@ -25,7 +25,6 @@ import polyglot.types.Flags;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -64,7 +63,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
 
     protected <N extends JifMethodDecl_c> N startLabel(N n, LabelNode startLabel) {
         if (n.startLabel == startLabel) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.startLabel = startLabel;
         return n;
     }
@@ -82,7 +81,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
     protected <N extends JifMethodDecl_c> N returnLabel(N n,
             LabelNode returnLabel) {
         if (n.returnLabel == returnLabel) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.returnLabel = returnLabel;
         return n;
     }
@@ -100,7 +99,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
     protected <N extends JifMethodDecl_c> N constraints(N n,
             List<ConstraintNode<Assertion>> constraints) {
         if (CollectionUtil.equals(n.constraints, constraints)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.constraints = ListUtil.copy(constraints, true);
         return n;
     }

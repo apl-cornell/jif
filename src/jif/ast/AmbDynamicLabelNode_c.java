@@ -123,18 +123,19 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
-        return reconstruct(expr);
+        Expr expr = visitChild(this.expr, v);
+        return reconstruct(this, expr);
     }
 
-    protected AmbDynamicLabelNode_c reconstruct(Expr expr) {
-        if (this.expr != expr) {
-            AmbDynamicLabelNode_c n = (AmbDynamicLabelNode_c) copy();
-            n.expr = expr;
-            return n;
-        }
-
-        return this;
+    protected <N extends AmbDynamicLabelNode_c> N reconstruct(N n, Expr expr) {
+        n = expr(n, expr);
+        return n;
     }
 
+    protected <N extends AmbDynamicLabelNode_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        n = copyIfNeeded(n);
+        n.expr = expr;
+        return n;
+    }
 }

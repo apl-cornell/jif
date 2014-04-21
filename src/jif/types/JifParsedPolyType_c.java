@@ -1,7 +1,6 @@
 package jif.types;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +17,7 @@ import polyglot.main.Options;
 import polyglot.types.FieldInstance;
 import polyglot.types.LazyClassInitializer;
 import polyglot.types.ParsedClassType_c;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -171,9 +171,7 @@ public class JifParsedPolyType_c extends ParsedClassType_c implements
 
     @Override
     public void setConstraints(List<Assertion> constraints) {
-        this.constraints =
-                Collections.unmodifiableList(new ArrayList<Assertion>(
-                        constraints));
+        this.constraints = ListUtil.copy(constraints, true);
     }
 
     @Override

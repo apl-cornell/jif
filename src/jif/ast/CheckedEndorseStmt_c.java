@@ -16,7 +16,7 @@ public class CheckedEndorseStmt_c extends EndorseStmt_c implements
         CheckedEndorseStmt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    private Expr expr;
+    protected Expr expr;
 
     public CheckedEndorseStmt_c(Position pos, Expr e, LabelNode bound,
             LabelNode label, If body) {
@@ -31,31 +31,32 @@ public class CheckedEndorseStmt_c extends EndorseStmt_c implements
 
     @Override
     public CheckedEndorseStmt expr(Expr expr) {
-        CheckedEndorseStmt_c n = (CheckedEndorseStmt_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends CheckedEndorseStmt_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        n = copyIfNeeded(n);
         n.expr = expr;
         return n;
     }
 
-    protected DowngradeStmt_c reconstruct(Expr expr, LabelNode bound,
-            LabelNode label, Stmt body) {
-        CheckedEndorseStmt_c n =
-                (CheckedEndorseStmt_c) super.reconstruct(bound, label, body);
-        if (this.expr != expr) {
-            if (n == this) n = (CheckedEndorseStmt_c) this.copy();
-            n.expr = expr;
-        }
+    protected <N extends CheckedEndorseStmt_c> N reconstruct(N n, Expr expr,
+            LabelNode bound, LabelNode label, Stmt body) {
+        n = super.reconstruct(n, bound, label, body);
+        n = expr(n, expr);
         return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr(), v);
+        Expr expr = visitChild(this.expr(), v);
         LabelNode bound =
                 this.bound() == null ? null : ((LabelNode) visitChild(
                         this.bound(), v));
-        LabelNode label = (LabelNode) visitChild(this.label(), v);
-        Stmt body = (Stmt) visitChild(this.body(), v);
-        return reconstruct(expr, bound, label, body);
+        LabelNode label = visitChild(this.label(), v);
+        Stmt body = visitChild(this.body(), v);
+        return reconstruct(this, expr, bound, label, body);
     }
 
     @Override

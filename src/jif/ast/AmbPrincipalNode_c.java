@@ -54,6 +54,20 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
         this.name = name;
     }
 
+    protected <N extends AmbPrincipalNode_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        n = copyIfNeeded(n);
+        n.expr = expr;
+        return n;
+    }
+
+    protected <N extends AmbPrincipalNode_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        n = copyIfNeeded(n);
+        n.name = name;
+        return n;
+    }
+
     @Override
     public boolean isDisambiguated() {
         return false;
@@ -237,23 +251,20 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
         Expr expr = this.expr;
         Id name = this.name;
         if (this.expr != null) {
-            expr = (Expr) visitChild(this.expr, v);
+            expr = visitChild(this.expr, v);
         }
         if (this.name != null) {
-            name = (Id) visitChild(this.name, v);
+            name = visitChild(this.name, v);
         }
 
-        return reconstruct(expr, name);
+        return reconstruct(this, expr, name);
     }
 
-    protected AmbPrincipalNode_c reconstruct(Expr expr, Id name) {
-        if (this.expr != expr || this.name != name) {
-            AmbPrincipalNode_c n = (AmbPrincipalNode_c) this.copy();
-            n.expr = expr;
-            n.name = name;
-            return n;
-        }
-        return this;
+    protected <N extends AmbPrincipalNode_c> N reconstruct(N n, Expr expr,
+            Id name) {
+        n = expr(n, expr);
+        n = id(n, name);
+        return n;
     }
 
 }

@@ -37,6 +37,22 @@ public class AmbJunctivePrincipalNode_c extends PrincipalNode_c implements
         return false;
     }
 
+    protected <N extends AmbJunctivePrincipalNode_c> N left(N n,
+            PrincipalNode left) {
+        if (n.left == left) return n;
+        n = copyIfNeeded(n);
+        n.left = left;
+        return n;
+    }
+
+    protected <N extends AmbJunctivePrincipalNode_c> N right(N n,
+            PrincipalNode right) {
+        if (n.right == right) return n;
+        n = copyIfNeeded(n);
+        n.right = right;
+        return n;
+    }
+
     @Override
     public String toString() {
         return left + (isConjunction ? "&" : ",") + right;
@@ -84,19 +100,15 @@ public class AmbJunctivePrincipalNode_c extends PrincipalNode_c implements
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        PrincipalNode l = (PrincipalNode) visitChild(this.left, v);
-        PrincipalNode r = (PrincipalNode) visitChild(this.right, v);
-        return reconstruct(l, r);
+        PrincipalNode l = visitChild(this.left, v);
+        PrincipalNode r = visitChild(this.right, v);
+        return reconstruct(this, l, r);
     }
 
-    protected AmbJunctivePrincipalNode_c reconstruct(PrincipalNode l,
-            PrincipalNode r) {
-        if (this.left == l && this.right == r) {
-            return this;
-        }
-        AmbJunctivePrincipalNode_c n = (AmbJunctivePrincipalNode_c) this.copy();
-        n.left = l;
-        n.right = r;
+    protected <N extends AmbJunctivePrincipalNode_c> N reconstruct(N n,
+            PrincipalNode l, PrincipalNode r) {
+        n = left(n, l);
+        n = right(n, r);
         return n;
     }
 

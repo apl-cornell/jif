@@ -33,7 +33,13 @@ public class AutoEndorseConstraintNode_c extends
 
     @Override
     public AutoEndorseConstraintNode endorseTo(LabelNode endorseTo) {
-        AutoEndorseConstraintNode_c n = (AutoEndorseConstraintNode_c) copy();
+        return endorseTo(this, endorseTo);
+    }
+
+    protected <N extends AutoEndorseConstraintNode_c> N endorseTo(N n,
+            LabelNode endorseTo) {
+        if (n.endorseTo == endorseTo) return n;
+        n = copyIfNeeded(n);
         n.endorseTo = endorseTo;
         if (constraint() != null) {
             n.setConstraint(((AutoEndorseConstraint_c) constraint())
@@ -42,18 +48,16 @@ public class AutoEndorseConstraintNode_c extends
         return n;
     }
 
-    protected AutoEndorseConstraintNode_c reconstruct(LabelNode endorseTo) {
-        if (this.endorseTo != endorseTo) {
-            return (AutoEndorseConstraintNode_c) this.endorseTo(endorseTo);
-        }
-
-        return this;
+    protected <N extends AutoEndorseConstraintNode_c> N reconstruct(N n,
+            LabelNode endorseTo) {
+        n = endorseTo(n, endorseTo);
+        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        LabelNode endorseTo = (LabelNode) visitChild(this.endorseTo, v);
-        return reconstruct(endorseTo);
+        LabelNode endorseTo = visitChild(this.endorseTo, v);
+        return reconstruct(this, endorseTo);
     }
 
     /**

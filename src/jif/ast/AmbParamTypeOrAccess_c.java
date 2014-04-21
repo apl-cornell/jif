@@ -47,7 +47,12 @@ public class AmbParamTypeOrAccess_c extends Node_c implements
     }
 
     public AmbParamTypeOrAccess prefix(Receiver prefix) {
-        AmbParamTypeOrAccess_c n = (AmbParamTypeOrAccess_c) copy();
+        return prefix(this, prefix);
+    }
+
+    protected <N extends AmbParamTypeOrAccess_c> N prefix(N n, Receiver prefix) {
+        if (n.prefix == prefix) return n;
+        n = copyIfNeeded(n);
         n.prefix = prefix;
         return n;
     }
@@ -57,30 +62,33 @@ public class AmbParamTypeOrAccess_c extends Node_c implements
         return this.expr;
     }
 
+    protected <N extends AmbParamTypeOrAccess_c> N expr(N n, Object expr) {
+        if (n.expr == expr) return n;
+        n = copyIfNeeded(n);
+        n.expr = expr;
+        return n;
+    }
+
     @Override
     public Type type() {
         return this.type;
     }
 
-    protected AmbParamTypeOrAccess_c reconstruct(Receiver prefix, Object expr) {
-        if (prefix != this.prefix || expr != this.expr) {
-            AmbParamTypeOrAccess_c n = (AmbParamTypeOrAccess_c) copy();
-            n.prefix = prefix;
-            n.expr = expr;
-            return n;
-        }
-
-        return this;
+    protected <N extends AmbParamTypeOrAccess_c> N reconstruct(N n,
+            Receiver prefix, Object expr) {
+        n = prefix(n, prefix);
+        n = expr(n, expr);
+        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Receiver prefix = (Receiver) visitChild(this.prefix, v);
+        Receiver prefix = visitChild(this.prefix, v);
         Object expr = this.expr;
         if (expr instanceof Expr) {
             expr = visitChild((Expr) expr, v);
         }
-        return reconstruct(prefix, expr);
+        return reconstruct(this, prefix, expr);
     }
 
     @Override

@@ -33,7 +33,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -76,7 +75,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
     protected <N extends JifClassDecl_c> N constraints(N n,
             List<ConstraintNode<Assertion>> constraints) {
         if (CollectionUtil.equals(n.constraints, constraints)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.constraints = ListUtil.copy(constraints, true);
         return n;
     }
@@ -93,7 +92,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
 
     protected <N extends JifClassDecl_c> N params(N n, List<ParamDecl> params) {
         if (CollectionUtil.equals(n.params, params)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.params = ListUtil.copy(params, true);
         return n;
     }
@@ -111,7 +110,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
     protected <N extends JifClassDecl_c> N authority(N n,
             List<PrincipalNode> authority) {
         if (CollectionUtil.equals(n.authority, authority)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.authority = ListUtil.copy(authority, true);
         return n;
     }

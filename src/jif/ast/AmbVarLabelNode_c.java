@@ -43,8 +43,22 @@ public class AmbVarLabelNode_c extends AmbLabelNode_c implements
     }
 
     public AmbVarLabelNode name(String name) {
-        AmbVarLabelNode_c n = (AmbVarLabelNode_c) copy();
-        n.name = n.name.id(name);
+        return name(this, name);
+    }
+
+    protected <N extends AmbVarLabelNode_c> N name(N n, String name) {
+        if (n.name.id().equals(name)) return n;
+        return id(n, n.name.id(name));
+    }
+
+    public AmbVarLabelNode id(Id id) {
+        return id(this, id);
+    }
+
+    protected <N extends AmbVarLabelNode_c> N id(N n, Id id) {
+        if (n.name == id) return n;
+        n = copyIfNeeded(n);
+        n.name = id;
         return n;
     }
 
@@ -52,16 +66,12 @@ public class AmbVarLabelNode_c extends AmbLabelNode_c implements
     public Node visitChildren(NodeVisitor v) {
         if (this.name == null) return this;
 
-        Id name = (Id) visitChild(this.name, v);
-        return reconstruct(name);
+        Id name = visitChild(this.name, v);
+        return reconstruct(this, name);
     }
 
-    protected AmbVarLabelNode_c reconstruct(Id name) {
-        if (this.name == name) {
-            return this;
-        }
-        AmbVarLabelNode_c n = (AmbVarLabelNode_c) this.copy();
-        n.name = name;
+    protected <N extends AmbVarLabelNode_c> N reconstruct(N n, Id name) {
+        n = id(n, name);
         return n;
     }
 

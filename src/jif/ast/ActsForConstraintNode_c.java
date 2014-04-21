@@ -43,7 +43,13 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
     @Override
     public ActsForConstraintNode<Actor, Granter> actor(
             ActsForParamNode<Actor> actor) {
-        ActsForConstraintNode_c<Actor, Granter> n = copy();
+        return actor(this, actor);
+    }
+
+    protected <N extends ActsForConstraintNode_c<Actor, Granter>> N actor(N n,
+            ActsForParamNode<Actor> actor) {
+        if (n.actor == actor) return n;
+        n = copyIfNeeded(n);
         n.actor = actor;
         if (constraint() != null) {
             n.setConstraint(constraint().actor(actor.parameter()));
@@ -65,7 +71,13 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
     @Override
     public ActsForConstraintNode<Actor, Granter> granter(
             ActsForParamNode<Granter> granter) {
-        ActsForConstraintNode_c<Actor, Granter> n = copy();
+        return granter(this, granter);
+    }
+
+    protected <N extends ActsForConstraintNode_c<Actor, Granter>> N granter(
+            N n, ActsForParamNode<Granter> granter) {
+        if (n.granter == granter) return n;
+        n = copyIfNeeded(n);
         n.granter = granter;
         if (constraint() != null) {
             n.setConstraint(constraint().granter(granter.parameter()));
@@ -73,26 +85,19 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
         return n;
     }
 
-    protected ActsForConstraintNode_c<Actor, Granter> reconstruct(
-            ActsForParamNode<Actor> actor, ActsForParamNode<Granter> granter) {
-        if (actor != this.actor || granter != this.granter) {
-            ActsForConstraintNode_c<Actor, Granter> n = copy();
-            return (ActsForConstraintNode_c<Actor, Granter>) n.actor(actor)
-                    .granter(granter);
-        }
-
-        return this;
+    protected <N extends ActsForConstraintNode_c<Actor, Granter>> N reconstruct(
+            N n, ActsForParamNode<Actor> actor,
+            ActsForParamNode<Granter> granter) {
+        n = actor(n, actor);
+        n = granter(n, granter);
+        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        @SuppressWarnings("unchecked")
-        ActsForParamNode<Actor> actor =
-                (ActsForParamNode<Actor>) visitChild(this.actor, v);
-        @SuppressWarnings("unchecked")
-        ActsForParamNode<Granter> granter =
-                (ActsForParamNode<Granter>) visitChild(this.granter, v);
-        return reconstruct(actor, granter);
+        ActsForParamNode<Actor> actor = visitChild(this.actor, v);
+        ActsForParamNode<Granter> granter = visitChild(this.granter, v);
+        return reconstruct(this, actor, granter);
     }
 
     /**
