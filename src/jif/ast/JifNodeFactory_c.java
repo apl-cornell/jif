@@ -65,8 +65,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     @Override
     public CanonicalTypeNode CanonicalTypeNode(Position pos, Type type) {
         Ext ext = null;
-        for (ExtFactory extFactory = extFactory(); extFactory != null; extFactory =
-                extFactory.nextExtFactory())
+        for (ExtFactory extFactory : extFactory())
             ext = composeExts(ext, extFactory.extCanonicalTypeNode());
 
         CanonicalTypeNode n = new JifCanonicalTypeNode_c(pos, type);
@@ -252,8 +251,12 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     @Override
     public ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess left,
             polyglot.ast.Assign.Operator op, Expr right) {
+        Ext ext = null;
+        for (ExtFactory extFactory : extFactory())
+            ext = composeExts(ext, extFactory.extArrayAccessAssign());
+
         ArrayAccessAssign n = new JifArrayAccessAssign_c(pos, left, op, right);
-        n = (ArrayAccessAssign) n.ext(extFactory().extArrayAccessAssign());
+        n = (ArrayAccessAssign) n.ext(ext);
         n = (ArrayAccessAssign) n.del(delFactory().delArrayAccessAssign());
         return n;
     }
@@ -375,8 +378,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
             List<Formal> formals, List<TypeNode> throwTypes,
             List<ConstraintNode<Assertion>> constraints, Block body, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extConstructorDecl());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extConstructorDecl());
         return new JifConstructorDecl_c(pos, flags, name, startLabel,
                 returnLabel, formals, throwTypes, constraints, body, ext);
     }
@@ -653,8 +656,12 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
 
     @Override
     public Binary Binary(Position pos, Expr left, Operator op, Expr right) {
+        Ext ext = null;
+        for (ExtFactory extFactory : extFactory())
+            ext = composeExts(ext, extFactory.extBinary());
+
         Binary n = new JifBinary_c(pos, left, op, right);
-        n = (Binary) n.ext(extFactory().extBinary());
+        n = (Binary) n.ext(ext);
         n = (Binary) n.del(delFactory().delBinary());
         return n;
     }
