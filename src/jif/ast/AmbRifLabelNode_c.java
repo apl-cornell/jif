@@ -57,8 +57,7 @@ public class AmbRifLabelNode_c extends LabelNode_c implements RifLabelNode {
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem) sc.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
-        Set<RifConfPolicy> confPolicies =
-                new LinkedHashSet<RifConfPolicy>();
+        Set<ConfPolicy> confPolicies = new LinkedHashSet<ConfPolicy>();
 
         for (RifPolicyNode c : this.policies) {
             if (!c.isDisambiguated()) {

@@ -74,7 +74,6 @@ import jif.types.label.ProviderLabel;
 import jif.types.label.ProviderLabel_c;
 import jif.types.label.ReaderPolicy;
 import jif.types.label.RifConfPolicy;
-import jif.types.label.RifJoinConfPolicy;
 import jif.types.label.RifJoinConfPolicy_c;
 import jif.types.label.RifReaderPolicy_c;
 import jif.types.label.RifVarLabel;
@@ -1134,7 +1133,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public ConfPolicy bottomConfPolicy(Position pos) {
-        Set<RifConfPolicy> s = new LinkedHashSet<RifConfPolicy>();
+        Set<ConfPolicy> s = new LinkedHashSet<ConfPolicy>();
         s.add(rifreaderPolicy(pos, bottomfsm(pos)));
         return rifjoinConfPolicy(pos, s);
     }
@@ -1146,7 +1145,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public ConfPolicy topConfPolicy(Position pos) {
-        Set<RifConfPolicy> s = new LinkedHashSet<RifConfPolicy>();
+        Set<ConfPolicy> s = new LinkedHashSet<ConfPolicy>();
         s.add(rifreaderPolicy(pos, topfsm(pos)));
         return rifjoinConfPolicy(pos, s);
     }
@@ -1572,13 +1571,12 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public ConfPolicy rifjoinConfPolicy(Position pos,
-            Set<RifConfPolicy> components) {
+    public ConfPolicy rifjoinConfPolicy(Position pos, Set<ConfPolicy> components) {
         if (components.isEmpty()) {
             return bottomConfPolicy(pos);
         }
-        return (RifJoinConfPolicy) new RifJoinConfPolicy_c(components, this,
-                pos).simplify();
+        return (ConfPolicy) new RifJoinConfPolicy_c(components, this, pos)
+                .simplify();
     }
 
     @Override
@@ -1590,8 +1588,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 //        }
 //        return (ConfPolicy) new JoinConfPolicy_c(components, this, pos)
 //                .simplify();
-        throw new UnsupportedOperationException(
-                "Try to create jif joinconfpolicy");
+        return rifjoinConfPolicy(pos, components);
     }
 
     @Override
@@ -1700,7 +1697,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         if (p2.isTop() || p1.isBottom()) {
             return p2;
         }
-        Set<RifConfPolicy> s = new HashSet<RifConfPolicy>();
+        Set<ConfPolicy> s = new HashSet<ConfPolicy>();
         s.add(p1);
         s.add(p2);
         Position pos = p1.position();

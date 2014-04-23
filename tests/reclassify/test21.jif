@@ -4,7 +4,7 @@
 
 public class test21{
     
-    public test21() {
+    public test21 {} () {
 
        	int rif[q1*:{Alice},q2:{Alice},f1:q1->q2] res; 
 	

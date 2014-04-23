@@ -22,6 +22,7 @@ import jif.types.SemanticDetailedException;
 import jif.types.label.AccessPath;
 import jif.types.label.AccessPathField;
 import jif.types.label.AccessPathLocal;
+import jif.types.label.ConfPolicy;
 import jif.types.label.ConfProjectionPolicy_c;
 import jif.types.label.DynamicLabel;
 import jif.types.label.IntegProjectionPolicy_c;
@@ -195,7 +196,7 @@ public class LabelTypeCheckUtil {
             }
         } else if (p instanceof RifJoinConfPolicy_c) {
             RifJoinConfPolicy_c rjcp = (RifJoinConfPolicy_c) p;
-            Collection<RifConfPolicy> joinComponents = rjcp.joinComponents();
+            Collection<ConfPolicy> joinComponents = rjcp.joinComponents();
             for (Policy pol : joinComponents) {
                 typeCheckPolicy(tc, pol);
             }

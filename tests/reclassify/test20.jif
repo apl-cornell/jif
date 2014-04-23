@@ -4,22 +4,21 @@
 
 public class test20{
     
-    public test20() {
+    public test20 {} () {
 
        	int rif[q1*:{Alice},q2:{Alice},f1:q1->q2] res; 
 	
-	res = help();
+		res = help();
     }
 
 
     int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2] help(){
 
-	int rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2] y;
+		int rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2] y;
 	
-	y = 10;
+		y = 10;
 
- 	return y;
-
+ 		return y;
     }
 	
 }

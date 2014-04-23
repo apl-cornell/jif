@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import jif.types.label.Label;
-import jif.types.label.PairLabel;
 import jif.types.label.Policy;
 import jif.types.label.RifConfPolicy;
 import jif.types.label.TransitionVarLabel;
@@ -84,7 +83,7 @@ public class VarMap {
         if (v instanceof TransitionVarLabel) {
             TransitionVarLabel reclassbound = (TransitionVarLabel) v;
             Label innerlabel = reclassbound.innerRifLabel();
-            PairLabel innerbound = (PairLabel) bounds.get(innerlabel);
+            Label innerbound = (Label) bounds.get(innerlabel);
             if (innerbound != null) {
                 JifTypeSystem ts = innerbound.typeSystem();
                 RifConfPolicy innerconf =

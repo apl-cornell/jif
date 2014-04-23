@@ -824,7 +824,7 @@ public class LabelEnv_c implements LabelEnv {
             if (p1.leq_(p2, this, state)) return true;
         } else if (p2 instanceof RifReaderPolicy_c) {
             if (p1 instanceof RifJoinConfPolicy) {
-                Iterator<RifConfPolicy> i =
+                Iterator<ConfPolicy> i =
                         ((RifJoinConfPolicy) p1).joinComponents().iterator();
                 p1new = (RifReaderPolicy_c) i.next();
             } else {
@@ -833,7 +833,7 @@ public class LabelEnv_c implements LabelEnv {
             if (p1new.leq_(p2, this, state)) return true;
         } else if (p2 instanceof RifJoinConfPolicy) {
             if (p1 instanceof RifJoinConfPolicy) {
-                Iterator<RifConfPolicy> i =
+                Iterator<ConfPolicy> i =
                         ((RifJoinConfPolicy) p1).joinComponents().iterator();
                 p1new = (RifReaderPolicy_c) i.next();
             } else {
