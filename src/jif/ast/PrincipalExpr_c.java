@@ -4,6 +4,7 @@ import java.util.List;
 
 import jif.types.JifTypeSystem;
 import polyglot.ast.Expr_c;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.types.Type;
@@ -23,8 +24,13 @@ public class PrincipalExpr_c extends Expr_c implements PrincipalExpr {
 
     protected PrincipalNode principal;
 
+    @Deprecated
     public PrincipalExpr_c(Position pos, PrincipalNode principal) {
-        super(pos);
+        this(pos, principal, null);
+    }
+
+    public PrincipalExpr_c(Position pos, PrincipalNode principal, Ext ext) {
+        super(pos, ext);
         this.principal = principal;
     }
 
@@ -52,7 +58,7 @@ public class PrincipalExpr_c extends Expr_c implements PrincipalExpr {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        PrincipalNode principal = (PrincipalNode) visitChild(this.principal, v);
+        PrincipalNode principal = visitChild(this.principal, v);
         return reconstruct(principal);
     }
 

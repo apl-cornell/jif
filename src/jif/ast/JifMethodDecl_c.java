@@ -16,6 +16,7 @@ import jif.types.label.AccessPathRoot;
 import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import polyglot.ast.Block;
+import polyglot.ast.Ext;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.MethodDecl_c;
@@ -34,6 +35,8 @@ import polyglot.visit.NodeVisitor;
 
 /** An implementation of the <code>JifMethod</code> interface.
  */
+// XXX Should be replaced with extension
+@Deprecated
 public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
@@ -41,11 +44,20 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
     protected LabelNode returnLabel;
     protected List<ConstraintNode<Assertion>> constraints;
 
+    @Deprecated
     public JifMethodDecl_c(Position pos, Flags flags, TypeNode returnType,
             Id name, LabelNode startLabel, List<Formal> formals,
             LabelNode returnLabel, List<TypeNode> throwTypes,
             List<ConstraintNode<Assertion>> constraints, Block body) {
-        super(pos, flags, returnType, name, formals, throwTypes, body);
+        this(pos, flags, returnType, name, startLabel, formals, returnLabel,
+                throwTypes, constraints, body, null);
+    }
+
+    public JifMethodDecl_c(Position pos, Flags flags, TypeNode returnType,
+            Id name, LabelNode startLabel, List<Formal> formals,
+            LabelNode returnLabel, List<TypeNode> throwTypes,
+            List<ConstraintNode<Assertion>> constraints, Block body, Ext ext) {
+        super(pos, flags, returnType, name, formals, throwTypes, body, ext);
         this.startLabel = startLabel;
         this.returnLabel = returnLabel;
         this.constraints = ListUtil.copy(constraints, true);

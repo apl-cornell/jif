@@ -7,6 +7,7 @@ import jif.types.AuthConstraint;
 import jif.types.AuthConstraint_c;
 import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -28,8 +29,14 @@ public class AuthConstraintNode_c extends ConstraintNode_c<AuthConstraint>
 
     protected List<PrincipalNode> principals;
 
+    @Deprecated
     public AuthConstraintNode_c(Position pos, List<PrincipalNode> principals) {
-        super(pos);
+        this(pos, principals, null);
+    }
+
+    public AuthConstraintNode_c(Position pos, List<PrincipalNode> principals,
+            Ext ext) {
+        super(pos, ext);
         this.principals = ListUtil.copy(principals, true);
     }
 

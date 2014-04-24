@@ -1,6 +1,7 @@
 package jif.ast;
 
 import jif.types.label.Policy;
+import polyglot.ast.Ext;
 import polyglot.ast.Node_c;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -14,14 +15,24 @@ public class PolicyNode_c extends Node_c implements PolicyNode {
     protected PrincipalNode owner;
     protected Policy policy = null;
 
+    @Deprecated
     public PolicyNode_c(Position pos, Policy policy) {
-        super(pos);
+        this(pos, policy, null);
+    }
+
+    public PolicyNode_c(Position pos, Policy policy, Ext ext) {
+        super(pos, ext);
         this.policy = policy;
         this.owner = null;
     }
 
+    @Deprecated
     public PolicyNode_c(Position pos, PrincipalNode owner) {
-        super(pos);
+        this(pos, owner, null);
+    }
+
+    public PolicyNode_c(Position pos, PrincipalNode owner, Ext ext) {
+        super(pos, ext);
         if (owner == null) throw new InternalCompilerError("null owner");
         this.owner = owner;
     }

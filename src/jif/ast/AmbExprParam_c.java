@@ -7,6 +7,7 @@ import jif.types.ParamInstance;
 import jif.types.SemanticDetailedException;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.ast.Field;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
@@ -30,8 +31,14 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam {
     protected Expr expr;
     protected ParamInstance expectedPI;
 
+    @Deprecated
     public AmbExprParam_c(Position pos, Expr expr, ParamInstance expectedPI) {
-        super(pos);
+        this(pos, expr, expectedPI, null);
+    }
+
+    public AmbExprParam_c(Position pos, Expr expr, ParamInstance expectedPI,
+            Ext ext) {
+        super(pos, ext);
         this.expr = expr;
         this.expectedPI = expectedPI;
     }

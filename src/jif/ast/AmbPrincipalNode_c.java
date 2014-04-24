@@ -15,6 +15,7 @@ import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.ast.Field;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
@@ -42,14 +43,23 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
     protected Expr expr;
     protected Id name;
 
+    @Deprecated
     public AmbPrincipalNode_c(Position pos, Expr expr) {
-        super(pos);
+        this(pos, expr, null);
+    }
+
+    public AmbPrincipalNode_c(Position pos, Expr expr, Ext ext) {
+        super(pos, ext);
         this.expr = expr;
         this.name = null;
     }
 
     public AmbPrincipalNode_c(Position pos, Id name) {
-        super(pos);
+        this(pos, name, null);
+    }
+
+    public AmbPrincipalNode_c(Position pos, Id name, Ext ext) {
+        super(pos, ext);
         this.expr = null;
         this.name = name;
     }

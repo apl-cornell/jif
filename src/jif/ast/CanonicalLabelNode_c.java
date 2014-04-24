@@ -3,6 +3,7 @@ package jif.ast;
 import jif.extension.LabelTypeCheckUtil;
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
@@ -16,8 +17,13 @@ public class CanonicalLabelNode_c extends LabelNode_c implements
         CanonicalLabelNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public CanonicalLabelNode_c(Position pos, Label label) {
-        super(pos, label);
+        this(pos, label, null);
+    }
+
+    public CanonicalLabelNode_c(Position pos, Label label, Ext ext) {
+        super(pos, label, ext);
     }
 
     @Override

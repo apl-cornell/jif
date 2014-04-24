@@ -8,6 +8,7 @@ import jif.types.PrincipalInstance;
 import jif.types.SemanticDetailedException;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
+import polyglot.ast.Ext;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
@@ -28,8 +29,13 @@ public class AmbParam_c extends Node_c implements AmbParam {
     protected Id name;
     protected ParamInstance pi;
 
+    @Deprecated
     public AmbParam_c(Position pos, Id name, ParamInstance pi) {
-        super(pos);
+        this(pos, name, pi, null);
+    }
+
+    public AmbParam_c(Position pos, Id name, ParamInstance pi, Ext ext) {
+        super(pos, ext);
         this.name = name;
         this.pi = pi;
     }

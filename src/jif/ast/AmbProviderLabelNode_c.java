@@ -3,6 +3,7 @@ package jif.ast;
 import jif.types.JifClassType;
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.types.SemanticException;
@@ -20,8 +21,13 @@ public class AmbProviderLabelNode_c extends AmbLabelNode_c implements
 
     TypeNode typeNode;
 
+    @Deprecated
     public AmbProviderLabelNode_c(Position pos, TypeNode typeNode) {
-        super(pos);
+        this(pos, typeNode, null);
+    }
+
+    public AmbProviderLabelNode_c(Position pos, TypeNode typeNode, Ext ext) {
+        super(pos, ext);
         this.typeNode = typeNode;
     }
 

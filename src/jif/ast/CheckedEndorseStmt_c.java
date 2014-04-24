@@ -1,6 +1,7 @@
 package jif.ast;
 
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.ast.If;
 import polyglot.ast.Node;
 import polyglot.ast.Stmt;
@@ -18,9 +19,15 @@ public class CheckedEndorseStmt_c extends EndorseStmt_c implements
 
     protected Expr expr;
 
+    @Deprecated
     public CheckedEndorseStmt_c(Position pos, Expr e, LabelNode bound,
             LabelNode label, If body) {
-        super(pos, bound, label, body);
+        this(pos, e, bound, label, body, null);
+    }
+
+    public CheckedEndorseStmt_c(Position pos, Expr e, LabelNode bound,
+            LabelNode label, If body, Ext ext) {
+        super(pos, bound, label, body, ext);
         this.expr = e;
     }
 

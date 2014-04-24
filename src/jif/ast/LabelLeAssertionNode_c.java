@@ -5,6 +5,7 @@ import java.util.Set;
 
 import jif.types.JifTypeSystem;
 import jif.types.LabelLeAssertion;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -25,9 +26,15 @@ public class LabelLeAssertionNode_c extends ConstraintNode_c<LabelLeAssertion>
     protected LabelNode rhs;
     protected final boolean isEquiv;
 
+    @Deprecated
     public LabelLeAssertionNode_c(Position pos, LabelNode lhs, LabelNode rhs,
             boolean isEquiv) {
-        super(pos);
+        this(pos, lhs, rhs, isEquiv, null);
+    }
+
+    public LabelLeAssertionNode_c(Position pos, LabelNode lhs, LabelNode rhs,
+            boolean isEquiv, Ext ext) {
+        super(pos, ext);
         this.lhs = lhs;
         this.rhs = rhs;
         this.isEquiv = isEquiv;
@@ -82,8 +89,8 @@ public class LabelLeAssertionNode_c extends ConstraintNode_c<LabelLeAssertion>
     /** Visits the children of this node. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        LabelNode lhs = (LabelNode) visitChild(this.lhs, v);
-        LabelNode rhs = (LabelNode) visitChild(this.rhs, v);
+        LabelNode lhs = visitChild(this.lhs, v);
+        LabelNode rhs = visitChild(this.rhs, v);
         return reconstruct(lhs, rhs);
     }
 

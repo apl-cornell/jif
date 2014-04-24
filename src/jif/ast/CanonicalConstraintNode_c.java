@@ -1,6 +1,7 @@
 package jif.ast;
 
 import jif.types.Assertion;
+import polyglot.ast.Ext;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -14,8 +15,13 @@ public class CanonicalConstraintNode_c extends ConstraintNode_c<Assertion>
         implements CanonicalConstraintNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public CanonicalConstraintNode_c(Position pos, Assertion constraint) {
-        super(pos);
+        this(pos, constraint, null);
+    }
+
+    public CanonicalConstraintNode_c(Position pos, Assertion constraint, Ext ext) {
+        super(pos, ext);
         this.setConstraint(constraint);
     }
 

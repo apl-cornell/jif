@@ -4,6 +4,7 @@ import java.util.List;
 
 import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.types.SemanticException;
@@ -24,9 +25,15 @@ public class AmbJunctivePrincipalNode_c extends PrincipalNode_c implements
     protected PrincipalNode right;
     protected boolean isConjunction;
 
+    @Deprecated
     public AmbJunctivePrincipalNode_c(Position pos, PrincipalNode left,
             PrincipalNode right, boolean isConjunction) {
-        super(pos);
+        this(pos, left, right, isConjunction, null);
+    }
+
+    public AmbJunctivePrincipalNode_c(Position pos, PrincipalNode left,
+            PrincipalNode right, boolean isConjunction, Ext ext) {
+        super(pos, ext);
         this.left = left;
         this.right = right;
         this.isConjunction = isConjunction;

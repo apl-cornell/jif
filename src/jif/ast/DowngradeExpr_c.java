@@ -5,6 +5,7 @@ import java.util.List;
 import jif.types.JifTypeSystem;
 import polyglot.ast.Expr;
 import polyglot.ast.Expr_c;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.Precedence;
 import polyglot.ast.Term;
@@ -28,9 +29,15 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr {
     protected LabelNode bound;
     protected Expr expr;
 
+    @Deprecated
     public DowngradeExpr_c(Position pos, Expr expr, LabelNode bound,
             LabelNode label) {
-        super(pos);
+        this(pos, expr, bound, label, null);
+    }
+
+    public DowngradeExpr_c(Position pos, Expr expr, LabelNode bound,
+            LabelNode label, Ext ext) {
+        super(pos, ext);
         this.expr = expr;
         this.bound = bound;
         this.label = label;

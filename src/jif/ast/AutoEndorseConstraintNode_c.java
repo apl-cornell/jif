@@ -3,6 +3,7 @@ package jif.ast;
 import jif.types.AutoEndorseConstraint;
 import jif.types.AutoEndorseConstraint_c;
 import jif.types.JifTypeSystem;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -21,8 +22,14 @@ public class AutoEndorseConstraintNode_c extends
 
     protected LabelNode endorseTo;
 
+    @Deprecated
     public AutoEndorseConstraintNode_c(Position pos, LabelNode endorseTo) {
-        super(pos);
+        this(pos, endorseTo, null);
+    }
+
+    public AutoEndorseConstraintNode_c(Position pos, LabelNode endorseTo,
+            Ext ext) {
+        super(pos, ext);
         this.endorseTo = endorseTo;
     }
 

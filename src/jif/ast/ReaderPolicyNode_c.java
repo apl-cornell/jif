@@ -7,6 +7,7 @@ import java.util.List;
 import jif.types.JifTypeSystem;
 import jif.types.label.Policy;
 import jif.types.principal.Principal;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
@@ -25,9 +26,15 @@ public class ReaderPolicyNode_c extends PolicyNode_c {
 
     protected List<PrincipalNode> principals;
 
+    @Deprecated
     public ReaderPolicyNode_c(Position pos, PrincipalNode owner,
             List<PrincipalNode> principals) {
-        super(pos, owner);
+        this(pos, owner, principals, null);
+    }
+
+    public ReaderPolicyNode_c(Position pos, PrincipalNode owner,
+            List<PrincipalNode> principals, Ext ext) {
+        super(pos, owner, ext);
         this.principals = ListUtil.copy(principals, true);
     }
 
@@ -89,7 +96,7 @@ public class ReaderPolicyNode_c extends PolicyNode_c {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        PrincipalNode owner = (PrincipalNode) visitChild(this.owner, v);
+        PrincipalNode owner = visitChild(this.owner, v);
         List<PrincipalNode> readers = visitList(this.principals, v);
         return reconstruct(owner, readers);
     }

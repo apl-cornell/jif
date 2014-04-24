@@ -3,6 +3,7 @@ package jif.ast;
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
 import polyglot.ast.Ambiguous;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ast.TypeNode_c;
@@ -29,9 +30,15 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode,
     protected TypeNode typePart;
     protected LabelNode labelPart;
 
+    @Deprecated
     public LabeledTypeNode_c(Position pos, TypeNode typePart,
             LabelNode labelPart) {
-        super(pos);
+        this(pos, typePart, labelPart, null);
+    }
+
+    public LabeledTypeNode_c(Position pos, TypeNode typePart,
+            LabelNode labelPart, Ext ext) {
+        super(pos, ext);
         this.typePart = typePart;
         this.labelPart = labelPart;
     }
@@ -74,8 +81,8 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode,
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode typePart = (TypeNode) visitChild(this.typePart, v);
-        LabelNode labelPart = (LabelNode) visitChild(this.labelPart, v);
+        TypeNode typePart = visitChild(this.typePart, v);
+        LabelNode labelPart = visitChild(this.labelPart, v);
         return reconstruct(typePart, labelPart);
     }
 

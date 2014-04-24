@@ -12,6 +12,7 @@ import jif.types.label.ConfPolicy;
 import jif.types.label.IntegPolicy;
 import jif.types.label.Label;
 import jif.types.label.Policy;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -30,8 +31,14 @@ public class MeetLabelNode_c extends AmbLabelNode_c implements MeetLabelNode {
 
     protected List<LabelComponentNode> components;
 
+    @Deprecated
     public MeetLabelNode_c(Position pos, List<LabelComponentNode> components) {
-        super(pos);
+        this(pos, components, null);
+    }
+
+    public MeetLabelNode_c(Position pos, List<LabelComponentNode> components,
+            Ext ext) {
+        super(pos, ext);
         this.components =
                 Collections.unmodifiableList(new ArrayList<LabelComponentNode>(
                         components));

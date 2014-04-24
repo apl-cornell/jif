@@ -4,6 +4,7 @@ import jif.types.label.ConfPolicy;
 import jif.types.label.IntegPolicy;
 import jif.types.label.Label;
 import jif.types.label.PairLabel;
+import polyglot.ast.Ext;
 import polyglot.ast.Node_c;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
@@ -20,12 +21,22 @@ public abstract class LabelNode_c extends Node_c implements LabelNode {
 
     private Label label;
 
+    @Deprecated
     public LabelNode_c(Position pos) {
-        super(pos);
+        this(pos, (Ext) null);
     }
 
+    public LabelNode_c(Position pos, Ext ext) {
+        this(pos, null, ext);
+    }
+
+    @Deprecated
     protected LabelNode_c(Position pos, Label label) {
-        super(pos);
+        this(pos, label, null);
+    }
+
+    protected LabelNode_c(Position pos, Label label, Ext ext) {
+        super(pos, ext);
         this.label = label;
     }
 

@@ -21,6 +21,7 @@ import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl_c;
+import polyglot.ast.Ext;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
@@ -45,6 +46,8 @@ import polyglot.visit.TypeBuilder;
 
 /** An implementation of the <code>JifClassDecl</code> interface.
  */
+// XXX Should be replaced with extension
+@Deprecated
 public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
@@ -52,11 +55,20 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
     protected List<PrincipalNode> authority;
     protected List<ConstraintNode<Assertion>> constraints;
 
+    @Deprecated
     public JifClassDecl_c(Position pos, Flags flags, Id name,
             List<ParamDecl> params, TypeNode superClass,
             List<TypeNode> interfaces, List<PrincipalNode> authority,
             List<ConstraintNode<Assertion>> constraints, ClassBody body) {
-        super(pos, flags, name, superClass, interfaces, body);
+        this(pos, flags, name, params, superClass, interfaces, authority,
+                constraints, body, null);
+    }
+
+    public JifClassDecl_c(Position pos, Flags flags, Id name,
+            List<ParamDecl> params, TypeNode superClass,
+            List<TypeNode> interfaces, List<PrincipalNode> authority,
+            List<ConstraintNode<Assertion>> constraints, ClassBody body, Ext ext) {
+        super(pos, flags, name, superClass, interfaces, body, ext);
         this.params = ListUtil.copy(params, true);
         this.authority = ListUtil.copy(authority, true);
         this.constraints = ListUtil.copy(constraints, true);

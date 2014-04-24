@@ -3,6 +3,7 @@ package jif.ast;
 import jif.types.JifPolyType;
 import jif.types.JifTypeSystem;
 import jif.types.ParamInstance;
+import polyglot.ast.Ext;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
@@ -23,8 +24,13 @@ public class ParamDecl_c extends Node_c implements ParamDecl {
     Id name;
     ParamInstance.Kind kind;
 
+    @Deprecated
     public ParamDecl_c(Position pos, ParamInstance.Kind kind, Id name) {
-        super(pos);
+        this(pos, kind, name, null);
+    }
+
+    public ParamDecl_c(Position pos, ParamInstance.Kind kind, Id name, Ext ext) {
+        super(pos, ext);
         this.kind = kind;
         this.name = name;
     }

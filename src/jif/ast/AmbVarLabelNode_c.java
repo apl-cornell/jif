@@ -7,6 +7,7 @@ import jif.types.ParamInstance;
 import jif.types.PrincipalInstance;
 import jif.types.label.CovariantParamLabel;
 import jif.types.label.ParamLabel;
+import polyglot.ast.Ext;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.types.Context;
@@ -28,7 +29,11 @@ public class AmbVarLabelNode_c extends AmbLabelNode_c implements
     protected Id name;
 
     public AmbVarLabelNode_c(Position pos, Id name) {
-        super(pos);
+        this(pos, name, null);
+    }
+
+    public AmbVarLabelNode_c(Position pos, Id name, Ext ext) {
+        super(pos, ext);
         this.name = name;
     }
 

@@ -2,6 +2,7 @@ package jif.ast;
 
 import java.util.List;
 
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.Stmt;
 import polyglot.ast.Stmt_c;
@@ -24,9 +25,15 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt {
     protected LabelNode label;
     protected Stmt body;
 
+    @Deprecated
     public DowngradeStmt_c(Position pos, LabelNode bound, LabelNode label,
             Stmt body) {
-        super(pos);
+        this(pos, bound, label, body, null);
+    }
+
+    public DowngradeStmt_c(Position pos, LabelNode bound, LabelNode label,
+            Stmt body, Ext ext) {
+        super(pos, ext);
         this.bound = bound;
         this.label = label;
         this.body = body;

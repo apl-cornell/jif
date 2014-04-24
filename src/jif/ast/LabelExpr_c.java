@@ -4,6 +4,7 @@ import java.util.List;
 
 import jif.types.JifTypeSystem;
 import polyglot.ast.Expr_c;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.types.SemanticException;
@@ -26,8 +27,13 @@ public class LabelExpr_c extends Expr_c implements LabelExpr {
 
     protected LabelNode label;
 
+    @Deprecated
     public LabelExpr_c(Position pos, LabelNode label) {
-        super(pos);
+        this(pos, label, null);
+    }
+
+    public LabelExpr_c(Position pos, LabelNode label, Ext ext) {
+        super(pos, ext);
         this.label = label;
     }
 
@@ -55,7 +61,7 @@ public class LabelExpr_c extends Expr_c implements LabelExpr {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        LabelNode label = (LabelNode) visitChild(this.label, v);
+        LabelNode label = visitChild(this.label, v);
         return reconstruct(label);
     }
 

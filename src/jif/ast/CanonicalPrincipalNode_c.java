@@ -5,6 +5,7 @@ import java.util.List;
 import jif.extension.LabelTypeCheckUtil;
 import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.types.SemanticException;
@@ -23,8 +24,13 @@ public class CanonicalPrincipalNode_c extends PrincipalNode_c implements
         CanonicalPrincipalNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public CanonicalPrincipalNode_c(Position pos, Principal principal) {
-        super(pos);
+        this(pos, principal, null);
+    }
+
+    public CanonicalPrincipalNode_c(Position pos, Principal principal, Ext ext) {
+        super(pos, ext);
         this.principal = principal;
     }
 

@@ -8,6 +8,7 @@ import jif.types.JifTypeSystem;
 import jif.types.Param;
 import jif.types.ParamInstance;
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
@@ -30,8 +31,14 @@ public class AmbParamTypeOrAccess_c extends Node_c implements
     protected Object expr;
     protected Type type;
 
+    @Deprecated
     public AmbParamTypeOrAccess_c(Position pos, Receiver prefix, Object expr) {
-        super(pos);
+        this(pos, prefix, expr, null);
+    }
+
+    public AmbParamTypeOrAccess_c(Position pos, Receiver prefix, Object expr,
+            Ext ext) {
+        super(pos, ext);
         this.prefix = prefix;
         this.expr = expr;
     }

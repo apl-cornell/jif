@@ -10,6 +10,7 @@ import jif.types.ParamInstance;
 import jif.types.SemanticDetailedException;
 import polyglot.ast.Expr;
 import polyglot.ast.Expr_c;
+import polyglot.ast.Ext;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
@@ -38,9 +39,15 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray {
     protected List<Expr> dims;
     protected int addDims;
 
+    @Deprecated
     public AmbNewArray_c(Position pos, TypeNode baseType, Object expr,
             List<Expr> dims, int addDims) {
-        super(pos);
+        this(pos, baseType, expr, dims, addDims, null);
+    }
+
+    public AmbNewArray_c(Position pos, TypeNode baseType, Object expr,
+            List<Expr> dims, int addDims, Ext ext) {
+        super(pos, ext);
         this.baseType = baseType;
         this.expr = expr;
         if (!(expr instanceof Expr) && !(expr instanceof Id)) {

@@ -12,6 +12,7 @@ import jif.types.ParamInstance;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
 import polyglot.ast.Ambiguous;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ast.TypeNode_c;
@@ -39,8 +40,14 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode,
     protected TypeNode base;
     protected List<ParamNode> params;
 
+    @Deprecated
     public InstTypeNode_c(Position pos, TypeNode base, List<ParamNode> params) {
-        super(pos);
+        this(pos, base, params, null);
+    }
+
+    public InstTypeNode_c(Position pos, TypeNode base, List<ParamNode> params,
+            Ext ext) {
+        super(pos, ext);
         this.base = base;
         this.params = ListUtil.copy(params, true);
     }
@@ -82,7 +89,7 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode,
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode base = (TypeNode) visitChild(this.base, v);
+        TypeNode base = visitChild(this.base, v);
         Type b = base.type();
 
         List<ParamNode> newParams = this.params;

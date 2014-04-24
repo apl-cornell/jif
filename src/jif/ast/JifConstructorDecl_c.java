@@ -33,6 +33,8 @@ import polyglot.visit.TypeChecker;
 /**
  * An implementation of the <code>JifConstructor</code> interface.
  */
+@Deprecated
+// XXX should be replaced with extension
 public class JifConstructorDecl_c extends ConstructorDecl_c implements
         JifConstructorDecl {
     private static final long serialVersionUID = SerialVersionUID.generate();

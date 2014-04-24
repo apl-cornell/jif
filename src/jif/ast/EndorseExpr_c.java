@@ -1,6 +1,7 @@
 package jif.ast;
 
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -9,9 +10,15 @@ import polyglot.util.SerialVersionUID;
 public class EndorseExpr_c extends DowngradeExpr_c implements EndorseExpr {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public EndorseExpr_c(Position pos, Expr expr, LabelNode bound,
             LabelNode label) {
-        super(pos, expr, bound, label);
+        this(pos, expr, bound, label, null);
+    }
+
+    public EndorseExpr_c(Position pos, Expr expr, LabelNode bound,
+            LabelNode label, Ext ext) {
+        super(pos, expr, bound, label, ext);
     }
 
     @Override

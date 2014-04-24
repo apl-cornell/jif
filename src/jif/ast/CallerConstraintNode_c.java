@@ -7,6 +7,7 @@ import jif.types.CallerConstraint;
 import jif.types.CallerConstraint_c;
 import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -29,8 +30,14 @@ public class CallerConstraintNode_c extends ConstraintNode_c<CallerConstraint>
 
     protected List<PrincipalNode> principals;
 
+    @Deprecated
     public CallerConstraintNode_c(Position pos, List<PrincipalNode> principals) {
-        super(pos);
+        this(pos, principals, null);
+    }
+
+    public CallerConstraintNode_c(Position pos, List<PrincipalNode> principals,
+            Ext ext) {
+        super(pos, ext);
         this.principals = ListUtil.copy(principals, true);
     }
 

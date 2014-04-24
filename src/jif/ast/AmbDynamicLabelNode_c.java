@@ -7,6 +7,7 @@ import jif.types.label.AccessPath;
 import jif.types.label.Label;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.ast.Field;
 import polyglot.ast.Node;
 import polyglot.frontend.MissingDependencyException;
@@ -30,8 +31,13 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements
 
     protected Expr expr;
 
+    @Deprecated
     public AmbDynamicLabelNode_c(Position pos, Expr expr) {
-        super(pos);
+        this(pos, expr, null);
+    }
+
+    public AmbDynamicLabelNode_c(Position pos, Expr expr, Ext ext) {
+        super(pos, ext);
         this.expr = expr;
     }
 

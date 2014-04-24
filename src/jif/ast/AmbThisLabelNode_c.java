@@ -2,6 +2,7 @@ package jif.ast;
 
 import jif.types.JifClassType;
 import jif.types.JifContext;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -16,8 +17,13 @@ public class AmbThisLabelNode_c extends AmbLabelNode_c implements
         AmbThisLabelNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public AmbThisLabelNode_c(Position pos) {
-        super(pos);
+        this(pos, null);
+    }
+
+    public AmbThisLabelNode_c(Position pos, Ext ext) {
+        super(pos, ext);
     }
 
     @Override

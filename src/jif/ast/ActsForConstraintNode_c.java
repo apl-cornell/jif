@@ -3,6 +3,7 @@ package jif.ast;
 import jif.types.ActsForConstraint;
 import jif.types.ActsForParam;
 import jif.types.JifTypeSystem;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -22,17 +23,29 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
     protected ActsForParamNode<Granter> granter;
     protected final boolean isEquiv;
 
+    @Deprecated
     public ActsForConstraintNode_c(Position pos, ActsForParamNode<Actor> actor,
             ActsForParamNode<Granter> granter, boolean isEquiv) {
-        super(pos);
+        this(pos, actor, granter, isEquiv, null);
+    }
+
+    public ActsForConstraintNode_c(Position pos, ActsForParamNode<Actor> actor,
+            ActsForParamNode<Granter> granter, boolean isEquiv, Ext ext) {
+        super(pos, ext);
         this.actor = actor;
         this.granter = granter;
         this.isEquiv = isEquiv;
     }
 
+    @Deprecated
     public ActsForConstraintNode_c(Position pos, ActsForParamNode<Actor> actor,
             ActsForParamNode<Granter> granter) {
-        this(pos, actor, granter, false);
+        this(pos, actor, granter, null);
+    }
+
+    public ActsForConstraintNode_c(Position pos, ActsForParamNode<Actor> actor,
+            ActsForParamNode<Granter> granter, Ext ext) {
+        this(pos, actor, granter, false, ext);
     }
 
     @Override
