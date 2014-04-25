@@ -390,7 +390,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
                 ext =
                         composeExts(ext,
                                 ((JifExtFactory) ef).extAmbPrincipalNode());
-        return new AmbJunctivePrincipalNode_c(pos, left, right, true, ext);
+        return new AmbJunctivePrincipalNode_c(pos, left, right, isConjunction,
+                ext);
     }
 
     @Override
