@@ -8,6 +8,7 @@ import polyglot.types.Flags;
 import polyglot.types.ParsedClassType;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
+import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -26,6 +27,18 @@ public class JifFieldInstance_c extends FieldInstance_c implements
             ReferenceType container, Flags flags, Type type, String name) {
 
         super(ts, pos, container, flags, type, name);
+    }
+
+    @Override
+    public boolean equalsImpl(TypeObject o) {
+        if (!(o instanceof JifFieldInstance)) return false;
+
+        JifFieldInstance jfi = (JifFieldInstance) o;
+        return super.equalsImpl(jfi)
+                && ts.equals(label, jfi.label())
+                && hasInitializer == jfi.hasInitializer()
+                && (hasInitializer ? ts.equals(initializer, jfi.initializer())
+                        : true);
     }
 
     @Override
