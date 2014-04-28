@@ -70,7 +70,7 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam {
 
     protected <N extends AmbExprParam_c> N expectedPI(N n,
             ParamInstance expectedPI) {
-        if (n.expr == expr) return n;
+        if (n.expectedPI == expectedPI) return n;
         n = copyIfNeeded(n);
         n.expectedPI = expectedPI;
         return n;
