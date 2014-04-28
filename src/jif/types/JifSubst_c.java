@@ -41,11 +41,6 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
         return subst.get(pi);
     }
 
-    @Override
-    public void put(ParamInstance pi, Param param) {
-        subst.put(pi, param);
-    }
-
     ////////////////////////////////////////////////////////////////
     // Override substitution methods to handle Jif constructs
 
