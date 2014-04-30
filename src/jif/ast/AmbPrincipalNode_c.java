@@ -54,6 +54,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
         this.name = null;
     }
 
+    @Deprecated
     public AmbPrincipalNode_c(Position pos, Id name) {
         this(pos, name, null);
     }
