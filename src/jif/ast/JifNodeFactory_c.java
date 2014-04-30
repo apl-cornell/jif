@@ -71,7 +71,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
 
     protected JifCanonicalTypeNode JifCanonicalTypeNode(Position pos,
             Type type, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory())
+        for (ExtFactory ef : extFactory)
             ext = composeExts(ext, ef.extCanonicalTypeNode());
         return new JifCanonicalTypeNode_c(pos, type, ext);
     }
@@ -437,7 +437,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     protected final ArrayAccessAssign JifArrayAccessAssign(Position pos,
             ArrayAccess left, polyglot.ast.Assign.Operator op, Expr right,
             Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory())
+        for (ExtFactory ef : extFactory)
             ext = composeExts(ext, ef.extArrayAccessAssign());
         return new JifArrayAccessAssign_c(pos, left, op, right, ext);
     }
@@ -984,7 +984,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
 
     protected final Catch JifCatch(Position pos, Formal formal, Block body,
             Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory())
+        for (ExtFactory ef : extFactory)
             ext = composeExts(ext, ef.extCatch());
         return new JifCatch_c(pos, formal, body, ext);
     }
@@ -998,7 +998,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
 
     protected final Formal JifFormal(Position pos, Flags flags, TypeNode type,
             Id name, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory())
+        for (ExtFactory ef : extFactory)
             ext = composeExts(ext, ef.extFormal());
         return new JifFormal_c(pos, flags, type, name, ext);
     }
@@ -1012,7 +1012,7 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
 
     protected final Binary JifBinary(Position pos, Expr left, Operator op,
             Expr right, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory())
+        for (ExtFactory ef : extFactory)
             ext = composeExts(ext, ef.extBinary());
         return new JifBinary_c(pos, left, op, right, ext);
     }
