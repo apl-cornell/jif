@@ -1,0 +1,11 @@
+// Array length
+// Non-Type-correct
+
+class test26 {
+    void test26{}(){
+	int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2] [] x = {3, 4, 5};
+	int rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2] y;
+
+	y=x.length+7;
+    }
+}

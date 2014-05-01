@@ -1,0 +1,19 @@
+// while-loop
+// Non-Type-correct
+
+public class test32{
+    
+    public test32() {
+
+       	int rif[q1*:{Alice},q2:{Alice},q3:{Alice,Bob},f1:q1->q2,f2:q2->q3,f3:q3->q1] res; 
+       	int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2,f2:q2->q1] x;
+	    
+	x = 200;
+	res = 0;
+
+	while (reclassify(x > 100,f1)) {
+            res = res + 1;
+	    x = x - 10;
+        }
+    }
+}

@@ -70,3 +70,15 @@ echo "--------------------------------------------------"
 echo "paperEvaluation2: N "
 ~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests paperEvaluation2.jif
 echo "--------------------------------------------------"
+echo "test20: Υ "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test20.jif
+echo "--------------------------------------------------"
+echo "test21: Υ "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test21.jif
+echo "--------------------------------------------------"
+echo "test22: Υ "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test22.jif
+echo "--------------------------------------------------"
+echo "test23: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test23.jif
+echo "--------------------------------------------------"

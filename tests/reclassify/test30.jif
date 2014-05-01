@@ -1,0 +1,20 @@
+// Complex guard condition
+// Type-correct
+
+public class test30{
+    
+    public test30() {
+
+       	int rif[q1*:{Alice},q2:{Alice},q3:{Alice},f1:q1->q2,f2:q2->q3,f3:q3->q1] res; 
+       	int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2,f2:q2->q1] x;
+	int rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2] y;
+	    
+	    	x = 96;
+	    	y = 45;
+		res = 0;
+
+		if (x+10>0 && y==3 || y==x){
+			res = y + 20;
+		}
+    }
+}

@@ -1,0 +1,12 @@
+//BadNullException
+//Non-type-correct
+
+import java.lang.*;
+
+public class test29 {
+    public static void main(String[] args) { 
+	// array index out of bounds can be thrown
+	int rif[q1*:{Alice},q2:{Alice},f1:q1->q2] [] a = {1};
+	int i = a[2];
+    }    
+}

@@ -1,0 +1,31 @@
+// rifspecs on objects
+// Non-Type-correct
+
+class Complex
+{
+    public final float real, imag;
+
+    public Complex(float r, float i) {
+	real = r;
+	imag = i;
+    }
+
+    public float real(){
+	return real;
+    }
+
+    public float imag(){
+	return imag;
+    }
+}
+
+public class test33{
+    
+    public test33() {
+
+       	int x;
+	Complex rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2,f2:q2->q1] c = new Complex(1.0,2.0);
+	    
+	x = c.real();
+    }
+}
