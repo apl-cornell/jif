@@ -13,6 +13,7 @@ import polyglot.ast.ArrayAccessAssign;
 import polyglot.ast.Binary;
 import polyglot.ast.Binary.Operator;
 import polyglot.ast.Block;
+import polyglot.ast.Call;
 import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.Catch;
 import polyglot.ast.ClassBody;
@@ -26,6 +27,7 @@ import polyglot.ast.ExtFactory;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.If;
+import polyglot.ast.LocalDecl;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
 import polyglot.ast.NodeFactory_c;
@@ -449,6 +451,22 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
                 Collections.<ParamDecl> emptyList(), superClass, interfaces,
                 Collections.<PrincipalNode> emptyList(),
                 Collections.<ConstraintNode<Assertion>> emptyList(), body);
+    }
+
+    @Override
+    public LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type,
+            Id name, Expr init) {
+        LocalDecl n =
+                JifLocalDecl(pos, flags, type, name, init, null, extFactory());
+        n = del(n, delFactory().delLocalDecl());
+        return n;
+    }
+
+    protected final LocalDecl JifLocalDecl(Position pos, Flags flags,
+            TypeNode type, Id name, Expr init, Ext ext, ExtFactory extFactory) {
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extLocalDecl());
+        return new JifLocalDecl_c(pos, flags, type, name, init, ext);
     }
 
     @Override
@@ -973,6 +991,20 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
             if (ef instanceof JifExtFactory)
                 ext = composeExts(ext, ((JifExtFactory) ef).extPrincipalExpr());
         return new PrincipalExpr_c(pos, principal, ext);
+    }
+
+    @Override
+    public Call Call(Position pos, Receiver target, Id name, List<Expr> args) {
+        Call n = JifCall(pos, target, name, args, null, extFactory());
+        n = del(n, delFactory().delCall());
+        return n;
+    }
+
+    protected final Call JifCall(Position pos, Receiver target, Id name,
+            List<Expr> args, Ext ext, ExtFactory extFactory) {
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extCall());
+        return new JifCall_c(pos, target, name, args, ext);
     }
 
     @Override
