@@ -1,0 +1,13 @@
+/**
+ * A list iterator interface for the Jif collection framework.
+ */
+public interface ListIterator[label L, type T] extends Iterator[L, T] {
+    boolean{L} hasPrevious();
+    T{L} previous{L}():{L} throws (NoSuchElementException{L});
+    int{L} nextIndex();
+    int{L} previousIndex();
+    
+    void set{L}(T{L} o):{L} throws (IllegalStateException{L});
+    void add{L}(T{L} o):{L} 
+        throws (ClassCastException{L}, IllegalArgumentException{L});
+}

@@ -1,0 +1,24 @@
+/**
+ * A list of JifObjects.
+ *
+ * @see jif.util.Collection
+ */
+public interface List[label L, type T] extends Collection[L, T] {
+    T{L;index} get(int index):{L;index}
+	throws (IndexOutOfBoundsException{L;index});
+    T{L} set{L}(int{L} index, T{L} element):{L}
+	throws (IndexOutOfBoundsException{L});
+    void add{L}(int{L} index, T{L} element):{L}
+	throws (IndexOutOfBoundsException{L});
+    T{L} remove{L}(int{L} index)
+	throws (IndexOutOfBoundsException{L});
+
+    int{L;o} indexOf(T o);
+    int{L;o} lastIndexOf(T o);
+    int{L;*lbl;lbl;o} indexOf(label lbl, T o);
+    int{L;*lbl;lbl;o} lastIndexOf(label lbl, T o);
+
+    ListIterator[L, T]{this} listIterator();
+    ListIterator[L, T]{this;L} listIterator{L}(int{L} index)
+	throws (IndexOutOfBoundsException{L});
+}

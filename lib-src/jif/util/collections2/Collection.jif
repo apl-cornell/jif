@@ -1,0 +1,44 @@
+/**
+ * A collection of JifObjects.
+ *
+ * The parameter L is the label of the elements, that is,
+ * the collection contains JifObject[L] elements. It is
+ * also the label for the amount of 
+ * information obtained by knowing what objects are 
+ * contained in this collection.
+ */
+public interface Collection[label L, type T] {
+    int{L} size();
+    boolean{L} isEmpty();
+    boolean{L;o} contains(T o);
+    boolean{L;*lbl;lbl;o} contains(label lbl, T o);
+    Iterator[L, T]{this} iterator();
+
+    T{L}[]{L} toArray{L}();
+    T{L}const[]{L} toConstArray{L}();
+
+    boolean{L} add{L}(T{L} o):{L} throws (ClassCastException{L}, IllegalArgumentException{L});
+    boolean{L} remove{L}(T{L} o);
+
+    boolean{L;c} containsAll(Collection[L, T]{L} c)
+    throws (NullPointerException{c});
+    boolean{L} addAll{L}(Collection[L, T]{L} c)
+    throws (ClassCastException{L}, IllegalArgumentException{L});
+    boolean{L} removeAll{L}(Collection[L, T]{L} c);
+    boolean{L} retainAll{L}(Collection[L, T]{L} c);
+    boolean{L} retainAll{L}(label lbl, Collection[lbl, T]{L} c) where lbl <= L;
+    void clear{L}();
+
+    // all collections must provide a way of accessing elements by index.
+    // this allows clients to iterate over elements without the side-effects
+    // required by iterators.
+    T{L;index} get(int index):{L;index}
+    throws (IndexOutOfBoundsException{L;index});
+
+    // convenience methods that automatically convert Strings to JifStrings.
+    // Note: when keys are returned, they will be returned as JifString[L]s
+    /*boolean{L} add{L}(String{L} o):{L} throws (ClassCastException{L}, IllegalArgumentException{L});
+    boolean{L} remove{L}(String{L} o);
+    boolean{L;o} contains{L}(String{L} o);
+    boolean{L;*lbl;lbl;o} contains{*lbl}(label lbl, String{*lbl} o);*/
+}

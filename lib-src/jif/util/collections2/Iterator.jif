@@ -1,0 +1,9 @@
+/**
+ * An iterator interface for the Jif collection framework.
+ */
+public interface Iterator[label L, type T] {
+    boolean{L} hasNext();
+    T{L} next{L}() throws (NoSuchElementException{L});
+    //? Object{L} next{L}() throws (NoSuchElementException{L});
+    void remove{L}() throws (IllegalStateException{L});
+}

@@ -1,0 +1,9 @@
+public object ContainerHasher implements Hasher[Container] {
+    public int{c} hash(Container c) {
+    	try {
+			return c.i * 31 + c.s.hashCode() * 31;
+		} catch (NullPointerException npe) {
+			throw new Error(npe);
+		}
+    }
+}

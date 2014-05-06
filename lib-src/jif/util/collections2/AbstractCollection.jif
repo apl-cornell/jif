@@ -1,0 +1,199 @@
+/**
+ * Base implementation for Collection.
+ */
+public abstract class AbstractCollection[label L, type T, type E extends Equality[T], type S extends Stringify[T]] implements Collection[L, T] {
+
+    final protected E{L} equality;
+    final protected S{L} stringify;
+    /**
+     * Sole constructor.  (For invocation by subclass constructors, typically
+     * implicit.)
+     */
+    protected AbstractCollection(E{L} equality, S{L} stringify) {
+        this.equality = equality;
+        this.stringify = stringify;
+    }
+
+    public abstract Iterator[L, T]{this} iterator();
+    public abstract int{L} size();
+
+    public final boolean{L} isEmpty() {
+        return size() == 0;
+    }
+
+
+    public boolean{L;o} contains(T o) {
+        return contains(L, o);
+    }
+
+    public boolean{L} add{L}(T{L} o):{L} throws (ClassCastException{L}, IllegalArgumentException{L})
+    {
+        return false;
+    }
+
+    public boolean{L} remove{L}(T{L} o) {
+        try {
+            Iterator[L, T] e = iterator();
+            if (e != null) {
+                if (o == null) {
+                    while (e.hasNext()) {
+                        if (e.next() == null) {
+                            e.remove();
+                            return true;
+                        }
+                    }
+                }
+                else {
+                    while (e.hasNext()) {
+                        if (equality.equals(o, e.next())) {
+                            e.remove();
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        catch (IllegalStateException e) { /* cant happen */ }
+        catch (NoSuchElementException e) { /* cant happen */ }
+        catch (NullPointerException e) { /* cant happen */ }
+        return false;
+    }
+
+    public boolean{L;c} containsAll(Collection[L, T]{L} c):{c} 
+    throws (NullPointerException{c}) {
+        if (c == null) throw new NullPointerException();
+        int size = c.size();
+        int i = 0;
+        boolean containsAll = true;
+        while (i < size) {
+            try {
+                if(!contains(c.get(i))) {
+                    containsAll = false;
+                    break;
+                }
+            }
+            catch (IndexOutOfBoundsException impossible) { }
+            i++;
+        }
+        return containsAll;
+    }
+
+    public boolean{L} addAll{L}(Collection[L, T]{L} c) 
+    throws (ClassCastException{L}, IllegalArgumentException{L}) {
+        boolean{this;L} modified = false;
+        if (c != null) {
+            Iterator[L, T]{this;L} e = c.iterator();
+            while (e != null && e.hasNext()) {
+                try {
+                    if(add(e.next())) {
+                        modified = true;
+                    }
+                }
+                catch (NoSuchElementException impossible) { }
+            }
+        }
+        return modified;
+    }
+
+    public boolean{L} removeAll{L}(Collection[L, T]{L} c) {
+        boolean modified = false;
+        if (c != null) {
+            Iterator[L, T] e = iterator();
+            while (e != null && e.hasNext()) {
+                try {
+                    if(c.contains(e.next())) {
+                        e.remove();
+                        modified = true;
+                    }
+                }
+                catch (IllegalStateException impossible) { }
+                catch (NoSuchElementException impossible) { }
+            }
+        }
+        return modified;
+    }
+
+    public boolean{L} retainAll{L}(Collection[L, T]{L} c) {
+      return retainAll(L, c);
+    }
+    
+    public boolean{L} retainAll{L}(label lbl, Collection[lbl, T]{L} c) where lbl <= L {
+        boolean modified = false;
+        Iterator[L, T] e = iterator();
+        while (e != null && e.hasNext()) {
+            try {
+                T o = e.next();
+                if(c == null || !c.contains(L, o)) {
+                    e.remove();
+                    modified = true;
+                }
+            }
+            catch (IllegalStateException impossible) { }
+            catch (NoSuchElementException impossible) { }
+        }
+        return modified;
+    }
+
+    public void clear{L}() {
+        Iterator[L, T] e = iterator();
+        while (e != null && e.hasNext()) {
+            try {
+                e.next();
+                e.remove();
+            }
+            catch (IllegalStateException impossible) { }
+            catch (NoSuchElementException impossible) { }
+
+        }
+    }
+
+    public T{L}[]{L} toArray{L}() {
+        try {
+            T{L}[] newArray = new T[this.size()]; 
+            Iterator[L, T] e = iterator();
+            int index = 0;
+            while (e != null && e.hasNext()) {
+                try {
+                    T o = e.next();
+                    newArray[index] = o;
+                }
+                catch (NoSuchElementException impossible) { }
+                catch (ArrayIndexOutOfBoundsException impossible) { }
+                index++;
+            }
+            return newArray;
+        }
+        catch (NegativeArraySizeException impossible) { } 
+        return null;
+    }
+    public T{L}const[]{L} toConstArray{L}() {
+        try {
+            return toArray().clone();
+        }
+        catch (NullPointerException imposs) { }
+        return null;
+    }
+
+    public String{L} toString() {
+        String s = "[";
+        int i = 0;
+
+        while (i < size()) {
+            try {
+                T obj = get(i);                
+                if (obj == this) {
+                    s += "(this Collection)";
+                }
+                else {
+                    s += (obj==null?"null":stringify.toString(obj));
+                }
+                if (++i < size()) s += ", ";
+            }
+            catch (IndexOutOfBoundsException e) {}
+            catch (NullPointerException e) {}
+        }
+        s = s + "]";
+        return s;
+    } 
+
+}

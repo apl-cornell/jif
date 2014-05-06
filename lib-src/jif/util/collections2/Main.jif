@@ -1,0 +1,24 @@
+import java.io.PrintStream;
+import jif.runtime.Runtime;
+
+public class Main {
+
+	public static final void main{}(principal{} p, String args[]):{p->} 
+			throws (NoSuchElementException, NullPointerException, SecurityException)
+			where caller(p) {
+		Runtime[p] runtime = Runtime[p].getRuntime();
+		PrintStream[{p->}]{p->} out = runtime==null?null:runtime.stdout(new label {p->});
+		ArrayList[{p->}, Container, ContainerEquality, ContainerStringify, ContainerHasher] l =
+			new ArrayList[{p->}, Container, ContainerEquality, ContainerStringify, ContainerHasher]
+			(single ContainerEquality(), single ContainerStringify(), single ContainerHasher());
+		for (int i = 0; i < 10; i++) {
+			l.add(new Container("Hi" + i, i));
+		}
+		Iterator[{p->}, Container] i = l.iterator();
+		Container c = null;
+		while (i.hasNext()) {
+			c = i.next();
+			out.println(c.s);
+		}
+	}
+}

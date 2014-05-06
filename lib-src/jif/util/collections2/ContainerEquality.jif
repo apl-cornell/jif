@@ -1,0 +1,9 @@
+public object ContainerEquality implements Equality[Container] {
+    public boolean{c1;c2} equals(Container c1, Container c2) {
+    	try {
+			return c1.i == c2.i;
+		} catch (NullPointerException npe) {
+			throw new Error(npe);
+		}
+    }
+}

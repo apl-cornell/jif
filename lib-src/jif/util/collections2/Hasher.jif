@@ -1,0 +1,3 @@
+public interface Hasher[type T] {
+    public int{t} hash(T t);
+}

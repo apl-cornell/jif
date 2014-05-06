@@ -1,0 +1,313 @@
+/**
+ * Base implementation for List.
+ */
+public abstract class AbstractList[label L, type T, type E extends Equality[T], 
+        type S extends Stringify[T], type H extends Hasher[T]] extends AbstractCollection[L, T, E, S] 
+    implements List[L, T] {
+
+    final protected H{L} hasher;
+
+    protected AbstractList(E{L} equality, S{L} stringify, H{L} hasher) {
+        this.hasher = hasher;
+        super(equality, stringify);
+    }
+
+
+    abstract public T{L;index} get(int index):{L;index}
+        throws (IndexOutOfBoundsException{L;index});
+
+    public boolean{L} remove{L}(T{L} o) {
+        int index = 0;
+        int sz = size();
+        while (index < sz) {
+            try {
+                T{L} e = get(index);
+                if (e == o || (e != null && equality.equals(e, o))) {
+                    // remove it...
+                    remove(index);
+                    return true;
+                }
+                index++;
+            }
+            catch (IndexOutOfBoundsException e) {
+                // can't happen...
+            }
+            catch (NullPointerException e) {}
+        }
+        return false;
+    }
+
+
+    // Search Operations
+    public boolean{L;*lbl;lbl;elem} contains(label lbl, T elem) {
+        return indexOf(lbl,elem) >= 0;
+    }
+
+
+    public int{L;o} indexOf(T o) {
+        return indexOf(L, o);
+    }
+    public int{L;*lbl;lbl;o} indexOf(label lbl, T o) {
+        int i = 0;
+        int sz = size();
+        try {
+            while (i < sz) {
+                T e = get(i);
+                if (o == e || (o != null && equality.equals(o, e))) {
+                    return i;
+                }
+                i++;
+            }
+        }
+        catch (IndexOutOfBoundsException e) { /* cant happen */ }
+        catch (NullPointerException e) {}
+        return -1;
+    }
+
+    public int{L;o} lastIndexOf(T o) {
+        return lastIndexOf(L, o);
+    }
+    public int{L;*lbl;lbl;o} lastIndexOf(label lbl, T o) {
+        int i = size() - 1;
+        try {
+            while (i >= 0) {
+                T e = get(i);
+                if (o == e || (o != null && equality.equals(o, e))) {
+                    return i;
+                }
+                i--;
+            }
+        }
+        catch (IndexOutOfBoundsException e) { /* cant happen */ }
+        catch (NullPointerException e) {}
+        return -1;
+    }
+
+
+    // Iterators
+
+    public Iterator[L, T]{this} iterator() {
+        return listIterator();
+    }    
+
+    public ListIterator[L, T]{this} listIterator() {
+        return new ListItr[L, T](this);
+    }    
+
+    public ListIterator[L, T]{this;L} listIterator{L}(int{L} index) 
+        throws (IndexOutOfBoundsException{L}) {
+        if (index<0 || index>size())
+            throw new IndexOutOfBoundsException("Index: "+index);
+        return new ListItr[L, T](this, index);
+    }    
+
+
+
+    // Comparison and hashing
+    public int{L} hashCode() {
+        int hashCode = 1;
+        int i = 0;
+        
+        while (i < size()) {
+            try {
+                T obj = get(i);
+                hashCode = 31*hashCode + (obj==null ? 0 : hasher.hash(obj));
+            }
+            catch (IndexOutOfBoundsException e) {}
+            catch (NullPointerException e) {}
+            i++;
+        }
+        return hashCode;
+    }
+    
+    public boolean{L;o} equals(IDComparable[L] o) {
+        return equals(L, o);
+    }
+
+    public boolean{L; *lbl; lbl; o} equals(label lbl, IDComparable[lbl] o) {
+        if (o == null) 
+            return false;
+        
+        if (!(o instanceof List[lbl, T]))
+            return false;
+        
+        if (o == this)
+            return true;
+        
+        List[lbl, T] that = null;
+        int sz = 0;
+        try {
+            that = (List[lbl, T])o;
+            
+            sz = this.size();
+            if (sz != that.size()) 
+                return false;
+        } 
+        catch(NullPointerException e) {}
+        catch(ClassCastException e) {}
+        
+        int i = 0;
+        while (i < sz) {
+            try {
+                T o1 = that.get(i);
+                T o2 = this.get(i);
+                
+                if (!(o1==null ? o2==null : equality.equals(o1, o2))) {
+                    return false;
+                }
+            }
+            catch (IndexOutOfBoundsException e) { /* cant happen */ }
+            catch (NullPointerException e) {}
+            
+            i++;
+        }
+        return true;
+    }
+
+}
+
+class ListItr[label L, type T]  implements ListIterator[L, T] {
+    // This class maintains the invariant that 0 <= nextIndex <= list.size()
+    private int{L} nextIndex;
+    private int{L} lastIndexReturned;
+
+    private final List[L, T]{this} list;
+    
+    protected ListItr(List[L, T]{this} l) {
+        nextIndex = 0;
+        lastIndexReturned = -1;
+        list = l;
+    }
+
+    protected ListItr(List[L, T]{this} l, int{L} index) {
+        nextIndex = index;
+        lastIndexReturned = -1;
+        list = l;
+    }
+    
+    public boolean{L} hasNext() {
+        List[L, T] l = this.list;
+        
+        if (l != null) {
+            return nextIndex != l.size();
+        }
+
+        return false;
+    }
+    
+    public T{L} next{L}():{L} 
+        throws (NoSuchElementException) {
+	    lastIndexReturned = nextIndex;
+
+	    List[L, T] l = this.list;
+	    if (l == null) 
+		return null; 
+
+	    if (nextIndex == l.size()) {
+		lastIndexReturned = -1;
+		throw new NoSuchElementException();
+	    }
+
+	    try {
+		nextIndex++;
+		return l.get(lastIndexReturned);
+	    }
+	    catch (IndexOutOfBoundsException e) {
+		// cannot happen...
+		return null;
+	    }
+
+	}
+
+    public boolean{L} hasPrevious() {
+        List[L, T] l = this.list;
+        
+        if (l != null) {
+            return nextIndex > 0;
+        }
+        
+        return false;
+    }
+
+    public T{L} previous{L}():{L} 
+        throws (NoSuchElementException) {
+	    lastIndexReturned = nextIndex - 1;
+
+	    List[L, T] l = this.list;
+	    if (l == null) 
+		return null;
+        
+	    if (nextIndex <= 0) {
+		lastIndexReturned = -1;
+		throw new NoSuchElementException();
+	    }
+        
+	    try {
+		nextIndex--;
+		return l.get(lastIndexReturned);
+	    }
+	    catch (IndexOutOfBoundsException e) {
+		// cannot happen...
+		return null;
+	    }
+	}
+
+    public int{L} nextIndex() {
+        return nextIndex;
+    }
+    
+    public int{L} previousIndex() {
+        return nextIndex-1;
+    }
+
+    public void remove{L}():{L} throws (IllegalStateException{L}) {
+        List[L, T] l = this.list;
+        if (l == null) 
+            return;
+
+        if (nextIndex > l.size() || nextIndex <= 0)
+            throw new IllegalStateException();
+
+        try {
+            int n = nextIndex - 1;
+            l.remove(n);
+        }
+        catch (IndexOutOfBoundsException e) {
+            // cannot happen...
+        }
+        nextIndex = nextIndex - 1;
+        lastIndexReturned = -1;
+    }
+
+    public void set{L}(T{L} o):{L} 
+        throws (IllegalStateException{L}) {
+	    List[L, T] l = this.list;
+	    if (l == null) 
+		return;
+
+	    if (lastIndexReturned >= l.size() || lastIndexReturned < 0)
+		throw new IllegalStateException();
+
+	    try {
+		l.set(lastIndexReturned, o);
+	    }
+	    catch (IndexOutOfBoundsException e) {
+		// cannot happen...
+	    }
+	}
+
+    public void add{L}(T{L} o):{L} 
+        throws (ClassCastException{L}, IllegalArgumentException{L}) {
+	    List[L, T] l = this.list;
+	    if (l == null) return;
+
+	    try {
+		l.add(nextIndex, o);
+	    }
+	    catch (IndexOutOfBoundsException e) {
+		// cannot happen
+	    }
+          
+	    lastIndexReturned = -1;
+	}
+}

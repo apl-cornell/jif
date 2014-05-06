@@ -1,0 +1,9 @@
+public object ContainerStringify implements Stringify[Container] {
+	public String{c} toString(Container c) {
+		try {
+			return c.s;
+		} catch (NullPointerException npe) {
+			throw new Error(npe);
+		}
+	}
+}

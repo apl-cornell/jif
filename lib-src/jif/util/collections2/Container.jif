@@ -1,0 +1,9 @@
+public class Container {
+	final public String{this} s;
+	final public int{this} i;
+
+	public Container(String{this} s, int{this} i) {
+		this.s = s;
+		this.i = i;
+	}
+}
