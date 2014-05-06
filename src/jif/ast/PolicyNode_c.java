@@ -15,7 +15,7 @@ public class PolicyNode_c extends Node_c implements PolicyNode {
     protected PrincipalNode owner;
     protected Policy policy = null;
 
-    @Deprecated
+//    @Deprecated
     public PolicyNode_c(Position pos, Policy policy) {
         this(pos, policy, null);
     }

@@ -15,7 +15,7 @@ import polyglot.util.SerialVersionUID;
 public class JifCatch_c extends Catch_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public JifCatch_c(Position pos, Formal formal, Block body) {
         this(pos, formal, body, null);
     }

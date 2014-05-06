@@ -43,7 +43,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
     protected Expr expr;
     protected Id name;
 
-    @Deprecated
+//    @Deprecated
     public AmbPrincipalNode_c(Position pos, Expr expr) {
         this(pos, expr, null);
     }
@@ -54,7 +54,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
         this.name = null;
     }
 
-    @Deprecated
+//    @Deprecated
     public AmbPrincipalNode_c(Position pos, Id name) {
         this(pos, name, null);
     }

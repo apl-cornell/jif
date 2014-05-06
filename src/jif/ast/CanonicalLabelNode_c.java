@@ -17,7 +17,7 @@ public class CanonicalLabelNode_c extends LabelNode_c implements
         CanonicalLabelNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public CanonicalLabelNode_c(Position pos, Label label) {
         this(pos, label, null);
     }

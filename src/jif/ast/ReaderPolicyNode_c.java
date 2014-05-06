@@ -26,7 +26,7 @@ public class ReaderPolicyNode_c extends PolicyNode_c {
 
     protected List<PrincipalNode> principals;
 
-    @Deprecated
+//    @Deprecated
     public ReaderPolicyNode_c(Position pos, PrincipalNode owner,
             List<PrincipalNode> principals) {
         this(pos, owner, principals, null);

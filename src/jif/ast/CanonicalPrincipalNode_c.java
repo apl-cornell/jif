@@ -24,7 +24,7 @@ public class CanonicalPrincipalNode_c extends PrincipalNode_c implements
         CanonicalPrincipalNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public CanonicalPrincipalNode_c(Position pos, Principal principal) {
         this(pos, principal, null);
     }

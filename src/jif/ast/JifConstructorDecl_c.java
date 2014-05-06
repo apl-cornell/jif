@@ -43,7 +43,7 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements
     protected LabelNode returnLabel;
     protected List<ConstraintNode<Assertion>> constraints;
 
-    @Deprecated
+//    @Deprecated
     public JifConstructorDecl_c(Position pos, Flags flags, Id name,
             LabelNode startLabel, LabelNode returnLabel, List<Formal> formals,
             List<TypeNode> throwTypes,

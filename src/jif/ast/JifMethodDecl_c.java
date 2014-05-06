@@ -44,7 +44,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
     protected LabelNode returnLabel;
     protected List<ConstraintNode<Assertion>> constraints;
 
-    @Deprecated
+//    @Deprecated
     public JifMethodDecl_c(Position pos, Flags flags, TypeNode returnType,
             Id name, LabelNode startLabel, List<Formal> formals,
             LabelNode returnLabel, List<TypeNode> throwTypes,

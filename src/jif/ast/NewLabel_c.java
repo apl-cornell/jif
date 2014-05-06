@@ -13,7 +13,7 @@ import polyglot.visit.Translator;
 public class NewLabel_c extends LabelExpr_c implements NewLabel {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public NewLabel_c(Position pos, LabelNode label) {
         this(pos, label, null);
     }

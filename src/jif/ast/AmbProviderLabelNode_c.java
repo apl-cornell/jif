@@ -21,7 +21,7 @@ public class AmbProviderLabelNode_c extends AmbLabelNode_c implements
 
     TypeNode typeNode;
 
-    @Deprecated
+//    @Deprecated
     public AmbProviderLabelNode_c(Position pos, TypeNode typeNode) {
         this(pos, typeNode, null);
     }

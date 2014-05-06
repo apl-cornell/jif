@@ -26,7 +26,7 @@ public class LabelLeAssertionNode_c extends ConstraintNode_c<LabelLeAssertion>
     protected LabelNode rhs;
     protected final boolean isEquiv;
 
-    @Deprecated
+//    @Deprecated
     public LabelLeAssertionNode_c(Position pos, LabelNode lhs, LabelNode rhs,
             boolean isEquiv) {
         this(pos, lhs, rhs, isEquiv, null);

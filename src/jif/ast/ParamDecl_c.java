@@ -24,7 +24,7 @@ public class ParamDecl_c extends Node_c implements ParamDecl {
     Id name;
     ParamInstance.Kind kind;
 
-    @Deprecated
+//    @Deprecated
     public ParamDecl_c(Position pos, ParamInstance.Kind kind, Id name) {
         this(pos, kind, name, null);
     }

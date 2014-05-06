@@ -31,7 +31,7 @@ public class MeetLabelNode_c extends AmbLabelNode_c implements MeetLabelNode {
 
     protected List<LabelComponentNode> components;
 
-    @Deprecated
+//    @Deprecated
     public MeetLabelNode_c(Position pos, List<LabelComponentNode> components) {
         this(pos, components, null);
     }

@@ -14,7 +14,7 @@ public class PrincipalActsForPrincipalConstraintNode_c extends
         PrincipalActsForPrincipalConstraintNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public PrincipalActsForPrincipalConstraintNode_c(Position pos,
             PrincipalNode actor, PrincipalNode granter, boolean isEquiv) {
         this(pos, actor, granter, isEquiv, null);

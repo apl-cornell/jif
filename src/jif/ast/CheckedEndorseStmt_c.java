@@ -19,7 +19,7 @@ public class CheckedEndorseStmt_c extends EndorseStmt_c implements
 
     protected Expr expr;
 
-    @Deprecated
+//    @Deprecated
     public CheckedEndorseStmt_c(Position pos, Expr e, LabelNode bound,
             LabelNode label, If body) {
         this(pos, e, bound, label, body, null);

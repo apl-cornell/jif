@@ -20,7 +20,7 @@ import polyglot.util.SerialVersionUID;
 public class JifArrayAccessAssign_c extends ArrayAccessAssign_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public JifArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op,
             Expr right) {
         this(pos, left, op, right, null);

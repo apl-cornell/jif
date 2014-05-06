@@ -55,7 +55,7 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
     protected List<PrincipalNode> authority;
     protected List<ConstraintNode<Assertion>> constraints;
 
-    @Deprecated
+//    @Deprecated
     public JifClassDecl_c(Position pos, Flags flags, Id name,
             List<ParamDecl> params, TypeNode superClass,
             List<TypeNode> interfaces, List<PrincipalNode> authority,

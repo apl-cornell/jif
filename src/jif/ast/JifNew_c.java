@@ -27,7 +27,7 @@ import polyglot.visit.TypeChecker;
 public class JifNew_c extends New_c implements New {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public JifNew_c(Position pos, Expr outer, TypeNode tn,
             List<Expr> arguments, ClassBody body) {
         this(pos, outer, tn, arguments, body, null);

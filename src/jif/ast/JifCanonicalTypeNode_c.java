@@ -34,7 +34,7 @@ public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements
         JifCanonicalTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public JifCanonicalTypeNode_c(Position pos, Type type) {
         this(pos, type, null);
     }

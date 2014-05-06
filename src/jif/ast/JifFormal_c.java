@@ -18,7 +18,7 @@ import polyglot.util.SerialVersionUID;
 public class JifFormal_c extends Formal_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public JifFormal_c(Position pos, Flags flags, TypeNode type, Id name) {
         this(pos, flags, type, name, null);
     }

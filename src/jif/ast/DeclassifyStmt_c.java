@@ -10,7 +10,7 @@ import polyglot.util.SerialVersionUID;
 public class DeclassifyStmt_c extends DowngradeStmt_c implements DeclassifyStmt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public DeclassifyStmt_c(Position pos, LabelNode bound, LabelNode label,
             Stmt body) {
         this(pos, bound, label, body, null);

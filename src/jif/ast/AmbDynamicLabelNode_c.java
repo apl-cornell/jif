@@ -31,7 +31,7 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements
 
     protected Expr expr;
 
-    @Deprecated
+//    @Deprecated
     public AmbDynamicLabelNode_c(Position pos, Expr expr) {
         this(pos, expr, null);
     }

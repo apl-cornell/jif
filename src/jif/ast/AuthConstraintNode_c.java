@@ -29,7 +29,7 @@ public class AuthConstraintNode_c extends ConstraintNode_c<AuthConstraint>
 
     protected List<PrincipalNode> principals;
 
-    @Deprecated
+//    @Deprecated
     public AuthConstraintNode_c(Position pos, List<PrincipalNode> principals) {
         this(pos, principals, null);
     }

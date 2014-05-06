@@ -30,7 +30,7 @@ public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode,
     protected TypeNode typePart;
     protected LabelNode labelPart;
 
-    @Deprecated
+//    @Deprecated
     public LabeledTypeNode_c(Position pos, TypeNode typePart,
             LabelNode labelPart) {
         this(pos, typePart, labelPart, null);

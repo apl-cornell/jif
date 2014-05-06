@@ -14,7 +14,7 @@ import polyglot.util.SerialVersionUID;
 public class JifBinary_c extends Binary_c implements Binary {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public JifBinary_c(Position pos, Expr left, Operator op, Expr right) {
         this(pos, left, op, right, null);
     }

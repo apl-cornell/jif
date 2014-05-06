@@ -29,7 +29,7 @@ public class AmbParam_c extends Node_c implements AmbParam {
     protected Id name;
     protected ParamInstance pi;
 
-    @Deprecated
+//    @Deprecated
     public AmbParam_c(Position pos, Id name, ParamInstance pi) {
         this(pos, name, pi, null);
     }

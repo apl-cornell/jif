@@ -39,7 +39,7 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray {
     protected List<Expr> dims;
     protected int addDims;
 
-    @Deprecated
+//    @Deprecated
     public AmbNewArray_c(Position pos, TypeNode baseType, Object expr,
             List<Expr> dims, int addDims) {
         this(pos, baseType, expr, dims, addDims, null);

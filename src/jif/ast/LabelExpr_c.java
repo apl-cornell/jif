@@ -27,7 +27,7 @@ public class LabelExpr_c extends Expr_c implements LabelExpr {
 
     protected LabelNode label;
 
-    @Deprecated
+//    @Deprecated
     public LabelExpr_c(Position pos, LabelNode label) {
         this(pos, label, null);
     }

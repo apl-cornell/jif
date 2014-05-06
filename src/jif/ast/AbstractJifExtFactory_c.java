@@ -21,222 +21,446 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extInstTypeNode() {
         Ext e = extInstTypeNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extInstTypeNode();
+            e = composeExts(e, e2);
+        }
         return postExtInstTypeNode(e);
     }
 
     @Override
     public final Ext extLabeledTypeNode() {
         Ext e = extLabeledTypeNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extLabeledTypeNode();
+            e = composeExts(e, e2);
+        }
         return postExtLabeledTypeNode(e);
     }
 
     @Override
     public final Ext extAmbNewArray() {
         Ext e = extAmbNewArrayImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extAmbNewArray();
+            e = composeExts(e, e2);
+        }
         return postExtAmbNewArray(e);
     }
 
     @Override
     public final Ext extAmbParamTypeOrAccess() {
         Ext e = extAmbParamTypeOrAccessImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extAmbParamTypeOrAccess();
+            e = composeExts(e, e2);
+        }
         return postExtAmbParamTypeOrAccess(e);
     }
 
     @Override
     public final Ext extJoinLabelNode() {
         Ext e = extJoinLabelNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extJoinLabelNode();
+            e = composeExts(e, e2);
+        }
         return postExtJoinLabelNode(e);
     }
 
     @Override
     public final Ext extMeetLabelNode() {
         Ext e = extMeetLabelNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extMeetLabelNode();
+            e = composeExts(e, e2);
+        }
         return postExtMeetLabelNode(e);
     }
 
     @Override
     public final Ext extPolicyNode() {
         Ext e = extPolicyNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extPolicyNode();
+            e = composeExts(e, e2);
+        }
         return postExtPolicyNode(e);
     }
 
     @Override
     public final Ext extAmbDynamicLabelNode() {
         Ext e = extAmbDynamicLabelNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extAmbDynamicLabelNode();
+            e = composeExts(e, e2);
+        }
         return postExtAmbDynamicLabelNode(e);
     }
 
     @Override
     public final Ext extAmbVarLabelNode() {
         Ext e = extAmbVarLabelNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extAmbVarLabelNode();
+            e = composeExts(e, e2);
+        }
         return postExtAmbVarLabelNode(e);
     }
 
     @Override
     public final Ext extAmbThisLabelNode() {
         Ext e = extAmbThisLabelNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extAmbThisLabelNode();
+            e = composeExts(e, e2);
+        }
         return postExtAmbThisLabelNode(e);
     }
 
     @Override
     public Ext extAmbProviderLabelNode() {
         Ext e = extAmbProviderLabelNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extAmbProviderLabelNode();
+            e = composeExts(e, e2);
+        }
         return postExtAmbProviderLabelNode(e);
     }
 
     @Override
     public final Ext extCanonicalLabelNode() {
         Ext e = extCanonicalLabelNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extCanonicalLabelNode();
+            e = composeExts(e, e2);
+        }
         return postExtCanonicalLabelNode(e);
     }
 
     @Override
     public final Ext extParamNode() {
         Ext e = extParamNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extParamNode();
+            e = composeExts(e, e2);
+        }
         return postExtParamNode(e);
     }
 
     @Override
     public final Ext extLabelNode() {
         Ext e = extLabelNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extLabelNode();
+            e = composeExts(e, e2);
+        }
         return postExtLabelNode(e);
     }
 
     @Override
     public final Ext extPrincipalNode() {
         Ext e = extPrincipalNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extPrincipalNode();
+            e = composeExts(e, e2);
+        }
         return postExtPrincipalNode(e);
     }
 
     @Override
     public final Ext extAmbPrincipalNode() {
         Ext e = extAmbPrincipalNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extAmbPrincipalNode();
+            e = composeExts(e, e2);
+        }
         return postExtAmbPrincipalNode(e);
     }
 
     @Override
     public final Ext extCanonicalPrincipalNode() {
         Ext e = extCanonicalPrincipalNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extCanonicalPrincipalNode();
+            e = composeExts(e, e2);
+        }
         return postExtCanonicalPrincipalNode(e);
     }
 
     @Override
     public final Ext extAmbParam() {
         Ext e = extAmbParamImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extAmbParam();
+            e = composeExts(e, e2);
+        }
         return postExtAmbParam(e);
     }
 
     @Override
     public final Ext extParamDecl() {
         Ext e = extParamDeclImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extParamDecl();
+            e = composeExts(e, e2);
+        }
         return postExtParamDecl(e);
     }
 
     @Override
     public final Ext extConstraintNode() {
         Ext e = extConstraintNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extConstraintNode();
+            e = composeExts(e, e2);
+        }
         return postExtConstraintNode(e);
     }
 
     @Override
     public final Ext extCanonicalConstraintNode() {
         Ext e = extCanonicalConstraintNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extCanonicalConstraintNode();
+            e = composeExts(e, e2);
+        }
         return postExtCanonicalConstraintNode(e);
     }
 
     @Override
     public final Ext extAuthConstraintNode() {
         Ext e = extAuthConstraintNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extAuthConstraintNode();
+            e = composeExts(e, e2);
+        }
         return postExtAuthConstraintNode(e);
     }
 
     @Override
     public final Ext extAutoEndorseConstraintNode() {
         Ext e = extAutoEndorseConstraintNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extAutoEndorseConstraintNode();
+            e = composeExts(e, e2);
+        }
         return postExtAutoEndorseConstraintNode(e);
     }
 
     @Override
     public final Ext extCallerConstraintNode() {
         Ext e = extCallerConstraintNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extCallerConstraintNode();
+            e = composeExts(e, e2);
+        }
         return postExtCallerConstraintNode(e);
     }
 
     @Override
     public final Ext extActsForConstraintNode() {
         Ext e = extActsForConstraintNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extActsForConstraintNode();
+            e = composeExts(e, e2);
+        }
         return postExtActsForConstraintNode(e);
     }
 
     @Override
     public final Ext extLabelActsForPrincipalConstraintNode() {
         Ext e = extLabelActsForPrincipalConstraintNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extLabelActsForPrincipalConstraintNode();
+            e = composeExts(e, e2);
+        }
         return postExtLabelActsForPrincipalConstraintNode(e);
     }
 
     @Override
     public final Ext extLabelActsForLabelConstraintNode() {
         Ext e = extLabelActsForLabelConstraintNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extLabelActsForLabelConstraintNode();
+            e = composeExts(e, e2);
+        }
         return postExtLabelActsForLabelConstraintNode(e);
     }
 
     @Override
     public final Ext extPrincipalActsForPrincipalConstraintNode() {
         Ext e = extPrincipalActsForPrincipalConstraintNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extPrincipalActsForPrincipalConstraintNode();
+            e = composeExts(e, e2);
+        }
         return postExtPrincipalActsForPrincipalConstraintNode(e);
     }
 
     @Override
     public final Ext extLabelLeAssertionNode() {
         Ext e = extLabelLeAssertionNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extLabelLeAssertionNode();
+            e = composeExts(e, e2);
+        }
         return postExtLabelLeAssertionNode(e);
     }
 
     @Override
     public final Ext extDeclassifyStmt() {
         Ext e = extDeclassifyStmtImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifStmtExtFactory) {
+            JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extDeclassifyStmt();
+            e = composeExts(e, e2);
+        }
         return postExtDeclassifyStmt(e);
     }
 
     @Override
     public final Ext extDeclassifyExpr() {
         Ext e = extDeclassifyExprImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extDeclassifyExpr();
+            e = composeExts(e, e2);
+        }
         return postExtDeclassifyExpr(e);
     }
 
     @Override
     public final Ext extEndorseStmt() {
         Ext e = extEndorseStmtImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifStmtExtFactory) {
+            JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extEndorseStmt();
+            e = composeExts(e, e2);
+        }
+
         return postExtEndorseStmt(e);
     }
 
     @Override
     public final Ext extCheckedEndorseStmt() {
         Ext e = extCheckedEndorseStmtImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifStmtExtFactory) {
+            JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extCheckedEndorseStmt();
+            e = composeExts(e, e2);
+        }
+
         return postExtEndorseStmt(e);
     }
 
     @Override
     public final Ext extEndorseExpr() {
         Ext e = extEndorseExprImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extEndorseExpr();
+            e = composeExts(e, e2);
+        }
         return postExtEndorseExpr(e);
     }
 
     @Override
     public final Ext extNewLabel() {
         Ext e = extNewLabelImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extNewLabel();
+            e = composeExts(e, e2);
+        }
         return postExtNewLabel(e);
     }
 
     @Override
     public final Ext extLabelExpr() {
         Ext e = extLabelExprImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extLabelExpr();
+            e = composeExts(e, e2);
+        }
         return postExtLabelExpr(e);
     }
 
     @Override
     public final Ext extPrincipalExpr() {
         Ext e = extPrincipalExprImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extPrincipalExpr();
+            e = composeExts(e, e2);
+        }
         return postExtPrincipalExpr(e);
     }
 

@@ -31,7 +31,7 @@ public class AmbParamTypeOrAccess_c extends Node_c implements
     protected Object expr;
     protected Type type;
 
-    @Deprecated
+//    @Deprecated
     public AmbParamTypeOrAccess_c(Position pos, Receiver prefix, Object expr) {
         this(pos, prefix, expr, null);
     }

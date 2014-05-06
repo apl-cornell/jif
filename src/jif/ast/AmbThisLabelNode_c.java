@@ -17,7 +17,7 @@ public class AmbThisLabelNode_c extends AmbLabelNode_c implements
         AmbThisLabelNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public AmbThisLabelNode_c(Position pos) {
         this(pos, null);
     }

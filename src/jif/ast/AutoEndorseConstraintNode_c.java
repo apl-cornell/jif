@@ -22,7 +22,7 @@ public class AutoEndorseConstraintNode_c extends
 
     protected LabelNode endorseTo;
 
-    @Deprecated
+//    @Deprecated
     public AutoEndorseConstraintNode_c(Position pos, LabelNode endorseTo) {
         this(pos, endorseTo, null);
     }

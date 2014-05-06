@@ -24,7 +24,7 @@ public class PrincipalExpr_c extends Expr_c implements PrincipalExpr {
 
     protected PrincipalNode principal;
 
-    @Deprecated
+//    @Deprecated
     public PrincipalExpr_c(Position pos, PrincipalNode principal) {
         this(pos, principal, null);
     }

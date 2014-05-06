@@ -13,7 +13,7 @@ import polyglot.util.SerialVersionUID;
 public class Prologue_c extends Block_c implements Prologue {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public Prologue_c(Position pos, List<Stmt> statements) {
         this(pos, statements, null);
     }

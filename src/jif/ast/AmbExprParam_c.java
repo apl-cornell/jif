@@ -31,7 +31,7 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam {
     protected Expr expr;
     protected ParamInstance expectedPI;
 
-    @Deprecated
+//    @Deprecated
     public AmbExprParam_c(Position pos, Expr expr, ParamInstance expectedPI) {
         this(pos, expr, expectedPI, null);
     }

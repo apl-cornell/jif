@@ -10,7 +10,7 @@ import polyglot.util.SerialVersionUID;
 public class EndorseStmt_c extends DowngradeStmt_c implements EndorseStmt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public EndorseStmt_c(Position pos, LabelNode bound, LabelNode label,
             Stmt body) {
         this(pos, bound, label, body, null);

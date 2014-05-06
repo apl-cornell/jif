@@ -22,7 +22,7 @@ public class ConstArrayTypeNode_c extends ArrayTypeNode_c implements
         ConstArrayTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public ConstArrayTypeNode_c(Position pos, TypeNode base) {
         this(pos, base, null);
     }

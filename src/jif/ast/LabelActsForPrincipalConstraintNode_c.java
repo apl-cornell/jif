@@ -11,7 +11,7 @@ public class LabelActsForPrincipalConstraintNode_c extends
         LabelActsForPrincipalConstraintNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public LabelActsForPrincipalConstraintNode_c(Position pos, LabelNode actor,
             PrincipalNode granter) {
         this(pos, actor, granter, null);

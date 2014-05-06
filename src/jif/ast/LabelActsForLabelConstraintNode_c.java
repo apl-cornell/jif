@@ -10,7 +10,7 @@ public class LabelActsForLabelConstraintNode_c extends
         LabelActsForLabelConstraintNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public LabelActsForLabelConstraintNode_c(Position pos, LabelNode actor,
             LabelNode granter) {
         this(pos, actor, granter, null);

@@ -15,7 +15,7 @@ public class CanonicalConstraintNode_c extends ConstraintNode_c<Assertion>
         implements CanonicalConstraintNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public CanonicalConstraintNode_c(Position pos, Assertion constraint) {
         this(pos, constraint, null);
     }

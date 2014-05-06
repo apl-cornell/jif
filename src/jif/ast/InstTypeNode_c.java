@@ -40,7 +40,7 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode,
     protected TypeNode base;
     protected List<ParamNode> params;
 
-    @Deprecated
+//    @Deprecated
     public InstTypeNode_c(Position pos, TypeNode base, List<ParamNode> params) {
         this(pos, base, params, null);
     }

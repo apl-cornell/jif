@@ -25,7 +25,7 @@ public class AmbJunctivePrincipalNode_c extends PrincipalNode_c implements
     protected PrincipalNode right;
     protected boolean isConjunction;
 
-    @Deprecated
+//    @Deprecated
     public AmbJunctivePrincipalNode_c(Position pos, PrincipalNode left,
             PrincipalNode right, boolean isConjunction) {
         this(pos, left, right, isConjunction, null);

@@ -32,7 +32,7 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode {
 
     protected List<LabelComponentNode> components;
 
-    @Deprecated
+//    @Deprecated
     public JoinLabelNode_c(Position pos, List<LabelComponentNode> components) {
         this(pos, components, null);
     }
