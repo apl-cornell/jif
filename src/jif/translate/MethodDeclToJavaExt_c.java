@@ -2,7 +2,9 @@ package jif.translate;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import jif.ast.JifMethodDecl;
 import jif.types.ActsForConstraint;
@@ -10,8 +12,13 @@ import jif.types.Assertion;
 import jif.types.JifMethodInstance;
 import jif.types.JifParsedPolyType;
 import jif.types.JifPolyType;
+import jif.types.JifSubstClassType_c;
 import jif.types.JifTypeSystem;
 import jif.types.LabelLeAssertion;
+import jif.types.LabeledType;
+import jif.types.Param;
+import jif.types.ParamInstance;
+import jif.types.TypeParam;
 import polyglot.ast.Binary;
 import polyglot.ast.Block;
 import polyglot.ast.Expr;
@@ -21,9 +28,12 @@ import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Stmt;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
+import polyglot.types.Named;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
@@ -54,6 +64,71 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
     @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         MethodDecl n = (MethodDecl) node();
+        JL5NodeFactory nf = (JL5NodeFactory) rw.java_nf();
+
+        if (n.methodInstance().returnType() instanceof LabeledType) {
+            Type t = ((LabeledType) n.methodInstance().returnType()).typePart();
+            if (t instanceof JifSubstClassType_c) {
+                JifSubstClassType_c subB = (JifSubstClassType_c) t;
+                List<TypeNode> args = new ArrayList<TypeNode>();
+                Iterator<Entry<ParamInstance, Param>> entries =
+                        subB.subst().entries();
+                while (entries.hasNext()) {
+                    Entry<ParamInstance, Param> e = entries.next();
+                    if (e.getKey().isType()) {
+                        TypeParam tp = (TypeParam) e.getValue();
+                        Named namedType = (Named) tp.type();
+                        args.add(nf.AmbTypeNode(e.getValue().position(),
+                                nf.Id(tp.position(), namedType.name())));
+                    }
+                }
+                if (args.size() > 0) {
+                    n =
+                            n.returnType(nf.AmbTypeInstantiation(subB
+                                    .position(),
+                                    nf.AmbTypeNode(subB.position(), nf.Id(n
+                                            .returnType().position(), n
+                                            .returnType().name())), args));
+                }
+            }
+        }
+
+        List<Formal> newFormals = new ArrayList<Formal>();
+        for (int i = 0; i < n.methodInstance().formalTypes().size(); i++) {
+            Type ft = n.methodInstance().formalTypes().get(i);
+            TypeNode tn = null;
+            if (ft instanceof LabeledType) {
+                Type t = ((LabeledType) ft).typePart();
+                if (t instanceof JifSubstClassType_c) {
+                    JifSubstClassType_c subB = (JifSubstClassType_c) t;
+                    List<TypeNode> args = new ArrayList<TypeNode>();
+                    Iterator<Entry<ParamInstance, Param>> entries =
+                            subB.subst().entries();
+                    while (entries.hasNext()) {
+                        Entry<ParamInstance, Param> e = entries.next();
+                        if (e.getKey().isType()) {
+                            TypeParam tp = (TypeParam) e.getValue();
+                            Named namedType = (Named) tp.type();
+                            args.add(nf.AmbTypeNode(e.getValue().position(),
+                                    nf.Id(tp.position(), namedType.name())));
+                        }
+                    }
+                    if (args.size() > 0) {
+                        tn =
+                                nf.AmbTypeInstantiation(
+                                        subB.position(),
+                                        nf.AmbTypeNode(subB.position(), nf.Id(
+                                                t.position(), subB.name())),
+                                        args);
+                    }
+                }
+            }
+            Formal f = n.formals().get(i);
+            newFormals.add(nf.Formal(f.position(), f.flags(),
+                    tn == null ? f.type() : tn, nf.Id(f.position(), f.name())));
+        }
+        n = n.formals(newFormals);
+
         boolean isMainMethod = "main".equals(n.name()) && n.flags().isStatic();
         if (isMainMethod && n.formals().size() == 2) {
             // the method is static main(principal p, String[] args). We
