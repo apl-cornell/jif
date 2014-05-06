@@ -13,6 +13,7 @@ import polyglot.ast.ArrayAccessAssign;
 import polyglot.ast.Binary;
 import polyglot.ast.Binary.Operator;
 import polyglot.ast.Block;
+import polyglot.ast.Call;
 import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.Catch;
 import polyglot.ast.ClassBody;
@@ -21,11 +22,10 @@ import polyglot.ast.ConstructorDecl;
 import polyglot.ast.DelFactory;
 import polyglot.ast.Disamb;
 import polyglot.ast.Expr;
-import polyglot.ast.Ext;
-import polyglot.ast.ExtFactory;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.If;
+import polyglot.ast.LocalDecl;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
 import polyglot.ast.NodeFactory_c;
@@ -63,12 +63,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
 
     @Override
     public CanonicalTypeNode CanonicalTypeNode(Position pos, Type type) {
-        Ext ext = null;
-        for (ExtFactory extFactory : extFactory())
-            ext = composeExts(ext, extFactory.extCanonicalTypeNode());
-
         CanonicalTypeNode n = new JifCanonicalTypeNode_c(pos, type);
-        n = (CanonicalTypeNode) n.ext(ext);
+        n = (CanonicalTypeNode) n.ext(extFactory().extCanonicalTypeNode());
         n = (CanonicalTypeNode) n.del(delFactory().delCanonicalTypeNode());
         return n;
     }
@@ -250,12 +246,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     @Override
     public ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess left,
             polyglot.ast.Assign.Operator op, Expr right) {
-        Ext ext = null;
-        for (ExtFactory extFactory : extFactory())
-            ext = composeExts(ext, extFactory.extArrayAccessAssign());
-
         ArrayAccessAssign n = new JifArrayAccessAssign_c(pos, left, op, right);
-        n = (ArrayAccessAssign) n.ext(ext);
+        n = (ArrayAccessAssign) n.ext(extFactory().extArrayAccessAssign());
         n = (ArrayAccessAssign) n.del(delFactory().delArrayAccessAssign());
         return n;
     }
@@ -263,15 +255,24 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     @Override
     public ClassDecl ClassDecl(Position pos, Flags flags, Id name,
             TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
-      ClassDecl n =
-          new JifClassDecl_c(pos, flags, name,
-                  Collections.<ParamDecl> emptyList(), superClass,
-                  interfaces, Collections.<PrincipalNode> emptyList(),
-                  Collections.<ConstraintNode<Assertion>> emptyList(),
-                  body);
-  n = (ClassDecl) n.ext(extFactory().extClassDecl());
-  n = (ClassDecl) n.del(delFactory().delClassDecl());
-  return n;
+        ClassDecl n =
+                new JifClassDecl_c(pos, flags, name,
+                        Collections.<ParamDecl> emptyList(), superClass,
+                        interfaces, Collections.<PrincipalNode> emptyList(),
+                        Collections.<ConstraintNode<Assertion>> emptyList(),
+                        body);
+        n = (ClassDecl) n.ext(extFactory().extClassDecl());
+        n = (ClassDecl) n.del(delFactory().delClassDecl());
+        return n;
+    }
+
+    @Override
+    public LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type,
+            Id name, Expr init) {
+        LocalDecl n = new JifLocalDecl_c(pos, flags, type, name, init);
+        n = (LocalDecl) n.ext(extFactory().extLocalDecl());
+        n = (LocalDecl) n.del(delFactory().delLocalDecl());
+        return n;
     }
 
     @Override
@@ -291,13 +292,13 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public MethodDecl MethodDecl(Position pos, Flags flags,
             TypeNode returnType, Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body) {
-      MethodDecl n =
-          new JifMethodDecl_c(pos, flags, returnType, name, null,
-                  formals, null, throwTypes,
-                  Collections.<ConstraintNode<Assertion>> emptyList(),
-                  body);
-  n = (MethodDecl) n.ext(extFactory().extMethodDecl());
-  n = (MethodDecl) n.del(delFactory().delMethodDecl());
+        MethodDecl n =
+                new JifMethodDecl_c(pos, flags, returnType, name, null,
+                        formals, null, throwTypes,
+                        Collections.<ConstraintNode<Assertion>> emptyList(),
+                        body);
+        n = (MethodDecl) n.ext(extFactory().extMethodDecl());
+        n = (MethodDecl) n.del(delFactory().delMethodDecl());
         return n;
     }
 
@@ -319,14 +320,14 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     @Override
     public ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-      ConstructorDecl n =
-          new JifConstructorDecl_c(pos, flags, name, null, null, formals,
-                  throwTypes,
-                  Collections.<ConstraintNode<Assertion>> emptyList(),
-                  body);
-  n = (ConstructorDecl) n.ext(extFactory().extConstructorDecl());
-  n = (ConstructorDecl) n.del(delFactory().delConstructorDecl());
-  return n;
+        ConstructorDecl n =
+                new JifConstructorDecl_c(pos, flags, name, null, null, formals,
+                        throwTypes,
+                        Collections.<ConstraintNode<Assertion>> emptyList(),
+                        body);
+        n = (ConstructorDecl) n.ext(extFactory().extConstructorDecl());
+        n = (ConstructorDecl) n.del(delFactory().delConstructorDecl());
+        return n;
     }
 
     @Override
@@ -335,22 +336,11 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
             List<Formal> formals, List<TypeNode> throwTypes,
             List<ConstraintNode<Assertion>> constraints, Block body) {
         JifConstructorDecl n =
-                JifConstructorDecl(pos, flags, name, startLabel, returnLabel,
-                        formals, throwTypes, constraints, body, null,
-                        extFactory());
-        n = del(n, delFactory().delConstructorDecl());
+                new JifConstructorDecl_c(pos, flags, name, startLabel,
+                        returnLabel, formals, throwTypes, constraints, body);
+        n = (JifConstructorDecl) n.ext(extFactory().extConstructorDecl());
+        n = (JifConstructorDecl) n.del(delFactory().delConstructorDecl());
         return n;
-    }
-
-    protected final JifConstructorDecl JifConstructorDecl(Position pos,
-            Flags flags, Id name, LabelNode startLabel, LabelNode returnLabel,
-            List<Formal> formals, List<TypeNode> throwTypes,
-            List<ConstraintNode<Assertion>> constraints, Block body, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extConstructorDecl());
-        return new JifConstructorDecl_c(pos, flags, name, startLabel,
-                returnLabel, formals, throwTypes, constraints, body, ext);
     }
 
     @Override
@@ -608,29 +598,33 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     }
 
     @Override
+    public Call Call(Position pos, Receiver target, Id name, List<Expr> args) {
+        Call n = new JifCall_c(pos, target, name, args);
+        n = (Call) n.ext(extFactory().extCall());
+        n = (Call) n.del(delFactory().delCall());
+        return n;
+    }
+
+    @Override
     public Catch Catch(Position pos, Formal formal, Block body) {
-      Catch n = new JifCatch_c(pos, formal, body);
-      n = (Catch) n.ext(extFactory().extCatch());
-      n = (Catch) n.del(delFactory().delCatch());
-      return n;
+        Catch n = new JifCatch_c(pos, formal, body);
+        n = (Catch) n.ext(extFactory().extCatch());
+        n = (Catch) n.del(delFactory().delCatch());
+        return n;
     }
 
     @Override
     public Formal Formal(Position pos, Flags flags, TypeNode type, Id name) {
-      Formal n = new JifFormal_c(pos, flags, type, name);
-      n = (Formal) n.ext(extFactory().extFormal());
-      n = (Formal) n.del(delFactory().delFormal());
-      return n;
+        Formal n = new JifFormal_c(pos, flags, type, name);
+        n = (Formal) n.ext(extFactory().extFormal());
+        n = (Formal) n.del(delFactory().delFormal());
+        return n;
     }
 
     @Override
     public Binary Binary(Position pos, Expr left, Operator op, Expr right) {
-        Ext ext = null;
-        for (ExtFactory extFactory : extFactory())
-            ext = composeExts(ext, extFactory.extBinary());
-
         Binary n = new JifBinary_c(pos, left, op, right);
-        n = (Binary) n.ext(ext);
+        n = (Binary) n.ext(extFactory().extBinary());
         n = (Binary) n.del(delFactory().delBinary());
         return n;
     }
