@@ -2,11 +2,9 @@
 // Reclassify of combination of two variables - assignment
 // Type-correct
 
-import java.lang.System.out;
-
-public class Main{
+public class test1{
     
-    public main() {
+     public static void  main {} (String[] args) throws (Exception{rif[q1*:{Alice},q2:{Alice},f1:q1->q2]}) {
 
        int rif[q1*:{Alice},q2:{Alice},f1:q1->q2]res; 
 	   int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2] x;
@@ -17,7 +15,7 @@ public class Main{
 	    
 	    res = reclassify(x+y,f1);
 	    
-	    System.out.println("Result:" + res);
+	    throw new Exception("Result: "+res);
 	    
     }
 

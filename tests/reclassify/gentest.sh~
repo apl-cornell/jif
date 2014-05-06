@@ -82,3 +82,42 @@ echo "--------------------------------------------------"
 echo "test23: N "
 ~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test23.jif
 echo "--------------------------------------------------"
+echo "test24: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test24.jif
+echo "--------------------------------------------------"
+echo "test25: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test25.jif
+echo "--------------------------------------------------"
+echo "test26: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test26.jif
+echo "--------------------------------------------------"
+echo "test27: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test27.jif
+echo "--------------------------------------------------"
+echo "test28: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test28.jif
+echo "--------------------------------------------------"
+echo "test29: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test29.jif
+echo "--------------------------------------------------"
+echo "test30: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test30.jif
+echo "--------------------------------------------------"
+echo "test31: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test31.jif
+echo "--------------------------------------------------"
+echo "test32: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test32.jif
+echo "--------------------------------------------------"
+echo "test33: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test33.jif
+echo "--------------------------------------------------"
+echo "test34: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test34.jif
+echo "--------------------------------------------------"
+echo "test35: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test35.jif
+echo "--------------------------------------------------"
+echo "test36: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test36.jif
+echo "--------------------------------------------------"

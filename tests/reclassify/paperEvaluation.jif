@@ -4,7 +4,7 @@
 
 public class paperEvaluation{
     
-    public paperEvaluation() {
+    public static void  main {} (String[] args) throws (Exception{rif[q3*:{Alice,Bob}]}) {
 
 	int rif[q1*:{Alice},q2:{},q3:{Alice,Bob},f1:q1->q2,f2:q1->q3] part_sum;
 	int num;
@@ -23,6 +23,8 @@ public class paperEvaluation{
 		part_sum = part_sum + eval;
 	}
 	if (reclassify((part_sum/num)>5,f2)) result = 1; else result = 0;
+	throw new Exception("Result: "+result);
     }
+    
 }
 
