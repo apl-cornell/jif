@@ -7,6 +7,7 @@ class test28 {
 	int rif[q1*:{Alice},q2:{Alice,Bob},f1:q1->q2] x;	
 	int rif[q1*:{Alice},q2:{Alice},f1:q1->q2] y;
 
+    x = 1;
 	y=7+x;
     }
 }

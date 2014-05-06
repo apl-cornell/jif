@@ -1,19 +1,23 @@
 
 // Reclassify of combination of two variables - assignment
-// Non-type-correct
+// Type-correct
 
-public class test1{
+import java.lang.System.out;
+
+public class Main{
     
-    public test1() {
+    public main() {
 
-       int rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2]res; 
+       int rif[q1*:{Alice},q2:{Alice},f1:q1->q2]res; 
 	   int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2] x;
 	   int rif[q1*:{Alice},q2:{Alice,Bob},f1:q1->q2] y; 
-	    
+	     
 	    x = 96;
 	    y = 45;
 	    
-	    res = reclassify(x+y,f1);  
+	    res = reclassify(x+y,f1);
+	    
+	    System.out.println("Result:" + res);
 	    
     }
 

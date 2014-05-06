@@ -80,7 +80,7 @@ public class RifFSMstate_c implements RifFSMstate {
     @Override
     public List<Principal> confEquivPrincipals() {
         List<Principal> l = new LinkedList<Principal>();
-        if (this.principals == null) return null;
+        if (this.principals == null || this.principals.isEmpty()) return null;
 
         for (Principal p : this.principals) {
             if (p.isBottomPrincipal()) {
@@ -157,7 +157,8 @@ public class RifFSMstate_c implements RifFSMstate {
 
     @Override
     public boolean isTopConfidentiality() {
-        return this.confEquivPrincipals() == null;
+        List<Principal> l = this.confEquivPrincipals();
+        return (l == null || l.size() == 0);
     }
 
     @Override

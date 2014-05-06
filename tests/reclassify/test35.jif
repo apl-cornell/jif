@@ -3,27 +3,28 @@
 
 class Complex
 {
-    public final float rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2,f2:q2->q1] real, imag;
+    public final int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2,f2:q2->q1] real, imag;
 
-    public Complex(float r, float i) {
+    public Complex(int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2,f2:q2->q1] r,int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2,f2:q2->q1] i) {
 	real = r;
 	imag = i;
     }
 
-    public float real(){
+    public int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2,f2:q2->q1] real(){
 	return real;
     }
 
-    public float imag(){
+    public int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2,f2:q2->q1] imag(){
 	return imag;
     }
 }
 
 public class test35{
     
-    public test35() {
+    public test35{}() {
 
        	int rif[q1*:{Alice},q2:{Alice},f1:q1->q2,f2:q2->q1] x;
-	Complex c = new Complex(x,2.0);
+       	x=3;
+	Complex c = new Complex(x,2);
     }
 }
