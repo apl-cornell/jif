@@ -288,6 +288,10 @@ public class SubtypeChecker {
 
                 // add the superclass and all interfaces of poss to the set of candidates.
                 Type possParent = poss.superType();
+                if (possParent == null && poss.flags().isInterface()) {
+                    // Treat Object as a supertype of all interfaces.
+                    possParent = ts.Object();
+                }
                 if (possParent instanceof JifClassType
                         && !checkedPossibles.contains(possParent)
                         && !subPossibles.contains(possParent)) {
