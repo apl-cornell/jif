@@ -20,7 +20,7 @@ import polyglot.util.SerialVersionUID;
 public class JifCall_c extends Call_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public JifCall_c(Position pos, Receiver target, Id name, List<Expr> args) {
         this(pos, target, name, args, null);
     }

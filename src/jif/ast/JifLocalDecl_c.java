@@ -18,7 +18,7 @@ import polyglot.visit.NodeVisitor;
 public class JifLocalDecl_c extends LocalDecl_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public JifLocalDecl_c(Position pos, Flags flags, TypeNode type, Id name,
             Expr init) {
         this(pos, flags, type, name, init, null);
