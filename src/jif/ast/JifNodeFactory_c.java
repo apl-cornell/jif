@@ -64,8 +64,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     @Override
     public CanonicalTypeNode CanonicalTypeNode(Position pos, Type type) {
         CanonicalTypeNode n = new JifCanonicalTypeNode_c(pos, type);
-        n = (CanonicalTypeNode) n.ext(extFactory().extCanonicalTypeNode());
-        n = (CanonicalTypeNode) n.del(delFactory().delCanonicalTypeNode());
+        n = ext(n, extFactory().extCanonicalTypeNode());
+        n = del(n, delFactory().delCanonicalTypeNode());
         return n;
     }
 
@@ -73,8 +73,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public InstTypeNode InstTypeNode(Position pos, TypeNode type,
             List<ParamNode> params) {
         InstTypeNode n = new InstTypeNode_c(pos, type, params);
-        n = (InstTypeNode) n.ext(jifExtFactory().extInstTypeNode());
-        n = (InstTypeNode) n.del(delFactory().delTypeNode());
+        n = ext(n, jifExtFactory().extInstTypeNode());
+        n = del(n, delFactory().delTypeNode());
         return n;
     }
 
@@ -82,8 +82,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public LabeledTypeNode LabeledTypeNode(Position pos, TypeNode type,
             LabelNode label) {
         LabeledTypeNode n = new LabeledTypeNode_c(pos, type, label);
-        n = (LabeledTypeNode) n.ext(jifExtFactory().extLabeledTypeNode());
-        n = (LabeledTypeNode) n.del(delFactory().delTypeNode());
+        n = ext(n, jifExtFactory().extLabeledTypeNode());
+        n = del(n, delFactory().delTypeNode());
         return n;
     }
 
@@ -91,8 +91,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public AmbNewArray AmbNewArray(Position pos, TypeNode baseType,
             Object expr, List<Expr> dims, int addDims) {
         AmbNewArray n = new AmbNewArray_c(pos, baseType, expr, dims, addDims);
-        n = (AmbNewArray) n.ext(jifExtFactory().extAmbNewArray());
-        n = (AmbNewArray) n.del(delFactory().delAmbExpr());
+        n = ext(n, jifExtFactory().extAmbNewArray());
+        n = del(n, delFactory().delAmbExpr());
         return n;
     }
 
@@ -100,10 +100,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public AmbParamTypeOrAccess AmbParamTypeOrAccess(Position pos,
             Receiver base, Object expr) {
         AmbParamTypeOrAccess n = new AmbParamTypeOrAccess_c(pos, base, expr);
-        n =
-                (AmbParamTypeOrAccess) n.ext(jifExtFactory()
-                        .extAmbParamTypeOrAccess());
-        n = (AmbParamTypeOrAccess) n.del(delFactory().delAmbReceiver());
+        n = ext(n, jifExtFactory().extAmbParamTypeOrAccess());
+        n = del(n, delFactory().delAmbReceiver());
         return n;
     }
 
@@ -111,8 +109,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public JoinLabelNode JoinLabelNode(Position pos,
             List<LabelComponentNode> components) {
         JoinLabelNode n = new JoinLabelNode_c(pos, components);
-        n = (JoinLabelNode) n.ext(jifExtFactory().extJoinLabelNode());
-        n = (JoinLabelNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extJoinLabelNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -120,8 +118,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public MeetLabelNode MeetLabelNode(Position pos,
             List<LabelComponentNode> components) {
         MeetLabelNode n = new MeetLabelNode_c(pos, components);
-        n = (MeetLabelNode) n.ext(jifExtFactory().extMeetLabelNode());
-        n = (MeetLabelNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extMeetLabelNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -129,8 +127,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public PolicyNode ReaderPolicyNode(Position pos, PrincipalNode owner,
             List<PrincipalNode> readers) {
         PolicyNode n = new ReaderPolicyNode_c(pos, owner, readers);
-        n = (PolicyNode) n.ext(jifExtFactory().extPolicyNode());
-        n = (PolicyNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extPolicyNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -138,42 +136,40 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public PolicyNode WriterPolicyNode(Position pos, PrincipalNode owner,
             List<PrincipalNode> writers) {
         PolicyNode n = new WriterPolicyNode_c(pos, owner, writers);
-        n = (PolicyNode) n.ext(jifExtFactory().extPolicyNode());
-        n = (PolicyNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extPolicyNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
     @Override
     public PolicyNode PolicyNode(Position pos, Policy policy) {
         PolicyNode n = new PolicyNode_c(pos, policy);
-        n = (PolicyNode) n.ext(jifExtFactory().extPolicyNode());
-        n = (PolicyNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extPolicyNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
     @Override
     public AmbDynamicLabelNode AmbDynamicLabelNode(Position pos, Expr expr) {
         AmbDynamicLabelNode n = new AmbDynamicLabelNode_c(pos, expr);
-        n =
-                (AmbDynamicLabelNode) n.ext(jifExtFactory()
-                        .extAmbDynamicLabelNode());
-        n = (AmbDynamicLabelNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extAmbDynamicLabelNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
     @Override
     public AmbVarLabelNode AmbVarLabelNode(Position pos, Id name) {
         AmbVarLabelNode n = new AmbVarLabelNode_c(pos, name);
-        n = (AmbVarLabelNode) n.ext(jifExtFactory().extAmbVarLabelNode());
-        n = (AmbVarLabelNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extAmbVarLabelNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
     @Override
     public AmbThisLabelNode AmbThisLabelNode(Position pos) {
         AmbThisLabelNode n = new AmbThisLabelNode_c(pos);
-        n = (AmbThisLabelNode) n.ext(jifExtFactory().extAmbThisLabelNode());
-        n = (AmbThisLabelNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extAmbThisLabelNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -181,34 +177,32 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public AmbProviderLabelNode AmbProviderLabelNode(Position pos,
             TypeNode typeNode) {
         AmbProviderLabelNode n = new AmbProviderLabelNode_c(pos, typeNode);
-        n =
-                (AmbProviderLabelNode) n.ext(jifExtFactory()
-                        .extAmbProviderLabelNode());
-        n = (AmbProviderLabelNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extAmbProviderLabelNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
     @Override
     public CanonicalLabelNode CanonicalLabelNode(Position pos, Label label) {
         CanonicalLabelNode n = new CanonicalLabelNode_c(pos, label);
-        n = (CanonicalLabelNode) n.ext(jifExtFactory().extCanonicalLabelNode());
-        n = (CanonicalLabelNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extCanonicalLabelNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
     @Override
     public AmbPrincipalNode AmbPrincipalNode(Position pos, Expr expr) {
         AmbPrincipalNode n = new AmbPrincipalNode_c(pos, expr);
-        n = (AmbPrincipalNode) n.ext(jifExtFactory().extAmbPrincipalNode());
-        n = (AmbPrincipalNode) n.del(delFactory().delExpr());
+        n = ext(n, jifExtFactory().extAmbPrincipalNode());
+        n = del(n, delFactory().delExpr());
         return n;
     }
 
     @Override
     public AmbPrincipalNode AmbPrincipalNode(Position pos, Id name) {
         AmbPrincipalNode n = new AmbPrincipalNode_c(pos, name);
-        n = (AmbPrincipalNode) n.ext(jifExtFactory().extAmbPrincipalNode());
-        n = (AmbPrincipalNode) n.del(delFactory().delExpr());
+        n = ext(n, jifExtFactory().extAmbPrincipalNode());
+        n = del(n, delFactory().delExpr());
         return n;
     }
 
@@ -217,8 +211,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
             PrincipalNode left, PrincipalNode right) {
         AmbPrincipalNode n =
                 new AmbJunctivePrincipalNode_c(pos, left, right, true);
-        n = (AmbPrincipalNode) n.ext(jifExtFactory().extAmbPrincipalNode());
-        n = (AmbPrincipalNode) n.del(delFactory().delExpr());
+        n = ext(n, jifExtFactory().extAmbPrincipalNode());
+        n = del(n, delFactory().delExpr());
         return n;
     }
 
@@ -227,8 +221,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
             PrincipalNode left, PrincipalNode right) {
         AmbPrincipalNode n =
                 new AmbJunctivePrincipalNode_c(pos, left, right, false);
-        n = (AmbPrincipalNode) n.ext(jifExtFactory().extAmbPrincipalNode());
-        n = (AmbPrincipalNode) n.del(delFactory().delExpr());
+        n = ext(n, jifExtFactory().extAmbPrincipalNode());
+        n = del(n, delFactory().delExpr());
         return n;
     }
 
@@ -236,10 +230,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public CanonicalPrincipalNode CanonicalPrincipalNode(Position pos,
             Principal principal) {
         CanonicalPrincipalNode n = new CanonicalPrincipalNode_c(pos, principal);
-        n =
-                (CanonicalPrincipalNode) n.ext(jifExtFactory()
-                        .extCanonicalPrincipalNode());
-        n = (CanonicalPrincipalNode) n.del(delFactory().delExpr());
+        n = ext(n, jifExtFactory().extCanonicalPrincipalNode());
+        n = del(n, delFactory().delExpr());
         return n;
     }
 
@@ -247,8 +239,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess left,
             polyglot.ast.Assign.Operator op, Expr right) {
         ArrayAccessAssign n = new JifArrayAccessAssign_c(pos, left, op, right);
-        n = (ArrayAccessAssign) n.ext(extFactory().extArrayAccessAssign());
-        n = (ArrayAccessAssign) n.del(delFactory().delArrayAccessAssign());
+        n = ext(n, extFactory().extArrayAccessAssign());
+        n = del(n, delFactory().delArrayAccessAssign());
         return n;
     }
 
@@ -261,8 +253,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
                         interfaces, Collections.<PrincipalNode> emptyList(),
                         Collections.<ConstraintNode<Assertion>> emptyList(),
                         body);
-        n = (ClassDecl) n.ext(extFactory().extClassDecl());
-        n = (ClassDecl) n.del(delFactory().delClassDecl());
+        n = ext(n, extFactory().extClassDecl());
+        n = del(n, delFactory().delClassDecl());
         return n;
     }
 
@@ -270,8 +262,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type,
             Id name, Expr init) {
         LocalDecl n = new JifLocalDecl_c(pos, flags, type, name, init);
-        n = (LocalDecl) n.ext(extFactory().extLocalDecl());
-        n = (LocalDecl) n.del(delFactory().delLocalDecl());
+        n = ext(n, extFactory().extLocalDecl());
+        n = del(n, delFactory().delLocalDecl());
         return n;
     }
 
@@ -283,8 +275,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
         JifClassDecl n =
                 new JifClassDecl_c(pos, flags, name, params, superClass,
                         interfaces, authority, constraints, body);
-        n = (JifClassDecl) n.ext(extFactory().extClassDecl());
-        n = (JifClassDecl) n.del(delFactory().delClassDecl());
+        n = ext(n, extFactory().extClassDecl());
+        n = del(n, delFactory().delClassDecl());
         return n;
     }
 
@@ -297,8 +289,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
                         formals, null, throwTypes,
                         Collections.<ConstraintNode<Assertion>> emptyList(),
                         body);
-        n = (MethodDecl) n.ext(extFactory().extMethodDecl());
-        n = (MethodDecl) n.del(delFactory().delMethodDecl());
+        n = ext(n, extFactory().extMethodDecl());
+        n = del(n, delFactory().delMethodDecl());
         return n;
     }
 
@@ -312,8 +304,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
                 new JifMethodDecl_c(pos, flags, returnType, name, startLabel,
                         formals, endLabel, throwTypes, constraints, body);
 
-        n = (JifMethodDecl) n.ext(extFactory().extMethodDecl());
-        n = (JifMethodDecl) n.del(delFactory().delMethodDecl());
+        n = ext(n, extFactory().extMethodDecl());
+        n = del(n, delFactory().delMethodDecl());
         return n;
     }
 
@@ -325,8 +317,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
                         throwTypes,
                         Collections.<ConstraintNode<Assertion>> emptyList(),
                         body);
-        n = (ConstructorDecl) n.ext(extFactory().extConstructorDecl());
-        n = (ConstructorDecl) n.del(delFactory().delConstructorDecl());
+        n = ext(n, extFactory().extConstructorDecl());
+        n = del(n, delFactory().delConstructorDecl());
         return n;
     }
 
@@ -338,8 +330,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
         JifConstructorDecl n =
                 new JifConstructorDecl_c(pos, flags, name, startLabel,
                         returnLabel, formals, throwTypes, constraints, body);
-        n = (JifConstructorDecl) n.ext(extFactory().extConstructorDecl());
-        n = (JifConstructorDecl) n.del(delFactory().delConstructorDecl());
+        n = ext(n, extFactory().extConstructorDecl());
+        n = del(n, delFactory().delConstructorDecl());
         return n;
     }
 
@@ -347,8 +339,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public New New(Position pos, Expr outer, TypeNode objectType,
             List<Expr> args, ClassBody body) {
         New n = new JifNew_c(pos, outer, objectType, args, body);
-        n = (New) n.ext(extFactory().extNew());
-        n = (New) n.del(delFactory().delNew());
+        n = ext(n, extFactory().extNew());
+        n = del(n, delFactory().delNew());
         return n;
     }
 
@@ -360,8 +352,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     @Override
     public AmbParam AmbParam(Position pos, Id name, ParamInstance pi) {
         AmbParam n = new AmbParam_c(pos, name, pi);
-        n = (AmbParam) n.ext(jifExtFactory().extAmbParam());
-        n = (AmbParam) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extAmbParam());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -369,16 +361,16 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public AmbExprParam AmbParam(Position pos, Expr expr,
             ParamInstance expectedPI) {
         AmbExprParam n = new AmbExprParam_c(pos, expr, expectedPI);
-        n = (AmbExprParam) n.ext(jifExtFactory().extAmbParam());
-        n = (AmbExprParam) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extAmbParam());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
     @Override
     public ParamDecl ParamDecl(Position pos, ParamInstance.Kind kind, Id name) {
         ParamDecl n = new ParamDecl_c(pos, kind, name);
-        n = (ParamDecl) n.ext(jifExtFactory().extParamDecl());
-        n = (ParamDecl) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extParamDecl());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -390,10 +382,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
         }
         CanonicalConstraintNode n =
                 new CanonicalConstraintNode_c(pos, constraint);
-        n =
-                (CanonicalConstraintNode) n.ext(jifExtFactory()
-                        .extCanonicalConstraintNode());
-        n = (CanonicalConstraintNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extCanonicalConstraintNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -401,8 +391,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public AuthConstraintNode AuthConstraintNode(Position pos,
             List<PrincipalNode> principals) {
         AuthConstraintNode n = new AuthConstraintNode_c(pos, principals);
-        n = (AuthConstraintNode) n.ext(jifExtFactory().extAuthConstraintNode());
-        n = (AuthConstraintNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extAuthConstraintNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -411,10 +401,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
             LabelNode endorseTo) {
         AutoEndorseConstraintNode n =
                 new AutoEndorseConstraintNode_c(pos, endorseTo);
-        n =
-                (AutoEndorseConstraintNode) n.ext(jifExtFactory()
-                        .extAutoEndorseConstraintNode());
-        n = (AutoEndorseConstraintNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extAutoEndorseConstraintNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -422,10 +410,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public CallerConstraintNode CallerConstraintNode(Position pos,
             List<PrincipalNode> principals) {
         CallerConstraintNode n = new CallerConstraintNode_c(pos, principals);
-        n =
-                (CallerConstraintNode) n.ext(jifExtFactory()
-                        .extCallerConstraintNode());
-        n = (CallerConstraintNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extCallerConstraintNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -444,11 +430,9 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
                 new PrincipalActsForPrincipalConstraintNode_c(pos, actor,
                         granter, isEquiv);
         n =
-                (PrincipalActsForPrincipalConstraintNode) n.ext(jifExtFactory()
+                ext(n, jifExtFactory()
                         .extPrincipalActsForPrincipalConstraintNode());
-        n =
-                (PrincipalActsForPrincipalConstraintNode) n.del(delFactory()
-                        .delNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -457,10 +441,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
             Position pos, LabelNode actor, PrincipalNode granter) {
         LabelActsForPrincipalConstraintNode n =
                 new LabelActsForPrincipalConstraintNode_c(pos, actor, granter);
-        n =
-                (LabelActsForPrincipalConstraintNode) n.ext(jifExtFactory()
-                        .extLabelActsForPrincipalConstraintNode());
-        n = (LabelActsForPrincipalConstraintNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extLabelActsForPrincipalConstraintNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -469,10 +451,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
             Position pos, LabelNode actor, LabelNode granter) {
         LabelActsForLabelConstraintNode n =
                 new LabelActsForLabelConstraintNode_c(pos, actor, granter);
-        n =
-                (LabelActsForLabelConstraintNode) n.ext(jifExtFactory()
-                        .extLabelActsForPrincipalConstraintNode());
-        n = (LabelActsForLabelConstraintNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extLabelActsForPrincipalConstraintNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -481,10 +461,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
             LabelNode lhs, LabelNode rhs, boolean isEquiv) {
         LabelLeAssertionNode n =
                 new LabelLeAssertionNode_c(pos, lhs, rhs, isEquiv);
-        n =
-                (LabelLeAssertionNode) n.ext(jifExtFactory()
-                        .extLabelLeAssertionNode());
-        n = (LabelLeAssertionNode) n.del(delFactory().delNode());
+        n = ext(n, jifExtFactory().extLabelLeAssertionNode());
+        n = del(n, delFactory().delNode());
         return n;
     }
 
@@ -492,8 +470,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public DeclassifyStmt DeclassifyStmt(Position pos, LabelNode bound,
             LabelNode label, Stmt body) {
         DeclassifyStmt n = new DeclassifyStmt_c(pos, bound, label, body);
-        n = (DeclassifyStmt) n.ext(jifExtFactory().extDeclassifyStmt());
-        n = (DeclassifyStmt) n.del(delFactory().delStmt());
+        n = ext(n, jifExtFactory().extDeclassifyStmt());
+        n = del(n, delFactory().delStmt());
         return n;
     }
 
@@ -501,8 +479,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public DeclassifyStmt DeclassifyStmt(Position pos, LabelNode label,
             Stmt body) {
         DeclassifyStmt n = new DeclassifyStmt_c(pos, null, label, body);
-        n = (DeclassifyStmt) n.ext(jifExtFactory().extDeclassifyStmt());
-        n = (DeclassifyStmt) n.del(delFactory().delStmt());
+        n = ext(n, jifExtFactory().extDeclassifyStmt());
+        n = del(n, delFactory().delStmt());
         return n;
     }
 
@@ -510,8 +488,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public DeclassifyExpr DeclassifyExpr(Position pos, Expr expr,
             LabelNode bound, LabelNode label) {
         DeclassifyExpr n = new DeclassifyExpr_c(pos, expr, bound, label);
-        n = (DeclassifyExpr) n.ext(jifExtFactory().extDeclassifyExpr());
-        n = (DeclassifyExpr) n.del(delFactory().delExpr());
+        n = ext(n, jifExtFactory().extDeclassifyExpr());
+        n = del(n, delFactory().delExpr());
         return n;
     }
 
@@ -519,8 +497,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public DeclassifyExpr DeclassifyExpr(Position pos, Expr expr,
             LabelNode label) {
         DeclassifyExpr n = new DeclassifyExpr_c(pos, expr, null, label);
-        n = (DeclassifyExpr) n.ext(jifExtFactory().extDeclassifyExpr());
-        n = (DeclassifyExpr) n.del(delFactory().delExpr());
+        n = ext(n, jifExtFactory().extDeclassifyExpr());
+        n = del(n, delFactory().delExpr());
         return n;
     }
 
@@ -528,16 +506,16 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public EndorseStmt EndorseStmt(Position pos, LabelNode bound,
             LabelNode label, Stmt body) {
         EndorseStmt n = new EndorseStmt_c(pos, bound, label, body);
-        n = (EndorseStmt) n.ext(jifExtFactory().extEndorseStmt());
-        n = (EndorseStmt) n.del(delFactory().delStmt());
+        n = ext(n, jifExtFactory().extEndorseStmt());
+        n = del(n, delFactory().delStmt());
         return n;
     }
 
     @Override
     public EndorseStmt EndorseStmt(Position pos, LabelNode label, Stmt body) {
         EndorseStmt n = new EndorseStmt_c(pos, null, label, body);
-        n = (EndorseStmt) n.ext(jifExtFactory().extEndorseStmt());
-        n = (EndorseStmt) n.del(delFactory().delStmt());
+        n = ext(n, jifExtFactory().extEndorseStmt());
+        n = del(n, delFactory().delStmt());
         return n;
     }
 
@@ -546,16 +524,16 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
             LabelNode bound, LabelNode label, If body) {
         CheckedEndorseStmt n =
                 new CheckedEndorseStmt_c(pos, e, bound, label, body);
-        n = (CheckedEndorseStmt) n.ext(jifExtFactory().extCheckedEndorseStmt());
-        n = (CheckedEndorseStmt) n.del(delFactory().delStmt());
+        n = ext(n, jifExtFactory().extCheckedEndorseStmt());
+        n = del(n, delFactory().delStmt());
         return n;
     }
 
     @Override
     public EndorseExpr EndorseExpr(Position pos, Expr expr, LabelNode label) {
         EndorseExpr n = new EndorseExpr_c(pos, expr, null, label);
-        n = (EndorseExpr) n.ext(jifExtFactory().extEndorseExpr());
-        n = (EndorseExpr) n.del(delFactory().delExpr());
+        n = ext(n, jifExtFactory().extEndorseExpr());
+        n = del(n, delFactory().delExpr());
         return n;
     }
 
@@ -563,8 +541,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public EndorseExpr EndorseExpr(Position pos, Expr expr, LabelNode bound,
             LabelNode label) {
         EndorseExpr n = new EndorseExpr_c(pos, expr, bound, label);
-        n = (EndorseExpr) n.ext(jifExtFactory().extEndorseExpr());
-        n = (EndorseExpr) n.del(delFactory().delExpr());
+        n = ext(n, jifExtFactory().extEndorseExpr());
+        n = del(n, delFactory().delExpr());
         return n;
     }
 
@@ -576,56 +554,56 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
 
     public LabelExpr LabelExpr(Position pos, LabelNode node) {
         LabelExpr n = new LabelExpr_c(pos, node);
-        n = (LabelExpr) n.ext(jifExtFactory().extLabelExpr());
-        n = (LabelExpr) n.del(((JifDelFactory) delFactory()).delLabelExpr());
+        n = ext(n, jifExtFactory().extLabelExpr());
+        n = del(n, ((JifDelFactory) delFactory()).delLabelExpr());
         return n;
     }
 
     @Override
     public NewLabel NewLabel(Position pos, LabelNode label) {
         NewLabel n = new NewLabel_c(pos, label);
-        n = (NewLabel) n.ext(jifExtFactory().extNewLabel());
-        n = (NewLabel) n.del(((JifDelFactory) delFactory()).delNewLabel());
+        n = ext(n, jifExtFactory().extNewLabel());
+        n = del(n, ((JifDelFactory) delFactory()).delNewLabel());
         return n;
     }
 
     @Override
     public PrincipalExpr PrincipalExpr(Position pos, PrincipalNode principal) {
         PrincipalExpr n = new PrincipalExpr_c(pos, principal);
-        n = (PrincipalExpr) n.ext(jifExtFactory().extPrincipalExpr());
-        n = (PrincipalExpr) n.del(delFactory().delExpr());
+        n = ext(n, jifExtFactory().extPrincipalExpr());
+        n = del(n, delFactory().delExpr());
         return n;
     }
 
     @Override
     public Call Call(Position pos, Receiver target, Id name, List<Expr> args) {
         Call n = new JifCall_c(pos, target, name, args);
-        n = (Call) n.ext(extFactory().extCall());
-        n = (Call) n.del(delFactory().delCall());
+        n = ext(n, extFactory().extCall());
+        n = del(n, delFactory().delCall());
         return n;
     }
 
     @Override
     public Catch Catch(Position pos, Formal formal, Block body) {
         Catch n = new JifCatch_c(pos, formal, body);
-        n = (Catch) n.ext(extFactory().extCatch());
-        n = (Catch) n.del(delFactory().delCatch());
+        n = ext(n, extFactory().extCatch());
+        n = del(n, delFactory().delCatch());
         return n;
     }
 
     @Override
     public Formal Formal(Position pos, Flags flags, TypeNode type, Id name) {
         Formal n = new JifFormal_c(pos, flags, type, name);
-        n = (Formal) n.ext(extFactory().extFormal());
-        n = (Formal) n.del(delFactory().delFormal());
+        n = ext(n, extFactory().extFormal());
+        n = del(n, delFactory().delFormal());
         return n;
     }
 
     @Override
     public Binary Binary(Position pos, Expr left, Operator op, Expr right) {
         Binary n = new JifBinary_c(pos, left, op, right);
-        n = (Binary) n.ext(extFactory().extBinary());
-        n = (Binary) n.del(delFactory().delBinary());
+        n = ext(n, extFactory().extBinary());
+        n = del(n, delFactory().delBinary());
         return n;
     }
 
@@ -637,8 +615,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     @Override
     public Prologue Prologue(Position pos, List<Stmt> stmts) {
         Prologue n = new Prologue_c(pos, stmts);
-        n = (Prologue) n.ext(extFactory().extBlock());
-        n = (Prologue) n.del(delFactory().delBlock());
+        n = ext(n, extFactory().extBlock());
+        n = del(n, delFactory().delBlock());
         return n;
     }
 }
