@@ -1,0 +1,13 @@
+public class dynTest[label L1, label L2, label L3] {
+
+   int{L1} res;
+   int{L2} x;
+   int{L3} y;
+
+   public dynTest() where L2<=L1, L3<=L1 {
+       x = 96;
+       y = 45;
+       res = x+y; // what happens when reclassify(x+y,f1); and f1({L1;L2}) <= L3 ?
+   }
+
+}

@@ -1,0 +1,14 @@
+public class dynTest2[label L1, label L2, label L3] {
+
+   int {rif[q1*:{Alice},q2:{Alice},f1:q1->q2]} res;  // Notice here that the rif-spec is inside {} ! 
+   int{L2} x;
+   int rif[q1*:{Alice},q2:{Alice,Bob},f1:q1->q2] y;
+
+   public dynTest2() where L2<={res} {
+       x = 96;
+       y = 45;
+       res = x+y; // what happens when reclassify(x+y,f1); and f1({L1;L2}) <= L3 ?
+   }
+
+}
+
