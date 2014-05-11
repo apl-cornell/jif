@@ -1,3 +1,4 @@
+import jif.util.List2;
 import jif.util.*;
 
 public class List2Test {
