@@ -1,0 +1,11 @@
+abstract class Regression01A[principal P] {
+  final principal{this} p;
+
+  Regression01A(principal{this} p) {
+    super();
+    this.p = p;
+  }
+
+  abstract void m(Regression01A[P] reg, label cL) where cL <= {reg.p→};
+}
+

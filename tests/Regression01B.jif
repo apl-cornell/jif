@@ -1,0 +1,7 @@
+abstract class Regression01B {
+  void invoke(label lbl, Regression01A[null] reg) where lbl <= {reg.p→} {
+    final Regression01A[null] _reg = reg;
+    if (reg != null) reg.m(_reg, lbl);
+  }
+}
+
