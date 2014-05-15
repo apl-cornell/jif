@@ -24,6 +24,7 @@ import polyglot.frontend.Job;
 import polyglot.frontend.JobExt;
 import polyglot.frontend.Parser;
 import polyglot.frontend.Scheduler;
+import polyglot.frontend.Source.Kind;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
 import polyglot.types.LoadedClassResolver;
@@ -176,9 +177,9 @@ public class ExtensionInfo extends JLExtensionInfo {
     }
 
     @Override
-    public FileSource createFileSource(FileObject f, boolean user)
+    public FileSource createFileSource(FileObject f, Kind kind)
             throws IOException {
-        return new jif.parse.UTF8FileSource(f, user);
+        return new jif.parse.UTF8FileSource(f, kind);
     }
 
 }

@@ -291,7 +291,9 @@ public class JifToJavaRewriter extends ContextVisitor {
                             java_ext.extFileManager().getJavaFileForOutput(
                                     location, pkgName + cd.name(), Kind.SOURCE,
                                     null);
-                    Source s = java_ext.createFileSource(jfo, false);
+                    Source s =
+                            java_ext.createFileSource(jfo,
+                                    Source.Kind.COMPILER_GENERATED);
                     sf = sf.source(s);
                     this.newSourceFiles.add(sf);
                 } catch (IOException e) {
