@@ -20,6 +20,7 @@ import jif.types.label.Policy;
 import jif.types.label.ProviderLabel;
 import jif.types.label.ReaderPolicy;
 import jif.types.label.RifConfPolicy;
+import jif.types.label.RifDynamicLabel;
 import jif.types.label.RifReaderPolicy_c;
 import jif.types.label.RifVarLabel;
 import jif.types.label.ThisLabel;
@@ -36,6 +37,7 @@ import jif.types.principal.TopPrincipal;
 import jif.types.principal.UnknownPrincipal;
 import jif.types.principal.VarPrincipal;
 import polyglot.ast.Expr;
+import polyglot.ast.Id;
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.types.ArrayType;
@@ -530,5 +532,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
     RifFSM bottomfsm(Position pos);
 
     RifVarLabel freshRifLabelVariable(Position pos, String s, String description);
+
+    RifDynamicLabel rifDynamicLabel(Position pos, Id name, Label lbl);
 
 }

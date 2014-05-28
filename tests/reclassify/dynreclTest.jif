@@ -10,5 +10,5 @@ public class dynreclTest[label L1, label L2, label L3] {
        res = reclassify(x+y,f1); 
    }
 
-}
+}        
 

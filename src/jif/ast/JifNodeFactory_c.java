@@ -152,6 +152,17 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     }
 
     @Override
+    public AmbRifDynamicLabelNode AmbRifDynamicLabelNode(Position pos, Id name,
+            LabelNode lbl) {
+        AmbRifDynamicLabelNode n = new AmbRifDynamicLabelNode_c(pos, name, lbl);
+        n =
+                (AmbRifDynamicLabelNode) n.ext(jifExtFactory()
+                        .extAmbRifDynamicLabelNode());
+        n = (AmbRifDynamicLabelNode) n.del(delFactory().delNode());
+        return n;
+    }
+
+    @Override
     public AmbDynamicLabelNode AmbDynamicLabelNode(Position pos, Expr expr) {
         AmbDynamicLabelNode n = new AmbDynamicLabelNode_c(pos, expr);
         n =

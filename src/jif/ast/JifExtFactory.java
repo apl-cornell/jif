@@ -93,4 +93,6 @@ public interface JifExtFactory extends ExtFactory, JifStmtExtFactory {
     Ext extPrincipalExpr();
 
     Ext extReclassifyExpr();
+
+    Ext extAmbRifDynamicLabelNode();
 }

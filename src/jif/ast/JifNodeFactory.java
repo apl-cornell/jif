@@ -168,4 +168,7 @@ public interface JifNodeFactory extends NodeFactory {
     PrincipalExpr PrincipalExpr(Position pos, PrincipalNode principal);
 
     TypeNode ConstArrayTypeNode(Position position, TypeNode node);
+
+    AmbRifDynamicLabelNode AmbRifDynamicLabelNode(Position pos, Id name,
+            LabelNode lbl);
 }

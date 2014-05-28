@@ -74,6 +74,8 @@ import jif.types.label.ProviderLabel;
 import jif.types.label.ProviderLabel_c;
 import jif.types.label.ReaderPolicy;
 import jif.types.label.RifConfPolicy;
+import jif.types.label.RifDynamicLabel;
+import jif.types.label.RifDynamicLabel_c;
 import jif.types.label.RifJoinConfPolicy_c;
 import jif.types.label.RifReaderPolicy_c;
 import jif.types.label.RifVarLabel;
@@ -1191,6 +1193,12 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     public LabelToJavaExpr meetLabelTranslator() {
         return new MeetLabelToJavaExpr_c();
+    }
+
+    @Override
+    public RifDynamicLabel rifDynamicLabel(Position pos, Id name, Label lbl) {
+        RifDynamicLabel t = new RifDynamicLabel_c(name, lbl, this, pos);
+        return t;
     }
 
     @Override

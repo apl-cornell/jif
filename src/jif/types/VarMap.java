@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import jif.types.label.Label;
 import jif.types.label.Policy;
 import jif.types.label.RifConfPolicy;
+import jif.types.label.RifDynamicLabel_c;
 import jif.types.label.TransitionVarLabel;
 import jif.types.label.VarLabel;
 import jif.types.label.Variable;
@@ -84,7 +85,14 @@ public class VarMap {
             TransitionVarLabel reclassbound = (TransitionVarLabel) v;
             Label innerlabel = reclassbound.innerRifLabel();
             Label innerbound = (Label) bounds.get(innerlabel);
-            if (innerbound != null) {
+            if (innerbound != null
+                    && !(innerbound.confProjection() instanceof RifConfPolicy)) {
+                JifTypeSystem ts = innerbound.typeSystem();
+                bound =
+                        new RifDynamicLabel_c(reclassbound.transition(),
+                                innerbound, ts, innerbound.position());
+                this.setBound(v, bound);
+            } else if (innerbound != null) {
                 JifTypeSystem ts = innerbound.typeSystem();
                 RifConfPolicy innerconf =
                         (RifConfPolicy) innerbound.confProjection();

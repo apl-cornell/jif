@@ -466,10 +466,9 @@ label_flexible ::=
             {: RESULT = a; :}
     | IDENTIFIER LPAREN label:a RPAREN
             {: RESULT = a; :}
-    | IDENTIFIER LPAREN dynamic_label:a RPAREN
-            {: RESULT = a; :}
+    | IDENTIFIER:a LPAREN dynamic_label:b RPAREN:y
+            {: RESULT = parser.nf.AmbRifDynamicLabelNode(parser.pos(a,y), parser.nf.Id(parser.pos(a), a.getIdentifier()), b); :}
     ;
-    
     
 join_component_list ::=
                     // List of LabelNode or PolicyNode. Implicitly a join

@@ -154,6 +154,18 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     /* end-new */
 
     @Override
+    public final Ext extAmbRifDynamicLabelNode() {
+        Ext e = extAmbRifDynamicLabelNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extAmbRifDynamicLabelNode();
+            e = composeExts(e, e2);
+        }
+        return postExtAmbRifDynamicLabelNode(e);
+    }
+
+    @Override
     public final Ext extAmbDynamicLabelNode() {
         Ext e = extAmbDynamicLabelNodeImpl();
         if (nextExtFactory() != null
@@ -580,6 +592,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
 
     /* end-new */
 
+    protected Ext extAmbRifDynamicLabelNodeImpl() {
+        return extLabelNode();
+    }
+
     protected Ext extAmbDynamicLabelNodeImpl() {
         return extLabelNode();
     }
@@ -737,6 +753,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
 
     protected Ext postExtPolicyNode(Ext e) {
         return postExtNode(e);
+    }
+
+    protected Ext postExtAmbRifDynamicLabelNode(Ext e) {
+        return postExtLabelNode(e);
     }
 
     protected Ext postExtAmbDynamicLabelNode(Ext e) {
