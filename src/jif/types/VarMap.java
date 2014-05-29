@@ -1,10 +1,14 @@
 package jif.types;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import jif.types.label.JoinLabel;
 import jif.types.label.Label;
 import jif.types.label.Policy;
 import jif.types.label.RifConfPolicy;
@@ -85,27 +89,50 @@ public class VarMap {
             TransitionVarLabel reclassbound = (TransitionVarLabel) v;
             Label innerlabel = reclassbound.innerRifLabel();
             Label innerbound = (Label) bounds.get(innerlabel);
-            if (innerbound != null
-                    && !(innerbound.confProjection() instanceof RifConfPolicy)) {
+
+            if (innerbound != null) {
                 JifTypeSystem ts = innerbound.typeSystem();
-                bound =
-                        new RifDynamicLabel_c(reclassbound.transition(),
-                                innerbound, ts, innerbound.position());
-                this.setBound(v, bound);
-            } else if (innerbound != null) {
-                JifTypeSystem ts = innerbound.typeSystem();
-                RifConfPolicy innerconf =
-                        (RifConfPolicy) innerbound.confProjection();
-                Id action = reclassbound.transition();
-                bound =
-                        ts.pairLabel(innerbound.position(),
-                                innerconf.takeTransition(action),
-                                innerbound.integProjection());
+                Collection<Label> components;
+                Collection<Label> newcomponents = new LinkedHashSet<Label>();
+                if (innerbound instanceof JoinLabel) {
+                    JoinLabel inbound = (JoinLabel) innerbound;
+                    // the components are already flattened
+                    components = inbound.joinComponents();
+                } else {
+                    components = new LinkedHashSet<Label>();
+                    components.add(innerbound);
+                }
+                for (Label ci : components) {
+                    Label boundci;
+                    if (!(ci.confProjection() instanceof RifConfPolicy)) {
+                        boundci =
+                                new RifDynamicLabel_c(
+                                        reclassbound.transition(), ci, ts,
+                                        innerbound.position());
+                    } else {
+                        RifConfPolicy innerconf =
+                                (RifConfPolicy) ci.confProjection();
+                        Id action = reclassbound.transition();
+                        boundci =
+                                ts.pairLabel(ci.position(),
+                                        innerconf.takeTransition(action),
+                                        ci.integProjection());
+                    }
+                    newcomponents.add(boundci);
+                }
+                if (newcomponents.size() == 1) {
+                    bound = newcomponents.iterator().next();
+                } else {
+                    bound =
+                            ts.joinLabel(innerbound.position(),
+                                    (Set<Label>) newcomponents);
+                }
                 this.setBound(v, bound);
             } else {
                 bound = defaultLabelBound;
                 this.setBound(v, bound);
             }
+
         } else if (bound == null) {
             // The variable has no bound: assume the default label.
             // insert the default label into the map.

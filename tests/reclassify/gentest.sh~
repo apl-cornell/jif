@@ -7,7 +7,7 @@
 
 # Run it as  ./gentest.sh 
 
-echo "test1: N "
+echo "test1: Y "
 ~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test1.jif
 echo "--------------------------------------------------"
 echo "test2: Y "
@@ -120,4 +120,7 @@ echo "test35: N "
 echo "--------------------------------------------------"
 echo "test36: Y "
 ~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test36.jif
+echo "--------------------------------------------------"
+echo "dynTest: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynTest.jif
 echo "--------------------------------------------------"

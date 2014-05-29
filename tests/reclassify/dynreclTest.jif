@@ -1,3 +1,5 @@
+//Type-correct
+
 public class dynreclTest[label L1, label L2, label L3] {
 
    int {rif[q1*:{Alice},q2:{Alice},f1:q1->q2]} res;
