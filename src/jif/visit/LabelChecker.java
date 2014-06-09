@@ -289,12 +289,12 @@ public class LabelChecker implements Copy {
 
     /**
      * Called by JifClassDeclExt just after this label checker has been used to
-     * check a class body. This allows us to use a different solver if
+     * check a method body. This allows us to use a different solver if
      * required.
      */
     public JifMethodDecl leavingMethod(JifMethodDecl n) {
         if (solvePerMethod) {
-            // solving by class. We need to solve the constraints
+            // solving by method. We need to solve the constraints
             return (JifMethodDecl) solveConstraints(n);
         }
         return n;
