@@ -1,0 +1,1090 @@
+Test script pthScript
+  A.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  AE.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  [labelparam/A.jif, labelparam/E.jif]: Warning: environment variable $CLASSPATH undefined.
+OK
+  OwnedObject.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabeledObject.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  TestPrincipal.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  TestClosure.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Account.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor7.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor8.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor9.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor10.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor12.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor13.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor14.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor15.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor16.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor16b.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor16c.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ActsFor17.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArgLabel1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArgLabel2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArgLabelSubst.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArgLabelSubst2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArgLabelSubst3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArgLabelSubst4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelSubst01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array7.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array8.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array9.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array10.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array12.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array13.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array14.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array15.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array16.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array17.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array18.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array19.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Array20.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArrayBaseLabel01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArrayLeak.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArrayLeak3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArrayLeak4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArrayLeak5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArrayLength01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArrayLength02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArrayLength03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArrayLength04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArrayLength05.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ArrayLength06.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Assign01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Assign02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Assign03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Authority01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Authority02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Authority03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Authority04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Authority05.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Authority06.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Authority07.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  AutoEndorse01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  AutoEndorse02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  CheckedEndorse01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  CheckedEndorse02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  CheckedEndorse03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  BadNullExcept1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  BadNullExcept2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  BadNullExcept3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  BadNullExcept4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  BadNullExcept5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  BadNullExcept6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  BadNullExcept7.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Binary.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call7.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call8.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call9.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call10.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call12.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call13.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Call14.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  CallerPC01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  CallerPC02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  cat.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Catch01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Catch02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Catch03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  clientEmptyList.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  clientList.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  clientPairList.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Complex.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  CondExpr.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  CondExpr2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  CondExpr3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  CondExpr4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  CondExpr5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  CondExpr6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConditionalLeak.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConjunctTest01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConjunctTest02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConjunctTest02a.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConjunctTest03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConjunctTest04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray03a.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray04a.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray05.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray06.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray06a.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray07.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray08.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray09.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray10.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray10a.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray10b.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray10c.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray10d.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray11a.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray12.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstArray13.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Constraints1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Constraints3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Constraints5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstructorTest.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Constructor1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstructorPrologue01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstructorPrologue02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstructorPrologue03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstructorPrologue04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstructorPrologue05.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstructorPrologue06.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ConstructorPrologue07.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Covariant01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Covariant02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DateTest.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Declassify.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Default1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Deref.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Deref2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  [Disamb01.jif, Disamb01A.jif]: Warning: environment variable $CLASSPATH undefined.
+OK
+  [Disamb02.jif, Disamb02A.jif, Disamb02B.jif]: Warning: environment variable $CLASSPATH undefined.
+OK
+  Division01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Division02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DuplicateClass.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Dyn1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Dyn2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Dyn4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Dyn5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Dyn6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Dyn7.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin7.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin8.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin9.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin10.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin12.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin13.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin14.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynPrin15.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynLabel1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynLabel2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynLabel3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynLabel4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynLabel5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynLabel6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynLabel7.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynLabel8.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynLabel9.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynLabel10.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynLabel11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynLabel12.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  DynLabel13.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  [EmptyList.jif, List.jif]: Warning: environment variable $CLASSPATH undefined.
+OK
+  EmptyList2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Exc.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Exc2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Exc3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FieldAssign01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FieldAssign02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FieldAssign03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FieldAssign04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FieldInit01.jif: Warning: environment variable $CLASSPATH undefined.
+Expected to see Semantic Error
+  FieldLabel01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FieldLeak.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FieldParam1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FieldParam2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FileTester.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalArgs01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalArgs02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalArgs03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalArgs04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalArgs05.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalArgs06.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalArgs07.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalArgs08.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalField01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalField02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalField03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalField04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalField05.jif: Warning: environment variable $CLASSPATH undefined.
+Label of right hand side not less restrictive than the label for field y (/home/jed/work/jif/tests/FinalField05.jif:10,7-8)
+  FinalField06.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalField07.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Hierarchy1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Heapsort.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Hello.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  HiRefLowField.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  If1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inf1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inf2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inf3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inf4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inf5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inf6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inf7.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inf8.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inf9.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inf10.jif: Warning: environment variable $CLASSPATH undefined.
+The actual argument is more restrictive than the formal argument. (/home/jed/work/jif/tests/Inf10.jif:11,12-13)
+  Inf11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inf12.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inf13.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Implicit.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Implicit2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inner0.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inner1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inner2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inner3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inner4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inner5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Inner6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  InnerFlow0.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  IntBounds1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  IntBounds2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  IntBounds3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  IntPair.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  InterfaceTest.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  InvariantClass3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  InvariantClass10.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  InvariantClass11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  InvariantThis1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  InvariantThis2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  InvariantThis3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  InvariantThis4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  JunctivePrincipals01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  JunctivePrincipals02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  JunctivePrincipals03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  JunctivePrincipals04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  JunctivePrincipals05.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  JunctivePrincipals06.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelIf1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelIf2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelIf3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelIf4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  [LabelIf5.jif, LabeledObject.jif]: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelIf6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelIf6a.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelIf7.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelIf7a.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelIf8.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelIf9.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelIf10.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelIf11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelIf12.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  [LabelCheckDependency01A.jif, LabelCheckDependency01B.jif]: Warning: environment variable $CLASSPATH undefined.
+OK
+  [LabelCheckDependency01B.jif, LabelCheckDependency01A.jif]: Warning: environment variable $CLASSPATH undefined.
+OK
+  [LabelCheckDependency02A.jif, LabelCheckDependency02B.jif]: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint05.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint06.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint07.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint08.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint08a.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint09.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint10.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint12.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint13.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelLeConstraint14.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelUtil01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  LabelUtil02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  List.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  List2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  List2Test.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ListTest.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Main1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Main2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Main3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Main5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  MapTest.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Meet01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Meet02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Meet03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  MyInteger.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Names01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NativePrincipal01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Nested01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Nested02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NewLabel.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NewLabel2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NewLabel3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NewLabel4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept7.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept8.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept9.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept10.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept12.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept13.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept14.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept15.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept16.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept17.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept18.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept19.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept20.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept21.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept22.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  NullExcept23.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  [PairList.jif, List.jif]: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override05.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override06.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override07.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override08.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override09.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override10.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override12.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override13.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override14.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override15.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override16.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override17.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override18.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Override19.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  PairList2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params1Test.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params1TestTest.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params7.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params8.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params9.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params10.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params12.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params13.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params14.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params15.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params16.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params17.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params18.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params19.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params20.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params21.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params22.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params22a.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params23.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params24.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params25.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params26.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params27.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params28.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params29.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params30.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params31.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params32.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params33.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params34.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params35.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params36.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params37.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params38.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params39.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params40.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params41.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params42.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params43.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params44.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Params45.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ParamsActsFor.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Password.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Password2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  PathMap01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  PathMap02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Poly.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  PreciseClass01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  PreciseClass02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  PreciseClass03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  PreciseClass04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  PreciseClass05.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  PreciseClass06.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  PreciseClass07.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  PreciseClass08.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  PreciseClass09.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  PrincipalUtil01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Protected.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Recursive.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams05.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams06.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams07.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams08.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams09.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams10.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams11.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams12.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams13.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams14.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams15.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams16.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams17.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams18.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams19.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams20.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams21.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams22.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams22a.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams23.jif: Warning: environment variable $CLASSPATH undefined.
+Expected to see Semantic Error matching the regular expression 'NullPointerException.*must either be caught'
+  RuntimeParams24.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams24a.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams24b.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams24c.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams24d.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams25.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams27.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RuntimeParams28.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  SetTest.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ShortCircuit01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ShortCircuit02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ShortCircuit03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Simple.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Simple2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Simple3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Simple4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Solver01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Solver02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  StaticField.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  StaticMethod.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  StaticThis1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  StaticThis2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  StaticThis3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  StaticThis4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  StaticThis5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  StaticThis6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  StaticThis7.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  StringTester.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  SubtypeChecker1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  SubtypeChecker2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  SubtypeChecker3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  SubtypeChecker4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Super1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Super2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Super3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Super4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Super5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Super6.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Super7.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Super8.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Super9.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  SwitchLabel.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  SwitchLabel2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  SwitchLabel3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  SwitchLabel4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  This1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  ToString.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  User1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Vec.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  While.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  While2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  While3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  While4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Do.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Do2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Do3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Do4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Do5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  For1.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  For2.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  For3.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  For4.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  For5.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Switch01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Switch02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Switch03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  Switch04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  UnsoundConstructor01.jif: Warning: environment variable $CLASSPATH undefined.
+Expected to see Semantic Error matching the regular expression 'pc'
+  UnsoundConstructor02.jif: Warning: environment variable $CLASSPATH undefined.
+Expected to see Semantic Error matching the regular expression 'pc'
+  UnsoundInference01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  FinalParamBug.jif: Warning: environment variable $CLASSPATH undefined.
+This method may return a value with a more restrictive label than the declared return value label. (/home/jed/work/jif/tests/FinalParamBug.jif:13,7-20)
+  RobustDecl01.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RobustDecl02.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RobustDecl03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+  RobustDecl04.jif: Warning: environment variable $CLASSPATH undefined.
+OK
+pthScript: 537 out of 544 tests succeeded.
