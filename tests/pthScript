@@ -611,6 +611,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Switch04.jif (Semantic, "not less restrictive");
 	UnsoundConstructor01.jif (Semantic, "pc");
 	UnsoundConstructor02.jif (Semantic, "pc");
+	UnsoundInference01.jif (Semantic);
     FinalParamBug.jif ;
 }
 
