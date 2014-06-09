@@ -68,6 +68,31 @@ public class JifScheduler extends JLScheduler {
         return g;
     }
 
+    /**
+     * Creates a goal for the label double-checking pass. Labels need to be
+     * double checked because the labels inferred during the first
+     * label-checking pass may be unsound.
+     */
+    public Goal LabelsDoubleChecked(Job job) {
+        JifOptions opts = (JifOptions) job.extensionInfo().getOptions();
+        Goal ig;
+        if (opts.skipLabelChecking) {
+            ig = new EmptyGoal(job);
+        } else {
+            ig = new LabelCheckGoal(job) {
+                // Create an anonymous subclass to avoid conflating with the
+                // goal for LabelsChecked.
+            };
+        }
+        Goal g = internGoal(ig);
+        try {
+            addPrerequisiteDependency(g, this.LabelsChecked(job));
+        } catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
+    }
+
     public Goal FinalParamsBarrier() {
         Goal g = internGoal(new Barrier("FinalParamsBarrier", this) {
             @Override
@@ -193,7 +218,7 @@ public class JifScheduler extends JLScheduler {
     public Goal Serialized(Job job) {
         Goal g = super.Serialized(job);
         try {
-            addPrerequisiteDependency(g, this.LabelsChecked(job));
+            addPrerequisiteDependency(g, this.LabelsDoubleChecked(job));
             addPrerequisiteDependency(g, this.NativeConstructorsAdded(job));
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);

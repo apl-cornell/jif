@@ -120,6 +120,8 @@ public class JifConstructorInstance_c extends ConstructorInstance_c implements
         if (this.returnLabel != null)
             this.returnLabel = bounds.applyTo(returnLabel);
 
+        this.setContainer(bounds.applyTo(container).toReference());
+
         List<Type> formalTypes = new LinkedList<Type>();
         for (Type t : formalTypes()) {
             formalTypes.add(bounds.applyTo(t));

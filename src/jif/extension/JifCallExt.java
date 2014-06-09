@@ -115,7 +115,7 @@ public class JifCallExt extends JifExprExt {
                                                 (FileSource) pct.fromSource(),
                                                 true);
                                 if (job != null) {
-                                    Goal g = sched.LabelsChecked(job);
+                                    Goal g = sched.LabelsDoubleChecked(job);
                                     throw new MissingDependencyException(g);
                                 }
                             }
@@ -142,7 +142,7 @@ public class JifCallExt extends JifExprExt {
                                                 (FileSource) pct.fromSource(),
                                                 true);
                                 if (job != null) {
-                                    Goal g = sched.LabelsChecked(job);
+                                    Goal g = sched.LabelsDoubleChecked(job);
                                     throw new MissingDependencyException(g);
                                 }
                             }
