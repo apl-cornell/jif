@@ -3,15 +3,15 @@ BattleShip
 
 BattleShip is a simple game between two players. Each player has a
 secret board that contains a number of ships. Players take turns to
-ask if a coordinate on the opponent's board is contains a ship. The
-object is to locate all of the opponent's ships first.
+ask if a coordinate on the opponent's board contains a ship. The
+object of the game is to locate all of the opponent's ships first.
 
 This simple game has interesting security properties. Each player has
 secret information: the location of ships on the board. Some of this
 secret information must be declassified when the opponent asks if a
-ship is occupying a given co-ordinate. A player's board must have the 
+ship is occupying a given coordinate. A player's board must have the 
 integrity of both players. That is, the opponent needs to trust that the 
-player's board is not modified (that is, ships moved around) during the game.
+player's board is not modified (i.e., cannot move ships) during the game.
 
 The BattleShip game is implemented in the classes BattleShip, Player,
 Board, Ship and Coordinate. The class Main provides code for
