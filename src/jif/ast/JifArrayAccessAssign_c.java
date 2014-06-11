@@ -1,9 +1,14 @@
 package jif.ast;
 
+import java.util.List;
+
 import polyglot.ast.ArrayAccess;
 import polyglot.ast.ArrayAccessAssign_c;
 import polyglot.ast.Expr;
 import polyglot.ast.Ext;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -31,12 +36,16 @@ public class JifArrayAccessAssign_c extends ArrayAccessAssign_c {
         super(pos, left, op, right, ext);
     }
 
-    /** Since Jif's type system makes arrays invariant
-     * on the base type, no array store exceptions can
-     * be thrown. */
     @Override
-    public boolean throwsArrayStoreException() {
-        return false;
+    public List<Type> throwTypes(TypeSystem ts) {
+        // Sanity check. It appears this method isn't called, so let's make sure
+        // it isn't.
+        //
+        // If you end up wanting to reinstate this method by calling the super
+        // class's implementation, make sure you remove ArrayStoreException from
+        // the result. Jif's type system makes arrays invariant on the base
+        // type, so no array store exceptions can be thrown.
+        throw new InternalCompilerError("Shouldn't reach here.");
     }
 
 }
