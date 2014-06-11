@@ -109,7 +109,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
         // run the typechecker over expr.
         TypeChecker tc = new JifTypeChecker(ar.job(), ts, nf, true);
         tc = (TypeChecker) tc.context(ar.context());
-        expr = (Expr) expr.visit(tc);
+        Expr expr = (Expr) this.expr.visit(tc);
 
         if (!expr.isTypeChecked()) {
             if (expr instanceof Field) {
@@ -139,7 +139,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
 
             ar.job().extensionInfo().scheduler().currentGoal()
                     .setUnreachableThisRun();
-            return this;
+            return reconstruct(this, expr, name);
         }
 
         if (expr.type() != null && expr.type().isCanonical()
