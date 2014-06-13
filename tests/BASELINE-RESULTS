@@ -1075,6 +1075,10 @@ OK
 This method may return a value with a more restrictive label than the declared return value label. (/home/jed/work/jif/tests/FinalParamBug.jif:13,7-20)
   [[Regression01A.jif], [Regression01B.jif]]: Warning: environment variable $CLASSPATH undefined.
 OK
+  [Regression01A.jif, Regression01B.jif]: Warning: environment variable $CLASSPATH undefined.
+OK
+  [Regression01B.jif, Regression01A.jif]: Warning: environment variable $CLASSPATH undefined.
+OK
   RobustDecl01.jif: Warning: environment variable $CLASSPATH undefined.
 OK
   RobustDecl02.jif: Warning: environment variable $CLASSPATH undefined.
@@ -1083,4 +1087,4 @@ OK
 OK
   RobustDecl04.jif: Warning: environment variable $CLASSPATH undefined.
 OK
-pthScript: 537 out of 542 tests succeeded.
+pthScript: 539 out of 544 tests succeeded.

@@ -614,6 +614,10 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 
     # Separate compilation test.
     Regression01A.jif, Regression01B.jif ;
+
+    # Test compilation order. This compiles in one order, but not in the other.
+    Regression01A.jif Regression01B.jif ;
+    Regression01B.jif Regression01A.jif ;
 }
 
 # the robustness test cases. Turn robustness on.
