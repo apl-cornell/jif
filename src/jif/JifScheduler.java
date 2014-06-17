@@ -59,9 +59,8 @@ public class JifScheduler extends JLScheduler {
         Goal g = internGoal(ig);
         try {
             addPrerequisiteDependency(g, this.FinalParamsBarrier());
-            addPrerequisiteDependency(g, this.FieldLabelInference(job));
+            addPrerequisiteDependency(g, this.FieldLabelInferenceBarrier());
             addPrerequisiteDependency(g, this.IntegerBoundsChecker(job));
-            addPrerequisiteDependency(g, this.ExceptionsChecked(job));
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
@@ -91,15 +90,23 @@ public class JifScheduler extends JLScheduler {
         return g;
     }
 
+    public Goal FieldLabelInferenceBarrier() {
+        Goal g = internGoal(new Barrier("FieldLabelInferenceBarrier", this) {
+            @Override
+            public Goal goalForJob(Job job) {
+                return FieldLabelInference(job);
+            }
+        });
+        return g;
+    }
+
     public FieldLabelInferenceGoal FieldLabelInference(Job job) {
         FieldLabelInferenceGoal g =
                 (FieldLabelInferenceGoal) internGoal(new FieldLabelInferenceGoal(
                         job));
 
-// Jif Dependency bugfix
         try {
-//          addPrerequisiteDependency(g, this.ExceptionsChecked(job));
-            addPrerequisiteDependency(g, this.Disambiguated(job));
+            addPrerequisiteDependency(g, this.ExceptionsChecked(job));
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
@@ -324,9 +331,6 @@ class TypeChecked extends VisitorGoal {
     @Override
     public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
         List<Goal> l = new ArrayList<Goal>();
-//        l.add(((JifScheduler)scheduler).FinalParams(job));
-        // Should this line be here, since FieldLabelResolver is added as a missing dependency during runtime?
-        l.add(((JifScheduler) scheduler).FieldLabelInference(job));
         l.add(scheduler.ConstantsChecked(job));
         l.addAll(super.corequisiteGoals(scheduler));
         return l;

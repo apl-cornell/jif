@@ -26,8 +26,6 @@ import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.CyclicDependencyException;
 import polyglot.frontend.Job;
-import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.goals.Goal;
 import polyglot.types.FieldInstance;
 import polyglot.types.ParsedClassType;
 import polyglot.types.ParsedTypeObject;
@@ -74,23 +72,6 @@ public class FieldLabelResolver extends ContextVisitor {
             // this class uses field f. Make sure that the field label resolver
             // pass for the container of f is run before we run label checking.
             FieldInstance fi = ((Field) n).fieldInstance();
-
-// Jif Dependency bugfix
-            if (fi == null) {
-                Field f = (Field) n;
-                JifScheduler sched =
-                        (JifScheduler) this.job().extensionInfo().scheduler();
-                Type tp = ts.unlabel(f.target().type());
-                Job next;
-                if (tp instanceof ParsedClassType) {
-                    ParsedClassType pct = (ParsedClassType) tp;
-                    next = pct.job();
-                } else {
-                    next = this.job();
-                }
-                Goal g = sched.TypeChecked(next);
-                throw new MissingDependencyException(g);
-            }
 
             JifScheduler scheduler =
                     (JifScheduler) typeSystem().extensionInfo().scheduler();
