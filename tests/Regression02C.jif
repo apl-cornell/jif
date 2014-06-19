@@ -1,0 +1,8 @@
+abstract class Regression02C[principal P] {
+  void invoke(label lbl, Regression02A[P] a, Regression02B[P] b)
+      where lbl <= {a.p→} {
+    final Regression02A a2 = a;
+
+    if (b != null) b.m(a2, lbl);
+  }
+}

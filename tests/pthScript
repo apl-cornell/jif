@@ -612,12 +612,14 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	#UnsoundConstructor.jif (Semantic, "pc");
     FinalParamBug.jif ;
 
-    # Separate compilation test.
-    Regression01A.jif, Regression01B.jif ;
-
-    # Test compilation order. This compiles in one order, but not in the other.
+    # Test compilation order.
+    # This used to compile in one order, but not in the other.
     Regression01A.jif Regression01B.jif ;
     Regression01B.jif Regression01A.jif ;
+
+    # Separate compilation tests.
+    Regression01A.jif, Regression01B.jif ;
+    Regression02A.jif Regression02B.jif, Regression02C.jif ;
 }
 
 # the robustness test cases. Turn robustness on.
