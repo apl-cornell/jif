@@ -1081,6 +1081,8 @@ OK
 OK
   [[Regression02A.jif, Regression02B.jif], [Regression02C.jif]]: Warning: environment variable $CLASSPATH undefined.
 OK
+  [[Regression02B.jif, Regression02A.jif], [Regression02C.jif]]: Warning: environment variable $CLASSPATH undefined.
+OK
   RobustDecl01.jif: Warning: environment variable $CLASSPATH undefined.
 OK
   RobustDecl02.jif: Warning: environment variable $CLASSPATH undefined.
@@ -1089,4 +1091,4 @@ OK
 OK
   RobustDecl04.jif: Warning: environment variable $CLASSPATH undefined.
 OK
-pthScript: 540 out of 545 tests succeeded.
+pthScript: 541 out of 546 tests succeeded.

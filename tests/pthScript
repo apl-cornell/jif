@@ -620,6 +620,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
     # Separate compilation tests.
     Regression01A.jif, Regression01B.jif ;
     Regression02A.jif Regression02B.jif, Regression02C.jif ;
+    Regression02B.jif Regression02A.jif, Regression02C.jif ;
 }
 
 # the robustness test cases. Turn robustness on.
