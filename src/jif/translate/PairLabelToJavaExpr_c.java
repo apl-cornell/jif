@@ -1,8 +1,14 @@
 package jif.translate;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import jif.types.RifFSM;
+import jif.types.RifFSMstate;
 import jif.types.label.ConfPolicy;
 import jif.types.label.IntegPolicy;
 import jif.types.label.JoinPolicy_c;
@@ -11,7 +17,10 @@ import jif.types.label.MeetPolicy_c;
 import jif.types.label.PairLabel;
 import jif.types.label.Policy;
 import jif.types.label.ReaderPolicy;
+import jif.types.label.RifJoinConfPolicy;
+import jif.types.label.RifReaderPolicy_c;
 import jif.types.label.WriterPolicy;
+import jif.types.principal.Principal;
 import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
@@ -64,6 +73,70 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
                     .position(
                             Position.compilerGenerated(p.toString() + ":"
                                     + p.position().toString()));
+        }
+
+        if (p instanceof RifJoinConfPolicy && p.isSingleton()) {
+            RifJoinConfPolicy policy = (RifJoinConfPolicy) p;
+            LinkedList<Policy> l =
+                    new LinkedList<Policy>(policy.joinComponents());
+            Iterator<Policy> iter = l.iterator();
+            RifReaderPolicy_c rpol = (RifReaderPolicy_c) iter.next();
+            RifFSM fsm = rpol.getFSM();
+            Map<String, RifFSMstate> states = fsm.states();
+            String statesStr = null;
+            String princStr;
+            for (Entry<String, RifFSMstate> pair : states.entrySet()) {
+                princStr = "STB," + pair.getKey() + ",";
+                if (fsm.currentState().name().toString() == pair.getKey()) {
+                    princStr += "*,";
+                }
+                List<Principal> principals = pair.getValue().principals();
+                for (Principal pr : principals) {
+                    Expr prexpr = rw.principalToJava(pr);
+                    princStr = princStr + prexpr + ",";
+                }
+                princStr = princStr + "STE,";
+                statesStr = statesStr + princStr;
+            }
+            String transStr = null;
+            for (Entry<String, RifFSMstate> pair : states.entrySet()) {
+                HashMap<String, RifFSMstate> transitions =
+                        pair.getValue().getTransitions();
+                if (transitions != null) {
+                    Iterator<Entry<String, RifFSMstate>> it =
+                            transitions.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Entry<String, RifFSMstate> pairs = it.next();
+                        transStr += "TRB," + pairs.getKey() + ",";
+                        transStr +=
+                                pair.getKey() + ","
+                                        + pairs.getValue().name().toString()
+                                        + ",";
+                        transStr += "TRE" + ",";
+                    }
+                }
+            }
+            return (Expr) rw
+                    .qq()
+                    .parseExpr(
+                            rw.runtimeLabelUtil() + ".rifreaderPolicy("
+                                    + statesStr + transStr + ")")
+                    .position(Position.compilerGenerated()); //what to put here as an argument?
+        }
+
+        if (p instanceof RifJoinConfPolicy && !p.isSingleton()) {
+            RifJoinConfPolicy jp = (RifJoinConfPolicy) p;
+            LinkedList<ConfPolicy> l =
+                    new LinkedList<ConfPolicy>(jp.joinComponents());
+            Iterator<ConfPolicy> iter = l.iterator();
+            Policy head = iter.next();
+            Expr e = policyToJava(head, rw);
+            while (iter.hasNext()) {
+                head = iter.next();
+                Expr f = policyToJava(head, rw);
+                e = rw.qq().parseExpr("%E.join(%E)", e, f);
+            }
+            return e;
         }
 
         if (p instanceof JoinPolicy_c) {

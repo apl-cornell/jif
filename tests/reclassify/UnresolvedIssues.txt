@@ -1,0 +1,16 @@
+- To Solve dynreclTest7 we need to add a case for RifJoinConfPolicy_c in method policyToJava,
+in class PairLabelToJavaExpr_c. Do we need to add more for the runtime representation of rifspecs? 
+- To solve dynreclTest8, we know that the "new label" syntax takes as an argument a label (not a dynamic_label).
+We need to create a new node for f(label). Then we need to add one more case at "extend primary" rule for
+NEW:n LABEL f(label).
+- Solve dynreclTest4.
+- The last case of label_flexible at the parser is wrong, because it considers only the first case of dynamic_label.
+- See if solver can deduce true facts about automata (i.e L1>f(L2) => g(L1)>g(f(L2)) )
+- Enable f(rifspec) to be the proper automaton.
+- How is f1(f2(f3(L))) resolved?
+- Dynamic labels: give rifspec as an input, or assign a rifspec in a variable.
+- allPossibleActions contains all the actions that appear in the program.
+ Somehow this list should be initialized when the whole program is parsed. (it is currently default)
+- Printing
+- Integrity
+- Examples (paper review / battleship)

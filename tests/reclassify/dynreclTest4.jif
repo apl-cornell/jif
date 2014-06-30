@@ -1,0 +1,23 @@
+public class dynreclTest[label L1, label L2, label L3] {
+
+   int {L1} res;
+   int {L2} y;
+
+   public dynreclTest() where f1(L1) <= L2  {
+       int x;
+   
+       x = 96;
+       res = 45;
+       y = reclassify(x,f1);
+       x = res;
+   }
+   
+ public void help() {
+   
+       dynreclTest w;
+       
+       w = new dynreclTest(); 
+   
+   }
+
+}

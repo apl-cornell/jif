@@ -464,10 +464,12 @@ label_flexible ::=
             {: RESULT = a; :}
     | dynamic_label:a
             {: RESULT = a; :}
+    /* begin-new */             
     | IDENTIFIER LPAREN label:a RPAREN
             {: RESULT = a; :}
     | IDENTIFIER:a LPAREN dynamic_label:b RPAREN:y
             {: RESULT = parser.nf.AmbRifDynamicLabelNode(parser.pos(a,y), parser.nf.Id(parser.pos(a), a.getIdentifier()), b); :}
+    /* end-new */ 
     ;
     
 join_component_list ::=

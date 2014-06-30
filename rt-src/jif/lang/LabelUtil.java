@@ -175,6 +175,15 @@ public class LabelUtil {
         return TOP_INTEG;
     }
 
+    public ConfPolicy rifreaderPolicy(String str) {
+        try {
+            enterTiming();
+            return new RifReaderPolicy(this, str);
+        } finally {
+            exitTiming();
+        }
+    }
+
     public ConfPolicy readerPolicy(Principal owner, Principal reader) {
         try {
             enterTiming();

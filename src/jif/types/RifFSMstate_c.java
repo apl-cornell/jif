@@ -215,13 +215,19 @@ public class RifFSMstate_c implements RifFSMstate {
     @Override
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         // check each principal in turn.
+        int check = 0;
         PathMap X;
-        PathMap Xtot = null; //or bottom
+        PathMap Xtot = null;
         if (this.principals == null) return null;
         for (Principal p : this.principals) {
             X = p.labelCheck(A, lc);
             A.setPc(X.N(), lc);
-            Xtot = Xtot.join(X);
+            if (check == 0) {
+                Xtot = X;
+            } else {
+                Xtot = Xtot.join(X);
+                check = 1;
+            }
         }
         return Xtot;
     }

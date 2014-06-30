@@ -1,12 +1,13 @@
-//Type-correct
+//non-type-correct
 
 public class dynreclTest[label L1, label L2, label L3] {
 
    int {rif[q1*:{Alice},q2:{Alice},f1:q1->q2]} res;
-   int x;
    int {rif[q1*:{Alice},q2:{Alice,Bob},f1:q1->q2]} y;
 
    public dynreclTest(){
+       int x;
+   
        x = 96;
        res = 45;
        y = reclassify(x,f1);

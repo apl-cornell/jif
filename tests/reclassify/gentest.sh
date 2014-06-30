@@ -130,7 +130,7 @@ echo "--------------------------------------------------"
 echo "dynreclTest: Y "
 ~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest.jif
 echo "--------------------------------------------------"
-echo "dynreclTest2: Y "
+echo "dynreclTest2: N "
 ~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest2.jif
 echo "--------------------------------------------------"
 echo "dynreclTest3: Y "

@@ -284,11 +284,17 @@ public class RifFSM_c implements RifFSM {
                 this.states.entrySet().iterator();
         PathMap X;
         PathMap Xtot = null; //or bottom
+        int check = 0;
         while (it.hasNext()) {
             Entry<String, RifFSMstate> pairs = it.next();
             X = pairs.getValue().labelCheck(A, lc);
             A.setPc(X.N(), lc);
-            Xtot = Xtot.join(X);
+            if (check == 0) {
+                Xtot = X;
+            } else {
+                Xtot = Xtot.join(X);
+                check = 1;
+            }
         }
         return Xtot;
     }
