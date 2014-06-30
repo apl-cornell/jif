@@ -34,8 +34,17 @@ public class JifFieldInstance_c extends FieldInstance_c implements
         if (!(o instanceof JifFieldInstance)) return false;
 
         JifFieldInstance jfi = (JifFieldInstance) o;
+        // XXX This doesn't test for label equality, but should. Adding the
+        // label-equality test, however, exposes scheduling bugs are complicated
+        // to fix. (Procedure instances with field final access paths in their
+        // constraints end up with unsubstituted VarLabels in the paths' field
+        // instances, which should have been substituted out by the
+        // FieldLabelResolver. The pthScript tests involving
+        // Regression0[12]?.jif exercise this issue.) Once this scheduling issue
+        // is fixed, the line below can be uncommented, and the kludge in
+        // JifSubstClassType_c.fields() can be removed.
         return super.equalsImpl(jfi)
-                && ts.equals(label, jfi.label())
+//                && ts.equals(label, jfi.label())
                 && hasInitializer == jfi.hasInitializer()
                 && (hasInitializer ? ts.equals(initializer, jfi.initializer())
                         : true);
