@@ -621,6 +621,11 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
     Regression01A.jif, Regression01B.jif ;
     Regression02A.jif Regression02B.jif, Regression02C.jif ;
     Regression02B.jif Regression02A.jif, Regression02C.jif ;
+
+    # Exposes a bug in the scheduler.
+    # Commented out because it also exposes a bug in pth (also causes remaining
+    # tests to fail).
+    #MutualDep01A.jif MutualDep01B.jif ;
 }
 
 # the robustness test cases. Turn robustness on.

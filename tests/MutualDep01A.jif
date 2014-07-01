@@ -1,0 +1,4 @@
+public class MutualDep01A {
+  public static final principal{MutualDep01B.Q→} P = null;
+  public static final principal Q = null;
+}
