@@ -77,7 +77,7 @@ public class JifScheduler extends JLScheduler {
         JifOptions opts = (JifOptions) job.extensionInfo().getOptions();
         Goal ig;
         if (opts.skipLabelChecking) {
-            ig = new EmptyGoal(job);
+            ig = new EmptyGoal(job, "LabelsDoubleChecked");
         } else {
             ig = new LabelCheckGoal(job, false) {
                 // Create an anonymous subclass to avoid conflating with the
