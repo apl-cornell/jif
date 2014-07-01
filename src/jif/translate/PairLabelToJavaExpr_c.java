@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import jif.types.JifTypeSystem;
 import jif.types.RifFSM;
 import jif.types.RifFSMstate;
 import jif.types.label.ConfPolicy;
@@ -83,44 +84,51 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
             RifReaderPolicy_c rpol = (RifReaderPolicy_c) iter.next();
             RifFSM fsm = rpol.getFSM();
             Map<String, RifFSMstate> states = fsm.states();
-            String statesStr = null;
-            String princStr;
-            for (Entry<String, RifFSMstate> pair : states.entrySet()) {
-                princStr = "STB," + pair.getKey() + ",";
-                if (fsm.currentState().name().toString() == pair.getKey()) {
-                    princStr += "*,";
+            String command = rw.runtimeLabelUtil() + ".rifreaderPolicy()";
+            JifTypeSystem ts = rw.jif_ts();
+            List<Expr> subst = new LinkedList<Expr>();
+            for (Entry<String, RifFSMstate> st : states.entrySet()) {
+                List<Principal> principals = st.getValue().principals();
+                Expr e = null;
+                for (Principal princ : principals) {
+                    Expr pe = rw.principalToJava(princ);
+                    if (e == null) {
+                        e = pe;
+                    } else {
+                        e =
+                                rw.qq()
+                                        .parseExpr(
+                                                ts.PrincipalUtilClassName()
+                                                        + ".conjunction(%E, %E)",
+                                                pe, e);
+                    }
                 }
-                List<Principal> principals = pair.getValue().principals();
-                for (Principal pr : principals) {
-                    Expr prexpr = rw.principalToJava(pr);
-                    princStr = princStr + prexpr + ",";
+                command += ".addstate(" + st.getKey() + ",";
+                if (fsm.currentState().name().toString() == st.getKey()) {
+                    command += "true,";
+                } else {
+                    command += "false,";
                 }
-                princStr = princStr + "STE,";
-                statesStr = statesStr + princStr;
-            }
-            String transStr = null;
-            for (Entry<String, RifFSMstate> pair : states.entrySet()) {
+                command += "%E)";
+                subst.add(e);
+
                 HashMap<String, RifFSMstate> transitions =
-                        pair.getValue().getTransitions();
+                        st.getValue().getTransitions();
                 if (transitions != null) {
                     Iterator<Entry<String, RifFSMstate>> it =
                             transitions.entrySet().iterator();
                     while (it.hasNext()) {
                         Entry<String, RifFSMstate> pairs = it.next();
-                        transStr += "TRB," + pairs.getKey() + ",";
-                        transStr +=
-                                pair.getKey() + ","
+                        command +=
+                                ".addtransition(" + pairs.getKey() + ","
+                                        + st.getKey() + ","
                                         + pairs.getValue().name().toString()
-                                        + ",";
-                        transStr += "TRE" + ",";
+                                        + ")";
                     }
                 }
+
             }
-            return (Expr) rw
-                    .qq()
-                    .parseExpr(
-                            rw.runtimeLabelUtil() + ".rifreaderPolicy("
-                                    + statesStr + transStr + ")")
+            return (Expr) rw.qq().parseExpr(command, subst)
                     .position(Position.compilerGenerated()); //what to put here as an argument?
         }
 
