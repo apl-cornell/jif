@@ -29,7 +29,7 @@
 # an appropriate class path, to make sure that pth can find the Jif compiler.
 #    $ pth pthScript -classpath "../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:."
 
-jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:../rt-classes:/../lib/jifrt.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar" {
+jif.ExtensionInfo  "-d out -nonrobust -classpath ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:../rt-classes:/../lib/jifrt.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar" {
 	A.jif ;
     labelparam/AE.jif ;
     labelparam/A.jif labelparam/E.jif ;
@@ -623,9 +623,7 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
     Regression02B.jif Regression02A.jif, Regression02C.jif ;
 
     # Exposes a bug in the scheduler.
-    # Commented out because it also exposes a bug in pth (also causes remaining
-    # tests to fail).
-    #MutualDep01A.jif MutualDep01B.jif ;
+    MutualDep01A.jif MutualDep01B.jif ;
 }
 
 # the robustness test cases. Turn robustness on.
