@@ -1,0 +1,20 @@
+/**
+ * Based on a test case submitted by Cormac Flanagan.
+ */
+class UnsoundInference[label K] {
+  label k() { return K; }
+
+  static boolean{⊤←} leak{⊤←}(boolean{⊤→} secret) {
+    final label TRUE = new label {⊤→};
+    final label FALSE = new label {⊤←};
+
+    // Encode secret argument as a label.
+    final label stillSecret = secret ? TRUE : FALSE;
+
+    // Launder secret through class parameter.
+    UnsoundInference[stillSecret] magic = new UnsoundInference();
+    final label notSecret = magic.k();
+
+    return notSecret equiv TRUE;
+  }
+}

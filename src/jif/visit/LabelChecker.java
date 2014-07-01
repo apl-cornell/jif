@@ -62,6 +62,12 @@ public class LabelChecker implements Copy {
     final protected NodeFactory nf;
 
     /**
+     * If true, then warnings will be produced; otherwise, warnings will be
+     * silenced.
+     */
+    final protected boolean warningsEnabled;
+
+    /**
      * If true, then a new system of constraints will be used for each
      * class body, and upon leaving the class body, the system of constraints
      * will be solved.
@@ -84,13 +90,14 @@ public class LabelChecker implements Copy {
     protected Solver solver;
 
     public LabelChecker(Job job, TypeSystem ts, NodeFactory nf,
-            boolean solvePerClassBody, boolean solvePerMethod,
-            boolean doLabelSubst) {
+            boolean warningsEnabled, boolean solvePerClassBody,
+            boolean solvePerMethod, boolean doLabelSubst) {
         this.job = job;
         this.ts = (JifTypeSystem) ts;
         this.context = (JifContext) ts.createContext();
         this.nf = nf;
 
+        this.warningsEnabled = warningsEnabled;
         this.solvePerClassBody = solvePerClassBody;
         this.solvePerMethod = solvePerMethod;
         //        if (solvePerMethod && solvePerClassBody) {
@@ -143,6 +150,10 @@ public class LabelChecker implements Copy {
 
     public Job job() {
         return this.job;
+    }
+
+    public boolean warningsEnabled() {
+        return warningsEnabled;
     }
 
     public ErrorQueue errorQueue() {
@@ -289,12 +300,12 @@ public class LabelChecker implements Copy {
 
     /**
      * Called by JifClassDeclExt just after this label checker has been used to
-     * check a class body. This allows us to use a different solver if
+     * check a method body. This allows us to use a different solver if
      * required.
      */
     public JifMethodDecl leavingMethod(JifMethodDecl n) {
         if (solvePerMethod) {
-            // solving by class. We need to solve the constraints
+            // solving by method. We need to solve the constraints
             return (JifMethodDecl) solveConstraints(n);
         }
         return n;

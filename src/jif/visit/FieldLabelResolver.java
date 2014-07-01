@@ -111,7 +111,7 @@ public class FieldLabelResolver extends ContextVisitor {
                     // field label inference of pct
                     try {
                         scheduler.addPrerequisiteDependency(
-                                scheduler.LabelsChecked(this.job),
+                                scheduler.LabelsDoubleChecked(this.job),
                                 scheduler.FieldLabelInference(pct.job()));
                     } catch (CyclicDependencyException e) {
                         throw new InternalCompilerError(e);
@@ -128,7 +128,7 @@ public class FieldLabelResolver extends ContextVisitor {
 
         LabelChecker lc =
                 ((ExtensionInfo) ct.typeSystem().extensionInfo())
-                        .createLabelChecker(job, false, false, false);
+                        .createLabelChecker(job, true, false, false, false);
 
         if (lc == null) {
             throw new InternalCompilerError(

@@ -1,8 +1,9 @@
 package jif.visit;
 
 import jif.ast.CanonicalLabelNode;
-import jif.ast.JifUtil;
 import jif.ast.JifExt_c;
+import jif.ast.JifUtil;
+import jif.types.JifConstructorInstance;
 import jif.types.JifFieldInstance;
 import jif.types.JifLocalInstance;
 import jif.types.JifProcedureInstance;
@@ -16,6 +17,7 @@ import polyglot.ast.FieldDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Local;
 import polyglot.ast.LocalDecl;
+import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.ProcedureDecl;
@@ -105,6 +107,13 @@ public class JifLabelSubst extends ContextVisitor {
                             .formalTypes(), c.target().type().toClass());
 
             n = c.methodInstance(mi);
+        }
+
+        if (n instanceof New) {
+            New m = (New) n;
+            JifConstructorInstance jci =
+                    (JifConstructorInstance) m.constructorInstance();
+            jci.subst(bounds);
         }
 
         if (JifUtil.jifExt(n) != null) {

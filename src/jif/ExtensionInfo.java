@@ -159,10 +159,12 @@ public class ExtensionInfo extends JLExtensionInfo {
         return new JifScheduler(this, jlext);
     }
 
-    public LabelChecker createLabelChecker(Job job, boolean solvePerClassBody,
-            boolean solvePerMethod, boolean doLabelSubst) {
+    public LabelChecker createLabelChecker(Job job, boolean warningsEnabled,
+            boolean solvePerClassBody, boolean solvePerMethod,
+            boolean doLabelSubst) {
         return new LabelChecker(job, typeSystem(), nodeFactory(),
-                solvePerClassBody, solvePerMethod, doLabelSubst);
+                warningsEnabled, solvePerClassBody, solvePerMethod,
+                doLabelSubst);
     }
 
     @Override
