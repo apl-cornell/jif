@@ -126,7 +126,7 @@ public class FieldLabelResolver extends ContextVisitor {
 
         LabelChecker lc =
                 ((ExtensionInfo) ct.typeSystem().extensionInfo())
-                        .createLabelChecker(job, false, false, false);
+                        .createLabelChecker(job, true, false, false, false);
 
         if (lc == null) {
             throw new InternalCompilerError(

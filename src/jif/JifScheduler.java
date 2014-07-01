@@ -54,7 +54,7 @@ public class JifScheduler extends JLScheduler {
         if (opts.skipLabelChecking) {
             ig = new EmptyGoal(job);
         } else {
-            ig = new LabelCheckGoal(job);
+            ig = new LabelCheckGoal(job, true);
         }
         Goal g = internGoal(ig);
         try {
@@ -79,7 +79,7 @@ public class JifScheduler extends JLScheduler {
         if (opts.skipLabelChecking) {
             ig = new EmptyGoal(job);
         } else {
-            ig = new LabelCheckGoal(job) {
+            ig = new LabelCheckGoal(job, false) {
                 // Create an anonymous subclass to avoid conflating with the
                 // goal for LabelsChecked.
             };
