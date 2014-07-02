@@ -1,8 +1,11 @@
 # Jif configuration properties.
 
 # Base directory of Polyglot installation.
+#
+#   This is optional if the Polyglot JARs are in the lib directory.
 #   Must be an absolute path.
-polyglot.home=${env.HOME}/polyglot
+#
+#polyglot.home=${env.HOME}/polyglot
 
 jdk.home=${java.home}
 # The following may work better if you have the JAVA_HOME environment variable
