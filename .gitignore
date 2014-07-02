@@ -8,3 +8,4 @@
 /config.properties
 .*.sw?
 /bin_
+/jif-*.*.*.zip
