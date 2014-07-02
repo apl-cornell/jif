@@ -7,7 +7,11 @@
 #
 #polyglot.home=${env.HOME}/polyglot
 
+
+# JDK installation dilectory.
+#
 jdk.home=${java.home}
+
 # The following may work better if you have the JAVA_HOME environment variable
 # defined:
 # jdk.home=${env.JAVA_HOME}

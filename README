@@ -84,11 +84,10 @@ compiler:
 2. Go to the root directory of the Jif installation (the directory
    this README is in). We'll call this directory $JIF from now on.
 
-    $ cd $JIF
+        $ cd $JIF
 
 3. Copy config.properties.in to config.properties, and then edit
-   config.properties to make "polyglot.home" the absolute
-   path of your Polyglot installation.
+   config.properties to reflect your system configuration.
   
 4. Run ant to configure the system.
 
@@ -96,7 +95,6 @@ compiler:
    
    This ensures that the classpath is set appropriately, and creates the
    executable scripts $JIF/bin/jifc and $JIF/bin/jif.
-
 
 5. Run ant to build the platform-specific Jif runtime support.
 
@@ -116,7 +114,6 @@ compiler:
    box." If you want, you can now skip step 6, which builds the Jif
    compiler, and proceed directly to step 7.
 
-
 6. (OPTIONAL) 
    Run ant to build the Jif compiler, Jif signatures for standard Java
    classes and the Jif library code.
@@ -129,7 +126,6 @@ compiler:
    The resulting .class files for the source code in $JIF/src,
    $JIF/sig-src and $JIF/lib-src will be stored in $JIF/classes,
    $JIF/sig-classes and $JIF/lib-classes respectively.
-
 
 7. You are now ready to try out Jif.  A suggested starting point is
    the BattleShip example, in the directory
