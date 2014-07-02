@@ -1,0 +1,17 @@
+public class Test {
+  void m() {
+    class C {
+      void m() {
+	Object o = new Object() {
+	  class D {
+	    class E {
+	      void m() {
+		E e = new E();
+	      }
+	    }
+	  }
+	};
+      }
+    }
+  }
+}
