@@ -824,7 +824,8 @@ public class Version extends polyglot.main.Version {
         Configures properties for dependency versions.
     -->
     <target name="configure-dependency-versions">
-        <!-- Create the distribution directory -->
+        <!-- Reset the distribution directory -->
+        <delete dir="${dist}" />
         <mkdir dir="${dist}" />
 
         <!--
