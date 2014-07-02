@@ -772,7 +772,9 @@ public class Version extends polyglot.main.Version {
                 <include name="examples/*" />
 
                 <include name="tests/*" />
+                <include name="tests/labelparam/*" />
                 <exclude name="tests/directory/**" />
+                <exclude name="tests/BASELINE-RESULTS" />
                 <include name="tests/jif/principals/**" />
                 <include name="README" />
                 <include name="LICENSE" />
