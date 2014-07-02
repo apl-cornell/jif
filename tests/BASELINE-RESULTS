@@ -507,22 +507,6 @@ OK
 OK
   Implicit2.jif: Warning: environment variable $CLASSPATH undefined.
 OK
-  Inner0.jif: Warning: environment variable $CLASSPATH undefined.
-OK
-  Inner1.jif: Warning: environment variable $CLASSPATH undefined.
-OK
-  Inner2.jif: Warning: environment variable $CLASSPATH undefined.
-OK
-  Inner3.jif: Warning: environment variable $CLASSPATH undefined.
-OK
-  Inner4.jif: Warning: environment variable $CLASSPATH undefined.
-OK
-  Inner5.jif: Warning: environment variable $CLASSPATH undefined.
-OK
-  Inner6.jif: Warning: environment variable $CLASSPATH undefined.
-OK
-  InnerFlow0.jif: Warning: environment variable $CLASSPATH undefined.
-OK
   IntBounds1.jif: Warning: environment variable $CLASSPATH undefined.
 OK
   IntBounds2.jif: Warning: environment variable $CLASSPATH undefined.
@@ -656,10 +640,6 @@ OK
   Names01.jif: Warning: environment variable $CLASSPATH undefined.
 OK
   NativePrincipal01.jif: Warning: environment variable $CLASSPATH undefined.
-OK
-  Nested01.jif: Warning: environment variable $CLASSPATH undefined.
-OK
-  Nested02.jif: Warning: environment variable $CLASSPATH undefined.
 OK
   NewLabel.jif: Warning: environment variable $CLASSPATH undefined.
 OK
@@ -1320,4 +1300,4 @@ OK
 OK
   RobustDecl04.jif: Warning: environment variable $CLASSPATH undefined.
 OK
-pthScript: 542 out of 550 tests succeeded.
+pthScript: 532 out of 540 tests succeeded.

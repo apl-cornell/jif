@@ -296,15 +296,6 @@ jif.ExtensionInfo  "-d out -nonrobust -classpath ../classes:../lib-classes:../li
 	Inf13.jif ;
 	Implicit.jif ;
 	Implicit2.jif ;
-    Inner0.jif;
-    Inner1.jif;
-    Inner2.jif;
-    Inner3.jif;
-    Inner4.jif;
-    Inner5.jif;
-    Inner6.jif;
-    # why doesn't this say ok?
-    InnerFlow0.jif (Semantic), (Semantic) ;
 	IntBounds1.jif ;
 	IntBounds2.jif ;
 	IntBounds3.jif ;
@@ -390,8 +381,6 @@ jif.ExtensionInfo  "-d out -nonrobust -classpath ../classes:../lib-classes:../li
 	            (Semantic, "can not contain .* character"),
 	            (Semantic, "can not contain .* character");
 	NativePrincipal01.jif ;
-	Nested01.jif ;
-	Nested02.jif ;
 	NewLabel.jif ;
 	NewLabel2.jif ;
 	NewLabel3.jif (Semantic, "not representable at runtime");
