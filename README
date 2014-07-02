@@ -32,7 +32,7 @@ Cygwin environment. Jif is compiled with the Ant build tool
 (http://jakarta.apache.org/ant). You must ensure that java, javac, and g++ are
 in your path.
 
-Software Versions: We recommend that you use JDK 1.4.2 or later.
+Software Versions: We recommend that you use JDK 7 or later.
 
 Jif and Cygwin: Jif can be built and used on a Windows platform running 
    Cygwin. Several issues are worth pointing out however. 
@@ -62,7 +62,7 @@ also developed at Cornell. Polyglot can be obtained from the web site:
     http://www.cs.cornell.edu/Projects/polyglot
 
 This Jif distribution contains the files polyglot.jar, jflex.jar and
-java_cup.jar from the Polyglot 2.5.2 distribution. These files are
+java_cup.jar from the Polyglot 2.6.1 distribution. These files are
 required to build Jif.
 
 This Jif distribution contains some C++ code, used to produce
@@ -77,7 +77,7 @@ Jif is compiled with the Ant build tool
 (http://jakarta.apache.org/ant).  Follow these steps to build the Jif
 compiler:
 
-1. Ensure javac is on your path and that you are using JDK 1.4.2 or
+1. Ensure javac is on your path and that you are using JDK 7 or
    later. Set the JAVA_HOME environment variable to the Java home
    directory.  The file $JAVA_HOME/include/jni.h should exist.
 
