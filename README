@@ -226,10 +226,10 @@ Jed Liu, and Danfeng Zhang. Mike George, Chinawat Isradisaikul,
 Matthew Loring, and K. Vikram also helped prepare this release. Thanks to
 Aslan Askarov, Cormac Flanagan, Robert Grabowski, Doaa Hassan,
 Daniel Hedin, Boniface Hicks, Dave King, Karl Mazurak, Todd Millstein,
-Andrei Sabelfeld, Lilia Sfaxi, and Steve Zdancewic, who provided bug
-reports and feedback for this and previous versions of Jif. Steve Chong,
-Xin Zheng, Lantian Zheng, Steve Zdancewic, and Nate Nystrom helped
-implement earlier versions.
+Andrei Sabelfeld, Thomas Schmitz, Lilia Sfaxi, and Steve Zdancewic, who
+provided bug reports and feedback for this and previous versions of Jif.
+Steve Chong, Xin Zheng, Lantian Zheng, Steve Zdancewic, and Nate Nystrom
+helped implement earlier versions.
 
 Restrictions on use
 -------------------
