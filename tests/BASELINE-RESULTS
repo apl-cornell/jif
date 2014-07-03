@@ -1052,9 +1052,11 @@ OK
   Switch04.jif: Warning: environment variable $CLASSPATH undefined.
 OK
   UnsoundConstructor01.jif: Warning: environment variable $CLASSPATH undefined.
-Expected to see Semantic Error matching the regular expression 'pc'
+OK
   UnsoundConstructor02.jif: Warning: environment variable $CLASSPATH undefined.
-Expected to see Semantic Error matching the regular expression 'pc'
+OK
+  UnsoundConstructor03.jif: Warning: environment variable $CLASSPATH undefined.
+OK
   UnsoundInference01.jif: Warning: environment variable $CLASSPATH undefined.
 OK
   FinalParamBug.jif: Warning: environment variable $CLASSPATH undefined.
@@ -1300,4 +1302,4 @@ OK
 OK
   RobustDecl04.jif: Warning: environment variable $CLASSPATH undefined.
 OK
-pthScript: 532 out of 540 tests succeeded.
+pthScript: 535 out of 541 tests succeeded.

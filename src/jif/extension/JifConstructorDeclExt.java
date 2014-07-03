@@ -31,14 +31,16 @@ import polyglot.ast.Formal;
 import polyglot.ast.Node;
 import polyglot.ast.Special;
 import polyglot.ast.Stmt;
+import polyglot.ast.Unary;
 import polyglot.main.Report;
+import polyglot.types.FieldInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 
 /** The Jif extension of the <code>JifConstructorDecl</code> node.
- * 
+ *
  *  @see polyglot.ast.ConstructorDecl
  *  @see jif.ast.JifConstructorDecl
  */
@@ -159,7 +161,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
         List<Stmt> statements = body.statements();
         for (Stmt s : statements) {
             if (seenSuperCall && uninitFinalVars.isEmpty() && A.checkingInits()
-                    && isEscapingThis(s)) {
+                    && (isEscapingThis(s) || hasStaticFieldAssign(s))) {
                 // there won't be a "dangerousSuperCall",
                 // and the next statement wants to let a reference to "this"
                 // escape, so mark this as the end of the init checking.
@@ -213,6 +215,50 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
 
         A = (JifContext) A.pop();
         return (Block) updatePathMap(body.statements(stmts), X);
+    }
+
+    /**
+     * Determines whether the given statement contains an assignment to a static
+     * field.
+     */
+    private boolean hasStaticFieldAssign(Stmt s) {
+        final boolean[] result = new boolean[] { false };
+        s.visit(new NodeVisitor() {
+            @Override
+            public Node override(Node n) {
+                return result[0] ? n : null;
+            }
+
+            @Override
+            public Node leave(Node old, Node n, NodeVisitor v) {
+                if (result[0]) return n;
+
+                // Check for static-field assignments.
+                if (n instanceof FieldAssign) {
+                    FieldInstance fi = ((FieldAssign) n).left().fieldInstance();
+                    result[0] = fi.flags().isStatic();
+                    return n;
+                }
+
+                // Check for pre/post-inc/dec of static fields.
+                if (n instanceof Unary) {
+                    Unary unary = (Unary) n;
+                    if (!(unary.expr() instanceof Field)) return n;
+
+                    Unary.Operator op = unary.operator();
+                    if (op == Unary.POST_INC || op == Unary.POST_DEC
+                            || op == Unary.PRE_INC || op == Unary.PRE_DEC) {
+                        FieldInstance fi =
+                                ((Field) unary.expr()).fieldInstance();
+                        result[0] = fi.flags().isStatic();
+                    }
+                    return n;
+                }
+
+                return n;
+            }
+        });
+        return result[0];
     }
 
     /**
@@ -322,12 +368,12 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
      * Check if the stmt is an assignment to a final field. Moreover, if
      * the final field is a label, and it is being initialized from a final
      * label, share the uids of the fields.
-     * 
+     *
      * @throws SemanticException
      */
     protected void checkFinalFieldAssignment(Stmt s_,
             Set<JifFieldInstance> uninitFinalVars, JifContext A)
-            throws SemanticException {
+                    throws SemanticException {
         // Added this so that we can initialize final fields within atomic blocks in Fabric programs
         List<Stmt> initializers = new ArrayList<Stmt>();
 
@@ -349,7 +395,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
             }
 
             FieldAssign ass = (FieldAssign) ((Eval) s).expr();
-            Field f = (Field) ass.left();
+            Field f = ass.left();
             JifFieldInstance assFi = (JifFieldInstance) f.fieldInstance();
 
             if (!(ass.operator() == Assign.ASSIGN

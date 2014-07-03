@@ -598,9 +598,10 @@ jif.ExtensionInfo  "-d out -nonrobust -classpath ../classes:../lib-classes:../li
 	Switch02.jif (Semantic, "not less restrictive");
 	Switch03.jif (Semantic, "not less restrictive");
 	Switch04.jif (Semantic, "not less restrictive");
-	UnsoundConstructor01.jif (Semantic, "pc");
-	UnsoundConstructor02.jif (Semantic, "pc");
-	UnsoundInference01.jif (Semantic);
+	UnsoundConstructor01.jif (Semantic, "may return a value with a more restrictive label");
+	UnsoundConstructor02.jif (Semantic, "not less restrictive");
+	UnsoundConstructor03.jif (Semantic, "not less restrictive");
+	UnsoundInference01.jif (Semantic, "not less restrictive");
     FinalParamBug.jif ;
 
     # Test compilation order.
