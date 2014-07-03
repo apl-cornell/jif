@@ -1,3 +1,4 @@
+- Solve dynreclTest9
 - To Solve dynreclTest7 we need to add a case for RifJoinConfPolicy_c in method policyToJava,
 in class PairLabelToJavaExpr_c. Do we need to add more for the runtime representation of rifspecs? 
 - To solve dynreclTest8, we know that the "new label" syntax takes as an argument a label (not a dynamic_label).
@@ -15,6 +16,6 @@ NEW:n LABEL f(label).
 - Printing
 - Integrity
 - Examples (paper review / battleship)
-- Conservatism of type-checking: LabelEnv_c at leq(ConfPolicy,ConfPolicy,SearchState) at 2nd case. 
+- Conservatism of type-checking: LabelEnv_c at leq(ConfPolicy,ConfPolicy,SearchState) at 2nd case (and at ReaderPolicy.java at relabelsTo). 
 If I need to check p1<=p1' join L join p2', what happens if the environment knows p1<=p1' join L join p2', or
 p1<= L join p (p=p1' join p2'), or p1<=L?
