@@ -18,7 +18,6 @@ import jif.types.label.PairLabel;
 import jif.types.label.ParamLabel;
 import jif.types.label.Policy;
 import jif.types.label.ProviderLabel;
-import jif.types.label.ReaderPolicy;
 import jif.types.label.RifConfPolicy;
 import jif.types.label.RifDynamicLabel;
 import jif.types.label.RifReaderPolicy_c;
@@ -271,9 +270,9 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
 
     Label pathToLabel(Position pos, AccessPath path);
 
-    ReaderPolicy readerPolicy(Position pos, Principal owner, Principal reader);
+    ConfPolicy readerPolicy(Position pos, Principal owner, Principal reader);
 
-    ReaderPolicy readerPolicy(Position pos, Principal owner,
+    ConfPolicy readerPolicy(Position pos, Principal owner,
             Collection<Principal> readers);
 
     RifConfPolicy rifreaderPolicy(Position pos, RifFSM fsm);

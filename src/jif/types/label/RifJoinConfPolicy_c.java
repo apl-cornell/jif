@@ -263,24 +263,24 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     @Override
     public ConfPolicy join(ConfPolicy p) {
         JifTypeSystem ts = (JifTypeSystem) this.ts;
-        return ts.join(this, (RifConfPolicy) p);
+        return ts.join(this, p);
     }
 
     @Override
-    public RifReaderPolicy_c flatten() {
-        RifReaderPolicy_c temp = null;
-        RifReaderPolicy_c next;
+    public ConfPolicy flatten() {
+        ConfPolicy temp = null;
+        ConfPolicy next = null;
 
         for (ConfPolicy c : joinComponents) {
-            if (c instanceof RifReaderPolicy_c) {
-                next = (RifReaderPolicy_c) c;
-            } else {
+            if (c instanceof RifJoinConfPolicy) {
                 next = ((RifJoinConfPolicy) c).flatten();
+            } else {
+                next = c;
             }
             if (temp == null) {
                 temp = next;
             } else {
-                temp = (RifReaderPolicy_c) temp.join(next);
+                temp = temp.join(next);
             }
         }
         return temp;

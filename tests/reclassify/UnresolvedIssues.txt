@@ -4,6 +4,7 @@ in class PairLabelToJavaExpr_c. Do we need to add more for the runtime represent
 We need to create a new node for f(label). Then we need to add one more case at "extend primary" rule for
 NEW:n LABEL f(label).
 - Solve dynreclTest4.
+- Does rif[L1;..] work?
 - The last case of label_flexible at the parser is wrong, because it considers only the first case of dynamic_label.
 - See if solver can deduce true facts about automata (i.e L1>f(L2) => g(L1)>g(f(L2)) )
 - Enable f(rifspec) to be the proper automaton.
@@ -14,3 +15,6 @@ NEW:n LABEL f(label).
 - Printing
 - Integrity
 - Examples (paper review / battleship)
+- Conservatism of type-checking: LabelEnv_c at leq(ConfPolicy,ConfPolicy,SearchState) at 2nd case. 
+If I need to check p1<=p1' join L join p2', what happens if the environment knows p1<=p1' join L join p2', or
+p1<= L join p (p=p1' join p2'), or p1<=L?

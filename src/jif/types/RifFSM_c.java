@@ -260,14 +260,16 @@ public class RifFSM_c implements RifFSM {
                 Entry<String, RifFSMstate> pairs = it2.next();
                 HashMap<String, RifFSMstate> transitions =
                         pairs.getValue().getTransitions();
-                Iterator<Entry<String, RifFSMstate>> transIt =
-                        transitions.entrySet().iterator();
-                while (transIt.hasNext()) {
-                    Entry<String, RifFSMstate> trans = transIt.next();
-                    RifFSMstate reachedstate =
-                            l.get(trans.getValue().name().id());
-                    l.get(pairs.getKey()).setTransition(trans.getKey(),
-                            reachedstate);
+                if (transitions != null) {
+                    Iterator<Entry<String, RifFSMstate>> transIt =
+                            transitions.entrySet().iterator();
+                    while (transIt.hasNext()) {
+                        Entry<String, RifFSMstate> trans = transIt.next();
+                        RifFSMstate reachedstate =
+                                l.get(trans.getValue().name().id());
+                        l.get(pairs.getKey()).setTransition(trans.getKey(),
+                                reachedstate);
+                    }
                 }
                 if (pairs.getKey() == this.current.name().id()) {
                     current = l.get(pairs.getKey());

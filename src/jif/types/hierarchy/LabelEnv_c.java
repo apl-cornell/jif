@@ -789,6 +789,7 @@ public class LabelEnv_c implements LabelEnv {
         if (p2.isSingleton() || !p1.isSingleton()) {
             if (p1.leq_(p2, this, state)) return true;
         }
+        // Is this more conservative that it need to be???
         if (p2 instanceof JoinPolicy_c) {
             // we need to find one element ci of p2 such that p1 <= ci
             @SuppressWarnings("unchecked")
@@ -839,8 +840,19 @@ public class LabelEnv_c implements LabelEnv {
             } else {
                 p1new = (RifReaderPolicy_c) p1;
             }
-            RifReaderPolicy_c p2new = ((RifJoinConfPolicy) p2).flatten();
-            if (p1new.leq_(p2new, this, state)) return true;
+            ConfPolicy p2new = ((RifJoinConfPolicy) p2).flatten();
+            if (p2new.isSingleton() && p1new.leq_(p2new, this, state))
+                return true;
+            //System.out.println(p2.toString() + " class=" + p2.getClass());
+            if (!p2new.isSingleton() && p2new instanceof JoinPolicy_c) {
+                JoinPolicy_c<ConfPolicy> jp = (JoinPolicy_c<ConfPolicy>) p2new;
+                Collection<ConfPolicy> joinComponents = jp.joinComponents();
+                for (ConfPolicy ci : joinComponents) {
+                    if (leq(p1, ci, state)) {
+                        return true;
+                    }
+                }
+            }
         }
         return false;
     }

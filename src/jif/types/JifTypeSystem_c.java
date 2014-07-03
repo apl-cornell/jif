@@ -72,7 +72,6 @@ import jif.types.label.ParamLabel_c;
 import jif.types.label.Policy;
 import jif.types.label.ProviderLabel;
 import jif.types.label.ProviderLabel_c;
-import jif.types.label.ReaderPolicy;
 import jif.types.label.RifConfPolicy;
 import jif.types.label.RifDynamicLabel;
 import jif.types.label.RifDynamicLabel_c;
@@ -1097,20 +1096,37 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    @Deprecated
-    public ReaderPolicy readerPolicy(Position pos, Principal owner,
+    public ConfPolicy readerPolicy(Position pos, Principal owner,
             Principal reader) {
-        /* ReaderPolicy t = new ReaderPolicy_c(owner, reader, this, pos);
-         return t;*/
-        throw new UnsupportedOperationException("Try to create jif policy");
+        List<Principal> principals = new LinkedList<Principal>();
+        principals.add(owner);
+        principals.add(reader);
+        HashMap<String, RifFSMstate> trans = new HashMap<String, RifFSMstate>();
+        RifFSMstate state =
+                new RifFSMstate_c(new Id_c(null, "q1"), principals, trans);
+        Map<String, RifFSMstate> states = new HashMap<String, RifFSMstate>();
+        states.put("q1", state);
+        RifFSM fsm = new RifFSM_c(states, state);
+        RifConfPolicy t = new RifReaderPolicy_c(fsm, this, pos);
+        return t;
     }
 
     @Override
-    @Deprecated
-    public ReaderPolicy readerPolicy(Position pos, Principal owner,
+    public ConfPolicy readerPolicy(Position pos, Principal owner,
             Collection<Principal> readers) {
-        Principal r = disjunctivePrincipal(pos, readers);
-        return readerPolicy(pos, owner, r);
+        List<Principal> principals = new LinkedList<Principal>();
+        principals.add(owner);
+        for (Principal p : readers) {
+            principals.add(p);
+        }
+        HashMap<String, RifFSMstate> trans = new HashMap<String, RifFSMstate>();
+        RifFSMstate state =
+                new RifFSMstate_c(new Id_c(null, "q1"), principals, trans);
+        Map<String, RifFSMstate> states = new HashMap<String, RifFSMstate>();
+        states.put("q1", state);
+        RifFSM fsm = new RifFSM_c(states, state);
+        RifConfPolicy t = new RifReaderPolicy_c(fsm, this, pos);
+        return t;
     }
 
     @Override
@@ -1847,6 +1863,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public ConfPolicy confProjection(Label L) {
+        //System.out.println(L.toString() + " class=" + L.getClass());
         if (L instanceof MeetLabel || L instanceof JoinLabel
                 || L instanceof PairLabel) return L.confProjection();
 

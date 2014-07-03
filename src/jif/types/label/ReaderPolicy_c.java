@@ -142,7 +142,7 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
         if (!changed) return substitution.substPolicy(this);
 
         JifTypeSystem ts = (JifTypeSystem) typeSystem();
-        ReaderPolicy newPolicy =
+        ConfPolicy newPolicy =
                 ts.readerPolicy(this.position(), newOwner, newReader);
         return substitution.substPolicy(newPolicy);
     }
