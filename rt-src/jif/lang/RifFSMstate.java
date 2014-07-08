@@ -79,4 +79,13 @@ public class RifFSMstate {
         return set1.containsAll(set2) && set2.containsAll(set1);
     }
 
+    public boolean leq(RifFSMstate other) {
+        List<Principal> set1 = this.confEquivPrincipals();
+        List<Principal> set2 = other.confEquivPrincipals();
+        if (set2 == null) return true;
+        if (set1 == null) return false;
+        // if (set1.size() == 1 && set1.get(0).isBottomPrincipal()) return true; //is it correct?
+        return set1.containsAll(set2);
+    }
+
 }

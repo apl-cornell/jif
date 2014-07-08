@@ -670,7 +670,11 @@ public class LabelUtil {
      * @return true iff from <= to in the information-flow ordering.
      */
     public boolean relabelsTo(Label from, Label to) {
-        try {
+
+        //is it correct???
+        return from.relabelsTo(to, null);
+
+        /*try {
             enterTiming();
             if (from == null || to == null) return false;
             if (from == to || from.equals(to)) return true;
@@ -702,7 +706,7 @@ public class LabelUtil {
             return result;
         } finally {
             exitTiming();
-        }
+        }*/
     }
 
     public boolean acts_for(Label actor, Principal granter) {
@@ -734,7 +738,10 @@ public class LabelUtil {
     }
 
     public boolean relabelsTo(Policy from, Policy to, Set<DelegationPair> s) {
-        try {
+        //is it correct???
+        return from.relabelsTo(to, null);
+
+        /*try {
             enterTiming();
             if (from == null || to == null) return false;
             if (from == to || from.equals(to)) return true;
@@ -770,7 +777,7 @@ public class LabelUtil {
             return result;
         } finally {
             exitTiming();
-        }
+        }*/
     }
 
     public String stringValue(Label lb) {

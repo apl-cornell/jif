@@ -1,4 +1,5 @@
 - Solve dynreclTest9
+- At RifReaderPolicy.java, at relabelsTo, fix line 90.
 - To Solve dynreclTest7 we need to add a case for RifJoinConfPolicy_c in method policyToJava,
 in class PairLabelToJavaExpr_c. Do we need to add more for the runtime representation of rifspecs? 
 - To solve dynreclTest8, we know that the "new label" syntax takes as an argument a label (not a dynamic_label).

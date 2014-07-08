@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import jif.types.JifTypeSystem;
 import jif.types.RifFSM;
 import jif.types.RifFSMstate;
 import jif.types.label.ConfPolicy;
@@ -85,31 +84,20 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
             RifFSM fsm = rpol.getFSM();
             Map<String, RifFSMstate> states = fsm.states();
             String command = rw.runtimeLabelUtil() + ".rifreaderPolicy()";
-            JifTypeSystem ts = rw.jif_ts();
-            List<Expr> subst = new LinkedList<Expr>();
+            List<List<Expr>> subst = new LinkedList<List<Expr>>();
             for (Entry<String, RifFSMstate> st : states.entrySet()) {
                 List<Principal> principals = st.getValue().principals();
-                Expr e = null;
+                List<Expr> e = new LinkedList<Expr>();
                 for (Principal princ : principals) {
-                    Expr pe = rw.principalToJava(princ);
-                    if (e == null) {
-                        e = pe;
-                    } else {
-                        e =
-                                rw.qq()
-                                        .parseExpr(
-                                                ts.PrincipalUtilClassName()
-                                                        + ".conjunction(%E, %E)",
-                                                pe, e);
-                    }
+                    e.add(rw.principalToJava(princ));
                 }
-                command += ".addstate(" + st.getKey() + ",";
+                command += ".addstate(" + "\"" + st.getKey() + "\"" + ",";
                 if (fsm.currentState().name().toString() == st.getKey()) {
-                    command += "true,";
+                    command += "\"true\",";
                 } else {
-                    command += "false,";
+                    command += "\"false\",";
                 }
-                command += "%E)";
+                command += "%LE)";
                 subst.add(e);
 
                 HashMap<String, RifFSMstate> transitions =
@@ -120,10 +108,11 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
                     while (it.hasNext()) {
                         Entry<String, RifFSMstate> pairs = it.next();
                         command +=
-                                ".addtransition(" + pairs.getKey() + ","
-                                        + st.getKey() + ","
+                                ".addtransition(" + "\"" + pairs.getKey()
+                                        + "\"" + "," + "\"" + st.getKey()
+                                        + "\"" + "," + "\""
                                         + pairs.getValue().name().toString()
-                                        + ")";
+                                        + "\"" + ")";
                     }
                 }
 

@@ -44,14 +44,13 @@ public class RifReaderPolicy extends AbstractPolicy implements ConfPolicy {
     }
 
     public RifReaderPolicy addstate(String stateId, String current,
-            Set<Principal> principals) {
+            List<Principal> principals) {
 
-        List<Principal> plist = new LinkedList<Principal>();
-        plist.addAll(principals);
         HashMap<String, RifFSMstate> transitions =
                 new HashMap<String, RifFSMstate>();
         RifFSMstate state =
-                new RifFSMstate(new Id_c(null, stateId), plist, transitions);
+                new RifFSMstate(new Id_c(null, stateId), principals,
+                        transitions);
         states.put(stateId, state);
         if (current == "true") {
             this.current = state;
@@ -87,8 +86,7 @@ public class RifReaderPolicy extends AbstractPolicy implements ConfPolicy {
 
         if (p instanceof JoinConfPolicy) {
             JoinPolicy jp = (JoinPolicy) p;
-            // this <= p1 join ... join p2 if there exists a pi such that
-            // this <= pi
+            //conservative checking
             for (Policy pi : jp.joinComponents()) {
                 if (labelUtil.relabelsTo(this, pi, s)) return true;
             }
@@ -97,7 +95,9 @@ public class RifReaderPolicy extends AbstractPolicy implements ConfPolicy {
             return false; //do we need to fill it???
         } else if (!(p instanceof ReaderPolicy)) return false;
 
-        return false;
+        RifReaderPolicy pp = (RifReaderPolicy) p;
+
+        return leqFSM(pp, new LinkedList<String>());
     }
 
     @Override
@@ -133,6 +133,30 @@ public class RifReaderPolicy extends AbstractPolicy implements ConfPolicy {
         if (this.currentState().equals(pol.currentState())) {
             for (Id action : allPossibleActions) {
                 if (!this.takeTransition(action).equalsFSM(
+                        pol.takeTransition(action), newvisited)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean leqFSM(RifReaderPolicy pol, List<String> visited) {
+        String pair =
+                this.current.name().id() + "&" + pol.currentState().name().id();
+        List<String> newvisited = new LinkedList<String>();
+
+        if (visited.contains(pair)) {
+            return true;
+        }
+        for (String s : visited) {
+            newvisited.add(s);
+        }
+        newvisited.add(pair);
+        if (this.currentState().leq(pol.currentState())) {
+            for (Id action : allPossibleActions) {
+                if (!this.takeTransition(action).leqFSM(
                         pol.takeTransition(action), newvisited)) {
                     return false;
                 }
