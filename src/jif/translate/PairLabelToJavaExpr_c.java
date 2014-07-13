@@ -76,6 +76,7 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
         }
 
         if (p instanceof RifJoinConfPolicy && p.isSingleton()) {
+            String curr = null;
             RifJoinConfPolicy policy = (RifJoinConfPolicy) p;
             LinkedList<Policy> l =
                     new LinkedList<Policy>(policy.joinComponents());
@@ -83,23 +84,40 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
             RifReaderPolicy_c rpol = (RifReaderPolicy_c) iter.next();
             RifFSM fsm = rpol.getFSM();
             Map<String, RifFSMstate> states = fsm.states();
-            String command = rw.runtimeLabelUtil() + ".rifreaderPolicy()";
-            List<List<Expr>> subst = new LinkedList<List<Expr>>();
+            Expr e =
+                    (Expr) rw
+                            .qq()
+                            .parseExpr(
+                                    rw.runtimeLabelUtil()
+                                            + ".rifreaderPolicy()")
+                            .position(Position.compilerGenerated());
             for (Entry<String, RifFSMstate> st : states.entrySet()) {
                 List<Principal> principals = st.getValue().principals();
-                List<Expr> e = new LinkedList<Expr>();
-                for (Principal princ : principals) {
-                    e.add(rw.principalToJava(princ));
-                }
-                command += ".addstate(" + "\"" + st.getKey() + "\"" + ",";
                 if (fsm.currentState().name().toString() == st.getKey()) {
-                    command += "\"true\",";
+                    curr = "\"true\"";
                 } else {
-                    command += "\"false\",";
+                    curr = "\"false\"";
                 }
-                command += "%LE)";
-                subst.add(e);
-
+                e =
+                        (Expr) rw
+                                .qq()
+                                .parseExpr(
+                                        rw.runtimeLabelUtil() + ".addstate("
+                                                + "\"" + st.getKey() + "\""
+                                                + "," + curr + ",%E)", e)
+                                .position(Position.compilerGenerated());
+                for (Principal princ : principals) {
+                    e =
+                            (Expr) rw
+                                    .qq()
+                                    .parseExpr(
+                                            rw.runtimeLabelUtil()
+                                                    + ".addprincipal(" + "\""
+                                                    + st.getKey() + "\""
+                                                    + ",%E,%E)",
+                                            rw.principalToJava(princ), e)
+                                    .position(Position.compilerGenerated());
+                }
                 HashMap<String, RifFSMstate> transitions =
                         st.getValue().getTransitions();
                 if (transitions != null) {
@@ -107,18 +125,31 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
                             transitions.entrySet().iterator();
                     while (it.hasNext()) {
                         Entry<String, RifFSMstate> pairs = it.next();
-                        command +=
-                                ".addtransition(" + "\"" + pairs.getKey()
-                                        + "\"" + "," + "\"" + st.getKey()
-                                        + "\"" + "," + "\""
-                                        + pairs.getValue().name().toString()
-                                        + "\"" + ")";
+                        e =
+                                (Expr) rw
+                                        .qq()
+                                        .parseExpr(
+                                                rw.runtimeLabelUtil()
+                                                        + ".addtransition("
+                                                        + "\""
+                                                        + pairs.getKey()
+                                                        + "\""
+                                                        + ","
+                                                        + "\""
+                                                        + st.getKey()
+                                                        + "\""
+                                                        + ","
+                                                        + "\""
+                                                        + pairs.getValue()
+                                                                .name()
+                                                                .toString()
+                                                        + "\"" + ",%E)", e)
+                                        .position(Position.compilerGenerated());
                     }
                 }
 
             }
-            return (Expr) rw.qq().parseExpr(command, subst)
-                    .position(Position.compilerGenerated()); //what to put here as an argument?
+            return e;
         }
 
         if (p instanceof RifJoinConfPolicy && !p.isSingleton()) {
@@ -168,5 +199,4 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
 
         throw new InternalCompilerError("Cannot translate policy " + p);
     }
-
 }

@@ -23,6 +23,10 @@ public class RifFSMstate {
         this.transitions.put(transName, rstate);
     }
 
+    public void addPrincipal(Principal p) {
+        this.principals.add(p);
+    }
+
     public HashMap<String, RifFSMstate> getTransitions() {
         return this.transitions;
     }

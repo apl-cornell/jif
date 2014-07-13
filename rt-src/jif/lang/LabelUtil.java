@@ -184,6 +184,34 @@ public class LabelUtil {
         }
     }
 
+    public ConfPolicy addstate(String name, String current, ConfPolicy rif) {
+        try {
+            enterTiming();
+            return ((RifReaderPolicy) rif).addstate(name, current, null);
+        } finally {
+            exitTiming();
+        }
+    }
+
+    public ConfPolicy addtransition(String name, String state1, String state2,
+            ConfPolicy rif) {
+        try {
+            enterTiming();
+            return ((RifReaderPolicy) rif).addtransition(name, state1, state2);
+        } finally {
+            exitTiming();
+        }
+    }
+
+    public ConfPolicy addprincipal(String name, Principal p, ConfPolicy rif) {
+        try {
+            enterTiming();
+            return ((RifReaderPolicy) rif).addprincipal(name, p);
+        } finally {
+            exitTiming();
+        }
+    }
+
     public ConfPolicy readerPolicy(Principal owner, Principal reader) {
         try {
             enterTiming();

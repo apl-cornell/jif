@@ -2,6 +2,7 @@ package jif.lang;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,17 @@ public class RifReaderPolicy extends AbstractPolicy implements ConfPolicy {
 
     }
 
+    public RifReaderPolicy addprincipal(String stateId, Principal p) {
+
+        for (Entry<String, RifFSMstate> st : states.entrySet()) {
+            if (st.getKey() == stateId) {
+                st.getValue().addPrincipal(p);
+            }
+        }
+        return this;
+
+    }
+
     public RifReaderPolicy addtransition(String transition, String state1,
             String state2) {
 
@@ -80,14 +92,96 @@ public class RifReaderPolicy extends AbstractPolicy implements ConfPolicy {
         return this.current;
     }
 
+    public Map<String, RifFSMstate> states() {
+        return this.states;
+    }
+
+    public RifReaderPolicy times(RifReaderPolicy p) {
+        if (p == null) {
+            return this;
+        }
+
+        HashMap<String, RifFSMstate> states =
+                new HashMap<String, RifFSMstate>();
+        RifFSMstate newcurrentstate = null;
+        RifReaderPolicy fsm1 = this;
+        RifReaderPolicy fsm2 = p;
+
+        LinkedList<Id> allPossibleActions = new LinkedList<Id>();
+        int j;
+        for (j = 0; j < 100; j++) {
+            allPossibleActions.add(new Id_c(null, "f" + Integer.toString(j)));
+        }
+
+        Iterator<Entry<String, RifFSMstate>> it1 =
+                fsm1.states().entrySet().iterator();
+        while (it1.hasNext()) {
+            Entry<String, RifFSMstate> pairs1 = it1.next();
+            Iterator<Entry<String, RifFSMstate>> it2 =
+                    fsm2.states().entrySet().iterator();
+            while (it2.hasNext()) {
+                Entry<String, RifFSMstate> pairs2 = it2.next();
+                String newname = pairs1.getKey() + "&" + pairs2.getKey();
+                List<Principal> newprincipals = new LinkedList<Principal>();
+                for (Principal princ : pairs1.getValue().principals()) {
+                    if (pairs2.getValue().principals().contains(princ)) {
+                        newprincipals.add(princ);
+                    }
+                }
+                states.put(newname, new RifFSMstate(new Id_c(null, newname),
+                        newprincipals, new HashMap<String, RifFSMstate>()));
+                if (fsm1.currentState().name().id() == pairs1.getKey()
+                        && fsm2.currentState().name().id() == pairs2.getKey())
+                    newcurrentstate = states.get(newname);
+            }
+        }
+
+        it1 = fsm1.states().entrySet().iterator();
+        while (it1.hasNext()) {
+            Entry<String, RifFSMstate> pairs1 = it1.next();
+            Iterator<Entry<String, RifFSMstate>> it2 =
+                    fsm2.states().entrySet().iterator();
+            while (it2.hasNext()) {
+                Entry<String, RifFSMstate> pairs2 = it2.next();
+                RifFSMstate currentstate =
+                        states.get(pairs1.getKey() + "&" + pairs2.getKey());
+                for (Id action : allPossibleActions) {
+                    RifFSMstate reachedstate1 =
+                            pairs1.getValue().reachedState(action.id());
+                    RifFSMstate reachedstate2 =
+                            pairs2.getValue().reachedState(action.id());
+                    String reachedname =
+                            reachedstate1.name().id() + "&"
+                                    + reachedstate2.name().id();
+                    currentstate.setTransition(action.id(),
+                            states.get(reachedname));
+                }
+            }
+        }
+
+        return new RifReaderPolicy(this.labelUtil, states, newcurrentstate);
+    }
+
     @Override
     public boolean relabelsTo(Policy p, Set<DelegationPair> s) {
+        Set<Policy> newlist = new LinkedHashSet<Policy>();
         if (this == p || this.equals(p)) return true;
 
         if (p instanceof JoinConfPolicy) {
             JoinPolicy jp = (JoinPolicy) p;
-            //conservative checking
+            RifReaderPolicy res = null;
             for (Policy pi : jp.joinComponents()) {
+                if (pi instanceof RifReaderPolicy) {
+                    RifReaderPolicy pol = (RifReaderPolicy) pi;
+                    res = pol.times(res);
+                } else {
+                    newlist.add(pi);
+                }
+            }
+            if (res != null) {
+                newlist.add(res);
+            }
+            for (Policy pi : newlist) {
                 if (labelUtil.relabelsTo(this, pi, s)) return true;
             }
             return false;
