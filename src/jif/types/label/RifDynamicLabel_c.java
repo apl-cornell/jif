@@ -2,6 +2,7 @@ package jif.types.label;
 
 import java.util.Set;
 
+import jif.translate.RifDynamicLabelToJavaExpr_c;
 import jif.types.JifTypeSystem;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
@@ -18,7 +19,7 @@ public class RifDynamicLabel_c extends Label_c implements RifDynamicLabel {
 
     public RifDynamicLabel_c(Id name, Label label, JifTypeSystem ts,
             Position pos) {
-        super(ts, pos);
+        super(ts, pos, new RifDynamicLabelToJavaExpr_c());
         this.name = name;
         this.label = label;
     }

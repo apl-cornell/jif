@@ -41,9 +41,9 @@ public class RifFSMstate {
         }
     }
 
-    public RifFSMstate getNextState(Id action) {
+    public RifFSMstate getNextState(String action) {
         if (this.transitions == null) return this;
-        RifFSMstate nextState = this.transitions.get(action.id());
+        RifFSMstate nextState = this.transitions.get(action);
         if (nextState == null) {
             return this;
         } else {

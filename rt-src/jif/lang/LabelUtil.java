@@ -212,6 +212,18 @@ public class LabelUtil {
         }
     }
 
+    public Label taketransition(String name, Label l) {
+        try {
+            enterTiming();
+            ConfPolicy cpol = l.confPolicy();
+            IntegPolicy ipol = l.integPolicy();
+            ConfPolicy ncpol = ((RifReaderPolicy) cpol).takeTransition(name);
+            return toLabel(ncpol, ipol);
+        } finally {
+            exitTiming();
+        }
+    }
+
     public ConfPolicy readerPolicy(Principal owner, Principal reader) {
         try {
             enterTiming();

@@ -262,6 +262,13 @@ public class RifReaderPolicy extends AbstractPolicy implements ConfPolicy {
 
     public RifReaderPolicy takeTransition(Id action) {
         RifReaderPolicy newfsm;
+        RifFSMstate nextState = this.current.getNextState(action.id());
+        newfsm = new RifReaderPolicy(this.labelUtil, this.states, nextState);
+        return newfsm;
+    }
+
+    public RifReaderPolicy takeTransition(String action) {
+        RifReaderPolicy newfsm;
         RifFSMstate nextState = this.current.getNextState(action);
         newfsm = new RifReaderPolicy(this.labelUtil, this.states, nextState);
         return newfsm;
@@ -355,4 +362,5 @@ public class RifReaderPolicy extends AbstractPolicy implements ConfPolicy {
     public ConfPolicy meet(ConfPolicy p, Set<DelegationPair> s, boolean simplify) {
         return labelUtil.meet(this, p, s, simplify);
     }
+
 }
