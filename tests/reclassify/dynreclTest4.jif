@@ -1,3 +1,5 @@
+//Not-type-correct
+
 public class dynreclTest[label L1, label L2, label L3] {
 
    int {L1} res;
@@ -16,7 +18,7 @@ public class dynreclTest[label L1, label L2, label L3] {
    
        dynreclTest w;
        
-       w = new dynreclTest(); 
+       w = new dynreclTest[L1,L2,L3](); 
    
    }
 

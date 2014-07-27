@@ -601,6 +601,14 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
         return n;
     }
 
+    @Override
+    public RifLabelNode RifTransLabelNode(Position pos, LabelNode pol, Id name) {
+        RifLabelNode n = new AmbRifTransLabelNode_c(pos, pol, name);
+        n = (RifLabelNode) n.ext(jifExtFactory().extRifLabelNode());
+        n = (RifLabelNode) n.del(delFactory().delNode());
+        return n;
+    }
+
     /* new-end */
 
     @Override

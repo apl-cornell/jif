@@ -8,10 +8,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import jif.types.label.IntegPolicy;
 import jif.types.label.JoinLabel;
 import jif.types.label.Label;
 import jif.types.label.Policy;
 import jif.types.label.RifConfPolicy;
+import jif.types.label.RifDynamicLabel;
 import jif.types.label.RifDynamicLabel_c;
 import jif.types.label.TransitionVarLabel;
 import jif.types.label.VarLabel;
@@ -138,6 +140,15 @@ public class VarMap {
             // insert the default label into the map.
             bound = defaultLabelBound;
             this.setBound(v, bound);
+        } else if (bound instanceof RifDynamicLabel) {
+            Label innerlabel = ((RifDynamicLabel) bound).getLabel();
+            Label reslabel = (Label) bounds.get(innerlabel);
+            RifConfPolicy cp =
+                    ((RifConfPolicy) reslabel.confProjection())
+                            .takeTransition(((RifDynamicLabel) bound).getName());
+            IntegPolicy ip = reslabel.integProjection();
+            bound = ts.pairLabel(bound.position(), cp, ip);
+            this.setBound(v, bound);
         }
 
         return bound;
@@ -163,6 +174,14 @@ public class VarMap {
             if (L instanceof VarLabel) {
                 VarLabel v = (VarLabel) L;
                 return VarMap.this.boundOf(v);
+            } else if (L instanceof RifDynamicLabel) {
+                Label innerlabel = ((RifDynamicLabel) L).getLabel();
+                Label reslabel = (Label) bounds.get(innerlabel);
+                RifConfPolicy cp =
+                        ((RifConfPolicy) reslabel.confProjection())
+                                .takeTransition(((RifDynamicLabel) L).getName());
+                IntegPolicy ip = reslabel.integProjection();
+                return ts.pairLabel(L.position(), cp, ip);
             }
             return L;
         }

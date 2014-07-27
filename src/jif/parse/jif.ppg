@@ -280,6 +280,7 @@ terminal Token DECLASSIFY;
 /* begin-new */
 terminal Token RECLASSIFY;
 terminal Token RIF;
+terminal Token TR;
 /* end-new */
 terminal Token ENDORSE;
 terminal Token TO;
@@ -307,6 +308,7 @@ non terminal RifStateNode current_state_component;
 non terminal List principal_set;
 non terminal RifTransitionNode transition_component;
 non terminal Token rif_rightarrow;
+non terminal RifLabelNode rif_label;
 non terminal List rif_join_list;
 /* end-new */
 non terminal EndorseExpr endorse;
@@ -374,14 +376,29 @@ label ::=
             {: RESULT = l; :}
           
             /* begin-new */
-    |    RIF:x LBRACK rif_join_list:a RBRACK:y
-            {: RifLabelNode ln;
-               ln = parser.nf.RifLabelNode(parser.pos(x, y), a);
-               RESULT = ln; :}
+    |   TR:x LPAREN LBRACE:w join_component_list:a RBRACE:z COMMA IDENTIFIER:b RPAREN:y
+            {: LabelNode ln1,ln2;
+               ln1 = parser.nf.JoinLabelNode(parser.pos(w, z), a);
+               ln2 = parser.nf.AmbRifDynamicLabelNode(parser.pos(x, y), parser.nf.Id(parser.pos(b), b.getIdentifier()),ln1);
+               RESULT = ln2; :}        
+    |    rif_label:a
+            {: RESULT = a; :}
             /* end-new */
     ;
           
     /* begin-new */
+rif_label ::= 
+     RIF:x LBRACK rif_join_list:a RBRACK:y
+            {: RifLabelNode ln;
+               ln = parser.nf.RifLabelNode(parser.pos(x, y), a);
+               RESULT = ln; :}
+   | TR:x LPAREN rif_label:a COMMA IDENTIFIER:b RPAREN:y  
+           {: RifLabelNode ln;
+               ln = parser.nf.RifTransLabelNode(parser.pos(x, y), a, parser.nf.Id(parser.pos(b), b.getIdentifier()));
+               RESULT = ln;;
+           :}            
+   ; 
+    
 rif_join_list ::=
         rif_policy:a
            {: List l = new LinkedList<RifPolicyNode>();
@@ -464,12 +481,6 @@ label_flexible ::=
             {: RESULT = a; :}
     | dynamic_label:a
             {: RESULT = a; :}
-    /* begin-new */             
-    | IDENTIFIER LPAREN label:a RPAREN
-            {: RESULT = a; :}
-    | IDENTIFIER:a LPAREN dynamic_label:b RPAREN:y
-            {: RESULT = parser.nf.AmbRifDynamicLabelNode(parser.pos(a,y), parser.nf.Id(parser.pos(a), a.getIdentifier()), b); :}
-    /* end-new */ 
     ;
     
 join_component_list ::=
@@ -613,6 +624,8 @@ dynamic_label ::=
                }
                RESULT = parser.nf.AmbProviderLabelNode(parser.pos(a, b), clazz);
             :}
+     | TR:x LPAREN dynamic_label:b COMMA IDENTIFIER:a RPAREN:y
+            {: RESULT = parser.nf.AmbRifDynamicLabelNode(parser.pos(x,y), parser.nf.Id(parser.pos(a), a.getIdentifier()), b); :}        
     ;
 
 accesspath ::=

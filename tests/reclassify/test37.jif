@@ -1,0 +1,20 @@
+
+// Transition on type
+// Type-correct
+
+public class test37{
+    
+    public test37() {
+
+       	int rif[q1*:{Alice,Bob},q2:{Alice},q3:{Alice},f1:q1->q2,f1:q2->q3] res; 
+       	int tr(tr(rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2,f2:q2->q1],f1),f2) x;
+	    int rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2] y;
+	    
+	    	x = 96;
+	    	y = 45;
+	    
+	    	res = x+y;  
+	    
+    }
+
+}

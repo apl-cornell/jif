@@ -171,4 +171,6 @@ public interface JifNodeFactory extends NodeFactory {
 
     AmbRifDynamicLabelNode AmbRifDynamicLabelNode(Position pos, Id name,
             LabelNode lbl);
+
+    RifLabelNode RifTransLabelNode(Position pos, LabelNode pol, Id name);
 }
