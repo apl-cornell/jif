@@ -24,6 +24,7 @@ import polyglot.frontend.Job;
 import polyglot.frontend.JobExt;
 import polyglot.frontend.Parser;
 import polyglot.frontend.Scheduler;
+import polyglot.frontend.Source;
 import polyglot.frontend.Source.Kind;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
@@ -134,7 +135,7 @@ public class ExtensionInfo extends JLExtensionInfo {
     }
 
     @Override
-    public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
+    public Parser parser(Reader reader, Source source, ErrorQueue eq) {
 
         polyglot.lex.Lexer lexer = new jif.parse.Lexer_c(reader, source, eq);
         polyglot.parse.BaseParser grm =
