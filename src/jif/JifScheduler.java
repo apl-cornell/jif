@@ -215,8 +215,8 @@ public class JifScheduler extends JLScheduler {
     }
 
     @Override
-    public Goal Serialized(Job job) {
-        Goal g = super.Serialized(job);
+    public Goal Validated(Job job) {
+        Goal g = super.Validated(job);
         try {
             addPrerequisiteDependency(g, this.LabelsDoubleChecked(job));
             addPrerequisiteDependency(g, this.NativeConstructorsAdded(job));
@@ -303,7 +303,7 @@ public class JifScheduler extends JLScheduler {
     }
 
     /**
-     * 
+     *
      */
     @Override
     public Job addJob(Source source, Node ast) {
@@ -315,7 +315,7 @@ public class JifScheduler extends JLScheduler {
     }
 
     /**
-     * 
+     *
      */
     @Override
     public Job addJob(Source source) {
