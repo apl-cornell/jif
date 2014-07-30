@@ -145,6 +145,11 @@ public class ExtensionInfo extends JLExtensionInfo {
         return new CupParser(grm, source, eq);
     }
 
+    @Override
+    public Set<String> keywords() {
+        return new jif.parse.Lexer_c((Reader) null).keywords();
+    }
+
     public static class JifJobExt implements JobExt {
         public JifJobExt(JifTypeSystem ts) {
         }
