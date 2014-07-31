@@ -1192,6 +1192,12 @@ extend primary ::=
             {: RESULT = parser.nf.PrincipalExpr(parser.pos(n, z), a); :}
     |   NEW:n objtype_or_expr:a dims_opt:b
             {: RESULT = a.toNewArray(parser.pos(n, a), b); :}
+    |   NEW:n LABEL TR:x LPAREN dynamic_label:b COMMA IDENTIFIER:a RPAREN:y
+            {: LabelNode ln;
+               ln = parser.nf.AmbRifDynamicLabelNode(parser.pos(x,y), parser.nf.Id(parser.pos(a), a.getIdentifier()), b);
+               RESULT = parser.nf.NewLabel(parser.pos(n, y), ln); :}     
+            
+            //the inside L should be param or path of final fields  
     ;
 
 extend primary_no_new_array ::=
@@ -1222,7 +1228,7 @@ primary_no_array ::=
     ;
 
 transfer primary_no_new_array to primary_no_array {
-        literal
+        literal   
     |   THIS
     |   LPAREN expression RPAREN
     |   class_instance_creation_expression

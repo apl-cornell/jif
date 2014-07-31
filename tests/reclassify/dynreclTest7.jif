@@ -1,11 +1,11 @@
-//Not-type-correct
+//Type-correct
 
 public class dynreclTest[label L1, label L2, label L3] {
 
    int {L1} res;
    int {L2} y;
 
-   public dynreclTest() where f1(L1) <= L2  {
+   public dynreclTest() where tr(L1,f1) <= L2  {
        int x;
    
        x = 96;

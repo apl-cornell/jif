@@ -1,9 +1,13 @@
+//Transition-label as expression
+//Type-correct
+
+
 public class dynreclTest[label L1, label L2, label L3] {
 
    int {L1} res;
    int {L2} y;
 
-   public dynreclTest() where f1(L1) <= L2  {
+   public dynreclTest() where tr(L1,f1) <= L2  {
        int x;
    
        x = 96;
@@ -16,7 +20,7 @@ public class dynreclTest[label L1, label L2, label L3] {
    
        dynreclTest w;
        
-       if(new label {f1(L1)} <= L2){ w = new dynreclTest(); }
+       if(new label tr(L1,f1) <= L2){ w = new dynreclTest[L1,L2,L3](); }
    
    }
 

@@ -143,12 +143,15 @@ public class VarMap {
         } else if (bound instanceof RifDynamicLabel) {
             Label innerlabel = ((RifDynamicLabel) bound).getLabel();
             Label reslabel = (Label) bounds.get(innerlabel);
-            RifConfPolicy cp =
-                    ((RifConfPolicy) reslabel.confProjection())
-                            .takeTransition(((RifDynamicLabel) bound).getName());
-            IntegPolicy ip = reslabel.integProjection();
-            bound = ts.pairLabel(bound.position(), cp, ip);
-            this.setBound(v, bound);
+            if (reslabel != null) {
+                RifConfPolicy cp =
+                        ((RifConfPolicy) reslabel.confProjection())
+                                .takeTransition(((RifDynamicLabel) bound)
+                                        .getName());
+                IntegPolicy ip = reslabel.integProjection();
+                bound = ts.pairLabel(bound.position(), cp, ip);
+                this.setBound(v, bound);
+            }
         }
 
         return bound;
@@ -177,11 +180,14 @@ public class VarMap {
             } else if (L instanceof RifDynamicLabel) {
                 Label innerlabel = ((RifDynamicLabel) L).getLabel();
                 Label reslabel = (Label) bounds.get(innerlabel);
-                RifConfPolicy cp =
-                        ((RifConfPolicy) reslabel.confProjection())
-                                .takeTransition(((RifDynamicLabel) L).getName());
-                IntegPolicy ip = reslabel.integProjection();
-                return ts.pairLabel(L.position(), cp, ip);
+                if (reslabel != null) {
+                    RifConfPolicy cp =
+                            ((RifConfPolicy) reslabel.confProjection())
+                                    .takeTransition(((RifDynamicLabel) L)
+                                            .getName());
+                    IntegPolicy ip = reslabel.integProjection();
+                    return ts.pairLabel(L.position(), cp, ip);
+                }
             }
             return L;
         }
