@@ -1035,6 +1035,7 @@ public class VersionInfo {
     <target name="jflex-lexer" depends="jflex-lexer-deps" unless="jflex.lexer.up-to-date">
         <java classname="jflex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
             <classpath refid="standard.classpath" />
+            <arg line="--noinputstreamctor" />
             <arg line="${jflex.file}" />
         </java>
     </target>

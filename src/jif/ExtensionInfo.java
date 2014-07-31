@@ -147,7 +147,7 @@ public class ExtensionInfo extends JLExtensionInfo {
 
     @Override
     public Set<String> keywords() {
-        return new jif.parse.Lexer_c((Reader) null).keywords();
+        return new jif.parse.Lexer_c(null).keywords();
     }
 
     public static class JifJobExt implements JobExt {
