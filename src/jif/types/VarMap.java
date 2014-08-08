@@ -180,6 +180,10 @@ public class VarMap {
             } else if (L instanceof RifDynamicLabel) {
                 Label innerlabel = ((RifDynamicLabel) L).getLabel();
                 Label reslabel = (Label) bounds.get(innerlabel);
+                if (reslabel != null && reslabel instanceof RifDynamicLabel) {
+                    return ts.rifDynamicLabel(L.position(),
+                            ((RifDynamicLabel) L).getName(), reslabel);
+                }
                 if (reslabel != null) {
                     RifConfPolicy cp =
                             ((RifConfPolicy) reslabel.confProjection())
