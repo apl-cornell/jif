@@ -1,5 +1,6 @@
 package jif.types.label;
 
+import java.util.List;
 import java.util.Set;
 
 import jif.translate.RifDynamicLabelToJavaExpr_c;
@@ -54,7 +55,7 @@ public class RifDynamicLabel_c extends Label_c implements RifDynamicLabel {
     public boolean leq_(Label L, LabelEnv H, SearchState state) {
         if (L instanceof RifDynamicLabel) {
             RifDynamicLabel that = (RifDynamicLabel) L;
-            return this.name.toString() == that.getName().toString()
+            return this.name.id().equals(that.getName().id())
                     && this.label.leq_(that.getLabel(), H, state);
 
         }
@@ -80,6 +81,23 @@ public class RifDynamicLabel_c extends Label_c implements RifDynamicLabel {
     public String componentString(Set<Label> printedLabels) {
 
         return this.name + "(" + this.label.componentString() + ")";
+    }
+
+    @Override
+    public List<Id> transToBeTaken(Label rdl, List<Id> list) {
+        if (this.equals(rdl)) {
+            return list;
+        }
+        if (!(this.getLabel() instanceof RifDynamicLabel)) {
+            if (this.getLabel().equals(rdl)) {
+                list.add(((RifDynamicLabel) this).getName());
+                return list;
+            }
+            return null;
+        }
+        list.add(((RifDynamicLabel) this).getName());
+        return ((RifDynamicLabel) this.getLabel()).transToBeTaken(rdl, list);
+
     }
 
     @Override

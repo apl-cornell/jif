@@ -39,6 +39,7 @@ import jif.types.label.PairLabel;
 import jif.types.label.ParamLabel;
 import jif.types.label.Policy;
 import jif.types.label.RifConfPolicy;
+import jif.types.label.RifDynamicLabel;
 import jif.types.label.RifJoinConfPolicy;
 import jif.types.label.RifReaderPolicy_c;
 import jif.types.label.VarLabel_c;
@@ -46,6 +47,7 @@ import jif.types.label.WriterPolicy;
 import jif.types.label.WritersToReadersLabel;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
+import polyglot.ast.Id;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
@@ -528,6 +530,14 @@ public class LabelEnv_c implements LabelEnv {
             return true;
         }
 
+        if (L1 instanceof RifDynamicLabel && L2 instanceof RifDynamicLabel) {
+            RifDynamicLabel lbl1 = (RifDynamicLabel) L1;
+            RifDynamicLabel lbl2 = (RifDynamicLabel) L2;
+            Label in1 = lbl1.getLabel();
+            Label in2 = lbl2.getLabel();
+            if (leqImpl(in1, in2, state)) return true;
+        }
+
         if (L1 instanceof ArgLabel) {
             ArgLabel al = (ArgLabel) L1;
             // recurse on upper bound.
@@ -693,6 +703,11 @@ public class LabelEnv_c implements LabelEnv {
             if (beSmart) {
                 // only use assertions that match one or the other of our labels                
                 if (!L1.equals(cLHS) && !L2.equals(cRHS)) {
+                    if ((L1 instanceof PairLabel && L2 instanceof RifDynamicLabel)
+                            || (L2 instanceof PairLabel && L1 instanceof RifDynamicLabel)) {
+                        if (transequals(L1, cLHS, L2, cRHS)) return true;
+
+                    }
                     continue;
                 }
             }
@@ -753,6 +768,60 @@ public class LabelEnv_c implements LabelEnv {
         }
         return false;
 
+    }
+
+    public boolean transequals(Label L1, Label cLHS, Label L2, Label cRHS) {
+        PairLabel pl1 = null, pl2 = null;
+        RifDynamicLabel rdl1 = null;
+        Label rdl2 = null;
+
+        if (L1 instanceof PairLabel) {
+            if (cLHS instanceof PairLabel) {
+                pl1 = (PairLabel) L1;
+                pl2 = (PairLabel) cLHS;
+            } else {
+                return false;
+            }
+        }
+        if (L2 instanceof PairLabel) {
+            if (cRHS instanceof PairLabel) {
+                pl1 = (PairLabel) L2;
+                pl2 = (PairLabel) cRHS;
+            } else {
+                return false;
+            }
+        }
+        if (L1 instanceof RifDynamicLabel) {
+            if (cLHS instanceof RifDynamicLabel || cLHS instanceof ParamLabel) {
+                rdl1 = (RifDynamicLabel) L1;
+                rdl2 = cLHS;
+            } else {
+                return false;
+            }
+        }
+        if (L2 instanceof RifDynamicLabel) {
+            if (cRHS instanceof RifDynamicLabel || cRHS instanceof ParamLabel) {
+                rdl1 = (RifDynamicLabel) L2;
+                rdl2 = cRHS;
+            } else {
+                return false;
+            }
+        }
+        List<Id> ids = rdl1.transToBeTaken(rdl2, new LinkedList<Id>());
+        if (ids == null) {
+            return false;
+        }
+        Collections.reverse(ids);
+        RifConfPolicy cp2 = (RifConfPolicy) pl2.confProjection();
+        RifConfPolicy cp1 = (RifConfPolicy) pl1.confProjection();
+        for (Id i : ids) {
+            cp2 = cp2.takeTransition(i);
+        }
+        if (cp1.equals(cp2)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
