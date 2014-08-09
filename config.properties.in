@@ -18,3 +18,4 @@ jdk.home=${java.home}
 
 # You may need something like the following on Mac OS
 # jif-runtime-native.java-include-dir=${jdk.home}/include
+# jif-runtime-native.java-include-dir=${jdk.home}/include/darwin
