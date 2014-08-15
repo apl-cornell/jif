@@ -441,6 +441,24 @@ public class LabelEnv_c implements LabelEnv {
         (result ? cacheTrue : cacheFalse).add(g);
     }
 
+    private PairLabel simplify(RifDynamicLabel lbl) {
+        if (lbl.getLabel() instanceof PairLabel) {
+            PairLabel l = (PairLabel) lbl.getLabel();
+            RifConfPolicy cp = (RifConfPolicy) l.confProjection();
+            IntegPolicy ip = l.integProjection();
+            RifConfPolicy ncp = cp.takeTransition(lbl.getName());
+            return ts.pairLabel(lbl.position(), ncp, ip);
+        } else if (!(lbl.getLabel() instanceof RifDynamicLabel)) {
+            return null;
+        }
+        PairLabel res = simplify((RifDynamicLabel) lbl.getLabel());
+        if (res == null) return null;
+        RifConfPolicy cp = (RifConfPolicy) res.confProjection();
+        IntegPolicy ip = res.integProjection();
+        RifConfPolicy ncp = cp.takeTransition(lbl.getName());
+        return ts.pairLabel(lbl.position(), ncp, ip);
+    }
+
     /**
      * Non-caching implementation of L1 <= L2
      */
@@ -536,6 +554,20 @@ public class LabelEnv_c implements LabelEnv {
             Label in1 = lbl1.getLabel();
             Label in2 = lbl2.getLabel();
             if (leqImpl(in1, in2, state)) return true;
+        }
+
+        if (L1 instanceof RifDynamicLabel && L2 instanceof PairLabel) {
+            RifDynamicLabel lbl1 = (RifDynamicLabel) L1;
+            PairLabel lbl2 = (PairLabel) L2;
+            PairLabel l1 = simplify(lbl1);
+            if (l1 != null && leqImpl(l1, lbl2, state)) return true;
+        }
+
+        if (L2 instanceof RifDynamicLabel && L1 instanceof PairLabel) {
+            RifDynamicLabel lbl2 = (RifDynamicLabel) L2;
+            PairLabel lbl1 = (PairLabel) L1;
+            PairLabel l2 = simplify(lbl2);
+            if (l2 != null && leqImpl(l2, lbl1, state)) return true;
         }
 
         if (L1 instanceof ArgLabel) {

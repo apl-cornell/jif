@@ -121,6 +121,12 @@ echo "--------------------------------------------------"
 echo "test36: Y "
 ~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test36.jif
 echo "--------------------------------------------------"
+echo "test37: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test37.jif
+echo "--------------------------------------------------"
+echo "test38: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests test38.jif
+echo "--------------------------------------------------"
 echo "dynTest: Y "
 ~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynTest.jif
 echo "--------------------------------------------------"
@@ -135,4 +141,28 @@ echo "dynreclTest2: N "
 echo "--------------------------------------------------"
 echo "dynreclTest3: Y "
 ~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest3.jif
+echo "--------------------------------------------------"
+echo "dynreclTest4: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest4.jif
+echo "--------------------------------------------------"
+echo "dynreclTest5: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest5.jif
+echo "--------------------------------------------------"
+echo "dynreclTest6: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest6.jif
+echo "--------------------------------------------------"
+echo "dynreclTest7: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest7.jif
+echo "--------------------------------------------------"
+echo "dynreclTest8: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest8.jif
+echo "--------------------------------------------------"
+echo "dynreclTest9: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest9.jif
+echo "--------------------------------------------------"
+echo "dynreclTest10: N "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest10.jif
+echo "--------------------------------------------------"
+echo "dynreclTest11: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest11.jif
 echo "--------------------------------------------------"
