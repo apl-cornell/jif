@@ -1744,7 +1744,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         Position pos = p1.position();
         if (pos == null) pos = p2.position();
 
-        return joinConfPolicy(pos, s);
+        return rifjoinConfPolicy(pos, s);
     }
 
     @Override

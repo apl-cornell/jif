@@ -169,8 +169,10 @@ public class RifReaderPolicy_c extends Policy_c implements RifConfPolicy {
         ConfPolicy newpol;
         if (p instanceof RifReaderPolicy_c) {
             newpol = ts.join(this, (RifReaderPolicy_c) p);
-        } else {
+        } else if (p instanceof RifConfPolicy) {
             newpol = ts.join((RifConfPolicy) this, (RifConfPolicy) p);
+        } else {
+            newpol = ts.join(this, p);
         }
         return newpol;
     }

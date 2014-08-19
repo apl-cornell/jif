@@ -1,0 +1,167 @@
+import jif.util.*;
+
+
+/**
+ * This class represents a player in the BattleShip game.
+ *
+ * A player has a secret Board that contains Ships. The player
+ * initially generates a Board by placing Ships on the Board before the game 
+ * starts.  That Board is then endorsed by the Opponent player (also an object
+ * of this class), and stored.
+ * 
+ * During the game the Player generates a query to ask the Opponent
+ * (the method getNextQuery), the Opponent endorses the query (the method 
+ * endorseQuery), and the Opponent processes the query (the method 
+ * processQuery()). Processing queries requires declassifying some 
+ * information about the board. 
+ *
+ * This class also keeps track of which queries the opponent has
+ * asked, to ensure the opponent doesn't repeat a query.
+ *
+ * This class is parameterized by the prinicipals P and O. P is the
+ * principal that this Player class represents, and O is the opponent. The 
+ * secret board is instantiated with the label parameter {P->*;P<-* meet O<-*}; 
+ * i.e., the information is readable only by P, but trusted by both O and P.
+ */
+class Player[principal P, principal O]{
+    /**
+     * This Board represents P's board. 
+     * It's fine to make the reference to the board public, as all the 
+     * information contained in the board is readable only by P
+     */
+    private Board{_->_;*<-*} board; 
+    // 
+
+    /**
+     * Record which queries the opponent has made, to stop them from
+     * repeating queries.
+     */
+    private final List[{_->_;*<-*}] opponentQueries;
+
+	private Coordinate[{_->_;*<-*}]{_->_;*<-*} nextQuery = null;
+
+    public Player() {
+		opponentQueries = new LinkedList();
+    }
+
+    /**
+     * Create an initial board by placing ships to cover numCovered coords.
+     */
+    Board init{_->_;*<-*}(int{_->_;*<-*} numCovered) {
+	// Here what we would do in a full system is make a call to
+	// some non-Jif function, through the runtime interface, to
+	// get the position of the ships to place. That function would
+	// either return something random, or would implement some
+	// strategy. Here, we fake it with some fixed positions for
+	// ships.
+	final Ship[{_->_;*<-*}]{_->_;*<-*}[] myCunningStrategy = {
+	    new Ship[{_->_;*<-*}](new Coordinate[{_->_;*<-*}](1, 1), 1, true),
+	    new Ship[{_->_;*<-*}](new Coordinate[{_->_;*<-*}](1, 3), 2, false),
+	    new Ship[{_->_;*<-*}](new Coordinate[{_->_;*<-*}](2, 2), 3, true),
+	    new Ship[{_->_;*<-*}](new Coordinate[{_->_;*<-*}](3, 4), 4, false),
+	    new Ship[{_->_;*<-*}](new Coordinate[{_->_;*<-*}](5, 6), 5, true),
+	    new Ship[{_->_;*<-*}](new Coordinate[{_->_;*<-*}](5, 7), 6, false), 
+	};
+
+	Board board = new Board();
+	int i = 0;
+        for (int count = numCovered; count > 0 && board != null; ) {
+	    try {
+		Ship[{_->_;*<-*}] newPiece = myCunningStrategy[i++];
+		if (newPiece != null && newPiece.length > count) {
+		    // this ship is too long!
+		    newPiece = new Ship[{_->_;*<-*}](newPiece.pos, 
+					              count, 
+					              newPiece.isHorizontal);
+		}
+		board.addShip(newPiece);
+		count -= (newPiece==null?0:newPiece.length);
+	    }
+	    catch (ArrayIndexOutOfBoundsException ignored) {}
+	    catch (IllegalArgumentException ignored) { 
+		// two ships overlapped. Just try adding the next ship
+		// instead.
+	    }
+        }
+        return board;
+    }
+    
+    /**
+     * Store the endorsed board.
+     */
+    void storeBoard{_->_;*<-*}(Board{_->_;*<-*} board) 
+    {
+        this.board = board;
+    }
+
+    /**
+     * Endorse the opponents board.
+     */
+
+    
+    /**
+     * Endorse a query from the opponent.
+     */
+
+    
+    /**
+     * Generate the next query to ask the opponent.
+     */
+    public Coordinate[{_->_;*<-*}] getNextQuery{_->_;*<-*}() {
+		// Here what we would do in a full system is make a call to
+		// some non-Jif function, through the runtime interface, to
+		// get the next coordinate to ask our opponent. We fake it
+		// here by asking queries in a fixed order.
+
+		Coordinate[{_->_;*<-*}]{_->_;*<-*} c = this.nextQuery;
+		if (c == null) {
+	    	c = new Coordinate[{_->_;*<-*}](0,0);
+		}
+
+		// update nextQuery.
+		boolean direction = ((c.x + c.y)%2 == 0);
+		int newX = c.x + (direction?1:-1);
+		int newY = c.y + (direction?-1:1);
+		if (newX < 0) newX = 0;
+		if (newY < 0) newY = 0;
+		this.nextQuery = new Coordinate[{_->_;*<-*}](newX, newY);
+
+		// we now have our secret query c, which needs to be declassified.
+		Coordinate d = new Coordinate[{_->_;*<-*}](c.x,c.y);
+
+		return d;
+    }
+    
+    /**
+     * Process the query of the opponent. Note that the method requires authority
+     * to declassify the result of processing the query.
+     *
+     * @throws IllegalArgumentException if the opponent has asked the query already
+     */
+    boolean processQuery{_->_;*<-*}(Coordinate[{_->_;*<-*}]{_->_;*<-*} query) throws (IllegalArgumentException{_->_;*<-*})
+    {
+
+		Board{_->_;*<-*} brd = this.board; 
+		List oppQueries = this.opponentQueries;
+		if (brd == null || oppQueries == null || query == null) {
+		        throw new IllegalArgumentException("Bad state or args");
+		}
+	
+		// test if the opponent asked this query already, and if not,
+		// add it to our list of queries.
+		if (oppQueries.contains(query)) {
+			throw new IllegalArgumentException("Opponent already asked the query " + query.toString());
+		}
+		try {
+			oppQueries.add(query);
+		}
+		catch (ClassCastException impossible) { }
+
+
+		// find the result.
+		boolean result = brd.testPosition(query, new label {_->_;*<-*});
+	
+		// declassify the result
+		return result;
+    }
+}
