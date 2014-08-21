@@ -10,10 +10,10 @@ class BattleShip[principal P1, principal P2]{
      * have on their board. Players can have any number of ships,
      * so long as the ships cover this number of squares.
      */
-    public static final int NUM_COVERED_COORDS = 10;
+    public static final int{_->_;*<-*} NUM_COVERED_COORDS = 10;
 
-    public void play(PrintStream[{}] output) 
-		throws (SecurityException, IllegalArgumentException)
+    public void play{_->_;*<-*}(PrintStream[{_->_;*<-*}]{_->_;*<-*} output) 
+		throws (SecurityException{_->_;*<-*}, IllegalArgumentException{_->_;*<-*})
     {
 
         if (output == null) throw new IllegalArgumentException("Null output");

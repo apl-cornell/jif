@@ -10,10 +10,10 @@ class BattleShip[principal P1, principal P2]{
      * have on their board. Players can have any number of ships,
      * so long as the ships cover this number of squares.
      */
-    public static final int NUM_COVERED_COORDS = 10;
+    public static final int{_->_;*<-*} NUM_COVERED_COORDS = 10;
 
-    public void play(PrintStream[{}] output) 
-		throws (SecurityException, IllegalArgumentException)
+    public void play{_->_;*<-*}(PrintStream[{_->_;*<-*}] output) 
+		throws (SecurityException{_->_;*<-*}, IllegalArgumentException{_->_;*<-*})
     {
 
         if (output == null) throw new IllegalArgumentException("Null output");
@@ -32,7 +32,7 @@ class BattleShip[principal P1, principal P2]{
         output.print("  Initializing....");
         
         // Player 1 first creates a board
-        Board[] accepted1 = player1.init(NUM_COVERED_COORDS);
+        Board accepted1 = player1.init(NUM_COVERED_COORDS);
         
         // Player 2 endorses it (since Player 2 doesn't care where the 
         // pieces are located).
@@ -43,7 +43,7 @@ class BattleShip[principal P1, principal P2]{
 
         // Similarly for Player 2: create a board, Player 1 endorses, and board 
         // is stored.
-        Board[] accepted2 = player2.init(NUM_COVERED_COORDS);
+        Board accepted2 = player2.init(NUM_COVERED_COORDS);
         player2.storeBoard(accepted2);
         
         output.println(" Done.");

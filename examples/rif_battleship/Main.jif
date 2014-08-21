@@ -14,18 +14,18 @@ class Main {
      * (By assumption, the invocation of the program has the permission of the
      * current user p).
      */
-    public static final void main (principal{} p, String args[])
+    public static final void main{_->_;*<-*} (principal{_->_;*<-*} p, String args[])
 		throws SecurityException, IllegalArgumentException
     {
-          PrintStream out = null;
-          try {
-              Runtime runtime = Runtime.getRuntime();
-              out = runtime==null?null:runtime.stdout(new label {});
-          }
-          catch (SecurityException e) {
+         PrintStream[{_->_;*<-*}]{_->_;*<-*} out = null;
+         // try {
+         //     Runtime{_->_;*<-*} runtime = Runtime.getRuntime();
+         //     out = runtime==null?null:runtime.stdout(new label {_->_;*<-*});
+         // }
+        //  catch (SecurityException e) {
               // just let out be null.
-          }
-              
+        //  }
+   
           // instantiate an instance of the BattleShip game for Alice 
           // and Bob, and play it.
           new BattleShip[Alice, Bob]().play(out);

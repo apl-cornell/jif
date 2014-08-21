@@ -14,13 +14,13 @@ class Main {
      * (By assumption, the invocation of the program has the permission of the
      * current user p).
      */
-    public static final void main (principal{} p, String args[])
+    public static final void main{_->_;*<-*} (principal{_->_;*<-*} p, String args[])
 		throws SecurityException, IllegalArgumentException
     {
-          PrintStream[{}] out = null;
+          PrintStream[{_->_;*<-*}]{_->_;*<-*} out = null;
           try {
-              Runtime[p] runtime = Runtime[p].getRuntime();
-              out = runtime==null?null:runtime.stdout(new label {});
+              Runtime{_->_;*<-*} runtime = Runtime.getRuntime();
+              out = runtime==null?null:runtime.stdout(new label {_->_;*<-*});
           }
           catch (SecurityException e) {
               // just let out be null.

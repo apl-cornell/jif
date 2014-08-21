@@ -73,27 +73,29 @@ public class Ship[label L] implements JifObject[{_->_;*<-*}] {
 		return false;
     }
 
-    public String{_->_;*<-*} toString{_->_;*<-*}(){
-		Coordinate[{_->_;*<-*}]{_->_;*<-*} pos = this.pos;
-		Coordinate[{_->_;*<-*}]{_->_;*<-*} end = null;
+    public String{_->_;*<-*} toString(){
+		return null;
+		//Coordinate[{_->_;*<-*}]{_->_;*<-*} pos = this.pos;
+		//Coordinate[{_->_;*<-*}]{_->_;*<-*} end = null;
 	
 		//if (pos == null) pos = new Coordinate[{_->_;*<-*}](0,0);
 
-		if (isHorizontal)
-			end = new Coordinate[{_->_;*<-*}](pos.x + length, pos.y);
-		else 
-			end = new Coordinate[{_->_;*<-*}](pos.x, pos.y + length);
+		//if (isHorizontal)
+		//	end = new Coordinate[{_->_;*<-*}](pos.x + length, pos.y);
+		//else 
+		//	end = new Coordinate[{_->_;*<-*}](pos.x, pos.y + length);
 
-		return pos.toString() + " to " + end.toString();
+		//return pos.toString() + " to " + end.toString();
     }
 
     public int{_->_;*<-*} hashCode() {
-		Coordinate[{_->_;*<-*}] pos = this.pos;
-		if (pos == null) pos = new Coordinate[{_->_;*<-*}](0,0);
-		return 
-			pos.hashCode() ^ 
-			(4007 * length) ^ 
-			(isHorizontal ? 1861 : 2713);
+		return 0;
+		//Coordinate[{_->_;*<-*}] pos = this.pos;
+		//if (pos == null) pos = new Coordinate[{_->_;*<-*}](0,0);
+		//return 
+		//	pos.hashCode() ^ 
+		//	(4007 * length) ^ 
+		//	(isHorizontal ? 1861 : 2713);
     }
 
     public boolean equals(label lbl, IDComparable[{*->*;_<-_}] o) {
