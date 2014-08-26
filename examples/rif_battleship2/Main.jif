@@ -6,7 +6,7 @@ import jif.runtime.Runtime;
  *
  * It plays a game of BattleShip for the prinicipals Alice and Bob.
  */
-class Main {
+class Main{
     
     /*
      * The main method has integrity {Alice<-* meet Bob<-* meet p<-*}. This means
@@ -14,21 +14,26 @@ class Main {
      * (By assumption, the invocation of the program has the permission of the
      * current user p).
      */
-    public static final void main{_->_;*<-*} (principal{_->_;*<-*} p, String args[])
-		throws SecurityException, IllegalArgumentException
+    public static final void main{_<-*}
+                     (principal{} p, String args[]) : {_<-*} 
+         throws SecurityException, IllegalArgumentException
+
     {
-         PrintStream[{_->_;_<-_}]{_->_;_<-_} out = null;
+          PrintStream[{}] out = null;
           try {
-              Runtime{_->_;_<-_} runtime = Runtime.getRuntime();
-              out = runtime==null?null:runtime.stdout(new label {_->_;_<-_});
+              Runtime runtime = Runtime.getRuntime();
+              out = runtime==null?null:runtime.stdout(new label {});
           }
           catch (SecurityException e) {
               // just let out be null.
           }
-   
+
+          // the PrintStream needs to be labeled {Alice<-* meet Bob<-*}, which
+          // requires a declassification and an endorsement.
+
+              
           // instantiate an instance of the BattleShip game for Alice 
           // and Bob, and play it.
-		  if (output == null) throw new IllegalArgumentException("Null output");
           new BattleShip[Alice, Bob]().play(out);
     }
 }

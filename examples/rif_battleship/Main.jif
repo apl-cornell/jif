@@ -17,14 +17,14 @@ class Main {
     public static final void main{_->_;*<-*} (principal{_->_;*<-*} p, String args[])
 		throws SecurityException, IllegalArgumentException
     {
-         PrintStream[{_->_;*<-*}]{_->_;*<-*} out = null;
-         // try {
-         //     Runtime{_->_;*<-*} runtime = Runtime.getRuntime();
-         //     out = runtime==null?null:runtime.stdout(new label {_->_;*<-*});
-         // }
-        //  catch (SecurityException e) {
+         PrintStream[{_->_;_<-_}]{_->_;_<-_} out = null;
+          try {
+              Runtime{_->_;_<-_} runtime = Runtime.getRuntime();
+              out = runtime==null?null:runtime.stdout(new label {_->_;_<-_});
+          }
+          catch (SecurityException e) {
               // just let out be null.
-        //  }
+          }
    
           // instantiate an instance of the BattleShip game for Alice 
           // and Bob, and play it.

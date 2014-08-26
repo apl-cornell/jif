@@ -6,7 +6,7 @@
  * It is parameterized by the label L, which is the level of information 
  * that the coordinate contains.
  */
-class Coordinate[label L] implements JifObject[{}] {
+class Coordinate[label L] implements JifObject[{_->_;*<-*}] {
     /**
      * The x coord. 
      */
@@ -29,7 +29,7 @@ class Coordinate[label L] implements JifObject[{}] {
         return (13 * this.x) ^ (-23 * this.y);
     }
 
-    public boolean{} equals(label lbl, IDComparable[lbl] o) {
+    public boolean{_->_;*<-*} equals(label lbl, IDComparable[lbl] o) {
         return true;
       //  if (o == null || !(o instanceof Coordinate)) {
       //      return false;
@@ -39,7 +39,7 @@ class Coordinate[label L] implements JifObject[{}] {
      //   return this.x == that.x && this.y == that.y;
     }
 
-    public boolean{} equals(IDComparable[{}] o) {
+    public boolean{_->_;*<-*} equals(IDComparable[{_->_;*<-*}] o) {
         return true;   //equals(new label {}, o);
     }
 }

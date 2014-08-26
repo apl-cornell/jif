@@ -12,7 +12,7 @@ class BattleShip[principal P1, principal P2]{
      */
     public static final int{_->_;*<-*} NUM_COVERED_COORDS = 10;
 
-    public void play{_->_;*<-*}(PrintStream[{_->_;*<-*}]{_->_;*<-*} output) 
+    public void play{_->_;*<-*}(PrintStream[{_->_;_<-_}]{_->_;_<-_} output) 
 		throws (SecurityException{_->_;*<-*}, IllegalArgumentException{_->_;*<-*})
     {
 

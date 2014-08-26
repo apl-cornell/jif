@@ -13,7 +13,7 @@ import jif.util.NoSuchElementException;
  * level of information the Ships contain.  
  */
 class Board {
-    private final List[{_->_;*<-*}]{_->_;*<-*} ships;
+    private final List[{}]{} ships;
 
     public Board() {
 		this.ships = new LinkedList();
@@ -23,14 +23,14 @@ class Board {
      * @throws IllegalArgumentException if the ship to add intersects a ship
      *   already on the board.
      */
-    public void addShip{_->_;*<-*}(Ship[{_->_;*<-*}]{_->_;*<-*} s) throws (IllegalArgumentException{_->_;*<-*}){
-		List[{_->_;*<-*}]{_->_;*<-*} shps = this.ships;
+    public void addShip{}(Ship[{}]{} s) throws (IllegalArgumentException{}){
+		List[{}]{} shps = this.ships;
 		if (s != null && shps != null) {
 			try {
 			// check that we don't intersect with an existing ship.
 			for (Iterator iter = shps.iterator(); iter != null && 
 		                                                      iter.hasNext(); ) {
-				Ship[{_->_;*<-*}]{_->_;*<-*} t = (Ship)iter.next();
+				Ship[{}]{} t = (Ship)iter.next();
 				if (s.intersects(t)) {
 					throw new IllegalArgumentException("Ship to add " +
 		                                    "intersects an existing ship.");
@@ -47,16 +47,16 @@ class Board {
     /**
      * Test if a ship occupies the coordinate coord
      */
-    public boolean{_->_;*<-*} testPosition{_->_;*<-*}(Coordinate[{_->_;*<-*}]{_->_;*<-*} coord, label{_->_;*<-*} lbl) 
+    public boolean{} testPosition{}(Coordinate[{}]{} coord, label{} lbl) 
     {
 	// go through each ship in turn, and test if it covers coord
 
-		List[{_->_;*<-*}]{_->_;*<-*} shps = this.ships;
+		List[{}]{} shps = this.ships;
 		if (shps != null) {
 			int{_->_;*<-*} sz = shps.size();
 			for (int i = 0; i < sz; i++) {
 			try {
-				Ship[{_->_;*<-*}]{_->_;*<-*} s = (Ship) shps.get(i);
+				Ship[{}]{} s = (Ship) shps.get(i);
 				if (s != null && s.covers(coord)) {
 					return true;
 				}

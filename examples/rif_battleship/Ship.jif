@@ -12,7 +12,7 @@ public class Ship[label L] implements JifObject[{_->_;*<-*}] {
      * The bottom left position of the ship. ( i.e., minimum 
      * values of x and y coords that the ship covers)
      */
-    final Coordinate[{_->_;*<-*}]{_->_;*<-*} pos;
+    final Coordinate[{}]{} pos;
     
     /**
      * Length of the ship.
@@ -26,7 +26,7 @@ public class Ship[label L] implements JifObject[{_->_;*<-*}] {
      */
     final boolean{_->_;*<-*} isHorizontal;
 
-    public Ship{_->_;*<-*}(Coordinate[{_->_;*<-*}]{_->_;*<-*} pos, int{_->_;*<-*} len, boolean{_->_;*<-*} isHoriz) {
+    public Ship{}(Coordinate[{}]{} pos, int{} len, boolean{} isHoriz) {
         this.pos = pos;
         this.length = len;
         this.isHorizontal = isHoriz;
@@ -35,8 +35,8 @@ public class Ship[label L] implements JifObject[{_->_;*<-*}] {
     /**
      * Does the ship cover the co-ordinate coord?
      */
-    public boolean{_->_;*<-*} covers{_->_;*<-*}(Coordinate[{_->_;*<-*}]{_->_;*<-*} coord) {
-		Coordinate[{_->_;*<-*}]{_->_;*<-*} pos = this.pos;
+    public boolean{} covers{}(Coordinate[{}]{} coord) {
+		Coordinate[{}]{} pos = this.pos;
 		if (coord == null || pos == null) 
 			return false;
 
@@ -55,19 +55,19 @@ public class Ship[label L] implements JifObject[{_->_;*<-*}] {
     /**
      * Does this Ship intersect with the Ship ship?
      */
-    public boolean{_->_;*<-*} intersects{_->_;*<-*}(Ship[{_->_;*<-*}]{_->_;*<-*} ship) {
+    public boolean{} intersects{}(Ship[{}]{} ship) {
 		if (ship == null) return false;
 
-		Coordinate[{_->_;*<-*}]{_->_;*<-*} c = this.pos;
+		Coordinate[{}]{} c = this.pos;
 		for (int i = 0; i < length && c != null; i++) {
 			if (ship.covers(c)) 
 			return true;
 
 			if (isHorizontal) {
-			c = new Coordinate[{_->_;*<-*}](c.x+1, c.y);
+			c = new Coordinate[{}](c.x+1, c.y);
 			}
 			else {
-			c = new Coordinate[{_->_;*<-*}](c.x, c.y+1);
+			c = new Coordinate[{}](c.x, c.y+1);
 			}
 		}
 		return false;
@@ -98,15 +98,15 @@ public class Ship[label L] implements JifObject[{_->_;*<-*}] {
 		//	(isHorizontal ? 1861 : 2713);
     }
 
-    public boolean equals(label lbl, IDComparable[{*->*;_<-_}] o) {
-		if (o == null || !(o instanceof Ship[{_->_;*<-*}])) {
+    public boolean{} equals(label lbl, IDComparable[{}] o) {
+		if (o == null || !(o instanceof Ship[{}])) {
 			return false;
 		}
-	    Ship[{_->_;*<-*}] that = (Ship[{_->_;*<-*}])o;
+	    Ship[{}] that = (Ship[{}])o;
 	    // use local variables to allow the NullPointerException
 		// analysis to work.
-		Coordinate[{_->_;*<-*}] thispos = this.pos;
-		Coordinate[{_->_;*<-*}] thatpos = that.pos;
+		Coordinate[{}] thispos = this.pos;
+		Coordinate[{}] thatpos = that.pos;
 	    return this.length == that.length && 
 		       this.isHorizontal == that.isHorizontal &&
 		       (thispos == thatpos || 

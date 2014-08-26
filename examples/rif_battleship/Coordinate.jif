@@ -10,23 +10,25 @@ class Coordinate[label L] implements JifObject[{_->_;*<-*}] {
     /**
      * The x coord. 
      */
-    public final int{_->_;*<-*} x;
+    public final int{} x;
     /**
      * The y coord.
      */
-    public final int{_->_;*<-*} y;
+    public final int{} y;
 
-    public Coordinate(int{_->_;*<-*} x, int{_->_;*<-*} y) {
+    public Coordinate(int{} x, int{} y) {
         this.x = x;
         this.y = y;
     }
 
-    public String{_->_;*<-*} toString() {
-        return "(" + x + ", " + y + ")";
+    public String toString() {
+		return null;
+        //return "(" + x + ", " + y + ")";
     }
 
-    public int{_->_;*<-*} hashCode() {
-        return (13 * this.x) ^ (-23 * this.y);
+    public int hashCode() {
+        return 0;
+        //return (13 * this.x) ^ (-23 * this.y);
     }
 
     public boolean{_->_;*<-*} equals(label lbl, IDComparable[lbl] o) {
