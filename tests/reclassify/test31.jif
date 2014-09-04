@@ -5,8 +5,8 @@ public class test31{
     
     public static void  main {} (String[] args) throws (Exception{rif[q1*:{Alice},q2:{Alice},q3:{Alice},f1:q1->q2,f2:q2->q3,f3:q3->q1]}){
 
-       	int rif[q1*:{Alice},q2:{Alice},q3:{Alice},f1:q1->q2,f2:q2->q3,f3:q3->q1] res; 
-       	int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2,f2:q2->q1] x;
+       	int {rif[q1*:{Alice},q2:{Alice},q3:{Alice},f1:q1->q2,f2:q2->q3,f3:q3->q1]} res; 
+       	int {rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2,f2:q2->q1]} x;
 	    
 	x = 96;
 	res = 0;

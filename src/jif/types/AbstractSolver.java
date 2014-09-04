@@ -688,6 +688,7 @@ public abstract class AbstractSolver implements Solver {
     }
 
     protected void considerEquation(LabelEquation eqn) throws SemanticException {
+
         Label lhsbound =
                 triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
         Label rhsbound =

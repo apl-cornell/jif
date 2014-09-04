@@ -6,43 +6,38 @@
  * It is parameterized by the label L, which is the level of information 
  * that the coordinate contains.
  */
-class Coordinate[label L] implements JifObject[{_->_;*<-*}] {
+class Coordinate[label L] implements JifObject[L] {
     /**
      * The x coord. 
      */
-    public final int{} x;
+    public final int{L} x;
     /**
      * The y coord.
      */
-    public final int{} y;
-
-    public Coordinate(int{} x, int{} y) {
+    public final int{L} y;
+    public Coordinate(int{L;this} x, int{L;this} y) {
         this.x = x;
         this.y = y;
     }
 
-    public String toString() {
-		return null;
-        //return "(" + x + ", " + y + ")";
+    public String{L} toString() {
+        return "(" + x + ", " + y + ")";
     }
 
-    public int hashCode() {
-        return 0;
-        //return (13 * this.x) ^ (-23 * this.y);
+    public int{L} hashCode() {
+        return (13 * this.x) ^ (-23 * this.y);
     }
 
-    public boolean{_->_;*<-*} equals(label lbl, IDComparable[lbl] o) {
-        return true;
-      //  if (o == null || !(o instanceof Coordinate)) {
-      //      return false;
-      //  }
+    public boolean{lbl;*lbl;L;o} equals(label lbl, IDComparable[lbl] o) {
+        if (o == null || !(o instanceof Coordinate[lbl])) {
+            return false;
+        }
 
-     //   Coordinate that = (Coordinate)o;
-     //   return this.x == that.x && this.y == that.y;
+        Coordinate[lbl] that = (Coordinate[lbl])o;
+        return this.x == that.x && this.y == that.y;
     }
-
-    public boolean{_->_;*<-*} equals(IDComparable[{_->_;*<-*}] o) {
-        return true;   //equals(new label {}, o);
+    public boolean{L;o} equals(IDComparable[L] o) {
+        return equals(L, o);
     }
 }
 

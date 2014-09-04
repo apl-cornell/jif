@@ -6,8 +6,8 @@ public class test4{
     
     public test4() {
 
-       int rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2]res; 
-	   int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2] x;
+       int {rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2]} res; 
+	   int {rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]} x;
 	    
 	    x = 96;
 	    

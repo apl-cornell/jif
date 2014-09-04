@@ -64,7 +64,7 @@ public class RifFSM_c implements RifFSM {
 
         allPossibleActions = new LinkedList<Id>();
         int i;
-        for (i = 0; i < 100; i++) {
+        for (i = 0; i < 5; i++) {
             allPossibleActions.add(new Id_c(null, "f" + Integer.toString(i)));
         }
     }
@@ -75,7 +75,7 @@ public class RifFSM_c implements RifFSM {
 
         allPossibleActions = new LinkedList<Id>();
         int i;
-        for (i = 0; i < 100; i++) {
+        for (i = 0; i < 5; i++) {
             allPossibleActions.add(new Id_c(null, "f" + Integer.toString(i)));
         }
     }
@@ -290,7 +290,7 @@ public class RifFSM_c implements RifFSM {
         while (it.hasNext()) {
             Entry<String, RifFSMstate> pairs = it.next();
             X = pairs.getValue().labelCheck(A, lc);
-            A.setPc(X.N(), lc);
+            if (X != null) A.setPc(X.N(), lc);
             if (check == 0) {
                 Xtot = X;
             } else {

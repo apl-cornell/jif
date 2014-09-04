@@ -26,7 +26,7 @@ public class RifReaderPolicy extends AbstractPolicy implements ConfPolicy {
         states = new HashMap<String, RifFSMstate>();
         allPossibleActions = new LinkedList<Id>();
         int i;
-        for (i = 0; i < 100; i++) {
+        for (i = 0; i < 5; i++) {
             allPossibleActions.add(new Id_c(null, "f" + Integer.toString(i)));
         }
     }
@@ -39,7 +39,7 @@ public class RifReaderPolicy extends AbstractPolicy implements ConfPolicy {
 
         allPossibleActions = new LinkedList<Id>();
         int i;
-        for (i = 0; i < 100; i++) {
+        for (i = 0; i < 5; i++) {
             allPossibleActions.add(new Id_c(null, "f" + Integer.toString(i)));
         }
     }
@@ -109,7 +109,7 @@ public class RifReaderPolicy extends AbstractPolicy implements ConfPolicy {
 
         LinkedList<Id> allPossibleActions = new LinkedList<Id>();
         int j;
-        for (j = 0; j < 100; j++) {
+        for (j = 0; j < 5; j++) {
             allPossibleActions.add(new Id_c(null, "f" + Integer.toString(j)));
         }
 

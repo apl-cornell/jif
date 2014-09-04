@@ -6,9 +6,9 @@ public class test19{
     
    public static void  main {} (String[] args) throws (Exception{rif[q1*:{},q2:{Alice},q3:{Alice,Bob},f1:q1->q2,f2:q2->q3]}){
 
-       	int rif[q1*:{},q2:{Alice},q3:{Alice,Bob},f1:q1->q2,f2:q2->q3] res; 
-       	int rif[q1*:{},q2:{Alice},q3:{Bob,Alice},f1:q1->q2,f2:q2->q3] x;
-		int rif[q1*:{Alice},f2:q1->q2,q2:{Bob, Alice}] y;
+       	int {rif[q1*:{},q2:{Alice},q3:{Alice,Bob},f1:q1->q2,f2:q2->q3]} res; 
+       	int {rif[q1*:{},q2:{Alice},q3:{Bob,Alice},f1:q1->q2,f2:q2->q3]} x;
+		int {rif[q1*:{Alice},f2:q1->q2,q2:{Bob, Alice}]} y;
 	    
 		x = 96;
 		y = 45;

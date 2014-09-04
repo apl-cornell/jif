@@ -23,54 +23,54 @@ import jif.util.*;
  * secret board is instantiated with the label parameter {P->*;P<-* meet O<-*}; 
  * i.e., the information is readable only by P, but trusted by both O and P.
  */
-class Player[principal P, principal O]{
+class Player[principal P, principal O] {
     /**
      * This Board represents P's board. 
      * It's fine to make the reference to the board public, as all the 
      * information contained in the board is readable only by P
      */
-    private Board{_->_;*<-*} board; 
+    private Board[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}]{_<-*} board; 
     // 
 
     /**
      * Record which queries the opponent has made, to stop them from
      * repeating queries.
      */
-    private final List[{}]{} opponentQueries;
+    private final List[{_<-*}]{this} opponentQueries;
 
-	private Coordinate[{_->_;*<-*}]{_->_;*<-*} nextQuery = null;
+    private Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}]{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*} nextQuery = null;
 
     public Player() {
-		opponentQueries = new LinkedList();
+	opponentQueries = new LinkedList[{_<-*}]();
     }
 
     /**
      * Create an initial board by placing ships to cover numCovered coords.
      */
-    Board init{_->_;*<-*}(int{} numCovered) {
+    Board[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}] init{_<-*}(int{_<-*} numCovered) {
 	// Here what we would do in a full system is make a call to
 	// some non-Jif function, through the runtime interface, to
 	// get the position of the ships to place. That function would
 	// either return something random, or would implement some
 	// strategy. Here, we fake it with some fixed positions for
 	// ships.
-	final Ship[{}]{}[] myCunningStrategy = {
-	    new Ship[{}](new Coordinate[{}](1, 1), 1, true),
-	    new Ship[{}](new Coordinate[{}](1, 3), 2, false),
-	    new Ship[{}](new Coordinate[{}](2, 2), 3, true),
-	    new Ship[{}](new Coordinate[{}](3, 4), 4, false),
-	    new Ship[{}](new Coordinate[{}](5, 6), 5, true),
-	    new Ship[{}](new Coordinate[{}](5, 7), 6, false), 
+	final Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}]{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}[] myCunningStrategy = {
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1] ; _<-*}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](1, 1), 1, true),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](1, 3), 2, false),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](2, 2), 3, true),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](3, 4), 4, false),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](5, 6), 5, true),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](5, 7), 6, false), 
 	};
 
-	Board board = new Board();
+	Board[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}] board = new Board[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}]();
 	int i = 0;
         for (int count = numCovered; count > 0 && board != null; ) {
 	    try {
-		Ship[{}] newPiece = myCunningStrategy[i++];
+		Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}] newPiece = myCunningStrategy[i++];
 		if (newPiece != null && newPiece.length > count) {
 		    // this ship is too long!
-		    newPiece = new Ship[{}](newPiece.pos, 
+		    newPiece = new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](newPiece.pos, 
 					              count, 
 					              newPiece.isHorizontal);
 		}
@@ -89,7 +89,8 @@ class Player[principal P, principal O]{
     /**
      * Store the endorsed board.
      */
-    void storeBoard{_->_;*<-*}(Board{_->_;*<-*} board) 
+    void storeBoard{_<-*}(
+            Board[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}]{_<-*} board) 
     {
         this.board = board;
     }
@@ -97,40 +98,43 @@ class Player[principal P, principal O]{
     /**
      * Endorse the opponents board.
      */
-
+   
     
     /**
      * Endorse a query from the opponent.
      */
-
+  
     
     /**
      * Generate the next query to ask the opponent.
      */
-    public Coordinate[{_->_;*<-*}] getNextQuery{_->_;*<-*}() {
-		// Here what we would do in a full system is make a call to
-		// some non-Jif function, through the runtime interface, to
-		// get the next coordinate to ask our opponent. We fake it
-		// here by asking queries in a fixed order.
+    public Coordinate[{rif[q0*:{_}];_<-*}] getNextQuery{_<-*}() {
+	// Here what we would do in a full system is make a call to
+	// some non-Jif function, through the runtime interface, to
+	// get the next coordinate to ask our opponent. We fake it
+	// here by asking queries in a fixed order.
 
-		Coordinate[{_->_;*<-*}]{_->_;*<-*} c = this.nextQuery;
-		if (c == null) {
-	    	c = new Coordinate[{_->_;*<-*}](0,0);
-		}
+	Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}] c = this.nextQuery;
+	if (c == null) {
+	    c = new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](0,0);
+	}
 
-		// update nextQuery.
-		boolean direction = ((c.x + c.y)%2 == 0);
-		int newX = c.x + (direction?1:-1);
-		int newY = c.y + (direction?-1:1);
-		if (newX < 0) newX = 0;
-		if (newY < 0) newY = 0;
-		this.nextQuery = new Coordinate[{_->_;*<-*}](newX, newY);
+	// update nextQuery.
+	boolean direction = ((c.x + c.y)%2 == 0);
+	int newX = c.x + (direction?1:-1);
+	int newY = c.y + (direction?-1:1);
+	if (newX < 0) newX = 0;
+	if (newY < 0) newY = 0;
+	this.nextQuery = new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}](newX, newY);
 
-		// we now have our secret query c, which needs to be declassified.
-		Coordinate d = new Coordinate[{_->_;*<-*}](c.x,c.y);
+	// we now have our secret query c, which needs to be declassified.
+	Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1];_<-*}] d = new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1];_<-*}](c.x,c.y);
+    
+    Coordinate[{rif[q0*:{_}];_<-*}] query = reclassify(d,f1);
 
-		return d;
+	return query;
     }
+
     
     /**
      * Process the query of the opponent. Note that the method requires authority
@@ -138,30 +142,31 @@ class Player[principal P, principal O]{
      *
      * @throws IllegalArgumentException if the opponent has asked the query already
      */
-    boolean{} processQuery{_->_;*<-*}(Coordinate[{}]{} query) throws (IllegalArgumentException{_->_;*<-*})
-    {
+    boolean{rif[q0*:{_}];_<-*} processQuery{_<-*}(Coordinate[{_<-*}]{_<-*} query) 
+         throws (IllegalArgumentException{_<-*}) 
+	{
 
-		Board{_->_;*<-*} brd = this.board; 
-		List[{}]{} oppQueries = this.opponentQueries;
-		if (brd == null || oppQueries == null || query == null) {
-		        throw new IllegalArgumentException("Bad state or args");
-		}
+	Board[{rif[q0*:{P},q1:{_},f1:q0->q1]; _<-*}] brd = this.board; 
+	List[{_<-*}] oppQueries = this.opponentQueries;
+	if (brd == null || oppQueries == null || query == null) {
+            throw new IllegalArgumentException("Bad state or args");
+	}
 	
-		// test if the opponent asked this query already, and if not,
-		// add it to our list of queries.
-		if (oppQueries.contains(query)) {
-			throw new IllegalArgumentException("Opponent already asked the query " + query.toString());
-		}
-		try {
-			oppQueries.add(query);
-		}
-		catch (ClassCastException impossible) { }
+	// test if the opponent asked this query already, and if not,
+	// add it to our list of queries.
+	if (oppQueries.contains(query)) {
+	    throw new IllegalArgumentException("Opponent already asked the query " + query.toString());
+	}
+	try {
+	    oppQueries.add(query);
+	}
+	catch (ClassCastException impossible) { }
 
 
-		// find the result.
-		boolean result = brd.testPosition(query, new label {_->_;*<-*});
+	// find the result.
+	boolean result = reclassify(brd.testPosition(query, new label {_<-*}),f1);
 	
-		// declassify the result
-		return result;
+	// declassify the result
+	return result;
     }
 }

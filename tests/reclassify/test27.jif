@@ -3,7 +3,7 @@
 
 class test27 {
 
-	public int rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2] y;
+	public int {rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2]} y;
 
     void test27{rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]}(){
 

@@ -6,12 +6,12 @@ public class paperEvaluation{
     
     public static void  main {} (String[] args) throws (Exception{rif[q3*:{Alice,Bob}]}) {
 
-	int rif[q1*:{Alice},q2:{},q3:{Alice,Bob},f1:q1->q2,f2:q1->q3] part_sum;
+	int {rif[q1*:{Alice},q2:{},q3:{Alice,Bob},f1:q1->q2,f2:q1->q3]} part_sum;
 	int num;
 	int id;
-	int rif[q1*:{Alice},q2:{},q3:{Alice,Bob},f1:q1->q2,f2:q1->q3] eval;
-	int rif[q2*:{}] record;
-	int rif[q3*:{Alice,Bob}] result;
+	int {rif[q1*:{Alice},q2:{},q3:{Alice,Bob},f1:q1->q2,f2:q1->q3]} eval;
+	int {rif[q2*:{}]} record;
+	int {rif[q3*:{Alice,Bob}]} result;
 	    
 	part_sum = 0;
 	num = 0;

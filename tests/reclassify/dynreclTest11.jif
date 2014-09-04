@@ -6,10 +6,10 @@ public class dynTest[label L1, label L2, label L3] {
    int{L2} x;
    int{L3} y;
 
-   public dynTest() where tr(L2,f1)<=L1, tr(L3,f1)<=L1 , L1<=rif[q1*:{Alice},q2:{Bob},q3:{Alice},f2:q1->q2,f3:q2->q3]{
+   public dynTest() where tr(L2,f1)<=L1, tr(L3,f1)<=L1 , L1<={rif[q1*:{Alice},q2:{Bob},q3:{Alice},f2:q1->q2,f3:q2->q3]}{
        int{tr({L2},f1)} z =0;
-       int{tr(tr({L2},f1),f2)} w;
-       int{tr(rif[q1:{Alice},q2*:{Bob},q3:{Alice},f2:q1->q2,f3:q2->q3],f3)} o;
+       int{tr({tr({L2},f1)},f2)} w;
+       int{tr({rif[q1:{Alice},q2*:{Bob},q3:{Alice},f2:q1->q2,f3:q2->q3]},f3)} o;
        int{rif[q1*:{Alice},q2:{Bob},q3:{Alice},f2:q1->q2,f3:q2->q3]} d=0;
        res=z;
        w = reclassify(z,f2);

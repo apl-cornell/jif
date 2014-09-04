@@ -37,6 +37,8 @@ public class RifFSMstate_c implements RifFSMstate {
 
     @Override
     public void setTransition(String transName, RifFSMstate rstate) {
+        if (this.transitions == null)
+            this.transitions = new HashMap<String, RifFSMstate>();
         this.transitions.put(transName, rstate);
     }
 
@@ -218,7 +220,6 @@ public class RifFSMstate_c implements RifFSMstate {
         int check = 0;
         PathMap X;
         PathMap Xtot = null;
-        if (this.principals == null) return null;
         for (Principal p : this.principals) {
             X = p.labelCheck(A, lc);
             A.setPc(X.N(), lc);

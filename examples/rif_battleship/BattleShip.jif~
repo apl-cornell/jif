@@ -4,17 +4,17 @@ import java.io.PrintStream;
  * The class BattleShip is responsible for coordinating gameplay
  * between two Players, P1 and P2.
  */
-class BattleShip[principal P1, principal P2]{
+class BattleShip[principal P1, principal P2] {
     /**
      * The number of covered coordinates that each player is to 
      * have on their board. Players can have any number of ships,
      * so long as the ships cover this number of squares.
      */
-    public static final int{_->_;*<-*} NUM_COVERED_COORDS = 10;
+    public static final int{_<-*} NUM_COVERED_COORDS = 10;
 
-    public void play{_->_;*<-*}(PrintStream[{_->_;_<-_}]{_->_;_<-_} output) 
-		throws (SecurityException{_->_;*<-*}, IllegalArgumentException{_->_;*<-*})
-    {
+    public void play{_<-*}(PrintStream[{}]{_<-*} output) 
+      throws (SecurityException, IllegalArgumentException{_<-*})
+	 {
 
         if (output == null) throw new IllegalArgumentException("Null output");
 
@@ -23,8 +23,8 @@ class BattleShip[principal P1, principal P2]{
                        + NUM_COVERED_COORDS + " covered coordinates");
 
         // instantiate the two players
-        Player[P1,P2]{_->_;*<-*} player1 = new Player[P1,P2]();
-        Player[P2,P1]{_->_;*<-*} player2 = new Player[P2,P1]();
+        Player[P1,P2] player1 = new Player[P1,P2]();
+        Player[P2,P1] player2 = new Player[P2,P1]();
 
 
 
@@ -32,7 +32,7 @@ class BattleShip[principal P1, principal P2]{
         output.print("  Initializing....");
         
         // Player 1 first creates a board
-        Board accepted1 = player1.init(NUM_COVERED_COORDS);
+        Board[{rif[q0*:{P1},q1:{_},f1:q0->q1];_<-*}] accepted1 = player1.init(NUM_COVERED_COORDS);
         
         // Player 2 endorses it (since Player 2 doesn't care where the 
         // pieces are located).
@@ -43,7 +43,8 @@ class BattleShip[principal P1, principal P2]{
 
         // Similarly for Player 2: create a board, Player 1 endorses, and board 
         // is stored.
-        Board accepted2 = player2.init(NUM_COVERED_COORDS);
+        Board[{rif[q0*:{P2},q1:{_},f1:q0->q1];_<-*}] accepted2 = player2.init(NUM_COVERED_COORDS);
+
         player2.storeBoard(accepted2);
         
         output.println(" Done.");
@@ -51,8 +52,8 @@ class BattleShip[principal P1, principal P2]{
         // These fields record how many hits each player has scored.
         // The game continues until one of the players has
         // scored NUM_COVERED_COORDS hits.
-        int player1Hits = 0;
-        int player2Hits = 0;
+        int{rif[q0*:{_}];_<-*} player1Hits = 0;
+        int{rif[q0*:{_}];_<-*} player2Hits = 0;
 
         output.println("  Playing rounds...");
         
@@ -60,7 +61,7 @@ class BattleShip[principal P1, principal P2]{
         while (player1Hits < NUM_COVERED_COORDS && player2Hits < NUM_COVERED_COORDS) {
 
             // get player 1's query
-            Coordinate play1QueryEnd = player1.getNextQuery();
+            Coordinate[{rif[q0*:{_}];_<-*}] play1QueryEnd = player1.getNextQuery();
             
             // Player 1's query is endorsed by Player 2.
 
@@ -76,7 +77,7 @@ class BattleShip[principal P1, principal P2]{
             
             if (player1Hits < NUM_COVERED_COORDS) {
                 // player 1 hasn't won, so let player 2 ask a query...
-                Coordinate play2QueryEnd = player2.getNextQuery();
+                Coordinate[{rif[q0*:{_}];_<-*}] play2QueryEnd = player2.getNextQuery();
                 
                 //player 1 endorse's the query
 

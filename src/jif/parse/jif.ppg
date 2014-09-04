@@ -381,12 +381,7 @@ label ::=
                ln1 = parser.nf.JoinLabelNode(parser.pos(w, z), a);
                ln2 = parser.nf.AmbRifDynamicLabelNode(parser.pos(x, y), parser.nf.Id(parser.pos(b), b.getIdentifier()),ln1);
                RESULT = ln2; :}        */
-    |    rif_label:a
-            {: RESULT = a; :}
-    |    TR:x LPAREN label:l COMMA IDENTIFIER:b RPAREN:y
-            {: LabelNode ln;
-               ln = parser.nf.AmbRifDynamicLabelNode(parser.pos(x, y), parser.nf.Id(parser.pos(b), b.getIdentifier()),l);
-               RESULT = ln; :}         
+      
             /* end-new */
     ;
           
@@ -454,7 +449,9 @@ state_component ::=
     
 principal_set ::=
          LBRACE:x RBRACE:y
-            {: RESULT = null; :}
+            {: List l = new LinkedList<PrincipalNode>();
+               l.add(parser.nf.CanonicalPrincipalNode(parser.pos(x), parser.ts.topPrincipal(parser.pos(x))));
+               RESULT = l; :}
     |    LBRACE:x principal_list:a RBRACE:y
             {: RESULT = a; :}
     ;
@@ -530,7 +527,14 @@ label_component ::=
     |   IDENTIFIER:a
             {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),
                                                   parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
+    |    rif_label:a
+            {: RESULT = a; :}
+    |    TR:x LPAREN label:l COMMA IDENTIFIER:b RPAREN:y
+            {: LabelNode ln;
+               ln = parser.nf.AmbRifDynamicLabelNode(parser.pos(x, y), parser.nf.Id(parser.pos(b), b.getIdentifier()),l);
+               RESULT = ln; :}   
     ;
+    
 provider ::=
         PROVIDER:a
             {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),parser.nf.Id(parser.pos(a), "provider")); :}

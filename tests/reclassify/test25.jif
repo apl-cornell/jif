@@ -3,8 +3,8 @@
 
 class test25 {
     void test25{rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]}()throws (IndexOutOfBoundsException){
-    	int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2] y;
-		int  rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2] [] rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2] x = {3, 4, 5};
+    	int {rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]} y;
+		int {rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]} [] {rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]} x = {3, 4, 5};
    
 	    y = 1;
 		x[0]=y;

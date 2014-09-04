@@ -1657,7 +1657,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
         LinkedList<Id> allPossibleActions = new LinkedList<Id>();
         int j;
-        for (j = 0; j < 100; j++) {
+        for (j = 0; j < 5; j++) {
             allPossibleActions.add(new Id_c(null, "f" + Integer.toString(j)));
         }
 
@@ -1756,7 +1756,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
         LinkedList<Id> allPossibleActions = new LinkedList<Id>();
         int j;
-        for (j = 0; j < 100; j++) {
+        for (j = 0; j < 5; j++) {
             allPossibleActions.add(new Id_c(null, "f" + Integer.toString(j)));
         }
 

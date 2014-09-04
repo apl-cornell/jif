@@ -6,10 +6,10 @@ public class test7{
     
     public test7() {
 
-       	int rif[q1*:{Alice},q2:{Alice},f1:q1->q2]res; 
-       	int rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2] x;
-	int rif[q1*:{Alice},q2:{Alice,Bob},f1:q1->q2] y;
-	int rif[q1*:{Alice},q2:{Bob},f1:q1->q2] z;
+       	int {rif[q1*:{Alice},q2:{Alice},f1:q1->q2]} res; 
+       	int {rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]} x;
+	    int {rif[q1*:{Alice},q2:{Alice,Bob},f1:q1->q2]} y;
+	    int {rif[q1*:{Alice},q2:{Bob},f1:q1->q2]} z;
 	    
 	    	x = 96;
 	    	y = 45;
