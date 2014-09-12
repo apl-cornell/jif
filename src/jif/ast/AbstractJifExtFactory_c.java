@@ -140,12 +140,36 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     }
 
     @Override
+    public final Ext extRifiPolicyNode() {
+        Ext e = extRifiPolicyNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extRifiPolicyNode();
+            e = composeExts(e, e2);
+        }
+        return postExtPolicyNode(e);
+    }
+
+    @Override
     public final Ext extRifLabelNode() {
         Ext e = extRifLabelNodeImpl();
         if (nextExtFactory() != null
                 && nextExtFactory() instanceof JifExtFactory) {
             JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
             Ext e2 = nextFac.extRifLabelNode();
+            e = composeExts(e, e2);
+        }
+        return postExtPolicyNode(e);
+    }
+
+    @Override
+    public final Ext extRifiLabelNode() {
+        Ext e = extRifiLabelNodeImpl();
+        if (nextExtFactory() != null
+                && nextExtFactory() instanceof JifExtFactory) {
+            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
+            Ext e2 = nextFac.extRifiLabelNode();
             e = composeExts(e, e2);
         }
         return postExtPolicyNode(e);
@@ -586,7 +610,15 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
         return extNode();
     }
 
+    protected Ext extRifiPolicyNodeImpl() {
+        return extNode();
+    }
+
     protected Ext extRifLabelNodeImpl() {
+        return extNode();
+    }
+
+    protected Ext extRifiLabelNodeImpl() {
         return extNode();
     }
 

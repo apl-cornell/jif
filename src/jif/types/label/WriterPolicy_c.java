@@ -143,7 +143,7 @@ public class WriterPolicy_c extends Policy_c implements WriterPolicy {
         if (!changed) return substitution.substPolicy(this).simplify();
 
         JifTypeSystem ts = (JifTypeSystem) typeSystem();
-        WriterPolicy newPolicy =
+        IntegPolicy newPolicy =
                 ts.writerPolicy(this.position(), newOwner, newWriter);
         return substitution.substPolicy(newPolicy).simplify();
     }

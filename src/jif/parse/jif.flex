@@ -115,6 +115,7 @@ import java.math.BigInteger;
 	/* new-begin */
 	keywords.put("reclassify",    new Integer(sym.RECLASSIFY));
 	keywords.put("rif",    new Integer(sym.RIF));
+    keywords.put("rifi",    new Integer(sym.RIFI));
 	keywords.put("tr",    new Integer(sym.TR));
 	/* new-end */
         keywords.put("endorse",       new Integer(sym.ENDORSE));

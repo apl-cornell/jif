@@ -184,10 +184,28 @@ public class LabelUtil {
         }
     }
 
+    public IntegPolicy rifwriterPolicy() {
+        try {
+            enterTiming();
+            return new RifWriterPolicy(this);
+        } finally {
+            exitTiming();
+        }
+    }
+
     public ConfPolicy addstate(String name, String current, ConfPolicy rif) {
         try {
             enterTiming();
             return ((RifReaderPolicy) rif).addstate(name, current, null);
+        } finally {
+            exitTiming();
+        }
+    }
+
+    public IntegPolicy addstate(String name, String current, IntegPolicy rif) {
+        try {
+            enterTiming();
+            return ((RifWriterPolicy) rif).addstate(name, current, null);
         } finally {
             exitTiming();
         }
@@ -203,10 +221,29 @@ public class LabelUtil {
         }
     }
 
+    public IntegPolicy addtransition(String name, String state1, String state2,
+            IntegPolicy rif) {
+        try {
+            enterTiming();
+            return ((RifWriterPolicy) rif).addtransition(name, state1, state2);
+        } finally {
+            exitTiming();
+        }
+    }
+
     public ConfPolicy addprincipal(String name, Principal p, ConfPolicy rif) {
         try {
             enterTiming();
             return ((RifReaderPolicy) rif).addprincipal(name, p);
+        } finally {
+            exitTiming();
+        }
+    }
+
+    public IntegPolicy addprincipal(String name, Principal p, IntegPolicy rif) {
+        try {
+            enterTiming();
+            return ((RifWriterPolicy) rif).addprincipal(name, p);
         } finally {
             exitTiming();
         }
@@ -218,7 +255,8 @@ public class LabelUtil {
             ConfPolicy cpol = l.confPolicy();
             IntegPolicy ipol = l.integPolicy();
             ConfPolicy ncpol = ((RifReaderPolicy) cpol).takeTransition(name);
-            return toLabel(ncpol, ipol);
+            IntegPolicy nipol = ((RifWriterPolicy) ipol).takeTransition(name);
+            return toLabel(ncpol, nipol);
         } finally {
             exitTiming();
         }

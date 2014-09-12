@@ -40,8 +40,11 @@ import jif.types.label.ParamLabel;
 import jif.types.label.Policy;
 import jif.types.label.RifConfPolicy;
 import jif.types.label.RifDynamicLabel;
+import jif.types.label.RifIntegPolicy;
 import jif.types.label.RifJoinConfPolicy;
+import jif.types.label.RifJoinIntegPolicy;
 import jif.types.label.RifReaderPolicy_c;
+import jif.types.label.RifWriterPolicy_c;
 import jif.types.label.VarLabel_c;
 import jif.types.label.WriterPolicy;
 import jif.types.label.WritersToReadersLabel;
@@ -445,18 +448,20 @@ public class LabelEnv_c implements LabelEnv {
         if (lbl.getLabel() instanceof PairLabel) {
             PairLabel l = (PairLabel) lbl.getLabel();
             RifConfPolicy cp = (RifConfPolicy) l.confProjection();
-            IntegPolicy ip = l.integProjection();
+            RifIntegPolicy ip = (RifIntegPolicy) l.integProjection();
             RifConfPolicy ncp = cp.takeTransition(lbl.getName());
-            return ts.pairLabel(lbl.position(), ncp, ip);
+            RifIntegPolicy nip = ip.takeTransition(lbl.getName());
+            return ts.pairLabel(lbl.position(), ncp, nip);
         } else if (!(lbl.getLabel() instanceof RifDynamicLabel)) {
             return null;
         }
         PairLabel res = simplify((RifDynamicLabel) lbl.getLabel());
         if (res == null) return null;
         RifConfPolicy cp = (RifConfPolicy) res.confProjection();
-        IntegPolicy ip = res.integProjection();
+        RifIntegPolicy ip = (RifIntegPolicy) res.integProjection();
         RifConfPolicy ncp = cp.takeTransition(lbl.getName());
-        return ts.pairLabel(lbl.position(), ncp, ip);
+        RifIntegPolicy nip = ip.takeTransition(lbl.getName());
+        return ts.pairLabel(lbl.position(), ncp, nip);
     }
 
     /**
@@ -846,10 +851,13 @@ public class LabelEnv_c implements LabelEnv {
         Collections.reverse(ids);
         RifConfPolicy cp2 = (RifConfPolicy) pl2.confProjection();
         RifConfPolicy cp1 = (RifConfPolicy) pl1.confProjection();
+        RifConfPolicy ip2 = (RifConfPolicy) pl2.integProjection();
+        RifConfPolicy ip1 = (RifConfPolicy) pl1.integProjection();
         for (Id i : ids) {
             cp2 = cp2.takeTransition(i);
+            ip2 = ip2.takeTransition(i);
         }
-        if (cp1.equals(cp2)) {
+        if (cp1.equals(cp2) && ip1.equals(ip2)) {
             return true;
         } else {
             return false;
@@ -876,6 +884,9 @@ public class LabelEnv_c implements LabelEnv {
 
         if (p1 instanceof RifConfPolicy && p2 instanceof ConfPolicy) {
             return leq((RifConfPolicy) p1, (ConfPolicy) p2, state);
+        }
+        if (p1 instanceof RifIntegPolicy && p2 instanceof IntegPolicy) {
+            return leq((RifIntegPolicy) p1, (IntegPolicy) p2, state);
         }
         if (p1 instanceof ConfPolicy && p2 instanceof ConfPolicy) {
             return leq((ConfPolicy) p1, (ConfPolicy) p2, state);
@@ -949,6 +960,46 @@ public class LabelEnv_c implements LabelEnv {
                 JoinPolicy_c<ConfPolicy> jp = (JoinPolicy_c<ConfPolicy>) p2new;
                 Collection<ConfPolicy> joinComponents = jp.joinComponents();
                 for (ConfPolicy ci : joinComponents) {
+                    if (leq(p1, ci, state)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean leq(RifIntegPolicy p1, IntegPolicy p2, SearchState state) {
+        RifWriterPolicy_c p1new;
+
+        if (!p1.isSingleton()) {
+            if (p1.leq_(p2, this, state)) return true;
+        } else if (p2 instanceof RifWriterPolicy_c) {
+            if (p1 instanceof RifJoinIntegPolicy) {
+                Iterator<IntegPolicy> i =
+                        ((RifJoinIntegPolicy) p1).joinComponents().iterator();
+                p1new = (RifWriterPolicy_c) i.next();
+            } else {
+                p1new = (RifWriterPolicy_c) p1;
+            }
+            if (p1new.leq_(p2, this, state)) return true;
+        } else if (p2 instanceof RifJoinIntegPolicy) {
+            if (p1 instanceof RifJoinIntegPolicy) {
+                Iterator<IntegPolicy> i =
+                        ((RifJoinIntegPolicy) p1).joinComponents().iterator();
+                p1new = (RifWriterPolicy_c) i.next();
+            } else {
+                p1new = (RifWriterPolicy_c) p1;
+            }
+            IntegPolicy p2new = ((RifJoinIntegPolicy) p2).flatten();
+            if (p2new.isSingleton() && p1new.leq_(p2new, this, state))
+                return true;
+            //System.out.println(p2.toString() + " class=" + p2.getClass());
+            if (!p2new.isSingleton() && p2new instanceof JoinPolicy_c) {
+                JoinPolicy_c<IntegPolicy> jp =
+                        (JoinPolicy_c<IntegPolicy>) p2new;
+                Collection<IntegPolicy> joinComponents = jp.joinComponents();
+                for (IntegPolicy ci : joinComponents) {
                     if (leq(p1, ci, state)) {
                         return true;
                     }

@@ -18,7 +18,9 @@ import jif.types.label.PairLabel;
 import jif.types.label.Policy;
 import jif.types.label.ReaderPolicy;
 import jif.types.label.RifJoinConfPolicy;
+import jif.types.label.RifJoinIntegPolicy;
 import jif.types.label.RifReaderPolicy_c;
+import jif.types.label.RifWriterPolicy_c;
 import jif.types.label.WriterPolicy;
 import jif.types.principal.Principal;
 import polyglot.ast.Expr;
@@ -152,11 +154,103 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
             return e;
         }
 
+        if (p instanceof RifJoinIntegPolicy && p.isSingleton()) {
+            String curr = null;
+            RifJoinIntegPolicy policy = (RifJoinIntegPolicy) p;
+            LinkedList<Policy> l =
+                    new LinkedList<Policy>(policy.joinComponents());
+            Iterator<Policy> iter = l.iterator();
+            RifWriterPolicy_c rpol = (RifWriterPolicy_c) iter.next();
+            RifFSM fsm = rpol.getFSM();
+            Map<String, RifFSMstate> states = fsm.states();
+            Expr e =
+                    (Expr) rw
+                            .qq()
+                            .parseExpr(
+                                    rw.runtimeLabelUtil()
+                                            + ".rifwriterPolicy()")
+                            .position(Position.compilerGenerated());
+            for (Entry<String, RifFSMstate> st : states.entrySet()) {
+                List<Principal> principals = st.getValue().principals();
+                if (fsm.currentState().name().toString() == st.getKey()) {
+                    curr = "\"true\"";
+                } else {
+                    curr = "\"false\"";
+                }
+                e =
+                        (Expr) rw
+                                .qq()
+                                .parseExpr(
+                                        rw.runtimeLabelUtil() + ".addstate("
+                                                + "\"" + st.getKey() + "\""
+                                                + "," + curr + ",%E)", e)
+                                .position(Position.compilerGenerated());
+                for (Principal princ : principals) {
+                    e =
+                            (Expr) rw
+                                    .qq()
+                                    .parseExpr(
+                                            rw.runtimeLabelUtil()
+                                                    + ".addprincipal(" + "\""
+                                                    + st.getKey() + "\""
+                                                    + ",%E,%E)",
+                                            rw.principalToJava(princ), e)
+                                    .position(Position.compilerGenerated());
+                }
+                HashMap<String, RifFSMstate> transitions =
+                        st.getValue().getTransitions();
+                if (transitions != null) {
+                    Iterator<Entry<String, RifFSMstate>> it =
+                            transitions.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Entry<String, RifFSMstate> pairs = it.next();
+                        e =
+                                (Expr) rw
+                                        .qq()
+                                        .parseExpr(
+                                                rw.runtimeLabelUtil()
+                                                        + ".addtransition("
+                                                        + "\""
+                                                        + pairs.getKey()
+                                                        + "\""
+                                                        + ","
+                                                        + "\""
+                                                        + st.getKey()
+                                                        + "\""
+                                                        + ","
+                                                        + "\""
+                                                        + pairs.getValue()
+                                                                .name()
+                                                                .toString()
+                                                        + "\"" + ",%E)", e)
+                                        .position(Position.compilerGenerated());
+                    }
+                }
+
+            }
+            return e;
+        }
+
         if (p instanceof RifJoinConfPolicy && !p.isSingleton()) {
             RifJoinConfPolicy jp = (RifJoinConfPolicy) p;
             LinkedList<ConfPolicy> l =
                     new LinkedList<ConfPolicy>(jp.joinComponents());
             Iterator<ConfPolicy> iter = l.iterator();
+            Policy head = iter.next();
+            Expr e = policyToJava(head, rw);
+            while (iter.hasNext()) {
+                head = iter.next();
+                Expr f = policyToJava(head, rw);
+                e = rw.qq().parseExpr("%E.join(%E)", e, f);
+            }
+            return e;
+        }
+
+        if (p instanceof RifJoinIntegPolicy && !p.isSingleton()) {
+            RifJoinIntegPolicy jp = (RifJoinIntegPolicy) p;
+            LinkedList<IntegPolicy> l =
+                    new LinkedList<IntegPolicy>(jp.joinComponents());
+            Iterator<IntegPolicy> iter = l.iterator();
             Policy head = iter.next();
             Expr e = policyToJava(head, rw);
             while (iter.hasNext()) {

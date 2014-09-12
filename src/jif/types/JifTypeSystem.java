@@ -20,12 +20,13 @@ import jif.types.label.Policy;
 import jif.types.label.ProviderLabel;
 import jif.types.label.RifConfPolicy;
 import jif.types.label.RifDynamicLabel;
+import jif.types.label.RifIntegPolicy;
 import jif.types.label.RifReaderPolicy_c;
 import jif.types.label.RifVarLabel;
+import jif.types.label.RifWriterPolicy_c;
 import jif.types.label.ThisLabel;
 import jif.types.label.UnknownLabel;
 import jif.types.label.VarLabel;
-import jif.types.label.WriterPolicy;
 import jif.types.label.WritersToReadersLabel;
 import jif.types.principal.BottomPrincipal;
 import jif.types.principal.DynamicPrincipal;
@@ -277,9 +278,9 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
 
     RifConfPolicy rifreaderPolicy(Position pos, RifFSM fsm);
 
-    WriterPolicy writerPolicy(Position pos, Principal owner, Principal writer);
+    IntegPolicy writerPolicy(Position pos, Principal owner, Principal writer);
 
-    WriterPolicy writerPolicy(Position pos, Principal owner,
+    IntegPolicy writerPolicy(Position pos, Principal owner,
             Collection<Principal> writers);
 
     /**
@@ -533,5 +534,15 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
     RifVarLabel freshRifLabelVariable(Position pos, String s, String description);
 
     RifDynamicLabel rifDynamicLabel(Position pos, Id name, Label lbl);
+
+    RifIntegPolicy rifwriterPolicy(Position pos, RifFSM fsm);
+
+    IntegPolicy rifjoinIntegPolicy(Position pos, Set<IntegPolicy> components);
+
+    RifWriterPolicy_c join(RifWriterPolicy_c p1, RifWriterPolicy_c p2);
+
+    RifIntegPolicy join(RifIntegPolicy p1, RifIntegPolicy p2);
+
+    IntegPolicy meet(RifWriterPolicy_c p1, RifWriterPolicy_c p2);
 
 }

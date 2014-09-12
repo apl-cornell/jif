@@ -280,6 +280,7 @@ terminal Token DECLASSIFY;
 /* begin-new */
 terminal Token RECLASSIFY;
 terminal Token RIF;
+terminal Token RIFI;
 terminal Token TR;
 /* end-new */
 terminal Token ENDORSE;
@@ -309,6 +310,7 @@ non terminal List principal_set;
 non terminal RifTransitionNode transition_component;
 non terminal Token rif_rightarrow;
 non terminal RifLabelNode rif_label;
+non terminal RifiLabelNode rifi_label;
 non terminal List rif_join_list;
 /* end-new */
 non terminal EndorseExpr endorse;
@@ -391,12 +393,18 @@ rif_label ::=
             {: RifLabelNode ln;
                ln = parser.nf.RifLabelNode(parser.pos(x, y), a);
                RESULT = ln; :}
- /*  | TR:x LPAREN rif_label:a COMMA IDENTIFIER:b RPAREN:y  
-           {: RifLabelNode ln;
-               ln = parser.nf.RifTransLabelNode(parser.pos(x, y), a, parser.nf.Id(parser.pos(b), b.getIdentifier()));
-               RESULT = ln;;
-           :}           */ 
-   ; 
+   ;
+   
+rifi_label ::= 
+     RIFI:x LBRACK rif_component_list:a RBRACK:y
+            {: RifiPolicyNode n;
+               n = parser.nf.RifiPolicyNode(parser.pos(a), a);
+               List l = new LinkedList<RifiPolicyNode>();
+               l.add(n);
+               RifiLabelNode ln;
+               ln = parser.nf.RifiLabelNode(parser.pos(x, y), l);
+               RESULT = ln; :}
+   ;
     
 rif_join_list ::=
         rif_policy:a
@@ -528,6 +536,8 @@ label_component ::=
             {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),
                                                   parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
     |    rif_label:a
+            {: RESULT = a; :}
+    |    rifi_label:a
             {: RESULT = a; :}
     |    TR:x LPAREN label:l COMMA IDENTIFIER:b RPAREN:y
             {: LabelNode ln;

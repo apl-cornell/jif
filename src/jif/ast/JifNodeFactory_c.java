@@ -594,10 +594,28 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     }
 
     @Override
+    public RifiPolicyNode RifiPolicyNode(Position pos,
+            List<RifComponentNode> components) {
+        RifiPolicyNode n = new RifiPolicyNode_c(pos, components);
+        n = (RifiPolicyNode) n.ext(jifExtFactory().extRifiPolicyNode());
+        n = (RifiPolicyNode) n.del(delFactory().delNode());
+        return n;
+    }
+
+    @Override
     public RifLabelNode RifLabelNode(Position pos, List<RifPolicyNode> policies) {
         RifLabelNode n = new AmbRifLabelNode_c(pos, policies);
         n = (RifLabelNode) n.ext(jifExtFactory().extRifLabelNode());
         n = (RifLabelNode) n.del(delFactory().delNode());
+        return n;
+    }
+
+    @Override
+    public RifiLabelNode RifiLabelNode(Position pos,
+            List<RifiPolicyNode> policies) {
+        RifiLabelNode n = new AmbRifiLabelNode_c(pos, policies);
+        n = (RifiLabelNode) n.ext(jifExtFactory().extRifiLabelNode());
+        n = (RifiLabelNode) n.del(delFactory().delNode());
         return n;
     }
 

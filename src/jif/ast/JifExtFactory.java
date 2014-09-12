@@ -25,7 +25,11 @@ public interface JifExtFactory extends ExtFactory, JifStmtExtFactory {
 
     Ext extRifPolicyNode();
 
+    Ext extRifiPolicyNode();
+
     Ext extRifLabelNode();
+
+    Ext extRifiLabelNode();
 
     /* end-new */
 

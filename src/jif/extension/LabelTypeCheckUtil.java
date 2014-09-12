@@ -25,6 +25,7 @@ import jif.types.label.AccessPathLocal;
 import jif.types.label.ConfPolicy;
 import jif.types.label.ConfProjectionPolicy_c;
 import jif.types.label.DynamicLabel;
+import jif.types.label.IntegPolicy;
 import jif.types.label.IntegProjectionPolicy_c;
 import jif.types.label.JoinLabel;
 import jif.types.label.JoinPolicy_c;
@@ -35,7 +36,9 @@ import jif.types.label.PairLabel;
 import jif.types.label.Policy;
 import jif.types.label.ReaderPolicy;
 import jif.types.label.RifConfPolicy;
+import jif.types.label.RifIntegPolicy;
 import jif.types.label.RifJoinConfPolicy_c;
+import jif.types.label.RifJoinIntegPolicy_c;
 import jif.types.label.VarLabel;
 import jif.types.label.WriterPolicy;
 import jif.types.principal.ConjunctivePrincipal;
@@ -200,6 +203,12 @@ public class LabelTypeCheckUtil {
             for (Policy pol : joinComponents) {
                 typeCheckPolicy(tc, pol);
             }
+        } else if (p instanceof RifJoinIntegPolicy_c) {
+            RifJoinIntegPolicy_c rjip = (RifJoinIntegPolicy_c) p;
+            Collection<IntegPolicy> joinComponents = rjip.joinComponents();
+            for (Policy pol : joinComponents) {
+                typeCheckPolicy(tc, pol);
+            }
         } else if (p instanceof MeetPolicy_c) {
             @SuppressWarnings("unchecked")
             MeetPolicy_c<Policy> mp = (MeetPolicy_c<Policy>) p;
@@ -217,6 +226,9 @@ public class LabelTypeCheckUtil {
             typeCheckPrincipal(tc, pol.writer());
         } else if (p instanceof RifConfPolicy) {
             RifConfPolicy pol = (RifConfPolicy) p;
+            typeCheckFSM(tc, pol.getFSMs());
+        } else if (p instanceof RifIntegPolicy) {
+            RifIntegPolicy pol = (RifIntegPolicy) p;
             typeCheckFSM(tc, pol.getFSMs());
         } else {
             System.out.println("HELLO " + p.getClass().getName());

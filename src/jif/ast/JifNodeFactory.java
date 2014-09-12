@@ -173,4 +173,9 @@ public interface JifNodeFactory extends NodeFactory {
             LabelNode lbl);
 
     RifLabelNode RifTransLabelNode(Position pos, LabelNode pol, Id name);
+
+    RifiPolicyNode RifiPolicyNode(Position pos,
+            List<RifComponentNode> components);
+
+    RifiLabelNode RifiLabelNode(Position pos, List<RifiPolicyNode> policies);
 }

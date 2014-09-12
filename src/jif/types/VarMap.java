@@ -15,6 +15,7 @@ import jif.types.label.Policy;
 import jif.types.label.RifConfPolicy;
 import jif.types.label.RifDynamicLabel;
 import jif.types.label.RifDynamicLabel_c;
+import jif.types.label.RifIntegPolicy;
 import jif.types.label.TransitionVarLabel;
 import jif.types.label.VarLabel;
 import jif.types.label.Variable;
@@ -114,11 +115,13 @@ public class VarMap {
                     } else {
                         RifConfPolicy innerconf =
                                 (RifConfPolicy) ci.confProjection();
+                        RifIntegPolicy innerinteg =
+                                (RifIntegPolicy) ci.integProjection();
                         Id action = reclassbound.transition();
                         boundci =
                                 ts.pairLabel(ci.position(),
                                         innerconf.takeTransition(action),
-                                        ci.integProjection());
+                                        innerinteg.takeTransition(action));
                     }
                     newcomponents.add(boundci);
                 }
@@ -148,7 +151,10 @@ public class VarMap {
                         ((RifConfPolicy) reslabel.confProjection())
                                 .takeTransition(((RifDynamicLabel) bound)
                                         .getName());
-                IntegPolicy ip = reslabel.integProjection();
+                IntegPolicy ip =
+                        ((RifIntegPolicy) reslabel.integProjection())
+                                .takeTransition(((RifDynamicLabel) bound)
+                                        .getName());
                 bound = ts.pairLabel(bound.position(), cp, ip);
                 this.setBound(v, bound);
             }
@@ -189,7 +195,10 @@ public class VarMap {
                             ((RifConfPolicy) reslabel.confProjection())
                                     .takeTransition(((RifDynamicLabel) L)
                                             .getName());
-                    IntegPolicy ip = reslabel.integProjection();
+                    IntegPolicy ip =
+                            ((RifIntegPolicy) reslabel.integProjection())
+                                    .takeTransition(((RifDynamicLabel) L)
+                                            .getName());
                     return ts.pairLabel(L.position(), cp, ip);
                 }
             }

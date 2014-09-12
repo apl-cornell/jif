@@ -55,7 +55,6 @@ import jif.types.label.DynamicLabel;
 import jif.types.label.DynamicLabel_c;
 import jif.types.label.IntegPolicy;
 import jif.types.label.IntegProjectionPolicy_c;
-import jif.types.label.JoinIntegPolicy_c;
 import jif.types.label.JoinLabel;
 import jif.types.label.JoinLabel_c;
 import jif.types.label.Label;
@@ -75,18 +74,19 @@ import jif.types.label.ProviderLabel_c;
 import jif.types.label.RifConfPolicy;
 import jif.types.label.RifDynamicLabel;
 import jif.types.label.RifDynamicLabel_c;
+import jif.types.label.RifIntegPolicy;
 import jif.types.label.RifJoinConfPolicy_c;
+import jif.types.label.RifJoinIntegPolicy_c;
 import jif.types.label.RifReaderPolicy_c;
 import jif.types.label.RifVarLabel;
 import jif.types.label.RifVarLabel_c;
+import jif.types.label.RifWriterPolicy_c;
 import jif.types.label.ThisLabel;
 import jif.types.label.ThisLabel_c;
 import jif.types.label.UnknownLabel;
 import jif.types.label.UnknownLabel_c;
 import jif.types.label.VarLabel;
 import jif.types.label.VarLabel_c;
-import jif.types.label.WriterPolicy;
-import jif.types.label.WriterPolicy_c;
 import jif.types.label.WritersToReadersLabel;
 import jif.types.label.WritersToReadersLabel_c;
 import jif.types.principal.BottomPrincipal;
@@ -1136,17 +1136,43 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public WriterPolicy writerPolicy(Position pos, Principal owner,
-            Principal writer) {
-        WriterPolicy t = new WriterPolicy_c(owner, writer, this, pos);
+    public RifIntegPolicy rifwriterPolicy(Position pos, RifFSM fsm) {
+        RifIntegPolicy t = new RifWriterPolicy_c(fsm, this, pos);
         return t;
     }
 
     @Override
-    public WriterPolicy writerPolicy(Position pos, Principal owner,
+    public IntegPolicy writerPolicy(Position pos, Principal owner,
+            Principal writer) {
+        List<Principal> principals = new LinkedList<Principal>();
+        principals.add(owner);
+        principals.add(writer);
+        HashMap<String, RifFSMstate> trans = new HashMap<String, RifFSMstate>();
+        RifFSMstate state =
+                new RifFSMstate_c(new Id_c(null, "q1"), principals, trans);
+        Map<String, RifFSMstate> states = new HashMap<String, RifFSMstate>();
+        states.put("q1", state);
+        RifFSM fsm = new RifFSM_c(states, state);
+        RifIntegPolicy t = new RifWriterPolicy_c(fsm, this, pos);
+        return t;
+    }
+
+    @Override
+    public IntegPolicy writerPolicy(Position pos, Principal owner,
             Collection<Principal> writers) {
-        Principal w = disjunctivePrincipal(pos, writers);
-        return writerPolicy(pos, owner, w);
+        List<Principal> principals = new LinkedList<Principal>();
+        principals.add(owner);
+        for (Principal p : writers) {
+            principals.add(p);
+        }
+        HashMap<String, RifFSMstate> trans = new HashMap<String, RifFSMstate>();
+        RifFSMstate state =
+                new RifFSMstate_c(new Id_c(null, "q1"), principals, trans);
+        Map<String, RifFSMstate> states = new HashMap<String, RifFSMstate>();
+        states.put("q1", state);
+        RifFSM fsm = new RifFSM_c(states, state);
+        RifIntegPolicy t = new RifWriterPolicy_c(fsm, this, pos);
+        return t;
     }
 
     @Override
@@ -1158,7 +1184,9 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public IntegPolicy bottomIntegPolicy(Position pos) {
-        return writerPolicy(pos, topPrincipal(pos), topPrincipal(pos));
+        Set<IntegPolicy> s = new LinkedHashSet<IntegPolicy>();
+        s.add(rifwriterPolicy(pos, topfsm(pos)));
+        return rifjoinIntegPolicy(pos, s);
     }
 
     @Override
@@ -1170,7 +1198,9 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public IntegPolicy topIntegPolicy(Position pos) {
-        return writerPolicy(pos, bottomPrincipal(pos), bottomPrincipal(pos));
+        Set<IntegPolicy> s = new LinkedHashSet<IntegPolicy>();
+        s.add(rifwriterPolicy(pos, bottomfsm(pos)));
+        return rifjoinIntegPolicy(pos, s);
     }
 
     @Override
@@ -1604,6 +1634,16 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
+    public IntegPolicy rifjoinIntegPolicy(Position pos,
+            Set<IntegPolicy> components) {
+        if (components.isEmpty()) {
+            return topIntegPolicy(pos);
+        }
+        return (IntegPolicy) new RifJoinIntegPolicy_c(components, this, pos)
+                .simplify();
+    }
+
+    @Override
     public ConfPolicy joinConfPolicy(Position pos, Set<ConfPolicy> components) {
 //        if (components.isEmpty()) {
 //            return bottomConfPolicy(pos);
@@ -1617,13 +1657,14 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public IntegPolicy joinIntegPolicy(Position pos, Set<IntegPolicy> components) {
-        if (components.isEmpty()) {
-            return bottomIntegPolicy(pos);
-        } else if (components.size() == 1) {
-            return components.iterator().next();
-        }
-        return (IntegPolicy) new JoinIntegPolicy_c(components, this, pos)
-                .simplify();
+        //       if (components.isEmpty()) {
+        //           return bottomIntegPolicy(pos);
+        //       } else if (components.size() == 1) {
+        //           return components.iterator().next();
+        //       }
+        //       return (IntegPolicy) new JoinIntegPolicy_c(components, this, pos)
+        //               .simplify();
+        return rifjoinIntegPolicy(pos, components);
     }
 
     @Override
@@ -1648,11 +1689,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                 .simplify();
     }
 
-    @Override
-    public RifReaderPolicy_c join(RifReaderPolicy_c p1, RifReaderPolicy_c p2) {
+    public RifFSM fsmConjunction(RifFSM fsm1, RifFSM fsm2) {
         HashMap<String, RifFSMstate> states;
-        RifFSM fsm1 = p1.getFSM();
-        RifFSM fsm2 = p2.getFSM();
         RifFSMstate newcurrentstate = null;
 
         LinkedList<Id> allPossibleActions = new LinkedList<Id>();
@@ -1709,49 +1747,11 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             }
         }
 
-        return new RifReaderPolicy_c(new RifFSM_c(states, newcurrentstate),
-                this, p1.position());
+        return new RifFSM_c(states, newcurrentstate);
     }
 
-    @Override
-    public RifConfPolicy join(RifConfPolicy p1, RifConfPolicy p2) {
-        if (p1.isTop() || p2.isBottom()) {
-            return p1;
-        }
-        if (p2.isTop() || p1.isBottom()) {
-            return p2;
-        }
-        Set<ConfPolicy> s = new HashSet<ConfPolicy>();
-        s.add(p1);
-        s.add(p2);
-        Position pos = p1.position();
-        if (pos == null) pos = p2.position();
-
-        return (RifConfPolicy) rifjoinConfPolicy(pos, s);
-    }
-
-    @Override
-    public ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {
-        if (p1.isTop() || p2.isBottom()) {
-            return p1;
-        }
-        if (p2.isTop() || p1.isBottom()) {
-            return p2;
-        }
-        Set<ConfPolicy> s = new HashSet<ConfPolicy>();
-        s.add(p1);
-        s.add(p2);
-        Position pos = p1.position();
-        if (pos == null) pos = p2.position();
-
-        return rifjoinConfPolicy(pos, s);
-    }
-
-    @Override
-    public ConfPolicy meet(RifReaderPolicy_c p1, RifReaderPolicy_c p2) {
+    public RifFSM fsmDisjunction(RifFSM fsm1, RifFSM fsm2) {
         HashMap<String, RifFSMstate> states;
-        RifFSM fsm1 = p1.getFSM();
-        RifFSM fsm2 = p2.getFSM();
         RifFSMstate newcurrentstate = null;
 
         LinkedList<Id> allPossibleActions = new LinkedList<Id>();
@@ -1806,17 +1806,51 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             }
         }
 
-        return new RifReaderPolicy_c(new RifFSM_c(states, newcurrentstate),
-                this, p1.position());
+        return new RifFSM_c(states, newcurrentstate);
     }
 
     @Override
-    public IntegPolicy join(IntegPolicy p1, IntegPolicy p2) {
+    public RifReaderPolicy_c join(RifReaderPolicy_c p1, RifReaderPolicy_c p2) {
+        RifFSM fsm1 = p1.getFSM();
+        RifFSM fsm2 = p2.getFSM();
+        RifFSM newfsm = fsmConjunction(fsm1, fsm2);
+
+        return new RifReaderPolicy_c(newfsm, this, p1.position());
+    }
+
+    @Override
+    public RifWriterPolicy_c join(RifWriterPolicy_c p1, RifWriterPolicy_c p2) {
+        RifFSM fsm1 = p1.getFSM();
+        RifFSM fsm2 = p2.getFSM();
+        RifFSM newfsm = fsmDisjunction(fsm1, fsm2);
+
+        return new RifWriterPolicy_c(newfsm, this, p1.position());
+    }
+
+    @Override
+    public RifConfPolicy join(RifConfPolicy p1, RifConfPolicy p2) {
         if (p1.isTop() || p2.isBottom()) {
-            return (IntegPolicy) p1.simplify();
+            return p1;
         }
         if (p2.isTop() || p1.isBottom()) {
-            return (IntegPolicy) p2.simplify();
+            return p2;
+        }
+        Set<ConfPolicy> s = new HashSet<ConfPolicy>();
+        s.add(p1);
+        s.add(p2);
+        Position pos = p1.position();
+        if (pos == null) pos = p2.position();
+
+        return (RifConfPolicy) rifjoinConfPolicy(pos, s);
+    }
+
+    @Override
+    public RifIntegPolicy join(RifIntegPolicy p1, RifIntegPolicy p2) {
+        if (p1.isTop() || p2.isBottom()) {
+            return p1;
+        }
+        if (p2.isTop() || p1.isBottom()) {
+            return p2;
         }
         Set<IntegPolicy> s = new HashSet<IntegPolicy>();
         s.add(p1);
@@ -1824,7 +1858,59 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         Position pos = p1.position();
         if (pos == null) pos = p2.position();
 
-        return (IntegPolicy) joinIntegPolicy(pos, s).simplify();
+        return (RifIntegPolicy) rifjoinIntegPolicy(pos, s);
+    }
+
+    @Override
+    public ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {
+        if (p1.isTop() || p2.isBottom()) {
+            return p1;
+        }
+        if (p2.isTop() || p1.isBottom()) {
+            return p2;
+        }
+        Set<ConfPolicy> s = new HashSet<ConfPolicy>();
+        s.add(p1);
+        s.add(p2);
+        Position pos = p1.position();
+        if (pos == null) pos = p2.position();
+
+        return rifjoinConfPolicy(pos, s);
+    }
+
+    @Override
+    public ConfPolicy meet(RifReaderPolicy_c p1, RifReaderPolicy_c p2) {
+        RifFSM fsm1 = p1.getFSM();
+        RifFSM fsm2 = p2.getFSM();
+        RifFSM newfsm = fsmDisjunction(fsm1, fsm2);
+
+        return new RifReaderPolicy_c(newfsm, this, p1.position());
+    }
+
+    @Override
+    public IntegPolicy meet(RifWriterPolicy_c p1, RifWriterPolicy_c p2) {
+        RifFSM fsm1 = p1.getFSM();
+        RifFSM fsm2 = p2.getFSM();
+        RifFSM newfsm = fsmConjunction(fsm1, fsm2);
+
+        return new RifWriterPolicy_c(newfsm, this, p1.position());
+    }
+
+    @Override
+    public IntegPolicy join(IntegPolicy p1, IntegPolicy p2) {
+        if (p1.isTop() || p2.isBottom()) {
+            return p1;
+        }
+        if (p2.isTop() || p1.isBottom()) {
+            return p2;
+        }
+        Set<IntegPolicy> s = new HashSet<IntegPolicy>();
+        s.add(p1);
+        s.add(p2);
+        Position pos = p1.position();
+        if (pos == null) pos = p2.position();
+
+        return rifjoinIntegPolicy(pos, s);
     }
 
     @Override
