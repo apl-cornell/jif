@@ -851,8 +851,8 @@ public class LabelEnv_c implements LabelEnv {
         Collections.reverse(ids);
         RifConfPolicy cp2 = (RifConfPolicy) pl2.confProjection();
         RifConfPolicy cp1 = (RifConfPolicy) pl1.confProjection();
-        RifConfPolicy ip2 = (RifConfPolicy) pl2.integProjection();
-        RifConfPolicy ip1 = (RifConfPolicy) pl1.integProjection();
+        RifIntegPolicy ip2 = (RifIntegPolicy) pl2.integProjection();
+        RifIntegPolicy ip1 = (RifIntegPolicy) pl1.integProjection();
         for (Id i : ids) {
             cp2 = cp2.takeTransition(i);
             ip2 = ip2.takeTransition(i);

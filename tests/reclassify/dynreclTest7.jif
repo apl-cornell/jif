@@ -18,7 +18,7 @@ public class dynreclTest[label L1, label L2, label L3] {
    
        dynreclTest w;
        
-       if(new label {rif[q1*:{Alice},q2:{Alice},f1:q1->q2]} <= L2){ w = new dynreclTest(); }
+       if(new label {rif[q1*:{Alice},q2:{Alice},f1:q1->q2];rifi[q1*:{Alice},q2:{Alice},f1:q1->q2]} <= L2){ w = new dynreclTest(); }
    
    }
 

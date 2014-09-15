@@ -309,8 +309,8 @@ non terminal RifStateNode current_state_component;
 non terminal List principal_set;
 non terminal RifTransitionNode transition_component;
 non terminal Token rif_rightarrow;
-non terminal RifLabelNode rif_label;
-non terminal RifiLabelNode rifi_label;
+non terminal RifPolicyNode rif_label;
+non terminal RifiPolicyNode rifi_label;
 non terminal List rif_join_list;
 /* end-new */
 non terminal EndorseExpr endorse;
@@ -389,21 +389,15 @@ label ::=
           
     /* begin-new */
 rif_label ::= 
-     RIF:x LBRACK rif_join_list:a RBRACK:y
-            {: RifLabelNode ln;
-               ln = parser.nf.RifLabelNode(parser.pos(x, y), a);
-               RESULT = ln; :}
+     RIF:x LBRACK rif_policy:a RBRACK:y
+            {: RESULT = a; :}
    ;
    
 rifi_label ::= 
      RIFI:x LBRACK rif_component_list:a RBRACK:y
             {: RifiPolicyNode n;
                n = parser.nf.RifiPolicyNode(parser.pos(a), a);
-               List l = new LinkedList<RifiPolicyNode>();
-               l.add(n);
-               RifiLabelNode ln;
-               ln = parser.nf.RifiLabelNode(parser.pos(x, y), l);
-               RESULT = ln; :}
+               RESULT = n; :}
    ;
     
 rif_join_list ::=

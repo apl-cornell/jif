@@ -2,9 +2,9 @@
 
 public class dynreclTest[label L1, label L2, label L3] {
 
-   int {rif[q1*:{Alice},q2:{Alice},f1:q1->q2]} res;
+   int {rif[q1*:{Alice},q2:{Alice},f1:q1->q2];rifi[q1*:{Alice}]} res;
    int{L2} x;
-   int{rif[q1*:{Alice},q2:{Alice,Bob},f1:q1->q2]} y;
+   int{rif[q1*:{Alice},q2:{Alice,Bob},f1:q1->q2];rifi[q1*:{Alice}]} y;
 
    public dynreclTest() where tr(L2,f1) <= {res} {
        x = 96;

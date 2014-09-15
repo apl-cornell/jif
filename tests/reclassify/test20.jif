@@ -4,17 +4,17 @@
 
 public class test20{
     
-    public test20 {} () {
+    public test20 {rifi[q1*:{Alice,Bob}]} () {
 
-       	int {rif[q1*:{Alice},q2:{Alice},f1:q1->q2]} res; 
+       	int {rif[q1*:{Alice},q2:{Alice},f1:q1->q2];rifi[q1*:{Alice,Bob}]} res; 
 	
 		res = help();
     }
 
 
-    int {rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]} help(){
+    int {rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2];rifi[q1*:{Alice}]} help(){
 
-		int {rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2]} y;
+		int {rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2];rifi[q1*:{}]} y;
 	
 		y = 10;
 

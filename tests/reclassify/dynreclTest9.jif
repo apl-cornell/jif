@@ -6,9 +6,9 @@ public class dynreclTest[label L1, label L2, label L3] {
    int {L2} y;
 
    public dynreclTest() {
-       int {rif[q1*:{Alice},q2:{Alice},f1:q1->q2]} x =0;
+       int {rif[q1*:{Alice},q2:{Alice},f1:q1->q2];rifi[q1*:{Alice}]} x =0;
    
-       if(new label {rif[q1*:{Alice},q2:{Alice},f1:q1->q2]} <= L2){ y=x; }
+       if(new label {rif[q1*:{Alice},q2:{Alice},f1:q1->q2];rifi[q1*:{Alice},q2:{Alice},f1:q1->q2]} <= L2){ y=x; }
        
    }
 

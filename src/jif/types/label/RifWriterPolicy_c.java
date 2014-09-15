@@ -96,7 +96,7 @@ public class RifWriterPolicy_c extends Policy_c implements RifIntegPolicy {
     @Override
     public boolean leq_(IntegPolicy p, LabelEnv env, SearchState state) {
         List<String> visited = new LinkedList<String>();
-        if (this.isTopIntegrity() || p.isBottomIntegrity()) return true;
+        if (this.isBottomIntegrity() || p.isTopIntegrity()) return true;
         if (p instanceof RifWriterPolicy_c) {
             return ((RifWriterPolicy_c) p).getFSM().leqFSM(this.fsm, visited);
         }
