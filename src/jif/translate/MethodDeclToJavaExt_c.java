@@ -45,7 +45,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
     protected List<Formal> formals;
 
     /**
-     * @throws SemanticException  
+     * @throws SemanticException
      */
     @Override
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw)
@@ -119,7 +119,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
                                         subB.position(),
                                         nf.AmbTypeNode(subB.position(), nf.Id(
                                                 t.position(), subB.name())),
-                                        args);
+                                                args);
                     }
                 }
             }
@@ -127,7 +127,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
             newFormals.add(nf.Formal(f.position(), f.flags(),
                     tn == null ? f.type() : tn, nf.Id(f.position(), f.name())));
         }
-        n = n.formals(newFormals);
+        n = (MethodDecl) n.formals(newFormals);
 
         boolean isMainMethod = "main".equals(n.name()) && n.flags().isStatic();
         if (isMainMethod && n.formals().size() == 2) {

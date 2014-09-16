@@ -287,7 +287,7 @@ public class JifToJavaRewriter extends ContextVisitor {
         for (ClassDecl cd : this.additionalClassDecls) {
             if (cd.flags().isPublic()) {
                 try {
-                    // cd is public, we will put it in it's own source file.
+                    // cd is public, we will put it in its own source file.
                     SourceFile sf =
                             java_nf().SourceFile(
                                     Position.compilerGenerated(),
@@ -304,7 +304,9 @@ public class JifToJavaRewriter extends ContextVisitor {
                             java_ext.extFileManager().getJavaFileForOutput(
                                     location, pkgName + cd.name(), Kind.SOURCE,
                                     null);
-                    Source s = java_ext.createFileSource(jfo, false);
+                    Source s =
+                            java_ext.createFileSource(jfo,
+                                    Source.Kind.COMPILER_GENERATED);
                     sf = sf.source(s);
                     this.newSourceFiles.add(sf);
                 } catch (IOException e) {

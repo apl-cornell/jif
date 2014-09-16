@@ -1,6 +1,7 @@
 package jif.ast;
 
 import polyglot.ast.Ambiguous;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.Position;
@@ -12,8 +13,13 @@ public abstract class AmbLabelNode_c extends LabelNode_c implements LabelNode,
         Ambiguous {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public AmbLabelNode_c(Position pos) {
-        super(pos);
+        this(pos, null);
+    }
+
+    public AmbLabelNode_c(Position pos, Ext ext) {
+        super(pos, ext);
     }
 
     @Override

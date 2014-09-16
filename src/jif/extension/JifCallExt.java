@@ -10,6 +10,7 @@ import jif.types.JifClassType;
 import jif.types.JifContext;
 import jif.types.JifFieldInstance;
 import jif.types.JifMethodInstance;
+import jif.types.JifParsedPolyType;
 import jif.types.JifTypeSystem;
 import jif.types.Param;
 import jif.types.PathMap;
@@ -20,7 +21,9 @@ import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 import polyglot.ast.Call;
+import polyglot.ast.CallOps;
 import polyglot.ast.Expr;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.Receiver;
 import polyglot.ast.Special;
@@ -29,19 +32,24 @@ import polyglot.frontend.Job;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.FieldInstance;
+import polyglot.types.MethodInstance;
 import polyglot.types.ParsedClassType;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>Call</code> node.
  * 
  *  @see polyglot.ast.Call_c
  */
-public class JifCallExt extends JifExprExt {
+public class JifCallExt extends JifExprExt implements CallOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifCallExt(ToJavaExt toJava) {
@@ -49,8 +57,25 @@ public class JifCallExt extends JifExprExt {
     }
 
     @Override
+    public Type findContainer(TypeSystem ts, MethodInstance mi) {
+        Type container = mi.container();
+        if (container instanceof JifParsedPolyType) {
+            JifParsedPolyType jppt = (JifParsedPolyType) container;
+            if (jppt.params().size() > 0) {
+                // return the "null instantiation" of the base type,
+                // to ensure that all TypeNodes contain either
+                // a JifParsedPolyType with zero params, or a
+                // JifSubstClassType
+                return ((JifTypeSystem) ts).nullInstantiate(node().position(),
+                        jppt.instantiatedFrom());
+            }
+        }
+        return superLang().findContainer(node(), ts, mi);
+    }
+
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
-        Call me = (Call) node();
+        Call me = node();
 
         JifContext A = lc.jifContext();
         A = (JifContext) me.del().enterScope(A);
@@ -115,7 +140,7 @@ public class JifCallExt extends JifExprExt {
                                                 (FileSource) pct.fromSource(),
                                                 true);
                                 if (job != null) {
-                                    Goal g = sched.LabelsChecked(job);
+                                    Goal g = sched.LabelsDoubleChecked(job);
                                     throw new MissingDependencyException(g);
                                 }
                             }
@@ -142,7 +167,7 @@ public class JifCallExt extends JifExprExt {
                                                 (FileSource) pct.fromSource(),
                                                 true);
                                 if (job != null) {
-                                    Goal g = sched.LabelsChecked(job);
+                                    Goal g = sched.LabelsDoubleChecked(job);
                                     throw new MissingDependencyException(g);
                                 }
                             }
@@ -221,5 +246,41 @@ public class JifCallExt extends JifExprExt {
         return updatePathMap(
                 me.target(target).arguments(helper.labelCheckedArgs()),
                 helper.X());
+    }
+
+    @Override
+    public Call node() {
+        return (Call) super.node();
+    }
+
+    @Override
+    public void printArgs(CodeWriter w, PrettyPrinter tr) {
+        superLang().printArgs(node(), w, tr);
+    }
+
+    @Override
+    public boolean constantValueSet(Lang lang) {
+        return superLang().constantValueSet(node(), lang);
+    }
+
+    @Override
+    public boolean isConstant(Lang lang) {
+        return superLang().isConstant(node(), lang);
+    }
+
+    @Override
+    public Object constantValue(Lang lang) {
+        return superLang().constantValue(node(), lang);
+    }
+
+    @Override
+    public ReferenceType findTargetType() throws SemanticException {
+        return superLang().findTargetType(node());
+    }
+
+    @Override
+    public Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes)
+            throws SemanticException {
+        return superLang().typeCheckNullTarget(node(), tc, argTypes);
     }
 }

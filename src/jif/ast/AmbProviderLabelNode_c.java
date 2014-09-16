@@ -3,6 +3,7 @@ package jif.ast;
 import jif.types.JifClassType;
 import jif.types.JifTypeSystem;
 import jif.types.label.Label;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.types.SemanticException;
@@ -20,9 +21,22 @@ public class AmbProviderLabelNode_c extends AmbLabelNode_c implements
 
     TypeNode typeNode;
 
+//    @Deprecated
     public AmbProviderLabelNode_c(Position pos, TypeNode typeNode) {
-        super(pos);
+        this(pos, typeNode, null);
+    }
+
+    public AmbProviderLabelNode_c(Position pos, TypeNode typeNode, Ext ext) {
+        super(pos, ext);
         this.typeNode = typeNode;
+    }
+
+    protected <N extends AmbProviderLabelNode_c> N typeNode(N n,
+            TypeNode typeNode) {
+        if (n.typeNode == typeNode) return n;
+        n = copyIfNeeded(n);
+        n.typeNode = typeNode;
+        return n;
     }
 
     @Override
@@ -58,17 +72,13 @@ public class AmbProviderLabelNode_c extends AmbLabelNode_c implements
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode typeNode = (TypeNode) visitChild(this.typeNode, v);
-        return reconstruct(typeNode);
+        TypeNode typeNode = visitChild(this.typeNode, v);
+        return reconstruct(this, typeNode);
     }
 
-    protected AmbProviderLabelNode_c reconstruct(TypeNode typeNode) {
-        if (this.typeNode != typeNode) {
-            AmbProviderLabelNode_c n = (AmbProviderLabelNode_c) copy();
-            n.typeNode = typeNode;
-            return n;
-        }
-
-        return this;
+    protected <N extends AmbProviderLabelNode_c> N reconstruct(N n,
+            TypeNode typeNode) {
+        n = typeNode(n, typeNode);
+        return n;
     }
 }

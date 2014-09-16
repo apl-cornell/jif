@@ -3,6 +3,7 @@ package jif.types;
 import java.io.IOException;
 
 import polyglot.main.Report;
+import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.VarInstance_c;
 import polyglot.util.Position;
@@ -132,7 +133,7 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance {
     private static final long readObjectVersionUID = 1L;
 
     protected void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    ClassNotFoundException {
         // If you update this method in an incompatible way, increment
         // readObjectVersionUID.
 
@@ -154,5 +155,15 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance {
         default:
             throw new IOException("invalid kind");
         }
+    }
+
+    @Override
+    public void setType(Type t) {
+        //Do nothing
+    }
+
+    @Override
+    public String fullName() {
+        return name();
     }
 }

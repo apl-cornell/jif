@@ -92,6 +92,10 @@ public class AccessPathField extends AccessPath {
         return this.fi;
     }
 
+    public AccessPathField fieldInstance(FieldInstance fi) {
+        return new AccessPathField(path, fi, fieldName, position());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof AccessPathField) {

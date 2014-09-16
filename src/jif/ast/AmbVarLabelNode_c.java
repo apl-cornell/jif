@@ -7,6 +7,7 @@ import jif.types.ParamInstance;
 import jif.types.PrincipalInstance;
 import jif.types.label.CovariantParamLabel;
 import jif.types.label.ParamLabel;
+import polyglot.ast.Ext;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.types.Context;
@@ -28,7 +29,11 @@ public class AmbVarLabelNode_c extends AmbLabelNode_c implements
     protected Id name;
 
     public AmbVarLabelNode_c(Position pos, Id name) {
-        super(pos);
+        this(pos, name, null);
+    }
+
+    public AmbVarLabelNode_c(Position pos, Id name, Ext ext) {
+        super(pos, ext);
         this.name = name;
     }
 
@@ -43,8 +48,22 @@ public class AmbVarLabelNode_c extends AmbLabelNode_c implements
     }
 
     public AmbVarLabelNode name(String name) {
-        AmbVarLabelNode_c n = (AmbVarLabelNode_c) copy();
-        n.name = n.name.id(name);
+        return name(this, name);
+    }
+
+    protected <N extends AmbVarLabelNode_c> N name(N n, String name) {
+        if (n.name.id().equals(name)) return n;
+        return id(n, n.name.id(name));
+    }
+
+    public AmbVarLabelNode id(Id id) {
+        return id(this, id);
+    }
+
+    protected <N extends AmbVarLabelNode_c> N id(N n, Id id) {
+        if (n.name == id) return n;
+        n = copyIfNeeded(n);
+        n.name = id;
         return n;
     }
 
@@ -52,16 +71,12 @@ public class AmbVarLabelNode_c extends AmbLabelNode_c implements
     public Node visitChildren(NodeVisitor v) {
         if (this.name == null) return this;
 
-        Id name = (Id) visitChild(this.name, v);
-        return reconstruct(name);
+        Id name = visitChild(this.name, v);
+        return reconstruct(this, name);
     }
 
-    protected AmbVarLabelNode_c reconstruct(Id name) {
-        if (this.name == name) {
-            return this;
-        }
-        AmbVarLabelNode_c n = (AmbVarLabelNode_c) this.copy();
-        n.name = name;
+    protected <N extends AmbVarLabelNode_c> N reconstruct(N n, Id name) {
+        n = id(n, name);
         return n;
     }
 

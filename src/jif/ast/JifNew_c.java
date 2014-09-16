@@ -9,6 +9,7 @@ import jif.types.JifTypeSystem;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.ClassBody;
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.ast.New;
 import polyglot.ast.New_c;
 import polyglot.ast.Node;
@@ -21,12 +22,20 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
+// XXX Should be replaced with extension
+@Deprecated
 public class JifNew_c extends New_c implements New {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+//    @Deprecated
     public JifNew_c(Position pos, Expr outer, TypeNode tn,
             List<Expr> arguments, ClassBody body) {
-        super(pos, outer, tn, arguments, body);
+        this(pos, outer, tn, arguments, body, null);
+    }
+
+    public JifNew_c(Position pos, Expr outer, TypeNode tn,
+            List<Expr> arguments, ClassBody body, Ext ext) {
+        super(pos, outer, tn, arguments, body, ext);
     }
 
     @Override
@@ -53,11 +62,10 @@ public class JifNew_c extends New_c implements New {
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
         List<Type> ex = new ArrayList<Type>(super.throwTypes(ts));
-        New n = (New) this.node();
         LabelTypeCheckUtil ltcu = ((JifTypeSystem) ts).labelTypeCheckUtil();
 
-        if (n.objectType().type() instanceof JifClassType) {
-            ex.addAll(ltcu.throwTypes((JifClassType) n.objectType().type()));
+        if (objectType().type() instanceof JifClassType) {
+            ex.addAll(ltcu.throwTypes((JifClassType) objectType().type()));
         }
         return ex;
     }

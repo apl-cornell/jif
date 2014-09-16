@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jif.ast.JifSingletonAccess;
+import jif.ast.JifNew_c;
 import jif.translate.ToJavaExt;
 import jif.types.JifClassType;
 import jif.types.JifContext;
@@ -18,6 +19,7 @@ import jif.types.label.AccessPathField;
 import jif.types.label.Label;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
+import jif.visit.JifTypeChecker;
 import jif.visit.LabelChecker;
 import jif.visit.SingletonChecker;
 import polyglot.ast.Expr;
@@ -28,8 +30,11 @@ import polyglot.types.ClassType;
 import polyglot.types.FieldInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>New</code> node.
  * 
@@ -45,8 +50,46 @@ public class JifNewExt extends JifExprExt {
     protected ConstructorChecker constructorChecker = new ConstructorChecker();
 
     @Override
+    public New node() {
+        return (New) super.node();
+    }
+
+    @Override
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+        JifTypeChecker jtc =
+                (JifTypeChecker) superLang().typeCheckEnter(node(), tc);
+        return jtc.inferClassParameters(true);
+    }
+
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        JifNew_c n = (JifNew_c) superLang().typeCheck(node(), tc);
+
+        Type t = n.objectType().type();
+        LabelTypeCheckUtil ltcu =
+                ((JifTypeSystem) tc.typeSystem()).labelTypeCheckUtil();
+        ltcu.typeCheckType(tc, t);
+
+        n = (JifNew_c) n.type(t);
+
+        return n;
+    }
+
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
+        New node = node();
+        List<Type> ex = new ArrayList<Type>(superLang().throwTypes(node(), ts));
+        LabelTypeCheckUtil ltcu = ((JifTypeSystem) ts).labelTypeCheckUtil();
+
+        if (node.objectType().type() instanceof JifClassType) {
+            ex.addAll(ltcu.throwTypes((JifClassType) node.objectType().type()));
+        }
+        return ex;
+    }
+
+    @Override
     public Node labelCheck(LabelChecker lc) throws SemanticException {
-        New noe = (New) node();
+        New noe = node();
 
         JifTypeSystem ts = lc.typeSystem();
         JifContext A = lc.jifContext();

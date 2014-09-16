@@ -14,6 +14,7 @@ import jif.types.label.VarLabel;
 import jif.types.principal.VarPrincipal;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.CanonicalTypeNode_c;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.types.ArrayType;
@@ -27,12 +28,19 @@ import polyglot.visit.TypeChecker;
 /**
  * A <code>JifCanonicalTypeNode</code> is a type node for a canonical type in Polyj.
  */
+@Deprecated
+// XXX Should be replaced with an extension
 public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements
         JifCanonicalTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+//    @Deprecated
     public JifCanonicalTypeNode_c(Position pos, Type type) {
-        super(pos, type);
+        this(pos, type, null);
+    }
+
+    public JifCanonicalTypeNode_c(Position pos, Type type, Ext ext) {
+        super(pos, type, ext);
     }
 
     @Override

@@ -1,7 +1,5 @@
 package jif.ast;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,11 +7,13 @@ import jif.types.CallerConstraint;
 import jif.types.CallerConstraint_c;
 import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -30,11 +30,15 @@ public class CallerConstraintNode_c extends ConstraintNode_c<CallerConstraint>
 
     protected List<PrincipalNode> principals;
 
+//    @Deprecated
     public CallerConstraintNode_c(Position pos, List<PrincipalNode> principals) {
-        super(pos);
-        this.principals =
-                Collections.unmodifiableList(new ArrayList<PrincipalNode>(
-                        principals));
+        this(pos, principals, null);
+    }
+
+    public CallerConstraintNode_c(Position pos, List<PrincipalNode> principals,
+            Ext ext) {
+        super(pos, ext);
+        this.principals = ListUtil.copy(principals, true);
     }
 
     @Override
@@ -44,10 +48,14 @@ public class CallerConstraintNode_c extends ConstraintNode_c<CallerConstraint>
 
     @Override
     public CallerConstraintNode principals(List<PrincipalNode> principals) {
-        CallerConstraintNode_c n = (CallerConstraintNode_c) copy();
-        n.principals =
-                Collections.unmodifiableList(new ArrayList<PrincipalNode>(
-                        principals));
+        return principals(this, principals);
+    }
+
+    protected <N extends CallerConstraintNode_c> N principals(N n,
+            List<PrincipalNode> principals) {
+        if (CollectionUtil.equals(n.principals, principals)) return n;
+        n = copyIfNeeded(n);
+        n.principals = ListUtil.copy(principals, true);
         if (constraint() != null) {
             List<Principal> l = new LinkedList<Principal>();
             for (PrincipalNode p : principals) {
@@ -58,21 +66,16 @@ public class CallerConstraintNode_c extends ConstraintNode_c<CallerConstraint>
         return n;
     }
 
-    protected CallerConstraintNode_c reconstruct(List<PrincipalNode> principals) {
-        if (!CollectionUtil.equals(principals, this.principals)) {
-            List<PrincipalNode> newPrincipals =
-                    Collections.unmodifiableList(new ArrayList<PrincipalNode>(
-                            principals));
-            return (CallerConstraintNode_c) this.principals(newPrincipals);
-        }
-
-        return this;
+    protected <N extends CallerConstraintNode_c> N reconstruct(N n,
+            List<PrincipalNode> principals) {
+        n = principals(n, principals);
+        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<PrincipalNode> principals = visitList(this.principals, v);
-        return reconstruct(principals);
+        return reconstruct(this, principals);
     }
 
     /**

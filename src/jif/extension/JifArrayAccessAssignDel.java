@@ -3,7 +3,6 @@ package jif.extension;
 import java.util.List;
 
 import jif.types.ConstArrayType;
-import polyglot.ast.ArrayAccess;
 import polyglot.ast.ArrayAccessAssign;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
@@ -30,12 +29,10 @@ public class JifArrayAccessAssignDel extends JifAssignDel {
      */
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
+        // NB: Jif's type system makes arrays invariant on the base type, so no
+        // array store exceptions can be thrown.
         ArrayAccessAssign a = (ArrayAccessAssign) node();
         List<Type> l = super.throwTypes(ts);
-        if (a.throwsArrayStoreException()) {
-            l.add(ts.ArrayStoreException());
-        }
-
         if (!((JifArrayAccessDel) a.left().del()).arrayIsNeverNull()) {
             l.add(ts.NullPointerException());
         }
@@ -50,7 +47,7 @@ public class JifArrayAccessAssignDel extends JifAssignDel {
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         ArrayAccessAssign aa = (ArrayAccessAssign) super.typeCheck(tc);
-        Expr array = ((ArrayAccess) aa.left()).array();
+        Expr array = aa.left().array();
         if (array.type() instanceof ConstArrayType) {
             ConstArrayType cat = (ConstArrayType) array.type();
             if (cat.isConst()) {

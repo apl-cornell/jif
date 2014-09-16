@@ -1,7 +1,7 @@
 package jif.extension;
 
+import jif.ast.JifExt;
 import jif.visit.LabelChecker;
-import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 
@@ -10,7 +10,7 @@ import polyglot.types.SemanticException;
  *  will invoke the <ndoe>labelCheckStmt</code> methods provided
  *  by the subclasses of this class. 
  */
-public interface JifStmtExt extends Ext {
+public interface JifStmtExt extends JifExt {
     public JifStmtExt stmtDel();
 
     public JifStmtExt stmtDel(JifStmtExt stmtDel);

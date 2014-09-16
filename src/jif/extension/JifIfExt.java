@@ -91,14 +91,14 @@ public class JifIfExt extends JifStmtExt_c {
                 extendContext(lc, A, b.right(), warn);
             }
             if (b.operator() == Binary.BIT_OR || b.operator() == Binary.COND_OR) {
-                extendContext(lc, A, b.left(), true);
-                extendContext(lc, A, b.right(), true);
+                extendContext(lc, A, b.left(), lc.warningsEnabled());
+                extendContext(lc, A, b.right(), lc.warningsEnabled());
             }
         }
         if (e instanceof Unary) {
             Unary u = (Unary) e;
             if (u.operator() == Unary.NOT && u.expr() instanceof Binary) {
-                extendContext(lc, A, u.expr(), true);
+                extendContext(lc, A, u.expr(), lc.warningsEnabled());
             }
         }
         extendFact(lc, A, e, warn);
@@ -112,7 +112,7 @@ public class JifIfExt extends JifStmtExt_c {
         if (e instanceof Unary) {
             Unary u = (Unary) e;
             if (u.expr() instanceof Binary) {
-                extendFact(lc, A, (Binary) u.expr(), true);
+                extendFact(lc, A, (Binary) u.expr(), lc.warningsEnabled());
             }
         }
     }

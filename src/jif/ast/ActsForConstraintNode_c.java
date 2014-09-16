@@ -3,6 +3,7 @@ package jif.ast;
 import jif.types.ActsForConstraint;
 import jif.types.ActsForParam;
 import jif.types.JifTypeSystem;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -22,17 +23,29 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
     protected ActsForParamNode<Granter> granter;
     protected final boolean isEquiv;
 
+    @Deprecated
     public ActsForConstraintNode_c(Position pos, ActsForParamNode<Actor> actor,
             ActsForParamNode<Granter> granter, boolean isEquiv) {
-        super(pos);
+        this(pos, actor, granter, isEquiv, null);
+    }
+
+    public ActsForConstraintNode_c(Position pos, ActsForParamNode<Actor> actor,
+            ActsForParamNode<Granter> granter, boolean isEquiv, Ext ext) {
+        super(pos, ext);
         this.actor = actor;
         this.granter = granter;
         this.isEquiv = isEquiv;
     }
 
+    @Deprecated
     public ActsForConstraintNode_c(Position pos, ActsForParamNode<Actor> actor,
             ActsForParamNode<Granter> granter) {
-        this(pos, actor, granter, false);
+        this(pos, actor, granter, null);
+    }
+
+    public ActsForConstraintNode_c(Position pos, ActsForParamNode<Actor> actor,
+            ActsForParamNode<Granter> granter, Ext ext) {
+        this(pos, actor, granter, false, ext);
     }
 
     @Override
@@ -43,7 +56,13 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
     @Override
     public ActsForConstraintNode<Actor, Granter> actor(
             ActsForParamNode<Actor> actor) {
-        ActsForConstraintNode_c<Actor, Granter> n = copy();
+        return actor(this, actor);
+    }
+
+    protected <N extends ActsForConstraintNode_c<Actor, Granter>> N actor(N n,
+            ActsForParamNode<Actor> actor) {
+        if (n.actor == actor) return n;
+        n = copyIfNeeded(n);
         n.actor = actor;
         if (constraint() != null) {
             n.setConstraint(constraint().actor(actor.parameter()));
@@ -65,7 +84,13 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
     @Override
     public ActsForConstraintNode<Actor, Granter> granter(
             ActsForParamNode<Granter> granter) {
-        ActsForConstraintNode_c<Actor, Granter> n = copy();
+        return granter(this, granter);
+    }
+
+    protected <N extends ActsForConstraintNode_c<Actor, Granter>> N granter(
+            N n, ActsForParamNode<Granter> granter) {
+        if (n.granter == granter) return n;
+        n = copyIfNeeded(n);
         n.granter = granter;
         if (constraint() != null) {
             n.setConstraint(constraint().granter(granter.parameter()));
@@ -73,26 +98,19 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
         return n;
     }
 
-    protected ActsForConstraintNode_c<Actor, Granter> reconstruct(
-            ActsForParamNode<Actor> actor, ActsForParamNode<Granter> granter) {
-        if (actor != this.actor || granter != this.granter) {
-            ActsForConstraintNode_c<Actor, Granter> n = copy();
-            return (ActsForConstraintNode_c<Actor, Granter>) n.actor(actor)
-                    .granter(granter);
-        }
-
-        return this;
+    protected <N extends ActsForConstraintNode_c<Actor, Granter>> N reconstruct(
+            N n, ActsForParamNode<Actor> actor,
+            ActsForParamNode<Granter> granter) {
+        n = actor(n, actor);
+        n = granter(n, granter);
+        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        @SuppressWarnings("unchecked")
-        ActsForParamNode<Actor> actor =
-                (ActsForParamNode<Actor>) visitChild(this.actor, v);
-        @SuppressWarnings("unchecked")
-        ActsForParamNode<Granter> granter =
-                (ActsForParamNode<Granter>) visitChild(this.granter, v);
-        return reconstruct(actor, granter);
+        ActsForParamNode<Actor> actor = visitChild(this.actor, v);
+        ActsForParamNode<Granter> granter = visitChild(this.granter, v);
+        return reconstruct(this, actor, granter);
     }
 
     /**

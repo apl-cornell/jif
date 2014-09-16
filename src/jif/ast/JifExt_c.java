@@ -55,7 +55,7 @@ public class JifExt_c extends Ext_c implements JifExt {
     }
 
     @Override
-    public Object copy() {
+    public JifExt copy() {
         JifExt_c copy = (JifExt_c) super.copy();
         if (toJava != null) {
             copy.toJava = (ToJavaExt) toJava.copy();

@@ -59,45 +59,51 @@
     <property name="jifc" location="${bin}/jifc" />
     <property name="jif" location="${bin}/jif" />
 
+    <!-- Polyglot distribution location -->
+    <property name="polyglot.url.prefix"
+            value="http://www.cs.cornell.edu/Projects/polyglot/src/polyglot-"/>
+    <property name="polyglot.url.suffix"
+            value="-src.zip"/>
+
 
     <!-- Polyglot classpath elements -->
     <condition property="polyglot-classes"
-	       value="${polyglot.home}/classes"
-	       else="">
-	<isset property="polyglot.home" />
+           value="${polyglot.home}/classes"
+           else="">
+    <isset property="polyglot.home" />
     </condition>
     <echo message="polyglot-classes is ${polyglot-classes}" level="verbose" />
 
     <condition property="polyglot-jar"
-	       value="${polyglot.home}/lib/polyglot.jar"
-	       else="">
-	<isset property="polyglot.home" />
+           value="${polyglot.home}/lib/polyglot.jar"
+           else="">
+    <isset property="polyglot.home" />
     </condition>
     <echo message="polyglot-jar is ${polyglot-jar}" level="verbose" />
 
     <condition property="ppg-jar"
-	       value="${polyglot.home}/lib/ppg.jar"
-	       else="">
-	<isset property="polyglot.home" />
+           value="${polyglot.home}/lib/ppg.jar"
+           else="">
+    <isset property="polyglot.home" />
     </condition>
     <echo message="ppg-jar is ${ppg-jar}" level="verbose" />
 
     <condition property="javacup-jar"
-	       value="${polyglot.home}/lib/java_cup.jar"
-	       else="">
-	<isset property="polyglot.home" />
+           value="${polyglot.home}/lib/java_cup.jar"
+           else="">
+    <isset property="polyglot.home" />
     </condition>
     <echo message="javacup-jar is ${javacup-jar}" level="verbose" />
 
     <condition property="jflex-jar"
-	       value="${polyglot.home}/lib/JFlex.jar"
-	       else="">
-	<isset property="polyglot.home" />
+           value="${polyglot.home}/lib/jflex.jar"
+           else="">
+    <isset property="polyglot.home" />
     </condition>
     <echo message="jflex-jar is ${jflex-jar}" level="verbose" />
 
     <condition property="polyglot.home" value="">
-	<not><isset property="polyglot.home" /></not>
+    <not><isset property="polyglot.home" /></not>
     </condition>
 
     <!-- the standard classpath -->
@@ -108,17 +114,17 @@
             <include name="*.jar" />
             <exclude name="jif*.jar" />
         </fileset>
-	<pathelement path="${polyglot-classes}" />
-	<pathelement path="${polyglot-jar}" />
-	<pathelement path="${ppg-jar}" />
-	<pathelement path="${javacup-jar}" />
-	<pathelement path="${jflex-jar}" />
+    <pathelement path="${polyglot-classes}" />
+    <pathelement path="${polyglot-jar}" />
+    <pathelement path="${ppg-jar}" />
+    <pathelement path="${javacup-jar}" />
+    <pathelement path="${jflex-jar}" />
     </path>
 
     <property name="standard.classpath" refid="standard.classpath" />
     <echo message="standard.classpath is ${standard.classpath}" level="verbose" />
 
-	<!-- establish the os -->
+    <!-- establish the os -->
     <condition property="os.isWindows">
         <os family="windows" />
     </condition>
@@ -227,69 +233,69 @@
        ****************************************  -->
     <target name="configure" description="Configure jif">
         <antcall target="check-classpath" />
-	<antcall target="jifc-executable" />
+    <antcall target="jifc-executable" />
         <antcall target="jif-executable-bat" />
-    	<chmod file="${jif}" perm="a+x"/>
-    	<chmod file="${jifc}" perm="a+x"/>
+        <chmod file="${jif}" perm="a+x"/>
+        <chmod file="${jifc}" perm="a+x"/>
     </target>
 
     <target name="check-classpath" description="Check the classpath contains the appropriate directories/jars">
         <available classname="polyglot.main.Main"
-	           classpathref="standard.classpath"
-	           property="cp_existence.polyglot"/>
+               classpathref="standard.classpath"
+               property="cp_existence.polyglot"/>
         <available classname="java_cup.Main"
-	           classpathref="standard.classpath"
-	           property="cp_existence.java_cup"/>
-        <available classname="JFlex.Main"
-	           classpathref="standard.classpath"
-	           property="cp_existence.jflex"/>
+               classpathref="standard.classpath"
+               property="cp_existence.java_cup"/>
+        <available classname="jflex.Main"
+               classpathref="standard.classpath"
+               property="cp_existence.jflex"/>
         <available classname="polyglot.ext.param.ExtensionInfo"
-	           classpathref="standard.classpath"
-	           property="cp_existence.polyglot.param"/>
+               classpathref="standard.classpath"
+               property="cp_existence.polyglot.param"/>
 
         <condition property="jdk_home.defined">
             <isset property="jdk.home" />
         </condition>
         <fail unless="cp_existence.polyglot"
-	      message="The polyglot classes must be on the classpath. Try adding polyglot.jar to the classpath."/>
+          message="The polyglot classes must be on the classpath. Try adding polyglot.jar to the classpath."/>
         <fail unless="cp_existence.java_cup"
-	      message="The java_cup classes must be on the classpath. Try adding java_cup.jar to the classpath."/>
+          message="The java_cup classes must be on the classpath. Try adding java_cup.jar to the classpath."/>
         <fail unless="cp_existence.jflex"
-	      message="The JFlex classes must be on the classpath. Try adding JFlex.jar to the classpath."/>
+          message="The JFlex classes must be on the classpath. Try adding jflex.jar to the classpath."/>
         <fail unless="cp_existence.polyglot.param"
-	      message="The Polyglot param extension must be compiled."/>
+          message="The Polyglot param extension must be compiled."/>
         <fail unless="jdk_home.defined"
-	      message="The JDK home (usually environment variable JAVA_HOME) must be defined."/>
+          message="The JDK home (usually environment variable JAVA_HOME) must be defined."/>
     </target>
 
     <!-- Configures Eclipse's .classpath file. -->
     <target name="eclipse" depends="eclipse-check"
-	    unless="eclipse.up-to-date"
-	    description="Configures Eclipse's .classpath file">
-	<condition property="tools.jar-entry"
-	    value="&lt;classpathentry kind=&quot;lib&quot; path=&quot;${jdk.home}/lib/tools.jar&quot;/&gt;"
-	    else="">
-	    <available file="${jdk.home}/lib/tools.jar" />
-	</condition>
-	<copy file="eclipse-classpath.in" tofile=".classpath">
-	    <filterset>
-		<filter token="TOOLS.JAR" value="${tools.jar-entry}" />
-	    </filterset>
-	</copy>
+        unless="eclipse.up-to-date"
+        description="Configures Eclipse's .classpath file">
+    <condition property="tools.jar-entry"
+        value="&lt;classpathentry kind=&quot;lib&quot; path=&quot;${jdk.home}/lib/tools.jar&quot;/&gt;"
+        else="">
+        <available file="${jdk.home}/lib/tools.jar" />
+    </condition>
+    <copy file="eclipse-classpath.in" tofile=".classpath">
+        <filterset>
+        <filter token="TOOLS.JAR" value="${tools.jar-entry}" />
+        </filterset>
+    </copy>
     </target>
 
     <target name="eclipse-check">
-	<uptodate property="eclipse.up-to-date" targetfile=".classpath"
-		    srcfile="eclipse-classpath.in" />
+    <uptodate property="eclipse.up-to-date" targetfile=".classpath"
+            srcfile="eclipse-classpath.in" />
     </target>
 
     <!-- Create jifc script if needed -->
     <target name="jifc-executable">
-	<copy file="${jifc}.in" tofile="${jifc}">
-	    <filterset>
-		<filter token="POLYGLOT" value="${polyglot.home}" />
-	    </filterset>
-	</copy>
+    <copy file="${jifc}.in" tofile="${jifc}">
+        <filterset>
+        <filter token="POLYGLOT" value="${polyglot.home}" />
+        </filterset>
+    </copy>
     </target>
 
     <!-- Create jif.bat and jifc.bat if needed -->
@@ -339,22 +345,22 @@ sh ${jif} %CMD_LINE_ARGS%
             <param name="ext.basedir" value="${basedir}" />
             <param name="parser.type" value="ppg" />
         </antcall>
-    	
-    	<!-- Copy jif.ppg to the classes dir so that it's included in the jar
-    	     for others to use. -->
-    	<copy file="${src}/jif/parse/jif.ppg" todir="${classes}/jif/parse" />
+        
+        <!-- Copy jif.ppg to the classes dir so that it's included in the jar
+             for others to use. -->
+        <copy file="${src}/jif/parse/jif.ppg" todir="${classes}/jif/parse" />
     </target>
 
     <!-- The Jif signatures for standard java classes, e.g. java.lang.Object -->
     <target name="jif-sig" depends="jif-base,jif-runtime" description="compile the signature classes">
         <mkdir dir="${sig-classes}" />
         <apply executable="${jifc}" 
-		       parallel="false" 
-		       failonerror="true" 
-		       dest="${basedir}" 
-		       relative="true" 
-		       skipemptyfilesets="true" 
-		       vmlauncher="false">
+               parallel="false" 
+               failonerror="true" 
+               dest="${basedir}" 
+               relative="true" 
+               skipemptyfilesets="true" 
+               vmlauncher="false">
             <arg value="-e" />
             <arg value="-d" />
             <arg value="sig-classes" />
@@ -363,27 +369,27 @@ sh ${jif} %CMD_LINE_ARGS%
             <!--
             <arg value="-rdebug" />
             -->
-	    <arg value="-classpath" />
-	    <arg value="${java.class.path}" />
+        <arg value="-classpath" />
+            <arg path="${java.class.path}" prefix="&quot;" suffix="&quot;" />
             <srcfile />
             <fileset dir="${basedir}" includes="sig-src/**/Object.jif" />
             <mapper type="regexp" from="^sig-src(.*)\.jif" to="sig-classes\1\.class" />
         </apply>
 
         <apply executable="${jifc}" 
-		       parallel="true" 
-		       failonerror="true" 
-		       dest="${basedir}"
-		       relative="true" 
-		       skipemptyfilesets="true" 
-		       vmlauncher="false">
+               parallel="true" 
+               failonerror="true" 
+               dest="${basedir}"
+               relative="true" 
+               skipemptyfilesets="true" 
+               vmlauncher="false">
             <arg value="-e" />
             <arg value="-d" />
             <arg value="sig-classes" />
             <arg value="-sourcepath" />
             <arg value="sig-src" />
-	    <arg value="-classpath" />
-	    <arg value="${java.class.path}" />
+        <arg value="-classpath" />
+            <arg path="${java.class.path}" prefix="&quot;" suffix="&quot;" />
             <srcfile />
             <fileset dir="${basedir}" includes="sig-src/**/*.jif" />
             <mapper type="regexp" from="^sig-src(.*)\.jif" to="sig-classes\1\.class" />
@@ -395,20 +401,20 @@ sh ${jif} %CMD_LINE_ARGS%
     <target name="jif-lib" depends="jif-base,jif-sig" description="compile the jif library code">
         <mkdir dir="${lib-classes}" />
         <apply executable="${jifc}" 
-		       parallel="true" 
-		       failonerror="true" 
-		       dest="${basedir}"
-		       relative="true" 
-		       skipemptyfilesets="true" 
-		       vmlauncher="false">
+               parallel="true" 
+               failonerror="true" 
+               dest="${basedir}"
+               relative="true" 
+               skipemptyfilesets="true" 
+               vmlauncher="false">
             <arg value="-e" />
             <arg value="-d" />
             <arg value="lib-classes" />
             <arg value="-sourcepath" />
             <arg value="lib-src" />
-	    <arg value="-e" />
-	    <arg value="-classpath" />
-	    <arg value="${java.class.path}" />
+        <arg value="-e" />
+        <arg value="-classpath" />
+            <arg path="${java.class.path}" prefix="&quot;" suffix="&quot;" />
             <!--      
       <arg value="-report" />
       <arg value="debug=1" />
@@ -422,7 +428,7 @@ sh ${jif} %CMD_LINE_ARGS%
 
     <target name="jif-runtime" depends="init,configure" description="compile the jif runtime">
         <mkdir dir="${rt-classes}" />
-        <javac source="1.5" target="1.5" srcdir="${rt-src}" destdir="${rt-classes}" debug="on" includes="**">
+        <javac source="1.5" target="1.5" srcdir="${rt-src}" destdir="${rt-classes}" encoding="UTF-8" debug="on" includes="**">
             <classpath>
                 <pathelement location="${sig-classes}" />
                 <pathelement location="${lib-classes}" />
@@ -528,10 +534,10 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
         </condition>
 
         <apply executable="g++" 
-		       failonerror="true" 
-		       dest="${lib}" 
-		       skipemptyfilesets="true" 
-		       vmlauncher="false">
+               failonerror="true" 
+               dest="${lib}" 
+               skipemptyfilesets="true" 
+               vmlauncher="false">
             <arg value="${jif-native-unix.sharedflag}" />
             <arg value="-fPIC" />
             <arg value="-I." />
@@ -551,12 +557,11 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
     <target name="jif-runtime-native-windows" if="os.isWindows">
         <echo>Compiling windows runtime</echo>
         <apply executable="g++" 
-		       failonerror="true"
-		       dest="${rt-src}" 
-		       skipemptyfilesets="true" 
-		       parallel="false" 
-		       vmlauncher="false">
-            <arg value="-mno-cygwin" />
+               failonerror="true"
+               dest="${rt-src}" 
+               skipemptyfilesets="true" 
+               parallel="false" 
+               vmlauncher="false">
             <arg value="-c" />
             <arg value="-I" />
             <arg path="${jdk.home}/include" />
@@ -573,14 +578,13 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
         </apply>
 
         <apply executable="g++" 
-		       failonerror="true" 
-		       dest="${lib}" 
-		       skipemptyfilesets="true" 
-		       parallel="true" 
-		       vmlauncher="false">
+               failonerror="true" 
+               dest="${lib}" 
+               skipemptyfilesets="true" 
+               parallel="true" 
+               vmlauncher="false">
             <arg value="-o" />
             <targetfile />
-            <arg value="-mno-cygwin" />
             <arg value="-shared" />
             <arg value="-Wl,--export-all-symbols" />
             <arg value="-Wl,--add-stdcall-alias" />
@@ -661,7 +665,7 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
   <target name="configure-version" unless="jif.version">
     <property file="${basedir}/version.properties" prefix="jif" />
     <property name="jif.version"
-	value="${jif.version.major}.${jif.version.minor}.${jif.version.patch}"/>
+        value="${jif.version.major}.${jif.version.minor}.${jif.version.patch}"/>
   </target>
 
   <!-- Generates version files in the source tree. -->
@@ -750,7 +754,111 @@ public class Version extends polyglot.main.Version {
     </target>
 
     <!-- generate the Jif distribution -->
-    <target name="dist" description="generate the distribution">
+    <target name="dist"
+            description="generate the distribution"
+            depends="download-polyglot,configure-version">
+        <!-- download-polyglot should have created the distribution directory
+             already. -->
+
+        <!-- Check out Jif from Git. -->
+        <antcall target="git-clone">
+            <param name="name" value="jif"/>
+            <param name="root" value="${basedir}"/>
+        </antcall>
+
+        <!-- Configure the scratch copy. -->
+        <concat destfile="${dist}/jif/config.properties" append="no">
+            jdk.home=${jdk.home}
+        </concat>
+
+        <!-- Copy Polyglot jars into the scratch copy. -->
+        <copy todir="${dist}/jif/lib">
+            <fileset dir="${dist}/polyglot/lib">
+                <include name="polyglot.jar"/>
+                <include name="ppg.jar"/>
+                <include name="pth.jar"/>
+                <include name="jflex.jar"/>
+                <include name="java_cup.jar"/>
+            </fileset>
+        </copy>
+
+        <!-- Create the distribution zip in the scratch copy. -->
+        <antcall target="sub-ant-dist">
+            <param name="sub-ant.dir" value="jif"/>
+            <param name="sub-ant.target" value="dist.zip"/>
+        </antcall>
+
+        <!-- Move the distribution zip out of the scratch directory. -->
+        <move todir="${basedir}"
+                file="${dist}/jif/jif-${jif.version}.zip"/>
+    </target>
+
+    <!--
+        Downloads and extracts Polyglot to ${dist}/polyglot.
+    -->
+    <target name="download-polyglot"
+            depends="get-polyglot-download-version">
+        <property name="polyglot.download.url"
+                value="${polyglot.url.prefix}${polyglot.download.version}${polyglot.url.suffix}"/>
+        <get src="${polyglot.download.url}" dest="${dist}/polyglot.zip"
+                verbose="on"/>
+        <unzip src="${dist}/polyglot.zip" dest="${dist}"/>
+        <move file="${dist}/polyglot-${polyglot.download.version}-src"
+                tofile="${dist}/polyglot"/>
+    </target>
+
+    <!--
+        Asks the user for the version of Poylglot to build against.
+    
+        ${polyglot.download.version} will be the version of Polyglot to be
+        downloaded.
+    -->
+    <target name="get-polyglot-download-version"
+            depends="configure-dependency-versions">
+        <input message="Polyglot version to download?"
+                defaultvalue="${polyglot.version}"
+                addproperty="polyglot.download.version"/>
+    </target>
+
+    <!--
+        Configures properties for dependency versions.
+    -->
+    <target name="configure-dependency-versions">
+        <!-- Reset the distribution directory -->
+        <delete dir="${dist}" />
+        <mkdir dir="${dist}" />
+
+        <!--
+            Generate code that will determine the Polyglot version. This is
+            done this way because we won't have Polyglot's build.properties
+            file if we're only building against polyglot.jar.
+        -->
+        <echo file="${dist}/VersionInfo.java">
+import polyglot.frontend.JLVersion;
+
+public class VersionInfo {
+  public static void main(String[] args) {
+    JLVersion ver = new JLVersion();
+    System.out.print(ver.major() + "." + ver.minor() + "." + ver.patch_level());
+  }
+}
+</echo>
+      <javac
+              srcdir="${dist}"
+              destdir="${dist}"
+              includes="VersionInfo.java"
+              classpathref="standard.classpath"/>
+  
+      <!-- Get Polyglot version. -->
+      <java classname="VersionInfo" outputproperty="polyglot.version">
+        <classpath>
+          <pathelement location="${dist}"/>
+          <path refid="standard.classpath"/>
+        </classpath>
+      </java>
+    </target>
+
+    <target name="dist.zip">
         <!-- Create the distribution directory -->
         <mkdir dir="${dist}" />
 
@@ -774,17 +882,20 @@ public class Version extends polyglot.main.Version {
                 <include name="examples/*" />
 
                 <include name="tests/*" />
+                <include name="tests/labelparam/*" />
                 <exclude name="tests/directory/**" />
+                <exclude name="tests/BASELINE-RESULTS" />
                 <include name="tests/jif/principals/**" />
                 <include name="README" />
                 <include name="LICENSE" />
                 <include name="CHANGES" />
                 <include name="build.xml" />
+                <include name="config.properties.in" />
             </fileset>
         </copy>
 
-	<copy file="config.properties.in" tofile="${dist}/config.properties" />
-	<copy file="eclipse-classpath.in" tofile="${dist}/eclipse-classpath.in" />
+        <copy file="config.properties.in" tofile="${dist}/config.properties" />
+        <copy file="eclipse-classpath.in" tofile="${dist}/eclipse-classpath.in" />
 
         <!-- Create the Javadoc, and copy the documentation -->
         <antcall target="javadoc" />
@@ -804,23 +915,24 @@ public class Version extends polyglot.main.Version {
             </fileset>
         </copy>
 
-		<antcall target="make.tar" />
+        <antcall target="make.tar" />
     </target>
 
     <target name="rmdir">
-		<delete failonerror="false" includeemptydirs="true" dir="${dir}" />
+        <delete failonerror="false" includeemptydirs="true" dir="${dir}" />
     </target>
 
-    <target name="make.tar" depends="configure-version" description="make the tar file">
-		<property name="tardir" location="${basedir}/jif-${jif.version}" />
-		<property name="tarfile" location="${tardir}.zip" />
-		<antcall target="rmdir">
-			<param name="dir" value="${tardir}" />
-		</antcall>
-		<move file="${dist}" tofile="${tardir}" />
-		<zip destfile="${tarfile}" basedir="${basedir}" includes="jif-${jif.version}/**"
-			 excludes="*/classes/**" />
-		<move file="${tardir}" tofile="${dist}" />
+    <target name="make.tar" depends="configure-version"
+            description="make the tar file">
+        <property name="tardir" location="${basedir}/jif-${jif.version}" />
+        <property name="tarfile" location="${tardir}.zip" />
+        <antcall target="rmdir">
+            <param name="dir" value="${tardir}" />
+        </antcall>
+        <move file="${dist}" tofile="${tardir}" />
+        <zip destfile="${tarfile}" basedir="${basedir}" includes="jif-${jif.version}/**"
+             excludes="*/classes/**" />
+        <move file="${tardir}" tofile="${dist}" />
     </target>
 
     <!-- ****************************************
@@ -832,7 +944,7 @@ public class Version extends polyglot.main.Version {
        @param ${ext.basedir} the base directory of the extension
     -->
     <target name="compile-ext">
-        <javac source="1.5" target="1.5" srcdir="${ext.basedir}/src" destdir="${classes}" debug="on" includes="${ext}/**">
+        <javac source="1.7" target="1.7" srcdir="${ext.basedir}/src" destdir="${classes}" encoding="UTF-8" debug="on" includes="${ext}/**">
             <classpath refid="standard.classpath" />
         </javac>
     </target>
@@ -851,14 +963,6 @@ public class Version extends polyglot.main.Version {
             <arg line="${ppg.file}" />
         </java>
         <antcall target="cup-parser" />
-	<!-- Hack to suppress warnings in parser. -->
-	<replaceregexp
-	    file="${parser.dir}/${parser.class}.java"
-	    match="^(public )?class"
-	    replace="@SuppressWarnings(&quot;all&quot;) \1class"
-	    flags="g"
-	    byline="yes"
-	/>
     </target>
 
     <!-- Set the property ppg.parser.up-to-date if the parser is in fact
@@ -929,8 +1033,9 @@ public class Version extends polyglot.main.Version {
        @param jflex.file    The name of the JFlex file.
    -->
     <target name="jflex-lexer" depends="jflex-lexer-deps" unless="jflex.lexer.up-to-date">
-        <java classname="JFlex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
+        <java classname="jflex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
             <classpath refid="standard.classpath" />
+            <arg line="--noinputstreamctor" />
             <arg line="${jflex.file}" />
         </java>
     </target>
@@ -1025,7 +1130,39 @@ public class Version extends polyglot.main.Version {
         <antcall target="compile-ext" />
     </target>
 
+    <!--
+        Clones a fresh copy of a project from Git into ${dist}.
+    
+        Parameters:
+            root - the Git URL to check out
+            name - the name of the destination in ${dist}.
+    -->
+    <target name="git-clone">
+        <!-- First, clone. -->
+        <exec executable="git" failonerror="true">
+            <arg value="clone" />
+            <arg value="-q" />
+            <arg value="${root}" />
+            <arg value="${dist}/${name}" />
+        </exec>
+    </target>
+  
+    <!--
+        Runs an Ant target in the ${dist} scratch area.
+    
+        Parameters:
+            sub-ant.dir - the subdirectory in ${dist} in which to find the
+                          build.xml file.
+            sub-ant.target - the target to run.
+    -->
+    <target name="sub-ant-dist">
+        <ant inheritAll="false"
+                antfile="${dist}/${sub-ant.dir}/build.xml"
+                dir="${dist}/${sub-ant.dir}"
+                target="${sub-ant.target}" />
+    </target>
+
 </project>
 
-<!-- vim: ts=4
+<!-- vim: ts=4 sw=4 ai et
 -->

@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import jif.ast.JifCall_c;
 import jif.ast.JifInstantiator;
 import jif.types.JifClassType;
 import jif.types.JifContext;
@@ -19,6 +18,8 @@ import polyglot.ast.Call;
 import polyglot.ast.CallOps;
 import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.Expr;
+import polyglot.ast.ExprOps;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.Receiver;
 import polyglot.ast.Special;
@@ -27,10 +28,12 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /** The Jif extension of the <code>Call</code> node.
@@ -201,20 +204,39 @@ public class JifCallDel extends JifDel_c implements CallOps {
     @Override
     public Type findContainer(TypeSystem ts, MethodInstance mi) {
         // XXX Should refactor to separate Del functionality out of JifCall.
-        return ((JifCall_c) node()).findContainer(ts, mi);
+        return ((CallOps) jl()).findContainer(ts, mi);
     }
 
     @Override
     public ReferenceType findTargetType() throws SemanticException {
         // XXX Should refactor to separate Del functionality out of JifCall.
-        return ((JifCall_c) node()).findTargetType();
+        return ((CallOps) jl()).findTargetType();
     }
 
     @Override
     public Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes)
             throws SemanticException {
         // XXX Should refactor to separate Del functionality out of JifCall.
-        return ((JifCall_c) node()).typeCheckNullTarget(tc, argTypes);
+        return ((CallOps) jl()).typeCheckNullTarget(tc, argTypes);
     }
 
+    @Override
+    public void printArgs(CodeWriter w, PrettyPrinter tr) {
+        ((CallOps) jl()).printArgs(w, tr);
+    }
+
+    @Override
+    public boolean constantValueSet(Lang lang) {
+        return ((ExprOps) jl()).constantValueSet(lang);
+    }
+
+    @Override
+    public boolean isConstant(Lang lang) {
+        return ((ExprOps) jl()).isConstant(lang);
+    }
+
+    @Override
+    public Object constantValue(Lang lang) {
+        return ((ExprOps) jl()).constantValue(lang);
+    }
 }

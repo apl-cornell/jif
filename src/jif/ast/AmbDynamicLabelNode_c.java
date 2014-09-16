@@ -7,6 +7,7 @@ import jif.types.label.AccessPath;
 import jif.types.label.Label;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.ast.Field;
 import polyglot.ast.Node;
 import polyglot.frontend.MissingDependencyException;
@@ -30,8 +31,13 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements
 
     protected Expr expr;
 
+//    @Deprecated
     public AmbDynamicLabelNode_c(Position pos, Expr expr) {
-        super(pos);
+        this(pos, expr, null);
+    }
+
+    public AmbDynamicLabelNode_c(Position pos, Expr expr, Ext ext) {
+        super(pos, ext);
         this.expr = expr;
     }
 
@@ -123,18 +129,19 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
-        return reconstruct(expr);
+        Expr expr = visitChild(this.expr, v);
+        return reconstruct(this, expr);
     }
 
-    protected AmbDynamicLabelNode_c reconstruct(Expr expr) {
-        if (this.expr != expr) {
-            AmbDynamicLabelNode_c n = (AmbDynamicLabelNode_c) copy();
-            n.expr = expr;
-            return n;
-        }
-
-        return this;
+    protected <N extends AmbDynamicLabelNode_c> N reconstruct(N n, Expr expr) {
+        n = expr(n, expr);
+        return n;
     }
 
+    protected <N extends AmbDynamicLabelNode_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        n = copyIfNeeded(n);
+        n.expr = expr;
+        return n;
+    }
 }

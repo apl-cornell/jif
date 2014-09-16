@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import jif.types.label.AccessPath;
+import jif.types.label.AccessPathField;
 import jif.types.label.CovariantParamLabel;
 import jif.types.label.Label;
 import jif.types.label.ParamLabel;
@@ -39,11 +41,6 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
     @Override
     public Param get(ParamInstance pi) {
         return subst.get(pi);
-    }
-
-    @Override
-    public void put(ParamInstance pi, Param param) {
-        subst.put(pi, param);
     }
 
     ////////////////////////////////////////////////////////////////
@@ -89,7 +86,7 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
     }
 
     @Override
-    public ClassType substClassType(ClassType t) {
+    protected ClassType substClassTypeImpl(ClassType t) {
         // Don't bother trying to substitute into a non-Jif class.
         if (!(t instanceof JifClassType)) {
             return t;
@@ -280,6 +277,21 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
             }
 
             return p;
+        }
+
+        @Override
+        public AccessPath substAccessPath(AccessPath ap)
+                throws SemanticException {
+            ap = super.substAccessPath(ap);
+            if (ap instanceof AccessPathField) {
+                // Also perform substitution within the access path's field
+                // instance.
+                AccessPathField apf = (AccessPathField) ap;
+                FieldInstance substFI = substField(apf.fieldInstance());
+                return apf.fieldInstance(substFI);
+            }
+
+            return ap;
         }
     }
 

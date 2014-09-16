@@ -1,7 +1,6 @@
 package jif.ast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +12,7 @@ import jif.types.label.Label;
 import polyglot.ast.Block;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorDecl_c;
+import polyglot.ast.Ext;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
@@ -23,6 +23,7 @@ import polyglot.types.Flags;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -32,6 +33,8 @@ import polyglot.visit.TypeChecker;
 /**
  * An implementation of the <code>JifConstructor</code> interface.
  */
+@Deprecated
+// XXX should be replaced with extension
 public class JifConstructorDecl_c extends ConstructorDecl_c implements
         JifConstructorDecl {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -40,17 +43,23 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements
     protected LabelNode returnLabel;
     protected List<ConstraintNode<Assertion>> constraints;
 
+//    @Deprecated
     public JifConstructorDecl_c(Position pos, Flags flags, Id name,
             LabelNode startLabel, LabelNode returnLabel, List<Formal> formals,
             List<TypeNode> throwTypes,
             List<ConstraintNode<Assertion>> constraints, Block body) {
-        super(pos, flags, name, formals, throwTypes, body);
+        this(pos, flags, name, startLabel, returnLabel, formals, throwTypes,
+                constraints, body, null);
+    }
+
+    public JifConstructorDecl_c(Position pos, Flags flags, Id name,
+            LabelNode startLabel, LabelNode returnLabel, List<Formal> formals,
+            List<TypeNode> throwTypes,
+            List<ConstraintNode<Assertion>> constraints, Block body, Ext ext) {
+        super(pos, flags, name, formals, throwTypes, body, ext);
         this.startLabel = startLabel;
         this.returnLabel = returnLabel;
-        this.constraints =
-                Collections
-                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
-                                constraints));
+        this.constraints = ListUtil.copy(constraints, true);
     }
 
     @Override
@@ -60,7 +69,13 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements
 
     @Override
     public JifConstructorDecl startLabel(LabelNode startLabel) {
-        JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
+        return startLabel(this, startLabel);
+    }
+
+    protected <N extends JifConstructorDecl_c> N startLabel(N n,
+            LabelNode startLabel) {
+        if (n.startLabel == startLabel) return n;
+        n = copyIfNeeded(n);
         n.startLabel = startLabel;
         return n;
     }
@@ -72,7 +87,13 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements
 
     @Override
     public JifConstructorDecl returnLabel(LabelNode returnLabel) {
-        JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
+        return returnLabel(this, returnLabel);
+    }
+
+    protected <N extends JifConstructorDecl_c> N returnLabel(N n,
+            LabelNode returnLabel) {
+        if (n.returnLabel == returnLabel) return n;
+        n = copyIfNeeded(n);
         n.returnLabel = returnLabel;
         return n;
     }
@@ -85,47 +106,40 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements
     @Override
     public JifConstructorDecl constraints(
             List<ConstraintNode<Assertion>> constraints) {
-        JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
-        n.constraints =
-                Collections
-                        .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
-                                constraints));
+        return constraints(this, constraints);
+    }
+
+    protected <N extends JifConstructorDecl_c> N constraints(N n,
+            List<ConstraintNode<Assertion>> constraints) {
+        if (CollectionUtil.equals(n.constraints, constraints)) return n;
+        n = copyIfNeeded(n);
+        n.constraints = ListUtil.copy(constraints, true);
         return n;
     }
 
-    protected JifConstructorDecl_c reconstruct(Id name, LabelNode startLabel,
-            LabelNode returnLabel, List<Formal> formals,
+    protected <N extends JifConstructorDecl_c> N reconstruct(N n, Id name,
+            LabelNode startLabel, LabelNode returnLabel, List<Formal> formals,
             List<TypeNode> throwTypes,
             List<ConstraintNode<Assertion>> constraints, Block body) {
-        if (startLabel != this.startLabel || returnLabel != this.returnLabel
-                || !CollectionUtil.equals(constraints, this.constraints)) {
-            JifConstructorDecl_c n = (JifConstructorDecl_c) copy();
-            n.startLabel = startLabel;
-            n.returnLabel = returnLabel;
-            n.constraints =
-                    Collections
-                            .unmodifiableList(new ArrayList<ConstraintNode<Assertion>>(
-                                    constraints));
-            return (JifConstructorDecl_c) n.reconstruct(name, formals,
-                    throwTypes, body);
-        }
-
-        return (JifConstructorDecl_c) super.reconstruct(name, formals,
-                throwTypes, body);
+        n = super.reconstruct(n, name, formals, throwTypes, body);
+        n = startLabel(n, startLabel);
+        n = returnLabel(n, returnLabel);
+        n = constraints(n, constraints);
+        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id) visitChild(this.name, v);
-        LabelNode startLabel = (LabelNode) visitChild(this.startLabel, v);
-        LabelNode returnLabel = (LabelNode) visitChild(this.returnLabel, v);
+        Id name = visitChild(this.name, v);
+        LabelNode startLabel = visitChild(this.startLabel, v);
+        LabelNode returnLabel = visitChild(this.returnLabel, v);
         List<Formal> formals = visitList(this.formals, v);
         List<TypeNode> throwTypes = visitList(this.throwTypes, v);
         List<ConstraintNode<Assertion>> constraints =
                 visitList(this.constraints, v);
-        Block body = (Block) visitChild(this.body, v);
-        return reconstruct(name, startLabel, returnLabel, formals, throwTypes,
-                constraints, body);
+        Block body = visitChild(this.body, v);
+        return reconstruct(this, name, startLabel, returnLabel, formals,
+                throwTypes, constraints, body);
     }
 
     @Override

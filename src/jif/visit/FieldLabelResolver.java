@@ -15,6 +15,8 @@ import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.Solver;
 import jif.types.VarMap;
+import jif.types.label.AccessPath;
+import jif.types.label.AccessPathField;
 import jif.types.label.Label;
 import jif.types.label.VarLabel;
 import polyglot.ast.ClassBody;
@@ -109,7 +111,7 @@ public class FieldLabelResolver extends ContextVisitor {
                     // field label inference of pct
                     try {
                         scheduler.addPrerequisiteDependency(
-                                scheduler.LabelsChecked(this.job),
+                                scheduler.LabelsDoubleChecked(this.job),
                                 scheduler.FieldLabelInference(pct.job()));
                     } catch (CyclicDependencyException e) {
                         throw new InternalCompilerError(e);
@@ -126,7 +128,7 @@ public class FieldLabelResolver extends ContextVisitor {
 
         LabelChecker lc =
                 ((ExtensionInfo) ct.typeSystem().extensionInfo())
-                        .createLabelChecker(job, false, false, false);
+                        .createLabelChecker(job, true, false, false, false);
 
         if (lc == null) {
             throw new InternalCompilerError(
@@ -192,6 +194,20 @@ public class FieldLabelResolver extends ContextVisitor {
                 return b;
             }
             return L;
+        }
+
+        @Override
+        public AccessPath substAccessPath(AccessPath ap)
+                throws SemanticException {
+            ap = super.substAccessPath(ap);
+            if (ap instanceof AccessPathField) {
+                // Also perform substitution within the access path's field
+                // instance.
+                AccessPathField apf = (AccessPathField) ap;
+                JifFieldInstance fi = (JifFieldInstance) apf.fieldInstance();
+                fi.setLabel(substLabel(fi.label()));
+            }
+            return ap;
         }
     }
 }

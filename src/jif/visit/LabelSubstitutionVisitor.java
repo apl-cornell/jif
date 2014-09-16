@@ -6,11 +6,18 @@ import java.util.List;
 import jif.ast.JifConstructorDecl;
 import jif.ast.JifMethodDecl;
 import jif.ast.LabelNode;
+import jif.types.ActsForConstraint;
+import jif.types.ActsForParam;
+import jif.types.Assertion;
+import jif.types.AuthConstraint;
+import jif.types.AutoEndorseConstraint;
+import jif.types.CallerConstraint;
 import jif.types.JifConstructorInstance;
 import jif.types.JifFieldInstance;
 import jif.types.JifLocalInstance;
 import jif.types.JifMethodInstance;
 import jif.types.JifProcedureInstance;
+import jif.types.LabelLeAssertion;
 import jif.types.LabelSubstitution;
 import jif.types.TypeSubstitutor;
 import jif.types.label.Label;
@@ -31,8 +38,8 @@ import polyglot.util.InternalCompilerError;
 import polyglot.visit.NodeVisitor;
 
 /**
- * Visits an AST, and applies a <code>LabelSubsitution</code> to all labels
- * that occur in the AST. The <code>LabelSubsitution</code> is not allowed
+ * Visits an AST, and applies a <code>LabelSubstitution</code> to all labels
+ * that occur in the AST. The <code>LabelSubstitution</code> is not allowed
  * to throw any <code>SemanticException</code>s.
  */
 public class LabelSubstitutionVisitor extends NodeVisitor {
@@ -128,11 +135,9 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
                 FieldDecl fd = (FieldDecl) n;
 
                 JifFieldInstance fi = (JifFieldInstance) fd.fieldInstance();
-                Type t = rewriteType(fi.type());
 
                 // Imperatively update the field instance.
-                fi.setType(t);
-                fi.setLabel(rewriteLabel(fi.label()));
+                rewriteFieldInstance(fi);
 
                 return fd;
             } else if (n instanceof ProcedureDecl) {
@@ -140,18 +145,32 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
 
                 JifProcedureInstance mi =
                         (JifProcedureInstance) md.procedureInstance();
+
+                // Process return label.
                 mi.setReturnLabel(rewriteLabel(mi.returnLabel()),
                         mi.isDefaultReturnLabel());
+
+                // Process PC bound.
                 mi.setPCBound(rewriteLabel(mi.pcBound()), mi.isDefaultPCBound());
 
+                // Process throw types.
                 ArrayList<Type> throwTypes =
                         new ArrayList<Type>(mi.throwTypes());
                 for (int i = 0; i < throwTypes.size(); i++) {
                     throwTypes.set(i, rewriteType(throwTypes.get(i)));
                 }
+
+                // Process formal types.
                 List<Type> formalTypes = new ArrayList<Type>(mi.formalTypes());
                 for (int i = 0; i < formalTypes.size(); i++) {
                     formalTypes.set(i, rewriteType(formalTypes.get(i)));
+                }
+
+                // Process constraints.
+                List<Assertion> constraints =
+                        new ArrayList<>(mi.constraints().size());
+                for (Assertion constraint : mi.constraints()) {
+                    constraints.add(rewriteConstraint(constraint));
                 }
 
                 if (mi instanceof JifMethodInstance) {
@@ -160,12 +179,14 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
 
                     jmi.setThrowTypes(throwTypes);
                     jmi.setFormalTypes(formalTypes);
+                    jmi.setConstraints(constraints);
                     md = ((JifMethodDecl) md).methodInstance(jmi);
                 } else if (mi instanceof JifConstructorInstance) {
                     JifConstructorInstance jci = (JifConstructorInstance) mi;
 
                     jci.setThrowTypes(throwTypes);
                     jci.setFormalTypes(formalTypes);
+                    jci.setConstraints(constraints);
                     md = ((JifConstructorDecl) md).constructorInstance(jci);
                 }
 
@@ -196,13 +217,75 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
         return typeSubstitutor.rewriteType(t);
     }
 
+    protected <P extends ActsForParam> P rewriteActsForParam(P param)
+            throws SemanticException {
+        if (param == null) return param;
+        @SuppressWarnings("unchecked")
+        P result = (P) param.subst(substitution).simplify();
+        return result;
+    }
+
     protected Label rewriteLabel(Label L) throws SemanticException {
-        if (L == null) return L;
-        return L.subst(substitution).simplify();
+        return rewriteActsForParam(L);
     }
 
     protected Principal rewritePrincipal(Principal p) throws SemanticException {
-        if (p == null) return p;
-        return p.subst(substitution);
+        return rewriteActsForParam(p);
+    }
+
+    protected List<Principal> rewritePrincipals(List<Principal> principals)
+            throws SemanticException {
+        List<Principal> result = new ArrayList<>(principals.size());
+        for (Principal p : principals) {
+            result.add(rewritePrincipal(p));
+        }
+        return result;
+    }
+
+    /**
+     * Imperatively rewrites the given field instance.
+     */
+    protected void rewriteFieldInstance(JifFieldInstance fi)
+            throws SemanticException {
+        fi.setType(rewriteType(fi.type()));
+        fi.setLabel(rewriteLabel(fi.label()));
+    }
+
+    protected <Actor extends ActsForParam, Granter extends ActsForParam> ActsForConstraint<Actor, Granter> rewriteActsForConstraint(
+            ActsForConstraint<Actor, Granter> afc) throws SemanticException {
+        Actor actor = rewriteActsForParam(afc.actor());
+        Granter granter = rewriteActsForParam(afc.granter());
+        return afc.actor(actor).granter(granter);
+    }
+
+    protected Assertion rewriteConstraint(Assertion c) throws SemanticException {
+        if (c instanceof ActsForConstraint<?, ?>) {
+            return rewriteActsForConstraint((ActsForConstraint<?, ?>) c);
+        }
+
+        if (c instanceof AuthConstraint) {
+            AuthConstraint ac = (AuthConstraint) c;
+            return ac.principals(rewritePrincipals(ac.principals()));
+        }
+
+        if (c instanceof AutoEndorseConstraint) {
+            AutoEndorseConstraint aec = (AutoEndorseConstraint) c;
+            return aec.endorseTo(rewriteLabel(aec.endorseTo()));
+        }
+
+        if (c instanceof CallerConstraint) {
+            CallerConstraint cc = (CallerConstraint) c;
+            return cc.principals(rewritePrincipals(cc.principals()));
+        }
+
+        if (c instanceof LabelLeAssertion) {
+            LabelLeAssertion lla = (LabelLeAssertion) c;
+            Label lhs = rewriteLabel(lla.lhs());
+            Label rhs = rewriteLabel(lla.rhs());
+            return lla.lhs(lhs).rhs(rhs);
+        }
+
+        throw new InternalCompilerError("Unexpected subclass of Assertion: "
+                + c.getClass());
     }
 }

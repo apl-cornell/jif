@@ -66,7 +66,7 @@ and on the classpath.
 The directory ./jif/principals contains Jif classes for all
 principals referred to in the test programs provided here. To compile
 these classes, go to the $JIF/tests directory and compile all Java
-files in the jif/principal directory:
+files in the jif/principals directory:
 
         $ cd $JIF/tests
         $ $JIF/bin/jifc jif/principals/*.jif

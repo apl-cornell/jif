@@ -6,6 +6,7 @@ import jif.types.JifParsedPolyType;
 import jif.types.JifTypeSystem;
 import polyglot.ast.Call_c;
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.ast.Id;
 import polyglot.ast.Receiver;
 import polyglot.types.MethodInstance;
@@ -14,11 +15,19 @@ import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
+//XXX should be replaced with extension
+@Deprecated
 public class JifCall_c extends Call_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+//    @Deprecated
     public JifCall_c(Position pos, Receiver target, Id name, List<Expr> args) {
-        super(pos, target, name, args);
+        this(pos, target, name, args, null);
+    }
+
+    public JifCall_c(Position pos, Receiver target, Id name, List<Expr> args,
+            Ext ext) {
+        super(pos, target, name, args, ext);
     }
 
     @Override

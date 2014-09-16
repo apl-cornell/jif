@@ -124,7 +124,7 @@ done
 
 unixclasspath=`unixpath $CLASSPATH`
 classpath="$extra_cp"
-classpath="$classpath:$dir/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar:$dir/lib/JFlex.jar"
+classpath="$classpath:$dir/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar:$dir/lib/jflex.jar"
 classpath="$classpath:$dir/classes:$dir/lib/jif.jar"
 
 PATH_unix=`unixpath $PATH`
@@ -140,7 +140,7 @@ fi
 if [ -n "$POLYGLOT" ]; then 
     polyglot_unix=`unixpath "$POLYGLOT"` 
     classpath="$classpath:$polyglot_unix/classes:$polyglot_unix/lib/polyglot.jar"
-    classpath="$classpath:$polyglot_unix/lib/java_cup.jar:$polyglot_unix/lib/JFlex.jar"
+    classpath="$classpath:$polyglot_unix/lib/java_cup.jar:$polyglot_unix/lib/jflex.jar"
 fi
 
 classpath="$classpath:$unixclasspath"

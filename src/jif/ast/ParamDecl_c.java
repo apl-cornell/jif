@@ -4,6 +4,7 @@ import jif.types.JifPolyType;
 import jif.types.JifTypeSystem;
 import jif.types.ParamInstance;
 import jif.types.UninstTypeParam;
+import polyglot.ast.Ext;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
@@ -28,15 +29,13 @@ public class ParamDecl_c extends Node_c implements ParamDecl {
     ParamInstance.Kind kind;
     TypeNode upperBound;
 
-    public ParamDecl_c(Position pos, ParamInstance.Kind kind, Id name) {
-        super(pos);
-        this.kind = kind;
-        this.name = name;
+    public ParamDecl_c(Position pos, ParamInstance.Kind kind, Id name, Ext ext) {
+        this(pos, kind, name, ext, null);
     }
 
-    public ParamDecl_c(Position pos, ParamInstance.Kind kind, Id name,
+    public ParamDecl_c(Position pos, ParamInstance.Kind kind, Id name, Ext ext,
             TypeNode upperBound) {
-        super(pos);
+        super(pos, ext);
         this.kind = kind;
         this.name = name;
         this.upperBound = upperBound;
@@ -120,15 +119,15 @@ public class ParamDecl_c extends Node_c implements ParamDecl {
             String name =
                     upperBound instanceof InstTypeNode ? ((InstTypeNode) upperBound)
                             .base().name() : upperBound.name();
-            TypeNode ub =
-                    ar.nodeFactory().CanonicalTypeNode(upperBound.position(),
-                            ar.typeSystem().typeForName(name));
-            upperBound = ub;
-            if (pi.type() instanceof UninstTypeParam) {
-                UninstTypeParam utp = (UninstTypeParam) pi.type();
-                pi.setType(utp.upperBound(ub.type().toReference()));
-            }
-            return upperBound(ub).paramInstance(pi);
+                            TypeNode ub =
+                                    ar.nodeFactory().CanonicalTypeNode(upperBound.position(),
+                                            ar.typeSystem().typeForName(name));
+                            upperBound = ub;
+                            if (pi.type() instanceof UninstTypeParam) {
+                                UninstTypeParam utp = (UninstTypeParam) pi.type();
+                                pi.setType(utp.upperBound(ub.type().toReference()));
+                            }
+                            return upperBound(ub).paramInstance(pi);
         }
         return this;
     }

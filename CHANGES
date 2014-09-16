@@ -2,9 +2,15 @@ Jif Change Log
 ==============
 
 This file documents changes between releases of Jif.
-2012-04-26    Jif 3.4.1
-    * Updated to Polyglot 2.5.2 release
+
+2014-07-02    Jif 3.4.2
+    * Updated to Polyglot 2.6.1 release.
     * Various bug fixes.
+
+2013-04-26    Jif 3.4.1
+    * Updated to Polyglot 2.5.2 release.
+    * Various bug fixes.
+
 2012-10-04    Jif 3.4.0
     * Latent support for provider labels for limited compilation of 
         untrusted code (to support Fabric).

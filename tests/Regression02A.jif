@@ -1,0 +1,8 @@
+abstract class Regression02A[principal PA] {
+  public final principal{this} p;
+
+  Regression02A(principal{this} p) {
+    super();
+    this.p = p;
+  }
+}

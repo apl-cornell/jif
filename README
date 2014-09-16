@@ -1,4 +1,4 @@
-Jif 3.4.1
+Jif 3.4.2
 
                          The Jif Language and Compiler
 			 -----------------------------
@@ -32,7 +32,7 @@ Cygwin environment. Jif is compiled with the Ant build tool
 (http://jakarta.apache.org/ant). You must ensure that java, javac, and g++ are
 in your path.
 
-Software Versions: We recommend that you use JDK 1.4.2 or later.
+Software Versions: We recommend that you use JDK 7 or later.
 
 Jif and Cygwin: Jif can be built and used on a Windows platform running 
    Cygwin. Several issues are worth pointing out however. 
@@ -61,8 +61,8 @@ also developed at Cornell. Polyglot can be obtained from the web site:
 
     http://www.cs.cornell.edu/Projects/polyglot
 
-This Jif distribution contains the files polyglot.jar, JFlex.jar and
-java_cup.jar from the Polyglot 2.5.2 distribution. These files are
+This Jif distribution contains the files polyglot.jar, jflex.jar and
+java_cup.jar from the Polyglot 2.6.1 distribution. These files are
 required to build Jif.
 
 This Jif distribution contains some C++ code, used to produce
@@ -77,18 +77,17 @@ Jif is compiled with the Ant build tool
 (http://jakarta.apache.org/ant).  Follow these steps to build the Jif
 compiler:
 
-1. Ensure javac is on your path and that you are using JDK 1.4.2 or
+1. Ensure javac is on your path and that you are using JDK 7 or
    later. Set the JAVA_HOME environment variable to the Java home
    directory.  The file $JAVA_HOME/include/jni.h should exist.
 
 2. Go to the root directory of the Jif installation (the directory
    this README is in). We'll call this directory $JIF from now on.
 
-    $ cd $JIF
+        $ cd $JIF
 
 3. Copy config.properties.in to config.properties, and then edit
-   config.properties to make "polyglot.home" the absolute
-   path of your Polyglot installation.
+   config.properties to reflect your system configuration.
   
 4. Run ant to configure the system.
 
@@ -96,7 +95,6 @@ compiler:
    
    This ensures that the classpath is set appropriately, and creates the
    executable scripts $JIF/bin/jifc and $JIF/bin/jif.
-
 
 5. Run ant to build the platform-specific Jif runtime support.
 
@@ -116,7 +114,6 @@ compiler:
    box." If you want, you can now skip step 6, which builds the Jif
    compiler, and proceed directly to step 7.
 
-
 6. (OPTIONAL) 
    Run ant to build the Jif compiler, Jif signatures for standard Java
    classes and the Jif library code.
@@ -129,7 +126,6 @@ compiler:
    The resulting .class files for the source code in $JIF/src,
    $JIF/sig-src and $JIF/lib-src will be stored in $JIF/classes,
    $JIF/sig-classes and $JIF/lib-classes respectively.
-
 
 7. You are now ready to try out Jif.  A suggested starting point is
    the BattleShip example, in the directory
@@ -221,18 +217,19 @@ $JIF/tests for some examples of Jif programs.
 Credits
 -------
 
-The Jif project is supervised by Andrew Myers at the Cornell
-University Computer Science Department. Many people have contributed
-to this software.
+The Jif project is supervised by Andrew Myers at the Cornell University
+Computer Science Department. Many people have contributed to this
+software.
 
 New features in this release of the Jif compiler were added by Owen Arden,
-Jed Liu, and Danfeng Zhang. Mike George and K. Vikram also helped prepare
-this release. Thanks to Aslan Askarov, Robert Grabowski, Doaa Hassan,
+Jed Liu, and Danfeng Zhang. Mike George, Chinawat Isradisaikul,
+Matthew Loring, and K. Vikram also helped prepare this release. Thanks to
+Aslan Askarov, Cormac Flanagan, Robert Grabowski, Doaa Hassan,
 Daniel Hedin, Boniface Hicks, Dave King, Karl Mazurak, Todd Millstein,
-Andrei Sabelfeld, Lilia Sfaxi, and Steve Zdancewic, who provided bug reports
-and feedback for this and previous versions of Jif. Steve Chong, Xin Zheng,
-Lantian Zheng, Steve Zdancewic, and Nate Nystrom helped implement earlier
-versions.
+Andrei Sabelfeld, Thomas Schmitz, Lilia Sfaxi, and Steve Zdancewic, who
+provided bug reports and feedback for this and previous versions of Jif.
+Steve Chong, Xin Zheng, Lantian Zheng, Steve Zdancewic, and Nate Nystrom
+helped implement earlier versions.
 
 Restrictions on use
 -------------------

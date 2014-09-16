@@ -24,6 +24,8 @@ import polyglot.frontend.Job;
 import polyglot.frontend.JobExt;
 import polyglot.frontend.Parser;
 import polyglot.frontend.Scheduler;
+import polyglot.frontend.Source;
+import polyglot.frontend.Source.Kind;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
 import polyglot.types.LoadedClassResolver;
@@ -133,7 +135,7 @@ public class ExtensionInfo extends JL5ExtensionInfo {
     }
 
     @Override
-    public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
+    public Parser parser(Reader reader, Source source, ErrorQueue eq) {
 
         polyglot.lex.Lexer lexer = new jif.parse.Lexer_c(reader, source, eq);
         polyglot.parse.BaseParser grm =
@@ -141,6 +143,11 @@ public class ExtensionInfo extends JL5ExtensionInfo {
                         (JifNodeFactory) nf, eq);
 
         return new CupParser(grm, source, eq);
+    }
+
+    @Override
+    public Set<String> keywords() {
+        return new jif.parse.Lexer_c(null).keywords();
     }
 
     public static class JifJobExt implements JobExt {
@@ -158,10 +165,12 @@ public class ExtensionInfo extends JL5ExtensionInfo {
         return new JifScheduler(this, jlext);
     }
 
-    public LabelChecker createLabelChecker(Job job, boolean solvePerClassBody,
-            boolean solvePerMethod, boolean doLabelSubst) {
+    public LabelChecker createLabelChecker(Job job, boolean warningsEnabled,
+            boolean solvePerClassBody, boolean solvePerMethod,
+            boolean doLabelSubst) {
         return new LabelChecker(job, typeSystem(), nodeFactory(),
-                solvePerClassBody, solvePerMethod, doLabelSubst);
+                warningsEnabled, solvePerClassBody, solvePerMethod,
+                doLabelSubst);
     }
 
     @Override
@@ -176,9 +185,9 @@ public class ExtensionInfo extends JL5ExtensionInfo {
     }
 
     @Override
-    public FileSource createFileSource(FileObject f, boolean user)
+    public FileSource createFileSource(FileObject f, Kind kind)
             throws IOException {
-        return new jif.parse.UTF8FileSource(f, user);
+        return new jif.parse.UTF8FileSource(f, kind);
     }
 
 }

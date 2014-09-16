@@ -21,10 +21,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extInstTypeNode() {
         Ext e = extInstTypeNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extInstTypeNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extInstTypeNode();
             e = composeExts(e, e2);
         }
         return postExtInstTypeNode(e);
@@ -33,10 +33,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extLabeledTypeNode() {
         Ext e = extLabeledTypeNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extLabeledTypeNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extLabeledTypeNode();
             e = composeExts(e, e2);
         }
         return postExtLabeledTypeNode(e);
@@ -45,10 +45,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extAmbNewArray() {
         Ext e = extAmbNewArrayImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extAmbNewArray();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extAmbNewArray();
             e = composeExts(e, e2);
         }
         return postExtAmbNewArray(e);
@@ -57,10 +57,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extAmbParamTypeOrAccess() {
         Ext e = extAmbParamTypeOrAccessImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extAmbParamTypeOrAccess();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extAmbParamTypeOrAccess();
             e = composeExts(e, e2);
         }
         return postExtAmbParamTypeOrAccess(e);
@@ -69,10 +69,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extJoinLabelNode() {
         Ext e = extJoinLabelNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extJoinLabelNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extJoinLabelNode();
             e = composeExts(e, e2);
         }
         return postExtJoinLabelNode(e);
@@ -81,10 +81,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extMeetLabelNode() {
         Ext e = extMeetLabelNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extMeetLabelNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extMeetLabelNode();
             e = composeExts(e, e2);
         }
         return postExtMeetLabelNode(e);
@@ -93,10 +93,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extPolicyNode() {
         Ext e = extPolicyNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extPolicyNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extPolicyNode();
             e = composeExts(e, e2);
         }
         return postExtPolicyNode(e);
@@ -105,10 +105,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extAmbDynamicLabelNode() {
         Ext e = extAmbDynamicLabelNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extAmbDynamicLabelNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extAmbDynamicLabelNode();
             e = composeExts(e, e2);
         }
         return postExtAmbDynamicLabelNode(e);
@@ -117,10 +117,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extAmbVarLabelNode() {
         Ext e = extAmbVarLabelNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extAmbVarLabelNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extAmbVarLabelNode();
             e = composeExts(e, e2);
         }
         return postExtAmbVarLabelNode(e);
@@ -129,10 +129,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extAmbThisLabelNode() {
         Ext e = extAmbThisLabelNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extAmbThisLabelNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extAmbThisLabelNode();
             e = composeExts(e, e2);
         }
         return postExtAmbThisLabelNode(e);
@@ -141,10 +141,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public Ext extAmbProviderLabelNode() {
         Ext e = extAmbProviderLabelNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extAmbProviderLabelNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extAmbProviderLabelNode();
             e = composeExts(e, e2);
         }
         return postExtAmbProviderLabelNode(e);
@@ -153,10 +153,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extCanonicalLabelNode() {
         Ext e = extCanonicalLabelNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extCanonicalLabelNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extCanonicalLabelNode();
             e = composeExts(e, e2);
         }
         return postExtCanonicalLabelNode(e);
@@ -165,10 +165,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extParamNode() {
         Ext e = extParamNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extParamNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extParamNode();
             e = composeExts(e, e2);
         }
         return postExtParamNode(e);
@@ -177,10 +177,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extLabelNode() {
         Ext e = extLabelNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extLabelNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extLabelNode();
             e = composeExts(e, e2);
         }
         return postExtLabelNode(e);
@@ -189,10 +189,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extPrincipalNode() {
         Ext e = extPrincipalNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extPrincipalNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extPrincipalNode();
             e = composeExts(e, e2);
         }
         return postExtPrincipalNode(e);
@@ -201,10 +201,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extAmbPrincipalNode() {
         Ext e = extAmbPrincipalNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extAmbPrincipalNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extAmbPrincipalNode();
             e = composeExts(e, e2);
         }
         return postExtAmbPrincipalNode(e);
@@ -213,10 +213,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extCanonicalPrincipalNode() {
         Ext e = extCanonicalPrincipalNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extCanonicalPrincipalNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extCanonicalPrincipalNode();
             e = composeExts(e, e2);
         }
         return postExtCanonicalPrincipalNode(e);
@@ -225,10 +225,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extAmbParam() {
         Ext e = extAmbParamImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extAmbParam();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extAmbParam();
             e = composeExts(e, e2);
         }
         return postExtAmbParam(e);
@@ -237,10 +237,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extParamDecl() {
         Ext e = extParamDeclImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extParamDecl();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extParamDecl();
             e = composeExts(e, e2);
         }
         return postExtParamDecl(e);
@@ -249,10 +249,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extConstraintNode() {
         Ext e = extConstraintNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extConstraintNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extConstraintNode();
             e = composeExts(e, e2);
         }
         return postExtConstraintNode(e);
@@ -261,10 +261,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extCanonicalConstraintNode() {
         Ext e = extCanonicalConstraintNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extCanonicalConstraintNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extCanonicalConstraintNode();
             e = composeExts(e, e2);
         }
         return postExtCanonicalConstraintNode(e);
@@ -273,10 +273,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extAuthConstraintNode() {
         Ext e = extAuthConstraintNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extAuthConstraintNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extAuthConstraintNode();
             e = composeExts(e, e2);
         }
         return postExtAuthConstraintNode(e);
@@ -285,10 +285,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extAutoEndorseConstraintNode() {
         Ext e = extAutoEndorseConstraintNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extAutoEndorseConstraintNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extAutoEndorseConstraintNode();
             e = composeExts(e, e2);
         }
         return postExtAutoEndorseConstraintNode(e);
@@ -297,10 +297,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extCallerConstraintNode() {
         Ext e = extCallerConstraintNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extCallerConstraintNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extCallerConstraintNode();
             e = composeExts(e, e2);
         }
         return postExtCallerConstraintNode(e);
@@ -309,10 +309,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extActsForConstraintNode() {
         Ext e = extActsForConstraintNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extActsForConstraintNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extActsForConstraintNode();
             e = composeExts(e, e2);
         }
         return postExtActsForConstraintNode(e);
@@ -321,10 +321,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extLabelActsForPrincipalConstraintNode() {
         Ext e = extLabelActsForPrincipalConstraintNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extLabelActsForPrincipalConstraintNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extLabelActsForPrincipalConstraintNode();
             e = composeExts(e, e2);
         }
         return postExtLabelActsForPrincipalConstraintNode(e);
@@ -333,10 +333,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extLabelActsForLabelConstraintNode() {
         Ext e = extLabelActsForLabelConstraintNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extLabelActsForLabelConstraintNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extLabelActsForLabelConstraintNode();
             e = composeExts(e, e2);
         }
         return postExtLabelActsForLabelConstraintNode(e);
@@ -345,10 +345,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extPrincipalActsForPrincipalConstraintNode() {
         Ext e = extPrincipalActsForPrincipalConstraintNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extPrincipalActsForPrincipalConstraintNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extPrincipalActsForPrincipalConstraintNode();
             e = composeExts(e, e2);
         }
         return postExtPrincipalActsForPrincipalConstraintNode(e);
@@ -357,10 +357,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extLabelLeAssertionNode() {
         Ext e = extLabelLeAssertionNodeImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extLabelLeAssertionNode();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extLabelLeAssertionNode();
             e = composeExts(e, e2);
         }
         return postExtLabelLeAssertionNode(e);
@@ -369,10 +369,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extDeclassifyStmt() {
         Ext e = extDeclassifyStmtImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifStmtExtFactory) {
-            JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extDeclassifyStmt();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifStmtExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extDeclassifyStmt();
             e = composeExts(e, e2);
         }
         return postExtDeclassifyStmt(e);
@@ -381,10 +381,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extDeclassifyExpr() {
         Ext e = extDeclassifyExprImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extDeclassifyExpr();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extDeclassifyExpr();
             e = composeExts(e, e2);
         }
         return postExtDeclassifyExpr(e);
@@ -393,10 +393,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extEndorseStmt() {
         Ext e = extEndorseStmtImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifStmtExtFactory) {
-            JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extEndorseStmt();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifStmtExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extEndorseStmt();
             e = composeExts(e, e2);
         }
 
@@ -406,10 +406,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extCheckedEndorseStmt() {
         Ext e = extCheckedEndorseStmtImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifStmtExtFactory) {
-            JifStmtExtFactory nextFac = (JifStmtExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extCheckedEndorseStmt();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifStmtExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extCheckedEndorseStmt();
             e = composeExts(e, e2);
         }
 
@@ -419,10 +419,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extEndorseExpr() {
         Ext e = extEndorseExprImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extEndorseExpr();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extEndorseExpr();
             e = composeExts(e, e2);
         }
         return postExtEndorseExpr(e);
@@ -431,10 +431,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extNewLabel() {
         Ext e = extNewLabelImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extNewLabel();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extNewLabel();
             e = composeExts(e, e2);
         }
         return postExtNewLabel(e);
@@ -443,10 +443,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extLabelExpr() {
         Ext e = extLabelExprImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extLabelExpr();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extLabelExpr();
             e = composeExts(e, e2);
         }
         return postExtLabelExpr(e);
@@ -455,10 +455,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     @Override
     public final Ext extPrincipalExpr() {
         Ext e = extPrincipalExprImpl();
-        if (nextExtFactory() != null
-                && nextExtFactory() instanceof JifExtFactory) {
-            JifExtFactory nextFac = (JifExtFactory) nextExtFactory();
-            Ext e2 = nextFac.extPrincipalExpr();
+
+	ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extPrincipalExpr();
             e = composeExts(e, e2);
         }
         return postExtPrincipalExpr(e);
@@ -687,7 +687,6 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c implements
     }
 
     protected Ext postExtAmbParam(Ext e) {
-        //return postExtAmbParam(e);
         return postExtNode(e);
     }
 

@@ -8,6 +8,7 @@ import jif.types.PrincipalInstance;
 import jif.types.SemanticDetailedException;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
+import polyglot.ast.Ext;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
@@ -31,8 +32,13 @@ public class AmbParam_c extends Node_c implements AmbParam {
     protected Id name;
     protected ParamInstance pi;
 
+//    @Deprecated
     public AmbParam_c(Position pos, Id name, ParamInstance pi) {
-        super(pos);
+        this(pos, name, pi, null);
+    }
+
+    public AmbParam_c(Position pos, Id name, ParamInstance pi, Ext ext) {
+        super(pos, ext);
         this.name = name;
         this.pi = pi;
     }
@@ -47,8 +53,22 @@ public class AmbParam_c extends Node_c implements AmbParam {
     }
 
     public AmbParam name(String name) {
-        AmbParam_c n = (AmbParam_c) copy();
-        n.name = n.name.id(name);
+        return name(this, name);
+    }
+
+    protected <N extends AmbParam_c> N name(N n, String name) {
+        if (n.name.id().equals(name)) return n;
+        return id(n, n.name.id(name));
+    }
+
+    public AmbParam id(Id id) {
+        return id(this, id);
+    }
+
+    protected <N extends AmbParam_c> N id(N n, Id id) {
+        if (n.name == id) return n;
+        n = copyIfNeeded(n);
+        n.name = id;
         return n;
     }
 
@@ -66,16 +86,12 @@ public class AmbParam_c extends Node_c implements AmbParam {
     public Node visitChildren(NodeVisitor v) {
         if (this.name == null) return this;
 
-        Id name = (Id) visitChild(this.name, v);
-        return reconstruct(name);
+        Id name = visitChild(this.name, v);
+        return reconstruct(this, name);
     }
 
-    protected AmbParam_c reconstruct(Id name) {
-        if (this.name == name) {
-            return this;
-        }
-        AmbParam_c n = (AmbParam_c) this.copy();
-        n.name = name;
+    protected <N extends AmbParam_c> N reconstruct(N n, Id name) {
+        n = id(n, name);
         return n;
     }
 

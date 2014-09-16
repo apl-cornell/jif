@@ -35,8 +35,13 @@ public class JifLocalDeclExt extends JifStmtExt_c {
     }
 
     @Override
+    public LocalDecl node() {
+        return (LocalDecl) super.node();
+    }
+
+    @Override
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
-        LocalDecl decl = (LocalDecl) node();
+        LocalDecl decl = node();
 
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();

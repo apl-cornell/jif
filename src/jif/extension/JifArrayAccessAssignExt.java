@@ -35,7 +35,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt {
     @Override
     public Node labelCheckLHS(LabelChecker lc) throws SemanticException {
         ArrayAccessAssign assign = (ArrayAccessAssign) node();
-        final ArrayAccess aie = (ArrayAccess) assign.left();
+        final ArrayAccess aie = assign.left();
         JifContext A = lc.jifContext();
         A = (JifContext) aie.del().enterScope(A);
         JifTypeSystem ts = lc.jifTypeSystem();
@@ -50,7 +50,6 @@ public class JifArrayAccessAssignExt extends JifAssignExt {
 
         Type npe = ts.NullPointerException();
         Type oob = ts.OutOfBoundsException();
-        Type ase = ts.ArrayStoreException();
         Type are = ts.ArithmeticException();
 
         final Expr array = (Expr) lc.context(A).labelCheck(aie.array());
@@ -113,11 +112,6 @@ public class JifArrayAccessAssignExt extends JifAssignExt {
                 // an out of bounds exception may be thrown
                 checkAndRemoveThrowType(throwTypes, oob);
                 X = X.exc(lc.upperBound(Xarr.NV(), Xind.NV(), X.N()), oob);
-            }
-
-            if (assign.throwsArrayStoreException()) {
-                checkAndRemoveThrowType(throwTypes, ase);
-                X = X.exc(lc.upperBound(Xarr.NV(), Xrhs.NV(), X.N()), ase);
             }
         }
 

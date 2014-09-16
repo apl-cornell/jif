@@ -5,14 +5,22 @@ import jif.visit.IntegerBoundsChecker.Interval;
 import polyglot.ast.Binary;
 import polyglot.ast.Binary_c;
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
+// XXX Should be replaced with extension
+@Deprecated
 public class JifBinary_c extends Binary_c implements Binary {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+//    @Deprecated
     public JifBinary_c(Position pos, Expr left, Operator op, Expr right) {
-        super(pos, left, op, right);
+        this(pos, left, op, right, null);
+    }
+
+    public JifBinary_c(Position pos, Expr left, Operator op, Expr right, Ext ext) {
+        super(pos, left, op, right, ext);
     }
 
     @Override

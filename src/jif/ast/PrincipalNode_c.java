@@ -5,6 +5,7 @@ import java.util.List;
 import jif.types.JifTypeSystem;
 import jif.types.principal.Principal;
 import polyglot.ast.Expr_c;
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -20,8 +21,13 @@ public abstract class PrincipalNode_c extends Expr_c implements PrincipalNode {
 
     Principal principal;
 
+    @Deprecated
     public PrincipalNode_c(Position pos) {
-        super(pos);
+        this(pos, null);
+    }
+
+    public PrincipalNode_c(Position pos, Ext ext) {
+        super(pos, ext);
     }
 
     @Override

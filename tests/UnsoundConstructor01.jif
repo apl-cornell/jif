@@ -4,13 +4,13 @@
  * final fields.
  */
 
-class UnsoundConstructor {
+class UnsoundConstructor01 {
 	public static boolean {_→} _declassify (boolean {*→} y) {
-		UnsoundConstructor o;
+		UnsoundConstructor01 o;
 		if (y)
-			o = new UnsoundConstructor(0);
+			o = new UnsoundConstructor01(0);
 		else
-			o = new UnsoundConstructor();
+			o = new UnsoundConstructor01();
 		return o.x;
 	}
 
@@ -18,8 +18,8 @@ class UnsoundConstructor {
 
 	final boolean {_→} x;
 
-	UnsoundConstructor {*→} ()      { x = false; }
-	UnsoundConstructor {*→} (int a) { x = true;  }
+	UnsoundConstructor01 {*→} ()      { x = false; }
+	UnsoundConstructor01 {*→} (int a) { x = true;  }
 
 }
 		

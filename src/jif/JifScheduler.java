@@ -53,9 +53,9 @@ public class JifScheduler extends JLScheduler {
         JifOptions opts = (JifOptions) job.extensionInfo().getOptions();
         Goal ig;
         if (opts.skipLabelChecking) {
-            ig = new EmptyGoal(job);
+            ig = new EmptyGoal(job, "LabelsChecked");
         } else {
-            ig = new LabelCheckGoal(job);
+            ig = new LabelCheckGoal(job, true);
         }
         Goal g = internGoal(ig);
         try {
@@ -63,6 +63,31 @@ public class JifScheduler extends JLScheduler {
             addPrerequisiteDependency(g, this.FieldLabelInference(job));
             addPrerequisiteDependency(g, this.IntegerBoundsChecker(job));
             addPrerequisiteDependency(g, this.ExceptionsChecked(job));
+        } catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
+    }
+
+    /**
+     * Creates a goal for the label double-checking pass. Labels need to be
+     * double checked because the labels inferred during the first
+     * label-checking pass may be unsound.
+     */
+    public Goal LabelsDoubleChecked(Job job) {
+        JifOptions opts = (JifOptions) job.extensionInfo().getOptions();
+        Goal ig;
+        if (opts.skipLabelChecking) {
+            ig = new EmptyGoal(job, "LabelsDoubleChecked");
+        } else {
+            ig = new LabelCheckGoal(job, false) {
+                // Create an anonymous subclass to avoid conflating with the
+                // goal for LabelsChecked.
+            };
+        }
+        Goal g = internGoal(ig);
+        try {
+            addPrerequisiteDependency(g, this.LabelsChecked(job));
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
@@ -191,10 +216,10 @@ public class JifScheduler extends JLScheduler {
     }
 
     @Override
-    public Goal Serialized(Job job) {
-        Goal g = super.Serialized(job);
+    public Goal Validated(Job job) {
+        Goal g = super.Validated(job);
         try {
-            addPrerequisiteDependency(g, this.LabelsChecked(job));
+            addPrerequisiteDependency(g, this.LabelsDoubleChecked(job));
             addPrerequisiteDependency(g, this.NativeConstructorsAdded(job));
             addPrerequisiteDependency(g, this.SingletonsChecked(job));
         } catch (CyclicDependencyException e) {
@@ -296,7 +321,7 @@ public class JifScheduler extends JLScheduler {
     }
 
     /**
-     * 
+     *
      */
     @Override
     public Job addJob(Source source, Node ast) {
@@ -308,7 +333,7 @@ public class JifScheduler extends JLScheduler {
     }
 
     /**
-     * 
+     *
      */
     @Override
     public Job addJob(Source source) {

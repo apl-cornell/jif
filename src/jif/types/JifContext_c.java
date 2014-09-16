@@ -85,7 +85,7 @@ public class JifContext_c extends Context_c implements JifContext {
     }
 
     @Override
-    public Object copy() {
+    public JifContext_c copy() {
         JifContext_c ctxt = (JifContext_c) super.copy();
         if (auth != null) {
             ctxt.auth = new LinkedHashSet<Principal>(auth);
@@ -590,7 +590,7 @@ public class JifContext_c extends Context_c implements JifContext {
 
     @Override
     public Context pushPrologue() {
-        JifContext_c v = (JifContext_c) this.copy();
+        JifContext_c v = this.copy();
         v.outer = this;
         /** Prologue does not have separate lexical scope: inherit types and vars:  */
         v.kind = BLOCK;

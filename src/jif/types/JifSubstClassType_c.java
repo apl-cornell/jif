@@ -11,6 +11,7 @@ import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.SubstClassType_c;
 import polyglot.main.Report;
 import polyglot.types.ClassType;
+import polyglot.types.FieldInstance;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -27,6 +28,59 @@ public class JifSubstClassType_c extends SubstClassType_c<ParamInstance, Param>
             throw new InternalCompilerError("Cannot perform subst on \"" + base
                     + "\".");
         }
+    }
+
+    @Override
+    public List<? extends FieldInstance> fields() {
+        // XXX Kludge. JifFieldInstance.equalsImpl() doesn't test for equality
+        // on its label, but should. Adding this equality test to
+        // JifFieldInstance, however, exposes scheduling bugs are complicated to
+        // fix. (Method instances with field final access paths in their
+        // constraints end up with unsubstituted VarLabels in the paths' field
+        // instances, which should have been substituted out by the
+        // FieldLabelResolver. The pthScript tests involving
+        // Regression0[12]?.jif exercise this issue.) Therefore, we override
+        // the super class's behaviour here to ensure label equality is captured
+        // because it is needed for correct substitution behaviour.
+        List<? extends FieldInstance> fields = base.fields();
+
+        // See if fields.equals(this.fields), but also take into account field
+        // instance labels.
+        boolean equals;
+        if (this.fields == null)
+            equals = false;
+        else {
+            equals = true;
+            for (Iterator<? extends FieldInstance> it1 = fields.iterator(), it2 =
+                    this.fields.iterator(); it1.hasNext() || it2.hasNext();) {
+                if (!it1.hasNext() || !it2.hasNext()) {
+                    equals = false;
+                    break;
+                }
+
+                FieldInstance fi1 = it1.next();
+                FieldInstance fi2 = it2.next();
+                if (!ts.equals(fi1, fi2)) {
+                    equals = false;
+                    break;
+                }
+
+                if (fi1 instanceof JifFieldInstance) {
+                    JifFieldInstance jfi1 = (JifFieldInstance) fi1;
+                    JifFieldInstance jfi2 = (JifFieldInstance) fi2;
+                    if (!ts.equals(jfi1.label(), jfi2.label())) {
+                        equals = false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!equals) {
+            this.fields = deepCopy(fields);
+            this.substFields = subst.substFieldList(fields);
+        }
+        return super.fields();
     }
 
     ////////////////////////////////////////////////////////////////

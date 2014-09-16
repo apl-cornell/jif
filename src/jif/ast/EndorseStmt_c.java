@@ -1,5 +1,6 @@
 package jif.ast;
 
+import polyglot.ast.Ext;
 import polyglot.ast.Stmt;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -9,9 +10,15 @@ import polyglot.util.SerialVersionUID;
 public class EndorseStmt_c extends DowngradeStmt_c implements EndorseStmt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+//    @Deprecated
     public EndorseStmt_c(Position pos, LabelNode bound, LabelNode label,
             Stmt body) {
-        super(pos, bound, label, body);
+        this(pos, bound, label, body, null);
+    }
+
+    public EndorseStmt_c(Position pos, LabelNode bound, LabelNode label,
+            Stmt body, Ext ext) {
+        super(pos, bound, label, body, ext);
     }
 
     @Override

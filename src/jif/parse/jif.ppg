@@ -701,19 +701,6 @@ override class_member_declaration ::=
             {: List l = new LinkedList<ClassMember>();
                l.add(a);
                RESULT = l; :}
-        /* repeat the prod for 'class_declaration' here: */
-    |   modifiers_opt:a CLASS:n IDENTIFIER:b
-                parameters_opt:p super_opt:c
-                interfaces_opt:d authority_opt:u constraints_opt:f class_body:e
-	    {: List l = new LinkedList<ClassMember>();
-               l.add(parser.nf.JifClassDecl(parser.pos(n, b),
-                                            a, parser.nf.Id(parser.pos(b), b.getIdentifier()),
-                                            p, c, d, u, f, e));
-	       RESULT = l; :}
-    |   interface_declaration:a
-	    {: List l = new LinkedList<ClassMember>();
-	       l.add(a);
-	       RESULT = l; :}
     ;
 
 
@@ -843,9 +830,6 @@ explicit_super_constructor_invocation ::=
                     // Stmt
         SUPER:a LPAREN argument_list_opt:b RPAREN:y SEMICOLON
             {: RESULT = parser.nf.SuperCall(parser.pos(a,y), b); :}
-    |   primary_no_new_array:a DOT SUPER:n LPAREN argument_list_opt:b RPAREN
-	SEMICOLON:c
-	    {: RESULT = parser.nf.SuperCall(parser.pos(a, c, n), a, b); :}
     ;
     
 
@@ -854,9 +838,6 @@ override explicit_constructor_invocation ::=
             {: RESULT = a; :}
     |   THIS:a LPAREN argument_list_opt:b RPAREN SEMICOLON:c
             {: RESULT = parser.nf.ThisCall(parser.pos(a, c), b); :}
-    |   primary_no_new_array:a DOT THIS:n LPAREN argument_list_opt:b RPAREN
-	SEMICOLON:c
-            {: RESULT = parser.nf.ThisCall(parser.pos(a, c, n), a, b); :}
     ;
 
 // 19.9) Interfaces
@@ -1046,9 +1027,12 @@ override extends_interfaces ::=
 
 drop { interface_type }
 
+drop { interface_member_declaration ::= class_declaration | interface_declaration; }
+
 // 19.10) Arrays
 
 // 19.11) Blocks and Statements
+drop { block_statement ::= class_declaration ; }
 override identifier_opt ::=
                     // Name
             {: RESULT = null; :}
@@ -1116,10 +1100,6 @@ primary_no_array ::=
                RESULT = parser.nf.NewLabel(parser.pos(a, b),
                    parser.nf.AmbProviderLabelNode(parser.pos(a, b), a.toType()));
             :}
-    |  reftype_or_expr:a DOT THIS:n
-	    {: if (!(a instanceof Name)) parser.die(parser.pos(a));
-	       RESULT = parser.nf.This(parser.pos(a, n, n), a.toType());
-	    :}
     ;
 
 transfer primary_no_new_array to primary_no_array {
@@ -1173,41 +1153,6 @@ class_instance_creation_expression ::=
     |   SINGLETON:x objtype_or_expr:a LPAREN RPAREN
             {:  TypeNode tn = a.toUnlabeledType();  
                 RESULT = parser.nf.JifSingletonAccess(parser.pos(x,a), tn, new ArrayList<Expr>()); :}
-    |   NEW:x objtype_or_expr:a label_opt:l LPAREN argument_list_opt:b RPAREN
-	class_body:c
-	    {:  TypeNode tn = a.toUnlabeledType();
-	        if (l != null)
-		    tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
-		RESULT = parser.nf.New(parser.pos(x,c), tn, b, c);
-	    :}
-    |   primary_no_new_array:a DOT NEW:n simple_name:b label_opt:l LPAREN
-	argument_list_opt:c RPAREN:d
-	    {:  TypeNode tn = b.toUnlabeledType();
-		if (l != null)
-		    tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
-		RESULT = parser.nf.New(parser.pos(a,d), a, tn, c);
-	    :}
-    |   primary_no_new_array:a DOT NEW simple_name:b label_opt:l LPAREN
-	argument_list_opt:c RPAREN class_body:d
-	    {:  TypeNode tn = b.toUnlabeledType();
-		if (l != null)
-		    tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
-		RESULT = parser.nf.New(parser.pos(a,d), a, tn, c, d);
-	    :}
-    |   reftype_or_expr:a DOT NEW simple_name:b label_opt:l LPAREN
-	argument_list_opt:c RPAREN:d
-	    {:  TypeNode tn = b.toUnlabeledType();
-	        if (l != null)
-	            tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
-	        RESULT = parser.nf.New(parser.pos(a,d), a.toExpr(), tn, c);
-	    :}
-    |   reftype_or_expr:a DOT NEW simple_name:b label_opt:l LPAREN
-	argument_list_opt:c RPAREN class_body:d
-	    {:  TypeNode tn = b.toUnlabeledType();
-	        if (l != null)
-	            tn = parser.nf.LabeledTypeNode(parser.pos(a,l), tn, l);
-	        RESULT = parser.nf.New(parser.pos(a,d), a.toExpr(), tn, c, d);
-	    :}
     ;
 
 override array_creation_expression ::=

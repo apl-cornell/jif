@@ -1,0 +1,24 @@
+import jif.runtime.Runtime;
+
+/**
+ * This attempts to leak the PC to a static field through a constructor call.
+ */
+public class UnsoundConstructor03 {
+  final static int{*->} secret1 = 42;
+  static int{} notSecret = 0;
+
+  UnsoundConstructor03() {
+    notSecret = notSecret + 1;
+  }
+
+  public static void main{p→;p←}(principal p, String[] args)
+      throws (Exception{p→;p←}) {
+    for (int i = 0; i < secret1; i++) {
+      new UnsoundConstructor03();
+    }
+
+    Runtime[p] runtime = Runtime[p].getRuntime();
+    String{} s = "secret leaked: " + notSecret;
+    runtime.out().println(s);
+  }
+}

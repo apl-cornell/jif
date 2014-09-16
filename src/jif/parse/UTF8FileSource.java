@@ -13,9 +13,8 @@ public class UTF8FileSource extends Source_c {
     /**
      * @throws IOException  
      */
-    public UTF8FileSource(FileObject f, boolean userSpecified)
-            throws IOException {
-        super(f, userSpecified);
+    public UTF8FileSource(FileObject f, Kind kind) throws IOException {
+        super(f, kind);
     }
 
     @Override

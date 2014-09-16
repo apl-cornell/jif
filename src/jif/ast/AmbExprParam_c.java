@@ -7,6 +7,7 @@ import jif.types.ParamInstance;
 import jif.types.SemanticDetailedException;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.ast.Field;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
@@ -30,8 +31,14 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam {
     protected Expr expr;
     protected ParamInstance expectedPI;
 
+//    @Deprecated
     public AmbExprParam_c(Position pos, Expr expr, ParamInstance expectedPI) {
-        super(pos);
+        this(pos, expr, expectedPI, null);
+    }
+
+    public AmbExprParam_c(Position pos, Expr expr, ParamInstance expectedPI,
+            Ext ext) {
+        super(pos, ext);
         this.expr = expr;
         this.expectedPI = expectedPI;
     }
@@ -45,15 +52,26 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam {
         return this.expr;
     }
 
-    public AmbParam expr(Expr expr) {
-        AmbExprParam_c n = (AmbExprParam_c) copy();
+    public AmbExprParam expr(Expr expr) {
+        return expr(this, expr);
+    }
+
+    protected <N extends AmbExprParam_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        n = copyIfNeeded(n);
         n.expr = expr;
         return n;
     }
 
     @Override
-    public AmbParam expectedPI(ParamInstance expectedPI) {
-        AmbExprParam_c n = (AmbExprParam_c) copy();
+    public AmbExprParam expectedPI(ParamInstance expectedPI) {
+        return expectedPI(this, expectedPI);
+    }
+
+    protected <N extends AmbExprParam_c> N expectedPI(N n,
+            ParamInstance expectedPI) {
+        if (n.expectedPI == expectedPI) return n;
+        n = copyIfNeeded(n);
         n.expectedPI = expectedPI;
         return n;
     }
@@ -70,17 +88,14 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
-        return reconstruct(expr, expectedPI);
+        Expr expr = visitChild(this.expr, v);
+        return reconstruct(this, expr, expectedPI);
     }
 
-    protected AmbExprParam_c reconstruct(Expr expr, ParamInstance expectedPI) {
-        if (this.expr == expr && this.expectedPI == expectedPI) {
-            return this;
-        }
-        AmbExprParam_c n = (AmbExprParam_c) this.copy();
-        n.expr = expr;
-        n.expectedPI = expectedPI;
+    protected <N extends AmbExprParam_c> N reconstruct(N n, Expr expr,
+            ParamInstance expectedPI) {
+        n = expr(n, expr);
+        n = expectedPI(n, expectedPI);
         return n;
     }
 

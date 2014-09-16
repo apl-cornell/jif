@@ -1,5 +1,6 @@
 package jif.ast;
 
+import polyglot.ast.Ext;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -12,8 +13,13 @@ import polyglot.visit.Translator;
 public class NewLabel_c extends LabelExpr_c implements NewLabel {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+//    @Deprecated
     public NewLabel_c(Position pos, LabelNode label) {
-        super(pos, label);
+        this(pos, label, null);
+    }
+
+    public NewLabel_c(Position pos, LabelNode label, Ext ext) {
+        super(pos, label, ext);
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import jif.types.Assertion;
+import polyglot.ast.Ext;
 import polyglot.ast.Node_c;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
@@ -20,8 +21,13 @@ public class ConstraintNode_c<Constraint extends Assertion> extends Node_c
 
     protected Set<Constraint> constraints; // of Assertion
 
+    @Deprecated
     public ConstraintNode_c(Position pos) {
-        super(pos);
+        this(pos, null);
+    }
+
+    public ConstraintNode_c(Position pos, Ext ext) {
+        super(pos, ext);
     }
 
     @Override

@@ -22,6 +22,4 @@ public interface JifSubst extends Subst<ParamInstance, Param> {
     public List<Principal> substPrincipalList(List<Principal> principals);
 
     public Param get(ParamInstance pi);
-
-    public void put(ParamInstance pi, Param param);
 }

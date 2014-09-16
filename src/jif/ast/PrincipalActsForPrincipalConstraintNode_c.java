@@ -1,6 +1,7 @@
 package jif.ast;
 
 import jif.types.principal.Principal;
+import polyglot.ast.Ext;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -13,8 +14,14 @@ public class PrincipalActsForPrincipalConstraintNode_c extends
         PrincipalActsForPrincipalConstraintNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+//    @Deprecated
     public PrincipalActsForPrincipalConstraintNode_c(Position pos,
             PrincipalNode actor, PrincipalNode granter, boolean isEquiv) {
-        super(pos, actor, granter, isEquiv);
+        this(pos, actor, granter, isEquiv, null);
+    }
+
+    public PrincipalActsForPrincipalConstraintNode_c(Position pos,
+            PrincipalNode actor, PrincipalNode granter, boolean isEquiv, Ext ext) {
+        super(pos, actor, granter, isEquiv, ext);
     }
 }

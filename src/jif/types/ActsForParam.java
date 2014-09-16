@@ -11,4 +11,6 @@ public interface ActsForParam extends Param {
     ActsForParam subst(LabelSubstitution labelSubst) throws SemanticException;
 
     Expr toJava(JifToJavaRewriter rw) throws SemanticException;
+
+    ActsForParam simplify();
 }

@@ -8,6 +8,7 @@ import polyglot.types.Flags;
 import polyglot.types.ParsedClassType;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
+import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -26,6 +27,27 @@ public class JifFieldInstance_c extends FieldInstance_c implements
             ReferenceType container, Flags flags, Type type, String name) {
 
         super(ts, pos, container, flags, type, name);
+    }
+
+    @Override
+    public boolean equalsImpl(TypeObject o) {
+        if (!(o instanceof JifFieldInstance)) return false;
+
+        JifFieldInstance jfi = (JifFieldInstance) o;
+        // XXX This doesn't test for label equality, but should. Adding the
+        // label-equality test, however, exposes scheduling bugs are complicated
+        // to fix. (Procedure instances with field final access paths in their
+        // constraints end up with unsubstituted VarLabels in the paths' field
+        // instances, which should have been substituted out by the
+        // FieldLabelResolver. The pthScript tests involving
+        // Regression0[12]?.jif exercise this issue.) Once this scheduling issue
+        // is fixed, the line below can be uncommented, and the kludge in
+        // JifSubstClassType_c.fields() can be removed.
+        return super.equalsImpl(jfi)
+//                && ts.equals(label, jfi.label())
+                && hasInitializer == jfi.hasInitializer()
+                && (hasInitializer ? ts.equals(initializer, jfi.initializer())
+                        : true);
     }
 
     @Override

@@ -2,6 +2,7 @@ package jif.ast;
 
 import java.util.List;
 
+import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.Stmt;
 import polyglot.ast.Stmt_c;
@@ -20,13 +21,19 @@ import polyglot.visit.Translator;
 public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    private LabelNode bound;
-    private LabelNode label;
-    private Stmt body;
+    protected LabelNode bound;
+    protected LabelNode label;
+    protected Stmt body;
 
+    @Deprecated
     public DowngradeStmt_c(Position pos, LabelNode bound, LabelNode label,
             Stmt body) {
-        super(pos);
+        this(pos, bound, label, body, null);
+    }
+
+    public DowngradeStmt_c(Position pos, LabelNode bound, LabelNode label,
+            Stmt body, Ext ext) {
+        super(pos, ext);
         this.bound = bound;
         this.label = label;
         this.body = body;
@@ -39,7 +46,12 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt {
 
     @Override
     public DowngradeStmt label(LabelNode label) {
-        DowngradeStmt_c n = (DowngradeStmt_c) copy();
+        return label(this, label);
+    }
+
+    protected <N extends DowngradeStmt_c> N label(N n, LabelNode label) {
+        if (n.label == label) return n;
+        n = copyIfNeeded(n);
         n.label = label;
         return n;
     }
@@ -51,8 +63,13 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt {
 
     @Override
     public DowngradeStmt bound(LabelNode b) {
-        DowngradeStmt_c n = (DowngradeStmt_c) copy();
-        n.bound = b;
+        return bound(this, b);
+    }
+
+    protected <N extends DowngradeStmt_c> N bound(N n, LabelNode bound) {
+        if (n.bound == bound) return n;
+        n = copyIfNeeded(n);
+        n.bound = bound;
         return n;
     }
 
@@ -63,22 +80,22 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt {
 
     @Override
     public DowngradeStmt body(Stmt body) {
-        DowngradeStmt_c n = (DowngradeStmt_c) copy();
+        return body(this, body);
+    }
+
+    protected <N extends DowngradeStmt_c> N body(N n, Stmt body) {
+        if (n.body == body) return n;
+        n = copyIfNeeded(n);
         n.body = body;
         return n;
     }
 
-    protected DowngradeStmt_c reconstruct(LabelNode bound, LabelNode label,
-            Stmt body) {
-        if (this.bound != bound || this.label != label || this.body != body) {
-            DowngradeStmt_c n = (DowngradeStmt_c) copy();
-            n.bound = bound;
-            n.label = label;
-            n.body = body;
-            return n;
-        }
-
-        return this;
+    protected <N extends DowngradeStmt_c> N reconstruct(N n, LabelNode bound,
+            LabelNode label, Stmt body) {
+        n = bound(n, bound);
+        n = label(n, label);
+        n = body(n, body);
+        return n;
     }
 
     @Override
@@ -86,9 +103,9 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt {
         LabelNode bound =
                 this.bound == null ? null : ((LabelNode) visitChild(this.bound,
                         v));
-        LabelNode label = (LabelNode) visitChild(this.label, v);
-        Stmt body = (Stmt) visitChild(this.body, v);
-        return reconstruct(bound, label, body);
+        LabelNode label = visitChild(this.label, v);
+        Stmt body = visitChild(this.body, v);
+        return reconstruct(this, bound, label, body);
     }
 
     @Override

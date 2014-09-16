@@ -1,13 +1,21 @@
 # Jif configuration properties.
 
 # Base directory of Polyglot installation.
+#
+#   This is optional if the Polyglot JARs are in the lib directory.
 #   Must be an absolute path.
-polyglot.home=${env.HOME}/polyglot
+#
+#polyglot.home=${env.HOME}/polyglot
 
+
+# JDK installation dilectory.
+#
 jdk.home=${java.home}
+
 # The following may work better if you have the JAVA_HOME environment variable
 # defined:
 # jdk.home=${env.JAVA_HOME}
 
 # You may need something like the following on Mac OS
 # jif-runtime-native.java-include-dir=${jdk.home}/include
+# jif-runtime-native.java-include-dir=${jdk.home}/include/darwin

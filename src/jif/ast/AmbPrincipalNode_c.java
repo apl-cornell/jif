@@ -15,6 +15,7 @@ import jif.types.principal.ExternalPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.JifTypeChecker;
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.ast.Field;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
@@ -42,16 +43,40 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
     protected Expr expr;
     protected Id name;
 
+//    @Deprecated
     public AmbPrincipalNode_c(Position pos, Expr expr) {
-        super(pos);
+        this(pos, expr, null);
+    }
+
+    public AmbPrincipalNode_c(Position pos, Expr expr, Ext ext) {
+        super(pos, ext);
         this.expr = expr;
         this.name = null;
     }
 
+//    @Deprecated
     public AmbPrincipalNode_c(Position pos, Id name) {
-        super(pos);
+        this(pos, name, null);
+    }
+
+    public AmbPrincipalNode_c(Position pos, Id name, Ext ext) {
+        super(pos, ext);
         this.expr = null;
         this.name = name;
+    }
+
+    protected <N extends AmbPrincipalNode_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        n = copyIfNeeded(n);
+        n.expr = expr;
+        return n;
+    }
+
+    protected <N extends AmbPrincipalNode_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        n = copyIfNeeded(n);
+        n.name = name;
+        return n;
     }
 
     @Override
@@ -84,7 +109,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
         // run the typechecker over expr.
         TypeChecker tc = new JifTypeChecker(ar.job(), ts, nf, true);
         tc = (TypeChecker) tc.context(ar.context());
-        expr = (Expr) expr.visit(tc);
+        Expr expr = (Expr) this.expr.visit(tc);
 
         if (!expr.isTypeChecked()) {
             if (expr instanceof Field) {
@@ -114,7 +139,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
 
             ar.job().extensionInfo().scheduler().currentGoal()
                     .setUnreachableThisRun();
-            return this;
+            return reconstruct(this, expr, name);
         }
 
         if (expr.type() != null && expr.type().isCanonical()
@@ -237,23 +262,20 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
         Expr expr = this.expr;
         Id name = this.name;
         if (this.expr != null) {
-            expr = (Expr) visitChild(this.expr, v);
+            expr = visitChild(this.expr, v);
         }
         if (this.name != null) {
-            name = (Id) visitChild(this.name, v);
+            name = visitChild(this.name, v);
         }
 
-        return reconstruct(expr, name);
+        return reconstruct(this, expr, name);
     }
 
-    protected AmbPrincipalNode_c reconstruct(Expr expr, Id name) {
-        if (this.expr != expr || this.name != name) {
-            AmbPrincipalNode_c n = (AmbPrincipalNode_c) this.copy();
-            n.expr = expr;
-            n.name = name;
-            return n;
-        }
-        return this;
+    protected <N extends AmbPrincipalNode_c> N reconstruct(N n, Expr expr,
+            Id name) {
+        n = expr(n, expr);
+        n = id(n, name);
+        return n;
     }
 
 }

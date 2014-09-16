@@ -29,7 +29,7 @@
 # an appropriate class path, to make sure that pth can find the Jif compiler.
 #    $ pth pthScript -classpath "../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:."
 
-jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:../rt-classes:/../lib/jifrt.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar" {
+jif.ExtensionInfo  "-d out -nonrobust -classpath ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:../rt-classes:/../lib/jifrt.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar" {
 	A.jif ;
     labelparam/AE.jif ;
     labelparam/A.jif labelparam/E.jif ;
@@ -296,15 +296,6 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Inf13.jif ;
 	Implicit.jif ;
 	Implicit2.jif ;
-    Inner0.jif;
-    Inner1.jif;
-    Inner2.jif;
-    Inner3.jif;
-    Inner4.jif;
-    Inner5.jif;
-    Inner6.jif;
-    # why doesn't this say ok?
-    InnerFlow0.jif (Semantic), (Semantic) ;
 	IntBounds1.jif ;
 	IntBounds2.jif ;
 	IntBounds3.jif ;
@@ -390,8 +381,6 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	            (Semantic, "can not contain .* character"),
 	            (Semantic, "can not contain .* character");
 	NativePrincipal01.jif ;
-	Nested01.jif ;
-	Nested02.jif ;
 	NewLabel.jif ;
 	NewLabel2.jif ;
 	NewLabel3.jif (Semantic, "not representable at runtime");
@@ -609,14 +598,31 @@ jif.ExtensionInfo  "-nonrobust -classpath ../classes:../lib-classes:../lib/jif.j
 	Switch02.jif (Semantic, "not less restrictive");
 	Switch03.jif (Semantic, "not less restrictive");
 	Switch04.jif (Semantic, "not less restrictive");
-	#UnsoundConstructor.jif (Semantic, "pc");
+	UnsoundConstructor01.jif (Semantic, "may return a value with a more restrictive label");
+	UnsoundConstructor02.jif (Semantic, "not less restrictive");
+	UnsoundConstructor03.jif (Semantic, "not less restrictive");
+	UnsoundInference01.jif (Semantic, "not less restrictive");
     FinalParamBug.jif ;
+
+    # Test compilation order.
+    # This used to compile in one order, but not in the other.
+    Regression01A.jif Regression01B.jif ;
+    Regression01B.jif Regression01A.jif ;
+
+    # Separate compilation tests.
+    Regression01A.jif, Regression01B.jif ;
+    Regression02A.jif Regression02B.jif, Regression02C.jif ;
+    Regression02B.jif Regression02A.jif, Regression02C.jif ;
+
+    # Exposes a bug in the scheduler.
+    MutualDep01A.jif MutualDep01B.jif ;
 }
 
 # the robustness test cases. Turn robustness on.
-jif.ExtensionInfo  "-robust -cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:../rt-classes:../lib/jifrt.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar" {
+jif.ExtensionInfo  "-d out -robust -cp ../classes:../lib-classes:../lib/jif.jar:../lib/jiflib.jar:../rt-classes:../lib/jifrt.jar:.:$CLASSPATH -sigcp ../sig-classes:../lib/jifsig.jar" {
 	RobustDecl01.jif ;
 	RobustDecl02.jif (Semantic, "not robust");
 	RobustDecl03.jif (Semantic, "not robust");
 	RobustDecl04.jif ;
 }
+
