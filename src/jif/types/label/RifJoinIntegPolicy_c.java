@@ -142,8 +142,32 @@ public class RifJoinIntegPolicy_c extends Policy_c implements
     }
 
     private static Set<IntegPolicy> flatten(Set<IntegPolicy> comps) {
-        // to be implemented
-        return comps;
+        boolean needFlattening = false;
+        for (IntegPolicy cp : comps) {
+            if (cp instanceof RifJoinIntegPolicy) {
+                needFlattening = true;
+                break;
+            }
+        }
+
+        if (!needFlattening) return comps;
+
+        Set<IntegPolicy> c = new LinkedHashSet<IntegPolicy>();
+        for (IntegPolicy cp : comps) {
+            if (cp.isTop()) {
+                return Collections.singleton(cp);
+            }
+
+            if (cp instanceof RifJoinIntegPolicy) {
+                Collection<IntegPolicy> lComps =
+                        ((RifJoinIntegPolicy) cp).joinComponents();
+                c.addAll(lComps);
+            } else {
+                c.add(cp);
+            }
+        }
+
+        return c;
     }
 
     @Override

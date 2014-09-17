@@ -141,8 +141,32 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
     }
 
     private static Set<ConfPolicy> flatten(Set<ConfPolicy> comps) {
-        // to be implemented
-        return comps;
+        boolean needFlattening = false;
+        for (ConfPolicy cp : comps) {
+            if (cp instanceof RifJoinConfPolicy) {
+                needFlattening = true;
+                break;
+            }
+        }
+
+        if (!needFlattening) return comps;
+
+        Set<ConfPolicy> c = new LinkedHashSet<ConfPolicy>();
+        for (ConfPolicy cp : comps) {
+            if (cp.isTop()) {
+                return Collections.singleton(cp);
+            }
+
+            if (cp instanceof RifJoinConfPolicy) {
+                Collection<ConfPolicy> lComps =
+                        ((RifJoinConfPolicy) cp).joinComponents();
+                c.addAll(lComps);
+            } else {
+                c.add(cp);
+            }
+        }
+
+        return c;
     }
 
     @Override

@@ -14,19 +14,19 @@ class Main{
      * (By assumption, the invocation of the program has the permission of the
      * current user p).
      */
-    public static final void main{_<-*}
+    public static final void main{rifi[f1*:{}]}
                      (principal{} p, String args[]) : {_<-*} 
          throws SecurityException, IllegalArgumentException
 
     {
-          PrintStream[{}] out = null;
-          try {
-              Runtime runtime = Runtime.getRuntime();
-              out = runtime==null?null:runtime.stdout(new label {});
-          }
-          catch (SecurityException e) {
+          PrintStream[{}]{rifi[f1*:{}]} out = null;
+       //   try {
+       //       Runtime{rifi[f1*:{}]} runtime = Runtime.getRuntime();
+       //       out = runtime==null?null:runtime.stdout(new label {});
+       //   }
+       //   catch (SecurityException e) {
               // just let out be null.
-          }
+      //    }
 
           // the PrintStream needs to be labeled {Alice<-* meet Bob<-*}, which
           // requires a declassification and an endorsement.

@@ -19,6 +19,10 @@ class Board[label L] {
 	this.ships = new LinkedList[L]();
     }
 
+    public List[L] Ships(){
+       return this.ships;
+    }
+
     /**
      * @throws IllegalArgumentException if the ship to add intersects a ship
      *   already on the board.
