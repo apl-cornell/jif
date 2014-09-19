@@ -14,15 +14,20 @@ class Main{
      * (By assumption, the invocation of the program has the permission of the
      * current user p).
      */
-    public static final void main{rifi[f1*:{}]}
-                     (principal{} p, String args[]) : {_<-*} 
-         throws SecurityException, IllegalArgumentException
+    public static final void main{rif[q0*:{_}];rifi[q1*:{}]}
+                     (principal{rifi[q1*:{}]} p, String args[]) : {rifi[q1*:{}]} 
+         throws (SecurityException{rifi[q1*:{}]}, IllegalArgumentException)
 
     {
-          PrintStream[{}]{rifi[f1*:{}]} out = null;
+          int{rif[q0*:{_}];rifi[q1*:{}]} key=0;   
+          PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{_}];rifi[q1*:{}]} out = null;
+          PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]} outinit = null;
+          PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{}]} out2 = null;
+          Runtime[p]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]} tryruntime;
+          Runtime[p]{rifi[q1*:{}]} runtime;
           try {
-              Runtime{rifi[f1*:{}]} runtime = Runtime.getRuntime();
-              out = runtime==null?null:runtime.stdout(new label {});
+              tryruntime = Runtime[p].getRuntime();
+              outinit = tryruntime==null?null:tryruntime.stdout(new label {rif[q1*:{_}];rifi[q1*:{}]});
           }
           catch (SecurityException e) {
               // just let out be null.
@@ -30,10 +35,11 @@ class Main{
 
           // the PrintStream needs to be labeled {Alice<-* meet Bob<-*}, which
           // requires a declassification and an endorsement.
+          
+          out2 = reclassify(outinit,f4);
 
-              
           // instantiate an instance of the BattleShip game for Alice 
           // and Bob, and play it.
-          new BattleShip[Alice, Bob]().play(out);
+          new BattleShip[Alice, Bob]().play(reclassify(out2,f0));
     }
 }

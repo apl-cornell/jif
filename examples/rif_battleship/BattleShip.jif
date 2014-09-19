@@ -12,8 +12,8 @@ class BattleShip[principal P1, principal P2] {
      */
     public static final int{rif[q0*:{_}];rifi[q1*:{}]} NUM_COVERED_COORDS = 10;
 
-    public void play{rifi[f1*:{}]}(PrintStream[{}]{rifi[f1*:{}]} output) 
-      throws (SecurityException, IllegalArgumentException{rifi[f1*:{}]})
+    public void play{rif[q1*:{_}];rifi[q1*:{}]}(PrintStream[{rifi[q1*:{}]}]{rifi[q1*:{}]} output) 
+      throws (SecurityException, IllegalArgumentException{rifi[q1*:{}]})
 	 {
 
         if (output == null) throw new IllegalArgumentException("Null output");
