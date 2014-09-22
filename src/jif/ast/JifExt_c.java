@@ -8,8 +8,8 @@ import jif.types.JifContext;
 import jif.types.PathMap;
 import jif.visit.LabelChecker;
 import jif.visit.SingletonChecker;
-import polyglot.ast.Ext_c;
 import polyglot.ast.Node;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
@@ -18,7 +18,7 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>Jif</code> interface.
  */
-public class JifExt_c extends Ext_c implements JifExt {
+public class JifExt_c extends JL5Ext implements JifExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected PathMap X;
