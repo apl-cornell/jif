@@ -159,7 +159,7 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance {
 
     @Override
     public void setType(Type t) {
-        //Do nothing
+        super.type = t;
     }
 
     @Override

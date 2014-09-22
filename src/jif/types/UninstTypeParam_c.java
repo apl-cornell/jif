@@ -51,30 +51,22 @@ public class UninstTypeParam_c extends ReferenceType_c implements
 
     @Override
     public List<? extends MethodInstance> methods() {
-        return upperBound == null ? new ArrayList<MethodInstance>()
-                : upperBound.methods();
+        return new ArrayList<MethodInstance>();
     }
 
     @Override
     public List<? extends FieldInstance> fields() {
-        return upperBound == null ? new ArrayList<FieldInstance>() : upperBound
-                .fields();
+        return new ArrayList<FieldInstance>();
     }
 
     @Override
     public FieldInstance fieldNamed(String name) {
-        for (FieldInstance fi : fields()) {
-            if (fi.name().equals(name)) {
-                return fi;
-            }
-        }
         return null;
     }
 
     @Override
     public List<? extends ReferenceType> interfaces() {
-        return upperBound == null ? new ArrayList<ReferenceType>() : upperBound
-                .interfaces();
+        return new ArrayList<ReferenceType>();
     }
 
     @Override
