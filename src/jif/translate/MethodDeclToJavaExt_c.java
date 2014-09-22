@@ -12,6 +12,7 @@ import jif.types.Assertion;
 import jif.types.JifMethodInstance;
 import jif.types.JifParsedPolyType;
 import jif.types.JifPolyType;
+import jif.types.JifSubst;
 import jif.types.JifSubstClassType_c;
 import jif.types.JifTypeSystem;
 import jif.types.LabelLeAssertion;
@@ -71,14 +72,13 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
             if (t instanceof JifSubstClassType_c) {
                 JifSubstClassType_c subB = (JifSubstClassType_c) t;
                 List<TypeNode> args = new ArrayList<TypeNode>();
-                Iterator<Entry<ParamInstance, Param>> entries =
-                        subB.subst().entries();
-                while (entries.hasNext()) {
-                    Entry<ParamInstance, Param> e = entries.next();
-                    if (e.getKey().isType()) {
-                        TypeParam tp = (TypeParam) e.getValue();
+                for (ParamInstance pi : ((JifParsedPolyType) subB.base())
+                        .params()) {
+                    if (pi.isType()) {
+                        TypeParam tp =
+                                (TypeParam) ((JifSubst) subB.subst()).get(pi);
                         Named namedType = (Named) tp.type();
-                        args.add(nf.AmbTypeNode(e.getValue().position(),
+                        args.add(nf.AmbTypeNode(tp.position(),
                                 nf.Id(tp.position(), namedType.name())));
                     }
                 }
@@ -119,7 +119,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
                                         subB.position(),
                                         nf.AmbTypeNode(subB.position(), nf.Id(
                                                 t.position(), subB.name())),
-                                                args);
+                                        args);
                     }
                 }
             }

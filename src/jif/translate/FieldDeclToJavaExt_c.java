@@ -1,13 +1,12 @@
 package jif.translate;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
+import jif.types.JifParsedPolyType;
+import jif.types.JifSubst;
 import jif.types.JifSubstClassType_c;
 import jif.types.LabeledType;
-import jif.types.Param;
 import jif.types.ParamInstance;
 import jif.types.TypeParam;
 import polyglot.ast.ArrayInit;
@@ -54,7 +53,7 @@ public class FieldDeclToJavaExt_c extends ToJavaExt_c {
                                 Position.compilerGenerated(),
                                 rw.typeToJava(base,
                                         Position.compilerGenerated()), 1,
-                                (ArrayInit) init);
+                                        (ArrayInit) init);
             }
             rw.addInitializer(fi, init);
             n = n.init(null);
@@ -65,14 +64,13 @@ public class FieldDeclToJavaExt_c extends ToJavaExt_c {
             if (b instanceof JifSubstClassType_c) {
                 JifSubstClassType_c subB = (JifSubstClassType_c) b;
                 List<TypeNode> args = new ArrayList<TypeNode>();
-                Iterator<Entry<ParamInstance, Param>> entries =
-                        subB.subst().entries();
-                while (entries.hasNext()) {
-                    Entry<ParamInstance, Param> e = entries.next();
-                    if (e.getKey().isType()) {
-                        TypeParam tp = (TypeParam) e.getValue();
+                for (ParamInstance pi : ((JifParsedPolyType) subB.base())
+                        .params()) {
+                    if (pi.isType()) {
+                        TypeParam tp =
+                                (TypeParam) ((JifSubst) subB.subst()).get(pi);
                         Named namedType = (Named) tp.type();
-                        args.add(nf.AmbTypeNode(e.getValue().position(),
+                        args.add(nf.AmbTypeNode(tp.position(),
                                 nf.Id(tp.position(), namedType.name())));
                     }
                 }
