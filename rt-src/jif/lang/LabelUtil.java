@@ -151,11 +151,15 @@ public class LabelUtil {
     private final Label NO_COMPONENTS;
 
     {
-        BOTTOM_CONF = this.readerPolicy(null, (Principal) null);
+        BOTTOM_CONF =
+                this.addprincipal("q0", (Principal) null,
+                        this.addstate("q0", "true", this.rifreaderPolicy()));
         TOP_CONF =
-                this.readerPolicy(PrincipalUtil.topPrincipal(),
-                        PrincipalUtil.topPrincipal());
-        TOP_INTEG = this.writerPolicy(null, (Principal) null);
+                this.addprincipal("q0", PrincipalUtil.topPrincipal(),
+                        this.addstate("q0", "true", this.rifreaderPolicy()));
+        TOP_INTEG =
+                this.addprincipal("q0", (Principal) null,
+                        this.addstate("q0", "true", this.rifwriterPolicy()));
         NO_COMPONENTS = this.toLabel(BOTTOM_CONF, TOP_INTEG);
     }
 
@@ -265,7 +269,16 @@ public class LabelUtil {
     public ConfPolicy readerPolicy(Principal owner, Principal reader) {
         try {
             enterTiming();
-            return new ReaderPolicy(this, owner, reader);
+
+            return this
+                    .addprincipal(
+                            "q0",
+                            reader,
+                            this.addprincipal(
+                                    "q0",
+                                    owner,
+                                    this.addstate("q0", "true",
+                                            this.rifreaderPolicy())));
         } finally {
             exitTiming();
         }
@@ -275,7 +288,14 @@ public class LabelUtil {
             Collection<Principal> readers) {
         try {
             enterTiming();
-            return readerPolicy(owner, PrincipalUtil.disjunction(readers));
+            RifReaderPolicy rif =
+                    (RifReaderPolicy) this
+                            .addprincipal(
+                                    "q0",
+                                    owner,
+                                    this.addstate("q0", "true",
+                                            this.rifreaderPolicy()));
+            return rif.addprincipals("q0", readers);
         } finally {
             exitTiming();
         }
@@ -356,7 +376,15 @@ public class LabelUtil {
     public IntegPolicy writerPolicy(Principal owner, Principal writer) {
         try {
             enterTiming();
-            return new WriterPolicy(this, owner, writer);
+            return this
+                    .addprincipal(
+                            "q0",
+                            writer,
+                            this.addprincipal(
+                                    "q0",
+                                    owner,
+                                    this.addstate("q0", "true",
+                                            this.rifwriterPolicy())));
         } finally {
             exitTiming();
         }
@@ -366,7 +394,14 @@ public class LabelUtil {
             Collection<Principal> writers) {
         try {
             enterTiming();
-            return writerPolicy(owner, PrincipalUtil.disjunction(writers));
+            RifWriterPolicy rif =
+                    (RifWriterPolicy) this
+                            .addprincipal(
+                                    "q0",
+                                    owner,
+                                    this.addstate("q0", "true",
+                                            this.rifwriterPolicy()));
+            return rif.addprincipals("q0", writers);
         } finally {
             exitTiming();
         }

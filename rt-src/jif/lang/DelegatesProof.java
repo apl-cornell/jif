@@ -1,5 +1,6 @@
 package jif.lang;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jif.lang.PrincipalUtil.DelegationPair;
@@ -22,6 +23,9 @@ public final class DelegatesProof extends ActsForProof {
                 && ((ConjunctivePrincipal) getActor()).conjuncts
                         .contains(getGranter())) {
             return;
+        }
+        if (s == null) {
+            s = new HashSet<DelegationPair>();
         }
         s.add(new PrincipalUtil.DelegationPair(getActor(), getGranter()));
     }

@@ -46,6 +46,6 @@ public interface RifFSMstate extends Serializable {
 
     RifFSMstate reachedState(String transition);
 
-    List<Principal> confEquivPrincipals();
+    List<Principal> EquivPrincipals();
 
 }

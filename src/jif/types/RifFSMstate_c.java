@@ -80,7 +80,7 @@ public class RifFSMstate_c implements RifFSMstate {
     }
 
     @Override
-    public List<Principal> confEquivPrincipals() {
+    public List<Principal> EquivPrincipals() {
         List<Principal> l = new LinkedList<Principal>();
         if (this.principals == null || this.principals.isEmpty()) return null;
 
@@ -92,13 +92,14 @@ public class RifFSMstate_c implements RifFSMstate {
             }
             if (!p.isTopPrincipal()) l.add(p);
         }
+        if (l == null || l.isEmpty()) return null;
         return l;
     }
 
     @Override
     public boolean equalsFSM(RifFSMstate other) {
-        List<Principal> set1 = this.confEquivPrincipals();
-        List<Principal> set2 = other.confEquivPrincipals();
+        List<Principal> set1 = this.EquivPrincipals();
+        List<Principal> set2 = other.EquivPrincipals();
 
         if (set1 == null && set2 == null) return true;
         if (set1 == null || set2 == null) return false;
@@ -107,8 +108,8 @@ public class RifFSMstate_c implements RifFSMstate {
 
     @Override
     public boolean leqFSM(RifFSMstate other) {
-        List<Principal> set1 = this.confEquivPrincipals();
-        List<Principal> set2 = other.confEquivPrincipals();
+        List<Principal> set1 = this.EquivPrincipals();
+        List<Principal> set2 = other.EquivPrincipals();
         if (set2 == null) return true;
         if (set1 == null) return false;
         if (set1.size() == 1 && set1.get(0).isBottomPrincipal()) return true;
@@ -152,14 +153,14 @@ public class RifFSMstate_c implements RifFSMstate {
 
     @Override
     public boolean isBottomConfidentiality() {
-        List<Principal> l = this.confEquivPrincipals();
+        List<Principal> l = this.EquivPrincipals();
         if (l == null) return false;
         return l.size() == 1 && l.get(0).isBottomPrincipal();
     }
 
     @Override
     public boolean isTopConfidentiality() {
-        List<Principal> l = this.confEquivPrincipals();
+        List<Principal> l = this.EquivPrincipals();
         return (l == null || l.size() == 0);
     }
 

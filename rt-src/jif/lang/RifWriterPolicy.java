@@ -1,5 +1,6 @@
 package jif.lang;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -10,8 +11,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import jif.lang.PrincipalUtil.DelegationPair;
-import polyglot.ast.Id;
-import polyglot.ast.Id_c;
 
 public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
 
@@ -19,15 +18,15 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
     protected RifFSMstate current;
     // allPossibleActions contains all the actions that appear in the program.
     // Somehow this list should be initialized when the whole program is parsed.
-    private LinkedList<Id> allPossibleActions;
+    private LinkedList<String> allPossibleActions;
 
     public RifWriterPolicy(LabelUtil labelUtil) {
         super(labelUtil);
         states = new HashMap<String, RifFSMstate>();
-        allPossibleActions = new LinkedList<Id>();
+        allPossibleActions = new LinkedList<String>();
         int i;
         for (i = 0; i < 5; i++) {
-            allPossibleActions.add(new Id_c(null, "f" + Integer.toString(i)));
+            allPossibleActions.add("f" + Integer.toString(i));
         }
     }
 
@@ -37,10 +36,10 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
         this.states = states;
         this.current = current;
 
-        allPossibleActions = new LinkedList<Id>();
+        allPossibleActions = new LinkedList<String>();
         int i;
         for (i = 0; i < 5; i++) {
-            allPossibleActions.add(new Id_c(null, "f" + Integer.toString(i)));
+            allPossibleActions.add("f" + Integer.toString(i));
         }
     }
 
@@ -49,11 +48,9 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
 
         HashMap<String, RifFSMstate> transitions =
                 new HashMap<String, RifFSMstate>();
-        RifFSMstate state =
-                new RifFSMstate(new Id_c(null, stateId), principals,
-                        transitions);
+        RifFSMstate state = new RifFSMstate(stateId, principals, transitions);
         states.put(stateId, state);
-        if (current == "true") {
+        if (current.equals("true")) {
             this.current = state;
         }
         return this;
@@ -63,8 +60,20 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
     public RifWriterPolicy addprincipal(String stateId, Principal p) {
 
         for (Entry<String, RifFSMstate> st : states.entrySet()) {
-            if (st.getKey() == stateId) {
+            if (st.getKey().equals(stateId)) {
                 st.getValue().addPrincipal(p);
+            }
+        }
+        return this;
+
+    }
+
+    public RifWriterPolicy addprincipals(String stateId,
+            Collection<Principal> ps) {
+
+        for (Entry<String, RifFSMstate> st : states.entrySet()) {
+            if (st.getKey().equals(stateId)) {
+                st.getValue().addPrincipals(ps);
             }
         }
         return this;
@@ -75,9 +84,9 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
             String state2) {
 
         for (Entry<String, RifFSMstate> st : states.entrySet()) {
-            if (st.getKey() == state1) {
+            if (st.getKey().equals(state1)) {
                 for (Entry<String, RifFSMstate> st2 : states.entrySet()) {
-                    if (st2.getKey() == state2) {
+                    if (st2.getKey().equals(state2)) {
                         st.getValue().setTransition(transition, st2.getValue());
                         break;
                     }
@@ -107,10 +116,10 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
         RifWriterPolicy fsm1 = this;
         RifWriterPolicy fsm2 = p;
 
-        LinkedList<Id> allPossibleActions = new LinkedList<Id>();
+        LinkedList<String> allPossibleActions = new LinkedList<String>();
         int j;
         for (j = 0; j < 5; j++) {
-            allPossibleActions.add(new Id_c(null, "f" + Integer.toString(j)));
+            allPossibleActions.add("f" + Integer.toString(j));
         }
 
         Iterator<Entry<String, RifFSMstate>> it1 =
@@ -123,15 +132,19 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
                 Entry<String, RifFSMstate> pairs2 = it2.next();
                 String newname = pairs1.getKey() + "&" + pairs2.getKey();
                 List<Principal> newprincipals = new LinkedList<Principal>();
-                for (Principal princ : pairs1.getValue().principals()) {
-                    if (pairs2.getValue().principals().contains(princ)) {
-                        newprincipals.add(princ);
-                    }
+                if (pairs1.getValue().hasTopPrincipal())
+                    newprincipals.addAll(pairs2.getValue().principals());
+                else if (pairs2.getValue().hasTopPrincipal())
+                    newprincipals.addAll(pairs1.getValue().principals());
+                else if (!pairs1.getValue().hasBottomPrincipal()
+                        && !pairs2.getValue().hasBottomPrincipal()) {
+                    newprincipals.addAll(pairs1.getValue().principals());
+                    newprincipals.addAll(pairs1.getValue().principals());
                 }
-                states.put(newname, new RifFSMstate(new Id_c(null, newname),
-                        newprincipals, new HashMap<String, RifFSMstate>()));
-                if (fsm1.currentState().name().id() == pairs1.getKey()
-                        && fsm2.currentState().name().id() == pairs2.getKey())
+                states.put(newname, new RifFSMstate(newname, newprincipals,
+                        new HashMap<String, RifFSMstate>()));
+                if (fsm1.currentState().name().equals(pairs1.getKey())
+                        && fsm2.currentState().name().equals(pairs2.getKey()))
                     newcurrentstate = states.get(newname);
             }
         }
@@ -145,16 +158,14 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
                 Entry<String, RifFSMstate> pairs2 = it2.next();
                 RifFSMstate currentstate =
                         states.get(pairs1.getKey() + "&" + pairs2.getKey());
-                for (Id action : allPossibleActions) {
+                for (String action : allPossibleActions) {
                     RifFSMstate reachedstate1 =
-                            pairs1.getValue().reachedState(action.id());
+                            pairs1.getValue().reachedState(action);
                     RifFSMstate reachedstate2 =
-                            pairs2.getValue().reachedState(action.id());
+                            pairs2.getValue().reachedState(action);
                     String reachedname =
-                            reachedstate1.name().id() + "&"
-                                    + reachedstate2.name().id();
-                    currentstate.setTransition(action.id(),
-                            states.get(reachedname));
+                            reachedstate1.name() + "&" + reachedstate2.name();
+                    currentstate.setTransition(action, states.get(reachedname));
                 }
             }
         }
@@ -187,7 +198,7 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
             return false;
         } else if (p instanceof MeetIntegPolicy) {
             return false; //do we need to fill it???
-        } else if (!(p instanceof WriterPolicy)) return false;
+        } else if (!(p instanceof RifWriterPolicy)) return false;
 
         RifWriterPolicy pp = (RifWriterPolicy) p;
 
@@ -213,8 +224,7 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
     }
 
     public boolean equalsFSM(RifWriterPolicy pol, List<String> visited) {
-        String pair =
-                this.current.name().id() + "&" + pol.currentState().name().id();
+        String pair = this.current.name() + "&" + pol.currentState().name();
         List<String> newvisited = new LinkedList<String>();
 
         if (visited.contains(pair)) {
@@ -225,7 +235,7 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
         }
         newvisited.add(pair);
         if (this.currentState().equals(pol.currentState())) {
-            for (Id action : allPossibleActions) {
+            for (String action : allPossibleActions) {
                 if (!this.takeTransition(action).equalsFSM(
                         pol.takeTransition(action), newvisited)) {
                     return false;
@@ -237,8 +247,7 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
     }
 
     public boolean leqFSM(RifWriterPolicy pol, List<String> visited) {
-        String pair =
-                this.current.name().id() + "&" + pol.currentState().name().id();
+        String pair = this.current.name() + "&" + pol.currentState().name();
         List<String> newvisited = new LinkedList<String>();
 
         if (visited.contains(pair)) {
@@ -249,22 +258,15 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
         }
         newvisited.add(pair);
         if (pol.currentState().leq(this.currentState())) {
-            for (Id action : allPossibleActions) {
-                if (!pol.takeTransition(action).leqFSM(
-                        this.takeTransition(action), newvisited)) {
+            for (String action : allPossibleActions) {
+                if (!this.takeTransition(action).leqFSM(
+                        pol.takeTransition(action), newvisited)) {
                     return false;
                 }
             }
             return true;
         }
         return false;
-    }
-
-    public RifWriterPolicy takeTransition(Id action) {
-        RifWriterPolicy newfsm;
-        RifFSMstate nextState = this.current.getNextState(action.id());
-        newfsm = new RifWriterPolicy(this.labelUtil, this.states, nextState);
-        return newfsm;
     }
 
     public RifWriterPolicy takeTransition(String action) {
@@ -284,15 +286,18 @@ public class RifWriterPolicy extends AbstractPolicy implements IntegPolicy {
         while (it.hasNext()) {
             Entry<String, RifFSMstate> stateentry = it.next();
             sb.append(stateentry.getKey());
-            if (current == stateentry.getValue()) sb.append("*");
+            if (current.name().equals(stateentry.getKey())) sb.append("*");
             sb.append(":{");
             List<Principal> principals = stateentry.getValue().principals();
-            if (principals != null) {
+            if (principals == null || principals.isEmpty())
+                sb.append("_");
+            else {
                 Iterator<Principal> ip = principals.iterator();
                 while (ip.hasNext()) {
                     Principal p = ip.next();
                     if (!PrincipalUtil.isTopPrincipal(p))
                         sb.append(PrincipalUtil.toString(p));
+                    else sb.append("*");
                     if (ip.hasNext()) {
                         sb.append(",");
                     }

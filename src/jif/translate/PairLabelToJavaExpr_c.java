@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import jif.types.JifTypeSystem;
 import jif.types.RifFSM;
 import jif.types.RifFSMstate;
 import jif.types.label.ConfPolicy;
@@ -94,7 +95,7 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
                                             + ".rifreaderPolicy()")
                             .position(Position.compilerGenerated());
             for (Entry<String, RifFSMstate> st : states.entrySet()) {
-                List<Principal> principals = st.getValue().principals();
+                List<Principal> principals = st.getValue().EquivPrincipals();
                 if (fsm.currentState().name().toString() == st.getKey()) {
                     curr = "\"true\"";
                 } else {
@@ -108,7 +109,7 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
                                                 + "\"" + st.getKey() + "\""
                                                 + "," + curr + ",%E)", e)
                                 .position(Position.compilerGenerated());
-                for (Principal princ : principals) {
+                if (principals == null || principals.isEmpty()) {
                     e =
                             (Expr) rw
                                     .qq()
@@ -117,8 +118,24 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
                                                     + ".addprincipal(" + "\""
                                                     + st.getKey() + "\""
                                                     + ",%E,%E)",
-                                            rw.principalToJava(princ), e)
+                                            rw.principalToJava(((JifTypeSystem) rpol
+                                                    .typeSystem())
+                                                    .topPrincipal(rpol
+                                                            .position())), e)
                                     .position(Position.compilerGenerated());
+                } else {
+                    for (Principal princ : principals) {
+                        e =
+                                (Expr) rw
+                                        .qq()
+                                        .parseExpr(
+                                                rw.runtimeLabelUtil()
+                                                        + ".addprincipal("
+                                                        + "\"" + st.getKey()
+                                                        + "\"" + ",%E,%E)",
+                                                rw.principalToJava(princ), e)
+                                        .position(Position.compilerGenerated());
+                    }
                 }
                 HashMap<String, RifFSMstate> transitions =
                         st.getValue().getTransitions();
@@ -171,7 +188,7 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
                                             + ".rifwriterPolicy()")
                             .position(Position.compilerGenerated());
             for (Entry<String, RifFSMstate> st : states.entrySet()) {
-                List<Principal> principals = st.getValue().principals();
+                List<Principal> principals = st.getValue().EquivPrincipals();
                 if (fsm.currentState().name().toString() == st.getKey()) {
                     curr = "\"true\"";
                 } else {
@@ -185,7 +202,7 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
                                                 + "\"" + st.getKey() + "\""
                                                 + "," + curr + ",%E)", e)
                                 .position(Position.compilerGenerated());
-                for (Principal princ : principals) {
+                if (principals == null || principals.isEmpty()) {
                     e =
                             (Expr) rw
                                     .qq()
@@ -194,8 +211,24 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
                                                     + ".addprincipal(" + "\""
                                                     + st.getKey() + "\""
                                                     + ",%E,%E)",
-                                            rw.principalToJava(princ), e)
+                                            rw.principalToJava(((JifTypeSystem) rpol
+                                                    .typeSystem())
+                                                    .topPrincipal(rpol
+                                                            .position())), e)
                                     .position(Position.compilerGenerated());
+                } else {
+                    for (Principal princ : principals) {
+                        e =
+                                (Expr) rw
+                                        .qq()
+                                        .parseExpr(
+                                                rw.runtimeLabelUtil()
+                                                        + ".addprincipal("
+                                                        + "\"" + st.getKey()
+                                                        + "\"" + ",%E,%E)",
+                                                rw.principalToJava(princ), e)
+                                        .position(Position.compilerGenerated());
+                    }
                 }
                 HashMap<String, RifFSMstate> transitions =
                         st.getValue().getTransitions();

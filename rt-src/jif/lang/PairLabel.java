@@ -33,7 +33,7 @@ public final class PairLabel implements Label {
             Set<DelegationPair> temp = new HashSet<DelegationPair>();
             if (labelUtil.relabelsTo(this.confPol, that.confPol, temp)
                     && labelUtil.relabelsTo(this.integPol, that.integPol, temp)) {
-                s.addAll(temp);
+                if (!temp.isEmpty()) s.addAll(temp);
                 return true;
             }
         }

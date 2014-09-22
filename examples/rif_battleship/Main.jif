@@ -26,10 +26,16 @@ class Main{
           Runtime[p]{rifi[q1*:{}]} runtime;
           try {
               tryruntime = Runtime[p].getRuntime();
+          }
+          catch (SecurityException e) {
+              throw new Error("channel is null 1 !");
+          }
+
+         try {
               outinit = tryruntime==null?null:tryruntime.stdout(new label {rif[q1*:{_}];rifi[q1*:{}]});
           }
           catch (SecurityException e) {
-              // just let out be null.
+              throw new Error("channel is null 2 !");
           }
 
           // the PrintStream needs to be labeled {Alice<-* meet Bob<-*}, which
