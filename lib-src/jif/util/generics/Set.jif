@@ -1,0 +1,5 @@
+/**
+ * @see jif.util.Collection
+ */
+public interface Set[label L, type T] extends Collection[L, T] {
+}

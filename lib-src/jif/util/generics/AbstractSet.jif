@@ -1,0 +1,83 @@
+/**
+ * Base implementation for Set.
+ */
+public abstract class AbstractSet[label L, type T, type E extends Equality[T], 
+            type S extends Stringify[T], type H extends Hasher[T]] 
+        extends AbstractCollection[L, T, E, S] implements Set[L, T] {
+
+    final protected H{L} hasher;
+
+    protected AbstractSet(E{L} equality, S{L} stringify, H{L} hasher) {
+        this.hasher = hasher;
+        super(equality, stringify);
+    }
+
+    public boolean{L;o} equals(IDComparable[L] o) {
+        return equals(L, o);
+    }
+    public boolean{L;o;lbl;*lbl} equals(label lbl, IDComparable[lbl] o) {
+        if (o == this) return true;
+        if (!(o instanceof Set[lbl, T])) return false;
+        Set[lbl, T] that = null;
+        try {
+            that = (Set[lbl, T])o;
+            if (this.size() != that.size()) return false;
+        }
+        catch(ClassCastException e) {}
+        catch(NullPointerException e) {}
+
+        for (int i = 0; i < this.size(); i++) {
+            try {
+                T elem = this.get(i);
+                if (!that.contains(L, elem)) return false;
+            }
+            catch (IndexOutOfBoundsException imposs) { }
+            catch(NullPointerException e) {}
+        }
+        return true;
+    }
+    public int{L} hashCode() {
+        int hashCode = 0;
+        int i = 0;
+        
+        while (i < size()) {
+            try {
+                T obj = get(i);
+                hashCode += (obj==null ? 0 : hasher.hash(obj));
+            }
+            catch (IndexOutOfBoundsException e) {}
+            catch (NullPointerException e) {}
+            i++;
+        }
+        return hashCode;
+    }
+    
+    public boolean{L} removeAll{L}(Collection[L, T]{L} c) {
+        if (c == null) return false;
+
+        boolean modified = false;
+
+        if (size() > c.size()) {
+            for (Iterator[L, T] i = c.iterator(); i != null && i.hasNext(); )
+                try {
+                    modified |= remove(i.next());
+                }
+                catch (NoSuchElementException impossible) { }
+        } 
+        else {
+            for (Iterator[L, T] i = iterator(); i != null && i.hasNext(); ) {
+                try {
+                    if (c.contains(i.next())) {
+                        i.remove();
+                        modified = true;
+                    }
+                }
+                catch (NoSuchElementException impossible) { }
+                catch (IllegalStateException impossible) { }
+
+            }
+        }
+        return modified;
+    }
+
+}

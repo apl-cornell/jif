@@ -11,14 +11,22 @@ public class Main {
 		ArrayList[{p->}, Container, ContainerEquality, ContainerStringify, ContainerHasher] l =
 			new ArrayList[{p->}, Container, ContainerEquality, ContainerStringify, ContainerHasher]
 			(single ContainerEquality(), single ContainerStringify(), single ContainerHasher());
-		for (int i = 0; i < 10; i++) {
-			l.add(new Container("Hi" + i, i));
+		for (int j = 0; j < 10; j++) {
+			l.add(new Container("Hi" + j, j));
 		}
 		Iterator[{p->}, Container] i = l.iterator();
-		Container c = null;
 		while (i.hasNext()) {
-			c = i.next();
-			out.println(c.s);
+			out.println(i.next().s);
+		}
+		LinkedListSet[{p->}, Container, ContainerEquality, ContainerStringify, ContainerHasher] lls =
+			new LinkedListSet[{p->}, Container, ContainerEquality, ContainerStringify, ContainerHasher]
+			(single ContainerEquality(), single ContainerStringify(), single ContainerHasher());
+		for (int j = 0; j < 20; j++) {
+			lls.add(new Container("Hi" + (j % 10), j % 10));
+		}
+		i = lls.iterator();
+		while (i.hasNext()) {
+			out.println(i.next().s);
 		}
 	}
 }
