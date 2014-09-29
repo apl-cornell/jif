@@ -1,3 +1,5 @@
+package jif.util.generics;
+
 /**
  * An iterator interface for the Jif collection framework.
  */

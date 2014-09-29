@@ -1,3 +1,5 @@
+package jif.util.generics;
+
 /**
  * An implementation of List, using a linked list to store the
  * list elements.

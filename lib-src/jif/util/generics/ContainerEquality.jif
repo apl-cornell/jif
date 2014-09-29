@@ -1,3 +1,5 @@
+package jif.util.generics;
+
 public object ContainerEquality implements Equality[Container] {
     public boolean{c1;c2} equals(Container c1, Container c2) {
     	try {

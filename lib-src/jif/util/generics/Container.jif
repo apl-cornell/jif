@@ -1,3 +1,5 @@
+package jif.util.generics;
+
 public class Container {
 	final public String{this} s;
 	final public int{this} i;

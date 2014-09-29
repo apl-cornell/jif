@@ -1,3 +1,5 @@
+package jif.util.generics;
+
 public object ContainerStringify implements Stringify[Container] {
 	public String{c} toString(Container c) {
 		try {

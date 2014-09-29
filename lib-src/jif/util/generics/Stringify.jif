@@ -1,3 +1,5 @@
+package jif.util.generics;
+
 public interface Stringify[type T] {
 	public String{t} toString(T t);
 }

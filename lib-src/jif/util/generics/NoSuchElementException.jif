@@ -1,3 +1,5 @@
+package jif.util.generics;
+
 public class NoSuchElementException extends RuntimeException {
     public NoSuchElementException() {
 	super();

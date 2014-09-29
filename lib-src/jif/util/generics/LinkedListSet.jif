@@ -1,3 +1,5 @@
+package jif.util.generics;
+
 /**
  * An implementatin of Set, using a linked list to store the
  * list elements.

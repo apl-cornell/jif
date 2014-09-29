@@ -1,3 +1,5 @@
+package jif.util.generics;
+
 /**
  * An implementatin of List, using an array to store the
  * list elements.

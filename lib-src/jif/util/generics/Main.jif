@@ -1,3 +1,5 @@
+package jif.util.generics;
+
 import java.io.PrintStream;
 import jif.runtime.Runtime;
 
@@ -15,6 +17,7 @@ public class Main {
 			l.add(new Container("Hi" + j, j));
 		}
 		Iterator[{p->}, Container] i = l.iterator();
+		out.println("Contents of ArrayList:");
 		while (i.hasNext()) {
 			out.println(i.next().s);
 		}
@@ -25,6 +28,7 @@ public class Main {
 			lls.add(new Container("Hi" + (j % 10), j % 10));
 		}
 		i = lls.iterator();
+		out.println("Contents of LinkedListSet:");
 		while (i.hasNext()) {
 			out.println(i.next().s);
 		}

@@ -1,3 +1,5 @@
+package jif.util.generics;
+
 /**
  * @see jif.util.Collection
  */

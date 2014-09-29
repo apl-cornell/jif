@@ -1,3 +1,5 @@
+package jif.util.generics;
+
 public interface Equality[type T] {
     public boolean{t1;t2} equals(T t1, T t2);
 }
