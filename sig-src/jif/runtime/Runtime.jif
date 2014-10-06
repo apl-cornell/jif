@@ -2,9 +2,9 @@ package jif.runtime;
 
 import java.io.*;
     
-public class Runtime[principal P]
+public class Runtime[principal P, label lbl]
 {
-    private Runtime(principal{this} pp) { }
+    private Runtime(principal{this} pp, label lbl) { }
 
     /**
      * Return a runtime instance.
@@ -12,7 +12,7 @@ public class Runtime[principal P]
      * @throws SecurityException
      *         if user() does not act for P.
      */
-    public static native Runtime[P]{rif[q1*:{P},q2:{_},f0:q1->q2];rifi[q1*:{P},q2:{},f4:q1->q2]} getRuntime() throws SecurityException;
+    public static native Runtime[P,lbl]{lbl} getRuntime() throws SecurityException;
 
     /**
      * Return a principal representing the system user who invoked the
@@ -36,7 +36,7 @@ public class Runtime[principal P]
      * @throws SecurityException
      *         unless L ⊑  {P→ ;_←_}
      */
-    public native PrintStream[{*L}]{rif[q1*:{P},q2:{_},f0:q1->q2];rifi[q1*:{P},q2:{},f4:q1->q2]} stdout(label L) throws (SecurityException{*L;L});
+    public native PrintStream[{*L}]{lbl} stdout(label L) throws (SecurityException{*L;L});
     public native InputStream[{*L}]{P:;P!:} stdin(label L) throws (SecurityException{*L;L});
     public native PrintStream[{*L}]{P:;P!:} stderr(label L) throws (SecurityException{*L;L});
 

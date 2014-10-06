@@ -18,14 +18,13 @@ class Main{
                      (principal{rifi[q1*:{}]} p, String args[]) : {rifi[q1*:{}]} 
          throws (SecurityException{rifi[q1*:{}]}, IllegalArgumentException)
 
-    {  
+    {     final label lbl = new label {rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]};
           PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{_}];rifi[q1*:{}]} out = null;
           PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]} outinit = null;
           PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{}]} out2 = null;
-          Runtime[p]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]} tryruntime;
-          Runtime[p]{rifi[q1*:{}]} runtime;
+          Runtime[p,lbl]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]} tryruntime;
           try {
-              tryruntime = Runtime[p].getRuntime();
+              tryruntime = Runtime[p,lbl].getRuntime();
           }
           catch (SecurityException e) {
               throw new Error("channel is null 1 !");

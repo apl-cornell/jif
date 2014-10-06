@@ -28,7 +28,7 @@ public class Runtime {
      */
     private Principal dynp;
 
-    private Runtime(Principal p) {
+    private Runtime(Principal p, Label lbl) {
         this.dynp = p;
     }
 
@@ -36,14 +36,14 @@ public class Runtime {
      * Gets a <code>Runtime</code> object parameterized with the
      * principal <code>p</code>.
      */
-    public static Runtime getRuntime(Principal p) throws SecurityException {
+    public static Runtime getRuntime(Principal p, Label lbl) throws SecurityException {
         //check if the current user can act for p
         Principal user = user(p);
         if (!PrincipalUtil.actsFor(user, p)) {
             throw new SecurityException("The current user does not act for "
                     + p.name() + ".");
         }
-        return new Runtime(p);
+        return new Runtime(p,lbl);
     }
 
     /** Get the current user  */
