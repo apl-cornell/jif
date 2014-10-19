@@ -1,52 +1,48 @@
-import java.util.List;
-
 
 public class Event {
 
 	private static int counter=0;
 	private int id;
-	private Date date;
-	private TimeOfDay time;
-	private int duration;
+	private Slot slot;
 	private String description;
 	private String creator;
 	private boolean autoRejectOnConflict;
-	private List<String> sharedBetween;
+	private rifList<String> sharedBetween;
+	private boolean pubSlot;
 
 	public Event(Date date, TimeOfDay time, int duration, String description, String creator) {
 		this.counter++;
 		this.id=this.counter;
-		this.date = date;
-		this.time=time;
-		this.duration=duration;
+		this.slot = new Slot(date,time,duration);
 		this.description = description;
 		this.creator = creator;
 		this.autoRejectOnConflict=false;
 		this.sharedBetween=null;
+		this.pubSlot=false;
 	}
 
 	public Date getDate() {
-		return date;
+		return this.slot.getDate();
 	}
 
 	public void setDate(Date date) {
-		this.date = date;
+		this.slot.setDate(date);
 	}
 
 	public TimeOfDay getTime() {
-		return time;
+		return this.slot.getTime();
 	}
 
 	public void setTime(TimeOfDay time) {
-		this.time = time;
+		this.slot.setTime(time);
 	}
 
 	public int getDuration() {
-		return duration;
+		return this.slot.getDuration();
 	}
 
 	public void setDuration(int duration) {
-		this.duration = duration;
+		this.slot.setDuration(duration);
 	}
 
 	public String getDescription() {
@@ -73,18 +69,26 @@ public class Event {
 		return this.autoRejectOnConflict;
 	}
 
-	public List<String> getSharedBetween() {
+	public rifList<String> getSharedBetween() {
 		return sharedBetween;
 	}
 
-	public void setSharedBetween(List<String> sharedBetween) {
+	public void setSharedBetween(rifList<String> sharedBetween) {
 		this.sharedBetween = sharedBetween;
+	}
+
+	public void setPubSlot(boolean b){
+		this.pubSlot=b;
+	}
+
+	public boolean getPubSlot(){
+		return this.pubSlot;
 	}
 
 	@Override
 	public String toString() {
-		return "Event("+ id +") [date=" + date + ", time=" + time + ", duration="
-				+ duration + "mins, description=" + description + ", creator="
+		return "Event("+ id +") [date=" + this.slot.getDate() + ", time=" + this.slot.getTime() + ", duration="
+				+ this.slot.getDuration() + "mins, description=" + description + ", creator="
 				+ creator + "]";
 	}
 

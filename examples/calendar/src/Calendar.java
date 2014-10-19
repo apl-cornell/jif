@@ -1,30 +1,28 @@
-import java.util.LinkedList;
-import java.util.List;
 
 
 public class Calendar {
 
 	private final String owner; //this should be substituted by a class parameter of type principal
-	private List<Event> eventList;
-	private List<Event> requestEvents;
-	private List<Event> pendingEvents;
-	private List<Event> canceledEvents;
-	private List<Event> deletedEvents;
+	private rifList<Event> eventList;
+	private rifList<Event> requestEvents;
+	private rifList<Event> pendingEvents;
+	private rifList<Event> canceledEvents;
+	/*	private rifList<Event> deletedEvents;*/
 
 	public Calendar(String owner) {
 		this.owner = owner;
-		this.eventList = new LinkedList<Event>();
-		this.requestEvents = new LinkedList<Event>();
-		this.pendingEvents = new LinkedList<Event>();
-		this.canceledEvents = new LinkedList<Event>();
-		this.deletedEvents = new LinkedList<Event>();
+		this.eventList = new rifList<Event>();
+		this.requestEvents = new rifList<Event>();
+		this.pendingEvents = new rifList<Event>();
+		this.canceledEvents = new rifList<Event>();
+		/*this.deletedEvents = new rifList<Event>();*/	
 	}
 
 	public String getOwner() {
 		return owner;
 	}
 
-	public List<Event> getEventList() {
+	public rifList<Event> getEventList() {
 		return eventList;
 	}
 
@@ -40,16 +38,28 @@ public class Calendar {
 		this.pendingEvents.add(e);
 	}
 
-	public void deleteEvent(int id){
-		for (Event e : this.eventList) {
-			if (e.getId()==id) this.eventList.remove(e);
+	/*	public void deleteEvent(int id){
+		int size=this.eventList.getSize();
+		int i;
+		Node<Event> n = this.eventList.getHead();
+		for(i=0;i<size;i++){
+			if (n.getData().getId()==id){
+				this.eventList.remove(n.getData());
+				this.deletedEvents.add(n.getData());
+				break;
+			}
+			n=n.getNext();
 		}
-	}
+	}*/
 
 	public String acceptPendingEvent(int id){
+		int size=this.pendingEvents.getSize();
+		int i;
+		Node<Event> n = this.pendingEvents.getHead();
 		Event se=null;
-		for (Event e : this.pendingEvents) {
-			if (e.getId()==id) se=e;
+		for (i=0;i<size;i++) {
+			if (n.getData().getId()==id) se=n.getData();
+			n=n.getNext();
 		}
 		this.pendingEvents.remove(se);
 		this.eventList.add(se);
@@ -57,16 +67,24 @@ public class Calendar {
 	}
 
 	public void requestedEventAccepted(int id){
+		int size=this.requestEvents.getSize();
+		int i;
+		Node<Event> n = this.requestEvents.getHead();
 		Event se=null;
-		for (Event e : this.requestEvents) {
-			if (e.getId()==id) se=e;
+		for (i=0;i<size;i++) {
+			if (n.getData().getId()==id) se=n.getData();
+			n=n.getNext();
 		}
 		this.requestEvents.remove(se);
 		this.eventList.add(se);
 	}
 
 	public boolean rejectOnConflict(Event ereq){
-		for (Event e : this.eventList) {
+		int size=this.eventList.getSize();
+		int i;
+		Node<Event> n = this.eventList.getHead();
+		for (i=0;i<size;i++) {
+			Event e=n.getData();
 			int reqStart = ereq.getTime().getHour()*60+ereq.getTime().getMinute();
 			int eStart = e.getTime().getHour()*60+e.getTime().getMinute();
 			int eFinish = eStart+ e.getDuration();
@@ -76,22 +94,78 @@ public class Calendar {
 					eStart<=reqStart && reqStart<=eFinish){
 				return true;
 			}
+			n=n.getNext();
 		}
 		return false;
 	}
 
-	public List<String> cancelEvent(int id){
-		for (Event e : this.eventList) {
+	public rifList<String> cancelEvent(int id){
+		int size=this.eventList.getSize();
+		int i;
+		Node<Event> n = this.eventList.getHead();
+		for (i=0;i<size;i++) {
+			Event e=n.getData();
 			if (e.getId()==id){
 				this.eventList.remove(e);
-				this.canceledEvents.add(e);
+				this.canceledEvents.add(new Event(e.getDate(), e.getTime(), e.getDuration(), e.getDescription(), e.getCreator()));
 				return e.getSharedBetween();
 			}
+			n=n.getNext();
 		}
 		return null;
 	}
 
-	public void deletePastSharedEvents(String user, Date d1){
+	//applied only to events created and owned by just this user!
+	public void publicizeSlot(int id){
+		int size=this.eventList.getSize();
+		int i;
+		Node<Event> n = this.eventList.getHead();
+		for (i=0;i<size;i++) {
+			Event e=n.getData();
+			if (e.getId()==id){
+				Event newe = new Event(e.getDate(), e.getTime(), e.getDuration(), e.getDescription(), e.getCreator());
+				newe.setPubSlot(true);
+				this.eventList.remove(e);
+				this.eventList.add(newe);
+			}
+			n=n.getNext();
+		}
+	}
+
+	//applied only to events created and owned by just this user!
+	public void hideSlot(int id){
+		int size=this.eventList.getSize();
+		int i;
+		Node<Event> n = this.eventList.getHead();
+		for (i=0;i<size;i++) {
+			Event e=n.getData();
+			if (e.getId()==id){
+				Event newe = new Event(e.getDate(), e.getTime(), e.getDuration(), e.getDescription(), e.getCreator());
+				newe.setPubSlot(false);
+				this.eventList.remove(e);
+				this.eventList.add(newe);
+			}
+			n=n.getNext();
+		}
+	}
+
+	public rifList<Event> takePubView(){
+		int size=this.eventList.getSize();
+		int i;
+		Node<Event> n = this.eventList.getHead();
+		rifList<Event> l = new rifList<Event>();
+		for (i=0;i<size;i++) {
+			Event e=n.getData();
+			if (e.getPubSlot()){
+				Event newe = new Event(e.getDate(), e.getTime(), e.getDuration(), null, null);
+				l.add(newe);
+			}
+			n=n.getNext();
+		}
+		return l;
+	}
+
+	/*	public void deletePastSharedEvents(String user, Date d1){
 		List<Event> l = new LinkedList<Event>();
 		for (Event e : this.eventList) {
 			if (e.getSharedBetween()!= null && e.getSharedBetween().contains(user)){
@@ -106,17 +180,30 @@ public class Calendar {
 		}
 		this.eventList.removeAll(l);
 		this.deletedEvents.addAll(l);
-	}
+	}*/
 
+	/*	public void removeParticipantFromSharedEvent(String user2, int id){
+		for (Event e : this.eventList) {
+			if (e.getId()==id){
+				e.getSharedBetween().remove(user2);
+				break;
+			}
+		}
+	}*/
 
 	@Override
 	public String toString() {
+		int size=this.eventList.getSize();
+		int i;
+		Node<Event> n = this.eventList.getHead();
 		String output=null;
-		for (Event e : this.eventList) {
+		for (i=0;i<size;i++) {
+			Event e=n.getData();
 			if (output==null) output=e.toString()+ "\n";
 			else{
 				output = output + e.toString() + "\n";
 			}
+			n=n.getNext();
 		}
 		return output;
 	}
