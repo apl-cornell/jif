@@ -1,0 +1,136 @@
+public class Server {
+
+	private rifList calList;
+
+	public Server() {
+		this.calList = new rifList();
+	}
+
+	public Calendar createCalendar(String owner){
+		Calendar cal = new Calendar(owner);
+		rifList cl = this.calList;
+		if (cl == null) return null;
+		cl.add(cal);
+ 		return cal;
+	}
+
+	public void addEvent(Calendar cal, Event e){
+		if (cal != null) cal.addEvent(e);
+	}
+
+	public void printCalendar(Calendar cal){
+		//System.out.println(cal.toString());
+	}
+
+	//used for confidentiality downgrade
+	public boolean requestSharedEvent(Calendar cal1, Calendar cal2, Event e){
+		if (cal1 == null || cal2==null) return false;
+		if (cal2.rejectOnConflict(e)) return false;
+		cal1.addRequestEvent(e);
+		cal2.addPendingEvent(e);
+		return true;
+	}
+
+	//used for integrity downgrade
+	public void acceptSharedEvent(Calendar cal2, Event e){
+		if (cal2 == null) return;
+		rifList cl = this.calList;
+		if (cl == null) return;
+		Calendar cal1=null;
+		String user1=null;
+		user1 = cal2.acceptPendingEvent(e);
+		Node n = cl.getHead();
+		int i;
+		int size= cl.getSize();
+		for (i=0;i<size;i++) {
+			if (n==null) return;
+			try{
+			Calendar c= (Calendar) n.getData();
+			if (c == null) return;
+			String user2 = c.getOwner();
+			if (user2!=null && user2.equals(user1)) cal1=c;
+			n=n.getNext();
+			} 
+			catch (ClassCastException impossible) { }
+		}
+		if (cal1 != null) cal1.requestedEventAccepted(e);
+	}
+
+	//used for integrity upgrade
+	public void cancelEvent(Calendar cal, Event e){
+		if (cal == null) return;
+		String user1 = cal.getOwner();
+		rifList l = cal.cancelEvent(e);
+		rifList cl = this.calList;
+		if (cl==null) return;
+		int size=cl.getSize();
+		int i;
+		Calendar cal2=null;
+		if (l != null){
+			int lsize=l.getSize();
+			int li;
+			Node ln = l.getHead();
+			for (li=0;li<lsize;li++) {
+				if (ln == null) return;
+				try{
+				String s= (String) ln.getData();
+				if (s != null && !s.equals(user1)){
+					Node n = cl.getHead();
+					for (i=0;i<size;i++) {
+						if (n == null) return;
+						try{
+						Calendar c= (Calendar) n.getData();
+						if (c==null) return;
+						String user2 = c.getOwner();
+						if (user2 != null && user2.equals(s)) cal2=c;
+						n=n.getNext();
+						}catch (ClassCastException impossible) { }
+					}
+					if (cal2 != null) cal2.cancelEvent(e);
+				}
+				ln=ln.getNext();
+				}catch (ClassCastException impossible) { }
+			}
+		}
+
+	}
+
+	//used for confidentiality downgrade
+	public void publicizeSlot(Calendar cal, Event e){
+		if (cal != null) cal.publicizeSlot(e);
+	}
+
+	//used for confidentiality upgrade
+	public void hideSlot(Calendar cal, Event e){
+		if (cal != null) cal.hideSlot(e);
+	}
+
+	public rifList takePubView(Calendar cal){
+		if (cal != null) return cal.takePubView();
+		else return null;
+	}
+
+	public void printListOfEvents(rifList el){
+		if (el == null) return;
+		Node n = el.getHead();
+		int i=0;
+		String output = "[";
+		while (i<el.getSize()) {
+			if (n == null) return;
+			try{
+			Event e = (Event) n.getData();
+			if (e == null) return;
+			output += e.toString();
+			n = n.getNext();
+			i++;
+			if (i<el.getSize()){
+				output += ",";
+			}
+			}catch (ClassCastException impossible) { }
+		}
+		output += "]";
+		//System.out.println(output);
+	}
+
+}
+

@@ -1,0 +1,57 @@
+public class rifList {
+
+	private Node head;
+	private Node last;
+	private int size;
+
+	public rifList() {
+		this.head = new Node(null);
+		this.last = this.head;
+		this.size = 0;
+	}
+
+	public void add(Object data){
+		Node lst = this.last;
+		if (lst == null) return;
+		lst.setData(data);
+		size++;
+		Node n = new Node(null);
+		lst.setNext(n);
+		this.last=n;		
+	}
+
+	public void remove(Object data){
+		Node n = this.head;
+		if (n == null) return;
+		int i=0;
+		if (this.size==0) return;
+		if (n.getData()==data){
+			this.head=n.getNext();
+			n.setNext(null);
+			this.size--;
+			return;
+		}
+		while (i<this.size-1){
+			if (n == null) return;
+			Node nxt = n.getNext();
+			if (nxt == null) return;
+			if (nxt.getData()==data){
+				n.setNext(nxt.getNext());
+				nxt.setNext(null);
+				this.size--;
+				return;
+			}
+			n=n.getNext();
+			i++;
+		}
+	}
+
+	public int getSize(){
+		return this.size;
+	}
+
+	public Node getHead(){
+		return this.head;
+	}
+
+}

@@ -1,0 +1,170 @@
+public class Calendar {
+
+	private final String owner; //this should be substituted by a class parameter of type principal
+	private rifList eventList;
+	private rifList requestEvents;
+	private rifList pendingEvents;
+	private rifList canceledEvents;
+
+	public Calendar(String owner) {
+		this.owner = owner;
+		this.eventList = new rifList();
+		this.requestEvents = new rifList();
+		this.pendingEvents = new rifList();
+		this.canceledEvents = new rifList();
+	}
+
+	public String getOwner() {
+		return this.owner;
+	}
+
+	public rifList getEventList() {
+		return this.eventList;
+	}
+
+	public void addEvent(Event e){
+		rifList l = this.eventList;
+        if (l != null) l.add(e);
+	}
+
+	public void addRequestEvent(Event e){
+		rifList l = this.requestEvents;
+		if (l != null) l.add(e);
+	}
+
+	public void addPendingEvent(Event e){
+		rifList l = this.pendingEvents;
+		if (l != null) l.add(e);
+	}
+
+	public String acceptPendingEvent(Event se){
+  		rifList pe = this.pendingEvents;
+		rifList el = this.eventList;
+		if (se != null && pe != null && el !=null){
+			pe.remove(se);
+			el.add(se);
+			return se.getCreator();
+		}else return null;
+	}
+
+	public void requestedEventAccepted(Event se){
+		rifList re = this.requestEvents;
+		rifList el = this.eventList;
+		if (re != null && el !=null){
+			re.remove(se);
+			el.add(se);
+		}
+	}
+
+	public boolean rejectOnConflict(Event ereq){
+		rifList el = this.eventList;
+		if (el == null) return false;
+		int size=el.getSize();
+		Node n = el.getHead();
+		int i;
+		for (i=0;i<size;i++) {
+			try{
+			if (n == null) return false;
+			Event e = (Event) n.getData();
+			if (ereq == null) return false;
+			TimeOfDay ereqT = ereq.getTime();
+			Date ereqDt = ereq.getDate();
+			if (e == null) return false;
+			TimeOfDay eT = e.getTime();
+			Date eDt = e.getDate();
+            if (ereq != null && ereqT != null && e!=null && eT!=null && eDt != null && ereqDt != null){
+				int reqStart = ereqT.getHour()*60+ereqT.getMinute();
+				int eStart = eT.getHour()*60+eT.getMinute();
+				int eFinish = eStart+ e.getDuration();
+				if (e.getAutoReject() && eDt.getYear()==ereqDt.getYear() && 
+					eDt.getMonth()==ereqDt.getMonth() &&
+					eDt.getDay()==ereqDt.getDay() && 
+					eStart<=reqStart && reqStart<=eFinish){
+					return true;
+				}
+			}
+			n=n.getNext();
+			}
+			catch (ClassCastException impossible) { }
+		}
+		return false;
+	}
+
+	public rifList cancelEvent(Event e){
+		rifList el = this.eventList;
+		rifList ce = this.canceledEvents;
+		if (el != null && ce != null && e != null){
+			el.remove(e);
+			ce.add(new Event(e.getDate(), e.getTime(), e.getDuration(), e.getDescription(), e.getCreator()));
+			return e.getSharedBetween();
+		}
+		return null;
+	}
+
+	//applied only to events created and owned by just this user!
+	public void publicizeSlot(Event e){
+		rifList el = this.eventList;
+		if (el != null && e != null){
+			Event newe = new Event(e.getDate(), e.getTime(), e.getDuration(), e.getDescription(), e.getCreator());
+			newe.setPubSlot(true);
+			el.remove(e);
+			el.add(newe);
+		}
+	}
+
+	//applied only to events created and owned by just this user!
+	public void hideSlot(Event e){
+		rifList el = this.eventList;
+		if (el != null && e != null){
+			Event newe = new Event(e.getDate(), e.getTime(), e.getDuration(), e.getDescription(), e.getCreator());
+			newe.setPubSlot(false);
+			el.remove(e);
+			el.add(newe);
+		}
+	}
+
+	public rifList takePubView(){
+		rifList el = this.eventList;
+		if (el == null) return null;
+		int size=el.getSize();
+		Node n = el.getHead();
+		rifList l = new rifList();
+		int i;
+		for (i=0;i<size;i++) {
+			if (n == null) return null;
+			try{
+			Event e = (Event) n.getData();
+			if (e != null && e.getPubSlot()){
+				Event newe = new Event(e.getDate(), e.getTime(), e.getDuration(), null, null);
+				l.add(newe);
+			}
+			n=n.getNext();
+			}catch (ClassCastException impossible) { }
+		}
+		return l;
+	}
+
+	public String toString() {
+		rifList el = this.eventList;
+		if (el == null) return null;
+		int size=el.getSize();
+		int i;
+		Node n = el.getHead();
+		String output=null;
+		for (i=0;i<size;i++) {
+			if (n == null) return null;
+			try{
+			Event e = (Event) n.getData();
+			if (e == null) return null;
+			if (output==null) output=e.toString()+ "\n";
+			else{
+				output = output + e.toString() + "\n";
+			}
+			n=n.getNext();
+			}catch (ClassCastException impossible) { }
+		}
+		return output;
+	}
+
+}
+

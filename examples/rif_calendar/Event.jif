@@ -1,0 +1,108 @@
+public class Event {
+
+	private static int counter=0;
+	private int id;
+	private Slot slot;
+	private String description;
+	private String creator;
+	private boolean autoRejectOnConflict;
+	private rifList sharedBetween;
+	private boolean pubSlot;
+
+	public Event(Date date, TimeOfDay time, int duration, String description, String creator) {
+		this.counter++;
+		this.id=this.counter;
+		this.slot = new Slot(date,time,duration);
+		this.description = description;
+		this.creator = creator;
+		this.autoRejectOnConflict=false;
+		this.sharedBetween=null;
+		this.pubSlot=false;
+	}
+
+	public Date getDate() {
+		Slot s = this.slot;
+		if (s != null) return s.getDate();
+		else return null;
+	}
+
+	public void setDate(Date date) {
+		Slot s = this.slot;
+		if (s != null) s.setDate(date);
+	}
+
+	public TimeOfDay getTime() {
+		Slot s = this.slot;
+		if (s != null) return s.getTime();
+		else return null;
+	}
+
+	public void setTime(TimeOfDay time) {
+		Slot s = this.slot;
+		if (s != null) s.setTime(time);
+	}
+
+	public int getDuration() {
+		Slot s = this.slot;
+		if (s != null) return s.getDuration();
+		else return 0;
+	}
+
+	public void setDuration(int duration) {
+		Slot s = this.slot;
+		if (s != null) s.setDuration(duration);
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getCreator() {
+		return creator;
+	}
+
+	public int getId(){
+		return this.id;
+	}
+
+	public void setAutoReject(boolean b){
+		this.autoRejectOnConflict=b;
+	}
+
+	public boolean getAutoReject(){
+		return this.autoRejectOnConflict;
+	}
+
+	public rifList getSharedBetween() {
+		return sharedBetween;
+	}
+
+	public void setSharedBetween(rifList sharedBetween) {
+		this.sharedBetween = sharedBetween;
+	}
+
+	public void setPubSlot(boolean b){
+		this.pubSlot=b;
+	}
+
+	public boolean getPubSlot(){
+		return this.pubSlot;
+	}
+
+	public String toString() {
+		Slot s = this.slot;
+		if (s==null) return null;
+		Date dt = s.getDate();
+		TimeOfDay t = s.getTime();
+		if (dt ==null || t==null) return null;
+		return "Event("+ id +") [date=" + dt.toString() + ", time=" + t.toString() + ", duration="
+				+ s.getDuration() + "mins, description=" + description + ", creator="
+				+ creator + "]";
+	}
+
+}
+
