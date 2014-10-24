@@ -1,18 +1,15 @@
-public class Event {
+public class Event[label Ls, label Ld] {
 
-	private static int counter=0;
-	private int id;
-	private Slot slot;
-	private String description;
-	private String creator;
-	private boolean autoRejectOnConflict;
-	private rifList sharedBetween;
-	private boolean pubSlot;
+	private Slot[Ls]{Ls} slot;
+	private String{Ld} description;
+	private String{Ld} creator;
+	private boolean{Ls} autoRejectOnConflict;
+	private rifList[Ld]{Ld} sharedBetween; //the label of this may ned to change due to the cancel operator
+	private boolean{Ls} pubSlot;
+	private final label{this} ls = Ls;
 
-	public Event(Date date, TimeOfDay time, int duration, String description, String creator) {
-		this.counter++;
-		this.id=this.counter;
-		this.slot = new Slot(date,time,duration);
+	public Event(Date[Ls]{Ls} date, TimeOfDay[Ls]{Ls} time, int{Ls} duration, String{Ld} description, String{Ld} creator) {
+		this.slot = new Slot[Ls](date,time,duration);
 		this.description = description;
 		this.creator = creator;
 		this.autoRejectOnConflict=false;
@@ -20,86 +17,82 @@ public class Event {
 		this.pubSlot=false;
 	}
 
-	public Date getDate() {
-		Slot s = this.slot;
+	public Date[Ls]{Ls} getDate() {
+		Slot[Ls]{Ls} s = this.slot;
 		if (s != null) return s.getDate();
 		else return null;
 	}
 
-	public void setDate(Date date) {
-		Slot s = this.slot;
+	public void setDate{Ls}(Date[Ls]{Ls} date) {
+		Slot[Ls]{Ls}  s = this.slot;
 		if (s != null) s.setDate(date);
 	}
 
-	public TimeOfDay getTime() {
+	public TimeOfDay[Ls]{Ls} getTime() {
 		Slot s = this.slot;
 		if (s != null) return s.getTime();
 		else return null;
 	}
 
-	public void setTime(TimeOfDay time) {
-		Slot s = this.slot;
+	public void setTime{Ls}(TimeOfDay[Ls]{Ls} time) {
+		Slot[Ls]{Ls} s = this.slot;
 		if (s != null) s.setTime(time);
 	}
 
-	public int getDuration() {
-		Slot s = this.slot;
+	public int{Ls} getDuration() {
+		Slot[Ls]{Ls} s = this.slot;
 		if (s != null) return s.getDuration();
 		else return 0;
 	}
 
-	public void setDuration(int duration) {
-		Slot s = this.slot;
+	public void setDuration{Ls}(int{Ls} duration) {
+		Slot[Ls]{Ls} s = this.slot;
 		if (s != null) s.setDuration(duration);
 	}
 
-	public String getDescription() {
+	public String{Ld} getDescription() {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription{Ld}(String{Ld} description) {
 		this.description = description;
 	}
 
-	public String getCreator() {
+	public String{Ld} getCreator() {
 		return creator;
 	}
 
-	public int getId(){
-		return this.id;
-	}
-
-	public void setAutoReject(boolean b){
+	public void setAutoReject{Ls}(boolean{Ls} b){
 		this.autoRejectOnConflict=b;
 	}
 
-	public boolean getAutoReject(){
+	public boolean{Ls} getAutoReject(){
 		return this.autoRejectOnConflict;
 	}
 
-	public rifList getSharedBetween() {
+	public rifList[Ld]{Ld} getSharedBetween() {
 		return sharedBetween;
 	}
 
-	public void setSharedBetween(rifList sharedBetween) {
+	public void setSharedBetween{Ld}(rifList[Ld]{Ld} sharedBetween) {
 		this.sharedBetween = sharedBetween;
 	}
 
-	public void setPubSlot(boolean b){
+	public void setPubSlot{Ls}(boolean{Ls} b){
 		this.pubSlot=b;
 	}
 
-	public boolean getPubSlot(){
+	public boolean{Ls} getPubSlot(){
 		return this.pubSlot;
 	}
 
-	public String toString() {
+	public String{Ls;Ld} toString() {
 		Slot s = this.slot;
 		if (s==null) return null;
 		Date dt = s.getDate();
 		TimeOfDay t = s.getTime();
 		if (dt ==null || t==null) return null;
-		return "Event("+ id +") [date=" + dt.toString() + ", time=" + t.toString() + ", duration="
+		return "Event [date=" + dt.toString() + ", time=" + t.toString() + ", duration="
 				+ s.getDuration() + "mins, description=" + description + ", creator="
 				+ creator + "]";
 	}

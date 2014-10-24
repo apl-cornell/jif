@@ -1,56 +1,61 @@
 public class Main {
 
-	final public static void main(final String[] args) {
+	final public static void main{rif[q0*:{_}];rifi[q1*:{}]}
+                     (principal{rifi[q1*:{}]} p, String args[]) : {rifi[q1*:{}]}
+    {
 
 		//for the api's we use id's instead of events because it is
 		//also a way to make sure that events are found/transfered to correct lists.
 
 		//System.out.println("Welcome to rif-Calendar!");
 
-		Server srv = new Server();
+//		Server srv = new Server();
 
-		Calendar calA = srv.createCalendar("Alice");
-		Calendar calB = srv.createCalendar("Bob");
+//		Calendar calA = srv.createCalendar("Alice");
+//		Calendar calB = srv.createCalendar("Bob");
 
-		Event e = new Event(new Date(23, 8, 2014), new TimeOfDay(10, 30), 30, "Meeting with Chris", "Alice");
-		srv.addEvent(calA, e);
-		srv.publicizeSlot(calA, e);
-		e = new Event(new Date(16, 9, 2014), new TimeOfDay(16, 15), 60, "Doctor appointment", "Alice");
-		e.setAutoReject(true);
-		srv.addEvent(calA, e);
-		srv.publicizeSlot(calA, e);
-		e = new Event(new Date(5, 10, 2014), new TimeOfDay(9, 30), 15, "Meeting with Chris", "Alice");
-		srv.addEvent(calA, e);
+  		final label ls = new label {rif[q1*:{Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3];rifi[q1*:{Alice},q2:{},q3:{_},f7:q1->q2,f8:q2->q3]};
+		final label ld = new label {rif[q1*:{Alice}];rifi[q1*:{Alice},q2:{},q3:{Alice},f7:q1->q2,f8:q2->q3]};
 
-		e = new Event(new Date(15, 10, 2014), new TimeOfDay(14, 30), 30, "Go to barbershop", "Bob");
-		srv.addEvent(calB, e);
-		e = new Event(new Date(18, 10, 2014), new TimeOfDay(15, 45), 15, "Buy present for John", "Bob");
-		srv.addEvent(calB, e);
+		Event[ls,ld]{ls} e = new Event[ls,ld](new Date[ls](23, 8, 2014), new TimeOfDay[ls](10, 30), 30, "Meeting with Chris", "Alice");
+//		srv.addEvent(calA, e);
+//		srv.publicizeSlot(calA, e);
+//		e = new Event(new Date(16, 9, 2014), new TimeOfDay(16, 15), 60, "Doctor appointment", "Alice");
+//		e.setAutoReject(true);
+//		srv.addEvent(calA, e);
+//		srv.publicizeSlot(calA, e);
+//		e = new Event(new Date(5, 10, 2014), new TimeOfDay(9, 30), 15, "Meeting with Chris", "Alice");
+//		srv.addEvent(calA, e);
+
+//		e = new Event(new Date(15, 10, 2014), new TimeOfDay(14, 30), 30, "Go to barbershop", "Bob");
+//		srv.addEvent(calB, e);
+//		e = new Event(new Date(18, 10, 2014), new TimeOfDay(15, 45), 15, "Buy present for John", "Bob");
+//		srv.addEvent(calB, e);
 
 		//System.out.println("Calendar of Alice");
 		//srv.printCalendar("Alice");
 		//System.out.println("Calendar of Bob");
 		//srv.printCalendar("Bob");
 
-		e = new Event(new Date(10, 11, 2014), new TimeOfDay(18, 10), 60, "Visit parents", "Bob");
-		boolean b = srv.requestSharedEvent(calB, calA, e);
-		if (b) srv.acceptSharedEvent(calA, e);
+//		e = new Event(new Date(10, 11, 2014), new TimeOfDay(18, 10), 60, "Visit parents", "Bob");
+//		boolean b = srv.requestSharedEvent(calB, calA, e);
+//		if (b) srv.acceptSharedEvent(calA, e);
 		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
-		Event e1=e;
+//		Event e1=e;
 
-		e = new Event(new Date(16, 9, 2014), new TimeOfDay(16, 45), 20, "Visit aunts", "Bob");
-		b = srv.requestSharedEvent(calB, calA, e);
-		if (b) srv.acceptSharedEvent(calA, e);
-		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
-
-		e = new Event(new Date(20, 2, 2010), new TimeOfDay(8, 15), 120, "Go for cinema", "Bob");
-		b = srv.requestSharedEvent(calB, calA, e);
-		if (b) srv.acceptSharedEvent(calA, e);
+//		e = new Event(new Date(16, 9, 2014), new TimeOfDay(16, 45), 20, "Visit aunts", "Bob");
+//		b = srv.requestSharedEvent(calB, calA, e);
+//		if (b) srv.acceptSharedEvent(calA, e);
 		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
 
-		Event e2 = new Event(new Date(30, 1, 2015), new TimeOfDay(21, 30), 120, "Go to concert", "Bob");
-		b = srv.requestSharedEvent(calB, calA, e2);
-		if (b) srv.acceptSharedEvent(calA, e2);
+//		e = new Event(new Date(20, 2, 2010), new TimeOfDay(8, 15), 120, "Go for cinema", "Bob");
+//		b = srv.requestSharedEvent(calB, calA, e);
+//		if (b) srv.acceptSharedEvent(calA, e);
+		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
+
+//		Event e2 = new Event(new Date(30, 1, 2015), new TimeOfDay(21, 30), 120, "Go to concert", "Bob");
+//		b = srv.requestSharedEvent(calB, calA, e2);
+//		if (b) srv.acceptSharedEvent(calA, e2);
 		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
 
 		//System.out.println("Calendar of Alice");
@@ -59,7 +64,7 @@ public class Main {
 		//srv.printCalendar("Bob");
 
 		//System.out.println("Canceling of "+e1.toString()+"\n");
-		srv.cancelEvent(calA, e1);
+//		srv.cancelEvent(calA, e1);
 
 		//System.out.println("Calendar of Alice");
 		//srv.printCalendar("Alice");
@@ -67,7 +72,7 @@ public class Main {
 		//srv.printCalendar("Bob");
 
 		//System.out.println("Public view of Alice");
-		rifList l = srv.takePubView(calA);
+//		rifList l = srv.takePubView(calA);
 		//srv.printListOfEvents(l);
 
 	}

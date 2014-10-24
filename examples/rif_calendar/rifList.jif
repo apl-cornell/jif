@@ -1,8 +1,8 @@
-public class rifList {
+public class rifList[label L] {
 
-	private Node head;
-	private Node last;
-	private int size;
+	private Node[L]{L} head;
+	private Node[L]{L} last;
+	private int{L} size;
 
 	public rifList() {
 		this.head = new Node(null);
@@ -10,17 +10,17 @@ public class rifList {
 		this.size = 0;
 	}
 
-	public void add(Object data){
+	public void add{L}(Object{La} data, label La){
 		Node lst = this.last;
 		if (lst == null) return;
 		lst.setData(data);
-		size++;
+		this.size++;
 		Node n = new Node(null);
 		lst.setNext(n);
 		this.last=n;		
 	}
 
-	public void remove(Object data){
+	public void remove{L}(Object{L} data){
 		Node n = this.head;
 		if (n == null) return;
 		int i=0;
@@ -46,11 +46,11 @@ public class rifList {
 		}
 	}
 
-	public int getSize(){
+	public int{L} getSize(){
 		return this.size;
 	}
 
-	public Node getHead(){
+	public Node[L]{L} getHead(){
 		return this.head;
 	}
 

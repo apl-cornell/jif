@@ -1,40 +1,40 @@
-public class Date {
+public class Date[label L] {
 
-	private int day;
-	private int month;
-	private int year;
+	private int{L} day;
+	private int{L} month;
+	private int{L} year;
 
-	public Date(int d, int m, int y) {
+	public Date(int{L} d, int{L} m, int{L} y) {
 		this.day=d;
 		this.month=m;
 		this.year=y;
 	}
 
-	int getDay(){
+	int{L} getDay(){
 		return this.day;
 	}
 
-	int getMonth(){
+	int{L} getMonth(){
 		return this.month;
 	}
 
-	int getYear(){
+	int{L} getYear(){
 		return this.year;
 	}
 
-	public void setDay(int day) {
+	public void setDay{L}(int{L} day) {
 		this.day = day;
 	}
 
-	public void setMonth(int month) {
+	public void setMonth{L}(int{L} month) {
 		this.month = month;
 	}
 
-	public void setYear(int year) {
+	public void setYear{L}(int{L} year) {
 		this.year = year;
 	}
 
-	public String toString() {
+	public String{L} toString() {
 		return day + "-" + month + "-" + year;
 	}
 

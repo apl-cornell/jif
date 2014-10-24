@@ -1,30 +1,30 @@
-public class TimeOfDay {
+public class TimeOfDay[label L] {
 
-	private int hour;
-	private int minute;
+	private int{L} hour;
+	private int{L} minute;
 
-	public TimeOfDay(int hour, int minute) {
+	public TimeOfDay(int{L} hour, int{L} minute) {
 		this.hour = hour;
 		this.minute = minute;
 	}
 
-	public int getHour() {
+	public int{L} getHour() {
 		return hour;
 	}
 
-	public void setHour(int hour) {
+	public void setHour{L}(int{L} hour) {
 		this.hour = hour;
 	}
 
-	public int getMinute() {
+	public int{L} getMinute() {
 		return minute;
 	}
 
-	public void setMinute(int minute) {
+	public void setMinute{L}(int{L} minute) {
 		this.minute = minute;
 	}
 
-	public String toString() {
+	public String{L} toString() {
 		return hour + ":" + minute;
 	}
 
