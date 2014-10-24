@@ -1,46 +1,59 @@
-public class Calendar[Principal O] {//policy for cal is {rif[q0*:{_}];rifi[q1*:{O},q2:{},f7:q1->q2]}
+public class Calendar[principal O, label Ln, label Ld] {//policy for cal is {rif[q0*:{_}];rifi[q1*:{O},q2:{},f7:q1->q2]}
 
-	private final Principal{rif[q0*:{_}];rifi[q1*:{O},q2:{},f7:q1->q2]} owner = O;
-	private rifList[rif[q0*:{_}];rifi[q1*:{}]]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{O},q2:{},f7:q1->q2]} eventList;
-	private rifList[rif[q0*:{_}];rifi[q1*:{}]]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{O},q2:{},f7:q1->q2]} requestEvents;
-	private rifList[rif[q0*:{_}];rifi[q1*:{}]]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{O},q2:{},f7:q1->q2]} pendingEvents;
-	private rifList[rif[q0*:{_}];rifi[q1*:{}]]{rif[q0*:{O}];rifi[q1*:{O}]} canceledEvents;
+	private final principal{rif[q0*:{_}];rifi[q1*:{O},q2:{},f7:q1->q2]} owner = O;
+	private rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{O},q2:{},f7:q1->q2]} eventList;
+	private rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{O},q2:{},f7:q1->q2]} requestEvents;
+	private rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{O},q2:{},f7:q1->q2]} pendingEvents;
+	private rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O}];rifi[q1*:{O}]} canceledEvents;
 
 	public Calendar() {
-		this.eventList = new rifList[rif[q0*:{_}];rifi[q1*:{}]]();
-		this.requestEvents = new rifList[rif[q0*:{_}];rifi[q1*:{}]]();
-		this.pendingEvents = new rifList[rif[q0*:{_}];rifi[q1*:{}]]();
-		this.canceledEvents = new rifList[rif[q0*:{_}];rifi[q1*:{}]]();
+		this.eventList = new rifList[{rif[q0*:{_}];rifi[q1*:{}]}]();
+		this.requestEvents = new rifList[{rif[q0*:{_}];rifi[q1*:{}]}]();
+		this.pendingEvents = new rifList[{rif[q0*:{_}];rifi[q1*:{}]}]();
+		this.canceledEvents = new rifList[{rif[q0*:{_}];rifi[q1*:{}]}]();
 	}
 
-/*	public String getOwner() {
+	public principal{rif[q0*:{_}];rifi[q1*:{O},q2:{},f7:q1->q2]} getOwner() {
 		return this.owner;
 	}
 
-	public rifList getEventList() {
+	public rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{O},q2:{},f7:q1->q2]} getEventList() {
 		return this.eventList;
 	}
 
-	public void addEvent(Event e){
-		rifList l = this.eventList;
-        if (l != null) l.add(e);
+	public void addEvent(Event[{*ls},Ld,Ln]{*ls} e, label{Ln} ls){
+		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{O},q2:{},f7:q1->q2]} l = this.eventList;
+		Node[Ln]{Ln} n;
+      //  if (reclassify(reclassify(l != null,f3),f7)){ // l will never be null, and so nothing is learned by this declassification
+		try{	n=l.add(e,ls);  //make this change to all methods!!!
+			e.setNode(n);}
+		catch (NullPointerException impossible) { }
+	//	}
 	}
 
-	public void addRequestEvent(Event e){
-		rifList l = this.requestEvents;
-		if (l != null) l.add(e);
+	public void addRequestEvent(Event[{*ls},Ld,Ln]{*ls} e, label{Ln} ls){
+		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{O},q2:{},f7:q1->q2]} l = this.requestEvents;
+		Node[Ln]{Ln} n;
+		if (reclassify(reclassify(l != null,f3),f7)){ 
+			n=l.add(e,ls);
+			e.setNode(n);
+		}
 	}
 
-	public void addPendingEvent(Event e){
-		rifList l = this.pendingEvents;
-		if (l != null) l.add(e);
+	public void addPendingEvent(Event[{*ls},Ld,Ln]{*ls} e, label{Ln} ls){
+		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{O},q2:{},f7:q1->q2]} l = this.pendingEvents;
+		Node[Ln]{Ln} n;
+		if (reclassify(reclassify(l != null,f3),f7)){ 
+			n=l.add(e,ls);
+			e.setNode(n);
+		}
 	}
 
-	public String acceptPendingEvent(Event se){
+/*	public String acceptPendingEvent(Event se){
   		rifList pe = this.pendingEvents;
 		rifList el = this.eventList;
 		if (se != null && pe != null && el !=null){
-			pe.remove(se);
+			pe.remove(se.getNode()); //make this change to all methods!!!
 			el.add(se);
 			return se.getCreator();
 		}else return null;

@@ -5,46 +5,102 @@ public class rifList[label L] {
 	private int{L} size;
 
 	public rifList() {
-		this.head = new Node(null);
+		this.head = null;
 		this.last = this.head;
 		this.size = 0;
 	}
 
-	public void add{L}(Object{La} data, label La){
+	public Node[L]{L} add{L}(Object{*La} data, label{L} La)
+		where L<=La
+	{
+		Node n = new Node[L](data,La);
 		Node lst = this.last;
-		if (lst == null) return;
-		lst.setData(data);
-		this.size++;
-		Node n = new Node(null);
+		if (lst == null){
+			this.head = n;
+			this.last = n;
+			this.size++;
+			return n;
+		}
 		lst.setNext(n);
-		this.last=n;		
+		this.last=n;
+		this.size++;
+		return n;
 	}
 
-	public void remove{L}(Object{L} data){
+	public void remove{L}(Node[L]{L} nr){
 		Node n = this.head;
 		if (n == null) return;
-		int i=0;
-		if (this.size==0) return;
-		if (n.getData()==data){
-			this.head=n.getNext();
+		if (this.size == 1 && n==nr){
+			this.head=null;
+			this.last = this.head;
+			this.size--;
+			return;
+		}
+		if (n==nr){
+			this.head = n.getNext();
 			n.setNext(null);
 			this.size--;
 			return;
 		}
-		while (i<this.size-1){
+		int i=0;
+		Node nb = n;
+		n = n.getNext();
+		while (i<this.size){
 			if (n == null) return;
-			Node nxt = n.getNext();
-			if (nxt == null) return;
-			if (nxt.getData()==data){
-				n.setNext(nxt.getNext());
-				nxt.setNext(null);
+			if (n==nr){
+				if (n == this.last){
+					this.last = nb;
+				}
+				nb.setNext(n.getNext());
+				n.setNext(null);
 				this.size--;
 				return;
 			}
+			nb = n;
 			n=n.getNext();
 			i++;
 		}
 	}
+
+
+/*
+	public void remove{L}(Object{*La} data, label{L} La){
+		Node n = this.head;
+		if (n == null) return;
+        label lbl = n.getLabel();
+		if (this.size == 1 && n.getData()==data){
+			this.head=null;
+			this.last = this.head;
+			this.size--;
+			return;
+		}
+		if (n.getData()==data){
+			this.head = n.getNext();
+			n.setNext(null);
+			this.size--;
+			return;
+		}
+		int i=0;
+		Node nb = n;
+		n = n.getNext();
+		while (i<this.size){
+			if (n == null) return;
+			if (n.getData()==data){
+				if (n == this.last){
+					this.last = nb;
+				}
+				nb.setNext(n.getNext());
+				n.setNext(null);
+				this.size--;
+				return;
+			}
+			nb = n;
+			n=n.getNext();
+			i++;
+		}
+	}
+
+*/
 
 	public int{L} getSize(){
 		return this.size;

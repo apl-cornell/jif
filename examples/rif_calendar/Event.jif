@@ -1,12 +1,13 @@
-public class Event[label Ls, label Ld] {
+public class Event[label Ls, label Ld, label Ln] {
 
 	private Slot[Ls]{Ls} slot;
 	private String{Ld} description;
 	private String{Ld} creator;
 	private boolean{Ls} autoRejectOnConflict;
-	private rifList[Ld]{Ld} sharedBetween; //the label of this may ned to change due to the cancel operator
+	private rifList[Ld]{Ld} sharedBetween; //the label of this may need to change due to the cancel operator
 	private boolean{Ls} pubSlot;
 	private final label{this} ls = Ls;
+	private Node[Ln]{Ln} node;
 
 	public Event(Date[Ls]{Ls} date, TimeOfDay[Ls]{Ls} time, int{Ls} duration, String{Ld} description, String{Ld} creator) {
 		this.slot = new Slot[Ls](date,time,duration);
@@ -15,6 +16,7 @@ public class Event[label Ls, label Ld] {
 		this.autoRejectOnConflict=false;
 		this.sharedBetween=null;
 		this.pubSlot=false;
+		this.node = null;
 	}
 
 	public Date[Ls]{Ls} getDate() {
@@ -84,6 +86,14 @@ public class Event[label Ls, label Ld] {
 
 	public boolean{Ls} getPubSlot(){
 		return this.pubSlot;
+	}
+
+	public void setNode{Ln}(Node[Ln]{Ln} n){
+		this.node=n;
+	}
+
+	public Node[Ln]{Ln} getNode(){
+		return this.node;
 	}
 
 	public String{Ls;Ld} toString() {

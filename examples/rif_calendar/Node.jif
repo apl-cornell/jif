@@ -1,18 +1,17 @@
-public class Node[label L, label La] {
-	Node[L]{L} next;
-	Object{La} data;
+public class Node[label L] {
+	
+	private final label{L} La;
+	private Node[L]{L} next;
+	private final Object{*La} data;
 
-	public Node(Object{La} data) {
+	public Node(Object{*la} data, label{L} la) {
+		this.La = la;
 		this.next = null;
 		this.data = data;
 	}
 
-	public Object{La} getData() {
+	public Object{*La} getData() {
 		return this.data;
-	}
-
-	public void setData{La}(Object{La} data) {
-		this.data = data;
 	}
 
 	public Node[L]{L} getNext() {
@@ -22,6 +21,11 @@ public class Node[label L, label La] {
 	public void setNext{L}(Node[L]{L} next) {
 		this.next = next;
 	}
+	
+	public label{L} getLabel() {
+		return La;
+	}
+	
 }
 
 
