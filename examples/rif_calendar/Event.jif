@@ -8,6 +8,7 @@ public class Event[label Ls, label Ld, label Ln] {
 	private boolean{Ls} pubSlot;
 	private final label{this} ls = Ls; //Ld may not be the same for all events, but Ls and Ld have the same integ
 	private Node[Ln]{Ls} node;
+	private int{Ls} bond=0;
 
 	public Event(Date[Ls]{Ls} date, TimeOfDay[Ls]{Ls} time, int{Ls} duration, String{Ld} description, principal {Ld} creator) {
 		this.slot = new Slot[Ls](date,time,duration);
@@ -17,6 +18,14 @@ public class Event[label Ls, label Ld, label Ln] {
 		this.sharedBetween=null;
 		this.pubSlot=false;
 		this.node = null;
+	}
+
+	public int{Ls} getBond() {
+		return this.bond;
+	}
+
+	public void setBond{Ls}(int{Ls} b) {
+		this.bond=b;
 	}
 
 	public Date[Ls]{Ls} getDate() {
