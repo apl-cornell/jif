@@ -2,14 +2,14 @@ public class Event[label Ls, label Ld, label Ln] {
 
 	private Slot[Ls]{Ls} slot;
 	private String{Ld} description;
-	private String{Ld} creator;
+	private principal{Ld} creator;
 	private boolean{Ls} autoRejectOnConflict;
 	private rifList[Ld]{Ld} sharedBetween; //the label of this may need to change due to the cancel operator
 	private boolean{Ls} pubSlot;
-	private final label{this} ls = Ls;
-	private Node[Ln]{Ln} node;
+	private final label{this} ls = Ls; //Ld may not be the same for all events, but Ls and Ld have the same integ
+	private Node[Ln]{Ls} node;
 
-	public Event(Date[Ls]{Ls} date, TimeOfDay[Ls]{Ls} time, int{Ls} duration, String{Ld} description, String{Ld} creator) {
+	public Event(Date[Ls]{Ls} date, TimeOfDay[Ls]{Ls} time, int{Ls} duration, String{Ld} description, principal {Ld} creator) {
 		this.slot = new Slot[Ls](date,time,duration);
 		this.description = description;
 		this.creator = creator;
@@ -60,7 +60,7 @@ public class Event[label Ls, label Ld, label Ln] {
 		this.description = description;
 	}
 
-	public String{Ld} getCreator() {
+	public principal{Ld} getCreator() {
 		return creator;
 	}
 
@@ -88,11 +88,11 @@ public class Event[label Ls, label Ld, label Ln] {
 		return this.pubSlot;
 	}
 
-	public void setNode{Ln}(Node[Ln]{Ln} n){
+	public void setNode{Ls}(Node[Ln]{Ls} n) {
 		this.node=n;
 	}
 
-	public Node[Ln]{Ln} getNode(){
+	public Node[Ln]{Ls} getNode(){
 		return this.node;
 	}
 
@@ -104,7 +104,7 @@ public class Event[label Ls, label Ld, label Ln] {
 		if (dt ==null || t==null) return null;
 		return "Event [date=" + dt.toString() + ", time=" + t.toString() + ", duration="
 				+ s.getDuration() + "mins, description=" + description + ", creator="
-				+ creator + "]";
+				+ PrincipalUtil.toString(creator) + "]";
 	}
 
 }

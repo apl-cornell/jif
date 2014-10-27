@@ -13,12 +13,12 @@ public class Main {
 
 //		Calendar calA = srv.createCalendar("Alice");
 //		Calendar calB = srv.createCalendar("Bob");
-
-  		final label ls = new label {rif[q1*:{Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3];rifi[q1*:{Alice},q2:{},q3:{_},f7:q1->q2,f8:q2->q3]};
+		//f9 is a transitionused in list operations
+  		final label ls = new label {rif[q1*:{Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];rifi[q1*:{Alice},q2:{},q3:{Alice},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 		final label ld = new label {rif[q1*:{Alice}];rifi[q1*:{Alice},q2:{},q3:{Alice},f7:q1->q2,f8:q2->q3]};
 		final label ln = new label {rif[q0*:{_}];rifi[q1*:{}]};
 
-		Event[ls,ld,ln]{ls} e = new Event[ls,ld,ln](new Date[ls](23, 8, 2014), new TimeOfDay[ls](10, 30), 30, "Meeting with Chris", "Alice");
+		Event[ls,ld,ln]{ls} e = new Event[ls,ld,ln](new Date[ls](23, 8, 2014), new TimeOfDay[ls](10, 30), 30, "Meeting with Chris", Alice);
 //		srv.addEvent(calA, e);
 //		srv.publicizeSlot(calA, e);
 //		e = new Event(new Date(16, 9, 2014), new TimeOfDay(16, 15), 60, "Doctor appointment", "Alice");
