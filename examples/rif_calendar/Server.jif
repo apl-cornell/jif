@@ -1,0 +1,169 @@
+public class Server {
+
+	private rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} calList;
+
+	public Server() {
+		this.calList = new rifList[{rif[q0*:{_}];rifi[q1*:{}]}]();
+	}
+
+	public Calendar[O,ls,ld]{rif[q0*:{_}];rifi[q1*:{}]} createCalendar
+	{rif[q0*:{_}];rifi[q1*:{}]}(principal{rif[q0*:{_}];rifi[q1*:{}]} O, label{rif[q0*:{_}];rifi[q1*:{}]} ls, label{rif[q0*:{_}];rifi[q1*:{}]} ld){
+		Calendar[O,ls,ld]{rif[q0*:{_}];rifi[q1*:{}]} cal = new Calendar[O, ls, ld]();
+		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} cl = this.calList;
+		if (cl == null) return null;
+		cl.add(cal, new label {rif[q0*:{_}];rifi[q1*:{}]});
+ 		return cal;
+	}
+
+	public void addEvent{rif[q0*:{_}];rifi[q1*:{}]}(Calendar[O,ls,ld]{rif[q0*:{_}];rifi[q1*:{}]} cal, Event[ls,ld,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls} e, 
+		principal{rif[q0*:{_}];rifi[q1*:{}]} O, label{rif[q0*:{_}];rifi[q1*:{}]} ls, label{rif[q0*:{_}];rifi[q1*:{}]} ld){
+		if (cal != null) cal.addEvent(e,ls,ld);
+	}
+
+
+	//used for confidentiality downgrade
+	public boolean requestSharedEvent{rif[q0*:{_}];rifi[q1*:{}]}(Calendar[o1,ls1,ld1]{rif[q0*:{_}];rifi[q1*:{}]} cal1, 
+	Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2, Event[ls1,ld1,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls1} se,
+	principal{rif[q0*:{_}];rifi[q1*:{}]} o1, principal{rif[q0*:{_}];rifi[q1*:{}]} o2,
+	label{rif[q0*:{_}];rifi[q1*:{}]} ls1, label{rif[q0*:{_}];rifi[q1*:{}]} ld1,
+	label{rif[q0*:{_}];rifi[q1*:{}]} ls2, label{rif[q0*:{_}];rifi[q1*:{}]} ld2,
+	int{rif[q0*:{_}];rifi[q1*:{}]} bond
+	) where tr(ls1,f9)<=ls2, tr(ld1,f9)<=ld2, tr(tr(ls1,f9),f9)<=tr(ls1,f9), tr(ls1,f9)<=ld2, tr(ls1,f9)<={rif[q0*:{_}];rifi[q1*:{}]}
+	{
+		try{
+		//if (cal2.rejectOnConflict(e)) return false;
+		cal1.addRequestEvent(se);
+		Event[ls1,ld1,{rif[q0*:{_}];rifi[q1*:{}]}]{tr({*ls1},f9)} e = reclassify(se,f9);
+		e.setBond(bond);
+		Date[ls1]{tr({*ls1},f9)} d= reclassify(e.getDate(),f9);
+		Date[ls2]{*ls2} date = 
+				new Date[ls2](reclassify(d.getDay(),f9),reclassify(d.getMonth(),f9), reclassify(d.getYear(),f9));
+		TimeOfDay[ls1]{tr({*ls1},f9)} t = reclassify(e.getTime(),f9);
+		TimeOfDay[ls2]{*ls2} time = 
+				new TimeOfDay[ls2](reclassify(t.getHour(),f9),reclassify(t.getMinute(),f9));
+		Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls2} ne = 
+				new Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}](
+				date, time, 
+				reclassify(e.getDuration(),f9), 
+				reclassify(e.getDescription(),f9), 
+				reclassify(e.getCreator(),f9));
+		ne.setBond(bond);
+		cal2.addPendingEvent(ne);
+		}catch (NullPointerException impossible) {}
+		return true;
+	}
+
+	//used for integrity downgrade
+	public void acceptSharedEvent(Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2, Event[ls,ld,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls} e,
+	principal{rif[q0*:{_}];rifi[q1*:{}]} o2,label{rif[q0*:{_}];rifi[q1*:{}]} ls2, label{rif[q0*:{_}];rifi[q1*:{}]} ld2)
+	{
+		if (cal2 == null) return;
+		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} cl = this.calList;
+		if (cl == null) return;
+		principal{*ld2} o1 = cal2.acceptPendingEvent(e);
+		final label ls1 = new label {rif[q1*:{o1},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
+									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
+		final label ld1 = new label {rif[q1*:{o1},q2:{_},f9:q1->q2];
+									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
+		Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} n = cl.getHead();
+		int{rif[q0*:{_}];rifi[q1*:{}]} i;
+		int{rif[q0*:{_}];rifi[q1*:{}]} size= cl.getSize();
+		Calendar[o1,ls1,ld1] cal1=null;
+		for (i=0;i<size;i++) {
+			if (n==null) return;
+			try{
+			final label lbl = n.getLabel;
+			Calendar c= (Calendar) n.getData();
+			if (c == null) return;
+			String user2 = c.getOwner();
+			if (user2!=null && user2.equals(user1)) cal1=c;
+			n=n.getNext();
+			} 
+			catch (ClassCastException impossible) { }
+		}
+		if (cal1 != null) cal1.requestedEventAccepted(e);
+	}
+
+	//used for integrity upgrade
+/*	public void cancelEvent(Calendar cal, Event e){
+		if (cal == null) return;
+		String user1 = cal.getOwner();
+		rifList l = cal.cancelEvent(e);
+		rifList cl = this.calList;
+		if (cl==null) return;
+		int size=cl.getSize();
+		int i;
+		Calendar cal2=null;
+		if (l != null){
+			int lsize=l.getSize();
+			int li;
+			Node ln = l.getHead();
+			for (li=0;li<lsize;li++) {
+				if (ln == null) return;
+				try{
+				String s= (String) ln.getData();
+				if (s != null && !s.equals(user1)){
+					Node n = cl.getHead();
+					for (i=0;i<size;i++) {
+						if (n == null) return;
+						try{
+						Calendar c= (Calendar) n.getData();
+						if (c==null) return;
+						String user2 = c.getOwner();
+						if (user2 != null && user2.equals(s)) cal2=c;
+						n=n.getNext();
+						}catch (ClassCastException impossible) { }
+					}
+					if (cal2 != null) cal2.cancelEvent(e);
+				}
+				ln=ln.getNext();
+				}catch (ClassCastException impossible) { }
+			}
+		}
+
+	}
+
+	//used for confidentiality downgrade
+	public void publicizeSlot(Calendar cal, Event e){
+		if (cal != null) cal.publicizeSlot(e);
+	}
+
+	//used for confidentiality upgrade
+	public void hideSlot(Calendar cal, Event e){
+		if (cal != null) cal.hideSlot(e);
+	}
+
+	public rifList takePubView(Calendar cal){
+		if (cal != null) return cal.takePubView();
+		else return null;
+	}
+
+	public void printListOfEvents(rifList el){
+		if (el == null) return;
+		Node n = el.getHead();
+		int i=0;
+		String output = "[";
+		while (i<el.getSize()) {
+			if (n == null) return;
+			try{
+			Event e = (Event) n.getData();
+			if (e == null) return;
+			output += e.toString();
+			n = n.getNext();
+			i++;
+			if (i<el.getSize()){
+				output += ",";
+			}
+			}catch (ClassCastException impossible) { }
+		}
+		output += "]";
+		//System.out.println(output);
+	}
+
+	public void printCalendar(Calendar cal){
+		System.out.println(cal.toString());
+	}
+
+*/
+}
+
