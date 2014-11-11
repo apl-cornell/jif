@@ -1,7 +1,7 @@
 public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif[q0*:{_}];rifi[q1*:{O},q2:{},f7:q1->q2]}
 //the current state of Ls and Ld is O for conf and integ,
 
-	private final principal{rif[q0*:{_}];rifi[q1*:{O},q2:{},f7:q1->q2]} owner = O;
+	private final principal{rif[q0*:{_}];rifi[q1*:{}]} owner = O;
 	private rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{}]} eventList;
 	private rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{}]} requestEvents;
 	private rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{}]} pendingEvents;
@@ -58,12 +58,12 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 
 //inconsistent syntax of tr(L,f)!!!
 
-	public principal{Ld} acceptPendingEvent{rif[q0*:{_}];rifi[q1*:{}]}(Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]{Ls} se)
+	public Object{Ls} acceptPendingEvent{rif[q0*:{_}];rifi[q1*:{}]}(Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]{Ls} se)
 		where tr(Ls,f9)<={rif[q0*:{_}];rifi[q1*:{}]}, Ls<=Ld
 	{
   		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{}]} pe2 = this.pendingEvents;
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}] pe = reclassify(pe2,f3);
-		principal p = null;
+		Object{Ls} p = null;
 		try{
 			Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}] e2 = reclassify(se,f9);
 			pe.remove(reclassify(e2.getNode(),f9));
@@ -79,9 +79,9 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 				date, time, 
 				reclassify(e.getDuration(),f7), 
 				reclassify(e.getDescription(),f7), 
-				reclassify(e.getCreator(),f7));
+				reclassify(e.getCreatorCal(),f7), reclassify(e.getCreator(),f7));
 			addEvent(ne,new label tr(Ls,f7),new label tr(Ld,f7));
-			p=se.getCreator();
+			p=se.getCreatorCal();
 		}catch (NullPointerException impossible) {}
 		return p;
 	}
@@ -106,7 +106,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 				date, time, 
 				reclassify(e.getDuration(),f7), 
 				reclassify(e.getDescription(),f7), 
-				reclassify(e.getCreator(),f7));
+				reclassify(e.getCreatorCal(),f7),reclassify(e.getCreator(),f7));
 			addEvent(ne,new label tr(Ls,f7),new label tr(Ld,f7));
 		}catch (NullPointerException impossible) {}
 	}
@@ -137,13 +137,38 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 				date, time, 
 				reclassify(e.getDuration(),f8), 
 				reclassify(e.getDescription(),f8), 
-				reclassify(e.getCreator(),f8));
+				reclassify(e.getCreatorCal(),f8),reclassify(e.getCreator(),f7));
 			Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} n;
 			n=ce.add(ne, new label tr(tr(Ls,f7),f8));
 			ne.setNode(n);
 			sb = e.getSharedBetween();
 		}catch (NullPointerException impossible) {}
 		return sb;
+	}
+
+	public Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]{Ls} findRequestedEvent{rif[q0*:{_}];rifi[q1*:{}]}(int{rif[q0*:{_}];rifi[q1*:{}]} bond){
+		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{}]} re2 = this.requestEvents;
+		rifList[{rif[q0*:{_}];rifi[q1*:{}]}] re = reclassify(re2,f3);
+		int size;
+		Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]{Ls} fe=null;
+		int i;
+		try{
+		size=re.getSize();
+		Node[{rif[q0*:{_}];rifi[q1*:{}]}] n = re.getHead();
+		for (i=0;i<size;i++) {
+			try{
+				final Node[{rif[q0*:{_}];rifi[q1*:{}]}] nd = n;
+				if (nd.La <= Ls){
+					Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}] e = (Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]) nd.getData();
+					if (e.getBond() == bond) 
+						fe=e;
+				}
+				n=n.getNext();
+
+			}catch (ClassCastException impossible) { }
+		}
+		}catch (NullPointerException impossible) {}
+		return fe;
 	}
 
 /*	public boolean rejectOnConflict(Event ereq){

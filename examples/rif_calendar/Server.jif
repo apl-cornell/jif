@@ -46,7 +46,7 @@ public class Server {
 				date, time, 
 				reclassify(e.getDuration(),f9), 
 				reclassify(e.getDescription(),f9), 
-				reclassify(e.getCreator(),f9));
+				reclassify(e.getCreatorCal(),f9),reclassify(e.getCreator(),f9));
 		ne.setBond(bond);
 		cal2.addPendingEvent(ne);
 		}catch (NullPointerException impossible) {}
@@ -54,36 +54,23 @@ public class Server {
 	}
 
 	//used for integrity downgrade
-	public void acceptSharedEvent(Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2, Event[ls,ld,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls} e,
+/*	public void acceptSharedEvent(Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2, Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls2} e,
 	principal{rif[q0*:{_}];rifi[q1*:{}]} o2,label{rif[q0*:{_}];rifi[q1*:{}]} ls2, label{rif[q0*:{_}];rifi[q1*:{}]} ld2)
 	{
 		if (cal2 == null) return;
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} cl = this.calList;
 		if (cl == null) return;
-		principal{*ld2} o1 = cal2.acceptPendingEvent(e);
+		principal{rif[q0*:{_}];rifi[q1*:{}]} o1 = e.getCreator();
 		final label ls1 = new label {rif[q1*:{o1},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
 									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 		final label ld1 = new label {rif[q1*:{o1},q2:{_},f9:q1->q2];
 									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
-		Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} n = cl.getHead();
-		int{rif[q0*:{_}];rifi[q1*:{}]} i;
-		int{rif[q0*:{_}];rifi[q1*:{}]} size= cl.getSize();
-		Calendar[o1,ls1,ld1] cal1=null;
-		for (i=0;i<size;i++) {
-			if (n==null) return;
-			try{
-			final label lbl = n.getLabel;
-			Calendar c= (Calendar) n.getData();
-			if (c == null) return;
-			String user2 = c.getOwner();
-			if (user2!=null && user2.equals(user1)) cal1=c;
-			n=n.getNext();
-			} 
-			catch (ClassCastException impossible) { }
-		}
-		if (cal1 != null) cal1.requestedEventAccepted(e);
+		Calendar[o1,ls1,ld1]{rif[q0*:{_}];rifi[q1*:{}]}  cal1 = cal2.acceptPendingEvent(e);
+		int{*ls2} bond= e.getBond();
+		Event e1 = cal1.findRequestedEvent(bond);
+		if (cal1 != null) cal1.requestedEventAccepted(e1);
 	}
-
+*/
 	//used for integrity upgrade
 /*	public void cancelEvent(Calendar cal, Event e){
 		if (cal == null) return;

@@ -72,10 +72,5 @@ class Board[label L] {
 	}
 	return false;
     }    
-    
-    /**
-     * Return a new board that has the endorsement of the principal o.
-     * The label L is required to be equivalent to {p->*; p<-*}.
-     */
    
 }

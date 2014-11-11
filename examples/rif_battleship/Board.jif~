@@ -20,7 +20,7 @@ class Board[label L] {
     }
 
     public List[L] Ships(){
-       return this.ships
+       return this.ships;
     }
 
     /**

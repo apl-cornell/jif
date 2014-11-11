@@ -207,10 +207,9 @@ class Player[principal P, principal O] {
 	catch (ClassCastException impossible) { }
 
 
-	// find the result.
+	// find and declassify the result.
 	boolean result = reclassify(brd.testPosition(query, new label {rifi[q1*:{}]}),f1);
-	
-	// declassify the result
+
 	return result;
     }
 }

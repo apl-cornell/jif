@@ -1,6 +1,6 @@
 public class Node[label L] {
 	
-	private final label{L} La;
+	final label{L} La;
 	private Node[L]{L} next;
 	private final Object{*La} data;
 

@@ -143,8 +143,8 @@ class Player[principal P, principal O] {
     /**
      * Endorse a query from the opponent.
      */
-    Coordinate[{rifi[q1*:{}]}]{rifi[q1*:{}]} reclassQuery{rifi[q1*:{}]}(Coordinate[{rifi[q0*:{_},q1:{},f3:q0->q1]}]{rifi[q0*:{_},q1:{},f3:q0->q1]} qu){
-        Coordinate[{rifi[q0*:{_},q1:{},f3:q0->q1]}]{rifi[q1*:{}]} query = reclassify(qu,f3);
+    Coordinate[{rifi[q1*:{}]}]{rifi[q1*:{}]} reclassQuery{rifi[q1*:{}]}(Coordinate[{rifi[q0*:{_},q1:{},f3:q0->q1]}]{rifi[q1*:{}]} qu){
+        Coordinate[{rifi[q0*:{_},q1:{},f3:q0->q1]}]{rifi[q1*:{}]} query = qu;
         if (query == null) return null;
         int x = reclassify(query.x, f3);
         int y = reclassify(query.y, f3);

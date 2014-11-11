@@ -2,7 +2,8 @@ public class Event[label Ls, label Ld, label Ln] {
 
 	private Slot[Ls]{Ls} slot;
 	private String{Ld} description;
-	private principal{Ld} creator;
+	private Object{Ln} creatorCal;
+	private principal{Ln} creator;
 	private boolean{Ls} autoRejectOnConflict;
 	private rifList[Ld]{Ld} sharedBetween; //the label of this may need to change due to the cancel operator
 	private boolean{Ls} pubSlot;
@@ -10,10 +11,12 @@ public class Event[label Ls, label Ld, label Ln] {
 	private Node[Ln]{Ls} node;
 	private int{Ls} bond=0;
 
-	public Event(Date[Ls]{Ls} date, TimeOfDay[Ls]{Ls} time, int{Ls} duration, String{Ld} description, principal {Ld} creator) {
+	public Event(Date[Ls]{Ls} date, TimeOfDay[Ls]{Ls} time, int{Ls} duration, String{Ld} description, 
+			Object{Ln} creatorCal, principal{Ln} creator) {
 		this.slot = new Slot[Ls](date,time,duration);
 		this.description = description;
-		this.creator = creator;
+		this.creatorCal = creatorCal;
+		this.creator=creator;
 		this.autoRejectOnConflict=false;
 		this.sharedBetween=null;
 		this.pubSlot=false;
@@ -69,8 +72,12 @@ public class Event[label Ls, label Ld, label Ln] {
 		this.description = description;
 	}
 
-	public principal{Ld} getCreator() {
+	public principal{Ln} getCreator() {
 		return creator;
+	}
+
+	public Object{Ln} getCreatorCal() {
+		return creatorCal;
 	}
 
 	public void setAutoReject{Ls}(boolean{Ls} b){
@@ -105,7 +112,7 @@ public class Event[label Ls, label Ld, label Ln] {
 		return this.node;
 	}
 
-	public String{Ls;Ld} toString() {
+	public String{Ls;Ld;Ln} toString() {
 		Slot s = this.slot;
 		if (s==null) return null;
 		Date dt = s.getDate();

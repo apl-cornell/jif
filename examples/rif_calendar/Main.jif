@@ -9,9 +9,9 @@ public class Main {
 
 		//System.out.println("Welcome to rif-Calendar!");
 
-//		Server srv = new Server();
+		Server{rif[q0*:{_}];rifi[q1*:{}]} srv = new Server();
 
-//		Calendar calA = srv.createCalendar("Alice");
+
 //		Calendar calB = srv.createCalendar("Bob");
 		//f9 is a transitionused in list operations
   		final label ls = new label {rif[q1*:{Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
@@ -19,8 +19,8 @@ public class Main {
 		final label ld = new label {rif[q1*:{Alice},q2:{_},f9:q1->q2];
 									rifi[q1*:{Alice},q2:{},q3:{Alice},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 		final label ln = new label {rif[q0*:{_}];rifi[q1*:{}]};
-
-		Event[ls,ld,ln]{ls} e = new Event[ls,ld,ln](new Date[ls](23, 8, 2014), new TimeOfDay[ls](10, 30), 30, "Meeting with Chris", Alice);
+		Calendar calA = srv.createCalendar(Alice,ls,ld);
+		Event[ls,ld,ln]{*ls} e = new Event[ls,ld,ln](new Date[ls](23, 8, 2014), new TimeOfDay[ls](10, 30), 30, "Meeting with Chris", calA, Alice);
 //		srv.addEvent(calA, e);
 //		srv.publicizeSlot(calA, e);
 //		e = new Event(new Date(16, 9, 2014), new TimeOfDay(16, 15), 60, "Doctor appointment", "Alice");
