@@ -8,8 +8,11 @@ import java.util.Map;
 import jif.types.label.CovariantParamLabel;
 import jif.types.label.Label;
 import jif.types.label.ParamLabel;
+import jif.types.label.RifDynamicLabel;
+import jif.types.label.RifDynamicLabel_c;
 import jif.types.principal.ParamPrincipal;
 import jif.types.principal.Principal;
+import polyglot.ast.Id;
 import polyglot.ext.param.types.Subst_c;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
@@ -248,6 +251,13 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
             } else if (L instanceof CovariantParamLabel) {
                 CovariantParamLabel c = (CovariantParamLabel) L;
                 return subLabel(c, c.paramInstance());
+            } else if (L instanceof RifDynamicLabel) {
+                RifDynamicLabel c = (RifDynamicLabel) L;
+                Label label = c.getLabel();
+                Id name = c.getName();
+                Label substlabel = substLabel(label);
+                return new RifDynamicLabel_c(name, substlabel,
+                        (JifTypeSystem) ts, c.position());
             }
             return L;
         }

@@ -166,3 +166,16 @@ echo "--------------------------------------------------"
 echo "dynreclTest11: Y "
 ~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest11.jif
 echo "--------------------------------------------------"
+
+echo "dynreclTest13: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest13.jif
+echo "--------------------------------------------------"
+echo "dynreclTest14: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest14.jif
+echo "--------------------------------------------------"
+echo "dynreclTest15: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest15.jif
+echo "--------------------------------------------------"
+echo "dynreclTest16: Y "
+~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests dynreclTest16.jif
+echo "--------------------------------------------------"

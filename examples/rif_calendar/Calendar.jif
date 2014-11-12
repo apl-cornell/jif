@@ -58,12 +58,12 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 
 //inconsistent syntax of tr(L,f)!!!
 
-	public Object{Ls} acceptPendingEvent{rif[q0*:{_}];rifi[q1*:{}]}(Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]{Ls} se)
+	public Object{rif[q0*:{_}];rifi[q1*:{}]} acceptPendingEvent{rif[q0*:{_}];rifi[q1*:{}]}(Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]{Ls} se)
 		where tr(Ls,f9)<={rif[q0*:{_}];rifi[q1*:{}]}, Ls<=Ld
 	{
   		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{}]} pe2 = this.pendingEvents;
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}] pe = reclassify(pe2,f3);
-		Object{Ls} p = null;
+		Object{rif[q0*:{_}];rifi[q1*:{}]} p = null;
 		try{
 			Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}] e2 = reclassify(se,f9);
 			pe.remove(reclassify(e2.getNode(),f9));
@@ -81,7 +81,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 				reclassify(e.getDescription(),f7), 
 				reclassify(e.getCreatorCal(),f7), reclassify(e.getCreator(),f7));
 			addEvent(ne,new label tr(Ls,f7),new label tr(Ld,f7));
-			p=se.getCreatorCal();
+			p=e2.getCreatorCal();
 		}catch (NullPointerException impossible) {}
 		return p;
 	}

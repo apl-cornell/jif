@@ -1,0 +1,20 @@
+//Type-correct
+
+public class dynreclTest[label L] {
+
+
+   public dynreclTest() where tr(L,f9)<= {rif[q0*:{_}];rifi[q1*:{}]}  {
+       int x;  
+       x = 96;
+   }
+   
+   public void help() {
+
+	   final label l = new label {rif[q1*:{Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
+									rifi[q1*:{Alice},q2:{},q3:{Alice},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
+   
+       dynreclTest[l] w = new dynreclTest[l](); 
+   
+   }
+
+}

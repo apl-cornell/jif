@@ -54,23 +54,27 @@ public class Server {
 	}
 
 	//used for integrity downgrade
-/*	public void acceptSharedEvent(Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2, Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls2} e,
-	principal{rif[q0*:{_}];rifi[q1*:{}]} o2,label{rif[q0*:{_}];rifi[q1*:{}]} ls2, label{rif[q0*:{_}];rifi[q1*:{}]} ld2)
+	public void acceptSharedEvent{rif[q0*:{_}];rifi[q1*:{}]}
+	(Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2, Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls2} e,
+		principal{rif[q0*:{_}];rifi[q1*:{}]} o2,label{rif[q0*:{_}];rifi[q1*:{}]} ls2, label{rif[q0*:{_}];rifi[q1*:{}]} ld2)
+	where tr(ls2,f9)<={rif[q0*:{_}];rifi[q1*:{}]}, ls2<=ld2
 	{
-		if (cal2 == null) return;
-		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} cl = this.calList;
-		if (cl == null) return;
-		principal{rif[q0*:{_}];rifi[q1*:{}]} o1 = e.getCreator();
+		try{
+		Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{tr({*ls2},f9)} se = reclassify(e,f9);
+		final principal{rif[q0*:{_}];rifi[q1*:{}]} o1 = se.getCreator();
 		final label ls1 = new label {rif[q1*:{o1},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
 									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 		final label ld1 = new label {rif[q1*:{o1},q2:{_},f9:q1->q2];
 									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
-		Calendar[o1,ls1,ld1]{rif[q0*:{_}];rifi[q1*:{}]}  cal1 = cal2.acceptPendingEvent(e);
-		int{*ls2} bond= e.getBond();
-		Event e1 = cal1.findRequestedEvent(bond);
+		try{
+		Calendar[o1,ls1,ld1] cal1 = (Calendar[o1,ls1,ld1]) cal2.acceptPendingEvent(e);
+		int{rif[q0*:{_}];rifi[q1*:{}]} bond= reclassify(se.getBond(),f9);
+		Event[ls1,ld1,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls1} e1 = cal1.findRequestedEvent(bond);
 		if (cal1 != null) cal1.requestedEventAccepted(e1);
+		}catch (ClassCastException impossible) { }
+		}catch (NullPointerException impossible) {}
 	}
-*/
+
 	//used for integrity upgrade
 /*	public void cancelEvent(Calendar cal, Event e){
 		if (cal == null) return;

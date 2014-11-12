@@ -83,6 +83,7 @@ public class RifDynamicLabel_c extends Label_c implements RifDynamicLabel {
         return this.name + "(" + this.label.componentString() + ")";
     }
 
+    //What transitions should be applied to rdl to get this.
     @Override
     public List<Id> transToBeTaken(Label rdl, List<Id> list) {
         if (this.equals(rdl)) {
@@ -112,5 +113,4 @@ public class RifDynamicLabel_c extends Label_c implements RifDynamicLabel {
 
         return b1 && b2;
     }
-
 }

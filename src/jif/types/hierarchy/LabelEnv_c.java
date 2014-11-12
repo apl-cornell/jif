@@ -829,20 +829,12 @@ public class LabelEnv_c implements LabelEnv {
             }
         }
         if (L1 instanceof RifDynamicLabel) {
-            if (cLHS instanceof RifDynamicLabel || cLHS instanceof ParamLabel) {
-                rdl1 = (RifDynamicLabel) L1;
-                rdl2 = cLHS;
-            } else {
-                return false;
-            }
+            rdl1 = (RifDynamicLabel) L1;
+            rdl2 = cLHS;
         }
         if (L2 instanceof RifDynamicLabel) {
-            if (cRHS instanceof RifDynamicLabel || cRHS instanceof ParamLabel) {
-                rdl1 = (RifDynamicLabel) L2;
-                rdl2 = cRHS;
-            } else {
-                return false;
-            }
+            rdl1 = (RifDynamicLabel) L2;
+            rdl2 = cRHS;
         }
         List<Id> ids = rdl1.transToBeTaken(rdl2, new LinkedList<Id>());
         if (ids == null) {

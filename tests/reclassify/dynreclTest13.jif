@@ -1,0 +1,17 @@
+//Type-correct
+
+public class dynreclTest[label L] {
+
+
+   public dynreclTest() where tr(tr(L,f1),f2)<= {rif[q0*:{_}];rifi[q1*:{}]}  {
+       int x;  
+       x = 96;
+   }
+   
+   public void help(label l) where tr(tr(l,f1),f2)<={rif[q0*:{_}];rifi[q1*:{}]} {
+   
+       dynreclTest[l] w = new dynreclTest[l](); 
+   
+   }
+
+}
