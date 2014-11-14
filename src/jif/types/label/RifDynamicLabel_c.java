@@ -5,9 +5,11 @@ import java.util.Set;
 
 import jif.translate.RifDynamicLabelToJavaExpr_c;
 import jif.types.JifTypeSystem;
+import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv.SearchState;
 import polyglot.ast.Id;
+import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -113,4 +115,14 @@ public class RifDynamicLabel_c extends Label_c implements RifDynamicLabel {
 
         return b1 && b2;
     }
+
+    @Override
+    public Label subst(LabelSubstitution substitution) throws SemanticException {
+        Label substlbl = this.label.subst(substitution);
+        Label newlbl =
+                new RifDynamicLabel_c(this.name, substlbl, (JifTypeSystem) ts,
+                        position);
+        return substitution.substLabel(newlbl);
+    }
+
 }

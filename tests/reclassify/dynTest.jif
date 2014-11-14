@@ -10,6 +10,14 @@ public class dynTest[label L1, label L2, label L3] {
        x = 96;
        y = 45;
        res = x+y; // what happens when reclassify(x+y,f1); and f1({L1;L2}) <= L3 ?
+       try{
+       jif.lang.Principal n = Alice;
+       Object o = (Object) n;
+       n = (jif.lang.Principal) o;
+       }catch (ClassCastException impossible) { }
+    // Integer n = new Integer(3);
+    // Object o = (Object) n;
+    // n = (Integer) o;
    }
 
 }

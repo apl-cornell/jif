@@ -740,8 +740,8 @@ public class LabelEnv_c implements LabelEnv {
             if (beSmart) {
                 // only use assertions that match one or the other of our labels                
                 if (!L1.equals(cLHS) && !L2.equals(cRHS)) {
-                    if ((L1 instanceof PairLabel && L2 instanceof RifDynamicLabel)
-                            || (L2 instanceof PairLabel && L1 instanceof RifDynamicLabel)) {
+                    if (L2 instanceof RifDynamicLabel
+                            || L1 instanceof RifDynamicLabel) {
                         if (transequals(L1, cLHS, L2, cRHS)) return true;
 
                     }

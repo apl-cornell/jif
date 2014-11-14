@@ -5,7 +5,7 @@ public class Event[label Ls, label Ld, label Ln] {
 	private Object{Ln} creatorCal;
 	private principal{Ln} creator;
 	private boolean{Ls} autoRejectOnConflict;
-	private rifList[Ld]{Ld} sharedBetween; //the label of this may need to change due to the cancel operator
+	private rifList[Ln]{Ld} sharedBetween; //the label of this may need to change due to the cancel operator
 	private boolean{Ls} pubSlot;
 	private final label{this} ls = Ls; //Ld may not be the same for all events, but Ls and Ld have the same integ
 	private Node[Ln]{Ls} node;
@@ -88,11 +88,11 @@ public class Event[label Ls, label Ld, label Ln] {
 		return this.autoRejectOnConflict;
 	}
 
-	public rifList[Ld]{Ld} getSharedBetween() {
+	public rifList[Ln]{Ld} getSharedBetween() {
 		return sharedBetween;
 	}
 
-	public void setSharedBetween{Ld}(rifList[Ld]{Ld} sharedBetween) {
+	public void setSharedBetween{Ld}(rifList[Ln]{Ld} sharedBetween) {
 		this.sharedBetween = sharedBetween;
 	}
 

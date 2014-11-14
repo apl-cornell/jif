@@ -11,54 +11,59 @@ public class Main {
 
 		Server{rif[q0*:{_}];rifi[q1*:{}]} srv = new Server();
 
-
-//		Calendar calB = srv.createCalendar("Bob");
-		//f9 is a transitionused in list operations
-  		final label ls = new label {rif[q1*:{Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
+		//f9 is a transition used in list operations
+  		final label lsA = new label {rif[q1*:{Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
 									rifi[q1*:{Alice},q2:{},q3:{Alice},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
-		final label ld = new label {rif[q1*:{Alice},q2:{_},f9:q1->q2];
+		final label ldA = new label {rif[q1*:{Alice},q2:{_},f9:q1->q2];
 									rifi[q1*:{Alice},q2:{},q3:{Alice},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 		final label ln = new label {rif[q0*:{_}];rifi[q1*:{}]};
-		Calendar calA = srv.createCalendar(Alice,ls,ld);
-		Event[ls,ld,ln]{*ls} e = new Event[ls,ld,ln](new Date[ls](23, 8, 2014), new TimeOfDay[ls](10, 30), 30, "Meeting with Chris", calA, Alice);
-//		srv.addEvent(calA, e);
-//		srv.publicizeSlot(calA, e);
-//		e = new Event(new Date(16, 9, 2014), new TimeOfDay(16, 15), 60, "Doctor appointment", "Alice");
-//		e.setAutoReject(true);
-//		srv.addEvent(calA, e);
-//		srv.publicizeSlot(calA, e);
-//		e = new Event(new Date(5, 10, 2014), new TimeOfDay(9, 30), 15, "Meeting with Chris", "Alice");
-//		srv.addEvent(calA, e);
+		Calendar calA = srv.createCalendar(Alice,lsA,ldA);
 
-//		e = new Event(new Date(15, 10, 2014), new TimeOfDay(14, 30), 30, "Go to barbershop", "Bob");
-//		srv.addEvent(calB, e);
-//		e = new Event(new Date(18, 10, 2014), new TimeOfDay(15, 45), 15, "Buy present for John", "Bob");
-//		srv.addEvent(calB, e);
+
+		final label lsB = new label {rif[q1*:{Bob},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
+									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
+		final label ldB = new label {rif[q1*:{Bob},q2:{_},f9:q1->q2];
+									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
+		Calendar calB = srv.createCalendar(Bob,lsB,ldB);
+
+		Event[lsA,ldA,ln]{*lsA} eA = new Event[lsA,ldA,ln](new Date[lsA](23, 8, 2014), new TimeOfDay[lsA](10, 30), 30, "Meeting with Chris", calA, Alice);
+		srv.addEvent(calA, eA, Alice, lsA, ldA);
+		//srv.publicizeSlot(calA, e);
+		eA = new Event[lsA,ldA,ln](new Date[lsA](16, 9, 2014), new TimeOfDay[lsA](16, 15), 60, "Doctor appointment", calA, Alice);
+		//e.setAutoReject(true);
+		srv.addEvent(calA, eA, Alice, lsA, ldA);
+		//srv.publicizeSlot(calA, e);
+		eA = new Event[lsA,ldA,ln](new Date[lsA](5, 10, 2014), new TimeOfDay[lsA](9, 30), 15, "Meeting with Chris", calA, Alice);
+		srv.addEvent(calA, eA, Alice, lsA, ldA);
+
+		Event[lsB,ldB,ln]{*lsB} eB = new Event[lsB,ldB,ln](new Date[lsB](15, 10, 2014), new TimeOfDay[lsB](14, 30), 30, "Go to barbershop", calB, Bob);
+		srv.addEvent(calB, eB, Bob, lsB,ldB);
+		eB = new Event[lsB,ldB,ln](new Date[lsB](18, 10, 2014), new TimeOfDay[lsB](15, 45), 15, "Buy present for John", calB, Bob);
+		srv.addEvent(calB, eB, Bob, lsB,ldB);
 
 		//System.out.println("Calendar of Alice");
 		//srv.printCalendar("Alice");
 		//System.out.println("Calendar of Bob");
 		//srv.printCalendar("Bob");
 
-//		e = new Event(new Date(10, 11, 2014), new TimeOfDay(18, 10), 60, "Visit parents", "Bob");
-//		boolean b = srv.requestSharedEvent(calB, calA, e);
-//		if (b) srv.acceptSharedEvent(calA, e);
-		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
-//		Event e1=e;
-
-//		e = new Event(new Date(16, 9, 2014), new TimeOfDay(16, 45), 20, "Visit aunts", "Bob");
-//		b = srv.requestSharedEvent(calB, calA, e);
-//		if (b) srv.acceptSharedEvent(calA, e);
+		eB = new Event[lsB,ldB,ln](new Date[lsB](10, 11, 2014), new TimeOfDay[lsB](18, 10), 60, "Visit parents", calB, Bob);
+	Event[lsA,ldA,ln]{*lsA} eAs = srv.requestSharedEvent(calB, calA, eB, Bob, Alice, lsB, ldB, lsA, ldA, 19871);
+		srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
 		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
 
-//		e = new Event(new Date(20, 2, 2010), new TimeOfDay(8, 15), 120, "Go for cinema", "Bob");
-//		b = srv.requestSharedEvent(calB, calA, e);
-//		if (b) srv.acceptSharedEvent(calA, e);
+		eB = new Event[lsB,ldB,ln](new Date[lsB](16, 9, 2014), new TimeOfDay[lsB](16, 45), 20, "Visit aunts", calB, Bob);
+		eAs = srv.requestSharedEvent(calB, calA, eB, Bob, Alice, lsB, ldB, lsA, ldA, 19872);
+		srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
 		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
 
-//		Event e2 = new Event(new Date(30, 1, 2015), new TimeOfDay(21, 30), 120, "Go to concert", "Bob");
-//		b = srv.requestSharedEvent(calB, calA, e2);
-//		if (b) srv.acceptSharedEvent(calA, e2);
+		eB = new Event[lsB,ldB,ln](new Date[lsB](20, 2, 2010), new TimeOfDay[lsB](8, 15), 120, "Go for cinema", calB, Bob);
+		eAs = srv.requestSharedEvent(calB, calA, eB, Bob, Alice, lsB, ldB, lsA, ldA, 19873);
+		srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
+		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
+
+		eB = new Event[lsB,ldB,ln](new Date[lsB](30, 1, 2015), new TimeOfDay[lsB](21, 30), 120, "Go to concert", calB, Bob);
+		eAs = srv.requestSharedEvent(calB, calA, eB, Bob, Alice, lsB, ldB, lsA, ldA, 19874);
+		srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
 		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
 
 		//System.out.println("Calendar of Alice");
@@ -67,7 +72,7 @@ public class Main {
 		//srv.printCalendar("Bob");
 
 		//System.out.println("Canceling of "+e1.toString()+"\n");
-//		srv.cancelEvent(calA, e1);
+		srv.cancelEvent(calA, 19871, Alice, lsA, ldA);     //both Alice and Bob should be able to cancl their shared events
 
 		//System.out.println("Calendar of Alice");
 		//srv.printCalendar("Alice");
@@ -75,7 +80,7 @@ public class Main {
 		//srv.printCalendar("Bob");
 
 		//System.out.println("Public view of Alice");
-//		rifList l = srv.takePubView(calA);
+		//rifList l = srv.takePubView(calA);
 		//srv.printListOfEvents(l);
 
 	}
