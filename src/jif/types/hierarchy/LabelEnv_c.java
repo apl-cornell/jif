@@ -830,7 +830,8 @@ public class LabelEnv_c implements LabelEnv {
                     for (Id i : ids) {
                         lbl = ts.rifDynamicLabel(cRHS.position(), i, lbl);
                     }
-                    if (leq(lbl, L2)) return true;
+                    if (L2 instanceof PairLabel && leq(lbl, L2)) return true;
+                    if (lbl.equals(L2)) return true;
                 }
             }
         }
@@ -855,58 +856,12 @@ public class LabelEnv_c implements LabelEnv {
                     for (Id i : ids) {
                         lbl = ts.rifDynamicLabel(cLHS.position(), i, lbl);
                     }
-                    if (leq(L1, lbl)) return true;
+                    if (L1 instanceof PairLabel && leq(L1, lbl)) return true;
+                    if (L1.equals(lbl)) return true;
                 }
             }
         }
         return false;
-
-        /*  PairLabel pl1 = null, pl2 = null;
-          RifDynamicLabel rdl1 = null;
-          Label rdl2 = null;
-
-          if (L1 instanceof PairLabel) {
-              if (cLHS instanceof PairLabel) {
-                  pl1 = (PairLabel) L1;
-                  pl2 = (PairLabel) cLHS;
-              } else {
-                  return false;
-              }
-          }
-          if (L2 instanceof PairLabel) {
-              if (cRHS instanceof PairLabel) {
-                  pl1 = (PairLabel) L2;
-                  pl2 = (PairLabel) cRHS;
-              } else {
-                  return false;
-              }
-          }
-          if (L1 instanceof RifDynamicLabel) {
-              rdl1 = (RifDynamicLabel) L1;
-              rdl2 = cLHS;
-          }
-          if (L2 instanceof RifDynamicLabel) {
-              rdl1 = (RifDynamicLabel) L2;
-              rdl2 = cRHS;
-          }
-          List<Id> ids = rdl1.transToBeTaken(rdl2, new LinkedList<Id>());
-          if (ids == null) {
-              return false;
-          }
-          Collections.reverse(ids);
-          RifConfPolicy cp2 = (RifConfPolicy) pl2.confProjection();
-          RifConfPolicy cp1 = (RifConfPolicy) pl1.confProjection();
-          RifIntegPolicy ip2 = (RifIntegPolicy) pl2.integProjection();
-          RifIntegPolicy ip1 = (RifIntegPolicy) pl1.integProjection();
-          for (Id i : ids) {
-              cp2 = cp2.takeTransition(i);
-              ip2 = ip2.takeTransition(i);
-          }
-          if (cp1.equals(cp2) && ip1.equals(ip2)) {
-              return true;
-          } else {
-              return false;
-          } */
     }
 
     @Override
@@ -1011,7 +966,7 @@ public class LabelEnv_c implements LabelEnv {
                 }
             }
         }
-        return false;
+        return p1.leq_(p2, this, state);
     }
 
     public boolean leq(RifIntegPolicy p1, IntegPolicy p2, SearchState state) {
@@ -1051,7 +1006,7 @@ public class LabelEnv_c implements LabelEnv {
                 }
             }
         }
-        return false;
+        return p1.leq_(p2, this, state);
     }
 
     public boolean leq(IntegPolicy p1, IntegPolicy p2, SearchState state) {

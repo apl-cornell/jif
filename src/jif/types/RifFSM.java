@@ -39,4 +39,8 @@ public interface RifFSM extends Serializable {
 
     Map<String, RifFSMstate> states();
 
+    boolean isBottom(List<String> newvisited);
+
+    boolean isTop(List<String> visited);
+
 }

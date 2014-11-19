@@ -187,28 +187,58 @@ public class RifFSM_c implements RifFSM {
 
     @Override
     public boolean isBottomConfidentiality() {
-        Iterator<Entry<String, RifFSMstate>> it =
-                this.states.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<String, RifFSMstate> pairs = it.next();
-            if (!pairs.getValue().isBottomConfidentiality()) {
-                return false;
-            }
+        return isBottom(new LinkedList<String>());
+    }
+
+    @Override
+    public boolean isBottom(List<String> visited) {
+        String state = this.current.name().id();
+        List<String> newvisited = new LinkedList<String>();
+
+        if (visited.contains(state)) {
+            return true;
         }
-        return true;
+        for (String s : visited) {
+            newvisited.add(s);
+        }
+        newvisited.add(state);
+        if (this.currentState().isBottomConfidentiality()) {
+            for (Id action : allPossibleActions) {
+                if (!this.takeTransition(action).isBottom(newvisited)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean isTopConfidentiality() {
-        Iterator<Entry<String, RifFSMstate>> it =
-                this.states.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<String, RifFSMstate> pairs = it.next();
-            if (!pairs.getValue().isTopConfidentiality()) {
-                return false;
-            }
+        return isTop(new LinkedList<String>());
+    }
+
+    @Override
+    public boolean isTop(List<String> visited) {
+        String state = this.current.name().id();
+        List<String> newvisited = new LinkedList<String>();
+
+        if (visited.contains(state)) {
+            return true;
         }
-        return true;
+        for (String s : visited) {
+            newvisited.add(s);
+        }
+        newvisited.add(state);
+        if (this.currentState().isTopConfidentiality()) {
+            for (Id action : allPossibleActions) {
+                if (!this.takeTransition(action).isBottom(newvisited)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override

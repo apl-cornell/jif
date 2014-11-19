@@ -108,6 +108,9 @@ public class RifJoinIntegPolicy_c extends Policy_c implements
 
     @Override
     public boolean leq_(Policy p, LabelEnv env, SearchState state) {
+        if (this.isSingleton())
+            return joinComponents.iterator().next()
+                    .leq_((IntegPolicy) p, env, state);
         for (IntegPolicy pi : joinComponents) {
             if (!env.leq(pi, p, state)) {
                 return false;

@@ -100,10 +100,6 @@ public class RifWriterPolicy_c extends Policy_c implements RifIntegPolicy {
         if (p instanceof RifWriterPolicy_c) {
             return ((RifWriterPolicy_c) p).getFSM().leqFSM(this.fsm, visited);
         }
-        if (p instanceof RifJoinIntegPolicy_c) {
-            throw new UnsupportedOperationException(
-                    "Try to compare RifWriterPolicy with RifJoinIntegPolicy.");
-        }
         return false;
     }
 

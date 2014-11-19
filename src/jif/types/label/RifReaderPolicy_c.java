@@ -101,10 +101,6 @@ public class RifReaderPolicy_c extends Policy_c implements RifConfPolicy {
         if (p instanceof RifReaderPolicy_c) {
             return this.fsm.leqFSM(((RifReaderPolicy_c) p).getFSM(), visited);
         }
-        if (p instanceof RifJoinConfPolicy_c) {
-            throw new UnsupportedOperationException(
-                    "Try to compare RifReaderPolicy with RifJoinConfPolicy.");
-        }
         return false;
     }
 

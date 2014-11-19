@@ -107,6 +107,9 @@ public class RifJoinConfPolicy_c extends Policy_c implements RifJoinConfPolicy {
 
     @Override
     public boolean leq_(Policy p, LabelEnv env, SearchState state) {
+        if (this.isSingleton())
+            return joinComponents.iterator().next()
+                    .leq_((ConfPolicy) p, env, state);
         for (ConfPolicy pi : joinComponents) {
             if (!env.leq(pi, p, state)) {
                 return false;

@@ -1,13 +1,39 @@
+import java.io.PrintStream;
+import jif.runtime.Runtime;
+
 public class Main {
 
 	final public static void main{rif[q0*:{_}];rifi[q1*:{}]}
                      (principal{rifi[q1*:{}]} p, String args[]) : {rifi[q1*:{}]}
+		 throws (NullPointerException)
     {
 
-		//for the api's we use id's instead of events because it is
-		//also a way to make sure that events are found/transfered to correct lists.
+		final label lbl = new label {rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]};
+        PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{_}];rifi[q1*:{}]} out = null;
+        PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]} outinit = null;
+        PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{}]} out2 = null;
+        Runtime[p,lbl]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]} tryruntime;
+        try {
+            tryruntime = Runtime[p,lbl].getRuntime();
+        }
+        catch (SecurityException e) {
+            throw new Error("channel is null 1 !");
+        }
 
-		//System.out.println("Welcome to rif-Calendar!");
+        try {
+            outinit = tryruntime==null?null:tryruntime.stdout(new label {rif[q1*:{_}];rifi[q1*:{}]});
+        }
+        catch (SecurityException e) {
+            throw new Error("channel is null 2 !");
+        }
+          
+        out2 = reclassify(outinit,f4);
+
+        out = reclassify(out2,f0);
+
+		if (out == null) throw new NullPointerException("Null output");
+
+		out.println("Welcome to rif-Calendar!");
 
 		Server{rif[q0*:{_}];rifi[q1*:{}]} srv = new Server();
 
