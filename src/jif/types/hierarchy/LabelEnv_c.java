@@ -807,53 +807,106 @@ public class LabelEnv_c implements LabelEnv {
 
     }
 
+    //It returns true if there exists a sequence F such that L1<=F(cLHS) and F(cRHS)<=L2.
     public boolean transequals(Label L1, Label cLHS, Label L2, Label cRHS) {
-        PairLabel pl1 = null, pl2 = null;
-        RifDynamicLabel rdl1 = null;
-        Label rdl2 = null;
-
-        if (L1 instanceof PairLabel) {
-            if (cLHS instanceof PairLabel) {
-                pl1 = (PairLabel) L1;
-                pl2 = (PairLabel) cLHS;
-            } else {
-                return false;
-            }
-        }
-        if (L2 instanceof PairLabel) {
-            if (cRHS instanceof PairLabel) {
-                pl1 = (PairLabel) L2;
-                pl2 = (PairLabel) cRHS;
-            } else {
-                return false;
-            }
-        }
         if (L1 instanceof RifDynamicLabel) {
-            rdl1 = (RifDynamicLabel) L1;
-            rdl2 = cLHS;
+            RifDynamicLabel l = (RifDynamicLabel) L1;
+            List<Id> ids = l.transToBeTaken(cLHS, new LinkedList<Id>());
+            if (ids != null) {
+                Collections.reverse(ids);
+                ConfPolicy c2 = L2.confProjection();
+                IntegPolicy i2 = L2.integProjection();
+                if (cRHS instanceof PairLabel) {
+                    RifConfPolicy ccr = (RifConfPolicy) cRHS.confProjection();
+                    RifIntegPolicy icr =
+                            (RifIntegPolicy) cRHS.integProjection();
+                    for (Id i : ids) {
+                        ccr = ccr.takeTransition(i);
+                        icr = icr.takeTransition(i);
+                    }
+                    if (leq(ccr, c2) && leq(icr, i2)) return true;
+                } else {
+                    Label lbl = cRHS;
+                    for (Id i : ids) {
+                        lbl = ts.rifDynamicLabel(cRHS.position(), i, lbl);
+                    }
+                    if (leq(lbl, L2)) return true;
+                }
+            }
         }
         if (L2 instanceof RifDynamicLabel) {
-            rdl1 = (RifDynamicLabel) L2;
-            rdl2 = cRHS;
+            RifDynamicLabel r = (RifDynamicLabel) L2;
+            List<Id> ids = r.transToBeTaken(cRHS, new LinkedList<Id>());
+            if (ids != null) {
+                Collections.reverse(ids);
+                ConfPolicy c1 = L1.confProjection();
+                IntegPolicy i1 = L1.integProjection();
+                if (cLHS instanceof PairLabel) {
+                    RifConfPolicy ccl = (RifConfPolicy) cLHS.confProjection();
+                    RifIntegPolicy icl =
+                            (RifIntegPolicy) cLHS.integProjection();
+                    for (Id i : ids) {
+                        ccl = ccl.takeTransition(i);
+                        icl = icl.takeTransition(i);
+                    }
+                    if (leq(c1, ccl) && leq(i1, icl)) return true;
+                } else {
+                    Label lbl = cLHS;
+                    for (Id i : ids) {
+                        lbl = ts.rifDynamicLabel(cLHS.position(), i, lbl);
+                    }
+                    if (leq(L1, lbl)) return true;
+                }
+            }
         }
-        List<Id> ids = rdl1.transToBeTaken(rdl2, new LinkedList<Id>());
-        if (ids == null) {
-            return false;
-        }
-        Collections.reverse(ids);
-        RifConfPolicy cp2 = (RifConfPolicy) pl2.confProjection();
-        RifConfPolicy cp1 = (RifConfPolicy) pl1.confProjection();
-        RifIntegPolicy ip2 = (RifIntegPolicy) pl2.integProjection();
-        RifIntegPolicy ip1 = (RifIntegPolicy) pl1.integProjection();
-        for (Id i : ids) {
-            cp2 = cp2.takeTransition(i);
-            ip2 = ip2.takeTransition(i);
-        }
-        if (cp1.equals(cp2) && ip1.equals(ip2)) {
-            return true;
-        } else {
-            return false;
-        }
+        return false;
+
+        /*  PairLabel pl1 = null, pl2 = null;
+          RifDynamicLabel rdl1 = null;
+          Label rdl2 = null;
+
+          if (L1 instanceof PairLabel) {
+              if (cLHS instanceof PairLabel) {
+                  pl1 = (PairLabel) L1;
+                  pl2 = (PairLabel) cLHS;
+              } else {
+                  return false;
+              }
+          }
+          if (L2 instanceof PairLabel) {
+              if (cRHS instanceof PairLabel) {
+                  pl1 = (PairLabel) L2;
+                  pl2 = (PairLabel) cRHS;
+              } else {
+                  return false;
+              }
+          }
+          if (L1 instanceof RifDynamicLabel) {
+              rdl1 = (RifDynamicLabel) L1;
+              rdl2 = cLHS;
+          }
+          if (L2 instanceof RifDynamicLabel) {
+              rdl1 = (RifDynamicLabel) L2;
+              rdl2 = cRHS;
+          }
+          List<Id> ids = rdl1.transToBeTaken(rdl2, new LinkedList<Id>());
+          if (ids == null) {
+              return false;
+          }
+          Collections.reverse(ids);
+          RifConfPolicy cp2 = (RifConfPolicy) pl2.confProjection();
+          RifConfPolicy cp1 = (RifConfPolicy) pl1.confProjection();
+          RifIntegPolicy ip2 = (RifIntegPolicy) pl2.integProjection();
+          RifIntegPolicy ip1 = (RifIntegPolicy) pl1.integProjection();
+          for (Id i : ids) {
+              cp2 = cp2.takeTransition(i);
+              ip2 = ip2.takeTransition(i);
+          }
+          if (cp1.equals(cp2) && ip1.equals(ip2)) {
+              return true;
+          } else {
+              return false;
+          } */
     }
 
     @Override

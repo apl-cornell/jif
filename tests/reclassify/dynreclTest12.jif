@@ -1,25 +1,25 @@
+//Type-correct
+
 public class dynreclTest {
-
-
 
    public dynreclTest(
 	label{rif[q0*:{_}];rifi[q1*:{}]} ls1, label{rif[q0*:{_}];rifi[q1*:{}]} ld1,
 	label{rif[q0*:{_}];rifi[q1*:{}]} ls2, label{rif[q0*:{_}];rifi[q1*:{}]} ld2) 
-	where tr(ls1,f9)<=ls2  {
+	where tr(ls1,f9)<=ls2, tr(tr(ls1,f9),f9)<=tr(ls1,f9)  {
        	int x =0;
    
    }
    
-   public void help() {
+   public void help{rif[q0*:{_}];rifi[q1*:{}]}() {
    
        	dynreclTest w;
-		final label lsA = new label {rif[q1*:{Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
+		final label{rif[q0*:{_}];rifi[q1*:{}]} lsA = new label {rif[q1*:{Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
 									rifi[q1*:{Alice},q2:{},q3:{Alice},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
-		final label ldA = new label {rif[q1*:{Alice},q2:{_},f9:q1->q2];
+		final label{rif[q0*:{_}];rifi[q1*:{}]} ldA = new label {rif[q1*:{Alice},q2:{_},f9:q1->q2];
 									rifi[q1*:{Alice},q2:{},q3:{Alice},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
-		final label lsB = new label {rif[q1*:{Bob},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
+		final label{rif[q0*:{_}];rifi[q1*:{}]} lsB = new label {rif[q1*:{Bob},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
 									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
-		final label ldB = new label {rif[q1*:{Bob},q2:{_},f9:q1->q2];
+		final label{rif[q0*:{_}];rifi[q1*:{}]} ldB = new label {rif[q1*:{Bob},q2:{_},f9:q1->q2];
 									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
        
        	w = new dynreclTest(lsA,ldA,lsB,ldB);
