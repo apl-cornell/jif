@@ -830,7 +830,6 @@ public class LabelEnv_c implements LabelEnv {
                     for (Id i : ids) {
                         lbl = ts.rifDynamicLabel(cRHS.position(), i, lbl);
                     }
-                    if (L2 instanceof PairLabel && leq(lbl, L2)) return true;
                     if (lbl.equals(L2)) return true;
                 }
             }
@@ -856,7 +855,6 @@ public class LabelEnv_c implements LabelEnv {
                     for (Id i : ids) {
                         lbl = ts.rifDynamicLabel(cLHS.position(), i, lbl);
                     }
-                    if (L1 instanceof PairLabel && leq(L1, lbl)) return true;
                     if (L1.equals(lbl)) return true;
                 }
             }

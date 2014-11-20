@@ -142,9 +142,10 @@ public class Server {
 
 	}
 
-	public String{rif[q0*:{_}];rifi[q1*:{}]} printCalendar(Calendar[o,ls,ld]{rif[q0*:{_}];rifi[q1*:{}]} cal, 
+	public String{rif[q0*:{_}];rifi[q1*:{}]} printCalendar{rif[q0*:{_}];rifi[q1*:{}]}
+		(Calendar[o,ls,ld]{rif[q0*:{_}];rifi[q1*:{}]} cal, 
 		principal{rif[q0*:{_}];rifi[q1*:{}]} o, label{rif[q0*:{_}];rifi[q1*:{}]} ls, label{rif[q0*:{_}];rifi[q1*:{}]} ld){
-		return cal.toString();
+		return cal!=null?cal.toString():null;
 	}
 
 

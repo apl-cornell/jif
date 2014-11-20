@@ -33,6 +33,16 @@ public class Main {
 
 		if (out == null) throw new NullPointerException("Null output");
 
+
+		final label{rif[q0*:{_}];rifi[q1*:{}]} lh =  new label {rif[q1*:{Bob},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
+									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
+      	if(new label tr(lh,f9)<=new label {rif[q0*:{_}];rifi[q1*:{}]})
+			out.println("sat");
+		else
+			out.println("Unsat");
+
+
+
 		out.println("Welcome to rif-Calendar!");
 
 		Server{rif[q0*:{_}];rifi[q1*:{}]} srv = new Server();

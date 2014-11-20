@@ -204,7 +204,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 	public String{rif[q0*:{_}];rifi[q1*:{}]} toString {rif[q0*:{_}];rifi[q1*:{}]} () {
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{}]} el2 = this.eventList;
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}] el = reclassify(el2,f3);
-		String{rif[q0*:{_}];rifi[q1*:{}]} output=null;
+		String{rif[q0*:{_}];rifi[q1*:{}]} output="start";
 		int size;
 		int i;
 		try{
