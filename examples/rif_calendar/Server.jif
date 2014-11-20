@@ -142,6 +142,11 @@ public class Server {
 
 	}
 
+	public String{rif[q0*:{_}];rifi[q1*:{}]} printCalendar(Calendar[o,ls,ld]{rif[q0*:{_}];rifi[q1*:{}]} cal, 
+		principal{rif[q0*:{_}];rifi[q1*:{}]} o, label{rif[q0*:{_}];rifi[q1*:{}]} ls, label{rif[q0*:{_}];rifi[q1*:{}]} ld){
+		return cal.toString();
+	}
+
 
 /*	//used for confidentiality downgrade
 	public void publicizeSlot(Calendar cal, Event e){
@@ -179,11 +184,7 @@ public class Server {
 		output += "]";
 		//System.out.println(output);
 	}
-
-	public void printCalendar(Calendar cal){
-		System.out.println(cal.toString());
-	}
-
 */
+
 }
 

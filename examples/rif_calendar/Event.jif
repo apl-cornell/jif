@@ -112,15 +112,19 @@ public class Event[label Ls, label Ld, label Ln] {
 		return this.node;
 	}
 
-	public String{Ls;Ld;Ln} toString() {
-		Slot s = this.slot;
+	public String{rif[q0*:{_}];rifi[q1*:{}]} toString{rif[q0*:{_}];rifi[q1*:{}]}() 
+	where tr(Ls,f9)<={rif[q0*:{_}];rifi[q1*:{}]}, tr(Ld,f9)<={rif[q0*:{_}];rifi[q1*:{}]}, tr(Ln,f9)<={rif[q0*:{_}];rifi[q1*:{}]}
+	{
+		String output;
+		Slot{rif[q0*:{_}];rifi[q1*:{}]} s = reclassify(this.slot,f9);
 		if (s==null) return null;
-		Date dt = s.getDate();
-		TimeOfDay t = s.getTime();
+		Date{rif[q0*:{_}];rifi[q1*:{}]} dt = reclassify(s.getDate(),f9);
+		TimeOfDay{rif[q0*:{_}];rifi[q1*:{}]} t = reclassify(s.getTime(),f9);
 		if (dt ==null || t==null) return null;
-		return "Event [date=" + dt.toString() + ", time=" + t.toString() + ", duration="
+		output = "Event [date=" + dt.toString() + ", time=" + t.toString() + ", duration="
 				+ s.getDuration() + "mins, description=" + description + ", creator="
 				+ PrincipalUtil.toString(creator) + "]";
+		return reclassify(output,f9);
 	}
 
 }

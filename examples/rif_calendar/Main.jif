@@ -67,8 +67,8 @@ public class Main {
 		eB = new Event[lsB,ldB,ln](new Date[lsB](18, 10, 2014), new TimeOfDay[lsB](15, 45), 15, "Buy present for John", calB, Bob);
 		srv.addEvent(calB, eB, Bob, lsB,ldB);
 
-		//System.out.println("Calendar of Alice");
-		//srv.printCalendar("Alice");
+		out.println("Calendar of Alice");
+		out.println(srv.printCalendar(calA, Alice, lsA, ldA));
 		//System.out.println("Calendar of Bob");
 		//srv.printCalendar("Bob");
 

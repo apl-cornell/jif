@@ -201,6 +201,31 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 		return fe;
 	}
 
+	public String{rif[q0*:{_}];rifi[q1*:{}]} toString {rif[q0*:{_}];rifi[q1*:{}]} () {
+		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{}]} el2 = this.eventList;
+		rifList[{rif[q0*:{_}];rifi[q1*:{}]}] el = reclassify(el2,f3);
+		String{rif[q0*:{_}];rifi[q1*:{}]} output=null;
+		int size;
+		int i;
+		try{
+		size=el.getSize();
+		Node[{rif[q0*:{_}];rifi[q1*:{}]}] n = el.getHead();
+		for (i=0;i<size;i++) {
+			try{
+				final Node[{rif[q0*:{_}];rifi[q1*:{}]}] nd = n;
+				if (new label tr(nd.La,f9) <= new label {rif[q0*:{_}];rifi[q1*:{}]}){
+					Event {rif[q0*:{_}];rifi[q1*:{}]} de = (Event) reclassify(nd.getData(),f9);
+					if (output==null) output = de.toString()+ "\n";
+					else output = output + de.toString() + "\n";
+				}
+				n=n.getNext();
+
+			}catch (ClassCastException impossible) { }
+		}
+		}catch (NullPointerException impossible) {}		
+		return output;
+	}
+
 
 /*	public boolean rejectOnConflict(Event ereq){
 		rifList el = this.eventList;
@@ -278,28 +303,8 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 		}
 		return l;
 	}
-
-	public String toString() {
-		rifList el = this.eventList;
-		if (el == null) return null;
-		int size=el.getSize();
-		int i;
-		Node n = el.getHead();
-		String output=null;
-		for (i=0;i<size;i++) {
-			if (n == null) return null;
-			try{
-			Event e = (Event) n.getData();
-			if (e == null) return null;
-			if (output==null) output=e.toString()+ "\n";
-			else{
-				output = output + e.toString() + "\n";
-			}
-			n=n.getNext();
-			}catch (ClassCastException impossible) { }
-		}
-		return output;
-	}
 */
+	
+
 }
 
