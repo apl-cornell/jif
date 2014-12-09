@@ -210,6 +210,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 		try{
 		size=el.getSize();
 		Node[{rif[q0*:{_}];rifi[q1*:{}]}] n = el.getHead();
+		if (size==3) output="3 entries";
 		for (i=0;i<size;i++) {
 			try{
 				final Node[{rif[q0*:{_}];rifi[q1*:{}]}] nd = n;

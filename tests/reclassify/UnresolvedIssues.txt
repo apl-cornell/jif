@@ -6,3 +6,7 @@
 - Conservatism of type-checking: LabelEnv_c at leq(ConfPolicy,ConfPolicy,SearchState) at 2nd case (and at ReaderPolicy.java at relabelsTo). 
 If I need to check p1<=p1' join L join p2', what happens if the environment knows p1<=p1' join L join p2', or
 p1<= L join p (p=p1' join p2'), or p1<=L?
+
+- write a report with all changes i have introduced + comments in the code
+- write down the experience/problems/techniques you met/used during developing calendar.
+Not many people have developed these programs, and so your epxerience may help others.

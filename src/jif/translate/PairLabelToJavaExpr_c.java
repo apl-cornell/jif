@@ -137,6 +137,8 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
                                         .position(Position.compilerGenerated());
                     }
                 }
+            }
+            for (Entry<String, RifFSMstate> st : states.entrySet()) {
                 HashMap<String, RifFSMstate> transitions =
                         st.getValue().getTransitions();
                 if (transitions != null) {
@@ -230,6 +232,8 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
                                         .position(Position.compilerGenerated());
                     }
                 }
+            }
+            for (Entry<String, RifFSMstate> st : states.entrySet()) {
                 HashMap<String, RifFSMstate> transitions =
                         st.getValue().getTransitions();
                 if (transitions != null) {
