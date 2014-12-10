@@ -28,7 +28,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}] l; //does not type-check if rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} l;
 		l = reclassify(l2,f3);
 		Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} n;
-		try{	n=l.add(e,ls);  //make this change to all methods!!!
+		try{	n=l.add(e,ls,ld);  //make this change to all methods!!!
 			e.setNode(n);}
 		catch (NullPointerException impossible) { 
 			// lt will never be null, and so nothing is learned by this declassification
@@ -41,7 +41,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}] l;
 		l = reclassify(l2,f3);
 		Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} n;
-		try{	n=l.add(e,Ls);
+		try{	n=l.add(e,Ls,Ld);
 			e.setNode(n);}
 		catch (NullPointerException impossible) {}
 	}
@@ -51,7 +51,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}] l;
 		l = reclassify(l2,f3);
 		Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} n;
-		try{	n=l.add(e,Ls);
+		try{	n=l.add(e,Ls,Ld);
 			e.setNode(n);}
 		catch (NullPointerException impossible) {}
 	}
@@ -139,7 +139,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 				reclassify(e.getDescription(),f8), 
 				reclassify(e.getCreatorCal(),f8),reclassify(e.getCreator(),f7));
 			Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} n;
-			n=ce.add(ne, new label tr(tr(Ls,f7),f8));
+			n=ce.add(ne, new label tr(tr(Ls,f7),f8), new label tr(tr(Ls,f7),f8));
 			ne.setNode(n);
 			sb = e.getSharedBetween();
 		}catch (NullPointerException impossible) {}
@@ -165,7 +165,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 				}
 				n=n.getNext();
 
-			}catch (ClassCastException impossible) { }
+			}catch (ClassCastException e) { throw new Error("ClassCastException 4 !");  }
 		}
 		}catch (NullPointerException impossible) {}
 		return fe;
@@ -195,27 +195,28 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 				}
 				n=n.getNext();
 
-			}catch (ClassCastException impossible) { }
+			}catch (ClassCastException e1) { throw new Error("ClassCastException at findAcceptedEvent !"); }
 		}
-		}catch (NullPointerException impossible) {}
+		}catch (NullPointerException e2) {throw new Error("NullPointerException at findAcceptedEvent !");}
 		return fe;
 	}
 
 	public String{rif[q0*:{_}];rifi[q1*:{}]} toString {rif[q0*:{_}];rifi[q1*:{}]} () {
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{}]} el2 = this.eventList;
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}] el = reclassify(el2,f3);
-		String{rif[q0*:{_}];rifi[q1*:{}]} output="start";
+		String{rif[q0*:{_}];rifi[q1*:{}]} output=null;
 		int size;
 		int i;
 		try{
 		size=el.getSize();
 		Node[{rif[q0*:{_}];rifi[q1*:{}]}] n = el.getHead();
-		if (size==3) output="3 entries";
 		for (i=0;i<size;i++) {
 			try{
-				final Node[{rif[q0*:{_}];rifi[q1*:{}]}] nd = n;
-				if (new label tr(nd.La,f9) <= new label {rif[q0*:{_}];rifi[q1*:{}]}){
-					Event {rif[q0*:{_}];rifi[q1*:{}]} de = (Event) reclassify(nd.getData(),f9);
+				final Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} nd = n;
+				if (new label tr(nd.La,f9) <= new label {rif[q0*:{_}];rifi[q1*:{}]} && 
+					new label tr(nd.Lb,f9) <= new label {rif[q0*:{_}];rifi[q1*:{}]}){
+					Object{rif[q0*:{_}];rifi[q1*:{}]} e = reclassify(nd.getData(),f9);
+					Event[nd.La,nd.Lb,{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} de = (Event[nd.La,nd.Lb,{rif[q0*:{_}];rifi[q1*:{}]}]) e;
 					if (output==null) output = de.toString()+ "\n";
 					else output = output + de.toString() + "\n";
 				}

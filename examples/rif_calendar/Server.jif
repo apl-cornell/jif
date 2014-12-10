@@ -129,16 +129,16 @@ public class Server {
 									if (cal2 != null) cal2.cancelEvent(e2);
 								}
 							}
-							}catch (ClassCastException impossible) { }
+							}catch (ClassCastException e1) { throw new Error("ClassCastException 1 !"); }
 						} 
 						n=n.getNext();						
 					} 
 				}
-				}catch (ClassCastException impossible) { }
+				}catch (ClassCastException e2) {throw new Error("ClassCastException 2 !"); }
 			}
 			ln=ln.getNext();			
 		}
-        }catch (NullPointerException impossible) {}
+        }catch (NullPointerException e3) {throw new Error("NullPointerException 3 !");}
 
 	}
 

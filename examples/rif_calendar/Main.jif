@@ -82,8 +82,8 @@ public class Main {
 
 		out.println("Calendar of Alice");
 		out.println(srv.printCalendar(calA, Alice, lsA, ldA));
-		//System.out.println("Calendar of Bob");
-		//srv.printCalendar("Bob");
+		out.println("Calendar of Bob");
+		out.println(srv.printCalendar(calB, Bob, lsB, ldB));
 
 		eB = new Event[lsB,ldB,ln](new Date[lsB](10, 11, 2014), new TimeOfDay[lsB](18, 10), 60, "Visit parents", calB, Bob);
 	    Event[lsA,ldA,ln]{*lsA} eAs = srv.requestSharedEvent(calB, calA, eB, Bob, Alice, lsB, ldB, lsA, ldA, 19871);
@@ -105,18 +105,18 @@ public class Main {
 		srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
 		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
 
-		//System.out.println("Calendar of Alice");
-		//srv.printCalendar("Alice");
-		//System.out.println("Calendar of Bob");
-		//srv.printCalendar("Bob");
+		out.println("Calendar of Alice");
+		out.println(srv.printCalendar(calA, Alice, lsA, ldA));
+		out.println("Calendar of Bob");
+		out.println(srv.printCalendar(calB, Bob, lsB, ldB));
 
 		//System.out.println("Canceling of "+e1.toString()+"\n");
-		srv.cancelEvent(calA, 19871, Alice, lsA, ldA);     //both Alice and Bob should be able to cancl their shared events
+		srv.cancelEvent(calA, 19871, Alice, lsA, ldA);     //both Alice and Bob should be able to cancel their shared events
 
-		//System.out.println("Calendar of Alice");
-		//srv.printCalendar("Alice");
-		//System.out.println("Calendar of Bob");
-		//srv.printCalendar("Bob");
+		out.println("Calendar of Alice");
+		out.println(srv.printCalendar(calA, Alice, lsA, ldA));
+		out.println("Calendar of Bob");
+		out.println(srv.printCalendar(calB, Bob, lsB, ldB));
 
 		//System.out.println("Public view of Alice");
 		//rifList l = srv.takePubView(calA);

@@ -7,7 +7,8 @@ public class Event[label Ls, label Ld, label Ln] {
 	private boolean{Ls} autoRejectOnConflict;
 	private rifList[Ln]{Ld} sharedBetween; //the label of this may need to change due to the cancel operator
 	private boolean{Ls} pubSlot;
-	private final label{this} ls = Ls; //Ld may not be the same for all events, but Ls and Ld have the same integ
+	public final label{this} ls = Ls; //Ld may not be the same for all events, but Ls and Ld have the same integ
+	public final label{this} ld = Ld;
 	private Node[Ln]{Ls} node;
 	private int{Ls} bond=0;
 
