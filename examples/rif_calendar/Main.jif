@@ -36,16 +36,6 @@ public class Main {
 
 		if (out == null) throw new NullPointerException("Null output");
 
-
-		/*final label{rif[q0*:{_}];rifi[q1*:{}]} lh =  new label {rif[q1*:{Bob},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
-									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
-      	if(new label tr(lh,f9)<=new label {rif[q0*:{_}];rifi[q1*:{}]})
-			out.println("sat");
-		else
-			out.println("Unsat");*/
-
-
-
 		out.println("Welcome to rif-Calendar!");
 
 		Server{rif[q0*:{_}];rifi[q1*:{}]} srv = new Server();
@@ -86,7 +76,7 @@ public class Main {
 		out.println(srv.printCalendar(calB, Bob, lsB, ldB));
 
 		eB = new Event[lsB,ldB,ln](new Date[lsB](10, 11, 2014), new TimeOfDay[lsB](18, 10), 60, "Visit parents", calB, Bob);
-	    Event[lsA,ldA,ln]{*lsA} eAs = srv.requestSharedEvent(calB, calA, eB, Bob, Alice, lsB, ldB, lsA, ldA, 19871);
+	  Event[lsA,ldA,ln]{*lsA} eAs = srv.requestSharedEvent(calB, calA, eB, Bob, Alice, lsB, ldB, lsA, ldA, 19871);
 		srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
 		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
 

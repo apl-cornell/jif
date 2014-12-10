@@ -44,6 +44,23 @@ public class rifList[label L] {
 		return n;
 	}
 
+  public Node[L]{L} add{L}(Object{*La} data, label{L} La, jif.lang.Principal{L} o)
+		where L<=La
+	{
+		Node n = new Node[L](data,La,o);
+		Node lst = this.last;
+		if (lst == null){
+			this.head = n;
+			this.last = n;
+			this.size++;
+			return n;
+		}
+		lst.setNext(n);
+		this.last=n;
+		this.size++;
+		return n;
+	}
+
 	public void remove{L}(Node[L]{L} nr){
 		Node n = this.head;
 		if (n == null) return;

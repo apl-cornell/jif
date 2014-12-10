@@ -80,6 +80,8 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 				reclassify(e.getDuration(),f7), 
 				reclassify(e.getDescription(),f7), 
 				reclassify(e.getCreatorCal(),f7), reclassify(e.getCreator(),f7));
+			ne.setBond(reclassify(e.getBond(),f7));
+		  ne.setSharedBetween(reclassify(e.getSharedBetween(),f7));
 			addEvent(ne,new label tr(Ls,f7),new label tr(Ld,f7));
 			p=e2.getCreatorCal();
 		}catch (NullPointerException impossible) {}
@@ -107,6 +109,8 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 				reclassify(e.getDuration(),f7), 
 				reclassify(e.getDescription(),f7), 
 				reclassify(e.getCreatorCal(),f7),reclassify(e.getCreator(),f7));
+			ne.setBond(reclassify(e.getBond(),f7));
+		  ne.setSharedBetween(reclassify(e.getSharedBetween(),f7));			
 			addEvent(ne,new label tr(Ls,f7),new label tr(Ld,f7));
 		}catch (NullPointerException impossible) {}
 	}
