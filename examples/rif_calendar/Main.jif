@@ -55,6 +55,9 @@ public class Main {
 									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 		Calendar calB = srv.createCalendar(Bob,lsB,ldB);
 
+		//Once an object is created, its label is created with it. So, object and label are unseparable.
+		//If we want to change the label of the object, then we need to create a new copy and attach the desired label.
+
 		Event[lsA,ldA,ln]{*lsA} eA = new Event[lsA,ldA,ln](new Date[lsA](23, 8, 2014), new TimeOfDay[lsA](10, 30), 30, "Meeting with Chris", calA, Alice);
 		srv.addEvent(calA, eA, Alice, lsA, ldA);
 		//srv.publicizeSlot(calA, e);

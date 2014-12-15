@@ -149,12 +149,16 @@ public class Server {
 	}
 
 
-/*	//used for confidentiality downgrade
-	public void publicizeSlot(Calendar cal, Event e){
-		if (cal != null) cal.publicizeSlot(e);
+	//used for confidentiality downgrade
+	public Event[{tr(ls,f1)},ld,{rif[q0*:{_}];rifi[q1*:{}]}]{tr(ls,f1)} publicizeSlot
+	(Calendar[o,ls,ld]{rif[q0*:{_}];rifi[q1*:{}]} cal, Event[ls,ld,{rif[q0*:{_}];rifi[q1*:{}]}] e,
+	principal{rif[q0*:{_}];rifi[q1*:{}]} o, label{rif[q0*:{_}];rifi[q1*:{}]} ls, label{rif[q0*:{_}];rifi[q1*:{}]} ld)
+	{
+		if (cal != null) return cal.publicizeSlot(e);
+		else return null;
 	}
 
-	//used for confidentiality upgrade
+/*	//used for confidentiality upgrade
 	public void hideSlot(Calendar cal, Event e){
 		if (cal != null) cal.hideSlot(e);
 	}

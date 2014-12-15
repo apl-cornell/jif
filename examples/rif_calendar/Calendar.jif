@@ -232,6 +232,36 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 		return output;
 	}
 
+	//applied only to events created and owned by just this user!
+	public Event[{tr({Ls},f1)},Ld,{rif[q0*:{_}];rifi[q1*:{}]]{tr({Ls},f1)} publicizeSlot{rif[q0*:{_}];rifi[q1*:{}]}
+	(Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]{Ls} pe)
+	{
+		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{}]} el2 = this.eventList;
+		rifList[{rif[q0*:{_}];rifi[q1*:{}]}] el = reclassify(el2,f3);
+		Event[{tr({Ls},f1)},Ld,{rif[q0*:{_}];rifi[q1*:{}]]{tr({Ls},f1)} ne = null;
+		try{
+			Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}] e2 = reclassify(pe,f9);
+			el.remove(reclassify(e2.getNode(),f9));
+			Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]{tr({Ls},f1)} e = reclassify(pe,f1);
+			Date[Ls]{tr({Ls},f1)} d= reclassify(e.getDate(),f1);
+			Date[{tr({Ls},f1)}]{tr({Ls},f1)} date = 
+				new Date[{tr({Ls},f1)}](reclassify(d.getDay(),f1),reclassify(d.getMonth(),f1), reclassify(d.getYear(),f1));
+			TimeOfDay[Ls]{tr({Ls},f1)} t = reclassify(e.getTime(),f1);
+			TimeOfDay[{tr({Ls},f1)}]{tr({Ls},f1)} time = 
+				new TimeOfDay[{tr({Ls},f1)}](reclassify(t.getHour(),f1),reclassify(t.getMinute(),f1));
+			ne = new Event[{tr({Ls},f1)},Ld,{rif[q0*:{_}];rifi[q1*:{}]}](
+				date, time, 
+				reclassify(e.getDuration(),f1), 
+				e.getDescription(), 
+				e.getCreatorCal(),e.getCreator());
+			ne.setPubSlot(true);
+			Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} n;
+			ne.setNode(n);
+			addEvent(ne,new label tr(Ls,f1),Ld);
+		}catch (NullPointerException impossible) {}
+		return ne;
+	}
+
 
 /*	public boolean rejectOnConflict(Event ereq){
 		rifList el = this.eventList;
@@ -266,19 +296,12 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 		}
 		return false;
 	}
+*/
 
-	//applied only to events created and owned by just this user!
-	public void publicizeSlot(Event e){
-		rifList el = this.eventList;
-		if (el != null && e != null){
-			Event newe = new Event(e.getDate(), e.getTime(), e.getDuration(), e.getDescription(), e.getCreator());
-			newe.setPubSlot(true);
-			el.remove(e);
-			el.add(newe);
-		}
-	}
-
-	//applied only to events created and owned by just this user!
+//this could be implimented by assigning the event to a more restricted event, without the use of transition.
+//But in this case you need to know the more restrictive type and include the correct where-restriction.
+//This case does not work if the same transition may create different automata when applied to different values. 
+/*	//applied only to events created and owned by just this user!
 	public void hideSlot(Event e){
 		rifList el = this.eventList;
 		if (el != null && e != null){
