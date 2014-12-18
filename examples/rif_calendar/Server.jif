@@ -72,9 +72,9 @@ public class Server {
 	{
 		try{
 		Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{tr({*ls2},f9)} se = reclassify(e,f9);
-		final principal{rif[q0*:{_}];rifi[q1*:{}]} o1 = se.getCreator();
-		final label ls1 = new label {rif[q1*:{o1},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
-									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
+		final principal{rif[q0*:{_}];rifi[q1*:{}]} o1 = reclassify(se.getCreator(),f9);
+		final label ls1 = new label {rif[q1*:{o1},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
+									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4]};
 		final label ld1 = new label {rif[q1*:{o1},q2:{_},f9:q1->q2];
 									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 		try{
@@ -118,8 +118,8 @@ public class Server {
 						if (nd != null && nd.La <= new label {rif[q0*:{_}];rifi[q1*:{}]}){
 							try{
 							final jif.lang.Principal{rif[q0*:{_}];rifi[q1*:{}]} o2 = nd.O;
-							final label ls2 = new label {rif[q1*:{o2},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3];
-										rifi[q1*:{o2},q2:{},q3:{o2},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
+							final label ls2 = new label {rif[q1*:{o2},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
+										rifi[q1*:{o2},q2:{},q3:{o2},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4]};
 							final label ld2 = new label {rif[q1*:{o2},q2:{_},f9:q1->q2];
 							 			rifi[q1*:{o2},q2:{},q3:{o2},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 							Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2= (Calendar[o2,ls2,ld2]) nd.getData();
@@ -150,25 +150,32 @@ public class Server {
 
 
 	//used for confidentiality downgrade
-	public Event[{tr(ls,f1)},ld,{rif[q0*:{_}];rifi[q1*:{}]}]{tr(ls,f1)} publicizeSlot
-	(Calendar[o,ls,ld]{rif[q0*:{_}];rifi[q1*:{}]} cal, Event[ls,ld,{rif[q0*:{_}];rifi[q1*:{}]}] e,
+	public Event[{tr({*ls},f1)},ld,{rif[q0*:{_}];rifi[q1*:{}]}]{tr({*ls},f1)} publicizeSlot{rif[q0*:{_}];rifi[q1*:{}]}
+	(Calendar[o,ls,ld]{rif[q0*:{_}];rifi[q1*:{}]} cal, Event[ls,ld,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls} e,
 	principal{rif[q0*:{_}];rifi[q1*:{}]} o, label{rif[q0*:{_}];rifi[q1*:{}]} ls, label{rif[q0*:{_}];rifi[q1*:{}]} ld)
+	where tr(ls,f9)<={rif[q0*:{_}];rifi[q1*:{}]}
 	{
 		if (cal != null) return cal.publicizeSlot(e);
 		else return null;
 	}
 
-/*	//used for confidentiality upgrade
-	public void hideSlot(Calendar cal, Event e){
-		if (cal != null) cal.hideSlot(e);
-	}
-
-	public rifList takePubView(Calendar cal){
-		if (cal != null) return cal.takePubView();
+	//used for confidentiality upgrade
+	public Event[ls,ld,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls} hideSlot{rif[q0*:{_}];rifi[q1*:{}]}
+	(Calendar[o,ls,ld]{rif[q0*:{_}];rifi[q1*:{}]} cal, Event[{tr({*ls},f1)},ld,{rif[q0*:{_}];rifi[q1*:{}]}]{tr({*ls},f1)} e,
+	principal{rif[q0*:{_}];rifi[q1*:{}]} o, label{rif[q0*:{_}];rifi[q1*:{}]} ls, label{rif[q0*:{_}];rifi[q1*:{}]} ld)
+	where tr(tr(ls,f1),f9)<={rif[q0*:{_}];rifi[q1*:{}]}, tr(tr(ls,f1),f2)<=ls, tr(ls,f2)<=ls, ls<=ld
+	{
+		if (cal != null) return cal.hideSlot(e);
 		else return null;
 	}
 
-	public void printListOfEvents(rifList el){
+	public String{rif[q0*:{_}];rifi[q1*:{}]} takePubView{rif[q0*:{_}];rifi[q1*:{}]}
+		(Calendar[o,ls,ld]{rif[q0*:{_}];rifi[q1*:{}]} cal, 
+		principal{rif[q0*:{_}];rifi[q1*:{}]} o, label{rif[q0*:{_}];rifi[q1*:{}]} ls, label{rif[q0*:{_}];rifi[q1*:{}]} ld){
+		return cal!=null?cal.takePubView():null;
+	}
+
+/*	public void printListOfEvents(rifList el){
 		if (el == null) return;
 		Node n = el.getHead();
 		int i=0;

@@ -1,26 +1,24 @@
 public class Event[label Ls, label Ld, label Ln] {
-
+//it is not good choice to use fields with less restrictive labels than the label of the entire object
 	private Slot[Ls]{Ls} slot;
 	private String{Ld} description;
-	private Object{Ln} creatorCal;
-	private principal{Ln} creator;
+	private Object{Ls} creatorCal;
+	private principal{Ls} creator;
 	private boolean{Ls} autoRejectOnConflict;
 	private rifList[Ln]{Ld} sharedBetween; //the label of this may need to change due to the cancel operator
-	private boolean{Ls} pubSlot;
 	public final label{this} ls = Ls; //Ld may not be the same for all events, but Ls and Ld have the same integ
 	public final label{this} ld = Ld;
 	private Node[Ln]{Ls} node;
 	private int{Ls} bond=0;
 
 	public Event(Date[Ls]{Ls} date, TimeOfDay[Ls]{Ls} time, int{Ls} duration, String{Ld} description, 
-			Object{Ln} creatorCal, principal{Ln} creator) {
+			Object{Ls} creatorCal, principal{Ls} creator) {
 		this.slot = new Slot[Ls](date,time,duration);
 		this.description = description;
 		this.creatorCal = creatorCal;
 		this.creator=creator;
 		this.autoRejectOnConflict=false;
 		this.sharedBetween=null;
-		this.pubSlot=false;
 		this.node = null;
 	}
 
@@ -73,11 +71,11 @@ public class Event[label Ls, label Ld, label Ln] {
 		this.description = description;
 	}
 
-	public principal{Ln} getCreator() {
+	public principal{Ls} getCreator() {
 		return creator;
 	}
 
-	public Object{Ln} getCreatorCal() {
+	public Object{Ls} getCreatorCal() {
 		return creatorCal;
 	}
 
@@ -95,14 +93,6 @@ public class Event[label Ls, label Ld, label Ln] {
 
 	public void setSharedBetween{Ld}(rifList[Ln]{Ld} sharedBetween) {
 		this.sharedBetween = sharedBetween;
-	}
-
-	public void setPubSlot{Ls}(boolean{Ls} b){
-		this.pubSlot=b;
-	}
-
-	public boolean{Ls} getPubSlot(){
-		return this.pubSlot;
 	}
 
 	public void setNode{Ls}(Node[Ln]{Ls} n) {
@@ -126,6 +116,22 @@ public class Event[label Ls, label Ld, label Ln] {
 				+ s.getDuration() + "mins, description=" + description + ", creator="
 				+ PrincipalUtil.toString(creator) + "]";
 		return reclassify(output,f9);
+	}
+
+	public String{rif[q0*:{_}];rifi[q1*:{}]} toStringf6{rif[q0*:{_}];rifi[q1*:{}]}() 
+	where tr(Ls,f6)<={rif[q0*:{_}];rifi[q1*:{}]}
+	{
+		String{Ls} output;
+		Slot[Ls]{Ls} s = this.slot;
+		if (s==null) throw new Error("Null slot");
+		Date[Ls]{Ls} dt = s.getDate();
+		if (dt==null) throw new Error("Null date");
+		TimeOfDay[Ls]{Ls} t = s.getTime();
+		if (t==null) throw new Error("Null time");
+		output = "Event [date=" + dt.toString() + ", time=" + t.toString() + ", duration="
+				+ s.getDuration() + "mins, description=---, creator="
+				+ PrincipalUtil.toString(creator) + "]";
+		return reclassify(output,f6);
 	}
 
 }
