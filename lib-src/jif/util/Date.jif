@@ -118,11 +118,12 @@ public final class Date[covariant label L] implements JifObject[L] {
      */
     public Date() {
         final principal p = PrincipalUtil.nullPrincipal();
-        this.year = Runtime[p].currentYear();
-        this.month = Runtime[p].currentMonth();
-        this.day = Runtime[p].currentDayOfMonth();
-        this.hour = Runtime[p].currentHour();
-        this.minute = Runtime[p].currentMinute();
+		final label lbl = new label {rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]};
+        this.year = Runtime[p,lbl].currentYear();
+        this.month = Runtime[p,lbl].currentMonth();
+        this.day = Runtime[p,lbl].currentDayOfMonth();
+        this.hour = Runtime[p,lbl].currentHour();
+        this.minute = Runtime[p,lbl].currentMinute();
     }
     public Date(int{L; this} pYear, int{L; this} pMonth, int{L; this} pDay) throws (IllegalArgumentException{pYear; pMonth; pDay}){
         this(pYear, pMonth, pDay, 0, 0);

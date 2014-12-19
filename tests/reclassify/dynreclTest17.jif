@@ -1,0 +1,21 @@
+//Type-correct
+
+public class dynreclTest{
+
+
+   public dynreclTest {rif[q0*:{_}];rifi[q1*:{}]} () {
+       	final label{rif[q0*:{_}];rifi[q1*:{}]} lsA = new label {rif[q1*:{Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
+									rifi[q1*:{Alice},q2:{},q3:{Alice},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4]};
+		help(lsA);
+		
+   }
+   
+   public void help(label{rif[q0*:{_}];rifi[q1*:{}]} ls) 
+	where tr(tr(ls,f1),f2)<=ls
+   {
+	   	int x;
+		x=0;	
+   
+   }
+
+}

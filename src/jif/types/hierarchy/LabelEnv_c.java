@@ -814,8 +814,6 @@ public class LabelEnv_c implements LabelEnv {
             List<Id> ids = l.transToBeTaken(cLHS, new LinkedList<Id>());
             if (ids != null) {
                 Collections.reverse(ids);
-                ConfPolicy c2 = L2.confProjection();
-                IntegPolicy i2 = L2.integProjection();
                 if (cRHS instanceof PairLabel) {
                     RifConfPolicy ccr = (RifConfPolicy) cRHS.confProjection();
                     RifIntegPolicy icr =
@@ -824,7 +822,8 @@ public class LabelEnv_c implements LabelEnv {
                         ccr = ccr.takeTransition(i);
                         icr = icr.takeTransition(i);
                     }
-                    if (leq(ccr, c2) && leq(icr, i2)) return true;
+                    PairLabel newcRHS = ts.pairLabel(cRHS.position(), ccr, icr);
+                    if (leq(newcRHS, L2)) return true;
                 } else {
                     Label lbl = cRHS;
                     for (Id i : ids) {
@@ -839,8 +838,6 @@ public class LabelEnv_c implements LabelEnv {
             List<Id> ids = r.transToBeTaken(cRHS, new LinkedList<Id>());
             if (ids != null) {
                 Collections.reverse(ids);
-                ConfPolicy c1 = L1.confProjection();
-                IntegPolicy i1 = L1.integProjection();
                 if (cLHS instanceof PairLabel) {
                     RifConfPolicy ccl = (RifConfPolicy) cLHS.confProjection();
                     RifIntegPolicy icl =
@@ -849,7 +846,8 @@ public class LabelEnv_c implements LabelEnv {
                         ccl = ccl.takeTransition(i);
                         icl = icl.takeTransition(i);
                     }
-                    if (leq(c1, ccl) && leq(i1, icl)) return true;
+                    PairLabel newcLHS = ts.pairLabel(cRHS.position(), ccl, icl);
+                    if (leq(L1, newcLHS)) return true;
                 } else {
                     Label lbl = cLHS;
                     for (Id i : ids) {

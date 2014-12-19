@@ -198,24 +198,24 @@ public class Runtime {
 
     private static native String currentUserImpl();
 
-    public static int currentYear(Principal dummy) {
+    public static int currentYear(Principal dummy, Label dummylbl) {
         return new GregorianCalendar().get(Calendar.YEAR);
     }
 
-    public static int currentMonth(Principal dummy) {
+    public static int currentMonth(Principal dummy, Label dummylbl) {
         return new GregorianCalendar().get(Calendar.MONTH) - Calendar.JANUARY
                 + 1;
     }
 
-    public static int currentDayOfMonth(Principal dummy) {
+    public static int currentDayOfMonth(Principal dummy, Label dummylbl) {
         return new GregorianCalendar().get(Calendar.DAY_OF_MONTH);
     }
 
-    public static int currentHour(Principal dummy) {
+    public static int currentHour(Principal dummy, Label dummylbl) {
         return new GregorianCalendar().get(Calendar.HOUR_OF_DAY);
     }
 
-    public static int currentMinute(Principal dummy) {
+    public static int currentMinute(Principal dummy, Label dummylbl) {
         return new GregorianCalendar().get(Calendar.MINUTE);
     }
 

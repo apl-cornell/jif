@@ -1,3 +1,5 @@
+/*To compile: ~/Desktop/jif/bin/jifc -simpleoutput -classpath ~/Desktop/jif/tests *.jif  */
+
 import java.io.PrintStream;
 import jif.runtime.Runtime;
 
@@ -18,7 +20,7 @@ class Main{
                      (principal{rifi[q1*:{}]} p, String args[]) : {rifi[q1*:{}]} 
          throws (SecurityException{rifi[q1*:{}]}, IllegalArgumentException)
 
-    {     label lbl = new label {rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]};
+    {     final label lbl = new label {rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]};
           PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{_}];rifi[q1*:{}]} out = null;
           PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]} outinit = null;
           PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{}]} out2 = null;

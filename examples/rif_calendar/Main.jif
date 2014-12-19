@@ -109,7 +109,6 @@ public class Main {
 		out.println("Calendar of Bob");
 		out.println(srv.printCalendar(calB, Bob, lsB, ldB));
 
-		//System.out.println("Canceling of "+e1.toString()+"\n");
 		srv.cancelEvent(calA, 19871, Alice, lsA, ldA);     //both Alice and Bob should be able to cancel their shared events
 
 		out.println("Calendar of Alice");
