@@ -31,12 +31,12 @@ public class Server {
 	label{rif[q0*:{_}];rifi[q1*:{}]} ls2, label{rif[q0*:{_}];rifi[q1*:{}]} ld2,
 	int{rif[q0*:{_}];rifi[q1*:{}]} bond
 	) where tr(ls1,f9)<=ls2, tr(ld1,f9)<=ld2, tr(tr(ls1,f9),f9)<=tr(ls1,f9), tr(ls1,f9)<=ld2, tr(ls1,f9)<={rif[q0*:{_}];rifi[q1*:{}]},
-		tr(ls2,f9)<={rif[q0*:{_}];rifi[q1*:{}]}
+		tr(ls2,f9)<={rif[q0*:{_}];rifi[q1*:{}]}, tr(ls1,f3)<={rif[q0*:{_}];rifi[q1*:{}]}, tr(ls2,f3)<={rif[q0*:{_}];rifi[q1*:{}]}
 	{
 		Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls2} ne = null;
 		Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{tr({*ls2},f9)} dne = null;
 		try{
-		//if (cal2.rejectOnConflict(e)) return false;
+		if (reclassify(cal2.rejectOnConflict(se,ls1,ld1),f3)) return null;
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} sharedBetween1 = new rifList[{rif[q0*:{_}];rifi[q1*:{}]}]();
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} sharedBetween2 = new rifList[{rif[q0*:{_}];rifi[q1*:{}]}]();
 		sharedBetween1.add((Object)o1, new label {*ld1});  sharedBetween1.add((Object)o2, new label {*ld1});
@@ -74,7 +74,7 @@ public class Server {
 		Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{tr({*ls2},f9)} se = reclassify(e,f9);
 		final principal{rif[q0*:{_}];rifi[q1*:{}]} o1 = reclassify(se.getCreator(),f9);
 		final label ls1 = new label {rif[q1*:{o1},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
-									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4]};
+									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4,f3:q1->q4]};
 		final label ld1 = new label {rif[q1*:{o1},q2:{_},f9:q1->q2];
 									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 		try{
@@ -119,7 +119,7 @@ public class Server {
 							try{
 							final jif.lang.Principal{rif[q0*:{_}];rifi[q1*:{}]} o2 = nd.O;
 							final label ls2 = new label {rif[q1*:{o2},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
-										rifi[q1*:{o2},q2:{},q3:{o2},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4]};
+										rifi[q1*:{o2},q2:{},q3:{o2},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4,f3:q1->q4]};
 							final label ld2 = new label {rif[q1*:{o2},q2:{_},f9:q1->q2];
 							 			rifi[q1*:{o2},q2:{},q3:{o2},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 							Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2= (Calendar[o2,ls2,ld2]) nd.getData();
@@ -174,29 +174,6 @@ public class Server {
 		principal{rif[q0*:{_}];rifi[q1*:{}]} o, label{rif[q0*:{_}];rifi[q1*:{}]} ls, label{rif[q0*:{_}];rifi[q1*:{}]} ld){
 		return cal!=null?cal.takePubView():null;
 	}
-
-/*	public void printListOfEvents(rifList el){
-		if (el == null) return;
-		Node n = el.getHead();
-		int i=0;
-		String output = "[";
-		while (i<el.getSize()) {
-			if (n == null) return;
-			try{
-			Event e = (Event) n.getData();
-			if (e == null) return;
-			output += e.toString();
-			n = n.getNext();
-			i++;
-			if (i<el.getSize()){
-				output += ",";
-			}
-			}catch (ClassCastException impossible) { }
-		}
-		output += "]";
-		//System.out.println(output);
-	}
-*/
 
 }
 

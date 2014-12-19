@@ -1,4 +1,4 @@
-/*To compile: ~/Desktop/jif/bin/jifc -classpath ~/Desktop/jif/tests *.jif */
+/*To compile: ~/Desktop/jif/bin/jifc -simpleoutput -classpath ~/Desktop/jif/tests *.jif */
 /*To run: ~/Desktop/jif/bin/jif -classpath ~/Desktop/jif/tests Main */
 
 import java.io.PrintStream;
@@ -42,7 +42,7 @@ public class Main {
 
 		//f9 is a transition used in list operations
   		final label lsA = new label {rif[q1*:{Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
-									rifi[q1*:{Alice},q2:{},q3:{Alice},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4]};
+									rifi[q1*:{Alice},q2:{},q3:{Alice},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4,f3:q1->q4]};
 		final label ldA = new label {rif[q1*:{Alice},q2:{_},f9:q1->q2];
 									rifi[q1*:{Alice},q2:{},q3:{Alice},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 		final label ln = new label {rif[q0*:{_}];rifi[q1*:{}]};
@@ -50,7 +50,7 @@ public class Main {
 
 
 		final label lsB = new label {rif[q1*:{Bob},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
-									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4]};
+									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4,f3:q1->q4]};
 		final label ldB = new label {rif[q1*:{Bob},q2:{_},f9:q1->q2];
 									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 		Calendar calB = srv.createCalendar(Bob,lsB,ldB);
@@ -62,11 +62,11 @@ public class Main {
 		srv.addEvent(calA, eA, Alice, lsA, ldA);
 		Event[{tr({*lsA},f1)},ldA,ln]{tr({*lsA},f1)} peA = srv.publicizeSlot(calA, eA, Alice, lsA, ldA);
 		eA = new Event[lsA,ldA,ln](new Date[lsA](16, 9, 2014), new TimeOfDay[lsA](16, 15), 60, "Doctor appointment", calA, Alice);
-		//e.setAutoReject(true);
 		srv.addEvent(calA, eA, Alice, lsA, ldA);
 		srv.publicizeSlot(calA, eA, Alice, lsA, ldA);
 		eA = new Event[lsA,ldA,ln](new Date[lsA](5, 10, 2014), new TimeOfDay[lsA](9, 30), 15, "Meeting with Chris", calA, Alice);
 		srv.addEvent(calA, eA, Alice, lsA, ldA);
+		eA.setAutoReject(true);
 
 		Event[lsB,ldB,ln]{*lsB} eB = new Event[lsB,ldB,ln](new Date[lsB](15, 10, 2014), new TimeOfDay[lsB](14, 30), 30, "Go to barbershop", calB, Bob);
 		srv.addEvent(calB, eB, Bob, lsB,ldB);
@@ -89,10 +89,11 @@ public class Main {
 		srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
 		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
 
-		eB = new Event[lsB,ldB,ln](new Date[lsB](16, 9, 2014), new TimeOfDay[lsB](16, 45), 20, "Visit aunts", calB, Bob);
+		eB = new Event[lsB,ldB,ln](new Date[lsB](5, 10, 2014), new TimeOfDay[lsB](9, 20), 20, "Visit aunts", calB, Bob);
 		eAs = srv.requestSharedEvent(calB, calA, eB, Bob, Alice, lsB, ldB, lsA, ldA, 19872);
-		srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
-		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
+		if (reclassify(eAs,f9) != null)
+			srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
+		else out.println("Automatic rejection: Visit aunts\n");
 
 		eB = new Event[lsB,ldB,ln](new Date[lsB](20, 2, 2010), new TimeOfDay[lsB](8, 15), 120, "Go for cinema", calB, Bob);
 		eAs = srv.requestSharedEvent(calB, calA, eB, Bob, Alice, lsB, ldB, lsA, ldA, 19873);

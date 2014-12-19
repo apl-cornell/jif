@@ -324,40 +324,53 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 		return output;
 	}
 
-/*	public boolean rejectOnConflict(Event ereq){
-		rifList el = this.eventList;
-		if (el == null) return false;
-		int size=el.getSize();
-		Node n = el.getHead();
+	public boolean{Ls;*ls} rejectOnConflict {rif[q0*:{_}];rifi[q1*:{}]} 
+	(Event[ls,ld,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls} ereq, label{rif[q0*:{_}];rifi[q1*:{}]} ls, label{rif[q0*:{_}];rifi[q1*:{}]} ld)
+	{
+		boolean{Ls;*ls} result=false;
+		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{}]} el2 = this.eventList;
+		rifList[{rif[q0*:{_}];rifi[q1*:{}]}] el = reclassify(el2,f3);
+		int size;
 		int i;
+		int{Ls;*ls} eStart;
+		int{Ls;*ls} eFinish;
+		try{
+		if (ereq==null) throw new Error("Null ereq");
+		Date[ls]{*ls} ereqDt = ereq.getDate();
+		TimeOfDay[ls]{*ls} ereqT = ereq.getTime();
+		int{*ls} reqStart = ereqT.getHour()*60+ereqT.getMinute();
+		int{*ls} reqFinish = reqStart+ ereq.getDuration();
+		if (el==null) throw new Error("Null el");
+		size=el.getSize();
+		Node[{rif[q0*:{_}];rifi[q1*:{}]}] n = el.getHead();
 		for (i=0;i<size;i++) {
 			try{
-			if (n == null) return false;
-			Event e = (Event) n.getData();
-			if (ereq == null) return false;
-			TimeOfDay ereqT = ereq.getTime();
-			Date ereqDt = ereq.getDate();
-			if (e == null) return false;
-			TimeOfDay eT = e.getTime();
-			Date eDt = e.getDate();
-            if (ereq != null && ereqT != null && e!=null && eT!=null && eDt != null && ereqDt != null){
-				int reqStart = ereqT.getHour()*60+ereqT.getMinute();
-				int eStart = eT.getHour()*60+eT.getMinute();
-				int eFinish = eStart+ e.getDuration();
-				if (e.getAutoReject() && eDt.getYear()==ereqDt.getYear() && 
-					eDt.getMonth()==ereqDt.getMonth() &&
-					eDt.getDay()==ereqDt.getDay() && 
-					eStart<=reqStart && reqStart<=eFinish){
-					return true;
+				final Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} nd = n;
+				if (nd.La <= Ls && Ls <= nd.La){
+					Object{Ls} ue = nd.getData();
+					Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]{Ls} e = (Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]) ue;
+					if (e==null) throw new Error("Null e");
+					TimeOfDay[Ls]{Ls} eT = e.getTime();
+					Date[Ls]{Ls} eDt = e.getDate();
+					if (eT==null) throw new Error("Null eT");			
+					eStart = eT.getHour()*60+eT.getMinute();
+					eFinish = eStart+ e.getDuration();
+					if (eDt==null || ereqDt==null) throw new Error("Null eDt or ereqDt");
+					if (e.getAutoReject() && eDt.getYear()==ereqDt.getYear() && 
+						eDt.getMonth()==ereqDt.getMonth() &&
+						eDt.getDay()==ereqDt.getDay() && 
+						(eStart<=reqStart && reqStart<=eFinish ||
+						 reqStart<=eStart && eStart<=reqFinish)){
+						result=true;
+					}
 				}
-			}
-			n=n.getNext();
-			}
-			catch (ClassCastException impossible) { }
+				n=n.getNext();
+
+			}catch (ClassCastException impossible) { throw new Error("ClassCastException at rejectOnConflict!"); }
 		}
-		return false;
+		}catch (NullPointerException impossible) {}
+		return result;
 	}
-*/
 	
 
 }
