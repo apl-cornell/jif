@@ -567,6 +567,14 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
             <arg path="${jdk.home}/include" />
             <arg value="-I" />
             <arg path="${jif-runtime-native.java-include-dir.location}" />
+            <arg value="-I" />
+            <arg path="${jif-runtime-native.java-include-dir.location}/${env.OSTYPE}" />
+            <arg value="-I" />
+            <arg path="${jif-runtime-native.java-include-dir.location}/linux" />
+            <arg value="-I" />
+            <arg path="${jif-runtime-native.java-include-dir.location}/solaris" />
+            <arg value="-I" />
+            <arg path="${jif-runtime-native.java-include-dir.location}/win32" />
             <srcfile />
             <arg value="-o" />
             <targetfile />
