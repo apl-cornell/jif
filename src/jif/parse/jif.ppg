@@ -1114,8 +1114,8 @@ primary_no_new_array ::=
 }
 drop { /* no inner classes... */
     class_instance_creation_expression ::=
-        NEW class_type LPAREN argument_list_opt RPAREN
-    |   NEW class_type LPAREN argument_list_opt RPAREN class_body
+        NEW class_or_interface_type LPAREN argument_list_opt RPAREN
+    |   NEW class_or_interface_type LPAREN argument_list_opt RPAREN class_body
     |   primary DOT NEW simple_name LPAREN argument_list_opt RPAREN
     |   primary DOT NEW simple_name LPAREN argument_list_opt RPAREN class_body
     |   name DOT NEW simple_name LPAREN argument_list_opt RPAREN
