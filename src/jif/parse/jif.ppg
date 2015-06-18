@@ -623,7 +623,7 @@ override class_declaration ::=
                 interfaces_opt:d authority_opt:u constraints_opt:f class_body:e
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n, b),
                                                a, parser.nf.Id(parser.pos(b), b.getIdentifier()),
-                                               p, c, d, u, f, e); :}
+                                               p, c, d, u, f, e, parser.javadoc(parser.pos(a), parser.pos(n))); :}
     ;
 
 override super ::=
@@ -710,7 +710,8 @@ override method_header ::=
             {: RESULT = parser.nf.JifMethodDecl(parser.pos(b,c,c), a,
                         parser.array(b, e.intValue()),
                         parser.nf.Id(parser.pos(c), c.getIdentifier()),
-                                                i, d, r, f, w, null);
+                                                i, d, r, f, w, null,
+                                                parser.javadoc(parser.pos(a), parser.pos(b)));
                if (i != null) parser.countAnnotation(parser.PC_BOUND_ANNOTATION, RESULT.position());
              :}
     |   modifiers_opt:a VOID:b IDENTIFIER:c label_opt:i
@@ -720,7 +721,8 @@ override method_header ::=
                         parser.nf.CanonicalTypeNode(parser.pos(b),
                                    parser.ts.Void()),
                                    parser.nf.Id(parser.pos(c), c.getIdentifier()),
-                                                i, d, r, f, w, null);
+                                                i, d, r, f, w, null,
+                                                parser.javadoc(parser.pos(a), parser.pos(b)));
                if (i != null) parser.countAnnotation(parser.PC_BOUND_ANNOTATION, RESULT.position());
             :}
     ;
@@ -779,7 +781,8 @@ override constructor_declaration ::=
                    i = null;
                }
            RESULT = parser.nf.JifConstructorDecl(parser.pos(q, y),
-                             a, b, i, r, c, d, w, e); 
+                             a, b, i, r, c, d, w, e,
+                             parser.javadoc(parser.pos(a), parser.pos(q))); 
         :}
     ;
     
@@ -991,7 +994,8 @@ override interface_declaration ::=
                                                a.set(Flags.INTERFACE),
                                                parser.nf.Id(parser.pos(b),
                                                b.getIdentifier()),
-                                               p, null, d, u, f, e); :}
+                                               p, null, d, u, f, e,
+                                               parser.javadoc(parser.pos(a), parser.pos(n))); :}
     ;
 
 override extends_interfaces ::=

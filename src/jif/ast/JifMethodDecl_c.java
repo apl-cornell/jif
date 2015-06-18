@@ -19,6 +19,7 @@ import polyglot.ast.Block;
 import polyglot.ast.Ext;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
+import polyglot.ast.Javadoc;
 import polyglot.ast.MethodDecl_c;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
@@ -48,16 +49,19 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
     public JifMethodDecl_c(Position pos, Flags flags, TypeNode returnType,
             Id name, LabelNode startLabel, List<Formal> formals,
             LabelNode returnLabel, List<TypeNode> throwTypes,
-            List<ConstraintNode<Assertion>> constraints, Block body) {
+            List<ConstraintNode<Assertion>> constraints, Block body,
+            Javadoc javadoc) {
         this(pos, flags, returnType, name, startLabel, formals, returnLabel,
-                throwTypes, constraints, body, null);
+                throwTypes, constraints, body, javadoc, null);
     }
 
     public JifMethodDecl_c(Position pos, Flags flags, TypeNode returnType,
             Id name, LabelNode startLabel, List<Formal> formals,
             LabelNode returnLabel, List<TypeNode> throwTypes,
-            List<ConstraintNode<Assertion>> constraints, Block body, Ext ext) {
-        super(pos, flags, returnType, name, formals, throwTypes, body, ext);
+            List<ConstraintNode<Assertion>> constraints, Block body,
+            Javadoc javadoc, Ext ext) {
+        super(pos, flags, returnType, name, formals, throwTypes, body, javadoc,
+                ext);
         this.startLabel = startLabel;
         this.returnLabel = returnLabel;
         this.constraints = ListUtil.copy(constraints, true);
@@ -156,7 +160,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
             if (!f.isDisambiguated()) {
                 // formals are not disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal()
-                        .setUnreachableThisRun();
+                .setUnreachableThisRun();
                 return this;
             }
             formalTypes.add(f.declType());
@@ -167,7 +171,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
         if (!n.returnType().isDisambiguated()) {
             // return type node not disambiguated yet
             ar.job().extensionInfo().scheduler().currentGoal()
-                    .setUnreachableThisRun();
+            .setUnreachableThisRun();
             return this;
         }
 
@@ -176,7 +180,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
         if (n.startLabel() != null && !n.startLabel().isDisambiguated()) {
             // the startlabel node hasn't been disambiguated yet
             ar.job().extensionInfo().scheduler().currentGoal()
-                    .setUnreachableThisRun();
+            .setUnreachableThisRun();
             return this;
         }
 
@@ -193,7 +197,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
         if (n.returnLabel() != null && !n.returnLabel().isDisambiguated()) {
             // the return label node hasn't been disambiguated yet
             ar.job().extensionInfo().scheduler().currentGoal()
-                    .setUnreachableThisRun();
+            .setUnreachableThisRun();
             return this;
         }
 
@@ -224,7 +228,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
             if (!tn.isDisambiguated()) {
                 // throw types haven't been disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal()
-                        .setUnreachableThisRun();
+                .setUnreachableThisRun();
                 return this;
             }
 
@@ -243,7 +247,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
             if (!cn.isDisambiguated()) {
                 // constraint nodes haven't been disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal()
-                        .setUnreachableThisRun();
+                .setUnreachableThisRun();
                 return this;
             }
             constraints.addAll(cn.constraints());
@@ -258,7 +262,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
     /**
      * Rename the arg labels and arg roots. This is needed to make sure
      * that during substitution of args in a recursive method call,
-     * we don't confuse the 
+     * we don't confuse the
      */
     public static JifMethodInstance unrenameArgs(JifMethodInstance jmi) {
         jmi = (JifMethodInstance) jmi.copy();
@@ -273,7 +277,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
     /**
      * Rename the arg labels and arg roots. This is needed to make sure
      * that during substitution of args in a recursive method call,
-     * we don't confuse the 
+     * we don't confuse the
      */
     private static void renameArgs(JifMethodInstance jmi, TypeSubstitutor tsub)
             throws SemanticException {
@@ -379,11 +383,11 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
 //if (L instanceof DynamicArgLabel) {
 //DynamicArgLabel dal = (DynamicArgLabel)L;
 //JifTypeSystem jts = (JifTypeSystem)dal.typeSystem();
-//L = jts.dynamicArgLabel(dal.position(), 
-//dal.uid(), 
-//dal.name(), 
-//dal.label(), 
-//dal.index(), 
+//L = jts.dynamicArgLabel(dal.position(),
+//dal.uid(),
+//dal.name(),
+//dal.label(),
+//dal.index(),
 //false);
 //}
 //return L;
