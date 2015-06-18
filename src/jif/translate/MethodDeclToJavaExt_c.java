@@ -35,7 +35,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
     protected List<Formal> formals;
 
     /**
-     * @throws SemanticException  
+     * @throws SemanticException
      */
     @Override
     public NodeVisitor toJavaEnter(JifToJavaRewriter rw)
@@ -76,7 +76,7 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
         n =
                 rw.java_nf().MethodDecl(n.position(), n.flags(),
                         n.returnType(), n.id(), formals, n.throwTypes(),
-                        n.body());
+                        n.body(), n.javadoc());
         n = n.methodInstance(null);
 
         if (isMainMethod) {

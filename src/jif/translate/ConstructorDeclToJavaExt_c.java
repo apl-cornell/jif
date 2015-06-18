@@ -73,7 +73,8 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
                 formals.addAll(n.formals());
                 n =
                         rw.java_nf().ConstructorDecl(n.position(), n.flags(),
-                                n.id(), formals, n.throwTypes(), n.body());
+                                n.id(), formals, n.throwTypes(), n.body(),
+                                n.javadoc());
                 n = n.constructorInstance(null);
                 retVal = n;
             } else {
@@ -82,7 +83,8 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
                 NodeFactory nf = rw.java_nf();
                 retVal =
                         nf.ConstructorDecl(n.position(), n.flags(), n.id(),
-                                n.formals(), n.throwTypes(), n.body());
+                                n.formals(), n.throwTypes(), n.body(),
+                                n.javadoc());
             }
         } else {
             retVal = jifClassConstructorDecl(rw, n);
@@ -103,7 +105,7 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
         // add a call to the initializer.
         inits.add(rw.qq().parseStmt(
                 "this." + ClassDeclToJavaExt_c.INITIALIZATIONS_METHOD_NAME
-                        + "();"));
+                + "();"));
 
         if (body.statements().isEmpty()
                 || (body.statements().size() == 1 && body.statements().get(0) instanceof Empty)) {
@@ -177,7 +179,7 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
 
         MethodDecl m =
                 nf.MethodDecl(n.position(), n.flags(), tn, name, n.formals(),
-                        n.throwTypes(), body);
+                        n.throwTypes(), body, n.javadoc());
         m = m.methodInstance(null);
 
         return m;
