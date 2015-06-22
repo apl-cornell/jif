@@ -34,7 +34,7 @@ public class BottomPrincipal_c extends Principal_c implements BottomPrincipal {
         if (Report.should_report(Report.debug, 2)) {
             return "<bottom principal>";
         }
-        return "_";
+        return "⊥";
     }
 
     @Override

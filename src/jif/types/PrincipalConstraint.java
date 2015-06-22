@@ -23,15 +23,15 @@ import polyglot.util.Position;
 public class PrincipalConstraint extends Constraint {
     /**
      * An equivalence kind of constraint. That is, the constraint requires that
-     * lhs actsfor rhs and rhs actsfor lhs.
+     * lhs ≽ rhs and rhs ≽ lhs.
      */
     public static final Kind EQUIV = new Kind(" equiv ");
 
     /**
      * An actsfor kind of constraint. That is, the constraint requires that
-     * lhs actsfor rhs.
+     * lhs ≽ rhs.
      */
-    public static final Kind ACTSFOR = new Kind(" actsfor ");
+    public static final Kind ACTSFOR = new Kind(" ≽ ");
 
     public PrincipalConstraint(Principal lhs, Kind kind, Principal rhs,
             LabelEnv env, Position pos, ConstraintMessage msg, boolean report) {

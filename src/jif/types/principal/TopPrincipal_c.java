@@ -34,7 +34,7 @@ public class TopPrincipal_c extends Principal_c implements TopPrincipal {
         if (Report.should_report(Report.debug, 2)) {
             return "<top principal>";
         }
-        return "*";
+        return "⊤";
     }
 
     @Override

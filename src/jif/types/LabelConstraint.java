@@ -30,15 +30,15 @@ import polyglot.util.Position;
 public class LabelConstraint extends Constraint {
     /**
      * An equality kind of constraint. That is, the constraint requires that
-     * lhs &lt;= rhs and rhs &lt;= lhs.
+     * lhs ⊑ rhs and rhs ⊑ lhs.
      */
     public static final Kind EQUAL = new Kind(" == ");
 
     /**
      * An inequality kind of constraint. That is, the constraint requires that
-     * lhs &lt;= rhs.
+     * lhs ⊑ rhs.
      */
-    public static final Kind LEQ = new Kind(" <= ");
+    public static final Kind LEQ = new Kind(" ⊑ ");
 
     /**
      * Names for the LHS
