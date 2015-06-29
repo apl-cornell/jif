@@ -71,10 +71,7 @@ public class BinaryToJavaExt_c extends ExprToJavaExt_c {
 
         String meth = isEquiv ? "equivalentTo" : "actsFor";
         String comparison = className + "." + meth + "((%E), (%E))";
-        List<Expr> l = new ArrayList<Expr>(2);
-        l.add(b.left());
-        l.add(b.right());
-        return rw.qq().parseExpr(comparison, l);
+        return rw.qq().parseExpr(comparison, b.left(), b.right());
     }
 
     /**
@@ -86,10 +83,7 @@ public class BinaryToJavaExt_c extends ExprToJavaExt_c {
         String meth = isEquiv ? "equivalentTo" : "relabelsTo";
         String comparison = rw.runtimeLabelUtil() + "." + meth + "((%E), (%E))";
 
-        List<Expr> l = new ArrayList<Expr>(2);
-        l.add(b.left());
-        l.add(b.right());
-        return rw.qq().parseExpr(comparison, l);
+        return rw.qq().parseExpr(comparison, b.left(), b.right());
     }
 
 }
