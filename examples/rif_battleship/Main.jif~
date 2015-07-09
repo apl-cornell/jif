@@ -1,5 +1,5 @@
 /*To compile: ~/Desktop/jif/bin/jifc -simpleoutput -classpath ~/Desktop/jif/tests *.jif  */
-
+/*To run: ~/Desktop/jif/bin/jif  -classpath ~/Desktop/jif/tests Main  */
 import java.io.PrintStream;
 import jif.runtime.Runtime;
 

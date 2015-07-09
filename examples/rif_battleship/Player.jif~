@@ -38,7 +38,7 @@ class Player[principal P, principal O] {
      */
     private final List[{rifi[q1*:{}]}]{this} opponentQueries;
 
-    private Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f3:q0->q1]}]{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f3:q0->q1]} nextQuery = null;
+    private Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f3:q0->q1]}]{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f3:q0->q1]} nextQuery = null;
 
     public Player() {
 	opponentQueries = new LinkedList[{rifi[q1*:{}]}]();
@@ -47,31 +47,31 @@ class Player[principal P, principal O] {
     /**
      * Create an initial board by placing ships to cover numCovered coords.
      */
-    Board[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{_},q1:{},f2:q0->q1]}]{rifi[q0*:{_},q1:{},f2:q0->q1]} init{rifi[q0*:{_},q1:{},f2:q0->q1]}(int{rifi[q0*:{_},q1:{},f2:q0->q1]} numCovered) {
+    Board[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{P},q1:{},f2:q0->q1]}]{rifi[q0*:{P},q1:{},f2:q0->q1]} init{rifi[q0*:{P},q1:{},f2:q0->q1]}(int{rifi[q0*:{P},q1:{},f2:q0->q1]} numCovered) {
 	// Here what we would do in a full system is make a call to
 	// some non-Jif function, through the runtime interface, to
 	// get the position of the ships to place. That function would
 	// either return something random, or would implement some
 	// strategy. Here, we fake it with some fixed positions for
 	// ships.
-	final Ship[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{_},q1:{},f2:q0->q1]}]{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}
+	final Ship[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{P},q1:{},f2:q0->q1]}]{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}
 [] myCunningStrategy = {
-	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1] ; rifi[q0*:{_},q1:{},f2:q0->q1]}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}](1, 1), 1, true),
-	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}](1, 3), 2, false),
-	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}](2, 2), 3, true),
-	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}](3, 4), 4, false),
-	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}](5, 6), 5, true),
-	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}](5, 7), 6, false), 
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1] ; rifi[q0*:{P},q1:{},f2:q0->q1]}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](1, 1), 1, true),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](1, 3), 2, false),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](2, 2), 3, true),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](3, 4), 4, false),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](5, 6), 5, true),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](5, 7), 6, false), 
 	};
 
-	Board[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}] board = new Board[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}]();
+	Board[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}] board = new Board[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}]();
 	int i = 0;
         for (int count = numCovered; count > 0 && board != null; ) {
 	    try {
-		Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}] newPiece = myCunningStrategy[i++];
+		Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}] newPiece = myCunningStrategy[i++];
 		if (newPiece != null && newPiece.length > count) {
 		    // this ship is too long!
-		    newPiece = new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{_},q1:{},f2:q0->q1]}](newPiece.pos, 
+		    newPiece = new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{P},q1:{},f2:q0->q1]}](newPiece.pos, 
 					              count, 
 					              newPiece.isHorizontal);
 		}
@@ -100,24 +100,24 @@ class Player[principal P, principal O] {
      * Endorse the opponents board.
      */
     Board[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]}]
-    reclElements{rifi[q1*:{}]}(Board[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{_},q1:{},f2:q0->q1]}]{rifi[q0*:{_},q1:{},f2:q0->q1]} oldboard){
+    reclElements{rifi[q1*:{}]}(Board[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]}]{rifi[q0*:{O},q1:{},f2:q0->q1]} oldboard){
 
      Board[{rif[q0*:{O},q1:{_},f1:q0->q1]; rifi[q1*:{}]}]{rifi[q1*:{}]} newBoard = new Board[{rif[q0*:{O},q1:{_},f1:q0->q1]; rifi[q1*:{}]}]();
-     List[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{_},q1:{},f2:q0->q1]}]{rifi[q0*:{_},q1:{},f2:q0->q1]} shps = oldboard==null?null:oldboard.Ships();
-     int{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{_},q1:{},f2:q0->q1]} szp = shps==null?0:shps.size();
+     List[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]}]{rifi[q0*:{O},q1:{},f2:q0->q1]} shps = oldboard==null?null:oldboard.Ships();
+     int{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]} szp = shps==null?0:shps.size();
      int{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} sz = reclassify(szp,f2);
      for (int i = 0; i < sz; i++) {
-            Ship[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{_},q1:{},f2:q0->q1]}]{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{_},q1:{},f2:q0->q1]}  s = null;
+            Ship[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]}]{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]}  s = null;
             try {
-                s = (Ship[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{_},q1:{},f2:q0->q1]}])(shps==null?null:shps.get(i));
+                s = (Ship[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]}])(shps==null?null:shps.get(i));
             }
             catch (IndexOutOfBoundsException impossible) { }
             catch (ClassCastException impossible) { }
             
             // endorse the ship
-            Ship[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{_},q1:{},f2:q0->q1]}]{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} ss = reclassify(s,f2);
+            Ship[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]}]{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} ss = reclassify(s,f2);
             if (ss != null) {
-                Coordinate[{rif[q0*:{O},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f2:q0->q1]}]{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} pos = ss.pos;
+                Coordinate[{rif[q0*:{O},q1:{_},f1:q0->q1]; rifi[q0*:{O},q1:{},f2:q0->q1]}]{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} pos = ss.pos;
                 if (pos != null) {
                     int{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} posX = reclassify(pos.x, f2);
                     int{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} posY = reclassify(pos.y, f2);
@@ -143,8 +143,8 @@ class Player[principal P, principal O] {
     /**
      * Endorse a query from the opponent.
      */
-    Coordinate[{rifi[q1*:{}]}]{rifi[q1*:{}]} reclassQuery{rifi[q1*:{}]}(Coordinate[{rifi[q0*:{_},q1:{},f3:q0->q1]}]{rifi[q1*:{}]} qu){
-        Coordinate[{rifi[q0*:{_},q1:{},f3:q0->q1]}]{rifi[q1*:{}]} query = qu;
+    Coordinate[{rifi[q1*:{}]}]{rifi[q1*:{}]} reclassQuery{rifi[q1*:{}]}(Coordinate[{rifi[q0*:{O},q1:{},f3:q0->q1]}]{rifi[q1*:{}]} qu){
+        Coordinate[{rifi[q0*:{O},q1:{},f3:q0->q1]}]{rifi[q1*:{}]} query = qu;
         if (query == null) return null;
         int x = reclassify(query.x, f3);
         int y = reclassify(query.y, f3);
@@ -154,15 +154,15 @@ class Player[principal P, principal O] {
     /**
      * Generate the next query to ask the opponent.
      */
-    public Coordinate[{rif[q0*:{_}];rifi[q0*:{_},q1:{},f3:q0->q1]}]{rifi[q0*:{_},q1:{},f3:q0->q1]} getNextQuery{rifi[q0*:{_},q1:{},f3:q0->q1]}() {
+    public Coordinate[{rif[q0*:{_}];rifi[q0*:{P},q1:{},f3:q0->q1]}]{rifi[q0*:{P},q1:{},f3:q0->q1]} getNextQuery{rifi[q0*:{P},q1:{},f3:q0->q1]}() {
 	// Here what we would do in a full system is make a call to
 	// some non-Jif function, through the runtime interface, to
 	// get the next coordinate to ask our opponent. We fake it
 	// here by asking queries in a fixed order.
 
-	Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{_},q1:{},f3:q0->q1]}] c = this.nextQuery;
+	Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{P},q1:{},f3:q0->q1]}] c = this.nextQuery;
 	if (c == null) {
-	    c = new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{_},q1:{},f3:q0->q1]}](0,0);
+	    c = new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{P},q1:{},f3:q0->q1]}](0,0);
 	}
 
 	// update nextQuery.
@@ -171,10 +171,10 @@ class Player[principal P, principal O] {
 	int newY = c.y + (direction?-1:1);
 	if (newX < 0) newX = 0;
 	if (newY < 0) newY = 0;
-	this.nextQuery = new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{_},q1:{},f3:q0->q1]}](newX, newY);
+	this.nextQuery = new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f3:q0->q1]}](newX, newY);
 
 	// we now have our secret query c, which needs to be declassified.
-	Coordinate[{rif[q0*:{_}];rifi[q0*:{_},q1:{},f3:q0->q1]}] d = new Coordinate[{rif[q0*:{_}];rifi[q0*:{_},q1:{},f3:q0->q1]}](reclassify(c.x,f1),reclassify(c.y,f1));
+	Coordinate[{rif[q0*:{_}];rifi[q0*:{P},q1:{},f3:q0->q1]}] d = new Coordinate[{rif[q0*:{_}];rifi[q0*:{P},q1:{},f3:q0->q1]}](reclassify(c.x,f1),reclassify(c.y,f1));
 
 	return d;
     }
@@ -207,10 +207,9 @@ class Player[principal P, principal O] {
 	catch (ClassCastException impossible) { }
 
 
-	// find the result.
+	// find and declassify the result.
 	boolean result = reclassify(brd.testPosition(query, new label {rifi[q1*:{}]}),f1);
-	
-	// declassify the result
+
 	return result;
     }
 }
