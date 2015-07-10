@@ -11,7 +11,7 @@ public class Server {
 		Calendar[O,ls,ld]{rif[q0*:{_}];rifi[q1*:{}]} cal = new Calendar[O, ls, ld]();
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} cl = this.calList;
 		if (cl == null) return null;
-		cl.add(cal, new label {rif[q0*:{_}];rifi[q1*:{}]}, O);
+		cl.add(cal, new label {rif[q0*:{_}];rifi[q1*:{}]}, ls, ld, O);
  		return cal;
 	}
 
@@ -34,7 +34,7 @@ public class Server {
 			new label tr(ls2,f3) <= new label {rif[q0*:{_}];rifi[q1*:{}]}){
 			if (reclassify(cal2.rejectOnConflict(se,ls1,ld1),f3)) result=true;
 		}
-		}catch (NullPointerException imopssible) {}
+		}catch (NullPointerException impossible) {}
 		return result;
 	}
 
@@ -70,7 +70,7 @@ public class Server {
 		ne = new Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}](
 				date, time, 
 				reclassify(e.getDuration(),f9), 
-				reclassify(e.getDescription(),f9), 
+				reclassify(e.getDescription(),f9), reclassify(e.getCreatorCalNode(),f9),
 				reclassify(e.getCreatorCal(),f9),reclassify(e.getCreator(),f9));
 		dne = reclassify(ne,f9);
 		dne.setBond(bond);
@@ -88,16 +88,16 @@ public class Server {
 	{
 		try{
 		Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{tr({*ls2},f9)} se = reclassify(e,f9);
+		Node[{rif[q0*:{_}];rifi[q1*:{}]}]{{rif[q0*:{_}];rifi[q1*:{}]}} n1 = reclassify(se.getCreatorCalNode(),f9);
+		final label ls1 = n1.Lb;
+		final label ld1 = n1.Lc;
 		final principal{rif[q0*:{_}];rifi[q1*:{}]} o1 = reclassify(se.getCreator(),f9);
-		final label ls1 = new label {rif[q1*:{o1},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
-									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4,f3:q1->q4]};
-		final label ld1 = new label {rif[q1*:{o1},q2:{_},f9:q1->q2];
-									rifi[q1*:{o1},q2:{},q3:{o1},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 		try{
-		Calendar[o1,ls1,ld1] cal1 = (Calendar[o1,ls1,ld1]) cal2.acceptPendingEvent(e);
+		Calendar[o1,ls1,ld1] cal1 = (Calendar[o1,ls1,ld1]) reclassify(se.getCreatorCal(),f9);
+		cal2.acceptPendingEvent(e);
 		int{rif[q0*:{_}];rifi[q1*:{}]} bond= reclassify(se.getBond(),f9);
 		Event[ls1,ld1,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls1} e1 = cal1.findRequestedEvent(bond);
-		if (cal1 != null) cal1.requestedEventAccepted(e1);
+		if (cal1 != null && new label tr(ls1,f9) <= new label {rif[q0*:{_}];rifi[q1*:{}]}) cal1.requestedEventAccepted(e1);
 		}catch (ClassCastException impossible) { }
 		}catch (NullPointerException impossible) {}
 	}
@@ -133,14 +133,12 @@ public class Server {
 						final Node[{rif[q0*:{_}];rifi[q1*:{}]}] nd = n;
 						if (nd != null && nd.La <= new label {rif[q0*:{_}];rifi[q1*:{}]}){
 							try{
-							final jif.lang.Principal{rif[q0*:{_}];rifi[q1*:{}]} o2 = nd.O;
-							final label ls2 = new label {rif[q1*:{o2},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
-										rifi[q1*:{o2},q2:{},q3:{o2},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4,f3:q1->q4]};
-							final label ld2 = new label {rif[q1*:{o2},q2:{_},f9:q1->q2];
-							 			rifi[q1*:{o2},q2:{},q3:{o2},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
+							final label ls2 = nd.Lb;
+							final label ld2 = nd.Lc;
+							final jif.lang.Principal o2 = nd.O;
 							Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2= (Calendar[o2,ls2,ld2]) nd.getData();
 							if(cal2!=null){
-								if (o2 != null && o2.equals(s)){
+								if (o2 != null && o2.equals(s) && new label tr(tr(ls2,f7),f9) <= new label {rif[q0*:{_}];rifi[q1*:{}]}){
 									Event[{tr({*ls2},f7)},{tr({*ld2},f7)},{rif[q0*:{_}];rifi[q1*:{}]}]{tr({*ls2},f7)} e2 = cal2.findAcceptedEvent(bond);
 									cal2.cancelEvent(e2);
 								}

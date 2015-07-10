@@ -2,13 +2,15 @@ public class Node[label L] {
 	
 	final label{L} La;
 	final label{L} Lb;
+	final label{L} Lc;
 	final jif.lang.Principal{L} O;
 	private Node[L]{L} next;
 	private final Object{*La} data;
 
 	public Node(Object{*la} data, label{L} la) {
 		this.La = la;
-    this.Lb = la;
+    	this.Lb = la;
+		this.Lc = la;
 		this.O=null;
 		this.next = null;
 		this.data = data;
@@ -16,16 +18,18 @@ public class Node[label L] {
 
 	public Node(Object{*la} data, label{L} la, label{L} lb) {
 		this.La = la;
-    this.Lb = lb;
+    	this.Lb = lb;
+		this.Lc = lb;
 		this.O=null;
 		this.next = null;
 		this.data = data;
 	}
 
-	public Node(Object{*la} data, label{L} la, jif.lang.Principal{L} o) {
+	public Node(Object{*la} data, label{L} la, label{L} lb, label{L} lc,jif.lang.Principal{L} o) {
 		this.La = la;
-   	this.Lb = la;
-    this.O = o;
+   		this.Lb = lb;
+    	this.Lc = lc;
+		this.O=o;
 		this.next = null;
 		this.data = data;
 	}

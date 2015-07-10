@@ -3,6 +3,7 @@ public class Event[label Ls, label Ld, label Ln] {
 	private Slot[Ls]{Ls} slot;
 	private String{Ld} description;
 	private Object{Ls} creatorCal;
+	private Node[Ln]{Ls} creatorCalNode;
 	private principal{Ls} creator;
 	private boolean{Ls} autoRejectOnConflict;
 	private rifList[Ln]{Ld} sharedBetween;
@@ -11,10 +12,11 @@ public class Event[label Ls, label Ld, label Ln] {
 	private Node[Ln]{Ls} node;
 	private int{Ls} bond=0;
 
-	public Event(Date[Ls]{Ls} date, TimeOfDay[Ls]{Ls} time, int{Ls} duration, String{Ld} description, 
+	public Event(Date[Ls]{Ls} date, TimeOfDay[Ls]{Ls} time, int{Ls} duration, String{Ld} description, Node[Ln]{Ls} creatorCalNode,
 			Object{Ls} creatorCal, principal{Ls} creator) {
 		this.slot = new Slot[Ls](date,time,duration);
 		this.description = description;
+		this.creatorCalNode=creatorCalNode;
 		this.creatorCal = creatorCal;
 		this.creator=creator;
 		this.autoRejectOnConflict=false;
@@ -77,6 +79,10 @@ public class Event[label Ls, label Ld, label Ln] {
 
 	public Object{Ls} getCreatorCal() {
 		return creatorCal;
+	}
+
+	public Node[Ln]{Ls} getCreatorCalNode() {
+		return creatorCalNode;
 	}
 
 	public void setAutoReject{Ls}(boolean{Ls} b){

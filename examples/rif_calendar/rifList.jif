@@ -44,10 +44,10 @@ public class rifList[label L] {
 		return n;
 	}
 
-  public Node[L]{L} add{L}(Object{*La} data, label{L} La, jif.lang.Principal{L} o)
+  public Node[L]{L} add{L}(Object{*La} data, label{L} La, label{L} Lb, label{L} Lc, jif.lang.Principal{L} o)
 		where L<=La
 	{
-		Node n = new Node[L](data,La,o);
+		Node n = new Node[L](data,La,Lb,Lc,o);
 		Node lst = this.last;
 		if (lst == null){
 			this.head = n;

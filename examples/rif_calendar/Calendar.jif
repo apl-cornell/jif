@@ -58,12 +58,11 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 
 //inconsistent syntax of tr(L,f)!!!
 
-	public Object{rif[q0*:{_}];rifi[q1*:{}]} acceptPendingEvent{rif[q0*:{_}];rifi[q1*:{}]}(Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]{Ls} se)
+	public void acceptPendingEvent{rif[q0*:{_}];rifi[q1*:{}]}(Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]{Ls} se)
 		where tr(Ls,f9)<={rif[q0*:{_}];rifi[q1*:{}]}, Ls<=Ld
 	{
   		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{}]} pe2 = this.pendingEvents;
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}] pe = reclassify(pe2,f3);
-		Object{rif[q0*:{_}];rifi[q1*:{}]} p = null;
 		try{
 			Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}] e2 = reclassify(se,f9);
 			pe.remove(reclassify(e2.getNode(),f9));
@@ -78,14 +77,12 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 				new Event[new label tr(Ls,f7),{tr({Ld},f7)},{rif[q0*:{_}];rifi[q1*:{}]}](
 				date, time, 
 				reclassify(e.getDuration(),f7), 
-				reclassify(e.getDescription(),f7), 
+				reclassify(e.getDescription(),f7), reclassify(e.getCreatorCalNode(),f7),
 				reclassify(e.getCreatorCal(),f7), reclassify(e.getCreator(),f7));
 			ne.setBond(reclassify(e.getBond(),f7));
 		  ne.setSharedBetween(reclassify(e.getSharedBetween(),f7));
 			addEvent(ne,new label tr(Ls,f7),new label tr(Ld,f7));
-			p=reclassify(e2.getCreatorCal(),f9);
 		}catch (NullPointerException impossible) {}
-		return p;
 	}
 
 	public void requestedEventAccepted{rif[q0*:{_}];rifi[q1*:{}]}(Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}]{Ls} se)
@@ -107,7 +104,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 				new Event[new label tr(Ls,f7),{tr({Ld},f7)},{rif[q0*:{_}];rifi[q1*:{}]}](
 				date, time, 
 				reclassify(e.getDuration(),f7), 
-				reclassify(e.getDescription(),f7), 
+				reclassify(e.getDescription(),f7), reclassify(e.getCreatorCalNode(),f7),
 				reclassify(e.getCreatorCal(),f7),reclassify(e.getCreator(),f7));
 			ne.setBond(reclassify(e.getBond(),f7));
 		  ne.setSharedBetween(reclassify(e.getSharedBetween(),f7));			
@@ -140,7 +137,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 				new Event[{tr({tr({Ls},f7)},f8)},{tr({tr({Ld},f7)},f8)},{rif[q0*:{_}];rifi[q1*:{}]}](
 				date, time, 
 				reclassify(e.getDuration(),f8), 
-				reclassify(e.getDescription(),f8), 
+				reclassify(e.getDescription(),f8), reclassify(e.getCreatorCalNode(),f8),
 				reclassify(e.getCreatorCal(),f8),reclassify(e.getCreator(),f7));
 			Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} n;
 			n=ce.add(ne, new label tr(tr(Ls,f7),f8), new label tr(tr(Ls,f7),f8));
@@ -253,7 +250,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 			ne = new Event[{tr({Ls},f1)},Ld,{rif[q0*:{_}];rifi[q1*:{}]}](
 				date, time, 
 				reclassify(e.getDuration(),f1), 
-				e.getDescription(), 
+				e.getDescription(), reclassify(e.getCreatorCalNode(),f1),
 				reclassify(e.getCreatorCal(),f1), reclassify(e.getCreator(),f1));
 			addEvent(ne,new label tr(Ls,f1),Ld);
 		}catch (NullPointerException impossible) {}
@@ -287,7 +284,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 			ne = new Event[Ls,Ld,{rif[q0*:{_}];rifi[q1*:{}]}](
 				date, time, 
 				reclassify(e.getDuration(),f2), 
-				e.getDescription(), 
+				e.getDescription(), e.getCreatorCalNode(),
 				e.getCreatorCal(),e.getCreator());
 			addEvent(ne, Ls, Ld);
 		}catch (NullPointerException impossible) {}
