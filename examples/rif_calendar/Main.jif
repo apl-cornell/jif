@@ -41,6 +41,7 @@ public class Main {
 		Server{rif[q0*:{_}];rifi[q1*:{}]} srv = new Server();
 
 		//f9 is a transition used in list operations
+		//transition f3 may or may not exist in lsA and lsB, depending on the choice of the corresponding user!
   		final label lsA = new label {rif[q1*:{Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
 									rifi[q1*:{Alice},q2:{},q3:{Alice},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4,f3:q1->q4]};
 		final label ldA = new label {rif[q1*:{Alice},q2:{_},f9:q1->q2];
@@ -49,7 +50,7 @@ public class Main {
 		Calendar calA = srv.createCalendar(Alice,lsA,ldA);
 
 
-		final label lsB = new label {rif[q1*:{Bob},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
+		final label lsB = new label {rif[q1*:{Bob},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f9:q1->q3,f9:q2->q3,f6:q2->q3];
 									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4,f3:q1->q4]};
 		final label ldB = new label {rif[q1*:{Bob},q2:{_},f9:q1->q2];
 									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};

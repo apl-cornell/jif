@@ -356,7 +356,7 @@ public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif
 					eStart = eT.getHour()*60+eT.getMinute();
 					eFinish = eStart+ e.getDuration();
 					if (eDt==null || ereqDt==null) throw new Error("Null eDt or ereqDt");
-					if (e.getAutoReject() && eDt.getYear()==ereqDt.getYear() && 
+					if (eDt.getYear()==ereqDt.getYear() && 
 						eDt.getMonth()==ereqDt.getMonth() &&
 						eDt.getDay()==ereqDt.getDay() && 
 						(eStart<=reqStart && reqStart<=eFinish ||

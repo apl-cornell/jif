@@ -23,6 +23,22 @@ public class Server {
 
 
 	//used for confidentiality downgrade
+	public boolean{rif[q0*:{_}];rifi[q1*:{}]} checkConflict {rif[q0*:{_}];rifi[q1*:{}]}
+	(Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2, Event[ls1,ld1,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls1} se,
+	label{rif[q0*:{_}];rifi[q1*:{}]} ls1, label{rif[q0*:{_}];rifi[q1*:{}]} ld1, principal{rif[q0*:{_}];rifi[q1*:{}]} o2,
+	label{rif[q0*:{_}];rifi[q1*:{}]} ls2, label{rif[q0*:{_}];rifi[q1*:{}]} ld2) 
+	{
+		boolean{rif[q0*:{_}];rifi[q1*:{}]} result=false;
+		try{
+		if (new label tr(ls1,f3) <= new label {rif[q0*:{_}];rifi[q1*:{}]} &&
+			new label tr(ls2,f3) <= new label {rif[q0*:{_}];rifi[q1*:{}]}){
+			if (reclassify(cal2.rejectOnConflict(se,ls1,ld1),f3)) result=true;
+		}
+		}catch (NullPointerException imopssible) {}
+		return result;
+	}
+
+	
 	public Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls2} requestSharedEvent
 	{rif[q0*:{_}];rifi[q1*:{}]}(Calendar[o1,ls1,ld1]{rif[q0*:{_}];rifi[q1*:{}]} cal1, 
 	Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2, Event[ls1,ld1,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls1} se,
@@ -31,12 +47,12 @@ public class Server {
 	label{rif[q0*:{_}];rifi[q1*:{}]} ls2, label{rif[q0*:{_}];rifi[q1*:{}]} ld2,
 	int{rif[q0*:{_}];rifi[q1*:{}]} bond
 	) where tr(ls1,f9)<=ls2, tr(ld1,f9)<=ld2, tr(tr(ls1,f9),f9)<=tr(ls1,f9), tr(ls1,f9)<=ld2, tr(ls1,f9)<={rif[q0*:{_}];rifi[q1*:{}]},
-		tr(ls2,f9)<={rif[q0*:{_}];rifi[q1*:{}]}, tr(ls1,f3)<={rif[q0*:{_}];rifi[q1*:{}]}, tr(ls2,f3)<={rif[q0*:{_}];rifi[q1*:{}]}
+		tr(ls2,f9)<={rif[q0*:{_}];rifi[q1*:{}]}
 	{
 		Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls2} ne = null;
 		Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{tr({*ls2},f9)} dne = null;
 		try{
-		if (reclassify(cal2.rejectOnConflict(se,ls1,ld1),f3)) return null;
+		if (checkConflict(cal2,se,ls1,ld1,o2,ls2,ld2)) return null;
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} sharedBetween1 = new rifList[{rif[q0*:{_}];rifi[q1*:{}]}]();
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} sharedBetween2 = new rifList[{rif[q0*:{_}];rifi[q1*:{}]}]();
 		sharedBetween1.add((Object)o1, new label {*ld1});  sharedBetween1.add((Object)o2, new label {*ld1});
