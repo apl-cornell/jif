@@ -5,7 +5,6 @@ public class Event[label Ls, label Ld, label Ln] {
 	private Object{Ls} creatorCal;
 	private Node[Ln]{Ls} creatorCalNode;
 	private principal{Ls} creator;
-	private boolean{Ls} autoRejectOnConflict;
 	private rifList[Ln]{Ld} sharedBetween;
 	public final label{this} ls = Ls; //Ld may not be the same for all events, but Ls and Ld have the same integ
 	public final label{this} ld = Ld;
@@ -19,7 +18,6 @@ public class Event[label Ls, label Ld, label Ln] {
 		this.creatorCalNode=creatorCalNode;
 		this.creatorCal = creatorCal;
 		this.creator=creator;
-		this.autoRejectOnConflict=false;
 		this.sharedBetween=null;
 		this.node = null;
 	}
@@ -83,14 +81,6 @@ public class Event[label Ls, label Ld, label Ln] {
 
 	public Node[Ln]{Ls} getCreatorCalNode() {
 		return creatorCalNode;
-	}
-
-	public void setAutoReject{Ls}(boolean{Ls} b){
-		this.autoRejectOnConflict=b;
-	}
-
-	public boolean{Ls} getAutoReject(){
-		return this.autoRejectOnConflict;
 	}
 
 	public rifList[Ln]{Ld} getSharedBetween() {

@@ -79,7 +79,6 @@ public class Main {
 		srv.publicizeSlot(calA, eA, Alice, lsA, ldA);
 		eA = new Event[lsA,ldA,ln](new Date[lsA](5, 10, 2014), new TimeOfDay[lsA](9, 30), 15, "Meeting with Chris", calNodeA, calA, Alice);
 		srv.addEvent(calA, eA, Alice, lsA, ldA);
-		eA.setAutoReject(true);
 
 		Event[lsB,ldB,ln]{*lsB} eB = new Event[lsB,ldB,ln](new Date[lsB](15, 10, 2014), new TimeOfDay[lsB](14, 30), 30, "Go to barbershop", calNodeB, calB, Bob);
 		srv.addEvent(calB, eB, Bob, lsB,ldB);

@@ -1,5 +1,6 @@
 public class Calendar[principal O, label Ls, label Ld] {//policy for cal is {rif[q0*:{_}];rifi[q1*:{O},q2:{},f7:q1->q2]}
 //the current state of Ls and Ld is O for conf and integ,
+//It is implied that all events in this calendar have as parameters Ls and Ld.
 
 	private final principal{rif[q0*:{_}];rifi[q1*:{}]} owner = O;
 	private rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f3:q0->q1];rifi[q1*:{}]} eventList;
