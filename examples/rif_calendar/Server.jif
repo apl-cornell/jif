@@ -21,7 +21,6 @@ public class Server {
 		if (cal != null) cal.addEvent(e,ls,ld);
 	}
 
-
 	//used for confidentiality downgrade
 	public boolean{rif[q0*:{_}];rifi[q1*:{}]} checkConflict {rif[q0*:{_}];rifi[q1*:{}]}
 	(Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2, Event[ls1,ld1,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls1} se,
@@ -38,46 +37,66 @@ public class Server {
 		return result;
 	}
 
-	
+	//This is called when Bob requests an event from Alice!
 	public Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls2} requestSharedEvent
 	{rif[q0*:{_}];rifi[q1*:{}]}(Calendar[o1,ls1,ld1]{rif[q0*:{_}];rifi[q1*:{}]} cal1, 
-	Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2, Event[ls1,ld1,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls1} se,
+	Calendar[o2,ls2,ld2]{rif[q0*:{_}];rifi[q1*:{}]} cal2, Event[ls,ld,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls} se,
 	principal{rif[q0*:{_}];rifi[q1*:{}]} o1, principal{rif[q0*:{_}];rifi[q1*:{}]} o2,
+	label{rif[q0*:{_}];rifi[q1*:{}]} ls, label{rif[q0*:{_}];rifi[q1*:{}]} ld,
 	label{rif[q0*:{_}];rifi[q1*:{}]} ls1, label{rif[q0*:{_}];rifi[q1*:{}]} ld1,
 	label{rif[q0*:{_}];rifi[q1*:{}]} ls2, label{rif[q0*:{_}];rifi[q1*:{}]} ld2,
 	int{rif[q0*:{_}];rifi[q1*:{}]} bond
 	) where tr(ls1,f9)<=ls2, tr(ld1,f9)<=ld2, tr(tr(ls1,f9),f9)<=tr(ls1,f9), tr(ls1,f9)<=ld2, tr(ls1,f9)<={rif[q0*:{_}];rifi[q1*:{}]},
-		tr(ls2,f9)<={rif[q0*:{_}];rifi[q1*:{}]}
+		tr(ls2,f9)<={rif[q0*:{_}];rifi[q1*:{}]}, tr(ls,f9)<={rif[q0*:{_}];rifi[q1*:{}]},
+		tr(ls,f4)<=ls1, tr(ld,f4)<=ld1, tr(ls,f5)<=ls2, tr(ld,f5)<=ld2, ls1<=ld1
 	{
-		Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls2} ne = null;
-		Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{tr({*ls2},f9)} dne = null;
+		Event[ls1,ld1,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls1} e1 = null;
+		Event[ls1,ld1,{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} de1 = null;
+		Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{*ls2} e2 = null;
+		Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} de2 = null;
+		
 		try{
-		if (checkConflict(cal2,se,ls1,ld1,o2,ls2,ld2)) return null;
+		Event[ls,ld,{rif[q0*:{_}];rifi[q1*:{}]}]{tr({*ls},f9)} e = reclassify(se,f9);
+
+		Date[ls]{tr({*ls},f9)} d1= reclassify(e.getDate(),f9);
+		Date[ls1]{*ls1} date1 = 
+				new Date[ls1](reclassify(d1.getDay(),f4),reclassify(d1.getMonth(),f4), reclassify(d1.getYear(),f4));
+		TimeOfDay[ls]{tr({*ls},f9)} t1 = reclassify(e.getTime(),f9);
+		TimeOfDay[ls1]{*ls1} time1 = 
+				new TimeOfDay[ls1](reclassify(t1.getHour(),f4),reclassify(t1.getMinute(),f4));
+		e1 = new Event[ls1,ld1,{rif[q0*:{_}];rifi[q1*:{}]}](
+				date1, time1, 
+				reclassify(e.getDuration(),f4), 
+				reclassify(e.getDescription(),f4), reclassify(e.getCreatorCalNode(),f4),
+				reclassify(e.getCreatorCal(),f4),reclassify(e.getCreator(),f4));
+
+		if (checkConflict(cal2,e1,ls1,ld1,o2,ls2,ld2)) return null;
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} sharedBetween1 = new rifList[{rif[q0*:{_}];rifi[q1*:{}]}]();
 		rifList[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} sharedBetween2 = new rifList[{rif[q0*:{_}];rifi[q1*:{}]}]();
 		sharedBetween1.add((Object)o1, new label {*ld1});  sharedBetween1.add((Object)o2, new label {*ld1});
 		sharedBetween2.add((Object)o1, new label {*ld2});  sharedBetween2.add((Object)o2, new label {*ld2});
-		Event[ls1,ld1,{rif[q0*:{_}];rifi[q1*:{}]}]{tr({*ls1},f9)} e = reclassify(se,f9);
-		e.setBond(bond);
-		e.setSharedBetween(sharedBetween1);
-		cal1.addRequestEvent(e);
-		Date[ls1]{tr({*ls1},f9)} d= reclassify(e.getDate(),f9);
-		Date[ls2]{*ls2} date = 
-				new Date[ls2](reclassify(d.getDay(),f9),reclassify(d.getMonth(),f9), reclassify(d.getYear(),f9));
-		TimeOfDay[ls1]{tr({*ls1},f9)} t = reclassify(e.getTime(),f9);
-		TimeOfDay[ls2]{*ls2} time = 
-				new TimeOfDay[ls2](reclassify(t.getHour(),f9),reclassify(t.getMinute(),f9));
-		ne = new Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}](
-				date, time, 
-				reclassify(e.getDuration(),f9), 
-				reclassify(e.getDescription(),f9), reclassify(e.getCreatorCalNode(),f9),
-				reclassify(e.getCreatorCal(),f9),reclassify(e.getCreator(),f9));
-		dne = reclassify(ne,f9);
-		dne.setBond(bond);
-		dne.setSharedBetween(sharedBetween2);
-		cal2.addPendingEvent(dne);
+		de1 = reclassify(e1,f9);
+		de1.setBond(bond);
+		de1.setSharedBetween(sharedBetween1);
+		cal1.addRequestEvent(de1);
+
+		Date[ls]{tr({*ls},f9)} d2= reclassify(e.getDate(),f9);
+		Date[ls2]{*ls2} date2 = 
+				new Date[ls2](reclassify(d2.getDay(),f5),reclassify(d2.getMonth(),f5), reclassify(d2.getYear(),f5));
+		TimeOfDay[ls]{tr({*ls},f9)} t2 = reclassify(e.getTime(),f9);
+		TimeOfDay[ls2]{*ls2} time2 = 
+				new TimeOfDay[ls2](reclassify(t2.getHour(),f5),reclassify(t2.getMinute(),f5));
+		e2 = new Event[ls2,ld2,{rif[q0*:{_}];rifi[q1*:{}]}](
+				date2, time2, 
+				reclassify(e.getDuration(),f5), 
+				reclassify(e.getDescription(),f5), reclassify(e.getCreatorCalNode(),f5),
+				reclassify(e.getCreatorCal(),f5),reclassify(e.getCreator(),f5));
+		de2 = reclassify(e2,f9);
+		de2.setBond(bond);
+		de2.setSharedBetween(sharedBetween2);
+		cal2.addPendingEvent(de2);
 		}catch (NullPointerException impossible) {}
-		return dne;
+		return de2;
 	}
 
 	//used for integrity downgrade

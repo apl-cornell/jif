@@ -51,12 +51,22 @@ public class Main {
 		Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} calNodeA = new Node(calA, ln, lsA, ldA,Alice);
 
 
-		final label lsB = new label {rif[q1*:{Bob},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f9:q1->q3,f9:q2->q3,f6:q2->q3];
+		final label lsB = new label {rif[q1*:{Bob},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1, f9:q1->q3,f9:q2->q3,f6:q2->q3];
 									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4,f3:q1->q4]};
 		final label ldB = new label {rif[q1*:{Bob},q2:{_},f9:q1->q2];
 									rifi[q1*:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
 		Calendar calB = srv.createCalendar(Bob,lsB,ldB);
         Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} calNodeB = new Node(calB, ln, lsB, ldB,Bob);
+
+		//These are labels for shared events (from Bob to Alice). They should not include an f3 transition.
+		final label lsBA = new label {rif[q1*:{Alice,Bob},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
+						   rifi[q0*:{Bob},q1:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4,f3:q1->q4,
+							     		  q5:{Alice},q6:{},q7:{Alice},q8:{},f7:q5->q6,f8:q6->q7,f9:q5->q8,f9:q6->q8,f6:q5->q8,f3:q5->q8,
+										  f4:q0->q1,f5:q0->q5,f9:q0->q4]};
+		final label ldBA = new label {rif[q1*:{Alice,Bob},q2:{_},f9:q1->q2];
+							rifi[q0*:{Bob},q1:{Bob},q2:{},q3:{Bob},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,
+							     		  q5:{Alice},q6:{},q7:{Alice},q8:{},f7:q5->q6,f8:q6->q7,f9:q5->q8,f9:q6->q8,
+										  f4:q0->q1,f5:q0->q5,f9:q0->q4]};
 
 		//Once an object is created, its label is created with it. So, object and label are unseparable.
 		//If we want to change the label of the object, then we need to create a new copy and attach the desired label.
@@ -87,24 +97,24 @@ public class Main {
 		out.println("Public view of Alice");
 		out.println(srv.takePubView(calA, Alice, lsA, ldA));
 
-		eB = new Event[lsB,ldB,ln](new Date[lsB](10, 11, 2014), new TimeOfDay[lsB](18, 10), 60, "Visit parents", calNodeB, calB, Bob);
-	  	Event[lsA,ldA,ln]{*lsA} eAs = srv.requestSharedEvent(calB, calA, eB, Bob, Alice, lsB, ldB, lsA, ldA, 19871);
+		Event[lsBA,ldBA,ln]{*lsBA} eBs = new Event[lsBA,ldBA,ln](new Date[lsBA](10, 11, 2014), new TimeOfDay[lsBA](18, 10), 60, "Visit parents", calNodeB, calB, Bob);
+	  	Event[lsA,ldA,ln]{*lsA} eAs = srv.requestSharedEvent(calB, calA, eBs, Bob, Alice, lsBA, ldBA, lsB, ldB, lsA, ldA, 19871);
 		srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
 		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
 
-		//eB = new Event[lsB,ldB,ln](new Date[lsB](5, 10, 2014), new TimeOfDay[lsB](9, 20), 20, "Visit aunts", calNodeB, calB, Bob);
-		//eAs = srv.requestSharedEvent(calB, calA, eB, Bob, Alice, lsB, ldB, lsA, ldA, 19872);
-		//if (reclassify(eAs,f9) != null)
-			//srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
-		//else out.println("Automatic rejection: Visit aunts\n");
+		eBs = new Event[lsBA,ldBA,ln](new Date[lsBA](5, 10, 2014), new TimeOfDay[lsBA](9, 20), 20, "Visit aunts", calNodeB, calB, Bob);
+		eAs = srv.requestSharedEvent(calB, calA, eBs, Bob, Alice, lsBA, ldBA, lsB, ldB, lsA, ldA, 19872);
+		if (reclassify(eAs,f9) != null)
+			srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
+		else out.println("Automatic rejection: Visit aunts\n");
 
-		eB = new Event[lsB,ldB,ln](new Date[lsB](20, 2, 2010), new TimeOfDay[lsB](8, 15), 120, "Go for cinema", calNodeB, calB, Bob);
-		eAs = srv.requestSharedEvent(calB, calA, eB, Bob, Alice, lsB, ldB, lsA, ldA, 19873);
+		eBs = new Event[lsBA,ldBA,ln](new Date[lsBA](20, 2, 2010), new TimeOfDay[lsBA](8, 15), 120, "Go for cinema", calNodeB, calB, Bob);
+		eAs = srv.requestSharedEvent(calB, calA, eBs, Bob, Alice, lsBA, ldBA, lsB, ldB, lsA, ldA, 19873);
 		srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
 		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
 
-		eB = new Event[lsB,ldB,ln](new Date[lsB](30, 1, 2015), new TimeOfDay[lsB](21, 30), 120, "Go to concert", calNodeB, calB, Bob);
-		eAs = srv.requestSharedEvent(calB, calA, eB, Bob, Alice, lsB, ldB, lsA, ldA, 19874);
+		eBs = new Event[lsBA,ldBA,ln](new Date[lsBA](30, 1, 2015), new TimeOfDay[lsBA](21, 30), 120, "Go to concert", calNodeB, calB, Bob);
+		eAs = srv.requestSharedEvent(calB, calA, eBs, Bob, Alice, lsBA, ldBA, lsB, ldB, lsA, ldA, 19874);
 		srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA);
 		//else System.out.println("Automatic rejection: "+e.toString()+"\n");
 
