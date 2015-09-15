@@ -7,14 +7,13 @@
 2. Modify $JIF/CHANGES with date of release and modifications since
    the last version.
 
-3. Record version number of Polyglot and Jif in $JIF/README and
-   $JIF/CHANGES. If updating the manual, also update the version numbers in
+3. If updating the manual, update the Jif and Polyglot version numbers in
    $JIF/doc/web/overview.html and $JIF/doc/index.html, and change the date
    as appropriate in $JIF/doc/web/title.html.
    
 4. Check out clean copy of Jif
 
-5. Run  "ant dist"
+5. Run "ant dist"
 
 6. Publish jif-x.x.x.zip on the web, at
 

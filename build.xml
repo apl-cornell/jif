@@ -916,8 +916,7 @@ public class VersionInfo {
                 <include name="tests/jif/principals/**" />
 
                 <!-- Miscellaneous -->
-                <include name="README" />
-                <include name="LICENSE" />
+                <include name="LICENSE.LGPL" />
                 <include name="CHANGES" />
                 <include name="build.xml" />
                 <include name="config.properties.in" />
@@ -925,7 +924,17 @@ public class VersionInfo {
             </fileset>
         </copy>
 
-        <copy file="config.properties.in" tofile="${dist}/config.properties" />
+        <!-- Generate files from "*.in" templates. -->
+        <copy todir="${dist}">
+            <fileset dir="${basedir}" includes="*.in"/>
+            <mapper type="glob" from="*.in" to="*"/>
+            <filterset>
+                <filter token="YEAR" value="${year}"/>
+                <filter token="VERSION" value="${jif.version}"/>
+                <filter token="POLYGLOT_VERSION"
+                        value="${polyglot.download.version}"/>
+            </filterset>
+        </copy>
 
         <!-- Create the Javadoc, and copy the documentation -->
         <antcall target="javadoc" />

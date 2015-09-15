@@ -1,0 +1,18 @@
+This release of Jif is governed by the GNU Lesser General Public
+License as described by the following copyright notice.
+
+Jif @VERSION@
+Copyright (C) 1999-@YEAR@ Jif project group, Cornell University
+
+Jif is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation; either version 2.1 of
+the License, or (at your option) any later version.
+
+Jif is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+A copy of the GNU Lesser General Public License version 2.1 can
+be found in the file LICENSE.LGPL, included in this distribution.
