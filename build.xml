@@ -277,7 +277,7 @@
         else="">
         <available file="${jdk.home}/lib/tools.jar" />
     </condition>
-    <copy file="eclipse-classpath.in" tofile=".classpath">
+    <copy file="eclipse/classpath.in" tofile=".classpath">
         <filterset>
         <filter token="TOOLS.JAR" value="${tools.jar-entry}" />
         </filterset>
@@ -286,7 +286,7 @@
 
     <target name="eclipse-check">
     <uptodate property="eclipse.up-to-date" targetfile=".classpath"
-            srcfile="eclipse-classpath.in" />
+            srcfile="eclipse/classpath.in" />
     </target>
 
     <!-- Create jifc script if needed -->
@@ -905,7 +905,7 @@ public class VersionInfo {
         </copy>
 
         <copy file="config.properties.in" tofile="${dist}/config.properties" />
-        <copy file="eclipse-classpath.in" tofile="${dist}/eclipse-classpath.in" />
+        <copy file="eclipse/classpath.in" tofile="${dist}/eclipse/classpath.in" />
 
         <!-- Create the Javadoc, and copy the documentation -->
         <antcall target="javadoc" />
