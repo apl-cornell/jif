@@ -4,6 +4,7 @@
 /classes
 /.classpath
 /dist
+/tmp
 /pthScript.results
 /config.properties
 .*.sw?

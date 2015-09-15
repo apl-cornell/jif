@@ -59,6 +59,21 @@
     <property name="jifc" location="${bin}/jifc" />
     <property name="jif" location="${bin}/jif" />
 
+    <!-- Set of source files to include in the distribution. -->
+    <fileset id="dist-src-files" dir="${basedir}" defaultexcludes="yes">
+        <include name="src/**" />
+        <exclude name="src/jif/todo.txt" />
+        <include name="rt-src/**" />
+        <include name="lib-src/**" />
+        <include name="sig-src/**" />
+    </fileset>
+
+    <!-- Set of class files that comprise the Jif compiler. -->
+    <!-- (i.e., the contents of jif.jar.) -->
+    <fileset id="dist-class-files" dir="${classes}">
+        <include name="jif/**"/>
+    </fileset>
+
     <!-- Polyglot distribution location -->
     <property name="polyglot.url.prefix"
             value="http://www.cs.cornell.edu/Projects/polyglot/src/polyglot-"/>
@@ -743,7 +758,9 @@ public class Version extends polyglot.main.Version {
        ****************************************  -->
 
     <target name="jar" depends="jif">
-        <jar jarfile="${lib}/jif.jar" basedir="${classes}" includes="jif/**" />
+        <jar jarfile="${lib}/jif.jar">
+            <fileset refid="dist-class-files"/>
+        </jar>
         <jar jarfile="${lib}/jifrt.jar" basedir="${rt-classes}" includes="jif/**" />
         <jar jarfile="${lib}/jifsig.jar" basedir="${sig-classes}" includes="jif/**, java/**" />
         <jar jarfile="${lib}/jiflib.jar" basedir="${lib-classes}" includes="jif/**" />
@@ -875,37 +892,40 @@ public class VersionInfo {
         <!-- Clobber everything so we're in a clean state -->
         <antcall target="clobber" />
 
-        <!-- Copy src files over. -->
+        <!-- Copy files over. -->
         <copy todir="${dist}" includeEmptyDirs="no">
+            <!-- Source code -->
+            <fileset refid="dist-src-files"/>
+
+            <!-- Other files -->
             <fileset dir="${basedir}" defaultexcludes="yes">
-                <include name="src/**" />
-                <exclude name="src/jif/todo.txt" />
-                <include name="rt-src/**" />
-                <include name="lib-src/**" />
-                <include name="sig-src/**" />
+                <!-- Scripts -->
                 <include name="bin/jif" />
                 <include name="bin/jifc.in" />
                 <include name="bin/jc" />
 
-                <!-- only include the battleship example at the moment -->
+                <!-- Examples (only include battleship at the moment) -->
                 <include name="examples/battleship/**" />
                 <include name="examples/*" />
 
+                <!-- Test programs & principals -->
                 <include name="tests/*" />
                 <include name="tests/labelparam/*" />
                 <exclude name="tests/directory/**" />
                 <exclude name="tests/BASELINE-RESULTS" />
                 <include name="tests/jif/principals/**" />
+
+                <!-- Miscellaneous -->
                 <include name="README" />
                 <include name="LICENSE" />
                 <include name="CHANGES" />
                 <include name="build.xml" />
                 <include name="config.properties.in" />
+                <include name="eclipse/classpath.in"/>
             </fileset>
         </copy>
 
         <copy file="config.properties.in" tofile="${dist}/config.properties" />
-        <copy file="eclipse/classpath.in" tofile="${dist}/eclipse/classpath.in" />
 
         <!-- Create the Javadoc, and copy the documentation -->
         <antcall target="javadoc" />
