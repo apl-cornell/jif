@@ -684,6 +684,10 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
       <format property="now" timezone="America/New_York"
           pattern="yyyy-MM-dd HH:mm:ss z" />
     </tstamp>
+    <tstamp>
+      <format property="year" timezone="America/New_York"
+          pattern="yyyy" />
+    </tstamp>
     <property name="jif.version.build" value="${jif.version} (${now})" />
   </target>
 
@@ -885,7 +889,7 @@ public class VersionInfo {
       </java>
     </target>
 
-    <target name="dist.zip">
+    <target name="dist.zip" depends="configure-buildstring">
         <!-- Create the distribution directory -->
         <mkdir dir="${dist}" />
 
@@ -1198,7 +1202,12 @@ public class VersionInfo {
         <ant inheritAll="false"
                 antfile="${dist}/${sub-ant.dir}/build.xml"
                 dir="${dist}/${sub-ant.dir}"
-                target="${sub-ant.target}" />
+                target="${sub-ant.target}">
+            <!-- Hack: pass down the downloaded Polyglot version in case we are
+                 building a distribution. -->
+            <property name="polyglot.download.version"
+                    value="${polyglot.download.version}"/>
+        </ant>
     </target>
 
 </project>
