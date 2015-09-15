@@ -1,4 +1,4 @@
-Jif 3.4.2
+Jif 3.4.3
 
                          The Jif Language and Compiler
 			 -----------------------------
@@ -62,7 +62,7 @@ also developed at Cornell. Polyglot can be obtained from the web site:
     http://www.cs.cornell.edu/Projects/polyglot
 
 This Jif distribution contains the files polyglot.jar, jflex.jar and
-java_cup.jar from the Polyglot 2.6.1 distribution. These files are
+java_cup.jar from the Polyglot 2.7.0 distribution. These files are
 required to build Jif.
 
 This Jif distribution contains some C++ code, used to produce
