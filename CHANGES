@@ -5,7 +5,7 @@ This file documents changes between releases of Jif.
 
 2015-09-18    Jif 3.4.3
     * Updated to Polyglot 2.7.0 release.
-    * Moved to LGPL 2.1 license.
+    * Changed from a custom license to LGPL.
 
 2014-07-02    Jif 3.4.2
     * Updated to Polyglot 2.6.1 release.
