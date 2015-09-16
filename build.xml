@@ -454,7 +454,15 @@ sh ${jif} %CMD_LINE_ARGS%
         <antcall target="jif-runtime-native" />
     </target>
 
-    <target name="jif-runtime-native" description="compile the jif runtime native code">
+    <!--
+         Although jif.skip-native isn't explicitly defined in this build file,
+         the jif-runtime-native target is guarded by jif.skip-native to allow
+         the user to avoid compiling the Jif runtime native code by defining
+         jif.skip-native externally.
+    -->
+    <target name="jif-runtime-native"
+            description="compile the jif runtime native code"
+            unless="jif.skip-native">
         <!-- Compile the headers for jif.lang.NativePM -->
         <mkdir dir="${rt-classes}/jif/native" />
 
