@@ -19,7 +19,7 @@
 
    <url>
       <update label="Jif Updates"
-            url="https://www.cs.cornell.edu/jif/ide/"/>
+            url="https://www.cs.cornell.edu/jif/ide/updates/"/>
       <discovery label="Jif project page"
             url="https://www.cs.cornell.edu/jif/"/>
    </url>
