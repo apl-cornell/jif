@@ -62,7 +62,10 @@
         <mkdir dir="${plugins}"/>
 
         <!-- Build the Jif JARs. -->
-        <ant antfile="${basedir}/build.xml" target="jar"/>
+        <ant antfile="${basedir}/build.xml" target="jar">
+          <!-- Avoid building the Jif native runtime. -->
+          <property name="jif.skip-native" value=""/>
+        </ant>
 
         <!-- Make ${tmp} pristine. We will build the plugin image there. -->
         <delete dir="${tmp}"/>

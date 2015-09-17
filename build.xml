@@ -443,7 +443,7 @@ sh ${jif} %CMD_LINE_ARGS%
 
     <target name="jif-runtime" depends="init,configure" description="compile the jif runtime">
         <mkdir dir="${rt-classes}" />
-        <javac source="1.5" target="1.5" srcdir="${rt-src}" destdir="${rt-classes}" encoding="UTF-8" debug="on" includes="**">
+        <javac source="1.7" target="1.7" srcdir="${rt-src}" destdir="${rt-classes}" encoding="UTF-8" debug="on" includes="**">
             <classpath>
                 <pathelement location="${sig-classes}" />
                 <pathelement location="${lib-classes}" />
