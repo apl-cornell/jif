@@ -1,0 +1,8 @@
+class Label02 {
+    void m{*<-}() {
+        final label l = new label{⊤→};
+        int{*l} foo = 5;
+        int{⊤->} bar = 6;
+        foo = bar;
+    }
+}
