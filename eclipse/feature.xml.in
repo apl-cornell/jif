@@ -33,7 +33,7 @@
          download-size="0"
          install-size="0"
          version="@version@"
-         unpack="false"/>
+         unpack="true"/>
 </feature>
 <!--
 vim: ts=3 sw=3 ai et

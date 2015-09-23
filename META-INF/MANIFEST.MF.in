@@ -19,3 +19,4 @@ Export-Package: jif,
  jif.types.label,
  jif.types.principal,
  jif.visit
+Eclipse-BundleShape: dir
