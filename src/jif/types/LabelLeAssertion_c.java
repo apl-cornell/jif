@@ -9,8 +9,8 @@ import polyglot.types.TypeObject_c;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-public class LabelLeAssertion_c extends TypeObject_c implements
-        LabelLeAssertion {
+public class LabelLeAssertion_c extends TypeObject_c
+        implements LabelLeAssertion {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected LabelLeAssertionToJavaExpr toJava;

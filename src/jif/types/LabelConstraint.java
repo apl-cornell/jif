@@ -173,8 +173,8 @@ public class LabelConstraint extends Constraint {
             addLEQEqns(eqns, lhsLabel(), rhsLabel());
             addLEQEqns(eqns, rhsLabel(), lhsLabel());
         } else {
-            throw new InternalCompilerError("Inappropriate kind of equation: "
-                    + kind);
+            throw new InternalCompilerError(
+                    "Inappropriate kind of equation: " + kind);
         }
 
         return eqns;
@@ -185,7 +185,8 @@ public class LabelConstraint extends Constraint {
      * Produce equations that require <code>left</code> to be less than or
      * equal to <code>right</code>, and add them to <code>eqns</code>.
      */
-    protected void addLEQEqns(Collection<Equation> eqns, Label left, Label right) {
+    protected void addLEQEqns(Collection<Equation> eqns, Label left,
+            Label right) {
         left = left.simplify();
         right = right.simplify();
         if (left instanceof JoinLabel) {

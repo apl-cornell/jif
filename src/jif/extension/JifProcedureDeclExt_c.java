@@ -47,8 +47,8 @@ import polyglot.util.SerialVersionUID;
  *  @see polyglot.ast.ProcedureDecl
  *  @see jif.types.JifProcedureInstance
  */
-public class JifProcedureDeclExt_c extends JifExt_c implements
-        JifProcedureDeclExt {
+public class JifProcedureDeclExt_c extends JifExt_c
+        implements JifProcedureDeclExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifProcedureDeclExt_c(ToJavaExt toJava) {
@@ -114,9 +114,8 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
             LabelChecker lc) throws SemanticException {
         final JifContext A = lc.jifContext();
         final ProviderLabel provider = mi.provider();
-        final NamedLabel namedProvider =
-                new NamedLabel(provider.toString(), "provider of "
-                        + provider.classType().fullName(), provider);
+        final NamedLabel namedProvider = new NamedLabel(provider.toString(),
+                "provider of " + provider.classType().fullName(), provider);
         for (Assertion c : mi.constraints()) {
             if (c instanceof CallerConstraint) {
                 final CallerConstraint cc = (CallerConstraint) c;
@@ -124,8 +123,8 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
                 for (final Principal pi : cc.principals()) {
                     // Check that the provider of the enclosing class acts for pi.
                     final JifProcedureInstance _mi = mi;
-                    lc.constrain(namedProvider, pi, A.labelEnv(),
-                            cc.position(), new ConstraintMessage() {
+                    lc.constrain(namedProvider, pi, A.labelEnv(), cc.position(),
+                            new ConstraintMessage() {
                                 @Override
                                 public String msg() {
                                     return provider + " must act for " + pi;
@@ -133,8 +132,7 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
 
                                 @Override
                                 public String detailMsg() {
-                                    return provider
-                                            + " is the provider of "
+                                    return provider + " is the provider of "
                                             + _mi.container()
                                             + " but does not have authority to act for "
                                             + pi;
@@ -173,8 +171,8 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
         if (!endorseTo.isTop()) {
             // check that there is sufficient authority to endorse to 
             // the label endorseTo.
-            JifEndorseExprExt.checkOneDimen(lc, A, Li, endorseTo,
-                    mi.position(), false, true);
+            JifEndorseExprExt.checkOneDimen(lc, A, Li, endorseTo, mi.position(),
+                    false, true);
             JifEndorseExprExt.checkAuth(lc, A, Li, endorseTo, mi.position(),
                     false, true);
 
@@ -196,7 +194,8 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
      * thesis (Figure 4.39).  It returns the set of principals for which the
      * method can act.
      */
-    protected Set<Principal> constrainAuth(JifProcedureInstance mi, JifContext A) {
+    protected Set<Principal> constrainAuth(JifProcedureInstance mi,
+            JifContext A) {
         Set<Principal> newAuth = new LinkedHashSet<Principal>();
 
         for (Assertion c : mi.constraints()) {
@@ -236,24 +235,26 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
 
         final String msgCodeName = codeName;
 
-        lc.constrain(authority, PrincipalConstraint.ACTSFOR, p, A.labelEnv(), A
-                .currentCode().position(), new ConstraintMessage() {
-            @Override
-            public String msg() {
-                return "The authority of the class " + A.currentClass().name()
-                        + " is insufficient to act for principal " + p + ".";
-            }
+        lc.constrain(authority, PrincipalConstraint.ACTSFOR, p, A.labelEnv(),
+                A.currentCode().position(), new ConstraintMessage() {
+                    @Override
+                    public String msg() {
+                        return "The authority of the class "
+                                + A.currentClass().name()
+                                + " is insufficient to act for principal " + p
+                                + ".";
+                    }
 
-            @Override
-            public String detailMsg() {
-                return "The " + msgCodeName
-                        + " states that it has the authority of the "
-                        + "principal " + p
-                        + ". However, the conjunction of the authority"
-                        + " set of the class is insufficient to act for " + p
-                        + ".";
-            }
-        });
+                    @Override
+                    public String detailMsg() {
+                        return "The " + msgCodeName
+                                + " states that it has the authority of the "
+                                + "principal " + p
+                                + ". However, the conjunction of the authority"
+                                + " set of the class is insufficient to act for "
+                                + p + ".";
+                    }
+                });
     }
 
     /**
@@ -275,7 +276,8 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
                     granter = ch.instantiate(A, granter);
                 }
 
-                if (actor instanceof Principal && granter instanceof Principal) {
+                if (actor instanceof Principal
+                        && granter instanceof Principal) {
                     Principal pActor = (Principal) actor;
                     Principal pGranter = (Principal) granter;
                     if (afc.isEquiv()) {
@@ -318,7 +320,7 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
      */
     protected void addReturnConstraints(Label Li, PathMap X,
             JifProcedureInstance mi, LabelChecker lc, final Type returnType)
-            throws SemanticException {
+                    throws SemanticException {
         if (Report.should_report(jif_verbose, 2))
             Report.report(2, "Adding constraints for result of " + mi);
 
@@ -350,19 +352,16 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
             X = X.R(ts.bottomLabel());
         } else {
             lc.constrain(
-                    new NamedLabel(
-                            "X.n",
+                    new NamedLabel("X.n",
                             "information that may be gained by the body terminating normally",
-                            X.N())
-                            .join(lc,
-                                    "X.r",
+                            X.N()).join(lc, "X.r",
                                     "information that may be gained by exiting the body with a return statement",
                                     X.R()).join(lc, "Li",
-                                    "Lower bound for method output",
-                                    A.currentCodePCBound()),
-                    LabelConstraint.LEQ, new NamedLabel("Lr",
-                            "return label of the method", Lr), A.labelEnv(), mn
-                            .position(), new ConstraintMessage() {
+                                            "Lower bound for method output",
+                                            A.currentCodePCBound()),
+                    LabelConstraint.LEQ,
+                    new NamedLabel("Lr", "return label of the method", Lr),
+                    A.labelEnv(), mn.position(), new ConstraintMessage() {
                         @Override
                         public String msg() {
                             return "The non-exception termination of the "
@@ -404,17 +403,16 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
 
             Label pathLabel = X.get(ep);
 
-            if (pathLabel instanceof NotTaken)
-                throw new InternalCompilerError(
-                        "An exception path cannot be not taken");
+            if (pathLabel instanceof NotTaken) throw new InternalCompilerError(
+                    "An exception path cannot be not taken");
 
             Type pathType = ep.exception();
             NamedLabel pathNamedLabel =
-                    new NamedLabel(
-                            "exc_" + pathType.toClass().name(),
+                    new NamedLabel("exc_" + pathType.toClass().name(),
                             "upper bound on information that may be gained "
                                     + "by observing the method throwing the exception "
-                                    + pathType.toClass().name(), pathLabel);
+                                    + pathType.toClass().name(),
+                            pathLabel);
 
             List<? extends Type> throwTypes = mi.throwTypes();
             for (final Type tj : throwTypes) {
@@ -434,19 +432,16 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
                                 new SubtypeChecker(pathType, tj);
                         subtypeChecker.addSubtypeConstraints(lc, mn.position());
                     }
-                    if (Report.should_report(jif_verbose, 4))
-                        Report.report(4, ">>> X[C'] <= Lj (for exception " + tj
-                                + ")");
+                    if (Report.should_report(jif_verbose, 4)) Report.report(4,
+                            ">>> X[C'] <= Lj (for exception " + tj + ")");
 
-                    lc.constrain(
-                            pathNamedLabel,
-                            LabelConstraint.LEQ,
-                            new NamedLabel(
-                                    "decl_exc_" + tj.toClass().name(),
+                    lc.constrain(pathNamedLabel, LabelConstraint.LEQ,
+                            new NamedLabel("decl_exc_" + tj.toClass().name(),
                                     "declared upper bound on information that may be "
                                             + "gained by observing the method throwing the exception "
-                                            + tj.toClass().name(), Lj), A
-                                    .labelEnv(), mi.position(),
+                                            + tj.toClass().name(),
+                                    Lj),
+                            A.labelEnv(), mi.position(),
                             new ConstraintMessage() {
                                 @Override
                                 public String msg() {
@@ -459,8 +454,7 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
 
                                 @Override
                                 public String technicalMsg() {
-                                    return "the path of <"
-                                            + tj
+                                    return "the path of <" + tj
                                             + "> may leak information "
                                             + "more restrictive than the join of the declared "
                                             + "exception label and the return(end) label";
@@ -494,8 +488,8 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
      * Checker to ensure that labels do not use
      * covariant labels in the wrong places
      */
-    protected static class ConstraintVarianceLabelChecker extends
-            LabelSubstitution {
+    protected static class ConstraintVarianceLabelChecker
+            extends LabelSubstitution {
         private Position declPosition;
 
         ConstraintVarianceLabelChecker(Position declPosition) {
@@ -508,7 +502,8 @@ public class JifProcedureDeclExt_c extends JifExt_c implements
                 throw new SemanticDetailedException(
                         "Covariant labels cannot occur on the right hand side of label constraints.",
                         "The right hand side of a label constraint cannot contain the covariant components such as "
-                                + L + ". ", declPosition);
+                                + L + ". ",
+                        declPosition);
             }
             return L;
         }

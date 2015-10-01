@@ -39,9 +39,8 @@ public class MeetLabelNode_c extends AmbLabelNode_c implements MeetLabelNode {
     public MeetLabelNode_c(Position pos, List<LabelComponentNode> components,
             Ext ext) {
         super(pos, ext);
-        this.components =
-                Collections.unmodifiableList(new ArrayList<LabelComponentNode>(
-                        components));
+        this.components = Collections.unmodifiableList(
+                new ArrayList<LabelComponentNode>(components));
     }
 
     @Override
@@ -52,19 +51,16 @@ public class MeetLabelNode_c extends AmbLabelNode_c implements MeetLabelNode {
     @Override
     public MeetLabelNode components(List<LabelComponentNode> components) {
         MeetLabelNode_c n = (MeetLabelNode_c) copy();
-        this.components =
-                Collections.unmodifiableList(new ArrayList<LabelComponentNode>(
-                        components));
+        this.components = Collections.unmodifiableList(
+                new ArrayList<LabelComponentNode>(components));
         return n;
     }
 
     protected MeetLabelNode_c reconstruct(List<LabelComponentNode> components) {
         if (!CollectionUtil.equals(components, this.components)) {
             MeetLabelNode_c n = (MeetLabelNode_c) copy();
-            n.components =
-                    Collections
-                            .unmodifiableList(new ArrayList<LabelComponentNode>(
-                                    components));
+            n.components = Collections.unmodifiableList(
+                    new ArrayList<LabelComponentNode>(components));
             return n;
         }
 

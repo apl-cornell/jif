@@ -135,8 +135,8 @@ public class CallHelper {
     public CallHelper(Label receiverLabel, Receiver receiver,
             ReferenceType calleeContainer, JifProcedureInstance pi,
             List<Expr> actualArgs, Position position) {
-        this(receiverLabel, receiver, calleeContainer, pi, actualArgs,
-                position, false);
+        this(receiverLabel, receiver, calleeContainer, pi, actualArgs, position,
+                false);
     }
 
     protected CallHelper(Label receiverLabel, Receiver receiver,
@@ -176,19 +176,18 @@ public class CallHelper {
             if (jts.isLabeled(t)) {
                 ArgLabel al = (ArgLabel) jts.labelOfType(t);
                 LocalInstance formalInst = (LocalInstance) al.formalInstance();
-                Local l =
-                        nf.Local(formalInst.position(),
-                                nf.Id(al.position(), al.name())).localInstance(
-                                formalInst);
+                Local l = nf
+                        .Local(formalInst.position(),
+                                nf.Id(al.position(), al.name()))
+                        .localInstance(formalInst);
                 actualArgs.add(l);
             } else {
                 throw new InternalCompilerError("Formal type is not labeled!");
             }
         }
 
-        CallHelper ch =
-                new CallHelper(receiverLabel, receiver, calleeContainer,
-                        overridden, actualArgs, overriding.position(), true);
+        CallHelper ch = new CallHelper(receiverLabel, receiver, calleeContainer,
+                overridden, actualArgs, overriding.position(), true);
         ch.overridingMethod = overriding;
         ch.actualParamLabels = Collections.emptyList();
         ch.actualArgLabels =
@@ -243,40 +242,36 @@ public class CallHelper {
         // if the method call is a constructor call, or a static method call,
         // then we need to check the pathmap.
         if (this.pi.flags().isStatic()) {
-            Xjoin =
-                    ltcu.labelCheckType(pi.container(), lc, throwTypes,
-                            position);
-            List<PathMap> Xparams =
-                    ltcu.labelCheckTypeParams(pi.container(), lc, throwTypes,
-                            position);
+            Xjoin = ltcu.labelCheckType(pi.container(), lc, throwTypes,
+                    position);
+            List<PathMap> Xparams = ltcu.labelCheckTypeParams(pi.container(),
+                    lc, throwTypes, position);
             actualParamLabels = new ArrayList<Label>(Xparams.size());
             for (PathMap Xj : Xparams) {
                 actualParamLabels.add(Xj.NV());
             }
         } else if (this.pi instanceof ConstructorInstance) {
-            Xjoin =
-                    ltcu.labelCheckType(pi.container(), lc, throwTypes,
-                            position);
+            Xjoin = ltcu.labelCheckType(pi.container(), lc, throwTypes,
+                    position);
             // now constraint params, pretending that they will be args to the constructor with upper bound {this}.
-            List<PathMap> Xparams =
-                    ltcu.labelCheckTypeParams(pi.container(), lc, throwTypes,
-                            position);
+            List<PathMap> Xparams = ltcu.labelCheckTypeParams(pi.container(),
+                    lc, throwTypes, position);
             actualParamLabels = new ArrayList<Label>(Xparams.size());
             JifContext A = lc.context();
 
-            NamedLabel paramUB =
-                    new NamedLabel(
-                            "param_upper_bound",
-                            "the upper bound on the information that may be revealed by any actual parameter",
-                            this.receiverLabel);
+            NamedLabel paramUB = new NamedLabel("param_upper_bound",
+                    "the upper bound on the information that may be revealed by any actual parameter",
+                    this.receiverLabel);
 
             int counter = 0;
             for (PathMap Xj : Xparams) {
                 actualParamLabels.add(Xj.NV());
                 final int count = ++counter;
-                lc.constrain(new NamedLabel("actual_param_" + count,
-                        "the label of the " + StringUtil.nth(count)
-                                + " actual parameter", Xj.NV()),
+                lc.constrain(
+                        new NamedLabel("actual_param_" + count,
+                                "the label of the " + StringUtil.nth(count)
+                                        + " actual parameter",
+                                Xj.NV()),
                         LabelConstraint.LEQ, paramUB, A.labelEnv(),
                         this.position, new ConstraintMessage() {
                             @Override
@@ -356,8 +351,8 @@ public class CallHelper {
      * @param formalType the type of ith formal arg.
      * 
      */
-    protected void constrainArg(LabelChecker lc, final int index,
-            final Expr Ej, Type formalType) throws SemanticException {
+    protected void constrainArg(LabelChecker lc, final int index, final Expr Ej,
+            Type formalType) throws SemanticException {
         // constrain the labels of the argument to be less
         // than the bound of the formal arg, substituting in the
         // fresh labels we just created.
@@ -371,13 +366,17 @@ public class CallHelper {
 
         // A |- Xj[nv] <= argLj
         PathMap Xj = JifExt_c.getPathMap(Ej);
-        lc.constrain(new NamedLabel("actual_arg_" + (index + 1),
-                "the label of the " + StringUtil.nth(index + 1)
-                        + " actual argument", Xj.NV()), LabelConstraint.LEQ,
+        lc.constrain(
+                new NamedLabel("actual_arg_" + (index + 1),
+                        "the label of the " + StringUtil.nth(index + 1)
+                                + " actual argument",
+                        Xj.NV()),
+                LabelConstraint.LEQ,
                 new NamedLabel("formal_arg_" + (index + 1),
                         "the upper bound of the formal argument "
-                                + aj.formalInstance().name(), argBoundj), A
-                        .labelEnv(), Ej.position(), new ConstraintMessage() {
+                                + aj.formalInstance().name(),
+                        argBoundj),
+                A.labelEnv(), Ej.position(), new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "The actual argument is more restrictive than "
@@ -386,8 +385,7 @@ public class CallHelper {
 
                     @Override
                     public String detailMsg() {
-                        return "The label of the actual argument, "
-                                + namedLhs()
+                        return "The label of the actual argument, " + namedLhs()
                                 + ", is more restrictive than the label of the "
                                 + "formal argument, " + namedRhs() + ".";
                     }
@@ -448,15 +446,11 @@ public class CallHelper {
                 Expr Ej = actualArgs.get(j);
                 if (!jts.isFinalAccessExprOrConst(Ej)) {
                     throw new SemanticDetailedException(
-                            "The "
-                                    + StringUtil.nth(j + 1)
+                            "The " + StringUtil.nth(j + 1)
                                     + " argument must be a final access path or a "
                                     + "constant",
-                            "The "
-                                    + StringUtil.nth(j + 1)
-                                    + " formal argument "
-                                    + "of "
-                                    + pi.debugString()
+                            "The " + StringUtil.nth(j + 1) + " formal argument "
+                                    + "of " + pi.debugString()
                                     + " is used to express a dynamic label or principal "
                                     + "in the procedure's signature. As such, "
                                     + "the actual argument must be a final "
@@ -502,7 +496,7 @@ public class CallHelper {
 
     protected PathMap excPathMap(LabelChecker lc, Label returnLabel,
             Label pcPriorToInvoke, List<Type> throwTypes)
-            throws SemanticException {
+                    throws SemanticException {
         JifTypeSystem ts = lc.typeSystem();
         PathMap Xexn = ts.pathMap();
 
@@ -559,15 +553,14 @@ public class CallHelper {
             JifContext A = lc.context();
 
             // the path map for the last argument.
-            NamedLabel namedLi =
-                    new NamedLabel("callee_PC_bound",
-                            "lower bound on the side effects of the method "
-                                    + callee.signature(), Li);
+            NamedLabel namedLi = new NamedLabel("callee_PC_bound",
+                    "lower bound on the side effects of the method "
+                            + callee.signature(),
+                    Li);
 
-            NamedLabel namedPc =
-                    new NamedLabel("pc",
-                            "label of the program counter at this call site",
-                            ts.join(Xjoin.N(), A.currentCodePCBound()));
+            NamedLabel namedPc = new NamedLabel("pc",
+                    "label of the program counter at this call site",
+                    ts.join(Xjoin.N(), A.currentCodePCBound()));
 
             lc.constrain(namedPc, LabelConstraint.LEQ, namedLi, A.labelEnv(),
                     position, new ConstraintMessage() {
@@ -582,8 +575,7 @@ public class CallHelper {
                         public String detailMsg() {
                             return "Calling the method at this program point may "
                                     + "reveal too much information to the receiver of "
-                                    + "the method call. "
-                                    + callee.signature()
+                                    + "the method call. " + callee.signature()
                                     + " can only be invoked "
                                     + "if the invocation will reveal no more "
                                     + "information than the callee's begin label, "
@@ -625,9 +617,8 @@ public class CallHelper {
         X = X.join(excPathMap(lc, Lr, pcPriorToInvoke, throwTypes));
 
         if (pi instanceof MethodInstance) {
-            returnType =
-                    instantiate(lc.context(),
-                            ((MethodInstance) pi).returnType());
+            returnType = instantiate(lc.context(),
+                    ((MethodInstance) pi).returnType());
         } else {
             returnType = null;
         }
@@ -645,7 +636,7 @@ public class CallHelper {
      */
     protected void satisfiesConstraints(final JifProcedureInstance jpi,
             LabelChecker lc, boolean performInstantiations)
-            throws SemanticException {
+                    throws SemanticException {
         final JifContext A = lc.context();
         // Check method-level and class-level constraints
         List<Assertion> constraints =
@@ -662,16 +653,15 @@ public class CallHelper {
                 CallerConstraint jcc = (CallerConstraint) jc;
 
                 // construct a principal representing the authority of the context
-                Principal authPrincipal =
-                        lc.jifTypeSystem().conjunctivePrincipal(jpi.position(),
-                                A.authority());
+                Principal authPrincipal = lc.jifTypeSystem()
+                        .conjunctivePrincipal(jpi.position(), A.authority());
                 final NamedLabel provider =
-                        new NamedLabel(A.provider().toString(), "provider of "
-                                + A.provider().classType().fullName(),
-                                A.provider());
-                JifOptions opt =
-                        (JifOptions) lc.jifTypeSystem().extensionInfo()
-                                .getOptions();
+                        new NamedLabel(A.provider().toString(),
+                                "provider of "
+                                        + A.provider().classType().fullName(),
+                        A.provider());
+                JifOptions opt = (JifOptions) lc.jifTypeSystem().extensionInfo()
+                        .getOptions();
                 // Check the authority
                 for (Principal orig : jcc.principals()) {
                     final Principal pi =
@@ -682,8 +672,7 @@ public class CallHelper {
                         public String msg() {
                             if (!overrideChecker) {
                                 return "The caller must have the authority of the principal "
-                                        + pi
-                                        + " to invoke "
+                                        + pi + " to invoke "
                                         + jpi.debugString();
                             } else {
                                 return "The subclass cannot assume the caller has the "
@@ -694,21 +683,17 @@ public class CallHelper {
                         @Override
                         public String detailMsg() {
                             if (!overrideChecker) {
-                                return "The "
-                                        + jpi.debugString()
+                                return "The " + jpi.debugString()
                                         + " requires that the "
                                         + "caller of the method have the authority of "
-                                        + "the principal "
-                                        + pi
+                                        + "the principal " + pi
                                         + ". The caller does "
                                         + "not have this principal's authority.";
                             } else {
-                                return "The "
-                                        + jpi.debugString()
+                                return "The " + jpi.debugString()
                                         + " requires that the "
                                         + "caller of the method have the authority of "
-                                        + "the principal "
-                                        + pi
+                                        + "the principal " + pi
                                         + ". However, this "
                                         + "method overrides the method in class "
                                         + CallHelper.this.pi.container()
@@ -723,8 +708,8 @@ public class CallHelper {
                                 overrideChecker ? jcc.position() : position,
                                 cmsg);
                     } else {
-                        lc.constrain(authPrincipal,
-                                PrincipalConstraint.ACTSFOR, pi, A.labelEnv(),
+                        lc.constrain(authPrincipal, PrincipalConstraint.ACTSFOR,
+                                pi, A.labelEnv(),
                                 overrideChecker ? jcc.position() : position,
                                 cmsg);
                     }
@@ -735,12 +720,13 @@ public class CallHelper {
                         (ActsForConstraint<ActsForParam, ActsForParam>) jc;
                 ActsForParam actor = jac.actor();
                 ActsForParam granter = jac.granter();
-                if (actor instanceof Principal && granter instanceof Principal) {
+                if (actor instanceof Principal
+                        && granter instanceof Principal) {
                     @SuppressWarnings("unchecked")
                     ActsForConstraint<Principal, Principal> jpapc =
                             (ActsForConstraint<Principal, Principal>) jc;
-                    satisfiesPrincipalActsForPrincipalConstraint(jpi, jpapc,
-                            lc, performInstantiations);
+                    satisfiesPrincipalActsForPrincipalConstraint(jpi, jpapc, lc,
+                            performInstantiations);
                 } else if (actor instanceof Label
                         && granter instanceof Principal) {
                     satisfiesLabelActsForPrincipalConstraint(jpi,
@@ -770,7 +756,7 @@ public class CallHelper {
             final JifProcedureInstance jpi,
             final ActsForConstraint<Principal, Principal> constraint,
             LabelChecker lc, boolean performInstantiations)
-            throws SemanticException {
+                    throws SemanticException {
         final JifContext A = lc.jifContext();
         final Principal actor, granter;
         if (performInstantiations) {
@@ -806,13 +792,9 @@ public class CallHelper {
                                         + " relationship " + constraint
                                         + " holds at the call site.";
                             } else {
-                                return "The "
-                                        + jpi.debugString()
-                                        + " requires that "
-                                        + actor
-                                        + " is "
-                                        + "equivalent to "
-                                        + granter
+                                return "The " + jpi.debugString()
+                                        + " requires that " + actor + " is "
+                                        + "equivalent to " + granter
                                         + ". However, this "
                                         + "method overrides the method in class "
                                         + pi.container()
@@ -845,13 +827,9 @@ public class CallHelper {
                                         + "relationship " + actor + " actsfor "
                                         + granter + " holds at the call site.";
                             } else {
-                                return "The "
-                                        + jpi.debugString()
-                                        + " requires that "
-                                        + actor
-                                        + " can "
-                                        + "actfor "
-                                        + granter
+                                return "The " + jpi.debugString()
+                                        + " requires that " + actor + " can "
+                                        + "actfor " + granter
                                         + ". However, this "
                                         + "method overrides the method in class "
                                         + pi.container()
@@ -869,7 +847,7 @@ public class CallHelper {
     private void satisfiesLabelActsForPrincipalConstraint(
             final JifProcedureInstance jpi, Position pos, Label label,
             Principal principal, LabelChecker lc, boolean performInstantiations)
-            throws SemanticException {
+                    throws SemanticException {
         final JifContext A = lc.jifContext();
         final Label lhs;
         final Principal rhs;
@@ -948,10 +926,11 @@ public class CallHelper {
             // being used as an override checker
         }
 
-        lc.constrain(new NamedLabel(left.toString(), "LHS of label assertion",
-                lhs), LabelConstraint.LEQ, new NamedLabel(right.toString(),
-                "RHS of label assertion", rhs), A.labelEnv(), pos,
-                new ConstraintMessage() {
+        lc.constrain(
+                new NamedLabel(left.toString(), "LHS of label assertion", lhs),
+                LabelConstraint.LEQ,
+                new NamedLabel(right.toString(), "RHS of label assertion", rhs),
+                A.labelEnv(), pos, new ConstraintMessage() {
                     @Override
                     public String msg() {
                         if (!overrideChecker) {
@@ -1003,7 +982,7 @@ public class CallHelper {
     public void bindVarLabels(LabelChecker lc, VarLabel receiverVarLabel,
             List<? extends Label> actualArgVarLabels,
             List<? extends Label> actualParamVarLabels)
-            throws SemanticException {
+                    throws SemanticException {
         if (overrideChecker) {
             throw new InternalCompilerError("Not available for call checking");
         }
@@ -1014,10 +993,13 @@ public class CallHelper {
 
         // bind the receiver var label
         if (receiverVarLabel != null && this.receiverLabel != null) {
-            lc.constrain(new NamedLabel(receiverVarLabel.componentString(),
-                    receiverVarLabel), LabelConstraint.EQUAL, new NamedLabel(
-                    receiverVarLabel.componentString(), this.receiverLabel), A
-                    .labelEnv(), this.position);
+            lc.constrain(
+                    new NamedLabel(receiverVarLabel.componentString(),
+                            receiverVarLabel),
+                    LabelConstraint.EQUAL,
+                    new NamedLabel(receiverVarLabel.componentString(),
+                            this.receiverLabel),
+                    A.labelEnv(), this.position);
         } else if (receiverVarLabel != null || this.receiverLabel != null) {
             throw new InternalCompilerError("Inconsistent receiver labels",
                     position);
@@ -1027,8 +1009,7 @@ public class CallHelper {
         for (int i = 0; i < actualArgLabels.size(); i++) {
             VarLabel argVarLbl = (VarLabel) actualArgVarLabels.get(i);
             Label argLbl = this.actualArgLabels.get(i);
-            lc.constrain(
-                    new NamedLabel(argVarLbl.componentString(), argVarLbl),
+            lc.constrain(new NamedLabel(argVarLbl.componentString(), argVarLbl),
                     LabelConstraint.EQUAL,
                     new NamedLabel(argVarLbl.componentString(), argLbl),
                     A.labelEnv(), this.position);
@@ -1047,17 +1028,19 @@ public class CallHelper {
             for (int i = 0; i < actualParamVarLabels.size(); i++) {
                 VarLabel paramVarLbl = (VarLabel) actualParamVarLabels.get(i);
                 Label paramLbl = this.actualParamLabels.get(i);
-                lc.constrain(new NamedLabel(paramVarLbl.componentString(),
-                        paramVarLbl), LabelConstraint.EQUAL, new NamedLabel(
-                        paramVarLbl.componentString(), paramLbl), A.labelEnv(),
-                        this.position);
+                lc.constrain(
+                        new NamedLabel(paramVarLbl.componentString(),
+                                paramVarLbl),
+                        LabelConstraint.EQUAL,
+                        new NamedLabel(paramVarLbl.componentString(), paramLbl),
+                        A.labelEnv(), this.position);
             }
         }
     }
 
     protected static List<ArgLabel> getArgLabelsFromFormalTypes(
             List<? extends Type> formalTypes, JifTypeSystem jts, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         List<ArgLabel> formalArgLabels =
                 new ArrayList<ArgLabel>(formalTypes.size());
         for (Type t : formalTypes) {
@@ -1074,15 +1057,11 @@ public class CallHelper {
     }
 
     public Label instantiate(JifContext A, Label L) throws SemanticException {
-        return JifInstantiator.instantiate(
-                L,
-                A,
-                receiverExpr,
-                calleeContainer,
+        return JifInstantiator.instantiate(L, A, receiverExpr, calleeContainer,
                 receiverLabel,
                 getArgLabelsFromFormalTypes(pi.formalTypes(),
-                        (JifTypeSystem) pi.typeSystem(), pi.position()), pi
-                        .formalTypes(), this.actualArgLabels, this.actualArgs,
+                        (JifTypeSystem) pi.typeSystem(), pi.position()),
+                pi.formalTypes(), this.actualArgLabels, this.actualArgs,
                 this.actualParamLabels);
     }
 
@@ -1119,28 +1098,20 @@ public class CallHelper {
 
     public Principal instantiate(JifContext A, Principal p)
             throws SemanticException {
-        return JifInstantiator.instantiate(
-                p,
-                A,
-                receiverExpr,
-                calleeContainer,
+        return JifInstantiator.instantiate(p, A, receiverExpr, calleeContainer,
                 receiverLabel,
                 getArgLabelsFromFormalTypes(this.pi.formalTypes(),
                         (JifTypeSystem) this.pi.typeSystem(),
-                        this.pi.position()), pi.formalTypes(), this.actualArgs,
-                this.actualParamLabels);
+                        this.pi.position()),
+                pi.formalTypes(), this.actualArgs, this.actualParamLabels);
     }
 
     public Type instantiate(JifContext A, Type t) throws SemanticException {
-        return JifInstantiator.instantiate(
-                t,
-                A,
-                receiverExpr,
-                calleeContainer,
+        return JifInstantiator.instantiate(t, A, receiverExpr, calleeContainer,
                 receiverLabel,
                 getArgLabelsFromFormalTypes(pi.formalTypes(),
-                        (JifTypeSystem) pi.typeSystem(), pi.position()), pi
-                        .formalTypes(), this.actualArgLabels, this.actualArgs,
+                        (JifTypeSystem) pi.typeSystem(), pi.position()),
+                pi.formalTypes(), this.actualArgLabels, this.actualArgs,
                 this.actualParamLabels);
     }
 
@@ -1167,7 +1138,8 @@ public class CallHelper {
         final JifMethodInstance overridden = (JifMethodInstance) this.pi;
         final JifMethodInstance overriding = this.overridingMethod;
 
-        if (overriding.formalTypes().size() != overridden.formalTypes().size()) {
+        if (overriding.formalTypes().size() != overridden.formalTypes()
+                .size()) {
             throw new InternalCompilerError("Different number of arguments!");
         }
 
@@ -1198,20 +1170,24 @@ public class CallHelper {
             ArgLabel ai = (ArgLabel) ts.labelOfType(i);
             ArgLabel aj = (ArgLabel) ts.labelOfType(j);
             final int argIndex = ++c;
-            newlc.constrain(new NamedLabel("sup_arg_" + argIndex, "label of "
-                    + StringUtil.nth(argIndex) + " arg of overridden method",
-                    instantiate(A, aj.upperBound())), LabelConstraint.LEQ,
-                    new NamedLabel("sub_arg_" + argIndex, "label of "
-                            + StringUtil.nth(argIndex)
-                            + " arg of overridding method", ai.upperBound()), A
-                            .labelEnv(), overriding.position(),
+            newlc.constrain(
+                    new NamedLabel("sup_arg_" + argIndex,
+                            "label of " + StringUtil.nth(argIndex)
+                                    + " arg of overridden method",
+                    instantiate(A, aj.upperBound())),
+                    LabelConstraint.LEQ,
+                    new NamedLabel("sub_arg_" + argIndex,
+                            "label of " + StringUtil.nth(argIndex)
+                                    + " arg of overridding method",
+                            ai.upperBound()),
+                    A.labelEnv(), overriding.position(),
                     new ConstraintMessage() {
                         @Override
                         public String msg() {
                             return "Cannot override " + overridden.signature()
-                                    + " in " + overridden.container()
-                                    + " with " + overriding.signature()
-                                    + " in " + overriding.container()
+                                    + " in " + overridden.container() + " with "
+                                    + overriding.signature() + " in "
+                                    + overriding.container()
                                     + ". The label of the "
                                     + StringUtil.nth(argIndex) + " argument "
                                     + "of the overriding method cannot "
@@ -1229,14 +1205,14 @@ public class CallHelper {
         // pc bounds  are contravariant:
         //    the pc bound on mi may be more restrictive than the
         // pc bound on mj
-        NamedLabel starti =
-                new NamedLabel("sub_pc_bound", "PC bound of method "
-                        + overriding.name() + " in " + overriding.container(),
-                        overriding.pcBound());
-        NamedLabel startj =
-                new NamedLabel("sup_pc_bound", "PC bound of method "
-                        + overridden.name() + " in " + overridden.container(),
-                        instantiate(A, overridden.pcBound()));
+        NamedLabel starti = new NamedLabel(
+                "sub_pc_bound", "PC bound of method " + overriding.name()
+                        + " in " + overriding.container(),
+                overriding.pcBound());
+        NamedLabel startj = new NamedLabel("sup_pc_bound",
+                "PC bound of method " + overridden.name() + " in "
+                        + overridden.container(),
+                instantiate(A, overridden.pcBound()));
         newlc.constrain(startj, LabelConstraint.LEQ, starti, A.labelEnv(),
                 overriding.position(), new ConstraintMessage() {
                     @Override
@@ -1266,14 +1242,14 @@ public class CallHelper {
         // return labels are covariant
         //      the return label on mi may be less restrictive than the
         //      return label on mj
-        NamedLabel reti =
-                new NamedLabel("sub_return_label", "return label of method "
+        NamedLabel reti = new NamedLabel(
+                "sub_return_label", "return label of method "
                         + overriding.name() + " in " + overriding.container(),
-                        overriding.returnLabel());
-        NamedLabel retj =
-                new NamedLabel("sup_return_label", "return label of method "
-                        + overridden.name() + " in " + overridden.container(),
-                        instantiate(A, overridden.returnLabel()));
+                overriding.returnLabel());
+        NamedLabel retj = new NamedLabel("sup_return_label",
+                "return label of method " + overridden.name() + " in "
+                        + overridden.container(),
+                instantiate(A, overridden.returnLabel()));
         newlc.constrain(reti, LabelConstraint.LEQ, retj, A.labelEnv(),
                 overriding.position(), new ConstraintMessage() {
                     @Override
@@ -1302,18 +1278,14 @@ public class CallHelper {
         // return value labels are covariant
         //      the return value label on mi may be less restrictive than the
         //      return value label on mj
-        NamedLabel retVali =
-                new NamedLabel("sub_return_val_label",
-                        "label of the return value of method "
-                                + overriding.name() + " in "
-                                + overriding.container(),
-                        overriding.returnValueLabel());
-        NamedLabel retValj =
-                new NamedLabel("sup_return_val_label",
-                        "label of the return value of method "
-                                + overridden.name() + " in "
-                                + overridden.container(), instantiate(A,
-                                overridden.returnValueLabel()));
+        NamedLabel retVali = new NamedLabel("sub_return_val_label",
+                "label of the return value of method " + overriding.name()
+                        + " in " + overriding.container(),
+                overriding.returnValueLabel());
+        NamedLabel retValj = new NamedLabel("sup_return_val_label",
+                "label of the return value of method " + overridden.name()
+                        + " in " + overridden.container(),
+                instantiate(A, overridden.returnValueLabel()));
         newlc.constrain(retVali, LabelConstraint.LEQ, retValj, A.labelEnv(),
                 overriding.position(), new ConstraintMessage() {
                     @Override
@@ -1351,23 +1323,21 @@ public class CallHelper {
             // find the corresponding exception(s) in mhExc
             for (final LabeledType exj : mjExc) {
                 if (ts.isSubtype(exi.typePart(), exj.typePart())) {
-                    newlc.constrain(new NamedLabel("exc_label_"
-                            + exi.typePart().toString(), "",//"label on the exception " + exi.typePart().toString(),
-                            exi.labelPart()), LabelConstraint.LEQ,
-                            new NamedLabel("exc_label_"
-                                    + exj.typePart().toString(), "",
-                                    instantiate(A, exj.labelPart())), A
-                                    .labelEnv(), overriding.position(),
+                    newlc.constrain(new NamedLabel(
+                            "exc_label_" + exi.typePart().toString(), "", //"label on the exception " + exi.typePart().toString(),
+                            exi.labelPart()),
+                            LabelConstraint.LEQ,
+                            new NamedLabel(
+                                    "exc_label_" + exj.typePart().toString(),
+                                    "", instantiate(A, exj.labelPart())),
+                            A.labelEnv(), overriding.position(),
                             new ConstraintMessage() {
                                 @Override
                                 public String msg() {
                                     return "Cannot override "
-                                            + overridden.signature()
-                                            + " in "
-                                            + overridden.container()
-                                            + " with "
-                                            + overriding.signature()
-                                            + " in "
+                                            + overridden.signature() + " in "
+                                            + overridden.container() + " with "
+                                            + overriding.signature() + " in "
                                             + overriding.container()
                                             + ". The label of the "
                                             + exi.typePart().toString()
@@ -1383,19 +1353,14 @@ public class CallHelper {
                                 @Override
                                 public String detailMsg() {
                                     return "Cannot override "
-                                            + overridden.signature()
-                                            + " in "
-                                            + overridden.container()
-                                            + " with "
-                                            + overriding.signature()
-                                            + " in "
+                                            + overridden.signature() + " in "
+                                            + overridden.container() + " with "
+                                            + overriding.signature() + " in "
                                             + overriding.container()
                                             + ". If the exception "
                                             + exi.typePart().toString()
-                                            + " is thrown "
-                                            + "by "
-                                            + overriding.signature()
-                                            + " in "
+                                            + " is thrown " + "by "
+                                            + overriding.signature() + " in "
                                             + overriding.container()
                                             + " then more information "
                                             + "may be revealed than is permitted by "

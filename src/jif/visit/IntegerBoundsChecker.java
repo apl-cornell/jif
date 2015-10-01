@@ -44,11 +44,11 @@ import polyglot.visit.NodeVisitor;
  * This class finds integral bounds on expressions. It uses that information to
  * determine whether it is impossible for certain exceptions to be thrown.
  */
-public class IntegerBoundsChecker extends
-        DataFlow<IntegerBoundsChecker.DataFlowItem> {
+public class IntegerBoundsChecker
+        extends DataFlow<IntegerBoundsChecker.DataFlowItem> {
     public IntegerBoundsChecker(Job job) {
-        this(job, job.extensionInfo().typeSystem(), job.extensionInfo()
-                .nodeFactory());
+        this(job, job.extensionInfo().typeSystem(),
+                job.extensionInfo().nodeFactory());
     }
 
     public IntegerBoundsChecker(Job job, TypeSystem ts, NodeFactory nf) {
@@ -84,10 +84,9 @@ public class IntegerBoundsChecker extends
     public Map<EdgeKey, DataFlowItem> flow(DataFlowItem trueItem,
             DataFlowItem falseItem, DataFlowItem otherItem,
             FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
-        DataFlowItem inItem =
-                safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, falseItem,
-                        FlowGraph.EDGE_KEY_FALSE, otherItem,
-                        FlowGraph.EDGE_KEY_OTHER, peer, graph);
+        DataFlowItem inItem = safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE,
+                falseItem, FlowGraph.EDGE_KEY_FALSE, otherItem,
+                FlowGraph.EDGE_KEY_OTHER, peer, graph);
         //System.err.println("flow for " + n + " : in " + inItem);
 
         if (peer.isEntry()) {
@@ -111,9 +110,8 @@ public class IntegerBoundsChecker extends
 
             if (ld.init() != null) {
                 // li = init, so add li <= init, and init <= li
-                int result =
-                        addBoundsAssign(updates, ld.localInstance(), ld.init(),
-                                inDFItem, null);
+                int result = addBoundsAssign(updates, ld.localInstance(),
+                        ld.init(), inDFItem, null);
                 if ((result & MAY_INCREASE) != 0)
                     increased = ld.localInstance();
                 if ((result & MAY_DECREASE) != 0)
@@ -127,17 +125,14 @@ public class IntegerBoundsChecker extends
             if (!la.operator().equals(Assign.ASSIGN)) {
                 // fake the experssion.
                 Binary.Operator op = la.operator().binaryOperator();
-                right =
-                        nodeFactory().Binary(Position.compilerGenerated(),
-                                la.left(), op, la.right());
+                right = nodeFactory().Binary(Position.compilerGenerated(),
+                        la.left(), op, la.right());
                 right = right.type(la.left().type());
             }
 
             // li = e, so add li <= e, and e <= li
-            int result =
-                    addBoundsAssign(updates, li, right, inDFItem,
-                            ((JifExprExt) JifUtil.jifExt(la))
-                                    .getNumericBounds());
+            int result = addBoundsAssign(updates, li, right, inDFItem,
+                    ((JifExprExt) JifUtil.jifExt(la)).getNumericBounds());
             if ((result & MAY_INCREASE) != 0) increased = li;
             if ((result & MAY_DECREASE) != 0) decreased = li;
 
@@ -155,11 +150,10 @@ public class IntegerBoundsChecker extends
                     decreased = l.localInstance();
                 }
             }
-        } else if (n instanceof Binary
-                && ((Binary) n).type().isBoolean()
+        } else if (n instanceof Binary && ((Binary) n).type().isBoolean()
                 && ((Binary) n).left().type().isNumeric()
-                && INTERESTING_BINARY_OPERATORS.contains(((Binary) n)
-                        .operator())) {
+                && INTERESTING_BINARY_OPERATORS
+                        .contains(((Binary) n).operator())) {
             // it's a comparison operation! We care about tracking the
             // information that may be gained by these comparisons
             Map<LocalInstance, Bounds> falseupdates =
@@ -218,9 +212,8 @@ public class IntegerBoundsChecker extends
             DataFlowItem otherDFItem = outDFItem;
             trueItem = trueItem == null ? outDFItem : trueItem;
             falseItem = falseItem == null ? outDFItem : falseItem;
-            Map<EdgeKey, DataFlowItem> m =
-                    flowBooleanConditions(trueItem, falseItem, otherDFItem,
-                            graph, peer);
+            Map<EdgeKey, DataFlowItem> m = flowBooleanConditions(trueItem,
+                    falseItem, otherDFItem, graph, peer);
 
             if (m != null) {
                 return m;
@@ -305,8 +298,8 @@ public class IntegerBoundsChecker extends
                 continue;
             }
 
-            for (Iterator<LocalInstance> iterator = newMap.keySet().iterator(); iterator
-                    .hasNext();) {
+            for (Iterator<LocalInstance> iterator =
+                    newMap.keySet().iterator(); iterator.hasNext();) {
                 LocalInstance li = iterator.next();
                 if (df.bounds.containsKey(li)) {
                     // merge the the bounds
@@ -533,7 +526,8 @@ public class IntegerBoundsChecker extends
         } else if (expr instanceof Unary) {
             Unary u = (Unary) expr;
 
-            if (u.operator() == Unary.PRE_INC || u.operator() == Unary.PRE_DEC) {
+            if (u.operator() == Unary.PRE_INC
+                    || u.operator() == Unary.PRE_DEC) {
                 return findLocalInstanceBounds(u.expr(), type);
             } else if (u.operator() == Unary.POST_INC && type.isUpper()) {
                 return findLocalInstanceBounds(u.expr(), type);
@@ -615,8 +609,8 @@ public class IntegerBoundsChecker extends
             if (f.target() instanceof Local) {
                 if (f.name().equals("length") && f.target().type().isArray()) {
                     // we have an expression of the form x.length!
-                    return Collections.singleton(((Local) f.target())
-                            .localInstance());
+                    return Collections
+                            .singleton(((Local) f.target()).localInstance());
                 }
             }
         } else if (expr instanceof Conditional) {
@@ -776,17 +770,16 @@ public class IntegerBoundsChecker extends
                 LocalBound lb = (LocalBound) b;
 
                 if (type.isLower() == lb.isLower()) {
-                    best =
-                            Bounds.refine(best,
-                                    findNumericBound(lb.li, df, lb.type, seen),
-                                    type);
+                    best = Bounds.refine(best,
+                            findNumericBound(lb.li, df, lb.type, seen), type);
                 }
             }
             // XXX TODO Could try to use array length bounds to get a better estimate...
 
         }
 
-        if (best != Bounds.POS_INF && best != Bounds.NEG_INF && type.isStrict()) {
+        if (best != Bounds.POS_INF && best != Bounds.NEG_INF
+                && type.isStrict()) {
             if (type.isLower()) {
                 best -= 1;
             } else {
@@ -831,7 +824,8 @@ public class IntegerBoundsChecker extends
             Long low = findNumericBound(li, df, Bound.lower(false));
             Long high = findNumericBound(li, df, Bound.upper(false));
             best = best.intersect(new Interval(low, high));
-        } else if (expr.isConstant() && expr.constantValue() instanceof Number) {
+        } else
+            if (expr.isConstant() && expr.constantValue() instanceof Number) {
             long n = ((Number) expr.constantValue()).longValue();
             best = best.intersect(Interval.singleton(n));
         } else if (expr instanceof Unary) {
@@ -910,11 +904,9 @@ public class IntegerBoundsChecker extends
 
         protected static enum Type {
 
-            @SuppressWarnings("hiding")
-            LT("<"), @SuppressWarnings("hiding")
-            LE("<="), @SuppressWarnings("hiding")
-            GT(">"), @SuppressWarnings("hiding")
-            GE(">=");
+            @SuppressWarnings("hiding") LT("<"), @SuppressWarnings("hiding") LE(
+                    "<="), @SuppressWarnings("hiding") GT(
+                            ">"), @SuppressWarnings("hiding") GE(">=");
 
             private final String name;
 
@@ -1068,7 +1060,7 @@ public class IntegerBoundsChecker extends
         public ArrayLengthBound(Type type, LocalInstance array) {
             super(type);
             this.array = array;
-            assert (array.type().isArray());
+            assert(array.type().isArray());
         }
 
         @Override
@@ -1132,8 +1124,8 @@ public class IntegerBoundsChecker extends
         /**
          * Interval representing all integers.
          */
-        public static final Interval FULL = new Interval(Bounds.NEG_INF,
-                Bounds.POS_INF);
+        public static final Interval FULL =
+                new Interval(Bounds.NEG_INF, Bounds.POS_INF);
 
         /**
          * The non-negative integers (includes 0).
@@ -1240,7 +1232,8 @@ public class IntegerBoundsChecker extends
                 return Bounds.POS_INF;
             }
 
-            if ((i == Bounds.POS_INF && j < 0) | (j == Bounds.POS_INF && i < 0)) {
+            if ((i == Bounds.POS_INF && j < 0)
+                    | (j == Bounds.POS_INF && i < 0)) {
                 return Bounds.NEG_INF;
             }
 
@@ -1531,7 +1524,8 @@ public class IntegerBoundsChecker extends
                                         // li was a lower bound but may have increased,
                                         // so it might not be a lower bound any more
                                         now.remove(lb);
-                                    } else if (lb.isUpper() && li == decreased) {
+                                    } else
+                                        if (lb.isUpper() && li == decreased) {
                                         // was upper bound but may have decreased
                                         now.remove(lb);
                                     }

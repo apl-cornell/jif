@@ -10,8 +10,8 @@ import polyglot.util.SerialVersionUID;
 
 /** Represents the meet of a number of confidentiality policies.
  */
-public class MeetConfPolicy_c extends MeetPolicy_c<ConfPolicy> implements
-        MeetConfPolicy {
+public class MeetConfPolicy_c extends MeetPolicy_c<ConfPolicy>
+        implements MeetConfPolicy {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public MeetConfPolicy_c(Set<ConfPolicy> components, JifTypeSystem ts,

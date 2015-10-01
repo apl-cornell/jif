@@ -9,7 +9,8 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy {
     private final Principal owner;
     private final Principal reader;
 
-    public ReaderPolicy(LabelUtil labelUtil, Principal owner, Principal reader) {
+    public ReaderPolicy(LabelUtil labelUtil, Principal owner,
+            Principal reader) {
         super(labelUtil);
         this.owner = owner;
         this.reader = reader;
@@ -90,12 +91,12 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy {
 
         ReaderPolicy policy = (ReaderPolicy) o;
 
-        if (owner == policy.owner
-                || (owner != null && owner.equals(policy.owner)
-                        && policy.owner != null && policy.owner.equals(owner))) {
+        if (owner == policy.owner || (owner != null
+                && owner.equals(policy.owner) && policy.owner != null
+                && policy.owner.equals(owner))) {
             return (reader == policy.reader || (reader != null
-                    && reader.equals(policy.reader) && policy.reader != null && policy.reader
-                        .equals(reader)));
+                    && reader.equals(policy.reader) && policy.reader != null
+                    && policy.reader.equals(reader)));
         }
 
         return false;
@@ -140,12 +141,14 @@ public class ReaderPolicy extends AbstractPolicy implements ConfPolicy {
     }
 
     @Override
-    public ConfPolicy join(ConfPolicy p, Set<DelegationPair> s, boolean simplify) {
+    public ConfPolicy join(ConfPolicy p, Set<DelegationPair> s,
+            boolean simplify) {
         return labelUtil.join(this, p, s, simplify);
     }
 
     @Override
-    public ConfPolicy meet(ConfPolicy p, Set<DelegationPair> s, boolean simplify) {
+    public ConfPolicy meet(ConfPolicy p, Set<DelegationPair> s,
+            boolean simplify) {
         return labelUtil.meet(this, p, s, simplify);
     }
 }

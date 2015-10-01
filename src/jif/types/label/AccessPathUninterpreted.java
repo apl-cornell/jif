@@ -59,7 +59,8 @@ public class AccessPathUninterpreted extends AccessPathRoot {
         this(expr, pos, false);
     }
 
-    public AccessPathUninterpreted(String expr, Position pos, boolean allowSubst) {
+    public AccessPathUninterpreted(String expr, Position pos,
+            boolean allowSubst) {
         super(pos);
         this.expr = expr;
         this.allowSubst = allowSubst;

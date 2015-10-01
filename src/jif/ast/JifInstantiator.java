@@ -99,9 +99,8 @@ public class JifInstantiator {
         }
         this.tempThisLbl = ts.unknownLabel(Position.compilerGenerated());
         this.tempThisLbl.setDescription("temp this");
-        this.tempThisRoot =
-                new AccessPathUninterpreted("temp this",
-                        Position.compilerGenerated(), true);
+        this.tempThisRoot = new AccessPathUninterpreted("temp this",
+                Position.compilerGenerated(), true);
 
     }
 
@@ -112,13 +111,13 @@ public class JifInstantiator {
         if (L == null) return null;
 
         // formal argLabels to formalTempLabels
-        for (int i = 0; formalArgLabels != null && i < formalArgLabels.size(); i++) {
+        for (int i = 0; formalArgLabels != null
+                && i < formalArgLabels.size(); i++) {
             Label temp = formalTempLabels.get(i);
             ArgLabel formalArgLbl = formalArgLabels.get(i);
             try {
-                L =
-                        substImpl(L, new LabelInstantiator(formalArgLbl, temp,
-                                false));
+                L = substImpl(L,
+                        new LabelInstantiator(formalArgLbl, temp, false));
             } catch (SemanticException e) {
                 throw new InternalCompilerError("Unexpected SemanticException "
                         + "during label substitution: " + e.getMessage(), pos);
@@ -129,12 +128,15 @@ public class JifInstantiator {
         try {
             L = substImpl(L, new ThisLabelInstantiator(tempThisLbl));
         } catch (SemanticException e) {
-            throw new InternalCompilerError("Unexpected SemanticException "
-                    + "during label substitution: " + e.getMessage(), pos);
+            throw new InternalCompilerError(
+                    "Unexpected SemanticException "
+                            + "during label substitution: " + e.getMessage(),
+                    pos);
         }
 
         // formal arg access paths to temp access paths
-        for (int i = 0; formalArgLabels != null && i < formalArgLabels.size(); i++) {
+        for (int i = 0; formalArgLabels != null
+                && i < formalArgLabels.size(); i++) {
             try {
                 ArgLabel formalArgLbl = formalArgLabels.get(i);
                 if (formalArgLbl.formalInstance().flags().isFinal()) {
@@ -145,28 +147,25 @@ public class JifInstantiator {
                                     formalArgLbl.position());
                     AccessPathRoot tempRoot = formalTempAccessPathRoots.get(i);
 
-                    L =
-                            substImpl(L, new AccessPathInstantiator(formalRoot,
-                                    tempRoot));
+                    L = substImpl(L,
+                            new AccessPathInstantiator(formalRoot, tempRoot));
                 }
             } catch (SemanticException e) {
-                throw new InternalCompilerError("Unexpected SemanticException "
-                        + e.getMessage(), pos);
+                throw new InternalCompilerError(
+                        "Unexpected SemanticException " + e.getMessage(), pos);
             }
         }
 
         // formal this access path to temp this access path
         if (receiverType != null && receiverType.isClass()) {
-            AccessPathRoot formalThisRoot =
-                    new AccessPathThis(receiverType.toClass(),
-                            receiverType.position());
+            AccessPathRoot formalThisRoot = new AccessPathThis(
+                    receiverType.toClass(), receiverType.position());
             try {
-                L =
-                        substImpl(L, new AccessPathInstantiator(formalThisRoot,
-                                tempThisRoot));
+                L = substImpl(L, new AccessPathInstantiator(formalThisRoot,
+                        tempThisRoot));
             } catch (SemanticException e) {
-                throw new InternalCompilerError("Unexpected SemanticException "
-                        + e.getMessage(), pos);
+                throw new InternalCompilerError(
+                        "Unexpected SemanticException " + e.getMessage(), pos);
             }
         }
 
@@ -185,34 +184,38 @@ public class JifInstantiator {
         try {
             L = substImpl(L, labelInstantiator);
         } catch (SemanticException e) {
-            throw new InternalCompilerError("Unexpected SemanticException "
-                    + "during label substitution: " + e.getMessage(), pos);
+            throw new InternalCompilerError(
+                    "Unexpected SemanticException "
+                            + "during label substitution: " + e.getMessage(),
+                    pos);
         }
 
         // this access path
         try {
-            L =
-                    substImpl(L, new AccessPathInstantiator(tempThisRoot,
-                            receiverPath));
+            L = substImpl(L,
+                    new AccessPathInstantiator(tempThisRoot, receiverPath));
         } catch (SemanticException e) {
-            throw new InternalCompilerError("Unexpected SemanticException "
-                    + "during label substitution: " + e.getMessage(), pos);
+            throw new InternalCompilerError(
+                    "Unexpected SemanticException "
+                            + "during label substitution: " + e.getMessage(),
+                    pos);
         }
 
         // replace arg labels
-        for (int i = 0; formalTempLabels != null && i < formalTempLabels.size(); i++) {
+        for (int i = 0; formalTempLabels != null
+                && i < formalTempLabels.size(); i++) {
             Label formalArgTempLbl = formalTempLabels.get(i);
             if (actualArgLabels != null) {
                 Label actualArgLbl = actualArgLabels.get(i);
                 try {
-                    L =
-                            substImpl(L, new ExactLabelInstantiator(
-                                    formalArgTempLbl, actualArgLbl));
+                    L = substImpl(L, new ExactLabelInstantiator(
+                            formalArgTempLbl, actualArgLbl));
                 } catch (SemanticException e) {
                     throw new InternalCompilerError(
                             "Unexpected SemanticException "
                                     + "during label substitution: "
-                                    + e.getMessage(), pos);
+                                    + e.getMessage(),
+                            pos);
                 }
             }
 
@@ -222,27 +225,26 @@ public class JifInstantiator {
                     Expr actualExpr = actualArgExprs.get(i);
                     Type formalArgType = formalArgTypes.get(i);
                     AccessPath target;
-                    if (ts.isFinalAccessExprOrConst(actualExpr, formalArgType)) {
-                        target =
-                                ts.exprToAccessPath(actualExpr, formalArgType,
-                                        callerContext);
+                    if (ts.isFinalAccessExprOrConst(actualExpr,
+                            formalArgType)) {
+                        target = ts.exprToAccessPath(actualExpr, formalArgType,
+                                callerContext);
                     } else {
-                        target =
-                                new AccessPathUninterpreted(actualExpr,
-                                        actualExpr.position());
+                        target = new AccessPathUninterpreted(actualExpr,
+                                actualExpr.position());
                     }
 
                     AccessPathRoot formalTempRoot =
                             formalTempAccessPathRoots.get(i);
 
-                    L =
-                            substImpl(L, new AccessPathInstantiator(
-                                    formalTempRoot, target));
+                    L = substImpl(L,
+                            new AccessPathInstantiator(formalTempRoot, target));
                 } catch (SemanticException e) {
                     throw new InternalCompilerError(
                             "Unexpected SemanticException "
                                     + "during label substitution: "
-                                    + e.getMessage(), pos);
+                                    + e.getMessage(),
+                            pos);
                 }
             }
         }
@@ -270,14 +272,14 @@ public class JifInstantiator {
                 ArgLabel paramArgLabel = ts.argLabel(pi.position(), pi);
                 paramArgLabel.setUpperBound(ts.topLabel());
                 try {
-                    L =
-                            substImpl(L, new LabelInstantiator(paramArgLabel,
-                                    actualParamLabel));
+                    L = substImpl(L, new LabelInstantiator(paramArgLabel,
+                            actualParamLabel));
                 } catch (SemanticException e) {
                     throw new InternalCompilerError(
                             "Unexpected SemanticException "
                                     + "during label substitution: "
-                                    + e.getMessage(), pos);
+                                    + e.getMessage(),
+                            pos);
                 }
             }
             if (iActualParamLabels.hasNext() || iFormalParams.hasNext()) {
@@ -289,8 +291,10 @@ public class JifInstantiator {
         try {
             substImpl(L, new CheckLeftOvers());
         } catch (SemanticException e) {
-            throw new InternalCompilerError("Unexpected SemanticException "
-                    + "during label substitution: " + e.getMessage(), pos);
+            throw new InternalCompilerError(
+                    "Unexpected SemanticException "
+                            + "during label substitution: " + e.getMessage(),
+                    pos);
         }
 
         return L;
@@ -404,8 +408,8 @@ public class JifInstantiator {
                 ThisLabel tl = (ThisLabel) L;
                 if (!thisClasses.contains(tl.classType())
                         && !thisClasses.isEmpty()) {
-                    throw new InternalCompilerError("multiple this classes: "
-                            + L);
+                    throw new InternalCompilerError(
+                            "multiple this classes: " + L);
                 }
                 thisClasses.add(tl.classType());
 
@@ -527,24 +531,21 @@ public class JifInstantiator {
 
     public static Label instantiate(Label L, JifContext callerContext,
             Expr receiverExpr, ReferenceType receiverType, Label receiverLabel,
-            List<ArgLabel> formalArgLabels,
-            List<? extends Type> formalArgTypes, List<Label> actualArgLabels,
-            List<Expr> actualArgExprs, List<Label> actualParamLabels)
-            throws SemanticException {
+            List<ArgLabel> formalArgLabels, List<? extends Type> formalArgTypes,
+            List<Label> actualArgLabels, List<Expr> actualArgExprs,
+            List<Label> actualParamLabels) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem) callerContext.typeSystem();
         AccessPath receiverPath;
         if (ts.isFinalAccessExprOrConst(receiverExpr, receiverType)) {
-            receiverPath =
-                    ts.exprToAccessPath(receiverExpr, receiverType,
-                            callerContext);
+            receiverPath = ts.exprToAccessPath(receiverExpr, receiverType,
+                    callerContext);
         } else {
             receiverPath =
                     new AccessPathUninterpreted(receiverExpr, L.position());
         }
-        JifInstantiator inst =
-                new JifInstantiator(receiverType, receiverLabel, receiverPath,
-                        formalArgLabels, formalArgTypes, actualArgLabels,
-                        actualArgExprs, actualParamLabels, callerContext);
+        JifInstantiator inst = new JifInstantiator(receiverType, receiverLabel,
+                receiverPath, formalArgLabels, formalArgTypes, actualArgLabels,
+                actualArgExprs, actualParamLabels, callerContext);
         return inst.instantiate(L);
     }
 
@@ -599,13 +600,12 @@ public class JifInstantiator {
      */
     public static Label instantiate(Label L, JifContext callerContext,
             Expr receiverExpr, ReferenceType receiverType, Label receiverLbl)
-            throws SemanticException {
+                    throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem) callerContext.typeSystem();
         AccessPath receiverPath;
         if (ts.isFinalAccessExprOrConst(receiverExpr, receiverType)) {
-            receiverPath =
-                    ts.exprToAccessPath(receiverExpr, receiverType,
-                            callerContext);
+            receiverPath = ts.exprToAccessPath(receiverExpr, receiverType,
+                    callerContext);
         } else {
             receiverPath =
                     new AccessPathUninterpreted(receiverExpr, L.position());
@@ -617,9 +617,8 @@ public class JifInstantiator {
     public static Label instantiate(Label L, JifContext callerContext,
             AccessPath receiverPath, ReferenceType receiverType,
             Label receiverLbl) {
-        JifInstantiator inst =
-                new JifInstantiator(receiverType, receiverLbl, receiverPath,
-                        null, null, null, null, null, callerContext);
+        JifInstantiator inst = new JifInstantiator(receiverType, receiverLbl,
+                receiverPath, null, null, null, null, null, callerContext);
         return inst.instantiate(L);
 
     }
@@ -627,74 +626,66 @@ public class JifInstantiator {
     public static Type instantiate(Type t, JifContext callerContext,
             AccessPath receiverPath, ReferenceType receiverType,
             Label receiverLbl) {
-        JifInstantiator inst =
-                new JifInstantiator(receiverType, receiverLbl, receiverPath,
-                        null, null, null, null, null, callerContext);
+        JifInstantiator inst = new JifInstantiator(receiverType, receiverLbl,
+                receiverPath, null, null, null, null, null, callerContext);
         return inst.instantiate(t);
     }
 
     public static Principal instantiate(Principal p, JifContext callerContext,
             Expr receiverExpr, ReferenceType receiverType, Label receiverLabel,
-            List<ArgLabel> formalArgLabels,
-            List<? extends Type> formalArgTypes, List<Expr> actualArgExprs,
-            List<Label> actualParamLabels) throws SemanticException {
+            List<ArgLabel> formalArgLabels, List<? extends Type> formalArgTypes,
+            List<Expr> actualArgExprs, List<Label> actualParamLabels)
+                    throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem) callerContext.typeSystem();
         AccessPath receiverPath;
         if (ts.isFinalAccessExprOrConst(receiverExpr, receiverType)) {
-            receiverPath =
-                    ts.exprToAccessPath(receiverExpr, receiverType,
-                            callerContext);
+            receiverPath = ts.exprToAccessPath(receiverExpr, receiverType,
+                    callerContext);
         } else {
             receiverPath =
                     new AccessPathUninterpreted(receiverExpr, p.position());
         }
-        JifInstantiator inst =
-                new JifInstantiator(receiverType, receiverLabel, receiverPath,
-                        formalArgLabels, formalArgTypes, null, actualArgExprs,
-                        actualParamLabels, callerContext);
+        JifInstantiator inst = new JifInstantiator(receiverType, receiverLabel,
+                receiverPath, formalArgLabels, formalArgTypes, null,
+                actualArgExprs, actualParamLabels, callerContext);
         return inst.instantiate(p);
     }
 
     public static Type instantiate(Type t, JifContext callerContext,
             Expr receiverExpr, ReferenceType receiverType, Label receiverLabel,
-            List<ArgLabel> formalArgLabels,
-            List<? extends Type> formalArgTypes,
+            List<ArgLabel> formalArgLabels, List<? extends Type> formalArgTypes,
             List<? extends Label> actualArgLabels, List<Expr> actualArgExprs,
             List<? extends Label> actualParamLabels) throws SemanticException {
         JifTypeSystem ts = (JifTypeSystem) callerContext.typeSystem();
         AccessPath receiverPath;
         if (ts.isFinalAccessExprOrConst(receiverExpr, receiverType)) {
-            receiverPath =
-                    ts.exprToAccessPath(receiverExpr, receiverType,
-                            callerContext);
+            receiverPath = ts.exprToAccessPath(receiverExpr, receiverType,
+                    callerContext);
         } else {
             receiverPath =
                     new AccessPathUninterpreted(receiverExpr, t.position());
         }
-        JifInstantiator inst =
-                new JifInstantiator(receiverType, receiverLabel, receiverPath,
-                        formalArgLabels, formalArgTypes, actualArgLabels,
-                        actualArgExprs, actualParamLabels, callerContext);
+        JifInstantiator inst = new JifInstantiator(receiverType, receiverLabel,
+                receiverPath, formalArgLabels, formalArgTypes, actualArgLabels,
+                actualArgExprs, actualParamLabels, callerContext);
         return inst.instantiate(t);
     }
 
     public static Type instantiate(Type t, JifContext callerContext,
             Expr receiverExpr, ReferenceType receiverType, Label receiverLbl)
-            throws SemanticException {
+                    throws SemanticException {
 
         JifTypeSystem ts = (JifTypeSystem) callerContext.typeSystem();
         AccessPath receiverPath;
         if (ts.isFinalAccessExprOrConst(receiverExpr, receiverType)) {
-            receiverPath =
-                    ts.exprToAccessPath(receiverExpr, receiverType,
-                            callerContext);
+            receiverPath = ts.exprToAccessPath(receiverExpr, receiverType,
+                    callerContext);
         } else {
             receiverPath =
                     new AccessPathUninterpreted(receiverExpr, t.position());
         }
-        JifInstantiator inst =
-                new JifInstantiator(receiverType, receiverLbl, receiverPath,
-                        null, null, null, null, null, callerContext);
+        JifInstantiator inst = new JifInstantiator(receiverType, receiverLbl,
+                receiverPath, null, null, null, null, null, callerContext);
         return inst.instantiate(t);
 
     }

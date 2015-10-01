@@ -43,8 +43,8 @@ public class ConstructorChecker {
                                         + jct
                                         + ", the calling context must have the authority of "
                                         + "the following principal(s): "
-                                        + principalListString(jct
-                                                .constructorCallAuthority())
+                                        + principalListString(
+                                                jct.constructorCallAuthority())
                                         + ".";
                             }
                         });
@@ -54,14 +54,13 @@ public class ConstructorChecker {
 
     public void checkStaticMethodAuthority(final JifMethodInstance mi,
             JifContext A, LabelChecker lc, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         ClassType t = mi.container().toClass();
         if (t instanceof JifClassType) {
             final JifClassType jct = (JifClassType) t;
             // construct a principal representing the authority of the context
-            Principal authPrincipal =
-                    lc.jifTypeSystem().conjunctivePrincipal(mi.position(),
-                            A.authority());
+            Principal authPrincipal = lc.jifTypeSystem()
+                    .conjunctivePrincipal(mi.position(), A.authority());
 
             // Check the authority
             for (final Principal pi : jct.constructorCallAuthority()) {
@@ -83,8 +82,8 @@ public class ConstructorChecker {
                                         + jct
                                         + ", the calling context must have the authority of "
                                         + "the following principal(s): "
-                                        + principalListString(jct
-                                                .constructorCallAuthority())
+                                        + principalListString(
+                                                jct.constructorCallAuthority())
                                         + ".";
                             }
                         });

@@ -67,15 +67,16 @@ public class JifFieldDeclExt_c extends JifExt_c implements JifFieldDeclExt {
         }
 
         Label declaredLabel = ts.labelOfType(t);
-        NamedLabel namedDeclaredLabel =
-                new NamedLabel("declared label of field " + fi.name(),
-                        declaredLabel);
+        NamedLabel namedDeclaredLabel = new NamedLabel(
+                "declared label of field " + fi.name(), declaredLabel);
 
         // error messages for equality constraints aren't displayed, so no
         // need to define error messages.
-        lc.constrain(new NamedLabel("field_label", "inferred label of field "
-                + fi.name(), L), LabelConstraint.EQUAL, namedDeclaredLabel,
-                A.labelEnv(), decl.position());
+        lc.constrain(
+                new NamedLabel("field_label",
+                        "inferred label of field " + fi.name(), L),
+                LabelConstraint.EQUAL, namedDeclaredLabel, A.labelEnv(),
+                decl.position());
     }
 
     /** Label check field initializers.
@@ -119,9 +120,8 @@ public class JifFieldDeclExt_c extends JifExt_c implements JifFieldDeclExt {
             // We use the TypeSubstitutor to ensure that the entire type is traversed,
             // including e.g. actual parameters to polymorphic types, labels
             // of array elements, etc.
-            TypeSubstitutor tsb =
-                    new TypeSubstitutor(new StaticFieldLabelChecker(
-                            decl.position()));
+            TypeSubstitutor tsb = new TypeSubstitutor(
+                    new StaticFieldLabelChecker(decl.position()));
 
             tsb.rewriteType(fi.type());
 
@@ -143,14 +143,13 @@ public class JifFieldDeclExt_c extends JifExt_c implements JifFieldDeclExt {
         // error messages for equality constraints aren't displayed, so no
         // need top define error messages.
         lc.constrain(
-                new NamedLabel("field_label", "inferred label of field "
-                        + fi.name(), L),
+                new NamedLabel("field_label",
+                        "inferred label of field " + fi.name(), L),
                 LabelConstraint.EQUAL,
-                new NamedLabel(
-                        "PC",
+                new NamedLabel("PC",
                         "Information revealed by program counter being at this program point",
-                        A.pc()).join(lc,
-                        "declared label of field " + fi.name(), declaredLabel),
+                        A.pc()).join(lc, "declared label of field " + fi.name(),
+                                declaredLabel),
                 A.labelEnv(), decl.position());
 
         PathMap Xd;
@@ -168,27 +167,20 @@ public class JifFieldDeclExt_c extends JifExt_c implements JifFieldDeclExt {
             // Lookup all final access paths reachable and add them to the
             // environment if they have constant initializers
             if (fi.flags().isFinal()) {
-                AccessPathField path =
-                        (AccessPathField) ts.varInstanceToAccessPath(fi,
-                                fi.position());
+                AccessPathField path = (AccessPathField) ts
+                        .varInstanceToAccessPath(fi, fi.position());
                 ts.processFAP(fi, path, A);
             }
 
             if (fi.flags().isFinal() && ts.isFinalAccessExprOrConst(init)) {
                 if (ts.isLabel(fi.type())) {
-                    Label dl =
-                            ts.dynamicLabel(
-                                    fi.position(),
-                                    ts.varInstanceToAccessPath(fi,
-                                            fi.position()));
+                    Label dl = ts.dynamicLabel(fi.position(),
+                            ts.varInstanceToAccessPath(fi, fi.position()));
                     Label rhs_label = ts.exprToLabel(ts, init, A);
                     A.addDefinitionalAssertionEquiv(dl, rhs_label, true);
                 } else if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
-                    DynamicPrincipal dp =
-                            ts.dynamicPrincipal(
-                                    fi.position(),
-                                    ts.varInstanceToAccessPath(fi,
-                                            fi.position()));
+                    DynamicPrincipal dp = ts.dynamicPrincipal(fi.position(),
+                            ts.varInstanceToAccessPath(fi, fi.position()));
                     Principal rhs_principal = ts.exprToPrincipal(ts, init, A);
                     A.addDefinitionalEquiv(dp, rhs_principal);
                 }
@@ -198,8 +190,8 @@ public class JifFieldDeclExt_c extends JifExt_c implements JifFieldDeclExt {
             init = (Expr) lcInit.labelCheck(decl.init());
 
             if (init instanceof ArrayInit) {
-                ((JifArrayInitExt) (JifUtil.jifExt(init))).labelCheckElements(
-                        lcInit, decl.type().type());
+                ((JifArrayInitExt) (JifUtil.jifExt(init)))
+                        .labelCheckElements(lcInit, decl.type().type());
             } else {
                 // Must check that the expression type is a subtype of the
                 // declared type.  Most of this is done in typeCheck, but if
@@ -212,12 +204,12 @@ public class JifFieldDeclExt_c extends JifExt_c implements JifFieldDeclExt {
 
             PathMap Xe = getPathMap(init);
             lcInit.constrain(
-                    new NamedLabel(
-                            "init.nv",
+                    new NamedLabel("init.nv",
                             "label of successful evaluation of initializing expression",
-                            Xe.NV()), LabelConstraint.LEQ, new NamedLabel(
-                            "label of field " + fi.name(), L), A.labelEnv(),
-                    init.position(), new ConstraintMessage() {
+                            Xe.NV()),
+                    LabelConstraint.LEQ,
+                    new NamedLabel("label of field " + fi.name(), L),
+                    A.labelEnv(), init.position(), new ConstraintMessage() {
                         @Override
                         public String msg() {
                             return "Label of field initializer not less "
@@ -268,8 +260,10 @@ public class JifFieldDeclExt_c extends JifExt_c implements JifFieldDeclExt {
         @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ThisLabel) {
-                throw new SemanticException("The label of a static field "
-                        + "cannot use the \"this\" label.", declPosition);
+                throw new SemanticException(
+                        "The label of a static field "
+                                + "cannot use the \"this\" label.",
+                        declPosition);
             }
             if (L instanceof ParamLabel || L instanceof CovariantParamLabel) {
                 throw new SemanticException("The label of a static field "
@@ -358,9 +352,7 @@ public class JifFieldDeclExt_c extends JifExt_c implements JifFieldDeclExt {
                         "The label of a non-final field, "
                                 + "or a mutable location within a final field (such as "
                                 + "the label of elements of an array) can not "
-                                + "contain the covariant component "
-                                + L
-                                + ". "
+                                + "contain the covariant component " + L + ". "
                                 + "Otherwise, sensitive "
                                 + "information could be written into the location "
                                 + "through a reference to the object with a sensitive type, "

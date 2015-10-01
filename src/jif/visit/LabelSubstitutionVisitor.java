@@ -151,7 +151,8 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
                         mi.isDefaultReturnLabel());
 
                 // Process PC bound.
-                mi.setPCBound(rewriteLabel(mi.pcBound()), mi.isDefaultPCBound());
+                mi.setPCBound(rewriteLabel(mi.pcBound()),
+                        mi.isDefaultPCBound());
 
                 // Process throw types.
                 ArrayList<Type> throwTypes =
@@ -195,8 +196,8 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
 
             return n;
         } catch (SemanticException e) {
-            throw new InternalCompilerError("Unexpected SemanticException "
-                    + "thrown", e);
+            throw new InternalCompilerError(
+                    "Unexpected SemanticException " + "thrown", e);
         }
     }
 
@@ -258,7 +259,8 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
         return afc.actor(actor).granter(granter);
     }
 
-    protected Assertion rewriteConstraint(Assertion c) throws SemanticException {
+    protected Assertion rewriteConstraint(Assertion c)
+            throws SemanticException {
         if (c instanceof ActsForConstraint<?, ?>) {
             return rewriteActsForConstraint((ActsForConstraint<?, ?>) c);
         }
@@ -285,7 +287,7 @@ public class LabelSubstitutionVisitor extends NodeVisitor {
             return lla.lhs(lhs).rhs(rhs);
         }
 
-        throw new InternalCompilerError("Unexpected subclass of Assertion: "
-                + c.getClass());
+        throw new InternalCompilerError(
+                "Unexpected subclass of Assertion: " + c.getClass());
     }
 }

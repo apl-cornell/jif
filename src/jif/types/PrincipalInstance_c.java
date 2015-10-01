@@ -8,8 +8,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>PrincipalInstance</code> interface. 
  */
-public class PrincipalInstance_c extends VarInstance_c implements
-        PrincipalInstance {
+public class PrincipalInstance_c extends VarInstance_c
+        implements PrincipalInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     ExternalPrincipal principal;

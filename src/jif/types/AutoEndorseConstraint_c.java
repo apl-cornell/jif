@@ -7,8 +7,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>CallerConstraint</code> interface.
  */
-public class AutoEndorseConstraint_c extends TypeObject_c implements
-        AutoEndorseConstraint {
+public class AutoEndorseConstraint_c extends TypeObject_c
+        implements AutoEndorseConstraint {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Label endorseTo;

@@ -35,7 +35,7 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
      */
     protected JifContext declassifyConstraintContext(LabelChecker lc,
             JifContext A, Label downgradeFrom, Label downgradeTo)
-            throws SemanticException {
+                    throws SemanticException {
         return A;
     }
 
@@ -61,17 +61,14 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
             downgradeFrom = d.bound().label();
         } else {
             boundSpecified = false;
-            downgradeFrom =
-                    lc.typeSystem()
-                            .freshLabelVariable(d.position(), "downgrade_from",
-                                    "The label the downgrade expression is downgrading from");
+            downgradeFrom = lc.typeSystem().freshLabelVariable(d.position(),
+                    "downgrade_from",
+                    "The label the downgrade expression is downgrading from");
         }
 
-        Label inferedFrom =
-                lc.typeSystem()
-                        .freshLabelVariable(d.position(),
-                                "infered_downgrade_from",
-                                "The label of the target label of downgraded expression");
+        Label inferedFrom = lc.typeSystem().freshLabelVariable(d.position(),
+                "infered_downgrade_from",
+                "The label of the target label of downgraded expression");
         inferLabelFrom(lc, d.position(), A, d, inferedFrom, Xe.NV(),
                 downgradeFrom);
 
@@ -81,11 +78,9 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
         A.setPc(Xe.N(), lc);
         lc = lc.context(A);
 
-        Label inferedTo =
-                lc.typeSystem()
-                        .freshLabelVariable(d.position(),
-                                "infered_downgrade_to",
-                                "The label of the target label of downgraded expression");
+        Label inferedTo = lc.typeSystem().freshLabelVariable(d.position(),
+                "infered_downgrade_to",
+                "The label of the target label of downgraded expression");
         inferLabelTo(lc, d.position(), A, inferedTo, Xe.NV(), downgradeTo);
         checkDowngradeFromBound(lc, A, Xe, d, inferedFrom, inferedTo,
                 boundSpecified);
@@ -106,7 +101,7 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
 
     abstract void inferLabelFrom(LabelChecker lc, Position pos, JifContext A,
             DowngradeExpr d, Label inferredFrom, Label exp, Label from)
-            throws SemanticException;
+                    throws SemanticException;
 
     abstract void inferLabelTo(LabelChecker lc, Position pos, JifContext A,
             Label l, Label exp, Label to) throws SemanticException;
@@ -117,18 +112,19 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
      */
     protected void checkDowngradeFromBound(LabelChecker lc, JifContext A,
             PathMap Xe, final DowngradeExpr d, Label downgradeFrom,
-            Label downgradeTo, boolean boundSpecified) throws SemanticException {
+            Label downgradeTo, boolean boundSpecified)
+                    throws SemanticException {
         Label from = downgradeFrom;
         lc.constrain(new NamedLabel("expr.nv", Xe.NV()),
                 boundSpecified ? LabelConstraint.LEQ : LabelConstraint.EQUAL,
                 new NamedLabel("downgrade_bound", from), A.labelEnv(),
-                d.position(), boundSpecified, /* report this constraint if the bound was specified*/
+                d.position(),
+                boundSpecified, /* report this constraint if the bound was specified*/
                 new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "The label of the expression to "
-                                + d.downgradeKind()
-                                + " is "
+                                + d.downgradeKind() + " is "
                                 + "more restrictive than the label of data that "
                                 + "the " + d.downgradeKind()
                                 + " expression is allowed to "
@@ -176,7 +172,7 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
      */
     protected abstract void checkOneDimenOnly(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException;
+                    throws SemanticException;
 
     /**
      * Check the authority condition
@@ -187,7 +183,7 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
      */
     protected abstract void checkAuthority(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException;
+                    throws SemanticException;
 
     /**
      * Check the robustness condition
@@ -198,5 +194,5 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
      */
     protected abstract void checkRobustness(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException;
+                    throws SemanticException;
 }

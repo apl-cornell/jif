@@ -9,9 +9,9 @@ import polyglot.util.SerialVersionUID;
  * An implementation of the <tt>PrincipalActsForPrincipalConstraintNode</tt>
  * interface.
  */
-public class PrincipalActsForPrincipalConstraintNode_c extends
-        ActsForConstraintNode_c<Principal, Principal> implements
-        PrincipalActsForPrincipalConstraintNode {
+public class PrincipalActsForPrincipalConstraintNode_c
+        extends ActsForConstraintNode_c<Principal, Principal>
+        implements PrincipalActsForPrincipalConstraintNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
 //    @Deprecated
@@ -21,7 +21,8 @@ public class PrincipalActsForPrincipalConstraintNode_c extends
     }
 
     public PrincipalActsForPrincipalConstraintNode_c(Position pos,
-            PrincipalNode actor, PrincipalNode granter, boolean isEquiv, Ext ext) {
+            PrincipalNode actor, PrincipalNode granter, boolean isEquiv,
+            Ext ext) {
         super(pos, actor, granter, isEquiv, ext);
     }
 }

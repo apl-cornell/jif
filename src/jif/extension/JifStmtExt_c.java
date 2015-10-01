@@ -90,9 +90,8 @@ public abstract class JifStmtExt_c extends JifExt_c implements JifStmtExt {
         A = (JifContext) node().del().enterScope(A);
 
         // Redispatch in case we're not the first delegate.
-        Node n =
-                ((JifStmtExt) JifUtil.jifExt(node())).stmtDel().labelCheckStmt(
-                        lc.context(A));
+        Node n = ((JifStmtExt) JifUtil.jifExt(node())).stmtDel()
+                .labelCheckStmt(lc.context(A));
 
         // Apply the "single path rule"
         PathMap X = getPathMap(n).NV(ts.notTaken());

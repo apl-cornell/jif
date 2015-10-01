@@ -29,8 +29,8 @@ public class UnsatisfiableConstraintException extends SemanticException {
      * @param eqn
      *          The unsatisfiable equation
      */
-    public UnsatisfiableConstraintException(AbstractSolver solver,
-            Equation eqn, FailedConstraintSnapshot snapshot) {
+    public UnsatisfiableConstraintException(AbstractSolver solver, Equation eqn,
+            FailedConstraintSnapshot snapshot) {
         super(eqn.position());
         this.solver = solver;
         this.failure = eqn;

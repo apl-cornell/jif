@@ -16,8 +16,8 @@ public interface Path {
     public static final Path NV = new FixedPath("NV");
 
     public static class FixedPath extends Enum implements Path {
-        private static final long serialVersionUID = SerialVersionUID
-                .generate();
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
 
         FixedPath(String name) {
             super(name);

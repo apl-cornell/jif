@@ -21,8 +21,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>JifConstructorInstance</code> interface.
  */
-public class JifConstructorInstance_c extends ConstructorInstance_c implements
-        JifConstructorInstance {
+public class JifConstructorInstance_c extends ConstructorInstance_c
+        implements JifConstructorInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Label pcBound;
@@ -100,7 +100,8 @@ public class JifConstructorInstance_c extends ConstructorInstance_c implements
     @Override
     public boolean isCanonical() {
         if (!(super.isCanonical() && pcBound.isCanonical()
-                && returnLabel.isCanonical() && listIsCanonical(constraints) && formalTypes != null)) {
+                && returnLabel.isCanonical() && listIsCanonical(constraints)
+                && formalTypes != null)) {
             return false;
         }
 

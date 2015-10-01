@@ -37,14 +37,10 @@ public class JifDoExt extends JifStmtExt_c {
         A = (JifContext) ds.del().enterScope(A);
         lc = lc.context(A);
 
-        Label L1 =
-                ts.freshLabelVariable(node().position(), "do",
-                        "label of PC for the do statement at "
-                                + node().position());
-        Label L2 =
-                ts.freshLabelVariable(node().position(), "do",
-                        "label of PC at end of do statement at "
-                                + node().position());
+        Label L1 = ts.freshLabelVariable(node().position(), "do",
+                "label of PC for the do statement at " + node().position());
+        Label L2 = ts.freshLabelVariable(node().position(), "do",
+                "label of PC at end of do statement at " + node().position());
         Label loopEntryPC = A.pc();
 
         A = (JifContext) A.pushBlock();
@@ -63,14 +59,15 @@ public class JifDoExt extends JifStmtExt_c {
 
         lc.constrain(
                 new NamedLabel("do_while_guard.NV",
-                        "label of evaluation of the loop guard", Xe.NV())
-                        .join(lc,
-                                "loop_entry_pc",
+                        "label of evaluation of the loop guard", Xe.NV()).join(
+                                lc, "loop_entry_pc",
                                 "label of the program counter just before the loop is executed",
-                                loopEntryPC), LabelConstraint.LEQ,
+                                loopEntryPC),
+                LabelConstraint.LEQ,
                 new NamedLabel("loop_pc",
                         "label of the program counter at the top of the loop",
-                        L1), lc.context().labelEnv(), ds.position(), false,
+                        L1),
+                lc.context().labelEnv(), ds.position(), false,
                 new ConstraintMessage() {
                     @Override
                     public String msg() {

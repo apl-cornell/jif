@@ -116,8 +116,8 @@ public class LabelEquation extends Equation {
     public String toString() {
         return lhs.toString() + " <= " + rhs.toString() + " in environment "
                 + env() + " (produced from " + labelConstraint().lhsLabel()
-                + labelConstraint().kind() + labelConstraint().rhsLabel()
-                + ") " + position();
+                + labelConstraint().kind() + labelConstraint().rhsLabel() + ") "
+                + position();
     }
 
     /**

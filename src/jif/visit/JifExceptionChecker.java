@@ -103,8 +103,7 @@ public class JifExceptionChecker extends ExceptionChecker {
                                     + fatalExcs);
                 }
                 if (!extInfo.getJifOptions().noWarnings())
-                    errorQueue().enqueue(
-                            ErrorInfo.WARNING,
+                    errorQueue().enqueue(ErrorInfo.WARNING,
                             "Uncaught exceptions in " + parent + " at "
                                     + parent.position()
                                     + " will be treated as fatal errors: "
@@ -115,27 +114,23 @@ public class JifExceptionChecker extends ExceptionChecker {
                 List<Catch> catchBlocks = new LinkedList<Catch>();
                 for (Type exType : fatalExcs) {
                     if (exType instanceof LabeledType)
-                        exType =
-                                ((LabeledType) exType).labelPart(jifts
-                                        .topLabel());
+                        exType = ((LabeledType) exType)
+                                .labelPart(jifts.topLabel());
                     else exType =
                             jifts.labeledType(pos, exType, jifts.topLabel());
 
                     CanonicalTypeNode exTypeNode =
                             nf.CanonicalTypeNode(pos, exType);
-                    Formal exc =
-                            nf.Formal(pos, Flags.NONE, exTypeNode,
-                                    nf.Id(pos, s));
-                    JifLocalInstance fli =
-                            (JifLocalInstance) jifts.localInstance(pos,
-                                    Flags.NONE, exType, s);
+                    Formal exc = nf.Formal(pos, Flags.NONE, exTypeNode,
+                            nf.Id(pos, s));
+                    JifLocalInstance fli = (JifLocalInstance) jifts
+                            .localInstance(pos, Flags.NONE, exType, s);
                     fli.setLabel(jifts.topLabel());
                     exc = exc.localInstance(fli);
 
                     Local loc = nf.Local(pos, nf.Id(pos, s));
-                    JifLocalInstance lli =
-                            (JifLocalInstance) jifts.localInstance(pos,
-                                    Flags.NONE, exType, s);
+                    JifLocalInstance lli = (JifLocalInstance) jifts
+                            .localInstance(pos, Flags.NONE, exType, s);
                     lli.setLabel(jifts.topLabel());
                     loc = loc.localInstance(lli);
                     loc = (Local) loc.type(exType);
@@ -143,15 +138,14 @@ public class JifExceptionChecker extends ExceptionChecker {
                     List<Expr> args = new LinkedList<Expr>();
                     args.add(loc);
 
-                    New newExc =
-                            nf.New(pos,
-                                    nf.CanonicalTypeNode(pos,
-                                            jifts.fatalException()), args);
+                    New newExc = nf.New(pos,
+                            nf.CanonicalTypeNode(pos, jifts.fatalException()),
+                            args);
                     ConstructorInstance ci =
                             ts.findConstructor(jifts.fatalException(),
-                                    Collections.singletonList((Type) ts
-                                            .Throwable()), jifts
-                                            .fatalException());
+                                    Collections.singletonList(
+                                            (Type) ts.Throwable()),
+                            jifts.fatalException());
                     newExc = newExc.constructorInstance(ci);
                     Throw thrw =
                             nf.Throw(pos, newExc.type(jifts.fatalException()));
@@ -162,9 +156,8 @@ public class JifExceptionChecker extends ExceptionChecker {
                     catchBlocks.add(c);
                 }
                 //remove fatal exceptions from throw types of children
-                Block newBlock =
-                        (Block) n.visit(new FatalExceptionSetter(job, ts, nf,
-                                fatalExcs));
+                Block newBlock = (Block) n.visit(
+                        new FatalExceptionSetter(job, ts, nf, fatalExcs));
 
                 List<Stmt> stmts = newBlock.statements();
                 Try t = nf.Try(pos, nf.Block(pos, stmts), catchBlocks);
@@ -192,12 +185,11 @@ public class JifExceptionChecker extends ExceptionChecker {
             if (n instanceof Throw) {
                 Throw th = (Throw) n;
                 if (toRemove.contains(th.expr().type()))
-                    throw new SemanticException(
-                            "Explicitly thrown exception "
-                                    + th.expr().type()
-                                    + " must either be caught or declared to be thrown."
-                                    + " : " + toRemove + ":: "
-                                    + th.expr().type(), th.position());
+                    throw new SemanticException("Explicitly thrown exception "
+                            + th.expr().type()
+                            + " must either be caught or declared to be thrown."
+                            + " : " + toRemove + ":: " + th.expr().type(),
+                            th.position());
             }
             //sigh... Not all nodes have JifJL delegates.
             if (n.del() instanceof JifDel)

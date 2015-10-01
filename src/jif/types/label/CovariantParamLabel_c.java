@@ -18,8 +18,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>CovariantLabel</code> interface.
  */
-public class CovariantParamLabel_c extends Label_c implements
-        CovariantParamLabel {
+public class CovariantParamLabel_c extends Label_c
+        implements CovariantParamLabel {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private final ParamInstance paramInstance;
@@ -45,8 +45,8 @@ public class CovariantParamLabel_c extends Label_c implements
 
     @Override
     public boolean isRuntimeRepresentable() {
-        return ((JifTypeSystem) ts).isParamsRuntimeRep(paramInstance
-                .container());
+        return ((JifTypeSystem) ts)
+                .isParamsRuntimeRep(paramInstance.container());
     }
 
     @Override

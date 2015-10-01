@@ -41,25 +41,24 @@ import polyglot.visit.NodeVisitor;
  * final access paths. This information is then stored in the appropriate
  * delegates.
  */
-public class PreciseClassChecker extends
-        DataFlow<PreciseClassChecker.DataFlowItem> {
+public class PreciseClassChecker
+        extends DataFlow<PreciseClassChecker.DataFlowItem> {
     public PreciseClassChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf, true /* forward analysis */);
         EDGE_KEY_CLASS_CAST_EXC = null;
     }
 
     public PreciseClassChecker(Job job) {
-        this(job, job.extensionInfo().typeSystem(), job.extensionInfo()
-                .nodeFactory());
+        this(job, job.extensionInfo().typeSystem(),
+                job.extensionInfo().nodeFactory());
     }
 
     private FlowGraph.ExceptionEdgeKey EDGE_KEY_CLASS_CAST_EXC;
 
     @Override
     public NodeVisitor begin() {
-        EDGE_KEY_CLASS_CAST_EXC =
-                new FlowGraph.ExceptionEdgeKey(typeSystem()
-                        .ClassCastException());
+        EDGE_KEY_CLASS_CAST_EXC = new FlowGraph.ExceptionEdgeKey(
+                typeSystem().ClassCastException());
         return super.begin();
 
     }
@@ -132,10 +131,9 @@ public class PreciseClassChecker extends
     public Map<EdgeKey, DataFlowItem> flow(DataFlowItem trueItem,
             DataFlowItem falseItem, DataFlowItem otherItem,
             FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
-        DataFlowItem dfIn =
-                safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, falseItem,
-                        FlowGraph.EDGE_KEY_FALSE, otherItem,
-                        FlowGraph.EDGE_KEY_OTHER, peer, graph);
+        DataFlowItem dfIn = safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE,
+                falseItem, FlowGraph.EDGE_KEY_FALSE, otherItem,
+                FlowGraph.EDGE_KEY_OTHER, peer, graph);
 
         if (peer.isEntry()) {
             return itemToMap(dfIn, peer.succEdgeKeys());
@@ -178,9 +176,8 @@ public class PreciseClassChecker extends
         } else if (n instanceof LocalDecl) {
             LocalDecl x = (LocalDecl) n;
             // remove the precise class information...
-            Map<AccessPath, Set<Type>> m =
-                    killClasses(dfIn.classTypes,
-                            new AccessPathLocal(x.localInstance()));
+            Map<AccessPath, Set<Type>> m = killClasses(dfIn.classTypes,
+                    new AccessPathLocal(x.localInstance()));
             return itemToMap(new DataFlowItem(m), peer.succEdgeKeys());
         } else if (n instanceof Assign) {
             Assign x = (Assign) n;
@@ -195,14 +192,14 @@ public class PreciseClassChecker extends
             if (trueItem == null) trueItem = dfIn;
             if (falseItem == null) falseItem = dfIn;
 
-            Map<EdgeKey, DataFlowItem> ret =
-                    flowBooleanConditions(trueItem, falseItem, dfIn, graph,
-                            peer);
+            Map<EdgeKey, DataFlowItem> ret = flowBooleanConditions(trueItem,
+                    falseItem, dfIn, graph, peer);
             if (ret == null) {
                 ret = itemToMap(dfIn, peer.succEdgeKeys());
             }
             return ret;
-        } else if (n instanceof DowngradeExpr && ((Expr) n).type().isBoolean()) {
+        } else
+            if (n instanceof DowngradeExpr && ((Expr) n).type().isBoolean()) {
             if (trueItem == null) trueItem = dfIn;
             if (falseItem == null) falseItem = dfIn;
             return itemsToMap(trueItem, falseItem, dfIn, peer.succEdgeKeys());
@@ -339,8 +336,8 @@ public class PreciseClassChecker extends
                 if (f.target() instanceof Expr) {
                     target = findAccessPathForExpr((Expr) f.target());
                 } else if (f.target() instanceof TypeNode) {
-                    target =
-                            new AccessPathClass(((TypeNode) f.target()).type());
+                    target = new AccessPathClass(
+                            ((TypeNode) f.target()).type());
                 }
                 if (target == null) return null;
                 return new AccessPathFinalField(target, f.fieldInstance());
@@ -380,8 +377,8 @@ public class PreciseClassChecker extends
 
         @Override
         public boolean equals(Object o) {
-            return (o instanceof AccessPathLocal && ((AccessPathLocal) o).li
-                    .equals(this.li));
+            return (o instanceof AccessPathLocal
+                    && ((AccessPathLocal) o).li.equals(this.li));
         }
 
         @Override
@@ -466,8 +463,8 @@ public class PreciseClassChecker extends
 
         @Override
         public boolean equals(Object o) {
-            return (o instanceof AccessPathClass && ((AccessPathClass) o).type
-                    .equals(this.type));
+            return (o instanceof AccessPathClass
+                    && ((AccessPathClass) o).type.equals(this.type));
         }
 
         @Override

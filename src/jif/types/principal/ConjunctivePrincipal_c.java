@@ -17,8 +17,8 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-public class ConjunctivePrincipal_c extends Principal_c implements
-        ConjunctivePrincipal {
+public class ConjunctivePrincipal_c extends Principal_c
+        implements ConjunctivePrincipal {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private final Set<Principal> conjuncts;
@@ -28,8 +28,8 @@ public class ConjunctivePrincipal_c extends Principal_c implements
         super(ts, pos, toJava);
         this.conjuncts = new LinkedHashSet<Principal>(conjuncts);
         if (conjuncts.size() < 2) {
-            throw new InternalCompilerError("ConjunctivePrincipal should "
-                    + "have at least 2 members");
+            throw new InternalCompilerError(
+                    "ConjunctivePrincipal should " + "have at least 2 members");
         }
     }
 

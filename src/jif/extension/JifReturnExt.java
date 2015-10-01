@@ -57,8 +57,8 @@ public class JifReturnExt extends JifStmtExt_c {
 
             CodeInstance ci = A.currentCode();
             if (!(ci instanceof MethodInstance)) {
-                throw new SemanticException("Cannot return a value from " + ci
-                        + ".");
+                throw new SemanticException(
+                        "Cannot return a value from " + ci + ".");
             }
             JifMethodInstance mi = (JifMethodInstance) ci;
             // Type retType = A.instantiate(mi.returnType()); 
@@ -70,16 +70,17 @@ public class JifReturnExt extends JifStmtExt_c {
             if (ts.isLabeled(retType)) {
                 Lrv = lc.upperBound(ts.labelOfType(retType), Lr);
             } else {
-                throw new InternalCompilerError("Unexpected return type: "
-                        + retType);
+                throw new InternalCompilerError(
+                        "Unexpected return type: " + retType);
             }
 
-            lc.constrain(new NamedLabel("rv",
-                    "the label of the value returned", Xe.NV()),
-                    LabelConstraint.LEQ, new NamedLabel("Lrv",
-                            "return value label of the method", Lrv), A
-                            .labelEnv(), rs.position(),
-                    new ConstraintMessage() {
+            lc.constrain(
+                    new NamedLabel("rv", "the label of the value returned",
+                            Xe.NV()),
+                    LabelConstraint.LEQ,
+                    new NamedLabel("Lrv", "return value label of the method",
+                            Lrv),
+                    A.labelEnv(), rs.position(), new ConstraintMessage() {
                         @Override
                         public String msg() {
                             return "This method may return a value with "

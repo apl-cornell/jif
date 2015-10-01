@@ -103,16 +103,15 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType {
         if (isConst) {
             if (toType.isArray()) {
                 // if we are strictly const then, toType must be a const
-                if (!isNonConst
-                        && (!(toType instanceof ConstArrayType) || !((ConstArrayType) toType)
-                                .isConst())) {
+                if (!isNonConst && (!(toType instanceof ConstArrayType)
+                        || !((ConstArrayType) toType).isConst())) {
                     // we are strictly const, and to type is not const
                     return false;
                 }
 
                 // const arrays are covariant
-                return ts.isImplicitCastValid(this.base(), toType.toArray()
-                        .base());
+                return ts.isImplicitCastValid(this.base(),
+                        toType.toArray().base());
             } else {
                 // Object = int[]
                 return super.isImplicitCastValidImpl(toType);
@@ -145,10 +144,9 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType {
 
             // Add field public final int length
             Label fieldLabel = ts.thisLabel(this);
-            JifFieldInstance fi =
-                    (JifFieldInstance) ts.fieldInstance(position(), this, ts
-                            .Public().Final(), ts.labeledType(position(),
-                            ts.Int(), fieldLabel), "length");
+            JifFieldInstance fi = (JifFieldInstance) ts.fieldInstance(
+                    position(), this, ts.Public().Final(),
+                    ts.labeledType(position(), ts.Int(), fieldLabel), "length");
             fi.setLabel(fieldLabel);
             fi.setNotConstant();
             fields.add(fi);

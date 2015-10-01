@@ -389,7 +389,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
      * java.lang.Error, java.lang.Exception, java.lang.IllegalArgumentException,
      * java.lang.IllegalStateException, java.lang.IndexOutOfBoundsException,
      * java.lang.RuntimeException or java.lang.SecurityException.
-
+    
      *
      * @param t Type to check
      * @return null if ct has no untrusted non-Jif ancestor, and the
@@ -496,8 +496,8 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
     void processFAP(ReferenceType rt, AccessPath path, JifContext A)
             throws SemanticException;
 
-    AccessPath varInstanceToAccessPath(VarInstance vi, String name, Position pos)
-            throws SemanticException;
+    AccessPath varInstanceToAccessPath(VarInstance vi, String name,
+            Position pos) throws SemanticException;
 
     AccessPath varInstanceToAccessPath(VarInstance vi, Position pos)
             throws SemanticException;

@@ -67,12 +67,12 @@ public class JifLocalAssignExt extends JifAssignExt {
         }
 
         lc.constrain(
-                new NamedLabel(
-                        "rhs.nv",
+                new NamedLabel("rhs.nv",
                         "label of successful evaluation of right hand of assignment",
-                        X.NV()), LabelConstraint.LEQ, new NamedLabel(
-                        "label of var " + li.name(), L), A.labelEnv(), lve
-                        .position(), new ConstraintMessage() {
+                        X.NV()),
+                LabelConstraint.LEQ,
+                new NamedLabel("label of var " + li.name(), L), A.labelEnv(),
+                lve.position(), new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "Label of right hand side not less "

@@ -90,7 +90,8 @@ public class JifIfExt extends JifStmtExt_c {
                 extendContext(lc, A, b.left(), warn);
                 extendContext(lc, A, b.right(), warn);
             }
-            if (b.operator() == Binary.BIT_OR || b.operator() == Binary.COND_OR) {
+            if (b.operator() == Binary.BIT_OR
+                    || b.operator() == Binary.COND_OR) {
                 extendContext(lc, A, b.left(), lc.warningsEnabled());
                 extendContext(lc, A, b.right(), lc.warningsEnabled());
             }
@@ -134,8 +135,7 @@ public class JifIfExt extends JifStmtExt_c {
             if (warn) {
                 // give a warning.
                 ErrorQueue eq = lc.errorQueue();
-                eq.enqueue(
-                        ErrorInfo.WARNING,
+                eq.enqueue(ErrorInfo.WARNING,
                         "The Jif compiler can only reason about "
                                 + "actsfor tests if they occur as conjuncts in the "
                                 + "conditional of an if statement.",
@@ -151,8 +151,7 @@ public class JifIfExt extends JifStmtExt_c {
             if (warn) {
                 // give a warning.
                 ErrorQueue eq = lc.errorQueue();
-                eq.enqueue(
-                        ErrorInfo.WARNING,
+                eq.enqueue(ErrorInfo.WARNING,
                         "The Jif compiler can only reason about "
                                 + "actsfor tests if they occur as conjuncts in the "
                                 + "conditional of an if statement.",

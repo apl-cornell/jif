@@ -46,12 +46,13 @@ public class JifAssignDel extends JifDel_c {
                     return false;
                 }
             }
-            if (((JifExprExt) JifUtil.jifExt(a.right())).getNumericBounds() != null) {
-                Interval i =
-                        ((JifExprExt) JifUtil.jifExt(a.right()))
-                                .getNumericBounds();
+            if (((JifExprExt) JifUtil.jifExt(a.right()))
+                    .getNumericBounds() != null) {
+                Interval i = ((JifExprExt) JifUtil.jifExt(a.right()))
+                        .getNumericBounds();
                 if ((i.getLower() != null && i.getLower().longValue() > 0)
-                        || (i.getUpper() != null && i.getUpper().longValue() < 0)) {
+                        || (i.getUpper() != null
+                                && i.getUpper().longValue() < 0)) {
                     // the right operand is non zero
                     return false;
                 }

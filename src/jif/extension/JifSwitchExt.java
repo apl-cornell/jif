@@ -48,10 +48,9 @@ public class JifSwitchExt extends JifStmtExt_c {
         Expr e = (Expr) lc.context(A).labelCheck(ss.expr());
         PathMap Xe = getPathMap(e);
 
-        Label L =
-                ts.freshLabelVariable(ss.position(), "switch",
-                        "label of PC at break target for switch statement at "
-                                + node().position());
+        Label L = ts.freshLabelVariable(ss.position(), "switch",
+                "label of PC at break target for switch statement at "
+                        + node().position());
 
         A = (JifContext) A.pushBlock();
         A.setPc(Xe.NV(), lc);
@@ -70,12 +69,13 @@ public class JifSwitchExt extends JifStmtExt_c {
         }
 
         A = (JifContext) A.pop();
-        lc.constrain(new NamedLabel(
-                "label of normal termination of swtich statement", Xa.N()),
-                LabelConstraint.LEQ, new NamedLabel(
-                        "label of break target for the switch stmt", L), A
-                        .labelEnv(), ss.position(), false,
-                new ConstraintMessage() {
+        lc.constrain(
+                new NamedLabel(
+                        "label of normal termination of swtich statement",
+                        Xa.N()),
+                LabelConstraint.LEQ,
+                new NamedLabel("label of break target for the switch stmt", L),
+                A.labelEnv(), ss.position(), false, new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "The information revealed by the normal "

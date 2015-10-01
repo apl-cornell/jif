@@ -115,9 +115,8 @@ public class JifFormalDel extends JifDel_c {
                     Type lblType = n.declType();
                     Label defaultBound =
                             jts.defaultSignature().defaultArgBound(n);
-                    lblType =
-                            jts.labeledType(lblType.position(), lblType,
-                                    defaultBound);
+                    lblType = jts.labeledType(lblType.position(), lblType,
+                            defaultBound);
                     n = n.type(n.type().type(lblType));
                 }
 

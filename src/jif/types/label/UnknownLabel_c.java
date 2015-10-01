@@ -57,7 +57,8 @@ public class UnknownLabel_c extends Label_c implements UnknownLabel {
 
     @Override
     public String toString() {
-        if (Report.should_report(Report.debug, 1) && this.description() != null) {
+        if (Report.should_report(Report.debug, 1)
+                && this.description() != null) {
             return "<unknown label: " + this.description() + ">";
         }
         return "<unknown label>";

@@ -32,7 +32,8 @@ public class JifCatch_c extends Catch_c {
     }
 
     @Override
-    protected <N extends Catch_c> N reconstruct(N n, Formal formal, Block body) {
+    protected <N extends Catch_c> N reconstruct(N n, Formal formal,
+            Block body) {
         setIsCatchFormal(formal);
         return super.reconstruct(n, formal, body);
     }

@@ -19,8 +19,8 @@ import polyglot.util.SerialVersionUID;
 
 /** The confidentiality projection of a (non meet, join or pair) label.
  */
-public class ConfProjectionPolicy_c extends Policy_c implements
-        ConfProjectionPolicy {
+public class ConfProjectionPolicy_c extends Policy_c
+        implements ConfProjectionPolicy {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private final Label label;
@@ -59,8 +59,8 @@ public class ConfProjectionPolicy_c extends Policy_c implements
         if (this == o) return true;
         if (o instanceof ConfProjectionPolicy_c) {
             ConfProjectionPolicy_c that = (ConfProjectionPolicy_c) o;
-            return (this.label == that.label || (this.label != null && this.label
-                    .equals(that.label)));
+            return (this.label == that.label
+                    || (this.label != null && this.label.equals(that.label)));
         }
         return false;
     }

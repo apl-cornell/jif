@@ -10,5 +10,5 @@ import polyglot.types.SemanticException;
 public interface ActsForConstraintToJavaExpr extends Serializable {
     <Actor extends ActsForParam, Granter extends ActsForParam> Expr toJava(
             ActsForConstraint<Actor, Granter> actsFor, JifToJavaRewriter rw)
-            throws SemanticException;
+                    throws SemanticException;
 }

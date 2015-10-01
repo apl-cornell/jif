@@ -90,7 +90,7 @@ public class JifClassDeclDel extends JifDel_c implements ClassDeclOps {
     @Override
     public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
             ConstructorInstance defaultConstructorInstance)
-            throws SemanticException {
+                    throws SemanticException {
         // XXX Should refactor to separate Del functionality out of JifClassDecl.
         return ((JifClassDecl_c) node()).addDefaultConstructor(ts, nf,
                 defaultConstructorInstance);

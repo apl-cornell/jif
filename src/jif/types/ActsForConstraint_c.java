@@ -19,7 +19,8 @@ public class ActsForConstraint_c<Actor extends ActsForParam, Granter extends Act
     protected final boolean isEquiv;
 
     public ActsForConstraint_c(TypeSystem ts, Position pos, Actor actor,
-            Granter granter, boolean isEquiv, ActsForConstraintToJavaExpr toJava) {
+            Granter granter, boolean isEquiv,
+            ActsForConstraintToJavaExpr toJava) {
         super(ts, pos);
         this.actor = actor;
         this.granter = granter;

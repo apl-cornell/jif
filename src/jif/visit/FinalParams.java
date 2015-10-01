@@ -33,15 +33,13 @@ public class FinalParams extends ContextVisitor {
             if (init != null) {
                 if (fi.flags().isFinal() && ts.isFinalAccessExprOrConst(init)) {
                     if (ts.isLabel(fi.type())) {
-                        Label rhs_label =
-                                ts.exprToLabel(ts, init,
-                                        (JifContext) fp.context());
+                        Label rhs_label = ts.exprToLabel(ts, init,
+                                (JifContext) fp.context());
                         fi.setInitializer(rhs_label);
-                    } else if (ts
-                            .isImplicitCastValid(fi.type(), ts.Principal())) {
-                        Principal rhs_principal =
-                                ts.exprToPrincipal(ts, init,
-                                        (JifContext) fp.context());
+                    } else
+                        if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
+                        Principal rhs_principal = ts.exprToPrincipal(ts, init,
+                                (JifContext) fp.context());
                         fi.setInitializer(rhs_principal);
                     }
 

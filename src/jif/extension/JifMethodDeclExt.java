@@ -121,9 +121,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c {
                     "The pc bound of a method "
                             + "can not be the covariant label " + Li + ".",
                     "The pc bound of a method "
-                            + "can not be the covariant label "
-                            + Li
-                            + ". "
+                            + "can not be the covariant label " + Li + ". "
                             + "Otherwise, information may be leaked by casting the "
                             + "low-parameter class to a high-parameter class, and masking "
                             + "the low side-effects that invoking the method may cause.",
@@ -141,16 +139,12 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c {
             if (argBj.isCovariant()) {
                 String name = mn.formals().get(index).name();
                 throw new SemanticDetailedException(
-                        "The method "
-                                + "argument "
-                                + name
+                        "The method " + "argument " + name
                                 + " can not be labeled with the covariant label "
                                 + argBj + ".",
-                        "The method argument "
-                                + name
+                        "The method argument " + name
                                 + " can not be labeled with the covariant label "
-                                + argBj
-                                + ". "
+                                + argBj + ". "
                                 + "Otherwise, information may be leaked by casting the "
                                 + "low-parameter class to a high-parameter class, and calling "
                                 + "the method with a high security parameter, which the "
@@ -224,12 +218,15 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c {
 //              "not satisfy the constraint.",
 //              errPosition);
             } else if (L.isCovariant()) {
-                throw new SemanticDetailedException("Covariant labels "
-                        + "can not occur on the right hand side of "
-                        + "a label constraint.", "Covariant labels "
-                        + "can not occur on the right hand side of "
-                        + "a label constraint, since subclasses may "
-                        + "not satisfy the constraint.", errPosition);
+                throw new SemanticDetailedException(
+                        "Covariant labels "
+                                + "can not occur on the right hand side of "
+                                + "a label constraint.",
+                        "Covariant labels "
+                                + "can not occur on the right hand side of "
+                                + "a label constraint, since subclasses may "
+                                + "not satisfy the constraint.",
+                        errPosition);
             }
             return L;
         }

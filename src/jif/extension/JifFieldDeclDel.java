@@ -42,9 +42,7 @@ public class JifFieldDeclDel extends JifDel_c {
         Expr init = fd.init();
         jfi.setHasInitializer(init != null);
 
-        jfi.setLabel(ts.freshLabelVariable(
-                fd.position(),
-                fd.name(),
+        jfi.setLabel(ts.freshLabelVariable(fd.position(), fd.name(),
                 "label of the field " + tb.currentClass().name() + "."
                         + fd.name()));
         return fd;
@@ -76,9 +74,8 @@ public class JifFieldDeclDel extends JifDel_c {
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         FieldDecl fd = (FieldDecl) node();
-        if (fd.name().indexOf('$') >= 0
-                && !((JifTypeSystem) tc.typeSystem()).isMarkerFieldName(fd
-                        .name())) {
+        if (fd.name().indexOf('$') >= 0 && !((JifTypeSystem) tc.typeSystem())
+                .isMarkerFieldName(fd.name())) {
             // check that the field isn't one of the special marker fields
             throw new SemanticException(
                     "Field names can not contain the character '$'.");
@@ -100,8 +97,8 @@ public class JifFieldDeclDel extends JifDel_c {
                                     + "executed when the class is loaded. Information may be "
                                     + "leaked if the time of class loading is observable. "
                                     + "To prevent this covert channel, Jif requires static "
-                                    + "field initializers to be constant.", fd
-                                    .position());
+                                    + "field initializers to be constant.",
+                            fd.position());
                 }
             }
         }

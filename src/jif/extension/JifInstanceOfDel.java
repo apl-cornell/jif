@@ -45,13 +45,14 @@ public class JifInstanceOfDel extends JifDel_c {
         }
 
         if (!ts.isParamsRuntimeRep(compareType)) {
-            if ((compareType instanceof JifSubstType && !((JifSubstType) compareType)
-                    .actuals().isEmpty())
-                    || (compareType instanceof JifPolyType && !((JifPolyType) compareType)
-                            .params().isEmpty()))
-                throw new SemanticException("Cannot perform instanceof on "
-                        + compareType + ", since it does "
-                        + "not represent the parameters at runtime.",
+            if ((compareType instanceof JifSubstType
+                    && !((JifSubstType) compareType).actuals().isEmpty())
+                    || (compareType instanceof JifPolyType
+                            && !((JifPolyType) compareType).params().isEmpty()))
+                throw new SemanticException(
+                        "Cannot perform instanceof on " + compareType
+                                + ", since it does "
+                                + "not represent the parameters at runtime.",
                         io.position());
         }
         if (compareType.isArray()) {
@@ -65,9 +66,8 @@ public class JifInstanceOfDel extends JifDel_c {
 //                throw new SemanticException("Jif does not currently support instanceof to an array of a parameterized type.", io.position());
 //            }
         }
-        this.isToSubstJifClass =
-                (compareType instanceof JifSubstType && ((JifSubstType) compareType)
-                        .entries().hasNext());
+        this.isToSubstJifClass = (compareType instanceof JifSubstType
+                && ((JifSubstType) compareType).entries().hasNext());
 
         ts.labelTypeCheckUtil().typeCheckType(tc, compareType);
         return super.typeCheck(tc);

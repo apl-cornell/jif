@@ -30,8 +30,8 @@ import polyglot.ast.JLDel;
 /**
  * Constructs Jif delegates
  **/
-public class JifDelFactory_c extends AbstractDelFactory_c implements
-        JifDelFactory {
+public class JifDelFactory_c extends AbstractDelFactory_c
+        implements JifDelFactory {
 
     protected JifDelFactory_c() {
         super();

@@ -20,8 +20,8 @@ import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>CanonicalPrincipal</code> interface. 
  */
-public class CanonicalPrincipalNode_c extends PrincipalNode_c implements
-        CanonicalPrincipalNode {
+public class CanonicalPrincipalNode_c extends PrincipalNode_c
+        implements CanonicalPrincipalNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
 //    @Deprecated
@@ -29,7 +29,8 @@ public class CanonicalPrincipalNode_c extends PrincipalNode_c implements
         this(pos, principal, null);
     }
 
-    public CanonicalPrincipalNode_c(Position pos, Principal principal, Ext ext) {
+    public CanonicalPrincipalNode_c(Position pos, Principal principal,
+            Ext ext) {
         super(pos, ext);
         this.principal = principal;
     }

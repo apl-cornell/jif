@@ -10,8 +10,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>ExternalPrincipal</code> interface. 
  */
-public class ExternalPrincipal_c extends Principal_c implements
-        ExternalPrincipal {
+public class ExternalPrincipal_c extends Principal_c
+        implements ExternalPrincipal {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private final String name;

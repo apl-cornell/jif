@@ -11,13 +11,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class AbstractPrincipal implements Principal {
     private String name;
-    private static Principal NULL_PRINCIPAL = new AbstractPrincipal(
-            "NULL PRINCIPAL") {
-        @Override
-        public boolean equals(Object o) {
-            return this == o;
-        }
-    };
+    private static Principal NULL_PRINCIPAL =
+            new AbstractPrincipal("NULL PRINCIPAL") {
+                @Override
+                public boolean equals(Object o) {
+                    return this == o;
+                }
+            };
 
     private Map<Principal, Principal> superiors =
             new ConcurrentHashMap<Principal, Principal>(); // treat this like a set
@@ -101,8 +101,8 @@ public abstract class AbstractPrincipal implements Principal {
                     PrincipalUtil.findActsForProof(p, s, searchState);
             if (prf != null) {
                 if (PrincipalUtil.actsFor(s, this)) {
-                    return new TransitiveProof(prf, s, new DelegatesProof(s,
-                            this));
+                    return new TransitiveProof(prf, s,
+                            new DelegatesProof(s, this));
                 }
             }
         }
@@ -118,8 +118,9 @@ public abstract class AbstractPrincipal implements Principal {
     public boolean equals(Object o) {
         if (o instanceof Principal) {
             Principal p = (Principal) o;
-            return (this.name == p.name() || (this.name != null && this.name
-                    .equals(p.name()))) && this.getClass() == p.getClass();
+            return (this.name == p.name()
+                    || (this.name != null && this.name.equals(p.name())))
+                    && this.getClass() == p.getClass();
         }
         return false;
     }
@@ -127,8 +128,9 @@ public abstract class AbstractPrincipal implements Principal {
     @Override
     public boolean equals(Principal p) {
         if (p == null) return false;
-        return (this.name == p.name() || (this.name != null && this.name
-                .equals(p.name()))) && this.getClass() == p.getClass();
+        return (this.name == p.name()
+                || (this.name != null && this.name.equals(p.name())))
+                && this.getClass() == p.getClass();
     }
 
 }

@@ -34,8 +34,8 @@ public class ParamPrincipal_c extends Principal_c implements ParamPrincipal {
 
     @Override
     public boolean isRuntimeRepresentable() {
-        return ((JifTypeSystem) ts).isParamsRuntimeRep(paramInstance
-                .container());
+        return ((JifTypeSystem) ts)
+                .isParamsRuntimeRep(paramInstance.container());
     }
 
     @Override

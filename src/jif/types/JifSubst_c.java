@@ -24,8 +24,8 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.Transformation;
 
-public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
-        JifSubst {
+public class JifSubst_c extends Subst_c<ParamInstance, Param>
+        implements JifSubst {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JifSubst_c(JifTypeSystem ts,
@@ -89,8 +89,9 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
             jmi.setPCBound(substLabel(jmi.pcBound()), jmi.isDefaultPCBound());
             jmi.setReturnLabel(substLabel(jmi.returnLabel()),
                     jmi.isDefaultReturnLabel());
-            jmi.setConstraints(new CachingTransformingList<Assertion, Assertion>(
-                    jmi.constraints(), new ConstraintXform()));
+            jmi.setConstraints(
+                    new CachingTransformingList<Assertion, Assertion>(
+                            jmi.constraints(), new ConstraintXform()));
 
             @SuppressWarnings("unchecked")
             MI tmpMi = (MI) jmi;
@@ -110,8 +111,9 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
             jci.setPCBound(substLabel(jci.pcBound()), jci.isDefaultPCBound());
             jci.setReturnLabel(substLabel(jci.returnLabel()),
                     jci.isDefaultReturnLabel());
-            jci.setConstraints(new CachingTransformingList<Assertion, Assertion>(
-                    jci.constraints(), new ConstraintXform()));
+            jci.setConstraints(
+                    new CachingTransformingList<Assertion, Assertion>(
+                            jci.constraints(), new ConstraintXform()));
 
             @SuppressWarnings("unchecked")
             CI tmpCi = (CI) jci;
@@ -232,8 +234,8 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
      *
      */
     @SuppressWarnings("serial")
-    protected class SubstLabelSubst extends LabelSubstitution implements
-            Serializable {
+    protected class SubstLabelSubst extends LabelSubstitution
+            implements Serializable {
         /**
          * @throws SemanticException
          */
@@ -308,8 +310,9 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
         } else if (sub == null) {
             return principal;
         } else {
-            throw new InternalCompilerError("Cannot substitute " + principal
-                    + " for " + sub + " with param instance " + pi,
+            throw new InternalCompilerError(
+                    "Cannot substitute " + principal + " for " + sub
+                            + " with param instance " + pi,
                     principal.position());
         }
     }
@@ -327,8 +330,8 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
         return super.substSubstValue(value);
     }
 
-    public class ConstraintXform implements
-            Transformation<Assertion, Assertion> {
+    public class ConstraintXform
+            implements Transformation<Assertion, Assertion> {
         @Override
         public Assertion transform(Assertion a) {
             return substConstraint(a);
@@ -342,7 +345,8 @@ public class JifSubst_c extends Subst_c<ParamInstance, Param> implements
         }
     }
 
-    public class PrincipalXform implements Transformation<Principal, Principal> {
+    public class PrincipalXform
+            implements Transformation<Principal, Principal> {
         @Override
         public Principal transform(Principal p) {
             return substPrincipal(p);

@@ -32,24 +32,24 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
     @Override
     protected void checkOneDimenOnly(LabelChecker lc, final JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         checkOneDimen(lc, A, labelFrom, labelTo, pos, true);
     }
 
     protected static void checkOneDimen(LabelChecker lc, final JifContext A,
             Label labelFrom, Label labelTo, Position pos, boolean isExpr)
-            throws SemanticException {
+                    throws SemanticException {
         final String exprOrStmt = (isExpr ? "expression" : "statement");
 
         JifTypeSystem jts = lc.jifTypeSystem();
-        Label topConfLabel =
-                jts.pairLabel(pos, jts.topConfPolicy(pos),
-                        jts.bottomIntegPolicy(pos));
+        Label topConfLabel = jts.pairLabel(pos, jts.topConfPolicy(pos),
+                jts.bottomIntegPolicy(pos));
 
         lc.constrain(new NamedLabel("declass_from", labelFrom),
-                LabelConstraint.LEQ, new NamedLabel("declass_to", labelTo)
-                        .join(lc, "top_confidentiality", topConfLabel), A
-                        .labelEnv(), pos, new ConstraintMessage() {
+                LabelConstraint.LEQ,
+                new NamedLabel("declass_to", labelTo).join(lc,
+                        "top_confidentiality", topConfLabel),
+                A.labelEnv(), pos, new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "Declassify " + exprOrStmt
@@ -59,8 +59,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
                     @Override
                     public String detailMsg() {
                         return "The declass_from label has lower integrity than the "
-                                + "declass_to label; declassify "
-                                + exprOrStmt
+                                + "declass_to label; declassify " + exprOrStmt
                                 + "s " + "cannot downgrade integrity.";
                     }
                 });
@@ -69,20 +68,20 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
     @Override
     protected void checkAuthority(LabelChecker lc, final JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         checkAuth(lc, A, labelFrom, labelTo, pos, true);
     }
 
     protected static void checkAuth(LabelChecker lc, final JifContext A,
             Label labelFrom, Label labelTo, Position pos, boolean isExpr)
-            throws SemanticException {
+                    throws SemanticException {
         final String exprOrStmt = (isExpr ? "expression" : "statement");
 
         Label authLabel = A.authLabel();
         lc.constrain(new NamedLabel("declass_from", labelFrom),
                 LabelConstraint.LEQ, new NamedLabel("declass_to", labelTo)
-                        .join(lc, "auth_label", authLabel), A.labelEnv(), pos,
-                new ConstraintMessage() {
+                        .join(lc, "auth_label", authLabel),
+                A.labelEnv(), pos, new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "The method does not have sufficient "
@@ -99,8 +98,8 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
                         } else {
                             sb.append("the following principals: ");
                         }
-                        for (Iterator<Principal> iter = authorities.iterator(); iter
-                                .hasNext();) {
+                        for (Iterator<Principal> iter =
+                                authorities.iterator(); iter.hasNext();) {
                             Principal p = iter.next();
                             sb.append(p.toString());
                             if (iter.hasNext()) {
@@ -108,9 +107,8 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
                             }
                         }
 
-                        return "The " + exprOrStmt
-                                + " to declassify has label " + namedRhs()
-                                + ", and the " + exprOrStmt + " "
+                        return "The " + exprOrStmt + " to declassify has label "
+                                + namedRhs() + ", and the " + exprOrStmt + " "
                                 + "should be downgraded to label "
                                 + "declass_to. However, the method has "
                                 + "the authority of " + sb.toString() + ". "
@@ -129,13 +127,13 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
     @Override
     protected void checkRobustness(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         checkRobustDecl(lc, A, labelFrom, labelTo, pos, true);
     }
 
     protected static void checkRobustDecl(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos, boolean isExpr)
-            throws SemanticException {
+                    throws SemanticException {
 
         final String exprOrStmt = (isExpr ? "expression" : "statement");
 
@@ -144,8 +142,8 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
 
         lc.constrain(new NamedLabel("declass_from", labelFrom),
                 LabelConstraint.LEQ, new NamedLabel("declass_to", labelTo)
-                        .join(lc, "pc_integrity", pcInteg), A.labelEnv(), pos,
-                new ConstraintMessage() {
+                        .join(lc, "pc_integrity", pcInteg),
+                A.labelEnv(), pos, new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "Declassification not robust: a new reader "
@@ -155,8 +153,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
 
                     @Override
                     public String detailMsg() {
-                        return "The declassification of this "
-                                + exprOrStmt
+                        return "The declassification of this " + exprOrStmt
                                 + " is "
                                 + "not robust; at least one of the principals that is "
                                 + "allowed to read the information after "
@@ -169,8 +166,8 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
         lc.constrain(new NamedLabel("declass_from_label", labelFrom),
                 LabelConstraint.LEQ,
                 new NamedLabel("declass_to_label", labelTo).join(lc,
-                        "from_label_integrity", fromInteg), A.labelEnv(), pos,
-                new ConstraintMessage() {
+                        "from_label_integrity", fromInteg),
+                A.labelEnv(), pos, new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "Declassification not robust: a new reader "
@@ -180,8 +177,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
 
                     @Override
                     public String detailMsg() {
-                        return "The declassification of this "
-                                + exprOrStmt
+                        return "The declassification of this " + exprOrStmt
                                 + " is "
                                 + "not robust; at least one of the principals that is "
                                 + "allowed to read the information after "
@@ -194,7 +190,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
     @Override
     void inferLabelFrom(LabelChecker lc, Position pos, JifContext A,
             final DowngradeExpr d, Label inferredFrom, Label exp, Label from)
-            throws SemanticException {
+                    throws SemanticException {
         // need to add these to constrain the following conditions
         // L(e) <= L(inferedFrom) <= L(from)
         // since the first part is checked already, we only check the second
@@ -205,8 +201,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
                     @Override
                     public String msg() {
                         return "The label of the expression to "
-                                + d.downgradeKind()
-                                + " is "
+                                + d.downgradeKind() + " is "
                                 + "more restrictive than the label of data that "
                                 + "the " + d.downgradeKind()
                                 + " expression is allowed to "
@@ -242,12 +237,10 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
         // the integrity label should be in between of I(exp) and I(to)
         // the confidential label should equal to C(to)
         JifTypeSystem jts = lc.jifTypeSystem();
-        Label botConfLabel =
-                jts.pairLabel(pos, jts.bottomConfPolicy(pos),
-                        jts.topIntegPolicy(pos));
-        Label botIntegLabel =
-                jts.pairLabel(pos, jts.topConfPolicy(pos),
-                        jts.bottomIntegPolicy(pos));
+        Label botConfLabel = jts.pairLabel(pos, jts.bottomConfPolicy(pos),
+                jts.topIntegPolicy(pos));
+        Label botIntegLabel = jts.pairLabel(pos, jts.topConfPolicy(pos),
+                jts.bottomIntegPolicy(pos));
         lc.constrain(new NamedLabel("exp_I", lc.lowerBound(exp, botConfLabel)),
                 LabelConstraint.LEQ,
                 new NamedLabel("l_I", lc.lowerBound(l, botConfLabel)),
@@ -261,11 +254,9 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
                     @Override
                     public String detailMsg() {
                         return "This declassify expression is allowed to declassify"
-                                + " integrity labeled up to "
-                                + namedRhs()
+                                + " integrity labeled up to " + namedRhs()
                                 + ". However, the integrity of the "
-                                + "expression to declassify is "
-                                + namedLhs()
+                                + "expression to declassify is " + namedLhs()
                                 + ", which is more restrictive than is "
                                 + "allowed.";
                     }
@@ -289,11 +280,9 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
                     @Override
                     public String detailMsg() {
                         return "This declassify expression is allowed to declassify"
-                                + " integrity labeled up to "
-                                + namedRhs()
+                                + " integrity labeled up to " + namedRhs()
                                 + ". However, the integrity of the "
-                                + "expression to declassify is "
-                                + namedLhs()
+                                + "expression to declassify is " + namedLhs()
                                 + ", which is more restrictive than is "
                                 + "allowed.";
                     }
@@ -318,8 +307,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
 
                     @Override
                     public String detailMsg() {
-                        return "The declassification of this "
-                                + "expression"
+                        return "The declassification of this " + "expression"
                                 + " is "
                                 + "not robust; at least one of the principals that is "
                                 + "allowed to read the information after "

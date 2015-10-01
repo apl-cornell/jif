@@ -32,7 +32,7 @@ public class JifEndorseExprExt extends JifDowngradeExprExt {
     @Override
     protected void checkOneDimenOnly(LabelChecker lc, final JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         checkOneDimen(lc, A, labelFrom, labelTo, pos, true, false);
     }
 
@@ -41,15 +41,16 @@ public class JifEndorseExprExt extends JifDowngradeExprExt {
             final boolean isAutoEndorse) throws SemanticException {
         final String exprOrStmt = (isExpr ? "expression" : "statement");
         JifTypeSystem jts = lc.jifTypeSystem();
-        Label botIntegLabel =
-                jts.pairLabel(pos, jts.topConfPolicy(pos),
-                        jts.bottomIntegPolicy(pos));
+        Label botIntegLabel = jts.pairLabel(pos, jts.topConfPolicy(pos),
+                jts.bottomIntegPolicy(pos));
 
-        lc.constrain(new NamedLabel(isAutoEndorse ? "pcBound" : "endorse_from",
-                labelFrom).meet(lc, "bottom_integ", botIntegLabel),
-                LabelConstraint.LEQ, new NamedLabel(
-                        isAutoEndorse ? "autoendorse_to" : "endorse_to",
-                        labelTo), A.labelEnv(), pos, new ConstraintMessage() {
+        lc.constrain(
+                new NamedLabel(isAutoEndorse ? "pcBound" : "endorse_from",
+                        labelFrom).meet(lc, "bottom_integ", botIntegLabel),
+                LabelConstraint.LEQ,
+                new NamedLabel(isAutoEndorse ? "autoendorse_to" : "endorse_to",
+                        labelTo),
+                A.labelEnv(), pos, new ConstraintMessage() {
                     @Override
                     public String msg() {
                         if (isAutoEndorse)
@@ -63,8 +64,7 @@ public class JifEndorseExprExt extends JifDowngradeExprExt {
                         if (isAutoEndorse)
                             return "The auto endorse label has lower confidentiality than the start label of the method.";
                         return "The endorse_to label has lower confidentiality than the "
-                                + "endorse_from label; endorse "
-                                + exprOrStmt
+                                + "endorse_from label; endorse " + exprOrStmt
                                 + "s " + "cannot downgrade confidentiality.";
                     }
                 });
@@ -73,7 +73,7 @@ public class JifEndorseExprExt extends JifDowngradeExprExt {
     @Override
     protected void checkAuthority(LabelChecker lc, final JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         checkAuth(lc, A, labelFrom, labelTo, pos, true, false);
     }
 
@@ -83,17 +83,20 @@ public class JifEndorseExprExt extends JifDowngradeExprExt {
         Label authLabel = A.authLabelInteg();
 
         final String exprOrStmt = (isExpr ? "expression" : "statement");
-        lc.constrain(new NamedLabel(isAutoEndorse ? "pcBound" : "endorse_from",
-                labelFrom).meet(lc, "auth_label", authLabel),
-                LabelConstraint.LEQ, new NamedLabel(
-                        isAutoEndorse ? "autoendorse_to" : "endorse_to",
-                        labelTo), A.labelEnv(), pos, new ConstraintMessage() {
+        lc.constrain(
+                new NamedLabel(isAutoEndorse ? "pcBound" : "endorse_from",
+                        labelFrom).meet(lc, "auth_label", authLabel),
+                LabelConstraint.LEQ,
+                new NamedLabel(isAutoEndorse ? "autoendorse_to" : "endorse_to",
+                        labelTo),
+                A.labelEnv(), pos, new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "The method does not have sufficient "
                                 + "authority to "
                                 + (isAutoEndorse ? "auto-endorse this method"
-                                        : "endorse this " + exprOrStmt) + ".";
+                                        : "endorse this " + exprOrStmt)
+                                + ".";
                     }
 
                     @Override
@@ -105,8 +108,8 @@ public class JifEndorseExprExt extends JifDowngradeExprExt {
                         } else {
                             sb.append("the following principals: ");
                         }
-                        for (Iterator<Principal> iter = authorities.iterator(); iter
-                                .hasNext();) {
+                        for (Iterator<Principal> iter =
+                                authorities.iterator(); iter.hasNext();) {
                             Principal p = iter.next();
                             sb.append(p.toString());
                             if (iter.hasNext()) {
@@ -119,8 +122,7 @@ public class JifEndorseExprExt extends JifDowngradeExprExt {
                                     + namedLhs()
                                     + ", and the auto-endorse label is "
                                     + namedRhs() + ". However, the method has "
-                                    + "the authority of " + sb.toString()
-                                    + ". "
+                                    + "the authority of " + sb.toString() + ". "
                                     + "The authority of other principals is "
                                     + "required to perform the endorse.";
                         }
@@ -145,25 +147,24 @@ public class JifEndorseExprExt extends JifDowngradeExprExt {
     @Override
     protected void checkRobustness(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         checkRobustEndorse(lc, A, labelFrom, labelTo, pos, true);
     }
 
     protected static void checkRobustEndorse(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos, boolean isExpr)
-            throws SemanticException {
+                    throws SemanticException {
 
         JifTypeSystem jts = lc.typeSystem();
         final String exprOrStmt = (isExpr ? "expression" : "statement");
-        Label pcInteg =
-                lc.upperBound(
-                        A.pc(),
-                        jts.pairLabel(pos, jts.topConfPolicy(pos),
-                                jts.bottomIntegPolicy(pos)));
+        Label pcInteg = lc.upperBound(A.pc(), jts.pairLabel(pos,
+                jts.topConfPolicy(pos), jts.bottomIntegPolicy(pos)));
 
-        lc.constrain(new NamedLabel("endorse_from_label", labelFrom).meet(lc,
-                "pc_integrity", pcInteg), LabelConstraint.LEQ, new NamedLabel(
-                "endorse_to_label", labelTo), A.labelEnv(), pos,
+        lc.constrain(
+                new NamedLabel("endorse_from_label", labelFrom).meet(lc,
+                        "pc_integrity", pcInteg),
+                LabelConstraint.LEQ,
+                new NamedLabel("endorse_to_label", labelTo), A.labelEnv(), pos,
                 new ConstraintMessage() {
                     @Override
                     public String msg() {
@@ -173,9 +174,7 @@ public class JifEndorseExprExt extends JifDowngradeExprExt {
 
                     @Override
                     public String detailMsg() {
-                        return "The endorsement of this "
-                                + exprOrStmt
-                                + " is "
+                        return "The endorsement of this " + exprOrStmt + " is "
                                 + "not robust; at least one of the principals that is "
                                 + "regarded as no longer influencing the information after "
                                 + "endorsement may be able to influence the "
@@ -188,15 +187,14 @@ public class JifEndorseExprExt extends JifDowngradeExprExt {
     @Override
     void inferLabelFrom(LabelChecker lc, Position pos, JifContext A,
             final DowngradeExpr d, Label inferredFrom, Label exp, Label from)
-            throws SemanticException {
+                    throws SemanticException {
         lc.constrain(new NamedLabel("l", inferredFrom), LabelConstraint.EQUAL,
                 new NamedLabel("from", from), A.labelEnv(), pos,
                 new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "The label of the expression to "
-                                + d.downgradeKind()
-                                + " is "
+                                + d.downgradeKind() + " is "
                                 + "more restrictive than the label of data that "
                                 + "the " + d.downgradeKind()
                                 + " expression is allowed to "
@@ -230,8 +228,8 @@ public class JifEndorseExprExt extends JifDowngradeExprExt {
             Label inferred, Label exp, Label to) throws SemanticException {
         // to = inferred
         lc.constrain(new NamedLabel("to label", to), LabelConstraint.EQUAL,
-                new NamedLabel("infered to label", inferred), A.labelEnv(),
-                pos, new ConstraintMessage() {
+                new NamedLabel("infered to label", inferred), A.labelEnv(), pos,
+                new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "The confidentiality of the expression to endorse is"
@@ -241,8 +239,7 @@ public class JifEndorseExprExt extends JifDowngradeExprExt {
                     @Override
                     public String detailMsg() {
                         return "This endorse expression is allowed to endorse"
-                                + " confidentiality labeled up to "
-                                + namedRhs()
+                                + " confidentiality labeled up to " + namedRhs()
                                 + ". However, the confidentiality of the "
                                 + "expression to endorse is " + namedLhs()
                                 + ", which is more restrictive than is "

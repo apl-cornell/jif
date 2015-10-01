@@ -221,9 +221,8 @@ public class VarMap {
             ActsForParam bound = e.getValue();
             String s = "";
             if (var instanceof VarLabel) {
-                s =
-                        ((VarLabel) var).componentString() + " = "
-                                + bound.toString();
+                s = ((VarLabel) var).componentString() + " = "
+                        + bound.toString();
                 if (((VarLabel) var).description() != null) {
                     s += "    \t" + ((VarLabel) var).description();
                 }
@@ -249,9 +248,8 @@ public class VarMap {
             ActsForParam bound = e.getValue();
             String s = "";
             if (var instanceof VarLabel) {
-                s =
-                        ((VarLabel) var).componentString() + " = "
-                                + bound.toString();
+                s = ((VarLabel) var).componentString() + " = "
+                        + bound.toString();
                 if (((VarLabel) var).description() != null) {
                     s += "    \t" + ((VarLabel) var).description();
                 }

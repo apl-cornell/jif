@@ -5,8 +5,8 @@ import polyglot.types.DeserializedClassInitializer;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 
-public class JifDeserializedClassInitializer extends
-        DeserializedClassInitializer {
+public class JifDeserializedClassInitializer
+        extends DeserializedClassInitializer {
 
     public JifDeserializedClassInitializer(TypeSystem ts) {
         super(ts);
@@ -21,8 +21,8 @@ public class JifDeserializedClassInitializer extends
                 && !extInfo.getJifOptions().skipLabelChecking) {
             //XXX: it would be nice to throw a SemanticException or
             //     something else here...
-            throw new InternalCompilerError("Cannot load class "
-                    + ct.fullName() + ". Label checks are currently enabled, "
+            throw new InternalCompilerError("Cannot load class " + ct.fullName()
+                    + ". Label checks are currently enabled, "
                     + "but it was compiled without label checks.");
         }
     }

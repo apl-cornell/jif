@@ -51,9 +51,8 @@ public class JifClassDeclExt extends JifExt_c {
         lc.enteringClassDecl(ct);
 
         // construct a principal that represents the authority of ct
-        final Principal authPrincipal =
-                lc.jifTypeSystem().conjunctivePrincipal(ct.position(),
-                        ct.authority());
+        final Principal authPrincipal = lc.jifTypeSystem()
+                .conjunctivePrincipal(ct.position(), ct.authority());
 
         // Check the authority of the class against the superclass.
         if (ct.superType() instanceof JifClassType) {
@@ -90,9 +89,8 @@ public class JifClassDeclExt extends JifExt_c {
         lc = lc.context(A);
 
         final ProviderLabel provider = ct.provider();
-        NamedLabel namedProvider =
-                new NamedLabel(provider.toString(), "provider of "
-                        + provider.classType().fullName(), provider);
+        NamedLabel namedProvider = new NamedLabel(provider.toString(),
+                "provider of " + provider.classType().fullName(), provider);
         lc.constrain(namedProvider, authPrincipal, A.labelEnv(), n.position(),
                 new ConstraintMessage() {
                     @Override

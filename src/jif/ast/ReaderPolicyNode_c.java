@@ -63,9 +63,8 @@ public class ReaderPolicyNode_c extends PolicyNode_c {
         }
 
         Principal o = owner.principal();
-        if (o == null)
-            throw new InternalCompilerError("null owner "
-                    + owner.getClass().getName() + " " + owner.position());
+        if (o == null) throw new InternalCompilerError("null owner "
+                + owner.getClass().getName() + " " + owner.position());
 
         List<Principal> l = new LinkedList<Principal>();
 

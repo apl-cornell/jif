@@ -32,7 +32,8 @@ public final class PairLabel implements Label {
             if (this == that || this.equals(that)) return true;
             Set<DelegationPair> temp = new HashSet<DelegationPair>();
             if (labelUtil.relabelsTo(this.confPol, that.confPol, temp)
-                    && labelUtil.relabelsTo(this.integPol, that.integPol, temp)) {
+                    && labelUtil.relabelsTo(this.integPol, that.integPol,
+                            temp)) {
                 s.addAll(temp);
                 return true;
             }
@@ -52,10 +53,9 @@ public final class PairLabel implements Label {
     public boolean equals(Object o) {
         if (o instanceof PairLabel) {
             PairLabel that = (PairLabel) o;
-            return this == that
-                    || (this.hashCode() == that.hashCode()
-                            && this.confPol.equals(that.confPol) && this.integPol
-                                .equals(that.integPol));
+            return this == that || (this.hashCode() == that.hashCode()
+                    && this.confPol.equals(that.confPol)
+                    && this.integPol.equals(that.integPol));
         }
         return false;
     }

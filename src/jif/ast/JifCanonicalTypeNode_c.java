@@ -30,8 +30,8 @@ import polyglot.visit.TypeChecker;
  */
 @Deprecated
 // XXX Should be replaced with an extension
-public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements
-        JifCanonicalTypeNode {
+public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c
+        implements JifCanonicalTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
 //    @Deprecated
@@ -82,18 +82,16 @@ public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements
 
                 for (ParamInstance pi : jpt.params()) {
                     if (pi.isLabel()) {
-                        VarLabel v =
-                                ts.freshLabelVariable(t.position(), pi.name()
-                                        + "_inferred",
-                                        "Inferred label parameter");
+                        VarLabel v = ts.freshLabelVariable(t.position(),
+                                pi.name() + "_inferred",
+                                "Inferred label parameter");
                         // mark the var label as needing to be runtime representable.
                         v.setMustRuntimeRepresentable();
                         varSubst.put(pi, v);
                     } else {
-                        VarPrincipal v =
-                                ts.freshPrincipalVariable(t.position(),
-                                        pi.name() + "_inferred",
-                                        "Inferred principal parameter");
+                        VarPrincipal v = ts.freshPrincipalVariable(t.position(),
+                                pi.name() + "_inferred",
+                                "Inferred principal parameter");
                         // mark the var label as needing to be runtime representable.
                         v.setMustRuntimeRepresentable();
                         varSubst.put(pi, v);
@@ -103,12 +101,13 @@ public class JifCanonicalTypeNode_c extends CanonicalTypeNode_c implements
             }
 
             if (!inferred) {
-                throw new SemanticDetailedException("Parameterized type " + t
-                        + " is uninstantiated", "The type " + t
-                        + " is a parameterized type, "
-                        + "and must be provided with parameters "
-                        + "to instantiate it. Jif prevents the use of "
-                        + "uninstantiated parameterized types.", position());
+                throw new SemanticDetailedException(
+                        "Parameterized type " + t + " is uninstantiated",
+                        "The type " + t + " is a parameterized type, "
+                                + "and must be provided with parameters "
+                                + "to instantiate it. Jif prevents the use of "
+                                + "uninstantiated parameterized types.",
+                        position());
             }
             return t;
         }

@@ -51,10 +51,11 @@ public class JifInitializerExt extends JifExt_c {
         PathMap X = getPathMap(body);
 
         // X[node()] join X[r] <= Lr (== Li) 
-        lc.constrain(new NamedLabel("X(initializer).n", X.N()).join(lc,
-                "X(initializer).r", X.R()), LabelConstraint.LEQ,
-                new NamedLabel("init_pc", Li), A.labelEnv(), ib.position(),
-                false, new ConstraintMessage() {
+        lc.constrain(
+                new NamedLabel("X(initializer).n", X.N()).join(lc,
+                        "X(initializer).r", X.R()),
+                LabelConstraint.LEQ, new NamedLabel("init_pc", Li),
+                A.labelEnv(), ib.position(), false, new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "The information revealed by the normal "

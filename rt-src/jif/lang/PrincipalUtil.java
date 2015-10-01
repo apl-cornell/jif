@@ -107,7 +107,8 @@ public class PrincipalUtil {
     /**
      * Notification that a new delegation has been created.
      */
-    public static void notifyNewDelegation(Principal granter, Principal superior) {
+    public static void notifyNewDelegation(Principal granter,
+            Principal superior) {
         // double check that the delegation occured
         if (!delegatesTo(granter, superior)) return;
 
@@ -208,7 +209,8 @@ public class PrincipalUtil {
             goalstack[0] = new ActsForPair(p, q);
         }
 
-        private ProofSearchState(ProofSearchState ss, Principal p, Principal q) {
+        private ProofSearchState(ProofSearchState ss, Principal p,
+                Principal q) {
             int len = ss.goalstack.length + 1;
             goalstack = new ActsForPair[len];
             System.arraycopy(ss.goalstack, 0, goalstack, 0, len - 1);
@@ -364,13 +366,13 @@ public class PrincipalUtil {
             LabelUtil.singleton().enterTiming();
             Principal closureP = c.jif$getjif_lang_Closure_P();
             Label closureL = c.jif$getjif_lang_Closure_L();
-            if (closureP == p
-                    || (p != null && closureP != null && p.equals(closureP) && closureP
-                            .equals(p))) {
+            if (closureP == p || (p != null && closureP != null
+                    && p.equals(closureP) && closureP.equals(p))) {
                 // The principals agree.
                 if (LabelUtil.singleton().equivalentTo(closureL, lb)) {
                     // the labels agree
-                    if (p == null || p.isAuthorized(authPrf, c, lb, executeNow)) {
+                    if (p == null
+                            || p.isAuthorized(authPrf, c, lb, executeNow)) {
                         // either p is null (and the "null" principal always
                         // gives authority!) or p grants authority to execute the
                         // closure.

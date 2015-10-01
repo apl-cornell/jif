@@ -18,8 +18,8 @@ import polyglot.visit.TypeBuilder;
  */
 // XXX should be replaced with extension 
 @Deprecated
-public class ConstArrayTypeNode_c extends ArrayTypeNode_c implements
-        ConstArrayTypeNode {
+public class ConstArrayTypeNode_c extends ArrayTypeNode_c
+        implements ConstArrayTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
 //    @Deprecated

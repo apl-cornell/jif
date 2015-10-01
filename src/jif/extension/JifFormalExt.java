@@ -112,7 +112,8 @@ public class JifFormalExt extends JifExt_c {
      * Checker to ensure that labels do not use
      * covariant labels in the wrong places
      */
-    protected static class FormalVarianceLabelChecker extends LabelSubstitution {
+    protected static class FormalVarianceLabelChecker
+            extends LabelSubstitution {
         private Position declPosition;
 
         FormalVarianceLabelChecker(Position declPosition) {
@@ -125,7 +126,8 @@ public class JifFormalExt extends JifExt_c {
                 throw new SemanticDetailedException(
                         "Covariant labels cannot occur in the type of formal arguments.",
                         "The type of a formal argument cannot contain the covariant components such as "
-                                + L + ". ", declPosition);
+                                + L + ". ",
+                        declPosition);
             }
             return L;
         }

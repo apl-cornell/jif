@@ -42,7 +42,8 @@ public class JifBinaryExt extends JifExprExt {
 
         A = (JifContext) A.pushBlock();
 
-        if (be.operator() == Binary.COND_AND || be.operator() == Binary.COND_OR) {
+        if (be.operator() == Binary.COND_AND
+                || be.operator() == Binary.COND_OR) {
             // if it's a short circuit evaluation, then
             // whether the right is executed or not depends on the _value_
             // of the left sub-expression.

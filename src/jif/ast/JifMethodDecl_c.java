@@ -77,7 +77,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
         return startLabel(this, startLabel);
     }
 
-    protected <N extends JifMethodDecl_c> N startLabel(N n, LabelNode startLabel) {
+    protected <N extends JifMethodDecl_c> N startLabel(N n,
+            LabelNode startLabel) {
         if (n.startLabel == startLabel) return n;
         n = copyIfNeeded(n);
         n.startLabel = startLabel;
@@ -108,7 +109,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
     }
 
     @Override
-    public JifMethodDecl constraints(List<ConstraintNode<Assertion>> constraints) {
+    public JifMethodDecl constraints(
+            List<ConstraintNode<Assertion>> constraints) {
         return constraints(this, constraints);
     }
 
@@ -160,7 +162,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
             if (!f.isDisambiguated()) {
                 // formals are not disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal()
-                .setUnreachableThisRun();
+                        .setUnreachableThisRun();
                 return this;
             }
             formalTypes.add(f.declType());
@@ -171,7 +173,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
         if (!n.returnType().isDisambiguated()) {
             // return type node not disambiguated yet
             ar.job().extensionInfo().scheduler().currentGoal()
-            .setUnreachableThisRun();
+                    .setUnreachableThisRun();
             return this;
         }
 
@@ -180,16 +182,15 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
         if (n.startLabel() != null && !n.startLabel().isDisambiguated()) {
             // the startlabel node hasn't been disambiguated yet
             ar.job().extensionInfo().scheduler().currentGoal()
-            .setUnreachableThisRun();
+                    .setUnreachableThisRun();
             return this;
         }
 
         Type declrt = n.returnType().type();
         if (!declrt.isVoid() && !jts.isLabeled(declrt)) {
             // return type isn't labeled. Add the default label.
-            declrt =
-                    jts.labeledType(declrt.position(), declrt,
-                            ds.defaultReturnValueLabel(n));
+            declrt = jts.labeledType(declrt.position(), declrt,
+                    ds.defaultReturnValueLabel(n));
             n = (JifMethodDecl) n.returnType(n.returnType().type(declrt));
         }
         jmi.setReturnType(declrt);
@@ -197,7 +198,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
         if (n.returnLabel() != null && !n.returnLabel().isDisambiguated()) {
             // the return label node hasn't been disambiguated yet
             ar.job().extensionInfo().scheduler().currentGoal()
-            .setUnreachableThisRun();
+                    .setUnreachableThisRun();
             return this;
         }
 
@@ -228,7 +229,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
             if (!tn.isDisambiguated()) {
                 // throw types haven't been disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal()
-                .setUnreachableThisRun();
+                        .setUnreachableThisRun();
                 return this;
             }
 
@@ -247,7 +248,7 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
             if (!cn.isDisambiguated()) {
                 // constraint nodes haven't been disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal()
-                .setUnreachableThisRun();
+                        .setUnreachableThisRun();
                 return this;
             }
             constraints.addAll(cn.constraints());
@@ -298,7 +299,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
         jmi.setReturnType(tsub.rewriteType(jmi.returnType()));
 
         // pc bound label
-        jmi.setPCBound(tsub.rewriteLabel(jmi.pcBound()), jmi.isDefaultPCBound());
+        jmi.setPCBound(tsub.rewriteLabel(jmi.pcBound()),
+                jmi.isDefaultPCBound());
 
         // return label
         jmi.setReturnLabel(tsub.rewriteLabel(jmi.returnLabel()),
@@ -360,9 +362,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
                     return newPath;
                 }
                 if (revertToOriginal && apl.name().endsWith("'")) {
-                    apl =
-                            apl.name(apl.name().substring(0,
-                                    apl.name().length() - 1));
+                    apl = apl.name(
+                            apl.name().substring(0, apl.name().length() - 1));
                     AccessPath newPath = ap.subst(r, apl);
                     return newPath;
                 }

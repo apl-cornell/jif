@@ -68,7 +68,8 @@ public class JifFieldDel extends JifDel_c {
 
     public boolean targetIsNeverNull() {
         Receiver r = ((Field) node()).target();
-        return (r instanceof Special || isNPEfatal || isTargetNeverNull || r instanceof CanonicalTypeNode);
+        return (r instanceof Special || isNPEfatal || isTargetNeverNull
+                || r instanceof CanonicalTypeNode);
     }
 
     @Override
@@ -93,9 +94,8 @@ public class JifFieldDel extends JifDel_c {
 
         if (ft_type instanceof JifSubstType && fn.target() instanceof Expr) {
             JifContext jc = (JifContext) tc.context();
-            ReferenceType rt =
-                    targetType((JifTypeSystem) tc.typeSystem(), jc,
-                            (Expr) fn.target());
+            ReferenceType rt = targetType((JifTypeSystem) tc.typeSystem(), jc,
+                    (Expr) fn.target());
 
             if (rt instanceof JifSubstType) {
                 Type ft1 = ((JifSubstType) rt).subst().substType(ft);
@@ -104,9 +104,8 @@ public class JifFieldDel extends JifDel_c {
             }
 
 // Jif Dependency bugfix
-            JifFieldInstance fi =
-                    (JifFieldInstance) ts.findField(rt.toReference(),
-                            fn.name(), jc.currentClass());
+            JifFieldInstance fi = (JifFieldInstance) ts
+                    .findField(rt.toReference(), fn.name(), jc.currentClass());
             if (fi.label() instanceof VarLabel
                     && !((JifTypeChecker) tc).disambiguationInProgress()) {
                 JifScheduler sched =

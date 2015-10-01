@@ -42,7 +42,8 @@ public class JifTypeNodeDel extends JifDel_c {
             JifParsedPolyType jppt = (JifParsedPolyType) unlabeledType;
             if (jppt.params().size() > 0) {
                 throw new SemanticException("The polymorphic class "
-                        + jppt.name() + " must be instantiated.", tn.position());
+                        + jppt.name() + " must be instantiated.",
+                        tn.position());
             }
         }
 
@@ -77,9 +78,8 @@ public class JifTypeNodeDel extends JifDel_c {
         @Override
         public Label substLabel(Label L) throws SemanticException {
             if (L instanceof ThisLabel) {
-                throw new SemanticException(
-                        "The label \"this\" cannot be used "
-                                + "in a static context.", position);
+                throw new SemanticException("The label \"this\" cannot be used "
+                        + "in a static context.", position);
             }
             return L;
         }

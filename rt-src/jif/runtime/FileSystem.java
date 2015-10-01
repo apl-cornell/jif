@@ -49,7 +49,7 @@ public class FileSystem {
         int i = 0;
         for (Iterator iter = p.readers().iterator(); iter.hasNext(); )
             readers[i++] = ((jif.lang.Principal) iter.next()).name();
-
+    
         String os = System.getProperty("os.name");
         //in unix systems, files can belong to only one group. so reader
         //set has to be adjusted.
@@ -74,13 +74,13 @@ public class FileSystem {
                 if (i < readers.length - 1 ) msg += ", ";
                 else msg += "}.";
             }
-
+    
             throw new IOException(msg);
         }
-
+    
         setPolicy(file, owner.name(), readers);
     }
-
+    
     /** Returns the set of groups in which <code>p</code> belongs.
      */
     public static Set<Principal> groups(NativePrincipal p) {

@@ -68,10 +68,13 @@ public class JifTryExt extends JifStmtExt_c {
             // be at least as high as the pc flow.
             if (ts.isLabeled(f.type().type())) {
                 Label declaredLabel = ts.labelOfType(f.type().type());
-                lc.constrain(new NamedLabel("local_label", "inferred label of "
-                        + f.name(), Li), LabelConstraint.EQUAL, new NamedLabel(
-                        "declared label of " + f.name(), declaredLabel), A
-                        .labelEnv(), f.position(), false,
+                lc.constrain(
+                        new NamedLabel("local_label",
+                                "inferred label of " + f.name(), Li),
+                        LabelConstraint.EQUAL,
+                        new NamedLabel("declared label of " + f.name(),
+                                declaredLabel),
+                        A.labelEnv(), f.position(), false,
                         new ConstraintMessage() {
                             @Override
                             public String msg() {
@@ -91,11 +94,12 @@ public class JifTryExt extends JifStmtExt_c {
                     new NamedLabel("join(pc|where exc_i could be thrown)",
                             "the information that could be revealed "
                                     + "by the exception " + catchTypeName + " "
-                                    + "being thrown", pc_i),
+                                    + "being thrown",
+                            pc_i),
                     LabelConstraint.LEQ,
-                    new NamedLabel("label_exc_i", "label of variable "
-                            + vi.name(), Li), A.labelEnv(), f.position(),
-                    false, new ConstraintMessage() {
+                    new NamedLabel("label_exc_i",
+                            "label of variable " + vi.name(), Li),
+                    A.labelEnv(), f.position(), false, new ConstraintMessage() {
                         @Override
                         public String msg() {
                             return "Label of thrown exceptions of type "
@@ -107,8 +111,7 @@ public class JifTryExt extends JifStmtExt_c {
                         @Override
                         public String detailMsg() {
                             return "More information may be revealed by an exception of "
-                                    + "type "
-                                    + catchTypeName
+                                    + "type " + catchTypeName
                                     + " being thrown than is "
                                     + "allowed to flow to " + vi.name() + ".";
                         }
@@ -187,7 +190,8 @@ public class JifTryExt extends JifStmtExt_c {
         return Xp;
     }
 
-    private Label excLabel(PathMap X, Type ct, LabelChecker lc, JifTypeSystem ts) {
+    private Label excLabel(PathMap X, Type ct, LabelChecker lc,
+            JifTypeSystem ts) {
 
         Label L = ts.bottomLabel(ct.position());
 
