@@ -263,6 +263,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
      * Rename the arg labels and arg roots. This is needed to make sure
      * that during substitution of args in a recursive method call,
      * we don't confuse the
+     *
+     * FIXME: This javadoc trails off...
      */
     public static JifMethodInstance unrenameArgs(JifMethodInstance jmi) {
         jmi = (JifMethodInstance) jmi.copy();
@@ -278,6 +280,8 @@ public class JifMethodDecl_c extends MethodDecl_c implements JifMethodDecl {
      * Rename the arg labels and arg roots. This is needed to make sure
      * that during substitution of args in a recursive method call,
      * we don't confuse the
+     *
+     * FIXME: This javadoc trails off...
      */
     private static void renameArgs(JifMethodInstance jmi, TypeSubstitutor tsub)
             throws SemanticException {

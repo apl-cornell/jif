@@ -136,7 +136,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel {
 
     @Override
     public String toString() {
-        if (isTop()) return "<top>";
+        if (isTop()) return "{⊤→}";
         return super.toString();
     }
 
@@ -210,11 +210,9 @@ public class JoinLabel_c extends Label_c implements JoinLabel {
                     pl = p;
                 } else {
                     combinedPL = true;
-                    pl =
-                            ts.pairLabel(position(),
-                                    pl.confPolicy().join(p.confPolicy()), pl
-                                            .integPolicy()
-                                            .join(p.integPolicy()));
+                    pl = ts.pairLabel(position(),
+                            pl.confPolicy().join(p.confPolicy()),
+                            pl.integPolicy().join(p.integPolicy()));
                 }
             }
         }
@@ -343,7 +341,8 @@ public class JoinLabel_c extends Label_c implements JoinLabel {
     }
 
     @Override
-    public Label subst(LabelSubstitution substitution) throws SemanticException {
+    public Label subst(LabelSubstitution substitution)
+            throws SemanticException {
         if (components.isEmpty() || substitution.stackContains(this)
                 || !substitution.recurseIntoChildren(this)) {
             return substitution.substLabel(this);
