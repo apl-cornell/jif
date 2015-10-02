@@ -618,7 +618,7 @@ jif.ExtensionInfo  "-d out -nonrobust -classpath ../classes:../lib-classes:../li
     MutualDep01A.jif MutualDep01B.jif ;
 
     # Bugs found in 03be86e and de8e340
-    Disjunction01.jif;
+    Disjunction01.jif; Disjunction02.jif;
     Principal01.jif; Principal02.jif;
     ConjunctTest05.jif; Label02.jif;
 }
