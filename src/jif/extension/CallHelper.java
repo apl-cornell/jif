@@ -130,7 +130,7 @@ public class CallHelper {
      * Method instance of the overriding (subclasses') method. Used
      * only for override checking.
      */
-    JifMethodInstance overridingMethod = null;
+    protected JifMethodInstance overridingMethod = null;
 
     public CallHelper(Label receiverLabel, Receiver receiver,
             ReferenceType calleeContainer, JifProcedureInstance pi,
