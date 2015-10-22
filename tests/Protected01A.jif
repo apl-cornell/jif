@@ -1,0 +1,5 @@
+package A;
+
+public class Protected01A[label L] {
+  protected Object o;
+}
