@@ -14,11 +14,13 @@ import jif.types.JifProcedureInstance;
 import jif.types.JifTypeSystem;
 import jif.types.LabelConstraint;
 import jif.types.NamedLabel;
+import jif.types.Path;
 import jif.types.PrincipalConstraint;
 import jif.types.Solver;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
+
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -362,4 +364,11 @@ public class LabelChecker implements Copy {
         return CallHelper.OverrideHelper(overridden, overriding, this);
     }
 
+    /**
+     * Helper function that can be overriden to indicate if a path is to be
+     * ignored for the single path rule (such as the NV path).
+     */
+    public boolean ignoredForSinglePathRule(Path p) {
+      return p.equals(Path.NV);
+    }
 }

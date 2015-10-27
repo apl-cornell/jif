@@ -99,7 +99,7 @@ public abstract class JifStmtExt_c extends JifExt_c implements JifStmtExt {
         Path singlePath = null;
 
         for (Path p : X.paths()) {
-            if (ignoredForSinglePathRule(p)) {
+            if (lc.ignoredForSinglePathRule(p)) {
                 continue;
             }
 
@@ -122,13 +122,5 @@ public abstract class JifStmtExt_c extends JifExt_c implements JifStmtExt {
         }
 
         return updatePathMap(n, X);
-    }
-
-    /**
-     * Helper function that can be overriden to indicate if a path is to be
-     * ignored for the single path rule (such as the NV path).
-     */
-    protected boolean ignoredForSinglePathRule(Path p) {
-      return p.equals(Path.NV);
     }
 }
