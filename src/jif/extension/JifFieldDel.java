@@ -105,7 +105,7 @@ public class JifFieldDel extends JifDel_c {
 
 // Jif Dependency bugfix
             JifFieldInstance fi = (JifFieldInstance) ts
-                    .findField(rt.toReference(), fn.name(), jc.currentClass());
+                    .findField(rt.toReference(), fn.name(), jc.currentClass(), !(fn.target() instanceof Special));
             if (fi.label() instanceof VarLabel
                     && !((JifTypeChecker) tc).disambiguationInProgress()) {
                 JifScheduler sched =
