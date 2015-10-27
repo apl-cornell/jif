@@ -19,7 +19,7 @@ public interface Path {
         private static final long serialVersionUID =
                 SerialVersionUID.generate();
 
-        FixedPath(String name) {
+        protected FixedPath(String name) {
             super(name);
         }
     }

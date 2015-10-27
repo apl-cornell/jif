@@ -55,7 +55,7 @@ public class JifProcedureDeclExt_c extends JifExt_c
         super(toJava);
     }
 
-    static String jif_verbose = "jif";
+    protected static String jif_verbose = "jif";
 
     /**
      * Label check the formals.
