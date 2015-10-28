@@ -354,7 +354,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
         return wasDangerousSuperCall;
     }
 
-    private void setEndOfInitChecking(LabelChecker lc,
+    protected void setEndOfInitChecking(LabelChecker lc,
             JifConstructorInstance ci) {
         JifContext A = lc.context();
         A.setCheckingInits(false);

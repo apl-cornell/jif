@@ -15,6 +15,7 @@ import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import jif.types.label.ThisLabel;
 import jif.visit.LabelChecker;
+
 import polyglot.ast.Block;
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
@@ -71,9 +72,8 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c {
             // Now, check the body of the method in the new context.
 
             // join the provider label into the pc
+            initContextForBody(lc, mi);
             A = lc.context();
-            Label providerAndPc = ts.join(A.currentCodePCBound(), A.provider());
-            A.setCurrentCodePCBound(providerAndPc);
 
             // Visit only the body, not the formal parameters.
             body = (Block) lc.context(A).labelCheck(mn.body());
@@ -97,6 +97,17 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c {
         mn = lc.leavingMethod(mn);
 
         return mn;
+    }
+
+    /**
+     * Set up context for checking the body.  Factored out to allow for
+     * overidding in extensions like Fabric.
+     */
+    protected void initContextForBody(LabelChecker lc, JifMethodInstance mi) {
+        JifContext A = lc.context();
+        JifTypeSystem ts = lc.jifTypeSystem();
+        Label providerAndPc = ts.join(A.currentCodePCBound(), A.provider());
+        A.setCurrentCodePCBound(providerAndPc);
     }
 
     /**
