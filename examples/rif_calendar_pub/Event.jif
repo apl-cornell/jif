@@ -1,0 +1,137 @@
+public class Event[label Ls, label Ld, label Ln] {
+private Slot[Ls]{Ls} slot;
+private String{Ld} description;
+private Object{Ls} creatorCal;
+private Node[Ln]{Ls} creatorCalNode;
+private principal{Ls} creator;
+private rifList[Ln]{Ld} sharedBetween;
+public final label{this} ls = Ls;
+public final label{this} ld = Ld;
+private Node[Ln]{Ls} node;
+private int{Ls} bond=0;
+
+public Event(Date[Ls]{Ls} date, TimeOfDay[Ls]{Ls} time, int{Ls} duration, String{Ld} description, 
+Node[Ln]{Ls} creatorCalNode, Object{Ls} creatorCal, principal{Ls} creator) 
+{
+    this.slot = new Slot[Ls](date,time,duration);
+    this.description = description;
+    this.creatorCalNode=creatorCalNode;
+    this.creatorCal = creatorCal;
+    this.creator=creator;
+    this.sharedBetween=null;
+    this.node = null;
+}
+
+public int{Ls} getBond() {
+    return this.bond;
+}
+
+public void setBond{Ls}(int{Ls} b) {
+    this.bond=b;
+}
+
+public Date[Ls]{Ls} getDate() {
+    Slot[Ls]{Ls} s = this.slot;
+    if (s != null) return s.getDate();
+    else return null;
+}
+
+public void setDate{Ls}(Date[Ls]{Ls} date) {
+    Slot[Ls]{Ls}  s = this.slot;
+    if (s != null) s.setDate(date);
+}
+
+public TimeOfDay[Ls]{Ls} getTime() {
+    Slot s = this.slot;
+    if (s != null) return s.getTime();
+    else return null;
+}
+
+public void setTime{Ls}(TimeOfDay[Ls]{Ls} time) {
+    Slot[Ls]{Ls} s = this.slot;
+    if (s != null) s.setTime(time);
+}
+
+public int{Ls} getDuration() {
+    Slot[Ls]{Ls} s = this.slot;
+    if (s != null) return s.getDuration();
+    else return 0;
+}
+
+public void setDuration{Ls}(int{Ls} duration) {
+    Slot[Ls]{Ls} s = this.slot;
+    if (s != null) s.setDuration(duration);
+}
+
+public String{Ld} getDescription() {
+    return description;
+}
+
+public void setDescription{Ld}(String{Ld} description) {
+    this.description = description;
+}
+
+public principal{Ls} getCreator() {
+    return creator;
+}
+
+public Object{Ls} getCreatorCal() {
+    return creatorCal;
+}
+
+public Node[Ln]{Ls} getCreatorCalNode() {
+    return creatorCalNode;
+}
+
+public rifList[Ln]{Ld} getSharedBetween() {
+    return sharedBetween;
+}
+
+public void setSharedBetween{Ld}(rifList[Ln]{Ld} sharedBetween) {
+    this.sharedBetween = sharedBetween;
+}
+
+public void setNode{Ls}(Node[Ln]{Ls} n) {
+    this.node=n;
+}
+
+public Node[Ln]{Ls} getNode(){
+    return this.node;
+}
+
+// Used to print the entire event, after it is declassified to the public.
+public String{rif[q0*:{_}];rifi[q1*:{}]} toString {rif[q0*:{_}];rifi[q1*:{}]}() 
+where tr(Ls,f9)<={rif[q0*:{_}];rifi[q1*:{}]}, tr(Ld,f9)<={rif[q0*:{_}];rifi[q1*:{}]},
+tr(Ln,f9)<={rif[q0*:{_}];rifi[q1*:{}]}
+{
+    String output;
+    Slot{rif[q0*:{_}];rifi[q1*:{}]} s = reclassify(this.slot,f9);
+    if (s==null) return null;
+    Date{rif[q0*:{_}];rifi[q1*:{}]} dt = reclassify(s.getDate(),f9);
+    TimeOfDay{rif[q0*:{_}];rifi[q1*:{}]} t = reclassify(s.getTime(),f9);
+    if (dt ==null || t==null) return null;
+    output = "Event [date=" + dt.toString() + ", time=" + t.toString() + ", duration="
+        + s.getDuration() + "mins, description=" + description + ", creator="
+        + PrincipalUtil.toString(creator) + "]";
+    return reclassify(output,f9);
+}
+
+// Used to print an event if its slot is publicized (the description is not printed).
+public String{rif[q0*:{_}];rifi[q1*:{}]} toStringf6 {rif[q0*:{_}];rifi[q1*:{}]}() 
+where tr(Ls,f6)<={rif[q0*:{_}];rifi[q1*:{}]}
+{
+    String{Ls} output;
+    Slot[Ls]{Ls} s = this.slot;
+    if (s==null) throw new Error("Null slot");
+    Date[Ls]{Ls} dt = s.getDate();
+    if (dt==null) throw new Error("Null date");
+    TimeOfDay[Ls]{Ls} t = s.getTime();
+    if (t==null) throw new Error("Null time");
+    output = "Event [date=" + dt.toString() + ", time=" + t.toString() + ", duration="
+    + s.getDuration() + "mins, description=---, creator="
+    + PrincipalUtil.toString(creator) + "]";
+    return reclassify(output,f6);
+}
+
+}
+

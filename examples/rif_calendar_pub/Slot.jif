@@ -1,0 +1,38 @@
+public class Slot[label L] {
+
+	private Date[L]{L} date;
+	private TimeOfDay[L]{L} time;
+	private int{L} duration;
+
+	public Slot(Date[L]{L} date, TimeOfDay[L]{L} time, int{L} duration) {
+		this.date = date;
+		this.time=time;
+		this.duration=duration;
+	}
+
+	public Date[L]{L} getDate() {
+		return date;
+	}
+
+	public void setDate{L}(Date[L]{L} date) {
+		this.date = date;
+	}
+
+	public TimeOfDay[L]{L} getTime() {
+		return time;
+	}
+
+	public void setTime{L}(TimeOfDay[L]{L} time) {
+		this.time = time;
+	}
+
+	public int{L} getDuration() {
+		return duration;
+	}
+
+	public void setDuration{L}(int{L} duration) {
+		this.duration = duration;
+	}
+
+}
+

@@ -1,0 +1,192 @@
+/**
+ * The Main method initializes the server for the shared calendar application.
+ * It also issues requests for various operations provided by the shared calendar.
+ * For example, it contains requests for calendar creation, event creation and cancelation,
+ * shared event invitation, shared event acceptance, publicizing and hiding events' slots.
+ * In a real system, these requests would have been issued by the users of the shared calendar.
+ * This implementation has been tested for two hypothetical users.
+ * This program is assumed to be executed by principal p.
+ * Also, this program uses the following reclassifiers:
+ * f0: for declassifying stdout,
+ * f4: for endorsing stdout,
+ * f1: for declassifying a slot of an event when the user wants to publicize it,
+ * f2: for classifying a slot of an event when the user wants to hide it,
+ * f3: for declassifying the result of whether a newly requested shared event
+ * conflicts with other existing events of that user,
+ * f6: for declassifying a publisized slot to the label of the screen,
+ * f7: for endorsing an accepted event (the integrity of the accepted event becomes so high that
+ * no participant will be able to modify it),
+ * f8: for disputing a canceled event (the integrity of the canceled event becomes so low
+ * that cannot participate in other operations of the calendar, like conflict-checking with a newly
+ * requested shared event),
+ * f9: for declassifying a reference. In the general case, if we write x=r.a,
+ * then the label of x should be more restrictive than a (because the information of a
+ * is copied in x) and reference r (because information of whether r is null or not flows in x).
+ * In several cases we assume that no sensitive information is leaked through references,
+ * and write r'=reclassify(r,f9); x=r'.a, making the implementation easier.
+ * f9 is also used for printing (debugging), by declassifying the information we want to print.
+ * It works as an escape hatch.
+ */
+
+import java.io.PrintStream;
+import jif.runtime.Runtime;
+
+public class Main {
+
+final public static void main {rif[q0*:{_}];rifi[q1*:{}]} (principal{rifi[q1*:{}]} p, String args[]) : {rifi[q1*:{}]}
+throws (NullPointerException)
+{
+    // Initialization of runtime and stdout.  
+    final label lbl = new label {rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]};
+    PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{_}];rifi[q1*:{}]} out = null;
+    PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]} outinit = null;
+    PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{}]} out2 = null;
+    Runtime[p,lbl]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]} tryruntime;
+    try {
+        tryruntime = Runtime[p,lbl].getRuntime();
+    }
+    catch (SecurityException e) {
+        throw new Error("Failure in getting runtime!");
+    }
+    try {
+        outinit = tryruntime==null?null:tryruntime.stdout(new label {rif[q1*:{_}];rifi[q1*:{}]});
+    }
+    catch (SecurityException e) {
+        throw new Error("Failure in getting stdout!");
+    }
+
+    // We assume that the label of the screen (stdout) is {rif[q0*:{_}];rifi[q1*:{}]},
+    // meaning that all information printed on the screen is considered public and trusted by all.
+    // So, the PrintStream needs to be labeled {rif[q0*:{_}];rifi[q1*:{}]}, which
+    // requires a declassification (triggered by f0) and an endorsement (triggered by f4). 
+    out2 = reclassify(outinit,f4);
+    out = reclassify(out2,f0);
+    if (out == null) throw new NullPointerException("Null output");
+
+    // Initialization of the server
+    out.println("Welcome to rif-Calendar!");
+    Server{rif[q0*:{_}];rifi[q1*:{}]} srv = new Server();
+
+    // The system creates 3 different dynamic labels for each user.
+    // One for tagging the slot of the events that this user creates (ls).
+    // One for tagging the desctription of the events that this user creates (ld).
+    // And one for tagging the reference of the calendar (ln).
+    // The labels of slots may or may not allow automatic rejection on conflicts, depending on what the user desires.
+    // For example, Alice (see lsA) allows automatic rejection (declassification triggerd by f3),
+    // but Bob (see lsB) does not.
+
+    final label lsA = new label {rif[q1*:{Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
+    rifi[q1*:{Alice},q2:{},q3:{_},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4,f3:q1->q4]};
+    final label ldA = new label {rif[q1*:{Alice},q2:{_},f9:q1->q2];
+    rifi[q1*:{Alice},q2:{},q3:{_},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
+    final label ln = new label {rif[q0*:{_}];rifi[q1*:{}]};
+    // Create a calendar for Alice.
+    Calendar calA = srv.createCalendar(Alice,lsA,ldA);
+    Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} calNodeA = new Node(calA, ln, lsA, ldA,Alice);
+
+    final label lsB = new label {rif[q1*:{Bob},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1, f9:q1->q3,f9:q2->q3,f6:q2->q3];
+    rifi[q1*:{Bob},q2:{},q3:{_},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4,f3:q1->q4]};
+    final label ldB = new label {rif[q1*:{Bob},q2:{_},f9:q1->q2];
+    rifi[q1*:{Bob},q2:{},q3:{_},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
+    // Create a calendar for Bob.
+    Calendar calB = srv.createCalendar(Bob,lsB,ldB);
+    Node[{rif[q0*:{_}];rifi[q1*:{}]}]{rif[q0*:{_}];rifi[q1*:{}]} calNodeB = new Node(calB, ln, lsB, ldB,Bob);
+
+    // The system also creates appropriate dynamic labels for events shared between users.
+    // For example, these are labels for shared events created by Bob and accepted by Alice.
+    // By default, these labels should include an f3 transition.
+    final label lsBA = new label {rif[q1*:{Bob,Alice},q2:{_},q3:{_},f1:q1->q2,f2:q2->q1,f3:q1->q3,f9:q1->q3,f9:q2->q3,f6:q2->q3];
+        rifi[q1*:{Bob},q2:{},q3:{_},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4,f6:q1->q4,f3:q1->q4]};
+    final label ldBA = new label {rif[q1*:{Bob,Alice},q2:{_},f9:q1->q2];
+        rifi[q1*:{Bob},q2:{},q3:{_},q4:{},f7:q1->q2,f8:q2->q3,f9:q1->q4,f9:q2->q4]};
+
+
+    // Start issuing requests...
+
+    // Create event for Alice.
+    Event[lsA,ldA,ln]{*lsA} eA = new Event[lsA,ldA,ln]
+        (new Date[lsA](23, 8, 2014), new TimeOfDay[lsA](10, 30), 30, "Meeting with Chris", calNodeA, calA, Alice);
+    srv.addEvent(calA, eA, Alice, lsA, ldA);
+    // Publicize the slot of this event.
+    Event[{tr({*lsA},f1)},ldA,ln]{tr({*lsA},f1)} peA = srv.publicizeSlot(calA, eA, Alice, lsA, ldA);
+
+    // Create some more events for Alice.
+    eA = new Event[lsA,ldA,ln]
+        (new Date[lsA](16, 9, 2014), new TimeOfDay[lsA](16, 15), 60, "Doctor appointment", calNodeA, calA, Alice);
+    srv.addEvent(calA, eA, Alice, lsA, ldA);
+    srv.publicizeSlot(calA, eA, Alice, lsA, ldA);
+    eA = new Event[lsA,ldA,ln]
+        (new Date[lsA](5, 10, 2014), new TimeOfDay[lsA](9, 30), 15, "Meeting with Zoe", calNodeA, calA, Alice);
+    srv.addEvent(calA, eA, Alice, lsA, ldA);
+
+    // Create events for Bob.   
+    Event[lsB,ldB,ln]{*lsB} eB = new Event[lsB,ldB,ln]
+        (new Date[lsB](15, 10, 2014), new TimeOfDay[lsB](14, 30), 30, "Go to barbershop", calNodeB, calB, Bob);
+    srv.addEvent(calB, eB, Bob, lsB,ldB);
+    eB = new Event[lsB,ldB,ln]
+        (new Date[lsB](18, 10, 2014), new TimeOfDay[lsB](15, 45), 15, "Buy present for John", calNodeB, calB, Bob);
+    srv.addEvent(calB, eB, Bob, lsB,ldB);
+
+    // Sanity check!
+    out.println("Calendar of Alice"); 
+    out.println(srv.printCalendar(calA, Alice, lsA, ldA));
+    out.println("Calendar of Bob");
+    out.println(srv.printCalendar(calB, Bob, lsB, ldB));
+    out.println("Public view of Alice");
+    out.println(srv.takePubView(calA, Alice, lsA, ldA));
+    srv.hideSlot(calA, peA, Alice, lsA, ldA);
+    out.println("Public view of Alice");
+    out.println(srv.takePubView(calA, Alice, lsA, ldA));
+
+    // Create a shared event from Bob to Alice.
+    Event[lsBA,ldBA,ln]{*lsBA} eBs = new Event[lsBA,ldBA,ln]
+        (new Date[lsBA](10, 11, 2014), new TimeOfDay[lsBA](18, 10), 60, "Visit parents", calNodeB, calB, Bob);
+    // Bob issues a request to share this event with Alice.
+    Event[lsBA,ldBA,ln]{*lsBA} eAs = 
+        srv.requestSharedEvent(calB, calA, eBs, Bob, Alice, lsBA, ldBA, lsB, ldB, lsA, ldA, 19871); //19871 is a refernece number.
+    // Alice accepts this event. So, two copies of this shared event are generated; 
+    // one for Alice's and one for Bob's calendar.
+    srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA, lsBA, ldBA);
+
+    // Create another shared event from Bob to Alice.
+    eBs = new Event[lsBA,ldBA,ln]
+        (new Date[lsBA](5, 10, 2014), new TimeOfDay[lsBA](9, 20), 20, "Visit aunts", calNodeB, calB, Bob);
+    eAs = srv.requestSharedEvent(calB, calA, eBs, Bob, Alice, lsBA, ldBA, lsB, ldB, lsA, ldA, 19872);
+    // If Alice allows declassification of a confict, and if there is a conflict, then notify Bob about the conflict,
+    // by automatically rejecting the requested shared event.
+    // Otherwise, we assume that Alice accepts the event. In this case, if there is a conflict,
+    // Alice will manually handle it. 
+    if (reclassify(eAs,f9) != null)
+        srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA, lsBA, ldBA);
+    else out.println("Automatic rejection: Visit aunts\n");
+
+    // Create some more events from Bob to Alice.
+    eBs = new Event[lsBA,ldBA,ln]
+        (new Date[lsBA](20, 2, 2010), new TimeOfDay[lsBA](8, 15), 120, "Go for cinema", calNodeB, calB, Bob);
+    eAs = srv.requestSharedEvent(calB, calA, eBs, Bob, Alice, lsBA, ldBA, lsB, ldB, lsA, ldA, 19873);
+    srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA, lsBA, ldBA);
+
+    eBs = new Event[lsBA,ldBA,ln]
+        (new Date[lsBA](30, 1, 2015), new TimeOfDay[lsBA](21, 30), 120, "Go to concert", calNodeB, calB, Bob);
+    eAs = srv.requestSharedEvent(calB, calA, eBs, Bob, Alice, lsBA, ldBA, lsB, ldB, lsA, ldA, 19874);
+    srv.acceptSharedEvent(calA, eAs, Alice, lsA, ldA, lsBA, ldBA);
+
+    // Sanity check!
+    out.println("Calendar of Alice");
+    out.println(srv.printCalendar(calA, Alice, lsA, ldA));
+    out.println("Calendar of Bob");
+    out.println(srv.printCalendar(calB, Bob, lsB, ldB));
+
+    // Alice cancels a shared event (# 19871) with Bob.
+    srv.cancelEvent(calA, 19871, Alice, lsA, ldA);     
+
+    // Sanity check
+    out.println("Calendar of Alice");
+    out.println(srv.printCalendar(calA, Alice, lsA, ldA));
+    out.println("Calendar of Bob");
+    out.println(srv.printCalendar(calB, Bob, lsB, ldB));
+
+	}
+
+}
+

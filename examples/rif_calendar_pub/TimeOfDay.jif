@@ -1,0 +1,32 @@
+public class TimeOfDay[label L] {
+
+	private int{L} hour;
+	private int{L} minute;
+
+	public TimeOfDay(int{L} hour, int{L} minute) {
+		this.hour = hour;
+		this.minute = minute;
+	}
+
+	public int{L} getHour() {
+		return hour;
+	}
+
+	public void setHour{L}(int{L} hour) {
+		this.hour = hour;
+	}
+
+	public int{L} getMinute() {
+		return minute;
+	}
+
+	public void setMinute{L}(int{L} minute) {
+		this.minute = minute;
+	}
+
+	public String{L} toString() {
+		return hour + ":" + minute;
+	}
+
+}
+
