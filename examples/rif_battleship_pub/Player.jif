@@ -1,0 +1,235 @@
+import jif.util.*;
+
+/**
+ * This class represents a player in the BattleShip game.
+ *
+ * A player has a secret Board that contains Ships. The player
+ * initially generates a Board by placing Ships on the Board before the game 
+ * starts. That Board is then endorsed by the Opponent player (also an object
+ * of this class), and stored.
+ * 
+ * During the game the Player generates a query to ask the Opponent
+ * (the method getNextQuery), the Opponent endorses the query (the method 
+ * endorseQuery), and the Opponent processes the query (the method 
+ * processQuery()). Processing queries requires declassifying some 
+ * information about the board. 
+ *
+ * This class also keeps track of which queries the opponent has
+ * asked, to ensure the opponent doesn't repeat a query.
+ *
+ * This class is parameterized by the prinicipals P and O. P is the
+ * principal that this Player class represents, and O is the opponent. The 
+ * secret board is instantiated with the label parameter 
+ * {rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q1*:{}]}, meaning that the elements
+ * of the board are readable only by P, unless f1 is applied, and trusted by all,
+ * including O and P.
+ */
+
+class Player[principal P, principal O] {
+    /**
+     * This Board represents P's board. 
+     * It's fine to make the reference to the board public, as all the 
+     * information contained in the board is readable only by P.
+     */
+    private Board[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q1*:{}]}]{rifi[q1*:{}]} board; 
+
+    /**
+     * Record which queries the opponent has made, to stop them from
+     * repeating queries.
+     */
+    private final List[{rifi[q1*:{}]}]{this} opponentQueries;
+
+    private Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f3:q0->q1]}]
+        {rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f3:q0->q1]} nextQuery = null;
+
+    public Player() {
+	    opponentQueries = new LinkedList[{rifi[q1*:{}]}]();
+    }
+
+    /**
+     * Create an initial board by placing ships to cover numCovered coords.
+     */
+    Board[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{P},q1:{},f2:q0->q1]}]{rifi[q0*:{P},q1:{},f2:q0->q1]}
+        init{rifi[q0*:{P},q1:{},f2:q0->q1]}(int{rifi[q0*:{P},q1:{},f2:q0->q1]} numCovered){
+	// Here what we would do in a full system is make a call to
+	// some non-jrif function, through the runtime interface, to
+	// get the position of the ships to place. That function would
+	// either return something random, or would implement some
+	// strategy. Here, we fake it with some fixed positions for
+	// ships.
+	final Ship[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{P},q1:{},f2:q0->q1]}]
+        {rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}[] myCunningStrategy = {
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1] ; rifi[q0*:{P},q1:{},f2:q0->q1]}](
+            new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](1, 1), 1, true),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](
+            new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](1, 3), 2, false),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](
+            new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](2, 2), 3, true),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](
+            new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](3, 4), 4, false),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](
+            new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](5, 6), 5, true),
+	    new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](
+            new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}](5, 7), 6, false), 
+	};
+
+	Board[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}] board =
+        new Board[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}]();
+	int i = 0;
+    for (int count = numCovered; count > 0 && board != null; ) {
+	    try {
+		Ship[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f2:q0->q1]}] newPiece = myCunningStrategy[i++];
+		if (newPiece != null && newPiece.length > count) {
+		    // this ship is too long!
+		    newPiece = new Ship[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{P},q1:{},f2:q0->q1]}](newPiece.pos, 
+					              count, 
+					              newPiece.isHorizontal);
+		}
+		board.addShip(newPiece);
+		count -= (newPiece==null?0:newPiece.length);
+	    }
+	    catch (ArrayIndexOutOfBoundsException ignored) {}
+	    catch (IllegalArgumentException ignored) { 
+		// two ships overlapped. Just try adding the next ship
+		// instead.
+	    }
+    }
+    return board;
+    }
+    
+    /**
+     * Store the endorsed board.
+     */
+    void storeBoard{rifi[q1*:{}]}(
+            Board[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q1*:{}]}]{rifi[q1*:{}]} board) 
+    {
+        this.board = board;
+    }
+
+    /**
+     * Endorse the elements of the opponent's board.
+     */
+    Board[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]}] reclElements {rifi[q1*:{}]}
+        (Board[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]}]{rifi[q0*:{O},q1:{},f2:q0->q1]} oldboard){
+
+     Board[{rif[q0*:{O},q1:{_},f1:q0->q1]; rifi[q1*:{}]}]{rifi[q1*:{}]} newBoard = 
+         new Board[{rif[q0*:{O},q1:{_},f1:q0->q1]; rifi[q1*:{}]}]();
+     List[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]}]{rifi[q0*:{O},q1:{},f2:q0->q1]} shps =
+         oldboard==null?null:oldboard.Ships();
+     int{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]} szp = shps==null?0:shps.size();
+     // Trigger an f2 reclassification (an endorsement) for the List of Ships.
+     int{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} sz = reclassify(szp,f2);
+     for (int i = 0; i < sz; i++) {
+            Ship[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]}]
+                {rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]}  s = null;
+            try {
+                s = (Ship[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]}])(shps==null?null:shps.get(i));
+            }
+            catch (IndexOutOfBoundsException impossible) { }
+            catch (ClassCastException impossible) { }
+            
+            // Trigger an f2 reclassification (an endorsement) for each Ship.
+            Ship[{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q0*:{O},q1:{},f2:q0->q1]}]
+                {rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} ss = reclassify(s,f2);
+            if (ss != null) {
+                Coordinate[{rif[q0*:{O},q1:{_},f1:q0->q1]; rifi[q0*:{O},q1:{},f2:q0->q1]}]
+                    {rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} pos = ss.pos;
+                if (pos != null) {
+                    // Trigger an f2 reclassification (an endorsement) for all fields of a Ship.
+                    int{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} posX = reclassify(pos.x, f2);
+                    int{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} posY = reclassify(pos.y, f2);
+                    Coordinate[{rif[q0*:{O},q1:{_},f1:q0->q1]; rifi[q1*:{}]}]{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]}
+                           c = new Coordinate[{rif[q0*:{O},q1:{_},f1:q0->q1]; rifi[q1*:{}]}](posX, posY);
+                    
+                    int{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} length = reclassify(ss.length, f2);
+                    boolean{rif[q0*:{O},q1:{_},f1:q0->q1];rifi[q1*:{}]} isHoriz = reclassify(ss.isHorizontal, f2);
+                    
+                    Ship[{rif[q0*:{O},q1:{_},f1:q0->q1]; rifi[q1*:{}]}] t = 
+                        new Ship[{rif[q0*:{O},q1:{_},f1:q0->q1]; rifi[q1*:{}]}](c, length, isHoriz);
+                    try {
+                            newBoard.addShip(t);
+                    }
+                    catch (IllegalArgumentException impossible) { }
+                }
+            }
+        }
+        return newBoard;
+
+}
+   
+    
+    /**
+     * Endorse a query from the opponent.
+     */
+    Coordinate[{rifi[q1*:{}]}]{rifi[q1*:{}]} reclassQuery{rifi[q1*:{}]}
+        (Coordinate[{rifi[q0*:{O},q1:{},f3:q0->q1]}]{rifi[q1*:{}]} qu){
+        Coordinate[{rifi[q0*:{O},q1:{},f3:q0->q1]}]{rifi[q1*:{}]} query = qu;
+        if (query == null) return null;
+        // Trigger an f3 reclassification (an endorsement) for each coordinate of the query.
+        int x = reclassify(query.x, f3);
+        int y = reclassify(query.y, f3);
+        return new Coordinate[{rifi[q1*:{}]}](x, y);
+    }
+    
+    /**
+     * Generate the next query to ask the opponent.
+     */
+    public Coordinate[{rif[q0*:{_}];rifi[q0*:{P},q1:{},f3:q0->q1]}]{rifi[q0*:{P},q1:{},f3:q0->q1]}
+        getNextQuery{rifi[q0*:{P},q1:{},f3:q0->q1]}() {
+	// Here what we would do in a full system is make a call to
+	// some non-jrif function, through the runtime interface, to
+	// get the next coordinate to ask our opponent. We fake it
+	// here by asking queries in a fixed order.
+
+	Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{P},q1:{},f3:q0->q1]}] c = this.nextQuery;
+	if (c == null) {
+	    c = new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q0*:{P},q1:{},f3:q0->q1]}](0,0);
+	}
+
+	// Update nextQuery.
+	boolean direction = ((c.x + c.y)%2 == 0);
+	int newX = c.x + (direction?1:-1);
+	int newY = c.y + (direction?-1:1);
+	if (newX < 0) newX = 0;
+	if (newY < 0) newY = 0;
+	this.nextQuery = new Coordinate[{rif[q0*:{P},q1:{_},f1:q0->q1]; rifi[q0*:{P},q1:{},f3:q0->q1]}](newX, newY);
+
+	// We now have our secret query c, which needs to be declassified.
+    // So, an f1 reclassification (a declassification) is triggered for each coordinate of the query.
+	Coordinate[{rif[q0*:{_}];rifi[q0*:{P},q1:{},f3:q0->q1]}] d = 
+        new Coordinate[{rif[q0*:{_}];rifi[q0*:{P},q1:{},f3:q0->q1]}](reclassify(c.x,f1),reclassify(c.y,f1));
+
+	return d;
+    }
+
+    
+    /**
+     * Process the query of the opponent.
+     * @throws IllegalArgumentException if the opponent has asked the query already
+     */
+    boolean{rif[q0*:{_}];rifi[q1*:{}]} processQuery{rifi[q1*:{}]}(Coordinate[{rifi[q1*:{}]}]{rifi[q1*:{}]} query) 
+         throws (IllegalArgumentException{rifi[q1*:{}]}) 
+	{
+
+	Board[{rif[q0*:{P},q1:{_},f1:q0->q1];rifi[q1*:{}]}] brd = this.board; 
+	List[{rifi[q1*:{}]}] oppQueries = this.opponentQueries;
+	if (brd == null || oppQueries == null || query == null) {
+            throw new IllegalArgumentException("Bad state or args");
+	}
+	
+	// Test if the opponent asked this query already, and if not, add it to our list of queries.
+	if (oppQueries.contains(query)) {
+	    throw new IllegalArgumentException("Opponent already asked the query " + query.toString());
+	}
+	try {
+	    oppQueries.add(query);
+	}
+	catch (ClassCastException impossible) { }
+
+
+	// Find the result. Then, trigger an f1 reclassification (a declassification).
+	boolean result = reclassify(brd.testPosition(query, new label {rifi[q1*:{}]}),f1);
+
+	return result;
+    }
+}

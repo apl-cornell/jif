@@ -1,0 +1,53 @@
+import java.io.PrintStream;
+import jif.runtime.Runtime;
+
+/**
+ * This is the Main class for the BattleShip example. 
+ * It plays a game of BattleShip for the prinicipals Alice and Bob.
+ * This program uses the following reclassifiers:
+ * f0: for declassifying stdout,
+ * f4: for endorsing stdout,
+ * f1: for declassifying the result of whether a player hit a ship of her opponent,
+ * f2: for endorsing the board of the opponent,
+ * f3: for endorsing the querries of the opponent.
+ */
+class Main{
+    
+    /* The principal that invoces the main method is p. 
+     * The begin-label of the main method is {rif[q0*:{_}];rifi[q1*:{}]}.
+     * This means that, at the point of invocation of the main method, the
+     * value of pc is considered public and trusted by everyone, including
+     * Alice, Bob, and p.
+     */
+    public static final void main{rif[q0*:{_}];rifi[q1*:{}]}
+                     (principal{rifi[q1*:{}]} p, String args[]) : {rifi[q1*:{}]} 
+         throws (SecurityException{rifi[q1*:{}]}, IllegalArgumentException)
+
+    {     final label lbl = new label {rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]};
+          PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{p},q2:{_},f0:q1->q2];
+              rifi[q1*:{p},q2:{},f4:q1->q2]} outinit = null;
+          PrintStream[{rif[q1*:{_}];rifi[q1*:{}]}]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{}]} out = null;
+          Runtime[p,lbl]{rif[q1*:{p},q2:{_},f0:q1->q2];rifi[q1*:{p},q2:{},f4:q1->q2]} tryruntime;
+          try {
+              tryruntime = Runtime[p,lbl].getRuntime();
+          }
+          catch (SecurityException e) {
+              throw new Error("Failure in getting runtime!");
+          }
+
+         try {
+              outinit = tryruntime==null?null:tryruntime.stdout(new label {rif[q1*:{_}];rifi[q1*:{}]});
+          }
+          catch (SecurityException e) {
+              throw new Error("Failure in getting stdout!");
+          }
+
+          // We assume that the label of the screen (stdout) is {rif[q0*:{_}];rifi[q1*:{}]},
+          // meaning that all information printed on the screen is considered public and trusted by all.
+          // So, the PrintStream needs to be labeled {rif[q0*:{_}];rifi[q1*:{}]}, which
+          // requires a declassification (triggered by f0) and an endorsement (triggered by f4).
+          
+          out = reclassify(outinit,f4);
+          new BattleShip[Alice, Bob]().play(reclassify(out,f0));
+    }
+}
