@@ -1,8 +1,0 @@
-public class For1 {
-
-    public void m() {
-    	for (;;) {
-	}
-    }
-}
-

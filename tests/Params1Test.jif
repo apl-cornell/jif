@@ -1,3 +1,0 @@
-class Params1Test authority(Alice, Bob) {
-    Params1[Alice, Bob] p = new Params1[Alice, Bob]();
-}

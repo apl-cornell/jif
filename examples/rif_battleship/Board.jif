@@ -31,7 +31,7 @@ class Board[label L] {
 	List[L] shps = this.ships;
 	if (s != null && shps != null) {
 	    try {
-		// check that we don't intersect with an existing ship.
+		// Check that we don't intersect with an existing ship.
 		for (Iterator[L] iter = shps.iterator(); iter != null && 
                                                           iter.hasNext(); ) {
 		    Ship[L] t = (Ship[L])iter.next();
@@ -49,12 +49,12 @@ class Board[label L] {
     }
 
     /**
-     * Test if a ship occupies the coordinate coord
+     * Test if a ship occupies the coordinate coord.
      */
     public boolean{*lbl;L;coord} testPosition{*lbl;L}(Coordinate[lbl] coord, 
                                                       label lbl) 
     {
-	// go through each ship in turn, and test if it covers coord
+	// Go through each ship in turn, and test if it covers coord.
 
 	List[L] shps = this.ships;
 	if (shps != null) {

@@ -1,3 +1,0 @@
-class Params1TestTest {
-    Params1Test p = new Params1Test();
-}

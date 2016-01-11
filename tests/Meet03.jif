@@ -1,6 +1,0 @@
-class C {
-    // test incorrect meets
-    void m() {
-	int{Alice:Bob meet Bob!:Chuck} x = 7;
-    }
-}

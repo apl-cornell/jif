@@ -1,5 +1,0 @@
-class C {
-    void m() {
-	final principal p = jif.runtime.Runtime[p].user();  // an initialization bug!
-    }
-}

@@ -1,6 +1,0 @@
-class C {
-    void m{*!:}() {
-        int[]{Alice:} x = {3, 4, 5};
-        int{Alice:} l = x.length;
-    }
-}

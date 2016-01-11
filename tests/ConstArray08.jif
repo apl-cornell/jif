@@ -1,5 +1,0 @@
-class C[label L] {
-    void m{*<-*}() {
-        C[{}]{}const[] foo = {null, null};
-    }
-}

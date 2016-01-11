@@ -1,4 +1,0 @@
-// parameters in a static context
-class C[label L] {
-    static int{L} f;
-}

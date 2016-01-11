@@ -1,5 +1,0 @@
-public class Simple4 {
-    public static int m(int x) {
-	return x;
-    }
-}

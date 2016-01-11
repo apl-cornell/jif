@@ -1,6 +1,0 @@
-class C {
-    void m{*<-*}() {
-        int{} const[] foo = {1, 2, 3};
-        int{}[] bar = foo; // BAD cannot assign from a const to a non-const array
-    }
-}

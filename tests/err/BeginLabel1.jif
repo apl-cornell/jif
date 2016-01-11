@@ -1,9 +1,0 @@
-class Wrapper
-{
-    int{Alice:Bob} f;
-
-    public void set(int{Alice:Bob} ff) {
-        f = ff; //the label of f is not as restrictive as the begin label.
-    }
-}
-

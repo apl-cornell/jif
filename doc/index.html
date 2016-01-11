@@ -1,55 +1,260 @@
 <html>
 <head>
-<link rel=StyleSheet href="jifdoc.css" type="text/css">
-<title>Jif Documentation</title>
+<title>JRIF</title>
 </head>
 
 <body>
+  <h1 align="center">JRIF: Reactive Information Flow Control for Java</h1>
+  <hr>
 
-<h1>Jif Documentation</h1>
-<p>Jif Version 3.3.1</p>
-<hr>
-<p>
-<p><b>Jif</b> is a security-typed programming language that extends Java with
-support for static information flow control. The Jif compiler checks how
-information flows within programs, rejecting programs that use
-confidential or trusted information improperly. As a result, Jif programs are secure
-in an end-to-end sense.
-
-Jif is based on the language described in the 1999 paper, <a
-href="http://www.cs.cornell.edu/andru/papers/popl99/myers-popl99.ps.gz">Practical
-Mostly-Static Information Flow Control</a>, published in the <i>Proceedings of the
-26th ACM Symposium on Principles of Programming Languages</i> (POPL),
-pp. 228-241, January 1999, by Andrew C. Myers.
-
-Another source of documentation for Jif can be found in Andrew Myers'
-thesis, linked to from the <a
-href="http://www.cs.cornell.edu/jif/">Jif web site</a>. However, the
-language has developed since that time, and some features in this
-version of Jif are not documented in the thesis.
+<h2>Overview</h2>
 
 <p>
-These documents describe Version 3.3.1 of the Jif programming
-language. Please contact the developers if you have questions or
-problems that this document does not address.
+JRIF extends Java to support RIF labels, by modifying the <a href="http://www.cs.cornell.edu/jif/">Jif</a> compiler and run time. 
+RIF labels express changes in values' confidentiality and integrity that are instigated by
+applied operations. Indeed, the confidentiality and integrity of the output
+value of an operation depends both on the confidentiality and integrity of the input values,
+and on the applied operation. So, a RIF label that tags a particular value can specify what
+is the confidentiality and integrity for all possible values derived from it, depending on
+the operations involves in these derivations. For example, a RIF label that tags a vote can
+express that (i) initially the vote can be read only by the principal that cast this vote,
+(ii) but the result of the majority (which is derived based on this and other votes) can
+be read by all principals.
 </p>
 
-<hr>
-<h2>Table of Contents</h2>
-<ul>
-  <li> <a href="../README">Installing and Configuring Jif</a></li>
-  <li><a href="http://www.cs.cornell.edu/jif/doc/jif-3.3.0/manual.html">Jif Reference Manual</a>
-  <li><a href="jif_usage.html">Compiling and Running Jif Programs</a></li>
-  <li> <a href="../CHANGES">Change log</a></li>
-  <li> <a href="../LICENSE">License</a></li>
-  <li><a>Javadoc APIs</a>
-    <ul>
-      <li><a href="jifc-api/index.html">Jif Compiler API</a></li>
-      <li><a href="rt-api/index.html">Jif Runtime API</a></li>
-    </ul>
-  </li>
-</ul>
+<p>
+A RIF label consists of two RIF automata; one c-automaton that specifies the confidentiality
+policy, and one i-automaton that specifies the integrity policy for a value. States of a 
+RIF automaton are mapped to sets of principals, and transitions are mapped to operations.
+For a c-automaton, these sets contain principals that are allowed to read values.
+For an i-automaton, these sets contain principals that should be trusted in order values to be trusted. 
+A visual representation of a c-automaton appropriate for the vote of the example above is shown
+below, where M identifies the majority operation, \not M identifies all other operations, pi
+is the principal that cast this vote, P is the set of all principals, \ast identifies all operations,
+and the grey state represents the initial state.
+</p>
+
+<IMG SRC="maj.png" ALT="some text" WIDTH=300 HEIGHT=100>
+
+<p>
+JRIF allows programmers to tag variables with RIF labels, and generally use RIF labels in any place 
+that ordinary types are used, specifying confidentiality and integrity restrictions
+on the corresponding information. RIF labels may be known statically, or they may be created dynamically.
+In the latter case, RIF labels can be treated as first order values. For a more complete description of how labels can be used
+in a Java program, please study <a href="http://www.cs.cornell.edu/jif/doc/jif-3.3.0/manual.html">Jif's documentation</a>
+(the syntax of Jif labels, and Jif's features for downgrading and authority are irrelevant for RJIF).
+</p>
+
+<p>
+If a JRIF program is type correct, then all RIF labels used in that program are satisfied. 
+In particular, if the value of a variable tagged with RIF label L is derived from 
+the value of another variable tagged with L', by applying some operations,
+then L should be more restrictive than L' after taking transitions that correspond to these operations.
+L1 is more restrictive than L2, when L1 allows less principals to read and requires more principals
+to be trusted, comparing to L2, for all possible derived values.
+</p>
+
+
+<h2>JRIF Syntax</h2>
+
+<p> <strong>RIF automaton:</strong> It is written as a linear representation of an automaton, by listing
+identified states and transitions. For example, the syntax for the c-automaton of the above figure is: 
+</p>
+
+<pre>
+rif[q1*:{pi},q2:{_},M:q1->q2].
+</pre>
+
+We use <tt>{_}</tt> to represent the set of all principals, and <tt>{}</tt> to represent the empty set.
+
+<p> <strong>RIF label:</strong> It is a pair of a c-automaton (starting with rif) and
+ an i-automaton (starting with rifi). For example: </p>
+
+<pre>
+{rif[q1*:{pi},q2:P,M:q1->q2];rifi[q1*:{pi},q2:{},M:q1->q2]}.
+</pre>
+
+The least restrictive RIF label, which is sometimes written as <tt>{}</tt>, allows all principals to read
+and requires no principal to be trusted:
+
+<pre>
+{rif[q1*:{_}];rifi[q1*:{}]}.
+</pre>
+
+Absence of the c-automaton from a RIF label, by default implies that no confidentiality restrictions
+are imposed. Similarly for the i-automaton.
+
+<p><strong>Annotated expression:</strong> Expressions in a program are regarded to be operations;
+the values of variables in an expression are the inputs, and the value of that expression is the output.
+Expressions are assumed to be annotated with reclassifiers, which identify these operations. 
+Reclassifiers are used to trigger transitions on RIF automata. Expression <tt>E</tt> annotated with reclassifier
+<tt>f</tt> is written as
+<pre> reclassify(E,f).</pre>
+Expressions that are not explicitly annotated, are assumed to be
+annotated with a default "empty" reclassifier, which has no effect on RIF automata. Currently, we assume that
+programmers use reclassifiers ranging from <tt>f0</tt> to <tt>f9</tt>. Discharging this assumption requires
+a slight modification of the algorithm that decides the restrictiveness relation between two RIF labels,
+which we leave for future work.
+</p>
+
+<p><strong>Transitions on RIF labels:</strong> New RIF labels can be computed by applying transitions to existing ones.
+For example, a programmer may write <tt>tr(tr(L,f1),f2)</tt>, meaning the  RIF label derived from L, by 
+applying reclassifiers <tt>f1</tt> and <tt>f2</tt>. Notice that L may or may not be statically known.</p>
+
+
+<h2>Examples</h2>
+
+<p> <strong>1. Reclassifying assigned expression:</strong> Reclassifier <tt>f1</tt> is applied to <tt>x+y</tt>. This method
+is type correct, because (i) the c-automaton of <tt>res</tt> is more restrictive than the c-automata of
+<tt>x</tt> and <tt>y</tt> after taking the <tt>f1</tt> transition, (ii) the c-automaton of the declared exception is more
+restrictive than the c-automaton of <tt>res</tt>, and (iii) the c-automaton of <tt>res</tt> if more restrictive than
+the c-automaton of the pc (program counter) at the call site of this method. In general, the specified RIF label
+of the pc at the call site of a method is written between the name and the arguments of that method.
+In this case, this RIF label is <tt>{}</tt>.</p>
+
+<pre>
+public static void  main {} (String[] args) throws (Exception{rif[q1*:{Alice}]}) {
+
+    int {rif[q1*:{Alice}]} res; 
+    int {rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]} x;
+    int {rif[q1*:{Alice},q2:{Alice,Bob},f1:q1->q2]} y; 
+    
+    res = reclassify(x+y,f1);
+    
+    throw new Exception("Result: "+res);
+    
+}
+</pre>
+
+
+<p> <strong>2. Reclassifying guard expression:</strong> Reclassifier <tt>f1</tt> is applied to <tt>x==y</tt>. This snippet
+is type correct, because the c-automaton of <tt>res</tt> is more restrictive than the c-automata of
+<tt>x</tt> and <tt>y</tt> after taking the <tt>f1</tt> transition.</p>
+
+<pre>
+int {rif[q1*:{Alice}]} res; 
+int {rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2,f2:q2->q1]} x;
+int {rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2]} y;
+
+if (reclassify(x==y,f1)){
+	res = 1;
+}
+</pre>
+
+
+<p> <strong>3. Consecutive reclassifications:</strong> The final value of res depends on consecutively applying
+reclassifiers <tt>f3</tt>, <tt>f1</tt>, <tt>f2</tt> to <tt>x</tt>. Here, both c-automata and i-automata are explicitly specified.</p>
+
+<pre>
+int {rif[q1*:{},q2:{Alice},q3:{Alice,Bob},f1:q1->q2,f2:q2->q3];rifi[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]} res; 
+int {rif[q1*:{},q2:{Alice},q3:{Bob,Alice},f1:q1->q2,f2:q2->q3];rifi[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]} x;
+int {rif[q1*:{Alice},f2:q1->q2,q2:{Bob, Alice}];rifi[q1*:{Alice}]} y;
+
+x = reclassify(res,f3);
+y = reclassify(x+4,f1);
+res = reclassify(y,f2);
+</pre>
+
+
+<p> <strong>4. Method call:</strong> Method <tt>work</tt> calls method <tt>help</tt> inside a reclassification. This snippet
+is type correct, because (i) the c-automaton of the return type of <tt>help</tt> is more restrictive than the
+c-automaton of <tt>y</tt>, and (ii) the c-automaton of <tt>res</tt> is more restrictive than the c-automata of
+<tt>x</tt> and <tt>help()</tt> after taking the <tt>f1</tt> transition.
+</p>
+
+<pre>
+public work {} () {
+
+    int {rif[q1*:{Alice}]} res;
+    int {rif[q1*:{Alice}]} x; 
+
+    x= 20;
+    res = reclassify(help()+x,f1);
+}
+
+
+int{rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]} help() {
+
+    int {rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2]} y;
+
+    y = 10;
+    return y;
+}
+</pre>
+
+
+<p> <strong>5. Parametric RIF labels in where-constraint:</strong> Class <tt>foo</tt> is defined parametrically to
+labels <tt>L1</tt>, <tt>L2</tt>, and <tt>L3</tt>. These parameters are instantiated once a <tt>foo</tt> object is constructed. Whenever the
+constructor <tt>foo</tt> is called (e.g. <tt>obj = new foo[{rif...;rifi...},{rif...;rifi...},{rif...;rifi...}]();</tt> ),
+the instantiations of the parameters <tt>L1</tt>,<tt>L2</tt>,<tt>L3</tt> should satisfy the where-constraint. Specifically, <tt>L1</tt> should
+be more restrictive than <tt>L2</tt> and <tt>L3</tt>, after they have taken the <tt>f1</tt> transition. If this condition holds,
+then the constructor is type correct, because the RIF label of <tt>res</tt> is more restrictive 
+than the RIF labels of <tt>x</tt> and <tt>y</tt>, after they have taken the <tt>f1</tt> transition.
+</p>
+
+<pre>
+public class foo[label L1, label L2, label L3] {
+
+   int{L1} res;
+   int{L2} x;
+   int{L3} y;
+
+   public foo() where tr(L2,f1)<=L1, tr(L3,f1)<=L1 {
+       x = 96;
+       y = 45;
+       res = reclassify(x+y,f1);
+   }
+
+}
+</pre>
+
+
+<p> <strong>6. Dynamic RIF labels in dynamic check:</strong> Method <tt>work</tt> creates two dynamic RIF labels, and then it passes
+these labels as arguments to method <tt>help</tt>. Method <tt>help</tt> executes the assignment only if the dynamic check succeeds.
+</p>
+
+<pre>
+public void help {rif[q0*:{_}];rifi[q1*:{}]} (label{rif[q0*:{_}];rifi[q1*:{}]} l1, label{rif[q0*:{_}];rifi[q1*:{}]} l2){
+
+    int{*l1} x;
+    int{*l2} y;
+
+    if ( new label tr(l1,f1) <= l2)  y = reclassify(x % 4,f1);
+}
+
+public void work{rif[q0*:{_}];rifi[q1*:{}]}() {
+
+    final label{rif[q0*:{_}];rifi[q1*:{}]} l1 = new label {rif[q1*:{Alice},q2:{_},f1:q1->q2]; rifi[q1*:{Alice},q2:{},f1:q1->q2]};
+    final label{rif[q0*:{_}];rifi[q1*:{}]} l2 = new label {rif[q1*:{_}]; rifi[q1*:{}]};
+   
+    help(l1,l2);
+
+}
+</pre>
+
+
+<h2>Applications</h2>
+
+<p> <strong>Battleship:</strong> Implementation of the Battleship game in JRIF. 
+The implementation involved adapting Jif's Battleship implementation into JRIF.
+The source code can be found here.
+</p>
+
+<p>For comparison, the Battleship implementation in Jif can be found here.</p>
+
+<p> <strong>Shared Calendar:</strong> This application allows users to create and share events in their calendars.
+The implementation involves all kinds of reclassifications for both confidentiality and integrity.
+The source code can be found here.
+</p>
+
+<h2>Software</h2>
+
+JRIF compiler can be found here. This package contains source code for the compiler, the above applications, and additional test cases.
+It also contains a detailed account for the changes introduced in Jif to implement JRIF.
+
+<h2>Publication</h2>
+<a href="https://ecommons.cornell.edu/handle/1813/41194"> JRIF: Reactive Information Flow Control for Java</a>
+<br/> Technical Report, October 2015
 
 </body>
-
 </html>

@@ -104,7 +104,7 @@ public class Ship[label L] implements JifObject[L] {
 
         Ship[lbl] that = (Ship[lbl])o;
 
-        // use local variables to allow the NullPointerException
+        // Use local variables to allow the NullPointerException
         // analysis to work.
         Coordinate[L] thispos = this.pos;
         Coordinate[lbl] thatpos = that.pos;

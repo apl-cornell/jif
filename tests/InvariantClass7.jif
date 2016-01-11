@@ -1,9 +1,0 @@
-interface CovariantInt7   {
-    Object{this} m();
-}
-
-class InvariantClass7 (invariant) implements CovariantInt7 { // illegal ?
-    public Object{this} m() {
-	return this; //illegal
-    }
-}

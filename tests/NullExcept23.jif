@@ -1,8 +1,0 @@
-class C {
-    void m(String m, String o) {
-        String n = m==null?"":o;
-        
-        // n may be null here.
-        n.length();
-    }
-}

@@ -1,3 +1,11 @@
+/**
+ * The class rifList is used to create lists of objects tagged with different labels.
+ * Each node of a rifList contains a field for the object and a field for the (dynamic) label that tags this object.
+ * For this implementation, a node may also contain fields for additional dynamic labels and principals.
+ * These additional fields are used to instantiate parameters of the corresponding object. 
+ */
+
+
 public class rifList[label L] {
 
 	private Node[L]{L} head;
@@ -95,46 +103,6 @@ public class rifList[label L] {
 			i++;
 		}
 	}
-
-
-/*
-	public void remove{L}(Object{*La} data, label{L} La){
-		Node n = this.head;
-		if (n == null) return;
-        label lbl = n.getLabel();
-		if (this.size == 1 && n.getData()==data){
-			this.head=null;
-			this.last = this.head;
-			this.size--;
-			return;
-		}
-		if (n.getData()==data){
-			this.head = n.getNext();
-			n.setNext(null);
-			this.size--;
-			return;
-		}
-		int i=0;
-		Node nb = n;
-		n = n.getNext();
-		while (i<this.size){
-			if (n == null) return;
-			if (n.getData()==data){
-				if (n == this.last){
-					this.last = nb;
-				}
-				nb.setNext(n.getNext());
-				n.setNext(null);
-				this.size--;
-				return;
-			}
-			nb = n;
-			n=n.getNext();
-			i++;
-		}
-	}
-
-*/
 
 	public int{L} getSize(){
 		return this.size;

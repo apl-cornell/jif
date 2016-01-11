@@ -1,9 +1,0 @@
-public class Binary 
-{
-	int{Alice:} a;
-	int{Alice:Bob} b;
-
-	public int{Alice:} comp(int{Alice:} c) {
-		return a + b + c;
-	}
-}

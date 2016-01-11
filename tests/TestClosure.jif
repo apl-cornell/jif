@@ -1,3 +1,0 @@
-// Reused by some test cases.
-public abstract class TestClosure[principal P, label L] implements Closure[P, L] {
-}

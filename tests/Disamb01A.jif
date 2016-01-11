@@ -1,4 +1,0 @@
-public class Disamb01A {
-    final label L = new label {};
-}
-

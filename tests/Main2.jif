@@ -1,6 +1,0 @@
-class Main2 {
-    static void main(principal p, String[] args) 
-    where caller(p) {
-
-    }
-}

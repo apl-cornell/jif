@@ -1,87 +1,113 @@
-Jif 3.4.1
 
-                         The Jif Language and Compiler
-			 -----------------------------
+JRIF: Reactive Information Flow Control for Java
+------------------------------------------------
 
-Jif is an implementation of the JFlow language (with several
-extensions) described in the 1999 paper, Practical Mostly-Static
-Information Flow Control, published in the Proceedings of the 26th ACM
-Symposium on Principles of Programming Languages (POPL), January 1999,
-pp. 228-241, by Andrew C. Myers.
+JRIF introduces reactive information flow labels in Jif (http://www.cs.cornell.edu/jif/).
+This file is adaptation of the README file in the Jif distribution.
 
 Since you are reading this file, you have already downloaded and unpacked
-the Jif distribution.  Your installation directory contains the following
-sub-directories:
+the JRIF distribution.  Your installation directory contains the following
+sub-directories and files:
 
-  - src:      the complete source code of the Jif compiler
-  - doc:      Jif documentation 
+  - src:      the complete source code of the JRIF compiler
+  - doc:      JRIF documentation 
   - lib:      needed JAR files
-  - bin:      scripts to run the Jif compiler
-  - examples: Jif examples
-  - rt-src:   source code for the Jif runtime classes
-  - sig-src:  Jif signatures for standard Java classes, e.g. java.lang.Object
-  - lib-src:  Jif source code for utility classes, e.g. jif.util.List
-  - tests:    Some Jif source code to test the Jif compiler
-
+  - bin:      scripts to run the JRIF compiler
+  - examples: JRIF examples
+  - rt-src:   source code for the JRIF runtime classes
+  - sig-src:  JRIF signatures for standard Java classes, e.g. java.lang.Object
+  - lib-src:  JRIF source code for utility classes, e.g. jif.util.List
+  - tests:    Some JRIF source code to test the JRIF compiler
+  - CHANGES:  Changes introduced in the Jif compiler, to implement JRIF 
 
 Requirements
 ------------
 
-This Jif distribution builds on Unix (Linux, MacOS) and on Windows under the
-Cygwin environment. Jif is compiled with the Ant build tool
+This JRIF distribution builds on Unix (Linux, MacOS) and on Windows under the
+Cygwin environment. JRIF is compiled with the Ant build tool
 (http://jakarta.apache.org/ant). You must ensure that java, javac, and g++ are
 in your path.
 
 Software Versions: We recommend that you use JDK 1.4.2 or later.
 
-Jif and Cygwin: Jif can be built and used on a Windows platform running 
+JRIF and Cygwin: JRIF can be built and used on a Windows platform running 
    Cygwin. Several issues are worth pointing out however. 
      - The GNU C++ compiler, g++, must be installed in order to build the 
-       Jif native runtime library.
+       JRIF native runtime library.
      - The w32api package must be installed, to ensure the appropriate 
        Windows header files are present.
      - Great care must be taken in specifying class paths and environment
-       variables. Any classpath used when compiling Jif programs must be
+       variables. Any classpath used when compiling JRIF programs must be
        understandable by both the javac compiler and ant. Thus, for 
-       example, if setting the environment variable JIF to the Jif 
+       example, if setting the environment variable JRIF to the JRIF 
        installation directory, the variable should be set to either the 
-       string "c:\data\jif", or "c:/data/jif". It should not be set to 
-       the string "/cygdrive/c/data/jif", which cannot be interpreted by
+       string "c:\data\jrif", or "c:/data/jrif". It should not be set to 
+       the string "/cygdrive/c/data/jrif", which cannot be interpreted by
        javac correctly.
        In addition, note that the path separator on a Windows platform is
        the semicolon (';'), and, class paths should be set accordingly, 
        for example:
           setenv CLASSPATH "$POLYGLOT/polyglot.jar;$POLYGLOT/lib/jflex.jar;$POLYGLOT/lib/java_cup.jar"
      - We have had some reports that some versions of Cygwin are 
-       incompatible with building Jif, however, cygwin-1.5.16-1 appears to 
+       incompatible with building JRIF, however, cygwin-1.5.16-1 appears to 
        be compatible. 
 
-Jif is implemented using the Polyglot extensible compiler toolkit,
-also developed at Cornell. Polyglot can be obtained from the web site:
+JRIF is implemented using the Polyglot extensible compiler toolkit,
+also developed at Cornell. To built JRIF, please use
+the polyglot release included in this installation directory.
 
-    http://www.cs.cornell.edu/Projects/polyglot
+Files polyglot.jar, JFlex.jar and java_cup.jar are
+required to build JRIF.
 
-This Jif distribution contains the files polyglot.jar, JFlex.jar and
-java_cup.jar from the Polyglot 2.5.2 distribution. These files are
-required to build Jif.
-
-This Jif distribution contains some C++ code, used to produce
-platform-specific Jif runtime support. Jif requires the g++ compiler
+This JRIF distribution contains some C++ code, used to produce
+platform-specific JRIF runtime support. JRIF requires the g++ compiler
 to be present to compile this C++ code.
 
 
-Building Jif
+Building JRIF
 ------------
 
+We give general instructions on how to build JRIF,
+along with particular commands (as an example) used to build JRIF in Ubuntu 14.04. These commands start with a "-".
+
 Jif is compiled with the Ant build tool
-(http://jakarta.apache.org/ant).  Follow these steps to build the Jif
+(http://jakarta.apache.org/ant).  Follow these steps to build the JRIF
 compiler:
 
 1. Ensure javac is on your path and that you are using JDK 1.4.2 or
    later. Set the JAVA_HOME environment variable to the Java home
    directory.  The file $JAVA_HOME/include/jni.h should exist.
 
-2. Go to the root directory of the Jif installation (the directory
+- sudo apt-get update
+- sudo apt-get install openjdk-6-jdk
+- sudo apt-get install g++
+- sudo apt-get install ant
+
+- JAVA_HOME="/usr/lib/jvm/java-6-openjdk-amd64"
+- export JAVA_HOME
+- echo $JAVA_HOME
+
+2. Install polyglot, included in this directory.
+You may place the polyglot directory out of this directory.
+See README in polyglot directory for general installation instructions.
+
+- cd polyglot_for_jrif/
+- ant
+- ant jar
+
+- PATH=$PATH:$HOME/bin:$JAVA_HOME/bin:/home/ubuntu/polyglot_for_jrif/bin
+- CLASSPATH=".:/home/ubuntu/polyglot_for_jrif/classes:/home/ubuntu/polyglot_for_jrif/lib/java_cup.jar"
+- export PATH
+- export CLASSPATH
+- echo $PATH
+- echo $CLASSPATH
+
+(The definition of variables JAVA_HOME, PATH and CLASSPATH, can also
+be done by editing /etc/profile (sudo vi /etc/profile), 
+and then executing: source /etc/profile .)
+
+
+2. Go to the root directory of the JRIF installation (the directory
    this README is in). We'll call this directory $JIF from now on.
 
     $ cd $JIF
@@ -89,7 +115,13 @@ compiler:
 3. Copy config.properties.in to config.properties, and then edit
    config.properties to make "polyglot.home" the absolute
    path of your Polyglot installation.
-  
+
+- Edits:
+   * polyglot.home=/home/ubuntu/polyglot_for_jrif  [uncomment and modify]
+   * #jdk.home=${java.home}  [comment]
+   * jdk.home=${env.JAVA_HOME} [uncomment]
+
+
 4. Run ant to configure the system.
 
         $ ant configure
@@ -116,10 +148,10 @@ compiler:
    box." If you want, you can now skip step 6, which builds the Jif
    compiler, and proceed directly to step 7.
 
+ - put path in build.xml
 
-6. (OPTIONAL) 
-   Run ant to build the Jif compiler, Jif signatures for standard Java
-   classes and the Jif library code.
+6. Run ant to build the JRIF compiler, JRIF signatures for standard Java
+   classes and the JRIF library code.
 
         $ ant
 
@@ -131,21 +163,21 @@ compiler:
    $JIF/sig-classes and $JIF/lib-classes respectively.
 
 
-7. You are now ready to try out Jif.  A suggested starting point is
+7. You are now ready to try out JRIF.  A suggested starting point is
    the BattleShip example, in the directory
-   $JIF/examples/battleship. See the README file in that directory for
+   $JIF/examples/rif_battleship. See the README file in that directory for
    more detailed information on compiling and running the BattleShip
    example.
 
 
 
-Running Jif
+Running JRIF
 -----------
 
 Scripts named "jifc" and "jif" are created in the $JIF/bin directory
 during the configuration process (see above, step 3). The jifc script
-runs the Jif compiler, and the jif script provides a convenient way to
-execute the compiled Jif code.
+runs the JRIF compiler, and the jif script provides a convenient way to
+execute the compiled JRIF code.
 
 The jifc script automatically ensures the directories $JIF/classes and
 $JIF/lib-classes are on the classpath, and that the directories
@@ -218,22 +250,6 @@ See the Jif documentation ($JIF/doc/index.html) for more information
 about writing Jif programs. See the directories $JIF/examples and
 $JIF/tests for some examples of Jif programs.
 
-Credits
--------
-
-The Jif project is supervised by Andrew Myers at the Cornell
-University Computer Science Department. Many people have contributed
-to this software.
-
-New features in this release of the Jif compiler were added by Owen Arden,
-Jed Liu, and Danfeng Zhang. Mike George and K. Vikram also helped prepare
-this release. Thanks to Aslan Askarov, Robert Grabowski, Doaa Hassan,
-Daniel Hedin, Boniface Hicks, Dave King, Karl Mazurak, Todd Millstein,
-Andrei Sabelfeld, Lilia Sfaxi, and Steve Zdancewic, who provided bug reports
-and feedback for this and previous versions of Jif. Steve Chong, Xin Zheng,
-Lantian Zheng, Steve Zdancewic, and Nate Nystrom helped implement earlier
-versions.
-
 Restrictions on use
 -------------------
 
@@ -241,32 +257,7 @@ This free release of the Jif system may be used, modified, and
 redistributed as governed by the license included in the attached file
 LICENSE.
 
-Jif: Java Information Flow
-Copyright (C) 1999-2012 Andrew C. Myers, Cornell University
-
 This software is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the file
 LICENSE for more details.
-
-More information
-----------------
-
-More information about Jif, including the latest release, can be found
-at the Jif web site at
-
-    http://www.cs.cornell.edu/jif
-
-If you use Jif, we'd appreciate your letting us know.  Send your
-comments and bug reports to Andrew Myers at andru@cs.cornell.edu. There
-is also a Jif users mailing list and a Jif announcement mailing list.
-If you would like to receive notification of future Jif updates, please
-join these mailing lists; details are on the Jif web site.
-
-Other Acknowledgments
----------------------
-
-This Jif software release was supported by NSF Grant 0964409, by ONR grant
-N000140910652, and by the USAF Research Laboratory.  Any opinions expressed or
-implied in this release are those of the software developers alone, and not
-necessarily those of these sponsors.

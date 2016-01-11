@@ -1,6 +1,0 @@
-class StaticThis2 {    
-    static void foo() {
-	int{this} f = 10; // BAD: "this" label used in static context.
-    }
-}
-

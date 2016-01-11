@@ -1,6 +1,0 @@
-import java.io.*;
-
-public class UnsafeIO {
-   native public static void print(String s);
-   native public static String readLine() throws IOException;
-}

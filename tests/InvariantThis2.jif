@@ -1,3 +1,0 @@
-class InvariantThis2 {
-    int{this} f = 5; // not allowed, not final field
-}

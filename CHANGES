@@ -1,158 +1,86 @@
-Jif Change Log
-==============
+Changes introduced in jif, to develop jrif
+==========================================
 
-This file documents changes between releases of Jif.
-2012-04-26    Jif 3.4.1
-    * Updated to Polyglot 2.5.2 release
-    * Various bug fixes.
-2012-10-04    Jif 3.4.0
-    * Latent support for provider labels for limited compilation of 
-        untrusted code (to support Fabric).
-    * -fail-on-exception option to promote uncaught exceptions to 
-        fatal errors.
-    * In "declassify" commands, only the confidential component now
-      needs to be specified. This makes declassify() easier to use.
-      For instance, when the label of expression e is {Alice->;Alice<-},
-      "declassify(e, {Alice->} to {})" is the same as
-      "declassify(e, {Alice->;Alice<-} to {Alice<-})".
-    * Updated to Polyglot 2.5.1 release.
+1) Introduce syntax for RIF labels, annotated expressions "reclassify(E,f)",
+where E is an expression and f is a reclassifier, and transitions on
+RIF labels "tr(L,f)", where L is a RIF label.
 
-2009-03-16    Jif 3.3.2
-    * Top/bottom Unicode syntax for principals supported.
-    * Small refactoring change to better support extensions to Jif.
-    * Other bug fixes.
+Modified files in jif/scr/jif/parse: jif.flex, jif.ppg
 
-2009-02-24    Jif 3.3.1
-    * Small bug fixes in Jif and upgrades to Polyglot.
-    * Subclasses of java.lang.Error now cannot be caught.
-    * Output format for labels uses more readable -> and <-
-    * Document -nonrobust option, which turns off robustness checking.
+2) New AST nodes are created to represent the syntactic entities we intro-
+duced above.
 
-2009-02-02    Jif 3.3.0
-    * Jif now infers arguments to parameterized types, both for principal
-      and label parameters.
+Modified/Added files in jif/src/jif/ast: AbstractJifExtFactory c.java, AmbRifDy-
+namicLabelNode c.java, AmbRifDynamicLabelNode.java, AmbRifiLabelNode c.java, Am-
+bRifLabelNode c.java, AmbRifTransLabelNode c.java, JifExtFactory.java, JifNodeFac-
+tory c.java, JifNodeFactory.java, RifComponentNode c.java, RifComponentNode.java, Ri-
+fiLabelNode.java, RifiPolicyNode c.java, RifiPolicyNode.java, RifLabelNode c.java, Rif-
+PolicyNode c.java, RifPolicyNode.java, RifStateNode c.java, RifStateNode.java, RifTran-
+sitionNode c.java, RifTransitionNode.java, ReclassifyExpr c.java, ReclassifyExpr.java.
 
-2008-04-15    Jif 3.2.0
-    * Refactoring for cleaner support of extensions, including Jifclipse.
-    * Minor bug fixes and style changes.
-    * Allow reader policies o->_ and writer policies o<-_ to be
-      dropped from labels. (Principal _ is the bottom principal, and
-      thus o->_ and o<-_ do not restrict the the sets of readers and 
-      writers.)
-      
-2007-11-01    Jif 3.1.1
-    * Based on Polyglot 2.3.0
-    * Checked endorse construct
-       * A useful form of the endorse statement for the common
-         case of validating an untrusted value. See the Jif 
-         manual for more details.
-    * Constant arrays
-       * Arrays can be declared constant, meaning their
-         contents will not change after initialization. This
-         allows more permissive label checking. See the Jif 
-         manual for more details.
-    * Dataflow analysis for array bounds
-       * Analysis is able to determine if some array access
-         and new array expressions will not throw
-         runtime exceptions.
-    * Numerous bug fixes
-    
-2006-06-09    Jif 3.0.0
-    * Added integrity
-       * See the Jif manual for a full explanation.
-       * Labels now form a complete lattice (meet operation
-         supported).
-    * Optional checking for robustness
-       * See the Jif manual for a full explanation.
-       * Label checking rules to enforce robustness against all
-         attackers can be turned on using the "-robust" command line
-         option.
-    * Syntactical/lexical changes
-       * UTF-8 encoded source files accepted
-       * A reader policy "p:q" can also be written "p->q" or
-         "p&#8594;q" (the arrow is Unicode character 8594)
-       * A writer policy "p!:q" can also be written "p-<q" or
-         "p&#8592;q" (the arrow is Unicode character 8592)
-       * Downgrades now explicitly mention the from and to labels
-            e.g., declassify(h, {Alice:} to {Alice:Bob})
-    * Richer principals       
-       * Top and bottom principals now explicitly represented.
-       * Conjunctive and disjunctive principals now supported.
-    * Runtime label and principal tests
-       * A new binary operator "equiv" added. For principals, "p equiv
-         q" is equivalent to "p actsfor q" and "q actsfor p". For
-         labels, "L1 equiv L2" is equivalent to "L1 <= L2" and "L2 <=
-         L1".
-       * Principal and label comparisons can be used as arbitrary
-         boolean expressions. e.g., "boolean b = (p actsfor q);" if a
-         principal or label test occurs as a conjunct of an
-         if-statement, then the label environment used to label check
-         the consequent will include this fact.
-    * Jif manual significantly expanded, including section on the
-      label checking rules in Jif.
-    * Jif library code now has HashMap and HashSet implementations.
-    * Numerous bug fixes.
+3) Through a disambiguation process, the AST nodes, which are syntactic
+entities, are mapped to semantic entities, which are types. We provided new types that cor-
+respond to Rif labels. The new types should be well-formed according to some Jif rules.
 
-2006-03-13    Jif 2.0.1
-    * Numerous bug fixes.
-    * Label less-than-or-equal constraints for methods.
-    * Map implementation in jif.util library.
-    * Simple runtime class analysis removes the need to statically handle 
-            some spurious ClassCastExceptions
-    * jif.lang.IDComparable interface now with additional method
-            equals(label lbl, IDComparable[lbl] o)
-        
-2005-08-26    Jif 2.0.0
-    * Class parameters now represented at runtime.
-    * Dynamic labels and principals more expressive: now allow access paths.
-    * Allow user-defined principals.
-    * Not-null checking more precise.
-    * Better documentation.
-    * Based on the Polyglot 2.0.0 architecture.
+Modified file in jif/src/jif/extension: LabelTypeCheckUtil.java.
 
-2004-10-04    Jif 1.1.1
-    * Based on the Polyglot 1.3.0 architecture
-    * Now includes required Polyglot jar files in the distribution
-    
-2004-04-13    Jif 1.1.0
-    * Based on the Polyglot 1.2.0 architecture.
-    * Improved error messages.
-    * New command line option to the Jif compiler: "-explain" (or "-e") 
-      makes the compiler provide more information about why label checking 
-      failed.      
-    * The signature for the "public static void main" method for Jif 
-      programs can now optionally include a dynamic principal, who is the 
-      current user. See the file examples/README in the distribution for 
-      more information.
-    * Misc bug fixes, including:
-          * The label "this" cannot be used in a static context.
-          * Incorrect labels missing colons (e.g., "{Alice}") are detected.
-          * Parameterized classes cannot be subclasses of 
-            "java.lang.Throwable".
-          * Final local variables require an initializer.
-          * Implementation of acts for corrected.
+4) Implementation of the join and meet operations for these new types.
 
-2003-07-11    Jif 1.0.0
-    * Based on the Polyglot 1.0.0 architecture.
-    * Bounded label parameters
-    * Non-null analysis to remove spurious exceptions
-    * New example program: Battleship 
+Modified/Added files in jif/src/jif/types/label: RifConfPolicy.java, RifDynam-
+icLabel c.java, RifDynamicLabel.java, RifIntegPolicy.java, RifJoinConfPolicy c.java,
+RifJoinConfPolicy.java, RifJoinIntegPolicy c.java, RifJoinIntegPolicy.java, RifReaderPol-
+icy c.java, RifVarLabel c.java, RifVarLabel.java, RifWriterPolicy c.java, TransitionVarLa-
+bel c.java, TransitionVarLabel.java.
 
-2001-09-06    Jif 0.9.2
-    * Fixed a bug with loading external principals.
-    * Fixed a bug with label checking loop statements.
-    * Fixed serialization bug with jltools.util.Enum.
-    * Installation procedure simplified.
-    * Fixed Jif runtime interface.
+Modified/Added files in jif/src/jif/types: JifTypeSystem c.java, JifTypeSystem.java,
+RifComponent.java, RifFSM c.java, RifFSM.java, RifFSMstate c.java, RifFSMstate.java,
+RIFstate c.java, RIFtransition c.java.
 
-2001-08-08    Jif 0.9.0
-    * Fixed many bugs with label/principal parameters and dynamic labels.
-    * Improved error reporting.
-    * Added Jif runtime, which provides the ability to read and write files.
-    * Added a utility to convert local users to Jif external principals.
+5) The phase of type-checking is enriched with the typing rule for annotated
+expressions. The type of an annotated expression reclassify(E,f) is the type
+of expression E after having taken the transition that corresponds to f.
+Specifically, if L is the type of E, then dynamic Rif-label tr(L,f) is the type
+of that annotated expression. Notice that L may or may not be statically known.
 
-2001-06-08    Jif 0.8.0
-    * Many bug fixes with porting Jif to JLTools 0.9.0.
+Added file in jif/src/jif/extension: JifReclassifyExprExt.java.
 
-2001-05-16    Jif 0.7.0 (JLTools 0.9.0)
-    * JLTools completely rewritten.
+6) We provide a new decision procedure for the restrictiveness relation. 
+We enrich this decision procedure with the fact that the transition function
+is monotone with respect to the restrictiveness relation. Specifically, if 
+L1 <= L2 , then the decision procedure can deduce
+that tr(L1,f) <= tr(L2,f).
+
+Modified file in jif/src/jif/types/hierarchy: LabelEnv c.java.
+
+7) We enriched the solver. Originally, the solver takes as
+input a set of restrictiveness relations (e.g. L1 <= L2 ), and it decides whether
+they are satisfied. During this process, values of specific unknown labels may
+be found. Now, once an unknown label L is found, the solver deduces
+the values of other unknown labels that are computed based on L, say
+tr(tr(L,f1),f2).
+
+Modified file in jif/src/jif/types: VarMap.java.
+
+Modified file in jif/src/jif/types: JifSubst c.java.
+
+8) After successful type-checking, the program that is written in RIFinJIF
+is translated into Java, in order to be executed by Java VM. Annotated
+expressions and Rif labels (with applied transitions or without) in the code
+are also translated into Java objects. So, we added methods in the compiler
+to generate these objects
+
+Modified/Added files in jif/rt-src/jif/lang: LabelUtil.java, RifFSMstate.java, RifRead-
+erPolicy.java, RifWriterPolicy.java.
+
+Modified/Added files in jif/src/jif/translate: PairLabelToJavaExpr c.java, RifDynami-
+cLabelToJavaExpr c.java, ReclassifyExprTojavaExt c.java.
+
+
+
+
+
+
+
+
+
+

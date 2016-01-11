@@ -1,3 +1,10 @@
+/**
+ * This class implements the Node of a rifList.
+ * Each node contains a field for an object and a field for the (dynamic) label that tags this object.
+ * For this implementation, a node may also contain fields for additional dynamic labels and principals.
+ * These additional fields are used to instantiate parameters of the corresponding object. 
+ */
+
 public class Node[label L] {
 	
 	final label{L} La;

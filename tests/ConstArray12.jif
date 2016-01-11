@@ -1,6 +1,0 @@
-class C {
-    void m{*<-*}() {
-        int{Alice:Bob} const[] foo = {1,2,3}; 
-        int{Alice:} const[] bar = foo; // OK, const arrays are covariant 
-    }
-}
