@@ -1,0 +1,21 @@
+//Type-correct
+
+public class work {
+
+public void help {rif[q0*:{_}];rifi[q1*:{}]} (label{rif[q0*:{_}];rifi[q1*:{}]} l1, label{rif[q0*:{_}];rifi[q1*:{}]} l2){
+   	int{*l1} x=0;
+    int{*l2} y;
+
+    if ( new label tr(l1,f1) <= l2)  y = reclassify(x % 4,f1);
+}
+
+public void work{rif[q0*:{_}];rifi[q1*:{}]}() {
+
+	final label{rif[q0*:{_}];rifi[q1*:{}]} l1 = new label {rif[q1*:{Alice},q2:{_},f1:q1->q2]; rifi[q1*:{Alice},q2:{},f1:q1->q2]};
+	final label{rif[q0*:{_}];rifi[q1*:{}]} l2 = new label {rif[q1*:{_}]; rifi[q1*:{}]};
+   
+   	help(l1,l2);
+
+}
+
+}
