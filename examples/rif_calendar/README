@@ -1,0 +1,95 @@
+Shared Calendar
+---------------
+
+This application allows users to create and share events.
+All four different kinds of reclassifications (declassification, classification,
+endorsement, and deprecation) are required in this application.
+Also, users may choose dynamic RIF labels to associate with values, so the same 
+reclassifier could have different effects on values with different specifications.
+Operations involved in our shared calendar include:
+– Create a personal or shared event.
+- Invite a user to participate in a shared event.
+- Accept an invitation to participate in a shared event (triggers endorsement).
+- Cancel a shared event (triggers deprecation).
+- Publish/hide an event date and time (triggers declassification/classification)
+- Check and announce a conflict between personal events (not canceled events) and
+an invitation for a new shared event (triggers declassification).
+
+
+To compile and run the shared calendar:
+
+1. Ensure that the JRIF compiler is working.
+  
+   See $JIF/doc for information on compiling the JRIF compiler.
+
+2. Ensure that the principals Alice and Bob are present.
+
+   The code for the principals is in the $JIF/tests directory. To
+   compile the code for the principals, perform the following
+   commands.
+        $ cd $JIF/tests
+        $ $JIF/bin/jifc jif/principals/Alice.jif jif/principals/Bob.jif
+
+3. Compile the shared calendar
+
+        $ cd $JIF/examples/rif_calendar
+        $ $JIF/bin/jifc -simpleoutput -classpath $JIF/tests *.jif
+
+   The $JIF/tests directory must be included on the classpath so the
+   JRIF compiler can locate the principals Alice and Bob.
+   
+4. Execute the shared calendar
+
+        $ cd $JIF/examples/rif_calendar
+        $ $JIF/bin/jif -classpath $JIF/tests Main
+
+The output should resemble the following:
+
+Welcome to rif-Calendar!
+Calendar of Alice
+Event [date=23-8-2014, time=10:30, duration=30mins, description=Meeting with Chris, creator=Alice]
+Event [date=16-9-2014, time=16:15, duration=60mins, description=Doctor appointment, creator=Alice]
+Event [date=5-10-2014, time=9:30, duration=15mins, description=Meeting with Zoe, creator=Alice]
+
+Calendar of Bob
+Event [date=15-10-2014, time=14:30, duration=30mins, description=Go to barbershop, creator=Bob]
+Event [date=18-10-2014, time=15:45, duration=15mins, description=Buy present for John, creator=Bob]
+
+Public view of Alice
+Event [date=23-8-2014, time=10:30, duration=30mins, description=---, creator=Alice]
+Event [date=16-9-2014, time=16:15, duration=60mins, description=---, creator=Alice]
+
+Public view of Alice
+Event [date=16-9-2014, time=16:15, duration=60mins, description=---, creator=Alice]
+
+Automatic rejection: Visit aunts
+
+Calendar of Alice
+Event [date=16-9-2014, time=16:15, duration=60mins, description=Doctor appointment, creator=Alice]
+Event [date=5-10-2014, time=9:30, duration=15mins, description=Meeting with Zoe, creator=Alice]
+Event [date=23-8-2014, time=10:30, duration=30mins, description=Meeting with Chris, creator=Alice]
+Event [date=10-11-2014, time=18:10, duration=60mins, description=Visit parents, creator=Bob]
+Event [date=20-2-2010, time=8:15, duration=120mins, description=Go for cinema, creator=Bob]
+Event [date=30-1-2015, time=21:30, duration=120mins, description=Go to concert, creator=Bob]
+
+Calendar of Bob
+Event [date=15-10-2014, time=14:30, duration=30mins, description=Go to barbershop, creator=Bob]
+Event [date=18-10-2014, time=15:45, duration=15mins, description=Buy present for John, creator=Bob]
+Event [date=10-11-2014, time=18:10, duration=60mins, description=Visit parents, creator=Bob]
+Event [date=20-2-2010, time=8:15, duration=120mins, description=Go for cinema, creator=Bob]
+Event [date=30-1-2015, time=21:30, duration=120mins, description=Go to concert, creator=Bob]
+
+Calendar of Alice
+Event [date=16-9-2014, time=16:15, duration=60mins, description=Doctor appointment, creator=Alice]
+Event [date=5-10-2014, time=9:30, duration=15mins, description=Meeting with Zoe, creator=Alice]
+Event [date=23-8-2014, time=10:30, duration=30mins, description=Meeting with Chris, creator=Alice]
+Event [date=20-2-2010, time=8:15, duration=120mins, description=Go for cinema, creator=Bob]
+Event [date=30-1-2015, time=21:30, duration=120mins, description=Go to concert, creator=Bob]
+
+Calendar of Bob
+Event [date=15-10-2014, time=14:30, duration=30mins, description=Go to barbershop, creator=Bob]
+Event [date=18-10-2014, time=15:45, duration=15mins, description=Buy present for John, creator=Bob]
+Event [date=20-2-2010, time=8:15, duration=120mins, description=Go for cinema, creator=Bob]
+Event [date=30-1-2015, time=21:30, duration=120mins, description=Go to concert, creator=Bob]
+
+
