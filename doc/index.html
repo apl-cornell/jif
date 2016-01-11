@@ -42,7 +42,7 @@ that ordinary types are used, specifying confidentiality and integrity restricti
 on the corresponding information. RIF labels may be known statically, or they may be created dynamically.
 In the latter case, RIF labels can be treated as first order values. For a more complete description of how labels can be used
 in a Java program, please study <a href="http://www.cs.cornell.edu/jif/doc/jif-3.3.0/manual.html">Jif's documentation</a>
-(the syntax of Jif labels, and Jif's features for downgrading and authority are irrelevant for RJIF).
+(the syntax of Jif labels, and Jif's features for downgrading and authority are irrelevant for JRIF).
 </p>
 
 <p>
@@ -142,7 +142,7 @@ if (reclassify(x==y,f1)){
 </pre>
 
 
-<p> <strong>3. Consecutive reclassifications:</strong> The final value of res depends on consecutively applying
+<p> <strong>3. Consecutive reclassifications:</strong> The final value of <tt>res</tt> depends on consecutively applying
 reclassifiers <tt>f3</tt>, <tt>f1</tt>, <tt>f2</tt> to <tt>x</tt>. Here, both c-automata and i-automata are explicitly specified.</p>
 
 <pre>
@@ -156,36 +156,32 @@ res = reclassify(y,f2);
 </pre>
 
 
-<p> <strong>4. Method call:</strong> Method <tt>work</tt> calls method <tt>help</tt> inside a reclassification. This snippet
+<p> <strong>4. Method call:</strong> Method <tt>work</tt> calls method <tt>help</tt> inside an annotated expression. This snippet
 is type correct, because (i) the c-automaton of the return type of <tt>help</tt> is more restrictive than the
-c-automaton of <tt>y</tt>, and (ii) the c-automaton of <tt>res</tt> is more restrictive than the c-automata of
-<tt>x</tt> and <tt>help()</tt> after taking the <tt>f1</tt> transition.
+c-automaton of <tt>y</tt>, (ii) the c-automaton of <tt>res</tt> is more restrictive than the c-automata of
+<tt>help(x)</tt> after taking the <tt>f1</tt> transition, and (iii) the c-automaton of <tt>y</tt> is more
+restrictive than the c-automaton of <tt>x</tt>.
 </p>
 
 <pre>
-public work {} () {
+public work {} (int {rif[q1*:{Alice,Bob}]} x) {
 
-    int {rif[q1*:{Alice}]} res;
-    int {rif[q1*:{Alice}]} x; 
+    int {rif[q1*:{Alice}]} res; 
 
-    x= 20;
-    res = reclassify(help()+x,f1);
+    res = reclassify(help(x),f1);
 }
 
 
-int{rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]} help() {
+int{rif[q1*:{Alice,Bob},q2:{Alice},f1:q1->q2]} help (int {rif[q1*:{Alice,Bob}]} y) {
 
-    int {rif[q1*:{Alice,Bob},q2:{Alice,Bob},f1:q1->q2]} y;
-
-    y = 10;
-    return y;
+    return y%2 + y%3 + y%4;
 }
 </pre>
 
 
 <p> <strong>5. Parametric RIF labels in where-constraint:</strong> Class <tt>foo</tt> is defined parametrically to
 labels <tt>L1</tt>, <tt>L2</tt>, and <tt>L3</tt>. These parameters are instantiated once a <tt>foo</tt> object is constructed. Whenever the
-constructor <tt>foo</tt> is called (e.g. <tt>obj = new foo[{rif...;rifi...},{rif...;rifi...},{rif...;rifi...}]();</tt> ),
+constructor <tt>foo</tt> is called (e.g. <tt>obj = new foo[{rif...;rifi...},{rif...;rifi...},{rif...;rifi...}](7,9);</tt> ),
 the instantiations of the parameters <tt>L1</tt>,<tt>L2</tt>,<tt>L3</tt> should satisfy the where-constraint. Specifically, <tt>L1</tt> should
 be more restrictive than <tt>L2</tt> and <tt>L3</tt>, after they have taken the <tt>f1</tt> transition. If this condition holds,
 then the constructor is type correct, because the RIF label of <tt>res</tt> is more restrictive 
@@ -199,9 +195,9 @@ public class foo[label L1, label L2, label L3] {
    int{L2} x;
    int{L3} y;
 
-   public foo() where tr(L2,f1)<=L1, tr(L3,f1)<=L1 {
-       x = 96;
-       y = 45;
+   public foo(int{L2} a, int{L3} b) where tr(L2,f1)<=L1, tr(L3,f1)<=L1 {
+       x = a;
+       y = b;
        res = reclassify(x+y,f1);
    }
 
@@ -214,20 +210,22 @@ these labels as arguments to method <tt>help</tt>. Method <tt>help</tt> executes
 </p>
 
 <pre>
-public void help {rif[q0*:{_}];rifi[q1*:{}]} (label{rif[q0*:{_}];rifi[q1*:{}]} l1, label{rif[q0*:{_}];rifi[q1*:{}]} l2){
+int{*l2} help {rif[q0*:{_}];rifi[q1*:{}]} (label{rif[q0*:{_}];rifi[q1*:{}]} l1, label{rif[q0*:{_}];rifi[q1*:{}]} l2, int{*l1} x){
 
-    int{*l1} x;
-    int{*l2} y;
+    int{*l2} y=-1;
 
     if ( new label tr(l1,f1) <= l2)  y = reclassify(x % 4,f1);
+    return y;
 }
 
 public void work{rif[q0*:{_}];rifi[q1*:{}]}() {
 
     final label{rif[q0*:{_}];rifi[q1*:{}]} l1 = new label {rif[q1*:{Alice},q2:{_},f1:q1->q2]; rifi[q1*:{Alice},q2:{},f1:q1->q2]};
     final label{rif[q0*:{_}];rifi[q1*:{}]} l2 = new label {rif[q1*:{_}]; rifi[q1*:{}]};
+    int{*l1} x = new Random();
+    int{*l2} res;
    
-    help(l1,l2);
+    res = help(l1,l2,x);
 
 }
 </pre>
@@ -243,7 +241,8 @@ The source code can be found here.
 <p>For comparison, the Battleship implementation in Jif can be found here.</p>
 
 <p> <strong>Shared Calendar:</strong> This application allows users to create and share events in their calendars.
-The implementation involves all kinds of reclassifications for both confidentiality and integrity.
+The implementation involves all kinds of reclassifications for both confidentiality and integrity,
+leading to richer RIF automata (more than 3 states).
 The source code can be found here.
 </p>
 
