@@ -1,28 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+	"http://www.w3.org/TR/xhtm111/DTD/xhtm111.dtd">
+
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+
+<style type="text/css">
+			.center_div
+				{
+				border:1px white;
+				margin-left:auto;
+				margin-right:auto;
+				width:60%;
+				background-color:white ;
+				text-align:left;
+				padding:8px;
+                font-family: Arial, Helvetica, sans-serif;
+				}
+
+h1 {
+    color: #6666ff;
+}
+
+h2 {
+    color: #8080ff;
+}
+
+strong {
+  color:#9999ff;
+}
+		</style>
+
 </head>
 <body>
+<div class="center_div">
 <h1 align="center">JRIF: Reactive Information Flow Control for Java</h1>
 <hr>
 <h2>Overview</h2>
-<p>JRIF extends Java to support RIF labels, by modifying the <a href="http://www.cs.cornell.edu/jif/">Jif</a> compiler and run time. RIF labels express changes in values' confidentiality and integrity that are instigated by applied operations. Indeed, the confidentiality and integrity of the output value of an operation depends both on the confidentiality and
+<div style="text-align:justify; font-size: 12pt;">
+JRIF extends Java to support RIF labels, by modifying the <a href="http://www.cs.cornell.edu/jif/">Jif</a> compiler and run time. RIF labels express changes in values' confidentiality and integrity that are instigated by applied operations. Indeed, the confidentiality and integrity of the output value of an operation depends both on the confidentiality and
  integrity of the input values, and on the applied operation. So, a RIF label that tags a particular value can specify what is the confidentiality and integrity for all possible values derived from it, depending on the operations involves in these derivations.
  For example, a RIF label that tags a vote can express that (i) initially the vote can be read only by the principal that cast this vote, (ii) but the result of the majority (which is derived based on this and other votes) can be read by all principals.
+</div>
 </p>
-<p>A RIF label consists of two RIF automata; a <i>c-automaton</i> that specifies the confidentiality policy, and an
+<div style="text-align:justify; font-size: 12pt;">
+A RIF label consists of two RIF automata; a <i>c-automaton</i> that specifies the confidentiality policy, and an
 <i>i-automaton</i> that specifies the integrity policy for a value. States of either kind of RIF automaton are mapped to sets of principals, and transitions are mapped to operations. For a c-automaton, these sets contain principals that are allowed to read
  values. For an i-automaton, these sets contain principals that should be trusted in order for values to be trusted. A visual representation of a c-automaton appropriate for the vote of the example above is shown below, where M identifies the majority operation,
  \not M identifies all other operations, pi is the principal that cast this vote, P is the set of all principals, \ast identifies all operations, and the grey state represents the initial state.
+</div>
 </p>
 <img alt="some text" height="100" width="300">
-<p>JRIF allows programmers to tag variables with RIF labels, and generally use RIF labels anywhere that ordinary types are used, specifying confidentiality and integrity restrictions on the corresponding information. RIF labels may be known statically, or they
+</p>
+<div style="text-align:justify; font-size: 12pt;">
+JRIF allows programmers to tag variables with RIF labels, and generally use RIF labels anywhere that ordinary types are used, specifying confidentiality and integrity restrictions on the corresponding information. RIF labels may be known statically, or they
  may be created dynamically. In the latter case, RIF labels can be treated as first-order values. For a more complete description of how labels can be used in a Java program, please study <a href="http://www.cs.cornell.edu/jif/doc/jif-3.3.0/manual.html">
 Jif's documentation</a> (the syntax of Jif labels, and Jif's features for downgrading and authority are irrelevant for JRIF).
+</div>
 </p>
-<p>If a JRIF program is type correct, then all RIF labels used in that program are satisfied. In particular, if the value of a variable tagged with RIF label L is derived from the value of another variable tagged with L', by applying some operations, then L
+<div style="text-align:justify; font-size: 12pt;">
+If a JRIF program is type correct, then all RIF labels used in that program are satisfied. In particular, if the value of a variable tagged with RIF label L is derived from the value of another variable tagged with L', by applying some operations, then L
  should be more restrictive than L' after taking transitions that correspond to these operations. L1 is more restrictive than L2, when L1 allows less principals to read and requires more principals to be trusted, comparing to L2, for all possible derived values.
-</p>
+</div>
+
 <h2>JRIF Syntax</h2>
 <p><strong>RIF automaton:</strong> It is written as a linear representation of an automaton, by listing identified states and transitions. For example, the syntax for the c-automaton of the above figure is:
 </p>
@@ -160,5 +201,7 @@ The JRIF compiler can be found here. This package contains source code for the c
 <h2>Publication</h2>
 <a href="https://ecommons.cornell.edu/handle/1813/41194"> JRIF: Reactive Information Flow Control for Java</a> <br>
 Technical Report, October 2015
+
+</div>
 </body>
 </html>
