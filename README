@@ -13,7 +13,7 @@ sub-directories and files:
   - doc:      JRIF documentation 
   - lib:      needed JAR files
   - bin:      scripts to run the JRIF compiler
-  - examples: JRIF examples
+  - examples: JRIF examples (battleship and shared calendar)
   - rt-src:   source code for the JRIF runtime classes
   - sig-src:  JRIF signatures for standard Java classes, e.g. java.lang.Object
   - lib-src:  JRIF source code for utility classes, e.g. jif.util.List
@@ -68,7 +68,8 @@ Building JRIF
 ------------
 
 We give general instructions on how to build JRIF,
-along with particular commands (as an example) used to build JRIF in Ubuntu 14.04. These commands start with a "-".
+along with particular commands (as an example) used to build JRIF in Ubuntu 14.04.
+These commands start with a "-".
 
 Jif is compiled with the Ant build tool
 (http://jakarta.apache.org/ant).  Follow these steps to build the JRIF
@@ -147,8 +148,6 @@ and then executing: source /etc/profile .)
    pre-built (in the lib directory), and is nearly usable "out of the
    box." If you want, you can now skip step 6, which builds the Jif
    compiler, and proceed directly to step 7.
-
- - put path in build.xml
 
 6. Run ant to build the JRIF compiler, JRIF signatures for standard Java
    classes and the JRIF library code.
