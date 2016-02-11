@@ -51,7 +51,7 @@ A RIF label consists of two RIF automata; a <i>c-automaton</i> that specifies th
  \not M identifies all other operations, pi is the principal that cast this vote, P is the set of all principals, \ast identifies all operations, and the grey state represents the initial state.
 </div>
 </p>
-<img alt="some text" height="100" width="300">
+<img src="maj.png" alt="some text" height="100" width="300">
 </p>
 <div style="text-align:justify; font-size: 12pt;">
 JRIF allows programmers to tag variables with RIF labels, and generally use RIF labels anywhere that ordinary types are used, specifying confidentiality and integrity restrictions on the corresponding information. RIF labels may be known statically, or they
@@ -190,17 +190,7 @@ public void work{rif[q0*:{_}];rifi[q1*:{}]}() {
 
 }
 </pre>
-<h2>Applications</h2>
-<p><strong>Battleship:</strong> Implementation of the Battleship game in JRIF. The implementation involved adapting Jif's Battleship implementation into JRIF. The source code can be found here.
-</p>
-<p>For comparison, the Battleship implementation in Jif can be found here.</p>
-<p><strong>Shared Calendar:</strong> This application allows users to create and share events in their calendars. The implementation involves all kinds of reclassifications for both confidentiality and integrity, leading to richer RIF automata (more than 3
- states). The source code can be found here. </p>
-<h2>Software</h2>
-The JRIF compiler can be found here. This package contains source code for the compiler, the above applications, and additional test cases. It also contains a detailed account of the changes introduced in Jif to implement JRIF.
-<h2>Publication</h2>
-<a href="https://ecommons.cornell.edu/handle/1813/41194"> JRIF: Reactive Information Flow Control for Java</a> <br>
-Technical Report, October 2015
+
 
 </div>
 </body>
