@@ -79,17 +79,16 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
     }
 
     public NotNullChecker(Job job) {
-        this(job, job.extensionInfo().typeSystem(), job.extensionInfo()
-                .nodeFactory());
+        this(job, job.extensionInfo().typeSystem(),
+                job.extensionInfo().nodeFactory());
     }
 
     private FlowGraph.ExceptionEdgeKey EDGE_KEY_NPE;
 
     @Override
     public NodeVisitor begin() {
-        EDGE_KEY_NPE =
-                new FlowGraph.ExceptionEdgeKey(typeSystem()
-                        .NullPointerException());
+        EDGE_KEY_NPE = new FlowGraph.ExceptionEdgeKey(
+                typeSystem().NullPointerException());
         return super.begin();
 
     }
@@ -110,7 +109,8 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
             resultIsNotNull = false;
         }
 
-        DataFlowItem(Set<AccessPath> notNullAccessPaths, boolean resultIsNotNull) {
+        DataFlowItem(Set<AccessPath> notNullAccessPaths,
+                boolean resultIsNotNull) {
             this.notNullAccessPaths = notNullAccessPaths;
             this.resultIsNotNull = resultIsNotNull;
         }
@@ -123,21 +123,20 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
         static boolean exprIsNotNullStatic(Expr e) {
             // expression is not null if it is a "new" expression, "this"
             // or if it is a cast of a non-null expression.
-            return (e instanceof New)
-                    || (e instanceof NewArray)
-                    || (e instanceof ArrayInit)
-                    || (e instanceof Special)
+            return (e instanceof New) || (e instanceof NewArray)
+                    || (e instanceof ArrayInit) || (e instanceof Special)
                     || (e instanceof Lit && !(e instanceof NullLit))
                     || (e instanceof Binary && ((Binary) e).type().typeSystem()
                             .String().equals(((Binary) e).type()))
-                    || (e instanceof Cast && exprIsNotNullStatic(((Cast) e)
-                            .expr()))
-                    || (e instanceof DowngradeExpr && exprIsNotNullStatic(((DowngradeExpr) e)
-                            .expr()))
+                    || (e instanceof Cast
+                            && exprIsNotNullStatic(((Cast) e).expr()))
+                    || (e instanceof DowngradeExpr
+                            && exprIsNotNullStatic(((DowngradeExpr) e).expr()))
                     || (e instanceof Conditional
-                            && exprIsNotNullStatic(((Conditional) e)
-                                    .consequent()) && exprIsNotNullStatic(((Conditional) e)
-                                .alternative()));
+                            && exprIsNotNullStatic(
+                                    ((Conditional) e).consequent())
+                            && exprIsNotNullStatic(
+                                    ((Conditional) e).alternative()));
         }
 
         boolean exprIsNotNull(Expr e) {
@@ -149,11 +148,12 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
             return exprIsNotNullStatic(e)
                     || (ap != null && notNullAccessPaths.contains(ap))
                     || (e instanceof Cast && exprIsNotNull(((Cast) e).expr()))
-                    || (e instanceof DowngradeExpr && exprIsNotNull(((DowngradeExpr) e)
-                            .expr()))
-                    || (e instanceof Conditional && (exprIsNotNullStatic(((Conditional) e)
-                            .consequent()) && exprIsNotNullStatic(((Conditional) e)
-                            .alternative())));
+                    || (e instanceof DowngradeExpr
+                            && exprIsNotNull(((DowngradeExpr) e).expr()))
+                    || (e instanceof Conditional && (exprIsNotNullStatic(
+                            ((Conditional) e).consequent())
+                            && exprIsNotNullStatic(
+                                    ((Conditional) e).alternative())));
         }
 
         @Override
@@ -204,10 +204,9 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
     public Map<EdgeKey, DataFlowItem> flow(DataFlowItem trueItem,
             DataFlowItem falseItem, DataFlowItem otherItem,
             FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
-        DataFlowItem dfIn =
-                safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, falseItem,
-                        FlowGraph.EDGE_KEY_FALSE, otherItem,
-                        FlowGraph.EDGE_KEY_OTHER, peer, graph);
+        DataFlowItem dfIn = safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE,
+                falseItem, FlowGraph.EDGE_KEY_FALSE, otherItem,
+                FlowGraph.EDGE_KEY_OTHER, peer, graph);
 
         if (peer.isEntry()) {
             return itemToMap(dfIn, peer.succEdgeKeys());
@@ -218,9 +217,8 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
         if (n instanceof LocalDecl) {
             LocalDecl x = (LocalDecl) n;
             if (dfIn.exprIsNotNull(x.init()) || dfIn.resultIsNotNull) {
-                Set<AccessPath> s =
-                        addNotNull(dfIn.notNullAccessPaths,
-                                new AccessPathLocal(x.localInstance()));
+                Set<AccessPath> s = addNotNull(dfIn.notNullAccessPaths,
+                        new AccessPathLocal(x.localInstance()));
                 DataFlowItem newItem = new DataFlowItem(s, false);
                 return checkNPE(itemToMap(newItem, peer.succEdgeKeys()), n);
             }
@@ -231,9 +229,8 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
                 // f is a formal in a catch block (e.g.,
                 // try {...} catch(Exception e) {...} )
                 // and as such is never null
-                Set<AccessPath> s =
-                        addNotNull(dfIn.notNullAccessPaths,
-                                new AccessPathLocal(f.localInstance()));
+                Set<AccessPath> s = addNotNull(dfIn.notNullAccessPaths,
+                        new AccessPathLocal(f.localInstance()));
                 DataFlowItem newItem = new DataFlowItem(s, false);
                 return checkNPE(itemToMap(newItem, peer.succEdgeKeys()), n);
             }
@@ -264,8 +261,8 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
                 return checkNPE(itemToMap(newItem, peer.succEdgeKeys()), n);
             }
         } else if (n instanceof Binary
-                && (Binary.EQ.equals(((Binary) n).operator()) || Binary.NE
-                        .equals(((Binary) n).operator()))) {
+                && (Binary.EQ.equals(((Binary) n).operator())
+                        || Binary.NE.equals(((Binary) n).operator()))) {
             Binary b = (Binary) n;
             // b is an == or != expression
             if (b.left() instanceof NullLit || b.right() instanceof NullLit) {
@@ -283,14 +280,14 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
             if (trueItem == null) trueItem = dfIn;
             if (falseItem == null) falseItem = dfIn;
 
-            Map<EdgeKey, DataFlowItem> ret =
-                    flowBooleanConditions(trueItem, falseItem, dfIn, graph,
-                            peer);
+            Map<EdgeKey, DataFlowItem> ret = flowBooleanConditions(trueItem,
+                    falseItem, dfIn, graph, peer);
             if (ret == null) {
                 ret = itemToMap(false, dfIn, peer.succEdgeKeys());
             }
             return checkNPE(ret, n);
-        } else if (n instanceof DowngradeExpr && ((Expr) n).type().isBoolean()) {
+        } else
+            if (n instanceof DowngradeExpr && ((Expr) n).type().isBoolean()) {
             dfIn = new DataFlowItem(dfIn.notNullAccessPaths, false);
             if (trueItem == null) trueItem = dfIn;
             if (falseItem == null) falseItem = dfIn;
@@ -300,8 +297,8 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
         }
 
         boolean resultIsNotNull = false;
-        if ((n instanceof Conditional && dfIn.resultIsNotNull && ((Conditional) n)
-                .type().isReference())
+        if ((n instanceof Conditional && dfIn.resultIsNotNull
+                && ((Conditional) n).type().isReference())
                 || (n instanceof Expr && dfIn.exprIsNotNull((Expr) n))) {
             // the result of this expression is not null.
             resultIsNotNull = true;
@@ -495,8 +492,8 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
         } else if (n instanceof Throw) {
             Throw t = (Throw) n;
             if ((inItem != null && inItem.exprIsNotNull(t.expr()))
-                    || (inItem == null && DataFlowItem.exprIsNotNullStatic(t
-                            .expr()))) {
+                    || (inItem == null
+                            && DataFlowItem.exprIsNotNullStatic(t.expr()))) {
                 // The object thrown by this throw statement can never be
                 // null, e.g. it is a new expression, or it is a variable
                 // that is never null.
@@ -524,8 +521,8 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
     private void checkQualifier(ConstructorCall n, DataFlowItem inItem) {
         boolean neverNull = false;
         if ((inItem != null && inItem.exprIsNotNull(n.qualifier()))
-                || (inItem == null && DataFlowItem.exprIsNotNullStatic(n
-                        .qualifier()))) {
+                || (inItem == null
+                        && DataFlowItem.exprIsNotNullStatic(n.qualifier()))) {
             // the receiver is not null
             neverNull = true;
         }
@@ -535,8 +532,8 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
     private void checkQualifier(New n, DataFlowItem inItem) {
         boolean neverNull = false;
         if ((inItem != null && inItem.exprIsNotNull(n.qualifier()))
-                || (inItem == null && DataFlowItem.exprIsNotNullStatic(n
-                        .qualifier()))) {
+                || (inItem == null
+                        && DataFlowItem.exprIsNotNullStatic(n.qualifier()))) {
             // the receiver is not null
             neverNull = true;
         }
@@ -551,8 +548,8 @@ public class NotNullChecker extends DataFlow<NotNullChecker.DataFlowItem> {
         if (r instanceof Expr) {
             Expr e = (Expr) r;
             boolean neverNull = false;
-            if ((inItem != null && inItem.exprIsNotNull(e))
-                    || (inItem == null && DataFlowItem.exprIsNotNullStatic(e))) {
+            if ((inItem != null && inItem.exprIsNotNull(e)) || (inItem == null
+                    && DataFlowItem.exprIsNotNullStatic(e))) {
                 // the receiver is not null
                 neverNull = true;
             }

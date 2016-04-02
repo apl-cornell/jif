@@ -15,8 +15,8 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
-public class AmbProviderLabelNode_c extends AmbLabelNode_c implements
-        AmbProviderLabelNode {
+public class AmbProviderLabelNode_c extends AmbLabelNode_c
+        implements AmbProviderLabelNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     TypeNode typeNode;
@@ -49,8 +49,10 @@ public class AmbProviderLabelNode_c extends AmbLabelNode_c implements
         JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
         Type type = typeNode.type();
         if (!type.isClass()) {
-            throw new SemanticException("Provider label expressions can only "
-                    + "be qualified with class types.", typeNode.position());
+            throw new SemanticException(
+                    "Provider label expressions can only "
+                            + "be qualified with class types.",
+                    typeNode.position());
         }
 
         Label providerLabel =

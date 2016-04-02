@@ -74,6 +74,7 @@ public class ExtensionInfo extends JLExtensionInfo {
     }
 
     static public Set<String> topics = new LinkedHashSet<String>();
+
     static {
         topics.add("jif");
     }
@@ -101,10 +102,9 @@ public class ExtensionInfo extends JLExtensionInfo {
         try {
             LoadedClassResolver lr;
             boolean allowRaw = getJifOptions().skipLabelChecking;
-            lr =
-                    new SourceClassResolver(compiler, this, allowRaw,
-                            getOptions().compile_command_line_only,
-                            getOptions().ignore_mod_times);
+            lr = new SourceClassResolver(compiler, this, allowRaw,
+                    getOptions().compile_command_line_only,
+                    getOptions().ignore_mod_times);
             ts.initialize(lr, this);
         } catch (SemanticException e) {
             throw new InternalCompilerError(
@@ -138,9 +138,8 @@ public class ExtensionInfo extends JLExtensionInfo {
     public Parser parser(Reader reader, Source source, ErrorQueue eq) {
 
         polyglot.lex.Lexer lexer = new jif.parse.Lexer_c(reader, source, eq);
-        polyglot.parse.BaseParser grm =
-                new jif.parse.Grm(lexer, (JifTypeSystem) ts,
-                        (JifNodeFactory) nf, eq);
+        polyglot.parse.BaseParser grm = new jif.parse.Grm(lexer,
+                (JifTypeSystem) ts, (JifNodeFactory) nf, eq);
 
         return new CupParser(grm, source, eq);
     }

@@ -24,7 +24,8 @@ public class IntegProjectionPolicy_c extends Policy_c implements IntegPolicy {
 
     private final Label label;
 
-    public IntegProjectionPolicy_c(Label label, JifTypeSystem ts, Position pos) {
+    public IntegProjectionPolicy_c(Label label, JifTypeSystem ts,
+            Position pos) {
         super(ts, pos);
         this.label = label;
     }
@@ -58,8 +59,8 @@ public class IntegProjectionPolicy_c extends Policy_c implements IntegPolicy {
         if (this == o) return true;
         if (o instanceof IntegProjectionPolicy_c) {
             IntegProjectionPolicy_c that = (IntegProjectionPolicy_c) o;
-            return (this.label == that.label || (this.label != null && this.label
-                    .equals(that.label)));
+            return (this.label == that.label
+                    || (this.label != null && this.label.equals(that.label)));
         }
         return false;
     }

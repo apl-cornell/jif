@@ -21,7 +21,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>DynamicPrincipal</code> interface.
  */
-public class DynamicPrincipal_c extends Principal_c implements DynamicPrincipal {
+public class DynamicPrincipal_c extends Principal_c
+        implements DynamicPrincipal {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private final AccessPath path;

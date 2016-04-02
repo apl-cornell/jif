@@ -84,21 +84,19 @@ public abstract class LabelNode_c extends Node_c implements LabelNode {
     @Override
     public void dump(CodeWriter w) {
         if (label != null) {
-            w.write("("
-                    + StringUtil.getShortNameComponent(label.getClass()
-                            .getName()) + " ");
+            w.write("(" + StringUtil
+                    .getShortNameComponent(label.getClass().getName()) + " ");
             if (label instanceof PairLabel) {
                 PairLabel pl = (PairLabel) label;
                 ConfPolicy cp = pl.confPolicy();
                 IntegPolicy ip = pl.integPolicy();
                 w.write("{"
-                        + StringUtil.getShortNameComponent(cp.getClass()
-                                .getName())
-                        + " "
-                        + cp.toString()
-                        + ";"
-                        + StringUtil.getShortNameComponent(ip.getClass()
-                                .getName()) + " " + ip.toString() + "}" + ")");
+                        + StringUtil
+                                .getShortNameComponent(cp.getClass().getName())
+                        + " " + cp.toString() + ";"
+                        + StringUtil
+                                .getShortNameComponent(ip.getClass().getName())
+                        + " " + ip.toString() + "}" + ")");
             } else {
                 w.write(label.toString());
             }

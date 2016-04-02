@@ -207,7 +207,8 @@ public abstract class Label_c extends Param_c implements Label {
     }
 
     @Override
-    public Label subst(LabelSubstitution substitution) throws SemanticException {
+    public Label subst(LabelSubstitution substitution)
+            throws SemanticException {
         return substitution.substLabel(this);
     }
 

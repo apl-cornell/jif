@@ -40,8 +40,7 @@ public class CallToJavaExt_c extends ExprToJavaExt_c {
 
         MethodInstance mi = n.methodInstance();
         // for static methods of Jif classes, add args for the params of the class
-        if (mi.flags().isStatic()
-                && mi.container() instanceof JifSubstType
+        if (mi.flags().isStatic() && mi.container() instanceof JifSubstType
                 && rw.jif_ts().isParamsRuntimeRep(
                         ((JifSubstType) mi.container()).base())) {
             JifSubstType t = (JifSubstType) mi.container();

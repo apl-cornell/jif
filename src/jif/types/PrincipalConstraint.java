@@ -60,8 +60,8 @@ public class PrincipalConstraint extends Constraint {
             addActsforEqns(eqns, lhsPrincipal(), rhsPrincipal());
             addActsforEqns(eqns, rhsPrincipal(), lhsPrincipal());
         } else {
-            throw new InternalCompilerError("Inappropriate kind of equation: "
-                    + kind);
+            throw new InternalCompilerError(
+                    "Inappropriate kind of equation: " + kind);
         }
 
         return eqns;

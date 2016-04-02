@@ -25,8 +25,8 @@ public class JifSubstClassType_c extends SubstClassType_c<ParamInstance, Param>
         super(ts, pos, base, subst);
 
         if (!(base instanceof JifPolyType)) {
-            throw new InternalCompilerError("Cannot perform subst on \"" + base
-                    + "\".");
+            throw new InternalCompilerError(
+                    "Cannot perform subst on \"" + base + "\".");
         }
     }
 
@@ -51,8 +51,9 @@ public class JifSubstClassType_c extends SubstClassType_c<ParamInstance, Param>
             equals = false;
         else {
             equals = true;
-            for (Iterator<? extends FieldInstance> it1 = fields.iterator(), it2 =
-                    this.fields.iterator(); it1.hasNext() || it2.hasNext();) {
+            for (Iterator<? extends FieldInstance> it1 =
+                    fields.iterator(), it2 = this.fields.iterator(); it1
+                            .hasNext() || it2.hasNext();) {
                 if (!it1.hasNext() || !it2.hasNext()) {
                     equals = false;
                     break;

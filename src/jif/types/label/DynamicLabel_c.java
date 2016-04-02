@@ -118,7 +118,8 @@ public class DynamicLabel_c extends Label_c implements DynamicLabel {
     }
 
     @Override
-    public Label subst(LabelSubstitution substitution) throws SemanticException {
+    public Label subst(LabelSubstitution substitution)
+            throws SemanticException {
         AccessPath newPath = substitution.substAccessPath(path);
         if (newPath != path) {
             JifTypeSystem ts = typeSystem();

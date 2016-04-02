@@ -50,8 +50,8 @@ public class OutputExtensionInfo extends JLExtensionInfo {
         CodeGenerated output = new CodeGenerated(job) {
             @Override
             public Pass createPass(polyglot.frontend.ExtensionInfo extInfo) {
-                return new OutputPass(this, new JifTranslator(job,
-                        typeSystem(), nodeFactory(), targetFactory()));
+                return new OutputPass(this, new JifTranslator(job, typeSystem(),
+                        nodeFactory(), targetFactory()));
             }
         };
 
@@ -122,7 +122,8 @@ public class OutputExtensionInfo extends JLExtensionInfo {
         public Goal Parsed(Job job) {
             return internGoal(new SourceFileGoal(job) {
                 @Override
-                public Pass createPass(polyglot.frontend.ExtensionInfo extInfo) {
+                public Pass createPass(
+                        polyglot.frontend.ExtensionInfo extInfo) {
                     return new EmptyPass(this);
                 }
             });
@@ -133,14 +134,13 @@ public class OutputExtensionInfo extends JLExtensionInfo {
     protected void initTypeSystem() {
         try {
             LoadedClassResolver lr;
-            lr =
-                    new SourceClassResolver(compiler, this, true,
-                            getOptions().compile_command_line_only,
-                            getOptions().ignore_mod_times);
+            lr = new SourceClassResolver(compiler, this, true,
+                    getOptions().compile_command_line_only,
+                    getOptions().ignore_mod_times);
             ts.initialize(lr, this);
         } catch (SemanticException e) {
-            throw new InternalCompilerError(
-                    "Unable to initialize type system.", e);
+            throw new InternalCompilerError("Unable to initialize type system.",
+                    e);
         }
     }
 }

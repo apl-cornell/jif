@@ -116,8 +116,8 @@ public class LabelLeAssertionNode_c extends ConstraintNode_c<LabelLeAssertion>
             cs.add(ts.labelLeAssertion(position(), rhs.label(), lhs.label()));
             return (LabelLeAssertionNode_c) constraints(cs);
         }
-        return (LabelLeAssertionNode_c) constraint(ts.labelLeAssertion(
-                position(), lhs.label(), rhs.label()));
+        return (LabelLeAssertionNode_c) constraint(
+                ts.labelLeAssertion(position(), lhs.label(), rhs.label()));
 
     }
 

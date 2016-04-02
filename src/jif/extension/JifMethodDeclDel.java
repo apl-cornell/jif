@@ -36,9 +36,8 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
     @Override
     public Context enterScope(Context c) {
         JifMethodDecl jmd = (JifMethodDecl) this.node();
-        JifMethodInstance mi =
-                JifMethodDecl_c.unrenameArgs((JifMethodInstance) jmd
-                        .methodInstance());
+        JifMethodInstance mi = JifMethodDecl_c
+                .unrenameArgs((JifMethodInstance) jmd.methodInstance());
         c = c.pushCode(mi);
         addFormalsToScope(c);
         return c;
@@ -55,9 +54,8 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
                     "Method names can not contain the character '$'.");
         }
 
-        JifMethodInstance mi =
-                JifMethodDecl_c.unrenameArgs((JifMethodInstance) jmd
-                        .methodInstance());
+        JifMethodInstance mi = JifMethodDecl_c
+                .unrenameArgs((JifMethodInstance) jmd.methodInstance());
         if ("main".equals(mi.name()) && mi.flags().isStatic()) {
             // check that the class is not parameterized.
             JifClassType currClass = (JifClassType) tc.context().currentClass();
@@ -66,8 +64,8 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
                         "A parameterized class can not have a \"main\" method.",
                         "Parameterized classes cannot have a main method, as "
                                 + "the invoker of the main method has no way to specify "
-                                + "instantiations of the class parameters.", mi
-                                .position());
+                                + "instantiations of the class parameters.",
+                        mi.position());
             }
             // ensure the signature of mi is either main(String[]) or
             // main(principal, String[])
@@ -98,14 +96,14 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
                 // warn the user that there may be a potentially wrong
                 // signature
                 ErrorQueue eq = tc.errorQueue();
-                eq.enqueue(
-                        ErrorInfo.WARNING,
+                eq.enqueue(ErrorInfo.WARNING,
                         "The signature of an invocable main "
                                 + "method in a Jif class should either be "
                                 + "\"main(String[] args)\" or \"main(principal p, "
                                 + "String[] args)\" where p will be the user "
                                 + "invoking the main method. This method may have "
-                                + "an incorrect signature.", mi.position());
+                                + "an incorrect signature.",
+                        mi.position());
             }
 
             // check that the method does not have any constraints that we do not check.
@@ -129,10 +127,9 @@ public class JifMethodDeclDel extends JifProcedureDeclDel {
                         // check that callerP is the same as the first arg.
                         if (callerP instanceof DynamicPrincipal) {
                             AccessPath ap = ((DynamicPrincipal) callerP).path();
-                            callerOK =
-                                    ap instanceof AccessPathLocal
-                                            && ((AccessPathLocal) ap).name()
-                                                    .equals(principalArgName);
+                            callerOK = ap instanceof AccessPathLocal
+                                    && ((AccessPathLocal) ap).name()
+                                            .equals(principalArgName);
                         }
                     }
                     if (!callerOK) {

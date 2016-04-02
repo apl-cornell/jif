@@ -58,9 +58,8 @@ public class InstanceOfToJavaExt_c extends ToJavaExt_c {
                     ClassDeclToJavaExt_c.interfaceClassImplName(jifImplClass);
         }
         return rw.qq()
-                .parseExpr(
-                        jifImplClass + "."
-                                + ClassDeclToJavaExt_c.INSTANCEOF_METHOD_NAME
-                                + "(%LE)", (Object) args);
+                .parseExpr(jifImplClass + "."
+                        + ClassDeclToJavaExt_c.INSTANCEOF_METHOD_NAME + "(%LE)",
+                (Object) args);
     }
 }

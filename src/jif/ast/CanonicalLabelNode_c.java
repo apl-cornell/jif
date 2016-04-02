@@ -13,8 +13,8 @@ import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>CanonicalLabelNode</code> interface.
  */
-public class CanonicalLabelNode_c extends LabelNode_c implements
-        CanonicalLabelNode {
+public class CanonicalLabelNode_c extends LabelNode_c
+        implements CanonicalLabelNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
 //    @Deprecated
@@ -35,7 +35,8 @@ public class CanonicalLabelNode_c extends LabelNode_c implements
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         if (!this.label().isCanonical()) {
             // label should be canonical by the time we start typechecking.
-            throw new InternalCompilerError(this.label() + " is not canonical.");
+            throw new InternalCompilerError(
+                    this.label() + " is not canonical.");
         }
         LabelTypeCheckUtil ltcu =
                 ((JifTypeSystem) tc.typeSystem()).labelTypeCheckUtil();

@@ -44,8 +44,8 @@ public class ParamLabel_c extends Label_c implements ParamLabel {
 
     @Override
     public boolean isRuntimeRepresentable() {
-        return ((JifTypeSystem) ts).isParamsRuntimeRep(paramInstance
-                .container());
+        return ((JifTypeSystem) ts)
+                .isParamsRuntimeRep(paramInstance.container());
     }
 
     @Override

@@ -195,8 +195,8 @@ public class JifToJavaRewriter extends ContextVisitor {
         }
 
         if (jifts.isPrincipal(t)) {
-            return nf
-                    .TypeNodeFromQualifiedName(pos, jifts.PrincipalClassName());
+            return nf.TypeNodeFromQualifiedName(pos,
+                    jifts.PrincipalClassName());
         }
 
         if (t.isArray()) {
@@ -267,33 +267,28 @@ public class JifToJavaRewriter extends ContextVisitor {
      * i.e., non-public class decls.
      */
     public Node leavingSourceFile(SourceFile n) {
-        List<TopLevelDecl> l =
-                new ArrayList<TopLevelDecl>(n.decls().size()
-                        + additionalClassDecls.size());
+        List<TopLevelDecl> l = new ArrayList<TopLevelDecl>(
+                n.decls().size() + additionalClassDecls.size());
         l.addAll(n.decls());
         for (ClassDecl cd : this.additionalClassDecls) {
             if (cd.flags().isPublic()) {
                 try {
                     // cd is public, we will put it in its own source file.
                     SourceFile sf =
-                            java_nf().SourceFile(
-                                    Position.compilerGenerated(),
-                                    n.package_(),
-                                    Collections.<Import> emptyList(),
-                                    Collections
-                                            .singletonList((TopLevelDecl) cd));
+                            java_nf().SourceFile(Position.compilerGenerated(),
+                                    n.package_(), Collections
+                                            .<Import> emptyList(),
+                            Collections.singletonList((TopLevelDecl) cd));
 
                     Location location = java_ext.getOptions().source_output;
                     String pkgName = "";
                     if (sf.package_() != null)
                         pkgName = sf.package_().package_().fullName() + ".";
-                    JavaFileObject jfo =
-                            java_ext.extFileManager().getJavaFileForOutput(
-                                    location, pkgName + cd.name(), Kind.SOURCE,
-                                    null);
-                    Source s =
-                            java_ext.createFileSource(jfo,
-                                    Source.Kind.COMPILER_GENERATED);
+                    JavaFileObject jfo = java_ext.extFileManager()
+                            .getJavaFileForOutput(location, pkgName + cd.name(),
+                                    Kind.SOURCE, null);
+                    Source s = java_ext.createFileSource(jfo,
+                            Source.Kind.COMPILER_GENERATED);
                     sf = sf.source(s);
                     this.newSourceFiles.add(sf);
                 } catch (IOException e) {

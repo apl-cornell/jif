@@ -18,6 +18,7 @@ public class FieldLabelInferenceGoal extends SourceFileGoal {
         ExtensionInfo jifext = (ExtensionInfo) extInfo;
         final JifTypeSystem ts = (JifTypeSystem) jifext.typeSystem();
         final JifNodeFactory nf = (JifNodeFactory) jifext.nodeFactory();
-        return new VisitorPass(this, new FieldLabelResolver(this.job(), ts, nf));
+        return new VisitorPass(this,
+                new FieldLabelResolver(this.job(), ts, nf));
     }
 }

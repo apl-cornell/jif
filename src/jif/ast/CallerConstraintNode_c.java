@@ -31,7 +31,8 @@ public class CallerConstraintNode_c extends ConstraintNode_c<CallerConstraint>
     protected List<PrincipalNode> principals;
 
 //    @Deprecated
-    public CallerConstraintNode_c(Position pos, List<PrincipalNode> principals) {
+    public CallerConstraintNode_c(Position pos,
+            List<PrincipalNode> principals) {
         this(pos, principals, null);
     }
 

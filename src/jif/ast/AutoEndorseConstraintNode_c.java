@@ -15,9 +15,9 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 
-public class AutoEndorseConstraintNode_c extends
-        ConstraintNode_c<AutoEndorseConstraint> implements
-        AutoEndorseConstraintNode {
+public class AutoEndorseConstraintNode_c
+        extends ConstraintNode_c<AutoEndorseConstraint>
+        implements AutoEndorseConstraintNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected LabelNode endorseTo;
@@ -74,8 +74,8 @@ public class AutoEndorseConstraintNode_c extends
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (constraint() == null) {
             JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
-            return constraint(ts.autoEndorseConstraint(position(),
-                    endorseTo.label()));
+            return constraint(
+                    ts.autoEndorseConstraint(position(), endorseTo.label()));
         }
 
         return this;

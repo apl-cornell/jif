@@ -126,13 +126,12 @@ public class FieldLabelResolver extends ContextVisitor {
     private void labelCheckClassBody(ClassBody d) throws SemanticException {
         JifClassType ct = (JifClassType) context().currentClassScope();
 
-        LabelChecker lc =
-                ((ExtensionInfo) ct.typeSystem().extensionInfo())
-                        .createLabelChecker(job, true, false, false, false);
+        LabelChecker lc = ((ExtensionInfo) ct.typeSystem().extensionInfo())
+                .createLabelChecker(job, true, false, false, false);
 
         if (lc == null) {
-            throw new InternalCompilerError(
-                    "Could not label check " + ct + ".", d.position());
+            throw new InternalCompilerError("Could not label check " + ct + ".",
+                    d.position());
         }
 
         List<ClassMember> members = d.members();
@@ -161,9 +160,8 @@ public class FieldLabelResolver extends ContextVisitor {
                         bounds.boundOf((VarLabel) fi.label()));
             }
 
-            Type lbledType =
-                    ts.labeledType(f.declType().position(),
-                            ts.unlabel(f.declType()), fi.label());
+            Type lbledType = ts.labeledType(f.declType().position(),
+                    ts.unlabel(f.declType()), fi.label());
             return f.type(f.type().type(lbledType));
 
         }
@@ -171,9 +169,8 @@ public class FieldLabelResolver extends ContextVisitor {
         if (n instanceof ClassBody) {
             // need to go through the entire class body and replace the 
             // variables that we have now solved for.
-            LabelSubstitutionVisitor lsv =
-                    new LabelSubstitutionVisitor(new FieldVarLabelSubst(
-                            this.fieldVarBounds), false);
+            LabelSubstitutionVisitor lsv = new LabelSubstitutionVisitor(
+                    new FieldVarLabelSubst(this.fieldVarBounds), false);
             n = n.del().visitChildren(lsv);
 
         }

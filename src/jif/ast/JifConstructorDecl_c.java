@@ -36,8 +36,8 @@ import polyglot.visit.TypeChecker;
  */
 @Deprecated
 // XXX should be replaced with extension
-public class JifConstructorDecl_c extends ConstructorDecl_c implements
-JifConstructorDecl {
+public class JifConstructorDecl_c extends ConstructorDecl_c
+        implements JifConstructorDecl {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected LabelNode startLabel;
@@ -170,7 +170,7 @@ JifConstructorDecl {
             if (!f.isDisambiguated()) {
                 // formals are not disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal()
-                .setUnreachableThisRun();
+                        .setUnreachableThisRun();
                 return this;
             }
             formalTypes.add(f.declType());
@@ -211,7 +211,7 @@ JifConstructorDecl {
             if (!tn.isDisambiguated()) {
                 // throw types haven't been disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal()
-                .setUnreachableThisRun();
+                        .setUnreachableThisRun();
                 return this;
             }
 
@@ -230,7 +230,7 @@ JifConstructorDecl {
             if (!cn.isDisambiguated()) {
                 // constraint nodes haven't been disambiguated yet.
                 ar.job().extensionInfo().scheduler().currentGoal()
-                .setUnreachableThisRun();
+                        .setUnreachableThisRun();
                 return this;
             }
             constraints.addAll(cn.constraints());
@@ -279,7 +279,7 @@ JifConstructorDecl {
             checkFirstStmtConstructorCall(
                     "The first statement of a constructor "
                             + "of a Java class must be a constructor call.",
-                            true, false);
+                    true, false);
         } else if (!ts.isSignature(ct) && untrusted != null) {
             // If ct is a Jif class, but the super class is an
             // untrusted Java class, then the first statement of the body
@@ -291,7 +291,8 @@ JifConstructorDecl {
                     "The first statement of a constructor "
                             + "of a Jif class with an untrusted Java superclass "
                             + "must be an explicit call to the default super constructor,"
-                            + "\"super()\".", false, true);
+                            + "\"super()\".",
+                    false, true);
         } else if (!ts.isSignature(ct) && ts.isSignature(ct.superType())) {
             // this is a Jif class, but it's superclass is a trusted Java class.
             // The first statement must either be a "this(...)" constructor

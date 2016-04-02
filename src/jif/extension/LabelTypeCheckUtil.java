@@ -83,7 +83,8 @@ public class LabelTypeCheckUtil {
                         "The type of a dynamic principal must be "
                                 + "\"principal\". The type of the expression "
                                 + dp.path().exprString() + " is "
-                                + dp.path().type() + ".", principal.position());
+                                + dp.path().type() + ".",
+                        principal.position());
             }
         }
         if (principal instanceof ConjunctivePrincipal) {
@@ -122,8 +123,8 @@ public class LabelTypeCheckUtil {
                     try {
                         path.verify((JifContext) tc.context());
                     } catch (SemanticException e) {
-                        throw new SemanticException(e.getMessage(), dl
-                                .position());
+                        throw new SemanticException(e.getMessage(),
+                                dl.position());
                     }
 
                     if (!ts.isLabel(dl.path().type())) {
@@ -132,7 +133,8 @@ public class LabelTypeCheckUtil {
                                 "The type of a dynamic label must be "
                                         + "\"label\". The type of the expression "
                                         + dl.path().exprString() + " is "
-                                        + dl.path().type() + ".", dl.position());
+                                        + dl.path().type() + ".",
+                                dl.position());
                     }
                 } else if (l instanceof PairLabel) {
                     PairLabel pl = (PairLabel) l;
@@ -253,9 +255,8 @@ public class LabelTypeCheckUtil {
                     if (ts.isParamsRuntimeRep(t)) {
                         // make sure the label is runtime representable
                         if (!L.isRuntimeRepresentable()) {
-                            if (L instanceof VarLabel
-                                    && ((VarLabel) L)
-                                            .mustRuntimeRepresentable()) {
+                            if (L instanceof VarLabel && ((VarLabel) L)
+                                    .mustRuntimeRepresentable()) {
                                 // the var label has already been marked as needing to be
                                 // runtime representable, and so the solver will
                                 // make sure it is indeed runtime representable.
@@ -280,10 +281,10 @@ public class LabelTypeCheckUtil {
                 } else if (arg instanceof Principal) {
                     Principal p = (Principal) arg;
                     A = (JifContext) A.pushBlock();
-                    if (ts.isParamsRuntimeRep(t) && !p.isRuntimeRepresentable()) {
-                        if (p instanceof VarPrincipal
-                                && ((VarPrincipal) p)
-                                        .mustRuntimeRepresentable()) {
+                    if (ts.isParamsRuntimeRep(t)
+                            && !p.isRuntimeRepresentable()) {
+                        if (p instanceof VarPrincipal && ((VarPrincipal) p)
+                                .mustRuntimeRepresentable()) {
                             // the var principal has already been marked as needing to be
                             // runtime representable, and so the solver will
                             // make sure it is indeed runtime representable.
@@ -297,7 +298,8 @@ public class LabelTypeCheckUtil {
                                             + "all parameters of the type must be runtime "
                                             + "representable. The principal "
                                             + p + " is not "
-                                            + "represented at runtime.", pos);
+                                            + "represented at runtime.",
+                                    pos);
                         }
                     }
 

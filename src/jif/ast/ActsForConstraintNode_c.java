@@ -15,8 +15,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 
 public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Granter extends ActsForParam>
-        extends ConstraintNode_c<ActsForConstraint<Actor, Granter>> implements
-        ActsForConstraintNode<Actor, Granter> {
+        extends ConstraintNode_c<ActsForConstraint<Actor, Granter>>
+        implements ActsForConstraintNode<Actor, Granter> {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected ActsForParamNode<Actor> actor;
@@ -87,8 +87,8 @@ public abstract class ActsForConstraintNode_c<Actor extends ActsForParam, Grante
         return granter(this, granter);
     }
 
-    protected <N extends ActsForConstraintNode_c<Actor, Granter>> N granter(
-            N n, ActsForParamNode<Granter> granter) {
+    protected <N extends ActsForConstraintNode_c<Actor, Granter>> N granter(N n,
+            ActsForParamNode<Granter> granter) {
         if (n.granter == granter) return n;
         n = copyIfNeeded(n);
         n.granter = granter;

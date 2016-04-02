@@ -1,0 +1,8 @@
+class ConjunctTest05 {
+    void m{*<-}(principal p, principal q) {
+        final principal r = new principal(p & q);
+        int{p->} foo = 5;
+        int{r->} bar = 6;
+        bar = foo;
+    }
+}

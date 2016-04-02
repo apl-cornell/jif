@@ -67,24 +67,20 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
                         new ArrayList<Formal>(n.formals().size() + 2);
                 if (ci.container() instanceof JifPolyType) {
                     JifPolyType jpt = (JifPolyType) ci.container();
-                    formals.addAll(ClassDeclToJavaExt_c.produceParamFormals(
-                            jpt, rw));
+                    formals.addAll(
+                            ClassDeclToJavaExt_c.produceParamFormals(jpt, rw));
                 }
                 formals.addAll(n.formals());
-                n =
-                        rw.java_nf().ConstructorDecl(n.position(), n.flags(),
-                                n.id(), formals, n.throwTypes(), n.body(),
-                                n.javadoc());
+                n = rw.java_nf().ConstructorDecl(n.position(), n.flags(),
+                        n.id(), formals, n.throwTypes(), n.body(), n.javadoc());
                 n = n.constructorInstance(null);
                 retVal = n;
             } else {
                 // it's a non-Jif class that doesn't represent parameters
                 // at runtime.
                 NodeFactory nf = rw.java_nf();
-                retVal =
-                        nf.ConstructorDecl(n.position(), n.flags(), n.id(),
-                                n.formals(), n.throwTypes(), n.body(),
-                                n.javadoc());
+                retVal = nf.ConstructorDecl(n.position(), n.flags(), n.id(),
+                        n.formals(), n.throwTypes(), n.body(), n.javadoc());
             }
         } else {
             retVal = jifClassConstructorDecl(rw, n);
@@ -94,7 +90,8 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
         return retVal;
     }
 
-    private Node jifClassConstructorDecl(JifToJavaRewriter rw, ConstructorDecl n) {
+    private Node jifClassConstructorDecl(JifToJavaRewriter rw,
+            ConstructorDecl n) {
         NodeFactory nf = rw.java_nf();
         ConstructorInstance ci = n.constructorInstance();
         ClassType ct = ci.container().toClass();
@@ -103,12 +100,11 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
         List<Stmt> inits = new ArrayList<Stmt>(3);
 
         // add a call to the initializer.
-        inits.add(rw.qq().parseStmt(
-                "this." + ClassDeclToJavaExt_c.INITIALIZATIONS_METHOD_NAME
-                + "();"));
+        inits.add(rw.qq().parseStmt("this."
+                + ClassDeclToJavaExt_c.INITIALIZATIONS_METHOD_NAME + "();"));
 
-        if (body.statements().isEmpty()
-                || (body.statements().size() == 1 && body.statements().get(0) instanceof Empty)) {
+        if (body.statements().isEmpty() || (body.statements().size() == 1
+                && body.statements().get(0) instanceof Empty)) {
             // no body to add...
         } else {
 
@@ -140,8 +136,7 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
                         // it's a super call.
                         // check that it's the default constructor
                         if (cc.arguments().size() != numSuperParams) {
-                            throw new InternalCompilerError(
-                                    body.position(),
+                            throw new InternalCompilerError(body.position(),
                                     "Expected super constructor call to be the "
                                             + "default constructor as we have a "
                                             + "Jif class with a non-Jif superclass: "
@@ -170,16 +165,14 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
 
         body = jifConstructorBody(rw, body);
 
-        Id name =
-                nf.Id(n.position(),
-                        ClassDeclToJavaExt_c.constructorTranslatedName(ct));
+        Id name = nf.Id(n.position(),
+                ClassDeclToJavaExt_c.constructorTranslatedName(ct));
 
         TypeNode tn = rw.jif_nf().CanonicalTypeNode(n.position(), ct);
         tn = (TypeNode) tn.visit(rw);
 
-        MethodDecl m =
-                nf.MethodDecl(n.position(), n.flags(), tn, name, n.formals(),
-                        n.throwTypes(), body, n.javadoc());
+        MethodDecl m = nf.MethodDecl(n.position(), n.flags(), tn, name,
+                n.formals(), n.throwTypes(), body, n.javadoc());
         m = m.methodInstance(null);
 
         return m;

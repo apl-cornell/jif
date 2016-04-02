@@ -160,7 +160,8 @@ public class JifOptions extends Options {
         } else if (arg.flag().ids().contains("-fail-on-exception")) {
             fatalExceptions = (Boolean) arg.value();
         } else if (arg.flag().ids().contains("-robust")) {
-            nonRobustness = !(Boolean) arg.value();
+            if ((Boolean) arg.value())
+              nonRobustness = false;
         } else if (arg.flag().ids().contains("-sigcp")) {
             this.sigcp.clear();
             this.sigcp.addAll((List<File>) arg.value());

@@ -25,8 +25,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /** An implementation of the <tt>AmbDynamicLabel</tt> interface. */
-public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements
-        AmbDynamicLabelNode {
+public class AmbDynamicLabelNode_c extends AmbLabelNode_c
+        implements AmbDynamicLabelNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Expr expr;
@@ -103,8 +103,7 @@ public class AmbDynamicLabelNode_c extends AmbLabelNode_c implements
 
             // previous line should throw an exception, but throw this just to
             // be safe.
-            throw new SemanticDetailedException(
-                    "Illegal dynamic label.",
+            throw new SemanticDetailedException("Illegal dynamic label.",
                     "Only final access paths or label expressions can be used as a dynamic label. "
                             + "A final access path is an expression starting with either \"this\" or a final "
                             + "local variable \"v\", followed by zero or more final field accesses. That is, "

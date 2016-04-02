@@ -11,7 +11,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>UnknownPrincipal</code> interface. 
  */
-public class UnknownPrincipal_c extends Principal_c implements UnknownPrincipal {
+public class UnknownPrincipal_c extends Principal_c
+        implements UnknownPrincipal {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public UnknownPrincipal_c(JifTypeSystem ts, Position pos) {

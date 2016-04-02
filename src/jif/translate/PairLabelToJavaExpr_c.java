@@ -57,13 +57,11 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
             ReaderPolicy policy = (ReaderPolicy) p;
             Expr owner = rw.principalToJava(policy.owner());
             Expr reader = rw.principalToJava(policy.reader());
-            return (Expr) rw
-                    .qq()
+            return (Expr) rw.qq()
                     .parseExpr(rw.runtimeLabelUtil() + ".readerPolicy(%E, %E)",
                             owner, reader)
-                    .position(
-                            Position.compilerGenerated(p.toString() + ":"
-                                    + p.position().toString()));
+                    .position(Position.compilerGenerated(
+                            p.toString() + ":" + p.position().toString()));
         }
 
         if (p instanceof JoinPolicy_c) {

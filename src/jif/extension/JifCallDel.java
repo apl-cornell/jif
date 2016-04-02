@@ -75,7 +75,8 @@ public class JifCallDel extends JifDel_c implements CallOps {
 
     public boolean targetIsNeverNull() {
         Receiver r = ((Call) node()).target();
-        return (r instanceof Special || isNPEfatal || isTargetNeverNull || r instanceof CanonicalTypeNode);
+        return (r instanceof Special || isNPEfatal || isTargetNeverNull
+                || r instanceof CanonicalTypeNode);
     }
 
     /**
@@ -158,31 +159,27 @@ public class JifCallDel extends JifDel_c implements CallOps {
         Expr receiverExpr = null;
         if (c.target() instanceof Expr) {
             receiverExpr = (Expr) c.target();
-            del.receiverVarLabel =
-                    ts.freshLabelVariable(c.position(), "receiver",
-                            "label of receiver of call " + c.toString());
+            del.receiverVarLabel = ts.freshLabelVariable(c.position(),
+                    "receiver", "label of receiver of call " + c.toString());
         }
         del.argVarLabels = new ArrayList<VarLabel>(c.arguments().size());
         for (int i = 0; i < c.arguments().size(); i++) {
             Expr arg = c.arguments().get(i);
-            VarLabel argLbl =
-                    ts.freshLabelVariable(arg.position(), "arg" + (i + 1)
-                            + "label", "label of arg " + (i + 1) + " of call "
-                            + c.toString());
+            VarLabel argLbl = ts.freshLabelVariable(arg.position(),
+                    "arg" + (i + 1) + "label",
+                    "label of arg " + (i + 1) + " of call " + c.toString());
             del.argVarLabels.add(argLbl);
         }
 
         if (ts.unlabel(mi.container()) instanceof JifSubstType) {
             JifSubstType jst = (JifSubstType) ts.unlabel(mi.container());
-            del.paramVarLabels =
-                    new ArrayList<VarLabel>(jst.instantiatedFrom().formals()
-                            .size());
+            del.paramVarLabels = new ArrayList<VarLabel>(
+                    jst.instantiatedFrom().formals().size());
 
             for (Param param : jst.actuals()) {
-                VarLabel paramLbl =
-                        ts.freshLabelVariable(param.position(), "param_"
-                                + param + "_label", "label of param " + param
-                                + " of call " + c.toString());
+                VarLabel paramLbl = ts.freshLabelVariable(param.position(),
+                        "param_" + param + "_label",
+                        "label of param " + param + " of call " + c.toString());
                 del.paramVarLabels.add(paramLbl);
             }
         } else {
@@ -190,12 +187,12 @@ public class JifCallDel extends JifDel_c implements CallOps {
         }
         Type t = mi.returnType();
 
-        Type retType =
-                JifInstantiator.instantiate(t, A, receiverExpr, mi.container(),
-                        del.receiverVarLabel, CallHelper
-                                .getArgLabelsFromFormalTypes(mi.formalTypes(),
-                                        ts, mi.position()), mi.formalTypes(),
-                        del.argVarLabels, c.arguments(), del.paramVarLabels);
+        Type retType = JifInstantiator.instantiate(t, A, receiverExpr,
+                mi.container(), del.receiverVarLabel,
+                CallHelper.getArgLabelsFromFormalTypes(mi.formalTypes(), ts,
+                        mi.position()),
+                mi.formalTypes(), del.argVarLabels, c.arguments(),
+                del.paramVarLabels);
 
         c = (Call) c.type(retType);
         return c;

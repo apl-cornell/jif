@@ -9,8 +9,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>JifLocalInstance</code> interface.
  */
-public class JifLocalInstance_c extends LocalInstance_c implements
-        JifLocalInstance {
+public class JifLocalInstance_c extends LocalInstance_c
+        implements JifLocalInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Label label;

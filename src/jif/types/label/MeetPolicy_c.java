@@ -25,8 +25,8 @@ import polyglot.util.SerialVersionUID;
 
 /** Represents the meet of a number of policies. 
  */
-public abstract class MeetPolicy_c<P extends Policy> extends Policy_c implements
-        MeetPolicy<P> {
+public abstract class MeetPolicy_c<P extends Policy> extends Policy_c
+        implements MeetPolicy<P> {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private final Set<P> meetComponents;

@@ -8,14 +8,14 @@ import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
 
-public class ActsForConstraintToJavaExpr_c implements
-        ActsForConstraintToJavaExpr {
+public class ActsForConstraintToJavaExpr_c
+        implements ActsForConstraintToJavaExpr {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
     public <Actor extends ActsForParam, Granter extends ActsForParam> Expr toJava(
             ActsForConstraint<Actor, Granter> actsFor, JifToJavaRewriter rw)
-            throws SemanticException {
+                    throws SemanticException {
         JifTypeSystem ts = rw.jif_ts();
         Expr actor = actsFor.actor().toJava(rw);
         Expr granter = actsFor.granter().toJava(rw);

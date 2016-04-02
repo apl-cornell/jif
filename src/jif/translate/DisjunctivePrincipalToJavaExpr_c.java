@@ -21,10 +21,9 @@ public class DisjunctivePrincipalToJavaExpr_c extends PrincipalToJavaExpr_c {
             if (e == null) {
                 e = pe;
             } else {
-                e =
-                        rw.qq().parseExpr(
-                                ts.PrincipalUtilClassName()
-                                        + ".disjunction(%E, %E)", pe, e);
+                e = rw.qq().parseExpr(
+                        ts.PrincipalUtilClassName() + ".disjunction(%E, %E)",
+                        pe, e);
             }
         }
         return e;

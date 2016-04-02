@@ -27,8 +27,7 @@ public class InformationFlowTrace {
         String dirstr = "";
         if (dir == Direction.IN) dirstr = "in";
         if (dir == Direction.BOTH) dirstr = "in/out";
-        return "Label " + lblflows.toString() + "flows " + dirstr
-                + " variable " + varlbl.name() + " according to constraint"
-                + equ.toString();
+        return "Label " + lblflows.toString() + "flows " + dirstr + " variable "
+                + varlbl.name() + " according to constraint" + equ.toString();
     }
 }

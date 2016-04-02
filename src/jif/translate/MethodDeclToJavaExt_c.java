@@ -73,10 +73,8 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
         }
 
         formals.addAll(n.formals());
-        n =
-                rw.java_nf().MethodDecl(n.position(), n.flags(),
-                        n.returnType(), n.id(), formals, n.throwTypes(),
-                        n.body(), n.javadoc());
+        n = rw.java_nf().MethodDecl(n.position(), n.flags(), n.returnType(),
+                n.id(), formals, n.throwTypes(), n.body(), n.javadoc());
         n = n.methodInstance(null);
 
         if (isMainMethod) {
@@ -100,13 +98,11 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
 
         JifTypeSystem jifTs = rw.jif_ts();
         TypeNode type = rw.qq().parseType(jifTs.PrincipalClassName());
-        Expr init =
-                rw.qq().parseExpr(
-                        jifTs.RuntimePackageName() + ".Runtime.user(null)");
+        Expr init = rw.qq()
+                .parseExpr(jifTs.RuntimePackageName() + ".Runtime.user(null)");
 
-        Stmt declPrincipal =
-                rw.java_nf().LocalDecl(origBody.position(), Flags.FINAL, type,
-                        formal0.id(), init);
+        Stmt declPrincipal = rw.java_nf().LocalDecl(origBody.position(),
+                Flags.FINAL, type, formal0.id(), init);
 
         // Translate the constraints and use them to guard the body.
         Block newBody = guardWithConstraints(rw, origBody);
@@ -114,10 +110,8 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
         newBody =
                 rw.java_nf().Block(origBody.position(), declPrincipal, newBody);
 
-        n =
-                rw.java_nf().MethodDecl(n.position(), n.flags(),
-                        n.returnType(), n.id(), formalList, n.throwTypes(),
-                        newBody);
+        n = rw.java_nf().MethodDecl(n.position(), n.flags(), n.returnType(),
+                n.id(), formalList, n.throwTypes(), newBody);
         n = n.methodInstance(null);
         return n;
     }
@@ -150,13 +144,13 @@ public class MethodDeclToJavaExt_c extends ToJavaExt_c {
         }
 
         if (guard == null) return b;
-        Expr errorMessage =
-                nf.StringLit(pos, "The method " + mi.debugString()
-                        + " has constraints that are unsatisfied.");
+        Expr errorMessage = nf.StringLit(pos, "The method " + mi.debugString()
+                + " has constraints that are unsatisfied.");
         Stmt error =
-                nf.Throw(pos, nf.New(pos,
-                        nf.CanonicalTypeNode(pos, rw.java_ts().Error()),
-                        Collections.singletonList(errorMessage)));
+                nf.Throw(pos,
+                        nf.New(pos,
+                                nf.CanonicalTypeNode(pos, rw.java_ts().Error()),
+                                Collections.singletonList(errorMessage)));
         return nf.Block(pos, nf.If(pos, guard, b, error));
     }
 }

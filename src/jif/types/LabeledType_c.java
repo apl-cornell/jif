@@ -28,8 +28,8 @@ public class LabeledType_c extends Type_c implements LabeledType {
         this.typePart = typePart;
         this.labelPart = labelPart;
         if (typePart == null || labelPart == null) {
-            throw new InternalCompilerError("Null args: " + typePart + " and "
-                    + labelPart);
+            throw new InternalCompilerError(
+                    "Null args: " + typePart + " and " + labelPart);
         }
     }
 

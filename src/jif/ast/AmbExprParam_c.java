@@ -146,9 +146,7 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam {
             if (!ts.isFinalAccessExprOrConst(expr, ts.Principal())) {
                 throw new SemanticDetailedException(
                         "Illegal principal parameter.",
-                        "The expression "
-                                + expr
-                                + " is not suitable as a "
+                        "The expression " + expr + " is not suitable as a "
                                 + "principal parameter. Principal parameters can be either "
                                 + "dynamic principals, or principal expressions, such as a "
                                 + "principal parameter, or an external principal.",
@@ -158,11 +156,8 @@ public class AmbExprParam_c extends Node_c implements AmbExprParam {
                     ts.exprToPrincipal(ts, expr, c));
         }
         if (!ts.isFinalAccessExprOrConst(expr, ts.Label())) {
-            throw new SemanticDetailedException(
-                    "Illegal label parameter.",
-                    "The expression "
-                            + expr
-                            + " is not suitable as a "
+            throw new SemanticDetailedException("Illegal label parameter.",
+                    "The expression " + expr + " is not suitable as a "
                             + "label parameter. Label parameters can be either "
                             + "dynamic labels, or label expressions.",
                     this.position());

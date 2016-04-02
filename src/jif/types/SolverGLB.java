@@ -68,8 +68,8 @@ public class SolverGLB extends AbstractSolver {
             changeable = ((PrincipalEquation) eqn).lhs().variables();
             awakeable = ((PrincipalEquation) eqn).rhs().variables();
         } else {
-            throw new InternalCompilerError("Unexpected kind of equation "
-                    + eqn);
+            throw new InternalCompilerError(
+                    "Unexpected kind of equation " + eqn);
         }
 
         for (Variable v : changeable) {
@@ -137,8 +137,8 @@ public class SolverGLB extends AbstractSolver {
         boolean isSingleVar = (rhsVariables.size() == 1);
         VarLabel singleVar = null;
         if (isSingleVar) singleVar = (VarLabel) rhsVariables.get(0);
-        if (isSingleVar
-                && (!isFixedValueVar(singleVar) || eqn.constraint().kind() == LabelConstraint.EQUAL)) {
+        if (isSingleVar && (!isFixedValueVar(singleVar)
+                || eqn.constraint().kind() == LabelConstraint.EQUAL)) {
             // only a single component is a variable
             refineVariableEquation(singleVar, eqn, true);
         } else {
@@ -177,12 +177,10 @@ public class SolverGLB extends AbstractSolver {
                 refineVariableEquation(comp, eqn, false);
 
                 // check that the equation is now satisfied.
-                Label lhsbound =
-                        triggerTransforms(bounds().applyTo(eqn.lhs()),
-                                eqn.env());
-                Label rhsbound =
-                        triggerTransforms(bounds().applyTo(eqn.rhs()),
-                                eqn.env());
+                Label lhsbound = triggerTransforms(bounds().applyTo(eqn.lhs()),
+                        eqn.env());
+                Label rhsbound = triggerTransforms(bounds().applyTo(eqn.rhs()),
+                        eqn.env());
 
                 try {
                     if (eqn.env().leq(lhsbound, rhsbound) && search(eqn)) {
@@ -239,8 +237,8 @@ public class SolverGLB extends AbstractSolver {
         boolean isSingleVar = (lhsVariables.size() == 1);
         VarPrincipal singleVar = null;
         if (isSingleVar) singleVar = (VarPrincipal) lhsVariables.get(0);
-        if (isSingleVar
-                && (!isFixedValueVar(singleVar) || eqn.constraint().kind() == PrincipalConstraint.EQUIV)) {
+        if (isSingleVar && (!isFixedValueVar(singleVar)
+                || eqn.constraint().kind() == PrincipalConstraint.EQUIV)) {
             // only a single component is a variable
             refineVariableEquation(singleVar, eqn);
         } else {
@@ -293,7 +291,8 @@ public class SolverGLB extends AbstractSolver {
     protected boolean allActivesAreMultiVarRHS() {
         for (Equation eqn : getQueue()) {
             if (eqn instanceof LabelEquation) {
-                if (((LabelEquation) eqn).rhs().variableComponents().size() <= 1) {
+                if (((LabelEquation) eqn).rhs().variableComponents()
+                        .size() <= 1) {
                     return false;
                 }
             }
@@ -327,7 +326,8 @@ public class SolverGLB extends AbstractSolver {
         if (shouldReport(4))
             report(4, "JOIN (" + v + ", NEEDED) := " + newBound);
 
-        if (v.mustRuntimeRepresentable() && !newBound.isRuntimeRepresentable()) {
+        if (v.mustRuntimeRepresentable()
+                && !newBound.isRuntimeRepresentable()) {
             Label rtRep = eqn.env().findNonArgLabelUpperBound(newBound);
             if (shouldReport(4))
                 report(4, "RUNTIME_REPR (" + newBound + ") := " + rtRep);
@@ -346,7 +346,8 @@ public class SolverGLB extends AbstractSolver {
     /**
      * Raise the bound on the label variable v, which is a component of the equation eqn.
      */
-    protected void refineVariableEquation(VarPrincipal v, PrincipalEquation eqn) {
+    protected void refineVariableEquation(VarPrincipal v,
+            PrincipalEquation eqn) {
         Principal vBound = bounds().boundOf(v);
         Principal lhsBound = bounds().applyTo(eqn.lhs());
         Principal rhsBound = bounds().applyTo(eqn.rhs());
@@ -404,7 +405,8 @@ public class SolverGLB extends AbstractSolver {
         }
     }
 
-    protected ConfPolicy findNeeded(ConfPolicy lhs, ConfPolicy rhs, LabelEnv env) {
+    protected ConfPolicy findNeeded(ConfPolicy lhs, ConfPolicy rhs,
+            LabelEnv env) {
         if (lhs instanceof JoinPolicy_c) {
             @SuppressWarnings("unchecked")
             JoinPolicy_c<ConfPolicy> jp = (JoinPolicy_c<ConfPolicy>) lhs;
@@ -549,9 +551,8 @@ public class SolverGLB extends AbstractSolver {
         if (c.lhsLabel().variableComponents().size() == 1) {
             // The LHS is has a single VarLabel, so we may be able to find
             // an equation that contradicts this one.
-            VarLabel v =
-                    (VarLabel) c.lhsLabel().variableComponents().iterator()
-                            .next();
+            VarLabel v = (VarLabel) c.lhsLabel().variableComponents().iterator()
+                    .next();
             return findTrace(v, bounds().applyTo(c.rhsLabel()), false);
         }
         // TODO: could try some other ways to find contradictive

@@ -35,7 +35,7 @@ public class PathMap {
     }
 
     public PathMap set(Path p, Label L) {
-        PathMap n = new PathMap(ts);
+        PathMap n = ts.pathMap();
         n.map.putAll(map);
 
         if (L instanceof NotTaken) {
@@ -102,7 +102,7 @@ public class PathMap {
     }
 
     public PathMap join(PathMap m) {
-        PathMap n = new PathMap(ts);
+        PathMap n = ts.pathMap();
         n.map.putAll(map);
 
         // Iterate over the elements of X, joining those labels with the ones
@@ -118,7 +118,7 @@ public class PathMap {
     }
 
     public PathMap subst(LabelSubstitution subst) throws SemanticException {
-        PathMap n = new PathMap(ts);
+        PathMap n = ts.pathMap();
 
         for (Map.Entry<Path, Label> e : map.entrySet()) {
             Path p = e.getKey();
@@ -130,7 +130,7 @@ public class PathMap {
     }
 
     public PathMap subst(VarMap bounds) {
-        PathMap n = new PathMap(ts);
+        PathMap n = ts.pathMap();
 
         for (Map.Entry<Path, Label> e : map.entrySet()) {
             Path p = e.getKey();

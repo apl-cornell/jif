@@ -24,9 +24,8 @@ public class JifNewArrayDel extends JifDel_c {
             // strip off the label of the base type, and replace them with variables, and
             // replace the array types with array types that are both const and non-const
             JifTypeSystem ts = (JifTypeSystem) tc.typeSystem();
-            na =
-                    (NewArray) na.type(JifArrayInitDel.relabelBaseType(na
-                            .type().toArray(), ts));
+            na = (NewArray) na.type(
+                    JifArrayInitDel.relabelBaseType(na.type().toArray(), ts));
 
         }
         return na;
@@ -49,7 +48,8 @@ public class JifNewArrayDel extends JifDel_c {
             }
         } catch (SemanticException e) {
             throw new InternalCompilerError(
-                    "Cannot find class java.lang.NegativeArraySizeException", e);
+                    "Cannot find class java.lang.NegativeArraySizeException",
+                    e);
         }
         return l;
     }
@@ -73,7 +73,8 @@ public class JifNewArrayDel extends JifDel_c {
             if (fatalExceptions.contains(nase)) setNoNegArraySizeExcThrown();
         } catch (SemanticException e) {
             throw new InternalCompilerError(
-                    "Cannot find class java.lang.NegativeArraySizeException", e);
+                    "Cannot find class java.lang.NegativeArraySizeException",
+                    e);
         }
     }
 }

@@ -25,8 +25,8 @@ import polyglot.util.SerialVersionUID;
 
 /** Represents a join of a number of policies. 
  */
-public abstract class JoinPolicy_c<P extends Policy> extends Policy_c implements
-        JoinPolicy<P> {
+public abstract class JoinPolicy_c<P extends Policy> extends Policy_c
+        implements JoinPolicy<P> {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private final Set<P> joinComponents;

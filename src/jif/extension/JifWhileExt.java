@@ -38,18 +38,11 @@ public class JifWhileExt extends JifStmtExt_c {
 
         Label notTaken = ts.notTaken();
 
-        Label L1 =
-                ts.freshLabelVariable(
-                        ws.position(),
-                        "while",
-                        "label of PC for the while statement at "
-                                + ws.position());
-        Label L2 =
-                ts.freshLabelVariable(
-                        ws.position(),
-                        "while",
-                        "label of PC for end of the while statement at "
-                                + ws.position());
+        Label L1 = ts.freshLabelVariable(ws.position(), "while",
+                "label of PC for the while statement at " + ws.position());
+        Label L2 = ts.freshLabelVariable(ws.position(), "while",
+                "label of PC for end of the while statement at "
+                        + ws.position());
         Label loopEntryPC = A.pc();
 
         A = (JifContext) A.pushBlock();
@@ -73,14 +66,14 @@ public class JifWhileExt extends JifStmtExt_c {
         lc.constrain(
                 new NamedLabel("while_body.N",
                         "label of normal termination of the loop body", Xs.N())
-                        .join(lc,
-                                "loop_entry_pc",
-                                "label of the program counter just before the loop is executed",
-                                loopEntryPC), LabelConstraint.LEQ,
+                                .join(lc, "loop_entry_pc",
+                                        "label of the program counter just before the loop is executed",
+                                        loopEntryPC),
+                LabelConstraint.LEQ,
                 new NamedLabel("loop_pc",
                         "label of the program counter at the top of the loop",
-                        L1), A.labelEnv(), ws.position(), false,
-                new ConstraintMessage() {
+                        L1),
+                A.labelEnv(), ws.position(), false, new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "The information revealed by the normal "

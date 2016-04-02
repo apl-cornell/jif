@@ -35,20 +35,16 @@ public class FieldDeclToJavaExt_c extends ToJavaExt_c {
             Expr init = n.init();
             if (init instanceof ArrayInit) {
                 Type base = fi.type().toArray().base();
-                init =
-                        rw.java_nf().NewArray(
-                                Position.compilerGenerated(),
-                                rw.typeToJava(base,
-                                        Position.compilerGenerated()), 1,
-                                        (ArrayInit) init);
+                init = rw.java_nf().NewArray(Position.compilerGenerated(),
+                        rw.typeToJava(base, Position.compilerGenerated()), 1,
+                        (ArrayInit) init);
             }
             rw.addInitializer(fi, init);
             n = n.init(null);
         }
 
-        n =
-                rw.java_nf().FieldDecl(n.position(), n.flags(), n.type(),
-                        n.id(), n.init(), n.javadoc());
+        n = rw.java_nf().FieldDecl(n.position(), n.flags(), n.type(), n.id(),
+                n.init(), n.javadoc());
         if (n.init() == null && n.flags().isFinal()) {
             // Strip "final" to allow translated constructor to assign to it.
             n = n.flags(n.flags().clear(Flags.FINAL));

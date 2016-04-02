@@ -9,7 +9,8 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy {
     private final Principal owner;
     private final Principal writer;
 
-    public WriterPolicy(LabelUtil labelUtil, Principal owner, Principal writer) {
+    public WriterPolicy(LabelUtil labelUtil, Principal owner,
+            Principal writer) {
         super(labelUtil);
         this.owner = owner;
         this.writer = writer;
@@ -91,12 +92,12 @@ public class WriterPolicy extends AbstractPolicy implements IntegPolicy {
 
         WriterPolicy policy = (WriterPolicy) o;
 
-        if (owner == policy.owner
-                || (owner != null && owner.equals(policy.owner)
-                        && policy.owner != null && policy.owner.equals(owner))) {
+        if (owner == policy.owner || (owner != null
+                && owner.equals(policy.owner) && policy.owner != null
+                && policy.owner.equals(owner))) {
             return (writer == policy.writer || (writer != null
-                    && writer.equals(policy.writer) && policy.writer != null && policy.writer
-                        .equals(writer)));
+                    && writer.equals(policy.writer) && policy.writer != null
+                    && policy.writer.equals(writer)));
         }
 
         return false;

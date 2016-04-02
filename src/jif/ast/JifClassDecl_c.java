@@ -83,7 +83,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
     }
 
     @Override
-    public JifClassDecl constraints(List<ConstraintNode<Assertion>> constraints) {
+    public JifClassDecl constraints(
+            List<ConstraintNode<Assertion>> constraints) {
         return constraints(this, constraints);
     }
 
@@ -186,7 +187,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
                         (ActsForConstraint<ActsForParam, ActsForParam>) constraint;
                 ActsForParam actor = pi.actor();
                 ActsForParam granter = pi.granter();
-                if (actor instanceof Principal && granter instanceof Principal) {
+                if (actor instanceof Principal
+                        && granter instanceof Principal) {
                     A.addActsFor((Principal) actor, (Principal) granter);
                 } else if (actor instanceof Label) {
                     A.addActsFor((Label) actor, (Principal) granter);
@@ -199,8 +201,9 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
                 LabelLeAssertion lle = (LabelLeAssertion) constraint;
                 A.addAssertionLE(lle.lhs(), lle.rhs());
             } else {
-                throw new InternalCompilerError("Unexpected assertion type: "
-                        + constraint, constraint.position());
+                throw new InternalCompilerError(
+                        "Unexpected assertion type: " + constraint,
+                        constraint.position());
             }
         }
 
@@ -330,7 +333,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
 
         if (!authority.isEmpty()) {
             w.write(" authority(");
-            for (Iterator<PrincipalNode> i = authority.iterator(); i.hasNext();) {
+            for (Iterator<PrincipalNode> i = authority.iterator(); i
+                    .hasNext();) {
                 PrincipalNode p = i.next();
                 print(p, w, tr);
                 if (i.hasNext()) {

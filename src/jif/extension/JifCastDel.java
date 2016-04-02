@@ -58,13 +58,13 @@ public class JifCastDel extends JifDel_c implements JifPreciseClassDel {
         }
 
         if (!ts.isParamsRuntimeRep(castType)) {
-            if ((castType instanceof JifSubstType && !((JifSubstType) castType)
-                    .actuals().isEmpty())
-                    || (castType instanceof JifPolyType && !((JifPolyType) castType)
-                            .params().isEmpty()))
-                throw new SemanticException("Cannot cast to " + castType
-                        + ", since it does "
-                        + "not represent the parameters at runtime.",
+            if ((castType instanceof JifSubstType
+                    && !((JifSubstType) castType).actuals().isEmpty())
+                    || (castType instanceof JifPolyType
+                            && !((JifPolyType) castType).params().isEmpty()))
+                throw new SemanticException(
+                        "Cannot cast to " + castType + ", since it does "
+                                + "not represent the parameters at runtime.",
                         c.position());
         }
 
@@ -78,9 +78,8 @@ public class JifCastDel extends JifDel_c implements JifPreciseClassDel {
             //XXX: Allow cast to array. Print warning?
         }
 
-        this.isToSubstJifClass =
-                (castType instanceof JifSubstType && !((JifSubstType) castType)
-                        .actuals().isEmpty());
+        this.isToSubstJifClass = (castType instanceof JifSubstType
+                && !((JifSubstType) castType).actuals().isEmpty());
 
         ts.labelTypeCheckUtil().typeCheckType(tc, castType);
         return super.typeCheck(tc);
@@ -138,9 +137,8 @@ public class JifCastDel extends JifDel_c implements JifPreciseClassDel {
         if (ts.equalsNoStrip(castType, exprType)) {
             return true;
         }
-        if (castType instanceof JifClassType
-                && SubtypeChecker.polyTypeForClass((JifClassType) castType)
-                        .params().isEmpty()) {
+        if (castType instanceof JifClassType && SubtypeChecker
+                .polyTypeForClass((JifClassType) castType).params().isEmpty()) {
             // cast type is not parameterized.
             if (!(exprType instanceof JifClassType)
                     || SubtypeChecker.polyTypeForClass((JifClassType) exprType)

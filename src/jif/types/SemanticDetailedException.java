@@ -36,8 +36,10 @@ public class SemanticDetailedException extends SemanticException {
         super(m, cause);
     }
 
-    public SemanticDetailedException(String m, String detailed, Throwable cause) {
-        super(((JifOptions) Options.global).explainErrors ? detailed : m, cause);
+    public SemanticDetailedException(String m, String detailed,
+            Throwable cause) {
+        super(((JifOptions) Options.global).explainErrors ? detailed : m,
+                cause);
     }
 
     public SemanticDetailedException(String m, String detailed,

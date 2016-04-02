@@ -173,7 +173,8 @@ public class PairLabel_c extends Label_c implements PairLabel {
     }
 
     @Override
-    public Label subst(LabelSubstitution substitution) throws SemanticException {
+    public Label subst(LabelSubstitution substitution)
+            throws SemanticException {
         PairLabel lbl = this;
         if (substitution.recurseIntoChildren(lbl)) {
             ConfPolicy newCP =

@@ -68,6 +68,7 @@ public class JifConditionalExt extends JifExprExt {
 
         PathMap X = Xe.N(ts.notTaken()).join(Xt).join(Xf);
 
-        return updatePathMap(te.cond(cond).consequent(cons).alternative(alt), X);
+        return updatePathMap(te.cond(cond).consequent(cons).alternative(alt),
+                X);
     }
 }

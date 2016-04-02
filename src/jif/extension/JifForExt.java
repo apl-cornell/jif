@@ -67,14 +67,11 @@ public class JifForExt extends JifStmtExt_c {
         }
 
         // Now handle the loop body, condition, and iterators.
-        Label L1 =
-                ts.freshLabelVariable(fs.position(), "for",
-                        "label of PC for the for statement at "
-                                + node().position());
-        Label L2 =
-                ts.freshLabelVariable(fs.position(), "for",
-                        "label of PC for end of the for statement at "
-                                + node().position());
+        Label L1 = ts.freshLabelVariable(fs.position(), "for",
+                "label of PC for the for statement at " + node().position());
+        Label L2 = ts.freshLabelVariable(fs.position(), "for",
+                "label of PC for end of the for statement at "
+                        + node().position());
 
         A = (JifContext) A.pushBlock();
         Label loopEntryPC = A.pc();
@@ -118,15 +115,15 @@ public class JifForExt extends JifStmtExt_c {
 
         lc.constrain(
                 new NamedLabel("for_body.N",
-                        "label of normal termination of the loop body", Xbody
-                                .N())
-                        .join(lc,
-                                "loop_entry_pc",
+                        "label of normal termination of the loop body",
+                        Xbody.N()).join(lc, "loop_entry_pc",
                                 "label of the program counter just before the loop is executed",
-                                loopEntryPC), LabelConstraint.LEQ,
+                                loopEntryPC),
+                LabelConstraint.LEQ,
                 new NamedLabel("loop_pc",
                         "label of the program counter at the top of the loop",
-                        L1), lc.context().labelEnv(), fs.position(), false,
+                        L1),
+                lc.context().labelEnv(), fs.position(), false,
                 new ConstraintMessage() {
                     @Override
                     public String msg() {
@@ -161,7 +158,7 @@ public class JifForExt extends JifStmtExt_c {
         // Compute the path map for "init ; loop"
         PathMap X = Xinit.N(notTaken).join(Xloop);
 
-        return updatePathMap(
-                fs.iters(iters).cond(cond).inits(inits).body(body), X);
+        return updatePathMap(fs.iters(iters).cond(cond).inits(inits).body(body),
+                X);
     }
 }

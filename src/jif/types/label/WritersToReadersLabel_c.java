@@ -21,13 +21,14 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>DynamicLabel</code> interface.
  */
-public class WritersToReadersLabel_c extends Label_c implements
-        WritersToReadersLabel {
+public class WritersToReadersLabel_c extends Label_c
+        implements WritersToReadersLabel {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     final Label label;
 
-    public WritersToReadersLabel_c(Label label, JifTypeSystem ts, Position pos) {
+    public WritersToReadersLabel_c(Label label, JifTypeSystem ts,
+            Position pos) {
         super(ts, pos, new CannotLabelToJavaExpr_c());
         this.label = label;
         setDescription("finds an upper bound of " + label
@@ -113,7 +114,8 @@ public class WritersToReadersLabel_c extends Label_c implements
     }
 
     @Override
-    public Label subst(LabelSubstitution substitution) throws SemanticException {
+    public Label subst(LabelSubstitution substitution)
+            throws SemanticException {
         WritersToReadersLabel lbl = this;
         if (substitution.recurseIntoChildren(lbl)) {
             Label newLabel = lbl.label().subst(substitution);
@@ -165,8 +167,8 @@ public class WritersToReadersLabel_c extends Label_c implements
             return ts.joinLabel(label.position(), comps);
         }
 
-        throw new InternalCompilerError("WritersToReaders undefined " + "for "
-                + label);
+        throw new InternalCompilerError(
+                "WritersToReaders undefined " + "for " + label);
     }
 
     protected static ConfPolicy transformIntegToConf(IntegPolicy pol) {

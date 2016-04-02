@@ -63,8 +63,7 @@ public final class ConjunctivePrincipal implements Principal {
     public boolean isAuthorized(Object authPrf, Closure closure, Label lb,
             boolean executeNow) {
         for (Principal p : conjuncts) {
-            if (!p.isAuthorized(authPrf, closure, lb, executeNow))
-                return false;
+            if (!p.isAuthorized(authPrf, closure, lb, executeNow)) return false;
         }
         // all conjuncts authorize the closure.
         return true;

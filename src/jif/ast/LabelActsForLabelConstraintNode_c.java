@@ -5,9 +5,9 @@ import polyglot.ast.Ext;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-public class LabelActsForLabelConstraintNode_c extends
-        ActsForConstraintNode_c<Label, Label> implements
-        LabelActsForLabelConstraintNode {
+public class LabelActsForLabelConstraintNode_c
+        extends ActsForConstraintNode_c<Label, Label>
+        implements LabelActsForLabelConstraintNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
 //    @Deprecated

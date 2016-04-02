@@ -14,11 +14,13 @@ import jif.types.JifProcedureInstance;
 import jif.types.JifTypeSystem;
 import jif.types.LabelConstraint;
 import jif.types.NamedLabel;
+import jif.types.Path;
 import jif.types.PrincipalConstraint;
 import jif.types.Solver;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.Label;
 import jif.types.principal.Principal;
+
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -199,7 +201,7 @@ public class LabelChecker implements Copy {
 
     public void constrain(NamedLabel lhs, LabelConstraint.Kind kind,
             NamedLabel rhs, LabelEnv env, Position pos, ConstraintMessage msg)
-            throws SemanticException {
+                    throws SemanticException {
         constrain(lhs, kind, rhs, env, pos, true, msg);
     }
 
@@ -214,7 +216,7 @@ public class LabelChecker implements Copy {
 
     public void constrain(NamedLabel lhs, LabelConstraint.Kind kind,
             NamedLabel rhs, LabelEnv env, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         constrain(lhs, kind, rhs, env, pos, false, null);
     }
 
@@ -224,13 +226,13 @@ public class LabelChecker implements Copy {
 
     public void constrain(Principal p, Constraint.Kind kind, Principal q,
             LabelEnv env, Position pos, ConstraintMessage msg)
-            throws SemanticException {
+                    throws SemanticException {
         constrain(p, kind, q, env, pos, msg, true);
     }
 
     public void constrain(Principal p, Constraint.Kind kind, Principal q,
             LabelEnv env, Position pos, ConstraintMessage msg, boolean report)
-            throws SemanticException {
+                    throws SemanticException {
         PrincipalConstraint c =
                 new PrincipalConstraint(p, kind, q, env, pos, msg, report);
         if (msg != null) msg.setConstraint(c);
@@ -252,10 +254,9 @@ public class LabelChecker implements Copy {
      */
     public void constrain(NamedLabel label, Principal p, LabelEnv env,
             Position pos, ConstraintMessage msg, boolean report)
-            throws SemanticException {
-        NamedLabel principalLabel =
-                new NamedLabel(p.toString(), "RHS of actsfor constraint", p
-                        .typeSystem().toLabel(p));
+                    throws SemanticException {
+        NamedLabel principalLabel = new NamedLabel(p.toString(),
+                "RHS of actsfor constraint", p.typeSystem().toLabel(p));
         constrain(label, LabelConstraint.LEQ, principalLabel, env, pos, report,
                 msg);
     }
@@ -280,8 +281,8 @@ public class LabelChecker implements Copy {
     public void enteringMethod(MethodInstance mi) {
         if (solvePerMethod) {
             // solving by method. Set a new solver for the method body
-            this.solver =
-                    ts.createSolver(mi.container().toString() + "." + mi.name());
+            this.solver = ts
+                    .createSolver(mi.container().toString() + "." + mi.name());
         }
     }
 
@@ -363,4 +364,11 @@ public class LabelChecker implements Copy {
         return CallHelper.OverrideHelper(overridden, overriding, this);
     }
 
+    /**
+     * Helper function that can be overriden to indicate if a path is to be
+     * ignored for the single path rule (such as the NV path).
+     */
+    public boolean ignoredForSinglePathRule(Path p) {
+      return p.equals(Path.NV);
+    }
 }

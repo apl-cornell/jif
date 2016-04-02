@@ -16,8 +16,8 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-public class DisjunctivePrincipal_c extends Principal_c implements
-        DisjunctivePrincipal {
+public class DisjunctivePrincipal_c extends Principal_c
+        implements DisjunctivePrincipal {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private final Set<Principal> disjuncts;
@@ -27,8 +27,8 @@ public class DisjunctivePrincipal_c extends Principal_c implements
         super(ts, pos, toJava);
         this.disjuncts = new LinkedHashSet<Principal>(disjuncts);
         if (disjuncts.size() < 2) {
-            throw new InternalCompilerError("DisjunctivePrincipal should "
-                    + "have at least 2 members");
+            throw new InternalCompilerError(
+                    "DisjunctivePrincipal should " + "have at least 2 members");
         }
     }
 

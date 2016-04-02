@@ -51,7 +51,7 @@ import polyglot.util.Position;
 
 /**
  * The wrapper of a set of assumptions that can be used to decide
- * whether L1 &lt;= L2. 
+ * whether L1 &lt;= L2.
  */
 public class LabelEnv_c implements LabelEnv {
     protected final PrincipalHierarchy ph;
@@ -77,8 +77,8 @@ public class LabelEnv_c implements LabelEnv {
     /**
      * Topics to report
      */
-    protected static Collection<String> topics = CollectionUtil.list(
-            Topics.jif, Topics.labelEnv);
+    protected static Collection<String> topics =
+            CollectionUtil.list(Topics.jif, Topics.labelEnv);
 
     public LabelEnv_c(JifTypeSystem ts, boolean useCache) {
         this(ts, new PrincipalHierarchy(), new LinkedList<LabelLeAssertion>(),
@@ -89,7 +89,8 @@ public class LabelEnv_c implements LabelEnv {
     protected LabelEnv_c(JifTypeSystem ts, PrincipalHierarchy ph,
             List<LabelLeAssertion> assertions, String displayLabelAssertions,
             boolean hasVariables, boolean useCache,
-            Map<AccessPath, AccessPath> accessPathEquivReps, LabelEnv_c parent) {
+            Map<AccessPath, AccessPath> accessPathEquivReps,
+            LabelEnv_c parent) {
         this.ph = ph;
         this.labelAssertions = assertions;
         this.accessPathEquivReps = accessPathEquivReps;
@@ -181,7 +182,7 @@ public class LabelEnv_c implements LabelEnv {
                 added = addAssertionLE(L1, cmp, false) || added;
             }
         } else {
-            // don't bother adding the assertion if we already know 
+            // don't bother adding the assertion if we already know
             // L1 is less than L2. However, if it has variables, we
             // need to add it regardless.
             if (L1.hasVariables() || L2.hasVariables()
@@ -216,11 +217,12 @@ public class LabelEnv_c implements LabelEnv {
     }
 
     public LabelEnv_c copy() {
-        return new LabelEnv_c(ts, ph.copy(), new LinkedList<LabelLeAssertion>(
-                labelAssertions), displayLabelAssertions.toString(),
-                hasVariables, useCache,
+        return new LabelEnv_c(ts, ph.copy(),
+                new LinkedList<LabelLeAssertion>(labelAssertions),
+                displayLabelAssertions.toString(), hasVariables, useCache,
                 new LinkedHashMap<AccessPath, AccessPath>(
-                        this.accessPathEquivReps), this);
+                        this.accessPathEquivReps),
+                this);
     }
 
     @Override
@@ -240,7 +242,8 @@ public class LabelEnv_c implements LabelEnv {
         }
 
         if (pathp != null && pathq != null
-                && equivalentAccessPaths(pathp, pathq)) return true;
+                && equivalentAccessPaths(pathp, pathq))
+            return true;
 
         return (ph.actsFor(p, q));
     }
@@ -263,7 +266,7 @@ public class LabelEnv_c implements LabelEnv {
     }
 
     /**
-     * Returns the representative of the equivalence class of p. 
+     * Returns the representative of the equivalence class of p.
      * Provided p is not-null, returns a not-null value.
      */
     private AccessPath findAccessPathRepr(AccessPath p) {
@@ -309,8 +312,8 @@ public class LabelEnv_c implements LabelEnv {
      * Cache the results of leq(Label, Label, SearchState), when we are
      * using assertions only. Note that the rest of the
      * search state contains only information for pruning the search,
-     * and so we can ignore it and consider only L1 and L2 when caching 
-     * the results. 
+     * and so we can ignore it and consider only L1 and L2 when caching
+     * the results.
      */
     private final Set<LeqGoal> cacheTrue;
     private final Set<LeqGoal> cacheFalse;
@@ -369,19 +372,18 @@ public class LabelEnv_c implements LabelEnv {
         }
     }
 
-    /** 
+    /**
      * Recursive implementation of L1 <= L2.
      */
     @Override
     public boolean leq(Label L1, Label L2, SearchState state) {
         if (!useCache || !((SearchState_c) state).useAssertions
                 || this.hasVariables()) {
-            if (Report.should_report(topics, 3))
-                Report.report(3, "Not using cache for " + L1 + " <= " + L2
-                        + " : useCache = " + useCache
-                        + "; state.useAssertions = "
-                        + ((SearchState_c) state).useAssertions
-                        + "; this.hasVariables() = " + this.hasVariables());
+            if (Report.should_report(topics, 3)) Report.report(3,
+                    "Not using cache for " + L1 + " <= " + L2 + " : useCache = "
+                            + useCache + "; state.useAssertions = "
+                            + ((SearchState_c) state).useAssertions
+                            + "; this.hasVariables() = " + this.hasVariables());
             return leqImpl(L1, L2, (SearchState_c) state);
         }
 
@@ -457,11 +459,10 @@ public class LabelEnv_c implements LabelEnv {
         }
 
         if (!L1.isComparable() || !L2.isComparable()) {
-            if (Report.should_report(topics, 3))
-                Report.report(3, "Goal " + L1 + " <= " + L2
-                        + " already on goal stack");
-            throw new InternalCompilerError("Cannot compare " + L1 + " with "
-                    + L2 + ".");
+            if (Report.should_report(topics, 3)) Report.report(3,
+                    "Goal " + L1 + " <= " + L2 + " already on goal stack");
+            throw new InternalCompilerError(
+                    "Cannot compare " + L1 + " with " + L2 + ".");
         }
 
         // do some easy tests firsts.
@@ -469,16 +470,15 @@ public class LabelEnv_c implements LabelEnv {
         //if (L2.isBottom()) return false;
 
         if (L2.isTop()) return true;
-        if (L1.isTop()) return false;
+        //if (L1.isTop()) return false;
 
         // check the current goals, to make sure we don't go into an infinite
         // recursion...
         LeqGoal newGoal = new LeqGoal(L1, L2);
         if (state.containsGoal(newGoal)) {
             // already have this subgoal on the stack
-            if (Report.should_report(topics, 3))
-                Report.report(3, "Goal " + L1 + " <= " + L2
-                        + " already on goal stack");
+            if (Report.should_report(topics, 3)) Report.report(3,
+                    "Goal " + L1 + " <= " + L2 + " already on goal stack");
             return false;
         }
         state = new SearchState_c(auc, state, newGoal);
@@ -487,13 +487,13 @@ public class LabelEnv_c implements LabelEnv {
 
         // L1 <= L2 if for all components of L1, there is one component
         // of L2 that is greater.  We need to filter out all L1, and L2
-        // that are not enumerable.        
+        // that are not enumerable.
         if (!L1.isEnumerable()) {
             return L1.leq_(L2, this, state);
         }
         if (!L1.isEnumerable() || !L2.isEnumerable()) {
-            throw new InternalCompilerError("Cannot compare " + L1 + " <= "
-                    + L2);
+            throw new InternalCompilerError(
+                    "Cannot compare " + L1 + " <= " + L2);
         }
 
         if (L2 instanceof MeetLabel) {
@@ -510,7 +510,7 @@ public class LabelEnv_c implements LabelEnv {
             if (allSat) return true;
         }
         if (L2 instanceof JoinLabel) {
-            // L1 <= c1 join ... join cn if there exists a cj 
+            // L1 <= c1 join ... join cn if there exists a cj
             // such that L1 <= cj
             JoinLabel jl = (JoinLabel) L2;
             for (Label cj : jl.joinComponents()) {
@@ -558,13 +558,13 @@ public class LabelEnv_c implements LabelEnv {
     /**
      * Breaks PairLabel L1 into smaller components to see if L1 <= L2.
      * Returns true if successfully discover that L1 <= L2, false otherwise.
-     * 
+     *
      * More precisely, given L1 = {o_1->r_1 ; ... ; o_m->r_m ; p_1<-w_1 ; ... ; p_n<-w_n},
      * this method will return true if
      *    {o_i->r_i ; *<-*} <= L2 for all i in 1..m
      *  and
      *    {_<-_ ; p_j<-w_j} <= L2 for all j in 1..n.
-     * 
+     *
      * @param L1 a PairLabel
      * @param L2 any label (shouldn't be a PairLabel)
      * @return
@@ -573,11 +573,12 @@ public class LabelEnv_c implements LabelEnv {
         ConfPolicy cp = L1.confPolicy();
         IntegPolicy ip = L1.integPolicy();
 
-        if ((!(cp instanceof JoinConfPolicy_c) && !(ip instanceof JoinIntegPolicy_c))
+        if ((!(cp instanceof JoinConfPolicy_c)
+                && !(ip instanceof JoinIntegPolicy_c))
                 || (cp.isSingleton() && ip.isSingleton())) {
-            // either cp and ip are both not Join Policies, or they are 
+            // either cp and ip are both not Join Policies, or they are
             // both singletons, i.e., cannot be decomposed.
-            // nothing we can do to help here 
+            // nothing we can do to help here
             return false;
         }
 
@@ -649,7 +650,8 @@ public class LabelEnv_c implements LabelEnv {
             boolean beSmart) {
         AssertionUseCount auc = state.auc;
         if (!state.useAssertions || auc.size() >= ASSERTION_TOTAL_BOUND
-                || auc.accessPathSize() > EQUIV_PATH_TOTAL_BOUND) return false;
+                || auc.accessPathSize() > EQUIV_PATH_TOTAL_BOUND)
+            return false;
         if (Report.should_report(topics, 2))
             Report.report(2, "Applying assertions for " + L1 + " <= " + L2);
 
@@ -668,9 +670,8 @@ public class LabelEnv_c implements LabelEnv {
             if (cRHS.hasVariables()) {
                 cRHS = this.solver.applyBoundsTo(c.rhs());
             }
-            if (Report.should_report(topics, 4))
-                Report.report(4, "Considering assertion " + c + " for " + L1
-                        + " <= " + L2);
+            if (Report.should_report(topics, 4)) Report.report(4,
+                    "Considering assertion " + c + " for " + L1 + " <= " + L2);
 
 //            if (beSmart) {
 //                boolean useConstraint = false;
@@ -687,14 +688,13 @@ public class LabelEnv_c implements LabelEnv {
 //                }
 //            }
             if (beSmart) {
-                // only use assertions that match one or the other of our labels                
+                // only use assertions that match one or the other of our labels
                 if (!L1.equals(cLHS) && !L2.equals(cRHS)) {
                     continue;
                 }
             }
-            if (Report.should_report(topics, 3))
-                Report.report(3, "Trying assertion " + c + " for " + L1
-                        + " <= " + L2);
+            if (Report.should_report(topics, 3)) Report.report(3,
+                    "Trying assertion " + c + " for " + L1 + " <= " + L2);
             if (leq(L1, cLHS, newState) && leq(cRHS, L2, newState)) {
                 return true;
             }
@@ -715,9 +715,8 @@ public class LabelEnv_c implements LabelEnv {
                 }
                 AssertionUseCount newAUC = new AssertionUseCount(auc, ea);
                 SearchState newState = new SearchState_c(newAUC, state, null);
-                Label equiv =
-                        ts.dynamicLabel(Position.compilerGenerated(),
-                                p2.subst(p2root, p));
+                Label equiv = ts.dynamicLabel(Position.compilerGenerated(),
+                        p2.subst(p2root, p));
                 if (leq(L1, equiv, newState)) {
                     return true;
                 }
@@ -737,9 +736,8 @@ public class LabelEnv_c implements LabelEnv {
                 }
                 AssertionUseCount newAUC = new AssertionUseCount(auc, ea);
                 SearchState newState = new SearchState_c(newAUC, state, null);
-                Label equiv =
-                        ts.dynamicLabel(Position.compilerGenerated(),
-                                p1.subst(p1root, p));
+                Label equiv = ts.dynamicLabel(Position.compilerGenerated(),
+                        p1.subst(p1root, p));
                 if (leq(equiv, L2, newState)) {
                     return true;
                 }
@@ -753,8 +751,8 @@ public class LabelEnv_c implements LabelEnv {
 
     @Override
     public boolean leq(Policy p1, Policy p2) {
-        return leq(p1.simplify(), p2.simplify(), new SearchState_c(
-                new AssertionUseCount()));
+        return leq(p1.simplify(), p2.simplify(),
+                new SearchState_c(new AssertionUseCount()));
     }
 
     @Override
@@ -793,7 +791,7 @@ public class LabelEnv_c implements LabelEnv {
                 }
             }
         } else if (p2 instanceof MeetPolicy_c) {
-            // for all elements ci of p2 we require p1 <= ci             
+            // for all elements ci of p2 we require p1 <= ci
             @SuppressWarnings("unchecked")
             MeetPolicy_c<ConfPolicy> mp = (MeetPolicy_c<ConfPolicy>) p2;
             boolean allSat = true;
@@ -873,8 +871,8 @@ public class LabelEnv_c implements LabelEnv {
             // cant do anything.
             return L;
         }
-        if (noArgLabels
-                && (L instanceof DynamicLabel || L instanceof ParamLabel || L instanceof CovariantParamLabel)) {
+        if (noArgLabels && (L instanceof DynamicLabel || L instanceof ParamLabel
+                || L instanceof CovariantParamLabel)) {
             // good enough
             return L;
         }
@@ -891,9 +889,8 @@ public class LabelEnv_c implements LabelEnv {
             JoinLabel jl = (JoinLabel) L;
             Label ret = ts.bottomLabel();
             for (Label comp : jl.joinComponents()) {
-                ret =
-                        ts.join(ret,
-                                this.findLowerBound(comp, newSeen, noArgLabels));
+                ret = ts.join(ret,
+                        this.findLowerBound(comp, newSeen, noArgLabels));
             }
             allBounds.add(ret);
         }
@@ -901,9 +898,8 @@ public class LabelEnv_c implements LabelEnv {
             MeetLabel ml = (MeetLabel) L;
             Label ret = ts.topLabel();
             for (Label comp : ml.meetComponents()) {
-                ret =
-                        ts.meet(ret,
-                                this.findLowerBound(comp, newSeen, noArgLabels));
+                ret = ts.meet(ret,
+                        this.findLowerBound(comp, newSeen, noArgLabels));
             }
             allBounds.add(ret);
         }
@@ -924,9 +920,8 @@ public class LabelEnv_c implements LabelEnv {
         }
 
         if (L instanceof ArgLabel) {
-            if (Report.should_report(topics, 4))
-                Report.report(4, "ArgLabel " + L
-                        + " does not have a non-trivial lower bound");
+            if (Report.should_report(topics, 4)) Report.report(4, "ArgLabel "
+                    + L + " does not have a non-trivial lower bound");
             return ts.bottomLabel();
         }
 
@@ -937,9 +932,8 @@ public class LabelEnv_c implements LabelEnv {
             } else {
                 lowerBound = ts.joinLabel(L.position(), allBounds);
             }
-            if (Report.should_report(topics, 4))
-                Report.report(4, "Using " + lowerBound + " as lower bound for "
-                        + L);
+            if (Report.should_report(topics, 4)) Report.report(4,
+                    "Using " + lowerBound + " as lower bound for " + L);
             return lowerBound;
         }
 
@@ -974,8 +968,8 @@ public class LabelEnv_c implements LabelEnv {
             // cant do anything.
             return L;
         }
-        if (noArgLabels
-                && (L instanceof DynamicLabel || L instanceof ParamLabel || L instanceof CovariantParamLabel)) {
+        if (noArgLabels && (L instanceof DynamicLabel || L instanceof ParamLabel
+                || L instanceof CovariantParamLabel)) {
             // good enough
             return L;
         }
@@ -991,9 +985,8 @@ public class LabelEnv_c implements LabelEnv {
             JoinLabel jl = (JoinLabel) L;
             Label ret = ts.bottomLabel();
             for (Label comp : jl.joinComponents()) {
-                ret =
-                        ts.join(ret,
-                                this.findUpperBound(comp, newSeen, noArgLabels));
+                ret = ts.join(ret,
+                        this.findUpperBound(comp, newSeen, noArgLabels));
             }
             allBounds.add(ret);
         }
@@ -1001,9 +994,8 @@ public class LabelEnv_c implements LabelEnv {
             MeetLabel ml = (MeetLabel) L;
             Label ret = ts.topLabel();
             for (Label comp : ml.meetComponents()) {
-                ret =
-                        ts.meet(ret,
-                                this.findUpperBound(comp, newSeen, noArgLabels));
+                ret = ts.meet(ret,
+                        this.findUpperBound(comp, newSeen, noArgLabels));
             }
             allBounds.add(ret);
         }
@@ -1026,10 +1018,10 @@ public class LabelEnv_c implements LabelEnv {
         if (L instanceof ArgLabel) {
             ArgLabel al = (ArgLabel) L;
             // we want to make sure that we don't end up recursing.
-            // Check that al.upperbound() is not recursively defined.            
+            // Check that al.upperbound() is not recursively defined.
             if (!argLabelBoundRecursive(al)) {
-                allBounds.add(findUpperBound(al.upperBound(), newSeen,
-                        noArgLabels));
+                allBounds.add(
+                        findUpperBound(al.upperBound(), newSeen, noArgLabels));
             }
         }
 
@@ -1040,9 +1032,8 @@ public class LabelEnv_c implements LabelEnv {
             } else {
                 upperBound = ts.meetLabel(L.position(), allBounds);
             }
-            if (Report.should_report(topics, 4))
-                Report.report(4, "Using " + upperBound + " as upper bound for "
-                        + L);
+            if (Report.should_report(topics, 4)) Report.report(4,
+                    "Using " + upperBound + " as upper bound for " + L);
             return upperBound;
         }
 
@@ -1106,12 +1097,12 @@ public class LabelEnv_c implements LabelEnv {
     }
 
     /**
-     * Returns a Map of Strings to List[String]s which is the descriptions of any 
-     * components that appear in the environment. This map is used for verbose 
-     * output to the user, to help explain the meaning of constraints and 
+     * Returns a Map of Strings to List[String]s which is the descriptions of any
+     * components that appear in the environment. This map is used for verbose
+     * output to the user, to help explain the meaning of constraints and
      * labels.
-     * 
-     * Seen components is a Set of Labels whose definitions will not be 
+     *
+     * Seen components is a Set of Labels whose definitions will not be
      * displayed.
      */
     @Override
@@ -1164,13 +1155,13 @@ public class LabelEnv_c implements LabelEnv {
 
     /**
      * Trigger the transformation of WritersToReaders labels. Not guaranteed
-     * to remove all writersToReaders labels. 
+     * to remove all writersToReaders labels.
      */
     @Override
     public Label triggerTransforms(Label label) {
         LabelSubstitution subst = new LabelSubstitution() {
             /**
-             * @throws SemanticException  
+             * @throws SemanticException
              */
             @Override
             public Label substLabel(Label L) throws SemanticException {
@@ -1190,7 +1181,7 @@ public class LabelEnv_c implements LabelEnv {
     }
 
     /**
-     * Class used to keep track of how many times each constraint has been used 
+     * Class used to keep track of how many times each constraint has been used
      * during the search to solve label inequality.
      */
     private static class AssertionUseCount {

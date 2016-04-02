@@ -63,7 +63,8 @@ public class PrincipalEquation extends Equation {
 
     @Override
     public Object copy() {
-        return new PrincipalEquation(lhs, rhs, (PrincipalConstraint) constraint);
+        return new PrincipalEquation(lhs, rhs,
+                (PrincipalConstraint) constraint);
     }
 
     public PrincipalConstraint principalConstraint() {

@@ -24,9 +24,8 @@ public class LocalDeclToJavaExt_c extends ToJavaExt_c {
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
         LocalDecl n = (LocalDecl) node();
         LocalInstance li = n.localInstance();
-        n =
-                rw.java_nf().LocalDecl(n.position(), n.flags(), n.type(),
-                        n.id(), n.init());
+        n = rw.java_nf().LocalDecl(n.position(), n.flags(), n.type(), n.id(),
+                n.init());
         return n.localInstance(li);
     }
 }

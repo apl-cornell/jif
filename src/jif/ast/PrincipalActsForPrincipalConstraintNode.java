@@ -13,6 +13,6 @@ import jif.types.principal.Principal;
  * a procedure header.
  * </p>
  */
-public interface PrincipalActsForPrincipalConstraintNode extends
-        ActsForConstraintNode<Principal, Principal> {
+public interface PrincipalActsForPrincipalConstraintNode
+        extends ActsForConstraintNode<Principal, Principal> {
 }

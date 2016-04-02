@@ -15,6 +15,7 @@ import jif.types.label.ArgLabel;
 import jif.types.label.Label;
 import jif.types.label.ThisLabel;
 import jif.visit.LabelChecker;
+
 import polyglot.ast.Block;
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
@@ -71,9 +72,8 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c {
             // Now, check the body of the method in the new context.
 
             // join the provider label into the pc
+            initContextForBody(lc, mi);
             A = lc.context();
-            Label providerAndPc = ts.join(A.currentCodePCBound(), A.provider());
-            A.setCurrentCodePCBound(providerAndPc);
 
             // Visit only the body, not the formal parameters.
             body = (Block) lc.context(A).labelCheck(mn.body());
@@ -100,6 +100,17 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c {
     }
 
     /**
+     * Set up context for checking the body.  Factored out to allow for
+     * overidding in extensions like Fabric.
+     */
+    protected void initContextForBody(LabelChecker lc, JifMethodInstance mi) {
+        JifContext A = lc.context();
+        JifTypeSystem ts = lc.jifTypeSystem();
+        Label providerAndPc = ts.join(A.currentCodePCBound(), A.provider());
+        A.setCurrentCodePCBound(providerAndPc);
+    }
+
+    /**
      * This method checks that covariant labels are not used in contravariant
      * positions.
      * @throws SemanticDetailedException
@@ -121,9 +132,7 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c {
                     "The pc bound of a method "
                             + "can not be the covariant label " + Li + ".",
                     "The pc bound of a method "
-                            + "can not be the covariant label "
-                            + Li
-                            + ". "
+                            + "can not be the covariant label " + Li + ". "
                             + "Otherwise, information may be leaked by casting the "
                             + "low-parameter class to a high-parameter class, and masking "
                             + "the low side-effects that invoking the method may cause.",
@@ -141,16 +150,12 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c {
             if (argBj.isCovariant()) {
                 String name = mn.formals().get(index).name();
                 throw new SemanticDetailedException(
-                        "The method "
-                                + "argument "
-                                + name
+                        "The method " + "argument " + name
                                 + " can not be labeled with the covariant label "
                                 + argBj + ".",
-                        "The method argument "
-                                + name
+                        "The method argument " + name
                                 + " can not be labeled with the covariant label "
-                                + argBj
-                                + ". "
+                                + argBj + ". "
                                 + "Otherwise, information may be leaked by casting the "
                                 + "low-parameter class to a high-parameter class, and calling "
                                 + "the method with a high security parameter, which the "
@@ -224,12 +229,15 @@ public class JifMethodDeclExt extends JifProcedureDeclExt_c {
 //              "not satisfy the constraint.",
 //              errPosition);
             } else if (L.isCovariant()) {
-                throw new SemanticDetailedException("Covariant labels "
-                        + "can not occur on the right hand side of "
-                        + "a label constraint.", "Covariant labels "
-                        + "can not occur on the right hand side of "
-                        + "a label constraint, since subclasses may "
-                        + "not satisfy the constraint.", errPosition);
+                throw new SemanticDetailedException(
+                        "Covariant labels "
+                                + "can not occur on the right hand side of "
+                                + "a label constraint.",
+                        "Covariant labels "
+                                + "can not occur on the right hand side of "
+                                + "a label constraint, since subclasses may "
+                                + "not satisfy the constraint.",
+                        errPosition);
             }
             return L;
         }

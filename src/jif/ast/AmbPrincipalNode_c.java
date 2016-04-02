@@ -36,8 +36,8 @@ import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>AmbPrincipalNode</code> interface.
  */
-public class AmbPrincipalNode_c extends PrincipalNode_c implements
-        AmbPrincipalNode {
+public class AmbPrincipalNode_c extends PrincipalNode_c
+        implements AmbPrincipalNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Expr expr;
@@ -146,15 +146,13 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
                 && !ts.isFinalAccessExprOrConst(expr, ts.Principal())) {
             // illegal dynamic principal. But try to convert it to an access path
             // to allow a more precise error message.
-            AccessPath ap =
-                    ts.exprToAccessPath(expr, ts.Principal(),
-                            (JifContext) ar.context());
+            AccessPath ap = ts.exprToAccessPath(expr, ts.Principal(),
+                    (JifContext) ar.context());
             ap.verify((JifContext) ar.context());
 
             // previous line should throw an exception, but throw this just to
             // be safe.
-            throw new SemanticDetailedException(
-                    "Illegal dynamic principal.",
+            throw new SemanticDetailedException("Illegal dynamic principal.",
                     "Only final access paths or principal expressions can be used as a dynamic principal. "
                             + "A final access path is an expression starting with either \"this\" or a final "
                             + "local variable \"v\", followed by zero or more final field accesses. That is, "
@@ -167,8 +165,7 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
         // the expression type may not yet be fully determined, but
         // that's ok, as type checking will ensure that it is
         // a suitable expression.
-        return nf.CanonicalPrincipalNode(
-                position(),
+        return nf.CanonicalPrincipalNode(position(),
                 ts.dynamicPrincipal(position(), ts.exprToAccessPath(expr,
                         ts.Principal(), (JifContext) ar.context())));
     }
@@ -208,14 +205,13 @@ public class AmbPrincipalNode_c extends PrincipalNode_c implements
         JifNodeFactory nf = (JifNodeFactory) sc.nodeFactory();
 
         if (vi.flags().isFinal()) {
-            return nf.CanonicalPrincipalNode(
-                    position(),
+            return nf.CanonicalPrincipalNode(position(),
                     ts.dynamicPrincipal(position(),
                             ts.varInstanceToAccessPath(vi, this.position())));
         }
 
-        throw new SemanticException(vi + " is not a final variable "
-                + "of type \"principal\".");
+        throw new SemanticException(
+                vi + " is not a final variable " + "of type \"principal\".");
     }
 
     /**

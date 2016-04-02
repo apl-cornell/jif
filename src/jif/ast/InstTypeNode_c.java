@@ -33,8 +33,8 @@ import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>InstTypeNode</code> interface.
  */
-public class InstTypeNode_c extends TypeNode_c implements InstTypeNode,
-        Ambiguous {
+public class InstTypeNode_c extends TypeNode_c
+        implements InstTypeNode, Ambiguous {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected TypeNode base;
@@ -76,7 +76,8 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode,
         return n;
     }
 
-    protected InstTypeNode_c reconstruct(TypeNode base, List<ParamNode> params) {
+    protected InstTypeNode_c reconstruct(TypeNode base,
+            List<ParamNode> params) {
         if (base != this.base || !CollectionUtil.equals(params, this.params)) {
             InstTypeNode_c n = (InstTypeNode_c) copy();
             n.base = base;
@@ -131,7 +132,8 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode,
             return this;
         }
 
-        if (!(b instanceof JifPolyType) || ((JifPolyType) b).params().isEmpty()) {
+        if (!(b instanceof JifPolyType)
+                || ((JifPolyType) b).params().isEmpty()) {
             throw new SemanticException(
                     "Cannot instantiate from a non-polymorphic type " + b);
         }
@@ -157,8 +159,9 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode,
             l.add(p.parameter());
         }
         if (i.hasNext()) {
-            throw new SemanticException("Too many parameters supplied for the "
-                    + "class " + t, this.position());
+            throw new SemanticException(
+                    "Too many parameters supplied for the " + "class " + t,
+                    this.position());
         }
 
         return sc.nodeFactory().CanonicalTypeNode(position(),
@@ -168,16 +171,21 @@ public class InstTypeNode_c extends TypeNode_c implements InstTypeNode,
     protected void checkParamSuitable(ParamInstance pi, ParamNode p)
             throws SemanticException {
         if (pi.isLabel() && !(p.parameter() instanceof Label)) {
-            throw new SemanticException("Can not instantiate a "
-                    + "label parameter with a non-label.", p.position());
+            throw new SemanticException(
+                    "Can not instantiate a "
+                            + "label parameter with a non-label.",
+                    p.position());
         }
         if (pi.isPrincipal() && !(p.parameter() instanceof Principal)) {
-            throw new SemanticException("Can not instantiate a "
-                    + "principal parameter with a non-principal.", p.position());
+            throw new SemanticException(
+                    "Can not instantiate a "
+                            + "principal parameter with a non-principal.",
+                    p.position());
         }
         if (pi.isInvariantLabel() && !((Label) p.parameter()).isInvariant())
-            throw new SemanticException("Can not instantiate an invariant "
-                    + "label parameter with a non-invariant label.",
+            throw new SemanticException(
+                    "Can not instantiate an invariant "
+                            + "label parameter with a non-invariant label.",
                     p.position());
     }
 

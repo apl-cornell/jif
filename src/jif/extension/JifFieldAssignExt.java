@@ -91,16 +91,14 @@ public class JifFieldAssignExt extends JifAssignExt {
 
         if (target instanceof Expr) {
             if (!(target instanceof Special)) {
-                Lf =
-                        JifInstantiator.instantiate(Lf, A, (Expr) target,
-                                JifFieldExt.targetType(ts, A, target, fe),
-                                getPathMap(target).NV());
+                Lf = JifInstantiator.instantiate(Lf, A, (Expr) target,
+                        JifFieldExt.targetType(ts, A, target, fe),
+                        getPathMap(target).NV());
             } else {
                 JifClassType jct = (JifClassType) A.currentClass();
-                Lf =
-                        JifInstantiator.instantiate(Lf, A, (Expr) target,
-                                JifFieldExt.targetType(ts, A, target, fe),
-                                jct.thisLabel());
+                Lf = JifInstantiator.instantiate(Lf, A, (Expr) target,
+                        JifFieldExt.targetType(ts, A, target, fe),
+                        jct.thisLabel());
             }
         }
 
@@ -108,10 +106,9 @@ public class JifFieldAssignExt extends JifAssignExt {
 
         if (target instanceof Expr) {
             // instantiate the type of the field
-            Type ft =
-                    JifInstantiator.instantiate(fe.type(), A, (Expr) target,
-                            JifFieldExt.targetType(ts, A, target, fe),
-                            getPathMap(target).NV());
+            Type ft = JifInstantiator.instantiate(fe.type(), A, (Expr) target,
+                    JifFieldExt.targetType(ts, A, target, fe),
+                    getPathMap(target).NV());
             fe = (Field) fe.type(ft);
         }
 
@@ -130,19 +127,13 @@ public class JifFieldAssignExt extends JifAssignExt {
             if (fi.flags().isFinal()
                     && ts.isFinalAccessExprOrConst(assign.right())) {
                 if (ts.isLabel(fi.type())) {
-                    Label dl =
-                            ts.dynamicLabel(
-                                    fi.position(),
-                                    ts.varInstanceToAccessPath(fi,
-                                            fi.position()));
+                    Label dl = ts.dynamicLabel(fi.position(),
+                            ts.varInstanceToAccessPath(fi, fi.position()));
                     Label rhs_label = ts.exprToLabel(ts, assign.right(), A);
                     A.addDefinitionalAssertionEquiv(dl, rhs_label);
                 } else if (ts.isImplicitCastValid(fi.type(), ts.Principal())) {
-                    DynamicPrincipal dp =
-                            ts.dynamicPrincipal(
-                                    fi.position(),
-                                    ts.varInstanceToAccessPath(fi,
-                                            fi.position()));
+                    DynamicPrincipal dp = ts.dynamicPrincipal(fi.position(),
+                            ts.varInstanceToAccessPath(fi, fi.position()));
                     Principal rhs_principal =
                             ts.exprToPrincipal(ts, assign.right(), A);
                     A.addDefinitionalEquiv(dp, rhs_principal);
@@ -157,12 +148,12 @@ public class JifFieldAssignExt extends JifAssignExt {
         }
 
         lc.constrain(
-                new NamedLabel(
-                        "rhs.nv",
+                new NamedLabel("rhs.nv",
                         "label of successful evaluation of right hand of assignment",
-                        X.NV()), LabelConstraint.LEQ, new NamedLabel(
-                        "label of field " + fi.name(), L), A.labelEnv(), fe
-                        .position(), new ConstraintMessage() {
+                        X.NV()),
+                LabelConstraint.LEQ,
+                new NamedLabel("label of field " + fi.name(), L), A.labelEnv(),
+                fe.position(), new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "Label of right hand side not less "
@@ -192,11 +183,11 @@ public class JifFieldAssignExt extends JifAssignExt {
             // considered as side-effects.
         } else {
             lc.constrain(
-                    new NamedLabel("Li", "Lower bound for side-effects", A
-                            .currentCodePCBound()), LabelConstraint.LEQ,
-                    new NamedLabel("label of field " + fi.name(), L), A
-                            .labelEnv(), fe.position(),
-                    new ConstraintMessage() {
+                    new NamedLabel("Li", "Lower bound for side-effects",
+                            A.currentCodePCBound()),
+                    LabelConstraint.LEQ,
+                    new NamedLabel("label of field " + fi.name(), L),
+                    A.labelEnv(), fe.position(), new ConstraintMessage() {
                         @Override
                         public String msg() {
                             return "Effect of assignment to field " + fi.name()
@@ -205,8 +196,7 @@ public class JifFieldAssignExt extends JifAssignExt {
 
                         @Override
                         public String detailMsg() {
-                            return "Assignment to the field "
-                                    + fi.name()
+                            return "Assignment to the field " + fi.name()
                                     + " is a side effect which reveals more"
                                     + " information than this method is allowed"
                                     + " to; the side effects of this method must"

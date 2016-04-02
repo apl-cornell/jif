@@ -7,11 +7,11 @@ import polyglot.util.SerialVersionUID;
 /** A parameter instance. A wrapper of all the type information 
  *  related to a label/principal parameter. 
  */
-public interface ParamInstance extends polyglot.ext.param.types.Param,
-        VarInstance {
+public interface ParamInstance
+        extends polyglot.ext.param.types.Param, VarInstance {
     public static class Kind extends Enum {
-        private static final long serialVersionUID = SerialVersionUID
-                .generate();
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
 
         final boolean isPrincipal;
         final boolean isInvariantLabel;
@@ -48,12 +48,12 @@ public interface ParamInstance extends polyglot.ext.param.types.Param,
         }
     }
 
-    public final static Kind INVARIANT_LABEL = new Kind("label", false, true,
-            false);
-    public final static Kind COVARIANT_LABEL = new Kind("covariant label",
-            false, false, true);
-    public final static Kind PRINCIPAL = new Kind("principal", true, false,
-            false);
+    public final static Kind INVARIANT_LABEL =
+            new Kind("label", false, true, false);
+    public final static Kind COVARIANT_LABEL =
+            new Kind("covariant label", false, false, true);
+    public final static Kind PRINCIPAL =
+            new Kind("principal", true, false, false);
 
     JifClassType container();
 

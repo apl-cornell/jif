@@ -10,8 +10,8 @@ import polyglot.util.SerialVersionUID;
 
 /** Represents the join of a number of integrity policies. 
  */
-public class JoinIntegPolicy_c extends JoinPolicy_c<IntegPolicy> implements
-        IntegPolicy {
+public class JoinIntegPolicy_c extends JoinPolicy_c<IntegPolicy>
+        implements IntegPolicy {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JoinIntegPolicy_c(Set<IntegPolicy> components, JifTypeSystem ts,

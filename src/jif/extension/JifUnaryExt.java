@@ -39,22 +39,20 @@ public class JifUnaryExt extends JifExprExt {
                 || ue.operator() == Unary.PRE_DEC) {
 
             if (!A.updateAllowed(e)) {
-                throw new SemanticException("Cannot assign to \"" + e
-                        + "\" in this context.", e.position());
+                throw new SemanticException(
+                        "Cannot assign to \"" + e + "\" in this context.",
+                        e.position());
             }
 
             if (e instanceof Local) {
-                e =
-                        (Expr) ((JifLocalExt) JifUtil.jifExt(e))
-                                .labelCheckIncrement(lc.context(A));
+                e = (Expr) ((JifLocalExt) JifUtil.jifExt(e))
+                        .labelCheckIncrement(lc.context(A));
             } else if (e instanceof Field) {
-                e =
-                        (Expr) ((JifFieldExt) JifUtil.jifExt(e))
-                                .labelCheckIncrement(lc.context(A));
+                e = (Expr) ((JifFieldExt) JifUtil.jifExt(e))
+                        .labelCheckIncrement(lc.context(A));
             } else if (e instanceof ArrayAccess) {
-                e =
-                        (Expr) ((JifArrayAccessExt) JifUtil.jifExt(e))
-                                .labelCheckIncrement(lc.context(A));
+                e = (Expr) ((JifArrayAccessExt) JifUtil.jifExt(e))
+                        .labelCheckIncrement(lc.context(A));
             } else {
                 throw new InternalCompilerError(
                         "Cannot perform unary operation on a " + e.type());

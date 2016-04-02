@@ -20,8 +20,8 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance {
     public ParamInstance_c(JifTypeSystem ts, Position pos,
             JifClassType container, Kind kind, String name) {
 
-        super(ts, pos, ts.Public().Static().Final(), kind == PRINCIPAL ? ts
-                .Principal() : ts.Label(), name);
+        super(ts, pos, ts.Public().Static().Final(),
+                kind == PRINCIPAL ? ts.Principal() : ts.Label(), name);
         this.kind = kind;
         this.container = container;
     }
@@ -35,10 +35,9 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance {
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof ParamInstance) {
             ParamInstance that = (ParamInstance) o;
-            return super.equalsImpl(that)
-                    && this.kind.equals(that.kind())
-                    && this.container.fullName().equals(
-                            that.container().fullName());
+            return super.equalsImpl(that) && this.kind.equals(that.kind())
+                    && this.container.fullName()
+                            .equals(that.container().fullName());
         }
 
         return false;
@@ -119,8 +118,8 @@ public class ParamInstance_c extends VarInstance_c implements ParamInstance {
     @SuppressWarnings("unused")
     private static final long readObjectVersionUID = 1L;
 
-    protected void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    protected void readObject(java.io.ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
         // If you update this method in an incompatible way, increment
         // readObjectVersionUID.
 
