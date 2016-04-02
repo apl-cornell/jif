@@ -619,14 +619,14 @@ override qualified_name ::=
 override class_declaration ::=
                     // ClassDecl
         modifiers_opt:a CLASS:n IDENTIFIER:b
-                parameters_opt:p super_opt:c
+                parameters_opt:p superclass_opt:c
                 interfaces_opt:d authority_opt:u constraints_opt:f class_body:e
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n, b),
                                                a, parser.nf.Id(parser.pos(b), b.getIdentifier()),
                                                p, c, d, u, f, e, parser.javadoc(parser.pos(a), parser.pos(n))); :}
     ;
 
-override super ::=
+override superclass ::=
                     // TypeNode
         EXTENDS objtype_or_expr:a
             {: RESULT = a.toUnlabeledType(); :}
