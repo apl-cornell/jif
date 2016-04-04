@@ -1,0 +1,25 @@
+public class Incompleteness03 {
+  public static void main{⊤←}(String[] args) {
+    final label A = new label{Alice→};
+    final label B = new label{Bob→};
+    final label C = new label{Chuck→};
+    final label D = new label{Dolores→};
+    final label L1 = new label{{*A ⊓ *B} ⊔ {*C ⊓ *D}};
+
+    final label AjoinC = new label{{*A} ⊔ {*C}};
+    final label AjoinD = new label{{*A} ⊔ {*D}};
+    final label BjoinC = new label{{*B} ⊔ {*C}};
+    final label BjoinD = new label{{*B} ⊔ {*D}};
+    final label L2 = new label{*AjoinC ⊓ *AjoinD ⊓ *BjoinC ⊓ *BjoinD};
+
+    if (L1 <= L2) {
+    } else {
+      throw new Error("failed L1 ⊑ L2");
+    }
+
+    if (L2 <= L1) {
+    } else {
+      throw new Error("failed L2 ⊑ L1");
+    }
+  }
+}
