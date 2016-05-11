@@ -46,6 +46,7 @@ public class JifIfExt extends JifStmtExt_c {
         A.setPc(Xe.NV(), lc);
 
         // extend the context with any label tests or actsfor tests
+        e = removeUnnecessaryLabelChecks(lc, A, e);
         extendContext(lc, A, e, false);
 
         Stmt S1 = (Stmt) lc.context(A).labelCheck(is.consequent());
@@ -79,6 +80,58 @@ public class JifIfExt extends JifStmtExt_c {
         PathMap X = Xe.N(ts.notTaken()).join(X1).join(X2);
         X = X.NV(ts.notTaken());
         return updatePathMap(is.cond(e).consequent(S1).alternative(S2), X);
+    }
+
+    protected static Expr removeUnnecessaryLabelChecks(LabelChecker lc, JifContext A, Expr e) throws SemanticException {
+        if (e instanceof Binary) {
+            Binary b = (Binary) e;
+            JifTypeSystem ts = lc.typeSystem();
+            Binary.Operator op = b.operator();
+
+            if (op == Binary.BIT_AND || op == Binary.COND_AND) {
+                b = b.left(removeUnnecessaryLabelChecks(lc, A, b.left()));
+                b = b.right(removeUnnecessaryLabelChecks(lc, A, b.right()));
+                return b;
+            } else if (op == JifBinaryDel.ACTSFOR) {
+                Principal granter = ts.exprToPrincipal(ts, b.right(), A);
+                if (ts.isLabel(b.left().type())) {
+                    Label actor = ts.exprToLabel(ts, b.left(), A);
+                    if (A.labelEnv().leq(actor, ts.toLabel(granter))) {
+                        return lc.nodeFactory().BooleanLit(b.position(), true);
+                    }
+                } else {
+                    Principal actor = ts.exprToPrincipal(ts, b.left(), A);
+                    if (A.labelEnv().actsFor(actor, granter)) {
+                        return lc.nodeFactory().BooleanLit(b.position(), true);
+                    }
+                }
+                return b;
+            } else if (op == JifBinaryDel.EQUIV
+                    && ts.isImplicitCastValid(b.left().type(), ts.Principal())) {
+                Principal left = ts.exprToPrincipal(ts, b.left(), A);
+                Principal right = ts.exprToPrincipal(ts, b.right(), A);
+                if (A.labelEnv().actsFor(left, right) && A.labelEnv().actsFor(right, left)) {
+                    return lc.nodeFactory().BooleanLit(b.position(), true);
+                }
+                return b;
+            } else if (op == JifBinaryDel.EQUIV && ts.isLabel(b.left().type())) {
+                Label lhs = ts.exprToLabel(ts, b.left(), A);
+                Label rhs = ts.exprToLabel(ts, b.right(), A);
+
+                if (A.labelEnv().leq(lhs, rhs) && A.labelEnv().leq(rhs, lhs)) {
+                    return lc.nodeFactory().BooleanLit(b.position(), true);
+                }
+                return b;
+            } else if (op == Binary.LE && ts.isLabel(b.left().type())) {
+                Label lhs = ts.exprToLabel(ts, b.left(), A);
+                Label rhs = ts.exprToLabel(ts, b.right(), A);
+                if (A.labelEnv().leq(lhs, rhs)) {
+                    return lc.nodeFactory().BooleanLit(b.position(), true);
+                }
+                return b;
+            }
+        }
+        return e;
     }
 
     protected static void extendContext(LabelChecker lc, JifContext A, Expr e,
