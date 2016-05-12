@@ -29,4 +29,7 @@ public interface Label {
 
     IntegPolicy integPolicy();
 
+    Label writersToReaders();
+
+    Label writersToReaders(boolean simplify);
 }

@@ -6,10 +6,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import jif.translate.CannotLabelToJavaExpr_c;
+import jif.translate.WritersToReadersLabelToJavaExpr_c;
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
+
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -29,7 +30,7 @@ public class WritersToReadersLabel_c extends Label_c
 
     public WritersToReadersLabel_c(Label label, JifTypeSystem ts,
             Position pos) {
-        super(ts, pos, new CannotLabelToJavaExpr_c());
+        super(ts, pos, new WritersToReadersLabelToJavaExpr_c());
         this.label = label;
         setDescription("finds an upper bound of " + label
                 + " and converts the writers of the bound into readers");
@@ -42,7 +43,7 @@ public class WritersToReadersLabel_c extends Label_c
 
     @Override
     public boolean isRuntimeRepresentable() {
-        return false;
+        return label.isRuntimeRepresentable();
     }
 
     @Override

@@ -101,4 +101,14 @@ public final class PairLabel implements Label {
     public IntegPolicy integPolicy() {
         return integPol;
     }
+
+    @Override
+    public Label writersToReaders() {
+        return writersToReaders(true);
+    }
+
+    @Override
+    public Label writersToReaders(boolean simplify) {
+        return labelUtil.writersToReaders(this, simplify);
+    }
 }

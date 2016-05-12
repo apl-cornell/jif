@@ -70,6 +70,8 @@ public class LabelUtil {
             new ConcurrentHashMap<Pair, Label>();
     private Map<Pair, Label> cacheLabelMeets =
             new ConcurrentHashMap<Pair, Label>();
+    private Map<Label, Label> cacheWritersToReaders =
+            new ConcurrentHashMap<Label, Label>();
     private Map<DelegationPair, Set<Pair>> cacheLabelJoinDependencies =
             new ConcurrentHashMap<DelegationPair, Set<Pair>>();
     private Map<DelegationPair, Set<Pair>> cacheLabelMeetDependencies =
@@ -148,12 +150,15 @@ public class LabelUtil {
 
     private final ConfPolicy BOTTOM_CONF;
     private final ConfPolicy TOP_CONF;
+    private final IntegPolicy BOTTOM_INTEG;
     private final IntegPolicy TOP_INTEG;
     private final Label NO_COMPONENTS;
 
     {
         BOTTOM_CONF = this.readerPolicy(null, (Principal) null);
         TOP_CONF = this.readerPolicy(PrincipalUtil.topPrincipal(),
+                PrincipalUtil.topPrincipal());
+        BOTTOM_INTEG = this.writerPolicy(PrincipalUtil.topPrincipal(),
                 PrincipalUtil.topPrincipal());
         TOP_INTEG = this.writerPolicy(null, (Principal) null);
         NO_COMPONENTS = this.toLabel(BOTTOM_CONF, TOP_INTEG);
@@ -169,6 +174,10 @@ public class LabelUtil {
 
     public ConfPolicy topConf() {
         return TOP_CONF;
+    }
+
+    public IntegPolicy bottomInteg() {
+        return TOP_INTEG;
     }
 
     public IntegPolicy topInteg() {
@@ -479,6 +488,60 @@ public class LabelUtil {
         } finally {
             exitTiming();
         }
+    }
+
+    public Label writersToReaders(Label l) {
+        return writersToReaders(l, true);
+    }
+
+    public Label writersToReaders(Label l, boolean simplify) {
+        try {
+            enterTiming();
+
+            if (l instanceof PairLabel) {
+                if (USE_CACHING) {
+                    return cacheWritersToReaders.get(l);
+                } else {
+                    PairLabel pl = (PairLabel) l;
+                    IntegPolicy integ = pl.integPolicy();
+                    ConfPolicy wtorPol = writersToReaders(integ, simplify);
+                    Label result = new PairLabel(this, wtorPol, BOTTOM_INTEG);
+                    if (USE_CACHING) {
+                        cacheWritersToReaders.put(l, result);
+                    }
+                    return result;
+                }
+            }
+
+            // error! non pair label!
+            return null;
+        } finally {
+            exitTiming();
+        }
+    }
+
+    public ConfPolicy writersToReaders(IntegPolicy integ, boolean simplify) {
+        if (integ instanceof WriterPolicy) {
+            WriterPolicy wp = (WriterPolicy) integ;
+            return new ReaderPolicy(this, wp.owner(), wp.writer());
+        } else if (integ instanceof JoinIntegPolicy) {
+            JoinIntegPolicy jip = (JoinIntegPolicy) integ;
+            Set<Policy> newComponents = new HashSet<>();
+            for (Policy comp : jip.joinComponents()) {
+              IntegPolicy ip = (IntegPolicy) comp;
+              newComponents.add(writersToReaders(ip, simplify));
+            }
+            return new MeetConfPolicy(this, newComponents);
+        } else if (integ instanceof MeetIntegPolicy) {
+            MeetIntegPolicy jip = (MeetIntegPolicy) integ;
+            Set<Policy> newComponents = new HashSet<>();
+            for (Policy comp : jip.meetComponents()) {
+              IntegPolicy ip = (IntegPolicy) comp;
+              newComponents.add(writersToReaders(ip, simplify));
+            }
+            return new JoinConfPolicy(this, newComponents);
+        }
+        return null;
     }
 
     public ConfPolicy join(ConfPolicy p1, ConfPolicy p2, boolean simplify) {
