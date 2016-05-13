@@ -30,7 +30,7 @@ public class WritersToReadersLabel_c extends Label_c
 
     public WritersToReadersLabel_c(Label label, JifTypeSystem ts,
             Position pos) {
-        super(ts, pos, new WritersToReadersLabelToJavaExpr_c());
+        super(ts, pos, ts.writersToReadersTranslator());
         this.label = label;
         setDescription("finds an upper bound of " + label
                 + " and converts the writers of the bound into readers");

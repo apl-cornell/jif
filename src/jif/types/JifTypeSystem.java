@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import jif.extension.LabelTypeCheckUtil;
+import jif.translate.LabelToJavaExpr;
 import jif.translate.PrincipalToJavaExpr;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.AccessPath;
@@ -32,6 +33,7 @@ import jif.types.principal.Principal;
 import jif.types.principal.TopPrincipal;
 import jif.types.principal.UnknownPrincipal;
 import jif.types.principal.VarPrincipal;
+
 import polyglot.ast.Expr;
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.ParamTypeSystem;
@@ -512,4 +514,8 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
      */
     boolean needsImplClass(Type ct);
 
+    /**
+     * @return class for translating writersToReaders labels to java expressions
+     */
+    LabelToJavaExpr writersToReadersTranslator();
 }

@@ -32,6 +32,7 @@ import jif.translate.MeetLabelToJavaExpr_c;
 import jif.translate.PairLabelToJavaExpr_c;
 import jif.translate.PrincipalToJavaExpr;
 import jif.translate.ProviderLabelToJavaExpr_c;
+import jif.translate.WritersToReadersLabelToJavaExpr_c;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv_c;
 import jif.types.label.AccessPath;
@@ -100,6 +101,7 @@ import jif.types.principal.UnknownPrincipal;
 import jif.types.principal.UnknownPrincipal_c;
 import jif.types.principal.VarPrincipal;
 import jif.types.principal.VarPrincipal_c;
+
 import polyglot.ast.Cast;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
@@ -2067,6 +2069,11 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     @Override
     public boolean needsImplClass(Type jpt) {
         return isParamsRuntimeRep(jpt);
+    }
+
+    @Override
+    public LabelToJavaExpr writersToReadersTranslator() {
+      return new WritersToReadersLabelToJavaExpr_c();
     }
 
 }
