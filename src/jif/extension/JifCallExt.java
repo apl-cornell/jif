@@ -216,7 +216,7 @@ public class JifCallExt extends JifExprExt implements CallOps {
         CallHelper helper = lc.createCallHelper(objLabel, target,
                 mi.container(), mi, me.arguments(), node().position());
         LabelChecker callLC = lc.context(A);
-        helper.checkCall(callLC, throwTypes, npExc);
+        me = helper.checkCall(callLC, throwTypes, me, npExc);
 
         // now use the call helper to bind the var labels that were created
         // during type checking of the call (see JifCallDel#typeCheck)

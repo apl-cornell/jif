@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Set;
 
 import jif.JifOptions;
+import jif.ast.JifExt_c;
 import jif.ast.JifInstantiator;
 import jif.ast.JifNodeFactory;
-import jif.ast.JifExt_c;
 import jif.types.ActsForConstraint;
 import jif.types.ActsForParam;
 import jif.types.Assertion;
@@ -40,8 +40,10 @@ import jif.types.label.Label;
 import jif.types.label.VarLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
+
 import polyglot.ast.Expr;
 import polyglot.ast.Local;
+import polyglot.ast.ProcedureCall;
 import polyglot.ast.Receiver;
 import polyglot.main.Report;
 import polyglot.types.ConstructorInstance;
@@ -515,8 +517,10 @@ public class CallHelper {
      * 
      * 
      */
-    public void checkCall(LabelChecker lc, List<Type> throwTypes,
-            boolean targetMayBeNull) throws SemanticException {
+    public <N extends ProcedureCall> N checkCall(LabelChecker lc,
+        List<Type> throwTypes, N call, boolean targetMayBeNull) throws
+      SemanticException {
+
         if (overrideChecker) {
             throw new InternalCompilerError("Not available for call checking");
         }
@@ -625,6 +629,8 @@ public class CallHelper {
 
         // record that this method has now been called.
         callChecked = true;
+
+        return call;
     }
 
     /** Check if the caller has sufficient authority, and label constraints
