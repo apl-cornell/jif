@@ -57,11 +57,7 @@ public class JifForExt extends JifStmtExt_c {
 
             PathMap Xs = getPathMap(init);
 
-            // At this point, the environment A should have been extended
-            // to include any declarations of s.  We push a new scope
-            // on the stack so that we can set the PC.
-
-            A.setPc(Xs.N(), lc);
+            updateContextForNextInit(lc, A, Xs);
 
             Xinit = Xinit.N(notTaken).join(Xs);
         }
@@ -90,12 +86,12 @@ public class JifForExt extends JifStmtExt_c {
         }
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.NV(), lc);
+        updateContextForBody(lc, A, Xe);
         Stmt body = (Stmt) lc.context(A).labelCheck(fs.body());
         PathMap Xbody = getPathMap(body);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xbody.N(), lc);
+        updateContextForNextIter(lc, A, Xbody);
 
         List<ForUpdate> iters = new LinkedList<ForUpdate>();
 
@@ -105,10 +101,7 @@ public class JifForExt extends JifStmtExt_c {
 
             PathMap Xs = getPathMap(update);
 
-            // At this point, the environment A should have been extended
-            // to include any declarations of s.  Reset the PC label.
-
-            A.setPc(Xs.N(), lc);
+            updateContextForNextIter(lc, A, Xs);
 
             Xbody = Xbody.N(notTaken).join(Xs);
         }
@@ -160,5 +153,42 @@ public class JifForExt extends JifStmtExt_c {
 
         return updatePathMap(fs.iters(iters).cond(cond).inits(inits).body(body),
                 X);
+    }
+
+    /**
+     * Utility method for updating the context for checking the next init
+     * statement in the for loop.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextForNextInit(LabelChecker lc, JifContext A,
+        PathMap Xprev) {
+        // At this point, the environment A should have been extended
+        // to include any declarations of s.  Reset the PC label.
+        A.setPc(Xprev.N(), lc);
+    }
+
+    /**
+     * Utility method for updating the context for checking the body in the for
+     * loop.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextForBody(LabelChecker lc, JifContext A,
+        PathMap Xcond) {
+        A.setPc(Xcond.NV(), lc);
+    }
+
+    /**
+     * Utility method for updating the context for checking the next iter
+     * statement in the for loop.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextForNextIter(LabelChecker lc, JifContext A,
+        PathMap Xprev) {
+        // At this point, the environment A should have been extended
+        // to include any declarations of s.  Reset the PC label.
+        A.setPc(Xprev.N(), lc);
     }
 }

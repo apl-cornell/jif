@@ -60,7 +60,7 @@ public class JifNewArrayExt extends JifExprExt {
             PathMap Xe = getPathMap(e);
             Xs = Xs.N(ts.notTaken()).join(Xe);
 
-            A.setPc(Xs.N(), lc);
+            updateContextForDims(lc, A, Xs);
             dimsNV = ts.join(dimsNV, Xe.NV());
         }
 
@@ -119,4 +119,13 @@ public class JifNewArrayExt extends JifExprExt {
         return true;
     }
 
+    /**
+     * Utility method for updating the context for checking the dims.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForDims(LabelChecker lc, JifContext A,
+            PathMap Xprev) {
+        A.setPc(Xprev.N(), lc);
+    }
 }

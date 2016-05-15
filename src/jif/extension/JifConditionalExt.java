@@ -51,7 +51,7 @@ public class JifConditionalExt extends JifExprExt {
         PathMap Xe = getPathMap(cond);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.NV(), lc);
+        updateContextForConsequent(lc, A, Xe);
 
         Expr cons = (Expr) lc.context(A).labelCheck(te.consequent());
         PathMap Xt = getPathMap(cons);
@@ -59,7 +59,7 @@ public class JifConditionalExt extends JifExprExt {
         A = (JifContext) A.pop();
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.NV(), lc);
+        updateContextForConsequent(lc, A, Xe);
 
         Expr alt = (Expr) lc.context(A).labelCheck(te.alternative());
         PathMap Xf = getPathMap(alt);
@@ -70,5 +70,15 @@ public class JifConditionalExt extends JifExprExt {
 
         return updatePathMap(te.cond(cond).consequent(cons).alternative(alt),
                 X);
+    }
+
+    /**
+     * Utility method for updating the context for the consequent/alternative.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextForConsequent(LabelChecker lc, JifContext A,
+        PathMap Xexpr) {
+        A.setPc(Xexpr.NV(), lc);
     }
 }

@@ -272,7 +272,7 @@ public class LabelTypeCheckUtil {
                         }
                     }
 
-                    A.setPc(X.N(), lc);
+                    updateContextForParam(lc, A, X);
                     PathMap Xj = L.labelCheck(A, lc);
                     throwTypes.removeAll(L.throwTypes(ts));
                     Xparams.add(Xj);
@@ -303,7 +303,7 @@ public class LabelTypeCheckUtil {
                         }
                     }
 
-                    A.setPc(X.N(), lc);
+                    updateContextForParam(lc, A, X);
                     PathMap Xj = p.labelCheck(A, lc);
                     throwTypes.removeAll(p.throwTypes(ts));
                     Xparams.add(Xj);
@@ -319,6 +319,17 @@ public class LabelTypeCheckUtil {
             Xparams = Collections.emptyList();
         }
         return Xparams;
+    }
+
+    /**
+     * Utility method for updating the context for checking a parameter for the
+     * type.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForParam(LabelChecker lc, JifContext A,
+            PathMap Xprev) {
+        A.setPc(Xprev.N(), lc);
     }
 
     /**

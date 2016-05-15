@@ -56,7 +56,7 @@ public class JifWhileExt extends JifStmtExt_c {
 
         A = (JifContext) A.pushBlock();
 
-        A.setPc(Xe.NV(), lc);
+        updateContextForBody(lc, A, Xe);
         Stmt S = (Stmt) lc.context(A).labelCheck(ws.body());
         PathMap Xs = getPathMap(S);
 
@@ -104,5 +104,15 @@ public class JifWhileExt extends JifStmtExt_c {
         X = X.N(lc.upperBound(X.N(), L2));
 
         return updatePathMap(ws.body(S).cond(e), X);
+    }
+
+    /**
+     * Utility method for updating the context for checking the body.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForBody(LabelChecker lc, JifContext A,
+            PathMap Xexpr) {
+        A.setPc(Xexpr.NV(), lc);
     }
 }

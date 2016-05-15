@@ -75,7 +75,7 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
         // The pc at the point of declassification is dependent on the expression to declassify
         // terminating normally.
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.N(), lc);
+        updateContextAfterExpr(lc, A, Xe);
         lc = lc.context(A);
 
         Label inferedTo = lc.typeSystem().freshLabelVariable(d.position(),
@@ -97,6 +97,15 @@ public abstract class JifDowngradeExprExt extends JifExprExt {
         PathMap X = Xe.NV(lc.upperBound(dA.pc(), inferedTo));
 
         return updatePathMap(d.expr(e), X);
+    }
+
+    /**
+     * Utility method for updating the context after checking the expression.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    public void updateContextAfterExpr(LabelChecker lc, JifContext A, PathMap Xe) {
+        A.setPc(Xe.N(), lc);
     }
 
     abstract void inferLabelFrom(LabelChecker lc, Position pos, JifContext A,

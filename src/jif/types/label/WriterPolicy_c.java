@@ -152,10 +152,20 @@ public class WriterPolicy_c extends Policy_c implements WriterPolicy {
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         // check each principal in turn.
         PathMap X = owner.labelCheck(A, lc);
-        A.setPc(X.N(), lc);
+        updateContextForWriter(lc, A, X);
         PathMap Xr = writer.labelCheck(A, lc);
         X = X.join(Xr);
         return X;
+    }
+
+    /**
+     * Utility method for updating the context for checking the writer.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForWriter(LabelChecker lc, JifContext A,
+            PathMap Xowner) {
+        A.setPc(Xowner.N(), lc);
     }
 
 //    public Expr toJava(JifToJavaRewriter rw) throws SemanticException {

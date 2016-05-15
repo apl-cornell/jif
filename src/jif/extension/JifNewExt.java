@@ -151,14 +151,14 @@ public class JifNewExt extends JifExprExt {
             PathMap Xs = getPathMap(e);
             if (Xs == null)
                 throw new InternalCompilerError("No entry for " + e);
-            A.setPc(Xs.N(), lc);
+            updateContextPostTarget(lc, A, Xs);
 
             if (!(e instanceof Special)) {
                 // TODO: a NPE may be thrown depending on the qualifier.
                 //       for now, assume the qualifier may be null.
                 npExc = (!((JifNewDel) node().del()).qualIsNeverNull());
                 newLabel = Xs.NV();
-                A.setPc(Xs.NV(), lc);
+                updateContextPostTargetExpr(lc, A, Xs);
             } else {
                 newLabel = ((JifClassType) lc.context().currentClass())
                         .thisLabel();
@@ -190,6 +190,30 @@ public class JifNewExt extends JifExprExt {
 
         checkThrowTypes(throwTypes);
         return updatePathMap(noe.arguments(helper.labelCheckedArgs()), X);
+    }
+
+    /**
+     * Utility method for updating the context after checking the target.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextPostTarget(LabelChecker lc, JifContext A,
+        PathMap Xtarg) {
+        // At this point, the environment A should have been extended
+        // to include any declarations of s.  Reset the PC label.
+        A.setPc(Xtarg.N(), lc);
+    }
+
+    /**
+     * Utility method for updating the context after checking the target and it
+     * is an expression (not a Special node).
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextPostTargetExpr(LabelChecker lc, JifContext A,
+        PathMap Xtarg) {
+        // a NPE may be thrown depending on the target.
+        A.setPc(Xtarg.NV(), lc);
     }
 
 }

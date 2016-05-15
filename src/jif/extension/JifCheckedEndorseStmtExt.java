@@ -60,7 +60,7 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt {
         PathMap Xe = getPathMap(e);
 
         Abody = (JifContext) Abody.pushBlock();
-        Abody.setPc(Xe.NV(), lc);
+        updateContextForConsequent(lc, Abody, Xe);
 
         // extend the context with any label tests or actsfor tests
         JifIfExt.extendContext(lc, Abody, e, false);
@@ -74,7 +74,7 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt {
         // check the alternative using the original context
         if (body.alternative() != null) {
             A = (JifContext) A.pushBlock();
-            A.setPc(Xe.NV(), lc);
+            updateContextForConsequent(lc, A, Xe);
 
             S2 = (Stmt) lc.context(A).labelCheck(body.alternative());
             X2 = getPathMap(S2);
@@ -89,6 +89,16 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt {
         return (Stmt) updatePathMap(body.cond(e).consequent(S1).alternative(S2),
                 X);
 
+    }
+
+    /**
+     * Utility method for updating the context for the consequent.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextForConsequent(LabelChecker lc, JifContext A,
+        PathMap Xexpr) {
+        A.setPc(Xexpr.NV(), lc);
     }
 
     @Override

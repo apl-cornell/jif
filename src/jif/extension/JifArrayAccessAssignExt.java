@@ -56,7 +56,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt {
         PathMap Xarr = getPathMap(array);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xarr.N(), lc);
+        updateContextForIndex(lc, A, Xarr);
 
         Expr index = (Expr) lc.context(A).labelCheck(aie.index());
         PathMap Xind = getPathMap(index);
@@ -79,7 +79,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt {
                 Xlhs = Xlhs.exc(lc.upperBound(Xarr.NV(), Xind.NV()), oob);
             }
         }
-        A.setPc(Xlhs.N(), lc);
+        updateContextForRHS(lc, A, Xlhs);
 
         Expr rhs = (Expr) lc.context(A).labelCheck(assign.right());
         PathMap Xrhs = rhsPathMap(lc.context(A), rhs, throwTypes);
@@ -187,6 +187,24 @@ public class JifArrayAccessAssignExt extends JifAssignExt {
 
         checkThrowTypes(throwTypes);
         return updatePathMap(assign.right(rhs).left(lhs), X);
+    }
+
+    /**
+     * Utility method for updating the context for checking the index
+     * expression.
+     */
+    protected void updateContextForIndex(LabelChecker lc, JifContext A,
+            PathMap Xarr) {
+        A.setPc(Xarr.N(), lc);
+    }
+
+    /**
+     * Utility method for updating the context for checking the RHS
+     * expression.
+     */
+    protected void updateContextForRHS(LabelChecker lc, JifContext A,
+            PathMap Xlhs) {
+        A.setPc(Xlhs.N(), lc);
     }
 
     protected PathMap rhsPathMap(LabelChecker checker, Expr rhs,
