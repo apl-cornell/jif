@@ -183,7 +183,7 @@ public class JifNewExt extends JifExprExt {
                 (JifProcedureInstance) noe.constructorInstance(),
                 noe.arguments(), node().position());
         LabelChecker callLC = lc.context(A);
-        helper.checkCall(callLC, throwTypes, npExc);
+        noe = helper.checkCall(callLC, throwTypes, noe, npExc);
 
         PathMap retX = helper.X();
         PathMap X = retX.NV(lc.upperBound(retX.NV(), newLabel));
