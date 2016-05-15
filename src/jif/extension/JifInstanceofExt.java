@@ -39,7 +39,7 @@ public class JifInstanceofExt extends JifExprExt {
 
         // label check the type too, since the type may leak information
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.N(), lc);
+        updateContextForType(lc, A, Xe);
         PathMap Xct =
                 ts.labelTypeCheckUtil().labelCheckType(ioe.compareType().type(),
                         lc, throwTypes, ioe.compareType().position());
@@ -48,5 +48,15 @@ public class JifInstanceofExt extends JifExprExt {
 
         checkThrowTypes(throwTypes);
         return updatePathMap(ioe.expr(e), X);
+    }
+
+    /**
+     * Utility method for updating the context for checking the type.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForType(LabelChecker lc, JifContext A,
+            PathMap Xexpr) {
+        A.setPc(Xexpr.N(), lc);
     }
 }

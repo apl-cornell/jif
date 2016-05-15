@@ -271,11 +271,21 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c
         A = (JifContext) A.pushBlock();
 
         for (P c : meetComponents) {
-            A.setPc(X.N(), lc);
+            updateContextForComp(lc, A, X);
             PathMap Xc = c.labelCheck(A, lc);
             X = X.join(Xc);
         }
         return X;
+    }
+
+    /**
+     * Utility method for updating the context for checking a meet component.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForComp(LabelChecker lc, JifContext A,
+            PathMap Xprev) {
+        A.setPc(Xprev.N(), lc);
     }
 
     @Override

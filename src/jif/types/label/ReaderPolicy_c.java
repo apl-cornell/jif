@@ -151,10 +151,20 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
     public PathMap labelCheck(JifContext A, LabelChecker lc) {
         // check each principal in turn.
         PathMap X = owner.labelCheck(A, lc);
-        A.setPc(X.N(), lc);
+        updateContextForReader(lc, A, X);
         PathMap Xr = reader.labelCheck(A, lc);
         X = X.join(Xr);
         return X;
+    }
+
+    /**
+     * Utility method for updating the context for checking the reader.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForReader(LabelChecker lc, JifContext A,
+            PathMap Xowner) {
+        A.setPc(Xowner.N(), lc);
     }
 
     @Override

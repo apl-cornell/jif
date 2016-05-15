@@ -53,7 +53,7 @@ public class JifSwitchExt extends JifStmtExt_c {
                         + node().position());
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.NV(), lc);
+        updateContextForCases(lc, A, Xe);
         A.gotoLabel(Branch.BREAK, null, L);
 
         PathMap Xa = Xe.N(notTaken);
@@ -64,7 +64,7 @@ public class JifSwitchExt extends JifStmtExt_c {
             l.add(s);
 
             PathMap Xs = getPathMap(s);
-            A.setPc(lc.upperBound(A.pc(), Xs.N()), lc);
+            updateContextForNextCase(lc, A, Xs);
             Xa = Xa.join(Xs);
         }
 
@@ -98,5 +98,27 @@ public class JifSwitchExt extends JifStmtExt_c {
         X = X.N(L);
 
         return updatePathMap(ss.elements(l), X);
+    }
+
+    /**
+     * Utility method for updating the context for checking the cases of a
+     * switch statement.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForCases(LabelChecker lc, JifContext A,
+            PathMap Xval) {
+        A.setPc(Xval.NV(), lc);
+    }
+
+    /**
+     * Utility method for updating the context for checking the cases of a
+     * switch statement.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForNextCase(LabelChecker lc, JifContext A,
+            PathMap Xprev) {
+        A.setPc(lc.upperBound(A.pc(), Xprev.N()), lc);
     }
 }

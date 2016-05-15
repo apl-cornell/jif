@@ -325,7 +325,7 @@ public class CallHelper {
 
             // A[pc := X_{j-1}[N]] |- Ej : Xj
             A = (JifContext) A.pushBlock();
-            A.setPc(Xj.N(), lc);
+            updateForNextArg(lc, A, Xj);
             Ej = (Expr) lc.context(A).labelCheck(Ej);
             A = (JifContext) A.pop();
 
@@ -343,6 +343,15 @@ public class CallHelper {
         }
 
         return Xjoin;
+    }
+
+    /**
+     * Utility method to abstract away passing along label information in the
+     * context between arguments during checking.
+     */
+    protected void updateForNextArg(LabelChecker lc, JifContext A,
+        PathMap Xprev) {
+        A.setPc(Xprev.N(), lc);
     }
 
     /**

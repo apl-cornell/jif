@@ -403,10 +403,20 @@ public class JoinLabel_c extends Label_c implements JoinLabel {
         A = (JifContext) A.pushBlock();
 
         for (Label c : components) {
-            A.setPc(X.N(), lc);
+            updateContextForComp(lc, A, X);
             PathMap Xc = c.labelCheck(A, lc);
             X = X.join(Xc);
         }
         return X;
+    }
+
+    /**
+     * Utility method for updating the context for checking a join component.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForComp(LabelChecker lc, JifContext A,
+            PathMap Xprev) {
+        A.setPc(Xprev.N(), lc);
     }
 }

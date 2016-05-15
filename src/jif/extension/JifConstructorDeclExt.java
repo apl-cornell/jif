@@ -202,9 +202,7 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
                 }
             }
 
-            // At this point, the environment A should have been extended
-            // to include any declarations of s.  Reset the PC label.
-            A.setPc(Xs.N(), lc);
+            updateContextForNextStmt(lc, A, Xs);
 
             X = X.N(ts.notTaken()).join(Xs);
         }
@@ -215,6 +213,19 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
 
         A = (JifContext) A.pop();
         return (Block) updatePathMap(body.statements(stmts), X);
+    }
+
+    /**
+     * Utility method for updating the context for checking the next statement
+     * in the block.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextForNextStmt(LabelChecker lc, JifContext A,
+        PathMap Xprev) {
+        // At this point, the environment A should have been extended
+        // to include any declarations of s.  Reset the PC label.
+        A.setPc(Xprev.N(), lc);
     }
 
     /**

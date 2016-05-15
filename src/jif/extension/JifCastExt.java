@@ -42,7 +42,7 @@ public class JifCastExt extends JifExprExt {
 
         // label check the type too, since the type may leak information
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.N(), lc);
+        updateContextForType(lc, A, Xe);
         PathMap Xct = ts.labelTypeCheckUtil()
                 .labelCheckType(c.castType().type(), lc, throwTypes, pos);
         A = (JifContext) A.pop();
@@ -57,5 +57,15 @@ public class JifCastExt extends JifExprExt {
 
         checkThrowTypes(throwTypes);
         return updatePathMap(c.expr(e), X);
+    }
+
+    /**
+     * Utility method for updating the context for the Type
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextForType(LabelChecker lc, JifContext A,
+        PathMap Xexpr) {
+        A.setPc(Xexpr.N(), lc);
     }
 }

@@ -35,7 +35,7 @@ public class JifSynchronizedExt extends JifStmtExt_c {
         Expr e = (Expr) lc.context(A).labelCheck(ss.expr());
         PathMap Xe = getPathMap(e);
 
-        A.setPc(Xe.N(), lc);
+        updateContextForBody(lc, A, Xe);
 
         Block s = (Block) lc.context(A).labelCheck(ss.body());
         PathMap Xs = getPathMap(s);
@@ -43,5 +43,15 @@ public class JifSynchronizedExt extends JifStmtExt_c {
         PathMap X = Xe.join(Xs);
 
         return updatePathMap(ss.body(s), X);
+    }
+
+    /**
+     * Utility method for updating the context for checking the body.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForBody(LabelChecker lc, JifContext A,
+            PathMap Xexpr) {
+        A.setPc(Xexpr.N(), lc);
     }
 }
