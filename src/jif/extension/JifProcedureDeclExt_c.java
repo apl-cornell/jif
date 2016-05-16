@@ -339,15 +339,7 @@ public class JifProcedureDeclExt_c extends JifExt_c
         //XXX: Somewhat experimental commenting of this check.
         // Why was is only considering methods that exited normally without
         // return statements?
-        // if (! (X.N() instanceof NotTaken)) {
-        boolean singlePath = true;
-        for (Path p : X.paths()) {
-            if (p.equals(Path.N) || p.equals(Path.R)) continue;
-            singlePath = false;
-            break;
-        }
-//      }        
-        if (singlePath) {
+        if (X.singlePath()) {
             X = X.N(ts.notTaken());
             X = X.R(ts.bottomLabel());
         } else {

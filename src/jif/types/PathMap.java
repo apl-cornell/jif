@@ -181,4 +181,16 @@ public class PathMap {
         w.end();
         w.write("]");
     }
+
+    /**
+     * Returns true if there's only one "path" through the method or
+     * constructor according to this PathMap
+     */
+    public boolean singlePath() {
+        for (Path p : paths()) {
+            if (p.equals(Path.N) || p.equals(Path.R)) continue;
+            return false;
+        }
+        return true;
+    }
 }
