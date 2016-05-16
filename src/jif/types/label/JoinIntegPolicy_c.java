@@ -22,7 +22,8 @@ public class JoinIntegPolicy_c extends JoinPolicy_c<IntegPolicy>
     @Override
     protected Policy constructJoinPolicy(Set<IntegPolicy> components,
             Position pos) {
-        return new JoinIntegPolicy_c(components, (JifTypeSystem) ts, pos);
+        JifTypeSystem jts = (JifTypeSystem) ts;
+        return jts.joinIntegPolicy(pos, components);
     }
 
     @Override

@@ -7,18 +7,17 @@ import java.util.Map;
 import java.util.Set;
 
 import jif.JifOptions;
-import jif.translate.JoinLabelToJavaExpr_c;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.hierarchy.LabelEnv_c;
 import jif.types.hierarchy.PrincipalHierarchy;
 import jif.types.label.AccessPath;
-import jif.types.label.JoinLabel_c;
 import jif.types.label.Label;
 import jif.types.label.NotTaken;
 import jif.types.label.PairLabel;
 import jif.types.label.ProviderLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
+
 import polyglot.ast.Expr;
 import polyglot.ast.Local;
 import polyglot.types.ClassType;
@@ -375,8 +374,7 @@ public class JifContext_c extends Context_c implements JifContext {
         if (pc != null) {
             Set<Label> set = new HashSet<Label>();
             set.add(pc);
-            this.pc = new JoinLabel_c(set, pc.typeSystem(), pc.position(),
-                    new JoinLabelToJavaExpr_c());
+            this.pc = lc.jifTypeSystem().joinLabel(pc.position(), set);
             this.pc.setDescription("pc label");
         } else this.pc = pc;
     }
