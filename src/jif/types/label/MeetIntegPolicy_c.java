@@ -22,7 +22,8 @@ public class MeetIntegPolicy_c extends MeetPolicy_c<IntegPolicy>
     @Override
     protected Policy constructMeetPolicy(Set<IntegPolicy> components,
             Position pos) {
-        return new MeetIntegPolicy_c(components, (JifTypeSystem) ts, pos);
+        JifTypeSystem jts = (JifTypeSystem) ts;
+        return jts.meetIntegPolicy(pos, components);
     }
 
     @Override
