@@ -325,10 +325,19 @@ public class LabelChecker implements Copy {
         return n;
     }
 
-    protected Node solveConstraints(Node n) {
-        Node newN = n;
+    /**
+     * Create a new JifLabelSubst.  Abstracted out so we can override what
+     * implementation we're using for it.
+     */
+    protected JifLabelSubst labelSubst() {
         JifLabelSubst jls =
                 new JifLabelSubst(this.job, this.ts, this.nf, this.solver);
+        return jls;
+    }
+
+    protected Node solveConstraints(Node n) {
+        Node newN = n;
+        JifLabelSubst jls = labelSubst();
 
         jls = (JifLabelSubst) jls.begin();
 
