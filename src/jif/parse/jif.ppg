@@ -282,6 +282,7 @@ terminal Token TO;
 
 terminal Token JOIN;
 terminal Token MEET;
+terminal Token WRITERSTOREADERS;
 terminal Token RIGHTARROW;
 terminal Token LEFTARROW;
 terminal Token TOP;
@@ -353,6 +354,10 @@ label ::=
                col.add(c);
                LabelNode mn = parser.nf.JoinLabelNode(parser.pos(x,c), col);
                RESULT = mn; :}
+    |    WRITERSTOREADERS:a LPAREN label:l RPAREN:b
+            {: RESULT = parser.nf.WritersToReadersLabelNode(parser.pos(a, b), l); :}
+    |    WRITERSTOREADERS:a LPAREN label_component:l RPAREN:b
+            {: RESULT = parser.nf.WritersToReadersLabelNode(parser.pos(a, b), (LabelComponentNode) l); :}
     |    LBRACE label:l RBRACE
             {: RESULT = l; :}
     ;

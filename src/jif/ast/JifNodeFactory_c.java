@@ -125,6 +125,15 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     }
 
     @Override
+    public WritersToReadersLabelNode WritersToReadersLabelNode(Position pos,
+            LabelComponentNode component) {
+        WritersToReadersLabelNode n = new WritersToReadersLabelNode_c(pos, component);
+        n = ext(n, jifExtFactory().extWritersToReadersLabelNode());
+        n = del(n, delFactory().delNode());
+        return n;
+    }
+
+    @Override
     public PolicyNode ReaderPolicyNode(Position pos, PrincipalNode owner,
             List<PrincipalNode> readers) {
         PolicyNode n = new ReaderPolicyNode_c(pos, owner, readers);

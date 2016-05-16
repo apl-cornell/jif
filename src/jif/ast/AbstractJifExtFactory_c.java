@@ -91,6 +91,18 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
     }
 
     @Override
+    public final Ext extWritersToReadersLabelNode() {
+        Ext e = extWritersToReadersLabelNodeImpl();
+
+        ExtFactory nextEF = nextExtFactory();
+        if (nextEF instanceof JifExtFactory) {
+            Ext e2 = ((JifExtFactory) nextEF).extWritersToReadersLabelNode();
+            e = composeExts(e, e2);
+        }
+        return postExtWritersToReadersLabelNode(e);
+    }
+
+    @Override
     public final Ext extPolicyNode() {
         Ext e = extPolicyNodeImpl();
 
@@ -494,6 +506,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
         return extLabelNode();
     }
 
+    protected Ext extWritersToReadersLabelNodeImpl() {
+        return extLabelNode();
+    }
+
     protected Ext extPolicyNodeImpl() {
         return extNode();
     }
@@ -642,6 +658,10 @@ public class AbstractJifExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext postExtMeetLabelNode(Ext e) {
+        return postExtLabelNode(e);
+    }
+
+    protected Ext postExtWritersToReadersLabelNode(Ext e) {
         return postExtLabelNode(e);
     }
 
