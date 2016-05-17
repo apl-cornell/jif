@@ -6,7 +6,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import jif.translate.WritersToReadersLabelToJavaExpr_c;
 import jif.types.JifTypeSystem;
 import jif.types.LabelSubstitution;
 import jif.types.hierarchy.LabelEnv;
@@ -20,7 +19,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-/** An implementation of the <code>DynamicLabel</code> interface.
+/** An implementation of the <code>WritersToReadersLabel</code> interface.
  */
 public class WritersToReadersLabel_c extends Label_c
         implements WritersToReadersLabel {
@@ -142,10 +141,7 @@ public class WritersToReadersLabel_c extends Label_c
 
     protected static Label transformImpl(Label label) {
         JifTypeSystem ts = label.typeSystem();
-        if (label instanceof VarLabel_c || label instanceof ProviderLabel) {
-            // cant do anything.
-            return ts.writersToReadersLabel(label.position(), label);
-        } else if (label instanceof PairLabel) {
+        if (label instanceof PairLabel) {
             PairLabel pl = (PairLabel) label;
             ConfPolicy newCP = transformIntegToConf(pl.integPolicy());
             return ts.pairLabel(pl.position(), newCP,
@@ -173,9 +169,7 @@ public class WritersToReadersLabel_c extends Label_c
               ts.topConfPolicy(label.position()),
               ts.bottomIntegPolicy(label.position()));
         }
-
-        throw new InternalCompilerError(
-                "WritersToReaders undefined " + "for " + label);
+        return ts.writersToReadersLabel(label.position(), label);
     }
 
     protected static ConfPolicy transformIntegToConf(IntegPolicy pol) {
@@ -213,15 +207,11 @@ public class WritersToReadersLabel_c extends Label_c
     @Override
     protected Label simplifyImpl() {
         JifTypeSystem ts = (JifTypeSystem) this.ts;
-        Label label = this.label.simplify();
-        if (label instanceof VarLabel_c || label instanceof ProviderLabel) {
-            // cant do anything.
-            return ts.writersToReadersLabel(label.position(), label);
-        } else if (label instanceof PairLabel) {
+        if (label instanceof PairLabel) {
             PairLabel pl = (PairLabel) label;
             ConfPolicy newCP = simplifyIntegToConf(pl.integPolicy());
             return ts.pairLabel(pl.position(), newCP,
-                    ts.bottomIntegPolicy(pl.position()));
+                    ts.bottomIntegPolicy(pl.position())).simplify();
         } else if (label instanceof JoinLabel) {
             JoinLabel L = (JoinLabel) label;
 
@@ -239,15 +229,13 @@ public class WritersToReadersLabel_c extends Label_c
             }
             return ts.joinLabel(label.position(), comps);
         } else if (label instanceof WritersToReadersLabel) {
-          // In this case, appliying writers to readers twice always produces
-          // {⊤→;⊤←}
-          return ts.pairLabel(label.position(),
-              ts.topConfPolicy(label.position()),
-              ts.bottomIntegPolicy(label.position()));
+            // In this case, appliying writers to readers twice always produces
+            // {⊤→;⊤←}
+            return ts.pairLabel(label.position(),
+                ts.topConfPolicy(label.position()),
+                ts.bottomIntegPolicy(label.position())).simplify();
         }
-
-        throw new InternalCompilerError(
-                "WritersToReaders undefined " + "for " + label);
+        return this;
     }
 
     protected static ConfPolicy simplifyIntegToConf(IntegPolicy pol) {
@@ -286,8 +274,38 @@ public class WritersToReadersLabel_c extends Label_c
 
     @Override
     public Label normalize() {
-        return new WritersToReadersLabel_c(transformImpl(label.normalize()),
-            (JifTypeSystem) ts, position);
-    }
+        JifTypeSystem ts = this.typeSystem();
+        Label label = this.label.normalize();
+        if (label instanceof PairLabel) {
+            PairLabel pl = (PairLabel) label;
+            ConfPolicy newCP = transformIntegToConf(pl.integPolicy());
+            return ts.pairLabel(pl.position(), newCP,
+                    ts.bottomIntegPolicy(pl.position())).normalize();
+        } else if (label instanceof JoinLabel) {
+            JoinLabel L = (JoinLabel) label;
 
+            Set<Label> comps = new LinkedHashSet<Label>();
+            for (Label c : L.joinComponents()) {
+                comps.add(transformImpl(c));
+            }
+            return ts.meetLabel(label.position(), comps).normalize();
+        } else if (label instanceof MeetLabel) {
+            MeetLabel L = (MeetLabel) label;
+
+            Set<Label> comps = new LinkedHashSet<Label>();
+            for (Label c : L.meetComponents()) {
+                comps.add(transformImpl(c));
+            }
+            return ts.joinLabel(label.position(), comps).normalize();
+        } else if (label instanceof WritersToReadersLabel) {
+            // In this case, appliying writers to readers twice always produces
+            // {⊤→;⊤←}
+            return ts.pairLabel(label.position(),
+                ts.topConfPolicy(label.position()),
+                ts.bottomIntegPolicy(label.position())).normalize();
+        } else if (label != this.label) {
+            return new WritersToReadersLabel_c(label, typeSystem(), position());
+        }
+        return this;
+    }
 }
