@@ -355,6 +355,25 @@ public class CallHelper {
     }
 
     /**
+     * Utility method to abstract away passing along label infromation in the
+     * context after param checking.
+     */
+    protected void updateContextPostParams(LabelChecker lc, JifContext A,
+        PathMap Xparams) {
+        A.setPc(Xparams.N(), lc);
+    }
+
+    /**
+     * Utility method to abstract away passing along label infromation in the
+     * context after args checking.
+     */
+    protected void updateContextPostArgs(LabelChecker lc, JifContext A,
+        PathMap Xargs) {
+        A.setPc(Xargs.N(), lc);
+    }
+
+
+    /**
      * Add constraints to ensure that the labels of the actual arguments
      * are less than the upper bounds of the formal arguments.
      * @param index the ith arg
@@ -545,7 +564,7 @@ public class CallHelper {
         // check parameters
         PathMap Xjoin = labelCheckAndConstrainParams(lc, throwTypes);
         lc = lc.context((JifContext) lc.context().pushBlock());
-        lc.context().setPc(Xjoin.N(), lc);
+        updateContextPostParams(lc, lc.context(), Xjoin);
 
         // check arguments
         Xjoin = labelCheckAndConstrainArgs(lc, Xjoin);
@@ -557,7 +576,7 @@ public class CallHelper {
         }
         constrainFinalActualArgs(ts);
         lc = lc.context((JifContext) lc.context().pushBlock());
-        lc.context().setPc(Xjoin.N(), lc);
+        updateContextPostArgs(lc, lc.context(), Xjoin);
 
         // A |- X_{maxj}[N] + entry_pc <= Li
         Label Li = resolvePCBound(lc);

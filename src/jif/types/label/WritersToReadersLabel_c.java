@@ -166,6 +166,12 @@ public class WritersToReadersLabel_c extends Label_c
                 comps.add(transformImpl(c));
             }
             return ts.joinLabel(label.position(), comps);
+        } else if (label instanceof WritersToReadersLabel) {
+          // In this case, appliying writers to readers twice always produces
+          // {⊤→;⊤←}
+          return ts.pairLabel(label.position(),
+              ts.topConfPolicy(label.position()),
+              ts.bottomIntegPolicy(label.position()));
         }
 
         throw new InternalCompilerError(
@@ -202,6 +208,86 @@ public class WritersToReadersLabel_c extends Label_c
         }
         //XXX: can we do anything about projections?
         throw new InternalCompilerError("Unexpected integ policy: " + pol);
+    }
+
+    @Override
+    protected Label simplifyImpl() {
+        JifTypeSystem ts = (JifTypeSystem) this.ts;
+        Label label = this.label.simplify();
+        if (label instanceof VarLabel_c || label instanceof ProviderLabel) {
+            // cant do anything.
+            return ts.writersToReadersLabel(label.position(), label);
+        } else if (label instanceof PairLabel) {
+            PairLabel pl = (PairLabel) label;
+            ConfPolicy newCP = simplifyIntegToConf(pl.integPolicy());
+            return ts.pairLabel(pl.position(), newCP,
+                    ts.bottomIntegPolicy(pl.position()));
+        } else if (label instanceof JoinLabel) {
+            JoinLabel L = (JoinLabel) label;
+
+            Set<Label> comps = new LinkedHashSet<Label>();
+            for (Label c : L.joinComponents()) {
+                comps.add(c.simplify());
+            }
+            return ts.meetLabel(label.position(), comps);
+        } else if (label instanceof MeetLabel) {
+            MeetLabel L = (MeetLabel) label;
+
+            Set<Label> comps = new LinkedHashSet<Label>();
+            for (Label c : L.meetComponents()) {
+                comps.add(c.simplify());
+            }
+            return ts.joinLabel(label.position(), comps);
+        } else if (label instanceof WritersToReadersLabel) {
+          // In this case, appliying writers to readers twice always produces
+          // {⊤→;⊤←}
+          return ts.pairLabel(label.position(),
+              ts.topConfPolicy(label.position()),
+              ts.bottomIntegPolicy(label.position()));
+        }
+
+        throw new InternalCompilerError(
+                "WritersToReaders undefined " + "for " + label);
+    }
+
+    protected static ConfPolicy simplifyIntegToConf(IntegPolicy pol) {
+        JifTypeSystem ts = (JifTypeSystem) pol.typeSystem();
+        pol = (IntegPolicy) pol.simplify();
+        if (pol instanceof WriterPolicy) {
+            WriterPolicy wp = (WriterPolicy) pol;
+            return (ConfPolicy) ts.readerPolicy(wp.position(), wp.owner(),
+                wp.writer()).simplify();
+        }
+        if (pol instanceof JoinIntegPolicy_c) {
+            @SuppressWarnings("unchecked")
+            JoinPolicy_c<IntegPolicy> jp = (JoinPolicy_c<IntegPolicy>) pol;
+            Set<ConfPolicy> newPols =
+                    new HashSet<ConfPolicy>(jp.joinComponents().size());
+            for (IntegPolicy ip : jp.joinComponents()) {
+                ConfPolicy cp = simplifyIntegToConf(ip);
+                newPols.add(cp);
+            }
+            return (ConfPolicy) ts.meetConfPolicy(jp.position(), newPols).simplify();
+        }
+        if (pol instanceof MeetIntegPolicy_c) {
+            @SuppressWarnings("unchecked")
+            MeetPolicy_c<IntegPolicy> mp = (MeetPolicy_c<IntegPolicy>) pol;
+            Set<ConfPolicy> newPols =
+                    new HashSet<ConfPolicy>(mp.meetComponents().size());
+            for (IntegPolicy ip : mp.meetComponents()) {
+                ConfPolicy cp = simplifyIntegToConf(ip);
+                newPols.add(cp);
+            }
+            return (ConfPolicy) ts.joinConfPolicy(mp.position(), newPols).simplify();
+        }
+        //XXX: can we do anything about projections?
+        throw new InternalCompilerError("Unexpected integ policy: " + pol);
+    }
+
+    @Override
+    public Label normalize() {
+        return new WritersToReadersLabel_c(transformImpl(label.normalize()),
+            (JifTypeSystem) ts, position);
     }
 
 }
