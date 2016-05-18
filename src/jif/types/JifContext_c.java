@@ -307,7 +307,7 @@ public class JifContext_c extends Context_c implements JifContext {
         env.ph().clear();
     }
 
-    static class Key {
+    protected static class Key {
         polyglot.ast.Branch.Kind kind;
         String label;
 
