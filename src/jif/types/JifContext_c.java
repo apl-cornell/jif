@@ -311,7 +311,7 @@ public class JifContext_c extends Context_c implements JifContext {
         protected polyglot.ast.Branch.Kind kind;
         protected String label;
 
-        protected Key(polyglot.ast.Branch.Kind kind, String label) {
+        public Key(polyglot.ast.Branch.Kind kind, String label) {
             this.kind = kind;
             this.label = label;
         }
