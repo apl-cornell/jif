@@ -30,6 +30,7 @@ import jif.translate.LabelLeAssertionToJavaExpr_c;
 import jif.translate.LabelToJavaExpr;
 import jif.translate.MeetLabelToJavaExpr_c;
 import jif.translate.PairLabelToJavaExpr_c;
+import jif.translate.ParamToJavaExpr_c;
 import jif.translate.PrincipalToJavaExpr;
 import jif.translate.ProviderLabelToJavaExpr_c;
 import jif.types.hierarchy.LabelEnv;
@@ -925,6 +926,16 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     @Override
     public PrincipalToJavaExpr disjunctivePrincipalTranslator() {
         return new DisjunctivePrincipalToJavaExpr_c();
+    }
+
+    @Override
+    public LabelToJavaExpr paramLabelTranslator() {
+        return new ParamToJavaExpr_c();
+    }
+
+    @Override
+    public PrincipalToJavaExpr paramPrincipalTranslator() {
+        return new ParamToJavaExpr_c();
     }
 
     private Collection<Principal> flattenConjuncts(Collection<Principal> ps) {
@@ -1924,7 +1935,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                         && isFinalAccessExprOrConst(((DowngradeExpr) e).expr()))
                 || (e instanceof NullLit && expectedType != null
                         && isImplicitCastValid(expectedType, Principal()))
-                        /*|| (e instanceof Special && ((Special)e).kind() == Special.SUPER)*/;
+        /*|| (e instanceof Special && ((Special)e).kind() == Special.SUPER)*/;
     }
 
     @Override
