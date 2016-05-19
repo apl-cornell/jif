@@ -12,6 +12,7 @@ import jif.types.NamedLabel;
 import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
+
 import polyglot.ast.Branch;
 import polyglot.ast.Expr;
 import polyglot.ast.For;
@@ -37,30 +38,25 @@ public class JifForExt extends JifStmtExt_c {
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         For fs = (For) node();
 
-        JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
         A = (JifContext) fs.del().enterScope(A);
 
-        Label notTaken = ts.notTaken();
-
         A = (JifContext) A.pushBlock();
 
-        // INIT: A.pushBlock();
+        List<ForInit> inits = new LinkedList<>();
+        PathMap Xinit = checkInits(lc, A, fs, inits);
 
-        PathMap Xinit = ts.pathMap().N(A.pc());
+        return checkLoop(lc, A, fs, inits, Xinit);
+    }
 
-        List<ForInit> inits = new LinkedList<ForInit>();
+    /**
+     * Utility for easier overriding of loop checking.
+     */
+    public Node checkLoop(LabelChecker lc, JifContext A, For fs,
+        List<ForInit> inits, PathMap Xinit) throws SemanticException {
 
-        for (ForInit init : fs.inits()) {
-            init = (ForInit) lc.context(A).labelCheck(init);
-            inits.add(init);
-
-            PathMap Xs = getPathMap(init);
-
-            updateContextForNextInit(lc, A, Xs);
-
-            Xinit = Xinit.N(notTaken).join(Xs);
-        }
+        JifTypeSystem ts = lc.jifTypeSystem();
+        Label notTaken = ts.notTaken();
 
         // Now handle the loop body, condition, and iterators.
         Label L1 = ts.freshLabelVariable(fs.position(), "for",
@@ -153,6 +149,31 @@ public class JifForExt extends JifStmtExt_c {
 
         return updatePathMap(fs.iters(iters).cond(cond).inits(inits).body(body),
                 X);
+    }
+
+    /**
+     * Splitting out checking of inits and checking of the loop to make it
+     * easier to extend.
+     */
+    protected PathMap checkInits(LabelChecker lc, JifContext A, For fs,
+        List<ForInit> newInits) throws SemanticException {
+
+        JifTypeSystem ts = lc.jifTypeSystem();
+        PathMap Xinit = ts.pathMap().N(A.pc());
+        Label notTaken = ts.notTaken();
+
+        for (ForInit init : fs.inits()) {
+            init = (ForInit) lc.context(A).labelCheck(init);
+            newInits.add(init);
+
+            PathMap Xs = getPathMap(init);
+
+            updateContextForNextInit(lc, A, Xs);
+
+            Xinit = Xinit.N(notTaken).join(Xs);
+        }
+
+        return Xinit;
     }
 
     /**
