@@ -15,6 +15,7 @@ public class WritersToReadersLabelToJavaExpr_c extends LabelToJavaExpr_c {
             throws SemanticException {
         WritersToReadersLabel L = (WritersToReadersLabel) label;
 
-        return rw.qq().parseExpr("%E.writersToReaders()", rw.labelToJava(L.label()));
+        return rw.qq().parseExpr("%E.writersToReaders()",
+            rw.labelToJava(L.label(), qualifier));
     }
 }
