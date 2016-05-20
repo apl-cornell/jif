@@ -15,12 +15,13 @@ public class MeetLabelToJavaExpr_c extends LabelToJavaExpr_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public Expr toJava(Label label, JifToJavaRewriter rw)
+    public Expr toJava(Label label, JifToJavaRewriter rw, Expr qualifier)
             throws SemanticException {
         MeetLabel L = (MeetLabel) label;
 
         if (L.meetComponents().size() == 1) {
-            return rw.labelToJava(L.meetComponents().iterator().next());
+            return rw.labelToJava(L.meetComponents().iterator().next(),
+                    qualifier);
         }
 
         boolean simplify = true;
@@ -31,10 +32,10 @@ public class MeetLabelToJavaExpr_c extends LabelToJavaExpr_c {
         LinkedList<Label> l = new LinkedList<Label>(L.meetComponents());
         Iterator<Label> iter = l.iterator();
         Label head = iter.next();
-        Expr e = rw.labelToJava(head);
+        Expr e = rw.labelToJava(head, qualifier);
         while (iter.hasNext()) {
             head = iter.next();
-            Expr f = rw.labelToJava(head);
+            Expr f = rw.labelToJava(head, qualifier);
             e = rw.qq().parseExpr("%E.meet(%E, %E)", e, f, rw.java_nf()
                     .BooleanLit(Position.compilerGenerated(), simplify));
         }

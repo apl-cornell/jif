@@ -1774,14 +1774,14 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                 //}
                 AccessPath prefix =
                         exprToAccessPath((Expr) f.target(), null, context);
-                return new AccessPathField(prefix, f.fieldInstance(), f.name(),
+                return accessPathField(prefix, f.fieldInstance(), f.name(),
                         f.position());
             } else if (target instanceof TypeNode
                     && ((TypeNode) target).type().isClass()) {
                 AccessPath prefix = new AccessPathClass(
                         ((TypeNode) target).type().toClass(),
                         target.position());
-                return new AccessPathField(prefix, f.fieldInstance(), f.name(),
+                return accessPathField(prefix, f.fieldInstance(), f.name(),
                         f.position());
             } else {
                 throw new InternalCompilerError(
@@ -1984,8 +1984,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         for (FieldInstance fieldInstance : ct.fields()) {
             JifFieldInstance jfi = (JifFieldInstance) fieldInstance;
             if (jfi.flags().isFinal()) {
-                AccessPathField path2 = new AccessPathField(path, jfi,
-                        jfi.name(), jfi.position());
+                AccessPathField path2 =
+                        accessPathField(path, jfi, jfi.name(), jfi.position());
                 // if it is static and is the end of a final access path and has an initializer
                 // TODO Could use isFinalAccessExprOrConst instead of restricting to isStatic and hasInitializer
                 Param init2 = jfi.initializer();
@@ -2054,7 +2054,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             } else {
                 root = new AccessPathThis(fi.container().toClass(), pos);
             }
-            return new AccessPathField(root, fi, name, pos);
+            return accessPathField(root, fi, name, pos);
         }
         throw new InternalCompilerError(
                 "Unexpected var instance " + vi.getClass());
@@ -2080,4 +2080,11 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         return isParamsRuntimeRep(jpt);
     }
 
+    /**
+     * Factory method for constructing AccessPathField objects.
+     */
+    protected AccessPathField accessPathField(AccessPath path, FieldInstance fi,
+            String fieldName, Position pos) {
+        return new AccessPathField(path, fi, fieldName, pos);
+    }
 }

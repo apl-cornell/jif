@@ -3,14 +3,12 @@ package jif.types.label;
 import java.util.List;
 import java.util.Set;
 
-import jif.translate.JifToJavaRewriter;
 import jif.types.ActsForParam;
 import jif.types.JifContext;
 import jif.types.LabelSubstitution;
 import jif.types.PathMap;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
-import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
@@ -78,9 +76,9 @@ public interface Label extends ActsForParam {
      * label at runtime will reveal as much information as the label of lb. For
      * example, the following code is illegal, as the runtime evaluation of the
      * label reveals too much information
-     * 
+     *
      * <pre>
-     * 
+     *
      *  boolean{Alice:} secret = ...;
      *  final label{Alice:} lb = secret?new label{}:new label{Bob:};
      *  boolean{} leak = false;
@@ -88,9 +86,9 @@ public interface Label extends ActsForParam {
      *                           // information at level {Alice:}
      *     leak = true;
      *  }
-     * 
+     *
      * </pre>
-     * 
+     *
      * @see jif.ast.JifExt#labelCheck(LabelChecker)
      * @see jif.types.principal.Principal#labelCheck(JifContext, LabelChecker)
      */
@@ -102,7 +100,7 @@ public interface Label extends ActsForParam {
      * For example, Singletons are enumerable, JoinLabels are enumerable,
      * RuntimeLabel (the label of all runtime representable components) is not
      * enumerable.
-     * 
+     *
      * NOTE: The components of a label are not neccessarily stuck together with
      * a join operation. For example, the MeetLabel uses the meet operation
      * between its components.
@@ -117,7 +115,7 @@ public interface Label extends ActsForParam {
     /**
      * Retrieve the collection of components. This method should only be called
      * if isEnumerable returns true.
-     * 
+     *
      * This collection should not be modified.
      */
 //    Collection components();
@@ -140,6 +138,7 @@ public interface Label extends ActsForParam {
     /**
      * Simplify the label, using leq if needed
      */
+    @Override
     Label simplify();
 
     /**
@@ -180,7 +179,7 @@ public interface Label extends ActsForParam {
 
     /**
      * Implementation of leq, should only be called by JifTypeSystem
-     * 
+     *
      * @param L the label to determine if this label is leq to. This label
      *            always satisfies !this.equals(L)
      * @param H the label environment (including principal hierarchy). Will
@@ -202,9 +201,6 @@ public interface Label extends ActsForParam {
      * evaluated at runtime, an empty list should be returned.
      */
     List<Type> throwTypes(TypeSystem ts);
-
-    @Override
-    Expr toJava(JifToJavaRewriter rw) throws SemanticException;
 
     @Override
     Label copy();

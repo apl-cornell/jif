@@ -207,7 +207,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
      */
     protected ClassBody addInterfaceParamGetters(ClassBody cb,
             JifPolyType baseClass, JifPolyType jpt, JifToJavaRewriter rw)
-                    throws SemanticException {
+            throws SemanticException {
         // go through the interfaces of cb
         if (!rw.jif_ts().isParamsRuntimeRep(jpt)) {
             // don't bother adding interface methods for classes that don't represent the runtime params (i.e., Jif sig classes)
@@ -429,12 +429,14 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             JifContext A = (JifContext) rw.context();
             JifToJavaRewriter rwCons =
                     (JifToJavaRewriter) rw.context(A.pushConstructorCall());
+            Expr qualifier = rw.qq().parseExpr("this");
             for (ParamInstance pi : superjpt.params()) {
                 Param param = ((JifSubst) superjst.subst()).get(pi);
                 if (pi.isLabel()) {
-                    superArgs.add(((Label) param).toJava(rwCons));
+                    superArgs.add(((Label) param).toJava(rwCons, qualifier));
                 } else {
-                    superArgs.add(((Principal) param).toJava(rwCons));
+                    superArgs
+                            .add(((Principal) param).toJava(rwCons, qualifier));
                 }
             }
         }
