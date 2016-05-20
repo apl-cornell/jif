@@ -22,20 +22,20 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public Expr toJava(Label label, JifToJavaRewriter rw)
+    public Expr toJava(Label label, JifToJavaRewriter rw, Expr qualifier)
             throws SemanticException {
         PairLabel pl = (PairLabel) label;
         if (pl.confPolicy().isBottomConfidentiality()
                 && pl.integPolicy().isTopIntegrity()) {
             return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".noComponents()");
         }
-        Expr cexp = policyToJava(pl.confPolicy(), rw);
-        Expr iexp = policyToJava(pl.integPolicy(), rw);
+        Expr cexp = policyToJava(pl.confPolicy(), rw, qualifier);
+        Expr iexp = policyToJava(pl.integPolicy(), rw, qualifier);
         return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".toLabel(%E, %E)",
                 cexp, iexp);
     }
 
-    public Expr policyToJava(Policy p, JifToJavaRewriter rw)
+    public Expr policyToJava(Policy p, JifToJavaRewriter rw, Expr qualifier)
             throws SemanticException {
         if (p instanceof ConfPolicy
                 && ((ConfPolicy) p).isBottomConfidentiality()) {
@@ -46,8 +46,8 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
         }
         if (p instanceof WriterPolicy) {
             WriterPolicy policy = (WriterPolicy) p;
-            Expr owner = rw.principalToJava(policy.owner());
-            Expr writer = rw.principalToJava(policy.writer());
+            Expr owner = rw.principalToJava(policy.owner(), qualifier);
+            Expr writer = rw.principalToJava(policy.writer(), qualifier);
             return rw.qq().parseExpr(
                     rw.runtimeLabelUtil() + ".writerPolicy(%E, %E)", owner,
                     writer);
@@ -55,8 +55,8 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
 
         if (p instanceof ReaderPolicy) {
             ReaderPolicy policy = (ReaderPolicy) p;
-            Expr owner = rw.principalToJava(policy.owner());
-            Expr reader = rw.principalToJava(policy.reader());
+            Expr owner = rw.principalToJava(policy.owner(), qualifier);
+            Expr reader = rw.principalToJava(policy.reader(), qualifier);
             return (Expr) rw.qq()
                     .parseExpr(rw.runtimeLabelUtil() + ".readerPolicy(%E, %E)",
                             owner, reader)
@@ -70,10 +70,10 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
             LinkedList<Policy> l = new LinkedList<Policy>(jp.joinComponents());
             Iterator<Policy> iter = l.iterator();
             Policy head = iter.next();
-            Expr e = policyToJava(head, rw);
+            Expr e = policyToJava(head, rw, qualifier);
             while (iter.hasNext()) {
                 head = iter.next();
-                Expr f = policyToJava(head, rw);
+                Expr f = policyToJava(head, rw, qualifier);
                 e = rw.qq().parseExpr("%E.join(%E)", e, f);
             }
             return e;
@@ -85,10 +85,10 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
             LinkedList<Policy> l = new LinkedList<Policy>(mp.meetComponents());
             Iterator<Policy> iter = l.iterator();
             Policy head = iter.next();
-            Expr e = policyToJava(head, rw);
+            Expr e = policyToJava(head, rw, qualifier);
             while (iter.hasNext()) {
                 head = iter.next();
-                Expr f = policyToJava(head, rw);
+                Expr f = policyToJava(head, rw, qualifier);
                 e = rw.qq().parseExpr("%E.meet(%E)", e, f);
             }
             return e;

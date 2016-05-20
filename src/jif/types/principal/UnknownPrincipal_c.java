@@ -9,7 +9,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-/** An implementation of the <code>UnknownPrincipal</code> interface. 
+/** An implementation of the <code>UnknownPrincipal</code> interface.
  */
 public class UnknownPrincipal_c extends Principal_c
         implements UnknownPrincipal {
@@ -35,7 +35,8 @@ public class UnknownPrincipal_c extends Principal_c
     }
 
     @Override
-    public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
+    public Expr toJava(JifToJavaRewriter rw, Expr qualifier)
+            throws SemanticException {
         throw new InternalCompilerError(
                 "Cannot translate an unknown principal.");
     }

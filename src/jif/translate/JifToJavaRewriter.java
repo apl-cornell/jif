@@ -157,21 +157,51 @@ public class JifToJavaRewriter extends ContextVisitor {
     }
 
     public Expr paramToJava(Param param) throws SemanticException {
+        return paramToJava(param, qq().parseExpr("this"));
+    }
+
+    /**
+     * @param qualifier
+     *          an expression for qualifying accesses to label params and
+     *          principal params.
+     */
+    public Expr paramToJava(Param param, Expr qualifier)
+            throws SemanticException {
         if (param instanceof Label) {
-            return labelToJava((Label) param);
+            return labelToJava((Label) param, qualifier);
         }
         if (param instanceof Principal) {
-            return principalToJava((Principal) param);
+            return principalToJava((Principal) param, qualifier);
         }
         throw new InternalCompilerError("Unexpected param " + param);
     }
 
     public Expr labelToJava(Label label) throws SemanticException {
-        return label.toJava(this);
+        return labelToJava(label, qq().parseExpr("this"));
+    }
+
+    /**
+     * @param qualifier
+     *          an expression for qualifying accesses to label params and
+     *          principal params.
+     */
+    public Expr labelToJava(Label label, Expr qualifier)
+            throws SemanticException {
+        return label.toJava(this, qualifier);
     }
 
     public Expr principalToJava(Principal principal) throws SemanticException {
-        return principal.toJava(this);
+        return principalToJava(principal, qq().parseExpr("this"));
+    }
+
+    /**
+     * @param qualifier
+     *          an expression for qualifying accesses to label params and
+     *          principal params.
+     */
+    public Expr principalToJava(Principal principal, Expr qualifier)
+            throws SemanticException {
+        return principal.toJava(this, qualifier);
     }
 
     public TypeNode typeToJava(Type t, Position pos) throws SemanticException {
@@ -238,7 +268,7 @@ public class JifToJavaRewriter extends ContextVisitor {
     }
 
     /**
-     * @throws SemanticException  
+     * @throws SemanticException
      */
     public void addInitializer(FieldInstance fi, Expr init)
             throws SemanticException {
@@ -274,10 +304,9 @@ public class JifToJavaRewriter extends ContextVisitor {
             if (cd.flags().isPublic()) {
                 try {
                     // cd is public, we will put it in its own source file.
-                    SourceFile sf =
-                            java_nf().SourceFile(Position.compilerGenerated(),
-                                    n.package_(), Collections
-                                            .<Import> emptyList(),
+                    SourceFile sf = java_nf().SourceFile(
+                            Position.compilerGenerated(), n.package_(),
+                            Collections.<Import> emptyList(),
                             Collections.singletonList((TopLevelDecl) cd));
 
                     Location location = java_ext.getOptions().source_output;

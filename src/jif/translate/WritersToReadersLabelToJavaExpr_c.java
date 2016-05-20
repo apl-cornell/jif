@@ -11,7 +11,7 @@ public class WritersToReadersLabelToJavaExpr_c extends LabelToJavaExpr_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public Expr toJava(Label label, JifToJavaRewriter rw)
+    public Expr toJava(Label label, JifToJavaRewriter rw, Expr qualifier)
             throws SemanticException {
         WritersToReadersLabel L = (WritersToReadersLabel) label;
 

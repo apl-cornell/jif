@@ -3,7 +3,6 @@ package jif.types.principal;
 import java.util.List;
 import java.util.Set;
 
-import jif.translate.JifToJavaRewriter;
 import jif.types.ActsForParam;
 import jif.types.JifContext;
 import jif.types.LabelSubstitution;
@@ -11,7 +10,6 @@ import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.types.label.Variable;
 import jif.visit.LabelChecker;
-import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
@@ -45,14 +43,11 @@ public interface Principal extends ActsForParam {
      *     leak = true;
      * 	}
      * </pre>
-     * 
+     *
      * @see jif.ast.JifExt#labelCheck(LabelChecker)
      * @see Label#labelCheck(JifContext, LabelChecker)
      */
     PathMap labelCheck(JifContext A, LabelChecker lc);
-
-    @Override
-    Expr toJava(JifToJavaRewriter rw) throws SemanticException;
 
     /**
      * If the principal is runtime representable, when it is evaluated at
@@ -81,5 +76,6 @@ public interface Principal extends ActsForParam {
     /**
      * Simplify the label, using the actsfor relation if needed
      */
+    @Override
     Principal simplify();
 }

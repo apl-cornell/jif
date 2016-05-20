@@ -10,7 +10,8 @@ public class CannotLabelToJavaExpr_c extends LabelToJavaExpr_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public Expr toJava(Label L, JifToJavaRewriter rw) throws SemanticException {
+    public Expr toJava(Label L, JifToJavaRewriter rw, Expr qualifier)
+            throws SemanticException {
         throw new InternalCompilerError(L.position(),
                 "Cannot translate " + L + " to Java.");
     }

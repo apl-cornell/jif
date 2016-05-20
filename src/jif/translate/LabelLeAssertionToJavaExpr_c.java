@@ -12,8 +12,9 @@ public class LabelLeAssertionToJavaExpr_c
     @Override
     public Expr toJava(LabelLeAssertion lla, JifToJavaRewriter rw)
             throws SemanticException {
-        Expr left = lla.lhs().toJava(rw);
-        Expr right = lla.rhs().toJava(rw);
+        Expr qualifier = rw.qq().parseExpr("this");
+        Expr left = lla.lhs().toJava(rw, qualifier);
+        Expr right = lla.rhs().toJava(rw, qualifier);
         String comparison = rw.runtimeLabelUtil() + ".relabelsTo((%E), (%E))";
         return rw.qq().parseExpr(comparison, left, right);
     }

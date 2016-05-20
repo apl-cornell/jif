@@ -10,8 +10,8 @@ public class BottomPrincipalToJavaExpr_c extends PrincipalToJavaExpr_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public Expr toJava(Principal principal, JifToJavaRewriter rw)
-            throws SemanticException {
+    public Expr toJava(Principal principal, JifToJavaRewriter rw,
+            Expr qualifier) throws SemanticException {
         JifTypeSystem ts = rw.jif_ts();
         return rw.qq()
                 .parseExpr(ts.PrincipalUtilClassName() + ".bottomPrincipal()");
