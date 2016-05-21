@@ -998,7 +998,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public Label topLabel() {
-        if (top == null) top = topLabel(null);
+        if (top == null) top = topLabel(Position.COMPILER_GENERATED);
         return top;
     }
 
@@ -1009,7 +1009,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public Label bottomLabel() {
-        if (bottom == null) bottom = bottomLabel(null);
+        if (bottom == null) bottom = bottomLabel(Position.COMPILER_GENERATED);
         return bottom;
     }
 
@@ -1030,7 +1030,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     @Override
     public Label noComponentsLabel() {
         if (noComponents == null) {
-            noComponents = noComponentsLabel(null);
+            noComponents = noComponentsLabel(Position.COMPILER_GENERATED);
         }
         return noComponents;
     }
@@ -1048,7 +1048,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public Label notTaken() {
-        if (notTaken == null) notTaken = notTaken(null);
+        if (notTaken == null) notTaken = notTaken(Position.COMPILER_GENERATED);
         return notTaken;
     }
 
