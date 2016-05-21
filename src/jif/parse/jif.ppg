@@ -354,10 +354,6 @@ label ::=
                col.add(c);
                LabelNode mn = parser.nf.JoinLabelNode(parser.pos(x,c), col);
                RESULT = mn; :}
-    |    WRITERSTOREADERS:a LPAREN label:l RPAREN:b
-            {: RESULT = parser.nf.WritersToReadersLabelNode(parser.pos(a, b), l); :}
-    |    WRITERSTOREADERS:a LPAREN label_component:l RPAREN:b
-            {: RESULT = parser.nf.WritersToReadersLabelNode(parser.pos(a, b), (LabelComponentNode) l); :}
     |    LBRACE label:l RBRACE
             {: RESULT = l; :}
     ;
@@ -418,6 +414,10 @@ label_component ::=
     |   IDENTIFIER:a
             {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),
                                                   parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
+    |    WRITERSTOREADERS:a LPAREN label:l RPAREN:b
+            {: RESULT = parser.nf.WritersToReadersLabelNode(parser.pos(a, b), l); :}
+    |    WRITERSTOREADERS:a LPAREN label_component:l RPAREN:b
+            {: RESULT = parser.nf.WritersToReadersLabelNode(parser.pos(a, b), (LabelComponentNode) l); :}
     ;
 provider ::=
         PROVIDER:a
