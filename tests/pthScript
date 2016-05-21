@@ -139,6 +139,12 @@ jif.ExtensionInfo  "-d out -nonrobust -classpath ../classes:../lib-classes:../li
 	Call12.jif ;
 	Call13.jif ;
 	Call14.jif ;
+	Call15.jif ;
+	Call16.jif ;
+	Call17.jif ;
+	Call18.jif ;
+	Call19.jif ;
+	Call20.jif ;
 	CallerPC01.jif (Semantic, "PC") ;
 	CallerPC02.jif (Semantic, "PC") ;
 	cat.jif ;

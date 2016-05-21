@@ -1,0 +1,7 @@
+class Call18[label L] {
+  void m{⊤←}() {
+    if (new label{⊤←} <= L) new Call18(0);
+  }
+
+  Call18{⊤→}(int{L} x) {}
+}

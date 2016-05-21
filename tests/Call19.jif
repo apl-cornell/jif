@@ -1,0 +1,7 @@
+class Call19[label L] {
+  static void m{⊤←}(Call19[L]{⊤←} o) throws (NullPointerException{⊤→}) {
+    if (new label{⊤←} <= L) o.f(0);
+  }
+
+  void f{⊤→}(int{L} x) {}
+}

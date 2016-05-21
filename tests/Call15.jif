@@ -1,0 +1,7 @@
+class Call15[label L] {
+  static void m{⊤←}() {
+    if (new label{⊤←} <= L) f(0);
+  }
+
+  static void f{⊤→}(int{L} x) {}
+}
