@@ -442,6 +442,7 @@ public class LabelEnv_c implements LabelEnv {
      */
     private boolean leqImpl(Label L1, Label L2, SearchState_c state) {
         AssertionUseCount auc = state.auc;
+
         L1 = L1.normalize();
         L2 = L2.normalize();
 
@@ -449,13 +450,17 @@ public class LabelEnv_c implements LabelEnv {
             Label tL1 = triggerTransformsLeft(L1).normalize();
             if (Report.should_report(topics, 3))
                 Report.report(3, "Transforming " + L1 + " to " + tL1);
-            if (!L1.equals(tL1)) return leq(tL1, L2, state);
+            // Try with transforming.
+            if (!L1.equals(tL1) && leq(tL1, L2, state))
+              return true;
         }
         if (L2 instanceof WritersToReadersLabel) {
             Label tL2 = triggerTransformsRight(L2).normalize();
             if (Report.should_report(topics, 3))
                 Report.report(3, "Transforming " + L2 + " to " + tL2);
-            if (!L2.equals(tL2)) return leq(L1, tL2, state);
+            // Try with transforming.
+            if (!L2.equals(tL2) && leq(L1, tL2, state))
+              return true;
         }
 
         if (!L1.isComparable() || !L2.isComparable()) {
@@ -496,6 +501,31 @@ public class LabelEnv_c implements LabelEnv {
                     "Cannot compare " + L1 + " <= " + L2);
         }
 
+        if (L1 instanceof MeetLabel) {
+            // C1 meet ... meet Cn <= L2 if
+            // exists cj such that cj <= L2
+            MeetLabel ml = (MeetLabel) L1;
+            for (Label cj : ml.meetComponents()) {
+                if (leq(cj, L2, state)) {
+                    return true;
+                }
+            }
+        }
+
+        if (L1 instanceof JoinLabel) {
+            // c1 join ... join cn <= L2 if
+            // for all j cj <= L2
+            JoinLabel jl = (JoinLabel) L1;
+            boolean allSat = true;
+            for (Label cj : jl.joinComponents()) {
+                if (!leq(cj, L2, state)) {
+                    allSat = false;
+                    break;
+                }
+            }
+            if (allSat) return true;
+        }
+
         if (L2 instanceof MeetLabel) {
             // L1 <= C1 meet ... meet Cn if
             // for all j L1 <= Cj
@@ -509,6 +539,7 @@ public class LabelEnv_c implements LabelEnv {
             }
             if (allSat) return true;
         }
+
         if (L2 instanceof JoinLabel) {
             // L1 <= c1 join ... join cn if there exists a cj
             // such that L1 <= cj
@@ -530,8 +561,12 @@ public class LabelEnv_c implements LabelEnv {
             if (leq(al.upperBound(), L2, state)) return true;
         }
 
-        if (L1 instanceof MeetLabel || L1 instanceof JoinLabel
-                || L2 instanceof MeetLabel || L2 instanceof JoinLabel) {
+        if (L1 instanceof MeetLabel ||
+            L1 instanceof JoinLabel ||
+            L2 instanceof MeetLabel ||
+            L2 instanceof JoinLabel ||
+            L1 instanceof WritersToReadersLabel ||
+            L2 instanceof WritersToReadersLabel) {
             // see if using a conf and integ projections will work
             ConfPolicy conf1 = ts.confProjection(L1);
             ConfPolicy conf2 = ts.confProjection(L2);
@@ -552,7 +587,6 @@ public class LabelEnv_c implements LabelEnv {
 
         // try to use assertions
         return leqApplyAssertions(L1, L2, state, true);
-
     }
 
     /**

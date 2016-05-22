@@ -71,6 +71,12 @@ public class WritersToReadersLabel_c extends Label_c
     }
 
     @Override
+    public ConfPolicy confProjection() {
+        return new WritersToReadersPolicy(label().integProjection(),
+                typeSystem(), position);
+    }
+
+    @Override
     public IntegPolicy integProjection() {
         return ((JifTypeSystem) ts).bottomIntegPolicy(position());
     }
@@ -105,7 +111,8 @@ public class WritersToReadersLabel_c extends Label_c
 
     @Override
     public boolean leq_(Label L, LabelEnv env, LabelEnv.SearchState state) {
-        return false;
+        return confProjection().leq_(L.confProjection(), env, state) &&
+          integProjection().leq_(L.integProjection(), env, state);
     }
 
     @Override

@@ -83,6 +83,7 @@ import jif.types.label.WriterPolicy;
 import jif.types.label.WriterPolicy_c;
 import jif.types.label.WritersToReadersLabel;
 import jif.types.label.WritersToReadersLabel_c;
+import jif.types.label.WritersToReadersPolicy;
 import jif.types.principal.BottomPrincipal;
 import jif.types.principal.BottomPrincipal_c;
 import jif.types.principal.ConjunctivePrincipal;
@@ -1239,6 +1240,12 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     public WritersToReadersLabel writersToReadersLabel(Position pos, Label L) {
         WritersToReadersLabel t = new WritersToReadersLabel_c(L, this, pos);
         return t;
+    }
+
+    @Override
+    public WritersToReadersPolicy writersToReadersPolicy(Position pos,
+            IntegPolicy integPol) {
+        return new WritersToReadersPolicy(integPol, this, pos);
     }
 
     @Override

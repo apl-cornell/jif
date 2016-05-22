@@ -25,6 +25,7 @@ import jif.types.label.UnknownLabel;
 import jif.types.label.VarLabel;
 import jif.types.label.WriterPolicy;
 import jif.types.label.WritersToReadersLabel;
+import jif.types.label.WritersToReadersPolicy;
 import jif.types.principal.BottomPrincipal;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.ExternalPrincipal;
@@ -265,6 +266,8 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
     PairLabel pairLabel(Position pos, ConfPolicy confPol, IntegPolicy integPol);
 
     WritersToReadersLabel writersToReadersLabel(Position pos, Label L);
+
+    WritersToReadersPolicy writersToReadersPolicy(Position pos, IntegPolicy integPol);
 
     Label pathToLabel(Position pos, AccessPath path);
 

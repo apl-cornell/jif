@@ -15,7 +15,7 @@ import jif.types.label.JoinLabel;
 import jif.types.label.Label;
 import jif.types.label.MeetLabel;
 import jif.types.label.Variable;
-import jif.types.label.WritersToReadersLabel;
+
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -166,10 +166,6 @@ public class LabelConstraint extends Constraint {
                 List<String> list = new ArrayList<String>(2);
                 list.add(l.description());
                 defns.put(s, list);
-                if (l instanceof WritersToReadersLabel) {
-                    // add the transform of the writersToReaders label
-                    list.add(env.triggerTransformsLeft(l).toString());
-                }
             }
         }
 
@@ -181,10 +177,6 @@ public class LabelConstraint extends Constraint {
                 List<String> list = new ArrayList<String>(2);
                 list.add(l.description());
                 defns.put(s, list);
-                if (l instanceof WritersToReadersLabel) {
-                    // add the transform of the writersToReaders label
-                    list.add(env.triggerTransformsRight(l).toString());
-                }
             }
         }
 

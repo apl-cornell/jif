@@ -73,7 +73,10 @@ public class ConfProjectionPolicy_c extends Policy_c
     @Override
     public boolean leq_(ConfPolicy p, LabelEnv env, SearchState state) {
         if (p instanceof ConfProjectionPolicy_c) {
-            return env.leq(this.label(), ((ConfProjectionPolicy_c) p).label(),
+            JifTypeSystem ts = (JifTypeSystem) typeSystem();
+            return env.leq(this.label(),
+                ts.join(((ConfProjectionPolicy_c) p).label(),
+                  ts.noComponentsLabel()),
                     state);
         }
         if (p.isTopConfidentiality()) return true;

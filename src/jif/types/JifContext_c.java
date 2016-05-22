@@ -15,6 +15,7 @@ import jif.types.label.Label;
 import jif.types.label.NotTaken;
 import jif.types.label.PairLabel;
 import jif.types.label.ProviderLabel;
+import jif.types.label.WritersToReadersLabel;
 import jif.types.principal.Principal;
 import jif.visit.LabelChecker;
 
@@ -402,7 +403,7 @@ public class JifContext_c extends Context_c implements JifContext {
             PairLabel public_untrusted = jifts.pairLabel(pos,
                     jifts.bottomConfPolicy(pos), jifts.topIntegPolicy(pos));
             Label provider_integ = jifts.meet(public_untrusted, provider());
-            Label L = jifts.writersToReadersLabel(pos, provider_integ);
+            WritersToReadersLabel L = jifts.writersToReadersLabel(pos, provider_integ);
             return env.triggerTransformsRight(L).normalize();
         } else {
             Set<Principal> auth = authority();
