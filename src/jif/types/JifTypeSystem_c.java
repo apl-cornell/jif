@@ -1537,6 +1537,10 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         return emptyLabelEnv.leq(p1, p2);
     }
 
+    /**
+     * Don't simplify here, it's called from a simplify implementation
+     * elsewhere and causes infinite recursion.
+     */
     @Override
     public ConfPolicy joinConfPolicy(Position pos, Set<ConfPolicy> components) {
         if (components.isEmpty()) {
@@ -1544,10 +1548,13 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         } else if (components.size() == 1) {
             return components.iterator().next();
         }
-        return (ConfPolicy) new JoinConfPolicy_c(components, this, pos)
-                .simplify();
+        return new JoinConfPolicy_c(components, this, pos);
     }
 
+    /**
+     * Don't simplify here, it's called from a simplify implementation
+     * elsewhere and causes infinite recursion.
+     */
     @Override
     public IntegPolicy joinIntegPolicy(Position pos,
             Set<IntegPolicy> components) {
@@ -1556,10 +1563,13 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         } else if (components.size() == 1) {
             return components.iterator().next();
         }
-        return (IntegPolicy) new JoinIntegPolicy_c(components, this, pos)
-                .simplify();
+        return new JoinIntegPolicy_c(components, this, pos);
     }
 
+    /**
+     * Don't simplify here, it's called from a simplify implementation
+     * elsewhere and causes infinite recursion.
+     */
     @Override
     public ConfPolicy meetConfPolicy(Position pos, Set<ConfPolicy> components) {
         if (components.isEmpty()) {
@@ -1567,10 +1577,13 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         } else if (components.size() == 1) {
             return components.iterator().next();
         }
-        return (ConfPolicy) new MeetConfPolicy_c(components, this, pos)
-                .simplify();
+        return new MeetConfPolicy_c(components, this, pos);
     }
 
+    /**
+     * Don't simplify here, it's called from a simplify implementation
+     * elsewhere and causes infinite recursion.
+     */
     @Override
     public IntegPolicy meetIntegPolicy(Position pos,
             Set<IntegPolicy> components) {
@@ -1579,8 +1592,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         } else if (components.size() == 1) {
             return components.iterator().next();
         }
-        return (IntegPolicy) new MeetIntegPolicy_c(components, this, pos)
-                .simplify();
+        return new MeetIntegPolicy_c(components, this, pos);
     }
 
     @Override

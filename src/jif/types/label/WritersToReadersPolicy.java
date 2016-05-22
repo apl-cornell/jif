@@ -52,12 +52,6 @@ public class WritersToReadersPolicy extends Policy_c implements ConfPolicy {
             return env.leq(other.integPol(), integPol(), state);
         }
 
-        Policy simp = simplify();
-        if (!(simp instanceof WritersToReadersPolicy)) {
-            // Avoid infinite recursion!
-            return env.leq(simplify(), p, state);
-        }
-
         // Not sure we can do more?
         return false;
     }
