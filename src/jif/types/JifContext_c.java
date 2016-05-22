@@ -404,7 +404,7 @@ public class JifContext_c extends Context_c implements JifContext {
                     jifts.bottomConfPolicy(pos), jifts.topIntegPolicy(pos));
             Label provider_integ = jifts.meet(public_untrusted, provider());
             WritersToReadersLabel L = jifts.writersToReadersLabel(pos, provider_integ);
-            return env.triggerTransformsRight(L).normalize();
+            return L;
         } else {
             Set<Principal> auth = authority();
 

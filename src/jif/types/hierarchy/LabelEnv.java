@@ -73,18 +73,6 @@ public interface LabelEnv {
     PrincipalHierarchy principalHierarchy();
 
     /**
-     * Trigger any writersToReaders transforms in label for right hand side of
-     * a comparison, and return the result.
-     */
-    Label triggerTransformsRight(Label label);
-
-    /**
-     * Trigger any writersToReaders transforms in label for left hand side of
-     * a comparison, and return the result.
-     */
-    Label triggerTransformsLeft(Label label);
-
-    /**
      * Is this environment empty, or does is contain some constraints?
      */
     boolean isEmpty();

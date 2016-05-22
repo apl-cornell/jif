@@ -177,10 +177,8 @@ public class SolverGLB extends AbstractSolver {
                 refineVariableEquation(comp, eqn, false);
 
                 // check that the equation is now satisfied.
-                Label lhsbound = triggerTransformsLeft(bounds().applyTo(eqn.lhs()),
-                        eqn.env());
-                Label rhsbound = triggerTransformsRight(bounds().applyTo(eqn.rhs()),
-                        eqn.env());
+                Label lhsbound = bounds().applyTo(eqn.lhs());
+                Label rhsbound = bounds().applyTo(eqn.rhs());
 
                 try {
                     if (eqn.env().leq(lhsbound, rhsbound) && search(eqn)) {
@@ -307,10 +305,8 @@ public class SolverGLB extends AbstractSolver {
     protected void refineVariableEquation(VarLabel v, LabelEquation eqn,
             boolean trace) throws SemanticException {
         Label vBound = bounds().boundOf(v);
-        Label lhsBound =
-                triggerTransformsLeft(bounds().applyTo(eqn.lhs()), eqn.env());
-        Label rhsBound =
-                triggerTransformsRight(bounds().applyTo(eqn.rhs()), eqn.env());
+        Label lhsBound = bounds().applyTo(eqn.lhs());
+        Label rhsBound = bounds().applyTo(eqn.rhs());
 
         if (shouldReport(5)) report(5, "BOUND of " + v + " = " + vBound);
         if (shouldReport(5)) report(5, "RHSBOUND = " + rhsBound);
@@ -494,12 +490,10 @@ public class SolverGLB extends AbstractSolver {
         // This equation must have been woken up. We need to
         // check whether it is solvable given the current variables.
 
-        Label rhsLabel =
-                triggerTransformsLeft(bounds().applyTo(eqn.rhs()), eqn.env());
+        Label rhsLabel = bounds().applyTo(eqn.rhs());
         if (shouldReport(4)) report(4, "RHS = " + rhsLabel);
 
-        Label lhsBound =
-                triggerTransformsRight(bounds().applyTo(eqn.lhs()), eqn.env());
+        Label lhsBound = bounds().applyTo(eqn.lhs());
         if (shouldReport(4)) report(4, "LHS APP = " + lhsBound);
 
         // Check to see if it is currently satisfiable.

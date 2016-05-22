@@ -1191,9 +1191,10 @@ public class LabelEnv_c implements LabelEnv {
      * Trigger the transformation of WritersToReaders labels for the right hand
      * side of a comparison. Not guaranteed to remove all writersToReaders
      * labels.
+     *
+     * This should not be called outside the LabelEnv.
      */
-    @Override
-    public Label triggerTransformsRight(Label label) {
+    protected Label triggerTransformsRight(Label label) {
         LabelSubstitution subst = new LabelSubstitution() {
             /**
              * @throws SemanticException
@@ -1219,9 +1220,10 @@ public class LabelEnv_c implements LabelEnv {
      * Trigger the transformation of WritersToReaders labels for the left hand
      * side of a comparison. Not guaranteed to remove all writersToReaders
      * labels.
+     *
+     * This should not be called outside the LabelEnv.
      */
-    @Override
-    public Label triggerTransformsLeft(Label label) {
+    protected Label triggerTransformsLeft(Label label) {
         LabelSubstitution subst = new LabelSubstitution() {
             /**
              * @throws SemanticException
