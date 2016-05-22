@@ -119,31 +119,35 @@ public class LabelConstraint extends Constraint {
         LabelTypeCheckUtil ltcu = lhs.typeSystem().labelTypeCheckUtil();
 
         if (namedLHS != null) {
-            String s = namedLHS.name();
-            List<String> l = new ArrayList<String>(2);
-            defns.put(namedLHS.nameToDescrip.get(namedLHS.name()), l);
+            for (String s : namedLHS.nameToDescrip.keySet()) {
+                Label lbl = namedLHS.nameToLabels.get(s);
+                List<String> l = new ArrayList<String>(2);
+                defns.put(s, l);
 
-            if (namedDescrips.get(s) != null) {
-                l.add(namedDescrips.get(s));
+                if (namedDescrips.get(s) != null) {
+                    l.add(namedDescrips.get(s));
+                }
+                Label bound = bounds.applyTo(lbl);
+                l.add(bound.toString());
+
+                labelComponentsLeft.addAll(ltcu.labelComponents(bound));
             }
-            Label bound = bounds.applyTo(namedLHS.label());
-            l.add(bound.toString());
-
-            labelComponentsLeft.addAll(ltcu.labelComponents(bound));
         }
 
         if (namedRHS != null) {
-            String s = namedRHS.name();
-            List<String> l = new ArrayList<String>(2);
-            defns.put(namedLHS.nameToDescrip.get(s), l);
+            for (String s : namedRHS.nameToDescrip.keySet()) {
+                Label lbl = namedRHS.nameToLabels.get(s);
+                List<String> l = new ArrayList<String>(2);
+                defns.put(s, l);
 
-            if (namedDescrips.get(s) != null) {
-                l.add(namedDescrips.get(s));
+                if (namedDescrips.get(s) != null) {
+                    l.add(namedDescrips.get(s));
+                }
+                Label bound = bounds.applyTo(lbl);
+                l.add(bound.toString());
+
+                labelComponentsRight.addAll(ltcu.labelComponents(bound));
             }
-            Label bound = bounds.applyTo(namedRHS.label());
-            l.add(bound.toString());
-
-            labelComponentsRight.addAll(ltcu.labelComponents(bound));
         }
 
         // in case there are no named labels, add all components of the lhs and
