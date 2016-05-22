@@ -501,31 +501,7 @@ public class LabelEnv_c implements LabelEnv {
                     "Cannot compare " + L1 + " <= " + L2);
         }
 
-        if (L1 instanceof MeetLabel) {
-            // C1 meet ... meet Cn <= L2 if
-            // exists cj such that cj <= L2
-            MeetLabel ml = (MeetLabel) L1;
-            for (Label cj : ml.meetComponents()) {
-                if (leq(cj, L2, state)) {
-                    return true;
-                }
-            }
-        }
-
-        if (L1 instanceof JoinLabel) {
-            // c1 join ... join cn <= L2 if
-            // for all j cj <= L2
-            JoinLabel jl = (JoinLabel) L1;
-            boolean allSat = true;
-            for (Label cj : jl.joinComponents()) {
-                if (!leq(cj, L2, state)) {
-                    allSat = false;
-                    break;
-                }
-            }
-            if (allSat) return true;
-        }
-
+        // THE L1 VERSIONS OF THE BELOW ARE HANDLED IN leq_.
         if (L2 instanceof MeetLabel) {
             // L1 <= C1 meet ... meet Cn if
             // for all j L1 <= Cj
