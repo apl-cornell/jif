@@ -445,6 +445,8 @@ public class LabelEnv_c implements LabelEnv {
         L1 = L1.normalize();
         L2 = L2.normalize();
 
+        /*
+         * Pretty sure the below is a (bad) hack.
         if (L1 instanceof WritersToReadersLabel) {
             Label tL1 = triggerTransforms(L1).normalize();
             if (Report.should_report(topics, 3))
@@ -457,6 +459,7 @@ public class LabelEnv_c implements LabelEnv {
                 Report.report(3, "Transforming " + L2 + " to " + tL2);
             if (!L2.equals(tL2)) return leq(L1, tL2, state);
         }
+        */
 
         if (!L1.isComparable() || !L2.isComparable()) {
             if (Report.should_report(topics, 3)) Report.report(3,
