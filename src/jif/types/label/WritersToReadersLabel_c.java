@@ -31,8 +31,8 @@ public class WritersToReadersLabel_c extends Label_c
             Position pos) {
         super(ts, pos, ts.writersToReadersTranslator());
         this.label = label;
-        setDescription("finds an upper bound of " + label
-                + " and converts the writers of the bound into readers");
+        setDescription("finds a bound of " + label
+            + " and converts the writers of the bound into readers");
     }
 
     @Override
