@@ -113,34 +113,49 @@ public class LabelConstraint extends Constraint {
         Map<String, List<String>> defns =
                 new LinkedHashMap<String, List<String>>();
 
-        Set<Label> labelComponents = new LinkedHashSet<Label>();
-        Map<String, Label> namedLabels = this.namedLabels();
+        Set<Label> labelComponentsLeft = new LinkedHashSet<Label>();
+        Set<Label> labelComponentsRight = new LinkedHashSet<Label>();
         Map<String, String> namedDescrips = this.namedDescrips();
         LabelTypeCheckUtil ltcu = lhs.typeSystem().labelTypeCheckUtil();
 
-        for (String s : namedLabels.keySet()) {
+        if (namedLHS != null) {
+            String s = namedLHS.name();
             List<String> l = new ArrayList<String>(2);
-            defns.put(s, l);
+            defns.put(namedLHS.nameToDescrip.get(namedLHS.name()), l);
 
             if (namedDescrips.get(s) != null) {
                 l.add(namedDescrips.get(s));
             }
-            Label bound = bounds.applyTo(namedLabels.get(s));
+            Label bound = bounds.applyTo(namedLHS.label());
             l.add(bound.toString());
 
-            labelComponents.addAll(ltcu.labelComponents(bound));
+            labelComponentsLeft.addAll(ltcu.labelComponents(bound));
+        }
+
+        if (namedRHS != null) {
+            String s = namedRHS.name();
+            List<String> l = new ArrayList<String>(2);
+            defns.put(namedLHS.nameToDescrip.get(s), l);
+
+            if (namedDescrips.get(s) != null) {
+                l.add(namedDescrips.get(s));
+            }
+            Label bound = bounds.applyTo(namedRHS.label());
+            l.add(bound.toString());
+
+            labelComponentsRight.addAll(ltcu.labelComponents(bound));
         }
 
         // in case there are no named labels, add all components of the lhs and
         // rhs bounds.
         Label bound = bounds.applyTo(lhsLabel());
-        labelComponents.addAll(ltcu.labelComponents(bound));
+        labelComponentsLeft.addAll(ltcu.labelComponents(bound));
 
         bound = bounds.applyTo(rhsLabel());
-        labelComponents.addAll(ltcu.labelComponents(bound));
+        labelComponentsRight.addAll(ltcu.labelComponents(bound));
 
-        // get definitions for the label components.
-        for (Label l : labelComponents) {
+        // get definitions for the left label components.
+        for (Label l : labelComponentsLeft) {
             if (l.description() != null) {
                 String s = l.componentString();
                 if (s.length() == 0) s = l.toString();
@@ -149,12 +164,28 @@ public class LabelConstraint extends Constraint {
                 defns.put(s, list);
                 if (l instanceof WritersToReadersLabel) {
                     // add the transform of the writersToReaders label
-                    list.add(env.triggerTransforms(l).toString());
+                    list.add(env.triggerTransformsLeft(l).toString());
                 }
             }
         }
 
-        defns.putAll(env.definitions(bounds, labelComponents));
+        // get definitions for the right label components.
+        for (Label l : labelComponentsRight) {
+            if (l.description() != null) {
+                String s = l.componentString();
+                if (s.length() == 0) s = l.toString();
+                List<String> list = new ArrayList<String>(2);
+                list.add(l.description());
+                defns.put(s, list);
+                if (l instanceof WritersToReadersLabel) {
+                    // add the transform of the writersToReaders label
+                    list.add(env.triggerTransformsRight(l).toString());
+                }
+            }
+        }
+
+        defns.putAll(env.definitions(bounds, labelComponentsLeft));
+        defns.putAll(env.definitions(bounds, labelComponentsRight));
 
         return defns;
     }

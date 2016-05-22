@@ -177,9 +177,9 @@ public class SolverGLB extends AbstractSolver {
                 refineVariableEquation(comp, eqn, false);
 
                 // check that the equation is now satisfied.
-                Label lhsbound = triggerTransforms(bounds().applyTo(eqn.lhs()),
+                Label lhsbound = triggerTransformsLeft(bounds().applyTo(eqn.lhs()),
                         eqn.env());
-                Label rhsbound = triggerTransforms(bounds().applyTo(eqn.rhs()),
+                Label rhsbound = triggerTransformsRight(bounds().applyTo(eqn.rhs()),
                         eqn.env());
 
                 try {
@@ -308,9 +308,9 @@ public class SolverGLB extends AbstractSolver {
             boolean trace) throws SemanticException {
         Label vBound = bounds().boundOf(v);
         Label lhsBound =
-                triggerTransforms(bounds().applyTo(eqn.lhs()), eqn.env());
+                triggerTransformsLeft(bounds().applyTo(eqn.lhs()), eqn.env());
         Label rhsBound =
-                triggerTransforms(bounds().applyTo(eqn.rhs()), eqn.env());
+                triggerTransformsRight(bounds().applyTo(eqn.rhs()), eqn.env());
 
         if (shouldReport(5)) report(5, "BOUND of " + v + " = " + vBound);
         if (shouldReport(5)) report(5, "RHSBOUND = " + rhsBound);
@@ -495,11 +495,11 @@ public class SolverGLB extends AbstractSolver {
         // check whether it is solvable given the current variables.
 
         Label rhsLabel =
-                triggerTransforms(bounds().applyTo(eqn.rhs()), eqn.env());
+                triggerTransformsLeft(bounds().applyTo(eqn.rhs()), eqn.env());
         if (shouldReport(4)) report(4, "RHS = " + rhsLabel);
 
         Label lhsBound =
-                triggerTransforms(bounds().applyTo(eqn.lhs()), eqn.env());
+                triggerTransformsRight(bounds().applyTo(eqn.lhs()), eqn.env());
         if (shouldReport(4)) report(4, "LHS APP = " + lhsBound);
 
         // Check to see if it is currently satisfiable.

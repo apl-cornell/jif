@@ -215,8 +215,12 @@ public abstract class AbstractSolver implements Solver {
         return bounds.applyTo(L);
     }
 
-    protected Label triggerTransforms(Label label, final LabelEnv env) {
-        return env.triggerTransforms(label);
+    protected Label triggerTransformsRight(Label label, final LabelEnv env) {
+        return env.triggerTransformsRight(label);
+    }
+
+    protected Label triggerTransformsLeft(Label label, final LabelEnv env) {
+        return env.triggerTransformsLeft(label);
     }
 
     protected List<Equation> getQueue() {
@@ -688,9 +692,9 @@ public abstract class AbstractSolver implements Solver {
     protected void considerEquation(LabelEquation eqn)
             throws SemanticException {
         Label lhsbound =
-                triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
+                triggerTransformsLeft(bounds.applyTo(eqn.lhs()), eqn.env());
         Label rhsbound =
-                triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());
+                triggerTransformsRight(bounds.applyTo(eqn.rhs()), eqn.env());
 
         if (eqn.env().leq(lhsbound, rhsbound)) {
             if (shouldReport(5)) report(5, "constraint: " + eqn
@@ -796,9 +800,9 @@ public abstract class AbstractSolver implements Solver {
         }
 
         Label lhsBound =
-                triggerTransforms(bounds.applyTo(eqn.lhs()), eqn.env());
+                triggerTransformsLeft(bounds.applyTo(eqn.lhs()), eqn.env());
         Label rhsBound =
-                triggerTransforms(bounds.applyTo(eqn.rhs()), eqn.env());
+                triggerTransformsRight(bounds.applyTo(eqn.rhs()), eqn.env());
 
         if (shouldReport(4)) {
             report(4, "Checking equation: " + eqn);
@@ -974,8 +978,8 @@ public abstract class AbstractSolver implements Solver {
                 if (eqn instanceof LabelEquation) {
                     LabelEquation leqn = (LabelEquation) eqn;
                     eqnSatisfied =
-                            eqnEnv.leq(triggerTransforms(leqn.lhs(), eqnEnv),
-                                    triggerTransforms(leqn.rhs(), eqnEnv));
+                            eqnEnv.leq(triggerTransformsLeft(leqn.lhs(), eqnEnv),
+                                    triggerTransformsRight(leqn.rhs(), eqnEnv));
                 } else if (eqn instanceof PrincipalEquation) {
                     PrincipalEquation peqn = (PrincipalEquation) eqn;
                     eqnSatisfied = eqnEnv.actsFor(peqn.lhs(), peqn.rhs());
@@ -989,9 +993,9 @@ public abstract class AbstractSolver implements Solver {
                     }
                     if (shouldReport(3) && eqn instanceof LabelEquation) {
                         report(3, "Statically failed "
-                                + triggerTransforms(((LabelEquation) eqn).lhs(),
+                                + triggerTransformsLeft(((LabelEquation) eqn).lhs(),
                                         eqnEnv)
-                                + " <= " + triggerTransforms(
+                                + " <= " + triggerTransformsRight(
                                         ((LabelEquation) eqn).rhs(), eqnEnv));
                     }
 

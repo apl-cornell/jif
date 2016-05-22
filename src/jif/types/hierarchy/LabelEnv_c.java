@@ -445,21 +445,18 @@ public class LabelEnv_c implements LabelEnv {
         L1 = L1.normalize();
         L2 = L2.normalize();
 
-        /*
-         * Pretty sure the below is a (bad) hack.
         if (L1 instanceof WritersToReadersLabel) {
-            Label tL1 = triggerTransforms(L1).normalize();
+            Label tL1 = triggerTransformsLeft(L1).normalize();
             if (Report.should_report(topics, 3))
                 Report.report(3, "Transforming " + L1 + " to " + tL1);
             if (!L1.equals(tL1)) return leq(tL1, L2, state);
         }
         if (L2 instanceof WritersToReadersLabel) {
-            Label tL2 = triggerTransforms(L2).normalize();
+            Label tL2 = triggerTransformsRight(L2).normalize();
             if (Report.should_report(topics, 3))
                 Report.report(3, "Transforming " + L2 + " to " + tL2);
             if (!L2.equals(tL2)) return leq(L1, tL2, state);
         }
-        */
 
         if (!L1.isComparable() || !L2.isComparable()) {
             if (Report.should_report(topics, 3)) Report.report(3,
@@ -1157,11 +1154,12 @@ public class LabelEnv_c implements LabelEnv {
     }
 
     /**
-     * Trigger the transformation of WritersToReaders labels. Not guaranteed
-     * to remove all writersToReaders labels.
+     * Trigger the transformation of WritersToReaders labels for the right hand
+     * side of a comparison. Not guaranteed to remove all writersToReaders
+     * labels.
      */
     @Override
-    public Label triggerTransforms(Label label) {
+    public Label triggerTransformsRight(Label label) {
         LabelSubstitution subst = new LabelSubstitution() {
             /**
              * @throws SemanticException
@@ -1170,7 +1168,35 @@ public class LabelEnv_c implements LabelEnv {
             public Label substLabel(Label L) throws SemanticException {
                 if (L instanceof WritersToReadersLabel) {
                     return ((WritersToReadersLabel) L)
-                            .transform(LabelEnv_c.this);
+                            .transformRight(LabelEnv_c.this);
+                }
+                return L;
+            }
+        };
+
+        try {
+            return label.subst(subst).simplify();
+        } catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected SemanticException", e);
+        }
+    }
+
+    /**
+     * Trigger the transformation of WritersToReaders labels for the left hand
+     * side of a comparison. Not guaranteed to remove all writersToReaders
+     * labels.
+     */
+    @Override
+    public Label triggerTransformsLeft(Label label) {
+        LabelSubstitution subst = new LabelSubstitution() {
+            /**
+             * @throws SemanticException
+             */
+            @Override
+            public Label substLabel(Label L) throws SemanticException {
+                if (L instanceof WritersToReadersLabel) {
+                    return ((WritersToReadersLabel) L)
+                            .transformLeft(LabelEnv_c.this);
                 }
                 return L;
             }

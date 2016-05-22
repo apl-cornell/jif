@@ -14,7 +14,14 @@ public interface WritersToReadersLabel extends Label {
     Label label();
 
     /**
-     * Apply this operator to the nested label.
+     * Apply this operator to the nested label.  Transform for the right hand
+     * side of a comparison.
      */
-    Label transform(LabelEnv env);
+    Label transformRight(LabelEnv env);
+
+    /**
+     * Apply this operator to the nested label.  Transform for the left hand
+     * side of a comparison
+     */
+    Label transformLeft(LabelEnv env);
 }

@@ -100,7 +100,7 @@ public class WritersToReadersLabel_c extends Label_c
         if (Report.should_report(Report.debug, 1)) {
             return "<writersToReaders " + label + ">";
         }
-        return "writersToReaders(" + label() + ")";
+        return "W2R(" + label() + ")";
     }
 
     @Override
@@ -134,8 +134,14 @@ public class WritersToReadersLabel_c extends Label_c
     }
 
     @Override
-    public Label transform(LabelEnv env) {
+    public Label transformRight(LabelEnv env) {
         Label bound = env.findUpperBound(label());
+        return transformImpl(bound);
+    }
+
+    @Override
+    public Label transformLeft(LabelEnv env) {
+        Label bound = env.findLowerBound(label());
         return transformImpl(bound);
     }
 
