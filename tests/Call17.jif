@@ -1,0 +1,7 @@
+class Call17[label L] {
+  static void m{⊤←}() {
+    if (new label{⊤←} <= L) new Call17(0);
+  }
+
+  Call17{⊤→}(int{L} x) {}
+}

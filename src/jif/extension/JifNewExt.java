@@ -20,6 +20,7 @@ import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.JifTypeChecker;
 import jif.visit.LabelChecker;
+
 import polyglot.ast.Expr;
 import polyglot.ast.New;
 import polyglot.ast.Node;
@@ -46,6 +47,12 @@ public class JifNewExt extends JifExprExt {
     }
 
     protected ConstructorChecker constructorChecker = new ConstructorChecker();
+
+    /**
+     * Squirreling this away here because we need to reuse it in the extended
+     * Fabric Checking.
+     */
+    protected CallHelper helper;
 
     @Override
     public New node() {
@@ -179,7 +186,7 @@ public class JifNewExt extends JifExprExt {
                     A.labelEnv(), noe.position());
         }
 
-        CallHelper helper = lc.createCallHelper(newLabel, noe, ct,
+        helper = lc.createCallHelper(newLabel, noe, ct,
                 (JifProcedureInstance) noe.constructorInstance(),
                 noe.arguments(), node().position());
         LabelChecker callLC = lc.context(A);
