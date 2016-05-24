@@ -138,7 +138,7 @@ public class JifDeclassifyExprExt extends JifDowngradeExprExt {
         final String exprOrStmt = (isExpr ? "expression" : "statement");
 
         JifTypeSystem jts = lc.typeSystem();
-        Label pcInteg = jts.writersToReadersLabel(pos, A.pc());
+        Label pcInteg = jts.writersToReadersLabel(pos, A.pc()).transformRight(A.labelEnv());
 
         lc.constrain(new NamedLabel("declass_from", labelFrom),
                 LabelConstraint.LEQ, new NamedLabel("declass_to", labelTo)
