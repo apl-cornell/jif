@@ -11,11 +11,11 @@ public interface ActsForParam extends Param {
     ActsForParam subst(LabelSubstitution labelSubst) throws SemanticException;
 
     /**
-     * @param qualifier
-     *          an Expr with which to qualify all accesses to label params and
-     *          principal params.
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
      */
-    Expr toJava(JifToJavaRewriter rw, Expr qualifier) throws SemanticException;
+    Expr toJava(JifToJavaRewriter rw, Expr thisQualifier)
+            throws SemanticException;
 
     ActsForParam simplify();
 }

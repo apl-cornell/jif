@@ -11,7 +11,7 @@ public class BottomPrincipalToJavaExpr_c extends PrincipalToJavaExpr_c {
 
     @Override
     public Expr toJava(Principal principal, JifToJavaRewriter rw,
-            Expr qualifier) throws SemanticException {
+            Expr thisQualifier) throws SemanticException {
         JifTypeSystem ts = rw.jif_ts();
         return rw.qq()
                 .parseExpr(ts.PrincipalUtilClassName() + ".bottomPrincipal()");

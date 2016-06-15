@@ -18,16 +18,17 @@ public class DynamicPrincipalToJavaExpr_c extends PrincipalToJavaExpr_c {
 
     @Override
     public Expr toJava(Principal principal, JifToJavaRewriter rw,
-            Expr qualifier) throws SemanticException {
+            Expr thisQualifier) throws SemanticException {
         DynamicPrincipal p = (DynamicPrincipal) principal;
-        return accessPathToExpr(rw, p.path());
+        return accessPathToExpr(rw, p.path(), thisQualifier);
     }
 
-    protected Expr accessPathToExpr(JifToJavaRewriter rw, AccessPath ap) {
+    protected Expr accessPathToExpr(JifToJavaRewriter rw, AccessPath ap,
+            Expr thisQualifier) {
         NodeFactory nf = rw.java_nf();
 
         if (ap instanceof AccessPathThis) {
-            return nf.This(ap.position());
+            return thisQualifier;
         } else if (ap instanceof AccessPathLocal) {
             LocalInstance li = ((AccessPathLocal) ap).localInstance();
             return nf.Local(li.position(), nf.Id(li.position(), li.name()));
@@ -35,7 +36,8 @@ public class DynamicPrincipalToJavaExpr_c extends PrincipalToJavaExpr_c {
             AccessPathField apf = (AccessPathField) ap;
             FieldInstance fi = apf.fieldInstance();
 
-            return nf.Field(ap.position(), accessPathToExpr(rw, apf.path()),
+            return nf.Field(ap.position(),
+                    accessPathToExpr(rw, apf.path(), thisQualifier),
                     nf.Id(fi.position(), fi.name()));
         } else {
             throw new Error("Don't know how to translate " + ap);

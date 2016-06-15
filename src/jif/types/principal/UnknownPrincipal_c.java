@@ -35,7 +35,7 @@ public class UnknownPrincipal_c extends Principal_c
     }
 
     @Override
-    public Expr toJava(JifToJavaRewriter rw, Expr qualifier)
+    public Expr toJava(JifToJavaRewriter rw, Expr thisQualifier)
             throws SemanticException {
         throw new InternalCompilerError(
                 "Cannot translate an unknown principal.");

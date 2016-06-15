@@ -12,12 +12,12 @@ public class ConjunctivePrincipalToJavaExpr_c extends PrincipalToJavaExpr_c {
 
     @Override
     public Expr toJava(Principal principal, JifToJavaRewriter rw,
-            Expr qualifier) throws SemanticException {
+            Expr thisQualifier) throws SemanticException {
         JifTypeSystem ts = rw.jif_ts();
         Expr e = null;
         ConjunctivePrincipal cp = (ConjunctivePrincipal) principal;
         for (Principal p : cp.conjuncts()) {
-            Expr pe = rw.principalToJava(p, qualifier);
+            Expr pe = rw.principalToJava(p, thisQualifier);
             if (e == null) {
                 e = pe;
             } else {

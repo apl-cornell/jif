@@ -161,17 +161,16 @@ public class JifToJavaRewriter extends ContextVisitor {
     }
 
     /**
-     * @param qualifier
-     *          an expression for qualifying accesses to label params and
-     *          principal params.
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
      */
-    public Expr paramToJava(Param param, Expr qualifier)
+    public Expr paramToJava(Param param, Expr thisQualifier)
             throws SemanticException {
         if (param instanceof Label) {
-            return labelToJava((Label) param, qualifier);
+            return labelToJava((Label) param, thisQualifier);
         }
         if (param instanceof Principal) {
-            return principalToJava((Principal) param, qualifier);
+            return principalToJava((Principal) param, thisQualifier);
         }
         throw new InternalCompilerError("Unexpected param " + param);
     }
@@ -181,13 +180,12 @@ public class JifToJavaRewriter extends ContextVisitor {
     }
 
     /**
-     * @param qualifier
-     *          an expression for qualifying accesses to label params and
-     *          principal params.
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
      */
-    public Expr labelToJava(Label label, Expr qualifier)
+    public Expr labelToJava(Label label, Expr thisQualifier)
             throws SemanticException {
-        return label.toJava(this, qualifier);
+        return label.toJava(this, thisQualifier);
     }
 
     public Expr principalToJava(Principal principal) throws SemanticException {
@@ -195,13 +193,12 @@ public class JifToJavaRewriter extends ContextVisitor {
     }
 
     /**
-     * @param qualifier
-     *          an expression for qualifying accesses to label params and
-     *          principal params.
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
      */
-    public Expr principalToJava(Principal principal, Expr qualifier)
+    public Expr principalToJava(Principal principal, Expr thisQualifier)
             throws SemanticException {
-        return principal.toJava(this, qualifier);
+        return principal.toJava(this, thisQualifier);
     }
 
     public TypeNode typeToJava(Type t, Position pos) throws SemanticException {

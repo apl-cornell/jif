@@ -11,7 +11,7 @@ public class ExternalPrincipalToJavaExpr_c extends PrincipalToJavaExpr_c {
 
     @Override
     public Expr toJava(Principal principal, JifToJavaRewriter rw,
-            Expr qualifier) throws SemanticException {
+            Expr thisQualifier) throws SemanticException {
         ExternalPrincipal P = (ExternalPrincipal) principal;
         return rw.qq().parseExpr("jif.principals.%s.getInstance()", P.name());
     }

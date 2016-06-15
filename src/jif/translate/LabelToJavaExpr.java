@@ -8,10 +8,9 @@ import polyglot.types.SemanticException;
 
 public interface LabelToJavaExpr extends Serializable {
     /**
-     * @param qualifier
-     *          an Expr with which to qualify all accesses to label params and
-     *          principal params.
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
      */
-    public Expr toJava(Label label, JifToJavaRewriter rw, Expr qualifier)
+    public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier)
             throws SemanticException;
 }

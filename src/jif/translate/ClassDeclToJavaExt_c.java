@@ -429,14 +429,15 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             JifContext A = (JifContext) rw.context();
             JifToJavaRewriter rwCons =
                     (JifToJavaRewriter) rw.context(A.pushConstructorCall());
-            Expr qualifier = rw.qq().parseExpr("this");
+            Expr thisQualifier = rw.qq().parseExpr("this");
             for (ParamInstance pi : superjpt.params()) {
                 Param param = ((JifSubst) superjst.subst()).get(pi);
                 if (pi.isLabel()) {
-                    superArgs.add(((Label) param).toJava(rwCons, qualifier));
-                } else {
                     superArgs
-                            .add(((Principal) param).toJava(rwCons, qualifier));
+                            .add(((Label) param).toJava(rwCons, thisQualifier));
+                } else {
+                    superArgs.add(
+                            ((Principal) param).toJava(rwCons, thisQualifier));
                 }
             }
         }

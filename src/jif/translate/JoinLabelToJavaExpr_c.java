@@ -15,13 +15,13 @@ public class JoinLabelToJavaExpr_c extends LabelToJavaExpr_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public Expr toJava(Label label, JifToJavaRewriter rw, Expr qualifier)
+    public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier)
             throws SemanticException {
         JoinLabel L = (JoinLabel) label;
 
         if (L.joinComponents().size() == 1) {
             return rw.labelToJava(L.joinComponents().iterator().next(),
-                    qualifier);
+                    thisQualifier);
         }
         boolean simplify = true;
         if (rw.context().currentCode() instanceof ConstructorInstance
@@ -31,10 +31,10 @@ public class JoinLabelToJavaExpr_c extends LabelToJavaExpr_c {
         LinkedList<Label> l = new LinkedList<Label>(L.joinComponents());
         Iterator<Label> iter = l.iterator();
         Label head = iter.next();
-        Expr e = rw.labelToJava(head, qualifier);
+        Expr e = rw.labelToJava(head, thisQualifier);
         while (iter.hasNext()) {
             head = iter.next();
-            Expr f = rw.labelToJava(head, qualifier);
+            Expr f = rw.labelToJava(head, thisQualifier);
             e = rw.qq().parseExpr("%E.join(%E, %E)", e, f, rw.java_nf()
                     .BooleanLit(Position.compilerGenerated(), simplify));
         }

@@ -17,9 +17,9 @@ public class ActsForConstraintToJavaExpr_c
             ActsForConstraint<Actor, Granter> actsFor, JifToJavaRewriter rw)
             throws SemanticException {
         JifTypeSystem ts = rw.jif_ts();
-        Expr qualifier = rw.qq().parseExpr("this");
-        Expr actor = actsFor.actor().toJava(rw, qualifier);
-        Expr granter = actsFor.granter().toJava(rw, qualifier);
+        Expr thisQualifier = rw.qq().parseExpr("this");
+        Expr actor = actsFor.actor().toJava(rw, thisQualifier);
+        Expr granter = actsFor.granter().toJava(rw, thisQualifier);
 
         String className;
         if (actsFor.actor() instanceof Label) {
