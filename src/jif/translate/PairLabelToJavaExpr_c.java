@@ -22,21 +22,21 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier)
-            throws SemanticException {
+    public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier,
+            boolean simplify) throws SemanticException {
         PairLabel pl = (PairLabel) label;
         if (pl.confPolicy().isBottomConfidentiality()
                 && pl.integPolicy().isTopIntegrity()) {
             return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".noComponents()");
         }
-        Expr cexp = policyToJava(pl.confPolicy(), rw, thisQualifier);
-        Expr iexp = policyToJava(pl.integPolicy(), rw, thisQualifier);
+        Expr cexp = policyToJava(pl.confPolicy(), rw, thisQualifier, simplify);
+        Expr iexp = policyToJava(pl.integPolicy(), rw, thisQualifier, simplify);
         return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".toLabel(%E, %E)",
                 cexp, iexp);
     }
 
-    public Expr policyToJava(Policy p, JifToJavaRewriter rw, Expr thisQualifier)
-            throws SemanticException {
+    public Expr policyToJava(Policy p, JifToJavaRewriter rw, Expr thisQualifier,
+            boolean simplify) throws SemanticException {
         if (p instanceof ConfPolicy
                 && ((ConfPolicy) p).isBottomConfidentiality()) {
             return rw.qq().parseExpr(rw.runtimeLabelUtil() + ".bottomConf()");
@@ -70,11 +70,12 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
             LinkedList<Policy> l = new LinkedList<Policy>(jp.joinComponents());
             Iterator<Policy> iter = l.iterator();
             Policy head = iter.next();
-            Expr e = policyToJava(head, rw, thisQualifier);
+            Expr e = policyToJava(head, rw, thisQualifier, simplify);
             while (iter.hasNext()) {
                 head = iter.next();
-                Expr f = policyToJava(head, rw, thisQualifier);
-                e = rw.qq().parseExpr("%E.join(%E)", e, f);
+                Expr f = policyToJava(head, rw, thisQualifier, simplify);
+                e = rw.qq().parseExpr("%E.join(%E, %E)", e, f, rw.java_nf()
+                        .BooleanLit(Position.compilerGenerated(), simplify));
             }
             return e;
         }
@@ -85,11 +86,12 @@ public class PairLabelToJavaExpr_c extends LabelToJavaExpr_c {
             LinkedList<Policy> l = new LinkedList<Policy>(mp.meetComponents());
             Iterator<Policy> iter = l.iterator();
             Policy head = iter.next();
-            Expr e = policyToJava(head, rw, thisQualifier);
+            Expr e = policyToJava(head, rw, thisQualifier, simplify);
             while (iter.hasNext()) {
                 head = iter.next();
-                Expr f = policyToJava(head, rw, thisQualifier);
-                e = rw.qq().parseExpr("%E.meet(%E)", e, f);
+                Expr f = policyToJava(head, rw, thisQualifier, simplify);
+                e = rw.qq().parseExpr("%E.meet(%E, %E)", e, f, rw.java_nf()
+                        .BooleanLit(Position.compilerGenerated(), simplify));
             }
             return e;
         }

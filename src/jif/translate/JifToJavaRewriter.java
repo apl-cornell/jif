@@ -180,12 +180,34 @@ public class JifToJavaRewriter extends ContextVisitor {
     }
 
     /**
+     * @param simplify
+     *          whether to attempt to simplify the label when it's constructed
+     *          at run time.
+     */
+    public Expr labelToJava(Label label, boolean simplify)
+            throws SemanticException {
+        return labelToJava(label, qq().parseExpr("this"), simplify);
+    }
+
+    /**
      * @param thisQualifier
      *          an Expr representing the translated "this" reference.
      */
     public Expr labelToJava(Label label, Expr thisQualifier)
             throws SemanticException {
-        return label.toJava(this, thisQualifier);
+        return labelToJava(label, thisQualifier, true);
+    }
+
+    /**
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
+     * @param simplify
+     *          whether to attempt to simplify the label when it's constructed
+     *          at run time.
+     */
+    public Expr labelToJava(Label label, Expr thisQualifier, boolean simplify)
+            throws SemanticException {
+        return label.toJava(this, thisQualifier, simplify);
     }
 
     public Expr principalToJava(Principal principal) throws SemanticException {

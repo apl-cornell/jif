@@ -18,8 +18,15 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
     @Override
     public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier)
             throws SemanticException {
+        return toJava(label, rw, thisQualifier, true);
+    }
+
+    @Override
+    public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier,
+            boolean simplify) throws SemanticException {
         if (label instanceof ParamLabel) {
-            return toJava(((ParamLabel) label).paramInstance(), rw, thisQualifier);
+            return toJava(((ParamLabel) label).paramInstance(), rw,
+                    thisQualifier);
         }
         return toJava(((CovariantParamLabel) label).paramInstance(), rw,
                 thisQualifier);
@@ -32,7 +39,8 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
                 thisQualifier);
     }
 
-    public Expr toJava(ParamInstance pi, JifToJavaRewriter rw, Expr thisQualifier) {
+    public Expr toJava(ParamInstance pi, JifToJavaRewriter rw,
+            Expr thisQualifier) {
         if (rw.jif_ts().isSignature(pi.container())) {
             // the parameter to be translated is in the code
             // of a non-Jif class (which does have runtime representation
@@ -55,7 +63,8 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
             // fields available to us. Hence the "!rw.inConstructor()")
             return rw.qq().parseExpr(paramArgName(pi));
         } else {
-            return rw.qq().parseExpr("%E.%s", thisQualifier, paramFieldName(pi));
+            return rw.qq().parseExpr("%E.%s", thisQualifier,
+                    paramFieldName(pi));
         }
     }
 

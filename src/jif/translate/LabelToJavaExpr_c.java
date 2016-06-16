@@ -12,6 +12,12 @@ public abstract class LabelToJavaExpr_c implements LabelToJavaExpr {
     @Override
     public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier)
             throws SemanticException {
+        return toJava(label, rw, thisQualifier, true);
+    }
+
+    @Override
+    public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier,
+            boolean simplify) throws SemanticException {
         throw new InternalCompilerError("Should never be called: " + label
                 + " :: " + label.getClass().getName());
     }

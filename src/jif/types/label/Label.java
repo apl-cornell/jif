@@ -3,12 +3,14 @@ package jif.types.label;
 import java.util.List;
 import java.util.Set;
 
+import jif.translate.JifToJavaRewriter;
 import jif.types.ActsForParam;
 import jif.types.JifContext;
 import jif.types.LabelSubstitution;
 import jif.types.PathMap;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
+import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
@@ -134,6 +136,16 @@ public interface Label extends ActsForParam {
 //     * be called is isSingleton returns true.
 //     */
 //    Label singletonComponent();
+
+    /**
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
+     * @param simplify
+     *          whether to attempt to simplify the label when it's constructed
+     *          at run time.
+     */
+    Expr toJava(JifToJavaRewriter rw, Expr thisQualifier, boolean simplify)
+            throws SemanticException;
 
     /**
      * Simplify the label, using leq if needed

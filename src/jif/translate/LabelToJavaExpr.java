@@ -13,4 +13,14 @@ public interface LabelToJavaExpr extends Serializable {
      */
     public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier)
             throws SemanticException;
+
+    /**
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
+     * @param simplify
+     *          whether to attempt to simplify the label when it's constructed
+     *          at run time.
+     */
+    public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier,
+            boolean simplify) throws SemanticException;
 }

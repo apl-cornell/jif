@@ -15,16 +15,17 @@ public class MeetLabelToJavaExpr_c extends LabelToJavaExpr_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier)
-            throws SemanticException {
+    public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier,
+            boolean simplify) throws SemanticException {
         MeetLabel L = (MeetLabel) label;
 
         if (L.meetComponents().size() == 1) {
             return rw.labelToJava(L.meetComponents().iterator().next(),
-                    thisQualifier);
+                    thisQualifier, simplify);
         }
 
-        boolean simplify = true;
+        // Never simplify if translating a meet label in the constructor of a
+        // principal class. This avoids some run-time bootstrapping issues.
         if (rw.context().currentCode() instanceof ConstructorInstance
                 && rw.currentClass().isSubtype(rw.jif_ts().PrincipalClass()))
             simplify = false;
@@ -32,10 +33,10 @@ public class MeetLabelToJavaExpr_c extends LabelToJavaExpr_c {
         LinkedList<Label> l = new LinkedList<Label>(L.meetComponents());
         Iterator<Label> iter = l.iterator();
         Label head = iter.next();
-        Expr e = rw.labelToJava(head, thisQualifier);
+        Expr e = rw.labelToJava(head, thisQualifier, simplify);
         while (iter.hasNext()) {
             head = iter.next();
-            Expr f = rw.labelToJava(head, thisQualifier);
+            Expr f = rw.labelToJava(head, thisQualifier, simplify);
             e = rw.qq().parseExpr("%E.meet(%E, %E)", e, f, rw.java_nf()
                     .BooleanLit(Position.compilerGenerated(), simplify));
         }
