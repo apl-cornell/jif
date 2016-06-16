@@ -88,6 +88,12 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
     @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
+        Node result = toJavaImpl(rw);
+        rw.leavingClass();
+        return result;
+    }
+
+    protected Node toJavaImpl(JifToJavaRewriter rw) throws SemanticException {
         JifClassDecl n = (JifClassDecl) node();
         JifPolyType jpt = (JifPolyType) n.type();
 
@@ -161,7 +167,6 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             }
         }
 
-        rw.leavingClass();
         return rw.java_nf().ClassDecl(n.position(), n.flags(), n.id(),
                 n.superClass(), n.interfaces(), cb, n.javadoc());
     }
