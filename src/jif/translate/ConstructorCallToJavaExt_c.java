@@ -26,6 +26,7 @@ public class ConstructorCallToJavaExt_c extends ToJavaExt_c {
         ClassType ct = ci.container().toClass();
 
         ConstructorCall.Kind kind = n.kind();
+        rw.haveThisCall(kind == ConstructorCall.THIS);
 
         // only translate calls to jif constructors
         if (rw.jif_ts().isSignature(ct)) {

@@ -71,6 +71,21 @@ public class JifToJavaRewriter extends ContextVisitor {
         this.newSourceFiles = new LinkedList<SourceFile>();
         this.initializations = new ArrayList<Stmt>();
         this.staticInitializations = new ArrayList<Block>();
+        this.haveThisCall = new Cell<>();
+    }
+
+    @Override
+    public JifToJavaRewriter copy() {
+        JifToJavaRewriter rw = (JifToJavaRewriter) super.copy();
+
+        // If we're in a constructor, the copy will share the same haveThisCall
+        // value as the original to ensure this information doesn't get lost
+        // when we pop back up. Otherwise, if we are not in a constructor, we
+        // make a copy of the haveThisCall value.
+        if (!inConstructor) {
+            rw.haveThisCall = new Cell<>(haveThisCall.value);
+        }
+        return rw;
     }
 
     @Override
@@ -138,7 +153,7 @@ public class JifToJavaRewriter extends ContextVisitor {
         try {
             JifExt ext = JifUtil.jifExt(n);
 
-            Node m = ext.toJava().toJava(this);
+            Node m = ext.toJava().toJava(this, v);
             if (m.del() instanceof JifExt)
                 throw new InternalCompilerError(m + " is still a Jif node.");
             return m;
@@ -270,6 +285,12 @@ public class JifToJavaRewriter extends ContextVisitor {
     private ClassType currentClass;
     private boolean inConstructor;
 
+    /**
+     * When we're in a constructor, this will (eventually) be populated with a
+     * boolean indicating whether the constructor calls {@code this(...)}.
+     */
+    private Cell<Boolean> haveThisCall;
+
     public ClassType currentClass() {
         return this.currentClass;
     }
@@ -358,6 +379,15 @@ public class JifToJavaRewriter extends ContextVisitor {
 
     public void inConstructor(boolean flag) {
         this.inConstructor = flag;
+        this.haveThisCall.value = flag ? false : null;
+    }
+
+    public Boolean haveThisCall() {
+        return haveThisCall.value;
+    }
+
+    public void haveThisCall(boolean value) {
+        this.haveThisCall.value = value;
     }
 
     /**
@@ -367,4 +397,16 @@ public class JifToJavaRewriter extends ContextVisitor {
         return jif_ts().LabelUtilClassName() + ".singleton()";
     }
 
+    /** A ref cell. */
+    private static class Cell<T> {
+        T value;
+
+        Cell() {
+            this(null);
+        }
+
+        Cell(T value) {
+            this.value = value;
+        }
+    }
 }
