@@ -3,6 +3,12 @@ Jif Change Log
 
 This file documents changes between releases of Jif.
 
+2016-06-23    Jif 3.5.0
+    * Updated to Polyglot 2.7.1 release.
+    * Various bug fixes, including a command-line processing bug that resulted
+      in robustness being turned off by default. This bug affects all Jif 3.4.x
+      releases.
+
 2015-09-18    Jif 3.4.3
     * Updated to Polyglot 2.7.0 release.
     * Changed from a custom license to LGPL.
