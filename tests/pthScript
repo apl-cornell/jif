@@ -608,6 +608,7 @@ jif.ExtensionInfo  "-d out -nonrobust -classpath ../classes:../lib-classes:../li
 	UnsoundConstructor02.jif (Semantic, "not less restrictive");
 	UnsoundConstructor03.jif (Semantic, "not less restrictive");
 	UnsoundInference01.jif (Semantic, "not less restrictive");
+        W2R01.jif (Semantic, "more restrictive than");
     FinalParamBug.jif ;
 
     # Test compilation order.

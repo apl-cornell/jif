@@ -1,0 +1,24 @@
+class W2R01 {
+  void m{⊤←}(
+      principal{⊤←} lowP,
+      principal{⊤←} store,
+      String{lowP→;lowP←} str
+    )
+  where
+    // store is more trusted than lowP
+    store ≽ lowP,
+
+    // True by definition.
+    {lowP→;lowP←} ⊑ {W2R({lowP→;lowP←})}
+  {
+    // XXX Should need an endorsement to store's integrity!
+    new D[{store→;store←}](str);
+  }
+}
+
+class D[label L] {
+  String{L} str;
+  D{L}(String{L} s) {
+    str = s;
+  }
+}
