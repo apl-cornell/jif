@@ -171,4 +171,14 @@ public class WritersToReadersPolicy extends Policy_c implements ConfPolicy {
     public boolean isTop() {
         return integPol.isBottom();
     }
+
+    @Override
+    public boolean hasWritersToReaders() {
+        return integPol.hasWritersToReaders();
+    }
+
+    @Override
+    public boolean hasVariables() {
+        return integPol.hasVariables();
+    }
 }
