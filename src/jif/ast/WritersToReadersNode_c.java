@@ -16,16 +16,16 @@ import polyglot.visit.PrettyPrinter;
 
 /** An implementation of the <code>JoinLabel</code> interface.
  */
-public class WritersToReadersLabelNode_c extends AmbLabelNode_c implements WritersToReadersLabelNode {
+public class WritersToReadersNode_c extends PolicyNode_c implements WritersToReadersNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected LabelComponentNode component;
 
-    public WritersToReadersLabelNode_c(Position pos, LabelComponentNode component) {
+    public WritersToReadersNode_c(Position pos, LabelComponentNode component) {
       this(pos, component, null);
     }
 
-    public WritersToReadersLabelNode_c(Position pos, LabelComponentNode component, Ext ext) {
+    public WritersToReadersNode_c(Position pos, LabelComponentNode component, Ext ext) {
       super(pos, ext);
       this.component = component;
     }
@@ -36,15 +36,15 @@ public class WritersToReadersLabelNode_c extends AmbLabelNode_c implements Write
     }
 
     @Override
-    public WritersToReadersLabelNode component(LabelComponentNode component) {
-      WritersToReadersLabelNode_c n = (WritersToReadersLabelNode_c) copy();
+    public WritersToReadersNode component(LabelComponentNode component) {
+      WritersToReadersNode_c n = (WritersToReadersNode_c) copy();
       n.component = component;
       return n;
     }
 
-    protected WritersToReadersLabelNode_c reconstruct(LabelComponentNode component) {
+    protected WritersToReadersNode_c reconstruct(LabelComponentNode component) {
       if (!this.component.equals(component)) {
-        WritersToReadersLabelNode_c n = (WritersToReadersLabelNode_c) copy();
+        WritersToReadersNode_c n = (WritersToReadersNode_c) copy();
         n.component = component;
         return n;
       }
@@ -68,21 +68,21 @@ public class WritersToReadersLabelNode_c extends AmbLabelNode_c implements Write
       }
 
       if (component instanceof LabelNode) {
-        return nf.CanonicalLabelNode(position(),
-            ts.writersToReadersLabel(position(), ((LabelNode) component).label()));
+        return nf.PolicyNode(position(),
+            ts.writersToReadersPolicy(position(),
+                ((LabelNode) component).label().integProjection()));
       } else if (component instanceof PolicyNode) {
         Policy p = ((PolicyNode) component).policy();
         if (p instanceof IntegPolicy) {
-          return nf.CanonicalLabelNode(position(), ts.writersToReadersLabel(position(),
-                ts.pairLabel(position(), ts.bottomConfPolicy(position()),
-                  ((IntegPolicy) p))));
+          return nf.PolicyNode(position(),
+                  ts.writersToReadersPolicy(position(), (IntegPolicy) p));
         }
       }
 
       // In this case, we're dealing with writers to readers of a
       // confidentiality policy, which doesn't really do anything and becomes
-      // the bottom label.
-      return nf.CanonicalLabelNode(position(), ts.bottomLabel(position()));
+      // the bottom confidentiality.
+      return nf.PolicyNode(position(), ts.bottomIntegPolicy(position()));
     }
 
     @Override

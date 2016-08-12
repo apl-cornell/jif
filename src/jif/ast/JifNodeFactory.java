@@ -42,7 +42,7 @@ public interface JifNodeFactory extends NodeFactory {
     MeetLabelNode MeetLabelNode(Position pos,
             List<LabelComponentNode> components);
 
-    WritersToReadersLabelNode WritersToReadersLabelNode(Position pos,
+    WritersToReadersNode WritersToReadersNode(Position pos,
             LabelComponentNode component);
 
     PolicyNode ReaderPolicyNode(Position pos, PrincipalNode owner,

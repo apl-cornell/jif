@@ -31,12 +31,14 @@ import jif.types.label.Policy;
 import jif.types.label.ReaderPolicy;
 import jif.types.label.VarLabel;
 import jif.types.label.WriterPolicy;
+import jif.types.label.WritersToReadersPolicy;
 import jif.types.principal.ConjunctivePrincipal;
 import jif.types.principal.DisjunctivePrincipal;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.types.principal.VarPrincipal;
 import jif.visit.LabelChecker;
+
 import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -187,6 +189,9 @@ public class LabelTypeCheckUtil {
             WriterPolicy pol = (WriterPolicy) p;
             typeCheckPrincipal(tc, pol.owner());
             typeCheckPrincipal(tc, pol.writer());
+        } else if (p instanceof WritersToReadersPolicy) {
+            WritersToReadersPolicy pol = (WritersToReadersPolicy) p;
+            typeCheckPolicy(tc, pol.integPol());
         } else {
             throw new InternalCompilerError("Unexpected policy " + p);
         }

@@ -3,7 +3,7 @@ package jif.ast;
 /** This class represents a join of several label nodes. It's also a
  *  label node by itself. 
  */
-public interface WritersToReadersLabelNode extends LabelNode {
+public interface WritersToReadersNode extends PolicyNode {
     /**
      * Gets the label component that the writers to readers transformation is
      * being performed on.
@@ -13,5 +13,5 @@ public interface WritersToReadersLabelNode extends LabelNode {
     /**
      * Returns a copy of this object with <code>sublabel</code> updated.
      */
-    WritersToReadersLabelNode component(LabelComponentNode component);
+    WritersToReadersNode component(LabelComponentNode component);
 }

@@ -3,7 +3,7 @@ package jif.ast;
 import jif.types.label.Policy;
 import polyglot.ast.Ext;
 import polyglot.ast.Node_c;
-import polyglot.util.InternalCompilerError;
+//import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -33,8 +33,15 @@ public class PolicyNode_c extends Node_c implements PolicyNode {
 
     public PolicyNode_c(Position pos, PrincipalNode owner, Ext ext) {
         super(pos, ext);
-        if (owner == null) throw new InternalCompilerError("null owner");
+        // I'm pretty sure the owner is never accessed outside of child classes
+        // that set it.  As a result, I'm fairly certain this check is
+        // unnecessary.
+        //if (owner == null) throw new InternalCompilerError("null owner");
         this.owner = owner;
+    }
+
+    public PolicyNode_c(Position pos, Ext ext) {
+        super(pos, ext);
     }
 
     @Override

@@ -16,7 +16,7 @@ public interface JifExtFactory extends ExtFactory, JifStmtExtFactory {
 
     Ext extMeetLabelNode();
 
-    Ext extWritersToReadersLabelNode();
+    Ext extWritersToReadersNode();
 
     Ext extPolicyNode();
 

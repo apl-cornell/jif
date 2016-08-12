@@ -414,10 +414,6 @@ label_component ::=
     |   IDENTIFIER:a
             {: RESULT = parser.nf.AmbVarLabelNode(parser.pos(a),
                                                   parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
-    |    WRITERSTOREADERS:a LPAREN label:l RPAREN:b
-            {: RESULT = parser.nf.WritersToReadersLabelNode(parser.pos(a, b), l); :}
-    |    WRITERSTOREADERS:a LPAREN label_component:l RPAREN:b
-            {: RESULT = parser.nf.WritersToReadersLabelNode(parser.pos(a, b), (LabelComponentNode) l); :}
     ;
 provider ::=
         PROVIDER:a
@@ -445,6 +441,10 @@ label_component_policy ::=
             {: RESULT = parser.nf.ReaderPolicyNode(parser.pos(a, parser.pos(b)==null?arr:b), a, b); :}
     |   principal_disjunctive:a leftarrow:arr principal_list_opt:b
             {: RESULT = parser.nf.WriterPolicyNode(parser.pos(a, parser.pos(b)==null?arr:b), a, b); :}
+    |   WRITERSTOREADERS:a LPAREN label:l RPAREN:b
+            {: RESULT = parser.nf.WritersToReadersNode(parser.pos(a, b), l); :}
+    |   WRITERSTOREADERS:a LPAREN label_component:l RPAREN:b
+            {: RESULT = parser.nf.WritersToReadersNode(parser.pos(a, b), (LabelComponentNode) l); :}
     ;
 
 principal_list_opt ::=

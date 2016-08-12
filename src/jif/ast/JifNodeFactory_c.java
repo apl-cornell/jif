@@ -125,10 +125,10 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     }
 
     @Override
-    public WritersToReadersLabelNode WritersToReadersLabelNode(Position pos,
+    public WritersToReadersNode WritersToReadersNode(Position pos,
             LabelComponentNode component) {
-        WritersToReadersLabelNode n = new WritersToReadersLabelNode_c(pos, component);
-        n = ext(n, jifExtFactory().extWritersToReadersLabelNode());
+        WritersToReadersNode n = new WritersToReadersNode_c(pos, component);
+        n = ext(n, jifExtFactory().extWritersToReadersNode());
         n = del(n, delFactory().delNode());
         return n;
     }
