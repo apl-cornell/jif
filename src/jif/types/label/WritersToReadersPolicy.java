@@ -52,7 +52,13 @@ public class WritersToReadersPolicy extends Policy_c implements ConfPolicy {
             return env.leq(other.integPol(), integPol(), state);
         }
 
-        // Not sure we can do more?
+        ConfPolicy simplified = simplifyIntegToConf(integPol);
+
+        if (!(simplified instanceof WritersToReadersPolicy)) {
+            return env.leq(simplified, p, state);
+        }
+
+        // Not sure what to do...
         return false;
     }
 
@@ -117,6 +123,18 @@ public class WritersToReadersPolicy extends Policy_c implements ConfPolicy {
             return (ConfPolicy) ts.joinConfPolicy(mp.position(), newPols).simplify();
         }
         return new WritersToReadersPolicy(pol, ts, pol.position());
+    }
+
+    public ConfPolicy transformRight(LabelEnv env) {
+      PairLabel pl = typeSystem().pairLabel(position(), typeSystem().bottomConfPolicy(position()), integPol);
+      WritersToReadersLabel_c conversion = new WritersToReadersLabel_c(pl, typeSystem(), position());
+      return conversion.transformRight(env).confProjection();
+    }
+
+    public ConfPolicy transformLeft(LabelEnv env) {
+      PairLabel pl = typeSystem().pairLabel(position(), typeSystem().bottomConfPolicy(position()), integPol);
+      WritersToReadersLabel_c conversion = new WritersToReadersLabel_c(pl, typeSystem(), position());
+      return conversion.transformLeft(env).confProjection();
     }
 
     @Override

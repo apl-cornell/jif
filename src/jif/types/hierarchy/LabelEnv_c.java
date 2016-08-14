@@ -35,13 +35,16 @@ import jif.types.label.Label;
 import jif.types.label.MeetLabel;
 import jif.types.label.MeetPolicy_c;
 import jif.types.label.PairLabel;
+import jif.types.label.PairLabel_c;
 import jif.types.label.ParamLabel;
 import jif.types.label.Policy;
 import jif.types.label.VarLabel_c;
 import jif.types.label.WriterPolicy;
 import jif.types.label.WritersToReadersLabel;
+import jif.types.label.WritersToReadersPolicy;
 import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
+
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
@@ -1180,6 +1183,15 @@ public class LabelEnv_c implements LabelEnv {
                 if (L instanceof WritersToReadersLabel) {
                     return ((WritersToReadersLabel) L)
                             .transformRight(LabelEnv_c.this);
+                } else if (L instanceof PairLabel_c) {
+                    PairLabel_c pl = (PairLabel_c) L;
+                    if (pl.confPolicy() instanceof WritersToReadersPolicy) {
+                        WritersToReadersPolicy w2r = (WritersToReadersPolicy) pl.confPolicy();
+                        JifTypeSystem ts = pl.typeSystem();
+                        return ts.pairLabel(pl.position(),
+                            w2r.transformRight(LabelEnv_c.this),
+                            pl.integPolicy());
+                    }
                 }
                 return L;
             }
@@ -1209,6 +1221,15 @@ public class LabelEnv_c implements LabelEnv {
                 if (L instanceof WritersToReadersLabel) {
                     return ((WritersToReadersLabel) L)
                             .transformLeft(LabelEnv_c.this);
+                } else if (L instanceof PairLabel_c) {
+                    PairLabel_c pl = (PairLabel_c) L;
+                    if (pl.confPolicy() instanceof WritersToReadersPolicy) {
+                        WritersToReadersPolicy w2r = (WritersToReadersPolicy) pl.confPolicy();
+                        JifTypeSystem ts = pl.typeSystem();
+                        return ts.pairLabel(pl.position(),
+                            w2r.transformLeft(LabelEnv_c.this),
+                            pl.integPolicy());
+                    }
                 }
                 return L;
             }
