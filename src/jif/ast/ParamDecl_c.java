@@ -15,6 +15,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeBuilder;
@@ -29,8 +30,15 @@ public class ParamDecl_c extends Node_c implements ParamDecl {
     ParamInstance.Kind kind;
     TypeNode upperBound;
 
-    public ParamDecl_c(Position pos, ParamInstance.Kind kind, Id name, Ext ext) {
+    public ParamDecl_c(Position pos, ParamInstance.Kind kind, Id name,
+            Ext ext) {
         this(pos, kind, name, ext, null);
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        TypeNode upperBound = visitChild(this.upperBound, v);
+        return upperBound(upperBound);
     }
 
     public ParamDecl_c(Position pos, ParamInstance.Kind kind, Id name, Ext ext,
@@ -115,19 +123,11 @@ public class ParamDecl_c extends Node_c implements ParamDecl {
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (upperBound != null) {
-            String name =
-                    upperBound instanceof InstTypeNode ? ((InstTypeNode) upperBound)
-                            .base().name() : upperBound.name();
-                            TypeNode ub =
-                                    ar.nodeFactory().CanonicalTypeNode(upperBound.position(),
-                                            ar.typeSystem().typeForName(name));
-                            upperBound = ub;
-                            if (pi.type() instanceof UninstTypeParam) {
-                                UninstTypeParam utp = (UninstTypeParam) pi.type();
-                                pi.setType(utp.upperBound(ub.type().toReference()));
-                            }
-                            return upperBound(ub).paramInstance(pi);
+        if (upperBound != null && upperBound.isDisambiguated()) {
+            if (pi.type() instanceof UninstTypeParam) {
+                UninstTypeParam utp = (UninstTypeParam) pi.type();
+                pi.setType(utp.upperBound(upperBound.type().toReference()));
+            }
         }
         return this;
     }

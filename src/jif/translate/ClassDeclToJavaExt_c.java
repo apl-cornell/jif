@@ -260,8 +260,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             }
             List<TypeNode> bounds = new ArrayList<TypeNode>();
             if (pd.upperBound() != null) {
-                bounds.add(nf.AmbTypeNode(pd.position(),
-                        nf.Id(pd.position(), pd.upperBound().name())));
+                bounds.add(
+                        rw.typeToJava(pd.upperBound().type(), pd.position()));
             }
             params.add(nf.ParamTypeNode(pd.position(),
                     nf.Id(pd.position(), pd.name()), bounds));
