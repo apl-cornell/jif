@@ -1,0 +1,42 @@
+package pkg;
+
+import jif.util.generics.Collection;
+import jif.util.generics.Equality;
+import jif.util.generics.Hasher;
+import jif.util.generics.LinkedListSet;
+import jif.util.generics.Set;
+import jif.util.generics.Stringify;
+
+class TypingBug01[principal p] {
+  private Set[{p←},test]{p←} set;
+
+  TypingBug01{p←}() {
+    set = new LinkedListSet[{p←}, test, testE, testS, testH](
+        single testE(), single testS(), single testH());
+  }
+
+  void m{p←}(test{p←} t) throws (Exception{p←}) {
+    set.add(t);
+  }
+}
+
+class test {
+}
+
+object testE implements Equality[test] {
+  public boolean{t1;t2} equals(test t1, test t2) {
+    return true;
+  }
+}
+
+object testS implements Stringify[test] {
+  public String{t} toString(test t) {
+    return null;
+  }
+}
+
+object testH implements Hasher[test] {
+  public int{t} hash(test t) {
+    return 0;
+  }
+}
