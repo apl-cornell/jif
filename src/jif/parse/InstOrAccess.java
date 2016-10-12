@@ -6,7 +6,6 @@ import java.util.List;
 
 import jif.ast.AmbNewArray;
 import jif.ast.ParamNode;
-import jif.ast.TypeParamNode;
 import polyglot.ast.Expr;
 import polyglot.ast.Labeled;
 import polyglot.ast.NewArray;
@@ -30,7 +29,8 @@ public class InstOrAccess extends Amb {
         this.prefix = prefix;
         this.param = param;
 
-        if (!(param instanceof Name || param instanceof Expr || param instanceof TypeNode)) {
+        if (!(param instanceof Name || param instanceof Expr
+                || param instanceof TypeNode)) {
             parser.die(pos);
         }
 
@@ -48,17 +48,8 @@ public class InstOrAccess extends Amb {
 
     @Override
     public TypeNode toType() throws Exception {
-        LinkedList<ParamNode> l = new LinkedList<ParamNode>();
-        if (param instanceof Name) {
-            l.add(parser.nf.AmbParam(((Name) param).pos,
-                    ((Name) param).toIdentifier()));
-        } else if (param instanceof TypeParamNode) {
-            TypeParamNode tn = (TypeParamNode) param;
-            l.add(tn);
-        } else {
-            l.add(parser.nf.AmbParam(((Expr) param).position(), (Expr) param,
-                    null));
-        }
+        List<ParamNode> l =
+                parser.toParamList(Collections.singletonList(param));
         return parser.nf.InstTypeNode(pos, prefix.toUnlabeledType(), l);
     }
 

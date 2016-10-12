@@ -140,8 +140,8 @@ parser Grm extends polyglot.parse.Grm {:
         return exprToUninstType(e);
     }
 
-    public List toParamList(java.util.List l) throws Exception {
-        List params = new LinkedList<ParamNode>();
+    public List<ParamNode> toParamList(java.util.List l) throws Exception {
+        List<ParamNode> params = new LinkedList<ParamNode>();
 
         for (Iterator i = l.iterator(); i.hasNext(); ) {
             Object n = i.next();
@@ -149,9 +149,14 @@ parser Grm extends polyglot.parse.Grm {:
             if (n instanceof Name) {
                 params.add(nf.AmbParam(((Name) n).pos,
                                 ((Name) n).toIdentifier()));
+                // FIXME n's prefix is lost
+            }
+            else if (n instanceof InstOrAccess) {
+                InstOrAccess ioa = (InstOrAccess) n;
+                params.add(nf.TypeParamNode(ioa.position(), ioa.toType()));
             }
             else if (n instanceof ParamNode) {
-                params.add(n);
+                params.add((ParamNode) n);
             }
             else if (n instanceof Expr) {
                 params.add(nf.AmbParam(((Expr) n).position(),
@@ -309,7 +314,7 @@ non terminal PolicyNode label_component_policy;
 non terminal PrincipalNode principal, principal_conjunctive, principal_disjunctive, principal_base;
 non terminal Expr accesspath;
 non terminal Receiver accesspath_receiver;
-non terminal Expr accesspath_no_id;
+non terminal Expr accesspath_no_id, accesspath_start_with_this;
 non terminal List principal_list, principal_list_opt;
 
 non terminal List parameters_opt, parameters;
@@ -479,7 +484,7 @@ principal_conjunctive ::=
     ;
 principal_base ::=
                     // PrincipalNode
-        accesspath_no_id:a
+       accesspath_no_id:a
             {: RESULT = parser.nf.AmbPrincipalNode(parser.pos(a), a); :}
     |  MULT:a // top principal
             {: RESULT = parser.nf.CanonicalPrincipalNode(parser.pos(a), parser.ts.topPrincipal(parser.pos(a))); :}
@@ -543,6 +548,13 @@ accesspath_no_id ::=
              {:  RESULT = parser.nf.This(parser.pos(a));  :}
     |   accesspath_receiver:a DOT IDENTIFIER:b
              {: RESULT = parser.nf.Field(parser.pos(a, b), a, b.getIdentifier()); :};
+
+accesspath_start_with_this ::=
+        THIS:a
+             {:  RESULT = parser.nf.This(parser.pos(a));  :}
+    |   accesspath_start_with_this:a DOT IDENTIFIER:b
+             {: RESULT = parser.nf.Field(parser.pos(a, b), a, b.getIdentifier()); :}
+    ;
 
 // 19.4) Types, Values, and Variables
 
@@ -1222,13 +1234,14 @@ param_or_expr_list ::=
                l.add(parser.nf.TypeParamNode(parser.pos(a), a));
                RESULT = l;
             :}
+    // FIXME cases missing; head of list can have more varieties
     |   param_or_expr_list:a COMMA primitive_type:b
             {: a.add(parser.nf.TypeParamNode(parser.pos(b), b)); RESULT = a; :}
-    |   param_or_expr_list:a COMMA simple_name:b
+    |   param_or_expr_list:a COMMA reftype_or_expr:b
             {: a.add(b); RESULT = a; :}
     |   param_or_expr_list:a COMMA label:b
             {: a.add(b); RESULT = a; :}
-    |   param_or_expr_list:a COMMA accesspath_no_id:b
+    |   param_or_expr_list:a COMMA accesspath_start_with_this:b
             {:  a.add(b); RESULT = a;  :}
     ;
 
