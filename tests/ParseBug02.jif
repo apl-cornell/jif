@@ -1,0 +1,4 @@
+
+public class ParseBug02[type T] {
+	ParseBug02[ParseBug02[int]] x;
+}
