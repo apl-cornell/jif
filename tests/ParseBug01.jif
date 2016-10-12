@@ -1,0 +1,5 @@
+import jif.util.generics.Collection;
+
+class ParseBug01[principal p] {
+  private Collection[{p←}, ParseBug01[p]]{p←} list;
+}
