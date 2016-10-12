@@ -3,5 +3,5 @@ package java.lang;
 public class Math {
     private static int __JIF_SIG_OF_JAVA_CLASS$20030619 = 0;
 
-    public static native double{a} floor(double a);
+    public static native double floor(double a);
 }
