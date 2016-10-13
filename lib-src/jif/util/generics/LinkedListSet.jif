@@ -13,6 +13,38 @@ public class LinkedListSet[label L, type T, type E extends Equality[T],
         list = new LinkedList[L, T, E, S, H](equality, stringify, hasher);
         super(equality, stringify, hasher);
     }
+
+    public LinkedListSet{L}(Collection[L,T]{L} c, E{L} equality, S{L} stringify,
+            H{L} hasher) throws (NullPointerException{L},
+                ClassCastException{L}, IllegalArgumentException{L}) {
+        // XXX Work around impreciseness in compiler's reasoning about field
+        // XXX initialization.
+        //this(equality, stringify, hasher);
+        list = new LinkedList[L, T, E, S, H](equality, stringify, hasher);
+        super(equality, stringify, hasher);
+
+        if (c instanceof LinkedListSet[L,T,E,S,H]) {
+          // XXX Work around type-checking bug.
+          //list.addAll(((LinkedListSet[L,T,E,S,H]) c).list);
+          ((Collection[L,T]) list).addAll(((LinkedListSet[L,T,E,S,H]) c).list);
+        } else {
+          addAll(c);
+        }
+    }
+
+// XXX These trigger compiler bugs.
+//    public LinkedListSet{L}(AbstractCollection[L,T,E,S]{L} c, H{L} hasher)
+//            throws (NullPointerException{L}, ClassCastException{L},
+//                IllegalArgumentException{L}) {
+//        this(c, c.equality, c.stringify, hasher);
+//    }
+//
+//    public LinkedListSet{L}(AbstractSet[L,T,E,S,H]{L} set)
+//            throws (NullPointerException{L}, ClassCastException{L},
+//                IllegalArgumentException{L}) {
+//        this(set, set.hasher);
+//    }
+
     public int{L} size() {
         try {
             return list.size();
