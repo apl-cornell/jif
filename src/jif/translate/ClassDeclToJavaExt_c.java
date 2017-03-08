@@ -88,6 +88,12 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
     @Override
     public Node toJava(JifToJavaRewriter rw) throws SemanticException {
+        Node result = toJavaImpl(rw);
+        rw.leavingClass();
+        return result;
+    }
+
+    protected Node toJavaImpl(JifToJavaRewriter rw) throws SemanticException {
         JifClassDecl n = (JifClassDecl) node();
         JifPolyType jpt = (JifPolyType) n.type();
 
@@ -161,7 +167,6 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             }
         }
 
-        rw.leavingClass();
         return rw.java_nf().ClassDecl(n.position(), n.flags(), n.id(),
                 n.superClass(), n.interfaces(), cb, n.javadoc());
     }
@@ -207,7 +212,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
      */
     protected ClassBody addInterfaceParamGetters(ClassBody cb,
             JifPolyType baseClass, JifPolyType jpt, JifToJavaRewriter rw)
-                    throws SemanticException {
+            throws SemanticException {
         // go through the interfaces of cb
         if (!rw.jif_ts().isParamsRuntimeRep(jpt)) {
             // don't bother adding interface methods for classes that don't represent the runtime params (i.e., Jif sig classes)
@@ -429,12 +434,15 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             JifContext A = (JifContext) rw.context();
             JifToJavaRewriter rwCons =
                     (JifToJavaRewriter) rw.context(A.pushConstructorCall());
+            Expr thisQualifier = rw.qq().parseExpr("this");
             for (ParamInstance pi : superjpt.params()) {
                 Param param = ((JifSubst) superjst.subst()).get(pi);
                 if (pi.isLabel()) {
-                    superArgs.add(((Label) param).toJava(rwCons));
+                    superArgs
+                            .add(((Label) param).toJava(rwCons, thisQualifier));
                 } else {
-                    superArgs.add(((Principal) param).toJava(rwCons));
+                    superArgs.add(
+                            ((Principal) param).toJava(rwCons, thisQualifier));
                 }
             }
         }

@@ -12,11 +12,11 @@ import java.util.Set;
 import jif.translate.LabelToJavaExpr;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
-import jif.types.JifTypeSystem_c;
 import jif.types.LabelSubstitution;
 import jif.types.PathMap;
 import jif.types.hierarchy.LabelEnv;
 import jif.visit.LabelChecker;
+
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
@@ -279,8 +279,7 @@ public class JoinLabel_c extends Label_c implements JoinLabel {
             return needed.iterator().next();
         }
 
-        return new JoinLabel_c(needed, (JifTypeSystem) ts, position(),
-                ((JifTypeSystem_c) ts).joinLabelTranslator());
+        return jts.joinLabel(position(), needed);
     }
 
     private static Set<Label> flatten(Set<Label> comps) {
@@ -403,10 +402,20 @@ public class JoinLabel_c extends Label_c implements JoinLabel {
         A = (JifContext) A.pushBlock();
 
         for (Label c : components) {
-            A.setPc(X.N(), lc);
+            updateContextForComp(lc, A, X);
             PathMap Xc = c.labelCheck(A, lc);
             X = X.join(Xc);
         }
         return X;
+    }
+
+    /**
+     * Utility method for updating the context for checking a join component.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForComp(LabelChecker lc, JifContext A,
+            PathMap Xprev) {
+        A.setPc(Xprev.N(), lc);
     }
 }

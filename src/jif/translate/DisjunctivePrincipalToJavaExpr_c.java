@@ -11,13 +11,13 @@ public class DisjunctivePrincipalToJavaExpr_c extends PrincipalToJavaExpr_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public Expr toJava(Principal principal, JifToJavaRewriter rw)
-            throws SemanticException {
+    public Expr toJava(Principal principal, JifToJavaRewriter rw,
+            Expr thisQualifier) throws SemanticException {
         JifTypeSystem ts = rw.jif_ts();
         Expr e = null;
         DisjunctivePrincipal dp = (DisjunctivePrincipal) principal;
         for (Principal p : dp.disjuncts()) {
-            Expr pe = rw.principalToJava(p);
+            Expr pe = rw.principalToJava(p, thisQualifier);
             if (e == null) {
                 e = pe;
             } else {

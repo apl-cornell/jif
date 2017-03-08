@@ -49,9 +49,17 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
                 .bypass(n.constraints());
     }
 
+    @Override
+    public final Node toJava(JifToJavaRewriter rw) throws SemanticException {
+        // Shouldn't be called, since we are overriding
+        // toJava(JifToJavaRewriter, NodeVisitor).
+        throw new InternalCompilerError("Shouldn't be called.");
+    }
+
     /** Rewrite constructor C(a) to method C C$(a) */
     @Override
-    public Node toJava(JifToJavaRewriter rw) throws SemanticException {
+    public Node toJava(JifToJavaRewriter rw, NodeVisitor childVisitor)
+            throws SemanticException {
         ConstructorDecl n = (ConstructorDecl) node();
 
         ClassType ct = ci.container().toClass();
@@ -83,7 +91,8 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
                         n.formals(), n.throwTypes(), n.body(), n.javadoc());
             }
         } else {
-            retVal = jifClassConstructorDecl(rw, n);
+            retVal = jifClassConstructorDecl(rw,
+                    (JifToJavaRewriter) childVisitor, n);
         }
 
         rw.inConstructor(false);
@@ -91,7 +100,7 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
     }
 
     private Node jifClassConstructorDecl(JifToJavaRewriter rw,
-            ConstructorDecl n) {
+            JifToJavaRewriter childRw, ConstructorDecl n) {
         NodeFactory nf = rw.java_nf();
         ConstructorInstance ci = n.constructorInstance();
         ClassType ct = ci.container().toClass();
@@ -99,9 +108,14 @@ public class ConstructorDeclToJavaExt_c extends ToJavaExt_c {
         Block body = n.body();
         List<Stmt> inits = new ArrayList<Stmt>(3);
 
-        // add a call to the initializer.
-        inits.add(rw.qq().parseStmt("this."
-                + ClassDeclToJavaExt_c.INITIALIZATIONS_METHOD_NAME + "();"));
+        // add a call to the initializer. But to avoid calling the initializer
+        // multiple times, we only call the initializer if there is NOT a this()
+        // call in the constructor.
+        if (!childRw.haveThisCall()) {
+            inits.add(rw.qq().parseStmt(
+                    "this." + ClassDeclToJavaExt_c.INITIALIZATIONS_METHOD_NAME
+                            + "();"));
+        }
 
         if (body.statements().isEmpty() || (body.statements().size() == 1
                 && body.statements().get(0) instanceof Empty)) {

@@ -16,21 +16,31 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public Expr toJava(Label label, JifToJavaRewriter rw)
+    public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier)
             throws SemanticException {
-        if (label instanceof ParamLabel) {
-            return toJava(((ParamLabel) label).paramInstance(), rw);
-        }
-        return toJava(((CovariantParamLabel) label).paramInstance(), rw);
+        return toJava(label, rw, thisQualifier, true);
     }
 
     @Override
-    public Expr toJava(Principal principal, JifToJavaRewriter rw)
-            throws SemanticException {
-        return toJava(((ParamPrincipal) principal).paramInstance(), rw);
+    public Expr toJava(Label label, JifToJavaRewriter rw, Expr thisQualifier,
+            boolean simplify) throws SemanticException {
+        if (label instanceof ParamLabel) {
+            return toJava(((ParamLabel) label).paramInstance(), rw,
+                    thisQualifier);
+        }
+        return toJava(((CovariantParamLabel) label).paramInstance(), rw,
+                thisQualifier);
     }
 
-    public Expr toJava(ParamInstance pi, JifToJavaRewriter rw) {
+    @Override
+    public Expr toJava(Principal principal, JifToJavaRewriter rw,
+            Expr thisQualifier) throws SemanticException {
+        return toJava(((ParamPrincipal) principal).paramInstance(), rw,
+                thisQualifier);
+    }
+
+    public Expr toJava(ParamInstance pi, JifToJavaRewriter rw,
+            Expr thisQualifier) {
         if (rw.jif_ts().isSignature(pi.container())) {
             // the parameter to be translated is in the code
             // of a non-Jif class (which does have runtime representation
@@ -53,7 +63,8 @@ public class ParamToJavaExpr_c implements LabelToJavaExpr, PrincipalToJavaExpr {
             // fields available to us. Hence the "!rw.inConstructor()")
             return rw.qq().parseExpr(paramArgName(pi));
         } else {
-            return rw.qq().parseExpr("this." + paramFieldName(pi));
+            return rw.qq().parseExpr("%E.%s", thisQualifier,
+                    paramFieldName(pi));
         }
     }
 

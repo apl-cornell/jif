@@ -56,7 +56,7 @@ public class JifArrayAccessExt extends JifExprExt {
         PathMap Xa = getPathMap(array);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xa.N(), lc);
+        updateContextForIndex(lc, A, Xa);
 
         Expr index = (Expr) lc.context(A).labelCheck(aie.index());
         PathMap Xb = getPathMap(index);
@@ -84,6 +84,15 @@ public class JifArrayAccessExt extends JifExprExt {
 
         checkThrowTypes(throwTypes);
         return updatePathMap(aie.index(index).array(array), X);
+    }
+
+    /**
+     * Utility method for updating the context for checking the index
+     * expression.
+     */
+    protected void updateContextForIndex(LabelChecker lc, JifContext A,
+            PathMap Xarr) {
+        A.setPc(Xarr.N(), lc);
     }
 
     private Type arrayType(Expr array, JifTypeSystem ts) {

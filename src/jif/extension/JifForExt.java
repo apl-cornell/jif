@@ -12,6 +12,7 @@ import jif.types.NamedLabel;
 import jif.types.PathMap;
 import jif.types.label.Label;
 import jif.visit.LabelChecker;
+
 import polyglot.ast.Branch;
 import polyglot.ast.Expr;
 import polyglot.ast.For;
@@ -37,34 +38,25 @@ public class JifForExt extends JifStmtExt_c {
     public Node labelCheckStmt(LabelChecker lc) throws SemanticException {
         For fs = (For) node();
 
-        JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
         A = (JifContext) fs.del().enterScope(A);
 
-        Label notTaken = ts.notTaken();
-
         A = (JifContext) A.pushBlock();
 
-        // INIT: A.pushBlock();
+        List<ForInit> inits = new LinkedList<>();
+        PathMap Xinit = checkInits(lc, A, fs, inits);
 
-        PathMap Xinit = ts.pathMap().N(A.pc());
+        return checkLoop(lc, A, fs, inits, Xinit);
+    }
 
-        List<ForInit> inits = new LinkedList<ForInit>();
+    /**
+     * Utility for easier overriding of loop checking.
+     */
+    public Node checkLoop(LabelChecker lc, JifContext A, For fs,
+        List<ForInit> inits, PathMap Xinit) throws SemanticException {
 
-        for (ForInit init : fs.inits()) {
-            init = (ForInit) lc.context(A).labelCheck(init);
-            inits.add(init);
-
-            PathMap Xs = getPathMap(init);
-
-            // At this point, the environment A should have been extended
-            // to include any declarations of s.  We push a new scope
-            // on the stack so that we can set the PC.
-
-            A.setPc(Xs.N(), lc);
-
-            Xinit = Xinit.N(notTaken).join(Xs);
-        }
+        JifTypeSystem ts = lc.jifTypeSystem();
+        Label notTaken = ts.notTaken();
 
         // Now handle the loop body, condition, and iterators.
         Label L1 = ts.freshLabelVariable(fs.position(), "for",
@@ -90,12 +82,12 @@ public class JifForExt extends JifStmtExt_c {
         }
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.NV(), lc);
+        updateContextForBody(lc, A, Xe);
         Stmt body = (Stmt) lc.context(A).labelCheck(fs.body());
         PathMap Xbody = getPathMap(body);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xbody.N(), lc);
+        updateContextForNextIter(lc, A, Xbody);
 
         List<ForUpdate> iters = new LinkedList<ForUpdate>();
 
@@ -105,10 +97,7 @@ public class JifForExt extends JifStmtExt_c {
 
             PathMap Xs = getPathMap(update);
 
-            // At this point, the environment A should have been extended
-            // to include any declarations of s.  Reset the PC label.
-
-            A.setPc(Xs.N(), lc);
+            updateContextForNextIter(lc, A, Xs);
 
             Xbody = Xbody.N(notTaken).join(Xs);
         }
@@ -160,5 +149,67 @@ public class JifForExt extends JifStmtExt_c {
 
         return updatePathMap(fs.iters(iters).cond(cond).inits(inits).body(body),
                 X);
+    }
+
+    /**
+     * Splitting out checking of inits and checking of the loop to make it
+     * easier to extend.
+     */
+    protected PathMap checkInits(LabelChecker lc, JifContext A, For fs,
+        List<ForInit> newInits) throws SemanticException {
+
+        JifTypeSystem ts = lc.jifTypeSystem();
+        PathMap Xinit = ts.pathMap().N(A.pc());
+        Label notTaken = ts.notTaken();
+
+        for (ForInit init : fs.inits()) {
+            init = (ForInit) lc.context(A).labelCheck(init);
+            newInits.add(init);
+
+            PathMap Xs = getPathMap(init);
+
+            updateContextForNextInit(lc, A, Xs);
+
+            Xinit = Xinit.N(notTaken).join(Xs);
+        }
+
+        return Xinit;
+    }
+
+    /**
+     * Utility method for updating the context for checking the next init
+     * statement in the for loop.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextForNextInit(LabelChecker lc, JifContext A,
+        PathMap Xprev) {
+        // At this point, the environment A should have been extended
+        // to include any declarations of s.  Reset the PC label.
+        A.setPc(Xprev.N(), lc);
+    }
+
+    /**
+     * Utility method for updating the context for checking the body in the for
+     * loop.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextForBody(LabelChecker lc, JifContext A,
+        PathMap Xcond) {
+        A.setPc(Xcond.NV(), lc);
+    }
+
+    /**
+     * Utility method for updating the context for checking the next iter
+     * statement in the for loop.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextForNextIter(LabelChecker lc, JifContext A,
+        PathMap Xprev) {
+        // At this point, the environment A should have been extended
+        // to include any declarations of s.  Reset the PC label.
+        A.setPc(Xprev.N(), lc);
     }
 }

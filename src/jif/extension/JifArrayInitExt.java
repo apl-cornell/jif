@@ -52,12 +52,21 @@ public class JifArrayInitExt extends JifExprExt {
             PathMap Xe = getPathMap(e);
             X = X.N(ts.notTaken()).join(Xe);
 
-            A.setPc(X.N(), lc);
+            updateContextForNextElem(lc, A, X);
         }
 
         A = (JifContext) A.pop();
 
         return updatePathMap(init.elements(l), X);
+    }
+
+    /**
+     * Utility method for updating the context for checking the next element
+     * expression.
+     */
+    protected void updateContextForNextElem(LabelChecker lc, JifContext A,
+            PathMap Xelem) {
+        A.setPc(Xelem.N(), lc);
     }
 
     public void labelCheckElements(LabelChecker lc, Type lhsType)

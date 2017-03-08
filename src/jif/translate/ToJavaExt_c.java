@@ -15,6 +15,11 @@ public abstract class ToJavaExt_c extends Ext_c implements ToJavaExt {
         return rw;
     }
 
-    @Override
     public abstract Node toJava(JifToJavaRewriter rw) throws SemanticException;
+
+    @Override
+    public Node toJava(JifToJavaRewriter rw, NodeVisitor childVisitor)
+            throws SemanticException {
+        return toJava(rw);
+    }
 }

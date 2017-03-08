@@ -3,7 +3,6 @@ package jif.types.label;
 import java.util.Collections;
 import java.util.Set;
 
-import jif.translate.ParamToJavaExpr_c;
 import jif.types.JifClassType;
 import jif.types.JifContext;
 import jif.types.JifTypeSystem;
@@ -26,7 +25,7 @@ public class CovariantParamLabel_c extends Label_c
 
     public CovariantParamLabel_c(ParamInstance paramInstance, JifTypeSystem ts,
             Position pos) {
-        super(ts, pos, new ParamToJavaExpr_c());
+        super(ts, pos, ts.paramLabelTranslator());
         this.paramInstance = paramInstance;
         String className = null;
         if (paramInstance != null && paramInstance.container() != null) {

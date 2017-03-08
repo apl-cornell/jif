@@ -13,7 +13,7 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 
 /**
- * This class is the common super class for integrity polices and 
+ * This class is the common super class for integrity polices and
  * confidentiality policies.
  */
 public interface Policy extends TypeObject {
@@ -38,6 +38,11 @@ public interface Policy extends TypeObject {
 
     Policy simplify();
 
+    /**
+     * @param printedLabels
+     *        the set of labels for which auxiliary information should be
+     *        omitted.
+     */
     String toString(Set<Label> printedLabels);
 
     PathMap labelCheck(JifContext A, LabelChecker lc);

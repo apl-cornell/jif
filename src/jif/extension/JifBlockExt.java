@@ -53,9 +53,7 @@ public class JifBlockExt extends JifStmtExt_c {
 
             PathMap Xs = getPathMap(s);
 
-            // At this point, the environment A should have been extended
-            // to include any declarations of s.  Reset the PC label.
-            A.setPc(Xs.N(), lc);
+            updateContextForNextStmt(lc, A, Xs);
 
             if (Report.should_report(jif.Topics.pc, 1)) {
                 Report.report(1, "pc after statement at " + s.position() + " : "
@@ -68,5 +66,18 @@ public class JifBlockExt extends JifStmtExt_c {
         A = (JifContext) A.pop();
 
         return updatePathMap(bs.statements(l), Xblock);
+    }
+
+    /**
+     * Utility method for updating the context for checking the next statement
+     * in the block.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextForNextStmt(LabelChecker lc, JifContext A,
+        PathMap Xprev) {
+        // At this point, the environment A should have been extended
+        // to include any declarations of s.  Reset the PC label.
+        A.setPc(Xprev.N(), lc);
     }
 }

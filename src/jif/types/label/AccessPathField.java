@@ -62,7 +62,7 @@ public class AccessPathField extends AccessPath {
     }
 
     @Override
-    public AccessPath subst(AccessPathRoot r, AccessPath e) {
+    public AccessPathField subst(AccessPathRoot r, AccessPath e) {
         AccessPath newPath = path.subst(r, e);
         if (newPath == path) return this;
 
@@ -90,6 +90,10 @@ public class AccessPathField extends AccessPath {
 
     public FieldInstance fieldInstance() {
         return this.fi;
+    }
+
+    public String fieldName() {
+        return this.fieldName;
     }
 
     public AccessPathField fieldInstance(FieldInstance fi) {

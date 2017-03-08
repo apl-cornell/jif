@@ -44,8 +44,9 @@ public abstract class Principal_c extends Param_c implements Principal {
     }
 
     @Override
-    public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
-        return toJava.toJava(this, rw);
+    public Expr toJava(JifToJavaRewriter rw, Expr thisQualifier)
+            throws SemanticException {
+        return toJava.toJava(this, rw, thisQualifier);
     }
 
     @Override

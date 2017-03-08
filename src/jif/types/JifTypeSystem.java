@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import jif.extension.LabelTypeCheckUtil;
+import jif.translate.LabelToJavaExpr;
 import jif.translate.PrincipalToJavaExpr;
 import jif.types.hierarchy.LabelEnv;
 import jif.types.label.AccessPath;
@@ -389,7 +390,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
      * java.lang.Error, java.lang.Exception, java.lang.IllegalArgumentException,
      * java.lang.IllegalStateException, java.lang.IndexOutOfBoundsException,
      * java.lang.RuntimeException or java.lang.SecurityException.
-    
+
      *
      * @param t Type to check
      * @return null if ct has no untrusted non-Jif ancestor, and the
@@ -454,6 +455,16 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
      * @return class for translating disjunctive principals to java expressions
      */
     PrincipalToJavaExpr disjunctivePrincipalTranslator();
+
+    /**
+     * @return object for translating label parameters to Java expressions
+     */
+    LabelToJavaExpr paramLabelTranslator();
+
+    /**
+     * @return object for translating principal parameters to Java expressions
+     */
+    PrincipalToJavaExpr paramPrincipalTranslator();
 
     ClassType fatalException();
 

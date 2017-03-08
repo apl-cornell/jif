@@ -7,6 +7,10 @@ import polyglot.ast.Expr;
 import polyglot.types.SemanticException;
 
 public interface PrincipalToJavaExpr extends Serializable {
-    public Expr toJava(Principal principal, JifToJavaRewriter rw)
-            throws SemanticException;
+    /**
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
+     */
+    public Expr toJava(Principal principal, JifToJavaRewriter rw,
+            Expr thisQualifier) throws SemanticException;
 }

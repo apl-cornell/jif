@@ -71,6 +71,21 @@ public class JifToJavaRewriter extends ContextVisitor {
         this.newSourceFiles = new LinkedList<SourceFile>();
         this.initializations = new ArrayList<Stmt>();
         this.staticInitializations = new ArrayList<Block>();
+        this.haveThisCall = new Cell<>();
+    }
+
+    @Override
+    public JifToJavaRewriter copy() {
+        JifToJavaRewriter rw = (JifToJavaRewriter) super.copy();
+
+        // If we're in a constructor, the copy will share the same haveThisCall
+        // value as the original to ensure this information doesn't get lost
+        // when we pop back up. Otherwise, if we are not in a constructor, we
+        // make a copy of the haveThisCall value.
+        if (!inConstructor) {
+            rw.haveThisCall = new Cell<>(haveThisCall.value);
+        }
+        return rw;
     }
 
     @Override
@@ -138,7 +153,7 @@ public class JifToJavaRewriter extends ContextVisitor {
         try {
             JifExt ext = JifUtil.jifExt(n);
 
-            Node m = ext.toJava().toJava(this);
+            Node m = ext.toJava().toJava(this, v);
             if (m.del() instanceof JifExt)
                 throw new InternalCompilerError(m + " is still a Jif node.");
             return m;
@@ -157,21 +172,70 @@ public class JifToJavaRewriter extends ContextVisitor {
     }
 
     public Expr paramToJava(Param param) throws SemanticException {
+        return paramToJava(param, qq().parseExpr("this"));
+    }
+
+    /**
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
+     */
+    public Expr paramToJava(Param param, Expr thisQualifier)
+            throws SemanticException {
         if (param instanceof Label) {
-            return labelToJava((Label) param);
+            return labelToJava((Label) param, thisQualifier);
         }
         if (param instanceof Principal) {
-            return principalToJava((Principal) param);
+            return principalToJava((Principal) param, thisQualifier);
         }
         throw new InternalCompilerError("Unexpected param " + param);
     }
 
     public Expr labelToJava(Label label) throws SemanticException {
-        return label.toJava(this);
+        return labelToJava(label, qq().parseExpr("this"));
+    }
+
+    /**
+     * @param simplify
+     *          whether to attempt to simplify the label when it's constructed
+     *          at run time.
+     */
+    public Expr labelToJava(Label label, boolean simplify)
+            throws SemanticException {
+        return labelToJava(label, qq().parseExpr("this"), simplify);
+    }
+
+    /**
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
+     */
+    public Expr labelToJava(Label label, Expr thisQualifier)
+            throws SemanticException {
+        return labelToJava(label, thisQualifier, true);
+    }
+
+    /**
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
+     * @param simplify
+     *          whether to attempt to simplify the label when it's constructed
+     *          at run time.
+     */
+    public Expr labelToJava(Label label, Expr thisQualifier, boolean simplify)
+            throws SemanticException {
+        return label.toJava(this, thisQualifier, simplify);
     }
 
     public Expr principalToJava(Principal principal) throws SemanticException {
-        return principal.toJava(this);
+        return principalToJava(principal, qq().parseExpr("this"));
+    }
+
+    /**
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
+     */
+    public Expr principalToJava(Principal principal, Expr thisQualifier)
+            throws SemanticException {
+        return principal.toJava(this, thisQualifier);
     }
 
     public TypeNode typeToJava(Type t, Position pos) throws SemanticException {
@@ -221,6 +285,12 @@ public class JifToJavaRewriter extends ContextVisitor {
     private ClassType currentClass;
     private boolean inConstructor;
 
+    /**
+     * When we're in a constructor, this will (eventually) be populated with a
+     * boolean indicating whether the constructor calls {@code this(...)}.
+     */
+    private Cell<Boolean> haveThisCall;
+
     public ClassType currentClass() {
         return this.currentClass;
     }
@@ -238,7 +308,7 @@ public class JifToJavaRewriter extends ContextVisitor {
     }
 
     /**
-     * @throws SemanticException  
+     * @throws SemanticException
      */
     public void addInitializer(FieldInstance fi, Expr init)
             throws SemanticException {
@@ -274,10 +344,9 @@ public class JifToJavaRewriter extends ContextVisitor {
             if (cd.flags().isPublic()) {
                 try {
                     // cd is public, we will put it in its own source file.
-                    SourceFile sf =
-                            java_nf().SourceFile(Position.compilerGenerated(),
-                                    n.package_(), Collections
-                                            .<Import> emptyList(),
+                    SourceFile sf = java_nf().SourceFile(
+                            Position.compilerGenerated(), n.package_(),
+                            Collections.<Import> emptyList(),
                             Collections.singletonList((TopLevelDecl) cd));
 
                     Location location = java_ext.getOptions().source_output;
@@ -310,6 +379,15 @@ public class JifToJavaRewriter extends ContextVisitor {
 
     public void inConstructor(boolean flag) {
         this.inConstructor = flag;
+        this.haveThisCall.value = flag ? false : null;
+    }
+
+    public Boolean haveThisCall() {
+        return haveThisCall.value;
+    }
+
+    public void haveThisCall(boolean value) {
+        this.haveThisCall.value = value;
     }
 
     /**
@@ -319,4 +397,16 @@ public class JifToJavaRewriter extends ContextVisitor {
         return jif_ts().LabelUtilClassName() + ".singleton()";
     }
 
+    /** A ref cell. */
+    private static class Cell<T> {
+        T value;
+
+        Cell() {
+            this(null);
+        }
+
+        Cell(T value) {
+            this.value = value;
+        }
+    }
 }

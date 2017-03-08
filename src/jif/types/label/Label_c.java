@@ -97,8 +97,15 @@ public abstract class Label_c extends Param_c implements Label {
     }
 
     @Override
-    public Expr toJava(JifToJavaRewriter rw) throws SemanticException {
-        return toJava.toJava(this, rw);
+    public Expr toJava(JifToJavaRewriter rw, Expr thisQualifier)
+            throws SemanticException {
+        return toJava(rw, thisQualifier, true);
+    }
+
+    @Override
+    public Expr toJava(JifToJavaRewriter rw, Expr thisQualifier,
+            boolean simplify) throws SemanticException {
+        return toJava.toJava(this, rw, thisQualifier, simplify);
     }
 
     //

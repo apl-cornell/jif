@@ -57,7 +57,7 @@ public class JifFieldAssignExt extends JifAssignExt {
 
         // check rhs
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.N(), lc);
+        updateContextForRHS(lc, A, Xe);
 
         Expr rhs = (Expr) lc.context(A).labelCheck(assign.right());
         PathMap Xr = rhsPathMap(lc.context(A), rhs, throwTypes);
@@ -223,6 +223,16 @@ public class JifFieldAssignExt extends JifAssignExt {
 
         checkThrowTypes(throwTypes);
         return updatePathMap(assign.right(rhs).left(lhs), X);
+    }
+
+    /**
+     * Utility method for updating the context for checking the RHS.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForRHS(LabelChecker lc, JifContext A,
+            PathMap Xleft) {
+        A.setPc(Xleft.N(), lc);
     }
 
     protected PathMap rhsPathMap(LabelChecker lc, Expr rhs,

@@ -15,10 +15,11 @@ public class ActsForConstraintToJavaExpr_c
     @Override
     public <Actor extends ActsForParam, Granter extends ActsForParam> Expr toJava(
             ActsForConstraint<Actor, Granter> actsFor, JifToJavaRewriter rw)
-                    throws SemanticException {
+            throws SemanticException {
         JifTypeSystem ts = rw.jif_ts();
-        Expr actor = actsFor.actor().toJava(rw);
-        Expr granter = actsFor.granter().toJava(rw);
+        Expr thisQualifier = rw.qq().parseExpr("this");
+        Expr actor = actsFor.actor().toJava(rw, thisQualifier);
+        Expr granter = actsFor.granter().toJava(rw, thisQualifier);
 
         String className;
         if (actsFor.actor() instanceof Label) {

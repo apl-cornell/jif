@@ -58,7 +58,7 @@ public class JifConstructorCallExt extends JifStmtExt_c {
         CallHelper helper = lc.createCallHelper(jct.thisLabel(), ct, ci,
                 ccs.arguments(), node().position());
 
-        helper.checkCall(lc.context(A), throwTypes, false);
+        ccs = helper.checkCall(lc.context(A), throwTypes, ccs, false);
 
         checkThrowTypes(throwTypes);
         return updatePathMap(ccs.arguments(helper.labelCheckedArgs()),

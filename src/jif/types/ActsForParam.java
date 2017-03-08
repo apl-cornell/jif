@@ -10,7 +10,12 @@ import polyglot.types.SemanticException;
 public interface ActsForParam extends Param {
     ActsForParam subst(LabelSubstitution labelSubst) throws SemanticException;
 
-    Expr toJava(JifToJavaRewriter rw) throws SemanticException;
+    /**
+     * @param thisQualifier
+     *          an Expr representing the translated "this" reference.
+     */
+    Expr toJava(JifToJavaRewriter rw, Expr thisQualifier)
+            throws SemanticException;
 
     ActsForParam simplify();
 }

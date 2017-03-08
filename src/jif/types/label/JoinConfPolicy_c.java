@@ -22,7 +22,8 @@ public class JoinConfPolicy_c extends JoinPolicy_c<ConfPolicy>
     @Override
     protected Policy constructJoinPolicy(Set<ConfPolicy> components,
             Position pos) {
-        return new JoinConfPolicy_c(components, (JifTypeSystem) ts, pos);
+        JifTypeSystem jts = (JifTypeSystem) ts;
+        return jts.joinConfPolicy(pos, components);
     }
 
     @Override

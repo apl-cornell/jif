@@ -43,7 +43,7 @@ public class JifIfExt extends JifStmtExt_c {
         PathMap Xe = getPathMap(e);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xe.NV(), lc);
+        updateContextForConsequent(lc, A, Xe);
 
         // extend the context with any label tests or actsfor tests
         extendContext(lc, A, e, false);
@@ -58,7 +58,7 @@ public class JifIfExt extends JifStmtExt_c {
 
         if (is.alternative() != null) {
             A = (JifContext) A.pushBlock();
-            A.setPc(Xe.NV(), lc);
+            updateContextForConsequent(lc, A, Xe);
 
             S2 = (Stmt) lc.context(A).labelCheck(is.alternative());
 
@@ -192,5 +192,16 @@ public class JifIfExt extends JifStmtExt_c {
                 A.addAssertionLE(lhs, rhs);
             }
         }
+    }
+
+    /**
+     * Utility method for updating the context for checking the
+     * consequent/alternative.
+     *
+     * Useful for overriding in projects like Fabric.
+     */
+    protected void updateContextForConsequent(LabelChecker lc, JifContext A,
+            PathMap Xcond) {
+        A.setPc(Xcond.NV(), lc);
     }
 }

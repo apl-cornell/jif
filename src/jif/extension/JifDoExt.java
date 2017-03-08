@@ -52,7 +52,7 @@ public class JifDoExt extends JifStmtExt_c {
         PathMap Xs = getPathMap(s);
 
         A = (JifContext) A.pushBlock();
-        A.setPc(Xs.N(), lc);
+        updateContextForGuard(lc, A, Xs);
 
         Expr e = (Expr) lc.context(A).labelCheck(ds.cond());
         PathMap Xe = getPathMap(e);
@@ -98,5 +98,15 @@ public class JifDoExt extends JifStmtExt_c {
         X = X.N(lc.upperBound(X.N(), L2));
 
         return updatePathMap(ds.cond(e).body(s), X);
+    }
+
+    /**
+     * Utility method for updating the context for checking the test.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextForGuard(LabelChecker lc, JifContext A,
+        PathMap Xbod) {
+        A.setPc(Xbod.N(), lc);
     }
 }

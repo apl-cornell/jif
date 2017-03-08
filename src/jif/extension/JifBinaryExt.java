@@ -47,12 +47,12 @@ public class JifBinaryExt extends JifExprExt {
             // if it's a short circuit evaluation, then
             // whether the right is executed or not depends on the _value_
             // of the left sub-expression.
-            A.setPc(Xl.NV(), lc);
+            updateContextForRShort(lc, A, Xl);
         } else {
             // non-short circuit operator, the right sub-expression
             // will always be evaluated, provided the left sub-expression
             // terminated normally.
-            A.setPc(Xl.N(), lc);
+            updateContextForR(lc, A, Xl);
         }
 
         Expr right = (Expr) lc.context(A).labelCheck(be.right());
@@ -69,5 +69,23 @@ public class JifBinaryExt extends JifExprExt {
 
         checkThrowTypes(throwTypes);
         return updatePathMap(be.left(left).right(right), X);
+    }
+
+    /**
+     * Utility method for updating the context for checking the right expression
+     * for a short circuiting operator.
+     */
+    protected void updateContextForRShort(LabelChecker lc, JifContext A,
+            PathMap Xleft) {
+        A.setPc(Xleft.NV(), lc);
+    }
+
+    /**
+     * Utility method for updating the context for checking the right expression
+     * for a non-short circuiting operator.
+     */
+    protected void updateContextForR(LabelChecker lc, JifContext A,
+            PathMap Xleft) {
+        A.setPc(Xleft.N(), lc);
     }
 }

@@ -20,6 +20,7 @@ import jif.types.principal.DynamicPrincipal;
 import jif.types.principal.Principal;
 import jif.visit.JifTypeChecker;
 import jif.visit.LabelChecker;
+
 import polyglot.ast.Expr;
 import polyglot.ast.New;
 import polyglot.ast.Node;
@@ -46,6 +47,12 @@ public class JifNewExt extends JifExprExt {
     }
 
     protected ConstructorChecker constructorChecker = new ConstructorChecker();
+
+    /**
+     * Squirreling this away here because we need to reuse it in the extended
+     * Fabric Checking.
+     */
+    protected CallHelper helper;
 
     @Override
     public New node() {
@@ -151,14 +158,14 @@ public class JifNewExt extends JifExprExt {
             PathMap Xs = getPathMap(e);
             if (Xs == null)
                 throw new InternalCompilerError("No entry for " + e);
-            A.setPc(Xs.N(), lc);
+            updateContextPostTarget(lc, A, Xs);
 
             if (!(e instanceof Special)) {
                 // TODO: a NPE may be thrown depending on the qualifier.
                 //       for now, assume the qualifier may be null.
                 npExc = (!((JifNewDel) node().del()).qualIsNeverNull());
                 newLabel = Xs.NV();
-                A.setPc(Xs.NV(), lc);
+                updateContextPostTargetExpr(lc, A, Xs);
             } else {
                 newLabel = ((JifClassType) lc.context().currentClass())
                         .thisLabel();
@@ -179,17 +186,41 @@ public class JifNewExt extends JifExprExt {
                     A.labelEnv(), noe.position());
         }
 
-        CallHelper helper = lc.createCallHelper(newLabel, noe, ct,
+        helper = lc.createCallHelper(newLabel, noe, ct,
                 (JifProcedureInstance) noe.constructorInstance(),
                 noe.arguments(), node().position());
         LabelChecker callLC = lc.context(A);
-        helper.checkCall(callLC, throwTypes, npExc);
+        noe = helper.checkCall(callLC, throwTypes, noe, npExc);
 
         PathMap retX = helper.X();
         PathMap X = retX.NV(lc.upperBound(retX.NV(), newLabel));
 
         checkThrowTypes(throwTypes);
         return updatePathMap(noe.arguments(helper.labelCheckedArgs()), X);
+    }
+
+    /**
+     * Utility method for updating the context after checking the target.
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextPostTarget(LabelChecker lc, JifContext A,
+        PathMap Xtarg) {
+        // At this point, the environment A should have been extended
+        // to include any declarations of s.  Reset the PC label.
+        A.setPc(Xtarg.N(), lc);
+    }
+
+    /**
+     * Utility method for updating the context after checking the target and it
+     * is an expression (not a Special node).
+     *
+     * Useful for overriding in projects like fabric.
+     */
+    protected void updateContextPostTargetExpr(LabelChecker lc, JifContext A,
+        PathMap Xtarg) {
+        // a NPE may be thrown depending on the target.
+        A.setPc(Xtarg.NV(), lc);
     }
 
 }

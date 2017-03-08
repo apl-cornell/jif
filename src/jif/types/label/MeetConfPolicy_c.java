@@ -22,7 +22,8 @@ public class MeetConfPolicy_c extends MeetPolicy_c<ConfPolicy>
     @Override
     protected Policy constructMeetPolicy(Set<ConfPolicy> components,
             Position pos) {
-        return new MeetConfPolicy_c(components, (JifTypeSystem) ts, pos);
+        JifTypeSystem jts = (JifTypeSystem) ts;
+        return jts.meetConfPolicy(pos, components);
     }
 
     @Override

@@ -108,10 +108,10 @@ public class JifOptions extends Options {
         flags.add(new Switch(new String[] { "-explain", "-e" },
                 "provide more detailed "
                         + "explanations of failed label checking"));
-        flags.add(new Switch("-nonrobust", "skip robustness checks."));
+        flags.add(new Switch("-nonrobust", "skip robustness checks.", false));
         flags.add(new Switch("-fail-on-exception",
                 "re-throw uncaught and undeclared runtime exceptions as fatal errors."));
-        flags.add(new Switch("-robust", "force robustness checks"));
+        flags.add(new Switch("-robust", "force robustness checks", true, true));
         flags.add(new PathFlag<File>("-sigcp", "<path>",
                 "path for Jif signatures (e.g. for java.lang.Object)") {
             @Override
@@ -156,7 +156,7 @@ public class JifOptions extends Options {
         } else if (arg.flag().ids().contains("-skip-label-checks")) {
             skipLabelChecking = (Boolean) arg.value();
         } else if (arg.flag().ids().contains("-nonrobust")) {
-            nonRobustness = (Boolean) arg.value();
+            nonRobustness = !(Boolean) arg.value();
         } else if (arg.flag().ids().contains("-fail-on-exception")) {
             fatalExceptions = (Boolean) arg.value();
         } else if (arg.flag().ids().contains("-robust")) {

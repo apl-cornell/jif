@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Jif
 Bundle-SymbolicName: jif
-Bundle-Version: 3.4.2
+Bundle-Version: 3.5.0
 Bundle-Vendor: Jif project group
-Fragment-Host: polyglot;bundle-version="[2.7.0,2.8.0)"
+Require-Bundle: polyglot;bundle-version="[2.7.1,2.8.0)"
 Export-Package: jif,
  jif.ast,
  jif.bin,
@@ -20,3 +20,4 @@ Export-Package: jif,
  jif.types.principal,
  jif.visit
 Eclipse-BundleShape: dir
+Eclipse-RegisterBuddy: polyglot

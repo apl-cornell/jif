@@ -1,0 +1,19 @@
+public class Incompleteness02 {
+  public static void main{⊤←}(String[] args) {
+    final label A = new label{Alice→};
+    final label B = new label{Bob→};
+    final label C = new label{Chuck→};
+    final label D = new label{Dolores→};
+    int{{*A ⊓ *B} ⊔ {*C ⊓ *D}} x  = 0;
+
+    final label AjoinC = new label{{*A} ⊔ {*C}};
+    final label AjoinD = new label{{*A} ⊔ {*D}};
+    final label BjoinC = new label{{*B} ⊔ {*C}};
+    final label BjoinD = new label{{*B} ⊔ {*D}};
+    int{*AjoinC ⊓ *AjoinD ⊓ *BjoinC ⊓ *BjoinD} y = 0;
+
+    // Both should work, since {x} and {y} are equivalent.
+    y = x;
+    x = y;
+  }
+}

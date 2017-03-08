@@ -30,6 +30,7 @@ import jif.translate.LabelLeAssertionToJavaExpr_c;
 import jif.translate.LabelToJavaExpr;
 import jif.translate.MeetLabelToJavaExpr_c;
 import jif.translate.PairLabelToJavaExpr_c;
+import jif.translate.ParamToJavaExpr_c;
 import jif.translate.PrincipalToJavaExpr;
 import jif.translate.ProviderLabelToJavaExpr_c;
 import jif.types.hierarchy.LabelEnv;
@@ -927,6 +928,16 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         return new DisjunctivePrincipalToJavaExpr_c();
     }
 
+    @Override
+    public LabelToJavaExpr paramLabelTranslator() {
+        return new ParamToJavaExpr_c();
+    }
+
+    @Override
+    public PrincipalToJavaExpr paramPrincipalTranslator() {
+        return new ParamToJavaExpr_c();
+    }
+
     private Collection<Principal> flattenConjuncts(Collection<Principal> ps) {
         Set<Principal> newps = new LinkedHashSet<Principal>();
         for (Principal p : ps) {
@@ -987,7 +998,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public Label topLabel() {
-        if (top == null) top = topLabel(null);
+        if (top == null) top = topLabel(Position.COMPILER_GENERATED);
         return top;
     }
 
@@ -998,7 +1009,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public Label bottomLabel() {
-        if (bottom == null) bottom = bottomLabel(null);
+        if (bottom == null) bottom = bottomLabel(Position.COMPILER_GENERATED);
         return bottom;
     }
 
@@ -1019,7 +1030,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     @Override
     public Label noComponentsLabel() {
         if (noComponents == null) {
-            noComponents = noComponentsLabel(null);
+            noComponents = noComponentsLabel(Position.COMPILER_GENERATED);
         }
         return noComponents;
     }
@@ -1037,7 +1048,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public Label notTaken() {
-        if (notTaken == null) notTaken = notTaken(null);
+        if (notTaken == null) notTaken = notTaken(Position.COMPILER_GENERATED);
         return notTaken;
     }
 
@@ -1763,14 +1774,14 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                 //}
                 AccessPath prefix =
                         exprToAccessPath((Expr) f.target(), null, context);
-                return new AccessPathField(prefix, f.fieldInstance(), f.name(),
+                return accessPathField(prefix, f.fieldInstance(), f.name(),
                         f.position());
             } else if (target instanceof TypeNode
                     && ((TypeNode) target).type().isClass()) {
                 AccessPath prefix = new AccessPathClass(
                         ((TypeNode) target).type().toClass(),
                         target.position());
-                return new AccessPathField(prefix, f.fieldInstance(), f.name(),
+                return accessPathField(prefix, f.fieldInstance(), f.name(),
                         f.position());
             } else {
                 throw new InternalCompilerError(
@@ -1924,7 +1935,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                         && isFinalAccessExprOrConst(((DowngradeExpr) e).expr()))
                 || (e instanceof NullLit && expectedType != null
                         && isImplicitCastValid(expectedType, Principal()))
-                        /*|| (e instanceof Special && ((Special)e).kind() == Special.SUPER)*/;
+        /*|| (e instanceof Special && ((Special)e).kind() == Special.SUPER)*/;
     }
 
     @Override
@@ -1973,8 +1984,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         for (FieldInstance fieldInstance : ct.fields()) {
             JifFieldInstance jfi = (JifFieldInstance) fieldInstance;
             if (jfi.flags().isFinal()) {
-                AccessPathField path2 = new AccessPathField(path, jfi,
-                        jfi.name(), jfi.position());
+                AccessPathField path2 =
+                        accessPathField(path, jfi, jfi.name(), jfi.position());
                 // if it is static and is the end of a final access path and has an initializer
                 // TODO Could use isFinalAccessExprOrConst instead of restricting to isStatic and hasInitializer
                 Param init2 = jfi.initializer();
@@ -2043,7 +2054,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             } else {
                 root = new AccessPathThis(fi.container().toClass(), pos);
             }
-            return new AccessPathField(root, fi, name, pos);
+            return accessPathField(root, fi, name, pos);
         }
         throw new InternalCompilerError(
                 "Unexpected var instance " + vi.getClass());
@@ -2069,4 +2080,11 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         return isParamsRuntimeRep(jpt);
     }
 
+    /**
+     * Factory method for constructing AccessPathField objects.
+     */
+    protected AccessPathField accessPathField(AccessPath path, FieldInstance fi,
+            String fieldName, Position pos) {
+        return new AccessPathField(path, fi, fieldName, pos);
+    }
 }
